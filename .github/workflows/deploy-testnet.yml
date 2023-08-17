@@ -1,0 +1,55 @@
+name: Deploy to v4.testnet.dydx.exchange
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up pnpm
+        uses: dydxprotocol/setup-pnpm@v1
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: https://registry.npmjs.org/
+          cache: pnpm
+
+      - name: Install dependencies
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          pnpm install --loglevel warn
+
+      - name: Build
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+          AMPLITUDE_API_KEY: ${{ secrets.AMPLITUDE_API_KEY }}
+          BUGSNAG_API_KEY: ${{ secrets.BUGSNAG_API_KEY }}
+          STATUS_PAGE_SCRIPT_URI: ${{ secrets.STATUS_PAGE_SCRIPT_URI }}
+        run: |
+          pnpm run build
+          pnpm run build:inject-amplitude
+          pnpm run build:inject-bugsnag
+          pnpm run build:inject-statuspage
+
+      - name: Upload to IPFS via web3.storage
+        uses: dydxprotocol/add-to-web3@v1
+        id: web3storage
+        with:
+          web3_token: ${{ secrets.WEB3_STORAGE_TOKEN }}
+          path_to_add: 'dist'
+
+      - name: Update IPNS record via web3name
+        id: web3name
+        env:
+          WEB3NAME_SIGNING_KEY: ${{ secrets.WEB3NAME_SIGNING_KEY }}
+        run: |
+          echo $WEB3NAME_SIGNING_KEY | base64 -d > .web3name.key
+          pnpm run deploy:update-ipns --cid=${{ steps.web3storage.outputs.cid }} --key=.web3name.key

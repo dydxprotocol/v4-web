@@ -1,0 +1,5 @@
+w3m-modal {
+  isolation: isolate;
+  position: relative;
+  z-index: 2;
+}

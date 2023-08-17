@@ -1,0 +1,73 @@
+{
+  "GENERAL": {
+    "SOMETHING_WENT_WRONG_WITH_MESSAGE": "問題が発生しました：{ERROR_MESSAGE} ",
+    "SOMETHING_WENT_WRONG": "問題が発生しました。後ほどやり直してください。",
+    "TIMESTAMP_DISCREPANCY": "セキュリティ上の理由により、アカウント認証の際にタイムスタンプを検証します。システムクロックが正しく同期されていることを確認し、アプリを更新してください。"
+  },
+  "TRADE_BOX": {
+    "AMOUNT_INPUT_STEP_SIZE": "注文金額は{STEP_SIZE}の因数でなければなりません。",
+    "BRACKET_ORDER_FAILED_TO_PLACE": "ブラケット注文のうち、1つ以上の注文が失敗しました。\n\n[オーダー]タブをチェックして、アクティブなテイクプロフィットとストップロスのオーダーを確認してください。",
+    "BRACKET_ORDER_STOP_LOSS_ABOVE_EXPECTED_PRICE": "ストップロスのトリガー価格は、成行注文の予想価格${EXPECTED_PRICE}を上回っている必要があります。",
+    "BRACKET_ORDER_STOP_LOSS_ABOVE_LIQUIDATION_PRICE": "ストップロスのトリガー価格が清算価格に近すぎます。このストップロス注文は清算前に完全に執行されない可能性があります。${TRIGGER_PRICE_LIMIT}を上回るトリガー価格を入力してください。",
+    "BRACKET_ORDER_STOP_LOSS_BELOW_EXPECTED_PRICE": "ストップロスのトリガー価格は、成行注文の予想価格${EXPECTED_PRICE}を下回っている必要があります。",
+    "BRACKET_ORDER_STOP_LOSS_BELOW_LIQUIDATION_PRICE": "ストップロスのトリガー価格が清算価格に近すぎます。このストップロス注文は清算前に完全に執行されない可能性があります。${TRIGGER_PRICE_LIMIT}を下回るトリガー価格を入力してください。",
+    "BRACKET_ORDER_TAKE_PROFIT_ABOVE_EXPECTED_PRICE": "利益確定注文のトリガー価格は、成行注文の予想価格${EXPECTED_PRICE}を上回っている必要があります。",
+    "BRACKET_ORDER_TAKE_PROFIT_ABOVE_LIQUIDATION_PRICE": "利益確定注文のトリガー価格が清算価格に近すぎます。この利益確定注文は清算前に完全に執行されない可能性があります。${TRIGGER_PRICE_LIMIT}を上回るトリガー価格を入力してください。",
+    "BRACKET_ORDER_TAKE_PROFIT_BELOW_EXPECTED_PRICE": "利益確定注文のトリガー価格は、成行注文の予想価格${EXPECTED_PRICE}を下回っている必要があります。",
+    "BRACKET_ORDER_TAKE_PROFIT_BELOW_LIQUIDATION_PRICE": "利益確定注文のトリガー価格が清算価格に近すぎます。この利益確定注文は清算前に完全に執行されない可能性があります。${TRIGGER_PRICE_LIMIT}を下回るトリガー価格を入力してください。",
+    "BUY_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE": "トリガー価格が清算価格に近すぎます。この注文は清算前に完全に執行されない可能性があります。${TRIGGER_PRICE_LIMIT}を下回るトリガー価格を入力するか、指値注文のストップオーダーを使用してください。",
+    "INVALID_LARGE_POSITION_LEVERAGE": "この取引の結果、ポジションにおけるレバレッジが無効になる可能性があります。リスクを限定するため、 なポジションの最大レバレッジは引き下げられています。",
+    "INVALID_NEW_ACCOUNT_MARGIN_USAGE": "この取引の結果、お客様の口座の証拠金使用率が100%を超えてしまう可能性があります。",
+    "INVALID_NEW_POSITION_LEVERAGE": "この取引の結果、ポジションにおけるレバレッジが無効になる可能性があります。",
+    "LIMIT_MUST_ABOVE_TRIGGER_PRICE": "この注文のトリガー価格を満たすには、指値がトリガー価格を上回っている必要があります。指値の調整または実行方法の変更を行ってください。",
+    "LIMIT_MUST_BELOW_TRIGGER_PRICE": "この注文のトリガー価格を満たすには、指値がトリガー価格を下回っている必要があります。指値の調整または実行方法の変更を行ってください。",
+    "LIMITED_ORDERS_FOR_PAIR": "このペアは通貨ごとの注文額に上限があります。",
+    "MARKET_ORDER_ERROR_INDEX_PRICE_SLIPPAGE": "この成行注文により、現在の流動性の下でインデックス価格に{SLIPPAGE}のスリッページが発生します。引き続きこの注文を行いたい場合は、指値注文を使用してください。",
+    "MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE": "この成行注文により、現在の流動性の下でオーダーブック価格に{SLIPPAGE}の影響が生じます。引き続きこの注文を行いたい場合は、指値注文を使用してください。",
+    "MARKET_ORDER_NOT_ENOUGH_LIQUIDITY": "この成行注文を執行するための十分な流動性がありません。注文金額を少なくしてみてください。",
+    "MARKET_ORDER_PRICE_IMPACT_AT_MAX_LEVERAGE": "この注文はゼロではない影響を及ぼし、お客様のポジションが最大レバレッジを超えてしまう可能性があります。取引額を引き下げてお試しください。",
+    "NEW_POSITION_SIZE_OVER_MAX": "この取引の結果、ポジションサイズが{MAX_SIZE} {SYMBOL}の最大サイズを超えてしまう可能性があります。",
+    "NO_EQUITY_DEPOSIT_FIRST": "発注前に資金を入金しなければなりません。",
+    "ORDER_BELOW_COLLATERALIZATION": "この注文により、口座はこのマーケットの担保率のしきい値を下回る可能性があります。取引額を引き下げてお試しください。",
+    "ORDER_CROSSES_OWN_ORDER": "この注文は、保有する1つ以上の既存注文を執行できます。競合する注文をキャンセルするか、注文金額を調整してください。",
+    "ORDER_SIZE_BELOW_MIN_SIZE": "注文サイズが、{MIN_SIZE} {SYMBOL}の最小注文サイズを下回っています",
+    "ORDER_WITH_CURRENT_ORDERS_INVALID": "お客様の現在のオープンオーダーを考慮すると、この注文により、お客様のポジションのレバレッジが無効になる可能性があります。この注文より先に執行される注文の一部または全部をクローズするか、注文のサイズを減らしてください。",
+    "ORDER_WOULD_FLIP_POSITION": "この注文により、ポジションがフリップまたは増加するでしょう。リデュースオンリーのチェックを解除するか、または注文サイズを縮小してください。",
+    "SELL_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE": "トリガー価格が清算価格に近すぎます。この注文は清算前に完全に執行されない可能性があります。${TRIGGER_PRICE_LIMIT}を上回るトリガー価格を入力するか、指値注文のストップオーダーを使用してください。",
+    "TAKER_FEE_INVALID": "手数料レートが変更された可能性があります。アプリを更新し、もう一度お試しください。",
+    "TRIGGER_MUST_ABOVE_INDEX_PRICE": "トリガー価格が現在のインデックス価格である{INDEX_PRICE}を上回っている必要があります。",
+    "TRIGGER_MUST_BELOW_INDEX_PRICE": "トリガー価格が現在のインデックス価格である{INDEX_PRICE}を下回っている必要があります。",
+    "TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE": "トリガー価格が清算価格に近すぎます。この注文は清算前に完全に執行されない可能性があります。トリガー価格を更新するか、または指値注文のストップオーダーを使用してください。",
+    "USER_MAX_ORDERS": "この注文を行うと、各マーケット、各サイドのオープンオーダーの上限である20件を超過します。",
+    "WOULD_NOT_REDUCE": "注文が約定された場合、ポジションが減少することはありません。",
+    "WOULD_NOT_REDUCE_UNCHECK": "この注文ではポジションが減少することはありません。注文を出す場合、リデュースオンリーのチェックを外してください。"
+  },
+  "ONBOARDING": {
+    "BANNED_USER": "あなたは、当社の利用条件に抵触する国や地域の居住者であるか、そうした国や地域で取引しているものとみなされています。そのため、当該プロトコル内での資金の移動、高速出金による当該プロトコルからの資金の引き上げ、および市場でのポジションの減額以外の注文に関して恒久的にブロックされています。プロトコルからいつでも資金を引き出すことができます。",
+    "INVALID_EMAIL": "有効なメールアドレスを入力してください。",
+    "INVALID_USERNAME": "ユーザー名はアルファベットで始まり、合計24文字未満であるほか、アルファベット、数字、アンダーバーのみで構成されなければなりません",
+    "KEY_RECOVERY_FAILED": "キーのリカバリーに失敗しました。「レガシー署名」を有効にしてもう一度お試しください。",
+    "LEDGER_U2F_REQUIRED": "台帳を接続するにはU2Fブラウザーに対応していなければなりません。現在お使いのブラウザーがこの機能に対応していることを確認してください。",
+    "USERNAME_TAKEN": "このユーザー名はすでに使用されています。",
+    "WALLET_NO_TRANSACTIONS": "このウォレットには資金や過去のトランザクションがありません。ウォレットに資金を入金してオンボーディングを続けてください。"
+  },
+  "DEPOSIT_MODAL": {
+    "DEPOSIT_ACCOUNT_OUT_OF_SYNC": "アカウントが同期されていません。ウォレットを再接続し、もう一度お試しください。",
+    "DEPOSIT_MORE_THAN_BALANCE": "ウォレットの利用可能残高を超えて入金することはできません。",
+    "DEPOSIT_WRONG_NETWORK_PRODUCTION": "ウォレットネットワークが正しくありません。「Ethereum Mainnet」に設定されていることを確認してください。",
+    "DEPOSIT_WRONG_NETWORK_STAGING": "ウォレットネットワークが正しくありません。「Goerli Test Network」に設定されていることを確認してください。"
+  },
+  "WITHDRAW_MODAL": {
+    "FAST_WITHDRAW_NOT_ENOUGH_LIQUIDITY": "この高速出金を処理するのに十分な流動性がありません。取引額を引き下げてお試しください。",
+    "MAX_FAST_WITHDRAW_AMOUNT": "出金額には、{MAX_FAST_WITHDRAW_AMOUNT}未満の金額を入力してください。",
+    "MIN_SLOW_WITHDRAW_AMOUNT": "通常出金額は10以上か、お客様の口座残高全額でなければなりません。",
+    "RESTRICTED_OPEN_POSITIONS_WITHDRAW": "お客様の口座は取引が制限されています。出金前にはすべてのポジションを閉じる必要があります。",
+    "WITHDRAW_MORE_THAN_FREE_DUE_TO_FEE": "担保不要額を超えて出金することはできません。金額入力時には、お客様が高速出金手数料を負担することをお忘れにならないようお願いします。",
+    "WITHDRAW_MORE_THAN_FREE": "担保不要額を超えて出金することはできません。"
+  },
+  "TRANSFER_MODAL": {
+    "TRANSFER_INVALID_ETH_ADDRESS": "このウォレットアドレスに関連付けられている口座が見つかりませんでした。",
+    "TRANSFER_MORE_THAN_FREE": "利用可能担保以上の金額を送金することはできません。",
+    "TRANSFER_TO_YOURSELF": "自分自身のウォレットアドレスへのダイレクト送金はできません。"
+  }
+}

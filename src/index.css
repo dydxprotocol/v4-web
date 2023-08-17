@@ -1,0 +1,99 @@
+@import 'styles/fonts.css';
+@import 'styles/text.css';
+@import 'styles/colors.css';
+@import 'styles/animations.css';
+
+:root {
+  height: 100%;
+  color: var(--color-text-1);
+  background-color: var(--color-layer-2);
+  user-select: none;
+  overflow: hidden;
+}
+
+body,
+#root {
+  display: contents;
+}
+
+#root:empty {
+  display: block;
+  position: fixed;
+  inset: 0;
+  background: url(/grid-loader.svg) no-repeat center / 50px 50px;
+}
+
+* {
+  border: none;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  scrollbar-width: none;
+  transform-style: inherit;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  background: transparent;
+}
+
+button {
+  appearance: none;
+  background: none;
+  cursor: pointer;
+  transition: 0.25s var(--ease-out-expo);
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+[role='button'] {
+  cursor: pointer;
+}
+
+:focus {
+  outline: var(--color-accent) 1px solid;
+  outline-offset: -1px;
+  /* outline-offset: -2px; */
+}
+
+a {
+  text-decoration: inherit;
+}
+
+p a {
+  --link-color: var(--color-accent);
+  font-weight: 500;
+  color: var(--link-color);
+  cursor: pointer;
+}
+
+p a:hover {
+  color: var(--link-color);
+  text-decoration: underline;
+}
+
+a:visited {
+  color: var(--link-color);
+}
+
+pre,
+code,
+samp,
+kbd {
+  font-family: var(--fontFamily-monospace);
+  font-size: 0.925em;
+}
+
+table {
+  border-collapse: separate !important;
+  border-spacing: var(--border-width);
+}
+
+strong,
+b {
+  font-weight: 700;
+}

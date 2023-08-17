@@ -1,0 +1,73 @@
+{
+  "GENERAL": {
+    "SOMETHING_WENT_WRONG_WITH_MESSAGE": "Algo salió mal: {ERROR_MESSAGE}",
+    "SOMETHING_WENT_WRONG": "Algo salió mal. Inténtalo de nuevo más tarde.",
+    "TIMESTAMP_DISCREPANCY": "Para fines de seguridad, verificamos las marcas de tiempo al autenticar tu cuenta. Asegúrate de que el reloj de tu sistema esté sincronizado correctamente y actualiza la aplicación."
+  },
+  "TRADE_BOX": {
+    "AMOUNT_INPUT_STEP_SIZE": "La cantidad del pedido debe ser un factor de {STEP_SIZE}.",
+    "BRACKET_ORDER_FAILED_TO_PLACE": "Una o más de las órdenes en tu orden de rango han fallado. Consulta la pestaña de Órdenes para revisar tus órdenes activas de Toma de ganancia y de Detención de pérdida.",
+    "BRACKET_ORDER_STOP_LOSS_ABOVE_EXPECTED_PRICE": "Tu precio de activación de detención de pérdida debe estar por encima del precio esperado de orden de mercado: ${EXPECTED_PRICE}.",
+    "BRACKET_ORDER_STOP_LOSS_ABOVE_LIQUIDATION_PRICE": "Tu precio de activación está demasiado cerca de tu precio de liquidación; puede que la orden de detención de pérdida no se ejecute completamente antes de que seas liquidado. Ingresa un precio de activación por encima de ${TRIGGER_PRICE_LIMIT}.",
+    "BRACKET_ORDER_STOP_LOSS_BELOW_EXPECTED_PRICE": "Tu precio de activación de detención de pérdida debe ser menor que el precio esperado de orden de mercado: ${EXPECTED_PRICE}.",
+    "BRACKET_ORDER_STOP_LOSS_BELOW_LIQUIDATION_PRICE": "Tu precio de activación está demasiado cerca de tu precio de liquidación; puede que la orden de detención de pérdida no se ejecute completamente antes de que seas liquidado. Ingresa un precio de activación menor que ${TRIGGER_PRICE_LIMIT}.",
+    "BRACKET_ORDER_TAKE_PROFIT_ABOVE_EXPECTED_PRICE": "Tu precio de activación de ganancia debe estar por encima del precio esperado de orden de mercado: ${EXPECTED_PRICE}.",
+    "BRACKET_ORDER_TAKE_PROFIT_ABOVE_LIQUIDATION_PRICE": "Tu precio de detención de ganancia está demasiado cerca de tu precio de liquidación; puede que la orden toma de ganancia no se ejecute completamente antes de que seas liquidado. Ingresa un precio de activación por encima de ${TRIGGER_PRICE_LIMIT}.",
+    "BRACKET_ORDER_TAKE_PROFIT_BELOW_EXPECTED_PRICE": "Tu precio de activación de ganancia debe ser menor que el precio esperado de orden de mercado: ${EXPECTED_PRICE}.",
+    "BRACKET_ORDER_TAKE_PROFIT_BELOW_LIQUIDATION_PRICE": "Tu precio de detención de ganancia está demasiado cerca de tu precio de liquidación; puede que la orden toma de ganancia no se ejecute completamente antes de que seas liquidado. Ingresa un precio de activación menor que ${TRIGGER_PRICE_LIMIT}.",
+    "BUY_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE": "Tu precio de activación está demasiado cerca de tu precio de liquidación; puede que esta orden no se ejecute completamente antes de que seas liquidado. Ingresa un precio de activación por debajo de $ {TRIGGER_PRICE_LIMIT} o utiliza una orden de límite de detención.",
+    "INVALID_LARGE_POSITION_LEVERAGE": "Este trade daría como resultado un apalancamiento no válido en tu posición. Para limitar el riesgo, las posiciones más altas tienen apalancamientos máximos más bajos.",
+    "INVALID_NEW_ACCOUNT_MARGIN_USAGE": "Esta operación daría como resultado un uso de margen superior al 100 % en tu cuenta.",
+    "INVALID_NEW_POSITION_LEVERAGE": "Este trade daría como resultado un apalancamiento no válido en tu posición. ",
+    "LIMIT_MUST_ABOVE_TRIGGER_PRICE": "Tu precio de límite debe ser superior al precio de activación para que esta orden se complete cuando se active. Ajusta tu precio de límite o cambia tu método de ejecución.",
+    "LIMIT_MUST_BELOW_TRIGGER_PRICE": "Tu precio de límite debe estar por debajo del precio de activación para que esta orden se complete cuando se active. Ajusta tu precio de límite o cambia tu método de ejecución.",
+    "LIMITED_ORDERS_FOR_PAIR": "Este par solo permite una cantidad limitada de órdenes por parte.",
+    "MARKET_ORDER_ERROR_INDEX_PRICE_SLIPPAGE": "Esta orden de mercado daría lugar a un deslizamiento del {SLIPPAGE} dada la liquidez actual. Por favor, utilice una orden limit si todavía tiene la intención de colocar esta orden.",
+    "MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE": "Este pedido de mercado daría como resultado el {SLIPPAGE} de impacto en el precio del libro de pedidos dada la liquidez actual. Por favor, utilice una orden limit si todavía tiene la intención de colocar esta orden.",
+    "MARKET_ORDER_NOT_ENOUGH_LIQUIDITY": "No hay suficiente liquidez para completar este pedido de mercado. Intenta con un pedido por un monto menor.",
+    "MARKET_ORDER_PRICE_IMPACT_AT_MAX_LEVERAGE": "Esta orden tiene un impacto de precio no nulo y podría poner su posición por encima del apalancamiento máximo. Intenta con una orden de menor cantidad.",
+    "NEW_POSITION_SIZE_OVER_MAX": "Esta operación podría generar un tamaño de posición superior al tamaño máximo de {MAX_SIZE} {SYMBOL}.",
+    "NO_EQUITY_DEPOSIT_FIRST": "Debes depositar fondos antes de poder hacer pedidos.",
+    "ORDER_BELOW_COLLATERALIZATION": "Esta orden puede poner tu cuenta por debajo del umbral de colateralización de este mercado. Intenta con una cantidad menor.",
+    "ORDER_CROSSES_OWN_ORDER": "Este pedido puede ocupar uno o más de tus propios pedidos existentes. Cancela cualquier pedido conflictivo o ajusta el monto de tu pedido.",
+    "ORDER_SIZE_BELOW_MIN_SIZE": "El tamaño tu pedido está por debajo del tamaño mínimo de {MIN_SIZE} {SYMBOL}",
+    "ORDER_WITH_CURRENT_ORDERS_INVALID": "Dados tus pedidos abiertos actuales, este pedido puede dar como resultado un apalancamiento no válido en tu posición. Por favor, cierre algunas o todas las órdenes que se llenarían antes de este pedido, o reduzca el tamaño de su orden.",
+    "ORDER_WOULD_FLIP_POSITION": "Esta orden cambiará o aumentará tu posición. Desmarca Solo reducir o reduce el tamaño de tu orden.",
+    "SELL_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE": "Tu precio de activación está demasiado cerca de tu precio de liquidación; puede que esta orden no se ejecute completamente antes de que seas liquidado. Ingresa un precio de activación superior a $ {TRIGGER_PRICE_LIMIT} o utiliza una orden de límite de detención.",
+    "TAKER_FEE_INVALID": "Es posible que tus tarifas hayan cambiado. Actualiza la aplicación e inténtalo de nuevo.",
+    "TRIGGER_MUST_ABOVE_INDEX_PRICE": "Tu precio de activación debe estar por encima del índice actual: {INDEX_PRICE}.",
+    "TRIGGER_MUST_BELOW_INDEX_PRICE": "Tu precio de activación debe estar por debajo del índice de precio actual: {INDEX_PRICE}.",
+    "TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE": "Tu precio de activación está demasiado cerca de tu precio de liquidación; puede que esta orden no se ejecute completamente antes de que seas liquidado. Actualiza tu precio de activación o utiliza una orden de límite de detención.",
+    "USER_MAX_ORDERS": "Esta orden te posicionaría por encima del límite máximo de 20 órdenes abiertas por mercado, por parte.",
+    "WOULD_NOT_REDUCE": "Tu posición no se reduciría si la orden se completa.",
+    "WOULD_NOT_REDUCE_UNCHECK": "Con esta orden tu posición no se reduciría. Por favor, desmarca Solo reducir si deseas poner tu orden."
+  },
+  "ONBOARDING": {
+    "BANNED_USER": "Debido a que pareces ser residente o estar haciendo operaciones desde una jurisdicción que infringe nuestras condiciones de uso, has sido bloqueado permanentemente para hacer transferencias dentro del protocolo, hacer retiros rápidos para sacar fondos del protocolo y hacer pedidos diferentes a pedidos de mercado para reducir tus posiciones. Puedes retirar tus fondos del protocolo en cualquier momento.",
+    "INVALID_EMAIL": "Ingresa una dirección de correo electrónico válida.",
+    "INVALID_USERNAME": "Los nombres de usuario deben comenzar con una letra, tener menos de 24 caracteres y contener únicamente letras, números y guiones bajos.",
+    "KEY_RECOVERY_FAILED": "La recuperación de clave falló. Intenta de nuevo habilitando la 'Firma patrimonial'.",
+    "LEDGER_U2F_REQUIRED": "Se requiere compatibilidad con el navegador U2F para las conexiones de Ledger. Asegúrate de que esta función sea compatible con tu navegador actual.",
+    "USERNAME_TAKEN": "Este nombre de usuario ya está en uso.",
+    "WALLET_NO_TRANSACTIONS": "Esta billetera no tiene fondos ni transacciones anteriores. Deposita fondos en tu billetera para continuar con la integración."
+  },
+  "DEPOSIT_MODAL": {
+    "DEPOSIT_ACCOUNT_OUT_OF_SYNC": "Tu cuenta no está sincronizada. Vuelve a vincular tu billetera e inténtalo de nuevo.",
+    "DEPOSIT_MORE_THAN_BALANCE": "No puedes depositar un monto mayor que el saldo disponible en tu billetera.",
+    "DEPOSIT_WRONG_NETWORK_PRODUCTION": "La red de tu billetera no es correcta. Asegúrate de que esté configurada en \"Ethereum Mainnet\".",
+    "DEPOSIT_WRONG_NETWORK_STAGING": "La red de tu billetera no es correcta. Asegúrate de que esté configurada en \"Goerli Test Network\"."
+  },
+  "WITHDRAW_MODAL": {
+    "FAST_WITHDRAW_NOT_ENOUGH_LIQUIDITY": "No hay suficiente liquidez para procesar este retiro rápido. Intenta con una cantidad menor.",
+    "MAX_FAST_WITHDRAW_AMOUNT": "Ingresa un monto de retiro inferior a {MAX_FAST_WITHDRAW_AMOUNT}.",
+    "MIN_SLOW_WITHDRAW_AMOUNT": "El monto del retiro lento debe ser mayor o igual a 10, o el saldo total de tu cuenta.",
+    "RESTRICTED_OPEN_POSITIONS_WITHDRAW": "Tu cuenta está restringida. Debes cerrar todas tus posiciones antes de poder hacer un retiro.",
+    "WITHDRAW_MORE_THAN_FREE_DUE_TO_FEE": "No puedes retirar más que tu garantía gratuita. Asegúrate de tener en cuenta la tasa de retiro rápido al ingresar un monto.",
+    "WITHDRAW_MORE_THAN_FREE": "No puedes retirar más que tu garantía gratuita."
+  },
+  "TRANSFER_MODAL": {
+    "TRANSFER_INVALID_ETH_ADDRESS": "No hemos podido encontrar una cuenta asociada a esta dirección de la billetera.",
+    "TRANSFER_MORE_THAN_FREE": "No puedes transferir más que tu garantía gratuita.",
+    "TRANSFER_TO_YOURSELF": "No puedes realizar una transferencia directa a tu propia dirección de billetera."
+  }
+}

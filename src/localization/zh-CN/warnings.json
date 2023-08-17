@@ -1,0 +1,15 @@
+{
+  "ONBOARDING": {
+    "ALWAYS_VERIFY_URL": "在找回密钥时，始终切记检查并确认您访问的网站是https://trade.dydx.exchange。"
+  },
+  "TRADE_BOX": {
+    "LIMIT_PRICE_TRIGGER_PRICE_SLIPPAGE_HIGHER": "本订单滑价低 - 我们建议 ${LIMIT_PRICE} 或更高的限价来提高本订单的成交几率。您的订单会在触发时以尽可能最好的价格执行。",
+    "LIMIT_PRICE_TRIGGER_PRICE_SLIPPAGE_LOWER": "本订单滑价低 - 我们建议 ${LIMIT_PRICE} 或更低的限价来提高本订单的成交几率。您的订单会在触发时以尽可能最好的价格执行。",
+    "MARKET_ORDER_CLOSE_TO_MAX_LEVERAGE": "此订单会让您的头寸接近允许的最大杠杆。如果执行时滑价超出预期价格，则您的订单可能会失败。",
+    "MARKET_ORDER_WARNING_INDEX_PRICE_SLIPPAGE": "鉴于当前的流动性，此市价单将导致 {SLIPPAGE} 指数价格下滑。",
+    "MARKET_ORDER_WARNING_ORDERBOOK_SLIPPAGE": "鉴于当前的流动性，此市价单将导致 {SLIPPAGE} 的订单簿价格影响。",
+    "MARKET_STATUS_CLOSE_ONLY": "{MARKET} 目前为仅平仓模式。无法创建新头寸。",
+    "STOP_MARKET_ORDER_MAY_NOT_EXECUTE": "dYdX上的止损市价单不能保证根据触发时的流动性来成交。要想获得更多的控制权，可以尝试使用止损限价单。",
+    "TAKE_PROFIT_MARKET_ORDER_MAY_NOT_EXECUTE": "dYdX上的止盈市价单不能保证根据触发时的流动性来成交。要想获得更多的控制权，可以尝试使用止盈限价单。"
+  }
+}

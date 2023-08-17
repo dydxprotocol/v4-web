@@ -1,0 +1,15 @@
+{
+  "ONBOARDING": {
+    "ALWAYS_VERIFY_URL": "Überprüfen Sie immer und überzeugen sich, ob Sie sich auf https://trade.dydx.exchange befinden, wenn Sie Ihre Keys wiederherstellen."
+  },
+  "TRADE_BOX": {
+    "LIMIT_PRICE_TRIGGER_PRICE_SLIPPAGE_HIGHER": "Die Slippage bei dieser Order ist niedrig - wir empfehlen, einen Limitpreis von  ${LIMIT_PRICE} oder höher, um die Chancen zur Ausführung dieser Order zu verbessern. Ihre Order wird zum bestmöglichen Preis ausgeführt, wenn sie auslöst.",
+    "LIMIT_PRICE_TRIGGER_PRICE_SLIPPAGE_LOWER": "Die Slippage auf dieser Order ist niedrig - wir empfehlen einen Limitpreis von  ${LIMIT_PRICE} oder niedriger, um Ihre Chancen zur Ausführung dieser Order zu verbessern. Ihre Order wird zum bestmöglichen Preis ausgeführt, wenn sie auslöst.",
+    "MARKET_ORDER_CLOSE_TO_MAX_LEVERAGE": "Diese Order würde Sie nah am maximal zulässigen Hebel positionieren. Wenn für den erwarteten Preis zum Ausführungszeitpunkt eine Slippage gilt, kann Ihre Order nicht ausgeführt werden.",
+    "MARKET_ORDER_WARNING_INDEX_PRICE_SLIPPAGE": "Diese Market Order würde bei der derzeitigen Liquidität zu {SLIPPAGE} Indexpreisverschiebungen führen.",
+    "MARKET_ORDER_WARNING_ORDERBOOK_SLIPPAGE": "Diese Market Order würde bei der derzeitigen Liquidität zu einer {SLIPPAGE} Beeinflussung des Orderbuch-Preises führen.",
+    "MARKET_STATUS_CLOSE_ONLY": "{MARKET} befindet sich derzeit im Close-Only Modus. Es können keine neuen Positionen erstellt werden.",
+    "STOP_MARKET_ORDER_MAY_NOT_EXECUTE": "Eine Ausführung von Stop Market Orders auf dYdX zum Triggerzeitpunkt kann je nach Liquidität nicht garantiert werden. Wenn Sie mehr Kontrolle haben wollen, versuchen Sie es mit einer Stop Limit Order.",
+    "TAKE_PROFIT_MARKET_ORDER_MAY_NOT_EXECUTE": "Eine Ausführung von Profit Market Orders auf dYdX zum Triggerzeitpunkt kann je nach Liquidität nicht garantiert werden. Wenn Sie mehr Kontrolle haben wollen, versuchen Sie es mit einer Take Profit Limit Order."
+  }
+}

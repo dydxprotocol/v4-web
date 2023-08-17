@@ -1,0 +1,73 @@
+{
+  "GENERAL": {
+    "SOMETHING_WENT_WRONG_WITH_MESSAGE": "Bir sorun oluştu: {ERROR_MESSAGE}",
+    "SOMETHING_WENT_WRONG": "Bir sorun oluştu. Lütfen daha sonra tekrar deneyin.",
+    "TIMESTAMP_DISCREPANCY": "Güvenlik nedeniyle, hesabınızın kimlik doğrulamasını yaparken zaman damgalarını doğruluyoruz. Lütfen sistem saatinizin doğru bir şekilde senkronize edildiğinden emin olun ve uygulamayı yenileyin."
+  },
+  "TRADE_BOX": {
+    "AMOUNT_INPUT_STEP_SIZE": "Talimat miktarı {STEP_SIZE} değerinin bir katı olmalıdır.",
+    "BRACKET_ORDER_FAILED_TO_PLACE": "Destekli talimatınız içindeki talimatlardan biri veya daha fazlası başarısız oldu. Lütfen aktif kâr alma ve kayıp durdurma talimatlarınızı gözden geçirmek için Talimatlar sekmesini kontrol edin.",
+    "BRACKET_ORDER_STOP_LOSS_ABOVE_EXPECTED_PRICE": "Stop tetikleme emir fiyatınız, piyasa talimatının beklenen fiyatı olan ${EXPECTED_PRICE} üzerinde olmalıdır.",
+    "BRACKET_ORDER_STOP_LOSS_ABOVE_LIQUIDATION_PRICE": "Stop emir fiyatınız tasfiye fiyatınıza çok yakın; stop emriniz tasfiyeniz gerçekleşmeden önce tamamen yürütülemeyebilir. Lütfen ${TRIGGER_PRICE_LIMIT} üzerinde bir tetikleme fiyatı girin.",
+    "BRACKET_ORDER_STOP_LOSS_BELOW_EXPECTED_PRICE": "Stop emir tetikleme fiyatınız piyasa talimatının beklenen fiyatı olan ${EXPECTED_PRICE} altında olmalıdır.",
+    "BRACKET_ORDER_STOP_LOSS_BELOW_LIQUIDATION_PRICE": "Stop emir fiyatınız tasfiye fiyatınıza çok yakın; stop emriniz tasfiyeniz gerçekleşmeden önce tamamen yürütülemeyebilir. Lütfen ${TRIGGER_PRICE_LIMIT} altında bir tetikleme fiyatı girin.",
+    "BRACKET_ORDER_TAKE_PROFIT_ABOVE_EXPECTED_PRICE": "Kâr alma tetikleme fiyatınız piyasa talimatının beklenen fiyatı olan ${EXPECTED_PRICE} üzerinde olmalıdır.",
+    "BRACKET_ORDER_TAKE_PROFIT_ABOVE_LIQUIDATION_PRICE": "Kâr alma fiyatınız tasfiye fiyatınıza çok yakın; kâr alma emriniz tasfiyeniz gerçekleşmeden önce tamamen yürütülemeyebilir. Lütfen ${TRIGGER_PRICE_LIMIT} üzerinde bir tetikleme fiyatı girin.",
+    "BRACKET_ORDER_TAKE_PROFIT_BELOW_EXPECTED_PRICE": "Kâr alma tetikleme fiyatınız piyasa talimatının beklenen fiyatı olan ${EXPECTED_PRICE} altında olmalıdır.",
+    "BRACKET_ORDER_TAKE_PROFIT_BELOW_LIQUIDATION_PRICE": "Kâr alma fiyatınız tasfiye fiyatınıza çok yakın; kâr alma emriniz tasfiyeniz gerçekleşmeden önce tamamen yürütülemeyebilir. Lütfen ${TRIGGER_PRICE_LIMIT} altında bir tetikleme fiyatı girin.",
+    "BUY_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE": "Tetikleme fiyatınız tasfiye fiyatınıza çok yakın; bu talimat tasfiyeniz gerçekleşmeden önce tamamen yürütülemeyebilir. Lütfen ${TRIGGER_PRICE_LIMIT} altında yeni bir tetikleme fiyatı girin veya bir Stop Limit emir kullanın.",
+    "INVALID_LARGE_POSITION_LEVERAGE": "Bu yatırım işlemi, pozisyonunuz üzerinde geçersiz bir kaldıraç oluşturacaktır. Riski sınırlamak için, daha büyük pozisyonlar daha düşük maksimum kaldıraç oranlarına sahiptir.",
+    "INVALID_NEW_ACCOUNT_MARGIN_USAGE": "Bu yatırım işlemi, hesabınızda %100 marj kullanımı ile sonuçlanır.",
+    "INVALID_NEW_POSITION_LEVERAGE": "Bu yatırım işlemi, pozisyonunuz üzerinde geçersiz bir kaldıraç oluşturacaktır.",
+    "LIMIT_MUST_ABOVE_TRIGGER_PRICE": "Limit fiyatınız, bu emrin karşılanabilmesi için tetiklenme anındaki tetikleme fiyatının üzerinde olmalıdır. Lütfen limit fiyatınızı ayarlayın veya yürütme yönteminizi değiştirin.",
+    "LIMIT_MUST_BELOW_TRIGGER_PRICE": "Limit fiyatınız, bu talimatın karşılanabilmesi için tetiklenme anındaki tetikleme fiyatının altında olmalıdır. Lütfen limit fiyatınızı ayarlayın veya yürütme yönteminizi değiştirin.",
+    "LIMITED_ORDERS_FOR_PAIR": "Bu çift taraf başına sadece sınırlı sayıda emre izin vermektedir.",
+    "MARKET_ORDER_ERROR_INDEX_PRICE_SLIPPAGE": "Bu piyasa talimatı mevcut likiditede {SLIPPAGE} endeks fiyat kayması ile sonuçlanır. Bu talimatı hâlâ vermek istiyorsanız lütfen bir limit talimatı kullanın.",
+    "MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE": "Bu piyasa talimatı mevcut likiditede talimat defteri fiyatı için {SLIPPAGE} etkisi ile sonuçlanır. Bu talimatı hâlâ vermek istiyorsanız lütfen bir limit talimatı kullanın.",
+    "MARKET_ORDER_NOT_ENOUGH_LIQUIDITY": "Bu piyasa talimatını karşılamak için yeterli likidite bulunmuyor; lütfen daha küçük bir talimat miktarı deneyin.",
+    "MARKET_ORDER_PRICE_IMPACT_AT_MAX_LEVERAGE": "Bu talimat sıfır dışında bir fiyat etkisine sahiptir ve potansiyel olarak pozisyonunuzu maksimum kaldıraç seviyesi üzerine taşıyabilir. Lütfen daha küçük bir talimat miktarı deneyin.",
+    "NEW_POSITION_SIZE_OVER_MAX": "Bu yatırım işlemi, {MAX_SIZE} {SYMBOL} maksimum boyutu üzerinde bir pozisyon boyutu ile sonuçlanabilir.",
+    "NO_EQUITY_DEPOSIT_FIRST": "Talimat vermeden önce fon yatırmanız gerekiyor.",
+    "ORDER_BELOW_COLLATERALIZATION": "Bu talimat, hesabınızı bu piyasanın teminatlandırma eşiğinin altına çekebilir. Lütfen daha küçük bir miktar deneyin.",
+    "ORDER_CROSSES_OWN_ORDER": "Bu talimat mevcut talimatlarınızın birini veya daha fazlasını karşılayabilir. Lütfen çelişen talimatlarınızı iptal edin veya talimat miktarınızı değiştirin.",
+    "ORDER_SIZE_BELOW_MIN_SIZE": "Talimat boyutunuz {MIN_SIZE} {SYMBOL} minimum talimat boyutunun altındadır",
+    "ORDER_WITH_CURRENT_ORDERS_INVALID": "Mevcut açık talimatlarınız göz önüne alındığında, bu talimat pozisyonunuz üzerinde geçersiz bir kaldıraç oluşturabilir. Lütfen bu talimat öncesinde karşılanacak bazı veya tüm talimatları kapatın veya talimat boyutunuzu azaltın.",
+    "ORDER_WOULD_FLIP_POSITION": "Bu talimat pozisyonunuzu yönünü değiştirecek veya miktarını artıracaktır. Lütfen Yalnızca Azalt özelliğini kaldırın veya talimat büyüklüğünüzü azaltın.",
+    "SELL_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE": "Tetikleme fiyatınız tasfiye fiyatınıza çok yakın; bu talimat tasfiyeniz gerçekleşmeden önce tamamen yürütülemeyebilir. Lütfen ${TRIGGER_PRICE_LIMIT} üstünde yeni bir tetikleme fiyatı girin veya bir Stop Limit emri kullanın.",
+    "TAKER_FEE_INVALID": "Ücret oranlarınız değişmiş olabilir. Lütfen uygulamayı yenileyin ve tekrar deneyin.",
+    "TRIGGER_MUST_ABOVE_INDEX_PRICE": "Tetikleme fiyatınız mevcut endeks fiyatının üzerinde olmalıdır: {INDEX_PRICE}.",
+    "TRIGGER_MUST_BELOW_INDEX_PRICE": "Tetikleme fiyatınız mevcut endeks fiyatının altında olmalıdır: {INDEX_PRICE}.",
+    "TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE": "Tetikleme fiyatınız tasfiye fiyatınıza çok yakın; bu talimat tasfiyeniz gerçekleşmeden önce tamamen yürütülemeyebilir. Lütfen tetikleme fiyatınızı güncelleyin veya bir durdurma limit talimatı kullanın.",
+    "USER_MAX_ORDERS": "Bu talimat, her bir taraf için piyasa başına maks 20 açık talimat limitinin üzerine çıkaracaktır.",
+    "WOULD_NOT_REDUCE": "Talimat karşılanırsa pozisyonunuz azaltılmayacaktır.",
+    "WOULD_NOT_REDUCE_UNCHECK": "Pozisyonunuz bu emriniz ile azaltılmayacaktır. Emrinizi vermek istiyorsanız lütfen Yalnızca Azalt işaretini kaldırın."
+  },
+  "ONBOARDING": {
+    "BANNED_USER": "Kullanım şartlarımızı ihlal eden bir bölgede ikamet ettiğiniz veya yatırım talebi gönderdiğiniz tespit edildiği için protokol içinde transfer yapmanız, protokol dışına hızlı çekme işlemiyle fon çıkarmanız ve pozisyonlarınızı azaltan piyasa talimatları dışında talimat vermeniz kalıcı olarak engellenmiştir. Fonlarınızı protokolden istediğiniz zaman çekebilirsiniz.",
+    "INVALID_EMAIL": "Lütfen geçerli bir e-posta adresi girin.",
+    "INVALID_USERNAME": "Kullanıcı adları bir harfle başlamalı, 24 karakterden daha kısa olmalı ve yalnızca harflerden, rakamlardan ve alt çizgi iminden oluşmalıdır.",
+    "KEY_RECOVERY_FAILED": "Anahtar kurtarma başarısız oldu. 'Eski İmzalar' etkinleştirmesi yaparak tekrar deneyin.",
+    "LEDGER_U2F_REQUIRED": "Ledger bağlantıları için U2F tarayıcı desteği gereklidir. Lütfen bu özelliğin mevcut tarayıcınızda desteklendiğinden emin olun.",
+    "USERNAME_TAKEN": "Bu kullanıcı adı zaten kullanılıyor.",
+    "WALLET_NO_TRANSACTIONS": "Bu cüzdanda fon ve geçmiş işlem bulunmuyor. Lütfen katılım işlemine devam etmek için cüzdanınıza fon yatırın."
+  },
+  "DEPOSIT_MODAL": {
+    "DEPOSIT_ACCOUNT_OUT_OF_SYNC": "Hesabınız senkronize değil. Lütfen cüzdanınızı yeniden bağlayın ve tekrar deneyin.",
+    "DEPOSIT_MORE_THAN_BALANCE": "Mevcut cüzdan bakiyenizden daha fazlasını yatıramazsınız.",
+    "DEPOSIT_WRONG_NETWORK_PRODUCTION": "Cüzdan ağınız yanlış. Lütfen 'Ethereum Mainnet' olarak ayarlandığından emin olun.",
+    "DEPOSIT_WRONG_NETWORK_STAGING": "Cüzdan ağınız yanlış. Lütfen 'Goerli Test Ağı' olarak ayarlandığından emin olun."
+  },
+  "WITHDRAW_MODAL": {
+    "FAST_WITHDRAW_NOT_ENOUGH_LIQUIDITY": "Bu hızlı çekme işlemiyle devam etmek için yeterli likidite bulunmuyor. Lütfen daha küçük bir miktar deneyin.",
+    "MAX_FAST_WITHDRAW_AMOUNT": "Lütfen {MAX_FAST_WITHDRAW_AMOUNT} miktarından daha az bir çekme miktarı girin.",
+    "MIN_SLOW_WITHDRAW_AMOUNT": "Yavaş çekme miktarı 10 veya daha yüksek ya da tüm hesap bakiyeniz olarak belirlenmelidir.",
+    "RESTRICTED_OPEN_POSITIONS_WITHDRAW": "Hesabınız kısıtlanmıştır. Çekme işleminden önce tüm pozisyonlarınızı kapatmanız gerekir.",
+    "WITHDRAW_MORE_THAN_FREE_DUE_TO_FEE": "Ücretsiz teminatınızdan daha fazlasını çekemezsiniz. Bir miktar girerken hızlı çekme ücretini hesaba kattığınızdan emin olun.",
+    "WITHDRAW_MORE_THAN_FREE": "Ücretsiz teminatınızdan daha fazlasını çekemezsiniz."
+  },
+  "TRANSFER_MODAL": {
+    "TRANSFER_INVALID_ETH_ADDRESS": "Bu cüzdan adresi ile ilişkili bir hesap bulamadık.",
+    "TRANSFER_MORE_THAN_FREE": "Ücretsiz teminatınızdan daha fazlasını transfer edemezsiniz.",
+    "TRANSFER_TO_YOURSELF": "Kendi cüzdan adresinize doğrudan transfer işlemini gerçekleştiremezsiniz."
+  }
+}

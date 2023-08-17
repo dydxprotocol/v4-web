@@ -1,0 +1,218 @@
+{
+  "GENERAL": {
+    "LEGACY_SIGNING": {
+      "TITLE": "Eski imza",
+      "BODY": "Bu seçeneği yalnızca anahtarlarınızı oluşturmak için donanım cüzdan imzası / eski imza kullandıysanız işaretleyin."
+    },
+    "REMEMBER_ME": {
+      "TITLE": "Beni hatırla",
+      "BODY": "Yalnızca sahibi olduğunuz güvenli bir cihazı kullanıyorsanız \"Beni Hatırla\" seçeneğini kullanın. Bu tercihi seçmek, genel veya güvenli olmayan bir cihaz kullanıyorsanız anahtarlarınızı ve bilgilerinizi başkalarına ifşa edebilir."
+    }
+  },
+  "PORTFOLIO": {
+    "HOLDING_HEDGIES": {
+      "TITLE": "Hedgie ödülleri indirimi",
+      "BODY": "Bir {NFT} sahibi olmak indirim düzeyinizi bir seviye yukarı çıkaracaktır. Birden fazlasına sahip olmanın ek bir etkisi bulunmamaktadır."
+    }
+  },
+  "TRADE": {
+    "ACCOUNT_LEVERAGE": {
+      "TITLE": "Hesap Kaldıracı",
+      "BODY": "Tüm açık pozisyonlarınıza göre hesabınızın kaldıraç oranı. Hesabınız çapraz marjlı olduğu için her açık pozisyonun kendi kaldıraçları vardır; ancak aynı zamanda genel hesap kaldıracınızı da etkiler."
+    },
+    "BRACKET_ORDER_SL": {
+      "TITLE": "Stop Emir",
+      "BODY": "Bu destekli talimatta bir stop emir talimatı yürütmek için geçerli tetikleme fiyatınız."
+    },
+    "BRACKET_ORDER_TP": {
+      "TITLE": "Kâr Alma",
+      "BODY": "Bu destekli talimatta bir Kâr Alma talimatı yürütmek için geçerli tetikleme fiyatınız."
+    },
+    "BUYING_POWER": {
+      "TITLE": "Satın Alma Gücü",
+      "BODY": "{MARKET} üzerindeki pozisyonlarınızı artırmak için kullanabileceğiniz toplam satın alma gücü. Satın alma gücünüz seçtiğiniz piyasaya göre değişecektir."
+    },
+    "DEFAULT_EXECUTION": {
+      "TITLE": "Varsayılan Yürütme",
+      "BODY": "Talimatınız açılış sırasında her türlü çakışan talimatı karşılayacaktır. Talimatınız tam olarak karşılanmadıysa karşılanana kadar, iptal edilene kadar veya süresi sona erene kadar açık kalacaktır."
+    },
+    "EQUITY": {
+      "TITLE": "Net Varlık",
+      "BODY": "Hesabınızın toplam değeri."
+    },
+    "EXPECTED_PRICE": {
+      "TITLE": "Beklenen Fiyat",
+      "BODY": "Talimatınız için beklenen yürütme fiyatı. Bu fiyat, talimat defteri talimatınız eşleştirme motoru tarafından işlenmeden önce değişebileceği için yalnızca bir tahmindir."
+    },
+    "FEE": {
+      "TITLE": "Ücret",
+      "BODY": "dYdX üzerindeki ücretler likidite türüne göre belirlenir. Satıcı talimatları, alıcı talimatlarından daha küçük bir ücret gerektirir."
+    },
+    "FILL_OR_KILL": {
+      "TITLE": "Karşıla Veya İptal Et",
+      "BODY": "Karşıla veya iptal et türündeki talimatlar yürütme akabinde derhal karşılanmalıdır; aksi takdirde otomatik olarak iptal edilecektir."
+    },
+    "FREE_COLLATERAL": {
+      "TITLE": "Ücretsiz Teminat",
+      "BODY": "Çekebileceğiniz maksimum miktar. Ücretsiz teminat 0 veya negatif olduğunda, hesabınız maksimum kaldıraç kullanır."
+    },
+    "GOOD_TIL": {
+      "TITLE": "Geçerlilik",
+      "BODY": "Talimatınızın sona ereceği zamana kadar olan süre."
+    },
+    "IMMEDIATE_OR_CANCEL": {
+      "TITLE": "Hemen Veya İptal Et",
+      "BODY": "Talimatınız açılış sırasında çakışan herhangi bir talimatı karşılayacak ve daha sonra karşılanmamış tüm talimat miktarlarını iptal edecektir."
+    },
+    "INDEX_PRICE": {
+      "TITLE": "Endeks Fiyatı",
+      "BODY": "Durdurma talimatları endeks fiyatına göre tetiklenir. Endeks fiyatı, birden fazla borsadan alınan fiyat verilerini birleştirirek sizi ani çökmeler gibi olaylardan korur."
+    },
+    "INITIAL_MARGIN_FRACTION": {
+      "TITLE": "Başlangıç Marj Oranı",
+      "BODY": "Marj oranı, pozisyonunuzun kavram değeri net varlığınıza bölünerek hesaplanır. Marj oranınız başlangıç marj oranını aşıyorsa, artık pozisyonunuzu artırmanıza izin verilmez. Riski sınırlamak için, başlangıç marj oranı belirli bir eşikten sonra pozisyon boyutuyla doğrusal olarak artar."
+    },
+    "INITIAL_STOP": {
+      "TITLE": "Başlangıç Durdurma",
+      "BODY": "Başlangıç durdurma fiyatı, takipçi yüzdenize göre belirlenir."
+    },
+    "LEVERAGE": {
+      "TITLE": "Kaldıraç",
+      "BODY": "Kaldıraç, kazançlarınız veya kayıplarınız üzerindeki çarpanı değiştirir. Kaldıracınızı artırmak, aynı fiyat hareketiyle bir alım satım işleminde ne kadar kazanacağınızı / kaybedeceğinizi değiştirir."
+    },
+    "LIMIT_PRICE": {
+      "TITLE": "Limit Fiyatı",
+      "BODY": "Bu talimat yalnızca belirtilen limit fiyatı üzerinden veya daha iyisiyle karşılanabilir. Talimatınız yerleştirme sırasında çaprazlanırsa, talimatınız çaprazlanan tüm talimatları en uygun fiyatla karşılayacaktır."
+    },
+    "LIMIT_PRICE_SLIPPAGE": {
+      "TITLE": "Slipaj",
+      "BODY": "Tetikleme fiyatınız ve limit fiyatınız arasındaki yüzdesel fark."
+    },
+    "LIQUIDATION_PRICE": {
+      "TITLE": "Tasfiye Fiyatı",
+      "BODY": "{SYMBOL} varlığının oracle fiyatı tasfiye fiyatının altına düşerse, pozisyonunuz tasfiye edilecektir. Tasfiye akabinde, pozisyonunuz otomatik olarak kapatılacak ve en az %1'lik bir tasfiye ücreti belirlenecektir (tasfiye esnasındaki likiditenize bağlı olarak daha yüksek olabilir)."
+    },
+    "LIQUIDATION_PRICE_GENERAL": {
+      "TITLE": "Tasfiye Fiyatı",
+      "BODY": "Pozisyon piyasasının oracle fiyatı tasfiye fiyatını aşarsa, pozisyonunuz tasfiye edilecektir. Tasfiye akabinde, pozisyonunuz otomatik olarak kapatılacak ve en az %1'lik bir tasfiye ücreti belirlenecektir (tasfiye esnasındaki likiditenize bağlı olarak daha yüksek olabilir)."
+    },
+    "LIQUIDITY": {
+      "TITLE": "Likidite",
+      "BODY": "Talimat defterinden likidite alan işlemler (örn. piyasa veya çakışan limit talimatları) alıcı talimatları olarak yürütülür. Talimat defterine likidite ekleyen ve başka bir taraf tarafından karşılanan limit talimatları, satıcı talimatları olarak karşılanır."
+    },
+    "MAINTENANCE_MARGIN_FRACTION": {
+      "TITLE": "Devam Marj Oranı",
+      "BODY": "Marj oranı, pozisyonunuzun kavram değeri net varlığınıza bölünerek hesaplanır. Marj oranınız bakım marj oranını aşarsa, pozisyonunuz otomatik olarak kapatılır (tasfiye edilir) ve en az %1'lik bir tasfiye ücreti belirlenir (tasfiye esnasındaki likiditeye bağlı olarak daha yüksek olabilir)."
+    },
+    "MAKER_FEE": {
+      "TITLE": "Satıcı Ücreti",
+      "BODY": "Borsa tahtasına likidite ekleyen ve başka bir taraf tarafından karşılanan limit talimatları, satıcı talimatları olarak karşılanır. Satıcı talimatları, alıcı talimatlarından daha düşük bir ücrete sahiptir."
+    },
+    "MARGIN_USAGE": {
+      "TITLE": "Marj Kullanımı",
+      "BODY": "Açık pozisyonlar tarafından kullanılan toplam marj oranınızın yüzdesi."
+    },
+    "MAX_WITHDRAW": {
+      "TITLE": "Maksimum Hızlı Çekme Miktarı",
+      "BODY": "Tek bir hızlı çekme işlemi için izin verilen maksimum miktar."
+    },
+    "MAXIMUM_LEVERAGE": {
+      "TITLE": "Maksimum Kaldıraç",
+      "BODY": "Bu piyasa için izin verilen maksimum kaldıraç. Riski sınırlamak için, belirli bir eşikten sonra maksimum kaldıraç pozisyonun boyutuyla birlikte doğrusal olarak azalır."
+    },
+    "NET_FUNDING": {
+      "TITLE": "Net Fonlama",
+      "BODY": "Mevcut pozisyonun ömrü için kazanılan / ödenen toplam fonlama. Pozisyonunuzu kapatır veya pozisyonun tarafını değiştirirseniz sıfırlanır (uzundan kısaya veya tam tersi)."
+    },
+    "OPEN_INTEREST": {
+      "TITLE": "Açık Faiz",
+      "BODY": "Açık faiz, bu piyasa üzerindeki tüm açık pozisyonların toplam büyüklüğünü ifade eder."
+    },
+    "ORACLE_PRICE": {
+      "TITLE": "Oracle Fiyatı",
+      "BODY": "Kaldıraç ve tasfiye değerleri, zincir içi oracle fiyatına göre belirlenir. Oracle fiyatı, birden fazla borsadan alınan fiyat verilerini birleştirirek sizi ani çökmeler gibi olaylardan korur."
+    },
+    "ORDER_AMOUNT": {
+      "TITLE": "Talimat Miktarı",
+      "BODY": "Satılacak veya satın alınacak {SYMBOL} miktarı. Bu miktar, pozisyonunuzun talimat karşılandığında artacağı veya azalacağı miktardır, sonuçta ortaya çıkacak pozisyon miktarınız değildir."
+    },
+    "POST_ONLY": {
+      "TITLE": "Yalnızca Yerleştir",
+      "BODY": "Yalnızca yerleştir seçeneği etkin talimatlar, yalnızca satıcı talimatları olarak verilebilir. Talimat, yerleştirme sırasında diğer talimatlarla çakışırsa otomatik olarak iptal edilir."
+    },
+    "PRICE_IMPACT": {
+      "TITLE": "Fiyat Etkisi",
+      "BODY": "Talimatınız için beklenen yürütme fiyatı ile alış veya satış teklifi tarafındaki en iyi talimat fiyatı arasındaki fark. Bu değer daha büyük alım satım boyutları için artacaktır."
+    },
+    "REALIZED_PNL": {
+      "TITLE": "Gerçekleşen Kâr / Zarar",
+      "BODY": "Bu pozisyon için kısmî kapatmalar, ücretler ve fonlama yoluyla gerçekleşmiş toplam kâr / zarar. Pozisyonunuzu tamamen kapatırsanız veya pozisyon tarafını değiştirirseniz (uzundan kısaya veya tam tersi) sıfırlanır."
+    },
+    "REDUCE_ONLY": {
+      "TITLE": "Yalnızca Azalt",
+      "BODY": "Yalnızca Azalt özelliği talimatın pozisyonun tarafının değiştirilmesine (uzundan kısaya veya kısadan uzuna) engel olur. Yalnızca Azalt [Reduce-Only] ayarlı bir emir, pozisyonunuz değiştikçe otomatik olarak yeniden boyutlanacak ve iptal olacaktır."
+    },
+    "STEP_SIZE": {
+      "TITLE": "Adım Boyutu",
+      "BODY": "Adım boyutu, bu piyasadaki talimat miktarları için izin verilen en küçük faktördür."
+    },
+    "TRIGGER_PRICE": {
+      "TITLE": "Tetikleme Fiyatı",
+      "BODY": "Bu piyasanın endeks fiyatı veya son işlem fiyatı tetikleme fiyatınızı aştığında, stop/kâr alma emriniz ya bir limit talimatına dönüştürülür, ya da bir piyasa talimatı olarak yürütülür."
+    },
+    "TAKER_FEE": {
+      "TITLE": "Piyasa Alıcı Ücreti",
+      "BODY": "Talimat defterinden likidite alan işlemler (örn. piyasa veya çakışan limit talimatları) alıcı talimatları olarak yürütülür. Alıcı talimatları, satıcı talimatlarından daha yüksek bir ücrete sahiptir."
+    },
+    "TICK_SIZE": {
+      "TITLE": "Puan Büyüklüğü",
+      "BODY": "Puan büyüklüğü, bu piyasadaki minimum fiyat hareketidir."
+    },
+    "TIME_IN_FORCE": {
+      "TITLE": "Yürürlükteki Süre",
+      "BODY": "Seçilen yürürlükteki süre tercihi, bir talimatın süresi sona erene veya karşılanana kadar ne kadar süreyle aktif kalacağını belirler."
+    },
+    "TRAILING_PERCENT": {
+      "TITLE": "Takipçi Yüzdesi",
+      "BODY": "Takipçi yüzdesi, durdurma fiyatınızın endeks fiyatını \"takip\" edeceği yüzde değerini belirler. Endeks fiyatı pozisyonunuz lehine hareket ettiğinde, talimatınızın durdurma fiyatı belirlediğiniz takipçi yüzdesine göre güncellenir."
+    },
+    "UNREALIZED_PNL": {
+      "TITLE": "Gerçekleşmemiş Kâr / Zarar",
+      "BODY": "Mevcut pozisyonunuzun geri kalanını mevcut endeks fiyatından tamamen kapatmanız durumunda elde edeceğiniz toplam kâr / zarar. Pozisyonunuzu kapatır veya pozisyonun tarafını değiştirirseniz sıfırlanır (uzundan kısaya veya tam tersi)."
+    }
+  },
+  "DEPOSIT": {
+    "AVAILABLE_GASLESS_DEPOSITS": {
+      "TITLE": "Mevcut",
+      "BODY": "Uygunsunuz! Gazsız fon yatırmayı etkinleştirmek için en az {GASLESS_DEPOSIT_THRESHOLD} {SYMBOL} yatırın."
+    },
+    "DISABLED_GASLESS_DEPOSITS": {
+      "TITLE": "Kullanılamıyor",
+      "BODY": "Gaz ücretsiz yatırma işlemleri geçici olarak kullanım dışı. Merak etmeyin, yakında geri gelecek!"
+    },
+    "GASLESS_DEPOSITS": {
+      "TITLE": "Gazsız yatırma işlemleri",
+      "BODY": "{GASLESS_DEPOSIT_THRESHOLD} {SYMBOL} veya daha fazlasını yatırırsanız dYdX gaz ücretlerinizi karşılayacak. Her üç günde bir bir adet gazsız fon yatırma için uygunsunuz. Gazsız fon yatırmalar kurallara tabidir."
+    },
+    "SWAP": {
+      "TITLE": "Takas ve Yatırma",
+      "BODY": "USDC dışı bir varlık yatırma işleminde, varlığınız 0xSquid API aracılığıyla otomatik olarak USDC'ye dönüştürülür. Maksimum kayma değerini ayarlamak, dönüşüm başarısız olmadan önce izin vereceğiniz kayma miktarını belirlemenize olanak tanır."
+    }
+  },
+  "WITHDRAW": {
+    "FAST_WITHDRAW_FEE": {
+      "TITLE": "Hızlı Çekme Ücreti",
+      "BODY": "Hızlı çekme işlemleri anında gönderilir ve dYdX bir ücret karşılığında gas maliyetlerini karşılar. Ücretsiz çekim için lütfen yavaş çekme işlemini kullanın (kendi gas maliyetinizi ödemeniz ve Katman 2 onayını beklemeniz gerekir)."
+    },
+    "WITHDRAW_TYPES": {
+      "TITLE": "Çekme İşlem Türleri",
+      "BODY": "dYdX, Katman 2'de iki tür çekme işlemini destekler. Hızlı çekme işlemleri küçük bir ücret gerektirir fakat gas gerektirmez ve anında gönderilir. Yavaş çekme işlemleri ücretsizdir ancak iki adım gerektirir, çok daha uzun sürer ve kullanıcıların kendi gas ücretlerini ödemesi gerekir."
+    }
+  },
+  "EMAIL_NOTIFICATIONS": {
+    "VERIFY_EMAIL": {
+      "TITLE": "E-posta adresini doğrulayın",
+      "BODY": "Lütfen size gönderdiğimiz e-postadaki bağlantıyı tıklayın; bu, e-posta adresinin sahibi olduğunuzu doğrulamakta bize yardımcı olacaktır."
+    }
+  }
+}

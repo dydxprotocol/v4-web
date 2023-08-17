@@ -1,0 +1,179 @@
+:root {
+  /* Parameters */
+
+  /*
+    --layer-base-hue
+    --layer-base-saturation
+    --layer-base-lightness
+
+    --color-text-0
+    --color-text-1
+    --color-text-2
+
+    --color-accent
+    --color-positive
+    --color-negative
+    --color-success
+    --color-warning
+    --color-error
+    --color-favorite
+  */
+
+  /* Computed: Layers */
+
+  --color-layer-0: hsl(
+    var(--layer-base-hue),
+    var(--layer-base-saturation),
+    calc(var(--layer-base-lightness) - 12%)
+  );
+
+  --color-layer-1: hsl(
+    var(--layer-base-hue),
+    var(--layer-base-saturation),
+    calc(var(--layer-base-lightness) - 8%)
+  );
+
+  --color-layer-2: hsl(
+    var(--layer-base-hue),
+    var(--layer-base-saturation),
+    calc(var(--layer-base-lightness) - 4%)
+  );
+
+  --color-layer-3: hsl(
+    var(--layer-base-hue),
+    var(--layer-base-saturation),
+    var(--layer-base-lightness)
+  );
+
+  --color-layer-4: hsl(
+    var(--layer-base-hue),
+    var(--layer-base-saturation),
+    calc(var(--layer-base-lightness) + 4%)
+  );
+
+  --color-layer-5: hsl(
+    var(--layer-base-hue),
+    calc(var(--layer-base-saturation) - 2%),
+    calc(var(--layer-base-lightness) + 7%)
+  );
+
+  --color-layer-6: hsl(
+    var(--layer-base-hue),
+    calc(var(--layer-base-saturation) - 4%),
+    calc(var(--layer-base-lightness) + 10%)
+  );
+
+  --color-layer-7: hsla(var(--layer-base-hue), 0%, 100%, 0.07);
+
+  --color-gradient-base-0: hsl(
+    var(--layer-base-hue),
+    calc(var(--layer-base-saturation) - 5%),
+    var(--layer-base-lightness)
+  );
+
+  --color-gradient-base-1: hsl(
+    var(--layer-base-hue),
+    calc(var(--layer-base-saturation) - 1%),
+    calc(var(--layer-base-lightness) + 7%)
+  );
+
+  /* Computed: Borders */
+
+  --color-border: var(--color-layer-5);
+  --color-border-white: hsla(0, 0%, 100%, 0.2);
+  --color-border-red: hsla(360, 73%, 61%, 0.2);
+}
+
+/* Theme: Classic (default) */
+:root {
+  /* Constants */
+
+  --theme-classic-hue-purple: 240;
+  --theme-classic-color-green: hsl(159, 67%, 39%);
+  --theme-classic-color-yellow: hsl(36, 100%, 64%);
+  --theme-classic-color-red: hsl(360, 73%, 61%);
+
+  /* Parameters */
+
+  --layer-base-hue: var(--theme-classic-hue-purple);
+  --layer-base-saturation: 20%;
+  --layer-base-lightness: 16%;
+
+  --color-text-0: hsl(245, 11%, 55%);
+  --color-text-1: hsl(244, 18%, 81%);
+  --color-text-2: hsl(240, 43%, 99%);
+
+  --color-accent: hsl(var(--theme-classic-hue-purple), 100%, 70%);
+  --color-positive: var(--theme-classic-color-green);
+  --color-negative: var(--theme-classic-color-red);
+  --color-success: var(--theme-classic-color-green);
+  --color-warning: var(--theme-classic-color-yellow);
+  --color-error: var(--theme-classic-color-red);
+  --color-favorite: var(--theme-classic-color-yellow);
+
+  --color-white: #fff;
+  --color-black: #000;
+
+  --color-gradient-positive: hsla(158, 49%, 48%, 0.16);
+  --color-gradient-negative: hsla(0, 100%, 66%, 0.16);
+
+  --color-risk-low: var(--theme-classic-color-green);
+  --color-risk-medium: var(--theme-classic-color-yellow);
+  --color-risk-high: var(--theme-classic-color-red);
+}
+
+/* Theme: Light */
+:root.theme-light {
+  /* Constants */
+
+  --theme-light-hue-purple: 234;
+  --theme-light-color-green: hsl(159, 67%, 39%);
+  --theme-light-color-yellow: hsl(36, 100%, 64%);
+  --theme-light-color-red: hsl(360, 73%, 61%);
+
+  /* Parameters */
+
+  --layer-base-hue: var(--theme-light-hue-purple);
+  --layer-base-saturation: 0%;
+  --layer-base-lightness: 86%;
+
+  --color-text-0: hsl(0, 0%, 55%);
+  --color-text-1: hsl(0, 0%, 40%);
+  --color-text-2: hsl(0, 0%, 5%);
+
+  --color-accent: hsl(var(--theme-light-hue-purple), 100%, 70%);
+  --color-positive: var(--theme-light-color-green);
+  --color-negative: var(--theme-light-color-red);
+  --color-success: var(--theme-light-color-green);
+  --color-warning: var(--theme-light-color-yellow);
+  --color-error: var(--theme-light-color-red);
+  --color-favorite: var(--theme-light-color-yellow);
+}
+
+/* Theme: Dark */
+:root.theme-dark {
+  /* Constants */
+
+  --theme-dark-hue-purple: 240;
+  --theme-dark-color-green: hsl(159, 67%, 39%);
+  --theme-dark-color-yellow: hsl(36, 100%, 64%);
+  --theme-dark-color-red: hsl(360, 73%, 61%);
+
+  /* Parameters */
+
+  --layer-base-hue: 0;
+  --layer-base-saturation: 0%;
+  --layer-base-lightness: 16%;
+
+  --color-text-0: hsl(0, 0%, 47%);
+  --color-text-1: hsl(0, 0%, 67%);
+  --color-text-2: hsl(0, 0%, 100%);
+
+  --color-accent: hsl(var(--theme-dark-hue-purple), 100%, 70%);
+  --color-positive: var(--theme-dark-color-green);
+  --color-negative: var(--theme-dark-color-red);
+  --color-success: var(--theme-dark-color-green);
+  --color-warning: var(--theme-dark-color-yellow);
+  --color-error: var(--theme-dark-color-red);
+  --color-favorite: var(--theme-dark-color-yellow);
+}

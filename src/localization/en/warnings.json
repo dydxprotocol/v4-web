@@ -1,0 +1,15 @@
+{
+  "ONBOARDING": {
+    "ALWAYS_VERIFY_URL": "Always check and verify you are on https://trade.dydx.exchange when recovering your keys."
+  },
+  "TRADE_BOX": {
+    "LIMIT_PRICE_TRIGGER_PRICE_SLIPPAGE_HIGHER": "The slippage on this order is low - we recommend a limit price of ${LIMIT_PRICE} or higher to improve your odds of filling this order. Your order will execute at the best possible price when it triggers.",
+    "LIMIT_PRICE_TRIGGER_PRICE_SLIPPAGE_LOWER": "The slippage on this order is low - we recommend a limit price of ${LIMIT_PRICE} or lower to improve your odds of filling this order. Your order will execute at the best possible price when it triggers.",
+    "MARKET_ORDER_CLOSE_TO_MAX_LEVERAGE": "This order would put your position close to the max allowed leverage. If there is slippage on top of the expected price at the time of execution, your order may fail.",
+    "MARKET_ORDER_WARNING_INDEX_PRICE_SLIPPAGE": "This market order would result in {SLIPPAGE} index price slippage given current liquidity.",
+    "MARKET_ORDER_WARNING_ORDERBOOK_SLIPPAGE": "This market order would result in {SLIPPAGE} of orderbook price impact given current liquidity.",
+    "MARKET_STATUS_CLOSE_ONLY": "{MARKET} is currently in close only mode. No new positions can be created.",
+    "STOP_MARKET_ORDER_MAY_NOT_EXECUTE": "Stop Market orders on dYdX are not guaranteed to fill depending on liquidity at time of triggering. For more control, try a Stop Limit order.",
+    "TAKE_PROFIT_MARKET_ORDER_MAY_NOT_EXECUTE": "Take Profit Market orders on dYdX are not guaranteed to fill depending on liquidity at time of triggering. For more control, try a Take Profit Limit order."
+  }
+}

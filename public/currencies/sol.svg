@@ -1,0 +1,20 @@
+<svg width="148" height="148" viewBox="0 0 148 148" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="74" cy="74" r="74" fill="black"/>
+  <path d="M44.8098 91.1367C45.3227 90.6208 46.0279 90.3199 46.7759 90.3199H114.607C115.846 90.3199 116.466 91.8245 115.59 92.7058L102.19 106.183C101.677 106.699 100.972 107 100.224 107H32.3934C31.1539 107 30.5342 105.495 31.4104 104.614L44.8098 91.1367Z" fill="url(#sol_gradient0)"/>
+  <path d="M44.8098 40.8168C45.3441 40.3009 46.0493 40 46.7759 40H114.607C115.846 40 116.466 41.5047 115.59 42.3859L102.19 55.8633C101.677 56.3792 100.972 56.6801 100.224 56.6801H32.3934C31.1539 56.6801 30.5342 55.1755 31.4104 54.2942L44.8098 40.8168Z" fill="url(#sol_gradient1)"/>
+  <path d="M102.19 65.8155C101.677 65.2996 100.972 64.9987 100.224 64.9987H32.3934C31.1539 64.9987 30.5342 66.5034 31.4104 67.3847L44.8098 80.862C45.3227 81.3779 46.0279 81.6789 46.7759 81.6789H114.607C115.846 81.6789 116.466 80.1742 115.59 79.2929L102.19 65.8155Z" fill="url(#sol_gradient2)"/>
+  <defs>
+    <linearGradient id="sol_gradient0" x1="97.7982" y1="26.5252" x2="50.4246" y2="116.74" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00FFA3"/>
+      <stop offset="1" stop-color="#DC1FFF"/>
+    </linearGradient>
+    <linearGradient id="sol_gradient1" x1="97.7982" y1="26.5252" x2="50.4246" y2="116.74" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00FFA3"/>
+      <stop offset="1" stop-color="#DC1FFF"/>
+    </linearGradient>
+    <linearGradient id="sol_gradient2" x1="97.7982" y1="26.5252" x2="50.4246" y2="116.74" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00FFA3"/>
+      <stop offset="1" stop-color="#DC1FFF"/>
+    </linearGradient>
+  </defs>
+</svg>

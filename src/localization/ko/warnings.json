@@ -1,0 +1,15 @@
+{
+  "ONBOARDING": {
+    "ALWAYS_VERIFY_URL": "키를 복구할 때 항상 https://trade.dydx.exchange상에 있는지 확인하십시오."
+  },
+  "TRADE_BOX": {
+    "LIMIT_PRICE_TRIGGER_PRICE_SLIPPAGE_HIGHER": "해당 주문에 대한 슬리피지가 낮습니다. 해당 주문의 실행 확률을 향상하기 위해 ${LIMIT_PRICE}의 지정가 또는 더 높은 가격을 권장합니다. 귀하의 주문은 발동 시에 가능한 최상의 가격으로 실행될 예정입니다.",
+    "LIMIT_PRICE_TRIGGER_PRICE_SLIPPAGE_LOWER": "해당 주문에 대한 슬리피지가 낮습니다. 해당 주문의 실행 확률을 향상하기 위해 ${LIMIT_PRICE}의 지정가 또는 더 낮은 가격을 권장합니다. 귀하의 주문은 발동 시에 가능한 최상의 가격으로 실행될 예정입니다.",
+    "MARKET_ORDER_CLOSE_TO_MAX_LEVERAGE": "이 주문으로 인해 포지션은 최대 허용 레버리지에 가까워 집니다. 실행 시점에 슬리피지가 기대 가격보다 높다면 주문은 실패할 수 있습니다.",
+    "MARKET_ORDER_WARNING_INDEX_PRICE_SLIPPAGE": "이 시장 주문으로 현재 유동성에 대한 {SLIPPAGE} 지수 가격 슬리피지가 발생할 수 있습니다.",
+    "MARKET_ORDER_WARNING_ORDERBOOK_SLIPPAGE": "이 시장 주문으로 현재 유동성에 대한 {SLIPPAGE}의 호가창 가격 충격이 발생할 수 있습니다.",
+    "MARKET_STATUS_CLOSE_ONLY": "{MARKET}은(는) 현재 청산 전용 모드입니다. 새로운 포지션을 생성할 수 없습니다.",
+    "STOP_MARKET_ORDER_MAY_NOT_EXECUTE": "dYdX의 스탑 마켓 주문은 발동 시점의 유동성에 따라 체결되지 않을 수 있습니다. 더 나은 통제력을 위해 스탑 리밋 주문을 사용해 보시기 바랍니다.",
+    "TAKE_PROFIT_MARKET_ORDER_MAY_NOT_EXECUTE": "dYdX의 이익 환수 시장가 주문은 발동 시점의 유동성에 따라 체결되지 않을 수 있습니다. 더 나은 통제력을 위해 이익 환수 지정가 주문을 사용해 보시기 바랍니다."
+  }
+}

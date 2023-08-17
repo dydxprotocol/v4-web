@@ -1,0 +1,91 @@
+{
+  "GENERAL": {
+    "SOMETHING_WENT_WRONG_WITH_MESSAGE": "Something went wrong: {ERROR_MESSAGE}",
+    "SOMETHING_WENT_WRONG": "Something went wrong. Please try again later.",
+    "TIMESTAMP_DISCREPANCY": "For security purposes, we verify timestamps when authenticating your account. Please make sure your system clock is synced correctly and refresh the app."
+  },
+  "TRADE_BOX": {
+    "AMOUNT_INPUT_STEP_SIZE": "Order amount must be a factor of {STEP_SIZE}.",
+    "BRACKET_ORDER_FAILED_TO_PLACE": "One or more of the orders in your bracket order has failed. Please check the Orders tab to review your active take profit and stop loss orders.",
+    "BRACKET_ORDER_STOP_LOSS_ABOVE_EXPECTED_PRICE": "Your stop loss trigger price must be above the market order expected price: ${EXPECTED_PRICE}.",
+    "BRACKET_ORDER_STOP_LOSS_ABOVE_LIQUIDATION_PRICE": "Your stop loss trigger price is too close to your liquidation price - the stop loss order may not execute fully before you get liquidated. Please enter a trigger price above ${TRIGGER_PRICE_LIMIT}.",
+    "BRACKET_ORDER_STOP_LOSS_BELOW_EXPECTED_PRICE": "Your stop loss trigger price must be below the market order expected price: ${EXPECTED_PRICE}.",
+    "BRACKET_ORDER_STOP_LOSS_BELOW_LIQUIDATION_PRICE": "Your stop loss trigger price is too close to your liquidation price - the stop loss order may not execute fully before you get liquidated. Please enter a trigger price below ${TRIGGER_PRICE_LIMIT}.",
+    "BRACKET_ORDER_TAKE_PROFIT_ABOVE_EXPECTED_PRICE": "Your take profit trigger price must be above the market order expected price: ${EXPECTED_PRICE}.",
+    "BRACKET_ORDER_TAKE_PROFIT_ABOVE_LIQUIDATION_PRICE": "Your take profit trigger price is too close to your liquidation price - the take profit order may not execute fully before you get liquidated. Please enter a trigger price above ${TRIGGER_PRICE_LIMIT}.",
+    "BRACKET_ORDER_TAKE_PROFIT_BELOW_EXPECTED_PRICE": "Your take profit trigger price must be below the market order expected price: ${EXPECTED_PRICE}.",
+    "BRACKET_ORDER_TAKE_PROFIT_BELOW_LIQUIDATION_PRICE": "Your take profit trigger price is too close to your liquidation price - the take profit order may not execute fully before you get liquidated. Please enter a trigger price below ${TRIGGER_PRICE_LIMIT}.",
+    "BUY_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE": "Your trigger price is too close to your liquidation price - this order may not execute fully before you get liquidated. Please enter a trigger price below ${TRIGGER_PRICE_LIMIT} or use a Stop Limit order.",
+    "INVALID_LARGE_POSITION_LEVERAGE": "This trade would result in an invalid leverage on your position. To limit risk, larger positions have lower maximum leverages.",
+    "INVALID_NEW_ACCOUNT_MARGIN_USAGE": "This trade would result in over 100% margin usage on your account.",
+    "INVALID_NEW_POSITION_LEVERAGE": "This trade would result in an invalid leverage on your position.",
+    "LIMIT_MUST_ABOVE_TRIGGER_PRICE": "Your limit price must be above your trigger price for this order to fill when it triggers. Please adjust your limit price or change your execution method.",
+    "LIMIT_MUST_BELOW_TRIGGER_PRICE": "Your limit price must be below your trigger price for this order to fill when it triggers. Please adjust your limit price or change your execution method.",
+    "LIMITED_ORDERS_FOR_PAIR": "This pair only allows a limited amount of orders per side.",
+    "MARKET_ORDER_ERROR_INDEX_PRICE_SLIPPAGE": "This market order would result in {SLIPPAGE} index price slippage given current liquidity. Please use a limit order if you still intend to place this order.",
+    "MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE": "This market order would result in {SLIPPAGE} of orderbook price impact given current liquidity. Please use a limit order if you still intend to place this order.",
+    "MARKET_ORDER_NOT_ENOUGH_LIQUIDITY": "There is not enough liquidity to fill this market order, please try a smaller order amount.",
+    "MARKET_ORDER_PRICE_IMPACT_AT_MAX_LEVERAGE": "This order has a non-zero price impact and could potentially put your position over max leverage. Please try a smaller order amount.",
+    "NEW_POSITION_SIZE_OVER_MAX": "This trade could result in a position size over the maximum size of {MAX_SIZE} {SYMBOL}.",
+    "NO_EQUITY_DEPOSIT_FIRST": "You must deposit funds before you can place orders.",
+    "ORDER_BELOW_COLLATERALIZATION": "This order may put your account below this market’s collateralization threshold. Please try a smaller amount.",
+    "ORDER_CROSSES_OWN_ORDER": "This order may fill one or more of your own existing orders. Please cancel any conflicting orders or adjust your order amount.",
+    "ORDER_SIZE_BELOW_MIN_SIZE": "Your order size is below the minimum order size of {MIN_SIZE} {SYMBOL}",
+    "ORDER_WITH_CURRENT_ORDERS_INVALID": "Given your current open orders, this order may result in an invalid leverage on your position. Please close some or all orders that would fill before this order, or reduce your order size.",
+    "ORDER_WOULD_FLIP_POSITION": "This order would flip or increase your position. Please uncheck Reduce-Only or reduce your order size.",
+    "SELL_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE": "Your trigger price is too close to your liquidation price - this order may not execute fully before you get liquidated. Please enter a trigger price above ${TRIGGER_PRICE_LIMIT} or use a Stop Limit order.",
+    "TAKER_FEE_INVALID": "Your fee rates may have changed. Please refresh the app and try again.",
+    "TRIGGER_MUST_ABOVE_INDEX_PRICE": "Your trigger price must be above the current index price: {INDEX_PRICE}.",
+    "TRIGGER_MUST_BELOW_INDEX_PRICE": "Your trigger price must be below the current index price: {INDEX_PRICE}.",
+    "TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE": "Your trigger price is too close to your liquidation price - this order may not execute fully before you get liquidated. Please update your trigger price or use a stop limit order.",
+    "USER_MAX_ORDERS": "This order would put you above the max limit of 20 open orders per market, per side.",
+    "WOULD_NOT_REDUCE": "Your position would not be reduced if order is filled.",
+    "WOULD_NOT_REDUCE_UNCHECK": "Your position would not be reduced with this order. Please uncheck Reduce-Only if you would like to place your order."
+  },
+  "ONBOARDING": {
+    "BANNED_USER": "Because you appear to be a resident of, or trading from, a jurisdiction that violates our terms of use, you have been permanently blocked from performing transfers within the protocol, making fast withdrawals to remove funds from the protocol, and placing orders other than market orders that reduce your positions. You may withdraw your funds from the protocol at any time.",
+    "INVALID_EMAIL": "Please enter a valid email address.",
+    "INVALID_USERNAME": "Usernames must start with a letter, be less than 24 characters long, and contain only letters, numbers, and underscores.",
+    "KEY_RECOVERY_FAILED": "Key recovery failed. Try again with 'Legacy Signing' enabled.",
+    "LEDGER_U2F_REQUIRED": "U2F browser support is required for Ledger connections. Please ensure this feature is supported in your current browser.",
+    "USERNAME_TAKEN": "This username has already been taken.",
+    "WALLET_NO_TRANSACTIONS": "This wallet has no funds and no previous transactions. Please deposit funds in your wallet to continue onboarding."
+  },
+  "DEPOSIT_MODAL": {
+    "DEPOSIT_ACCOUNT_OUT_OF_SYNC": "Your account is out of sync. Please reconnect your wallet and try again.",
+    "DEPOSIT_MORE_THAN_BALANCE": "You cannot deposit more than your available wallet balance.",
+    "DEPOSIT_WRONG_NETWORK_PRODUCTION": "Your wallet network is incorrect. Please make sure it’s set to 'Ethereum Mainnet'.",
+    "DEPOSIT_WRONG_NETWORK_STAGING": "Your wallet network is incorrect. Please make sure it’s set to 'Goerli Test Network'.",
+    "MUST_SPECIFY_ASSET": "Please select an asset to deposit.",
+    "MUST_SPECIFY_CHAIN": "Please select a source chain to deposit from."
+  },
+  "WITHDRAW_MODAL": {
+    "FAST_WITHDRAW_NOT_ENOUGH_LIQUIDITY": "There is not enough liquidity to process this fast withdraw. Please try a smaller amount.",
+    "MAX_FAST_WITHDRAW_AMOUNT": "Please enter a withdraw amount less than {MAX_FAST_WITHDRAW_AMOUNT}.",
+    "MIN_SLOW_WITHDRAW_AMOUNT": "Slow withdraw amount must be greater than or equal to 10, or your entire account balance.",
+    "RESTRICTED_OPEN_POSITIONS_WITHDRAW": "Your account is restricted. You must close all your positions before you can withdraw.",
+    "WITHDRAW_MORE_THAN_FREE_DUE_TO_FEE": "You cannot withdraw more than your free collateral. Make sure you account for the fast withdraw fee when entering an amount.",
+    "WITHDRAW_MORE_THAN_FREE": "You cannot withdraw more than your free collateral."
+  },
+  "TRANSFER_MODAL": {
+    "TRANSFER_INVALID_ETH_ADDRESS": "We could not find an account associated with this wallet address.",
+    "TRANSFER_MORE_THAN_FREE": "You cannot transfer more than your free collateral.",
+    "TRANSFER_TO_YOURSELF": "You cannot complete a transfer to your own dYdX Chain address.",
+    "TRANSFER_INVALID_DYDX_ADDRESS": "Invalid dYdX Chain address."
+  },
+  "ORDER": {
+    "2000_FILL_OR_KILL_ORDER_COULD_NOT_BE_FULLY_FILLED": "Fill Or Kill order could not be fully filled",
+    "2001_REDUCE_ONLY_WOULD_INCREASE_POSITION_SIZE": "Reduce-only orders cannot increase the position size",
+    "2002_REDUCE_ONLY_WOULD_CHANGE_POSITION_SIDE": "Reduce-only orders cannot change the position side",
+    "2003_POST_ONLY_WOULD_CROSS_MAKER_ORDER": "Post-only order would cross one or more maker orders",
+    "3000_INVALID_ORDER_FLAGS": "Invalid order flags",
+    "3001_INVALID_STATEFUL_ORDER_GOOD_TIL_BLOCK_TIME": "Invalid order goodTilBlockTime",
+    "3002_STATEFUL_ORDERS_CANNOT_REQUIRE_IMMEDIATE_EXECUTION": "Stateful orders cannot require immediate execution",
+    "3003_TIME_EXCEEDS_GOOD_TIL_BLOCK_TIME": "The block time is greater than the GoodTilBlockTime of the message",
+    "3004_GOOD_TIL_BLOCK_TIME_EXCEEDS_STATEFUL_ORDER_TIME_WINDOW": "The GoodTilBlockTime of the message is further than StatefulOrderTimeWindow into the future",
+    "3005_STATEFUL_ORDER_ALREADY_EXISTS": "Existing stateful order has higher-or-equal priority than the new one",
+    "3006_STATEFUL_ORDER_DOES_NOT_EXIST": "Stateful order does not exist",
+    "3007_STATEFUL_ORDER_COLLATERALIZATION_CHECK_FAILED": "Stateful order collateralization check failed",
+    "3008_STATEFUL_ORDER_PREVIOUSLY_CANCELLED": "Stateful order was previously cancelled and therefore cannot be placed"
+  }
+}

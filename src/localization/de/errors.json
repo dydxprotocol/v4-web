@@ -1,0 +1,73 @@
+{
+  "GENERAL": {
+    "SOMETHING_WENT_WRONG_WITH_MESSAGE": "Etwas ist schiefgelaufen: {ERROR_MESSAGE}",
+    "SOMETHING_WENT_WRONG": "Etwas ist schiefgelaufen. Bitte versuchen Sie es später erneut.",
+    "TIMESTAMP_DISCREPANCY": "Aus Sicherheitsgründen überprüfen wir die Zeitstempel bei der Authentifizierung Ihres Kontos. Bitte stellen Sie sicher, dass Ihre Systemuhr korrekt synchronisiert ist und aktualisieren Sie die App."
+  },
+  "TRADE_BOX": {
+    "AMOUNT_INPUT_STEP_SIZE": "Die Höhe der Order muss ein Vielfaches von {STEP_SIZE} sein.",
+    "BRACKET_ORDER_FAILED_TO_PLACE": "Eine oder mehrere Orders in Ihrer Bracket-Order sind fehlgeschlagen. Bitte überprüfen Sie die Registerkarte Orders, um Ihre aktiven Take-Profit- und Stop-Loss-Aufträge zu überprüfen.",
+    "BRACKET_ORDER_STOP_LOSS_ABOVE_EXPECTED_PRICE": "Ihr Stop-Loss-Auslösepreis muss über dem erwarteten Preis der Market Order liegen: ${EXPECTED_PRICE}.",
+    "BRACKET_ORDER_STOP_LOSS_ABOVE_LIQUIDATION_PRICE": "Ihr Stop-Loss-Trigger-Preis liegt zu nahe an Ihrem Liquidationspreis – der Stop-Loss-Auftrag wird möglicherweise nicht vollständig ausgeführt, bevor er für Sie abgewickelt wurde. Bitte geben Sie einen Auslösepreis über ${TRIGGER_PRICE_LIMIT} ein.",
+    "BRACKET_ORDER_STOP_LOSS_BELOW_EXPECTED_PRICE": "Ihr Stop-Loss-Auslösepreis muss unter dem erwarteten Marktpreis liegen: ${EXPECTED_PRICE}.",
+    "BRACKET_ORDER_STOP_LOSS_BELOW_LIQUIDATION_PRICE": "Ihr Stop-Loss-Trigger-Preis liegt zu nahe an Ihrem Liquidationspreis – der Stop-Loss-Auftrag wird möglicherweise nicht vollständig ausgeführt, bevor er für Sie abgewickelt wurde. Bitte geben Sie einen Auslösepreis unter ${TRIGGER_PRICE_LIMIT} ein.",
+    "BRACKET_ORDER_TAKE_PROFIT_ABOVE_EXPECTED_PRICE": "Ihr Take-Profit-Auslösepreis muss über dem erwarteten Marktpreis liegen: ${EXPECTED_PRICE}.",
+    "BRACKET_ORDER_TAKE_PROFIT_ABOVE_LIQUIDATION_PRICE": "Ihr Take-Profit-Auslösepreis liegt zu nahe an Ihrem Abwicklungspreis – die Take-Profit-Order wird möglicherweise nicht vollständig ausgeführt, bevor sie für Sie abgewickelt wurde. Bitte geben Sie einen Auslösepreis über ${TRIGGER_PRICE_LIMIT} ein.",
+    "BRACKET_ORDER_TAKE_PROFIT_BELOW_EXPECTED_PRICE": "Ihr Take-Profit-Auslösepreis muss unter dem erwarteten Marktpreis liegen: ${EXPECTED_PRICE}.",
+    "BRACKET_ORDER_TAKE_PROFIT_BELOW_LIQUIDATION_PRICE": "Ihr Take-Profit-Auslösepreis liegt zu nahe an Ihrem Abwicklungspreis – die Take-Profit-Order wird möglicherweise nicht vollständig ausgeführt, bevor sie für Sie abgewickelt wurde. Bitte geben Sie einen Auslösepreis unter ${TRIGGER_PRICE_LIMIT} ein.",
+    "BUY_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE": "Ihr Trigger-Preis liegt zu nahe an Ihrem Abwicklungspreis – es kann sein, dass diese Order nicht vollständig ausgeführt wird, bevor Sie für Sie abgewickelt wurde. Bitte geben Sie einen Auslösepreis unter ${TRIGGER_PRICE_LIMIT} ein oder verwenden Sie eine Stop-Limit-Order.",
+    "INVALID_LARGE_POSITION_LEVERAGE": "Dieser Trade würde zu einer ungültigen Leverage auf Ihre Position führen. Um das Risiko zu begrenzen, haben größere Positionen niedrigere maximale Leverages.",
+    "INVALID_NEW_ACCOUNT_MARGIN_USAGE": "Dieser Trade würde zu einer Margin von über 100 % auf Ihrem Konto führen.",
+    "INVALID_NEW_POSITION_LEVERAGE": "Dieser Trade würde zu einer ungültigen Leverage auf Ihre Position führen.",
+    "LIMIT_MUST_ABOVE_TRIGGER_PRICE": "Ihr Limitpreis muss über Ihrem Triggerpreis liegen, damit diese Order ausgeführt werden kann, wenn sie auslöst. Bitte passen Sie Ihren Limitpreis an oder ändern Sie Ihre Ausführungsmethode.",
+    "LIMIT_MUST_BELOW_TRIGGER_PRICE": "Ihr Limitpreis muss unter Ihrem Triggerpreis liegen, damit diese Order ausgeführt werden kann, wenn sie auslöst. Bitte passen Sie Ihren Limitpreis an oder ändern Sie Ihre Ausführungsmethode.",
+    "LIMITED_ORDERS_FOR_PAIR": "Dieses Paar erlaubt nur eine begrenzte Anzahl von Orders pro Seite.",
+    "MARKET_ORDER_ERROR_INDEX_PRICE_SLIPPAGE": "Diese Marktorder würde angesichts der aktuellen Liquidität zu {SLIPPAGE} Slippage des Indexpreises führen. Bitte verwenden Sie eine Limit-Order, wenn Sie diese Order dennoch platzieren möchten.",
+    "MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE": "Diese Market Order würde bei der derzeitigen Liquidität zu einer {SLIPPAGE} Beeinflussung des Orderbuch-Preises führen. Bitte verwenden Sie eine Limit-Order, wenn Sie diese Order dennoch platzieren möchten.",
+    "MARKET_ORDER_NOT_ENOUGH_LIQUIDITY": "Es ist nicht genug Liquidität vorhanden, um diese Marktorder auszuführen, bitte versuchen Sie es mit einem kleineren Orderbetrag.",
+    "MARKET_ORDER_PRICE_IMPACT_AT_MAX_LEVERAGE": "Diese Order hat eine Preisauswirkung ungleich Null und könnte Ihre Position möglicherweise über die maximale Leverage bringen. Bitte versuchen Sie es mit einem kleineren Orderbetrag.",
+    "NEW_POSITION_SIZE_OVER_MAX": "Dieser Trade könnte zu einer Positionsgröße über der maximalen Größe von {MAX_SIZE} {SYMBOL} führen.",
+    "NO_EQUITY_DEPOSIT_FIRST": "Sie müssen Geld einzahlen, bevor Sie Orders platzieren können.",
+    "ORDER_BELOW_COLLATERALIZATION": "Dieser Auftrag kann Ihr Konto möglicherweise unter die Besicherungsschwelle dieses Marktes bringen. Bitte versuchen Sie es mit einem kleineren Betrag.",
+    "ORDER_CROSSES_OWN_ORDER": "Diese Order kann eine oder mehrere Ihrer eigenen bestehenden Orders erfüllen. Bitte stornieren Sie widersprüchliche Orders oder passen Sie Ihre Ordermenge an.",
+    "ORDER_SIZE_BELOW_MIN_SIZE": "Ihre Ordergröße liegt unter der Mindestordergröße von {MIN_SIZE} {SYMBOL}",
+    "ORDER_WITH_CURRENT_ORDERS_INVALID": "Angesichts Ihrer aktuellen offenen Orders kann diese Order zu einer ungültigen Leverage auf Ihre Position führen. Bitte schließen Sie einige oder alle Orders, die vor dieser Order ausgeführt würden oder reduzieren Sie Ihre Ordergröße.",
+    "ORDER_WOULD_FLIP_POSITION": "Diese Order würde Ihre Position umkehren oder erhöhen. Bitte deaktivieren Sie „Nur Reduzierung“ oder reduzieren Sie Ihre Ordergröße.",
+    "SELL_TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE": "Ihr Trigger-Preis liegt zu nahe an Ihrem Abwicklungspreis – es kann sein, dass diese Order nicht vollständig ausgeführt wird, bevor Sie für Sie abgewickelt wurde. Bitte geben Sie einen Trigger-Preis über ${TRIGGER_PRICE_LIMIT} ein oder verwenden Sie eine Stop-Limit-Order.",
+    "TAKER_FEE_INVALID": "Möglicherweise haben sich Ihre Gebührensätze geändert Bitte aktualisieren Sie die App und versuchen Sie es erneut.",
+    "TRIGGER_MUST_ABOVE_INDEX_PRICE": "Ihr Auslösepreis muss über dem aktuellen Indexpreis liegen: {INDEX_PRICE}.",
+    "TRIGGER_MUST_BELOW_INDEX_PRICE": "Ihr Auslösepreis muss unter dem aktuellen Indexpreis liegen: {INDEX_PRICE}.",
+    "TRIGGER_TOO_CLOSE_TO_LIQUIDATION_PRICE": "Ihr Trigger-Preis liegt zu nahe an Ihrem Abwicklungspreis – es kann sein, dass diese Order nicht vollständig ausgeführt wird, bevor Sie für Sie abgewickelt wurde. Bitte aktualisieren Sie Ihren Auslösepreis oder verwenden Sie eine Stop-Limit-Order.",
+    "USER_MAX_ORDERS": "Diese Order würde Sie über die maximale Grenze von 20 offenen Orders pro Markt und Seite bringen.",
+    "WOULD_NOT_REDUCE": "Ihre Position würde nicht reduziert werden, wenn die Order ausgeführt wird.",
+    "WOULD_NOT_REDUCE_UNCHECK": "Ihre Position würde bei dieser Order nicht reduziert werden. Bitte deaktivieren Sie „Nur Reduzierung“, wenn Sie Ihre Order platzieren möchten."
+  },
+  "ONBOARDING": {
+    "BANNED_USER": "Da Sie anscheinend in einer Gerichtsbarkeit wohnhaft sind oder in einer Gerichtsbarkeit traden, die gegen unsere Nutzungsbedingungen verstößt, wird Ihnen dauerhaft verweigert, Überweisungen innerhalb des Protokolls durchzuführen, schnelle Abhebungen vorzunehmen, um Gelder aus dem Protokoll zu entnehmen und andere als Markt Orders zu platzieren, die Ihre Positionen reduzieren. Sie können Ihr Geld jederzeit aus dem Protokoll abheben.",
+    "INVALID_EMAIL": "Bitte geben Sie eine gültige E-Mail-Adresse an.",
+    "INVALID_USERNAME": "Benutzernamen müssen mit einem Buchstaben beginnen, weniger als 24 Zeichen lang sein und dürfen nur Buchstaben, Zahlen und Unterstriche enthalten.",
+    "KEY_RECOVERY_FAILED": "Schlüsselwiederherstellung fehlgeschlagen. Versuchen Sie es erneut mit aktiviertem „Legacy Signing“.",
+    "LEDGER_U2F_REQUIRED": "Für Ledger-Verbindungen ist U2F-Browserunterstützung erforderlich. Bitte stellen Sie sicher, dass diese Funktion in Ihrem aktuellen Browser unterstützt wird.",
+    "USERNAME_TAKEN": "Dieser Benutzername ist bereits vergeben.",
+    "WALLET_NO_TRANSACTIONS": "Diese Wallet hat kein Guthaben und keine früheren Transaktionen. Bitte zahlen Sie Geld in Ihre Wallet ein, um fortzufahren."
+  },
+  "DEPOSIT_MODAL": {
+    "DEPOSIT_ACCOUNT_OUT_OF_SYNC": "Ihr Konto ist nicht synchron. Bitte verbinden Sie Ihr Wallet noch einmal und versuchen Sie es erneut.",
+    "DEPOSIT_MORE_THAN_BALANCE": "Sie können nicht mehr als Ihr verfügbares Wallet-Guthaben einzahlen.",
+    "DEPOSIT_WRONG_NETWORK_PRODUCTION": "Ihr Wallet-Netzwerk ist falsch. Bitte stellen Sie sicher, dass es auf „Ethereum Mainnet“ eingestellt ist.",
+    "DEPOSIT_WRONG_NETWORK_STAGING": "Ihr Wallet-Netzwerk ist falsch. Bitte vergewissern Sie sich, dass es auf 'Goerli Test Network' eingestellt ist."
+  },
+  "WITHDRAW_MODAL": {
+    "FAST_WITHDRAW_NOT_ENOUGH_LIQUIDITY": "Es ist nicht genug Liquidität vorhanden, um diese schnelle Auszahlung zu verarbeiten. Bitte versuchen Sie es mit einem kleineren Betrag.",
+    "MAX_FAST_WITHDRAW_AMOUNT": "Bitte geben Sie einen Auszahlungsbetrag von weniger als {MAX_FAST_WITHDRAW_AMOUNT} ein.",
+    "MIN_SLOW_WITHDRAW_AMOUNT": "Der Betrag für langsame Auszahlungen muss größer oder gleich 10 oder Ihr gesamter Kontostand sein.",
+    "RESTRICTED_OPEN_POSITIONS_WITHDRAW": "Ihr Konto ist eingeschränkt. Sie müssen alle Ihre Positionen schließen, bevor Sie abheben können.",
+    "WITHDRAW_MORE_THAN_FREE_DUE_TO_FEE": "Sie können nicht mehr als Ihre freien Sicherheiten abheben. Stellen Sie sicher, dass Sie die Gebühr für schnelle Auszahlungen einberechnen, wenn Sie einen Betrag eingeben.",
+    "WITHDRAW_MORE_THAN_FREE": "Sie können nicht mehr als Ihre freien Sicherheiten abheben."
+  },
+  "TRANSFER_MODAL": {
+    "TRANSFER_INVALID_ETH_ADDRESS": "Wir konnten kein mit dieser Wallet-Adresse verknüpftes Konto finden.",
+    "TRANSFER_MORE_THAN_FREE": "Sie können nicht mehr als Ihre freien Sicherheiten übertragen.",
+    "TRANSFER_TO_YOURSELF": "Sie können keine direkte Überweisung an Ihre eigene Wallet-Adresse durchführen."
+  }
+}
