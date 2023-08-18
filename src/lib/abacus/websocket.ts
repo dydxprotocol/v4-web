@@ -11,6 +11,8 @@ import {
 import { subscriptionsByChannelId } from '@/lib/tradingView/dydxfeed/cache';
 import { mapCandle } from '@/lib/tradingView/utils';
 
+import { lastSuccessfulWebsocketRequestByOrigin } from '@/hooks/useAnalytics';
+
 import { log } from '../telemetry';
 
 const RECONNECT_INTERVAL_MS = 10_000;
@@ -154,6 +156,8 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
             this.receivedCallback(m.data);
           }
         }
+
+        lastSuccessfulWebsocketRequestByOrigin[new URL(this.url!).origin] = Date.now();
       } catch (error) {
         log('AbacusWebsocketProtocol/onmessage', error);
       }

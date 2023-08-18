@@ -85,6 +85,8 @@ export enum AnalyticsEvent {
   // Trading
   TradeOrderTypeSelected = 'TradeOrderTypeSelected',
   TradePlaceOrder = 'TradePlaceOrder',
+  TradePlaceOrderConfirmed = 'TradePlaceOrderConfirmed',
+  TradeCancelOrderConfirmed = 'TradeCancelOrderConfirmed',
 }
 
 export type AnalyticsEventData<T extends AnalyticsEvent> =
@@ -94,6 +96,12 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
   : T extends AnalyticsEvent.NetworkStatus ?
     {
       status: typeof AbacusApiStatus['name'];
+      /** Last time indexer node was queried successfully */
+      lastSuccessfulIndexerRpcQuery?: number;
+      /** Time elapsed since indexer node was queried successfully */
+      elapsedTime?: number;
+      blockHeight?: number;
+      indexerBlockHeight?: number;
     }
 
   // Navigation
@@ -151,6 +159,19 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
     SubaccountPlaceOrderPayload & {
       isClosePosition: boolean;
     }
-
+  : T extends AnalyticsEvent.TradePlaceOrderConfirmed ?
+    {
+      /** roundtrip time between user placing an order and confirmation from indexer (client → validator → indexer → client) */
+      roundtripMs: number;
+      /** URL/IP of node the order was sent to */
+      validator: string;
+    }
+  : T extends AnalyticsEvent.TradeCancelOrderConfirmed ?
+    {
+      /** roundtrip time between user canceling an order and confirmation from indexer (client → validator → indexer → client) */
+      roundtripMs: number;
+      /** URL/IP of node the order was sent to */
+      validator: string;
+    }
   :
-    {};
+    never;

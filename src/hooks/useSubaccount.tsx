@@ -235,8 +235,10 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         execution: OrderExecution;
         postOnly: boolean;
         reduceOnly: boolean;
-      }) =>
-        await compositeClient?.placeOrder(
+      }) => {
+        const startTimestamp = performance.now();
+
+        const result = await compositeClient?.placeOrder(
           subaccount,
           marketId,
           type,
@@ -249,7 +251,17 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
           execution,
           postOnly,
           reduceOnly
-        ),
+        );
+
+        const endTimestamp = performance.now();
+
+        track(AnalyticsEvent.TradePlaceOrderConfirmed, {
+          roundtripMs: endTimestamp - startTimestamp,
+          validator: compositeClient!.validatorClient.config.restEndpoint,
+        });
+
+        return result;
+      },
 
       cancelOrderForSubaccount: async ({
         subaccount,
@@ -265,15 +277,27 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         clobPairId: number;
         goodTilBlock?: number;
         goodTilBlockTime?: number;
-      }) =>
-        await compositeClient?.cancelOrder(
+      }) => {
+        const startTimestamp = performance.now();
+
+        const result = await compositeClient?.cancelOrder(
           subaccount,
           clientId,
           orderFlags,
           clobPairId,
           goodTilBlock,
           goodTilBlockTime
-        ),
+        )
+
+        const endTimestamp = performance.now();
+
+        track(AnalyticsEvent.TradeCancelOrderConfirmed, {
+          roundtripMs: endTimestamp - startTimestamp,
+          validator: compositeClient!.validatorClient.config.restEndpoint,
+        });
+
+        return result;
+      },
     }),
     [compositeClient]
   );

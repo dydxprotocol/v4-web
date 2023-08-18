@@ -10,6 +10,7 @@ import { useApiState } from './useApiState';
 import { useBreakpoints } from './useBreakpoints';
 import { useSelectedNetwork } from './useSelectedNetwork';
 import { useAccounts } from './useAccounts';
+import { useDydxClient } from './useDydxClient';
 
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getOnboardingState, getSubaccountId } from '@/state/accountSelectors';
@@ -22,6 +23,7 @@ import { getInputTradeData } from '@/state/inputsSelectors';
 
 export const useAnalytics = () => {
   const { walletType, walletConnectionType, evmAddress, dydxAddress, selectedWalletType } = useAccounts();
+  const { compositeClient } = useDydxClient();
 
   /** User properties */
 
@@ -95,10 +97,25 @@ export const useAnalytics = () => {
   }, []);
 
   // AnalyticsEvent.NetworkStatus
-  const { status } = useApiState();
+  const { height, indexerHeight, status } = useApiState();
 
   useEffect(() => {
-    if (status) track(AnalyticsEvent.NetworkStatus, { status: status.name });
+    if (status) {
+      const websocketEndpoint = compositeClient?.indexerClient?.config.websocketEndpoint;
+
+      const lastSuccessfulIndexerRpcQuery =
+        (websocketEndpoint &&
+          lastSuccessfulWebsocketRequestByOrigin[new URL(websocketEndpoint).origin]) ||
+        undefined;
+
+      track(AnalyticsEvent.NetworkStatus, {
+        status: status.name,
+        lastSuccessfulIndexerRpcQuery,
+        elapsedTime: lastSuccessfulIndexerRpcQuery && Date.now() - lastSuccessfulIndexerRpcQuery,
+        blockHeight: height ?? undefined,
+        indexerBlockHeight: indexerHeight ?? undefined,
+      });
+    }
   }, [status]);
 
   // AnalyticsEvent.NavigatePage
@@ -191,3 +208,6 @@ export const useAnalytics = () => {
     }
   }, [selectedOrderType]);
 };
+
+export const lastSuccessfulRestRequestByOrigin: Record<URL['origin'], number> = {};
+export const lastSuccessfulWebsocketRequestByOrigin: Record<URL['origin'], number> = {};
