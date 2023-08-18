@@ -5,7 +5,7 @@ import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, TOOLTIP_STRING_KEYS } from '@/constants/localization';
-import { wallets } from '@/constants/wallets';
+import { DydxChainAsset, wallets } from '@/constants/wallets';
 
 import { useAccounts, useBreakpoints, useStringGetter, useAccountBalance } from '@/hooks';
 
@@ -103,22 +103,60 @@ export const AccountMenu = () => {
             </Styled.AddressRow>
             <Styled.Balances>
               <div>
-                <Styled.label>
-                  {stringGetter({ key: STRING_KEYS.ASSET_BALANCE, params: { ASSET: 'Dv4TNT' } })}
-                  {/* <AssetIcon symbol="DYDX" /> */}
-                </Styled.label>
-                <Styled.BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
+                <div>
+                  <Styled.label>
+                    {stringGetter({ key: STRING_KEYS.ASSET_BALANCE, params: { ASSET: 'Dv4TNT' } })}
+                    {/* <AssetIcon symbol="DYDX" /> */}
+                  </Styled.label>
+                  <Styled.BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
+                </div>
+                <IconButton
+                  action={ButtonAction.Base}
+                  iconName={IconName.Send}
+                  onClick={() => dispatch(openDialog({ type: DialogTypes.Transfer }))}
+                  shape={ButtonShape.Square}
+                />
               </div>
               <div>
-                <Styled.label>
-                  {stringGetter({ key: STRING_KEYS.ASSET_BALANCE, params: { ASSET: 'USDC' } })}
-                  <AssetIcon symbol="USDC" />
-                </Styled.label>
-                <Styled.BalanceOutput
-                  type={OutputType.Asset}
-                  value={freeCollateral?.current || 0}
-                  fractionDigits={2}
-                />
+                <div>
+                  <Styled.label>
+                    {stringGetter({ key: STRING_KEYS.ASSET_BALANCE, params: { ASSET: 'USDC' } })}
+                    <AssetIcon symbol="USDC" />
+                  </Styled.label>
+                  <Styled.BalanceOutput
+                    type={OutputType.Asset}
+                    value={freeCollateral?.current || 0}
+                    fractionDigits={2}
+                  />
+                </div>
+                <Styled.InlineRow>
+                  <IconButton
+                    action={ButtonAction.Base}
+                    iconName={IconName.Qr}
+                    onClick={() =>
+                      dispatch(
+                        openDialog({
+                          type: DialogTypes.Receive,
+                          dialogProps: { selectedAsset: DydxChainAsset.USDC },
+                        })
+                      )
+                    }
+                    shape={ButtonShape.Square}
+                  />
+                  <IconButton
+                    action={ButtonAction.Base}
+                    iconName={IconName.Send}
+                    onClick={() =>
+                      dispatch(
+                        openDialog({
+                          type: DialogTypes.Transfer,
+                          dialogProps: { selectedAsset: DydxChainAsset.USDC },
+                        })
+                      )
+                    }
+                    shape={ButtonShape.Square}
+                  />
+                </Styled.InlineRow>
               </div>
             </Styled.Balances>
           </Styled.AccountInfo>
@@ -204,6 +242,10 @@ Styled.Column = styled.div`
   ${layoutMixins.column}
 `;
 
+Styled.InlineRow = styled.div`
+  ${layoutMixins.inlineRow}
+`;
+
 Styled.AddressRow = styled.div`
   ${layoutMixins.row}
 
@@ -256,7 +298,7 @@ Styled.Balances = styled.div`
   gap: 2px;
 
   > div {
-    ${layoutMixins.flexColumn}
+    ${layoutMixins.spacedRow}
 
     gap: 0.5rem;
     padding: 0.5rem 1rem;
@@ -281,6 +323,7 @@ Styled.DropdownMenu = styled(DropdownMenu)`
 
   --dropdownMenu-item-font-size: 0.875rem;
   --popover-padding: 0 0 0.5rem 0;
+  --trigger-hover-backgroundColor: var(--color-layer-3);
 `;
 
 Styled.WarningIcon = styled(Icon)`

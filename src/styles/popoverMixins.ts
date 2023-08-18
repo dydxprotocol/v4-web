@@ -185,6 +185,7 @@ export const popoverMixins = {
     --item-checked-backgroundColor: var(--color-layer-2);
     --item-checked-textColor: currentColor;
 
+    --item-highlighted-backgroundColor: var(--color-layer-2);
     --item-highlighted-textColor: var(--color-text-2);
 
     --item-radius: 0px;
@@ -218,6 +219,7 @@ export const popoverMixins = {
       &[data-highlighted] // @radix-ui
       {
         filter: brightness(1.1);
+        background-color: var(--item-highlighted-backgroundColor);
         color: var(--item-highlighted-textColor, var(--trigger-textColor, inherit)) !important;
         outline: none;
       }

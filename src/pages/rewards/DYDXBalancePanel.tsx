@@ -36,8 +36,8 @@ export const DYDXBalancePanel = () => {
       slotHeader={
         <Styled.Header>
           <Styled.Title>
-            <AssetIcon symbol="DYDX" />
-            DYDX
+            {/* <AssetIcon symbol="DYDX" /> */}
+            Dv4TNT
           </Styled.Title>
           <Styled.ReceiveAndTransferButtons>
             {!canAccountTrade ? (
@@ -106,7 +106,7 @@ export const DYDXBalancePanel = () => {
             {
               key: 'totalBalance',
               label: 'Total balance',
-              value: <Output type={OutputType.Asset} value={nativeTokenBalance} tag="DYDX" />,
+              value: <Output type={OutputType.Asset} value={nativeTokenBalance} tag="Dv4TNT" />,
             },
           ]}
         />

@@ -48,6 +48,7 @@ import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 
 type TransferFormProps = {
+  selectedAsset?: DydxChainAsset;
   onDone?: () => void;
   className?: string;
 };
@@ -74,7 +75,11 @@ const debouncedEstimateFee = debounce(
   { trailing: true }
 );
 
-export const TransferForm = ({ onDone, className }: TransferFormProps) => {
+export const TransferForm = ({
+  selectedAsset = DydxChainAsset.DYDX,
+  onDone,
+  className,
+}: TransferFormProps) => {
   const stringGetter = useStringGetter();
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
   const { dydxAddress } = useAccounts();
@@ -84,7 +89,7 @@ export const TransferForm = ({ onDone, className }: TransferFormProps) => {
   const { selectedNetwork } = useSelectedNetwork();
 
   // User Input
-  const [asset, setAsset] = useState<DydxChainAsset>(DydxChainAsset.DYDX);
+  const [asset, setAsset] = useState<DydxChainAsset>(selectedAsset);
 
   // Form states
   const [error, setError] = useState<Error | undefined>();
@@ -214,7 +219,8 @@ export const TransferForm = ({ onDone, className }: TransferFormProps) => {
       value: DydxChainAsset.DYDX,
       label: (
         <Styled.InlineRow>
-          <AssetIcon symbol="DYDX" /> DYDX
+          {/* <AssetIcon symbol="DYDX" />  */}
+          Dv4TNT
         </Styled.InlineRow>
       ),
     },
