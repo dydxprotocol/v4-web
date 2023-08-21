@@ -6,8 +6,8 @@ import { useBreakpoints, useStringGetter } from '@/hooks';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 
-import { DepositForm } from '@/views/forms/DepositForm';
-import { TestnetDepositForm } from '@/views/forms/TestnetDepositForm';
+import { DepositForm } from '@/views/forms/AccountManagementForms/DepositForm';
+import { TestnetDepositForm } from '@/views/forms/AccountManagementForms/TestnetDepositForm';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -32,12 +32,12 @@ export const DepositDialog = ({ setIsOpen }: ElementProps) => {
     >
       <Styled.Content>
         {showTestDeposit ? <TestnetDepositForm onDeposit={closeDialog} /> : <DepositForm />}
-        {/* TODO TRCL-1693 - uncomment when deposit form is ready
+        {/* TODO TRCL-1693 - uncomment when deposit form is ready */}
          {import.meta.env.MODE !== 'production' && (
           <Styled.TextToggle onClick={() => setShowTestDeposit(!showTestDeposit)}>
             {showTestDeposit ? 'Show deposit form (Under Construction)' : 'Show test faucet'}
           </Styled.TextToggle>
-        )} */}
+        )}
       </Styled.Content>
     </Dialog>
   );

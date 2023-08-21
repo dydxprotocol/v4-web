@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import type { Nullable } from '@dydxprotocol/abacus';
 import Long from 'long';
 import type { IndexedTx } from '@cosmjs/stargate';
-import { type Coin } from '@cosmjs/proto-signing';
+import { EncodeObject, type Coin } from '@cosmjs/proto-signing';
 import { Method } from '@cosmjs/tendermint-rpc';
 
 import {
@@ -301,6 +301,32 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
         return result;
       },
+      
+      sendSquidWithdraw: async ({
+        subaccount,
+        payload,
+      }:{
+        subaccount: SubaccountClient;
+        payload: string;
+      }) => {
+        const decode = (str: string):string => Buffer.from(str, 'base64').toString('binary');
+        const decoded = decode(payload);
+  
+        const json = JSON.parse(decoded);
+  
+        const ibcMsg: EncodeObject = {
+          typeUrl: json.msgTypeUrl, 
+          value: json.msg,
+        };
+        const encodeObjects: Promise<EncodeObject[]> = Promise.resolve([ibcMsg]);
+
+        await compositeClient?.send(
+          subaccount.wallet,
+          () => encodeObjects,
+          false
+        )
+      },
+
     }),
     [compositeClient]
   );

@@ -38,6 +38,10 @@ export const WAGMI_SUPPORTED_CHAINS: Chain[] = [
   optimismGoerli,
 ];
 
+export const WAGMI_SUPPORTED_CHAIN_MAP = Object.fromEntries(
+  WAGMI_SUPPORTED_CHAINS.map((supportedChain) => [supportedChain.id, supportedChain])
+);
+
 const { chains, publicClient, webSocketPublicClient } = configureChains(WAGMI_SUPPORTED_CHAINS, [
   alchemyProvider({ apiKey: import.meta.env.VITE_ALCHEMY_API_KEY }),
   jsonRpcProvider({
@@ -162,7 +166,13 @@ const createWalletConnect2ConnectorWithId = (walletconnect2Id: string) =>
   });
 
 // Custom connector from wallet selection
-import { type WalletConnection, WalletConnectionType, type WalletType, walletConnectionTypes, wallets } from '@/constants/wallets';
+import {
+  type WalletConnection,
+  WalletConnectionType,
+  type WalletType,
+  walletConnectionTypes,
+  wallets,
+} from '@/constants/wallets';
 
 export const resolveWagmiConnector = ({
   walletType,
@@ -174,15 +184,12 @@ export const resolveWagmiConnector = ({
   const walletConfig = wallets[walletType];
   const walletConnectionConfig = walletConnectionTypes[walletConnection.type];
 
-  return (
-    walletConnection.type === WalletConnectionType.InjectedEip1193 && walletConnection.provider ?
-      createInjectedConnectorWithProvider(walletConnection.provider)
-    : walletConnection.type === WalletConnectionType.WalletConnect1 && walletConfig.walletconnect1Name ?
-      createWalletConnect1ConnectorWithName(walletConfig.walletconnect1Name)
-    : walletConnection.type === WalletConnectionType.WalletConnect2 && walletConfig.walletconnect2Id ?
-      createWalletConnect2ConnectorWithId(walletConfig.walletconnect2Id)
-    : connectors.find(
-        ({ id }: { id: string }) => id === walletConnectionConfig.wagmiConnectorId
-      )
-  );
+  return walletConnection.type === WalletConnectionType.InjectedEip1193 && walletConnection.provider
+    ? createInjectedConnectorWithProvider(walletConnection.provider)
+    : walletConnection.type === WalletConnectionType.WalletConnect1 &&
+      walletConfig.walletconnect1Name
+    ? createWalletConnect1ConnectorWithName(walletConfig.walletconnect1Name)
+    : walletConnection.type === WalletConnectionType.WalletConnect2 && walletConfig.walletconnect2Id
+    ? createWalletConnect2ConnectorWithId(walletConfig.walletconnect2Id)
+    : connectors.find(({ id }: { id: string }) => id === walletConnectionConfig.wagmiConnectorId);
 };

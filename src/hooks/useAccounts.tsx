@@ -63,6 +63,8 @@ const useAccountsContext = () => {
       forgetEvmSignature(previousEvmAddress);
     }
 
+    if (evmAddress) abacusStateManager.setEvmAddress(evmAddress);
+
     setPreviousEvmAddress(evmAddress);
   }, [evmAddress]);
 

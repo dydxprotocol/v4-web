@@ -2,6 +2,7 @@ import { useApiState } from './useApiState';
 import { useBreakpoints } from './useBreakpoints';
 import { useCommandMenu } from './useCommandMenu';
 import { useCurrentMarketId } from './useCurrentMarketId';
+import { useDebounce } from './useDebounce';
 import { useInterval } from './useInterval';
 import { useDocumentTitle } from './useDocumentTitle';
 import { useDydxClient } from './useDydxClient';
@@ -17,6 +18,7 @@ import { useOnClickOutside } from './useOnClickOutside';
 import { usePageTitlePriceUpdates } from './usePageTitlePriceUpdates';
 import { useShouldShowFooter } from './useShouldShowFooter';
 import { useSelectedNetwork } from './useSelectedNetwork';
+import { useSquidRouter } from './useSquidRouter';
 import { useStringGetter } from './useStringGetter';
 import { useSubaccount } from './useSubaccount';
 
@@ -25,6 +27,7 @@ export {
   useBreakpoints,
   useCommandMenu,
   useCurrentMarketId,
+  useDebounce,
   useDocumentTitle,
   useDydxClient,
   useAccountBalance,
@@ -41,5 +44,6 @@ export {
   useShouldShowFooter,
   useSelectedNetwork,
   useStringGetter,
+  useSquidRouter,
   useSubaccount,
 };

@@ -1,4 +1,4 @@
-import { type Dispatch, type SetStateAction, useState } from 'react';
+import { type Dispatch, useMemo, type SetStateAction, useState, type ReactNode } from 'react';
 import styled, { type AnyStyledComponent, css } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
 import type { RouteData, TokenData } from '@0xsquid/sdk';
@@ -12,6 +12,7 @@ import {
   ButtonType,
 } from '@/constants/buttons';
 
+import { TransferInputTokenResource } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
@@ -30,11 +31,11 @@ import { ToggleButton } from '@/components/ToggleButton';
 import { WithReceipt } from '@/components/WithReceipt';
 
 import { getSubaccountBuyingPower, getSubaccountEquity } from '@/state/accountSelectors';
+import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
-import squidRouter from '@/lib/squidRouter';
 
-import { SlippageEditor } from './SlippageEditor';
+import { SlippageEditor } from '../SlippageEditor';
 
 type ElementProps = {
   isDisabled?: boolean;
@@ -43,8 +44,9 @@ type ElementProps = {
   chainId?: string | number;
   setError?: Dispatch<SetStateAction<Error | undefined>>;
   slippage: number;
+  slotError?: ReactNode;
   setSlippage: (slippage: number) => void;
-  sourceToken?: TokenData;
+  sourceToken?: TransferInputTokenResource;
   squidRoute?: RouteData;
 };
 
@@ -54,10 +56,9 @@ export const DepositButtonAndReceipt = ({
   slippage,
   setSlippage,
   sourceToken,
-  squidRoute,
 
   isDisabled,
-  isLoading,
+  slotError,
 }: ElementProps) => {
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
   const [isEditingSlippage, setIsEditingSlipapge] = useState(false);
@@ -78,35 +79,23 @@ export const DepositButtonAndReceipt = ({
   const { current: buyingPower, postOrder: newBuyingPower } =
     useSelector(getSubaccountBuyingPower, shallowEqual) || {};
 
-  const { gasCosts, feeCosts } = squidRoute?.estimate || {};
+  const { summary, requestPayload } = useSelector(getTransferInputs, shallowEqual) || {};
 
-  const totalGasCosts =
-    gasCosts?.reduce(
-      (acc: BigNumber, { amountUSD }: { amountUSD: string }) => acc.plus(MustBigNumber(amountUSD)),
-      BIG_NUMBERS.ZERO
-    ) || BIG_NUMBERS.ZERO;
+  const feeSubitems: DetailsItem[] = [];
 
-  const totalFeeCosts =
-    feeCosts?.reduce(
-      (acc: BigNumber, { amountUSD }: { amountUSD: string }) => acc.plus(MustBigNumber(amountUSD)),
-      BIG_NUMBERS.ZERO
-    ) || BIG_NUMBERS.ZERO;
-
-  const totalFees = totalGasCosts.plus(totalFeeCosts);
-
-  const feeSubitems: DetailsItem[] = feeCosts
-    ? feeCosts.map(({ amountUSD, name }: { amountUSD: string; name: string }) => ({
-        key: name,
-        label: <span>{name}</span>,
-        value: <Output type={OutputType.Fiat} value={amountUSD} />,
-      }))
-    : [];
-
-  if (gasCosts) {
+  if (typeof summary?.gasFee === 'number') {
     feeSubitems.push({
       key: 'gas-fees',
       label: <span>{stringGetter({ key: STRING_KEYS.GAS_FEE })}</span>,
-      value: <Output type={OutputType.Fiat} value={totalGasCosts} />,
+      value: <Output type={OutputType.Fiat} value={summary?.gasFee} />,
+    });
+  }
+
+  if (typeof summary?.bridgeFee === 'number') {
+    feeSubitems.push({
+      key: 'bridge-fees',
+      label: <span>Bridge Fee</span>,
+      value: <Output type={OutputType.Fiat} value={summary?.bridgeFee} />,
     });
   }
 
@@ -128,9 +117,9 @@ export const DepositButtonAndReceipt = ({
         <DiffOutput
           type={OutputType.Fiat}
           value={equity}
-          newValue={newEquity}
+          newValue={newEquity} // using toAmountUSD as a proxy for equity until Abacus supports accounts with no funds.
           sign={NumberSign.Positive}
-          withDiff={Boolean(newEquity) && equity !== newEquity}
+          withDiff={equity !== newEquity}
         />
       ),
     },
@@ -154,27 +143,20 @@ export const DepositButtonAndReceipt = ({
     {
       key: 'exchange-rate',
       label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
-      value: sourceToken && squidRoute && (
+      value: typeof summary?.exchangeRate === 'number' && (
         <Styled.ExchangeRate>
-          <Output
-            type={OutputType.Asset}
-            value={1}
-            fractionDigits={0}
-            tag={<Tag>{sourceToken?.symbol}</Tag>}
-          />
+          <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={sourceToken?.symbol} />
           =
-          <Output
-            type={OutputType.Asset}
-            value={squidRoute?.estimate?.exchangeRate}
-            tag={<Tag>{squidRouter.SQUID_ROUTE_DEFAULTS.toToken.toUpperCase()}</Tag>}
-          />
+          <Output type={OutputType.Asset} value={summary?.exchangeRate} tag="USDC" />
         </Styled.ExchangeRate>
       ),
     },
     {
       key: 'total-fees',
       label: <span>{stringGetter({ key: STRING_KEYS.TOTAL_FEES })}</span>,
-      value: squidRoute && <Output type={OutputType.Fiat} value={totalFees} />,
+      value: typeof summary?.bridgeFee === 'number' && typeof summary?.gasFee === 'number' && (
+        <Output type={OutputType.Fiat} value={summary?.bridgeFee + summary?.gasFee} />
+      ),
       subitems: feeSubitems,
     },
     {
@@ -191,6 +173,7 @@ export const DepositButtonAndReceipt = ({
   ];
 
   const isFormValid = !isDisabled && !isEditingSlippage;
+  const isLoading = isFormValid && !requestPayload;
 
   return (
     <Styled.WithReceipt
@@ -212,17 +195,22 @@ export const DepositButtonAndReceipt = ({
           </Styled.DetailButtons>
         </Styled.CollapsibleDetails>
       }
+      slotError={slotError}
     >
       {!isMatchingNetwork ? (
         <Button
           action={ButtonAction.Primary}
           onClick={switchNetwork}
-          state={{ isLoading: isSwitchingNetwork || isLoading }}
+          state={{ isLoading: isSwitchingNetwork }}
         >
           {stringGetter({ key: STRING_KEYS.SWITCH_NETWORK })}
         </Button>
       ) : (
-        <Button type={ButtonType.Submit} state={{ isDisabled: !isFormValid, isLoading }}>
+        <Button
+          action={ButtonAction.Primary}
+          type={ButtonType.Submit}
+          state={{ isDisabled: !isFormValid, isLoading }}
+        >
           {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
         </Button>
       )}
@@ -234,7 +222,7 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.ExchangeRate = styled.span`
   ${layoutMixins.row}
-  gap: 1ch;
+  gap: 0.5ch;
 `;
 
 Styled.WithReceipt = styled(WithReceipt)`

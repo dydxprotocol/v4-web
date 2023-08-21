@@ -147,6 +147,10 @@ class AbacusStateManager {
     this.stateManager.accountAddress = walletAddress;
   };
 
+  setEvmAddress = (evmAddress: string) => {
+    this.stateManager.sourceAddress = evmAddress;
+  };
+
   setSubaccountNumber = (subaccountNumber: number) =>
     (this.stateManager.subaccountNumber = subaccountNumber);
 
