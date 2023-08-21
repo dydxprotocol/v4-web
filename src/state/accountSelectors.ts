@@ -195,6 +195,12 @@ export const getCurrentMarketFills = createSelector(
 
 /**
  * @param state
+ * @returns list of transfers for the currently connected subaccount
+ */
+export const getSubaccountTransfers = (state: RootState) => state.account?.transfers;
+
+/**
+ * @param state
  * @returns list of funding payments for the currently connected subaccount
  */
 export const getSubaccountFundingPayments = (state: RootState) => state.account?.fundingPayments;

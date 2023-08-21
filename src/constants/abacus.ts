@@ -112,6 +112,8 @@ export type SubaccountFill = Abacus.exchange.dydx.abacus.output.SubaccountFill;
 export type SubaccountFundingPayment = Abacus.exchange.dydx.abacus.output.SubaccountFundingPayment;
 export type SubaccountFundingPayments =
   Abacus.exchange.dydx.abacus.output.SubaccountFundingPayment[];
+export type SubaccountTransfer = Abacus.exchange.dydx.abacus.output.SubaccountTransfer;
+export type SubaccountTransfers = Abacus.exchange.dydx.abacus.output.SubaccountTransfer[];
 
 // ------ Historical PnL ------ //
 export type SubAccountHistoricalPNL = Abacus.exchange.dydx.abacus.output.SubaccountHistoricalPNL;

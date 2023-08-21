@@ -19,6 +19,7 @@ import {
   setFundingPayments,
   setHistoricalPnl,
   setSubaccount,
+  setTransfers,
   setWallet,
 } from '@/state/account';
 
@@ -100,6 +101,11 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
             const fundingPayments =
               updatedState.subaccountFundingPayments(subaccountId)?.toArray() || [];
             dispatch(setFundingPayments(fundingPayments));
+          }
+
+          if (changes.has(Changes.transfers)) {
+            const transfers = updatedState.subaccountTransfers(subaccountId)?.toArray() || [];
+            dispatch(setTransfers(transfers));
           }
 
           if (changes.has(Changes.historicalPnl)) {

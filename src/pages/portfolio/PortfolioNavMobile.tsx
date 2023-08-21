@@ -40,12 +40,12 @@ export const PortfolioNavMobile = () => {
       label: stringGetter({ key: STRING_KEYS.TRADES }),
       description: stringGetter({ key: STRING_KEYS.TRADES_DESCRIPTION }),
     },
-    // TODO: TRCL-1693 - re-enable when Payments and Transfers are ready
-    // {
-    //   value: `${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.Transfers}`,
-    //   label: stringGetter({ key: STRING_KEYS.TRANSFERS }),
-    //   description: stringGetter({ key: STRING_KEYS.TRANSFERS_DESCRIPTION }),
-    // },
+    {
+      value: `${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.Transfers}`,
+      label: stringGetter({ key: STRING_KEYS.TRANSFERS }),
+      description: stringGetter({ key: STRING_KEYS.TRANSFERS_DESCRIPTION }),
+    },
+    // TODO: TRCL-1693 - re-enable when Payments are ready
     // {
     //   value: `${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.Payments}`,
     //   label: stringGetter({ key: STRING_KEYS.PAYMENTS }),

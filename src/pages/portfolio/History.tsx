@@ -28,12 +28,13 @@ export const History = () => {
                   label: <h3>{stringGetter({ key: STRING_KEYS.TRADES })}</h3>,
                   href: HistoryRoute.Trades,
                 },
+                {
+                  value: HistoryRoute.Transfers,
+                  label: <h3>{stringGetter({ key: STRING_KEYS.TRANSFERS })}</h3>,
+                  href: HistoryRoute.Transfers,
+                  tag: 'USDC',
+                },
                 // TODO - TRCL-1693 -
-                // {
-                //   value: HistoryRoute.Transfers,
-                //   label: <h3>{stringGetter({ key: STRING_KEYS.TRANSFERS })}</h3>,
-                //   href: HistoryRoute.Transfers,
-                // },
                 // {
                 //   value: HistoryRoute.Payments,
                 //   label: <h3>{stringGetter({ key: STRING_KEYS.PAYMENTS })}</h3>,
