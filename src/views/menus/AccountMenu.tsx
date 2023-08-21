@@ -1,5 +1,7 @@
+import { memo } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import type { Dispatch } from '@reduxjs/toolkit';
 
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -110,12 +112,7 @@ export const AccountMenu = () => {
                   </Styled.label>
                   <Styled.BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
                 </div>
-                <IconButton
-                  action={ButtonAction.Base}
-                  iconName={IconName.Send}
-                  onClick={() => dispatch(openDialog({ type: DialogTypes.Transfer }))}
-                  shape={ButtonShape.Square}
-                />
+                <AssetActions asset={DydxChainAsset.DYDX} dispatch={dispatch} />
               </div>
               <div>
                 <div>
@@ -129,34 +126,7 @@ export const AccountMenu = () => {
                     fractionDigits={2}
                   />
                 </div>
-                <Styled.InlineRow>
-                  <IconButton
-                    action={ButtonAction.Base}
-                    iconName={IconName.Qr}
-                    onClick={() =>
-                      dispatch(
-                        openDialog({
-                          type: DialogTypes.Receive,
-                          dialogProps: { selectedAsset: DydxChainAsset.USDC },
-                        })
-                      )
-                    }
-                    shape={ButtonShape.Square}
-                  />
-                  <IconButton
-                    action={ButtonAction.Base}
-                    iconName={IconName.Send}
-                    onClick={() =>
-                      dispatch(
-                        openDialog({
-                          type: DialogTypes.Transfer,
-                          dialogProps: { selectedAsset: DydxChainAsset.USDC },
-                        })
-                      )
-                    }
-                    shape={ButtonShape.Square}
-                  />
-                </Styled.InlineRow>
+                <AssetActions asset={DydxChainAsset.USDC} dispatch={dispatch} />
               </div>
             </Styled.Balances>
           </Styled.AccountInfo>
@@ -228,6 +198,29 @@ export const AccountMenu = () => {
     </Styled.DropdownMenu>
   );
 };
+
+const AssetActions = memo(({ asset, dispatch }: { asset: DydxChainAsset; dispatch: Dispatch }) => (
+  <Styled.InlineRow>
+    {[
+      // TODO(@rosepuppy): Add withdraw action for USDC
+      {
+        dialogType: DialogTypes.Receive,
+        iconName: IconName.Qr,
+      },
+      { dialogType: DialogTypes.Transfer, iconName: IconName.Send },
+    ].map(({ iconName, dialogType }) => (
+      <IconButton
+        key={dialogType}
+        action={ButtonAction.Base}
+        iconName={iconName}
+        onClick={() =>
+          dispatch(openDialog({ type: dialogType, dialogProps: { selectedAsset: asset } }))
+        }
+        shape={ButtonShape.Square}
+      />
+    ))}
+  </Styled.InlineRow>
+));
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
