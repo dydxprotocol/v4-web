@@ -15836,12 +15836,6 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
 
-  file:../../abacus/build/packages/js/dydxprotocol-abacus-0.2.28.tgz:
-    resolution: {integrity: sha512-aOT+QROV5aL0QLNq7QINW6Bw3Vz8ds7LOoC4MQfPDsGGqgyundpAcPkLmgcbIk0Ft8BQsdOz+HbbAYL4n7Iqlg==, tarball: file:../../abacus/build/packages/js/dydxprotocol-abacus-0.2.28.tgz}
-    name: '@dydxprotocol/abacus'
-    version: 0.2.28
-    dev: false
-
   github.com/release-it/conventional-changelog/a4acfeac76369937a6566d698a5ae9180eceb413(release-it@15.11.0):
     resolution: {tarball: https://codeload.github.com/release-it/conventional-changelog/tar.gz/a4acfeac76369937a6566d698a5ae9180eceb413}
     id: github.com/release-it/conventional-changelog/a4acfeac76369937a6566d698a5ae9180eceb413
