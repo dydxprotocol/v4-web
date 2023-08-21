@@ -2,6 +2,8 @@ import type { Nullable, kollections } from '@dydxprotocol/abacus';
 
 import type { AbacusRestProtocol } from '@/constants/abacus';
 
+import { lastSuccessfulRestRequestByOrigin } from '@/hooks/useAnalytics';
+
 type Headers = Nullable<kollections.Map<string, string>>;
 type FetchResponseCallback = (p0: Nullable<string>, p1: number) => void;
 
@@ -46,16 +48,20 @@ class AbacusRest implements AbacusRestProtocol {
     };
 
     fetch(url, options)
-      .then((response) =>
-        response.text().then((data) => {
-          if (response.ok) {
-            callback(data, response.status);
-          } else {
-            // response not OK, call callback with null data and the status, this includes 400/500 status codes
-            callback(null, response.status);
-          }
-        })
-      )
+      .then(async (response) => {
+        const data = await response.text();
+
+        if (response.ok) {
+          callback(data, response.status);
+        } else {
+          // response not OK, call callback with null data and the status, this includes 400/500 status codes
+          callback(null, response.status);
+        }
+
+        try {
+          lastSuccessfulRestRequestByOrigin[new URL(url).origin] = Date.now();
+        } catch {}
+      })
       .catch(() => callback(null, 0)); // Network error or request couldn't be made
   }
 
