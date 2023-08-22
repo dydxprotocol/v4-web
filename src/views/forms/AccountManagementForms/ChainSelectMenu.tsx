@@ -2,7 +2,7 @@ import type { ChainData } from '@0xsquid/sdk';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
 
-import { TransferInputChainResource, TransferType } from '@/constants/abacus';
+import { SelectionOption, TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { useStringGetter } from '@/hooks';
 
@@ -15,8 +15,8 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 type ElementProps = {
   label?: string;
-  selectedChain?: TransferInputChainResource;
-  onSelectChain: (chain: TransferInputChainResource) => void;
+  selectedChain?: string;
+  onSelectChain: (chain: string) => void;
 };
 
 export const ChainSelectMenu = ({
@@ -34,11 +34,12 @@ export const ChainSelectMenu = ({
     value: chain.type,
     label: chain.stringKey,
     onSelect: () => {
-      const selectedChain = resources?.chainResources?.get(chain.type);
-      selectedChain && onSelectChain(selectedChain);
+      onSelectChain(chain.type);
     },
     slotBefore: <Styled.Img src={chain.iconUrl} alt="" />,
   }));
+
+  const selectedOption = chains.find((item) => item.type === selectedChain); 
 
   return (
     <SearchSelectMenu
@@ -54,7 +55,7 @@ export const ChainSelectMenu = ({
       <Styled.ChainRow>
         {selectedChain ? (
           <>
-            <Styled.Img src={selectedChain?.iconUrl} alt="" /> {selectedChain?.chainName}
+            <Styled.Img src={selectedOption?.iconUrl} alt="" /> {selectedOption?.stringKey}
           </>
         ) : (
           stringGetter({ key: STRING_KEYS.SELECT_CHAIN })

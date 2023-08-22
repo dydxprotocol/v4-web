@@ -55,14 +55,9 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const { signerWagmi } = useAccounts();
 
-  const { requestPayload, token, chain, resources } = useSelector(getTransferInputs) || {};
+  const { requestPayload, token, chain: chainId, resources } = useSelector(getTransferInputs) || {};
 
   // User inputs
-  const sourceChain = useMemo(
-    () => (chain ? resources?.chainResources?.get(chain) : undefined),
-    [chain, resources]
-  );
-
   const sourceToken = useMemo(
     () => (token ? resources?.tokenResources?.get(token) : undefined),
     [token, resources]
@@ -78,9 +73,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const { balance, queryStatus, isQueryFetching } = useAccountBalance({
     addressOrDenom: sourceToken?.address || undefined,
     assetSymbol: sourceToken?.symbol || undefined,
-    chainId: sourceChain?.chainId || undefined,
+    chainId: chainId ? parseInt(chainId) : undefined,
     decimals: sourceToken?.decimals || undefined,
-    rpc: sourceChain?.rpc || undefined,
     isCosmosChain: false,
   });
 
@@ -115,12 +109,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     if (error) onError?.();
   }, [error]);
 
-  const onSelectChain = useCallback((chain: TransferInputChainResource) => {
+  const onSelectChain = useCallback((chain: string) => {
     if (chain) {
       abacusStateManager.clearTransferInputValues();
       abacusStateManager.setTransferValue({
         field: TransferInputField.chain,
-        value: chain.chainId,
+        value: chain,
       });
       setFromAmount('');
     }
@@ -194,7 +188,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           abacusStateManager.setTransferStatus({
             hash: txHash,
             toChainId: TESTNET_CHAIN_ID,
-            fromChainId: sourceChain?.chainId?.toString(),
+            fromChainId: chainId?.toString(),
           });
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');
@@ -206,7 +200,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         setIsLoading(false);
       }
     },
-    [requestPayload, signerWagmi, sourceChain]
+    [requestPayload, signerWagmi, chainId]
   );
 
   const amountInputReceipt = [
@@ -246,7 +240,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     }
 
     if (fromAmount) {
-      if (!sourceChain) {
+      if (!chainId) {
         return stringGetter({ key: STRING_KEYS.MUST_SPECIFY_CHAIN });
       } else if (!sourceToken) {
         return stringGetter({ key: STRING_KEYS.MUST_SPECIFY_ASSET });
@@ -258,12 +252,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     }
 
     return undefined;
-  }, [error, balance, sourceChain, fromAmount, sourceToken]);
+  }, [error, balance, chainId, fromAmount, sourceToken]);
 
   const isDisabled =
     Boolean(errorMessage) ||
     !sourceToken ||
-    !sourceChain ||
+    !chainId ||
     debouncedAmountBN.isNaN() ||
     debouncedAmountBN.isZero();
 
@@ -273,7 +267,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   return (
     <Styled.Form onSubmit={onSubmit}>
-      <ChainSelectMenu selectedChain={sourceChain || undefined} onSelectChain={onSelectChain} />
+      <ChainSelectMenu selectedChain={chainId || undefined} onSelectChain={onSelectChain} />
       <TokenSelectMenu selectedToken={sourceToken || undefined} onSelectToken={onSelectToken} />
       <Styled.WithDetailsReceipt side="bottom" detailItems={amountInputReceipt}>
         <FormInput
@@ -302,7 +296,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       <DepositButtonAndReceipt
         isDisabled={isDisabled}
         isLoading={isLoading}
-        chainId={sourceChain?.chainId || undefined}
+        chainId={chainId || undefined}
         setSlippage={onSetSlippage}
         slippage={slippage}
         sourceToken={sourceToken || undefined}

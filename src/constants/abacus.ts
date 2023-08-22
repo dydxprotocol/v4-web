@@ -100,6 +100,7 @@ export type TransferInputs = Abacus.exchange.dydx.abacus.output.input.TransferIn
 export type InputError = Abacus.exchange.dydx.abacus.output.input.ValidationError;
 export type TransferInputTokenResource = Abacus.exchange.dydx.abacus.output.input.TransferInputTokenResource;
 export type TransferInputChainResource = Abacus.exchange.dydx.abacus.output.input.TransferInputChainResource;
+export type SelectionOption = Abacus.exchange.dydx.abacus.output.input.SelectionOption;
 export const ErrorType = Abacus.exchange.dydx.abacus.output.input.ErrorType;
 export const InputSelectionOption = Abacus.exchange.dydx.abacus.output.input.SelectionOption;
 
