@@ -12,10 +12,6 @@ export type AbacusDydxChainQueriesProtocol = Omit<
   Abacus.exchange.dydx.abacus.protocols.DYDXChainQueriesProtocol,
   '__doNotUseOrImplementIt'
 >;
-export type AbacusDYDXChainTransactionsProtocol = Omit<
-  Abacus.exchange.dydx.abacus.protocols.DYDXChainTransactionsProtocol,
-  '__doNotUseOrImplementIt'
->;
 export type AbacusRestProtocol = Omit<
   Abacus.exchange.dydx.abacus.protocols.RestProtocol,
   '__doNotUseOrImplementIt'
@@ -47,10 +43,6 @@ export const CoroutineTimer = Abacus.exchange.dydx.abacus.utils.CoroutineTimer;
 export const QueryType = Abacus.exchange.dydx.abacus.protocols.QueryType;
 const queryTypes = [...QueryType.values()] as const;
 export type QueryTypes = (typeof queryTypes)[number];
-
-export const TransactionType = Abacus.exchange.dydx.abacus.protocols.TransactionType;
-const TransactionTypes = [...TransactionType.values()] as const;
-export type TransactionTypes = (typeof TransactionTypes)[number];
 
 export type NetworkConfig = {
   chainId: string;
