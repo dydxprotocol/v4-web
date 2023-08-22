@@ -55,7 +55,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const { signerWagmi } = useAccounts();
 
-  const { requestPayload, token, chain: chainId, resources } = useSelector(getTransferInputs) || {};
+  const { requestPayload, token, chain: chainIdStr, resources } = useSelector(getTransferInputs) || {};
+  const chainId = chainIdStr ? parseInt(chainIdStr) : undefined
 
   // User inputs
   const sourceToken = useMemo(
@@ -73,7 +74,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const { balance, queryStatus, isQueryFetching } = useAccountBalance({
     addressOrDenom: sourceToken?.address || undefined,
     assetSymbol: sourceToken?.symbol || undefined,
-    chainId: chainId ? parseInt(chainId) : undefined,
+    chainId: chainId,
     decimals: sourceToken?.decimals || undefined,
     isCosmosChain: false,
   });
@@ -267,7 +268,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   return (
     <Styled.Form onSubmit={onSubmit}>
-      <ChainSelectMenu selectedChain={chainId || undefined} onSelectChain={onSelectChain} />
+      <ChainSelectMenu selectedChain={chainIdStr || undefined} onSelectChain={onSelectChain} />
       <TokenSelectMenu selectedToken={sourceToken || undefined} onSelectToken={onSelectToken} />
       <Styled.WithDetailsReceipt side="bottom" detailItems={amountInputReceipt}>
         <FormInput
