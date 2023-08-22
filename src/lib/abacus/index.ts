@@ -190,6 +190,18 @@ class AbacusStateManager {
     this.abacusFormatter.setLocaleSeparators({ group, decimal });
   };
 
+  setTransferStatus = ({
+    hash,
+    fromChainId,
+    toChainId,
+  }: {
+    hash: string;
+    fromChainId?: string;
+    toChainId?: string;
+  }) => {
+    this.stateManager.transferStatus(hash, fromChainId, toChainId);
+  };
+
   // ------ Utils ------ //
   placeOrderPayload = (): Nullable<HumanReadablePlaceOrderPayload> =>
     this.stateManager.placeOrderPayload();

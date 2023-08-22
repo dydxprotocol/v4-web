@@ -6,14 +6,19 @@ import type { TokenData, ChainData } from '@0xsquid/sdk';
 import { shallowEqual, useSelector } from 'react-redux';
 import { parseUnits } from 'viem';
 
-import { TransferInputField, TransferInputChainResource, TransferInputTokenResource, TransferType } from '@/constants/abacus';
+import {
+  TransferInputField,
+  TransferInputChainResource,
+  TransferInputTokenResource,
+  TransferType,
+} from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { CLIENT_NETWORK_CONFIGS, type DydxV4Network } from '@/constants/networks';
-import { NumberSign } from '@/constants/numbers';
+import { NumberSign, QUANTUM_MULTIPLIER } from '@/constants/numbers';
 
-import { useAccounts, useDebounce, useStringGetter, useSquidRouter } from '@/hooks';
+import { useAccounts, useDebounce, useStringGetter, useSquidRouter, useSubaccount } from '@/hooks';
 import { SQUID_WITHDRAW_ROUTE_DEFAULTS } from '@/hooks/useSquidRouter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -39,27 +44,32 @@ import { MustBigNumber } from '@/lib/numbers';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
+import { parse } from 'path';
+import { s } from 'vitest/dist/types-2b1c412e';
 
 export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
-  const { dydxAddress } = useAccounts();
+  const [error, setError] = useState<Error | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { simulateWithdraw, sendSquidWithdraw } = useSubaccount();
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
 
-  const {
-    error,
-    setError,
-    isLoading,
-
-    axelarscanURL,
-  } = useSquidRouter({ allChains: true });
+  const { axelarscanURL } = useSquidRouter();
 
   // User input
   const [withdrawAmount, setWithdrawAmount] = useState('');
-  const [slippage, setSlippage] = useState(0.001); // 0.1% slippage
+  const [slippage, setSlippage] = useState(0.01); // 0.1% slippage
   const debouncedAmount = useDebounce<string>(withdrawAmount, 500);
 
-  const { requestPayload, token, chain, address: toAddress, resources } = useSelector(getTransferInputs) || {};
-  
+  const {
+    requestPayload,
+    token,
+    chain,
+    address: toAddress,
+    resources,
+  } = useSelector(getTransferInputs) || {};
+
   const toChain = useMemo(
     () => (chain ? resources?.chainResources?.get(chain) : undefined),
     [chain, resources]
@@ -88,14 +98,24 @@ export const WithdrawForm = () => {
   }, []);
 
   useEffect(() => {
-    const hasInvalidInput = debouncedAmountBN.isNaN() || debouncedAmountBN.lte(0);
+    const setTransferValue = async () => {
+      const hasInvalidInput = debouncedAmountBN.isNaN() || debouncedAmountBN.lte(0);
 
-    abacusStateManager.setTransferValue({
-      value: hasInvalidInput ? 0 : debouncedAmount,
-      field: TransferInputField.usdcSize,
-    });
+      const stdFee = await simulateWithdraw(parseFloat(debouncedAmount));
+      const amount = hasInvalidInput
+        ? 0
+        : parseFloat(debouncedAmount) -
+          parseFloat(stdFee?.amount[0]?.amount || '0') / QUANTUM_MULTIPLIER;
 
-    setError(null);
+      abacusStateManager.setTransferValue({
+        value: hasInvalidInput ? 0 : amount.toString(),
+        field: TransferInputField.usdcSize,
+      });
+
+      setError(null);
+    };
+
+    setTransferValue();
   }, [debouncedAmountBN.toNumber()]);
 
   /**
@@ -106,23 +126,33 @@ export const WithdrawForm = () => {
   const onSubmit = useCallback(
     async (e: FormEvent) => {
       e.preventDefault();
-      // const withdraw = await dydxClient.withdrawFromSubaccount(debouncedAmountBN.toNumber(), 0);
-      // const txHash = await executeRoute();
-      // @ts-ignore execute route returns Promise<string> instead of Promise<TransactionReponse>
-      // setTransactionHash(txHash);
+      try {
+        
+        if (!requestPayload?.data || !debouncedAmountBN.toNumber()) {
+          throw new Error('Invalid request payload');
+        }
+        const txHash = await sendSquidWithdraw(debouncedAmountBN.toNumber(), requestPayload?.data);
+
+        if (txHash?.hash) {
+          abacusStateManager.setTransferStatus({
+            hash: `0x${Buffer.from(txHash.hash).toString('hex')}`,
+            fromChainId: 'dydx-testnet-2',
+            toChainId: toChain?.chainId?.toString(),
+          })
+        }
+      } catch (error) {
+        setError(error);
+      }
     },
-    [setTransactionHash]
+    [setTransactionHash, requestPayload, debouncedAmountBN]
   );
 
-  const onChangeAddress = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      abacusStateManager.setTransferValue({
-        field: TransferInputField.address,
-        value: e.target.value,
-      });
-    },
-    []
-  );
+  const onChangeAddress = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    abacusStateManager.setTransferValue({
+      field: TransferInputField.address,
+      value: e.target.value,
+    });
+  }, []);
 
   const onChangeAmount = useCallback(
     ({ value }: NumberFormatValues) => {
@@ -146,7 +176,6 @@ export const WithdrawForm = () => {
     setWithdrawAmount(freeCollateralBN.toString());
   }, [freeCollateral?.current, setWithdrawAmount]);
 
-
   const onSelectChain = useCallback((chain: TransferInputChainResource) => {
     if (chain) {
       abacusStateManager.clearTransferInputValues();
@@ -158,19 +187,16 @@ export const WithdrawForm = () => {
     }
   }, []);
 
-  const onSelectToken = useCallback(
-    (token: TransferInputTokenResource) => {
-      if (token) {
-        abacusStateManager.clearTransferInputValues();
-        abacusStateManager.setTransferValue({
-          field: TransferInputField.token,
-          value: token.address,
-        });
-        setWithdrawAmount('');
-      }
-    },
-    []
-  );
+  const onSelectToken = useCallback((token: TransferInputTokenResource) => {
+    if (token) {
+      abacusStateManager.clearTransferInputValues();
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.token,
+        value: token.address,
+      });
+      setWithdrawAmount('');
+    }
+  }, []);
 
   const amountInputReceipt = [
     {
@@ -196,8 +222,9 @@ export const WithdrawForm = () => {
   ];
 
   let errorMessage = !toAddress ? 'Please enter a destination address' : undefined;
-  
-  const isDisabled = !!errorMessage ||
+
+  const isDisabled =
+    !!errorMessage ||
     !toToken ||
     !toChain ||
     debouncedAmountBN.isNaN() ||
@@ -219,10 +246,7 @@ export const WithdrawForm = () => {
           onSelectChain={onSelectChain}
         />
       </Styled.DestinationRow>
-      <TokenSelectMenu
-        selectedToken={toToken || undefined}
-        onSelectToken={onSelectToken}
-      />
+      <TokenSelectMenu selectedToken={toToken || undefined} onSelectToken={onSelectToken} />
       <Styled.WithDetailsReceipt side="bottom" detailItems={amountInputReceipt}>
         <FormInput
           type={InputType.Number}
@@ -260,7 +284,6 @@ export const WithdrawForm = () => {
       )}
       <WithdrawButtonAndReceipt
         isDisabled={isDisabled}
-        isLoading={isLoading}
         setError={undefined}
         setSlippage={onSetSlippage}
         slippage={slippage}

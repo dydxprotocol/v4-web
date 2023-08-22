@@ -40,7 +40,6 @@ type ElementProps = {
   withdrawToken?: TransferInputTokenResource;
 
   isDisabled?: boolean;
-  isLoading?: boolean;
 };
 
 export const WithdrawButtonAndReceipt = ({
@@ -52,7 +51,6 @@ export const WithdrawButtonAndReceipt = ({
   withdrawToken,
 
   isDisabled,
-  isLoading,
 }: ElementProps) => {
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
   const [isEditingSlippage, setIsEditingSlipapge] = useState(false);
@@ -166,6 +164,9 @@ export const WithdrawButtonAndReceipt = ({
     // },
   ];
 
+  const isFormValid = !isDisabled && !isEditingSlippage && queryStatus !== 'error';
+  const isLoading = isFormValid && !requestPayload;
+
   return (
     <Styled.WithReceipt
       slotReceipt={
@@ -192,7 +193,7 @@ export const WithdrawButtonAndReceipt = ({
         action={ButtonAction.Primary}
         type={ButtonType.Submit}
         state={{
-          isDisabled: isEditingSlippage || isDisabled || queryStatus === 'error',
+          isDisabled: !isFormValid,
           isLoading,
         }}
       >

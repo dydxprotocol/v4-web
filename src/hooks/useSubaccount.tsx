@@ -89,6 +89,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     simulateTransferNativeToken,
     placeOrderForSubaccount,
     cancelOrderForSubaccount,
+    sendSquidWithdrawFromSubaccount,
   } = useMemo(
     () => ({
       depositToSubaccount: async ({
@@ -302,31 +303,31 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         return result;
       },
       
-      sendSquidWithdraw: async ({
-        subaccount,
+      sendSquidWithdrawFromSubaccount: async ({
+        subaccountClient,
+        amount,
         payload,
-      }:{
-        subaccount: SubaccountClient;
+      }: {
+        subaccountClient: SubaccountClient;
+        amount: number;
         payload: string;
       }) => {
-        const decode = (str: string):string => Buffer.from(str, 'base64').toString('binary');
-        const decoded = decode(payload);
-  
-        const json = JSON.parse(decoded);
-  
+        if (!compositeClient) throw new Error('client not initialized');
+        
+        const transaction = JSON.parse(payload);
+
+        const msg = compositeClient.withdrawFromSubaccountMessage(subaccountClient, amount);
         const ibcMsg: EncodeObject = {
-          typeUrl: json.msgTypeUrl, 
-          value: json.msg,
+          typeUrl: transaction.msgTypeUrl,
+          value: transaction.msg,
         };
-        const encodeObjects: Promise<EncodeObject[]> = Promise.resolve([ibcMsg]);
 
-        await compositeClient?.send(
-          subaccount.wallet,
-          () => encodeObjects,
+        return await compositeClient.send(
+          subaccountClient.wallet,
+          () => Promise.resolve([msg, ibcMsg]),
           false
-        )
+        );
       },
-
     }),
     [compositeClient]
   );
@@ -422,6 +423,28 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         : simulateTransferNativeToken)({ subaccountClient, amount, recipient });
     },
     [subaccountClient, simulateWithdrawFromSubaccount, simulateTransferNativeToken]
+  );
+
+  const simulateWithdraw = useCallback(
+    async (amount: number) => {
+      if (!subaccountClient) {
+        return;
+      }
+
+      return await simulateWithdrawFromSubaccount({ subaccountClient, amount });
+    },
+    [subaccountClient, simulateWithdrawFromSubaccount]
+  );
+
+  const sendSquidWithdraw = useCallback(
+    async (amount: number, payload: string) => {
+      if (!subaccountClient) {
+        return;
+      }
+
+      return await sendSquidWithdrawFromSubaccount({ subaccountClient, amount, payload });
+    },
+    [subaccountClient, sendSquidWithdrawFromSubaccount]
   );
 
   // ------ Faucet Methods ------ //
@@ -615,6 +638,8 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     // Transfer Methods
     simulateTransfer,
     transfer,
+    simulateWithdraw,
+    sendSquidWithdraw,
 
     // Trading Methods
     placeOrder,
