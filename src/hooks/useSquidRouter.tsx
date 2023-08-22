@@ -4,9 +4,7 @@ import { useSelector } from 'react-redux';
 import { Squid, type GetRoute, type RouteResponse, ChainData, ChainType } from '@0xsquid/sdk';
 import { USDC_DENOM } from '@dydxprotocol/v4-client';
 
-import { TransferInputs } from '@/constants/abacus';
 import { DydxV4Network, isDydxV4Network } from '@/constants/networks';
-import { useAccounts } from '@/hooks/useAccounts';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
 
@@ -69,50 +67,3 @@ export const SquidProvider = ({ ...props }) => (
 );
 
 export const useSquid = () => useContext(SquidContext);
-
-export const useSquidRouter = () => {
-  const squid = useSquid();
-  const { signerWagmi } = useAccounts();
-
-  const submitDeposit = useCallback(
-    async (requestPayload: TransferInputs['requestPayload']) => {
-      if (!signerWagmi) {
-        throw new Error('Missing signer');
-      }
-      if (
-        !requestPayload?.targetAddress ||
-        !requestPayload.data ||
-        !requestPayload.value ||
-        !requestPayload.gasLimit ||
-        !requestPayload.gasPrice ||
-        !requestPayload.routeType
-      ) {
-        throw new Error('Missing request payload');
-      }
-      let tx = {
-        to: requestPayload.targetAddress as `0x${string}`,
-        data: requestPayload.data as `0x${string}`,
-        gasLimit: ethers.toBigInt(requestPayload.gasLimit),
-        value:
-          requestPayload.routeType !== 'SEND' ? ethers.toBigInt(requestPayload.value) : undefined,
-      };
-      return await signerWagmi.sendTransaction(tx);
-    },
-    [signerWagmi]
-  );
-
-  const getStatus = useCallback(
-    async (transactionId: string) => {
-      const status = await squid?.getStatus({ transactionId });
-      return status;
-    },
-    [squid]
-  );
-
-  return {
-    getStatus,
-    submitDeposit,
-
-    axelarscanURL: squid?.axelarscanURL,
-  };
-};

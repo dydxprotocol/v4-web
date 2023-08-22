@@ -32,7 +32,6 @@ import { getSubaccount } from '@/state/accountSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 type ElementProps = {
-  setError?: Dispatch<SetStateAction<Error | undefined>>;
   setSlippage: (slippage: number) => void;
 
   slippage: number;
@@ -40,10 +39,10 @@ type ElementProps = {
   withdrawToken?: TransferInputTokenResource;
 
   isDisabled?: boolean;
+  isLoading?: boolean;
 };
 
 export const WithdrawButtonAndReceipt = ({
-  setError,
   setSlippage,
 
   slippage,
@@ -51,6 +50,7 @@ export const WithdrawButtonAndReceipt = ({
   withdrawToken,
 
   isDisabled,
+  isLoading,
 }: ElementProps) => {
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
   const [isEditingSlippage, setIsEditingSlipapge] = useState(false);
@@ -165,7 +165,6 @@ export const WithdrawButtonAndReceipt = ({
   ];
 
   const isFormValid = !isDisabled && !isEditingSlippage && queryStatus !== 'error';
-  const isLoading = isFormValid && !requestPayload;
 
   return (
     <Styled.WithReceipt
@@ -177,9 +176,8 @@ export const WithdrawButtonAndReceipt = ({
               <Styled.ToggleButton
                 shape={ButtonShape.Pill}
                 size={ButtonSize.XSmall}
-                state={{ isDisabled: !hasSubitems }}
                 isPressed={showFeeBreakdown}
-                onPressedChanged={() => setShowFeeBreakdown(!showFeeBreakdown)}
+                onPressedChange={setShowFeeBreakdown}
                 slotLeft={<Icon iconName={IconName.Caret} />}
               >
                 {showSubitemsToggle}
@@ -194,7 +192,7 @@ export const WithdrawButtonAndReceipt = ({
         type={ButtonType.Submit}
         state={{
           isDisabled: !isFormValid,
-          isLoading,
+          isLoading: (isFormValid && !requestPayload) || isLoading,
         }}
       >
         {stringGetter({ key: STRING_KEYS.WITHDRAW })}

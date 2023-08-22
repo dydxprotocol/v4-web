@@ -944,7 +944,8 @@
     "SLOW_WITHDRAW_PENDING_DESCRIPTION": "You have {AMOUNT_ELEMENT} in pending slow withdraws. You will receive a notification when your funds have been confirmed on Layer 2.",
     "SLOW_WITHDRAW_PENDING": "Slow withdraw(s) pending",
     "SUSPICIOUS_TRADE": "Suspicious activity",
-    "SUSPICIOUS_TRADE_BODY": "We have noticed suspicious trading activity related to your account on dYdX, including potential wash trading activity. We will be reviewing your activity on an ongoing basis. If we notice similar activity in the future, then you will be permanently blocked from performing transfers within the protocol and from placing orders other than market orders that reduce your positions."
+    "SUSPICIOUS_TRADE_BODY": "We have noticed suspicious trading activity related to your account on dYdX, including potential wash trading activity. We will be reviewing your activity on an ongoing basis. If we notice similar activity in the future, then you will be permanently blocked from performing transfers within the protocol and from placing orders other than market orders that reduce your positions.",
+    "WITHDRAW_IN_PROGRESS": "Withdrawal(s) in progress"
   },
   "EMAIL_NOTIFICATIONS": {
     "ACCOUNT_DESCRIPTION": "Deposits, Withdrawals, Account Updates",

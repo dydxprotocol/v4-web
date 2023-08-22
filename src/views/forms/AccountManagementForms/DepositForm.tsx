@@ -2,6 +2,8 @@ import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
+import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client';
+import { ethers } from 'ethers';
 
 import {
   TransferInputField,
@@ -14,7 +16,7 @@ import { ButtonSize } from '@/constants/buttons';
 import { StringGetterFunction, STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
-import { useDebounce, useStringGetter, useSquidRouter } from '@/hooks';
+import { useAccounts, useDebounce, useStringGetter } from '@/hooks';
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -23,7 +25,6 @@ import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
-import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { Link } from '@/components/Link';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
@@ -40,6 +41,7 @@ import { TokenSelectMenu } from './TokenSelectMenu';
 import { DepositButtonAndReceipt } from './DepositForm/DepositButtonAndReceipt';
 
 import { getTransferInputs } from '@/state/inputsSelectors';
+import { set } from 'lodash';
 
 type DepositFormProps = {
   onDeposit?: () => void;
@@ -51,7 +53,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { submitDeposit, axelarscanURL } = useSquidRouter();
+  const { signerWagmi } = useAccounts();
 
   const { requestPayload, token, chain, resources } = useSelector(getTransferInputs) || {};
 
@@ -156,6 +158,57 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     }
   }, [balance, setFromAmount]);
 
+  const onSubmit = useCallback(
+    async (e: FormEvent) => {
+      try {
+        e.preventDefault();
+
+        if (!signerWagmi) {
+          throw new Error('Missing signer');
+        }
+        if (
+          !requestPayload?.targetAddress ||
+          !requestPayload.data ||
+          !requestPayload.value ||
+          !requestPayload.gasLimit ||
+          !requestPayload.gasPrice ||
+          !requestPayload.routeType
+        ) {
+          throw new Error('Missing request payload');
+        }
+
+        setIsLoading(true);
+
+        let tx = {
+          to: requestPayload.targetAddress as `0x${string}`,
+          data: requestPayload.data as `0x${string}`,
+          gasLimit: ethers.toBigInt(requestPayload.gasLimit),
+          value:
+            requestPayload.routeType !== 'SEND' ? ethers.toBigInt(requestPayload.value) : undefined,
+        };
+        const txHash = await signerWagmi.sendTransaction(tx);
+        onDeposit?.();
+
+        if (txHash) {
+          setTransactionHash(txHash);
+          abacusStateManager.setTransferStatus({
+            hash: txHash,
+            toChainId: TESTNET_CHAIN_ID,
+            fromChainId: sourceChain?.chainId?.toString(),
+          });
+          abacusStateManager.clearTransferInputValues();
+          setFromAmount('');
+        }
+
+      } catch (error) {
+        setError(error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [requestPayload, signerWagmi, sourceChain]
+  );
+
   const amountInputReceipt = [
     {
       key: 'amount',
@@ -191,7 +244,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           })
         : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG });
     }
-  
+
     if (fromAmount) {
       if (!sourceChain) {
         return stringGetter({ key: STRING_KEYS.MUST_SPECIFY_CHAIN });
@@ -199,13 +252,13 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         return stringGetter({ key: STRING_KEYS.MUST_SPECIFY_ASSET });
       }
     }
-  
+
     if (MustBigNumber(fromAmount).gt(MustBigNumber(balance))) {
       return stringGetter({ key: STRING_KEYS.DEPOSIT_MORE_THAN_BALANCE });
     }
-  
+
     return undefined;
-  }, [error, balance, sourceChain, fromAmount, sourceToken])
+  }, [error, balance, sourceChain, fromAmount, sourceToken]);
 
   const isDisabled =
     Boolean(errorMessage) ||
@@ -219,21 +272,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   }
 
   return (
-    <Styled.Form
-      onSubmit={async (e: FormEvent) => {
-        try {
-          e.preventDefault();
-          setIsLoading(true);
-          const txHash = await submitDeposit(requestPayload);
-          onDeposit?.();
-          setTransactionHash(txHash);
-        } catch (error) {
-          setError(error);
-        } finally {
-          setIsLoading(false);
-        }
-      }}
-    >
+    <Styled.Form onSubmit={onSubmit}>
       <ChainSelectMenu selectedChain={sourceChain || undefined} onSelectChain={onSelectChain} />
       <TokenSelectMenu selectedToken={sourceToken || undefined} onSelectToken={onSelectToken} />
       <Styled.WithDetailsReceipt side="bottom" detailItems={amountInputReceipt}>
@@ -256,12 +295,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           <AlertMessage type={AlertType.Success}>
             <Styled.TransactionInfo>
               {stringGetter({ key: STRING_KEYS.DEPOSIT_IN_PROGRESS })}
-            </Styled.TransactionInfo>
-            <Styled.TransactionInfo>
-              <Styled.Link href={`${axelarscanURL}/gmp/${transactionHash}`}>
-                {stringGetter({ key: STRING_KEYS.VIEW_TRANSACTION })}
-                <Icon iconName={IconName.LinkOut} />
-              </Styled.Link>
             </Styled.TransactionInfo>
           </AlertMessage>
         )

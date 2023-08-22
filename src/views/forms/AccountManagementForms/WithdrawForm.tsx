@@ -2,9 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import type { NumberFormatValues } from 'react-number-format';
-import type { TokenData, ChainData } from '@0xsquid/sdk';
 import { shallowEqual, useSelector } from 'react-redux';
-import { parseUnits } from 'viem';
+import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client';
 
 import {
   TransferInputField,
@@ -15,11 +14,9 @@ import {
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { CLIENT_NETWORK_CONFIGS, type DydxV4Network } from '@/constants/networks';
 import { NumberSign, QUANTUM_MULTIPLIER } from '@/constants/numbers';
 
-import { useAccounts, useDebounce, useStringGetter, useSquidRouter, useSubaccount } from '@/hooks';
-import { SQUID_WITHDRAW_ROUTE_DEFAULTS } from '@/hooks/useSquidRouter';
+import { useDebounce, useStringGetter, useSubaccount } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -27,7 +24,6 @@ import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
-import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { Link } from '@/components/Link';
 import { OutputType } from '@/components/Output';
@@ -44,8 +40,6 @@ import { MustBigNumber } from '@/lib/numbers';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
-import { parse } from 'path';
-import { s } from 'vitest/dist/types-2b1c412e';
 
 export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
@@ -54,8 +48,6 @@ export const WithdrawForm = () => {
 
   const { simulateWithdraw, sendSquidWithdraw } = useSubaccount();
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
-
-  const { axelarscanURL } = useSquidRouter();
 
   // User input
   const [withdrawAmount, setWithdrawAmount] = useState('');
@@ -99,52 +91,68 @@ export const WithdrawForm = () => {
 
   useEffect(() => {
     const setTransferValue = async () => {
-      const hasInvalidInput = debouncedAmountBN.isNaN() || debouncedAmountBN.lte(0);
+      try {
+        setIsLoading(true);
+        const hasInvalidInput = debouncedAmountBN.isNaN() || debouncedAmountBN.lte(0);
+        if (hasInvalidInput) {
+          abacusStateManager.setTransferValue({
+            value: 0,
+            field: TransferInputField.usdcSize,
+          });
+        } else {
+          const stdFee = await simulateWithdraw(parseFloat(debouncedAmount));
+          const amount =
+            parseFloat(debouncedAmount) -
+            parseFloat(stdFee?.amount[0]?.amount || '0') / QUANTUM_MULTIPLIER;
 
-      const stdFee = await simulateWithdraw(parseFloat(debouncedAmount));
-      const amount = hasInvalidInput
-        ? 0
-        : parseFloat(debouncedAmount) -
-          parseFloat(stdFee?.amount[0]?.amount || '0') / QUANTUM_MULTIPLIER;
+          abacusStateManager.setTransferValue({
+            value: amount.toString(),
+            field: TransferInputField.usdcSize,
+          });
 
-      abacusStateManager.setTransferValue({
-        value: hasInvalidInput ? 0 : amount.toString(),
-        field: TransferInputField.usdcSize,
-      });
-
-      setError(null);
+          setError(null);
+        }
+      } catch (error) {
+        setError(error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     setTransferValue();
   }, [debouncedAmountBN.toNumber()]);
 
-  /**
-   * @todo Withdrawing involves two steps.
-   * 1. MsgCreateTransfer for withdrawing from the subaccount.
-   * 2. MsgTransfer to IBC transfer the funds to the destination chain. 0xSquid will provide the IBC path instructions.
-   */
   const onSubmit = useCallback(
     async (e: FormEvent) => {
-      e.preventDefault();
       try {
-        
+        e.preventDefault();
+
         if (!requestPayload?.data || !debouncedAmountBN.toNumber()) {
           throw new Error('Invalid request payload');
         }
-        const txHash = await sendSquidWithdraw(debouncedAmountBN.toNumber(), requestPayload?.data);
 
+        setIsLoading(true);
+        const txHash = await sendSquidWithdraw(debouncedAmountBN.toNumber(), requestPayload?.data);
+        
         if (txHash?.hash) {
+          const hash = `0x${Buffer.from(txHash.hash).toString('hex')}`;
+          
+          setTransactionHash(hash);
           abacusStateManager.setTransferStatus({
-            hash: `0x${Buffer.from(txHash.hash).toString('hex')}`,
-            fromChainId: 'dydx-testnet-2',
+            hash,
+            fromChainId: TESTNET_CHAIN_ID,
             toChainId: toChain?.chainId?.toString(),
-          })
+          });
+          abacusStateManager.clearTransferInputValues();
+          setWithdrawAmount('');
         }
       } catch (error) {
         setError(error);
+      } finally {
+        setIsLoading(false);
       }
     },
-    [setTransactionHash, requestPayload, debouncedAmountBN]
+    [setTransactionHash, requestPayload, debouncedAmountBN, toChain]
   );
 
   const onChangeAddress = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -165,6 +173,7 @@ export const WithdrawForm = () => {
     (newSlippage: number) => {
       setSlippage(newSlippage);
 
+      // TODO: to be implemented via abacus
       // if (MustBigNumber(newSlippage).gt(0) && debouncedAmountBN.gt(0)) {
       //   fetchRoute({ newAmount: debouncedAmount, newSlippage });
       // }
@@ -221,12 +230,38 @@ export const WithdrawForm = () => {
     },
   ];
 
-  let errorMessage = !toAddress ? 'Please enter a destination address' : undefined;
+  const errorMessage = useMemo(() => {
+    if (error) {
+      return error?.message
+        ? stringGetter({
+            key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+            params: { ERROR_MESSAGE: error.message },
+          })
+        : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG });
+    }
+
+    if (!toAddress) return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ADDRESS });
+
+    if (debouncedAmountBN) {
+      if (!toChain) {
+        return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_CHAIN });
+      } else if (!toToken) {
+        return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ASSET });
+      }
+    }
+
+    if (MustBigNumber(debouncedAmountBN).gt(MustBigNumber(freeCollateralBN))) {
+      return stringGetter({ key: STRING_KEYS.WITHDRAW_MORE_THAN_FREE });
+    }
+
+    return undefined;
+  }, [error, freeCollateralBN, toChain, debouncedAmountBN, toToken]);
 
   const isDisabled =
     !!errorMessage ||
     !toToken ||
     !toChain ||
+    !toAddress ||
     debouncedAmountBN.isNaN() ||
     debouncedAmountBN.isZero();
 
@@ -271,20 +306,14 @@ export const WithdrawForm = () => {
         transactionHash && (
           <AlertMessage type={AlertType.Success}>
             <Styled.TransactionInfo>
-              {stringGetter({ key: STRING_KEYS.DEPOSIT_IN_PROGRESS })}
-            </Styled.TransactionInfo>
-            <Styled.TransactionInfo>
-              <Styled.Link href={`${axelarscanURL}/gmp/${transactionHash}`}>
-                {stringGetter({ key: STRING_KEYS.VIEW_TRANSACTION })}
-                <Icon iconName={IconName.LinkOut} />
-              </Styled.Link>
+              {stringGetter({ key: STRING_KEYS.WITHDRAW_IN_PROGRESS })}
             </Styled.TransactionInfo>
           </AlertMessage>
         )
       )}
       <WithdrawButtonAndReceipt
         isDisabled={isDisabled}
-        setError={undefined}
+        isLoading={isLoading}
         setSlippage={onSetSlippage}
         slippage={slippage}
         withdrawChain={toChain || undefined}

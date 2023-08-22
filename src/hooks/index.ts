@@ -18,7 +18,6 @@ import { useOnClickOutside } from './useOnClickOutside';
 import { usePageTitlePriceUpdates } from './usePageTitlePriceUpdates';
 import { useShouldShowFooter } from './useShouldShowFooter';
 import { useSelectedNetwork } from './useSelectedNetwork';
-import { useSquidRouter } from './useSquidRouter';
 import { useStringGetter } from './useStringGetter';
 import { useSubaccount } from './useSubaccount';
 
@@ -44,6 +43,5 @@ export {
   useShouldShowFooter,
   useSelectedNetwork,
   useStringGetter,
-  useSquidRouter,
   useSubaccount,
 };

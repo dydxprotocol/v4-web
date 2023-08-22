@@ -58,6 +58,7 @@ export const DepositButtonAndReceipt = ({
   sourceToken,
 
   isDisabled,
+  isLoading,
   slotError,
 }: ElementProps) => {
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
@@ -173,7 +174,6 @@ export const DepositButtonAndReceipt = ({
   ];
 
   const isFormValid = !isDisabled && !isEditingSlippage;
-  const isLoading = isFormValid && !requestPayload;
 
   return (
     <Styled.WithReceipt
@@ -209,7 +209,10 @@ export const DepositButtonAndReceipt = ({
         <Button
           action={ButtonAction.Primary}
           type={ButtonType.Submit}
-          state={{ isDisabled: !isFormValid, isLoading }}
+          state={{
+            isDisabled: !isFormValid,
+            isLoading: (isFormValid && !requestPayload) || isLoading,
+          }}
         >
           {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
         </Button>

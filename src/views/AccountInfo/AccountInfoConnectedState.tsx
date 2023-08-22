@@ -73,14 +73,16 @@ export const AccountInfoConnectedState = () => {
         <Styled.Header>
           <span>{stringGetter({ key: STRING_KEYS.ACCOUNT })}</span>
           <Styled.TransferButtons>
-            <Styled.Button
-              state={{ isDisabled: !dydxAccounts }}
-              onClick={() => dispatch(openDialog({ type: DialogTypes.Withdraw }))}
-              shape={ButtonShape.Pill}
-              size={ButtonSize.XSmall}
-            >
-              {stringGetter({ key: STRING_KEYS.WITHDRAW })}
-            </Styled.Button>
+            {import.meta.env.MODE !== 'production' && (
+              <Styled.Button
+                state={{ isDisabled: !dydxAccounts }}
+                onClick={() => dispatch(openDialog({ type: DialogTypes.Withdraw }))}
+                shape={ButtonShape.Pill}
+                size={ButtonSize.XSmall}
+              >
+                {stringGetter({ key: STRING_KEYS.WITHDRAW })}
+              </Styled.Button>
+            )}
             <Styled.Button
               state={{ isDisabled: !dydxAccounts }}
               onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
@@ -284,7 +286,7 @@ Styled.Header = styled.header`
 Styled.TransferButtons = styled.div`
   ${layoutMixins.row}
   gap: 1rem;
-`
+`;
 
 Styled.ConnectedAccountInfoContainer = styled.div<{ $showHeader?: boolean }>`
   ${layoutMixins.column}
