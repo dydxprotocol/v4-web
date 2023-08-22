@@ -30,12 +30,13 @@ import { SlippageEditor } from '../SlippageEditor';
 
 import { getSubaccount } from '@/state/accountSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
+import { w } from 'vitest/dist/types-2b1c412e';
 
 type ElementProps = {
   setSlippage: (slippage: number) => void;
 
   slippage: number;
-  withdrawChain?: TransferInputChainResource;
+  withdrawChain?: string;
   withdrawToken?: TransferInputTokenResource;
 
   isDisabled?: boolean;
@@ -59,9 +60,8 @@ export const WithdrawButtonAndReceipt = ({
   const { balance, queryStatus } = useAccountBalance({
     addressOrDenom: withdrawToken?.address || undefined,
     assetSymbol: withdrawToken?.symbol || undefined,
-    chainId: withdrawChain?.chainId || undefined,
+    chainId: withdrawChain ? parseInt(withdrawChain) : undefined,
     decimals: withdrawToken?.decimals || undefined,
-    rpc: withdrawChain?.rpc || undefined,
     isCosmosChain: false,
   });
 

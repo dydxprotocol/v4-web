@@ -57,15 +57,11 @@ export const WithdrawForm = () => {
   const {
     requestPayload,
     token,
-    chain,
+    chain: chainIdStr,
     address: toAddress,
     resources,
   } = useSelector(getTransferInputs) || {};
 
-  const toChain = useMemo(
-    () => (chain ? resources?.chainResources?.get(chain) : undefined),
-    [chain, resources]
-  );
   const toToken = useMemo(
     () => (token ? resources?.tokenResources?.get(token) : undefined),
     [token, resources]
@@ -145,7 +141,7 @@ export const WithdrawForm = () => {
           abacusStateManager.setTransferStatus({
             hash,
             fromChainId: TESTNET_CHAIN_ID,
-            toChainId: toChain?.chainId?.toString(),
+            toChainId: chainIdStr || undefined,
           });
           abacusStateManager.clearTransferInputValues();
           setWithdrawAmount('');
@@ -156,7 +152,7 @@ export const WithdrawForm = () => {
         setIsLoading(false);
       }
     },
-    [setTransactionHash, requestPayload, debouncedAmountBN, toChain]
+    [setTransactionHash, requestPayload, debouncedAmountBN, chainIdStr]
   );
 
   const onChangeAddress = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -189,12 +185,12 @@ export const WithdrawForm = () => {
     setWithdrawAmount(freeCollateralBN.toString());
   }, [freeCollateral?.current, setWithdrawAmount]);
 
-  const onSelectChain = useCallback((chain: TransferInputChainResource) => {
+  const onSelectChain = useCallback((chain: string) => {
     if (chain) {
       abacusStateManager.clearTransferInputValues();
       abacusStateManager.setTransferValue({
         field: TransferInputField.chain,
-        value: chain.chainId,
+        value: chain,
       });
       setWithdrawAmount('');
     }
@@ -247,7 +243,7 @@ export const WithdrawForm = () => {
     if (!toAddress) return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ADDRESS });
 
     if (debouncedAmountBN) {
-      if (!toChain) {
+      if (!chainIdStr) {
         return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_CHAIN });
       } else if (!toToken) {
         return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ASSET });
@@ -259,12 +255,12 @@ export const WithdrawForm = () => {
     }
 
     return undefined;
-  }, [error, freeCollateralBN, toChain, debouncedAmountBN, toToken]);
+  }, [error, freeCollateralBN, chainIdStr, debouncedAmountBN, toToken]);
 
   const isDisabled =
     !!errorMessage ||
     !toToken ||
-    !toChain ||
+    !chainIdStr ||
     !toAddress ||
     debouncedAmountBN.isNaN() ||
     debouncedAmountBN.isZero();
@@ -281,7 +277,7 @@ export const WithdrawForm = () => {
         />
         <ChainSelectMenu
           label={stringGetter({ key: STRING_KEYS.NETWORK })}
-          selectedChain={toChain || undefined}
+          selectedChain={chainIdStr || undefined}
           onSelectChain={onSelectChain}
         />
       </Styled.DestinationRow>
@@ -320,7 +316,7 @@ export const WithdrawForm = () => {
         isLoading={isLoading}
         setSlippage={onSetSlippage}
         slippage={slippage}
-        withdrawChain={toChain || undefined}
+        withdrawChain={chainIdStr || undefined}
         withdrawToken={toToken || undefined}
       />
     </Styled.Form>
