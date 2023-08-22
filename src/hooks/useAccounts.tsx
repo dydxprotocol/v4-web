@@ -1,10 +1,10 @@
 import { useCallback, useContext, createContext, useEffect, useState, useMemo } from 'react';
 
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import { AES, enc } from 'crypto-js';
 import { LocalWallet, USDC_DENOM, type Subaccount } from '@dydxprotocol/v4-client';
 
-import { SubAccountHistoricalPNLs } from '@/constants/abacus';
+import { SubAccountHistoricalPNLs, TransferType } from '@/constants/abacus';
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
 import { LocalStorageKey, LOCAL_STORAGE_VERSIONS } from '@/constants/localStorage';
 import { DydxAddress, EthereumAddress, PrivateInformation } from '@/constants/wallets';
@@ -15,6 +15,7 @@ import {
   setSubaccount,
   setHistoricalPnl,
 } from '@/state/account';
+import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
@@ -36,6 +37,7 @@ export const useAccounts = () => useContext(AccountsContext)!;
 
 const useAccountsContext = () => {
   const dispatch = useDispatch();
+  const { type: transferType } = useSelector(getTransferInputs, shallowEqual) || {};
 
   // Wallet connection
   const {
@@ -225,8 +227,12 @@ const useAccountsContext = () => {
   // abacus
   // TODO: useAbacus({ dydxAddress })
   useEffect(() => {
-    if (dydxAddress) abacusStateManager.setAccount(dydxAddress);
-    else abacusStateManager.disconnectAccount();
+    if (dydxAddress) {
+      abacusStateManager.setAccount(dydxAddress);
+    } else if (transferType?.rawValue !== TransferType.deposit.rawValue) {
+      // we don't want to disconnect the account if we switch network during the deposit form
+      abacusStateManager.disconnectAccount();
+    }
   }, [dydxAddress]);
 
   // clear subaccounts when no dydxAddress is set

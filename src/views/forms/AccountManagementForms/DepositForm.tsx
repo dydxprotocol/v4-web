@@ -97,11 +97,15 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   useEffect(() => {
     abacusStateManager.setTransferValue({
-      value: TransferType.deposit.rawValue,
       field: TransferInputField.type,
+      value: TransferType.deposit.rawValue,
     });
 
     return () => {
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.type,
+        value: null,
+      });
       abacusStateManager.clearTransferInputValues();
     };
   }, []);

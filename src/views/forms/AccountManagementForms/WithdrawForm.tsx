@@ -80,11 +80,15 @@ export const WithdrawForm = () => {
 
   useEffect(() => {
     abacusStateManager.setTransferValue({
-      value: TransferType.withdrawal.rawValue,
       field: TransferInputField.type,
+      value: TransferType.withdrawal.rawValue,
     });
 
     return () => {
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.type,
+        value: null,
+      });
       abacusStateManager.clearTransferInputValues();
     };
   }, []);
