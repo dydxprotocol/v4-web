@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styled, { type AnyStyledComponent, css } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import type { ColumnSize } from '@react-types/table';
@@ -10,7 +11,7 @@ import { useBreakpoints, useStringGetter } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
-import { Icon } from '@/components/Icon';
+import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { Table, TableCell, TableColumnHeader, type ColumnDef } from '@/components/Table';
 
@@ -78,8 +79,8 @@ const getTransferHistoryTableColumnDef = ({
         ),
         renderCell: ({ fromAddress, toAddress }) => (
           <TableCell stacked>
-            <span>{fromAddress ? truncateAddress(fromAddress) : '-'}</span>
-            <span>{toAddress ? truncateAddress(toAddress) : '-'}</span>
+            <CopyableAddress address={fromAddress ?? undefined} />
+            <CopyableAddress address={toAddress ?? undefined} />
           </TableCell>
         ),
       },
@@ -93,8 +94,14 @@ const getTransferHistoryTableColumnDef = ({
         columnKey: TransferHistoryTableColumnKey.TxHash,
         getCellValue: (row) => row.transactionHash,
         label: stringGetter({ key: STRING_KEYS.TRANSACTION }),
-        renderCell: ({ transactionHash }) =>
-          transactionHash ? <Styled.TxHash withIcon>{transactionHash}</Styled.TxHash> : '-',
+        renderCell: ({ transactionHash, resources }) =>
+          transactionHash ? (
+            <Styled.TxHash withIcon href={resources.blockExplorerUrl}>
+              {truncateAddress(transactionHash, '')}
+            </Styled.TxHash>
+          ) : (
+            '-'
+          ),
       },
     } as Record<TransferHistoryTableColumnKey, ColumnDef<SubaccountTransfer>>
   )[key],
@@ -161,6 +168,26 @@ export const TransferHistoryTable = ({
   );
 };
 
+const CopyableAddress = ({ address }: { address?: string }) => {
+  const [copied, setCopied] = useState(false);
+
+  const onCopy = () => {
+    if (!address) return;
+    setCopied(true);
+    navigator.clipboard.writeText(address);
+    setTimeout(() => setCopied(false), 500);
+  };
+
+  return address ? (
+    <Styled.CopyableAddress onClick={onCopy} copied={copied}>
+      {truncateAddress(address)}
+      <Icon iconName={IconName.Copy} />
+    </Styled.CopyableAddress>
+  ) : (
+    '-'
+  );
+};
+
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Table = styled(Table)`
@@ -181,4 +208,20 @@ Styled.TimeOutput = styled(Output)`
 
 Styled.TxHash = styled(Link)`
   justify-content: flex-end;
+`;
+
+Styled.CopyableAddress = styled(Styled.InlineRow)<{ copied: boolean }>`
+  cursor: pointer;
+
+  ${({ copied }) =>
+    copied
+      ? css`
+          filter: brightness(0.8);
+        `
+      : css`
+          &:hover {
+            filter: brightness(1.1);
+            text-decoration: underline;
+          }
+        `}
 `;
