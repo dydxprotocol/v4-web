@@ -22,14 +22,15 @@ import { truncateAddress } from '@/lib/wallet';
 import { OnboardingTriggerButton } from './OnboardingTriggerButton';
 
 type ElementProps = {
+  selectedAsset?: DydxChainAsset;
   setIsOpen: (open: boolean) => void;
 };
 
-export const ReceiveDialog = ({ setIsOpen }: ElementProps) => {
+export const ReceiveDialog = ({ selectedAsset = DydxChainAsset.DYDX, setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
 
-  const [asset, setAsset] = useState(DydxChainAsset.DYDX);
+  const [asset, setAsset] = useState(selectedAsset);
   const [copied, setCopied] = useState(false);
 
   const onCopy = () => {
@@ -52,7 +53,8 @@ export const ReceiveDialog = ({ setIsOpen }: ElementProps) => {
       value: DydxChainAsset.DYDX,
       label: (
         <Styled.InlineRow>
-          <AssetIcon symbol="DYDX" /> DYDX
+          {/* <AssetIcon symbol="DYDX" />  */}
+          Dv4TNT
         </Styled.InlineRow>
       ),
     },

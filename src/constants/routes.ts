@@ -5,7 +5,7 @@ export enum AppRoute {
   Profile = '/profile',
   Alerts = '/alerts',
   Settings = '/settings',
-  Rewards = '/DYDX',
+  Rewards = '/DV4TNT',
 }
 
 export enum PortfolioRoute {

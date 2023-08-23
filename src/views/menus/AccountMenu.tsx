@@ -1,11 +1,13 @@
+import { memo } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import type { Dispatch } from '@reduxjs/toolkit';
 
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, TOOLTIP_STRING_KEYS } from '@/constants/localization';
-import { wallets } from '@/constants/wallets';
+import { DydxChainAsset, wallets } from '@/constants/wallets';
 
 import { useAccounts, useBreakpoints, useStringGetter, useAccountBalance } from '@/hooks';
 
@@ -103,22 +105,28 @@ export const AccountMenu = () => {
             </Styled.AddressRow>
             <Styled.Balances>
               <div>
-                <Styled.label>
-                  {stringGetter({ key: STRING_KEYS.ASSET_BALANCE, params: { ASSET: 'Dv4TNT' } })}
-                  {/* <AssetIcon symbol="DYDX" /> */}
-                </Styled.label>
-                <Styled.BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
+                <div>
+                  <Styled.label>
+                    {stringGetter({ key: STRING_KEYS.ASSET_BALANCE, params: { ASSET: 'Dv4TNT' } })}
+                    {/* <AssetIcon symbol="DYDX" /> */}
+                  </Styled.label>
+                  <Styled.BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
+                </div>
+                <AssetActions asset={DydxChainAsset.DYDX} dispatch={dispatch} />
               </div>
               <div>
-                <Styled.label>
-                  {stringGetter({ key: STRING_KEYS.ASSET_BALANCE, params: { ASSET: 'USDC' } })}
-                  <AssetIcon symbol="USDC" />
-                </Styled.label>
-                <Styled.BalanceOutput
-                  type={OutputType.Asset}
-                  value={freeCollateral?.current || 0}
-                  fractionDigits={2}
-                />
+                <div>
+                  <Styled.label>
+                    {stringGetter({ key: STRING_KEYS.ASSET_BALANCE, params: { ASSET: 'USDC' } })}
+                    <AssetIcon symbol="USDC" />
+                  </Styled.label>
+                  <Styled.BalanceOutput
+                    type={OutputType.Asset}
+                    value={freeCollateral?.current || 0}
+                    fractionDigits={2}
+                  />
+                </div>
+                <AssetActions asset={DydxChainAsset.USDC} dispatch={dispatch} />
               </div>
             </Styled.Balances>
           </Styled.AccountInfo>
@@ -191,6 +199,29 @@ export const AccountMenu = () => {
   );
 };
 
+const AssetActions = memo(({ asset, dispatch }: { asset: DydxChainAsset; dispatch: Dispatch }) => (
+  <Styled.InlineRow>
+    {[
+      // TODO(@rosepuppy): Add withdraw action for USDC
+      {
+        dialogType: DialogTypes.Receive,
+        iconName: IconName.Qr,
+      },
+      { dialogType: DialogTypes.Transfer, iconName: IconName.Send },
+    ].map(({ iconName, dialogType }) => (
+      <IconButton
+        key={dialogType}
+        action={ButtonAction.Base}
+        shape={ButtonShape.Square}
+        iconName={iconName}
+        onClick={() =>
+          dispatch(openDialog({ type: dialogType, dialogProps: { selectedAsset: asset } }))
+        }
+      />
+    ))}
+  </Styled.InlineRow>
+));
+
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.AccountInfo = styled.div`
@@ -202,6 +233,10 @@ Styled.AccountInfo = styled.div`
 
 Styled.Column = styled.div`
   ${layoutMixins.column}
+`;
+
+Styled.InlineRow = styled.div`
+  ${layoutMixins.inlineRow}
 `;
 
 Styled.AddressRow = styled.div`
@@ -256,7 +291,7 @@ Styled.Balances = styled.div`
   gap: 2px;
 
   > div {
-    ${layoutMixins.flexColumn}
+    ${layoutMixins.spacedRow}
 
     gap: 0.5rem;
     padding: 0.5rem 1rem;

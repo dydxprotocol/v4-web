@@ -377,7 +377,7 @@ export const DYDX_CHAIN_INFO: Parameters<typeof suggestChain>[0] = {
 
 export enum DydxChainAsset {
   USDC = 'USDC',
-  DYDX = 'DYDX',
+  DYDX = 'Dv4TNT',
 }
 
 export const DYDX_CHAIN_ASSET_COIN_DENOM: Record<DydxChainAsset, string> = {
