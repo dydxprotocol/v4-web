@@ -316,7 +316,6 @@ Styled.DropdownMenu = styled(DropdownMenu)`
 
   --dropdownMenu-item-font-size: 0.875rem;
   --popover-padding: 0 0 0.5rem 0;
-  --trigger-hover-backgroundColor: var(--color-layer-3);
 `;
 
 Styled.WarningIcon = styled(Icon)`

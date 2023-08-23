@@ -5,7 +5,7 @@ export const headerMixins = {
     --trigger-backgroundColor: transparent;
     --trigger-textColor: var(--color-text-0);
 
-    --trigger-hover-backgroundColor: var(--color-layer-4);
+    --trigger-hover-backgroundColor: var(--color-layer-3);
     --trigger-hover-textColor: var(--color-text-2);
 
     --trigger-open-backgroundColor: var(--color-layer-1);
