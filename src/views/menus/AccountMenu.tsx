@@ -212,11 +212,11 @@ const AssetActions = memo(({ asset, dispatch }: { asset: DydxChainAsset; dispatc
       <IconButton
         key={dialogType}
         action={ButtonAction.Base}
+        shape={ButtonShape.Square}
         iconName={iconName}
         onClick={() =>
           dispatch(openDialog({ type: dialogType, dialogProps: { selectedAsset: asset } }))
         }
-        shape={ButtonShape.Square}
       />
     ))}
   </Styled.InlineRow>
