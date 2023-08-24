@@ -56,7 +56,7 @@ export const useMarketsData = (
     () => [
       MarketFilters.ALL,
       ...Object.keys(MARKET_FILTER_LABELS).filter((marketFilter) =>
-        markets.some((market) => market.asset.tags?.toArray().some((tag) => tag === marketFilter))
+        markets.some((market) => market.asset?.tags?.toArray().some((tag) => tag === marketFilter))
       ),
     ],
     [markets]
