@@ -99,7 +99,8 @@ export const TradeForm = ({
   const { limitPrice, triggerPrice, trailingPercent } = price || {};
   const hasUncommittedOrders = useSelector(calculateHasUncommittedOrders);
   const currentInput = useSelector(getCurrentInput);
-  const { tickSizeDecimals } = useSelector(getCurrentMarketConfig, shallowEqual) || {};
+  const { tickSizeDecimals, stepSizeDecimals } =
+    useSelector(getCurrentMarketConfig, shallowEqual) || {};
 
   const needsAdvancedOptions =
     needsGoodUntil || timeInForceOptions || executionOptions || needsPostOnly || needsReduceOnly;
@@ -120,6 +121,8 @@ export const TradeForm = ({
   const inputAlert = getTradeInputAlert({
     abacusInputErrors: tradeErrors ?? [],
     stringGetter,
+    stepSizeDecimals,
+    tickSizeDecimals,
   });
 
   if (placeOrderError) {

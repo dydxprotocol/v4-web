@@ -1,6 +1,7 @@
 import { BigNumber } from 'bignumber.js';
 
 export type BigNumberish = BigNumber | string | number;
+export type LocaleSeparators = { group?: string; decimal?: string };
 
 export const BIG_NUMBERS = {
   ZERO: new BigNumber(0),
@@ -56,12 +57,12 @@ export const shorternNumberForDisplay = (num?: number) =>
  * @returns separator for the given locale and separator type
  */
 export const getSeparator = ({
-  locale = navigator.language || 'en-US',
+  browserLanguage = navigator.language || 'en-US',
   separatorType,
 }: {
-  locale?: string;
+  browserLanguage?: string;
   separatorType: Intl.NumberFormatPartTypes;
 }) =>
-  Intl.NumberFormat(locale)
+  Intl.NumberFormat(browserLanguage)
     .formatToParts(1000.1)
     .find?.((part) => part.type === separatorType)?.value;

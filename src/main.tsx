@@ -11,12 +11,15 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import './index.css';
 
 import App from './App';
+import { LocaleProvider } from './hooks/useLocaleSeparators';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <ErrorBoundary>
     <StrictMode>
       <Provider store={store}>
-        <HashRouter children={<App />} />
+        <LocaleProvider>
+          <HashRouter children={<App />} />
+        </LocaleProvider>
       </Provider>
     </StrictMode>
   </ErrorBoundary>
