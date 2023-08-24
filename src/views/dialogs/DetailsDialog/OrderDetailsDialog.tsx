@@ -35,7 +35,7 @@ import {
 
 type ElementProps = {
   orderId: string;
-  setIsOpen?: (open: boolean) => void;
+  setIsOpen: (open: boolean) => void;
 };
 
 export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {

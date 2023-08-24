@@ -10,7 +10,7 @@ export enum TradeTypes {
   LIMIT = 'LIMIT',
   STOP_LIMIT = 'STOP_LIMIT',
   STOP_MARKET = 'STOP_MARKET',
-  TAKE_PROFIT_LIMIT = 'TAKE_PROFIT_LIMIT',
+  TAKE_PROFIT = 'TAKE_PROFIT',
   TAKE_PROFIT_MARKET = 'TAKE_PROFIT_MARKET',
   TRAILING_STOP = 'TRAILING_STOP',
 }
@@ -30,9 +30,9 @@ export enum PositionSide {
 export const UNCOMMITTED_ORDER_TIMEOUT = 10_000;
 
 export const ORDER_SIDE_STRINGS = {
-  [OrderSide.SIDE_BUY]: STRING_KEYS.BUY,
-  [OrderSide.SIDE_SELL]: STRING_KEYS.SELL,
-}
+  [OrderSide.BUY]: STRING_KEYS.BUY,
+  [OrderSide.SELL]: STRING_KEYS.SELL,
+};
 
 export const POSITION_SIDE_STRINGS: Record<PositionSide, string> = {
   [PositionSide.None]: STRING_KEYS.NONE,
@@ -68,7 +68,7 @@ export const TRADE_TYPE_STRINGS: Record<
     tradeTypeKey: STRING_KEYS.STOP_MARKET,
     descriptionKey: STRING_KEYS.STOP_MARKET_DESCRIPTION,
   },
-  [TradeTypes.TAKE_PROFIT_LIMIT]: {
+  [TradeTypes.TAKE_PROFIT]: {
     tradeTypeKeyShort: STRING_KEYS.TAKE_PROFIT_LIMIT,
     tradeTypeKey: STRING_KEYS.TAKE_PROFIT_LIMIT,
     descriptionKey: STRING_KEYS.TAKE_PROFIT_LIMIT_DESCRIPTION,

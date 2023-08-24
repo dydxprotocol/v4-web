@@ -1,6 +1,6 @@
 import Abacus, { kollections } from '@dydxprotocol/abacus';
 import { OrderSide } from '@dydxprotocol/v4-client';
-import { PositionSide } from './trade';
+import { PositionSide, TradeTypes } from './trade';
 import { STRING_KEYS } from './localization';
 
 export type Nullable<T> = T | null | undefined;
@@ -99,6 +99,7 @@ export type TradeInputSummary = Abacus.exchange.dydx.abacus.output.input.TradeIn
 export type TransferInputs = Abacus.exchange.dydx.abacus.output.input.TransferInput;
 export type InputError = Abacus.exchange.dydx.abacus.output.input.ValidationError;
 export const ErrorType = Abacus.exchange.dydx.abacus.output.input.ErrorType;
+export const InputSelectionOption = Abacus.exchange.dydx.abacus.output.input.SelectionOption;
 
 // ------ Wallet ------ //
 export type Wallet = Abacus.exchange.dydx.abacus.output.Wallet;
@@ -214,4 +215,20 @@ export const ORDER_STATUS_STRINGS: Record<KotlinIrEnumValues<typeof AbacusOrderS
   [AbacusOrderStatus.canceling.name]: STRING_KEYS.CANCELING,
   [AbacusOrderStatus.pending.name]: STRING_KEYS.PENDING,
   [AbacusOrderStatus.untriggered.name]: STRING_KEYS.UNTRIGGERED,
+};
+
+export const TRADE_TYPES: Record<
+  KotlinIrEnumValues<typeof AbacusOrderType>,
+  Nullable<TradeTypes>
+> = {
+  [AbacusOrderType.limit.name]: TradeTypes.LIMIT,
+  [AbacusOrderType.market.name]: TradeTypes.MARKET,
+  [AbacusOrderType.stopLimit.name]: TradeTypes.STOP_LIMIT,
+  [AbacusOrderType.stopMarket.name]: TradeTypes.STOP_MARKET,
+  [AbacusOrderType.takeProfitLimit.name]: TradeTypes.TAKE_PROFIT,
+  [AbacusOrderType.takeProfitMarket.name]: TradeTypes.TAKE_PROFIT_MARKET,
+
+  [AbacusOrderType.liquidated.name]: null,
+  [AbacusOrderType.liquidation.name]: null,
+  [AbacusOrderType.trailingStop.name]: null,
 };
