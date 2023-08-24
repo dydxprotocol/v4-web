@@ -29,7 +29,7 @@ export const useMarketsData = (
 
   const markets = useMemo(() => {
     return Object.values(allPerpetualMarkets)
-      .filter(Boolean)
+      .filter(({ assetId }) => allAssets[assetId]) // Filter out markets with no asset information
       .map((marketData) => ({
         asset: allAssets[marketData.assetId],
         tickSizeDecimals: marketData.configs?.tickSizeDecimals,
