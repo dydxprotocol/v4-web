@@ -153,8 +153,16 @@ const getOrdersTableColumnDef = ({
         tag: symbol,
         renderCell: ({ size, totalFilled, stepSizeDecimals }) => (
           <TableCell stacked>
-            <Output type={OutputType.Asset} value={size} fractionDigits={stepSizeDecimals} />
-            <Output type={OutputType.Asset} value={totalFilled} fractionDigits={stepSizeDecimals} />
+            <Output
+              type={OutputType.Asset}
+              value={size}
+              fractionDigits={stepSizeDecimals < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals}
+            />
+            <Output
+              type={OutputType.Asset}
+              value={totalFilled}
+              fractionDigits={stepSizeDecimals < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals}
+            />
           </TableCell>
         ),
       },
