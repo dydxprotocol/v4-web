@@ -44,7 +44,7 @@ type StyleProps = {
 
 type RowData = OrderbookLine & { side: 'bid' | 'ask'; mine?: number };
 
-const calculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number }) => {
+const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number }) => {
   const orderbook = useSelector(getCurrentMarketOrderbook, shallowEqual);
 
   const openOrdersBySideAndPrice =
@@ -96,7 +96,8 @@ const calculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number }) 
       }
     }
 
-    const spread = MustBigNumber(asks[0]?.price ?? 0).minus(bids[0]?.price ?? 0);
+    const spread =
+      asks[0] && bids[0] ? MustBigNumber(asks[0]?.price ?? 0).minus(bids[0]?.price ?? 0) : null;
 
     const spreadPercent = orderbook?.spreadPercent;
 
@@ -233,7 +234,7 @@ export const Orderbook = ({
   const showMineColumn = useSelector(calculateCanViewAccount) && !isTablet;
 
   const { asks, bids, spread, spreadPercent, histogramRange, hasOrderbook } =
-    calculateOrderbookData({
+    useCalculateOrderbookData({
       maxRowsPerSide,
     });
 
