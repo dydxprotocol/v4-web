@@ -7,7 +7,6 @@ import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client';
 
 import {
   TransferInputField,
-  TransferInputChainResource,
   TransferInputTokenResource,
   TransferType,
 } from '@/constants/abacus';
@@ -60,7 +59,7 @@ export const WithdrawForm = () => {
     chain: chainIdStr,
     address: toAddress,
     resources,
-  } = useSelector(getTransferInputs) || {};
+  } = useSelector(getTransferInputs, shallowEqual) || {};
 
   const toToken = useMemo(
     () => (token ? resources?.tokenResources?.get(token) : undefined),

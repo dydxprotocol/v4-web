@@ -1,8 +1,7 @@
-import { type Dispatch, useMemo, type SetStateAction, useState, type ReactNode } from 'react';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import { type Dispatch, type SetStateAction, useState, type ReactNode } from 'react';
+import styled, { type AnyStyledComponent,  } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
-import type { RouteData, TokenData } from '@0xsquid/sdk';
-import BigNumber from 'bignumber.js';
+import type { RouteData } from '@0xsquid/sdk';
 
 import {
   ButtonAction,
@@ -32,8 +31,6 @@ import { WithReceipt } from '@/components/WithReceipt';
 
 import { getSubaccountBuyingPower, getSubaccountEquity } from '@/state/accountSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
-
-import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 
 import { SlippageEditor } from '../SlippageEditor';
 

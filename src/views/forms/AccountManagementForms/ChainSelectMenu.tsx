@@ -1,8 +1,7 @@
-import type { ChainData } from '@0xsquid/sdk';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
 
-import { SelectionOption, TransferType } from '@/constants/abacus';
+import { TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { useStringGetter } from '@/hooks';
 

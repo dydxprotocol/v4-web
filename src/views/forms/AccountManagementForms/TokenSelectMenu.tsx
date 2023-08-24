@@ -1,4 +1,3 @@
-import type { ChainData, TokenData } from '@0xsquid/sdk';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
 

@@ -1,12 +1,8 @@
-import { type Dispatch, type SetStateAction, useState } from 'react';
+import { useState } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
-import { ChainType } from '@0xsquid/sdk';
-import type { ChainData, CosmosChain, RouteData, TokenData } from '@0xsquid/sdk';
-import BigNumber from 'bignumber.js';
-import { parseUnits } from 'viem';
 
-import { TransferInputChainResource, TransferInputTokenResource } from '@/constants/abacus';
+import { TransferInputTokenResource } from '@/constants/abacus';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
@@ -20,17 +16,13 @@ import { Details, DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
-import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 import { WithReceipt } from '@/components/WithReceipt';
-
-import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 
 import { SlippageEditor } from '../SlippageEditor';
 
 import { getSubaccount } from '@/state/accountSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
-import { w } from 'vitest/dist/types-2b1c412e';
 
 type ElementProps = {
   setSlippage: (slippage: number) => void;
@@ -65,12 +57,13 @@ export const WithdrawButtonAndReceipt = ({
     isCosmosChain: false,
   });
 
-  const balanceBN = MustBigNumber(balance);
+  // TODO: uncomment when we have a way to get token amount estimate from abacus
+  // const balanceBN = MustBigNumber(balance);
   // const newBalance =
   //   // toAmountMin && withdrawToken && parseUnits(toAmountMin, withdrawToken.decimals).toString();
 
   const { leverage } = useSelector(getSubaccount, shallowEqual) || {};
-  const { summary, requestPayload } = useSelector(getTransferInputs) || {};
+  const { summary, requestPayload } = useSelector(getTransferInputs, shallowEqual) || {};
 
   const feeSubitems: DetailsItem[] = [];
 
@@ -144,6 +137,7 @@ export const WithdrawButtonAndReceipt = ({
         />
       ),
     },
+    // TODO: uncomment when we have a way to get token amount estimate from abacus
     // {
     //   key: 'wallet',
     //   label: (

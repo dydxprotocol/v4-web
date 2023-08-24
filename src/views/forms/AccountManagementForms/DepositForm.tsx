@@ -32,6 +32,8 @@ import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
+import { getTransferInputs } from '@/state/inputsSelectors';
+
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 
@@ -39,9 +41,6 @@ import { ChainSelectMenu } from './ChainSelectMenu';
 import { TokenSelectMenu } from './TokenSelectMenu';
 
 import { DepositButtonAndReceipt } from './DepositForm/DepositButtonAndReceipt';
-
-import { getTransferInputs } from '@/state/inputsSelectors';
-import { set } from 'lodash';
 
 type DepositFormProps = {
   onDeposit?: () => void;
@@ -55,7 +54,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const { signerWagmi } = useAccounts();
 
-  const { requestPayload, token, chain: chainIdStr, resources } = useSelector(getTransferInputs) || {};
+  const { requestPayload, token, chain: chainIdStr, resources } = useSelector(getTransferInputs, shallowEqual) || {};
   const chainId = chainIdStr ? parseInt(chainIdStr) : undefined
 
   // User inputs
