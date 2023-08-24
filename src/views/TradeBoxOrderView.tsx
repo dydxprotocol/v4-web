@@ -49,7 +49,7 @@ export const TradeBoxOrderView = () => {
       ].map((tradeType) => ({
         value: tradeType,
         label: stringGetter({ key: TRADE_TYPE_STRINGS[tradeType].tradeTypeKeyShort }),
-        disabled: true,
+        disabled: tradeType === TradeTypes.TRAILING_STOP,
       })),
     },
   ];
