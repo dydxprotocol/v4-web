@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import type { Nullable } from '@dydxprotocol/abacus';
 import Long from 'long';
 import type { IndexedTx } from '@cosmjs/stargate';
-import { EncodeObject, type Coin } from '@cosmjs/proto-signing';
+import type { EncodeObject, Coin } from '@cosmjs/proto-signing';
 import { Method } from '@cosmjs/tendermint-rpc';
 
 import {

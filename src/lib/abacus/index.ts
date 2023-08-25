@@ -18,6 +18,7 @@ import {
   IOImplementations,
   UIImplementations,
   CoroutineTimer,
+  TransferType,
 } from '@/constants/abacus';
 
 import { DEFAULT_MARKETID } from '@/constants/markets';
@@ -26,6 +27,7 @@ import { type DydxNetwork } from '@/constants/networks';
 import type { RootStore } from '@/state/_store';
 
 import { getInputTradeOptions } from '@/state/inputsSelectors';
+import { getTransferInputs } from '@/state/inputsSelectors';
 
 import AbacusRest from './rest';
 import AbacusWebsocket from './websocket';
@@ -90,6 +92,15 @@ class AbacusStateManager {
   disconnectAccount = () => {
     this.stateManager.accountAddress = null;
   };
+  
+  attemptDisconnectAccount = () => {
+    const state = this.store?.getState();
+    const { type: transferType }= (state && getTransferInputs(state)) || {};
+    // we don't want to disconnect the account if we switch network during the deposit form
+    if (transferType?.rawValue !== TransferType.deposit.rawValue) {
+      this.disconnectAccount();
+    }
+  }
 
   // ------ Input Values ------ //
   clearTradeInputValues = ({ shouldResetSize }: { shouldResetSize?: boolean } = {}) => {
@@ -147,7 +158,7 @@ class AbacusStateManager {
     this.stateManager.accountAddress = walletAddress;
   };
 
-  setEvmAddress = (evmAddress: string) => {
+  setTransfersSourceAddress = (evmAddress: string) => {
     this.stateManager.sourceAddress = evmAddress;
   };
 

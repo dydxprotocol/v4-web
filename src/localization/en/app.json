@@ -479,6 +479,7 @@
     "LEAVING_WEBSITE": "Leaving website"
   },
   "DEPOSIT_MODAL": {
+    "BRIDGE_FEE": "Bridge Fee",
     "ENABLE_FOR_THIS_DEPOSIT": "Enable for this deposit",
     "ENABLE_SYMBOL_ON_DYDX": "Enable {SYMBOL} on dYdX",
     "ENABLE_SYMBOL": "Enable {SYMBOL}",

@@ -38,10 +38,6 @@ export const WAGMI_SUPPORTED_CHAINS: Chain[] = [
   optimismGoerli,
 ];
 
-export const WAGMI_SUPPORTED_CHAIN_MAP = Object.fromEntries(
-  WAGMI_SUPPORTED_CHAINS.map((supportedChain) => [supportedChain.id, supportedChain])
-);
-
 const { chains, publicClient, webSocketPublicClient } = configureChains(WAGMI_SUPPORTED_CHAINS, [
   alchemyProvider({ apiKey: import.meta.env.VITE_ALCHEMY_API_KEY }),
   jsonRpcProvider({

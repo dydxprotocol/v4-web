@@ -1,7 +1,6 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { ethers } from 'ethers';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Squid, type GetRoute, type RouteResponse, ChainData, ChainType } from '@0xsquid/sdk';
+import { Squid } from '@0xsquid/sdk';
 import { USDC_DENOM } from '@dydxprotocol/v4-client';
 
 import { DydxV4Network, isDydxV4Network } from '@/constants/networks';

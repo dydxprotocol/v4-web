@@ -78,7 +78,7 @@ export const WithdrawButtonAndReceipt = ({
   if (typeof summary?.bridgeFee === 'number') {
     feeSubitems.push({
       key: 'bridge-fees',
-      label: <span>Bridge Fee</span>,
+      label: <span>{stringGetter({ key: STRING_KEYS.BRIDGE_FEE })}</span>,
       value: <Output type={OutputType.Fiat} value={summary?.bridgeFee} />,
     });
   }

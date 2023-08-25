@@ -7,13 +7,12 @@ import { ethers } from 'ethers';
 
 import {
   TransferInputField,
-  TransferInputChainResource,
   TransferInputTokenResource,
   TransferType,
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
-import { StringGetterFunction, STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
 import { useAccounts, useDebounce, useStringGetter } from '@/hooks';
