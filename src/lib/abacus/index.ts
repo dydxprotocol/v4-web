@@ -210,7 +210,7 @@ class AbacusStateManager {
   };
 
   sendSocketRequest = (requestText: string) => {
-    this.websocket.sendSocketRequest(requestText);
+    this.websocket.send(requestText);
   };
 }
 

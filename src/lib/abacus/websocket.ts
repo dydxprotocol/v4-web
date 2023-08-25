@@ -46,10 +46,6 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
     }
   }
 
-  sendSocketRequest = (requestText: string) => {
-    this.socket?.send(requestText);
-  };
-
   handleCandlesSubscription = ({
     channelId,
     subscribe,
