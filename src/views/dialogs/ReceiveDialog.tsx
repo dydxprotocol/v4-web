@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
-import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { DydxChainAsset } from '@/constants/wallets';
 
@@ -10,9 +9,8 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { useAccounts, useStringGetter } from '@/hooks';
 
 import { AssetIcon } from '@/components/AssetIcon';
-import { Button } from '@/components/Button';
+import { CopyButton } from '@/components/CopyButton';
 import { Dialog } from '@/components/Dialog';
-import { Icon, IconName } from '@/components/Icon';
 import { QrCode } from '@/components/QrCode';
 import { SelectItem, SelectMenu } from '@/components/SelectMenu';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
@@ -31,14 +29,6 @@ export const ReceiveDialog = ({ selectedAsset = DydxChainAsset.DYDX, setIsOpen }
   const { dydxAddress } = useAccounts();
 
   const [asset, setAsset] = useState(selectedAsset);
-  const [copied, setCopied] = useState(false);
-
-  const onCopy = () => {
-    if (!dydxAddress) return;
-    setCopied(true);
-    navigator.clipboard.writeText(dydxAddress);
-    setTimeout(() => setCopied(false), 500);
-  };
 
   const assetOptions = [
     {
@@ -89,10 +79,7 @@ export const ReceiveDialog = ({ selectedAsset = DydxChainAsset.DYDX, setIsOpen }
             >
               <QrCode hasLogo value={dydxAddress!} />
             </Styled.WithDetailsReceipt>
-            <Button action={copied ? ButtonAction.Create : ButtonAction.Primary} onClick={onCopy}>
-              <Icon iconName={IconName.Copy} />
-              {stringGetter({ key: copied ? STRING_KEYS.COPIED : STRING_KEYS.COPY_ADDRESS })}
-            </Button>
+            <CopyButton value={dydxAddress} />
           </>
         )}
       </Styled.Content>

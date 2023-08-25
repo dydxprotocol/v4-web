@@ -1,9 +1,10 @@
-import { useState } from 'react';
 import styled, { type AnyStyledComponent, css } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import type { ColumnSize } from '@react-types/table';
 
 import { type SubaccountTransfer } from '@/constants/abacus';
+import { ButtonAction } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
@@ -11,20 +12,19 @@ import { useBreakpoints, useStringGetter } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
-import { Icon, IconName } from '@/components/Icon';
+import { Button } from '@/components/Button';
+import { CopyButton } from '@/components/CopyButton';
+import { Icon } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { Table, TableCell, TableColumnHeader, type ColumnDef } from '@/components/Table';
+import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { getSubaccountTransfers } from '@/state/accountSelectors';
+import { calculateCanAccountTrade } from '@/state/accountCalculators';
+import { openDialog } from '@/state/dialogs';
 
 import { truncateAddress } from '@/lib/wallet';
-import { Button } from '@/components/Button';
-import { ButtonAction } from '@/constants/buttons';
-import { openDialog } from '@/state/dialogs';
-import { DialogTypes } from '@/constants/dialogs';
-import { Link } from '@/components/Link';
-import { calculateCanAccountTrade } from '@/state/accountCalculators';
-import { OnboardingTriggerButton } from '../dialogs/OnboardingTriggerButton';
 
 const MOBILE_TRANSFERS_PER_PAGE = 50;
 
@@ -79,8 +79,12 @@ const getTransferHistoryTableColumnDef = ({
         ),
         renderCell: ({ fromAddress, toAddress }) => (
           <TableCell stacked>
-            <CopyableAddress address={fromAddress ?? undefined} />
-            <CopyableAddress address={toAddress ?? undefined} />
+            <CopyButton shownAsText value={fromAddress ?? undefined}>
+              {fromAddress ? truncateAddress(fromAddress) : '-'}
+            </CopyButton>{' '}
+            <CopyButton shownAsText value={toAddress ?? undefined}>
+              {toAddress ? truncateAddress(toAddress) : '-'}
+            </CopyButton>
           </TableCell>
         ),
       },
@@ -168,26 +172,6 @@ export const TransferHistoryTable = ({
   );
 };
 
-const CopyableAddress = ({ address }: { address?: string }) => {
-  const [copied, setCopied] = useState(false);
-
-  const onCopy = () => {
-    if (!address) return;
-    setCopied(true);
-    navigator.clipboard.writeText(address);
-    setTimeout(() => setCopied(false), 500);
-  };
-
-  return address ? (
-    <Styled.CopyableAddress onClick={onCopy} copied={copied}>
-      {truncateAddress(address)}
-      <Icon iconName={IconName.Copy} />
-    </Styled.CopyableAddress>
-  ) : (
-    '-'
-  );
-};
-
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Table = styled(Table)`
@@ -208,20 +192,4 @@ Styled.TimeOutput = styled(Output)`
 
 Styled.TxHash = styled(Link)`
   justify-content: flex-end;
-`;
-
-Styled.CopyableAddress = styled(Styled.InlineRow)<{ copied: boolean }>`
-  cursor: pointer;
-
-  ${({ copied }) =>
-    copied
-      ? css`
-          filter: brightness(0.8);
-        `
-      : css`
-          &:hover {
-            filter: brightness(1.1);
-            text-decoration: underline;
-          }
-        `}
 `;
