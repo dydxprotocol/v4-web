@@ -1,6 +1,7 @@
 import { useApiState } from './useApiState';
 import { useBreakpoints } from './useBreakpoints';
 import { useCommandMenu } from './useCommandMenu';
+import { useCurrentMarketId } from './useCurrentMarketId';
 import { useInterval } from './useInterval';
 import { useDocumentTitle } from './useDocumentTitle';
 import { useDydxClient } from './useDydxClient';
@@ -23,6 +24,7 @@ export {
   useApiState,
   useBreakpoints,
   useCommandMenu,
+  useCurrentMarketId,
   useDocumentTitle,
   useDydxClient,
   useAccountBalance,

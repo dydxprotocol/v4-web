@@ -61,10 +61,7 @@ const Content = () => {
           <Routes>
             <Route path={AppRoute.Trade}>
               <Route path=":market" element={<TradePage />} />
-              <Route
-                path={AppRoute.Trade}
-                element={<Navigate to={DEFAULT_TRADE_ROUTE} replace />}
-              />
+              <Route path={AppRoute.Trade} element={<TradePage />} />
             </Route>
             <Route path={AppRoute.Markets} element={<MarketsPage />} />
             {import.meta.env.MODE !== 'production' && (

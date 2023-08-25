@@ -7,12 +7,12 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks';
 
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
-
 import { Tabs } from '@/components/Tabs';
 
 import { Orderbook, orderbookMixins, OrderbookScrollBehavior } from '@/views/tables/Orderbook';
 import { LiveTrades } from '@/views/tables/LiveTrades';
+
+import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 enum Tab {
   Orderbook = 'Orderbook',

@@ -11,8 +11,7 @@ import { mapCandle } from '@/lib/tradingView/utils';
  * @param state
  * @returns marketId of the market the user is currently viewing
  */
-export const getCurrentMarketId = (state: RootState) =>
-  matchPath(TRADE_ROUTE, state.navigation.tradeLocation.pathname)?.params.market;
+export const getCurrentMarketId = (state: RootState) => state.perpetuals.currentMarketId;
 
 /**
  * @returns assetId of the currentMarket

@@ -10,6 +10,10 @@ import type {
 } from '@/constants/abacus';
 
 import { Candle, RESOLUTION_MAP } from '@/constants/candles';
+import { LocalStorageKey } from '@/constants/localStorage';
+import { DEFAULT_MARKETID } from '@/constants/markets';
+
+import { getLocalStorage } from '@/lib/localStorage';
 
 interface CandleDataByMarket {
   data: Record<string, Candle[]>;
@@ -17,6 +21,7 @@ interface CandleDataByMarket {
 }
 
 export interface PerpetualsState {
+  currentMarketId?: string;
   candles: Record<string, CandleDataByMarket>;
   liveTrades?: Record<string, MarketTrade[]>;
   markets?: Record<string, PerpetualMarket>;
@@ -25,6 +30,7 @@ export interface PerpetualsState {
 }
 
 const initialState: PerpetualsState = {
+  currentMarketId: undefined,
   candles: {},
   liveTrades: {},
   markets: undefined,
@@ -38,6 +44,9 @@ export const perpetualsSlice = createSlice({
   name: 'Perpetuals',
   initialState,
   reducers: {
+    setCurrentMarketId: (state: PerpetualsState, action: PayloadAction<string>) => {
+      state.currentMarketId = action.payload;
+    },
     setCandles: (
       state: PerpetualsState,
       action: PayloadAction<{ candles: Candle[]; marketId: string; resolution: string }>
@@ -116,11 +125,17 @@ export const perpetualsSlice = createSlice({
     ) => {
       state.historicalFundings[action.payload.marketId] = action.payload.historicalFundings;
     },
-    resetPerpetualsState: () => initialState,
+    resetPerpetualsState: () =>
+      ({
+        ...initialState,
+        currentMarketId:
+          getLocalStorage({ key: LocalStorageKey.LastViewedMarket }) ?? DEFAULT_MARKETID,
+      } as PerpetualsState),
   },
 });
 
 export const {
+  setCurrentMarketId,
   setCandles,
   setLiveTrades,
   setMarkets,

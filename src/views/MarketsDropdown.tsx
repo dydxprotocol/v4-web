@@ -15,7 +15,7 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { Popover, TriggerType } from '@/components/Popover';
-import { Tag, TagSize } from '@/components/Tag';
+import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
 import { ColumnDef, Table } from '@/components/Table';
 
@@ -152,7 +152,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
   );
 };
 
-export const MarketsDropdown: React.FC<{ currentMarketId: string; symbol: string | null }> = memo(
+export const MarketsDropdown: React.FC<{ currentMarketId?: string; symbol: string | null }> = memo(
   ({ currentMarketId, symbol = '' }) => {
     const [isOpen, setIsOpen] = useState(false);
     const stringGetter = useStringGetter();
