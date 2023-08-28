@@ -101,11 +101,11 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     });
 
     return () => {
+      abacusStateManager.clearTransferInputValues();
       abacusStateManager.setTransferValue({
         field: TransferInputField.type,
         value: null,
       });
-      abacusStateManager.clearTransferInputValues();
     };
   }, []);
 
