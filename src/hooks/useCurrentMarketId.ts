@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useMemo } from 'react';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useMatch, useNavigate } from 'react-router-dom';
 
 import { LocalStorageKey } from '@/constants/localStorage';
@@ -13,6 +13,7 @@ import { setCurrentMarketId } from '@/state/perpetuals';
 import abacusStateManager from '@/lib/abacus';
 
 import { useLocalStorage } from './useLocalStorage';
+import { getMarketIds } from '@/state/perpetualsSelectors';
 
 export const useCurrentMarketId = () => {
   const navigate = useNavigate();
@@ -20,26 +21,27 @@ export const useCurrentMarketId = () => {
   const { marketId } = match?.params ?? {};
   const dispatch = useDispatch();
   const selectedNetwork = useSelector(getSelectedNetwork);
+  const marketIds = useSelector(getMarketIds, shallowEqual);
   const [lastViewedMarket, setLastViewedMarket] = useLocalStorage({
     key: LocalStorageKey.LastViewedMarket,
     defaultValue: DEFAULT_MARKETID,
   });
 
+  const validId = useMemo(() => {
+    if (marketIds.length === 0) return marketId ?? lastViewedMarket;
+    if (!marketIds.includes(marketId)) return DEFAULT_MARKETID;
+    return marketId ?? lastViewedMarket;
+  }, [marketIds, marketId]);
+
   useEffect(() => {
-    setLastViewedMarket(marketId ?? DEFAULT_MARKETID);
-    dispatch(setCurrentMarketId(marketId ?? DEFAULT_MARKETID));
+    setLastViewedMarket(validId);
+    dispatch(setCurrentMarketId(validId));
     dispatch(closeDialogInTradeBox());
 
-    if (!marketId) {
-      navigate(lastViewedMarket ? `${AppRoute.Trade}/${lastViewedMarket}` : DEFAULT_TRADE_ROUTE, {
-        replace: true,
-      });
-    } else {
-      navigate(`${AppRoute.Trade}/${marketId}`, {
-        replace: true,
-      });
-    }
-  }, [marketId]);
+    navigate(`${AppRoute.Trade}/${validId}`, {
+      replace: true,
+    });
+  }, [validId]);
 
   useEffect(() => {
     abacusStateManager.setMarket(marketId ?? DEFAULT_MARKETID);
