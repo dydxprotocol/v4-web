@@ -1,16 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import styled, { AnyStyledComponent, css } from 'styled-components';
-import { useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { TradeLayouts } from '@/constants/layout';
 
-import { useBreakpoints, usePageTitlePriceUpdates } from '@/hooks';
-
-import { setTradeLocation } from '@/state/navigation';
+import { useBreakpoints, useCurrentMarketId, usePageTitlePriceUpdates } from '@/hooks';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
@@ -32,18 +29,12 @@ import { TradeBox } from '@/views/TradeBox';
 const TradePage = () => {
   const tradePageRef = useRef<HTMLDivElement>(null);
 
-  const location = useLocation();
-  const dispatch = useDispatch();
+  useCurrentMarketId();
   const { isTablet } = useBreakpoints();
   const tradeLayout = useSelector(getSelectedTradeLayout);
-
-  const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
-
   const canAccountTrade = useSelector(calculateCanAccountTrade);
 
-  useEffect(() => {
-    dispatch(setTradeLocation(location));
-  }, [location.pathname]);
+  const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
 
   usePageTitlePriceUpdates();
 

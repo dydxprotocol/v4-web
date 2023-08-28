@@ -13,7 +13,7 @@ import {
 } from '@/constants/abacus';
 
 import { AlertType } from '@/constants/alerts';
-import { PERCENT_DECIMALS } from '@/constants/numbers';
+import { PERCENT_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { TRADE_ROUTE } from '@/constants/routes';
 import { PositionSide, TradeTypes } from '@/constants/trade';
 
@@ -65,9 +65,13 @@ export const hasPositionSideChanged = ({
 const formatErrorParam = ({
   value,
   format,
+  stepSizeDecimals,
+  tickSizeDecimals,
 }: {
   value: Nullable<string>;
   format?: Nullable<string>;
+  stepSizeDecimals: Nullable<number>;
+  tickSizeDecimals: Nullable<number>;
 }) => {
   switch (format) {
     case 'percent': {
@@ -76,7 +80,11 @@ const formatErrorParam = ({
     }
     case 'size': {
       const sizeBN = MustBigNumber(value);
-      return sizeBN.toFixed(0);
+      return sizeBN.toFixed(stepSizeDecimals ?? 0);
+    }
+    case 'price': {
+      const dollarBN = MustBigNumber(value);
+      return `$${dollarBN.toFixed(tickSizeDecimals ?? USD_DECIMALS)}`;
     }
     default: {
       return value || '';
@@ -90,9 +98,13 @@ const formatErrorParam = ({
 export const getTradeInputAlert = ({
   abacusInputErrors,
   stringGetter,
+  stepSizeDecimals,
+  tickSizeDecimals,
 }: {
   abacusInputErrors: ValidationError[];
   stringGetter: StringGetterFunction;
+  stepSizeDecimals: Nullable<number>;
+  tickSizeDecimals: Nullable<number>;
 }) => {
   const inputAlerts = abacusInputErrors.map(({ action: errorAction, resources, type }) => {
     const { action, text } = resources || {};
@@ -104,7 +116,10 @@ export const getTradeInputAlert = ({
       Object.fromEntries(
         stringParams
           .toArray()
-          .map(({ key, value, format }) => [key, formatErrorParam({ value, format })])
+          .map(({ key, value, format }) => [
+            key,
+            formatErrorParam({ value, format, stepSizeDecimals, tickSizeDecimals }),
+          ])
       );
 
     return {

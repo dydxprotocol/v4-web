@@ -34,6 +34,7 @@ import AbacusStateNotifier from './stateNotification';
 import AbacusLocalizer from './localizer';
 import AbacusFormatter from './formatter';
 import AbacusThreading from './threading';
+import { LocaleSeparators } from '../numbers';
 
 class AbacusStateManager {
   private store: RootStore | undefined;
@@ -42,12 +43,14 @@ class AbacusStateManager {
   stateManager: InstanceType<typeof AsyncAbacusStateManager>;
   websocket: AbacusWebsocket;
   stateNotifier: AbacusStateNotifier;
+  abacusFormatter: AbacusFormatter;
 
   constructor() {
     this.store = undefined;
     this.currentMarket = undefined;
     this.stateNotifier = new AbacusStateNotifier();
     this.websocket = new AbacusWebsocket();
+    this.abacusFormatter = new AbacusFormatter();
 
     const ioImplementations = new IOImplementations(
       // @ts-ignore
@@ -63,7 +66,7 @@ class AbacusStateManager {
     const uiImplementations = new UIImplementations(
       // @ts-ignore
       new AbacusLocalizer(),
-      new AbacusFormatter()
+      this.abacusFormatter
     );
 
     this.stateManager = new AsyncAbacusStateManager(
@@ -179,6 +182,10 @@ class AbacusStateManager {
     this.stateManager.closePosition(value, field);
   };
 
+  setLocaleSeparators = ({ group, decimal }: LocaleSeparators) => {
+    this.abacusFormatter.setLocaleSeparators({ group, decimal });
+  };
+
   // ------ Utils ------ //
   placeOrderPayload = (): Nullable<HumanReadablePlaceOrderPayload> =>
     this.stateManager.placeOrderPayload();
@@ -203,7 +210,7 @@ class AbacusStateManager {
   };
 
   sendSocketRequest = (requestText: string) => {
-    this.websocket.sendSocketRequest(requestText);
+    this.websocket.send(requestText);
   };
 }
 

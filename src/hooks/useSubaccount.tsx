@@ -215,6 +215,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         type,
         side,
         price,
+        triggerPrice,
         size,
         clientId,
         timeInForce,
@@ -228,6 +229,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         type: OrderType;
         side: OrderSide;
         price: number;
+        triggerPrice: Nullable<number>;
         size: number;
         clientId: number;
         timeInForce: OrderTimeInForce;
@@ -250,7 +252,8 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
           goodTilTimeInSeconds,
           execution,
           postOnly,
-          reduceOnly
+          reduceOnly,
+          triggerPrice ?? undefined
         );
 
         const endTimestamp = performance.now();
@@ -287,7 +290,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
           clobPairId,
           goodTilBlock,
           goodTilBlockTime
-        )
+        );
 
         const endTimestamp = performance.now();
 
@@ -435,6 +438,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
           type,
           side,
           price,
+          triggerPrice,
           size,
           clientId,
           timeInForce,
@@ -461,6 +465,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
           type: type as OrderType,
           side: side as OrderSide,
           price,
+          triggerPrice,
           size,
           clientId,
           timeInForce: timeInForce as OrderTimeInForce,
@@ -490,7 +495,10 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
           );
         }
 
-        track(AnalyticsEvent.TradePlaceOrder, { ...orderParams, isClosePosition });
+        track(AnalyticsEvent.TradePlaceOrder, {
+          ...orderParams,
+          isClosePosition,
+        } as HumanReadablePlaceOrderPayload & { isClosePosition: boolean });
         onSuccess?.();
       } catch (error) {
         const errorStringKey = error?.code && ORDER_ERROR_CODE_MAP[error.code as number];

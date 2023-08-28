@@ -10,10 +10,10 @@ import { AppRoute, DEFAULT_TRADE_ROUTE } from '@/constants/routes';
 import { useBreakpoints, useInitializePage, useShouldShowFooter, useAnalytics } from '@/hooks';
 import { DydxProvider } from '@/hooks/useDydxClient';
 import { AccountsProvider } from '@/hooks/useAccounts';
-import { SubaccountProvider } from './hooks/useSubaccount';
 import { DialogAreaProvider, useDialogArea } from './hooks/useDialogArea';
+import { LocaleProvider } from './hooks/useLocaleSeparators';
 import { NotificationsProvider } from './hooks/useNotifications';
-
+import { SubaccountProvider } from './hooks/useSubaccount';
 import { GuardedMobileRoute } from '@/components/GuardedMobileRoute';
 
 import MarketsPage from '@/pages/markets/Markets';
@@ -61,10 +61,7 @@ const Content = () => {
           <Routes>
             <Route path={AppRoute.Trade}>
               <Route path=":market" element={<TradePage />} />
-              <Route
-                path={AppRoute.Trade}
-                element={<Navigate to={DEFAULT_TRADE_ROUTE} replace />}
-              />
+              <Route path={AppRoute.Trade} element={<TradePage />} />
             </Route>
             <Route path={AppRoute.Markets} element={<MarketsPage />} />
             {import.meta.env.MODE !== 'production' && (
@@ -103,17 +100,19 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <GrazProvider>
       <WagmiConfig config={config}>
-        <DydxProvider>
-          <AccountsProvider>
-            <SubaccountProvider>
-              <NotificationsProvider>
-                <DialogAreaProvider>
-                  <Content />
-                </DialogAreaProvider>
-              </NotificationsProvider>
-            </SubaccountProvider>
-          </AccountsProvider>
-        </DydxProvider>
+        <LocaleProvider>
+          <DydxProvider>
+            <AccountsProvider>
+              <SubaccountProvider>
+                <NotificationsProvider>
+                  <DialogAreaProvider>
+                    <Content />
+                  </DialogAreaProvider>
+                </NotificationsProvider>
+              </SubaccountProvider>
+            </AccountsProvider>
+          </DydxProvider>
+        </LocaleProvider>
       </WagmiConfig>
     </GrazProvider>
   </QueryClientProvider>

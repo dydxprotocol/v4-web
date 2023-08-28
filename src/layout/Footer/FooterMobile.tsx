@@ -1,6 +1,7 @@
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { DEFAULT_MARKETID } from '@/constants/markets';
@@ -15,9 +16,8 @@ import { BellIcon, MarketsIcon, PlayIcon, PortfolioIcon, ProfileIcon, TradeIcon 
 import { IconButton } from '@/components/IconButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 import { openDialog } from '@/state/dialogs';
-import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 export const FooterMobile = () => {
   const dispatch = useDispatch();

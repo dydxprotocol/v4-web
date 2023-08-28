@@ -91,6 +91,7 @@ Styled.Trigger = styled(Trigger)<{ $withBlur?: boolean }>`
 Styled.DropdownIcon = styled(SelectIcon)`
   font-size: 0.675em;
   color: var(--color-text-1);
+  margin-left: auto;
 `;
 
 Styled.Content = styled(Content)`

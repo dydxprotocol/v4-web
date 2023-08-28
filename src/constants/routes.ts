@@ -1,3 +1,5 @@
+import { DEFAULT_MARKETID } from './markets';
+
 export enum AppRoute {
   Markets = '/markets',
   Portfolio = '/portfolio',
@@ -31,7 +33,7 @@ export enum MobileSettingsRoute {
 export const TRADE_ROUTE = `${AppRoute.Trade}/:market`;
 export const PORTFOLIO_ROUTE = `${AppRoute.Portfolio}/:subroute`;
 export const HISTORY_ROUTE = `${AppRoute.Portfolio}/${PortfolioRoute.History}/:subroute`;
-export const DEFAULT_TRADE_ROUTE = `${AppRoute.Trade}/ETH-USD`;
+export const DEFAULT_TRADE_ROUTE = `${AppRoute.Trade}/${DEFAULT_MARKETID}`;
 export const SETTINGS_ROUTE = `${AppRoute.Settings}/*`;
 export const DEFAULT_DOCUMENT_TITLE = 'dYdX';
 

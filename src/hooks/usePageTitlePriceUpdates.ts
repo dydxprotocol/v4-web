@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { shallowEqual, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { DEFAULT_DOCUMENT_TITLE } from '@/constants/routes';
 
