@@ -5,6 +5,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { useStringGetter } from '@/hooks';
 
+import { DiffArrow } from '@/components/DiffArrow';
 import { Icon, IconName } from '@/components/Icon';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 import { Tag } from '@/components/Tag';
@@ -52,7 +53,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken }: ElementProps) 
           value: selectedToken && (
             <>
               <Tag>{type === TransferType.deposit ? selectedToken?.symbol : 'USDC'}</Tag>
-              <Styled.Icon iconName={IconName.Arrow} />
+              <DiffArrow />
               <Tag>{type === TransferType.deposit ? 'USDC' : selectedToken?.symbol}</Tag>
             </>
           ),
