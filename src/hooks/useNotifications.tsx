@@ -5,13 +5,15 @@ import {
   type Notification,
   type NotificationDisplayData,
   type Notifications,
+  type TransferNotifcation,
   NotificationStatus,
 } from '@/constants/notifications';
 
 import { useLocalStorage } from './useLocalStorage';
-import { notificationTypes } from './useNotificationTypes';
+import { notificationTypes as notificationTypesFactory } from './useNotificationTypes';
 
 import { renderSvgToDataUrl } from '../lib/renderSvgToDataUrl';
+import { set } from 'lodash';
 
 const NotificationsContext = createContext<ReturnType<typeof useNotificationsContext> | undefined>(
   undefined
@@ -36,6 +38,20 @@ const useNotificationsContext = () => {
     key: LocalStorageKey.NotificationsLastUpdated,
     defaultValue: Date.now(),
   });
+
+  // Front-end only notifications
+  const [transferNotifications, setTransferNotifications] = useState<TransferNotifcation[]>([]);
+
+  const addTransferNotification = useCallback(
+    (notification: TransferNotifcation) =>
+      setTransferNotifications([...transferNotifications, notification]),
+    [transferNotifications]
+  );
+
+  const notificationTypes = useMemo(
+    () => notificationTypesFactory(transferNotifications),
+    [transferNotifications]
+  );
 
   useEffect(() => {
     setNotificationsLastUpdated(Date.now());
@@ -106,7 +122,10 @@ const useNotificationsContext = () => {
               updateKey,
             } as Notification);
 
-            updateStatus(notification, isNew ? NotificationStatus.Triggered : NotificationStatus.Cleared);
+            updateStatus(
+              notification,
+              isNew ? NotificationStatus.Triggered : NotificationStatus.Cleared
+            );
           }
 
           // updateKey changed - update existing notification
@@ -141,7 +160,9 @@ const useNotificationsContext = () => {
   // Push notifications
   const [hasEnabledPush, setHasEnabledPush] = useLocalStorage({
     key: LocalStorageKey.PushNotificationsEnabled,
-    defaultValue: Boolean(globalThis.Notification && globalThis.Notification.permission === 'granted'),
+    defaultValue: Boolean(
+      globalThis.Notification && globalThis.Notification.permission === 'granted'
+    ),
   });
   const [isEnablingPush, setIsEnablingPush] = useState(false);
 
@@ -234,6 +255,8 @@ const useNotificationsContext = () => {
     // Menu state
     isMenuOpen,
     setIsMenuOpen,
+
+    addTransferNotification,
   };
 };
 // }

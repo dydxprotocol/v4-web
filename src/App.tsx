@@ -14,7 +14,7 @@ import { DialogAreaProvider, useDialogArea } from './hooks/useDialogArea';
 import { LocaleProvider } from './hooks/useLocaleSeparators';
 import { NotificationsProvider } from './hooks/useNotifications';
 import { SubaccountProvider } from './hooks/useSubaccount';
-import { SquidProvider } from '@/hooks/useSquidRouter';
+import { SquidProvider } from '@/hooks/useSquid';
 
 import { GuardedMobileRoute } from '@/components/GuardedMobileRoute';
 

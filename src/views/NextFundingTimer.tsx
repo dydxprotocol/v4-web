@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useInterval } from '@/hooks';
 
-import { getTimeTillNextUnit, getTimeString } from '@/lib/timeUtils';
+import { getTimeTillNextUnit, formatSeconds } from '@/lib/timeUtils';
 import { Output, OutputType } from '@/components/Output';
 
 export const NextFundingTimer = () => {
@@ -18,7 +18,7 @@ export const NextFundingTimer = () => {
       type={OutputType.Text}
       value={
         secondsLeft !== undefined
-          ? `${getTimeString(Math.floor(secondsLeft / 60))}:${getTimeString(secondsLeft % 60)}`
+          ? formatSeconds(secondsLeft)
           : undefined
       }
     />

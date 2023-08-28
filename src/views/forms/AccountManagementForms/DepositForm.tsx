@@ -1,7 +1,7 @@
 import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { type NumberFormatValues } from 'react-number-format';
-import { shallowEqual, useSelector } from 'react-redux';
+import { useDispatch, shallowEqual, useSelector } from 'react-redux';
 import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client';
 import { ethers } from 'ethers';
 
@@ -17,6 +17,7 @@ import { NumberSign } from '@/constants/numbers';
 
 import { useAccounts, useDebounce, useStringGetter } from '@/hooks';
 import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useNotifications } from '@/hooks/useNotifications';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
@@ -49,12 +50,15 @@ type DepositFormProps = {
 
 export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const stringGetter = useStringGetter();
+  const dispatch = useDispatch();
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const { signerWagmi } = useAccounts();
 
-  const { requestPayload, token, chain: chainIdStr, resources } = useSelector(getTransferInputs, shallowEqual) || {};
+  const { addTransferNotification } = useNotifications();
+
+  const { requestPayload, token, chain: chainIdStr, resources, summary } = useSelector(getTransferInputs, shallowEqual) || {};
   const chainId = chainIdStr ? parseInt(chainIdStr) : undefined
 
   // User inputs
@@ -98,6 +102,13 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     abacusStateManager.setTransferValue({
       field: TransferInputField.type,
       value: TransferType.deposit.rawValue,
+    });
+
+    addTransferNotification({
+      txHash: '0x4a8bb0893f0bfe5b6bf4eab9ee1ff4a02dd088e9946f3404a6b9e9df5205b057',
+      toChainId: TESTNET_CHAIN_ID,
+      fromChainId: '5',
+      toAmount: 2.5832,
     });
 
     return () => {
@@ -189,11 +200,17 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
         if (txHash) {
           setTransactionHash(txHash);
-          abacusStateManager.setTransferStatus({
-            hash: txHash,
+          addTransferNotification({
+            txHash,
             toChainId: TESTNET_CHAIN_ID,
-            fromChainId: chainId?.toString(),
+            fromChainId: chainIdStr || undefined,
+            toAmount: summary?.usdcSize || undefined,
           });
+          // abacusStateManager.setTransferStatus({
+          //   hash: txHash,
+          //   toChainId: TESTNET_CHAIN_ID,
+          //   fromChainId: chainId?.toString(),
+          // });
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');
         }

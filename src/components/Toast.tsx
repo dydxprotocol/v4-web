@@ -80,10 +80,11 @@ export const Toast = ({
           </$Header>
 
           <$Description>{slotDescription}</$Description>
-
-          <$Action asChild altText={actionAltText}>
-            {slotAction}
-          </$Action>
+          {actionDescription && (
+            <$Action asChild altText={actionAltText}>
+              {slotAction}
+            </$Action>
+          )}
         </$Container>
       </div>
     </$Root>
@@ -118,8 +119,7 @@ const $Root = styled(Root)`
       align-items: end;
       transform-origin: left bottom;
 
-      animation:
-        ${keyframes`
+      animation: ${keyframes`
           from {
             /* scale: 0; */
             grid-template-rows: 0fr; // height transition
@@ -203,8 +203,8 @@ const $Container = styled.div`
   // Rules
   ${popoverMixins.popover}
   padding: 1rem;
-  box-shadow:
-    0 0 0 var(--border-width) var(--color-border), // border
+  box-shadow: 0 0 0 var(--border-width) var(--color-border),
+    // border
     0 0 0.5rem 0.1rem var(--color-layer-2); // shadow
 
   ${$Root}:focus:not([data-swipe='end']) & {

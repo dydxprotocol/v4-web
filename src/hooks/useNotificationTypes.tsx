@@ -5,17 +5,26 @@ import { groupBy } from 'lodash';
 import { AbacusOrderStatus, ORDER_SIDES, ORDER_STATUS_STRINGS } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { type NotificationTypeConfig, NotificationType } from '@/constants/notifications';
+import { type NotificationTypeConfig, type TransferNotifcation, NotificationType } from '@/constants/notifications';
 import { ORDER_SIDE_STRINGS, TRADE_TYPE_STRINGS, TradeTypes } from '@/constants/trade';
 
-import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
+import { Icon, IconName } from '@/components/Icon';
+import { TransferStatusToast } from '@/components/TransferStatus';
+
+import {
+  getSquidTransfers,
+  getSubaccountFills,
+  getSubaccountOrders,
+} from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { OrderStatusIcon } from '@/views/OrderStatusIcon';
 
 import { useStringGetter } from './useStringGetter';
 
-export const notificationTypes = [
+export const notificationTypes = (
+  transferNotifications: TransferNotifcation[]
+) => [
   {
     type: NotificationType.OrderStatusChanged,
 
@@ -93,4 +102,32 @@ export const notificationTypes = [
       };
     },
   } as NotificationTypeConfig<string, [string, number]>,
+  {
+    type: NotificationType.SquidTransfer,
+    useTrigger: ({ trigger, lastUpdated }) => {
+      useEffect(() => {
+        for (const transfer of transferNotifications) {
+          const transferHash = transfer.txHash;
+          trigger(
+            transferHash,
+            {
+              icon: <Icon iconName={IconName.Clock} />,
+              title: `Deposit in progress...`,
+              description: (
+                <TransferStatusToast
+                  txHash={transferHash}
+                  toChainId={transfer.toChainId}
+                  fromChainId={transfer.fromChainId}
+                  toAmount={transfer.toAmount}
+                  triggeredAt={transfer.triggeredAt}
+                />
+              ),
+              toastSensitivity: 'foreground',
+            },
+            [],
+          );
+        }
+      }, [transferNotifications]);
+    },
+  },
 ] satisfies NotificationTypeConfig[];

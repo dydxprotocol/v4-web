@@ -1,16 +1,20 @@
 /** implemented in useNotificationTypes */
 export enum NotificationType {
   OrderStatusChanged = 'OrderStatusChanged',
+  SquidTransfer = 'SquidTransfer',
 }
 
 export enum NotificationComponentType {}
 
-export type NotificationId = string | number
+export type NotificationId = string | number;
 
-export type NotificationTypeConfig<_NotificationId extends NotificationId = string, NotificationUpdateKey = any> = {
+export type NotificationTypeConfig<
+  _NotificationId extends NotificationId = string,
+  NotificationUpdateKey = any
+> = {
   type: NotificationType;
 
-  /** React hook to trigger notifications based on app state */ 
+  /** React hook to trigger notifications based on app state */
   useTrigger: (_: {
     trigger: (
       /** Unique ID for the triggered notification */
@@ -30,7 +34,7 @@ export type NotificationTypeConfig<_NotificationId extends NotificationId = stri
        * @param true (default): Notification initialized with status NotificationStatus.Triggered
        * @param false: Notification initialized with status NotificationStatus.Cleared
        */
-      isNew?: boolean,
+      isNew?: boolean
     ) => void;
 
     lastUpdated: number;
@@ -58,7 +62,10 @@ export enum NotificationStatus {
 }
 
 /** Notification state. Serialized and cached into localStorage. */
-export type Notification<_NotificationId extends NotificationId = string, NotificationUpdateKey = any> = {
+export type Notification<
+  _NotificationId extends NotificationId = string,
+  NotificationUpdateKey = any
+> = {
   id: _NotificationId;
   type: NotificationType;
   status: NotificationStatus;
@@ -74,7 +81,7 @@ export type NotificationDisplayData = {
 
   title?: string;
 
-  description?: string;
+  description?: React.ReactNode;
 
   actionDescription?: string;
 
@@ -100,4 +107,13 @@ export type NotificationDisplayData = {
      Push notification: requires interaction.
    */
   toastDuration?: number;
+};
+
+// Notification types
+export type TransferNotifcation = {
+  txHash: string;
+  toChainId: string;
+  fromChainId?: string;
+  toAmount?: number;
+  triggeredAt?: number;
 };

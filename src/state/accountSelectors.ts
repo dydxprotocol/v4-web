@@ -319,3 +319,8 @@ export const getUserStats = (state: RootState) => ({
   makerVolume30D: state.account?.wallet?.user?.makerVolume30D,
   takerVolume30D: state.account?.wallet?.user?.takerVolume30D,
 });
+
+/**
+ * @returns Get the current squid transfers
+ */
+export const getSquidTransfers = (state: RootState) => state.account?.squidTransfer;

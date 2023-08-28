@@ -135,6 +135,8 @@ export const TransferType = Abacus.exchange.dydx.abacus.output.input.TransferTyp
 const transferTypes = [...TransferType.values()] as const;
 export type TransferTypes = (typeof transferTypes)[number];
 
+export type TransferStatus = Abacus.exchange.dydx.abacus.output.TransferStatus;
+
 // ------ Trade Items ------ //
 export const TradeInputField = Abacus.exchange.dydx.abacus.state.modal.TradeInputField;
 const tradeInputFields = [...TradeInputField.values()] as const;

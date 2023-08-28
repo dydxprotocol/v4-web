@@ -8,6 +8,7 @@ import type {
   PerpetualState,
   PerpetualStateChanges,
   SubaccountOrder,
+  TransferStatus,
 } from '@/constants/abacus';
 
 import { Changes } from '@/constants/abacus';
@@ -21,6 +22,7 @@ import {
   setSubaccount,
   setTransfers,
   setWallet,
+  setTransferStatuses,
 } from '@/state/account';
 
 import { setApiState } from '@/state/app';
@@ -66,6 +68,14 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
       if (changes.has(Changes.input)) {
         dispatch(setInputs(updatedState.input));
+      }
+
+      if (changes.has(Changes.transferStatuses) && updatedState.transferStatuses) {
+        const transferStatuses: Record<string, TransferStatus> = {};
+        updatedState.transferStatuses.forEach((transferStatus) => {
+          transferStatuses[transferStatus.k] = transferStatus.v;
+        });
+        dispatch(setTransferStatuses(transferStatuses));
       }
 
       if (changes.has(Changes.wallet)) {
