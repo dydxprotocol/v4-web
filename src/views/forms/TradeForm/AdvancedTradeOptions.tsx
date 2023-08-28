@@ -109,6 +109,7 @@ export const AdvancedTradeOptions = () => {
             {executionOptions && (
               <Styled.SelectMenu
                 value={execution}
+                label={stringGetter({ key: STRING_KEYS.EXECUTION })}
                 onValueChange={(selectedTimeInForceOption: string) =>
                   abacusStateManager.setTradeValue({
                     value: selectedTimeInForceOption,

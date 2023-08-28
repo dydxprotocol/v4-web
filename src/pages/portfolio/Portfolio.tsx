@@ -9,6 +9,7 @@ import { useBreakpoints, useDocumentTitle, useStringGetter } from '@/hooks';
 
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { FundingPaymentsTable } from '@/views/tables/FundingPaymentsTable';
+import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 import { Icon, IconName } from '@/components/Icon';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { WithSidebar } from '@/components/WithSidebar';
@@ -61,7 +62,10 @@ export default () => {
             />
           }
         />
-        <Route path={HistoryRoute.Transfers} element={<div />} />
+        <Route
+          path={HistoryRoute.Transfers}
+          element={<TransferHistoryTable withOuterBorder={isNotTablet} />}
+        />
         <Route
           path={HistoryRoute.Payments}
           element={<FundingPaymentsTable withOuterBorder={isNotTablet} />}
@@ -118,8 +122,6 @@ export default () => {
                   },
                 ],
               },
-              // TODO(aforaleka) Add back subitems when there are clearer designs
-              // or when transfers and payments are ready
             ]}
           />
         )

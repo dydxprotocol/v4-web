@@ -9,7 +9,7 @@ import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
-import { Button } from '@/components/Button';
+import { CopyButton } from '@/components/CopyButton';
 import { Dialog } from '@/components/Dialog';
 import { Checkbox } from '@/components/Checkbox';
 import { Icon, IconName } from '@/components/Icon';
@@ -30,20 +30,11 @@ export const MnemonicExportDialog = ({ setIsOpen }: ElementProps) => {
   const [hasAcknowledged, setHasAcknowledged] = useState(false);
   const [currentStep, setCurrentStep] = useState(MnemonicExportStep.AcknowledgeRisk);
   const [isShowing, setIsShowing] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   const stringGetter = useStringGetter();
 
   const { hdKey } = useAccounts();
   const { mnemonic } = hdKey ?? {};
-
-  const onCopy = () => {
-    setCopied(true);
-    if (mnemonic) {
-      navigator.clipboard.writeText(mnemonic);
-    }
-    setTimeout(() => setCopied(false), 500);
-  };
 
   const title = {
     [MnemonicExportStep.AcknowledgeRisk]: stringGetter({ key: STRING_KEYS.REVEAL_SECRET_PHRASE }),
@@ -116,10 +107,7 @@ export const MnemonicExportDialog = ({ setIsOpen }: ElementProps) => {
             </Styled.WordList>
           }
         >
-          <Button action={copied ? ButtonAction.Create : ButtonAction.Primary} onClick={onCopy}>
-            <Icon iconName={IconName.Copy} />
-            {stringGetter({ key: copied ? STRING_KEYS.COPIED : STRING_KEYS.COPY })}
-          </Button>
+          <CopyButton value={mnemonic} />
         </WithReceipt>
       </>
     ),

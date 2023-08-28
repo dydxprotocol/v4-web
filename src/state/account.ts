@@ -9,6 +9,7 @@ import type {
   SubaccountFundingPayments,
   Wallet,
   SubaccountOrder,
+  SubaccountTransfers,
   HistoricalPnlPeriods,
   SubAccountHistoricalPNLs,
 } from '@/constants/abacus';
@@ -22,6 +23,7 @@ import { getLocalStorage } from '@/lib/localStorage';
 export type AccountState = {
   fills?: SubaccountFills;
   fundingPayments?: SubaccountFundingPayments;
+  transfers?: SubaccountTransfers;
   clearedOrderIds?: string[];
   uncommittedOrderClientIds?: number[];
   hasUnseenFillUpdates: boolean;
@@ -38,6 +40,7 @@ export type AccountState = {
 const initialState: AccountState = {
   fills: undefined,
   fundingPayments: undefined,
+  transfers: undefined,
   clearedOrderIds: undefined,
   uncommittedOrderClientIds: undefined,
   hasUnseenFillUpdates: false,
@@ -80,6 +83,9 @@ export const accountSlice = createSlice({
     },
     setFundingPayments: (state, action: PayloadAction<any>) => {
       state.fundingPayments = action.payload;
+    },
+    setTransfers: (state, action: PayloadAction<any>) => {
+      state.transfers = action.payload;
     },
     clearOrder: (state, action: PayloadAction<string>) => ({
       ...state,
@@ -148,6 +154,7 @@ export const accountSlice = createSlice({
 export const {
   setFills,
   setFundingPayments,
+  setTransfers,
   clearOrder,
   setOnboardingGuard,
   setOnboardingState,
