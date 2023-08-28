@@ -34,6 +34,7 @@ import AbacusStateNotifier from './stateNotification';
 import AbacusLocalizer from './localizer';
 import AbacusFormatter from './formatter';
 import AbacusThreading from './threading';
+import AbacusFileSystem from './filesystem';
 import { LocaleSeparators } from '../numbers';
 
 class AbacusStateManager {
@@ -60,7 +61,7 @@ class AbacusStateManager {
       null,
       new AbacusThreading(),
       new CoroutineTimer(),
-      null
+      new AbacusFileSystem()
     );
 
     const uiImplementations = new UIImplementations(
@@ -70,6 +71,8 @@ class AbacusStateManager {
     );
 
     this.stateManager = new AsyncAbacusStateManager(
+      import.meta.env.SHARED_RESOURCES_URI,
+      'config/staging/environments.json',
       ioImplementations,
       uiImplementations,
       // @ts-ignore

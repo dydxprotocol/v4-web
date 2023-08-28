@@ -1,7 +1,7 @@
 export enum DydxV4Network {
   V4Mainnet = 'dydxprotocol-mainnet',
   V4Staging = 'dydxprotocol-staging',
-  V4Testnet2 = 'dydxprotocol-testnet-2',
+  V4Testnet2 = 'dydxprotocol-testnet',
   V4Local = 'dydxprotocol-dev',
 }
 

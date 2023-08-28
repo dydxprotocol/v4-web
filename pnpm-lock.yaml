@@ -27,8 +27,8 @@ dependencies:
     specifier: ^0.31.0
     version: 0.31.0
   '@dydxprotocol/abacus':
-    specifier: ^0.2.28
-    version: 0.2.28
+    specifier: file:/Users/jaredvu/Documents/v4-abacus/build/packages/dydxprotocol-abacus-0.3.7.tgz
+    version: file:../v4-abacus/build/packages/dydxprotocol-abacus-0.3.7.tgz
   '@dydxprotocol/v4-client':
     specifier: ^0.29.0
     version: 0.29.0
@@ -1142,10 +1142,6 @@ packages:
   /@cush/relative@1.0.0:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
-
-  /@dydxprotocol/abacus@0.2.28:
-    resolution: {integrity: sha512-mGmhwQM8aiV/cD+d3lvW76ysoPN7uVsDyAiVcRdzGqgj+gbM0IIJDYXG14xHruOTi+gK1Aga5MUz2pdvmPDhYA==}
-    dev: false
 
   /@dydxprotocol/dydxjs@0.3.0:
     resolution: {integrity: sha512-ygNeBs0f3H7sJk1qLUjfNwaXgc5TmjD+qZf7BFDbi7+boHJI9xuOWrGpjfBo7OTUZxS6O5jZG323CgU5XqMSPw==}
@@ -8277,7 +8273,7 @@ packages:
     resolution: {integrity: sha512-WIdaQ8uW1vIbYvNnAVunkC6yxTrneJC7VQ5UUQ0kuw8b0C0A39KTIpoQHCfc8tV7o9vF4niwRhdXEdfAgQEsQQ==}
     dependencies:
       cosmos-directory-types: 0.0.6
-      node-fetch-native: 1.2.0
+      node-fetch-native: 1.4.0
     dev: false
 
   /cosmos-directory-types@0.0.6:
@@ -12462,8 +12458,8 @@ packages:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
 
-  /node-fetch-native@1.2.0:
-    resolution: {integrity: sha512-5IAMBTl9p6PaAjYCnMv5FmqIF6GcZnawAVnzaCG0rX2aYZJ4CxEkZNtVPuTRug7fL7wyM5BQYTlAzcyMPi6oTQ==}
+  /node-fetch-native@1.4.0:
+    resolution: {integrity: sha512-F5kfEj95kX8tkDhUCYdV8dg3/8Olx/94zB8+ZNthFs6Bz31UpUi8Xh40TN3thLwXgrwXry1pEg9lJ++tLWTcqA==}
     dev: false
 
   /node-fetch@2.6.12:
@@ -15839,6 +15835,12 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
+
+  file:../v4-abacus/build/packages/dydxprotocol-abacus-0.3.7.tgz:
+    resolution: {integrity: sha512-omUiVHcT/tHWeXKgZTk1WW8LDVHI+2yxXNM6+B756liRY/t1JwUkRzwplp09U2+mNo/FenejHFtWZ0qd+W79iw==, tarball: file:../v4-abacus/build/packages/dydxprotocol-abacus-0.3.7.tgz}
+    name: '@dydxprotocol/abacus'
+    version: 0.3.7
+    dev: false
 
   github.com/release-it/conventional-changelog/a4acfeac76369937a6566d698a5ae9180eceb413(release-it@15.11.0):
     resolution: {tarball: https://codeload.github.com/release-it/conventional-changelog/tar.gz/a4acfeac76369937a6566d698a5ae9180eceb413}
