@@ -80,11 +80,11 @@ export const WithdrawForm = () => {
     });
 
     return () => {
+      abacusStateManager.clearTransferInputValues();
       abacusStateManager.setTransferValue({
         field: TransferInputField.type,
         value: null,
       });
-      abacusStateManager.clearTransferInputValues();
     };
   }, []);
 
@@ -272,7 +272,7 @@ export const WithdrawForm = () => {
           placeholder={stringGetter({ key: STRING_KEYS.ADDRESS })}
           onChange={onChangeAddress}
           value={toAddress || ''}
-          label={stringGetter({ key: STRING_KEYS.ADDRESS })}
+          label={stringGetter({ key: STRING_KEYS.DESTINATION })}
         />
         <ChainSelectMenu
           label={stringGetter({ key: STRING_KEYS.NETWORK })}
@@ -329,6 +329,8 @@ Styled.DiffOutput = styled(DiffOutput)`
 `;
 
 Styled.Form = styled.form`
+  --form-input-height: 3.5rem;
+
   min-height: calc(100% - var(--stickyArea0-bottomHeight));
 
   ${layoutMixins.flexColumn}

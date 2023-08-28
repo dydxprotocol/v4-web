@@ -19,6 +19,7 @@ import { useAccounts, useDebounce, useStringGetter } from '@/hooks';
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+import { formMixins } from '@/styles/formMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
@@ -279,9 +280,9 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           label={stringGetter({ key: STRING_KEYS.AMOUNT })}
           value={fromAmount}
           slotRight={
-            <Button size={ButtonSize.XSmall} onClick={onClickMax}>
+            <Styled.FormInputButton size={ButtonSize.XSmall} onClick={onClickMax}>
               {stringGetter({ key: STRING_KEYS.MAX })}
-            </Button>
+            </Styled.FormInputButton>
           }
         />
       </Styled.WithDetailsReceipt>
@@ -311,6 +312,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Form = styled.form`
+  --form-input-height: 3.5rem;
+
   ${layoutMixins.flexColumn}
   gap: 1.5rem;
 
@@ -332,4 +335,8 @@ Styled.Link = styled(Link)`
 
 Styled.TransactionInfo = styled.span`
   ${layoutMixins.row}
+`;
+
+Styled.FormInputButton = styled(Button)`
+  ${formMixins.inputInnerButton}
 `;

@@ -114,7 +114,7 @@ export const WithdrawButtonAndReceipt = ({
     {
       key: 'exchange-rate',
       label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
-      value: withdrawToken && (
+      value: withdrawToken && typeof summary?.exchangeRate === 'number' && (
         <Styled.ExchangeRate>
           <Output type={OutputType.Asset} value={1} fractionDigits={0} tag="USDC" />
           =

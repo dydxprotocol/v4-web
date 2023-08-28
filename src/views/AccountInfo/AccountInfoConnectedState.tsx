@@ -284,7 +284,7 @@ Styled.Header = styled.header`
 `;
 
 Styled.TransferButtons = styled.div`
-  ${layoutMixins.row}
+  ${layoutMixins.inlineRow}
   gap: 1rem;
 `;
 
