@@ -1,6 +1,5 @@
-import { DEV_ENDPOINTS, ENDPOINTS } from '@dydxprotocol/v4-localization';
-
 import type { AbacusFileSystemProtocol, FileLocation, Nullable } from '@/constants/abacus';
+import { NETWORK_ENDPOINTS } from '@/constants/networks';
 
 export const ENDPOINTS_PATH =
   import.meta.env.MODE === 'production'
@@ -10,8 +9,7 @@ export const ENDPOINTS_PATH =
 class AbacusFileSystem implements AbacusFileSystemProtocol {
   readTextFile(location: FileLocation, path: string): Nullable<string> {
     if (path === ENDPOINTS_PATH) {
-      const environments = import.meta.env.MODE === 'production' ? ENDPOINTS : DEV_ENDPOINTS;
-      return JSON.stringify(environments);
+      return JSON.stringify(NETWORK_ENDPOINTS);
     }
 
     return null;
