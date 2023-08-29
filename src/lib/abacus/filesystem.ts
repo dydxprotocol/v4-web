@@ -9,7 +9,6 @@ export const ENDPOINTS_PATH =
 
 class AbacusFileSystem implements AbacusFileSystemProtocol {
   readTextFile(location: FileLocation, path: string): Nullable<string> {
-    console.log(location, path);
     if (path === ENDPOINTS_PATH) {
       const environments = import.meta.env.MODE === 'production' ? ENDPOINTS : DEV_ENDPOINTS;
       return JSON.stringify(environments);
