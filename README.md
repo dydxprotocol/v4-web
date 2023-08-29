@@ -4,6 +4,8 @@
 
 - Node.js version 18 and `pnpm` installed on your system
 
+For deploying with Vercel, create an account with [Vercel](https://vercel.com/signup) if you don't have one already.
+
 For deploying to IPFS, choose one of the following:
 
 - **Option 1:** A free [web3.storage](https://web3.storage/) account
@@ -51,7 +53,24 @@ pnpm ladle
 
 This will automatically open your default browser at `http://localhost:61000`.
 
-## Part 3: Deploying to IPFS
+## Part 3: Deploying with Vercel
+
+### Step 1: Connect your repository to Vercel
+
+Select "Import Git Repository" from your dashboard, and provide the URL of this repository or your forked repository.
+
+### Step 2: Configure your project
+
+For the "Build & Development Settings", we recommend the following:
+- Framework Preset: `Vite`
+- Build Command (override): `pnpm run build`
+
+If you wish to incorporate analytics via Amplitude and Bugsnag, you can use our scripts:
+`pnpm run build:inject-amplitude` and `pnpm run build:inject-bugsnag`. You will need to provide your own API keys for these services. In the Environment Variables section, name the variables as `AMPLITUDE_API_KEY` and `BUGSNAG_API_KEY` and provide the respective keys as their values.
+
+For more details, check out Vercel's [official documentation](https://vercel.com/docs).
+
+## Part 4: Deploying to IPFS
 
 ### web3.storage: deploy to IPFS via web3.storage using the provided script
 
@@ -74,7 +93,7 @@ ipfs add -r dist
 
 Save the CID provided in the output.
 
-## Part 4: Accessing your content on IPFS
+### Accessing your content on IPFS
 
 To access your content on IPFS:
 
