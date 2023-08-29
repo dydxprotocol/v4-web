@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux';
 import { AES, enc } from 'crypto-js';
 import { LocalWallet, USDC_DENOM, type Subaccount } from '@dydxprotocol/v4-client-js';
 
-import { SubAccountHistoricalPNLs } from '@/constants/abacus';
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
 import { LocalStorageKey, LOCAL_STORAGE_VERSIONS } from '@/constants/localStorage';
 import { DydxAddress, EthereumAddress, PrivateInformation } from '@/constants/wallets';
@@ -12,8 +11,6 @@ import { DydxAddress, EthereumAddress, PrivateInformation } from '@/constants/wa
 import {
   setOnboardingState,
   setOnboardingGuard,
-  setSubaccount,
-  setHistoricalPnl,
 } from '@/state/account';
 
 import abacusStateManager from '@/lib/abacus';
@@ -62,6 +59,8 @@ const useAccountsContext = () => {
       // Forget EVM signature
       forgetEvmSignature(previousEvmAddress);
     }
+
+    if (evmAddress) abacusStateManager.setTransfersSourceAddress(evmAddress);
 
     setPreviousEvmAddress(evmAddress);
   }, [evmAddress]);
@@ -224,7 +223,7 @@ const useAccountsContext = () => {
   // TODO: useAbacus({ dydxAddress })
   useEffect(() => {
     if (dydxAddress) abacusStateManager.setAccount(dydxAddress);
-    else abacusStateManager.disconnectAccount();
+    else abacusStateManager.attemptDisconnectAccount();
   }, [dydxAddress]);
 
   // clear subaccounts when no dydxAddress is set

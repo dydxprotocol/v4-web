@@ -72,16 +72,26 @@ export const AccountInfoConnectedState = () => {
       {!showHeader ? null : (
         <Styled.Header>
           <span>{stringGetter({ key: STRING_KEYS.ACCOUNT })}</span>
-
-          <Styled.Button
-            state={{ isDisabled: !dydxAccounts }}
-            onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
-            shape={ButtonShape.Pill}
-            size={ButtonSize.XSmall}
-            slotLeft={<Icon iconName={IconName.Transfer} />}
-          >
-            {stringGetter({ key: STRING_KEYS.MANAGE_FUNDS })}
-          </Styled.Button>
+          <Styled.TransferButtons>
+            {import.meta.env.MODE !== 'production' && (
+              <Styled.Button
+                state={{ isDisabled: !dydxAccounts }}
+                onClick={() => dispatch(openDialog({ type: DialogTypes.Withdraw }))}
+                shape={ButtonShape.Pill}
+                size={ButtonSize.XSmall}
+              >
+                {stringGetter({ key: STRING_KEYS.WITHDRAW })}
+              </Styled.Button>
+            )}
+            <Styled.Button
+              state={{ isDisabled: !dydxAccounts }}
+              onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
+              shape={ButtonShape.Pill}
+              size={ButtonSize.XSmall}
+            >
+              {stringGetter({ key: STRING_KEYS.DEPOSIT })}
+            </Styled.Button>
+          </Styled.TransferButtons>
         </Styled.Header>
       )}
       <Styled.Stack>
@@ -271,6 +281,11 @@ Styled.Header = styled.header`
   ${layoutMixins.spacedRow}
   font: var(--font-small-book);
   padding: 0 1.25rem;
+`;
+
+Styled.TransferButtons = styled.div`
+  ${layoutMixins.inlineRow}
+  gap: 1rem;
 `;
 
 Styled.ConnectedAccountInfoContainer = styled.div<{ $showHeader?: boolean }>`

@@ -19,7 +19,7 @@ import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { Icon } from '@/components/Icon';
 import { Ring } from '@/components/Ring';
 
-import { TestnetDepositForm } from '@/views/forms/TestnetDepositForm';
+import { TestnetDepositForm } from '@/views/forms/AccountManagementForms/TestnetDepositForm';
 
 import { track } from '@/lib/analytics';
 

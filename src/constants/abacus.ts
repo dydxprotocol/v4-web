@@ -104,6 +104,9 @@ export type ClosePositionInputs = Abacus.exchange.dydx.abacus.output.input.Close
 export type TradeInputSummary = Abacus.exchange.dydx.abacus.output.input.TradeInputSummary;
 export type TransferInputs = Abacus.exchange.dydx.abacus.output.input.TransferInput;
 export type InputError = Abacus.exchange.dydx.abacus.output.input.ValidationError;
+export type TransferInputTokenResource = Abacus.exchange.dydx.abacus.output.input.TransferInputTokenResource;
+export type TransferInputChainResource = Abacus.exchange.dydx.abacus.output.input.TransferInputChainResource;
+export type SelectionOption = Abacus.exchange.dydx.abacus.output.input.SelectionOption;
 export const ErrorType = Abacus.exchange.dydx.abacus.output.input.ErrorType;
 export const InputSelectionOption = Abacus.exchange.dydx.abacus.output.input.SelectionOption;
 

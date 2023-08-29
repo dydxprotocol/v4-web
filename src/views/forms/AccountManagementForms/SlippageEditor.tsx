@@ -12,6 +12,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { Input, InputType } from '@/components/Input';
 import { Output, OutputType } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
+import { FormInput } from '@/components/FormInput';
 
 enum EditorState {
   Viewing = 'Viewing',
@@ -115,7 +116,7 @@ export const SlippageEditor = ({ slippage, setIsEditing, setSlippage }: Slippage
             </Styled.SlippageInput>
           ),
           [EditorState.Editing]: (
-            <Styled.Input
+            <Styled.FormInput
               type={InputType.Percent}
               value={slippageInputValue}
               tabIndex={0}
@@ -151,10 +152,8 @@ Styled.SlippageInput = styled.div`
   border-radius: 0.5em;
 `;
 
-Styled.Input = styled(Input)`
-  // TODO(@aforaleka): replace with input container
-  --input-height: 1.5rem;
-  --input-backgroundColor: var(--color-layer-5);
+Styled.FormInput = styled(FormInput)`
+  --form-input-height: 1.5rem;
 
   input {
     text-align: end;

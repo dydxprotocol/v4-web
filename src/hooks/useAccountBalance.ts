@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { useBalance } from 'wagmi';
 import { StargateClient } from '@cosmjs/stargate';
 import { useQuery } from 'react-query';
-import { formatUnits } from 'ethers';
+import { formatUnits } from 'viem';
 
 import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
@@ -42,7 +42,7 @@ export const useAccountBalance = ({
   assetSymbol,
   bech32AddrPrefix,
   chainId,
-  decimals,
+  decimals = 0,
   rpc,
   isCosmosChain,
 }: UseAccountBalanceProps = {}) => {
@@ -63,7 +63,7 @@ export const useAccountBalance = ({
   });
 
   const cosmosQueryFn = useCallback(async () => {
-    if (dydxAddress && bech32AddrPrefix && rpc) {
+    if (dydxAddress && bech32AddrPrefix && rpc && addressOrDenom) {
       const address = convertBech32Address({
         address: dydxAddress,
         bech32Prefix: bech32AddrPrefix,
@@ -73,14 +73,7 @@ export const useAccountBalance = ({
       const balanceAsCoin = await client.getBalance(address, addressOrDenom);
       await client.disconnect();
 
-      /**
-       * Hardcode decimals because most cosmos coins default to 6 decimals.
-       * Squids testnet has some coins as having 18 decimals instead of 6.
-       * @url https://github1s.com/cosmos/cosmjs/blob/HEAD/packages/amino/src/coins.ts#L8-L16
-       *
-       * @todo: change '6' to 'decimals' when Squid testnet data is updated.
-       * */
-      return formatUnits(balanceAsCoin.amount, decimals);
+      return formatUnits(BigInt(balanceAsCoin.amount), decimals);
     }
   }, [addressOrDenom, chainId, rpc]);
 
@@ -106,11 +99,7 @@ export const useAccountBalance = ({
   return {
     balance,
     nativeTokenBalance,
-    isBalanceError: isCosmosChain
-      ? cosmosQuery.status === 'error' && !cosmosQuery.isFetching
-      : evmQuery.status === 'error' && evmQuery.fetchStatus === 'idle',
-    isBalanceLoading: isCosmosChain
-      ? cosmosQuery.status === 'loading' && cosmosQuery.isFetching
-      : evmQuery.status === 'loading' && evmQuery.fetchStatus === 'fetching',
+    queryStatus: isCosmosChain ? cosmosQuery.status : evmQuery.status,
+    isQueryFetching: isCosmosChain ? cosmosQuery.isFetching : evmQuery.fetchStatus === 'fetching',
   };
 };
