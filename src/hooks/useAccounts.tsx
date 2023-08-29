@@ -192,7 +192,7 @@ const useAccountsContext = () => {
         } catch (error) {
           log('useAccounts/setLocalDydxWallet', error);
         }
-      } else if (evmAddress && signerWagmi) {
+      } else if (evmAddress) {
         if (!localDydxWallet) {
           dispatch(setOnboardingState(OnboardingState.WalletConnected));
 
