@@ -89,8 +89,6 @@ export type NotificationDisplayData = {
 
   customMenuContent?: React.ReactNode;
 
-  customMenuSlotAfter?: React.ReactNode;
-
   actionDescription?: string;
 
   /** Screen reader: instructions for performing toast action after its timer expires */

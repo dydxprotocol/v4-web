@@ -5,23 +5,16 @@ import { groupBy } from 'lodash';
 import { AbacusOrderStatus, ORDER_SIDES, ORDER_STATUS_STRINGS } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import {
-  type NotificationTypeConfig,
-  type TransferNotifcation,
-  NotificationType,
-} from '@/constants/notifications';
+import { type NotificationTypeConfig, NotificationType } from '@/constants/notifications';
 import { ORDER_SIDE_STRINGS, TRADE_TYPE_STRINGS, TradeTypes } from '@/constants/trade';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { Icon, IconName } from '@/components/Icon';
+import { Output, OutputType } from '@/components/Output';
 import { TransferStatusToast } from '@/views/TransferStatus';
 
-import {
-  getSquidTransfers,
-  getSubaccountFills,
-  getSubaccountOrders,
-} from '@/state/accountSelectors';
+import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { OrderStatusIcon } from '@/views/OrderStatusIcon';
@@ -132,8 +125,13 @@ export const notificationTypes = [
             {
               icon: <Icon iconName={finished ? IconName.Transfer : IconName.Clock} />,
               title: stringGetter({ key: getTitleStringKey(type, finished) }),
-              description:
-                type === 'deposit' ? `Deposit of $${toAmount}` : `Withdraw of ${toAmount}`,
+              // TODO: confirm with design what the description should be
+              description: (
+                <>
+                  <span>{type === 'deposit' ? 'Deposit of ' : 'Withdraw of'}</span>
+                  <Output type={OutputType.Fiat} value={toAmount} />
+                </>
+              ),
               customContent: (
                 <TransferStatusToast
                   toAmount={transfer.toAmount}
