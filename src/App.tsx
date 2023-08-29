@@ -99,12 +99,10 @@ const Content = () => {
   );
 };
 
-type ProviderWrapperProps = {
-  children: React.ReactNode;
-};
-
 const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
-  return ({ children }: ProviderWrapperProps) => <Component {...props}>{children}</Component>;
+  return ({ children }: { children: React.ReactNode }) => (
+    <Component {...props}>{children}</Component>
+  );
 };
 
 const providers = [
@@ -118,7 +116,7 @@ const providers = [
   wrapProvider(SquidProvider),
   wrapProvider(LocalNotificationsProvider),
   wrapProvider(NotificationsProvider),
-  wrapProvider(DialogAreaProvider)
+  wrapProvider(DialogAreaProvider),
 ];
 
 const App = () => {

@@ -1,29 +1,22 @@
-import { useCallback, useState } from 'react';
-import { useQuery } from 'react-query';
-import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
+import { useCallback, useState, useMemo } from 'react';
+import styled, { type AnyStyledComponent } from 'styled-components';
+import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client';
 import { Root, Trigger, Content } from '@radix-ui/react-collapsible';
 import { StatusResponse } from '@0xsquid/sdk';
 
-import type { TransferStatus } from '@/constants/abacus';
-
 import { useInterval, useStringGetter } from '@/hooks';
-import { useSquid } from '@/hooks/useSquid';
 
 import { STRING_KEYS } from '@/constants/localization';
 
 import { formatSeconds } from '@/lib/timeUtils';
-import abacusStateManager from '@/lib/abacus';
 
 import { Output, OutputType } from '@/components/Output';
-import { Link } from '@/components/Link';
 import { WithReceipt } from '@/components/WithReceipt';
 import { Icon, IconName } from '@/components/Icon';
 import { TransferStatusSteps } from '@/views/TransferStatusSteps';
 import { LoadingDots } from '@/components/Loading/LoadingDots';
 
 import { layoutMixins } from '@/styles/layoutMixins';
-import { popoverMixins } from '@/styles/popoverMixins';
-import { DateTime } from 'luxon';
 
 type ElementProps = {
   toAmount?: number;
@@ -39,6 +32,11 @@ export const TransferStatusToast = ({
   const stringGetter = useStringGetter();
   const [open, setOpen] = useState<boolean>(false);
   const [secondsLeft, setSecondsLeft] = useState<number | undefined>();
+
+  const type = useMemo(
+    () => (status?.toChain?.chainData.chainId === TESTNET_CHAIN_ID ? 'deposit' : 'withdrawal'),
+    [status]
+  );
 
   const updateSecondsLeft = useCallback(() => {
     const fromChainEta = (status?.fromChain?.chainData?.estimatedRouteDuration || 0) * 1000;
@@ -64,7 +62,7 @@ export const TransferStatusToast = ({
         <Styled.BridgingStatus>
           <Styled.Status>
             {stringGetter({
-              key: STRING_KEYS.DEPOSIT_STATUS,
+              key: type === 'deposit' ? STRING_KEYS.DEPOSIT_STATUS : STRING_KEYS.WITHDRAW_STATUS,
               params: {
                 AMOUNT_USD: <Styled.InlineOutput type={OutputType.Fiat} value={toAmount} />,
                 ESTIMATED_DURATION: (
