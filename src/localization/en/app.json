@@ -1219,9 +1219,10 @@
     "V4_DEVNET_4": "V4 Dev 4",
     "V4_DEVNET_5": "V4 Dev 5",
     "V4_STAGING": "V4 Staging",
-    "V4_TESTNET2": "V4 Public Testnet #2",
-    "V4_TESTNET2_DSRV": "V4 Public Testnet #2 DSRV",
-    "V4_TESTNET2_DYDX": "V4 Public Testnet #2 dYdX",
-    "V4_TESTNET2_NODEFLEET": "V4 Public Testnet #2 nodefleet"
+    "V4_TESTNET2": "V4 Testnet",
+    "V4_TESTNET2_DSRV": "V4 Testnet (DSRV)",
+    "V4_TESTNET2_DYDX": "V4 Testnet (dYdX)",
+    "V4_TESTNET2_NODEFLEET": "V4 Testnet (nodefleet)",
+    "V4_TESTNET2_IMPERATOR": "V4 Testnet (Imperator)"
   }
 }
