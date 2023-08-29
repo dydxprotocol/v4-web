@@ -1,5 +1,5 @@
 import { type Location, matchPath } from 'react-router-dom';
-import { OrderSide } from '@dydxprotocol/v4-client';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { StringGetterFunction } from '@/constants/localization';
 

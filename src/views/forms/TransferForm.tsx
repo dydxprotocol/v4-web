@@ -5,7 +5,7 @@ import { shallowEqual, useSelector } from 'react-redux';
 import type { SyntheticInputEvent } from 'react-number-format/types/types';
 import { debounce } from 'lodash';
 import { StdFee } from '@cosmjs/stargate';
-import { validation } from '@dydxprotocol/v4-client';
+import { validation } from '@dydxprotocol/v4-client-js';
 
 import { TransferInputField, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';

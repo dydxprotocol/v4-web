@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
 
-import { OrderSide } from '@dydxprotocol/v4-client';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { type OrderbookLine, TradeInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 

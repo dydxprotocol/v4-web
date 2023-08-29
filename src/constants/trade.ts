@@ -1,4 +1,4 @@
-import { OrderSide } from '@dydxprotocol/v4-client';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { AlertType } from '@/constants/alerts';
 import { STRING_KEYS } from '@/constants/localization';

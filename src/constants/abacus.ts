@@ -1,5 +1,5 @@
 import Abacus, { kollections } from '@dydxprotocol/abacus';
-import { OrderSide } from '@dydxprotocol/v4-client';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { PositionSide, TradeTypes } from './trade';
 import { STRING_KEYS } from './localization';
 

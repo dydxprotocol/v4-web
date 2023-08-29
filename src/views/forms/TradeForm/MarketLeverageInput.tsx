@@ -1,7 +1,7 @@
 import type { Dispatch, SetStateAction } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
-import { OrderSide } from '@dydxprotocol/v4-client';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { TradeInputField, Nullable } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';

@@ -3,7 +3,7 @@ import { useQuery } from 'react-query';
 import { useAccounts } from '@/hooks';
 
 import { DydxAddress } from '@/constants/wallets';
-import { DYDX_DENOM } from '@dydxprotocol/v4-client';
+import { DYDX_DENOM } from '@dydxprotocol/v4-client-js';
 
 const ACCOUNT_BALANCE_POLLING_INTERVAL = 60_000;
 

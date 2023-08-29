@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import styled, { css, type AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { DateTime } from 'luxon';
-import { OrderSide } from '@dydxprotocol/v4-client';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { ColumnSize } from '@react-types/table';
 import type { Dispatch } from '@reduxjs/toolkit';
 

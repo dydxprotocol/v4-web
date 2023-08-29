@@ -50,7 +50,7 @@ export const useTradingView = ({
     if (hasMarkets) {
       const widgetOptions = getWidgetOptions();
       const widgetOverrides = getWidgetOverrides(appTheme);
-
+      console.log(marketId);
       const options = {
         // debug: true,
         ...widgetOptions,
