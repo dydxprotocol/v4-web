@@ -29,7 +29,7 @@ export const useCurrentMarketId = () => {
 
   const validId = useMemo(() => {
     if (marketIds.length === 0) return marketId ?? lastViewedMarket;
-    if (!marketIds.includes(marketId)) return DEFAULT_MARKETID;
+    if (!marketIds.includes(marketId ?? lastViewedMarket)) return DEFAULT_MARKETID;
     return marketId ?? lastViewedMarket;
   }, [marketIds, marketId]);
 
