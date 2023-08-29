@@ -2,13 +2,11 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 
 import { AbacusApiStatus } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
-import { isDydxV4Network } from '@/constants/networks';
 
 import { setApiState, setSelectedNetwork } from '@/state/app';
 import { resetPerpetualsState } from '@/state/perpetuals';
 
 import abacusStateManager from '@/lib/abacus';
-import squidRouter from '@/lib/squidRouter';
 
 import { openDialog } from './dialogs';
 import { getActiveDialog } from './dialogsSelectors';
@@ -22,10 +20,6 @@ export default (store: any) => (next: any) => async (action: PayloadAction<any>)
     case setSelectedNetwork.type: {
       store.dispatch(resetPerpetualsState());
       abacusStateManager.switchNetwork(payload);
-
-      if (isDydxV4Network(payload)) {
-        squidRouter.switchNetwork(payload);
-      }
       break;
     }
     case setApiState.type: {

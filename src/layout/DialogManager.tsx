@@ -17,6 +17,7 @@ import { OnboardingDialog } from '@/views/dialogs/OnboardingDialog';
 import { ReceiveDialog } from '@/views/dialogs/ReceiveDialog';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
+import { WithdrawDialog } from '@/views/dialogs/WithdrawDialog';
 
 import { OrderDetailsDialog } from '@/views/dialogs/DetailsDialog/OrderDetailsDialog';
 import { FillDetailsDialog } from '@/views/dialogs/DetailsDialog/FillDetailsDialog';
@@ -53,5 +54,6 @@ export const DialogManager = () => {
     [DialogTypes.Receive]: <ReceiveDialog {...modalProps} />,
     [DialogTypes.Trade]: <TradeDialog {...modalProps} />,
     [DialogTypes.Transfer]: <TransferDialog {...modalProps} />,
+    [DialogTypes.Withdraw]: <WithdrawDialog {...modalProps} />,
   }[type];
 };

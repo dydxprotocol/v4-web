@@ -14,6 +14,8 @@ import { DialogAreaProvider, useDialogArea } from './hooks/useDialogArea';
 import { LocaleProvider } from './hooks/useLocaleSeparators';
 import { NotificationsProvider } from './hooks/useNotifications';
 import { SubaccountProvider } from './hooks/useSubaccount';
+import { SquidProvider } from '@/hooks/useSquidRouter';
+
 import { GuardedMobileRoute } from '@/components/GuardedMobileRoute';
 
 import MarketsPage from '@/pages/markets/Markets';
@@ -106,7 +108,9 @@ const App = () => (
               <SubaccountProvider>
                 <NotificationsProvider>
                   <DialogAreaProvider>
-                    <Content />
+                    <SquidProvider>
+                      <Content />
+                    </SquidProvider>
                   </DialogAreaProvider>
                 </NotificationsProvider>
               </SubaccountProvider>

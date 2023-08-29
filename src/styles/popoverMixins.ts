@@ -61,7 +61,7 @@ export const popoverMixins = {
 
     ${layoutMixins.spacedRow}
     grid-template-columns: 1fr auto;
-    padding-right: 1rem;
+    gap: 0;
     border: 1px solid var(--color-layer-6);
   `,
 

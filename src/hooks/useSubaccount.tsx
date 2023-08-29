@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import type { Nullable } from '@dydxprotocol/abacus';
 import Long from 'long';
 import type { IndexedTx } from '@cosmjs/stargate';
-import { type Coin } from '@cosmjs/proto-signing';
+import type { EncodeObject, Coin } from '@cosmjs/proto-signing';
 import { Method } from '@cosmjs/tendermint-rpc';
 
 import {
@@ -89,6 +89,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     simulateTransferNativeToken,
     placeOrderForSubaccount,
     cancelOrderForSubaccount,
+    sendSquidWithdrawFromSubaccount,
   } = useMemo(
     () => ({
       depositToSubaccount: async ({
@@ -301,6 +302,32 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
         return result;
       },
+      
+      sendSquidWithdrawFromSubaccount: async ({
+        subaccountClient,
+        amount,
+        payload,
+      }: {
+        subaccountClient: SubaccountClient;
+        amount: number;
+        payload: string;
+      }) => {
+        if (!compositeClient) throw new Error('client not initialized');
+        
+        const transaction = JSON.parse(payload);
+
+        const msg = compositeClient.withdrawFromSubaccountMessage(subaccountClient, amount);
+        const ibcMsg: EncodeObject = {
+          typeUrl: transaction.msgTypeUrl,
+          value: transaction.msg,
+        };
+
+        return await compositeClient.send(
+          subaccountClient.wallet,
+          () => Promise.resolve([msg, ibcMsg]),
+          false
+        );
+      },
     }),
     [compositeClient]
   );
@@ -396,6 +423,28 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         : simulateTransferNativeToken)({ subaccountClient, amount, recipient });
     },
     [subaccountClient, simulateWithdrawFromSubaccount, simulateTransferNativeToken]
+  );
+
+  const simulateWithdraw = useCallback(
+    async (amount: number) => {
+      if (!subaccountClient) {
+        return;
+      }
+
+      return await simulateWithdrawFromSubaccount({ subaccountClient, amount });
+    },
+    [subaccountClient, simulateWithdrawFromSubaccount]
+  );
+
+  const sendSquidWithdraw = useCallback(
+    async (amount: number, payload: string) => {
+      if (!subaccountClient) {
+        return;
+      }
+
+      return await sendSquidWithdrawFromSubaccount({ subaccountClient, amount, payload });
+    },
+    [subaccountClient, sendSquidWithdrawFromSubaccount]
   );
 
   // ------ Faucet Methods ------ //
@@ -589,6 +638,8 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     // Transfer Methods
     simulateTransfer,
     transfer,
+    simulateWithdraw,
+    sendSquidWithdraw,
 
     // Trading Methods
     placeOrder,

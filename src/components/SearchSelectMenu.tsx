@@ -19,6 +19,7 @@ type ElementProps = {
   disabled?: boolean;
   label?: string;
   items: MenuConfig<string, string>;
+  slotEmpty?: ReactNode;
   withSearch?: boolean;
   withReceiptItems?: DetailsItem[];
 };
@@ -52,12 +53,10 @@ export const SearchSelectMenu = ({
   const Trigger = asChild ? (
     children
   ) : (
-    <>
-      <Styled.MenuTrigger>
-        <Styled.WithLabel label={label}>{children}</Styled.WithLabel>
-      </Styled.MenuTrigger>
+    <Styled.MenuTrigger>
+      {label ? <Styled.WithLabel label={label}>{children}</Styled.WithLabel> : children}
       <Styled.TriggerIcon iconName={IconName.Triangle} open={open} />
-    </>
+    </Styled.MenuTrigger>
   );
 
   return (
@@ -86,7 +85,7 @@ export const SearchSelectMenu = ({
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.MenuTrigger = styled.div`
-  height: 3.5rem;
+  height: var(--form-input-height);
 
   ${layoutMixins.spacedRow}
   align-items: center;
@@ -117,7 +116,7 @@ Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
 Styled.Popover = styled(Popover)`
   max-height: 30vh;
   margin-top: 1rem;
-  border: 1px solid var(--color-layer-6);
+  border: var(--border-width) solid var(--color-layer-6);
   border-radius: 0.5rem;
   z-index: 2;
   box-shadow: none;
@@ -135,6 +134,8 @@ Styled.ComboboxMenu = styled(ComboboxMenu)`
   --comboboxMenu-item-highlighted-backgroundColor: var(--color-layer-5);
   --comboboxMenu-item-checked-textColor: var(--color-text-2);
   --comboboxMenu-item-highlighted-textColor: var(--color-text-2);
+
+  --stickyArea1-topHeight: var(--form-input-height);
 
   input:focus {
     outline: none;

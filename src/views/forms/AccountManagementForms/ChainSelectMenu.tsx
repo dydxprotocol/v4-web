@@ -1,30 +1,44 @@
-import type { ChainData } from '@0xsquid/sdk';
 import styled, { type AnyStyledComponent } from 'styled-components';
+import { shallowEqual, useSelector } from 'react-redux';
 
+import { TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { useStringGetter } from '@/hooks';
 
-import { WithLabel } from '@/components/WithLabel';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
 
+import { getTransferInputs } from '@/state/inputsSelectors';
+
 type ElementProps = {
-  chains?: ChainData[];
-  currentChain?: ChainData;
-  setCurrentChain: (chain: ChainData) => void;
+  label?: string;
+  selectedChain?: string;
+  onSelectChain: (chain: string) => void;
 };
 
-export const ChainSelectMenu = ({ chains = [], currentChain, setCurrentChain }: ElementProps) => {
+export const ChainSelectMenu = ({
+  label,
+  selectedChain,
+  onSelectChain,
+}: ElementProps) => {
   const stringGetter = useStringGetter();
+  const { type, depositOptions, withdrawalOptions, resources } =
+    useSelector(getTransferInputs, shallowEqual) || {};
+  const chains =
+    (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.chains?.toArray() || [];
 
-  const chainItems = Object.values(chains).map((chain: ChainData) => ({
-    value: chain.chainId.toString(),
-    label: chain.chainName,
-    onSelect: () => setCurrentChain(chain),
-    slotBefore: <Styled.Img src={chain.chainIconURI} alt="" />,
+  const chainItems = Object.values(chains).map((chain) => ({
+    value: chain.type,
+    label: chain.stringKey,
+    onSelect: () => {
+      onSelectChain(chain.type);
+    },
+    slotBefore: <Styled.Img src={chain.iconUrl} alt="" />,
   }));
+
+  const selectedOption = chains.find((item) => item.type === selectedChain); 
 
   return (
     <SearchSelectMenu
@@ -35,12 +49,12 @@ export const ChainSelectMenu = ({ chains = [], currentChain, setCurrentChain }: 
           items: chainItems,
         },
       ]}
-      label="Source"
+      label={label || (type === TransferType.deposit ? 'Source' : 'Destination')}
     >
       <Styled.ChainRow>
-        {currentChain ? (
+        {selectedChain ? (
           <>
-            <Styled.Img src={currentChain?.chainIconURI} alt="" /> {currentChain?.chainName}
+            <Styled.Img src={selectedOption?.iconUrl} alt="" /> {selectedOption?.stringKey}
           </>
         ) : (
           stringGetter({ key: STRING_KEYS.SELECT_CHAIN })

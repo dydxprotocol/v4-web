@@ -12,6 +12,7 @@ export enum DialogTypes {
   Receive = 'Receive',
   Trade = 'Trade',
   Transfer = 'Transfer',
+  Withdraw = 'Withdraw',
 }
 
 export enum TradeBoxDialogTypes {
