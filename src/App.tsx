@@ -106,13 +106,13 @@ const App = () => (
           <DydxProvider>
             <AccountsProvider>
               <SubaccountProvider>
-                <NotificationsProvider>
-                  <DialogAreaProvider>
-                    <SquidProvider>
+                <SquidProvider>
+                  <NotificationsProvider>
+                    <DialogAreaProvider>
                       <Content />
-                    </SquidProvider>
-                  </DialogAreaProvider>
-                </NotificationsProvider>
+                    </DialogAreaProvider>
+                  </NotificationsProvider>
+                </SquidProvider>
               </SubaccountProvider>
             </AccountsProvider>
           </DydxProvider>

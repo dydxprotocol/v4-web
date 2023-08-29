@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useQuery } from 'react-query';
 
 import { LocalStorageKey } from '@/constants/localStorage';
 import {
@@ -9,11 +10,12 @@ import {
   NotificationStatus,
 } from '@/constants/notifications';
 
+import { useSquid } from '@/hooks/useSquid';
 import { useLocalStorage } from './useLocalStorage';
 import { notificationTypes as notificationTypesFactory } from './useNotificationTypes';
 
 import { renderSvgToDataUrl } from '../lib/renderSvgToDataUrl';
-import { set } from 'lodash';
+import { StatusResponse } from '@0xsquid/sdk';
 
 const NotificationsContext = createContext<ReturnType<typeof useNotificationsContext> | undefined>(
   undefined
@@ -39,8 +41,11 @@ const useNotificationsContext = () => {
     defaultValue: Date.now(),
   });
 
-  // Front-end only notifications
-  const [transferNotifications, setTransferNotifications] = useState<TransferNotifcation[]>([]);
+  // transfer notifications
+  const [transferNotifications, setTransferNotifications] = useLocalStorage<TransferNotifcation[]>({
+    key: LocalStorageKey.TransferNotifications,
+    defaultValue: [],
+  });
 
   const addTransferNotification = useCallback(
     (notification: TransferNotifcation) =>
@@ -52,6 +57,41 @@ const useNotificationsContext = () => {
     () => notificationTypesFactory(transferNotifications),
     [transferNotifications]
   );
+
+  const squid = useSquid();
+
+  const { data: transferStatuses } = useQuery({
+    queryKey: ['getTransactionStatus', transferNotifications],
+    queryFn: async () => {
+      const statuses: { [key: string]: StatusResponse } = {};
+      for (const {
+        txHash,
+        toChainId,
+        fromChainId,
+        status: currentStatus,
+      } of transferNotifications) {
+        if (currentStatus && currentStatus?.squidTransactionStatus !== 'ongoing') continue;
+
+        const status = await squid?.getStatus({ transactionId: txHash, toChainId, fromChainId });
+        if (status) statuses[txHash] = status;
+      }
+      return statuses;
+    },
+    refetchInterval: 10_000,
+  });
+
+  useEffect(() => {
+    if (!transferStatuses) return;
+    const newTransferNotifications = transferNotifications.map((notification) => {
+      const status = transferStatuses[notification.txHash];
+      if (!status) return notification;
+      return {
+        ...notification,
+        status,
+      };
+    });
+    setTransferNotifications(newTransferNotifications);
+  }, [transferStatuses]);
 
   useEffect(() => {
     setNotificationsLastUpdated(Date.now());

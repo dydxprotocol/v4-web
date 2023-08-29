@@ -17,6 +17,7 @@ type ElementProps = {
   slotIcon?: React.ReactNode;
   slotTitle?: React.ReactNode;
   slotDescription?: React.ReactNode;
+  slotCustomContent?: React.ReactNode;
   slotAction?: React.ReactNode;
   actionDescription?: string;
   actionAltText?: string;
@@ -33,6 +34,7 @@ export const Toast = ({
   slotIcon,
   slotTitle,
   slotDescription,
+  slotCustomContent,
   slotAction,
   actionDescription = '',
   actionAltText = actionDescription,
@@ -78,8 +80,8 @@ export const Toast = ({
 
             <$Title>{slotTitle}</$Title>
           </$Header>
-
-          <$Description>{slotDescription}</$Description>
+          {!slotCustomContent && <$Description>{slotDescription}</$Description>}
+          {slotCustomContent}
           {actionDescription && (
             <$Action asChild altText={actionAltText}>
               {slotAction}

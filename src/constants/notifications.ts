@@ -1,3 +1,5 @@
+import { StatusResponse } from "@0xsquid/sdk";
+
 /** implemented in useNotificationTypes */
 export enum NotificationType {
   OrderStatusChanged = 'OrderStatusChanged',
@@ -83,6 +85,12 @@ export type NotificationDisplayData = {
 
   description?: React.ReactNode;
 
+  customContent?: React.ReactNode;
+
+  customMenuContent?: React.ReactNode;
+
+  customMenuSlotAfter?: React.ReactNode;
+
   actionDescription?: string;
 
   /** Screen reader: instructions for performing toast action after its timer expires */
@@ -112,8 +120,9 @@ export type NotificationDisplayData = {
 // Notification types
 export type TransferNotifcation = {
   txHash: string;
-  toChainId: string;
+  toChainId?: string;
   fromChainId?: string;
   toAmount?: number;
   triggeredAt?: number;
+  status?: StatusResponse;
 };

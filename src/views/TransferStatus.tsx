@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { useQuery } from 'react-query';
 import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
 import { Root, Trigger, Content } from '@radix-ui/react-collapsible';
+import { StatusResponse } from '@0xsquid/sdk';
 
 import type { TransferStatus } from '@/constants/abacus';
 
@@ -17,32 +18,27 @@ import { Output, OutputType } from '@/components/Output';
 import { Link } from '@/components/Link';
 import { WithReceipt } from '@/components/WithReceipt';
 import { Icon, IconName } from '@/components/Icon';
+import { TransferStatusSteps } from '@/views/TransferStatusSteps';
+import { LoadingDots } from '@/components/Loading/LoadingDots';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
 import { DateTime } from 'luxon';
-import { LoadingDots } from './Loading/LoadingDots';
 
 type ElementProps = {
-  txHash: string;
-  toChainId: string;
-  fromChainId?: string;
   toAmount?: number;
   triggeredAt?: number;
+  status?: StatusResponse;
 };
 
-export const TransferStatusToast = ({ txHash, toChainId, fromChainId, toAmount, triggeredAt = Date.now() }: ElementProps) => {
+export const TransferStatusToast = ({
+  toAmount,
+  triggeredAt = Date.now(),
+  status,
+}: ElementProps) => {
   const stringGetter = useStringGetter();
   const [open, setOpen] = useState<boolean>(false);
   const [secondsLeft, setSecondsLeft] = useState<number | undefined>();
-
-  const squid = useSquid();
-
-  const { data: status } = useQuery({
-    queryKey: ['getTransactionStatus', { transactionId: txHash, toChainId, fromChainId }],
-    queryFn: async () => await squid?.getStatus({ transactionId: txHash, toChainId, fromChainId }),
-    refetchInterval: 30_000,
-  });
 
   const updateSecondsLeft = useCallback(() => {
     const fromChainEta = (status?.fromChain?.chainData?.estimatedRouteDuration || 0) * 1000;
@@ -60,22 +56,9 @@ export const TransferStatusToast = ({ txHash, toChainId, fromChainId, toAmount, 
         hideReceipt={!open}
         side="bottom"
         slotReceipt={
-          <Styled.Content>
-            {/* {statusSteps.map(({ status, label, url, eta }, index) => {
-              return (
-                <Styled.Step key={index}>
-                  {url ? (
-                    <Link href={url}>
-                      <span>{label}</span>
-                      <Icon iconName={IconName.LinkOut} />
-                    </Link>
-                  ) : (
-                    <span>{label}</span>
-                  )}
-                </Styled.Step>
-              );
-            })} */}
-          </Styled.Content>
+          <Styled.Receipt>
+            <TransferStatusSteps status={status} />
+          </Styled.Receipt>
         }
       >
         <Styled.BridgingStatus>
@@ -83,16 +66,11 @@ export const TransferStatusToast = ({ txHash, toChainId, fromChainId, toAmount, 
             {stringGetter({
               key: STRING_KEYS.DEPOSIT_STATUS,
               params: {
-                AMOUNT_USD: (
-                  <Styled.InlineOutput
-                    type={OutputType.Fiat}
-                    value={toAmount}
-                  />
-                ),
+                AMOUNT_USD: <Styled.InlineOutput type={OutputType.Fiat} value={toAmount} />,
                 ESTIMATED_DURATION: (
                   <Styled.InlineOutput
                     type={OutputType.Text}
-                    value={formatSeconds(secondsLeft || 0)}
+                    value={formatSeconds(Math.max(secondsLeft || 0, 0))}
                   />
                 ),
               },
@@ -113,7 +91,13 @@ export const TransferStatusToast = ({ txHash, toChainId, fromChainId, toAmount, 
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Root = styled(Root)`
-  margin: 0 -1rem -1rem -1rem;
+  margin: 0.5rem -1rem -1rem -1rem;
+  color: var(--color-text-0);
+  font: var(--font-small-book);
+`;
+
+Styled.Receipt = styled.div`
+  padding: 0 1rem;
 `;
 
 Styled.BridgingStatus = styled.div`

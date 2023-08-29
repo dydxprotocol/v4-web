@@ -917,6 +917,7 @@
     "66_REDUCTION": "66% reduction",
     "ADJUSTED_IMR": "Adjusted Margin",
     "ADJUSTED_IMR_BODY": "We have temporarily {ACTION} the Initial Margin Requirements on {MARKET} to {PERCENT} due to volatility. {ADDITIONAL_NOTE}",
+    "BRIDGING_TOKENS": "Bridging tokens",
     "CLOSE_MARKET_POSITIONS": "Close your {MARKET} position",
     "CLOSE_MARKET_POSITIONS_BODY": "{MARKET} is set to close only mode and the close price of {MARKET} is now fixed. Please close your open {MARKET} position as soon as you are able. We're here to help via the help chat if you run into issues.",
     "COMPLIANCE_ALERT": "Compliance alert",
@@ -924,6 +925,7 @@
     "DEPOSIT_IN_PROGRESS": "Deposit in progress",
     "DEPOSIT_SUCCESS_DESCRIPTION": "Your deposit of {AMOUNT_ELEMENT} has been confirmed and is now available for trading.",
     "DEPOSIT_SUCCESS": "Deposit success!",
+    "DEPOSIT_TO_CHAIN": "Deposit to {CHAIN}",
     "DIRECT_TRANSFER_SUCCESS": "Direct transfer success!",
     "DIRECT_TRANSFER_SUCCESS_DESCRIPTION": "Your direct transfer of {AMOUNT_ELEMENT} has been confirmed.",
     "EPOCH_REWARDS": "Epoch {EPOCH_NUMBER} Rewards",
@@ -932,6 +934,8 @@
     "FAST_WITHDRAW_PENDING": "Fast withdraw pending",
     "FAST_WITHDRAW_SUCCESS_DESCRIPTION": "Your fast withdraw of {AMOUNT_ELEMENT} has been confirmed.",
     "FAST_WITHDRAW_SUCCESS": "Fast withdraw success!",
+    "INITIATED_DEPOSIT": "Initiated deposit",
+    "INITIATED_WITHDRAWAL": "Initiated withdrawal",
     "LEGAL_UPDATES": "Legal updates",
     "LEGAL_UPDATES_DESCRIPTION": "Please check out our updated {TOU} and {PRIVACY_POLICY}.",
     "MAINTENANCE_MARGIN_ADJUSTMENTS": "Maintenance margin requirements {ACTION} at {PERCENT}%.",
@@ -948,7 +952,8 @@
     "SLOW_WITHDRAW_PENDING": "Slow withdraw(s) pending",
     "SUSPICIOUS_TRADE": "Suspicious activity",
     "SUSPICIOUS_TRADE_BODY": "We have noticed suspicious trading activity related to your account on dYdX, including potential wash trading activity. We will be reviewing your activity on an ongoing basis. If we notice similar activity in the future, then you will be permanently blocked from performing transfers within the protocol and from placing orders other than market orders that reduce your positions.",
-    "WITHDRAW_IN_PROGRESS": "Withdrawal(s) in progress"
+    "WITHDRAW_IN_PROGRESS": "Withdrawal(s) in progress",
+    "WITHDRAW_TO_CHAIN": "Withdraw to {CHAIN}"
   },
   "EMAIL_NOTIFICATIONS": {
     "ACCOUNT_DESCRIPTION": "Deposits, Withdrawals, Account Updates",

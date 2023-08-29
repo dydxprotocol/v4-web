@@ -5,11 +5,7 @@ import { useDispatch, shallowEqual, useSelector } from 'react-redux';
 import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client';
 import { ethers } from 'ethers';
 
-import {
-  TransferInputField,
-  TransferInputTokenResource,
-  TransferType,
-} from '@/constants/abacus';
+import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -58,8 +54,14 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const { addTransferNotification } = useNotifications();
 
-  const { requestPayload, token, chain: chainIdStr, resources, summary } = useSelector(getTransferInputs, shallowEqual) || {};
-  const chainId = chainIdStr ? parseInt(chainIdStr) : undefined
+  const {
+    requestPayload,
+    token,
+    chain: chainIdStr,
+    resources,
+    summary,
+  } = useSelector(getTransferInputs, shallowEqual) || {};
+  const chainId = chainIdStr ? parseInt(chainIdStr) : undefined;
 
   // User inputs
   const sourceToken = useMemo(
@@ -102,13 +104,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     abacusStateManager.setTransferValue({
       field: TransferInputField.type,
       value: TransferType.deposit.rawValue,
-    });
-
-    addTransferNotification({
-      txHash: '0x4a8bb0893f0bfe5b6bf4eab9ee1ff4a02dd088e9946f3404a6b9e9df5205b057',
-      toChainId: TESTNET_CHAIN_ID,
-      fromChainId: '5',
-      toAmount: 2.5832,
     });
 
     return () => {
@@ -206,15 +201,9 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
             fromChainId: chainIdStr || undefined,
             toAmount: summary?.usdcSize || undefined,
           });
-          // abacusStateManager.setTransferStatus({
-          //   hash: txHash,
-          //   toChainId: TESTNET_CHAIN_ID,
-          //   fromChainId: chainId?.toString(),
-          // });
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');
         }
-
       } catch (error) {
         setError(error);
       } finally {
@@ -303,17 +292,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           }
         />
       </Styled.WithDetailsReceipt>
-      {errorMessage ? (
-        <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>
-      ) : (
-        transactionHash && (
-          <AlertMessage type={AlertType.Success}>
-            <Styled.TransactionInfo>
-              {stringGetter({ key: STRING_KEYS.DEPOSIT_IN_PROGRESS })}
-            </Styled.TransactionInfo>
-          </AlertMessage>
-        )
-      )}
+      {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
       <DepositButtonAndReceipt
         isDisabled={isDisabled}
         isLoading={isLoading}

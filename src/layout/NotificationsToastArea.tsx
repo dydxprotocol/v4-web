@@ -41,6 +41,7 @@ export const NotificationsToastArea = ({ className }: StyleProps) => {
             slotIcon={displayData.icon}
             slotTitle={displayData.title}
             slotDescription={displayData.description}
+            slotCustomContent={displayData.customContent}
             slotAction={
               <Button size={ButtonSize.Small} onClick={() => onNotificationAction(notification)}>
                 {displayData.actionDescription}

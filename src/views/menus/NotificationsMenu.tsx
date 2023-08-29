@@ -89,9 +89,9 @@ export const NotificationsMenu = ({
             .map(({ notification, key, displayData }) => ({
               value: key,
               label: displayData.title ?? '',
-              description: displayData.description,
-              slotBefore: displayData.icon,
-              slotAfter: (
+              description: displayData.customMenuContent || displayData.description,
+              slotBefore: !displayData.customMenuContent && displayData.icon,
+              slotAfter: !displayData.customMenuContent && (
                 <>
                   <$Output
                     type={OutputType.RelativeTime}

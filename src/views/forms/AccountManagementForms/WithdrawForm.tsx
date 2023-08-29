@@ -16,6 +16,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, QUANTUM_MULTIPLIER } from '@/constants/numbers';
 
 import { useDebounce, useStringGetter, useSubaccount } from '@/hooks';
+import { useNotifications } from '@/hooks/useNotifications';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -65,6 +66,8 @@ export const WithdrawForm = () => {
     () => (token ? resources?.tokenResources?.get(token) : undefined),
     [token, resources]
   );
+
+  const { addTransferNotification } = useNotifications();
 
   // Async Data
   const [transactionHash, setTransactionHash] = useState<string>();
@@ -137,10 +140,12 @@ export const WithdrawForm = () => {
           const hash = `0x${Buffer.from(txHash.hash).toString('hex')}`;
           
           setTransactionHash(hash);
-          abacusStateManager.setTransferStatus({
-            hash,
+          
+          addTransferNotification({
+            txHash: hash,
             fromChainId: TESTNET_CHAIN_ID,
             toChainId: chainIdStr || undefined,
+            toAmount: debouncedAmountBN.toNumber(),
           });
           abacusStateManager.clearTransferInputValues();
           setWithdrawAmount('');
