@@ -1,7 +1,7 @@
 import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { type NumberFormatValues } from 'react-number-format';
-import { useDispatch, shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual, useSelector } from 'react-redux';
 import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client';
 import { ethers } from 'ethers';
 
@@ -46,7 +46,6 @@ type DepositFormProps = {
 
 export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 

@@ -8,7 +8,6 @@ import type {
   PerpetualState,
   PerpetualStateChanges,
   SubaccountOrder,
-  TransferStatus,
 } from '@/constants/abacus';
 
 import { Changes } from '@/constants/abacus';
