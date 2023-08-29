@@ -64,7 +64,7 @@ export const TransferStatusSteps = ({ status }: ElementProps) => {
         link: status?.fromChain?.transactionUrl,
       },
       {
-        label: 'Bridging tokens',
+        label: stringGetter({ key: STRING_KEYS.BRIDGING_TOKENS }),
         step: TransferStatusStep.Bridge,
         link: status?.axelarTransactionUrl,
       },
