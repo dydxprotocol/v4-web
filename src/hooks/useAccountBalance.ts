@@ -5,7 +5,7 @@ import { StargateClient } from '@cosmjs/stargate';
 import { useQuery } from 'react-query';
 import { formatUnits } from 'ethers';
 
-import { CLIENT_NETWORK_CONFIGS, type DydxV4Network } from '@/constants/networks';
+import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { EthereumAddress } from '@/constants/wallets';
 
@@ -15,7 +15,6 @@ import { MustBigNumber } from '@/lib/numbers';
 import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { useAccounts } from './useAccounts';
-// import { useDydxClient } from './useDydxClient';
 import { usePollNativeTokenBalance } from './usePollNativeTokenBalance';
 
 type UseAccountBalanceProps = {
@@ -49,10 +48,8 @@ export const useAccountBalance = ({
 }: UseAccountBalanceProps = {}) => {
   const { evmAddress, dydxAddress } = useAccounts();
 
-  // TODO: let Abacus / useDydxClient handle EVM chain IDs
-  // const { networkConfig } = useDydxClient();
   const selectedNetwork = useSelector(getSelectedNetwork);
-  const evmChainId = Number(CLIENT_NETWORK_CONFIGS[selectedNetwork as DydxV4Network].ethereumChainId);
+  const evmChainId = Number(CLIENT_NETWORK_CONFIGS[selectedNetwork].ethereumChainId);
 
   const evmQuery = useBalance({
     enabled: Boolean(!isCosmosChain && addressOrDenom?.startsWith('0x')),

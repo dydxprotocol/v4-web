@@ -12,7 +12,7 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { ERROR_STRING_KEYS } from '@/constants/localization/errors';
 import { STRING_KEYS } from '@/constants/localization';
-import { CHAIN_IDS } from '@/constants/networks';
+import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
 import { NumberSign, QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { DYDX_CHAIN_ASSET_COIN_DENOM, DYDX_CHAIN_INFO, DydxChainAsset } from '@/constants/wallets';
 
@@ -228,7 +228,7 @@ export const TransferForm = ({
 
   const networkOptions = [
     {
-      chainId: CHAIN_IDS[selectedNetwork],
+      chainId: CLIENT_NETWORK_CONFIGS[selectedNetwork].dydxChainId,
       label: (
         <Styled.InlineRow>
           <AssetIcon symbol="DYDX" /> {stringGetter({ key: STRING_KEYS.DYDX_CHAIN })}
@@ -318,7 +318,7 @@ export const TransferForm = ({
         />
         <Styled.NetworkSelectMenu
           label={stringGetter({ key: STRING_KEYS.NETWORK })}
-          value={CHAIN_IDS[selectedNetwork]}
+          value={CLIENT_NETWORK_CONFIGS[selectedNetwork].dydxChainId}
           slotTriggerAfter={null}
         >
           {networkOptions.map(({ chainId, label }) => (

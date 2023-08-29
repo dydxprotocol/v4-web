@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 
 import { SubaccountPosition } from '@/constants/abacus';
-import { OnboardingGuard, OnboardingState, OnboardingSteps } from '@/constants/account';
+import { OnboardingState, OnboardingSteps } from '@/constants/account';
 import { isDydxV4Network } from '@/constants/networks';
 
 import {

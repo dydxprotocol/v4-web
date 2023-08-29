@@ -27,11 +27,14 @@ dependencies:
     specifier: ^0.31.0
     version: 0.31.0
   '@dydxprotocol/abacus':
-    specifier: ^0.3.7
-    version: 0.3.7
+    specifier: ^0.3.9
+    version: 0.3.9
   '@dydxprotocol/v4-client':
     specifier: ^0.29.0
     version: 0.29.0
+  '@dydxprotocol/v4-localization':
+    specifier: ^0.0.12
+    version: 0.0.12
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -1143,8 +1146,8 @@ packages:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
 
-  /@dydxprotocol/abacus@0.3.7:
-    resolution: {integrity: sha512-wYGdsFNnVulwVqsNpMrS3j02lOyw/qg5QrB2DdlWtj4YeNZqvdM/vHC6HgU+U4McdVJW4STiEKW2Fl0rF/qbhQ==}
+  /@dydxprotocol/abacus@0.3.9:
+    resolution: {integrity: sha512-VphzsCEP5Apu41ln7Bi8+QwWBO1AuUZ4Fv02b7pPKw/BIy1eDW73FsC4qhyKW3KxQm/wo0X4Huom7r820KoR1A==}
     dev: false
 
   /@dydxprotocol/dydxjs@0.3.0:
@@ -1185,6 +1188,10 @@ packages:
       - bufferutil
       - debug
       - utf-8-validate
+    dev: false
+
+  /@dydxprotocol/v4-localization@0.0.12:
+    resolution: {integrity: sha512-J5VY8WIIl/1/COO43E/wR/TYlEEjpydmTtUC4d02qhvRYip7m82TyqIMA9iiMvvCQnzY8RTNsHcvTb+puyGiQA==}
     dev: false
 
   /@emotion/is-prop-valid@1.2.1:

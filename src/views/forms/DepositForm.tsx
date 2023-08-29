@@ -11,9 +11,9 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { StringGetterFunction, STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
-import { CLIENT_NETWORK_CONFIGS, type DydxV4Network } from '@/constants/networks';
+import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
 
-import { useAccounts, useDydxClient, useStringGetter } from '@/hooks';
+import { useAccounts, useStringGetter } from '@/hooks';
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -135,7 +135,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   // const { networkConfig } = useDydxClient();
   const selectedNetwork = useSelector(getSelectedNetwork);
-  const evmChainId = Number(CLIENT_NETWORK_CONFIGS[selectedNetwork as DydxV4Network].ethereumChainId);
+  const evmChainId = Number(CLIENT_NETWORK_CONFIGS[selectedNetwork].ethereumChainId);
 
   const { chains, tokens } = useSquidData(signerGraz ? 'cosmos' : 'evm');
 

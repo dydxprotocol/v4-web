@@ -1,6 +1,7 @@
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { useSelectedNetwork } from '@/hooks';
+import { layoutMixins } from '@/styles/layoutMixins';
 import { headerMixins } from '@/styles/headerMixins';
 
 import { DropdownSelectMenu } from '@/components/DropdownSelectMenu';
@@ -18,7 +19,6 @@ export const NetworkSelectMenu = ({ align, sideOffset }: StyleProps) => {
 
   return (
     <Styled.DropdownSelectMenu
-      disabled={import.meta.env.MODE === 'production'}
       items={networks}
       value={selectedNetwork}
       onValueChange={switchNetwork}
@@ -32,4 +32,11 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.DropdownSelectMenu = styled(DropdownSelectMenu)`
   ${headerMixins.dropdownTrigger}
+
+  & > span:first-of-type {
+    ${layoutMixins.textOverflow}
+    max-width: 5.625rem;
+    min-width: 0;
+    white-space: nowrap;
+  }
 `;
