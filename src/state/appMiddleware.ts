@@ -24,7 +24,7 @@ export default (store: any) => (next: any) => async (action: PayloadAction<any>)
       abacusStateManager.switchNetwork(payload);
 
       if (isDydxV4Network(payload)) {
-        squidRouter.switchNetwork(payload);
+        // squidRouter.switchNetwork(payload);
       }
       break;
     }

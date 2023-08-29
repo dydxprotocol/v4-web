@@ -33,7 +33,7 @@ export const useInitializePage = () => {
     abacusStateManager.start({ network: localStorageNetwork });
 
     if (isDydxV4Network(localStorageNetwork)) {
-      squidRouter.switchNetwork(localStorageNetwork);
+      // squidRouter.switchNetwork(localStorageNetwork);
     }
   }, []);
 };
