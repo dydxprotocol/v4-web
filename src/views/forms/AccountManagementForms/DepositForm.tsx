@@ -13,6 +13,7 @@ import { NumberSign } from '@/constants/numbers';
 
 import { useAccounts, useDebounce, useStringGetter } from '@/hooks';
 import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
@@ -50,11 +51,14 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const { signerWagmi } = useAccounts();
 
+  const { addTransferNotification } = useLocalNotifications();
+
   const {
     requestPayload,
     token,
     chain: chainIdStr,
     resources,
+    summary,
   } = useSelector(getTransferInputs, shallowEqual) || {};
   const chainId = chainIdStr ? parseInt(chainIdStr) : undefined;
 
@@ -69,8 +73,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const debouncedAmount = useDebounce<string>(fromAmount, 500);
 
   // Async Data
-  const [transactionHash, setTransactionHash] = useState<string>();
-
   const { balance, queryStatus, isQueryFetching } = useAccountBalance({
     addressOrDenom: sourceToken?.address || undefined,
     assetSymbol: sourceToken?.symbol || undefined,
@@ -189,11 +191,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         onDeposit?.();
 
         if (txHash) {
-          setTransactionHash(txHash);
-          abacusStateManager.setTransferStatus({
-            hash: txHash,
+          addTransferNotification({
+            txHash,
             toChainId: TESTNET_CHAIN_ID,
-            fromChainId: chainId?.toString(),
+            fromChainId: chainIdStr || undefined,
+            toAmount: summary?.usdcSize || undefined,
+            triggeredAt: Date.now(),
           });
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');
@@ -286,17 +289,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           }
         />
       </Styled.WithDetailsReceipt>
-      {errorMessage ? (
-        <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>
-      ) : (
-        transactionHash && (
-          <AlertMessage type={AlertType.Success}>
-            <Styled.TransactionInfo>
-              {stringGetter({ key: STRING_KEYS.DEPOSIT_IN_PROGRESS })}
-            </Styled.TransactionInfo>
-          </AlertMessage>
-        )
-      )}
+      {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
       <DepositButtonAndReceipt
         isDisabled={isDisabled}
         isLoading={isLoading}

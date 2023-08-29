@@ -12,6 +12,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, QUANTUM_MULTIPLIER } from '@/constants/numbers';
 
 import { useDebounce, useStringGetter, useSubaccount } from '@/hooks';
+import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
@@ -63,9 +64,9 @@ export const WithdrawForm = () => {
     [token, resources]
   );
 
-  // Async Data
-  const [transactionHash, setTransactionHash] = useState<string>();
+  const { addTransferNotification } = useLocalNotifications();
 
+  // Async Data
   const debouncedAmountBN = MustBigNumber(debouncedAmount);
   const withdrawAmountBN = MustBigNumber(withdrawAmount);
   const freeCollateralBN = MustBigNumber(freeCollateral?.current);
@@ -133,11 +134,12 @@ export const WithdrawForm = () => {
         if (txHash?.hash) {
           const hash = `0x${Buffer.from(txHash.hash).toString('hex')}`;
 
-          setTransactionHash(hash);
-          abacusStateManager.setTransferStatus({
-            hash,
+          addTransferNotification({
+            txHash: hash,
             fromChainId: TESTNET_CHAIN_ID,
             toChainId: chainIdStr || undefined,
+            toAmount: debouncedAmountBN.toNumber(),
+            triggeredAt: Date.now(),
           });
           abacusStateManager.clearTransferInputValues();
           setWithdrawAmount('');
@@ -148,7 +150,7 @@ export const WithdrawForm = () => {
         setIsLoading(false);
       }
     },
-    [setTransactionHash, requestPayload, debouncedAmountBN, chainIdStr]
+    [requestPayload, debouncedAmountBN, chainIdStr]
   );
 
   const onChangeAddress = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -291,17 +293,7 @@ export const WithdrawForm = () => {
           }
         />
       </Styled.WithDetailsReceipt>
-      {errorMessage ? (
-        <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>
-      ) : (
-        transactionHash && (
-          <AlertMessage type={AlertType.Success}>
-            <Styled.TransactionInfo>
-              {stringGetter({ key: STRING_KEYS.WITHDRAW_IN_PROGRESS })}
-            </Styled.TransactionInfo>
-          </AlertMessage>
-        )
-      )}
+      {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
       <WithdrawButtonAndReceipt
         isDisabled={isDisabled}
         isLoading={isLoading}
