@@ -5,11 +5,7 @@ import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
 import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client';
 
-import {
-  TransferInputField,
-  TransferInputTokenResource,
-  TransferType,
-} from '@/constants/abacus';
+import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -135,17 +131,18 @@ export const WithdrawForm = () => {
 
         setIsLoading(true);
         const txHash = await sendSquidWithdraw(debouncedAmountBN.toNumber(), requestPayload?.data);
-        
+
         if (txHash?.hash) {
           const hash = `0x${Buffer.from(txHash.hash).toString('hex')}`;
-          
+
           setTransactionHash(hash);
-          
+
           addTransferNotification({
             txHash: hash,
             fromChainId: TESTNET_CHAIN_ID,
             toChainId: chainIdStr || undefined,
             toAmount: debouncedAmountBN.toNumber(),
+            triggeredAt: Date.now(),
           });
           abacusStateManager.clearTransferInputValues();
           setWithdrawAmount('');
@@ -304,17 +301,7 @@ export const WithdrawForm = () => {
           }
         />
       </Styled.WithDetailsReceipt>
-      {errorMessage ? (
-        <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>
-      ) : (
-        transactionHash && (
-          <AlertMessage type={AlertType.Success}>
-            <Styled.TransactionInfo>
-              {stringGetter({ key: STRING_KEYS.WITHDRAW_IN_PROGRESS })}
-            </Styled.TransactionInfo>
-          </AlertMessage>
-        )
-      )}
+      {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
       <WithdrawButtonAndReceipt
         isDisabled={isDisabled}
         isLoading={isLoading}

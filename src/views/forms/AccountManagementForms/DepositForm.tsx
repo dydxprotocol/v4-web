@@ -197,6 +197,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
             toChainId: TESTNET_CHAIN_ID,
             fromChainId: chainIdStr || undefined,
             toAmount: summary?.usdcSize || undefined,
+            triggeredAt: Date.now(),
           });
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');

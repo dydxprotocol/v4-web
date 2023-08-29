@@ -12,7 +12,6 @@ import type {
   SubaccountTransfers,
   HistoricalPnlPeriods,
   SubAccountHistoricalPNLs,
-  TransferStatus,
 } from '@/constants/abacus';
 
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
@@ -36,16 +35,6 @@ export type AccountState = {
   wallet?: Nullable<Wallet>;
   walletType?: WalletType;
   historicalPnlPeriod?: HistoricalPnlPeriods;
-  squidTransfer?: Record<
-    string,
-    {
-      hash: string;
-      toChainId: string;
-      fromChainId?: string;
-      toAmount?: number;
-      status?: TransferStatus;
-    }
-  >;
 };
 
 const initialState: AccountState = {
@@ -159,24 +148,6 @@ export const accountSlice = createSlice({
     viewedOrders: (state) => {
       state.hasUnseenOrderUpdates = false;
     },
-    addSquidTransfer: (
-      state,
-      action: PayloadAction<{
-        hash: string;
-        toChainId: string;
-        fromChainId?: string;
-        toAmount?: number;
-      }>
-    ) => {
-      if (!state.squidTransfer) state.squidTransfer = {};
-      state.squidTransfer[action.payload.hash] = { ...action.payload };
-    },
-    setTransferStatuses: (state, action: PayloadAction<Record<string, TransferStatus>>) => {
-      Object.keys(action.payload).forEach((key) => {
-        if (state.squidTransfer && state.squidTransfer[key])
-          state.squidTransfer[key].status = action.payload[key];
-      });
-    },
   },
 });
 
@@ -194,6 +165,4 @@ export const {
   removeUncommittedOrderClientId,
   viewedFills,
   viewedOrders,
-  addSquidTransfer,
-  setTransferStatuses,
 } = accountSlice.actions;
