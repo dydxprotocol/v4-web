@@ -19,10 +19,10 @@ import { Output, OutputType } from '@/components/Output';
 import { ToggleButton } from '@/components/ToggleButton';
 import { WithReceipt } from '@/components/WithReceipt';
 
-import { SlippageEditor } from '../SlippageEditor';
-
 import { getSubaccount } from '@/state/accountSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
+
+import { SlippageEditor } from '../SlippageEditor';
 
 type ElementProps = {
   setSlippage: (slippage: number) => void;

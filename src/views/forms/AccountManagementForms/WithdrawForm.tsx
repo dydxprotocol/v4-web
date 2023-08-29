@@ -5,19 +5,16 @@ import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
 import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client';
 
-import {
-  TransferInputField,
-  TransferInputTokenResource,
-  TransferType,
-} from '@/constants/abacus';
+import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
-import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import {  ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, QUANTUM_MULTIPLIER } from '@/constants/numbers';
 
 import { useDebounce, useStringGetter, useSubaccount } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+import { formMixins } from '@/styles/formMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
@@ -132,10 +129,10 @@ export const WithdrawForm = () => {
 
         setIsLoading(true);
         const txHash = await sendSquidWithdraw(debouncedAmountBN.toNumber(), requestPayload?.data);
-        
+
         if (txHash?.hash) {
           const hash = `0x${Buffer.from(txHash.hash).toString('hex')}`;
-          
+
           setTransactionHash(hash);
           abacusStateManager.setTransferStatus({
             hash,
@@ -288,14 +285,9 @@ export const WithdrawForm = () => {
           value={withdrawAmount}
           label={stringGetter({ key: STRING_KEYS.AMOUNT })}
           slotRight={
-            <Button
-              type={ButtonType.Button}
-              action={ButtonAction.Secondary}
-              size={ButtonSize.XSmall}
-              onClick={onClickMax}
-            >
+            <Styled.FormInputButton size={ButtonSize.XSmall} onClick={onClickMax}>
               {stringGetter({ key: STRING_KEYS.MAX })}
-            </Button>
+            </Styled.FormInputButton>
           }
         />
       </Styled.WithDetailsReceipt>
@@ -359,4 +351,8 @@ Styled.Link = styled(Link)`
 
 Styled.TransactionInfo = styled.span`
   ${layoutMixins.row}
+`;
+
+Styled.FormInputButton = styled(Button)`
+  ${formMixins.inputInnerButton}
 `;
