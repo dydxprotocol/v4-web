@@ -13,6 +13,7 @@ import { AccountsProvider } from '@/hooks/useAccounts';
 import { DialogAreaProvider, useDialogArea } from './hooks/useDialogArea';
 import { LocaleProvider } from './hooks/useLocaleSeparators';
 import { NotificationsProvider } from './hooks/useNotifications';
+import { LocalNotificationsProvider } from './hooks/useLocalNotifications';
 import { SubaccountProvider } from './hooks/useSubaccount';
 import { SquidProvider } from '@/hooks/useSquid';
 
@@ -98,29 +99,33 @@ const Content = () => {
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <GrazProvider>
-      <WagmiConfig config={config}>
-        <LocaleProvider>
-          <DydxProvider>
-            <AccountsProvider>
-              <SubaccountProvider>
-                <SquidProvider>
-                  <NotificationsProvider>
-                    <DialogAreaProvider>
-                      <Content />
-                    </DialogAreaProvider>
-                  </NotificationsProvider>
-                </SquidProvider>
-              </SubaccountProvider>
-            </AccountsProvider>
-          </DydxProvider>
-        </LocaleProvider>
-      </WagmiConfig>
-    </GrazProvider>
-  </QueryClientProvider>
-);
+type ProviderWrapperProps = {
+  children: React.ReactNode;
+};
+
+const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
+  return ({ children }: ProviderWrapperProps) => <Component {...props}>{children}</Component>;
+};
+
+const providers = [
+  wrapProvider(QueryClientProvider, { client: queryClient }),
+  wrapProvider(GrazProvider),
+  wrapProvider(WagmiConfig, { config }),
+  wrapProvider(LocaleProvider),
+  wrapProvider(DydxProvider),
+  wrapProvider(AccountsProvider),
+  wrapProvider(SubaccountProvider),
+  wrapProvider(SquidProvider),
+  wrapProvider(LocalNotificationsProvider),
+  wrapProvider(NotificationsProvider),
+  wrapProvider(DialogAreaProvider)
+];
+
+const App = () => {
+  return [...providers].reverse().reduce((children, Provider) => {
+    return <Provider>{children}</Provider>;
+  }, <Content />);
+};
 
 const Styled: Record<string, AnyStyledComponent> = {};
 

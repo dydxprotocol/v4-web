@@ -1,10 +1,8 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { createContext, useContext, useCallback, useEffect, useMemo } from 'react';
 import { useQuery } from 'react-query';
 
 import { LocalStorageKey } from '@/constants/localStorage';
-import {
-  type TransferNotifcation,
-} from '@/constants/notifications';
+import { type TransferNotifcation } from '@/constants/notifications';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useSquid } from '@/hooks/useSquid';
@@ -12,22 +10,30 @@ import { useLocalStorage } from './useLocalStorage';
 
 import { StatusResponse } from '@0xsquid/sdk';
 
-export const useLocalNotifications = () => {
+const LocalNotificationsContext = createContext<
+  ReturnType<typeof useLocalNotificationsContext> | undefined
+>(undefined);
 
+LocalNotificationsContext.displayName = 'LocalNotifications';
+
+export const LocalNotificationsProvider = ({ ...props }) => (
+  <LocalNotificationsContext.Provider value={useLocalNotificationsContext()} {...props} />
+);
+
+export const useLocalNotifications = () => useContext(LocalNotificationsContext)!;
+
+const useLocalNotificationsContext = () => {
   // transfer notifications
-  const [allTransferNotifications, setAllTransferNotifications] = useLocalStorage<{[key: `dydx${string}`]: TransferNotifcation[]}>({
+  const [allTransferNotifications, setAllTransferNotifications] = useLocalStorage<{
+    [key: `dydx${string}`]: TransferNotifcation[];
+  }>({
     key: LocalStorageKey.TransferNotifications,
     defaultValue: {},
   });
 
   const { dydxAddress } = useAccounts();
 
-  const transferNotifications = useMemo(() => {
-    if (!dydxAddress) return [];
-    console.log({allTransferNotifications, transferNotifications: allTransferNotifications[dydxAddress]})
-    return allTransferNotifications[dydxAddress] || [];
-  }, [allTransferNotifications, dydxAddress]);
-
+  const transferNotifications = dydxAddress ? allTransferNotifications[dydxAddress] || [] : [];
 
   const setTransferNotifications = useCallback(
     (notifications: TransferNotifcation[]) => {

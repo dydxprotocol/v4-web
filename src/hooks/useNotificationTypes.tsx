@@ -110,7 +110,7 @@ export const notificationTypes = [
   } as NotificationTypeConfig<string, [string, number]>,
   {
     type: NotificationType.SquidTransfer,
-    useTrigger: ({ trigger, lastUpdated }) => {
+    useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const { transferNotifications } = useLocalNotifications();
 
