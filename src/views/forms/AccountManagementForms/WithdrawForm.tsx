@@ -66,8 +66,6 @@ export const WithdrawForm = () => {
   const { addTransferNotification } = useLocalNotifications();
 
   // Async Data
-  const [transactionHash, setTransactionHash] = useState<string>();
-
   const debouncedAmountBN = MustBigNumber(debouncedAmount);
   const withdrawAmountBN = MustBigNumber(withdrawAmount);
   const freeCollateralBN = MustBigNumber(freeCollateral?.current);

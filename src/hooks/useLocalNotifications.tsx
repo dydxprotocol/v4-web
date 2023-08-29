@@ -22,6 +22,8 @@ export const LocalNotificationsProvider = ({ ...props }) => (
 
 export const useLocalNotifications = () => useContext(LocalNotificationsContext)!;
 
+const TRANSFER_STATUS_FETCH_INTERVAL = 10_000;
+
 const useLocalNotificationsContext = () => {
   // transfer notifications
   const [allTransferNotifications, setAllTransferNotifications] = useLocalStorage<{
@@ -70,7 +72,7 @@ const useLocalNotificationsContext = () => {
       }
       return statuses;
     },
-    refetchInterval: 10_000,
+    refetchInterval: TRANSFER_STATUS_FETCH_INTERVAL,
   });
 
   useEffect(() => {
