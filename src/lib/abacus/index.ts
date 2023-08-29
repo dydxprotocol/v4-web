@@ -72,7 +72,9 @@ class AbacusStateManager {
 
     this.stateManager = new AsyncAbacusStateManager(
       import.meta.env.SHARED_RESOURCES_URI,
-      'config/staging/environments.json',
+      import.meta.env.MODE === 'production'
+        ? 'config/prod/endpoints.json'
+        : 'config/staging/dev_endpoints.json',
       ioImplementations,
       uiImplementations,
       // @ts-ignore

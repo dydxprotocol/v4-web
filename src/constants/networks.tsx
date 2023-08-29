@@ -1,12 +1,15 @@
 import { ENDPOINTS, DEV_ENDPOINTS } from '@dydxprotocol/v4-localization';
 
-const endpoints = import.meta.env.MODE === 'production' ? ENDPOINTS : DEV_ENDPOINTS;
+export const NETWORK_ENDPOINTS = import.meta.env.MODE === 'production' ? ENDPOINTS : DEV_ENDPOINTS;
 
-export const CLIENT_NETWORK_CONFIGS: Record<string, (typeof endpoints.environments)[number]> =
-  Object.fromEntries(
-    endpoints.environments.map((environment) => [environment.environment, environment])
-  );
-export const DEFAULT_APP_ENVIRONMENT = endpoints.defaultEnvironment;
+export const CLIENT_NETWORK_CONFIGS: Record<
+  string,
+  (typeof NETWORK_ENDPOINTS.environments)[number]
+> = Object.fromEntries(
+  NETWORK_ENDPOINTS.environments.map((environment) => [environment.environment, environment])
+);
+
+export const DEFAULT_APP_ENVIRONMENT = NETWORK_ENDPOINTS.defaultEnvironment;
 
 export enum DydxV4Network {
   V4Mainnet = 'dydxprotocol-mainnet',

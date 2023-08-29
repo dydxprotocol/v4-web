@@ -40,11 +40,11 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   }
 
   environmentsChanged(): void {
-    console.log('environments changed');
+    return;
   }
 
   notificationsChanged(notifications: kollections.List<AbacusNotification>): void {
-    console.log(notifications.toArray());
+    return;
   }
 
   stateChanged(
