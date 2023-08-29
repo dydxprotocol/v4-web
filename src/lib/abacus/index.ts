@@ -34,9 +34,8 @@ import AbacusStateNotifier from './stateNotification';
 import AbacusLocalizer from './localizer';
 import AbacusFormatter from './formatter';
 import AbacusThreading from './threading';
-import AbacusFileSystem from './filesystem';
+import AbacusFileSystem, { ENDPOINTS_PATH } from './filesystem';
 import { LocaleSeparators } from '../numbers';
-
 class AbacusStateManager {
   private store: RootStore | undefined;
   private currentMarket: string | undefined;
@@ -72,9 +71,7 @@ class AbacusStateManager {
 
     this.stateManager = new AsyncAbacusStateManager(
       import.meta.env.SHARED_RESOURCES_URI,
-      import.meta.env.MODE === 'production'
-        ? 'config/prod/endpoints.json'
-        : 'config/staging/dev_endpoints.json',
+      ENDPOINTS_PATH,
       ioImplementations,
       uiImplementations,
       // @ts-ignore
