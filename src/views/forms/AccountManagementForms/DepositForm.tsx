@@ -13,7 +13,7 @@ import { NumberSign } from '@/constants/numbers';
 
 import { useAccounts, useDebounce, useStringGetter } from '@/hooks';
 import { useAccountBalance } from '@/hooks/useAccountBalance';
-import { useNotifications } from '@/hooks/useNotifications';
+import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
@@ -52,7 +52,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const { signerWagmi } = useAccounts();
 
-  const { addTransferNotification } = useNotifications();
+  const { addTransferNotification } = useLocalNotifications();
 
   const {
     requestPayload,
@@ -74,8 +74,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const debouncedAmount = useDebounce<string>(fromAmount, 500);
 
   // Async Data
-  const [transactionHash, setTransactionHash] = useState<string>();
-
   const { balance, queryStatus, isQueryFetching } = useAccountBalance({
     addressOrDenom: sourceToken?.address || undefined,
     assetSymbol: sourceToken?.symbol || undefined,
@@ -194,7 +192,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         onDeposit?.();
 
         if (txHash) {
-          setTransactionHash(txHash);
           addTransferNotification({
             txHash,
             toChainId: TESTNET_CHAIN_ID,

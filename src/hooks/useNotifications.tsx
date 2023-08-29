@@ -12,7 +12,7 @@ import {
 
 import { useSquid } from '@/hooks/useSquid';
 import { useLocalStorage } from './useLocalStorage';
-import { notificationTypes as notificationTypesFactory } from './useNotificationTypes';
+import { notificationTypes } from './useNotificationTypes';
 
 import { renderSvgToDataUrl } from '../lib/renderSvgToDataUrl';
 import { StatusResponse } from '@0xsquid/sdk';
@@ -40,58 +40,6 @@ const useNotificationsContext = () => {
     key: LocalStorageKey.NotificationsLastUpdated,
     defaultValue: Date.now(),
   });
-
-  // transfer notifications
-  const [transferNotifications, setTransferNotifications] = useLocalStorage<TransferNotifcation[]>({
-    key: LocalStorageKey.TransferNotifications,
-    defaultValue: [],
-  });
-
-  const addTransferNotification = useCallback(
-    (notification: TransferNotifcation) =>
-      setTransferNotifications([...transferNotifications, notification]),
-    [transferNotifications]
-  );
-
-  const notificationTypes = useMemo(
-    () => notificationTypesFactory(transferNotifications),
-    [transferNotifications]
-  );
-
-  const squid = useSquid();
-
-  const { data: transferStatuses } = useQuery({
-    queryKey: ['getTransactionStatus', transferNotifications],
-    queryFn: async () => {
-      const statuses: { [key: string]: StatusResponse } = {};
-      for (const {
-        txHash,
-        toChainId,
-        fromChainId,
-        status: currentStatus,
-      } of transferNotifications) {
-        if (currentStatus && currentStatus?.squidTransactionStatus !== 'ongoing') continue;
-
-        const status = await squid?.getStatus({ transactionId: txHash, toChainId, fromChainId });
-        if (status) statuses[txHash] = status;
-      }
-      return statuses;
-    },
-    refetchInterval: 10_000,
-  });
-
-  useEffect(() => {
-    if (!transferStatuses) return;
-    const newTransferNotifications = transferNotifications.map((notification) => {
-      const status = transferStatuses[notification.txHash];
-      if (!status) return notification;
-      return {
-        ...notification,
-        status,
-      };
-    });
-    setTransferNotifications(newTransferNotifications);
-  }, [transferStatuses]);
 
   useEffect(() => {
     setNotificationsLastUpdated(Date.now());
@@ -295,8 +243,5 @@ const useNotificationsContext = () => {
     // Menu state
     isMenuOpen,
     setIsMenuOpen,
-
-    addTransferNotification,
   };
 };
-// }

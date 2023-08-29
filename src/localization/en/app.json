@@ -922,7 +922,7 @@
     "CLOSE_MARKET_POSITIONS_BODY": "{MARKET} is set to close only mode and the close price of {MARKET} is now fixed. Please close your open {MARKET} position as soon as you are able. We're here to help via the help chat if you run into issues.",
     "COMPLIANCE_ALERT": "Compliance alert",
     "DEPOSIT_IN_PROGRESS_DESCRIPTION": "Your deposit of {AMOUNT_ELEMENT} will be available after 14 confirmations.",
-    "DEPOSIT_IN_PROGRESS": "Deposit in progress",
+    "DEPOSIT_IN_PROGRESS": "Deposit in progress...",
     "DEPOSIT_SUCCESS_DESCRIPTION": "Your deposit of {AMOUNT_ELEMENT} has been confirmed and is now available for trading.",
     "DEPOSIT_SUCCESS": "Deposit success!",
     "DEPOSIT_TO_CHAIN": "Deposit to {CHAIN}",
@@ -952,7 +952,7 @@
     "SLOW_WITHDRAW_PENDING": "Slow withdraw(s) pending",
     "SUSPICIOUS_TRADE": "Suspicious activity",
     "SUSPICIOUS_TRADE_BODY": "We have noticed suspicious trading activity related to your account on dYdX, including potential wash trading activity. We will be reviewing your activity on an ongoing basis. If we notice similar activity in the future, then you will be permanently blocked from performing transfers within the protocol and from placing orders other than market orders that reduce your positions.",
-    "WITHDRAW_IN_PROGRESS": "Withdrawal(s) in progress",
+    "WITHDRAW_IN_PROGRESS": "Withdrawal(s) in progress...",
     "WITHDRAW_TO_CHAIN": "Withdraw to {CHAIN}"
   },
   "EMAIL_NOTIFICATIONS": {

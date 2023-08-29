@@ -16,7 +16,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, QUANTUM_MULTIPLIER } from '@/constants/numbers';
 
 import { useDebounce, useStringGetter, useSubaccount } from '@/hooks';
-import { useNotifications } from '@/hooks/useNotifications';
+import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -67,7 +67,7 @@ export const WithdrawForm = () => {
     [token, resources]
   );
 
-  const { addTransferNotification } = useNotifications();
+  const { addTransferNotification } = useLocalNotifications();
 
   // Async Data
   const [transactionHash, setTransactionHash] = useState<string>();
