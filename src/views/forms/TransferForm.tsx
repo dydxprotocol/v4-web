@@ -14,7 +14,7 @@ import { ERROR_STRING_KEYS } from '@/constants/localization/errors';
 import { STRING_KEYS } from '@/constants/localization';
 import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
 import { NumberSign, QUANTUM_MULTIPLIER } from '@/constants/numbers';
-import { DYDX_CHAIN_ASSET_COIN_DENOM, DYDX_CHAIN_INFO, DydxChainAsset } from '@/constants/wallets';
+import { DYDX_CHAIN_ASSET_COIN_DENOM, DydxChainAsset } from '@/constants/wallets';
 
 import {
   useAccountBalance,

@@ -3,7 +3,6 @@ import Long from 'long';
 
 import {
   CompositeClient,
-  FaucetClient,
   IndexerConfig,
   Network,
   NetworkOptimizer,
@@ -11,14 +10,15 @@ import {
 } from '@dydxprotocol/v4-client-js';
 
 import {
-  type AbacusDydxChainQueriesProtocol,
+  type AbacusDYDXChainTransactionsProtocol,
   QueryType,
   type QueryTypes,
+  type TransactionTypes,
 } from '@/constants/abacus';
 
 import { log } from '../telemetry';
 
-class DydxChainQueries implements AbacusDydxChainQueriesProtocol {
+class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   private compositeClient: CompositeClient | undefined;
 
   constructor() {
@@ -85,6 +85,15 @@ class DydxChainQueries implements AbacusDydxChainQueriesProtocol {
     throw new Error(`Unsupported data type: ${typeof x}`);
   }
 
+  async transaction(
+    type: TransactionTypes,
+    paramsInJson: Abacus.Nullable<string>,
+    callback: (p0: Abacus.Nullable<string>) => void
+  ): Promise<void> {
+    // To be implemented
+    return;
+  }
+
   async get(
     type: QueryTypes,
     paramsInJson: Abacus.Nullable<string>,
@@ -131,10 +140,10 @@ class DydxChainQueries implements AbacusDydxChainQueriesProtocol {
           break;
       }
     } catch (error) {
-      log('AbacusDydxChainQueries/get', error);
+      log('DydxChainTransactions/get', error);
       callback(null);
     }
   }
 }
 
-export default DydxChainQueries;
+export default DydxChainTransactions;
