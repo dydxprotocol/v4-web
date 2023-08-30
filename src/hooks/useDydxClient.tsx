@@ -9,7 +9,7 @@ import {
   onboarding,
   Network,
   ValidatorConfig,
-} from '@dydxprotocol/v4-client';
+} from '@dydxprotocol/v4-client-js';
 
 import type { ResolutionString } from 'public/tradingview/charting_library';
 

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
-import { OrderSide } from '@dydxprotocol/v4-client';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { MarketTrade } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';

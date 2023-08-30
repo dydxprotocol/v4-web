@@ -3,7 +3,7 @@ import styled, { AnyStyledComponent } from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { AbacusApiStatus } from '@/constants/abacus';
-import { DydxV4Network } from '@/constants/networks';
+import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
 import { UNICODE } from '@/constants/unicode';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -44,7 +44,7 @@ export const ExchangeOfflineDialog = ({ preventClose, setIsOpen }: ElementProps)
     >
       <Styled.Content>
         <p>{statusErrorMessage}</p>
-        {selectedNetwork === DydxV4Network.V4Testnet2 && (
+        {CLIENT_NETWORK_CONFIGS[selectedNetwork].dydxChainId === 'dydx-testnet-2' && (
           <Styled.Link href="https://status.v4testnet.dydx.exchange">
             {stringGetter({ key: STRING_KEYS.LEARN_MORE })} {UNICODE.ARROW_RIGHT}
           </Styled.Link>

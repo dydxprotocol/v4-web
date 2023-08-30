@@ -1,4 +1,4 @@
-import { OrderSide } from '@dydxprotocol/v4-client';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { useStringGetter } from '@/hooks';

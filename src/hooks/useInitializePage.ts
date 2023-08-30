@@ -3,11 +3,7 @@ import { useDispatch } from 'react-redux';
 
 import { LocalStorageKey } from '@/constants/localStorage';
 
-import {
-  DEFAULT_APP_ENVIRONMENT,
-  DydxNetwork,
-  isValidDydxNetwork,
-} from '@/constants/networks';
+import { DEFAULT_APP_ENVIRONMENT, DydxNetwork, isValidDydxNetwork } from '@/constants/networks';
 
 import { useLocalStorage } from '@/hooks';
 

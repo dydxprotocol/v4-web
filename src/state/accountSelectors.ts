@@ -1,4 +1,4 @@
-import { OrderSide } from '@dydxprotocol/v4-client';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { createSelector } from 'reselect';
 
 import {

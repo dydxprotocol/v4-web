@@ -1,5 +1,5 @@
 import Abacus, { kollections } from '@dydxprotocol/abacus';
-import { OrderSide } from '@dydxprotocol/v4-client';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { PositionSide, TradeTypes } from './trade';
 import { STRING_KEYS } from './localization';
 
@@ -36,6 +36,12 @@ export type AbacusThreadingProtocol = Omit<
   Abacus.exchange.dydx.abacus.protocols.ThreadingProtocol,
   '__doNotUseOrImplementIt'
 >;
+export type AbacusFileSystemProtocol = Omit<
+  Abacus.exchange.dydx.abacus.protocols.FileSystemProtocol,
+  '__doNotUseOrImplementIt'
+>;
+
+export type FileLocation = Abacus.exchange.dydx.abacus.protocols.FileLocation;
 export type ThreadingType = Abacus.exchange.dydx.abacus.protocols.ThreadingType;
 export const CoroutineTimer = Abacus.exchange.dydx.abacus.utils.CoroutineTimer;
 
@@ -179,6 +185,9 @@ export const AbacusHelper = Abacus.exchange.dydx.abacus.utils.AbacusHelper;
 export const RiskLevel = Abacus.exchange.dydx.abacus.utils.RiskLevel;
 const riskLevels = [...RiskLevel.values()] as const;
 export type RiskLevels = (typeof riskLevels)[number];
+
+// ------ Notifications ------ //
+export type AbacusNotification = Abacus.exchange.dydx.abacus.output.Notification;
 
 // ------ Enum Conversions ------ //
 type IfEquals<X, Y, A, B> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import styled, { type AnyStyledComponent, css } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import { OrderSide } from '@dydxprotocol/v4-client';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { ColumnSize } from '@react-types/table';
 
 import { type Asset, type SubaccountFill } from '@/constants/abacus';

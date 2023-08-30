@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import styled, { css } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
-import { OrderSide } from '@dydxprotocol/v4-client';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { AbacusOrderSide } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
@@ -31,9 +31,7 @@ export const TradeSideToggle = memo(() => {
       onValueChange={(side: OrderSide) => {
         abacusStateManager.setTradeValue({
           value:
-            side === OrderSide.BUY
-              ? AbacusOrderSide.buy.rawValue
-              : AbacusOrderSide.sell.rawValue,
+            side === OrderSide.BUY ? AbacusOrderSide.buy.rawValue : AbacusOrderSide.sell.rawValue,
           field: TradeInputField.side,
         });
       }}

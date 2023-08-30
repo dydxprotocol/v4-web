@@ -2,7 +2,7 @@ import { useCallback, useContext, createContext, useEffect, useState, useMemo } 
 
 import { useDispatch } from 'react-redux';
 import { AES, enc } from 'crypto-js';
-import { LocalWallet, USDC_DENOM, type Subaccount } from '@dydxprotocol/v4-client';
+import { LocalWallet, USDC_DENOM, type Subaccount } from '@dydxprotocol/v4-client-js';
 
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
 import { LocalStorageKey, LOCAL_STORAGE_VERSIONS } from '@/constants/localStorage';

@@ -2,7 +2,7 @@ import { type Dispatch, type SetStateAction, useCallback, useMemo } from 'react'
 import styled, { AnyStyledComponent, css } from 'styled-components';
 import { Root, Thumb, Track } from '@radix-ui/react-slider';
 import _ from 'lodash';
-import { OrderSide } from '@dydxprotocol/v4-client';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { type Nullable, TradeInputField } from '@/constants/abacus';
 import { PositionSide } from '@/constants/trade';
@@ -43,9 +43,7 @@ export const LeverageSlider = ({
       },
       [PositionSide.Long]: {
         min:
-          orderSide === OrderSide.BUY
-            ? leverageBN.toNumber()
-            : maxLeverageBN.negated().toNumber(),
+          orderSide === OrderSide.BUY ? leverageBN.toNumber() : maxLeverageBN.negated().toNumber(),
         max: orderSide === OrderSide.BUY ? maxLeverageBN.toNumber() : leverageBN.toNumber(),
         midpoint:
           orderSide === OrderSide.SELL
@@ -56,9 +54,7 @@ export const LeverageSlider = ({
       },
       [PositionSide.Short]: {
         min:
-          orderSide === OrderSide.BUY
-            ? leverageBN.toNumber()
-            : maxLeverageBN.negated().toNumber(),
+          orderSide === OrderSide.BUY ? leverageBN.toNumber() : maxLeverageBN.negated().toNumber(),
         max: orderSide === OrderSide.BUY ? maxLeverageBN.toNumber() : leverageBN.toNumber(),
         midpoint:
           orderSide === OrderSide.BUY

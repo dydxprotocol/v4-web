@@ -302,7 +302,7 @@ export type WalletConnection = {
 
 // dYdX Chain wallets
 
-import { USDC_DENOM, type Onboarding, DYDX_DENOM } from '@dydxprotocol/v4-client';
+import { USDC_DENOM, type Onboarding, DYDX_DENOM } from '@dydxprotocol/v4-client-js';
 import type { suggestChain } from 'graz';
 
 export const COSMOS_DERIVATION_PATH = "m/44'/118'/0'/0/0";

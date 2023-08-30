@@ -3,11 +3,11 @@ import type { ChangeEvent, FormEvent } from 'react';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
-import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client';
+import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
 
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
-import {  ButtonSize } from '@/constants/buttons';
+import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, QUANTUM_MULTIPLIER } from '@/constants/numbers';
 

@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
 import isEmpty from 'lodash/isEmpty';
 
 import { LanguageCode, ResolutionString, widget } from 'public/tradingview/charting_library';
@@ -14,9 +13,8 @@ import { store } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { getAppTheme } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
-import { getMarketIds } from '@/state/perpetualsSelectors';
+import { getCurrentMarketId, getMarketIds } from '@/state/perpetualsSelectors';
 
-import { getMarketIdFromLocation } from '@/lib/tradeData';
 import { getDydxDatafeed } from '@/lib/tradingView/dydxfeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
 
@@ -30,8 +28,7 @@ export const useTradingView = ({
   tvWidgetRef: React.MutableRefObject<any>;
   setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const location = useLocation();
-  const marketId = getMarketIdFromLocation(location);
+  const marketId = useSelector(getCurrentMarketId);
   const appTheme = useSelector(getAppTheme);
   const marketIds = useSelector(getMarketIds, shallowEqual);
   const selectedLocale = useSelector(getSelectedLocale);
@@ -50,7 +47,6 @@ export const useTradingView = ({
     if (hasMarkets) {
       const widgetOptions = getWidgetOptions();
       const widgetOverrides = getWidgetOverrides(appTheme);
-
       const options = {
         // debug: true,
         ...widgetOptions,

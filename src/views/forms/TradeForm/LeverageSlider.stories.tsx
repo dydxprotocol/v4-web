@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { Story } from '@ladle/react';
 import styled, { AnyStyledComponent } from 'styled-components';
-import { OrderSide } from '@dydxprotocol/v4-client';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { PositionSide } from '@/constants/trade';
 import { breakpoints } from '@/styles';

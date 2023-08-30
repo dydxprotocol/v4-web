@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useSignTypedData } from 'wagmi';
 import styled, { type AnyStyledComponent, css } from 'styled-components';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { AES } from 'crypto-js';
 
 import { EvmDerivedAccountStatus } from '@/constants/account';
@@ -9,7 +9,7 @@ import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvent } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { CLIENT_NETWORK_CONFIGS, DydxV4Network } from '@/constants/networks';
+import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
 import { DydxAddress, SIGN_TYPED_DATA } from '@/constants/wallets';
 
 import { useAccounts, useBreakpoints, useDydxClient, useStringGetter } from '@/hooks';
@@ -54,7 +54,7 @@ export const GenerateKeys = ({
   // 1. Switch network
   const selectedNetwork = useSelector(getSelectedNetwork);
 
-  const chainId = Number(CLIENT_NETWORK_CONFIGS[selectedNetwork as DydxV4Network].ethereumChainId);
+  const chainId = Number(CLIENT_NETWORK_CONFIGS[selectedNetwork].ethereumChainId);
 
   const { isMatchingNetwork, matchNetwork, isSwitchingNetwork } = useMatchingEvmNetwork({
     chainId,

@@ -2,14 +2,10 @@ import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
-import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client';
+import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
 import { ethers } from 'ethers';
 
-import {
-  TransferInputField,
-  TransferInputTokenResource,
-  TransferType,
-} from '@/constants/abacus';
+import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -54,8 +50,13 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const { signerWagmi } = useAccounts();
 
-  const { requestPayload, token, chain: chainIdStr, resources } = useSelector(getTransferInputs, shallowEqual) || {};
-  const chainId = chainIdStr ? parseInt(chainIdStr) : undefined
+  const {
+    requestPayload,
+    token,
+    chain: chainIdStr,
+    resources,
+  } = useSelector(getTransferInputs, shallowEqual) || {};
+  const chainId = chainIdStr ? parseInt(chainIdStr) : undefined;
 
   // User inputs
   const sourceToken = useMemo(
@@ -197,7 +198,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');
         }
-
       } catch (error) {
         setError(error);
       } finally {

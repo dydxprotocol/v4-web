@@ -33,7 +33,7 @@ import { Details } from '@/components/Details';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 
-import { OrderSide } from '@dydxprotocol/v4-client';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 // @ts-ignore
 const theme = buildChartTheme({

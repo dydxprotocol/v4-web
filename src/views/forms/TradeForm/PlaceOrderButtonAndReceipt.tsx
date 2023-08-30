@@ -1,5 +1,5 @@
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import { OrderSide } from '@dydxprotocol/v4-client';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import type { TradeInputSummary } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';

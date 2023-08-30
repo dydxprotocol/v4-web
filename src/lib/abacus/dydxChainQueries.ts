@@ -8,7 +8,7 @@ import {
   Network,
   NetworkOptimizer,
   ValidatorConfig,
-} from '@dydxprotocol/v4-client';
+} from '@dydxprotocol/v4-client-js';
 
 import {
   type AbacusDydxChainQueriesProtocol,

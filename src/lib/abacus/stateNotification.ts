@@ -1,5 +1,8 @@
+import { kollections } from '@dydxprotocol/abacus';
+
 import type {
   AbacusApiState,
+  AbacusNotification,
   AbacusStateNotificationProtocol,
   Asset,
   Nullable,
@@ -34,6 +37,14 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
   constructor() {
     this.store = undefined;
+  }
+
+  environmentsChanged(): void {
+    return;
+  }
+
+  notificationsChanged(notifications: kollections.List<AbacusNotification>): void {
+    return;
   }
 
   stateChanged(
