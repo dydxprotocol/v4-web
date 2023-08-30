@@ -166,7 +166,8 @@ export const TransferForm = ({
       const txResponse = await transfer(
         amountToTransfer,
         recipientAddress as string,
-        DYDX_CHAIN_ASSET_COIN_DENOM[asset]
+        DYDX_CHAIN_ASSET_COIN_DENOM[asset],
+        import.meta.env.MODE !== 'production' // zeroFee enabled on staging
       );
 
       if (txResponse?.code === 0) {

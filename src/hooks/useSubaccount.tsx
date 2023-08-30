@@ -140,30 +140,20 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         assetId = 0,
         amount,
         recipient,
+        zeroFee,
       }: {
         subaccountClient: SubaccountClient;
         assetId?: number;
         amount: number;
         recipient: string;
+        zeroFee?: boolean;
       }) =>
-        await compositeClient?.validatorClient.post.send(
-          subaccountClient?.wallet,
-          () =>
-            new Promise((resolve) => {
-              const msg =
-                compositeClient?.validatorClient.post.composer.composeMsgWithdrawFromSubaccount(
-                  subaccountClient.address,
-                  subaccountClient.subaccountNumber,
-                  assetId,
-                  Long.fromNumber(amount * QUANTUM_MULTIPLIER),
-                  recipient
-                );
-
-              resolve([msg]);
-            }),
-          false,
-          undefined,
-          undefined,
+        await compositeClient?.validatorClient.post.withdraw(
+          subaccountClient,
+          assetId,
+          Long.fromNumber(amount * QUANTUM_MULTIPLIER),
+          recipient,
+          zeroFee,
           Method.BroadcastTxCommit
         ),
 
@@ -171,16 +161,19 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         subaccountClient,
         amount,
         recipient,
+        zeroFee,
       }: {
         subaccountClient: SubaccountClient;
         amount: number;
         recipient: string;
+        zeroFee?: boolean;
       }) =>
         await compositeClient?.validatorClient.post.sendToken(
           subaccountClient,
           recipient,
           DYDX_DENOM,
           Long.fromNumber(amount * QUANTUM_MULTIPLIER),
+          zeroFee,
           Method.BroadcastTxCommit
         ),
 
@@ -302,7 +295,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
         return result;
       },
-      
+
       sendSquidWithdrawFromSubaccount: async ({
         subaccountClient,
         amount,
@@ -313,7 +306,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         payload: string;
       }) => {
         if (!compositeClient) throw new Error('client not initialized');
-        
+
         const transaction = JSON.parse(payload);
 
         const msg = compositeClient.withdrawFromSubaccountMessage(subaccountClient, amount);
@@ -400,14 +393,14 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   // ------ Transfer Methods ------ //
 
   const transfer = useCallback(
-    async (amount: number, recipient: string, coinDenom: string) => {
+    async (amount: number, recipient: string, coinDenom: string, zeroFee?: boolean) => {
       if (!subaccountClient) {
         return;
       }
 
       return (await (coinDenom === USDC_DENOM
         ? transferFromSubaccountToAddress
-        : transferNativeToken)({ subaccountClient, amount, recipient })) as IndexedTx;
+        : transferNativeToken)({ subaccountClient, amount, recipient, zeroFee })) as IndexedTx;
     },
     [subaccountClient, transferFromSubaccountToAddress, transferNativeToken]
   );
