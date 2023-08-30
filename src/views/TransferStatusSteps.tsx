@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
 import { StatusResponse } from '@0xsquid/sdk';
-import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client';
+import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
 
 import { useStringGetter } from '@/hooks';
 

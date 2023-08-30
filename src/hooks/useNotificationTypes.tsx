@@ -21,7 +21,7 @@ import { OrderStatusIcon } from '@/views/OrderStatusIcon';
 
 import { useStringGetter } from './useStringGetter';
 import { TransferStatusSteps } from '@/views/TransferStatusSteps';
-import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client';
+import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
 
 export const notificationTypes = [
   {

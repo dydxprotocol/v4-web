@@ -1,6 +1,6 @@
 import { useCallback, useState, useMemo } from 'react';
 import styled, { type AnyStyledComponent } from 'styled-components';
-import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client';
+import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
 import { Root, Trigger, Content } from '@radix-ui/react-collapsible';
 import { StatusResponse } from '@0xsquid/sdk';
 
