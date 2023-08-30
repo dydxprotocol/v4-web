@@ -238,7 +238,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.AssetIcon = styled(AssetIcon)`
-  height: 1.5em;
+  font-size: 1.5em;
 `;
 
 Styled.CollapsibleTabs = styled(CollapsibleTabs)`
