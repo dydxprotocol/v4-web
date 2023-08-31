@@ -1,6 +1,11 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
+import { LOCALE_DATA, SupportedLocale, TOOLTIPS } from '@dydxprotocol/v4-localization';
 
-import { SUPPORTED_BASE_TAGS_LOCALE_MAPPING, SupportedLocales } from '@/constants/localization';
+import {
+  type LocaleData,
+  SUPPORTED_BASE_TAGS_LOCALE_MAPPING,
+  SupportedLocales,
+} from '@/constants/localization';
 import { LocalStorageKey } from '@/constants/localStorage';
 
 import { initializeLocalization } from '@/state/app';
@@ -8,19 +13,23 @@ import { setLocaleData, setLocaleLoaded, setSelectedLocale } from '@/state/local
 
 import { getLocalStorage, setLocalStorage } from '@/lib/localStorage';
 
-const getNewLocaleData = async ({
+const getNewLocaleData = ({
   store,
   locale,
   isAutoDetect,
 }: {
   store: any;
-  locale: string;
+  locale: SupportedLocale;
   isAutoDetect: boolean;
 }) => {
   store.dispatch(setLocaleLoaded(false));
 
-  const newLocaleData = await import(`../localization/${locale}/index.ts`);
-  store.dispatch(setLocaleData(newLocaleData.default));
+  const newLocaleData = {
+    ...LOCALE_DATA[locale],
+    TOOLTIPS: TOOLTIPS[locale],
+  };
+
+  store.dispatch(setLocaleData(newLocaleData as LocaleData));
 
   if (!isAutoDetect) {
     setLocalStorage({ key: LocalStorageKey.SelectedLocale, value: locale });
@@ -54,7 +63,7 @@ export default (store: any) => (next: any) => async (action: PayloadAction<any>)
     }
     // @ts-ignore
     case setSelectedLocale().type: {
-      const { locale, isAutoDetect } = action.payload;
+      const { locale, isAutoDetect } = payload;
       getNewLocaleData({ store, locale, isAutoDetect });
       break;
     }

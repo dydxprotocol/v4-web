@@ -10,7 +10,6 @@ import { validation } from '@dydxprotocol/v4-client-js';
 import { TransferInputField, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
-import { ERROR_STRING_KEYS } from '@/constants/localization/errors';
 import { STRING_KEYS } from '@/constants/localization';
 import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
 import { NumberSign, QUANTUM_MULTIPLIER } from '@/constants/numbers';
@@ -261,8 +260,8 @@ export const TransferForm = ({
   const addressValidationErrorMessage = stringGetter({
     key:
       dydxAddress === recipientAddress
-        ? ERROR_STRING_KEYS.TRANSFER_TO_YOURSELF
-        : ERROR_STRING_KEYS.TRANSFER_INVALID_DYDX_ADDRESS,
+        ? STRING_KEYS.TRANSFER_TO_YOURSELF
+        : STRING_KEYS.TRANSFER_INVALID_DYDX_ADDRESS,
   });
 
   const renderFormInputButton = ({

@@ -10,8 +10,10 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Button } from '@/components/Button';
 
 import { getSubaccount } from '@/state/accountSelectors';
+import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { log } from '@/lib/telemetry';
+import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
 
 type DepositFormProps = {
   onDeposit?: () => void;
@@ -23,6 +25,7 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
   const { dydxAddress, getSubaccounts } = useAccounts();
   const { requestFaucetFunds } = useSubaccount();
   const subAccount = useSelector(getSubaccount, shallowEqual);
+  const selectedNetwork = useSelector(getSelectedNetwork);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -57,7 +60,17 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
         }
       }}
     >
-      <p>Your account will be credited with $100 in test funds.</p>
+      <p>
+        {stringGetter({
+          key: STRING_KEYS.CREDITED_WITH,
+          params: {
+            AMOUNT_USD:
+              CLIENT_NETWORK_CONFIGS[selectedNetwork].ethereumChainId === 'dydxprotocol-testnet'
+                ? 1000
+                : 100,
+          },
+        })}
+      </p>
       <Styled.SubmitButton
         action={ButtonAction.Primary}
         type={ButtonType.Submit}

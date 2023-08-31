@@ -60,7 +60,7 @@ export const notificationTypes = [
                 title: `${stringGetter({
                   key: TRADE_TYPE_STRINGS[order.type.rawValue as TradeTypes].tradeTypeKey,
                 })} ${
-                  order.status === AbacusOrderStatus.open && order.totalFilled > 0
+                  order.status === AbacusOrderStatus.open && (order?.totalFilled ?? 0) > 0
                     ? stringGetter({ key: STRING_KEYS.PARTIALLY_FILLED })
                     : stringGetter({ key: ORDER_STATUS_STRINGS[order.status.name] })
                 }`,

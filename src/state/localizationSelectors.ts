@@ -1,11 +1,12 @@
 import { createSelector } from 'reselect';
 import _ from 'lodash';
 
+import { EN_LOCALE_DATA, LocaleData, SupportedLocales } from '@/constants/localization';
+
 import formatString from '@/lib/formatString';
-import { LocaleData, SupportedLocales } from '@/constants/localization';
+
 import type { RootState } from './_store';
 
-import enLocaleData from '@/localization/en';
 /**
  * @param state
  * @returns
@@ -38,14 +39,10 @@ export const getStringGetterForLocaleData = (localeData: LocaleData) => {
     key: any;
     params?: { [key: string]: string | React.ReactNode };
   }): string | Array<string | React.ReactNode> => {
-    // TODO(@aforaleka) Temporary solution until new localization is implemented in trader-fe
-    const formattedKey = key?.replace(/^APP\./, '');
-
     // Fallback to english whenever a key doesn't exist for other languages
-    let formattedString: string =
-      _.get(localeData, formattedKey) || _.get(enLocaleData, formattedKey) || '';
+    let formattedString: string = _.get(localeData, key) || _.get(EN_LOCALE_DATA, key) || '';
 
-    return formatString(formattedString, params);;
+    return formatString(formattedString, params);
   };
 };
 

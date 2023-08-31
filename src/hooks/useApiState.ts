@@ -2,11 +2,11 @@ import { shallowEqual, useSelector } from 'react-redux';
 
 import type { AbacusApiState, Nullable } from '@/constants/abacus';
 import { AbacusApiStatus } from '@/constants/abacus';
-import { STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 
 import { getApiState } from '@/state/appSelectors';
+
 import { useStringGetter } from './useStringGetter';
-import { StringGetterFunction } from '@/constants/localization';
 
 const getStatusErrorMessage = ({
   apiState,
@@ -24,20 +24,23 @@ const getStatusErrorMessage = ({
     case AbacusApiStatus.INDEXER_HALTED: {
       return stringGetter({
         key: STRING_KEYS.INDEXER_HALTED,
-        params: { BLOCK_NUMBER: haltedBlock },
+        params: { HALTED_BLOCK: haltedBlock },
       });
     }
     case AbacusApiStatus.INDEXER_TRAILING: {
       return stringGetter({
         key: STRING_KEYS.INDEXER_TRAILING,
-        params: { BLOCK_DIFFERENCE: trailingBlocks },
+        params: { TRAILING_BLOCKS: trailingBlocks },
       });
     }
     case AbacusApiStatus.VALIDATOR_DOWN: {
-      return stringGetter({ key: STRING_KEYS.NODE_DOWN });
+      return stringGetter({ key: STRING_KEYS.VALIDATOR_DOWN });
     }
     case AbacusApiStatus.VALIDATOR_HALTED: {
-      return stringGetter({ key: STRING_KEYS.NODE_HALTED, params: { BLOCK_NUMBER: haltedBlock } });
+      return stringGetter({
+        key: STRING_KEYS.VALIDATOR_HALTED,
+        params: { HALTED_BLOCK: haltedBlock },
+      });
     }
     case AbacusApiStatus.UNKNOWN: {
       return stringGetter({ key: STRING_KEYS.UNKNOWN_API_ERROR });
