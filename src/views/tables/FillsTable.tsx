@@ -14,7 +14,7 @@ import { useBreakpoints, useStringGetter } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
-import { AssetIcon, type AssetSymbol } from '@/components/AssetIcon';
+import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { OrderSideTag } from '@/components/OrderSideTag';
@@ -90,7 +90,7 @@ const getFillsTableColumnDef = ({
           key: STRING_KEYS.AMOUNT,
         })}`,
         renderCell: ({ resources, size, stepSizeDecimals, asset: { symbol } }) => (
-          <TableCell stacked slotLeft={<Styled.AssetIcon symbol={symbol as AssetSymbol} />}>
+          <TableCell stacked slotLeft={<Styled.AssetIcon symbol={symbol} />}>
             <span>
               {resources.typeStringKey ? stringGetter({ key: resources.typeStringKey }) : null}
             </span>

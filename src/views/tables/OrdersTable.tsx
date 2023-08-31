@@ -16,7 +16,7 @@ import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
-import { AssetIcon, AssetSymbol } from '@/components/AssetIcon';
+import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
@@ -254,7 +254,7 @@ const getOrdersTableColumnDef = ({
                     value={createdAtMilliseconds}
                   />
                   <Styled.AssetIconWithStatus>
-                    <Styled.AssetIcon symbol={assetSymbol as AssetSymbol} />
+                    <Styled.AssetIcon symbol={assetSymbol} />
                     <Styled.StatusDot color={statusIconColor} />
                   </Styled.AssetIconWithStatus>
                 </>

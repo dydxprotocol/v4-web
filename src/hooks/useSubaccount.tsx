@@ -181,6 +181,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
           recipient,
           DYDX_DENOM,
           Long.fromNumber(amount * QUANTUM_MULTIPLIER),
+          false,
           Method.BroadcastTxCommit
         ),
 
