@@ -4,6 +4,7 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
 import { useAccounts, useStringGetter, useSubaccount } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -13,7 +14,6 @@ import { getSubaccount } from '@/state/accountSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { log } from '@/lib/telemetry';
-import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
 
 type DepositFormProps = {
   onDeposit?: () => void;

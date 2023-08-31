@@ -1,3 +1,5 @@
+import { ReactNode } from 'react';
+
 import {
   APP_STRING_KEYS,
   ERRORS_STRING_KEYS,
@@ -5,7 +7,6 @@ import {
   TOOLTIPS,
   WARNINGS_STRING_KEYS,
 } from '@dydxprotocol/v4-localization';
-import React from 'react';
 
 export { TOOLTIP_STRING_KEYS } from '@dydxprotocol/v4-localization';
 
@@ -38,7 +39,7 @@ export type LocaleData = typeof EN_LOCALE_DATA;
 export type StringGetterFunction = (a: {
   key: string;
   params?: {
-    [key: string]: string | number | undefined | null;
+    [key: string]: ReactNode;
   };
 }) => string;
 
