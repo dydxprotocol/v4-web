@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 dependencies:
   '@0xsquid/sdk':
     specifier: ^1.7.2
@@ -27,11 +23,11 @@ dependencies:
     specifier: ^0.31.0
     version: 0.31.0
   '@dydxprotocol/abacus':
-    specifier: ^0.3.10
-    version: 0.3.10
+    specifier: ^0.4.1
+    version: 0.4.1
   '@dydxprotocol/v4-client-js':
-    specifier: ^0.30.3
-    version: 0.30.3
+    specifier: ^0.32.0
+    version: 0.32.0
   '@dydxprotocol/v4-localization':
     specifier: ^0.0.16
     version: 0.0.16
@@ -1146,8 +1142,8 @@ packages:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
 
-  /@dydxprotocol/abacus@0.3.10:
-    resolution: {integrity: sha512-CJV6zyoQLAoDWJdgLbP1Y2QYvSPybCGpykQY+WEWk4kQKnZkjxz25LPL0b8I9LrNDt2JknOxPJfAoUDXJPfNkg==}
+  /@dydxprotocol/abacus@0.4.1:
+    resolution: {integrity: sha512-+2uKbTYBM6h7e3L8OX6gYwbqfIPtzwWUz4Onw6UCk7oD966Znwoky/PQmVDGjIcxw0BGWJUfHmF3Qd3t973tLQ==}
     dev: false
 
   /@dydxprotocol/dydxjs@0.3.0:
@@ -1167,8 +1163,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-client-js@0.30.3:
-    resolution: {integrity: sha512-h9nB2cU+6sWwfOTQz6sMKZZxVa/Iwp1JciUqKi5HDUyWl/4wfbczDlUqbMUUeXgBgfbb9CImxn+PjF0v7lcD5A==}
+  /@dydxprotocol/v4-client-js@0.32.0:
+    resolution: {integrity: sha512-KvKActMgWLcsRQ7RQhpi/F8xeQ7MWUp3G5+4IPNZ4wyRwAxDSbcrfYbTetI/IesHyelRPSeYxam9eYq3wXwZ1A==}
     dependencies:
       '@cosmjs/amino': 0.30.1
       '@cosmjs/proto-signing': 0.30.1
@@ -15862,3 +15858,7 @@ packages:
       release-it: 15.11.0
       semver: 7.5.1
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
