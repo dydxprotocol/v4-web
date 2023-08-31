@@ -200,6 +200,7 @@ export const TradeForm = ({
         });
       },
       value: triggerPrice ?? '',
+      decimals: tickSizeDecimals || USD_DECIMALS,
     });
   }
 

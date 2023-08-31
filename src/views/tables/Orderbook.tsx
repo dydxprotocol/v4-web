@@ -186,7 +186,7 @@ const OrderbookTable = ({
         ),
       },
     ].filter(Boolean);
-  }, [showMineColumn, symbol, stepSizeDecimals, tickSizeDecimals, histogramSide]);
+  }, [showMineColumn, symbol, stepSizeDecimals, tickSizeDecimals, histogramSide, stringGetter]);
 
   return (
     <Styled.OrderbookTable

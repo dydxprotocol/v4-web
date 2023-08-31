@@ -73,8 +73,8 @@ const getTransferHistoryTableColumnDef = ({
         getCellValue: (row) => `${row.fromAddress}-${row.toAddress}`,
         label: (
           <TableColumnHeader>
-            <span>{stringGetter({ key: STRING_KEYS.SENDER })}</span>
-            <span>{stringGetter({ key: STRING_KEYS.RECIPIENT })}</span>
+            <span>{stringGetter({ key: STRING_KEYS.TRANSFER_SENDER })}</span>
+            <span>{stringGetter({ key: STRING_KEYS.TRANSFER_RECIPIENT })}</span>
           </TableColumnHeader>
         ),
         renderCell: ({ fromAddress, toAddress }) => (

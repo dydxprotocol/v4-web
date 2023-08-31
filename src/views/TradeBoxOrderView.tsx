@@ -29,7 +29,9 @@ const useTradeTypeOptions = () => {
   const { typeOptions } = useSelector(getInputTradeOptions, shallowEqual) ?? {};
   const allTradeTypeItems = typeOptions?.toArray()?.map(({ type, stringKey }) => ({
     value: type,
-    label: stringGetter({ key: stringKey }),
+    label: stringGetter({
+      key: type === TradeTypes.TAKE_PROFIT ? STRING_KEYS.TAKE_PROFIT_LIMIT : stringKey,
+    }),
   }));
 
   return {

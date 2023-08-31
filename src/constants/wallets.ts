@@ -253,13 +253,13 @@ export const wallets: Record<WalletType, WalletConfig> = {
   },
   [WalletType.WalletConnect2]: {
     type: WalletType.WalletConnect,
-    stringKey: STRING_KEYS.WALLETCONNECT_2,
+    stringKey: STRING_KEYS.WALLET_CONNECT_2,
     icon: WalletConnectIcon,
     connectionTypes: [WalletConnectionType.WalletConnect2],
   },
   [WalletType.WalletConnect]: {
     type: WalletType.WalletConnect,
-    stringKey: STRING_KEYS.WALLETCONNECT,
+    stringKey: STRING_KEYS.WALLET_CONNECT,
     icon: WalletConnectIcon,
     connectionTypes: [WalletConnectionType.WalletConnect1],
   },
@@ -302,7 +302,7 @@ export type WalletConnection = {
 
 // dYdX Chain wallets
 
-import { USDC_DENOM, type Onboarding, DYDX_DENOM } from '@dydxprotocol/v4-client-js';
+import { USDC_DENOM, type onboarding, DYDX_DENOM } from '@dydxprotocol/v4-client-js';
 import type { suggestChain } from 'graz';
 
 export const COSMOS_DERIVATION_PATH = "m/44'/118'/0'/0/0";
@@ -323,9 +323,7 @@ export const SIGN_TYPED_DATA = {
   },
 } as const;
 
-export type PrivateInformation = ReturnType<
-  typeof Onboarding.prototype.deriveHDKeyFromEthereumSignature
->;
+export type PrivateInformation = ReturnType<typeof onboarding.deriveHDKeyFromEthereumSignature>;
 
 export type EthereumAddress = `0x${string}`;
 export type DydxAddress = `dydx${string}`;
