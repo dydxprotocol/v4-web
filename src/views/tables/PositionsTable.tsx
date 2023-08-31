@@ -23,7 +23,7 @@ import { getExistingOpenPositions } from '@/state/accountSelectors';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
-import { AssetIcon, AssetSymbol } from '@/components/AssetIcon';
+import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { Output, OutputType, ShowSign } from '@/components/Output';
@@ -72,7 +72,7 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.id,
         label: stringGetter({ key: STRING_KEYS.DETAILS }),
         renderCell: ({ id, asset, leverage, resources, size }) => (
-          <TableCell stacked slotLeft={<Styled.AssetIcon symbol={asset?.symbol as AssetSymbol} />}>
+          <TableCell stacked slotLeft={<Styled.AssetIcon symbol={asset?.symbol} />}>
             <Styled.HighlightOutput
               type={OutputType.Asset}
               value={size?.current}

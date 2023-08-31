@@ -6,7 +6,7 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
 
-import { AssetIcon, type AssetSymbol } from '@/components/AssetIcon';
+import { AssetIcon } from '@/components/AssetIcon';
 import { CollapsibleTabs } from '@/components/CollapsibleTabs';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { MobileTabs } from '@/components/Tabs';
@@ -217,7 +217,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
               value: PanelView.CurrentMarket,
               ...(currentMarketAssetId
                 ? {
-                    slotBefore: <Styled.AssetIcon symbol={currentMarketAssetId as AssetSymbol} />,
+                    slotBefore: <Styled.AssetIcon symbol={currentMarketAssetId} />,
                     label: currentMarketAssetId,
                   }
                 : { label: stringGetter({ key: STRING_KEYS.MARKET }) }),

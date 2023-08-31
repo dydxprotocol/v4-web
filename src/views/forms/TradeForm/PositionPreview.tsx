@@ -6,7 +6,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { useStringGetter } from '@/hooks';
 
-import { AssetIcon, type AssetSymbol } from '@/components/AssetIcon';
+import { AssetIcon } from '@/components/AssetIcon';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketData } from '@/state/perpetualsSelectors';
@@ -29,7 +29,7 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
   return (
     <Styled.PositionPreviewContainer>
       <Styled.YourPosition>
-        {!showNarrowVariation && <AssetIcon symbol={symbol as unknown as AssetSymbol} />}
+        {!showNarrowVariation && <AssetIcon symbol={symbol} />}
         <span>
           {stringGetter({
             key: STRING_KEYS.YOUR_MARKET_POSITION,

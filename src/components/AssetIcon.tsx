@@ -62,13 +62,17 @@ const assetIcons = {
   ZRX: '/currencies/zrx.png',
 } as const;
 
+const isAssetSymbol = (symbol: Nullable<string>): symbol is AssetSymbol =>
+  symbol != null && assetIcons.hasOwnProperty(symbol);
+
 export const AssetIcon = ({
   symbol,
   className,
 }: {
-  symbol?: Nullable<AssetSymbol>;
+  symbol?: Nullable<string>;
   className?: string;
-}) => (symbol ? <Styled.Img src={assetIcons[symbol]} className={className} /> : null);
+}) =>
+  isAssetSymbol(symbol) ? <Styled.Img src={assetIcons[symbol]} className={className} /> : null;
 
 const Styled: Record<string, AnyStyledComponent> = {};
 

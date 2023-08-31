@@ -8,7 +8,7 @@ import { MobilePlaceOrderSteps } from '@/constants/trade';
 import { useBreakpoints, useStringGetter } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { AssetIcon, AssetSymbol } from '@/components/AssetIcon';
+import { AssetIcon } from '@/components/AssetIcon';
 import { ClosePositionForm } from '@/views/forms/ClosePositionForm';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
@@ -46,7 +46,7 @@ export const ClosePositionDialog = ({ setIsOpen }: ElementProps) => {
   } = {
     [MobilePlaceOrderSteps.EditOrder]: {
       title: <CloseOrderHeader />,
-      slotIcon: symbol ? <AssetIcon symbol={symbol as unknown as AssetSymbol} /> : undefined,
+      slotIcon: <AssetIcon symbol={symbol} />,
     },
     [MobilePlaceOrderSteps.PreviewOrder]: {
       title: (

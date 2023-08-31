@@ -9,7 +9,7 @@ import { TradeTypes, TRADE_TYPE_STRINGS, MobilePlaceOrderSteps } from '@/constan
 import { useBreakpoints, useStringGetter } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { AssetIcon, AssetSymbol } from '@/components/AssetIcon';
+import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { TradeForm } from '@/views/forms/TradeForm';
@@ -65,7 +65,7 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
               items={[TradeTypes.LIMIT, TradeTypes.MARKET].map((tradeType: TradeTypes) => ({
                 value: tradeType,
                 label: stringGetter({ key: TRADE_TYPE_STRINGS[tradeType].tradeTypeKey }),
-                slotBefore: <AssetIcon symbol={symbol as unknown as AssetSymbol} />,
+                slotBefore: <AssetIcon symbol={symbol} />,
               }))}
               value={selectedTradeType}
               onValueChange={(tradeType: TradeTypes) =>
