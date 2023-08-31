@@ -8,8 +8,8 @@ export type Nullable<T> = T | null | undefined;
 // ------ V4 Protocols ------ //
 export const IOImplementations = Abacus.exchange.dydx.abacus.utils.IOImplementations;
 export const UIImplementations = Abacus.exchange.dydx.abacus.utils.UIImplementations;
-export type AbacusDydxChainQueriesProtocol = Omit<
-  Abacus.exchange.dydx.abacus.protocols.DYDXChainQueriesProtocol,
+export type AbacusDYDXChainTransactionsProtocol = Omit<
+  Abacus.exchange.dydx.abacus.protocols.DYDXChainTransactionsProtocol,
   '__doNotUseOrImplementIt'
 >;
 export type AbacusRestProtocol = Omit<
@@ -49,6 +49,10 @@ export const CoroutineTimer = Abacus.exchange.dydx.abacus.utils.CoroutineTimer;
 export const QueryType = Abacus.exchange.dydx.abacus.protocols.QueryType;
 const queryTypes = [...QueryType.values()] as const;
 export type QueryTypes = (typeof queryTypes)[number];
+
+export const TransactionType = Abacus.exchange.dydx.abacus.protocols.TransactionType;
+const transactionTypes = [...TransactionType.values()] as const;
+export type TransactionTypes = (typeof transactionTypes)[number];
 
 export type NetworkConfig = {
   chainId: string;

@@ -31,7 +31,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import AbacusRest from './rest';
 import AbacusWebsocket from './websocket';
-import AbacusChainQuery from './dydxChainQueries';
+import AbacusChainTransaction from './dydxChainTransactions';
 import AbacusStateNotifier from './stateNotification';
 import AbacusLocalizer from './localizer';
 import AbacusFormatter from './formatter';
@@ -58,7 +58,7 @@ class AbacusStateManager {
       // @ts-ignore
       new AbacusRest(),
       this.websocket,
-      new AbacusChainQuery(),
+      new AbacusChainTransaction(),
       null,
       new AbacusThreading(),
       new CoroutineTimer(),
@@ -94,15 +94,15 @@ class AbacusStateManager {
   disconnectAccount = () => {
     this.stateManager.accountAddress = null;
   };
-  
+
   attemptDisconnectAccount = () => {
     const state = this.store?.getState();
-    const { type: transferType }= (state && getTransferInputs(state)) || {};
+    const { type: transferType } = (state && getTransferInputs(state)) || {};
     // we don't want to disconnect the account if we switch network during the deposit form
     if (transferType?.rawValue !== TransferType.deposit.rawValue) {
       this.disconnectAccount();
     }
-  }
+  };
 
   // ------ Input Values ------ //
   clearTradeInputValues = ({ shouldResetSize }: { shouldResetSize?: boolean } = {}) => {
