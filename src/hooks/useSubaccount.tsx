@@ -27,7 +27,7 @@ import type {
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
 import { AnalyticsEvent } from '@/constants/analytics';
-import { ORDER_ERROR_CODE_MAP } from '@/constants/localization';
+import { ORDER_ERROR_CODE_MAP, STRING_KEYS } from '@/constants/localization';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { UNCOMMITTED_ORDER_TIMEOUT } from '@/constants/trade';
 import { DydxAddress } from '@/constants/wallets';
@@ -551,7 +551,10 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         } as HumanReadablePlaceOrderPayload & { isClosePosition: boolean });
         onSuccess?.();
       } catch (error) {
-        const errorStringKey = error?.code && ORDER_ERROR_CODE_MAP[error.code as number];
+        const errorCode: number | undefined = error?.code;
+        const errorStringKey = !!errorCode
+          ? STRING_KEYS?.[ORDER_ERROR_CODE_MAP[errorCode] as keyof typeof STRING_KEYS]
+          : undefined;
         onError?.({ errorStringKey });
 
         log('useSubaccount/placeOrder', error, {
