@@ -54,7 +54,7 @@ button:disabled {
   cursor: pointer;
 }
 
-:focus {
+:focus-visible{
   outline: var(--color-accent) 1px solid;
   outline-offset: -1px;
   /* outline-offset: -2px; */

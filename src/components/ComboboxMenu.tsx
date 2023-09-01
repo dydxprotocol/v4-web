@@ -82,7 +82,9 @@ export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extend
                 <Styled.Item
                   // value={item.value} // search by both value and textContent
                   // value={[group.groupLabel, item.label, item.tag].filter(Boolean).join('|')} // exclude item.value from searchable terms (not guaranteed to be unique)
-                  value={[group.groupLabel, item.value, item.description, item.label, item.tag].filter(Boolean).join('|')}
+                  value={[group.groupLabel, item.value, item.description, item.label, item.tag]
+                    .filter(Boolean)
+                    .join('|')}
                   onSelect={() => {
                     if (item.subitems) {
                       // open submenu
@@ -116,7 +118,15 @@ export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extend
                       <Styled.Item
                         // value={subitem.value} // search by both value and textContent
                         // value={[group.groupLabel, item.label, subitem.label, subitem.tag].filter(Boolean).join('|')}
-                        value={[group.groupLabel, item.value, item.description, item.label, item.tag].filter(Boolean).join('|')}
+                        value={[
+                          group.groupLabel,
+                          item.value,
+                          item.description,
+                          item.label,
+                          item.tag,
+                        ]
+                          .filter(Boolean)
+                          .join('|')}
                         onSelect={() => {
                           subitem.onSelect?.(subitem.value);
                           onItemSelected?.();
@@ -168,7 +178,7 @@ Styled.Command = styled(Command)<{ $withStickyLayout?: boolean }>`
   background-color: var(--comboboxMenu-backgroundColor);
   border-radius: inherit;
 
-  input:focus {
+  input:focus-visible {
     outline: none;
   }
 
@@ -272,7 +282,7 @@ Styled.Item = styled(Command.Item)`
   align-items: center;
   gap: 0.5rem;
 
-  &[aria-disabled="true"] {
+  &[aria-disabled='true'] {
     opacity: 0.75;
     cursor: not-allowed;
   }
