@@ -30,6 +30,7 @@ import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
+import { parseWalletError } from '@/lib/wallet';
 
 type ElementProps = {
   status: EvmDerivedAccountStatus;
@@ -66,8 +67,12 @@ export const GenerateKeys = ({
     try {
       await matchNetwork?.();
     } catch (error) {
-      setError(error.message);
-      log('GenerateKeys/switchNetwork', error);
+      const { message, walletErrorType } = parseWalletError({ error, stringGetter });
+
+      if (message) {
+        log('GenerateKeys/switchNetwork', error, { walletErrorType });
+        setError(message);
+      }
     }
   };
 
@@ -124,7 +129,12 @@ export const GenerateKeys = ({
           }
         }
       } catch (error) {
-        log('GenerateKeys/getSubaccounts', error);
+        const { message } = parseWalletError({ error, stringGetter });
+
+        if (message) {
+          track(AnalyticsEvent.OnboardingWalletIsNonDeterministic);
+          setError(message);
+        }
       }
 
       await setWalletFromEvmSignature(signature);
@@ -140,11 +150,12 @@ export const GenerateKeys = ({
       setStatus(EvmDerivedAccountStatus.Derived);
     } catch (error) {
       setStatus(EvmDerivedAccountStatus.NotDerived);
-      setError(error?.message);
+      const { message, walletErrorType } = parseWalletError({ error, stringGetter });
 
-      log('GenerateKeys/deriveKeys', error);
-
-      throw error;
+      if (message) {
+        setError(message);
+        log('GenerateKeys/deriveKeys', error, { walletErrorType });
+      }
     }
   };
 

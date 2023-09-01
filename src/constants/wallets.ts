@@ -32,6 +32,18 @@ export enum WalletConnectionType {
   WalletConnect2 = 'walletConnect2',
 }
 
+export enum WalletErrorType {
+  // General
+  ChainMismatch,
+  UserCanceled,
+
+  // Non-Deterministic
+  NonDeterministicWallet,
+
+  // Misc
+  Unknown,
+}
+
 type WalletConnectionTypeConfig = {
   name: string;
   wagmiConnectorId?: string;

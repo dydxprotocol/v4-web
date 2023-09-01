@@ -26,7 +26,7 @@ import {
 } from 'graz';
 
 import { resolveWagmiConnector } from '@/lib/wagmi';
-import { getWalletConnection } from '@/lib/wallet';
+import { getWalletConnection, getWalletErrorType, parseWalletError } from '@/lib/wallet';
 import { log } from '@/lib/telemetry';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -129,8 +129,6 @@ export const useWalletConnection = () => {
           }
         }
       } catch (error) {
-        log('useWalletConnection/connectWallet', error);
-
         throw Object.assign(
           new Error([error.message, error.cause?.message].filter(Boolean).join('\n')),
           {
@@ -158,7 +156,7 @@ export const useWalletConnection = () => {
   // Wallet selection
 
   const [selectedWalletType, setSelectedWalletType] = useState<WalletType | undefined>(walletType);
-  const [selectedWalletError, setSelectedWalletError] = useState<Error>();
+  const [selectedWalletError, setSelectedWalletError] = useState<string>();
 
   useEffect(() => {
     (async () => {
@@ -173,8 +171,23 @@ export const useWalletConnection = () => {
           setWalletType(walletType);
           setWalletConnectionType(walletConnectionType);
         } catch (error) {
-          log('useWalletConnection/connectWallet', error);
-          setSelectedWalletError(error);
+          console.log(
+            'useWalletConnection/connectWallet',
+            error,
+            error.code,
+            error.msg,
+            error.message
+          );
+
+          const { walletErrorType, message } = parseWalletError({
+            error,
+            stringGetter,
+          });
+
+          if (message) {
+            log('useWalletConnection/connectWallet', error, { walletErrorType });
+            setSelectedWalletError(message);
+          }
         }
       } else {
         setWalletType(undefined);

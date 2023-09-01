@@ -67,6 +67,7 @@ export enum AnalyticsEvent {
   // Onboarding
   OnboardingStepChanged = 'OnboardingStepChanged',
   OnboardingAccountDerived = 'OnboardingAccountDerived',
+  OnboardingWalletIsNonDeterministic = 'OnboardingWalletIsNonDeterministic',
 
   // Transfers
   TransferFaucet = 'TransferFaucet',

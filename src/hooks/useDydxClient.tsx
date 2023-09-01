@@ -57,8 +57,8 @@ const useDydxClientContext = () => {
         networkConfig?.indexerSocketUrl &&
         networkConfig?.validatorUrl
       ) {
-        setCompositeClient(
-          await CompositeClient.connect(
+        try {
+          const initializedClient = await CompositeClient.connect(
             new Network(
               selectedNetwork,
               new IndexerConfig(networkConfig.indexerUrl, networkConfig.indexerSocketUrl),
@@ -67,8 +67,11 @@ const useDydxClientContext = () => {
                 broadcastTimeoutMs: 60_000,
               })
             )
-          )
-        );
+          );
+          setCompositeClient(initializedClient);
+        } catch (error) {
+          log('useDydxClient/initializeCompositeClient', error);
+        }
       } else {
         setCompositeClient(undefined);
       }

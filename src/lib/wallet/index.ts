@@ -2,10 +2,12 @@ import {
   type WalletConnection,
   wallets,
   WalletConnectionType,
+  WalletErrorType,
   WalletType,
 } from '@/constants/wallets';
 
 import { detectInjectedEip1193Providers } from './providers';
+import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
 // Formatting
 export const truncateAddress = (address?: string, prefix: string = 'dydx') => {
@@ -67,4 +69,67 @@ export const getWalletConnection = ({
       }
     }
   }
+};
+
+export const getWalletErrorType = ({ error }: { error: Error }) => {
+  const { message } = error;
+  const messageLower = message.toLowerCase();
+
+  // General - Cancelled
+  if (
+    messageLower.includes('connection request reset') ||
+    messageLower.includes('rejected') ||
+    messageLower.includes('reject') ||
+    messageLower.includes('cancelled') ||
+    messageLower.includes('canceled') ||
+    messageLower.includes('user denied')
+  ) {
+    return WalletErrorType.UserCanceled;
+  }
+
+  if (messageLower.includes('chain mismatch')) {
+    return WalletErrorType.ChainMismatch;
+  }
+
+  // ImToken - User canceled
+  if (messageLower.includes('用户取消了操作')) {
+    return WalletErrorType.UserCanceled;
+  }
+
+  if (messageLower.includes('does not support deterministic signing')) {
+    return WalletErrorType.NonDeterministicWallet;
+  }
+
+  return WalletErrorType.Unknown;
+};
+
+export const parseWalletError = ({
+  error,
+  stringGetter,
+}: {
+  error: Error;
+  stringGetter: StringGetterFunction;
+}) => {
+  const walletErrorType = getWalletErrorType({ error });
+  let message;
+
+  switch (walletErrorType) {
+    case WalletErrorType.ChainMismatch:
+    case WalletErrorType.UserCanceled: {
+      break;
+    }
+    default: {
+      message = stringGetter({
+        key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+        params: {
+          ERROR_MESSAGE: error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
+        },
+      });
+    }
+  }
+
+  return {
+    walletErrorType,
+    message,
+  };
 };
