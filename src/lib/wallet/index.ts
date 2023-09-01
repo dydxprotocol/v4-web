@@ -1,3 +1,5 @@
+import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
+
 import {
   type WalletConnection,
   wallets,
@@ -7,7 +9,6 @@ import {
 } from '@/constants/wallets';
 
 import { detectInjectedEip1193Providers } from './providers';
-import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
 // Formatting
 export const truncateAddress = (address?: string, prefix: string = 'dydx') => {

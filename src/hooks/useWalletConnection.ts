@@ -11,6 +11,8 @@ import {
   DYDX_CHAIN_INFO,
 } from '@/constants/wallets';
 
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+
 import {
   useConnect as useConnectWagmi,
   useAccount as useAccountWagmi,
@@ -26,10 +28,9 @@ import {
 } from 'graz';
 
 import { resolveWagmiConnector } from '@/lib/wagmi';
-import { getWalletConnection, getWalletErrorType, parseWalletError } from '@/lib/wallet';
+import { getWalletConnection, parseWalletError } from '@/lib/wallet';
 import { log } from '@/lib/telemetry';
 
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useStringGetter } from './useStringGetter';
 
 export const useWalletConnection = () => {
@@ -171,14 +172,6 @@ export const useWalletConnection = () => {
           setWalletType(walletType);
           setWalletConnectionType(walletConnectionType);
         } catch (error) {
-          console.log(
-            'useWalletConnection/connectWallet',
-            error,
-            error.code,
-            error.msg,
-            error.message
-          );
-
           const { walletErrorType, message } = parseWalletError({
             error,
             stringGetter,
