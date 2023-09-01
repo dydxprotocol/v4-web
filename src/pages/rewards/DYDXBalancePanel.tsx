@@ -49,7 +49,7 @@ export const DYDXBalancePanel = () => {
                   size={ButtonSize.Small}
                   onClick={() => dispatch(openDialog({ type: DialogTypes.Receive }))}
                 >
-                  {stringGetter({ key: STRING_KEYS.EXCHANGE_RECEIVED })}
+                  {stringGetter({ key: STRING_KEYS.RECEIVE })}
                 </Styled.ReceiveButton>
                 <Button
                   slotLeft={<Icon iconName={IconName.Send} />}

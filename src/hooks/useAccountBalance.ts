@@ -16,6 +16,7 @@ import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { useAccounts } from './useAccounts';
 import { usePollNativeTokenBalance } from './usePollNativeTokenBalance';
+import { usePollUSDCBalance } from './usePollUSDCBalance';
 
 type UseAccountBalanceProps = {
   // Token Items
@@ -96,9 +97,13 @@ export const useAccountBalance = ({
     .div(QUANTUM_MULTIPLIER)
     .toNumber();
 
+  const usdcCoinBalance = usePollUSDCBalance({ dydxAddress });
+  const usdcBalance = MustBigNumber(usdcCoinBalance?.amount).div(QUANTUM_MULTIPLIER).toNumber();
+
   return {
     balance,
     nativeTokenBalance,
+    usdcBalance,
     queryStatus: isCosmosChain ? cosmosQuery.status : evmQuery.status,
     isQueryFetching: isCosmosChain ? cosmosQuery.isFetching : evmQuery.fetchStatus === 'fetching',
   };
