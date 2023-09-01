@@ -743,7 +743,7 @@ Styled.Tr = styled.tr<{
       cursor: pointer;
 
       &:hover,
-      &:focus,
+      &:focus-visible,
       &:focus-within {
         --tableRow-currentBackgroundColor: var(--tableRow-hover-backgroundColor);
         filter: brightness(1.1);
@@ -753,7 +753,7 @@ Styled.Tr = styled.tr<{
   ${({ withFocusStickyRows }) =>
     withFocusStickyRows &&
     css`
-      &:focus,
+      &:focus-visible,
       &:focus-within {
         ${layoutMixins.sticky}
         z-index: 1;

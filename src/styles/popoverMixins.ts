@@ -214,7 +214,7 @@ export const popoverMixins = {
       /* &:hover, */
       /* :not(:has(* > [data-highlighted])) > &:hover, */
       &[data-radix-collection-item]:hover, // @radix-ui/react-navigation-menu
-      /* &:focus, */
+      /* &:focus-visible, */
       &[aria-selected="true"], // cmdk
       &[data-highlighted] // @radix-ui
       {

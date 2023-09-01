@@ -304,7 +304,7 @@ Styled.Popover = styled(Popover)`
       }
     `} 0.2s;
   }
-  &:focus {
+  &:focus-visible {
     outline: none;
   }
 `;

@@ -90,10 +90,7 @@ export const Dialog = ({
   return (
     <Root modal={showOverlay} open={isOpen} onOpenChange={setIsOpen}>
       {slotTrigger && <Trigger asChild>{slotTrigger}</Trigger>}
-      <DialogPortal
-        withPortal={placement !== DialogPlacement.Inline}
-        container={portalContainer}
-      >
+      <DialogPortal withPortal={placement !== DialogPlacement.Inline} container={portalContainer}>
         {showOverlay && <Styled.Overlay />}
         <Styled.Container
           placement={placement}
@@ -425,7 +422,7 @@ Styled.Close = styled(Close)`
   }
 
   &:hover,
-  &:focus {
+  &:focus-visible {
     color: var(--color-text-2);
   }
 
