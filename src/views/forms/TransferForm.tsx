@@ -84,7 +84,7 @@ export const TransferForm = ({
   const { dydxAddress } = useAccounts();
   const { address: recipientAddress, size } = useSelector(getTransferInputs, shallowEqual) || {};
   const { transfer, simulateTransfer } = useSubaccount();
-  const { nativeTokenBalance } = useAccountBalance();
+  const { nativeTokenBalance, usdcBalance } = useAccountBalance();
   const { selectedNetwork } = useSelectedNetwork();
 
   // User Input
@@ -103,6 +103,8 @@ export const TransferForm = ({
           .minus(size?.size ?? 0)
           .toNumber();
   const amount = asset === DydxChainAsset.USDC ? size?.usdcSize : size?.size;
+
+  const showNotEnoughGasWarning = fees && asset === DydxChainAsset.USDC && usdcBalance < fees;
 
   // BN
   const amountBN = MustBigNumber(amount);
@@ -358,6 +360,15 @@ export const TransferForm = ({
           disabled={isLoading}
         />
       </WithDetailsReceipt>
+
+      {showNotEnoughGasWarning && (
+        <AlertMessage type={AlertType.Warning}>
+          {stringGetter({
+            key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS,
+            params: { USDC_BALANCE: `(${usdcBalance})` },
+          })}
+        </AlertMessage>
+      )}
 
       {error && <AlertMessage type={AlertType.Error}>{error.message}</AlertMessage>}
 
