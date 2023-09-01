@@ -137,7 +137,7 @@ Styled.ComboboxMenu = styled(ComboboxMenu)`
 
   --stickyArea1-topHeight: var(--form-input-height);
 
-  input:focus {
+  input:focus-visible {
     outline: none;
   }
 

@@ -72,8 +72,8 @@ export const OrderbookTradesTable = styled(Table)<{ histogramSide: 'left' | 'rig
   }
 
   tbody tr:hover,
-  tr:focus,
-  td:focus {
+  tr:focus-visible,
+  td:focus-visible {
     color: var(--color-text-2);
     background-color: var(--color-layer-3);
   }

@@ -91,7 +91,7 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.Content = styled(Content)`
   z-index: 1;
 
-  &:focus {
+  &:focus-visible {
     outline: none;
   }
 `;
