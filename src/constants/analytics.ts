@@ -1,7 +1,7 @@
 import type { SupportedLocales } from './localization';
 import type { DydxNetwork } from './networks';
 import type { OnboardingState, OnboardingSteps } from './account';
-import type { DydxAddress, WalletType, WalletConnectionType, EthereumAddress } from './wallets';
+import type { DydxAddress, WalletType, WalletConnectionType, EvmAddress } from './wallets';
 import type { DialogTypes } from './dialogs';
 import type { TradeTypes } from './trade';
 import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
@@ -40,7 +40,7 @@ export type AnalyticsUserPropertyValue<T extends AnalyticsUserProperty> =
     : T extends AnalyticsUserProperty.WalletConnectionType
     ? WalletConnectionType | undefined
     : T extends AnalyticsUserProperty.WalletAddress
-    ? EthereumAddress | DydxAddress | undefined
+    ? EvmAddress | DydxAddress | undefined
     : // Account
     T extends AnalyticsUserProperty.DydxAddress
     ? DydxAddress | undefined

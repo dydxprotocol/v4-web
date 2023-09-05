@@ -1,5 +1,6 @@
 import { createContext, useContext, useCallback, useEffect, useMemo } from 'react';
 import { useQuery } from 'react-query';
+import type { StatusResponse } from '@0xsquid/sdk';
 
 import { LocalStorageKey } from '@/constants/localStorage';
 import { type TransferNotifcation } from '@/constants/notifications';
@@ -7,8 +8,6 @@ import { type TransferNotifcation } from '@/constants/notifications';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useSquid } from '@/hooks/useSquid';
 import { useLocalStorage } from './useLocalStorage';
-
-import { StatusResponse } from '@0xsquid/sdk';
 
 const LocalNotificationsContext = createContext<
   ReturnType<typeof useLocalNotificationsContext> | undefined

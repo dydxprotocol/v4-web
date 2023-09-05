@@ -4,7 +4,7 @@ import { LocalStorageKey } from '@/constants/localStorage';
 
 import {
   type DydxAddress,
-  type EthereumAddress,
+  type EvmAddress,
   WalletConnectionType,
   WalletType,
   wallets,
@@ -38,7 +38,7 @@ export const useWalletConnection = () => {
   const stringGetter = useStringGetter();
 
   // EVM wallet connection
-  const [evmAddress, saveEvmAddress] = useLocalStorage<EthereumAddress | undefined>({
+  const [evmAddress, saveEvmAddress] = useLocalStorage<EvmAddress | undefined>({
     key: LocalStorageKey.EvmAddress,
     defaultValue: undefined,
   });

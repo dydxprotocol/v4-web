@@ -49,11 +49,11 @@ export enum EvmDerivedAccountStatus {
   Derived,
 }
 
-import type { DydxAddress, EthereumAddress } from './wallets';
+import type { DydxAddress, EvmAddress } from './wallets';
 
 export type EvmDerivedAddresses = {
   version?: string;
-  [EthereumAddress: EthereumAddress]: {
+  [EvmAddress: EvmAddress]: {
     encryptedSignature?: string;
     dydxAddress?: DydxAddress;
   };

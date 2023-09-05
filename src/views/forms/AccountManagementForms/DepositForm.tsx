@@ -11,6 +11,7 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
+import type { EvmAddress } from '@/constants/wallets';
 
 import { useAccounts, useDebounce, useStringGetter } from '@/hooks';
 import { useAccountBalance } from '@/hooks/useAccountBalance';
@@ -36,6 +37,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
+import { log } from '@/lib/telemetry';
 
 import { ChainSelectMenu } from './ChainSelectMenu';
 import { TokenSelectMenu } from './TokenSelectMenu';
@@ -177,10 +179,10 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     if (sourceToken?.address === NATIVE_TOKEN_ADDRESS) return;
 
     const allowance = await publicClientWagmi.readContract({
-      address: sourceToken.address as `0x${string}`,
+      address: sourceToken.address as EvmAddress,
       abi: erc20,
       functionName: 'allowance',
-      args: [evmAddress as `0x${string}`, requestPayload.targetAddress as `0x${string}`]
+      args: [evmAddress as EvmAddress, requestPayload.targetAddress as EvmAddress]
     });
 
     const sourceAmountBN = parseUnits(debouncedAmount, sourceToken.decimals);
@@ -188,10 +190,10 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     if (sourceAmountBN > (allowance as bigint)) {
       const { request } = await publicClientWagmi.simulateContract({
         account: evmAddress,
-        address: sourceToken.address as `0x${string}`,
+        address: sourceToken.address as EvmAddress,
         abi: erc20,
         functionName: 'approve',
-        args: [requestPayload.targetAddress as `0x${string}`, sourceAmountBN],
+        args: [requestPayload.targetAddress as EvmAddress, sourceAmountBN],
       })
 
       const approveTx = await signerWagmi.writeContract(request);
@@ -225,8 +227,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         await validateTokenApproval();
 
         let tx = {
-          to: requestPayload.targetAddress as `0x${string}`,
-          data: requestPayload.data as `0x${string}`,
+          to: requestPayload.targetAddress as EvmAddress,
+          data: requestPayload.data as EvmAddress,
           gasLimit: BigInt(requestPayload.gasLimit),
           value:
             requestPayload.routeType !== 'SEND' ? BigInt(requestPayload.value) : undefined,
@@ -247,7 +249,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           setFromAmount('');
         }
       } catch (error) {
-        console.error(error);
+        log('DepositForm/onSubmit', error);
         setError(error);
       } finally {
         setIsLoading(false);

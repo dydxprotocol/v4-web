@@ -337,7 +337,7 @@ export const SIGN_TYPED_DATA = {
 
 export type PrivateInformation = ReturnType<typeof onboarding.deriveHDKeyFromEthereumSignature>;
 
-export type EthereumAddress = `0x${string}`;
+export type EvmAddress = `0x${string}`;
 export type DydxAddress = `dydx${string}`;
 
 export const DYDX_CHAIN_INFO: Parameters<typeof suggestChain>[0] = {

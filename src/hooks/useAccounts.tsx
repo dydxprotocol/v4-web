@@ -6,7 +6,7 @@ import { LocalWallet, USDC_DENOM, type Subaccount } from '@dydxprotocol/v4-clien
 
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
 import { LocalStorageKey, LOCAL_STORAGE_VERSIONS } from '@/constants/localStorage';
-import { DydxAddress, EthereumAddress, PrivateInformation } from '@/constants/wallets';
+import { DydxAddress, EvmAddress, PrivateInformation } from '@/constants/wallets';
 
 import {
   setOnboardingState,
@@ -82,7 +82,7 @@ const useAccountsContext = () => {
     evmAddress,
     dydxAddress,
   }: {
-    evmAddress: EthereumAddress;
+    evmAddress: EvmAddress;
     dydxAddress?: DydxAddress;
   }) => {
     saveEvmDerivedAddresses({
