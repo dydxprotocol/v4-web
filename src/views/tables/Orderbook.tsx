@@ -510,7 +510,7 @@ Styled.OrderbookTable = styled(OrderbookTradesTable)<StyleProps>`
       content: '';
     }
 
-    &:not(:active):is(:focus, :focus-within) {
+    &:not(:active):is(:focus-visible, :focus-within) {
       ${orderbookMixins.scrollSnapItem}
       z-index: 2;
 

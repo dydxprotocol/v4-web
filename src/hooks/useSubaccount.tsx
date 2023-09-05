@@ -551,7 +551,8 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         } as HumanReadablePlaceOrderPayload & { isClosePosition: boolean });
         onSuccess?.();
       } catch (error) {
-        const errorStringKey = error?.code && ORDER_ERROR_CODE_MAP[error.code as number];
+        const errorCode: number | undefined = error?.code;
+        const errorStringKey = errorCode ? ORDER_ERROR_CODE_MAP[errorCode] : undefined;
         onError?.({ errorStringKey });
 
         log('useSubaccount/placeOrder', error, {
