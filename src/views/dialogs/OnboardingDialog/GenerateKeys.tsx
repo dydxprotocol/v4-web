@@ -25,11 +25,12 @@ import { Switch } from '@/components/Switch';
 import { WithReceipt } from '@/components/WithReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { getSelectedNetwork } from '@/state/appSelectors';
+
 import { track } from '@/lib/analytics';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
-
-import { getSelectedNetwork } from '@/state/appSelectors';
+import { parseWalletError } from '@/lib/wallet';
 
 type ElementProps = {
   status: EvmDerivedAccountStatus;
@@ -66,8 +67,12 @@ export const GenerateKeys = ({
     try {
       await matchNetwork?.();
     } catch (error) {
-      setError(error.message);
-      log('GenerateKeys/switchNetwork', error);
+      const { message, walletErrorType } = parseWalletError({ error, stringGetter });
+
+      if (message) {
+        log('GenerateKeys/switchNetwork', error, { walletErrorType });
+        setError(message);
+      }
     }
   };
 
@@ -124,7 +129,12 @@ export const GenerateKeys = ({
           }
         }
       } catch (error) {
-        log('GenerateKeys/getSubaccounts', error);
+        const { message } = parseWalletError({ error, stringGetter });
+
+        if (message) {
+          track(AnalyticsEvent.OnboardingWalletIsNonDeterministic);
+          setError(message);
+        }
       }
 
       await setWalletFromEvmSignature(signature);
@@ -140,48 +150,48 @@ export const GenerateKeys = ({
       setStatus(EvmDerivedAccountStatus.Derived);
     } catch (error) {
       setStatus(EvmDerivedAccountStatus.NotDerived);
-      setError(error?.message);
+      const { message, walletErrorType } = parseWalletError({ error, stringGetter });
 
-      log('GenerateKeys/deriveKeys', error);
-
-      throw error;
+      if (message) {
+        setError(message);
+        log('GenerateKeys/deriveKeys', error, { walletErrorType });
+      }
     }
   };
 
   return (
     <>
-      {isMobile && (
-        <Styled.MobileStatusCards>
-          {[
-            {
-              status: EvmDerivedAccountStatus.Deriving,
-              title: stringGetter({ key: STRING_KEYS.GENERATE_COSMOS_WALLET }),
-              description: stringGetter({ key: STRING_KEYS.GENERATE_COSMOS_WALLET }),
-            },
-            status === EvmDerivedAccountStatus.EnsuringDeterminism && {
-              status: EvmDerivedAccountStatus.EnsuringDeterminism,
-              title: stringGetter({ key: STRING_KEYS.VERIFY_WALLET_COMPATIBILITY }),
-              description: stringGetter({ key: STRING_KEYS.ENSURES_WALLET_SUPPORT }),
-            },
-          ]
-            .filter(isTruthy)
-            .map((step) => (
-              <Styled.StatusCard key={step.status} active={status === step.status}>
-                {status < step.status ? (
-                  <LoadingSpinner disabled />
-                ) : status === step.status ? (
-                  <LoadingSpinner />
-                ) : (
-                  <Styled.GreenCheckCircle />
-                )}
-                <div>
-                  <h3>{step.title}</h3>
-                  <p>{step.description}</p>
-                </div>
-              </Styled.StatusCard>
-            ))}
-        </Styled.MobileStatusCards>
-      )}
+      <Styled.StatusCardsContainer>
+        {[
+          {
+            status: EvmDerivedAccountStatus.Deriving,
+            title: stringGetter({ key: STRING_KEYS.GENERATE_COSMOS_WALLET }),
+            description: stringGetter({ key: STRING_KEYS.GENERATE_COSMOS_WALLET }),
+          },
+          status === EvmDerivedAccountStatus.EnsuringDeterminism && {
+            status: EvmDerivedAccountStatus.EnsuringDeterminism,
+            title: stringGetter({ key: STRING_KEYS.VERIFY_WALLET_COMPATIBILITY }),
+            description: stringGetter({ key: STRING_KEYS.ENSURES_WALLET_SUPPORT }),
+          },
+        ]
+          .filter(isTruthy)
+          .map((step) => (
+            <Styled.StatusCard key={step.status} active={status === step.status}>
+              {status < step.status ? (
+                <LoadingSpinner disabled />
+              ) : status === step.status ? (
+                <LoadingSpinner />
+              ) : (
+                <Styled.GreenCheckCircle />
+              )}
+              <div>
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
+              </div>
+            </Styled.StatusCard>
+          ))}
+      </Styled.StatusCardsContainer>
+
       <Styled.Footer>
         <Styled.RememberMe htmlFor="remember-me">
           <WithTooltip withIcon tooltip="remember-me">
@@ -251,7 +261,7 @@ export const GenerateKeys = ({
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
-Styled.MobileStatusCards = styled.div`
+Styled.StatusCardsContainer = styled.div`
   display: grid;
   margin-top: 1rem;
   gap: 1rem;

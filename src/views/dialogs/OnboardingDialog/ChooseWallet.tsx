@@ -32,8 +32,12 @@ export const ChooseWallet = () => {
     <>
       {selectedWalletType && selectedWalletError && (
         <Styled.AlertMessage type={AlertType.Error}>
-          {<h4>Couldn't connect to {stringGetter({ key: wallets[selectedWalletType].stringKey })}.</h4>}
-          <code>{selectedWalletError.message}</code>
+          {
+            <h4>
+              Couldn't connect to {stringGetter({ key: wallets[selectedWalletType].stringKey })}.
+            </h4>
+          }
+          {selectedWalletError}
         </Styled.AlertMessage>
       )}
 
