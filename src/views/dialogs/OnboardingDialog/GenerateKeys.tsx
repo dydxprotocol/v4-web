@@ -25,11 +25,11 @@ import { Switch } from '@/components/Switch';
 import { WithReceipt } from '@/components/WithReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { getSelectedNetwork } from '@/state/appSelectors';
+
 import { track } from '@/lib/analytics';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
-
-import { getSelectedNetwork } from '@/state/appSelectors';
 import { parseWalletError } from '@/lib/wallet';
 
 type ElementProps = {
@@ -161,38 +161,37 @@ export const GenerateKeys = ({
 
   return (
     <>
-      {isMobile && (
-        <Styled.MobileStatusCards>
-          {[
-            {
-              status: EvmDerivedAccountStatus.Deriving,
-              title: stringGetter({ key: STRING_KEYS.GENERATE_COSMOS_WALLET }),
-              description: stringGetter({ key: STRING_KEYS.GENERATE_COSMOS_WALLET }),
-            },
-            status === EvmDerivedAccountStatus.EnsuringDeterminism && {
-              status: EvmDerivedAccountStatus.EnsuringDeterminism,
-              title: stringGetter({ key: STRING_KEYS.VERIFY_WALLET_COMPATIBILITY }),
-              description: stringGetter({ key: STRING_KEYS.ENSURES_WALLET_SUPPORT }),
-            },
-          ]
-            .filter(isTruthy)
-            .map((step) => (
-              <Styled.StatusCard key={step.status} active={status === step.status}>
-                {status < step.status ? (
-                  <LoadingSpinner disabled />
-                ) : status === step.status ? (
-                  <LoadingSpinner />
-                ) : (
-                  <Styled.GreenCheckCircle />
-                )}
-                <div>
-                  <h3>{step.title}</h3>
-                  <p>{step.description}</p>
-                </div>
-              </Styled.StatusCard>
-            ))}
-        </Styled.MobileStatusCards>
-      )}
+      <Styled.StatusCardsContainer>
+        {[
+          {
+            status: EvmDerivedAccountStatus.Deriving,
+            title: stringGetter({ key: STRING_KEYS.GENERATE_COSMOS_WALLET }),
+            description: stringGetter({ key: STRING_KEYS.GENERATE_COSMOS_WALLET }),
+          },
+          status === EvmDerivedAccountStatus.EnsuringDeterminism && {
+            status: EvmDerivedAccountStatus.EnsuringDeterminism,
+            title: stringGetter({ key: STRING_KEYS.VERIFY_WALLET_COMPATIBILITY }),
+            description: stringGetter({ key: STRING_KEYS.ENSURES_WALLET_SUPPORT }),
+          },
+        ]
+          .filter(isTruthy)
+          .map((step) => (
+            <Styled.StatusCard key={step.status} active={status === step.status}>
+              {status < step.status ? (
+                <LoadingSpinner disabled />
+              ) : status === step.status ? (
+                <LoadingSpinner />
+              ) : (
+                <Styled.GreenCheckCircle />
+              )}
+              <div>
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
+              </div>
+            </Styled.StatusCard>
+          ))}
+      </Styled.StatusCardsContainer>
+
       <Styled.Footer>
         <Styled.RememberMe htmlFor="remember-me">
           <WithTooltip withIcon tooltip="remember-me">
@@ -262,7 +261,7 @@ export const GenerateKeys = ({
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
-Styled.MobileStatusCards = styled.div`
+Styled.StatusCardsContainer = styled.div`
   display: grid;
   margin-top: 1rem;
   gap: 1rem;
