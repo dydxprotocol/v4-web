@@ -3,6 +3,7 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
 import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
+import { parseUnits } from 'viem'
 
 import erc20 from '@/abi/erc20.json';
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
@@ -169,7 +170,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const validateTokenApproval = useCallback(async () => {
     if (!signerWagmi || !publicClientWagmi) throw new Error('Missing signer');
-    if (!sourceToken?.address) throw new Error('Missing source token address');
+    if (!sourceToken?.address || !sourceToken.decimals) throw new Error('Missing source token address');
     if (!sourceChain?.rpc) throw new Error('Missing source chain rpc');
     if (!requestPayload?.targetAddress) throw new Error('Missing target address');
     if (!requestPayload?.value) throw new Error('Missing transaction value');
@@ -182,7 +183,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       args: [evmAddress as `0x${string}`, requestPayload.targetAddress as `0x${string}`]
     });
 
-    const sourceAmountBN = BigInt(requestPayload.value)
+    const sourceAmountBN = parseUnits(debouncedAmount, sourceToken.decimals);
     
     if (sourceAmountBN > (allowance as bigint)) {
       const { request } = await publicClientWagmi.simulateContract({
@@ -193,7 +194,10 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         args: [requestPayload.targetAddress as `0x${string}`, sourceAmountBN],
       })
 
-      await signerWagmi.writeContract(request);
+      const approveTx = await signerWagmi.writeContract(request);
+      await publicClientWagmi.waitForTransactionReceipt({
+        hash: approveTx,
+      })
     }
   }, [signerWagmi, sourceToken, sourceChain, requestPayload, publicClientWagmi]);
 
@@ -217,8 +221,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         }
 
         setIsLoading(true);
-        
-        validateTokenApproval();
+
+        await validateTokenApproval();
 
         let tx = {
           to: requestPayload.targetAddress as `0x${string}`,
