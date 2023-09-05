@@ -14283,19 +14283,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
-
-  github.com/release-it/conventional-changelog/a4acfeac76369937a6566d698a5ae9180eceb413(release-it@15.11.0):
-    resolution: {tarball: https://codeload.github.com/release-it/conventional-changelog/tar.gz/a4acfeac76369937a6566d698a5ae9180eceb413}
-    id: github.com/release-it/conventional-changelog/a4acfeac76369937a6566d698a5ae9180eceb413
-    name: '@release-it/conventional-changelog'
-    version: 7.0.0
-    engines: {node: '>=16'}
-    peerDependencies:
-      release-it: ^16.0.0
-    dependencies:
-      concat-stream: 2.0.0
-      conventional-changelog: 4.0.0
-      conventional-recommended-bump: 7.0.1
-      release-it: 15.11.0
-      semver: 7.5.1
-    dev: false
