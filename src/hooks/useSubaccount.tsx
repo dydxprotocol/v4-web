@@ -27,7 +27,7 @@ import type {
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
 import { AnalyticsEvent } from '@/constants/analytics';
-import { ORDER_ERROR_CODE_MAP, STRING_KEYS } from '@/constants/localization';
+import { ORDER_ERROR_CODE_MAP } from '@/constants/localization';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { UNCOMMITTED_ORDER_TIMEOUT } from '@/constants/trade';
 import { DydxAddress } from '@/constants/wallets';
