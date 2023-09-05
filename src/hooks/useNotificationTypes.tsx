@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useSelector, shallowEqual, useDispatch } from 'react-redux';
 import { groupBy } from 'lodash';
 
@@ -8,12 +8,20 @@ import { STRING_KEYS } from '@/constants/localization';
 import { type NotificationTypeConfig, NotificationType } from '@/constants/notifications';
 import { ORDER_SIDE_STRINGS, TRADE_TYPE_STRINGS, TradeTypes } from '@/constants/trade';
 
+import { useLocalNotifications } from '@/hooks/useLocalNotifications';
+
+import { Icon, IconName } from '@/components/Icon';
+import { Output, OutputType } from '@/components/Output';
+import { TransferStatusToast } from '@/views/TransferStatus';
+
 import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { OrderStatusIcon } from '@/views/OrderStatusIcon';
 
 import { useStringGetter } from './useStringGetter';
+import { TransferStatusSteps } from '@/views/TransferStatusSteps';
+import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
 
 export const notificationTypes = [
   {
@@ -93,4 +101,51 @@ export const notificationTypes = [
       };
     },
   } as NotificationTypeConfig<string, [string, number]>,
+  {
+    type: NotificationType.SquidTransfer,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const { transferNotifications } = useLocalNotifications();
+
+      const getTitleStringKey = useCallback((type: 'deposit' | 'withdraw', finished: boolean) => {
+        if (type === 'deposit' && !finished) return STRING_KEYS.DEPOSIT_IN_PROGRESS;
+        if (type === 'deposit' && finished) return STRING_KEYS.DEPOSIT;
+        if (type === 'withdraw' && !finished) return STRING_KEYS.WITHDRAW_IN_PROGRESS;
+        return STRING_KEYS.WITHDRAW;
+      }, []);
+
+      useEffect(() => {
+        for (const transfer of transferNotifications) {
+          const { toChainId, status, txHash, toAmount } = transfer;
+          const finished = Boolean(status) && status?.squidTransactionStatus !== 'ongoing';
+          const type = toChainId === TESTNET_CHAIN_ID ? 'deposit' : 'withdraw';
+
+          trigger(
+            txHash,
+            {
+              icon: <Icon iconName={finished ? IconName.Transfer : IconName.Clock} />,
+              title: stringGetter({ key: getTitleStringKey(type, finished) }),
+              // TODO: confirm with design what the description should be
+              description: (
+                <>
+                  <span>{type === 'deposit' ? 'Deposit of ' : 'Withdraw of'}</span>
+                  <Output type={OutputType.Fiat} value={toAmount} />
+                </>
+              ),
+              customContent: (
+                <TransferStatusToast
+                  toAmount={transfer.toAmount}
+                  triggeredAt={transfer.triggeredAt}
+                  status={transfer.status}
+                />
+              ),
+              customMenuContent: !finished && <TransferStatusSteps status={transfer.status} />,
+              toastSensitivity: 'foreground',
+            },
+            []
+          );
+        }
+      }, [transferNotifications]);
+    },
+  },
 ] satisfies NotificationTypeConfig[];

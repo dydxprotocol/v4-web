@@ -1,17 +1,13 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
 import { Squid } from '@0xsquid/sdk';
 
-import { DydxV4Network, isDydxV4Network } from '@/constants/networks';
+import { CLIENT_NETWORK_CONFIGS, DydxV4Network, isDydxV4Network } from '@/constants/networks';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
 
-const SQUID_BASE_URL: Record<DydxV4Network, string | undefined> = {
-  [DydxV4Network.V4Testnet2]: 'https://squid-api-git-feat-cosmos-maintestnet-0xsquid.vercel.app',
-  [DydxV4Network.V4Staging]: undefined,
-  [DydxV4Network.V4Local]: undefined,
-  [DydxV4Network.V4Mainnet]: 'https://api.0xsquid.com',
-};
+export const NATIVE_TOKEN_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
 const useSquidContext = () => {
   const selectedNetwork = useSelector(getSelectedNetwork);
@@ -27,7 +23,7 @@ const useSquidContext = () => {
   const squid = useMemo(
     () =>
       isDydxV4Network(selectedNetwork)
-        ? new Squid({ baseUrl: SQUID_BASE_URL[selectedNetwork as DydxV4Network] })
+        ? new Squid({ baseUrl: CLIENT_NETWORK_CONFIGS[selectedNetwork]?.endpoints['0xsquid'] })
         : undefined,
     [selectedNetwork]
   );

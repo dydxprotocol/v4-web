@@ -4,7 +4,7 @@ import { LocalStorageKey } from '@/constants/localStorage';
 
 import {
   type DydxAddress,
-  type EthereumAddress,
+  type EvmAddress,
   WalletConnectionType,
   WalletType,
   wallets,
@@ -17,6 +17,7 @@ import {
   useConnect as useConnectWagmi,
   useAccount as useAccountWagmi,
   useDisconnect as useDisconnectWagmi,
+  usePublicClient as usePublicClientWagmi,
   useWalletClient as useWalletClientWagmi,
 } from 'wagmi';
 import {
@@ -37,11 +38,12 @@ export const useWalletConnection = () => {
   const stringGetter = useStringGetter();
 
   // EVM wallet connection
-  const [evmAddress, saveEvmAddress] = useLocalStorage<EthereumAddress | undefined>({
+  const [evmAddress, saveEvmAddress] = useLocalStorage<EvmAddress | undefined>({
     key: LocalStorageKey.EvmAddress,
     defaultValue: undefined,
   });
   const { address: evmAddressWagmi, isConnected: isConnectedWagmi } = useAccountWagmi();
+  const publicClientWagmi = usePublicClientWagmi();
   const { data: signerWagmi } = useWalletClientWagmi();
   const { disconnectAsync: disconnectWagmi } = useDisconnectWagmi();
 
@@ -214,7 +216,8 @@ export const useWalletConnection = () => {
     evmAddress,
     evmAddressWagmi,
     signerWagmi,
-
+    publicClientWagmi,
+    
     // Wallet connection (Cosmos)
     dydxAddress,
     dydxAddressGraz,

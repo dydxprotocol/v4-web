@@ -106,7 +106,10 @@ const useNotificationsContext = () => {
               updateKey,
             } as Notification);
 
-            updateStatus(notification, isNew ? NotificationStatus.Triggered : NotificationStatus.Cleared);
+            updateStatus(
+              notification,
+              isNew ? NotificationStatus.Triggered : NotificationStatus.Cleared
+            );
           }
 
           // updateKey changed - update existing notification
@@ -141,7 +144,9 @@ const useNotificationsContext = () => {
   // Push notifications
   const [hasEnabledPush, setHasEnabledPush] = useLocalStorage({
     key: LocalStorageKey.PushNotificationsEnabled,
-    defaultValue: Boolean(globalThis.Notification && globalThis.Notification.permission === 'granted'),
+    defaultValue: Boolean(
+      globalThis.Notification && globalThis.Notification.permission === 'granted'
+    ),
   });
   const [isEnablingPush, setIsEnablingPush] = useState(false);
 
@@ -236,4 +241,3 @@ const useNotificationsContext = () => {
     setIsMenuOpen,
   };
 };
-// }

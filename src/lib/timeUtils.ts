@@ -72,3 +72,9 @@ export const getTimeTillNextUnit = (unit: 'minute' | 'hour' | 'day') => {
 };
 
 export const getTimeString = (time: number) => time.toString().padStart(2, '0');
+
+export const formatSeconds = (seconds: number) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${getTimeString(minutes)}:${getTimeString(remainingSeconds)}`;
+}

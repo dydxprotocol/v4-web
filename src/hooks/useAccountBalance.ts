@@ -7,7 +7,7 @@ import { formatUnits } from 'viem';
 
 import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
-import { EthereumAddress } from '@/constants/wallets';
+import { EvmAddress } from '@/constants/wallets';
 
 import { convertBech32Address } from '@/lib/addressUtils';
 import { MustBigNumber } from '@/lib/numbers';
@@ -59,7 +59,7 @@ export const useAccountBalance = ({
     token:
       addressOrDenom === CHAIN_DEFAULT_TOKEN_ADDRESS
         ? undefined
-        : (addressOrDenom as EthereumAddress),
+        : (addressOrDenom as EvmAddress),
     watch: true,
   });
 

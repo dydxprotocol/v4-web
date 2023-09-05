@@ -3,16 +3,21 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
 import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
-import { ethers } from 'ethers';
+import { parseUnits } from 'viem'
 
+import erc20 from '@/abi/erc20.json';
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
+import type { EvmAddress } from '@/constants/wallets';
 
 import { useAccounts, useDebounce, useStringGetter } from '@/hooks';
 import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useLocalNotifications } from '@/hooks/useLocalNotifications';
+import { NATIVE_TOKEN_ADDRESS, useSquid } from '@/hooks/useSquid';
+import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
@@ -32,6 +37,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
+import { log } from '@/lib/telemetry';
 
 import { ChainSelectMenu } from './ChainSelectMenu';
 import { TokenSelectMenu } from './TokenSelectMenu';
@@ -48,13 +54,17 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { signerWagmi } = useAccounts();
+  const { evmAddress, signerWagmi } = useAccounts();
+  const { publicClientWagmi } = useWalletConnection();
+
+  const { addTransferNotification } = useLocalNotifications();
 
   const {
     requestPayload,
     token,
     chain: chainIdStr,
     resources,
+    summary,
   } = useSelector(getTransferInputs, shallowEqual) || {};
   const chainId = chainIdStr ? parseInt(chainIdStr) : undefined;
 
@@ -64,13 +74,16 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     [token, resources]
   );
 
+  const sourceChain = useMemo(
+    () => (chainIdStr ? resources?.chainResources?.get(chainIdStr) : undefined),
+    [chainId, resources]
+  );
+
   const [fromAmount, setFromAmount] = useState('');
   const [slippage, setSlippage] = useState(0.01); // 1% slippage
   const debouncedAmount = useDebounce<string>(fromAmount, 500);
 
   // Async Data
-  const [transactionHash, setTransactionHash] = useState<string>();
-
   const { balance, queryStatus, isQueryFetching } = useAccountBalance({
     addressOrDenom: sourceToken?.address || undefined,
     assetSymbol: sourceToken?.symbol || undefined,
@@ -157,6 +170,39 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     }
   }, [balance, setFromAmount]);
 
+  const validateTokenApproval = useCallback(async () => {
+    if (!signerWagmi || !publicClientWagmi) throw new Error('Missing signer');
+    if (!sourceToken?.address || !sourceToken.decimals) throw new Error('Missing source token address');
+    if (!sourceChain?.rpc) throw new Error('Missing source chain rpc');
+    if (!requestPayload?.targetAddress) throw new Error('Missing target address');
+    if (!requestPayload?.value) throw new Error('Missing transaction value');
+    if (sourceToken?.address === NATIVE_TOKEN_ADDRESS) return;
+
+    const allowance = await publicClientWagmi.readContract({
+      address: sourceToken.address as EvmAddress,
+      abi: erc20,
+      functionName: 'allowance',
+      args: [evmAddress as EvmAddress, requestPayload.targetAddress as EvmAddress]
+    });
+
+    const sourceAmountBN = parseUnits(debouncedAmount, sourceToken.decimals);
+    
+    if (sourceAmountBN > (allowance as bigint)) {
+      const { request } = await publicClientWagmi.simulateContract({
+        account: evmAddress,
+        address: sourceToken.address as EvmAddress,
+        abi: erc20,
+        functionName: 'approve',
+        args: [requestPayload.targetAddress as EvmAddress, sourceAmountBN],
+      })
+
+      const approveTx = await signerWagmi.writeContract(request);
+      await publicClientWagmi.waitForTransactionReceipt({
+        hash: approveTx,
+      })
+    }
+  }, [signerWagmi, sourceToken, sourceChain, requestPayload, publicClientWagmi]);
+
   const onSubmit = useCallback(
     async (e: FormEvent) => {
       try {
@@ -178,27 +224,32 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
         setIsLoading(true);
 
+        await validateTokenApproval();
+
         let tx = {
-          to: requestPayload.targetAddress as `0x${string}`,
-          data: requestPayload.data as `0x${string}`,
-          gasLimit: ethers.toBigInt(requestPayload.gasLimit),
+          to: requestPayload.targetAddress as EvmAddress,
+          data: requestPayload.data as EvmAddress,
+          gasLimit: BigInt(requestPayload.gasLimit),
           value:
-            requestPayload.routeType !== 'SEND' ? ethers.toBigInt(requestPayload.value) : undefined,
+            requestPayload.routeType !== 'SEND' ? BigInt(requestPayload.value) : undefined,
         };
         const txHash = await signerWagmi.sendTransaction(tx);
+
         onDeposit?.();
 
         if (txHash) {
-          setTransactionHash(txHash);
-          abacusStateManager.setTransferStatus({
-            hash: txHash,
+          addTransferNotification({
+            txHash: txHash,
             toChainId: TESTNET_CHAIN_ID,
-            fromChainId: chainId?.toString(),
+            fromChainId: chainIdStr || undefined,
+            toAmount: summary?.usdcSize || undefined,
+            triggeredAt: Date.now(),
           });
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');
         }
       } catch (error) {
+        log('DepositForm/onSubmit', error);
         setError(error);
       } finally {
         setIsLoading(false);
@@ -286,17 +337,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           }
         />
       </Styled.WithDetailsReceipt>
-      {errorMessage ? (
-        <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>
-      ) : (
-        transactionHash && (
-          <AlertMessage type={AlertType.Success}>
-            <Styled.TransactionInfo>
-              {stringGetter({ key: STRING_KEYS.DEPOSIT_IN_PROGRESS })}
-            </Styled.TransactionInfo>
-          </AlertMessage>
-        )
-      )}
+      {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
       <DepositButtonAndReceipt
         isDisabled={isDisabled}
         isLoading={isLoading}
