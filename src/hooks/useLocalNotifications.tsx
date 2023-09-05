@@ -65,10 +65,14 @@ const useLocalNotificationsContext = () => {
         fromChainId,
         status: currentStatus,
       } of transferNotifications) {
-        if (currentStatus && currentStatus?.squidTransactionStatus !== 'ongoing') continue;
-
-        const status = await squid?.getStatus({ transactionId: txHash, toChainId, fromChainId });
-        if (status) statuses[txHash] = status;
+        try {
+          if (currentStatus && currentStatus?.squidTransactionStatus !== 'ongoing') continue;
+  
+          const status = await squid?.getStatus({ transactionId: txHash, toChainId, fromChainId });
+          if (status) statuses[txHash] = status;
+        } catch (error) {
+          console.error(error);
+        }
       }
       return statuses;
     },

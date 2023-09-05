@@ -3,8 +3,8 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
 import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
-import { ethers } from 'ethers';
 
+import erc20 from '@/abi/erc20.json';
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
@@ -14,6 +14,8 @@ import { NumberSign } from '@/constants/numbers';
 import { useAccounts, useDebounce, useStringGetter } from '@/hooks';
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
+import { NATIVE_TOKEN_ADDRESS, useSquid } from '@/hooks/useSquid';
+import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
@@ -49,7 +51,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { signerWagmi } = useAccounts();
+  const { evmAddress, signerWagmi } = useAccounts();
+  const { publicClientWagmi } = useWalletConnection();
 
   const { addTransferNotification } = useLocalNotifications();
 
@@ -66,6 +69,11 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const sourceToken = useMemo(
     () => (token ? resources?.tokenResources?.get(token) : undefined),
     [token, resources]
+  );
+
+  const sourceChain = useMemo(
+    () => (chainIdStr ? resources?.chainResources?.get(chainIdStr) : undefined),
+    [chainId, resources]
   );
 
   const [fromAmount, setFromAmount] = useState('');
@@ -159,6 +167,36 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     }
   }, [balance, setFromAmount]);
 
+  const validateTokenApproval = useCallback(async () => {
+    if (!signerWagmi || !publicClientWagmi) throw new Error('Missing signer');
+    if (!sourceToken?.address) throw new Error('Missing source token address');
+    if (!sourceChain?.rpc) throw new Error('Missing source chain rpc');
+    if (!requestPayload?.targetAddress) throw new Error('Missing target address');
+    if (!requestPayload?.value) throw new Error('Missing transaction value');
+    if (sourceToken?.address === NATIVE_TOKEN_ADDRESS) return;
+
+    const allowance = await publicClientWagmi.readContract({
+      address: sourceToken.address as `0x${string}`,
+      abi: erc20,
+      functionName: 'allowance',
+      args: [evmAddress as `0x${string}`, requestPayload.targetAddress as `0x${string}`]
+    });
+
+    const sourceAmountBN = BigInt(requestPayload.value)
+    
+    if (sourceAmountBN > (allowance as bigint)) {
+      const { request } = await publicClientWagmi.simulateContract({
+        account: evmAddress,
+        address: sourceToken.address as `0x${string}`,
+        abi: erc20,
+        functionName: 'approve',
+        args: [requestPayload.targetAddress as `0x${string}`, sourceAmountBN],
+      })
+
+      await signerWagmi.writeContract(request);
+    }
+  }, [signerWagmi, sourceToken, sourceChain, requestPayload, publicClientWagmi]);
+
   const onSubmit = useCallback(
     async (e: FormEvent) => {
       try {
@@ -179,20 +217,23 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         }
 
         setIsLoading(true);
+        
+        validateTokenApproval();
 
         let tx = {
           to: requestPayload.targetAddress as `0x${string}`,
           data: requestPayload.data as `0x${string}`,
-          gasLimit: ethers.toBigInt(requestPayload.gasLimit),
+          gasLimit: BigInt(requestPayload.gasLimit),
           value:
-            requestPayload.routeType !== 'SEND' ? ethers.toBigInt(requestPayload.value) : undefined,
+            requestPayload.routeType !== 'SEND' ? BigInt(requestPayload.value) : undefined,
         };
         const txHash = await signerWagmi.sendTransaction(tx);
+
         onDeposit?.();
 
         if (txHash) {
           addTransferNotification({
-            txHash,
+            txHash: txHash,
             toChainId: TESTNET_CHAIN_ID,
             fromChainId: chainIdStr || undefined,
             toAmount: summary?.usdcSize || undefined,
@@ -202,6 +243,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           setFromAmount('');
         }
       } catch (error) {
+        console.error(error);
         setError(error);
       } finally {
         setIsLoading(false);

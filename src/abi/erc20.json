@@ -1,4 +1,4 @@
-export const erc20 = [
+[
   {
     "constant": true,
     "inputs": [],
@@ -219,4 +219,4 @@ export const erc20 = [
     "name": "Transfer",
     "type": "event"
   }
-] as const;
+]

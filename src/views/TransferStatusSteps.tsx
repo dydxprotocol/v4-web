@@ -27,38 +27,17 @@ enum TransferStatusStep {
 export const TransferStatusSteps = ({ status }: ElementProps) => {
   const stringGetter = useStringGetter();
 
-  const type = useMemo(
-    () => (status?.toChain?.chainData.chainId === TESTNET_CHAIN_ID ? 'deposit' : 'withdrawal'),
-    [status]
-  );
-
-  const currentStep = useMemo(() => {
+  const { currentStep, steps, type } = useMemo(() => {
     const routeStatus = status?.routeStatus;
-    const fromChain = status?.fromChain?.chainData.chainId;
-    const toChain = status?.toChain?.chainData.chainId;
+    const fromChain = status?.fromChain?.chainData?.chainId;
+    const toChain = status?.toChain?.chainData?.chainId;
+    const type = toChain === TESTNET_CHAIN_ID ? 'deposit' : 'withdrawal';
 
-    if (!routeStatus?.length) return TransferStatusStep.FromChain;
-
-    const currentStatus = routeStatus[routeStatus?.length - 1];
-
-    if (currentStatus.chainId === toChain) {
-      return currentStatus.status !== 'success'
-        ? TransferStatusStep.ToChain
-        : TransferStatusStep.Complete;
-    }
-
-    if (currentStatus.chainId === fromChain && currentStatus.status !== 'success') {
-      return TransferStatusStep.FromChain;
-    }
-
-    return TransferStatusStep.Bridge;
-  }, [status]);
-
-  const steps = useMemo(
-    () => [
+    const steps = [
       {
         label: stringGetter({
-          key: type === 'deposit' ? STRING_KEYS.INITIATED_DEPOSIT : STRING_KEYS.INITIATED_WITHDRAWAL,
+          key:
+            type === 'deposit' ? STRING_KEYS.INITIATED_DEPOSIT : STRING_KEYS.INITIATED_WITHDRAWAL,
         }),
         step: TransferStatusStep.FromChain,
         link: status?.fromChain?.transactionUrl,
@@ -72,15 +51,35 @@ export const TransferStatusSteps = ({ status }: ElementProps) => {
         label: stringGetter({
           key: type === 'deposit' ? STRING_KEYS.DEPOSIT_TO_CHAIN : STRING_KEYS.WITHDRAW_TO_CHAIN,
           params: {
-            CHAIN: status?.toChain?.chainData.chainName,
-          }
+            CHAIN: status?.toChain?.chainData?.chainName,
+          },
         }),
         step: TransferStatusStep.ToChain,
         link: status?.toChain?.transactionUrl,
       },
-    ],
-    [status]
-  );
+    ];
+
+    const currentStatus = routeStatus[routeStatus?.length - 1];
+
+    let currentStep = TransferStatusStep.Bridge;
+
+    if (!routeStatus?.length) {
+      currentStep = TransferStatusStep.FromChain;
+    } else if (currentStatus.chainId === toChain) {
+      currentStep =
+        currentStatus.status !== 'success'
+          ? TransferStatusStep.ToChain
+          : TransferStatusStep.Complete;
+    } else if (currentStatus.chainId === fromChain && currentStatus.status !== 'success') {
+      currentStep = TransferStatusStep.FromChain;
+    }
+
+    return {
+      currentStep,
+      steps,
+      type,
+    };
+  }, [status, stringGetter]);
 
   if (!status) return <LoadingDots size={3} />;
 
@@ -108,9 +107,7 @@ export const TransferStatusSteps = ({ status }: ElementProps) => {
                 </Styled.Label>
               </Link>
             ) : (
-              <Styled.Label highlighted={currentStep >= step.step}>
-                {step.label}
-              </Styled.Label>
+              <Styled.Label highlighted={currentStep >= step.step}>{step.label}</Styled.Label>
             )}
           </Styled.row>
         </Styled.Step>

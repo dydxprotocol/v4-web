@@ -34,7 +34,7 @@ export const TransferStatusToast = ({
   const [secondsLeft, setSecondsLeft] = useState<number | undefined>();
 
   const type = useMemo(
-    () => (status?.toChain?.chainData.chainId === TESTNET_CHAIN_ID ? 'deposit' : 'withdrawal'),
+    () => (status?.toChain?.chainData?.chainId === TESTNET_CHAIN_ID ? 'deposit' : 'withdrawal'),
     [status]
   );
 

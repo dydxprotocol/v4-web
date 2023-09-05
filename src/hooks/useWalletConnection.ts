@@ -17,6 +17,7 @@ import {
   useConnect as useConnectWagmi,
   useAccount as useAccountWagmi,
   useDisconnect as useDisconnectWagmi,
+  usePublicClient as usePublicClientWagmi,
   useWalletClient as useWalletClientWagmi,
 } from 'wagmi';
 import {
@@ -42,6 +43,7 @@ export const useWalletConnection = () => {
     defaultValue: undefined,
   });
   const { address: evmAddressWagmi, isConnected: isConnectedWagmi } = useAccountWagmi();
+  const publicClientWagmi = usePublicClientWagmi();
   const { data: signerWagmi } = useWalletClientWagmi();
   const { disconnectAsync: disconnectWagmi } = useDisconnectWagmi();
 
@@ -214,7 +216,8 @@ export const useWalletConnection = () => {
     evmAddress,
     evmAddressWagmi,
     signerWagmi,
-
+    publicClientWagmi,
+    
     // Wallet connection (Cosmos)
     dydxAddress,
     dydxAddressGraz,
