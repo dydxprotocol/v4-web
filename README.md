@@ -22,8 +22,8 @@ Alternatively, follow the [IPFS Kubo installation guide](https://docs.ipfs.tech
 Clone the repository and navigate to its directory:
 
 ```bash
-git clone https://github.com/dydxprotocol/trader-fe.git
-cd trader-fe
+git clone https://github.com/dydxprotocol/v4-web.git
+cd v4-web
 ```
 
 ### Step 2: Install pnpm and dependencies
