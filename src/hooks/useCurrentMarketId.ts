@@ -4,7 +4,7 @@ import { useMatch, useNavigate } from 'react-router-dom';
 
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID } from '@/constants/markets';
-import { AppRoute, DEFAULT_TRADE_ROUTE } from '@/constants/routes';
+import { AppRoute } from '@/constants/routes';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { closeDialogInTradeBox } from '@/state/dialogs';
