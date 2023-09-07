@@ -1,36 +1,6 @@
 import { Asset, PerpetualMarket } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
-export interface Market {
-  market: string;
-  status: string;
-  baseAsset: string;
-  quoteAsset: string;
-  stepSize: string;
-  tickSize: string;
-  oraclePrice: string;
-  priceChange24H: string;
-  nextFundingRate: string;
-  nextFundingAt: string;
-  minOrderSize: string;
-  type: string;
-  initialMarginFraction: string;
-  maintenanceMarginFraction: string;
-  volume24H: string;
-  trades24H: string;
-  openInterest: string;
-  incrementalInitialMarginFraction: string;
-  incrementalPositionSize: string;
-  maxPositionSize: string;
-  baselinePositionSize: string;
-  assetResolution: string;
-  syntheticAssetId: string;
-}
-
-export type AllMarkets = {
-  [market: string]: Market;
-};
-
 export type MarketData = {
   asset: Asset;
   tickSizeDecimals: number;

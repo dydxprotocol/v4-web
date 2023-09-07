@@ -2,7 +2,7 @@ import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
-import { STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS, type StringKey } from '@/constants/localization';
 import { useBreakpoints, useStringGetter } from '@/hooks';
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -34,10 +34,7 @@ export const MarketDetails: React.FC = () => {
     initialMarginFraction,
     maintenanceMarginFraction,
     minOrderSize,
-    maxPositionSize,
-    baselinePositionSize,
-    incrementalInitialMarginFraction,
-    incrementalPositionSize,
+    stepSizeDecimals,
     tickSizeDecimals,
   } = configs;
 
@@ -72,12 +69,28 @@ export const MarketDetails: React.FC = () => {
       key: 'step-size',
       label: stringGetter({ key: STRING_KEYS.STEP_SIZE }),
       tooltip: 'step-size',
-      value: <Output useGrouping value={stepSize} type={OutputType.Asset} tag={symbol} />,
+      value: (
+        <Output
+          useGrouping
+          value={stepSize}
+          type={OutputType.Asset}
+          tag={symbol}
+          fractionDigits={stepSizeDecimals}
+        />
+      ),
     },
     {
       key: 'min-order-size',
       label: stringGetter({ key: STRING_KEYS.MINIMUM_ORDER_SIZE }),
-      value: <Output useGrouping value={minOrderSize} type={OutputType.Asset} tag={symbol} />,
+      value: (
+        <Output
+          useGrouping
+          value={minOrderSize}
+          type={OutputType.Asset}
+          tag={symbol}
+          fractionDigits={stepSizeDecimals}
+        />
+      ),
     },
     {
       key: 'max-leverage',
@@ -105,36 +118,6 @@ export const MarketDetails: React.FC = () => {
       tooltip: 'initial-margin-fraction',
       value: <Output useGrouping value={initialMarginFraction} type={OutputType.SmallPercent} />,
     },
-    {
-      key: 'incremental-initial-margin-fraction',
-      label: stringGetter({ key: STRING_KEYS.INCREMENTAL_INITIAL_MARGIN_FRACTION }),
-      value: (
-        <Output
-          useGrouping
-          value={incrementalInitialMarginFraction}
-          type={OutputType.SmallPercent}
-        />
-      ),
-    },
-    {
-      key: 'incremental-position-size',
-      label: stringGetter({ key: STRING_KEYS.INCREMENTAL_POSITION_SIZE }),
-      value: (
-        <Output useGrouping value={incrementalPositionSize} type={OutputType.Asset} tag={symbol} />
-      ),
-    },
-    {
-      key: 'baseline-position-size',
-      label: stringGetter({ key: STRING_KEYS.BASELINE_POSITION_SIZE }),
-      value: (
-        <Output useGrouping value={baselinePositionSize} type={OutputType.Asset} tag={symbol} />
-      ),
-    },
-    {
-      key: 'max-position-size',
-      label: stringGetter({ key: STRING_KEYS.MAXIMUM_POSITION_SIZE }),
-      value: <Output useGrouping value={maxPositionSize} type={OutputType.Asset} tag={symbol} />,
-    },
   ];
 
   return (
@@ -150,10 +133,10 @@ export const MarketDetails: React.FC = () => {
 
         <Styled.MarketDescription>
           {primaryDescriptionKey && (
-            <p>{stringGetter({ key: STRING_KEYS[primaryDescriptionKey] })}</p>
+            <p>{stringGetter({ key: STRING_KEYS[primaryDescriptionKey as StringKey] })}</p>
           )}
           {secondaryDescriptionKey && (
-            <p>{stringGetter({ key: STRING_KEYS[secondaryDescriptionKey] })}</p>
+            <p>{stringGetter({ key: STRING_KEYS[secondaryDescriptionKey as StringKey] })}</p>
           )}
         </Styled.MarketDescription>
 
