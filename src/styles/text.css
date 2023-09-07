@@ -1,22 +1,16 @@
 /* Constants */
 
 :root {
-  --fontFamily-base: "Circular", system-ui, -apple-system, Helvetica, Arial, sans-serif;
+  --fontFamily-base: "Satoshi", system-ui, -apple-system, Helvetica, Arial, sans-serif;
   --fontFamily-monospace: "CircularMono", Courier, monospace, var(--fontFamily-base);
 
   --fontWeight-base-0: 450;
   --fontWeight-base-1: 500;
   --fontWeight-base-2: 700;
-  --fontWeight-monospace: 400;
 
   --letter-spacing-base: -0.02em;
 
   /* New Typography system */
-
-  /**
-   * @size 10px/11px
-   * @weight 400
-   */
   --fontSize-tiny: 0.625rem; /* 10px/11px */
   --fontSize-mini: 0.75rem; /* 12px/13px */
   --fontSize-small: 0.8438rem; /* 13.5px/14.5px */
