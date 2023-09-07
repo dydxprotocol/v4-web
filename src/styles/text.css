@@ -2,7 +2,7 @@
 
 :root {
   --fontFamily-base: "Satoshi", system-ui, -apple-system, Helvetica, Arial, sans-serif;
-  --fontFamily-monospace: "CircularMono", Courier, monospace, var(--fontFamily-base);
+  --fontFamily-monospace: Courier, monospace, var(--fontFamily-base);
 
   --fontWeight-base-0: 450;
   --fontWeight-base-1: 500;
