@@ -34,6 +34,8 @@ export const STRING_KEYS = {
   ...WARNINGS_STRING_KEYS,
 };
 
+export type StringKey = keyof typeof STRING_KEYS;
+
 export type LocaleData = typeof EN_LOCALE_DATA;
 
 export type StringGetterFunction = (a: {
