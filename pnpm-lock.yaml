@@ -27,8 +27,8 @@ dependencies:
     specifier: ^0.31.0
     version: 0.31.0
   '@dydxprotocol/abacus':
-    specifier: ^0.4.15
-    version: 0.4.15
+    specifier: ^0.4.16
+    version: 0.4.16
   '@dydxprotocol/v4-client-js':
     specifier: ^0.32.0
     version: 0.32.0
@@ -1145,8 +1145,8 @@ packages:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
 
-  /@dydxprotocol/abacus@0.4.15:
-    resolution: {integrity: sha512-cpbF4dT8rAtoWB9Zi163tuOddeL3ZSmJxzn6Dm9aMJ1J4CR2+oRTOKh7W3rUYZKhiakDh+5CyrxgKvoLRGEcqg==}
+  /@dydxprotocol/abacus@0.4.16:
+    resolution: {integrity: sha512-FTvzgVZ0xjMRmfHwlyoluUSG4Uu4FUHPnaTvLLPl0ER0junmaVDrmBydAUMWMEYGiLyx/k0ln1cLUDrYF2aX6A==}
     dev: false
 
   /@dydxprotocol/dydxjs@0.3.0:
