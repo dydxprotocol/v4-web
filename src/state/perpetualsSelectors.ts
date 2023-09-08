@@ -1,11 +1,10 @@
-import { matchPath } from 'react-router-dom';
 import { createSelector } from 'reselect';
 
 import { Candle, TradingViewBar } from '@/constants/candles';
-import { TRADE_ROUTE } from '@/constants/routes';
+
+import { mapCandle } from '@/lib/tradingView/utils';
 
 import type { RootState } from './_store';
-import { mapCandle } from '@/lib/tradingView/utils';
 
 /**
  * @param state

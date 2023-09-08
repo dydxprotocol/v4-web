@@ -12,9 +12,8 @@ import {
 
 import { OnboardingState } from '@/constants/account';
 
-import type { RootState } from './_store';
-
 import { getHydratedTradingData } from '@/lib/orders';
+import type { RootState } from './_store';
 
 import { getCurrentMarketId, getPerpetualMarkets } from './perpetualsSelectors';
 import { getAssets } from './assetsSelectors';
@@ -106,11 +105,11 @@ export const getSubaccountOpenOrdersBySideAndPrice = createSelector(
   [getSubaccountOpenOrders],
   (openOrders = []) => {
     const ordersBySide: Partial<Record<OrderSide, Record<number, SubaccountOrder>>> = {};
-    for (const order of openOrders) {
+    openOrders.forEach((order) => {
       const side = ORDER_SIDES[order.side.name];
       const byPrice = (ordersBySide[side] ??= {});
       byPrice[order.price] = order;
-    }
+    });
     return ordersBySide;
   }
 );
@@ -123,8 +122,10 @@ export const getOrderDetails = (orderId: string) =>
   createSelector(
     [getSubaccountOrders, getAssets, getPerpetualMarkets],
     (orders, assets, perpetualMarkets) => {
-      const order = orders?.find((order) => order.id === orderId);
-      return order ? getHydratedTradingData({ data: order, assets, perpetualMarkets }) : undefined;
+      const matchingOrder = orders?.find((order) => order.id === orderId);
+      return matchingOrder
+        ? getHydratedTradingData({ data: matchingOrder, assets, perpetualMarkets })
+        : undefined;
     }
   );
 
@@ -178,8 +179,10 @@ export const getFillDetails = (fillId: string) =>
   createSelector(
     [getSubaccountFills, getAssets, getPerpetualMarkets],
     (fills, assets, perpetualMarkets) => {
-      const fill = fills?.find((fill) => fill.id === fillId);
-      return fill ? getHydratedTradingData({ data: fill, assets, perpetualMarkets }) : undefined;
+      const matchingFill = fills?.find((fill) => fill.id === fillId);
+      return matchingFill
+        ? getHydratedTradingData({ data: matchingFill, assets, perpetualMarkets })
+        : undefined;
     }
   );
 
