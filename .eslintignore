@@ -12,5 +12,4 @@ vite.config.ts
 /src/menus
 /src/pages
 /src/state
-/src/styles
 /src/views

@@ -5,7 +5,6 @@ import {
   type ThemeProps,
 } from 'styled-components';
 
-import breakpoints from './breakpoints';
 import { layoutMixins } from './layoutMixins';
 
 export const tableMixins: Record<
