@@ -1,0 +1,81 @@
+{
+    "applinks": {
+        "apps": [],
+        "details": [
+            {
+                "appIDs": [
+                    "75C6UARB5H.exchangeV4.dydx.trading"
+                ],
+                "components": [
+                    {
+                        "/": "/trade/*"
+                    },
+                    {
+                        "/": "/r/*"
+                    },
+                    {
+                        "/": "/portfolio/overview"
+                    },
+                    {
+                        "/": "/portfolio/positions"
+                    },
+                    {
+                        "/": "/portfolio/orders"
+                    },
+                    {
+                        "/": "/portfolio/fees"
+                    },
+                    {
+                        "/": "/portfolio/history"
+                    },
+                    {
+                        "/": "/portfolio/history/trades"
+                    },
+                    {
+                        "/": "/portfolio/history/transfers"
+                    },
+                    {
+                        "/": "/portfolio/history/funding"
+                    },
+                    {
+                        "/": "/rewards"
+                    },
+                    {
+                        "/": "/my-profile"
+                    },
+                    {
+                        "/": "/rankings/hedgies"
+                    },
+                    {
+                        "/": "/rankings/competition"
+                    },
+                    {
+                        "/": "/rankings/diamond"
+                    },
+                    {
+                        "/": "/rankings/platinum"
+                    },
+                    {
+                        "/": "/rankings/gold"
+                    },
+                    {
+                        "/": "/rankings/silver"
+                    },
+                    {
+                        "/": "/rankings/bronze"
+                    },
+                    {
+                        "/": "/rankings/pnl-absolute"
+                    },
+                    {
+                        "/": "/rankings/pnl-percent"
+                    },
+                    {
+                        "/": "/walletsegue",
+                        "comment": "Callback link for WalletSegue/Coinbase SDK"
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,54 @@
+:root {
+  /* Borders */
+  --default-border-width: 1px;
+
+  /* Header + footer constants */
+  --page-header-height: 2.9rem;
+  --page-header-height-mobile: 4rem;
+  --page-footer-height: 2.25rem;
+  --page-footer-height-mobile: 4.5rem;
+
+  /* Sidebar constants */
+  --sidebar-width: 20.25rem;
+  --collapsed-sidebar-width: 3.5rem;
+
+  /* Content constants */
+  --default-page-content-max-width: 80rem;
+
+  /* Trade constants */
+  --market-info-row-height: 3rem;
+  --market-info-row-height-mobile: 4.5rem;
+
+  --tabs-height: 2.75rem;
+  --tabs-height-mobile: 3.25rem;
+
+  --orderbook-trades-width: 18.75rem;
+
+  --tableHeader-height: 2.5rem;
+  --tableHeader-height-mobile: 3.25rem;
+
+  --account-info-section-height: 11.25rem;
+  --position-details-width: 23rem;
+
+  /* Auto grid constants */
+  --single-unit-min-width: 15.625rem;
+  --single-unit-max-width: 23.4375rem;
+  --single-unit-height: 9.375rem;
+
+  /* Modal constants */
+  --sidebar-modal-width: 18.75rem;
+  --modal-small-width: 18.75rem;
+  --modal-medium-width: 20.5rem;
+  --modal-large-width: 26.25rem;
+  --modal-header-height: 4rem;
+
+  /* Market Selector constants */
+  --marketsDropdown-openWidth: 45rem;
+
+  /* Form constants */
+  --form-input-gap: 0.625rem;
+  --form-input-height: 3rem;
+  --form-input-height-mobile: 3.5rem;
+  --form-input-paddingY: 0.375rem;
+  --form-input-paddingX: 0.625rem;
+}

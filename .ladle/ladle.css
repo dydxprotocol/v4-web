@@ -1,0 +1,7 @@
+:root {
+  --ladle-bg-color-primary: transparent;
+}
+
+#ladle-root {
+  height: 100vh;
+}

@@ -1,0 +1,88 @@
+/* Constants */
+
+:root {
+  --fontFamily-base: "Satoshi", system-ui, -apple-system, Helvetica, Arial, sans-serif;
+  --fontFamily-monospace: Courier, monospace, var(--fontFamily-base);
+
+  --fontWeight-base-0: 450;
+  --fontWeight-base-1: 500;
+  --fontWeight-base-2: 700;
+
+  --letter-spacing-base: -0.02em;
+
+  /* New Typography system */
+  --fontSize-tiny: 0.625rem; /* 10px/11px */
+  --fontSize-mini: 0.75rem; /* 12px/13px */
+  --fontSize-small: 0.8438rem; /* 13.5px/14.5px */
+  --fontSize-base: 0.9375rem; /* 15px/16px */
+  --fontSize-medium: 1.125rem; /* 18px/18px */
+  --fontSize-large: 1.375rem; /* 22px/22px */
+  --fontSize-extra: 1.75rem; /* 28px/25px */
+
+  --fontWeight-regular: 400;
+  --fontWeight-book: 450;
+  --fontWeight-medium: 500;
+
+  --font-tiny-regular: var(--fontWeight-regular) var(--fontSize-tiny) var(--fontFamily-base);
+  --font-tiny-book: var(--fontWeight-book) var(--fontSize-tiny) var(--fontFamily-base);
+  --font-tiny-medium: var(--fontWeight-medium) var(--fontSize-tiny) var(--fontFamily-base);
+  
+  --font-mini-regular: var(--fontWeight-regular) var(--fontSize-mini) var(--fontFamily-base);
+  --font-mini-book: var(--fontWeight-book) var(--fontSize-mini) var(--fontFamily-base);
+  --font-mini-medium: var(--fontWeight-medium) var(--fontSize-mini) var(--fontFamily-base);
+  
+  --font-small-regular: var(--fontWeight-regular) var(--fontSize-small) var(--fontFamily-base);
+  --font-small-book: var(--fontWeight-book) var(--fontSize-small) var(--fontFamily-base);
+  --font-small-medium: var(--fontWeight-medium) var(--fontSize-small) var(--fontFamily-base);
+
+  --font-base-regular: var(--fontWeight-regular) var(--fontSize-base) var(--fontFamily-base);
+  --font-base-book: var(--fontWeight-book) var(--fontSize-base) var(--fontFamily-base);
+  --font-base-medium: var(--fontWeight-medium) var(--fontSize-base) var(--fontFamily-base);
+
+  --font-medium-regular: var(--fontWeight-regular) var(--fontSize-medium) var(--fontFamily-base);
+  --font-medium-book: var(--fontWeight-book) var(--fontSize-medium) var(--fontFamily-base);
+  --font-medium-medium: var(--fontWeight-medium) var(--fontSize-medium) var(--fontFamily-base);
+
+  --font-large-regular: var(--fontWeight-regular) var(--fontSize-large) var(--fontFamily-base);
+  --font-large-book: var(--fontWeight-book) var(--fontSize-large) var(--fontFamily-base);
+  --font-large-medium: var(--fontWeight-medium) var(--fontSize-large) var(--fontFamily-base);
+
+  --font-extra-regular: var(--fontWeight-regular) var(--fontSize-extra) var(--fontFamily-base);
+  --font-extra-book: var(--fontWeight-book) var(--fontSize-extra) var(--fontFamily-base);
+  --font-extra-medium: var(--fontWeight-medium) var(--fontSize-extra) var(--fontFamily-base);
+  
+  --fontFeature-monoNumbers: 'tnum' on, 'lnum' on, 'zero' 1;
+}
+
+@media screen and (max-width: 64rem) {
+  :root {
+    --fontSize-tiny: 0.6875rem;
+    --fontSize-mini: 0.8125rem;
+    --fontSize-small: 0.9063rem;
+    --fontSize-base: 1rem;
+    --fontSize-medium: 1.125rem;
+    --fontSize-large: 1.375rem;
+    --fontSize-extra: 1.5625rem;
+  }
+}
+
+/* Global defaults */
+
+:root {
+  font-family: var(--fontFamily-base);
+  font-weight: var(--fontWeight-base-0);
+  letter-spacing: var(--letter-spacing-base);
+
+  font-size: 1em;
+  line-height: 1.3;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+* {
+  font: inherit;
+}
