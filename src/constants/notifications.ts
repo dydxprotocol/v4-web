@@ -1,4 +1,4 @@
-import { StatusResponse } from "@0xsquid/sdk";
+import { StatusResponse } from '@0xsquid/sdk';
 
 /** implemented in useNotificationTypes */
 export enum NotificationType {
@@ -11,7 +11,7 @@ export enum NotificationComponentType {}
 export type NotificationId = string | number;
 
 export type NotificationTypeConfig<
-  _NotificationId extends NotificationId = string,
+  NotificationIdType extends NotificationId = string,
   NotificationUpdateKey = any
 > = {
   type: NotificationType;
@@ -20,7 +20,7 @@ export type NotificationTypeConfig<
   useTrigger: (_: {
     trigger: (
       /** Unique ID for the triggered notification */
-      id: _NotificationId,
+      id: NotificationIdType,
 
       /** Display data for the triggered notification */
       displayData: NotificationDisplayData,
@@ -43,7 +43,7 @@ export type NotificationTypeConfig<
   }) => void;
 
   /** Callback for notification action (Toast action button click, NotificationsMenu item click, or native push notification interaction) */
-  useNotificationAction?: () => (id: _NotificationId) => any;
+  useNotificationAction?: () => (id: NotificationIdType) => any;
 };
 
 export enum NotificationStatus {
@@ -65,10 +65,10 @@ export enum NotificationStatus {
 
 /** Notification state. Serialized and cached into localStorage. */
 export type Notification<
-  _NotificationId extends NotificationId = string,
+  NotificationIdType extends NotificationId = string,
   NotificationUpdateKey = any
 > = {
-  id: _NotificationId;
+  id: NotificationIdType;
   type: NotificationType;
   status: NotificationStatus;
   timestamps: Partial<Record<NotificationStatus, number>>;

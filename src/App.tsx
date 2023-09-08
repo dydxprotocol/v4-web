@@ -10,11 +10,11 @@ import { AppRoute, DEFAULT_TRADE_ROUTE } from '@/constants/routes';
 import { useBreakpoints, useInitializePage, useShouldShowFooter, useAnalytics } from '@/hooks';
 import { DydxProvider } from '@/hooks/useDydxClient';
 import { AccountsProvider } from '@/hooks/useAccounts';
-import { DialogAreaProvider, useDialogArea } from './hooks/useDialogArea';
-import { LocaleProvider } from './hooks/useLocaleSeparators';
-import { NotificationsProvider } from './hooks/useNotifications';
-import { LocalNotificationsProvider } from './hooks/useLocalNotifications';
-import { SubaccountProvider } from './hooks/useSubaccount';
+import { DialogAreaProvider, useDialogArea } from '@/hooks/useDialogArea';
+import { LocaleProvider } from '@/hooks/useLocaleSeparators';
+import { NotificationsProvider } from '@/hooks/useNotifications';
+import { LocalNotificationsProvider } from '@/hooks/useLocalNotifications';
+import { SubaccountProvider } from '@/hooks/useSubaccount';
 import { SquidProvider } from '@/hooks/useSquid';
 
 import { GuardedMobileRoute } from '@/components/GuardedMobileRoute';
@@ -100,6 +100,7 @@ const Content = () => {
 };
 
 const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
+  // eslint-disable-next-line react/display-name
   return ({ children }: { children: React.ReactNode }) => (
     <Component {...props}>{children}</Component>
   );

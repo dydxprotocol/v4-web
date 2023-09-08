@@ -31,7 +31,7 @@ import {
 import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { shorternNumberForDisplay } from '@/lib/numbers';
+import { shortenNumberForDisplay } from '@/lib/numbers';
 
 import { PositionInfo } from '@/views/PositionInfo';
 
@@ -73,9 +73,9 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
 
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
 
-  const fillsTagNumber = shorternNumberForDisplay(showCurrentMarket ? numFills : numTotalFills);
+  const fillsTagNumber = shortenNumberForDisplay(showCurrentMarket ? numFills : numTotalFills);
 
-  const ordersTagNumber = shorternNumberForDisplay(
+  const ordersTagNumber = shortenNumberForDisplay(
     showCurrentMarket ? numOpenOrders : numTotalOpenOrders
   );
 
@@ -86,7 +86,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
         key: showCurrentMarket ? STRING_KEYS.POSITION : STRING_KEYS.POSITIONS,
       }),
 
-      tag: showCurrentMarket ? null : shorternNumberForDisplay(numTotalPositions),
+      tag: showCurrentMarket ? null : shortenNumberForDisplay(numTotalPositions),
 
       content: showCurrentMarket ? (
         <PositionInfo showNarrowVariation={isTablet} />
@@ -190,7 +190,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     //   value: InfoSection.Payments,
     //   label: stringGetter({ key: STRING_KEYS.PAYMENTS }),
 
-    //   tag: shorternNumberForDisplay(
+    //   tag: shortenNumberForDisplay(
     //     showCurrentMarket ? numFundingPayments : numTotalFundingPayments
     //   ),
     //   content: (

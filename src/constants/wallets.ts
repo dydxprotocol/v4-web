@@ -1,4 +1,6 @@
 import type { ExternalProvider } from '@ethersproject/providers';
+import { USDC_DENOM, type onboarding, DYDX_DENOM } from '@dydxprotocol/v4-client-js';
+import type { suggestChain } from 'graz';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -313,10 +315,6 @@ export type WalletConnection = {
 };
 
 // dYdX Chain wallets
-
-import { USDC_DENOM, type onboarding, DYDX_DENOM } from '@dydxprotocol/v4-client-js';
-import type { suggestChain } from 'graz';
-
 export const COSMOS_DERIVATION_PATH = "m/44'/118'/0'/0/0";
 
 /**
