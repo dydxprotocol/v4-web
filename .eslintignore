@@ -7,8 +7,6 @@ vite.config.ts
 /src/components
 /src/forms
 /src/hooks
-/src/history.ts
-/src/icons
 /src/lib
 /src/main.tsx
 /src/menus
