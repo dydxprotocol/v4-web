@@ -1,4 +1,4 @@
-import Abacus, { Nullable } from '@dydxprotocol/abacus';
+import Abacus, { Nullable } from '@dydxprotocol/v4-abacus';
 import Long from 'long';
 
 import {
@@ -84,7 +84,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
     throw new Error(`Unsupported data type: ${typeof x}`);
   }
-
 
   async transaction(
     type: TransactionTypes,

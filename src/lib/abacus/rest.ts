@@ -1,4 +1,4 @@
-import type { Nullable, kollections } from '@dydxprotocol/abacus';
+import type { Nullable, kollections } from '@dydxprotocol/v4-abacus';
 
 import type { AbacusRestProtocol } from '@/constants/abacus';
 

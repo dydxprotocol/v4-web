@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Nullable } from '@dydxprotocol/abacus';
+import { Nullable } from '@dydxprotocol/v4-abacus';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
 
@@ -270,11 +270,11 @@ Styled.FeeTable = styled(Table)`
   --table-cell-align: end;
 
   font: var(--font-base-book);
- 
+
   tbody tr {
     &[data-yours='true'] {
       background-color: var(--color-layer-3);
-      
+
       td:first-child {
         border-left: 0.125rem solid var(--color-accent);
       }

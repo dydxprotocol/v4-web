@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import type { Nullable } from '@dydxprotocol/abacus';
+import type { Nullable } from '@dydxprotocol/v4-abacus';
 import Long from 'long';
 import type { IndexedTx } from '@cosmjs/stargate';
 import type { EncodeObject, Coin } from '@cosmjs/proto-signing';

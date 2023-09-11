@@ -26,7 +26,7 @@ dependencies:
   '@cosmjs/tendermint-rpc':
     specifier: ^0.31.0
     version: 0.31.0
-  '@dydxprotocol/abacus':
+  '@dydxprotocol/v4-abacus':
     specifier: ^0.4.18
     version: 0.4.18
   '@dydxprotocol/v4-client-js':
@@ -1145,8 +1145,8 @@ packages:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
 
-  /@dydxprotocol/abacus@0.4.18:
-    resolution: {integrity: sha512-WqfgIgUPpMN2Dl2/kGARSBBgOCFrltUsVXnQOTEc4DJStCDn+7qHCfQMXSlvGMkYQE9eL5vKUOBbgyGtw/Pq1g==}
+  /@dydxprotocol/v4-abacus@0.4.18:
+    resolution: {integrity: sha512-KCASp6/a7cW1TAcV2XMOFWtzcH8TCBERvKG0cweaYzQPEVe1Rtb1RcDHkN+NjOI+czGzLJBEV2tjqP4EdDv2Mg==}
     dev: false
 
   /@dydxprotocol/v4-client-js@0.33.1:
