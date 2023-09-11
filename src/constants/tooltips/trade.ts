@@ -5,6 +5,10 @@ export const tradeTooltips: TooltipStrings = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.ACCOUNT_LEVERAGE_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.ACCOUNT_LEVERAGE_BODY }),
   }),
+  'base-position-notional': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.BASE_POSITION_NOTIONAL_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.BASE_POSITION_NOTIONAL_BODY }),
+  }),
   'bracket-sl': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.BRACKET_ORDER_SL_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.BRACKET_ORDER_SL_BODY }),
