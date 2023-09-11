@@ -29,6 +29,7 @@ export const MarketDetails: React.FC = () => {
   if (!configs) return null;
 
   const {
+    basePositionNotional,
     tickSize,
     stepSize,
     initialMarginFraction,
@@ -113,10 +114,16 @@ export const MarketDetails: React.FC = () => {
       ),
     },
     {
-      key: 'initial-margin-fraction',
-      label: stringGetter({ key: STRING_KEYS.INITIAL_MARGIN_FRACTION }),
+      key: 'base-initial-margin-fraction',
+      label: stringGetter({ key: STRING_KEYS.BASE_INITIAL_MARGIN_FRACTION }),
       tooltip: 'initial-margin-fraction',
       value: <Output useGrouping value={initialMarginFraction} type={OutputType.SmallPercent} />,
+    },
+    {
+      key: 'base-position-notional',
+      label: stringGetter({ key: STRING_KEYS.BASE_POSITION_NOTIONAL }),
+      tooltip: 'base-position-notional',
+      value: <Output useGrouping value={basePositionNotional} type={OutputType.Number} />,
     },
   ];
 
