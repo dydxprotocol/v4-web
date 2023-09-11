@@ -30,8 +30,8 @@ dependencies:
     specifier: ^0.4.18
     version: 0.4.18
   '@dydxprotocol/v4-client-js':
-    specifier: ^0.32.0
-    version: 0.32.0
+    specifier: ^0.33.1
+    version: 0.33.1
   '@dydxprotocol/v4-localization':
     specifier: ^0.1.4
     version: 0.1.4
@@ -1149,31 +1149,14 @@ packages:
     resolution: {integrity: sha512-WqfgIgUPpMN2Dl2/kGARSBBgOCFrltUsVXnQOTEc4DJStCDn+7qHCfQMXSlvGMkYQE9eL5vKUOBbgyGtw/Pq1g==}
     dev: false
 
-  /@dydxprotocol/dydxjs@0.3.0:
-    resolution: {integrity: sha512-ygNeBs0f3H7sJk1qLUjfNwaXgc5TmjD+qZf7BFDbi7+boHJI9xuOWrGpjfBo7OTUZxS6O5jZG323CgU5XqMSPw==}
-    dependencies:
-      '@babel/runtime': 7.22.10
-      '@bufbuild/buf': 1.19.0-1
-      '@cosmjs/amino': 0.30.1
-      '@cosmjs/proto-signing': 0.30.1
-      '@cosmjs/stargate': 0.30.1
-      '@cosmjs/tendermint-rpc': 0.30.1
-      osmojs: 15.5.0
-      protobufjs: 6.11.4
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - utf-8-validate
-    dev: false
-
-  /@dydxprotocol/v4-client-js@0.32.0:
-    resolution: {integrity: sha512-KvKActMgWLcsRQ7RQhpi/F8xeQ7MWUp3G5+4IPNZ4wyRwAxDSbcrfYbTetI/IesHyelRPSeYxam9eYq3wXwZ1A==}
+  /@dydxprotocol/v4-client-js@0.33.1:
+    resolution: {integrity: sha512-yFDyiG5aVo4avF5u98yz6BEmWW66SscV2RgmdDwV+LfyKfcubVqKfmv3FtuqE0WKZuzzwiCuFat7YMSK125zyQ==}
     dependencies:
       '@cosmjs/amino': 0.30.1
       '@cosmjs/proto-signing': 0.30.1
       '@cosmjs/stargate': 0.30.1
       '@cosmjs/tendermint-rpc': 0.30.1
-      '@dydxprotocol/dydxjs': 0.3.0
+      '@dydxprotocol/v4-proto': 0.1.2
       '@osmonauts/lcd': 0.6.0
       '@scure/bip32': 1.3.1
       '@scure/bip39': 1.2.1
@@ -1191,6 +1174,23 @@ packages:
 
   /@dydxprotocol/v4-localization@0.1.4:
     resolution: {integrity: sha512-wvpoP+FgiIAkqYCocRzlJXiljWfLPHg2QOB9cTajSIUYp635wphnacKwy5DnR6XByQ/H3r7BiF6Z8GDIa/d+Lw==}
+    dev: false
+
+  /@dydxprotocol/v4-proto@0.1.2:
+    resolution: {integrity: sha512-kcwdVdAexWB1nq/elFKCO4Su2ONQxBCJbN1TMeIAQiIAXxa7CnmYwdbLt4AIIxjgRhu4cHP8F6sGdwft6cjkCA==}
+    dependencies:
+      '@babel/runtime': 7.22.10
+      '@bufbuild/buf': 1.19.0-1
+      '@cosmjs/amino': 0.30.1
+      '@cosmjs/proto-signing': 0.30.1
+      '@cosmjs/stargate': 0.30.1
+      '@cosmjs/tendermint-rpc': 0.30.1
+      osmojs: 15.5.0
+      protobufjs: 6.11.4
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - utf-8-validate
     dev: false
 
   /@emotion/is-prop-valid@1.2.1:

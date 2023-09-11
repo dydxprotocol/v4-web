@@ -1,4 +1,12 @@
-# v4 Web App
+<p align="center"><img src="https://dydx.exchange/icon.svg?" width="256" /></p>
+
+<h1 align="center">v4 Web</h1>
+
+<div align="center">
+  <a href='https://github.com/dydxprotocol/v4-web/blob/main/LICENSE'>
+    <img src='https://img.shields.io/badge/License-BSL_1.1-blue' alt='License' />
+  </a>
+</div>
 
 ## Prerequisites
 
