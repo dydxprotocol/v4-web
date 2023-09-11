@@ -1,4 +1,4 @@
-import { kollections } from '@dydxprotocol/abacus';
+import { kollections } from '@dydxprotocol/v4-abacus';
 
 import type {
   AbacusApiState,

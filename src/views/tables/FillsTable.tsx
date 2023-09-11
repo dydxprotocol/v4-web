@@ -3,12 +3,12 @@ import styled, { type AnyStyledComponent, css } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { ColumnSize } from '@react-types/table';
+import { Nullable } from '@dydxprotocol/v4-abacus';
 
 import { type Asset, type SubaccountFill } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
-import { Nullable } from '@dydxprotocol/abacus';
 import { useBreakpoints, useStringGetter } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
