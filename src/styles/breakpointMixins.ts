@@ -1,4 +1,4 @@
-import styled, { css, type FlattenSimpleInterpolation } from 'styled-components';
+import { css } from 'styled-components';
 
 import breakpoints from './breakpoints';
 

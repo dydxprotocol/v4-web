@@ -7,10 +7,9 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 import { useStringGetter } from '@/hooks';
-import { LogoShortIcon } from '@/icons';
+import { LogoShortIcon, BellIcon } from '@/icons';
 
 import { Icon, IconName } from '@/components/Icon';
-import { BellIcon } from '@/icons';
 import { IconButton } from '@/components/IconButton';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { VerticalSeparator } from '@/components/Separator';

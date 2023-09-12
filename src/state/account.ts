@@ -1,5 +1,4 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import _ from 'lodash';
 
 import type {
   SubaccountFill,

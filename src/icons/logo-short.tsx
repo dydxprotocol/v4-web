@@ -1,4 +1,4 @@
-const LogoShortIcon: React.FC<{ id?: string }> = ({ id }) => (
+const LogoShortIcon: React.FC<{ id?: string }> = ({ id }: { id?: string }) => (
   <svg
     width="135"
     height="145"

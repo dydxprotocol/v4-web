@@ -48,7 +48,7 @@ export const isNumber = (value: any): value is number =>
 /**
  * @description Returns null if input is 0 or null, '99+' if input is greater than 99, otherwise original input number
  */
-export const shorternNumberForDisplay = (num?: number) =>
+export const shortenNumberForDisplay = (num?: number) =>
   MustBigNumber(num).eq(0) ? null : MustBigNumber(num).gt(99) ? '99+' : num;
 
 /**

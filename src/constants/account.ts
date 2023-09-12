@@ -1,18 +1,5 @@
-/**
- * OnboardingSteps
- * 1. Choose between 3 options
- *  a. Ethereum EOA (current)
- *  b. Keplr or Other Cosmos (future)
- *  c. Social (future)
- * 2. Key derivation
- *  a. If wallet has no dYdX Chain transactions and not on whitelist, sign twice (future)
- *   i. Success
- *   ii. Signatures don't match error (Wallet is non-deterministic)
- *  b. Success
- * 3. Post Registration items (Only on first onboarding)
- *  a. Acknowledge Terms
- *  b. DepositFunds
- */
+import type { DydxAddress, EvmAddress } from './wallets';
+
 export enum OnboardingSteps {
   ChooseWallet = 'ChooseWallet',
   KeyDerivation = 'KeyDerivation',
@@ -49,14 +36,12 @@ export enum EvmDerivedAccountStatus {
   Derived,
 }
 
-import type { DydxAddress, EvmAddress } from './wallets';
-
 export type EvmDerivedAddresses = {
   version?: string;
   [EvmAddress: EvmAddress]: {
     encryptedSignature?: string;
     dydxAddress?: DydxAddress;
   };
-}
+};
 
 export const AMOUNT_RESERVED_FOR_GAS_USDC = 100_000;

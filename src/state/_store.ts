@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 
+import abacusStateManager from '@/lib/abacus';
 import appMiddleware from './appMiddleware';
 import localizationMiddleware from './localizationMiddleware';
 import routerMiddleware from './routerMiddleware';
@@ -15,8 +16,6 @@ import { layoutSlice } from './layout';
 import { localizationSlice } from './localization';
 import { navigationSlice } from './navigation';
 import { perpetualsSlice } from './perpetuals';
-
-import abacusStateManager from '@/lib/abacus';
 
 export const commandMenuSlices = [layoutSlice, localizationSlice];
 

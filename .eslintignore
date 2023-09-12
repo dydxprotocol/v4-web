@@ -5,15 +5,10 @@ vite.config.ts
 
 # Temporarily ignore, we will slowly remove each directory as we fix files to follow ESLint rules
 /src/components
-/src/dialogs
 /src/forms
 /src/hooks
-/src/history.ts
-/src/icons
 /src/lib
 /src/main.tsx
 /src/menus
 /src/pages
-/src/state
-/src/styles
 /src/views

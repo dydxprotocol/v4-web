@@ -6,8 +6,6 @@ import {
   type ThemeProps,
 } from 'styled-components';
 
-import breakpoints from './breakpoints';
-
 export const layoutMixins: Record<
   string,
   FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>

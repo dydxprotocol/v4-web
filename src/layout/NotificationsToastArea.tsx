@@ -15,12 +15,20 @@ type StyleProps = {
 };
 
 export const NotificationsToastArea = ({ className }: StyleProps) => {
-  const { notifications, getKey, getDisplayData, markUnseen, markSeen, isMenuOpen, onNotificationAction } = useNotifications();
+  const {
+    notifications,
+    getKey,
+    getDisplayData,
+    markUnseen,
+    markSeen,
+    isMenuOpen,
+    onNotificationAction,
+  } = useNotifications();
 
   const { isMobile } = useBreakpoints();
 
   return (
-    <$ToastArea swipeDirection={isMobile ? 'up' : 'right'} className={className}>
+    <StyledToastArea swipeDirection={isMobile ? 'up' : 'right'} className={className}>
       {Object.values(notifications)
         // Sort by time of first trigger
         .sort(
@@ -53,19 +61,20 @@ export const NotificationsToastArea = ({ className }: StyleProps) => {
             sensitivity={displayData.toastSensitivity}
             setIsOpen={(isOpen, isClosedFromTimeout) => {
               if (!isOpen)
-                // Toast timer expired without user interaction
-                if (isClosedFromTimeout) markUnseen(notification);
+                if (isClosedFromTimeout)
+                  // Toast timer expired without user interaction
+                  markUnseen(notification);
                 // Toast interacted with or dismissed
                 else markSeen(notification);
             }}
             lastUpdated={notification.timestamps[notification.status]}
           />
         ))}
-    </$ToastArea>
+    </StyledToastArea>
   );
 };
 
-const $ToastArea = styled(ToastArea)`
+const StyledToastArea = styled(ToastArea)`
   position: absolute;
   width: min(16rem, 100%);
   inset: 0 0 0 auto;

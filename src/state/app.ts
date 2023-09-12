@@ -47,9 +47,5 @@ export const appSlice = createSlice({
   },
 });
 
-export const {
-  initializeLocalization,
-  initializeWebsocket,
-  setApiState,
-  setSelectedNetwork,
-} = appSlice.actions;
+export const { initializeLocalization, initializeWebsocket, setApiState, setSelectedNetwork } =
+  appSlice.actions;

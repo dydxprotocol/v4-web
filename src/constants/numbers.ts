@@ -1,5 +1,3 @@
-import { getSeparator } from '@/lib/numbers';
-
 export const USD_DECIMALS = 2;
 export const SMALL_USD_DECIMALS = 4;
 
