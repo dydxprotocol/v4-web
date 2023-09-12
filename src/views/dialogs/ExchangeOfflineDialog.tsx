@@ -29,8 +29,12 @@ export const ExchangeOfflineDialog = ({ preventClose, setIsOpen }: ElementProps)
   const { status, statusErrorMessage } = useApiState();
   const selectedNetwork = useSelector(getSelectedNetwork);
 
+  const showTestnetMaintenanceMessage =
+    import.meta.env.MODE === 'production' &&
+    CLIENT_NETWORK_CONFIGS[selectedNetwork].dydxChainId === 'dydx-testnet-2';
+
   useEffect(() => {
-    if (status === AbacusApiStatus.NORMAL) {
+    if (status === AbacusApiStatus.NORMAL && !showTestnetMaintenanceMessage) {
       dispatch(closeDialog());
     }
   }, [status, selectedNetwork]);
@@ -43,11 +47,15 @@ export const ExchangeOfflineDialog = ({ preventClose, setIsOpen }: ElementProps)
       title={stringGetter({ key: STRING_KEYS.UNAVAILABLE })}
     >
       <Styled.Content>
-        <p>{statusErrorMessage}</p>
-        {CLIENT_NETWORK_CONFIGS[selectedNetwork].dydxChainId === 'dydx-testnet-2' && (
-          <Styled.Link href="https://status.v4testnet.dydx.exchange">
-            {stringGetter({ key: STRING_KEYS.LEARN_MORE })} {UNICODE.ARROW_RIGHT}
-          </Styled.Link>
+        {showTestnetMaintenanceMessage ? (
+          <>
+            <p>Testnet is currently shutdown for maintenance. Please check back!</p>
+            <Styled.Link href="https://v4-teacher.vercel.app/testnets/schedule">
+              {stringGetter({ key: STRING_KEYS.LEARN_MORE })} {UNICODE.ARROW_RIGHT}
+            </Styled.Link>
+          </>
+        ) : (
+          <p>{statusErrorMessage}</p>
         )}
         {import.meta.env.MODE !== 'production' && <NetworkSelectMenu />}
       </Styled.Content>
