@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
-import { useDispatch, useSelector } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import { AbacusApiStatus } from '@/constants/abacus';
+import { DialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
 import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
 import { UNICODE } from '@/constants/unicode';
-
-import { STRING_KEYS } from '@/constants/localization';
 import { useApiState, useStringGetter } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -17,6 +17,7 @@ import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
 import { closeDialog } from '@/state/dialogs';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
+import { getActiveDialog } from '@/state/dialogsSelectors';
 
 type ElementProps = {
   preventClose?: boolean;
@@ -28,13 +29,18 @@ export const ExchangeOfflineDialog = ({ preventClose, setIsOpen }: ElementProps)
   const stringGetter = useStringGetter();
   const { status, statusErrorMessage } = useApiState();
   const selectedNetwork = useSelector(getSelectedNetwork);
+  const activeDialog = useSelector(getActiveDialog, shallowEqual);
 
   const showTestnetMaintenanceMessage =
     import.meta.env.MODE === 'production' &&
     CLIENT_NETWORK_CONFIGS[selectedNetwork].dydxChainId === 'dydx-testnet-2';
 
   useEffect(() => {
-    if (status === AbacusApiStatus.NORMAL && !showTestnetMaintenanceMessage) {
+    if (
+      activeDialog?.type === DialogTypes.ExchangeOffline &&
+      status === AbacusApiStatus.NORMAL &&
+      !showTestnetMaintenanceMessage
+    ) {
       dispatch(closeDialog());
     }
   }, [status, selectedNetwork]);

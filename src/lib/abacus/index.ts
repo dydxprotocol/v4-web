@@ -46,6 +46,7 @@ class AbacusStateManager {
   websocket: AbacusWebsocket;
   stateNotifier: AbacusStateNotifier;
   abacusFormatter: AbacusFormatter;
+  chainTransactionClient: AbacusChainTransaction;
 
   constructor() {
     this.store = undefined;
@@ -53,12 +54,13 @@ class AbacusStateManager {
     this.stateNotifier = new AbacusStateNotifier();
     this.websocket = new AbacusWebsocket();
     this.abacusFormatter = new AbacusFormatter();
+    this.chainTransactionClient = new AbacusChainTransaction();
 
     const ioImplementations = new IOImplementations(
       // @ts-ignore
       new AbacusRest(),
       this.websocket,
-      new AbacusChainTransaction(),
+      this.chainTransactionClient,
       null,
       new AbacusThreading(),
       new CoroutineTimer(),
@@ -155,6 +157,7 @@ class AbacusStateManager {
   setStore = (store: RootStore) => {
     this.store = store;
     this.stateNotifier.setStore(store);
+    this.chainTransactionClient.setStore(store);
   };
 
   setAccount = (walletAddress: string) => {

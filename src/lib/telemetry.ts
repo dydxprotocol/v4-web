@@ -1,5 +1,7 @@
 export const log = (location: string, error: Error, metadata?: any) => {
-  // console.warn(error);
+  if (import.meta.env.MODE !== 'production') {
+    console.warn('telemetry/log:', { location, error, metadata });
+  }
 
   const customEvent = new CustomEvent('dydx:log', {
     detail: {
@@ -16,7 +18,10 @@ export const log = (location: string, error: Error, metadata?: any) => {
 globalThis.addEventListener('unhandledrejection', (event) => {
   event.preventDefault();
 
-  log('window/onunhandledrejection', new Error(`Promise rejected and uncaught; reason: ${event.reason}`));
+  log(
+    'window/onunhandledrejection',
+    new Error(`Promise rejected and uncaught; reason: ${event.reason}`)
+  );
 });
 
 // Log rejected Promises that are caught late (handler attached at a later time)
@@ -25,7 +30,10 @@ globalThis.addEventListener(
   (event) => {
     event.preventDefault();
 
-    log('window/onrejectionhandled', new Error(`Promise rejected and caught late; reason: ${event.reason}`));
+    log(
+      'window/onrejectionhandled',
+      new Error(`Promise rejected and caught late; reason: ${event.reason}`)
+    );
   },
   false
 );
