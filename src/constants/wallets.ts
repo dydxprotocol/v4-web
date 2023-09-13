@@ -339,19 +339,19 @@ export type EvmAddress = `0x${string}`;
 export type DydxAddress = `dydx${string}`;
 
 export const DYDX_CHAIN_INFO: Parameters<typeof suggestChain>[0] = {
-  rpc: 'https://dydx-testnet-archive.allthatnode.com:26657',
-  rest: 'https://dydx-testnet-archive.allthatnode.com:1317',
+  rpc: 'https://rpc-dydx-testnet.keplr.app',
+  rest: 'https://lcd-dydx-testnet.keplr.app',
   chainId: 'dydx-testnet-3',
-  chainName: 'dYdX Public Testnet',
+  chainName: 'dydx Testnet',
   chainSymbolImageUrl:
-    'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/dydx-testnet-3/chain.png',
+    'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/dydx-testnet/chain.png',
   bech32Config: {
-    bech32PrefixAccPub: 'dydxpub',
-    bech32PrefixValPub: 'dydxvaloperpub',
     bech32PrefixAccAddr: 'dydx',
-    bech32PrefixConsPub: 'dydxvalconspub',
+    bech32PrefixAccPub: 'dydxpub',
     bech32PrefixValAddr: 'dydxvaloper',
+    bech32PrefixValPub: 'dydxvaloperpub',
     bech32PrefixConsAddr: 'dydxvalcons',
+    bech32PrefixConsPub: 'dydxvalconspub',
   },
   bip44: {
     coinType: 118,
@@ -366,11 +366,6 @@ export const DYDX_CHAIN_INFO: Parameters<typeof suggestChain>[0] = {
       coinDenom: 'DV4TNT',
       coinDecimals: 6,
       coinMinimalDenom: 'dv4tnt',
-    },
-    {
-      coinDenom: 'USDC',
-      coinMinimalDenom: 'ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5',
-      coinDecimals: 6,
     },
   ],
   feeCurrencies: [
