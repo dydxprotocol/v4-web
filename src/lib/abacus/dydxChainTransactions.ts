@@ -15,14 +15,24 @@ import {
   type QueryTypes,
   type TransactionTypes,
 } from '@/constants/abacus';
+import { DialogTypes } from '@/constants/dialogs';
+
+import { RootStore } from '@/state/_store';
+import { openDialog } from '@/state/dialogs';
 
 import { log } from '../telemetry';
 
 class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   private compositeClient: CompositeClient | undefined;
+  private store: RootStore | undefined;
 
   constructor() {
     this.compositeClient = undefined;
+    this.store = undefined;
+  }
+
+  setStore(store: RootStore): void {
+    this.store = store;
   }
 
   async connectNetwork(
@@ -33,30 +43,41 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     faucetUrl: Nullable<string> | undefined,
     callback: (p0: Nullable<string>) => void
   ): Promise<void> {
-    this.compositeClient = await CompositeClient.connect(
-      new Network(
-        chainId,
-        new IndexerConfig(indexerUrl, indexerSocketUrl),
-        new ValidatorConfig(validatorUrl, chainId, {
-          broadcastPollIntervalMs: 3_000,
-          broadcastTimeoutMs: 60_000,
-        })
-      )
-    );
+    try {
+      const compositeClient = await CompositeClient.connect(
+        new Network(
+          chainId,
+          new IndexerConfig(indexerUrl, indexerSocketUrl),
+          new ValidatorConfig(validatorUrl, chainId, {
+            broadcastPollIntervalMs: 3_000,
+            broadcastTimeoutMs: 60_000,
+          })
+        )
+      );
 
-    // Dispatch custom event to notify other parts of the app that the network has been connected
-    const customEvent = new CustomEvent('abacus:connectNetwork', {
-      detail: {
-        indexerUrl,
-        indexerSocketUrl,
-        validatorUrl,
-        chainId,
-        faucetUrl,
-      },
-    });
+      this.compositeClient = compositeClient;
 
-    globalThis.dispatchEvent(customEvent);
-    callback(JSON.stringify({ success: true }));
+      // Dispatch custom event to notify other parts of the app that the network has been connected
+      const customEvent = new CustomEvent('abacus:connectNetwork', {
+        detail: {
+          indexerUrl,
+          indexerSocketUrl,
+          validatorUrl,
+          chainId,
+          faucetUrl,
+        },
+      });
+
+      globalThis.dispatchEvent(customEvent);
+      callback(JSON.stringify({ success: true }));
+    } catch (error) {
+      this.store?.dispatch(
+        openDialog({ type: DialogTypes.ExchangeOffline, dialogProps: { preventClose: true } })
+      );
+
+      log('DydxChainTransactions/connectNetwork', error);
+      return;
+    }
   }
 
   parseToPrimitives<T>(x: T): T {

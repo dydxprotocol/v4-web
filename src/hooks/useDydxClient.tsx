@@ -114,7 +114,7 @@ const useDydxClientContext = () => {
     }): Promise<Candle[]> => {
       try {
         const { candles } =
-          (await compositeClient!.indexerClient.markets.getPerpetualMarketCandles(
+          (await compositeClient?.indexerClient.markets.getPerpetualMarketCandles(
             marketId,
             RESOLUTION_MAP[resolution],
             fromIso,
