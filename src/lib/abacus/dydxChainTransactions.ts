@@ -29,7 +29,6 @@ import { RootStore } from '@/state/_store';
 import { openDialog } from '@/state/dialogs';
 
 import { log } from '../telemetry';
-import { Sub } from '@radix-ui/react-navigation-menu';
 
 class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   private compositeClient: CompositeClient | undefined;
