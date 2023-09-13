@@ -155,7 +155,9 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
     }
   }
 
-  lastOrderChanged(order: SubaccountOrder) {}
+  lastOrderChanged(order: SubaccountOrder) {
+    console.log('lastOrderChanged', order);
+  }
 
   errorsEmitted(errors: ParsingErrors) {
     console.error('parse errors', errors.toArray());

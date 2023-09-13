@@ -1,3 +1,5 @@
+import { LocalWallet } from '@dydxprotocol/v4-client-js';
+
 import type {
   ClosePositionInputFields,
   Nullable,
@@ -6,6 +8,7 @@ import type {
   TradeInputFields,
   TransferInputFields,
   HistoricalPnlPeriods,
+  ParsingError,
 } from '@/constants/abacus';
 
 import {
@@ -46,7 +49,7 @@ class AbacusStateManager {
   websocket: AbacusWebsocket;
   stateNotifier: AbacusStateNotifier;
   abacusFormatter: AbacusFormatter;
-  chainTransactionClient: AbacusChainTransaction;
+  chainTransactions: AbacusChainTransaction;
 
   constructor() {
     this.store = undefined;
@@ -54,13 +57,13 @@ class AbacusStateManager {
     this.stateNotifier = new AbacusStateNotifier();
     this.websocket = new AbacusWebsocket();
     this.abacusFormatter = new AbacusFormatter();
-    this.chainTransactionClient = new AbacusChainTransaction();
+    this.chainTransactions = new AbacusChainTransaction();
 
     const ioImplementations = new IOImplementations(
       // @ts-ignore
       new AbacusRest(),
       this.websocket,
-      this.chainTransactionClient,
+      this.chainTransactions,
       null,
       new AbacusThreading(),
       new CoroutineTimer(),
@@ -157,11 +160,14 @@ class AbacusStateManager {
   setStore = (store: RootStore) => {
     this.store = store;
     this.stateNotifier.setStore(store);
-    this.chainTransactionClient.setStore(store);
+    this.chainTransactions.setStore(store);
   };
 
-  setAccount = (walletAddress: string) => {
-    this.stateManager.accountAddress = walletAddress;
+  setAccount = (localWallet?: LocalWallet) => {
+    if (localWallet) {
+      this.stateManager.accountAddress = localWallet.address;
+      this.chainTransactions.setLocalWallet(localWallet);
+    }
   };
 
   setTransfersSourceAddress = (evmAddress: string) => {
@@ -218,6 +224,14 @@ class AbacusStateManager {
   }) => {
     this.stateManager.transferStatus(hash, fromChainId, toChainId);
   };
+
+  // ------ Transactions ------ //
+
+  placeOrder = (callback: (p0: boolean, p1: Nullable<ParsingError>) => void) =>
+    this.stateManager.commitPlaceOrder(callback);
+
+  closePosition = (callback: (p0: boolean, p1: Nullable<ParsingError>) => void) =>
+    this.stateManager.commitClosePosition(callback);
 
   // ------ Utils ------ //
   placeOrderPayload = (): Nullable<HumanReadablePlaceOrderPayload> =>

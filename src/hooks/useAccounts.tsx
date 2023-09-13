@@ -8,10 +8,7 @@ import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/co
 import { LocalStorageKey, LOCAL_STORAGE_VERSIONS } from '@/constants/localStorage';
 import { DydxAddress, EvmAddress, PrivateInformation } from '@/constants/wallets';
 
-import {
-  setOnboardingState,
-  setOnboardingGuard,
-} from '@/state/account';
+import { setOnboardingState, setOnboardingGuard } from '@/state/account';
 
 import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
@@ -222,9 +219,9 @@ const useAccountsContext = () => {
   // abacus
   // TODO: useAbacus({ dydxAddress })
   useEffect(() => {
-    if (dydxAddress) abacusStateManager.setAccount(dydxAddress);
+    if (dydxAddress) abacusStateManager.setAccount(localDydxWallet);
     else abacusStateManager.attemptDisconnectAccount();
-  }, [dydxAddress]);
+  }, [localDydxWallet]);
 
   // clear subaccounts when no dydxAddress is set
   useEffect(() => {

@@ -22,6 +22,7 @@ import {
 import type {
   HumanReadableCancelOrderPayload,
   HumanReadablePlaceOrderPayload,
+  ParsingError,
   SubAccountHistoricalPNLs,
 } from '@/constants/abacus';
 
@@ -470,96 +471,102 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       onError?: (onErrorParams?: { errorStringKey?: string }) => void;
       onSuccess?: () => void;
     }) => {
-      let orderParams: Nullable<HumanReadablePlaceOrderPayload>;
+      const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
+        console.log({ success, parsingError });
+      };
 
-      if (!subaccountClient) return;
-
-      try {
-        orderParams = isClosePosition
-          ? abacusStateManager.closePositionPayload()
-          : abacusStateManager.placeOrderPayload();
-
-        if (!orderParams) {
-          throw new Error('Missing order params');
-        }
-
-        const {
-          marketId,
-          type,
-          side,
-          price,
-          triggerPrice,
-          size,
-          clientId,
-          timeInForce,
-          goodTilTimeInSeconds,
-          execution,
-          postOnly,
-          reduceOnly,
-        } = orderParams;
-
-        dispatch(addUncommittedOrderClientId(clientId));
-
-        // Remove uncommitted order after timeout if it hasn't already been removed
-        setTimeout(() => {
-          dispatch(removeUncommittedOrderClientId(clientId));
-        }, UNCOMMITTED_ORDER_TIMEOUT);
-
-        console.log('useSubaccount/placeOrder', {
-          ...orderParams,
-        });
-
-        const response = await placeOrderForSubaccount({
-          subaccount: subaccountClient,
-          marketId,
-          type: type as OrderType,
-          side: side as OrderSide,
-          price,
-          triggerPrice,
-          size,
-          clientId,
-          timeInForce: timeInForce as OrderTimeInForce,
-          goodTilTimeInSeconds: goodTilTimeInSeconds ?? 0,
-          execution: execution as OrderExecution,
-          postOnly,
-          reduceOnly,
-        });
-
-        // Handle Stateful orders
-        if ((response as IndexedTx)?.code !== 0) {
-          throw new StatefulOrderError('Stateful order has failed to commit.', response);
-        }
-
-        if (orderParams?.clientId) {
-          dispatch(removeUncommittedOrderClientId(orderParams.clientId));
-        }
-
-        if (response?.hash) {
-          console.log(
-            isClosePosition
-              ? 'useSubaccount/closePosition'
-              : 'useSubaccount/placeOrderForSubaccount',
-            {
-              txHash: Buffer.from(response.hash).toString('hex').toUpperCase(),
-            }
-          );
-        }
-
-        track(AnalyticsEvent.TradePlaceOrder, {
-          ...orderParams,
-          isClosePosition,
-        } as HumanReadablePlaceOrderPayload & { isClosePosition: boolean });
-        onSuccess?.();
-      } catch (error) {
-        const errorCode: number | undefined = error?.code;
-        const errorStringKey = errorCode ? ORDER_ERROR_CODE_MAP[errorCode] : undefined;
-        onError?.({ errorStringKey });
-
-        log('useSubaccount/placeOrder', error, {
-          orderParams,
-          isClosePosition,
-        });
+      if (isClosePosition) {
+        abacusStateManager.closePosition(callback);
+      } else {
+        abacusStateManager.placeOrder(callback);
       }
+
+      // try {
+      //   orderParams = isClosePosition
+      //     ? abacusStateManager.closePositionPayload()
+      //     : abacusStateManager.placeOrderPayload();
+
+      //   if (!orderParams) {
+      //     throw new Error('Missing order params');
+      //   }
+
+      //   const {
+      //     marketId,
+      //     type,
+      //     side,
+      //     price,
+      //     triggerPrice,
+      //     size,
+      //     clientId,
+      //     timeInForce,
+      //     goodTilTimeInSeconds,
+      //     execution,
+      //     postOnly,
+      //     reduceOnly,
+      //   } = orderParams;
+
+      // dispatch(addUncommittedOrderClientId(clientId));
+
+      // // Remove uncommitted order after timeout if it hasn't already been removed
+      // setTimeout(() => {
+      //   dispatch(removeUncommittedOrderClientId(clientId));
+      // }, UNCOMMITTED_ORDER_TIMEOUT);
+
+      // console.log('useSubaccount/placeOrder', {
+      //   ...orderParams,
+      // });
+
+      // const response = await placeOrderForSubaccount({
+      //   subaccount: subaccountClient,
+      //   marketId,
+      //   type: type as OrderType,
+      //   side: side as OrderSide,
+      //   price,
+      //   triggerPrice,
+      //   size,
+      //   clientId,
+      //   timeInForce: timeInForce as OrderTimeInForce,
+      //   goodTilTimeInSeconds: goodTilTimeInSeconds ?? 0,
+      //   execution: execution as OrderExecution,
+      //   postOnly,
+      //   reduceOnly,
+      // });
+
+      // Handle Stateful orders
+      // if ((response as IndexedTx)?.code !== 0) {
+      //   throw new StatefulOrderError('Stateful order has failed to commit.', response);
+      // }
+
+      // if (orderParams?.clientId) {
+      //   dispatch(removeUncommittedOrderClientId(orderParams.clientId));
+      // }
+
+      // if (response?.hash) {
+      //   console.log(
+      //     isClosePosition
+      //       ? 'useSubaccount/closePosition'
+      //       : 'useSubaccount/placeOrderForSubaccount',
+      //     {
+      //       txHash: Buffer.from(response.hash).toString('hex').toUpperCase(),
+      //     }
+      //   );
+      // }
+
+      // track(AnalyticsEvent.TradePlaceOrder, {
+      //   ...orderParams,
+      //   isClosePosition,
+      // } as HumanReadablePlaceOrderPayload & { isClosePosition: boolean });
+      //   onSuccess?.();
+      // } catch (error) {
+      //   const errorCode: number | undefined = error?.code;
+      //   const errorStringKey = errorCode ? ORDER_ERROR_CODE_MAP[errorCode] : undefined;
+      //   onError?.({ errorStringKey });
+
+      //   log('useSubaccount/placeOrder', error, {
+      //     orderParams,
+      //     isClosePosition,
+      //   });
+      // }
     },
     [subaccountClient, placeOrderForSubaccount]
   );
