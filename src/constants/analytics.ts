@@ -162,6 +162,8 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
         /** URL/IP of node the order was sent to */
         validatorUrl: string;
       }
+    : T extends AnalyticsEvent.TradeCancelOrder
+    ? {}
     : T extends AnalyticsEvent.TradeCancelOrderConfirmed
     ? {
         /** roundtrip time between user canceling an order and confirmation from indexer (client → validator → indexer → client) */

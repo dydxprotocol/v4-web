@@ -7,7 +7,7 @@ import type { EncodeObject, Coin } from '@cosmjs/proto-signing';
 import { Method } from '@cosmjs/tendermint-rpc';
 
 import {
-  LocalWallet,
+  type LocalWallet,
   SubaccountClient,
   DYDX_DENOM,
   USDC_DENOM,
@@ -411,7 +411,6 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
         if (success) {
           track(AnalyticsEvent.TradeCancelOrder);
-
           onSuccess?.();
         } else {
           onError?.({ errorStringKey: parsingError?.stringKey });

@@ -1,4 +1,4 @@
-import { LocalWallet } from '@dydxprotocol/v4-client-js';
+import type { LocalWallet } from '@dydxprotocol/v4-client-js';
 
 import type {
   ClosePositionInputFields,
