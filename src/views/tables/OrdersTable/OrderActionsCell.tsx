@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useCallback, useEffect, useState } from 'react';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { AbacusOrderStatus, type OrderStatus } from '@/constants/abacus';
@@ -12,6 +12,7 @@ import { IconButton } from '@/components/IconButton';
 import { Toolbar } from '@/components/Toolbar';
 
 import { clearOrder } from '@/state/account';
+import { getSubaccountOrderById } from '@/state/accountSelectors';
 
 import { isOrderStatusClearable } from '@/lib/orders';
 
@@ -29,8 +30,7 @@ export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) 
 
   const onCancel = useCallback(async () => {
     setIsCanceling(true);
-    await cancelOrder({ orderId });
-    setIsCanceling(false);
+    await cancelOrder({ orderId, onError: () => setIsCanceling(false) });
   }, []);
 
   return (

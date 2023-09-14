@@ -215,13 +215,11 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       switch (type) {
         case TransactionType.PlaceOrder: {
           const result = await this.placeOrderTransaction(params);
-          console.log(result);
           callback(result);
           break;
         }
         case TransactionType.CancelOrder: {
           const result = await this.cancelOrderTransaction(params);
-          console.log(result);
           callback(result);
           break;
         }
