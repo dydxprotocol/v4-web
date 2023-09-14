@@ -21,6 +21,7 @@ import {
   setFills,
   setFundingPayments,
   setHistoricalPnl,
+  setLatestOrder,
   setSubaccount,
   setTransfers,
   setWallet,
@@ -156,7 +157,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   }
 
   lastOrderChanged(order: SubaccountOrder) {
-    console.log('lastOrderChanged', order);
+    this.store?.dispatch(setLatestOrder(order));
   }
 
   errorsEmitted(errors: ParsingErrors) {

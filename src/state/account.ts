@@ -28,6 +28,7 @@ export type AccountState = {
   hasUnseenFillUpdates: boolean;
   hasUnseenOrderUpdates: boolean;
   historicalPnl?: SubAccountHistoricalPNLs;
+  latestOrder?: Nullable<SubaccountOrder>;
   onboardingGuards: Record<OnboardingGuard, boolean | undefined>;
   onboardingState: OnboardingState;
   subaccount?: Nullable<Subaccount>;
@@ -45,6 +46,7 @@ const initialState: AccountState = {
   hasUnseenFillUpdates: false,
   hasUnseenOrderUpdates: false,
   historicalPnl: undefined,
+  latestOrder: undefined,
   onboardingGuards: {
     [OnboardingGuard.hasAcknowledgedTerms]: Boolean(
       getLocalStorage<boolean>({
@@ -85,6 +87,9 @@ export const accountSlice = createSlice({
     },
     setTransfers: (state, action: PayloadAction<any>) => {
       state.transfers = action.payload;
+    },
+    setLatestOrder: (state, action: PayloadAction<Nullable<SubaccountOrder>>) => {
+      state.latestOrder = action.payload;
     },
     clearOrder: (state, action: PayloadAction<string>) => ({
       ...state,
@@ -154,6 +159,7 @@ export const {
   setFills,
   setFundingPayments,
   setTransfers,
+  setLatestOrder,
   clearOrder,
   setOnboardingGuard,
   setOnboardingState,

@@ -7,6 +7,7 @@ import { AlertType } from '@/constants/alerts';
 
 import {
   ErrorType,
+  Nullable,
   TradeInputErrorAction,
   TradeInputField,
   ValidationError,
@@ -101,6 +102,8 @@ export const TradeForm = ({
   const currentInput = useSelector(getCurrentInput);
   const { tickSizeDecimals, stepSizeDecimals } =
     useSelector(getCurrentMarketConfig, shallowEqual) || {};
+  // const latestOrder = useSelector((state) => state.account.latestOrder);
+  // console.log(latestOrder);
 
   const needsAdvancedOptions =
     needsGoodUntil || timeInForceOptions || executionOptions || needsPostOnly || needsReduceOnly;
@@ -171,7 +174,7 @@ export const TradeForm = ({
     setIsPlacingOrder(true);
 
     await placeOrder({
-      onError: (errorParams?: { errorStringKey?: string }) => {
+      onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
         setPlaceOrderError(
           stringGetter({ key: errorParams?.errorStringKey || STRING_KEYS.SOMETHING_WENT_WRONG })
         );

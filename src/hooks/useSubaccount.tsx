@@ -28,7 +28,6 @@ import type {
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
 import { AnalyticsEvent } from '@/constants/analytics';
-import { ORDER_ERROR_CODE_MAP } from '@/constants/localization';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { UNCOMMITTED_ORDER_TIMEOUT } from '@/constants/trade';
 import { DydxAddress } from '@/constants/wallets';
@@ -468,11 +467,23 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       onSuccess,
     }: {
       isClosePosition?: boolean;
-      onError?: (onErrorParams?: { errorStringKey?: string }) => void;
+      onError?: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
       onSuccess?: () => void;
     }) => {
       const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
-        console.log({ success, parsingError });
+        const params: Nullable<HumanReadablePlaceOrderPayload | HumanReadableCancelOrderPayload> =
+          abacusStateManager[isClosePosition ? 'closePositionPayload' : 'placeOrderPayload']();
+
+        if (success) {
+          track(AnalyticsEvent.TradePlaceOrder, {
+            ...params,
+            isClosePosition,
+          } as HumanReadablePlaceOrderPayload & { isClosePosition: boolean });
+
+          onSuccess?.();
+        } else {
+          onError?.({ errorStringKey: parsingError?.stringKey });
+        }
       };
 
       if (isClosePosition) {
@@ -576,7 +587,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       onError,
       onSuccess,
     }: {
-      onError: (onErrorParams?: { errorStringKey?: string }) => void;
+      onError: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
       onSuccess?: () => void;
     }) => await placeOrder({ isClosePosition: true, onError, onSuccess }),
     [placeOrder]

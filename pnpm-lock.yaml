@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@0xsquid/sdk':
     specifier: ^1.10.0
@@ -29,8 +33,8 @@ dependencies:
     specifier: ^0.33.1
     version: 0.33.1
   '@dydxprotocol/v4-localization':
-    specifier: ^0.1.5
-    version: 0.1.5
+    specifier: ^0.1.7
+    version: 0.1.7
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -1168,8 +1172,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@0.1.5:
-    resolution: {integrity: sha512-fiSHWrG8E2HuXkCzWsqyekntlI13hBRACrP0vaYudeSulw+ScGeAqZ5xp9/cANF6PP+H3z1yciNCZOH3OwSDwA==}
+  /@dydxprotocol/v4-localization@0.1.7:
+    resolution: {integrity: sha512-ACF/hQUD1PYwRMV69eByovM+mCjjzygtdAWEI1CZ9QGgYf6VhAEEWWcjXuuMm907m0YPjVGd7ZplouJf5giuBQ==}
     dev: false
 
   /@dydxprotocol/v4-proto@0.1.2:
@@ -14279,7 +14283,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false

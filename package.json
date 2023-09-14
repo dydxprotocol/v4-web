@@ -39,7 +39,7 @@
     "@cosmjs/tendermint-rpc": "^0.31.0",
     "@dydxprotocol/v4-abacus": "^0.4.20",
     "@dydxprotocol/v4-client-js": "^0.33.1",
-    "@dydxprotocol/v4-localization": "^0.1.5",
+    "@dydxprotocol/v4-localization": "^0.1.7",
     "@ethersproject/providers": "^5.7.2",
     "@js-joda/core": "^5.5.3",
     "@radix-ui/react-collapsible": "^1.0.3",

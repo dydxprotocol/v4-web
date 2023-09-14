@@ -1,5 +1,6 @@
-import Abacus, { Nullable } from '@dydxprotocol/v4-abacus';
+import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
 import Long from 'long';
+import type { IndexedTx } from '@cosmjs/stargate';
 
 import {
   CompositeClient,
@@ -21,7 +22,7 @@ import {
   type QueryTypes,
   TransactionType,
   type TransactionTypes,
-  HumanReadablePlaceOrderPayload,
+  type HumanReadablePlaceOrderPayload,
 } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 
@@ -29,6 +30,7 @@ import { RootStore } from '@/state/_store';
 import { openDialog } from '@/state/dialogs';
 
 import { log } from '../telemetry';
+import { StatefulOrderError } from '../errors';
 
 class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   private compositeClient: CompositeClient | undefined;
@@ -119,42 +121,57 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     throw new Error(`Unsupported data type: ${typeof x}`);
   }
 
-  async placeOrderTransaction(params: HumanReadablePlaceOrderPayload) {
-    if (!this.compositeClient || !this.localWallet) return;
+  async placeOrderTransaction(params: HumanReadablePlaceOrderPayload): Promise<string> {
+    if (!this.compositeClient || !this.localWallet)
+      throw new Error('Missing compositeClient or localWallet');
 
-    const {
-      subaccountNumber,
-      marketId,
-      type,
-      side,
-      price,
-      size,
-      clientId,
-      timeInForce,
-      goodTilTimeInSeconds,
-      execution,
-      postOnly,
-      reduceOnly,
-      triggerPrice,
-    } = params || {};
+    try {
+      const {
+        subaccountNumber,
+        marketId,
+        type,
+        side,
+        price,
+        size,
+        clientId,
+        timeInForce,
+        goodTilTimeInSeconds,
+        execution,
+        postOnly,
+        reduceOnly,
+        triggerPrice,
+      } = params || {};
 
-    const order = await this.compositeClient?.placeOrder(
-      new SubaccountClient(this.localWallet, subaccountNumber),
-      marketId,
-      type as OrderType,
-      side as OrderSide,
-      price,
-      size,
-      clientId,
-      timeInForce as OrderTimeInForce,
-      goodTilTimeInSeconds ?? 0,
-      execution as OrderExecution,
-      postOnly,
-      reduceOnly,
-      triggerPrice ?? undefined
-    );
+      const tx = await this.compositeClient?.placeOrder(
+        new SubaccountClient(this.localWallet, subaccountNumber),
+        marketId,
+        type as OrderType,
+        side as OrderSide,
+        price,
+        size,
+        clientId,
+        timeInForce as OrderTimeInForce,
+        goodTilTimeInSeconds ?? 0,
+        execution as OrderExecution,
+        postOnly,
+        reduceOnly,
+        triggerPrice ?? undefined
+      );
 
-    console.log(order, params);
+      // Handle stateful orders
+      if ((tx as IndexedTx)?.code !== 0) {
+        throw new StatefulOrderError('Stateful order has failed to commit.', tx);
+      }
+
+      const hash = tx?.hash && Buffer.from(tx.hash).toString('hex').toUpperCase();
+      return JSON.stringify(tx);
+    } catch (error) {
+      log('DydxChainTransactions/placeOrderTransaction', error);
+
+      return JSON.stringify({
+        error,
+      });
+    }
   }
 
   async transaction(
@@ -162,14 +179,14 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     paramsInJson: Abacus.Nullable<string>,
     callback: (p0: Abacus.Nullable<string>) => void
   ): Promise<void> {
-    console.log({ type, paramsInJson, callback });
     try {
       const params = paramsInJson ? JSON.parse(paramsInJson) : undefined;
 
       switch (type) {
         case TransactionType.PlaceOrder: {
-          await this.placeOrderTransaction(params);
-          callback('success');
+          const result = await this.placeOrderTransaction(params);
+          console.log(result);
+          callback(result);
           break;
         }
         default: {
