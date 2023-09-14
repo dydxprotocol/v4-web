@@ -71,6 +71,7 @@ export enum AnalyticsEvent {
 
   // Transfers
   TransferFaucet = 'TransferFaucet',
+  TransferFaucetConfirmed = 'TransferFaucetConfirmed',
   TransferDeposit = 'TransferDeposit',
   TransferWithdraw = 'TransferWithdraw',
 
@@ -133,6 +134,13 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
     : // Transfers
     T extends AnalyticsEvent.TransferFaucet
     ? {}
+    : T extends AnalyticsEvent.TransferFaucetConfirmed
+    ? {
+        /** roundtrip time between user placing an order and confirmation from indexer (client → validator → indexer → client) */
+        roundtripMs: number;
+        /** URL/IP of node the order was sent to */
+        validatorUrl: string;
+      }
     : T extends AnalyticsEvent.TransferDeposit
     ? {}
     : T extends AnalyticsEvent.TransferWithdraw
@@ -151,13 +159,13 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
         /** roundtrip time between user placing an order and confirmation from indexer (client → validator → indexer → client) */
         roundtripMs: number;
         /** URL/IP of node the order was sent to */
-        validator: string;
+        validatorUrl: string;
       }
     : T extends AnalyticsEvent.TradeCancelOrderConfirmed
     ? {
         /** roundtrip time between user canceling an order and confirmation from indexer (client → validator → indexer → client) */
         roundtripMs: number;
         /** URL/IP of node the order was sent to */
-        validator: string;
+        validatorUrl: string;
       }
     : never;

@@ -33,6 +33,7 @@ import { getInputTradeOptions } from '@/state/inputsSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import AbacusRest from './rest';
+import AbacusAnalytics from './analytics';
 import AbacusWebsocket from './websocket';
 import AbacusChainTransaction from './dydxChainTransactions';
 import AbacusStateNotifier from './stateNotification';
@@ -48,6 +49,7 @@ class AbacusStateManager {
   stateManager: InstanceType<typeof AsyncAbacusStateManager>;
   websocket: AbacusWebsocket;
   stateNotifier: AbacusStateNotifier;
+  analytics: AbacusAnalytics;
   abacusFormatter: AbacusFormatter;
   chainTransactions: AbacusChainTransaction;
 
@@ -55,6 +57,7 @@ class AbacusStateManager {
     this.store = undefined;
     this.currentMarket = undefined;
     this.stateNotifier = new AbacusStateNotifier();
+    this.analytics = new AbacusAnalytics();
     this.websocket = new AbacusWebsocket();
     this.abacusFormatter = new AbacusFormatter();
     this.chainTransactions = new AbacusChainTransaction();
@@ -64,7 +67,7 @@ class AbacusStateManager {
       new AbacusRest(),
       this.websocket,
       this.chainTransactions,
-      null,
+      this.analytics,
       new AbacusThreading(),
       new CoroutineTimer(),
       new AbacusFileSystem()
