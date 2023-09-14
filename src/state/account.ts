@@ -24,7 +24,6 @@ export type AccountState = {
   fundingPayments?: SubaccountFundingPayments;
   transfers?: SubaccountTransfers;
   clearedOrderIds?: string[];
-  uncommittedOrderClientIds?: number[];
   hasUnseenFillUpdates: boolean;
   hasUnseenOrderUpdates: boolean;
   historicalPnl?: SubAccountHistoricalPNLs;
@@ -42,7 +41,6 @@ const initialState: AccountState = {
   fundingPayments: undefined,
   transfers: undefined,
   clearedOrderIds: undefined,
-  uncommittedOrderClientIds: undefined,
   hasUnseenFillUpdates: false,
   hasUnseenOrderUpdates: false,
   historicalPnl: undefined,
@@ -136,16 +134,6 @@ export const accountSlice = createSlice({
       ...state,
       wallet: action.payload,
     }),
-    addUncommittedOrderClientId: (state, action: PayloadAction<number>) => {
-      state.uncommittedOrderClientIds = state.uncommittedOrderClientIds
-        ? [...state.uncommittedOrderClientIds, action.payload]
-        : [action.payload];
-    },
-    removeUncommittedOrderClientId: (state, action: PayloadAction<number>) => {
-      state.uncommittedOrderClientIds = state.uncommittedOrderClientIds?.filter(
-        (clientId) => clientId !== action.payload
-      );
-    },
     viewedFills: (state) => {
       state.hasUnseenFillUpdates = false;
     },
@@ -166,8 +154,6 @@ export const {
   setHistoricalPnl,
   setSubaccount,
   setWallet,
-  addUncommittedOrderClientId,
-  removeUncommittedOrderClientId,
   viewedFills,
   viewedOrders,
 } = accountSlice.actions;

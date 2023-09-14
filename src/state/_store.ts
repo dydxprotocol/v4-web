@@ -4,7 +4,6 @@ import abacusStateManager from '@/lib/abacus';
 import appMiddleware from './appMiddleware';
 import localizationMiddleware from './localizationMiddleware';
 import routerMiddleware from './routerMiddleware';
-import tradeMiddleware from './tradeMiddleware';
 
 import { accountSlice } from './account';
 import { appSlice } from './app';
@@ -40,7 +39,6 @@ export const store = configureStore({
     appMiddleware,
     localizationMiddleware,
     routerMiddleware,
-    tradeMiddleware,
   ],
 
   devTools: process.env.NODE_ENV !== 'production',

@@ -12,7 +12,6 @@ import { IconButton } from '@/components/IconButton';
 import { Toolbar } from '@/components/Toolbar';
 
 import { clearOrder } from '@/state/account';
-import { getSubaccountOrderById } from '@/state/accountSelectors';
 
 import { isOrderStatusClearable } from '@/lib/orders';
 

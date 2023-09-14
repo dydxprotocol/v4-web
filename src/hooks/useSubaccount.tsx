@@ -8,7 +8,6 @@ import { Method } from '@cosmjs/tendermint-rpc';
 
 import {
   LocalWallet,
-  OrderFlags,
   SubaccountClient,
   DYDX_DENOM,
   USDC_DENOM,
@@ -31,7 +30,6 @@ import { setSubaccount, setHistoricalPnl } from '@/state/account';
 
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics';
-import { StatefulOrderError } from '@/lib/errors';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 
@@ -407,7 +405,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       onSuccess,
     }: {
       orderId: string;
-      onError?: ({ errorMsg }?: { errorMsg?: Nullable<string> }) => void;
+      onError?: ({ errorStringKey }?: { errorStringKey?: Nullable<string> }) => void;
       onSuccess?: () => void;
     }) => {
       const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
@@ -416,7 +414,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
           onSuccess?.();
         } else {
-          console.log(parsingError);
+          onError?.({ errorStringKey: parsingError?.stringKey });
         }
       };
 

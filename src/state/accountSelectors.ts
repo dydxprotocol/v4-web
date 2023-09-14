@@ -80,6 +80,12 @@ export const getSubaccountOrders = (state: RootState) =>
 
 /**
  * @param state
+ * @returns latestOrder of the currently connected subaccount throughout this session
+ */
+export const getLatestOrder = (state: RootState) => state.account?.latestOrder;
+
+/**
+ * @param state
  * @returns list of order ids that user has cleared and should be hidden
  */
 export const getSubaccountClearedOrderIds = (state: RootState) => state.account.clearedOrderIds;
@@ -115,7 +121,20 @@ export const getSubaccountOpenOrdersBySideAndPrice = createSelector(
 );
 
 /**
- * @param state
+ * @returns the id of the latest order
+ */
+export const getLatestOrderId = createSelector([getLatestOrder], (order) => order?.id);
+
+/**
+ * @returns the rawValue status of the latest order
+ */
+export const getLatestOrderStatus = createSelector(
+  [getLatestOrder],
+  (order) => order?.status.rawValue
+);
+
+/**
+ * @param orderId
  * @returns order details with the given orderId
  */
 export const getOrderDetails = (orderId: string) =>
@@ -282,21 +301,6 @@ export const getIsAccountConnected = (state: RootState) =>
  * @returns OnboardingGuards (Record of boolean items) to aid in determining what Onboarding Step the user is on.
  */
 export const getOnboardingGuards = (state: RootState) => state.account.onboardingGuards;
-
-/**
- * @param state
- * @returns a boolean indicating whether the user has uncommitted orders
- */
-export const calculateHasUncommittedOrders = (state: RootState) => {
-  return !!state.account.uncommittedOrderClientIds?.length;
-};
-
-/**
- * @param state
- * @returns List of uncommitted order clientIds
- */
-export const getUncommittedOrderClientIds = (state: RootState) =>
-  state.account.uncommittedOrderClientIds;
 
 /**
  * @param state

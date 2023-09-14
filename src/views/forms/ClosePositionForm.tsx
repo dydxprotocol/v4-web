@@ -2,7 +2,7 @@ import { type FormEvent, useEffect, useState } from 'react';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
-import { ClosePositionInputField, type Nullable } from '@/constants/abacus';
+import { AbacusOrderStatus, ClosePositionInputField, type Nullable } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
@@ -28,8 +28,9 @@ import { Orderbook, orderbookMixins, type OrderbookScrollBehavior } from '@/view
 import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
 
 import {
-  calculateHasUncommittedOrders,
   getCurrentMarketPositionData,
+  getLatestOrderId,
+  getLatestOrderStatus,
 } from '@/state/accountSelectors';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
@@ -82,8 +83,9 @@ export const ClosePositionForm = ({
   const { stepSizeDecimals } = useSelector(getCurrentMarketConfig, shallowEqual) || {};
   const { size: sizeData, summary } = useSelector(getInputClosePositionData, shallowEqual) || {};
   const { size, percent } = sizeData || {};
-  const hasUncommittedOrders = useSelector(calculateHasUncommittedOrders);
   const currentInput = useSelector(getCurrentInput);
+  const latestOrderStatus = useSelector(getLatestOrderStatus) ?? '';
+  const latestOrderId = useSelector(getLatestOrderId);
 
   const currentPositionData = useSelector(getCurrentMarketPositionData, shallowEqual);
   const { size: currentPositionSize } = currentPositionData || {};
@@ -108,15 +110,25 @@ export const ClosePositionForm = ({
 
   useEffect(() => {
     // close has been placed
-    if (!isFirstRender && !hasUncommittedOrders) {
+    if (
+      !isFirstRender &&
+      [
+        AbacusOrderStatus.open.rawValue,
+        AbacusOrderStatus.filled.rawValue,
+        AbacusOrderStatus.untriggered.rawValue,
+        AbacusOrderStatus.canceling.rawValue,
+      ].includes(latestOrderStatus)
+    ) {
       abacusStateManager.clearClosePositionInputValues({ shouldFocusOnTradeInput: true });
       onClosePositionSuccess?.();
 
       if (currentStep === MobilePlaceOrderSteps.PlacingOrder) {
         setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
       }
+
+      setIsClosingPosition(false);
     }
-  }, [hasUncommittedOrders]);
+  }, [currentStep, latestOrderId, latestOrderStatus]);
 
   const onAmountInput = ({ floatValue }: { floatValue?: number }) => {
     if (currentSize == null) return;
@@ -169,10 +181,9 @@ export const ClosePositionForm = ({
         setClosePositionError(
           stringGetter({ key: errorParams?.errorStringKey || STRING_KEYS.SOMETHING_WENT_WRONG })
         );
+        setIsClosingPosition(false);
       },
     });
-
-    setIsClosingPosition(false);
   };
 
   const alertMessage = closePositionError && (

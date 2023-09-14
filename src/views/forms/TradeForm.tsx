@@ -6,6 +6,7 @@ import type { NumberFormatValues, SourceInfo } from 'react-number-format';
 import { AlertType } from '@/constants/alerts';
 
 import {
+  AbacusOrderStatus,
   ErrorType,
   Nullable,
   TradeInputErrorAction,
@@ -35,7 +36,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { Orderbook } from '@/views/tables/Orderbook';
 
-import { calculateHasUncommittedOrders } from '@/state/accountSelectors';
+import { getLatestOrderId, getLatestOrderStatus } from '@/state/accountSelectors';
 import { getCurrentInput, useTradeFormData } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
@@ -98,12 +99,11 @@ export const TradeForm = ({
   } = useTradeFormData();
 
   const { limitPrice, triggerPrice, trailingPercent } = price || {};
-  const hasUncommittedOrders = useSelector(calculateHasUncommittedOrders);
   const currentInput = useSelector(getCurrentInput);
   const { tickSizeDecimals, stepSizeDecimals } =
     useSelector(getCurrentMarketConfig, shallowEqual) || {};
-  // const latestOrder = useSelector((state) => state.account.latestOrder);
-  // console.log(latestOrder);
+  const latestOrderStatus = useSelector(getLatestOrderStatus) ?? '';
+  const latestOrderId = useSelector(getLatestOrderId);
 
   const needsAdvancedOptions =
     needsGoodUntil || timeInForceOptions || executionOptions || needsPostOnly || needsReduceOnly;
@@ -158,16 +158,20 @@ export const TradeForm = ({
   };
 
   useEffect(() => {
-    // order has been placed
     if (
       (!currentStep || currentStep === MobilePlaceOrderSteps.PlacingOrder) &&
-      !hasUncommittedOrders
+      [
+        AbacusOrderStatus.open.rawValue,
+        AbacusOrderStatus.filled.rawValue,
+        AbacusOrderStatus.untriggered.rawValue,
+        AbacusOrderStatus.canceling.rawValue,
+      ].includes(latestOrderStatus)
     ) {
       setIsPlacingOrder(false);
       abacusStateManager.clearTradeInputValues({ shouldResetSize: true });
       setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
     }
-  }, [currentStep, hasUncommittedOrders]);
+  }, [currentStep, latestOrderStatus, latestOrderId]);
 
   const onPlaceOrder = async () => {
     setPlaceOrderError(undefined);

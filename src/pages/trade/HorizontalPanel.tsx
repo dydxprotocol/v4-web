@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
+import { AbacusOrderStatus } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
@@ -21,10 +22,10 @@ import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/Position
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 
 import {
-  calculateHasUncommittedOrders,
   getCurrentMarketTradeInfoNumbers,
   getHasUnseenFillUpdates,
   getHasUnseenOrderUpdates,
+  getLatestOrderStatus,
   getTradeInfoNumbers,
 } from '@/state/accountSelectors';
 
@@ -69,7 +70,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const hasUnseenOrderUpdates = useSelector(getHasUnseenOrderUpdates);
   const hasUnseenFillUpdates = useSelector(getHasUnseenFillUpdates);
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
-  const hasUncommittedOrders = useSelector(calculateHasUncommittedOrders);
+  const latestOrderStatus = useSelector(getLatestOrderStatus);
 
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
 
@@ -118,15 +119,16 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
       value: InfoSection.Orders,
       label: stringGetter({ key: STRING_KEYS.ORDERS }),
 
-      slotRight: hasUncommittedOrders ? (
-        <Styled.LoadingSpinner />
-      ) : (
-        ordersTagNumber && (
-          <Tag type={TagType.Number} isHighlighted={hasUnseenOrderUpdates}>
-            {ordersTagNumber}
-          </Tag>
-        )
-      ),
+      slotRight:
+        latestOrderStatus === AbacusOrderStatus.pending.rawValue ? (
+          <Styled.LoadingSpinner />
+        ) : (
+          ordersTagNumber && (
+            <Tag type={TagType.Number} isHighlighted={hasUnseenOrderUpdates}>
+              {ordersTagNumber}
+            </Tag>
+          )
+        ),
 
       content: (
         <OrdersTable
