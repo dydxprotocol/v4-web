@@ -236,6 +236,9 @@ class AbacusStateManager {
   closePosition = (callback: (p0: boolean, p1: Nullable<ParsingError>) => void) =>
     this.stateManager.commitClosePosition(callback);
 
+  cancelOrder = (orderId: string, callback: (p0: boolean, p1: Nullable<ParsingError>) => void) =>
+    this.stateManager.cancelOrder(orderId, callback);
+
   // ------ Utils ------ //
   placeOrderPayload = (): Nullable<HumanReadablePlaceOrderPayload> =>
     this.stateManager.placeOrderPayload();

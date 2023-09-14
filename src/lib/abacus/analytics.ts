@@ -6,6 +6,7 @@ import { log as telemetryLog } from '../telemetry';
 
 class AbacusAnalytics implements AbacusTrackingProtocol {
   log(event: string, data: Nullable<string>) {
+    console.log('AbacusAnalytics/log', event, data);
     try {
       const parsedData = data ? JSON.parse(data) : {};
       track(event as AnalyticsEvent, parsedData);

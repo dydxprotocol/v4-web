@@ -23,7 +23,9 @@ import {
   TransactionType,
   type TransactionTypes,
   type HumanReadablePlaceOrderPayload,
+  type HumanReadableCancelOrderPayload,
 } from '@/constants/abacus';
+
 import { DialogTypes } from '@/constants/dialogs';
 
 import { RootStore } from '@/state/_store';
@@ -174,6 +176,34 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     }
   }
 
+  async cancelOrderTransaction(params: HumanReadableCancelOrderPayload): Promise<string> {
+    if (!this.compositeClient || !this.localWallet) {
+      throw new Error('Missing compositeClient or localWallet');
+    }
+
+    const { subaccountNumber, clientId, orderFlags, clobPairId, goodTilBlock, goodTilBlockTime } =
+      params ?? {};
+
+    try {
+      const tx = await this.compositeClient?.cancelOrder(
+        new SubaccountClient(this.localWallet, subaccountNumber),
+        clientId,
+        orderFlags,
+        clobPairId,
+        goodTilBlock ?? undefined,
+        goodTilBlockTime ?? undefined
+      );
+
+      return JSON.stringify(tx);
+    } catch (error) {
+      log('DydxChainTransactions/cancelOrderTransaction', error);
+
+      return JSON.stringify({
+        error,
+      });
+    }
+  }
+
   async transaction(
     type: TransactionTypes,
     paramsInJson: Abacus.Nullable<string>,
@@ -185,6 +215,12 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       switch (type) {
         case TransactionType.PlaceOrder: {
           const result = await this.placeOrderTransaction(params);
+          console.log(result);
+          callback(result);
+          break;
+        }
+        case TransactionType.CancelOrder: {
+          const result = await this.cancelOrderTransaction(params);
           console.log(result);
           callback(result);
           break;

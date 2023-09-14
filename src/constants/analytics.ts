@@ -79,6 +79,7 @@ export enum AnalyticsEvent {
   TradeOrderTypeSelected = 'TradeOrderTypeSelected',
   TradePlaceOrder = 'TradePlaceOrder',
   TradePlaceOrderConfirmed = 'TradePlaceOrderConfirmed',
+  TradeCancelOrder = 'TradeCancelOrder',
   TradeCancelOrderConfirmed = 'TradeCancelOrderConfirmed',
 }
 

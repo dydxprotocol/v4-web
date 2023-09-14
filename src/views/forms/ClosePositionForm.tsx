@@ -2,7 +2,7 @@ import { type FormEvent, useEffect, useState } from 'react';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
-import { ClosePositionInputField } from '@/constants/abacus';
+import { ClosePositionInputField, type Nullable } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
@@ -165,7 +165,7 @@ export const ClosePositionForm = ({
     setIsClosingPosition(true);
 
     await closePosition({
-      onError: (errorParams?: { errorStringKey?: string }) => {
+      onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
         setClosePositionError(
           stringGetter({ key: errorParams?.errorStringKey || STRING_KEYS.SOMETHING_WENT_WRONG })
         );
