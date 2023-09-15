@@ -18,6 +18,7 @@ import { type Candle, RESOLUTION_MAP } from '@/constants/candles';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { log } from '@/lib/telemetry';
+import { DydxAddress, EvmAddress } from '@/constants/wallets';
 
 type DydxContextType = ReturnType<typeof useDydxClientContext>;
 const DydxContext = createContext<DydxContextType>({} as DydxContextType);
@@ -178,6 +179,17 @@ const useDydxClientContext = () => {
     [requestCandles]
   );
 
+  const screenAddress = useCallback(
+    async ({ address }: { address: DydxAddress | EvmAddress }) => {
+      try {
+        return await compositeClient?.indexerClient.utility.screen(address);
+      } catch (error) {
+        log('useDydxClient/screenAddress', error);
+      }
+    },
+    [compositeClient]
+  );
+
   // ------ Subacount Methods ------ //
 
   return {
@@ -192,5 +204,6 @@ const useDydxClientContext = () => {
 
     // Public Methods
     getCandlesForDatafeed,
+    screenAddress,
   };
 };
