@@ -30,11 +30,11 @@ dependencies:
     specifier: ^0.4.28
     version: 0.4.28
   '@dydxprotocol/v4-client-js':
-    specifier: ^0.35.0
-    version: 0.35.0
+    specifier: ^0.36.1
+    version: 0.36.1
   '@dydxprotocol/v4-localization':
-    specifier: ^0.1.5
-    version: 0.1.5
+    specifier: ^0.1.8
+    version: 0.1.8
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -983,8 +983,8 @@ packages:
     resolution: {integrity: sha512-RQGTXI7q4HAXDmlUpDhpJDLN8C0dFMgKHzFITK1Sz3KnLb3mkkpqEU1D8VIn/hB7ngt+equMsLFSkUwzXCzgdA==}
     dev: false
 
-  /@dydxprotocol/v4-client-js@0.35.0:
-    resolution: {integrity: sha512-H+0/tOBVqyWx2JQ4jUFdJOlFof0NqN1u9vzKJ2h3Nv5KNteSPd59eiywoz+3J0jlmkREw0Jzg9CS0bLwzYVLvA==}
+  /@dydxprotocol/v4-client-js@0.36.1:
+    resolution: {integrity: sha512-KJ3MtWI61wmm+xZtXQd7/hYKIoVFG32TRdyyVaXXO8vpW9Oqd0JD8QSM/wuegkciAh5YmP/BrDzYuu77zHO6yg==}
     dependencies:
       '@cosmjs/amino': 0.30.1
       '@cosmjs/encoding': 0.31.1
@@ -1010,8 +1010,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@0.1.5:
-    resolution: {integrity: sha512-fiSHWrG8E2HuXkCzWsqyekntlI13hBRACrP0vaYudeSulw+ScGeAqZ5xp9/cANF6PP+H3z1yciNCZOH3OwSDwA==}
+  /@dydxprotocol/v4-localization@0.1.8:
+    resolution: {integrity: sha512-ZuM/V2tLVSWyi9pDZLOu8h6HScrzKlFftQ/1iBPNIOU4bBMx83vYgokm0X9hzueWzz0PJ2pzT+EoN81sPlN2bg==}
     dev: false
 
   /@dydxprotocol/v4-proto@0.2.1:
