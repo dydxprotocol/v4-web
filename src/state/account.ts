@@ -28,6 +28,7 @@ export type AccountState = {
   hasUnseenFillUpdates: boolean;
   hasUnseenOrderUpdates: boolean;
   historicalPnl?: SubAccountHistoricalPNLs;
+  isGeoBlocked?: boolean;
   onboardingGuards: Record<OnboardingGuard, boolean | undefined>;
   onboardingState: OnboardingState;
   subaccount?: Nullable<Subaccount>;
@@ -45,6 +46,7 @@ const initialState: AccountState = {
   hasUnseenFillUpdates: false,
   hasUnseenOrderUpdates: false,
   historicalPnl: undefined,
+  isGeoBlocked: false,
   onboardingGuards: {
     [OnboardingGuard.hasAcknowledgedTerms]: Boolean(
       getLocalStorage<boolean>({
@@ -109,6 +111,9 @@ export const accountSlice = createSlice({
         state.historicalPnl = action.payload;
       }
     },
+    setIsGeoBlocked: (state, action: PayloadAction<boolean>) => {
+      state.isGeoBlocked = action.payload;
+    },
     setSubaccount: (state, action: PayloadAction<Nullable<Subaccount>>) => {
       const existingOrderIds = state.subaccount?.orders
         ? state.subaccount.orders.toArray().map((order) => order.id)
@@ -158,6 +163,7 @@ export const {
   setOnboardingGuard,
   setOnboardingState,
   setHistoricalPnl,
+  setIsGeoBlocked,
   setSubaccount,
   setWallet,
   addUncommittedOrderClientId,

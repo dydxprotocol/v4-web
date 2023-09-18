@@ -5,20 +5,21 @@ import { AES, enc } from 'crypto-js';
 import { LocalWallet, USDC_DENOM, type Subaccount } from '@dydxprotocol/v4-client-js';
 
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
+import { DialogTypes } from '@/constants/dialogs';
 import { LocalStorageKey, LOCAL_STORAGE_VERSIONS } from '@/constants/localStorage';
 import { DydxAddress, EvmAddress, PrivateInformation } from '@/constants/wallets';
 
 import { setOnboardingState, setOnboardingGuard } from '@/state/account';
+import { openDialog } from '@/state/dialogs';
+
+import { UnauthorizedReason } from '@/views/dialogs/UnauthorizedDialog';
 
 import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
 
-import { useLocalStorage } from './useLocalStorage';
-
-import { useWalletConnection } from './useWalletConnection';
 import { useDydxClient } from './useDydxClient';
-import { useNavigate } from 'react-router-dom';
-import { AppRoute } from '@/constants/routes';
+import { useLocalStorage } from './useLocalStorage';
+import { useWalletConnection } from './useWalletConnection';
 
 const AccountsContext = createContext<ReturnType<typeof useAccountsContext> | undefined>(undefined);
 
@@ -187,11 +188,11 @@ const useAccountsContext = () => {
   }) => {
     if (evmAddress) {
       const response = await screenAddress({ address: evmAddress });
-      console.log('evm', response);
+      console.log('evm', response, evmAddress);
       setIsRestricted(response?.restricted);
     } else if (dydxAddress) {
       const response = await screenAddress({ address: dydxAddress });
-      console.log('cosmos', response);
+      console.log('cosmos', response, dydxAddress);
       setIsRestricted(response?.restricted);
     }
   };
@@ -208,14 +209,16 @@ const useAccountsContext = () => {
     }
   }, [isRestricted, evmAddress, dydxAddress, compositeClient]);
 
-  const navigate = useNavigate();
-
   useEffect(() => {
-    console.log(isRestricted);
     if (isRestricted) {
-      navigate(AppRoute.Unavailable);
+      dispatch(
+        openDialog({
+          type: DialogTypes.Unauthorized,
+          dialogProps: { reason: UnauthorizedReason.ELLIPTIC },
+        })
+      );
     }
-  }, [isRestricted]);
+  }, [isRestricted, evmAddress, dydxAddress]);
 
   useEffect(() => {
     (async () => {

@@ -64,17 +64,22 @@ export type NetworkConfig = {
 
 export type ConnectNetworkEvent = CustomEvent<Partial<NetworkConfig>>;
 
-// ------ State ------
+// ------ State ------ //
 export type AbacusApiState = Abacus.exchange.dydx.abacus.state.app.ApiState;
 export const AbacusApiStatus = Abacus.exchange.dydx.abacus.state.app.ApiStatus;
-const abacusApiStatuses = [...AbacusApiStatus.values()];
+const abacusApiStatuses = [...AbacusApiStatus.values()] as const;
 export type AbacusApiStatuses = (typeof abacusApiStatuses)[number];
 export const Changes = Abacus.exchange.dydx.abacus.state.changes.Changes;
 export type PerpetualStateChanges = Abacus.exchange.dydx.abacus.state.changes.StateChanges;
 export const AsyncAbacusStateManager =
   Abacus.exchange.dydx.abacus.state.manager.AsyncAbacusStateManager;
+
+// ------ Parsing Errors ------ //
 export type ParsingError = Abacus.exchange.dydx.abacus.responses.ParsingError;
 export type ParsingErrors = kollections.List<ParsingError>;
+export const ParsingErrorType = Abacus.exchange.dydx.abacus.responses.ParsingErrorType;
+const parsingErrorTypes = [...ParsingErrorType.values()] as const;
+export type ParsingErrorTypes = (typeof parsingErrorTypes)[number];
 
 // ------ Perpetuals/Markets ------ //
 export type PerpetualState = Abacus.exchange.dydx.abacus.output.PerpetualState;

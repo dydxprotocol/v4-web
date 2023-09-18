@@ -17,6 +17,7 @@ import { OnboardingDialog } from '@/views/dialogs/OnboardingDialog';
 import { ReceiveDialog } from '@/views/dialogs/ReceiveDialog';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
+import { UnauthorizedDialog } from '@/views/dialogs/UnauthorizedDialog';
 import { WithdrawDialog } from '@/views/dialogs/WithdrawDialog';
 
 import { OrderDetailsDialog } from '@/views/dialogs/DetailsDialog/OrderDetailsDialog';
@@ -54,6 +55,7 @@ export const DialogManager = () => {
     [DialogTypes.Receive]: <ReceiveDialog {...modalProps} />,
     [DialogTypes.Trade]: <TradeDialog {...modalProps} />,
     [DialogTypes.Transfer]: <TransferDialog {...modalProps} />,
+    [DialogTypes.Unauthorized]: <UnauthorizedDialog {...modalProps} />,
     [DialogTypes.Withdraw]: <WithdrawDialog {...modalProps} />,
   }[type];
 };
