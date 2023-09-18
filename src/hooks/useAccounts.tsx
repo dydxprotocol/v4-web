@@ -8,10 +8,7 @@ import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/co
 import { LocalStorageKey, LOCAL_STORAGE_VERSIONS } from '@/constants/localStorage';
 import { DydxAddress, EvmAddress, PrivateInformation } from '@/constants/wallets';
 
-import {
-  setOnboardingState,
-  setOnboardingGuard,
-} from '@/state/account';
+import { setOnboardingState, setOnboardingGuard } from '@/state/account';
 
 import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
@@ -20,6 +17,8 @@ import { useLocalStorage } from './useLocalStorage';
 
 import { useWalletConnection } from './useWalletConnection';
 import { useDydxClient } from './useDydxClient';
+import { useNavigate } from 'react-router-dom';
+import { AppRoute } from '@/constants/routes';
 
 const AccountsContext = createContext<ReturnType<typeof useAccountsContext> | undefined>(undefined);
 
@@ -60,7 +59,9 @@ const useAccountsContext = () => {
       forgetEvmSignature(previousEvmAddress);
     }
 
-    if (evmAddress) abacusStateManager.setTransfersSourceAddress(evmAddress);
+    if (evmAddress) {
+      abacusStateManager.setTransfersSourceAddress(evmAddress);
+    }
 
     setPreviousEvmAddress(evmAddress);
   }, [evmAddress]);
@@ -125,7 +126,7 @@ const useAccountsContext = () => {
   };
 
   // dYdXClient Onboarding & Account Helpers
-  const { compositeClient, getWalletFromEvmSignature } = useDydxClient();
+  const { compositeClient, getWalletFromEvmSignature, screenAddress } = useDydxClient();
   // dYdX subaccounts
   const [dydxSubaccounts, setDydxSubaccounts] = useState<Subaccount[] | undefined>();
 
@@ -160,6 +161,7 @@ const useAccountsContext = () => {
   // dYdX wallet / onboarding state
   const [localDydxWallet, setLocalDydxWallet] = useState<LocalWallet>();
   const [hdKey, setHdKey] = useState<PrivateInformation>();
+  const [isRestricted, setIsRestricted] = useState<boolean>();
 
   const dydxAccounts = useMemo(() => localDydxWallet?.accounts, [localDydxWallet]);
 
@@ -176,11 +178,44 @@ const useAccountsContext = () => {
     setHdKey({ mnemonic, privateKey, publicKey });
   };
 
+  const checkIfAddressIsHighRisk = async ({
+    evmAddress,
+    dydxAddress,
+  }: {
+    evmAddress?: EvmAddress;
+    dydxAddress?: DydxAddress;
+  }) => {
+    if (evmAddress) {
+      const response = await screenAddress({ address: evmAddress });
+      console.log('evm', response);
+      setIsRestricted(response?.restricted);
+    } else if (dydxAddress) {
+      const response = await screenAddress({ address: dydxAddress });
+      console.log('cosmos', response);
+      setIsRestricted(response?.restricted);
+    }
+  };
+
   useEffect(() => {
     if (evmAddress) {
       saveEvmDerivedAccount({ evmAddress, dydxAddress });
     }
   }, [evmAddress, dydxAddress]);
+
+  useEffect(() => {
+    if (compositeClient && isRestricted === undefined && (evmAddress || dydxAddress)) {
+      checkIfAddressIsHighRisk({ evmAddress, dydxAddress });
+    }
+  }, [isRestricted, evmAddress, dydxAddress, compositeClient]);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log(isRestricted);
+    if (isRestricted) {
+      navigate(AppRoute.Unavailable);
+    }
+  }, [isRestricted]);
 
   useEffect(() => {
     (async () => {

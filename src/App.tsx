@@ -22,6 +22,7 @@ import { GuardedMobileRoute } from '@/components/GuardedMobileRoute';
 import MarketsPage from '@/pages/markets/Markets';
 import PortfolioPage from '@/pages/portfolio/Portfolio';
 import { AlertsPage } from '@/pages/AlertsPage';
+import { GeoPage } from '@/pages/Geo';
 import ProfilePage from '@/pages/Profile';
 import { SettingsPage } from '@/pages/settings/Settings';
 import TradePage from '@/pages/trade/Trade';
@@ -81,6 +82,8 @@ const Content = () => {
             <Route element={<GuardedMobileRoute />}>
               <Route path={`${AppRoute.Portfolio}/*`} element={<PortfolioPage />} />
             </Route>
+
+            <Route element={<GeoPage />} path={AppRoute.Unavailable} />
             <Route path="*" element={<Navigate to={DEFAULT_TRADE_ROUTE} replace />} />
           </Routes>
         </Suspense>
