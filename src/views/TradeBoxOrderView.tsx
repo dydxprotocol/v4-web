@@ -49,7 +49,6 @@ const useTradeTypeOptions = () => {
                   value && {
                     value: value as TradeTypes,
                     label,
-                    disabled: false,
                   }
               )
               .filter(isTruthy),
