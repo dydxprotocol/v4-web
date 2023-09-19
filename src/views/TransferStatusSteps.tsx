@@ -59,7 +59,7 @@ export const TransferStatusSteps = ({ status }: ElementProps) => {
       },
     ];
 
-    const currentStatus = routeStatus[routeStatus?.length - 1];
+    const currentStatus = routeStatus ? routeStatus[routeStatus?.length - 1] : undefined;
 
     let currentStep = TransferStatusStep.Bridge;
 
