@@ -15,7 +15,6 @@ import {
 } from '@dydxprotocol/v4-client-js';
 
 import type {
-  HumanReadableCancelOrderPayload,
   HumanReadablePlaceOrderPayload,
   ParsingError,
   SubAccountHistoricalPNLs,
@@ -26,7 +25,7 @@ import { AnalyticsEvent } from '@/constants/analytics';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { DydxAddress } from '@/constants/wallets';
 
-import { setSubaccount, setHistoricalPnl } from '@/state/account';
+import { setSubaccount, setHistoricalPnl, removeUncommittedOrderClientId } from '@/state/account';
 
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics';
@@ -360,29 +359,38 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     }: {
       isClosePosition?: boolean;
       onError?: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
-      onSuccess?: () => void;
+      onSuccess?: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => void;
     }) => {
-      const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
-        const params: Nullable<HumanReadablePlaceOrderPayload | HumanReadableCancelOrderPayload> =
-          abacusStateManager[isClosePosition ? 'closePositionPayload' : 'placeOrderPayload']();
-
+      const callback = (
+        success: boolean,
+        parsingError?: Nullable<ParsingError>,
+        data?: Nullable<HumanReadablePlaceOrderPayload>
+      ) => {
         if (success) {
-          track(AnalyticsEvent.TradePlaceOrder, {
-            ...params,
-            isClosePosition,
-          } as HumanReadablePlaceOrderPayload & { isClosePosition: boolean });
-
-          onSuccess?.();
+          onSuccess?.(data);
         } else {
           onError?.({ errorStringKey: parsingError?.stringKey });
+
+          if (data?.clientId !== undefined) {
+            dispatch(removeUncommittedOrderClientId(data.clientId));
+          }
         }
       };
 
+      let placeOrderParams;
+
       if (isClosePosition) {
-        abacusStateManager.closePosition(callback);
+        placeOrderParams = abacusStateManager.closePosition(callback);
       } else {
-        abacusStateManager.placeOrder(callback);
+        placeOrderParams = abacusStateManager.placeOrder(callback);
       }
+
+      track(AnalyticsEvent.TradePlaceOrder, {
+        ...placeOrderParams,
+        isClosePosition,
+      } as HumanReadablePlaceOrderPayload & { isClosePosition: boolean });
+
+      return placeOrderParams;
     },
     [subaccountClient]
   );
@@ -393,7 +401,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       onSuccess,
     }: {
       onError: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
-      onSuccess?: () => void;
+      onSuccess?: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => void;
     }) => await placeOrder({ isClosePosition: true, onError, onSuccess }),
     [placeOrder]
   );

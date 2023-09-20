@@ -27,12 +27,15 @@ import {
 } from '@/constants/abacus';
 
 import { DialogTypes } from '@/constants/dialogs';
+import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 
 import { RootStore } from '@/state/_store';
+import { addUncommittedOrderClientId, removeUncommittedOrderClientId } from '@/state/account';
 import { openDialog } from '@/state/dialogs';
 
-import { log } from '../telemetry';
 import { StatefulOrderError } from '../errors';
+import { bytesToBigInt } from '../numbers';
+import { log } from '../telemetry';
 
 class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   private compositeClient: CompositeClient | undefined;
@@ -110,6 +113,10 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       return x.toString() as T;
     }
 
+    if (x instanceof Uint8Array) {
+      return bytesToBigInt(x).toString() as T;
+    }
+
     if (typeof x === 'object') {
       const parsedObj: { [key: string]: any } = {};
       for (const key in x) {
@@ -144,6 +151,14 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         triggerPrice,
       } = params || {};
 
+      // Observe uncommitted order
+      this.store?.dispatch(addUncommittedOrderClientId(clientId));
+
+      setTimeout(() => {
+        this.store?.dispatch(removeUncommittedOrderClientId(clientId));
+      }, UNCOMMITTED_ORDER_TIMEOUT_MS);
+
+      // Place order
       const tx = await this.compositeClient?.placeOrder(
         new SubaccountClient(this.localWallet, subaccountNumber),
         marketId,
@@ -165,10 +180,18 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         throw new StatefulOrderError('Stateful order has failed to commit.', tx);
       }
 
-      const hash = tx?.hash && Buffer.from(tx.hash).toString('hex').toUpperCase();
-      return JSON.stringify(tx);
+      const parsedTx = this.parseToPrimitives(tx);
+      const hash = parsedTx?.hash;
+
+      if (import.meta.env.MODE === 'production') {
+        console.log(`https://testnet.mintscan.io/dydx-testnet/txs/${hash}`);
+      } else console.log(`txHash: ${hash}`);
+
+      return JSON.stringify(parsedTx);
     } catch (error) {
-      log('DydxChainTransactions/placeOrderTransaction', error);
+      if (error?.name !== 'BroadcastError') {
+        log('DydxChainTransactions/placeOrderTransaction', error);
+      }
 
       return JSON.stringify({
         error,
@@ -194,7 +217,9 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         goodTilBlockTime ?? undefined
       );
 
-      return JSON.stringify(tx);
+      const parsedTx = this.parseToPrimitives(tx);
+
+      return JSON.stringify(parsedTx);
     } catch (error) {
       log('DydxChainTransactions/cancelOrderTransaction', error);
 
@@ -259,6 +284,12 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
             params.chainId
           );
           callback(JSON.stringify({ url: optimalNode }));
+          break;
+        case QueryType.EquityTiers:
+          const equityTiers =
+            await this.compositeClient?.validatorClient.get.getEquityTierLimitConfiguration();
+          const parsedEquityTiers = this.parseToPrimitives(equityTiers);
+          callback(JSON.stringify(parsedEquityTiers));
           break;
         case QueryType.FeeTiers:
           const feeTiers = await this.compositeClient?.validatorClient.get.getFeeTiers();

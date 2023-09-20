@@ -230,25 +230,32 @@ class AbacusStateManager {
 
   // ------ Transactions ------ //
 
-  placeOrder = (callback: (p0: boolean, p1: Nullable<ParsingError>) => void) =>
-    this.stateManager.commitPlaceOrder(callback);
+  placeOrder = (
+    callback: (
+      success: boolean,
+      parsingError: Nullable<ParsingError>,
+      data: Nullable<HumanReadablePlaceOrderPayload>
+    ) => void
+  ): Nullable<HumanReadablePlaceOrderPayload> => this.stateManager.commitPlaceOrder(callback);
 
-  closePosition = (callback: (p0: boolean, p1: Nullable<ParsingError>) => void) =>
-    this.stateManager.commitClosePosition(callback);
+  closePosition = (
+    callback: (
+      success: boolean,
+      parsingError: Nullable<ParsingError>,
+      data: Nullable<HumanReadablePlaceOrderPayload>
+    ) => void
+  ): Nullable<HumanReadablePlaceOrderPayload> => this.stateManager.commitClosePosition(callback);
 
-  cancelOrder = (orderId: string, callback: (p0: boolean, p1: Nullable<ParsingError>) => void) =>
-    this.stateManager.cancelOrder(orderId, callback);
+  cancelOrder = (
+    orderId: string,
+    callback: (
+      success: boolean,
+      parsingError: Nullable<ParsingError>,
+      data: Nullable<HumanReadableCancelOrderPayload>
+    ) => void
+  ) => this.stateManager.cancelOrder(orderId, callback);
 
   // ------ Utils ------ //
-  placeOrderPayload = (): Nullable<HumanReadablePlaceOrderPayload> =>
-    this.stateManager.placeOrderPayload();
-
-  closePositionPayload = (): Nullable<HumanReadablePlaceOrderPayload> =>
-    this.stateManager.closePositionPayload();
-
-  cancelOrderPayload = (orderId: string): Nullable<HumanReadableCancelOrderPayload> =>
-    this.stateManager.cancelOrderPayload(orderId);
-
   getHistoricalPnlPeriod = (): Nullable<HistoricalPnlPeriods> =>
     this.stateManager.historicalPnlPeriod;
 

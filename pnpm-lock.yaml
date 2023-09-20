@@ -27,14 +27,14 @@ dependencies:
     specifier: ^0.31.0
     version: 0.31.0
   '@dydxprotocol/v4-abacus':
-    specifier: ^0.4.28
-    version: 0.4.28
+    specifier: file:/Users/jaredvu/Documents/v4-abacus/build/packages/dydxprotocol-v4-abacus-0.4.44.tgz
+    version: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-0.4.44.tgz
   '@dydxprotocol/v4-client-js':
     specifier: ^0.35.0
     version: 0.35.0
   '@dydxprotocol/v4-localization':
-    specifier: ^0.1.7
-    version: 0.1.7
+    specifier: ^0.1.11
+    version: 0.1.11
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -979,10 +979,6 @@ packages:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
 
-  /@dydxprotocol/v4-abacus@0.4.28:
-    resolution: {integrity: sha512-RQGTXI7q4HAXDmlUpDhpJDLN8C0dFMgKHzFITK1Sz3KnLb3mkkpqEU1D8VIn/hB7ngt+equMsLFSkUwzXCzgdA==}
-    dev: false
-
   /@dydxprotocol/v4-client-js@0.35.0:
     resolution: {integrity: sha512-H+0/tOBVqyWx2JQ4jUFdJOlFof0NqN1u9vzKJ2h3Nv5KNteSPd59eiywoz+3J0jlmkREw0Jzg9CS0bLwzYVLvA==}
     dependencies:
@@ -1010,8 +1006,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@0.1.7:
-    resolution: {integrity: sha512-ACF/hQUD1PYwRMV69eByovM+mCjjzygtdAWEI1CZ9QGgYf6VhAEEWWcjXuuMm907m0YPjVGd7ZplouJf5giuBQ==}
+  /@dydxprotocol/v4-localization@0.1.11:
+    resolution: {integrity: sha512-eW88t8KJuDT0fNEgaw615+n3gEYxDZYPeHhdBYquVDXjnkhLNznaH8ftmlLPVPyfu7o5aFeU/cw8ZiqRrf/Stw==}
     dev: false
 
   /@dydxprotocol/v4-proto@0.2.1:
@@ -14077,3 +14073,9 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
+
+  file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-0.4.44.tgz:
+    resolution: {integrity: sha512-/lsqb5pORtDVkpYQHxUmQ1m3HLA3J4n4TUxsGDdUxJrHFW3BOD1RoHhQPXBTjuoHpdVYa3MR/gPAUxapvEFYPw==, tarball: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-0.4.44.tgz}
+    name: '@dydxprotocol/v4-abacus'
+    version: 0.4.44
+    dev: false

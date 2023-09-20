@@ -1,4 +1,4 @@
-import { type FormEvent, useState, useEffect, Ref } from 'react';
+import { type FormEvent, useState, Ref, useCallback } from 'react';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
 import type { NumberFormatValues, SourceInfo } from 'react-number-format';
@@ -6,9 +6,9 @@ import type { NumberFormatValues, SourceInfo } from 'react-number-format';
 import { AlertType } from '@/constants/alerts';
 
 import {
-  AbacusOrderStatus,
   ErrorType,
-  Nullable,
+  type HumanReadablePlaceOrderPayload,
+  type Nullable,
   TradeInputErrorAction,
   TradeInputField,
   ValidationError,
@@ -21,6 +21,7 @@ import { InputErrorData, TradeBoxKeys, MobilePlaceOrderSteps } from '@/constants
 
 import { breakpoints } from '@/styles';
 import { useStringGetter, useSubaccount } from '@/hooks';
+import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
@@ -36,7 +37,6 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { Orderbook } from '@/views/tables/Orderbook';
 
-import { getLatestOrderId, getLatestOrderStatus } from '@/state/accountSelectors';
 import { getCurrentInput, useTradeFormData } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
@@ -102,8 +102,6 @@ export const TradeForm = ({
   const currentInput = useSelector(getCurrentInput);
   const { tickSizeDecimals, stepSizeDecimals } =
     useSelector(getCurrentMarketConfig, shallowEqual) || {};
-  const latestOrderStatus = useSelector(getLatestOrderStatus) ?? '';
-  const latestOrderId = useSelector(getLatestOrderId);
 
   const needsAdvancedOptions =
     needsGoodUntil || timeInForceOptions || executionOptions || needsPostOnly || needsReduceOnly;
@@ -157,21 +155,17 @@ export const TradeForm = ({
     }
   };
 
-  useEffect(() => {
-    if (
-      (!currentStep || currentStep === MobilePlaceOrderSteps.PlacingOrder) &&
-      [
-        AbacusOrderStatus.open.rawValue,
-        AbacusOrderStatus.filled.rawValue,
-        AbacusOrderStatus.untriggered.rawValue,
-        AbacusOrderStatus.canceling.rawValue,
-      ].includes(latestOrderStatus)
-    ) {
+  const onLastOrderIndexed = useCallback(() => {
+    if (!currentStep || currentStep === MobilePlaceOrderSteps.PlacingOrder) {
       setIsPlacingOrder(false);
       abacusStateManager.clearTradeInputValues({ shouldResetSize: true });
       setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
     }
-  }, [currentStep, latestOrderStatus, latestOrderId]);
+  }, [currentStep]);
+
+  const { setUnIndexedClientId } = useOnLastOrderIndexed({
+    callback: onLastOrderIndexed,
+  });
 
   const onPlaceOrder = async () => {
     setPlaceOrderError(undefined);
@@ -184,6 +178,9 @@ export const TradeForm = ({
         );
 
         setIsPlacingOrder(false);
+      },
+      onSuccess: (placeOrderPayload?: Nullable<HumanReadablePlaceOrderPayload>) => {
+        setUnIndexedClientId(placeOrderPayload?.clientId);
       },
     });
   };

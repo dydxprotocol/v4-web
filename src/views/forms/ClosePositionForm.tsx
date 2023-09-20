@@ -1,14 +1,19 @@
-import { type FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useCallback, useEffect, useState } from 'react';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
-import { AbacusOrderStatus, ClosePositionInputField, type Nullable } from '@/constants/abacus';
+import {
+  ClosePositionInputField,
+  type HumanReadablePlaceOrderPayload,
+  type Nullable,
+} from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { STRING_KEYS } from '@/constants/localization';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 import { useBreakpoints, useIsFirstRender, useStringGetter, useSubaccount } from '@/hooks';
+import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -27,11 +32,7 @@ import { Orderbook, orderbookMixins, type OrderbookScrollBehavior } from '@/view
 
 import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
 
-import {
-  getCurrentMarketPositionData,
-  getLatestOrderId,
-  getLatestOrderStatus,
-} from '@/state/accountSelectors';
+import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getInputClosePositionData } from '@/state/inputsSelectors';
@@ -84,9 +85,6 @@ export const ClosePositionForm = ({
   const { size: sizeData, summary } = useSelector(getInputClosePositionData, shallowEqual) || {};
   const { size, percent } = sizeData || {};
   const currentInput = useSelector(getCurrentInput);
-  const latestOrderStatus = useSelector(getLatestOrderStatus) ?? '';
-  const latestOrderId = useSelector(getLatestOrderId);
-
   const currentPositionData = useSelector(getCurrentMarketPositionData, shallowEqual);
   const { size: currentPositionSize } = currentPositionData || {};
   const { current: currentSize } = currentPositionSize || {};
@@ -108,17 +106,8 @@ export const ClosePositionForm = ({
     }
   }, [currentInput, market, currentStep]);
 
-  useEffect(() => {
-    // close has been placed
-    if (
-      !isFirstRender &&
-      [
-        AbacusOrderStatus.open.rawValue,
-        AbacusOrderStatus.filled.rawValue,
-        AbacusOrderStatus.untriggered.rawValue,
-        AbacusOrderStatus.canceling.rawValue,
-      ].includes(latestOrderStatus)
-    ) {
+  const onLastOrderIndexed = useCallback(() => {
+    if (!isFirstRender) {
       abacusStateManager.clearClosePositionInputValues({ shouldFocusOnTradeInput: true });
       onClosePositionSuccess?.();
 
@@ -128,7 +117,11 @@ export const ClosePositionForm = ({
 
       setIsClosingPosition(false);
     }
-  }, [currentStep, latestOrderId, latestOrderStatus]);
+  }, [currentStep, isFirstRender]);
+
+  const { setUnIndexedClientId } = useOnLastOrderIndexed({
+    callback: onLastOrderIndexed,
+  });
 
   const onAmountInput = ({ floatValue }: { floatValue?: number }) => {
     if (currentSize == null) return;
@@ -182,6 +175,9 @@ export const ClosePositionForm = ({
           stringGetter({ key: errorParams?.errorStringKey || STRING_KEYS.SOMETHING_WENT_WRONG })
         );
         setIsClosingPosition(false);
+      },
+      onSuccess: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => {
+        setUnIndexedClientId(placeOrderPayload?.clientId);
       },
     });
   };

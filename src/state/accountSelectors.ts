@@ -121,9 +121,9 @@ export const getSubaccountOpenOrdersBySideAndPrice = createSelector(
 );
 
 /**
- * @returns the id of the latest order
+ * @returns the clientId of the latest order
  */
-export const getLatestOrderId = createSelector([getLatestOrder], (order) => order?.id);
+export const getLatestOrderClientId = createSelector([getLatestOrder], (order) => order?.clientId);
 
 /**
  * @returns the rawValue status of the latest order
@@ -132,6 +132,12 @@ export const getLatestOrderStatus = createSelector(
   [getLatestOrder],
   (order) => order?.status.rawValue
 );
+
+/**
+ * @returns a list of clientIds belonging to uncommmited orders
+ */
+export const getUncommittedOrderClientIds = (state: RootState) =>
+  state.account.uncommittedOrderClientIds;
 
 /**
  * @param orderId
