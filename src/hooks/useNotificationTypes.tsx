@@ -129,16 +129,19 @@ export const notificationTypes = [
           const description = (
             <div>
               <Styled.TransferText>
-                {type === 'deposit' ? 'Deposit of ' : 'Withdraw of'}{' '}
+                {type === 'deposit' ? 'Deposit of ' : 'Withdraw of '}
                 <Output type={OutputType.Fiat} value={toAmount} />
               </Styled.TransferText>
 
               {error && (
-                <AlertMessage type={AlertType.Error}>
+                <Styled.ErrorMessage type={AlertType.Error}>
                   {stringGetter({
                     key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+                    params: {
+                      ERROR_MESSAGE: error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
+                    },
                   })}
-                </AlertMessage>
+                </Styled.ErrorMessage>
               )}
             </div>
           );
@@ -179,3 +182,7 @@ Styled.TransferText = styled.span`
   align-items: center;
   gap: 0.5ch;
 `
+
+Styled.ErrorMessage = styled.div`
+  max-width: 13rem;
+`;

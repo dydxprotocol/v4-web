@@ -6,7 +6,7 @@ import { LocalStorageKey } from '@/constants/localStorage';
 import { type TransferNotifcation } from '@/constants/notifications';
 
 import { useAccounts } from '@/hooks/useAccounts';
-import { useSquid } from '@/hooks/useSquid';
+import { SQUID_ERROR_TYPES, useSquid } from '@/hooks/useSquid';
 import { useLocalStorage } from './useLocalStorage';
 
 const LocalNotificationsContext = createContext<
@@ -71,7 +71,7 @@ const useLocalNotificationsContext = () => {
           if (status) statuses[txHash] = status;
         } catch (error) {
           // ignore not found errors since the route might not be available yet
-          if (error?.errors?.length && error.errors[0].errorType !== 'NotFoundError') {
+          if (error?.errors?.length && error.errors[0].errorType !== SQUID_ERROR_TYPES.NotFoundError) {
             statuses[txHash] = error;
           }
         }
