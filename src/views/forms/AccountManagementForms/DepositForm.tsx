@@ -38,6 +38,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
+import { parseWalletError } from '@/lib/wallet';
 
 import { ChainSelectMenu } from './ChainSelectMenu';
 import { TokenSelectMenu } from './TokenSelectMenu';
@@ -286,12 +287,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const errorMessage = useMemo(() => {
     if (error) {
-      return error?.message
-        ? stringGetter({
-            key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-            params: { ERROR_MESSAGE: error.message },
-          })
-        : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG });
+      return parseWalletError({ error, stringGetter }).message;
     }
 
     if (fromAmount) {
