@@ -1,13 +1,16 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
 import { Squid } from '@0xsquid/sdk';
 
-import { CLIENT_NETWORK_CONFIGS, DydxV4Network, isDydxV4Network } from '@/constants/networks';
+import { CLIENT_NETWORK_CONFIGS, isDydxV4Network } from '@/constants/networks';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
 
 export const NATIVE_TOKEN_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+
+export enum SQUID_ERROR_TYPES {
+  NotFoundError = 'NotFoundError',
+}
 
 const useSquidContext = () => {
   const selectedNetwork = useSelector(getSelectedNetwork);

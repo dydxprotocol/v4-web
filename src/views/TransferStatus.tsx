@@ -7,9 +7,11 @@ import { StatusResponse } from '@0xsquid/sdk';
 import { useInterval, useStringGetter } from '@/hooks';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { AlertType } from '@/constants/alerts';
 
 import { formatSeconds } from '@/lib/timeUtils';
 
+import { AlertMessage } from '@/components/AlertMessage';
 import { Output, OutputType } from '@/components/Output';
 import { WithReceipt } from '@/components/WithReceipt';
 import { Icon, IconName } from '@/components/Icon';
@@ -32,6 +34,9 @@ export const TransferStatusToast = ({
   const stringGetter = useStringGetter();
   const [open, setOpen] = useState<boolean>(false);
   const [secondsLeft, setSecondsLeft] = useState<number | undefined>();
+
+  // @ts-ignore status.errors is not in the type definition but can be returned
+  const error = status?.errors?.length ? status?.errors[0] : status?.error;
 
   const type = useMemo(
     () => (status?.toChain?.chainData?.chainId === TESTNET_CHAIN_ID ? 'deposit' : 'withdrawal'),
@@ -74,6 +79,16 @@ export const TransferStatusToast = ({
               },
             })}
           </Styled.Status>
+          {error && (
+            <AlertMessage type={AlertType.Error}>
+              {stringGetter({
+                key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+                params: {
+                  ERROR_MESSAGE: error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
+                },
+              })}
+            </AlertMessage>
+          )}
           <Styled.Trigger>
             <Styled.TriggerIcon>
               <Icon iconName={IconName.Caret} />

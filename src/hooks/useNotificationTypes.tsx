@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo } from 'react';
+import styled, { type AnyStyledComponent } from 'styled-components';
 import { useSelector, shallowEqual, useDispatch } from 'react-redux';
 import { groupBy } from 'lodash';
 
+import { AlertType } from '@/constants/alerts';
 import { AbacusOrderStatus, ORDER_SIDES, ORDER_STATUS_STRINGS } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -10,6 +12,7 @@ import { ORDER_SIDE_STRINGS, TRADE_TYPE_STRINGS, TradeTypes } from '@/constants/
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
+import { AlertMessage } from '@/components/AlertMessage';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { TransferStatusToast } from '@/views/TransferStatus';
@@ -119,19 +122,36 @@ export const notificationTypes = [
           const { toChainId, status, txHash, toAmount } = transfer;
           const finished = Boolean(status) && status?.squidTransactionStatus !== 'ongoing';
           const type = toChainId === TESTNET_CHAIN_ID ? 'deposit' : 'withdraw';
+          // @ts-ignore status.errors is not in the type definition but can be returned
+          const error = status?.errors?.length ? status?.errors[0] : status?.error;
+
+          // TODO: confirm with design what the description should be
+          const description = (
+            <div>
+              <Styled.TransferText>
+                {type === 'deposit' ? 'Deposit of ' : 'Withdraw of '}
+                <Output type={OutputType.Fiat} value={toAmount} />
+              </Styled.TransferText>
+
+              {error && (
+                <Styled.ErrorMessage type={AlertType.Error}>
+                  {stringGetter({
+                    key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+                    params: {
+                      ERROR_MESSAGE: error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
+                    },
+                  })}
+                </Styled.ErrorMessage>
+              )}
+            </div>
+          );
 
           trigger(
             txHash,
             {
               icon: <Icon iconName={finished ? IconName.Transfer : IconName.Clock} />,
               title: stringGetter({ key: getTitleStringKey(type, finished) }),
-              // TODO: confirm with design what the description should be
-              description: (
-                <>
-                  <span>{type === 'deposit' ? 'Deposit of ' : 'Withdraw of'}</span>
-                  <Output type={OutputType.Fiat} value={toAmount} />
-                </>
-              ),
+              description: description,
               customContent: (
                 <TransferStatusToast
                   toAmount={transfer.toAmount}
@@ -139,7 +159,12 @@ export const notificationTypes = [
                   status={transfer.status}
                 />
               ),
-              customMenuContent: !finished && <TransferStatusSteps status={transfer.status} />,
+              customMenuContent: !finished && (
+                <div>
+                  {description}
+                  <TransferStatusSteps status={transfer.status} />
+                </div>
+              ),
               toastSensitivity: 'foreground',
             },
             []
@@ -149,3 +174,15 @@ export const notificationTypes = [
     },
   },
 ] satisfies NotificationTypeConfig[];
+
+const Styled: Record<string, AnyStyledComponent> = {};
+
+Styled.TransferText = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5ch;
+`
+
+Styled.ErrorMessage = styled.div`
+  max-width: 13rem;
+`;
