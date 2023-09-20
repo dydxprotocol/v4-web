@@ -27,8 +27,8 @@ dependencies:
     specifier: ^0.31.0
     version: 0.31.0
   '@dydxprotocol/v4-abacus':
-    specifier: file:/Users/jaredvu/Documents/v4-abacus/build/packages/dydxprotocol-v4-abacus-0.4.44.tgz
-    version: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-0.4.44.tgz
+    specifier: ^0.5.0
+    version: 0.5.0
   '@dydxprotocol/v4-client-js':
     specifier: ^0.35.0
     version: 0.35.0
@@ -978,6 +978,10 @@ packages:
   /@cush/relative@1.0.0:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
+
+  /@dydxprotocol/v4-abacus@0.5.0:
+    resolution: {integrity: sha512-K/aLJeOWzmToCn6p9vjBqfwn79/nuKxjZLSzaj1mKNxw25KBFh2q93njNbONFRA72zBElD0K+gw8J/skTpGg1Q==}
+    dev: false
 
   /@dydxprotocol/v4-client-js@0.35.0:
     resolution: {integrity: sha512-H+0/tOBVqyWx2JQ4jUFdJOlFof0NqN1u9vzKJ2h3Nv5KNteSPd59eiywoz+3J0jlmkREw0Jzg9CS0bLwzYVLvA==}
@@ -14073,9 +14077,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
-
-  file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-0.4.44.tgz:
-    resolution: {integrity: sha512-/lsqb5pORtDVkpYQHxUmQ1m3HLA3J4n4TUxsGDdUxJrHFW3BOD1RoHhQPXBTjuoHpdVYa3MR/gPAUxapvEFYPw==, tarball: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-0.4.44.tgz}
-    name: '@dydxprotocol/v4-abacus'
-    version: 0.4.44
-    dev: false
