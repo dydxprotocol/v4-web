@@ -49,7 +49,6 @@ const useTradeTypeOptions = () => {
                   value && {
                     value: value as TradeTypes,
                     label,
-                    disabled: import.meta.env.MODE === 'production', // TODO: Remove this when stop orders are supported on testnet
                   }
               )
               .filter(isTruthy),

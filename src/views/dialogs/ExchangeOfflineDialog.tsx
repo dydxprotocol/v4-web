@@ -5,8 +5,6 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { AbacusApiStatus } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
-import { UNICODE } from '@/constants/unicode';
 import { useApiState, useStringGetter } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -31,16 +29,8 @@ export const ExchangeOfflineDialog = ({ preventClose, setIsOpen }: ElementProps)
   const selectedNetwork = useSelector(getSelectedNetwork);
   const activeDialog = useSelector(getActiveDialog, shallowEqual);
 
-  const showOfflineMessage =
-    import.meta.env.MODE === 'production' &&
-    CLIENT_NETWORK_CONFIGS[selectedNetwork].dydxChainId === 'dydx-testnet-3';
-
   useEffect(() => {
-    if (
-      activeDialog?.type === DialogTypes.ExchangeOffline &&
-      status === AbacusApiStatus.NORMAL &&
-      !showOfflineMessage
-    ) {
+    if (activeDialog?.type === DialogTypes.ExchangeOffline && status === AbacusApiStatus.NORMAL) {
       dispatch(closeDialog());
     }
   }, [status, selectedNetwork]);
@@ -53,16 +43,7 @@ export const ExchangeOfflineDialog = ({ preventClose, setIsOpen }: ElementProps)
       title={stringGetter({ key: STRING_KEYS.UNAVAILABLE })}
     >
       <Styled.Content>
-        {showOfflineMessage ? (
-          <>
-            <p>Testnet is currently offline. Please check back!</p>
-            <Styled.Link href="https://v4-teacher.vercel.app/testnets/schedule">
-              {stringGetter({ key: STRING_KEYS.LEARN_MORE })} {UNICODE.ARROW_RIGHT}
-            </Styled.Link>
-          </>
-        ) : (
-          <p>{statusErrorMessage}</p>
-        )}
+        <p>{statusErrorMessage}</p>
         {import.meta.env.MODE !== 'production' && <NetworkSelectMenu />}
       </Styled.Content>
     </Dialog>

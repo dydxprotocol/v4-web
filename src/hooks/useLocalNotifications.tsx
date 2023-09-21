@@ -6,7 +6,7 @@ import { LocalStorageKey } from '@/constants/localStorage';
 import { type TransferNotifcation } from '@/constants/notifications';
 
 import { useAccounts } from '@/hooks/useAccounts';
-import { useSquid } from '@/hooks/useSquid';
+import { SQUID_ERROR_TYPES, useSquid } from '@/hooks/useSquid';
 import { useLocalStorage } from './useLocalStorage';
 
 const LocalNotificationsContext = createContext<
@@ -66,11 +66,14 @@ const useLocalNotificationsContext = () => {
       } of transferNotifications) {
         try {
           if (currentStatus && currentStatus?.squidTransactionStatus !== 'ongoing') continue;
-  
+
           const status = await squid?.getStatus({ transactionId: txHash, toChainId, fromChainId });
           if (status) statuses[txHash] = status;
         } catch (error) {
-          console.error(error);
+          // ignore not found errors since the route might not be available yet
+          if (error?.errors?.length && error.errors[0].errorType !== SQUID_ERROR_TYPES.NotFoundError) {
+            statuses[txHash] = error;
+          }
         }
       }
       return statuses;
