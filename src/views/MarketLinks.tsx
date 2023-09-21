@@ -15,14 +15,17 @@ export const MarketLinks = () => {
 
   const linkItems = [
     {
+      key: 'coinmarketcap',
       href: coinMarketCapsLink,
       icon: IconName.CoinMarketCap,
     },
     {
+      key: 'whitepaper',
       href: whitepaperLink,
       icon: IconName.Whitepaper,
     },
     {
+      key: 'project-website',
       href: websiteLink,
       icon: IconName.Website,
     },
@@ -31,8 +34,8 @@ export const MarketLinks = () => {
   return (
     <Styled.MarketLinks>
       {linkItems.map(
-        ({ href, icon }) =>
-          href && <IconButton key={href} href={href} iconName={icon} type={ButtonType.Link} />
+        ({ key, href, icon }) =>
+          href && <IconButton key={key} href={href} iconName={icon} type={ButtonType.Link} />
       )}
     </Styled.MarketLinks>
   );

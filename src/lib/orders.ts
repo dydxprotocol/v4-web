@@ -58,6 +58,12 @@ export const getStatusIconInfo = ({
         statusIconColor: `var(--color-negative)`,
       };
     }
+    case AbacusOrderStatus.untriggered: {
+      return {
+        statusIcon: IconName.OrderUntriggered,
+        statusIconColor: `var(--color-text-2)`,
+      };
+    }
     case AbacusOrderStatus.pending:
     default: {
       return {

@@ -17,7 +17,7 @@ import { Ring } from '@/components/Ring';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-import { getInputTradeData } from '@/state/inputsSelectors';
+import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { getSelectedTradeType } from '@/lib/tradeData';
@@ -35,6 +35,15 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
   const currentTradeData = useSelector(getInputTradeData, shallowEqual);
   const { type } = currentTradeData || {};
   const selectedTradeType = getSelectedTradeType(type);
+  const { typeOptions } = useSelector(getInputTradeOptions, shallowEqual) ?? {};
+
+  const allTradeTypeItems = typeOptions?.toArray()?.map(({ type, stringKey }) => ({
+    value: type,
+    label: stringGetter({
+      key: stringKey,
+    }),
+    slotBefore: <AssetIcon symbol={symbol} />,
+  }));
 
   const [currentStep, setCurrentStep] = useState<MobilePlaceOrderSteps>(
     MobilePlaceOrderSteps.EditOrder
@@ -62,11 +71,7 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
         [MobilePlaceOrderSteps.EditOrder]: {
           title: (
             <Styled.ToggleGroup
-              items={[TradeTypes.LIMIT, TradeTypes.MARKET].map((tradeType: TradeTypes) => ({
-                value: tradeType,
-                label: stringGetter({ key: TRADE_TYPE_STRINGS[tradeType].tradeTypeKey }),
-                slotBefore: <AssetIcon symbol={symbol} />,
-              }))}
+              items={allTradeTypeItems}
               value={selectedTradeType}
               onValueChange={(tradeType: TradeTypes) =>
                 onTradeTypeChange(tradeType || selectedTradeType)
@@ -126,6 +131,8 @@ Styled.Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
 `;
 
 Styled.ToggleGroup = styled(ToggleGroup)`
+  overflow-x: auto;
+
   button[data-state='off'] {
     gap: 0;
 

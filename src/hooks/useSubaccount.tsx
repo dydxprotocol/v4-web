@@ -7,12 +7,7 @@ import type { EncodeObject, Coin } from '@cosmjs/proto-signing';
 import { Method } from '@cosmjs/tendermint-rpc';
 
 import {
-  LocalWallet,
-  OrderExecution,
-  OrderFlags,
-  OrderSide,
-  OrderTimeInForce,
-  OrderType,
+  type LocalWallet,
   SubaccountClient,
   DYDX_DENOM,
   USDC_DENOM,
@@ -20,28 +15,20 @@ import {
 } from '@dydxprotocol/v4-client-js';
 
 import type {
-  HumanReadableCancelOrderPayload,
   HumanReadablePlaceOrderPayload,
+  ParsingError,
   SubAccountHistoricalPNLs,
 } from '@/constants/abacus';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
 import { AnalyticsEvent } from '@/constants/analytics';
-import { ORDER_ERROR_CODE_MAP } from '@/constants/localization';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
-import { UNCOMMITTED_ORDER_TIMEOUT } from '@/constants/trade';
 import { DydxAddress } from '@/constants/wallets';
 
-import {
-  addUncommittedOrderClientId,
-  removeUncommittedOrderClientId,
-  setSubaccount,
-  setHistoricalPnl,
-} from '@/state/account';
+import { setSubaccount, setHistoricalPnl, removeUncommittedOrderClientId } from '@/state/account';
 
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics';
-import { StatefulOrderError } from '@/lib/errors';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 
@@ -87,8 +74,6 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     transferFromSubaccountToAddress,
     transferNativeToken,
     simulateTransferNativeToken,
-    placeOrderForSubaccount,
-    cancelOrderForSubaccount,
     sendSquidWithdrawFromSubaccount,
   } = useMemo(
     () => ({
@@ -210,100 +195,6 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
           GAS_PRICE_DYDX_DENOM,
           undefined
         ),
-
-      placeOrderForSubaccount: async ({
-        subaccount,
-        marketId,
-        type,
-        side,
-        price,
-        triggerPrice,
-        size,
-        clientId,
-        timeInForce,
-        goodTilTimeInSeconds,
-        execution,
-        postOnly,
-        reduceOnly,
-      }: {
-        subaccount: SubaccountClient;
-        marketId: string;
-        type: OrderType;
-        side: OrderSide;
-        price: number;
-        triggerPrice: Nullable<number>;
-        size: number;
-        clientId: number;
-        timeInForce: OrderTimeInForce;
-        goodTilTimeInSeconds: number;
-        execution: OrderExecution;
-        postOnly: boolean;
-        reduceOnly: boolean;
-      }) => {
-        const startTimestamp = performance.now();
-
-        const result = await compositeClient?.placeOrder(
-          subaccount,
-          marketId,
-          type,
-          side,
-          price,
-          size,
-          clientId,
-          timeInForce,
-          goodTilTimeInSeconds,
-          execution,
-          postOnly,
-          reduceOnly,
-          triggerPrice ?? undefined
-        );
-
-        const endTimestamp = performance.now();
-
-        track(AnalyticsEvent.TradePlaceOrderConfirmed, {
-          roundtripMs: endTimestamp - startTimestamp,
-          validator: compositeClient!.validatorClient.config.restEndpoint,
-        });
-
-        return result;
-      },
-
-      cancelOrderForSubaccount: async ({
-        subaccount,
-        clientId,
-        clobPairId,
-        orderFlags,
-        goodTilBlock,
-        goodTilBlockTime,
-      }: {
-        subaccount: SubaccountClient;
-        clientId: number;
-        orderFlags: OrderFlags;
-        clobPairId: number;
-        goodTilBlock?: number;
-        goodTilBlockTime?: number;
-      }) => {
-        const startTimestamp = performance.now();
-
-        const result = await compositeClient?.cancelOrder(
-          subaccount,
-          clientId,
-          orderFlags,
-          clobPairId,
-          goodTilBlock,
-          goodTilBlockTime
-        );
-
-        const endTimestamp = performance.now();
-
-        track(AnalyticsEvent.TradeCancelOrderConfirmed, {
-          roundtripMs: endTimestamp - startTimestamp,
-          validator: compositeClient!.validatorClient.config.restEndpoint,
-        });
-
-        return result;
-      },
-
       sendSquidWithdrawFromSubaccount: async ({
         subaccountClient,
         amount,
@@ -467,101 +358,41 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       onSuccess,
     }: {
       isClosePosition?: boolean;
-      onError?: (onErrorParams?: { errorStringKey?: string }) => void;
-      onSuccess?: () => void;
+      onError?: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
+      onSuccess?: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => void;
     }) => {
-      let orderParams: Nullable<HumanReadablePlaceOrderPayload>;
+      const callback = (
+        success: boolean,
+        parsingError?: Nullable<ParsingError>,
+        data?: Nullable<HumanReadablePlaceOrderPayload>
+      ) => {
+        if (success) {
+          onSuccess?.(data);
+        } else {
+          onError?.({ errorStringKey: parsingError?.stringKey });
 
-      if (!subaccountClient) return;
-
-      try {
-        orderParams = isClosePosition
-          ? abacusStateManager.closePositionPayload()
-          : abacusStateManager.placeOrderPayload();
-
-        if (!orderParams) {
-          throw new Error('Missing order params');
+          if (data?.clientId !== undefined) {
+            dispatch(removeUncommittedOrderClientId(data.clientId));
+          }
         }
+      };
 
-        const {
-          marketId,
-          type,
-          side,
-          price,
-          triggerPrice,
-          size,
-          clientId,
-          timeInForce,
-          goodTilTimeInSeconds,
-          execution,
-          postOnly,
-          reduceOnly,
-        } = orderParams;
+      let placeOrderParams;
 
-        dispatch(addUncommittedOrderClientId(clientId));
-
-        // Remove uncommitted order after timeout if it hasn't already been removed
-        setTimeout(() => {
-          dispatch(removeUncommittedOrderClientId(clientId));
-        }, UNCOMMITTED_ORDER_TIMEOUT);
-
-        console.log('useSubaccount/placeOrder', {
-          ...orderParams,
-        });
-
-        const response = await placeOrderForSubaccount({
-          subaccount: subaccountClient,
-          marketId,
-          type: type as OrderType,
-          side: side as OrderSide,
-          price,
-          triggerPrice,
-          size,
-          clientId,
-          timeInForce: timeInForce as OrderTimeInForce,
-          goodTilTimeInSeconds: goodTilTimeInSeconds ?? 0,
-          execution: execution as OrderExecution,
-          postOnly,
-          reduceOnly,
-        });
-
-        // Handle Stateful orders
-        if ((response as IndexedTx)?.code !== 0) {
-          throw new StatefulOrderError('Stateful order has failed to commit.', response);
-        }
-
-        if (orderParams?.clientId) {
-          dispatch(removeUncommittedOrderClientId(orderParams.clientId));
-        }
-
-        if (response?.hash) {
-          console.log(
-            isClosePosition
-              ? 'useSubaccount/closePosition'
-              : 'useSubaccount/placeOrderForSubaccount',
-            {
-              txHash: Buffer.from(response.hash).toString('hex').toUpperCase(),
-            }
-          );
-        }
-
-        track(AnalyticsEvent.TradePlaceOrder, {
-          ...orderParams,
-          isClosePosition,
-        } as HumanReadablePlaceOrderPayload & { isClosePosition: boolean });
-        onSuccess?.();
-      } catch (error) {
-        const errorCode: number | undefined = error?.code;
-        const errorStringKey = errorCode ? ORDER_ERROR_CODE_MAP[errorCode] : undefined;
-        onError?.({ errorStringKey });
-
-        log('useSubaccount/placeOrder', error, {
-          orderParams,
-          isClosePosition,
-        });
+      if (isClosePosition) {
+        placeOrderParams = abacusStateManager.closePosition(callback);
+      } else {
+        placeOrderParams = abacusStateManager.placeOrder(callback);
       }
+
+      track(AnalyticsEvent.TradePlaceOrder, {
+        ...placeOrderParams,
+        isClosePosition,
+      } as HumanReadablePlaceOrderPayload & { isClosePosition: boolean });
+
+      return placeOrderParams;
     },
-    [subaccountClient, placeOrderForSubaccount]
+    [subaccountClient]
   );
 
   const closePosition = useCallback(
@@ -569,8 +400,8 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       onError,
       onSuccess,
     }: {
-      onError: (onErrorParams?: { errorStringKey?: string }) => void;
-      onSuccess?: () => void;
+      onError: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
+      onSuccess?: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => void;
     }) => await placeOrder({ isClosePosition: true, onError, onSuccess }),
     [placeOrder]
   );
@@ -582,53 +413,21 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       onSuccess,
     }: {
       orderId: string;
-      onError?: ({ errorMsg }?: { errorMsg?: string }) => void;
+      onError?: ({ errorStringKey }?: { errorStringKey?: Nullable<string> }) => void;
       onSuccess?: () => void;
     }) => {
-      let cancelOrderParams: Nullable<HumanReadableCancelOrderPayload>;
-
-      if (!subaccountClient) return;
-
-      try {
-        cancelOrderParams = abacusStateManager.cancelOrderPayload(orderId);
-
-        if (!cancelOrderParams) {
-          throw new Error('Missing cancel order params');
+      const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
+        if (success) {
+          track(AnalyticsEvent.TradeCancelOrder);
+          onSuccess?.();
+        } else {
+          onError?.({ errorStringKey: parsingError?.stringKey });
         }
+      };
 
-        const { clientId, clobPairId, goodTilBlock, goodTilBlockTime, orderFlags } =
-          cancelOrderParams;
-
-        // Keep for debugging
-        console.log('useSubaccount/cancelOrder', cancelOrderParams);
-
-        const response = await cancelOrderForSubaccount({
-          subaccount: subaccountClient,
-          clientId,
-          orderFlags,
-          clobPairId,
-          goodTilBlock: goodTilBlock || undefined,
-          goodTilBlockTime: goodTilBlockTime || undefined,
-        });
-
-        // Handle Stateful orders
-        if ((response as IndexedTx)?.code !== 0) {
-          throw new StatefulOrderError('Stateful cancel has failed to commit.', response);
-        }
-
-        if (response?.hash) {
-          console.log('useSubaccount/cancelOrderForSubaccount', {
-            txHash: Buffer.from(response.hash).toString('hex').toUpperCase(),
-          });
-        }
-
-        onSuccess?.();
-      } catch (error) {
-        onError?.();
-        log('useSubaccount/cancelOrder', error, cancelOrderParams);
-      }
+      abacusStateManager.cancelOrder(orderId, callback);
     },
-    [subaccountClient, cancelOrderForSubaccount]
+    [subaccountClient]
   );
 
   return {

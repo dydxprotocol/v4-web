@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
+import { AbacusOrderStatus } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
@@ -18,13 +19,16 @@ import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { OrdersTable, OrdersTableColumnKey } from '@/views/tables/OrdersTable';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
-import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-
 import {
   calculateHasUncommittedOrders,
+  calculateIsAccountViewOnly,
+} from '@/state/accountCalculators';
+
+import {
   getCurrentMarketTradeInfoNumbers,
   getHasUnseenFillUpdates,
   getHasUnseenOrderUpdates,
+  getLatestOrderStatus,
   getTradeInfoNumbers,
 } from '@/state/accountSelectors';
 
@@ -69,8 +73,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const hasUnseenOrderUpdates = useSelector(getHasUnseenOrderUpdates);
   const hasUnseenFillUpdates = useSelector(getHasUnseenFillUpdates);
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
-  const hasUncommittedOrders = useSelector(calculateHasUncommittedOrders);
-
+  const isWaitingForOrderToIndex = useSelector(calculateHasUncommittedOrders);
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
 
   const fillsTagNumber = shortenNumberForDisplay(showCurrentMarket ? numFills : numTotalFills);
@@ -118,7 +121,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
       value: InfoSection.Orders,
       label: stringGetter({ key: STRING_KEYS.ORDERS }),
 
-      slotRight: hasUncommittedOrders ? (
+      slotRight: isWaitingForOrderToIndex ? (
         <Styled.LoadingSpinner />
       ) : (
         ordersTagNumber && (
