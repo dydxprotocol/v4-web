@@ -1,30 +1,46 @@
-import Abacus, { Nullable } from '@dydxprotocol/v4-abacus';
+import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
 import Long from 'long';
+import type { IndexedTx } from '@cosmjs/stargate';
 
 import {
   CompositeClient,
   IndexerConfig,
+  type LocalWallet,
   Network,
   NetworkOptimizer,
+  SubaccountClient,
   ValidatorConfig,
+  OrderType,
+  OrderSide,
+  OrderTimeInForce,
+  OrderExecution,
 } from '@dydxprotocol/v4-client-js';
 
 import {
   type AbacusDYDXChainTransactionsProtocol,
   QueryType,
   type QueryTypes,
+  TransactionType,
   type TransactionTypes,
+  type HumanReadablePlaceOrderPayload,
+  type HumanReadableCancelOrderPayload,
 } from '@/constants/abacus';
+
 import { DialogTypes } from '@/constants/dialogs';
+import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 
 import { RootStore } from '@/state/_store';
+import { addUncommittedOrderClientId, removeUncommittedOrderClientId } from '@/state/account';
 import { openDialog } from '@/state/dialogs';
 
+import { StatefulOrderError } from '../errors';
+import { bytesToBigInt } from '../numbers';
 import { log } from '../telemetry';
 
 class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   private compositeClient: CompositeClient | undefined;
   private store: RootStore | undefined;
+  private localWallet: LocalWallet | undefined;
 
   constructor() {
     this.compositeClient = undefined;
@@ -33,6 +49,10 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
   setStore(store: RootStore): void {
     this.store = store;
+  }
+
+  setLocalWallet(localWallet: LocalWallet) {
+    this.localWallet = localWallet;
   }
 
   async connectNetwork(
@@ -93,6 +113,10 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       return x.toString() as T;
     }
 
+    if (x instanceof Uint8Array) {
+      return bytesToBigInt(x).toString() as T;
+    }
+
     if (typeof x === 'object') {
       const parsedObj: { [key: string]: any } = {};
       for (const key in x) {
@@ -106,13 +130,138 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     throw new Error(`Unsupported data type: ${typeof x}`);
   }
 
+  async placeOrderTransaction(params: HumanReadablePlaceOrderPayload): Promise<string> {
+    if (!this.compositeClient || !this.localWallet)
+      throw new Error('Missing compositeClient or localWallet');
+
+    try {
+      const {
+        subaccountNumber,
+        marketId,
+        type,
+        side,
+        price,
+        size,
+        clientId,
+        timeInForce,
+        goodTilTimeInSeconds,
+        execution,
+        postOnly,
+        reduceOnly,
+        triggerPrice,
+      } = params || {};
+
+      // Observe uncommitted order
+      this.store?.dispatch(addUncommittedOrderClientId(clientId));
+
+      setTimeout(() => {
+        this.store?.dispatch(removeUncommittedOrderClientId(clientId));
+      }, UNCOMMITTED_ORDER_TIMEOUT_MS);
+
+      // Place order
+      const tx = await this.compositeClient?.placeOrder(
+        new SubaccountClient(this.localWallet, subaccountNumber),
+        marketId,
+        type as OrderType,
+        side as OrderSide,
+        price,
+        size,
+        clientId,
+        timeInForce as OrderTimeInForce,
+        goodTilTimeInSeconds ?? 0,
+        execution as OrderExecution,
+        postOnly,
+        reduceOnly,
+        triggerPrice ?? undefined
+      );
+
+      // Handle stateful orders
+      if ((tx as IndexedTx)?.code !== 0) {
+        throw new StatefulOrderError('Stateful order has failed to commit.', tx);
+      }
+
+      const parsedTx = this.parseToPrimitives(tx);
+      const hash = parsedTx?.hash;
+
+      if (import.meta.env.MODE === 'production') {
+        console.log(`https://testnet.mintscan.io/dydx-testnet/txs/${hash}`);
+      } else console.log(`txHash: ${hash}`);
+
+      return JSON.stringify(parsedTx);
+    } catch (error) {
+      if (error?.name !== 'BroadcastError') {
+        log('DydxChainTransactions/placeOrderTransaction', error);
+      }
+
+      return JSON.stringify({
+        error,
+      });
+    }
+  }
+
+  async cancelOrderTransaction(params: HumanReadableCancelOrderPayload): Promise<string> {
+    if (!this.compositeClient || !this.localWallet) {
+      throw new Error('Missing compositeClient or localWallet');
+    }
+
+    const { subaccountNumber, clientId, orderFlags, clobPairId, goodTilBlock, goodTilBlockTime } =
+      params ?? {};
+
+    try {
+      const tx = await this.compositeClient?.cancelOrder(
+        new SubaccountClient(this.localWallet, subaccountNumber),
+        clientId,
+        orderFlags,
+        clobPairId,
+        goodTilBlock ?? undefined,
+        goodTilBlockTime ?? undefined
+      );
+
+      const parsedTx = this.parseToPrimitives(tx);
+
+      return JSON.stringify(parsedTx);
+    } catch (error) {
+      log('DydxChainTransactions/cancelOrderTransaction', error);
+
+      return JSON.stringify({
+        error,
+      });
+    }
+  }
+
   async transaction(
     type: TransactionTypes,
     paramsInJson: Abacus.Nullable<string>,
     callback: (p0: Abacus.Nullable<string>) => void
   ): Promise<void> {
-    // To be implemented
-    return;
+    try {
+      const params = paramsInJson ? JSON.parse(paramsInJson) : undefined;
+
+      switch (type) {
+        case TransactionType.PlaceOrder: {
+          const result = await this.placeOrderTransaction(params);
+          callback(result);
+          break;
+        }
+        case TransactionType.CancelOrder: {
+          const result = await this.cancelOrderTransaction(params);
+          callback(result);
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    } catch (error) {
+      try {
+        const serializedError = JSON.stringify(error);
+        callback(serializedError);
+      } catch (parseError) {
+        log('DydxChainTransactions/transaction', parseError);
+      }
+
+      log('DydxChainTransactions/transaction', error);
+    }
   }
 
   async get(
@@ -135,6 +284,12 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
             params.chainId
           );
           callback(JSON.stringify({ url: optimalNode }));
+          break;
+        case QueryType.EquityTiers:
+          const equityTiers =
+            await this.compositeClient?.validatorClient.get.getEquityTierLimitConfiguration();
+          const parsedEquityTiers = this.parseToPrimitives(equityTiers);
+          callback(JSON.stringify(parsedEquityTiers));
           break;
         case QueryType.FeeTiers:
           const feeTiers = await this.compositeClient?.validatorClient.get.getFeeTiers();

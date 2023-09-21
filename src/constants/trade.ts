@@ -27,7 +27,7 @@ export enum PositionSide {
   Short = 'SHORT',
 }
 
-export const UNCOMMITTED_ORDER_TIMEOUT = 10_000;
+export const UNCOMMITTED_ORDER_TIMEOUT_MS = 10_000;
 
 export const ORDER_SIDE_STRINGS = {
   [OrderSide.BUY]: STRING_KEYS.BUY,

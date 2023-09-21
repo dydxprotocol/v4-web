@@ -9,6 +9,7 @@ import {
   getOnboardingGuards,
   getOnboardingState,
   getSubaccountId,
+  getUncommittedOrderClientIds,
 } from '@/state/accountSelectors';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
@@ -67,6 +68,11 @@ export const calculateIsAccountViewOnly = createSelector(
 export const calculateHasOpenPositions = createSelector(
   [getExistingOpenPositions],
   (openPositions?: SubaccountPosition[]) => (openPositions?.length || 0) > 0
+);
+
+export const calculateHasUncommittedOrders = createSelector(
+  [getUncommittedOrderClientIds],
+  (uncommittedOrderClientIds: number[]) => uncommittedOrderClientIds.length > 0
 );
 
 /**

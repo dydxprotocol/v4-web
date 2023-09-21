@@ -7,7 +7,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AbacusOrderStatus, AbacusOrderTypes, type Nullable } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
-import { STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS, type StringKey } from '@/constants/localization';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
@@ -47,7 +47,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
   const { cancelOrder } = useSubaccount();
 
   const {
-    asset = {},
+    asset,
     cancelReason,
     createdAtMilliseconds,
     expiresAtMilliseconds,
@@ -57,7 +57,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     price,
     reduceOnly,
     totalFilled,
-    resources = {},
+    resources,
     size,
     status,
     stepSizeDecimals,
@@ -121,7 +121,9 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     {
       key: 'cancel-reason',
       label: stringGetter({ key: STRING_KEYS.CANCEL_REASON }),
-      value: cancelReason ? stringGetter({ key: STRING_KEYS[cancelReason] }) : undefined,
+      value: cancelReason
+        ? stringGetter({ key: STRING_KEYS[cancelReason as StringKey] })
+        : undefined,
     },
     {
       key: 'amount',
@@ -182,8 +184,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
 
   const onCancelClick = async () => {
     setIsPlacingCancel(true);
-    await cancelOrder({ orderId });
-    setIsPlacingCancel(false);
+    await cancelOrder({ orderId, onError: () => setIsPlacingCancel(false) });
   };
 
   const onClearClick = () => {

@@ -62,8 +62,10 @@ export const AccountInfoConnectedState = () => {
   const { buyingPower, equity, marginUsage, leverage } = subAccount || {};
 
   const hasDiff =
-    marginUsage?.postOrder != null &&
-    !MustBigNumber(marginUsage?.postOrder).eq(MustBigNumber(marginUsage?.current));
+    (marginUsage?.postOrder !== null &&
+      !MustBigNumber(marginUsage?.postOrder).eq(MustBigNumber(marginUsage?.current))) ||
+    (buyingPower?.postOrder !== null &&
+      !MustBigNumber(buyingPower?.postOrder).eq(MustBigNumber(buyingPower?.current)));
 
   const showHeader = !hasDiff && !isTablet;
 

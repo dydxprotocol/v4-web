@@ -260,9 +260,9 @@ const useAccountsContext = () => {
   // abacus
   // TODO: useAbacus({ dydxAddress })
   useEffect(() => {
-    if (dydxAddress) abacusStateManager.setAccount(dydxAddress);
+    if (dydxAddress) abacusStateManager.setAccount(localDydxWallet);
     else abacusStateManager.attemptDisconnectAccount();
-  }, [dydxAddress]);
+  }, [localDydxWallet]);
 
   // clear subaccounts when no dydxAddress is set
   useEffect(() => {

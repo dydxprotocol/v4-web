@@ -1,4 +1,4 @@
-import { type FormEvent, useState, useEffect, Ref } from 'react';
+import { type FormEvent, useState, Ref, useCallback } from 'react';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
 import type { NumberFormatValues, SourceInfo } from 'react-number-format';
@@ -7,6 +7,8 @@ import { AlertType } from '@/constants/alerts';
 
 import {
   ErrorType,
+  type HumanReadablePlaceOrderPayload,
+  type Nullable,
   TradeInputErrorAction,
   TradeInputField,
   ValidationError,
@@ -19,6 +21,7 @@ import { InputErrorData, TradeBoxKeys, MobilePlaceOrderSteps } from '@/constants
 
 import { breakpoints } from '@/styles';
 import { useStringGetter, useSubaccount } from '@/hooks';
+import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
@@ -34,7 +37,6 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { Orderbook } from '@/views/tables/Orderbook';
 
-import { calculateHasUncommittedOrders } from '@/state/accountSelectors';
 import { getCurrentInput, useTradeFormData } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
@@ -97,7 +99,6 @@ export const TradeForm = ({
   } = useTradeFormData();
 
   const { limitPrice, triggerPrice, trailingPercent } = price || {};
-  const hasUncommittedOrders = useSelector(calculateHasUncommittedOrders);
   const currentInput = useSelector(getCurrentInput);
   const { tickSizeDecimals, stepSizeDecimals } =
     useSelector(getCurrentMarketConfig, shallowEqual) || {};
@@ -154,29 +155,32 @@ export const TradeForm = ({
     }
   };
 
-  useEffect(() => {
-    // order has been placed
-    if (
-      (!currentStep || currentStep === MobilePlaceOrderSteps.PlacingOrder) &&
-      !hasUncommittedOrders
-    ) {
+  const onLastOrderIndexed = useCallback(() => {
+    if (!currentStep || currentStep === MobilePlaceOrderSteps.PlacingOrder) {
       setIsPlacingOrder(false);
       abacusStateManager.clearTradeInputValues({ shouldResetSize: true });
       setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
     }
-  }, [currentStep, hasUncommittedOrders]);
+  }, [currentStep]);
+
+  const { setUnIndexedClientId } = useOnLastOrderIndexed({
+    callback: onLastOrderIndexed,
+  });
 
   const onPlaceOrder = async () => {
     setPlaceOrderError(undefined);
     setIsPlacingOrder(true);
 
     await placeOrder({
-      onError: (errorParams?: { errorStringKey?: string }) => {
+      onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
         setPlaceOrderError(
           stringGetter({ key: errorParams?.errorStringKey || STRING_KEYS.SOMETHING_WENT_WRONG })
         );
 
         setIsPlacingOrder(false);
+      },
+      onSuccess: (placeOrderPayload?: Nullable<HumanReadablePlaceOrderPayload>) => {
+        setUnIndexedClientId(placeOrderPayload?.clientId);
       },
     });
   };

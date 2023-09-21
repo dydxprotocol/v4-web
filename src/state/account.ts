@@ -24,14 +24,15 @@ export type AccountState = {
   fundingPayments?: SubaccountFundingPayments;
   transfers?: SubaccountTransfers;
   clearedOrderIds?: string[];
-  uncommittedOrderClientIds?: number[];
   hasUnseenFillUpdates: boolean;
   hasUnseenOrderUpdates: boolean;
   historicalPnl?: SubAccountHistoricalPNLs;
   isGeoBlocked?: boolean;
+  latestOrder?: Nullable<SubaccountOrder>;
   onboardingGuards: Record<OnboardingGuard, boolean | undefined>;
   onboardingState: OnboardingState;
   subaccount?: Nullable<Subaccount>;
+  uncommittedOrderClientIds: number[];
   wallet?: Nullable<Wallet>;
   walletType?: WalletType;
   historicalPnlPeriod?: HistoricalPnlPeriods;
@@ -42,11 +43,11 @@ const initialState: AccountState = {
   fundingPayments: undefined,
   transfers: undefined,
   clearedOrderIds: undefined,
-  uncommittedOrderClientIds: undefined,
   hasUnseenFillUpdates: false,
   hasUnseenOrderUpdates: false,
   historicalPnl: undefined,
   isGeoBlocked: false,
+  latestOrder: undefined,
   onboardingGuards: {
     [OnboardingGuard.hasAcknowledgedTerms]: Boolean(
       getLocalStorage<boolean>({
@@ -58,6 +59,7 @@ const initialState: AccountState = {
   },
   onboardingState: OnboardingState.Disconnected,
   subaccount: undefined,
+  uncommittedOrderClientIds: [],
   wallet: undefined,
   walletType: getLocalStorage<WalletType>({
     key: LocalStorageKey.OnboardingSelectedWalletType,
@@ -87,6 +89,16 @@ export const accountSlice = createSlice({
     },
     setTransfers: (state, action: PayloadAction<any>) => {
       state.transfers = action.payload;
+    },
+    setLatestOrder: (state, action: PayloadAction<Nullable<SubaccountOrder>>) => {
+      const { clientId } = action.payload ?? {};
+      state.latestOrder = action.payload;
+
+      if (clientId) {
+        state.uncommittedOrderClientIds = state.uncommittedOrderClientIds.filter(
+          (id) => id !== clientId
+        );
+      }
     },
     clearOrder: (state, action: PayloadAction<string>) => ({
       ...state,
@@ -136,21 +148,19 @@ export const accountSlice = createSlice({
       ...state,
       wallet: action.payload,
     }),
-    addUncommittedOrderClientId: (state, action: PayloadAction<number>) => {
-      state.uncommittedOrderClientIds = state.uncommittedOrderClientIds
-        ? [...state.uncommittedOrderClientIds, action.payload]
-        : [action.payload];
-    },
-    removeUncommittedOrderClientId: (state, action: PayloadAction<number>) => {
-      state.uncommittedOrderClientIds = state.uncommittedOrderClientIds?.filter(
-        (clientId) => clientId !== action.payload
-      );
-    },
     viewedFills: (state) => {
       state.hasUnseenFillUpdates = false;
     },
     viewedOrders: (state) => {
       state.hasUnseenOrderUpdates = false;
+    },
+    addUncommittedOrderClientId: (state, action: PayloadAction<number>) => {
+      state.uncommittedOrderClientIds.push(action.payload);
+    },
+    removeUncommittedOrderClientId: (state, action: PayloadAction<number>) => {
+      state.uncommittedOrderClientIds = state.uncommittedOrderClientIds.filter(
+        (id) => id !== action.payload
+      );
     },
   },
 });
@@ -159,6 +169,7 @@ export const {
   setFills,
   setFundingPayments,
   setTransfers,
+  setLatestOrder,
   clearOrder,
   setOnboardingGuard,
   setOnboardingState,
@@ -166,8 +177,8 @@ export const {
   setIsGeoBlocked,
   setSubaccount,
   setWallet,
-  addUncommittedOrderClientId,
-  removeUncommittedOrderClientId,
   viewedFills,
   viewedOrders,
+  addUncommittedOrderClientId,
+  removeUncommittedOrderClientId,
 } = accountSlice.actions;

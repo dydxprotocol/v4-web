@@ -136,7 +136,7 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const buttonState = currentStep
     ? buttonStatesPerStep[currentStep].buttonState
-    : { isDisabled: !shouldEnableTrade, isLoading };
+    : { isDisabled: !shouldEnableTrade || isLoading, isLoading };
 
   return (
     <WithDetailsReceipt detailItems={items}>

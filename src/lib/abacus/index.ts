@@ -1,3 +1,5 @@
+import type { LocalWallet } from '@dydxprotocol/v4-client-js';
+
 import type {
   ClosePositionInputFields,
   Nullable,
@@ -6,6 +8,7 @@ import type {
   TradeInputFields,
   TransferInputFields,
   HistoricalPnlPeriods,
+  ParsingError,
 } from '@/constants/abacus';
 
 import {
@@ -30,6 +33,7 @@ import { getInputTradeOptions } from '@/state/inputsSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import AbacusRest from './rest';
+import AbacusAnalytics from './analytics';
 import AbacusWebsocket from './websocket';
 import AbacusChainTransaction from './dydxChainTransactions';
 import AbacusStateNotifier from './stateNotification';
@@ -45,23 +49,25 @@ class AbacusStateManager {
   stateManager: InstanceType<typeof AsyncAbacusStateManager>;
   websocket: AbacusWebsocket;
   stateNotifier: AbacusStateNotifier;
+  analytics: AbacusAnalytics;
   abacusFormatter: AbacusFormatter;
-  chainTransactionClient: AbacusChainTransaction;
+  chainTransactions: AbacusChainTransaction;
 
   constructor() {
     this.store = undefined;
     this.currentMarket = undefined;
     this.stateNotifier = new AbacusStateNotifier();
+    this.analytics = new AbacusAnalytics();
     this.websocket = new AbacusWebsocket();
     this.abacusFormatter = new AbacusFormatter();
-    this.chainTransactionClient = new AbacusChainTransaction();
+    this.chainTransactions = new AbacusChainTransaction();
 
     const ioImplementations = new IOImplementations(
       // @ts-ignore
       new AbacusRest(),
       this.websocket,
-      this.chainTransactionClient,
-      null,
+      this.chainTransactions,
+      this.analytics,
       new AbacusThreading(),
       new CoroutineTimer(),
       new AbacusFileSystem()
@@ -157,11 +163,14 @@ class AbacusStateManager {
   setStore = (store: RootStore) => {
     this.store = store;
     this.stateNotifier.setStore(store);
-    this.chainTransactionClient.setStore(store);
+    this.chainTransactions.setStore(store);
   };
 
-  setAccount = (walletAddress: string) => {
-    this.stateManager.accountAddress = walletAddress;
+  setAccount = (localWallet?: LocalWallet) => {
+    if (localWallet) {
+      this.stateManager.accountAddress = localWallet.address;
+      this.chainTransactions.setLocalWallet(localWallet);
+    }
   };
 
   setTransfersSourceAddress = (evmAddress: string) => {
@@ -219,16 +228,34 @@ class AbacusStateManager {
     this.stateManager.transferStatus(hash, fromChainId, toChainId);
   };
 
+  // ------ Transactions ------ //
+
+  placeOrder = (
+    callback: (
+      success: boolean,
+      parsingError: Nullable<ParsingError>,
+      data: Nullable<HumanReadablePlaceOrderPayload>
+    ) => void
+  ): Nullable<HumanReadablePlaceOrderPayload> => this.stateManager.commitPlaceOrder(callback);
+
+  closePosition = (
+    callback: (
+      success: boolean,
+      parsingError: Nullable<ParsingError>,
+      data: Nullable<HumanReadablePlaceOrderPayload>
+    ) => void
+  ): Nullable<HumanReadablePlaceOrderPayload> => this.stateManager.commitClosePosition(callback);
+
+  cancelOrder = (
+    orderId: string,
+    callback: (
+      success: boolean,
+      parsingError: Nullable<ParsingError>,
+      data: Nullable<HumanReadableCancelOrderPayload>
+    ) => void
+  ) => this.stateManager.cancelOrder(orderId, callback);
+
   // ------ Utils ------ //
-  placeOrderPayload = (): Nullable<HumanReadablePlaceOrderPayload> =>
-    this.stateManager.placeOrderPayload();
-
-  closePositionPayload = (): Nullable<HumanReadablePlaceOrderPayload> =>
-    this.stateManager.closePositionPayload();
-
-  cancelOrderPayload = (orderId: string): Nullable<HumanReadableCancelOrderPayload> =>
-    this.stateManager.cancelOrderPayload(orderId);
-
   getHistoricalPnlPeriod = (): Nullable<HistoricalPnlPeriods> =>
     this.stateManager.historicalPnlPeriod;
 
