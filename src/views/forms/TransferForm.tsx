@@ -13,7 +13,7 @@ import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
 import { NumberSign, QUANTUM_MULTIPLIER } from '@/constants/numbers';
-import { DYDX_CHAIN_ASSET_COIN_DENOM, DydxChainAsset } from '@/constants/wallets';
+import { DYDX_CHAIN_ASSET_COIN_DENOM, DYDX_CHAIN_ASSET_TAGS, DydxChainAsset } from '@/constants/wallets';
 
 import {
   useAccountBalance,
@@ -52,28 +52,6 @@ type TransferFormProps = {
   className?: string;
 };
 
-const debouncedEstimateFee = debounce(
-  async ({ amount, recipientAddress, asset, setFees, simulateTransfer }) => {
-    if (!amount || !recipientAddress) {
-      return;
-    }
-
-    try {
-      const coinDenom = DYDX_CHAIN_ASSET_COIN_DENOM[asset as DydxChainAsset];
-      const stdFee: StdFee = await simulateTransfer(amount, recipientAddress, coinDenom);
-
-      const fee = stdFee?.amount.find((coin) => coin.denom === coinDenom)?.amount;
-      const feeAmount = MustBigNumber(fee).div(QUANTUM_MULTIPLIER).toNumber();
-
-      setFees(feeAmount);
-    } catch (error) {
-      console.error('TransferForm > : debouncedEstimateFee > ', error);
-    }
-  },
-  1000,
-  { trailing: true }
-);
-
 export const TransferForm = ({
   selectedAsset = DydxChainAsset.DYDX,
   onDone,
@@ -82,8 +60,8 @@ export const TransferForm = ({
   const stringGetter = useStringGetter();
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
   const { dydxAddress } = useAccounts();
-  const { address: recipientAddress, size } = useSelector(getTransferInputs, shallowEqual) || {};
-  const { transfer, simulateTransfer } = useSubaccount();
+  const { address: recipientAddress, size, fee } = useSelector(getTransferInputs, shallowEqual) || {};
+  const { transfer } = useSubaccount();
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
   const { selectedNetwork } = useSelectedNetwork();
 
@@ -93,7 +71,6 @@ export const TransferForm = ({
   // Form states
   const [error, setError] = useState<Error | undefined>();
   const [isLoading, setIsLoading] = useState(false);
-  const [fees, setFees] = useState<number>();
 
   const balance = asset === DydxChainAsset.USDC ? freeCollateral?.current : nativeTokenBalance;
   const newBalance =
@@ -104,7 +81,7 @@ export const TransferForm = ({
           .toNumber();
   const amount = asset === DydxChainAsset.USDC ? size?.usdcSize : size?.size;
 
-  const showNotEnoughGasWarning = fees && asset === DydxChainAsset.USDC && usdcBalance < fees;
+  const showNotEnoughGasWarning = fee && asset === DydxChainAsset.USDC && usdcBalance < fee;
 
   // BN
   const amountBN = MustBigNumber(amount);
@@ -134,34 +111,21 @@ export const TransferForm = ({
 
   useEffect(() => {
     setError(undefined);
-    debouncedEstimateFee.cancel();
-
-    if (isAmountValid && isAddressValid) {
-      debouncedEstimateFee({
-        amount,
-        recipientAddress,
-        asset,
-        setFees,
-        simulateTransfer,
-      });
-    } else {
-      setFees(undefined);
-    }
-  }, [asset, amount, recipientAddress]);
-
-  useEffect(() => {
-    setError(undefined);
+    abacusStateManager.setTransferValue({
+      value: asset,
+      field: TransferInputField.token,
+    });
   }, [asset]);
 
   const onTransfer = async () => {
-    if (!isAmountValid || !isAddressValid || !fees) return;
+    if (!isAmountValid || !isAddressValid || !fee) return;
     setIsLoading(true);
     setError(undefined);
 
     try {
       // Subtract fees from amount if sending native tokens
       const amountToTransfer = (
-        asset === DydxChainAsset.DYDX ? amountBN.minus(fees) : amountBN
+        asset === DydxChainAsset.DYDX ? amountBN.minus(fee) : amountBN
       ).toNumber();
 
       const txResponse = await transfer(
@@ -212,7 +176,7 @@ export const TransferForm = ({
       value: DydxChainAsset.USDC,
       label: (
         <Styled.InlineRow>
-          <AssetIcon symbol="USDC" /> USDC
+          <AssetIcon symbol="USDC" /> {DYDX_CHAIN_ASSET_TAGS[DydxChainAsset.USDC]}
         </Styled.InlineRow>
       ),
     },
@@ -221,7 +185,7 @@ export const TransferForm = ({
       label: (
         <Styled.InlineRow>
           {/* <AssetIcon symbol="DYDX" />  */}
-          Dv4TNT
+          {DYDX_CHAIN_ASSET_TAGS[DydxChainAsset.DYDX]}
         </Styled.InlineRow>
       ),
     },
@@ -243,7 +207,7 @@ export const TransferForm = ({
       key: 'amount',
       label: (
         <span>
-          {stringGetter({ key: STRING_KEYS.AVAILABLE })} <Tag>{asset}</Tag>
+          {stringGetter({ key: STRING_KEYS.AVAILABLE })} <Tag>{DYDX_CHAIN_ASSET_TAGS[asset]}</Tag>
         </span>
       ),
       value: (
@@ -375,9 +339,9 @@ export const TransferForm = ({
       <Styled.Footer>
         <TransferButtonAndReceipt
           selectedAsset={asset}
-          fees={fees}
-          isDisabled={!isAmountValid || !isAddressValid || !fees}
-          isLoading={isLoading || Boolean(isAmountValid && isAddressValid && !fees)}
+          fees={fee || undefined}
+          isDisabled={!isAmountValid || !isAddressValid || !fee}
+          isLoading={isLoading || Boolean(isAmountValid && isAddressValid && !fee)}
         />
       </Styled.Footer>
     </Styled.Form>

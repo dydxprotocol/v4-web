@@ -122,6 +122,7 @@ export const InputSelectionOption = Abacus.exchange.dydx.abacus.output.input.Sel
 
 // ------ Wallet ------ //
 export type Wallet = Abacus.exchange.dydx.abacus.output.Wallet;
+export type AccountBalance = Abacus.exchange.dydx.abacus.output.AccountBalance;
 export type Subaccount = Abacus.exchange.dydx.abacus.output.Subaccount;
 export type SubaccountPosition = Abacus.exchange.dydx.abacus.output.SubaccountPosition;
 export type SubaccountOrder = Abacus.exchange.dydx.abacus.output.SubaccountOrder;
@@ -188,6 +189,10 @@ export type HumanReadablePlaceOrderPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadablePlaceOrderPayload;
 export type HumanReadableCancelOrderPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableCancelOrderPayload;
+export type HumanReadableWithdrawPayload =
+  Abacus.exchange.dydx.abacus.state.manager.HumanReadableWithdrawPayload;
+export type HumanReadableTransferPayload =
+  Abacus.exchange.dydx.abacus.state.manager.HumanReadableTransferPayload;
 
 // ------ Helpers ------ //
 export const AbacusHelper = Abacus.exchange.dydx.abacus.utils.AbacusHelper;

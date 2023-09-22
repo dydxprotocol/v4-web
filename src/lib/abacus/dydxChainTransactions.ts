@@ -14,6 +14,8 @@ import {
   OrderSide,
   OrderTimeInForce,
   OrderExecution,
+  DYDX_DENOM,
+  GAS_PRICE_DYDX_DENOM,
 } from '@dydxprotocol/v4-client-js';
 
 import {
@@ -24,10 +26,13 @@ import {
   type TransactionTypes,
   type HumanReadablePlaceOrderPayload,
   type HumanReadableCancelOrderPayload,
+  type HumanReadableWithdrawPayload,
+  type HumanReadableTransferPayload,
 } from '@/constants/abacus';
 
 import { DialogTypes } from '@/constants/dialogs';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
+import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 
 import { RootStore } from '@/state/_store';
 import { addUncommittedOrderClientId, removeUncommittedOrderClientId } from '@/state/account';
@@ -229,6 +234,76 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     }
   }
 
+  async simulateWithdrawTransaction(params: HumanReadableWithdrawPayload): Promise<string> {
+    if (!this.compositeClient || !this.localWallet) {
+      throw new Error('Missing compositeClient or localWallet');
+    }
+
+    const { subaccountNumber, amount } = params ?? {};
+    const compositeClient = this.compositeClient;
+    const subaccountClient = new SubaccountClient(this.localWallet, subaccountNumber);
+
+    try {
+      const tx = await compositeClient.simulate(
+        this.localWallet,
+        () =>
+          new Promise((resolve) => {
+            const msg = compositeClient.withdrawFromSubaccountMessage(subaccountClient, amount);
+
+            resolve([msg]);
+          }),
+      );
+
+      const parsedTx = this.parseToPrimitives(tx);
+
+      return JSON.stringify(parsedTx);
+    } catch (error) {
+      log('DydxChainTransactions/simulateWithdrawTransaction', error);
+
+      return JSON.stringify({
+        error,
+      });
+    }
+  }
+
+  async simulateTransferNativeTokenTransaction(params: HumanReadableTransferPayload): Promise<string> {
+    if (!this.compositeClient || !this.localWallet) {
+      throw new Error('Missing compositeClient or localWallet');
+    }
+
+    const { subaccountNumber, amount, recipient } = params ?? {};
+    const compositeClient = this.compositeClient;
+    const subaccountClient = new SubaccountClient(this.localWallet, subaccountNumber);
+
+    try {
+      const tx = await compositeClient.simulate(
+        this.localWallet,
+        () =>
+          new Promise((resolve) => {
+            const msg = compositeClient?.validatorClient.post.composer.composeMsgSendToken(
+              subaccountClient.address,
+              recipient,
+              DYDX_DENOM,
+              Long.fromNumber(amount * QUANTUM_MULTIPLIER)
+            );
+
+            resolve([msg]);
+          }),
+        GAS_PRICE_DYDX_DENOM,
+      );
+
+      const parsedTx = this.parseToPrimitives(tx);
+
+      return JSON.stringify(parsedTx);
+    } catch (error) {
+      log('DydxChainTransactions/simulateTransferNativeTokenTransaction', error);
+
+      return JSON.stringify({
+        error,
+      });
+    }
+  }
+
   async transaction(
     type: TransactionTypes,
     paramsInJson: Abacus.Nullable<string>,
@@ -245,6 +320,16 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         }
         case TransactionType.CancelOrder: {
           const result = await this.cancelOrderTransaction(params);
+          callback(result);
+          break;
+        }
+        case TransactionType.simulateWithdraw: {
+          const result = await this.simulateWithdrawTransaction(params);
+          callback(result);
+          break;
+        }
+        case TransactionType.simulateTransferNativeToken: {
+          const result = await this.simulateTransferNativeTokenTransaction(params);
           callback(result);
           break;
         }
@@ -309,6 +394,14 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
           );
           const parsedUserStats = this.parseToPrimitives(userStats);
           callback(JSON.stringify(parsedUserStats));
+          break;
+        case QueryType.GetAccountBalances:
+          if (!this.localWallet?.address) throw new Error('Missing localWallet');
+          const accountBalances = await this.compositeClient?.validatorClient.get.getAccountBalances(
+            this.localWallet.address
+          );
+          const parsedAccountBalances = this.parseToPrimitives(accountBalances);
+          callback(JSON.stringify(parsedAccountBalances));
           break;
         // Do not implement Transfers (yet)
         case QueryType.Transfers:

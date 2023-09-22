@@ -383,12 +383,18 @@ export const DYDX_CHAIN_INFO: Parameters<typeof suggestChain>[0] = {
   features: [],
 };
 
+// TODO: export this type from abacus instead
 export enum DydxChainAsset {
-  USDC = 'USDC',
-  DYDX = 'Dv4TNT',
+  USDC = 'usdc',
+  DYDX = 'dydx',
 }
 
 export const DYDX_CHAIN_ASSET_COIN_DENOM: Record<DydxChainAsset, string> = {
   [DydxChainAsset.USDC]: USDC_DENOM,
   [DydxChainAsset.DYDX]: DYDX_DENOM,
+};
+
+export const DYDX_CHAIN_ASSET_TAGS: Record<DydxChainAsset, string> = {
+  [DydxChainAsset.USDC]: 'USDC',
+  [DydxChainAsset.DYDX]: 'Dv4TNT',
 };
