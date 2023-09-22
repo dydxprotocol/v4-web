@@ -15,6 +15,7 @@ import {
   OrderTimeInForce,
   OrderExecution,
   DYDX_DENOM,
+  GAS_PRICE_DYDX_DENOM,
 } from '@dydxprotocol/v4-client-js';
 
 import {
@@ -289,6 +290,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
             resolve([msg]);
           }),
+        GAS_PRICE_DYDX_DENOM,
         undefined
       );
 
