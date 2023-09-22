@@ -252,7 +252,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
             resolve([msg]);
           }),
-        undefined
       );
 
       const parsedTx = this.parseToPrimitives(tx);
@@ -291,7 +290,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
             resolve([msg]);
           }),
         GAS_PRICE_DYDX_DENOM,
-        undefined
       );
 
       const parsedTx = this.parseToPrimitives(tx);
