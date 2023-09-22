@@ -49,15 +49,15 @@ export const WithdrawButtonAndReceipt = ({
   const [isEditingSlippage, setIsEditingSlipapge] = useState(false);
   const stringGetter = useStringGetter();
 
-  const { balance, queryStatus } = useAccountBalance({
-    addressOrDenom: withdrawToken?.address || undefined,
-    assetSymbol: withdrawToken?.symbol || undefined,
-    chainId: withdrawChain ? parseInt(withdrawChain) : undefined,
-    decimals: withdrawToken?.decimals || undefined,
-    isCosmosChain: false,
-  });
-
   // TODO: uncomment when we have a way to get token amount estimate from abacus
+  // const { balance, queryStatus } = useAccountBalance({
+  //   addressOrDenom: withdrawToken?.address || undefined,
+  //   assetSymbol: withdrawToken?.symbol || undefined,
+  //   chainId: withdrawChain ? parseInt(withdrawChain) : undefined,
+  //   decimals: withdrawToken?.decimals || undefined,
+  //   isCosmosChain: false,
+  // });
+
   // const balanceBN = MustBigNumber(balance);
   // const newBalance =
   //   // toAmountMin && withdrawToken && parseUnits(toAmountMin, withdrawToken.decimals).toString();
@@ -158,7 +158,7 @@ export const WithdrawButtonAndReceipt = ({
     // },
   ];
 
-  const isFormValid = !isDisabled && !isEditingSlippage && queryStatus !== 'error';
+  const isFormValid = !isDisabled && !isEditingSlippage;
 
   return (
     <Styled.WithReceipt
