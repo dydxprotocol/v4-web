@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { shallowEqual, useSelector, useDispatch } from 'react-redux';
 import type { Nullable } from '@dydxprotocol/v4-abacus';
 import Long from 'long';
 import type { IndexedTx } from '@cosmjs/stargate';
@@ -11,10 +11,10 @@ import {
   SubaccountClient,
   DYDX_DENOM,
   USDC_DENOM,
-  GAS_PRICE_DYDX_DENOM,
 } from '@dydxprotocol/v4-client-js';
 
 import type {
+  AccountBalance,
   HumanReadablePlaceOrderPayload,
   ParsingError,
   SubAccountHistoricalPNLs,
@@ -26,6 +26,7 @@ import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { DydxAddress } from '@/constants/wallets';
 
 import { setSubaccount, setHistoricalPnl, removeUncommittedOrderClientId } from '@/state/account';
+import { getBalances } from '@/state/accountSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics';
@@ -34,7 +35,7 @@ import { log } from '@/lib/telemetry';
 
 import { useAccounts } from './useAccounts';
 import { useDydxClient } from './useDydxClient';
-import { usePollUSDCBalance } from './usePollUSDCBalance';
+
 
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
 const SubaccountContext = createContext<SubaccountContextType>({} as SubaccountContextType);
@@ -70,10 +71,8 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   const {
     depositToSubaccount,
     withdrawFromSubaccount,
-    simulateWithdrawFromSubaccount,
     transferFromSubaccountToAddress,
     transferNativeToken,
-    simulateTransferNativeToken,
     sendSquidWithdrawFromSubaccount,
   } = useMemo(
     () => ({
@@ -94,31 +93,6 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         subaccountClient: SubaccountClient;
         amount: number;
       }) => await compositeClient?.withdrawFromSubaccount(subaccountClient, amount),
-
-      simulateWithdrawFromSubaccount: async ({
-        subaccountClient,
-        amount,
-        recipient,
-      }: {
-        subaccountClient: SubaccountClient;
-        amount: number;
-        recipient?: string;
-      }) => {
-        return await compositeClient?.simulate(
-          subaccountClient?.wallet,
-          () =>
-            new Promise((resolve) => {
-              const msg = compositeClient?.withdrawFromSubaccountMessage(
-                subaccountClient,
-                amount,
-                recipient
-              );
-
-              resolve([msg]);
-            }),
-          undefined
-        );
-      },
 
       transferFromSubaccountToAddress: async ({
         subaccountClient,
@@ -170,31 +144,6 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
           Method.BroadcastTxCommit
         ),
 
-      simulateTransferNativeToken: async ({
-        subaccountClient,
-        amount,
-        recipient,
-      }: {
-        subaccountClient: SubaccountClient;
-        amount: number;
-        recipient: string;
-      }) =>
-        await compositeClient?.simulate(
-          subaccountClient?.wallet,
-          () =>
-            new Promise((resolve) => {
-              const msg = compositeClient?.validatorClient.post.composer.composeMsgSendToken(
-                subaccountClient.address,
-                recipient,
-                DYDX_DENOM,
-                Long.fromNumber(amount * QUANTUM_MULTIPLIER)
-              );
-
-              resolve([msg]);
-            }),
-          GAS_PRICE_DYDX_DENOM,
-          undefined
-        ),
       sendSquidWithdrawFromSubaccount: async ({
         subaccountClient,
         amount,
@@ -244,10 +193,10 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
   // ------ Deposit/Withdraw Methods ------ //
   const depositFunds = useCallback(
-    async (balance?: Coin) => {
+    async (balance: AccountBalance) => {
       if (!localDydxWallet) return;
 
-      const amountAfterDust = MustBigNumber(balance?.amount)
+      const amountAfterDust = MustBigNumber(balance.amount)
         .minus(AMOUNT_RESERVED_FOR_GAS_USDC) // keep 0.1 USDC in user's wallet for gas
         .toString();
 
@@ -261,11 +210,14 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     [localDydxWallet, depositToSubaccount]
   );
 
-  const balance = usePollUSDCBalance({ dydxAddress });
+  const balances = useSelector(getBalances, shallowEqual);
+  const usdcCoinBalance = balances?.[USDC_DENOM];
 
   useEffect(() => {
-    depositFunds(balance);
-  }, [balance]);
+    if (usdcCoinBalance) {
+      depositFunds(usdcCoinBalance);
+    }
+  }, [usdcCoinBalance]);
 
   const deposit = useCallback(
     async (amount: Long) => {
@@ -302,30 +254,6 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         : transferNativeToken)({ subaccountClient, amount, recipient })) as IndexedTx;
     },
     [subaccountClient, transferFromSubaccountToAddress, transferNativeToken]
-  );
-
-  const simulateTransfer = useCallback(
-    async (amount: number, recipient: string, coinDenom: string) => {
-      if (!subaccountClient) {
-        return;
-      }
-
-      return await (coinDenom === USDC_DENOM
-        ? simulateWithdrawFromSubaccount
-        : simulateTransferNativeToken)({ subaccountClient, amount, recipient });
-    },
-    [subaccountClient, simulateWithdrawFromSubaccount, simulateTransferNativeToken]
-  );
-
-  const simulateWithdraw = useCallback(
-    async (amount: number) => {
-      if (!subaccountClient) {
-        return;
-      }
-
-      return await simulateWithdrawFromSubaccount({ subaccountClient, amount });
-    },
-    [subaccountClient, simulateWithdrawFromSubaccount]
   );
 
   const sendSquidWithdraw = useCallback(
@@ -437,9 +365,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     requestFaucetFunds,
 
     // Transfer Methods
-    simulateTransfer,
     transfer,
-    simulateWithdraw,
     sendSquidWithdraw,
 
     // Trading Methods

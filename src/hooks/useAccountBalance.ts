@@ -1,9 +1,11 @@
 import { useCallback } from 'react';
-import { useSelector } from 'react-redux';
+import { shallowEqual, useSelector } from 'react-redux';
 import { useBalance } from 'wagmi';
 import { StargateClient } from '@cosmjs/stargate';
 import { useQuery } from 'react-query';
 import { formatUnits } from 'viem';
+
+import { USDC_DENOM, DYDX_DENOM } from '@dydxprotocol/v4-client-js';
 
 import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
@@ -12,11 +14,10 @@ import { EvmAddress } from '@/constants/wallets';
 import { convertBech32Address } from '@/lib/addressUtils';
 import { MustBigNumber } from '@/lib/numbers';
 
+import { getBalances } from '@/state/accountSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { useAccounts } from './useAccounts';
-import { usePollNativeTokenBalance } from './usePollNativeTokenBalance';
-import { usePollUSDCBalance } from './usePollUSDCBalance';
 
 type UseAccountBalanceProps = {
   // Token Items
@@ -50,6 +51,7 @@ export const useAccountBalance = ({
   const { evmAddress, dydxAddress } = useAccounts();
 
   const selectedNetwork = useSelector(getSelectedNetwork);
+  const balances = useSelector(getBalances, shallowEqual);
   const evmChainId = Number(CLIENT_NETWORK_CONFIGS[selectedNetwork].ethereumChainId);
 
   const evmQuery = useBalance({
@@ -92,12 +94,12 @@ export const useAccountBalance = ({
   const { formatted: evmBalance } = evmQuery.data || {};
   const balance = !assetSymbol ? '0' : isCosmosChain ? cosmosQuery.data : evmBalance;
 
-  const nativeTokenCoinBalance = usePollNativeTokenBalance({ dydxAddress });
+  const nativeTokenCoinBalance = balances?.[DYDX_DENOM];
   const nativeTokenBalance = MustBigNumber(nativeTokenCoinBalance?.amount)
     .div(QUANTUM_MULTIPLIER)
     .toNumber();
-
-  const usdcCoinBalance = usePollUSDCBalance({ dydxAddress });
+  
+  const usdcCoinBalance = balances?.[USDC_DENOM];
   const usdcBalance = MustBigNumber(usdcCoinBalance?.amount).div(QUANTUM_MULTIPLIER).toNumber();
 
   return {
