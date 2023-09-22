@@ -13,7 +13,7 @@ import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
 import { NumberSign, QUANTUM_MULTIPLIER } from '@/constants/numbers';
-import { DYDX_CHAIN_ASSET_COIN_DENOM, DydxChainAsset } from '@/constants/wallets';
+import { DYDX_CHAIN_ASSET_COIN_DENOM, DYDX_CHAIN_ASSET_TAGS, DydxChainAsset } from '@/constants/wallets';
 
 import {
   useAccountBalance,
@@ -176,7 +176,7 @@ export const TransferForm = ({
       value: DydxChainAsset.USDC,
       label: (
         <Styled.InlineRow>
-          <AssetIcon symbol="USDC" /> USDC
+          <AssetIcon symbol="USDC" /> {DYDX_CHAIN_ASSET_TAGS[DydxChainAsset.USDC]}
         </Styled.InlineRow>
       ),
     },
@@ -185,7 +185,7 @@ export const TransferForm = ({
       label: (
         <Styled.InlineRow>
           {/* <AssetIcon symbol="DYDX" />  */}
-          Dv4TNT
+          {DYDX_CHAIN_ASSET_TAGS[DydxChainAsset.DYDX]}
         </Styled.InlineRow>
       ),
     },
@@ -207,7 +207,7 @@ export const TransferForm = ({
       key: 'amount',
       label: (
         <span>
-          {stringGetter({ key: STRING_KEYS.AVAILABLE })} <Tag>{asset}</Tag>
+          {stringGetter({ key: STRING_KEYS.AVAILABLE })} <Tag>{DYDX_CHAIN_ASSET_TAGS[asset]}</Tag>
         </span>
       ),
       value: (

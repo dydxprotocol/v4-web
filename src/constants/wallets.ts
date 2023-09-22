@@ -393,3 +393,8 @@ export const DYDX_CHAIN_ASSET_COIN_DENOM: Record<DydxChainAsset, string> = {
   [DydxChainAsset.USDC]: USDC_DENOM,
   [DydxChainAsset.DYDX]: DYDX_DENOM,
 };
+
+export const DYDX_CHAIN_ASSET_TAGS: Record<DydxChainAsset, string> = {
+  [DydxChainAsset.USDC]: 'USDC',
+  [DydxChainAsset.DYDX]: 'Dv4TNT',
+};
