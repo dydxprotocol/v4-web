@@ -104,6 +104,7 @@ export const getWidgetOptions = () => {
       'symbol_info',
       'go_to_date',
       'timeframes_toolbar',
+      'volume_force_overlay',
     ],
     enabled_features: [
       'remove_library_container_border',
