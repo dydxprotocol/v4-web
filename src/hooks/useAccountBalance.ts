@@ -37,10 +37,10 @@ type UseAccountBalanceProps = {
  * 0xSquid uses this 0x address as the chain's default token.
  * @todo We will need to add additional logic here if we 'useAccountBalance' on non-Squid related forms.
  */
-const CHAIN_DEFAULT_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+export const CHAIN_DEFAULT_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 
 export const useAccountBalance = ({
-  addressOrDenom = CHAIN_DEFAULT_TOKEN_ADDRESS,
+  addressOrDenom,
   assetSymbol,
   bech32AddrPrefix,
   chainId,
