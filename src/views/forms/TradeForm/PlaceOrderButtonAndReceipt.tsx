@@ -88,7 +88,7 @@ export const PlaceOrderButtonAndReceipt = ({
           {/* <AssetIcon symbol="DYDX" /> */}
         </>
       ),
-      value: <Output type={OutputType.Asset} value={reward} useGrouping />,
+      value: <Output type={OutputType.Asset} value={reward} useGrouping tag={reward ? "Dv4TNT" : ''} />,
       tooltip: 'max-reward',
     },
     {
