@@ -9,6 +9,7 @@ import { TRADE_TYPE_STRINGS, MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks';
 
+import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
@@ -62,7 +63,7 @@ export const PlaceOrderButtonAndReceipt = ({
   const selectedTradeType = getSelectedTradeType(type);
   const selectedOrderSide = getSelectedOrderSide(side);
 
-  const { fee, price: expectedPrice, total } = summary || {};
+  const { fee, price: expectedPrice, total, reward } = summary || {};
 
   const items = [
     {
@@ -78,6 +79,17 @@ export const PlaceOrderButtonAndReceipt = ({
       key: 'fee',
       label: stringGetter({ key: STRING_KEYS.FEE }),
       value: <Output type={OutputType.Fiat} value={fee} useGrouping />,
+    },
+    {
+      key: 'max-reward',
+      label: (
+        <>
+          {stringGetter({ key: STRING_KEYS.MAXIMUM_REWARDS })}
+          {/* <AssetIcon symbol="DYDX" /> */}
+        </>
+      ),
+      value: <Output type={OutputType.Asset} value={reward} useGrouping />,
+      tooltip: 'max-reward',
     },
     {
       key: 'total',
