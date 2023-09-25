@@ -403,6 +403,22 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
           const parsedAccountBalances = this.parseToPrimitives(accountBalances);
           callback(JSON.stringify(parsedAccountBalances));
           break;
+        case QueryType.RewardsParams:
+          const rewardsParams = await this.compositeClient?.validatorClient.get.getRewardsParams();
+          const parsedRewardsParams = this.parseToPrimitives(rewardsParams);
+          callback(JSON.stringify(parsedRewardsParams));
+          break;
+        case QueryType.GetMarketPrice:
+          const price = await this.compositeClient?.validatorClient.get.getPrice(params.marketId);
+          const parsedPrice = this.parseToPrimitives(price);
+          callback(JSON.stringify(parsedPrice));
+          break;
+        case QueryType.GetDelegations:
+          const delegations =
+            await this.compositeClient?.validatorClient.get.getDelegatorDelegations(params.address);
+          const parseDelegations = this.parseToPrimitives(delegations);
+          callback(JSON.stringify(parseDelegations));
+          break;
         // Do not implement Transfers (yet)
         case QueryType.Transfers:
         default:

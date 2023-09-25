@@ -94,6 +94,10 @@ export const tradeTooltips: TooltipStrings = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.MAINTENANCE_MARGIN_FRACTION_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.MAINTENANCE_MARGIN_FRACTION_BODY }),
   }),
+  'max-reward': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.MAXIMUM_REWARDS_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.MAXIMUM_REWARDS_BODY }),
+  }),
   'max-withdraw': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.MAX_WITHDRAW_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.MAX_WITHDRAW_BODY }),
