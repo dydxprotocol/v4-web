@@ -32,7 +32,7 @@ export const DYDXBalancePanel = () => {
   const { nativeTokenBalance } = useAccountBalance();
 
   return (
-    <Styled.TransfersCard
+    <Panel
       slotHeader={
         <Styled.Header>
           <Styled.Title>
@@ -111,15 +111,11 @@ export const DYDXBalancePanel = () => {
           ]}
         />
       </Styled.Content>
-    </Styled.TransfersCard>
+    </Panel>
   );
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TransfersCard = styled(Panel)`
-  width: 21.25rem;
-`;
 
 Styled.Header = styled.div`
   ${layoutMixins.spacedRow}
