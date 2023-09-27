@@ -1,6 +1,6 @@
 {
     "deployments":{
-       "testnet":{
+       "TESTNET":{
           "environments":[
              {
                 "id":"dydxprotocol-testnet",
@@ -32,7 +32,7 @@
           ],
           "default":"dydxprotocol-testnet"
        },
-       "development":null,
-       "mainnet":null
+       "DEV":null,
+       "MAINNET":null
     }
  }
