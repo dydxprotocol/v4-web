@@ -1,9 +1,11 @@
 import styled, { AnyStyledComponent } from 'styled-components';
+import { useDispatch } from 'react-redux';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 
-import { useAccounts, useBreakpoints, useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -11,9 +13,12 @@ import { Panel } from '@/components/Panel';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 
+import { openDialog } from '@/state/dialogs';
+
 import { DYDXBalancePanel } from './DYDXBalancePanel';
 
 export const RewardsPage = () => {
+  const dispatch = useDispatch();
   const stringGetter = useStringGetter();
 
   return (
@@ -23,20 +28,26 @@ export const RewardsPage = () => {
           slotHeader={<Styled.Title>{stringGetter({ key: STRING_KEYS.GOVERNANCE })}</Styled.Title>}
         >
           <Styled.Row>
-            <div>
-              {stringGetter({ key: STRING_KEYS.GOVERNANCE_DESCRIPTION })}
-            </div>
-            <IconButton action={ButtonAction.Base} iconName={IconName.Arrow} size={ButtonSize.Small} />
+            <div>{stringGetter({ key: STRING_KEYS.GOVERNANCE_DESCRIPTION })}</div>
+            <IconButton
+              action={ButtonAction.Base}
+              iconName={IconName.Arrow}
+              onClick={() => dispatch(openDialog({ type: DialogTypes.Keplr }))}
+              size={ButtonSize.Small}
+            />
           </Styled.Row>
         </Styled.Panel>
         <Styled.Panel
           slotHeader={<Styled.Title>{stringGetter({ key: STRING_KEYS.STAKING })}</Styled.Title>}
         >
           <Styled.Row>
-            <div>
-              {stringGetter({ key: STRING_KEYS.STAKING_DESCRIPTION })}
-            </div>
-            <IconButton action={ButtonAction.Base} iconName={IconName.Arrow} size={ButtonSize.Small} />
+            <div>{stringGetter({ key: STRING_KEYS.STAKING_DESCRIPTION })}</div>
+            <IconButton
+              action={ButtonAction.Base}
+              iconName={IconName.Arrow}
+              onClick={() => dispatch(openDialog({ type: DialogTypes.Keplr }))}
+              size={ButtonSize.Small}
+            />
           </Styled.Row>
         </Styled.Panel>
         <Styled.BalancePanelContainer>
@@ -78,4 +89,4 @@ Styled.Title = styled.h3`
 
 Styled.Panel = styled(Panel)`
   padding: 0 1.5rem 1rem;
-`
+`;

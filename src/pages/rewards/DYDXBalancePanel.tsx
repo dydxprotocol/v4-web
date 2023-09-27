@@ -29,7 +29,7 @@ export const DYDXBalancePanel = () => {
 
   const { walletType } = useAccounts();
   const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
-  const { nativeTokenBalance } = useAccountBalance();
+  const { nativeTokenBalance, nativeStakingBalance } = useAccountBalance();
 
   return (
     <Panel
@@ -97,7 +97,7 @@ export const DYDXBalancePanel = () => {
                 </Styled.Label>
               ),
 
-              value: <Output type={OutputType.Asset} value={undefined} />,
+              value: <Output type={OutputType.Asset} value={nativeStakingBalance} />,
             },
           ]}
         />
@@ -106,7 +106,7 @@ export const DYDXBalancePanel = () => {
             {
               key: 'totalBalance',
               label: 'Total balance',
-              value: <Output type={OutputType.Asset} value={nativeTokenBalance} tag="Dv4TNT" />,
+              value: <Output type={OutputType.Asset} value={nativeTokenBalance + nativeStakingBalance} tag="Dv4TNT" />,
             },
           ]}
         />

@@ -14,7 +14,7 @@ import { EvmAddress } from '@/constants/wallets';
 import { convertBech32Address } from '@/lib/addressUtils';
 import { MustBigNumber } from '@/lib/numbers';
 
-import { getBalances } from '@/state/accountSelectors';
+import { getBalances, getStakingBalances } from '@/state/accountSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { useAccounts } from './useAccounts';
@@ -53,6 +53,7 @@ export const useAccountBalance = ({
   const selectedNetwork = useSelector(getSelectedNetwork);
   const balances = useSelector(getBalances, shallowEqual);
   const evmChainId = Number(ENVIRONMENT_CONFIG_MAP[selectedNetwork].ethereumChainId);
+  const stakingBalances = useSelector(getStakingBalances, shallowEqual);
 
   const evmQuery = useBalance({
     enabled: Boolean(!isCosmosChain && addressOrDenom?.startsWith('0x')),
@@ -100,9 +101,15 @@ export const useAccountBalance = ({
   const usdcCoinBalance = balances?.[USDC_DENOM];
   const usdcBalance = MustBigNumber(usdcCoinBalance?.amount).div(QUANTUM_MULTIPLIER).toNumber();
 
+  const nativeStakingCoinBalanace = stakingBalances?.[DYDX_DENOM];
+  const nativeStakingBalance = MustBigNumber(nativeStakingCoinBalanace?.amount)
+    .div(QUANTUM_MULTIPLIER)
+    .toNumber();
+
   return {
     balance,
     nativeTokenBalance,
+    nativeStakingBalance,
     usdcBalance,
     queryStatus: isCosmosChain ? cosmosQuery.status : evmQuery.status,
     isQueryFetching: isCosmosChain ? cosmosQuery.isFetching : evmQuery.fetchStatus === 'fetching',
