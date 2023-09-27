@@ -71,7 +71,7 @@ export const WAGMI_SUPPORTED_CHAINS: Chain[] = [
 ];
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(WAGMI_SUPPORTED_CHAINS, [
-  alchemyProvider({ apiKey: import.meta.env.VITE_ALCHEMY_API_KEY }),
+  // alchemyProvider({ apiKey: import.meta.env.VITE_ALCHEMY_API_KEY }),
   jsonRpcProvider({
     rpc: (chain) => ({ http: chain.rpcUrls.default.http[0] }),
   }),
