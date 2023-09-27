@@ -69,8 +69,8 @@ export type NetworkConfig = {
 export type ConnectNetworkEvent = CustomEvent<Partial<NetworkConfig>>;
 
 // ------ State ------
-export type AbacusApiState = Abacus.exchange.dydx.abacus.state.app.ApiState;
-export const AbacusApiStatus = Abacus.exchange.dydx.abacus.state.app.ApiStatus;
+export type AbacusApiState = Abacus.exchange.dydx.abacus.state.manager.ApiState;
+export const AbacusApiStatus = Abacus.exchange.dydx.abacus.state.manager.ApiStatus;
 const abacusApiStatuses = [...AbacusApiStatus.values()];
 export type AbacusApiStatuses = (typeof abacusApiStatuses)[number];
 export const Changes = Abacus.exchange.dydx.abacus.state.changes.Changes;
@@ -139,7 +139,7 @@ export type SubaccountTransfers = Abacus.exchange.dydx.abacus.output.SubaccountT
 // ------ Historical PnL ------ //
 export type SubAccountHistoricalPNL = Abacus.exchange.dydx.abacus.output.SubaccountHistoricalPNL;
 export type SubAccountHistoricalPNLs = Abacus.exchange.dydx.abacus.output.SubaccountHistoricalPNL[];
-export const HistoricalPnlPeriod = Abacus.exchange.dydx.abacus.state.app.HistoricalPnlPeriod;
+export const HistoricalPnlPeriod = Abacus.exchange.dydx.abacus.protocols.HistoricalPnlPeriod;
 const historicalPnlPeriod = [...HistoricalPnlPeriod.values()] as const;
 export type HistoricalPnlPeriods = (typeof historicalPnlPeriod)[number];
 
@@ -178,12 +178,6 @@ export const AbacusOrderSide = Abacus.exchange.dydx.abacus.output.input.OrderSid
 
 export const AbacusPositionSide = Abacus.exchange.dydx.abacus.output.PositionSide;
 export type AbacusPositionSides = Abacus.exchange.dydx.abacus.output.PositionSide;
-
-export type SubaccountPlaceOrderPayload =
-  Abacus.exchange.dydx.abacus.state.app.V4SubaccountPlaceOrderPayload2;
-
-export type SubaccountCancelOrderPayload =
-  Abacus.exchange.dydx.abacus.state.app.V4SubaccountCancelOrderPayload2;
 
 export type HumanReadablePlaceOrderPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadablePlaceOrderPayload;
