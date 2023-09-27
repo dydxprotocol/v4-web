@@ -1,5 +1,5 @@
 {
-    "deploments":{
+    "deployments":{
        "MAINNET":null,
        "TESTNET":{
           "environments":[
