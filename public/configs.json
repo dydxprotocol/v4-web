@@ -1,23 +1,23 @@
 {
-    "deploments": {
-        "MAINNET": null,
-        "TESTNET": {
-            "environments" : [
-                "dydxprotocol-testnet"
-            ],
-            "default": "dydxprotocol-testnet"
-        },
-        "DEV": {
-            "environments" : [
-                "dydxprotocol-dev",
-                "dydxprotocol-dev-2",
-                "dydxprotocol-dev-4",
-                "dydxprotocol-dev-5",
-                "dydxprotocol-staging",
-                "dydxprotocol-testnet"
-            ],
-            "default": "dydxprotocol-staging"
-        }
+    "deploments":{
+       "MAINNET":null,
+       "TESTNET":{
+          "environments":[
+             "dydxprotocol-testnet"
+          ],
+          "default":"dydxprotocol-testnet"
+       },
+       "DEV":{
+          "environments":[
+             "dydxprotocol-dev",
+             "dydxprotocol-dev-2",
+             "dydxprotocol-dev-4",
+             "dydxprotocol-dev-5",
+             "dydxprotocol-staging",
+             "dydxprotocol-testnet"
+          ],
+          "default":"dydxprotocol-testnet"
+       }
     },
     "environments":[
        {
@@ -139,7 +139,10 @@
           "links":{
              "tos":"https://dydx.exchange/v4-terms",
              "privacy":"https://dydx.exchange/privacy",
-             "mintscan":"https://testnet.mintscan.io/dydx-testnet/txs/{tx_hash}"
+             "mintscan":"https://testnet.mintscan.io/dydx-testnet/txs/{tx_hash}",
+             "documentation":"https://v4-teacher.vercel.app/",
+             "community":"https://discord.com/invite/dydx",
+             "feedback":"https://docs.google.com/forms/d/e/1FAIpQLSezLsWCKvAYDEb7L-2O4wOON1T56xxro9A2Azvl6IxXHP_15Q/viewform"
           }
        },
        {
@@ -166,7 +169,10 @@
           "links":{
              "tos":"https://dydx.exchange/v4-terms",
              "privacy":"https://dydx.exchange/privacy",
-             "mintscan":"https://testnet.mintscan.io/dydx-testnet/txs/{tx_hash}"
+             "mintscan":"https://testnet.mintscan.io/dydx-testnet/txs/{tx_hash}",
+             "documentation":"https://v4-teacher.vercel.app/",
+             "community":"https://discord.com/invite/dydx",
+             "feedback":"https://docs.google.com/forms/d/e/1FAIpQLSezLsWCKvAYDEb7L-2O4wOON1T56xxro9A2Azvl6IxXHP_15Q/viewform"
           }
        }
     ]
