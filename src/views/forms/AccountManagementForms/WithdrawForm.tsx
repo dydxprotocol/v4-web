@@ -43,7 +43,7 @@ export const WithdrawForm = () => {
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { simulateWithdraw, sendSquidWithdraw } = useSubaccount();
+  const { sendSquidWithdraw } = useSubaccount();
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
 
   // User input
@@ -97,16 +97,10 @@ export const WithdrawForm = () => {
             field: TransferInputField.usdcSize,
           });
         } else {
-          const stdFee = await simulateWithdraw(parseFloat(debouncedAmount));
-          const amount =
-            parseFloat(debouncedAmount) -
-            parseFloat(stdFee?.amount[0]?.amount || '0') / QUANTUM_MULTIPLIER;
-
           abacusStateManager.setTransferValue({
-            value: amount.toString(),
+            value: debouncedAmount,
             field: TransferInputField.usdcSize,
           });
-
           setError(null);
         }
       } catch (error) {

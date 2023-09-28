@@ -3,7 +3,7 @@ import { shallowEqual, useSelector } from 'react-redux';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
-import { DydxChainAsset } from '@/constants/wallets';
+import { DYDX_CHAIN_ASSET_TAGS, DydxChainAsset } from '@/constants/wallets';
 
 import { useAccountBalance, useStringGetter } from '@/hooks';
 
@@ -60,7 +60,7 @@ export const TransferButtonAndReceipt = ({
       key: 'fees',
       label: (
         <span>
-          {stringGetter({ key: STRING_KEYS.FEES })} <Tag>{selectedAsset}</Tag>
+          {stringGetter({ key: STRING_KEYS.FEES })} <Tag>{DYDX_CHAIN_ASSET_TAGS[selectedAsset]}</Tag>
         </span>
       ),
       value: <Output type={OutputType.Asset} value={fees} />,
@@ -69,7 +69,7 @@ export const TransferButtonAndReceipt = ({
       key: 'balance',
       label: (
         <span>
-          {stringGetter({ key: STRING_KEYS.BALANCE })} <Tag>{selectedAsset}</Tag>
+          {stringGetter({ key: STRING_KEYS.BALANCE })} <Tag>{DYDX_CHAIN_ASSET_TAGS[selectedAsset]}</Tag>
         </span>
       ),
       value: (

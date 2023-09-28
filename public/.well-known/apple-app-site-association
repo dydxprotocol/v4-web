@@ -4,7 +4,7 @@
         "details": [
             {
                 "appIDs": [
-                    "75C6UARB5H.exchangeV4.dydx.trading"
+                    "{PLACE_YOUR_APP_ID_HERE}"
                 ],
                 "components": [
                     {

@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import type {
+  AccountBalance,
   SubaccountFill,
   Nullable,
   Subaccount,
@@ -36,6 +37,7 @@ export type AccountState = {
   wallet?: Nullable<Wallet>;
   walletType?: WalletType;
   historicalPnlPeriod?: HistoricalPnlPeriods;
+  balances?: Record<string, AccountBalance>;
 };
 
 const initialState: AccountState = {
@@ -154,6 +156,9 @@ export const accountSlice = createSlice({
     viewedOrders: (state) => {
       state.hasUnseenOrderUpdates = false;
     },
+    setBalances: (state, action: PayloadAction<Record<string, AccountBalance>>) => {
+      state.balances = action.payload;
+    },
     addUncommittedOrderClientId: (state, action: PayloadAction<number>) => {
       state.uncommittedOrderClientIds.push(action.payload);
     },
@@ -179,6 +184,7 @@ export const {
   setWallet,
   viewedFills,
   viewedOrders,
+  setBalances,
   addUncommittedOrderClientId,
   removeUncommittedOrderClientId,
 } = accountSlice.actions;
