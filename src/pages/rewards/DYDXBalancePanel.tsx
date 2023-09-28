@@ -170,13 +170,15 @@ Styled.IconContainer = styled.div`
 
 Styled.WalletAndStakedBalance = styled(Details)`
   --details-item-backgroundColor: var(--color-layer-6);
+
+  grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
+
 
   > div {
     gap: 1rem;
 
     padding: 1rem;
-    width: 8.625rem;
 
     border-radius: 0.75em;
     background-color: var(--color-layer-5);

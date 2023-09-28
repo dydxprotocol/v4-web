@@ -36,7 +36,7 @@ export const KeplrDialog = ({ setIsOpen }: ElementProps) => {
             {stringGetter({
               key: STRING_KEYS.NAVIGATE_TO_KEPLR,
               params: {
-                STRONG_YES: <strong>Yes</strong>,
+                STRONG_YES: <strong>{stringGetter({ key: STRING_KEYS.YES })}</strong>,
               },
             })}
           </span>
@@ -53,7 +53,7 @@ export const KeplrDialog = ({ setIsOpen }: ElementProps) => {
             {stringGetter({
               key: STRING_KEYS.LEARN_TO_EXPORT,
               params: {
-                STRONG_NO: <strong>No</strong>,
+                STRONG_NO: <strong>{stringGetter({ key: STRING_KEYS.NO })}</strong>,
               },
             })}
           </span>
