@@ -60,7 +60,8 @@ export const RewardsPage = () => {
                 {stringGetter({ key: STRING_KEYS.MIGRATE })}
               </Styled.MigrateTitle>
               <Styled.Description>
-                {stringGetter({ key: STRING_KEYS.MIGRATE_DESCRIPTION })}
+                Migrate your tokens from Ethereum to dYdX Chain. This will enable you to participate in governance. You will also be able to stake your tokens.
+                {/* {stringGetter({ key: STRING_KEYS.MIGRATE_DESCRIPTION })} */}
                 <Link href={MIGRATE_HELP_URL}>
                   {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
                 </Link>

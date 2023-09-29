@@ -43,6 +43,11 @@ export const HeaderDesktop = () => {
           href: AppRoute.Trade,
         },
         {
+          value: 'Dv4TNT',
+          label: 'Dv4TNT',
+          href: AppRoute.Rewards,
+        },
+        {
           value: 'PORTFOLIO',
           label: stringGetter({ key: STRING_KEYS.PORTFOLIO }),
           href: AppRoute.Portfolio,
