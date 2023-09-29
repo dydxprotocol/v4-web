@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
 import { STRING_KEYS } from '@/constants/localization';
-import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonState, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { breakpoints } from '@/styles';
 
@@ -48,7 +48,7 @@ export const RewardsPage = () => {
   const MIGRATE_HELP_URL = 'https://help.dydx.exchange/';
   const GOVERNANCE_HELP_URL = 'https://help.dydx.exchange/';
   const STAKING_HELP_URL = 'https://help.dydx.exchange/';
-  const BRIDGE_URL = 'https://bridge.dydx.exchange/';
+  // const BRIDGE_URL = 'https://bridge.dydx.exchange/';
 
   return (
     <Styled.Page>
@@ -76,8 +76,8 @@ export const RewardsPage = () => {
               </div>
               <Button
                 action={tokenBalance ? ButtonAction.Primary : ButtonAction.Base}
-                type={ButtonType.Link}
-                href={BRIDGE_URL}
+                // type={ButtonType.Link}
+                // href={BRIDGE_URL}
                 disabled
               >
                 {tokenBalance
@@ -117,8 +117,6 @@ export const RewardsPage = () => {
           >
             <Button
               action={tokenBalance ? ButtonAction.Primary : ButtonAction.Base}
-              type={ButtonType.Link}
-              href={BRIDGE_URL}
               size={ButtonSize.Medium}
               disabled
             >
@@ -151,7 +149,7 @@ export const RewardsPage = () => {
                 {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
               </Link>
             </Styled.Description>
-            <IconButton
+            <Styled.IconButton
               action={ButtonAction.Base}
               iconName={IconName.Arrow}
               onClick={() => dispatch(openDialog({ type: DialogTypes.Keplr }))}
@@ -168,7 +166,7 @@ export const RewardsPage = () => {
               {stringGetter({ key: STRING_KEYS.STAKING_DESCRIPTION })}
               <Link href={STAKING_HELP_URL}>{stringGetter({ key: STRING_KEYS.LEARN_MORE })} →</Link>
             </Styled.Description>
-            <IconButton
+            <Styled.IconButton
               action={ButtonAction.Base}
               iconName={IconName.Arrow}
               onClick={() => dispatch(openDialog({ type: DialogTypes.Keplr }))}
@@ -323,4 +321,8 @@ Styled.WithReceipt = styled(WithReceipt)`
 Styled.LearnMore = styled(Styled.Description)`
   ${layoutMixins.row}
   gap: 1ch;
+`;
+
+Styled.IconButton = styled(IconButton)`
+  color: var(--color-text-0);
 `;

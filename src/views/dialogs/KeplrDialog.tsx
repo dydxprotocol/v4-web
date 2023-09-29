@@ -41,7 +41,7 @@ export const KeplrDialog = ({ setIsOpen }: ElementProps) => {
             })}
           </span>
 
-          <IconButton
+          <Styled.IconButton
             action={ButtonAction.Base}
             iconName={IconName.Arrow}
             size={ButtonSize.XSmall}
@@ -58,7 +58,7 @@ export const KeplrDialog = ({ setIsOpen }: ElementProps) => {
             })}
           </span>
 
-          <IconButton
+          <Styled.IconButton
             action={ButtonAction.Base}
             iconName={IconName.Arrow}
             size={ButtonSize.XSmall}
@@ -100,4 +100,8 @@ Styled.Button = styled(Button)`
   gap: 0;
 
   justify-content: space-between;
+`;
+
+Styled.IconButton = styled(IconButton)`
+  color: var(--color-text-0);
 `;
