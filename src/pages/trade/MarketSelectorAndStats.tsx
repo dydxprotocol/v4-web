@@ -12,12 +12,12 @@ import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 export const MarketSelectorAndStats = ({ className }: { className?: string }) => {
-  const { symbol = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { id = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const currentMarketId = useSelector(getCurrentMarketId);
 
   return (
     <Styled.Container className={className}>
-      <MarketsDropdown currentMarketId={currentMarketId} symbol={symbol} />
+      <MarketsDropdown currentMarketId={currentMarketId} symbol={id} />
 
       <VerticalSeparator />
 

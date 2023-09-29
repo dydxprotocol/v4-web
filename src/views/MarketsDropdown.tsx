@@ -63,9 +63,9 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
                 renderCell: ({ asset }) => (
                   <Styled.MarketName isFavorited={false}>
                     {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
-                    <AssetIcon symbol={asset.symbol} />
+                    <AssetIcon symbol={asset.id} />
                     <h2>{asset.name}</h2>
-                    <Tag>{asset.symbol}</Tag>
+                    <Tag>{asset.id}</Tag>
                   </Styled.MarketName>
                 ),
               },

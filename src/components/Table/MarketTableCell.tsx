@@ -24,7 +24,7 @@ export const MarketTableCell = ({
     slotLeft={
       <>
         {showFavorite && <Icon iconName={IconName.Star} />}
-        <Styled.AssetIcon symbol={asset?.symbol} />
+        <Styled.AssetIcon symbol={asset?.id} />
       </>
     }
   >

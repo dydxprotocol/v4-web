@@ -68,7 +68,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
   const isLoading = useSelector(calculateIsAccountLoading);
 
   const { stepSizeDecimals, tickSizeDecimals } = currentMarketConfigs || {};
-  const { symbol } = currentMarketAssetData || {};
+  const { id } = currentMarketAssetData || {};
   const { type: dialogType } = activeDialog || {};
   const { type: tradeBoxDialogType } = activeTradeBoxDialog || {};
 
@@ -188,7 +188,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       label: STRING_KEYS.LIQUIDATION_PRICE,
       tooltip: 'liquidation-price',
       tooltipParams: {
-        SYMBOL: symbol || '',
+        SYMBOL: id || '',
       },
       fractionDigits: tickSizeDecimals,
       hasInvalidNewValue: Boolean(newLeverageIsInvalid),
@@ -326,7 +326,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
             notionalTotal={notionalTotal?.current}
             postOrderSize={size?.postOrder}
             stepSizeDecimals={stepSizeDecimals}
-            symbol={symbol || undefined}
+            symbol={id || undefined}
             tickSizeDecimals={tickSizeDecimals}
             showNarrowVariation={showNarrowVariation}
             isLoading={isLoading}
@@ -370,7 +370,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
           notionalTotal={notionalTotal?.current}
           postOrderSize={size?.postOrder}
           stepSizeDecimals={stepSizeDecimals}
-          symbol={symbol || undefined}
+          symbol={id || undefined}
           tickSizeDecimals={tickSizeDecimals}
           isLoading={isLoading}
         />

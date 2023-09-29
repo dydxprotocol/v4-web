@@ -6,6 +6,7 @@ import { STRING_KEYS } from './localization';
 export type Nullable<T> = T | null | undefined;
 
 // ------ V4 Protocols ------ //
+export const AbacusAppConfig = Abacus.exchange.dydx.abacus.state.manager.AppConfigs;
 export const IOImplementations = Abacus.exchange.dydx.abacus.utils.IOImplementations;
 export const UIImplementations = Abacus.exchange.dydx.abacus.utils.UIImplementations;
 export type AbacusDYDXChainTransactionsProtocol = Omit<
