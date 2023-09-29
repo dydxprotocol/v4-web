@@ -46,7 +46,7 @@ export const useMarketsData = (
       return filtered.filter(
         ({ asset }) =>
           asset.name?.toLocaleLowerCase().includes(searchFilter.toLowerCase()) ||
-          asset.symbol?.toLocaleLowerCase().includes(searchFilter.toLowerCase())
+          asset.id?.toLocaleLowerCase().includes(searchFilter.toLowerCase())
       );
     }
     return filtered;
