@@ -47,6 +47,11 @@ class AbacusRest implements AbacusRestProtocol {
       body,
     };
 
+    if (!url) {
+      callback(null, 0);
+      return;
+    }
+
     fetch(url, options)
       .then(async (response) => {
         const data = await response.text();

@@ -24,6 +24,7 @@ import {
   setFundingPayments,
   setHistoricalPnl,
   setLatestOrder,
+  setRestrictionType,
   setSubaccount,
   setTransfers,
   setWallet,
@@ -76,7 +77,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
       if (changes.has(Changes.accountBalances)) {
         if (updatedState.account?.balances) {
-          const balances: Record<string, AccountBalance> = {}
+          const balances: Record<string, AccountBalance> = {};
           for (const { k, v } of updatedState.account.balances.toArray()) {
             balances[k] = v;
           }
@@ -108,6 +109,10 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
             update: !!marketIds,
           })
         );
+      }
+
+      if (changes.has(Changes.restriction)) {
+        dispatch(setRestrictionType(updatedState.restriction));
       }
 
       subaccountNumbers?.forEach((subaccountId: number) => {

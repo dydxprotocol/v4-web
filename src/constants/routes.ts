@@ -8,7 +8,6 @@ export enum AppRoute {
   Alerts = '/alerts',
   Settings = '/settings',
   Rewards = '/DV4TNT',
-  Unavailable = '/unavailable',
 }
 
 export enum PortfolioRoute {

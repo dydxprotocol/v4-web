@@ -7,6 +7,8 @@ import { GrazProvider } from 'graz';
 
 import { AppRoute, DEFAULT_TRADE_ROUTE } from '@/constants/routes';
 
+import { RestrictionProvider } from '@/contexts/RestrictionContext';
+
 import { useBreakpoints, useInitializePage, useShouldShowFooter, useAnalytics } from '@/hooks';
 import { DydxProvider } from '@/hooks/useDydxClient';
 import { AccountsProvider } from '@/hooks/useAccounts';
@@ -22,7 +24,6 @@ import { GuardedMobileRoute } from '@/components/GuardedMobileRoute';
 import MarketsPage from '@/pages/markets/Markets';
 import PortfolioPage from '@/pages/portfolio/Portfolio';
 import { AlertsPage } from '@/pages/AlertsPage';
-import { GeoPage } from '@/pages/Geo';
 import ProfilePage from '@/pages/Profile';
 import { SettingsPage } from '@/pages/settings/Settings';
 import TradePage from '@/pages/trade/Trade';
@@ -83,7 +84,6 @@ const Content = () => {
               <Route path={`${AppRoute.Portfolio}/*`} element={<PortfolioPage />} />
             </Route>
 
-            <Route element={<GeoPage />} path={AppRoute.Unavailable} />
             <Route path="*" element={<Navigate to={DEFAULT_TRADE_ROUTE} replace />} />
           </Routes>
         </Suspense>
@@ -117,6 +117,7 @@ const providers = [
   wrapProvider(DydxProvider),
   wrapProvider(AccountsProvider),
   wrapProvider(SubaccountProvider),
+  wrapProvider(RestrictionProvider),
   wrapProvider(SquidProvider),
   wrapProvider(LocalNotificationsProvider),
   wrapProvider(NotificationsProvider),

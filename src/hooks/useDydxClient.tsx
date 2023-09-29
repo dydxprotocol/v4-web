@@ -179,17 +179,6 @@ const useDydxClientContext = () => {
     [requestCandles]
   );
 
-  const screenAddress = useCallback(
-    async ({ address }: { address: DydxAddress | EvmAddress }) => {
-      try {
-        return await compositeClient?.indexerClient.utility.screen(address);
-      } catch (error) {
-        log('useDydxClient/screenAddress', error);
-      }
-    },
-    [compositeClient]
-  );
-
   // ------ Subacount Methods ------ //
 
   return {
@@ -204,6 +193,5 @@ const useDydxClientContext = () => {
 
     // Public Methods
     getCandlesForDatafeed,
-    screenAddress,
   };
 };

@@ -22,6 +22,7 @@ import { WithdrawDialog } from '@/views/dialogs/WithdrawDialog';
 
 import { OrderDetailsDialog } from '@/views/dialogs/DetailsDialog/OrderDetailsDialog';
 import { FillDetailsDialog } from '@/views/dialogs/DetailsDialog/FillDetailsDialog';
+import { RateLimitDialog } from '@/views/dialogs/RateLimitDialog';
 
 export const DialogManager = () => {
   const dispatch = useDispatch();
@@ -52,6 +53,7 @@ export const DialogManager = () => {
     [DialogTypes.MobileSignIn]: <MobileSignInDialog {...modalProps} />,
     [DialogTypes.Onboarding]: <OnboardingDialog {...modalProps} />,
     [DialogTypes.OrderDetails]: <OrderDetailsDialog {...modalProps} />,
+    [DialogTypes.RateLimit]: <RateLimitDialog {...modalProps} />,
     [DialogTypes.Receive]: <ReceiveDialog {...modalProps} />,
     [DialogTypes.Trade]: <TradeDialog {...modalProps} />,
     [DialogTypes.Transfer]: <TransferDialog {...modalProps} />,

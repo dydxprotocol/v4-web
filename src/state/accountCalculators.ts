@@ -1,6 +1,11 @@
 import { createSelector } from 'reselect';
 
-import { SubaccountPosition } from '@/constants/abacus';
+import {
+  Nullable,
+  RestrictionType,
+  RestrictionTypes,
+  SubaccountPosition,
+} from '@/constants/abacus';
 import { OnboardingState, OnboardingSteps } from '@/constants/account';
 import { isDydxV4Network } from '@/constants/networks';
 
@@ -8,6 +13,7 @@ import {
   getExistingOpenPositions,
   getOnboardingGuards,
   getOnboardingState,
+  getRestrictionType,
   getSubaccountId,
   getUncommittedOrderClientIds,
 } from '@/state/accountSelectors';
@@ -93,4 +99,13 @@ export const calculateIsAccountLoading = createSelector(
       hasPreviousTransactions
     );
   }
+);
+
+/**
+ * @description calculate whether the current session is geo-restricted
+ */
+export const calculateIsGeoRestricted = createSelector(
+  [getRestrictionType],
+  (restrictionType?: Nullable<RestrictionTypes>) =>
+    restrictionType === RestrictionType.GEO_RESTRICTED
 );

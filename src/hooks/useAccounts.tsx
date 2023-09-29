@@ -10,9 +10,6 @@ import { LocalStorageKey, LOCAL_STORAGE_VERSIONS } from '@/constants/localStorag
 import { DydxAddress, EvmAddress, PrivateInformation } from '@/constants/wallets';
 
 import { setOnboardingState, setOnboardingGuard } from '@/state/account';
-import { openDialog } from '@/state/dialogs';
-
-import { UnauthorizedReason } from '@/views/dialogs/UnauthorizedDialog';
 
 import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
@@ -127,7 +124,7 @@ const useAccountsContext = () => {
   };
 
   // dYdXClient Onboarding & Account Helpers
-  const { compositeClient, getWalletFromEvmSignature, screenAddress } = useDydxClient();
+  const { compositeClient, getWalletFromEvmSignature } = useDydxClient();
   // dYdX subaccounts
   const [dydxSubaccounts, setDydxSubaccounts] = useState<Subaccount[] | undefined>();
 
@@ -179,46 +176,11 @@ const useAccountsContext = () => {
     setHdKey({ mnemonic, privateKey, publicKey });
   };
 
-  const checkIfAddressIsHighRisk = async ({
-    evmAddress,
-    dydxAddress,
-  }: {
-    evmAddress?: EvmAddress;
-    dydxAddress?: DydxAddress;
-  }) => {
-    if (evmAddress) {
-      const response = await screenAddress({ address: evmAddress });
-      console.log('evm', response, evmAddress);
-      setIsRestricted(response?.restricted);
-    } else if (dydxAddress) {
-      const response = await screenAddress({ address: dydxAddress });
-      console.log('cosmos', response, dydxAddress);
-      setIsRestricted(response?.restricted);
-    }
-  };
-
   useEffect(() => {
     if (evmAddress) {
       saveEvmDerivedAccount({ evmAddress, dydxAddress });
     }
   }, [evmAddress, dydxAddress]);
-
-  useEffect(() => {
-    if (compositeClient && isRestricted === undefined && (evmAddress || dydxAddress)) {
-      checkIfAddressIsHighRisk({ evmAddress, dydxAddress });
-    }
-  }, [isRestricted, evmAddress, dydxAddress, compositeClient]);
-
-  useEffect(() => {
-    if (isRestricted) {
-      dispatch(
-        openDialog({
-          type: DialogTypes.Unauthorized,
-          dialogProps: { reason: UnauthorizedReason.ELLIPTIC },
-        })
-      );
-    }
-  }, [isRestricted, evmAddress, dydxAddress]);
 
   useEffect(() => {
     (async () => {
@@ -258,11 +220,10 @@ const useAccountsContext = () => {
   }, [evmAddress, evmDerivedAddresses, signerWagmi, connectedDydxAddress, signerGraz]);
 
   // abacus
-  // TODO: useAbacus({ dydxAddress })
   useEffect(() => {
-    if (dydxAddress) abacusStateManager.setAccount(localDydxWallet);
+    if (dydxAddress) abacusStateManager.setAccount(evmAddress, localDydxWallet);
     else abacusStateManager.attemptDisconnectAccount();
-  }, [localDydxWallet]);
+  }, [evmAddress, localDydxWallet]);
 
   // clear subaccounts when no dydxAddress is set
   useEffect(() => {

@@ -1,17 +1,17 @@
 import styled from 'styled-components';
 
-// import { STRING_KEYS } from '@/constants/localization';
 // import { useStringGetter } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog } from '@/components/Dialog';
+// import { STRING_KEYS } from '@/constants/localization';
 
 type ElementProps = {
   preventClose?: boolean;
   setIsOpen?: (open: boolean) => void;
 };
 
-export const UnauthorizedDialog = ({ preventClose, setIsOpen }: ElementProps) => {
+export const RateLimitDialog = ({ preventClose, setIsOpen }: ElementProps) => {
   // const stringGetter = useStringGetter();
 
   return (
@@ -19,12 +19,12 @@ export const UnauthorizedDialog = ({ preventClose, setIsOpen }: ElementProps) =>
       isOpen
       preventClose={preventClose}
       setIsOpen={setIsOpen}
-      title="Wallet Restricted"
-      // title={stringGetter({ key: STRING_KEYS.WALLET_RESTRICTED_ERROR_TITLE })}
+      title="Rate Limit Reached"
+      // title={stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_TITLE })}
     >
       <StyledContent>
-        The connected wallet has been disconnected
-        {/* {stringGetter({ key: STRING_KEYS.WALLET_RESTRICTED_ERROR_MESSAGE })} */}
+        Rate limited reached for this IP address. Please try again later.
+        {/* {stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_MESSAGE })} */}
       </StyledContent>
     </Dialog>
   );
