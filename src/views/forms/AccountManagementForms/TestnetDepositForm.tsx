@@ -4,7 +4,7 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { useAccounts, useStringGetter, useSubaccount } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -65,7 +65,7 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
           key: STRING_KEYS.CREDITED_WITH,
           params: {
             AMOUNT_USD:
-              CLIENT_NETWORK_CONFIGS[selectedNetwork].ethereumChainId === 'dydxprotocol-testnet'
+              ENVIRONMENT_CONFIG_MAP[selectedNetwork].ethereumChainId === 'dydxprotocol-testnet'
                 ? 1000
                 : 100,
           },

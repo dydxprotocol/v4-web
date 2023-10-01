@@ -1,4 +1,3 @@
-import { isDydxV4Network } from '@/constants/networks';
 import { WalletType } from '@/constants/wallets';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -11,7 +10,7 @@ export const useDisplayedWallets = () => {
   return [
     WalletType.MetaMask,
 
-    import.meta.env.MODE !== 'production' && isDydxV4Network(selectedNetwork) && WalletType.Keplr,
+    import.meta.env.MODE !== 'production' && WalletType.Keplr,
 
     WalletType.WalletConnect2,
     WalletType.WalletConnect,

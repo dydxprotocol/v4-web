@@ -7,7 +7,7 @@ import { formatUnits } from 'viem';
 
 import { USDC_DENOM, DYDX_DENOM } from '@dydxprotocol/v4-client-js';
 
-import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { EvmAddress } from '@/constants/wallets';
 
@@ -52,16 +52,14 @@ export const useAccountBalance = ({
 
   const selectedNetwork = useSelector(getSelectedNetwork);
   const balances = useSelector(getBalances, shallowEqual);
-  const evmChainId = Number(CLIENT_NETWORK_CONFIGS[selectedNetwork].ethereumChainId);
+  const evmChainId = Number(ENVIRONMENT_CONFIG_MAP[selectedNetwork].ethereumChainId);
 
   const evmQuery = useBalance({
     enabled: Boolean(!isCosmosChain && addressOrDenom?.startsWith('0x')),
     address: evmAddress,
     chainId: typeof chainId === 'number' ? chainId : Number(evmChainId),
     token:
-      addressOrDenom === CHAIN_DEFAULT_TOKEN_ADDRESS
-        ? undefined
-        : (addressOrDenom as EvmAddress),
+      addressOrDenom === CHAIN_DEFAULT_TOKEN_ADDRESS ? undefined : (addressOrDenom as EvmAddress),
     watch: true,
   });
 
@@ -98,7 +96,7 @@ export const useAccountBalance = ({
   const nativeTokenBalance = MustBigNumber(nativeTokenCoinBalance?.amount)
     .div(QUANTUM_MULTIPLIER)
     .toNumber();
-  
+
   const usdcCoinBalance = balances?.[USDC_DENOM];
   const usdcBalance = MustBigNumber(usdcCoinBalance?.amount).div(QUANTUM_MULTIPLIER).toNumber();
 

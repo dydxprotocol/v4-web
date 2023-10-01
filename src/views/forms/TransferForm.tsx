@@ -11,9 +11,13 @@ import { TransferInputField, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { NumberSign, QUANTUM_MULTIPLIER } from '@/constants/numbers';
-import { DYDX_CHAIN_ASSET_COIN_DENOM, DYDX_CHAIN_ASSET_TAGS, DydxChainAsset } from '@/constants/wallets';
+import {
+  DYDX_CHAIN_ASSET_COIN_DENOM,
+  DYDX_CHAIN_ASSET_TAGS,
+  DydxChainAsset,
+} from '@/constants/wallets';
 
 import {
   useAccountBalance,
@@ -60,7 +64,11 @@ export const TransferForm = ({
   const stringGetter = useStringGetter();
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
   const { dydxAddress } = useAccounts();
-  const { address: recipientAddress, size, fee } = useSelector(getTransferInputs, shallowEqual) || {};
+  const {
+    address: recipientAddress,
+    size,
+    fee,
+  } = useSelector(getTransferInputs, shallowEqual) || {};
   const { transfer } = useSubaccount();
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
   const { selectedNetwork } = useSelectedNetwork();
@@ -193,7 +201,7 @@ export const TransferForm = ({
 
   const networkOptions = [
     {
-      chainId: CLIENT_NETWORK_CONFIGS[selectedNetwork].dydxChainId,
+      chainId: ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId,
       label: (
         <Styled.InlineRow>
           <AssetIcon symbol="DYDX" /> {stringGetter({ key: STRING_KEYS.DYDX_CHAIN })}
@@ -283,7 +291,7 @@ export const TransferForm = ({
         />
         <Styled.NetworkSelectMenu
           label={stringGetter({ key: STRING_KEYS.NETWORK })}
-          value={CLIENT_NETWORK_CONFIGS[selectedNetwork].dydxChainId}
+          value={ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId}
           slotTriggerAfter={null}
         >
           {networkOptions.map(({ chainId, label }) => (

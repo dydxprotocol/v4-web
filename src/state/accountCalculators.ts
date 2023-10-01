@@ -2,7 +2,6 @@ import { createSelector } from 'reselect';
 
 import { SubaccountPosition } from '@/constants/abacus';
 import { OnboardingState, OnboardingSteps } from '@/constants/account';
-import { isDydxV4Network } from '@/constants/networks';
 
 import {
   getExistingOpenPositions,
@@ -11,8 +10,6 @@ import {
   getSubaccountId,
   getUncommittedOrderClientIds,
 } from '@/state/accountSelectors';
-
-import { getSelectedNetwork } from '@/state/appSelectors';
 
 export const calculateOnboardingStep = createSelector(
   [getOnboardingState, getOnboardingGuards],
@@ -35,9 +32,9 @@ export const calculateOnboardingStep = createSelector(
  * @description calculate whether an account is in a state where they can trade
  */
 export const calculateCanAccountTrade = createSelector(
-  [getOnboardingState, getSelectedNetwork],
-  (onboardingState: OnboardingState, selectedNetwork: string) => {
-    return onboardingState === OnboardingState.AccountConnected && isDydxV4Network(selectedNetwork);
+  [getOnboardingState],
+  (onboardingState: OnboardingState) => {
+    return onboardingState === OnboardingState.AccountConnected;
   }
 );
 
