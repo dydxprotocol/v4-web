@@ -26,7 +26,7 @@ import {
 } from '@/constants/abacus';
 
 import { DEFAULT_MARKETID } from '@/constants/markets';
-import { type DydxNetwork } from '@/constants/networks';
+import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork } from '@/constants/networks';
 
 import type { RootStore } from '@/state/_store';
 
@@ -82,7 +82,7 @@ class AbacusStateManager {
 
     this.stateManager = new AsyncAbacusStateManager(
       '',
-      'DEV',
+      CURRENT_ABACUS_DEPLOYMENT,
       AbacusAppConfig.Companion.forWeb,
       ioImplementations,
       uiImplementations,
