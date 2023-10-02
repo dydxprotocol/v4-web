@@ -5,7 +5,7 @@ export enum DialogTypes {
   ExchangeOffline = 'ExchangeOffline',
   FillDetails = 'FillDetails',
   Help = 'Help',
-  Keplr = 'Keplr',
+  ExternalNavKeplr = 'ExternalNavKeplr',
   MnemonicExport = 'MnemonicExport',
   MobileSignIn = 'MobileSignIn',
   Onboarding = 'Onboarding',

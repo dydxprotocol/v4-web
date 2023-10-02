@@ -16,6 +16,7 @@ import { Panel } from '@/components/Panel';
 import { IconName } from '@/components/Icon';
 import { Button } from '@/components/Button';
 import { IconButton } from '@/components/IconButton';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 import { WithReceipt } from '@/components/WithReceipt';
@@ -24,35 +25,35 @@ import { openDialog } from '@/state/dialogs';
 import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { DYDXBalancePanel } from './DYDXBalancePanel';
-import { Link } from '@/components/Link';
+
+// TODO: replace placeholder URL with real URLs when avaialble
+const GOVERNANCE_HELP_URL = 'https://help.dydx.exchange/';
+const STAKING_HELP_URL = 'https://help.dydx.exchange/';
+// const MIGRATE_HELP_URL = 'https://help.dydx.exchange/';
+// const BRIDGE_URL = 'https://bridge.dydx.exchange/';
 
 export const RewardsPage = () => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
-
-  const selectedNetwork = useSelector(getSelectedNetwork);
   const { isTablet, isNotTablet } = useBreakpoints();
 
-  const chainId = Number(CLIENT_NETWORK_CONFIGS[selectedNetwork].ethereumChainId);
+  const selectedNetwork = useSelector(getSelectedNetwork);
 
-  const { balance } = useAccountBalance({
-    addressOrDenom: import.meta.env.VITE_V3_TOKEN_ADDRESS,
-    assetSymbol: 'DYDX',
-    chainId,
-    isCosmosChain: false,
-  });
+  // const chainId = Number(CLIENT_NETWORK_CONFIGS[selectedNetwork].ethereumChainId);
 
-  const tokenBalance = import.meta.env.VITE_V3_TOKEN_ADDRESS ? balance : 0;
+  // const { balance } = useAccountBalance({
+  //   addressOrDenom: import.meta.env.VITE_V3_TOKEN_ADDRESS,
+  //   assetSymbol: 'DYDX',
+  //   chainId,
+  //   isCosmosChain: false,
+  // });
 
-  // TODO: replace placeholder URL with real URLs when avaialble
-  const MIGRATE_HELP_URL = 'https://help.dydx.exchange/';
-  const GOVERNANCE_HELP_URL = 'https://help.dydx.exchange/';
-  const STAKING_HELP_URL = 'https://help.dydx.exchange/';
-  // const BRIDGE_URL = 'https://bridge.dydx.exchange/';
+  // const tokenBalance = import.meta.env.VITE_V3_TOKEN_ADDRESS ? balance : 0;
+
 
   return (
     <Styled.Page>
-      {isNotTablet ? (
+      {/* {isNotTablet ? (
         <Styled.Migrate>
           <Styled.TwoItemRow>
             <div>
@@ -60,8 +61,7 @@ export const RewardsPage = () => {
                 {stringGetter({ key: STRING_KEYS.MIGRATE })}
               </Styled.MigrateTitle>
               <Styled.Description>
-                Migrate your tokens from Ethereum to dYdX Chain. This will enable you to participate in governance. You will also be able to stake your tokens.
-                {/* {stringGetter({ key: STRING_KEYS.MIGRATE_DESCRIPTION })} */}
+                {stringGetter({ key: STRING_KEYS.MIGRATE_DESCRIPTION })}
                 <Link href={MIGRATE_HELP_URL}>
                   {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
                 </Link>
@@ -130,7 +130,7 @@ export const RewardsPage = () => {
             <Link href={MIGRATE_HELP_URL}>{stringGetter({ key: STRING_KEYS.CLICK_HERE })}</Link>
           </Styled.LearnMore>
         </Styled.MobileMigrateCard>
-      )}
+      )} */}
 
       <Styled.PanelRow>
         {isTablet && (
@@ -152,7 +152,7 @@ export const RewardsPage = () => {
             <Styled.IconButton
               action={ButtonAction.Base}
               iconName={IconName.Arrow}
-              onClick={() => dispatch(openDialog({ type: DialogTypes.Keplr }))}
+              onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr }))}
               size={ButtonSize.Small}
             />
           </Styled.Row>
@@ -169,7 +169,7 @@ export const RewardsPage = () => {
             <Styled.IconButton
               action={ButtonAction.Base}
               iconName={IconName.Arrow}
-              onClick={() => dispatch(openDialog({ type: DialogTypes.Keplr }))}
+              onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr }))}
               size={ButtonSize.Small}
             />
           </Styled.Row>
