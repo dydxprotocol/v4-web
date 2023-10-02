@@ -71,7 +71,7 @@ const useLocalNotificationsContext = () => {
           const status = await squid?.getStatus({ transactionId: txHash, toChainId, fromChainId });
           if (status) statuses[txHash] = status;
         } catch (error) {
-          // ignore errors for the first 120s since the route might not be available yet
+          // ignore errors for the first 120s since the status might not be available yet
           if (!triggeredAt || Date.now() - triggeredAt > STATUS_ERROR_GRACE_PERIOD) {
             statuses[txHash] = error;
           }
