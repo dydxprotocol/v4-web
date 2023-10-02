@@ -217,7 +217,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           !requestPayload.data ||
           !requestPayload.value ||
           !requestPayload.gasLimit ||
-          !requestPayload.gasPrice ||
           !requestPayload.routeType
         ) {
           throw new Error('Missing request payload');
