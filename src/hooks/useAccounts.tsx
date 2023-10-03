@@ -10,12 +10,14 @@ import { LocalStorageKey, LOCAL_STORAGE_VERSIONS } from '@/constants/localStorag
 import { DydxAddress, EvmAddress, PrivateInformation } from '@/constants/wallets';
 
 import { setOnboardingState, setOnboardingGuard } from '@/state/account';
+import { forceOpenDialog } from '@/state/dialogs';
 
 import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
 
 import { useDydxClient } from './useDydxClient';
 import { useLocalStorage } from './useLocalStorage';
+import { useRestrictions } from './useRestrictions';
 import { useWalletConnection } from './useWalletConnection';
 
 const AccountsContext = createContext<ReturnType<typeof useAccountsContext> | undefined>(undefined);
@@ -159,7 +161,6 @@ const useAccountsContext = () => {
   // dYdX wallet / onboarding state
   const [localDydxWallet, setLocalDydxWallet] = useState<LocalWallet>();
   const [hdKey, setHdKey] = useState<PrivateInformation>();
-  const [isRestricted, setIsRestricted] = useState<boolean>();
 
   const dydxAccounts = useMemo(() => localDydxWallet?.accounts, [localDydxWallet]);
 
@@ -259,6 +260,16 @@ const useAccountsContext = () => {
       })
     );
   }, [dydxSubaccounts]);
+
+  // Restrictions
+  const { isBadActor } = useRestrictions();
+
+  useEffect(() => {
+    if (isBadActor && dydxAddress) {
+      dispatch(forceOpenDialog({ type: DialogTypes.WalletRestricted }));
+      disconnect();
+    }
+  }, [isBadActor, dydxAddress]);
 
   // Disconnect wallet / accounts
   const disconnectLocalDydxWallet = () => {

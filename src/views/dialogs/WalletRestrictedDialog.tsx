@@ -11,7 +11,7 @@ type ElementProps = {
   setIsOpen?: (open: boolean) => void;
 };
 
-export const UnauthorizedDialog = ({ preventClose, setIsOpen }: ElementProps) => {
+export const WalletRestrictedDialog = ({ preventClose, setIsOpen }: ElementProps) => {
   // const stringGetter = useStringGetter();
 
   return (

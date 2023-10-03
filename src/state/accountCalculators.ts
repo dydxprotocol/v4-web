@@ -100,12 +100,3 @@ export const calculateIsAccountLoading = createSelector(
     );
   }
 );
-
-/**
- * @description calculate whether the current session is geo-restricted
- */
-export const calculateIsGeoRestricted = createSelector(
-  [getRestrictionType],
-  (restrictionType?: Nullable<RestrictionTypes>) =>
-    restrictionType === RestrictionType.GEO_RESTRICTED
-);

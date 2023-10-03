@@ -14,15 +14,16 @@ import { HelpDialog } from '@/views/dialogs/HelpDialog';
 import { MnemonicExportDialog } from '@/views/dialogs/MnemonicExportDialog';
 import { MobileSignInDialog } from '@/views/dialogs/MobileSignInDialog';
 import { OnboardingDialog } from '@/views/dialogs/OnboardingDialog';
+import { RateLimitDialog } from '@/views/dialogs/RateLimitDialog';
 import { ReceiveDialog } from '@/views/dialogs/ReceiveDialog';
+import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
-import { UnauthorizedDialog } from '@/views/dialogs/UnauthorizedDialog';
+import { WalletRestrictedDialog } from '@/views/dialogs/WalletRestrictedDialog';
 import { WithdrawDialog } from '@/views/dialogs/WithdrawDialog';
 
 import { OrderDetailsDialog } from '@/views/dialogs/DetailsDialog/OrderDetailsDialog';
 import { FillDetailsDialog } from '@/views/dialogs/DetailsDialog/FillDetailsDialog';
-import { RateLimitDialog } from '@/views/dialogs/RateLimitDialog';
 
 export const DialogManager = () => {
   const dispatch = useDispatch();
@@ -55,9 +56,10 @@ export const DialogManager = () => {
     [DialogTypes.OrderDetails]: <OrderDetailsDialog {...modalProps} />,
     [DialogTypes.RateLimit]: <RateLimitDialog {...modalProps} />,
     [DialogTypes.Receive]: <ReceiveDialog {...modalProps} />,
+    [DialogTypes.RestrictedGeo]: <RestrictedGeoDialog {...modalProps} />,
     [DialogTypes.Trade]: <TradeDialog {...modalProps} />,
     [DialogTypes.Transfer]: <TransferDialog {...modalProps} />,
-    [DialogTypes.Unauthorized]: <UnauthorizedDialog {...modalProps} />,
+    [DialogTypes.WalletRestricted]: <WalletRestrictedDialog {...modalProps} />,
     [DialogTypes.Withdraw]: <WithdrawDialog {...modalProps} />,
   }[type];
 };

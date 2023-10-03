@@ -11,9 +11,10 @@ export enum DialogTypes {
   OrderDetails = 'OrderDetails',
   RateLimit = 'RateLimit',
   Receive = 'Receive',
+  RestrictedGeo = 'RestrictedGeo',
   Trade = 'Trade',
   Transfer = 'Transfer',
-  Unauthorized = 'Unauthorized',
+  WalletRestricted = 'WalletRestricted',
   Withdraw = 'Withdraw',
 }
 

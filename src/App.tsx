@@ -7,8 +7,6 @@ import { GrazProvider } from 'graz';
 
 import { AppRoute, DEFAULT_TRADE_ROUTE } from '@/constants/routes';
 
-import { RestrictionProvider } from '@/contexts/RestrictionContext';
-
 import { useBreakpoints, useInitializePage, useShouldShowFooter, useAnalytics } from '@/hooks';
 import { DydxProvider } from '@/hooks/useDydxClient';
 import { AccountsProvider } from '@/hooks/useAccounts';
@@ -16,6 +14,7 @@ import { DialogAreaProvider, useDialogArea } from '@/hooks/useDialogArea';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
 import { LocalNotificationsProvider } from '@/hooks/useLocalNotifications';
+import { RestrictionProvider } from '@/hooks/useRestrictions';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
 import { SquidProvider } from '@/hooks/useSquid';
 
@@ -115,9 +114,9 @@ const providers = [
   wrapProvider(WagmiConfig, { config }),
   wrapProvider(LocaleProvider),
   wrapProvider(DydxProvider),
+  wrapProvider(RestrictionProvider),
   wrapProvider(AccountsProvider),
   wrapProvider(SubaccountProvider),
-  wrapProvider(RestrictionProvider),
   wrapProvider(SquidProvider),
   wrapProvider(LocalNotificationsProvider),
   wrapProvider(NotificationsProvider),
