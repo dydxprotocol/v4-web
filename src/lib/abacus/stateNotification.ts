@@ -76,7 +76,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
       if (changes.has(Changes.accountBalances)) {
         if (updatedState.account?.balances) {
-          const balances: Record<string, AccountBalance> = {}
+          const balances: Record<string, AccountBalance> = {};
           for (const { k, v } of updatedState.account.balances.toArray()) {
             balances[k] = v;
           }

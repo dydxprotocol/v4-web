@@ -37,9 +37,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               columnKey: 'market',
               getCellValue: (row) => row.market,
               label: stringGetter({ key: STRING_KEYS.MARKET }),
-              renderCell: ({ asset, id }) => (
-                <Styled.MarketTableCell asset={asset} marketId={id} />
-              ),
+              renderCell: ({ asset, id }) => <Styled.MarketTableCell asset={asset} marketId={id} />,
             },
             {
               columnKey: 'price',
@@ -144,7 +142,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                     fractionDigits={LARGE_TOKEN_DECIMALS}
                     type={OutputType.Number}
                     value={row.openInterest}
-                    tag={row.asset?.symbol}
+                    tag={row.asset?.id}
                   />
                   <Output
                     type={OutputType.Fiat}

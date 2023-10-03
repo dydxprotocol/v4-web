@@ -24,7 +24,7 @@ export const MarketDetails: React.FC = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
   const { configs, market } = useSelector(getCurrentMarketData, shallowEqual) || {};
-  const { symbol, name, resources } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
+  const { id, name, resources } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
 
   if (!configs) return null;
 
@@ -75,7 +75,7 @@ export const MarketDetails: React.FC = () => {
           useGrouping
           value={stepSize}
           type={OutputType.Asset}
-          tag={symbol}
+          tag={id}
           fractionDigits={stepSizeDecimals}
         />
       ),
@@ -88,7 +88,7 @@ export const MarketDetails: React.FC = () => {
           useGrouping
           value={minOrderSize}
           type={OutputType.Asset}
-          tag={symbol}
+          tag={id}
           fractionDigits={stepSizeDecimals}
         />
       ),
@@ -132,7 +132,7 @@ export const MarketDetails: React.FC = () => {
       <Styled.Header>
         <Styled.WrapRow>
           <Styled.MarketTitle>
-            <AssetIcon symbol={symbol} />
+            <AssetIcon symbol={id} />
             {name}
           </Styled.MarketTitle>
           {isTablet && <Styled.MarketLinks />}

@@ -21,7 +21,7 @@ type ElementProps = {
 export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
   const stringGetter = useStringGetter();
 
-  const { symbol } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
+  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
   const { configs, oraclePrice } = useSelector(getCurrentMarketData, shallowEqual) || {};
   const { size: positionSize } = useSelector(getCurrentMarketPositionData, shallowEqual) || {};
   const { stepSizeDecimals, tickSizeDecimals } = configs || {};
@@ -29,12 +29,12 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
   return (
     <Styled.PositionPreviewContainer>
       <Styled.YourPosition>
-        {!showNarrowVariation && <AssetIcon symbol={symbol} />}
+        {!showNarrowVariation && <AssetIcon symbol={id} />}
         <span>
           {stringGetter({
             key: STRING_KEYS.YOUR_MARKET_POSITION,
             params: {
-              MARKET: showNarrowVariation ? '' : <strong>{symbol ?? ''}</strong>,
+              MARKET: showNarrowVariation ? '' : <strong>{id ?? ''}</strong>,
             },
           })}
         </span>
@@ -44,7 +44,7 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
         oraclePrice={oraclePrice}
         postOrderSize={positionSize?.postOrder}
         stepSizeDecimals={stepSizeDecimals}
-        symbol={symbol || undefined}
+        symbol={id || undefined}
         tickSizeDecimals={tickSizeDecimals}
         showNarrowVariation={showNarrowVariation}
       />

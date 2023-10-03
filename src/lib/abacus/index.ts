@@ -22,10 +22,11 @@ import {
   UIImplementations,
   CoroutineTimer,
   TransferType,
+  AbacusAppConfig,
 } from '@/constants/abacus';
 
 import { DEFAULT_MARKETID } from '@/constants/markets';
-import { type DydxNetwork } from '@/constants/networks';
+import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork } from '@/constants/networks';
 
 import type { RootStore } from '@/state/_store';
 
@@ -80,8 +81,9 @@ class AbacusStateManager {
     );
 
     this.stateManager = new AsyncAbacusStateManager(
-      import.meta.env.SHARED_RESOURCES_URI,
-      ENDPOINTS_PATH,
+      '',
+      CURRENT_ABACUS_DEPLOYMENT,
+      AbacusAppConfig.Companion.forWeb,
       ioImplementations,
       uiImplementations,
       // @ts-ignore

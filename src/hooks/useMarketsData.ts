@@ -28,15 +28,13 @@ export const useMarketsData = (
   const allAssets = useSelector(getAssets, shallowEqual) || {};
 
   const markets = useMemo(() => {
-    return Object.values(allPerpetualMarkets)
-      .filter((market) => allAssets[market?.assetId]) // Filter out markets with no asset information
-      .map((marketData) => ({
-        asset: allAssets[marketData.assetId],
-        tickSizeDecimals: marketData.configs?.tickSizeDecimals,
-        ...marketData,
-        ...marketData.perpetual,
-        ...marketData.configs,
-      })) as MarketData[];
+    return Object.values(allPerpetualMarkets).map((marketData) => ({
+      asset: allAssets[marketData.assetId],
+      tickSizeDecimals: marketData.configs?.tickSizeDecimals,
+      ...marketData,
+      ...marketData.perpetual,
+      ...marketData.configs,
+    })) as MarketData[];
   }, [allPerpetualMarkets, allAssets]);
 
   const filteredMarkets = useMemo(() => {
@@ -45,8 +43,8 @@ export const useMarketsData = (
     if (searchFilter) {
       return filtered.filter(
         ({ asset }) =>
-          asset.name?.toLocaleLowerCase().includes(searchFilter.toLowerCase()) ||
-          asset.symbol?.toLocaleLowerCase().includes(searchFilter.toLowerCase())
+          asset?.name?.toLocaleLowerCase().includes(searchFilter.toLowerCase()) ||
+          asset?.id?.toLocaleLowerCase().includes(searchFilter.toLowerCase())
       );
     }
     return filtered;

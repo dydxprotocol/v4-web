@@ -80,7 +80,7 @@ export const ClosePositionForm = ({
   const { closePosition } = useSubaccount();
 
   const market = useSelector(getCurrentMarketId);
-  const { symbol } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
+  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
   const { stepSizeDecimals } = useSelector(getCurrentMarketConfig, shallowEqual) || {};
   const { size: sizeData, summary } = useSelector(getInputClosePositionData, shallowEqual) || {};
   const { size, percent } = sizeData || {};
@@ -193,7 +193,7 @@ export const ClosePositionForm = ({
         label={
           <>
             {stringGetter({ key: STRING_KEYS.AMOUNT })}
-            {symbol && <Tag>{symbol}</Tag>}
+            {id && <Tag>{id}</Tag>}
           </>
         }
         decimals={stepSizeDecimals || TOKEN_DECIMALS}

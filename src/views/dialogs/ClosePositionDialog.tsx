@@ -28,7 +28,7 @@ type ElementProps = {
 };
 
 export const ClosePositionDialog = ({ setIsOpen }: ElementProps) => {
-  const { symbol } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const { isTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
 
@@ -46,7 +46,7 @@ export const ClosePositionDialog = ({ setIsOpen }: ElementProps) => {
   } = {
     [MobilePlaceOrderSteps.EditOrder]: {
       title: <CloseOrderHeader />,
-      slotIcon: <AssetIcon symbol={symbol} />,
+      slotIcon: <AssetIcon symbol={id} />,
     },
     [MobilePlaceOrderSteps.PreviewOrder]: {
       title: (
