@@ -332,3 +332,8 @@ export const getUserStats = (state: RootState) => ({
   makerVolume30D: state.account?.wallet?.user?.makerVolume30D,
   takerVolume30D: state.account?.wallet?.user?.takerVolume30D,
 });
+
+/**
+ * @returns user wallet balances
+ */
+export const getBalances = (state: RootState) => state.account?.balances;

@@ -14,7 +14,7 @@ import { NumberSign } from '@/constants/numbers';
 import type { EvmAddress } from '@/constants/wallets';
 
 import { useAccounts, useDebounce, useStringGetter } from '@/hooks';
-import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useAccountBalance, CHAIN_DEFAULT_TOKEN_ADDRESS } from '@/hooks/useAccountBalance';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { NATIVE_TOKEN_ADDRESS, useSquid } from '@/hooks/useSquid';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
@@ -86,7 +86,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   // Async Data
   const { balance, queryStatus, isQueryFetching } = useAccountBalance({
-    addressOrDenom: sourceToken?.address || undefined,
+    addressOrDenom: sourceToken?.address || CHAIN_DEFAULT_TOKEN_ADDRESS,
     assetSymbol: sourceToken?.symbol || undefined,
     chainId: chainId,
     decimals: sourceToken?.decimals || undefined,
@@ -217,7 +217,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           !requestPayload.data ||
           !requestPayload.value ||
           !requestPayload.gasLimit ||
-          !requestPayload.gasPrice ||
           !requestPayload.routeType
         ) {
           throw new Error('Missing request payload');

@@ -1,6 +1,7 @@
 import { kollections } from '@dydxprotocol/v4-abacus';
 
 import type {
+  AccountBalance,
   AbacusApiState,
   AbacusNotification,
   AbacusStateNotificationProtocol,
@@ -18,6 +19,7 @@ import { Changes } from '@/constants/abacus';
 import type { RootStore } from '@/state/_store';
 
 import {
+  setBalances,
   setFills,
   setFundingPayments,
   setHistoricalPnl,
@@ -70,6 +72,16 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
             ) as Record<string, Asset>
           )
         );
+      }
+
+      if (changes.has(Changes.accountBalances)) {
+        if (updatedState.account?.balances) {
+          const balances: Record<string, AccountBalance> = {}
+          for (const { k, v } of updatedState.account.balances.toArray()) {
+            balances[k] = v;
+          }
+          dispatch(setBalances(balances));
+        }
       }
 
       if (changes.has(Changes.configs)) {

@@ -8,9 +8,7 @@ import { getSelectedNetwork } from '@/state/appSelectors';
 
 export const NATIVE_TOKEN_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
-export enum SQUID_ERROR_TYPES {
-  NotFoundError = 'NotFoundError',
-}
+export const STATUS_ERROR_GRACE_PERIOD = 120_000;
 
 const useSquidContext = () => {
   const selectedNetwork = useSelector(getSelectedNetwork);
