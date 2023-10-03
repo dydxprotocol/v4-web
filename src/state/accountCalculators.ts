@@ -1,11 +1,6 @@
 import { createSelector } from 'reselect';
 
-import {
-  Nullable,
-  RestrictionType,
-  RestrictionTypes,
-  SubaccountPosition,
-} from '@/constants/abacus';
+import { SubaccountPosition } from '@/constants/abacus';
 import { OnboardingState, OnboardingSteps } from '@/constants/account';
 import { isDydxV4Network } from '@/constants/networks';
 
@@ -13,7 +8,6 @@ import {
   getExistingOpenPositions,
   getOnboardingGuards,
   getOnboardingState,
-  getRestrictionType,
   getSubaccountId,
   getUncommittedOrderClientIds,
 } from '@/state/accountSelectors';

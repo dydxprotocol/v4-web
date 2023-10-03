@@ -17,8 +17,8 @@ import type { NetworkConfig, ConnectNetworkEvent } from '@/constants/abacus';
 import { type Candle, RESOLUTION_MAP } from '@/constants/candles';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
+
 import { log } from '@/lib/telemetry';
-import { DydxAddress, EvmAddress } from '@/constants/wallets';
 
 type DydxContextType = ReturnType<typeof useDydxClientContext>;
 const DydxContext = createContext<DydxContextType>({} as DydxContextType);
