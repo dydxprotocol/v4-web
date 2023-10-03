@@ -197,7 +197,7 @@ Styled.NotificationsToastArea = styled(NotificationsToastArea)`
 
 Styled.DialogArea = styled.aside`
   position: fixed;
-  height: 100vh;
+  height: 100%;
   z-index: 1;
   inset: 0;
   overflow: clip;
