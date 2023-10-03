@@ -12,7 +12,10 @@ import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { Output, OutputType } from '@/components/Output';
 import { Table, TableCell, type ColumnDef } from '@/components/Table';
 
-import { getCurrentMarketFundingPayments, getSubaccountFundingPayments } from '@/state/accountSelectors';
+import {
+  getCurrentMarketFundingPayments,
+  getSubaccountFundingPayments,
+} from '@/state/accountSelectors';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
@@ -111,7 +114,7 @@ export const FundingPaymentsTable = ({
                   type={OutputType.Asset}
                   value={Math.abs(positionSize)}
                   fractionDigits={stepSizeDecimals}
-                  tag={asset.symbol}
+                  tag={asset.id}
                 />
                 <Styled.Output
                   type={OutputType.Text}

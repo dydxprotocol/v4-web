@@ -89,8 +89,8 @@ const getFillsTableColumnDef = ({
         label: `${stringGetter({ key: STRING_KEYS.TYPE })} / ${stringGetter({
           key: STRING_KEYS.AMOUNT,
         })}`,
-        renderCell: ({ resources, size, stepSizeDecimals, asset: { symbol } }) => (
-          <TableCell stacked slotLeft={<Styled.AssetIcon symbol={symbol} />}>
+        renderCell: ({ resources, size, stepSizeDecimals, asset: { id } }) => (
+          <TableCell stacked slotLeft={<Styled.AssetIcon symbol={id} />}>
             <span>
               {resources.typeStringKey ? stringGetter({ key: resources.typeStringKey }) : null}
             </span>
@@ -161,7 +161,7 @@ const getFillsTableColumnDef = ({
                 }[orderSide],
               })}
             </Styled.Side>
-            <Output type={OutputType.Text} value={asset.symbol} />
+            <Output type={OutputType.Text} value={asset.id} />
           </Styled.TableCell>
         ),
       },
@@ -325,9 +325,7 @@ export const FillsTable = ({
     if (hasUnseenFillUpdates) dispatch(viewedFills());
   }, [hasUnseenFillUpdates]);
 
-  const symbol = currentMarket
-    ? allAssets[allPerpetualMarkets[currentMarket]?.assetId]?.symbol
-    : null;
+  const symbol = currentMarket ? allAssets[allPerpetualMarkets[currentMarket]?.assetId]?.id : null;
 
   const fillsData = fills.map((fill: SubaccountFill) =>
     getHydratedTradingData({

@@ -3,11 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AbacusApiState } from '@/constants/abacus';
 import { LocalStorageKey } from '@/constants/localStorage';
 
-import {
-  DEFAULT_APP_ENVIRONMENT,
-  isValidDydxNetwork,
-  type DydxNetwork,
-} from '@/constants/networks';
+import { DEFAULT_APP_ENVIRONMENT, type DydxNetwork } from '@/constants/networks';
 
 import { getLocalStorage } from '@/lib/localStorage';
 
@@ -23,7 +19,6 @@ const initialState: AppState = {
   selectedNetwork: getLocalStorage({
     key: LocalStorageKey.SelectedNetwork,
     defaultValue: DEFAULT_APP_ENVIRONMENT,
-    validateFn: isValidDydxNetwork,
   }),
 };
 

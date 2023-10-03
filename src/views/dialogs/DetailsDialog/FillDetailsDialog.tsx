@@ -19,7 +19,7 @@ import { MustBigNumber } from '@/lib/numbers';
 
 type ElementProps = {
   fillId: string;
-  setIsOpen?: (open: boolean) => void;
+  setIsOpen: (open: boolean) => void;
 };
 
 export const FillDetailsDialog = ({ fillId, setIsOpen }: ElementProps) => {
@@ -94,7 +94,7 @@ export const FillDetailsDialog = ({ fillId, setIsOpen }: ElementProps) => {
 
   return (
     <DetailsDialog
-      slotIcon={<Styled.AssetIcon symbol={asset.symbol} />}
+      slotIcon={<Styled.AssetIcon symbol={asset.id} />}
       title={resources.typeStringKey && stringGetter({ key: resources.typeStringKey })}
       items={detailItems}
       setIsOpen={setIsOpen}

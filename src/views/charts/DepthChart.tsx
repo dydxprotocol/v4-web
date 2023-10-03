@@ -98,7 +98,7 @@ export const DepthChart = ({
   // Chart data
 
   const orderbook = useSelector(getCurrentMarketOrderbook, shallowEqual);
-  const { symbol = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { id = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const { stepSizeDecimals, tickSizeDecimals } =
     useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
 
@@ -393,7 +393,7 @@ export const DepthChart = ({
                         ? chartPointAtPointer.size
                         : tooltipData!.nearestDatum?.datum.depth
                     }
-                    tag={symbol}
+                    tag={id}
                     accentColor={
                       {
                         [DepthChartSeries.Asks]: 'var(--color-negative)',
@@ -476,7 +476,7 @@ export const DepthChart = ({
                                     type={OutputType.Asset}
                                     value={chartPointAtPointer.size}
                                     fractionDigits={stepSizeDecimals}
-                                    tag={symbol}
+                                    tag={id}
                                     useGrouping={false}
                                   />
                                 ),
@@ -543,7 +543,7 @@ export const DepthChart = ({
                                     type={OutputType.Asset}
                                     value={nearestDatum?.datum.depth}
                                     fractionDigits={stepSizeDecimals}
-                                    tag={symbol}
+                                    tag={id}
                                     useGrouping={false}
                                   />
                                 ),

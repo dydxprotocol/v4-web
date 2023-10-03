@@ -40,7 +40,7 @@ export const TradeSizeInputs = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
 
-  const { symbol } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
+  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
   const inputTradeSizeData = useSelector(getInputTradeSizeData, shallowEqual);
   const currentTradeInputOptions = useSelector(getInputTradeOptions, shallowEqual);
 
@@ -94,7 +94,7 @@ export const TradeSizeInputs = () => {
       shape={ButtonShape.Square}
     >
       <Icon iconName={IconName.Trade} />
-      {showUSDCInputOnTablet ? 'USD' : symbol}
+      {showUSDCInputOnTablet ? 'USD' : id}
     </Styled.ToggleButton>
   );
 
@@ -105,10 +105,10 @@ export const TradeSizeInputs = () => {
       onInput={onSizeInput}
       label={
         <>
-          <WithTooltip tooltip="order-amount" stringParams={{ SYMBOL: symbol ?? '' }} side="right">
+          <WithTooltip tooltip="order-amount" stringParams={{ SYMBOL: id ?? '' }} side="right">
             {stringGetter({ key: STRING_KEYS.AMOUNT })}
           </WithTooltip>
-          {symbol && <Tag>{symbol}</Tag>}
+          {id && <Tag>{id}</Tag>}
         </>
       }
       slotRight={isTablet && inputToggleButton}
@@ -126,11 +126,7 @@ export const TradeSizeInputs = () => {
       decimals={tickSizeDecimals || USD_DECIMALS}
       label={
         <>
-          <WithTooltip
-            tooltip="order-amount-usd"
-            stringParams={{ SYMBOL: symbol ?? '' }}
-            side="right"
-          >
+          <WithTooltip tooltip="order-amount-usd" stringParams={{ SYMBOL: id ?? '' }} side="right">
             {stringGetter({ key: STRING_KEYS.AMOUNT })}
           </WithTooltip>
           <Tag>USD</Tag>

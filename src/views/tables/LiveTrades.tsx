@@ -43,7 +43,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
   const currentMarketConfig = useSelector(getCurrentMarketConfig, shallowEqual);
   const currentMarketLiveTrades = useSelector(getCurrentMarketLiveTrades, shallowEqual) || [];
 
-  const { symbol = '' } = currentMarketAssetData ?? {};
+  const { id = '' } = currentMarketAssetData ?? {};
   const { stepSizeDecimals, tickSizeDecimals } = currentMarketConfig || {};
 
   const rows = currentMarketLiveTrades.map(
@@ -84,7 +84,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
         columnKey: 'size',
         getCellValue: (row: RowData) => row.size,
         label: stringGetter({ key: STRING_KEYS.SIZE }),
-        tag: symbol,
+        tag: id,
         renderCell: (row: RowData) => (
           <Styled.SizeOutput
             type={OutputType.Asset}
@@ -111,7 +111,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
       },
       !isTablet && timeColumn,
     ].filter(isTruthy);
-  }, [stepSizeDecimals, tickSizeDecimals, symbol, histogramSide, stringGetter]);
+  }, [stepSizeDecimals, tickSizeDecimals, id, histogramSide, stringGetter]);
 
   return (
     <Styled.LiveTradesTable

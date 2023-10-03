@@ -72,13 +72,13 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.id,
         label: stringGetter({ key: STRING_KEYS.DETAILS }),
         renderCell: ({ id, asset, leverage, resources, size }) => (
-          <TableCell stacked slotLeft={<Styled.AssetIcon symbol={asset?.symbol} />}>
+          <TableCell stacked slotLeft={<Styled.AssetIcon symbol={asset?.id} />}>
             <Styled.HighlightOutput
               type={OutputType.Asset}
               value={size?.current}
               fractionDigits={TOKEN_DECIMALS}
               showSign={ShowSign.None}
-              tag={asset?.symbol}
+              tag={asset?.id}
             />
             <Styled.InlineRow>
               <Styled.PositionSide>

@@ -10,7 +10,23 @@ import {
   bscTestnet,
   optimism,
   optimismGoerli,
-} from 'wagmi/chains';
+  base,
+  baseGoerli,
+  polygon,
+  polygonMumbai,
+  linea,
+  lineaTestnet,
+  mantle,
+  mantleTestnet,
+  moonbeam,
+  moonbaseAlpha,
+  filecoin,
+  filecoinHyperspace,
+  fantom,
+  fantomTestnet,
+  celo,
+  celoAlfajores,
+} from 'viem/chains';
 
 import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
@@ -36,10 +52,26 @@ export const WAGMI_SUPPORTED_CHAINS: Chain[] = [
   bscTestnet,
   optimism,
   optimismGoerli,
+  base,
+  baseGoerli,
+  polygon,
+  polygonMumbai,
+  linea,
+  lineaTestnet,
+  mantle,
+  mantleTestnet,
+  moonbeam,
+  moonbaseAlpha,
+  filecoin,
+  filecoinHyperspace,
+  fantom,
+  fantomTestnet,
+  celo,
+  celoAlfajores,
 ];
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(WAGMI_SUPPORTED_CHAINS, [
-  alchemyProvider({ apiKey: import.meta.env.VITE_ALCHEMY_API_KEY }),
+  // alchemyProvider({ apiKey: import.meta.env.VITE_ALCHEMY_API_KEY }),
   jsonRpcProvider({
     rpc: (chain) => ({ http: chain.rpcUrls.default.http[0] }),
   }),

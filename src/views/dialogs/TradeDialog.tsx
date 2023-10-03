@@ -3,7 +3,7 @@ import { shallowEqual, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
-import { STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS, StringKey } from '@/constants/localization';
 import { TradeTypes, TRADE_TYPE_STRINGS, MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
@@ -31,7 +31,7 @@ type ElementProps = {
 export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) => {
   const { isMobile } = useBreakpoints();
   const stringGetter = useStringGetter();
-  const { symbol } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const currentTradeData = useSelector(getInputTradeData, shallowEqual);
   const { type } = currentTradeData || {};
   const selectedTradeType = getSelectedTradeType(type);
@@ -40,9 +40,9 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
   const allTradeTypeItems = typeOptions?.toArray()?.map(({ type, stringKey }) => ({
     value: type,
     label: stringGetter({
-      key: stringKey,
+      key: stringKey as StringKey,
     }),
-    slotBefore: <AssetIcon symbol={symbol} />,
+    slotBefore: <AssetIcon symbol={id} />,
   }));
 
   const [currentStep, setCurrentStep] = useState<MobilePlaceOrderSteps>(

@@ -27,8 +27,8 @@ dependencies:
     specifier: ^0.31.0
     version: 0.31.0
   '@dydxprotocol/v4-abacus':
-    specifier: ^0.5.12
-    version: 0.5.12
+    specifier: ^0.6.3
+    version: 0.6.3
   '@dydxprotocol/v4-client-js':
     specifier: ^0.36.1
     version: 0.36.1
@@ -231,11 +231,11 @@ dependencies:
     specifier: ^1.2.1
     version: 1.2.1(@types/react@18.2.14)(react@18.2.0)
   viem:
-    specifier: ^1.1.6
-    version: 1.1.6(typescript@5.1.3)
+    specifier: ^1.12.2
+    version: 1.12.2(typescript@5.1.3)
   wagmi:
     specifier: ^1.3.7
-    version: 1.3.7(@types/react@18.2.14)(react-dom@18.2.0)(react@18.2.0)(typescript@5.1.3)(viem@1.1.6)
+    version: 1.3.7(@types/react@18.2.14)(react-dom@18.2.0)(react@18.2.0)(typescript@5.1.3)(viem@1.12.2)
 
 devDependencies:
   '@babel/core':
@@ -380,12 +380,12 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /@adraffy/ens-normalize@1.9.0:
-    resolution: {integrity: sha512-iowxq3U30sghZotgl4s/oJRci6WPBfNO5YYgk2cIOMCHr3LeGPcsZjCEr+33Q4N+oV3OABDAtA+pyvWjbvBifQ==}
-    dev: false
-
   /@adraffy/ens-normalize@1.9.2:
     resolution: {integrity: sha512-0h+FrQDqe2Wn+IIGFkTCd4aAwTJ+7834Ek1COohCyV26AXhwQ7WQaz+4F/nLOeVl/3BtWHOHLPsq46V8YB46Eg==}
+    dev: false
+
+  /@adraffy/ens-normalize@1.9.4:
+    resolution: {integrity: sha512-UK0bHA7hh9cR39V+4gl2/NnBBjoXIxkuWAPCaY4X7fbH4L/azIi7ilWOCjMUYfpJgraLUAqkRi2BqrjME8Rynw==}
     dev: false
 
   /@ampproject/remapping@2.2.1:
@@ -979,8 +979,8 @@ packages:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
 
-  /@dydxprotocol/v4-abacus@0.5.12:
-    resolution: {integrity: sha512-OigoIjGtp0az1elkP84nc9qKYBVg5Fg4QEJFDn7J7oiUqVvwNggYNfnDsX77D8+K4DJ/rtbi2yZYsDE8OZMSoQ==}
+  /@dydxprotocol/v4-abacus@0.6.3:
+    resolution: {integrity: sha512-oYMbII7o7fXjNpl2PZpG6mwKQ49e8Qky5vA8Ua9boNs7nRUx3PC6azfoPtjHKMdYY33eHoXcZBpTynhneLXCVg==}
     dev: false
 
   /@dydxprotocol/v4-client-js@0.36.1:
@@ -2032,6 +2032,12 @@ packages:
       '@noble/hashes': 1.3.1
     dev: false
 
+  /@noble/curves@1.2.0:
+    resolution: {integrity: sha512-oYclrNgRaM9SsBUBVbb8M6DTV7ZHRTKugureoYEncY5c65HOmRzvSiTE3y5CYaPYJA/GVkrhXEoF0M3Ya9PMnw==}
+    dependencies:
+      '@noble/hashes': 1.3.2
+    dev: false
+
   /@noble/ed25519@1.7.3:
     resolution: {integrity: sha512-iR8GBkDt0Q3GyaVcIu7mSsVIqnFbkbRzGLWlvhwunacoLwt4J3swfKhfaM6rN6WY+TBGoYT1GtT1mIh2/jGbRQ==}
     dev: true
@@ -2046,6 +2052,11 @@ packages:
 
   /@noble/hashes@1.3.1:
     resolution: {integrity: sha512-EbqwksQwz9xDRGfDST86whPBgM65E0OH/pCgqW0GBVzO22bNE+NuIbeTb714+IfSjU3aRk47EUvXIb5bTsenKA==}
+    engines: {node: '>= 16'}
+    dev: false
+
+  /@noble/hashes@1.3.2:
+    resolution: {integrity: sha512-MVC8EAQp7MvEcm30KWENFjgR+Mkmf+D189XJTkFIlwohU5hcBbn1ZkKq7KVTi2Hme3PMGF390DaL52beVrIihQ==}
     engines: {node: '>= 16'}
     dev: false
 
@@ -4647,7 +4658,7 @@ packages:
     resolution: {integrity: sha512-gYw0ki/EAuV1oSyMxpqandHjnthZjYYy+YWpTAzf8BqfXM3ItcZLpjxfg+3+mXW8HIO+3jw6T9iiqEXsqHaMMw==}
     dependencies:
       '@safe-global/safe-gateway-typescript-sdk': 3.9.0
-      viem: 1.1.6(typescript@5.1.3)
+      viem: 1.12.2(typescript@5.1.3)
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -4660,7 +4671,7 @@ packages:
     resolution: {integrity: sha512-XJbEPuaVc7b9n23MqlF6c+ToYIS3f7P2Sel8f3cSBQ9WORE4xrSuvhMpK9fDSFqJ7by/brc+rmJR/5HViRr0/w==}
     dependencies:
       '@safe-global/safe-gateway-typescript-sdk': 3.9.0
-      viem: 1.1.6(typescript@5.1.3)
+      viem: 1.12.2(typescript@5.1.3)
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -4681,6 +4692,10 @@ packages:
     resolution: {integrity: sha512-ZxOhsSyxYwLJj3pLZCefNitxsj093tb2vq90mp2txoYeBqbcjDjqFhyM8eUjq/uFm6zJ+mUuqxlS2FkuSY1MTA==}
     dev: false
 
+  /@scure/base@1.1.3:
+    resolution: {integrity: sha512-/+SgoRjLq7Xlf0CWuLHq2LUZeL/w65kfzAPG5NH9pcmBhs+nunQTn4gvdwgMTIXnt9b2C/1SeL2XiysZEyIC9Q==}
+    dev: false
+
   /@scure/bip32@1.3.0:
     resolution: {integrity: sha512-bcKpo1oj54hGholplGLpqPHRbIsnbixFtc06nwuNM5/dwSXOq/AAYoIBRsBmnZJSdfeNW5rnff7NTAz3ZCqR9Q==}
     dependencies:
@@ -4697,6 +4712,14 @@ packages:
       '@scure/base': 1.1.1
     dev: false
 
+  /@scure/bip32@1.3.2:
+    resolution: {integrity: sha512-N1ZhksgwD3OBlwTv3R6KFEcPojl/W4ElJOeCZdi+vuI5QmTFwLq3OFf2zd2ROpKvxFdgZ6hUpb0dx9bVNEwYCA==}
+    dependencies:
+      '@noble/curves': 1.2.0
+      '@noble/hashes': 1.3.2
+      '@scure/base': 1.1.3
+    dev: false
+
   /@scure/bip39@1.2.0:
     resolution: {integrity: sha512-SX/uKq52cuxm4YFXWFaVByaSHJh2w3BnokVSeUJVCv6K7WulT9u2BuNRBhuFl8vAuYnzx9bEu9WgpcNYTrYieg==}
     dependencies:
@@ -4707,7 +4730,7 @@ packages:
   /@scure/bip39@1.2.1:
     resolution: {integrity: sha512-Z3/Fsz1yr904dduJD0NpiyRHhRYHdcnyh73FZWiV+/qhWi83wNJ3NWolYqCEN+ZWsUz2TWwajJggcRE9r1zUYg==}
     dependencies:
-      '@noble/hashes': 1.3.1
+      '@noble/hashes': 1.3.2
       '@scure/base': 1.1.1
     dev: false
 
@@ -5408,6 +5431,12 @@ packages:
       '@types/node': 20.3.1
     dev: false
 
+  /@types/ws@8.5.6:
+    resolution: {integrity: sha512-8B5EO9jLVCy+B58PLHvLDuOD8DRVMgQzq8d55SjLCOn9kqGyqOvy27exVaTio1q1nX5zLu8/6N0n2ThSxOM6tg==}
+    dependencies:
+      '@types/node': 20.3.1
+    dev: false
+
   /@typescript-eslint/eslint-plugin@5.60.0(@typescript-eslint/parser@5.60.0)(eslint@8.43.0)(typescript@5.1.3):
     resolution: {integrity: sha512-78B+anHLF1TI8Jn/cD0Q00TBYdMgjdOn980JfAVa9yw5sop8nyTfVOQAv6LWywkOGLclDBtv5z3oxN4w7jxyNg==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
@@ -5904,17 +5933,6 @@ packages:
       pretty-format: 27.5.1
     dev: true
 
-  /@wagmi/chains@1.2.0(typescript@5.1.3):
-    resolution: {integrity: sha512-dmDRipsE54JfyudOBkuhEexqQWcrZqxn/qiujG8SBzMh/az/AH5xlJSA+j1CPWTx9+QofSMF3B7A4gb6XRmSaQ==}
-    peerDependencies:
-      typescript: '>=5.0.4'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-    dependencies:
-      typescript: 5.1.3
-    dev: false
-
   /@wagmi/chains@1.4.0(typescript@5.1.3):
     resolution: {integrity: sha512-9HwJrhcZ1TxyrCbE10y7s1eSiSiyfGam7AHIOLYExaOX+vpOZ+MNTt4orFEDbEpz1fxwJDPPI38lanAUix1OSA==}
     peerDependencies:
@@ -5926,7 +5944,7 @@ packages:
       typescript: 5.1.3
     dev: false
 
-  /@wagmi/connectors@2.6.5(@wagmi/chains@1.4.0)(react@18.2.0)(typescript@5.1.3)(viem@1.1.6):
+  /@wagmi/connectors@2.6.5(@wagmi/chains@1.4.0)(react@18.2.0)(typescript@5.1.3)(viem@1.12.2):
     resolution: {integrity: sha512-klF31togMDd0qQqEcLl5cCGxjMbL0RRXQ8I1vxmEa3KdGzw6Z3ICVzX7/bDfnNEZcOW7BKyAnZDq7rCt5jTOiw==}
     peerDependencies:
       '@wagmi/chains': '>=1.3.0'
@@ -5950,7 +5968,7 @@ packages:
       abitype: 0.8.7(typescript@5.1.3)
       eventemitter3: 4.0.7
       typescript: 5.1.3
-      viem: 1.1.6(typescript@5.1.3)
+      viem: 1.12.2(typescript@5.1.3)
     transitivePeerDependencies:
       - '@react-native-async-storage/async-storage'
       - bufferutil
@@ -5962,7 +5980,7 @@ packages:
       - zod
     dev: false
 
-  /@wagmi/core@1.3.6(@types/react@18.2.14)(react@18.2.0)(typescript@5.1.3)(viem@1.1.6):
+  /@wagmi/core@1.3.6(@types/react@18.2.14)(react@18.2.0)(typescript@5.1.3)(viem@1.12.2):
     resolution: {integrity: sha512-TXv9ZlRR5aySfERFuWMuo+lKXC/CoqtxVJZVHPqhK1jY+nldMx3AvrWzzF4CccRaMYcVdvPFepvmxzq2A2VvWg==}
     peerDependencies:
       typescript: '>=5.0.4'
@@ -5972,11 +5990,11 @@ packages:
         optional: true
     dependencies:
       '@wagmi/chains': 1.4.0(typescript@5.1.3)
-      '@wagmi/connectors': 2.6.5(@wagmi/chains@1.4.0)(react@18.2.0)(typescript@5.1.3)(viem@1.1.6)
+      '@wagmi/connectors': 2.6.5(@wagmi/chains@1.4.0)(react@18.2.0)(typescript@5.1.3)(viem@1.12.2)
       abitype: 0.8.7(typescript@5.1.3)
       eventemitter3: 4.0.7
       typescript: 5.1.3
-      viem: 1.1.6(typescript@5.1.3)
+      viem: 1.12.2(typescript@5.1.3)
       zustand: 4.4.1(@types/react@18.2.14)(react@18.2.0)
     transitivePeerDependencies:
       - '@react-native-async-storage/async-storage'
@@ -6671,6 +6689,20 @@ packages:
       typescript: '>=5.0.4'
       zod: ^3 >=3.19.1
     peerDependenciesMeta:
+      zod:
+        optional: true
+    dependencies:
+      typescript: 5.1.3
+    dev: false
+
+  /abitype@0.9.8(typescript@5.1.3):
+    resolution: {integrity: sha512-puLifILdm+8sjyss4S+fsUN09obiT1g2YW6CtcQF+QDzxR0euzgEB29MZujC6zMk2a6SVmtttq1fc6+YFA7WYQ==}
+    peerDependencies:
+      typescript: '>=5.0.4'
+      zod: ^3 >=3.19.1
+    peerDependenciesMeta:
+      typescript:
+        optional: true
       zod:
         optional: true
     dependencies:
@@ -9986,12 +10018,12 @@ packages:
       ws: 7.5.9
     dev: false
 
-  /isomorphic-ws@5.0.0(ws@8.12.0):
+  /isomorphic-ws@5.0.0(ws@8.13.0):
     resolution: {integrity: sha512-muId7Zzn9ywDsyXgTIafTry2sV3nySZeUDe6YedVd1Hvuuep5AsIlqK+XefWpYTyJG5e503F2xIuT2lcU6rCSw==}
     peerDependencies:
       ws: '*'
     dependencies:
-      ws: 8.12.0
+      ws: 8.13.0(bufferutil@4.0.7)(utf-8-validate@5.0.10)
     dev: false
 
   /it-all@1.0.6:
@@ -13520,21 +13552,24 @@ packages:
       vfile-message: 3.1.4
     dev: true
 
-  /viem@1.1.6(typescript@5.1.3):
-    resolution: {integrity: sha512-7nK3HMucLr1Yz0QnDXiD6viigKS6QeYD/YhRHpi3Bby/g0hCyZqK8+YJNtp3/Ri64tpl4kaTIeCScJWV2jqXHQ==}
+  /viem@1.12.2(typescript@5.1.3):
+    resolution: {integrity: sha512-aCaUCyg72ES+jK4s6tVYOMnOt4if71RwzgiUAUpAuaCgvHFfh9DCnwuEfwkxEZLE2vafOsirgJ3fcn7nsDVQoQ==}
     peerDependencies:
       typescript: '>=5.0.4'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
     dependencies:
-      '@adraffy/ens-normalize': 1.9.0
-      '@noble/curves': 1.0.0
-      '@noble/hashes': 1.3.0
-      '@scure/bip32': 1.3.0
-      '@scure/bip39': 1.2.0
-      '@wagmi/chains': 1.2.0(typescript@5.1.3)
-      abitype: 0.8.7(typescript@5.1.3)
-      isomorphic-ws: 5.0.0(ws@8.12.0)
+      '@adraffy/ens-normalize': 1.9.4
+      '@noble/curves': 1.2.0
+      '@noble/hashes': 1.3.2
+      '@scure/bip32': 1.3.2
+      '@scure/bip39': 1.2.1
+      '@types/ws': 8.5.6
+      abitype: 0.9.8(typescript@5.1.3)
+      isomorphic-ws: 5.0.0(ws@8.13.0)
       typescript: 5.1.3
-      ws: 8.12.0
+      ws: 8.13.0(bufferutil@4.0.7)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -13702,7 +13737,7 @@ packages:
       - supports-color
     dev: true
 
-  /wagmi@1.3.7(@types/react@18.2.14)(react-dom@18.2.0)(react@18.2.0)(typescript@5.1.3)(viem@1.1.6):
+  /wagmi@1.3.7(@types/react@18.2.14)(react-dom@18.2.0)(react@18.2.0)(typescript@5.1.3)(viem@1.12.2):
     resolution: {integrity: sha512-n4Qwby0QB8/JSGjc0gGn4MWZ0BT229agEg6saPGS6VswmPjJLdkLq9qxKn1JptXxPREmb/ZvwHxU++3Z+gQJVA==}
     peerDependencies:
       react: '>=17.0.0'
@@ -13715,12 +13750,12 @@ packages:
       '@tanstack/query-sync-storage-persister': 4.32.6
       '@tanstack/react-query': 4.32.6(react-dom@18.2.0)(react@18.2.0)
       '@tanstack/react-query-persist-client': 4.32.6(@tanstack/react-query@4.32.6)
-      '@wagmi/core': 1.3.6(@types/react@18.2.14)(react@18.2.0)(typescript@5.1.3)(viem@1.1.6)
+      '@wagmi/core': 1.3.6(@types/react@18.2.14)(react@18.2.0)(typescript@5.1.3)(viem@1.12.2)
       abitype: 0.8.7(typescript@5.1.3)
       react: 18.2.0
       typescript: 5.1.3
       use-sync-external-store: 1.2.0(react@18.2.0)
-      viem: 1.1.6(typescript@5.1.3)
+      viem: 1.12.2(typescript@5.1.3)
     transitivePeerDependencies:
       - '@react-native-async-storage/async-storage'
       - '@types/react'
@@ -13938,19 +13973,6 @@ packages:
     peerDependencies:
       bufferutil: ^4.0.1
       utf-8-validate: ^5.0.2
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-    dev: false
-
-  /ws@8.12.0:
-    resolution: {integrity: sha512-kU62emKIdKVeEIOIKVegvqpXMSTAMLJozpHZaJNDYqBjzlSYXQGviYwN1osDLJ9av68qHd4a2oSjd7yD4pacig==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: '>=5.0.2'
     peerDependenciesMeta:
       bufferutil:
         optional: true
