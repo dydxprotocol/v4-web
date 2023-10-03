@@ -60,12 +60,12 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
                 columnKey: 'market',
                 getCellValue: (row) => row.market,
                 label: stringGetter({ key: STRING_KEYS.MARKET }),
-                renderCell: ({ asset }) => (
+                renderCell: ({ assetId, id }) => (
                   <Styled.MarketName isFavorited={false}>
                     {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
-                    <AssetIcon symbol={asset.id} />
-                    <h2>{asset.name}</h2>
-                    <Tag>{asset.id}</Tag>
+                    <AssetIcon symbol={assetId} />
+                    <h2>{id}</h2>
+                    <Tag>{assetId}</Tag>
                   </Styled.MarketName>
                 ),
               },
