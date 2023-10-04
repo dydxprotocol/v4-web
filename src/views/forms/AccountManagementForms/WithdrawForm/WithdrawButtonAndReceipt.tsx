@@ -1,14 +1,19 @@
 import { useState } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
+import { formatUnits } from 'viem';
 
 import { TransferInputTokenResource } from '@/constants/abacus';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
+
+import { formatSeconds } from '@/lib/timeUtils';
+
+import { layoutMixins } from '@/styles/layoutMixins';
+
 import { useStringGetter } from '@/hooks';
 import { useAccountBalance } from '@/hooks/useAccountBalance';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 
@@ -16,6 +21,7 @@ import { Details, DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
+import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 import { WithReceipt } from '@/components/WithReceipt';
 
@@ -49,21 +55,13 @@ export const WithdrawButtonAndReceipt = ({
   const [isEditingSlippage, setIsEditingSlipapge] = useState(false);
   const stringGetter = useStringGetter();
 
-  // TODO: uncomment when we have a way to get token amount estimate from abacus
-  // const { balance, queryStatus } = useAccountBalance({
-  //   addressOrDenom: withdrawToken?.address || undefined,
-  //   assetSymbol: withdrawToken?.symbol || undefined,
-  //   chainId: withdrawChain ? parseInt(withdrawChain) : undefined,
-  //   decimals: withdrawToken?.decimals || undefined,
-  //   isCosmosChain: false,
-  // });
-
-  // const balanceBN = MustBigNumber(balance);
-  // const newBalance =
-  //   // toAmountMin && withdrawToken && parseUnits(toAmountMin, withdrawToken.decimals).toString();
-
   const { leverage } = useSelector(getSubaccount, shallowEqual) || {};
   const { summary, requestPayload } = useSelector(getTransferInputs, shallowEqual) || {};
+
+  const toAmount =
+    summary?.toAmount &&
+    withdrawToken?.decimals &&
+    formatUnits(BigInt(summary.toAmount), withdrawToken?.decimals);
 
   const feeSubitems: DetailsItem[] = [];
 
@@ -99,8 +97,26 @@ export const WithdrawButtonAndReceipt = ({
       subitems: feeSubitems,
     },
     {
+      key: 'wallet',
+      label: (
+        <span>
+          {stringGetter({ key: STRING_KEYS.AMOUNT_RECEIVED })}{' '}
+          {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
+        </span>
+      ),
+      value: (
+        <Styled.DiffOutput
+          type={OutputType.Asset}
+          value={'0'}
+          newValue={toAmount}
+          sign={NumberSign.Positive}
+          withDiff={Boolean(toAmount)}
+        />
+      ),
+    },
+    {
       key: 'leverage',
-      label: <span>{stringGetter({ key: STRING_KEYS.LEVERAGE })}</span>,
+      label: <span>{stringGetter({ key: STRING_KEYS.ACCOUNT_LEVERAGE })}</span>,
       value: (
         <Styled.DiffOutput
           type={OutputType.Multiple}
@@ -137,25 +153,19 @@ export const WithdrawButtonAndReceipt = ({
         />
       ),
     },
-    // TODO: uncomment when we have a way to get token amount estimate from abacus
-    // {
-    //   key: 'wallet',
-    //   label: (
-    //     <span>
-    //       {stringGetter({ key: STRING_KEYS.WALLET })}{' '}
-    //       {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
-    //     </span>
-    //   ),
-    //   value: (
-    //     <Styled.DiffOutput
-    //       type={OutputType.Asset}
-    //       value={balanceBN?.toString()}
-    //       newValue={newBalance}
-    //       sign={NumberSign.Negative}
-    //       withDiff={Boolean(balance !== newBalance)}
-    //     />
-    //   ),
-    // },
+    {
+      key: 'estimatedRouteDuration',
+      label: <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_TIME })}</span>,
+      value: typeof summary?.estimatedRouteDuration === 'number' && (
+        <Output
+          type={OutputType.Text}
+          value={stringGetter({
+            key: STRING_KEYS.X_MINUTES_LOWERCASED,
+            params: { X: Math.round(summary?.estimatedRouteDuration / 60) },
+          })}
+        />
+      ),
+    },
   ];
 
   const isFormValid = !isDisabled && !isEditingSlippage;
