@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
-// import { STRING_KEYS } from '@/constants/localization';
-// import { useStringGetter } from '@/hooks';
+import { STRING_KEYS } from '@/constants/localization';
+import { useStringGetter } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog } from '@/components/Dialog';
@@ -12,19 +12,17 @@ type ElementProps = {
 };
 
 export const WalletRestrictedDialog = ({ preventClose, setIsOpen }: ElementProps) => {
-  // const stringGetter = useStringGetter();
+  const stringGetter = useStringGetter();
 
   return (
     <Dialog
       isOpen
       preventClose={preventClose}
       setIsOpen={setIsOpen}
-      title="Wallet Restricted"
-      // title={stringGetter({ key: STRING_KEYS.WALLET_RESTRICTED_ERROR_TITLE })}
+      title={stringGetter({ key: STRING_KEYS.WALLET_RESTRICTED_ERROR_TITLE })}
     >
       <StyledContent>
-        The connected wallet has been disconnected
-        {/* {stringGetter({ key: STRING_KEYS.WALLET_RESTRICTED_ERROR_MESSAGE })} */}
+        {stringGetter({ key: STRING_KEYS.WALLET_RESTRICTED_ERROR_MESSAGE })}
       </StyledContent>
     </Dialog>
   );

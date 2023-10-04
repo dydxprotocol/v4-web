@@ -179,7 +179,20 @@ const useDydxClientContext = () => {
     [requestCandles]
   );
 
-  // ------ Subacount Methods ------ //
+  const screenAddresses = useCallback(
+    async ({ addresses }: { addresses: string[] }) => {
+      if (compositeClient) {
+        const promises = addresses.map((address) =>
+          compositeClient.indexerClient.utility.screen(address)
+        );
+        const results = await Promise.all(promises);
+        return Object.fromEntries(
+          addresses.map((address, index) => [address, results[index]?.restricted])
+        );
+      }
+    },
+    [compositeClient]
+  );
 
   return {
     // Client initialization
@@ -193,5 +206,6 @@ const useDydxClientContext = () => {
 
     // Public Methods
     getCandlesForDatafeed,
+    screenAddresses,
   };
 };

@@ -3,8 +3,6 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
 import type { SyntheticInputEvent } from 'react-number-format/types/types';
-import { debounce } from 'lodash';
-import { StdFee } from '@cosmjs/stargate';
 import { validation } from '@dydxprotocol/v4-client-js';
 
 import { TransferInputField, TransferType } from '@/constants/abacus';
@@ -12,7 +10,7 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
-import { NumberSign, QUANTUM_MULTIPLIER } from '@/constants/numbers';
+import { NumberSign } from '@/constants/numbers';
 import {
   DYDX_CHAIN_ASSET_COIN_DENOM,
   DYDX_CHAIN_ASSET_TAGS,
@@ -22,6 +20,7 @@ import {
 import {
   useAccountBalance,
   useAccounts,
+  useDydxClient,
   useSelectedNetwork,
   useStringGetter,
   useSubaccount,
@@ -77,7 +76,7 @@ export const TransferForm = ({
   const [asset, setAsset] = useState<DydxChainAsset>(selectedAsset);
 
   // Form states
-  const [error, setError] = useState<Error | undefined>();
+  const [error, setError] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
 
   const balance = asset === DydxChainAsset.USDC ? freeCollateral?.current : nativeTokenBalance;
@@ -125,6 +124,8 @@ export const TransferForm = ({
     });
   }, [asset]);
 
+  const { screenAddresses } = useDydxClient();
+
   const onTransfer = async () => {
     if (!isAmountValid || !isAddressValid || !fee) return;
     setIsLoading(true);
@@ -136,20 +137,38 @@ export const TransferForm = ({
         asset === DydxChainAsset.DYDX ? amountBN.minus(fee) : amountBN
       ).toNumber();
 
-      const txResponse = await transfer(
-        amountToTransfer,
-        recipientAddress as string,
-        DYDX_CHAIN_ASSET_COIN_DENOM[asset]
-      );
+      const screenResults = await screenAddresses({
+        addresses: [recipientAddress!, dydxAddress!],
+      });
 
-      if (txResponse?.code === 0) {
-        console.log('TransferForm > txReceipt > ', txResponse?.hash);
-        onDone?.();
+      if (screenResults?.[recipientAddress!]) {
+        setError(
+          stringGetter({
+            key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_DESTINATION_ERROR_MESSAGE,
+          })
+        );
+      } else if (screenResults?.[dydxAddress!]) {
+        setError(
+          stringGetter({
+            key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_ORIGINATION_ERROR_MESSAGE,
+          })
+        );
       } else {
-        throw new Error(txResponse?.rawLog ?? 'Transaction did not commit.');
+        const txResponse = await transfer(
+          amountToTransfer,
+          recipientAddress as string,
+          DYDX_CHAIN_ASSET_COIN_DENOM[asset]
+        );
+
+        if (txResponse?.code === 0) {
+          console.log('TransferForm > txReceipt > ', txResponse?.hash);
+          onDone?.();
+        } else {
+          throw new Error(txResponse?.rawLog ?? 'Transaction did not commit.');
+        }
       }
     } catch (error) {
-      setError(error);
+      setError(error?.message);
       log('TransferForm/onTransfer', error);
     } finally {
       setIsLoading(false);
@@ -342,7 +361,7 @@ export const TransferForm = ({
         </AlertMessage>
       )}
 
-      {error && <AlertMessage type={AlertType.Error}>{error.message}</AlertMessage>}
+      {error && <AlertMessage type={AlertType.Error}>{error}</AlertMessage>}
 
       <Styled.Footer>
         <TransferButtonAndReceipt
