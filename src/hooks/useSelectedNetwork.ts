@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { LocalStorageKey } from '@/constants/localStorage';
-import { DEFAULT_APP_ENVIRONMENT, DydxNetwork } from '@/constants/networks';
+import { DEFAULT_APP_ENVIRONMENT, DydxNetwork, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
 import { useAccounts, useLocalStorage } from '@/hooks';
 
@@ -20,6 +20,7 @@ export const useSelectedNetwork = (): {
   const [, setLocalStorageNetwork] = useLocalStorage<DydxNetwork>({
     key: LocalStorageKey.SelectedNetwork,
     defaultValue: DEFAULT_APP_ENVIRONMENT,
+    validateFn: (value) => Object.keys(ENVIRONMENT_CONFIG_MAP).includes(value),
   });
 
   const switchNetwork = useCallback(

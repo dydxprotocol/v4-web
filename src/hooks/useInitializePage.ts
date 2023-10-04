@@ -3,7 +3,11 @@ import { useDispatch } from 'react-redux';
 
 import { LocalStorageKey } from '@/constants/localStorage';
 
-import { DEFAULT_APP_ENVIRONMENT, type DydxNetwork } from '@/constants/networks';
+import {
+  DEFAULT_APP_ENVIRONMENT,
+  ENVIRONMENT_CONFIG_MAP,
+  type DydxNetwork,
+} from '@/constants/networks';
 
 import { useLocalStorage } from '@/hooks';
 
@@ -18,6 +22,7 @@ export const useInitializePage = () => {
   const [localStorageNetwork] = useLocalStorage<DydxNetwork>({
     key: LocalStorageKey.SelectedNetwork,
     defaultValue: DEFAULT_APP_ENVIRONMENT,
+    validateFn: (value) => Object.keys(ENVIRONMENT_CONFIG_MAP).includes(value),
   });
 
   useEffect(() => {
