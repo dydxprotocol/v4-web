@@ -1,14 +1,14 @@
 import styled, { AnyStyledComponent } from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { STRING_KEYS } from '@/constants/localization';
 import { ButtonAction, ButtonSize, ButtonState, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
-import { breakpoints } from '@/styles';
 
 import { useAccountBalance, useBreakpoints, useStringGetter } from '@/hooks';
 
+import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';
@@ -29,8 +29,6 @@ import { DYDXBalancePanel } from './DYDXBalancePanel';
 // TODO: replace placeholder URL with real URLs when avaialble
 const GOVERNANCE_HELP_URL = 'https://help.dydx.exchange/';
 const STAKING_HELP_URL = 'https://help.dydx.exchange/';
-// const MIGRATE_HELP_URL = 'https://help.dydx.exchange/';
-// const BRIDGE_URL = 'https://bridge.dydx.exchange/';
 
 export const RewardsPage = () => {
   const dispatch = useDispatch();
@@ -39,7 +37,7 @@ export const RewardsPage = () => {
 
   const selectedNetwork = useSelector(getSelectedNetwork);
 
-  // const chainId = Number(CLIENT_NETWORK_CONFIGS[selectedNetwork].ethereumChainId);
+  // const chainId = Number(ENVIRONMENT_CONFIG_MAP[selectedNetwork].ethereumChainId);
 
   // const { balance } = useAccountBalance({
   //   addressOrDenom: import.meta.env.VITE_V3_TOKEN_ADDRESS,
@@ -49,7 +47,6 @@ export const RewardsPage = () => {
   // });
 
   // const tokenBalance = import.meta.env.VITE_V3_TOKEN_ADDRESS ? balance : 0;
-
 
   return (
     <Styled.Page>
@@ -141,18 +138,18 @@ export const RewardsPage = () => {
 
         <Styled.Panel
           slotHeader={<Styled.Title>{stringGetter({ key: STRING_KEYS.GOVERNANCE })}</Styled.Title>}
+          onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr }))}
         >
           <Styled.Row>
             <Styled.Description>
               {stringGetter({ key: STRING_KEYS.GOVERNANCE_DESCRIPTION })}
-              <Link href={GOVERNANCE_HELP_URL}>
+              <Link href={GOVERNANCE_HELP_URL} onClick={(e) => e.stopPropagation()}>
                 {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
               </Link>
             </Styled.Description>
             <Styled.IconButton
               action={ButtonAction.Base}
               iconName={IconName.Arrow}
-              onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr }))}
               size={ButtonSize.Small}
             />
           </Styled.Row>
@@ -160,16 +157,18 @@ export const RewardsPage = () => {
 
         <Styled.Panel
           slotHeader={<Styled.Title>{stringGetter({ key: STRING_KEYS.STAKING })}</Styled.Title>}
+          onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr }))}
         >
           <Styled.Row>
             <Styled.Description>
               {stringGetter({ key: STRING_KEYS.STAKING_DESCRIPTION })}
-              <Link href={STAKING_HELP_URL}>{stringGetter({ key: STRING_KEYS.LEARN_MORE })} →</Link>
+              <Link href={STAKING_HELP_URL} onClick={(e) => e.stopPropagation()}>
+                {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
+              </Link>
             </Styled.Description>
             <Styled.IconButton
               action={ButtonAction.Base}
               iconName={IconName.Arrow}
-              onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr }))}
               size={ButtonSize.Small}
             />
           </Styled.Row>
@@ -248,6 +247,10 @@ Styled.PanelRow = styled(Styled.Row)`
   gap: 1.5rem;
   max-width: min(100vw, var(--content-max-width));
   align-items: flex-start;
+
+  > section {
+    cursor: pointer;
+  }
 
   @media ${breakpoints.tablet} {
     grid-auto-flow: row;
