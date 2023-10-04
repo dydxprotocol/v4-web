@@ -147,6 +147,7 @@ export const RewardsPage = () => {
                 {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
               </Link>
             </Styled.Description>
+            {/* TODO: vertically center based on Panel height */}
             <Styled.IconButton
               action={ButtonAction.Base}
               iconName={IconName.Arrow}
@@ -166,6 +167,7 @@ export const RewardsPage = () => {
                 {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
               </Link>
             </Styled.Description>
+            {/* TODO: vertically center based on Panel height */}
             <Styled.IconButton
               action={ButtonAction.Base}
               iconName={IconName.Arrow}
