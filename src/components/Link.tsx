@@ -12,7 +12,7 @@ type ElementProps = {
   };
   children: React.ReactNode;
   href?: string;
-  onClick?: () => void;
+  onClick?: (e: MouseEvent) => void;
   withIcon?: boolean;
 };
 
@@ -37,12 +37,12 @@ export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
       ref={ref}
       className={className}
       href={href}
-      onClick={() => {
+      onClick={(e: MouseEvent) => {
         if (analyticsConfig) {
           console.log(analyticsConfig);
         }
 
-        onClick?.();
+        onClick?.(e);
       }}
       rel="noopener noreferrer"
       target="_blank"

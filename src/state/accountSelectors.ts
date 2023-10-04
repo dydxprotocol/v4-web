@@ -337,3 +337,8 @@ export const getUserStats = (state: RootState) => ({
  * @returns user wallet balances
  */
 export const getBalances = (state: RootState) => state.account?.balances;
+
+/**
+ *  @returns user wallet staking balances
+ * */
+export const getStakingBalances = (state: RootState) => state.account?.stakingBalances;

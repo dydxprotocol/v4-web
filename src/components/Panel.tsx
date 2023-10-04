@@ -11,6 +11,7 @@ type PanelProps = {
   children?: React.ReactNode;
   href?: string;
   onHeaderClick?: () => void;
+  onClick?: () => void;
 };
 
 type PanelStyleProps = {
@@ -24,10 +25,11 @@ export const Panel = ({
   children,
   href,
   onHeaderClick,
+  onClick,
   hasSeparator,
   className,
 }: PanelProps & PanelStyleProps) => (
-  <Styled.Panel>
+  <Styled.Panel onClick={onClick}>
     {href ? (
       <Link to={href}>
         {slotHeader ? (
