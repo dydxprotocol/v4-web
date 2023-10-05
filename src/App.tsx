@@ -69,10 +69,7 @@ const Content = () => {
             </Route>
 
             <Route path={AppRoute.Markets} element={<MarketsPage />} />
-            {import.meta.env.MODE !== 'production' && (
-              <Route path={AppRoute.Rewards} element={<RewardsPage />} />
-            )}
-
+            <Route path={AppRoute.Rewards} element={<RewardsPage />} />
             {isTablet && (
               <>
                 <Route path={AppRoute.Alerts} element={<AlertsPage />} />

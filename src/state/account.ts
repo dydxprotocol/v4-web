@@ -23,6 +23,7 @@ import { getLocalStorage } from '@/lib/localStorage';
 
 export type AccountState = {
   balances?: Record<string, AccountBalance>;
+  stakingBalances?: Record<string, AccountBalance>;
   wallet?: Nullable<Wallet>;
   walletType?: WalletType;
 
@@ -175,6 +176,9 @@ export const accountSlice = createSlice({
     setBalances: (state, action: PayloadAction<Record<string, AccountBalance>>) => {
       state.balances = action.payload;
     },
+    setStakingBalances: (state, action: PayloadAction<Record<string, AccountBalance>>) => {
+      state.stakingBalances = action.payload;
+    },
     addUncommittedOrderClientId: (state, action: PayloadAction<number>) => {
       state.uncommittedOrderClientIds.push(action.payload);
     },
@@ -201,6 +205,7 @@ export const {
   viewedFills,
   viewedOrders,
   setBalances,
+  setStakingBalances,
   addUncommittedOrderClientId,
   removeUncommittedOrderClientId,
 } = accountSlice.actions;

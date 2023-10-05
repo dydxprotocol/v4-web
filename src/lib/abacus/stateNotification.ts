@@ -20,6 +20,7 @@ import type { RootStore } from '@/state/_store';
 
 import {
   setBalances,
+  setStakingBalances,
   setFills,
   setFundingPayments,
   setHistoricalPnl,
@@ -82,6 +83,13 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
             balances[k] = v;
           }
           dispatch(setBalances(balances));
+        }
+        if (updatedState.account?.stakingBalances) {
+          const stakingBalances: Record<string, AccountBalance> = {}
+          for (const { k, v } of updatedState.account.stakingBalances.toArray()) {
+            stakingBalances[k] = v;
+          }
+          dispatch(setStakingBalances(stakingBalances));
         }
       }
 

@@ -11,6 +11,7 @@ import { DepositDialog } from '@/views/dialogs/DepositDialog';
 import { DisconnectDialog } from '@/views/dialogs/DisconnectDialog';
 import { ExchangeOfflineDialog } from '@/views/dialogs/ExchangeOfflineDialog';
 import { HelpDialog } from '@/views/dialogs/HelpDialog';
+import { ExternalNavKeplrDialog } from '@/views/dialogs/ExternalNavKeplrDialog';
 import { MnemonicExportDialog } from '@/views/dialogs/MnemonicExportDialog';
 import { MobileSignInDialog } from '@/views/dialogs/MobileSignInDialog';
 import { OnboardingDialog } from '@/views/dialogs/OnboardingDialog';
@@ -50,6 +51,7 @@ export const DialogManager = () => {
     [DialogTypes.ExchangeOffline]: <ExchangeOfflineDialog {...modalProps} />,
     [DialogTypes.FillDetails]: <FillDetailsDialog {...modalProps} />,
     [DialogTypes.Help]: <HelpDialog {...modalProps} />,
+    [DialogTypes.ExternalNavKeplr]: <ExternalNavKeplrDialog {...modalProps} />,
     [DialogTypes.MnemonicExport]: <MnemonicExportDialog {...modalProps} />,
     [DialogTypes.MobileSignIn]: <MobileSignInDialog {...modalProps} />,
     [DialogTypes.Onboarding]: <OnboardingDialog {...modalProps} />,

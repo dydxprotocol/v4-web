@@ -29,10 +29,10 @@ export const DYDXBalancePanel = () => {
 
   const { walletType } = useAccounts();
   const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
-  const { nativeTokenBalance } = useAccountBalance();
+  const { nativeTokenBalance, nativeStakingBalance } = useAccountBalance();
 
   return (
-    <Styled.TransfersCard
+    <Panel
       slotHeader={
         <Styled.Header>
           <Styled.Title>
@@ -97,7 +97,7 @@ export const DYDXBalancePanel = () => {
                 </Styled.Label>
               ),
 
-              value: <Output type={OutputType.Asset} value={undefined} />,
+              value: <Output type={OutputType.Asset} value={nativeStakingBalance} />,
             },
           ]}
         />
@@ -106,20 +106,16 @@ export const DYDXBalancePanel = () => {
             {
               key: 'totalBalance',
               label: 'Total balance',
-              value: <Output type={OutputType.Asset} value={nativeTokenBalance} tag="Dv4TNT" />,
+              value: <Output type={OutputType.Asset} value={nativeTokenBalance + nativeStakingBalance} tag="Dv4TNT" />,
             },
           ]}
         />
       </Styled.Content>
-    </Styled.TransfersCard>
+    </Panel>
   );
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TransfersCard = styled(Panel)`
-  width: 21.25rem;
-`;
 
 Styled.Header = styled.div`
   ${layoutMixins.spacedRow}
@@ -174,13 +170,15 @@ Styled.IconContainer = styled.div`
 
 Styled.WalletAndStakedBalance = styled(Details)`
   --details-item-backgroundColor: var(--color-layer-6);
+
+  grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
+
 
   > div {
     gap: 1rem;
 
     padding: 1rem;
-    width: 8.625rem;
 
     border-radius: 0.75em;
     background-color: var(--color-layer-5);
