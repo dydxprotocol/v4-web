@@ -9,9 +9,9 @@ import { TransferInputField, TransferInputTokenResource, TransferType } from '@/
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { NumberSign, QUANTUM_MULTIPLIER } from '@/constants/numbers';
+import { NumberSign } from '@/constants/numbers';
 
-import { useDebounce, useStringGetter, useSubaccount } from '@/hooks';
+import { useDebounce, useDydxClient, useStringGetter, useSubaccount } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -40,7 +40,7 @@ import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceip
 
 export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
 
   const { sendSquidWithdraw } = useSubaccount();
@@ -101,10 +101,10 @@ export const WithdrawForm = () => {
             value: debouncedAmount,
             field: TransferInputField.usdcSize,
           });
-          setError(null);
+          setError(undefined);
         }
       } catch (error) {
-        setError(error);
+        setError(error.message);
       } finally {
         setIsLoading(false);
       }
@@ -113,38 +113,52 @@ export const WithdrawForm = () => {
     setTransferValue();
   }, [debouncedAmountBN.toNumber()]);
 
+  const { screenAddresses } = useDydxClient();
+
   const onSubmit = useCallback(
     async (e: FormEvent) => {
       try {
         e.preventDefault();
 
-        if (!requestPayload?.data || !debouncedAmountBN.toNumber()) {
+        if (!requestPayload?.data || !debouncedAmountBN.toNumber() || !toAddress) {
           throw new Error('Invalid request payload');
         }
 
         setIsLoading(true);
-        const txHash = await sendSquidWithdraw(debouncedAmountBN.toNumber(), requestPayload?.data);
+        setError(undefined);
 
-        if (txHash?.hash) {
-          const hash = `0x${Buffer.from(txHash.hash).toString('hex')}`;
+        const screenResults = await screenAddresses({
+          addresses: [toAddress],
+        });
 
-          addTransferNotification({
-            txHash: hash,
-            fromChainId: TESTNET_CHAIN_ID,
-            toChainId: chainIdStr || undefined,
-            toAmount: debouncedAmountBN.toNumber(),
-            triggeredAt: Date.now(),
-          });
-          abacusStateManager.clearTransferInputValues();
-          setWithdrawAmount('');
+        if (screenResults?.[toAddress]) {
+          setError(
+            stringGetter({
+              key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_DESTINATION_ERROR_MESSAGE,
+            })
+          );
+        } else {
+          const txHash = await sendSquidWithdraw(debouncedAmountBN.toNumber(), requestPayload.data);
+          if (txHash?.hash) {
+            const hash = `0x${Buffer.from(txHash.hash).toString('hex')}`;
+            addTransferNotification({
+              txHash: hash,
+              fromChainId: TESTNET_CHAIN_ID,
+              toChainId: chainIdStr || undefined,
+              toAmount: debouncedAmountBN.toNumber(),
+              triggeredAt: Date.now(),
+            });
+            abacusStateManager.clearTransferInputValues();
+            setWithdrawAmount('');
+          }
         }
       } catch (error) {
-        setError(error);
+        setError(error.message);
       } finally {
         setIsLoading(false);
       }
     },
-    [requestPayload, debouncedAmountBN, chainIdStr]
+    [requestPayload, debouncedAmountBN, chainIdStr, toAddress, screenAddresses, stringGetter]
   );
 
   const onChangeAddress = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -224,12 +238,10 @@ export const WithdrawForm = () => {
 
   const errorMessage = useMemo(() => {
     if (error) {
-      return error?.message
-        ? stringGetter({
-            key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-            params: { ERROR_MESSAGE: error.message },
-          })
-        : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG });
+      return stringGetter({
+        key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+        params: { ERROR_MESSAGE: error },
+      });
     }
 
     if (!toAddress) return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ADDRESS });
@@ -255,7 +267,8 @@ export const WithdrawForm = () => {
     !chainIdStr ||
     !toAddress ||
     debouncedAmountBN.isNaN() ||
-    debouncedAmountBN.isZero();
+    debouncedAmountBN.isZero() ||
+    isLoading;
 
   return (
     <Styled.Form onSubmit={onSubmit}>

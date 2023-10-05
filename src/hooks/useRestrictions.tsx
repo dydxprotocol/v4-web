@@ -5,16 +5,14 @@ import { RestrictionType } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 
 import { getRestrictionType } from '@/state/accountSelectors';
-import { forceOpenDialog, openDialog } from '@/state/dialogs';
+import { forceOpenDialog } from '@/state/dialogs';
 
 const useRestrictionContext = () => {
   const dispatch = useDispatch();
   const restrictionType = useSelector(getRestrictionType, shallowEqual);
 
   useEffect(() => {
-    if (restrictionType === RestrictionType.USER_RESTRICTION_UNKNOWN) {
-      dispatch(openDialog({ type: DialogTypes.RateLimit }));
-    } else if (restrictionType === RestrictionType.GEO_RESTRICTED) {
+    if (restrictionType === RestrictionType.GEO_RESTRICTED) {
       dispatch(
         forceOpenDialog({ type: DialogTypes.RestrictedGeo, dialogProps: { preventClose: true } })
       );

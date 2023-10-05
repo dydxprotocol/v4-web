@@ -185,7 +185,9 @@ const useDydxClientContext = () => {
         const promises = addresses.map((address) =>
           compositeClient.indexerClient.utility.screen(address)
         );
+
         const results = await Promise.all(promises);
+
         return Object.fromEntries(
           addresses.map((address, index) => [address, results[index]?.restricted])
         );
