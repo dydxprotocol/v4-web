@@ -19,8 +19,8 @@ import { type Candle, RESOLUTION_MAP } from '@/constants/candles';
 import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { log } from '@/lib/telemetry';
+
 import { useRestrictions } from './useRestrictions';
-import { isTruthy } from '@/lib/isTruthy';
 
 type DydxContextType = ReturnType<typeof useDydxClientContext>;
 const DydxContext = createContext<DydxContextType>({} as DydxContextType);
