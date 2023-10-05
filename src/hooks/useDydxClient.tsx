@@ -19,6 +19,8 @@ import { type Candle, RESOLUTION_MAP } from '@/constants/candles';
 import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { log } from '@/lib/telemetry';
+import { useRestrictions } from './useRestrictions';
+import { isTruthy } from '@/lib/isTruthy';
 
 type DydxContextType = ReturnType<typeof useDydxClientContext>;
 const DydxContext = createContext<DydxContextType>({} as DydxContextType);
@@ -179,6 +181,8 @@ const useDydxClientContext = () => {
     [requestCandles]
   );
 
+  const { updateSanctionedAddresses } = useRestrictions();
+
   const screenAddresses = useCallback(
     async ({ addresses }: { addresses: string[] }) => {
       if (compositeClient) {
@@ -188,9 +192,12 @@ const useDydxClientContext = () => {
 
         const results = await Promise.all(promises);
 
-        return Object.fromEntries(
+        const screenedAddresses = Object.fromEntries(
           addresses.map((address, index) => [address, results[index]?.restricted])
         );
+
+        updateSanctionedAddresses(screenedAddresses);
+        return screenedAddresses;
       }
     },
     [compositeClient]

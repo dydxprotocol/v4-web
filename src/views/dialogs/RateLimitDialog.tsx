@@ -1,10 +1,11 @@
-import styled from 'styled-components';
+import styled, { AnyStyledComponent } from 'styled-components';
 
+import { STRING_KEYS } from '@/constants/localization';
 import { useStringGetter } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog } from '@/components/Dialog';
-import { STRING_KEYS } from '@/constants/localization';
+import { Icon, IconName } from '@/components/Icon';
 
 type ElementProps = {
   preventClose?: boolean;
@@ -20,15 +21,22 @@ export const RateLimitDialog = ({ preventClose, setIsOpen }: ElementProps) => {
       preventClose={preventClose}
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_TITLE })}
+      slotIcon={<Styled.Icon iconName={IconName.Warning} />}
     >
-      <StyledContent>
+      <Styled.Content>
         {stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_MESSAGE })}
-      </StyledContent>
+      </Styled.Content>
     </Dialog>
   );
 };
 
-const StyledContent = styled.div`
+const Styled: Record<string, AnyStyledComponent> = {};
+
+Styled.Icon = styled(Icon)`
+  color: var(--color-warning);
+`;
+
+Styled.Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
 `;

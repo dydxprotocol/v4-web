@@ -262,14 +262,19 @@ const useAccountsContext = () => {
   }, [dydxSubaccounts]);
 
   // Restrictions
-  const { isBadActor } = useRestrictions();
+  const { isBadActor, sanctionedAddresses } = useRestrictions();
 
   useEffect(() => {
-    if (isBadActor && dydxAddress) {
+    if (
+      dydxAddress &&
+      (isBadActor ||
+        sanctionedAddresses.has(dydxAddress) ||
+        (evmAddress && sanctionedAddresses.has(evmAddress)))
+    ) {
       dispatch(forceOpenDialog({ type: DialogTypes.WalletRestricted }));
       disconnect();
     }
-  }, [isBadActor, dydxAddress]);
+  }, [isBadActor, evmAddress, dydxAddress, sanctionedAddresses]);
 
   // Disconnect wallet / accounts
   const disconnectLocalDydxWallet = () => {

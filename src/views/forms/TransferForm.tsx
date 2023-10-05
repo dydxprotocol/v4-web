@@ -21,6 +21,7 @@ import {
   useAccountBalance,
   useAccounts,
   useDydxClient,
+  useRestrictions,
   useSelectedNetwork,
   useStringGetter,
   useSubaccount,
@@ -95,16 +96,6 @@ export const TransferForm = ({
   const balanceBN = MustBigNumber(balance);
   const newBalanceBN = MustBigNumber(newBalance);
 
-  const isAddressValid = useMemo(
-    () =>
-      recipientAddress &&
-      dydxAddress !== recipientAddress &&
-      validation.isValidAddress(recipientAddress),
-    [recipientAddress]
-  );
-
-  const isAmountValid = balance && amount && amountBN.gt(0) && newBalanceBN.gte(0);
-
   useEffect(() => {
     abacusStateManager.setTransferValue({
       value: TransferType.transferOut.rawValue,
@@ -123,6 +114,19 @@ export const TransferForm = ({
       field: TransferInputField.token,
     });
   }, [asset]);
+
+  const { sanctionedAddresses } = useRestrictions();
+
+  const isAddressValid = useMemo(
+    () =>
+      recipientAddress &&
+      dydxAddress !== recipientAddress &&
+      validation.isValidAddress(recipientAddress) &&
+      !sanctionedAddresses.has(recipientAddress),
+    [recipientAddress, sanctionedAddresses, dydxAddress]
+  );
+
+  const isAmountValid = balance && amount && amountBN.gt(0) && newBalanceBN.gte(0);
 
   const { screenAddresses } = useDydxClient();
 
@@ -250,13 +254,6 @@ export const TransferForm = ({
     },
   ];
 
-  const addressValidationErrorMessage = stringGetter({
-    key:
-      dydxAddress === recipientAddress
-        ? STRING_KEYS.TRANSFER_TO_YOURSELF
-        : STRING_KEYS.TRANSFER_INVALID_DYDX_ADDRESS,
-  });
-
   const renderFormInputButton = ({
     label,
     isInputEmpty,
@@ -321,7 +318,12 @@ export const TransferForm = ({
 
       {recipientAddress && !isAddressValid && (
         <Styled.AddressValidationAlertMessage type={AlertType.Error}>
-          {addressValidationErrorMessage}
+          {stringGetter({
+            key:
+              dydxAddress === recipientAddress
+                ? STRING_KEYS.TRANSFER_TO_YOURSELF
+                : STRING_KEYS.TRANSFER_INVALID_DYDX_ADDRESS,
+          })}
         </Styled.AddressValidationAlertMessage>
       )}
 
@@ -367,7 +369,7 @@ export const TransferForm = ({
         <TransferButtonAndReceipt
           selectedAsset={asset}
           fees={fee || undefined}
-          isDisabled={!isAmountValid || !isAddressValid || !fee}
+          isDisabled={!isAmountValid || !isAddressValid || !fee || isLoading}
           isLoading={isLoading || Boolean(isAmountValid && isAddressValid && !fee)}
         />
       </Styled.Footer>

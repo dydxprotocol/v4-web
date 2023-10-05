@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import { RestrictionType } from '@/constants/abacus';
@@ -6,10 +6,12 @@ import { DialogTypes } from '@/constants/dialogs';
 
 import { getRestrictionType } from '@/state/accountSelectors';
 import { forceOpenDialog } from '@/state/dialogs';
+import { isTruthy } from '@/lib/isTruthy';
 
 const useRestrictionContext = () => {
   const dispatch = useDispatch();
   const restrictionType = useSelector(getRestrictionType, shallowEqual);
+  const [sanctionedAddresses, setSanctionedAddresses] = useState<string[]>([]);
 
   useEffect(() => {
     if (restrictionType === RestrictionType.GEO_RESTRICTED) {
@@ -19,9 +21,26 @@ const useRestrictionContext = () => {
     }
   }, [restrictionType, dispatch]);
 
+  const updateSanctionedAddresses = useCallback(
+    (screenedAddresses: { [address: string]: boolean }) => {
+      const toAdd = Object.entries(screenedAddresses)
+        .map(([address, isSanctioned]) => {
+          if (isSanctioned) return address;
+        })
+        .filter(isTruthy);
+
+      if (toAdd.length) {
+        setSanctionedAddresses([...sanctionedAddresses, ...toAdd]);
+      }
+    },
+    [sanctionedAddresses]
+  );
+
   return {
     isBadActor: restrictionType === RestrictionType.USER_RESTRICTED,
     isGeoRestricted: restrictionType === RestrictionType.GEO_RESTRICTED,
+    updateSanctionedAddresses,
+    sanctionedAddresses: useMemo(() => new Set(sanctionedAddresses), [sanctionedAddresses]),
   };
 };
 

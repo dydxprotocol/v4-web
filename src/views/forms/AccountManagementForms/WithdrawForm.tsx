@@ -11,7 +11,14 @@ import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
-import { useDebounce, useDydxClient, useStringGetter, useSubaccount } from '@/hooks';
+import {
+  useAccounts,
+  useDebounce,
+  useDydxClient,
+  useRestrictions,
+  useStringGetter,
+  useSubaccount,
+} from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -37,6 +44,7 @@ import { MustBigNumber } from '@/lib/numbers';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
+import { join } from 'path';
 
 export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
@@ -67,9 +75,11 @@ export const WithdrawForm = () => {
   const { addTransferNotification } = useLocalNotifications();
 
   // Async Data
-  const debouncedAmountBN = MustBigNumber(debouncedAmount);
-  const withdrawAmountBN = MustBigNumber(withdrawAmount);
-  const freeCollateralBN = MustBigNumber(freeCollateral?.current);
+  const debouncedAmountBN = useMemo(() => MustBigNumber(debouncedAmount), [debouncedAmount]);
+  const freeCollateralBN = useMemo(
+    () => MustBigNumber(freeCollateral?.current),
+    [freeCollateral?.current]
+  );
 
   useEffect(() => {
     abacusStateManager.setTransferValue({
@@ -111,16 +121,17 @@ export const WithdrawForm = () => {
     };
 
     setTransferValue();
-  }, [debouncedAmountBN.toNumber()]);
+  }, [debouncedAmountBN]);
 
   const { screenAddresses } = useDydxClient();
+  const { dydxAddress } = useAccounts();
 
   const onSubmit = useCallback(
     async (e: FormEvent) => {
       try {
         e.preventDefault();
 
-        if (!requestPayload?.data || !debouncedAmountBN.toNumber() || !toAddress) {
+        if (!requestPayload?.data || !debouncedAmountBN.toNumber() || !toAddress || !dydxAddress) {
           throw new Error('Invalid request payload');
         }
 
@@ -128,13 +139,19 @@ export const WithdrawForm = () => {
         setError(undefined);
 
         const screenResults = await screenAddresses({
-          addresses: [toAddress],
+          addresses: [toAddress, dydxAddress],
         });
 
         if (screenResults?.[toAddress]) {
           setError(
             stringGetter({
               key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_DESTINATION_ERROR_MESSAGE,
+            })
+          );
+        } else if (screenResults?.[dydxAddress]) {
+          setError(
+            stringGetter({
+              key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_ORIGINATION_ERROR_MESSAGE,
             })
           );
         } else {
@@ -189,7 +206,7 @@ export const WithdrawForm = () => {
 
   const onClickMax = useCallback(() => {
     setWithdrawAmount(freeCollateralBN.toString());
-  }, [freeCollateral?.current, setWithdrawAmount]);
+  }, [freeCollateralBN, setWithdrawAmount]);
 
   const onSelectChain = useCallback((chain: string) => {
     if (chain) {
@@ -227,7 +244,7 @@ export const WithdrawForm = () => {
           value={freeCollateral?.current}
           newValue={freeCollateral?.postOrder}
           sign={NumberSign.Negative}
-          hasInvalidNewValue={withdrawAmountBN.minus(freeCollateralBN).isNegative()}
+          hasInvalidNewValue={MustBigNumber(withdrawAmount).minus(freeCollateralBN).isNegative()}
           withDiff={
             Boolean(withdrawAmount) && !debouncedAmountBN.isNaN() && !debouncedAmountBN.isZero()
           }
@@ -236,6 +253,8 @@ export const WithdrawForm = () => {
     },
   ];
 
+  const { sanctionedAddresses } = useRestrictions();
+
   const errorMessage = useMemo(() => {
     if (error) {
       return stringGetter({
@@ -243,6 +262,11 @@ export const WithdrawForm = () => {
         params: { ERROR_MESSAGE: error },
       });
     }
+
+    if (toAddress && sanctionedAddresses.has(toAddress))
+      return stringGetter({
+        key: STRING_KEYS.TRANSFER_INVALID_DYDX_ADDRESS,
+      });
 
     if (!toAddress) return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ADDRESS });
 
@@ -259,7 +283,15 @@ export const WithdrawForm = () => {
     }
 
     return undefined;
-  }, [error, freeCollateralBN, chainIdStr, debouncedAmountBN, toToken]);
+  }, [
+    error,
+    freeCollateralBN,
+    chainIdStr,
+    debouncedAmountBN,
+    toToken,
+    toAddress,
+    sanctionedAddresses,
+  ]);
 
   const isDisabled =
     !!errorMessage ||

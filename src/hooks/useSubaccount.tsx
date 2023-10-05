@@ -36,7 +36,6 @@ import { log } from '@/lib/telemetry';
 import { useAccounts } from './useAccounts';
 import { useDydxClient } from './useDydxClient';
 
-
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
 const SubaccountContext = createContext<SubaccountContextType>({} as SubaccountContextType);
 SubaccountContext.displayName = 'Subaccount';
@@ -275,6 +274,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       await getFaucetFunds({ dydxAddress, subaccountNumber });
     } catch (error) {
       log('useSubaccount/getFaucetFunds', error);
+      throw error;
     }
   }, [dydxAddress, getFaucetFunds, subaccountNumber]);
 
