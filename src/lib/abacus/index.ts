@@ -168,7 +168,7 @@ class AbacusStateManager {
     this.chainTransactions.setStore(store);
   };
 
-  setAccount = (evmAddress?: string, localWallet?: LocalWallet) => {
+  setAccount = (localWallet?: LocalWallet) => {
     if (localWallet) {
       this.stateManager.accountAddress = localWallet.address;
       this.chainTransactions.setLocalWallet(localWallet);
