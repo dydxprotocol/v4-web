@@ -20,7 +20,7 @@ import { ReceiveDialog } from '@/views/dialogs/ReceiveDialog';
 import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
-import { WalletRestrictedDialog } from '@/views/dialogs/WalletRestrictedDialog';
+import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
 import { WithdrawDialog } from '@/views/dialogs/WithdrawDialog';
 
 import { OrderDetailsDialog } from '@/views/dialogs/DetailsDialog/OrderDetailsDialog';
@@ -59,9 +59,9 @@ export const DialogManager = () => {
     [DialogTypes.RateLimit]: <RateLimitDialog {...modalProps} />,
     [DialogTypes.Receive]: <ReceiveDialog {...modalProps} />,
     [DialogTypes.RestrictedGeo]: <RestrictedGeoDialog {...modalProps} />,
+    [DialogTypes.RestrictedWallet]: <RestrictedWalletDialog {...modalProps} />,
     [DialogTypes.Trade]: <TradeDialog {...modalProps} />,
     [DialogTypes.Transfer]: <TransferDialog {...modalProps} />,
-    [DialogTypes.WalletRestricted]: <WalletRestrictedDialog {...modalProps} />,
     [DialogTypes.Withdraw]: <WithdrawDialog {...modalProps} />,
   }[type];
 };

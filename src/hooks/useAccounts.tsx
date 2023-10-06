@@ -271,7 +271,7 @@ const useAccountsContext = () => {
         sanctionedAddresses.has(dydxAddress) ||
         (evmAddress && sanctionedAddresses.has(evmAddress)))
     ) {
-      dispatch(forceOpenDialog({ type: DialogTypes.WalletRestricted }));
+      dispatch(forceOpenDialog({ type: DialogTypes.RestrictedWallet }));
       disconnect();
     }
   }, [isBadActor, evmAddress, dydxAddress, sanctionedAddresses]);

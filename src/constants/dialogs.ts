@@ -13,9 +13,9 @@ export enum DialogTypes {
   RateLimit = 'RateLimit',
   Receive = 'Receive',
   RestrictedGeo = 'RestrictedGeo',
+  RestrictedWallet = 'RestrictedWallet',
   Trade = 'Trade',
   Transfer = 'Transfer',
-  WalletRestricted = 'WalletRestricted',
   Withdraw = 'Withdraw',
 }
 
