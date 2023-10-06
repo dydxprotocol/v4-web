@@ -145,16 +145,16 @@ export const TransferForm = ({
         addresses: [recipientAddress!, dydxAddress!],
       });
 
-      if (screenResults?.[recipientAddress!]) {
-        setError(
-          stringGetter({
-            key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_DESTINATION_ERROR_MESSAGE,
-          })
-        );
-      } else if (screenResults?.[dydxAddress!]) {
+      if (screenResults?.[dydxAddress!]) {
         setError(
           stringGetter({
             key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_ORIGINATION_ERROR_MESSAGE,
+          })
+        );
+      } else if (screenResults?.[recipientAddress!]) {
+        setError(
+          stringGetter({
+            key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_DESTINATION_ERROR_MESSAGE,
           })
         );
       } else {

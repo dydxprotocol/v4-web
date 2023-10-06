@@ -24,10 +24,8 @@ const useRestrictionContext = () => {
   const updateSanctionedAddresses = useCallback(
     (screenedAddresses: { [address: string]: boolean }) => {
       const toAdd = Object.entries(screenedAddresses)
-        .map(([address, isSanctioned]) => {
-          if (isSanctioned) return address;
-        })
-        .filter(isTruthy);
+        .filter(([, isSanctioned]) => isSanctioned)
+        .map(([address]) => address);
 
       if (toAdd.length) {
         setSanctionedAddresses([...sanctionedAddresses, ...toAdd]);
