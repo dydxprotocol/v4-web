@@ -9,6 +9,8 @@ import { useAccounts, useLocalStorage } from '@/hooks';
 import { setSelectedNetwork } from '@/state/app';
 import { getSelectedNetwork } from '@/state/appSelectors';
 
+import { validateAgainstAvailableEnvironments } from '@/lib/network';
+
 export const useSelectedNetwork = (): {
   switchNetwork: (network: DydxNetwork) => void;
   selectedNetwork: DydxNetwork;
@@ -20,7 +22,7 @@ export const useSelectedNetwork = (): {
   const [, setLocalStorageNetwork] = useLocalStorage<DydxNetwork>({
     key: LocalStorageKey.SelectedNetwork,
     defaultValue: DEFAULT_APP_ENVIRONMENT,
-    validateFn: (value) => Object.keys(ENVIRONMENT_CONFIG_MAP).includes(value),
+    validateFn: validateAgainstAvailableEnvironments,
   });
 
   const switchNetwork = useCallback(
