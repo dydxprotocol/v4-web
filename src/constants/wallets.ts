@@ -266,7 +266,7 @@ export const wallets: Record<WalletType, WalletConfig> = {
     walletconnect2Id: '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0',
   },
   [WalletType.WalletConnect2]: {
-    type: WalletType.WalletConnect,
+    type: WalletType.WalletConnect2,
     stringKey: STRING_KEYS.WALLET_CONNECT_2,
     icon: WalletConnectIcon,
     connectionTypes: [WalletConnectionType.WalletConnect2],
