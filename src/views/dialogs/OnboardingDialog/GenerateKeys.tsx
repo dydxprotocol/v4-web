@@ -10,7 +10,7 @@ import { AnalyticsEvent } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
-import { DydxAddress, SIGN_TYPED_DATA } from '@/constants/wallets';
+import { DydxAddress, getSignTypedData } from '@/constants/wallets';
 
 import { useAccounts, useBreakpoints, useDydxClient, useStringGetter } from '@/hooks';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
@@ -85,10 +85,11 @@ export const GenerateKeys = ({
     EvmDerivedAccountStatus.Derived,
   ].includes(status);
 
+  const signTypedData = getSignTypedData(selectedNetwork);
   const { signTypedDataAsync } = useSignTypedData({
-    ...SIGN_TYPED_DATA,
+    ...signTypedData,
     domain: {
-      ...SIGN_TYPED_DATA.domain,
+      ...signTypedData.domain,
       chainId,
     },
   });
