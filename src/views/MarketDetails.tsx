@@ -139,11 +139,9 @@ export const MarketDetails: React.FC = () => {
         </Styled.WrapRow>
 
         <Styled.MarketDescription>
-          {primaryDescriptionKey && (
-            <p>{stringGetter({ key: STRING_KEYS[primaryDescriptionKey as StringKey] })}</p>
-          )}
+          {primaryDescriptionKey && <p>{stringGetter({ key: `APP.${primaryDescriptionKey}` })}</p>}
           {secondaryDescriptionKey && (
-            <p>{stringGetter({ key: STRING_KEYS[secondaryDescriptionKey as StringKey] })}</p>
+            <p>{stringGetter({ key: `APP.${secondaryDescriptionKey}` })}</p>
           )}
         </Styled.MarketDescription>
 
