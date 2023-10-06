@@ -24,7 +24,7 @@ export const RestrictedGeoDialog = ({ preventClose, setIsOpen }: ElementProps) =
       slotIcon={<Styled.Icon iconName={IconName.Warning} />}
     >
       <Styled.Content>
-        {stringGetter({ key: STRING_KEYS.REGION_NOT_PERMITTED_SUBTITLE })}{' '}
+        {stringGetter({ key: STRING_KEYS.REGION_NOT_PERMITTED_SUBTITLE })}
       </Styled.Content>
     </Dialog>
   );

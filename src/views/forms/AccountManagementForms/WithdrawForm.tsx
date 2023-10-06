@@ -263,12 +263,12 @@ export const WithdrawForm = () => {
       });
     }
 
-    if (toAddress && sanctionedAddresses.has(toAddress))
+    if (!toAddress) return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ADDRESS });
+
+    if (sanctionedAddresses.has(toAddress))
       return stringGetter({
         key: STRING_KEYS.TRANSFER_INVALID_DYDX_ADDRESS,
       });
-
-    if (!toAddress) return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ADDRESS });
 
     if (debouncedAmountBN) {
       if (!chainIdStr) {
