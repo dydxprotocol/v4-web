@@ -6,7 +6,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
 
 import { TradeInputField } from '@/constants/abacus';
-import { STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS, StringKey } from '@/constants/localization';
 import { INTEGER_DECIMALS } from '@/constants/numbers';
 import { TimeUnitShort } from '@/constants/time';
 import { GOOD_TIL_TIME_TIMESCALE_STRINGS } from '@/constants/trade';
@@ -29,12 +29,12 @@ export const AdvancedTradeOptions = () => {
   const currentTradeFormConfig = useSelector(getInputTradeOptions, shallowEqual);
   const inputTradeData = useSelector(getInputTradeData, shallowEqual);
 
-  const { execution, goodUntil, postOnly, reduceOnly, timeInForce } = inputTradeData || {};
+  const { execution, goodTil, postOnly, reduceOnly, timeInForce } = inputTradeData || {};
 
   const { executionOptions, needsGoodUntil, needsPostOnly, needsReduceOnly, timeInForceOptions } =
     currentTradeFormConfig || {};
 
-  const { duration, unit } = goodUntil || {};
+  const { duration, unit } = goodTil || {};
 
   const needsExecution = executionOptions || needsPostOnly || needsReduceOnly;
 
@@ -62,7 +62,7 @@ export const AdvancedTradeOptions = () => {
                 <Styled.SelectItem
                   key={type}
                   value={type}
-                  label={stringGetter({ key: stringKey })}
+                  label={stringGetter({ key: stringKey as StringKey })}
                 />
               ))}
             </Styled.SelectMenu>
@@ -76,7 +76,7 @@ export const AdvancedTradeOptions = () => {
               onChange={({ value }: NumberFormatValues) => {
                 abacusStateManager.setTradeValue({
                   value: Number(value),
-                  field: TradeInputField.goodUntilDuration,
+                  field: TradeInputField.goodTilDuration,
                 });
               }}
               value={duration ?? ''}
@@ -86,7 +86,7 @@ export const AdvancedTradeOptions = () => {
                   onValueChange={(goodTilTimeTimescale: string) => {
                     abacusStateManager.setTradeValue({
                       value: goodTilTimeTimescale,
-                      field: TradeInputField.goodUntilUnit,
+                      field: TradeInputField.goodTilUnit,
                     });
                   }}
                 >
@@ -121,7 +121,7 @@ export const AdvancedTradeOptions = () => {
                   <Styled.SelectItem
                     key={type}
                     value={type}
-                    label={stringGetter({ key: stringKey })}
+                    label={stringGetter({ key: stringKey as StringKey })}
                   />
                 ))}
               </Styled.SelectMenu>
