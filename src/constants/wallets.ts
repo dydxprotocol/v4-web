@@ -24,6 +24,8 @@ import {
 
 import { isMetaMask } from '@/lib/wallet/providers';
 
+import { DydxNetwork, ENVIRONMENT_CONFIG_MAP } from './networks';
+
 // Wallet connection types
 
 export enum WalletConnectionType {
@@ -266,7 +268,7 @@ export const wallets: Record<WalletType, WalletConfig> = {
     walletconnect2Id: '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0',
   },
   [WalletType.WalletConnect2]: {
-    type: WalletType.WalletConnect,
+    type: WalletType.WalletConnect2,
     stringKey: STRING_KEYS.WALLET_CONNECT_2,
     icon: WalletConnectIcon,
     connectionTypes: [WalletConnectionType.WalletConnect2],
@@ -318,20 +320,21 @@ export type WalletConnection = {
 export const COSMOS_DERIVATION_PATH = "m/44'/118'/0'/0/0";
 
 /**
- * @description typed data to sign for v4 onboarding
+ * @description typed data to sign for dYdX Chain onboarding
  */
-export const SIGN_TYPED_DATA = {
-  primaryType: 'dYdX',
-  domain: {
-    name: 'dYdX V4',
-  },
-  types: {
-    dYdX: [{ name: 'action', type: 'string' }],
-  },
-  message: {
-    action: 'dYdX V4 Onboarding',
-  },
-} as const;
+export const getSignTypedData = (selectedNetwork: DydxNetwork) =>
+  ({
+    primaryType: 'dYdX',
+    domain: {
+      name: ENVIRONMENT_CONFIG_MAP[selectedNetwork].wallets.signTypedDataDomainName,
+    },
+    types: {
+      dYdX: [{ name: 'action', type: 'string' }],
+    },
+    message: {
+      action: ENVIRONMENT_CONFIG_MAP[selectedNetwork].wallets.signTypedDataAction,
+    },
+  } as const);
 
 export type PrivateInformation = ReturnType<typeof onboarding.deriveHDKeyFromEthereumSignature>;
 

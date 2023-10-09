@@ -51,7 +51,7 @@ export const TransferStatusSteps = ({ status }: ElementProps) => {
         label: stringGetter({
           key: type === 'deposit' ? STRING_KEYS.DEPOSIT_TO_CHAIN : STRING_KEYS.WITHDRAW_TO_CHAIN,
           params: {
-            CHAIN: status?.toChain?.chainData?.chainName,
+            CHAIN: type === 'deposit' ? 'dYdX' : status?.toChain?.chainData?.chainName,
           },
         }),
         step: TransferStatusStep.ToChain,

@@ -53,6 +53,15 @@ export const TransferStatusToast = ({
 
   if (!status) return <LoadingDots size={3} />;
 
+  const statusString =
+    type === 'deposit'
+      ? status?.squidTransactionStatus === 'success'
+        ? STRING_KEYS.DEPOSIT_COMPLETE
+        : STRING_KEYS.DEPOSIT_STATUS
+      : status?.squidTransactionStatus === 'success'
+      ? STRING_KEYS.WITHDRAW_COMPLETE
+      : STRING_KEYS.WITHDRAW_STATUS;
+
   return (
     <Styled.Root open={open} onOpenChange={setOpen}>
       <WithReceipt
@@ -67,7 +76,7 @@ export const TransferStatusToast = ({
         <Styled.BridgingStatus>
           <Styled.Status>
             {stringGetter({
-              key: type === 'deposit' ? STRING_KEYS.DEPOSIT_STATUS : STRING_KEYS.WITHDRAW_STATUS,
+              key: statusString,
               params: {
                 AMOUNT_USD: <Styled.InlineOutput type={OutputType.Fiat} value={toAmount} />,
                 ESTIMATED_DURATION: (

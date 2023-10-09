@@ -168,6 +168,19 @@ export const DepositButtonAndReceipt = ({
         />
       ),
     },
+    {
+      key: 'estimatedRouteDuration',
+      label: <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_TIME })}</span>,
+      value: typeof summary?.estimatedRouteDuration === 'number' && (
+        <Output
+          type={OutputType.Text}
+          value={stringGetter({
+            key: STRING_KEYS.X_MINUTES_LOWERCASED,
+            params: { X: Math.round(summary?.estimatedRouteDuration / 60) },
+          })}
+        />
+      ),
+    },
   ];
 
   const isFormValid = !isDisabled && !isEditingSlippage;

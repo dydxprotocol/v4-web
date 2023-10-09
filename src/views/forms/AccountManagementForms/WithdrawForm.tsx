@@ -4,6 +4,7 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
 import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
+import { isAddress } from 'viem';
 
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
@@ -26,6 +27,7 @@ import { Link } from '@/components/Link';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
+import { Icon, IconName } from '@/components/Icon';
 
 import { ChainSelectMenu } from '@/views/forms/AccountManagementForms/ChainSelectMenu';
 
@@ -58,6 +60,8 @@ export const WithdrawForm = () => {
     address: toAddress,
     resources,
   } = useSelector(getTransferInputs, shallowEqual) || {};
+
+  const isValidAddress = toAddress && isAddress(toAddress);
 
   const toToken = useMemo(
     () => (token ? resources?.tokenResources?.get(token) : undefined),
@@ -179,7 +183,6 @@ export const WithdrawForm = () => {
 
   const onSelectChain = useCallback((chain: string) => {
     if (chain) {
-      abacusStateManager.clearTransferInputValues();
       abacusStateManager.setTransferValue({
         field: TransferInputField.chain,
         value: chain,
@@ -190,7 +193,6 @@ export const WithdrawForm = () => {
 
   const onSelectToken = useCallback((token: TransferInputTokenResource) => {
     if (token) {
-      abacusStateManager.clearTransferInputValues();
       abacusStateManager.setTransferValue({
         field: TransferInputField.token,
         value: token.address,
@@ -265,7 +267,12 @@ export const WithdrawForm = () => {
           placeholder={stringGetter({ key: STRING_KEYS.ADDRESS })}
           onChange={onChangeAddress}
           value={toAddress || ''}
-          label={stringGetter({ key: STRING_KEYS.DESTINATION })}
+          label={
+            <span>
+              {stringGetter({ key: STRING_KEYS.DESTINATION })}{' '}
+              {isValidAddress ? <Styled.CheckIcon iconName={IconName.Check} /> : null}
+            </span>
+          }
         />
         <ChainSelectMenu
           label={stringGetter({ key: STRING_KEYS.NETWORK })}
@@ -341,4 +348,11 @@ Styled.TransactionInfo = styled.span`
 
 Styled.FormInputButton = styled(Button)`
   ${formMixins.inputInnerButton}
+`;
+
+Styled.CheckIcon = styled(Icon)`
+  margin: 0 1ch;
+
+  color: var(--color-positive);
+  font-size: 0.625rem;
 `;
