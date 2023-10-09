@@ -36,6 +36,7 @@ import { setAssets } from '@/state/assets';
 import { setConfigs } from '@/state/configs';
 import { setInputs } from '@/state/inputs';
 import { setHistoricalFundings, setLiveTrades, setMarkets, setOrderbook } from '@/state/perpetuals';
+import { isTruthy } from '../isTruthy';
 
 class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   private store: RootStore | undefined;
@@ -85,7 +86,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
           dispatch(setBalances(balances));
         }
         if (updatedState.account?.stakingBalances) {
-          const stakingBalances: Record<string, AccountBalance> = {}
+          const stakingBalances: Record<string, AccountBalance> = {};
           for (const { k, v } of updatedState.account.stakingBalances.toArray()) {
             stakingBalances[k] = v;
           }
@@ -109,10 +110,12 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         dispatch(
           setMarkets({
             markets: Object.fromEntries(
-              (marketIds || updatedState.marketIds()?.toArray() || []).map((marketId: string) => {
-                const marketData = updatedState.market(marketId);
-                return [marketId, marketData];
-              })
+              (marketIds || updatedState.marketIds()?.toArray() || [])
+                .map((marketId: string) => {
+                  const marketData = updatedState.market(marketId);
+                  return [marketId, marketData];
+                })
+                .filter(isTruthy)
             ) as Record<string, PerpetualMarket>,
             update: !!marketIds,
           })
