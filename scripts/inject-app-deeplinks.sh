@@ -17,3 +17,5 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 else
     sed -i "s/{PLACE_YOUR_APP_ID_HERE}/$app_id/g" $source
 fi
+
+cat $source
