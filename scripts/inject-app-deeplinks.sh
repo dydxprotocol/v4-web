@@ -1,6 +1,6 @@
 #!/bin/sh
 
-source="public/.well-known/apple-app-site-association"
+source="dist/.well-known/apple-app-site-association"
 if [ ! -f "$source" ]; then
   echo "Error: $source file not found"
   exit 1
@@ -17,5 +17,3 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 else
     sed -i "s/{PLACE_YOUR_APP_ID_HERE}/$app_id/g" $source
 fi
-
-cat $source
