@@ -12,4 +12,8 @@ if [ -z "$app_id" ]; then
   exit 1
 fi
 
-sed -i '' "s/{PLACE_YOUR_APP_ID_HERE}/$app_id/g" $source
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' "s/{PLACE_YOUR_APP_ID_HERE}/$app_id/g" $source
+else
+    sed -i "s/{PLACE_YOUR_APP_ID_HERE}/$app_id/g" $source
+fi
