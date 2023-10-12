@@ -92,7 +92,6 @@ export enum WalletType {
   Rainbow = 'RAINBOW_WALLET',
   TokenPocket = 'TOKEN_POCKET',
   TrustWallet = 'TRUST_WALLET',
-  WalletConnect = 'WALLETCONNECT',
   WalletConnect2 = 'WALLETCONNECT_2',
   // TestWallet = 'TEST_WALLET',
   OtherWallet = 'OTHER_WALLET',
@@ -163,6 +162,7 @@ export const wallets: Record<WalletType, WalletConfig> = {
     connectionTypes: [
       WalletConnectionType.CoinbaseWalletSdk,
       WalletConnectionType.InjectedEip1193,
+      WalletConnectionType.WalletConnect2,
       WalletConnectionType.WalletConnect1,
     ],
     matchesInjectedEip1193: (provider) => provider.isCoinbaseWallet, // provider.selectedProvider?.isCoinbaseWallet,
@@ -272,12 +272,6 @@ export const wallets: Record<WalletType, WalletConfig> = {
     stringKey: STRING_KEYS.WALLET_CONNECT_2,
     icon: WalletConnectIcon,
     connectionTypes: [WalletConnectionType.WalletConnect2],
-  },
-  [WalletType.WalletConnect]: {
-    type: WalletType.WalletConnect,
-    stringKey: STRING_KEYS.WALLET_CONNECT,
-    icon: WalletConnectIcon,
-    connectionTypes: [WalletConnectionType.WalletConnect1],
   },
   [WalletType.Keplr]: {
     type: WalletType.Keplr,
