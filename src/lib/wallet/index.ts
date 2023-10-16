@@ -45,12 +45,6 @@ export const getWalletConnection = ({
         break;
       }
 
-      case WalletConnectionType.WalletConnect1: {
-        return {
-          type: WalletConnectionType.WalletConnect1,
-        };
-      }
-
       case WalletConnectionType.WalletConnect2: {
         return {
           type: WalletConnectionType.WalletConnect2,

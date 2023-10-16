@@ -32,7 +32,6 @@ export enum WalletConnectionType {
   CoinbaseWalletSdk = 'coinbaseWalletSdk',
   CosmosSigner = 'CosmosSigner',
   InjectedEip1193 = 'injectedEip1193',
-  WalletConnect1 = 'walletConnect1',
   WalletConnect2 = 'walletConnect2',
 }
 
@@ -62,10 +61,6 @@ export const walletConnectionTypes: Record<WalletConnectionType, WalletConnectio
     name: 'injected EIP-1193 provider',
     wagmiConnectorId: 'injected',
   },
-  [WalletConnectionType.WalletConnect1]: {
-    name: 'WalletConnect 1.0',
-    wagmiConnectorId: 'walletConnectLegacy',
-  },
   [WalletConnectionType.WalletConnect2]: {
     name: 'WalletConnect 2.0',
     wagmiConnectorId: 'walletConnect',
@@ -92,7 +87,6 @@ export enum WalletType {
   Rainbow = 'RAINBOW_WALLET',
   TokenPocket = 'TOKEN_POCKET',
   TrustWallet = 'TRUST_WALLET',
-  WalletConnect = 'WALLETCONNECT',
   WalletConnect2 = 'WALLETCONNECT_2',
   // TestWallet = 'TEST_WALLET',
   OtherWallet = 'OTHER_WALLET',
@@ -104,7 +98,6 @@ type WalletConfig = {
   icon: string;
   connectionTypes: WalletConnectionType[];
   matchesInjectedEip1193?: (provider: ExternalProvider & any) => boolean;
-  walletconnect1Name?: string;
   walletconnect2Id?: string;
 };
 
@@ -117,7 +110,6 @@ export const wallets: Record<WalletType, WalletConfig> = {
       WalletConnectionType.InjectedEip1193,
       // WalletConnectionType.CoinbaseWalletSdk,
       WalletConnectionType.WalletConnect2,
-      WalletConnectionType.WalletConnect1,
     ],
     matchesInjectedEip1193: (provider) =>
       Object.entries(wallets).every(
@@ -131,30 +123,23 @@ export const wallets: Record<WalletType, WalletConfig> = {
     type: WalletType.BitKeep,
     stringKey: STRING_KEYS.BITKEEP,
     icon: BitkeepIcon,
-    connectionTypes: [
-      WalletConnectionType.InjectedEip1193,
-      WalletConnectionType.WalletConnect2,
-      WalletConnectionType.WalletConnect1,
-    ],
+    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
     matchesInjectedEip1193: (provider) => provider.isBitKeep, // isBitKeepChrome, isBitEthereum
-    walletconnect1Name: 'bitkeep',
     walletconnect2Id: '38f5d18bd8522c244bdd70cb4a68e0e718865155811c043f052fb9f1c51de662',
   },
   [WalletType.BitPie]: {
     type: WalletType.BitPie,
     stringKey: STRING_KEYS.BITPIE,
     icon: BitpieIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect1],
+    connectionTypes: [WalletConnectionType.InjectedEip1193],
     matchesInjectedEip1193: (provider) => provider.isBitpie,
-    walletconnect1Name: 'bitpie',
   },
   [WalletType.CloverWallet]: {
     type: WalletType.CloverWallet,
     stringKey: STRING_KEYS.CLOVER_WALLET,
     icon: CloverWalletIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect1],
+    connectionTypes: [WalletConnectionType.InjectedEip1193],
     matchesInjectedEip1193: (provider) => provider.isClover,
-    // walletconnect1Name: 'clover',
   },
   [WalletType.CoinbaseWallet]: {
     type: WalletType.CoinbaseWallet,
@@ -163,33 +148,23 @@ export const wallets: Record<WalletType, WalletConfig> = {
     connectionTypes: [
       WalletConnectionType.CoinbaseWalletSdk,
       WalletConnectionType.InjectedEip1193,
-      WalletConnectionType.WalletConnect1,
+      WalletConnectionType.WalletConnect2,
     ],
     matchesInjectedEip1193: (provider) => provider.isCoinbaseWallet, // provider.selectedProvider?.isCoinbaseWallet,
-    walletconnect1Name: 'coinbase',
   },
   [WalletType.Coin98]: {
     type: WalletType.Coin98,
     stringKey: STRING_KEYS.COIN98,
     icon: Coin98Icon,
-    connectionTypes: [
-      WalletConnectionType.InjectedEip1193,
-      WalletConnectionType.WalletConnect2,
-      WalletConnectionType.WalletConnect1,
-    ],
+    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
     matchesInjectedEip1193: (provider) => provider.isCoin98,
-    walletconnect1Name: 'coin98',
     walletconnect2Id: '2a3c89040ac3b723a1972a33a125b1db11e258a6975d3a61252cd64e6ea5ea01',
   },
   [WalletType.HuobiWallet]: {
     type: WalletType.HuobiWallet,
     stringKey: STRING_KEYS.HUOBI_WALLET,
     icon: HuobiIcon,
-    connectionTypes: [
-      WalletConnectionType.InjectedEip1193,
-      WalletConnectionType.WalletConnect2,
-      WalletConnectionType.WalletConnect1,
-    ],
+    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
     matchesInjectedEip1193: (provider) => provider.isHbWallet,
     walletconnect2Id: '797c615e2c556b610c048eb35535f212c0dd58de5d03e763120e90a7d1350a77',
   },
@@ -197,74 +172,48 @@ export const wallets: Record<WalletType, WalletConfig> = {
     type: WalletType.ImToken,
     stringKey: STRING_KEYS.IMTOKEN,
     icon: ImTokenIcon,
-    connectionTypes: [
-      WalletConnectionType.InjectedEip1193,
-      WalletConnectionType.WalletConnect2,
-      WalletConnectionType.WalletConnect1,
-    ],
+    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
     matchesInjectedEip1193: (provider) => provider.isImToken,
-    walletconnect1Name: 'imtoken',
     walletconnect2Id: 'ef333840daf915aafdc4a004525502d6d49d77bd9c65e0642dbaefb3c2893bef',
   },
   [WalletType.MathWallet]: {
     type: WalletType.MathWallet,
     stringKey: STRING_KEYS.MATH_WALLET,
     icon: MathWalletIcon,
-    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect1],
+    connectionTypes: [WalletConnectionType.InjectedEip1193],
     matchesInjectedEip1193: (provider) => provider.isMathWallet,
-    walletconnect1Name: 'math',
     walletconnect2Id: '7674bb4e353bf52886768a3ddc2a4562ce2f4191c80831291218ebd90f5f5e26',
   },
   [WalletType.MetaMask]: {
     type: WalletType.MetaMask,
     stringKey: STRING_KEYS.METAMASK,
     icon: MetaMaskIcon,
-    connectionTypes: [
-      WalletConnectionType.InjectedEip1193,
-      WalletConnectionType.WalletConnect2,
-      WalletConnectionType.WalletConnect1,
-    ],
+    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
     matchesInjectedEip1193: isMetaMask,
-    walletconnect1Name: 'metamask',
     walletconnect2Id: 'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96',
   },
   [WalletType.Rainbow]: {
     type: WalletType.Rainbow,
     stringKey: STRING_KEYS.RAINBOW_WALLET,
     icon: RainbowIcon,
-    connectionTypes: [
-      WalletConnectionType.InjectedEip1193,
-      WalletConnectionType.WalletConnect2,
-      WalletConnectionType.WalletConnect1,
-    ],
+    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
     matchesInjectedEip1193: (provider) => provider.isRainbowWallet,
-    walletconnect1Name: 'rainbow',
     walletconnect2Id: '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369',
   },
   [WalletType.TokenPocket]: {
     type: WalletType.TokenPocket,
     stringKey: STRING_KEYS.TOKEN_POCKET,
     icon: TokenPocketIcon,
-    connectionTypes: [
-      WalletConnectionType.InjectedEip1193,
-      WalletConnectionType.WalletConnect2,
-      WalletConnectionType.WalletConnect1,
-    ],
+    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
     matchesInjectedEip1193: (provider) => provider.isTokenPocket,
-    walletconnect1Name: 'tokenpocket',
     walletconnect2Id: '20459438007b75f4f4acb98bf29aa3b800550309646d375da5fd4aac6c2a2c66',
   },
   [WalletType.TrustWallet]: {
     type: WalletType.TrustWallet,
     stringKey: STRING_KEYS.TRUST_WALLET,
     icon: TrustWalletIcon,
-    connectionTypes: [
-      WalletConnectionType.InjectedEip1193,
-      WalletConnectionType.WalletConnect2,
-      WalletConnectionType.WalletConnect1,
-    ],
+    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
     matchesInjectedEip1193: (provider) => provider.isTrust,
-    walletconnect1Name: 'trust',
     walletconnect2Id: '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0',
   },
   [WalletType.WalletConnect2]: {
@@ -272,12 +221,6 @@ export const wallets: Record<WalletType, WalletConfig> = {
     stringKey: STRING_KEYS.WALLET_CONNECT_2,
     icon: WalletConnectIcon,
     connectionTypes: [WalletConnectionType.WalletConnect2],
-  },
-  [WalletType.WalletConnect]: {
-    type: WalletType.WalletConnect,
-    stringKey: STRING_KEYS.WALLET_CONNECT,
-    icon: WalletConnectIcon,
-    connectionTypes: [WalletConnectionType.WalletConnect1],
   },
   [WalletType.Keplr]: {
     type: WalletType.Keplr,
