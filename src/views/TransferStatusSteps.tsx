@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
 import { StatusResponse } from '@0xsquid/sdk';
-import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
 
 import { useStringGetter } from '@/hooks';
 
@@ -15,6 +14,7 @@ import { STRING_KEYS } from '@/constants/localization';
 
 type ElementProps = {
   status?: StatusResponse;
+  type: 'withdrawal' | 'deposit';
 };
 
 enum TransferStatusStep {
@@ -24,14 +24,13 @@ enum TransferStatusStep {
   Complete,
 }
 
-export const TransferStatusSteps = ({ status }: ElementProps) => {
+export const TransferStatusSteps = ({ status, type }: ElementProps) => {
   const stringGetter = useStringGetter();
 
-  const { currentStep, steps, type } = useMemo(() => {
+  const { currentStep, steps } = useMemo(() => {
     const routeStatus = status?.routeStatus;
     const fromChain = status?.fromChain?.chainData?.chainId;
     const toChain = status?.toChain?.chainData?.chainId;
-    const type = toChain === TESTNET_CHAIN_ID ? 'deposit' : 'withdrawal';
 
     const steps = [
       {
@@ -72,6 +71,10 @@ export const TransferStatusSteps = ({ status }: ElementProps) => {
           : TransferStatusStep.Complete;
     } else if (currentStatus.chainId === fromChain && currentStatus.status !== 'success') {
       currentStep = TransferStatusStep.FromChain;
+    }
+
+    if (status?.squidTransactionStatus === 'success') {
+      currentStep = TransferStatusStep.Complete;
     }
 
     return {

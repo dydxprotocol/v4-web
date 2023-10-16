@@ -110,18 +110,18 @@ export const notificationTypes = [
       const stringGetter = useStringGetter();
       const { transferNotifications } = useLocalNotifications();
 
-      const getTitleStringKey = useCallback((type: 'deposit' | 'withdraw', finished: boolean) => {
+      const getTitleStringKey = useCallback((type: 'deposit' | 'withdrawal', finished: boolean) => {
         if (type === 'deposit' && !finished) return STRING_KEYS.DEPOSIT_IN_PROGRESS;
         if (type === 'deposit' && finished) return STRING_KEYS.DEPOSIT;
-        if (type === 'withdraw' && !finished) return STRING_KEYS.WITHDRAW_IN_PROGRESS;
+        if (type === 'withdrawal' && !finished) return STRING_KEYS.WITHDRAW_IN_PROGRESS;
         return STRING_KEYS.WITHDRAW;
       }, []);
 
       useEffect(() => {
         for (const transfer of transferNotifications) {
-          const { toChainId, status, txHash, toAmount } = transfer;
+          const { fromChainId, status, txHash, toAmount } = transfer;
           const finished = Boolean(status) && status?.squidTransactionStatus !== 'ongoing';
-          const type = toChainId === TESTNET_CHAIN_ID ? 'deposit' : 'withdraw';
+          const type = fromChainId === TESTNET_CHAIN_ID ? 'withdrawal' : 'deposit';
           // @ts-ignore status.errors is not in the type definition but can be returned
           const error = status?.errors?.length ? status?.errors[0] : status?.error;
 
@@ -154,6 +154,7 @@ export const notificationTypes = [
               description: description,
               customContent: (
                 <TransferStatusToast
+                  type={type}
                   toAmount={transfer.toAmount}
                   triggeredAt={transfer.triggeredAt}
                   status={transfer.status}
@@ -162,7 +163,7 @@ export const notificationTypes = [
               customMenuContent: !finished && (
                 <div>
                   {description}
-                  <TransferStatusSteps status={transfer.status} />
+                  <TransferStatusSteps status={transfer.status} type={type} />
                 </div>
               ),
               toastSensitivity: 'foreground',
