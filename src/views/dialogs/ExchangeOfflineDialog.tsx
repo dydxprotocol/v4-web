@@ -34,7 +34,7 @@ export const ExchangeOfflineDialog = ({ preventClose, setIsOpen }: ElementProps)
 
   const showOfflineMessage =
     import.meta.env.MODE === 'production' &&
-    ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId === 'dydx-testnet-3';
+    ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId === 'dydx-testnet-4';
 
   useEffect(() => {
     if (
