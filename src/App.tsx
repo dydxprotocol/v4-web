@@ -14,6 +14,7 @@ import { DialogAreaProvider, useDialogArea } from '@/hooks/useDialogArea';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
 import { LocalNotificationsProvider } from '@/hooks/useLocalNotifications';
+import { RestrictionProvider } from '@/hooks/useRestrictions';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
 import { SquidProvider } from '@/hooks/useSquid';
 
@@ -66,6 +67,7 @@ const Content = () => {
               <Route path=":market" element={<TradePage />} />
               <Route path={AppRoute.Trade} element={<TradePage />} />
             </Route>
+
             <Route path={AppRoute.Markets} element={<MarketsPage />} />
             <Route path={AppRoute.Rewards} element={<RewardsPage />} />
             {isTablet && (
@@ -79,6 +81,7 @@ const Content = () => {
             <Route element={<GuardedMobileRoute />}>
               <Route path={`${AppRoute.Portfolio}/*`} element={<PortfolioPage />} />
             </Route>
+
             <Route path="*" element={<Navigate to={DEFAULT_TRADE_ROUTE} replace />} />
           </Routes>
         </Suspense>
@@ -109,6 +112,7 @@ const providers = [
   wrapProvider(GrazProvider),
   wrapProvider(WagmiConfig, { config }),
   wrapProvider(LocaleProvider),
+  wrapProvider(RestrictionProvider),
   wrapProvider(DydxProvider),
   wrapProvider(AccountsProvider),
   wrapProvider(SubaccountProvider),

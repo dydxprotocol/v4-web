@@ -16,6 +16,7 @@ import { useLocalStorage } from './useLocalStorage';
 import { useNow } from './useNow';
 import { useOnClickOutside } from './useOnClickOutside';
 import { usePageTitlePriceUpdates } from './usePageTitlePriceUpdates';
+import { useRestrictions } from './useRestrictions';
 import { useShouldShowFooter } from './useShouldShowFooter';
 import { useSelectedNetwork } from './useSelectedNetwork';
 import { useStringGetter } from './useStringGetter';
@@ -40,6 +41,7 @@ export {
   useNow,
   useOnClickOutside,
   usePageTitlePriceUpdates,
+  useRestrictions,
   useShouldShowFooter,
   useSelectedNetwork,
   useStringGetter,

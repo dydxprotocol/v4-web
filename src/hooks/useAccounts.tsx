@@ -5,18 +5,20 @@ import { AES, enc } from 'crypto-js';
 import { LocalWallet, USDC_DENOM, type Subaccount } from '@dydxprotocol/v4-client-js';
 
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
+import { DialogTypes } from '@/constants/dialogs';
 import { LocalStorageKey, LOCAL_STORAGE_VERSIONS } from '@/constants/localStorage';
 import { DydxAddress, EvmAddress, PrivateInformation } from '@/constants/wallets';
 
 import { setOnboardingState, setOnboardingGuard } from '@/state/account';
+import { forceOpenDialog } from '@/state/dialogs';
 
 import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
 
-import { useLocalStorage } from './useLocalStorage';
-
-import { useWalletConnection } from './useWalletConnection';
 import { useDydxClient } from './useDydxClient';
+import { useLocalStorage } from './useLocalStorage';
+import { useRestrictions } from './useRestrictions';
+import { useWalletConnection } from './useWalletConnection';
 
 const AccountsContext = createContext<ReturnType<typeof useAccountsContext> | undefined>(undefined);
 
@@ -57,7 +59,9 @@ const useAccountsContext = () => {
       forgetEvmSignature(previousEvmAddress);
     }
 
-    if (evmAddress) abacusStateManager.setTransfersSourceAddress(evmAddress);
+    if (evmAddress) {
+      abacusStateManager.setTransfersSourceAddress(evmAddress);
+    }
 
     setPreviousEvmAddress(evmAddress);
   }, [evmAddress]);
@@ -217,7 +221,6 @@ const useAccountsContext = () => {
   }, [evmAddress, evmDerivedAddresses, signerWagmi, connectedDydxAddress, signerGraz]);
 
   // abacus
-  // TODO: useAbacus({ dydxAddress })
   useEffect(() => {
     if (dydxAddress) abacusStateManager.setAccount(localDydxWallet);
     else abacusStateManager.attemptDisconnectAccount();
@@ -257,6 +260,21 @@ const useAccountsContext = () => {
       })
     );
   }, [dydxSubaccounts]);
+
+  // Restrictions
+  const { isBadActor, sanctionedAddresses } = useRestrictions();
+
+  useEffect(() => {
+    if (
+      dydxAddress &&
+      (isBadActor ||
+        sanctionedAddresses.has(dydxAddress) ||
+        (evmAddress && sanctionedAddresses.has(evmAddress)))
+    ) {
+      dispatch(forceOpenDialog({ type: DialogTypes.RestrictedWallet }));
+      disconnect();
+    }
+  }, [isBadActor, evmAddress, dydxAddress, sanctionedAddresses]);
 
   // Disconnect wallet / accounts
   const disconnectLocalDydxWallet = () => {

@@ -23,39 +23,36 @@ export const dialogsSlice = createSlice({
   name: 'Dialogs',
   initialState,
   reducers: {
-    addDialogToQueue: (state: DialogsState, action: PayloadAction<DialogInfo<DialogTypes>>) => {
-      const dialogQueue = state.dialogQueue;
-      dialogQueue.push(action.payload);
-
-      return {
-        ...state,
-        dialogQueue,
-      };
+    openDialog: (state: DialogsState, action: PayloadAction<DialogInfo<DialogTypes>>) => {
+      if (state.activeDialog) {
+        state.dialogQueue.push(action.payload);
+      } else {
+        state.activeDialog = action.payload;
+      }
     },
-    closeDialog: (state: DialogsState) => ({
-      ...state,
-      activeDialog: state.dialogQueue.shift(),
-    }),
-    openDialog: (state: DialogsState, action: PayloadAction<DialogInfo<DialogTypes>>) => ({
-      ...state,
-      activeDialog: action.payload,
-    }),
-    closeDialogInTradeBox: (state: DialogsState) => ({
-      ...state,
-      activeTradeBoxDialog: undefined,
-    }),
+    closeDialog: (state: DialogsState) => {
+      state.activeDialog = state.dialogQueue.shift();
+    },
+    forceOpenDialog: (state: DialogsState, action: PayloadAction<DialogInfo<DialogTypes>>) => {
+      if (state.activeDialog) {
+        state.dialogQueue.unshift(state.activeDialog);
+      }
+      state.activeDialog = action.payload;
+    },
+    closeDialogInTradeBox: (state: DialogsState) => {
+      state.activeTradeBoxDialog = undefined;
+    },
     openDialogInTradeBox: (
       state: DialogsState,
       action: PayloadAction<DialogInfo<TradeBoxDialogTypes>>
-    ) => ({
-      ...state,
-      activeTradeBoxDialog: action.payload,
-    }),
+    ) => {
+      state.activeTradeBoxDialog = action.payload;
+    },
   },
 });
 
 export const {
-  addDialogToQueue,
+  forceOpenDialog,
   closeDialog,
   closeDialogInTradeBox,
   openDialog,

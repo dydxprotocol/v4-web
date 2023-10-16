@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
 import { TooltipContextType } from '@visx/xychart';
+import BigNumber from 'bignumber.js';
 
 import type { Nullable } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
@@ -24,7 +25,6 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
-
 
 export const usePortfolioValues = ({
   equity,
@@ -140,7 +140,12 @@ export const AccountDetailsAndHistory = () => {
       <Styled.AccountValue>
         <Styled.WithLabel label={accountValueLabel}>
           <Styled.AccountEquity>
-            <Output type={OutputType.Fiat} value={accountEquity} withBaseFont />
+            <Output
+              type={OutputType.Fiat}
+              value={accountEquity}
+              roundingMode={BigNumber.ROUND_FLOOR}
+              withBaseFont
+            />
           </Styled.AccountEquity>
           <Styled.PnlDiff isPositive={MustBigNumber(pnlDiff).gte(0)}>
             {pnlDiff && <TriangleIndicator value={MustBigNumber(pnlDiff)} />}

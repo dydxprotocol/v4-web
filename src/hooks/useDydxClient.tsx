@@ -17,7 +17,10 @@ import type { NetworkConfig, ConnectNetworkEvent } from '@/constants/abacus';
 import { type Candle, RESOLUTION_MAP } from '@/constants/candles';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
+
 import { log } from '@/lib/telemetry';
+
+import { useRestrictions } from './useRestrictions';
 
 type DydxContextType = ReturnType<typeof useDydxClientContext>;
 const DydxContext = createContext<DydxContextType>({} as DydxContextType);
@@ -178,7 +181,27 @@ const useDydxClientContext = () => {
     [requestCandles]
   );
 
-  // ------ Subacount Methods ------ //
+  const { updateSanctionedAddresses } = useRestrictions();
+
+  const screenAddresses = useCallback(
+    async ({ addresses }: { addresses: string[] }) => {
+      if (compositeClient) {
+        const promises = addresses.map((address) =>
+          compositeClient.indexerClient.utility.screen(address)
+        );
+
+        const results = await Promise.all(promises);
+
+        const screenedAddresses = Object.fromEntries(
+          addresses.map((address, index) => [address, results[index]?.restricted])
+        );
+
+        updateSanctionedAddresses(screenedAddresses);
+        return screenedAddresses;
+      }
+    },
+    [compositeClient]
+  );
 
   return {
     // Client initialization
@@ -192,5 +215,6 @@ const useDydxClientContext = () => {
 
     // Public Methods
     getCandlesForDatafeed,
+    screenAddresses,
   };
 };

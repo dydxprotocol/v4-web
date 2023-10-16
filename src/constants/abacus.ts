@@ -78,8 +78,13 @@ export const Changes = Abacus.exchange.dydx.abacus.state.changes.Changes;
 export type PerpetualStateChanges = Abacus.exchange.dydx.abacus.state.changes.StateChanges;
 export const AsyncAbacusStateManager =
   Abacus.exchange.dydx.abacus.state.manager.AsyncAbacusStateManager;
+
+// ------ Parsing Errors ------ //
 export type ParsingError = Abacus.exchange.dydx.abacus.responses.ParsingError;
 export type ParsingErrors = kollections.List<ParsingError>;
+export const ParsingErrorType = Abacus.exchange.dydx.abacus.responses.ParsingErrorType;
+const parsingErrorTypes = [...ParsingErrorType.values()] as const;
+export type ParsingErrorTypes = (typeof parsingErrorTypes)[number];
 
 // ------ Perpetuals/Markets ------ //
 export type PerpetualState = Abacus.exchange.dydx.abacus.output.PerpetualState;
@@ -198,6 +203,12 @@ export type RiskLevels = (typeof riskLevels)[number];
 
 // ------ Notifications ------ //
 export type AbacusNotification = Abacus.exchange.dydx.abacus.output.Notification;
+
+// ------ Restrictions ------ //
+export type UsageRestriction = Abacus.exchange.dydx.abacus.output.UsageRestriction;
+export const RestrictionType = Abacus.exchange.dydx.abacus.output.Restriction;
+const restrictionTypes = [...RestrictionType.values()] as const;
+export type RestrictionTypes = (typeof restrictionTypes)[number];
 
 // ------ Enum Conversions ------ //
 type IfEquals<X, Y, A, B> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2

@@ -25,6 +25,7 @@ import {
   setFundingPayments,
   setHistoricalPnl,
   setLatestOrder,
+  setRestrictionType,
   setSubaccount,
   setTransfers,
   setWallet,
@@ -119,6 +120,10 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
             update: !!marketIds,
           })
         );
+      }
+
+      if (changes.has(Changes.restriction)) {
+        dispatch(setRestrictionType(updatedState.restriction));
       }
 
       subaccountNumbers?.forEach((subaccountId: number) => {
