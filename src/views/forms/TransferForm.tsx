@@ -172,16 +172,20 @@ export const TransferForm = ({
         }
       }
     } catch (error) {
-      setError(
-        error.message
-          ? stringGetter({
-              key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-              params: {
-                ERROR_MESSAGE: error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
-              },
-            })
-          : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })
-      );
+      if (error?.code === 429) {
+        setError(stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_MESSAGE }));
+      } else {
+        setError(
+          error.message
+            ? stringGetter({
+                key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+                params: {
+                  ERROR_MESSAGE: error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
+                },
+              })
+            : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })
+        );
+      }
       log('TransferForm/onTransfer', error);
     } finally {
       setIsLoading(false);
