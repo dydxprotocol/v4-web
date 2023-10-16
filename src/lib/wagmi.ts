@@ -100,11 +100,10 @@ const walletconnect2ConnectorOptions: ConstructorParameters<typeof WalletConnect
   options: {
     projectId: import.meta.env.VITE_WALLETCONNECT2_PROJECT_ID,
     metadata: {
-      // TODO: update to local URLs/images
       name: 'dYdX',
       description: '',
-      url: 'https://trade.dydx.exchange',
-      icons: ['https://trade.dydx.exchange/cbw-image.png'],
+      url: import.meta.env.VITE_BASE_URL,
+      icons: [`${import.meta.env.VITE_BASE_URL}/cbw-image.png}`],
     },
     showQrModal: true,
     qrModalOptions: {

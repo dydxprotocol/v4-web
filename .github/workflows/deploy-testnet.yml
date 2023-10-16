@@ -33,11 +33,13 @@ jobs:
           AMPLITUDE_API_KEY: ${{ secrets.AMPLITUDE_API_KEY }}
           BUGSNAG_API_KEY: ${{ secrets.BUGSNAG_API_KEY }}
           STATUS_PAGE_SCRIPT_URI: ${{ secrets.STATUS_PAGE_SCRIPT_URI }}
+          IOS_APP_ID: ${{ secrets.IOS_APP_ID }}
         run: |
           pnpm run build
           pnpm run build:inject-amplitude
           pnpm run build:inject-bugsnag
           pnpm run build:inject-statuspage
+          sh scripts/inject-app-deeplinks.sh
 
       - name: Upload to IPFS via web3.storage
         uses: dydxprotocol/add-to-web3@v1

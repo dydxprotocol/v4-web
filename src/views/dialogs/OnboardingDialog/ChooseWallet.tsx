@@ -19,7 +19,7 @@ import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-const aboutWalletsLink = `https://www.dydxacademy.info/educational-video-series/onboarding-to-defi-with-dydx`;
+const aboutWalletsLink = `https://www.dydx.academy/video/defi-wallet`;
 
 export const ChooseWallet = () => {
   const stringGetter = useStringGetter();
@@ -34,7 +34,14 @@ export const ChooseWallet = () => {
         <Styled.AlertMessage type={AlertType.Error}>
           {
             <h4>
-              Couldn't connect to {stringGetter({ key: wallets[selectedWalletType].stringKey })}.
+              {stringGetter({
+                key: STRING_KEYS.COULD_NOT_CONNECT,
+                params: {
+                  WALLET: stringGetter({
+                    key: wallets[selectedWalletType].stringKey,
+                  }),
+                },
+              })}
             </h4>
           }
           {selectedWalletError}
