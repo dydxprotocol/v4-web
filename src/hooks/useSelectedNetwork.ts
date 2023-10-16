@@ -30,7 +30,7 @@ export const useSelectedNetwork = (): {
   useEffect(() => {
     if (
       import.meta.env.MODE === 'production' &&
-      ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId === 'dydx-testnet-3'
+      ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId === 'dydx-testnet-4'
     ) {
       dispatch(
         openDialog({ type: DialogTypes.ExchangeOffline, dialogProps: { preventClose: true } })

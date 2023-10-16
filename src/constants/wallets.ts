@@ -287,10 +287,10 @@ export type DydxAddress = `dydx${string}`;
 export const DYDX_CHAIN_INFO: Parameters<typeof suggestChain>[0] = {
   rpc: 'https://dydx-testnet-archive.allthatnode.com:26657',
   rest: 'https://dydx-testnet-archive.allthatnode.com:1317',
-  chainId: 'dydx-testnet-3',
+  chainId: 'dydx-testnet-4',
   chainName: 'dYdX Public Testnet',
   chainSymbolImageUrl:
-    'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/dydx-testnet-3/chain.png',
+    'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/dydx-testnet-4/chain.png',
   bech32Config: {
     bech32PrefixAccPub: 'dydxpub',
     bech32PrefixValPub: 'dydxvaloperpub',
@@ -304,26 +304,31 @@ export const DYDX_CHAIN_INFO: Parameters<typeof suggestChain>[0] = {
   },
   stakeCurrency: {
     coinDenom: 'DV4TNT',
-    coinDecimals: 6,
-    coinMinimalDenom: 'dv4tnt',
+    coinDecimals: 18,
+    coinMinimalDenom: 'adv4tnt',
   },
   currencies: [
     {
       coinDenom: 'DV4TNT',
-      coinDecimals: 6,
-      coinMinimalDenom: 'dv4tnt',
+      coinDecimals: 18,
+      coinMinimalDenom: 'adv4tnt',
     },
     {
       coinDenom: 'USDC',
-      coinMinimalDenom: 'ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5',
       coinDecimals: 6,
+      coinMinimalDenom: 'ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5',
     },
   ],
   feeCurrencies: [
     {
       coinDenom: 'DV4TNT',
+      coinDecimals: 18,
+      coinMinimalDenom: 'adv4tnt',
+    },
+    {
+      coinDenom: 'USDC',
       coinDecimals: 6,
-      coinMinimalDenom: 'dv4tnt',
+      coinMinimalDenom: 'ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5',
     },
   ],
   features: [],
