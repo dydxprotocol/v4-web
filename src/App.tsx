@@ -27,6 +27,8 @@ import ProfilePage from '@/pages/Profile';
 import { SettingsPage } from '@/pages/settings/Settings';
 import TradePage from '@/pages/trade/Trade';
 import { RewardsPage } from '@/pages/rewards/RewardsPage';
+import { TermsOfUsePage } from '@/pages/TermsOfUsePage';
+import { PrivacyPolicyPage } from '@/pages/PrivacyPolicyPage';
 
 import { HeaderDesktop } from '@/layout/Header/HeaderDesktop';
 import { FooterDesktop } from '@/layout/Footer/FooterDesktop';
@@ -81,6 +83,9 @@ const Content = () => {
             <Route element={<GuardedMobileRoute />}>
               <Route path={`${AppRoute.Portfolio}/*`} element={<PortfolioPage />} />
             </Route>
+
+            <Route path={AppRoute.Terms} element={<TermsOfUsePage />} />
+            <Route path={AppRoute.Privacy} element={<PrivacyPolicyPage />} />
 
             <Route path="*" element={<Navigate to={DEFAULT_TRADE_ROUTE} replace />} />
           </Routes>

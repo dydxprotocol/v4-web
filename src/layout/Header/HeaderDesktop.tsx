@@ -78,13 +78,13 @@ export const HeaderDesktop = () => {
               value: 'TERMS_OF_USE',
               slotBefore: <Icon iconName={IconName.File} />,
               label: stringGetter({ key: STRING_KEYS.TERMS_OF_USE }),
-              href: 'https://dydx.exchange/terms',
+              href: AppRoute.Terms,
             },
             {
               value: 'PRIVACY_POLICY',
               slotBefore: <Icon iconName={IconName.Privacy} />,
               label: stringGetter({ key: STRING_KEYS.PRIVACY_POLICY }),
-              href: 'https://dydx.exchange/privacy',
+              href: AppRoute.Privacy,
             },
             {
               value: 'HELP',

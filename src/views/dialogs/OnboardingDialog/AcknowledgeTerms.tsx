@@ -2,6 +2,7 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { useAccounts, useStringGetter } from '@/hooks';
 
+import { AppRoute } from '@/constants/routes';
 import { STRING_KEYS } from '@/constants/localization';
 import { ButtonAction } from '@/constants/buttons';
 
@@ -29,12 +30,12 @@ export const AcknowledgeTerms = ({ onContinue }: ElementProps) => {
           key: STRING_KEYS.LEGAL_UPDATES_DESCRIPTION,
           params: {
             TOU: (
-              <Styled.Link href="https://dydx.exchange/v4-terms">
+              <Styled.Link href={`/#${AppRoute.Terms}`}>
                 {stringGetter({ key: STRING_KEYS.TERMS_OF_USE })}
               </Styled.Link>
             ),
             PRIVACY_POLICY: (
-              <Styled.Link href="https://dydx.exchange/privacy">
+              <Styled.Link href={`/#${AppRoute.Privacy}`}>
                 {stringGetter({ key: STRING_KEYS.PRIVACY_POLICY })}
               </Styled.Link>
             ),
