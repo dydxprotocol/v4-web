@@ -92,6 +92,24 @@ export enum WalletType {
   OtherWallet = 'OTHER_WALLET',
 }
 
+const WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS = {
+  Metamask: 'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96',
+  imToken: 'ef333840daf915aafdc4a004525502d6d49d77bd9c65e0642dbaefb3c2893bef',
+  TokenPocket: '20459438007b75f4f4acb98bf29aa3b800550309646d375da5fd4aac6c2a2c66',
+  Trust: '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0',
+  Rainbow: '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369',
+  Zerion: 'ecc4036f814562b41a5268adc86270fba1365471402006302e70169465b7ac18',
+  Ledger: '19177a98252e07ddfc9af2083ba8e07ef627cb6103467ffebb3f8f4205fd7927',
+  Fireblocks: '5864e2ced7c293ed18ac35e0db085c09ed567d67346ccb6f58a0327a75137489',
+  Uniswap: 'c03dfee351b6fcc421b4494ea33b9d4b92a984f87aa76d1663bb28705e95034a',
+  Robinhood: '8837dd9413b1d9b585ee937d27a816590248386d9dbf59f5cd3422dbbb65683e',
+  '1inch': 'c286eebc742a537cd1d6818363e9dc53b21759a1e8e5d9b263d0c03ec7703576',
+};
+
+export const WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS = Object.values(
+  WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS
+);
+
 type WalletConfig = {
   type: WalletType;
   stringKey: string;
@@ -125,7 +143,6 @@ export const wallets: Record<WalletType, WalletConfig> = {
     icon: BitkeepIcon,
     connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
     matchesInjectedEip1193: (provider) => provider.isBitKeep, // isBitKeepChrome, isBitEthereum
-    walletconnect2Id: '38f5d18bd8522c244bdd70cb4a68e0e718865155811c043f052fb9f1c51de662',
   },
   [WalletType.BitPie]: {
     type: WalletType.BitPie,
@@ -158,7 +175,6 @@ export const wallets: Record<WalletType, WalletConfig> = {
     icon: Coin98Icon,
     connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
     matchesInjectedEip1193: (provider) => provider.isCoin98,
-    walletconnect2Id: '2a3c89040ac3b723a1972a33a125b1db11e258a6975d3a61252cd64e6ea5ea01',
   },
   [WalletType.HuobiWallet]: {
     type: WalletType.HuobiWallet,
@@ -166,7 +182,6 @@ export const wallets: Record<WalletType, WalletConfig> = {
     icon: HuobiIcon,
     connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
     matchesInjectedEip1193: (provider) => provider.isHbWallet,
-    walletconnect2Id: '797c615e2c556b610c048eb35535f212c0dd58de5d03e763120e90a7d1350a77',
   },
   [WalletType.ImToken]: {
     type: WalletType.ImToken,
@@ -174,7 +189,7 @@ export const wallets: Record<WalletType, WalletConfig> = {
     icon: ImTokenIcon,
     connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
     matchesInjectedEip1193: (provider) => provider.isImToken,
-    walletconnect2Id: 'ef333840daf915aafdc4a004525502d6d49d77bd9c65e0642dbaefb3c2893bef',
+    walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.imToken,
   },
   [WalletType.MathWallet]: {
     type: WalletType.MathWallet,
@@ -190,7 +205,7 @@ export const wallets: Record<WalletType, WalletConfig> = {
     icon: MetaMaskIcon,
     connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
     matchesInjectedEip1193: isMetaMask,
-    walletconnect2Id: 'c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96',
+    walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.Metamask,
   },
   [WalletType.Rainbow]: {
     type: WalletType.Rainbow,
@@ -198,7 +213,7 @@ export const wallets: Record<WalletType, WalletConfig> = {
     icon: RainbowIcon,
     connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
     matchesInjectedEip1193: (provider) => provider.isRainbowWallet,
-    walletconnect2Id: '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369',
+    walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.Rainbow,
   },
   [WalletType.TokenPocket]: {
     type: WalletType.TokenPocket,
@@ -206,7 +221,7 @@ export const wallets: Record<WalletType, WalletConfig> = {
     icon: TokenPocketIcon,
     connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
     matchesInjectedEip1193: (provider) => provider.isTokenPocket,
-    walletconnect2Id: '20459438007b75f4f4acb98bf29aa3b800550309646d375da5fd4aac6c2a2c66',
+    walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.TokenPocket,
   },
   [WalletType.TrustWallet]: {
     type: WalletType.TrustWallet,
@@ -214,7 +229,7 @@ export const wallets: Record<WalletType, WalletConfig> = {
     icon: TrustWalletIcon,
     connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
     matchesInjectedEip1193: (provider) => provider.isTrust,
-    walletconnect2Id: '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0',
+    walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.Trust,
   },
   [WalletType.WalletConnect2]: {
     type: WalletType.WalletConnect2,
