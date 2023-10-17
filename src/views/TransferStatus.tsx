@@ -1,6 +1,5 @@
 import { useCallback, useState, useMemo } from 'react';
 import styled, { type AnyStyledComponent } from 'styled-components';
-import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
 import { Root, Trigger, Content } from '@radix-ui/react-collapsible';
 import { StatusResponse } from '@0xsquid/sdk';
 
@@ -21,12 +20,14 @@ import { LoadingDots } from '@/components/Loading/LoadingDots';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 type ElementProps = {
+  type: 'withdrawal' | 'deposit';
   toAmount?: number;
   triggeredAt?: number;
   status?: StatusResponse;
 };
 
 export const TransferStatusToast = ({
+  type,
   toAmount,
   triggeredAt = Date.now(),
   status,
@@ -37,11 +38,6 @@ export const TransferStatusToast = ({
 
   // @ts-ignore status.errors is not in the type definition but can be returned
   const error = status?.errors?.length ? status?.errors[0] : status?.error;
-
-  const type = useMemo(
-    () => (status?.toChain?.chainData?.chainId === TESTNET_CHAIN_ID ? 'deposit' : 'withdrawal'),
-    [status]
-  );
 
   const updateSecondsLeft = useCallback(() => {
     const fromChainEta = (status?.fromChain?.chainData?.estimatedRouteDuration || 0) * 1000;
@@ -69,7 +65,7 @@ export const TransferStatusToast = ({
         side="bottom"
         slotReceipt={
           <Styled.Receipt>
-            <TransferStatusSteps status={status} />
+            <TransferStatusSteps status={status} type={type} />
           </Styled.Receipt>
         }
       >
