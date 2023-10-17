@@ -36,7 +36,15 @@ import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet';
 import { InjectedConnector } from 'wagmi/connectors/injected';
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
-import { WalletConnectLegacyConnector } from 'wagmi/connectors/walletConnectLegacy';
+
+import {
+  type WalletConnection,
+  WalletConnectionType,
+  type WalletType,
+  walletConnectionTypes,
+  wallets,
+  WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS,
+} from '@/constants/wallets';
 
 // Config
 
@@ -101,20 +109,10 @@ const walletconnect2ConnectorOptions: ConstructorParameters<typeof WalletConnect
     qrModalOptions: {
       themeMode: 'dark' as const,
       themeVariables: {
-        '--w3m-accent-color': '#5973fe',
-        '--w3m-background-color': '#5973fe',
-        '--w3m-color-bg-1': 'var(--color-layer-3)',
-        '--w3m-color-bg-2': 'var(--color-layer-4)',
-        '--w3m-color-bg-3': 'var(--color-layer-5)',
-        '--w3m-font-family': 'var(--fontFamily-base)',
-        '--w3m-font-feature-settings': 'none',
-        '--w3m-overlay-backdrop-filter': 'blur(6px)',
-        // '--w3m-logo-image-url': 'https://trade.dydx.exchange/cbw-image.png',
+        '--wcm-accent-color': '#5973fe',
+        '--wcm-font-family': 'var(--fontFamily-base)',
       },
-      enableExplorer: true,
-      explorerAllowList: [],
-      explorerDenyList: [],
-      chainImages: {},
+      explorerRecommendedWalletIds: WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS,
     },
   },
 };
@@ -124,7 +122,6 @@ const connectors = [
     chains,
     options: {
       shimDisconnect: true,
-      shimChainChangedDisconnect: false,
     },
   }),
   new CoinbaseWalletConnector({
@@ -165,19 +162,11 @@ const createWalletConnect2ConnectorWithId = (walletconnect2Id: string) =>
         ...walletconnect2ConnectorOptions.options.qrModalOptions,
         explorerRecommendedWalletIds: [walletconnect2Id],
         explorerExcludedWalletIds: 'ALL',
-        chainImages: {},
       },
     },
   });
 
 // Custom connector from wallet selection
-import {
-  type WalletConnection,
-  WalletConnectionType,
-  type WalletType,
-  walletConnectionTypes,
-  wallets,
-} from '@/constants/wallets';
 
 export const resolveWagmiConnector = ({
   walletType,
