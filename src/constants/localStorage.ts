@@ -24,6 +24,6 @@ export enum LocalStorageKey {
 }
 
 export const LOCAL_STORAGE_VERSIONS = {
-  [LocalStorageKey.EvmDerivedAddresses]: 'v1',
+  [LocalStorageKey.EvmDerivedAddresses]: 'v2',
   // TODO: version all localStorage keys
 };
