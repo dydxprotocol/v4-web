@@ -44,6 +44,9 @@ export const useCurrentMarketId = () => {
   }, [validId]);
 
   useEffect(() => {
-    abacusStateManager.setMarket(marketId ?? DEFAULT_MARKETID);
-  }, [selectedNetwork, marketId]);
+    // Check for marketIds otherwise Abacus will silently fail its isMarketValid check
+    if (marketIds) {
+      abacusStateManager.setMarket(marketId ?? DEFAULT_MARKETID);
+    }
+  }, [selectedNetwork, marketIds, marketId]);
 };

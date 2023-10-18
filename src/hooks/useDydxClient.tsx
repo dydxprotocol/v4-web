@@ -13,7 +13,7 @@ import {
 
 import type { ResolutionString } from 'public/tradingview/charting_library';
 
-import type { NetworkConfig, ConnectNetworkEvent } from '@/constants/abacus';
+import type { ConnectNetworkEvent, NetworkConfig } from '@/constants/abacus';
 import { type Candle, RESOLUTION_MAP } from '@/constants/candles';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
@@ -37,7 +37,7 @@ const useDydxClientContext = () => {
 
   const selectedNetwork = useSelector(getSelectedNetwork);
 
-  const [networkConfig, setNetworkConfig] = useState<Partial<NetworkConfig>>();
+  const [networkConfig, setNetworkConfig] = useState<NetworkConfig>();
 
   useEffect(() => {
     const onConnectNetwork = (event: ConnectNetworkEvent) => setNetworkConfig(event.detail);
@@ -57,14 +57,14 @@ const useDydxClientContext = () => {
       if (
         networkConfig?.chainId &&
         networkConfig?.indexerUrl &&
-        networkConfig?.indexerSocketUrl &&
+        networkConfig?.websocketUrl &&
         networkConfig?.validatorUrl
       ) {
         try {
           const initializedClient = await CompositeClient.connect(
             new Network(
               selectedNetwork,
-              new IndexerConfig(networkConfig.indexerUrl, networkConfig.indexerSocketUrl),
+              new IndexerConfig(networkConfig.indexerUrl, networkConfig.websocketUrl),
               new ValidatorConfig(networkConfig.validatorUrl, networkConfig.chainId, {
                 broadcastPollIntervalMs: 3_000,
                 broadcastTimeoutMs: 60_000,
@@ -209,6 +209,7 @@ const useDydxClientContext = () => {
     networkConfig,
     compositeClient,
     faucetClient,
+    isConnected: !!compositeClient,
 
     // Wallet Methods
     getWalletFromEvmSignature,

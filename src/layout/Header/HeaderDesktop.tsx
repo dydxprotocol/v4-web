@@ -7,7 +7,7 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 import { useStringGetter } from '@/hooks';
-import { LogoShortIcon, BellIcon } from '@/icons';
+import { LogoShortIcon, BellStrokeIcon } from '@/icons';
 
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
@@ -131,7 +131,9 @@ export const HeaderDesktop = () => {
         <VerticalSeparator />
 
         <NotificationsMenu
-          slotTrigger={<Styled.IconButton shape={ButtonShape.Rectangle} iconComponent={BellIcon} />}
+          slotTrigger={
+            <Styled.IconButton shape={ButtonShape.Rectangle} iconComponent={BellStrokeIcon} />
+          }
         />
 
         <VerticalSeparator />
@@ -165,7 +167,7 @@ Styled.Header = styled.header`
     )
     var(--border-width) 1fr var(--border-width) auto;
 
-  font-size: 0.9375em;
+  font-size: 0.9375rem;
 
   :before {
     backdrop-filter: blur(10px);
@@ -214,7 +216,8 @@ Styled.NavAfter = styled.div`
   }
 `;
 
-Styled.IconButton = styled(IconButton)`
+Styled.IconButton = styled(IconButton)<{ size?: string }>`
   ${headerMixins.button}
   --button-border: none;
+  --button-icon-size: 1rem;
 `;

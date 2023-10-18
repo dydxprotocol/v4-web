@@ -2,6 +2,7 @@ export { default as AddressConnectorIcon } from './address-connector.svg';
 export { default as ArrowIcon } from './arrow.svg';
 export { default as Bar3Icon } from './bar3.svg';
 export { default as BellIcon } from './bell.svg';
+export { default as BellStrokeIcon } from './bell-stroke.svg';
 export { default as BoxCloseIcon } from './box-close.svg';
 export { default as CalculatorIcon } from './calculator.svg';
 export { default as CaretIcon } from './caret-down.svg';

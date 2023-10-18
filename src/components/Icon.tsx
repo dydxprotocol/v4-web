@@ -6,6 +6,8 @@ import {
   AddressConnectorIcon,
   ArrowIcon,
   Bar3Icon,
+  BellIcon,
+  BellStrokeIcon,
   BoxCloseIcon,
   CalculatorIcon,
   CaretIcon,
@@ -71,6 +73,8 @@ export enum IconName {
   AddressConnector = 'AddressConnector',
   Arrow = 'Arrow',
   Bar3 = 'Bar3',
+  Bell = 'Bell',
+  BellStroked = 'BellStroked',
   BoxClose = 'BoxClose',
   Calculator = 'Calculator',
   Caret = 'Caret',
@@ -137,6 +141,8 @@ const icons = {
   [IconName.AddressConnector]: AddressConnectorIcon,
   [IconName.Arrow]: ArrowIcon,
   [IconName.Bar3]: Bar3Icon,
+  [IconName.Bell]: BellIcon,
+  [IconName.BellStroked]: BellStrokeIcon,
   [IconName.BoxClose]: BoxCloseIcon,
   [IconName.Calculator]: CalculatorIcon,
   [IconName.Caret]: CaretIcon,
@@ -213,7 +219,8 @@ export const Icon = styled(
     iconComponent: Component = iconName && icons[iconName],
     className,
     ...props
-  }: ElementProps & StyleProps) => (Component ? <Component className={className} {...props} /> : null)
+  }: ElementProps & StyleProps) =>
+    Component ? <Component className={className} {...props} /> : null
 )`
   width: 1em;
   height: 1em;
