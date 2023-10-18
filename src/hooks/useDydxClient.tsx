@@ -33,7 +33,6 @@ export const DydxProvider = ({ ...props }) => (
 export const useDydxClient = () => useContext(DydxContext);
 
 const useDydxClientContext = () => {
-  const [isConnected, setIsConnected] = useState(false);
   // ------ Network ------ //
 
   const selectedNetwork = useSelector(getSelectedNetwork);
@@ -73,14 +72,11 @@ const useDydxClientContext = () => {
             )
           );
           setCompositeClient(initializedClient);
-          setIsConnected(true);
         } catch (error) {
           log('useDydxClient/initializeCompositeClient', error);
-          setIsConnected(false);
         }
       } else {
         setCompositeClient(undefined);
-        setIsConnected(false);
       }
 
       if (networkConfig?.faucetUrl) {
@@ -213,7 +209,7 @@ const useDydxClientContext = () => {
     networkConfig,
     compositeClient,
     faucetClient,
-    isConnected,
+    isConnected: !!compositeClient,
 
     // Wallet Methods
     getWalletFromEvmSignature,
