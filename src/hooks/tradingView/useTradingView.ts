@@ -33,7 +33,7 @@ export const useTradingView = ({
   const marketIds = useSelector(getMarketIds, shallowEqual);
   const selectedLocale = useSelector(getSelectedLocale);
   const selectedNetwork = useSelector(getSelectedNetwork);
-  const { getCandlesForDatafeed } = useDydxClient();
+  const { getCandlesForDatafeed, isConnected: isClientConnected } = useDydxClient();
 
   const [savedTvChartConfig, setTvChartConfig] = useLocalStorage<object | undefined>({
     key: LocalStorageKey.TradingViewChartConfig,
@@ -44,7 +44,7 @@ export const useTradingView = ({
   const hasMarkets = marketIds.length > 0;
 
   useEffect(() => {
-    if (hasMarkets) {
+    if (hasMarkets && isClientConnected) {
       const widgetOptions = getWidgetOptions();
       const widgetOverrides = getWidgetOverrides(appTheme);
       const options = {
@@ -75,7 +75,7 @@ export const useTradingView = ({
       tvWidgetRef.current = null;
       setIsChartReady(false);
     };
-  }, [getCandlesForDatafeed, hasMarkets, selectedLocale, selectedNetwork]);
+  }, [getCandlesForDatafeed, isClientConnected, hasMarkets, selectedLocale, selectedNetwork]);
 
   return { savedResolution };
 };
