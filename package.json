@@ -39,7 +39,7 @@
     "@cosmjs/stargate": "^0.31.0",
     "@cosmjs/tendermint-rpc": "^0.31.0",
     "@dydxprotocol/v4-abacus": "^0.7.2",
-    "@dydxprotocol/v4-client-js": "file:/Users/zhenqianhe/workspace/v4-clients/v4-client-js/dydxprotocol-v4-client-js-0.40.1.tgz",
+    "@dydxprotocol/v4-client-js": "^0.40.2",
     "@dydxprotocol/v4-localization": "^0.1.30",
     "@ethersproject/providers": "^5.7.2",
     "@js-joda/core": "^5.5.3",

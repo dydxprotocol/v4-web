@@ -16,6 +16,7 @@ import { getBalances, getStakingBalances } from '@/state/accountSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { useAccounts } from './useAccounts';
+import { useTokenConfigs } from './useTokenConfigs';
 
 type UseAccountBalanceProps = {
   // Token Items
@@ -50,9 +51,8 @@ export const useAccountBalance = ({
 
   const selectedNetwork = useSelector(getSelectedNetwork);
   const balances = useSelector(getBalances, shallowEqual);
+  const { chainDenom, usdcDenom } = useTokenConfigs();
   const evmChainId = Number(ENVIRONMENT_CONFIG_MAP[selectedNetwork].ethereumChainId);
-  const chainDenom = ENVIRONMENT_CONFIG_MAP[selectedNetwork].tokens['chain'].denom;
-  const usdcDenom = ENVIRONMENT_CONFIG_MAP[selectedNetwork].tokens['usdc'].denom;
   const stakingBalances = useSelector(getStakingBalances, shallowEqual);
 
   const evmQuery = useBalance({
