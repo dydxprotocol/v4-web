@@ -95,15 +95,28 @@ const injectedConnectorOptions = {
   },
 };
 
-const walletconnect2ConnectorOptions: ConstructorParameters<typeof WalletConnectConnector>[0] = {
+type WalletConnectConfig = {
+  client: {
+    name: string;
+    description: string;
+    iconUrl: string;
+  };
+  v2: {
+    projectId: string;
+  };
+};
+
+const getWalletconnect2ConnectorOptions = (
+  config: WalletConnectConfig
+): ConstructorParameters<typeof WalletConnectConnector>[0] => ({
   chains,
   options: {
-    projectId: import.meta.env.VITE_WALLETCONNECT2_PROJECT_ID,
+    projectId: config.v2.projectId,
     metadata: {
-      name: 'dYdX',
-      description: '',
+      name: config.client.name,
+      description: config.client.description,
       url: import.meta.env.VITE_BASE_URL,
-      icons: [`${import.meta.env.VITE_BASE_URL}/cbw-image.png}`],
+      icons: [config.client.iconUrl],
     },
     showQrModal: true,
     qrModalOptions: {
@@ -115,9 +128,9 @@ const walletconnect2ConnectorOptions: ConstructorParameters<typeof WalletConnect
       explorerRecommendedWalletIds: WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS,
     },
   },
-};
+});
 
-const connectors = [
+const getConnectors = (walletConnectConfig: WalletConnectConfig) => [
   new MetaMaskConnector({
     chains,
     options: {
@@ -131,7 +144,7 @@ const connectors = [
       reloadOnDisconnect: false,
     },
   }),
-  new WalletConnectConnector(walletconnect2ConnectorOptions),
+  new WalletConnectConnector(getWalletconnect2ConnectorOptions(walletConnectConfig)),
   new InjectedConnector(injectedConnectorOptions),
 ];
 
@@ -153,27 +166,34 @@ const createInjectedConnectorWithProvider = (provider: ExternalProvider) =>
       provider as unknown as Awaited<ReturnType<InjectedConnector['getProvider']>>;
   })(injectedConnectorOptions) as InjectedConnector;
 
-const createWalletConnect2ConnectorWithId = (walletconnect2Id: string) =>
-  new WalletConnectConnector({
+const createWalletConnect2ConnectorWithId = (
+  walletconnectId: string,
+  walletConnectConfig: WalletConnectConfig
+) => {
+  const walletconnect2ConnectorOptions = getWalletconnect2ConnectorOptions(walletConnectConfig);
+  return new WalletConnectConnector({
     ...walletconnect2ConnectorOptions,
     options: {
       ...walletconnect2ConnectorOptions.options,
       qrModalOptions: {
         ...walletconnect2ConnectorOptions.options.qrModalOptions,
-        explorerRecommendedWalletIds: [walletconnect2Id],
+        explorerRecommendedWalletIds: [walletconnectId],
         explorerExcludedWalletIds: 'ALL',
       },
     },
   });
+};
 
 // Custom connector from wallet selection
 
 export const resolveWagmiConnector = ({
   walletType,
   walletConnection,
+  walletConnectConfig,
 }: {
   walletType: WalletType;
   walletConnection: WalletConnection;
+  walletConnectConfig: WalletConnectConfig;
 }) => {
   const walletConfig = wallets[walletType];
   const walletConnectionConfig = walletConnectionTypes[walletConnection.type];
@@ -181,6 +201,6 @@ export const resolveWagmiConnector = ({
   return walletConnection.type === WalletConnectionType.InjectedEip1193 && walletConnection.provider
     ? createInjectedConnectorWithProvider(walletConnection.provider)
     : walletConnection.type === WalletConnectionType.WalletConnect2 && walletConfig.walletconnect2Id
-    ? createWalletConnect2ConnectorWithId(walletConfig.walletconnect2Id)
-    : connectors.find(({ id }: { id: string }) => id === walletConnectionConfig.wagmiConnectorId);
+    ? createWalletConnect2ConnectorWithId(walletConfig.walletconnect2Id, walletConnectConfig)
+    : getConnectors(walletConnectConfig).find(({ id }: { id: string }) => id === walletConnectionConfig.wagmiConnectorId);
 };
