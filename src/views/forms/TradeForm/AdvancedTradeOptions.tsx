@@ -29,7 +29,7 @@ export const AdvancedTradeOptions = () => {
   const currentTradeFormConfig = useSelector(getInputTradeOptions, shallowEqual);
   const inputTradeData = useSelector(getInputTradeData, shallowEqual);
 
-  const { execution, goodTil, postOnly, reduceOnly, timeInForce } = inputTradeData || {};
+  const { execution, goodTil, postOnly, reduceOnly, timeInForce, type } = inputTradeData || {};
 
   const { executionOptions, needsGoodUntil, needsPostOnly, needsReduceOnly, timeInForceOptions } =
     currentTradeFormConfig || {};
@@ -37,6 +37,7 @@ export const AdvancedTradeOptions = () => {
   const { duration, unit } = goodTil || {};
 
   const needsExecution = executionOptions || needsPostOnly || needsReduceOnly;
+  const hasTimeInForce = timeInForceOptions?.toArray()?.length;
 
   return (
     <Styled.Collapsible
@@ -47,7 +48,7 @@ export const AdvancedTradeOptions = () => {
     >
       <Styled.AdvancedInputsContainer>
         <Styled.AdvancedInputsRow needsGoodUntil={needsGoodUntil}>
-          {timeInForceOptions?.toArray() && (
+          {hasTimeInForce && (
             <Styled.SelectMenu
               value={timeInForce}
               onValueChange={(selectedTimeInForceOption: string) =>
@@ -72,7 +73,9 @@ export const AdvancedTradeOptions = () => {
               id="trade-good-til-time"
               type={InputType.Number}
               decimals={INTEGER_DECIMALS}
-              label={stringGetter({ key: STRING_KEYS.TIME })}
+              label={stringGetter({
+                key: hasTimeInForce ? STRING_KEYS.TIME : STRING_KEYS.GOOD_TIL_TIME,
+              })}
               onChange={({ value }: NumberFormatValues) => {
                 abacusStateManager.setTradeValue({
                   value: Number(value),
