@@ -4,15 +4,14 @@ import { useSelector, shallowEqual, useDispatch } from 'react-redux';
 import { groupBy } from 'lodash';
 
 import { AlertType } from '@/constants/alerts';
-import { AbacusOrderStatus, ORDER_SIDES, ORDER_STATUS_STRINGS } from '@/constants/abacus';
+import { AbacusOrderStatus, ORDER_SIDES } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
-import { STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS, StringKey } from '@/constants/localization';
 import { type NotificationTypeConfig, NotificationType } from '@/constants/notifications';
-import { ORDER_SIDE_STRINGS, TRADE_TYPE_STRINGS, TradeTypes } from '@/constants/trade';
+import { ORDER_SIDE_STRINGS } from '@/constants/trade';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
-import { AlertMessage } from '@/components/AlertMessage';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { TransferStatusToast } from '@/views/TransferStatus';
@@ -69,11 +68,11 @@ export const notificationTypes = [
                   <OrderStatusIcon status={order.status} totalFilled={order.totalFilled ?? 0} />
                 ),
                 title: `${stringGetter({
-                  key: TRADE_TYPE_STRINGS[order.type.rawValue as TradeTypes]?.tradeTypeKey,
+                  key: order.resources.typeStringKey as StringKey,
                 })} ${
                   order.status === AbacusOrderStatus.open && (order?.totalFilled ?? 0) > 0
                     ? stringGetter({ key: STRING_KEYS.PARTIALLY_FILLED })
-                    : stringGetter({ key: ORDER_STATUS_STRINGS[order.status.name] })
+                    : stringGetter({ key: order.resources.statusStringKey as StringKey })
                 }`,
                 description: `${stringGetter({
                   key: ORDER_SIDE_STRINGS[ORDER_SIDES[order.side.name]],
@@ -91,18 +90,34 @@ export const notificationTypes = [
       }, [orderIds]);
     },
 
-    useNotificationAction: () => {
-      const dispatch = useDispatch();
+    // useNotificationAction: () => {
+    //   const dispatch = useDispatch();
+    //   const orders = useSelector(getSubaccountOrders, shallowEqual) || [];
+    //   const ordersByOrderId = Object.fromEntries(orders.map((order) => [order.id, order]));
 
-      return (orderId) => {
-        dispatch(
-          openDialog({
-            type: DialogTypes.OrderDetails,
-            dialogProps: { orderId },
-          })
-        );
-      };
-    },
+    //   const fills = useSelector(getSubaccountFills, shallowEqual) || [];
+    //   const fillsByOrderId = groupBy(fills, (fill) => fill.orderId);
+
+    //   return (id) => {
+    //     if (ordersByOrderId[id]) {
+    //       dispatch(
+    //         openDialog({
+    //           type: DialogTypes.OrderDetails,
+    //           dialogProps: { orderId: id },
+    //         })
+    //       );
+    //     } else if (fillsByOrderId[id]) {
+    //       const fillId = fillsByOrderId[id][0].id;
+
+    //       dispatch(
+    //         openDialog({
+    //           type: DialogTypes.FillDetails,
+    //           dialogProps: { fillId },
+    //         })
+    //       );
+    //     }
+    //   };
+    // },
   } as NotificationTypeConfig<string, [string, number]>,
   {
     type: NotificationType.SquidTransfer,
