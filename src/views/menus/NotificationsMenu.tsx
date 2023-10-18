@@ -178,10 +178,11 @@ export const NotificationsMenu = ({
 };
 
 const $UnreadIndicator = styled.div`
-  width: 0.5em;
-  height: 0.5em;
+  width: 0.5rem;
+  height: 0.5rem;
   border-radius: 50%;
   background-color: var(--color-accent);
+  border: 1px solid var(--color-layer-2);
 `;
 
 const $TriggerContainer = styled.div`
@@ -192,8 +193,8 @@ const $TriggerUnreadIndicator = styled($UnreadIndicator)`
   place-self: center;
 
   position: relative;
-  right: -0.425em;
-  top: -0.425em;
+  right: -0.2rem;
+  top: -0.325rem;
 `;
 
 const $Output = styled(Output)`

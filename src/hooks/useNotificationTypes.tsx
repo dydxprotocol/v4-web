@@ -69,7 +69,7 @@ export const notificationTypes = [
                   <OrderStatusIcon status={order.status} totalFilled={order.totalFilled ?? 0} />
                 ),
                 title: `${stringGetter({
-                  key: TRADE_TYPE_STRINGS[order.type.rawValue as TradeTypes].tradeTypeKey,
+                  key: TRADE_TYPE_STRINGS[order.type.rawValue as TradeTypes]?.tradeTypeKey,
                 })} ${
                   order.status === AbacusOrderStatus.open && (order?.totalFilled ?? 0) > 0
                     ? stringGetter({ key: STRING_KEYS.PARTIALLY_FILLED })
@@ -138,7 +138,8 @@ export const notificationTypes = [
                   {stringGetter({
                     key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
                     params: {
-                      ERROR_MESSAGE: error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
+                      ERROR_MESSAGE:
+                        error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
                     },
                   })}
                 </Styled.ErrorMessage>
@@ -182,7 +183,7 @@ Styled.TransferText = styled.span`
   display: inline-flex;
   align-items: center;
   gap: 0.5ch;
-`
+`;
 
 Styled.ErrorMessage = styled.div`
   max-width: 13rem;
