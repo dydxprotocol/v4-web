@@ -59,16 +59,6 @@ export const TransactionType = Abacus.exchange.dydx.abacus.protocols.Transaction
 const transactionTypes = [...TransactionType.values()] as const;
 export type TransactionTypes = (typeof transactionTypes)[number];
 
-export type NetworkConfig = {
-  chainId: string;
-  indexerUrl: string;
-  indexerSocketUrl: string;
-  validatorUrl: string;
-  faucetUrl?: string | null;
-};
-
-export type ConnectNetworkEvent = CustomEvent<Partial<NetworkConfig>>;
-
 // ------ State ------
 export type AbacusApiState = Abacus.exchange.dydx.abacus.state.manager.ApiState;
 export const AbacusApiStatus = Abacus.exchange.dydx.abacus.state.manager.ApiStatus;
@@ -267,3 +257,20 @@ export const TRADE_TYPES: Record<
   [AbacusOrderType.liquidation.name]: null,
   [AbacusOrderType.trailingStop.name]: null,
 };
+
+// Custom types involving Abacus
+
+export type NetworkConfig = Partial<{
+  indexerUrl: Nullable<string>;
+  websocketUrl: Nullable<string>;
+  validatorUrl: Nullable<string>;
+  chainId: Nullable<string>;
+  faucetUrl: Nullable<string>;
+  USDC_DENOM: Nullable<string>;
+  USDC_DECIMALS: Nullable<number>;
+  USDC_GAS_DENOM: Nullable<string>;
+  CHAINTOKEN_DENOM: Nullable<string>;
+  CHAINTOKEN_DECIMALS: Nullable<number>;
+}>;
+
+export type ConnectNetworkEvent = CustomEvent<Partial<NetworkConfig>>;
