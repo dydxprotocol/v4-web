@@ -5,8 +5,6 @@ import { StargateClient } from '@cosmjs/stargate';
 import { useQuery } from 'react-query';
 import { formatUnits } from 'viem';
 
-import { USDC_DENOM, DYDX_DENOM } from '@dydxprotocol/v4-client-js';
-
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { EvmAddress } from '@/constants/wallets';
@@ -53,6 +51,8 @@ export const useAccountBalance = ({
   const selectedNetwork = useSelector(getSelectedNetwork);
   const balances = useSelector(getBalances, shallowEqual);
   const evmChainId = Number(ENVIRONMENT_CONFIG_MAP[selectedNetwork].ethereumChainId);
+  const chainDenom = ENVIRONMENT_CONFIG_MAP[selectedNetwork].tokens['chain'].denom;
+  const usdcDenom = ENVIRONMENT_CONFIG_MAP[selectedNetwork].tokens['usdc'].denom;
   const stakingBalances = useSelector(getStakingBalances, shallowEqual);
 
   const evmQuery = useBalance({
@@ -93,15 +93,15 @@ export const useAccountBalance = ({
   const { formatted: evmBalance } = evmQuery.data || {};
   const balance = !assetSymbol ? '0' : isCosmosChain ? cosmosQuery.data : evmBalance;
 
-  const nativeTokenCoinBalance = balances?.[DYDX_DENOM];
+  const nativeTokenCoinBalance = balances?.[chainDenom];
   const nativeTokenBalance = MustBigNumber(nativeTokenCoinBalance?.amount)
     .div(QUANTUM_MULTIPLIER)
     .toNumber();
 
-  const usdcCoinBalance = balances?.[USDC_DENOM];
+  const usdcCoinBalance = balances?.[usdcDenom];
   const usdcBalance = MustBigNumber(usdcCoinBalance?.amount).div(QUANTUM_MULTIPLIER).toNumber();
 
-  const nativeStakingCoinBalanace = stakingBalances?.[DYDX_DENOM];
+  const nativeStakingCoinBalanace = stakingBalances?.[chainDenom];
   const nativeStakingBalance = MustBigNumber(nativeStakingCoinBalanace?.amount)
     .div(QUANTUM_MULTIPLIER)
     .toNumber();

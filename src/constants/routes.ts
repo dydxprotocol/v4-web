@@ -7,7 +7,6 @@ export enum AppRoute {
   Profile = '/profile',
   Alerts = '/alerts',
   Settings = '/settings',
-  Rewards = '/DV4TNT',
   Terms = '/terms',
   Privacy = '/privacy',
 }

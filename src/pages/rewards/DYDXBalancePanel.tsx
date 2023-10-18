@@ -3,7 +3,7 @@ import styled, { AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import { layoutMixins } from '@/styles/layoutMixins';
-import { useAccountBalance, useAccounts, useStringGetter } from '@/hooks';
+import { useAccountBalance, useAccounts, useTokenConfigs, useStringGetter } from '@/hooks';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
@@ -30,6 +30,7 @@ export const DYDXBalancePanel = () => {
   const { walletType } = useAccounts();
   const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
   const { nativeTokenBalance, nativeStakingBalance } = useAccountBalance();
+  const { chainLabel } = useTokenConfigs();
 
   return (
     <Panel
@@ -37,7 +38,7 @@ export const DYDXBalancePanel = () => {
         <Styled.Header>
           <Styled.Title>
             {/* <AssetIcon symbol="DYDX" /> */}
-            Dv4TNT
+            {chainLabel}
           </Styled.Title>
           <Styled.ReceiveAndTransferButtons>
             {!canAccountTrade ? (
@@ -106,7 +107,13 @@ export const DYDXBalancePanel = () => {
             {
               key: 'totalBalance',
               label: 'Total balance',
-              value: <Output type={OutputType.Asset} value={nativeTokenBalance + nativeStakingBalance} tag="Dv4TNT" />,
+              value: (
+                <Output
+                  type={OutputType.Asset}
+                  value={nativeTokenBalance + nativeStakingBalance}
+                  tag={chainLabel}
+                />
+              ),
             },
           ]}
         />
@@ -173,7 +180,6 @@ Styled.WalletAndStakedBalance = styled(Details)`
 
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
-
 
   > div {
     gap: 1rem;

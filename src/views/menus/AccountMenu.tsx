@@ -9,7 +9,13 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, TOOLTIP_STRING_KEYS } from '@/constants/localization';
 import { DydxChainAsset, wallets } from '@/constants/wallets';
 
-import { useAccounts, useBreakpoints, useStringGetter, useAccountBalance } from '@/hooks';
+import {
+  useAccounts,
+  useBreakpoints,
+  useTokenConfigs,
+  useStringGetter,
+  useAccountBalance,
+} from '@/hooks';
 
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
@@ -18,6 +24,7 @@ import { DropdownMenu } from '@/components/DropdownMenu';
 import { Output, OutputType } from '@/components/Output';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { openDialog } from '@/state/dialogs';
@@ -39,6 +46,7 @@ export const AccountMenu = () => {
   const onboardingState = useSelector(getOnboardingState);
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
   const { nativeTokenBalance } = useAccountBalance();
+  const { usdcLabel, chainLabel } = useTokenConfigs();
 
   const { evmAddress, walletType, dydxAddress, hdKey } = useAccounts();
 
@@ -107,17 +115,23 @@ export const AccountMenu = () => {
               <div>
                 <div>
                   <Styled.label>
-                    {stringGetter({ key: STRING_KEYS.ASSET_BALANCE, params: { ASSET: 'Dv4TNT' } })}
+                    {stringGetter({
+                      key: STRING_KEYS.ASSET_BALANCE,
+                      params: { ASSET: chainLabel },
+                    })}
                     {/* <AssetIcon symbol="DYDX" /> */}
                   </Styled.label>
                   <Styled.BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
                 </div>
-                <AssetActions asset={DydxChainAsset.DYDX} dispatch={dispatch} />
+                <AssetActions asset={DydxChainAsset.CHAIN} dispatch={dispatch} />
               </div>
               <div>
                 <div>
                   <Styled.label>
-                    {stringGetter({ key: STRING_KEYS.ASSET_BALANCE, params: { ASSET: 'USDC' } })}
+                    {stringGetter({
+                      key: STRING_KEYS.ASSET_BALANCE,
+                      params: { ASSET: usdcLabel },
+                    })}
                     <AssetIcon symbol="USDC" />
                   </Styled.label>
                   <Styled.BalanceOutput

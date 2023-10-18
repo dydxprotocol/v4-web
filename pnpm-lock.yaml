@@ -27,11 +27,11 @@ dependencies:
     specifier: ^0.31.0
     version: 0.31.0
   '@dydxprotocol/v4-abacus':
-    specifier: ^0.7.0
-    version: 0.7.0
+    specifier: ^0.7.2
+    version: 0.7.2
   '@dydxprotocol/v4-client-js':
-    specifier: ^0.36.1
-    version: 0.36.1
+    specifier: file:/Users/zhenqianhe/workspace/v4-clients/v4-client-js/dydxprotocol-v4-client-js-0.40.1.tgz
+    version: file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-0.40.1.tgz
   '@dydxprotocol/v4-localization':
     specifier: ^0.1.30
     version: 0.1.30
@@ -645,7 +645,7 @@ packages:
   /@confio/ics23@0.6.8:
     resolution: {integrity: sha512-wB6uo+3A50m0sW/EWcU64xpV/8wShZ6bMTa7pF8eYsTrSkQA7oLUIJcs/wb8g4y2Oyq701BaGiO6n/ak5WXO1w==}
     dependencies:
-      '@noble/hashes': 1.3.1
+      '@noble/hashes': 1.3.2
       protobufjs: 6.11.4
     dev: false
 
@@ -717,7 +717,7 @@ packages:
       '@cosmjs/encoding': 0.30.1
       '@cosmjs/math': 0.30.1
       '@cosmjs/utils': 0.30.1
-      '@noble/hashes': 1.3.1
+      '@noble/hashes': 1.3.2
       bn.js: 5.2.1
       elliptic: 6.5.4
       libsodium-wrappers: 0.7.11
@@ -979,43 +979,16 @@ packages:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
 
-  /@dydxprotocol/v4-abacus@0.7.0:
-    resolution: {integrity: sha512-XheqfIpOODfQFG860oH0fneVgp9qQKPMDTwrvFXaM/JtKH9ekOUUO6De72EsJ7qOuxWwl1WgoALA8b4tRs0tiw==}
-    dev: false
-
-  /@dydxprotocol/v4-client-js@0.36.1:
-    resolution: {integrity: sha512-KJ3MtWI61wmm+xZtXQd7/hYKIoVFG32TRdyyVaXXO8vpW9Oqd0JD8QSM/wuegkciAh5YmP/BrDzYuu77zHO6yg==}
-    dependencies:
-      '@cosmjs/amino': 0.30.1
-      '@cosmjs/encoding': 0.31.1
-      '@cosmjs/math': 0.31.1
-      '@cosmjs/proto-signing': 0.30.1
-      '@cosmjs/stargate': 0.30.1
-      '@cosmjs/tendermint-rpc': 0.30.1
-      '@cosmjs/utils': 0.31.1
-      '@dydxprotocol/v4-proto': 0.2.1
-      '@osmonauts/lcd': 0.6.0
-      '@scure/bip32': 1.3.1
-      '@scure/bip39': 1.2.1
-      axios: 1.1.3
-      bech32: 1.1.4
-      bignumber.js: 9.1.1
-      ethereum-cryptography: 2.1.2
-      long: 4.0.0
-      protobufjs: 6.11.4
-      ws: 8.13.0(bufferutil@4.0.7)(utf-8-validate@5.0.10)
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - utf-8-validate
+  /@dydxprotocol/v4-abacus@0.7.2:
+    resolution: {integrity: sha512-5foamomN82FH6ko3EuzwFlSoAEY6Sal8fDgvZo2RsB19Ks6SFgFDeeOcEDdfoa3DNwvl8yW0C9cfxeQ+BfU8uA==}
     dev: false
 
   /@dydxprotocol/v4-localization@0.1.30:
     resolution: {integrity: sha512-xTlQuQmPz7wfGkjd07giYMAxRrolDbJE3DryJSIMB6R1MBq1wLzAcwp/iR/nELRwilRX9c44Tap0gGt+oAajiQ==}
     dev: false
 
-  /@dydxprotocol/v4-proto@0.2.1:
-    resolution: {integrity: sha512-Q5b/g331DoyMjBpO2/jtrxUX3WF5UaIKZp/unK332xuefHNFnkMYtZ05p0V71iSdO35tBdz8yt0VYP2WtUsp+w==}
+  /@dydxprotocol/v4-proto@0.4.1:
+    resolution: {integrity: sha512-2pBkokufWcxfIpiXE6QuQOBXUe154OTp6ojCIdOPW9TFLxzchoygxXnb5dL6rAQVNj9Qbg+hhXBllutt4m99dw==}
     dependencies:
       protobufjs: 6.11.4
     dev: false
@@ -4708,8 +4681,8 @@ packages:
     resolution: {integrity: sha512-osvveYtyzdEVbt3OfwwXFr4P2iVBL5u1Q3q4ONBfDY/UpOuXmOlbgwc1xECEboY8wIays8Yt6onaWMUdUbfl0A==}
     dependencies:
       '@noble/curves': 1.1.0
-      '@noble/hashes': 1.3.1
-      '@scure/base': 1.1.1
+      '@noble/hashes': 1.3.2
+      '@scure/base': 1.1.3
     dev: false
 
   /@scure/bip32@1.3.2:
@@ -4731,7 +4704,7 @@ packages:
     resolution: {integrity: sha512-Z3/Fsz1yr904dduJD0NpiyRHhRYHdcnyh73FZWiV+/qhWi83wNJ3NWolYqCEN+ZWsUz2TWwajJggcRE9r1zUYg==}
     dependencies:
       '@noble/hashes': 1.3.2
-      '@scure/base': 1.1.1
+      '@scure/base': 1.1.3
     dev: false
 
   /@solana/buffer-layout@4.0.1:
@@ -4745,8 +4718,8 @@ packages:
     resolution: {integrity: sha512-up5VG1dK+GPhykmuMIozJZBbVqpm77vbOG6/r5dS7NBGZonwHfTLdBbsYc3rjmaQ4DpCXUa3tUc4RZHRORvZrw==}
     dependencies:
       '@babel/runtime': 7.22.10
-      '@noble/curves': 1.1.0
-      '@noble/hashes': 1.3.1
+      '@noble/curves': 1.2.0
+      '@noble/hashes': 1.3.2
       '@solana/buffer-layout': 4.0.1
       agentkeepalive: 4.5.0
       bigint-buffer: 1.1.5
@@ -7144,7 +7117,7 @@ packages:
   /bip39@3.1.0:
     resolution: {integrity: sha512-c9kiwdk45Do5GL0vJMe7tS95VjCii65mYAH7DfWl3uW8AVzXKQVUm64i3hzVybBDMp9r7j9iNxR85+ul8MdN/A==}
     dependencies:
-      '@noble/hashes': 1.3.1
+      '@noble/hashes': 1.3.2
     dev: false
 
   /bl@5.1.0:
@@ -14099,3 +14072,33 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
+
+  file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-0.40.1.tgz:
+    resolution: {integrity: sha512-QMWMKM/DC2/1lDa7pvQKIrTpXYv5mq9Ixjs3I1KCxgMcdi8WFVxFwJicmH00B7VCPcvHGdfoXGj6Szs+Ug+u7w==, tarball: file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-0.40.1.tgz}
+    name: '@dydxprotocol/v4-client-js'
+    version: 0.40.1
+    dependencies:
+      '@cosmjs/amino': 0.30.1
+      '@cosmjs/encoding': 0.31.1
+      '@cosmjs/math': 0.31.1
+      '@cosmjs/proto-signing': 0.30.1
+      '@cosmjs/stargate': 0.30.1
+      '@cosmjs/tendermint-rpc': 0.30.1
+      '@cosmjs/utils': 0.31.1
+      '@dydxprotocol/v4-proto': 0.4.1
+      '@osmonauts/lcd': 0.6.0
+      '@scure/bip32': 1.3.2
+      '@scure/bip39': 1.2.1
+      axios: 1.1.3
+      bech32: 1.1.4
+      bignumber.js: 9.1.1
+      ethereum-cryptography: 2.1.2
+      ethers: 6.6.1
+      long: 4.0.0
+      protobufjs: 6.11.4
+      ws: 8.13.0(bufferutil@4.0.7)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - utf-8-validate
+    dev: false

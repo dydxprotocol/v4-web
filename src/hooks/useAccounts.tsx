@@ -2,7 +2,7 @@ import { useCallback, useContext, createContext, useEffect, useState, useMemo } 
 
 import { useDispatch } from 'react-redux';
 import { AES, enc } from 'crypto-js';
-import { LocalWallet, USDC_DENOM, type Subaccount } from '@dydxprotocol/v4-client-js';
+import { LocalWallet, type Subaccount } from '@dydxprotocol/v4-client-js';
 
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
 import { DialogTypes } from '@/constants/dialogs';
@@ -130,16 +130,8 @@ const useAccountsContext = () => {
   // dYdX subaccounts
   const [dydxSubaccounts, setDydxSubaccounts] = useState<Subaccount[] | undefined>();
 
-  const { getAccountBalance, getSubaccounts } = useMemo(
+  const { getSubaccounts } = useMemo(
     () => ({
-      getAccountBalance: async ({
-        dydxAddress,
-        denom = USDC_DENOM,
-      }: {
-        dydxAddress: DydxAddress;
-        denom?: string;
-      }) => await compositeClient?.validatorClient.get.getAccountBalance(dydxAddress, denom),
-
       getSubaccounts: async ({ dydxAddress }: { dydxAddress: DydxAddress }) => {
         try {
           const response = await compositeClient?.indexerClient.account.getSubaccounts(dydxAddress);
@@ -326,7 +318,6 @@ const useAccountsContext = () => {
     disconnect,
 
     // dydxClient Account methods
-    getAccountBalance,
     getSubaccounts,
   };
 };

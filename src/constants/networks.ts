@@ -1,3 +1,4 @@
+import { env } from 'process';
 import environments from '../../public/configs/env.json';
 
 // TODO: Update for Mainnet deployment

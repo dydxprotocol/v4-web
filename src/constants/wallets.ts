@@ -1,5 +1,5 @@
 import type { ExternalProvider } from '@ethersproject/providers';
-import { USDC_DENOM, type onboarding, DYDX_DENOM } from '@dydxprotocol/v4-client-js';
+import { type onboarding } from '@dydxprotocol/v4-client-js';
 import type { suggestChain } from 'graz';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -352,15 +352,5 @@ export const DYDX_CHAIN_INFO: Parameters<typeof suggestChain>[0] = {
 // TODO: export this type from abacus instead
 export enum DydxChainAsset {
   USDC = 'usdc',
-  DYDX = 'dydx',
+  CHAIN = 'chain',
 }
-
-export const DYDX_CHAIN_ASSET_COIN_DENOM: Record<DydxChainAsset, string> = {
-  [DydxChainAsset.USDC]: USDC_DENOM,
-  [DydxChainAsset.DYDX]: DYDX_DENOM,
-};
-
-export const DYDX_CHAIN_ASSET_TAGS: Record<DydxChainAsset, string> = {
-  [DydxChainAsset.USDC]: 'USDC',
-  [DydxChainAsset.DYDX]: 'Dv4TNT',
-};

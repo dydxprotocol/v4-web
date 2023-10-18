@@ -11,11 +11,7 @@ import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { NumberSign } from '@/constants/numbers';
-import {
-  DYDX_CHAIN_ASSET_COIN_DENOM,
-  DYDX_CHAIN_ASSET_TAGS,
-  DydxChainAsset,
-} from '@/constants/wallets';
+import { DydxChainAsset } from '@/constants/wallets';
 
 import {
   useAccountBalance,
@@ -25,6 +21,7 @@ import {
   useSelectedNetwork,
   useStringGetter,
   useSubaccount,
+  useTokenConfigs,
 } from '@/hooks';
 
 import { formMixins } from '@/styles/formMixins';
@@ -57,7 +54,7 @@ type TransferFormProps = {
 };
 
 export const TransferForm = ({
-  selectedAsset = DydxChainAsset.DYDX,
+  selectedAsset = DydxChainAsset.CHAIN,
   onDone,
   className,
 }: TransferFormProps) => {
@@ -72,6 +69,7 @@ export const TransferForm = ({
   const { transfer } = useSubaccount();
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
   const { selectedNetwork } = useSelectedNetwork();
+  const { tokensConfigs, usdcLabel, chainLabel } = useTokenConfigs();
 
   // User Input
   const [asset, setAsset] = useState<DydxChainAsset>(selectedAsset);
@@ -138,7 +136,7 @@ export const TransferForm = ({
     try {
       // Subtract fees from amount if sending native tokens
       const amountToTransfer = (
-        asset === DydxChainAsset.DYDX ? amountBN.minus(fee) : amountBN
+        asset === DydxChainAsset.CHAIN ? amountBN.minus(fee) : amountBN
       ).toNumber();
 
       const screenResults = await screenAddresses({
@@ -161,7 +159,7 @@ export const TransferForm = ({
         const txResponse = await transfer(
           amountToTransfer,
           recipientAddress as string,
-          DYDX_CHAIN_ASSET_COIN_DENOM[asset]
+          tokensConfigs[asset].denom,
         );
 
         if (txResponse?.code === 0) {
@@ -220,16 +218,16 @@ export const TransferForm = ({
       value: DydxChainAsset.USDC,
       label: (
         <Styled.InlineRow>
-          <AssetIcon symbol="USDC" /> {DYDX_CHAIN_ASSET_TAGS[DydxChainAsset.USDC]}
+          <AssetIcon symbol="USDC" /> {usdcLabel}
         </Styled.InlineRow>
       ),
     },
     {
-      value: DydxChainAsset.DYDX,
+      value: DydxChainAsset.CHAIN,
       label: (
         <Styled.InlineRow>
           {/* <AssetIcon symbol="DYDX" />  */}
-          {DYDX_CHAIN_ASSET_TAGS[DydxChainAsset.DYDX]}
+          {chainLabel}
         </Styled.InlineRow>
       ),
     },
@@ -251,7 +249,7 @@ export const TransferForm = ({
       key: 'amount',
       label: (
         <span>
-          {stringGetter({ key: STRING_KEYS.AVAILABLE })} <Tag>{DYDX_CHAIN_ASSET_TAGS[asset]}</Tag>
+          {stringGetter({ key: STRING_KEYS.AVAILABLE })} <Tag>{tokensConfigs[asset].name}</Tag>
         </span>
       ),
       value: (

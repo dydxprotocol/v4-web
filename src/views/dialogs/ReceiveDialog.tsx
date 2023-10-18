@@ -6,7 +6,7 @@ import { DydxChainAsset } from '@/constants/wallets';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
-import { useAccounts, useStringGetter } from '@/hooks';
+import { useAccounts, useTokenConfigs, useStringGetter } from '@/hooks';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { CopyButton } from '@/components/CopyButton';
@@ -24,9 +24,10 @@ type ElementProps = {
   setIsOpen: (open: boolean) => void;
 };
 
-export const ReceiveDialog = ({ selectedAsset = DydxChainAsset.DYDX, setIsOpen }: ElementProps) => {
+export const ReceiveDialog = ({ selectedAsset = DydxChainAsset.CHAIN, setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
+  const { chainLabel, usdcLabel } = useTokenConfigs();
 
   const [asset, setAsset] = useState(selectedAsset);
 
@@ -35,16 +36,16 @@ export const ReceiveDialog = ({ selectedAsset = DydxChainAsset.DYDX, setIsOpen }
       value: DydxChainAsset.USDC,
       label: (
         <Styled.InlineRow>
-          <AssetIcon symbol="USDC" /> USDC
+          <AssetIcon symbol="USDC" /> {usdcLabel}
         </Styled.InlineRow>
       ),
     },
     {
-      value: DydxChainAsset.DYDX,
+      value: DydxChainAsset.CHAIN,
       label: (
         <Styled.InlineRow>
           {/* <AssetIcon symbol="DYDX" />  */}
-          Dv4TNT
+          {chainLabel}
         </Styled.InlineRow>
       ),
     },
