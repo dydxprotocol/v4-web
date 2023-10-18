@@ -264,7 +264,6 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.StatusCardsContainer = styled.div`
   display: grid;
-  margin-top: 1rem;
   gap: 1rem;
 `;
 
