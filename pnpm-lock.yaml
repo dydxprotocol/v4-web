@@ -30,8 +30,8 @@ dependencies:
     specifier: ^0.7.2
     version: 0.7.2
   '@dydxprotocol/v4-client-js':
-    specifier: ^0.40.2
-    version: 0.40.2
+    specifier: ^0.40.3
+    version: 0.40.3
   '@dydxprotocol/v4-localization':
     specifier: ^0.1.30
     version: 0.1.30
@@ -983,8 +983,8 @@ packages:
     resolution: {integrity: sha512-5foamomN82FH6ko3EuzwFlSoAEY6Sal8fDgvZo2RsB19Ks6SFgFDeeOcEDdfoa3DNwvl8yW0C9cfxeQ+BfU8uA==}
     dev: false
 
-  /@dydxprotocol/v4-client-js@0.40.2:
-    resolution: {integrity: sha512-fGx+kojUasDxLlDkL5DVoTmbUL5ubwpN6Cu/RVG1SbHf29mcq5iftjFnYijQsY5A+i0DnAsbv6IgTC922wPVqg==}
+  /@dydxprotocol/v4-client-js@0.40.3:
+    resolution: {integrity: sha512-nMQd6tYisKDKIbfx0BGJSYEOSt+I+t5SsaBSmlgTdso+w2rCRO9vyxS+u6MF9h4w5FsVRfhHo3e6uTWX48WpGQ==}
     dependencies:
       '@cosmjs/amino': 0.30.1
       '@cosmjs/encoding': 0.31.1

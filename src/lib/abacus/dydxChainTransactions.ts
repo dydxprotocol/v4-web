@@ -223,11 +223,11 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       params ?? {};
 
     try {
-      const tx = await this.compositeClient?.cancelOrder(
+      const tx = await this.compositeClient?.cancelRawOrder(
         new SubaccountClient(this.localWallet, subaccountNumber),
         clientId,
         orderFlags,
-        clobPairId.toString(),
+        clobPairId,
         goodTilBlock || undefined,
         goodTilBlockTime || undefined,
       );
