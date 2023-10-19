@@ -63,7 +63,7 @@ const Content = () => {
   const { isTablet, isNotTablet } = useBreakpoints();
   const isShowingHeader = isNotTablet;
   const isShowingFooter = useShouldShowFooter();
-  const { chainLabel } = useTokenConfigs();
+  const { chainTokenLabel } = useTokenConfigs();
 
   return (
     <Styled.Content isShowingHeader={isShowingHeader} isShowingFooter={isShowingFooter}>
@@ -78,7 +78,7 @@ const Content = () => {
             </Route>
 
             <Route path={AppRoute.Markets} element={<MarketsPage />} />
-            <Route path={`/${chainLabel}`} element={<RewardsPage />} />
+            <Route path={`/${chainTokenLabel}`} element={<RewardsPage />} />
             {isTablet && (
               <>
                 <Route path={AppRoute.Alerts} element={<AlertsPage />} />

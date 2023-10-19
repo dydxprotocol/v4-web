@@ -24,7 +24,6 @@ import { DropdownMenu } from '@/components/DropdownMenu';
 import { Output, OutputType } from '@/components/Output';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { openDialog } from '@/state/dialogs';
@@ -46,7 +45,7 @@ export const AccountMenu = () => {
   const onboardingState = useSelector(getOnboardingState);
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
   const { nativeTokenBalance } = useAccountBalance();
-  const { usdcLabel, chainLabel } = useTokenConfigs();
+  const { usdcLabel, chainTokenLabel } = useTokenConfigs();
 
   const { evmAddress, walletType, dydxAddress, hdKey } = useAccounts();
 
@@ -117,13 +116,13 @@ export const AccountMenu = () => {
                   <Styled.label>
                     {stringGetter({
                       key: STRING_KEYS.ASSET_BALANCE,
-                      params: { ASSET: chainLabel },
+                      params: { ASSET: chainTokenLabel },
                     })}
                     {/* <AssetIcon symbol="DYDX" /> */}
                   </Styled.label>
                   <Styled.BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
                 </div>
-                <AssetActions asset={DydxChainAsset.CHAIN} dispatch={dispatch} />
+                <AssetActions asset={DydxChainAsset.CHAINTOKEN} dispatch={dispatch} />
               </div>
               <div>
                 <div>

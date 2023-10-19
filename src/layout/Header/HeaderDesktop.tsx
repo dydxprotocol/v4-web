@@ -28,7 +28,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
-  const { chainLabel } = useTokenConfigs();
+  const { chainTokenLabel } = useTokenConfigs();
 
   const navItems = [
     {
@@ -45,9 +45,9 @@ export const HeaderDesktop = () => {
           href: AppRoute.Trade,
         },
         {
-          value: chainLabel,
-          label: chainLabel,
-          href: `/${chainLabel}`,
+          value: chainTokenLabel,
+          label: chainTokenLabel,
+          href: `/${chainTokenLabel}`,
         },
         {
           value: 'PORTFOLIO',

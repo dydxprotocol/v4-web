@@ -5,12 +5,12 @@ import { useSelectedNetwork } from '@/hooks';
 
 export const useTokenConfigs = (): {
   tokensConfigs: {
-    ['usdc']: {
+    [DydxChainAsset.USDC]: {
       denom: string;
       name: string;
       decimals: number;
     },
-    ['chain']: {
+    [DydxChainAsset.CHAINTOKEN]: {
       denom: string;
       name: string;
       decimals: number;
@@ -18,8 +18,8 @@ export const useTokenConfigs = (): {
   };
   usdcDenom: string;
   usdcLabel: string;
-  chainDenom: string;
-  chainLabel: string;
+  chainTokenDenom: string;
+  chainTokenLabel: string;
 } => {
   const { selectedNetwork } = useSelectedNetwork();
   const tokensConfigs = ENVIRONMENT_CONFIG_MAP[selectedNetwork].tokens;
@@ -28,7 +28,7 @@ export const useTokenConfigs = (): {
     tokensConfigs,
     usdcDenom: tokensConfigs[DydxChainAsset.USDC].denom, 
     usdcLabel: tokensConfigs[DydxChainAsset.USDC].name,
-    chainDenom: tokensConfigs[DydxChainAsset.CHAIN].denom,
-    chainLabel: tokensConfigs[DydxChainAsset.CHAIN].name,
+    chainTokenDenom: tokensConfigs[DydxChainAsset.CHAINTOKEN].denom,
+    chainTokenLabel: tokensConfigs[DydxChainAsset.CHAINTOKEN].name,
   };
 };

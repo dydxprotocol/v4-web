@@ -30,7 +30,7 @@ export const DYDXBalancePanel = () => {
   const { walletType } = useAccounts();
   const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
   const { nativeTokenBalance, nativeStakingBalance } = useAccountBalance();
-  const { chainLabel } = useTokenConfigs();
+  const { chainTokenLabel } = useTokenConfigs();
 
   return (
     <Panel
@@ -38,7 +38,7 @@ export const DYDXBalancePanel = () => {
         <Styled.Header>
           <Styled.Title>
             {/* <AssetIcon symbol="DYDX" /> */}
-            {chainLabel}
+            {chainTokenLabel}
           </Styled.Title>
           <Styled.ReceiveAndTransferButtons>
             {!canAccountTrade ? (
@@ -111,7 +111,7 @@ export const DYDXBalancePanel = () => {
                 <Output
                   type={OutputType.Asset}
                   value={nativeTokenBalance + nativeStakingBalance}
-                  tag={chainLabel}
+                  tag={chainTokenLabel}
                 />
               ),
             },

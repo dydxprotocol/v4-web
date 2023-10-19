@@ -24,10 +24,10 @@ type ElementProps = {
   setIsOpen: (open: boolean) => void;
 };
 
-export const ReceiveDialog = ({ selectedAsset = DydxChainAsset.CHAIN, setIsOpen }: ElementProps) => {
+export const ReceiveDialog = ({ selectedAsset = DydxChainAsset.CHAINTOKEN, setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
-  const { chainLabel, usdcLabel } = useTokenConfigs();
+  const { chainTokenLabel, usdcLabel } = useTokenConfigs();
 
   const [asset, setAsset] = useState(selectedAsset);
 
@@ -41,11 +41,11 @@ export const ReceiveDialog = ({ selectedAsset = DydxChainAsset.CHAIN, setIsOpen 
       ),
     },
     {
-      value: DydxChainAsset.CHAIN,
+      value: DydxChainAsset.CHAINTOKEN,
       label: (
         <Styled.InlineRow>
           {/* <AssetIcon symbol="DYDX" />  */}
-          {chainLabel}
+          {chainTokenLabel}
         </Styled.InlineRow>
       ),
     },

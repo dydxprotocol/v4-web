@@ -54,7 +54,7 @@ type TransferFormProps = {
 };
 
 export const TransferForm = ({
-  selectedAsset = DydxChainAsset.CHAIN,
+  selectedAsset = DydxChainAsset.CHAINTOKEN,
   onDone,
   className,
 }: TransferFormProps) => {
@@ -69,7 +69,7 @@ export const TransferForm = ({
   const { transfer } = useSubaccount();
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
   const { selectedNetwork } = useSelectedNetwork();
-  const { tokensConfigs, usdcLabel, chainLabel } = useTokenConfigs();
+  const { tokensConfigs, usdcLabel, chainTokenLabel } = useTokenConfigs();
 
   // User Input
   const [asset, setAsset] = useState<DydxChainAsset>(selectedAsset);
@@ -136,7 +136,7 @@ export const TransferForm = ({
     try {
       // Subtract fees from amount if sending native tokens
       const amountToTransfer = (
-        asset === DydxChainAsset.CHAIN ? amountBN.minus(fee) : amountBN
+        asset === DydxChainAsset.CHAINTOKEN ? amountBN.minus(fee) : amountBN
       ).toNumber();
 
       const screenResults = await screenAddresses({
@@ -223,11 +223,11 @@ export const TransferForm = ({
       ),
     },
     {
-      value: DydxChainAsset.CHAIN,
+      value: DydxChainAsset.CHAINTOKEN,
       label: (
         <Styled.InlineRow>
           {/* <AssetIcon symbol="DYDX" />  */}
-          {chainLabel}
+          {chainTokenLabel}
         </Styled.InlineRow>
       ),
     },

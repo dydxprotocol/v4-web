@@ -352,5 +352,5 @@ export const DYDX_CHAIN_INFO: Parameters<typeof suggestChain>[0] = {
 // TODO: export this type from abacus instead
 export enum DydxChainAsset {
   USDC = 'usdc',
-  CHAIN = 'chain',
+  CHAINTOKEN = 'chain',
 }

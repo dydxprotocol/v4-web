@@ -51,7 +51,7 @@ export const useAccountBalance = ({
 
   const selectedNetwork = useSelector(getSelectedNetwork);
   const balances = useSelector(getBalances, shallowEqual);
-  const { chainDenom, usdcDenom } = useTokenConfigs();
+  const { chainTokenDenom, usdcDenom } = useTokenConfigs();
   const evmChainId = Number(ENVIRONMENT_CONFIG_MAP[selectedNetwork].ethereumChainId);
   const stakingBalances = useSelector(getStakingBalances, shallowEqual);
 
@@ -93,7 +93,7 @@ export const useAccountBalance = ({
   const { formatted: evmBalance } = evmQuery.data || {};
   const balance = !assetSymbol ? '0' : isCosmosChain ? cosmosQuery.data : evmBalance;
 
-  const nativeTokenCoinBalance = balances?.[chainDenom];
+  const nativeTokenCoinBalance = balances?.[chainTokenDenom];
   const nativeTokenBalance = MustBigNumber(nativeTokenCoinBalance?.amount)
     .div(QUANTUM_MULTIPLIER)
     .toNumber();
@@ -101,7 +101,7 @@ export const useAccountBalance = ({
   const usdcCoinBalance = balances?.[usdcDenom];
   const usdcBalance = MustBigNumber(usdcCoinBalance?.amount).div(QUANTUM_MULTIPLIER).toNumber();
 
-  const nativeStakingCoinBalanace = stakingBalances?.[chainDenom];
+  const nativeStakingCoinBalanace = stakingBalances?.[chainTokenDenom];
   const nativeStakingBalance = MustBigNumber(nativeStakingCoinBalanace?.amount)
     .div(QUANTUM_MULTIPLIER)
     .toNumber();
