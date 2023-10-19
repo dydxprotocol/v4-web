@@ -8,6 +8,7 @@ export { default as CalculatorIcon } from './calculator.svg';
 export { default as CaretIcon } from './caret-down.svg';
 export { default as CautionCircleIcon } from './caution-circle.svg';
 export { default as CautionCircleStrokeIcon } from './caution-circle-stroke.svg';
+export { default as ChatIcon } from './chat-bubble.svg';
 export { default as CheckIcon } from './check.svg';
 export { default as ChevronLeftIcon } from './chevron-left.svg';
 export { default as ChevronRightIcon } from './chevron-right.svg';
