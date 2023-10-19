@@ -15,12 +15,14 @@ import type { ResolutionString } from 'public/tradingview/charting_library';
 
 import type { ConnectNetworkEvent, NetworkConfig } from '@/constants/abacus';
 import { type Candle, RESOLUTION_MAP } from '@/constants/candles';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { log } from '@/lib/telemetry';
 
 import { useRestrictions } from './useRestrictions';
+import { DydxChainAsset } from '@/constants/wallets';
 
 type DydxContextType = ReturnType<typeof useDydxClientContext>;
 const DydxContext = createContext<DydxContextType>({} as DydxContextType);
@@ -36,6 +38,7 @@ const useDydxClientContext = () => {
   // ------ Network ------ //
 
   const selectedNetwork = useSelector(getSelectedNetwork);
+  const tokensConfigs = ENVIRONMENT_CONFIG_MAP[selectedNetwork].tokens;
 
   const [networkConfig, setNetworkConfig] = useState<NetworkConfig>();
 
@@ -65,7 +68,14 @@ const useDydxClientContext = () => {
             new Network(
               selectedNetwork,
               new IndexerConfig(networkConfig.indexerUrl, networkConfig.websocketUrl),
-              new ValidatorConfig(networkConfig.validatorUrl, networkConfig.chainId, {
+              new ValidatorConfig(networkConfig.validatorUrl, networkConfig.chainId,
+                {
+                  USDC_DENOM: tokensConfigs[DydxChainAsset.USDC].denom,
+                  USDC_DECIMALS: tokensConfigs[DydxChainAsset.USDC].decimals,
+                  USDC_GAS_DENOM: tokensConfigs[DydxChainAsset.USDC].gasDenom,
+                  CHAINTOKEN_DENOM: tokensConfigs[DydxChainAsset.CHAINTOKEN].denom,
+                  CHAINTOKEN_DECIMALS: tokensConfigs[DydxChainAsset.CHAINTOKEN].decimals,
+                }, {
                 broadcastPollIntervalMs: 3_000,
                 broadcastTimeoutMs: 60_000,
               })
