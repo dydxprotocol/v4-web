@@ -24,6 +24,8 @@ export const dialogsSlice = createSlice({
   initialState,
   reducers: {
     openDialog: (state: DialogsState, action: PayloadAction<DialogInfo<DialogTypes>>) => {
+      if (state.activeDialog?.type === action.payload.type) return;
+
       if (state.activeDialog) {
         state.dialogQueue.push(action.payload);
       } else {
