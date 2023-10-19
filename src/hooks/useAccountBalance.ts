@@ -94,17 +94,13 @@ export const useAccountBalance = ({
   const balance = !assetSymbol ? '0' : isCosmosChain ? cosmosQuery.data : evmBalance;
 
   const nativeTokenCoinBalance = balances?.[chainTokenDenom];
-  const nativeTokenBalance = MustBigNumber(nativeTokenCoinBalance?.amount)
-    .div(QUANTUM_MULTIPLIER)
-    .toNumber();
+  const nativeTokenBalance = MustBigNumber(nativeTokenCoinBalance?.amount);
 
   const usdcCoinBalance = balances?.[usdcDenom];
-  const usdcBalance = MustBigNumber(usdcCoinBalance?.amount).div(QUANTUM_MULTIPLIER).toNumber();
+  const usdcBalance = MustBigNumber(usdcCoinBalance?.amount).toNumber();
 
   const nativeStakingCoinBalanace = stakingBalances?.[chainTokenDenom];
-  const nativeStakingBalance = MustBigNumber(nativeStakingCoinBalanace?.amount)
-    .div(QUANTUM_MULTIPLIER)
-    .toNumber();
+  const nativeStakingBalance = MustBigNumber(nativeStakingCoinBalanace?.amount).toNumber();
 
   return {
     balance,

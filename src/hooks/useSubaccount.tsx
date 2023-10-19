@@ -131,7 +131,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         amount: number;
         recipient: string;
       }) =>
-        await compositeClient?.send(
+        await compositeClient?.validatorClient.post.send(
           subaccountClient.wallet,
           () =>
             new Promise((resolve) => {
@@ -145,6 +145,8 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
             }),
           false,
           compositeClient?.validatorClient?.post.defaultDydxGasPrice,
+          undefined,
+          Method.BroadcastTxCommit
         ),
 
       sendSquidWithdrawFromSubaccount: async ({
