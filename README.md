@@ -11,6 +11,7 @@
 ## Prerequisites
 
 - Node.js version 18 and `pnpm` installed on your system
+- Wallet Connect account
 
 For deploying with Vercel, create an account with [Vercel](https://vercel.com/signup) if you don't have one already.
 
@@ -61,7 +62,14 @@ pnpm ladle
 
 This will automatically open your default browser at `http://localhost:61000`.
 
-## Part 3: Deploying with Vercel
+## Part 3: Configuring environment
+
+Add or modify the relevant endpoints, links and options in `/public/configs/env.json`.
+You'll need to provide a Wallet Connect project id to enable onboarding and wallet connection:
+- Create a project on https://cloud.walletconnect.com/app
+- Copy over the project ID into this [field](https://github.com/dydxprotocol/v4-web/blob/67ecbd75b43e0c264b7b4d2d9b3d969830b0621c/public/configs/env.json#L822C33-L822C46)
+
+## Part 4: Deploying with Vercel
 
 ### Step 1: Connect your repository to Vercel
 
@@ -78,7 +86,7 @@ If you wish to incorporate analytics via Amplitude and Bugsnag, you can use our 
 
 For more details, check out Vercel's [official documentation](https://vercel.com/docs).
 
-## Part 4: Deploying to IPFS
+## Part 5: Deploying to IPFS
 
 ### web3.storage: deploy to IPFS via web3.storage using the provided script
 

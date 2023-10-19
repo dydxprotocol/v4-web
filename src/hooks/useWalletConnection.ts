@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import { LocalStorageKey } from '@/constants/localStorage';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
 import {
   type DydxAddress,
@@ -27,6 +29,8 @@ import {
   useOfflineSigners as useOfflineSignersGraz,
   WalletType as CosmosWalletType,
 } from 'graz';
+
+import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { resolveWagmiConnector } from '@/lib/wagmi';
 import { getWalletConnection, parseWalletError } from '@/lib/wallet';
@@ -84,6 +88,9 @@ export const useWalletConnection = () => {
 
   // Wallet connection
 
+  const selectedNetwork = useSelector(getSelectedNetwork);
+  const walletConnectConfig = ENVIRONMENT_CONFIG_MAP[selectedNetwork].wallets.walletconnect;
+
   const { connectAsync: connectWagmi } =
     walletType && walletConnectionType
       ? useConnectWagmi({
@@ -92,6 +99,7 @@ export const useWalletConnection = () => {
             walletConnection: {
               type: walletConnectionType,
             },
+            walletConnectConfig,
           }),
         })
       : useConnectWagmi();
@@ -127,6 +135,7 @@ export const useWalletConnection = () => {
               connector: resolveWagmiConnector({
                 walletType,
                 walletConnection,
+                walletConnectConfig,
               }),
             });
           }
@@ -217,7 +226,7 @@ export const useWalletConnection = () => {
     evmAddressWagmi,
     signerWagmi,
     publicClientWagmi,
-    
+
     // Wallet connection (Cosmos)
     dydxAddress,
     dydxAddressGraz,
