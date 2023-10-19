@@ -6,8 +6,9 @@ import { ButtonShape } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
-import { useStringGetter } from '@/hooks';
 import { LogoShortIcon, BellStrokeIcon } from '@/icons';
+
+import { useTokenConfigs, useStringGetter } from '@/hooks';
 
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
@@ -27,6 +28,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
+  const { chainTokenLabel } = useTokenConfigs();
 
   const navItems = [
     {
@@ -43,9 +45,9 @@ export const HeaderDesktop = () => {
           href: AppRoute.Trade,
         },
         {
-          value: 'Dv4TNT',
-          label: 'Dv4TNT',
-          href: AppRoute.Rewards,
+          value: chainTokenLabel,
+          label: chainTokenLabel,
+          href: `/${chainTokenLabel}`,
         },
         {
           value: 'PORTFOLIO',

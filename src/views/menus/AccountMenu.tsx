@@ -9,7 +9,13 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, TOOLTIP_STRING_KEYS } from '@/constants/localization';
 import { DydxChainAsset, wallets } from '@/constants/wallets';
 
-import { useAccounts, useBreakpoints, useStringGetter, useAccountBalance } from '@/hooks';
+import {
+  useAccounts,
+  useBreakpoints,
+  useTokenConfigs,
+  useStringGetter,
+  useAccountBalance,
+} from '@/hooks';
 
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
@@ -39,6 +45,7 @@ export const AccountMenu = () => {
   const onboardingState = useSelector(getOnboardingState);
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
   const { nativeTokenBalance } = useAccountBalance();
+  const { usdcLabel, chainTokenLabel } = useTokenConfigs();
 
   const { evmAddress, walletType, dydxAddress, hdKey } = useAccounts();
 
@@ -107,17 +114,23 @@ export const AccountMenu = () => {
               <div>
                 <div>
                   <Styled.label>
-                    {stringGetter({ key: STRING_KEYS.ASSET_BALANCE, params: { ASSET: 'Dv4TNT' } })}
+                    {stringGetter({
+                      key: STRING_KEYS.ASSET_BALANCE,
+                      params: { ASSET: chainTokenLabel },
+                    })}
                     {/* <AssetIcon symbol="DYDX" /> */}
                   </Styled.label>
                   <Styled.BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
                 </div>
-                <AssetActions asset={DydxChainAsset.DYDX} dispatch={dispatch} />
+                <AssetActions asset={DydxChainAsset.CHAINTOKEN} dispatch={dispatch} />
               </div>
               <div>
                 <div>
                   <Styled.label>
-                    {stringGetter({ key: STRING_KEYS.ASSET_BALANCE, params: { ASSET: 'USDC' } })}
+                    {stringGetter({
+                      key: STRING_KEYS.ASSET_BALANCE,
+                      params: { ASSET: usdcLabel },
+                    })}
                     <AssetIcon symbol="USDC" />
                   </Styled.label>
                   <Styled.BalanceOutput

@@ -1,5 +1,6 @@
 import { useApiState } from './useApiState';
 import { useBreakpoints } from './useBreakpoints';
+import { useTokenConfigs } from './useTokenConfigs';
 import { useCommandMenu } from './useCommandMenu';
 import { useCurrentMarketId } from './useCurrentMarketId';
 import { useDebounce } from './useDebounce';
@@ -25,6 +26,7 @@ import { useSubaccount } from './useSubaccount';
 export {
   useApiState,
   useBreakpoints,
+  useTokenConfigs,
   useCommandMenu,
   useCurrentMarketId,
   useDebounce,

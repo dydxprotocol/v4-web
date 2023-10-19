@@ -3,15 +3,10 @@ import { shallowEqual, useSelector, useDispatch } from 'react-redux';
 import type { Nullable } from '@dydxprotocol/v4-abacus';
 import Long from 'long';
 import type { IndexedTx } from '@cosmjs/stargate';
-import type { EncodeObject, Coin } from '@cosmjs/proto-signing';
+import type { EncodeObject } from '@cosmjs/proto-signing';
 import { Method } from '@cosmjs/tendermint-rpc';
 
-import {
-  type LocalWallet,
-  SubaccountClient,
-  DYDX_DENOM,
-  USDC_DENOM,
-} from '@dydxprotocol/v4-client-js';
+import { type LocalWallet, SubaccountClient } from '@dydxprotocol/v4-client-js';
 
 import type {
   AccountBalance,
@@ -34,6 +29,7 @@ import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 
 import { useAccounts } from './useAccounts';
+import { useTokenConfigs } from './useTokenConfigs';
 import { useDydxClient } from './useDydxClient';
 
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
@@ -52,6 +48,7 @@ export const useSubaccount = () => useContext(SubaccountContext);
 
 export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWallet }) => {
   const dispatch = useDispatch();
+  const { usdcDenom } = useTokenConfigs();
   const { compositeClient, faucetClient } = useDydxClient();
 
   const { getFaucetFunds } = useMemo(
@@ -91,7 +88,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       }: {
         subaccountClient: SubaccountClient;
         amount: number;
-      }) => await compositeClient?.withdrawFromSubaccount(subaccountClient, amount),
+      }) => await compositeClient?.withdrawFromSubaccount(subaccountClient, amount.toString()),
 
       transferFromSubaccountToAddress: async ({
         subaccountClient,
@@ -134,12 +131,21 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         amount: number;
         recipient: string;
       }) =>
-        await compositeClient?.validatorClient.post.sendToken(
-          subaccountClient,
-          recipient,
-          DYDX_DENOM,
-          Long.fromNumber(amount * QUANTUM_MULTIPLIER),
+        await compositeClient?.validatorClient.post.send(
+          subaccountClient.wallet,
+          () =>
+            new Promise((resolve) => {
+              const msg = compositeClient?.sendTokenMessage(
+                subaccountClient.wallet,
+                amount.toString(),
+                recipient,
+              );
+
+              resolve([msg]);
+            }),
           false,
+          compositeClient?.validatorClient?.post.defaultDydxGasPrice,
+          undefined,
           Method.BroadcastTxCommit
         ),
 
@@ -156,7 +162,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
         const transaction = JSON.parse(payload);
 
-        const msg = compositeClient.withdrawFromSubaccountMessage(subaccountClient, amount);
+        const msg = compositeClient.withdrawFromSubaccountMessage(subaccountClient, amount.toString());
         const ibcMsg: EncodeObject = {
           typeUrl: transaction.msgTypeUrl,
           value: transaction.msg,
@@ -210,7 +216,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   );
 
   const balances = useSelector(getBalances, shallowEqual);
-  const usdcCoinBalance = balances?.[USDC_DENOM];
+  const usdcCoinBalance = balances?.[usdcDenom];
 
   useEffect(() => {
     if (usdcCoinBalance) {
@@ -247,8 +253,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       if (!subaccountClient) {
         return;
       }
-
-      return (await (coinDenom === USDC_DENOM
+      return (await (coinDenom === usdcDenom
         ? transferFromSubaccountToAddress
         : transferNativeToken)({ subaccountClient, amount, recipient })) as IndexedTx;
     },

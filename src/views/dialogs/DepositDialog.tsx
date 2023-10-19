@@ -32,12 +32,9 @@ export const DepositDialog = ({ setIsOpen }: ElementProps) => {
     >
       <Styled.Content>
         {showTestDeposit ? <TestnetDepositForm onDeposit={closeDialog} /> : <DepositForm />}
-        {/* TODO TRCL-1693 - uncomment when deposit form is ready */}
-         {import.meta.env.MODE !== 'production' && (
-          <Styled.TextToggle onClick={() => setShowTestDeposit(!showTestDeposit)}>
-            {showTestDeposit ? 'Show deposit form (Under Construction)' : 'Show test faucet'}
-          </Styled.TextToggle>
-        )}
+        <Styled.TextToggle onClick={() => setShowTestDeposit(!showTestDeposit)}>
+          {showTestDeposit ? 'Show deposit form (Under Construction)' : 'Show test faucet'}
+        </Styled.TextToggle>
       </Styled.Content>
     </Dialog>
   );

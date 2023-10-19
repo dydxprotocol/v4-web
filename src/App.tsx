@@ -7,7 +7,13 @@ import { GrazProvider } from 'graz';
 
 import { AppRoute, DEFAULT_TRADE_ROUTE } from '@/constants/routes';
 
-import { useBreakpoints, useInitializePage, useShouldShowFooter, useAnalytics } from '@/hooks';
+import {
+  useBreakpoints,
+  useTokenConfigs,
+  useInitializePage,
+  useShouldShowFooter,
+  useAnalytics,
+} from '@/hooks';
 import { DydxProvider } from '@/hooks/useDydxClient';
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { DialogAreaProvider, useDialogArea } from '@/hooks/useDialogArea';
@@ -57,6 +63,7 @@ const Content = () => {
   const { isTablet, isNotTablet } = useBreakpoints();
   const isShowingHeader = isNotTablet;
   const isShowingFooter = useShouldShowFooter();
+  const { chainTokenLabel } = useTokenConfigs();
 
   return (
     <Styled.Content isShowingHeader={isShowingHeader} isShowingFooter={isShowingFooter}>
@@ -71,7 +78,7 @@ const Content = () => {
             </Route>
 
             <Route path={AppRoute.Markets} element={<MarketsPage />} />
-            <Route path={AppRoute.Rewards} element={<RewardsPage />} />
+            <Route path={`/${chainTokenLabel}`} element={<RewardsPage />} />
             {isTablet && (
               <>
                 <Route path={AppRoute.Alerts} element={<AlertsPage />} />
