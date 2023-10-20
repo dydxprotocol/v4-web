@@ -16,7 +16,7 @@ type ElementProps = {
 const HELP_LINKS = {
   apiDocumentation: 'https://v4-teacher.vercel.app/',
   helpCenter: null,
-  feedback: `https://docs.google.com/forms/d/e/1FAIpQLSezLsWCKvAYDEb7L-2O4wOON1T56xxro9A2Azvl6IxXHP_15Q/viewform?usp=sf_link`,
+  feedback: null,
 };
 
 export const HelpDialog = ({ setIsOpen }: ElementProps) => {
@@ -37,12 +37,12 @@ export const HelpDialog = ({ setIsOpen }: ElementProps) => {
             },
             slotBefore: <FileIcon />,
           },
-          {
+          HELP_LINKS.apiDocumentation && {
             value: 'api-documentation',
             label: stringGetter({ key: STRING_KEYS.API_DOCUMENTATION }),
             description: stringGetter({ key: STRING_KEYS.API_DOCUMENTATION_DESCRIPTION }),
             onSelect: () => {
-              globalThis.open(HELP_LINKS.apiDocumentation, '_blank');
+              HELP_LINKS.apiDocumentation && globalThis.open(HELP_LINKS.apiDocumentation, '_blank');
               setIsOpen(false);
             },
             slotBefore: <TerminalIcon />,
@@ -57,12 +57,12 @@ export const HelpDialog = ({ setIsOpen }: ElementProps) => {
             },
             slotBefore: <ChatIcon />,
           },
-          {
+          HELP_LINKS.feedback && {
             value: 'feedback',
             label: stringGetter({ key: STRING_KEYS.PROVIDE_FEEDBACK }),
             description: stringGetter({ key: STRING_KEYS.PROVIDE_FEEDBACK_DESCRIPTION }),
             onSelect: () => {
-              globalThis.open(HELP_LINKS.feedback, '_blank');
+              HELP_LINKS.feedback && globalThis.open(HELP_LINKS.feedback, '_blank');
               setIsOpen(false);
             },
             slotBefore: <FeedbackIcon />,
