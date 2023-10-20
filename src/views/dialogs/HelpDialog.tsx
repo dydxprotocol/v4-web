@@ -3,7 +3,7 @@ import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { useStringGetter } from '@/hooks';
-import { ChatIcon, FeedbackIcon } from '@/icons';
+import { ChatIcon, FeedbackIcon, FileIcon, TerminalIcon } from '@/icons';
 
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 
@@ -13,7 +13,11 @@ type ElementProps = {
   setIsOpen: (open: boolean) => void;
 };
 
-const HELP_URL = `https://docs.google.com/forms/d/e/1FAIpQLSezLsWCKvAYDEb7L-2O4wOON1T56xxro9A2Azvl6IxXHP_15Q/viewform?usp=sf_link`;
+const HELP_LINKS = {
+  apiDocumentation: 'https://v4-teacher.vercel.app/',
+  helpCenter: null,
+  feedback: `https://docs.google.com/forms/d/e/1FAIpQLSezLsWCKvAYDEb7L-2O4wOON1T56xxro9A2Azvl6IxXHP_15Q/viewform?usp=sf_link`,
+};
 
 export const HelpDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
@@ -23,6 +27,21 @@ export const HelpDialog = ({ setIsOpen }: ElementProps) => {
       {
         group: 'help-items',
         items: [
+          HELP_LINKS.helpCenter && {
+            value: 'help-center',
+            label: stringGetter({ key: STRING_KEYS.HELP_CENTER }),
+            description: stringGetter({ key: STRING_KEYS.HELP_CENTER_DESCRIPTION }),
+            onSelect: () =>
+              HELP_LINKS.helpCenter && globalThis.open(HELP_LINKS.helpCenter, '_blank'),
+            slotBefore: <FileIcon />,
+          },
+          {
+            value: 'api-documentation',
+            label: stringGetter({ key: STRING_KEYS.API_DOCUMENTATION }),
+            description: stringGetter({ key: STRING_KEYS.API_DOCUMENTATION_DESCRIPTION }),
+            onSelect: () => globalThis.open(HELP_LINKS.apiDocumentation, '_blank'),
+            slotBefore: <TerminalIcon />,
+          },
           globalThis?.Intercom && {
             value: 'live-chat',
             label: stringGetter({ key: STRING_KEYS.LIVE_CHAT }),
@@ -34,7 +53,7 @@ export const HelpDialog = ({ setIsOpen }: ElementProps) => {
             value: 'feedback',
             label: stringGetter({ key: STRING_KEYS.PROVIDE_FEEDBACK }),
             description: stringGetter({ key: STRING_KEYS.PROVIDE_FEEDBACK_DESCRIPTION }),
-            onSelect: () => globalThis.open(HELP_URL, '_blank'),
+            onSelect: () => globalThis.open(HELP_LINKS.feedback, '_blank'),
             slotBefore: <FeedbackIcon />,
           },
         ].filter(isTruthy),
