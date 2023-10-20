@@ -115,4 +115,5 @@ Styled.Dialog = styled(Dialog)`
 
 Styled.ComboboxMenu = styled(ComboboxMenu)`
   --comboboxMenu-backgroundColor: var(--comboboxDialogMenu-backgroundColor);
+  --comboboxMenu-item-gap: var(--comboxDialogMenu-item-gap, 0.5rem);
 `;

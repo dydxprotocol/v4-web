@@ -79,4 +79,5 @@ Styled.ComboboxDialogMenu = styled(ComboboxDialogMenu)`
   --dialog-width: var(--dialog-small-width);
   --dialog-content-paddingTop: 1rem;
   --dialog-content-paddingBottom: 1rem;
+  --comboxDialogMenu-item-gap: 1rem;
 `;

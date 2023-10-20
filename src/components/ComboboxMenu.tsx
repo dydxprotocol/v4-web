@@ -176,6 +176,7 @@ Styled.Command = styled(Command)<{ $withStickyLayout?: boolean }>`
   --comboboxMenu-item-highlighted-backgroundColor: var(--color-layer-3);
   --comboboxMenu-item-highlighted-textColor: var(--color-text-1);
   --comboboxMenu-item-backgroundColor: ;
+  --comboboxMenu-item-gap: 0.5rem;
 
   display: grid;
   align-content: start;
@@ -274,18 +275,17 @@ Styled.List = styled(Command.List)<{ $withStickyLayout?: boolean }>`
 `;
 
 Styled.Item = styled(Command.Item)`
+  ${layoutMixins.scrollSnapItem}
   ${popoverMixins.item}
   --item-checked-backgroundColor: var(--comboboxMenu-item-checked-backgroundColor);
   --item-checked-textColor: var(--comboboxMenu-item-checked-textColor);
   --item-highlighted-textColor: var(--comboboxMenu-item-highlighted-textColor);
-
-  ${layoutMixins.scrollSnapItem}
+  --item-gap: var(--comboboxMenu-item-gap);
 
   background-color: var(--comboboxMenu-backgroundColor, inherit);
 
   display: flex;
   align-items: center;
-  gap: 0.5rem;
 
   &[aria-disabled='true'] {
     opacity: 0.75;

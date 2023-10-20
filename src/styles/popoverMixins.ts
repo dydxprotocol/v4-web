@@ -188,13 +188,14 @@ export const popoverMixins = {
     --item-highlighted-backgroundColor: var(--color-layer-2);
     --item-highlighted-textColor: var(--color-text-2);
 
+    --item-gap: 0.5em;
     --item-radius: 0px;
     --item-padding: 0.5em 1em;
 
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 0.5em;
+    gap: var(--item-gap);
 
     padding: var(--item-padding);
     border-radius: var(--item-radius);
