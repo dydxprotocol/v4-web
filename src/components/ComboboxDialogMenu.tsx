@@ -3,31 +3,43 @@ import styled, { AnyStyledComponent } from 'styled-components';
 
 import { type MenuConfig } from '@/constants/menus';
 
-import { Dialog, DialogPlacement } from '@/components/Dialog';
-import { ComboboxMenu } from '@/components/ComboboxMenu';
+import { Dialog, DialogPlacement, type DialogProps } from '@/components/Dialog';
+import { ComboboxMenu, type ComboboxMenuProps } from '@/components/ComboboxMenu';
 
 type ElementProps<MenuItemValue extends string | number, MenuGroupValue extends string | number> = {
-  isOpen?: boolean;
-  setIsOpen?: (open: boolean) => void;
   title?: React.ReactNode;
   description?: React.ReactNode;
-  slotTrigger?: React.ReactNode;
-  slotHeaderInner?: React.ReactNode;
-  slotFooter?: React.ReactNode;
   children?: React.ReactNode;
-
   items: MenuConfig<MenuItemValue, MenuGroupValue>;
-  onItemSelected?: () => void;
-  inputPlaceholder?: string;
-  slotEmpty?: React.ReactNode;
 };
 
 type StyleProps = {
-  placement: DialogPlacement,
   className?: string;
 };
 
-export const ComboboxDialogMenu = <MenuItemValue extends string | number, MenuGroupValue extends string | number>({
+type PickComboxMenuProps<
+  MenuItemValue extends string | number,
+  MenuGroupValue extends string | number
+> = Pick<
+  ComboboxMenuProps<MenuItemValue, MenuGroupValue>,
+  'inputPlaceholder' | 'onItemSelected' | 'slotEmpty' | 'withSearch' | 'withStickyLayout'
+>;
+
+type PickDialogProps = Pick<
+  DialogProps,
+  | 'description'
+  | 'isOpen'
+  | 'placement'
+  | 'setIsOpen'
+  | 'slotHeaderInner'
+  | 'slotTrigger'
+  | 'slotFooter'
+>;
+
+export const ComboboxDialogMenu = <
+  MenuItemValue extends string | number,
+  MenuGroupValue extends string | number
+>({
   isOpen = false,
   setIsOpen,
   title,
@@ -40,11 +52,16 @@ export const ComboboxDialogMenu = <MenuItemValue extends string | number, MenuGr
   onItemSelected,
   inputPlaceholder,
   slotEmpty,
+  withSearch,
+  withStickyLayout = true,
   children,
-  
+
   placement = DialogPlacement.Default,
   className,
-}: ElementProps<MenuItemValue, MenuGroupValue> & StyleProps) => (
+}: ElementProps<MenuItemValue, MenuGroupValue> &
+  PickComboxMenuProps<MenuItemValue, MenuGroupValue> &
+  PickDialogProps &
+  StyleProps) => (
   // TODO: sub-menu state management
   <Styled.Dialog
     isOpen={isOpen}
@@ -54,7 +71,6 @@ export const ComboboxDialogMenu = <MenuItemValue extends string | number, MenuGr
     slotHeaderInner={slotHeaderInner}
     slotTrigger={slotTrigger}
     slotFooter={slotFooter}
-
     placement={placement}
     className={className}
   >
@@ -64,7 +80,8 @@ export const ComboboxDialogMenu = <MenuItemValue extends string | number, MenuGr
       title={title}
       inputPlaceholder={inputPlaceholder}
       slotEmpty={slotEmpty}
-      withStickyLayout
+      withSearch={withSearch}
+      withStickyLayout={withStickyLayout}
     />
     {children}
   </Styled.Dialog>

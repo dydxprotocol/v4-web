@@ -8,7 +8,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Tag } from '@/components/Tag';
 
-type ElementProps<MenuItemValue extends string, MenuGroupValue extends string> = {
+type ElementProps<MenuItemValue extends string | number, MenuGroupValue extends string | number> = {
   items: MenuConfig<MenuItemValue, MenuGroupValue>;
   onItemSelected?: () => void;
 
@@ -23,6 +23,11 @@ type StyleProps = {
   withStickyLayout?: boolean;
 };
 
+export type ComboboxMenuProps<
+  MenuItemValue extends string | number,
+  MenuGroupValue extends string | number
+> = ElementProps<MenuItemValue, MenuGroupValue> & StyleProps;
+
 export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extends string>({
   items,
   onItemSelected,
@@ -34,7 +39,7 @@ export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extend
 
   className,
   withStickyLayout,
-}: ElementProps<MenuItemValue, MenuGroupValue> & StyleProps) => {
+}: ComboboxMenuProps<MenuItemValue, MenuGroupValue>) => {
   const [highlightedCommand, setHighlightedCommand] = useState<MenuItemValue>();
   const [searchValue, setSearchValue] = useState('');
   // const inputRef = useRef<HTMLInputElement | null>(null);
