@@ -16,13 +16,13 @@ import type { ResolutionString } from 'public/tradingview/charting_library';
 import type { ConnectNetworkEvent, NetworkConfig } from '@/constants/abacus';
 import { type Candle, RESOLUTION_MAP } from '@/constants/candles';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { DydxChainAsset } from '@/constants/wallets';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { log } from '@/lib/telemetry';
 
 import { useRestrictions } from './useRestrictions';
-import { DydxChainAsset } from '@/constants/wallets';
 
 type DydxContextType = ReturnType<typeof useDydxClientContext>;
 const DydxContext = createContext<DydxContextType>({} as DydxContextType);
