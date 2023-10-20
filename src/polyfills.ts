@@ -13,4 +13,6 @@ declare global {
 
     'abacus:connectNetwork': CustomEvent;
   }
+
+  var Intercom: any;
 }
