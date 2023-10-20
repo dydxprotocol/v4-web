@@ -31,29 +31,40 @@ export const HelpDialog = ({ setIsOpen }: ElementProps) => {
             value: 'help-center',
             label: stringGetter({ key: STRING_KEYS.HELP_CENTER }),
             description: stringGetter({ key: STRING_KEYS.HELP_CENTER_DESCRIPTION }),
-            onSelect: () =>
-              HELP_LINKS.helpCenter && globalThis.open(HELP_LINKS.helpCenter, '_blank'),
+            onSelect: () => {
+              HELP_LINKS.helpCenter && globalThis.open(HELP_LINKS.helpCenter, '_blank');
+              setIsOpen(false);
+            },
             slotBefore: <FileIcon />,
           },
           {
             value: 'api-documentation',
             label: stringGetter({ key: STRING_KEYS.API_DOCUMENTATION }),
             description: stringGetter({ key: STRING_KEYS.API_DOCUMENTATION_DESCRIPTION }),
-            onSelect: () => globalThis.open(HELP_LINKS.apiDocumentation, '_blank'),
+            onSelect: () => {
+              globalThis.open(HELP_LINKS.apiDocumentation, '_blank');
+              setIsOpen(false);
+            },
             slotBefore: <TerminalIcon />,
           },
           globalThis?.Intercom && {
             value: 'live-chat',
             label: stringGetter({ key: STRING_KEYS.LIVE_CHAT }),
             description: stringGetter({ key: STRING_KEYS.LIVE_CHAT_DESCRIPTION }),
-            onSelect: () => globalThis.Intercom('show'),
+            onSelect: () => {
+              globalThis.Intercom('show');
+              setIsOpen(false);
+            },
             slotBefore: <ChatIcon />,
           },
           {
             value: 'feedback',
             label: stringGetter({ key: STRING_KEYS.PROVIDE_FEEDBACK }),
             description: stringGetter({ key: STRING_KEYS.PROVIDE_FEEDBACK_DESCRIPTION }),
-            onSelect: () => globalThis.open(HELP_LINKS.feedback, '_blank'),
+            onSelect: () => {
+              globalThis.open(HELP_LINKS.feedback, '_blank');
+              setIsOpen(false);
+            },
             slotBefore: <FeedbackIcon />,
           },
         ].filter(isTruthy),
