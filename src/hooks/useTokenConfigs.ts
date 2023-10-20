@@ -9,11 +9,13 @@ export const useTokenConfigs = (): {
       denom: string;
       name: string;
       decimals: number;
+      gasDenom?: string;
     },
     [DydxChainAsset.CHAINTOKEN]: {
       denom: string;
       name: string;
       decimals: number;
+      gasDenom?: string;
     },
   };
   usdcDenom: string;
