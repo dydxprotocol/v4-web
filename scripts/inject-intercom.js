@@ -18,7 +18,7 @@ if (INTERCOM_APP_ID) {
     <script>
       window.intercomSettings = {
         api_base: 'https://api-iam.intercom.io',
-        app_id: ${INTERCOM_APP_ID},
+        app_id: '${INTERCOM_APP_ID}',
         custom_launcher_selector: '.custom_intercom',
         hide_default_launcher: true,
       };
