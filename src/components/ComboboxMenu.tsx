@@ -8,7 +8,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Tag } from '@/components/Tag';
 
-type ElementProps<MenuItemValue extends string, MenuGroupValue extends string> = {
+type ElementProps<MenuItemValue extends string | number, MenuGroupValue extends string | number> = {
   items: MenuConfig<MenuItemValue, MenuGroupValue>;
   onItemSelected?: () => void;
 
@@ -23,6 +23,11 @@ type StyleProps = {
   withStickyLayout?: boolean;
 };
 
+export type ComboboxMenuProps<
+  MenuItemValue extends string | number,
+  MenuGroupValue extends string | number
+> = ElementProps<MenuItemValue, MenuGroupValue> & StyleProps;
+
 export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extends string>({
   items,
   onItemSelected,
@@ -34,7 +39,7 @@ export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extend
 
   className,
   withStickyLayout,
-}: ElementProps<MenuItemValue, MenuGroupValue> & StyleProps) => {
+}: ComboboxMenuProps<MenuItemValue, MenuGroupValue>) => {
   const [highlightedCommand, setHighlightedCommand] = useState<MenuItemValue>();
   const [searchValue, setSearchValue] = useState('');
   // const inputRef = useRef<HTMLInputElement | null>(null);
@@ -171,6 +176,7 @@ Styled.Command = styled(Command)<{ $withStickyLayout?: boolean }>`
   --comboboxMenu-item-highlighted-backgroundColor: var(--color-layer-3);
   --comboboxMenu-item-highlighted-textColor: var(--color-text-1);
   --comboboxMenu-item-backgroundColor: ;
+  --comboboxMenu-item-gap: 0.5rem;
 
   display: grid;
   align-content: start;
@@ -269,18 +275,17 @@ Styled.List = styled(Command.List)<{ $withStickyLayout?: boolean }>`
 `;
 
 Styled.Item = styled(Command.Item)`
+  ${layoutMixins.scrollSnapItem}
   ${popoverMixins.item}
   --item-checked-backgroundColor: var(--comboboxMenu-item-checked-backgroundColor);
   --item-checked-textColor: var(--comboboxMenu-item-checked-textColor);
   --item-highlighted-textColor: var(--comboboxMenu-item-highlighted-textColor);
-
-  ${layoutMixins.scrollSnapItem}
+  --item-gap: var(--comboboxMenu-item-gap);
 
   background-color: var(--comboboxMenu-backgroundColor, inherit);
 
   display: flex;
   align-items: center;
-  gap: 0.5rem;
 
   &[aria-disabled='true'] {
     opacity: 0.75;

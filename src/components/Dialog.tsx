@@ -48,6 +48,8 @@ type StyleProps = {
   className?: string;
 };
 
+export type DialogProps = ElementProps & StyleProps;
+
 const DialogPortal = ({
   withPortal,
   container,
@@ -82,7 +84,7 @@ export const Dialog = ({
   hasHeaderBorder = false,
   children,
   className,
-}: ElementProps & StyleProps) => {
+}: DialogProps) => {
   const closeButtonRef = useRef<HTMLButtonElement>();
 
   const showOverlay = ![DialogPlacement.Inline, DialogPlacement.FullScreen].includes(placement);
