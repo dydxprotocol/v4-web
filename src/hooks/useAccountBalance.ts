@@ -6,7 +6,6 @@ import { useQuery } from 'react-query';
 import { formatUnits } from 'viem';
 
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
-import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { EvmAddress } from '@/constants/wallets';
 
 import { convertBech32Address } from '@/lib/addressUtils';
@@ -21,7 +20,6 @@ import { useTokenConfigs } from './useTokenConfigs';
 type UseAccountBalanceProps = {
   // Token Items
   addressOrDenom?: string;
-  assetSymbol?: string;
   decimals?: number;
 
   // Chain Items
@@ -40,7 +38,6 @@ export const CHAIN_DEFAULT_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeee
 
 export const useAccountBalance = ({
   addressOrDenom,
-  assetSymbol,
   bech32AddrPrefix,
   chainId,
   decimals = 0,
@@ -91,7 +88,7 @@ export const useAccountBalance = ({
   });
 
   const { formatted: evmBalance } = evmQuery.data || {};
-  const balance = !assetSymbol ? '0' : isCosmosChain ? cosmosQuery.data : evmBalance;
+  const balance = isCosmosChain ? cosmosQuery.data : evmBalance;
 
   const nativeTokenCoinBalance = balances?.[chainTokenDenom];
   const nativeTokenBalance = MustBigNumber(nativeTokenCoinBalance?.amount);
