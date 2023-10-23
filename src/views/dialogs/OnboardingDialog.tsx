@@ -87,10 +87,10 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
             title: stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TERMS }),
             children: (
               <Styled.Content>
-                <AcknowledgeTerms />
+                <AcknowledgeTerms onClose={() => setIsOpen?.(false)} />
               </Styled.Content>
             ),
-            width: '20rem',
+            width: '30rem',
           },
           [OnboardingSteps.DepositFunds]: {
             title: stringGetter({ key: STRING_KEYS.DEPOSIT }),
