@@ -37,7 +37,7 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { isMobile } = useBreakpoints();
 
-  const { walletType } = useAccounts();
+  const { disconnect, walletType } = useAccounts();
 
   const currentOnboardingStep = useSelector(calculateOnboardingStep);
 
@@ -45,10 +45,17 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
     if (!currentOnboardingStep) setIsOpen?.(false);
   }, [currentOnboardingStep]);
 
+  const setIsOpenFromDialog = (open: boolean) => {
+    if (!open && currentOnboardingStep === OnboardingSteps.AcknowledgeTerms) {
+      disconnect();
+    }
+    setIsOpen?.(open);
+  }
+
   return (
     <Styled.Dialog
       isOpen={Boolean(currentOnboardingStep)}
-      setIsOpen={setIsOpen}
+      setIsOpen={setIsOpenFromDialog}
       {...(currentOnboardingStep &&
         {
           [OnboardingSteps.ChooseWallet]: {
@@ -87,7 +94,7 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
             title: stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TERMS }),
             children: (
               <Styled.Content>
-                <AcknowledgeTerms onClose={() => setIsOpen?.(false)} />
+                <AcknowledgeTerms onClose={() => setIsOpenFromDialog?.(false)} />
               </Styled.Content>
             ),
             width: '30rem',

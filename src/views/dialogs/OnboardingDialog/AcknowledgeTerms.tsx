@@ -19,17 +19,12 @@ type ElementProps = {
 export const AcknowledgeTerms = ({ onClose, onContinue }: ElementProps) => {
   const stringGetter = useStringGetter();
 
-  const { disconnect, saveHasAcknowledgedTerms } = useAccounts();
+  const { saveHasAcknowledgedTerms } = useAccounts();
 
   const onAcknowledgement = () => {
     saveHasAcknowledgedTerms(true);
     onContinue?.();
   };
-
-  const onDecline = () => {
-    disconnect();
-    onClose?.();
-  }
 
   return (
     <>
@@ -60,7 +55,7 @@ export const AcknowledgeTerms = ({ onClose, onContinue }: ElementProps) => {
         </ul>
       </Styled.TOS>
       <Styled.Row>
-        <Styled.Button onClick={onDecline} action={ButtonAction.Base}>
+        <Styled.Button onClick={onClose} action={ButtonAction.Base}>
           {stringGetter({ key: STRING_KEYS.CLOSE })}
         </Styled.Button>
         <Styled.Button onClick={onAcknowledgement} action={ButtonAction.Primary}>
