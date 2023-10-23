@@ -74,13 +74,12 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     () => ({
       depositToSubaccount: async ({
         subaccountClient,
-        assetId = 0,
         amount,
       }: {
         subaccountClient: SubaccountClient;
         assetId?: number;
-        amount: Long;
-      }) => await compositeClient?.validatorClient.post.deposit(subaccountClient, assetId, amount),
+        amount: number;
+      }) => await compositeClient?.depositToSubaccount(subaccountClient, amount.toString()),
 
       withdrawFromSubaccount: async ({
         subaccountClient,
@@ -201,13 +200,9 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     async (balance: AccountBalance) => {
       if (!localDydxWallet) return;
 
-      const amountAfterDust = MustBigNumber(balance.amount)
-        .minus(AMOUNT_RESERVED_FOR_GAS_USDC) // keep 0.1 USDC in user's wallet for gas
-        .toString();
+      const amount = parseFloat(balance.amount) - AMOUNT_RESERVED_FOR_GAS_USDC;
 
-      const amount = Long.fromString(amountAfterDust || '0');
-
-      if (amount.greaterThan(Long.ZERO)) {
+      if (amount > 0) {
         const subaccountClient = new SubaccountClient(localDydxWallet, 0);
         await depositToSubaccount({ amount, subaccountClient });
       }
@@ -225,7 +220,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   }, [usdcCoinBalance]);
 
   const deposit = useCallback(
-    async (amount: Long) => {
+    async (amount: number) => {
       if (!subaccountClient) {
         return;
       }

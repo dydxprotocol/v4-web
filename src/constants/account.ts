@@ -44,4 +44,4 @@ export type EvmDerivedAddresses = {
   };
 };
 
-export const AMOUNT_RESERVED_FOR_GAS_USDC = 100_000;
+export const AMOUNT_RESERVED_FOR_GAS_USDC = 0.1;
