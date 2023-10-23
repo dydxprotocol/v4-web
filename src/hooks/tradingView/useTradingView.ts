@@ -44,7 +44,7 @@ export const useTradingView = ({
   const hasMarkets = marketIds.length > 0;
 
   useEffect(() => {
-    if (hasMarkets && isClientConnected) {
+    if (hasMarkets && isClientConnected && marketId) {
       const widgetOptions = getWidgetOptions();
       const widgetOverrides = getWidgetOverrides(appTheme);
       const options = {
@@ -75,7 +75,7 @@ export const useTradingView = ({
       tvWidgetRef.current = null;
       setIsChartReady(false);
     };
-  }, [getCandlesForDatafeed, isClientConnected, hasMarkets, selectedLocale, selectedNetwork]);
+  }, [getCandlesForDatafeed, isClientConnected, hasMarkets, selectedLocale, selectedNetwork, marketId]);
 
   return { savedResolution };
 };
