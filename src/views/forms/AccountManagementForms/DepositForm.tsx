@@ -87,7 +87,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   // Async Data
   const { balance, queryStatus, isQueryFetching } = useAccountBalance({
     addressOrDenom: sourceToken?.address || CHAIN_DEFAULT_TOKEN_ADDRESS,
-    assetSymbol: sourceToken?.symbol || undefined,
     chainId: chainId,
     decimals: sourceToken?.decimals || undefined,
     isCosmosChain: false,

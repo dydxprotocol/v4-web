@@ -22,7 +22,6 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 import { openDialog } from '@/state/dialogs';
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 
-// TODO(@aforaleka): replace with real data
 export const DYDXBalancePanel = () => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
@@ -110,7 +109,7 @@ export const DYDXBalancePanel = () => {
               value: (
                 <Output
                   type={OutputType.Asset}
-                  value={nativeTokenBalance + nativeStakingBalance}
+                  value={nativeTokenBalance.plus(nativeStakingBalance)}
                   tag={chainTokenLabel}
                 />
               ),
@@ -126,7 +125,7 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Header = styled.div`
   ${layoutMixins.spacedRow}
-  padding: 1.25rem 1.5rem 0.5rem;
+  padding: 1rem 1.5rem 0;
 `;
 
 Styled.Title = styled.h3`
@@ -155,7 +154,6 @@ Styled.ReceiveButton = styled(Button)`
 Styled.Content = styled.div`
   ${layoutMixins.flexColumn}
   gap: 0.75rem;
-  padding: 0 0.5rem 0.5rem;
 `;
 
 Styled.IconContainer = styled.div`
