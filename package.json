@@ -1,9 +1,9 @@
 {
   "name": "dydx-chain-web",
   "private": true,
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
-  "license": "BSL-1.1",
+  "license": "AGPL-3.0",
   "engines": {
     "node": ">=18"
   },
