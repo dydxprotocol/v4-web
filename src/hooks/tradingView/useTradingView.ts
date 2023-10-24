@@ -75,7 +75,7 @@ export const useTradingView = ({
       tvWidgetRef.current = null;
       setIsChartReady(false);
     };
-  }, [getCandlesForDatafeed, isClientConnected, hasMarkets, selectedLocale, selectedNetwork, marketId]);
+  }, [getCandlesForDatafeed, isClientConnected, hasMarkets, selectedLocale, selectedNetwork, !!marketId]);
 
   return { savedResolution };
 };
