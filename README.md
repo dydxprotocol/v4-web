@@ -1,6 +1,6 @@
 <p align="center"><img src="https://dydx.exchange/icon.svg?" width="256" /></p>
 
-<h1 align="center">v4 Web</h1>
+<h1 align="center">dYdX Chain Web</h1>
 
 <div align="center">
   <a href='https://github.com/dydxprotocol/v4-web/blob/main/LICENSE'>
