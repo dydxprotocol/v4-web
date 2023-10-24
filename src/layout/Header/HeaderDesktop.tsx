@@ -62,7 +62,7 @@ export const HeaderDesktop = () => {
               value: 'DOCUMENTATION',
               slotBefore: <Icon iconName={IconName.Terminal} />,
               label: stringGetter({ key: STRING_KEYS.DOCUMENTATION }),
-              href: 'https://v4-teacher.vercel.app/',
+              href: 'https://docs.dydx.exchange/',
             },
             {
               value: 'MINTSCAN',
