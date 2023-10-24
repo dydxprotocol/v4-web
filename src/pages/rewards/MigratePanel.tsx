@@ -21,6 +21,8 @@ import { WithReceipt } from '@/components/WithReceipt';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
 
+import { MustBigNumber } from '@/lib/numbers';
+
 const TOKEN_MIGRATION_LEARN_MORE_LINK =
   'https://www.dydx.foundation/blog/update-on-exploring-the-future-of-dydx';
 
@@ -50,7 +52,7 @@ export const MigratePanel = () => {
           </div>
           {import.meta.env.VITE_TOKEN_MIGRATION_URI && (
             <Button
-              action={tokenBalance ? ButtonAction.Primary : ButtonAction.Base}
+              action={MustBigNumber(tokenBalance).gt(0) ? ButtonAction.Primary : ButtonAction.Base}
               type={ButtonType.Link}
               href={import.meta.env.VITE_TOKEN_MIGRATION_URI}
               slotRight={<Icon iconName={IconName.LinkOut} />}

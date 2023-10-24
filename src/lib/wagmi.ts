@@ -46,6 +46,8 @@ import {
   WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS,
 } from '@/constants/wallets';
 
+import { isTruthy } from './isTruthy';
+
 // Config
 
 export const WAGMI_SUPPORTED_CHAINS: Chain[] = [
@@ -162,7 +164,6 @@ export const config = createConfig({
 // Custom connectors
 
 import type { ExternalProvider } from '@ethersproject/providers';
-import { isTruthy } from './isTruthy';
 
 // Create a custom wagmi InjectedConnector using a specific injected EIP-1193 provider (instead of wagmi's default detection logic)
 const createInjectedConnectorWithProvider = (provider: ExternalProvider) =>
