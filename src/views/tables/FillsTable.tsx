@@ -161,7 +161,7 @@ const getFillsTableColumnDef = ({
                 }[orderSide],
               })}
             </Styled.Side>
-            <Output type={OutputType.Text} value={asset.id} />
+            <Output type={OutputType.Text} value={asset?.id} />
           </Styled.TableCell>
         ),
       },
