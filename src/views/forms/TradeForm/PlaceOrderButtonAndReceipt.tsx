@@ -7,9 +7,8 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { TRADE_TYPE_STRINGS, MobilePlaceOrderSteps } from '@/constants/trade';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter, useTokenConfigs } from '@/hooks';
 
-import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
@@ -47,6 +46,7 @@ export const PlaceOrderButtonAndReceipt = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
+  const { chainTokenLabel } = useTokenConfigs();
 
   const canAccountTrade = useSelector(calculateCanAccountTrade);
   const subaccountNumber = useSelector(getSubaccountId);
@@ -88,7 +88,14 @@ export const PlaceOrderButtonAndReceipt = ({
           {/* <AssetIcon symbol="DYDX" /> */}
         </>
       ),
-      value: <Output type={OutputType.Asset} value={reward} useGrouping tag={reward ? "Dv4TNT" : ''} />,
+      value: (
+        <Output
+          type={OutputType.Asset}
+          value={reward}
+          useGrouping
+          tag={reward ? chainTokenLabel : ''}
+        />
+      ),
       tooltip: 'max-reward',
     },
     {
@@ -105,13 +112,9 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const buttonStatesPerStep = {
     [MobilePlaceOrderSteps.EditOrder]: {
-      buttonTextStringKey: shouldEnableTrade
-        ? STRING_KEYS.PREVIEW_ORDER
-        : actionStringKey
-        ? actionStringKey
-        : STRING_KEYS.UNAVAILABLE,
+      buttonTextStringKey: shouldEnableTrade ? STRING_KEYS.PREVIEW_ORDER : actionStringKey,
       buttonAction: ButtonAction.Primary,
-      buttonState: { isDisabled: !shouldEnableTrade },
+      buttonState: { isDisabled: !shouldEnableTrade, isLoading: hasMissingData },
     },
 
     [MobilePlaceOrderSteps.PreviewOrder]: {
@@ -137,7 +140,7 @@ export const PlaceOrderButtonAndReceipt = ({
     ? ButtonAction.Destroy
     : orderSideAction;
 
-  let buttonTextStringKey = STRING_KEYS.UNAVAILABLE;
+  let buttonTextStringKey;
   if (currentStep) {
     buttonTextStringKey = buttonStatesPerStep[currentStep].buttonTextStringKey;
   } else if (shouldEnableTrade) {
@@ -148,7 +151,7 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const buttonState = currentStep
     ? buttonStatesPerStep[currentStep].buttonState
-    : { isDisabled: !shouldEnableTrade || isLoading, isLoading };
+    : { isDisabled: !shouldEnableTrade || isLoading, isLoading: isLoading || hasMissingData };
 
   return (
     <WithDetailsReceipt detailItems={items}>
