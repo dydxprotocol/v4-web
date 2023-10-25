@@ -231,7 +231,7 @@ const getOrdersTableColumnDef = ({
           key: STRING_KEYS.FILL,
         })}`,
         renderCell: ({
-          asset: { symbol: assetSymbol },
+          asset,
           createdAtMilliseconds,
           size,
           status,
@@ -254,7 +254,7 @@ const getOrdersTableColumnDef = ({
                     value={createdAtMilliseconds}
                   />
                   <Styled.AssetIconWithStatus>
-                    <Styled.AssetIcon symbol={assetSymbol} />
+                    <Styled.AssetIcon symbol={asset?.id} />
                     <Styled.StatusDot color={statusIconColor} />
                   </Styled.AssetIconWithStatus>
                 </>
@@ -276,7 +276,7 @@ const getOrdersTableColumnDef = ({
                   type={OutputType.Asset}
                   value={size}
                   fractionDigits={TOKEN_DECIMALS}
-                  tag={assetSymbol}
+                  tag={asset?.id}
                 />
               </Styled.InlineRow>
             </TableCell>

@@ -17,7 +17,7 @@ import { MustBigNumber } from '@/lib/numbers';
 import { MidMarketPrice } from '@/views/MidMarketPrice';
 
 export const TradeHeaderMobile = () => {
-  const { name, symbol } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { name, id } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const navigate = useNavigate();
 
   const { market, priceChange24H, priceChange24HPercent } =
@@ -27,7 +27,7 @@ export const TradeHeaderMobile = () => {
     <Styled.Header>
       <BackButton onClick={() => navigate(AppRoute.Markets)} />
       <Styled.MarketName>
-        <Styled.AssetIcon symbol={symbol} />
+        <Styled.AssetIcon symbol={id} />
         <Styled.Name>
           <h3>{name}</h3>
           <span>{market}</span>
