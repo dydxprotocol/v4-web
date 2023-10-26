@@ -4,7 +4,7 @@ import { Content, Portal, Provider, Root, Trigger, Arrow } from '@radix-ui/react
 
 import { tooltipStrings } from '@/constants/tooltips';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter, useURLConfigs } from '@/hooks';
 
 import { Icon, IconName } from '@/components/Icon';
 
@@ -38,6 +38,7 @@ export const WithTooltip = ({
   slotTooltip,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
+  const urlConfigs = useURLConfigs();
 
   const getTooltipStrings = tooltip && tooltipStrings[tooltip];
   if (!getTooltipStrings && !tooltipString && !slotTooltip) return <>{children}</>;
@@ -49,6 +50,7 @@ export const WithTooltip = ({
     const { title, body } = getTooltipStrings({
       stringGetter,
       stringParams,
+      urlConfigs,
     });
     tooltipTitle = title;
     tooltipBody = body;

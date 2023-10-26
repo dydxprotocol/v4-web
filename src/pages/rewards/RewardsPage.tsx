@@ -5,7 +5,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints, useStringGetter, useURLConfigs } from '@/hooks';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -20,15 +20,10 @@ import { openDialog } from '@/state/dialogs';
 import { DYDXBalancePanel } from './DYDXBalancePanel';
 import { MigratePanel } from './MigratePanel';
 
-// TODO: consolidate help link urls to env variables
-const GOVERNANCE_HELP_URL = 'https://help.dydx.exchange/';
-const STAKING_HELP_URL =
-  'https://docs.dydx.community/dydx-chain-documentation/staking/how-to-stake';
-
 export const RewardsPage = () => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
-
+  const { governanceLearnmore, stakingLearnmore } = useURLConfigs();
   const { isTablet, isNotTablet } = useBreakpoints();
 
   const panelArrow = (
@@ -58,7 +53,7 @@ export const RewardsPage = () => {
         >
           <Styled.Description>
             {stringGetter({ key: STRING_KEYS.GOVERNANCE_DESCRIPTION })}
-            <Link href={GOVERNANCE_HELP_URL} onClick={(e) => e.stopPropagation()}>
+            <Link href={governanceLearnmore} onClick={(e) => e.stopPropagation()}>
               {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
             </Link>
           </Styled.Description>
@@ -71,7 +66,7 @@ export const RewardsPage = () => {
         >
           <Styled.Description>
             {stringGetter({ key: STRING_KEYS.STAKING_DESCRIPTION })}
-            <Link href={STAKING_HELP_URL} onClick={(e) => e.stopPropagation()}>
+            <Link href={stakingLearnmore} onClick={(e) => e.stopPropagation()}>
               {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
             </Link>
           </Styled.Description>

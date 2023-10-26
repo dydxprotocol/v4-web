@@ -57,10 +57,10 @@ export const tradeTooltips: TooltipStrings = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.INDEX_PRICE_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.INDEX_PRICE_BODY }),
   }),
-  'initial-margin-fraction': ({ stringGetter }) => ({
+  'initial-margin-fraction': ({ stringGetter, urlConfigs }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.INITIAL_MARGIN_FRACTION_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.INITIAL_MARGIN_FRACTION_BODY }),
-    learnMoreLink: 'https://help.dydx.exchange/articles/5232637-maximum-position-sizes',
+    learnMoreLink: urlConfigs?.initialMarginFractionLearnmore,
   }),
   'initial-stop': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.INITIAL_STOP_TITLE }),
@@ -146,10 +146,10 @@ export const tradeTooltips: TooltipStrings = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.REALIZED_PNL_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.REALIZED_PNL_BODY }),
   }),
-  'reduce-only': ({ stringGetter }) => ({
+  'reduce-only': ({ stringGetter, urlConfigs }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_BODY }),
-    learnMoreLink: 'https://help.dydx.exchange/articles/6345793-reduce-only-orders',
+    learnMoreLink: urlConfigs?.reduceOnlyLearnmore,
   }),
   spread: () => ({
     title: 'Spread',

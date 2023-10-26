@@ -15,6 +15,7 @@ import {
   useTokenConfigs,
   useStringGetter,
   useAccountBalance,
+  useURLConfigs,
 } from '@/hooks';
 
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
@@ -36,10 +37,9 @@ import { truncateAddress } from '@/lib/wallet';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { headerMixins } from '@/styles/headerMixins';
 
-const explorerBaseUri = 'https://testnet.mintscan.io/dydx-testnet';
-
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
+  const { mintscanBase } = useURLConfigs();
   const { isTablet } = useBreakpoints();
   const dispatch = useDispatch();
   const onboardingState = useSelector(getOnboardingState);
@@ -92,7 +92,7 @@ export const AccountMenu = () => {
               />
               <IconButton
                 action={ButtonAction.Base}
-                href={`${explorerBaseUri}/account/${dydxAddress}`}
+                href={`${mintscanBase}/account/${dydxAddress}`}
                 iconName={IconName.LinkOut}
                 shape={ButtonShape.Square}
                 type={ButtonType.Link}
@@ -167,7 +167,7 @@ export const AccountMenu = () => {
         //   value: 'ViewInExplorer',
         //   icon: <Icon iconName={IconName.Etherscan} />,
         //   label: stringGetter({ key: STRING_KEYS.OPEN_IN_ETHERSCAN }),
-        //   onSelect: () => globalThis.open(`${explorerBaseUri}/address/${address}`),
+        //   onSelect: () => globalThis.open(`${mintscanBase}/address/${address}`),
         //   separator: true,
         // },
         ...(onboardingState === OnboardingState.AccountConnected && hdKey

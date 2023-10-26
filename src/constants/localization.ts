@@ -8,6 +8,8 @@ import {
   WARNINGS_STRING_KEYS,
 } from '@dydxprotocol/v4-localization';
 
+import { type LinksConfigs } from '@/hooks/useURLConfigs';
+
 export { TOOLTIP_STRING_KEYS } from '@dydxprotocol/v4-localization';
 
 export enum SupportedLocales {
@@ -79,9 +81,11 @@ export type TooltipStrings = {
   [key: string]: ({
     stringGetter,
     stringParams,
+    urlConfigs,
   }: {
     stringGetter: StringGetterFunction;
     stringParams?: any;
+    urlConfigs?: LinksConfigs;
   }) => {
     title: string;
     body: string;

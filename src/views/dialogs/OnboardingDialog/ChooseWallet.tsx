@@ -13,16 +13,15 @@ import { Button } from '@/components/Button';
 import { Icon } from '@/components/Icon';
 import { Link } from '@/components/Link';
 
-import { useAccounts, useStringGetter } from '@/hooks';
+import { useAccounts, useStringGetter, useURLConfigs } from '@/hooks';
 import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-const aboutWalletsLink = `https://www.dydx.academy/video/defi-wallet`;
-
 export const ChooseWallet = () => {
   const stringGetter = useStringGetter();
+  const { walletLearnmore } = useURLConfigs();
 
   const displayedWallets = useDisplayedWallets();
 
@@ -63,7 +62,7 @@ export const ChooseWallet = () => {
       </Styled.Wallets>
 
       <Styled.Footer>
-        <Link href={aboutWalletsLink} withIcon>
+        <Link href={walletLearnmore} withIcon>
           {stringGetter({ key: STRING_KEYS.ABOUT_WALLETS })}
         </Link>
       </Styled.Footer>

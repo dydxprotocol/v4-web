@@ -8,7 +8,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 import { LogoShortIcon, BellStrokeIcon } from '@/icons';
 
-import { useTokenConfigs, useStringGetter } from '@/hooks';
+import { useTokenConfigs, useStringGetter, useURLConfigs } from '@/hooks';
 
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
@@ -28,6 +28,7 @@ import breakpoints from '@/styles/breakpoints';
 
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
+  const { documentation, community, mintscanBase } = useURLConfigs();
   const dispatch = useDispatch();
   const { chainTokenLabel } = useTokenConfigs();
 
@@ -63,19 +64,19 @@ export const HeaderDesktop = () => {
               value: 'DOCUMENTATION',
               slotBefore: <Icon iconName={IconName.Terminal} />,
               label: stringGetter({ key: STRING_KEYS.DOCUMENTATION }),
-              href: 'https://docs.dydx.exchange/',
+              href: documentation,
             },
             {
               value: 'MINTSCAN',
               slotBefore: <Icon iconName={IconName.Mintscan} />,
               label: stringGetter({ key: STRING_KEYS.MINTSCAN }),
-              href: 'https://testnet.mintscan.io/dydx-testnet',
+              href: mintscanBase,
             },
             {
               value: 'COMMUNITY',
               slotBefore: <Icon iconName={IconName.Discord} />,
               label: stringGetter({ key: STRING_KEYS.COMMUNITY }),
-              href: 'https://discord.gg/dydx',
+              href: community,
             },
             {
               value: 'TERMS_OF_USE',

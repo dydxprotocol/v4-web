@@ -37,7 +37,3 @@ export const HISTORY_ROUTE = `${AppRoute.Portfolio}/${PortfolioRoute.History}/:s
 export const DEFAULT_TRADE_ROUTE = `${AppRoute.Trade}/${DEFAULT_MARKETID}`;
 export const SETTINGS_ROUTE = `${AppRoute.Settings}/*`;
 export const DEFAULT_DOCUMENT_TITLE = 'dYdX';
-
-export enum ExternalLink {
-  Foundation = 'https://dydx.foundation',
-}
