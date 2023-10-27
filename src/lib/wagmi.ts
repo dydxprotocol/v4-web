@@ -46,6 +46,8 @@ import {
   WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS,
 } from '@/constants/wallets';
 
+import { isTruthy } from './isTruthy';
+
 // Config
 
 export const WAGMI_SUPPORTED_CHAINS: Chain[] = [
@@ -78,13 +80,17 @@ export const WAGMI_SUPPORTED_CHAINS: Chain[] = [
   celoAlfajores,
 ];
 
-const { chains, publicClient, webSocketPublicClient } = configureChains(WAGMI_SUPPORTED_CHAINS, [
-  // alchemyProvider({ apiKey: import.meta.env.VITE_ALCHEMY_API_KEY }),
-  jsonRpcProvider({
-    rpc: (chain) => ({ http: chain.rpcUrls.default.http[0] }),
-  }),
-  publicProvider(),
-]);
+const { chains, publicClient, webSocketPublicClient } = configureChains(
+  WAGMI_SUPPORTED_CHAINS,
+  [
+    import.meta.env.VITE_ALCHEMY_API_KEY &&
+      alchemyProvider({ apiKey: import.meta.env.VITE_ALCHEMY_API_KEY }),
+    jsonRpcProvider({
+      rpc: (chain) => ({ http: chain.rpcUrls.default.http[0] }),
+    }),
+    publicProvider(),
+  ].filter(isTruthy)
+);
 
 const injectedConnectorOptions = {
   chains,
@@ -202,5 +208,7 @@ export const resolveWagmiConnector = ({
     ? createInjectedConnectorWithProvider(walletConnection.provider)
     : walletConnection.type === WalletConnectionType.WalletConnect2 && walletConfig.walletconnect2Id
     ? createWalletConnect2ConnectorWithId(walletConfig.walletconnect2Id, walletConnectConfig)
-    : getConnectors(walletConnectConfig).find(({ id }: { id: string }) => id === walletConnectionConfig.wagmiConnectorId);
+    : getConnectors(walletConnectConfig).find(
+        ({ id }: { id: string }) => id === walletConnectionConfig.wagmiConnectorId
+      );
 };

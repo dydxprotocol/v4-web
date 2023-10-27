@@ -104,4 +104,5 @@ Styled.Button = styled(Button)`
 
 Styled.IconButton = styled(IconButton)`
   color: var(--color-text-0);
+  --color-border: var(--color-layer-6);
 `;
