@@ -112,7 +112,11 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const buttonStatesPerStep = {
     [MobilePlaceOrderSteps.EditOrder]: {
-      buttonTextStringKey: shouldEnableTrade ? STRING_KEYS.PREVIEW_ORDER : actionStringKey,
+      buttonTextStringKey: shouldEnableTrade
+        ? STRING_KEYS.PREVIEW_ORDER
+        : actionStringKey
+        ? actionStringKey
+        : STRING_KEYS.UNAVAILABLE,
       buttonAction: ButtonAction.Primary,
       buttonState: { isDisabled: !shouldEnableTrade, isLoading: hasMissingData },
     },
@@ -140,7 +144,7 @@ export const PlaceOrderButtonAndReceipt = ({
     ? ButtonAction.Destroy
     : orderSideAction;
 
-  let buttonTextStringKey;
+  let buttonTextStringKey = STRING_KEYS.UNAVAILABLE;
   if (currentStep) {
     buttonTextStringKey = buttonStatesPerStep[currentStep].buttonTextStringKey;
   } else if (shouldEnableTrade) {
@@ -151,7 +155,10 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const buttonState = currentStep
     ? buttonStatesPerStep[currentStep].buttonState
-    : { isDisabled: !shouldEnableTrade || isLoading, isLoading: isLoading || hasMissingData };
+    : {
+        isDisabled: !shouldEnableTrade || isLoading,
+        isLoading: isLoading || hasMissingData,
+      };
 
   return (
     <WithDetailsReceipt detailItems={items}>
