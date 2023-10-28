@@ -525,6 +525,9 @@ Styled.NavItem = styled(NavItem)<{ orientation: 'horizontal' | 'vertical' }>`
 `;
 
 Styled.Icon = styled(Icon)`
+  height: 0.75em;
+  transition: rotate 0.3s var(--ease-out-expo);
+
   ${Styled.List}[data-orientation="menu"] & {
     rotate: -0.25turn;
   }

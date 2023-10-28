@@ -168,7 +168,7 @@ Styled.TriggerIcon = styled.span`
   width: 0.75em;
 
   display: inline-flex;
-  transition: transform 0.3s var(--ease-out-expo);
+  transition: rotate 0.3s var(--ease-out-expo);
 
   ${Styled.Trigger}[data-state='open'] & {
     rotate: -0.5turn;
