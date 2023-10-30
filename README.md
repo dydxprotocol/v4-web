@@ -26,7 +26,7 @@ Alternatively, follow the [IPFS Kubo installation guide](https://docs.ipfs.tech
 
 ## Part 1: Setting up your local environment
 
-### Step 1: Clone the repo
+### 1. Clone the repo
 
 Clone the repository and navigate to its directory:
 
@@ -35,7 +35,7 @@ git clone https://github.com/dydxprotocol/v4-web.git
 cd v4-web
 ```
 
-### Step 2: Install pnpm and dependencies
+### 2. Install pnpm and dependencies
 
 Install pnpm and the project dependencies:
 
@@ -69,7 +69,9 @@ You'll need to provide a Wallet Connect project id to enable onboarding and wall
 - Create a project on https://cloud.walletconnect.com/app
 - Copy over the project ID into this [field](https://github.com/dydxprotocol/v4-web/blob/67ecbd75b43e0c264b7b4d2d9b3d969830b0621c/public/configs/env.json#L822C33-L822C46)
 
-## Part 4: Deploying with Vercel
+# Deployments
+
+## Deploying with Vercel
 
 ### Step 1: Connect your repository to Vercel
 
@@ -86,7 +88,7 @@ If you wish to incorporate analytics via Amplitude and Bugsnag, you can use our 
 
 For more details, check out Vercel's [official documentation](https://vercel.com/docs).
 
-## Part 5: Deploying to IPFS
+## Deploying to IPFS
 
 ### web3.storage: deploy to IPFS via web3.storage using the provided script
 
@@ -118,3 +120,18 @@ To access your content on IPFS:
 2. **Public IPFS gateway:** Access your content via a public IPFS gateway, such as [https://dweb.link](https://dweb.link/) or [https://w3s.link/](https://w3s.link/). Use the gateway URL with your CID appended, like `https://dweb.link/ipfs/your_cid`.
 
 Replace `your_cid` with the actual CID.
+
+## Cloudflare Settings
+
+We recommend that you add your website to Cloudflare for additional security settings.
+
+To block OFAC Sanctioned countries:
+1. Navigate Websites > Domain > Security > WAF
+
+2. Create Rule with the following settings:
+  * If incoming requests match
+`(ip.geoip.country eq "CU") or (ip.geoip.country eq "IR") or (ip.geoip.country eq "KP") or (ip.geoip.country eq "SY") or (ip.geoip.country eq "MM") or (ip.geoip.subdivision_1_iso_code eq "UA-09") or (ip.geoip.subdivision_1_iso_code eq "UA-14") or (ip.geoip.subdivision_1_iso_code eq "UA-43")`
+  * This rule will bring up a Cloudflare page when a restricted geography tries to access your site. You will have the option to display:
+    1. Custom Text
+      - (e.g. `Because you appear to be a resident of, or trading from, a jurisdiction that violates our terms of use, or have engaged in activity that violates our terms of use, you have been blocked. You may withdraw your funds from the protocol at any time.`)
+    2. Default Cloudflare WAF block page
