@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 dependencies:
   '@0xsquid/sdk':
     specifier: ^1.10.0
@@ -27,14 +23,14 @@ dependencies:
     specifier: ^0.31.0
     version: 0.31.0
   '@dydxprotocol/v4-abacus':
-    specifier: ^0.7.6
-    version: 0.7.6
+    specifier: ^1.0.3
+    version: 1.0.3
   '@dydxprotocol/v4-client-js':
-    specifier: ^0.40.3
-    version: 0.40.3
+    specifier: ^1.0.0
+    version: 1.0.0
   '@dydxprotocol/v4-localization':
-    specifier: ^0.1.32
-    version: 0.1.32
+    specifier: ^1.0.0
+    version: 1.0.0
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -979,12 +975,12 @@ packages:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
 
-  /@dydxprotocol/v4-abacus@0.7.6:
-    resolution: {integrity: sha512-FdDXRaFMfxhyrJJs0dNrb1KG6X95lPHelua1yCn/SVgzwGaAqlJczrzmdh98INntuRAgIxOu69R5mCGyekumyg==}
+  /@dydxprotocol/v4-abacus@1.0.3:
+    resolution: {integrity: sha512-GuX37/DMMNSke8ZFcw52II7IVJfUgVGHqoi1Uw2cUb+hgIjjSG3OtbyRWedm5r6nqWq8BNLOexI0VVFB6OMVYg==}
     dev: false
 
-  /@dydxprotocol/v4-client-js@0.40.3:
-    resolution: {integrity: sha512-nMQd6tYisKDKIbfx0BGJSYEOSt+I+t5SsaBSmlgTdso+w2rCRO9vyxS+u6MF9h4w5FsVRfhHo3e6uTWX48WpGQ==}
+  /@dydxprotocol/v4-client-js@1.0.0:
+    resolution: {integrity: sha512-ehfHO+zQy795TcJRwtiawadFHZyh4HnpJNP26hCGsIjLE5q6LLHweQHpK/1N/sXU1PBOuQwc7iaJnFop6gYauQ==}
     dependencies:
       '@cosmjs/amino': 0.30.1
       '@cosmjs/encoding': 0.31.1
@@ -1011,8 +1007,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@0.1.32:
-    resolution: {integrity: sha512-ZtXScxgFLjUt0Ag52RyFnQe9aEl1Aky5fp+vMGOBduVkFiCEMRMkSsSgg6grMdyw/x0AbnxOTRkhYoX2MsK9Ow==}
+  /@dydxprotocol/v4-localization@1.0.0:
+    resolution: {integrity: sha512-U7QjOlzpfSAVEchkNDB3xYRx7okzdeYi83XsnHwI+EHa2quFm/2Y2dhrBkT5fqpZmhcwxb/vG8AZmFSToOf9hA==}
     dev: false
 
   /@dydxprotocol/v4-proto@0.4.1:
@@ -14100,3 +14096,7 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false

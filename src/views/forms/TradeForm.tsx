@@ -322,7 +322,6 @@ export const TradeForm = ({
           summary={summary ?? undefined}
           currentStep={currentStep}
           showDeposit={inputAlert?.errorAction === TradeInputErrorAction.DEPOSIT}
-          showConnectWallet={inputAlert?.errorAction === TradeInputErrorAction.CONNECT_WALLET}
         />
       </Styled.Footer>
     </Styled.TradeForm>

@@ -24,6 +24,7 @@ import { openDialog } from '@/state/dialogs';
 
 import { headerMixins } from '@/styles/headerMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
+import breakpoints from '@/styles/breakpoints';
 
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
@@ -35,24 +36,24 @@ export const HeaderDesktop = () => {
       group: 'navigation',
       items: [
         {
-          value: 'MARKET',
-          label: stringGetter({ key: STRING_KEYS.MARKET }),
-          href: AppRoute.Markets,
-        },
-        {
           value: 'TRADE',
           label: stringGetter({ key: STRING_KEYS.TRADE }),
           href: AppRoute.Trade,
         },
         {
-          value: chainTokenLabel,
-          label: chainTokenLabel,
-          href: `/${chainTokenLabel}`,
-        },
-        {
           value: 'PORTFOLIO',
           label: stringGetter({ key: STRING_KEYS.PORTFOLIO }),
           href: AppRoute.Portfolio,
+        },
+        {
+          value: 'MARKETS',
+          label: stringGetter({ key: STRING_KEYS.MARKETS }),
+          href: AppRoute.Markets,
+        },
+        {
+          value: chainTokenLabel,
+          label: chainTokenLabel,
+          href: `/${chainTokenLabel}`,
         },
         {
           value: 'MORE',
@@ -62,7 +63,7 @@ export const HeaderDesktop = () => {
               value: 'DOCUMENTATION',
               slotBefore: <Icon iconName={IconName.Terminal} />,
               label: stringGetter({ key: STRING_KEYS.DOCUMENTATION }),
-              href: 'https://v4-teacher.vercel.app/',
+              href: 'https://docs.dydx.exchange/',
             },
             {
               value: 'MINTSCAN',
@@ -150,12 +151,15 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Header = styled.header`
   --header-horizontal-padding-mobile: 0.5rem;
+  --trigger-height: 2.25rem;
   --logo-width: 3.5rem;
 
   ${layoutMixins.container}
   ${layoutMixins.stickyHeader}
   ${layoutMixins.scrollSnapItem}
   backdrop-filter: none;
+
+  height: var(--page-currentHeaderHeight);
 
   grid-area: Header;
 
@@ -169,6 +173,14 @@ Styled.Header = styled.header`
     )
     var(--border-width) 1fr var(--border-width) auto;
 
+  @media ${breakpoints.tablet} {
+    --trigger-height: 3rem;
+  }
+
+  @media ${breakpoints.mobile} {
+    --navBefore-width: 7rem;
+  }
+
   font-size: 0.9375rem;
 
   :before {
@@ -179,6 +191,7 @@ Styled.Header = styled.header`
 Styled.NavigationMenu = styled(NavigationMenu)`
   & {
     --navigationMenu-height: var(--stickyArea-topHeight);
+    --navigationMenu-item-height: var(--trigger-height);
   }
 
   ${layoutMixins.scrollArea}

@@ -35,6 +35,7 @@ export { default as LockIcon } from './lock.svg';
 export { default as LogoShortIcon } from './logo-short';
 export { default as MarketsIcon } from './markets.svg';
 export { default as MenuIcon } from './menu.svg';
+export { default as MigrateIcon } from './migrate.svg';
 export { default as MintscanIcon } from './logos/mintscan.svg';
 export { default as OrderbookIcon } from './orderbook.svg';
 export { default as OverviewIcon } from './overview.svg';

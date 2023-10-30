@@ -17,7 +17,7 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, PortfolioRoute, HistoryRoute } from '@/constants/routes';
 import { wallets, WalletType } from '@/constants/wallets';
-import { useAccounts, useStringGetter } from '@/hooks';
+import { useAccounts, useStringGetter, useTokenConfigs } from '@/hooks';
 
 import { getOnboardingState } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
@@ -37,6 +37,7 @@ const Profile = () => {
   const isConnected = onboardingState !== OnboardingState.Disconnected;
 
   const { evmAddress, dydxAddress, walletType } = useAccounts();
+  const { chainTokenLabel } = useTokenConfigs();
 
   const { data: ensName } = useEnsName({
     address: evmAddress,
@@ -137,7 +138,11 @@ const Profile = () => {
             layout="grid"
           />
         </Panel>
-        <Styled.RewardsPanel header={stringGetter({ key: STRING_KEYS.REWARDS })} hasSeparator>
+        <Styled.RewardsPanel
+          slotHeaderContent={stringGetter({ key: STRING_KEYS.REWARDS })}
+          href={`/${chainTokenLabel}`}
+          hasSeparator
+        >
           <Styled.Details
             items={[
               { key: 'maker', label: stringGetter({ key: STRING_KEYS.YOU_WILL_EARN }), value: '-' },
@@ -149,8 +154,8 @@ const Profile = () => {
       </Styled.EqualGrid>
 
       <Styled.TablePanel
-        header={stringGetter({ key: STRING_KEYS.HISTORY })}
-        linkto={`${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.Trades}`}
+        slotHeaderContent={stringGetter({ key: STRING_KEYS.HISTORY })}
+        href={`${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.Trades}`}
         hasSeparator
       >
         <FillsTable
@@ -273,22 +278,21 @@ Styled.RewardsPanel = styled(Panel)`
 `;
 
 Styled.TablePanel = styled(Panel)`
-  padding: 0;
   max-width: calc(100vw - 2rem);
   max-height: 10rem;
+  margin-top: 0.5rem;
+  padding: 0;
+  border-radius: 0.875rem;
 
   table {
     --tableCell-padding: 0.25rem 1rem;
-
-    background-color: transparent;
-
+    --tableRow-backgroundColor: var(--color-layer-3);
+    background-color: var(--color-layer-3);
     thead {
       color: var(--color-text-0);
     }
 
     tbody {
-      background-color: transparent;
-
       tr {
         td:nth-child(2),
         td:nth-child(3) {
