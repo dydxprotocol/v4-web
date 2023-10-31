@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@0xsquid/sdk':
     specifier: ^1.10.0
@@ -23,8 +27,8 @@ dependencies:
     specifier: ^0.31.0
     version: 0.31.0
   '@dydxprotocol/v4-abacus':
-    specifier: ^1.0.3
-    version: 1.0.3
+    specifier: ^1.0.9
+    version: 1.0.9
   '@dydxprotocol/v4-client-js':
     specifier: ^1.0.0
     version: 1.0.0
@@ -975,8 +979,8 @@ packages:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.0.3:
-    resolution: {integrity: sha512-GuX37/DMMNSke8ZFcw52II7IVJfUgVGHqoi1Uw2cUb+hgIjjSG3OtbyRWedm5r6nqWq8BNLOexI0VVFB6OMVYg==}
+  /@dydxprotocol/v4-abacus@1.0.9:
+    resolution: {integrity: sha512-SivceYSIBDRZth4mEIqEX7tqDGtiVR1fMYkLhE+Ngz1Nir0YciDYdQt+gPtI+/4SvzPPlnWHoB2J5YVDWxC0Ig==}
     dev: false
 
   /@dydxprotocol/v4-client-js@1.0.0:
@@ -7652,7 +7656,7 @@ packages:
     resolution: {integrity: sha512-WIdaQ8uW1vIbYvNnAVunkC6yxTrneJC7VQ5UUQ0kuw8b0C0A39KTIpoQHCfc8tV7o9vF4niwRhdXEdfAgQEsQQ==}
     dependencies:
       cosmos-directory-types: 0.0.6
-      node-fetch-native: 1.4.0
+      node-fetch-native: 1.4.1
     dev: false
 
   /cosmos-directory-types@0.0.6:
@@ -11283,8 +11287,8 @@ packages:
     engines: {node: '>=10.5.0'}
     dev: true
 
-  /node-fetch-native@1.4.0:
-    resolution: {integrity: sha512-F5kfEj95kX8tkDhUCYdV8dg3/8Olx/94zB8+ZNthFs6Bz31UpUi8Xh40TN3thLwXgrwXry1pEg9lJ++tLWTcqA==}
+  /node-fetch-native@1.4.1:
+    resolution: {integrity: sha512-NsXBU0UgBxo2rQLOeWNZqS3fvflWePMECr8CoSWoSTqCqGbVVsvl9vZu1HfQicYN0g5piV9Gh8RTEvo/uP752w==}
     dev: false
 
   /node-fetch@2.6.12:
@@ -14096,7 +14100,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
