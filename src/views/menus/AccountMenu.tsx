@@ -139,7 +139,7 @@ export const AccountMenu = () => {
                     fractionDigits={2}
                   />
                 </div>
-                <AssetActions asset={DydxChainAsset.USDC} dispatch={dispatch} />
+                <AssetActions asset={DydxChainAsset.USDC} dispatch={dispatch} withOnboarding />
               </div>
             </Styled.Balances>
           </Styled.AccountInfo>
@@ -212,28 +212,51 @@ export const AccountMenu = () => {
   );
 };
 
-const AssetActions = memo(({ asset, dispatch }: { asset: DydxChainAsset; dispatch: Dispatch }) => (
-  <Styled.InlineRow>
-    {[
-      // TODO(@rosepuppy): Add withdraw action for USDC
-      {
-        dialogType: DialogTypes.Receive,
-        iconName: IconName.Qr,
-      },
-      { dialogType: DialogTypes.Transfer, iconName: IconName.Send },
-    ].map(({ iconName, dialogType }) => (
-      <IconButton
-        key={dialogType}
-        action={ButtonAction.Base}
-        shape={ButtonShape.Square}
-        iconName={iconName}
-        onClick={() =>
-          dispatch(openDialog({ type: dialogType, dialogProps: { selectedAsset: asset } }))
-        }
-      />
-    ))}
-  </Styled.InlineRow>
-));
+const AssetActions = memo(
+  ({
+    asset,
+    dispatch,
+    withOnboarding,
+  }: {
+    asset: DydxChainAsset;
+    dispatch: Dispatch;
+    withOnboarding?: boolean;
+  }) => (
+    <Styled.InlineRow>
+      {[
+        // TODO(@rosepuppy): Add withdraw action for USDC
+        {
+          dialogType: DialogTypes.Receive,
+          dialogProps: { selectedAsset: asset },
+          iconName: IconName.Qr,
+        },
+        {
+          dialogType: DialogTypes.Transfer,
+          dialogProps: { selectedAsset: asset },
+          iconName: IconName.Send,
+        },
+        withOnboarding && {
+          dialogType: DialogTypes.Withdraw,
+          iconName: IconName.Upload,
+        },
+        withOnboarding && {
+          dialogType: DialogTypes.Deposit,
+          iconName: IconName.Download,
+        },
+      ]
+        .filter(isTruthy)
+        .map(({ iconName, dialogType, dialogProps }) => (
+          <IconButton
+            key={dialogType}
+            action={ButtonAction.Base}
+            shape={ButtonShape.Square}
+            iconName={iconName}
+            onClick={() => dispatch(openDialog({ type: dialogType, dialogProps }))}
+          />
+        ))}
+    </Styled.InlineRow>
+  )
+);
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
@@ -250,6 +273,10 @@ Styled.Column = styled.div`
 
 Styled.InlineRow = styled.div`
   ${layoutMixins.inlineRow}
+  flex-wrap: wrap;
+
+  width: calc(1.75rem * 2 + 0.5ch);
+  min-width: 0;
 `;
 
 Styled.AddressRow = styled.div`
