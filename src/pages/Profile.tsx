@@ -180,7 +180,7 @@ Styled.MobileProfileLayout = styled.div`
   ${layoutMixins.contentContainerPage}
 
   gap: 1rem;
-  padding: 1rem;
+  padding: 1.25rem;
 `;
 
 Styled.Header = styled.header`
@@ -278,13 +278,17 @@ Styled.RewardsPanel = styled(Panel)`
 `;
 
 Styled.TablePanel = styled(Panel)`
-  max-width: calc(100vw - 2rem);
-  max-height: 10rem;
-  margin-top: 0.5rem;
-  padding: 0;
-  border-radius: 0.875rem;
+  --panel-content-paddingY: 0;
+  --panel-content-paddingX: 0;
+
+  > div > div {
+    margin-top: 0.5rem;
+    --scrollArea-height: 10rem;
+    border-radius: 0.875rem;
+  }
 
   table {
+    max-height: 10rem;
     --tableCell-padding: 0.25rem 1rem;
     --tableRow-backgroundColor: var(--color-layer-3);
     background-color: var(--color-layer-3);

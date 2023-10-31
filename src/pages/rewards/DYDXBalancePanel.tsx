@@ -32,11 +32,11 @@ export const DYDXBalancePanel = () => {
   const { chainTokenLabel } = useTokenConfigs();
 
   return (
-    <Panel
+    <Styled.Panel
       slotHeader={
         <Styled.Header>
           <Styled.Title>
-            {/* <AssetIcon symbol="DYDX" /> */}
+            <AssetIcon symbol={chainTokenLabel} />
             {chainTokenLabel}
           </Styled.Title>
           <Styled.ReceiveAndTransferButtons>
@@ -117,14 +117,19 @@ export const DYDXBalancePanel = () => {
           ]}
         />
       </Styled.Content>
-    </Panel>
+    </Styled.Panel>
   );
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
+Styled.Panel = styled(Panel)`
+  --panel-paddingX: 1.5rem;
+`;
+
 Styled.Header = styled.div`
   ${layoutMixins.spacedRow}
+  gap: 1rem;
   padding: 1rem 1.5rem 0;
 `;
 
@@ -177,7 +182,7 @@ Styled.WalletAndStakedBalance = styled(Details)`
   --details-item-backgroundColor: var(--color-layer-6);
 
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
+  gap: 1rem;
 
   > div {
     gap: 1rem;

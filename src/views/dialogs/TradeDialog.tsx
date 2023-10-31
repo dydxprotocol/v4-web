@@ -73,9 +73,7 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
             <Styled.ToggleGroup
               items={allTradeTypeItems}
               value={selectedTradeType}
-              onValueChange={(tradeType: TradeTypes) =>
-                onTradeTypeChange(tradeType || selectedTradeType)
-              }
+              onValueChange={onTradeTypeChange}
             />
           ),
         },

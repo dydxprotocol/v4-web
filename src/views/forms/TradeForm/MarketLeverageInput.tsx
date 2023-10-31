@@ -153,9 +153,7 @@ export const MarketLeverageInput = ({
           value: MustBigNumber(leverageAmount).toFixed(LEVERAGE_DECIMALS),
         }))}
         value={MustBigNumber(formattedLeverageValue).abs().toFixed(LEVERAGE_DECIMALS)} // sign agnostic
-        onValueChange={(option?: number) =>
-          updateLeverage(option === undefined ? formattedLeverageValue : option)
-        }
+        onValueChange={updateLeverage}
         shape={ButtonShape.Rectangle}
       />
     </>

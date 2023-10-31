@@ -31,7 +31,7 @@ export const Panel = ({
   hasSeparator,
   className,
 }: PanelProps & PanelStyleProps) => (
-  <Styled.Panel onClick={onClick}>
+  <Styled.Panel onClick={onClick} className={className}>
     <Styled.Left>
       {href ? (
         <Link to={href}>
@@ -53,7 +53,7 @@ export const Panel = ({
           </Styled.Header>
         )
       )}
-      <Styled.Content className={className}>{children}</Styled.Content>
+      <Styled.Content>{children}</Styled.Content>
     </Styled.Left>
     {slotRight}
   </Styled.Panel>
@@ -61,11 +61,29 @@ export const Panel = ({
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
-Styled.Panel = styled.section`
+Styled.Panel = styled.section<{ onClick?: () => void }>`
+  --panel-paddingY: 1rem;
+  --panel-paddingX: 1rem;
+  --panel-content-paddingY: var(--panel-paddingY);
+  --panel-content-paddingX: var(--panel-paddingX);
+
   ${layoutMixins.row}
 
   background-color: var(--color-layer-3);
   border-radius: 0.875rem;
+
+  ${({ onClick }) =>
+    onClick &&
+    css`
+      cursor: pointer;
+
+      &:hover {
+        button:not(:disabled) {
+          color: var(--button-hover-textColor);
+          filter: var(--button-hover-filter);
+        }
+      }
+    `}
 `;
 
 Styled.Left = styled.div`
@@ -75,7 +93,7 @@ Styled.Left = styled.div`
 
 Styled.Header = styled.header<{ hasSeparator?: boolean }>`
   ${layoutMixins.spacedRow}
-  padding: 1rem 1rem;
+  padding: var(--panel-paddingY) var(--panel-paddingX);
 
   ${({ hasSeparator }) =>
     hasSeparator &&
@@ -94,5 +112,5 @@ Styled.Content = styled.div`
   ${layoutMixins.scrollArea}
   ${layoutMixins.stickyArea0}
   --stickyArea0-background: transparent;
-  padding: 1rem 1rem;
+  padding: var(--panel-content-paddingY) var(--panel-content-paddingX);
 `;

@@ -40,11 +40,7 @@ export const RewardsPage = () => {
     <Styled.Page>
       {import.meta.env.VITE_V3_TOKEN_ADDRESS && <MigratePanel />}
       <Styled.PanelRow>
-        {isTablet && (
-          <Styled.BalancePanelContainer>
-            <DYDXBalancePanel />
-          </Styled.BalancePanelContainer>
-        )}
+        {isTablet && <DYDXBalancePanel />}
 
         <Styled.Panel
           slotHeader={<Styled.Title>{stringGetter({ key: STRING_KEYS.GOVERNANCE })}</Styled.Title>}
@@ -72,11 +68,7 @@ export const RewardsPage = () => {
           </Styled.Description>
         </Styled.Panel>
 
-        {isNotTablet && (
-          <Styled.BalancePanelContainer>
-            <DYDXBalancePanel />
-          </Styled.BalancePanelContainer>
-        )}
+        {isNotTablet && <DYDXBalancePanel />}
       </Styled.PanelRow>
     </Styled.Page>
   );
@@ -87,10 +79,26 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.Page = styled.div`
   ${layoutMixins.contentContainerPage}
   gap: 1.5rem;
+  padding: 2rem;
+  align-items: center;
+
+  > * {
+    --content-max-width: 70rem;
+    max-width: min(calc(100vw - 4rem), var(--content-max-width));
+  }
+
+  @media ${breakpoints.tablet} {
+    padding: 1.25rem;
+
+    > * {
+      max-width: calc(100vw - 2.5rem);
+      width: 100%;
+    }
+  }
 `;
 
 Styled.Panel = styled(Panel)`
-  padding: 1rem 1.5rem;
+  --panel-paddingX: 1.5rem;
 `;
 
 Styled.Title = styled.h3`
@@ -105,27 +113,14 @@ Styled.Description = styled.div`
 `;
 
 Styled.PanelRow = styled.div`
-  ${layoutMixins.spacedRow}
+  ${layoutMixins.gridEqualColumns}
   gap: 1.5rem;
-  max-width: min(100vw, var(--content-max-width));
-  align-items: flex-start;
 
-  > section {
-    cursor: pointer;
-  }
+  align-items: flex-start;
 
   @media ${breakpoints.tablet} {
     grid-auto-flow: row;
     grid-template-columns: 1fr;
-    max-width: auto;
-  }
-`;
-
-Styled.BalancePanelContainer = styled.div`
-  width: 21.25rem;
-
-  @media ${breakpoints.tablet} {
-    width: auto;
   }
 `;
 
@@ -135,5 +130,5 @@ Styled.IconButton = styled(IconButton)`
 `;
 
 Styled.Arrow = styled.div`
-  padding: 1rem 1.5rem;
+  padding: 1rem;
 `;
