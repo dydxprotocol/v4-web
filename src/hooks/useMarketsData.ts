@@ -9,7 +9,7 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 import { isTruthy } from '@/lib/isTruthy';
 
 const filterFunctions = {
-  [MarketFilters.ALL]: (market: MarketData) => true,
+  [MarketFilters.ALL]: () => true,
   [MarketFilters.LAYER_1]: (market: MarketData) => {
     return market.asset.tags?.toArray().includes('Layer 1');
   },
