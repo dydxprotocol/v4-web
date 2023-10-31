@@ -19,9 +19,9 @@ export { default as CoinsIcon } from './coins.svg';
 export { default as CommentIcon } from './comment.svg';
 export { default as CopyIcon } from './copy.svg';
 export { default as CubeIcon } from './cube.svg';
+export { default as DepositIcon } from './deposit.svg';
 export { default as DepthChartIcon } from './depth-chart.svg';
 export { default as DiscordIcon } from './discord.svg';
-export { default as DownloadIcon } from './download.svg';
 export { default as ExportKeysIcon } from './export-keys.svg';
 export { default as FeedbackIcon } from './feedback.svg';
 export { default as FileIcon } from './file.svg';
@@ -59,8 +59,8 @@ export { default as TradeIcon } from './trade.svg';
 export { default as TransferIcon } from './transfer.svg';
 export { default as TriangleIcon } from './triangle.svg';
 export { default as TryAgainIcon } from './try-again.svg';
-export { default as UploadIcon } from './upload.svg';
 export { default as WarningIcon } from './warning.svg';
+export { default as WithdrawIcon } from './withdraw.svg';
 
 // Wallets
 export { default as BitkeepIcon } from './wallets/bitkeep.svg';

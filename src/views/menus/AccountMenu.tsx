@@ -224,29 +224,23 @@ const AssetActions = memo(
   }) => (
     <Styled.InlineRow>
       {[
-        // TODO(@rosepuppy): Add withdraw action for USDC
-        {
-          dialogType: DialogTypes.Receive,
-          dialogProps: { selectedAsset: asset },
-          iconName: IconName.Qr,
+        withOnboarding && {
+          dialogType: DialogTypes.Withdraw,
+          iconName: IconName.Withdraw,
+        },
+        withOnboarding && {
+          dialogType: DialogTypes.Deposit,
+          iconName: IconName.Deposit,
         },
         {
           dialogType: DialogTypes.Transfer,
           dialogProps: { selectedAsset: asset },
           iconName: IconName.Send,
         },
-        withOnboarding && {
-          dialogType: DialogTypes.Withdraw,
-          iconName: IconName.Upload,
-        },
-        withOnboarding && {
-          dialogType: DialogTypes.Deposit,
-          iconName: IconName.Download,
-        },
       ]
         .filter(isTruthy)
         .map(({ iconName, dialogType, dialogProps }) => (
-          <IconButton
+          <Styled.IconButton
             key={dialogType}
             action={ButtonAction.Base}
             shape={ButtonShape.Square}
@@ -273,10 +267,6 @@ Styled.Column = styled.div`
 
 Styled.InlineRow = styled.div`
   ${layoutMixins.inlineRow}
-  flex-wrap: wrap;
-
-  width: calc(1.75rem * 2 + 0.5ch);
-  min-width: 0;
 `;
 
 Styled.AddressRow = styled.div`
@@ -377,4 +367,8 @@ Styled.ConnectToChain = styled(Styled.Column)`
     color: var(--color-text-1);
     font: var(--font-small-book);
   }
+`;
+
+Styled.IconButton = styled(IconButton)`
+  --button-padding: 0 0.25rem;
 `;

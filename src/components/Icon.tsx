@@ -24,10 +24,10 @@ import {
   CommentIcon,
   CopyIcon,
   CubeIcon,
-  DiscordIcon,
-  DownloadIcon,
-  EtherscanIcon,
+  DepositIcon,
   DepthChartIcon,
+  DiscordIcon,
+  EtherscanIcon,
   ExportKeysIcon,
   FeedbackIcon,
   FileIcon,
@@ -67,10 +67,10 @@ import {
   TransferIcon,
   TriangleIcon,
   TryAgainIcon,
-  UploadIcon,
   WarningIcon,
   WebsiteIcon,
   WhitepaperIcon,
+  WithdrawIcon,
 } from '@/icons';
 
 export enum IconName {
@@ -95,9 +95,9 @@ export enum IconName {
   Comment = 'Comment',
   Copy = 'Copy',
   Cube = 'Cube',
+  Deposit = 'Deposit',
   DepthChart = 'DepthChart',
   Discord = 'Discord',
-  Download = 'Download',
   Etherscan = 'Etherscan',
   ExportKeys = 'ExportKeys',
   Feedback = 'Feedback',
@@ -139,10 +139,10 @@ export enum IconName {
   Transfer = 'Transfer',
   Triangle = 'Triangle',
   TryAgain = 'TryAgain',
-  Upload = 'Upload',
   Warning = 'Warning',
   Website = 'Website',
   Whitepaper = 'Whitepaper',
+  Withdraw = 'Withdraw',
 }
 
 const icons = {
@@ -167,9 +167,9 @@ const icons = {
   [IconName.Comment]: CommentIcon,
   [IconName.Copy]: CopyIcon,
   [IconName.Cube]: CubeIcon,
+  [IconName.Deposit]: DepositIcon,
   [IconName.DepthChart]: DepthChartIcon,
   [IconName.Discord]: DiscordIcon,
-  [IconName.Download]: DownloadIcon,
   [IconName.Etherscan]: EtherscanIcon,
   [IconName.ExportKeys]: ExportKeysIcon,
   [IconName.Feedback]: FeedbackIcon,
@@ -210,10 +210,10 @@ const icons = {
   [IconName.Transfer]: TransferIcon,
   [IconName.Triangle]: TriangleIcon,
   [IconName.TryAgain]: TryAgainIcon,
-  [IconName.Upload]: UploadIcon,
   [IconName.Warning]: WarningIcon,
   [IconName.Website]: WebsiteIcon,
   [IconName.Whitepaper]: WhitepaperIcon,
+  [IconName.Withdraw]: WithdrawIcon,
 } as Record<IconName, ElementType>;
 
 type ElementProps = {
