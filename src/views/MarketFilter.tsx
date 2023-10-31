@@ -34,9 +34,7 @@ export const MarketFilter = ({
             value,
           }))}
           value={selectedFilter}
-          onValueChange={(newFilter: string) => {
-            onChangeFilter((newFilter || selectedFilter) as MarketFilters);
-          }}
+          onValueChange={onChangeFilter}
         />
       )}
 

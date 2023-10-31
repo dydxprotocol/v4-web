@@ -209,7 +209,7 @@ export const ClosePositionForm = ({
           value: value.toString(),
         }))}
         value={percent?.toString() ?? ''}
-        onValueChange={(value: any) => onSelectPercentage((value || percent?.toString()) ?? '')}
+        onValueChange={onSelectPercentage}
         shape={ButtonShape.Rectangle}
       />
 
