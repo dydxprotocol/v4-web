@@ -71,7 +71,7 @@ const NavItem = forwardRef(
           )}
         </span>
         {slotAfter}
-        {subitems?.length && <Styled.Icon iconName={IconName.Caret} />}
+        {subitems?.length && <Styled.Icon iconName={IconName.Triangle} />}
       </>
     );
 
@@ -525,7 +525,7 @@ Styled.NavItem = styled(NavItem)<{ orientation: 'horizontal' | 'vertical' }>`
 `;
 
 Styled.Icon = styled(Icon)`
-  height: 0.75em;
+  font-size: 0.375em;
   transition: rotate 0.3s var(--ease-out-expo);
 
   ${Styled.List}[data-orientation="menu"] & {
