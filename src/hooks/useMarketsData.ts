@@ -6,6 +6,8 @@ import { MarketFilters, MARKET_FILTER_LABELS, type MarketData } from '@/constant
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
+import { isTruthy } from '@/lib/isTruthy';
+
 const filterFunctions = {
   [MarketFilters.ALL]: (market: MarketData) => true,
   [MarketFilters.LAYER_1]: (market: MarketData) => {
@@ -28,13 +30,15 @@ export const useMarketsData = (
   const allAssets = useSelector(getAssets, shallowEqual) || {};
 
   const markets = useMemo(() => {
-    return Object.values(allPerpetualMarkets).map((marketData) => ({
-      asset: allAssets[marketData.assetId],
-      tickSizeDecimals: marketData.configs?.tickSizeDecimals,
-      ...marketData,
-      ...marketData.perpetual,
-      ...marketData.configs,
-    })) as MarketData[];
+    return Object.values(allPerpetualMarkets)
+      .filter(isTruthy)
+      .map((marketData) => ({
+        asset: allAssets[marketData.assetId],
+        tickSizeDecimals: marketData.configs?.tickSizeDecimals,
+        ...marketData,
+        ...marketData.perpetual,
+        ...marketData.configs,
+      })) as MarketData[];
   }, [allPerpetualMarkets, allAssets]);
 
   const filteredMarkets = useMemo(() => {
