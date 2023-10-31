@@ -70,7 +70,7 @@ export const Fees = () => {
           <Styled.AdditionalConditionsText>
             {isAdditional && stringGetter({ key: STRING_KEYS.AND })}{' '}
             {stringGetter({ key: STRING_KEYS.MAKER_MARKET_SHARE })}{' '}
-            <Styled.Highlighted>{' >'}</Styled.Highlighted>{' '}
+            <Styled.Highlighted>{'>'}</Styled.Highlighted>{' '}
             <Styled.HighlightOutput
               type={OutputType.Percent}
               value={makerShare}
