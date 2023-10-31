@@ -2,7 +2,7 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints, useStringGetter, useURLConfigs } from '@/hooks';
 
 import { Button } from '@/components/Button';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
@@ -15,12 +15,10 @@ type ElementProps = {
   setIsOpen: (open: boolean) => void;
 };
 
-// TODO: replace placeholder URL with real URLs when avaialble
-const KEPLR_DASHBOARD_URL = 'https://testnet.keplr.app/';
-const HELP_URL = 'https://help.dydx.exchange/en/articles/2921366-how-do-i-create-an-account-or-sign-up';
-
 export const ExternalNavKeplrDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
+  const { keplrDashboard, accountExportLearnMore } = useURLConfigs();
+
   const { isTablet } = useBreakpoints();
 
   return (
@@ -31,7 +29,7 @@ export const ExternalNavKeplrDialog = ({ setIsOpen }: ElementProps) => {
       placement={isTablet ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
       <Styled.Content>
-        <Styled.Button type={ButtonType.Link} size={ButtonSize.XLarge} href={KEPLR_DASHBOARD_URL}>
+        <Styled.Button type={ButtonType.Link} size={ButtonSize.XLarge} href={keplrDashboard}>
           <span>
             {stringGetter({
               key: STRING_KEYS.NAVIGATE_TO_KEPLR,
@@ -48,7 +46,7 @@ export const ExternalNavKeplrDialog = ({ setIsOpen }: ElementProps) => {
           />
         </Styled.Button>
 
-        <Styled.Button type={ButtonType.Link} size={ButtonSize.XLarge} href={HELP_URL}>
+        <Styled.Button type={ButtonType.Link} size={ButtonSize.XLarge} href={accountExportLearnMore}>
           <span>
             {stringGetter({
               key: STRING_KEYS.LEARN_TO_EXPORT,
