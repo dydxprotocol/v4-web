@@ -76,6 +76,13 @@ Styled.Panel = styled.section<{ onClick?: () => void }>`
     onClick &&
     css`
       cursor: pointer;
+
+      &:hover {
+        button:not(:disabled) {
+          color: var(--button-hover-textColor);
+          filter: var(--button-hover-filter);
+        }
+      }
     `}
 `;
 
