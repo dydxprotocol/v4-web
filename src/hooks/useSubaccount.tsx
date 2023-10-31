@@ -313,11 +313,6 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         placeOrderParams = abacusStateManager.placeOrder(callback);
       }
 
-      track(AnalyticsEvent.TradePlaceOrder, {
-        ...placeOrderParams,
-        isClosePosition,
-      } as HumanReadablePlaceOrderPayload & { isClosePosition: boolean });
-
       return placeOrderParams;
     },
     [subaccountClient]
@@ -346,7 +341,6 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     }) => {
       const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
         if (success) {
-          track(AnalyticsEvent.TradeCancelOrder);
           onSuccess?.();
         } else {
           onError?.({ errorStringKey: parsingError?.stringKey });
