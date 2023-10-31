@@ -204,6 +204,7 @@ const $Container = styled.div`
 
   // Rules
   ${popoverMixins.popover}
+  overflow: visible;
   padding: 1rem;
   box-shadow: 0 0 0 var(--border-width) var(--color-border),
     // border
@@ -242,9 +243,22 @@ const $CloseButton = styled(IconButton)`
   --button-textColor: var(--color-text-0);
   --button-border: none;
   --button-icon-size: 0.85em;
+  display: none;
 
-  float: right;
+  /* float: right; */
   margin: -0.42rem -0.42rem -0.42rem 0.42rem;
+
+  // Absolute
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  border: solid var(--border-width) var(--color-border);
+  border-radius: 50%;
+
+  ${$Root}:hover & {
+    display: block;
+  }
 `;
 
 const $Title = styled(Title)`

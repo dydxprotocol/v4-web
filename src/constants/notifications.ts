@@ -81,9 +81,9 @@ export type Notifications = Record<NotificationId, Notification<any>>;
 export type NotificationDisplayData = {
   icon?: React.ReactNode;
 
-  title?: string;
+  title: string;
 
-  description?: React.ReactNode;
+  description?: string;
 
   customContent?: React.ReactNode;
 
