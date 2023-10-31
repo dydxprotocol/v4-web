@@ -139,7 +139,7 @@ export const AccountMenu = () => {
                     fractionDigits={2}
                   />
                 </div>
-                <AssetActions asset={DydxChainAsset.USDC} dispatch={dispatch} />
+                <AssetActions asset={DydxChainAsset.USDC} dispatch={dispatch} withOnboarding />
               </div>
             </Styled.Balances>
           </Styled.AccountInfo>
@@ -212,28 +212,45 @@ export const AccountMenu = () => {
   );
 };
 
-const AssetActions = memo(({ asset, dispatch }: { asset: DydxChainAsset; dispatch: Dispatch }) => (
-  <Styled.InlineRow>
-    {[
-      // TODO(@rosepuppy): Add withdraw action for USDC
-      {
-        dialogType: DialogTypes.Receive,
-        iconName: IconName.Qr,
-      },
-      { dialogType: DialogTypes.Transfer, iconName: IconName.Send },
-    ].map(({ iconName, dialogType }) => (
-      <IconButton
-        key={dialogType}
-        action={ButtonAction.Base}
-        shape={ButtonShape.Square}
-        iconName={iconName}
-        onClick={() =>
-          dispatch(openDialog({ type: dialogType, dialogProps: { selectedAsset: asset } }))
-        }
-      />
-    ))}
-  </Styled.InlineRow>
-));
+const AssetActions = memo(
+  ({
+    asset,
+    dispatch,
+    withOnboarding,
+  }: {
+    asset: DydxChainAsset;
+    dispatch: Dispatch;
+    withOnboarding?: boolean;
+  }) => (
+    <Styled.InlineRow>
+      {[
+        withOnboarding && {
+          dialogType: DialogTypes.Withdraw,
+          iconName: IconName.Withdraw,
+        },
+        withOnboarding && {
+          dialogType: DialogTypes.Deposit,
+          iconName: IconName.Deposit,
+        },
+        {
+          dialogType: DialogTypes.Transfer,
+          dialogProps: { selectedAsset: asset },
+          iconName: IconName.Send,
+        },
+      ]
+        .filter(isTruthy)
+        .map(({ iconName, dialogType, dialogProps }) => (
+          <Styled.IconButton
+            key={dialogType}
+            action={ButtonAction.Base}
+            shape={ButtonShape.Square}
+            iconName={iconName}
+            onClick={() => dispatch(openDialog({ type: dialogType, dialogProps }))}
+          />
+        ))}
+    </Styled.InlineRow>
+  )
+);
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
@@ -350,4 +367,8 @@ Styled.ConnectToChain = styled(Styled.Column)`
     color: var(--color-text-1);
     font: var(--font-small-book);
   }
+`;
+
+Styled.IconButton = styled(IconButton)`
+  --button-padding: 0 0.25rem;
 `;
