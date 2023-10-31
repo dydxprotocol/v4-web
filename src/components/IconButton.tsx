@@ -67,6 +67,7 @@ const Styled: Record<string, AnyStyledComponent> = {};
 const buttonMixin = css`
   // Params
   --button-icon-size: 1.125em;
+  --button-padding: 0 0.5em;
 
   // Rules
   > * {
