@@ -1,10 +1,13 @@
 import React, { useMemo } from 'react';
-
+import styled from 'styled-components';
+import { layoutMixins } from '@/styles/layoutMixins';
 import { groupBy } from 'lodash';
 
 import { type Notification, NotificationStatus } from '@/constants/notifications';
 
+import { useBreakpoints } from '@/hooks';
 import { useNotifications } from '@/hooks/useNotifications';
+import { CloseIcon } from '@/icons';
 
 import { Button } from '@/components/Button';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
@@ -13,10 +16,6 @@ import { DialogPlacement } from '@/components/Dialog';
 import { Output, OutputType } from '@/components/Output';
 import { IconButton } from '@/components/IconButton';
 import { Toolbar } from '@/components/Toolbar';
-import { CloseIcon } from '@/icons';
-
-import styled from 'styled-components';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 type ElementProps = {
   slotTrigger?: React.ReactNode;
@@ -27,6 +26,7 @@ export const NotificationsMenu = ({
   slotTrigger,
   placement = DialogPlacement.Sidebar,
 }: ElementProps) => {
+  const { isTablet } = useBreakpoints();
   const {
     notifications,
     getDisplayData,
@@ -173,6 +173,7 @@ export const NotificationsMenu = ({
         </$FooterToolbar>
       }
       placement={placement}
+      preventClose={isTablet}
     />
   );
 };
