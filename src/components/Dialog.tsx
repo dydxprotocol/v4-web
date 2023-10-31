@@ -38,6 +38,7 @@ type ElementProps = {
   slotTrigger?: React.ReactNode;
   slotHeaderInner?: React.ReactNode;
   slotFooter?: React.ReactNode;
+  withClose?: boolean;
 };
 
 type StyleProps = {
@@ -79,6 +80,7 @@ export const Dialog = ({
   slotTrigger,
   slotHeaderInner,
   slotFooter,
+  withClose = true,
   placement = DialogPlacement.Default,
   portalContainer,
   hasHeaderBorder = false,
@@ -114,7 +116,7 @@ export const Dialog = ({
 
               {title && <Styled.Title>{title}</Styled.Title>}
 
-              {!preventClose && (
+              {!preventClose && withClose && (
                 <Styled.Close ref={closeButtonRef}>
                   <Icon iconName={IconName.Close} />
                 </Styled.Close>

@@ -17,6 +17,7 @@ import { CloseIcon } from '@/icons';
 
 import styled from 'styled-components';
 import { layoutMixins } from '@/styles/layoutMixins';
+import { useBreakpoints } from '@/hooks';
 
 type ElementProps = {
   slotTrigger?: React.ReactNode;
@@ -46,6 +47,8 @@ export const NotificationsMenu = ({
     isMenuOpen,
     setIsMenuOpen,
   } = useNotifications();
+
+  const { isTablet } = useBreakpoints();
 
   const notificationsByStatus: Partial<Record<NotificationStatus, Notification[]>> = useMemo(
     () =>
@@ -172,6 +175,7 @@ export const NotificationsMenu = ({
           </Button>
         </$FooterToolbar>
       }
+      withClose={!isTablet}
       placement={placement}
     />
   );
