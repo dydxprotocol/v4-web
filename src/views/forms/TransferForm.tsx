@@ -84,6 +84,7 @@ export const TransferForm = ({
       ? freeCollateral?.postOrder
       : MustBigNumber(nativeTokenBalance)
           .minus(size?.size ?? 0)
+          .minus(fee ?? 0)
           .toNumber();
   const amount = asset === DydxChainAsset.USDC ? size?.usdcSize : size?.size;
 
@@ -134,11 +135,6 @@ export const TransferForm = ({
     setError(undefined);
 
     try {
-      // Subtract fees from amount if sending native tokens
-      const amountToTransfer = (
-        asset === DydxChainAsset.CHAINTOKEN ? amountBN.minus(fee) : amountBN
-      ).toNumber();
-
       const screenResults = await screenAddresses({
         addresses: [recipientAddress!, dydxAddress!],
       });
@@ -157,9 +153,9 @@ export const TransferForm = ({
         );
       } else {
         const txResponse = await transfer(
-          amountToTransfer,
+          amountBN.toNumber(),
           recipientAddress as string,
-          tokensConfigs[asset].denom,
+          tokensConfigs[asset].denom
         );
 
         if (txResponse?.code === 0) {
@@ -226,7 +222,7 @@ export const TransferForm = ({
       value: DydxChainAsset.CHAINTOKEN,
       label: (
         <Styled.InlineRow>
-          {/* <AssetIcon symbol="DYDX" />  */}
+          <AssetIcon symbol={chainTokenLabel} />
           {chainTokenLabel}
         </Styled.InlineRow>
       ),
@@ -355,12 +351,15 @@ export const TransferForm = ({
           type={InputType.Number}
           onChange={({ floatValue }: NumberFormatValues) => onChangeAmount(floatValue)}
           value={amount ?? undefined}
-          slotRight={renderFormInputButton({
-            label: stringGetter({ key: STRING_KEYS.MAX }),
-            isInputEmpty: size?.usdcSize == null,
-            onClear: () => onChangeAmount(undefined),
-            onClick: () => onChangeAmount(balanceBN.toNumber()),
-          })}
+          slotRight={
+            asset === DydxChainAsset.USDC &&
+            renderFormInputButton({
+              label: stringGetter({ key: STRING_KEYS.MAX }),
+              isInputEmpty: size?.usdcSize == null,
+              onClear: () => onChangeAmount(undefined),
+              onClick: () => onChangeAmount(balanceBN.toNumber()),
+            })
+          }
           disabled={isLoading}
         />
       </WithDetailsReceipt>
@@ -369,7 +368,7 @@ export const TransferForm = ({
         <AlertMessage type={AlertType.Warning}>
           {stringGetter({
             key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS,
-            params: { USDC_BALANCE: `(${usdcBalance})` },
+            params: { USDC_BALANCE: `(${usdcBalance} USDC)` },
           })}
         </AlertMessage>
       )}
