@@ -7,13 +7,15 @@ import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { useBreakpoints } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import {  type BaseButtonProps } from '@/components/BaseButton';
+import { type BaseButtonProps } from '@/components/BaseButton';
 import { ToggleButton } from '@/components/ToggleButton';
 
 type ElementProps<MenuItemValue extends string> = {
   items: MenuItem<MenuItemValue>[];
   value: MenuItemValue;
-  onValueChange: (value: MenuItemValue) => void;
+  onValueChange: (value: any) => void;
+  onInteraction?: () => void;
+  ensureSelected?: boolean;
 };
 
 type StyleProps = {
@@ -25,10 +27,14 @@ export const ToggleGroup = forwardRef(
     {
       items,
       value,
+      ensureSelected = true,
       onValueChange,
+      onInteraction,
+
       className,
       size,
       shape = ButtonShape.Pill,
+
       ...buttonProps
     }: ElementProps<MenuItemValue> & StyleProps & BaseButtonProps,
     ref: Ref<HTMLDivElement>
@@ -40,12 +46,17 @@ export const ToggleGroup = forwardRef(
         ref={ref}
         type="single"
         value={value}
-        onValueChange={onValueChange}
+        onValueChange={(newValue: MenuItemValue) => {
+          if ((ensureSelected && newValue) || !ensureSelected) {
+            onValueChange(newValue);
+          }
+          onInteraction?.();
+        }}
         className={className}
         loop
       >
         {items.map((item) => (
-          <Item key={item.value} value={item.value} aria-label={item.label} asChild>
+          <Item key={item.value} value={item.value} asChild>
             <ToggleButton
               size={size ? size : isTablet ? ButtonSize.Small : ButtonSize.XSmall}
               shape={shape}

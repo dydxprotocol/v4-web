@@ -2,10 +2,10 @@ import { useMemo } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { useStringGetter } from '@/hooks';
-import { ChatIcon, FeedbackIcon, FileIcon, TerminalIcon } from '@/icons';
+import { useStringGetter, useURLConfigs } from '@/hooks';
 
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
+import { Icon, IconName } from '@/components/Icon';
 
 import { isTruthy } from '@/lib/isTruthy';
 
@@ -13,39 +13,24 @@ type ElementProps = {
   setIsOpen: (open: boolean) => void;
 };
 
-const HELP_LINKS = {
-  apiDocumentation: 'https://v4-teacher.vercel.app/',
-  helpCenter: null,
-  feedback: null,
-};
-
 export const HelpDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
+  const { help: helpCenter, community } = useURLConfigs();
 
   const HELP_ITEMS = useMemo(
     () => [
       {
         group: 'help-items',
         items: [
-          HELP_LINKS.helpCenter && {
+          helpCenter && {
             value: 'help-center',
             label: stringGetter({ key: STRING_KEYS.HELP_CENTER }),
             description: stringGetter({ key: STRING_KEYS.HELP_CENTER_DESCRIPTION }),
             onSelect: () => {
-              HELP_LINKS.helpCenter && globalThis.open(HELP_LINKS.helpCenter, '_blank');
+              helpCenter && globalThis.open(helpCenter, '_blank');
               setIsOpen(false);
             },
-            slotBefore: <FileIcon />,
-          },
-          HELP_LINKS.apiDocumentation && {
-            value: 'api-documentation',
-            label: stringGetter({ key: STRING_KEYS.API_DOCUMENTATION }),
-            description: stringGetter({ key: STRING_KEYS.API_DOCUMENTATION_DESCRIPTION }),
-            onSelect: () => {
-              HELP_LINKS.apiDocumentation && globalThis.open(HELP_LINKS.apiDocumentation, '_blank');
-              setIsOpen(false);
-            },
-            slotBefore: <TerminalIcon />,
+            slotBefore: <Icon iconName={IconName.File} />,
           },
           globalThis?.Intercom && {
             value: 'live-chat',
@@ -55,22 +40,22 @@ export const HelpDialog = ({ setIsOpen }: ElementProps) => {
               globalThis.Intercom('show');
               setIsOpen(false);
             },
-            slotBefore: <ChatIcon />,
+            slotBefore: <Icon iconName={IconName.Chat} />,
           },
-          HELP_LINKS.feedback && {
-            value: 'feedback',
-            label: stringGetter({ key: STRING_KEYS.PROVIDE_FEEDBACK }),
-            description: stringGetter({ key: STRING_KEYS.PROVIDE_FEEDBACK_DESCRIPTION }),
+          community && {
+            value: 'community',
+            label: stringGetter({ key: STRING_KEYS.COMMUNITY }),
+            description: stringGetter({ key: STRING_KEYS.COMMUNITY_DESCRIPTION }),
             onSelect: () => {
-              HELP_LINKS.feedback && globalThis.open(HELP_LINKS.feedback, '_blank');
+              community && globalThis.open(community, '_blank');
               setIsOpen(false);
             },
-            slotBefore: <FeedbackIcon />,
+            slotBefore: <Icon iconName={IconName.Discord} />,
           },
         ].filter(isTruthy),
       },
     ],
-    [stringGetter]
+    [stringGetter, helpCenter, community]
   );
 
   return (

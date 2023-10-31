@@ -198,8 +198,6 @@ Styled.Details = styled(Details)`
   @media ${breakpoints.tablet} {
     ${layoutMixins.withOuterAndInnerBorders}
 
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
     font: var(--font-small-book);
 
     > * {

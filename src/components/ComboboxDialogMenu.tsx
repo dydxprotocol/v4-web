@@ -35,6 +35,7 @@ type PickDialogProps = Pick<
   | 'slotTrigger'
   | 'slotFooter'
   | 'withClose'
+  | 'preventClose'
 >;
 
 export const ComboboxDialogMenu = <
@@ -59,6 +60,7 @@ export const ComboboxDialogMenu = <
   children,
 
   placement = DialogPlacement.Default,
+  preventClose,
   className,
 }: ElementProps<MenuItemValue, MenuGroupValue> &
   PickComboxMenuProps<MenuItemValue, MenuGroupValue> &
@@ -75,6 +77,7 @@ export const ComboboxDialogMenu = <
     slotFooter={slotFooter}
     withClose={withClose}
     placement={placement}
+    preventClose={preventClose}
     className={className}
   >
     <Styled.ComboboxMenu

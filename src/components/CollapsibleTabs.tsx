@@ -225,6 +225,7 @@ Styled.CollapsibleContent = styled(CollapsibleContent)`
 `;
 
 Styled.IconButton = styled(IconButton)`
+  --button-icon-size: 1em;
   ${Styled.CollapsibleRoot}[data-state='closed'] & {
     rotate: -0.5turn;
   }

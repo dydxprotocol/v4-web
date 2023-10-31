@@ -22,6 +22,7 @@ import { useShouldShowFooter } from './useShouldShowFooter';
 import { useSelectedNetwork } from './useSelectedNetwork';
 import { useStringGetter } from './useStringGetter';
 import { useSubaccount } from './useSubaccount';
+import { useURLConfigs } from './useURLConfigs';
 
 export {
   useApiState,
@@ -48,4 +49,5 @@ export {
   useSelectedNetwork,
   useStringGetter,
   useSubaccount,
+  useURLConfigs,
 };

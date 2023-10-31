@@ -5,7 +5,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints, useStringGetter, useURLConfigs } from '@/hooks';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -20,15 +20,10 @@ import { openDialog } from '@/state/dialogs';
 import { DYDXBalancePanel } from './DYDXBalancePanel';
 import { MigratePanel } from './MigratePanel';
 
-// TODO: consolidate help link urls to env variables
-const GOVERNANCE_HELP_URL = 'https://help.dydx.exchange/';
-const STAKING_HELP_URL =
-  'https://docs.dydx.community/dydx-chain-documentation/staking/how-to-stake';
-
 export const RewardsPage = () => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
-
+  const { governanceLearnMore, stakingLearnMore } = useURLConfigs();
   const { isTablet, isNotTablet } = useBreakpoints();
 
   const panelArrow = (
@@ -45,11 +40,7 @@ export const RewardsPage = () => {
     <Styled.Page>
       {import.meta.env.VITE_V3_TOKEN_ADDRESS && <MigratePanel />}
       <Styled.PanelRow>
-        {isTablet && (
-          <Styled.BalancePanelContainer>
-            <DYDXBalancePanel />
-          </Styled.BalancePanelContainer>
-        )}
+        {isTablet && <DYDXBalancePanel />}
 
         <Styled.Panel
           slotHeader={<Styled.Title>{stringGetter({ key: STRING_KEYS.GOVERNANCE })}</Styled.Title>}
@@ -58,7 +49,7 @@ export const RewardsPage = () => {
         >
           <Styled.Description>
             {stringGetter({ key: STRING_KEYS.GOVERNANCE_DESCRIPTION })}
-            <Link href={GOVERNANCE_HELP_URL} onClick={(e) => e.stopPropagation()}>
+            <Link href={governanceLearnMore} onClick={(e) => e.stopPropagation()}>
               {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
             </Link>
           </Styled.Description>
@@ -71,17 +62,13 @@ export const RewardsPage = () => {
         >
           <Styled.Description>
             {stringGetter({ key: STRING_KEYS.STAKING_DESCRIPTION })}
-            <Link href={STAKING_HELP_URL} onClick={(e) => e.stopPropagation()}>
+            <Link href={stakingLearnMore} onClick={(e) => e.stopPropagation()}>
               {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
             </Link>
           </Styled.Description>
         </Styled.Panel>
 
-        {isNotTablet && (
-          <Styled.BalancePanelContainer>
-            <DYDXBalancePanel />
-          </Styled.BalancePanelContainer>
-        )}
+        {isNotTablet && <DYDXBalancePanel />}
       </Styled.PanelRow>
     </Styled.Page>
   );
@@ -92,10 +79,26 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.Page = styled.div`
   ${layoutMixins.contentContainerPage}
   gap: 1.5rem;
+  padding: 2rem;
+  align-items: center;
+
+  > * {
+    --content-max-width: 70rem;
+    max-width: min(calc(100vw - 4rem), var(--content-max-width));
+  }
+
+  @media ${breakpoints.tablet} {
+    padding: 1.25rem;
+
+    > * {
+      max-width: calc(100vw - 2.5rem);
+      width: 100%;
+    }
+  }
 `;
 
 Styled.Panel = styled(Panel)`
-  padding: 1rem 1.5rem;
+  --panel-paddingX: 1.5rem;
 `;
 
 Styled.Title = styled.h3`
@@ -110,27 +113,14 @@ Styled.Description = styled.div`
 `;
 
 Styled.PanelRow = styled.div`
-  ${layoutMixins.spacedRow}
+  ${layoutMixins.gridEqualColumns}
   gap: 1.5rem;
-  max-width: min(100vw, var(--content-max-width));
-  align-items: flex-start;
 
-  > section {
-    cursor: pointer;
-  }
+  align-items: flex-start;
 
   @media ${breakpoints.tablet} {
     grid-auto-flow: row;
     grid-template-columns: 1fr;
-    max-width: auto;
-  }
-`;
-
-Styled.BalancePanelContainer = styled.div`
-  width: 21.25rem;
-
-  @media ${breakpoints.tablet} {
-    width: auto;
   }
 `;
 
@@ -140,5 +130,5 @@ Styled.IconButton = styled(IconButton)`
 `;
 
 Styled.Arrow = styled.div`
-  padding: 1rem 1.5rem;
+  padding: 1rem;
 `;
