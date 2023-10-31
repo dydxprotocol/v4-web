@@ -13,15 +13,15 @@ export interface LinksConfigs {
   help?: string,
   blogs?: string,
   foundation?: string,
-  initialMarginFractionLearnmore?: string,
-  reduceOnlyLearnmore?: string,
+  initialMarginFractionLearnMore?: string,
+  reduceOnlyLearnMore?: string,
   documentation?: string,
   community?: string,
-  governanceLearnmore?: string,
-  stakingLearnmore?: string,
+  governanceLearnMore?: string,
+  stakingLearnMore?: string,
   keplrDashboard?: string,
-  accountExportLearnmore?: string,
-  walletLearnmore?: string
+  accountExportLearnMore?: string,
+  walletLearnMore?: string
 }
 
 export const useURLConfigs = (): LinksConfigs => {
@@ -37,14 +37,14 @@ export const useURLConfigs = (): LinksConfigs => {
     help: linksConfigs.help || FALLBACK_URL,
     blogs: linksConfigs.blogs || FALLBACK_URL,
     foundation: linksConfigs.foundation || FALLBACK_URL,
-    initialMarginFractionLearnmore: linksConfigs.initialMarginFractionLearnmore || FALLBACK_URL,
-    reduceOnlyLearnmore: linksConfigs.reduceOnlyLearnmore || FALLBACK_URL,
+    initialMarginFractionLearnMore: linksConfigs.initialMarginFractionLearnMore || FALLBACK_URL,
+    reduceOnlyLearnMore: linksConfigs.reduceOnlyLearnMore || FALLBACK_URL,
     documentation: linksConfigs.documentation || FALLBACK_URL,
     community: linksConfigs.community || FALLBACK_URL,
-    governanceLearnmore: linksConfigs.governanceLearnmore || FALLBACK_URL,
-    stakingLearnmore: linksConfigs.stakingLearnmore || FALLBACK_URL,
+    governanceLearnMore: linksConfigs.governanceLearnMore || FALLBACK_URL,
+    stakingLearnMore: linksConfigs.stakingLearnMore || FALLBACK_URL,
     keplrDashboard: linksConfigs.keplrDashboard || FALLBACK_URL,
-    accountExportLearnmore: linksConfigs.accountExportLearnmore || FALLBACK_URL,
-    walletLearnmore: linksConfigs.walletLearnmore || FALLBACK_URL,
+    accountExportLearnMore: linksConfigs.accountExportLearnMore || FALLBACK_URL,
+    walletLearnMore: linksConfigs.walletLearnMore || FALLBACK_URL,
   };
 };

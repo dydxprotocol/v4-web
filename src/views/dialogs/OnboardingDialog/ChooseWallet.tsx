@@ -21,7 +21,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 export const ChooseWallet = () => {
   const stringGetter = useStringGetter();
-  const { walletLearnmore } = useURLConfigs();
+  const { walletLearnMore } = useURLConfigs();
 
   const displayedWallets = useDisplayedWallets();
 
@@ -62,7 +62,7 @@ export const ChooseWallet = () => {
       </Styled.Wallets>
 
       <Styled.Footer>
-        <Link href={walletLearnmore} withIcon>
+        <Link href={walletLearnMore} withIcon>
           {stringGetter({ key: STRING_KEYS.ABOUT_WALLETS })}
         </Link>
       </Styled.Footer>

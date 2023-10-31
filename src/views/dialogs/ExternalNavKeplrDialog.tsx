@@ -17,7 +17,7 @@ type ElementProps = {
 
 export const ExternalNavKeplrDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const { keplrDashboard, accountExportLearnmore } = useURLConfigs();
+  const { keplrDashboard, accountExportLearnMore } = useURLConfigs();
 
   const { isTablet } = useBreakpoints();
 
@@ -46,7 +46,7 @@ export const ExternalNavKeplrDialog = ({ setIsOpen }: ElementProps) => {
           />
         </Styled.Button>
 
-        <Styled.Button type={ButtonType.Link} size={ButtonSize.XLarge} href={accountExportLearnmore}>
+        <Styled.Button type={ButtonType.Link} size={ButtonSize.XLarge} href={accountExportLearnMore}>
           <span>
             {stringGetter({
               key: STRING_KEYS.LEARN_TO_EXPORT,

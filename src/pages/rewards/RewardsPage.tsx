@@ -23,7 +23,7 @@ import { MigratePanel } from './MigratePanel';
 export const RewardsPage = () => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
-  const { governanceLearnmore, stakingLearnmore } = useURLConfigs();
+  const { governanceLearnMore, stakingLearnMore } = useURLConfigs();
   const { isTablet, isNotTablet } = useBreakpoints();
 
   const panelArrow = (
@@ -53,7 +53,7 @@ export const RewardsPage = () => {
         >
           <Styled.Description>
             {stringGetter({ key: STRING_KEYS.GOVERNANCE_DESCRIPTION })}
-            <Link href={governanceLearnmore} onClick={(e) => e.stopPropagation()}>
+            <Link href={governanceLearnMore} onClick={(e) => e.stopPropagation()}>
               {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
             </Link>
           </Styled.Description>
@@ -66,7 +66,7 @@ export const RewardsPage = () => {
         >
           <Styled.Description>
             {stringGetter({ key: STRING_KEYS.STAKING_DESCRIPTION })}
-            <Link href={stakingLearnmore} onClick={(e) => e.stopPropagation()}>
+            <Link href={stakingLearnMore} onClick={(e) => e.stopPropagation()}>
               {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
             </Link>
           </Styled.Description>

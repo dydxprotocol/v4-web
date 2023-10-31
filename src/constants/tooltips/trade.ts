@@ -60,7 +60,7 @@ export const tradeTooltips: TooltipStrings = {
   'initial-margin-fraction': ({ stringGetter, urlConfigs }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.INITIAL_MARGIN_FRACTION_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.INITIAL_MARGIN_FRACTION_BODY }),
-    learnMoreLink: urlConfigs?.initialMarginFractionLearnmore,
+    learnMoreLink: urlConfigs?.initialMarginFractionLearnMore,
   }),
   'initial-stop': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.INITIAL_STOP_TITLE }),
@@ -149,7 +149,7 @@ export const tradeTooltips: TooltipStrings = {
   'reduce-only': ({ stringGetter, urlConfigs }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_BODY }),
-    learnMoreLink: urlConfigs?.reduceOnlyLearnmore,
+    learnMoreLink: urlConfigs?.reduceOnlyLearnMore,
   }),
   spread: () => ({
     title: 'Spread',
