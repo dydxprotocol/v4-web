@@ -180,7 +180,7 @@ Styled.MobileProfileLayout = styled.div`
   ${layoutMixins.contentContainerPage}
 
   gap: 1rem;
-  padding: 1rem;
+  padding: 1.25rem;
 `;
 
 Styled.Header = styled.header`

@@ -86,6 +86,14 @@ Styled.Page = styled.div`
     --content-max-width: 70rem;
     max-width: min(calc(100vw - 4rem), var(--content-max-width));
   }
+
+  @media ${breakpoints.tablet} {
+    padding: 1.25rem;
+
+    > * {
+      max-width: calc(100vw - 2.5rem);
+    }
+  }
 `;
 
 Styled.Panel = styled(Panel)`
