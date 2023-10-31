@@ -71,7 +71,7 @@ export const MigratePanel = () => {
       </Styled.Description>
     </Styled.MigratePanel>
   ) : (
-    <Styled.MobileMigratePanel
+    <Styled.MigratePanel
       slotHeader={
         <Styled.MobileMigrateHeader>
           <h3>
@@ -88,49 +88,52 @@ export const MigratePanel = () => {
         </Styled.MobileMigrateHeader>
       }
     >
-      <Styled.WithReceipt
-        slotReceipt={
-          <Styled.Details
-            items={[
-              {
-                key: 'available-to-migrate',
-                label: (
-                  <Styled.InlineRow>
-                    {stringGetter({ key: STRING_KEYS.AVAILABLE_TO_MIGRATE })}
-                    <Tag>DYDX</Tag>
-                  </Styled.InlineRow>
-                ),
-                value: <Output type={OutputType.Asset} value={tokenBalance} />,
-              },
-            ]}
-          />
-        }
-      >
-        {import.meta.env.VITE_TOKEN_MIGRATION_URI && (
-          <Button
-            action={tokenBalance ? ButtonAction.Primary : ButtonAction.Base}
-            size={ButtonSize.Medium}
-            slotRight={<Icon iconName={IconName.LinkOut} />}
-            href={import.meta.env.VITE_TOKEN_MIGRATION_URI}
-          >
-            {stringGetter({ key: STRING_KEYS.MIGRATE_NOW })}
-          </Button>
-        )}
-      </Styled.WithReceipt>
-      <Styled.InlineRow>
-        {stringGetter({ key: STRING_KEYS.WANT_TO_LEARN })}
-        <Link href={TOKEN_MIGRATION_LEARN_MORE_LINK} withIcon>
-          {stringGetter({ key: STRING_KEYS.CLICK_HERE })}
-        </Link>
-      </Styled.InlineRow>
-    </Styled.MobileMigratePanel>
+      <Styled.Column>
+        <Styled.WithReceipt
+          slotReceipt={
+            <Styled.Details
+              items={[
+                {
+                  key: 'available-to-migrate',
+                  label: (
+                    <Styled.InlineRow>
+                      {stringGetter({ key: STRING_KEYS.AVAILABLE_TO_MIGRATE })}
+                      <Tag>DYDX</Tag>
+                    </Styled.InlineRow>
+                  ),
+                  value: <Output type={OutputType.Asset} value={tokenBalance} />,
+                },
+              ]}
+            />
+          }
+        >
+          {import.meta.env.VITE_TOKEN_MIGRATION_URI && (
+            <Button
+              action={tokenBalance ? ButtonAction.Primary : ButtonAction.Base}
+              size={ButtonSize.Medium}
+              slotRight={<Icon iconName={IconName.LinkOut} />}
+              href={import.meta.env.VITE_TOKEN_MIGRATION_URI}
+            >
+              {stringGetter({ key: STRING_KEYS.MIGRATE_NOW })}
+            </Button>
+          )}
+        </Styled.WithReceipt>
+        <Styled.InlineRow>
+          {stringGetter({ key: STRING_KEYS.WANT_TO_LEARN })}
+          <Link href={TOKEN_MIGRATION_LEARN_MORE_LINK} withIcon>
+            {stringGetter({ key: STRING_KEYS.CLICK_HERE })}
+          </Link>
+        </Styled.InlineRow>
+      </Styled.Column>
+    </Styled.MigratePanel>
   );
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.MigratePanel = styled(Panel)`
-  padding: 1rem 1.5rem;
+  --panel-paddingX: 1.5rem;
+  width: 100%;
 `;
 
 Styled.Title = styled.h3`
@@ -163,10 +166,9 @@ Styled.Description = styled.div`
   --link-color: var(--color-text-1);
 `;
 
-Styled.MobileMigratePanel = styled(Panel)`
+Styled.Column = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1rem;
-
   align-items: center;
 `;
 

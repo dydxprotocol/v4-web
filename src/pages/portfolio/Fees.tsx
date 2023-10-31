@@ -103,7 +103,7 @@ export const Fees = () => {
             },
           ]}
         />
-        <div>
+        <Styled.TableContainer>
           <Styled.FeeTable
             label="Fee Tiers"
             data={feeTiers || []}
@@ -187,7 +187,7 @@ export const Fees = () => {
             withOuterBorder={isNotTablet}
             withInnerBorders
           />
-        </div>
+        </Styled.TableContainer>
       </Styled.ContentWrapper>
     </AttachedExpandingSection>
   );
@@ -198,6 +198,7 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.ContentWrapper = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1.5rem;
+  max-width: 100vw;
 `;
 
 Styled.AdditionalConditions = styled.div`
@@ -212,6 +213,10 @@ Styled.AdditionalConditions = styled.div`
 
 Styled.FeesDetails = styled(Details)`
   gap: 1rem;
+
+  @media ${breakpoints.notTablet} {
+    margin: 0 1rem;
+  }
 
   @media ${breakpoints.tablet} {
     padding: 1rem 1rem 0 1rem;
@@ -264,6 +269,13 @@ Styled.CardLabel = styled(Styled.TextRow)`
   }
 `;
 
+Styled.TableContainer = styled.div`
+  @media ${breakpoints.tablet} {
+    width: 100%;
+    overflow-x: scroll;
+  }
+`;
+
 Styled.FeeTable = styled(Table)`
   --tableCell-padding: 0.5rem 1.5rem;
   --bordered-content-border-radius: 0.625rem;
@@ -283,6 +295,10 @@ Styled.FeeTable = styled(Table)`
 
   @media ${breakpoints.notTablet} {
     --tableHeader-backgroundColor: var(--color-layer-1);
+
+    tr:last-of-type {
+      --border-width: 0;
+    }
   }
 `;
 
