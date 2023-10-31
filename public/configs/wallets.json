@@ -40,6 +40,7 @@
       "iosMinVersion": "0",
       "imageUrl": "",
       "encoding": "=\"#%/<>?@\\^`{|}:&",
+      "androidPackage": "io.metamask",
       "connections": [
         {
           "type": "walletConnectV2",
@@ -98,6 +99,7 @@
       "iosMinVersion": "1.8.0",
       "imageUrl": "",
       "encoding": "=\"#%/<>?@\\^`{|}:&",
+      "androidPackage": "org.toshi",
       "connections": [
         {
           "type": "walletSegue",
@@ -155,6 +157,7 @@
       "comment": "imToken",
       "iosMinVersion": "0",
       "imageUrl": "",
+      "androidPackage": "im.token.app",
       "connections": [
         {
           "type": "walletConnectV2",
@@ -214,6 +217,7 @@
       "iosMinVersion": "0",
       "encoding": "=\"#%/<>?@\\^`{|}:&",
       "imageUrl": "",
+      "androidPackage": "com.wallet.crypto.trustapp",
       "connections": [
         {
           "type": "walletConnectV2",
@@ -271,6 +275,7 @@
       "iosMinVersion": "0",
       "encoding": "=\"#%/<>?@\\^`{|}:&",
       "imageUrl": "",
+      "androidPackage": "io.zerion.android",
       "connections": [
         {
           "type": "walletConnectV2",
@@ -327,6 +332,7 @@
       "comment": "TokenPocket",
       "iosMinVersion": "0",
       "imageUrl": "",
+      "androidPackage": "vip.mytokenpocket",
       "connections": [
         {
           "type": "walletConnectV2",
@@ -383,6 +389,7 @@
       "comment": "Rainbow",
       "iosMinVersion": "0",
       "encoding": "=\"#%/<>?@\\^`{|}:&",
+      "androidPackage": "me.rainbow",
       "backlinked": true,
       "imageUrl": "",
       "connections": [
@@ -442,6 +449,7 @@
       "comment": "1inch",
       "iosMinVersion": "0",
       "encoding": "=\"#%/<>?@\\^`{|}:&",
+      "androidPackage": "io.oneinch.android",
       "imageUrl": "",
       "connections": [
         {
