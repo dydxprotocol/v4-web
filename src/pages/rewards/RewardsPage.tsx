@@ -92,6 +92,7 @@ Styled.Page = styled.div`
 
     > * {
       max-width: calc(100vw - 2.5rem);
+      width: 100%;
     }
   }
 `;
