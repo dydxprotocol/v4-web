@@ -35,6 +35,7 @@ import { setApiState } from '@/state/app';
 import { setAssets } from '@/state/assets';
 import { setConfigs } from '@/state/configs';
 import { setInputs } from '@/state/inputs';
+import { updateNotifications } from '@/state/notifications';
 import { setHistoricalFundings, setLiveTrades, setMarkets, setOrderbook } from '@/state/perpetuals';
 import { isTruthy } from '../isTruthy';
 
@@ -50,6 +51,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   }
 
   notificationsChanged(notifications: kollections.List<AbacusNotification>): void {
+    this.store?.dispatch(updateNotifications(notifications.toArray()));
     return;
   }
 
