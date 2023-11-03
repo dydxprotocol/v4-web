@@ -22,7 +22,11 @@ const useSquidContext = () => {
   };
 
   const squid = useMemo(
-    () => new Squid({ baseUrl: ENVIRONMENT_CONFIG_MAP[selectedNetwork]?.endpoints['0xsquid'] }),
+    () =>
+      new Squid({
+        baseUrl: ENVIRONMENT_CONFIG_MAP[selectedNetwork]?.endpoints['0xsquid'],
+        integratorId: ENVIRONMENT_CONFIG_MAP[selectedNetwork]?.squidIntegratorId,
+      }),
     [selectedNetwork]
   );
 
