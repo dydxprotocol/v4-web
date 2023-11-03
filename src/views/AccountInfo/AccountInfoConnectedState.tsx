@@ -151,7 +151,10 @@ export const AccountInfoConnectedState = () => {
               ),
               label: stringGetter({ key: STRING_KEYS.BUYING_POWER }),
               type: OutputType.Fiat,
-              value: buyingPower,
+              value:
+                MustBigNumber(buyingPower?.current).lt(0) && buyingPower?.postOrder === null
+                  ? undefined
+                  : buyingPower,
             },
           ].map(
             ({

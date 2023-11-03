@@ -131,7 +131,7 @@ export const AccountDetailsAndHistory = () => {
       key: 'BuyingPower',
       labelKey: STRING_KEYS.BUYING_POWER,
       type: OutputType.Fiat,
-      value: buyingPower?.current,
+      value: MustBigNumber(buyingPower?.current).lt(0) ? undefined : buyingPower?.current, // show '-' when buying power is negative
     },
   ].filter(isTruthy);
 
