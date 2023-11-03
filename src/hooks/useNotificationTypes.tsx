@@ -1,124 +1,93 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { type ReactNode, useCallback, useEffect } from 'react';
 import styled, { type AnyStyledComponent } from 'styled-components';
-import { useSelector, shallowEqual, useDispatch } from 'react-redux';
-import { groupBy } from 'lodash';
+import { useSelector } from 'react-redux';
+import { isEqual } from 'lodash';
+import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
 
 import { AlertType } from '@/constants/alerts';
-import { AbacusOrderStatus, ORDER_SIDES } from '@/constants/abacus';
-import { DialogTypes } from '@/constants/dialogs';
-import { STRING_KEYS, StringKey } from '@/constants/localization';
+import { STRING_KEYS, type StringGetterFunction, StringKey } from '@/constants/localization';
 import { type NotificationTypeConfig, NotificationType } from '@/constants/notifications';
-import { ORDER_SIDE_STRINGS } from '@/constants/trade';
 
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
-import { TransferStatusToast } from '@/views/TransferStatus';
+import { TransferStatusToast } from '@/views/notifications/TransferStatusNotification';
+import { TransferStatusSteps } from '@/views/TransferStatusSteps';
 
-import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
-import { openDialog } from '@/state/dialogs';
-
-import { OrderStatusIcon } from '@/views/OrderStatusIcon';
+import { getAbacusNotifications } from '@/state/notificationsSelectors';
 
 import { useStringGetter } from './useStringGetter';
-import { TransferStatusSteps } from '@/views/TransferStatusSteps';
-import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
 
-export const notificationTypes = [
+const STRING_VALUES = Object.fromEntries(Object.values(STRING_KEYS).map((key) => [key, key]));
+
+const parseStringParamsForNotification = ({
+  stringGetter,
+  value,
+}: {
+  stringGetter: StringGetterFunction;
+  value: unknown;
+}): ReactNode => {
+  if (STRING_VALUES[value as StringKey]) {
+    return stringGetter({ key: value as StringKey });
+  }
+
+  return value as ReactNode;
+};
+
+export const notificationTypes: NotificationTypeConfig[] = [
   {
     type: NotificationType.OrderStatusChanged,
 
-    useTrigger: ({ trigger, lastUpdated }) => {
+    useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
-
-      const orders = useSelector(getSubaccountOrders, shallowEqual) || [];
-      const ordersByOrderId = Object.fromEntries(orders.map((order) => [order.id, order]));
-
-      const fills = useSelector(getSubaccountFills, shallowEqual) || [];
-      const fillsByOrderId = groupBy(fills, (fill) => fill.orderId);
-
-      const orderIds = useMemo(
-        () => [...Object.keys(ordersByOrderId), ...Object.keys(fillsByOrderId)],
-        [orders, fills]
-      );
+      const abacusNotifications = useSelector(getAbacusNotifications, isEqual);
 
       useEffect(() => {
-        for (const orderId of orderIds) {
-          const fills = fillsByOrderId[orderId];
+        for (const notification of abacusNotifications) {
+          const abacusNotificationType = notification.id.split(':')[0];
 
-          const order =
-            ordersByOrderId[orderId] ??
-            (fills?.length
-              ? {
-                  ...fills[fills.length - 1],
-                  id: orderId,
-                  createdAtMilliseconds: Math.max(
-                    ...fills.map((fill) => fill.createdAtMilliseconds)
-                  ),
-                  status: AbacusOrderStatus.filled,
-                }
-              : undefined);
+          const parsedData = notification.data ? JSON.parse(notification.data) : {};
 
-          if (order)
-            trigger(
-              order.id,
-              {
-                icon: (
-                  <OrderStatusIcon status={order.status} totalFilled={order.totalFilled ?? 0} />
-                ),
-                title: `${stringGetter({
-                  key: order.resources.typeStringKey as StringKey,
-                })} ${
-                  order.status === AbacusOrderStatus.open && (order?.totalFilled ?? 0) > 0
-                    ? stringGetter({ key: STRING_KEYS.PARTIALLY_FILLED })
-                    : stringGetter({ key: order.resources.statusStringKey as StringKey })
-                }`,
-                description: `${stringGetter({
-                  key: ORDER_SIDE_STRINGS[ORDER_SIDES[order.side.name]],
-                })} ${order.size} ${order.marketId} @ $${order.price}`,
-                actionDescription: 'View Order',
-                actionAltText: 'View this order in the Orders tab or the Notifications menu.',
-                toastSensitivity:
-                  order.status === AbacusOrderStatus.pending ? 'foreground' : 'background',
-                toastDuration: 5000,
-              },
-              [order.status.name, order.size],
-              !order.createdAtMilliseconds || order.createdAtMilliseconds > lastUpdated
-            );
+          const params = Object.fromEntries(
+            Object.entries(parsedData).map(([key, value]) => {
+              return [key, parseStringParamsForNotification({ stringGetter, value })];
+            })
+          );
+
+          switch (abacusNotificationType) {
+            case 'order': {
+              trigger(
+                notification.id,
+                {
+                  icon: notification.image && <Styled.Icon src={notification.image} alt="" />,
+                  title: stringGetter({ key: notification.title }),
+                  body: notification.text ? stringGetter({ key: notification.text, params }) : '',
+                  toastSensitivity: 'foreground',
+                },
+                [notification.updateTimeInMilliseconds, notification.data],
+                true
+              );
+              break;
+            }
+            default:
+              trigger(
+                notification.id,
+                {
+                  icon: notification.image && <Styled.Icon src={notification.image} alt="" />,
+                  title: stringGetter({ key: notification.title }),
+                  body: notification.text ? stringGetter({ key: notification.text, params }) : '',
+                  toastSensitivity: 'foreground',
+                },
+                [notification.updateTimeInMilliseconds, notification.data],
+                true
+              );
+              break;
+          }
         }
-      }, [orderIds]);
+      }, [abacusNotifications]);
     },
-
-    // useNotificationAction: () => {
-    //   const dispatch = useDispatch();
-    //   const orders = useSelector(getSubaccountOrders, shallowEqual) || [];
-    //   const ordersByOrderId = Object.fromEntries(orders.map((order) => [order.id, order]));
-
-    //   const fills = useSelector(getSubaccountFills, shallowEqual) || [];
-    //   const fillsByOrderId = groupBy(fills, (fill) => fill.orderId);
-
-    //   return (id) => {
-    //     if (ordersByOrderId[id]) {
-    //       dispatch(
-    //         openDialog({
-    //           type: DialogTypes.OrderDetails,
-    //           dialogProps: { orderId: id },
-    //         })
-    //       );
-    //     } else if (fillsByOrderId[id]) {
-    //       const fillId = fillsByOrderId[id][0].id;
-
-    //       dispatch(
-    //         openDialog({
-    //           type: DialogTypes.FillDetails,
-    //           dialogProps: { fillId },
-    //         })
-    //       );
-    //     }
-    //   };
-    // },
-  } as NotificationTypeConfig<string, [string, number]>,
+  },
   {
     type: NotificationType.SquidTransfer,
     useTrigger: ({ trigger }) => {
@@ -140,35 +109,13 @@ export const notificationTypes = [
           // @ts-ignore status.errors is not in the type definition but can be returned
           const error = status?.errors?.length ? status?.errors[0] : status?.error;
 
-          // TODO: confirm with design what the description should be
-          const description = (
-            <div>
-              <Styled.TransferText>
-                {type === 'deposit' ? 'Deposit of ' : 'Withdraw of '}
-                <Output type={OutputType.Fiat} value={toAmount} />
-              </Styled.TransferText>
-
-              {error && (
-                <Styled.ErrorMessage type={AlertType.Error}>
-                  {stringGetter({
-                    key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-                    params: {
-                      ERROR_MESSAGE:
-                        error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
-                    },
-                  })}
-                </Styled.ErrorMessage>
-              )}
-            </div>
-          );
-
           trigger(
             txHash,
             {
               icon: <Icon iconName={finished ? IconName.Transfer : IconName.Clock} />,
               title: stringGetter({ key: getTitleStringKey(type, finished) }),
-              description: description,
-              customContent: (
+              body: `${type === 'deposit' ? 'Deposit of' : 'Withdraw of'} ${toAmount}`,
+              customBody: (
                 <TransferStatusToast
                   type={type}
                   toAmount={transfer.toAmount}
@@ -178,7 +125,24 @@ export const notificationTypes = [
               ),
               customMenuContent: !finished && (
                 <div>
-                  {description}
+                  <div>
+                    <Styled.TransferText>
+                      {type === 'deposit' ? 'Deposit of ' : 'Withdraw of '}
+                      <Output type={OutputType.Fiat} value={toAmount} />
+                    </Styled.TransferText>
+
+                    {error && (
+                      <Styled.ErrorMessage type={AlertType.Error}>
+                        {stringGetter({
+                          key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+                          params: {
+                            ERROR_MESSAGE:
+                              error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
+                          },
+                        })}
+                      </Styled.ErrorMessage>
+                    )}
+                  </div>
                   <TransferStatusSteps status={transfer.status} type={type} />
                 </div>
               ),
@@ -190,9 +154,14 @@ export const notificationTypes = [
       }, [transferNotifications]);
     },
   },
-] satisfies NotificationTypeConfig[];
+];
 
 const Styled: Record<string, AnyStyledComponent> = {};
+
+Styled.Icon = styled.img`
+  height: 1.5rem;
+  width: 1.5rem;
+`;
 
 Styled.TransferText = styled.span`
   display: inline-flex;

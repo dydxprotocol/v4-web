@@ -1,11 +1,13 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { LocalStorageKey } from '@/constants/localStorage';
+import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import {
   type Notification,
   type NotificationDisplayData,
+  type NotificationPreferences,
   type Notifications,
   NotificationStatus,
+  NotificationType,
 } from '@/constants/notifications';
 
 import { useLocalStorage } from './useLocalStorage';
@@ -29,13 +31,26 @@ const useNotificationsContext = () => {
   // Local storage
   const [notifications, setNotifications] = useLocalStorage<Notifications>({
     key: LocalStorageKey.Notifications,
-    defaultValue: {},
+    defaultValue: {
+      notifications: {},
+      version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.Notifications],
+    },
   });
 
   const [notificationsLastUpdated, setNotificationsLastUpdated] = useLocalStorage<number>({
     key: LocalStorageKey.NotificationsLastUpdated,
     defaultValue: Date.now(),
   });
+
+  const [notificationPreferences, setNotificationPreferences] =
+    useLocalStorage<NotificationPreferences>({
+      key: LocalStorageKey.NotificationPreferences,
+      defaultValue: {
+        [NotificationType.OrderStatusChanged]: true,
+        [NotificationType.SquidTransfer]: true,
+        version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
+      },
+    });
 
   useEffect(() => {
     setNotificationsLastUpdated(Date.now());
@@ -54,12 +69,36 @@ const useNotificationsContext = () => {
     [notificationsDisplayData]
   );
 
+  // Check for version changes
+  useEffect(() => {
+    if (notifications.version !== LOCAL_STORAGE_VERSIONS[LocalStorageKey.Notifications]) {
+      setNotifications({
+        notifications: {},
+        version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.Notifications],
+      });
+    }
+
+    if (
+      notificationPreferences.version !==
+      LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences]
+    ) {
+      setNotificationPreferences({
+        [NotificationType.OrderStatusChanged]: true,
+        [NotificationType.SquidTransfer]: true,
+        version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
+      });
+    }
+  }, []);
+
   // Status changes
   const updateStatus = useCallback(
     (notification: Notification, status: NotificationStatus) => {
       notification.status = status;
       notification.timestamps[notification.status] = Date.now();
-      setNotifications({ ...notifications });
+      setNotifications({
+        notifications: notifications.notifications,
+        version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.Notifications],
+      } as Notifications);
     },
     [notifications]
   );
@@ -83,7 +122,7 @@ const useNotificationsContext = () => {
   );
 
   const markAllCleared = useCallback(() => {
-    for (const notification of Object.values(notifications)) {
+    for (const notification of Object.values(notifications.notifications)) {
       markCleared(notification);
     }
   }, [notifications, markCleared]);
@@ -95,45 +134,56 @@ const useNotificationsContext = () => {
         (id, displayData, updateKey, isNew = true) => {
           const key = getKey({ type, id });
 
-          const notification = notifications[key];
+          const notification = notifications.notifications[key];
 
-          // New unique key - create new notification
-          if (!notification) {
-            const notification = (notifications[key] = {
-              id,
-              type,
-              timestamps: {},
-              updateKey,
-            } as Notification);
+          // Filter out notifications that are not enabled
+          if (notificationPreferences[type] !== false) {
+            // New unique key - create new notification
+            if (!notification) {
+              const notification = (notifications.notifications[key] = {
+                id,
+                type,
+                timestamps: {},
+                updateKey,
+              } as Notification);
 
-            updateStatus(
-              notification,
-              isNew ? NotificationStatus.Triggered : NotificationStatus.Cleared
-            );
+              updateStatus(
+                notification,
+                isNew ? NotificationStatus.Triggered : NotificationStatus.Cleared
+              );
+            } else if (JSON.stringify(updateKey) !== JSON.stringify(notification.updateKey)) {
+              // updateKey changed - update existing notification
+
+              const notification = notifications.notifications[key];
+
+              notification.updateKey = updateKey;
+              updateStatus(notification, NotificationStatus.Updated);
+            }
+          } else {
+            // Notification is disabled - remove it
+            delete notifications.notifications[key];
           }
 
-          // updateKey changed - update existing notification
-          else if (JSON.stringify(updateKey) !== JSON.stringify(notification.updateKey)) {
-            const notification = notifications[key];
-
-            notification.updateKey = updateKey;
-            updateStatus(notification, NotificationStatus.Updated);
-          }
-
+          // if (notificationPreferences[type] !== false) {
           notificationsDisplayData[key] = displayData;
           setNotificationsDisplayData({ ...notificationsDisplayData });
+          // }
         },
-        [notifications, updateStatus]
+        [notificationsDisplayData, notifications, updateStatus, notificationPreferences[type]]
       ),
 
       lastUpdated: notificationsLastUpdated,
     });
 
   // Actions
-  const actions = Object.fromEntries(
-    notificationTypes.map(
-      ({ type, useNotificationAction }) => [type, useNotificationAction?.()] as const
-    )
+  const actions = useMemo(
+    () =>
+      Object.fromEntries(
+        notificationTypes.map(
+          ({ type, useNotificationAction }) => [type, useNotificationAction?.()] as const
+        )
+      ),
+    [notificationTypes]
   );
 
   const onNotificationAction = useCallback(
@@ -171,7 +221,7 @@ const useNotificationsContext = () => {
     (async () => {
       if (!hasEnabledPush) return;
 
-      for (const notification of Object.values(notifications))
+      for (const notification of Object.values(notifications.notifications))
         if (
           notification.status < NotificationStatus.Seen &&
           notification.timestamps[notification.status]! > pushNotificationsLastUpdated &&
@@ -186,7 +236,7 @@ const useNotificationsContext = () => {
             renotify: true,
             tag: getKey(notification),
             data: notification,
-            body: displayData.description,
+            description: displayData.body,
             icon: iconUrl ?? '/favicon.svg',
             badge: iconUrl ?? '/favicon.svg',
             image: iconUrl ?? '/favicon.svg',
@@ -215,7 +265,7 @@ const useNotificationsContext = () => {
 
   // Public
   return {
-    notifications,
+    notifications: notifications.notifications,
     /** Resolve key */
     getKey,
     /** Resolve associated NotificationDisplayData */
@@ -239,5 +289,13 @@ const useNotificationsContext = () => {
     // Menu state
     isMenuOpen,
     setIsMenuOpen,
+
+    // Notification Preferences
+    notificationPreferences,
+    setNotificationPreferences,
+    getNotificationPreferenceForType: useCallback(
+      (type: NotificationType) => notificationPreferences[type],
+      [notificationPreferences]
+    ),
   };
 };

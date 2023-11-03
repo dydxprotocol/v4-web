@@ -26,9 +26,12 @@ type ElementProps = {
   lastUpdated?: number;
 };
 
-type StyleProps = {};
+type StyleProps = {
+  className?: string;
+};
 
 export const Toast = ({
+  className,
   isOpen = true,
   setIsOpen,
   slotIcon,
@@ -58,6 +61,7 @@ export const Toast = ({
 
   return (
     <$Root
+      className={className}
       type={sensitivity}
       duration={Infinity}
       open={isOpen}
@@ -228,11 +232,7 @@ const $Header = styled.header`
 
 const $Icon = styled.div`
   ${layoutMixins.row}
-
   float: left;
-
-  width: 1em;
-  height: 1em;
 
   margin-right: 0.4em;
 

@@ -2,7 +2,7 @@ import { Fragment, type ReactNode, useState } from 'react';
 import styled, { type AnyStyledComponent, css } from 'styled-components';
 import { Command } from 'cmdk';
 
-import { type MenuConfig } from '@/constants/menus';
+import { MenuItem, type MenuConfig } from '@/constants/menus';
 import { popoverMixins } from '@/styles/popoverMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -20,6 +20,7 @@ type ElementProps<MenuItemValue extends string | number, MenuGroupValue extends 
 
 type StyleProps = {
   className?: string;
+  withItemBorders?: boolean;
   withStickyLayout?: boolean;
 };
 
@@ -38,6 +39,7 @@ export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extend
   withSearch = true,
 
   className,
+  withItemBorders,
   withStickyLayout,
 }: ComboboxMenuProps<MenuItemValue, MenuGroupValue>) => {
   const [highlightedCommand, setHighlightedCommand] = useState<MenuItemValue>();
@@ -80,6 +82,7 @@ export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extend
           <Styled.Group
             key={group.group}
             heading={group.groupLabel}
+            $withItemBorders={withItemBorders}
             $withStickyLayout={withStickyLayout}
           >
             {group.items.map((item) => (
@@ -99,22 +102,27 @@ export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extend
                     }
                   }}
                   disabled={item.disabled}
+                  $withItemBorders={withItemBorders}
                 >
-                  {item.slotBefore}
-                  <Styled.ItemLabel>
-                    <span>
-                      {`${item.label}${item.subitems?.length ? '…' : ''}`}
-                      {item.tag && (
-                        <>
-                          {' '}
-                          <Tag>{item.tag}</Tag>
-                        </>
-                      )}
-                    </span>
-                    {item.description && <span>{item.description}</span>}
-                  </Styled.ItemLabel>
-                  {item.slotAfter}
-                  {item.subitems && '→'}
+                  {item.slotCustomContent ?? (
+                    <>
+                      {item.slotBefore}
+                      <Styled.ItemLabel>
+                        <span>
+                          {`${item.label}${item.subitems?.length ? '…' : ''}`}
+                          {item.tag && (
+                            <>
+                              {' '}
+                              <Tag>{item.tag}</Tag>
+                            </>
+                          )}
+                        </span>
+                        {item.description && <span>{item.description}</span>}
+                      </Styled.ItemLabel>
+                      {item.slotAfter}
+                      {item.subitems && '→'}
+                    </>
+                  )}
                 </Styled.Item>
 
                 {searchValue &&
@@ -137,6 +145,7 @@ export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extend
                           onItemSelected?.();
                         }}
                         disabled={subitem.disabled}
+                        $withItemBorders={withItemBorders}
                       >
                         {subitem.slotBefore}
                         <Styled.ItemLabel>
@@ -225,7 +234,7 @@ Styled.Input = styled(Command.Input)`
   gap: 0.5rem;
 `;
 
-Styled.Group = styled(Command.Group)<{ $withStickyLayout?: boolean }>`
+Styled.Group = styled(Command.Group)<{ $withItemBorders?: boolean; $withStickyLayout?: boolean }>`
   color: var(--color-text-0);
 
   > [cmdk-group-heading] {
@@ -246,6 +255,14 @@ Styled.Group = styled(Command.Group)<{ $withStickyLayout?: boolean }>`
 
       > [cmdk-group-items] {
         ${layoutMixins.stickyArea3}
+      }
+    `}
+
+  ${({ $withItemBorders }) =>
+    $withItemBorders &&
+    css`
+      > [cmdk-group-items] {
+        padding: var(--border-width) 0;
       }
     `}
 `;
@@ -274,7 +291,7 @@ Styled.List = styled(Command.List)<{ $withStickyLayout?: boolean }>`
     `}
 `;
 
-Styled.Item = styled(Command.Item)`
+Styled.Item = styled(Command.Item)<{ $withItemBorders?: boolean }>`
   ${layoutMixins.scrollSnapItem}
   ${popoverMixins.item}
   --item-checked-backgroundColor: var(--comboboxMenu-item-checked-backgroundColor);
@@ -291,6 +308,12 @@ Styled.Item = styled(Command.Item)`
     opacity: 0.75;
     cursor: not-allowed;
   }
+
+  ${({ $withItemBorders }) =>
+    $withItemBorders &&
+    css`
+      ${layoutMixins.withOuterBorder}
+    `}
 `;
 
 Styled.ItemLabel = styled.div`
@@ -309,6 +332,8 @@ Styled.ItemLabel = styled.div`
       opacity: 0.8;
     }
   }
+
+  min-width: 0;
 `;
 
 Styled.Empty = styled(Command.Empty)`

@@ -5,7 +5,7 @@ import { groupBy } from 'lodash';
 
 import { type Notification, NotificationStatus } from '@/constants/notifications';
 
-import { useBreakpoints } from '@/hooks';
+import { useBreakpoints, useStringGetter } from '@/hooks';
 import { useNotifications } from '@/hooks/useNotifications';
 import { CloseIcon } from '@/icons';
 
@@ -16,6 +16,7 @@ import { DialogPlacement } from '@/components/Dialog';
 import { Output, OutputType } from '@/components/Output';
 import { IconButton } from '@/components/IconButton';
 import { Toolbar } from '@/components/Toolbar';
+import { STRING_KEYS } from '@/constants/localization';
 
 type ElementProps = {
   slotTrigger?: React.ReactNode;
@@ -27,6 +28,8 @@ export const NotificationsMenu = ({
   placement = DialogPlacement.Sidebar,
 }: ElementProps) => {
   const { isTablet } = useBreakpoints();
+  const stringGetter = useStringGetter();
+
   const {
     notifications,
     getDisplayData,
@@ -65,14 +68,12 @@ export const NotificationsMenu = ({
   const items: Parameters<typeof ComboboxDialogMenu>[0]['items'] = useMemo(
     () =>
       (Object.entries(notificationsByStatus) as unknown as [NotificationStatus, Notification[]][])
-        // .filter(([status]) => status !== NotificationStatus.Cleared)
+        .filter(([status]) => status !== NotificationStatus.Cleared)
         .map(([status, notifications]) => ({
           group: status,
           groupLabel: {
             [NotificationStatus.Triggered]: 'New',
-            // [NotificationStatus.Updated]: 'Updates',
             [NotificationStatus.Seen]: 'Seen',
-            [NotificationStatus.Cleared]: 'Archived',
           }[status as number],
 
           items: notifications
@@ -89,16 +90,13 @@ export const NotificationsMenu = ({
             .map(({ notification, key, displayData }) => ({
               value: key,
               label: displayData.title ?? '',
-              description: displayData.customMenuContent || displayData.description,
-              slotBefore: !displayData.customMenuContent && displayData.icon,
-              slotAfter: !displayData.customMenuContent && (
+              description: displayData.body,
+              slotBefore: displayData.icon,
+              slotAfter: !displayData.customBody && (
                 <>
                   <$Output
                     type={OutputType.RelativeTime}
-                    value={
-                      notification.timestamps[NotificationStatus.Updated] ||
-                      notification.timestamps[NotificationStatus.Triggered]
-                    }
+                    value={notification.timestamps[NotificationStatus.Triggered]}
                   />
 
                   {notification.status < NotificationStatus.Seen ? <$UnreadIndicator /> : null}
@@ -119,6 +117,7 @@ export const NotificationsMenu = ({
                   ) : null}
                 </>
               ),
+              slotCustomContent: displayData.customBody,
               disabled: notification.status === NotificationStatus.Cleared,
               onSelect: () => {
                 onNotificationAction(notification);
@@ -132,10 +131,11 @@ export const NotificationsMenu = ({
 
   return (
     <ComboboxDialogMenu
+      withItemBorders
       isOpen={isMenuOpen || placement === DialogPlacement.Inline}
       setIsOpen={setIsMenuOpen}
       items={items}
-      title="Notifications"
+      title={stringGetter({ key: STRING_KEYS.NOTIFICATIONS })}
       slotTrigger={
         <$TriggerContainer>
           {slotTrigger}

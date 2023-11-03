@@ -15,6 +15,7 @@ import { ExternalNavKeplrDialog } from '@/views/dialogs/ExternalNavKeplrDialog';
 import { MnemonicExportDialog } from '@/views/dialogs/MnemonicExportDialog';
 import { MobileSignInDialog } from '@/views/dialogs/MobileSignInDialog';
 import { OnboardingDialog } from '@/views/dialogs/OnboardingDialog';
+import { PreferencesDialog } from '@/views/dialogs/PreferencesDialog';
 import { RateLimitDialog } from '@/views/dialogs/RateLimitDialog';
 import { ReceiveDialog } from '@/views/dialogs/ReceiveDialog';
 import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
@@ -56,6 +57,7 @@ export const DialogManager = () => {
     [DialogTypes.MobileSignIn]: <MobileSignInDialog {...modalProps} />,
     [DialogTypes.Onboarding]: <OnboardingDialog {...modalProps} />,
     [DialogTypes.OrderDetails]: <OrderDetailsDialog {...modalProps} />,
+    [DialogTypes.Preferences]: <PreferencesDialog {...modalProps} />,
     [DialogTypes.RateLimit]: <RateLimitDialog {...modalProps} />,
     [DialogTypes.Receive]: <ReceiveDialog {...modalProps} />,
     [DialogTypes.RestrictedGeo]: <RestrictedGeoDialog {...modalProps} />,

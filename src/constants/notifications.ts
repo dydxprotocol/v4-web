@@ -75,18 +75,19 @@ export type Notification<
   updateKey: NotificationUpdateKey;
 };
 
-export type Notifications = Record<NotificationId, Notification<any>>;
+export type Notifications = {
+  notifications: Record<NotificationId, Notification<any>>;
+  version: string;
+};
 
 /** Notification display data derived from app state at runtime. */
 export type NotificationDisplayData = {
   icon?: React.ReactNode;
 
-  title: string;
+  title: string; // Title for Toast, Notification, and Push Notification
+  body?: string; // Description body for Toast, Notification, and Push Notification
 
-  description?: string;
-
-  customContent?: React.ReactNode;
-
+  customBody?: React.ReactNode; // Custom Notification
   customMenuContent?: React.ReactNode;
 
   actionDescription?: string;
@@ -124,3 +125,10 @@ export type TransferNotifcation = {
   triggeredAt?: number;
   status?: StatusResponse;
 };
+
+/**
+ * @description Struct to store whether a NotificationType should be triggered
+ */
+export type NotificationPreferences = {
+  [key in NotificationType]: boolean;
+} & { version: string };

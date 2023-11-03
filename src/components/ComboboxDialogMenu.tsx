@@ -22,7 +22,12 @@ type PickComboxMenuProps<
   MenuGroupValue extends string | number
 > = Pick<
   ComboboxMenuProps<MenuItemValue, MenuGroupValue>,
-  'inputPlaceholder' | 'onItemSelected' | 'slotEmpty' | 'withSearch' | 'withStickyLayout'
+  | 'inputPlaceholder'
+  | 'onItemSelected'
+  | 'slotEmpty'
+  | 'withItemBorders'
+  | 'withSearch'
+  | 'withStickyLayout'
 >;
 
 type PickDialogProps = Pick<
@@ -53,6 +58,7 @@ export const ComboboxDialogMenu = <
   onItemSelected,
   inputPlaceholder,
   slotEmpty,
+  withItemBorders,
   withSearch,
   withStickyLayout = true,
   children,
@@ -83,6 +89,7 @@ export const ComboboxDialogMenu = <
       title={title}
       inputPlaceholder={inputPlaceholder}
       slotEmpty={slotEmpty}
+      withItemBorders={withItemBorders}
       withSearch={withSearch}
       withStickyLayout={withStickyLayout}
     />
