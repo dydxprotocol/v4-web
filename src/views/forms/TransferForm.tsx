@@ -61,39 +61,53 @@ export const TransferForm = ({
   const stringGetter = useStringGetter();
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
   const { dydxAddress } = useAccounts();
-  const {
-    address: recipientAddress,
-    size,
-    fee,
-  } = useSelector(getTransferInputs, shallowEqual) || {};
   const { transfer } = useSubaccount();
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
   const { selectedNetwork } = useSelectedNetwork();
   const { tokensConfigs, usdcLabel, chainTokenLabel } = useTokenConfigs();
 
-  // User Input
-  const [asset, setAsset] = useState<DydxChainAsset>(selectedAsset);
+  const {
+    address: recipientAddress,
+    size,
+    fee,
+    token,
+  } = useSelector(getTransferInputs, shallowEqual) || {};
 
   // Form states
   const [error, setError] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
 
-  const balance = asset === DydxChainAsset.USDC ? freeCollateral?.current : nativeTokenBalance;
-  const newBalance =
-    asset === DydxChainAsset.USDC
-      ? freeCollateral?.postOrder
-      : MustBigNumber(nativeTokenBalance)
-          .minus(size?.size ?? 0)
-          .minus(fee ?? 0)
-          .toNumber();
-  const amount = asset === DydxChainAsset.USDC ? size?.usdcSize : size?.size;
+  // temp fix: TODO: reset fees when changing token in Abacus
+  const [currentFee, setCurrentFee] = useState(fee);
+  useEffect(() => {
+    setCurrentFee(fee);
+  }, [fee]);
 
-  const showNotEnoughGasWarning = fee && asset === DydxChainAsset.USDC && usdcBalance < fee;
+  const asset = (token ?? selectedAsset) as DydxChainAsset;
+  const isUSDCSelected = asset === DydxChainAsset.USDC;
+  const amount = isUSDCSelected ? size?.usdcSize : size?.size;
+  const showNotEnoughGasWarning = fee && isUSDCSelected && usdcBalance < fee;
+  const balance = isUSDCSelected ? freeCollateral?.current : nativeTokenBalance;
 
   // BN
+  const newBalanceBN = isUSDCSelected
+    ? MustBigNumber(freeCollateral?.postOrder)
+    : nativeTokenBalance.minus(size?.size ?? 0);
+
   const amountBN = MustBigNumber(amount);
   const balanceBN = MustBigNumber(balance);
-  const newBalanceBN = MustBigNumber(newBalance);
+
+  const onChangeAsset = (asset: DydxChainAsset) => {
+    setError(undefined);
+    setCurrentFee(undefined);
+
+    if (asset) {
+      abacusStateManager.setTransferValue({
+        value: asset,
+        field: TransferInputField.token,
+      });
+    }
+  };
 
   useEffect(() => {
     abacusStateManager.setTransferValue({
@@ -101,18 +115,12 @@ export const TransferForm = ({
       field: TransferInputField.type,
     });
 
+    onChangeAsset(selectedAsset);
+
     return () => {
       abacusStateManager.clearTransferInputValues();
     };
   }, []);
-
-  useEffect(() => {
-    setError(undefined);
-    abacusStateManager.setTransferValue({
-      value: asset,
-      field: TransferInputField.token,
-    });
-  }, [asset]);
 
   const { sanctionedAddresses } = useRestrictions();
 
@@ -155,7 +163,7 @@ export const TransferForm = ({
         const txResponse = await transfer(
           amountBN.toNumber(),
           recipientAddress as string,
-          tokensConfigs[asset].denom
+          tokensConfigs[asset]?.denom
         );
 
         if (txResponse?.code === 0) {
@@ -196,7 +204,7 @@ export const TransferForm = ({
   const onChangeAmount = (value?: number) => {
     abacusStateManager.setTransferValue({
       value,
-      field: asset === DydxChainAsset.USDC ? TransferInputField.usdcSize : TransferInputField.size,
+      field: isUSDCSelected ? TransferInputField.usdcSize : TransferInputField.size,
     });
   };
 
@@ -245,15 +253,15 @@ export const TransferForm = ({
       key: 'amount',
       label: (
         <span>
-          {stringGetter({ key: STRING_KEYS.AVAILABLE })} <Tag>{tokensConfigs[asset].name}</Tag>
+          {stringGetter({ key: STRING_KEYS.AVAILABLE })} <Tag>{tokensConfigs[asset]?.name}</Tag>
         </span>
       ),
       value: (
         <DiffOutput
           type={OutputType.Asset}
-          value={balanceBN.toString()}
-          newValue={newBalanceBN.toString()}
+          value={balanceBN}
           sign={NumberSign.Negative}
+          newValue={newBalanceBN}
           hasInvalidNewValue={newBalanceBN.isNegative()}
           withDiff={Boolean(amount && balance) && !amountBN.isNaN()}
         />
@@ -336,8 +344,8 @@ export const TransferForm = ({
 
       <Styled.SelectMenu
         label={stringGetter({ key: STRING_KEYS.ASSET })}
-        value={asset}
-        onValueChange={setAsset}
+        value={token}
+        onValueChange={onChangeAsset}
         disabled={isLoading}
       >
         {assetOptions.map(({ value, label }) => (
@@ -352,7 +360,8 @@ export const TransferForm = ({
           onChange={({ floatValue }: NumberFormatValues) => onChangeAmount(floatValue)}
           value={amount ?? undefined}
           slotRight={
-            asset === DydxChainAsset.USDC &&
+            isUSDCSelected &&
+            balanceBN.gt(0) &&
             renderFormInputButton({
               label: stringGetter({ key: STRING_KEYS.MAX }),
               isInputEmpty: size?.usdcSize == null,
@@ -378,9 +387,9 @@ export const TransferForm = ({
       <Styled.Footer>
         <TransferButtonAndReceipt
           selectedAsset={asset}
-          fees={fee || undefined}
-          isDisabled={!isAmountValid || !isAddressValid || !fee || isLoading}
-          isLoading={isLoading || Boolean(isAmountValid && isAddressValid && !fee)}
+          fee={currentFee || undefined}
+          isDisabled={!isAmountValid || !isAddressValid || !currentFee || isLoading}
+          isLoading={isLoading || Boolean(isAmountValid && isAddressValid && !currentFee)}
         />
       </Styled.Footer>
     </Styled.Form>
