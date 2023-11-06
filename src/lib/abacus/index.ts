@@ -41,7 +41,7 @@ import AbacusStateNotifier from './stateNotification';
 import AbacusLocalizer from './localizer';
 import AbacusFormatter from './formatter';
 import AbacusThreading from './threading';
-import AbacusFileSystem, { ENDPOINTS_PATH } from './filesystem';
+import AbacusFileSystem from './filesystem';
 import { LocaleSeparators } from '../numbers';
 class AbacusStateManager {
   private store: RootStore | undefined;

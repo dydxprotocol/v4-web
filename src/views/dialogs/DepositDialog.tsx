@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
+import { isMainnet } from '@/constants/networks';
 import { STRING_KEYS } from '@/constants/localization';
 import { useBreakpoints, useStringGetter } from '@/hooks';
 
@@ -27,14 +28,22 @@ export const DepositDialog = ({ setIsOpen }: ElementProps) => {
       isOpen
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.DEPOSIT })}
-      description={showTestDeposit && 'Test funds will be sent directly to your dYdX account.'}
+      description={
+        !isMainnet && showTestDeposit && 'Test funds will be sent directly to your dYdX account.'
+      }
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
       <Styled.Content>
-        {showTestDeposit ? <TestnetDepositForm onDeposit={closeDialog} /> : <DepositForm />}
-        <Styled.TextToggle onClick={() => setShowTestDeposit(!showTestDeposit)}>
-          {showTestDeposit ? 'Show deposit form (Under Construction)' : 'Show test faucet'}
-        </Styled.TextToggle>
+        {!isMainnet && showTestDeposit ? (
+          <TestnetDepositForm onDeposit={closeDialog} />
+        ) : (
+          <DepositForm />
+        )}
+        {!isMainnet && (
+          <Styled.TextToggle onClick={() => setShowTestDeposit(!showTestDeposit)}>
+            {showTestDeposit ? 'Show deposit form (Under Construction)' : 'Show test faucet'}
+          </Styled.TextToggle>
+        )}
       </Styled.Content>
     </Dialog>
   );
