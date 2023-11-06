@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 dependencies:
   '@0xsquid/sdk':
     specifier: ^1.10.0
@@ -27,8 +23,8 @@ dependencies:
     specifier: ^0.31.0
     version: 0.31.0
   '@dydxprotocol/v4-abacus':
-    specifier: ^1.0.10
-    version: 1.0.10
+    specifier: ^1.0.12
+    version: 1.0.12
   '@dydxprotocol/v4-client-js':
     specifier: ^1.0.0
     version: 1.0.0
@@ -979,8 +975,8 @@ packages:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.0.10:
-    resolution: {integrity: sha512-SdxI/JcyxM1ydtR9ImWujeurea3gbxj37qYnw1wz829BQiZ05uNEtll3xJCI0MjpG+01ARsxVys7SHbpjSxwOg==}
+  /@dydxprotocol/v4-abacus@1.0.12:
+    resolution: {integrity: sha512-SNOv07gLnvC/S7UFT2XU5/rRNGGw2tfD51ob597uNjBWRWBSlXJZWFn9EGEOMffn56R9xeODtWPfPrBnkKvcbA==}
     dev: false
 
   /@dydxprotocol/v4-client-js@1.0.0:
@@ -14100,3 +14096,7 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
