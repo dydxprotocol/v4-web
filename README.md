@@ -69,6 +69,20 @@ You'll need to provide a Wallet Connect project id to enable onboarding and wall
 - Create a project on https://cloud.walletconnect.com/app
 - Copy over the project ID into this [field](https://github.com/dydxprotocol/v4-web/blob/67ecbd75b43e0c264b7b4d2d9b3d969830b0621c/public/configs/env.json#L822C33-L822C46)
 
+## Part 4: Set Enviornment variables
+Set environment variables via `.env`.
+
+- `VITE_BASE_URL` (required) the base url of the deployment (e.g https://www.example.com)
+- `VITE_ALCHEMY_API_KEY` (optional) Add an Alchemy API Key for evm interactions, app will fallback to public RPCs if not provided
+- `VITE_PK_ENCRYPTION_KEY` (required) AES encryption key used for signature obfuscation, need for enabling "Remember Me" feature.
+- `VITE_V3_TOKEN_ADDRESS` (required) Address of the V3 $DYDX token
+- `VITE_TOKEN_MIGRATION_URI` (required) the URL of the token migration website
+- `AMPLITUDE_API_KEY` (optional) Amplitude API Key for enabling Amplitude, used with `pnpm run build:inject-amplitude`
+- `BUGSNAG_API_KEY` (optional) API Key for enabling bugsnap, used with `pnpm run build:inject-bugsnag`
+- `IOS_APP_ID` (optional) IOS APP ID used for enabling deeplinking to the IOS APP, used with `pnpm run build:inject-app-deeplinks`
+- `INTERCOM_APP_ID` (optional) used for enabling intercom, used with `pnpm run build:inject-intercom`
+- `STATUS_PAGE_SCRIPT_URI` (optional) used for enabling status page, used with `pnpm run build:inject-statuspage`
+
 # Deployments
 
 ## Deploying with Vercel
