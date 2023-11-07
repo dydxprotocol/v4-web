@@ -7,9 +7,11 @@ import { AlertType } from '@/constants/alerts';
 import { AbacusOrderStatus, ORDER_SIDES } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, StringKey } from '@/constants/localization';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { type NotificationTypeConfig, NotificationType } from '@/constants/notifications';
 import { ORDER_SIDE_STRINGS } from '@/constants/trade';
 
+import { useSelectedNetwork }  from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { Icon, IconName } from '@/components/Icon';
@@ -23,7 +25,6 @@ import { OrderStatusIcon } from '@/views/OrderStatusIcon';
 
 import { useStringGetter } from './useStringGetter';
 import { TransferStatusSteps } from '@/views/TransferStatusSteps';
-import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
 
 export const notificationTypes = [
   {
@@ -124,6 +125,7 @@ export const notificationTypes = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const { transferNotifications } = useLocalNotifications();
+      const { selectedNetwork } = useSelectedNetwork();
 
       const getTitleStringKey = useCallback((type: 'deposit' | 'withdrawal', finished: boolean) => {
         if (type === 'deposit' && !finished) return STRING_KEYS.DEPOSIT_IN_PROGRESS;
@@ -136,7 +138,7 @@ export const notificationTypes = [
         for (const transfer of transferNotifications) {
           const { fromChainId, status, txHash, toAmount } = transfer;
           const finished = Boolean(status) && status?.squidTransactionStatus !== 'ongoing';
-          const type = fromChainId === TESTNET_CHAIN_ID ? 'withdrawal' : 'deposit';
+          const type = fromChainId === ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId ? 'withdrawal' : 'deposit';
           // @ts-ignore status.errors is not in the type definition but can be returned
           const error = status?.errors?.length ? status?.errors[0] : status?.error;
 

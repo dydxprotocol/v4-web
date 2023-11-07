@@ -3,13 +3,13 @@ import type { ChangeEvent, FormEvent } from 'react';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
-import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
 import { isAddress } from 'viem';
 
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { NumberSign } from '@/constants/numbers';
 
 import {
@@ -17,6 +17,7 @@ import {
   useDebounce,
   useDydxClient,
   useRestrictions,
+  useSelectedNetwork,
   useStringGetter,
   useSubaccount,
 } from '@/hooks';
@@ -52,6 +53,7 @@ export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
   const [error, setError] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
+  const { selectedNetwork } = useSelectedNetwork();
 
   const { sendSquidWithdraw } = useSubaccount();
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
@@ -164,7 +166,7 @@ export const WithdrawForm = () => {
             const hash = `0x${Buffer.from(txHash.hash).toString('hex')}`;
             addTransferNotification({
               txHash: hash,
-              fromChainId: TESTNET_CHAIN_ID,
+              fromChainId: ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId,
               toChainId: chainIdStr || undefined,
               toAmount: debouncedAmountBN.toNumber(),
               triggeredAt: Date.now(),
