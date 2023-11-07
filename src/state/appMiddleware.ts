@@ -2,6 +2,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 
 import { AbacusApiStatus } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
+import { isDev } from '@/constants/networks';
 
 import { setApiState, setSelectedNetwork } from '@/state/app';
 import { resetPerpetualsState } from '@/state/perpetuals';
@@ -30,7 +31,7 @@ export default (store: any) => (next: any) => async (action: PayloadAction<any>)
         store.dispatch(
           openDialog({
             type: DialogTypes.ExchangeOffline,
-            dialogProps: { preventClose: import.meta.env.MODE === 'production' },
+            dialogProps: { preventClose: !isDev },
           })
         );
       }

@@ -1,5 +1,7 @@
+import { isDev } from "@/constants/networks";
+
 export const log = (location: string, error: Error, metadata?: any) => {
-  if (import.meta.env.MODE !== 'production') {
+  if (isDev) {
     console.warn('telemetry/log:', { location, error, metadata });
   }
 

@@ -30,7 +30,7 @@ import {
 
 import { DialogTypes } from '@/constants/dialogs';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
-import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
+import { ENVIRONMENT_CONFIG_MAP, DydxNetwork, isTestnet } from '@/constants/networks';
 
 import { RootStore } from '@/state/_store';
 import { addUncommittedOrderClientId, removeUncommittedOrderClientId } from '@/state/account';
@@ -198,8 +198,13 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       const parsedTx = this.parseToPrimitives(tx);
       const hash = parsedTx?.hash;
 
-      if (import.meta.env.MODE === 'production') {
-        console.log(`https://testnet.mintscan.io/dydx-testnet/txs/${hash}`);
+      if (isTestnet) {
+        console.log(
+          `${
+            ENVIRONMENT_CONFIG_MAP[this.compositeClient.network.getString() as DydxNetwork]?.links
+              ?.mintscanBase
+          }/txs/${hash}`
+        );
       } else console.log(`txHash: ${hash}`);
 
       return JSON.stringify(parsedTx);
@@ -229,7 +234,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         orderFlags,
         clobPairId,
         goodTilBlock || undefined,
-        goodTilBlockTime || undefined,
+        goodTilBlockTime || undefined
       );
 
       const parsedTx = this.parseToPrimitives(tx);
@@ -295,15 +300,11 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
             if (!this.localWallet) {
               throw new Error('Missing compositeClient or localWallet');
             }
-            const msg = compositeClient?.sendTokenMessage(
-              this.localWallet,
-              amount,
-              recipient,
-            );
+            const msg = compositeClient?.sendTokenMessage(this.localWallet, amount, recipient);
 
             resolve([msg]);
           }),
-        this.compositeClient?.validatorClient?.post.defaultDydxGasPrice,
+        this.compositeClient?.validatorClient?.post.defaultDydxGasPrice
       );
 
       const parsedTx = this.parseToPrimitives(tx);

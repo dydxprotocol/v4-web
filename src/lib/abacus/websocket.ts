@@ -1,5 +1,6 @@
 import type { AbacusWebsocketProtocol } from '@/constants/abacus';
 import type { TradingViewBar } from '@/constants/candles';
+import { isDev } from '@/constants/networks';
 
 import {
   PING_INTERVAL_MS,
@@ -161,13 +162,13 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
 
     this.socket.onclose = (e) => {
       this.connectedCallback?.(false);
-      if (import.meta.env.MODE === 'production') return;
+      if (!isDev) return;
       console.warn('AbacusStateManager > WS > close > ', e);
     };
 
     this.socket.onerror = (e) => {
       this.connectedCallback?.(false);
-      if (import.meta.env.MODE === 'production') return;
+      if (!isDev) return;
       console.error('AbacusStateManager > WS > error > ', e);
     };
   };
