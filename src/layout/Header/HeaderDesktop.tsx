@@ -236,4 +236,5 @@ Styled.IconButton = styled(IconButton)<{ size?: string }>`
   ${headerMixins.button}
   --button-border: none;
   --button-icon-size: 1rem;
+  --button-padding: 0 0.5em;
 `;

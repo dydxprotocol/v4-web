@@ -7,7 +7,7 @@ import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints, useStringGetter, useURLConfigs } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
@@ -40,11 +40,13 @@ const getTransferHistoryTableColumnDef = ({
   key,
   stringGetter,
   width,
+  mintscanTxUrl,
 }: {
   key: TransferHistoryTableColumnKey;
   isTablet?: boolean;
   stringGetter: StringGetterFunction;
   width?: ColumnSize;
+  mintscanTxUrl?: string;
 }): ColumnDef<SubaccountTransfer> => ({
   width,
   ...(
@@ -98,9 +100,12 @@ const getTransferHistoryTableColumnDef = ({
         columnKey: TransferHistoryTableColumnKey.TxHash,
         getCellValue: (row) => row.transactionHash,
         label: stringGetter({ key: STRING_KEYS.TRANSACTION }),
-        renderCell: ({ transactionHash, resources }) =>
+        renderCell: ({ transactionHash }) =>
           transactionHash ? (
-            <Styled.TxHash withIcon href={resources.blockExplorerUrl}>
+            <Styled.TxHash
+              withIcon
+              href={`${mintscanTxUrl?.replace('{tx_hash}', transactionHash)}`}
+            >
               {truncateAddress(transactionHash, '')}
             </Styled.TxHash>
           ) : (
@@ -130,6 +135,7 @@ export const TransferHistoryTable = ({
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
   const { isMobile, isTablet } = useBreakpoints();
+  const { mintscan: mintscanTxUrl } = useURLConfigs();
 
   const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
 
@@ -146,6 +152,7 @@ export const TransferHistoryTable = ({
           isTablet,
           stringGetter,
           width: columnWidths?.[key],
+          mintscanTxUrl,
         })
       )}
       slotEmpty={
