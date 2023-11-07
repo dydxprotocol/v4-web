@@ -1,24 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
-
-import { Root, Title, Description, Action, Close } from '@radix-ui/react-toast';
+import { useEffect, useRef, useState } from 'react';
+import styled, { keyframes } from 'styled-components';
+import { Root, Action, Close } from '@radix-ui/react-toast';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import { popoverMixins } from '@/styles/popoverMixins';
+
+import { Notification, type NotificationProps } from '@/views/notifications/Notification';
 
 import { IconButton } from './IconButton';
-import { CloseIcon } from '@/icons';
-
-import styled, { keyframes } from 'styled-components';
-import { popoverMixins } from '@/styles/popoverMixins';
-import { layoutMixins } from '@/styles/layoutMixins';
+import { IconName } from './Icon';
 
 type ElementProps = {
   isOpen?: boolean;
   setIsOpen?: (isOpen: boolean, isClosedFromTimeout?: boolean) => void;
-  slotIcon?: React.ReactNode;
-  slotTitle?: React.ReactNode;
-  slotDescription?: React.ReactNode;
-  slotCustomContent?: React.ReactNode;
-  slotAction?: React.ReactNode;
   actionDescription?: string;
   actionAltText?: string;
   sensitivity?: 'foreground' | 'background';
@@ -30,12 +24,17 @@ type StyleProps = {
   className?: string;
 };
 
+type ToastProps = NotificationProps & ElementProps & StyleProps;
+
 export const Toast = ({
   className,
   isOpen = true,
+  notification,
   setIsOpen,
   slotIcon,
   slotTitle,
+  slotTitleLeft,
+  slotTitleRight,
   slotDescription,
   slotCustomContent,
   slotAction,
@@ -44,7 +43,7 @@ export const Toast = ({
   sensitivity = 'background',
   duration = Infinity,
   lastUpdated,
-}: ElementProps & StyleProps) => {
+}: ToastProps) => {
   // Timeout
   const timeout = useRef<number>();
   const [isPaused, setIsPaused] = useState(false);
@@ -69,30 +68,32 @@ export const Toast = ({
       onPause={() => setIsPaused(true)}
       onResume={() => setIsPaused(false)}
     >
-      <div>
-        <$Container>
-          <$Header>
-            {slotIcon && <$Icon>{slotIcon}</$Icon>}
+      <Close asChild>
+        <$CloseButton
+          iconName={IconName.Close}
+          shape={ButtonShape.Square}
+          size={ButtonSize.XSmall}
+        />
+      </Close>
 
-            <Close asChild>
-              <$CloseButton
-                iconComponent={CloseIcon}
-                shape={ButtonShape.Square}
-                size={ButtonSize.XSmall}
-              />
-            </Close>
-
-            <$Title>{slotTitle}</$Title>
-          </$Header>
-          {!slotCustomContent && <$Description>{slotDescription}</$Description>}
-          {slotCustomContent}
-          {actionDescription && (
-            <$Action asChild altText={actionAltText}>
-              {slotAction}
-            </$Action>
-          )}
-        </$Container>
-      </div>
+      {slotCustomContent ?? (
+        <$Notification
+          isToast
+          notification={notification}
+          slotIcon={slotIcon}
+          slotTitle={slotTitle}
+          slotTitleLeft={slotTitleLeft}
+          slotTitleRight={slotTitleRight}
+          slotDescription={slotDescription}
+          slotAction={
+            actionDescription && (
+              <$Action asChild altText={actionAltText}>
+                {slotAction}
+              </$Action>
+            )
+          }
+        />
+      )}
     </$Root>
   );
 };
@@ -118,7 +119,7 @@ const $Root = styled(Root)`
   translate: var(--x) var(--y);
   will-change: translate, margin-top;
 
-  margin-bottom: var(--toasts-gap);
+  /* margin-bottom: var(--toasts-gap); */
 
   &[data-swipe-direction='right'] {
     &[data-state='open'] {
@@ -167,6 +168,10 @@ const $Root = styled(Root)`
     cursor: n-resize;
   }
 
+  &:focus:not([data-swipe='end']) & {
+    outline: var(--color-accent) 1px solid;
+  }
+
   &[data-swipe='move'] {
     transition-property: opacity;
     opacity: 0.98;
@@ -174,6 +179,10 @@ const $Root = styled(Root)`
     cursor: grabbing;
     * {
       cursor: inherit;
+    }
+
+    & > * {
+      opacity: 0.5;
     }
   }
 
@@ -202,7 +211,7 @@ const $Root = styled(Root)`
   }
 `;
 
-const $Container = styled.div`
+const $Notification = styled(Notification)`
   // Params
   --toast-icon-size: 1.75em;
 
@@ -214,29 +223,9 @@ const $Container = styled.div`
     // border
     0 0 0.5rem 0.1rem var(--color-layer-2); // shadow
 
-  ${$Root}:focus:not([data-swipe='end']) & {
-    outline: var(--color-accent) 1px solid;
-  }
-
   > * {
     transition: opacity 0.2s;
   }
-  ${$Root}[data-swipe='move'] & > * {
-    opacity: 0.5;
-  }
-`;
-
-const $Header = styled.header`
-  display: block;
-`;
-
-const $Icon = styled.div`
-  ${layoutMixins.row}
-  float: left;
-
-  margin-right: 0.4em;
-
-  line-height: 1;
 `;
 
 const $CloseButton = styled(IconButton)`
@@ -258,23 +247,8 @@ const $CloseButton = styled(IconButton)`
 
   ${$Root}:hover & {
     display: block;
+    z-index: 2;
   }
-`;
-
-const $Title = styled(Title)`
-  flex: 1;
-
-  font: var(--font-base-medium);
-  color: var(--color-text-2);
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const $Description = styled(Description)`
-  margin-top: 0.5rem;
-  color: var(--color-text-0);
-  font: var(--font-small-book);
 `;
 
 const $Action = styled(Action)`

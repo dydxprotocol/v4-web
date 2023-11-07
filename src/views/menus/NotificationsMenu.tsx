@@ -10,7 +10,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { CloseIcon } from '@/icons';
 
 import { Button } from '@/components/Button';
-import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { DialogPlacement } from '@/components/Dialog';
 import { Output, OutputType } from '@/components/Output';
@@ -50,15 +50,12 @@ export const NotificationsMenu = ({
     setIsMenuOpen,
   } = useNotifications();
 
-  const notificationsByStatus: Partial<Record<NotificationStatus, Notification[]>> = useMemo(
-    () =>
-      groupBy(Object.values(notifications).filter(getDisplayData), (notification) =>
-        notification.status < NotificationStatus.Seen
-          ? NotificationStatus.Triggered
-          : notification.status
-      ),
-    [notifications, getDisplayData]
-  );
+  const notificationsByStatus: Partial<Record<NotificationStatus, Notification[]>> = useMemo(() => {
+    return groupBy(
+      Object.values(notifications).filter(getDisplayData),
+      (notification) => notification.status
+    );
+  }, [notifications, getDisplayData]);
 
   const hasUnreadNotifications = useMemo(
     () => notificationsByStatus[NotificationStatus.Triggered]?.length! > 0,
@@ -68,7 +65,7 @@ export const NotificationsMenu = ({
   const items: Parameters<typeof ComboboxDialogMenu>[0]['items'] = useMemo(
     () =>
       (Object.entries(notificationsByStatus) as unknown as [NotificationStatus, Notification[]][])
-        .filter(([status]) => status !== NotificationStatus.Cleared)
+        .filter(([status]) => status < NotificationStatus.Cleared)
         .map(([status, notifications]) => ({
           group: status,
           groupLabel: {
@@ -84,44 +81,19 @@ export const NotificationsMenu = ({
             )
             .map((notification) => ({
               notification,
-              key: getKey(notification),
-              displayData: getDisplayData(notification),
+              key: getKey?.(notification),
+              displayData: getDisplayData?.(notification),
             }))
             .map(({ notification, key, displayData }) => ({
               value: key,
-              label: displayData.title ?? '',
+              label: displayData.title,
               description: displayData.body,
-              slotBefore: displayData.icon,
-              slotAfter: !displayData.customBody && (
-                <>
-                  <$Output
-                    type={OutputType.RelativeTime}
-                    value={notification.timestamps[NotificationStatus.Triggered]}
-                  />
-
-                  {notification.status < NotificationStatus.Seen ? <$UnreadIndicator /> : null}
-
-                  {notification.status < NotificationStatus.Cleared ? (
-                    <$IconButton
-                      iconComponent={CloseIcon}
-                      onClick={(e) => {
-                        e.stopPropagation();
-
-                        /*if (notification.status < NotificationStatus.Seen) {
-                          markSeen(notification);
-                        } else*/ if (notification.status < NotificationStatus.Cleared) {
-                          markCleared(notification);
-                        }
-                      }}
-                    />
-                  ) : null}
-                </>
-              ),
-              slotCustomContent: displayData.customBody,
+              slotBefore: !displayData.renderCustomBody && displayData.icon,
+              slotCustomContent: displayData.renderCustomBody?.({ notification }),
               disabled: notification.status === NotificationStatus.Cleared,
               onSelect: () => {
-                onNotificationAction(notification);
-                markSeen(notification);
+                onNotificationAction?.(notification);
+                markSeen?.(notification);
               },
             })),
         }))
@@ -130,7 +102,7 @@ export const NotificationsMenu = ({
   );
 
   return (
-    <ComboboxDialogMenu
+    <$ComboboxDialogMenu
       withItemBorders
       isOpen={isMenuOpen || placement === DialogPlacement.Inline}
       setIsOpen={setIsMenuOpen}
@@ -178,6 +150,10 @@ export const NotificationsMenu = ({
   );
 };
 
+const $ComboboxDialogMenu = styled(ComboboxDialogMenu)`
+  --comboboxDialogMenu-item-padding: 0;
+`;
+
 const $UnreadIndicator = styled.div`
   width: 0.5rem;
   height: 0.5rem;
@@ -196,16 +172,6 @@ const $TriggerUnreadIndicator = styled($UnreadIndicator)`
   position: relative;
   right: -0.2rem;
   top: -0.325rem;
-`;
-
-const $Output = styled(Output)`
-  color: var(--color-text-0);
-`;
-
-const $IconButton = styled(IconButton)`
-  --button-border: none;
-  --button-textColor: var(--color-text-0);
-  --button-hover-textColor: var(--color-text-1);
 `;
 
 const $FooterToolbar = styled(Toolbar)`

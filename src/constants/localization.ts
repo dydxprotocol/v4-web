@@ -40,6 +40,10 @@ export const STRING_KEYS = {
   ...NOTIFICATIONS_STRING_KEYS,
 };
 
+export const STRING_KEY_VALUES = Object.fromEntries(
+  Object.values(STRING_KEYS).map((key) => [key, key])
+);
+
 export type StringKey = keyof typeof STRING_KEYS;
 
 export type LocaleData = typeof EN_LOCALE_DATA;

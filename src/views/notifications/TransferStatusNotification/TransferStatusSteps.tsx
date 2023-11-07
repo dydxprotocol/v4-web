@@ -17,6 +17,10 @@ type ElementProps = {
   type: 'withdrawal' | 'deposit';
 };
 
+type StyleProps = {
+  className?: string;
+};
+
 enum TransferStatusStep {
   FromChain,
   Bridge,
@@ -24,7 +28,7 @@ enum TransferStatusStep {
   Complete,
 }
 
-export const TransferStatusSteps = ({ status, type }: ElementProps) => {
+export const TransferStatusSteps = ({ className, status, type }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
 
   const { currentStep, steps } = useMemo(() => {
@@ -87,7 +91,7 @@ export const TransferStatusSteps = ({ status, type }: ElementProps) => {
   if (!status) return <LoadingDots size={3} />;
 
   return (
-    <Styled.BridgingStatus>
+    <Styled.BridgingStatus className={className}>
       {steps.map((step) => (
         <Styled.Step key={step.step}>
           <Styled.row>

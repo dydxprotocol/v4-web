@@ -104,25 +104,29 @@ export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extend
                   disabled={item.disabled}
                   $withItemBorders={withItemBorders}
                 >
-                  {item.slotCustomContent ?? (
+                  {
                     <>
                       {item.slotBefore}
-                      <Styled.ItemLabel>
-                        <span>
-                          {`${item.label}${item.subitems?.length ? '…' : ''}`}
-                          {item.tag && (
-                            <>
-                              {' '}
-                              <Tag>{item.tag}</Tag>
-                            </>
-                          )}
-                        </span>
-                        {item.description && <span>{item.description}</span>}
-                      </Styled.ItemLabel>
+                      {item.slotCustomContent ?? (
+                        <Styled.ItemLabel>
+                          <span>
+                            {typeof item.label === 'string'
+                              ? `${item.label}${item.subitems?.length ? '…' : ''}`
+                              : item.label}
+                            {item.tag && (
+                              <>
+                                {' '}
+                                <Tag>{item.tag}</Tag>
+                              </>
+                            )}
+                          </span>
+                          {item.description && <span>{item.description}</span>}
+                        </Styled.ItemLabel>
+                      )}
                       {item.slotAfter}
                       {item.subitems && '→'}
                     </>
-                  )}
+                  }
                 </Styled.Item>
 
                 {searchValue &&
@@ -178,14 +182,17 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Command = styled(Command)<{ $withStickyLayout?: boolean }>`
   --comboboxMenu-backgroundColor: var(--color-layer-2);
+
   --comboboxMenu-input-backgroundColor: var(--color-layer-3);
   --comboboxMenu-input-height: 2.5rem;
+
   --comboboxMenu-item-checked-backgroundColor: ;
   --comboboxMenu-item-checked-textColor: ;
   --comboboxMenu-item-highlighted-backgroundColor: var(--color-layer-3);
   --comboboxMenu-item-highlighted-textColor: var(--color-text-1);
   --comboboxMenu-item-backgroundColor: ;
   --comboboxMenu-item-gap: 0.5rem;
+  --comboboxMenu-item-padding: 0.5em 1em;
 
   display: grid;
   align-content: start;
@@ -298,6 +305,7 @@ Styled.Item = styled(Command.Item)<{ $withItemBorders?: boolean }>`
   --item-checked-textColor: var(--comboboxMenu-item-checked-textColor);
   --item-highlighted-textColor: var(--comboboxMenu-item-highlighted-textColor);
   --item-gap: var(--comboboxMenu-item-gap);
+  --item-padding: var(--comboboxMenu-item-padding);
 
   background-color: var(--comboboxMenu-backgroundColor, inherit);
 

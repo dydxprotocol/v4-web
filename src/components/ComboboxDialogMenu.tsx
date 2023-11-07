@@ -102,6 +102,8 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.Dialog = styled(Dialog)`
   /* Params */
   --comboboxDialogMenu-backgroundColor: var(--color-layer-2);
+  --comboboxDialogMenu-item-gap: 0.5rem;
+  --comboboxDialogMenu-item-padding: 0.5rem 1rem;
 
   /* Overrides */
   & {
@@ -125,5 +127,6 @@ Styled.Dialog = styled(Dialog)`
 
 Styled.ComboboxMenu = styled(ComboboxMenu)`
   --comboboxMenu-backgroundColor: var(--comboboxDialogMenu-backgroundColor);
-  --comboboxMenu-item-gap: var(--comboxDialogMenu-item-gap, 0.5rem);
+  --comboboxMenu-item-gap: var(--comboboxDialogMenu-item-gap);
+  --comboboxMenu-item-padding: var(--comboboxDialogMenu-item-padding);
 `;

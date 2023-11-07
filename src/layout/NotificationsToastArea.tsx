@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import { NotificationStatus } from '@/constants/notifications';
@@ -14,7 +15,7 @@ type StyleProps = {
   className?: string;
 };
 
-const MAX_TOASTS = 10;
+const MAX_TOASTS = 3;
 
 export const NotificationsToastArea = ({ className }: StyleProps) => {
   const {
@@ -28,23 +29,26 @@ export const NotificationsToastArea = ({ className }: StyleProps) => {
   } = useNotifications();
 
   const { isMobile } = useBreakpoints();
-
-  const notificationMap = !isMenuOpen
-    ? Object.values(notifications)
+  const notificationMap = useMemo(() => {
+    return (
+      Object.values(notifications)
         // Sort by time of first trigger
         .sort(
           (n1, n2) =>
             n1.timestamps[NotificationStatus.Triggered]! -
             n2.timestamps[NotificationStatus.Triggered]!
         )
-        .slice(0, MAX_TOASTS)
         .map((notification) => ({
           notification,
           key: getKey(notification),
           displayData: getDisplayData(notification),
         }))
         .filter(({ displayData }) => displayData)
-    : [];
+        .slice(-MAX_TOASTS)
+    );
+  }, [notifications, getKey, getDisplayData]);
+
+  if (isMenuOpen) return null;
 
   return (
     <StyledToastArea swipeDirection={isMobile ? 'up' : 'right'} className={className}>
@@ -53,10 +57,13 @@ export const NotificationsToastArea = ({ className }: StyleProps) => {
           key={key}
           layer={notificationMap.length - 1 - idx}
           isOpen={notification.status < NotificationStatus.Unseen}
+          notification={notification}
           slotIcon={displayData.icon}
           slotTitle={displayData.title}
+          slotTitleLeft={displayData.slotTitleLeft}
+          slotTitleRight={displayData.slotTitleRight}
           slotDescription={displayData.body}
-          slotCustomContent={displayData.customBody}
+          slotCustomContent={displayData.renderCustomBody?.({ isToast: true, notification })}
           slotAction={
             <Button size={ButtonSize.Small} onClick={() => onNotificationAction(notification)}>
               {displayData.actionDescription}
@@ -83,7 +90,7 @@ export const NotificationsToastArea = ({ className }: StyleProps) => {
 
 const StyledToastArea = styled(ToastArea)`
   position: absolute;
-  width: min(16rem, 100%);
+  width: min(17.5rem, 100%);
   inset: 0 0 0 auto;
 
   padding: 0.75rem 0.75rem 0.75rem 0;

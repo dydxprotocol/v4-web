@@ -12,8 +12,8 @@ export const headerMixins = {
     --trigger-open-textColor: var(--color-text-2);
 
     &:hover:not(:disabled) {
-      background-color: var(--trigger-hover-backgroundColor);
-      color: var(--trigger-hover-textColor);
+      --trigger-backgroundColor: var(--trigger-hover-backgroundColor);
+      --trigger-textColor: var(--trigger-hover-textColor);
     }
   `,
 

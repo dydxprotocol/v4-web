@@ -1,25 +1,28 @@
-import { type ReactNode, useCallback, useEffect } from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import { type ReactNode, useEffect } from 'react';
+import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { isEqual } from 'lodash';
 import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
 
-import { AlertType } from '@/constants/alerts';
-import { STRING_KEYS, type StringGetterFunction, StringKey } from '@/constants/localization';
+import {
+  STRING_KEYS,
+  STRING_KEY_VALUES,
+  type StringGetterFunction,
+  type StringKey,
+} from '@/constants/localization';
 import { type NotificationTypeConfig, NotificationType } from '@/constants/notifications';
+import { DydxChainAsset } from '@/constants/wallets';
 
+import { useStringGetter } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { Icon, IconName } from '@/components/Icon';
-import { Output, OutputType } from '@/components/Output';
-import { TransferStatusToast } from '@/views/notifications/TransferStatusNotification';
-import { TransferStatusSteps } from '@/views/TransferStatusSteps';
+import { TradeNotification } from '@/views/notifications/TradeNotification';
+import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
 
-import { useStringGetter } from './useStringGetter';
-
-const STRING_VALUES = Object.fromEntries(Object.values(STRING_KEYS).map((key) => [key, key]));
+import { formatSeconds } from '@/lib/timeUtils';
 
 const parseStringParamsForNotification = ({
   stringGetter,
@@ -28,7 +31,7 @@ const parseStringParamsForNotification = ({
   stringGetter: StringGetterFunction;
   value: unknown;
 }): ReactNode => {
-  if (STRING_VALUES[value as StringKey]) {
+  if (STRING_KEY_VALUES[value as StringKey]) {
     return stringGetter({ key: value as StringKey });
   }
 
@@ -45,8 +48,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       useEffect(() => {
         for (const notification of abacusNotifications) {
-          const abacusNotificationType = notification.id.split(':')[0];
-
+          const [abacusNotificationType = ''] = notification.id.split(':');
           const parsedData = notification.data ? JSON.parse(notification.data) : {};
 
           const params = Object.fromEntries(
@@ -60,10 +62,17 @@ export const notificationTypes: NotificationTypeConfig[] = [
               trigger(
                 notification.id,
                 {
-                  icon: notification.image && <Styled.Icon src={notification.image} alt="" />,
+                  icon: notification.image && <$Icon src={notification.image} alt="" />,
                   title: stringGetter({ key: notification.title }),
                   body: notification.text ? stringGetter({ key: notification.text, params }) : '',
                   toastSensitivity: 'foreground',
+                  renderCustomBody: ({ isToast, notification }) => (
+                    <TradeNotification
+                      isToast={isToast}
+                      data={parsedData}
+                      notification={notification}
+                    />
+                  ),
                 },
                 [notification.updateTimeInMilliseconds, notification.data],
                 true
@@ -74,7 +83,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               trigger(
                 notification.id,
                 {
-                  icon: notification.image && <Styled.Icon src={notification.image} alt="" />,
+                  icon: notification.image && <$Icon src={notification.image} alt="" />,
                   title: stringGetter({ key: notification.title }),
                   body: notification.text ? stringGetter({ key: notification.text, params }) : '',
                   toastSensitivity: 'foreground',
@@ -85,7 +94,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               break;
           }
         }
-      }, [abacusNotifications]);
+      }, [abacusNotifications, stringGetter]);
     },
   },
   {
@@ -94,81 +103,59 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
       const { transferNotifications } = useLocalNotifications();
 
-      const getTitleStringKey = useCallback((type: 'deposit' | 'withdrawal', finished: boolean) => {
-        if (type === 'deposit' && !finished) return STRING_KEYS.DEPOSIT_IN_PROGRESS;
-        if (type === 'deposit' && finished) return STRING_KEYS.DEPOSIT;
-        if (type === 'withdrawal' && !finished) return STRING_KEYS.WITHDRAW_IN_PROGRESS;
-        return STRING_KEYS.WITHDRAW;
-      }, []);
-
       useEffect(() => {
         for (const transfer of transferNotifications) {
           const { fromChainId, status, txHash, toAmount } = transfer;
-          const finished = Boolean(status) && status?.squidTransactionStatus !== 'ongoing';
+          console.log(transfer);
+          const isFinished = Boolean(status) && status?.squidTransactionStatus !== 'ongoing';
           const type = fromChainId === TESTNET_CHAIN_ID ? 'withdrawal' : 'deposit';
-          // @ts-ignore status.errors is not in the type definition but can be returned
-          const error = status?.errors?.length ? status?.errors[0] : status?.error;
+          const icon = <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />;
+
+          const title = stringGetter({
+            key: {
+              deposit: isFinished ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
+              withdrawal: isFinished ? STRING_KEYS.WITHDRAW : STRING_KEYS.WITHDRAW_IN_PROGRESS,
+            }[type],
+          });
+
+          const toChainEta = status?.toChain?.chainData?.estimatedRouteDuration || 0;
+          const estimatedDuration = formatSeconds(Math.max(toChainEta, 0));
+          const body = stringGetter({
+            key: STRING_KEYS.DEPOSIT_STATUS,
+            params: {
+              AMOUNT_USD: `${toAmount} ${DydxChainAsset.USDC.toUpperCase()}`,
+              ESTIMATED_DURATION: estimatedDuration,
+            },
+          });
 
           trigger(
             txHash,
             {
-              icon: <Icon iconName={finished ? IconName.Transfer : IconName.Clock} />,
-              title: stringGetter({ key: getTitleStringKey(type, finished) }),
-              body: `${type === 'deposit' ? 'Deposit of' : 'Withdraw of'} ${toAmount}`,
-              customBody: (
-                <TransferStatusToast
+              icon,
+              title,
+              body,
+              renderCustomBody: ({ isToast, notification }) => (
+                <TransferStatusNotification
+                  isToast={isToast}
+                  slotIcon={icon}
+                  slotTitle={title}
+                  transfer={transfer}
                   type={type}
-                  toAmount={transfer.toAmount}
                   triggeredAt={transfer.triggeredAt}
-                  status={transfer.status}
+                  notification={notification}
                 />
-              ),
-              customMenuContent: !finished && (
-                <div>
-                  <div>
-                    <Styled.TransferText>
-                      {type === 'deposit' ? 'Deposit of ' : 'Withdraw of '}
-                      <Output type={OutputType.Fiat} value={toAmount} />
-                    </Styled.TransferText>
-
-                    {error && (
-                      <Styled.ErrorMessage type={AlertType.Error}>
-                        {stringGetter({
-                          key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-                          params: {
-                            ERROR_MESSAGE:
-                              error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
-                          },
-                        })}
-                      </Styled.ErrorMessage>
-                    )}
-                  </div>
-                  <TransferStatusSteps status={transfer.status} type={type} />
-                </div>
               ),
               toastSensitivity: 'foreground',
             },
-            []
+            [isFinished]
           );
         }
-      }, [transferNotifications]);
+      }, [transferNotifications, stringGetter]);
     },
   },
 ];
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Icon = styled.img`
+const $Icon = styled.img`
   height: 1.5rem;
   width: 1.5rem;
-`;
-
-Styled.TransferText = styled.span`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5ch;
-`;
-
-Styled.ErrorMessage = styled.div`
-  max-width: 13rem;
 `;

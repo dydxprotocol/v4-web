@@ -59,7 +59,7 @@ export enum NotificationStatus {
   /** Toast or NotificationsMenu item interacted with or dismissed. "Seen" in NotificationsMenu. */
   Seen,
 
-  /** Notification marked for deletion. "Archived" in NotificationsMenu. */
+  /** Notification marked for deletion. Hidden in NotificationsMenu. */
   Cleared,
 }
 
@@ -75,20 +75,25 @@ export type Notification<
   updateKey: NotificationUpdateKey;
 };
 
-export type Notifications = {
-  notifications: Record<NotificationId, Notification<any>>;
-  version: string;
-};
+export type Notifications = Record<NotificationId, Notification<any>>;
 
 /** Notification display data derived from app state at runtime. */
 export type NotificationDisplayData = {
   icon?: React.ReactNode;
-
   title: string; // Title for Toast, Notification, and Push Notification
   body?: string; // Description body for Toast, Notification, and Push Notification
 
-  customBody?: React.ReactNode; // Custom Notification
-  customMenuContent?: React.ReactNode;
+  slotTitleLeft?: React.ReactNode;
+  slotTitleRight?: React.ReactNode;
+
+  // Overrides title/body for Notification in NotificationMenu
+  renderCustomBody?: ({
+    isToast,
+    notification,
+  }: {
+    isToast?: boolean;
+    notification: Notification;
+  }) => React.ReactNode; // Custom Notification
 
   actionDescription?: string;
 

@@ -1,6 +1,7 @@
 import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
 import Long from 'long';
 import type { IndexedTx } from '@cosmjs/stargate';
+import { encodeJson } from '@dydxprotocol/v4-client-js';
 
 import {
   CompositeClient,
@@ -195,14 +196,14 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         throw new StatefulOrderError('Stateful order has failed to commit.', tx);
       }
 
-      const parsedTx = this.parseToPrimitives(tx);
-      const hash = parsedTx?.hash;
+      const encodedTx = encodeJson(tx);
 
-      if (import.meta.env.MODE === 'production') {
-        console.log(`https://testnet.mintscan.io/dydx-testnet/txs/${hash}`);
-      } else console.log(`txHash: ${hash}`);
+      if (import.meta.env.MODE === 'development') {
+        const parsedTx = JSON.parse(encodedTx);
+        console.log(parsedTx, parsedTx.hash.toUpperCase());
+      }
 
-      return JSON.stringify(parsedTx);
+      return encodedTx;
     } catch (error) {
       if (error?.name !== 'BroadcastError') {
         log('DydxChainTransactions/placeOrderTransaction', error);
@@ -229,12 +230,17 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         orderFlags,
         clobPairId,
         goodTilBlock || undefined,
-        goodTilBlockTime || undefined,
+        goodTilBlockTime || undefined
       );
 
-      const parsedTx = this.parseToPrimitives(tx);
+      const encodedTx = encodeJson(tx);
 
-      return JSON.stringify(parsedTx);
+      if (import.meta.env.MODE === 'development') {
+        const parsedTx = JSON.parse(encodedTx);
+        console.log(parsedTx, parsedTx.hash.toUpperCase());
+      }
+
+      return encodedTx;
     } catch (error) {
       log('DydxChainTransactions/cancelOrderTransaction', error);
 
@@ -295,15 +301,11 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
             if (!this.localWallet) {
               throw new Error('Missing compositeClient or localWallet');
             }
-            const msg = compositeClient?.sendTokenMessage(
-              this.localWallet,
-              amount,
-              recipient,
-            );
+            const msg = compositeClient?.sendTokenMessage(this.localWallet, amount, recipient);
 
             resolve([msg]);
           }),
-        this.compositeClient?.validatorClient?.post.defaultDydxGasPrice,
+        this.compositeClient?.validatorClient?.post.defaultDydxGasPrice
       );
 
       const parsedTx = this.parseToPrimitives(tx);
@@ -434,8 +436,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
           const parseDelegations = this.parseToPrimitives(delegations);
           callback(JSON.stringify(parseDelegations));
           break;
-        // Do not implement Transfers (yet)
-        case QueryType.Transfers:
         default:
           break;
       }
