@@ -9,13 +9,13 @@ import {
   PONG_MESSAGE_TYPE,
 } from '@/constants/websocket';
 
+import { lastSuccessfulWebsocketRequestByOrigin } from '@/hooks/useAnalytics';
+import { testFlags } from '@/hooks/useTestFlags';
+
 import { subscriptionsByChannelId } from '@/lib/tradingView/dydxfeed/cache';
 import { mapCandle } from '@/lib/tradingView/utils';
 
-import { lastSuccessfulWebsocketRequestByOrigin } from '@/hooks/useAnalytics';
-
 import { log } from '../telemetry';
-import { testFlags } from '@/hooks/useTestFlags';
 
 const RECONNECT_INTERVAL_MS = 10_000;
 
