@@ -15,6 +15,7 @@ import { mapCandle } from '@/lib/tradingView/utils';
 import { lastSuccessfulWebsocketRequestByOrigin } from '@/hooks/useAnalytics';
 
 import { log } from '../telemetry';
+import { testFlags } from '@/hooks/useTestFlags';
 
 const RECONNECT_INTERVAL_MS = 10_000;
 
@@ -140,6 +141,21 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
                     handler.callback(bar)
                   );
                 }
+              }
+
+              break;
+            }
+            case 'v4_markets': {
+              if (testFlags.displayInitializingMarkets) {
+                shouldProcess = false;
+                const { contents } = parsedMessage;
+
+                parsedMessage.contents = contents.markets?.map((market: any) => ({
+                  ...market,
+                  status: market.status === 'INITIALIZING' ? 'ONLINE' : market.status,
+                }));
+
+                this.receivedCallback?.(JSON.stringify(parsedMessage));
               }
 
               break;
