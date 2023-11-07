@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { LocalStorageKey } from '@/constants/localStorage';
@@ -90,18 +90,23 @@ export const useWalletConnection = () => {
 
   const selectedNetwork = useSelector(getSelectedNetwork);
   const walletConnectConfig = ENVIRONMENT_CONFIG_MAP[selectedNetwork].wallets.walletconnect;
-
-  const { connectAsync: connectWagmi } =
-    walletType && walletConnectionType
-      ? useConnectWagmi({
-          connector: resolveWagmiConnector({
+  const wagmiConnector = useMemo(
+    () =>
+      walletType && walletConnectionType
+        ? resolveWagmiConnector({
             walletType,
             walletConnection: {
               type: walletConnectionType,
             },
             walletConnectConfig,
-          }),
-        })
+          })
+        : undefined,
+    [walletConnectConfig, walletType, walletConnectionType]
+  );
+
+  const { connectAsync: connectWagmi } =
+    walletType && walletConnectionType
+      ? useConnectWagmi({ connector: wagmiConnector })
       : useConnectWagmi();
   const { suggestAndConnect: connectGraz } = useConnectGraz();
 
