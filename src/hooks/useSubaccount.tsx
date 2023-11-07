@@ -79,16 +79,34 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         subaccountClient: SubaccountClient;
         assetId?: number;
         amount: number;
-      }) => await compositeClient?.depositToSubaccount(subaccountClient, amount.toString()),
-
+      }) => {
+        try {
+          await compositeClient?.depositToSubaccount(
+            subaccountClient,
+            amount.toFixed(QUANTUM_MULTIPLIER)
+          );
+        } catch (error) {
+          log('useSubaccount/depositToSubaccount', error);
+          throw error;
+        }
+      },
       withdrawFromSubaccount: async ({
         subaccountClient,
         amount,
       }: {
         subaccountClient: SubaccountClient;
         amount: number;
-      }) => await compositeClient?.withdrawFromSubaccount(subaccountClient, amount.toString()),
-
+      }) => {
+        try {
+          await compositeClient?.withdrawFromSubaccount(
+            subaccountClient,
+            amount.toFixed(QUANTUM_MULTIPLIER)
+          );
+        } catch (error) {
+          log('useSubaccount/withdrawFromSubaccount', error);
+          throw error;
+        }
+      },
       transferFromSubaccountToAddress: async ({
         subaccountClient,
         assetId = 0,
@@ -137,7 +155,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
               const msg = compositeClient?.sendTokenMessage(
                 subaccountClient.wallet,
                 amount.toString(),
-                recipient,
+                recipient
               );
 
               resolve([msg]);
@@ -161,7 +179,10 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
         const transaction = JSON.parse(payload);
 
-        const msg = compositeClient.withdrawFromSubaccountMessage(subaccountClient, amount.toString());
+        const msg = compositeClient.withdrawFromSubaccountMessage(
+          subaccountClient,
+          amount.toFixed(6)
+        );
         const ibcMsg: EncodeObject = {
           typeUrl: transaction.msgTypeUrl,
           value: transaction.msg,
