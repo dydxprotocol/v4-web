@@ -57,8 +57,6 @@ export const TransferButtonAndReceipt = ({
 
   const newBalance = isUSDCSelected ? newEquity : newNativeTokenBalance;
 
-  console.log(balance, newBalance);
-
   const transferDetailItems = [
     {
       key: 'fees',
