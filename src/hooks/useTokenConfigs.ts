@@ -19,8 +19,10 @@ export const useTokenConfigs = (): {
     },
   };
   usdcDenom: string;
+  usdcDecimals: number;
   usdcLabel: string;
   chainTokenDenom: string;
+  chainTokenDecimals: number;
   chainTokenLabel: string;
 } => {
   const { selectedNetwork } = useSelectedNetwork();
@@ -29,8 +31,10 @@ export const useTokenConfigs = (): {
   return { 
     tokensConfigs,
     usdcDenom: tokensConfigs[DydxChainAsset.USDC].denom, 
+    usdcDecimals: tokensConfigs[DydxChainAsset.USDC].decimals, 
     usdcLabel: tokensConfigs[DydxChainAsset.USDC].name,
     chainTokenDenom: tokensConfigs[DydxChainAsset.CHAINTOKEN].denom,
+    chainTokenDecimals: tokensConfigs[DydxChainAsset.CHAINTOKEN].decimals, 
     chainTokenLabel: tokensConfigs[DydxChainAsset.CHAINTOKEN].name,
   };
 };
