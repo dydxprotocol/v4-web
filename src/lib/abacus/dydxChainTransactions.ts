@@ -200,10 +200,9 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
       if (isTestnet) {
         console.log(
-          `${
-            ENVIRONMENT_CONFIG_MAP[this.compositeClient.network.getString() as DydxNetwork]?.links
-              ?.mintscanBase
-          }/txs/${hash}`
+          `${ENVIRONMENT_CONFIG_MAP[
+            this.compositeClient.network.getString() as DydxNetwork
+          ]?.links?.mintscan?.replace('{tx_hash}', hash.toString())}`
         );
       } else console.log(`txHash: ${hash}`);
 
