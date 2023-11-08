@@ -104,10 +104,7 @@ export const useWalletConnection = () => {
     [walletConnectConfig, walletType, walletConnectionType]
   );
 
-  const { connectAsync: connectWagmi } =
-    walletType && walletConnectionType
-      ? useConnectWagmi({ connector: wagmiConnector })
-      : useConnectWagmi();
+  const { connectAsync: connectWagmi } = useConnectWagmi({ connector: wagmiConnector })
   const { suggestAndConnect: connectGraz } = useConnectGraz();
 
   const connectWallet = useCallback(

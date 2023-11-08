@@ -55,7 +55,7 @@ export const TransferStatusToast = ({
         ? STRING_KEYS.DEPOSIT_STATUS
         : STRING_KEYS.DEPOSIT_STATUS_SHORTLY
       : secondsLeft > 0
-      ? STRING_KEYS.WITHDRAW_COMPLETE
+      ? STRING_KEYS.WITHDRAW_STATUS
       : STRING_KEYS.WITHDRAW_STATUS_SHORTLY;
 
   const statusString =
