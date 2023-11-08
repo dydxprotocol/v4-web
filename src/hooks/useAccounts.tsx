@@ -42,6 +42,7 @@ const useAccountsContext = () => {
     selectedWalletError,
     evmAddress,
     signerWagmi,
+    publicClientWagmi,
     dydxAddress: connectedDydxAddress,
     signerGraz,
   } = useWalletConnection();
@@ -296,6 +297,7 @@ const useAccountsContext = () => {
     // Wallet connection (EVM)
     evmAddress,
     signerWagmi,
+    publicClientWagmi,
 
     // Wallet connection (Cosmos)
     signerGraz,
