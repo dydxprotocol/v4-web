@@ -2,7 +2,7 @@ import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
-import { parseUnits } from 'viem'
+import { parseUnits } from 'viem';
 
 import erc20 from '@/abi/erc20.json';
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
@@ -172,7 +172,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const validateTokenApproval = useCallback(async () => {
     if (!signerWagmi || !publicClientWagmi) throw new Error('Missing signer');
-    if (!sourceToken?.address || !sourceToken.decimals) throw new Error('Missing source token address');
+    if (!sourceToken?.address || !sourceToken.decimals)
+      throw new Error('Missing source token address');
     if (!sourceChain?.rpc) throw new Error('Missing source chain rpc');
     if (!requestPayload?.targetAddress) throw new Error('Missing target address');
     if (!requestPayload?.value) throw new Error('Missing transaction value');
@@ -182,11 +183,11 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       address: sourceToken.address as EvmAddress,
       abi: erc20,
       functionName: 'allowance',
-      args: [evmAddress as EvmAddress, requestPayload.targetAddress as EvmAddress]
+      args: [evmAddress as EvmAddress, requestPayload.targetAddress as EvmAddress],
     });
 
     const sourceAmountBN = parseUnits(debouncedAmount, sourceToken.decimals);
-    
+
     if (sourceAmountBN > (allowance as bigint)) {
       const { request } = await publicClientWagmi.simulateContract({
         account: evmAddress,
@@ -194,12 +195,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         abi: erc20,
         functionName: 'approve',
         args: [requestPayload.targetAddress as EvmAddress, sourceAmountBN],
-      })
+      });
 
       const approveTx = await signerWagmi.writeContract(request);
       await publicClientWagmi.waitForTransactionReceipt({
         hash: approveTx,
-      })
+      });
     }
   }, [signerWagmi, sourceToken, sourceChain, requestPayload, publicClientWagmi]);
 
@@ -229,8 +230,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           to: requestPayload.targetAddress as EvmAddress,
           data: requestPayload.data as EvmAddress,
           gasLimit: BigInt(requestPayload.gasLimit),
-          value:
-            requestPayload.routeType !== 'SEND' ? BigInt(requestPayload.value) : undefined,
+          value: requestPayload.routeType !== 'SEND' ? BigInt(requestPayload.value) : undefined,
         };
         const txHash = await signerWagmi.sendTransaction(tx);
 
@@ -298,7 +298,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       }
     }
 
-
     if (fromAmount) {
       if (!chainId) {
         return stringGetter({ key: STRING_KEYS.MUST_SPECIFY_CHAIN });
@@ -312,7 +311,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     }
 
     return undefined;
-  }, [error, balance, chainId, fromAmount, sourceToken]);
+  }, [error, routeErrors, balance, chainId, fromAmount, sourceToken]);
 
   const isDisabled =
     Boolean(errorMessage) ||
