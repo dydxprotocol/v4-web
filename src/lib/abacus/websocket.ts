@@ -150,10 +150,12 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
                 shouldProcess = false;
                 const { contents } = parsedMessage;
 
-                parsedMessage.contents = contents.markets?.map((market: any) => ({
-                  ...market,
-                  status: market.status === 'INITIALIZING' ? 'ONLINE' : market.status,
-                }));
+                Object.keys(contents.markets)?.forEach((market: any) => {
+                  const status = contents.markets[market].status;
+                  if (status === 'INITIALIZING') {
+                    contents.markets[market].status = 'ONLINE';
+                  }
+                });
 
                 this.receivedCallback?.(JSON.stringify(parsedMessage));
               }
