@@ -137,3 +137,5 @@ export type TransferNotifcation = {
 export type NotificationPreferences = {
   [key in NotificationType]: boolean;
 } & { version: string };
+
+export const DEFAULT_TOAST_AUTO_CLOSE_MS = 5000;

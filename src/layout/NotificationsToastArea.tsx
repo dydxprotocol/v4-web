@@ -15,7 +15,7 @@ type StyleProps = {
   className?: string;
 };
 
-const MAX_TOASTS = 3;
+const MAX_TOASTS = 10;
 
 export const NotificationsToastArea = ({ className }: StyleProps) => {
   const {

@@ -154,8 +154,6 @@ const useNotificationsContext = () => {
           }
 
           notificationsDisplayData[key] = displayData;
-          console.log(id, displayData, notificationsDisplayData);
-
           setNotificationsDisplayData({ ...notificationsDisplayData });
         },
         [notifications, updateStatus, notificationPreferences[type]]

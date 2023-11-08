@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 import { StatusResponse } from '@0xsquid/sdk';
 
 import { useStringGetter, useSelectedNetwork, useURLConfigs } from '@/hooks';

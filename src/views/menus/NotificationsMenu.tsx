@@ -3,20 +3,17 @@ import styled from 'styled-components';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { groupBy } from 'lodash';
 
+import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
 import { type Notification, NotificationStatus } from '@/constants/notifications';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
 import { useNotifications } from '@/hooks/useNotifications';
-import { CloseIcon } from '@/icons';
 
 import { Button } from '@/components/Button';
-import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { DialogPlacement } from '@/components/Dialog';
-import { Output, OutputType } from '@/components/Output';
-import { IconButton } from '@/components/IconButton';
 import { Toolbar } from '@/components/Toolbar';
-import { STRING_KEYS } from '@/constants/localization';
 
 type ElementProps = {
   slotTrigger?: React.ReactNode;
@@ -36,7 +33,6 @@ export const NotificationsMenu = ({
     getKey,
 
     markSeen,
-    markCleared,
     markAllCleared,
 
     onNotificationAction,
@@ -69,7 +65,7 @@ export const NotificationsMenu = ({
         .map(([status, notifications]) => ({
           group: status,
           groupLabel: {
-            [NotificationStatus.Triggered]: 'New',
+            [NotificationStatus.Triggered]: stringGetter({ key: STRING_KEYS.NEW }),
             [NotificationStatus.Seen]: 'Seen',
           }[status as number],
 
@@ -98,7 +94,7 @@ export const NotificationsMenu = ({
             })),
         }))
         .filter(({ items }) => items.length),
-    [notificationsByStatus, getDisplayData, onNotificationAction, markSeen]
+    [notificationsByStatus, getDisplayData, onNotificationAction, markSeen, stringGetter]
   );
 
   return (
@@ -122,11 +118,11 @@ export const NotificationsMenu = ({
               state={{ isLoading: isEnablingPush }}
               onClick={enablePush}
             >
-              Enable Push Notifications
+              {stringGetter({ key: STRING_KEYS.ENABLE_PUSH_NOTIFICATIONS })}
             </Button>
           ) : (
             <Button size={ButtonSize.Small} action={ButtonAction.Secondary} onClick={disablePush}>
-              Disable Push Notifications
+              {stringGetter({ key: STRING_KEYS.DISABLE_PUSH_NOTIFICATIONS })}
             </Button>
           )}
 
@@ -140,7 +136,7 @@ export const NotificationsMenu = ({
               ),
             }}
           >
-            Clear All
+            {stringGetter({ key: STRING_KEYS.CLEAR_ALL })}
           </Button>
         </$FooterToolbar>
       }

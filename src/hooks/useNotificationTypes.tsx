@@ -11,7 +11,11 @@ import {
 } from '@/constants/localization';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
-import { type NotificationTypeConfig, NotificationType } from '@/constants/notifications';
+import {
+  type NotificationTypeConfig,
+  NotificationType,
+  DEFAULT_TOAST_AUTO_CLOSE_MS,
+} from '@/constants/notifications';
 import { DydxChainAsset } from '@/constants/wallets';
 
 import { useSelectedNetwork, useStringGetter } from '@/hooks';
@@ -42,7 +46,6 @@ const parseStringParamsForNotification = ({
 export const notificationTypes: NotificationTypeConfig[] = [
   {
     type: NotificationType.OrderStatusChanged,
-
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const abacusNotifications = useSelector(getAbacusNotifications, isEqual);
@@ -66,6 +69,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   icon: notification.image && <$Icon src={notification.image} alt="" />,
                   title: stringGetter({ key: notification.title }),
                   body: notification.text ? stringGetter({ key: notification.text, params }) : '',
+                  toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
                   toastSensitivity: 'foreground',
                   renderCustomBody: ({ isToast, notification }) => (
                     <TradeNotification
@@ -87,6 +91,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   icon: notification.image && <$Icon src={notification.image} alt="" />,
                   title: stringGetter({ key: notification.title }),
                   body: notification.text ? stringGetter({ key: notification.text, params }) : '',
+                  toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
                   toastSensitivity: 'foreground',
                 },
                 [notification.updateTimeInMilliseconds, notification.data],
@@ -108,13 +113,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
       useEffect(() => {
         for (const transfer of transferNotifications) {
           const { fromChainId, status, txHash, toAmount } = transfer;
-          console.log(transfer);
           const isFinished = Boolean(status) && status?.squidTransactionStatus !== 'ongoing';
+          const icon = <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />;
+
           const type =
             fromChainId === ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId
               ? 'withdrawal'
               : 'deposit';
-          const icon = <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />;
 
           const title = stringGetter({
             key: {
@@ -150,6 +155,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   notification={notification}
                 />
               ),
+              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
               toastSensitivity: 'foreground',
             },
             [isFinished]
