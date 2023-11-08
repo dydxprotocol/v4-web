@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@0xsquid/sdk':
     specifier: ^1.10.0
@@ -1007,13 +1011,8 @@ packages:
       - utf-8-validate
     dev: false
 
-<<<<<<< HEAD
-  /@dydxprotocol/v4-localization@1.0.3:
-    resolution: {integrity: sha512-DSTVabwVI6TjR0Z6Nlcl+ryrmayCoki0eBbBcSO/bsNYAffsPAy1e4ctajH49hQC6CKaCyK4urZPEXsdCmLlzQ==}
-=======
   /@dydxprotocol/v4-localization@1.0.5:
     resolution: {integrity: sha512-zZm3GFp/ORz9YjigQFVBlcWmaxYY+XEdIw8AWN5nEbsuiA2Jay+/OA7lO9+nV1J1p1T+TgLo9iczIHJsAo3IsA==}
->>>>>>> 90c3fd1 (address comments)
     dev: false
 
   /@dydxprotocol/v4-proto@0.4.1:
@@ -14101,7 +14100,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
