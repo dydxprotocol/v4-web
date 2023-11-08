@@ -50,6 +50,15 @@ export const getTradeInputErrors = (state: RootState) => {
 
 /**
  * @param state
+ * @returns input errors for Close position
+ */
+export const getClosePositionInputErrors = (state: RootState) => {
+  const currentInput = state.inputs.current;
+  return currentInput === 'closePosition' ? getInputErrors(state) : [];
+};
+
+/**
+ * @param state
  * @returns input errors for Transfer
  */
 export const getTransferInputErrors = (state: RootState) => {
