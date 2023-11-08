@@ -9,10 +9,11 @@ import {
   PONG_MESSAGE_TYPE,
 } from '@/constants/websocket';
 
+import { lastSuccessfulWebsocketRequestByOrigin } from '@/hooks/useAnalytics';
+import { testFlags } from '@/hooks/useTestFlags';
+
 import { subscriptionsByChannelId } from '@/lib/tradingView/dydxfeed/cache';
 import { mapCandle } from '@/lib/tradingView/utils';
-
-import { lastSuccessfulWebsocketRequestByOrigin } from '@/hooks/useAnalytics';
 
 import { log } from '../telemetry';
 
@@ -140,6 +141,23 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
                     handler.callback(bar)
                   );
                 }
+              }
+
+              break;
+            }
+            case 'v4_markets': {
+              if (testFlags.displayInitializingMarkets) {
+                shouldProcess = false;
+                const { contents } = parsedMessage;
+
+                Object.keys(contents.markets ?? {}).forEach((market: any) => {
+                  const status = contents.markets[market].status;
+                  if (status === 'INITIALIZING') {
+                    contents.markets[market].status = 'ONLINE';
+                  }
+                });
+
+                this.receivedCallback?.(JSON.stringify(parsedMessage));
               }
 
               break;
