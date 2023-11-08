@@ -17,7 +17,6 @@ import { useAccounts, useDebounce, useStringGetter, useSelectedNetwork } from '@
 import { useAccountBalance, CHAIN_DEFAULT_TOKEN_ADDRESS } from '@/hooks/useAccountBalance';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { NATIVE_TOKEN_ADDRESS, useSquid } from '@/hooks/useSquid';
-import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
@@ -56,8 +55,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { selectedNetwork } = useSelectedNetwork();
 
-  const { evmAddress, signerWagmi } = useAccounts();
-  const { publicClientWagmi } = useWalletConnection();
+  const { evmAddress, signerWagmi, publicClientWagmi } = useAccounts();
 
   const { addTransferNotification } = useLocalNotifications();
 
