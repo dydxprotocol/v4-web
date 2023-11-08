@@ -39,7 +39,7 @@ export const TransferStatusNotification = ({
 }: ElementProps & NotificationProps) => {
   const stringGetter = useStringGetter();
   const [open, setOpen] = useState<boolean>(false);
-  const [secondsLeft, setSecondsLeft] = useState<number | undefined>();
+  const [secondsLeft, setSecondsLeft] = useState<number>(0);
   const { fromChainId, status, txHash, toAmount } = transfer;
 
   // @ts-ignore status.errors is not in the type definition but can be returned
@@ -55,14 +55,23 @@ export const TransferStatusNotification = ({
 
   if (!status) return <LoadingDots size={3} />;
 
+  const inProgressStatusString =
+    type === 'deposit'
+      ? secondsLeft > 0
+        ? STRING_KEYS.DEPOSIT_STATUS
+        : STRING_KEYS.DEPOSIT_STATUS_SHORTLY
+      : secondsLeft > 0
+      ? STRING_KEYS.WITHDRAW_STATUS
+      : STRING_KEYS.WITHDRAW_STATUS_SHORTLY;
+
   const statusString =
     type === 'deposit'
       ? status?.squidTransactionStatus === 'success'
         ? STRING_KEYS.DEPOSIT_COMPLETE
-        : STRING_KEYS.DEPOSIT_STATUS
+        : inProgressStatusString
       : status?.squidTransactionStatus === 'success'
       ? STRING_KEYS.WITHDRAW_COMPLETE
-      : STRING_KEYS.WITHDRAW_STATUS;
+      : inProgressStatusString;
 
   const transferNotif = (
     <Notification

@@ -98,6 +98,11 @@ For the "Build & Development Settings", we recommend the following:
 - Framework Preset: `Vite`
 - Build Command (override): `pnpm run build`
 
+By default, the dev server runs in development mode and the build command runs in production mode. To override the default mode, you can pass in the `--mode` option flag. For example, if you want to build your app for testnet:
+```
+pnpm run build --mode testnet
+```
+
 If you wish to incorporate analytics via Amplitude and Bugsnag, you can use our scripts:
 `pnpm run build:inject-amplitude` and `pnpm run build:inject-bugsnag`. You will need to provide your own API keys for these services. In the Environment Variables section, name the variables as `AMPLITUDE_API_KEY` and `BUGSNAG_API_KEY` and provide the respective keys as their values.
 
