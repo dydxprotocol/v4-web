@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type MouseEvent } from 'react';
 import styled, { css } from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
@@ -19,6 +19,7 @@ import { Output, OutputType } from '@/components/Output';
 
 type ElementProps = {
   notification: NotificationDataType;
+  onClick?: () => void;
   slotIcon?: React.ReactNode;
   slotTitle?: React.ReactNode;
   slotTitleLeft?: React.ReactNode;
@@ -40,6 +41,7 @@ export const Notification = ({
   className,
   isToast,
   notification,
+  onClick,
   slotIcon,
   slotTitle,
   slotTitleLeft,
@@ -52,7 +54,7 @@ export const Notification = ({
   const { markCleared, markSeen } = useNotifications();
 
   return (
-    <$Container className={className} isToast={isToast}>
+    <$Container className={className} isToast={isToast} onClick={onClick}>
       <$Header>
         {slotTitleLeft ?? (slotIcon && <$Icon>{slotIcon}</$Icon>)}
         <$Title>{slotTitle}</$Title>
@@ -71,7 +73,7 @@ export const Notification = ({
                 iconName={IconName.Close}
                 shape={ButtonShape.Square}
                 size={ButtonSize.XSmall}
-                onClick={(e) => {
+                onClick={(e: MouseEvent) => {
                   e.stopPropagation();
 
                   if (notification.status < NotificationStatus.Seen) {

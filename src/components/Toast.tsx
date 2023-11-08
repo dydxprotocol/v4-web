@@ -30,6 +30,7 @@ export const Toast = ({
   className,
   isOpen = true,
   notification,
+  onClick,
   setIsOpen,
   slotIcon,
   slotTitle,
@@ -67,6 +68,10 @@ export const Toast = ({
       onOpenChange={setIsOpen}
       onPause={() => setIsPaused(true)}
       onResume={() => setIsPaused(false)}
+      onClick={() => {
+        setIsOpen?.(false, false);
+        onClick?.();
+      }}
     >
       <Close asChild>
         <$CloseButton

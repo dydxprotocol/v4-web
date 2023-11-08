@@ -64,6 +64,7 @@ export const NotificationsToastArea = ({ className }: StyleProps) => {
           slotTitleRight={displayData.slotTitleRight}
           slotDescription={displayData.body}
           slotCustomContent={displayData.renderCustomBody?.({ isToast: true, notification })}
+          onClick={() => onNotificationAction(notification)}
           slotAction={
             <Button size={ButtonSize.Small} onClick={() => onNotificationAction(notification)}>
               {displayData.actionDescription}

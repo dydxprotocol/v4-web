@@ -46,12 +46,15 @@ export const NotificationsMenu = ({
     setIsMenuOpen,
   } = useNotifications();
 
-  const notificationsByStatus: Partial<Record<NotificationStatus, Notification[]>> = useMemo(() => {
-    return groupBy(
-      Object.values(notifications).filter(getDisplayData),
-      (notification) => notification.status
-    );
-  }, [notifications, getDisplayData]);
+  const notificationsByStatus: Partial<Record<NotificationStatus, Notification[]>> = useMemo(
+    () =>
+      groupBy(Object.values(notifications).filter(getDisplayData), (notification) =>
+        notification.status < NotificationStatus.Seen
+          ? NotificationStatus.Triggered
+          : notification.status
+      ),
+    [notifications, getDisplayData]
+  );
 
   const hasUnreadNotifications = useMemo(
     () => notificationsByStatus[NotificationStatus.Triggered]?.length! > 0,
@@ -148,6 +151,10 @@ export const NotificationsMenu = ({
 
 const $ComboboxDialogMenu = styled(ComboboxDialogMenu)`
   --comboboxDialogMenu-item-padding: 0;
+
+  [cmdk-list] > [cmdk-list-sizer] > * {
+    box-shadow: none;
+  }
 `;
 
 const $UnreadIndicator = styled.div`

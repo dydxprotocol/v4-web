@@ -1,7 +1,11 @@
 import { type ReactNode, useEffect } from 'react';
 import styled from 'styled-components';
-import { useSelector } from 'react-redux';
-import { isEqual } from 'lodash';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { isEqual, groupBy } from 'lodash';
+
+import { DialogTypes } from '@/constants/dialogs';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { DydxChainAsset } from '@/constants/wallets';
 
 import {
   STRING_KEYS,
@@ -9,14 +13,12 @@ import {
   type StringGetterFunction,
   type StringKey,
 } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
 import {
   type NotificationTypeConfig,
   NotificationType,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
 } from '@/constants/notifications';
-import { DydxChainAsset } from '@/constants/wallets';
 
 import { useSelectedNetwork, useStringGetter } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
@@ -25,9 +27,14 @@ import { Icon, IconName } from '@/components/Icon';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
+import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
+import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
 
 import { formatSeconds } from '@/lib/timeUtils';
+import { getMarketIds } from '@/state/perpetualsSelectors';
+import { useNavigate } from 'react-router-dom';
+import { AppRoute } from '@/constants/routes';
 
 const parseStringParamsForNotification = ({
   stringGetter,
@@ -52,7 +59,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       useEffect(() => {
         for (const notification of abacusNotifications) {
-          const [abacusNotificationType = ''] = notification.id.split(':');
+          const [abacusNotificationType = '', id = ''] = notification.id.split(':');
           const parsedData = notification.data ? JSON.parse(notification.data) : {};
 
           const params = Object.fromEntries(
@@ -101,6 +108,39 @@ export const notificationTypes: NotificationTypeConfig[] = [
           }
         }
       }, [abacusNotifications, stringGetter]);
+    },
+    useNotificationAction: () => {
+      const dispatch = useDispatch();
+      const orders = useSelector(getSubaccountOrders, shallowEqual) || [];
+      const ordersById = groupBy(orders, 'id');
+      const fills = useSelector(getSubaccountFills, shallowEqual) || [];
+      const fillsById = groupBy(fills, 'id');
+      const marketIds = useSelector(getMarketIds, shallowEqual);
+      const navigate = useNavigate();
+
+      return (notificationId: string) => {
+        const [abacusNotificationType = '', id = ''] = notificationId.split(':');
+
+        if (ordersById[id]) {
+          dispatch(
+            openDialog({
+              type: DialogTypes.OrderDetails,
+              dialogProps: { orderId: id },
+            })
+          );
+        } else if (fillsById[id]) {
+          dispatch(
+            openDialog({
+              type: DialogTypes.FillDetails,
+              dialogProps: { fillId: id },
+            })
+          );
+        } else if (marketIds.includes(id)) {
+          navigate(`${AppRoute.Trade}/${id}`, {
+            replace: true,
+          });
+        }
+      };
     },
   },
   {
@@ -162,6 +202,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
       }, [transferNotifications, stringGetter]);
+    },
+    useNotificationAction: () => {
+      return () => {};
     },
   },
 ];

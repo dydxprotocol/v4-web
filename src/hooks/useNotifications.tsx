@@ -163,20 +163,14 @@ const useNotificationsContext = () => {
     });
 
   // Actions
-  const actions = useMemo(
-    () =>
-      Object.fromEntries(
-        notificationTypes.map(
-          ({ type, useNotificationAction }) => [type, useNotificationAction?.()] as const
-        )
-      ),
-    [notificationTypes]
+  const actions = Object.fromEntries(
+    notificationTypes.map(
+      ({ type, useNotificationAction }) => [type, useNotificationAction?.()] as const
+    )
   );
 
-  const onNotificationAction = useCallback(
-    async (notification: Notification) => await actions[notification.type]?.(notification.id),
-    [actions]
-  );
+  const onNotificationAction = async (notification: Notification) =>
+    await actions[notification.type]?.(notification.id);
 
   // Push notifications
   const [hasEnabledPush, setHasEnabledPush] = useLocalStorage({
@@ -245,7 +239,7 @@ const useNotificationsContext = () => {
 
       setPushNotificationsLastUpdated(Date.now());
     })();
-  }, [hasEnabledPush, notifications, onNotificationAction, markSeen]);
+  }, [hasEnabledPush, notifications, markSeen]);
 
   // Menu state
   const [isMenuOpen, setIsMenuOpen] = useState(false);
