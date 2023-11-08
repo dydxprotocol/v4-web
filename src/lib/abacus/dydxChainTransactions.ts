@@ -31,7 +31,7 @@ import {
 
 import { DialogTypes } from '@/constants/dialogs';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
-import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
+import { ENVIRONMENT_CONFIG_MAP, DydxNetwork, isTestnet } from '@/constants/networks';
 
 import { RootStore } from '@/state/_store';
 import { addUncommittedOrderClientId, removeUncommittedOrderClientId } from '@/state/account';
@@ -197,11 +197,17 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       }
 
       const encodedTx = encodeJson(tx);
+      const parsedTx = JSON.parse(encodedTx);
+      const hash = parsedTx.hash.toUpperCase();
 
-      if (import.meta.env.MODE === 'development') {
-        const parsedTx = JSON.parse(encodedTx);
-        console.log(parsedTx, parsedTx.hash.toUpperCase());
-      }
+      if (isTestnet) {
+        console.log(
+          `${
+            ENVIRONMENT_CONFIG_MAP[this.compositeClient.network.getString() as DydxNetwork]?.links
+              ?.mintscanBase
+          }/txs/${hash}`
+        );
+      } else console.log(`txHash: ${hash}`);
 
       return encodedTx;
     } catch (error) {

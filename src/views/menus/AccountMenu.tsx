@@ -36,6 +36,7 @@ import { truncateAddress } from '@/lib/wallet';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { headerMixins } from '@/styles/headerMixins';
+import { MustBigNumber } from '@/lib/numbers';
 
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
@@ -48,6 +49,8 @@ export const AccountMenu = () => {
   const { usdcLabel, chainTokenLabel } = useTokenConfigs();
 
   const { evmAddress, walletType, dydxAddress, hdKey } = useAccounts();
+
+  const usdcBalance = freeCollateral?.current || 0;
 
   const onRecoverKeys = () => {
     dispatch(openDialog({ type: DialogTypes.Onboarding }));
@@ -122,7 +125,11 @@ export const AccountMenu = () => {
                   </Styled.label>
                   <Styled.BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
                 </div>
-                <AssetActions asset={DydxChainAsset.CHAINTOKEN} dispatch={dispatch} />
+                <AssetActions
+                  asset={DydxChainAsset.CHAINTOKEN}
+                  dispatch={dispatch}
+                  hasBalance={nativeTokenBalance.gt(0)}
+                />
               </div>
               <div>
                 <div>
@@ -135,11 +142,16 @@ export const AccountMenu = () => {
                   </Styled.label>
                   <Styled.BalanceOutput
                     type={OutputType.Asset}
-                    value={freeCollateral?.current || 0}
+                    value={usdcBalance}
                     fractionDigits={2}
                   />
                 </div>
-                <AssetActions asset={DydxChainAsset.USDC} dispatch={dispatch} withOnboarding />
+                <AssetActions
+                  asset={DydxChainAsset.USDC}
+                  dispatch={dispatch}
+                  hasBalance={MustBigNumber(usdcBalance).gt(0)}
+                  withOnboarding
+                />
               </div>
             </Styled.Balances>
           </Styled.AccountInfo>
@@ -223,22 +235,25 @@ const AssetActions = memo(
     asset,
     dispatch,
     withOnboarding,
+    hasBalance,
   }: {
     asset: DydxChainAsset;
     dispatch: Dispatch;
     withOnboarding?: boolean;
+    hasBalance?: boolean;
   }) => (
     <Styled.InlineRow>
       {[
-        withOnboarding && {
-          dialogType: DialogTypes.Withdraw,
-          iconName: IconName.Withdraw,
-        },
+        withOnboarding &&
+          hasBalance && {
+            dialogType: DialogTypes.Withdraw,
+            iconName: IconName.Withdraw,
+          },
         withOnboarding && {
           dialogType: DialogTypes.Deposit,
           iconName: IconName.Deposit,
         },
-        {
+        hasBalance && {
           dialogType: DialogTypes.Transfer,
           dialogProps: { selectedAsset: asset },
           iconName: IconName.Send,

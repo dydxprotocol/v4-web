@@ -2,7 +2,6 @@ import { type ReactNode, useEffect } from 'react';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { isEqual } from 'lodash';
-import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
 
 import {
   STRING_KEYS,
@@ -10,10 +9,12 @@ import {
   type StringGetterFunction,
   type StringKey,
 } from '@/constants/localization';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+
 import { type NotificationTypeConfig, NotificationType } from '@/constants/notifications';
 import { DydxChainAsset } from '@/constants/wallets';
 
-import { useStringGetter } from '@/hooks';
+import { useSelectedNetwork, useStringGetter } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { Icon, IconName } from '@/components/Icon';
@@ -102,13 +103,17 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const { transferNotifications } = useLocalNotifications();
+      const { selectedNetwork } = useSelectedNetwork();
 
       useEffect(() => {
         for (const transfer of transferNotifications) {
           const { fromChainId, status, txHash, toAmount } = transfer;
           console.log(transfer);
           const isFinished = Boolean(status) && status?.squidTransactionStatus !== 'ongoing';
-          const type = fromChainId === TESTNET_CHAIN_ID ? 'withdrawal' : 'deposit';
+          const type =
+            fromChainId === ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId
+              ? 'withdrawal'
+              : 'deposit';
           const icon = <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />;
 
           const title = stringGetter({

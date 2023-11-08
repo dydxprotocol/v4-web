@@ -48,7 +48,7 @@ export const useSubaccount = () => useContext(SubaccountContext);
 
 export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWallet }) => {
   const dispatch = useDispatch();
-  const { usdcDenom } = useTokenConfigs();
+  const { usdcDenom, usdcDecimals } = useTokenConfigs();
   const { compositeClient, faucetClient } = useDydxClient();
 
   const { getFaucetFunds } = useMemo(
@@ -79,16 +79,34 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         subaccountClient: SubaccountClient;
         assetId?: number;
         amount: number;
-      }) => await compositeClient?.depositToSubaccount(subaccountClient, amount.toString()),
-
+      }) => {
+        try {
+          return await compositeClient?.depositToSubaccount(
+            subaccountClient,
+            amount.toFixed(usdcDecimals)
+          );
+        } catch (error) {
+          log('useSubaccount/depositToSubaccount', error);
+          throw error;
+        }
+      },
       withdrawFromSubaccount: async ({
         subaccountClient,
         amount,
       }: {
         subaccountClient: SubaccountClient;
         amount: number;
-      }) => await compositeClient?.withdrawFromSubaccount(subaccountClient, amount.toString()),
-
+      }) => {
+        try {
+          return await compositeClient?.withdrawFromSubaccount(
+            subaccountClient,
+            amount.toFixed(usdcDecimals)
+          );
+        } catch (error) {
+          log('useSubaccount/withdrawFromSubaccount', error);
+          throw error;
+        }
+      },
       transferFromSubaccountToAddress: async ({
         subaccountClient,
         assetId = 0,
@@ -99,27 +117,33 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         assetId?: number;
         amount: number;
         recipient: string;
-      }) =>
-        await compositeClient?.validatorClient.post.send(
-          subaccountClient?.wallet,
-          () =>
-            new Promise((resolve) => {
-              const msg =
-                compositeClient?.validatorClient.post.composer.composeMsgWithdrawFromSubaccount(
-                  subaccountClient.address,
-                  subaccountClient.subaccountNumber,
-                  assetId,
-                  Long.fromNumber(amount * QUANTUM_MULTIPLIER),
-                  recipient
-                );
+      }) => {
+        try {
+          return await compositeClient?.validatorClient.post.send(
+            subaccountClient?.wallet,
+            () =>
+              new Promise((resolve) => {
+                const msg =
+                  compositeClient?.validatorClient.post.composer.composeMsgWithdrawFromSubaccount(
+                    subaccountClient.address,
+                    subaccountClient.subaccountNumber,
+                    assetId,
+                    Long.fromNumber(amount * QUANTUM_MULTIPLIER),
+                    recipient
+                  );
 
-              resolve([msg]);
-            }),
-          false,
-          undefined,
-          undefined,
-          Method.BroadcastTxCommit
-        ),
+                resolve([msg]);
+              }),
+            false,
+            undefined,
+            undefined,
+            Method.BroadcastTxCommit
+          );
+        } catch (error) {
+          log('useSubaccount/transferFromSubaccountToAddress', error);
+          throw error;
+        }
+      },
 
       transferNativeToken: async ({
         subaccountClient,
@@ -129,24 +153,30 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         subaccountClient: SubaccountClient;
         amount: number;
         recipient: string;
-      }) =>
-        await compositeClient?.validatorClient.post.send(
-          subaccountClient.wallet,
-          () =>
-            new Promise((resolve) => {
-              const msg = compositeClient?.sendTokenMessage(
-                subaccountClient.wallet,
-                amount.toString(),
-                recipient,
-              );
+      }) => {
+        try {
+          return await compositeClient?.validatorClient.post.send(
+            subaccountClient.wallet,
+            () =>
+              new Promise((resolve) => {
+                const msg = compositeClient?.sendTokenMessage(
+                  subaccountClient.wallet,
+                  amount.toString(),
+                  recipient
+                );
 
-              resolve([msg]);
-            }),
-          false,
-          compositeClient?.validatorClient?.post.defaultDydxGasPrice,
-          undefined,
-          Method.BroadcastTxCommit
-        ),
+                resolve([msg]);
+              }),
+            false,
+            compositeClient?.validatorClient?.post.defaultDydxGasPrice,
+            undefined,
+            Method.BroadcastTxCommit
+          );
+        } catch (error) {
+          log('useSubaccount/transferNativeToken', error);
+          throw error;
+        }
+      },
 
       sendSquidWithdrawFromSubaccount: async ({
         subaccountClient,
@@ -158,20 +188,27 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         payload: string;
       }) => {
         if (!compositeClient) throw new Error('client not initialized');
+        try {
+          const transaction = JSON.parse(payload);
 
-        const transaction = JSON.parse(payload);
+          const msg = compositeClient.withdrawFromSubaccountMessage(
+            subaccountClient,
+            amount.toFixed(usdcDecimals)
+          );
+          const ibcMsg: EncodeObject = {
+            typeUrl: transaction.msgTypeUrl,
+            value: transaction.msg,
+          };
 
-        const msg = compositeClient.withdrawFromSubaccountMessage(subaccountClient, amount.toString());
-        const ibcMsg: EncodeObject = {
-          typeUrl: transaction.msgTypeUrl,
-          value: transaction.msg,
-        };
-
-        return await compositeClient.send(
-          subaccountClient.wallet,
-          () => Promise.resolve([msg, ibcMsg]),
-          false
-        );
+          return await compositeClient.send(
+            subaccountClient.wallet,
+            () => Promise.resolve([msg, ibcMsg]),
+            false
+          );
+        } catch (error) {
+          log('useSubaccount/sendSquidWithdrawFromSubaccount', error);
+          throw error;
+        }
       },
     }),
     [compositeClient]
@@ -313,11 +350,6 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         placeOrderParams = abacusStateManager.placeOrder(callback);
       }
 
-      track(AnalyticsEvent.TradePlaceOrder, {
-        ...placeOrderParams,
-        isClosePosition,
-      } as HumanReadablePlaceOrderPayload & { isClosePosition: boolean });
-
       return placeOrderParams;
     },
     [subaccountClient]
@@ -346,7 +378,6 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     }) => {
       const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
         if (success) {
-          track(AnalyticsEvent.TradeCancelOrder);
           onSuccess?.();
         } else {
           onError?.({ errorStringKey: parsingError?.stringKey });

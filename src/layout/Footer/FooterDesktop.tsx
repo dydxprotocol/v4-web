@@ -3,7 +3,7 @@ import styled, { type AnyStyledComponent, css } from 'styled-components';
 import { AbacusApiStatus } from '@/constants/abacus';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { ENVIRONMENT_CONFIG_MAP, isDev } from '@/constants/networks';
 
 import { useApiState, useSelectedNetwork, useStringGetter } from '@/hooks';
 import { ChatIcon, LinkOutIcon } from '@/icons';
@@ -75,7 +75,7 @@ export const FooterDesktop = () => {
         )}
       </Styled.Row>
 
-      {import.meta.env.MODE !== 'production' && (
+      {isDev && (
         <Styled.Details
           withSeparators
           items={[

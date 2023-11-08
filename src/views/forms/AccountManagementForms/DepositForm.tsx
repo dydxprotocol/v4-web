@@ -2,7 +2,6 @@ import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
-import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
 import { parseUnits } from 'viem'
 
 import erc20 from '@/abi/erc20.json';
@@ -10,10 +9,11 @@ import { TransferInputField, TransferInputTokenResource, TransferType } from '@/
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { NumberSign } from '@/constants/numbers';
 import type { EvmAddress } from '@/constants/wallets';
 
-import { useAccounts, useDebounce, useStringGetter } from '@/hooks';
+import { useAccounts, useDebounce, useStringGetter, useSelectedNetwork } from '@/hooks';
 import { useAccountBalance, CHAIN_DEFAULT_TOKEN_ADDRESS } from '@/hooks/useAccountBalance';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { NATIVE_TOKEN_ADDRESS, useSquid } from '@/hooks/useSquid';
@@ -54,6 +54,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const stringGetter = useStringGetter();
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { selectedNetwork } = useSelectedNetwork();
 
   const { evmAddress, signerWagmi } = useAccounts();
   const { publicClientWagmi } = useWalletConnection();
@@ -239,7 +240,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         if (txHash) {
           addTransferNotification({
             txHash: txHash,
-            toChainId: TESTNET_CHAIN_ID,
+            toChainId: ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId,
             fromChainId: chainIdStr || undefined,
             toAmount: summary?.usdcSize || undefined,
             triggeredAt: Date.now(),
