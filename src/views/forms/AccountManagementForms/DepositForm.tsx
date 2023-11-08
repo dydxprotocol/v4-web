@@ -65,6 +65,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     chain: chainIdStr,
     resources,
     summary,
+    errors: routeErrors,
   } = useSelector(getTransferInputs, shallowEqual) || {};
   const chainId = chainIdStr ? parseInt(chainIdStr) : undefined;
 
@@ -286,6 +287,17 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     if (error) {
       return parseWalletError({ error, stringGetter }).message;
     }
+
+    if (routeErrors) {
+      const parsedErrors = JSON.parse(routeErrors);
+      if (parsedErrors?.[0]?.message) {
+        return stringGetter({
+          key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+          params: { ERROR_MESSAGE: parsedErrors?.[0]?.message },
+        });
+      }
+    }
+
 
     if (fromAmount) {
       if (!chainId) {

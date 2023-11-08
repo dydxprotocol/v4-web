@@ -69,6 +69,7 @@ export const WithdrawForm = () => {
     chain: chainIdStr,
     address: toAddress,
     resources,
+    errors: routeErrors,
   } = useSelector(getTransferInputs, shallowEqual) || {};
 
   const isValidAddress = toAddress && isAddress(toAddress);
@@ -281,6 +282,16 @@ export const WithdrawForm = () => {
       });
     }
 
+    if (routeErrors) {
+      const parsedErrors = JSON.parse(routeErrors);
+      if (parsedErrors?.[0]?.message) {
+        return stringGetter({
+          key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+          params: { ERROR_MESSAGE: parsedErrors?.[0]?.message },
+        });
+      }
+    }
+
     if (!toAddress) return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ADDRESS });
 
     if (sanctionedAddresses.has(toAddress))
@@ -303,6 +314,7 @@ export const WithdrawForm = () => {
     return undefined;
   }, [
     error,
+    routeErrors,
     freeCollateralBN,
     chainIdStr,
     debouncedAmountBN,
