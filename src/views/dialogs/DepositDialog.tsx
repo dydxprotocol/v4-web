@@ -17,7 +17,7 @@ type ElementProps = {
 };
 
 export const DepositDialog = ({ setIsOpen }: ElementProps) => {
-  const [showTestDeposit, setShowTestDeposit] = useState(true);
+  const [showFaucet, setShowFaucet] = useState(!isMainnet);
   const stringGetter = useStringGetter();
   const { isMobile } = useBreakpoints();
 
@@ -28,20 +28,18 @@ export const DepositDialog = ({ setIsOpen }: ElementProps) => {
       isOpen
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.DEPOSIT })}
-      description={
-        !isMainnet && showTestDeposit && 'Test funds will be sent directly to your dYdX account.'
-      }
+      description={showFaucet && 'Test funds will be sent directly to your dYdX account.'}
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
       <Styled.Content>
-        {!isMainnet && showTestDeposit ? (
-          <TestnetDepositForm onDeposit={closeDialog} />
-        ) : (
+        {isMainnet || !showFaucet ? (
           <DepositForm />
+        ) : (
+          <TestnetDepositForm onDeposit={closeDialog} />
         )}
         {!isMainnet && (
-          <Styled.TextToggle onClick={() => setShowTestDeposit(!showTestDeposit)}>
-            {showTestDeposit ? 'Show deposit form (Under Construction)' : 'Show test faucet'}
+          <Styled.TextToggle onClick={() => setShowFaucet(!showFaucet)}>
+            {showFaucet ? 'Show deposit form' : 'Show test faucet'}
           </Styled.TextToggle>
         )}
       </Styled.Content>
