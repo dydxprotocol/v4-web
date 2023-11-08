@@ -45,7 +45,7 @@ const parseStringParamsForNotification = ({
 
 export const notificationTypes: NotificationTypeConfig[] = [
   {
-    type: NotificationType.OrderStatusChanged,
+    type: NotificationType.AbacusGenerated,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const abacusNotifications = useSelector(getAbacusNotifications, isEqual);

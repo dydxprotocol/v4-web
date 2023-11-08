@@ -30,16 +30,16 @@ export const usePreferenceMenu = () => {
       groupLabel: stringGetter({ key: STRING_KEYS.NOTIFICATIONS }),
       items: [
         {
-          value: NotificationType.OrderStatusChanged,
+          value: NotificationType.AbacusGenerated,
           label: stringGetter({ key: STRING_KEYS.TRADING }),
           slotAfter: (
             <Switch
-              name={NotificationType.OrderStatusChanged}
-              checked={enabledNotifs[NotificationType.OrderStatusChanged]}
+              name={NotificationType.AbacusGenerated}
+              checked={enabledNotifs[NotificationType.AbacusGenerated]}
               onCheckedChange={(enabled: boolean) => null}
             />
           ),
-          onSelect: () => toggleNotifPreference(NotificationType.OrderStatusChanged),
+          onSelect: () => toggleNotifPreference(NotificationType.AbacusGenerated),
         },
         {
           value: NotificationType.SquidTransfer,

@@ -42,7 +42,7 @@ const useNotificationsContext = () => {
     useLocalStorage<NotificationPreferences>({
       key: LocalStorageKey.NotificationPreferences,
       defaultValue: {
-        [NotificationType.OrderStatusChanged]: true,
+        [NotificationType.AbacusGenerated]: true,
         [NotificationType.SquidTransfer]: true,
         version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
       },
@@ -75,7 +75,7 @@ const useNotificationsContext = () => {
       LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences]
     ) {
       setNotificationPreferences({
-        [NotificationType.OrderStatusChanged]: true,
+        [NotificationType.AbacusGenerated]: true,
         [NotificationType.SquidTransfer]: true,
         version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
       });

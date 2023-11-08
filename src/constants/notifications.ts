@@ -2,7 +2,7 @@ import { StatusResponse } from '@0xsquid/sdk';
 
 /** implemented in useNotificationTypes */
 export enum NotificationType {
-  OrderStatusChanged = 'OrderStatusChanged',
+  AbacusGenerated = 'AbacusGenerated',
   SquidTransfer = 'SquidTransfer',
 }
 
