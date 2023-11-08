@@ -5,7 +5,7 @@ import { Root, Action, Close } from '@radix-ui/react-toast';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { popoverMixins } from '@/styles/popoverMixins';
 
-import { Notification, type NotificationProps } from '@/views/notifications/Notification';
+import { Notification, type NotificationProps } from '@/components/Notification';
 
 import { IconButton } from './IconButton';
 import { IconName } from './Icon';

@@ -17,13 +17,12 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Details } from '@/components/Details';
+import { Notification, NotificationProps } from '@/components/Notification';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { OrderStatusIcon } from '@/views/OrderStatusIcon';
 import { Output, OutputType } from '@/components/Output';
 
 import { getMarketData } from '@/state/perpetualsSelectors';
-
-import { Notification, NotificationProps } from '../Notification';
 
 type ElementProps = {
   data: {

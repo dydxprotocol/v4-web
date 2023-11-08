@@ -13,13 +13,13 @@ import { AlertMessage } from '@/components/AlertMessage';
 import { Collapsible } from '@/components/Collapsible';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingDots } from '@/components/Loading/LoadingDots';
+import { Notification, NotificationProps } from '@/components/Notification';
 import { Output, OutputType } from '@/components/Output';
 import { WithReceipt } from '@/components/WithReceipt';
-import { Notification, NotificationProps } from '@/views/notifications/Notification';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { TransferStatusSteps } from './/TransferStatusSteps';
+import { TransferStatusSteps } from './TransferStatusSteps';
 
 type ElementProps = {
   type: 'withdrawal' | 'deposit';
