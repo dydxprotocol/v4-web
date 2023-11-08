@@ -124,7 +124,7 @@ export const TransferStatusNotification = ({
       hideReceipt={!open}
       side="bottom"
       slotReceipt={
-        <Collapsible open={open} onOpenChange={setOpen} label="" withLabel={false}>
+        <Collapsible open={open} onOpenChange={setOpen} label="" withTrigger={false}>
           <Styled.Receipt>
             <TransferStatusSteps status={status} type={type} />
           </Styled.Receipt>

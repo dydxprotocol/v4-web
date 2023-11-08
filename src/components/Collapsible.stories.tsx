@@ -20,7 +20,7 @@ export const CollapsibleStory: Story<CollapsibleProps> = (args) => (
 
 CollapsibleStory.args = {
   disabled: false,
-  withLabel: true,
+  withTrigger: true,
   label: 'Collapsible List of Items',
 };
 

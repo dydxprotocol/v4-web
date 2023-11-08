@@ -14,7 +14,7 @@ type ElementProps = {
   label: React.ReactNode;
   triggerIcon?: IconName;
   children: React.ReactNode;
-  withLabel?: boolean;
+  withTrigger?: boolean;
 };
 
 type StyleProps = {
@@ -38,10 +38,10 @@ export const Collapsible = ({
   triggerIconSide = 'left',
   fullWidth,
   className,
-  withLabel = true,
+  withTrigger = true,
 }: CollapsibleProps) => (
   <Styled.Root defaultOpen={defaultOpen} open={open} onOpenChange={onOpenChange}>
-    {withLabel && (
+    {withTrigger && (
       <Styled.Trigger className={className} disabled={disabled}>
         {triggerIconSide === 'right' && (
           <>
