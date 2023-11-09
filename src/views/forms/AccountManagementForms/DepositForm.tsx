@@ -289,12 +289,17 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     }
 
     if (routeErrors) {
-      const parsedErrors = JSON.parse(routeErrors);
-      if (parsedErrors?.[0]?.message) {
-        return stringGetter({
-          key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-          params: { ERROR_MESSAGE: parsedErrors?.[0]?.message },
-        });
+      try {
+        const parsedErrors = JSON.parse(routeErrors);
+        if (parsedErrors?.[0]?.message) {
+          return stringGetter({
+            key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+            params: { ERROR_MESSAGE: parsedErrors?.[0]?.message },
+          });
+        }
+      } catch (e) {
+        log('WithDrawForm/errorMessage', e);
+        return stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG });
       }
     }
 
@@ -311,7 +316,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     }
 
     return undefined;
-  }, [error, routeErrors, balance, chainId, fromAmount, sourceToken]);
+  }, [error, routeErrors, balance, chainId, fromAmount, sourceToken, stringGetter]);
 
   const isDisabled =
     Boolean(errorMessage) ||

@@ -44,10 +44,10 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
+import { log } from '@/lib/telemetry';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
-import { join } from 'path';
 
 export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
@@ -283,12 +283,17 @@ export const WithdrawForm = () => {
     }
 
     if (routeErrors) {
-      const parsedErrors = JSON.parse(routeErrors);
-      if (parsedErrors?.[0]?.message) {
-        return stringGetter({
-          key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-          params: { ERROR_MESSAGE: parsedErrors?.[0]?.message },
-        });
+      try {
+        const parsedErrors = JSON.parse(routeErrors);
+        if (parsedErrors?.[0]?.message) {
+          return stringGetter({
+            key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+            params: { ERROR_MESSAGE: parsedErrors?.[0]?.message },
+          });
+        }
+      } catch (e) {
+        log('WithDrawForm/errorMessage', e);
+        return stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG });
       }
     }
 
@@ -321,6 +326,7 @@ export const WithdrawForm = () => {
     toToken,
     toAddress,
     sanctionedAddresses,
+    stringGetter,
   ]);
 
   const isDisabled =
