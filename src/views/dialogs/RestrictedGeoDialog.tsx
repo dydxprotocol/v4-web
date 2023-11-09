@@ -1,11 +1,13 @@
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { isDev } from '@/constants/networks';
 import { useStringGetter } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
+import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
 
 type ElementProps = {
   preventClose?: boolean;
@@ -25,6 +27,7 @@ export const RestrictedGeoDialog = ({ preventClose, setIsOpen }: ElementProps) =
     >
       <Styled.Content>
         {stringGetter({ key: STRING_KEYS.REGION_NOT_PERMITTED_SUBTITLE })}
+        {isDev && <NetworkSelectMenu />}
       </Styled.Content>
     </Dialog>
   );
