@@ -831,6 +831,7 @@ Styled.SortArrow = styled.span<{ sortDirection: 'ascending' | 'descending' }>`
 Styled.Thead = styled.thead<StyleProps>`
   ${layoutMixins.stickyHeader}
   scroll-snap-align: none;
+  font: var(--font-mini-book);
 
   > * {
     height: var(--stickyArea-topHeight);
@@ -839,18 +840,17 @@ Styled.Thead = styled.thead<StyleProps>`
   color: var(--tableHeader-textColor);
   background-color: var(--tableHeader-backgroundColor);
 
-  @media ${breakpoints.notTablet} {
-    ${({ withInnerBorders, withGradientCardRows }) =>
-      withInnerBorders &&
-      !withGradientCardRows &&
-      css`
-        ${layoutMixins.withInnerHorizontalBorders}
-      `}
-  }
+  ${({ withInnerBorders, withGradientCardRows }) =>
+    withInnerBorders &&
+    !withGradientCardRows &&
+    css`
+      ${layoutMixins.withInnerHorizontalBorders}
+    `}
 `;
 
 Styled.Tbody = styled.tbody<StyleProps>`
   ${layoutMixins.stickyArea2}
+  font: var(--font-small-book);
 
   // If <table> height is fixed with not enough rows to overflow, vertically center the rows
   &:before,
@@ -869,6 +869,10 @@ Styled.Tbody = styled.tbody<StyleProps>`
       --stickyArea2-paddingBottom: var(--border-width);
       --stickyArea2-paddingLeft: var(--border-width);
       --stickyArea2-paddingRight: var(--border-width);
+
+      tr:first-of-type {
+        box-shadow: none;
+      }
     `}
 
   ${({ withGradientCardRows }) =>
