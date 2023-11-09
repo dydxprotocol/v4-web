@@ -70,6 +70,7 @@ export const WithdrawForm = () => {
     address: toAddress,
     resources,
     errors: routeErrors,
+    errorMessage: routeErrorMessage,
   } = useSelector(getTransferInputs, shallowEqual) || {};
 
   const isValidAddress = toAddress && isAddress(toAddress);
@@ -283,18 +284,12 @@ export const WithdrawForm = () => {
     }
 
     if (routeErrors) {
-      try {
-        const parsedErrors = JSON.parse(routeErrors);
-        if (parsedErrors?.[0]?.message) {
-          return stringGetter({
+      return routeErrorMessage
+        ? stringGetter({
             key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-            params: { ERROR_MESSAGE: parsedErrors?.[0]?.message },
-          });
-        }
-      } catch (e) {
-        log('WithDrawForm/errorMessage', e);
-        return stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG });
-      }
+            params: { ERROR_MESSAGE: routeErrorMessage },
+          })
+        : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG });
     }
 
     if (!toAddress) return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ADDRESS });
@@ -320,6 +315,7 @@ export const WithdrawForm = () => {
   }, [
     error,
     routeErrors,
+    routeErrorMessage,
     freeCollateralBN,
     chainIdStr,
     debouncedAmountBN,

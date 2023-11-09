@@ -66,6 +66,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     resources,
     summary,
     errors: routeErrors,
+    errorMessage: routeErrorMessage,
   } = useSelector(getTransferInputs, shallowEqual) || {};
   const chainId = chainIdStr ? parseInt(chainIdStr) : undefined;
 
@@ -289,18 +290,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     }
 
     if (routeErrors) {
-      try {
-        const parsedErrors = JSON.parse(routeErrors);
-        if (parsedErrors?.[0]?.message) {
-          return stringGetter({
+      return routeErrorMessage
+        ? stringGetter({
             key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-            params: { ERROR_MESSAGE: parsedErrors?.[0]?.message },
-          });
-        }
-      } catch (e) {
-        log('WithDrawForm/errorMessage', e);
-        return stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG });
-      }
+            params: { ERROR_MESSAGE: routeErrorMessage },
+          })
+        : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG });
     }
 
     if (fromAmount) {
@@ -316,7 +311,16 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     }
 
     return undefined;
-  }, [error, routeErrors, balance, chainId, fromAmount, sourceToken, stringGetter]);
+  }, [
+    error,
+    routeErrors,
+    routeErrorMessage,
+    balance,
+    chainId,
+    fromAmount,
+    sourceToken,
+    stringGetter,
+  ]);
 
   const isDisabled =
     Boolean(errorMessage) ||
