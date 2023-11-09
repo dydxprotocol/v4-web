@@ -98,7 +98,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   useEffect(() => {
     const hasInvalidInput =
-      debouncedAmountBN.isNaN() || debouncedAmountBN.lte(0) || debouncedAmountBN.gte(balanceBN);
+      debouncedAmountBN.isNaN() || debouncedAmountBN.lte(0) || debouncedAmountBN.gt(balanceBN);
 
     abacusStateManager.setTransferValue({
       value: hasInvalidInput ? 0 : debouncedAmount,
