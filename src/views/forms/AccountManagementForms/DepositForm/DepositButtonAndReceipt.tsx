@@ -164,6 +164,7 @@ export const DepositButtonAndReceipt = ({
       label: <span>{stringGetter({ key: STRING_KEYS.SLIPPAGE })}</span>,
       value: (
         <SlippageEditor
+          disabled
           slippage={slippage}
           setIsEditing={setIsEditingSlipapge}
           setSlippage={setSlippage}

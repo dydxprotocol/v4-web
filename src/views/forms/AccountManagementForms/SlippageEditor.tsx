@@ -24,11 +24,17 @@ type ElementProps = {
   slippage: number;
   setIsEditing?: Dispatch<SetStateAction<boolean>>;
   setSlippage: (slippage: number) => void;
+  disabled?: boolean;
 };
 
 export type SlippageEditorProps = ElementProps;
 
-export const SlippageEditor = ({ slippage, setIsEditing, setSlippage }: SlippageEditorProps) => {
+export const SlippageEditor = ({
+  disabled,
+  slippage,
+  setIsEditing,
+  setSlippage,
+}: SlippageEditorProps) => {
   const percentSlippage = slippage * 100;
   const [slippageInputValue, setSlippageInputValue] = useState(percentSlippage.toString());
   const [editorState, setEditorState] = useState(EditorState.Viewing);
@@ -79,6 +85,10 @@ export const SlippageEditor = ({ slippage, setIsEditing, setSlippage }: Slippage
       setEditorState(EditorState.Viewing);
     }
   };
+
+  if (disabled) {
+    return <Output type={OutputType.Percent} value={slippage} />;
+  }
 
   return (
     <Styled.WithConfirmationPopover
