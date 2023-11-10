@@ -10,6 +10,7 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { NotificationStatus } from '@/constants/notifications';
 import { NumberSign } from '@/constants/numbers';
 
 import {
@@ -171,6 +172,7 @@ export const WithdrawForm = () => {
               toChainId: chainIdStr || undefined,
               toAmount: debouncedAmountBN.toNumber(),
               triggeredAt: Date.now(),
+              notificationStatus: NotificationStatus.Triggered,
             });
             abacusStateManager.clearTransferInputValues();
             setWithdrawAmount('');

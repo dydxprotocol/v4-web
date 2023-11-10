@@ -2,7 +2,7 @@ import { createContext, useContext, useCallback, useEffect, useMemo } from 'reac
 import { useQuery } from 'react-query';
 import type { StatusResponse } from '@0xsquid/sdk';
 
-import { LocalStorageKey } from '@/constants/localStorage';
+import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import { type TransferNotifcation } from '@/constants/notifications';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -27,10 +27,25 @@ const useLocalNotificationsContext = () => {
   // transfer notifications
   const [allTransferNotifications, setAllTransferNotifications] = useLocalStorage<{
     [key: `dydx${string}`]: TransferNotifcation[];
+    version: string;
   }>({
     key: LocalStorageKey.TransferNotifications,
-    defaultValue: {},
+    defaultValue: {
+      version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.TransferNotifications],
+    },
   });
+
+  // Ensure version matches, otherwise wipe
+  useEffect(() => {
+    if (
+      allTransferNotifications?.version !==
+      LOCAL_STORAGE_VERSIONS[LocalStorageKey.TransferNotifications]
+    ) {
+      setAllTransferNotifications({
+        version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.TransferNotifications],
+      });
+    }
+  }, [allTransferNotifications]);
 
   const { dydxAddress } = useAccounts();
 

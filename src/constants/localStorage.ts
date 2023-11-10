@@ -31,6 +31,7 @@ export enum LocalStorageKey {
 export const LOCAL_STORAGE_VERSIONS = {
   [LocalStorageKey.EvmDerivedAddresses]: 'v2',
   [LocalStorageKey.NotificationPreferences]: 'v1',
+  [LocalStorageKey.TransferNotifications]: 'v1',
 
   /**
    * @deprecated

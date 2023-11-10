@@ -129,6 +129,7 @@ export type TransferNotifcation = {
   toAmount?: number;
   triggeredAt?: number;
   status?: StatusResponse;
+  notificationStatus: NotificationStatus;
 };
 
 /**

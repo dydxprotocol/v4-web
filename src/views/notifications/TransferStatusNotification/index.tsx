@@ -1,4 +1,4 @@
-import { useCallback, useState, useMemo } from 'react';
+import { useCallback, useState, useMemo, MouseEvent } from 'react';
 import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import { useInterval, useStringGetter } from '@/hooks';
@@ -53,8 +53,6 @@ export const TransferStatusNotification = ({
 
   useInterval({ callback: updateSecondsLeft });
 
-  if (!status) return <LoadingDots size={3} />;
-
   const inProgressStatusString =
     type === 'deposit'
       ? secondsLeft > 0
@@ -80,7 +78,9 @@ export const TransferStatusNotification = ({
       slotIcon={isToast && slotIcon}
       slotTitle={slotTitle}
       slotCustomContent={
-        isToast ? (
+        !status ? (
+          <LoadingDots size={3} />
+        ) : isToast ? (
           <Styled.BridgingStatus>
             <Styled.Status>
               {stringGetter({
@@ -116,7 +116,13 @@ export const TransferStatusNotification = ({
       }
       slotAction={
         isToast && (
-          <Styled.Trigger isOpen={open} onClick={() => setOpen(!open)}>
+          <Styled.Trigger
+            isOpen={open}
+            onClick={(e: MouseEvent) => {
+              e.stopPropagation();
+              setOpen(!open);
+            }}
+          >
             <Icon iconName={IconName.Caret} />{' '}
             {stringGetter({
               key: open ? STRING_KEYS.HIDE_DETAILS : STRING_KEYS.VIEW_DETAILS,
