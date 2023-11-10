@@ -22,6 +22,7 @@ import { useShouldShowFooter } from './useShouldShowFooter';
 import { useSelectedNetwork } from './useSelectedNetwork';
 import { useStringGetter } from './useStringGetter';
 import { useSubaccount } from './useSubaccount';
+import { useTradeFormInputs } from './useTradeFormInputs';
 import { useURLConfigs } from './useURLConfigs';
 
 export {
@@ -49,5 +50,6 @@ export {
   useSelectedNetwork,
   useStringGetter,
   useSubaccount,
+  useTradeFormInputs,
   useURLConfigs,
 };

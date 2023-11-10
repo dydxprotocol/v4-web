@@ -190,14 +190,6 @@ export const TradeForm = ({
     });
   };
 
-  useEffect(() => {
-    const floatValue = parseFloat(triggerPriceInput);
-    abacusStateManager.setTradeValue({
-      value: floatValue,
-      field: TradeInputField.triggerPrice,
-    });
-  }, [triggerPriceInput]);
-
   if (needsTriggerPrice) {
     tradeFormInputs.push({
       key: TradeBoxKeys.TriggerPrice,
@@ -218,11 +210,6 @@ export const TradeForm = ({
     });
   }
 
-  useEffect(() => {
-    const floatValue = parseFloat(limitPriceInput);
-    abacusStateManager.setTradeValue({ value: floatValue, field: TradeInputField.limitPrice });
-  }, [limitPriceInput]);
-
   if (needsLimitPrice) {
     tradeFormInputs.push({
       key: TradeBoxKeys.LimitPrice,
@@ -242,14 +229,6 @@ export const TradeForm = ({
       decimals: tickSizeDecimals || USD_DECIMALS,
     });
   }
-
-  useEffect(() => {
-    const floatValue = parseFloat(trailingPercentInput);
-    abacusStateManager.setTradeValue({
-      value: floatValue,
-      field: TradeInputField.trailingPercent,
-    });
-  }, [trailingPercentInput]);
 
   if (needsTrailingPercent) {
     tradeFormInputs.push({
