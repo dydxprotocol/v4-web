@@ -109,7 +109,7 @@ export const Dialog = ({
               e.preventDefault();
             }
           }}
-          withAnimation={withAnimation}
+          $withAnimation={withAnimation}
         >
           <Styled.Header $withBorder={hasHeaderBorder}>
             <Styled.HeaderTopRow>
@@ -173,7 +173,7 @@ Styled.Overlay = styled(Overlay)`
   }
 `;
 
-Styled.Container = styled(Content)<{ placement: DialogPlacement; withAnimation?: boolean }>`
+Styled.Container = styled(Content)<{ placement: DialogPlacement; $withAnimation?: boolean }>`
   /* Params */
   --dialog-inset: 1rem;
   --dialog-width: 30rem;
@@ -229,7 +229,7 @@ Styled.Container = styled(Content)<{ placement: DialogPlacement; withAnimation?:
 
   outline: none;
 
-  ${({ placement, withAnimation }) =>
+  ${({ placement, $withAnimation }) =>
     ({
       [DialogPlacement.Default]: css`
         inset: var(--dialog-inset);
@@ -265,7 +265,7 @@ Styled.Container = styled(Content)<{ placement: DialogPlacement; withAnimation?:
           padding-bottom: var(--dialog-radius); */
         }
 
-        ${withAnimation &&
+        ${$withAnimation &&
         css`
           @media (prefers-reduced-motion: no-preference) {
             &[data-state='open'] {
@@ -299,7 +299,7 @@ Styled.Container = styled(Content)<{ placement: DialogPlacement; withAnimation?:
           margin-left: auto;
         }
 
-        ${withAnimation &&
+        ${$withAnimation &&
         css`
           @media (prefers-reduced-motion: no-preference) {
             &[data-state='open'] {
@@ -323,7 +323,7 @@ Styled.Container = styled(Content)<{ placement: DialogPlacement; withAnimation?:
         `}
       `,
       [DialogPlacement.Inline]: css`
-        ${withAnimation &&
+        ${$withAnimation &&
         css`
           @media (prefers-reduced-motion: no-preference) {
             &[data-state='open'] {
