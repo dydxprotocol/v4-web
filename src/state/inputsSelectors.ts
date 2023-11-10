@@ -120,3 +120,8 @@ export const useTradeFormData = () => {
     shallowEqual
   );
 };
+
+/**
+ * @returns Tradeform Input states for display. Abacus inputs should track these values.
+ */
+export const getTradeFormInputs = (state: RootState) => state.inputs.tradeFormInputs;

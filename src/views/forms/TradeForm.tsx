@@ -1,6 +1,6 @@
-import { type FormEvent, useState, Ref, useCallback } from 'react';
+import { type FormEvent, useState, Ref, useCallback, useEffect } from 'react';
 import styled, { AnyStyledComponent, css } from 'styled-components';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import type { NumberFormatValues, SourceInfo } from 'react-number-format';
 
 import { AlertType } from '@/constants/alerts';
@@ -37,7 +37,8 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { Orderbook } from '@/views/tables/Orderbook';
 
-import { getCurrentInput, useTradeFormData } from '@/state/inputsSelectors';
+import { setTradeFormInputs } from '@/state/inputs';
+import { getCurrentInput, getTradeFormInputs, useTradeFormData } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -80,6 +81,7 @@ export const TradeForm = ({
   const [placeOrderError, setPlaceOrderError] = useState<string>();
   const [showOrderbook, setShowOrderbook] = useState(false);
 
+  const dispatch = useDispatch();
   const stringGetter = useStringGetter();
   const { placeOrder } = useSubaccount();
 
@@ -98,10 +100,12 @@ export const TradeForm = ({
     tradeErrors,
   } = useTradeFormData();
 
-  const { limitPrice, triggerPrice, trailingPercent } = price || {};
   const currentInput = useSelector(getCurrentInput);
   const { tickSizeDecimals, stepSizeDecimals } =
     useSelector(getCurrentMarketConfig, shallowEqual) || {};
+
+  const tradeFormInputValues = useSelector(getTradeFormInputs, shallowEqual);
+  const { limitPriceInput, triggerPriceInput, trailingPercentInput } = tradeFormInputValues;
 
   const needsAdvancedOptions =
     needsGoodUntil || timeInForceOptions || executionOptions || needsPostOnly || needsReduceOnly;
@@ -109,7 +113,8 @@ export const TradeForm = ({
   const tradeFormInputs: TradeBoxInputConfig[] = [];
 
   const isInputFilled =
-    Object.values(price || {}).some((val) => val != null) ||
+    Object.values(tradeFormInputValues).some((val) => val !== '') ||
+    Object.values(price || {}).some((val) => !!val) ||
     [size?.size, size?.usdcSize, size?.leverage].some((val) => val != null);
 
   const hasInputErrors =
@@ -185,6 +190,14 @@ export const TradeForm = ({
     });
   };
 
+  useEffect(() => {
+    const floatValue = parseFloat(triggerPriceInput);
+    abacusStateManager.setTradeValue({
+      value: floatValue,
+      field: TradeInputField.triggerPrice,
+    });
+  }, [triggerPriceInput]);
+
   if (needsTriggerPrice) {
     tradeFormInputs.push({
       key: TradeBoxKeys.TriggerPrice,
@@ -197,16 +210,18 @@ export const TradeForm = ({
           <Tag>USD</Tag>
         </>
       ),
-      onChange: ({ floatValue }: NumberFormatValues) => {
-        abacusStateManager.setTradeValue({
-          value: floatValue,
-          field: TradeInputField.triggerPrice,
-        });
+      onChange: ({ value }: NumberFormatValues) => {
+        dispatch(setTradeFormInputs({ triggerPriceInput: value }));
       },
-      value: triggerPrice ?? '',
+      value: triggerPriceInput ?? '',
       decimals: tickSizeDecimals || USD_DECIMALS,
     });
   }
+
+  useEffect(() => {
+    const floatValue = parseFloat(limitPriceInput);
+    abacusStateManager.setTradeValue({ value: floatValue, field: TradeInputField.limitPrice });
+  }, [limitPriceInput]);
 
   if (needsLimitPrice) {
     tradeFormInputs.push({
@@ -220,13 +235,21 @@ export const TradeForm = ({
           <Tag>USD</Tag>
         </>
       ),
-      onChange: ({ floatValue }: NumberFormatValues) => {
-        abacusStateManager.setTradeValue({ value: floatValue, field: TradeInputField.limitPrice });
+      onChange: ({ value }: NumberFormatValues) => {
+        dispatch(setTradeFormInputs({ limitPriceInput: value }));
       },
-      value: limitPrice ?? '',
+      value: limitPriceInput,
       decimals: tickSizeDecimals || USD_DECIMALS,
     });
   }
+
+  useEffect(() => {
+    const floatValue = parseFloat(trailingPercentInput);
+    abacusStateManager.setTradeValue({
+      value: floatValue,
+      field: TradeInputField.trailingPercent,
+    });
+  }, [trailingPercentInput]);
 
   if (needsTrailingPercent) {
     tradeFormInputs.push({
@@ -237,13 +260,10 @@ export const TradeForm = ({
           {stringGetter({ key: STRING_KEYS.TRAILING_PERCENT })}
         </WithTooltip>
       ),
-      onChange: ({ floatValue }: NumberFormatValues) => {
-        abacusStateManager.setTradeValue({
-          value: floatValue,
-          field: TradeInputField.trailingPercent,
-        });
+      onChange: ({ value }: NumberFormatValues) => {
+        dispatch(setTradeFormInputs({ trailingPercentInput: value }));
       },
-      value: trailingPercent ?? '',
+      value: trailingPercentInput ?? '',
     });
   }
 

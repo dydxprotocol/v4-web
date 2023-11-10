@@ -27,11 +27,11 @@ import {
 
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork } from '@/constants/networks';
+import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
 
 import type { RootStore } from '@/state/_store';
-
-import { getInputTradeOptions } from '@/state/inputsSelectors';
-import { getTransferInputs } from '@/state/inputsSelectors';
+import { setTradeFormInputs } from '@/state/inputs';
+import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors';
 
 import AbacusRest from './rest';
 import AbacusAnalytics from './analytics';
@@ -43,6 +43,7 @@ import AbacusFormatter from './formatter';
 import AbacusThreading from './threading';
 import AbacusFileSystem from './filesystem';
 import { LocaleSeparators } from '../numbers';
+
 class AbacusStateManager {
   private store: RootStore | undefined;
   private currentMarket: string | undefined;
@@ -132,6 +133,8 @@ class AbacusStateManager {
       this.setTradeValue({ value: null, field: TradeInputField.limitPrice });
     }
 
+    this.store?.dispatch(setTradeFormInputs(CLEARED_TRADE_INPUTS));
+
     if (shouldResetSize) {
       this.setTradeValue({ value: null, field: TradeInputField.size });
       this.setTradeValue({ value: null, field: TradeInputField.usdcSize });
@@ -139,6 +142,8 @@ class AbacusStateManager {
       if (needsLeverage) {
         this.setTradeValue({ value: null, field: TradeInputField.leverage });
       }
+
+      this.store?.dispatch(setTradeFormInputs(CLEARED_SIZE_INPUTS));
     }
   };
 
