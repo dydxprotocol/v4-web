@@ -1,11 +1,13 @@
-import { useEffect } from 'react';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
+import { OnboardingState } from '@/constants/account';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { HistoryRoute, PortfolioRoute } from '@/constants/routes';
 
-import { useBreakpoints, useDocumentTitle, useStringGetter } from '@/hooks';
+import { useAccountBalance, useBreakpoints, useDocumentTitle, useStringGetter } from '@/hooks';
 
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { FundingPaymentsTable } from '@/views/tables/FundingPaymentsTable';
@@ -13,6 +15,9 @@ import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 import { Icon, IconName } from '@/components/Icon';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { WithSidebar } from '@/components/WithSidebar';
+
+import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
+import { openDialog } from '@/state/dialogs';
 
 import { PortfolioNavMobile } from './PortfolioNavMobile';
 import { Overview } from './Overview';
@@ -22,10 +27,19 @@ import { Fees } from './Fees';
 import { History } from './History';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+import { Button } from '@/components/Button';
+import { ButtonAction } from '@/constants/buttons';
 
 export default () => {
+  const dispatch = useDispatch();
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
+
+  const onboardingState = useSelector(getOnboardingState);
+  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
+  const { nativeTokenBalance } = useAccountBalance();
+
+  const usdcBalance = freeCollateral?.current || 0;
 
   useDocumentTitle(stringGetter({ key: STRING_KEYS.PORTFOLIO }));
 
@@ -84,46 +98,74 @@ export default () => {
     <WithSidebar
       sidebar={
         isTablet ? null : (
-          <Styled.NavigationMenu
-            items={[
-              {
-                group: 'views',
-                groupLabel: stringGetter({ key: STRING_KEYS.VIEWS }),
-                items: [
-                  {
-                    value: PortfolioRoute.Overview,
-                    slotBefore: <Styled.Icon iconName={IconName.Overview} />,
-                    label: stringGetter({ key: STRING_KEYS.OVERVIEW }),
-                    href: PortfolioRoute.Overview,
-                  },
-                  {
-                    value: PortfolioRoute.Positions,
-                    slotBefore: <Styled.Icon iconName={IconName.Cube} />,
-                    label: stringGetter({ key: STRING_KEYS.POSITIONS }),
-                    href: PortfolioRoute.Positions,
-                  },
-                  {
-                    value: PortfolioRoute.Orders,
-                    slotBefore: <Styled.Icon iconName={IconName.OrderPending} />,
-                    label: stringGetter({ key: STRING_KEYS.ORDERS }),
-                    href: PortfolioRoute.Orders,
-                  },
-                  {
-                    value: PortfolioRoute.Fees,
-                    slotBefore: <Styled.Icon iconName={IconName.Calculator} />,
-                    label: stringGetter({ key: STRING_KEYS.FEES }),
-                    href: PortfolioRoute.Fees,
-                  },
-                  {
-                    value: PortfolioRoute.History,
-                    slotBefore: <Styled.Icon iconName={IconName.History} />,
-                    label: stringGetter({ key: STRING_KEYS.HISTORY }),
-                    href: PortfolioRoute.History,
-                  },
-                ],
-              },
-            ]}
-          />
+          <Styled.SideBar>
+            <Styled.NavigationMenu
+              items={[
+                {
+                  group: 'views',
+                  groupLabel: stringGetter({ key: STRING_KEYS.VIEWS }),
+                  items: [
+                    {
+                      value: PortfolioRoute.Overview,
+                      slotBefore: <Styled.Icon iconName={IconName.Overview} />,
+                      label: stringGetter({ key: STRING_KEYS.OVERVIEW }),
+                      href: PortfolioRoute.Overview,
+                    },
+                    {
+                      value: PortfolioRoute.Positions,
+                      slotBefore: <Styled.Icon iconName={IconName.Cube} />,
+                      label: stringGetter({ key: STRING_KEYS.POSITIONS }),
+                      href: PortfolioRoute.Positions,
+                    },
+                    {
+                      value: PortfolioRoute.Orders,
+                      slotBefore: <Styled.Icon iconName={IconName.OrderPending} />,
+                      label: stringGetter({ key: STRING_KEYS.ORDERS }),
+                      href: PortfolioRoute.Orders,
+                    },
+                    {
+                      value: PortfolioRoute.Fees,
+                      slotBefore: <Styled.Icon iconName={IconName.Calculator} />,
+                      label: stringGetter({ key: STRING_KEYS.FEES }),
+                      href: PortfolioRoute.Fees,
+                    },
+                    {
+                      value: PortfolioRoute.History,
+                      slotBefore: <Styled.Icon iconName={IconName.History} />,
+                      label: stringGetter({ key: STRING_KEYS.HISTORY }),
+                      href: PortfolioRoute.History,
+                    },
+                  ],
+                },
+              ]}
+            />
+            {onboardingState === OnboardingState.AccountConnected && (
+              <Styled.Footer>
+                <Button
+                  action={ButtonAction.Primary}
+                  onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
+                >
+                  {stringGetter({ key: STRING_KEYS.DEPOSIT })}
+                </Button>
+                {usdcBalance > 0 && (
+                  <Button
+                    action={ButtonAction.Base}
+                    onClick={() => dispatch(openDialog({ type: DialogTypes.Withdraw }))}
+                  >
+                    {stringGetter({ key: STRING_KEYS.WITHDRAW })}
+                  </Button>
+                )}
+                {(usdcBalance > 0 || nativeTokenBalance.gt(0)) && (
+                  <Button
+                    action={ButtonAction.Base}
+                    onClick={() => dispatch(openDialog({ type: DialogTypes.Transfer }))}
+                  >
+                    {stringGetter({ key: STRING_KEYS.TRANSFER })}
+                  </Button>
+                )}
+              </Styled.Footer>
+            )}
+          </Styled.SideBar>
         )
       }
     >
@@ -137,6 +179,24 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.PortfolioMobile = styled.div`
   min-height: 100%;
   ${layoutMixins.expandingColumnWithHeader}
+`;
+
+Styled.SideBar = styled.div`
+  ${layoutMixins.flexColumn}
+  justify-content: space-between;
+
+  height: 100%;
+`;
+
+Styled.Footer = styled.div`
+  ${layoutMixins.row}
+  padding: 1rem;
+
+  gap: 0.5rem;
+
+  > button {
+    flex-grow: 1;
+  }
 `;
 
 Styled.NavigationMenu = styled(NavigationMenu)`
