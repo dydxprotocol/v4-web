@@ -113,6 +113,8 @@ const $Container = styled.div<{ isToast?: boolean }>`
       : css`
           flex: 1;
           background-color: transparent;
+          border-radius: 0;
+          backdrop-filter: none;
         `}
 `;
 
@@ -158,7 +160,8 @@ const $Action = styled.div`
 `;
 
 const $ActionItems = styled.div`
-  min-width: 50px;
+  min-width: fit-content;
+  padding-left: 0.5rem;
   height: 100%;
   ${layoutMixins.row};
   justify-content: end;

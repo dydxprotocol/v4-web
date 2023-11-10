@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { type MouseEvent, useEffect, useRef, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Root, Action, Close } from '@radix-ui/react-toast';
 
@@ -78,6 +78,7 @@ export const Toast = ({
           iconName={IconName.Close}
           shape={ButtonShape.Square}
           size={ButtonSize.XSmall}
+          onClick={(e: MouseEvent) => e.stopPropagation()}
         />
       </Close>
 
