@@ -5,7 +5,7 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { useAccounts, useStringGetter } from '@/hooks';
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
@@ -54,11 +54,14 @@ export const MnemonicExportDialog = ({ setIsOpen }: ElementProps) => {
         <Styled.WithReceipt
           slotReceipt={
             <Styled.CheckboxContainer>
-              <Styled.Checkbox
+              <Checkbox
                 checked={hasAcknowledged}
-                onClick={() => setHasAcknowledged(!hasAcknowledged)}
+                onCheckedChange={setHasAcknowledged}
+                id="acknowledge-secret-phase-risk"
+                label={stringGetter({
+                  key: STRING_KEYS.SECRET_PHRASE_RISK_ACK,
+                })}
               />
-              <span>{stringGetter({ key: STRING_KEYS.SECRET_PHRASE_RISK_ACK })}</span>
             </Styled.CheckboxContainer>
           }
         >
@@ -162,15 +165,8 @@ Styled.WithReceipt = styled(WithReceipt)`
 `;
 
 Styled.CheckboxContainer = styled.div`
-  ${layoutMixins.spacedRow};
-
   padding: 1rem;
-  gap: 0.75rem;
   color: var(--color-text-0);
-`;
-
-Styled.Checkbox = styled(Checkbox)`
-  --checkbox-backgroundColor: var(--color-layer-3);
 `;
 
 Styled.AlertMessage = styled(AlertMessage)`

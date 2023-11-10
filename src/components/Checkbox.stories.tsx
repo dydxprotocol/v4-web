@@ -13,7 +13,9 @@ export const Checkboxes: Story<CheckboxProps> = (args) => {
       <Checkbox
         {...args}
         checked={isChecked}
-        onClick={(e: React.ChangeEvent) => setIsChecked((e.target as HTMLInputElement).checked)}
+        onCheckedChange={setIsChecked}
+        id="story-checkbox"
+        label="example label"
       />
     </StoryWrapper>
   );
