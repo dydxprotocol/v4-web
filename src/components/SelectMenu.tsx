@@ -13,6 +13,7 @@ import {
   Portal,
   Icon as SelectIcon,
 } from '@radix-ui/react-select';
+import { CheckIcon } from '@radix-ui/react-icons';
 
 import { popoverMixins } from '@/styles/popoverMixins';
 import { formMixins } from '@/styles/formMixins';
@@ -68,7 +69,9 @@ export const SelectItem = <T extends string>({
 }) => (
   <Styled.Item className={className} value={value}>
     <ItemText>{label}</ItemText>
-    <Styled.ItemIndicator>✔{/* <CheckIcon /> */}</Styled.ItemIndicator>
+    <Styled.ItemIndicator>
+      <CheckIcon />
+    </Styled.ItemIndicator>
   </Styled.Item>
 );
 
