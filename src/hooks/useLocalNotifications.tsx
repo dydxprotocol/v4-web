@@ -66,7 +66,16 @@ const useLocalNotificationsContext = () => {
         status: currentStatus,
       } of transferNotifications) {
         try {
-          if (currentStatus && currentStatus?.squidTransactionStatus !== 'ongoing') continue;
+          // skip if error is returned or if the transaction is not ongoing
+          if (
+            // @ts-ignore status.errors is not in the type definition but can be returned
+            currentStatus?.errors ||
+            currentStatus?.error ||
+            (currentStatus?.squidTransactionStatus &&
+              currentStatus?.squidTransactionStatus !== 'ongoing')
+          ) {
+            continue;
+          }
 
           const status = await squid?.getStatus({ transactionId: txHash, toChainId, fromChainId });
           if (status) statuses[txHash] = status;
