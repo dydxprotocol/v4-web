@@ -47,7 +47,6 @@ import { MustBigNumber } from '@/lib/numbers';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
-import { join } from 'path';
 
 export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
@@ -69,6 +68,8 @@ export const WithdrawForm = () => {
     chain: chainIdStr,
     address: toAddress,
     resources,
+    errors: routeErrors,
+    errorMessage: routeErrorMessage,
   } = useSelector(getTransferInputs, shallowEqual) || {};
 
   const isValidAddress = toAddress && isAddress(toAddress);
@@ -281,6 +282,15 @@ export const WithdrawForm = () => {
       });
     }
 
+    if (routeErrors) {
+      return routeErrorMessage
+        ? stringGetter({
+            key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+            params: { ERROR_MESSAGE: routeErrorMessage },
+          })
+        : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG });
+    }
+
     if (!toAddress) return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ADDRESS });
 
     if (sanctionedAddresses.has(toAddress))
@@ -303,12 +313,15 @@ export const WithdrawForm = () => {
     return undefined;
   }, [
     error,
+    routeErrors,
+    routeErrorMessage,
     freeCollateralBN,
     chainIdStr,
     debouncedAmountBN,
     toToken,
     toAddress,
     sanctionedAddresses,
+    stringGetter,
   ]);
 
   const isDisabled =

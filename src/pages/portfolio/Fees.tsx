@@ -304,10 +304,6 @@ Styled.FeeTable = styled(Table)`
 
   @media ${breakpoints.notTablet} {
     --tableHeader-backgroundColor: var(--color-layer-1);
-
-    thead tr {
-      --border-width: 0;
-    }
   }
 `;
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -22,6 +22,11 @@ export const SearchInput = ({
 }: SearchInputProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState('');
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (isOpen) inputRef?.current?.focus();
+  }, [inputRef, isOpen]);
 
   return (
     <Styled.Search>
@@ -41,6 +46,7 @@ export const SearchInput = ({
       />
       <Styled.Input
         autoFocus
+        ref={inputRef}
         value={value}
         isOpen={isOpen}
         type={type}

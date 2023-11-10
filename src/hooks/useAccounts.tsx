@@ -136,8 +136,8 @@ const useAccountsContext = () => {
       getSubaccounts: async ({ dydxAddress }: { dydxAddress: DydxAddress }) => {
         try {
           const response = await compositeClient?.indexerClient.account.getSubaccounts(dydxAddress);
-          setDydxSubaccounts(response.subaccounts);
-          return response.subaccounts;
+          setDydxSubaccounts(response?.subaccounts);
+          return response?.subaccounts ?? [];
         } catch (error) {
           // 404 is expected if the user has no subaccounts
           if (error.status === 404) {
