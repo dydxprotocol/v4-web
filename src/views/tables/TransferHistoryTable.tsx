@@ -81,10 +81,10 @@ const getTransferHistoryTableColumnDef = ({
         ),
         renderCell: ({ fromAddress, toAddress }) => (
           <TableCell stacked>
-            <CopyButton shownAsText value={fromAddress ?? undefined}>
+            <CopyButton buttonType="text" value={fromAddress ?? undefined}>
               {fromAddress ? truncateAddress(fromAddress) : '-'}
             </CopyButton>{' '}
-            <CopyButton shownAsText value={toAddress ?? undefined}>
+            <CopyButton buttonType="text" value={toAddress ?? undefined}>
               {toAddress ? truncateAddress(toAddress) : '-'}
             </CopyButton>
           </TableCell>

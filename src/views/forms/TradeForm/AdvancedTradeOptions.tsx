@@ -130,40 +130,38 @@ export const AdvancedTradeOptions = () => {
               </Styled.SelectMenu>
             )}
             {needsPostOnly && (
-              <Styled.CheckboxField>
-                <Checkbox
-                  checked={postOnly || false}
-                  onClick={() =>
-                    abacusStateManager.setTradeValue({
-                      value: !postOnly,
-                      field: TradeInputField.postOnly,
-                    })
-                  }
-                />
-                <Styled.CheckboxLabel>
+              <Checkbox
+                checked={postOnly || false}
+                onCheckedChange={(checked) =>
+                  abacusStateManager.setTradeValue({
+                    value: checked,
+                    field: TradeInputField.postOnly,
+                  })
+                }
+                id="post-only"
+                label={
                   <WithTooltip tooltip="post-only" side="right">
                     {stringGetter({ key: STRING_KEYS.POST_ONLY })}
                   </WithTooltip>
-                </Styled.CheckboxLabel>
-              </Styled.CheckboxField>
+                }
+              />
             )}
             {needsReduceOnly && (
-              <Styled.CheckboxField>
-                <Checkbox
-                  checked={reduceOnly || false}
-                  onClick={() =>
-                    abacusStateManager.setTradeValue({
-                      value: !reduceOnly,
-                      field: TradeInputField.reduceOnly,
-                    })
-                  }
-                />
-                <Styled.CheckboxLabel>
+              <Checkbox
+                checked={reduceOnly || false}
+                onCheckedChange={(checked) =>
+                  abacusStateManager.setTradeValue({
+                    value: checked,
+                    field: TradeInputField.reduceOnly,
+                  })
+                }
+                id="reduce-only"
+                label={
                   <WithTooltip tooltip="reduce-only" side="right">
                     {stringGetter({ key: STRING_KEYS.REDUCE_ONLY })}
                   </WithTooltip>
-                </Styled.CheckboxLabel>
-              </Styled.CheckboxField>
+                }
+              />
             )}
           </>
         )}
@@ -173,15 +171,6 @@ export const AdvancedTradeOptions = () => {
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.CheckboxField = styled.div`
-  ${layoutMixins.row}
-  gap: 0.5rem;
-`;
-
-Styled.CheckboxLabel = styled.div`
-  font-size: 0.875em;
-`;
 
 Styled.Collapsible = styled(Collapsible)`
   --trigger-backgroundColor: transparent;
