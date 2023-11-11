@@ -14,6 +14,7 @@ type ElementProps = {
   label: React.ReactNode;
   triggerIcon?: IconName;
   children: React.ReactNode;
+  withTrigger?: boolean;
 };
 
 type StyleProps = {
@@ -22,6 +23,8 @@ type StyleProps = {
   triggerIconSide?: 'left' | 'right';
   fullWidth?: boolean;
 };
+
+export type CollapsibleProps = ElementProps & StyleProps;
 
 export const Collapsible = ({
   defaultOpen = false,
@@ -35,26 +38,29 @@ export const Collapsible = ({
   triggerIconSide = 'left',
   fullWidth,
   className,
-}: ElementProps & StyleProps) => (
+  withTrigger = true,
+}: CollapsibleProps) => (
   <Styled.Root defaultOpen={defaultOpen} open={open} onOpenChange={onOpenChange}>
-    <Styled.Trigger className={className} disabled={disabled}>
-      {triggerIconSide === 'right' && (
-        <>
-          {label}
-          {fullWidth && <HorizontalSeparatorFiller />}
-        </>
-      )}
+    {withTrigger && (
+      <Styled.Trigger className={className} disabled={disabled}>
+        {triggerIconSide === 'right' && (
+          <>
+            {label}
+            {fullWidth && <HorizontalSeparatorFiller />}
+          </>
+        )}
 
-      <Styled.TriggerIcon>
-        <Icon iconName={triggerIcon} />
-      </Styled.TriggerIcon>
-      {triggerIconSide === 'left' && (
-        <>
-          {fullWidth && <HorizontalSeparatorFiller />}
-          {label}
-        </>
-      )}
-    </Styled.Trigger>
+        <Styled.TriggerIcon>
+          <Icon iconName={triggerIcon} />
+        </Styled.TriggerIcon>
+        {triggerIconSide === 'left' && (
+          <>
+            {fullWidth && <HorizontalSeparatorFiller />}
+            {label}
+          </>
+        )}
+      </Styled.Trigger>
+    )}
     <Styled.Content $transitionDuration={transitionDuration}>{children}</Styled.Content>
   </Styled.Root>
 );

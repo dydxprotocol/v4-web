@@ -1,5 +1,10 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { LOCALE_DATA, SupportedLocale, TOOLTIPS } from '@dydxprotocol/v4-localization';
+import {
+  LOCALE_DATA,
+  NOTIFICATIONS,
+  SupportedLocale,
+  TOOLTIPS,
+} from '@dydxprotocol/v4-localization';
 
 import {
   type LocaleData,
@@ -26,6 +31,7 @@ const getNewLocaleData = ({
 
   const newLocaleData = {
     ...LOCALE_DATA[locale],
+    ...NOTIFICATIONS[locale],
     TOOLTIPS: TOOLTIPS[locale],
   };
 

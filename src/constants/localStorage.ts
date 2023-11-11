@@ -13,6 +13,7 @@ export enum LocalStorageKey {
   PushNotificationsEnabled = 'dydx.PushNotificationsEnabled',
   PushNotificationsLastUpdated = 'dydx.PushNotificationsLastUpdated',
   TransferNotifications = 'dydx.TransferNotifications',
+  NotificationPreferences = 'dydx.NotificationPreferences',
 
   // UI State
   LastViewedMarket = 'dydx.LastViewedMarket',
@@ -25,5 +26,8 @@ export enum LocalStorageKey {
 
 export const LOCAL_STORAGE_VERSIONS = {
   [LocalStorageKey.EvmDerivedAddresses]: 'v2',
+  [LocalStorageKey.NotificationPreferences]: 'v1',
+  [LocalStorageKey.TransferNotifications]: 'v1',
+  [LocalStorageKey.Notifications]: 'v1',
   // TODO: version all localStorage keys
 };

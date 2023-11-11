@@ -10,6 +10,7 @@ export enum DialogTypes {
   MobileSignIn = 'MobileSignIn',
   Onboarding = 'Onboarding',
   OrderDetails = 'OrderDetails',
+  Preferences = 'Preferences',
   RateLimit = 'RateLimit',
   Receive = 'Receive',
   RestrictedGeo = 'RestrictedGeo',

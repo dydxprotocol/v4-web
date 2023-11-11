@@ -3,18 +3,17 @@ import styled from 'styled-components';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { groupBy } from 'lodash';
 
+import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
 import { type Notification, NotificationStatus } from '@/constants/notifications';
 
-import { useBreakpoints } from '@/hooks';
+import { useBreakpoints, useStringGetter } from '@/hooks';
 import { useNotifications } from '@/hooks/useNotifications';
-import { CloseIcon } from '@/icons';
 
 import { Button } from '@/components/Button';
-import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { DialogPlacement } from '@/components/Dialog';
-import { Output, OutputType } from '@/components/Output';
-import { IconButton } from '@/components/IconButton';
+import { Notification as NotificationCard } from '@/components/Notification';
 import { Toolbar } from '@/components/Toolbar';
 
 type ElementProps = {
@@ -27,13 +26,14 @@ export const NotificationsMenu = ({
   placement = DialogPlacement.Sidebar,
 }: ElementProps) => {
   const { isTablet } = useBreakpoints();
+  const stringGetter = useStringGetter();
+
   const {
     notifications,
     getDisplayData,
     getKey,
 
     markSeen,
-    markCleared,
     markAllCleared,
 
     onNotificationAction,
@@ -65,14 +65,12 @@ export const NotificationsMenu = ({
   const items: Parameters<typeof ComboboxDialogMenu>[0]['items'] = useMemo(
     () =>
       (Object.entries(notificationsByStatus) as unknown as [NotificationStatus, Notification[]][])
-        // .filter(([status]) => status !== NotificationStatus.Cleared)
+        .filter(([status]) => status < NotificationStatus.Cleared)
         .map(([status, notifications]) => ({
           group: status,
           groupLabel: {
-            [NotificationStatus.Triggered]: 'New',
-            // [NotificationStatus.Updated]: 'Updates',
+            [NotificationStatus.Triggered]: stringGetter({ key: STRING_KEYS.NEW }),
             [NotificationStatus.Seen]: 'Seen',
-            [NotificationStatus.Cleared]: 'Archived',
           }[status as number],
 
           items: notifications
@@ -83,59 +81,40 @@ export const NotificationsMenu = ({
             )
             .map((notification) => ({
               notification,
-              key: getKey(notification),
-              displayData: getDisplayData(notification),
+              key: getKey?.(notification),
+              displayData: getDisplayData?.(notification),
             }))
             .map(({ notification, key, displayData }) => ({
               value: key,
-              label: displayData.title ?? '',
-              description: displayData.customMenuContent || displayData.description,
-              slotBefore: !displayData.customMenuContent && displayData.icon,
-              slotAfter: !displayData.customMenuContent && (
-                <>
-                  <$Output
-                    type={OutputType.RelativeTime}
-                    value={
-                      notification.timestamps[NotificationStatus.Updated] ||
-                      notification.timestamps[NotificationStatus.Triggered]
-                    }
-                  />
-
-                  {notification.status < NotificationStatus.Seen ? <$UnreadIndicator /> : null}
-
-                  {notification.status < NotificationStatus.Cleared ? (
-                    <$IconButton
-                      iconComponent={CloseIcon}
-                      onClick={(e) => {
-                        e.stopPropagation();
-
-                        /*if (notification.status < NotificationStatus.Seen) {
-                          markSeen(notification);
-                        } else*/ if (notification.status < NotificationStatus.Cleared) {
-                          markCleared(notification);
-                        }
-                      }}
-                    />
-                  ) : null}
-                </>
+              label: displayData.title,
+              description: displayData.body,
+              slotCustomContent: displayData.renderCustomBody?.({ notification }) ?? (
+                <NotificationCard
+                  isToast={false}
+                  slotIcon={displayData.icon}
+                  slotTitle={displayData.title}
+                  slotDescription={displayData.body}
+                  notification={notification}
+                />
               ),
               disabled: notification.status === NotificationStatus.Cleared,
               onSelect: () => {
-                onNotificationAction(notification);
-                markSeen(notification);
+                onNotificationAction?.(notification);
+                markSeen?.(notification);
               },
             })),
         }))
         .filter(({ items }) => items.length),
-    [notificationsByStatus, getDisplayData, onNotificationAction, markSeen]
+    [notificationsByStatus, getDisplayData, onNotificationAction, markSeen, stringGetter]
   );
 
   return (
-    <ComboboxDialogMenu
+    <$ComboboxDialogMenu
+      withItemBorders
       isOpen={isMenuOpen || placement === DialogPlacement.Inline}
       setIsOpen={setIsMenuOpen}
       items={items}
-      title="Notifications"
+      title={stringGetter({ key: STRING_KEYS.NOTIFICATIONS })}
       slotTrigger={
         <$TriggerContainer>
           {slotTrigger}
@@ -150,11 +129,11 @@ export const NotificationsMenu = ({
               state={{ isLoading: isEnablingPush }}
               onClick={enablePush}
             >
-              Enable Push Notifications
+              {stringGetter({ key: STRING_KEYS.ENABLE_PUSH_NOTIFICATIONS })}
             </Button>
           ) : (
             <Button size={ButtonSize.Small} action={ButtonAction.Secondary} onClick={disablePush}>
-              Disable Push Notifications
+              {stringGetter({ key: STRING_KEYS.DISABLE_PUSH_NOTIFICATIONS })}
             </Button>
           )}
 
@@ -168,7 +147,7 @@ export const NotificationsMenu = ({
               ),
             }}
           >
-            Clear All
+            {stringGetter({ key: STRING_KEYS.CLEAR_ALL })}
           </Button>
         </$FooterToolbar>
       }
@@ -177,6 +156,14 @@ export const NotificationsMenu = ({
     />
   );
 };
+
+const $ComboboxDialogMenu = styled(ComboboxDialogMenu)`
+  --comboboxDialogMenu-item-padding: 0;
+
+  [cmdk-list] > [cmdk-list-sizer] > * {
+    box-shadow: none;
+  }
+`;
 
 const $UnreadIndicator = styled.div`
   width: 0.5rem;
@@ -196,16 +183,6 @@ const $TriggerUnreadIndicator = styled($UnreadIndicator)`
   position: relative;
   right: -0.2rem;
   top: -0.325rem;
-`;
-
-const $Output = styled(Output)`
-  color: var(--color-text-0);
-`;
-
-const $IconButton = styled(IconButton)`
-  --button-border: none;
-  --button-textColor: var(--color-text-0);
-  --button-hover-textColor: var(--color-text-1);
 `;
 
 const $FooterToolbar = styled(Toolbar)`

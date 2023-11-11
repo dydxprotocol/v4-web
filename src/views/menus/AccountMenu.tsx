@@ -185,6 +185,12 @@ export const AccountMenu = () => {
             ].filter(isTruthy)
           : []),
         {
+          value: 'Preferences',
+          icon: <Icon iconName={IconName.Gear} />,
+          label: stringGetter({ key: STRING_KEYS.PREFERENCES }),
+          onSelect: () => dispatch(openDialog({ type: DialogTypes.Preferences })),
+        },
+        {
           value: 'Disconnect',
           icon: <Icon iconName={IconName.BoxClose} />,
           label: stringGetter({ key: STRING_KEYS.DISCONNECT }),

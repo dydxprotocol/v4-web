@@ -10,6 +10,7 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { NotificationStatus } from '@/constants/notifications';
 import { NumberSign } from '@/constants/numbers';
 import type { EvmAddress } from '@/constants/wallets';
 
@@ -244,6 +245,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
             fromChainId: chainIdStr || undefined,
             toAmount: summary?.usdcSize || undefined,
             triggeredAt: Date.now(),
+            notificationStatus: NotificationStatus.Triggered,
           });
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');
