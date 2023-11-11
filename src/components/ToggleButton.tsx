@@ -52,10 +52,10 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.BaseButton = styled(BaseButton)`
   --button-toggle-off-backgroundColor: var(--color-layer-3);
   --button-toggle-off-textColor: var(--color-text-0);
-  --button-toggle-off-border: solid var(--border-width) var(--button-border-color);
+  --button-toggle-off-border: solid var(--border-width) var(--border-color);
   --button-toggle-on-backgroundColor: var(--color-layer-1);
   --button-toggle-on-textColor: var(--color-text-2);
-  --button-toggle-on-border: solid var(--border-width) var(--button-border-color);
+  --button-toggle-on-border: solid var(--border-width) var(--border-color);
 
   --button-backgroundColor: var(--button-toggle-off-backgroundColor);
   --button-textColor: var(--button-toggle-off-textColor);
