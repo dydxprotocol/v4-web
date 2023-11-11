@@ -51,7 +51,7 @@ const Profile = () => {
       icon: { iconName: IconName.Gear },
       href: AppRoute.Settings,
     },
-    {
+    isConnected && {
       key: 'transfers',
       label: stringGetter({ key: STRING_KEYS.MANAGE_FUNDS }),
       icon: { iconName: IconName.Transfer },

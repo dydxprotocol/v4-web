@@ -4,20 +4,18 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 import { TransferInputField, TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { ButtonSize } from '@/constants/buttons';
-import { isMainnet } from '@/constants/networks';
 import { useStringGetter } from '@/hooks';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { ToggleGroup } from '@/components/ToggleGroup';
-
 import { TransferForm } from '@/views/forms/TransferForm';
-import { DepositForm } from '@/views/forms/AccountManagementForms/DepositForm';
 import { WithdrawForm } from '@/views/forms/AccountManagementForms/WithdrawForm';
-import { TestnetDepositForm } from '@/views/forms/AccountManagementForms/TestnetDepositForm';
 
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+
+import { DepositDialogContent } from './DepositDialog/DepositDialogContent';
 
 type ElementProps = {
   setIsOpen?: (open: boolean) => void;
@@ -34,11 +32,7 @@ export const ManageFundsDialog = ({ setIsOpen }: ElementProps) => {
     [TransferType.deposit.rawValue]: {
       value: TransferType.deposit.rawValue,
       label: stringGetter({ key: STRING_KEYS.DEPOSIT }),
-      component: isMainnet ? (
-        <DepositForm onDeposit={closeDialog} />
-      ) : (
-        <TestnetDepositForm onDeposit={closeDialog} />
-      ),
+      component: <DepositDialogContent />,
     },
     [TransferType.withdrawal.rawValue]: {
       value: TransferType.withdrawal.rawValue,
