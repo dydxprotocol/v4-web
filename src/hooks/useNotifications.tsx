@@ -31,7 +31,11 @@ export const useNotifications = () => useContext(NotificationsContext)!;
 
 const useNotificationsContext = () => {
   // Local storage
-  const [notifications, setNotifications] = useState<Notifications>({});
+  // const [notifications, setNotifications] = useState<Notifications>({});
+  const [notifications, setNotifications] = useLocalStorage<Notifications>({
+    key: LocalStorageKey.Notifications,
+    defaultValue: {},
+  });
 
   const [notificationsLastUpdated, setNotificationsLastUpdated] = useLocalStorage<number>({
     key: LocalStorageKey.NotificationsLastUpdated,
@@ -95,16 +99,19 @@ const useNotificationsContext = () => {
   const { markUnseen, markSeen, markCleared } = useMemo(
     () => ({
       markUnseen: (notification: Notification) => {
-        if (notification.status < NotificationStatus.Unseen)
+        if (notification.status < NotificationStatus.Unseen) {
           updateStatus(notification, NotificationStatus.Unseen);
+        }
       },
       markSeen: (notification: Notification) => {
-        if (notification.status < NotificationStatus.Seen)
+        if (notification.status < NotificationStatus.Seen) {
           updateStatus(notification, NotificationStatus.Seen);
+        }
       },
       markCleared: (notification: Notification) => {
-        if (notification.status < NotificationStatus.Cleared)
+        if (notification.status < NotificationStatus.Cleared) {
           updateStatus(notification, NotificationStatus.Cleared);
+        }
       },
     }),
     [updateStatus]
@@ -135,7 +142,6 @@ const useNotificationsContext = () => {
                 timestamps: {},
                 updateKey,
               } as Notification);
-
               updateStatus(
                 notification,
                 isNew ? NotificationStatus.Triggered : NotificationStatus.Cleared

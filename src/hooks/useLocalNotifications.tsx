@@ -4,9 +4,9 @@ import type { StatusResponse } from '@0xsquid/sdk';
 
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import { type TransferNotifcation } from '@/constants/notifications';
-
 import { useAccounts } from '@/hooks/useAccounts';
 import { STATUS_ERROR_GRACE_PERIOD, useSquid } from '@/hooks/useSquid';
+
 import { useLocalStorage } from './useLocalStorage';
 
 const LocalNotificationsContext = createContext<

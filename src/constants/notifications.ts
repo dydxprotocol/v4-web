@@ -130,7 +130,6 @@ export type TransferNotifcation = {
   triggeredAt?: number;
   errorCount?: number;
   status?: StatusResponse;
-  notificationStatus: NotificationStatus;
 };
 
 /**

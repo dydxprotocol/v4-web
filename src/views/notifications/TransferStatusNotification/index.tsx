@@ -32,7 +32,7 @@ export const TransferStatusNotification = ({
   notification,
   slotIcon,
   slotTitle,
-
+  slotDescription,
   transfer,
   type,
   triggeredAt = Date.now(),
@@ -110,12 +110,29 @@ export const TransferStatusNotification = ({
           </Styled.BridgingStatus>
         ) : (
           <div>
-            <Styled.TransferStatusSteps status={status} type={type} />
+            {error ? (
+              <>
+                <Styled.Status withMarginBottom>{slotDescription}</Styled.Status>
+                <AlertMessage type={AlertType.Error}>
+                  {stringGetter({
+                    key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+                    params: {
+                      ERROR_MESSAGE:
+                        error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
+                    },
+                  })}
+                </AlertMessage>
+              </>
+            ) : (
+              <Styled.TransferStatusSteps status={status} type={type} />
+            )}
           </div>
         )
       }
       slotAction={
-        isToast && (
+        isToast &&
+        status &&
+        !error && (
           <Styled.Trigger
             isOpen={open}
             onClick={(e: MouseEvent) => {
@@ -160,9 +177,15 @@ Styled.BridgingStatus = styled.div`
   gap: 0.5rem;
 `;
 
-Styled.Status = styled.div`
+Styled.Status = styled.div<{ withMarginBottom?: boolean }>`
   color: var(--color-text-0);
   font-size: 0.875rem;
+
+  ${({ withMarginBottom }) =>
+    withMarginBottom &&
+    css`
+      margin-bottom: 0.5rem;
+    `}
 `;
 
 Styled.InlineOutput = styled(Output)`

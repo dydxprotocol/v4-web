@@ -101,8 +101,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
                   toastSensitivity: 'foreground',
                 },
-                [notification.updateTimeInMilliseconds, notification.data],
-                true
+                [notification.updateTimeInMilliseconds, notification.data]
               );
               break;
           }
@@ -189,13 +188,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   isToast={isToast}
                   slotIcon={icon}
                   slotTitle={title}
+                  slotDescription={body}
                   transfer={transfer}
                   type={type}
                   triggeredAt={transfer.triggeredAt}
                   notification={notification}
                 />
               ),
-              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
               toastSensitivity: 'foreground',
             },
             [isFinished]
