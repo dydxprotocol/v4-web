@@ -12,6 +12,8 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithLabel } from '@/components/WithLabel';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+import { formMixins } from '@/styles/formMixins';
+import breakpoints from '@/styles/breakpoints';
 
 type ElementProps = {
   asChild?: boolean;
@@ -84,25 +86,28 @@ export const SearchSelectMenu = ({
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
+Styled.SearchSelectMenu = styled.div`
+  ${layoutMixins.column}
+`;
+
 Styled.MenuTrigger = styled.div`
   height: var(--form-input-height);
 
   ${layoutMixins.spacedRow}
   align-items: center;
-  padding: 0 1rem;
+  padding: var(--form-input-paddingY) var(--form-input-paddingX);
+
+  @media ${breakpoints.tablet} {
+    height: var(--form-input-height-mobile);
+  }
 `;
 
 Styled.WithLabel = styled(WithLabel)`
-  --label-textColor: var(--color-text-0);
-  gap: 0.25rem;
+  ${formMixins.inputLabel}
 
   label {
     font: var(--font-mini-book);
   }
-`;
-
-Styled.SearchSelectMenu = styled.div`
-  ${layoutMixins.column}
 `;
 
 Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`

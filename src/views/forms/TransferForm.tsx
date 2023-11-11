@@ -300,7 +300,7 @@ export const TransferForm = ({
       }}
     >
       <Styled.Row>
-        <Styled.FormInput
+        <FormInput
           id="destination"
           onInput={(e: SyntheticInputEvent) => onChangeAddress(e.target?.value)}
           label={
@@ -353,8 +353,8 @@ export const TransferForm = ({
         ))}
       </Styled.SelectMenu>
 
-      <WithDetailsReceipt side="bottom" detailItems={amountDetailItems}>
-        <Styled.FormInput
+      <Styled.WithDetailsReceipt side="bottom" detailItems={amountDetailItems}>
+        <FormInput
           label={stringGetter({ key: STRING_KEYS.AMOUNT })}
           type={InputType.Number}
           onChange={({ floatValue }: NumberFormatValues) => onChangeAmount(floatValue)}
@@ -371,7 +371,7 @@ export const TransferForm = ({
           }
           disabled={isLoading}
         />
-      </WithDetailsReceipt>
+      </Styled.WithDetailsReceipt>
 
       {showNotEnoughGasWarning && (
         <AlertMessage type={AlertType.Warning}>
@@ -399,12 +399,7 @@ export const TransferForm = ({
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Form = styled.form`
-  ${formMixins.inputsColumn}
-  gap: 1.25rem;
-`;
-
-Styled.FormInput = styled(FormInput)`
-  --form-input-height: 3.5rem;
+  ${formMixins.transfersForm}
 `;
 
 Styled.Footer = styled.footer`
@@ -419,7 +414,6 @@ Styled.Row = styled.div`
 
 Styled.SelectMenu = styled(SelectMenu)`
   ${formMixins.inputSelectMenu}
-  --form-input-height: 3.5rem;
 `;
 
 Styled.SelectItem = styled(SelectItem)`
@@ -428,6 +422,10 @@ Styled.SelectItem = styled(SelectItem)`
 
 Styled.NetworkSelectMenu = styled(Styled.SelectMenu)`
   pointer-events: none;
+`;
+
+Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
+  --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
 Styled.InlineRow = styled.span`

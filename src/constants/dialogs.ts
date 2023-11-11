@@ -17,6 +17,7 @@ export enum DialogTypes {
   Trade = 'Trade',
   Transfer = 'Transfer',
   Withdraw = 'Withdraw',
+  ManageFunds = 'ManageFunds',
 }
 
 export enum TradeBoxDialogTypes {

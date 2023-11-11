@@ -52,15 +52,19 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.BaseButton = styled(BaseButton)`
   --button-toggle-off-backgroundColor: var(--color-layer-3);
   --button-toggle-off-textColor: var(--color-text-0);
+  --button-toggle-off-borderColor: var(--border-color);
   --button-toggle-on-backgroundColor: var(--color-layer-1);
   --button-toggle-on-textColor: var(--color-text-2);
+  --button-toggle-on-borderColor: var(--border-color);
 
   --button-backgroundColor: var(--button-toggle-off-backgroundColor);
   --button-textColor: var(--button-toggle-off-textColor);
+  --button-border: solid var(--border-width) var(--button-toggle-off-borderColor);
 
   &[data-state='on'],
   &[data-state='active'] {
     --button-backgroundColor: var(--button-toggle-on-backgroundColor);
     --button-textColor: var(--button-toggle-on-textColor);
+    --button-border: solid var(--border-width) var(--button-toggle-on-borderColor);
   }
 `;

@@ -369,14 +369,16 @@ export const WithdrawForm = () => {
         />
       </Styled.WithDetailsReceipt>
       {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
-      <WithdrawButtonAndReceipt
-        isDisabled={isDisabled}
-        isLoading={isLoading}
-        setSlippage={onSetSlippage}
-        slippage={slippage}
-        withdrawChain={chainIdStr || undefined}
-        withdrawToken={toToken || undefined}
-      />
+      <Styled.Footer>
+        <WithdrawButtonAndReceipt
+          isDisabled={isDisabled}
+          isLoading={isLoading}
+          setSlippage={onSetSlippage}
+          slippage={slippage}
+          withdrawChain={chainIdStr || undefined}
+          withdrawToken={toToken || undefined}
+        />
+      </Styled.Footer>
     </Styled.Form>
   );
 };
@@ -388,14 +390,12 @@ Styled.DiffOutput = styled(DiffOutput)`
 `;
 
 Styled.Form = styled.form`
-  --form-input-height: 3.5rem;
+  ${formMixins.transfersForm}
+`;
 
-  min-height: calc(100% - var(--stickyArea0-bottomHeight));
-
-  ${layoutMixins.flexColumn}
-  gap: 1.25rem;
-
-  ${layoutMixins.stickyArea1}
+Styled.Footer = styled.footer`
+  ${layoutMixins.stickyFooter}
+  margin-top: auto;
 `;
 
 Styled.DestinationRow = styled.div`
