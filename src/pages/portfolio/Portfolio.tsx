@@ -190,6 +190,8 @@ Styled.SideBar = styled.div`
 
 Styled.Footer = styled.div`
   ${layoutMixins.row}
+  flex-wrap: wrap;
+  
   padding: 1rem;
 
   gap: 0.5rem;
