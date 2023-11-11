@@ -444,10 +444,6 @@ Styled.DestinationInputLabel = styled.span`
 
   svg {
     color: var(--color-positive);
-
-    path {
-      stroke-width: 2;
-    }
   }
 `;
 

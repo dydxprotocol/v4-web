@@ -15,10 +15,10 @@ CopyButtonStory.args = {
 };
 
 CopyButtonStory.argTypes = {
-  shownAsText: {
-    options: [true, false],
+  buttonType: {
+    options: ["text", "icon", "default"],
     control: { type: 'select' },
-    defaultValue: false,
+    defaultValue: "default",
   },
   children: {
     options: ['some text to copy'],

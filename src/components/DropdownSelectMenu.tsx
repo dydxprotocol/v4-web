@@ -9,6 +9,7 @@ import {
   RadioItem,
   Portal,
 } from '@radix-ui/react-dropdown-menu';
+import { CheckIcon } from '@radix-ui/react-icons';
 
 import { type MenuItem } from '@/constants/menus';
 
@@ -90,7 +91,9 @@ export const DropdownSelectMenu = <MenuItemValue extends string>({
 
                 {slotAfter}
 
-                <Styled.ItemIndicator>✔{/* <CheckIcon /> */}</Styled.ItemIndicator>
+                <Styled.ItemIndicator>
+                  <CheckIcon />
+                </Styled.ItemIndicator>
               </Styled.RadioItem>
             ))}
           </RadioGroup>

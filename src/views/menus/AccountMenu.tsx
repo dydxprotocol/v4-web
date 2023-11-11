@@ -7,6 +7,7 @@ import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, TOOLTIP_STRING_KEYS } from '@/constants/localization';
+import { isMainnet } from '@/constants/networks';
 import { DydxChainAsset, wallets } from '@/constants/wallets';
 
 import {
@@ -21,6 +22,7 @@ import {
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { AssetIcon } from '@/components/AssetIcon';
+import { CopyButton } from '@/components/CopyButton';
 import { DropdownMenu } from '@/components/DropdownMenu';
 import { Output, OutputType } from '@/components/Output';
 import { Icon, IconName } from '@/components/Icon';
@@ -37,6 +39,7 @@ import { truncateAddress } from '@/lib/wallet';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { headerMixins } from '@/styles/headerMixins';
 import { MustBigNumber } from '@/lib/numbers';
+
 
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
@@ -87,13 +90,8 @@ export const AccountMenu = () => {
                 </WithTooltip>
                 <Styled.Address>{truncateAddress(dydxAddress)}</Styled.Address>
               </Styled.Column>
-              <IconButton
-                action={ButtonAction.Base}
-                iconName={IconName.Copy}
-                onClick={() => dydxAddress && navigator.clipboard.writeText(dydxAddress)}
-                shape={ButtonShape.Square}
-              />
-              <IconButton
+              <Styled.CopyButton buttonType="icon" value={dydxAddress} shape={ButtonShape.Square} />
+              <Styled.IconButton
                 action={ButtonAction.Base}
                 href={`${mintscanBase}/account/${dydxAddress}`}
                 iconName={IconName.LinkOut}
@@ -121,7 +119,7 @@ export const AccountMenu = () => {
                       key: STRING_KEYS.ASSET_BALANCE,
                       params: { ASSET: chainTokenLabel },
                     })}
-                    {/* <AssetIcon symbol="DYDX" /> */}
+                    <AssetIcon symbol={chainTokenLabel} />
                   </Styled.label>
                   <Styled.BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
                 </div>
@@ -169,22 +167,9 @@ export const AccountMenu = () => {
           onSelect: onRecoverKeys,
           separator: true,
         },
-        dydxAddress && {
-          value: 'CopyAddress',
-          icon: <Icon iconName={IconName.Copy} />,
-          label: stringGetter({ key: STRING_KEYS.COPY_ADDRESS }),
-          onSelect: async () => await navigator.clipboard.writeText(dydxAddress),
-        },
-        // {
-        //   value: 'ViewInExplorer',
-        //   icon: <Icon iconName={IconName.Etherscan} />,
-        //   label: stringGetter({ key: STRING_KEYS.OPEN_IN_ETHERSCAN }),
-        //   onSelect: () => globalThis.open(`${mintscanBase}/address/${address}`),
-        //   separator: true,
-        // },
         ...(onboardingState === OnboardingState.AccountConnected && hdKey
           ? [
-              {
+              !isMainnet && {
                 value: 'MobileQrSignIn',
                 icon: <Icon iconName={IconName.Qr} />,
                 label: stringGetter({ key: STRING_KEYS.TITLE_SIGN_INTO_MOBILE }),
@@ -192,16 +177,12 @@ export const AccountMenu = () => {
               },
               {
                 value: 'MnemonicExport',
-                icon: (
-                  <span>
-                    <Icon iconName={IconName.ExportKeys} />
-                  </span>
-                ),
+                icon: <Icon iconName={IconName.ExportKeys} />,
                 label: <span>{stringGetter({ key: STRING_KEYS.EXPORT_SECRET_PHRASE })}</span>,
                 highlightColor: 'negative',
                 onSelect: () => dispatch(openDialog({ type: DialogTypes.MnemonicExport })),
               },
-            ]
+            ].filter(isTruthy)
           : []),
         {
           value: 'Preferences',
@@ -339,13 +320,12 @@ Styled.label = styled.div`
 Styled.Balances = styled.div`
   ${layoutMixins.flexColumn}
 
-  gap: 2px;
-
   > div {
     ${layoutMixins.spacedRow}
+    box-shadow: 0 0 0 1px var(--color-border);
 
     gap: 0.5rem;
-    padding: 0.5rem 1rem;
+    padding: 0.625rem 1rem;
 
     background-color: var(--color-layer-4);
 
@@ -392,4 +372,10 @@ Styled.ConnectToChain = styled(Styled.Column)`
 
 Styled.IconButton = styled(IconButton)`
   --button-padding: 0 0.25rem;
+  --button-border: solid var(--border-width) var(--color-layer-6);
+`;
+
+Styled.CopyButton = styled(CopyButton)`
+  --button-padding: 0 0.25rem;
+  --button-border: solid var(--border-width) var(--color-layer-6);
 `;

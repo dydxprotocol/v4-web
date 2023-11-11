@@ -49,7 +49,12 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
             type === 'deposit' ? STRING_KEYS.INITIATED_DEPOSIT : STRING_KEYS.INITIATED_WITHDRAWAL,
         }),
         step: TransferStatusStep.FromChain,
-        link: status?.fromChain?.transactionUrl,
+        link: 
+          type === 'deposit'
+            ? status?.fromChain?.transactionUrl
+            : routeStatus?.[0]?.chainId === dydxChainId && routeStatus[0].txHash
+            ? `${mintscanTxUrl?.replace('{tx_hash}', routeStatus[0].txHash.replace('0x', ''))}`
+            : undefined,
       },
       {
         label: stringGetter({ key: STRING_KEYS.BRIDGING_TOKENS }),
@@ -68,7 +73,7 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
           type === 'withdrawal'
             ? status?.toChain?.transactionUrl
             : currentStatus?.chainId === dydxChainId && currentStatus?.txHash
-            ? `${mintscanTxUrl?.replace('{tx_hash}', currentStatus.txHash)}`
+            ? `${mintscanTxUrl?.replace('{tx_hash}', currentStatus.txHash.replace('0x', ''))}`
             : undefined,
       },
     ];

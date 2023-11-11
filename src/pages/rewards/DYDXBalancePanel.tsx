@@ -43,23 +43,14 @@ export const DYDXBalancePanel = () => {
             {!canAccountTrade ? (
               <OnboardingTriggerButton size={ButtonSize.Small} />
             ) : (
-              <>
-                <Styled.ReceiveButton
-                  slotLeft={<Icon iconName={IconName.Qr} />}
-                  size={ButtonSize.Small}
-                  onClick={() => dispatch(openDialog({ type: DialogTypes.Receive }))}
-                >
-                  {stringGetter({ key: STRING_KEYS.RECEIVE })}
-                </Styled.ReceiveButton>
-                <Button
-                  slotLeft={<Icon iconName={IconName.Send} />}
-                  size={ButtonSize.Small}
-                  action={ButtonAction.Primary}
-                  onClick={() => dispatch(openDialog({ type: DialogTypes.Transfer }))}
-                >
-                  {stringGetter({ key: STRING_KEYS.TRANSFER })}
-                </Button>
-              </>
+              <Button
+                slotLeft={<Icon iconName={IconName.Send} />}
+                size={ButtonSize.Small}
+                action={ButtonAction.Primary}
+                onClick={() => dispatch(openDialog({ type: DialogTypes.Transfer }))}
+              >
+                {stringGetter({ key: STRING_KEYS.TRANSFER })}
+              </Button>
             )}
           </Styled.ReceiveAndTransferButtons>
         </Styled.Header>
