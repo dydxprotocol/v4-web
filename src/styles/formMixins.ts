@@ -107,12 +107,17 @@ export const formMixins: Record<
   `,
 
   inputLabel: css`
+    --label-textColor: var(--color-text-1);
     position: relative;
     height: 100%;
     width: 100%;
     gap: 0;
 
     border-radius: inherit;
+
+    @media ${breakpoints.tablet} {
+      gap: 0.25rem;
+    }
   `,
 
   inputToggleGroup: css`
@@ -128,6 +133,30 @@ export const formMixins: Record<
     > button {
       --button-toggle-off-backgroundColor: var(--color-layer-4);
       --button-toggle-off-textColor: var(--color-text-1);
+    }
+  `,
+
+  footer: css`
+    ${layoutMixins.stickyFooter}
+    ${layoutMixins.withStickyFooterBackdrop}
+
+    margin-top: auto;
+  `,
+
+  transfersForm: css`
+    ${() => formMixins.inputsColumn}
+    --form-input-gap: 1.25rem;
+    --form-input-height: 3.5rem;
+    --form-input-height-mobile: 4rem;
+    --form-input-paddingY: 0.5rem;
+    --form-input-paddingX: 1rem;
+
+    label {
+      --label-textColor: var(--color-text-0);
+    }
+
+    @media ${breakpoints.tablet} {
+      --form-input-gap: 1rem;
     }
   `,
 };

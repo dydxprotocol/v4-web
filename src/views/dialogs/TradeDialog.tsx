@@ -112,8 +112,6 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
   --dialog-backgroundColor: var(--color-layer-2);
   --dialog-header-height: 1rem;
-  --dialog-header-paddingTop: 1.5rem;
-  --dialog-header-paddingBottom: 1rem;
   --dialog-content-paddingTop: 0;
   --dialog-content-paddingBottom: 0;
   --dialog-content-paddingLeft: 0;

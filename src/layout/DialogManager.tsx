@@ -23,6 +23,7 @@ import { TradeDialog } from '@/views/dialogs/TradeDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
 import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
 import { WithdrawDialog } from '@/views/dialogs/WithdrawDialog';
+import { ManageFundsDialog } from '@/views/dialogs/ManageFundsDialog';
 
 import { OrderDetailsDialog } from '@/views/dialogs/DetailsDialog/OrderDetailsDialog';
 import { FillDetailsDialog } from '@/views/dialogs/DetailsDialog/FillDetailsDialog';
@@ -65,5 +66,6 @@ export const DialogManager = () => {
     [DialogTypes.Trade]: <TradeDialog {...modalProps} />,
     [DialogTypes.Transfer]: <TransferDialog {...modalProps} />,
     [DialogTypes.Withdraw]: <WithdrawDialog {...modalProps} />,
+    [DialogTypes.ManageFunds]: <ManageFundsDialog {...modalProps} />,
   }[type];
 };

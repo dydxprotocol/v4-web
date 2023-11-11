@@ -51,11 +51,14 @@ const Profile = () => {
       icon: { iconName: IconName.Gear },
       href: AppRoute.Settings,
     },
-    // {
-    //   key: 'tutorials',
-    //   label: stringGetter({ key: STRING_KEYS.TUTORIALS }),
-    //   icon: { iconName: IconName.Comment },
-    // },
+    isConnected && {
+      key: 'transfers',
+      label: stringGetter({ key: STRING_KEYS.MANAGE_FUNDS }),
+      icon: { iconName: IconName.Transfer },
+      onClick: () => {
+        dispatch(openDialog({ type: DialogTypes.ManageFunds }));
+      },
+    },
     isConnected
       ? {
           key: 'sign-out',

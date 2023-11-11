@@ -353,14 +353,17 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         />
       </Styled.WithDetailsReceipt>
       {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
-      <DepositButtonAndReceipt
-        isDisabled={isDisabled}
-        isLoading={isLoading}
-        chainId={chainId || undefined}
-        setSlippage={onSetSlippage}
-        slippage={slippage}
-        sourceToken={sourceToken || undefined}
-      />
+
+      <Styled.Footer>
+        <DepositButtonAndReceipt
+          isDisabled={isDisabled}
+          isLoading={isLoading}
+          chainId={chainId || undefined}
+          setSlippage={onSetSlippage}
+          slippage={slippage}
+          sourceToken={sourceToken || undefined}
+        />
+      </Styled.Footer>
     </Styled.Form>
   );
 };
@@ -368,13 +371,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Form = styled.form`
-  --form-input-height: 3.5rem;
+  ${formMixins.transfersForm}
+`;
 
-  ${layoutMixins.flexColumn}
-  gap: 1.5rem;
-
-  ${layoutMixins.stickyArea1}
-  min-height: calc(100% - var(--stickyArea0-bottomHeight));
+Styled.Footer = styled.footer`
+  ${formMixins.footer}
+  --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
 `;
 
 Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
