@@ -71,7 +71,7 @@ const useLocalNotificationsContext = () => {
   const squid = useSquid();
 
   useQuery({
-    queryKey: ['getTransactionStatus', transferNotifications],
+    queryKey: 'getTransactionStatus',
     queryFn: async () => {
       const processTransferNotifications = async (transferNotifications: TransferNotifcation[]) => {
         const newTransferNotifications = await Promise.all(
