@@ -86,7 +86,7 @@ Styled.ToggleGroup = styled(ToggleGroup)`
   overflow-x: auto;
 
   button {
-    --button-toggle-off-borderColor: trasnparent;
+    --button-toggle-off-border: none;
     --button-padding: 0 1rem;
   }
 `;

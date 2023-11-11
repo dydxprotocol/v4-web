@@ -403,8 +403,8 @@ Styled.Form = styled.form`
 `;
 
 Styled.Footer = styled.footer`
-  ${layoutMixins.stickyFooter}
-  margin-top: auto;
+  ${formMixins.footer}
+  --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
 `;
 
 Styled.Row = styled.div`

@@ -136,6 +136,13 @@ export const formMixins: Record<
     }
   `,
 
+  footer: css`
+    ${layoutMixins.stickyFooter}
+    ${layoutMixins.withStickyFooterBackdrop}
+
+    margin-top: auto;
+  `,
+
   transfersForm: css`
     ${() => formMixins.inputsColumn}
     --form-input-gap: 1.25rem;

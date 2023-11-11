@@ -56,7 +56,8 @@ const ToggleContainer = styled(ToggleGroup)<{ value: OrderSide }>`
   position: relative;
 
   > button {
-    --button-border: none;
+    --button-toggle-on-border: none;
+    --button-toggle-off-border: none;
     --button-toggle-off-backgroundColor: transparent;
     --button-toggle-on-backgroundColor: transparent;
     --button-toggle-on-textColor: var(--toggle-color);

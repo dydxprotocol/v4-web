@@ -460,10 +460,10 @@ Styled.ButtonRow = styled.div`
 `;
 
 Styled.Footer = styled.footer`
-  ${layoutMixins.stickyFooter}
+  ${formMixins.footer}
+  --stickyFooterBackdrop-outsetY: var(--tradeBox-content-paddingBottom);
   backdrop-filter: none;
 
   ${layoutMixins.column}
   ${layoutMixins.noPointerEvents}
-  margin-top: auto;
 `;
