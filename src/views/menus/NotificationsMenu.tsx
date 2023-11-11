@@ -13,6 +13,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { Button } from '@/components/Button';
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { DialogPlacement } from '@/components/Dialog';
+import { Notification as NotificationCard } from '@/components/Notification';
 import { Toolbar } from '@/components/Toolbar';
 
 type ElementProps = {
@@ -87,8 +88,15 @@ export const NotificationsMenu = ({
               value: key,
               label: displayData.title,
               description: displayData.body,
-              slotBefore: !displayData.renderCustomBody && displayData.icon,
-              slotCustomContent: displayData.renderCustomBody?.({ notification }),
+              slotCustomContent: displayData.renderCustomBody?.({ notification }) ?? (
+                <NotificationCard
+                  isToast={false}
+                  slotIcon={displayData.icon}
+                  slotTitle={displayData.title}
+                  slotDescription={displayData.body}
+                  notification={notification}
+                />
+              ),
               disabled: notification.status === NotificationStatus.Cleared,
               onSelect: () => {
                 onNotificationAction?.(notification);

@@ -26,7 +26,6 @@ import { useSelectedNetwork, useStringGetter } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { Icon, IconName } from '@/components/Icon';
-import { Notification } from '@/components/Notification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
@@ -101,17 +100,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   body: abacusNotif.text ? stringGetter({ key: abacusNotif.text, params }) : '',
                   toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
                   toastSensitivity: 'foreground',
-                  renderCustomBody: ({ isToast, notification }) => (
-                    <Notification
-                      isToast={isToast}
-                      slotIcon={abacusNotif.image && <$Icon src={abacusNotif.image} alt="" />}
-                      slotTitle={stringGetter({ key: abacusNotif.title })}
-                      slotDescription={
-                        abacusNotif.text ? stringGetter({ key: abacusNotif.text, params }) : ''
-                      }
-                      notification={notification}
-                    />
-                  ),
                 },
                 [abacusNotif.updateTimeInMilliseconds, abacusNotif.data]
               );
