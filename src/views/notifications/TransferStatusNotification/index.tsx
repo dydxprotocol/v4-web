@@ -71,6 +71,35 @@ export const TransferStatusNotification = ({
       ? STRING_KEYS.WITHDRAW_COMPLETE
       : inProgressStatusString;
 
+  const content = (
+    <>
+      <Styled.Status>
+        {stringGetter({
+          key: statusString,
+          params: {
+            AMOUNT_USD: <Styled.InlineOutput type={OutputType.Fiat} value={toAmount} />,
+            ESTIMATED_DURATION: (
+              <Styled.InlineOutput
+                type={OutputType.Text}
+                value={formatSeconds(Math.max(secondsLeft || 0, 0))}
+              />
+            ),
+          },
+        })}
+      </Styled.Status>
+      {error && (
+        <AlertMessage type={AlertType.Error}>
+          {stringGetter({
+            key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+            params: {
+              ERROR_MESSAGE: error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
+            },
+          })}
+        </AlertMessage>
+      )}
+    </>
+  );
+
   const transferNotif = (
     <Notification
       isToast={isToast}
@@ -80,53 +109,13 @@ export const TransferStatusNotification = ({
       slotCustomContent={
         !status ? (
           <LoadingDots size={3} />
-        ) : isToast ? (
-          <Styled.BridgingStatus>
-            <Styled.Status>
-              {stringGetter({
-                key: statusString,
-                params: {
-                  AMOUNT_USD: <Styled.InlineOutput type={OutputType.Fiat} value={toAmount} />,
-                  ESTIMATED_DURATION: (
-                    <Styled.InlineOutput
-                      type={OutputType.Text}
-                      value={formatSeconds(Math.max(secondsLeft || 0, 0))}
-                    />
-                  ),
-                },
-              })}
-            </Styled.Status>
-            {error && (
-              <AlertMessage type={AlertType.Error}>
-                {stringGetter({
-                  key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-                  params: {
-                    ERROR_MESSAGE:
-                      error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
-                  },
-                })}
-              </AlertMessage>
-            )}
-          </Styled.BridgingStatus>
         ) : (
-          <div>
-            {error ? (
-              <>
-                <Styled.Status withMarginBottom>{slotDescription}</Styled.Status>
-                <AlertMessage type={AlertType.Error}>
-                  {stringGetter({
-                    key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-                    params: {
-                      ERROR_MESSAGE:
-                        error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
-                    },
-                  })}
-                </AlertMessage>
-              </>
-            ) : (
+          <Styled.BridgingStatus>
+            {content}
+            {!isToast && status?.squidTransactionStatus !== 'success' && (
               <Styled.TransferStatusSteps status={status} type={type} />
             )}
-          </div>
+          </Styled.BridgingStatus>
         )
       }
       slotAction={

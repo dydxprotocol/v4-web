@@ -188,7 +188,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   isToast={isToast}
                   slotIcon={icon}
                   slotTitle={title}
-                  slotDescription={body}
                   transfer={transfer}
                   type={type}
                   triggeredAt={transfer.triggeredAt}
