@@ -128,6 +128,7 @@ export type TransferNotifcation = {
   fromChainId?: string;
   toAmount?: number;
   triggeredAt?: number;
+  errorCount?: number;
   status?: StatusResponse;
   notificationStatus: NotificationStatus;
 };
