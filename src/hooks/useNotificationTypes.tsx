@@ -2,9 +2,11 @@ import { type ReactNode, useEffect } from 'react';
 import styled from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { isEqual, groupBy } from 'lodash';
+import { useNavigate } from 'react-router-dom';
 
 import { DialogTypes } from '@/constants/dialogs';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { AppRoute } from '@/constants/routes';
 import { DydxChainAsset } from '@/constants/wallets';
 
 import {
@@ -24,17 +26,16 @@ import { useSelectedNetwork, useStringGetter } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { Icon, IconName } from '@/components/Icon';
+import { Notification } from '@/components/Notification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
 import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
+import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import { formatSeconds } from '@/lib/timeUtils';
-import { getMarketIds } from '@/state/perpetualsSelectors';
-import { useNavigate } from 'react-router-dom';
-import { AppRoute } from '@/constants/routes';
 
 const parseStringParamsForNotification = ({
   stringGetter,
@@ -58,9 +59,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const abacusNotifications = useSelector(getAbacusNotifications, isEqual);
 
       useEffect(() => {
-        for (const notification of abacusNotifications) {
-          const [abacusNotificationType = '', id = ''] = notification.id.split(':');
-          const parsedData = notification.data ? JSON.parse(notification.data) : {};
+        for (const abacusNotif of abacusNotifications) {
+          const [abacusNotificationType = '', id = ''] = abacusNotif.id.split(':');
+          const parsedData = abacusNotif.data ? JSON.parse(abacusNotif.data) : {};
 
           const params = Object.fromEntries(
             Object.entries(parsedData).map(([key, value]) => {
@@ -71,11 +72,11 @@ export const notificationTypes: NotificationTypeConfig[] = [
           switch (abacusNotificationType) {
             case 'order': {
               trigger(
-                notification.id,
+                abacusNotif.id,
                 {
-                  icon: notification.image && <$Icon src={notification.image} alt="" />,
-                  title: stringGetter({ key: notification.title }),
-                  body: notification.text ? stringGetter({ key: notification.text, params }) : '',
+                  icon: abacusNotif.image && <$Icon src={abacusNotif.image} alt="" />,
+                  title: stringGetter({ key: abacusNotif.title }),
+                  body: abacusNotif.text ? stringGetter({ key: abacusNotif.text, params }) : '',
                   toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
                   toastSensitivity: 'foreground',
                   renderCustomBody: ({ isToast, notification }) => (
@@ -86,22 +87,33 @@ export const notificationTypes: NotificationTypeConfig[] = [
                     />
                   ),
                 },
-                [notification.updateTimeInMilliseconds, notification.data],
+                [abacusNotif.updateTimeInMilliseconds, abacusNotif.data],
                 true
               );
               break;
             }
             default:
               trigger(
-                notification.id,
+                abacusNotif.id,
                 {
-                  icon: notification.image && <$Icon src={notification.image} alt="" />,
-                  title: stringGetter({ key: notification.title }),
-                  body: notification.text ? stringGetter({ key: notification.text, params }) : '',
+                  icon: abacusNotif.image && <$Icon src={abacusNotif.image} alt="" />,
+                  title: stringGetter({ key: abacusNotif.title }),
+                  body: abacusNotif.text ? stringGetter({ key: abacusNotif.text, params }) : '',
                   toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
                   toastSensitivity: 'foreground',
+                  renderCustomBody: ({ isToast, notification }) => (
+                    <Notification
+                      isToast={isToast}
+                      slotIcon={abacusNotif.image && <$Icon src={abacusNotif.image} alt="" />}
+                      slotTitle={stringGetter({ key: abacusNotif.title })}
+                      slotDescription={
+                        abacusNotif.text ? stringGetter({ key: abacusNotif.text, params }) : ''
+                      }
+                      notification={notification}
+                    />
+                  ),
                 },
-                [notification.updateTimeInMilliseconds, notification.data]
+                [abacusNotif.updateTimeInMilliseconds, abacusNotif.data]
               );
               break;
           }
