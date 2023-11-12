@@ -76,7 +76,7 @@ export const Toast = ({
       <Close asChild>
         <$CloseButton
           iconName={IconName.Close}
-          shape={ButtonShape.Square}
+          shape={ButtonShape.Circle}
           size={ButtonSize.XSmall}
           onClick={(e: MouseEvent) => e.stopPropagation()}
         />
@@ -249,7 +249,6 @@ const $CloseButton = styled(IconButton)`
   right: 0;
 
   border: solid var(--border-width) var(--color-border);
-  border-radius: 50%;
 
   ${$Root}:hover & {
     display: block;
