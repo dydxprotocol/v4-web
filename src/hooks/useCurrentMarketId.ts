@@ -22,6 +22,7 @@ export const useCurrentMarketId = () => {
   const dispatch = useDispatch();
   const selectedNetwork = useSelector(getSelectedNetwork);
   const marketIds = useSelector(getMarketIds, shallowEqual);
+  const hasMarketIds = marketIds.length > 0;
   const [lastViewedMarket, setLastViewedMarket] = useLocalStorage({
     key: LocalStorageKey.LastViewedMarket,
     defaultValue: DEFAULT_MARKETID,
@@ -48,5 +49,5 @@ export const useCurrentMarketId = () => {
     if (marketIds) {
       abacusStateManager.setMarket(marketId ?? DEFAULT_MARKETID);
     }
-  }, [selectedNetwork, marketIds, marketId]);
+  }, [selectedNetwork, hasMarketIds, marketId]);
 };
