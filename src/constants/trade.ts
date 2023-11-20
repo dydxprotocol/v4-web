@@ -116,3 +116,15 @@ export enum MobilePlaceOrderSteps {
   PlacingOrder = 'PlacingOrder',
   Confirmation = 'Confirmation',
 }
+
+export const CLEARED_TRADE_INPUTS = {
+  limitPriceInput: '',
+  triggerPriceInput: '',
+  trailingPercentInput: '',
+};
+
+export const CLEARED_SIZE_INPUTS = {
+  amountInput: '',
+  usdAmountInput: '',
+  leverageInput: '',
+};

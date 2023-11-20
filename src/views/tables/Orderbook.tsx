@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
@@ -9,13 +9,13 @@ import { STRING_KEYS } from '@/constants/localization';
 import { useBreakpoints, useStringGetter } from '@/hooks';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
+import { setTradeFormInputs } from '@/state/inputs';
 
 import { getSubaccountOpenOrdersBySideAndPrice } from '@/state/accountSelectors';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketOrderbook } from '@/state/perpetualsSelectors';
 import { getCurrentInput } from '@/state/inputsSelectors';
 
-import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { Details } from '@/components/Details';
@@ -208,7 +208,6 @@ const OrderbookTable = ({
       // Style props
       histogramSide={histogramSide}
       hideHeader={hideHeader}
-      withFocusStickyRows
       style={{
         '--histogram-range': histogramRange,
       }}
@@ -223,11 +222,12 @@ export const Orderbook = ({
   maxRowsPerSide = ORDERBOOK_MAX_ROWS_PER_SIDE,
   hideHeader = false,
 }: ElementProps & StyleProps) => {
+  const dispatch = useDispatch();
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
 
   const currentInput = useSelector(getCurrentInput);
-  const { symbol = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { id = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const { stepSizeDecimals, tickSizeDecimals } =
     useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
 
@@ -274,18 +274,16 @@ export const Orderbook = ({
 
   const onRowAction = useCallback(
     (key: string, row: RowData) => {
-      if (currentInput === 'trade' && key !== 'spread' && row?.price)
-        abacusStateManager.setTradeValue({
-          value: row?.price,
-          field: TradeInputField.limitPrice,
-        });
+      if (currentInput === 'trade' && key !== 'spread' && row?.price) {
+        dispatch(setTradeFormInputs({ limitPriceInput: row?.price?.toString() }));
+      }
     },
     [currentInput]
   );
 
   const orderbookTableProps = {
     showMineColumn,
-    symbol,
+    symbol: id,
     stepSizeDecimals,
     tickSizeDecimals,
     histogramRange,
@@ -510,17 +508,21 @@ Styled.OrderbookTable = styled(OrderbookTradesTable)<StyleProps>`
       content: '';
     }
 
-    &:not(:active):is(:focus-visible, :focus-within) {
-      ${orderbookMixins.scrollSnapItem}
-      z-index: 2;
+    ${({ withFocusStickyRows }) =>
+      withFocusStickyRows &&
+      css`
+        &:not(:active):is(:focus-visible, :focus-within) {
+          ${orderbookMixins.scrollSnapItem}
+          z-index: 2;
 
-      &[data-side='bid'] {
-        top: calc(var(--stickyArea-totalInsetTop) + var(--orderbook-spreadRowHeight));
-      }
-      &[data-side='ask'] {
-        bottom: calc(var(--stickyArea-totalInsetBottom) + var(--orderbook-spreadRowHeight));
-      }
-    }
+          &[data-side='bid'] {
+            top: calc(var(--stickyArea-totalInsetTop) + var(--orderbook-spreadRowHeight));
+          }
+          &[data-side='ask'] {
+            bottom: calc(var(--stickyArea-totalInsetBottom) + var(--orderbook-spreadRowHeight));
+          }
+        }
+      `}
   }
 
   ${Styled.HorizontalLayout} & {

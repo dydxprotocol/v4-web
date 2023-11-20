@@ -7,7 +7,12 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { TradeLayouts } from '@/constants/layout';
 
-import { useBreakpoints, useCurrentMarketId, usePageTitlePriceUpdates } from '@/hooks';
+import {
+  useBreakpoints,
+  useCurrentMarketId,
+  usePageTitlePriceUpdates,
+  useTradeFormInputs,
+} from '@/hooks';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
@@ -37,6 +42,7 @@ const TradePage = () => {
   const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
 
   usePageTitlePriceUpdates();
+  useTradeFormInputs();
 
   return isTablet ? (
     <Styled.TradeLayoutMobile>
