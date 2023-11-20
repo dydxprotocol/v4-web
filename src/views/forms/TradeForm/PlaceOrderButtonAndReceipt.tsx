@@ -9,6 +9,7 @@ import { TRADE_TYPE_STRINGS, MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { useStringGetter, useTokenConfigs } from '@/hooks';
 
+import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
@@ -77,7 +78,11 @@ export const PlaceOrderButtonAndReceipt = ({
     },
     {
       key: 'fee',
-      label: stringGetter({ key: STRING_KEYS.FEE }),
+      label: (
+        <WithTooltip tooltip="fee" side="right">
+          {stringGetter({ key: STRING_KEYS.FEE })}
+        </WithTooltip>
+      ),
       value: <Output type={OutputType.Fiat} value={fee} useGrouping />,
     },
     {
@@ -85,7 +90,7 @@ export const PlaceOrderButtonAndReceipt = ({
       label: (
         <>
           {stringGetter({ key: STRING_KEYS.MAXIMUM_REWARDS })}
-          {/* <AssetIcon symbol="DYDX" /> */}
+          <AssetIcon symbol={chainTokenLabel} />
         </>
       ),
       value: (

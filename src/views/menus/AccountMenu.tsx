@@ -1,12 +1,12 @@
 import { memo } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled, { AnyStyledComponent, css } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import type { Dispatch } from '@reduxjs/toolkit';
 
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
-import { STRING_KEYS, TOOLTIP_STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS, StringGetterFunction, TOOLTIP_STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { DydxChainAsset, wallets } from '@/constants/wallets';
 
@@ -39,7 +39,6 @@ import { truncateAddress } from '@/lib/wallet';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { headerMixins } from '@/styles/headerMixins';
 import { MustBigNumber } from '@/lib/numbers';
-
 
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
@@ -91,13 +90,15 @@ export const AccountMenu = () => {
                 <Styled.Address>{truncateAddress(dydxAddress)}</Styled.Address>
               </Styled.Column>
               <Styled.CopyButton buttonType="icon" value={dydxAddress} shape={ButtonShape.Square} />
-              <Styled.IconButton
-                action={ButtonAction.Base}
-                href={`${mintscanBase}/account/${dydxAddress}`}
-                iconName={IconName.LinkOut}
-                shape={ButtonShape.Square}
-                type={ButtonType.Link}
-              />
+              <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.MINTSCAN })}>
+                <Styled.IconButton
+                  action={ButtonAction.Base}
+                  href={`${mintscanBase}/account/${dydxAddress}`}
+                  iconName={IconName.LinkOut}
+                  shape={ButtonShape.Square}
+                  type={ButtonType.Link}
+                />
+              </WithTooltip>
             </Styled.AddressRow>
             <Styled.AddressRow>
               {walletType && (
@@ -127,6 +128,7 @@ export const AccountMenu = () => {
                   asset={DydxChainAsset.CHAINTOKEN}
                   dispatch={dispatch}
                   hasBalance={nativeTokenBalance.gt(0)}
+                  stringGetter={stringGetter}
                 />
               </div>
               <div>
@@ -148,6 +150,7 @@ export const AccountMenu = () => {
                   asset={DydxChainAsset.USDC}
                   dispatch={dispatch}
                   hasBalance={MustBigNumber(usdcBalance).gt(0)}
+                  stringGetter={stringGetter}
                   withOnboarding
                 />
               </div>
@@ -167,6 +170,12 @@ export const AccountMenu = () => {
           onSelect: onRecoverKeys,
           separator: true,
         },
+        {
+          value: 'Preferences',
+          icon: <Icon iconName={IconName.Gear} />,
+          label: stringGetter({ key: STRING_KEYS.PREFERENCES }),
+          onSelect: () => dispatch(openDialog({ type: DialogTypes.Preferences })),
+        },
         ...(onboardingState === OnboardingState.AccountConnected && hdKey
           ? [
               !isMainnet && {
@@ -184,12 +193,6 @@ export const AccountMenu = () => {
               },
             ].filter(isTruthy)
           : []),
-        {
-          value: 'Preferences',
-          icon: <Icon iconName={IconName.Gear} />,
-          label: stringGetter({ key: STRING_KEYS.PREFERENCES }),
-          onSelect: () => dispatch(openDialog({ type: DialogTypes.Preferences })),
-        },
         {
           value: 'Disconnect',
           icon: <Icon iconName={IconName.BoxClose} />,
@@ -217,38 +220,48 @@ const AssetActions = memo(
     dispatch,
     withOnboarding,
     hasBalance,
+    stringGetter,
   }: {
     asset: DydxChainAsset;
     dispatch: Dispatch;
     withOnboarding?: boolean;
     hasBalance?: boolean;
+    stringGetter: StringGetterFunction;
   }) => (
     <Styled.InlineRow>
       {[
+        withOnboarding && {
+          dialogType: DialogTypes.Deposit,
+          iconName: IconName.Deposit,
+          tooltipStringKey: STRING_KEYS.DEPOSIT,
+        },
         withOnboarding &&
           hasBalance && {
             dialogType: DialogTypes.Withdraw,
             iconName: IconName.Withdraw,
+            tooltipStringKey: STRING_KEYS.WITHDRAW,
           },
-        withOnboarding && {
-          dialogType: DialogTypes.Deposit,
-          iconName: IconName.Deposit,
-        },
         hasBalance && {
           dialogType: DialogTypes.Transfer,
           dialogProps: { selectedAsset: asset },
           iconName: IconName.Send,
+          tooltipStringKey: STRING_KEYS.TRANSFER,
         },
       ]
         .filter(isTruthy)
-        .map(({ iconName, dialogType, dialogProps }) => (
-          <Styled.IconButton
-            key={dialogType}
-            action={ButtonAction.Base}
-            shape={ButtonShape.Square}
-            iconName={iconName}
-            onClick={() => dispatch(openDialog({ type: dialogType, dialogProps }))}
-          />
+        .map(({ iconName, tooltipStringKey, dialogType, dialogProps }) => (
+          <Styled.WithTooltip
+            key={tooltipStringKey}
+            tooltipString={stringGetter({ key: tooltipStringKey })}
+          >
+            <Styled.IconButton
+              key={dialogType}
+              action={ButtonAction.Base}
+              shape={ButtonShape.Square}
+              iconName={iconName}
+              onClick={() => dispatch(openDialog({ type: dialogType, dialogProps }))}
+            />
+          </Styled.WithTooltip>
         ))}
     </Styled.InlineRow>
   )
@@ -370,12 +383,22 @@ Styled.ConnectToChain = styled(Styled.Column)`
   }
 `;
 
-Styled.IconButton = styled(IconButton)`
+Styled.IconButton = styled(IconButton)<{ iconName: IconName }>`
   --button-padding: 0 0.25rem;
   --button-border: solid var(--border-width) var(--color-layer-6);
+
+  ${({ iconName }) =>
+    [IconName.Withdraw, IconName.Deposit].includes(iconName) &&
+    css`
+      --button-icon-size: 1.375em;
+    `}
 `;
 
 Styled.CopyButton = styled(CopyButton)`
   --button-padding: 0 0.25rem;
   --button-border: solid var(--border-width) var(--color-layer-6);
+`;
+
+Styled.WithTooltip = styled(WithTooltip)`
+  --tooltip-backgroundColor: var(--color-layer-5);
 `;

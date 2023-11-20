@@ -44,8 +44,7 @@ export const ReceiveDialog = ({ selectedAsset = DydxChainAsset.CHAINTOKEN, setIs
       value: DydxChainAsset.CHAINTOKEN,
       label: (
         <Styled.InlineRow>
-          {/* TODO: conditionally display the native token assetIcon */}
-          {/* <AssetIcon symbol="DYDX" />  */}
+          <AssetIcon symbol={chainTokenLabel} />
           {chainTokenLabel}
         </Styled.InlineRow>
       ),

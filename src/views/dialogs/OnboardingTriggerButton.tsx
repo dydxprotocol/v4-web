@@ -8,7 +8,7 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { Button } from '@/components/Button';
 
-import { openDialog } from '@/state/dialogs';
+import { forceOpenDialog } from '@/state/dialogs';
 import { getOnboardingState } from '@/state/accountSelectors';
 import { OnboardingState } from '@/constants/account';
 
@@ -26,7 +26,7 @@ export const OnboardingTriggerButton = ({ size = ButtonSize.Small }: StyleProps)
     <Button
       action={ButtonAction.Primary}
       size={size}
-      onClick={() => dispatch(openDialog({ type: DialogTypes.Onboarding }))}
+      onClick={() => dispatch(forceOpenDialog({ type: DialogTypes.Onboarding }))}
     >
       {
         {
