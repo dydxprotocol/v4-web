@@ -7,6 +7,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { ButtonAction } from '@/constants/buttons';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+import { formMixins } from '@/styles/formMixins';
 
 import { Button } from '@/components/Button';
 import { Link } from '@/components/Link';
@@ -54,14 +55,14 @@ export const AcknowledgeTerms = ({ onClose, onContinue }: ElementProps) => {
           <li>{stringGetter({ key: STRING_KEYS.TOS_LINE5 })}</li>
         </ul>
       </Styled.TOS>
-      <Styled.Row>
+      <Styled.Footer>
         <Styled.Button onClick={onClose} action={ButtonAction.Base}>
           {stringGetter({ key: STRING_KEYS.CLOSE })}
         </Styled.Button>
         <Styled.Button onClick={onAcknowledgement} action={ButtonAction.Primary}>
           {stringGetter({ key: STRING_KEYS.I_AGREE })}
         </Styled.Button>
-      </Styled.Row>
+      </Styled.Footer>
     </>
   );
 };
@@ -87,8 +88,9 @@ Styled.TOS = styled.section`
   }
 `;
 
-Styled.Row = styled.div`
-  ${layoutMixins.row};
+Styled.Footer = styled.div`
+  ${formMixins.footer};
+  ${layoutMixins.row}
 
   gap: 1rem;
 `;
