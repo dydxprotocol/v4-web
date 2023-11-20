@@ -124,6 +124,8 @@ export type SubaccountPosition = Abacus.exchange.dydx.abacus.output.SubaccountPo
 export type SubaccountOrder = Abacus.exchange.dydx.abacus.output.SubaccountOrder;
 export type OrderStatus = Abacus.exchange.dydx.abacus.output.input.OrderStatus;
 export const AbacusOrderStatus = Abacus.exchange.dydx.abacus.output.input.OrderStatus;
+const abacusOrderStatuses = [...AbacusOrderStatus.values()] as const;
+export type AbacusOrderStatuses = (typeof abacusOrderStatuses)[number];
 export type SubaccountFills = Abacus.exchange.dydx.abacus.output.SubaccountFill[];
 export type SubaccountFill = Abacus.exchange.dydx.abacus.output.SubaccountFill;
 export type SubaccountFundingPayment = Abacus.exchange.dydx.abacus.output.SubaccountFundingPayment;
@@ -209,11 +211,13 @@ type ReadonlyKeysOf<T> = {
   [K in keyof T]: IfEquals<{ [_ in K]: T[K] }, { readonly [_ in K]: T[K] }, K, never>;
 }[keyof T];
 
-type KotlinIrEnumValues<T> = Exclude<ReadonlyKeysOf<T>, 'Companion' | '$serializer'>;
+export type KotlinIrEnumValues<T> = Exclude<ReadonlyKeysOf<T>, 'Companion' | '$serializer'>;
 
 export const ORDER_SIDES: Record<KotlinIrEnumValues<typeof AbacusOrderSide>, OrderSide> = {
   [AbacusOrderSide.buy.name]: OrderSide.BUY,
   [AbacusOrderSide.sell.name]: OrderSide.SELL,
+  [AbacusOrderSide.buy.rawValue]: OrderSide.BUY,
+  [AbacusOrderSide.sell.rawValue]: OrderSide.SELL,
 };
 
 export const POSITION_SIDES: Record<KotlinIrEnumValues<typeof AbacusPositionSide>, PositionSide> = {
@@ -234,12 +238,25 @@ export const HISTORICAL_PNL_PERIODS: Record<
 
 export const ORDER_STATUS_STRINGS: Record<KotlinIrEnumValues<typeof AbacusOrderStatus>, string> = {
   [AbacusOrderStatus.open.name]: STRING_KEYS.OPEN_STATUS,
+  [AbacusOrderStatus.open.rawValue]: STRING_KEYS.OPEN_STATUS,
+
   [AbacusOrderStatus.partiallyFilled.name]: STRING_KEYS.PARTIALLY_FILLED,
+  [AbacusOrderStatus.partiallyFilled.rawValue]: STRING_KEYS.PARTIALLY_FILLED,
+
   [AbacusOrderStatus.filled.name]: STRING_KEYS.ORDER_FILLED,
+  [AbacusOrderStatus.filled.rawValue]: STRING_KEYS.ORDER_FILLED,
+
   [AbacusOrderStatus.cancelled.name]: STRING_KEYS.CANCELED,
+  [AbacusOrderStatus.cancelled.rawValue]: STRING_KEYS.CANCELED,
+
   [AbacusOrderStatus.canceling.name]: STRING_KEYS.CANCELING,
+  [AbacusOrderStatus.canceling.rawValue]: STRING_KEYS.CANCELING,
+
   [AbacusOrderStatus.pending.name]: STRING_KEYS.PENDING,
+  [AbacusOrderStatus.pending.rawValue]: STRING_KEYS.PENDING,
+
   [AbacusOrderStatus.untriggered.name]: STRING_KEYS.UNTRIGGERED,
+  [AbacusOrderStatus.untriggered.rawValue]: STRING_KEYS.UNTRIGGERED,
 };
 
 export const TRADE_TYPES: Record<
@@ -247,15 +264,31 @@ export const TRADE_TYPES: Record<
   Nullable<TradeTypes>
 > = {
   [AbacusOrderType.limit.name]: TradeTypes.LIMIT,
+  [AbacusOrderType.limit.rawValue]: TradeTypes.LIMIT,
+
   [AbacusOrderType.market.name]: TradeTypes.MARKET,
+  [AbacusOrderType.market.rawValue]: TradeTypes.MARKET,
+
   [AbacusOrderType.stopLimit.name]: TradeTypes.STOP_LIMIT,
+  [AbacusOrderType.stopLimit.rawValue]: TradeTypes.STOP_LIMIT,
+
   [AbacusOrderType.stopMarket.name]: TradeTypes.STOP_MARKET,
+  [AbacusOrderType.stopMarket.rawValue]: TradeTypes.STOP_MARKET,
+
   [AbacusOrderType.takeProfitLimit.name]: TradeTypes.TAKE_PROFIT,
+  [AbacusOrderType.takeProfitLimit.rawValue]: TradeTypes.TAKE_PROFIT,
+
   [AbacusOrderType.takeProfitMarket.name]: TradeTypes.TAKE_PROFIT_MARKET,
+  [AbacusOrderType.takeProfitMarket.rawValue]: TradeTypes.TAKE_PROFIT_MARKET,
 
   [AbacusOrderType.liquidated.name]: null,
   [AbacusOrderType.liquidation.name]: null,
+
+  [AbacusOrderType.liquidation.name]: null,
+  [AbacusOrderType.liquidation.rawValue]: null,
+
   [AbacusOrderType.trailingStop.name]: null,
+  [AbacusOrderType.trailingStop.rawValue]: null,
 };
 
 // Custom types involving Abacus

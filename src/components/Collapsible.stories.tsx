@@ -1,16 +1,13 @@
 import type { Story } from '@ladle/react';
 
-import { Collapsible } from '@/components/Collapsible';
+import { Collapsible, type CollapsibleProps } from '@/components/Collapsible';
 
 import { StoryWrapper } from '.ladle/components';
 import { IconName } from './Icon';
 
-export const CollapsibleStory: Story<Parameters<typeof Collapsible>> = (args) => (
+export const CollapsibleStory: Story<CollapsibleProps> = (args) => (
   <StoryWrapper>
-    <Collapsible
-      label="Collapsible List of Items"
-      {...args}
-    >
+    <Collapsible {...args}>
       <ul>
         <li>Collapsible Item 1</li>
         <li>Collapsible Item 2</li>
@@ -23,6 +20,8 @@ export const CollapsibleStory: Story<Parameters<typeof Collapsible>> = (args) =>
 
 CollapsibleStory.args = {
   disabled: false,
+  withTrigger: true,
+  label: 'Collapsible List of Items',
 };
 
 CollapsibleStory.argTypes = {

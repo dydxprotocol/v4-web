@@ -34,6 +34,7 @@ const $ToastArea = styled.aside`
   > * {
     display: contents;
     pointer-events: none;
+    position: relative;
 
     > ol {
       /* display: block; */
@@ -43,6 +44,7 @@ const $ToastArea = styled.aside`
       // Desired display order: latest to earliest (¯\_(ツ)_/¯)
       display: flex;
       flex-direction: column-reverse;
+      position: relative;
 
       pointer-events: none;
 

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 import { StatusResponse } from '@0xsquid/sdk';
 
 import { useStringGetter, useSelectedNetwork, useURLConfigs } from '@/hooks';
@@ -18,6 +18,10 @@ type ElementProps = {
   type: 'withdrawal' | 'deposit';
 };
 
+type StyleProps = {
+  className?: string;
+};
+
 enum TransferStatusStep {
   FromChain,
   Bridge,
@@ -25,7 +29,7 @@ enum TransferStatusStep {
   Complete,
 }
 
-export const TransferStatusSteps = ({ status, type }: ElementProps) => {
+export const TransferStatusSteps = ({ className, status, type }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
   const { selectedNetwork } = useSelectedNetwork();
   const { mintscan: mintscanTxUrl } = useURLConfigs();
@@ -45,7 +49,12 @@ export const TransferStatusSteps = ({ status, type }: ElementProps) => {
             type === 'deposit' ? STRING_KEYS.INITIATED_DEPOSIT : STRING_KEYS.INITIATED_WITHDRAWAL,
         }),
         step: TransferStatusStep.FromChain,
-        link: status?.fromChain?.transactionUrl,
+        link: 
+          type === 'deposit'
+            ? status?.fromChain?.transactionUrl
+            : routeStatus?.[0]?.chainId === dydxChainId && routeStatus[0].txHash
+            ? `${mintscanTxUrl?.replace('{tx_hash}', routeStatus[0].txHash.replace('0x', ''))}`
+            : undefined,
       },
       {
         label: stringGetter({ key: STRING_KEYS.BRIDGING_TOKENS }),
@@ -64,7 +73,7 @@ export const TransferStatusSteps = ({ status, type }: ElementProps) => {
           type === 'withdrawal'
             ? status?.toChain?.transactionUrl
             : currentStatus?.chainId === dydxChainId && currentStatus?.txHash
-            ? `${mintscanTxUrl?.replace('{tx_hash}', currentStatus.txHash)}`
+            ? `${mintscanTxUrl?.replace('{tx_hash}', currentStatus.txHash.replace('0x', ''))}`
             : undefined,
       },
     ];
@@ -96,7 +105,7 @@ export const TransferStatusSteps = ({ status, type }: ElementProps) => {
   if (!status) return <LoadingDots size={3} />;
 
   return (
-    <Styled.BridgingStatus>
+    <Styled.BridgingStatus className={className}>
       {steps.map((step) => (
         <Styled.Step key={step.step}>
           <Styled.row>

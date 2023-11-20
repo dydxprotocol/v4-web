@@ -1,6 +1,7 @@
 import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
 import Long from 'long';
 import type { IndexedTx } from '@cosmjs/stargate';
+import { encodeJson } from '@dydxprotocol/v4-client-js';
 
 import {
   CompositeClient,
@@ -195,8 +196,9 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         throw new StatefulOrderError('Stateful order has failed to commit.', tx);
       }
 
-      const parsedTx = this.parseToPrimitives(tx);
-      const hash = parsedTx?.hash;
+      const encodedTx = encodeJson(tx);
+      const parsedTx = JSON.parse(encodedTx);
+      const hash = parsedTx.hash.toUpperCase();
 
       if (isTestnet) {
         console.log(
@@ -206,7 +208,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         );
       } else console.log(`txHash: ${hash}`);
 
-      return JSON.stringify(parsedTx);
+      return encodedTx;
     } catch (error) {
       if (error?.name !== 'BroadcastError') {
         log('DydxChainTransactions/placeOrderTransaction', error);
@@ -236,9 +238,14 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         goodTilBlockTime || undefined
       );
 
-      const parsedTx = this.parseToPrimitives(tx);
+      const encodedTx = encodeJson(tx);
 
-      return JSON.stringify(parsedTx);
+      if (import.meta.env.MODE === 'development') {
+        const parsedTx = JSON.parse(encodedTx);
+        console.log(parsedTx, parsedTx.hash.toUpperCase());
+      }
+
+      return encodedTx;
     } catch (error) {
       log('DydxChainTransactions/cancelOrderTransaction', error);
 
@@ -434,8 +441,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
           const parseDelegations = this.parseToPrimitives(delegations);
           callback(JSON.stringify(parseDelegations));
           break;
-        // Do not implement Transfers (yet)
-        case QueryType.Transfers:
         default:
           break;
       }

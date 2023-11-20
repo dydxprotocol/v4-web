@@ -10,6 +10,7 @@ export enum DialogTypes {
   MobileSignIn = 'MobileSignIn',
   Onboarding = 'Onboarding',
   OrderDetails = 'OrderDetails',
+  Preferences = 'Preferences',
   RateLimit = 'RateLimit',
   Receive = 'Receive',
   RestrictedGeo = 'RestrictedGeo',
@@ -17,6 +18,7 @@ export enum DialogTypes {
   Trade = 'Trade',
   Transfer = 'Transfer',
   Withdraw = 'Withdraw',
+  ManageFunds = 'ManageFunds',
 }
 
 export enum TradeBoxDialogTypes {

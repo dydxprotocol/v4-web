@@ -1,4 +1,5 @@
 import { shallowEqual, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -12,9 +13,9 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
-import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
+import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
@@ -102,7 +103,7 @@ export const TransferButtonAndReceipt = ({
   ].filter(isTruthy);
 
   return (
-    <WithDetailsReceipt detailItems={transferDetailItems}>
+    <Styled.WithDetailsReceipt detailItems={transferDetailItems}>
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
       ) : (
@@ -114,6 +115,16 @@ export const TransferButtonAndReceipt = ({
           {stringGetter({ key: STRING_KEYS.CONFIRM_TRANSFER })}
         </Button>
       )}
-    </WithDetailsReceipt>
+    </Styled.WithDetailsReceipt>
   );
 };
+
+const Styled: Record<string, AnyStyledComponent> = {};
+
+Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
+  --withReceipt-backgroundColor: var(--color-layer-2);
+
+  dl {
+    padding: var(--form-input-paddingY) var(--form-input-paddingX);
+  }
+`;

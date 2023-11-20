@@ -28,7 +28,9 @@ import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 import { WithReceipt } from '@/components/WithReceipt';
+import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
+import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccountBuyingPower, getSubaccountEquity } from '@/state/accountSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
@@ -63,6 +65,8 @@ export const DepositButtonAndReceipt = ({
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
   const [isEditingSlippage, setIsEditingSlipapge] = useState(false);
   const stringGetter = useStringGetter();
+
+  const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
 
   const {
     matchNetwork: switchNetwork,
@@ -210,7 +214,9 @@ export const DepositButtonAndReceipt = ({
       }
       slotError={slotError}
     >
-      {!isMatchingNetwork ? (
+      {!canAccountTrade ? (
+        <OnboardingTriggerButton size={ButtonSize.Base} />
+      ) : !isMatchingNetwork ? (
         <Button
           action={ButtonAction.Primary}
           onClick={switchNetwork}
@@ -247,8 +253,7 @@ Styled.WithReceipt = styled(WithReceipt)`
 
 Styled.CollapsibleDetails = styled.div`
   ${layoutMixins.column}
-  padding: 0.375rem 1rem 0.5rem;
-  gap: 0.5rem;
+  padding: var(--form-input-paddingY) var(--form-input-paddingX);
 `;
 
 Styled.Details = styled(Details)`

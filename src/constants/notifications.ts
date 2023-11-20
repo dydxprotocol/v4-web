@@ -2,7 +2,7 @@ import { StatusResponse } from '@0xsquid/sdk';
 
 /** implemented in useNotificationTypes */
 export enum NotificationType {
-  OrderStatusChanged = 'OrderStatusChanged',
+  AbacusGenerated = 'AbacusGenerated',
   SquidTransfer = 'SquidTransfer',
 }
 
@@ -59,7 +59,7 @@ export enum NotificationStatus {
   /** Toast or NotificationsMenu item interacted with or dismissed. "Seen" in NotificationsMenu. */
   Seen,
 
-  /** Notification marked for deletion. "Archived" in NotificationsMenu. */
+  /** Notification marked for deletion. Hidden in NotificationsMenu. */
   Cleared,
 }
 
@@ -80,14 +80,20 @@ export type Notifications = Record<NotificationId, Notification<any>>;
 /** Notification display data derived from app state at runtime. */
 export type NotificationDisplayData = {
   icon?: React.ReactNode;
+  title: string; // Title for Toast, Notification, and Push Notification
+  body?: string; // Description body for Toast, Notification, and Push Notification
 
-  title?: string;
+  slotTitleLeft?: React.ReactNode;
+  slotTitleRight?: React.ReactNode;
 
-  description?: React.ReactNode;
-
-  customContent?: React.ReactNode;
-
-  customMenuContent?: React.ReactNode;
+  // Overrides title/body for Notification in NotificationMenu
+  renderCustomBody?: ({
+    isToast,
+    notification,
+  }: {
+    isToast?: boolean;
+    notification: Notification;
+  }) => React.ReactNode; // Custom Notification
 
   actionDescription?: string;
 
@@ -122,5 +128,15 @@ export type TransferNotifcation = {
   fromChainId?: string;
   toAmount?: number;
   triggeredAt?: number;
+  errorCount?: number;
   status?: StatusResponse;
 };
+
+/**
+ * @description Struct to store whether a NotificationType should be triggered
+ */
+export type NotificationPreferences = {
+  [key in NotificationType]: boolean;
+} & { version: string };
+
+export const DEFAULT_TOAST_AUTO_CLOSE_MS = 5000;

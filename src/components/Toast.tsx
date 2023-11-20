@@ -1,24 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
-
-import { Root, Title, Description, Action, Close } from '@radix-ui/react-toast';
+import { type MouseEvent, useEffect, useRef, useState } from 'react';
+import styled, { keyframes } from 'styled-components';
+import { Root, Action, Close } from '@radix-ui/react-toast';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import { popoverMixins } from '@/styles/popoverMixins';
+
+import { Notification, type NotificationProps } from '@/components/Notification';
 
 import { IconButton } from './IconButton';
-import { CloseIcon } from '@/icons';
-
-import styled, { keyframes } from 'styled-components';
-import { popoverMixins } from '@/styles/popoverMixins';
-import { layoutMixins } from '@/styles/layoutMixins';
+import { IconName } from './Icon';
 
 type ElementProps = {
   isOpen?: boolean;
   setIsOpen?: (isOpen: boolean, isClosedFromTimeout?: boolean) => void;
-  slotIcon?: React.ReactNode;
-  slotTitle?: React.ReactNode;
-  slotDescription?: React.ReactNode;
-  slotCustomContent?: React.ReactNode;
-  slotAction?: React.ReactNode;
   actionDescription?: string;
   actionAltText?: string;
   sensitivity?: 'foreground' | 'background';
@@ -26,13 +20,22 @@ type ElementProps = {
   lastUpdated?: number;
 };
 
-type StyleProps = {};
+type StyleProps = {
+  className?: string;
+};
+
+type ToastProps = NotificationProps & ElementProps & StyleProps;
 
 export const Toast = ({
+  className,
   isOpen = true,
+  notification,
+  onClick,
   setIsOpen,
   slotIcon,
   slotTitle,
+  slotTitleLeft,
+  slotTitleRight,
   slotDescription,
   slotCustomContent,
   slotAction,
@@ -41,7 +44,7 @@ export const Toast = ({
   sensitivity = 'background',
   duration = Infinity,
   lastUpdated,
-}: ElementProps & StyleProps) => {
+}: ToastProps) => {
   // Timeout
   const timeout = useRef<number>();
   const [isPaused, setIsPaused] = useState(false);
@@ -58,37 +61,45 @@ export const Toast = ({
 
   return (
     <$Root
+      className={className}
       type={sensitivity}
       duration={Infinity}
       open={isOpen}
       onOpenChange={setIsOpen}
       onPause={() => setIsPaused(true)}
       onResume={() => setIsPaused(false)}
+      onClick={() => {
+        setIsOpen?.(false, false);
+        onClick?.();
+      }}
     >
-      <div>
-        <$Container>
-          <$Header>
-            {slotIcon && <$Icon>{slotIcon}</$Icon>}
+      <Close asChild>
+        <$CloseButton
+          iconName={IconName.Close}
+          shape={ButtonShape.Square}
+          size={ButtonSize.XSmall}
+          onClick={(e: MouseEvent) => e.stopPropagation()}
+        />
+      </Close>
 
-            <Close asChild>
-              <$CloseButton
-                iconComponent={CloseIcon}
-                shape={ButtonShape.Square}
-                size={ButtonSize.XSmall}
-              />
-            </Close>
-
-            <$Title>{slotTitle}</$Title>
-          </$Header>
-          {!slotCustomContent && <$Description>{slotDescription}</$Description>}
-          {slotCustomContent}
-          {actionDescription && (
-            <$Action asChild altText={actionAltText}>
-              {slotAction}
-            </$Action>
-          )}
-        </$Container>
-      </div>
+      {slotCustomContent ?? (
+        <$Notification
+          isToast
+          notification={notification}
+          slotIcon={slotIcon}
+          slotTitle={slotTitle}
+          slotTitleLeft={slotTitleLeft}
+          slotTitleRight={slotTitleRight}
+          slotDescription={slotDescription}
+          slotAction={
+            actionDescription && (
+              <$Action asChild altText={actionAltText}>
+                {slotAction}
+              </$Action>
+            )
+          }
+        />
+      )}
     </$Root>
   );
 };
@@ -114,7 +125,7 @@ const $Root = styled(Root)`
   translate: var(--x) var(--y);
   will-change: translate, margin-top;
 
-  margin-bottom: var(--toasts-gap);
+  /* margin-bottom: var(--toasts-gap); */
 
   &[data-swipe-direction='right'] {
     &[data-state='open'] {
@@ -163,6 +174,10 @@ const $Root = styled(Root)`
     cursor: n-resize;
   }
 
+  &:focus:not([data-swipe='end']) & {
+    outline: var(--color-accent) 1px solid;
+  }
+
   &[data-swipe='move'] {
     transition-property: opacity;
     opacity: 0.98;
@@ -170,6 +185,10 @@ const $Root = styled(Root)`
     cursor: grabbing;
     * {
       cursor: inherit;
+    }
+
+    & > * {
+      opacity: 0.5;
     }
   }
 
@@ -198,69 +217,44 @@ const $Root = styled(Root)`
   }
 `;
 
-const $Container = styled.div`
+const $Notification = styled(Notification)`
   // Params
   --toast-icon-size: 1.75em;
 
   // Rules
   ${popoverMixins.popover}
+  overflow: visible;
   padding: 1rem;
   box-shadow: 0 0 0 var(--border-width) var(--color-border),
     // border
     0 0 0.5rem 0.1rem var(--color-layer-2); // shadow
 
-  ${$Root}:focus:not([data-swipe='end']) & {
-    outline: var(--color-accent) 1px solid;
-  }
-
   > * {
     transition: opacity 0.2s;
   }
-  ${$Root}[data-swipe='move'] & > * {
-    opacity: 0.5;
-  }
-`;
-
-const $Header = styled.header`
-  display: block;
-`;
-
-const $Icon = styled.div`
-  ${layoutMixins.row}
-
-  float: left;
-
-  width: 1em;
-  height: 1em;
-
-  margin-right: 0.4em;
-
-  line-height: 1;
 `;
 
 const $CloseButton = styled(IconButton)`
   --button-textColor: var(--color-text-0);
   --button-border: none;
   --button-icon-size: 0.85em;
+  display: none;
 
-  float: right;
+  /* float: right; */
   margin: -0.42rem -0.42rem -0.42rem 0.42rem;
-`;
 
-const $Title = styled(Title)`
-  flex: 1;
+  // Absolute
+  position: absolute;
+  top: 0;
+  right: 0;
 
-  font: var(--font-base-medium);
-  color: var(--color-text-2);
+  border: solid var(--border-width) var(--color-border);
+  border-radius: 50%;
 
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const $Description = styled(Description)`
-  margin-top: 0.5rem;
-  color: var(--color-text-0);
-  font: var(--font-small-book);
+  ${$Root}:hover & {
+    display: block;
+    z-index: 2;
+  }
 `;
 
 const $Action = styled(Action)`

@@ -26,6 +26,7 @@ export type MenuItem<MenuItemValue, MenuItemTypes = string> = {
   tag?: React.ReactNode;
   slotAfter?: React.ReactNode;
   description?: string;
+  slotCustomContent?: React.ReactNode;
 
   href?: string;
   onSelect?: (key: MenuItemValue) => void;
