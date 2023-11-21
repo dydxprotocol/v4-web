@@ -138,13 +138,14 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
               renderCell: (row) => (
                 <TableCell stacked>
+                  <Output type={OutputType.Fiat} value={row.openInterestUSDC} />
+
                   <Output
                     fractionDigits={LARGE_TOKEN_DECIMALS}
                     type={OutputType.Number}
                     value={row.openInterest}
                     tag={row.asset?.id}
                   />
-                  <Output type={OutputType.Fiat} value={row.openInterestUSDC} />
                 </TableCell>
               ),
             },
