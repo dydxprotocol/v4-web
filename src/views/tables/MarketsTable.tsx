@@ -134,7 +134,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
             },
             {
               columnKey: 'openInterest',
-              getCellValue: (row) => row.openInterest,
+              getCellValue: (row) => row.openInterestUSDC,
               label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
               renderCell: (row) => (
                 <TableCell stacked>
@@ -144,10 +144,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                     value={row.openInterest}
                     tag={row.asset?.id}
                   />
-                  <Output
-                    type={OutputType.Fiat}
-                    value={MustBigNumber(row.openInterest).times(MustBigNumber(row.oraclePrice))}
-                  />
+                  <Output type={OutputType.Fiat} value={row.openInterestUSDC} />
                 </TableCell>
               ),
             },
@@ -155,7 +152,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               columnKey: 'volume24H',
               getCellValue: (row) => row.volume24H,
               label: stringGetter({ key: STRING_KEYS.VOLUME_24H }),
-              renderCell: (row) => <Output type={OutputType.Number} value={row.volume24H} />,
+              renderCell: (row) => <Output type={OutputType.Fiat} value={row.volume24H} />,
             },
             {
               columnKey: 'trades24H',

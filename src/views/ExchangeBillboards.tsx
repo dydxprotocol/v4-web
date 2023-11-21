@@ -60,7 +60,7 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({
         },
         {
           key: 'trades',
-          labelKey: STRING_KEYS.TRADES,
+          labelKey: isTablet ? STRING_KEYS.TRADES_24H : STRING_KEYS.TRADES,
           value: totalTrades24H || undefined,
           type: isTablet ? OutputType.CompactNumber : OutputType.Number,
           subLabelKey: !isTablet && STRING_KEYS.TRADES_LABEL,
