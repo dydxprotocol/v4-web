@@ -4,6 +4,7 @@ import { Root, Action, Close } from '@radix-ui/react-toast';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { popoverMixins } from '@/styles/popoverMixins';
+import { breakpoints } from '@/styles';
 
 import { Notification, type NotificationProps } from '@/components/Notification';
 
@@ -251,6 +252,11 @@ const $CloseButton = styled(IconButton)`
   border: solid var(--border-width) var(--color-border);
 
   ${$Root}:hover & {
+    display: block;
+    z-index: 2;
+  }
+
+  @media ${breakpoints.mobile} {
     display: block;
     z-index: 2;
   }

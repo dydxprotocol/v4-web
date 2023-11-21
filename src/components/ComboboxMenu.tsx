@@ -44,13 +44,6 @@ export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extend
 }: ComboboxMenuProps<MenuItemValue, MenuGroupValue>) => {
   const [highlightedCommand, setHighlightedCommand] = useState<MenuItemValue>();
   const [searchValue, setSearchValue] = useState('');
-  // const inputRef = useRef<HTMLInputElement | null>(null);
-
-  // console.log({ commandValue: highlightedCommand });
-
-  // useEffect(() => {
-  //   inputRef?.current?.focus();
-  // }, []);
 
   return (
     <Styled.Command
@@ -67,11 +60,14 @@ export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extend
       {withSearch && (
         <Styled.Header $withStickyLayout={withStickyLayout}>
           <Styled.Input
-            // ref={inputRef}
+            /**
+             * Mobile Issue: Search Input will always trigger mobile keyboard drawer. There is no fix.
+             * https://github.com/pacocoursey/cmdk/issues/127
+             */
+            autoFocus
             type="search"
             value={searchValue}
             onValueChange={setSearchValue}
-            autoFocus
             placeholder={inputPlaceholder}
           />
         </Styled.Header>

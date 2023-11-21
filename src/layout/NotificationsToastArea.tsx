@@ -75,7 +75,7 @@ export const NotificationsToastArea = ({ className }: StyleProps) => {
       {notificationMap.map(({ notification, key, displayData }, idx) => (
         <StyledToast
           key={key}
-          isStacked={!isMobile && shouldStackNotifications}
+          isStacked={shouldStackNotifications}
           isOpen={notification.status < NotificationStatus.Unseen}
           layer={notificationMap.length - 1 - idx}
           notification={notification}
@@ -167,6 +167,9 @@ const StyledToggleButton = styled(ToggleButton)<{ isPressed: boolean }>`
   }
 
   @media ${breakpoints.mobile} {
-    display: none;
+    display: flex;
+    left: calc(50% - 2rem);
+    --button-width: 4rem;
+    --button-height: 2rem;
   }
 `;
