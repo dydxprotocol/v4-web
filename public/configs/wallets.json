@@ -199,7 +199,7 @@
     },
     "mobile": {
       "native": "trust:",
-      "universal": "https://link.trustwallet.com"
+      "universal": ""
     },
     "desktop": {
       "native": "",
