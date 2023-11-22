@@ -6,7 +6,11 @@ import {
   LOCALE_DATA,
   TOOLTIPS,
   WARNINGS_STRING_KEYS,
+  NOTIFICATIONS_STRING_KEYS,
+  NOTIFICATIONS,
 } from '@dydxprotocol/v4-localization';
+
+import { type LinksConfigs } from '@/hooks/useURLConfigs';
 
 export { TOOLTIP_STRING_KEYS } from '@dydxprotocol/v4-localization';
 
@@ -25,6 +29,7 @@ export enum SupportedLocales {
 
 export const EN_LOCALE_DATA = {
   ...LOCALE_DATA[SupportedLocales.EN],
+  ...NOTIFICATIONS[SupportedLocales.EN],
   TOOLTIPS: TOOLTIPS[SupportedLocales.EN],
 };
 
@@ -32,7 +37,12 @@ export const STRING_KEYS = {
   ...APP_STRING_KEYS,
   ...ERRORS_STRING_KEYS,
   ...WARNINGS_STRING_KEYS,
+  ...NOTIFICATIONS_STRING_KEYS,
 };
+
+export const STRING_KEY_VALUES = Object.fromEntries(
+  Object.values(STRING_KEYS).map((key) => [key, key])
+);
 
 export type StringKey = keyof typeof STRING_KEYS;
 
@@ -79,9 +89,11 @@ export type TooltipStrings = {
   [key: string]: ({
     stringGetter,
     stringParams,
+    urlConfigs,
   }: {
     stringGetter: StringGetterFunction;
     stringParams?: any;
+    urlConfigs?: LinksConfigs;
   }) => {
     title: string;
     body: string;

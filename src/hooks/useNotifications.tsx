@@ -1,11 +1,13 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { LocalStorageKey } from '@/constants/localStorage';
+import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import {
   type Notification,
   type NotificationDisplayData,
+  type NotificationPreferences,
   type Notifications,
   NotificationStatus,
+  NotificationType,
 } from '@/constants/notifications';
 
 import { useLocalStorage } from './useLocalStorage';
@@ -13,8 +15,10 @@ import { notificationTypes } from './useNotificationTypes';
 
 import { renderSvgToDataUrl } from '../lib/renderSvgToDataUrl';
 
-const NotificationsContext = createContext<ReturnType<typeof useNotificationsContext> | undefined>(
-  undefined
+type NotificationsContextType = ReturnType<typeof useNotificationsContext>;
+
+const NotificationsContext = createContext<NotificationsContextType>(
+  {} as NotificationsContextType
 );
 
 NotificationsContext.displayName = 'Notifications';
@@ -27,6 +31,7 @@ export const useNotifications = () => useContext(NotificationsContext)!;
 
 const useNotificationsContext = () => {
   // Local storage
+  // const [notifications, setNotifications] = useState<Notifications>({});
   const [notifications, setNotifications] = useLocalStorage<Notifications>({
     key: LocalStorageKey.Notifications,
     defaultValue: {},
@@ -37,12 +42,25 @@ const useNotificationsContext = () => {
     defaultValue: Date.now(),
   });
 
+  const [notificationPreferences, setNotificationPreferences] =
+    useLocalStorage<NotificationPreferences>({
+      key: LocalStorageKey.NotificationPreferences,
+      defaultValue: {
+        [NotificationType.AbacusGenerated]: true,
+        [NotificationType.SquidTransfer]: true,
+        version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
+      },
+    });
+
   useEffect(() => {
     setNotificationsLastUpdated(Date.now());
   }, [notifications]);
 
-  const getKey = <T extends string | number>(notification: Pick<Notification<T>, 'type' | 'id'>) =>
-    `${notification.type}/${notification.id}`;
+  const getKey = useCallback(
+    <T extends string | number>(notification: Pick<Notification<T>, 'type' | 'id'>) =>
+      `${notification.type}/${notification.id}`,
+    []
+  );
 
   // Display data
   const [notificationsDisplayData, setNotificationsDisplayData] = useState(
@@ -54,29 +72,46 @@ const useNotificationsContext = () => {
     [notificationsDisplayData]
   );
 
+  // Check for version changes
+  useEffect(() => {
+    if (
+      notificationPreferences.version !==
+      LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences]
+    ) {
+      setNotificationPreferences({
+        [NotificationType.AbacusGenerated]: true,
+        [NotificationType.SquidTransfer]: true,
+        version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
+      });
+    }
+  }, []);
+
   // Status changes
   const updateStatus = useCallback(
     (notification: Notification, status: NotificationStatus) => {
       notification.status = status;
       notification.timestamps[notification.status] = Date.now();
-      setNotifications({ ...notifications });
+      setNotifications({ ...notifications, [getKey(notification)]: notification });
     },
-    [notifications]
+    [notifications, getKey]
   );
 
   const { markUnseen, markSeen, markCleared } = useMemo(
     () => ({
       markUnseen: (notification: Notification) => {
-        if (notification.status < NotificationStatus.Unseen)
+        if (notification.status < NotificationStatus.Unseen) {
           updateStatus(notification, NotificationStatus.Unseen);
+        }
       },
       markSeen: (notification: Notification) => {
-        if (notification.status < NotificationStatus.Seen)
+        if (notification.status < NotificationStatus.Seen) {
           updateStatus(notification, NotificationStatus.Seen);
+        }
       },
       markCleared: (notification: Notification) => {
-        if (notification.status < NotificationStatus.Cleared)
+        if (notification.status < NotificationStatus.Cleared) {
           updateStatus(notification, NotificationStatus.Cleared);
+        }
       },
     }),
     [updateStatus]
@@ -97,33 +132,37 @@ const useNotificationsContext = () => {
 
           const notification = notifications[key];
 
-          // New unique key - create new notification
-          if (!notification) {
-            const notification = (notifications[key] = {
-              id,
-              type,
-              timestamps: {},
-              updateKey,
-            } as Notification);
+          // Filter out notifications that are not enabled
+          if (notificationPreferences[type] !== false) {
+            // New unique key - create new notification
+            if (!notification) {
+              const notification = (notifications[key] = {
+                id,
+                type,
+                timestamps: {},
+                updateKey,
+              } as Notification);
+              updateStatus(
+                notification,
+                isNew ? NotificationStatus.Triggered : NotificationStatus.Cleared
+              );
+            } else if (JSON.stringify(updateKey) !== JSON.stringify(notification.updateKey)) {
+              // updateKey changed - update existing notification
 
-            updateStatus(
-              notification,
-              isNew ? NotificationStatus.Triggered : NotificationStatus.Cleared
-            );
-          }
+              const notification = notifications[key];
 
-          // updateKey changed - update existing notification
-          else if (JSON.stringify(updateKey) !== JSON.stringify(notification.updateKey)) {
-            const notification = notifications[key];
-
-            notification.updateKey = updateKey;
-            updateStatus(notification, NotificationStatus.Updated);
+              notification.updateKey = updateKey;
+              updateStatus(notification, NotificationStatus.Updated);
+            }
+          } else {
+            // Notification is disabled - remove it
+            delete notifications[key];
           }
 
           notificationsDisplayData[key] = displayData;
           setNotificationsDisplayData({ ...notificationsDisplayData });
         },
-        [notifications, updateStatus]
+        [notifications, updateStatus, notificationPreferences[type]]
       ),
 
       lastUpdated: notificationsLastUpdated,
@@ -136,10 +175,8 @@ const useNotificationsContext = () => {
     )
   );
 
-  const onNotificationAction = useCallback(
-    async (notification: Notification) => await actions[notification.type]?.(notification.id),
-    [actions]
-  );
+  const onNotificationAction = async (notification: Notification) =>
+    await actions[notification.type]?.(notification.id);
 
   // Push notifications
   const [hasEnabledPush, setHasEnabledPush] = useLocalStorage({
@@ -186,7 +223,7 @@ const useNotificationsContext = () => {
             renotify: true,
             tag: getKey(notification),
             data: notification,
-            body: displayData.description,
+            description: displayData.body,
             icon: iconUrl ?? '/favicon.svg',
             badge: iconUrl ?? '/favicon.svg',
             image: iconUrl ?? '/favicon.svg',
@@ -208,7 +245,7 @@ const useNotificationsContext = () => {
 
       setPushNotificationsLastUpdated(Date.now());
     })();
-  }, [hasEnabledPush, notifications, onNotificationAction, markSeen]);
+  }, [hasEnabledPush, notifications, markSeen]);
 
   // Menu state
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -239,5 +276,13 @@ const useNotificationsContext = () => {
     // Menu state
     isMenuOpen,
     setIsMenuOpen,
+
+    // Notification Preferences
+    notificationPreferences,
+    setNotificationPreferences,
+    getNotificationPreferenceForType: useCallback(
+      (type: NotificationType) => notificationPreferences[type],
+      [notificationPreferences]
+    ),
   };
 };

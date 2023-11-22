@@ -3,31 +3,49 @@ import styled, { AnyStyledComponent } from 'styled-components';
 
 import { type MenuConfig } from '@/constants/menus';
 
-import { Dialog, DialogPlacement } from '@/components/Dialog';
-import { ComboboxMenu } from '@/components/ComboboxMenu';
+import { Dialog, DialogPlacement, type DialogProps } from '@/components/Dialog';
+import { ComboboxMenu, type ComboboxMenuProps } from '@/components/ComboboxMenu';
 
 type ElementProps<MenuItemValue extends string | number, MenuGroupValue extends string | number> = {
-  isOpen?: boolean;
-  setIsOpen?: (open: boolean) => void;
   title?: React.ReactNode;
   description?: React.ReactNode;
-  slotTrigger?: React.ReactNode;
-  slotHeaderInner?: React.ReactNode;
-  slotFooter?: React.ReactNode;
   children?: React.ReactNode;
-
   items: MenuConfig<MenuItemValue, MenuGroupValue>;
-  onItemSelected?: () => void;
-  inputPlaceholder?: string;
-  slotEmpty?: React.ReactNode;
 };
 
 type StyleProps = {
-  placement: DialogPlacement,
   className?: string;
 };
 
-export const ComboboxDialogMenu = <MenuItemValue extends string | number, MenuGroupValue extends string | number>({
+type PickComboxMenuProps<
+  MenuItemValue extends string | number,
+  MenuGroupValue extends string | number
+> = Pick<
+  ComboboxMenuProps<MenuItemValue, MenuGroupValue>,
+  | 'inputPlaceholder'
+  | 'onItemSelected'
+  | 'slotEmpty'
+  | 'withItemBorders'
+  | 'withSearch'
+  | 'withStickyLayout'
+>;
+
+type PickDialogProps = Pick<
+  DialogProps,
+  | 'description'
+  | 'isOpen'
+  | 'placement'
+  | 'setIsOpen'
+  | 'slotHeaderInner'
+  | 'slotTrigger'
+  | 'slotFooter'
+  | 'preventClose'
+>;
+
+export const ComboboxDialogMenu = <
+  MenuItemValue extends string | number,
+  MenuGroupValue extends string | number
+>({
   isOpen = false,
   setIsOpen,
   title,
@@ -40,11 +58,18 @@ export const ComboboxDialogMenu = <MenuItemValue extends string | number, MenuGr
   onItemSelected,
   inputPlaceholder,
   slotEmpty,
+  withItemBorders,
+  withSearch,
+  withStickyLayout = true,
   children,
-  
+
   placement = DialogPlacement.Default,
+  preventClose,
   className,
-}: ElementProps<MenuItemValue, MenuGroupValue> & StyleProps) => (
+}: ElementProps<MenuItemValue, MenuGroupValue> &
+  PickComboxMenuProps<MenuItemValue, MenuGroupValue> &
+  PickDialogProps &
+  StyleProps) => (
   // TODO: sub-menu state management
   <Styled.Dialog
     isOpen={isOpen}
@@ -54,8 +79,8 @@ export const ComboboxDialogMenu = <MenuItemValue extends string | number, MenuGr
     slotHeaderInner={slotHeaderInner}
     slotTrigger={slotTrigger}
     slotFooter={slotFooter}
-
     placement={placement}
+    preventClose={preventClose}
     className={className}
   >
     <Styled.ComboboxMenu
@@ -64,7 +89,9 @@ export const ComboboxDialogMenu = <MenuItemValue extends string | number, MenuGr
       title={title}
       inputPlaceholder={inputPlaceholder}
       slotEmpty={slotEmpty}
-      withStickyLayout
+      withItemBorders={withItemBorders}
+      withSearch={withSearch}
+      withStickyLayout={withStickyLayout}
     />
     {children}
   </Styled.Dialog>
@@ -75,6 +102,8 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.Dialog = styled(Dialog)`
   /* Params */
   --comboboxDialogMenu-backgroundColor: var(--color-layer-2);
+  --comboboxDialogMenu-item-gap: 0.5rem;
+  --comboboxDialogMenu-item-padding: 0.5rem 1rem;
 
   /* Overrides */
   & {
@@ -98,4 +127,6 @@ Styled.Dialog = styled(Dialog)`
 
 Styled.ComboboxMenu = styled(ComboboxMenu)`
   --comboboxMenu-backgroundColor: var(--comboboxDialogMenu-backgroundColor);
+  --comboboxMenu-item-gap: var(--comboboxDialogMenu-item-gap);
+  --comboboxMenu-item-padding: var(--comboboxDialogMenu-item-padding);
 `;

@@ -33,6 +33,8 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.DropdownSelectMenu = styled(DropdownSelectMenu)`
   ${headerMixins.dropdownTrigger}
 
+  width: max-content;
+
   & > span:first-of-type {
     ${layoutMixins.textOverflow}
     max-width: 5.625rem;

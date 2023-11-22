@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import abacusStateManager from '@/lib/abacus';
+
 import appMiddleware from './appMiddleware';
 import localizationMiddleware from './localizationMiddleware';
-import routerMiddleware from './routerMiddleware';
 
 import { accountSlice } from './account';
 import { appSlice } from './app';
@@ -13,8 +13,8 @@ import { dialogsSlice } from './dialogs';
 import { inputsSlice } from './inputs';
 import { layoutSlice } from './layout';
 import { localizationSlice } from './localization';
-import { navigationSlice } from './navigation';
 import { perpetualsSlice } from './perpetuals';
+import { notificationsSlice } from './notifications';
 
 export const commandMenuSlices = [layoutSlice, localizationSlice];
 
@@ -28,7 +28,7 @@ export const store = configureStore({
     inputs: inputsSlice.reducer,
     layout: layoutSlice.reducer,
     localization: localizationSlice.reducer,
-    navigation: navigationSlice.reducer,
+    notifications: notificationsSlice.reducer,
     perpetuals: perpetualsSlice.reducer,
   },
 
@@ -38,7 +38,6 @@ export const store = configureStore({
     }),
     appMiddleware,
     localizationMiddleware,
-    routerMiddleware,
   ],
 
   devTools: process.env.NODE_ENV !== 'production',

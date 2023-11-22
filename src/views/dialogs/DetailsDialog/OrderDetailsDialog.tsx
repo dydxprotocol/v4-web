@@ -194,7 +194,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
 
   return (
     <DetailsDialog
-      slotIcon={<Styled.AssetIcon symbol={asset.symbol} />}
+      slotIcon={<Styled.AssetIcon symbol={asset.id} />}
       title={!resources.typeStringKey ? '' : stringGetter({ key: resources.typeStringKey })}
       slotFooter={
         isAccountViewOnly ? null : isOrderStatusClearable(status) ? (

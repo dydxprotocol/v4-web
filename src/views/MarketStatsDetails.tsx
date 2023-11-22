@@ -45,7 +45,7 @@ const defaultMarketStatistics = Object.values(MarketStats);
 export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-  const { symbol = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { id = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const { tickSizeDecimals } = useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
   const midMarketPrice = useSelector(getCurrentMarketMidMarketPrice);
   const lastMidMarketPrice = useRef(midMarketPrice);
@@ -116,7 +116,7 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
                   <Styled.Output
                     type={OutputType.Number}
                     value={value}
-                    tag={symbol}
+                    tag={id}
                     fractionDigits={LARGE_TOKEN_DECIMALS}
                   />
                 );
@@ -198,8 +198,6 @@ Styled.Details = styled(Details)`
   @media ${breakpoints.tablet} {
     ${layoutMixins.withOuterAndInnerBorders}
 
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
     font: var(--font-small-book);
 
     > * {

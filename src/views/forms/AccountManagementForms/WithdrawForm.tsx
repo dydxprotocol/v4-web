@@ -3,15 +3,25 @@ import type { ChangeEvent, FormEvent } from 'react';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
-import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
+import { isAddress } from 'viem';
 
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { NumberSign, QUANTUM_MULTIPLIER } from '@/constants/numbers';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { NotificationStatus } from '@/constants/notifications';
+import { NumberSign } from '@/constants/numbers';
 
-import { useDebounce, useStringGetter, useSubaccount } from '@/hooks';
+import {
+  useAccounts,
+  useDebounce,
+  useDydxClient,
+  useRestrictions,
+  useSelectedNetwork,
+  useStringGetter,
+  useSubaccount,
+} from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -26,6 +36,7 @@ import { Link } from '@/components/Link';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
+import { Icon, IconName } from '@/components/Icon';
 
 import { ChainSelectMenu } from '@/views/forms/AccountManagementForms/ChainSelectMenu';
 
@@ -40,8 +51,9 @@ import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceip
 
 export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
+  const { selectedNetwork } = useSelectedNetwork();
 
   const { sendSquidWithdraw } = useSubaccount();
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
@@ -57,7 +69,11 @@ export const WithdrawForm = () => {
     chain: chainIdStr,
     address: toAddress,
     resources,
+    errors: routeErrors,
+    errorMessage: routeErrorMessage,
   } = useSelector(getTransferInputs, shallowEqual) || {};
+
+  const isValidAddress = toAddress && isAddress(toAddress);
 
   const toToken = useMemo(
     () => (token ? resources?.tokenResources?.get(token) : undefined),
@@ -67,9 +83,11 @@ export const WithdrawForm = () => {
   const { addTransferNotification } = useLocalNotifications();
 
   // Async Data
-  const debouncedAmountBN = MustBigNumber(debouncedAmount);
-  const withdrawAmountBN = MustBigNumber(withdrawAmount);
-  const freeCollateralBN = MustBigNumber(freeCollateral?.current);
+  const debouncedAmountBN = useMemo(() => MustBigNumber(debouncedAmount), [debouncedAmount]);
+  const freeCollateralBN = useMemo(
+    () => MustBigNumber(freeCollateral?.current),
+    [freeCollateral?.current]
+  );
 
   useEffect(() => {
     abacusStateManager.setTransferValue({
@@ -101,50 +119,86 @@ export const WithdrawForm = () => {
             value: debouncedAmount,
             field: TransferInputField.usdcSize,
           });
-          setError(null);
+          setError(undefined);
         }
       } catch (error) {
-        setError(error);
+        setError(error.message);
       } finally {
         setIsLoading(false);
       }
     };
 
     setTransferValue();
-  }, [debouncedAmountBN.toNumber()]);
+  }, [debouncedAmountBN]);
+
+  const { screenAddresses } = useDydxClient();
+  const { dydxAddress } = useAccounts();
 
   const onSubmit = useCallback(
     async (e: FormEvent) => {
       try {
         e.preventDefault();
 
-        if (!requestPayload?.data || !debouncedAmountBN.toNumber()) {
+        if (!requestPayload?.data || !debouncedAmountBN.toNumber() || !toAddress || !dydxAddress) {
           throw new Error('Invalid request payload');
         }
 
         setIsLoading(true);
-        const txHash = await sendSquidWithdraw(debouncedAmountBN.toNumber(), requestPayload?.data);
+        setError(undefined);
 
-        if (txHash?.hash) {
-          const hash = `0x${Buffer.from(txHash.hash).toString('hex')}`;
+        const screenResults = await screenAddresses({
+          addresses: [toAddress, dydxAddress],
+        });
 
-          addTransferNotification({
-            txHash: hash,
-            fromChainId: TESTNET_CHAIN_ID,
-            toChainId: chainIdStr || undefined,
-            toAmount: debouncedAmountBN.toNumber(),
-            triggeredAt: Date.now(),
-          });
-          abacusStateManager.clearTransferInputValues();
-          setWithdrawAmount('');
+        if (screenResults?.[dydxAddress]) {
+          setError(
+            stringGetter({
+              key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_ORIGINATION_ERROR_MESSAGE,
+            })
+          );
+        } else if (screenResults?.[toAddress]) {
+          setError(
+            stringGetter({
+              key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_DESTINATION_ERROR_MESSAGE,
+            })
+          );
+        } else {
+          const txHash = await sendSquidWithdraw(debouncedAmountBN.toNumber(), requestPayload.data);
+          if (txHash?.hash) {
+            const hash = `0x${Buffer.from(txHash.hash).toString('hex')}`;
+            addTransferNotification({
+              txHash: hash,
+              fromChainId: ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId,
+              toChainId: chainIdStr || undefined,
+              toAmount: debouncedAmountBN.toNumber(),
+              triggeredAt: Date.now(),
+              notificationStatus: NotificationStatus.Triggered,
+            });
+            abacusStateManager.clearTransferInputValues();
+            setWithdrawAmount('');
+          }
         }
       } catch (error) {
-        setError(error);
+        if (error?.code === 429) {
+          setError(stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_MESSAGE }));
+        } else {
+          setError(
+            error.message
+              ? stringGetter({
+                  key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+                  params: {
+                    ERROR_MESSAGE:
+                      error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
+                  },
+                })
+              : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })
+          );
+        }
       } finally {
         setIsLoading(false);
       }
     },
-    [requestPayload, debouncedAmountBN, chainIdStr]
+    [requestPayload, debouncedAmountBN, chainIdStr, toAddress, screenAddresses, stringGetter]
   );
 
   const onChangeAddress = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -175,11 +229,10 @@ export const WithdrawForm = () => {
 
   const onClickMax = useCallback(() => {
     setWithdrawAmount(freeCollateralBN.toString());
-  }, [freeCollateral?.current, setWithdrawAmount]);
+  }, [freeCollateralBN, setWithdrawAmount]);
 
   const onSelectChain = useCallback((chain: string) => {
     if (chain) {
-      abacusStateManager.clearTransferInputValues();
       abacusStateManager.setTransferValue({
         field: TransferInputField.chain,
         value: chain,
@@ -190,7 +243,6 @@ export const WithdrawForm = () => {
 
   const onSelectToken = useCallback((token: TransferInputTokenResource) => {
     if (token) {
-      abacusStateManager.clearTransferInputValues();
       abacusStateManager.setTransferValue({
         field: TransferInputField.token,
         value: token.address,
@@ -213,7 +265,7 @@ export const WithdrawForm = () => {
           value={freeCollateral?.current}
           newValue={freeCollateral?.postOrder}
           sign={NumberSign.Negative}
-          hasInvalidNewValue={withdrawAmountBN.minus(freeCollateralBN).isNegative()}
+          hasInvalidNewValue={MustBigNumber(withdrawAmount).minus(freeCollateralBN).isNegative()}
           withDiff={
             Boolean(withdrawAmount) && !debouncedAmountBN.isNaN() && !debouncedAmountBN.isZero()
           }
@@ -222,17 +274,31 @@ export const WithdrawForm = () => {
     },
   ];
 
+  const { sanctionedAddresses } = useRestrictions();
+
   const errorMessage = useMemo(() => {
     if (error) {
-      return error?.message
+      return stringGetter({
+        key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+        params: { ERROR_MESSAGE: error },
+      });
+    }
+
+    if (routeErrors) {
+      return routeErrorMessage
         ? stringGetter({
             key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-            params: { ERROR_MESSAGE: error.message },
+            params: { ERROR_MESSAGE: routeErrorMessage },
           })
         : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG });
     }
 
     if (!toAddress) return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ADDRESS });
+
+    if (sanctionedAddresses.has(toAddress))
+      return stringGetter({
+        key: STRING_KEYS.TRANSFER_INVALID_DYDX_ADDRESS,
+      });
 
     if (debouncedAmountBN) {
       if (!chainIdStr) {
@@ -247,7 +313,18 @@ export const WithdrawForm = () => {
     }
 
     return undefined;
-  }, [error, freeCollateralBN, chainIdStr, debouncedAmountBN, toToken]);
+  }, [
+    error,
+    routeErrors,
+    routeErrorMessage,
+    freeCollateralBN,
+    chainIdStr,
+    debouncedAmountBN,
+    toToken,
+    toAddress,
+    sanctionedAddresses,
+    stringGetter,
+  ]);
 
   const isDisabled =
     !!errorMessage ||
@@ -255,7 +332,8 @@ export const WithdrawForm = () => {
     !chainIdStr ||
     !toAddress ||
     debouncedAmountBN.isNaN() ||
-    debouncedAmountBN.isZero();
+    debouncedAmountBN.isZero() ||
+    isLoading;
 
   return (
     <Styled.Form onSubmit={onSubmit}>
@@ -265,7 +343,12 @@ export const WithdrawForm = () => {
           placeholder={stringGetter({ key: STRING_KEYS.ADDRESS })}
           onChange={onChangeAddress}
           value={toAddress || ''}
-          label={stringGetter({ key: STRING_KEYS.DESTINATION })}
+          label={
+            <span>
+              {stringGetter({ key: STRING_KEYS.DESTINATION })}{' '}
+              {isValidAddress ? <Styled.CheckIcon iconName={IconName.Check} /> : null}
+            </span>
+          }
         />
         <ChainSelectMenu
           label={stringGetter({ key: STRING_KEYS.NETWORK })}
@@ -288,14 +371,16 @@ export const WithdrawForm = () => {
         />
       </Styled.WithDetailsReceipt>
       {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
-      <WithdrawButtonAndReceipt
-        isDisabled={isDisabled}
-        isLoading={isLoading}
-        setSlippage={onSetSlippage}
-        slippage={slippage}
-        withdrawChain={chainIdStr || undefined}
-        withdrawToken={toToken || undefined}
-      />
+      <Styled.Footer>
+        <WithdrawButtonAndReceipt
+          isDisabled={isDisabled}
+          isLoading={isLoading}
+          setSlippage={onSetSlippage}
+          slippage={slippage}
+          withdrawChain={chainIdStr || undefined}
+          withdrawToken={toToken || undefined}
+        />
+      </Styled.Footer>
     </Styled.Form>
   );
 };
@@ -307,14 +392,12 @@ Styled.DiffOutput = styled(DiffOutput)`
 `;
 
 Styled.Form = styled.form`
-  --form-input-height: 3.5rem;
+  ${formMixins.transfersForm}
+`;
 
-  min-height: calc(100% - var(--stickyArea0-bottomHeight));
-
-  ${layoutMixins.flexColumn}
-  gap: 1.25rem;
-
-  ${layoutMixins.stickyArea1}
+Styled.Footer = styled.footer`
+  ${formMixins.footer}
+  --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
 `;
 
 Styled.DestinationRow = styled.div`
@@ -341,4 +424,11 @@ Styled.TransactionInfo = styled.span`
 
 Styled.FormInputButton = styled(Button)`
   ${formMixins.inputInnerButton}
+`;
+
+Styled.CheckIcon = styled(Icon)`
+  margin: 0 1ch;
+
+  color: var(--color-positive);
+  font-size: 0.625rem;
 `;

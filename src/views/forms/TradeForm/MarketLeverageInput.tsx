@@ -30,8 +30,8 @@ import { getSelectedOrderSide, hasPositionSideChanged } from '@/lib/tradeData';
 import { LeverageSlider } from './LeverageSlider';
 
 type ElementProps = {
-  leverageInputValue: Nullable<number>;
-  setLeverageInputValue: Dispatch<SetStateAction<Nullable<number>>>;
+  leverageInputValue: string;
+  setLeverageInputValue: (value: string) => void;
 };
 
 export const MarketLeverageInput = ({
@@ -66,7 +66,7 @@ export const MarketLeverageInput = ({
     const newLeverage = MustBigNumber(floatValue).toFixed();
 
     if (value === '' || newLeverage === 'NaN' || !floatValue) {
-      setLeverageInputValue(null);
+      setLeverageInputValue('');
       abacusStateManager.setTradeValue({
         value: null,
         field: TradeInputField.leverage,
@@ -84,7 +84,7 @@ export const MarketLeverageInput = ({
         ? newLeverageBN.abs().negated()
         : newLeverageBN.abs();
 
-    setLeverageInputValue(newLeverageSignedBN.toNumber());
+    setLeverageInputValue(newLeverageSignedBN.toString());
 
     abacusStateManager.setTradeValue({
       value: newLeverageSignedBN.toFixed(LEVERAGE_DECIMALS),
@@ -98,11 +98,11 @@ export const MarketLeverageInput = ({
     if (leveragePosition === PositionSide.None) return;
 
     const inputValue = leverageInputValue || currentLeverage;
-    const newInputValue = MustBigNumber(inputValue).negated().toNumber();
+    const newInputValue = MustBigNumber(inputValue).negated().toFixed(LEVERAGE_DECIMALS);
 
     setLeverageInputValue(newInputValue);
     abacusStateManager.setTradeValue({
-      value: newInputValue.toFixed(LEVERAGE_DECIMALS),
+      value: newInputValue,
       field: TradeInputField.leverage,
     });
   };
@@ -153,9 +153,7 @@ export const MarketLeverageInput = ({
           value: MustBigNumber(leverageAmount).toFixed(LEVERAGE_DECIMALS),
         }))}
         value={MustBigNumber(formattedLeverageValue).abs().toFixed(LEVERAGE_DECIMALS)} // sign agnostic
-        onValueChange={(option?: number) =>
-          updateLeverage(option === undefined ? formattedLeverageValue : option)
-        }
+        onValueChange={updateLeverage}
         shape={ButtonShape.Rectangle}
       />
     </>

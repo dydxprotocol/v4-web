@@ -3,6 +3,7 @@ import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import { AnalyticsEvent } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
+import { isMainnet } from '@/constants/networks';
 import { EvmDerivedAccountStatus, OnboardingSteps } from '@/constants/account';
 import { wallets } from '@/constants/wallets';
 
@@ -26,6 +27,7 @@ import { track } from '@/lib/analytics';
 import { AcknowledgeTerms } from './OnboardingDialog/AcknowledgeTerms';
 import { ChooseWallet } from './OnboardingDialog/ChooseWallet';
 import { GenerateKeys } from './OnboardingDialog/GenerateKeys';
+import { DepositForm } from '../forms/AccountManagementForms/DepositForm';
 
 type ElementProps = {
   setIsOpen?: (open: boolean) => void;
@@ -37,7 +39,7 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { isMobile } = useBreakpoints();
 
-  const { walletType } = useAccounts();
+  const { disconnect, walletType } = useAccounts();
 
   const currentOnboardingStep = useSelector(calculateOnboardingStep);
 
@@ -45,10 +47,17 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
     if (!currentOnboardingStep) setIsOpen?.(false);
   }, [currentOnboardingStep]);
 
+  const setIsOpenFromDialog = (open: boolean) => {
+    if (!open && currentOnboardingStep === OnboardingSteps.AcknowledgeTerms) {
+      disconnect();
+    }
+    setIsOpen?.(open);
+  };
+
   return (
     <Styled.Dialog
       isOpen={Boolean(currentOnboardingStep)}
-      setIsOpen={setIsOpen}
+      setIsOpen={setIsOpenFromDialog}
       {...(currentOnboardingStep &&
         {
           [OnboardingSteps.ChooseWallet]: {
@@ -75,10 +84,7 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
             description: stringGetter({ key: STRING_KEYS.SIGNATURE_CREATES_COSMOS_WALLET }),
             children: (
               <Styled.Content>
-                <GenerateKeys
-                  status={derivationStatus}
-                  setStatus={setDerivationStatus}
-                />
+                <GenerateKeys status={derivationStatus} setStatus={setDerivationStatus} />
               </Styled.Content>
             ),
             width: '23rem',
@@ -87,21 +93,29 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
             title: stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TERMS }),
             children: (
               <Styled.Content>
-                <AcknowledgeTerms />
+                <AcknowledgeTerms onClose={() => setIsOpenFromDialog?.(false)} />
               </Styled.Content>
             ),
-            width: '20rem',
+            width: '30rem',
           },
           [OnboardingSteps.DepositFunds]: {
             title: stringGetter({ key: STRING_KEYS.DEPOSIT }),
-            description: 'Test funds will be sent directly to your dYdX account.',
+            description: !isMainnet && 'Test funds will be sent directly to your dYdX account.',
             children: (
               <Styled.Content>
-                <TestnetDepositForm
-                  onDeposit={() => {
-                    track(AnalyticsEvent.TransferFaucet);
-                  }}
-                />
+                {isMainnet ? (
+                  <DepositForm
+                    onDeposit={() => {
+                      track(AnalyticsEvent.TransferDeposit);
+                    }}
+                  />
+                ) : (
+                  <TestnetDepositForm
+                    onDeposit={() => {
+                      track(AnalyticsEvent.TransferFaucet);
+                    }}
+                  />
+                )}
               </Styled.Content>
             ),
           },

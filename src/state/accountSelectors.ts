@@ -337,3 +337,18 @@ export const getUserStats = (state: RootState) => ({
  * @returns user wallet balances
  */
 export const getBalances = (state: RootState) => state.account?.balances;
+
+/**
+ *  @returns user wallet staking balances
+ * */
+export const getStakingBalances = (state: RootState) => state.account?.stakingBalances;
+
+/**
+ * @returns UsageRestriction of the current session
+ */
+export const getUsageRestriction = (state: RootState) => state.account.restriction;
+
+/**
+ * @returns RestrictionType from the current session
+ */
+export const getRestrictionType = (state: RootState) => state.account.restriction?.restriction;

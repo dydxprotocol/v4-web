@@ -12,6 +12,7 @@ import type {
   SubaccountTransfers,
   HistoricalPnlPeriods,
   SubAccountHistoricalPNLs,
+  UsageRestriction,
 } from '@/constants/abacus';
 
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
@@ -21,33 +22,46 @@ import { WalletType } from '@/constants/wallets';
 import { getLocalStorage } from '@/lib/localStorage';
 
 export type AccountState = {
+  balances?: Record<string, AccountBalance>;
+  stakingBalances?: Record<string, AccountBalance>;
+  wallet?: Nullable<Wallet>;
+  walletType?: WalletType;
+
+  subaccount?: Nullable<Subaccount>;
   fills?: SubaccountFills;
   fundingPayments?: SubaccountFundingPayments;
   transfers?: SubaccountTransfers;
+  historicalPnl?: SubAccountHistoricalPNLs;
+
+  onboardingGuards: Record<OnboardingGuard, boolean | undefined>;
+  onboardingState: OnboardingState;
+
   clearedOrderIds?: string[];
   hasUnseenFillUpdates: boolean;
   hasUnseenOrderUpdates: boolean;
-  historicalPnl?: SubAccountHistoricalPNLs;
   latestOrder?: Nullable<SubaccountOrder>;
-  onboardingGuards: Record<OnboardingGuard, boolean | undefined>;
-  onboardingState: OnboardingState;
-  subaccount?: Nullable<Subaccount>;
-  uncommittedOrderClientIds: number[];
-  wallet?: Nullable<Wallet>;
-  walletType?: WalletType;
   historicalPnlPeriod?: HistoricalPnlPeriods;
-  balances?: Record<string, AccountBalance>;
+  uncommittedOrderClientIds: number[];
+
+  restriction?: Nullable<UsageRestriction>;
 };
 
 const initialState: AccountState = {
+  // Wallet
+  balances: undefined,
+  wallet: undefined,
+  walletType: getLocalStorage<WalletType>({
+    key: LocalStorageKey.OnboardingSelectedWalletType,
+  }),
+
+  // Subaccount
+  subaccount: undefined,
   fills: undefined,
   fundingPayments: undefined,
   transfers: undefined,
-  clearedOrderIds: undefined,
-  hasUnseenFillUpdates: false,
-  hasUnseenOrderUpdates: false,
   historicalPnl: undefined,
-  latestOrder: undefined,
+
+  // Onboarding
   onboardingGuards: {
     [OnboardingGuard.hasAcknowledgedTerms]: Boolean(
       getLocalStorage<boolean>({
@@ -58,12 +72,17 @@ const initialState: AccountState = {
     [OnboardingGuard.hasPreviousTransactions]: undefined,
   },
   onboardingState: OnboardingState.Disconnected,
-  subaccount: undefined,
+
+  // UI
+  clearedOrderIds: undefined,
+  hasUnseenFillUpdates: false,
+  hasUnseenOrderUpdates: false,
+  latestOrder: undefined,
   uncommittedOrderClientIds: [],
-  wallet: undefined,
-  walletType: getLocalStorage<WalletType>({
-    key: LocalStorageKey.OnboardingSelectedWalletType,
-  }),
+  historicalPnlPeriod: undefined,
+
+  // Restriction
+  restriction: undefined,
 };
 
 export const accountSlice = createSlice({
@@ -123,6 +142,9 @@ export const accountSlice = createSlice({
         state.historicalPnl = action.payload;
       }
     },
+    setRestrictionType: (state, action: PayloadAction<Nullable<UsageRestriction>>) => {
+      state.restriction = action.payload;
+    },
     setSubaccount: (state, action: PayloadAction<Nullable<Subaccount>>) => {
       const existingOrderIds = state.subaccount?.orders
         ? state.subaccount.orders.toArray().map((order) => order.id)
@@ -154,6 +176,9 @@ export const accountSlice = createSlice({
     setBalances: (state, action: PayloadAction<Record<string, AccountBalance>>) => {
       state.balances = action.payload;
     },
+    setStakingBalances: (state, action: PayloadAction<Record<string, AccountBalance>>) => {
+      state.stakingBalances = action.payload;
+    },
     addUncommittedOrderClientId: (state, action: PayloadAction<number>) => {
       state.uncommittedOrderClientIds.push(action.payload);
     },
@@ -174,11 +199,13 @@ export const {
   setOnboardingGuard,
   setOnboardingState,
   setHistoricalPnl,
+  setRestrictionType,
   setSubaccount,
   setWallet,
   viewedFills,
   viewedOrders,
   setBalances,
+  setStakingBalances,
   addUncommittedOrderClientId,
   removeUncommittedOrderClientId,
 } = accountSlice.actions;

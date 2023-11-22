@@ -1,9 +1,8 @@
 import { useMemo } from 'react';
-import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 import { StatusResponse } from '@0xsquid/sdk';
-import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter, useSelectedNetwork, useURLConfigs } from '@/hooks';
 
 import { Link } from '@/components/Link';
 import { Icon, IconName } from '@/components/Icon';
@@ -12,9 +11,15 @@ import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { STRING_KEYS } from '@/constants/localization';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
 type ElementProps = {
   status?: StatusResponse;
+  type: 'withdrawal' | 'deposit';
+};
+
+type StyleProps = {
+  className?: string;
 };
 
 enum TransferStatusStep {
@@ -24,14 +29,18 @@ enum TransferStatusStep {
   Complete,
 }
 
-export const TransferStatusSteps = ({ status }: ElementProps) => {
+export const TransferStatusSteps = ({ className, status, type }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
+  const { selectedNetwork } = useSelectedNetwork();
+  const { mintscan: mintscanTxUrl } = useURLConfigs();
+  const dydxChainId = ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId;
 
-  const { currentStep, steps, type } = useMemo(() => {
+  const { currentStep, steps } = useMemo(() => {
     const routeStatus = status?.routeStatus;
     const fromChain = status?.fromChain?.chainData?.chainId;
     const toChain = status?.toChain?.chainData?.chainId;
-    const type = toChain === TESTNET_CHAIN_ID ? 'deposit' : 'withdrawal';
+
+    const currentStatus = routeStatus?.[routeStatus?.length - 1];
 
     const steps = [
       {
@@ -40,7 +49,12 @@ export const TransferStatusSteps = ({ status }: ElementProps) => {
             type === 'deposit' ? STRING_KEYS.INITIATED_DEPOSIT : STRING_KEYS.INITIATED_WITHDRAWAL,
         }),
         step: TransferStatusStep.FromChain,
-        link: status?.fromChain?.transactionUrl,
+        link: 
+          type === 'deposit'
+            ? status?.fromChain?.transactionUrl
+            : routeStatus?.[0]?.chainId === dydxChainId && routeStatus[0].txHash
+            ? `${mintscanTxUrl?.replace('{tx_hash}', routeStatus[0].txHash.replace('0x', ''))}`
+            : undefined,
       },
       {
         label: stringGetter({ key: STRING_KEYS.BRIDGING_TOKENS }),
@@ -51,15 +65,18 @@ export const TransferStatusSteps = ({ status }: ElementProps) => {
         label: stringGetter({
           key: type === 'deposit' ? STRING_KEYS.DEPOSIT_TO_CHAIN : STRING_KEYS.WITHDRAW_TO_CHAIN,
           params: {
-            CHAIN: status?.toChain?.chainData?.chainName,
+            CHAIN: type === 'deposit' ? 'dYdX' : status?.toChain?.chainData?.chainName,
           },
         }),
         step: TransferStatusStep.ToChain,
-        link: status?.toChain?.transactionUrl,
+        link:
+          type === 'withdrawal'
+            ? status?.toChain?.transactionUrl
+            : currentStatus?.chainId === dydxChainId && currentStatus?.txHash
+            ? `${mintscanTxUrl?.replace('{tx_hash}', currentStatus.txHash.replace('0x', ''))}`
+            : undefined,
       },
     ];
-
-    const currentStatus = routeStatus?.[routeStatus?.length - 1];
 
     let currentStep = TransferStatusStep.Bridge;
 
@@ -74,6 +91,10 @@ export const TransferStatusSteps = ({ status }: ElementProps) => {
       currentStep = TransferStatusStep.FromChain;
     }
 
+    if (status?.squidTransactionStatus === 'success') {
+      currentStep = TransferStatusStep.Complete;
+    }
+
     return {
       currentStep,
       steps,
@@ -84,7 +105,7 @@ export const TransferStatusSteps = ({ status }: ElementProps) => {
   if (!status) return <LoadingDots size={3} />;
 
   return (
-    <Styled.BridgingStatus>
+    <Styled.BridgingStatus className={className}>
       {steps.map((step) => (
         <Styled.Step key={step.step}>
           <Styled.row>

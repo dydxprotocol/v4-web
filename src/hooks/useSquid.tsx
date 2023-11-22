@@ -2,13 +2,13 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Squid } from '@0xsquid/sdk';
 
-import { CLIENT_NETWORK_CONFIGS, isDydxV4Network } from '@/constants/networks';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
 
-export const NATIVE_TOKEN_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+export const NATIVE_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 
-export const STATUS_ERROR_GRACE_PERIOD = 120_000;
+export const STATUS_ERROR_GRACE_PERIOD = 300_000;
 
 const useSquidContext = () => {
   const selectedNetwork = useSelector(getSelectedNetwork);
@@ -23,9 +23,10 @@ const useSquidContext = () => {
 
   const squid = useMemo(
     () =>
-      isDydxV4Network(selectedNetwork)
-        ? new Squid({ baseUrl: CLIENT_NETWORK_CONFIGS[selectedNetwork]?.endpoints['0xsquid'] })
-        : undefined,
+      new Squid({
+        baseUrl: ENVIRONMENT_CONFIG_MAP[selectedNetwork]?.endpoints['0xsquid'],
+        integratorId: ENVIRONMENT_CONFIG_MAP[selectedNetwork]?.squidIntegratorId,
+      }),
     [selectedNetwork]
   );
 
@@ -39,7 +40,7 @@ const useSquidContext = () => {
 };
 
 type SquidContextType = ReturnType<typeof useSquidContext>;
-const SquidContext = createContext<SquidContextType>(undefined);
+const SquidContext = createContext<SquidContextType | undefined>(undefined);
 SquidContext.displayName = '0xSquid';
 
 export const SquidProvider = ({ ...props }) => (

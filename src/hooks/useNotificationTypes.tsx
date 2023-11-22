@@ -1,188 +1,213 @@
-import { useCallback, useEffect, useMemo } from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
-import { useSelector, shallowEqual, useDispatch } from 'react-redux';
-import { groupBy } from 'lodash';
+import { type ReactNode, useEffect } from 'react';
+import styled from 'styled-components';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { isEqual, groupBy } from 'lodash';
+import { useNavigate } from 'react-router-dom';
 
-import { AlertType } from '@/constants/alerts';
-import { AbacusOrderStatus, ORDER_SIDES, ORDER_STATUS_STRINGS } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
-import { STRING_KEYS } from '@/constants/localization';
-import { type NotificationTypeConfig, NotificationType } from '@/constants/notifications';
-import { ORDER_SIDE_STRINGS, TRADE_TYPE_STRINGS, TradeTypes } from '@/constants/trade';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { AppRoute } from '@/constants/routes';
+import { DydxChainAsset } from '@/constants/wallets';
 
+import {
+  STRING_KEYS,
+  STRING_KEY_VALUES,
+  type StringGetterFunction,
+  type StringKey,
+} from '@/constants/localization';
+
+import {
+  type NotificationTypeConfig,
+  NotificationType,
+  DEFAULT_TOAST_AUTO_CLOSE_MS,
+} from '@/constants/notifications';
+
+import { useSelectedNetwork, useStringGetter } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
-import { AlertMessage } from '@/components/AlertMessage';
 import { Icon, IconName } from '@/components/Icon';
-import { Output, OutputType } from '@/components/Output';
-import { TransferStatusToast } from '@/views/TransferStatus';
+import { TradeNotification } from '@/views/notifications/TradeNotification';
+import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
 import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
+import { getAbacusNotifications } from '@/state/notificationsSelectors';
+import { getMarketIds } from '@/state/perpetualsSelectors';
 
-import { OrderStatusIcon } from '@/views/OrderStatusIcon';
+import { formatSeconds } from '@/lib/timeUtils';
 
-import { useStringGetter } from './useStringGetter';
-import { TransferStatusSteps } from '@/views/TransferStatusSteps';
-import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
+const parseStringParamsForNotification = ({
+  stringGetter,
+  value,
+}: {
+  stringGetter: StringGetterFunction;
+  value: unknown;
+}): ReactNode => {
+  if (STRING_KEY_VALUES[value as StringKey]) {
+    return stringGetter({ key: value as StringKey });
+  }
 
-export const notificationTypes = [
+  return value as ReactNode;
+};
+
+export const notificationTypes: NotificationTypeConfig[] = [
   {
-    type: NotificationType.OrderStatusChanged,
-
-    useTrigger: ({ trigger, lastUpdated }) => {
+    type: NotificationType.AbacusGenerated,
+    useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
-
-      const orders = useSelector(getSubaccountOrders, shallowEqual) || [];
-      const ordersByOrderId = Object.fromEntries(orders.map((order) => [order.id, order]));
-
-      const fills = useSelector(getSubaccountFills, shallowEqual) || [];
-      const fillsByOrderId = groupBy(fills, (fill) => fill.orderId);
-
-      const orderIds = useMemo(
-        () => [...Object.keys(ordersByOrderId), ...Object.keys(fillsByOrderId)],
-        [orders, fills]
-      );
+      const abacusNotifications = useSelector(getAbacusNotifications, isEqual);
 
       useEffect(() => {
-        for (const orderId of orderIds) {
-          const fills = fillsByOrderId[orderId];
+        for (const abacusNotif of abacusNotifications) {
+          const [abacusNotificationType = '', id = ''] = abacusNotif.id.split(':');
+          const parsedData = abacusNotif.data ? JSON.parse(abacusNotif.data) : {};
 
-          const order =
-            ordersByOrderId[orderId] ??
-            (fills?.length
-              ? {
-                  ...fills[fills.length - 1],
-                  id: orderId,
-                  createdAtMilliseconds: Math.max(
-                    ...fills.map((fill) => fill.createdAtMilliseconds)
+          const params = Object.fromEntries(
+            Object.entries(parsedData).map(([key, value]) => {
+              return [key, parseStringParamsForNotification({ stringGetter, value })];
+            })
+          );
+
+          switch (abacusNotificationType) {
+            case 'order': {
+              trigger(
+                abacusNotif.id,
+                {
+                  icon: abacusNotif.image && <$Icon src={abacusNotif.image} alt="" />,
+                  title: stringGetter({ key: abacusNotif.title }),
+                  body: abacusNotif.text ? stringGetter({ key: abacusNotif.text, params }) : '',
+                  toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+                  toastSensitivity: 'foreground',
+                  renderCustomBody: ({ isToast, notification }) => (
+                    <TradeNotification
+                      isToast={isToast}
+                      data={parsedData}
+                      notification={notification}
+                    />
                   ),
-                  status: AbacusOrderStatus.filled,
-                }
-              : undefined);
-
-          if (order)
-            trigger(
-              order.id,
-              {
-                icon: (
-                  <OrderStatusIcon status={order.status} totalFilled={order.totalFilled ?? 0} />
-                ),
-                title: `${stringGetter({
-                  key: TRADE_TYPE_STRINGS[order.type.rawValue as TradeTypes].tradeTypeKey,
-                })} ${
-                  order.status === AbacusOrderStatus.open && (order?.totalFilled ?? 0) > 0
-                    ? stringGetter({ key: STRING_KEYS.PARTIALLY_FILLED })
-                    : stringGetter({ key: ORDER_STATUS_STRINGS[order.status.name] })
-                }`,
-                description: `${stringGetter({
-                  key: ORDER_SIDE_STRINGS[ORDER_SIDES[order.side.name]],
-                })} ${order.size} ${order.marketId} @ $${order.price}`,
-                actionDescription: 'View Order',
-                actionAltText: 'View this order in the Orders tab or the Notifications menu.',
-                toastSensitivity:
-                  order.status === AbacusOrderStatus.pending ? 'foreground' : 'background',
-                toastDuration: 5000,
-              },
-              [order.status.name, order.size],
-              !order.createdAtMilliseconds || order.createdAtMilliseconds > lastUpdated
-            );
+                },
+                [abacusNotif.updateTimeInMilliseconds, abacusNotif.data],
+                true
+              );
+              break;
+            }
+            default:
+              trigger(
+                abacusNotif.id,
+                {
+                  icon: abacusNotif.image && <$Icon src={abacusNotif.image} alt="" />,
+                  title: stringGetter({ key: abacusNotif.title }),
+                  body: abacusNotif.text ? stringGetter({ key: abacusNotif.text, params }) : '',
+                  toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+                  toastSensitivity: 'foreground',
+                },
+                [abacusNotif.updateTimeInMilliseconds, abacusNotif.data]
+              );
+              break;
+          }
         }
-      }, [orderIds]);
+      }, [abacusNotifications, stringGetter]);
     },
-
     useNotificationAction: () => {
       const dispatch = useDispatch();
+      const orders = useSelector(getSubaccountOrders, shallowEqual) || [];
+      const ordersById = groupBy(orders, 'id');
+      const fills = useSelector(getSubaccountFills, shallowEqual) || [];
+      const fillsById = groupBy(fills, 'id');
+      const marketIds = useSelector(getMarketIds, shallowEqual);
+      const navigate = useNavigate();
 
-      return (orderId) => {
-        dispatch(
-          openDialog({
-            type: DialogTypes.OrderDetails,
-            dialogProps: { orderId },
-          })
-        );
+      return (notificationId: string) => {
+        const [abacusNotificationType = '', id = ''] = notificationId.split(':');
+
+        if (ordersById[id]) {
+          dispatch(
+            openDialog({
+              type: DialogTypes.OrderDetails,
+              dialogProps: { orderId: id },
+            })
+          );
+        } else if (fillsById[id]) {
+          dispatch(
+            openDialog({
+              type: DialogTypes.FillDetails,
+              dialogProps: { fillId: id },
+            })
+          );
+        } else if (marketIds.includes(id)) {
+          navigate(`${AppRoute.Trade}/${id}`, {
+            replace: true,
+          });
+        }
       };
     },
-  } as NotificationTypeConfig<string, [string, number]>,
+  },
   {
     type: NotificationType.SquidTransfer,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const { transferNotifications } = useLocalNotifications();
-
-      const getTitleStringKey = useCallback((type: 'deposit' | 'withdraw', finished: boolean) => {
-        if (type === 'deposit' && !finished) return STRING_KEYS.DEPOSIT_IN_PROGRESS;
-        if (type === 'deposit' && finished) return STRING_KEYS.DEPOSIT;
-        if (type === 'withdraw' && !finished) return STRING_KEYS.WITHDRAW_IN_PROGRESS;
-        return STRING_KEYS.WITHDRAW;
-      }, []);
+      const { selectedNetwork } = useSelectedNetwork();
 
       useEffect(() => {
         for (const transfer of transferNotifications) {
-          const { toChainId, status, txHash, toAmount } = transfer;
-          const finished = Boolean(status) && status?.squidTransactionStatus !== 'ongoing';
-          const type = toChainId === TESTNET_CHAIN_ID ? 'deposit' : 'withdraw';
-          // @ts-ignore status.errors is not in the type definition but can be returned
-          const error = status?.errors?.length ? status?.errors[0] : status?.error;
+          const { fromChainId, status, txHash, toAmount } = transfer;
+          const isFinished = Boolean(status) && status?.squidTransactionStatus !== 'ongoing';
+          const icon = <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />;
 
-          // TODO: confirm with design what the description should be
-          const description = (
-            <div>
-              <Styled.TransferText>
-                {type === 'deposit' ? 'Deposit of ' : 'Withdraw of '}
-                <Output type={OutputType.Fiat} value={toAmount} />
-              </Styled.TransferText>
+          const type =
+            fromChainId === ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId
+              ? 'withdrawal'
+              : 'deposit';
 
-              {error && (
-                <Styled.ErrorMessage type={AlertType.Error}>
-                  {stringGetter({
-                    key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-                    params: {
-                      ERROR_MESSAGE: error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
-                    },
-                  })}
-                </Styled.ErrorMessage>
-              )}
-            </div>
-          );
+          const title = stringGetter({
+            key: {
+              deposit: isFinished ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
+              withdrawal: isFinished ? STRING_KEYS.WITHDRAW : STRING_KEYS.WITHDRAW_IN_PROGRESS,
+            }[type],
+          });
+
+          const toChainEta = status?.toChain?.chainData?.estimatedRouteDuration || 0;
+          const estimatedDuration = formatSeconds(Math.max(toChainEta, 0));
+          const body = stringGetter({
+            key: STRING_KEYS.DEPOSIT_STATUS,
+            params: {
+              AMOUNT_USD: `${toAmount} ${DydxChainAsset.USDC.toUpperCase()}`,
+              ESTIMATED_DURATION: estimatedDuration,
+            },
+          });
 
           trigger(
             txHash,
             {
-              icon: <Icon iconName={finished ? IconName.Transfer : IconName.Clock} />,
-              title: stringGetter({ key: getTitleStringKey(type, finished) }),
-              description: description,
-              customContent: (
-                <TransferStatusToast
-                  toAmount={transfer.toAmount}
+              icon,
+              title,
+              body,
+              renderCustomBody: ({ isToast, notification }) => (
+                <TransferStatusNotification
+                  isToast={isToast}
+                  slotIcon={icon}
+                  slotTitle={title}
+                  transfer={transfer}
+                  type={type}
                   triggeredAt={transfer.triggeredAt}
-                  status={transfer.status}
+                  notification={notification}
                 />
-              ),
-              customMenuContent: !finished && (
-                <div>
-                  {description}
-                  <TransferStatusSteps status={transfer.status} />
-                </div>
               ),
               toastSensitivity: 'foreground',
             },
-            []
+            [isFinished]
           );
         }
-      }, [transferNotifications]);
+      }, [transferNotifications, stringGetter]);
+    },
+    useNotificationAction: () => {
+      return () => {};
     },
   },
-] satisfies NotificationTypeConfig[];
+];
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TransferText = styled.span`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5ch;
-`
-
-Styled.ErrorMessage = styled.div`
-  max-width: 13rem;
+const $Icon = styled.img`
+  height: 1.5rem;
+  width: 1.5rem;
 `;

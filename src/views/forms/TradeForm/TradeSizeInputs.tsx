@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
@@ -20,8 +20,13 @@ import { Icon, IconName } from '@/components/Icon';
 import { ToggleButton } from '@/components/ToggleButton';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
+import { setTradeFormInputs } from '@/state/inputs';
 
-import { getInputTradeSizeData, getInputTradeOptions } from '@/state/inputsSelectors';
+import {
+  getInputTradeSizeData,
+  getInputTradeOptions,
+  getTradeFormInputs,
+} from '@/state/inputsSelectors';
 
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
@@ -31,16 +36,12 @@ import { MustBigNumber } from '@/lib/numbers';
 import { MarketLeverageInput } from './MarketLeverageInput';
 
 export const TradeSizeInputs = () => {
-  const [sizeInputValue, setSizeInputValue] = useState<number | null>();
-  const [usdcInputValue, setUsdcInputValue] = useState<number | null>();
-  const [leverageInputValue, setLeverageInputValue] = useState<number | null>();
-
   const [showUSDCInputOnTablet, setShowUSDCInputOnTablet] = useState(false);
-
+  const dispatch = useDispatch();
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
 
-  const { symbol } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
+  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
   const inputTradeSizeData = useSelector(getInputTradeSizeData, shallowEqual);
   const currentTradeInputOptions = useSelector(getInputTradeOptions, shallowEqual);
 
@@ -50,24 +51,27 @@ export const TradeSizeInputs = () => {
   const { needsLeverage } = currentTradeInputOptions || {};
   const decimals = stepSizeDecimals || TOKEN_DECIMALS;
 
+  const { amountInput, usdAmountInput, leverageInput } = useSelector(
+    getTradeFormInputs,
+    shallowEqual
+  );
+
   // Update State variables if their inputs are not being source of calculations
   // Or if they have been reset to null
   useEffect(() => {
     if (lastEditedInput !== TradeSizeInput.Size || size == null) {
-      // Abacus size already respects step size
-      // using .toFixed to prevent trailing zeros and exponential notation
-      setSizeInputValue(size);
+      dispatch(setTradeFormInputs({ amountInput: size ? size.toString() : '' }));
     }
     if (lastEditedInput !== TradeSizeInput.Usdc || usdcSize == null) {
-      setUsdcInputValue(usdcSize);
+      dispatch(setTradeFormInputs({ usdAmountInput: usdcSize ? usdcSize.toString() : '' }));
     }
     if (lastEditedInput !== TradeSizeInput.Leverage || leverage == null) {
-      setLeverageInputValue(leverage);
+      dispatch(setTradeFormInputs({ leverageInput: leverage ? leverage.toString() : '' }));
     }
   }, [size, usdcSize, leverage, lastEditedInput]);
 
   const onSizeInput = ({ value, floatValue }: { value: string; floatValue?: number }) => {
-    setSizeInputValue(floatValue);
+    dispatch(setTradeFormInputs({ amountInput: value }));
     const newAmount = MustBigNumber(floatValue).toFixed(decimals);
 
     abacusStateManager.setTradeValue({
@@ -77,7 +81,7 @@ export const TradeSizeInputs = () => {
   };
 
   const onUSDCInput = ({ value, floatValue }: { value: string; floatValue?: number }) => {
-    setUsdcInputValue(floatValue);
+    dispatch(setTradeFormInputs({ usdAmountInput: value }));
     const newUsdcAmount = MustBigNumber(floatValue).toFixed();
 
     abacusStateManager.setTradeValue({
@@ -94,7 +98,7 @@ export const TradeSizeInputs = () => {
       shape={ButtonShape.Square}
     >
       <Icon iconName={IconName.Trade} />
-      {showUSDCInputOnTablet ? 'USD' : symbol}
+      {showUSDCInputOnTablet ? 'USD' : id}
     </Styled.ToggleButton>
   );
 
@@ -105,15 +109,15 @@ export const TradeSizeInputs = () => {
       onInput={onSizeInput}
       label={
         <>
-          <WithTooltip tooltip="order-amount" stringParams={{ SYMBOL: symbol ?? '' }} side="right">
+          <WithTooltip tooltip="order-amount" stringParams={{ SYMBOL: id ?? '' }} side="right">
             {stringGetter({ key: STRING_KEYS.AMOUNT })}
           </WithTooltip>
-          {symbol && <Tag>{symbol}</Tag>}
+          {id && <Tag>{id}</Tag>}
         </>
       }
       slotRight={isTablet && inputToggleButton}
       type={InputType.Number}
-      value={sizeInputValue || ''}
+      value={amountInput || ''}
     />
   );
 
@@ -122,15 +126,11 @@ export const TradeSizeInputs = () => {
       id="trade-usdc"
       onInput={onUSDCInput}
       type={InputType.Currency}
-      value={usdcInputValue || ''}
+      value={usdAmountInput || ''}
       decimals={tickSizeDecimals || USD_DECIMALS}
       label={
         <>
-          <WithTooltip
-            tooltip="order-amount-usd"
-            stringParams={{ SYMBOL: symbol ?? '' }}
-            side="right"
-          >
+          <WithTooltip tooltip="order-amount-usd" stringParams={{ SYMBOL: id ?? '' }} side="right">
             {stringGetter({ key: STRING_KEYS.AMOUNT })}
           </WithTooltip>
           <Tag>USD</Tag>
@@ -157,8 +157,10 @@ export const TradeSizeInputs = () => {
 
       {needsLeverage && (
         <MarketLeverageInput
-          leverageInputValue={leverageInputValue}
-          setLeverageInputValue={setLeverageInputValue}
+          leverageInputValue={leverageInput}
+          setLeverageInputValue={(value: string) =>
+            dispatch(setTradeFormInputs({ leverageInput: value }))
+          }
         />
       )}
     </Styled.Column>

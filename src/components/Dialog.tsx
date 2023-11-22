@@ -38,6 +38,7 @@ type ElementProps = {
   slotTrigger?: React.ReactNode;
   slotHeaderInner?: React.ReactNode;
   slotFooter?: React.ReactNode;
+  withClose?: boolean;
 };
 
 type StyleProps = {
@@ -46,7 +47,10 @@ type StyleProps = {
   hasHeaderBorder?: boolean;
   children?: React.ReactNode;
   className?: string;
+  withAnimation?: boolean;
 };
+
+export type DialogProps = ElementProps & StyleProps;
 
 const DialogPortal = ({
   withPortal,
@@ -77,12 +81,14 @@ export const Dialog = ({
   slotTrigger,
   slotHeaderInner,
   slotFooter,
+  withClose = true,
   placement = DialogPlacement.Default,
   portalContainer,
   hasHeaderBorder = false,
+  withAnimation = false,
   children,
   className,
-}: ElementProps & StyleProps) => {
+}: DialogProps) => {
   const closeButtonRef = useRef<HTMLButtonElement>();
 
   const showOverlay = ![DialogPlacement.Inline, DialogPlacement.FullScreen].includes(placement);
@@ -103,6 +109,7 @@ export const Dialog = ({
               e.preventDefault();
             }
           }}
+          $withAnimation={withAnimation}
         >
           <Styled.Header $withBorder={hasHeaderBorder}>
             <Styled.HeaderTopRow>
@@ -112,7 +119,7 @@ export const Dialog = ({
 
               {title && <Styled.Title>{title}</Styled.Title>}
 
-              {!preventClose && (
+              {!preventClose && withClose && (
                 <Styled.Close ref={closeButtonRef}>
                   <Icon iconName={IconName.Close} />
                 </Styled.Close>
@@ -166,7 +173,7 @@ Styled.Overlay = styled(Overlay)`
   }
 `;
 
-Styled.Container = styled(Content)<{ placement: DialogPlacement }>`
+Styled.Container = styled(Content)<{ placement: DialogPlacement; $withAnimation?: boolean }>`
   /* Params */
   --dialog-inset: 1rem;
   --dialog-width: 30rem;
@@ -222,7 +229,7 @@ Styled.Container = styled(Content)<{ placement: DialogPlacement }>`
 
   outline: none;
 
-  ${({ placement }) =>
+  ${({ placement, $withAnimation }) =>
     ({
       [DialogPlacement.Default]: css`
         inset: var(--dialog-inset);
@@ -258,9 +265,11 @@ Styled.Container = styled(Content)<{ placement: DialogPlacement }>`
           padding-bottom: var(--dialog-radius); */
         }
 
-        @media (prefers-reduced-motion: no-preference) {
-          &[data-state='open'] {
-            animation: ${keyframes`
+        ${$withAnimation &&
+        css`
+          @media (prefers-reduced-motion: no-preference) {
+            &[data-state='open'] {
+              animation: ${keyframes`
               from {
                 opacity: 0;
               }
@@ -268,18 +277,19 @@ Styled.Container = styled(Content)<{ placement: DialogPlacement }>`
                 max-height: 0;
               }
             `} 0.15s var(--ease-out-expo);
-          }
+            }
 
-          &[data-state='closed'] {
-            animation: ${keyframes`
+            &[data-state='closed'] {
+              animation: ${keyframes`
               to {
                 opacity: 0;
                 scale: 0.9;
                 max-height: 0;
               }
             `} 0.15s;
+            }
           }
-        }
+        `}
       `,
       [DialogPlacement.Sidebar]: css`
         --dialog-width: var(--sidebar-width);
@@ -289,50 +299,52 @@ Styled.Container = styled(Content)<{ placement: DialogPlacement }>`
           margin-left: auto;
         }
 
-        @media (prefers-reduced-motion: no-preference) {
-          &[data-state='open'] {
-            animation: ${keyframes`
+        ${$withAnimation &&
+        css`
+          @media (prefers-reduced-motion: no-preference) {
+            &[data-state='open'] {
+              animation: ${keyframes`
               from {
                 translate: 100% 0;
                 opacity: 0;
               }
             `} 0.15s var(--ease-out-expo);
-          }
+            }
 
-          &[data-state='closed'] {
-            animation: ${keyframes`
+            &[data-state='closed'] {
+              animation: ${keyframes`
               to {
                 translate: 100% 0;
                 opacity: 0;
               }
             `} 0.15s var(--ease-out-expo);
+            }
           }
-        }
+        `}
       `,
       [DialogPlacement.Inline]: css`
-        @media (prefers-reduced-motion: no-preference) {
-          &[data-state='open'] {
-            animation: ${keyframes`
+        ${$withAnimation &&
+        css`
+          @media (prefers-reduced-motion: no-preference) {
+            &[data-state='open'] {
+              animation: ${keyframes`
               from {
                 scale: 0.99;
                 opacity: 0;
-                /* filter: blur(2px); */
-                /* backdrop-filter: none; */
               }
             `} 0.15s var(--ease-out-expo);
-          }
+            }
 
-          &[data-state='closed'] {
-            animation: ${keyframes`
+            &[data-state='closed'] {
+              animation: ${keyframes`
               to {
                 scale: 0.99;
                 opacity: 0;
-                /* filter: blur(2px); */
-                /* backdrop-filter: none; */
               }
             `} 0.15s var(--ease-out-expo);
+            }
           }
-        }
+        `}
       `,
       [DialogPlacement.FullScreen]: css`
         --dialog-width: 100vw;

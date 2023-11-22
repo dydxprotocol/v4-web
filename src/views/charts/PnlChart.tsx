@@ -25,7 +25,11 @@ import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 import { AxisLabelOutput } from '@/components/visx/AxisLabelOutput';
 // import { TooltipContent } from '@/components/visx/TooltipContent';
 
-import { getSubaccount, getSubaccountHistoricalPnl, getSubaccountId } from '@/state/accountSelectors';
+import {
+  getSubaccount,
+  getSubaccountHistoricalPnl,
+  getSubaccountId,
+} from '@/state/accountSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { formatRelativeTime } from '@/lib/dateTime';

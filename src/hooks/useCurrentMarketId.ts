@@ -22,6 +22,8 @@ export const useCurrentMarketId = () => {
   const dispatch = useDispatch();
   const selectedNetwork = useSelector(getSelectedNetwork);
   const marketIds = useSelector(getMarketIds, shallowEqual);
+  const hasMarketIds = marketIds.length > 0;
+
   const [lastViewedMarket, setLastViewedMarket] = useLocalStorage({
     key: LocalStorageKey.LastViewedMarket,
     defaultValue: DEFAULT_MARKETID,
@@ -44,6 +46,9 @@ export const useCurrentMarketId = () => {
   }, [validId]);
 
   useEffect(() => {
-    abacusStateManager.setMarket(marketId ?? DEFAULT_MARKETID);
-  }, [selectedNetwork, marketId]);
+    // Check for marketIds otherwise Abacus will silently fail its isMarketValid check
+    if (marketIds) {
+      abacusStateManager.setMarket(marketId ?? DEFAULT_MARKETID);
+    }
+  }, [selectedNetwork, hasMarketIds, marketId]);
 };

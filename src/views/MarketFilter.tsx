@@ -29,7 +29,7 @@ export const MarketFilter = ({
     <>
       {!isSearch && (
         <ToggleGroup
-          items={Object.entries(filters).map(([key, value]) => ({
+          items={Object.values(filters).map((value) => ({
             label: stringGetter({ key: MARKET_FILTER_LABELS[value] }),
             value,
           }))}

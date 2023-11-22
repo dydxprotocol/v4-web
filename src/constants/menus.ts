@@ -21,11 +21,12 @@ export type MenuItem<MenuItemValue, MenuItemTypes = string> = {
   value: MenuItemValue;
 
   slotBefore?: React.ReactNode;
-  label: string;
+  label: React.ReactNode;
   labelRight?: React.ReactNode;
   tag?: React.ReactNode;
   slotAfter?: React.ReactNode;
   description?: string;
+  slotCustomContent?: React.ReactNode;
 
   href?: string;
   onSelect?: (key: MenuItemValue) => void;

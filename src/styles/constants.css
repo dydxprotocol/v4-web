@@ -36,11 +36,10 @@
   --single-unit-height: 9.375rem;
 
   /* Modal constants */
-  --sidebar-modal-width: 18.75rem;
-  --modal-small-width: 18.75rem;
-  --modal-medium-width: 20.5rem;
-  --modal-large-width: 26.25rem;
-  --modal-header-height: 4rem;
+  --dialog-small-width: 18.75rem;
+  --dialog-medium-width: 20.5rem;
+  --dialog-large-width: 26.25rem;
+  --dialog-header-height: 4rem;
 
   /* Market Selector constants */
   --marketsDropdown-openWidth: 45rem;

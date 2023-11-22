@@ -60,12 +60,12 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
                 columnKey: 'market',
                 getCellValue: (row) => row.market,
                 label: stringGetter({ key: STRING_KEYS.MARKET }),
-                renderCell: ({ asset }) => (
+                renderCell: ({ assetId, id }) => (
                   <Styled.MarketName isFavorited={false}>
                     {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
-                    <AssetIcon symbol={asset.symbol} />
-                    <h2>{asset.name}</h2>
-                    <Tag>{asset.symbol}</Tag>
+                    <AssetIcon symbol={assetId} />
+                    <h2>{id}</h2>
+                    <Tag>{assetId}</Tag>
                   </Styled.MarketName>
                 ),
               },
@@ -82,18 +82,18 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
                 ),
               },
               {
-                columnKey: 'priceChange24H',
-                getCellValue: (row) => row.priceChange24H,
+                columnKey: 'priceChange24HPercent',
+                getCellValue: (row) => row.priceChange24HPercent,
                 label: stringGetter({ key: STRING_KEYS._24H }),
-                renderCell: ({ priceChange24H, priceChange24HPercent }) => (
+                renderCell: ({ priceChange24HPercent }) => (
                   <Styled.InlineRow>
-                    {!priceChange24H ? (
+                    {!priceChange24HPercent ? (
                       <Styled.Output type={OutputType.Text} value={null} />
                     ) : (
                       <Styled.PriceChangeOutput
                         type={OutputType.Percent}
                         value={priceChange24HPercent}
-                        isNegative={MustBigNumber(priceChange24H).isNegative()}
+                        isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
                       />
                     )}
                   </Styled.InlineRow>

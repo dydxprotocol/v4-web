@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import {
   Root,
@@ -13,11 +13,13 @@ import {
   Portal,
   Icon as SelectIcon,
 } from '@radix-ui/react-select';
+import { CheckIcon } from '@radix-ui/react-icons';
 
 import { popoverMixins } from '@/styles/popoverMixins';
 import { formMixins } from '@/styles/formMixins';
 
 import { WithLabel } from '@/components/WithLabel';
+import { Icon, IconName } from './Icon';
 
 export const SelectMenu = <T extends string>({
   children,
@@ -44,7 +46,9 @@ export const SelectMenu = <T extends string>({
         ) : (
           <Value />
         )}
-        {React.Children.toArray(children).length > 1 && <Styled.DropdownIcon />}
+        {React.Children.toArray(children).length > 1 && (
+          <Styled.TriggerIcon iconName={IconName.Triangle} />
+        )}
       </Styled.Trigger>
       <Portal>
         <Styled.Content className={className}>
@@ -68,7 +72,9 @@ export const SelectItem = <T extends string>({
 }) => (
   <Styled.Item className={className} value={value}>
     <ItemText>{label}</ItemText>
-    <Styled.ItemIndicator>✔{/* <CheckIcon /> */}</Styled.ItemIndicator>
+    <Styled.ItemIndicator>
+      <CheckIcon />
+    </Styled.ItemIndicator>
   </Styled.Item>
 );
 
@@ -86,12 +92,6 @@ Styled.Trigger = styled(Trigger)<{ $withBlur?: boolean }>`
     overflow: hidden;
     text-overflow: ellipsis;
   }
-`;
-
-Styled.DropdownIcon = styled(SelectIcon)`
-  font-size: 0.675em;
-  color: var(--color-text-1);
-  margin-left: auto;
 `;
 
 Styled.Content = styled(Content)`
@@ -115,4 +115,10 @@ Styled.ItemIndicator = styled(ItemIndicator)`
 Styled.WithLabel = styled(WithLabel)`
   ${formMixins.inputLabel}
   border-radius: 0;
+`;
+
+Styled.TriggerIcon = styled(Icon)`
+  width: 0.625rem;
+  height: 0.375rem;
+  color: var(--color-text-0);
 `;

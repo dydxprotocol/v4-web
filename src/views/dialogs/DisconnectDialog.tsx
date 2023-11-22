@@ -27,9 +27,9 @@ export const DisconnectDialog = ({ setIsOpen }: ElementProps) => {
   };
 
   return (
-    <Dialog isOpen setIsOpen={setIsOpen} title="Disconnect">
+    <Dialog isOpen setIsOpen={setIsOpen} title={stringGetter({ key: STRING_KEYS.DISCONNECT })}>
       <Styled.Content>
-        <p>Are you sure you want to disconnect your account?</p>
+        <p>{stringGetter({ key: STRING_KEYS.DISCONNECT_CONFIRMATION })}</p>
         <Styled.ButtonRow>
           <Close asChild>
             <Button action={ButtonAction.Destroy} onClick={disconnect}>

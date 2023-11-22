@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 
 import { LocalStorageKey } from '@/constants/localStorage';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
 import {
   type DydxAddress,
@@ -27,6 +29,8 @@ import {
   useOfflineSigners as useOfflineSignersGraz,
   WalletType as CosmosWalletType,
 } from 'graz';
+
+import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { resolveWagmiConnector } from '@/lib/wagmi';
 import { getWalletConnection, parseWalletError } from '@/lib/wallet';
@@ -84,17 +88,23 @@ export const useWalletConnection = () => {
 
   // Wallet connection
 
-  const { connectAsync: connectWagmi } =
-    walletType && walletConnectionType
-      ? useConnectWagmi({
-          connector: resolveWagmiConnector({
+  const selectedNetwork = useSelector(getSelectedNetwork);
+  const walletConnectConfig = ENVIRONMENT_CONFIG_MAP[selectedNetwork].wallets.walletconnect;
+  const wagmiConnector = useMemo(
+    () =>
+      walletType && walletConnectionType
+        ? resolveWagmiConnector({
             walletType,
             walletConnection: {
               type: walletConnectionType,
             },
-          }),
-        })
-      : useConnectWagmi();
+            walletConnectConfig,
+          })
+        : undefined,
+    [walletConnectConfig, walletType, walletConnectionType]
+  );
+
+  const { connectAsync: connectWagmi } = useConnectWagmi({ connector: wagmiConnector })
   const { suggestAndConnect: connectGraz } = useConnectGraz();
 
   const connectWallet = useCallback(
@@ -127,6 +137,7 @@ export const useWalletConnection = () => {
               connector: resolveWagmiConnector({
                 walletType,
                 walletConnection,
+                walletConnectConfig,
               }),
             });
           }
@@ -217,7 +228,7 @@ export const useWalletConnection = () => {
     evmAddressWagmi,
     signerWagmi,
     publicClientWagmi,
-    
+
     // Wallet connection (Cosmos)
     dydxAddress,
     dydxAddressGraz,

@@ -1,5 +1,6 @@
 import { useApiState } from './useApiState';
 import { useBreakpoints } from './useBreakpoints';
+import { useTokenConfigs } from './useTokenConfigs';
 import { useCommandMenu } from './useCommandMenu';
 import { useCurrentMarketId } from './useCurrentMarketId';
 import { useDebounce } from './useDebounce';
@@ -16,14 +17,18 @@ import { useLocalStorage } from './useLocalStorage';
 import { useNow } from './useNow';
 import { useOnClickOutside } from './useOnClickOutside';
 import { usePageTitlePriceUpdates } from './usePageTitlePriceUpdates';
+import { useRestrictions } from './useRestrictions';
 import { useShouldShowFooter } from './useShouldShowFooter';
 import { useSelectedNetwork } from './useSelectedNetwork';
 import { useStringGetter } from './useStringGetter';
 import { useSubaccount } from './useSubaccount';
+import { useTradeFormInputs } from './useTradeFormInputs';
+import { useURLConfigs } from './useURLConfigs';
 
 export {
   useApiState,
   useBreakpoints,
+  useTokenConfigs,
   useCommandMenu,
   useCurrentMarketId,
   useDebounce,
@@ -40,8 +45,11 @@ export {
   useNow,
   useOnClickOutside,
   usePageTitlePriceUpdates,
+  useRestrictions,
   useShouldShowFooter,
   useSelectedNetwork,
   useStringGetter,
   useSubaccount,
+  useTradeFormInputs,
+  useURLConfigs,
 };

@@ -246,9 +246,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
               }[rate] || '',
           }))}
           value={fundingRateView}
-          onValueChange={(newRate: FundingRateResolution) => {
-            if (newRate) setFundingRateView(newRate);
-          }}
+          onValueChange={setFundingRateView}
           size={ButtonSize.XSmall}
         />
       </Styled.FundingRateToggle>

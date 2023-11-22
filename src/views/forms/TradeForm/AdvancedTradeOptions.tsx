@@ -6,7 +6,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
 
 import { TradeInputField } from '@/constants/abacus';
-import { STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS, StringKey } from '@/constants/localization';
 import { INTEGER_DECIMALS } from '@/constants/numbers';
 import { TimeUnitShort } from '@/constants/time';
 import { GOOD_TIL_TIME_TIMESCALE_STRINGS } from '@/constants/trade';
@@ -29,14 +29,15 @@ export const AdvancedTradeOptions = () => {
   const currentTradeFormConfig = useSelector(getInputTradeOptions, shallowEqual);
   const inputTradeData = useSelector(getInputTradeData, shallowEqual);
 
-  const { execution, goodUntil, postOnly, reduceOnly, timeInForce } = inputTradeData || {};
+  const { execution, goodTil, postOnly, reduceOnly, timeInForce, type } = inputTradeData || {};
 
   const { executionOptions, needsGoodUntil, needsPostOnly, needsReduceOnly, timeInForceOptions } =
     currentTradeFormConfig || {};
 
-  const { duration, unit } = goodUntil || {};
+  const { duration, unit } = goodTil || {};
 
   const needsExecution = executionOptions || needsPostOnly || needsReduceOnly;
+  const hasTimeInForce = timeInForceOptions?.toArray()?.length;
 
   return (
     <Styled.Collapsible
@@ -47,7 +48,7 @@ export const AdvancedTradeOptions = () => {
     >
       <Styled.AdvancedInputsContainer>
         <Styled.AdvancedInputsRow needsGoodUntil={needsGoodUntil}>
-          {timeInForceOptions?.toArray() && (
+          {hasTimeInForce && (
             <Styled.SelectMenu
               value={timeInForce}
               onValueChange={(selectedTimeInForceOption: string) =>
@@ -62,7 +63,7 @@ export const AdvancedTradeOptions = () => {
                 <Styled.SelectItem
                   key={type}
                   value={type}
-                  label={stringGetter({ key: stringKey })}
+                  label={stringGetter({ key: stringKey as StringKey })}
                 />
               ))}
             </Styled.SelectMenu>
@@ -72,11 +73,13 @@ export const AdvancedTradeOptions = () => {
               id="trade-good-til-time"
               type={InputType.Number}
               decimals={INTEGER_DECIMALS}
-              label={stringGetter({ key: STRING_KEYS.TIME })}
+              label={stringGetter({
+                key: hasTimeInForce ? STRING_KEYS.TIME : STRING_KEYS.GOOD_TIL_TIME,
+              })}
               onChange={({ value }: NumberFormatValues) => {
                 abacusStateManager.setTradeValue({
                   value: Number(value),
-                  field: TradeInputField.goodUntilDuration,
+                  field: TradeInputField.goodTilDuration,
                 });
               }}
               value={duration ?? ''}
@@ -86,7 +89,7 @@ export const AdvancedTradeOptions = () => {
                   onValueChange={(goodTilTimeTimescale: string) => {
                     abacusStateManager.setTradeValue({
                       value: goodTilTimeTimescale,
-                      field: TradeInputField.goodUntilUnit,
+                      field: TradeInputField.goodTilUnit,
                     });
                   }}
                 >
@@ -121,46 +124,44 @@ export const AdvancedTradeOptions = () => {
                   <Styled.SelectItem
                     key={type}
                     value={type}
-                    label={stringGetter({ key: stringKey })}
+                    label={stringGetter({ key: stringKey as StringKey })}
                   />
                 ))}
               </Styled.SelectMenu>
             )}
             {needsPostOnly && (
-              <Styled.CheckboxField>
-                <Checkbox
-                  checked={postOnly || false}
-                  onClick={() =>
-                    abacusStateManager.setTradeValue({
-                      value: !postOnly,
-                      field: TradeInputField.postOnly,
-                    })
-                  }
-                />
-                <Styled.CheckboxLabel>
+              <Checkbox
+                checked={postOnly || false}
+                onCheckedChange={(checked) =>
+                  abacusStateManager.setTradeValue({
+                    value: checked,
+                    field: TradeInputField.postOnly,
+                  })
+                }
+                id="post-only"
+                label={
                   <WithTooltip tooltip="post-only" side="right">
                     {stringGetter({ key: STRING_KEYS.POST_ONLY })}
                   </WithTooltip>
-                </Styled.CheckboxLabel>
-              </Styled.CheckboxField>
+                }
+              />
             )}
             {needsReduceOnly && (
-              <Styled.CheckboxField>
-                <Checkbox
-                  checked={reduceOnly || false}
-                  onClick={() =>
-                    abacusStateManager.setTradeValue({
-                      value: !reduceOnly,
-                      field: TradeInputField.reduceOnly,
-                    })
-                  }
-                />
-                <Styled.CheckboxLabel>
+              <Checkbox
+                checked={reduceOnly || false}
+                onCheckedChange={(checked) =>
+                  abacusStateManager.setTradeValue({
+                    value: checked,
+                    field: TradeInputField.reduceOnly,
+                  })
+                }
+                id="reduce-only"
+                label={
                   <WithTooltip tooltip="reduce-only" side="right">
                     {stringGetter({ key: STRING_KEYS.REDUCE_ONLY })}
                   </WithTooltip>
-                </Styled.CheckboxLabel>
-              </Styled.CheckboxField>
+                }
+              />
             )}
           </>
         )}
@@ -170,15 +171,6 @@ export const AdvancedTradeOptions = () => {
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.CheckboxField = styled.div`
-  ${layoutMixins.row}
-  gap: 0.5rem;
-`;
-
-Styled.CheckboxLabel = styled.div`
-  font-size: 0.875em;
-`;
 
 Styled.Collapsible = styled(Collapsible)`
   --trigger-backgroundColor: transparent;

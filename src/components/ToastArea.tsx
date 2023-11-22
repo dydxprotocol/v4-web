@@ -1,6 +1,7 @@
+import styled from 'styled-components';
+
 import { Provider, Viewport } from '@radix-ui/react-toast';
 
-import styled from 'styled-components';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 type ElementProps = {
@@ -12,7 +13,9 @@ type StyleProps = {
   className?: string;
 };
 
-export const ToastArea = ({ swipeDirection, children, className }: ElementProps & StyleProps) => (
+type ToastAreaProps = ElementProps & StyleProps;
+
+export const ToastArea = ({ swipeDirection, children, className }: ToastAreaProps) => (
   <$ToastArea className={className}>
     <Provider swipeDirection={swipeDirection}>
       {children}
@@ -34,6 +37,7 @@ const $ToastArea = styled.aside`
   > * {
     display: contents;
     pointer-events: none;
+    position: relative;
 
     > ol {
       /* display: block; */
@@ -43,6 +47,7 @@ const $ToastArea = styled.aside`
       // Desired display order: latest to earliest (¯\_(ツ)_/¯)
       display: flex;
       flex-direction: column-reverse;
+      position: relative;
 
       pointer-events: none;
 

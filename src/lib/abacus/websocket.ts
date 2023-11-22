@@ -1,5 +1,6 @@
 import type { AbacusWebsocketProtocol } from '@/constants/abacus';
 import type { TradingViewBar } from '@/constants/candles';
+import { isDev } from '@/constants/networks';
 
 import {
   PING_INTERVAL_MS,
@@ -8,10 +9,11 @@ import {
   PONG_MESSAGE_TYPE,
 } from '@/constants/websocket';
 
+import { lastSuccessfulWebsocketRequestByOrigin } from '@/hooks/useAnalytics';
+import { testFlags } from '@/hooks/useTestFlags';
+
 import { subscriptionsByChannelId } from '@/lib/tradingView/dydxfeed/cache';
 import { mapCandle } from '@/lib/tradingView/utils';
-
-import { lastSuccessfulWebsocketRequestByOrigin } from '@/hooks/useAnalytics';
 
 import { log } from '../telemetry';
 
@@ -143,6 +145,23 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
 
               break;
             }
+            case 'v4_markets': {
+              if (testFlags.displayInitializingMarkets) {
+                shouldProcess = false;
+                const { contents } = parsedMessage;
+
+                Object.keys(contents.markets ?? {}).forEach((market: any) => {
+                  const status = contents.markets[market].status;
+                  if (status === 'INITIALIZING') {
+                    contents.markets[market].status = 'ONLINE';
+                  }
+                });
+
+                this.receivedCallback?.(JSON.stringify(parsedMessage));
+              }
+
+              break;
+            }
             default: {
               break;
             }
@@ -161,13 +180,13 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
 
     this.socket.onclose = (e) => {
       this.connectedCallback?.(false);
-      if (import.meta.env.MODE === 'production') return;
+      if (!isDev) return;
       console.warn('AbacusStateManager > WS > close > ', e);
     };
 
     this.socket.onerror = (e) => {
       this.connectedCallback?.(false);
-      if (import.meta.env.MODE === 'production') return;
+      if (!isDev) return;
       console.error('AbacusStateManager > WS > error > ', e);
     };
   };

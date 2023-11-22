@@ -3,7 +3,7 @@ import { shallowEqual, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
-import { STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS, StringKey } from '@/constants/localization';
 import { TradeTypes, TRADE_TYPE_STRINGS, MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
@@ -31,18 +31,18 @@ type ElementProps = {
 export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) => {
   const { isMobile } = useBreakpoints();
   const stringGetter = useStringGetter();
-  const { symbol } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const currentTradeData = useSelector(getInputTradeData, shallowEqual);
   const { type } = currentTradeData || {};
   const selectedTradeType = getSelectedTradeType(type);
   const { typeOptions } = useSelector(getInputTradeOptions, shallowEqual) ?? {};
 
-  const allTradeTypeItems = typeOptions?.toArray()?.map(({ type, stringKey }) => ({
+  const allTradeTypeItems = (typeOptions?.toArray() ?? []).map(({ type, stringKey }) => ({
     value: type,
     label: stringGetter({
-      key: stringKey,
+      key: stringKey as StringKey,
     }),
-    slotBefore: <AssetIcon symbol={symbol} />,
+    slotBefore: <AssetIcon symbol={id} />,
   }));
 
   const [currentStep, setCurrentStep] = useState<MobilePlaceOrderSteps>(
@@ -73,9 +73,7 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
             <Styled.ToggleGroup
               items={allTradeTypeItems}
               value={selectedTradeType}
-              onValueChange={(tradeType: TradeTypes) =>
-                onTradeTypeChange(tradeType || selectedTradeType)
-              }
+              onValueChange={onTradeTypeChange}
             />
           ),
         },
@@ -114,8 +112,6 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
   --dialog-backgroundColor: var(--color-layer-2);
   --dialog-header-height: 1rem;
-  --dialog-header-paddingTop: 1.5rem;
-  --dialog-header-paddingBottom: 1rem;
   --dialog-content-paddingTop: 0;
   --dialog-content-paddingBottom: 0;
   --dialog-content-paddingLeft: 0;

@@ -33,9 +33,11 @@ export const DropdownHeaderMenu = <MenuItemValue extends string>({
 
   return (
     <Root>
-      <Styled.Trigger className={className}>
+      <Styled.Trigger className={className} asChild>
+        <div>
         {children}
         <Styled.DropdownIconButton iconName={IconName.Caret} isToggle />
+        </div>
       </Styled.Trigger>
       <Portal>
         <Styled.Content

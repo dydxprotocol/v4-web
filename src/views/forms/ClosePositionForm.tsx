@@ -4,8 +4,10 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import {
   ClosePositionInputField,
+  ValidationError,
   type HumanReadablePlaceOrderPayload,
   type Nullable,
+  ErrorType,
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -35,13 +37,14 @@ import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-import { getInputClosePositionData } from '@/state/inputsSelectors';
+import { getClosePositionInputErrors, getInputClosePositionData } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
 import { closeDialog } from '@/state/dialogs';
 import { getCurrentInput } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
+import { getTradeInputAlert } from '@/lib/tradeData';
 
 const MAX_KEY = 'MAX';
 
@@ -80,15 +83,38 @@ export const ClosePositionForm = ({
   const { closePosition } = useSubaccount();
 
   const market = useSelector(getCurrentMarketId);
-  const { symbol } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
-  const { stepSizeDecimals } = useSelector(getCurrentMarketConfig, shallowEqual) || {};
+  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
+  const { stepSizeDecimals, tickSizeDecimals } =
+    useSelector(getCurrentMarketConfig, shallowEqual) || {};
   const { size: sizeData, summary } = useSelector(getInputClosePositionData, shallowEqual) || {};
   const { size, percent } = sizeData || {};
   const currentInput = useSelector(getCurrentInput);
+  const closePositionInputErrors = useSelector(getClosePositionInputErrors, shallowEqual);
   const currentPositionData = useSelector(getCurrentMarketPositionData, shallowEqual);
   const { size: currentPositionSize } = currentPositionData || {};
   const { current: currentSize } = currentPositionSize || {};
   const currentSizeBN = MustBigNumber(currentSize).abs();
+
+  const hasInputErrors = closePositionInputErrors?.some(
+    (error: ValidationError) => error.type !== ErrorType.warning
+  );
+
+  const inputAlert = getTradeInputAlert({
+    abacusInputErrors: closePositionInputErrors ?? [],
+    stringGetter,
+    stepSizeDecimals,
+    tickSizeDecimals,
+  });
+
+  let alertContent;
+  let alertType = AlertType.Error;
+
+  if (closePositionError) {
+    alertContent = closePositionError;
+  } else if (inputAlert) {
+    alertContent = inputAlert?.alertString;
+    alertType = inputAlert?.type;
+  }
 
   useEffect(() => {
     if (currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder) return;
@@ -182,9 +208,7 @@ export const ClosePositionForm = ({
     });
   };
 
-  const alertMessage = closePositionError && (
-    <AlertMessage type={AlertType.Error}>{closePositionError}</AlertMessage>
-  );
+  const alertMessage = alertContent && <AlertMessage type={alertType}>{alertContent}</AlertMessage>;
 
   const inputs = (
     <Styled.InputsColumn>
@@ -193,7 +217,7 @@ export const ClosePositionForm = ({
         label={
           <>
             {stringGetter({ key: STRING_KEYS.AMOUNT })}
-            {symbol && <Tag>{symbol}</Tag>}
+            {id && <Tag>{id}</Tag>}
           </>
         }
         decimals={stepSizeDecimals || TOKEN_DECIMALS}
@@ -209,7 +233,7 @@ export const ClosePositionForm = ({
           value: value.toString(),
         }))}
         value={percent?.toString() ?? ''}
-        onValueChange={(value: any) => onSelectPercentage((value || percent?.toString()) ?? '')}
+        onValueChange={onSelectPercentage}
         shape={ButtonShape.Rectangle}
       />
 
@@ -265,8 +289,8 @@ export const ClosePositionForm = ({
 
         <PlaceOrderButtonAndReceipt
           isLoading={isClosingPosition}
-          hasValidationErrors={!size}
-          actionStringKey={!size ? STRING_KEYS.ENTER_AMOUNT : undefined}
+          hasValidationErrors={hasInputErrors}
+          actionStringKey={inputAlert?.actionStringKey}
           summary={summary ?? undefined}
           currentStep={currentStep}
           isClosePosition

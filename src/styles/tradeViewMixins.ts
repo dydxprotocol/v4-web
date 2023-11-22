@@ -18,9 +18,5 @@ export const tradeViewMixins: Record<
     tbody {
       font: var(--font-small-book);
     }
-
-    thead tr {
-      box-shadow: none;
-    }
   `,
 };

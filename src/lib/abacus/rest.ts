@@ -47,17 +47,17 @@ class AbacusRest implements AbacusRestProtocol {
       body,
     };
 
+    if (!url) {
+      callback(null, 0);
+      return;
+    }
+
     fetch(url, options)
       .then(async (response) => {
         const data = await response.text();
 
-        if (response.ok) {
-          callback(data, response.status);
-        } else {
-          // response not OK, call callback with null data and the status, this includes 400/500 status codes
-          callback(null, response.status);
-        }
-
+        callback(data, response.status);
+        
         try {
           lastSuccessfulRestRequestByOrigin[new URL(url).origin] = Date.now();
         } catch {}

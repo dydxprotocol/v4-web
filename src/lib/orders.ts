@@ -107,8 +107,8 @@ export const getHydratedTradingData = ({
   perpetualMarkets?: Record<string, PerpetualMarket>;
 }) => ({
   ...data,
-  asset: assets && perpetualMarkets && assets[perpetualMarkets[data.marketId].assetId],
-  stepSizeDecimals: perpetualMarkets?.[data.marketId].configs?.stepSizeDecimals,
-  tickSizeDecimals: perpetualMarkets?.[data.marketId].configs?.tickSizeDecimals,
+  asset: assets && perpetualMarkets && assets[perpetualMarkets[data.marketId]?.assetId],
+  stepSizeDecimals: perpetualMarkets?.[data.marketId]?.configs?.stepSizeDecimals,
+  tickSizeDecimals: perpetualMarkets?.[data.marketId]?.configs?.tickSizeDecimals,
   ...('side' in data && { orderSide: convertAbacusOrderSide(data.side) }),
 });

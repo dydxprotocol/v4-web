@@ -6,8 +6,9 @@ import { ButtonShape } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
-import { useStringGetter } from '@/hooks';
-import { LogoShortIcon, BellIcon } from '@/icons';
+import { LogoShortIcon, BellStrokeIcon } from '@/icons';
+
+import { useTokenConfigs, useStringGetter, useURLConfigs } from '@/hooks';
 
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
@@ -23,20 +24,18 @@ import { openDialog } from '@/state/dialogs';
 
 import { headerMixins } from '@/styles/headerMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
+import breakpoints from '@/styles/breakpoints';
 
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
+  const { documentation, community, mintscanBase } = useURLConfigs();
   const dispatch = useDispatch();
+  const { chainTokenLabel } = useTokenConfigs();
 
   const navItems = [
     {
       group: 'navigation',
       items: [
-        {
-          value: 'MARKET',
-          label: stringGetter({ key: STRING_KEYS.MARKET }),
-          href: AppRoute.Markets,
-        },
         {
           value: 'TRADE',
           label: stringGetter({ key: STRING_KEYS.TRADE }),
@@ -48,6 +47,16 @@ export const HeaderDesktop = () => {
           href: AppRoute.Portfolio,
         },
         {
+          value: 'MARKETS',
+          label: stringGetter({ key: STRING_KEYS.MARKETS }),
+          href: AppRoute.Markets,
+        },
+        {
+          value: chainTokenLabel,
+          label: chainTokenLabel,
+          href: `/${chainTokenLabel}`,
+        },
+        {
           value: 'MORE',
           label: stringGetter({ key: STRING_KEYS.MORE }),
           subitems: [
@@ -55,31 +64,31 @@ export const HeaderDesktop = () => {
               value: 'DOCUMENTATION',
               slotBefore: <Icon iconName={IconName.Terminal} />,
               label: stringGetter({ key: STRING_KEYS.DOCUMENTATION }),
-              href: 'https://v4-teacher.vercel.app/',
+              href: documentation,
             },
             {
               value: 'MINTSCAN',
               slotBefore: <Icon iconName={IconName.Mintscan} />,
               label: stringGetter({ key: STRING_KEYS.MINTSCAN }),
-              href: 'https://testnet.mintscan.io/dydx-testnet',
+              href: mintscanBase,
             },
             {
               value: 'COMMUNITY',
               slotBefore: <Icon iconName={IconName.Discord} />,
               label: stringGetter({ key: STRING_KEYS.COMMUNITY }),
-              href: 'https://discord.gg/dydx',
+              href: community,
             },
             {
               value: 'TERMS_OF_USE',
               slotBefore: <Icon iconName={IconName.File} />,
               label: stringGetter({ key: STRING_KEYS.TERMS_OF_USE }),
-              href: 'https://dydx.exchange/terms',
+              href: AppRoute.Terms,
             },
             {
               value: 'PRIVACY_POLICY',
               slotBefore: <Icon iconName={IconName.Privacy} />,
               label: stringGetter({ key: STRING_KEYS.PRIVACY_POLICY }),
-              href: 'https://dydx.exchange/privacy',
+              href: AppRoute.Privacy,
             },
             {
               value: 'HELP',
@@ -126,7 +135,9 @@ export const HeaderDesktop = () => {
         <VerticalSeparator />
 
         <NotificationsMenu
-          slotTrigger={<Styled.IconButton shape={ButtonShape.Rectangle} iconComponent={BellIcon} />}
+          slotTrigger={
+            <Styled.IconButton shape={ButtonShape.Rectangle} iconComponent={BellStrokeIcon} />
+          }
         />
 
         <VerticalSeparator />
@@ -141,12 +152,15 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Header = styled.header`
   --header-horizontal-padding-mobile: 0.5rem;
+  --trigger-height: 2.25rem;
   --logo-width: 3.5rem;
 
   ${layoutMixins.container}
   ${layoutMixins.stickyHeader}
   ${layoutMixins.scrollSnapItem}
   backdrop-filter: none;
+
+  height: var(--page-currentHeaderHeight);
 
   grid-area: Header;
 
@@ -160,7 +174,15 @@ Styled.Header = styled.header`
     )
     var(--border-width) 1fr var(--border-width) auto;
 
-  font-size: 0.9375em;
+  @media ${breakpoints.tablet} {
+    --trigger-height: 3rem;
+  }
+
+  @media ${breakpoints.mobile} {
+    --navBefore-width: 7rem;
+  }
+
+  font-size: 0.9375rem;
 
   :before {
     backdrop-filter: blur(10px);
@@ -170,6 +192,7 @@ Styled.Header = styled.header`
 Styled.NavigationMenu = styled(NavigationMenu)`
   & {
     --navigationMenu-height: var(--stickyArea-topHeight);
+    --navigationMenu-item-height: var(--trigger-height);
   }
 
   ${layoutMixins.scrollArea}
@@ -209,7 +232,9 @@ Styled.NavAfter = styled.div`
   }
 `;
 
-Styled.IconButton = styled(IconButton)`
+Styled.IconButton = styled(IconButton)<{ size?: string }>`
   ${headerMixins.button}
   --button-border: none;
+  --button-icon-size: 1rem;
+  --button-padding: 0 0.5em;
 `;

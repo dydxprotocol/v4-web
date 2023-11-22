@@ -3,24 +3,25 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
 import type { SyntheticInputEvent } from 'react-number-format/types/types';
-import { debounce } from 'lodash';
-import { StdFee } from '@cosmjs/stargate';
 import { validation } from '@dydxprotocol/v4-client-js';
 
 import { TransferInputField, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
-import { NumberSign, QUANTUM_MULTIPLIER } from '@/constants/numbers';
-import { DYDX_CHAIN_ASSET_COIN_DENOM, DYDX_CHAIN_ASSET_TAGS, DydxChainAsset } from '@/constants/wallets';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { NumberSign } from '@/constants/numbers';
+import { DydxChainAsset } from '@/constants/wallets';
 
 import {
   useAccountBalance,
   useAccounts,
+  useDydxClient,
+  useRestrictions,
   useSelectedNetwork,
   useStringGetter,
   useSubaccount,
+  useTokenConfigs,
 } from '@/hooks';
 
 import { formMixins } from '@/styles/formMixins';
@@ -53,50 +54,60 @@ type TransferFormProps = {
 };
 
 export const TransferForm = ({
-  selectedAsset = DydxChainAsset.DYDX,
+  selectedAsset = DydxChainAsset.CHAINTOKEN,
   onDone,
   className,
 }: TransferFormProps) => {
   const stringGetter = useStringGetter();
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
   const { dydxAddress } = useAccounts();
-  const { address: recipientAddress, size, fee } = useSelector(getTransferInputs, shallowEqual) || {};
   const { transfer } = useSubaccount();
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
   const { selectedNetwork } = useSelectedNetwork();
+  const { tokensConfigs, usdcLabel, chainTokenLabel } = useTokenConfigs();
 
-  // User Input
-  const [asset, setAsset] = useState<DydxChainAsset>(selectedAsset);
+  const {
+    address: recipientAddress,
+    size,
+    fee,
+    token,
+  } = useSelector(getTransferInputs, shallowEqual) || {};
 
   // Form states
-  const [error, setError] = useState<Error | undefined>();
+  const [error, setError] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
 
-  const balance = asset === DydxChainAsset.USDC ? freeCollateral?.current : nativeTokenBalance;
-  const newBalance =
-    asset === DydxChainAsset.USDC
-      ? freeCollateral?.postOrder
-      : MustBigNumber(nativeTokenBalance)
-          .minus(size?.size ?? 0)
-          .toNumber();
-  const amount = asset === DydxChainAsset.USDC ? size?.usdcSize : size?.size;
+  // temp fix: TODO: reset fees when changing token in Abacus
+  const [currentFee, setCurrentFee] = useState(fee);
+  useEffect(() => {
+    setCurrentFee(fee);
+  }, [fee]);
 
-  const showNotEnoughGasWarning = fee && asset === DydxChainAsset.USDC && usdcBalance < fee;
+  const asset = (token ?? selectedAsset) as DydxChainAsset;
+  const isUSDCSelected = asset === DydxChainAsset.USDC;
+  const amount = isUSDCSelected ? size?.usdcSize : size?.size;
+  const showNotEnoughGasWarning = fee && isUSDCSelected && usdcBalance < fee;
+  const balance = isUSDCSelected ? freeCollateral?.current : nativeTokenBalance;
 
   // BN
+  const newBalanceBN = isUSDCSelected
+    ? MustBigNumber(freeCollateral?.postOrder)
+    : nativeTokenBalance.minus(size?.size ?? 0);
+
   const amountBN = MustBigNumber(amount);
   const balanceBN = MustBigNumber(balance);
-  const newBalanceBN = MustBigNumber(newBalance);
 
-  const isAddressValid = useMemo(
-    () =>
-      recipientAddress &&
-      dydxAddress !== recipientAddress &&
-      validation.isValidAddress(recipientAddress),
-    [recipientAddress]
-  );
+  const onChangeAsset = (asset: DydxChainAsset) => {
+    setError(undefined);
+    setCurrentFee(undefined);
 
-  const isAmountValid = balance && amount && amountBN.gt(0) && newBalanceBN.gte(0);
+    if (asset) {
+      abacusStateManager.setTransferValue({
+        value: asset,
+        field: TransferInputField.token,
+      });
+    }
+  };
 
   useEffect(() => {
     abacusStateManager.setTransferValue({
@@ -104,18 +115,27 @@ export const TransferForm = ({
       field: TransferInputField.type,
     });
 
+    onChangeAsset(selectedAsset);
+
     return () => {
       abacusStateManager.clearTransferInputValues();
     };
   }, []);
 
-  useEffect(() => {
-    setError(undefined);
-    abacusStateManager.setTransferValue({
-      value: asset,
-      field: TransferInputField.token,
-    });
-  }, [asset]);
+  const { sanctionedAddresses } = useRestrictions();
+
+  const isAddressValid = useMemo(
+    () =>
+      recipientAddress &&
+      dydxAddress !== recipientAddress &&
+      validation.isValidAddress(recipientAddress) &&
+      !sanctionedAddresses.has(recipientAddress),
+    [recipientAddress, sanctionedAddresses, dydxAddress]
+  );
+
+  const isAmountValid = balance && amount && amountBN.gt(0) && newBalanceBN.gte(0);
+
+  const { screenAddresses } = useDydxClient();
 
   const onTransfer = async () => {
     if (!isAmountValid || !isAddressValid || !fee) return;
@@ -123,25 +143,51 @@ export const TransferForm = ({
     setError(undefined);
 
     try {
-      // Subtract fees from amount if sending native tokens
-      const amountToTransfer = (
-        asset === DydxChainAsset.DYDX ? amountBN.minus(fee) : amountBN
-      ).toNumber();
+      const screenResults = await screenAddresses({
+        addresses: [recipientAddress!, dydxAddress!],
+      });
 
-      const txResponse = await transfer(
-        amountToTransfer,
-        recipientAddress as string,
-        DYDX_CHAIN_ASSET_COIN_DENOM[asset]
-      );
-
-      if (txResponse?.code === 0) {
-        console.log('TransferForm > txReceipt > ', txResponse?.hash);
-        onDone?.();
+      if (screenResults?.[dydxAddress!]) {
+        setError(
+          stringGetter({
+            key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_ORIGINATION_ERROR_MESSAGE,
+          })
+        );
+      } else if (screenResults?.[recipientAddress!]) {
+        setError(
+          stringGetter({
+            key: STRING_KEYS.WALLET_RESTRICTED_WITHDRAWAL_TRANSFER_DESTINATION_ERROR_MESSAGE,
+          })
+        );
       } else {
-        throw new Error(txResponse?.rawLog ?? 'Transaction did not commit.');
+        const txResponse = await transfer(
+          amountBN.toNumber(),
+          recipientAddress as string,
+          tokensConfigs[asset]?.denom
+        );
+
+        if (txResponse?.code === 0) {
+          console.log('TransferForm > txReceipt > ', txResponse?.hash);
+          onDone?.();
+        } else {
+          throw new Error(txResponse?.rawLog ?? 'Transaction did not commit.');
+        }
       }
     } catch (error) {
-      setError(error);
+      if (error?.code === 429) {
+        setError(stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_MESSAGE }));
+      } else {
+        setError(
+          error.message
+            ? stringGetter({
+                key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+                params: {
+                  ERROR_MESSAGE: error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
+                },
+              })
+            : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })
+        );
+      }
       log('TransferForm/onTransfer', error);
     } finally {
       setIsLoading(false);
@@ -158,7 +204,7 @@ export const TransferForm = ({
   const onChangeAmount = (value?: number) => {
     abacusStateManager.setTransferValue({
       value,
-      field: asset === DydxChainAsset.USDC ? TransferInputField.usdcSize : TransferInputField.size,
+      field: isUSDCSelected ? TransferInputField.usdcSize : TransferInputField.size,
     });
   };
 
@@ -176,16 +222,16 @@ export const TransferForm = ({
       value: DydxChainAsset.USDC,
       label: (
         <Styled.InlineRow>
-          <AssetIcon symbol="USDC" /> {DYDX_CHAIN_ASSET_TAGS[DydxChainAsset.USDC]}
+          <AssetIcon symbol="USDC" /> {usdcLabel}
         </Styled.InlineRow>
       ),
     },
     {
-      value: DydxChainAsset.DYDX,
+      value: DydxChainAsset.CHAINTOKEN,
       label: (
         <Styled.InlineRow>
-          {/* <AssetIcon symbol="DYDX" />  */}
-          {DYDX_CHAIN_ASSET_TAGS[DydxChainAsset.DYDX]}
+          <AssetIcon symbol={chainTokenLabel} />
+          {chainTokenLabel}
         </Styled.InlineRow>
       ),
     },
@@ -193,7 +239,7 @@ export const TransferForm = ({
 
   const networkOptions = [
     {
-      chainId: CLIENT_NETWORK_CONFIGS[selectedNetwork].dydxChainId,
+      chainId: ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId,
       label: (
         <Styled.InlineRow>
           <AssetIcon symbol="DYDX" /> {stringGetter({ key: STRING_KEYS.DYDX_CHAIN })}
@@ -207,28 +253,21 @@ export const TransferForm = ({
       key: 'amount',
       label: (
         <span>
-          {stringGetter({ key: STRING_KEYS.AVAILABLE })} <Tag>{DYDX_CHAIN_ASSET_TAGS[asset]}</Tag>
+          {stringGetter({ key: STRING_KEYS.AVAILABLE })} <Tag>{tokensConfigs[asset]?.name}</Tag>
         </span>
       ),
       value: (
         <DiffOutput
           type={OutputType.Asset}
-          value={balanceBN.toString()}
-          newValue={newBalanceBN.toString()}
+          value={balanceBN}
           sign={NumberSign.Negative}
+          newValue={newBalanceBN}
           hasInvalidNewValue={newBalanceBN.isNegative()}
           withDiff={Boolean(amount && balance) && !amountBN.isNaN()}
         />
       ),
     },
   ];
-
-  const addressValidationErrorMessage = stringGetter({
-    key:
-      dydxAddress === recipientAddress
-        ? STRING_KEYS.TRANSFER_TO_YOURSELF
-        : STRING_KEYS.TRANSFER_INVALID_DYDX_ADDRESS,
-  });
 
   const renderFormInputButton = ({
     label,
@@ -261,7 +300,7 @@ export const TransferForm = ({
       }}
     >
       <Styled.Row>
-        <Styled.FormInput
+        <FormInput
           id="destination"
           onInput={(e: SyntheticInputEvent) => onChangeAddress(e.target?.value)}
           label={
@@ -283,7 +322,7 @@ export const TransferForm = ({
         />
         <Styled.NetworkSelectMenu
           label={stringGetter({ key: STRING_KEYS.NETWORK })}
-          value={CLIENT_NETWORK_CONFIGS[selectedNetwork].dydxChainId}
+          value={ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId}
           slotTriggerAfter={null}
         >
           {networkOptions.map(({ chainId, label }) => (
@@ -294,14 +333,19 @@ export const TransferForm = ({
 
       {recipientAddress && !isAddressValid && (
         <Styled.AddressValidationAlertMessage type={AlertType.Error}>
-          {addressValidationErrorMessage}
+          {stringGetter({
+            key:
+              dydxAddress === recipientAddress
+                ? STRING_KEYS.TRANSFER_TO_YOURSELF
+                : STRING_KEYS.TRANSFER_INVALID_DYDX_ADDRESS,
+          })}
         </Styled.AddressValidationAlertMessage>
       )}
 
       <Styled.SelectMenu
         label={stringGetter({ key: STRING_KEYS.ASSET })}
-        value={asset}
-        onValueChange={setAsset}
+        value={token}
+        onValueChange={onChangeAsset}
         disabled={isLoading}
       >
         {assetOptions.map(({ value, label }) => (
@@ -309,39 +353,43 @@ export const TransferForm = ({
         ))}
       </Styled.SelectMenu>
 
-      <WithDetailsReceipt side="bottom" detailItems={amountDetailItems}>
-        <Styled.FormInput
+      <Styled.WithDetailsReceipt side="bottom" detailItems={amountDetailItems}>
+        <FormInput
           label={stringGetter({ key: STRING_KEYS.AMOUNT })}
           type={InputType.Number}
           onChange={({ floatValue }: NumberFormatValues) => onChangeAmount(floatValue)}
           value={amount ?? undefined}
-          slotRight={renderFormInputButton({
-            label: stringGetter({ key: STRING_KEYS.MAX }),
-            isInputEmpty: size?.usdcSize == null,
-            onClear: () => onChangeAmount(undefined),
-            onClick: () => onChangeAmount(balanceBN.toNumber()),
-          })}
+          slotRight={
+            isUSDCSelected &&
+            balanceBN.gt(0) &&
+            renderFormInputButton({
+              label: stringGetter({ key: STRING_KEYS.MAX }),
+              isInputEmpty: size?.usdcSize == null,
+              onClear: () => onChangeAmount(undefined),
+              onClick: () => onChangeAmount(balanceBN.toNumber()),
+            })
+          }
           disabled={isLoading}
         />
-      </WithDetailsReceipt>
+      </Styled.WithDetailsReceipt>
 
       {showNotEnoughGasWarning && (
         <AlertMessage type={AlertType.Warning}>
           {stringGetter({
             key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS,
-            params: { USDC_BALANCE: `(${usdcBalance})` },
+            params: { USDC_BALANCE: `(${usdcBalance} USDC)` },
           })}
         </AlertMessage>
       )}
 
-      {error && <AlertMessage type={AlertType.Error}>{error.message}</AlertMessage>}
+      {error && <AlertMessage type={AlertType.Error}>{error}</AlertMessage>}
 
       <Styled.Footer>
         <TransferButtonAndReceipt
           selectedAsset={asset}
-          fees={fee || undefined}
-          isDisabled={!isAmountValid || !isAddressValid || !fee}
-          isLoading={isLoading || Boolean(isAmountValid && isAddressValid && !fee)}
+          fee={currentFee || undefined}
+          isDisabled={!isAmountValid || !isAddressValid || !currentFee || isLoading}
+          isLoading={isLoading || Boolean(isAmountValid && isAddressValid && !currentFee)}
         />
       </Styled.Footer>
     </Styled.Form>
@@ -351,17 +399,12 @@ export const TransferForm = ({
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Form = styled.form`
-  ${formMixins.inputsColumn}
-  gap: 1.25rem;
-`;
-
-Styled.FormInput = styled(FormInput)`
-  --form-input-height: 3.5rem;
+  ${formMixins.transfersForm}
 `;
 
 Styled.Footer = styled.footer`
-  ${layoutMixins.stickyFooter}
-  margin-top: auto;
+  ${formMixins.footer}
+  --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
 `;
 
 Styled.Row = styled.div`
@@ -371,7 +414,6 @@ Styled.Row = styled.div`
 
 Styled.SelectMenu = styled(SelectMenu)`
   ${formMixins.inputSelectMenu}
-  --form-input-height: 3.5rem;
 `;
 
 Styled.SelectItem = styled(SelectItem)`
@@ -380,6 +422,10 @@ Styled.SelectItem = styled(SelectItem)`
 
 Styled.NetworkSelectMenu = styled(Styled.SelectMenu)`
   pointer-events: none;
+`;
+
+Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
+  --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
 Styled.InlineRow = styled.span`
@@ -396,10 +442,6 @@ Styled.DestinationInputLabel = styled.span`
 
   svg {
     color: var(--color-positive);
-
-    path {
-      stroke-width: 2;
-    }
   }
 `;
 

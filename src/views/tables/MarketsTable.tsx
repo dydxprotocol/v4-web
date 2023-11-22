@@ -37,9 +37,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               columnKey: 'market',
               getCellValue: (row) => row.market,
               label: stringGetter({ key: STRING_KEYS.MARKET }),
-              renderCell: ({ asset, id }) => (
-                <Styled.MarketTableCell asset={asset} marketId={id} />
-              ),
+              renderCell: ({ asset, id }) => <Styled.MarketTableCell asset={asset} marketId={id} />,
             },
             {
               columnKey: 'price',
@@ -98,19 +96,19 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               ),
             },
             {
-              columnKey: 'priceChange24H',
-              getCellValue: (row) => row.priceChange24H,
+              columnKey: 'priceChange24HPercent',
+              getCellValue: (row) => row.priceChange24HPercent,
               label: stringGetter({ key: STRING_KEYS.CHANGE_24H }),
               renderCell: ({ priceChange24H, priceChange24HPercent, tickSizeDecimals }) => (
                 <TableCell stacked>
                   <Styled.InlineRow>
-                    {!priceChange24H ? (
+                    {!priceChange24HPercent ? (
                       <Output type={OutputType.Text} value={null} />
                     ) : (
                       <Styled.Output
                         type={OutputType.Percent}
                         value={MustBigNumber(priceChange24HPercent).abs()}
-                        isNegative={MustBigNumber(priceChange24H).isNegative()}
+                        isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
                       />
                     )}
                   </Styled.InlineRow>
@@ -136,19 +134,17 @@ export const MarketsTable = ({ className }: { className?: string }) => {
             },
             {
               columnKey: 'openInterest',
-              getCellValue: (row) => row.openInterest,
+              getCellValue: (row) => row.openInterestUSDC,
               label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
               renderCell: (row) => (
                 <TableCell stacked>
+                  <Output type={OutputType.Fiat} value={row.openInterestUSDC} />
+
                   <Output
                     fractionDigits={LARGE_TOKEN_DECIMALS}
                     type={OutputType.Number}
                     value={row.openInterest}
-                    tag={row.asset?.symbol}
-                  />
-                  <Output
-                    type={OutputType.Fiat}
-                    value={MustBigNumber(row.openInterest).times(MustBigNumber(row.oraclePrice))}
+                    tag={row.asset?.id}
                   />
                 </TableCell>
               ),
@@ -157,7 +153,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               columnKey: 'volume24H',
               getCellValue: (row) => row.volume24H,
               label: stringGetter({ key: STRING_KEYS.VOLUME_24H }),
-              renderCell: (row) => <Output type={OutputType.Number} value={row.volume24H} />,
+              renderCell: (row) => <Output type={OutputType.Fiat} value={row.volume24H} />,
             },
             {
               columnKey: 'trades24H',

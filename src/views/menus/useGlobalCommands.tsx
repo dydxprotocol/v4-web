@@ -129,15 +129,13 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
         {
           value: NavItems.NavigateToMarket,
           label: 'Navigate to Market',
-          subitems: joinedPerpetualMarketsAndAssets.map(
-            ({ market = '', name = '', symbol = '' }) => ({
-              value: market, // `${market}|${name}`,
-              slotBefore: <AssetIcon symbol={symbol} />,
-              label: name,
-              tag: symbol, // <abbr>{symbol}</abbr>,
-              onSelect: () => navigate(`/trade/${market}`),
-            })
-          ),
+          subitems: joinedPerpetualMarketsAndAssets.map(({ market = '', name = '', id = '' }) => ({
+            value: market,
+            slotBefore: <AssetIcon symbol={id} />,
+            label: name,
+            tag: id,
+            onSelect: () => navigate(`/trade/${market}`),
+          })),
         },
       ],
     },

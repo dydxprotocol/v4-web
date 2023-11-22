@@ -9,8 +9,8 @@ import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvent } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { CLIENT_NETWORK_CONFIGS } from '@/constants/networks';
-import { DydxAddress, SIGN_TYPED_DATA } from '@/constants/wallets';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { DydxAddress, getSignTypedData } from '@/constants/wallets';
 
 import { useAccounts, useBreakpoints, useDydxClient, useStringGetter } from '@/hooks';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
@@ -55,7 +55,7 @@ export const GenerateKeys = ({
   // 1. Switch network
   const selectedNetwork = useSelector(getSelectedNetwork);
 
-  const chainId = Number(CLIENT_NETWORK_CONFIGS[selectedNetwork].ethereumChainId);
+  const chainId = Number(ENVIRONMENT_CONFIG_MAP[selectedNetwork].ethereumChainId);
 
   const { isMatchingNetwork, matchNetwork, isSwitchingNetwork } = useMatchingEvmNetwork({
     chainId,
@@ -85,10 +85,11 @@ export const GenerateKeys = ({
     EvmDerivedAccountStatus.Derived,
   ].includes(status);
 
+  const signTypedData = getSignTypedData(selectedNetwork);
   const { signTypedDataAsync } = useSignTypedData({
-    ...SIGN_TYPED_DATA,
+    ...signTypedData,
     domain: {
-      ...SIGN_TYPED_DATA.domain,
+      ...signTypedData.domain,
       chainId,
     },
   });
@@ -129,12 +130,14 @@ export const GenerateKeys = ({
           }
         }
       } catch (error) {
+        setStatus(EvmDerivedAccountStatus.NotDerived);
         const { message } = parseWalletError({ error, stringGetter });
 
         if (message) {
           track(AnalyticsEvent.OnboardingWalletIsNonDeterministic);
           setError(message);
         }
+        return;
       }
 
       await setWalletFromEvmSignature(signature);
@@ -165,8 +168,8 @@ export const GenerateKeys = ({
         {[
           {
             status: EvmDerivedAccountStatus.Deriving,
-            title: stringGetter({ key: STRING_KEYS.GENERATE_COSMOS_WALLET }),
-            description: stringGetter({ key: STRING_KEYS.GENERATE_COSMOS_WALLET }),
+            title: stringGetter({ key: STRING_KEYS.GENERATE_DYDX_WALLET }),
+            description: stringGetter({ key: STRING_KEYS.VERIFY_WALLET_OWNERSHIP }),
           },
           status === EvmDerivedAccountStatus.EnsuringDeterminism && {
             status: EvmDerivedAccountStatus.EnsuringDeterminism,
@@ -263,7 +266,6 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.StatusCardsContainer = styled.div`
   display: grid;
-  margin-top: 1rem;
   gap: 1rem;
 `;
 

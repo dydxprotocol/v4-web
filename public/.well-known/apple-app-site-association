@@ -8,67 +8,43 @@
                 ],
                 "components": [
                     {
-                        "/": "/trade/*"
+                        "/": "/"
                     },
                     {
-                        "/": "/r/*"
+                        "/": "/#/"
                     },
                     {
-                        "/": "/portfolio/overview"
+                        "/": "*/markets"
                     },
                     {
-                        "/": "/portfolio/positions"
+                        "/": "*/trade"
                     },
                     {
-                        "/": "/portfolio/orders"
+                        "/": "*/trade/*"
                     },
                     {
-                        "/": "/portfolio/fees"
+                        "/": "*/portfolio"
                     },
                     {
-                        "/": "/portfolio/history"
+                        "/": "*/portfolio/overview"
                     },
                     {
-                        "/": "/portfolio/history/trades"
+                        "/": "*/portfolio/positions"
                     },
                     {
-                        "/": "/portfolio/history/transfers"
+                        "/": "*/portfolio/orders"
                     },
                     {
-                        "/": "/portfolio/history/funding"
+                        "/": "*/portfolio/fees"
                     },
                     {
-                        "/": "/rewards"
+                        "/": "*/portfolio/history/trades"
                     },
                     {
-                        "/": "/my-profile"
+                        "/": "*/portfolio/history/transfers"
                     },
                     {
-                        "/": "/rankings/hedgies"
-                    },
-                    {
-                        "/": "/rankings/competition"
-                    },
-                    {
-                        "/": "/rankings/diamond"
-                    },
-                    {
-                        "/": "/rankings/platinum"
-                    },
-                    {
-                        "/": "/rankings/gold"
-                    },
-                    {
-                        "/": "/rankings/silver"
-                    },
-                    {
-                        "/": "/rankings/bronze"
-                    },
-                    {
-                        "/": "/rankings/pnl-absolute"
-                    },
-                    {
-                        "/": "/rankings/pnl-percent"
+                        "/": "*/portfolio/history/funding"
                     },
                     {
                         "/": "/walletsegue",

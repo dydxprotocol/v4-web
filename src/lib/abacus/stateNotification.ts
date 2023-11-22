@@ -20,10 +20,12 @@ import type { RootStore } from '@/state/_store';
 
 import {
   setBalances,
+  setStakingBalances,
   setFills,
   setFundingPayments,
   setHistoricalPnl,
   setLatestOrder,
+  setRestrictionType,
   setSubaccount,
   setTransfers,
   setWallet,
@@ -33,7 +35,9 @@ import { setApiState } from '@/state/app';
 import { setAssets } from '@/state/assets';
 import { setConfigs } from '@/state/configs';
 import { setInputs } from '@/state/inputs';
+import { updateNotifications } from '@/state/notifications';
 import { setHistoricalFundings, setLiveTrades, setMarkets, setOrderbook } from '@/state/perpetuals';
+import { isTruthy } from '../isTruthy';
 
 class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   private store: RootStore | undefined;
@@ -47,6 +51,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   }
 
   notificationsChanged(notifications: kollections.List<AbacusNotification>): void {
+    this.store?.dispatch(updateNotifications(notifications.toArray()));
     return;
   }
 
@@ -76,11 +81,18 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
       if (changes.has(Changes.accountBalances)) {
         if (updatedState.account?.balances) {
-          const balances: Record<string, AccountBalance> = {}
+          const balances: Record<string, AccountBalance> = {};
           for (const { k, v } of updatedState.account.balances.toArray()) {
             balances[k] = v;
           }
           dispatch(setBalances(balances));
+        }
+        if (updatedState.account?.stakingBalances) {
+          const stakingBalances: Record<string, AccountBalance> = {};
+          for (const { k, v } of updatedState.account.stakingBalances.toArray()) {
+            stakingBalances[k] = v;
+          }
+          dispatch(setStakingBalances(stakingBalances));
         }
       }
 
@@ -100,14 +112,20 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         dispatch(
           setMarkets({
             markets: Object.fromEntries(
-              (marketIds || updatedState.marketIds()?.toArray() || []).map((marketId: string) => {
-                const marketData = updatedState.market(marketId);
-                return [marketId, marketData];
-              })
+              (marketIds || updatedState.marketIds()?.toArray() || [])
+                .map((marketId: string) => {
+                  const marketData = updatedState.market(marketId);
+                  return [marketId, marketData];
+                })
+                .filter(isTruthy)
             ) as Record<string, PerpetualMarket>,
             update: !!marketIds,
           })
         );
+      }
+
+      if (changes.has(Changes.restriction)) {
+        dispatch(setRestrictionType(updatedState.restriction));
       }
 
       subaccountNumbers?.forEach((subaccountId: number) => {

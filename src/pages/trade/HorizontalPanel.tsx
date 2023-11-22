@@ -227,8 +227,8 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
             },
           ]}
           value={view}
-          onValueChange={(newView: string) => {
-            setView((newView || view) as PanelView);
+          onValueChange={setView}
+          onInteraction={() => {
             setIsOpen?.(true);
           }}
         />

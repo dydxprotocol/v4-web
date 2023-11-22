@@ -6,8 +6,10 @@ import { MarketFilters, MARKET_FILTER_LABELS, type MarketData } from '@/constant
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
+import { isTruthy } from '@/lib/isTruthy';
+
 const filterFunctions = {
-  [MarketFilters.ALL]: (market: MarketData) => true,
+  [MarketFilters.ALL]: () => true,
   [MarketFilters.LAYER_1]: (market: MarketData) => {
     return market.asset.tags?.toArray().includes('Layer 1');
   },
@@ -29,7 +31,7 @@ export const useMarketsData = (
 
   const markets = useMemo(() => {
     return Object.values(allPerpetualMarkets)
-      .filter((market) => allAssets[market?.assetId]) // Filter out markets with no asset information
+      .filter(isTruthy)
       .map((marketData) => ({
         asset: allAssets[marketData.assetId],
         tickSizeDecimals: marketData.configs?.tickSizeDecimals,
@@ -45,8 +47,8 @@ export const useMarketsData = (
     if (searchFilter) {
       return filtered.filter(
         ({ asset }) =>
-          asset.name?.toLocaleLowerCase().includes(searchFilter.toLowerCase()) ||
-          asset.symbol?.toLocaleLowerCase().includes(searchFilter.toLowerCase())
+          asset?.name?.toLocaleLowerCase().includes(searchFilter.toLowerCase()) ||
+          asset?.id?.toLocaleLowerCase().includes(searchFilter.toLowerCase())
       );
     }
     return filtered;

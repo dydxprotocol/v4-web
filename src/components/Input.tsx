@@ -207,6 +207,16 @@ const InputStyle = css`
     color: var(--color-text-0);
     opacity: 1;
   }
+
+  // Input autofill Styles
+  &:-webkit-autofill,
+  &:-webkit-autofill:focus {
+    transition: background-color 600000s 0s, color 600000s 0s;
+  }
+
+  &[data-autocompleted] {
+    background-color: var(--input-backgroundColor) !important;
+  }
 `;
 
 Styled.NumericFormat = styled(NumericFormat)`

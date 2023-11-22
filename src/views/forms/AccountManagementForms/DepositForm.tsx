@@ -2,22 +2,22 @@ import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
-import { TESTNET_CHAIN_ID } from '@dydxprotocol/v4-client-js';
-import { parseUnits } from 'viem'
+import { parseUnits } from 'viem';
 
 import erc20 from '@/abi/erc20.json';
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { NotificationStatus } from '@/constants/notifications';
 import { NumberSign } from '@/constants/numbers';
 import type { EvmAddress } from '@/constants/wallets';
 
-import { useAccounts, useDebounce, useStringGetter } from '@/hooks';
+import { useAccounts, useDebounce, useStringGetter, useSelectedNetwork } from '@/hooks';
 import { useAccountBalance, CHAIN_DEFAULT_TOKEN_ADDRESS } from '@/hooks/useAccountBalance';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { NATIVE_TOKEN_ADDRESS, useSquid } from '@/hooks/useSquid';
-import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
@@ -54,9 +54,9 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const stringGetter = useStringGetter();
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { selectedNetwork } = useSelectedNetwork();
 
-  const { evmAddress, signerWagmi } = useAccounts();
-  const { publicClientWagmi } = useWalletConnection();
+  const { evmAddress, signerWagmi, publicClientWagmi } = useAccounts();
 
   const { addTransferNotification } = useLocalNotifications();
 
@@ -66,6 +66,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     chain: chainIdStr,
     resources,
     summary,
+    errors: routeErrors,
+    errorMessage: routeErrorMessage,
   } = useSelector(getTransferInputs, shallowEqual) || {};
   const chainId = chainIdStr ? parseInt(chainIdStr) : undefined;
 
@@ -87,7 +89,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   // Async Data
   const { balance, queryStatus, isQueryFetching } = useAccountBalance({
     addressOrDenom: sourceToken?.address || CHAIN_DEFAULT_TOKEN_ADDRESS,
-    assetSymbol: sourceToken?.symbol || undefined,
     chainId: chainId,
     decimals: sourceToken?.decimals || undefined,
     isCosmosChain: false,
@@ -99,7 +100,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   useEffect(() => {
     const hasInvalidInput =
-      debouncedAmountBN.isNaN() || debouncedAmountBN.lte(0) || debouncedAmountBN.gte(balanceBN);
+      debouncedAmountBN.isNaN() || debouncedAmountBN.lte(0) || debouncedAmountBN.gt(balanceBN);
 
     abacusStateManager.setTransferValue({
       value: hasInvalidInput ? 0 : debouncedAmount,
@@ -173,7 +174,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   const validateTokenApproval = useCallback(async () => {
     if (!signerWagmi || !publicClientWagmi) throw new Error('Missing signer');
-    if (!sourceToken?.address || !sourceToken.decimals) throw new Error('Missing source token address');
+    if (!sourceToken?.address || !sourceToken.decimals)
+      throw new Error('Missing source token address');
     if (!sourceChain?.rpc) throw new Error('Missing source chain rpc');
     if (!requestPayload?.targetAddress) throw new Error('Missing target address');
     if (!requestPayload?.value) throw new Error('Missing transaction value');
@@ -183,11 +185,11 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       address: sourceToken.address as EvmAddress,
       abi: erc20,
       functionName: 'allowance',
-      args: [evmAddress as EvmAddress, requestPayload.targetAddress as EvmAddress]
+      args: [evmAddress as EvmAddress, requestPayload.targetAddress as EvmAddress],
     });
 
     const sourceAmountBN = parseUnits(debouncedAmount, sourceToken.decimals);
-    
+
     if (sourceAmountBN > (allowance as bigint)) {
       const { request } = await publicClientWagmi.simulateContract({
         account: evmAddress,
@@ -195,12 +197,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         abi: erc20,
         functionName: 'approve',
         args: [requestPayload.targetAddress as EvmAddress, sourceAmountBN],
-      })
+      });
 
       const approveTx = await signerWagmi.writeContract(request);
       await publicClientWagmi.waitForTransactionReceipt({
         hash: approveTx,
-      })
+      });
     }
   }, [signerWagmi, sourceToken, sourceChain, requestPayload, publicClientWagmi]);
 
@@ -230,8 +232,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           to: requestPayload.targetAddress as EvmAddress,
           data: requestPayload.data as EvmAddress,
           gasLimit: BigInt(requestPayload.gasLimit),
-          value:
-            requestPayload.routeType !== 'SEND' ? BigInt(requestPayload.value) : undefined,
+          value: requestPayload.routeType !== 'SEND' ? BigInt(requestPayload.value) : undefined,
         };
         const txHash = await signerWagmi.sendTransaction(tx);
 
@@ -240,10 +241,11 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         if (txHash) {
           addTransferNotification({
             txHash: txHash,
-            toChainId: TESTNET_CHAIN_ID,
+            toChainId: ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId,
             fromChainId: chainIdStr || undefined,
             toAmount: summary?.usdcSize || undefined,
             triggeredAt: Date.now(),
+            notificationStatus: NotificationStatus.Triggered,
           });
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');
@@ -289,6 +291,15 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       return parseWalletError({ error, stringGetter }).message;
     }
 
+    if (routeErrors) {
+      return routeErrorMessage
+        ? stringGetter({
+            key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+            params: { ERROR_MESSAGE: routeErrorMessage },
+          })
+        : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG });
+    }
+
     if (fromAmount) {
       if (!chainId) {
         return stringGetter({ key: STRING_KEYS.MUST_SPECIFY_CHAIN });
@@ -302,7 +313,16 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     }
 
     return undefined;
-  }, [error, balance, chainId, fromAmount, sourceToken]);
+  }, [
+    error,
+    routeErrors,
+    routeErrorMessage,
+    balance,
+    chainId,
+    fromAmount,
+    sourceToken,
+    stringGetter,
+  ]);
 
   const isDisabled =
     Boolean(errorMessage) ||
@@ -333,14 +353,17 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         />
       </Styled.WithDetailsReceipt>
       {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
-      <DepositButtonAndReceipt
-        isDisabled={isDisabled}
-        isLoading={isLoading}
-        chainId={chainId || undefined}
-        setSlippage={onSetSlippage}
-        slippage={slippage}
-        sourceToken={sourceToken || undefined}
-      />
+
+      <Styled.Footer>
+        <DepositButtonAndReceipt
+          isDisabled={isDisabled}
+          isLoading={isLoading}
+          chainId={chainId || undefined}
+          setSlippage={onSetSlippage}
+          slippage={slippage}
+          sourceToken={sourceToken || undefined}
+        />
+      </Styled.Footer>
     </Styled.Form>
   );
 };
@@ -348,13 +371,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Form = styled.form`
-  --form-input-height: 3.5rem;
+  ${formMixins.transfersForm}
+`;
 
-  ${layoutMixins.flexColumn}
-  gap: 1.5rem;
-
-  ${layoutMixins.stickyArea1}
-  min-height: calc(100% - var(--stickyArea0-bottomHeight));
+Styled.Footer = styled.footer`
+  ${formMixins.footer}
+  --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
 `;
 
 Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
