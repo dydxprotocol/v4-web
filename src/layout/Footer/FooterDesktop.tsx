@@ -132,7 +132,7 @@ Styled.StatusDot = styled.div<{ exchangeStatus: ExchangeStatus }>`
 Styled.FooterButton = styled(Button)`
   --button-height: 1.5rem;
   --button-radius: 0.25rem;
-  --button-backgroundColor: var(--color-layer-2);
+  --button-backgroundColor: transparent;
   --button-border: none;
   --button-textColor: var(--color-text-0);
 
