@@ -119,6 +119,10 @@ export const TransferForm = ({
 
     return () => {
       abacusStateManager.clearTransferInputValues();
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.type,
+        value: null,
+      });
     };
   }, []);
 

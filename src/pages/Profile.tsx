@@ -54,11 +54,14 @@ const Profile = () => {
       label: stringGetter({ key: STRING_KEYS.DEPOSIT }),
       icon: { iconName: IconName.Deposit },
       onClick: () => {
-        abacusStateManager.setTransferValue({
-          field: TransferInputField.type,
-          value: TransferType.deposit.rawValue,
-        });
-        dispatch(openDialog({ type: DialogTypes.ManageFunds }));
+        dispatch(
+          openDialog({
+            type: DialogTypes.ManageFunds,
+            dialogProps: {
+              selectedTransferType: TransferType.deposit.rawValue,
+            },
+          })
+        );
       },
     },
     {
@@ -66,11 +69,14 @@ const Profile = () => {
       label: stringGetter({ key: STRING_KEYS.WITHDRAW }),
       icon: { iconName: IconName.Withdraw },
       onClick: () => {
-        abacusStateManager.setTransferValue({
-          field: TransferInputField.type,
-          value: TransferType.withdrawal.rawValue,
-        });
-        dispatch(openDialog({ type: DialogTypes.ManageFunds }));
+        dispatch(
+          openDialog({
+            type: DialogTypes.ManageFunds,
+            dialogProps: {
+              selectedTransferType: TransferType.withdrawal.rawValue,
+            },
+          })
+        );
       },
     },
     {
@@ -78,11 +84,14 @@ const Profile = () => {
       label: stringGetter({ key: STRING_KEYS.TRANSFER }),
       icon: { iconName: IconName.Send },
       onClick: () => {
-        abacusStateManager.setTransferValue({
-          field: TransferInputField.type,
-          value: TransferType.transferOut.rawValue,
-        });
-        dispatch(openDialog({ type: DialogTypes.ManageFunds }));
+        dispatch(
+          openDialog({
+            type: DialogTypes.ManageFunds,
+            dialogProps: {
+              selectedTransferType: TransferType.transferOut.rawValue,
+            },
+          })
+        );
       },
     },
     isConnected
