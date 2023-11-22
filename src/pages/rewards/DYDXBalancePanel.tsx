@@ -39,7 +39,7 @@ export const DYDXBalancePanel = () => {
             <AssetIcon symbol={chainTokenLabel} />
             {chainTokenLabel}
           </Styled.Title>
-          <Styled.ReceiveAndTransferButtons>
+          <Styled.ActionButtons>
             {!canAccountTrade ? (
               <OnboardingTriggerButton size={ButtonSize.Small} />
             ) : (
@@ -52,7 +52,7 @@ export const DYDXBalancePanel = () => {
                 {stringGetter({ key: STRING_KEYS.TRANSFER })}
               </Button>
             )}
-          </Styled.ReceiveAndTransferButtons>
+          </Styled.ActionButtons>
         </Styled.Header>
       }
     >
@@ -134,7 +134,7 @@ Styled.Title = styled.h3`
   }
 `;
 
-Styled.ReceiveAndTransferButtons = styled(Toolbar)`
+Styled.ActionButtons = styled(Toolbar)`
   ${layoutMixins.inlineRow}
   --stickyArea-topHeight: max-content;
   gap: 0.5rem;

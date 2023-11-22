@@ -1,7 +1,6 @@
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { DEFAULT_MARKETID } from '@/constants/markets';
@@ -11,8 +10,8 @@ import { useShouldShowFooter, useStringGetter } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { NavigationMenu } from '@/components/NavigationMenu';
-import { Icon } from '@/components/Icon';
-import { BellIcon, MarketsIcon, PlayIcon, PortfolioIcon, ProfileIcon, TradeIcon } from '@/icons';
+import { Icon, IconName } from '@/components/Icon';
+import { BellIcon, MarketsIcon, PortfolioIcon, ProfileIcon } from '@/icons';
 import { IconButton } from '@/components/IconButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
@@ -42,11 +41,9 @@ export const FooterMobile = () => {
                     value: 'trade',
                     label: stringGetter({ key: STRING_KEYS.TRADE }),
                     slotBefore: (
-                      <Styled.IconButton
-                        iconComponent={TradeIcon}
-                        size={ButtonSize.Large}
-                        action={ButtonAction.Primary}
-                      />
+                      <Styled.StartIcon>
+                        <Icon iconName={IconName.Trade} />
+                      </Styled.StartIcon>
                     ),
                     href: `${AppRoute.Trade}/${marketId ?? DEFAULT_MARKETID}`,
                   }
@@ -54,11 +51,9 @@ export const FooterMobile = () => {
                     value: 'onboarding',
                     label: stringGetter({ key: STRING_KEYS.ONBOARDING }),
                     slotBefore: (
-                      <Styled.IconButton
-                        iconComponent={PlayIcon}
-                        size={ButtonSize.Large}
-                        action={ButtonAction.Primary}
-                      />
+                      <Styled.StartIcon>
+                        <Icon iconName={IconName.Play} />
+                      </Styled.StartIcon>
                     ),
                     onClick: () => dispatch(openDialog({ type: DialogTypes.Onboarding })),
                   },
@@ -167,4 +162,25 @@ Styled.IconButton = styled(IconButton)`
 
 Styled.Icon = styled(Icon)`
   font-size: 1.5rem;
+`;
+
+Styled.StartIcon = styled.div`
+  display: inline-flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-top: -0.25rem;
+
+  width: 3.5rem;
+  height: 3.5rem;
+
+  color: var(--color-text-2);
+  background-color: var(--color-accent);
+  border: solid var(--border-width) var(--color-border-white);
+  border-radius: 50%;
+
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
 `;

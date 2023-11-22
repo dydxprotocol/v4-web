@@ -151,6 +151,8 @@ export const formMixins: Record<
     --form-input-paddingY: 0.5rem;
     --form-input-paddingX: 1rem;
 
+    height: 100%;
+
     label {
       --label-textColor: var(--color-text-0);
     }

@@ -17,7 +17,6 @@ import { MobileSignInDialog } from '@/views/dialogs/MobileSignInDialog';
 import { OnboardingDialog } from '@/views/dialogs/OnboardingDialog';
 import { PreferencesDialog } from '@/views/dialogs/PreferencesDialog';
 import { RateLimitDialog } from '@/views/dialogs/RateLimitDialog';
-import { ReceiveDialog } from '@/views/dialogs/ReceiveDialog';
 import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
@@ -60,7 +59,6 @@ export const DialogManager = () => {
     [DialogTypes.OrderDetails]: <OrderDetailsDialog {...modalProps} />,
     [DialogTypes.Preferences]: <PreferencesDialog {...modalProps} />,
     [DialogTypes.RateLimit]: <RateLimitDialog {...modalProps} />,
-    [DialogTypes.Receive]: <ReceiveDialog {...modalProps} />,
     [DialogTypes.RestrictedGeo]: <RestrictedGeoDialog {...modalProps} />,
     [DialogTypes.RestrictedWallet]: <RestrictedWalletDialog {...modalProps} />,
     [DialogTypes.Trade]: <TradeDialog {...modalProps} />,

@@ -67,7 +67,8 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                         <Styled.Output
                           type={OutputType.Percent}
                           value={MustBigNumber(priceChange24HPercent).abs()}
-                          isNegative={MustBigNumber(priceChange24H).isNegative()}
+                          isPositive={MustBigNumber(priceChange24HPercent).gt(0)}
+                          isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
                         />
                       </>
                     )}
@@ -108,6 +109,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                       <Styled.Output
                         type={OutputType.Percent}
                         value={MustBigNumber(priceChange24HPercent).abs()}
+                        isPositive={MustBigNumber(priceChange24HPercent).gt(0)}
                         isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
                       />
                     )}
@@ -128,6 +130,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                 <Styled.Output
                   type={OutputType.SmallPercent}
                   value={row.nextFundingRate}
+                  isPositive={MustBigNumber(row.nextFundingRate).gt(0)}
                   isNegative={MustBigNumber(row.nextFundingRate).isNegative()}
                 />
               ),
@@ -239,6 +242,11 @@ Styled.TabletPriceChange = styled(Styled.InlineRow)`
   font: var(--font-small-book);
 `;
 
-Styled.Output = styled(Output)<{ isNegative?: boolean }>`
-  color: ${({ isNegative }) => (isNegative ? `var(--color-negative)` : `var(--color-positive)`)};
+Styled.Output = styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`
+  color: ${({ isNegative, isPositive }) =>
+    isNegative
+      ? `var(--color-negative)`
+      : isPositive
+      ? `var(--color-positive)`
+      : `var(--color-text-1)`};
 `;
