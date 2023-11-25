@@ -29,6 +29,134 @@ export const useDrawOrderbookHistograms = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvas = canvasRef.current;
 
+  /**
+   *         to === 'right'                to === 'left'
+   *         |===================|         |===================|
+   * bar:    a                   b         c                   d
+   * a = 0
+   * b = depthBarWidth
+   * c = canvasWidth - depthBarWidth
+   * d = canvasWidth
+   *
+   */
+  const getXYValues = ({
+    barWidth,
+    canvasWidth,
+    gradientMultiplier,
+  }: {
+    barWidth: number;
+    canvasWidth: number;
+    gradientMultiplier: number;
+  }) => {
+    const gradient = {
+      x1: to === 'right' ? barWidth : canvasWidth - barWidth,
+      x2:
+        to === 'right'
+          ? 0 - (canvasWidth * gradientMultiplier - canvasWidth)
+          : canvasWidth * gradientMultiplier,
+    };
+    const bar = {
+      x1: to === 'right' ? 0 : canvasWidth - barWidth,
+      x2: to === 'right' ? Math.min(barWidth, canvasWidth - 2) : canvasWidth - 2,
+    };
+
+    return {
+      bar,
+      gradient,
+    };
+  };
+
+  const drawBars = ({
+    value,
+    canvasWidth,
+    ctx,
+    gradientMultiplier,
+    histogramAccentColor,
+    idx,
+    to,
+  }: {
+    value: Nullable<number>;
+    canvasWidth: number;
+    ctx: CanvasRenderingContext2D;
+    gradientMultiplier: number;
+    histogramAccentColor: string;
+    idx: number;
+    to: 'left' | 'right';
+  }) => {
+    const histogramBarWidth = ctx.canvas.width - 2;
+    const barWidth = value ? (value / histogramRange) * histogramBarWidth : 0;
+    const { gradient, bar } = getXYValues({ barWidth, canvasWidth, gradientMultiplier });
+
+    const linearGradient = ctx.createLinearGradient(gradient.x1, 10, gradient.x2, 10);
+    linearGradient.addColorStop(0, histogramAccentColor);
+    linearGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = linearGradient;
+
+    ctx.beginPath();
+
+    ctx.roundRect
+      ? ctx.roundRect?.(
+          bar.x1,
+          idx * 20 + 1,
+          bar.x2,
+          18,
+          to === 'left' ? [2, 0, 0, 2] : [0, 2, 2, 0]
+        )
+      : ctx.rect(bar.x1, idx * 20 + 1, bar.x2, 18);
+    ctx.fill();
+  };
+
+  const drawText = ({
+    ctx,
+    idx,
+    size,
+    price,
+    mine,
+    x,
+  }: {
+    ctx: CanvasRenderingContext2D;
+    idx: number;
+    size?: Nullable<number>;
+    price?: Nullable<number>;
+    mine?: Nullable<number>;
+    x: number;
+  }) => {
+    ctx.font = `12.5px Satoshi`;
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.imageSmoothingQuality = 'high';
+
+    // Size text
+    if (size) {
+      ctx.fillStyle = 'white';
+      ctx.fillText(
+        MustBigNumber(size).toFixed(stepSizeDecimals ?? TOKEN_DECIMALS),
+        x - 8,
+        idx * 20 + 10
+      );
+    }
+
+    // Price text
+    if (price) {
+      ctx.fillStyle = 'white';
+      ctx.fillText(
+        MustBigNumber(price).toFixed(tickSizeDecimals ?? SMALL_USD_DECIMALS),
+        x * 2 - 8,
+        idx * 20 + 10
+      );
+    }
+
+    // Mine text
+    if (mine) {
+      ctx.fillStyle = 'white';
+      ctx.fillText(
+        MustBigNumber(mine).toFixed(stepSizeDecimals ?? TOKEN_DECIMALS),
+        x * 3 - 8,
+        idx * 20 + 10
+      );
+    }
+  };
+
   useEffect(() => {
     const ctx = canvas?.getContext('2d');
 
@@ -73,119 +201,42 @@ export const useDrawOrderbookHistograms = ({
         histogramAlpha = 0.75;
       }
 
-      const histogramBarWidth = ctx.canvas.width - 2;
       const histogramAccentColor =
         side === 'bid'
           ? `hsla(159, 67%, 39%, ${histogramAlpha})`
           : `hsla(360, 73%, 61%, ${histogramAlpha})`;
 
-      /**
-       *         to === 'right'                to === 'left'
-       *         |===================|         |===================|
-       * bar:    a                   b         c                   d
-       * a = 0
-       * b = depthBarWidth
-       * c = canvasWidth - depthBarWidth
-       * d = canvasWidth
-       *
-       */
-      const getXYValues = ({
-        barWidth,
-        gradientMultiplier,
-      }: {
-        barWidth: number;
-        gradientMultiplier: number;
-      }) => {
-        const gradient = {
-          x1: to === 'right' ? barWidth : canvasWidth - barWidth,
-          x2:
-            to === 'right'
-              ? 0 - (canvasWidth * gradientMultiplier - canvasWidth)
-              : canvasWidth * gradientMultiplier,
-        };
-        const bar = {
-          x1: to === 'right' ? 0 : canvasWidth - barWidth,
-          x2: to === 'right' ? Math.min(barWidth, canvasWidth - 2) : canvasWidth - 2,
-        };
-
-        return {
-          bar,
-          gradient,
-        };
-      };
-
-      const drawBars = ({
-        barWidth,
-        gradientMultiplier,
-      }: {
-        barWidth: number;
-        gradientMultiplier: number;
-      }) => {
-        const { gradient, bar } = getXYValues({ barWidth, gradientMultiplier });
-        const linearGradient = ctx.createLinearGradient(gradient.x1, 10, gradient.x2, 10);
-        linearGradient.addColorStop(0, histogramAccentColor);
-        linearGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        ctx.fillStyle = linearGradient;
-        ctx.beginPath();
-
-        ctx.roundRect
-          ? ctx.roundRect?.(
-              bar.x1,
-              idx * 20 + 1,
-              bar.x2,
-              18,
-              to === 'left' ? [2, 0, 0, 2] : [0, 2, 2, 0]
-            )
-          : ctx.rect(bar.x1, idx * 20 + 1, bar.x2, 18);
-        ctx.fill();
-      };
-
       // Depth Bar
-      const depthBarWidth = depth ? (depth / histogramRange) * histogramBarWidth : 0;
-      drawBars({ barWidth: depthBarWidth, gradientMultiplier: 2 });
+      drawBars({
+        value: depth,
+        canvasWidth,
+        ctx,
+        gradientMultiplier: 2,
+        histogramAccentColor,
+        idx,
+        to,
+      });
 
       // Size Bar
-      const sizeBarWidth = size ? (size / histogramRange) * histogramBarWidth : 0;
-      drawBars({ barWidth: sizeBarWidth, gradientMultiplier: 5 });
+      drawBars({
+        value: size,
+        canvasWidth,
+        ctx,
+        gradientMultiplier: 5,
+        histogramAccentColor,
+        idx,
+        to,
+      });
 
-      const drawText = () => {
-        ctx.font = `12.5px Satoshi`;
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'middle';
-        ctx.imageSmoothingQuality = 'high';
-
-        // Size text
-        if (size) {
-          ctx.fillStyle = 'white';
-          ctx.fillText(
-            MustBigNumber(size).toFixed(stepSizeDecimals ?? TOKEN_DECIMALS),
-            columnX - 8,
-            idx * 20 + 10
-          );
-        }
-
-        // Price text
-        if (price) {
-          ctx.fillStyle = 'white';
-          ctx.fillText(
-            MustBigNumber(price).toFixed(tickSizeDecimals ?? SMALL_USD_DECIMALS),
-            columnX * 2 - 8,
-            idx * 20 + 10
-          );
-        }
-
-        // Mine text
-        if (mine) {
-          ctx.fillStyle = 'white';
-          ctx.fillText(
-            MustBigNumber(mine).toFixed(stepSizeDecimals ?? TOKEN_DECIMALS),
-            columnX * 3 - 8,
-            idx * 20 + 10
-          );
-        }
-      };
-
-      drawText();
+      // Size, Price, Mine
+      drawText({
+        ctx,
+        idx,
+        size,
+        price,
+        mine,
+        x: columnX,
+      });
     });
   }, [data, histogramRange, hoveredRow, selectedTheme, stepSizeDecimals, tickSizeDecimals, to]);
 

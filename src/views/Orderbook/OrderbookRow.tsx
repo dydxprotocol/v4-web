@@ -17,7 +17,6 @@ export const Row = styled.div`
   min-height: ${ROW_HEIGHT}px;
 
   font: var(--font-mini-book);
-  cursor: pointer;
 
   position: relative;
   padding-right: 0.5rem;

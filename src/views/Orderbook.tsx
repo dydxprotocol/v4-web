@@ -92,7 +92,8 @@ export const Orderbook = ({
    * Display top or bottom spreadRow when center spreadRow is off screen
    */
   const spreadRowRef = useRef<HTMLDivElement>(null);
-  const { displaySide } = useSpreadRowScrollListener({
+
+  const displaySide = useSpreadRowScrollListener({
     orderbookRef,
     spreadRowRef,
   });
@@ -143,7 +144,7 @@ export const Orderbook = ({
           <span>{showMineColumn && stringGetter({ key: STRING_KEYS.MINE })}</span>
         </$Header>
         {displaySide === 'top' && (
-          <SpreadRow
+          <$SpreadRow
             side="top"
             spread={spread}
             spreadPercent={spreadPercent}
@@ -211,7 +212,7 @@ export const Orderbook = ({
           )}
         </$OrderbookWrapper>
         {displaySide === 'bottom' && (
-          <SpreadRow
+          <$SpreadRow
             side="bottom"
             spread={spread}
             spreadPercent={spreadPercent}
@@ -276,4 +277,8 @@ const $HistogramCanvas = styled(Canvas)`
 
 const $Row = styled(Row)<{ onClick?: () => void }>`
   ${({ onClick }) => (onClick ? 'cursor: pointer;' : 'cursor: default;')}
+`;
+
+const $SpreadRow = styled(SpreadRow)`
+  position: absolute;
 `;
