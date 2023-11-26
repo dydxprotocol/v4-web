@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 
 import type { Nullable } from '@/constants/abacus';
 import { SMALL_USD_DECIMALS, TOKEN_DECIMALS } from '@/constants/numbers';
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 
 import { getAppTheme } from '@/state/configsSelectors';
 
@@ -130,53 +131,62 @@ export const useDrawOrderbookHistograms = ({
     ctx.fill();
   };
 
-  const drawText = ({
-    ctx,
-    canvasWidth,
-    idx,
-    size,
-    price,
-    mine,
-  }: {
-    ctx: CanvasRenderingContext2D;
-    canvasWidth: number;
-    idx: number;
-    size?: Nullable<number>;
-    price?: Nullable<number>;
-    mine?: Nullable<number>;
-  }) => {
-    const y = getYFromIndex(idx, 'text');
+  const { decimal: LOCALE_DECIMAL_SEPARATOR } = useLocaleSeparators();
 
-    // Size text
-    if (size) {
-      ctx.fillStyle = 'white';
-      ctx.fillText(
-        MustBigNumber(size).toFixed(stepSizeDecimals ?? TOKEN_DECIMALS),
-        getXByColumn({ canvasWidth, colIdx: 0 }) - ROW_PADDING_RIGHT,
-        y
-      );
-    }
-
-    // Price text
-    if (price) {
-      ctx.fillStyle = 'white';
-      ctx.fillText(
-        MustBigNumber(price).toFixed(tickSizeDecimals ?? SMALL_USD_DECIMALS),
-        getXByColumn({ canvasWidth, colIdx: 1 }) - ROW_PADDING_RIGHT,
-        y
-      );
-    }
-
-    // Mine text
-    if (mine) {
-      ctx.fillStyle = 'white';
-      ctx.fillText(
-        MustBigNumber(mine).toFixed(stepSizeDecimals ?? TOKEN_DECIMALS),
-        getXByColumn({ canvasWidth, colIdx: 2 }) - ROW_PADDING_RIGHT,
-        y
-      );
-    }
+  const formatOptions = {
+    decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
   };
+
+  const drawText = useCallback(
+    ({
+      ctx,
+      canvasWidth,
+      idx,
+      size,
+      price,
+      mine,
+    }: {
+      ctx: CanvasRenderingContext2D;
+      canvasWidth: number;
+      idx: number;
+      size?: Nullable<number>;
+      price?: Nullable<number>;
+      mine?: Nullable<number>;
+    }) => {
+      const y = getYFromIndex(idx, 'text');
+
+      // Size text
+      if (size) {
+        ctx.fillStyle = 'white';
+        ctx.fillText(
+          MustBigNumber(size).toFormat(stepSizeDecimals ?? TOKEN_DECIMALS, formatOptions),
+          getXByColumn({ canvasWidth, colIdx: 0 }) - ROW_PADDING_RIGHT,
+          y
+        );
+      }
+
+      // Price text
+      if (price) {
+        ctx.fillStyle = 'white';
+        ctx.fillText(
+          MustBigNumber(price).toFormat(tickSizeDecimals ?? SMALL_USD_DECIMALS, formatOptions),
+          getXByColumn({ canvasWidth, colIdx: 1 }) - ROW_PADDING_RIGHT,
+          y
+        );
+      }
+
+      // Mine text
+      if (mine) {
+        ctx.fillStyle = 'white';
+        ctx.fillText(
+          MustBigNumber(mine).toFormat(stepSizeDecimals ?? TOKEN_DECIMALS, formatOptions),
+          getXByColumn({ canvasWidth, colIdx: 2 }) - ROW_PADDING_RIGHT,
+          y
+        );
+      }
+    },
+    [LOCALE_DECIMAL_SEPARATOR]
+  );
 
   /**
    * Scale canvas using device pixel ratio to unblur drawn text
@@ -292,7 +302,16 @@ export const useDrawOrderbookHistograms = ({
         mine,
       });
     });
-  }, [canvasWidth, data, histogramRange, selectedTheme, stepSizeDecimals, tickSizeDecimals, to]);
+  }, [
+    canvasWidth,
+    data,
+    drawText,
+    histogramRange,
+    selectedTheme,
+    stepSizeDecimals,
+    tickSizeDecimals,
+    to,
+  ]);
 
   return { canvasRef, hoverCanvasRef };
 };
