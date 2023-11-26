@@ -18,5 +18,5 @@ export const useCenterOrderbook = ({ marketId, orderbookRef }: ElementProps) => 
     if (orderbookEl && shouldScroll) {
       orderbookEl.scrollTo({ top: (scrollHeight - clientHeight) / 2 });
     }
-  }, [clientHeight, shouldScroll, marketId]);
+  }, [shouldScroll, marketId]);
 };
