@@ -23,7 +23,7 @@ import { Canvas } from '@/components/Canvas';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Tag } from '@/components/Tag';
 
-import { Row, type RowData } from './Orderbook/OrderbookRow';
+import { ROW_HEIGHT, Row, type RowData } from './Orderbook/OrderbookRow';
 import { SpreadRow } from './Orderbook/SpreadRow';
 
 const ORDERBOOK_MAX_ROWS_PER_SIDE = 35;
@@ -115,7 +115,7 @@ export const Orderbook = ({
     side: 'bid' | 'ask';
   }>();
 
-  const { canvasRef: asksCanvasRef } = useDrawOrderbookHistograms({
+  const { canvasRef: asksCanvasRef, hoverCanvasRef: asksHoverRef } = useDrawOrderbookHistograms({
     data: asksSlice.reverse(),
     histogramRange,
     stepSizeDecimals,
@@ -123,7 +123,7 @@ export const Orderbook = ({
     hoveredRow: hoveredRow?.side === 'ask' ? hoveredRow.idx : undefined,
   });
 
-  const { canvasRef: bidsCanvasRef } = useDrawOrderbookHistograms({
+  const { canvasRef: bidsCanvasRef, hoverCanvasRef: bidsHoverRef } = useDrawOrderbookHistograms({
     data: bidsSlice.reverse(),
     histogramRange,
     stepSizeDecimals,
@@ -163,20 +163,31 @@ export const Orderbook = ({
               >
                 <$HistogramCanvas
                   ref={asksCanvasRef}
-                  width={asksCanvasRef.current?.clientWidth ?? 0}
-                  height={asksCanvasRef.current?.clientHeight ?? 0}
+                  width={300}
+                  height={maxRowsPerSide * ROW_HEIGHT}
+                  // width={asksCanvasRef.current?.clientWidth ?? 0}
+                  // height={asksCanvasRef.current?.clientHeight ?? 0}
+                />
+                <$HistogramCanvas
+                  ref={asksHoverRef}
+                  width={300}
+                  height={maxRowsPerSide * ROW_HEIGHT}
+                  // width={asksCanvasRef.current?.clientWidth ?? 0}
+                  // height={asksCanvasRef.current?.clientHeight ?? 0}
                 />
 
-                {asksSlice.map((row: RowData, idx) => (
-                  <$Row
-                    key={idx}
-                    title={row.price ? `${row.price}` : undefined}
-                    onClick={() => (row.price ? onRowAction(row.price) : {})}
-                    onMouseOver={(e) => {
-                      setHoveredRow({ idx, side: 'ask' });
-                    }}
-                  />
-                ))}
+                {asksSlice.map((row: RowData, idx) =>
+                  row.price ? (
+                    <$Row
+                      key={idx}
+                      title={`${row.price}`}
+                      onClick={() => onRowAction(row.price)}
+                      onMouseOver={(e) => setHoveredRow({ idx, side: 'ask' })}
+                    />
+                  ) : (
+                    <$Row key={idx} />
+                  )
+                )}
               </$OrderbookSideContainer>
 
               <SpreadRow
@@ -193,20 +204,31 @@ export const Orderbook = ({
               >
                 <$HistogramCanvas
                   ref={bidsCanvasRef}
-                  width={bidsCanvasRef.current?.clientWidth ?? 0}
-                  height={bidsCanvasRef.current?.clientHeight ?? 0}
+                  width={300}
+                  height={maxRowsPerSide * ROW_HEIGHT}
+                  // width={bidsCanvasRef.current?.clientWidth ?? 0}
+                  // height={bidsCanvasRef.current?.clientHeight ?? 0}
+                />
+                <$HistogramCanvas
+                  ref={bidsHoverRef}
+                  width={300}
+                  height={maxRowsPerSide * ROW_HEIGHT}
+                  // width={bidsCanvasRef.current?.clientWidth ?? 0}
+                  // height={bidsCanvasRef.current?.clientHeight ?? 0}
                 />
 
-                {bidsSlice.map((row: RowData, idx) => (
-                  <$Row
-                    key={idx}
-                    title={row.price ? `${row.price}` : undefined}
-                    onClick={() => (row.price ? onRowAction(row.price) : {})}
-                    onMouseOver={(e) => {
-                      setHoveredRow({ idx, side: 'bid' });
-                    }}
-                  />
-                ))}
+                {bidsSlice.map((row: RowData, idx) =>
+                  row.price ? (
+                    <$Row
+                      key={idx}
+                      title={`${row.price}`}
+                      onClick={() => onRowAction(row.price)}
+                      onMouseOver={(e) => setHoveredRow({ idx, side: 'bid' })}
+                    />
+                  ) : (
+                    <$Row key={idx} />
+                  )
+                )}
               </$OrderbookSideContainer>
             </>
           )}

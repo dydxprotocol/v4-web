@@ -1,13 +1,10 @@
-import { memo, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 import { OrderbookLine } from '@/constants/abacus';
-
-import { Output, OutputType } from '@/components/Output';
-
 export type RowData = OrderbookLine & { side: 'bid' | 'ask'; mine?: number };
 
 export const ROW_HEIGHT = 20;
+export const ROW_PADDING_RIGHT = 8;
 
 export const Row = styled.div`
   display: flex;
@@ -25,12 +22,5 @@ export const Row = styled.div`
     flex: 1 1 0%;
     text-align: right;
     padding-bottom: 2px;
-  }
-`;
-
-const $OrderbookRow = styled(Row)`
-  &:hover {
-    // color: var(--color-text-2);
-    background-color: var(--color-layer-3);
   }
 `;
