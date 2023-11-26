@@ -185,7 +185,7 @@ export const Orderbook = ({
                       onMouseOver={(e) => setHoveredRow({ idx, side: 'ask' })}
                     />
                   ) : (
-                    <$Row key={idx} />
+                    <$Row key={idx} onMouseOver={(e) => setHoveredRow(undefined)} />
                   )
                 )}
               </$OrderbookSideContainer>
@@ -226,7 +226,7 @@ export const Orderbook = ({
                       onMouseOver={(e) => setHoveredRow({ idx, side: 'bid' })}
                     />
                   ) : (
-                    <$Row key={idx} />
+                    <$Row key={idx} onMouseOver={(e) => setHoveredRow(undefined)} />
                   )
                 )}
               </$OrderbookSideContainer>
