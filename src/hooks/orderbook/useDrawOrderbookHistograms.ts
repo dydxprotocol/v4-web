@@ -11,6 +11,7 @@ import { ROW_HEIGHT, ROW_PADDING_RIGHT, type RowData } from '@/views/Orderbook/O
 
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
+import { Colors } from '@/styles/colors';
 
 export const useDrawOrderbookHistograms = ({
   data,
@@ -27,7 +28,7 @@ export const useDrawOrderbookHistograms = ({
   to?: 'left' | 'right';
   hoveredRow?: number;
 }) => {
-  const selectedTheme = useSelector(getAppTheme);
+  const theme = useSelector(getAppTheme);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const hoverCanvasRef = useRef<HTMLCanvasElement>(null);
   const canvas = canvasRef.current;
@@ -169,10 +170,11 @@ export const useDrawOrderbookHistograms = ({
       mine?: Nullable<number>;
     }) => {
       const y = getYFromIndex(idx, 'text');
+      const textColor = Colors[theme].text2;
 
       // Size text
       if (size) {
-        ctx.fillStyle = 'white';
+        ctx.fillStyle = textColor;
         ctx.fillText(
           MustBigNumber(size).toFormat(stepSizeDecimals ?? TOKEN_DECIMALS, formatOptions),
           getXByColumn({ canvasWidth, colIdx: 0 }) - ROW_PADDING_RIGHT,
@@ -182,7 +184,7 @@ export const useDrawOrderbookHistograms = ({
 
       // Price text
       if (price) {
-        ctx.fillStyle = 'white';
+        ctx.fillStyle = textColor;
         ctx.fillText(
           MustBigNumber(price).toFormat(tickSizeDecimals ?? SMALL_USD_DECIMALS, formatOptions),
           getXByColumn({ canvasWidth, colIdx: 1 }) - ROW_PADDING_RIGHT,
@@ -192,7 +194,7 @@ export const useDrawOrderbookHistograms = ({
 
       // Mine text
       if (mine) {
-        ctx.fillStyle = 'white';
+        ctx.fillStyle = textColor;
         ctx.fillText(
           MustBigNumber(mine).toFormat(stepSizeDecimals ?? TOKEN_DECIMALS, formatOptions),
           getXByColumn({ canvasWidth, colIdx: 2 }) - ROW_PADDING_RIGHT,
@@ -200,7 +202,7 @@ export const useDrawOrderbookHistograms = ({
         );
       }
     },
-    [LOCALE_DECIMAL_SEPARATOR]
+    [theme, LOCALE_DECIMAL_SEPARATOR, tickSizeDecimals, stepSizeDecimals]
   );
 
   /**
@@ -317,16 +319,7 @@ export const useDrawOrderbookHistograms = ({
         mine,
       });
     });
-  }, [
-    canvasWidth,
-    data,
-    drawText,
-    histogramRange,
-    selectedTheme,
-    stepSizeDecimals,
-    tickSizeDecimals,
-    to,
-  ]);
+  }, [canvasWidth, data, drawText, histogramRange, stepSizeDecimals, tickSizeDecimals, to]);
 
   return { canvasRef, hoverCanvasRef };
 };
