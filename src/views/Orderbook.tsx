@@ -74,7 +74,9 @@ export const Orderbook = ({
     if (asksSlice.length < numRows) {
       const emptyRows = new Array(numRows - asksSlice.length).fill(getEmptyRow('ask'));
       asksSlice.push(...emptyRows);
-    } else if (bidsSlice.length < numRows) {
+    }
+
+    if (bidsSlice.length < numRows) {
       const emptyRows = new Array(numRows - bidsSlice.length).fill(getEmptyRow('bid'));
       bidsSlice.unshift(...emptyRows);
     }

@@ -10,6 +10,7 @@ import { getAppTheme } from '@/state/configsSelectors';
 import { ROW_HEIGHT, ROW_PADDING_RIGHT, type RowData } from '@/views/Orderbook/OrderbookRow';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { log } from '@/lib/telemetry';
 
 export const useDrawOrderbookHistograms = ({
   data,
@@ -107,15 +108,29 @@ export const useDrawOrderbookHistograms = ({
     const barWidth = value ? (value / histogramRange) * histogramBarWidth : 0;
     const { gradient, bar } = getXYValues({ barWidth, canvasWidth, gradientMultiplier });
 
-    const linearGradient = ctx.createLinearGradient(
-      gradient.x1,
-      ROW_HEIGHT / 2,
-      gradient.x2,
-      ROW_HEIGHT / 2
-    );
-    linearGradient.addColorStop(0, histogramAccentColor);
-    linearGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-    ctx.fillStyle = linearGradient;
+    let linearGradient;
+
+    try {
+      linearGradient = ctx.createLinearGradient(
+        gradient.x1,
+        ROW_HEIGHT / 2,
+        gradient.x2,
+        ROW_HEIGHT / 2
+      );
+
+      linearGradient.addColorStop(0, histogramAccentColor);
+      linearGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = linearGradient;
+    } catch (err) {
+      log('Orderbook/createLinearGradient', err, {
+        x1: gradient.x1,
+        y1: ROW_HEIGHT / 2,
+        x2: gradient.x2,
+        y2: ROW_HEIGHT / 2,
+      });
+
+      ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+    }
 
     ctx.beginPath();
 
