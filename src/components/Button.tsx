@@ -47,6 +47,8 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
       slotLeft = null,
       slotRight = null,
 
+      href,
+
       ...otherProps
     },
     ref
@@ -59,7 +61,28 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
             [ButtonState.Disabled]: stateConfig.isDisabled,
           };
 
-    return (
+    return href ? (
+      <a href={href} rel="noopener noreferrer" target="_blank">
+        <StyledBaseButton
+          disabled={state[ButtonState.Disabled]}
+          {...{ ref, action, size, shape, state, ...otherProps }}
+        >
+          {
+            <>
+              {state[ButtonState.Loading] ? (
+                <LoadingDots size={3} />
+              ) : (
+                <>
+                  {slotLeft}
+                  {children}
+                  {slotRight}
+                </>
+              )}
+            </>
+          }
+        </StyledBaseButton>
+      </a>
+    ) : (
       <StyledBaseButton
         disabled={state[ButtonState.Disabled]}
         {...{ ref, action, size, shape, state, ...otherProps }}

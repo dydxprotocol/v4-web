@@ -59,6 +59,7 @@ export const FooterDesktop = () => {
             slotRight={statusPage && <LinkOutIcon />}
             size={ButtonSize.XSmall}
             state={{ isDisabled: !statusPage }}
+            href={statusPage}
           >
             {label}
           </Styled.FooterButton>
