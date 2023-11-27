@@ -1,0 +1,50 @@
+[
+    {
+        "chainId": "42161",
+        "name": "Arbitrum"
+    },
+    {
+        "chainId": "43114",
+        "name": "Avalanche"
+    },
+    {
+        "chainId": "8453",
+        "name": "Base"
+    },
+    {
+        "chainId": "1",
+        "name": "Ethereum"
+    },
+    {
+        "chainId": "10",
+        "name": "OP Mainnet"
+    },
+    {
+        "chainId": "421613",
+        "name": "Arbitrum Goerli"
+    },
+    {
+        "chainId": "43113",
+        "name": "Avalanche Fuji"
+    },
+    {
+        "chainId": "84531",
+        "name": "Base Goerli"
+    },
+    {
+        "chainId": "5",
+        "name": "Ethereum Goerli"
+    },
+    {
+        "chainId": "grand-1",
+        "name": "Noble Testnet"
+    },
+    {
+        "chainId": "420",
+        "name": "OP Goerli"
+    },
+    {
+        "chainId": "103",
+        "name": "Solana Devnet"
+    }
+]
