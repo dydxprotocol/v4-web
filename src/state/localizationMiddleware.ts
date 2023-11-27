@@ -57,9 +57,8 @@ export default (store: any) => (next: any) => async (action: PayloadAction<any>)
       } else if (globalThis.navigator?.language) {
         const browserLanguageBaseTag = globalThis.navigator.language.split('-')[0].toLowerCase();
 
-        const locale = SUPPORTED_BASE_TAGS_LOCALE_MAPPING[
-          browserLanguageBaseTag
-        ] as SupportedLocales;
+        const locale = (SUPPORTED_BASE_TAGS_LOCALE_MAPPING[browserLanguageBaseTag] ??
+          SUPPORTED_BASE_TAGS_LOCALE_MAPPING[SupportedLocales.EN]) as SupportedLocales;
 
         if (locale) {
           store.dispatch(setSelectedLocale({ locale, isAutoDetect: true }));
