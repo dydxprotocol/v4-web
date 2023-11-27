@@ -13,21 +13,26 @@ import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 import { Colors } from '@/styles/colors';
 
+type ElementProps = {
+  data: RowData[];
+  histogramRange: number;
+  hoveredRow?: number;
+  stepSizeDecimals: Nullable<number>;
+  tickSizeDecimals: Nullable<number>;
+};
+
+type StyleProps = {
+  histogramSide?: 'left' | 'right';
+};
+
 export const useDrawOrderbookHistograms = ({
   data,
   histogramRange,
   stepSizeDecimals,
   tickSizeDecimals,
-  to = 'left',
+  histogramSide = 'right',
   hoveredRow,
-}: {
-  data: RowData[];
-  histogramRange: number;
-  stepSizeDecimals: Nullable<number>;
-  tickSizeDecimals: Nullable<number>;
-  to?: 'left' | 'right';
-  hoveredRow?: number;
-}) => {
+}: ElementProps & StyleProps) => {
   const theme = useSelector(getAppTheme);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const hoverCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -54,16 +59,18 @@ export const useDrawOrderbookHistograms = ({
     gradientMultiplier: number;
   }) => {
     const gradient = {
-      x1: Math.floor(to === 'right' ? barWidth : canvasWidth - barWidth),
+      x1: Math.floor(histogramSide === 'left' ? barWidth : canvasWidth - barWidth),
       x2: Math.floor(
-        to === 'right'
+        histogramSide === 'left'
           ? 0 - (canvasWidth * gradientMultiplier - canvasWidth)
           : canvasWidth * gradientMultiplier
       ),
     };
     const bar = {
-      x1: Math.floor(to === 'right' ? 0 : canvasWidth - barWidth),
-      x2: Math.floor(to === 'right' ? Math.min(barWidth, canvasWidth - 2) : canvasWidth - 2),
+      x1: Math.floor(histogramSide === 'left' ? 0 : canvasWidth - barWidth),
+      x2: Math.floor(
+        histogramSide === 'left' ? Math.min(barWidth, canvasWidth - 2) : canvasWidth - 2
+      ),
     };
 
     return {
@@ -95,7 +102,7 @@ export const useDrawOrderbookHistograms = ({
     gradientMultiplier,
     histogramAccentColor,
     idx,
-    to,
+    histogramSide,
   }: {
     value: Nullable<number>;
     canvasWidth: number;
@@ -103,7 +110,7 @@ export const useDrawOrderbookHistograms = ({
     gradientMultiplier: number;
     histogramAccentColor: string;
     idx: number;
-    to: 'left' | 'right';
+    histogramSide: 'left' | 'right';
   }) => {
     const histogramBarWidth = canvasWidth - 2;
     const barWidth = value ? (value / histogramRange) * histogramBarWidth : 0;
@@ -141,7 +148,7 @@ export const useDrawOrderbookHistograms = ({
           getYFromIndex(idx, 'bar'),
           bar.x2,
           ROW_HEIGHT - 2,
-          to === 'left' ? [2, 0, 0, 2] : [0, 2, 2, 0]
+          histogramSide === 'right' ? [2, 0, 0, 2] : [0, 2, 2, 0]
         )
       : ctx.rect(bar.x1, getYFromIndex(idx, 'bar'), bar.x2, ROW_HEIGHT - 2);
     ctx.fill();
@@ -295,7 +302,7 @@ export const useDrawOrderbookHistograms = ({
         gradientMultiplier: 1.3,
         histogramAccentColor,
         idx,
-        to,
+        histogramSide,
       });
 
       // Size Bar
@@ -306,7 +313,7 @@ export const useDrawOrderbookHistograms = ({
         gradientMultiplier: 5,
         histogramAccentColor,
         idx,
-        to,
+        histogramSide,
       });
 
       // Size, Price, Mine
@@ -319,7 +326,15 @@ export const useDrawOrderbookHistograms = ({
         mine,
       });
     });
-  }, [canvasWidth, data, drawText, histogramRange, stepSizeDecimals, tickSizeDecimals, to]);
+  }, [
+    canvasWidth,
+    data,
+    drawText,
+    histogramRange,
+    stepSizeDecimals,
+    tickSizeDecimals,
+    histogramSide,
+  ]);
 
   return { canvasRef, hoverCanvasRef };
 };

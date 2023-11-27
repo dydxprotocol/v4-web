@@ -48,6 +48,7 @@ const getEmptyRow = (side: 'bid' | 'ask') => ({
 });
 
 export const Orderbook = ({
+  histogramSide,
   maxRowsPerSide = ORDERBOOK_MAX_ROWS_PER_SIDE,
 }: ElementProps & StyleProps) => {
   const dispatch = useDispatch();
@@ -123,6 +124,7 @@ export const Orderbook = ({
     stepSizeDecimals,
     tickSizeDecimals,
     hoveredRow: hoveredRow?.side === 'ask' ? hoveredRow.idx : undefined,
+    histogramSide,
   });
 
   const { canvasRef: bidsCanvasRef, hoverCanvasRef: bidsHoverRef } = useDrawOrderbookHistograms({
@@ -131,6 +133,7 @@ export const Orderbook = ({
     stepSizeDecimals,
     tickSizeDecimals,
     hoveredRow: hoveredRow?.side === 'bid' ? hoveredRow.idx : undefined,
+    histogramSide,
   });
 
   return (
