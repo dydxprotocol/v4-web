@@ -165,17 +165,13 @@ export const Orderbook = ({
               >
                 <$HistogramCanvas
                   ref={asksCanvasRef}
-                  width={300}
-                  height={maxRowsPerSide * ROW_HEIGHT}
-                  // width={asksCanvasRef.current?.clientWidth ?? 0}
-                  // height={asksCanvasRef.current?.clientHeight ?? 0}
+                  width={asksCanvasRef.current?.clientWidth ?? 0}
+                  height={asksCanvasRef.current?.clientHeight ?? 0}
                 />
                 <$HistogramCanvas
                   ref={asksHoverRef}
-                  width={300}
-                  height={maxRowsPerSide * ROW_HEIGHT}
-                  // width={asksCanvasRef.current?.clientWidth ?? 0}
-                  // height={asksCanvasRef.current?.clientHeight ?? 0}
+                  width={asksCanvasRef.current?.clientWidth ?? 0}
+                  height={asksCanvasRef.current?.clientHeight ?? 0}
                 />
 
                 {asksSlice.map((row: RowData, idx) =>
@@ -206,17 +202,13 @@ export const Orderbook = ({
               >
                 <$HistogramCanvas
                   ref={bidsCanvasRef}
-                  width={300}
-                  height={maxRowsPerSide * ROW_HEIGHT}
-                  // width={bidsCanvasRef.current?.clientWidth ?? 0}
-                  // height={bidsCanvasRef.current?.clientHeight ?? 0}
+                  width={bidsCanvasRef.current?.clientWidth ?? 0}
+                  height={bidsCanvasRef.current?.clientHeight ?? 0}
                 />
                 <$HistogramCanvas
                   ref={bidsHoverRef}
-                  width={300}
-                  height={maxRowsPerSide * ROW_HEIGHT}
-                  // width={bidsCanvasRef.current?.clientWidth ?? 0}
-                  // height={bidsCanvasRef.current?.clientHeight ?? 0}
+                  width={bidsCanvasRef.current?.clientWidth ?? 0}
+                  height={bidsCanvasRef.current?.clientHeight ?? 0}
                 />
 
                 {bidsSlice.map((row: RowData, idx) =>
