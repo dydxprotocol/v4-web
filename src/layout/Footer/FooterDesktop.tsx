@@ -1,7 +1,7 @@
 import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import { AbacusApiStatus } from '@/constants/abacus';
-import { ButtonSize } from '@/constants/buttons';
+import { ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { ENVIRONMENT_CONFIG_MAP, isDev } from '@/constants/networks';
 
@@ -55,6 +55,7 @@ export const FooterDesktop = () => {
           }
         >
           <Styled.FooterButton
+            type={statusPage ? ButtonType.Link : ButtonType.Button}
             slotLeft={<Styled.StatusDot exchangeStatus={exchangeStatus} />}
             slotRight={statusPage && <LinkOutIcon />}
             size={ButtonSize.XSmall}
