@@ -5,8 +5,8 @@ type StyleProps = {
 };
 
 type ElementProps = {
-  width: number;
-  height: number;
+  width: number | string;
+  height: number | string;
 };
 
 export const Canvas = forwardRef<HTMLCanvasElement, ElementProps & StyleProps>(

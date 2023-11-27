@@ -166,8 +166,8 @@ export const Orderbook = ({
                 side="ask"
                 onMouseLeave={() => setHoveredRow(undefined)}
               >
-                <$HistogramCanvas ref={asksCanvasRef} width={300} height={numRows * ROW_HEIGHT} />
-                <$HistogramCanvas ref={asksHoverRef} width={300} height={numRows * ROW_HEIGHT} />
+                <$HistogramCanvas ref={asksCanvasRef} width="100%" height={numRows * ROW_HEIGHT} />
+                <$HistogramCanvas ref={asksHoverRef} width="100%" height={numRows * ROW_HEIGHT} />
 
                 {asksSlice.map((row: RowData, idx) =>
                   row.price ? (
@@ -195,8 +195,8 @@ export const Orderbook = ({
                 side="bid"
                 onMouseLeave={() => setHoveredRow(undefined)}
               >
-                <$HistogramCanvas ref={bidsCanvasRef} width={300} height={numRows * ROW_HEIGHT} />
-                <$HistogramCanvas ref={bidsHoverRef} width={300} height={numRows * ROW_HEIGHT} />
+                <$HistogramCanvas ref={bidsCanvasRef} width="100%" height={numRows * ROW_HEIGHT} />
+                <$HistogramCanvas ref={bidsHoverRef} width="100%" height={numRows * ROW_HEIGHT} />
 
                 {bidsSlice.map((row: RowData, idx) =>
                   row.price ? (
