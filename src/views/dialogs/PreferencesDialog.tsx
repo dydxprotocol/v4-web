@@ -53,6 +53,11 @@ export const usePreferenceMenu = () => {
           ),
           onSelect: () => toggleNotifPreference(NotificationType.SquidTransfer),
         },
+        {
+          value: NotificationType.ReleaseNotification,
+          label: "Rewards and full trading are now live!",
+          onSelect: () => toggleNotifPreference(NotificationType.ReleaseNotification),
+        }
       ],
     }),
     [stringGetter, enabledNotifs]

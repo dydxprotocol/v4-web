@@ -205,6 +205,27 @@ export const notificationTypes: NotificationTypeConfig[] = [
       return () => {};
     },
   },
+  {
+    type: NotificationType.ReleaseNotification,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+
+      useEffect(() => {
+        trigger(
+          'rewards-and-full-trading-live',
+          {
+            icon: <Icon iconName={IconName.LogoShort} />,
+            title: 'Rewards and full trading are now live!',
+            toastSensitivity: 'foreground',
+          },
+          []
+        );
+      }, [stringGetter]);
+    },
+    useNotificationAction: () => {
+      return () => {};
+    },
+  },
 ];
 
 const $Icon = styled.img`
