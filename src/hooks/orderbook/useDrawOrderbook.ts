@@ -25,7 +25,7 @@ type StyleProps = {
   histogramSide?: 'left' | 'right';
 };
 
-export const useDrawOrderbookHistograms = ({
+export const useDrawOrderbook = ({
   data,
   histogramRange,
   stepSizeDecimals,

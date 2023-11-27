@@ -9,7 +9,7 @@ import { useBreakpoints, useStringGetter } from '@/hooks';
 import {
   useCalculateOrderbookData,
   useCenterOrderbook,
-  useDrawOrderbookHistograms,
+  useDrawOrderbook,
   useSpreadRowScrollListener,
 } from '@/hooks/orderbook';
 
@@ -118,7 +118,7 @@ export const Orderbook = ({
     side: 'bid' | 'ask';
   }>();
 
-  const { canvasRef: asksCanvasRef, hoverCanvasRef: asksHoverRef } = useDrawOrderbookHistograms({
+  const { canvasRef: asksCanvasRef, hoverCanvasRef: asksHoverRef } = useDrawOrderbook({
     data: asksSlice.reverse(),
     histogramRange,
     stepSizeDecimals,
@@ -127,7 +127,7 @@ export const Orderbook = ({
     histogramSide,
   });
 
-  const { canvasRef: bidsCanvasRef, hoverCanvasRef: bidsHoverRef } = useDrawOrderbookHistograms({
+  const { canvasRef: bidsCanvasRef, hoverCanvasRef: bidsHoverRef } = useDrawOrderbook({
     data: bidsSlice.reverse(),
     histogramRange,
     stepSizeDecimals,
