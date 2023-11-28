@@ -53,6 +53,18 @@ export const usePreferenceMenu = () => {
           ),
           onSelect: () => toggleNotifPreference(NotificationType.SquidTransfer),
         },
+        {
+          value: NotificationType.ReleaseUpdates,
+          label: "Release Updates",
+          slotAfter: (
+            <Switch
+              name={NotificationType.ReleaseUpdates}
+              checked={enabledNotifs[NotificationType.ReleaseUpdates]}
+              onCheckedChange={(enabled: boolean) => null}
+            />
+          ),
+          onSelect: () => toggleNotifPreference(NotificationType.ReleaseUpdates),
+        }
       ],
     }),
     [stringGetter, enabledNotifs]

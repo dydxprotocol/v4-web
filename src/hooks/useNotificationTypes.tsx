@@ -25,6 +25,7 @@ import {
 import { useSelectedNetwork, useStringGetter } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
+import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
@@ -205,9 +206,58 @@ export const notificationTypes: NotificationTypeConfig[] = [
       return () => {};
     },
   },
+  {
+    type: NotificationType.ReleaseUpdates,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+
+      useEffect(() => {
+        trigger(
+          'rewards-and-full-trading-live',
+          {
+            icon: <AssetIcon symbol="DYDX" />,
+            title: stringGetter({ key: 'NOTIFICATIONS.RELEASE_REWARDS_AND_FULL_TRADING.TITLE' }),
+            body: stringGetter({
+              key: 'NOTIFICATIONS.RELEASE_REWARDS_AND_FULL_TRADING.BODY',
+              params: {
+                BLOGPOST: (
+                  <$Link
+                    href="https://www.dydxopsdao.com/blog/deep-dive-full-trading"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {stringGetter({ key: STRING_KEYS.HERE })}
+                  </$Link>
+                ),
+                // todo: update localization to flip the two
+                DOS_BLOGPOST: (
+                  <$Link
+                    href="https://dydx.exchange/blog/v4-full-trading"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {stringGetter({ key: STRING_KEYS.HERE })}
+                  </$Link>
+                ),
+              },
+            }),
+            toastSensitivity: 'foreground',
+          },
+          []
+        );
+      }, [stringGetter]);
+    },
+    useNotificationAction: () => {
+      return () => {};
+    },
+  },
 ];
 
 const $Icon = styled.img`
   height: 1.5rem;
   width: 1.5rem;
+`;
+
+const $Link = styled.a`
+  --link-color: var(--color-text-2);
 `;

@@ -41,7 +41,7 @@
     "@cosmjs/tendermint-rpc": "^0.31.0",
     "@dydxprotocol/v4-abacus": "^1.0.30",
     "@dydxprotocol/v4-client-js": "^1.0.0",
-    "@dydxprotocol/v4-localization": "^1.0.6",
+    "@dydxprotocol/v4-localization": "^1.0.8",
     "@ethersproject/providers": "^5.7.2",
     "@js-joda/core": "^5.5.3",
     "@radix-ui/react-checkbox": "^1.0.4",
