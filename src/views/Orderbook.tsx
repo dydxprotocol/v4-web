@@ -25,6 +25,7 @@ import { Tag } from '@/components/Tag';
 
 import { ROW_HEIGHT, Row, type RowData } from './Orderbook/OrderbookRow';
 import { SpreadRow } from './Orderbook/SpreadRow';
+import { Output, OutputType } from '@/components/Output';
 
 const ORDERBOOK_MAX_ROWS_PER_SIDE = 35;
 
@@ -166,21 +167,32 @@ export const Orderbook = ({
                 side="ask"
                 onMouseLeave={() => setHoveredRow(undefined)}
               >
-                <$HistogramCanvas ref={asksCanvasRef} width="100%" height={numRows * ROW_HEIGHT} />
-                <$HistogramCanvas ref={asksHoverRef} width="100%" height={numRows * ROW_HEIGHT} />
-
-                {asksSlice.map((row: RowData, idx) =>
-                  row.price ? (
-                    <$Row
-                      key={idx}
-                      title={`${row.price}`}
-                      onClick={() => onRowAction(row.price)}
-                      onMouseOver={(e) => setHoveredRow({ idx, side: 'ask' })}
-                    />
-                  ) : (
-                    <$Row key={idx} onMouseOver={(e) => setHoveredRow(undefined)} />
-                  )
-                )}
+                <$OrderbookCanvas ref={asksCanvasRef} width="100%" height={numRows * ROW_HEIGHT} />
+                <$HoverCanvas ref={asksHoverRef} width="100%" height={numRows * ROW_HEIGHT} />
+                <$HoverRows>
+                  {asksSlice.map((row: RowData, idx) =>
+                    row.price ? (
+                      <$Row
+                        key={idx}
+                        title={`${row.price}`}
+                        onClick={() => onRowAction(row.price)}
+                        onMouseOver={(e) => setHoveredRow({ idx, side: 'ask' })}
+                      >
+                        <span></span>
+                        <span></span>
+                        <span>
+                          <Output
+                            type={OutputType.Fiat}
+                            value={row.price}
+                            fractionDigits={tickSizeDecimals}
+                          />
+                        </span>
+                      </$Row>
+                    ) : (
+                      <$Row key={idx} onMouseOver={(e) => setHoveredRow(undefined)} />
+                    )
+                  )}
+                </$HoverRows>
               </$OrderbookSideContainer>
 
               <SpreadRow
@@ -195,21 +207,32 @@ export const Orderbook = ({
                 side="bid"
                 onMouseLeave={() => setHoveredRow(undefined)}
               >
-                <$HistogramCanvas ref={bidsCanvasRef} width="100%" height={numRows * ROW_HEIGHT} />
-                <$HistogramCanvas ref={bidsHoverRef} width="100%" height={numRows * ROW_HEIGHT} />
-
-                {bidsSlice.map((row: RowData, idx) =>
-                  row.price ? (
-                    <$Row
-                      key={idx}
-                      title={`${row.price}`}
-                      onClick={() => onRowAction(row.price)}
-                      onMouseOver={(e) => setHoveredRow({ idx, side: 'bid' })}
-                    />
-                  ) : (
-                    <$Row key={idx} onMouseOver={(e) => setHoveredRow(undefined)} />
-                  )
-                )}
+                <$OrderbookCanvas ref={bidsCanvasRef} width="100%" height={numRows * ROW_HEIGHT} />
+                <$HoverCanvas ref={bidsHoverRef} width="100%" height={numRows * ROW_HEIGHT} />
+                <$HoverRows>
+                  {bidsSlice.map((row: RowData, idx) =>
+                    row.price ? (
+                      <$Row
+                        key={idx}
+                        title={`${row.price}`}
+                        onClick={() => onRowAction(row.price)}
+                        onMouseOver={(e) => setHoveredRow({ idx, side: 'bid' })}
+                      >
+                        <span></span>
+                        <span></span>
+                        <span>
+                          <Output
+                            type={OutputType.Fiat}
+                            value={row.price}
+                            fractionDigits={tickSizeDecimals}
+                          />
+                        </span>
+                      </$Row>
+                    ) : (
+                      <$Row key={idx} onMouseOver={(e) => setHoveredRow(undefined)} />
+                    )
+                  )}
+                </$HoverRows>
               </$OrderbookSideContainer>
             </>
           )}
@@ -267,7 +290,7 @@ const $OrderbookSideContainer = styled.div<{ numRows: number; side: 'bid' | 'ask
   position: relative;
 `;
 
-const $HistogramCanvas = styled(Canvas)`
+const $OrderbookCanvas = styled(Canvas)`
   width: 100%;
   height: 100%;
 
@@ -276,6 +299,13 @@ const $HistogramCanvas = styled(Canvas)`
   right: 0;
 
   font-feature-settings: var(--fontFeature-monoNumbers);
+`;
+
+const $HoverCanvas = styled($OrderbookCanvas)``;
+
+const $HoverRows = styled.div`
+  position: absolute;
+  width: 100%;
 `;
 
 const $Row = styled(Row)<{ onClick?: () => void }>`

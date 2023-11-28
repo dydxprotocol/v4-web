@@ -168,6 +168,7 @@ export const useDrawOrderbook = ({
       size,
       price,
       mine,
+      animationType,
     }: {
       ctx: CanvasRenderingContext2D;
       canvasWidth: number;
@@ -175,9 +176,39 @@ export const useDrawOrderbook = ({
       size?: Nullable<number>;
       price?: Nullable<number>;
       mine?: Nullable<number>;
+      animationType?: 'remove' | 'add';
     }) => {
       const y = getYFromIndex(idx, 'text');
-      const textColor = Colors[theme].text2;
+      const rectY = getYFromIndex(idx, 'rect');
+
+      let startTime: number;
+      let textColor: string = Colors[theme].text2;
+      const animateColor = (timestamp: number) => {
+        if (!startTime) startTime = timestamp;
+        const animationTime = timestamp - startTime;
+
+        // Linear transition for demonstration purposes
+        textColor = animationType
+          ? {
+              add: Colors[theme].green,
+              remove: Colors[theme].red,
+            }[animationType]
+          : Colors[theme].text2;
+
+        if (animationTime < 500) {
+          // Continue the animation for 500ms (adjust as needed)
+          requestAnimationFrame(animateColor);
+        } else {
+          textColor = Colors[theme].text2;
+        }
+
+        if (animationType) {
+          // TODO: Clear rect and redraw text
+          // ctx.clearRect(0, rectY, canvasWidth, rectY + ROW_HEIGHT);
+        }
+      };
+
+      requestAnimationFrame(animateColor);
 
       // Size text
       if (size) {
@@ -201,7 +232,7 @@ export const useDrawOrderbook = ({
 
       // Mine text
       if (mine) {
-        ctx.fillStyle = textColor;
+        ctx.fillStyle = Colors[theme].text2;
         ctx.fillText(
           MustBigNumber(mine).toFormat(stepSizeDecimals ?? TOKEN_DECIMALS, formatOptions),
           getXByColumn({ canvasWidth, colIdx: 2 }) - ROW_PADDING_RIGHT,
@@ -258,9 +289,7 @@ export const useDrawOrderbook = ({
     return canvas.width / ratio;
   }, [canvas, hoverCanvas]);
 
-  /**
-   * Handle Row Hover
-   */
+  //Handle Row Hover
   const lastHoveredRowRef = useRef<number>();
   const lastHoveredRow = lastHoveredRowRef.current;
   useEffect(() => {
@@ -280,7 +309,12 @@ export const useDrawOrderbook = ({
     }
   }, [lastHoveredRow, hoveredRow]);
 
-  // Update histograms and row contents on data change
+  // Row Removal Animation state
+  const previousDataRef = useRef<{
+    [key: string]: number;
+  }>(Object.fromEntries(data.map((row: RowData) => [row.price, row.size])));
+
+  //Update histograms and row contents on data change
   useEffect(() => {
     const ctx = canvas?.getContext('2d');
 
@@ -316,6 +350,9 @@ export const useDrawOrderbook = ({
         histogramSide,
       });
 
+      const isNew = !previousDataRef.current[price];
+      const wasRemoved = previousDataRef.current[price] && !data.find((row) => row.price === price);
+
       // Size, Price, Mine
       drawText({
         ctx,
@@ -324,8 +361,11 @@ export const useDrawOrderbook = ({
         size,
         price,
         mine,
+        animationType: isNew ? 'add' : wasRemoved ? 'remove' : undefined,
       });
     });
+
+    previousDataRef.current = Object.fromEntries(data.map((row: RowData) => [row.price, row.size]));
   }, [
     canvasWidth,
     data,
