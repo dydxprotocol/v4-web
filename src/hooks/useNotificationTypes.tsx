@@ -28,6 +28,7 @@ import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { Icon, IconName } from '@/components/Icon';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
+import { ReleaseUpdatesNotification } from '@/views/notifications/ReleaseUpdatesNotification';
 
 import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
@@ -206,16 +207,54 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
   },
   {
-    type: NotificationType.ReleaseNotification,
+    type: NotificationType.ReleaseUpdates,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
+      const body = (
+        <div>
+          {stringGetter({
+            key: 'NOTIFICATIONS.RELEASE_REWARDS_AND_FULL_TRADING.BODY',
+            params: {
+              BLOGPOST: (
+                <$Link
+                  href="https://www.dydxopsdao.com/blog/deep-dive-full-trading"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {stringGetter({ key: STRING_KEYS.HERE })}
+                </$Link>
+              ),
+              // todo: update localization to flip the two
+              DOS_BLOGPOST: (
+                <$Link
+                  href="https://dydx.exchange/blog/v4-full-trading"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {stringGetter({ key: STRING_KEYS.HERE })}
+                </$Link>
+              ),
+            },
+          })}
+        </div>
+      );
 
       useEffect(() => {
         trigger(
           'rewards-and-full-trading-live',
           {
             icon: <Icon iconName={IconName.LogoShort} />,
-            title: 'Rewards and full trading are now live!',
+            title: stringGetter({ key: 'NOTIFICATIONS.RELEASE_REWARDS_AND_FULL_TRADING.TITLE' }),
+            renderCustomBody: ({ isToast, notification }) => (
+              <ReleaseUpdatesNotification
+                isToast={isToast}
+                slotTitle={stringGetter({
+                  key: 'NOTIFICATIONS.RELEASE_REWARDS_AND_FULL_TRADING.TITLE',
+                })}
+                slotDescription={body}
+                notification={notification}
+              />
+            ),
             toastSensitivity: 'foreground',
           },
           []
@@ -231,4 +270,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
 const $Icon = styled.img`
   height: 1.5rem;
   width: 1.5rem;
+`;
+
+const $Link = styled.a`
+  --link-color: var(--color-text-2);
 `;

@@ -4,7 +4,7 @@ import { StatusResponse } from '@0xsquid/sdk';
 export enum NotificationType {
   AbacusGenerated = 'AbacusGenerated',
   SquidTransfer = 'SquidTransfer',
-  ReleaseNotification = 'ReleaseNotification',
+  ReleaseUpdates = 'ReleaseUpdates',
 }
 
 export enum NotificationComponentType {}
