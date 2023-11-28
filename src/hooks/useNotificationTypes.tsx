@@ -28,7 +28,6 @@ import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { Icon, IconName } from '@/components/Icon';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
-import { ReleaseUpdatesNotification } from '@/views/notifications/ReleaseUpdatesNotification';
 
 import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
@@ -36,6 +35,7 @@ import { getAbacusNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import { formatSeconds } from '@/lib/timeUtils';
+import { AssetIcon } from '@/components/AssetIcon';
 
 const parseStringParamsForNotification = ({
   stringGetter,
@@ -210,51 +210,37 @@ export const notificationTypes: NotificationTypeConfig[] = [
     type: NotificationType.ReleaseUpdates,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
-      const body = (
-        <div>
-          {stringGetter({
-            key: 'NOTIFICATIONS.RELEASE_REWARDS_AND_FULL_TRADING.BODY',
-            params: {
-              BLOGPOST: (
-                <$Link
-                  href="https://www.dydxopsdao.com/blog/deep-dive-full-trading"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {stringGetter({ key: STRING_KEYS.HERE })}
-                </$Link>
-              ),
-              // todo: update localization to flip the two
-              DOS_BLOGPOST: (
-                <$Link
-                  href="https://dydx.exchange/blog/v4-full-trading"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {stringGetter({ key: STRING_KEYS.HERE })}
-                </$Link>
-              ),
-            },
-          })}
-        </div>
-      );
 
       useEffect(() => {
         trigger(
           'rewards-and-full-trading-live',
           {
-            icon: <Icon iconName={IconName.LogoShort} />,
+            icon: <AssetIcon symbol="DYDX" />,
             title: stringGetter({ key: 'NOTIFICATIONS.RELEASE_REWARDS_AND_FULL_TRADING.TITLE' }),
-            renderCustomBody: ({ isToast, notification }) => (
-              <ReleaseUpdatesNotification
-                isToast={isToast}
-                slotTitle={stringGetter({
-                  key: 'NOTIFICATIONS.RELEASE_REWARDS_AND_FULL_TRADING.TITLE',
-                })}
-                slotDescription={body}
-                notification={notification}
-              />
-            ),
+            body: stringGetter({
+              key: 'NOTIFICATIONS.RELEASE_REWARDS_AND_FULL_TRADING.BODY',
+              params: {
+                BLOGPOST: (
+                  <$Link
+                    href="https://www.dydxopsdao.com/blog/deep-dive-full-trading"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {stringGetter({ key: STRING_KEYS.HERE })}
+                  </$Link>
+                ),
+                // todo: update localization to flip the two
+                DOS_BLOGPOST: (
+                  <$Link
+                    href="https://dydx.exchange/blog/v4-full-trading"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {stringGetter({ key: STRING_KEYS.HERE })}
+                  </$Link>
+                ),
+              },
+            }),
             toastSensitivity: 'foreground',
           },
           []
