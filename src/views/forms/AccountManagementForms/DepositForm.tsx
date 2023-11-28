@@ -192,15 +192,14 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     const sourceAmountBN = parseUnits(debouncedAmount, sourceToken.decimals);
 
     if (sourceAmountBN > (allowance as bigint)) {
-      const simulateApprove = async (abi: Abi) => {
-        return await publicClientWagmi.simulateContract({
+      const simulateApprove = async (abi: Abi) =>
+        publicClientWagmi.simulateContract({
           account: evmAddress,
           address: sourceToken.address as EvmAddress,
           abi,
           functionName: 'approve',
           args: [requestPayload.targetAddress as EvmAddress, sourceAmountBN],
         });
-      };
 
       let result;
       try {
