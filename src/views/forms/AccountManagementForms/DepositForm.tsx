@@ -2,9 +2,10 @@ import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
-import { parseUnits } from 'viem';
+import { Abi, parseUnits } from 'viem';
 
 import erc20 from '@/abi/erc20.json';
+import erc20_usdt from '@/abi/erc20_usdt.json';
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
@@ -191,15 +192,23 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     const sourceAmountBN = parseUnits(debouncedAmount, sourceToken.decimals);
 
     if (sourceAmountBN > (allowance as bigint)) {
-      const { request } = await publicClientWagmi.simulateContract({
-        account: evmAddress,
-        address: sourceToken.address as EvmAddress,
-        abi: erc20,
-        functionName: 'approve',
-        args: [requestPayload.targetAddress as EvmAddress, sourceAmountBN],
-      });
+      const simulateApprove = async (abi: Abi) =>
+        publicClientWagmi.simulateContract({
+          account: evmAddress,
+          address: sourceToken.address as EvmAddress,
+          abi,
+          functionName: 'approve',
+          args: [requestPayload.targetAddress as EvmAddress, sourceAmountBN],
+        });
 
-      const approveTx = await signerWagmi.writeContract(request);
+      let result;
+      try {
+        result = await simulateApprove(erc20 as Abi);
+      } catch (e) {
+        result = await simulateApprove(erc20_usdt as Abi);
+      }
+
+      const approveTx = await signerWagmi.writeContract(result.request);
       await publicClientWagmi.waitForTransactionReceipt({
         hash: approveTx,
       });
