@@ -26,3 +26,5 @@ export enum FundingDirection {
   ToShort = 'ToShort',
   ToLong = 'ToLong',
 }
+
+export const MARKETS_TO_DISPLAY = ['BTC-USD', 'ETH-USD', 'LINK-USD', 'SOL-USD'];

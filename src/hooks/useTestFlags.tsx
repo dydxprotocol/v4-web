@@ -16,6 +16,13 @@ class TestFlags {
   get displayInitializingMarkets() {
     return !!this.queryParams.displayInitializingMarkets;
   }
+
+  /**
+   * @description We are temporarily displaying a subset of ACTIVE markets, this flag will allow you to see all ACTIVE markets
+   */
+  get displayAllMarkets() {
+    return !!this.queryParams.displayAllMarkets;
+  }
 }
 
 export const testFlags = new TestFlags();
