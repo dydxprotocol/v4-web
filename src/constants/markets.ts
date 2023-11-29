@@ -41,4 +41,9 @@ export const MARKETS_TO_DISPLAY = [
   'ADA-USD',
   'TRX-USD',
   'OP-USD',
+  'MKR-USD',
+  'DOGE-USD',
+  'SHIB-USD',
+  'COMP-USD',
+  'LDO-USD',
 ];
