@@ -46,4 +46,9 @@ export const MARKETS_TO_DISPLAY = [
   'SHIB-USD',
   'COMP-USD',
   'LDO-USD',
+  'NEAR-USD',
+  'APT-USD',
+  'SUI-USD',
+  'DOT-USD',
+  'ETC-USD',
 ];
