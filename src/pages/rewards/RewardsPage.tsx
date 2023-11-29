@@ -19,6 +19,7 @@ import { openDialog } from '@/state/dialogs';
 
 import { DYDXBalancePanel } from './DYDXBalancePanel';
 import { MigratePanel } from './MigratePanel';
+import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 
 export const RewardsPage = () => {
   const dispatch = useDispatch();
@@ -39,9 +40,20 @@ export const RewardsPage = () => {
   return (
     <Styled.Page>
       {import.meta.env.VITE_V3_TOKEN_ADDRESS && <MigratePanel />}
-      <Styled.PanelRow>
-        {isTablet && <DYDXBalancePanel />}
 
+      {isTablet ? (
+        <>
+          <LaunchIncentivesPanel />
+          <DYDXBalancePanel />
+        </>
+      ) : (
+        <Styled.PanelRowIncentivesAndBalance>
+          <LaunchIncentivesPanel />
+          <DYDXBalancePanel />
+        </Styled.PanelRowIncentivesAndBalance>
+      )}
+
+      <Styled.PanelRow>
         <Styled.Panel
           slotHeader={<Styled.Title>{stringGetter({ key: STRING_KEYS.GOVERNANCE })}</Styled.Title>}
           slotRight={panelArrow}
@@ -67,8 +79,6 @@ export const RewardsPage = () => {
             </Link>
           </Styled.Description>
         </Styled.Panel>
-
-        {isNotTablet && <DYDXBalancePanel />}
       </Styled.PanelRow>
     </Styled.Page>
   );
@@ -99,6 +109,11 @@ Styled.Page = styled.div`
 
 Styled.Panel = styled(Panel)`
   --panel-paddingX: 1.5rem;
+
+  @media ${breakpoints.tablet} {
+    --panel-paddingY: 1.5rem;
+    --panel-content-paddingY: 1rem;
+  }
 `;
 
 Styled.Title = styled.h3`
@@ -110,18 +125,27 @@ Styled.Title = styled.h3`
 Styled.Description = styled.div`
   color: var(--color-text-0);
   --link-color: var(--color-text-1);
+
+  a {
+    display: inline;
+    ::before {
+      content: ' ';
+    }
+  }
 `;
 
 Styled.PanelRow = styled.div`
   ${layoutMixins.gridEqualColumns}
   gap: 1.5rem;
 
-  align-items: flex-start;
-
   @media ${breakpoints.tablet} {
     grid-auto-flow: row;
     grid-template-columns: 1fr;
   }
+`;
+
+Styled.PanelRowIncentivesAndBalance = styled(Styled.PanelRow)`
+  grid-template-columns: 2fr 1fr;
 `;
 
 Styled.IconButton = styled(IconButton)`
