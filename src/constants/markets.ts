@@ -36,4 +36,9 @@ export const MARKETS_TO_DISPLAY = [
   'ATOM-USD',
   'AVAX-USD',
   'APE-USD',
+  'XRP-USD',
+  'UNI-USD',
+  'ADA-USD',
+  'TRX-USD',
+  'OP-USD',
 ];
