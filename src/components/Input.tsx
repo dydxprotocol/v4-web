@@ -10,7 +10,7 @@ import {
   USD_DECIMALS,
 } from '@/constants/numbers';
 
-import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
+import { BIG_NUMBERS } from '@/lib/numbers';
 import { useLocaleSeparators } from '@/hooks';
 
 export enum InputType {
@@ -29,31 +29,38 @@ type StyleProps = {
 type ElementProps = {
   type?: InputType;
   value?: string | number | null;
-
-  allowNegative?: boolean;
-  decimals?: number;
   disabled?: boolean;
   id?: string;
-  max?: number;
   onBlur?: () => void;
-  onChange?:
-    | Dispatch<SetStateAction<string>>
-    | React.ReactEventHandler<HTMLInputElement>
-    | ((values: NumberFormatValues, e: SourceInfo) => void);
   onFocus?: () => void;
-  onInput?: ({
-    value,
-    floatValue,
-    formattedValue,
-  }: {
-    value: string;
-    floatValue?: number;
-    formattedValue: string;
-  }) => void;
   placeholder?: string;
 };
 
-export type InputProps = ElementProps & StyleProps;
+type ConditionalProps =
+  | {
+      allowNegative?: boolean;
+      decimals?: number;
+      max?: number;
+      onChange?: (values: NumberFormatValues, e: SourceInfo) => void;
+      onInput?: ({
+        value,
+        floatValue,
+        formattedValue,
+      }: {
+        value: string;
+        floatValue?: number;
+        formattedValue: string;
+      }) => void;
+    }
+  | {
+      allowNegative?: never;
+      decimals?: never;
+      max?: never;
+      onChange?: Dispatch<SetStateAction<string>> | React.ReactEventHandler<HTMLInputElement>;
+      onInput?: (e: SyntheticInputEvent) => void;
+    };
+
+export type InputProps = ElementProps & StyleProps & ConditionalProps;
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   (
@@ -137,6 +144,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref as React.Ref<typeof NumericFormat<unknown>>}
             id={id}
             // NumericFormat
+            valueIsNumericString
             allowNegative={allowNegative}
             decimalScale={decimals}
             decimalSeparator={LOCALE_DECIMAL_SEPARATOR}
@@ -160,7 +168,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 ? undefined
                 : Number(formattedValue.replace(',', '.'));
 
-              onInput?.({ value, floatValue, formattedValue });
+              onInput?.({ value, floatValue, formattedValue, ...e });
             }}
             // Native
             disabled={disabled}
