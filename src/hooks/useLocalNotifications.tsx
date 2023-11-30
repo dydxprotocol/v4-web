@@ -79,7 +79,7 @@ const useLocalNotificationsContext = () => {
               toChainId,
               fromChainId,
               triggeredAt,
-              cctp,
+              isCctp,
               errorCount,
               status: currentStatus,
             } = transferNotification;
@@ -99,7 +99,7 @@ const useLocalNotificationsContext = () => {
                   transactionId: txHash,
                   toChainId,
                   fromChainId,
-                }, cctp);
+                }, isCctp);
 
                 if (status) {
                   transferNotification.status = status;

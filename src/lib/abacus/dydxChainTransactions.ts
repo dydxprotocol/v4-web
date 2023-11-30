@@ -1,7 +1,7 @@
 import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
 import Long from 'long';
 import type { IndexedTx } from '@cosmjs/stargate';
-import { encodeJson } from '@dydxprotocol/v4-client-js';
+import { GAS_MULTIPLIER, encodeJson } from '@dydxprotocol/v4-client-js';
 
 import {
   CompositeClient,
@@ -354,7 +354,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   
       // take out fee from amount before sweeping
       const amount = parseInt(ibcMsg.value.token.amount, 10) -
-        Math.floor(parseInt(fee.amount[0].amount, 10) * 1.4);
+        Math.floor(parseInt(fee.amount[0].amount, 10) * GAS_MULTIPLIER);
   
       if (amount <= 0) {
         throw new Error('noble balance does not cover fees');

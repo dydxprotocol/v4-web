@@ -69,7 +69,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     summary,
     errors: routeErrors,
     errorMessage: routeErrorMessage,
-    cctp,
+    isCctp,
   } = useSelector(getTransferInputs, shallowEqual) || {};
   const chainId = chainIdStr ? parseInt(chainIdStr) : undefined;
 
@@ -85,7 +85,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   );
 
   const [fromAmount, setFromAmount] = useState('');
-  const [slippage, setSlippage] = useState(cctp ? 0 : 0.01); // 1% slippage
+  const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 1% slippage
   const debouncedAmount = useDebounce<string>(fromAmount, 500);
 
   // Async Data
@@ -100,7 +100,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const debouncedAmountBN = MustBigNumber(debouncedAmount);
   const balanceBN = MustBigNumber(balance);
 
-  useEffect(() => setSlippage(cctp ? 0 : 0.01), [cctp]);
+  useEffect(() => setSlippage(isCctp ? 0 : 0.01), [isCctp]);
 
   useEffect(() => {
     const hasInvalidInput =
@@ -253,11 +253,11 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         if (txHash) {
           addTransferNotification({
             txHash: txHash,
-            toChainId: !cctp ? ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId : getNobleChainId(),
+            toChainId: !isCctp ? ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId : getNobleChainId(),
             fromChainId: chainIdStr || undefined,
             toAmount: summary?.usdcSize || undefined,
             triggeredAt: Date.now(),
-            cctp,
+            isCctp,
           });
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');

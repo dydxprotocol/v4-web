@@ -66,12 +66,12 @@ export const WithdrawForm = () => {
     resources,
     errors: routeErrors,
     errorMessage: routeErrorMessage,
-    cctp
+    isCctp
   } = useSelector(getTransferInputs, shallowEqual) || {};
 
   // User input
   const [withdrawAmount, setWithdrawAmount] = useState('');
-  const [slippage, setSlippage] = useState(cctp ? 0 : 0.01); // 0.1% slippage
+  const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 0.1% slippage
   const debouncedAmount = useDebounce<string>(withdrawAmount, 500);
 
 
@@ -91,7 +91,7 @@ export const WithdrawForm = () => {
     [freeCollateral?.current]
   );
 
-  useEffect(() => setSlippage(cctp ? 0 : 0.01), [cctp]);
+  useEffect(() => setSlippage(isCctp ? 0 : 0.01), [isCctp]);
 
   useEffect(() => {
     abacusStateManager.setTransferValue({
