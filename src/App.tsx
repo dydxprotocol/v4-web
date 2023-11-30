@@ -22,7 +22,6 @@ import { NotificationsProvider } from '@/hooks/useNotifications';
 import { LocalNotificationsProvider } from '@/hooks/useLocalNotifications';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
-import { SquidProvider } from '@/hooks/useSquid';
 import { TestFlagsProvider } from '@/hooks/useTestFlags';
 
 import { GuardedMobileRoute } from '@/components/GuardedMobileRoute';
@@ -130,7 +129,6 @@ const providers = [
   wrapProvider(DydxProvider),
   wrapProvider(AccountsProvider),
   wrapProvider(SubaccountProvider),
-  wrapProvider(SquidProvider),
   wrapProvider(LocalNotificationsProvider),
   wrapProvider(NotificationsProvider),
   wrapProvider(DialogAreaProvider),

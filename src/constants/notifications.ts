@@ -129,6 +129,7 @@ export type TransferNotifcation = {
   fromChainId?: string;
   toAmount?: number;
   triggeredAt?: number;
+  cctp?: boolean;
   errorCount?: number;
   status?: StatusResponse;
 };

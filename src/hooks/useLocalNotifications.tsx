@@ -1,11 +1,11 @@
 import { createContext, useContext, useCallback, useEffect, useMemo } from 'react';
 import { useQuery } from 'react-query';
-import type { StatusResponse } from '@0xsquid/sdk';
 
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import { type TransferNotifcation } from '@/constants/notifications';
 import { useAccounts } from '@/hooks/useAccounts';
-import { STATUS_ERROR_GRACE_PERIOD, useSquid } from '@/hooks/useSquid';
+
+import { fetchSquidStatus, STATUS_ERROR_GRACE_PERIOD } from '@/lib/squid';
 
 import { useLocalStorage } from './useLocalStorage';
 
@@ -68,8 +68,6 @@ const useLocalNotificationsContext = () => {
     [transferNotifications]
   );
 
-  const squid = useSquid();
-
   useQuery({
     queryKey: 'getTransactionStatus',
     queryFn: async () => {
@@ -81,23 +79,27 @@ const useLocalNotificationsContext = () => {
               toChainId,
               fromChainId,
               triggeredAt,
+              cctp,
               errorCount,
               status: currentStatus,
             } = transferNotification;
 
+            // @ts-ignore status.errors is not in the type definition but can be returned
+            // also error can some time come back as an empty object so we need to ignore for that
+            const hasErrors = !!currentStatus?.errors || 
+                 (currentStatus?.error && Object.keys(currentStatus.error).length !== 0);
+
             if (
-              // @ts-ignore status.errors is not in the type definition but can be returned
-              !currentStatus?.errors &&
-              !currentStatus?.error &&
+              !hasErrors &&
               (!currentStatus?.squidTransactionStatus ||
                 currentStatus?.squidTransactionStatus === 'ongoing')
             ) {
               try {
-                const status = await squid?.getStatus({
+                const status = await fetchSquidStatus({
                   transactionId: txHash,
                   toChainId,
                   fromChainId,
-                });
+                }, cctp);
 
                 if (status) {
                   transferNotification.status = status;

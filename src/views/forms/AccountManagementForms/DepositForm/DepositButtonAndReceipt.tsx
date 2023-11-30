@@ -158,8 +158,8 @@ export const DepositButtonAndReceipt = ({
     {
       key: 'total-fees',
       label: <span>{stringGetter({ key: STRING_KEYS.TOTAL_FEES })}</span>,
-      value: typeof summary?.bridgeFee === 'number' && typeof summary?.gasFee === 'number' && (
-        <Output type={OutputType.Fiat} value={summary?.bridgeFee + summary?.gasFee} />
+      value: typeof summary?.bridgeFee === 'number' || typeof summary?.gasFee === 'number' && (
+        <Output type={OutputType.Fiat} value={(summary?.bridgeFee || 0) + (summary?.gasFee || 0)} />
       ),
       subitems: feeSubitems,
     },
@@ -183,7 +183,12 @@ export const DepositButtonAndReceipt = ({
           type={OutputType.Text}
           value={stringGetter({
             key: STRING_KEYS.X_MINUTES_LOWERCASED,
-            params: { X: Math.round(summary?.estimatedRouteDuration / 60) },
+            params: {
+              X:
+                summary?.estimatedRouteDuration < 60
+                  ? '< 1'
+                  : Math.round(summary?.estimatedRouteDuration / 60),
+            },
           })}
         />
       ),
