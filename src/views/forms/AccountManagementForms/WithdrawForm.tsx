@@ -91,6 +91,8 @@ export const WithdrawForm = () => {
     [freeCollateral?.current]
   );
 
+  useEffect(() => setSlippage(cctp ? 0 : 0.01), [cctp]);
+
   useEffect(() => {
     abacusStateManager.setTransferValue({
       field: TransferInputField.type,
