@@ -78,7 +78,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         websocketUrl,
         validatorUrl,
         chainId,
-        nobleValidator,
+        nobleValidatorUrl,
         USDC_DENOM,
         USDC_DECIMALS,
         USDC_GAS_DENOM,
@@ -109,7 +109,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       );
 
       this.compositeClient = compositeClient;
-      this.nobleClient = new NobleClient(nobleValidator);
+      this.nobleClient = new NobleClient(nobleValidatorUrl);
       if (this.nobleWallet) await this.nobleClient.connect(this.nobleWallet);
       // Dispatch custom event to notify other parts of the app that the network has been connected
       const customEvent = new CustomEvent('abacus:connectNetwork', {
