@@ -1,6 +1,7 @@
-import styled, { AnyStyledComponent } from 'styled-components';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { useQuery } from 'react-query';
-import axios from 'axios';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
@@ -17,10 +18,17 @@ import { Output, OutputType } from '@/components/Output';
 import { Icon, IconName } from '@/components/Icon';
 import { Tag, TagSize } from '@/components/Tag';
 
+import { markLaunchIncentivesSeen } from '@/state/configs';
+
 import { log } from '@/lib/telemetry';
 
 export const LaunchIncentivesPanel = () => {
   const { isNotTablet } = useBreakpoints();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(markLaunchIncentivesSeen());
+  }, []);
 
   return isNotTablet ? (
     <Styled.Panel slotHeader={<LaunchIncentivesTitle />} slotRight={<EstimatedRewards />}>
@@ -61,10 +69,8 @@ const EstimatedRewards = () => {
     queryKey: `launch_incentives_rewards_${dydxAddress ?? ''}`,
     queryFn: async () => {
       if (!dydxAddress) return undefined;
-      const { data } = await axios.get(
-        `https://cloud.chaoslabs.co/query/api/dydx/points/${dydxAddress}`
-      );
-      return data?.incentivePoints;
+      const resp = await fetch(`https://cloud.chaoslabs.co/query/api/dydx/points/${dydxAddress}`);
+      return (await resp.json())?.incentivePoints;
     },
     onError: (error: Error) => log('LaunchIncentives/fetchPoints', error),
   });
