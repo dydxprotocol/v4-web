@@ -1,7 +1,7 @@
 [
     {
         "chainId": "42161",
-        "tokenAddress": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+        "tokenAddress": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
         "name": "Arbitrum"
     },
     {
@@ -11,7 +11,7 @@
     },
     {
         "chainId": "8453",
-        "tokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        "tokenAddress": "0x66627F389ae46D881773B7131139b2411980E09E",
         "name": "Base"
     },
     {
@@ -21,7 +21,7 @@
     },
     {
         "chainId": "10",
-        "tokenAddress": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+        "tokenAddress": "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
         "name": "OP Mainnet"
     },
     {
