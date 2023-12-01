@@ -94,7 +94,7 @@ const EstimatedRewards = () => {
 
         <Styled.Points>
           <Output type={OutputType.Number} value={data} isLoading={isLoading} fractionDigits={2} />
-          {stringGetter({ key: STRING_KEYS.POINTS })}
+          {data !== undefined && stringGetter({ key: STRING_KEYS.POINTS })}
         </Styled.Points>
       </Styled.EstimatedRewardsCardContent>
 
