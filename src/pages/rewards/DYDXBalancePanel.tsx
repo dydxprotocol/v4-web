@@ -2,6 +2,7 @@ import type { ElementType } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { useAccountBalance, useAccounts, useTokenConfigs, useStringGetter } from '@/hooks';
 
@@ -116,12 +117,17 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Panel = styled(Panel)`
   --panel-paddingX: 1.5rem;
+
+  @media ${breakpoints.tablet} {
+    --panel-paddingY: 1.5rem;
+    --panel-content-paddingY: 1rem;
+  }
 `;
 
 Styled.Header = styled.div`
   ${layoutMixins.spacedRow}
   gap: 1rem;
-  padding: 1rem 1.5rem 0;
+  padding: var(--panel-paddingY) var(--panel-paddingX) 0;
 `;
 
 Styled.Title = styled.h3`

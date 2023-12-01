@@ -7,6 +7,8 @@ import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 
 import { useAccountBalance, useBreakpoints, useStringGetter } from '@/hooks';
 
+import { breakpoints } from '@/styles';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';
@@ -134,13 +136,22 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.MigratePanel = styled(Panel)`
   --panel-paddingX: 1.5rem;
   width: 100%;
+
+  background-image: url('/dots-background.svg');
+  background-position: right;
+  background-repeat: no-repeat;
+
+  @media ${breakpoints.tablet} {
+    --panel-paddingY: 1.5rem;
+    --panel-content-paddingY: 1rem;
+  }
 `;
 
 Styled.Title = styled.h3`
   font: var(--font-medium-book);
   color: var(--color-text-2);
 
-  padding: 1rem 1.5rem 0;
+  padding: var(--panel-paddingY) var(--panel-paddingX) 0;
 `;
 
 Styled.MigrateAction = styled.div`
@@ -164,6 +175,13 @@ Styled.Token = styled(Output)`
 Styled.Description = styled.div`
   color: var(--color-text-0);
   --link-color: var(--color-text-1);
+
+  a {
+    display: inline;
+    ::before {
+      content: ' ';
+    }
+  }
 `;
 
 Styled.Column = styled.div`
