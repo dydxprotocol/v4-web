@@ -497,9 +497,11 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
           callback(JSON.stringify(parseDelegations));
           break;
         case QueryType.GetNobleBalance:
-          const nobleBalance = await this.nobleClient?.getAccountBalance('uusdc');
-          const parsedNobleBalance = this.parseToPrimitives(nobleBalance);
-          callback(JSON.stringify(parsedNobleBalance));
+          if (this.nobleClient?.isConnected) {
+            const nobleBalance = await this.nobleClient.getAccountBalance('uusdc');
+            const parsedNobleBalance = this.parseToPrimitives(nobleBalance);
+            callback(JSON.stringify(parsedNobleBalance));
+          }
           break;
         default:
           break;
