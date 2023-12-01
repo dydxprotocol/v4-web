@@ -109,6 +109,8 @@ export const DepositButtonAndReceipt = ({
     ? stringGetter({ key: STRING_KEYS.HIDE_ALL_DETAILS })
     : stringGetter({ key: STRING_KEYS.SHOW_ALL_DETAILS });
 
+  const totalFees = (summary?.bridgeFee || 0) + (summary?.gasFee || 0);
+
   const submitButtonReceipt = [
     {
       key: 'equity',
@@ -158,9 +160,7 @@ export const DepositButtonAndReceipt = ({
     {
       key: 'total-fees',
       label: <span>{stringGetter({ key: STRING_KEYS.TOTAL_FEES })}</span>,
-      value: typeof summary?.bridgeFee === 'number' && typeof summary?.gasFee === 'number' && (
-        <Output type={OutputType.Fiat} value={summary?.bridgeFee + summary?.gasFee} />
-      ),
+      value: <Output type={OutputType.Fiat} value={totalFees} />,
       subitems: feeSubitems,
     },
     {
@@ -183,7 +183,12 @@ export const DepositButtonAndReceipt = ({
           type={OutputType.Text}
           value={stringGetter({
             key: STRING_KEYS.X_MINUTES_LOWERCASED,
-            params: { X: Math.round(summary?.estimatedRouteDuration / 60) },
+            params: {
+              X:
+                summary?.estimatedRouteDuration < 60
+                  ? '< 1'
+                  : Math.round(summary?.estimatedRouteDuration / 60),
+            },
           })}
         />
       ),

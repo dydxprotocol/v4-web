@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@0xsquid/sdk':
     specifier: ^1.10.0
@@ -23,11 +27,11 @@ dependencies:
     specifier: ^0.31.0
     version: 0.31.0
   '@dydxprotocol/v4-abacus':
-    specifier: ^1.0.30
-    version: 1.0.30
+    specifier: ^1.1.4
+    version: 1.1.4
   '@dydxprotocol/v4-client-js':
-    specifier: ^1.0.0
-    version: 1.0.0
+    specifier: ^1.0.6
+    version: 1.0.6
   '@dydxprotocol/v4-localization':
     specifier: ^1.0.17
     version: 1.0.17
@@ -984,12 +988,12 @@ packages:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.0.30:
-    resolution: {integrity: sha512-zzJzNzMR3Stwv1Mu0XGUNlyo1V/ywo3yi3QSzE4mzUtXB+p5Shj5hRQCcwhHcNjLgp6a+T0BcRjBPa4QMETmwg==}
+  /@dydxprotocol/v4-abacus@1.1.4:
+    resolution: {integrity: sha512-gml6qheFsPShE9p3FmzFeStYM9ZVhgMq0K0+y12V7pObnMKbumkOIISgCzc47idkah0GMNhiqwi9faD5SjOy/A==}
     dev: false
 
-  /@dydxprotocol/v4-client-js@1.0.0:
-    resolution: {integrity: sha512-ehfHO+zQy795TcJRwtiawadFHZyh4HnpJNP26hCGsIjLE5q6LLHweQHpK/1N/sXU1PBOuQwc7iaJnFop6gYauQ==}
+  /@dydxprotocol/v4-client-js@1.0.6:
+    resolution: {integrity: sha512-xiWH+kbix+zhI6EsAnd+NDvkjBgxWtGwQmvpd0PjljWNYSFgUtNe5M+piDdRbl2nhy6YWbxAGTwwS3K/ih5qSw==}
     dependencies:
       '@cosmjs/amino': 0.30.1
       '@cosmjs/encoding': 0.31.1
@@ -14136,7 +14140,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
