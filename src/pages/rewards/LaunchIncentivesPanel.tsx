@@ -4,7 +4,8 @@ import { useQuery } from 'react-query';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { ButtonAction } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 
 import breakpoints from '@/styles/breakpoints';
 import { useAccounts, useBreakpoints, useStringGetter } from '@/hooks';
@@ -19,6 +20,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { Tag, TagSize } from '@/components/Tag';
 
 import { markLaunchIncentivesSeen } from '@/state/configs';
+import { openDialog } from '@/state/dialogs';
 
 import { log } from '@/lib/telemetry';
 
@@ -103,6 +105,8 @@ const EstimatedRewards = () => {
 
 const LaunchIncentivesContent = () => {
   const stringGetter = useStringGetter();
+  const dispatch = useDispatch();
+
   return (
     <Styled.Column>
       <Styled.Description>
@@ -112,16 +116,28 @@ const LaunchIncentivesContent = () => {
       <Styled.ButtonRow>
         <Styled.AboutButton
           action={ButtonAction.Base}
-          type={ButtonType.Link}
-          href="https://dydx.exchange/blog/v4-full-trading"
+          onClick={() => {
+            dispatch(
+              openDialog({
+                type: DialogTypes.ExternalLink,
+                dialogProps: { link: 'https://dydx.exchange/blog/v4-full-trading' },
+              })
+            );
+          }}
           slotRight={<Styled.LinkOutIcon iconName={IconName.LinkOut} />}
         >
           {stringGetter({ key: STRING_KEYS.ABOUT })}
         </Styled.AboutButton>
         <Styled.Button
           action={ButtonAction.Primary}
-          type={ButtonType.Link}
-          href="https://community.chaoslabs.xyz/dydx-v4/risk/leaderboard"
+          onClick={() => {
+            dispatch(
+              openDialog({
+                type: DialogTypes.ExternalLink,
+                dialogProps: { link: 'https://community.chaoslabs.xyz/dydx-v4/risk/leaderboard' },
+              })
+            );
+          }}
           slotRight={<Styled.LinkOutIcon iconName={IconName.LinkOut} />}
           slotLeft={<Icon iconName={IconName.Leaderboard} />}
         >
