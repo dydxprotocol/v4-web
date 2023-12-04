@@ -1,7 +1,7 @@
 import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
 import Long from 'long';
 import type { IndexedTx } from '@cosmjs/stargate';
-import { encodeJson } from '@dydxprotocol/v4-client-js';
+import { GAS_MULTIPLIER, encodeJson } from '@dydxprotocol/v4-client-js';
 
 import {
   CompositeClient,
@@ -9,6 +9,7 @@ import {
   type LocalWallet,
   Network,
   NetworkOptimizer,
+  NobleClient,
   SubaccountClient,
   ValidatorConfig,
   OrderType,
@@ -43,8 +44,10 @@ import { log } from '../telemetry';
 
 class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   private compositeClient: CompositeClient | undefined;
+  private nobleClient: NobleClient | undefined;
   private store: RootStore | undefined;
   private localWallet: LocalWallet | undefined;
+  private nobleWallet: LocalWallet | undefined;
 
   constructor() {
     this.compositeClient = undefined;
@@ -59,6 +62,11 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     this.localWallet = localWallet;
   }
 
+  setNobleWallet(nobleWallet: LocalWallet) {
+    this.nobleWallet = nobleWallet;
+    this.nobleClient?.connect(nobleWallet);
+  }
+
   async connectNetwork(
     paramsInJson: Nullable<string>,
     callback: (p0: Nullable<string>) => void
@@ -70,6 +78,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         websocketUrl,
         validatorUrl,
         chainId,
+        nobleValidatorUrl,
         USDC_DENOM,
         USDC_DECIMALS,
         USDC_GAS_DENOM,
@@ -100,7 +109,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       );
 
       this.compositeClient = compositeClient;
-
+      this.nobleClient = new NobleClient(nobleValidatorUrl);
+      if (this.nobleWallet) await this.nobleClient.connect(this.nobleWallet);
       // Dispatch custom event to notify other parts of the app that the network has been connected
       const customEvent = new CustomEvent('abacus:connectNetwork', {
         detail: parsedParams,
@@ -325,6 +335,46 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     }
   }
 
+  async sendNobleIBC(
+    params: {
+      msgTypeUrl: string,
+      msg: any,
+    }
+  ): Promise<string> {
+    if (!this.nobleClient?.isConnected) {
+      throw new Error('Missing nobleClient or localWallet');
+    }
+
+    try {
+      const ibcMsg = {
+        typeUrl: params.msgTypeUrl, // '/ibc.applications.transfer.v1.MsgTransfer',
+        value: params.msg,
+      };
+      const fee = await this.nobleClient.simulateTransaction([ibcMsg]);
+  
+      // take out fee from amount before sweeping
+      const amount = parseInt(ibcMsg.value.token.amount, 10) -
+        Math.floor(parseInt(fee.amount[0].amount, 10) * GAS_MULTIPLIER);
+  
+      if (amount <= 0) {
+        throw new Error('noble balance does not cover fees');
+      }
+  
+      ibcMsg.value.token.amount = amount.toString();
+      const tx = await this.nobleClient.send([ibcMsg]);
+
+      const parsedTx = this.parseToPrimitives(tx);
+
+      return JSON.stringify(parsedTx);
+    } catch (error) {
+      log('DydxChainTransactions/sendNobleIBC', error);
+
+      return JSON.stringify({
+        error,
+      });
+    }
+  }
+
   async transaction(
     type: TransactionTypes,
     paramsInJson: Abacus.Nullable<string>,
@@ -351,6 +401,11 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         }
         case TransactionType.simulateTransferNativeToken: {
           const result = await this.simulateTransferNativeTokenTransaction(params);
+          callback(result);
+          break;
+        }
+        case TransactionType.SendNobleIBC: {
+          const result = await this.sendNobleIBC(params);
           callback(result);
           break;
         }
@@ -440,6 +495,13 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
             await this.compositeClient?.validatorClient.get.getDelegatorDelegations(params.address);
           const parseDelegations = this.parseToPrimitives(delegations);
           callback(JSON.stringify(parseDelegations));
+          break;
+        case QueryType.GetNobleBalance:
+          if (this.nobleClient?.isConnected) {
+            const nobleBalance = await this.nobleClient.getAccountBalance('uusdc');
+            const parsedNobleBalance = this.parseToPrimitives(nobleBalance);
+            callback(JSON.stringify(parsedNobleBalance));
+          }
           break;
         default:
           break;

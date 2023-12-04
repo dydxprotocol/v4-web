@@ -116,6 +116,7 @@
 
   --color-gradient-positive: hsla(158, 49%, 48%, 0.16);
   --color-gradient-negative: hsla(0, 100%, 66%, 0.16);
+  --color-accent-faded: hsla(var(--theme-classic-hue-purple), 100%, 70%, 0.16);
 
   --color-risk-low: var(--theme-classic-color-green);
   --color-risk-medium: var(--theme-classic-color-yellow);

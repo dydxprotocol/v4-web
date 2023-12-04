@@ -26,7 +26,7 @@ import {
 } from '@/constants/abacus';
 
 import { DEFAULT_MARKETID } from '@/constants/markets';
-import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork } from '@/constants/networks';
+import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork, isMainnet } from '@/constants/networks';
 import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
 
 import type { RootStore } from '@/state/_store';
@@ -81,10 +81,13 @@ class AbacusStateManager {
       this.abacusFormatter
     );
 
+    const appConfigs = AbacusAppConfig.Companion.forWeb;
+    if (!isMainnet) appConfigs.squidVersion = AbacusAppConfig.SquidVersion.V2DepositOnly;
+
     this.stateManager = new AsyncAbacusStateManager(
       '',
       CURRENT_ABACUS_DEPLOYMENT,
-      AbacusAppConfig.Companion.forWeb,
+      appConfigs,
       ioImplementations,
       uiImplementations,
       // @ts-ignore
@@ -179,6 +182,12 @@ class AbacusStateManager {
       this.chainTransactions.setLocalWallet(localWallet);
     }
   };
+
+  setNobleWallet = (nobleWallet?: LocalWallet) => {
+    if (nobleWallet) {
+      this.chainTransactions.setNobleWallet(nobleWallet);
+    }
+  }
 
   setTransfersSourceAddress = (evmAddress: string) => {
     this.stateManager.sourceAddress = evmAddress;
