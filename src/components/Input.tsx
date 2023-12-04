@@ -129,6 +129,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             placeholder={placeholder}
             value={value}
             // Other
+            data-1p-ignore // prevent 1Password fill
             {...otherProps}
           />
         ) : (
@@ -168,6 +169,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             value={formattedValue}
             autoComplete="off"
             autoCorrect="off"
+            data-1p-ignore // prevent 1Password fill
             {...otherProps}
           />
         )}

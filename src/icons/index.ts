@@ -32,6 +32,7 @@ export { default as GiftboxIcon } from './giftbox.svg';
 export { default as HelpCircleIcon } from './help-circle.svg';
 export { default as HideIcon } from './hide.svg';
 export { default as HistoryIcon } from './history.svg';
+export { default as LeaderboardIcon } from './leaderboard.svg';
 export { default as LinkOutIcon } from './link-out.svg';
 export { default as LockIcon } from './lock.svg';
 export { default as LogoShortIcon } from './logo-short';

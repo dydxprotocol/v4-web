@@ -1,12 +1,16 @@
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { ButtonShape } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 import { LogoShortIcon, BellStrokeIcon } from '@/icons';
+
+import { headerMixins } from '@/styles/headerMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
+import breakpoints from '@/styles/breakpoints';
 
 import { useTokenConfigs, useStringGetter, useURLConfigs } from '@/hooks';
 
@@ -21,16 +25,15 @@ import { NotificationsMenu } from '@/views/menus/NotificationsMenu';
 import { LanguageSelector } from '@/views/menus/LanguageSelector';
 
 import { openDialog } from '@/state/dialogs';
-
-import { headerMixins } from '@/styles/headerMixins';
-import { layoutMixins } from '@/styles/layoutMixins';
-import breakpoints from '@/styles/breakpoints';
+import { getHasSeenLaunchIncentives } from '@/state/configsSelectors';
 
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
   const { documentation, community, mintscanBase } = useURLConfigs();
   const dispatch = useDispatch();
   const { chainTokenLabel } = useTokenConfigs();
+
+  const hasSeenLaunchIncentives = useSelector(getHasSeenLaunchIncentives);
 
   const navItems = [
     {
@@ -55,6 +58,7 @@ export const HeaderDesktop = () => {
           value: chainTokenLabel,
           label: chainTokenLabel,
           href: `/${chainTokenLabel}`,
+          slotAfter: !hasSeenLaunchIncentives && <Styled.UnreadIndicator />,
         },
         {
           value: 'MORE',
@@ -237,4 +241,11 @@ Styled.IconButton = styled(IconButton)<{ size?: string }>`
   --button-border: none;
   --button-icon-size: 1rem;
   --button-padding: 0 0.5em;
+`;
+
+Styled.UnreadIndicator = styled.div`
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: 50%;
+  background-color: var(--color-accent);
 `;

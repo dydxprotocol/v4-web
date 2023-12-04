@@ -17,6 +17,7 @@ export interface ConfigsState {
   feeTiers?: kollections.List<FeeTier>;
   feeDiscounts?: FeeDiscount[];
   network?: NetworkConfigs;
+  hasSeenLaunchIncentives: boolean;
 }
 
 const DOCUMENT_THEME_MAP = {
@@ -43,6 +44,10 @@ const initialState: ConfigsState = {
   feeDiscounts: undefined,
   feeTiers: undefined,
   network: undefined,
+  hasSeenLaunchIncentives: getLocalStorage({
+    key: LocalStorageKey.HasSeenLaunchIncentives,
+    defaultValue: false,
+  }),
 };
 
 changeTheme(initialState.appTheme);
@@ -60,7 +65,11 @@ export const configsSlice = createSlice({
       ...state,
       ...action.payload,
     }),
+    markLaunchIncentivesSeen: (state: ConfigsState) => {
+      setLocalStorage({ key: LocalStorageKey.HasSeenLaunchIncentives, value: true });
+      state.hasSeenLaunchIncentives = true;
+    },
   },
 });
 
-export const { setAppTheme, setConfigs } = configsSlice.actions;
+export const { setAppTheme, setConfigs, markLaunchIncentivesSeen } = configsSlice.actions;
