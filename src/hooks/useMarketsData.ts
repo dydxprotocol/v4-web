@@ -8,7 +8,7 @@ import {
   MARKETS_TO_DISPLAY,
 } from '@/constants/markets';
 
-import { testFlags } from '@/hooks/useTestFlags';
+import { testFlags } from '@/lib/testFlags';
 
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';

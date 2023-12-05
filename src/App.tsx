@@ -22,7 +22,6 @@ import { NotificationsProvider } from '@/hooks/useNotifications';
 import { LocalNotificationsProvider } from '@/hooks/useLocalNotifications';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
-import { TestFlagsProvider } from '@/hooks/useTestFlags';
 
 import { GuardedMobileRoute } from '@/components/GuardedMobileRoute';
 
@@ -123,7 +122,6 @@ const providers = [
   wrapProvider(QueryClientProvider, { client: queryClient }),
   wrapProvider(GrazProvider),
   wrapProvider(WagmiConfig, { config }),
-  wrapProvider(TestFlagsProvider),
   wrapProvider(LocaleProvider),
   wrapProvider(RestrictionProvider),
   wrapProvider(DydxProvider),
