@@ -49,7 +49,7 @@ export const TradeSizeInputs = () => {
     useSelector(getCurrentMarketConfig, shallowEqual) || {};
   const { size, usdcSize, leverage, input: lastEditedInput } = inputTradeSizeData || {};
   const { needsLeverage } = currentTradeInputOptions || {};
-  const decimals = stepSizeDecimals || TOKEN_DECIMALS;
+  const decimals = stepSizeDecimals ?? TOKEN_DECIMALS;
 
   const { amountInput, usdAmountInput, leverageInput } = useSelector(
     getTradeFormInputs,
@@ -71,7 +71,7 @@ export const TradeSizeInputs = () => {
   }, [size, usdcSize, leverage, lastEditedInput]);
 
   const onSizeInput = ({ value, floatValue }: { value: string; floatValue?: number }) => {
-    dispatch(setTradeFormInputs({ amountInput: value }));
+    dispatch(setTradeFormInputs({ amountInput: `${floatValue}` }));
     const newAmount = MustBigNumber(floatValue).toFixed(decimals);
 
     abacusStateManager.setTradeValue({
@@ -81,7 +81,7 @@ export const TradeSizeInputs = () => {
   };
 
   const onUSDCInput = ({ value, floatValue }: { value: string; floatValue?: number }) => {
-    dispatch(setTradeFormInputs({ usdAmountInput: value }));
+    dispatch(setTradeFormInputs({ usdAmountInput: `${floatValue}` }));
     const newUsdcAmount = MustBigNumber(floatValue).toFixed();
 
     abacusStateManager.setTradeValue({
