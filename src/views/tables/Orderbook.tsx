@@ -353,7 +353,7 @@ export const Orderbook = ({
       </Styled.Header>
       <Styled.SplitOrderbook>
         <OrderbookTable data={asks} histogramSide="right" {...orderbookTableProps} />
-        <OrderbookTable data={bids} histogramSide="left" {...orderbookTableProps} />
+        <OrderbookTable data={bids.reverse()} histogramSide="left" {...orderbookTableProps} />
       </Styled.SplitOrderbook>
     </Styled.HorizontalLayout>
   );
