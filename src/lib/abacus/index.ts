@@ -33,6 +33,8 @@ import type { RootStore } from '@/state/_store';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors';
 
+import { testFlags } from '@/lib/testFlags';
+
 import AbacusRest from './rest';
 import AbacusAnalytics from './analytics';
 import AbacusWebsocket from './websocket';
@@ -82,9 +84,7 @@ class AbacusStateManager {
     );
 
     const appConfigs = AbacusAppConfig.Companion.forWeb;
-
-    const enableCCTP = import.meta.env.VITE_ENABLE_CCTP;
-    if (!isMainnet || enableCCTP)
+    if (!isMainnet || testFlags.withCCTP)
       appConfigs.squidVersion = AbacusAppConfig.SquidVersion.V2DepositOnly;
 
     this.stateManager = new AsyncAbacusStateManager(
