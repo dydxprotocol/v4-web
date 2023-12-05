@@ -82,7 +82,10 @@ class AbacusStateManager {
     );
 
     const appConfigs = AbacusAppConfig.Companion.forWeb;
-    if (!isMainnet) appConfigs.squidVersion = AbacusAppConfig.SquidVersion.V2DepositOnly;
+
+    const enableCCTP = import.meta.env.VITE_ENABLE_CCTP;
+    if (!isMainnet || enableCCTP)
+      appConfigs.squidVersion = AbacusAppConfig.SquidVersion.V2DepositOnly;
 
     this.stateManager = new AsyncAbacusStateManager(
       '',
@@ -187,7 +190,7 @@ class AbacusStateManager {
     if (nobleWallet) {
       this.chainTransactions.setNobleWallet(nobleWallet);
     }
-  }
+  };
 
   setTransfersSourceAddress = (evmAddress: string) => {
     this.stateManager.sourceAddress = evmAddress;
@@ -230,18 +233,6 @@ class AbacusStateManager {
 
   setLocaleSeparators = ({ group, decimal }: LocaleSeparators) => {
     this.abacusFormatter.setLocaleSeparators({ group, decimal });
-  };
-
-  setTransferStatus = ({
-    hash,
-    fromChainId,
-    toChainId,
-  }: {
-    hash: string;
-    fromChainId?: string;
-    toChainId?: string;
-  }) => {
-    this.stateManager.transferStatus(hash, fromChainId, toChainId);
   };
 
   // ------ Transactions ------ //
