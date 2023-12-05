@@ -220,7 +220,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             body: stringGetter({
               key: 'NOTIFICATIONS.RELEASE_REWARDS_AND_FULL_TRADING.BODY',
               params: {
-                BLOGPOST: (
+                DOS_BLOGPOST: (
                   <$Link
                     href="https://www.dydxopsdao.com/blog/deep-dive-full-trading"
                     target="_blank"
@@ -229,8 +229,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                     {stringGetter({ key: STRING_KEYS.HERE })}
                   </$Link>
                 ),
-                // todo: update localization to flip the two
-                DOS_BLOGPOST: (
+                TRADING_BLOGPOST: (
                   <$Link
                     href="https://dydx.exchange/blog/v4-full-trading"
                     target="_blank"

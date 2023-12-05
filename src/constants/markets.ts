@@ -27,4 +27,28 @@ export enum FundingDirection {
   ToLong = 'ToLong',
 }
 
-export const MARKETS_TO_DISPLAY = ['BTC-USD', 'ETH-USD', 'LINK-USD', 'SOL-USD'];
+export const MARKETS_TO_DISPLAY = [
+  'BTC-USD',
+  'ETH-USD',
+  'LINK-USD',
+  'SOL-USD',
+  'MATIC-USD',
+  'ATOM-USD',
+  'AVAX-USD',
+  'APE-USD',
+  'XRP-USD',
+  'UNI-USD',
+  'ADA-USD',
+  'TRX-USD',
+  'OP-USD',
+  'MKR-USD',
+  'DOGE-USD',
+  'SHIB-USD',
+  'COMP-USD',
+  'LDO-USD',
+  'NEAR-USD',
+  'APT-USD',
+  'SUI-USD',
+  'DOT-USD',
+  'ETC-USD',
+];
