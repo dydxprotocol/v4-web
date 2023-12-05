@@ -4,7 +4,7 @@ import { shallowEqual, useSelector } from 'react-redux';
 import { STRING_KEYS } from '@/constants/localization';
 import { MARKETS_TO_DISPLAY } from '@/constants/markets';
 import { useBreakpoints, useStringGetter } from '@/hooks';
-import { testFlags } from '@/hooks/useTestFlags';
+import { testFlags } from '@/lib/testFlags';
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 

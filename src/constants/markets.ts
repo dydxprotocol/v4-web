@@ -51,4 +51,9 @@ export const MARKETS_TO_DISPLAY = [
   'SUI-USD',
   'DOT-USD',
   'ETC-USD',
+  'ARB-USD',
+  'CRV-USD',
+  'BLUR-USD',
+  'FIL-USD',
+  'XLM-USD',
 ];
