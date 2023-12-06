@@ -77,7 +77,7 @@ export const TradeSizeInputs = () => {
     floatValue?: number;
     formattedValue: string;
   }) => {
-    dispatch(setTradeFormInputs({ amountInput: `${floatValue}` }));
+    dispatch(setTradeFormInputs({ amountInput: MustBigNumber(floatValue).toString() }));
     const newAmount = MustBigNumber(floatValue).toFixed(decimals);
 
     abacusStateManager.setTradeValue({
@@ -93,7 +93,7 @@ export const TradeSizeInputs = () => {
     floatValue?: number;
     formattedValue: string;
   }) => {
-    dispatch(setTradeFormInputs({ usdAmountInput: `${floatValue}` }));
+    dispatch(setTradeFormInputs({ usdAmountInput: MustBigNumber(floatValue).toString() }));
     const newUsdcAmount = MustBigNumber(floatValue).toFixed(tickSizeDecimals || USD_DECIMALS);
 
     abacusStateManager.setTradeValue({
