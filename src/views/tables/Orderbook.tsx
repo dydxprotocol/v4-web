@@ -237,6 +237,7 @@ const OrderbookTable = ({
         style: {
           '--histogram-bucket-size': row.size,
           '--histogram-bucket-depth': row.depth,
+          '--tr-pointerEvents': row.price ? 'auto' : 'none',
         },
       })}
       onRowAction={onRowAction}
@@ -523,6 +524,7 @@ Styled.OrderbookTable = styled(OrderbookTradesTable)<StyleProps>`
 
   tr {
     --histogram-bucket-depth: 0;
+    pointer-events: var(--tr-pointerEvents);
 
     &[data-side='bid'] {
       --accent-color: var(--color-positive);
