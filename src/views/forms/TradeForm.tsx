@@ -206,7 +206,7 @@ export const TradeForm = ({
         dispatch(setTradeFormInputs({ triggerPriceInput: value }));
       },
       value: triggerPriceInput ?? '',
-      decimals: tickSizeDecimals || USD_DECIMALS,
+      decimals: tickSizeDecimals ?? USD_DECIMALS,
     });
   }
 
@@ -226,7 +226,7 @@ export const TradeForm = ({
         dispatch(setTradeFormInputs({ limitPriceInput: value }));
       },
       value: limitPriceInput,
-      decimals: tickSizeDecimals || USD_DECIMALS,
+      decimals: tickSizeDecimals ?? USD_DECIMALS,
     });
   }
 

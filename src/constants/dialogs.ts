@@ -3,6 +3,7 @@ export enum DialogTypes {
   Deposit = 'Deposit',
   DisconnectWallet = 'DisconnectWallet',
   ExchangeOffline = 'ExchangeOffline',
+  ExternalLink = 'ExternalLink',
   FillDetails = 'FillDetails',
   Help = 'Help',
   ExternalNavKeplr = 'ExternalNavKeplr',

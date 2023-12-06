@@ -11,22 +11,19 @@ export const useTradeFormInputs = () => {
   const { limitPriceInput, triggerPriceInput, trailingPercentInput } = tradeFormInputValues;
 
   useEffect(() => {
-    const floatValue = parseFloat(triggerPriceInput);
     abacusStateManager.setTradeValue({
-      value: floatValue,
+      value: triggerPriceInput,
       field: TradeInputField.triggerPrice,
     });
   }, [triggerPriceInput]);
 
   useEffect(() => {
-    const floatValue = parseFloat(limitPriceInput);
-    abacusStateManager.setTradeValue({ value: floatValue, field: TradeInputField.limitPrice });
+    abacusStateManager.setTradeValue({ value: limitPriceInput, field: TradeInputField.limitPrice });
   }, [limitPriceInput]);
 
   useEffect(() => {
-    const floatValue = parseFloat(trailingPercentInput);
     abacusStateManager.setTradeValue({
-      value: floatValue,
+      value: trailingPercentInput,
       field: TradeInputField.trailingPercent,
     });
   }, [trailingPercentInput]);

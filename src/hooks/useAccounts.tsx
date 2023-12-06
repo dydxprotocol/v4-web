@@ -2,7 +2,7 @@ import { useCallback, useContext, createContext, useEffect, useState, useMemo } 
 
 import { useDispatch } from 'react-redux';
 import { AES, enc } from 'crypto-js';
-import { LocalWallet, type Subaccount } from '@dydxprotocol/v4-client-js';
+import { NOBLE_BECH32_PREFIX, LocalWallet, type Subaccount } from '@dydxprotocol/v4-client-js';
 
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
 import { DialogTypes } from '@/constants/dialogs';
@@ -218,6 +218,16 @@ const useAccountsContext = () => {
     if (dydxAddress) abacusStateManager.setAccount(localDydxWallet);
     else abacusStateManager.attemptDisconnectAccount();
   }, [localDydxWallet]);
+
+  useEffect(() => {
+    const setNobleWallet = async () => {
+      if (hdKey?.mnemonic) {
+        const nobleWallet = await LocalWallet.fromMnemonic(hdKey.mnemonic, NOBLE_BECH32_PREFIX);
+        abacusStateManager.setNobleWallet(nobleWallet);
+      }
+    };
+    setNobleWallet();
+  }, [hdKey?.mnemonic]);
 
   // clear subaccounts when no dydxAddress is set
   useEffect(() => {

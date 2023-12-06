@@ -10,7 +10,7 @@ import {
 } from '@/constants/websocket';
 
 import { lastSuccessfulWebsocketRequestByOrigin } from '@/hooks/useAnalytics';
-import { testFlags } from '@/hooks/useTestFlags';
+import { testFlags } from '@/lib/testFlags';
 
 import { subscriptionsByChannelId } from '@/lib/tradingView/dydxfeed/cache';
 import { mapCandle } from '@/lib/tradingView/utils';
