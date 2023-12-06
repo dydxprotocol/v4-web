@@ -56,4 +56,9 @@ export const MARKETS_TO_DISPLAY = [
   'BLUR-USD',
   'FIL-USD',
   'XLM-USD',
+  'PEPE-USD',
+  'WLD-USD',
+  'SEI-USD',
+  'LTC-USD',
+  'BCH-USD',
 ];
