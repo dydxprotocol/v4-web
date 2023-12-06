@@ -70,22 +70,34 @@ export const TradeSizeInputs = () => {
     }
   }, [size, usdcSize, leverage, lastEditedInput]);
 
-  const onSizeInput = ({ value, floatValue }: { value: string; floatValue?: number }) => {
+  const onSizeInput = ({
+    floatValue,
+    formattedValue,
+  }: {
+    floatValue?: number;
+    formattedValue: string;
+  }) => {
     dispatch(setTradeFormInputs({ amountInput: `${floatValue}` }));
     const newAmount = MustBigNumber(floatValue).toFixed(decimals);
 
     abacusStateManager.setTradeValue({
-      value: value === '' || newAmount === 'NaN' ? null : newAmount,
+      value: formattedValue === '' || newAmount === 'NaN' ? null : newAmount,
       field: TradeInputField.size,
     });
   };
 
-  const onUSDCInput = ({ value, floatValue }: { value: string; floatValue?: number }) => {
+  const onUSDCInput = ({
+    floatValue,
+    formattedValue,
+  }: {
+    floatValue?: number;
+    formattedValue: string;
+  }) => {
     dispatch(setTradeFormInputs({ usdAmountInput: `${floatValue}` }));
-    const newUsdcAmount = MustBigNumber(floatValue).toFixed();
+    const newUsdcAmount = MustBigNumber(floatValue).toFixed(tickSizeDecimals || USD_DECIMALS);
 
     abacusStateManager.setTradeValue({
-      value: value === '' || newUsdcAmount === 'NaN' ? null : newUsdcAmount,
+      value: formattedValue === '' || newUsdcAmount === 'NaN' ? null : newUsdcAmount,
       field: TradeInputField.usdcSize,
     });
   };
