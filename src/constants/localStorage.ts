@@ -22,6 +22,7 @@ export enum LocalStorageKey {
   SelectedTheme = 'dydx.SelectedTheme',
   SelectedTradeLayout = 'dydx.SelectedTradeLayout',
   TradingViewChartConfig = 'dydx.TradingViewChartConfig',
+  HasSeenLaunchIncentives = 'dydx.HasSeenLaunchIncentives',
 }
 
 export const LOCAL_STORAGE_VERSIONS = {

@@ -4,6 +4,7 @@ import { StatusResponse } from '@0xsquid/sdk';
 export enum NotificationType {
   AbacusGenerated = 'AbacusGenerated',
   SquidTransfer = 'SquidTransfer',
+  ReleaseUpdates = 'ReleaseUpdates',
 }
 
 export enum NotificationComponentType {}
@@ -128,6 +129,7 @@ export type TransferNotifcation = {
   fromChainId?: string;
   toAmount?: number;
   triggeredAt?: number;
+  isCctp?: boolean;
   errorCount?: number;
   status?: StatusResponse;
 };

@@ -58,11 +58,6 @@ export const WithdrawForm = () => {
   const { sendSquidWithdraw } = useSubaccount();
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
 
-  // User input
-  const [withdrawAmount, setWithdrawAmount] = useState('');
-  const [slippage, setSlippage] = useState(0.01); // 0.1% slippage
-  const debouncedAmount = useDebounce<string>(withdrawAmount, 500);
-
   const {
     requestPayload,
     token,
@@ -71,7 +66,14 @@ export const WithdrawForm = () => {
     resources,
     errors: routeErrors,
     errorMessage: routeErrorMessage,
+    isCctp
   } = useSelector(getTransferInputs, shallowEqual) || {};
+
+  // User input
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 0.1% slippage
+  const debouncedAmount = useDebounce<string>(withdrawAmount, 500);
+
 
   const isValidAddress = toAddress && isAddress(toAddress);
 
@@ -88,6 +90,8 @@ export const WithdrawForm = () => {
     () => MustBigNumber(freeCollateral?.current),
     [freeCollateral?.current]
   );
+
+  useEffect(() => setSlippage(isCctp ? 0 : 0.01), [isCctp]);
 
   useEffect(() => {
     abacusStateManager.setTransferValue({

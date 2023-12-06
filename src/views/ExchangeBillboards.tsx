@@ -2,7 +2,9 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { MARKETS_TO_DISPLAY } from '@/constants/markets';
 import { useBreakpoints, useStringGetter } from '@/hooks';
+import { testFlags } from '@/lib/testFlags';
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -32,6 +34,7 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({
 
   Object.values(perpetualMarkets)
     .filter(Boolean)
+    .filter(({ id }) => (testFlags.displayAllMarkets ? true : MARKETS_TO_DISPLAY.includes(id)))
     .forEach(({ oraclePrice, perpetual }) => {
       const { volume24H, trades24H, openInterest = 0 } = perpetual || {};
       volume24HUSDC += volume24H ?? 0;

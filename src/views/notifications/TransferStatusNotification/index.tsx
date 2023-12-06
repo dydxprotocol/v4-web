@@ -44,6 +44,7 @@ export const TransferStatusNotification = ({
 
   // @ts-ignore status.errors is not in the type definition but can be returned
   const error = status?.errors?.length ? status?.errors[0] : status?.error;
+  const hasError = error && Object.keys(error).length !== 0;
 
   const updateSecondsLeft = useCallback(() => {
     const fromChainEta = (status?.fromChain?.chainData?.estimatedRouteDuration || 0) * 1000;
@@ -87,7 +88,7 @@ export const TransferStatusNotification = ({
           },
         })}
       </Styled.Status>
-      {error && (
+      {hasError && (
         <AlertMessage type={AlertType.Error}>
           {stringGetter({
             key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
@@ -112,7 +113,7 @@ export const TransferStatusNotification = ({
         ) : (
           <Styled.BridgingStatus>
             {content}
-            {!isToast && status?.squidTransactionStatus !== 'success' && (
+            {!isToast && status?.squidTransactionStatus !== 'success' && !hasError && (
               <Styled.TransferStatusSteps status={status} type={type} />
             )}
           </Styled.BridgingStatus>
@@ -120,8 +121,7 @@ export const TransferStatusNotification = ({
       }
       slotAction={
         isToast &&
-        status &&
-        !error && (
+        status && (
           <Styled.Trigger
             isOpen={open}
             onClick={(e: MouseEvent) => {
