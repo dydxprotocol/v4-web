@@ -85,7 +85,7 @@ class AbacusStateManager {
 
     const appConfigs = AbacusAppConfig.Companion.forWeb;
     if (!isMainnet || testFlags.withCCTP)
-      appConfigs.squidVersion = AbacusAppConfig.SquidVersion.V2DepositOnly;
+      appConfigs.squidVersion = AbacusAppConfig.SquidVersion.V2;
 
     this.stateManager = new AsyncAbacusStateManager(
       '',
@@ -261,6 +261,14 @@ class AbacusStateManager {
       data: Nullable<HumanReadableCancelOrderPayload>
     ) => void
   ) => this.stateManager.cancelOrder(orderId, callback);
+
+  cctpWithdraw = (
+    callback: (
+      success: boolean,
+      parsingError: Nullable<ParsingError>,
+      data: string,
+    ) => void
+  ): void => this.stateManager.commitCCTPWithdraw(callback);
 
   // ------ Utils ------ //
   getHistoricalPnlPeriod = (): Nullable<HistoricalPnlPeriods> =>

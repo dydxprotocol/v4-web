@@ -293,12 +293,29 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   );
 
   const sendSquidWithdraw = useCallback(
-    async (amount: number, payload: string) => {
+    async (amount: number, payload: string, isCCtp?: boolean) => {
+      
+      const cctpWithdraw = () => {
+        return new Promise<string>((resolve, reject) => 
+          abacusStateManager.cctpWithdraw((success, error, data) => {
+            const parsedData = JSON.parse(data);
+            if (success && parsedData?.code == 0) {
+              resolve(parsedData?.transactionHash);
+            } else {
+              reject(error);
+            }
+          })
+        )
+      }
+      if (isCCtp) {
+        return await cctpWithdraw();
+      }
+
       if (!subaccountClient) {
         return;
       }
-
-      return await sendSquidWithdrawFromSubaccount({ subaccountClient, amount, payload });
+      const txHash = await sendSquidWithdrawFromSubaccount({ subaccountClient, amount, payload });
+      return `0x${Buffer.from(txHash?.hash).toString('hex')}`;
     },
     [subaccountClient, sendSquidWithdrawFromSubaccount]
   );
