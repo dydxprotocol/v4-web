@@ -9,7 +9,7 @@ import { useBreakpoints, useStringGetter } from '@/hooks';
 import { AssetIcon } from '@/components/AssetIcon';
 import { CollapsibleTabs } from '@/components/CollapsibleTabs';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
-import { MobileTabs, Tabs } from '@/components/Tabs';
+import { MobileTabs } from '@/components/Tabs';
 import { Tag, TagType } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
@@ -27,7 +27,6 @@ import {
   getCurrentMarketTradeInfoNumbers,
   getHasUnseenFillUpdates,
   getHasUnseenOrderUpdates,
-  getLatestOrderStatus,
   getTradeInfoNumbers,
 } from '@/state/accountSelectors';
 
@@ -222,7 +221,6 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     <MobileTabs defaultValue={InfoSection.Position} items={tabItems} withBorders={false} />
   ) : (
     <Styled.CollapsibleTabs
-      withTransitions={false}
       defaultValue={InfoSection.Position}
       defaultOpen={isOpen}
       onOpenChange={setIsOpen}
