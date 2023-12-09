@@ -203,7 +203,6 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Stack = styled.div`
   ${layoutMixins.stack}
-  ${layoutMixins.perspectiveArea}
 `;
 
 Styled.CornerButton = styled(Button)`

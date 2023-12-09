@@ -31,9 +31,11 @@ type ElementProps<TabItemsValue> = {
 };
 
 type StyleProps = {
-  fullWidthTabs?: boolean;
   className?: string;
+  fullWidthTabs?: boolean;
 };
+
+export type CollapsibleTabsProps<TabItemsValue> = ElementProps<TabItemsValue> & StyleProps;
 
 export const CollapsibleTabs = <TabItemsValue extends string>({
   defaultValue,
@@ -43,8 +45,9 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
   onOpenChange,
 
   fullWidthTabs,
+
   className,
-}: ElementProps<TabItemsValue> & StyleProps) => {
+}: CollapsibleTabsProps<TabItemsValue>) => {
   const [value, setValue] = useState(defaultValue);
 
   const currentItem = items.find((item) => item.value === value);
@@ -86,8 +89,8 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
         </Styled.Header>
 
         <Styled.CollapsibleContent>
-          {items.map(({ value, content }) => (
-            <Styled.TabsContent key={value} value={value}>
+          {items.map(({ asChild, value, content }) => (
+            <Styled.TabsContent key={value} asChild={asChild} value={value}>
               {content}
             </Styled.TabsContent>
           ))}
@@ -219,7 +222,6 @@ Styled.Header = styled.header`
 
 Styled.CollapsibleContent = styled(CollapsibleContent)`
   ${layoutMixins.stack}
-  ${layoutMixins.perspectiveArea}
 
   box-shadow: none;
 `;

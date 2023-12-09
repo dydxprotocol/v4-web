@@ -877,11 +877,6 @@ export const layoutMixins: Record<
     }
   `,
 
-  perspectiveArea: css`
-    perspective: 100rem;
-    transform-style: preserve-3d;
-  `,
-
   absolute: css`
     position: absolute;
     top: 0;
