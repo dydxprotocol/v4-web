@@ -556,12 +556,12 @@ Styled.MobilePositionInfo = styled.div`
 Styled.PositionTile = styled(PositionTile)``;
 
 Styled.ClosePositionButton = styled(Button)`
-  --button-border: solid var(--border-width) var(--color-border-destructive);
+  --button-border: solid var(--border-width) var(--color-border-red);
   --button-textColor: var(--color-negative);
 `;
 
 Styled.ClosePositionToggleButton = styled(ToggleButton)`
-  --button-border: solid var(--border-width) var(--color-border-destructive);
+  --button-border: solid var(--border-width) var(--color-border-red);
   --button-toggle-off-textColor: var(--color-negative);
   --button-toggle-on-textColor: var(--color-negative);
 `;
