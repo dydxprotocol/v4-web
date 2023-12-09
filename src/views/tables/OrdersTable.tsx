@@ -230,14 +230,7 @@ const getOrdersTableColumnDef = ({
         label: `${stringGetter({ key: STRING_KEYS.STATUS })} / ${stringGetter({
           key: STRING_KEYS.FILL,
         })}`,
-        renderCell: ({
-          asset,
-          createdAtMilliseconds,
-          size,
-          status,
-          totalFilled,
-          resources,
-        }) => {
+        renderCell: ({ asset, createdAtMilliseconds, size, status, totalFilled, resources }) => {
           const { statusIconColor, statusStringKey } = getStatusIconInfo({
             status,
             totalFilled,
@@ -345,9 +338,7 @@ export const OrdersTable = ({
     if (hasUnseenOrderUpdates) dispatch(viewedOrders());
   }, [hasUnseenOrderUpdates]);
 
-  const symbol = currentMarket
-    ? allAssets[allPerpetualMarkets[currentMarket]?.assetId]?.symbol
-    : null;
+  const symbol = currentMarket ? allAssets[allPerpetualMarkets[currentMarket]?.assetId]?.id : null;
 
   const ordersData = orders.map((order: SubaccountOrder) =>
     getHydratedTradingData({
