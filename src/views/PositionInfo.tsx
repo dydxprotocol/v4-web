@@ -453,13 +453,6 @@ Styled.Actions = styled.footer`
   > :last-child {
     flex: 2;
   }
-
-  position: sticky;
-  bottom: clamp(0.5rem, 7.5%, 2rem);
-
-  @media ${breakpoints.tablet} {
-    bottom: 0;
-  }
 `;
 
 Styled.Output = styled(Output)<{ sign: NumberSign; smallText?: boolean; margin?: string }>`
@@ -514,6 +507,7 @@ Styled.PositionInfo = styled.div`
 
 Styled.DetachedSection = styled(DetachedSection)`
   padding: 0 1.5rem;
+  position: relative;
 `;
 
 Styled.DetachedScrollableSection = styled(DetachedScrollableSection)`
@@ -562,12 +556,12 @@ Styled.MobilePositionInfo = styled.div`
 Styled.PositionTile = styled(PositionTile)``;
 
 Styled.ClosePositionButton = styled(Button)`
-  --button-border: solid var(--border-width) var(--color-border-red);
+  --button-border: solid var(--border-width) var(--color-border-destructive);
   --button-textColor: var(--color-negative);
 `;
 
 Styled.ClosePositionToggleButton = styled(ToggleButton)`
-  --button-border: solid var(--border-width) var(--color-border-red);
+  --button-border: solid var(--border-width) var(--color-border-destructive);
   --button-toggle-off-textColor: var(--color-negative);
   --button-toggle-on-textColor: var(--color-negative);
 `;
