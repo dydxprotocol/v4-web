@@ -86,7 +86,6 @@ export const LeverageSlider = ({
 
   const onValueCommit = ([newLeverage]: number[]) => {
     setLeverageInputValue(`${newLeverage}`);
-    console.log('commit', newLeverage);
 
     // Ensure Abacus is updated with the latest, committed value
     debouncedSetAbacusLeverage.cancel();
