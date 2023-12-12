@@ -1,9 +1,8 @@
-import type { Dispatch, SetStateAction } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
-import { TradeInputField, Nullable } from '@/constants/abacus';
+import { TradeInputField } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { LEVERAGE_DECIMALS } from '@/constants/numbers';
@@ -62,21 +61,7 @@ export const MarketLeverageInput = ({
 
   const leveragePosition = postOrderLeverage ? newPositionSide : currentPositionSide;
 
-  const onLeverageInput = ({ value, floatValue }: { value: string; floatValue?: number }) => {
-    const newLeverage = MustBigNumber(floatValue).toFixed();
-
-    if (value === '' || newLeverage === 'NaN' || !floatValue) {
-      setLeverageInputValue('');
-      abacusStateManager.setTradeValue({
-        value: null,
-        field: TradeInputField.leverage,
-      });
-    } else {
-      updateLeverage(floatValue);
-    }
-  };
-
-  const updateLeverage = (newLeverage: string | number) => {
+  const getSignedLeverage = (newLeverage: string | number) => {
     const newLeverageBN = MustBigNumber(newLeverage);
     const newLeverageSignedBN =
       leveragePosition === PositionSide.Short ||
@@ -84,10 +69,33 @@ export const MarketLeverageInput = ({
         ? newLeverageBN.abs().negated()
         : newLeverageBN.abs();
 
-    setLeverageInputValue(newLeverageSignedBN.toString());
+    return newLeverageSignedBN.toFixed(LEVERAGE_DECIMALS);
+  };
+
+  const onLeverageInput = ({
+    floatValue,
+    formattedValue,
+  }: {
+    floatValue?: number;
+    formattedValue: string;
+  }) => {
+    setLeverageInputValue(formattedValue);
+    const newLeverage = MustBigNumber(floatValue).toFixed();
 
     abacusStateManager.setTradeValue({
-      value: newLeverageSignedBN.toFixed(LEVERAGE_DECIMALS),
+      value:
+        formattedValue === '' || newLeverage === 'NaN' ? null : getSignedLeverage(formattedValue),
+      field: TradeInputField.leverage,
+    });
+  };
+
+  const updateLeverage = (newLeverage: string | number) => {
+    const newLeverageSigned = getSignedLeverage(newLeverage);
+
+    setLeverageInputValue(newLeverageSigned);
+
+    abacusStateManager.setTradeValue({
+      value: newLeverageSigned,
       field: TradeInputField.leverage,
     });
   };
@@ -130,7 +138,7 @@ export const MarketLeverageInput = ({
         >
           <Styled.LeverageSlider
             leverage={currentLeverage}
-            leverageInputValue={leverageInputValue}
+            leverageInputValue={getSignedLeverage(leverageInputValue)}
             maxLeverage={maxLeverage}
             orderSide={orderSide}
             positionSide={currentPositionSide}
