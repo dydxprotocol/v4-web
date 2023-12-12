@@ -42,6 +42,7 @@ import { openDialog } from '@/state/dialogs';
 import { StatefulOrderError } from '../errors';
 import { bytesToBigInt } from '../numbers';
 import { log } from '../telemetry';
+import { hashFromTx } from '../hashfromTx';
 
 class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   private compositeClient: CompositeClient | undefined;
@@ -415,7 +416,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       );
 
       return JSON.stringify({
-        txHash: `0x${Buffer.from(tx?.hash).toString('hex')}`
+        txHash: hashFromTx(tx?.hash)
       });
     } catch (error) {
       log('DydxChainTransactions/withdrawToNobleIBC', error);
