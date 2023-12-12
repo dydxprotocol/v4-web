@@ -198,7 +198,6 @@ Styled.InputContainer = styled.div`
   border-radius: inherit;
 
   input {
-    user-select: all;
     flex: 1;
     width: 100%;
   }

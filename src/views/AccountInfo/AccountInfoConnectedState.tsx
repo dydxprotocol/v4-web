@@ -203,7 +203,6 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Stack = styled.div`
   ${layoutMixins.stack}
-  ${layoutMixins.perspectiveArea}
 `;
 
 Styled.CornerButton = styled(Button)`
@@ -293,7 +292,14 @@ Styled.TransferButtons = styled.div`
 
 Styled.ConnectedAccountInfoContainer = styled.div<{ $showHeader?: boolean }>`
   ${layoutMixins.column}
-  ${layoutMixins.withOuterAndInnerBorders}
+
+  @media ${breakpoints.notTablet} {
+    ${layoutMixins.withOuterAndInnerBorders}
+  }
+
+  @media ${breakpoints.tablet} {
+    ${layoutMixins.withInnerBorder}
+  }
 
   ${({ $showHeader }) =>
     $showHeader &&

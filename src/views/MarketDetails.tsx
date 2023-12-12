@@ -213,13 +213,8 @@ Styled.MarketDetails = styled.div`
 `;
 
 Styled.Header = styled.header`
-  /* max-width: fit-content; */
-
   ${layoutMixins.column}
   gap: 1.25rem;
-
-  position: sticky;
-  bottom: 3rem;
 `;
 
 Styled.WrapRow = styled.div`
