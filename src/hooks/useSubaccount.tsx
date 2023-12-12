@@ -31,6 +31,7 @@ import { log } from '@/lib/telemetry';
 import { useAccounts } from './useAccounts';
 import { useTokenConfigs } from './useTokenConfigs';
 import { useDydxClient } from './useDydxClient';
+import { hashFromTx } from '@/lib/hashfromTx';
 
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
 const SubaccountContext = createContext<SubaccountContextType>({} as SubaccountContextType);
@@ -293,12 +294,29 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   );
 
   const sendSquidWithdraw = useCallback(
-    async (amount: number, payload: string) => {
+    async (amount: number, payload: string, isCctp?: boolean) => {
+      
+      const cctpWithdraw = () => {
+        return new Promise<string>((resolve, reject) => 
+          abacusStateManager.cctpWithdraw((success, error, data) => {
+            const parsedData = JSON.parse(data);
+            if (success && parsedData?.code == 0) {
+              resolve(parsedData?.transactionHash);
+            } else {
+              reject(error);
+            }
+          })
+        )
+      }
+      if (isCctp) {
+        return await cctpWithdraw();
+      }
+
       if (!subaccountClient) {
         return;
       }
-
-      return await sendSquidWithdrawFromSubaccount({ subaccountClient, amount, payload });
+      const tx = await sendSquidWithdrawFromSubaccount({ subaccountClient, amount, payload });
+      return hashFromTx(tx?.hash);
     },
     [subaccountClient, sendSquidWithdrawFromSubaccount]
   );

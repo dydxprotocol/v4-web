@@ -27,11 +27,11 @@ dependencies:
     specifier: ^0.31.0
     version: 0.31.0
   '@dydxprotocol/v4-abacus':
-    specifier: ^1.1.16
-    version: 1.1.16
+    specifier: ^1.1.22
+    version: 1.1.22
   '@dydxprotocol/v4-client-js':
-    specifier: ^1.0.6
-    version: 1.0.6
+    specifier: ^1.0.11
+    version: 1.0.11
   '@dydxprotocol/v4-localization':
     specifier: ^1.0.18
     version: 1.0.18
@@ -988,12 +988,12 @@ packages:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.1.16:
-    resolution: {integrity: sha512-R9ROWx70f0a4lHxAPP/iJd9qnLhzL1SG8vIowfNg2VvWLk6f+f1HwsgMhDd07H328RqY016GNrRmnigeyVcz/g==}
+  /@dydxprotocol/v4-abacus@1.1.22:
+    resolution: {integrity: sha512-txinqnKGblCEcn1FjMj5nW9Tv2446fbkRaquodwQSk0GTP92/78xl4VSOwMngc0f4heiVGbirlCKyHmtZUADmA==}
     dev: false
 
-  /@dydxprotocol/v4-client-js@1.0.6:
-    resolution: {integrity: sha512-xiWH+kbix+zhI6EsAnd+NDvkjBgxWtGwQmvpd0PjljWNYSFgUtNe5M+piDdRbl2nhy6YWbxAGTwwS3K/ih5qSw==}
+  /@dydxprotocol/v4-client-js@1.0.11:
+    resolution: {integrity: sha512-rJNFGTO+HU1GQppXeRLKXNk4HWx/h+DjU2sUCieEv5mnRIMQpLw8dH/L+Uyhxx2oovccY1MaKB4Fr9IngdrF0A==}
     dependencies:
       '@cosmjs/amino': 0.30.1
       '@cosmjs/encoding': 0.31.1
@@ -1013,7 +1013,7 @@ packages:
       ethers: 6.6.1
       long: 4.0.0
       protobufjs: 6.11.4
-      ws: 8.13.0(bufferutil@4.0.7)(utf-8-validate@5.0.10)
+      ws: 8.15.0
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -14035,6 +14035,19 @@ packages:
     dependencies:
       bufferutil: 4.0.7
       utf-8-validate: 5.0.10
+    dev: false
+
+  /ws@8.15.0:
+    resolution: {integrity: sha512-H/Z3H55mrcrgjFwI+5jKavgXvwQLtfPCUEp6pi35VhoB0pfcHnSoyuTzkBEZpzq49g1193CUEwIvmsjcotenYw==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
     dev: false
 
   /ws@8.5.0:

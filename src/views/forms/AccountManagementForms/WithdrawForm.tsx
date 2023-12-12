@@ -10,7 +10,7 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
-import { NotificationStatus } from '@/constants/notifications';
+import { NotificationStatus, TransferNotificationTypes } from '@/constants/notifications';
 import { NumberSign } from '@/constants/numbers';
 
 import {
@@ -45,6 +45,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
+import { getNobleChainId } from '@/lib/squid';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
@@ -167,16 +168,16 @@ export const WithdrawForm = () => {
             })
           );
         } else {
-          const txHash = await sendSquidWithdraw(debouncedAmountBN.toNumber(), requestPayload.data);
-          if (txHash?.hash) {
-            const hash = `0x${Buffer.from(txHash.hash).toString('hex')}`;
+          const txHash = await sendSquidWithdraw(debouncedAmountBN.toNumber(), requestPayload.data, isCctp);
+          if (txHash) {
             addTransferNotification({
-              txHash: hash,
-              fromChainId: ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId,
+              txHash: txHash,
+              type: TransferNotificationTypes.Withdrawal,
+              fromChainId: !isCctp ? ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId : getNobleChainId(),
               toChainId: chainIdStr || undefined,
               toAmount: debouncedAmountBN.toNumber(),
               triggeredAt: Date.now(),
-              notificationStatus: NotificationStatus.Triggered,
+              isCctp,
             });
             abacusStateManager.clearTransferInputValues();
             setWithdrawAmount('');

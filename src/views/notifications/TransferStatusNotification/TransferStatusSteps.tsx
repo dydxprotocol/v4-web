@@ -12,10 +12,11 @@ import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { STRING_KEYS } from '@/constants/localization';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { TransferNotificationTypes } from '@/constants/notifications';
 
 type ElementProps = {
   status?: StatusResponse;
-  type: 'withdrawal' | 'deposit';
+  type: TransferNotificationTypes;
 };
 
 type StyleProps = {
@@ -46,11 +47,13 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
       {
         label: stringGetter({
           key:
-            type === 'deposit' ? STRING_KEYS.INITIATED_DEPOSIT : STRING_KEYS.INITIATED_WITHDRAWAL,
+            type === TransferNotificationTypes.Deposit
+              ? STRING_KEYS.INITIATED_DEPOSIT
+              : STRING_KEYS.INITIATED_WITHDRAWAL,
         }),
         step: TransferStatusStep.FromChain,
-        link: 
-          type === 'deposit'
+        link:
+          type === TransferNotificationTypes.Deposit
             ? status?.fromChain?.transactionUrl
             : routeStatus?.[0]?.chainId === dydxChainId && routeStatus[0].txHash
             ? `${mintscanTxUrl?.replace('{tx_hash}', routeStatus[0].txHash.replace('0x', ''))}`
@@ -63,14 +66,20 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
       },
       {
         label: stringGetter({
-          key: type === 'deposit' ? STRING_KEYS.DEPOSIT_TO_CHAIN : STRING_KEYS.WITHDRAW_TO_CHAIN,
+          key:
+            type === TransferNotificationTypes.Deposit
+              ? STRING_KEYS.DEPOSIT_TO_CHAIN
+              : STRING_KEYS.WITHDRAW_TO_CHAIN,
           params: {
-            CHAIN: type === 'deposit' ? 'dYdX' : status?.toChain?.chainData?.chainName,
+            CHAIN:
+              type === TransferNotificationTypes.Deposit
+                ? 'dYdX'
+                : status?.toChain?.chainData?.chainName,
           },
         }),
         step: TransferStatusStep.ToChain,
         link:
-          type === 'withdrawal'
+          type === TransferNotificationTypes.Withdrawal
             ? status?.toChain?.transactionUrl
             : currentStatus?.chainId === dydxChainId && currentStatus?.txHash
             ? `${mintscanTxUrl?.replace('{tx_hash}', currentStatus.txHash.replace('0x', ''))}`
