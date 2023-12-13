@@ -65,9 +65,13 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   }
 
   setNobleWallet(nobleWallet: LocalWallet) {
-    this.nobleWallet = nobleWallet;
-    if (this.nobleClient) {
-      this.nobleClient.connect(nobleWallet);
+    try {
+      this.nobleWallet = nobleWallet;
+      if (this.nobleClient) {
+        this.nobleClient.connect(nobleWallet);
+      }
+    } catch (e) {
+      log('DydxChainTransactions/setNobleWallet', e);
     }
   }
 
@@ -114,10 +118,15 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
       this.compositeClient = compositeClient;
 
-      if (nobleValidatorUrl) {
-        this.nobleClient = new NobleClient(nobleValidatorUrl);
-        if (this.nobleWallet) await this.nobleClient.connect(this.nobleWallet);
+      try {
+        if (nobleValidatorUrl) {
+          this.nobleClient = new NobleClient(nobleValidatorUrl);
+          if (this.nobleWallet) await this.nobleClient.connect(this.nobleWallet);
+        }
+      } catch (e) {
+        log('DydxChainTransactions/connectNetwork/NobleClient', e);
       }
+
       // Dispatch custom event to notify other parts of the app that the network has been connected
       const customEvent = new CustomEvent('abacus:connectNetwork', {
         detail: parsedParams,

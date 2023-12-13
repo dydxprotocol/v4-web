@@ -57,7 +57,6 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken }: ElementProps) 
               <Tag>{type === TransferType.deposit ? 'USDC' : selectedToken?.symbol}</Tag>
             </>
           ),
-          tooltip: 'swap',
         },
       ]}
     >
