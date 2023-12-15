@@ -80,6 +80,14 @@ export const RewardsPage = () => {
           </Styled.Description>
         </Styled.Panel>
       </Styled.PanelRow>
+      <Styled.PanelRow>
+        <Styled.Panel
+          // Improvement: Use string getter
+          slotHeader={<Styled.Title> Available to Stake </Styled.Title>}
+        ></Styled.Panel>
+        <Styled.Panel slotHeader={<Styled.Title> Staked Balance </Styled.Title>}></Styled.Panel>
+        <Styled.Panel slotHeader={<Styled.Title> Lifetime Rewards </Styled.Title>}></Styled.Panel>
+      </Styled.PanelRow>
     </Styled.Page>
   );
 };
