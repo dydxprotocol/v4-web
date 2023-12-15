@@ -84,8 +84,7 @@ class AbacusStateManager {
     );
 
     const appConfigs = AbacusAppConfig.Companion.forWeb;
-    if (!isMainnet || testFlags.withCCTP)
-      appConfigs.squidVersion = AbacusAppConfig.SquidVersion.V2;
+    appConfigs.squidVersion = AbacusAppConfig.SquidVersion.V2;
 
     this.stateManager = new AsyncAbacusStateManager(
       '',
