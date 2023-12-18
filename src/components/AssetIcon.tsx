@@ -45,6 +45,7 @@ const assetIcons = {
   SOL: '/currencies/sol.png',
   SUI: '/currencies/sui.png',
   SUSHI: '/currencies/sushi.png',
+  TIA: '/currencies/tia.png',
   TRX: '/currencies/trx.png',
   UMA: '/currencies/uma.png',
   UNI: '/currencies/uni.png',
