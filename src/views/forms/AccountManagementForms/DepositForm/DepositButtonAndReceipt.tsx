@@ -165,7 +165,7 @@ export const DepositButtonAndReceipt = ({
     },
     {
       key: 'slippage',
-      label: <span>{stringGetter({ key: STRING_KEYS.SLIPPAGE })}</span>,
+      label: <span>{stringGetter({ key: STRING_KEYS.MAX_SLIPPAGE })}</span>,
       value: (
         <SlippageEditor
           disabled
