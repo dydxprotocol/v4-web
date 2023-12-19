@@ -27,8 +27,8 @@ dependencies:
     specifier: ^0.31.0
     version: 0.31.0
   '@dydxprotocol/v4-abacus':
-    specifier: ^1.1.24
-    version: 1.1.24
+    specifier: ^1.1.25
+    version: 1.1.25
   '@dydxprotocol/v4-client-js':
     specifier: ^1.0.11
     version: 1.0.11
@@ -988,8 +988,8 @@ packages:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.1.24:
-    resolution: {integrity: sha512-TO4TMQGEX6Qy3UVDJmlIHAn+YgQG/cWmhmqAnvy8e2vnQPGUUxXYPExgDqmld+/b/rYIz80xq4N5ssKpoLandQ==}
+  /@dydxprotocol/v4-abacus@1.1.25:
+    resolution: {integrity: sha512-gaRaSUF1wb1R8/GUBwl4ObgiVTaJyDZFxq/55HJ8YxdkOxwFK4JR1tKNxKPStXalPUVWNCZibGJp+VrIvEmhTA==}
     dev: false
 
   /@dydxprotocol/v4-client-js@1.0.11:
@@ -2190,6 +2190,7 @@ packages:
     dependencies:
       is-glob: 4.0.3
       micromatch: 4.0.5
+      napi-wasm: 1.1.0
     dev: false
     bundledDependencies:
       - napi-wasm
@@ -11684,6 +11685,10 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
     dev: true
+
+  /napi-wasm@1.1.0:
+    resolution: {integrity: sha512-lHwIAJbmLSjF9VDRm9GoVOy9AGp3aIvkjv+Kvz9h16QR3uSVYH78PNQUnT2U4X53mhlnV2M7wrhibQ3GHicDmg==}
+    dev: false
 
   /native-abort-controller@1.0.4(abort-controller@3.0.0):
     resolution: {integrity: sha512-zp8yev7nxczDJMoP6pDxyD20IU0T22eX8VwN2ztDccKvSZhRaV33yP1BGwKSZfXuqWUzsXopVFjBdau9OOAwMQ==}
