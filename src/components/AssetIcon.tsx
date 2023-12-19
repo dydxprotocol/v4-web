@@ -72,8 +72,13 @@ export const AssetIcon = ({
 }: {
   symbol?: Nullable<string>;
   className?: string;
-}) =>
-  isAssetSymbol(symbol) ? <Styled.Img src={assetIcons[symbol]} className={className} /> : null;
+}) => (
+  <Styled.Img
+    src={isAssetSymbol(symbol) ? assetIcons[symbol] : '/currencies/unavailable.png'}
+    className={className}
+    alt={symbol}
+  />
+);
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
