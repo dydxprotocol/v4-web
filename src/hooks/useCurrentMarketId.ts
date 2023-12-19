@@ -5,7 +5,6 @@ import { useMatch, useNavigate } from 'react-router-dom';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
-import { useIsFirstRender } from '@/hooks/useIsFirstRender';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
@@ -23,7 +22,6 @@ export const useCurrentMarketId = () => {
   const selectedNetwork = useSelector(getSelectedNetwork);
   const marketIds = useSelector(getMarketIds, shallowEqual);
   const hasMarketIds = marketIds.length > 0;
-  const isFirstRender = useIsFirstRender();
 
   const [lastViewedMarket, setLastViewedMarket] = useLocalStorage({
     key: LocalStorageKey.LastViewedMarket,
@@ -48,9 +46,9 @@ export const useCurrentMarketId = () => {
           replace: true,
         });
       }
-    } else if (hasMarketIds) {
+    } else {
       // If v4_markets has been subscribed to, check if marketId is valid
-      if (!marketIds.includes(marketId) && !isFirstRender) {
+      if (!marketIds.includes(marketId)) {
         // If marketId is not valid (i.e. final settlement), navigate to markets page
         navigate(AppRoute.Markets, {
           replace: true,
