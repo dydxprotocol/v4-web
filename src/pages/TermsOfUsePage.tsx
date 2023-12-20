@@ -2,7 +2,7 @@ import styled, { AnyStyledComponent } from 'styled-components';
 
 import { articleMixins } from '@/styles/articleMixins';
 
-export const TermsOfUsePage = () => (
+const TermsOfUsePage = () => (
   <Styled.Article>
     <header>
       <h1>Sample Terms of Use</h1>
@@ -1075,6 +1075,8 @@ export const TermsOfUsePage = () => (
     </div>
   </Styled.Article>
 );
+
+export default TermsOfUsePage;
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
