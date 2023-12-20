@@ -8,6 +8,7 @@ import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { Icon, IconName } from '@/components/Icon';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { breakpoints } from '@/styles';
 
 type ElementProps = {
   setIsOpen: (open: boolean) => void;
@@ -72,8 +73,11 @@ export const HelpDialog = ({ setIsOpen }: ElementProps) => {
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.ComboboxDialogMenu = styled(ComboboxDialogMenu)`
-  --dialog-width: var(--dialog-small-width);
   --dialog-content-paddingTop: 1rem;
   --dialog-content-paddingBottom: 1rem;
   --comboxDialogMenu-item-gap: 1rem;
+
+  @media ${breakpoints.notMobile} {
+    --dialog-width: var(--dialog-small-width);
+  }
 `;

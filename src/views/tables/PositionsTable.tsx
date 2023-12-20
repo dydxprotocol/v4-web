@@ -366,6 +366,7 @@ Styled.InlineRow = styled.div`
 
 Styled.AssetIcon = styled(AssetIcon)`
   ${layoutMixins.inlineRow}
+  min-width: unset;
   font-size: 2.25rem;
 `;
 
