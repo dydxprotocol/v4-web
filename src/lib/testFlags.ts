@@ -5,22 +5,18 @@ class TestFlags {
     this.queryParams = {};
     const hash = window.location.hash;
     const queryIndex = hash.indexOf('?');
-    if (queryIndex === -1) return
+    if (queryIndex === -1) return;
 
     const queryParamsString = hash.substring(queryIndex + 1);
     const params = new URLSearchParams(queryParamsString);
 
     for (const [key, value] of params) {
-        this.queryParams[key] = value;
+      this.queryParams[key] = value;
     }
   }
 
   get displayInitializingMarkets() {
     return !!this.queryParams.displayInitializingMarkets;
-  }
-
-  get displayAllMarkets() {
-    return !!this.queryParams.displayAllMarkets;
   }
 
   get withCCTP() {
