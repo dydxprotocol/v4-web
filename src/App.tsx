@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, lazy } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 import { WagmiConfig } from 'wagmi';
@@ -25,16 +25,6 @@ import { SubaccountProvider } from '@/hooks/useSubaccount';
 
 import { GuardedMobileRoute } from '@/components/GuardedMobileRoute';
 
-import MarketsPage from '@/pages/markets/Markets';
-import PortfolioPage from '@/pages/portfolio/Portfolio';
-import { AlertsPage } from '@/pages/AlertsPage';
-import ProfilePage from '@/pages/Profile';
-import { SettingsPage } from '@/pages/settings/Settings';
-import TradePage from '@/pages/trade/Trade';
-import { RewardsPage } from '@/pages/rewards/RewardsPage';
-import { TermsOfUsePage } from '@/pages/TermsOfUsePage';
-import { PrivacyPolicyPage } from '@/pages/PrivacyPolicyPage';
-
 import { HeaderDesktop } from '@/layout/Header/HeaderDesktop';
 import { FooterDesktop } from '@/layout/Footer/FooterDesktop';
 import { FooterMobile } from '@/layout/Footer/FooterMobile';
@@ -50,6 +40,17 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import '@/styles/constants.css';
 import '@/styles/fonts.css';
 import '@/styles/web3modal.css';
+import { LoadingSpace } from './components/Loading/LoadingSpinner';
+
+const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
+const PortfolioPage = lazy(() => import('@/pages/portfolio/Portfolio'));
+const AlertsPage = lazy(() => import('@/pages/AlertsPage'));
+const ProfilePage = lazy(() => import('@/pages/Profile'));
+const SettingsPage = lazy(() => import('@/pages/settings/Settings'));
+const TradePage = lazy(() => import('@/pages/trade/Trade'));
+const RewardsPage = lazy(() => import('@/pages/rewards/RewardsPage'));
+const TermsOfUsePage = lazy(() => import('@/pages/TermsOfUsePage'));
+const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicyPage'));
 
 const queryClient = new QueryClient();
 
@@ -69,7 +70,7 @@ const Content = () => {
       {isNotTablet && <HeaderDesktop />}
 
       <Styled.Main>
-        <Suspense fallback={null}>
+        <Suspense fallback={<LoadingSpace id="main" />}>
           <Routes>
             <Route path={AppRoute.Trade}>
               <Route path=":market" element={<TradePage />} />

@@ -21,7 +21,7 @@ import { DYDXBalancePanel } from './DYDXBalancePanel';
 import { MigratePanel } from './MigratePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 
-export const RewardsPage = () => {
+const RewardsPage = () => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
   const { governanceLearnMore, stakingLearnMore } = useURLConfigs();
@@ -83,6 +83,8 @@ export const RewardsPage = () => {
     </Styled.Page>
   );
 };
+
+export default RewardsPage;
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
