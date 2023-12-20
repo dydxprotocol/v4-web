@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react';
+import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 import { WagmiConfig } from 'wagmi';
@@ -36,11 +36,11 @@ import { config } from '@/lib/wagmi';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
+import { LoadingSpace } from './components/Loading/LoadingSpinner';
 
 import '@/styles/constants.css';
 import '@/styles/fonts.css';
 import '@/styles/web3modal.css';
-import { LoadingSpace } from './components/Loading/LoadingSpinner';
 
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
 const PortfolioPage = lazy(() => import('@/pages/portfolio/Portfolio'));
