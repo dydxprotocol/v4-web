@@ -28,7 +28,7 @@ import { MustBigNumber } from '@/lib/numbers';
 const TOKEN_MIGRATION_LEARN_MORE_LINK =
   'https://www.dydx.foundation/blog/update-on-exploring-the-future-of-dydx';
 
-export const MigratePanel = () => {
+export const MigratePanel = ({ className }: { className?: string }) => {
   const { isNotTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
 
@@ -45,6 +45,7 @@ export const MigratePanel = () => {
 
   return isNotTablet ? (
     <Styled.MigratePanel
+      className={className}
       slotHeader={<Styled.Title>{stringGetter({ key: STRING_KEYS.MIGRATE })}</Styled.Title>}
       slotRight={
         <Styled.MigrateAction>
@@ -74,6 +75,7 @@ export const MigratePanel = () => {
     </Styled.MigratePanel>
   ) : (
     <Styled.MigratePanel
+      className={className}
       slotHeader={
         <Styled.MobileMigrateHeader>
           <h3>
@@ -135,6 +137,7 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.MigratePanel = styled(Panel)`
   --panel-paddingX: 1.5rem;
+  --panel-paddingY: 1.25rem;
   width: 100%;
 
   background-image: url('/dots-background.svg');
@@ -142,7 +145,6 @@ Styled.MigratePanel = styled(Panel)`
   background-repeat: no-repeat;
 
   @media ${breakpoints.tablet} {
-    --panel-paddingY: 1.5rem;
     --panel-content-paddingY: 1rem;
   }
 `;

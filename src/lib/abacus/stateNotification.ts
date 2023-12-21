@@ -29,6 +29,7 @@ import {
   setSubaccount,
   setTransfers,
   setWallet,
+  setTradingRewards,
 } from '@/state/account';
 
 import { setApiState } from '@/state/app';
@@ -93,6 +94,12 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
             stakingBalances[k] = v;
           }
           dispatch(setStakingBalances(stakingBalances));
+        }
+      }
+
+      if (changes.has(Changes.tradingRewards)) {
+        if (updatedState.account?.tradingRewards) {
+          dispatch(setTradingRewards(updatedState.account?.tradingRewards));
         }
       }
 

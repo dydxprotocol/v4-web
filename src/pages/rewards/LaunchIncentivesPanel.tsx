@@ -151,15 +151,11 @@ const LaunchIncentivesContent = () => {
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Panel = styled(Panel)`
-  --panel-paddingY: 1rem;
+  --panel-paddingY: 1.25rem;
   --panel-paddingX: 1.5rem;
 
   background-color: var(--color-layer-4);
   width: 100%;
-
-  @media ${breakpoints.tablet} {
-    --panel-paddingY: 1.5rem;
-  }
 `;
 
 Styled.ForV4 = styled.span`
@@ -223,7 +219,7 @@ Styled.Column = styled.div`
 Styled.EstimatedRewardsCard = styled.div`
   ${layoutMixins.spacedRow}
   padding: 1rem 1.25rem;
-  min-width: 21.25rem;
+  min-width: 19rem;
   height: calc(100% - calc(1.5rem * 2));
   margin: 1.5rem;
 

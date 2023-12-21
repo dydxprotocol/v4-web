@@ -119,6 +119,8 @@ export const InputSelectionOption = Abacus.exchange.dydx.abacus.output.input.Sel
 // ------ Wallet ------ //
 export type Wallet = Abacus.exchange.dydx.abacus.output.Wallet;
 export type AccountBalance = Abacus.exchange.dydx.abacus.output.AccountBalance;
+export type TradingRewards = Abacus.exchange.dydx.abacus.output.TradingRewards;
+export type HistoricalTradingReward = Abacus.exchange.dydx.abacus.output.HistoricalTradingReward;
 export type Subaccount = Abacus.exchange.dydx.abacus.output.Subaccount;
 export type SubaccountPosition = Abacus.exchange.dydx.abacus.output.SubaccountPosition;
 export type SubaccountOrder = Abacus.exchange.dydx.abacus.output.SubaccountOrder;
