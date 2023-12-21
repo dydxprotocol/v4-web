@@ -1,0 +1,16 @@
+{
+    "tradingRewardsFAQs": [
+        {
+            "questionLocalizationKey": "APP.TRADING_REWARDS.FAQ_WHO_IS_ELIGIBLE_QUESTION",
+            "answerLocalizationKey": "APP.TRADING_REWARDS.FAQ_WHO_IS_ELIGIBLE_ANSWER"
+        },
+        {
+            "questionLocalizationKey": "APP.TRADING_REWARDS.FAQ_HOW_DO_TRADING_REWARDS_WORK_QUESTION",
+            "answerLocalizationKey": "APP.TRADING_REWARDS.FAQ_HOW_DO_TRADING_REWARDS_WORK_ANSWER"
+        },
+        {
+            "questionLocalizationKey": "APP.TRADING_REWARDS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_QUESTION",
+            "answerLocalizationKey": "APP.TRADING_REWARDS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_ANSWER"
+        }
+    ]
+}
