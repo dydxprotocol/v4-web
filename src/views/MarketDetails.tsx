@@ -114,8 +114,8 @@ export const MarketDetails: React.FC = () => {
       ),
     },
     {
-      key: 'base-initial-margin-fraction',
-      label: stringGetter({ key: STRING_KEYS.BASE_INITIAL_MARGIN_FRACTION }),
+      key: 'initial-margin-fraction',
+      label: stringGetter({ key: STRING_KEYS.INITIAL_MARGIN_FRACTION }),
       tooltip: 'initial-margin-fraction',
       value: <Output useGrouping value={initialMarginFraction} type={OutputType.SmallPercent} />,
     },
