@@ -1,15 +1,9 @@
-import { type Dispatch, type SetStateAction, useState, type ReactNode } from 'react';
+import { type Dispatch, type SetStateAction, useState, type ReactNode, useEffect } from 'react';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
 import type { RouteData } from '@0xsquid/sdk';
 
-import {
-  ButtonAction,
-  ButtonShape,
-  ButtonSize,
-  ButtonState,
-  ButtonType,
-} from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 
 import { TransferInputTokenResource } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -17,6 +11,7 @@ import { NumberSign } from '@/constants/numbers';
 
 import { useStringGetter } from '@/hooks';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
+import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -67,6 +62,23 @@ export const DepositButtonAndReceipt = ({
   const stringGetter = useStringGetter();
 
   const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
+
+  const { connectWallet, isConnectedWagmi } = useWalletConnection();
+  const [hasConnectWalletError, setHasConnectWalletError] = useState(false);
+
+  const attemptWalletConnect = async () => {
+    try {
+      await connectWallet();
+    } catch (e) {
+      setHasConnectWalletError(true);
+    }
+  };
+
+  useEffect(() => {
+    if (!isConnectedWagmi && canAccountTrade) {
+      attemptWalletConnect();
+    }
+  }, [isConnectedWagmi, canAccountTrade]);
 
   const {
     matchNetwork: switchNetwork,
@@ -221,6 +233,14 @@ export const DepositButtonAndReceipt = ({
     >
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
+      ) : !isConnectedWagmi ? (
+        <Button
+          action={ButtonAction.Primary}
+          onClick={connectWallet}
+          state={{ isLoading: !hasConnectWalletError }}
+        >
+          {stringGetter({ key: STRING_KEYS.CHECK_WALLET_FOR_REQUEST })}
+        </Button>
       ) : !isMatchingNetwork ? (
         <Button
           action={ButtonAction.Primary}
