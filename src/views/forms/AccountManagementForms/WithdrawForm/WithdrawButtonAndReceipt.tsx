@@ -89,7 +89,7 @@ export const WithdrawButtonAndReceipt = ({
   const showSubitemsToggle = showFeeBreakdown
     ? stringGetter({ key: STRING_KEYS.HIDE_ALL_DETAILS })
     : stringGetter({ key: STRING_KEYS.SHOW_ALL_DETAILS });
-  
+
   const totalFees = (summary?.bridgeFee || 0) + (summary?.gasFee || 0);
 
   const submitButtonReceipt = [
@@ -100,10 +100,55 @@ export const WithdrawButtonAndReceipt = ({
       subitems: feeSubitems,
     },
     {
+      key: 'slippage',
+      label: <span>{stringGetter({ key: STRING_KEYS.MAX_SLIPPAGE })}</span>,
+      value: (
+        <SlippageEditor
+          disabled
+          slippage={slippage}
+          setIsEditing={setIsEditingSlipapge}
+          setSlippage={setSlippage}
+        />
+      ),
+    },
+    {
+      key: 'exchange-rate',
+      label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
+      value: withdrawToken && typeof summary?.exchangeRate === 'number' && (
+        <Styled.ExchangeRate>
+          <Output type={OutputType.Asset} value={1} fractionDigits={0} tag="USDC" />
+          =
+          <Output
+            type={OutputType.Asset}
+            value={summary?.exchangeRate}
+            tag={withdrawToken?.symbol}
+          />
+        </Styled.ExchangeRate>
+      ),
+    },
+    {
+      key: 'estimatedRouteDuration',
+      label: <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_TIME })}</span>,
+      value: typeof summary?.estimatedRouteDuration === 'number' && (
+        <Output
+          type={OutputType.Text}
+          value={stringGetter({
+            key: STRING_KEYS.X_MINUTES_LOWERCASED,
+            params: {
+              X:
+                summary?.estimatedRouteDuration < 60
+                  ? '< 1'
+                  : Math.round(summary?.estimatedRouteDuration / 60),
+            },
+          })}
+        />
+      ),
+    },
+    {
       key: 'wallet',
       label: (
         <span>
-          {stringGetter({ key: STRING_KEYS.AMOUNT_RECEIVED })}{' '}
+          {stringGetter({ key: STRING_KEYS.MINIMUM_AMOUNT_RECEIVED })}{' '}
           {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
         </span>
       ),
@@ -127,51 +172,6 @@ export const WithdrawButtonAndReceipt = ({
           newValue={leverage?.postOrder}
           sign={NumberSign.Negative}
           withDiff={Boolean(leverage?.current && leverage.current !== leverage?.postOrder)}
-        />
-      ),
-    },
-    {
-      key: 'exchange-rate',
-      label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
-      value: withdrawToken && typeof summary?.exchangeRate === 'number' && (
-        <Styled.ExchangeRate>
-          <Output type={OutputType.Asset} value={1} fractionDigits={0} tag="USDC" />
-          =
-          <Output
-            type={OutputType.Asset}
-            value={summary?.exchangeRate}
-            tag={withdrawToken?.symbol}
-          />
-        </Styled.ExchangeRate>
-      ),
-    },
-    {
-      key: 'slippage',
-      label: <span>{stringGetter({ key: STRING_KEYS.SLIPPAGE })}</span>,
-      value: (
-        <SlippageEditor
-          disabled
-          slippage={slippage}
-          setIsEditing={setIsEditingSlipapge}
-          setSlippage={setSlippage}
-        />
-      ),
-    },
-    {
-      key: 'estimatedRouteDuration',
-      label: <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_TIME })}</span>,
-      value: typeof summary?.estimatedRouteDuration === 'number' && (
-        <Output
-          type={OutputType.Text}
-          value={stringGetter({
-            key: STRING_KEYS.X_MINUTES_LOWERCASED,
-            params: {
-              X:
-                summary?.estimatedRouteDuration < 60
-                  ? '< 1'
-                  : Math.round(summary?.estimatedRouteDuration / 60),
-            },
-          })}
         />
       ),
     },

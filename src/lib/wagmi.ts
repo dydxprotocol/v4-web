@@ -146,7 +146,7 @@ const getConnectors = (walletConnectConfig: WalletConnectConfig) => [
   new CoinbaseWalletConnector({
     chains,
     options: {
-      appName: 'wagmi',
+      appName: 'dYdX',
       reloadOnDisconnect: false,
     },
   }),

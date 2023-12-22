@@ -10,6 +10,7 @@ export const LEVERAGE_DECIMALS = 2;
 export const TOKEN_DECIMALS = 4;
 export const LARGE_TOKEN_DECIMALS = 2;
 export const FEE_DECIMALS = 3;
+export const FUNDING_DECIMALS = 6;
 
 export const QUANTUM_MULTIPLIER = 1_000_000;
 
