@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
+import { EvmDerivedAddresses } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
@@ -104,11 +105,17 @@ export const useWalletConnection = () => {
     [walletConnectConfig, walletType, walletConnectionType]
   );
 
-  const { connectAsync: connectWagmi } = useConnectWagmi({ connector: wagmiConnector })
+  const { connectAsync: connectWagmi } = useConnectWagmi({ connector: wagmiConnector });
   const { suggestAndConnect: connectGraz } = useConnectGraz();
+  const [evmDerivedAddresses] = useLocalStorage({
+    key: LocalStorageKey.EvmDerivedAddresses,
+    defaultValue: {} as EvmDerivedAddresses,
+  });
 
   const connectWallet = useCallback(
-    async ({ walletType }: { walletType: WalletType }) => {
+    async ({ walletType, forceConnect }: { walletType?: WalletType; forceConnect?: boolean }) => {
+      if (!walletType) return { walletType, walletConnectionType };
+
       const walletConnection = getWalletConnection({ walletType });
 
       try {
@@ -132,7 +139,11 @@ export const useWalletConnection = () => {
             });
           }
         } else {
-          if (!isConnectedWagmi) {
+          const isAccountConnected = Boolean(
+            evmAddress && evmDerivedAddresses[evmAddress]?.encryptedSignature
+          );
+          // if account connected (via remember me), do not show wagmi popup until forceConnect
+          if (!isConnectedWagmi && (forceConnect || !isAccountConnected)) {
             await connectWagmi({
               connector: resolveWagmiConnector({
                 walletType,
@@ -228,6 +239,12 @@ export const useWalletConnection = () => {
     evmAddressWagmi,
     signerWagmi,
     publicClientWagmi,
+    isConnectedWagmi,
+    connectWallet: () =>
+      connectWallet({
+        walletType: selectedWalletType,
+        forceConnect: true,
+      }),
 
     // Wallet connection (Cosmos)
     dydxAddress,
