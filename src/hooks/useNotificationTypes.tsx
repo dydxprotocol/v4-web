@@ -157,8 +157,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
           const isFinished = Boolean(status) && status?.squidTransactionStatus !== 'ongoing';
           const icon = <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />;
 
-          const transferType = type ??
-            fromChainId === ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId
+          const transferType =
+            type ?? fromChainId === ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId
               ? TransferNotificationTypes.Withdrawal
               : TransferNotificationTypes.Deposit;
 

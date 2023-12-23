@@ -83,7 +83,6 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const tabItems = useMemo(
     () => [
       {
-        asChild: true,
         value: InfoSection.Position,
         label: stringGetter({
           key: showCurrentMarket ? STRING_KEYS.POSITION : STRING_KEYS.POSITIONS,

@@ -14,6 +14,8 @@ export const FUNDING_DECIMALS = 6;
 
 export const QUANTUM_MULTIPLIER = 1_000_000;
 
+export const MAX_CCTP_TRANSFER_AMOUNT = 1_000_000;
+
 export enum NumberSign {
   Positive = 'Positive',
   Negative = 'Negative',

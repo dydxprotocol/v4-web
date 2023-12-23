@@ -61,11 +61,6 @@ export const WithdrawButtonAndReceipt = ({
   const { summary, requestPayload } = useSelector(getTransferInputs, shallowEqual) || {};
   const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
 
-  const toAmount =
-    summary?.toAmount &&
-    withdrawToken?.decimals &&
-    formatUnits(BigInt(summary.toAmount), withdrawToken?.decimals);
-
   const feeSubitems: DetailsItem[] = [];
 
   if (typeof summary?.gasFee === 'number') {
@@ -91,6 +86,7 @@ export const WithdrawButtonAndReceipt = ({
     : stringGetter({ key: STRING_KEYS.SHOW_ALL_DETAILS });
 
   const totalFees = (summary?.bridgeFee || 0) + (summary?.gasFee || 0);
+  console.log('withdraw', summary);
 
   const submitButtonReceipt = [
     {
@@ -98,18 +94,6 @@ export const WithdrawButtonAndReceipt = ({
       label: <span>{stringGetter({ key: STRING_KEYS.TOTAL_FEES })}</span>,
       value: <Output type={OutputType.Fiat} value={totalFees} />,
       subitems: feeSubitems,
-    },
-    {
-      key: 'slippage',
-      label: <span>{stringGetter({ key: STRING_KEYS.MAX_SLIPPAGE })}</span>,
-      value: (
-        <SlippageEditor
-          disabled
-          slippage={slippage}
-          setIsEditing={setIsEditingSlipapge}
-          setSlippage={setSlippage}
-        />
-      ),
     },
     {
       key: 'exchange-rate',
@@ -127,7 +111,7 @@ export const WithdrawButtonAndReceipt = ({
       ),
     },
     {
-      key: 'estimatedRouteDuration',
+      key: 'estimated-route-duration',
       label: <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_TIME })}</span>,
       value: typeof summary?.estimatedRouteDuration === 'number' && (
         <Output
@@ -145,20 +129,49 @@ export const WithdrawButtonAndReceipt = ({
       ),
     },
     {
-      key: 'wallet',
+      key: 'expected-amount-received',
       label: (
         <span>
-          {stringGetter({ key: STRING_KEYS.MINIMUM_AMOUNT_RECEIVED })}{' '}
+          {stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED })}{' '}
           {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
         </span>
       ),
       value: (
-        <Styled.DiffOutput
+        <Output
           type={OutputType.Asset}
-          value={'0'}
-          newValue={toAmount}
-          sign={NumberSign.Positive}
-          withDiff={Boolean(toAmount)}
+          value={summary?.toAmount}
+          fractionDigits={withdrawToken?.decimals}
+        />
+      ),
+      subitems: [
+        {
+          key: 'minimum-amount-received',
+          label: (
+            <span>
+              {stringGetter({ key: STRING_KEYS.MINIMUM_AMOUNT_RECEIVED })}{' '}
+              {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
+            </span>
+          ),
+          value: (
+            <Output
+              type={OutputType.Asset}
+              value={summary?.toAmountMin}
+              fractionDigits={withdrawToken?.decimals}
+            />
+          ),
+          tooltip: 'minimum-amount-received',
+        },
+      ],
+    },
+    {
+      key: 'slippage',
+      label: <span>{stringGetter({ key: STRING_KEYS.MAX_SLIPPAGE })}</span>,
+      value: (
+        <SlippageEditor
+          disabled
+          slippage={slippage}
+          setIsEditing={setIsEditingSlipapge}
+          setSlippage={setSlippage}
         />
       ),
     },

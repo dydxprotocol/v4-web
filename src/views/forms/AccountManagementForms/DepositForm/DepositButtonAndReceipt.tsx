@@ -3,13 +3,7 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
 import type { RouteData } from '@0xsquid/sdk';
 
-import {
-  ButtonAction,
-  ButtonShape,
-  ButtonSize,
-  ButtonState,
-  ButtonType,
-} from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 
 import { TransferInputTokenResource } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -98,7 +92,7 @@ export const DepositButtonAndReceipt = ({
   if (typeof summary?.bridgeFee === 'number') {
     feeSubitems.push({
       key: 'bridge-fees',
-      label: <span>Bridge Fee</span>,
+      label: <span>{stringGetter({ key: STRING_KEYS.BRIDGE_FEE })}</span>,
       value: <Output type={OutputType.Fiat} value={summary?.bridgeFee} />,
     });
   }
@@ -112,6 +106,40 @@ export const DepositButtonAndReceipt = ({
   const totalFees = (summary?.bridgeFee || 0) + (summary?.gasFee || 0);
 
   const submitButtonReceipt = [
+    {
+      key: 'expected-deposit-amount',
+      label: (
+        <span>
+          {stringGetter({ key: STRING_KEYS.EXPECTED_DEPOSIT_AMOUNT })}{' '}
+          {sourceToken && <Tag>{sourceToken?.symbol}</Tag>}
+        </span>
+      ),
+      value: <Output type={OutputType.Asset} value={summary?.toAmount} />,
+      subitems: [
+        {
+          key: 'minimum-deposit-amount',
+          label: (
+            <span>
+              {stringGetter({ key: STRING_KEYS.MINIMUM_DEPOSIT_AMOUNT })}{' '}
+              {sourceToken && <Tag>{sourceToken?.symbol}</Tag>}
+            </span>
+          ),
+          value: <Output type={OutputType.Asset} value={summary?.toAmount} />,
+          tooltip: 'minimum-deposit-amount',
+        },
+      ],
+    },
+    {
+      key: 'exchange-rate',
+      label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
+      value: typeof summary?.exchangeRate === 'number' && (
+        <Styled.ExchangeRate>
+          <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={sourceToken?.symbol} />
+          =
+          <Output type={OutputType.Asset} value={summary?.exchangeRate} tag="USDC" />
+        </Styled.ExchangeRate>
+      ),
+    },
     {
       key: 'equity',
       label: (
@@ -144,17 +172,6 @@ export const DepositButtonAndReceipt = ({
           sign={NumberSign.Positive}
           withDiff={Boolean(newBuyingPower) && buyingPower !== newBuyingPower}
         />
-      ),
-    },
-    {
-      key: 'exchange-rate',
-      label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
-      value: typeof summary?.exchangeRate === 'number' && (
-        <Styled.ExchangeRate>
-          <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={sourceToken?.symbol} />
-          =
-          <Output type={OutputType.Asset} value={summary?.exchangeRate} tag="USDC" />
-        </Styled.ExchangeRate>
       ),
     },
     {
