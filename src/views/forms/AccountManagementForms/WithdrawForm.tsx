@@ -11,7 +11,7 @@ import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { ENVIRONMENT_CONFIG_MAP, isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
-import { MAX_CCTP_TRANSFER_AMOUNT, NumberSign } from '@/constants/numbers';
+import { MAX_CCTP_TRANSFER_AMOUNT, MAX_PRICE_IMPACT, NumberSign } from '@/constants/numbers';
 
 import {
   useAccounts,
@@ -67,8 +67,8 @@ export const WithdrawForm = () => {
     resources,
     errors: routeErrors,
     errorMessage: routeErrorMessage,
-    summary,
     isCctp,
+    summary,
   } = useSelector(getTransferInputs, shallowEqual) || {};
 
   // User input
@@ -334,7 +334,7 @@ export const WithdrawForm = () => {
       }
     }
 
-    if (isMainnet && MustBigNumber(summary?.aggregatePriceImpact).gte(0.025)) {
+    if (isMainnet && MustBigNumber(summary?.aggregatePriceImpact).gte(MAX_PRICE_IMPACT)) {
       return stringGetter({ key: STRING_KEYS.PRICE_IMPACT_TOO_HIGH });
     }
 
@@ -350,6 +350,7 @@ export const WithdrawForm = () => {
     toAddress,
     sanctionedAddresses,
     stringGetter,
+    summary,
   ]);
 
   const isDisabled =

@@ -21,3 +21,7 @@ export enum NumberSign {
   Negative = 'Negative',
   Neutral = 'Neutral',
 }
+
+// Deposit/Withdraw
+export const MAX_CCTP_TRANSFER_AMOUNT = 1_000_000;
+export const MAX_PRICE_IMPACT = 0.02; // 2%
