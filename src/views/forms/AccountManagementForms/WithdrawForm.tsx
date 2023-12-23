@@ -9,9 +9,9 @@ import { TransferInputField, TransferInputTokenResource, TransferType } from '@/
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
-import { NotificationStatus, TransferNotificationTypes } from '@/constants/notifications';
-import { NumberSign } from '@/constants/numbers';
+import { ENVIRONMENT_CONFIG_MAP, isMainnet } from '@/constants/networks';
+import { TransferNotificationTypes } from '@/constants/notifications';
+import { MAX_CCTP_TRANSFER_AMOUNT, MAX_PRICE_IMPACT, NumberSign } from '@/constants/numbers';
 
 import {
   useAccounts,
@@ -67,14 +67,14 @@ export const WithdrawForm = () => {
     resources,
     errors: routeErrors,
     errorMessage: routeErrorMessage,
-    isCctp
+    isCctp,
+    summary,
   } = useSelector(getTransferInputs, shallowEqual) || {};
 
   // User input
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 0.1% slippage
   const debouncedAmount = useDebounce<string>(withdrawAmount, 500);
-
 
   const isValidAddress = toAddress && isAddress(toAddress);
 
@@ -168,12 +168,18 @@ export const WithdrawForm = () => {
             })
           );
         } else {
-          const txHash = await sendSquidWithdraw(debouncedAmountBN.toNumber(), requestPayload.data, isCctp);
+          const txHash = await sendSquidWithdraw(
+            debouncedAmountBN.toNumber(),
+            requestPayload.data,
+            isCctp
+          );
           if (txHash) {
             addTransferNotification({
               txHash: txHash,
               type: TransferNotificationTypes.Withdrawal,
-              fromChainId: !isCctp ? ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId : getNobleChainId(),
+              fromChainId: !isCctp
+                ? ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId
+                : getNobleChainId(),
               toChainId: chainIdStr || undefined,
               toAmount: debouncedAmountBN.toNumber(),
               triggeredAt: Date.now(),
@@ -317,6 +323,21 @@ export const WithdrawForm = () => {
       return stringGetter({ key: STRING_KEYS.WITHDRAW_MORE_THAN_FREE });
     }
 
+    if (isCctp) {
+      if (MustBigNumber(debouncedAmountBN).gte(MAX_CCTP_TRANSFER_AMOUNT)) {
+        return stringGetter({
+          key: STRING_KEYS.MAX_CCTP_TRANSFER_LIMIT_EXCEEDED,
+          params: {
+            MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
+          },
+        });
+      }
+    }
+
+    if (isMainnet && MustBigNumber(summary?.aggregatePriceImpact).gte(MAX_PRICE_IMPACT)) {
+      return stringGetter({ key: STRING_KEYS.PRICE_IMPACT_TOO_HIGH });
+    }
+
     return undefined;
   }, [
     error,
@@ -329,6 +350,7 @@ export const WithdrawForm = () => {
     toAddress,
     sanctionedAddresses,
     stringGetter,
+    summary,
   ]);
 
   const isDisabled =
