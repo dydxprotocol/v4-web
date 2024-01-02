@@ -28,6 +28,7 @@ import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccountBuyingPower, getSubaccountEquity } from '@/state/accountSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
+import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { SlippageEditor } from '../SlippageEditor';
@@ -77,7 +78,7 @@ export const DepositButtonAndReceipt = ({
   const { current: buyingPower, postOrder: newBuyingPower } =
     useSelector(getSubaccountBuyingPower, shallowEqual) || {};
 
-  const { summary, requestPayload } = useSelector(getTransferInputs, shallowEqual) || {};
+  const { isCctp, summary, requestPayload } = useSelector(getTransferInputs, shallowEqual) || {};
 
   const feeSubitems: DetailsItem[] = [];
 
@@ -174,7 +175,7 @@ export const DepositButtonAndReceipt = ({
         />
       ),
     },
-    {
+    !isCctp && {
       key: 'total-fees',
       label: <span>{stringGetter({ key: STRING_KEYS.TOTAL_FEES })}</span>,
       value: <Output type={OutputType.Fiat} value={totalFees} />,
@@ -210,7 +211,7 @@ export const DepositButtonAndReceipt = ({
         />
       ),
     },
-  ];
+  ].filter(isTruthy);
 
   const isFormValid = !isDisabled && !isEditingSlippage;
 
