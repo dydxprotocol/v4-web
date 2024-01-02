@@ -24,6 +24,7 @@ import { DYDXBalancePanel } from './DYDXBalancePanel';
 import { MigratePanel } from './MigratePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
+import { RewardsHelpPanel } from './RewardsHelpPanel';
 
 const RewardsPage = () => {
   const dispatch = useDispatch();
@@ -59,7 +60,7 @@ const RewardsPage = () => {
 
         <Styled.TradingRewardsColumn>
           <TradingRewardsSummaryPanel />
-          {isTablet && <Styled.HelpPanel slotHeader={<Styled.Title>Help</Styled.Title>} />}
+          {isTablet && <RewardsHelpPanel />}
           <Styled.Panel slotHeader={<Styled.Title>Reward History</Styled.Title>} />
         </Styled.TradingRewardsColumn>
 
@@ -93,7 +94,7 @@ const RewardsPage = () => {
               </Styled.Description>
             </Styled.Panel>
 
-            <Styled.Panel slotHeader={<Styled.Title>Help</Styled.Title>} />
+            <RewardsHelpPanel />
           </Styled.OtherColumn>
         )}
       </Styled.GridLayout>
@@ -176,6 +177,7 @@ Styled.MigratePanel = styled(MigratePanel)`
 Styled.LaunchIncentivesPanel = styled(LaunchIncentivesPanel)`
   grid-area: incentives;
 `;
+
 Styled.DYDXBalancePanel = styled(DYDXBalancePanel)`
   grid-area: balance;
 `;
@@ -184,6 +186,7 @@ Styled.TradingRewardsColumn = styled.div`
   grid-area: rewards;
   ${layoutMixins.flexColumn}
 `;
+
 Styled.OtherColumn = styled.div`
   grid-area: other;
   ${layoutMixins.flexColumn}
@@ -213,5 +216,5 @@ Styled.IconButton = styled(IconButton)`
 `;
 
 Styled.Arrow = styled.div`
-  padding: 1rem;
+  padding-right: 1.5rem;
 `;
