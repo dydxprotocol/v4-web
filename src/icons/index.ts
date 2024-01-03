@@ -44,6 +44,7 @@ export { default as OrderbookIcon } from './orderbook.svg';
 export { default as OverviewIcon } from './overview.svg';
 export { default as PencilIcon } from './pencil.svg';
 export { default as PlayIcon } from './play.svg';
+export { default as PlusIcon } from './plus.svg';
 export { default as PortfolioIcon } from './portfolio.svg';
 export { default as PositionsIcon } from './positions.svg';
 export { default as PriceChartIcon } from './price-chart.svg';
