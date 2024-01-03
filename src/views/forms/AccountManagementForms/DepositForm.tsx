@@ -235,6 +235,10 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           throw new Error('Missing request payload');
         }
 
+        if (isCctp && !abacusStateManager.chainTransactions.isNobleClientConnected) {
+          throw new Error('Noble client unable to initialize');
+        }
+
         setIsLoading(true);
 
         await validateTokenApproval();
