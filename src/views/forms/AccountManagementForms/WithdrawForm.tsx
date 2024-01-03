@@ -289,10 +289,7 @@ export const WithdrawForm = () => {
 
   const errorMessage = useMemo(() => {
     if (error) {
-      return stringGetter({
-        key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-        params: { ERROR_MESSAGE: error },
-      });
+      return error;
     }
 
     if (routeErrors) {
