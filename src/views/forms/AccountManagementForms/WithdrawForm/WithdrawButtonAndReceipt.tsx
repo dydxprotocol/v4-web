@@ -8,8 +8,6 @@ import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/b
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 
-import { formatSeconds } from '@/lib/timeUtils';
-
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { useStringGetter, useTokenConfigs } from '@/hooks';
