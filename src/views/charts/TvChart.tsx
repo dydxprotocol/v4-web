@@ -82,7 +82,6 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.PriceChart = styled.div<{ isChartReady?: boolean }>`
   ${layoutMixins.stack}
-  ${layoutMixins.perspectiveArea}
 
   height: 100%;
 

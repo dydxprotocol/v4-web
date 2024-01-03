@@ -1,14 +1,7 @@
 import { useMemo } from 'react';
 import { useSelector, shallowEqual } from 'react-redux';
 
-import {
-  MarketFilters,
-  MARKET_FILTER_LABELS,
-  type MarketData,
-  MARKETS_TO_DISPLAY,
-} from '@/constants/markets';
-
-import { testFlags } from '@/lib/testFlags';
+import { MarketFilters, MARKET_FILTER_LABELS, type MarketData } from '@/constants/markets';
 
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
@@ -49,9 +42,7 @@ export const useMarketsData = (
   }, [allPerpetualMarkets, allAssets]);
 
   const filteredMarkets = useMemo(() => {
-    const filtered = markets
-      .filter(filterFunctions[filter])
-      .filter(({ id }) => (testFlags.displayAllMarkets ? true : MARKETS_TO_DISPLAY.includes(id)));
+    const filtered = markets.filter(filterFunctions[filter]);
 
     if (searchFilter) {
       return filtered.filter(

@@ -1,10 +1,10 @@
-import { type Dispatch, type SetStateAction, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 import { Root, Thumb, Track } from '@radix-ui/react-slider';
 import _ from 'lodash';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
-import { type Nullable, TradeInputField } from '@/constants/abacus';
+import { TradeInputField } from '@/constants/abacus';
 import { PositionSide } from '@/constants/trade';
 
 import { MustBigNumber, type BigNumberish } from '@/lib/numbers';
@@ -12,11 +12,11 @@ import abacusStateManager from '@/lib/abacus';
 
 type ElementProps = {
   leverage?: BigNumberish | null;
-  leverageInputValue: Nullable<number>;
+  leverageInputValue: string;
   maxLeverage: BigNumberish | null;
   orderSide: OrderSide;
   positionSide: PositionSide;
-  setLeverageInputValue: Dispatch<SetStateAction<Nullable<number>>>;
+  setLeverageInputValue: (value: string) => void;
 };
 
 type StyleProps = { className?: string };
@@ -33,6 +33,7 @@ export const LeverageSlider = ({
   const leverageBN = MustBigNumber(leverage);
   const maxLeverageBN = MustBigNumber(maxLeverage);
   const leverageInputBN = MustBigNumber(leverageInputValue || leverage);
+  const leverageInputNumber = isNaN(leverageInputBN.toNumber()) ? 0 : leverageInputBN.toNumber();
 
   const sliderConfig = useMemo(
     () => ({
@@ -79,12 +80,12 @@ export const LeverageSlider = ({
   );
 
   const onSliderDrag = ([newLeverage]: number[]) => {
-    setLeverageInputValue(newLeverage);
+    setLeverageInputValue(`${newLeverage}`);
     debouncedSetAbacusLeverage(newLeverage);
   };
 
   const onValueCommit = ([newLeverage]: number[]) => {
-    setLeverageInputValue(newLeverage);
+    setLeverageInputValue(`${newLeverage}`);
 
     // Ensure Abacus is updated with the latest, committed value
     debouncedSetAbacusLeverage.cancel();
@@ -102,7 +103,7 @@ export const LeverageSlider = ({
         min={min}
         max={max}
         step={0.1}
-        value={[Math.min(Math.max(leverageInputBN.toNumber(), min), max)]}
+        value={[Math.min(Math.max(leverageInputNumber, min), max)]}
         onValueChange={onSliderDrag}
         onValueCommit={onValueCommit}
       >

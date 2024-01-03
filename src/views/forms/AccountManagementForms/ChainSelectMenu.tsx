@@ -18,11 +18,7 @@ type ElementProps = {
   onSelectChain: (chain: string) => void;
 };
 
-export const ChainSelectMenu = ({
-  label,
-  selectedChain,
-  onSelectChain,
-}: ElementProps) => {
+export const ChainSelectMenu = ({ label, selectedChain, onSelectChain }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions, resources } =
     useSelector(getTransferInputs, shallowEqual) || {};
@@ -38,7 +34,7 @@ export const ChainSelectMenu = ({
     slotBefore: <Styled.Img src={chain.iconUrl} alt="" />,
   }));
 
-  const selectedOption = chains.find((item) => item.type === selectedChain); 
+  const selectedOption = chains.find((item) => item.type === selectedChain);
 
   return (
     <SearchSelectMenu

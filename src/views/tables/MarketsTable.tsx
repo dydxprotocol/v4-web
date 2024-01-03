@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, type MarketData } from '@/constants/markets';
-import { LARGE_TOKEN_DECIMALS } from '@/constants/numbers';
+import { FUNDING_DECIMALS, LARGE_TOKEN_DECIMALS } from '@/constants/numbers';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
@@ -128,7 +128,8 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               label: stringGetter({ key: STRING_KEYS.FUNDING_RATE_1H_SHORT }),
               renderCell: (row) => (
                 <Styled.Output
-                  type={OutputType.SmallPercent}
+                  type={OutputType.Percent}
+                  fractionDigits={FUNDING_DECIMALS}
                   value={row.nextFundingRate}
                   isPositive={MustBigNumber(row.nextFundingRate).gt(0)}
                   isNegative={MustBigNumber(row.nextFundingRate).isNegative()}

@@ -42,6 +42,8 @@ type StyleProps = {
   className?: string;
 };
 
+export type TabsProps<TabItemsValue> = ElementProps<TabItemsValue> & StyleProps;
+
 export const Tabs = <TabItemsValue extends string>({
   defaultValue,
   value,
@@ -111,6 +113,7 @@ export const Tabs = <TabItemsValue extends string>({
           {items.map(({ asChild, value, content, forceMount }) => (
             <Styled.Content
               key={value}
+              asChild={asChild}
               value={value}
               forceMount={forceMount}
               $hide={forceMount && currentItem?.value !== value}
@@ -244,7 +247,6 @@ Styled.Trigger = styled(Trigger)<{ $withBorders?: boolean }>`
 
 Styled.Stack = styled.div`
   ${layoutMixins.stack}
-  ${layoutMixins.perspectiveArea}
 
   box-shadow: none;
 `;

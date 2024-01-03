@@ -20,6 +20,7 @@ import {
   type NotificationTypeConfig,
   NotificationType,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
+  TransferNotificationTypes,
 } from '@/constants/notifications';
 
 import { useSelectedNetwork, useStringGetter } from '@/hooks';
@@ -152,20 +153,20 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       useEffect(() => {
         for (const transfer of transferNotifications) {
-          const { fromChainId, status, txHash, toAmount } = transfer;
+          const { fromChainId, status, txHash, toAmount, type } = transfer;
           const isFinished = Boolean(status) && status?.squidTransactionStatus !== 'ongoing';
           const icon = <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />;
 
-          const type =
-            fromChainId === ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId
-              ? 'withdrawal'
-              : 'deposit';
+          const transferType =
+            type ?? fromChainId === ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId
+              ? TransferNotificationTypes.Withdrawal
+              : TransferNotificationTypes.Deposit;
 
           const title = stringGetter({
             key: {
               deposit: isFinished ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
               withdrawal: isFinished ? STRING_KEYS.WITHDRAW : STRING_KEYS.WITHDRAW_IN_PROGRESS,
-            }[type],
+            }[transferType],
           });
 
           const toChainEta = status?.toChain?.chainData?.estimatedRouteDuration || 0;
@@ -190,7 +191,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   slotIcon={icon}
                   slotTitle={title}
                   transfer={transfer}
-                  type={type}
+                  type={transferType}
                   triggeredAt={transfer.triggeredAt}
                   notification={notification}
                 />

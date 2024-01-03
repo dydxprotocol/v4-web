@@ -122,9 +122,15 @@ export type NotificationDisplayData = {
   toastDuration?: number;
 };
 
+export enum TransferNotificationTypes {
+  Withdrawal = 'withdrawal',
+  Deposit = 'deposit',
+}
+
 // Notification types
 export type TransferNotifcation = {
   txHash: string;
+  type?: TransferNotificationTypes;
   toChainId?: string;
   fromChainId?: string;
   toAmount?: number;

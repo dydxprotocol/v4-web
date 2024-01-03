@@ -5,7 +5,7 @@ import { useInterval, useStringGetter } from '@/hooks';
 
 import { AlertType } from '@/constants/alerts';
 import { STRING_KEYS } from '@/constants/localization';
-import { TransferNotifcation } from '@/constants/notifications';
+import { TransferNotifcation, TransferNotificationTypes } from '@/constants/notifications';
 
 import { formatSeconds } from '@/lib/timeUtils';
 
@@ -22,7 +22,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { TransferStatusSteps } from './TransferStatusSteps';
 
 type ElementProps = {
-  type: 'withdrawal' | 'deposit';
+  type: TransferNotificationTypes;
   transfer: TransferNotifcation;
   triggeredAt?: number;
 };
@@ -55,7 +55,7 @@ export const TransferStatusNotification = ({
   useInterval({ callback: updateSecondsLeft });
 
   const inProgressStatusString =
-    type === 'deposit'
+    type === TransferNotificationTypes.Deposit
       ? secondsLeft > 0
         ? STRING_KEYS.DEPOSIT_STATUS
         : STRING_KEYS.DEPOSIT_STATUS_SHORTLY
@@ -64,7 +64,7 @@ export const TransferStatusNotification = ({
       : STRING_KEYS.WITHDRAW_STATUS_SHORTLY;
 
   const statusString =
-    type === 'deposit'
+    type === TransferNotificationTypes.Deposit
       ? status?.squidTransactionStatus === 'success'
         ? STRING_KEYS.DEPOSIT_COMPLETE
         : inProgressStatusString

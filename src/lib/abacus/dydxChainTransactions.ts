@@ -2,6 +2,7 @@ import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
 import Long from 'long';
 import type { IndexedTx } from '@cosmjs/stargate';
 import { GAS_MULTIPLIER, encodeJson } from '@dydxprotocol/v4-client-js';
+import { EncodeObject } from '@cosmjs/proto-signing';
 
 import {
   CompositeClient,
@@ -41,6 +42,7 @@ import { openDialog } from '@/state/dialogs';
 import { StatefulOrderError } from '../errors';
 import { bytesToBigInt } from '../numbers';
 import { log } from '../telemetry';
+import { hashFromTx } from '../hashfromTx';
 
 class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   private compositeClient: CompositeClient | undefined;
@@ -63,9 +65,13 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   }
 
   setNobleWallet(nobleWallet: LocalWallet) {
-    this.nobleWallet = nobleWallet;
-    if (this.nobleClient) {
-      this.nobleClient.connect(nobleWallet);
+    try {
+      this.nobleWallet = nobleWallet;
+      if (this.nobleClient) {
+        this.nobleClient.connect(nobleWallet);
+      }
+    } catch (e) {
+      log('DydxChainTransactions/setNobleWallet', e);
     }
   }
 
@@ -112,10 +118,15 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
       this.compositeClient = compositeClient;
 
-      if (nobleValidatorUrl) {
-        this.nobleClient = new NobleClient(nobleValidatorUrl);
-        if (this.nobleWallet) await this.nobleClient.connect(this.nobleWallet);
+      try {
+        if (nobleValidatorUrl) {
+          this.nobleClient = new NobleClient(nobleValidatorUrl);
+          if (this.nobleWallet) await this.nobleClient.connect(this.nobleWallet);
+        }
+      } catch (e) {
+        log('DydxChainTransactions/connectNetwork/NobleClient', e);
       }
+
       // Dispatch custom event to notify other parts of the app that the network has been connected
       const customEvent = new CustomEvent('abacus:connectNetwork', {
         detail: parsedParams,
@@ -201,8 +212,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         timeInForce as OrderTimeInForce,
         goodTilTimeInSeconds ?? 0,
         execution as OrderExecution,
-        postOnly,
-        reduceOnly,
+        postOnly ?? undefined,
+        reduceOnly ?? undefined,
         triggerPrice ?? undefined
       );
 
@@ -340,12 +351,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     }
   }
 
-  async sendNobleIBC(
-    params: {
-      msgTypeUrl: string,
-      msg: any,
-    }
-  ): Promise<string> {
+  async sendNobleIBC(params: { msgTypeUrl: string; msg: any }): Promise<string> {
     if (!this.nobleClient?.isConnected) {
       throw new Error('Missing nobleClient or localWallet');
     }
@@ -356,15 +362,16 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         value: params.msg,
       };
       const fee = await this.nobleClient.simulateTransaction([ibcMsg]);
-  
+
       // take out fee from amount before sweeping
-      const amount = parseInt(ibcMsg.value.token.amount, 10) -
+      const amount =
+        parseInt(ibcMsg.value.token.amount, 10) -
         Math.floor(parseInt(fee.amount[0].amount, 10) * GAS_MULTIPLIER);
-  
+
       if (amount <= 0) {
         throw new Error('noble balance does not cover fees');
       }
-  
+
       ibcMsg.value.token.amount = amount.toString();
       const tx = await this.nobleClient.send([ibcMsg]);
 
@@ -373,6 +380,86 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       return JSON.stringify(parsedTx);
     } catch (error) {
       log('DydxChainTransactions/sendNobleIBC', error);
+
+      return JSON.stringify({
+        error,
+      });
+    }
+  }
+
+  async withdrawToNobleIBC(params: {
+    subaccountNumber: number;
+    amount: string;
+    ibcPayload: string;
+  }): Promise<string> {
+    if (!this.compositeClient || !this.localWallet) {
+      throw new Error('Missing compositeClient or localWallet');
+    }
+
+    const { subaccountNumber, amount, ibcPayload } = params ?? {};
+    const parsedIbcPayload: {
+      msgTypeUrl: string;
+      msg: any;
+    } = ibcPayload ? JSON.parse(atob(ibcPayload)) : undefined;
+
+    try {
+      const msg = this.compositeClient.withdrawFromSubaccountMessage(
+        new SubaccountClient(this.localWallet, subaccountNumber),
+        parseFloat(amount).toFixed(this.compositeClient.validatorClient.config.denoms.USDC_DECIMALS)
+      );
+      const ibcMsg: EncodeObject = {
+        typeUrl: parsedIbcPayload.msgTypeUrl,
+        value: parsedIbcPayload.msg,
+      };
+
+      const tx = await this.compositeClient.send(
+        this.localWallet,
+        () => Promise.resolve([msg, ibcMsg]),
+        false
+      );
+
+      return JSON.stringify({
+        txHash: hashFromTx(tx?.hash),
+      });
+    } catch (error) {
+      log('DydxChainTransactions/withdrawToNobleIBC', error);
+
+      return JSON.stringify({
+        error,
+      });
+    }
+  }
+
+  async cctpWithdraw(params: { typeUrl: string; value: any }): Promise<string> {
+    if (!this.nobleClient?.isConnected) {
+      throw new Error('Missing nobleClient or localWallet');
+    }
+
+    try {
+      const ibcMsg = {
+        typeUrl: params.typeUrl, // '/circle.cctp.v1.MsgDepositForBurn',
+        value: params.value,
+      };
+      const fee = await this.nobleClient.simulateTransaction([ibcMsg]);
+
+      // take out fee from amount before sweeping
+      const amount =
+        parseInt(ibcMsg.value.amount, 10) -
+        Math.floor(parseInt(fee.amount[0].amount, 10) * GAS_MULTIPLIER);
+
+      if (amount <= 0) {
+        throw new Error('noble balance does not cover fees');
+      }
+
+      ibcMsg.value.amount = amount.toString();
+
+      const tx = await this.nobleClient.send([ibcMsg]);
+
+      const parsedTx = this.parseToPrimitives(tx);
+
+      return JSON.stringify(parsedTx);
+    } catch (error) {
+      log('DydxChainTransactions/cctpWithdraw', error);
 
       return JSON.stringify({
         error,
@@ -412,6 +499,17 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         case TransactionType.SendNobleIBC: {
           const result = await this.sendNobleIBC(params);
           callback(result);
+          break;
+        }
+        case TransactionType.WithdrawToNobleIBC: {
+          const result = await this.withdrawToNobleIBC(params);
+          callback(result);
+          break;
+        }
+        case TransactionType.CctpWithdraw: {
+          const result = await this.cctpWithdraw(params);
+          callback(result);
+          break;
           break;
         }
         default: {

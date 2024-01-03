@@ -39,11 +39,12 @@
     "@cosmjs/proto-signing": "^0.31.0",
     "@cosmjs/stargate": "^0.31.0",
     "@cosmjs/tendermint-rpc": "^0.31.0",
-    "@dydxprotocol/v4-abacus": "^1.1.4",
-    "@dydxprotocol/v4-client-js": "^1.0.6",
-    "@dydxprotocol/v4-localization": "^1.0.17",
+    "@dydxprotocol/v4-abacus": "^1.1.32",
+    "@dydxprotocol/v4-client-js": "^1.0.11",
+    "@dydxprotocol/v4-localization": "^1.1.5",
     "@ethersproject/providers": "^5.7.2",
     "@js-joda/core": "^5.5.3",
+    "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-collapsible": "^1.0.3",
     "@radix-ui/react-dialog": "^1.0.4",
@@ -111,7 +112,7 @@
     "styled-components": "^5.3.11",
     "use-latest": "^1.2.1",
     "viem": "^1.12.2",
-    "wagmi": "^1.4.5"
+    "wagmi": "^1.4.12"
   },
   "devDependencies": {
     "@babel/core": "^7.22.5",

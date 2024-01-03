@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { formatUnits } from 'viem';
@@ -6,14 +6,11 @@ import { formatUnits } from 'viem';
 import { TransferInputTokenResource } from '@/constants/abacus';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { NumberSign } from '@/constants/numbers';
-
-import { formatSeconds } from '@/lib/timeUtils';
+import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { useStringGetter } from '@/hooks';
-import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useStringGetter, useTokenConfigs } from '@/hooks';
 
 import { Button } from '@/components/Button';
 
@@ -58,13 +55,9 @@ export const WithdrawButtonAndReceipt = ({
   const stringGetter = useStringGetter();
 
   const { leverage } = useSelector(getSubaccount, shallowEqual) || {};
-  const { summary, requestPayload } = useSelector(getTransferInputs, shallowEqual) || {};
+  const { isCctp, summary, requestPayload } = useSelector(getTransferInputs, shallowEqual) || {};
   const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
-
-  const toAmount =
-    summary?.toAmount &&
-    withdrawToken?.decimals &&
-    formatUnits(BigInt(summary.toAmount), withdrawToken?.decimals);
+  const { usdcLabel } = useTokenConfigs();
 
   const feeSubitems: DetailsItem[] = [];
 
@@ -89,8 +82,28 @@ export const WithdrawButtonAndReceipt = ({
   const showSubitemsToggle = showFeeBreakdown
     ? stringGetter({ key: STRING_KEYS.HIDE_ALL_DETAILS })
     : stringGetter({ key: STRING_KEYS.SHOW_ALL_DETAILS });
-  
+
   const totalFees = (summary?.bridgeFee || 0) + (summary?.gasFee || 0);
+
+  const { toAmount, toAmountMin } = useMemo(() => {
+    if (isCctp) {
+      return {
+        toAmount: summary?.toAmount,
+        toAmountMin: summary?.toAmountMin,
+      };
+    } else {
+      return {
+        toAmount:
+          summary?.toAmount &&
+          withdrawToken?.decimals &&
+          formatUnits(BigInt(summary.toAmount), withdrawToken.decimals),
+        toAmountMin:
+          summary?.toAmountMin &&
+          withdrawToken?.decimals &&
+          formatUnits(BigInt(summary.toAmountMin), withdrawToken.decimals),
+      };
+    }
+  }, [isCctp, summary, withdrawToken]);
 
   const submitButtonReceipt = [
     {
@@ -100,42 +113,11 @@ export const WithdrawButtonAndReceipt = ({
       subitems: feeSubitems,
     },
     {
-      key: 'wallet',
-      label: (
-        <span>
-          {stringGetter({ key: STRING_KEYS.AMOUNT_RECEIVED })}{' '}
-          {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
-        </span>
-      ),
-      value: (
-        <Styled.DiffOutput
-          type={OutputType.Asset}
-          value={'0'}
-          newValue={toAmount}
-          sign={NumberSign.Positive}
-          withDiff={Boolean(toAmount)}
-        />
-      ),
-    },
-    {
-      key: 'leverage',
-      label: <span>{stringGetter({ key: STRING_KEYS.ACCOUNT_LEVERAGE })}</span>,
-      value: (
-        <Styled.DiffOutput
-          type={OutputType.Multiple}
-          value={leverage?.current}
-          newValue={leverage?.postOrder}
-          sign={NumberSign.Negative}
-          withDiff={Boolean(leverage?.current && leverage.current !== leverage?.postOrder)}
-        />
-      ),
-    },
-    {
       key: 'exchange-rate',
       label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
       value: withdrawToken && typeof summary?.exchangeRate === 'number' && (
         <Styled.ExchangeRate>
-          <Output type={OutputType.Asset} value={1} fractionDigits={0} tag="USDC" />
+          <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={usdcLabel} />
           =
           <Output
             type={OutputType.Asset}
@@ -146,19 +128,7 @@ export const WithdrawButtonAndReceipt = ({
       ),
     },
     {
-      key: 'slippage',
-      label: <span>{stringGetter({ key: STRING_KEYS.SLIPPAGE })}</span>,
-      value: (
-        <SlippageEditor
-          disabled
-          slippage={slippage}
-          setIsEditing={setIsEditingSlipapge}
-          setSlippage={setSlippage}
-        />
-      ),
-    },
-    {
-      key: 'estimatedRouteDuration',
+      key: 'estimated-route-duration',
       label: <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_TIME })}</span>,
       value: typeof summary?.estimatedRouteDuration === 'number' && (
         <Output
@@ -172,6 +142,56 @@ export const WithdrawButtonAndReceipt = ({
                   : Math.round(summary?.estimatedRouteDuration / 60),
             },
           })}
+        />
+      ),
+    },
+    {
+      key: 'expected-amount-received',
+      label: (
+        <span>
+          {stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED })}{' '}
+          {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
+        </span>
+      ),
+      value: <Output type={OutputType.Asset} value={toAmount} fractionDigits={TOKEN_DECIMALS} />,
+      subitems: [
+        {
+          key: 'minimum-amount-received',
+          label: (
+            <span>
+              {stringGetter({ key: STRING_KEYS.MINIMUM_AMOUNT_RECEIVED })}{' '}
+              {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
+            </span>
+          ),
+          value: (
+            <Output type={OutputType.Asset} value={toAmountMin} fractionDigits={TOKEN_DECIMALS} />
+          ),
+          tooltip: 'minimum-amount-received',
+        },
+      ],
+    },
+    {
+      key: 'slippage',
+      label: <span>{stringGetter({ key: STRING_KEYS.MAX_SLIPPAGE })}</span>,
+      value: (
+        <SlippageEditor
+          disabled
+          slippage={slippage}
+          setIsEditing={setIsEditingSlipapge}
+          setSlippage={setSlippage}
+        />
+      ),
+    },
+    {
+      key: 'leverage',
+      label: <span>{stringGetter({ key: STRING_KEYS.ACCOUNT_LEVERAGE })}</span>,
+      value: (
+        <Styled.DiffOutput
+          type={OutputType.Multiple}
+          value={leverage?.current}
+          newValue={leverage?.postOrder}
+          sign={NumberSign.Negative}
+          withDiff={Boolean(leverage?.current && leverage.current !== leverage?.postOrder)}
         />
       ),
     },

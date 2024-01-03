@@ -43,6 +43,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from './Icon';
 import { Tag } from './Tag';
+import { MustBigNumber } from '@/lib/numbers';
 
 export { TableCell } from './Table/TableCell';
 export { TableColumnHeader } from './Table/TableColumnHeader';
@@ -161,10 +162,7 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
         ? // String
           collator.compare(first as string, second as string)
         : // Number
-          Math.sign(
-            (parseInt(first as string) || (first as number)) -
-              (parseInt(second as string) || (second as number))
-          )) *
+          MustBigNumber(first).comparedTo(MustBigNumber(second))) *
       // Flip the direction if descending order is specified.
       (sortDirection === 'descending' ? -1 : 1)
     );
