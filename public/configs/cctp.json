@@ -5,37 +5,8 @@
         "name": "Ethereum"
     },
     {
-        "chainId": "421613",
-        "tokenAddress": "0xfd064a18f3bf249cf1f87fc203e90d8f650f2d63",
-        "name": "Arbitrum Goerli"
-    },
-    {
-        "chainId": "43113",
-        "tokenAddress": "0x5425890298aed601595a70AB815c96711a31Bc65",
-        "name": "Avalanche Fuji"
-    },
-    {
-        "chainId": "84531",
-        "tokenAddress": "0xf175520c52418dfe19c8098071a252da48cd1c19",
-        "name": "Base Goerli"
-    },
-    {
         "chainId": "5",
         "tokenAddress": "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
         "name": "Ethereum Goerli"
-    },
-    {
-        "chainId": "grand-1",
-        "tokenAddress": "uusdc",
-        "name": "Noble Testnet"
-    },
-    {
-        "chainId": "420",
-        "tokenAddress": "0xe05606174bac4a6364b31bd0eca4bf4dd368f8c6",
-        "name": "OP Goerli"
-    },
-    {
-        "chainId": "103",
-        "name": "Solana Devnet"
     }
 ]
