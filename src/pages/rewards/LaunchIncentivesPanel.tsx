@@ -86,7 +86,7 @@ const EstimatedRewards = () => {
             {stringGetter({
               key: STRING_KEYS.LAUNCH_INCENTIVES_SEASON_NUM,
               params: {
-                SEASON_NUMBER: 1,
+                SEASON_NUMBER: 2,
               },
             })}
           </Styled.Season>
