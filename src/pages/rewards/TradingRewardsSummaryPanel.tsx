@@ -12,11 +12,12 @@ import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 
 import { getHistoricalTradingRewards } from '@/state/accountSelectors';
+import { HistoricalTradingReward } from '@/constants/abacus';
 
 export const TradingRewardsSummaryPanel = () => {
   const stringGetter = useStringGetter();
   const historicalTradingRewards = useSelector(getHistoricalTradingRewards, shallowEqual);
-  const currentWeekTradingReward = historicalTradingRewards?.get('WEEKLY')?.firstOrNull()?.amount;
+  const currentWeekTradingReward = historicalTradingRewards?.get('WEEKLY')?.firstOrNull();
   const { chainTokenLabel } = useTokenConfigs();
 
   return (
@@ -28,27 +29,45 @@ export const TradingRewardsSummaryPanel = () => {
       }
     >
       <Styled.Content>
-        <Styled.TradingRewardsDetails
-          layout="grid"
-          items={[
-            {
-              key: 'week',
-              label: (
-                <Styled.Label>
-                  <h4>{stringGetter({ key: STRING_KEYS.THIS_WEEK })}</h4>
-                </Styled.Label>
-              ),
-              value: (
-                <Output
-                  slotRight={<AssetIcon symbol={chainTokenLabel} />}
-                  type={OutputType.Asset}
-                  value={currentWeekTradingReward}
-                />
-              ),
-            },
-            // TODO(@aforaleka): add all-time when supported
-          ]}
-        />
+        <Styled.ComingSoon>{stringGetter({ key: STRING_KEYS.COMING_SOON })}</Styled.ComingSoon>
+        {
+          <Styled.TradingRewardsDetails
+            layout="grid"
+            items={[
+              {
+                key: 'week',
+                label: (
+                  <Styled.Label>
+                    <h4>{stringGetter({ key: STRING_KEYS.THIS_WEEK })}</h4>
+                  </Styled.Label>
+                ),
+                value: (
+                  <Styled.Column>
+                    <Output
+                      slotRight={<AssetIcon symbol={chainTokenLabel} />}
+                      type={OutputType.Asset}
+                      value={currentWeekTradingReward?.amount}
+                    />
+                    <Styled.TimePeriod>
+                      <Output
+                        type={OutputType.Date}
+                        value={1701388800000} // {currentWeekTradingReward?.startedAtInMilliseconds}
+                        timeOptions={{ useUTC: true }}
+                      />
+                      →
+                      <Output
+                        type={OutputType.Date}
+                        value={1704067199000} // {currentWeekTradingReward?.endedAtInMilliseconds}
+                        timeOptions={{ useUTC: true }}
+                      />
+                    </Styled.TimePeriod>
+                  </Styled.Column>
+                ),
+              },
+              // TODO(@aforaleka): add all-time when supported
+            ]}
+          />
+        }
       </Styled.Content>
     </Styled.Panel>
   );
@@ -116,4 +135,22 @@ Styled.Label = styled.div`
 
   font: var(--font-base-book);
   color: var(--color-text-1);
+`;
+
+Styled.ComingSoon = styled.div`
+  color: var(--color-text-0);
+`;
+
+Styled.TimePeriod = styled.div`
+  ${layoutMixins.inlineRow}
+
+  &, output {
+    color: var(--color-text-0);
+    font: var(--font-small-book);
+  }
+`;
+
+Styled.Column = styled.div`
+  ${layoutMixins.flexColumn}
+  gap: 0.5rem;
 `;
