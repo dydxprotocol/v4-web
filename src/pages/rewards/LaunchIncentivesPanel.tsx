@@ -24,6 +24,8 @@ import { openDialog } from '@/state/dialogs';
 
 import { log } from '@/lib/telemetry';
 
+const SEASON_NUMBER = 2;
+
 export const LaunchIncentivesPanel = () => {
   const { isNotTablet } = useBreakpoints();
   const dispatch = useDispatch();
@@ -71,7 +73,7 @@ const EstimatedRewards = () => {
     queryKey: `launch_incentives_rewards_${dydxAddress ?? ''}`,
     queryFn: async () => {
       if (!dydxAddress) return undefined;
-      const resp = await fetch(`https://cloud.chaoslabs.co/query/api/dydx/points/${dydxAddress}`);
+      const resp = await fetch(`https://cloud.chaoslabs.co/query/api/dydx/points/${dydxAddress}?n=${SEASON_NUMBER}`);
       return (await resp.json())?.incentivePoints;
     },
     onError: (error: Error) => log('LaunchIncentives/fetchPoints', error),
@@ -85,9 +87,7 @@ const EstimatedRewards = () => {
           <Styled.Season>
             {stringGetter({
               key: STRING_KEYS.LAUNCH_INCENTIVES_SEASON_NUM,
-              params: {
-                SEASON_NUMBER: 2,
-              },
+              params: { SEASON_NUMBER },
             })}
           </Styled.Season>
         </div>
