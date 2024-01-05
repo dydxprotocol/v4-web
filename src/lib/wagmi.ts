@@ -26,6 +26,8 @@ import {
   fantomTestnet,
   celo,
   celoAlfajores,
+  scroll,
+  kava,
 } from 'viem/chains';
 
 import { alchemyProvider } from 'wagmi/providers/alchemy';
@@ -78,6 +80,8 @@ export const WAGMI_SUPPORTED_CHAINS: Chain[] = [
   fantomTestnet,
   celo,
   celoAlfajores,
+  scroll,
+  kava,
 ];
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
