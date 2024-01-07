@@ -118,6 +118,7 @@ export const Tabs = <TabItemsValue extends string>({
               forceMount={forceMount}
               $hide={forceMount && currentItem?.value !== value}
               $withTransitions={withTransitions}
+              asChild={asChild}
             >
               {content}
             </Styled.Content>
