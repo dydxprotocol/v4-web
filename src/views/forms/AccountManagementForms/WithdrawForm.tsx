@@ -148,6 +148,10 @@ export const WithdrawForm = () => {
           throw new Error('Invalid request payload');
         }
 
+        if (isCctp && !abacusStateManager.chainTransactions.isNobleClientConnected) {
+          throw new Error('Noble client unable to initialize');
+        }
+
         setIsLoading(true);
         setError(undefined);
 
