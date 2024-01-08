@@ -7,12 +7,12 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { useStringGetter, useTokenConfigs } from '@/hooks';
 
 import { AssetIcon } from '@/components/AssetIcon';
+import { ComingSoon } from '@/components/ComingSoon';
 import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 
 import { getHistoricalTradingRewards } from '@/state/accountSelectors';
-import { HistoricalTradingReward } from '@/constants/abacus';
 
 export const TradingRewardsSummaryPanel = () => {
   const stringGetter = useStringGetter();
@@ -29,8 +29,7 @@ export const TradingRewardsSummaryPanel = () => {
       }
     >
       <Styled.Content>
-        <Styled.ComingSoon>{stringGetter({ key: STRING_KEYS.COMING_SOON })}</Styled.ComingSoon>
-        {
+        {currentWeekTradingReward ? (
           <Styled.TradingRewardsDetails
             layout="grid"
             items={[
@@ -44,20 +43,20 @@ export const TradingRewardsSummaryPanel = () => {
                 value: (
                   <Styled.Column>
                     <Output
-                      slotRight={<AssetIcon symbol={chainTokenLabel} />}
+                      slotRight={<Styled.AssetIcon symbol={chainTokenLabel} />}
                       type={OutputType.Asset}
-                      value={currentWeekTradingReward?.amount}
+                      value={currentWeekTradingReward.amount}
                     />
                     <Styled.TimePeriod>
                       <Output
                         type={OutputType.Date}
-                        value={1701388800000} // {currentWeekTradingReward?.startedAtInMilliseconds}
+                        value={currentWeekTradingReward.startedAtInMilliseconds}
                         timeOptions={{ useUTC: true }}
                       />
                       →
                       <Output
                         type={OutputType.Date}
-                        value={1704067199000} // {currentWeekTradingReward?.endedAtInMilliseconds}
+                        value={currentWeekTradingReward.endedAtInMilliseconds}
                         timeOptions={{ useUTC: true }}
                       />
                     </Styled.TimePeriod>
@@ -67,7 +66,9 @@ export const TradingRewardsSummaryPanel = () => {
               // TODO(@aforaleka): add all-time when supported
             ]}
           />
-        }
+        ) : (
+          <ComingSoon />
+        )}
       </Styled.Content>
     </Styled.Panel>
   );
@@ -94,6 +95,7 @@ Styled.Title = styled.h3`
   ${layoutMixins.inlineRow}
   font: var(--font-medium-book);
   color: var(--color-text-2);
+  margin-bottom: -0.5rem;
 
   img {
     font-size: 1.5rem;
@@ -112,10 +114,8 @@ Styled.TradingRewardsDetails = styled(Details)`
   gap: 1rem;
 
   > div {
-    gap: 1rem;
-
+    gap: 0.5rem;
     padding: 1rem;
-
     border-radius: 0.75em;
     background-color: var(--color-layer-5);
   }
@@ -152,5 +152,9 @@ Styled.TimePeriod = styled.div`
 
 Styled.Column = styled.div`
   ${layoutMixins.flexColumn}
-  gap: 0.5rem;
+  gap: 0.33rem;
+`;
+
+Styled.AssetIcon = styled(AssetIcon)`
+  margin-left: 0.5ch;
 `;

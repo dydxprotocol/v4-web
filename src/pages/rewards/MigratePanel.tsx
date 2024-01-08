@@ -138,15 +138,12 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.MigratePanel = styled(Panel)`
   --panel-paddingX: 1.5rem;
   --panel-paddingY: 1.25rem;
+  --panel-content-paddingY: 1rem;
   width: 100%;
 
   background-image: url('/dots-background.svg');
   background-position: right;
   background-repeat: no-repeat;
-
-  @media ${breakpoints.tablet} {
-    --panel-content-paddingY: 1rem;
-  }
 `;
 
 Styled.Title = styled.h3`
@@ -154,14 +151,15 @@ Styled.Title = styled.h3`
   color: var(--color-text-2);
 
   padding: var(--panel-paddingY) var(--panel-paddingX) 0;
+  margin-bottom: -0.5rem;
 `;
 
 Styled.MigrateAction = styled.div`
   ${layoutMixins.flexEqualColumns}
   align-items: center;
-  margin-right: 1rem;
   gap: 1rem;
   padding: 1rem;
+  margin: 1rem;
   width: 100%;
 
   background-color: var(--color-layer-2);

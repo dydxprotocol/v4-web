@@ -44,6 +44,8 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Icon, IconName } from './Icon';
 import { Tag } from './Tag';
 import { MustBigNumber } from '@/lib/numbers';
+import { Button } from './Button';
+import { CaretIcon } from '@/icons';
 
 export { TableCell } from './Table/TableCell';
 export { TableColumnHeader } from './Table/TableColumnHeader';
@@ -92,6 +94,7 @@ type ElementProps<TableRowData extends object | CustomRowConfig, TableRowKey ext
   selectionBehavior?: 'replace' | 'toggle';
   onRowAction?: (key: TableRowKey, row: TableRowData) => void;
   slotEmpty?: React.ReactNode;
+  initialNumRowsToShow?: number;
   // collection: TableCollection<string>;
   // children: React.ReactNode;
 };
@@ -121,6 +124,7 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   selectionMode = 'single',
   selectionBehavior = 'toggle',
   slotEmpty,
+  initialNumRowsToShow = data.length,
   // shouldRowRender,
 
   // collection,
@@ -136,6 +140,7 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   style,
 }: ElementProps<TableRowData, TableRowKey> & StyleProps) => {
   const [selectedKeys, setSelectedKeys] = useState(new Set<TableRowKey>());
+  const [numRowsToShow, setNumRowsToShow] = useState(initialNumRowsToShow);
 
   const currentBreakpoints = useBreakpoints();
   const shownColumns = columns.filter(
@@ -188,67 +193,77 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   const isEmpty = data.length === 0;
 
   return (
-    <Styled.TableWrapper
-      className={className}
-      style={style}
-      isEmpty={isEmpty}
-      withGradientCardRows={withGradientCardRows}
-      withOuterBorder={withOuterBorder}
-    >
-      {!isEmpty ? (
-        <TableRoot
-          aria-label={label}
-          sortDescriptor={list.sortDescriptor}
-          onSortChange={list.sort}
-          selectedKeys={selectedKeys}
-          setSelectedKeys={setSelectedKeys}
-          selectionMode={selectionMode}
-          selectionBehavior={selectionBehavior}
-          getRowAttributes={getRowAttributes}
-          onRowAction={
-            onRowAction &&
-            ((key: TableRowKey) => onRowAction(key, data.find((row) => getRowKey(row) === key)!))
-          }
-          // shouldRowRender={shouldRowRender}
-          hideHeader={hideHeader}
-          withGradientCardRows={withGradientCardRows}
-          withFocusStickyRows={withFocusStickyRows}
-          withOuterBorder={withOuterBorder}
-          withInnerBorders={withInnerBorders}
-          withScrollSnapColumns={withScrollSnapColumns}
-          withScrollSnapRows={withScrollSnapRows}
-        >
-          <TableHeader columns={shownColumns}>
-            {(column) => (
-              <Column
-                key={column.columnKey}
-                childColumns={column.childColumns}
-                allowsSorting={column.allowsSorting ?? true}
-                allowsResizing={column.allowsResizing}
-                width={column.width}
-              >
-                {column.label}
-                {column.tag && <Tag>{column.tag}</Tag>}
-              </Column>
-            )}
-          </TableHeader>
+    <>
+      <Styled.TableWrapper
+        className={className}
+        style={style}
+        isEmpty={isEmpty}
+        withGradientCardRows={withGradientCardRows}
+        withOuterBorder={withOuterBorder}
+      >
+        {!isEmpty ? (
+          <TableRoot
+            aria-label={label}
+            sortDescriptor={list.sortDescriptor}
+            onSortChange={list.sort}
+            selectedKeys={selectedKeys}
+            setSelectedKeys={setSelectedKeys}
+            selectionMode={selectionMode}
+            selectionBehavior={selectionBehavior}
+            getRowAttributes={getRowAttributes}
+            onRowAction={
+              onRowAction &&
+              ((key: TableRowKey) => onRowAction(key, data.find((row) => getRowKey(row) === key)!))
+            }
+            // shouldRowRender={shouldRowRender}
+            hideHeader={hideHeader}
+            withGradientCardRows={withGradientCardRows}
+            withFocusStickyRows={withFocusStickyRows}
+            withOuterBorder={withOuterBorder}
+            withInnerBorders={withInnerBorders}
+            withScrollSnapColumns={withScrollSnapColumns}
+            withScrollSnapRows={withScrollSnapRows}
+          >
+            <TableHeader columns={shownColumns}>
+              {(column) => (
+                <Column
+                  key={column.columnKey}
+                  childColumns={column.childColumns}
+                  allowsSorting={column.allowsSorting ?? true}
+                  allowsResizing={column.allowsResizing}
+                  width={column.width}
+                >
+                  {column.label}
+                  {column.tag && <Tag>{column.tag}</Tag>}
+                </Column>
+              )}
+            </TableHeader>
 
-          <TableBody items={list.items}>
-            {(item) => (
-              <Row key={getRowKey(item)}>
-                {(columnKey) => (
-                  <Cell key={`${getRowKey(item)}-${columnKey}`}>
-                    {columns.find((column) => column.columnKey === columnKey)?.renderCell?.(item)}
-                  </Cell>
-                )}
-              </Row>
-            )}
-          </TableBody>
-        </TableRoot>
-      ) : (
-        <Styled.Empty withOuterBorder={withOuterBorder}>{slotEmpty}</Styled.Empty>
+            <TableBody items={list.items.slice(0, numRowsToShow)}>
+              {(item) => (
+                <Row key={getRowKey(item)}>
+                  {(columnKey) => (
+                    <Cell key={`${getRowKey(item)}-${columnKey}`}>
+                      {columns.find((column) => column.columnKey === columnKey)?.renderCell?.(item)}
+                    </Cell>
+                  )}
+                </Row>
+              )}
+            </TableBody>
+          </TableRoot>
+        ) : (
+          <Styled.Empty withOuterBorder={withOuterBorder}>{slotEmpty}</Styled.Empty>
+        )}
+      </Styled.TableWrapper>
+      {numRowsToShow !== undefined && numRowsToShow < data.length && (
+        <Styled.ViewMoreButton
+          onClick={() => setNumRowsToShow(data.length)}
+          slotRight={<CaretIcon />}
+        >
+          View more
+        </Styled.ViewMoreButton>
       )}
-    </Styled.TableWrapper>
+    </>
   );
 };
 
@@ -921,4 +936,9 @@ Styled.Tbody = styled.tbody<StyleProps>`
 Styled.Row = styled.div`
   ${layoutMixins.inlineRow}
   padding: var(--tableCell-padding);
+`;
+
+Styled.ViewMoreButton = styled(Button)`
+  --button-backgroundColor: var(--color-layer-2);
+  width: 100%;
 `;

@@ -151,8 +151,9 @@ const LaunchIncentivesContent = () => {
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Panel = styled(Panel)`
-  --panel-paddingY: 1.25rem;
   --panel-paddingX: 1.5rem;
+  --panel-paddingY: 1.25rem;
+  --panel-content-paddingY: 1rem;
 
   background-color: var(--color-layer-4);
   width: 100%;

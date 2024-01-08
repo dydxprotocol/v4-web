@@ -10,7 +10,7 @@ export type AccordionItem = {
   content: React.ReactNode;
 };
 
-type AccordionProps = {
+export type AccordionProps = {
   items: AccordionItem[];
   className?: string;
 };
@@ -67,7 +67,8 @@ Styled.Icon = styled.div`
 Styled.Trigger = styled(Trigger)`
   ${layoutMixins.spacedRow}
   width: 100%;
-  padding: 1rem 0.75rem;
+  padding: 1rem 1.5rem;
+  gap: 0.5rem;
 
   color: var(--color-text-1);
   text-align: start;
@@ -91,7 +92,7 @@ Styled.Trigger = styled(Trigger)`
 
 Styled.Content = styled(Content)`
   overflow: hidden;
-  margin: 0 0.75rem 1rem;
+  margin: 0 1.5rem 1rem;
 
   color: var(--color-text-0);
 

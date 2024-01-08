@@ -66,7 +66,6 @@ type ElementProps = {
     stripRelativeWords?: boolean;
   };
   timeOptions?: {
-    format?: 'long' | 'short' | 'narrow' | 'singleCharacter';
     useUTC?: boolean;
   };
   tag?: React.ReactNode;

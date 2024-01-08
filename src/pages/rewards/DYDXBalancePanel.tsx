@@ -118,10 +118,7 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.Panel = styled(Panel)`
   --panel-paddingX: 1.5rem;
   --panel-paddingY: 1.25rem;
-
-  @media ${breakpoints.tablet} {
-    --panel-content-paddingY: 1rem;
-  }
+  --panel-content-paddingY: 1rem;
 `;
 
 Styled.Header = styled.div`

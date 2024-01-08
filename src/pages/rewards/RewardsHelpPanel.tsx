@@ -51,6 +51,7 @@ export const RewardsHelpPanel = () => {
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.HelpCard = styled(Panel)`
+  --panel-content-paddingX: 0;
   --panel-content-paddingY: 0;
   width: 100%;
   height: max-content;

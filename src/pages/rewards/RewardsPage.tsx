@@ -25,6 +25,7 @@ import { MigratePanel } from './MigratePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
+import { RewardHistoryPanel } from './RewardHistoryPanel';
 
 const RewardsPage = () => {
   const dispatch = useDispatch();
@@ -48,7 +49,7 @@ const RewardsPage = () => {
       {isTablet && (
         <Styled.MobileHeader>
           <BackButton onClick={() => navigate(AppRoute.Profile)} />
-          Trading Rewards
+          {stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
         </Styled.MobileHeader>
       )}
       <Styled.GridLayout>
@@ -61,7 +62,7 @@ const RewardsPage = () => {
         <Styled.TradingRewardsColumn>
           <TradingRewardsSummaryPanel />
           {isTablet && <RewardsHelpPanel />}
-          <Styled.Panel slotHeader={<Styled.Title>Reward History</Styled.Title>} />
+          <RewardHistoryPanel/>
         </Styled.TradingRewardsColumn>
 
         {isNotTablet && (
@@ -140,7 +141,7 @@ Styled.MobileHeader = styled.header`
 
 Styled.Panel = styled(Panel)`
   --panel-paddingX: 1.5rem;
-  --panel-paddingY: 1.25rem;
+  --panel-paddingY: 1rem;
   --panel-content-paddingY: 1rem;
 
   height: fit-content;
@@ -192,10 +193,21 @@ Styled.OtherColumn = styled.div`
   ${layoutMixins.flexColumn}
 `;
 
+Styled.RewardHistoryHeader = styled.div`
+  h3 {
+    font: var(--font-medium-book);
+    color: var(--color-text-2);
+  }
+
+  padding: 1rem 1.5rem 0;
+  margin-bottom: -0.5rem;
+`;
+
 Styled.Title = styled.h3`
   font: var(--font-medium-book);
   color: var(--color-text-2);
   padding: 1rem 1.5rem 0;
+  margin-bottom: -0.5rem;
 `;
 
 Styled.Description = styled.div`

@@ -9,6 +9,8 @@ import type {
   TransferInputFields,
   HistoricalPnlPeriods,
   ParsingError,
+  HistoricaTradingRewardsPeriods,
+  HistoricaTradingRewardsPeriod,
 } from '@/constants/abacus';
 
 import {
@@ -218,6 +220,12 @@ class AbacusStateManager {
     this.stateManager.historicalPnlPeriod = period;
   };
 
+  setHistoricalTradingRewardPeriod = (
+    period: (typeof HistoricaTradingRewardsPeriod)[keyof typeof HistoricaTradingRewardsPeriod]
+  ) => {
+    this.stateManager.historicalTradingRewardPeriod = period;
+  };
+
   switchNetwork = (network: DydxNetwork) => {
     this.stateManager.environmentId = network;
 
@@ -262,16 +270,15 @@ class AbacusStateManager {
   ) => this.stateManager.cancelOrder(orderId, callback);
 
   cctpWithdraw = (
-    callback: (
-      success: boolean,
-      parsingError: Nullable<ParsingError>,
-      data: string,
-    ) => void
+    callback: (success: boolean, parsingError: Nullable<ParsingError>, data: string) => void
   ): void => this.stateManager.commitCCTPWithdraw(callback);
 
   // ------ Utils ------ //
   getHistoricalPnlPeriod = (): Nullable<HistoricalPnlPeriods> =>
     this.stateManager.historicalPnlPeriod;
+
+  getHistoricalTradingRewardPeriod = (): HistoricaTradingRewardsPeriods =>
+    this.stateManager.historicalTradingRewardPeriod;
 
   handleCandlesSubscription = ({
     channelId,
