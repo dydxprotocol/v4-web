@@ -34,6 +34,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken }: ElementProps) 
       selectedToken && onSelectToken(selectedToken);
     },
     slotBefore: <Styled.Img src={token.iconUrl} alt="" />,
+    tag: resources?.tokenResources?.get(token.type)?.symbol,
   }));
 
   return (
