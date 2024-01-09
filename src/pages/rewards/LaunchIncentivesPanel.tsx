@@ -70,7 +70,7 @@ const EstimatedRewards = () => {
 
   const { data, isLoading } = useQuery({
     enabled: !!dydxAddress,
-    queryKey: `launch_incentives_rewards_${dydxAddress ?? ''}`,
+    queryKey: `launch_incentives_rewards_${dydxAddress ?? ''}_${SEASON_NUMBER}`,
     queryFn: async () => {
       if (!dydxAddress) return undefined;
       const resp = await fetch(
