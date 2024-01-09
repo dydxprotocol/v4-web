@@ -7,8 +7,6 @@ import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 
 import { useAccountBalance, useBreakpoints, useStringGetter } from '@/hooks';
 
-import { breakpoints } from '@/styles';
-
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';
@@ -28,7 +26,7 @@ import { MustBigNumber } from '@/lib/numbers';
 const TOKEN_MIGRATION_LEARN_MORE_LINK =
   'https://www.dydx.foundation/blog/update-on-exploring-the-future-of-dydx';
 
-export const MigratePanel = () => {
+export const MigratePanel = ({ className }: { className?: string }) => {
   const { isNotTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
 
@@ -45,6 +43,7 @@ export const MigratePanel = () => {
 
   return isNotTablet ? (
     <Styled.MigratePanel
+      className={className}
       slotHeader={<Styled.Title>{stringGetter({ key: STRING_KEYS.MIGRATE })}</Styled.Title>}
       slotRight={
         <Styled.MigrateAction>
@@ -74,6 +73,7 @@ export const MigratePanel = () => {
     </Styled.MigratePanel>
   ) : (
     <Styled.MigratePanel
+      className={className}
       slotHeader={
         <Styled.MobileMigrateHeader>
           <h3>
@@ -134,17 +134,11 @@ export const MigratePanel = () => {
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.MigratePanel = styled(Panel)`
-  --panel-paddingX: 1.5rem;
   width: 100%;
 
   background-image: url('/dots-background.svg');
   background-position: right;
   background-repeat: no-repeat;
-
-  @media ${breakpoints.tablet} {
-    --panel-paddingY: 1.5rem;
-    --panel-content-paddingY: 1rem;
-  }
 `;
 
 Styled.Title = styled.h3`
@@ -157,7 +151,7 @@ Styled.Title = styled.h3`
 Styled.MigrateAction = styled.div`
   ${layoutMixins.flexEqualColumns}
   align-items: center;
-  margin-right: 1rem;
+  margin: 1rem;
   gap: 1rem;
   padding: 1rem;
   width: 100%;
@@ -197,7 +191,7 @@ Styled.MobileMigrateHeader = styled.div`
   font: var(--font-small-book);
   color: var(--color-text-0);
 
-  padding: 1rem 1.5rem 0;
+  padding: 1rem 1rem 0;
 
   h3 {
     ${layoutMixins.inlineRow}

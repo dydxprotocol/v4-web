@@ -30,6 +30,9 @@ import abacusStateManager from '@/lib/abacus';
 import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
 
+import { DYDXBalancePanel } from './rewards/DYDXBalancePanel';
+import { MigratePanel } from './rewards/MigratePanel';
+
 const ENS_CHAIN_ID = 1; // Ethereum
 
 const Profile = () => {
@@ -175,8 +178,27 @@ const Profile = () => {
           onClick={() => dispatch(openDialog({ type: DialogTypes.Help }))}
         />
       </Styled.EqualGrid>
+      
+      <MigratePanel />
+      <DYDXBalancePanel />
 
       <Styled.EqualGrid>
+        <Styled.RewardsPanel
+          slotHeaderContent="Trading Rewards"
+          href={`/${chainTokenLabel}`}
+          hasSeparator
+        >
+          <Styled.Details
+            items={[
+              {
+                key: 'week-rewards',
+                label: stringGetter({ key: STRING_KEYS.THIS_WEEK }),
+                value: '-',
+              },
+            ]}
+            layout="grid"
+          />
+        </Styled.RewardsPanel>
         <Panel
           slotHeaderContent={stringGetter({ key: STRING_KEYS.FEES })}
           href={`${AppRoute.Portfolio}/${PortfolioRoute.Fees}`}
@@ -191,19 +213,6 @@ const Profile = () => {
             layout="grid"
           />
         </Panel>
-        <Styled.RewardsPanel
-          slotHeaderContent={stringGetter({ key: STRING_KEYS.REWARDS })}
-          href={`/${chainTokenLabel}`}
-          hasSeparator
-        >
-          <Styled.Details
-            items={[
-              { key: 'maker', label: stringGetter({ key: STRING_KEYS.YOU_WILL_EARN }), value: '-' },
-              { key: 'taker', label: stringGetter({ key: STRING_KEYS.EPOCH_ENDS_IN }), value: '-' },
-            ]}
-            layout="grid"
-          />
-        </Styled.RewardsPanel>
       </Styled.EqualGrid>
 
       <Styled.TablePanel
@@ -327,6 +336,13 @@ Styled.Details = styled(Details)`
 `;
 
 Styled.RewardsPanel = styled(Panel)`
+  align-self: flex-start;
+  
+  &,
+  > * {
+    height: 100%;
+  }
+
   dl {
     --details-grid-numColumns: 1;
   }

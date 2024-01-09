@@ -2,7 +2,6 @@ import type { ElementType } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
-import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { useAccountBalance, useAccounts, useTokenConfigs, useStringGetter } from '@/hooks';
 
@@ -33,7 +32,7 @@ export const DYDXBalancePanel = () => {
   const { chainTokenLabel } = useTokenConfigs();
 
   return (
-    <Styled.Panel
+    <Panel
       slotHeader={
         <Styled.Header>
           <Styled.Title>
@@ -109,20 +108,11 @@ export const DYDXBalancePanel = () => {
           ]}
         />
       </Styled.Content>
-    </Styled.Panel>
+    </Panel>
   );
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Panel = styled(Panel)`
-  --panel-paddingX: 1.5rem;
-
-  @media ${breakpoints.tablet} {
-    --panel-paddingY: 1.5rem;
-    --panel-content-paddingY: 1rem;
-  }
-`;
 
 Styled.Header = styled.div`
   ${layoutMixins.spacedRow}

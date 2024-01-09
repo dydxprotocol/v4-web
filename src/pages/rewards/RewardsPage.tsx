@@ -1,15 +1,18 @@
 import styled, { AnyStyledComponent } from 'styled-components';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
+import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints, useStringGetter, useURLConfigs } from '@/hooks';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { BackButton } from '@/components/BackButton';
 import { Panel } from '@/components/Panel';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
@@ -20,12 +23,14 @@ import { openDialog } from '@/state/dialogs';
 import { DYDXBalancePanel } from './DYDXBalancePanel';
 import { MigratePanel } from './MigratePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
+import { RewardsHelpPanel } from './RewardsHelpPanel';
 
 const RewardsPage = () => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
   const { governanceLearnMore, stakingLearnMore } = useURLConfigs();
   const { isTablet, isNotTablet } = useBreakpoints();
+  const navigate = useNavigate();
 
   const panelArrow = (
     <Styled.Arrow>
@@ -39,13 +44,16 @@ const RewardsPage = () => {
 
   return (
     <Styled.Page>
-      {import.meta.env.VITE_V3_TOKEN_ADDRESS && <MigratePanel />}
+      {isTablet && (
+        <Styled.MobileHeader>
+          <BackButton onClick={() => navigate(AppRoute.Profile)} />
+          {stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
+        </Styled.MobileHeader>
+      )}
+      {import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && <MigratePanel />}
 
       {isTablet ? (
-        <>
-          <LaunchIncentivesPanel />
-          <DYDXBalancePanel />
-        </>
+        <LaunchIncentivesPanel />
       ) : (
         <Styled.PanelRowIncentivesAndBalance>
           <LaunchIncentivesPanel />
@@ -55,7 +63,9 @@ const RewardsPage = () => {
 
       <Styled.PanelRow>
         <Styled.Panel
-          slotHeader={<Styled.Title>{stringGetter({ key: STRING_KEYS.GOVERNANCE })}</Styled.Title>}
+          slotHeaderContent={
+            <Styled.Title>{stringGetter({ key: STRING_KEYS.GOVERNANCE })}</Styled.Title>
+          }
           slotRight={panelArrow}
           onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr }))}
         >
@@ -68,7 +78,9 @@ const RewardsPage = () => {
         </Styled.Panel>
 
         <Styled.Panel
-          slotHeader={<Styled.Title>{stringGetter({ key: STRING_KEYS.STAKING })}</Styled.Title>}
+          slotHeaderContent={
+            <Styled.Title>{stringGetter({ key: STRING_KEYS.STAKING })}</Styled.Title>
+          }
           slotRight={panelArrow}
           onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr }))}
         >
@@ -80,6 +92,8 @@ const RewardsPage = () => {
           </Styled.Description>
         </Styled.Panel>
       </Styled.PanelRow>
+
+      <RewardsHelpPanel />
     </Styled.Page>
   );
 };
@@ -95,33 +109,41 @@ Styled.Page = styled.div`
   align-items: center;
 
   > * {
-    --content-max-width: 70rem;
+    --content-max-width: 80rem;
     max-width: min(calc(100vw - 4rem), var(--content-max-width));
   }
 
   @media ${breakpoints.tablet} {
-    padding: 1.25rem;
+    --stickyArea-topHeight: var(--page-header-height-mobile);
+    padding: 0 1rem 1rem;
 
     > * {
-      max-width: calc(100vw - 2.5rem);
+      max-width: calc(100vw - 2rem);
       width: 100%;
     }
   }
 `;
 
-Styled.Panel = styled(Panel)`
-  --panel-paddingX: 1.5rem;
+Styled.MobileHeader = styled.header`
+  ${layoutMixins.contentSectionDetachedScrollable}
+  ${layoutMixins.stickyHeader}
+  z-index: 2;
+  padding: 1.25rem 0;
+  margin-bottom: -1.5rem;
 
-  @media ${breakpoints.tablet} {
-    --panel-paddingY: 1.5rem;
-    --panel-content-paddingY: 1rem;
-  }
+  font: var(--font-large-medium);
+  color: var(--color-text-2);
+  background-color: var(--color-layer-2);
+`;
+
+Styled.Panel = styled(Panel)`
+  height: fit-content;
 `;
 
 Styled.Title = styled.h3`
   font: var(--font-medium-book);
   color: var(--color-text-2);
-  padding: 1rem 1.5rem 0;
+  margin-bottom: -1rem;
 `;
 
 Styled.Description = styled.div`
