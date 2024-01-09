@@ -28,6 +28,7 @@ import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
+import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
@@ -82,6 +83,28 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   toastSensitivity: 'foreground',
                   renderCustomBody: ({ isToast, notification }) => (
                     <TradeNotification
+                      isToast={isToast}
+                      data={parsedData}
+                      notification={notification}
+                    />
+                  ),
+                },
+                [abacusNotif.updateTimeInMilliseconds, abacusNotif.data],
+                true
+              );
+              break;
+            }
+            case 'blockReward': {
+              trigger(
+                abacusNotif.id,
+                {
+                  icon: abacusNotif.image && <$Icon src={abacusNotif.image} alt="" />,
+                  title: stringGetter({ key: abacusNotif.title }),
+                  body: abacusNotif.text ? stringGetter({ key: abacusNotif.text, params }) : '',
+                  toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+                  toastSensitivity: 'foreground',
+                  renderCustomBody: ({ isToast, notification }) => (
+                    <BlockRewardNotification
                       isToast={isToast}
                       data={parsedData}
                       notification={notification}

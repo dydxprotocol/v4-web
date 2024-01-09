@@ -20,7 +20,7 @@ type StyleProps = {
 const MAX_TOASTS = 10;
 
 export const NotificationsToastArea = ({ className }: StyleProps) => {
-  const [shouldStackNotifications, setshouldStackNotifications] = useState(true);
+  const [shouldStackNotifications, setshouldStackNotifications] = useState(false);
 
   const {
     notifications,
