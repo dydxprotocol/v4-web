@@ -3,6 +3,8 @@ import styled, { keyframes, type AnyStyledComponent } from 'styled-components';
 import { Root, Item, Header, Trigger, Content } from '@radix-ui/react-accordion';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+import { breakpoints } from '@/styles';
+
 import { PlusIcon } from '@/icons';
 
 export type AccordionItem = {
@@ -10,7 +12,7 @@ export type AccordionItem = {
   content: React.ReactNode;
 };
 
-type AccordionProps = {
+export type AccordionProps = {
   items: AccordionItem[];
   className?: string;
 };
@@ -36,6 +38,13 @@ export const Accordion = ({ items, className }: AccordionProps) => (
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Root = styled(Root)`
+  --accordion-paddingY: 1rem;
+  --accordion-paddingX: 1rem;
+
+  @media ${breakpoints.notTablet} {
+    --accordion-paddingX: 1.5rem;
+  }
+
   > *:not(:last-child) {
     border-bottom: var(--border-width) solid var(--border-color);
   }
@@ -67,7 +76,8 @@ Styled.Icon = styled.div`
 Styled.Trigger = styled(Trigger)`
   ${layoutMixins.spacedRow}
   width: 100%;
-  padding: 1rem 0.75rem;
+  padding: var(--accordion-paddingY) var(--accordion-paddingX);
+  gap: 0.5rem;
 
   color: var(--color-text-1);
   text-align: start;
@@ -91,7 +101,7 @@ Styled.Trigger = styled(Trigger)`
 
 Styled.Content = styled(Content)`
   overflow: hidden;
-  margin: 0 0.75rem 1rem;
+  margin: 0 var(--accordion-paddingX) var(--accordion-paddingY);
 
   color: var(--color-text-0);
 

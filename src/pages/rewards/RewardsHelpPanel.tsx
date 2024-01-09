@@ -1,5 +1,6 @@
 import styled, { AnyStyledComponent } from 'styled-components';
 
+import { breakpoints } from '@/styles';
 import { STRING_KEYS } from '@/constants/localization';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { useStringGetter } from '@/hooks';
@@ -51,6 +52,7 @@ export const RewardsHelpPanel = () => {
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.HelpCard = styled(Panel)`
+  --panel-content-paddingX: 0;
   --panel-content-paddingY: 0;
   width: 100%;
   height: max-content;
@@ -64,10 +66,14 @@ Styled.Header = styled.div`
   ${layoutMixins.spacedRow}
   gap: 1ch;
 
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1rem;
   border-bottom: var(--border-width) solid var(--border-color);
 
   font: var(--font-small-book);
+
+  @media ${breakpoints.notTablet} {
+    padding: 1.5rem 1.25rem;
+  }
 
   h3 {
     font: var(--font-medium-book);
