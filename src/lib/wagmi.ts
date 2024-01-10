@@ -1,4 +1,4 @@
-import { createConfig, configureChains, mainnet, Chain, Connector, usePublicClient } from 'wagmi';
+import { createConfig, configureChains, mainnet, Chain } from 'wagmi';
 import { goerli } from 'wagmi/chains';
 
 import {
@@ -28,6 +28,7 @@ import {
   celoAlfajores,
   scroll,
   kava,
+  sepolia,
 } from 'viem/chains';
 
 import { alchemyProvider } from 'wagmi/providers/alchemy';
@@ -55,7 +56,7 @@ import { isTruthy } from './isTruthy';
 export const WAGMI_SUPPORTED_CHAINS: Chain[] = [
   mainnet,
   goerli,
-
+  sepolia,
   arbitrum,
   arbitrumGoerli,
   avalanche,
