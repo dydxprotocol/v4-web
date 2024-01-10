@@ -59,6 +59,8 @@ export const Colors = {
     green: 'hsl(159, 67%, 39%)',
     yellow: 'hsl(36, 100%, 64%)',
     red: 'hsl(360, 73%, 61%)',
+    fadedGreen: 'hsl(158, 49%, 48%, 0.16)',
+    fadedRed: 'hsl(0, 100%, 66%, 0.2)',
 
     positive: 'hsl(159, 67%, 39%)',
     negative: 'hsl(360, 73%, 61%)',
@@ -79,6 +81,8 @@ export const Colors = {
     green: 'hsl(159, 67%, 39%)',
     yellow: 'hsl(36, 100%, 64%)',
     red: 'hsl(360, 73%, 61%)',
+    fadedGreen: 'hsl(158, 49%, 48%, 0.16)',
+    fadedRed: 'hsl(0, 100%, 66%, 0.2)',
 
     positive: 'hsl(159, 67%, 39%)',
     negative: 'hsl(360, 73%, 61%)',
@@ -102,6 +106,8 @@ export const Colors = {
 
     positive: 'hsl(159, 67%, 39%)',
     negative: 'hsl(360, 73%, 61%)',
+    fadedGreen: 'hsl(158, 49%, 48%, 0.16)',
+    fadedRed: 'hsl(0, 100%, 66%, 0.2)',
 
     success: 'hsl(159, 67%, 39%)',
     warning: 'hsl(36, 100%, 64%)',

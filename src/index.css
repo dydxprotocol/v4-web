@@ -9,6 +9,7 @@
   background-color: var(--color-layer-2);
   user-select: none;
   overflow: hidden;
+  --border: var(--default-border-width) solid var(--color-border);
 }
 
 body,
@@ -54,7 +55,7 @@ button:disabled {
   cursor: pointer;
 }
 
-:focus-visible{
+:focus-visible {
   outline: var(--color-accent) 1px solid;
   outline-offset: -1px;
   /* outline-offset: -2px; */
