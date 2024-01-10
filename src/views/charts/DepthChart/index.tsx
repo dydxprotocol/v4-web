@@ -45,7 +45,7 @@ import { DepthChartTooltipContent } from './Tooltip';
 // @ts-ignore
 const theme = buildChartTheme({
   ...darkTheme,
-  colors: ['var(--color-positive)', 'var(--color-negative)', 'var(--color-text-1)'], // categorical colors, mapped to series via `dataKey`s
+  colors: ['var(--color-positive)', 'var(--color-negative)', 'var(--color-layer-6)'], // categorical colors, mapped to series via `dataKey`s
 });
 
 const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n));

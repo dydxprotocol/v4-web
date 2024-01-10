@@ -31,7 +31,7 @@ export const FundingChartTooltipContent = ({
         {
           [FundingDirection.ToLong]: 'var(--color-negative)',
           [FundingDirection.ToShort]: 'var(--color-positive)',
-          [FundingDirection.None]: 'var(--color-text-1)',
+          [FundingDirection.None]: 'var(--color-layer-6)',
         }[tooltipDatum.direction]
       }
     >
