@@ -40,7 +40,7 @@ import { OutputType } from '@/components/Output';
 
 import { MustBigNumber } from '@/lib/numbers';
 
-import { DepthChartTooltipContent } from './DepthChart/Tooltip';
+import { DepthChartTooltipContent } from './Tooltip';
 
 // @ts-ignore
 const theme = buildChartTheme({

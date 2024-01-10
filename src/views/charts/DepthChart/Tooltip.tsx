@@ -29,7 +29,7 @@ type DepthChartTooltipProps = {
   tickSizeDecimals: Nullable<number>;
 } & Pick<RenderTooltipParams<DepthChartDatum>, 'colorScale' | 'tooltipData'>;
 
-export const DepthChartTooltip = ({
+export const DepthChartTooltipContent = ({
   chartPointAtPointer,
   colorScale,
   isEditingOrder,

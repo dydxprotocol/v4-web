@@ -3,39 +3,27 @@ import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent, css } from 'styled-components';
 import { curveMonotoneX, curveStepAfter } from '@visx/curve';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
 import { ButtonSize } from '@/constants/buttons';
+import { FundingRateResolution, type FundingChartDatum } from '@/constants/charts';
 import { STRING_KEYS } from '@/constants/localization';
-import { SMALL_PERCENT_DECIMALS, TINY_PERCENT_DECIMALS } from '@/constants/numbers';
 import { FundingDirection } from '@/constants/markets';
+import { SMALL_PERCENT_DECIMALS, TINY_PERCENT_DECIMALS } from '@/constants/numbers';
+import { useBreakpoints, useStringGetter } from '@/hooks';
 
 import { breakpoints } from '@/styles';
 
-import { Details, DetailsItem } from '@/components/Details';
-import { Output, OutputType, ShowSign } from '@/components/Output';
+import { Output, OutputType } from '@/components/Output';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 import { AxisLabelOutput } from '@/components/visx/AxisLabelOutput';
-import { TooltipContent } from '@/components/visx/TooltipContent';
 import type { TooltipContextType } from '@visx/xychart';
 
 import { calculateFundingRateHistory } from '@/state/perpetualsCalculators';
 
 import { MustBigNumber } from '@/lib/numbers';
-
-enum FundingRateResolution {
-  OneHour = 'OneHour',
-  EightHour = 'EightHour',
-  Annualized = 'Annualized',
-}
-
-type FundingChartDatum = {
-  time: number;
-  fundingRate: number;
-  direction: FundingDirection;
-};
+import { FundingChartTooltipContent } from './Tooltip';
 
 const FUNDING_RATE_TIME_RESOLUTION = 60 * 60 * 1000; // 1 hour
 
@@ -116,114 +104,20 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
               {
                 [FundingDirection.ToLong]: 'var(--color-negative)',
                 [FundingDirection.ToShort]: 'var(--color-positive)',
+                [FundingDirection.None]: 'var(--color-text-1)',
               }[tooltipDatum.direction]
             }
           />
         );
       }}
-      renderTooltip={({ tooltipData }) => {
-        const { nearestDatum } = tooltipData || {};
-
-        const tooltipDatum = nearestDatum?.datum ?? latestDatum;
-        const isShowingCurrentFundingRate = tooltipDatum === latestDatum;
-
-        return (
-          <TooltipContent
-            accentColor={
-              {
-                [FundingDirection.ToLong]: 'var(--color-negative)',
-                [FundingDirection.ToShort]: 'var(--color-positive)',
-              }[tooltipDatum.direction]
-            }
-          >
-            <h4>
-              {isShowingCurrentFundingRate
-                ? stringGetter({ key: STRING_KEYS.CURRENT_FUNDING_RATE })
-                : stringGetter({ key: STRING_KEYS.HISTORICAL_FUNDING_RATE })}
-            </h4>
-
-            <Details
-              layout="column"
-              items={
-                [
-                  {
-                    key: 'direction',
-                    label: stringGetter({ key: STRING_KEYS.DIRECTION }),
-                    value: (
-                      <Output
-                        type={OutputType.Text}
-                        value={
-                          {
-                            [FundingDirection.ToLong]: `${stringGetter({
-                              key: STRING_KEYS.SHORT_POSITION_SHORT,
-                            })} → ${stringGetter({
-                              key: STRING_KEYS.LONG_POSITION_SHORT,
-                            })}`,
-                            [FundingDirection.ToShort]: `${stringGetter({
-                              key: STRING_KEYS.LONG_POSITION_SHORT,
-                            })} → ${stringGetter({
-                              key: STRING_KEYS.SHORT_POSITION_SHORT,
-                            })}`,
-                          }[tooltipDatum.direction]
-                        }
-                      />
-                    ),
-                  },
-                  {
-                    key: 'fundingRate1h',
-                    label: stringGetter({ key: STRING_KEYS.RATE_1H }),
-                    value: (
-                      <Output
-                        type={OutputType.SmallPercent}
-                        value={tooltipDatum.fundingRate}
-                        showSign={ShowSign.Both}
-                      />
-                    ),
-                  },
-                  {
-                    key: 'fundingRate8h',
-                    label: stringGetter({ key: STRING_KEYS.RATE_8H }),
-                    value: (
-                      <Output
-                        type={OutputType.SmallPercent}
-                        value={tooltipDatum.fundingRate * 8}
-                        // value={
-                        //   Math.sign(tooltipDatum.fundingRate) *
-                        //   ((Math.abs(tooltipDatum.fundingRate) + 1) ** 8 - 1)
-                        // }
-                        showSign={ShowSign.Both}
-                      />
-                    ),
-                  },
-                  {
-                    key: 'fundingRateAnnualized',
-                    label: stringGetter({ key: STRING_KEYS.ANNUALIZED }),
-                    value: (
-                      <Output
-                        type={OutputType.SmallPercent}
-                        value={tooltipDatum.fundingRate * (24 * 365)}
-                        // value={
-                        //   Math.sign(tooltipDatum.fundingRate) *
-                        //   ((Math.abs(tooltipDatum.fundingRate) + 1) ** (24 * 365) - 1)
-                        // }
-                        showSign={ShowSign.Both}
-                      />
-                    ),
-                  },
-                  {
-                    key: 'time',
-                    label: isShowingCurrentFundingRate
-                      ? 'Time Remaining'
-                      : stringGetter({ key: STRING_KEYS.TIME }),
-                    value: <Output type={OutputType.DateTime} value={tooltipDatum.time} />,
-                  },
-                ].filter(Boolean) as Array<DetailsItem>
-              }
-            />
-          </TooltipContent>
-        );
-      }}
-      onTooltipContext={setTooltipContext}
+      renderTooltip={({ tooltipData }) => (
+        <FundingChartTooltipContent
+          fundingRateView={fundingRateView}
+          tooltipData={tooltipData}
+          latestDatum={latestDatum}
+        />
+      )}
+      onTooltipContext={(tooltipContext) => setTooltipContext(tooltipContext)}
       minZoomDomain={FUNDING_RATE_TIME_RESOLUTION * 4}
       numGridLines={1}
       slotEmpty={<LoadingSpace id="funding-chart-loading" />}
@@ -290,6 +184,7 @@ Styled.FundingRateToggle = styled.div`
 Styled.CurrentFundingRate = styled.div<{ isShowing?: boolean }>`
   place-self: start center;
   padding: clamp(1.5rem, 9rem - 15%, 4rem);
+  pointer-events: none;
 
   font: var(--font-large-book);
 
