@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { RenderTooltipParams } from '@visx/xychart/lib/components/Tooltip';
 import { shallowEqual, useSelector } from 'react-redux';
@@ -12,15 +13,15 @@ import {
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks';
+import { useOrderbookValuesForDepthChart } from '@/hooks/useOrderbookValues';
 
 import { TooltipContent } from '@/components/visx/TooltipContent';
 import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
 
-import { MustBigNumber } from '@/lib/numbers';
-import { useOrderbookValuesForDepthChart } from '@/hooks/useOrderbookValues';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-import { useMemo } from 'react';
+
+import { MustBigNumber } from '@/lib/numbers';
 
 type DepthChartTooltipProps = {
   chartPointAtPointer: DepthChartPoint;
@@ -72,12 +73,12 @@ export const DepthChartTooltipContent = ({
     >
       <h4>
         {isEditingOrder
-          ? 'Release mouse to edit order'
+          ? stringGetter({ key: STRING_KEYS.RELEASE_TO_EDIT })
           : nearestDatum &&
             {
-              [DepthChartSeries.Bids]: 'Bids',
-              [DepthChartSeries.Asks]: 'Asks',
-              [DepthChartSeries.MidMarket]: 'Mid-Market',
+              [DepthChartSeries.Bids]: stringGetter({ key: STRING_KEYS.BIDS }),
+              [DepthChartSeries.Asks]: stringGetter({ key: STRING_KEYS.ASKS }),
+              [DepthChartSeries.MidMarket]: stringGetter({ key: STRING_KEYS.MID_MARKET }),
             }[nearestDatum.key]}
       </h4>
 
@@ -134,7 +135,6 @@ export const DepthChartTooltipContent = ({
             ? [
                 {
                   key: 'midMarketPrice',
-                  // label: stringGetter({ key: STRING_KEYS.ORDERBOOK_MID_MARKET_PRICE }),
                   label: stringGetter({ key: STRING_KEYS.PRICE }),
                   value: (
                     <Output type={OutputType.Fiat} value={midMarketPrice} useGrouping={false} />
