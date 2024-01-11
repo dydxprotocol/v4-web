@@ -25,4 +25,5 @@ export const DEFAULT_MARKETID = 'ETH-USD';
 export enum FundingDirection {
   ToShort = 'ToShort',
   ToLong = 'ToLong',
+  None = 'None',
 }

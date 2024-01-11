@@ -26,7 +26,12 @@ export const calculateFundingRateHistory = createSelector(
     return data.map(({ effectiveAtMilliseconds, rate }) => ({
       time: effectiveAtMilliseconds,
       fundingRate: rate,
-      direction: rate < 0 ? FundingDirection.ToLong : FundingDirection.ToShort,
+      direction:
+        rate === 0
+          ? FundingDirection.None
+          : rate < 0
+          ? FundingDirection.ToLong
+          : FundingDirection.ToShort,
     }));
   }
 );
