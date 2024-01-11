@@ -142,7 +142,7 @@ const historicalPnlPeriod = [...HistoricalPnlPeriod.values()] as const;
 export type HistoricalPnlPeriods = (typeof historicalPnlPeriod)[number];
 
 // ------ Transfer Items ------ //
-export const TransferInputField = Abacus.exchange.dydx.abacus.state.modal.TransferInputField;
+export const TransferInputField = Abacus.exchange.dydx.abacus.state.model.TransferInputField;
 const transferInputFields = [...TransferInputField.values()] as const;
 export type TransferInputFields = (typeof transferInputFields)[number];
 
@@ -151,7 +151,7 @@ const transferTypes = [...TransferType.values()] as const;
 export type TransferTypes = (typeof transferTypes)[number];
 
 // ------ Trade Items ------ //
-export const TradeInputField = Abacus.exchange.dydx.abacus.state.modal.TradeInputField;
+export const TradeInputField = Abacus.exchange.dydx.abacus.state.model.TradeInputField;
 const tradeInputFields = [...TradeInputField.values()] as const;
 export type TradeInputFields = (typeof tradeInputFields)[number];
 
@@ -162,7 +162,7 @@ export type TradeState<T> = {
 };
 
 export const ClosePositionInputField =
-  Abacus.exchange.dydx.abacus.state.modal.ClosePositionInputField;
+  Abacus.exchange.dydx.abacus.state.model.ClosePositionInputField;
 
 const closePositionInputFields = [...ClosePositionInputField.values()] as const;
 export type ClosePositionInputFields = (typeof closePositionInputFields)[number];

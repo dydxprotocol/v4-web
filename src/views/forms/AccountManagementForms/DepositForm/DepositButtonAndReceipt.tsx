@@ -108,20 +108,6 @@ export const DepositButtonAndReceipt = ({
 
   const totalFees = (summary?.bridgeFee || 0) + (summary?.gasFee || 0);
 
-  const { toAmount, toAmountMin } = useMemo(() => {
-    if (isCctp) {
-      return {
-        toAmount: summary?.toAmount,
-        toAmountMin: summary?.toAmountMin,
-      };
-    } else {
-      return {
-        toAmount: summary?.toAmount && formatUnits(BigInt(summary.toAmount), usdcDecimals),
-        toAmountMin: summary?.toAmountMin && formatUnits(BigInt(summary.toAmountMin), usdcDecimals),
-      };
-    }
-  }, [isCctp, summary]);
-
   const submitButtonReceipt = [
     {
       key: 'expected-deposit-amount',
@@ -130,7 +116,7 @@ export const DepositButtonAndReceipt = ({
           {stringGetter({ key: STRING_KEYS.EXPECTED_DEPOSIT_AMOUNT })} <Tag>{usdcLabel}</Tag>
         </span>
       ),
-      value: <Output type={OutputType.Fiat} fractionDigits={TOKEN_DECIMALS} value={toAmount} />,
+      value: <Output type={OutputType.Fiat} fractionDigits={TOKEN_DECIMALS} value={summary?.toAmount} />,
       subitems: [
         {
           key: 'minimum-deposit-amount',
@@ -140,7 +126,7 @@ export const DepositButtonAndReceipt = ({
             </span>
           ),
           value: (
-            <Output type={OutputType.Fiat} fractionDigits={TOKEN_DECIMALS} value={toAmountMin} />
+            <Output type={OutputType.Fiat} fractionDigits={TOKEN_DECIMALS} value={summary?.toAmountMin} />
           ),
           tooltip: 'minimum-deposit-amount',
         },
