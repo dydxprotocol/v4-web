@@ -34,7 +34,6 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
       }}
       items={[
         {
-          // content: <Orderbook histogramSide={HISTOGRAM_SIDES_BY_LAYOUT[tradeLayout]} />,
           asChild: true,
           content: <CanvasOrderbook histogramSide={HISTOGRAM_SIDES_BY_LAYOUT[tradeLayout]} />,
           label: stringGetter({ key: STRING_KEYS.ORDERBOOK_SHORT }),

@@ -51,6 +51,7 @@ export const CanvasOrderbook = forwardRef(
       useCalculateOrderbookData({
         maxRowsPerSide,
       });
+
     const stringGetter = useStringGetter();
     const currentMarket = useSelector(getCurrentMarketId) ?? '';
     const currentMarketConfig = useSelector(getCurrentMarketConfig, shallowEqual);

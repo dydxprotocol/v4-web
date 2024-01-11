@@ -262,8 +262,7 @@ export const useDrawOrderbook = ({
     animationType?: OrderbookRowAnimationType;
   }) => {
     if (!rowToRender) return;
-    const { price, size, depth } = rowToRender;
-    const mine = undefined;
+    const { depth, mine, price, size } = rowToRender;
     const histogramAccentColor = side === 'bid' ? color.fadedGreen : color.fadedRed;
 
     // Depth Bar
