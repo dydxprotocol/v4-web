@@ -19,7 +19,6 @@ export { default as CoinMarketCapIcon } from './logos/coinmarketcap.svg';
 export { default as CoinsIcon } from './coins.svg';
 export { default as CommentIcon } from './comment.svg';
 export { default as CopyIcon } from './copy.svg';
-export { default as CubeIcon } from './cube.svg';
 export { default as DepositIcon } from './deposit.svg';
 export { default as DepthChartIcon } from './depth-chart.svg';
 export { default as DiscordIcon } from './discord.svg';

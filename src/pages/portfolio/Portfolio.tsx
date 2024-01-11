@@ -118,7 +118,7 @@ export default () => {
                     },
                     {
                       value: PortfolioRoute.Positions,
-                      slotBefore: <Styled.Icon iconName={IconName.Cube} />,
+                      slotBefore: <Styled.Icon iconName={IconName.Positions} />,
                       label: stringGetter({ key: STRING_KEYS.POSITIONS }),
                       href: PortfolioRoute.Positions,
                     },
