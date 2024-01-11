@@ -13,7 +13,7 @@ import {
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks';
-import { useOrderbookValuesForDepthChart } from '@/hooks/useOrderbookValues';
+import { useOrderbookValuesForDepthChart } from '@/hooks/Orderbook/useOrderbookValues';
 
 import { TooltipContent } from '@/components/visx/TooltipContent';
 import { Details } from '@/components/Details';
