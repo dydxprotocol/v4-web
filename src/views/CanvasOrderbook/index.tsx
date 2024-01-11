@@ -52,11 +52,9 @@ export const CanvasOrderbook = forwardRef(
         maxRowsPerSide,
       });
     const stringGetter = useStringGetter();
-    const currentMarket = useSelector(getCurrentMarketId);
+    const currentMarket = useSelector(getCurrentMarketId) ?? '';
     const currentMarketConfig = useSelector(getCurrentMarketConfig, shallowEqual);
-    const assetData = useSelector(getCurrentMarketAssetData, shallowEqual);
-    const asset = assetData?.id ?? '';
-    const ticker = currentMarket ?? '';
+    const { id = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
 
     const { tickSizeDecimals = 2 } = currentMarketConfig ?? {};
 
@@ -71,7 +69,6 @@ export const CanvasOrderbook = forwardRef(
           : [];
       asksSlice = [...emptyAskRows, ...asks.reverse()];
 
-      const bidsCumulativeDepth = bids?.[0]?.depth ?? 0;
       let bidsSlice: Array<PerpetualMarketOrderbookLevel | undefined> = [];
       const emptyBidRows =
         bids.length < maxRowsPerSide
@@ -86,7 +83,7 @@ export const CanvasOrderbook = forwardRef(
     }, [asks, bids]);
 
     const orderbookRef = useRef<HTMLDivElement>(null);
-    useCenterOrderbook({ orderbookRef, marketId: ticker });
+    useCenterOrderbook({ orderbookRef, marketId: currentMarket });
 
     /**
      * Display top or bottom spreadRow when center spreadRow is off screen
@@ -132,13 +129,14 @@ export const CanvasOrderbook = forwardRef(
         <Styled.OrderbookContent $isLoading={!hasOrderbook}>
           <Styled.Header>
             <span>
-              {stringGetter({ key: STRING_KEYS.SIZE })} {asset && <Tag>{asset}</Tag>}
+              {stringGetter({ key: STRING_KEYS.SIZE })} {id && <Tag>{id}</Tag>}
             </span>
             <span>
               {stringGetter({ key: STRING_KEYS.PRICE })} <Tag>USD</Tag>
             </span>
             <span>{stringGetter({ key: STRING_KEYS.MINE })}</span>
           </Styled.Header>
+
           {displaySide === 'top' && (
             <Styled.SpreadRow
               side="top"
@@ -147,6 +145,7 @@ export const CanvasOrderbook = forwardRef(
               tickSizeDecimals={tickSizeDecimals}
             />
           )}
+
           <Styled.OrderbookWrapper ref={orderbookRef}>
             {!hasOrderbook ? (
               <LoadingSpace id="canvas-orderbook" />

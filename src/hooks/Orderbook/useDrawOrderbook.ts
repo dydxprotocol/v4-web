@@ -6,7 +6,7 @@ import { SMALL_USD_DECIMALS, TOKEN_DECIMALS } from '@/constants/numbers';
 
 import { ROW_HEIGHT, ROW_PADDING_RIGHT } from '@/views/CanvasOrderbook/OrderbookRow';
 
-import { getCurrentMarketConfig, getCurrentMarketOrderbook } from '@/state/perpetualsSelectors';
+import { getCurrentMarketConfig, getCurrentMarketOrderbookMap } from '@/state/perpetualsSelectors';
 import { getAppTheme } from '@/state/configsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -47,7 +47,7 @@ export const useDrawOrderbook = ({
 }: ElementProps & StyleProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvas = canvasRef.current;
-  const currentOrderbook = useSelector(getCurrentMarketOrderbook, shallowEqual);
+  const currentOrderbookMap = useSelector(getCurrentMarketOrderbookMap, shallowEqual);
   const { stepSizeDecimals = 2, tickSizeDecimals = 2 } =
     useSelector(getCurrentMarketConfig, shallowEqual) || {};
   const prevData = useRef<typeof data>(data);
@@ -146,9 +146,7 @@ export const useDrawOrderbook = ({
 
     try {
       linearGradient = ctx.createLinearGradient(gradient.x1, y1, gradient.x2, y2);
-
       linearGradient.addColorStop(0, histogramAccentColor);
-      // linearGradient.addColorStop(0.7, );
       linearGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = linearGradient;
     } catch (err) {
@@ -308,11 +306,13 @@ export const useDrawOrderbook = ({
     const ctx = canvas?.getContext('2d');
 
     if (!canvas || !ctx) return;
+
     // Clear canvas before redraw
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     // Animate row removal and update
-    //  const mapOfOrderbookPriceLevels = currentOrderbook?.[side];
+    const mapOfOrderbookPriceLevels =
+      side && currentOrderbookMap?.[side === 'ask' ? 'asks' : 'bids'];
     const empty: number[] = [];
     const removed: number[] = [];
     const updated: number[] = [];
@@ -322,38 +322,31 @@ export const useDrawOrderbook = ({
         empty.push(idx);
         return;
       }
-      updated.push(idx);
-      drawOrderbookRow({
-        ctx,
-        idx,
-        rowToRender: row,
-        animationType: OrderbookRowAnimationType.NONE,
-      });
 
-      // if (mapOfOrderbookPriceLevels?.[row.price]?.size === '0') {
-      //   removed.push(idx);
-      //   drawOrderbookRow({
-      //     ctx,
-      //     idx,
-      //     rowToRender: row,
-      //     animationType: OrderbookRowAnimationType.REMOVE,
-      //   });
-      // } else if (mapOfOrderbookPriceLevels?.[row.price]?.size === row?.size) {
-      //   drawOrderbookRow({
-      //     ctx,
-      //     idx,
-      //     rowToRender: data[idx],
-      //     animationType: OrderbookRowAnimationType.NONE,
-      //   });
-      // } else {
-      //   updated.push(idx);
-      //   drawOrderbookRow({
-      //     ctx,
-      //     idx,
-      //     rowToRender: row,
-      //     animationType: OrderbookRowAnimationType.NEW,
-      //   });
-      // }
+      if (mapOfOrderbookPriceLevels?.[row.price] === 0) {
+        removed.push(idx);
+        drawOrderbookRow({
+          ctx,
+          idx,
+          rowToRender: row,
+          animationType: OrderbookRowAnimationType.REMOVE,
+        });
+      } else if (mapOfOrderbookPriceLevels?.[row.price] === row?.size) {
+        drawOrderbookRow({
+          ctx,
+          idx,
+          rowToRender: data[idx],
+          animationType: OrderbookRowAnimationType.NONE,
+        });
+      } else {
+        updated.push(idx);
+        drawOrderbookRow({
+          ctx,
+          idx,
+          rowToRender: row,
+          animationType: OrderbookRowAnimationType.NEW,
+        });
+      }
     });
 
     setTimeout(() => {
@@ -387,6 +380,7 @@ export const useDrawOrderbook = ({
     histogramSide,
     side,
     theme,
+    currentOrderbookMap,
   ]);
 
   return { canvasRef };
