@@ -17,9 +17,10 @@ import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { NavigationMenu } from '@/components/NavigationMenu';
+import { Tag, TagType } from '@/components/Tag';
 import { WithSidebar } from '@/components/WithSidebar';
 
-import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
+import { getExistingOpenPositions, getOnboardingState, getSubaccount, getSubaccountUnclearedOrders } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { PortfolioNavMobile } from './PortfolioNavMobile';
@@ -41,6 +42,9 @@ export default () => {
   const onboardingState = useSelector(getOnboardingState);
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
   const { nativeTokenBalance } = useAccountBalance();
+
+  const numPositions = useSelector(getExistingOpenPositions)?.length || 0;
+  const numOrders = useSelector(getSubaccountUnclearedOrders)?.length || 0;
 
   const usdcBalance = freeCollateral?.current || 0;
 
@@ -119,13 +123,27 @@ export default () => {
                     {
                       value: PortfolioRoute.Positions,
                       slotBefore: <Styled.Icon iconName={IconName.Positions} />,
-                      label: stringGetter({ key: STRING_KEYS.POSITIONS }),
+                      label: (
+                        <>
+                          {stringGetter({ key: STRING_KEYS.POSITIONS })}
+                          {numPositions > 0 && (
+                            <Tag type={TagType.Number}> {numPositions} </Tag>
+                          )}
+                        </>
+                      ),
                       href: PortfolioRoute.Positions,
                     },
                     {
                       value: PortfolioRoute.Orders,
                       slotBefore: <Styled.Icon iconName={IconName.OrderPending} />,
-                      label: stringGetter({ key: STRING_KEYS.ORDERS }),
+                      label: (
+                        <>
+                          {stringGetter({ key: STRING_KEYS.ORDERS })}
+                          {numOrders > 0 && (
+                            <Tag type={TagType.Number}> {numOrders} </Tag>
+                          )}
+                        </>
+                      ),
                       href: PortfolioRoute.Orders,
                     },
                     {
