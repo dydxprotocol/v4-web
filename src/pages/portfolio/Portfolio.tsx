@@ -20,7 +20,7 @@ import { NavigationMenu } from '@/components/NavigationMenu';
 import { Tag, TagType } from '@/components/Tag';
 import { WithSidebar } from '@/components/WithSidebar';
 
-import { getExistingOpenPositions, getOnboardingState, getSubaccount, getSubaccountUnclearedOrders } from '@/state/accountSelectors';
+import { getNumExistingOpenPositions, getNumSubaccountUnclearedOrders, getOnboardingState, getSubaccount } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { PortfolioNavMobile } from './PortfolioNavMobile';
@@ -43,8 +43,8 @@ export default () => {
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
   const { nativeTokenBalance } = useAccountBalance();
 
-  const numPositions = useSelector(getExistingOpenPositions)?.length || 0;
-  const numOrders = useSelector(getSubaccountUnclearedOrders)?.length || 0;
+  const numPositions = useSelector(getNumExistingOpenPositions);
+  const numOrders = useSelector(getNumSubaccountUnclearedOrders);
 
   const usdcBalance = freeCollateral?.current || 0;
 

@@ -61,6 +61,15 @@ export const getExistingOpenPositions = createSelector([getOpenPositions], (allO
 
 /**
  * @param state
+ * @returns total number of open positions in a subaccount, excluding the ones in draft, i.e. with NONE position side.
+ */
+export const getNumExistingOpenPositions = createSelector(
+  [getExistingOpenPositions],
+  (positions) => positions?.length || 0
+);
+
+/**
+ * @param state
  * @returns AccountPositions of the current market
  */
 export const getCurrentMarketPositionData = (state: RootState) => {
@@ -97,6 +106,15 @@ export const getSubaccountClearedOrderIds = (state: RootState) => state.account.
 export const getSubaccountUnclearedOrders = createSelector(
   [getSubaccountOrders, getSubaccountClearedOrderIds],
   (orders, clearedOrderIds) => orders?.filter((order) => !clearedOrderIds?.includes(order.id))
+);
+
+/**
+ * @param state
+ * @returns total number of orders that user has not cleared and should be displayed
+ */
+export const getNumSubaccountUnclearedOrders = createSelector(
+  [getSubaccountUnclearedOrders],
+  (orders) => orders?.length || 0
 );
 
 /**
