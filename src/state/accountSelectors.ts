@@ -2,6 +2,7 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { createSelector } from 'reselect';
 
 import {
+  type AbacusOrderStatuses,
   type SubaccountOrder,
   type SubaccountFill,
   type SubaccountFundingPayment,
@@ -43,7 +44,6 @@ export const getSubaccountBuyingPower = (state: RootState) => state.account.suba
 export const getSubaccountEquity = (state: RootState) => state.account.subaccount?.equity;
 
 export const getSubaccountHistoricalPnl = (state: RootState) => state.account?.historicalPnl;
-
 /**
  * @param state
  * @returns list of a subaccount's open positions. Each item in the list is an open position in a different market.
@@ -57,15 +57,6 @@ export const getOpenPositions = (state: RootState) =>
  */
 export const getExistingOpenPositions = createSelector([getOpenPositions], (allOpenPositions) =>
   allOpenPositions?.filter((position) => position.side.current !== AbacusPositionSide.NONE)
-);
-
-/**
- * @param state
- * @returns total number of open positions in a subaccount, excluding the ones in draft, i.e. with NONE position side.
- */
-export const getNumExistingOpenPositions = createSelector(
-  [getExistingOpenPositions],
-  (positions) => positions?.length || 0
 );
 
 /**
@@ -106,15 +97,6 @@ export const getSubaccountClearedOrderIds = (state: RootState) => state.account.
 export const getSubaccountUnclearedOrders = createSelector(
   [getSubaccountOrders, getSubaccountClearedOrderIds],
   (orders, clearedOrderIds) => orders?.filter((order) => !clearedOrderIds?.includes(order.id))
-);
-
-/**
- * @param state
- * @returns total number of orders that user has not cleared and should be displayed
- */
-export const getNumSubaccountUnclearedOrders = createSelector(
-  [getSubaccountUnclearedOrders],
-  (orders) => orders?.length || 0
 );
 
 /**
@@ -278,14 +260,21 @@ export const getCurrentMarketFundingPayments = createSelector(
 
 /**
  * @param state
+ * @returns boolean on whether an order status is considered open
+ */
+const isOpenOrderStatus = (status: AbacusOrderStatuses) => {
+  return status !== AbacusOrderStatus.filled && status !== AbacusOrderStatus.cancelled;
+};
+
+/**
+ * @param state
  * @returns Total numbers of the subaccount's open positions, open orders and fills
  */
 export const getTradeInfoNumbers = createSelector(
   [getExistingOpenPositions, getSubaccountOrders, getSubaccountFills, getSubaccountFundingPayments],
   (positions, orders, fills, fundingPayments) => ({
     numTotalPositions: positions?.length,
-    numTotalOpenOrders: orders?.filter((order) => order.status !== AbacusOrderStatus.cancelled)
-      .length,
+    numTotalOpenOrders: orders?.filter((order) => isOpenOrderStatus(order.status)).length,
     numTotalFills: fills?.length,
     numTotalFundingPayments: fundingPayments?.length,
   })
@@ -299,8 +288,7 @@ export const getCurrentMarketTradeInfoNumbers = createSelector(
   [getCurrentMarketOrders, getCurrentMarketFills, getCurrentMarketFundingPayments],
   (marketOrders, marketFills, marketFundingPayments) => {
     return {
-      numOpenOrders: marketOrders?.filter((order) => order.status !== AbacusOrderStatus.cancelled)
-        .length,
+      numOpenOrders: marketOrders?.filter((order) => isOpenOrderStatus(order.status)).length,
       numFills: marketFills?.length,
       numFundingPayments: marketFundingPayments?.length,
     };
