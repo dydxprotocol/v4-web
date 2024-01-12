@@ -1,10 +1,8 @@
 import { createSelector } from 'reselect';
 
-import { SubaccountPosition } from '@/constants/abacus';
 import { OnboardingState, OnboardingSteps } from '@/constants/account';
 
 import {
-  getExistingOpenPositions,
   getOnboardingGuards,
   getOnboardingState,
   getSubaccountId,
@@ -60,13 +58,8 @@ export const calculateIsAccountViewOnly = createSelector(
 );
 
 /**
- * @description calculate whether the subaccount has open positions
+ * @description calculate whether the subaccount has uncommitted positions
  */
-export const calculateHasOpenPositions = createSelector(
-  [getExistingOpenPositions],
-  (openPositions?: SubaccountPosition[]) => (openPositions?.length || 0) > 0
-);
-
 export const calculateHasUncommittedOrders = createSelector(
   [getUncommittedOrderClientIds],
   (uncommittedOrderClientIds: number[]) => uncommittedOrderClientIds.length > 0
