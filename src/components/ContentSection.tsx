@@ -11,6 +11,5 @@ export const DetachedScrollableSection = styled.section`
 
 export const AttachedExpandingSection = styled.section`
   ${layoutMixins.contentSectionAttached}
-  ${layoutMixins.expandingColumnWithHeader}
   gap: var(--border-width);
 `;

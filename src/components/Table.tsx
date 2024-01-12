@@ -36,8 +36,6 @@ import { useAsyncList } from 'react-stately';
 import { useBreakpoints } from '@/hooks';
 import { MediaQueryKeys } from '@/hooks/useBreakpoints';
 
-import { Checkbox } from '@/components/Checkbox';
-
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -80,7 +78,7 @@ export type ColumnDef<TableRowData extends object> = {
   width?: ColumnSize;
 };
 
-type ElementProps<TableRowData extends object | CustomRowConfig, TableRowKey extends Key> = {
+export type ElementProps<TableRowData extends object | CustomRowConfig, TableRowKey extends Key> = {
   label?: string;
   columns: ColumnDef<TableRowData>[];
   data: TableRowData[];
@@ -92,11 +90,12 @@ type ElementProps<TableRowData extends object | CustomRowConfig, TableRowKey ext
   selectionBehavior?: 'replace' | 'toggle';
   onRowAction?: (key: TableRowKey, row: TableRowData) => void;
   slotEmpty?: React.ReactNode;
+  numRowsToShow?: number;
   // collection: TableCollection<string>;
   // children: React.ReactNode;
 };
 
-type StyleProps = {
+export type StyleProps = {
   hideHeader?: boolean;
   withGradientCardRows?: boolean;
   withFocusStickyRows?: boolean;
@@ -121,6 +120,7 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   selectionMode = 'single',
   selectionBehavior = 'toggle',
   slotEmpty,
+  numRowsToShow = data.length,
   // shouldRowRender,
 
   // collection,
@@ -233,7 +233,7 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
             )}
           </TableHeader>
 
-          <TableBody items={list.items}>
+          <TableBody items={list.items.slice(0, numRowsToShow)}>
             {(item) => (
               <Row key={getRowKey(item)}>
                 {(columnKey) => (
@@ -337,6 +337,7 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
       <TableBodyRowGroup
         withGradientCardRows={props.withGradientCardRows}
         withInnerBorders={props.withInnerBorders}
+        withOuterBorder={props.withOuterBorder}
       >
         {/* {Array.from(collection.getChildren!(collection.body.key), (row) => */}
         {[...collection.body.childNodes].map((row) =>
@@ -415,6 +416,7 @@ const TableBodyRowGroup = ({
   children,
   withGradientCardRows,
   withInnerBorders,
+  withOuterBorder,
 }: { children: React.ReactNode } & StyleProps) => {
   const { rowGroupProps } = useTableRowGroup();
 
@@ -423,6 +425,7 @@ const TableBodyRowGroup = ({
       {...rowGroupProps}
       withGradientCardRows={withGradientCardRows}
       withInnerBorders={withInnerBorders}
+      withOuterBorder={withOuterBorder}
     >
       {children}
     </Styled.Tbody>
@@ -660,7 +663,7 @@ Styled.Empty = styled.div<{ withOuterBorder: boolean }>`
 
   justify-items: center;
   align-content: center;
-  padding: 2rem;
+  padding: 4rem;
   gap: 0.75em;
 
   color: var(--color-text-0);
@@ -867,6 +870,18 @@ Styled.Tbody = styled.tbody<StyleProps>`
       --stickyArea2-paddingBottom: var(--border-width);
       --stickyArea2-paddingLeft: var(--border-width);
       --stickyArea2-paddingRight: var(--border-width);
+
+      tr:first-of-type {
+        box-shadow: 0 calc(var(--border-width)) 0 0 var(--border-color);
+      }
+    `}
+
+  ${({ withOuterBorder }) =>
+    withOuterBorder &&
+    css`
+      tr:last-of-type:not(:only-of-type) {
+        box-shadow: 0 calc(-1 * var(--border-width)) 0 0 var(--border-color);
+      }
 
       tr:first-of-type {
         box-shadow: none;
