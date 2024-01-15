@@ -55,7 +55,7 @@ export const WithdrawButtonAndReceipt = ({
   const stringGetter = useStringGetter();
 
   const { leverage } = useSelector(getSubaccount, shallowEqual) || {};
-  const { isCctp, summary, requestPayload } = useSelector(getTransferInputs, shallowEqual) || {};
+  const { summary, requestPayload } = useSelector(getTransferInputs, shallowEqual) || {};
   const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
   const { usdcLabel } = useTokenConfigs();
 
@@ -84,26 +84,6 @@ export const WithdrawButtonAndReceipt = ({
     : stringGetter({ key: STRING_KEYS.SHOW_ALL_DETAILS });
 
   const totalFees = (summary?.bridgeFee || 0) + (summary?.gasFee || 0);
-
-  const { toAmount, toAmountMin } = useMemo(() => {
-    if (isCctp) {
-      return {
-        toAmount: summary?.toAmount,
-        toAmountMin: summary?.toAmountMin,
-      };
-    } else {
-      return {
-        toAmount:
-          summary?.toAmount &&
-          withdrawToken?.decimals &&
-          formatUnits(BigInt(summary.toAmount), withdrawToken.decimals),
-        toAmountMin:
-          summary?.toAmountMin &&
-          withdrawToken?.decimals &&
-          formatUnits(BigInt(summary.toAmountMin), withdrawToken.decimals),
-      };
-    }
-  }, [isCctp, summary, withdrawToken]);
 
   const submitButtonReceipt = [
     {
@@ -153,7 +133,7 @@ export const WithdrawButtonAndReceipt = ({
           {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
         </span>
       ),
-      value: <Output type={OutputType.Asset} value={toAmount} fractionDigits={TOKEN_DECIMALS} />,
+      value: <Output type={OutputType.Asset} value={summary?.toAmount} fractionDigits={TOKEN_DECIMALS} />,
       subitems: [
         {
           key: 'minimum-amount-received',
@@ -164,7 +144,7 @@ export const WithdrawButtonAndReceipt = ({
             </span>
           ),
           value: (
-            <Output type={OutputType.Asset} value={toAmountMin} fractionDigits={TOKEN_DECIMALS} />
+            <Output type={OutputType.Asset} value={summary?.toAmountMin} fractionDigits={TOKEN_DECIMALS} />
           ),
           tooltip: 'minimum-amount-received',
         },
