@@ -8,7 +8,6 @@ import { Notification, NotificationProps } from '@/components/Notification';
 import { Output, OutputType } from '@/components/Output';
 import { Icon, IconName } from '@/components/Icon';
 
-
 type ElementProps = {
   data: {
     BLOCK_REWARD_AMOUNT: string;
@@ -40,7 +39,13 @@ export const BlockRewardNotification = ({
             {
               key: 'block_reward',
               label: stringGetter({ key: STRING_KEYS.BLOCK_REWARD }),
-              value: <Output type={OutputType.Asset} value={BLOCK_REWARD_AMOUNT} tag={TOKEN_NAME} />,
+              value: (
+                <Styled.Output
+                  type={OutputType.Asset}
+                  value={BLOCK_REWARD_AMOUNT}
+                  tag={TOKEN_NAME}
+                />
+              ),
             },
           ]}
         />
@@ -62,4 +67,12 @@ Styled.Details = styled(Details)`
 Styled.Notification = styled(Notification)`
   background-image: url('/dots-background-2.svg');
   background-size: cover;
+`;
+
+Styled.Output = styled(Output)`
+  &:before {
+    content: '+';
+    color: var(--color-positive);
+    margin-right: 0.5ch;
+  }
 `;
