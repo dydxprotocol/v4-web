@@ -87,6 +87,8 @@ export type NotificationDisplayData = {
   slotTitleLeft?: React.ReactNode;
   slotTitleRight?: React.ReactNode;
 
+  groupKey: string; // Grouping key toast notification stacking
+
   // Overrides title/body for Notification in NotificationMenu
   renderCustomBody?: ({
     isToast,

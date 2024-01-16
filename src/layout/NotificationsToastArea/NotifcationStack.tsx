@@ -1,7 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { NotificationStatus } from '@/constants/notifications';
+import {
+  type Notification,
+  type NotificationDisplayData,
+  NotificationStatus,
+} from '@/constants/notifications';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -13,54 +17,31 @@ import { Toast } from '@/components/Toast';
 import { ToastArea } from '@/components/ToastArea';
 import { ToggleButton } from '@/components/ToggleButton';
 
+type ElementProps = {
+  notifications: {
+    notification: Notification<any, any>;
+    key: string;
+    displayData: NotificationDisplayData;
+  }[];
+};
+
 type StyleProps = {
   className?: string;
 };
 
-const MAX_TOASTS = 10;
-
-export const NotificationsToastArea = ({ className }: StyleProps) => {
+export const NotificationStack = ({ notifications, className }: ElementProps & StyleProps) => {
   const [shouldStackNotifications, setshouldStackNotifications] = useState(true);
 
-  const {
-    notifications,
-    getKey,
-    getDisplayData,
-    markUnseen,
-    markSeen,
-    isMenuOpen,
-    onNotificationAction,
-  } = useNotifications();
-
+  const { markUnseen, markSeen, onNotificationAction } = useNotifications();
   const { isMobile } = useBreakpoints();
-  const notificationMap = useMemo(() => {
-    return (
-      Object.values(notifications)
-        // Sort by time of first trigger
-        .sort(
-          (n1, n2) =>
-            n1.timestamps[NotificationStatus.Triggered]! -
-            n2.timestamps[NotificationStatus.Triggered]!
-        )
-        .map((notification) => ({
-          notification,
-          key: getKey(notification),
-          displayData: getDisplayData(notification),
-        }))
-        .filter(
-          ({ displayData, notification }) =>
-            displayData && notification.status < NotificationStatus.Unseen
-        )
-        .slice(-MAX_TOASTS)
-    );
-  }, [notifications, getKey, getDisplayData]);
-
-  if (isMenuOpen) return null;
-
-  const hasMultipleToasts = notificationMap.length > 1;
+  const hasMultipleToasts = notifications.length > 1;
 
   return (
-    <StyledToastArea swipeDirection={isMobile ? 'up' : 'right'} className={className}>
+    <StyledToastArea
+      swipeDirection={isMobile ? 'up' : 'right'}
+      className={className}
+      size={notifications.length}
+    >
       {hasMultipleToasts && (
         <StyledToggleButton
           shape={ButtonShape.Pill}
@@ -72,12 +53,12 @@ export const NotificationsToastArea = ({ className }: StyleProps) => {
         </StyledToggleButton>
       )}
 
-      {notificationMap.map(({ notification, key, displayData }, idx) => (
+      {notifications.map(({ notification, key, displayData }, idx) => (
         <StyledToast
           key={key}
-          isStacked={shouldStackNotifications}
+          isStacked={idx > 0 && shouldStackNotifications}
           isOpen={notification.status < NotificationStatus.Unseen}
-          layer={notificationMap.length - 1 - idx}
+          layer={idx}
           notification={notification}
           slotIcon={displayData.icon}
           slotTitle={displayData.title}
@@ -110,19 +91,13 @@ export const NotificationsToastArea = ({ className }: StyleProps) => {
   );
 };
 
-const StyledToastArea = styled(ToastArea)`
-  position: absolute;
-  width: min(17.5rem, 100%);
-  inset: 0 0 0 auto;
-
-  padding: 0.75rem 0.75rem 0.75rem 0;
-
-  mask-image: linear-gradient(to left, transparent, white 0.5rem);
-
-  @media ${breakpoints.mobile} {
-    width: 100%;
-    position: fixed;
-  }
+const StyledToastArea = styled(ToastArea)<{ size: number }>`
+  position: relative;
+  ${({ size }) =>
+    size &&
+    css`
+      padding-bottom: calc(${size - 1} * 2px);
+    `}
 `;
 
 const StyledToast = styled(Toast)<{ isStacked?: boolean; layer: number }>`
@@ -133,7 +108,7 @@ const StyledToast = styled(Toast)<{ isStacked?: boolean; layer: number }>`
           position: absolute;
           left: 0;
           top: calc(${layer} * 2px);
-          right: calc(${layer} * -2px);
+          right: 0;
         `
       : css`
           margin-bottom: 0.75rem;
@@ -145,7 +120,7 @@ const StyledToggleButton = styled(ToggleButton)<{ isPressed: boolean }>`
   pointer-events: auto;
   display: none;
   position: absolute;
-  top: 4px;
+  top: -0.5rem;
   left: calc(50% - 0.75rem);
   --button-width: 2rem;
   --button-height: 1rem;
