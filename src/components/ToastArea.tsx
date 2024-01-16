@@ -27,9 +27,8 @@ export const ToastArea = ({ swipeDirection, children, className }: ToastAreaProp
 const $ToastArea = styled.aside`
   // Params
   --toasts-gap: 0.5rem;
-
+  
   // Rules
-  ${layoutMixins.scrollArea}
   z-index: 1;
 
   pointer-events: none;

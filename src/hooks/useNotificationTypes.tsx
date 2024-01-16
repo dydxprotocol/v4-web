@@ -81,6 +81,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   body: abacusNotif.text ? stringGetter({ key: abacusNotif.text, params }) : '',
                   toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
                   toastSensitivity: 'foreground',
+                  groupKey: abacusNotificationType,
                   renderCustomBody: ({ isToast, notification }) => (
                     <TradeNotification
                       isToast={isToast}
@@ -103,6 +104,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   body: abacusNotif.text ? stringGetter({ key: abacusNotif.text, params }) : '',
                   toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
                   toastSensitivity: 'foreground',
+                  groupKey: abacusNotificationType,
                   renderCustomBody: ({ isToast, notification }) => (
                     <BlockRewardNotification
                       isToast={isToast}
@@ -125,6 +127,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   body: abacusNotif.text ? stringGetter({ key: abacusNotif.text, params }) : '',
                   toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
                   toastSensitivity: 'foreground',
+                  groupKey: abacusNotificationType,
                 },
                 [abacusNotif.updateTimeInMilliseconds, abacusNotif.data]
               );
@@ -220,6 +223,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 />
               ),
               toastSensitivity: 'foreground',
+              groupKey: NotificationType.SquidTransfer,
             },
             [isFinished]
           );
@@ -265,6 +269,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               },
             }),
             toastSensitivity: 'foreground',
+            groupKey: NotificationType.ReleaseUpdates,
           },
           []
         );
