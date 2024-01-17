@@ -29,7 +29,6 @@ export const MarketDetails: React.FC = () => {
   if (!configs) return null;
 
   const {
-    basePositionNotional,
     tickSize,
     stepSize,
     initialMarginFraction,
