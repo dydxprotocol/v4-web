@@ -2,6 +2,7 @@ import { FormEvent } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+import { useDydxClient } from '@/hooks';
 
 type InputProps = {
   label: string;
@@ -15,10 +16,13 @@ const Input = ({ label, ...props }: InputProps) => (
 );
 
 export const NewMarketForm = () => {
+  const { compositeClient } = useDydxClient();
+
   return (
     <Styled.Form
       onSubmit={(e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        // compositeClient?.validatorClient.post.send()
       }}
     >
       <Input label="Market Name" />

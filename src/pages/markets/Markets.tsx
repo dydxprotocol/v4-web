@@ -1,4 +1,5 @@
 import styled, { AnyStyledComponent } from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 import { breakpoints } from '@/styles';
 
@@ -12,10 +13,13 @@ import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 
 import { ExchangeBillboards } from '@/views/ExchangeBillboards';
 import { MarketsTable } from '@/views/tables/MarketsTable';
+import { Button } from '@/components/Button';
+import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 const Markets = () => {
   const stringGetter = useStringGetter();
   const { isNotTablet } = useBreakpoints();
+  const navigate = useNavigate();
 
   useDocumentTitle(stringGetter({ key: STRING_KEYS.MARKETS }));
 
@@ -25,6 +29,11 @@ const Markets = () => {
         <Styled.ContentSectionHeader
           title={stringGetter({ key: STRING_KEYS.MARKETS })}
           subtitle={isNotTablet && stringGetter({ key: STRING_KEYS.DISCOVER_NEW_ASSETS })}
+          slotRight={
+            <Button onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}>
+              Add a Market
+            </Button>
+          }
         />
         <Styled.ExchangeBillboards isSearching={false} searchQuery="" />
       </Styled.HeaderSection>
