@@ -11,6 +11,10 @@ export enum AppRoute {
   Privacy = '/privacy',
 }
 
+export enum MarketsRoute {
+  New = 'new',
+}
+
 export enum PortfolioRoute {
   Fees = 'fees',
   History = 'history',
