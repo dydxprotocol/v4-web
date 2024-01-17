@@ -71,7 +71,7 @@ export const getIndexerHeight = (apiState: Nullable<AbacusApiState>) => {
 export const useApiState = () => {
   const stringGetter = useStringGetter();
   const apiState = useSelector(getApiState, shallowEqual);
-  const { haltedBlock, height, status, trailingBlocks } = apiState ?? {};
+  const { haltedBlock, height, status, trailingBlocks} = apiState ?? {};
   const statusErrorMessage = getStatusErrorMessage({ apiState, stringGetter });
   const indexerHeight = getIndexerHeight(apiState);
 
