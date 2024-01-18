@@ -1,5 +1,6 @@
 // Custom connectors
 import type { ExternalProvider } from '@ethersproject/providers';
+import type { PrivyClientConfig } from '@privy-io/react-auth';
 import {
   arbitrum,
   arbitrumGoerli,
@@ -83,6 +84,16 @@ export const WAGMI_SUPPORTED_CHAINS: Chain[] = [
   scroll,
   kava,
 ];
+
+export const privyConfig: PrivyClientConfig = {
+  embeddedWallets: {
+    createOnLogin: 'users-without-wallets',
+    requireUserPasswordOnCreate: true,
+    noPromptOnSignature: true,
+  },
+  loginMethods: ['email', 'sms', 'twitter'],
+  defaultChain: sepolia,
+};
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   WAGMI_SUPPORTED_CHAINS,

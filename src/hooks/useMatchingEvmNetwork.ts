@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo } from 'react';
 
 import { useNetwork, useSwitchNetwork } from 'wagmi';
+import { useSwitchNetwork as useSwitchNetworkPrivy } from '@privy-io/wagmi-connector';
+import { WalletConnectionType } from '@/constants/wallets';
+
+import { useWalletConnection } from './useWalletConnection';
 
 export const useMatchingEvmNetwork = ({
   chainId,
@@ -12,7 +16,10 @@ export const useMatchingEvmNetwork = ({
   onError?: (error: Error) => void;
 }) => {
   const { chain } = useNetwork();
+  const { walletConnectionType } = useWalletConnection();
   const { isLoading, switchNetworkAsync } = useSwitchNetwork({ onError });
+  const { isLoading: isLoadingPrivy, switchNetworkAsync: switchNetworkAsyncPrivy } =
+    useSwitchNetworkPrivy({ onError });
 
   // If chainId is not a number, we can assume it is a non EVM compatible chain
   const isMatchingNetwork = useMemo(
@@ -22,7 +29,11 @@ export const useMatchingEvmNetwork = ({
 
   const matchNetwork = useCallback(async () => {
     if (!isMatchingNetwork) {
-      await switchNetworkAsync?.(Number(chainId));
+      if (walletConnectionType === WalletConnectionType.Privy) {
+        await switchNetworkAsyncPrivy?.(Number(chainId));
+      } else {
+        await switchNetworkAsync?.(Number(chainId));
+      }
     }
   }, [chainId, chain]);
 
@@ -35,6 +46,6 @@ export const useMatchingEvmNetwork = ({
   return {
     isMatchingNetwork,
     matchNetwork,
-    isSwitchingNetwork: isLoading,
+    isSwitchingNetwork: isLoading || isLoadingPrivy,
   };
 };

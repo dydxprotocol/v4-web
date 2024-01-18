@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, useMemo } from 'react';
 
+import { usePrivy, useLogout } from '@privy-io/react-auth';
 import {
   useSuggestChainAndConnect as useConnectGraz,
   useAccount as useAccountGraz,
@@ -112,6 +113,8 @@ export const useWalletConnection = () => {
     key: LocalStorageKey.EvmDerivedAddresses,
     defaultValue: {} as EvmDerivedAddresses,
   });
+  const { login, ready, authenticated } = usePrivy();
+  const { logout } = useLogout();
 
   const connectWallet = useCallback(
     async ({
@@ -130,6 +133,11 @@ export const useWalletConnection = () => {
       try {
         if (!walletConnection) {
           throw new Error('Onboarding: No wallet connection found.');
+        } else if (walletConnection.type === WalletConnectionType.Privy) {
+          console.log({ isConnectedWagmi, authenticated, ready });
+          if (!isConnectedWagmi && !authenticated && ready) {
+            login();
+          }
         } else if (walletConnection.type === WalletConnectionType.CosmosSigner) {
           const cosmosWalletType = {
             [WalletType.Keplr as string]: CosmosWalletType.KEPLR,
@@ -187,6 +195,7 @@ export const useWalletConnection = () => {
 
     if (isConnectedWagmi) await disconnectWagmi();
     if (isConnectedGraz) await disconnectGraz();
+    if (authenticated) await logout();
   }, [isConnectedGraz, isConnectedWagmi]);
 
   // Wallet selection
