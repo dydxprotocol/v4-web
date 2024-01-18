@@ -198,7 +198,7 @@ Styled.Subtitle = styled.span`
 `;
 
 Styled.FormContainer = styled.div`
-  width: 30rem;
+  min-width: 30rem;
   height: fit-content;
   border-radius: 1rem;
   background-color: var(--color-layer-3);

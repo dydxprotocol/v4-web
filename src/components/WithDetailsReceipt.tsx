@@ -40,5 +40,5 @@ Styled.Details = styled(Details)`
 
   padding: 0.375rem 0.75rem 0.25rem;
 
-  font-size: 0.8125em;
+  font-size: var(--details-item-fontSize, 0.8125em);
 `;

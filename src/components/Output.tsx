@@ -116,6 +116,7 @@ export const Output = ({
           {value?.toString() ?? null}
 
           {tag && <Tag>{tag}</Tag>}
+          {slotRight}
         </Styled.Text>
       );
     }

@@ -1,26 +1,18 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { Root, Item } from '@radix-ui/react-radio-group';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
-import { OnboardingState } from '@/constants/account';
-import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { LIQUIDITY_TIERS, MOCK_DATA } from '@/constants/potentialMarkets';
 import { useAccountBalance, useDydxClient } from '@/hooks';
 
-import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
-import { Tag } from '@/components/Tag';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
-import { WithReceipt } from '@/components/WithReceipt';
 
-import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
-
-import { getOnboardingState } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { formMixins } from '@/styles/formMixins';

@@ -8,7 +8,7 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { LIQUIDITY_TIERS, MOCK_DATA } from '@/constants/potentialMarkets';
-import { useAccountBalance, useDydxClient } from '@/hooks';
+import { useAccountBalance, useBreakpoints, useDydxClient } from '@/hooks';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
@@ -28,6 +28,7 @@ import { isTruthy } from '@/lib/isTruthy';
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { NewMarketPreviewForm } from './NewMarketPreviewForm';
+import { breakpoints } from '@/styles';
 
 enum NewMarketFormStep {
   SELECTION,
@@ -40,6 +41,7 @@ export const NewMarketForm = () => {
   const { nativeTokenBalance } = useAccountBalance();
   const onboardingState = useSelector(getOnboardingState);
   const isDisconnected = onboardingState === OnboardingState.Disconnected;
+  const { isMobile } = useBreakpoints();
 
   const [mode, setMode] = useState(NewMarketFormStep.SELECTION);
   const [assetToAdd, setAssetToAdd] = useState<(typeof MOCK_DATA)[number]>();
@@ -73,6 +75,8 @@ export const NewMarketForm = () => {
       );
     }
   }
+
+  const isDisabled = !assetToAdd || liquidityTier === undefined;
 
   return (
     <Styled.Form
@@ -125,7 +129,7 @@ export const NewMarketForm = () => {
                       {tier === assetToAdd?.liquidityTier && <span> - Recommended ✨</span>}
                     </Styled.Header>
                     <Styled.Details
-                      layout="rowColumns"
+                      layout={isMobile ? 'grid' : 'rowColumns'}
                       withSeparators
                       items={[
                         {
@@ -173,7 +177,7 @@ export const NewMarketForm = () => {
             items={[
               assetToAdd && {
                 key: 'message-details',
-                label: <span>Message Details</span>,
+                label: <span>Message details</span>,
                 value: (
                   <Button
                     action={ButtonAction.Navigation}
@@ -213,11 +217,7 @@ export const NewMarketForm = () => {
         {isDisconnected ? (
           <OnboardingTriggerButton />
         ) : (
-          <Button
-            type={ButtonType.Submit}
-            state={{ isDisabled: !assetToAdd }}
-            action={ButtonAction.Primary}
-          >
+          <Button type={ButtonType.Submit} state={{ isDisabled }} action={ButtonAction.Primary}>
             Preview Market Proposal
           </Button>
         )}
@@ -241,7 +241,6 @@ Styled.SelectedAsset = styled.span`
 `;
 
 Styled.Disclaimer = styled.div`
-  font: var(--font-small);
   color: var(--color-text-0);
   margin-left: 0.5ch;
 `;
@@ -274,9 +273,20 @@ Styled.LiquidityTierRadioButton = styled(Item)<{ selected?: boolean }>`
 Styled.Details = styled(Details)`
   margin-top: 0.5rem;
   padding: 0;
+
+  dt {
+    text-align: left;
+  }
+
+  @media ${breakpoints.mobile} {
+    padding: 0 1rem;
+
+    dd {
+      margin-bottom: 0.5rem;
+    }
+  }
 `;
 
 Styled.ReceiptDetails = styled(Details)`
   padding: 0.375rem 0.75rem 0.25rem;
-  font-size: 0.8125em;
 `;
