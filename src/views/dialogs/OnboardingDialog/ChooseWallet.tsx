@@ -57,7 +57,7 @@ export const ChooseWallet = () => {
             size={ButtonSize.Small}
           >
             <div>
-              {walletType !== WalletType.Privy
+              {walletType !== WalletType.Privy && import.meta.env.VITE_PRIVY_APP_ID
                 ? stringGetter({ key: wallets[walletType].stringKey })
                 : 'Socials (Email, SMS, etc.)'}
             </div>
