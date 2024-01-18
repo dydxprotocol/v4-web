@@ -1,9 +1,3 @@
-export enum RiskAssessment {
-  NotRecommended,
-  Safe,
-  PotentiallySafe,
-}
-
 export const MOCK_ORACLE_DATA = [
   {
     base_asset: 'AAVE',

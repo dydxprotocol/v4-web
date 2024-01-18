@@ -1,11 +1,11 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { Root, Item } from '@radix-ui/react-radio-group';
-import { useDispatch, useSelector } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import { OnboardingState } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
-import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { LIQUIDITY_TIERS, MOCK_DATA } from '@/constants/potentialMarkets';
 import { useAccountBalance, useBreakpoints, useDydxClient } from '@/hooks';
@@ -13,6 +13,7 @@ import { useAccountBalance, useBreakpoints, useDydxClient } from '@/hooks';
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
+import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
@@ -22,17 +23,20 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 
 import { getOnboardingState } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
+import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
-import { NewMarketPreviewForm } from './NewMarketPreviewForm';
 import { breakpoints } from '@/styles';
+
+import { NewMarketPreviewForm, NewMarketProposalSent } from './NewMarketPreviewForm';
 
 enum NewMarketFormStep {
   SELECTION,
   PREVIEW,
+  SUCCESS,
 }
 
 export const NewMarketForm = () => {
@@ -42,10 +46,12 @@ export const NewMarketForm = () => {
   const onboardingState = useSelector(getOnboardingState);
   const isDisconnected = onboardingState === OnboardingState.Disconnected;
   const { isMobile } = useBreakpoints();
+  const marketIds = useSelector(getMarketIds, shallowEqual);
 
-  const [mode, setMode] = useState(NewMarketFormStep.SELECTION);
+  const [step, setStep] = useState(NewMarketFormStep.SELECTION);
   const [assetToAdd, setAssetToAdd] = useState<(typeof MOCK_DATA)[number]>();
   const [liquidityTier, setLiquidityTier] = useState<string>();
+  const [canModifyLiqTier, setCanModifyLiqTier] = useState(false);
 
   const alertMessage = useMemo(() => {
     if (nativeTokenBalance.lt(10_000)) {
@@ -64,13 +70,26 @@ export const NewMarketForm = () => {
     }
   }, [assetToAdd]);
 
-  if (NewMarketFormStep.PREVIEW === mode) {
+  const potentialMarkets = useMemo(() => {
+    return MOCK_DATA.filter(
+      (potentialMarket) =>
+        potentialMarket.riskAssessment === 'Safe' &&
+        !marketIds.includes(`${potentialMarket.symbol}-USD`)
+    );
+  }, [MOCK_DATA, marketIds]);
+
+  if (NewMarketFormStep.SUCCESS === step) {
+    return <NewMarketProposalSent onBack={() => setStep(NewMarketFormStep.SELECTION)} />;
+  }
+
+  if (NewMarketFormStep.PREVIEW === step) {
     if (assetToAdd && liquidityTier) {
       return (
         <NewMarketPreviewForm
           assetData={assetToAdd}
           liquidityTier={liquidityTier}
-          onBack={() => setMode(NewMarketFormStep.SELECTION)}
+          onBack={() => setStep(NewMarketFormStep.SELECTION)}
+          onSuccess={() => setStep(NewMarketFormStep.SUCCESS)}
         />
       );
     }
@@ -82,7 +101,7 @@ export const NewMarketForm = () => {
     <Styled.Form
       onSubmit={(e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setMode(NewMarketFormStep.PREVIEW);
+        setStep(NewMarketFormStep.PREVIEW);
       }}
     >
       <h2>Add Market</h2>
@@ -91,7 +110,7 @@ export const NewMarketForm = () => {
           {
             group: 'markets',
             groupLabel: 'Markets',
-            items: MOCK_DATA.map((potentialMarket: (typeof MOCK_DATA)[number]) => ({
+            items: potentialMarkets.map((potentialMarket: (typeof MOCK_DATA)[number]) => ({
               value: potentialMarket.symbol,
               label: `${potentialMarket.symbol}-USD`,
               onSelect: () => {
@@ -113,7 +132,21 @@ export const NewMarketForm = () => {
           <div>Populated details</div>
           <div>
             <Styled.Root value={liquidityTier} onValueChange={setLiquidityTier}>
-              <Styled.Header>Liquidity tier</Styled.Header>
+              <Styled.Header>
+                Liquidity tier{' '}
+                <Button
+                  shape={ButtonShape.Pill}
+                  onClick={() => setCanModifyLiqTier(!canModifyLiqTier)}
+                >
+                  {canModifyLiqTier ? (
+                    'Cancel'
+                  ) : (
+                    <>
+                      Modify <Icon iconName={IconName.Pencil} />
+                    </>
+                  )}
+                </Button>
+              </Styled.Header>
 
               {Object.keys(LIQUIDITY_TIERS).map((tier, idx) => {
                 const { maintenanceMarginFraction, impactNotional, label, initialMarginFraction } =
@@ -123,6 +156,7 @@ export const NewMarketForm = () => {
                     key={tier}
                     value={tier}
                     selected={tier === liquidityTier}
+                    disabled={!canModifyLiqTier}
                   >
                     <Styled.Header style={{ marginLeft: '1rem' }}>
                       {label}
@@ -157,7 +191,7 @@ export const NewMarketForm = () => {
                         {
                           key: 'impact-notional',
                           label: 'Impact notional',
-                          value: <Output type={OutputType.Number} value={impactNotional} />,
+                          value: <Output type={OutputType.Fiat} value={impactNotional} />,
                         },
                       ]}
                     />
@@ -246,8 +280,12 @@ Styled.Disclaimer = styled.div`
 `;
 
 Styled.Header = styled.div`
+  display: flex;
+  flex: 1;
+  align-items: center;
   color: var(--color-text-2);
   font: var(--font-base-medium);
+  justify-content: space-between;
 `;
 
 Styled.Root = styled(Root)`

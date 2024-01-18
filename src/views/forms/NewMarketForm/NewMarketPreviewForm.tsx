@@ -1,39 +1,41 @@
-import { FormEvent } from 'react';
+import { FormEvent, useMemo } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
-import { Root, Item } from '@radix-ui/react-radio-group';
 import { useDispatch } from 'react-redux';
 
+import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
+import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 import { LIQUIDITY_TIERS, MOCK_DATA } from '@/constants/potentialMarkets';
 import { useAccountBalance, useDydxClient } from '@/hooks';
+import { LinkOutIcon } from '@/icons';
 
+import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
-import { Details } from '@/components/Details';
+import { DiffOutput } from '@/components/DiffOutput';
+import { FormInput } from '@/components/FormInput';
+import { Icon, IconName } from '@/components/Icon';
+import { InputType } from '@/components/Input';
 import { Output, OutputType } from '@/components/Output';
-import { SearchSelectMenu } from '@/components/SearchSelectMenu';
+import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
 import { openDialog } from '@/state/dialogs';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
-import { InputType } from '@/components/Input';
-import { FormInput } from '@/components/FormInput';
-import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
-import { CheckIcon } from '@/icons';
-import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
-import { DiffOutput } from '@/components/DiffOutput';
 
 type NewMarketPreviewFormProps = {
   assetData: (typeof MOCK_DATA)[number];
   liquidityTier: string;
   onBack: () => void;
+  onSuccess: () => void;
 };
 
 export const NewMarketPreviewForm = ({
   assetData,
   liquidityTier,
   onBack,
+  onSuccess,
 }: NewMarketPreviewFormProps) => {
   const { compositeClient } = useDydxClient();
   const { nativeTokenBalance } = useAccountBalance();
@@ -42,18 +44,40 @@ export const NewMarketPreviewForm = ({
   const { label, initialMarginFraction, maintenanceMarginFraction, impactNotional } =
     LIQUIDITY_TIERS[liquidityTier as unknown as keyof typeof LIQUIDITY_TIERS];
 
-  const isDisabled = nativeTokenBalance.lt(10_000);
+  const alertMessage = useMemo(() => {
+    if (nativeTokenBalance.lt(10_000)) {
+      return {
+        type: AlertType.Error,
+        message: 'You need at least 10,000 DYDX to add a market.',
+      };
+    }
+
+    return null;
+  }, [nativeTokenBalance]);
+
+  const isDisabled = false; // alertMessage !== null;
 
   return (
     <Styled.Form
-      onSubmit={(e: FormEvent<HTMLFormElement>) => {
+      onSubmit={async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // compositeClient?.validatorClient.post.send()
+        try {
+          // const response = await compositeClient?.validatorClient.post.send()
+
+          onSuccess();
+        } catch (error) {
+          console.error('[NewMarketPreviewForm] Error sending proposal', error);
+        }
       }}
     >
       <h2>Confirm new market proposal</h2>
-      <FormInput disabled label="Market" type={InputType.Text} value={`${assetData.symbol}-USD`} />
-      <WithDetailsReceipt
+      <Styled.FormInput
+        disabled
+        label="Market"
+        type={InputType.Text}
+        value={`${assetData.symbol}-USD`}
+      />
+      <Styled.WithDetailsReceipt
         side="bottom"
         detailItems={[
           {
@@ -81,10 +105,10 @@ export const NewMarketPreviewForm = ({
           },
         ]}
       >
-        <FormInput disabled label="Liquidity tier" type={InputType.Text} value={label} />
-      </WithDetailsReceipt>
+        <Styled.FormInput disabled label="Liquidity tier" type={InputType.Text} value={label} />
+      </Styled.WithDetailsReceipt>
 
-      <WithDetailsReceipt
+      <Styled.WithDetailsReceipt
         side="bottom"
         detailItems={[
           {
@@ -110,7 +134,20 @@ export const NewMarketPreviewForm = ({
           {
             key: 'required-balance',
             label: 'Required balance',
-            value: <Output type={OutputType.Text} value="10,000+" slotRight={<CheckIcon />} />,
+            value: (
+              <Output
+                type={OutputType.Text}
+                value="10,000+"
+                slotRight={
+                  <Styled.Icon
+                    hasError={nativeTokenBalance?.lt(10_000)}
+                    iconName={
+                      nativeTokenBalance?.gt(10_000) ? IconName.CheckCircle : IconName.CautionCircle
+                    }
+                  />
+                }
+              />
+            ),
           },
           {
             key: 'wallet-balance',
@@ -130,7 +167,10 @@ export const NewMarketPreviewForm = ({
         ]}
       >
         <div />
-      </WithDetailsReceipt>
+      </Styled.WithDetailsReceipt>
+      {alertMessage && (
+        <AlertMessage type={alertMessage.type}>{alertMessage.message} </AlertMessage>
+      )}
       <Styled.ButtonRow>
         <Button onClick={onBack}>Back</Button>
         <Button type={ButtonType.Submit} action={ButtonAction.Primary} state={{ isDisabled }}>
@@ -146,7 +186,72 @@ export const NewMarketPreviewForm = ({
   );
 };
 
+type NewMarketProposalSentProps = {
+  onBack: () => void;
+};
+
+export const NewMarketProposalSent = ({ onBack }: NewMarketProposalSentProps) => {
+  return (
+    <Styled.ProposalSent>
+      <Styled.OuterCircle>
+        <Styled.InnerCircle>
+          <Icon iconName={IconName.Check} />
+        </Styled.InnerCircle>
+      </Styled.OuterCircle>
+      <h2>Submitted Proposal!</h2>
+      <span>Your proposal is now going through governance.</span>
+      <Styled.ButtonRow>
+        <Button onClick={onBack}>Back</Button>
+        <Button type={ButtonType.Link} href="https://google.com" action={ButtonAction.Primary}>
+          View proposal
+          <LinkOutIcon />
+        </Button>
+      </Styled.ButtonRow>
+    </Styled.ProposalSent>
+  );
+};
+
 const Styled: Record<string, AnyStyledComponent> = {};
+
+Styled.ProposalSent = styled.div`
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+`;
+
+Styled.OuterCircle = styled.div`
+  width: 5.25rem;
+  height: 5.25rem;
+  min-width: 5.25rem;
+  height: 5.25rem;
+  border-radius: 50%;
+  background-color: var(--color-gradient-positive);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+Styled.InnerCircle = styled.div`
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-color: var(--color-success);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    color: var(--color-layer-2);
+  }
+`;
 
 Styled.Form = styled.form`
   ${formMixins.transfersForm}
@@ -154,60 +259,31 @@ Styled.Form = styled.form`
   --stickyArea0-background: transparent;
 `;
 
-Styled.SearchSelectMenu = styled(SearchSelectMenu)``;
+Styled.FormInput = styled(FormInput)`
+  input {
+    font-size: 1rem;
+  }
+`;
 
-Styled.SelectedAsset = styled.span`
-  color: var(--color-text-2);
+Styled.Icon = styled(Icon)<{ hasError?: boolean }>`
+  margin-left: 0.5ch;
+
+  ${({ hasError }) => (hasError ? 'color: var(--color-error);' : 'color: var(--color-success);')}
+`;
+
+Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
+  --details-item-fontSize: 1rem;
 `;
 
 Styled.Disclaimer = styled.div`
   font: var(--font-small);
   color: var(--color-text-0);
+  text-align: center;
   margin-left: 0.5ch;
-`;
-
-Styled.Header = styled.div`
-  color: var(--color-text-2);
-  font: var(--font-base-medium);
-`;
-
-Styled.Root = styled(Root)`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 1rem;
-  border-radius: 10px;
-  border: 1px solid var(--color-layer-6);
-  background-color: var(--color-layer-4);
-`;
-
-Styled.LiquidityTierRadioButton = styled(Item)<{ selected?: boolean }>`
-  display: flex;
-  flex-direction: column;
-  border-radius: 0.625rem;
-  border: 1px solid var(--color-layer-6);
-  padding: 1rem 0;
-
-  ${({ selected }) => selected && 'background-color: var(--color-layer-2)'}
-`;
-
-Styled.Details = styled(Details)`
-  margin-top: 0.5rem;
-  padding: 0;
-`;
-
-Styled.ReceiptDetails = styled(Details)`
-  padding: 0.375rem 0.75rem 0.25rem;
-  font-size: 0.8125em;
 `;
 
 Styled.ButtonRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 1rem;
-`;
-
-Styled.Disclaimer = styled.p`
-  text-align: center;
-  color: var(--color-text-0);
 `;
