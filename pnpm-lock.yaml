@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@0xsquid/sdk':
     specifier: ^1.10.0
@@ -31,6 +35,9 @@ dependencies:
   '@dydxprotocol/v4-localization':
     specifier: ^1.1.11
     version: 1.1.11
+  '@dydxprotocol/v4-proto':
+    specifier: 3.0.0-dev.0
+    version: 3.0.0-dev.0
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -181,6 +188,9 @@ dependencies:
   color:
     specifier: ^4.2.3
     version: 4.2.3
+  cosmjs-types:
+    specifier: ^0.9.0
+    version: 0.9.0
   crypto-js:
     specifier: ^4.1.1
     version: 4.1.1
@@ -1025,6 +1035,12 @@ packages:
 
   /@dydxprotocol/v4-proto@0.4.1:
     resolution: {integrity: sha512-2pBkokufWcxfIpiXE6QuQOBXUe154OTp6ojCIdOPW9TFLxzchoygxXnb5dL6rAQVNj9Qbg+hhXBllutt4m99dw==}
+    dependencies:
+      protobufjs: 6.11.4
+    dev: false
+
+  /@dydxprotocol/v4-proto@3.0.0-dev.0:
+    resolution: {integrity: sha512-hT6F/AgaTqv8Bwo7twpIhmjXvJE/Fx+3mmHHTuIXMeL6OhVtlOpcEQyHvBEAdh1VrNq/S7qWvdQD0fvC/UgKyA==}
     dependencies:
       protobufjs: 6.11.4
     dev: false
@@ -8057,6 +8073,10 @@ packages:
       protobufjs: 6.11.4
     dev: false
 
+  /cosmjs-types@0.9.0:
+    resolution: {integrity: sha512-MN/yUe6mkJwHnCFfsNPeCfXVhyxHYW6c/xDUzrSbBycYzw++XvWDMJArXp2pLdgD6FQ8DW79vkPjeNKVrXaHeQ==}
+    dev: false
+
   /cosmos-directory-client@0.0.6:
     resolution: {integrity: sha512-WIdaQ8uW1vIbYvNnAVunkC6yxTrneJC7VQ5UUQ0kuw8b0C0A39KTIpoQHCfc8tV7o9vF4niwRhdXEdfAgQEsQQ==}
     dependencies:
@@ -14809,7 +14829,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
