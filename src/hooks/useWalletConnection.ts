@@ -118,6 +118,7 @@ export const useWalletConnection = () => {
         if (!walletConnection) {
           throw new Error('Onboarding: No wallet connection found.');
         } else if (walletConnection.type === WalletConnectionType.Privy) {
+
           console.log({ isConnectedWagmi, authenticated, ready });
           if (!isConnectedWagmi && !authenticated && ready) {
             login();
