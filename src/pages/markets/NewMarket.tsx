@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from 'react-query';
 
 import { AppRoute } from '@/constants/routes';
 import { useAccountBalance, useBreakpoints, useDocumentTitle } from '@/hooks';
@@ -53,6 +54,24 @@ const NewMarket = () => {
 
   useDocumentTitle('New Market');
 
+  // const { data, isLoading } = useQuery({
+  //   queryKey: ['market_proposals'],
+  //   queryFn: async () => {
+  //     const response = fetch('http://3.134.210.83:1317/cosmos/gov/v1/proposals', {
+  //       headers: {
+  //         Accept: 'application/json',
+  //         'Content-Type': 'application/json',
+  //       },
+  //     });
+
+  //     return (await response).json();
+  //   },
+  //   refetchInterval: 10_000,
+  //   staleTime: 10_000,
+  // });
+
+  // console.log(data, isLoading);
+
   return (
     <Styled.Page>
       <Styled.HeaderSection>
@@ -85,6 +104,9 @@ const NewMarket = () => {
               ))}
             </>
           )}
+          <>
+            <h2>Proposals</h2>
+          </>
         </div>
         <Styled.FormContainer>
           <NewMarketForm />

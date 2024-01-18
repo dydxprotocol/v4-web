@@ -122,7 +122,7 @@ export const NewMarketPreviewForm = ({
                   dispatch(
                     openDialog({
                       type: DialogTypes.NewMarketMessageDetails,
-                      dialogProps: { assetData },
+                      dialogProps: { assetData, liquidityTier },
                     })
                   )
                 }

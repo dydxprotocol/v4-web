@@ -8,7 +8,7 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { LIQUIDITY_TIERS, MOCK_DATA } from '@/constants/potentialMarkets';
-import { useAccountBalance, useBreakpoints, useDydxClient } from '@/hooks';
+import { useAccountBalance, useBreakpoints } from '@/hooks';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
@@ -40,7 +40,6 @@ enum NewMarketFormStep {
 }
 
 export const NewMarketForm = () => {
-  const { compositeClient } = useDydxClient();
   const dispatch = useDispatch();
   const { nativeTokenBalance } = useAccountBalance();
   const onboardingState = useSelector(getOnboardingState);
@@ -104,7 +103,19 @@ export const NewMarketForm = () => {
         setStep(NewMarketFormStep.PREVIEW);
       }}
     >
-      <h2>Add Market</h2>
+      <h2>
+        Add Market{' '}
+        {assetToAdd && (
+          <span>
+            Ref. Price:{' '}
+            <Output
+              type={OutputType.Fiat}
+              value={assetToAdd.referencePrice}
+              fractionDigits={Math.abs(Number(assetToAdd.ticksizeExponent))}
+            />
+          </span>
+        )}
+      </h2>
       <Styled.SearchSelectMenu
         items={[
           {
@@ -159,8 +170,10 @@ export const NewMarketForm = () => {
                     disabled={!canModifyLiqTier}
                   >
                     <Styled.Header style={{ marginLeft: '1rem' }}>
-                      {label}
-                      {tier === assetToAdd?.liquidityTier && <span> - Recommended ✨</span>}
+                      {label}{' '}
+                      {tier === assetToAdd?.liquidityTier && (
+                        <span style={{ marginLeft: '0.5ch' }}>- Recommended ✨</span>
+                      )}
                     </Styled.Header>
                     <Styled.Details
                       layout={isMobile ? 'grid' : 'rowColumns'}
@@ -220,7 +233,7 @@ export const NewMarketForm = () => {
                       dispatch(
                         openDialog({
                           type: DialogTypes.NewMarketMessageDetails,
-                          dialogProps: { assetData: assetToAdd },
+                          dialogProps: { assetData: assetToAdd, liquidityTier },
                         })
                       )
                     }
@@ -266,6 +279,22 @@ Styled.Form = styled.form`
   ${formMixins.transfersForm}
   ${layoutMixins.stickyArea0}
   --stickyArea0-background: transparent;
+
+  h2 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    span {
+      display: flex;
+      align-items: center;
+    }
+
+    output {
+      margin-left: 0.5ch;
+    }
+  }
 `;
 
 Styled.SearchSelectMenu = styled(SearchSelectMenu)``;
