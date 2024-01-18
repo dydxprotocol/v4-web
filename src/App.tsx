@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 import { WagmiConfig } from 'wagmi';
@@ -22,20 +22,8 @@ import { NotificationsProvider } from '@/hooks/useNotifications';
 import { LocalNotificationsProvider } from '@/hooks/useLocalNotifications';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
-import { SquidProvider } from '@/hooks/useSquid';
-import { TestFlagsProvider } from '@/hooks/useTestFlags';
 
 import { GuardedMobileRoute } from '@/components/GuardedMobileRoute';
-
-import MarketsPage from '@/pages/markets/Markets';
-import PortfolioPage from '@/pages/portfolio/Portfolio';
-import { AlertsPage } from '@/pages/AlertsPage';
-import ProfilePage from '@/pages/Profile';
-import { SettingsPage } from '@/pages/settings/Settings';
-import TradePage from '@/pages/trade/Trade';
-import { RewardsPage } from '@/pages/rewards/RewardsPage';
-import { TermsOfUsePage } from '@/pages/TermsOfUsePage';
-import { PrivacyPolicyPage } from '@/pages/PrivacyPolicyPage';
 
 import { HeaderDesktop } from '@/layout/Header/HeaderDesktop';
 import { FooterDesktop } from '@/layout/Footer/FooterDesktop';
@@ -48,10 +36,21 @@ import { config } from '@/lib/wagmi';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
+import { LoadingSpace } from './components/Loading/LoadingSpinner';
 
 import '@/styles/constants.css';
 import '@/styles/fonts.css';
 import '@/styles/web3modal.css';
+
+const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
+const PortfolioPage = lazy(() => import('@/pages/portfolio/Portfolio'));
+const AlertsPage = lazy(() => import('@/pages/AlertsPage'));
+const ProfilePage = lazy(() => import('@/pages/Profile'));
+const SettingsPage = lazy(() => import('@/pages/settings/Settings'));
+const TradePage = lazy(() => import('@/pages/trade/Trade'));
+const RewardsPage = lazy(() => import('@/pages/rewards/RewardsPage'));
+const TermsOfUsePage = lazy(() => import('@/pages/TermsOfUsePage'));
+const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicyPage'));
 
 const queryClient = new QueryClient();
 
@@ -71,7 +70,7 @@ const Content = () => {
       {isNotTablet && <HeaderDesktop />}
 
       <Styled.Main>
-        <Suspense fallback={null}>
+        <Suspense fallback={<LoadingSpace id="main" />}>
           <Routes>
             <Route path={AppRoute.Trade}>
               <Route path=":market" element={<TradePage />} />
@@ -124,13 +123,11 @@ const providers = [
   wrapProvider(QueryClientProvider, { client: queryClient }),
   wrapProvider(GrazProvider),
   wrapProvider(WagmiConfig, { config }),
-  wrapProvider(TestFlagsProvider),
   wrapProvider(LocaleProvider),
   wrapProvider(RestrictionProvider),
   wrapProvider(DydxProvider),
   wrapProvider(AccountsProvider),
   wrapProvider(SubaccountProvider),
-  wrapProvider(SquidProvider),
   wrapProvider(LocalNotificationsProvider),
   wrapProvider(NotificationsProvider),
   wrapProvider(DialogAreaProvider),

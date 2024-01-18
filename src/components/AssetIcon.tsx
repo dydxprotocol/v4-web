@@ -45,6 +45,7 @@ const assetIcons = {
   SOL: '/currencies/sol.png',
   SUI: '/currencies/sui.png',
   SUSHI: '/currencies/sushi.png',
+  TIA: '/currencies/tia.png',
   TRX: '/currencies/trx.png',
   UMA: '/currencies/uma.png',
   UNI: '/currencies/uni.png',
@@ -71,8 +72,13 @@ export const AssetIcon = ({
 }: {
   symbol?: Nullable<string>;
   className?: string;
-}) =>
-  isAssetSymbol(symbol) ? <Styled.Img src={assetIcons[symbol]} className={className} /> : null;
+}) => (
+  <Styled.Img
+    src={isAssetSymbol(symbol) ? assetIcons[symbol] : '/currencies/unavailable.png'}
+    className={className}
+    alt={symbol}
+  />
+);
 
 const Styled: Record<string, AnyStyledComponent> = {};
 

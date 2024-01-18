@@ -32,14 +32,14 @@ export const DYDXBalancePanel = () => {
   const { chainTokenLabel } = useTokenConfigs();
 
   return (
-    <Styled.Panel
+    <Panel
       slotHeader={
         <Styled.Header>
           <Styled.Title>
             <AssetIcon symbol={chainTokenLabel} />
             {chainTokenLabel}
           </Styled.Title>
-          <Styled.ReceiveAndTransferButtons>
+          <Styled.ActionButtons>
             {!canAccountTrade ? (
               <OnboardingTriggerButton size={ButtonSize.Small} />
             ) : (
@@ -52,7 +52,7 @@ export const DYDXBalancePanel = () => {
                 {stringGetter({ key: STRING_KEYS.TRANSFER })}
               </Button>
             )}
-          </Styled.ReceiveAndTransferButtons>
+          </Styled.ActionButtons>
         </Styled.Header>
       }
     >
@@ -108,20 +108,16 @@ export const DYDXBalancePanel = () => {
           ]}
         />
       </Styled.Content>
-    </Styled.Panel>
+    </Panel>
   );
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
-Styled.Panel = styled(Panel)`
-  --panel-paddingX: 1.5rem;
-`;
-
 Styled.Header = styled.div`
   ${layoutMixins.spacedRow}
   gap: 1rem;
-  padding: 1rem 1.5rem 0;
+  padding: var(--panel-paddingY) var(--panel-paddingX) 0;
 `;
 
 Styled.Title = styled.h3`
@@ -134,7 +130,7 @@ Styled.Title = styled.h3`
   }
 `;
 
-Styled.ReceiveAndTransferButtons = styled(Toolbar)`
+Styled.ActionButtons = styled(Toolbar)`
   ${layoutMixins.inlineRow}
   --stickyArea-topHeight: max-content;
   gap: 0.5rem;

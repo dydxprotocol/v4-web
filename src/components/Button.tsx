@@ -61,7 +61,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
 
     return (
       <StyledBaseButton
-        disabled={state[ButtonState.Disabled]}
+        disabled={state[ButtonState.Disabled] || state[ButtonState.Loading]}
         {...{ ref, action, size, shape, state, ...otherProps }}
       >
         {

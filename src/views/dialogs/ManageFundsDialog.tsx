@@ -18,13 +18,14 @@ import abacusStateManager from '@/lib/abacus';
 import { DepositDialogContent } from './DepositDialog/DepositDialogContent';
 
 type ElementProps = {
+  selectedTransferType?: string;
   setIsOpen?: (open: boolean) => void;
 };
 
-export const ManageFundsDialog = ({ setIsOpen }: ElementProps) => {
+export const ManageFundsDialog = ({ setIsOpen, selectedTransferType }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { type } = useSelector(getTransferInputs, shallowEqual) || {};
-  const currentType = type?.rawValue ?? TransferType.deposit.rawValue;
+  const currentType = type?.rawValue ?? selectedTransferType ?? TransferType.deposit.rawValue;
 
   const closeDialog = () => setIsOpen?.(false);
 

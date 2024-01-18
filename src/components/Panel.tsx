@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Icon, IconName } from '@/components/Icon';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+import { breakpoints } from '@/styles';
 
 type PanelProps = {
   slotHeaderContent?: string;
@@ -66,6 +67,12 @@ Styled.Panel = styled.section<{ onClick?: () => void }>`
   --panel-paddingX: 1rem;
   --panel-content-paddingY: var(--panel-paddingY);
   --panel-content-paddingX: var(--panel-paddingX);
+
+  @media ${breakpoints.notTablet} {
+    --panel-paddingX: 1.5rem;
+    --panel-paddingY: 1.25rem;
+    --panel-content-paddingY: 1rem;
+  }
 
   ${layoutMixins.row}
 

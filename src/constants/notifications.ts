@@ -4,6 +4,7 @@ import { StatusResponse } from '@0xsquid/sdk';
 export enum NotificationType {
   AbacusGenerated = 'AbacusGenerated',
   SquidTransfer = 'SquidTransfer',
+  ReleaseUpdates = 'ReleaseUpdates',
 }
 
 export enum NotificationComponentType {}
@@ -86,6 +87,8 @@ export type NotificationDisplayData = {
   slotTitleLeft?: React.ReactNode;
   slotTitleRight?: React.ReactNode;
 
+  groupKey: string; // Grouping key toast notification stacking
+
   // Overrides title/body for Notification in NotificationMenu
   renderCustomBody?: ({
     isToast,
@@ -121,13 +124,20 @@ export type NotificationDisplayData = {
   toastDuration?: number;
 };
 
+export enum TransferNotificationTypes {
+  Withdrawal = 'withdrawal',
+  Deposit = 'deposit',
+}
+
 // Notification types
 export type TransferNotifcation = {
   txHash: string;
+  type?: TransferNotificationTypes;
   toChainId?: string;
   fromChainId?: string;
   toAmount?: number;
   triggeredAt?: number;
+  isCctp?: boolean;
   errorCount?: number;
   status?: StatusResponse;
 };

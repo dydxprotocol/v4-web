@@ -20,12 +20,15 @@ import {
   type NotificationTypeConfig,
   NotificationType,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
+  TransferNotificationTypes,
 } from '@/constants/notifications';
 
 import { useSelectedNetwork, useStringGetter } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
+import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
+import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
@@ -78,8 +81,32 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   body: abacusNotif.text ? stringGetter({ key: abacusNotif.text, params }) : '',
                   toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
                   toastSensitivity: 'foreground',
+                  groupKey: abacusNotificationType,
                   renderCustomBody: ({ isToast, notification }) => (
                     <TradeNotification
+                      isToast={isToast}
+                      data={parsedData}
+                      notification={notification}
+                    />
+                  ),
+                },
+                [abacusNotif.updateTimeInMilliseconds, abacusNotif.data],
+                true
+              );
+              break;
+            }
+            case 'blockReward': {
+              trigger(
+                abacusNotif.id,
+                {
+                  icon: abacusNotif.image && <$Icon src={abacusNotif.image} alt="" />,
+                  title: stringGetter({ key: abacusNotif.title }),
+                  body: abacusNotif.text ? stringGetter({ key: abacusNotif.text, params }) : '',
+                  toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+                  toastSensitivity: 'foreground',
+                  groupKey: abacusNotificationType,
+                  renderCustomBody: ({ isToast, notification }) => (
+                    <BlockRewardNotification
                       isToast={isToast}
                       data={parsedData}
                       notification={notification}
@@ -100,6 +127,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   body: abacusNotif.text ? stringGetter({ key: abacusNotif.text, params }) : '',
                   toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
                   toastSensitivity: 'foreground',
+                  groupKey: abacusNotificationType,
                 },
                 [abacusNotif.updateTimeInMilliseconds, abacusNotif.data]
               );
@@ -151,20 +179,20 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       useEffect(() => {
         for (const transfer of transferNotifications) {
-          const { fromChainId, status, txHash, toAmount } = transfer;
+          const { fromChainId, status, txHash, toAmount, type } = transfer;
           const isFinished = Boolean(status) && status?.squidTransactionStatus !== 'ongoing';
           const icon = <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />;
 
-          const type =
-            fromChainId === ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId
-              ? 'withdrawal'
-              : 'deposit';
+          const transferType =
+            type ?? fromChainId === ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId
+              ? TransferNotificationTypes.Withdrawal
+              : TransferNotificationTypes.Deposit;
 
           const title = stringGetter({
             key: {
               deposit: isFinished ? STRING_KEYS.DEPOSIT : STRING_KEYS.DEPOSIT_IN_PROGRESS,
               withdrawal: isFinished ? STRING_KEYS.WITHDRAW : STRING_KEYS.WITHDRAW_IN_PROGRESS,
-            }[type],
+            }[transferType],
           });
 
           const toChainEta = status?.toChain?.chainData?.estimatedRouteDuration || 0;
@@ -189,12 +217,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   slotIcon={icon}
                   slotTitle={title}
                   transfer={transfer}
-                  type={type}
+                  type={transferType}
                   triggeredAt={transfer.triggeredAt}
                   notification={notification}
                 />
               ),
               toastSensitivity: 'foreground',
+              groupKey: NotificationType.SquidTransfer,
             },
             [isFinished]
           );
@@ -205,9 +234,58 @@ export const notificationTypes: NotificationTypeConfig[] = [
       return () => {};
     },
   },
+  {
+    type: NotificationType.ReleaseUpdates,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+
+      useEffect(() => {
+        trigger(
+          'rewards-and-full-trading-live',
+          {
+            icon: <AssetIcon symbol="DYDX" />,
+            title: stringGetter({ key: 'NOTIFICATIONS.RELEASE_REWARDS_AND_FULL_TRADING.TITLE' }),
+            body: stringGetter({
+              key: 'NOTIFICATIONS.RELEASE_REWARDS_AND_FULL_TRADING.BODY',
+              params: {
+                DOS_BLOGPOST: (
+                  <$Link
+                    href="https://www.dydxopsdao.com/blog/deep-dive-full-trading"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {stringGetter({ key: STRING_KEYS.HERE })}
+                  </$Link>
+                ),
+                TRADING_BLOGPOST: (
+                  <$Link
+                    href="https://dydx.exchange/blog/v4-full-trading"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {stringGetter({ key: STRING_KEYS.HERE })}
+                  </$Link>
+                ),
+              },
+            }),
+            toastSensitivity: 'foreground',
+            groupKey: NotificationType.ReleaseUpdates,
+          },
+          []
+        );
+      }, [stringGetter]);
+    },
+    useNotificationAction: () => {
+      return () => {};
+    },
+  },
 ];
 
 const $Icon = styled.img`
   height: 1.5rem;
   width: 1.5rem;
+`;
+
+const $Link = styled.a`
+  --link-color: var(--color-text-2);
 `;

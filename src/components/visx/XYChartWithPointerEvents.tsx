@@ -1,26 +1,33 @@
-import React, { useContext, useState } from 'react';
+import React, { PropsWithChildren, useContext, useState } from 'react';
 
 import { Point } from '@visx/point';
 import { localPoint } from '@visx/event';
-import { XYChart, DataContext } from '@visx/xychart';
+import { XYChart, DataContext, type EventHandlerParams } from '@visx/xychart';
 import { getScaleBandwidth } from '@/components/visx/getScaleBandwidth';
 
 export const XYChartWithPointerEvents = ({
-  onPointerMove, onPointerUp, onPointerPressedChange, ...props
+  onPointerMove,
+  onPointerUp,
+  onPointerPressedChange,
+  ...props
 }: {
-  onPointerMove?: (point: Point) => void;
-  onPointerUp?: (point: Point) => void;
+  onPointerMove?: (point: Point | EventHandlerParams<object>) => void;
+  onPointerUp?: (point: Point | EventHandlerParams<object>) => void;
   onPointerPressedChange?: (isPointerPressed: boolean) => void;
-} & React.PropsWithChildren<Parameters<typeof XYChart>>) => {
+} & PropsWithChildren<Parameters<typeof XYChart>[0]>) => {
   const { xScale, yScale } = useContext(DataContext);
-
   const [lastPointerMoveEvent, setLastPointerMoveEvent] = useState<React.PointerEvent>();
 
   const pointerContainerPosition = lastPointerMoveEvent ? localPoint(lastPointerMoveEvent) : null;
 
-  const pointerChartPosition = xScale && yScale && pointerContainerPosition &&
+  const pointerChartPosition =
+    xScale &&
+    yScale &&
+    pointerContainerPosition &&
     new Point({
+      // @ts-expect-error invert supposedly doesn't exist on AxisScale
       x: xScale.invert(pointerContainerPosition?.x - getScaleBandwidth(xScale) / 2),
+      // @ts-expect-error invert supposedly doesn't exist on AxisScale
       y: yScale.invert(pointerContainerPosition?.y - getScaleBandwidth(yScale) / 2),
     });
 
@@ -29,15 +36,13 @@ export const XYChartWithPointerEvents = ({
       {...props}
       onPointerMove={({ event }) => {
         setLastPointerMoveEvent(event as React.PointerEvent);
-        if (pointerChartPosition)
-          onPointerMove?.(pointerChartPosition);
+        if (pointerChartPosition) onPointerMove?.(pointerChartPosition);
       }}
       onPointerOut={() => setLastPointerMoveEvent(undefined)}
       onPointerDown={() => onPointerPressedChange?.(true)}
       onPointerUp={() => {
         onPointerPressedChange?.(false);
-        if (pointerChartPosition)
-          onPointerUp?.(pointerChartPosition);
+        if (pointerChartPosition) onPointerUp?.(pointerChartPosition);
       }}
     >
       {props.children}

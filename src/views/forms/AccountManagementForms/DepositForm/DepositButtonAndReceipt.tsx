@@ -1,21 +1,16 @@
-import { type Dispatch, type SetStateAction, useState, type ReactNode } from 'react';
+import { type Dispatch, type ReactNode, type SetStateAction, useState, useMemo } from 'react';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
 import type { RouteData } from '@0xsquid/sdk';
+import { formatUnits } from 'viem';
 
-import {
-  ButtonAction,
-  ButtonShape,
-  ButtonSize,
-  ButtonState,
-  ButtonType,
-} from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 
 import { TransferInputTokenResource } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
-import { NumberSign } from '@/constants/numbers';
+import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter, useTokenConfigs } from '@/hooks';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -34,6 +29,7 @@ import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccountBuyingPower, getSubaccountEquity } from '@/state/accountSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
+import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { SlippageEditor } from '../SlippageEditor';
@@ -83,7 +79,8 @@ export const DepositButtonAndReceipt = ({
   const { current: buyingPower, postOrder: newBuyingPower } =
     useSelector(getSubaccountBuyingPower, shallowEqual) || {};
 
-  const { summary, requestPayload } = useSelector(getTransferInputs, shallowEqual) || {};
+  const { isCctp, summary, requestPayload } = useSelector(getTransferInputs, shallowEqual) || {};
+  const { usdcDecimals, usdcLabel } = useTokenConfigs();
 
   const feeSubitems: DetailsItem[] = [];
 
@@ -98,7 +95,7 @@ export const DepositButtonAndReceipt = ({
   if (typeof summary?.bridgeFee === 'number') {
     feeSubitems.push({
       key: 'bridge-fees',
-      label: <span>Bridge Fee</span>,
+      label: <span>{stringGetter({ key: STRING_KEYS.BRIDGE_FEE })}</span>,
       value: <Output type={OutputType.Fiat} value={summary?.bridgeFee} />,
     });
   }
@@ -109,12 +106,56 @@ export const DepositButtonAndReceipt = ({
     ? stringGetter({ key: STRING_KEYS.HIDE_ALL_DETAILS })
     : stringGetter({ key: STRING_KEYS.SHOW_ALL_DETAILS });
 
+  const totalFees = (summary?.bridgeFee || 0) + (summary?.gasFee || 0);
+
   const submitButtonReceipt = [
+    {
+      key: 'expected-deposit-amount',
+      label: (
+        <span>
+          {stringGetter({ key: STRING_KEYS.EXPECTED_DEPOSIT_AMOUNT })} <Tag>{usdcLabel}</Tag>
+        </span>
+      ),
+      value: <Output type={OutputType.Fiat} fractionDigits={TOKEN_DECIMALS} value={summary?.toAmount} />,
+      subitems: [
+        {
+          key: 'minimum-deposit-amount',
+          label: (
+            <span>
+              {stringGetter({ key: STRING_KEYS.MINIMUM_DEPOSIT_AMOUNT })} <Tag>{usdcLabel}</Tag>
+            </span>
+          ),
+          value: (
+            <Output type={OutputType.Fiat} fractionDigits={TOKEN_DECIMALS} value={summary?.toAmountMin} />
+          ),
+          tooltip: 'minimum-deposit-amount',
+        },
+      ],
+    },
+    {
+      key: 'exchange-rate',
+      label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
+      value:
+        typeof summary?.exchangeRate === 'number' ? (
+          <Styled.ExchangeRate>
+            <Output
+              type={OutputType.Asset}
+              value={1}
+              fractionDigits={0}
+              tag={sourceToken?.symbol}
+            />
+            =
+            <Output type={OutputType.Asset} value={summary?.exchangeRate} tag={usdcLabel} />
+          </Styled.ExchangeRate>
+        ) : (
+          <Output type={OutputType.Asset} />
+        ),
+    },
     {
       key: 'equity',
       label: (
         <span>
-          {stringGetter({ key: STRING_KEYS.EQUITY })} <Tag>USDC</Tag>
+          {stringGetter({ key: STRING_KEYS.EQUITY })} <Tag>{usdcLabel}</Tag>
         </span>
       ),
       value: (
@@ -131,7 +172,7 @@ export const DepositButtonAndReceipt = ({
       key: 'buying-power',
       label: (
         <span>
-          {stringGetter({ key: STRING_KEYS.BUYING_POWER })} <Tag>USDC</Tag>
+          {stringGetter({ key: STRING_KEYS.BUYING_POWER })} <Tag>{usdcLabel}</Tag>
         </span>
       ),
       value: (
@@ -144,28 +185,15 @@ export const DepositButtonAndReceipt = ({
         />
       ),
     },
-    {
-      key: 'exchange-rate',
-      label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
-      value: typeof summary?.exchangeRate === 'number' && (
-        <Styled.ExchangeRate>
-          <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={sourceToken?.symbol} />
-          =
-          <Output type={OutputType.Asset} value={summary?.exchangeRate} tag="USDC" />
-        </Styled.ExchangeRate>
-      ),
-    },
-    {
+    !isCctp && {
       key: 'total-fees',
       label: <span>{stringGetter({ key: STRING_KEYS.TOTAL_FEES })}</span>,
-      value: typeof summary?.bridgeFee === 'number' && typeof summary?.gasFee === 'number' && (
-        <Output type={OutputType.Fiat} value={summary?.bridgeFee + summary?.gasFee} />
-      ),
+      value: <Output type={OutputType.Fiat} value={totalFees} />,
       subitems: feeSubitems,
     },
     {
       key: 'slippage',
-      label: <span>{stringGetter({ key: STRING_KEYS.SLIPPAGE })}</span>,
+      label: <span>{stringGetter({ key: STRING_KEYS.MAX_SLIPPAGE })}</span>,
       value: (
         <SlippageEditor
           disabled
@@ -178,17 +206,26 @@ export const DepositButtonAndReceipt = ({
     {
       key: 'estimatedRouteDuration',
       label: <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_TIME })}</span>,
-      value: typeof summary?.estimatedRouteDuration === 'number' && (
+      value: (
         <Output
           type={OutputType.Text}
-          value={stringGetter({
-            key: STRING_KEYS.X_MINUTES_LOWERCASED,
-            params: { X: Math.round(summary?.estimatedRouteDuration / 60) },
-          })}
+          value={
+            typeof summary?.estimatedRouteDuration === 'number'
+              ? stringGetter({
+                  key: STRING_KEYS.X_MINUTES_LOWERCASED,
+                  params: {
+                    X:
+                      summary?.estimatedRouteDuration < 60
+                        ? '< 1'
+                        : Math.round(summary?.estimatedRouteDuration / 60),
+                  },
+                })
+              : null
+          }
         />
       ),
     },
-  ];
+  ].filter(isTruthy);
 
   const isFormValid = !isDisabled && !isEditingSlippage;
 

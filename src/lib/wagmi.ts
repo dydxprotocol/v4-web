@@ -1,4 +1,4 @@
-import { createConfig, configureChains, mainnet, Chain, Connector, usePublicClient } from 'wagmi';
+import { createConfig, configureChains, mainnet, Chain } from 'wagmi';
 import { goerli } from 'wagmi/chains';
 
 import {
@@ -26,6 +26,9 @@ import {
   fantomTestnet,
   celo,
   celoAlfajores,
+  scroll,
+  kava,
+  sepolia,
 } from 'viem/chains';
 
 import { alchemyProvider } from 'wagmi/providers/alchemy';
@@ -53,7 +56,7 @@ import { isTruthy } from './isTruthy';
 export const WAGMI_SUPPORTED_CHAINS: Chain[] = [
   mainnet,
   goerli,
-
+  sepolia,
   arbitrum,
   arbitrumGoerli,
   avalanche,
@@ -78,6 +81,8 @@ export const WAGMI_SUPPORTED_CHAINS: Chain[] = [
   fantomTestnet,
   celo,
   celoAlfajores,
+  scroll,
+  kava,
 ];
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
@@ -146,7 +151,7 @@ const getConnectors = (walletConnectConfig: WalletConnectConfig) => [
   new CoinbaseWalletConnector({
     chains,
     options: {
-      appName: 'wagmi',
+      appName: 'dYdX',
       reloadOnDisconnect: false,
     },
   }),

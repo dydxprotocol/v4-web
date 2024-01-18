@@ -21,6 +21,7 @@ export type TabItem<TabItemsValue> = {
   content?: React.ReactNode;
   subitems?: TabItem<TabItemsValue>[];
   customTrigger?: ReactNode;
+  asChild?: boolean;
 };
 
 type ElementProps<TabItemsValue> = {
@@ -40,6 +41,8 @@ type StyleProps = {
   withTransitions?: boolean;
   className?: string;
 };
+
+export type TabsProps<TabItemsValue> = ElementProps<TabItemsValue> & StyleProps;
 
 export const Tabs = <TabItemsValue extends string>({
   defaultValue,
@@ -107,9 +110,10 @@ export const Tabs = <TabItemsValue extends string>({
         sharedContent
       ) : (
         <Styled.Stack>
-          {items.map(({ value, content, forceMount }) => (
+          {items.map(({ asChild, value, content, forceMount }) => (
             <Styled.Content
               key={value}
+              asChild={asChild}
               value={value}
               forceMount={forceMount}
               $hide={forceMount && currentItem?.value !== value}
@@ -242,7 +246,6 @@ Styled.Trigger = styled(Trigger)<{ $withBorders?: boolean }>`
 
 Styled.Stack = styled.div`
   ${layoutMixins.stack}
-  ${layoutMixins.perspectiveArea}
 
   box-shadow: none;
 `;

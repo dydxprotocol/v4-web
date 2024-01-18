@@ -10,6 +10,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Button, ButtonProps } from './Button';
 import { Icon, IconName } from './Icon';
 import { IconButton } from './IconButton';
+import { WithTooltip } from './WithTooltip';
 
 export type CopyButtonProps = {
   value?: string;
@@ -40,13 +41,17 @@ export const CopyButton = ({
       <Styled.Icon copied={copied} iconName={copied ? IconName.Check : IconName.Copy} />
     </Styled.InlineRow>
   ) : buttonType === 'icon' ? (
-    <Styled.IconButton
-      {...buttonProps}
-      copied={copied}
-      action={ButtonAction.Base}
-      iconName={copied ? IconName.Check : IconName.Copy}
-      onClick={onCopy}
-    />
+    <WithTooltip
+      tooltipString={stringGetter({ key: copied ? STRING_KEYS.COPIED : STRING_KEYS.COPY })}
+    >
+      <Styled.IconButton
+        {...buttonProps}
+        copied={copied}
+        action={ButtonAction.Base}
+        iconName={copied ? IconName.Check : IconName.Copy}
+        onClick={onCopy}
+      />
+    </WithTooltip>
   ) : (
     <Button
       {...buttonProps}

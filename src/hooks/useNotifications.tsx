@@ -81,6 +81,7 @@ const useNotificationsContext = () => {
       setNotificationPreferences({
         [NotificationType.AbacusGenerated]: true,
         [NotificationType.SquidTransfer]: true,
+        [NotificationType.ReleaseUpdates]: true,
         version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
       });
     }

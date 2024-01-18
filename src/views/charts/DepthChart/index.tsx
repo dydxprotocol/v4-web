@@ -1,14 +1,20 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { AnyStyledComponent, css, keyframes } from 'styled-components';
 import { useSelector, shallowEqual } from 'react-redux';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 
-import { StringGetterFunction, STRING_KEYS } from '@/constants/localization';
+import {
+  DepthChartDatum,
+  DepthChartPoint,
+  DepthChartSeries,
+  SERIES_KEY_FOR_ORDER_SIDE,
+} from '@/constants/charts';
+import { StringGetterFunction } from '@/constants/localization';
 
 import { useBreakpoints } from '@/hooks';
+import { useOrderbookValuesForDepthChart } from '@/hooks/useOrderbookValues';
 
-import { MustBigNumber } from '@/lib/numbers';
-
-import { getCurrentMarketConfig, getCurrentMarketOrderbook } from '@/state/perpetualsSelectors';
+import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 
 import { XYChartWithPointerEvents } from '@/components/visx/XYChartWithPointerEvents';
@@ -21,24 +27,25 @@ import {
   darkTheme,
   DataProvider,
   EventEmitterProvider,
+  type EventHandlerParams,
 } from '@visx/xychart';
 import { LinearGradient } from '@visx/gradient';
 import { curveStepAfter } from '@visx/curve';
-import type { Point } from '@visx/point';
+import { Point } from '@visx/point';
 import Tooltip from '@/components/visx/XYChartTooltipWithBounds';
-import { TooltipContent } from '@/components/visx/TooltipContent';
 import { AxisLabelOutput } from '@/components/visx/AxisLabelOutput';
 
-import { Details } from '@/components/Details';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
-import { Output, OutputType } from '@/components/Output';
+import { OutputType } from '@/components/Output';
 
-import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { MustBigNumber } from '@/lib/numbers';
+
+import { DepthChartTooltipContent } from './Tooltip';
 
 // @ts-ignore
 const theme = buildChartTheme({
   ...darkTheme,
-  colors: ['var(--color-positive)', 'var(--color-negative)', 'white'], // categorical colors, mapped to series via `dataKey`s
+  colors: ['var(--color-positive)', 'var(--color-negative)', 'var(--color-layer-6)'], // categorical colors, mapped to series via `dataKey`s
 });
 
 const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n));
@@ -58,30 +65,6 @@ const formatNumber = (n: number, selectedLocale: string, isCompact: boolean = n 
     : formattedNumber;
 };
 
-enum DepthChartSeries {
-  Asks = 'Asks',
-  Bids = 'Bids',
-  MidMarket = 'MidMarket',
-}
-
-type DepthChartDatum = {
-  size: number;
-  price: number;
-  depth: number;
-  seriesKey: DepthChartSeries;
-};
-
-const seriesKeyForOrderSide = {
-  [OrderSide.BUY]: DepthChartSeries.Bids,
-  [OrderSide.SELL]: DepthChartSeries.Asks,
-};
-
-type DepthChartPoint = {
-  side: OrderSide;
-  price: number;
-  size: number;
-};
-
 export const DepthChart = ({
   onChartClick,
   stringGetter,
@@ -96,8 +79,6 @@ export const DepthChart = ({
   const { isMobile } = useBreakpoints();
 
   // Chart data
-
-  const orderbook = useSelector(getCurrentMarketOrderbook, shallowEqual);
   const { id = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const { stepSizeDecimals, tickSizeDecimals } =
     useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
@@ -112,43 +93,15 @@ export const DepthChart = ({
     midMarketPrice,
     spread,
     spreadPercent,
-  } = useMemo(() => {
-    const bids = (orderbook?.bids?.toArray() ?? [])
-      .filter(Boolean)
-      .map((datum) => ({ ...datum, seriesKey: DepthChartSeries.Bids } as DepthChartDatum));
-
-    const asks = (orderbook?.asks?.toArray() ?? [])
-      .filter(Boolean)
-      .map((datum) => ({ ...datum, seriesKey: DepthChartSeries.Asks } as DepthChartDatum));
-
-    const lowestBid = bids[bids.length - 1];
-    const highestBid = bids[0];
-    const lowestAsk = asks[0];
-    const highestAsk = asks[asks.length - 1];
-
-    const midMarketPrice = orderbook?.midPrice;
-    const spread = MustBigNumber(lowestAsk?.price ?? 0).minus(highestBid?.price ?? 0);
-    const spreadPercent = orderbook?.spreadPercent;
-
-    return {
-      bids,
-      asks,
-      lowestBid,
-      highestBid,
-      lowestAsk,
-      highestAsk,
-      midMarketPrice,
-      spread,
-      spreadPercent,
-    };
-  }, [orderbook]);
+    orderbook,
+  } = useOrderbookValuesForDepthChart();
 
   // Chart state
 
   const [isPointerPressed, setIsPointerPressed] = useState(false);
   const [chartPointAtPointer, setChartPointAtPointer] = useState<DepthChartPoint>();
 
-  const isEditingOrder = isPointerPressed && chartPointAtPointer;
+  const isEditingOrder = Boolean(isPointerPressed && chartPointAtPointer);
 
   const [zoomDomain, setZoomDomain] = useState<undefined | number>();
 
@@ -193,12 +146,24 @@ export const DepthChart = ({
   }, [orderbook, zoomDomain]);
 
   const getChartPoint = useCallback(
-    ({ x: price, y: size }: Point) =>
-      ({
-        side: price < midMarketPrice! ? OrderSide.BUY : OrderSide.SELL,
+    (point: Point | EventHandlerParams<object>) => {
+      let price, size;
+      if (point instanceof Point) {
+        const { x, y } = point as Point;
+        price = x;
+        size = y;
+      } else {
+        const { svgPoint: { x, y } = {} } = point as EventHandlerParams<object>;
+        price = x;
+        size = y;
+      }
+
+      return {
+        side: MustBigNumber(price).lt(midMarketPrice!) ? OrderSide.BUY : OrderSide.SELL,
         price,
         size,
-      } as DepthChartPoint),
+      } as DepthChartPoint;
+    },
     [midMarketPrice]
   );
 
@@ -256,7 +221,7 @@ export const DepthChart = ({
             }}
             onPointerUp={(point) => point && onChartClick?.(getChartPoint(point))}
             onPointerMove={(point) => point && setChartPointAtPointer(getChartPoint(point))}
-            onPointerPressedChange={setIsPointerPressed}
+            onPointerPressedChange={(isPointerPressed) => setIsPointerPressed(isPointerPressed)}
           >
             <Axis
               orientation="bottom"
@@ -363,7 +328,7 @@ export const DepthChart = ({
                 <Styled.XAxisLabelOutput
                   type={OutputType.Fiat}
                   value={
-                    isEditingOrder
+                    isEditingOrder && chartPointAtPointer
                       ? chartPointAtPointer.price
                       : tooltipData!.nearestDatum?.datum.price
                   }
@@ -374,8 +339,8 @@ export const DepthChart = ({
                       [DepthChartSeries.Bids]: 'var(--color-positive)',
                       [DepthChartSeries.MidMarket]: 'var(--color-layer-6)',
                     }[
-                      isEditingOrder
-                        ? seriesKeyForOrderSide[chartPointAtPointer.side]
+                      isEditingOrder && chartPointAtPointer
+                        ? SERIES_KEY_FOR_ORDER_SIDE[chartPointAtPointer.side]
                         : (tooltipData!.nearestDatum?.key as DepthChartSeries)
                     ]
                   }
@@ -389,7 +354,7 @@ export const DepthChart = ({
                   <Styled.YAxisLabelOutput
                     type={OutputType.Asset}
                     value={
-                      isEditingOrder
+                      isEditingOrder && chartPointAtPointer
                         ? chartPointAtPointer.size
                         : tooltipData!.nearestDatum?.datum.depth
                     }
@@ -400,8 +365,8 @@ export const DepthChart = ({
                         [DepthChartSeries.Bids]: 'var(--color-positive)',
                         [DepthChartSeries.MidMarket]: 'var(--color-layer-6)',
                       }[
-                        isEditingOrder
-                          ? seriesKeyForOrderSide[chartPointAtPointer.side]
+                        isEditingOrder && chartPointAtPointer
+                          ? SERIES_KEY_FOR_ORDER_SIDE[chartPointAtPointer.side]
                           : (tooltipData!.nearestDatum?.key as DepthChartSeries)
                       ]
                     }
@@ -410,181 +375,22 @@ export const DepthChart = ({
               }
               snapTooltipToDatumX={!isEditingOrder}
               snapTooltipToDatumY={isEditingOrder ? false : isMobile}
-              renderTooltip={({ tooltipData, colorScale }) => {
-                const { nearestDatum } = tooltipData || {};
-
-                if (!isEditingOrder && !nearestDatum?.datum) return null;
-
-                return (
-                  <TooltipContent
-                    accentColor={colorScale?.(
-                      isEditingOrder
-                        ? seriesKeyForOrderSide[chartPointAtPointer.side]
-                        : nearestDatum.key
-                    )}
-                  >
-                    <h4>
-                      {isEditingOrder
-                        ? 'Release mouse to edit order'
-                        : {
-                            [DepthChartSeries.Bids]: 'Bids',
-                            [DepthChartSeries.Asks]: 'Asks',
-                            [DepthChartSeries.MidMarket]: 'Mid-Market',
-                          }[nearestDatum.key]}
-                    </h4>
-
-                    <Details
-                      layout="column"
-                      items={
-                        isEditingOrder
-                          ? [
-                              {
-                                key: 'side',
-                                label: stringGetter({ key: STRING_KEYS.SIDE }),
-                                value: (
-                                  <Output
-                                    type={OutputType.Text}
-                                    value={
-                                      {
-                                        [OrderSide.BUY]: stringGetter({
-                                          key: STRING_KEYS.BUY,
-                                        }),
-                                        [OrderSide.SELL]: stringGetter({
-                                          key: STRING_KEYS.SELL,
-                                        }),
-                                      }[chartPointAtPointer.side]
-                                    }
-                                  />
-                                ),
-                              },
-                              {
-                                key: 'limitPrice',
-                                label: stringGetter({ key: STRING_KEYS.LIMIT_PRICE }),
-                                value: (
-                                  <Output
-                                    type={OutputType.Fiat}
-                                    value={chartPointAtPointer.price}
-                                    useGrouping={false}
-                                  />
-                                ),
-                              },
-                              {
-                                key: 'size',
-                                label: stringGetter({ key: STRING_KEYS.AMOUNT }),
-                                value: (
-                                  <Output
-                                    type={OutputType.Asset}
-                                    value={chartPointAtPointer.size}
-                                    fractionDigits={stepSizeDecimals}
-                                    tag={id}
-                                    useGrouping={false}
-                                  />
-                                ),
-                              },
-                            ]
-                          : nearestDatum?.key === DepthChartSeries.MidMarket
-                          ? [
-                              {
-                                key: 'midMarketPrice',
-                                // label: stringGetter({ key: STRING_KEYS.ORDERBOOK_MID_MARKET_PRICE }),
-                                label: stringGetter({ key: STRING_KEYS.PRICE }),
-                                value: (
-                                  <Output
-                                    type={OutputType.Fiat}
-                                    value={midMarketPrice}
-                                    useGrouping={false}
-                                  />
-                                ),
-                              },
-                              {
-                                key: 'spread',
-                                label: stringGetter({ key: STRING_KEYS.ORDERBOOK_SPREAD }),
-                                value: (
-                                  <>
-                                    <Output
-                                      type={OutputType.Fiat}
-                                      value={spread}
-                                      fractionDigits={tickSizeDecimals}
-                                      useGrouping={false}
-                                    />
-                                    <Output
-                                      type={OutputType.SmallPercent}
-                                      value={spreadPercent}
-                                      withParentheses
-                                    />
-                                  </>
-                                ),
-                              },
-                            ]
-                          : [
-                              {
-                                key: 'price',
-                                label: stringGetter({ key: STRING_KEYS.PRICE }),
-                                value: (
-                                  <>
-                                    {nearestDatum &&
-                                      {
-                                        [DepthChartSeries.Bids]: '≥',
-                                        [DepthChartSeries.Asks]: '≤',
-                                      }[nearestDatum.key]}
-                                    <Output
-                                      type={OutputType.Fiat}
-                                      value={nearestDatum?.datum.price}
-                                      useGrouping={false}
-                                    />
-                                  </>
-                                ),
-                              },
-                              {
-                                key: 'depth',
-                                label: stringGetter({ key: STRING_KEYS.TOTAL_SIZE }),
-                                value: (
-                                  <Output
-                                    type={OutputType.Asset}
-                                    value={nearestDatum?.datum.depth}
-                                    fractionDigits={stepSizeDecimals}
-                                    tag={id}
-                                    useGrouping={false}
-                                  />
-                                ),
-                              },
-                              {
-                                key: 'cost',
-                                label: stringGetter({ key: STRING_KEYS.TOTAL_COST }),
-                                value: (
-                                  <Output
-                                    useGrouping
-                                    type={OutputType.Fiat}
-                                    value={nearestDatum?.datum.price * nearestDatum?.datum.depth}
-                                  />
-                                ),
-                              },
-                              {
-                                key: 'priceImpact',
-                                label: stringGetter({ key: STRING_KEYS.PRICE_IMPACT }),
-                                value: (
-                                  <Output
-                                    useGrouping
-                                    type={OutputType.Percent}
-                                    value={{
-                                      [DepthChartSeries.Asks]: () =>
-                                        MustBigNumber(nearestDatum.datum.price)
-                                          .minus(lowestAsk.price)
-                                          .div(nearestDatum.datum.price),
-                                      [DepthChartSeries.Bids]: () =>
-                                        MustBigNumber(highestBid.price)
-                                          .minus(nearestDatum.datum.price)
-                                          .div(highestBid.price),
-                                    }[nearestDatum.key]()}
-                                  />
-                                ),
-                              },
-                            ]
-                      }
-                    />
-                  </TooltipContent>
-                );
-              }}
+              renderTooltip={({ tooltipData, colorScale }) =>
+                chartPointAtPointer && (
+                  <DepthChartTooltipContent
+                    {...{
+                      tooltipData,
+                      colorScale,
+                      isEditingOrder,
+                      chartPointAtPointer,
+                      stringGetter,
+                      selectedLocale,
+                      stepSizeDecimals,
+                      tickSizeDecimals,
+                    }}
+                  />
+                )
+              }
             />
           </XYChartWithPointerEvents>
         </EventEmitterProvider>

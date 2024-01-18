@@ -2,22 +2,21 @@ import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
-import { parseUnits } from 'viem';
+import { Abi, parseUnits } from 'viem';
 
 import erc20 from '@/abi/erc20.json';
+import erc20_usdt from '@/abi/erc20_usdt.json';
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
-import { NotificationStatus } from '@/constants/notifications';
-import { NumberSign } from '@/constants/numbers';
+import { ENVIRONMENT_CONFIG_MAP, isMainnet } from '@/constants/networks';
+import { MAX_CCTP_TRANSFER_AMOUNT, MAX_PRICE_IMPACT, NumberSign } from '@/constants/numbers';
 import type { EvmAddress } from '@/constants/wallets';
 
 import { useAccounts, useDebounce, useStringGetter, useSelectedNetwork } from '@/hooks';
 import { useAccountBalance, CHAIN_DEFAULT_TOKEN_ADDRESS } from '@/hooks/useAccountBalance';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
-import { NATIVE_TOKEN_ADDRESS, useSquid } from '@/hooks/useSquid';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
@@ -37,6 +36,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
+import { getNobleChainId, NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 import { parseWalletError } from '@/lib/wallet';
 
@@ -68,6 +68,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     summary,
     errors: routeErrors,
     errorMessage: routeErrorMessage,
+    isCctp,
   } = useSelector(getTransferInputs, shallowEqual) || {};
   const chainId = chainIdStr ? parseInt(chainIdStr) : undefined;
 
@@ -83,7 +84,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   );
 
   const [fromAmount, setFromAmount] = useState('');
-  const [slippage, setSlippage] = useState(0.01); // 1% slippage
+  const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 1% slippage
   const debouncedAmount = useDebounce<string>(fromAmount, 500);
 
   // Async Data
@@ -97,6 +98,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   // BN
   const debouncedAmountBN = MustBigNumber(debouncedAmount);
   const balanceBN = MustBigNumber(balance);
+
+  useEffect(() => setSlippage(isCctp ? 0 : 0.01), [isCctp]);
 
   useEffect(() => {
     const hasInvalidInput =
@@ -191,15 +194,23 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     const sourceAmountBN = parseUnits(debouncedAmount, sourceToken.decimals);
 
     if (sourceAmountBN > (allowance as bigint)) {
-      const { request } = await publicClientWagmi.simulateContract({
-        account: evmAddress,
-        address: sourceToken.address as EvmAddress,
-        abi: erc20,
-        functionName: 'approve',
-        args: [requestPayload.targetAddress as EvmAddress, sourceAmountBN],
-      });
+      const simulateApprove = async (abi: Abi) =>
+        publicClientWagmi.simulateContract({
+          account: evmAddress,
+          address: sourceToken.address as EvmAddress,
+          abi,
+          functionName: 'approve',
+          args: [requestPayload.targetAddress as EvmAddress, sourceAmountBN],
+        });
 
-      const approveTx = await signerWagmi.writeContract(request);
+      let result;
+      try {
+        result = await simulateApprove(erc20 as Abi);
+      } catch (e) {
+        result = await simulateApprove(erc20_usdt as Abi);
+      }
+
+      const approveTx = await signerWagmi.writeContract(result.request);
       await publicClientWagmi.waitForTransactionReceipt({
         hash: approveTx,
       });
@@ -241,11 +252,13 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         if (txHash) {
           addTransferNotification({
             txHash: txHash,
-            toChainId: ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId,
+            toChainId: !isCctp
+              ? ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId
+              : getNobleChainId(),
             fromChainId: chainIdStr || undefined,
             toAmount: summary?.usdcSize || undefined,
             triggeredAt: Date.now(),
-            notificationStatus: NotificationStatus.Triggered,
+            isCctp,
           });
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');
@@ -312,6 +325,21 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       return stringGetter({ key: STRING_KEYS.DEPOSIT_MORE_THAN_BALANCE });
     }
 
+    if (isCctp) {
+      if (MustBigNumber(debouncedAmountBN).gte(MAX_CCTP_TRANSFER_AMOUNT)) {
+        return stringGetter({
+          key: STRING_KEYS.MAX_CCTP_TRANSFER_LIMIT_EXCEEDED,
+          params: {
+            MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
+          },
+        });
+      }
+    }
+
+    if (isMainnet && MustBigNumber(summary?.aggregatePriceImpact).gte(MAX_PRICE_IMPACT)) {
+      return stringGetter({ key: STRING_KEYS.PRICE_IMPACT_TOO_HIGH });
+    }
+
     return undefined;
   }, [
     error,
@@ -322,6 +350,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     fromAmount,
     sourceToken,
     stringGetter,
+    summary,
   ]);
 
   const isDisabled =

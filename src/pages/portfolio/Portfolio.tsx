@@ -1,34 +1,40 @@
+import { lazy, Suspense } from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { OnboardingState } from '@/constants/account';
+import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { HistoryRoute, PortfolioRoute } from '@/constants/routes';
-
 import { useAccountBalance, useBreakpoints, useDocumentTitle, useStringGetter } from '@/hooks';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { FundingPaymentsTable } from '@/views/tables/FundingPaymentsTable';
 import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
+import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { NavigationMenu } from '@/components/NavigationMenu';
+import { Tag, TagType } from '@/components/Tag';
 import { WithSidebar } from '@/components/WithSidebar';
 
-import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
+import { getOnboardingState, getSubaccount, getTradeInfoNumbers } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
 
-import { PortfolioNavMobile } from './PortfolioNavMobile';
-import { Overview } from './Overview';
-import { Positions } from './Positions';
-import { Orders } from './Orders';
-import { Fees } from './Fees';
-import { History } from './History';
+import { shortenNumberForDisplay } from '@/lib/numbers';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-import { Button } from '@/components/Button';
-import { ButtonAction } from '@/constants/buttons';
+import { PortfolioNavMobile } from './PortfolioNavMobile';
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
+
+const Overview = lazy(() => import('./Overview').then((module) => ({ default: module.Overview })));
+const Positions = lazy(() =>
+  import('./Positions').then((module) => ({ default: module.Positions }))
+);
+const Orders = lazy(() => import('./Orders').then((module) => ({ default: module.Orders })));
+const Fees = lazy(() => import('./Fees').then((module) => ({ default: module.Fees })));
+const History = lazy(() => import('./History').then((module) => ({ default: module.History })));
 
 export default () => {
   const dispatch = useDispatch();
@@ -39,54 +45,60 @@ export default () => {
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
   const { nativeTokenBalance } = useAccountBalance();
 
+  const { numTotalPositions, numTotalOpenOrders } = useSelector(getTradeInfoNumbers, shallowEqual) || {};
+  const numPositions = shortenNumberForDisplay(numTotalPositions);
+  const numOrders = shortenNumberForDisplay(numTotalOpenOrders);
+
   const usdcBalance = freeCollateral?.current || 0;
 
   useDocumentTitle(stringGetter({ key: STRING_KEYS.PORTFOLIO }));
 
   const routesComponent = (
-    <Routes>
-      <Route path={PortfolioRoute.Overview} element={<Overview />} />
-      <Route path={PortfolioRoute.Positions} element={<Positions />} />
-      <Route path={PortfolioRoute.Orders} element={<Orders />} />
-      <Route path={PortfolioRoute.Fees} element={<Fees />} />
-      <Route path={PortfolioRoute.History} element={<History />}>
-        <Route index path="*" element={<Navigate to={HistoryRoute.Trades} />} />
-        <Route
-          path={HistoryRoute.Trades}
-          element={
-            <FillsTable
-              columnKeys={
-                isTablet
-                  ? [
-                      FillsTableColumnKey.Time,
-                      FillsTableColumnKey.TypeAmount,
-                      FillsTableColumnKey.PriceFee,
-                    ]
-                  : [
-                      FillsTableColumnKey.Time,
-                      FillsTableColumnKey.Market,
-                      FillsTableColumnKey.Side,
-                      FillsTableColumnKey.AmountPrice,
-                      FillsTableColumnKey.TotalFee,
-                      FillsTableColumnKey.Type,
-                      FillsTableColumnKey.Liquidity,
-                    ]
-              }
-              withOuterBorder={isNotTablet}
-            />
-          }
-        />
-        <Route
-          path={HistoryRoute.Transfers}
-          element={<TransferHistoryTable withOuterBorder={isNotTablet} />}
-        />
-        <Route
-          path={HistoryRoute.Payments}
-          element={<FundingPaymentsTable withOuterBorder={isNotTablet} />}
-        />
-      </Route>
-      <Route path="*" element={<Navigate to={PortfolioRoute.Overview} replace />} />
-    </Routes>
+    <Suspense fallback={<LoadingSpace id="portfolio" />}>
+      <Routes>
+        <Route path={PortfolioRoute.Overview} element={<Overview />} />
+        <Route path={PortfolioRoute.Positions} element={<Positions />} />
+        <Route path={PortfolioRoute.Orders} element={<Orders />} />
+        <Route path={PortfolioRoute.Fees} element={<Fees />} />
+        <Route path={PortfolioRoute.History} element={<History />}>
+          <Route index path="*" element={<Navigate to={HistoryRoute.Trades} />} />
+          <Route
+            path={HistoryRoute.Trades}
+            element={
+              <FillsTable
+                columnKeys={
+                  isTablet
+                    ? [
+                        FillsTableColumnKey.Time,
+                        FillsTableColumnKey.TypeAmount,
+                        FillsTableColumnKey.PriceFee,
+                      ]
+                    : [
+                        FillsTableColumnKey.Time,
+                        FillsTableColumnKey.Market,
+                        FillsTableColumnKey.Side,
+                        FillsTableColumnKey.AmountPrice,
+                        FillsTableColumnKey.TotalFee,
+                        FillsTableColumnKey.Type,
+                        FillsTableColumnKey.Liquidity,
+                      ]
+                }
+                withOuterBorder={isNotTablet}
+              />
+            }
+          />
+          <Route
+            path={HistoryRoute.Transfers}
+            element={<TransferHistoryTable withOuterBorder={isNotTablet} />}
+          />
+          <Route
+            path={HistoryRoute.Payments}
+            element={<FundingPaymentsTable withOuterBorder={isNotTablet} />}
+          />
+        </Route>
+        <Route path="*" element={<Navigate to={PortfolioRoute.Overview} replace />} />
+      </Routes>
+    </Suspense>
   );
 
   return isTablet ? (
@@ -113,14 +125,28 @@ export default () => {
                     },
                     {
                       value: PortfolioRoute.Positions,
-                      slotBefore: <Styled.Icon iconName={IconName.Cube} />,
-                      label: stringGetter({ key: STRING_KEYS.POSITIONS }),
+                      slotBefore: <Styled.Icon iconName={IconName.Positions} />,
+                      label: (
+                        <>
+                          {stringGetter({ key: STRING_KEYS.POSITIONS })}
+                          {numPositions > 0 && (
+                            <Tag type={TagType.Number}> {numPositions} </Tag>
+                          )}
+                        </>
+                      ),
                       href: PortfolioRoute.Positions,
                     },
                     {
                       value: PortfolioRoute.Orders,
                       slotBefore: <Styled.Icon iconName={IconName.OrderPending} />,
-                      label: stringGetter({ key: STRING_KEYS.ORDERS }),
+                      label: (
+                        <>
+                          {stringGetter({ key: STRING_KEYS.ORDERS })}
+                          {numOrders > 0 && (
+                            <Tag type={TagType.Number}> {numOrders} </Tag>
+                          )}
+                        </>
+                      ),
                       href: PortfolioRoute.Orders,
                     },
                     {
@@ -191,7 +217,7 @@ Styled.SideBar = styled.div`
 Styled.Footer = styled.div`
   ${layoutMixins.row}
   flex-wrap: wrap;
-  
+
   padding: 1rem;
 
   gap: 0.5rem;

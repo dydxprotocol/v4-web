@@ -5,7 +5,7 @@ import { useInterval, useStringGetter } from '@/hooks';
 
 import { AlertType } from '@/constants/alerts';
 import { STRING_KEYS } from '@/constants/localization';
-import { TransferNotifcation } from '@/constants/notifications';
+import { TransferNotifcation, TransferNotificationTypes } from '@/constants/notifications';
 
 import { formatSeconds } from '@/lib/timeUtils';
 
@@ -22,7 +22,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { TransferStatusSteps } from './TransferStatusSteps';
 
 type ElementProps = {
-  type: 'withdrawal' | 'deposit';
+  type: TransferNotificationTypes;
   transfer: TransferNotifcation;
   triggeredAt?: number;
 };
@@ -44,6 +44,7 @@ export const TransferStatusNotification = ({
 
   // @ts-ignore status.errors is not in the type definition but can be returned
   const error = status?.errors?.length ? status?.errors[0] : status?.error;
+  const hasError = error && Object.keys(error).length !== 0;
 
   const updateSecondsLeft = useCallback(() => {
     const fromChainEta = (status?.fromChain?.chainData?.estimatedRouteDuration || 0) * 1000;
@@ -54,7 +55,7 @@ export const TransferStatusNotification = ({
   useInterval({ callback: updateSecondsLeft });
 
   const inProgressStatusString =
-    type === 'deposit'
+    type === TransferNotificationTypes.Deposit
       ? secondsLeft > 0
         ? STRING_KEYS.DEPOSIT_STATUS
         : STRING_KEYS.DEPOSIT_STATUS_SHORTLY
@@ -63,7 +64,7 @@ export const TransferStatusNotification = ({
       : STRING_KEYS.WITHDRAW_STATUS_SHORTLY;
 
   const statusString =
-    type === 'deposit'
+    type === TransferNotificationTypes.Deposit
       ? status?.squidTransactionStatus === 'success'
         ? STRING_KEYS.DEPOSIT_COMPLETE
         : inProgressStatusString
@@ -87,7 +88,7 @@ export const TransferStatusNotification = ({
           },
         })}
       </Styled.Status>
-      {error && (
+      {hasError && (
         <AlertMessage type={AlertType.Error}>
           {stringGetter({
             key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
@@ -112,7 +113,7 @@ export const TransferStatusNotification = ({
         ) : (
           <Styled.BridgingStatus>
             {content}
-            {!isToast && status?.squidTransactionStatus !== 'success' && (
+            {!isToast && status?.squidTransactionStatus !== 'success' && !hasError && (
               <Styled.TransferStatusSteps status={status} type={type} />
             )}
           </Styled.BridgingStatus>
@@ -120,8 +121,7 @@ export const TransferStatusNotification = ({
       }
       slotAction={
         isToast &&
-        status &&
-        !error && (
+        status && (
           <Styled.Trigger
             isOpen={open}
             onClick={(e: MouseEvent) => {

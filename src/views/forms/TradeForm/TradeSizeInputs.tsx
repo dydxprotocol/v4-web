@@ -49,7 +49,7 @@ export const TradeSizeInputs = () => {
     useSelector(getCurrentMarketConfig, shallowEqual) || {};
   const { size, usdcSize, leverage, input: lastEditedInput } = inputTradeSizeData || {};
   const { needsLeverage } = currentTradeInputOptions || {};
-  const decimals = stepSizeDecimals || TOKEN_DECIMALS;
+  const decimals = stepSizeDecimals ?? TOKEN_DECIMALS;
 
   const { amountInput, usdAmountInput, leverageInput } = useSelector(
     getTradeFormInputs,
@@ -70,22 +70,34 @@ export const TradeSizeInputs = () => {
     }
   }, [size, usdcSize, leverage, lastEditedInput]);
 
-  const onSizeInput = ({ value, floatValue }: { value: string; floatValue?: number }) => {
-    dispatch(setTradeFormInputs({ amountInput: value }));
+  const onSizeInput = ({
+    floatValue,
+    formattedValue,
+  }: {
+    floatValue?: number;
+    formattedValue: string;
+  }) => {
+    dispatch(setTradeFormInputs({ amountInput: formattedValue }));
     const newAmount = MustBigNumber(floatValue).toFixed(decimals);
 
     abacusStateManager.setTradeValue({
-      value: value === '' || newAmount === 'NaN' ? null : newAmount,
+      value: formattedValue === '' || newAmount === 'NaN' ? null : newAmount,
       field: TradeInputField.size,
     });
   };
 
-  const onUSDCInput = ({ value, floatValue }: { value: string; floatValue?: number }) => {
-    dispatch(setTradeFormInputs({ usdAmountInput: value }));
-    const newUsdcAmount = MustBigNumber(floatValue).toFixed();
+  const onUSDCInput = ({
+    floatValue,
+    formattedValue,
+  }: {
+    floatValue?: number;
+    formattedValue: string;
+  }) => {
+    dispatch(setTradeFormInputs({ usdAmountInput: formattedValue }));
+    const newUsdcAmount = MustBigNumber(floatValue).toFixed(tickSizeDecimals || USD_DECIMALS);
 
     abacusStateManager.setTradeValue({
-      value: value === '' || newUsdcAmount === 'NaN' ? null : newUsdcAmount,
+      value: formattedValue === '' || newUsdcAmount === 'NaN' ? null : newUsdcAmount,
       field: TradeInputField.usdcSize,
     });
   };

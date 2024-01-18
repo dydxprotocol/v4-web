@@ -11,13 +11,13 @@ import { DepositDialog } from '@/views/dialogs/DepositDialog';
 import { DisconnectDialog } from '@/views/dialogs/DisconnectDialog';
 import { ExchangeOfflineDialog } from '@/views/dialogs/ExchangeOfflineDialog';
 import { HelpDialog } from '@/views/dialogs/HelpDialog';
+import { ExternalLinkDialog } from '@/views/dialogs/ExternalLinkDialog';
 import { ExternalNavKeplrDialog } from '@/views/dialogs/ExternalNavKeplrDialog';
 import { MnemonicExportDialog } from '@/views/dialogs/MnemonicExportDialog';
 import { MobileSignInDialog } from '@/views/dialogs/MobileSignInDialog';
 import { OnboardingDialog } from '@/views/dialogs/OnboardingDialog';
 import { PreferencesDialog } from '@/views/dialogs/PreferencesDialog';
 import { RateLimitDialog } from '@/views/dialogs/RateLimitDialog';
-import { ReceiveDialog } from '@/views/dialogs/ReceiveDialog';
 import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
@@ -54,13 +54,13 @@ export const DialogManager = () => {
     [DialogTypes.FillDetails]: <FillDetailsDialog {...modalProps} />,
     [DialogTypes.Help]: <HelpDialog {...modalProps} />,
     [DialogTypes.ExternalNavKeplr]: <ExternalNavKeplrDialog {...modalProps} />,
+    [DialogTypes.ExternalLink]: <ExternalLinkDialog {...modalProps} />,
     [DialogTypes.MnemonicExport]: <MnemonicExportDialog {...modalProps} />,
     [DialogTypes.MobileSignIn]: <MobileSignInDialog {...modalProps} />,
     [DialogTypes.Onboarding]: <OnboardingDialog {...modalProps} />,
     [DialogTypes.OrderDetails]: <OrderDetailsDialog {...modalProps} />,
     [DialogTypes.Preferences]: <PreferencesDialog {...modalProps} />,
     [DialogTypes.RateLimit]: <RateLimitDialog {...modalProps} />,
-    [DialogTypes.Receive]: <ReceiveDialog {...modalProps} />,
     [DialogTypes.RestrictedGeo]: <RestrictedGeoDialog {...modalProps} />,
     [DialogTypes.RestrictedWallet]: <RestrictedWalletDialog {...modalProps} />,
     [DialogTypes.Trade]: <TradeDialog {...modalProps} />,

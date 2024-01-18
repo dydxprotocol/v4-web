@@ -42,7 +42,11 @@ type StyleProps = {
   className?: string;
 };
 
-type RowData = OrderbookLine & { side: 'bid' | 'ask'; mine?: number };
+type RowData = Pick<OrderbookLine, 'depth' | 'offset' | 'price' | 'size'> & {
+  side: 'bid' | 'ask';
+  mine?: number;
+  key: string;
+};
 
 const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number }) => {
   const orderbook = useSelector(getCurrentMarketOrderbook, shallowEqual);
@@ -53,8 +57,9 @@ const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number 
   return useMemo(() => {
     const asks = (orderbook?.asks?.toArray() ?? [])
       .map(
-        (row: OrderbookLine) =>
+        (row: OrderbookLine, idx: number) =>
           ({
+            key: `ask-${idx}`,
             side: 'ask',
             mine: openOrdersBySideAndPrice[OrderSide.SELL]?.[row.price]?.size,
             ...row,
@@ -64,8 +69,9 @@ const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number 
 
     const bids = (orderbook?.bids?.toArray() ?? [])
       .map(
-        (row: OrderbookLine) =>
+        (row: OrderbookLine, idx: number) =>
           ({
+            key: `bid-${idx}`,
             side: 'bid',
             mine: openOrdersBySideAndPrice[OrderSide.BUY]?.[row.price]?.size,
             ...row,
@@ -97,14 +103,43 @@ const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number 
     }
 
     const spread =
-      asks[0] && bids[0] ? MustBigNumber(asks[0]?.price ?? 0).minus(bids[0]?.price ?? 0) : null;
+      asks[0]?.price && bids[0]?.price ? MustBigNumber(asks[0].price).minus(bids[0].price) : null;
 
     const spreadPercent = orderbook?.spreadPercent;
 
     const histogramRange = Math.max(
-      Number(bids[bids.length - 1]?.depth),
-      Number(asks[asks.length - 1]?.depth)
+      isNaN(Number(bids[bids.length - 1]?.depth)) ? 0 : Number(bids[bids.length - 1]?.depth),
+      isNaN(Number(asks[asks.length - 1]?.depth)) ? 0 : Number(asks[asks.length - 1]?.depth)
     );
+
+    // Ensure asks and bids are of length maxRowsPerSide by adding empty rows.
+    let idx = asks.length - 1;
+    while (asks.length < maxRowsPerSide) {
+      idx += 1;
+
+      asks.push({
+        key: `ask-${idx}`,
+        side: 'ask',
+        size: 0,
+        price: 0,
+        offset: 0,
+        depth: 0,
+      });
+    }
+
+    idx = bids.length - 1;
+    while (bids.length < maxRowsPerSide) {
+      idx += 1;
+
+      bids.push({
+        key: `bid-${idx}`,
+        side: 'bid',
+        size: 0,
+        price: 0,
+        offset: 0,
+        depth: 0,
+      });
+    }
 
     return { asks, bids, spread, spreadPercent, histogramRange, hasOrderbook: !!orderbook };
   }, [orderbook, openOrdersBySideAndPrice]);
@@ -142,31 +177,33 @@ const OrderbookTable = ({
         getCellValue: (row: RowData) => row.size,
         label: stringGetter({ key: STRING_KEYS.ORDERBOOK_ORDER_SIZE }),
         tag: symbol,
-        renderCell: (row: RowData) => (
-          <Styled.HistogramOutput
-            highlightText
-            type={OutputType.Asset}
-            value={row.size}
-            fractionDigits={stepSizeDecimals}
-            histogramSide={histogramSide === 'left' && 'left'}
-            useGrouping={false}
-          />
-        ),
+        renderCell: (row: RowData) =>
+          row.size > 0 && (
+            <Styled.HistogramOutput
+              highlightText
+              type={OutputType.Asset}
+              value={row.size}
+              fractionDigits={stepSizeDecimals}
+              histogramSide={histogramSide === 'left' && 'left'}
+              useGrouping={false}
+            />
+          ),
       },
       {
         columnKey: 'price',
         getCellValue: (row: RowData) => row.price,
         label: stringGetter({ key: STRING_KEYS.PRICE }),
         tag: 'USD',
-        renderCell: (row: RowData) => (
-          <OrderbookTradesOutput
-            highlightText
-            type={OutputType.Number}
-            value={row.price}
-            fractionDigits={tickSizeDecimals}
-            useGrouping={false}
-          />
-        ),
+        renderCell: (row: RowData) =>
+          row.price > 0 && (
+            <OrderbookTradesOutput
+              highlightText
+              type={OutputType.Number}
+              value={row.price}
+              fractionDigits={tickSizeDecimals}
+              useGrouping={false}
+            />
+          ),
       },
       {
         columnKey: 'subaccount-orders',
@@ -194,12 +231,13 @@ const OrderbookTable = ({
       label="Orderbook"
       data={data}
       columns={columns}
-      getRowKey={(row: RowData) => `${row.side}-${row.price}`}
+      getRowKey={(row: RowData) => row.key}
       getRowAttributes={(row: RowData) => ({
         'data-side': row.side,
         style: {
           '--histogram-bucket-size': row.size,
           '--histogram-bucket-depth': row.depth,
+          '--tr-pointerEvents': row.price ? 'auto' : 'none',
         },
       })}
       onRowAction={onRowAction}
@@ -238,19 +276,10 @@ export const Orderbook = ({
       maxRowsPerSide,
     });
 
-  const [showRowsPerSide, setShowRowsPerSide] = useState(0);
-
-  // Make rows visible one by one so avoid jumps in initial scroll position
-  useEffect(() => {
-    if (showRowsPerSide < maxRowsPerSide) {
-      setShowRowsPerSide((showRows) => showRows + 1);
-    }
-  }, [showRowsPerSide]);
-
   const data = useMemo(
     () =>
       [
-        ...bids.slice(0, showRowsPerSide).reverse(),
+        ...bids.reverse(),
         {
           key: 'spread',
           slotCustomRow: (props) => (
@@ -267,9 +296,9 @@ export const Orderbook = ({
             </Styled.SpreadTableRow>
           ),
         } as CustomRowConfig,
-        ...asks.slice(0, showRowsPerSide),
+        ...asks,
       ].reverse(),
-    [asks, bids, spread, spreadPercent, showRowsPerSide, isTablet]
+    [asks, bids, spread, spreadPercent, isTablet]
   );
 
   const onRowAction = useCallback(
@@ -325,7 +354,7 @@ export const Orderbook = ({
       </Styled.Header>
       <Styled.SplitOrderbook>
         <OrderbookTable data={asks} histogramSide="right" {...orderbookTableProps} />
-        <OrderbookTable data={bids} histogramSide="left" {...orderbookTableProps} />
+        <OrderbookTable data={bids.reverse()} histogramSide="left" {...orderbookTableProps} />
       </Styled.SplitOrderbook>
     </Styled.HorizontalLayout>
   );
@@ -495,6 +524,7 @@ Styled.OrderbookTable = styled(OrderbookTradesTable)<StyleProps>`
 
   tr {
     --histogram-bucket-depth: 0;
+    pointer-events: var(--tr-pointerEvents);
 
     &[data-side='bid'] {
       --accent-color: var(--color-positive);

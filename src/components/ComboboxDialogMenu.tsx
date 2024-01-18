@@ -122,6 +122,7 @@ Styled.Dialog = styled(Dialog)`
 
     /* Net 0 sticky top inset (let stickyArea1 header stick to top) */
     --stickyArea0-topGap: calc(-1 * var(--stickyArea0-topHeight));
+    overflow-x: clip;
   }
 `;
 

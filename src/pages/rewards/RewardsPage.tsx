@@ -1,15 +1,18 @@
 import styled, { AnyStyledComponent } from 'styled-components';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
+import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints, useStringGetter, useURLConfigs } from '@/hooks';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { BackButton } from '@/components/BackButton';
 import { Panel } from '@/components/Panel';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
@@ -19,12 +22,15 @@ import { openDialog } from '@/state/dialogs';
 
 import { DYDXBalancePanel } from './DYDXBalancePanel';
 import { MigratePanel } from './MigratePanel';
+import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
+import { RewardsHelpPanel } from './RewardsHelpPanel';
 
-export const RewardsPage = () => {
+const RewardsPage = () => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
   const { governanceLearnMore, stakingLearnMore } = useURLConfigs();
   const { isTablet, isNotTablet } = useBreakpoints();
+  const navigate = useNavigate();
 
   const panelArrow = (
     <Styled.Arrow>
@@ -38,12 +44,28 @@ export const RewardsPage = () => {
 
   return (
     <Styled.Page>
-      {import.meta.env.VITE_V3_TOKEN_ADDRESS && <MigratePanel />}
-      <Styled.PanelRow>
-        {isTablet && <DYDXBalancePanel />}
+      {isTablet && (
+        <Styled.MobileHeader>
+          <BackButton onClick={() => navigate(AppRoute.Profile)} />
+          {stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
+        </Styled.MobileHeader>
+      )}
+      {import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && <MigratePanel />}
 
+      {isTablet ? (
+        <LaunchIncentivesPanel />
+      ) : (
+        <Styled.PanelRowIncentivesAndBalance>
+          <LaunchIncentivesPanel />
+          <DYDXBalancePanel />
+        </Styled.PanelRowIncentivesAndBalance>
+      )}
+
+      <Styled.PanelRow>
         <Styled.Panel
-          slotHeader={<Styled.Title>{stringGetter({ key: STRING_KEYS.GOVERNANCE })}</Styled.Title>}
+          slotHeaderContent={
+            <Styled.Title>{stringGetter({ key: STRING_KEYS.GOVERNANCE })}</Styled.Title>
+          }
           slotRight={panelArrow}
           onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr }))}
         >
@@ -56,7 +78,9 @@ export const RewardsPage = () => {
         </Styled.Panel>
 
         <Styled.Panel
-          slotHeader={<Styled.Title>{stringGetter({ key: STRING_KEYS.STAKING })}</Styled.Title>}
+          slotHeaderContent={
+            <Styled.Title>{stringGetter({ key: STRING_KEYS.STAKING })}</Styled.Title>
+          }
           slotRight={panelArrow}
           onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr }))}
         >
@@ -67,12 +91,14 @@ export const RewardsPage = () => {
             </Link>
           </Styled.Description>
         </Styled.Panel>
-
-        {isNotTablet && <DYDXBalancePanel />}
       </Styled.PanelRow>
+
+      <RewardsHelpPanel />
     </Styled.Page>
   );
 };
+
+export default RewardsPage;
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
@@ -83,45 +109,67 @@ Styled.Page = styled.div`
   align-items: center;
 
   > * {
-    --content-max-width: 70rem;
+    --content-max-width: 80rem;
     max-width: min(calc(100vw - 4rem), var(--content-max-width));
   }
 
   @media ${breakpoints.tablet} {
-    padding: 1.25rem;
+    --stickyArea-topHeight: var(--page-header-height-mobile);
+    padding: 0 1rem 1rem;
 
     > * {
-      max-width: calc(100vw - 2.5rem);
+      max-width: calc(100vw - 2rem);
       width: 100%;
     }
   }
 `;
 
+Styled.MobileHeader = styled.header`
+  ${layoutMixins.contentSectionDetachedScrollable}
+  ${layoutMixins.stickyHeader}
+  z-index: 2;
+  padding: 1.25rem 0;
+  margin-bottom: -1.5rem;
+
+  font: var(--font-large-medium);
+  color: var(--color-text-2);
+  background-color: var(--color-layer-2);
+`;
+
 Styled.Panel = styled(Panel)`
-  --panel-paddingX: 1.5rem;
+  height: fit-content;
 `;
 
 Styled.Title = styled.h3`
   font: var(--font-medium-book);
   color: var(--color-text-2);
-  padding: 1rem 1.5rem 0;
+  margin-bottom: -1rem;
 `;
 
 Styled.Description = styled.div`
   color: var(--color-text-0);
   --link-color: var(--color-text-1);
+
+  a {
+    display: inline;
+    ::before {
+      content: ' ';
+    }
+  }
 `;
 
 Styled.PanelRow = styled.div`
   ${layoutMixins.gridEqualColumns}
   gap: 1.5rem;
 
-  align-items: flex-start;
-
   @media ${breakpoints.tablet} {
     grid-auto-flow: row;
     grid-template-columns: 1fr;
   }
+`;
+
+Styled.PanelRowIncentivesAndBalance = styled(Styled.PanelRow)`
+  grid-template-columns: 2fr 1fr;
 `;
 
 Styled.IconButton = styled(IconButton)`

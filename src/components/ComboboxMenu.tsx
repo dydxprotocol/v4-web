@@ -254,6 +254,7 @@ Styled.Group = styled(Command.Group)<{ $withItemBorders?: boolean; $withStickyLa
 
       > [cmdk-group-heading] {
         ${layoutMixins.stickyHeader}
+        z-index: 2;
       }
 
       > [cmdk-group-items] {

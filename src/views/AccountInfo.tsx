@@ -63,7 +63,6 @@ Styled.AccountInfoSectionContainer = styled.div<{ showAccountInfo?: boolean }>`
   ${layoutMixins.column}
   height: var(--account-info-section-height);
   min-height: var(--account-info-section-height);
-  overflow-x: clip;
 
   ${({ showAccountInfo }) =>
     !showAccountInfo &&

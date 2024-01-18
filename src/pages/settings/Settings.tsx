@@ -25,7 +25,7 @@ import { useNetworks } from '@/views/menus/useNetworks';
 import { SettingsHeader } from './SettingsHeader';
 import { ComingSoonSpace } from '@/components/ComingSoon';
 
-export const SettingsPage = () => {
+const SettingsPage = () => {
   const stringGetter = useStringGetter();
   const { pathname } = useLocation();
   const dispatch = useDispatch();
@@ -105,3 +105,5 @@ export const SettingsPage = () => {
     </>
   );
 };
+
+export default SettingsPage;
