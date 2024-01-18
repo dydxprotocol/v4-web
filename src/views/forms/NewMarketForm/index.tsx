@@ -123,7 +123,8 @@ export const NewMarketForm = () => {
             groupLabel: 'Markets',
             items: potentialMarkets.map((potentialMarket: (typeof MOCK_DATA)[number]) => ({
               value: potentialMarket.symbol,
-              label: `${potentialMarket.symbol}-USD`,
+              label: potentialMarket?.assetName ?? potentialMarket.symbol,
+              tag: `${potentialMarket.symbol}-USD`,
               onSelect: () => {
                 setAssetToAdd(potentialMarket);
               },
@@ -133,7 +134,9 @@ export const NewMarketForm = () => {
         label="Market"
       >
         {assetToAdd ? (
-          <Styled.SelectedAsset>{assetToAdd?.symbol}-USD</Styled.SelectedAsset>
+          <Styled.SelectedAsset>
+            {assetToAdd?.assetName ?? assetToAdd.symbol} <Tag>{assetToAdd?.symbol}-USD</Tag>
+          </Styled.SelectedAsset>
         ) : (
           'e.g. "BTC-USD"'
         )}
