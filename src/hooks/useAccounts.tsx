@@ -29,6 +29,7 @@ import { useWalletConnection } from './useWalletConnection';
 import { useSignTypedData } from 'wagmi';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { usePrivy } from '@privy-io/react-auth';
 
 const AccountsContext = createContext<ReturnType<typeof useAccountsContext> | undefined>(undefined);
 
@@ -199,6 +200,7 @@ const useAccountsContext = () => {
       chainId,
     },
   });
+  const { ready, authenticated } = usePrivy();
 
   useEffect(() => {
     (async () => {
@@ -216,7 +218,7 @@ const useAccountsContext = () => {
 
           const evmDerivedAccount = evmDerivedAddresses[evmAddress];
 
-          if (walletConnectionType === WalletConnectionType.Privy) {
+          if (walletConnectionType === WalletConnectionType.Privy && authenticated && ready) {
             try {
               const signature = await signTypedDataAsync();
 

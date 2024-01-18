@@ -105,7 +105,7 @@ export const useWalletConnection = () => {
     [walletConnectConfig, walletType, walletConnectionType]
   );
 
-  const { connectAsync: connectWagmi } = useConnectWagmi({ connector: wagmiConnector })
+  const { connectAsync: connectWagmi } = useConnectWagmi({ connector: wagmiConnector });
   const { suggestAndConnect: connectGraz } = useConnectGraz();
   const { login, ready, authenticated } = usePrivy();
   const { logout } = useLogout();
@@ -118,6 +118,7 @@ export const useWalletConnection = () => {
         if (!walletConnection) {
           throw new Error('Onboarding: No wallet connection found.');
         } else if (walletConnection.type === WalletConnectionType.Privy) {
+          console.log({ isConnectedWagmi, authenticated, ready });
           if (!isConnectedWagmi && !authenticated && ready) {
             login();
           }
