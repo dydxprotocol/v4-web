@@ -2,6 +2,9 @@ import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 import { WagmiConfig } from 'wagmi';
+import type { PrivyClientConfig } from '@privy-io/react-auth';
+import { PrivyProvider } from '@privy-io/react-auth';
+import { PrivyWagmiConnector } from '@privy-io/wagmi-connector';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { GrazProvider } from 'graz';
 
@@ -32,7 +35,7 @@ import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
 import { DialogManager } from '@/layout/DialogManager';
 import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 
-import { config } from '@/lib/wagmi';
+import { config, privyConfig } from '@/lib/wagmi';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -120,8 +123,13 @@ const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
 };
 
 const providers = [
+  wrapProvider(PrivyProvider, {
+    appId: import.meta.env.VITE_PRIVY_APP_ID,
+    config: privyConfig,
+  }),
   wrapProvider(QueryClientProvider, { client: queryClient }),
   wrapProvider(GrazProvider),
+  wrapProvider(PrivyWagmiConnector, { wagmiChainsConfig: config }),
   wrapProvider(WagmiConfig, { config }),
   wrapProvider(LocaleProvider),
   wrapProvider(RestrictionProvider),

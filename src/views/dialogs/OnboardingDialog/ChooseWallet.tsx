@@ -56,7 +56,11 @@ export const ChooseWallet = () => {
             slotLeft={<Styled.Icon iconComponent={wallets[walletType].icon} />}
             size={ButtonSize.Small}
           >
-            <div>{stringGetter({ key: wallets[walletType].stringKey })}</div>
+            <div>
+              {walletType !== WalletType.Privy
+                ? stringGetter({ key: wallets[walletType].stringKey })
+                : 'Socials (Email, SMS, etc.)'}
+            </div>
           </Styled.WalletButton>
         ))}
       </Styled.Wallets>

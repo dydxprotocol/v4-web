@@ -1,5 +1,6 @@
 import { createConfig, configureChains, mainnet, Chain } from 'wagmi';
 import { goerli } from 'wagmi/chains';
+import type { PrivyClientConfig } from '@privy-io/react-auth';
 
 import {
   arbitrum,
@@ -84,6 +85,16 @@ export const WAGMI_SUPPORTED_CHAINS: Chain[] = [
   scroll,
   kava,
 ];
+
+export const privyConfig: PrivyClientConfig = {
+  embeddedWallets: {
+    createOnLogin: 'users-without-wallets',
+    requireUserPasswordOnCreate: true,
+    noPromptOnSignature: true,
+  },
+  loginMethods: ['email', 'sms', 'twitter'],
+  defaultChain: sepolia
+};
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   WAGMI_SUPPORTED_CHAINS,

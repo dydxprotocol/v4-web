@@ -31,6 +31,7 @@ import { DydxNetwork, ENVIRONMENT_CONFIG_MAP } from './networks';
 export enum WalletConnectionType {
   CoinbaseWalletSdk = 'coinbaseWalletSdk',
   CosmosSigner = 'CosmosSigner',
+  Privy = 'Privy',
   InjectedEip1193 = 'injectedEip1193',
   WalletConnect2 = 'walletConnect2',
 }
@@ -68,6 +69,9 @@ export const walletConnectionTypes: Record<WalletConnectionType, WalletConnectio
   [WalletConnectionType.CosmosSigner]: {
     name: 'CosmosSigner',
   },
+  [WalletConnectionType.Privy]: {
+    name: 'Privy',
+  },
 };
 
 // Wallets
@@ -90,6 +94,7 @@ export enum WalletType {
   WalletConnect2 = 'WALLETCONNECT_2',
   // TestWallet = 'TEST_WALLET',
   OtherWallet = 'OTHER_WALLET',
+  Privy = 'PRIVY',
 }
 
 const WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS = {
@@ -242,6 +247,12 @@ export const wallets: Record<WalletType, WalletConfig> = {
     stringKey: STRING_KEYS.KEPLR,
     icon: KeplrIcon,
     connectionTypes: [WalletConnectionType.CosmosSigner],
+  },
+  [WalletType.Privy]: {
+    type: WalletType.Privy,
+    stringKey: STRING_KEYS.KEPLR,
+    icon: GenericWalletIcon,
+    connectionTypes: [WalletConnectionType.Privy],
   },
 };
 

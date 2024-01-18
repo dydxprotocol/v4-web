@@ -62,6 +62,12 @@ export const getWalletConnection = ({
           type: WalletConnectionType.CosmosSigner,
         };
       }
+
+      case WalletConnectionType.Privy: {
+        return {
+          type: WalletConnectionType.Privy,
+        };
+      }
     }
   }
 };
