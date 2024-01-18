@@ -145,6 +145,11 @@ export const NewMarketPreviewForm = ({
           Propose new market
         </Button>
       </Styled.ButtonRow>
+      <Styled.Disclaimer>
+        When you submit a proposal, 10,000 DYDX will be deducted from your wallet. After the
+        governance vote concludes, these tokens will be returned to your wallet, except if the
+        proposal is vetoed.
+      </Styled.Disclaimer>
     </Styled.Form>
   );
 };
@@ -208,4 +213,9 @@ Styled.ButtonRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 1rem;
+`;
+
+Styled.Disclaimer = styled.p`
+  text-align: center;
+  color: var(--color-text-0);
 `;
