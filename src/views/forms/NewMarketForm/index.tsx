@@ -7,8 +7,9 @@ import { OnboardingState } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
+import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { LIQUIDITY_TIERS, MOCK_DATA } from '@/constants/potentialMarkets';
-import { useAccountBalance, useBreakpoints } from '@/hooks';
+import { useAccountBalance, useBreakpoints, useTokenConfigs } from '@/hooks';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
@@ -46,6 +47,7 @@ export const NewMarketForm = () => {
   const isDisconnected = onboardingState === OnboardingState.Disconnected;
   const { isMobile } = useBreakpoints();
   const marketIds = useSelector(getMarketIds, shallowEqual);
+  const { chainTokenDenom, chainTokenDecimals } = useTokenConfigs();
 
   const [step, setStep] = useState(NewMarketFormStep.SELECTION);
   const [assetToAdd, setAssetToAdd] = useState<(typeof MOCK_DATA)[number]>();
@@ -77,6 +79,12 @@ export const NewMarketForm = () => {
     );
   }, [MOCK_DATA, marketIds]);
 
+  const tickSizeDecimal = useMemo(() => {
+    if (!assetToAdd) return TOKEN_DECIMALS;
+    const p = Math.floor(Math.log(Number(assetToAdd.referencePrice)));
+    return Math.abs(p - 3);
+  }, [assetToAdd]);
+
   if (NewMarketFormStep.SUCCESS === step) {
     return <NewMarketProposalSent onBack={() => setStep(NewMarketFormStep.SELECTION)} />;
   }
@@ -104,17 +112,18 @@ export const NewMarketForm = () => {
       }}
     >
       <h2>
-        Add Market{' '}
-        {assetToAdd && (
-          <span>
-            Ref. Price:{' '}
-            <Output
-              type={OutputType.Fiat}
-              value={assetToAdd.referencePrice}
-              fractionDigits={Math.abs(Number(assetToAdd.ticksizeExponent))}
-            />
-          </span>
-        )}
+        Add Market
+        <span>
+          Balance:{' '}
+          <Output
+            type={OutputType.Number}
+            value={nativeTokenBalance}
+            fractionDigits={2}
+            slotRight={
+              <Tag style={{ marginTop: '0.25rem', marginLeft: '0.5ch' }}>{chainTokenDenom}</Tag>
+            }
+          />
+        </span>
       </h2>
       <Styled.SearchSelectMenu
         items={[
@@ -173,9 +182,9 @@ export const NewMarketForm = () => {
                     disabled={!canModifyLiqTier}
                   >
                     <Styled.Header style={{ marginLeft: '1rem' }}>
-                      {label}{' '}
+                      {label}
                       {tier === assetToAdd?.liquidityTier && (
-                        <span style={{ marginLeft: '0.5ch' }}>- Recommended ✨</span>
+                        <Tag style={{ marginLeft: '0.5ch' }}>✨ Recommended</Tag>
                       )}
                     </Styled.Header>
                     <Styled.Details
@@ -225,6 +234,17 @@ export const NewMarketForm = () => {
         slotReceipt={
           <Styled.ReceiptDetails
             items={[
+              assetToAdd && {
+                key: 'reference-price',
+                label: <span>Reference price</span>,
+                value: (
+                  <Output
+                    type={OutputType.Fiat}
+                    value={assetToAdd.referencePrice}
+                    fractionDigits={tickSizeDecimal}
+                  />
+                ),
+              },
               assetToAdd && {
                 key: 'message-details',
                 label: <span>Message details</span>,

@@ -25,13 +25,14 @@ import { getBalances } from '@/state/accountSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { track } from '@/lib/analytics';
+import { hashFromTx } from '@/lib/hashfromTx';
 import { MustBigNumber } from '@/lib/numbers';
+import { getAddNewMarketGovProposal } from '@/lib/proposeNewMarket';
 import { log } from '@/lib/telemetry';
 
 import { useAccounts } from './useAccounts';
 import { useTokenConfigs } from './useTokenConfigs';
 import { useDydxClient } from './useDydxClient';
-import { hashFromTx } from '@/lib/hashfromTx';
 
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
 const SubaccountContext = createContext<SubaccountContextType>({} as SubaccountContextType);
@@ -233,6 +234,75 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     dispatch(setHistoricalPnl([] as unknown as SubAccountHistoricalPNLs));
   }, [dydxAddress]);
 
+  // ------ Submit proposal ------ //
+  const submitNewMarketProposal = useCallback(
+    async ({
+      walletAddress,
+      id,
+      symbol,
+      exponent,
+      minExchanges,
+      minPriceChangePpm,
+      exchangeConfigJson,
+      atomicResolution,
+      defaultFundingPpm,
+      liquidityTier,
+      quantumConversionExponent,
+      stepBaseQuantums,
+      subticksPerTick,
+    }: {
+      walletAddress: string;
+      id: number;
+      symbol: string;
+      exponent: number;
+      minExchanges: number;
+      minPriceChangePpm: number;
+      exchangeConfigJson: string;
+      atomicResolution: number;
+      defaultFundingPpm: number;
+      liquidityTier: number;
+      quantumConversionExponent: number;
+      stepBaseQuantums: Long;
+      subticksPerTick: number;
+    }) => {
+      if (!localDydxWallet || !localDydxWallet.address || !compositeClient) {
+        console.error('[useSubaccount/submitNewMarketProposal] Missing wallet or client');
+        return;
+      }
+      const account = compositeClient?.validatorClient.post.account(
+        localDydxWallet.address,
+        undefined
+      );
+
+      const resp = await compositeClient?.validatorClient.post.send(
+        localDydxWallet,
+        () =>
+          getAddNewMarketGovProposal({
+            walletAddress,
+            id,
+            symbol,
+            exponent,
+            minExchanges,
+            minPriceChangePpm,
+            exchangeConfigJson,
+            atomicResolution,
+            defaultFundingPpm,
+            liquidityTier,
+            quantumConversionExponent,
+            stepBaseQuantums,
+            subticksPerTick,
+          }),
+        false,
+        undefined,
+        undefined,
+        () => account
+      );
+
+      return resp;
+    },
+    [compositeClient, subaccountClient]
+  );
+
   // ------ Deposit/Withdraw Methods ------ //
   const depositFunds = useCallback(
     async (balance: AccountBalance) => {
@@ -295,9 +365,8 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
   const sendSquidWithdraw = useCallback(
     async (amount: number, payload: string, isCctp?: boolean) => {
-      
       const cctpWithdraw = () => {
-        return new Promise<string>((resolve, reject) => 
+        return new Promise<string>((resolve, reject) =>
           abacusStateManager.cctpWithdraw((success, error, data) => {
             const parsedData = JSON.parse(data);
             if (success && parsedData?.code == 0) {
@@ -306,8 +375,8 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
               reject(error);
             }
           })
-        )
-      }
+        );
+      };
       if (isCctp) {
         return await cctpWithdraw();
       }

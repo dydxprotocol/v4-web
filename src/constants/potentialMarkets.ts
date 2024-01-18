@@ -9190,5 +9190,3 @@ export const LIQUIDITY_TIERS = {
     impactNotional: 2_500,
   },
 };
-
-export const INITIAL_DEPOSIT_AMOUNT = 1_000_000_000;

@@ -7,7 +7,7 @@ import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 import { LIQUIDITY_TIERS, MOCK_DATA } from '@/constants/potentialMarkets';
-import { useAccountBalance, useDydxClient } from '@/hooks';
+import { useAccountBalance, useDydxClient, useTokenConfigs } from '@/hooks';
 import { LinkOutIcon } from '@/icons';
 
 import { AlertMessage } from '@/components/AlertMessage';
@@ -17,6 +17,7 @@ import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { Output, OutputType } from '@/components/Output';
+import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
 import { openDialog } from '@/state/dialogs';
@@ -40,6 +41,7 @@ export const NewMarketPreviewForm = ({
   const { compositeClient } = useDydxClient();
   const { nativeTokenBalance } = useAccountBalance();
   const dispatch = useDispatch();
+  const { chainTokenDenom } = useTokenConfigs();
 
   const { label, initialMarginFraction, maintenanceMarginFraction, impactNotional } =
     LIQUIDITY_TIERS[liquidityTier as unknown as keyof typeof LIQUIDITY_TIERS];
@@ -54,6 +56,12 @@ export const NewMarketPreviewForm = ({
 
     return null;
   }, [nativeTokenBalance]);
+
+  const tickSizeDecimal = useMemo(() => {
+    if (!assetData) return TOKEN_DECIMALS;
+    const p = Math.floor(Math.log(Number(assetData.referencePrice)));
+    return Math.abs(p - 3);
+  }, [assetData]);
 
   const isDisabled = false; // alertMessage !== null;
 
@@ -70,7 +78,20 @@ export const NewMarketPreviewForm = ({
         }
       }}
     >
-      <h2>Confirm new market proposal</h2>
+      <h2>
+        Confirm new market proposal
+        <span>
+          Balance:{' '}
+          <Output
+            type={OutputType.Number}
+            value={nativeTokenBalance}
+            fractionDigits={2}
+            slotRight={
+              <Tag style={{ marginTop: '0.25rem', marginLeft: '0.5ch' }}>{chainTokenDenom}</Tag>
+            }
+          />
+        </span>
+      </h2>
       <Styled.FormInput
         disabled
         label="Market"
@@ -111,6 +132,17 @@ export const NewMarketPreviewForm = ({
       <Styled.WithDetailsReceipt
         side="bottom"
         detailItems={[
+          {
+            key: 'reference-price',
+            label: <span>Reference price</span>,
+            value: (
+              <Output
+                type={OutputType.Fiat}
+                value={assetData.referencePrice}
+                fractionDigits={tickSizeDecimal}
+              />
+            ),
+          },
           {
             key: 'message-details',
             label: 'Message details',
@@ -221,6 +253,12 @@ Styled.ProposalSent = styled.div`
   justify-content: center;
   gap: 1rem;
   padding: 1rem;
+
+  && {
+    h2 {
+      margin: 0 1rem;
+    }
+  }
 `;
 
 Styled.OuterCircle = styled.div`
@@ -257,6 +295,22 @@ Styled.Form = styled.form`
   ${formMixins.transfersForm}
   ${layoutMixins.stickyArea0}
   --stickyArea0-background: transparent;
+
+  h2 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    span {
+      display: flex;
+      align-items: center;
+    }
+
+    output {
+      margin-left: 0.5ch;
+    }
+  }
 `;
 
 Styled.FormInput = styled(FormInput)`
@@ -286,4 +340,5 @@ Styled.ButtonRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 1rem;
+  width: 100%;
 `;

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
 
 import { AppRoute } from '@/constants/routes';
-import { useAccountBalance, useBreakpoints, useDocumentTitle } from '@/hooks';
+import { useAccountBalance, useBreakpoints, useDocumentTitle, useDydxClient } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { breakpoints } from '@/styles';
@@ -48,7 +48,7 @@ const StepItem = ({ step, subtitle, title }: { step: number; subtitle: string; t
 
 const NewMarket = () => {
   const { isNotTablet } = useBreakpoints();
-  const { nativeTokenBalance } = useAccountBalance();
+  const { networkConfig } = useDydxClient();
   const navigate = useNavigate();
   const [displaySteps, setDisplaySteps] = useState(true);
 
@@ -57,7 +57,7 @@ const NewMarket = () => {
   // const { data, isLoading } = useQuery({
   //   queryKey: ['market_proposals'],
   //   queryFn: async () => {
-  //     const response = fetch('http://3.134.210.83:1317/cosmos/gov/v1/proposals', {
+  //     const response = fetch(`${networkConfig?.validatorUrl}/cosmos/gov/v1/proposals`, {
   //       headers: {
   //         Accept: 'application/json',
   //         'Content-Type': 'application/json',
@@ -220,7 +220,7 @@ Styled.Subtitle = styled.span`
 `;
 
 Styled.FormContainer = styled.div`
-  min-width: 30rem;
+  min-width: 31.25rem;
   height: fit-content;
   border-radius: 1rem;
   background-color: var(--color-layer-3);
@@ -228,6 +228,7 @@ Styled.FormContainer = styled.div`
 
   @media ${breakpoints.tablet} {
     width: 100%;
+    min-width: unset;
   }
 `;
 

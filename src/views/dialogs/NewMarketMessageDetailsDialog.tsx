@@ -1,12 +1,19 @@
 import { useMemo, useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { MOCK_ORACLE_DATA, MOCK_DATA, INITIAL_DEPOSIT_AMOUNT } from '@/constants/potentialMarkets';
+import { MOCK_ORACLE_DATA, MOCK_DATA } from '@/constants/potentialMarkets';
 
 import { Details } from '@/components/Details';
 import { Dialog } from '@/components/Dialog';
 import { Tag, TagType } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
+
+import {
+  DEFAULT_DELAY_BLOCK,
+  INITIAL_DEPOSIT_AMOUNT,
+  getSummary,
+  getTitle,
+} from '@/lib/proposeNewMarket';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -21,7 +28,6 @@ export enum CodeToggleGroup {
   CREATE_ORACLE = 'CREATE_ORACLE',
   MSG_CREATE_PERPETUAL = 'MSG_CREATE_PERPETUAL',
   MSG_CREATE_CLOB_PAIR = 'MSG_CREATE_CLOB_PAIR',
-  MSG_UPDATE_CLOB_PAIR = 'MSG_UPDATE_CLOB_PAIR',
   MSG_DELAY_MESSAGE = 'MSG_DELAY_MESSAGE',
   MSG_SUBMIT_PROPOSAL = 'MSG_SUBMIT_PROPOSAL',
 }
@@ -69,10 +75,6 @@ export const NewMarketMessageDetailsDialog = ({
         label: 'Msg create clobPair',
       },
       {
-        value: CodeToggleGroup.MSG_UPDATE_CLOB_PAIR,
-        label: 'Msg update clobPair',
-      },
-      {
         value: CodeToggleGroup.MSG_DELAY_MESSAGE,
         label: 'Msg delay message',
       },
@@ -99,7 +101,7 @@ export const NewMarketMessageDetailsDialog = ({
         {
           {
             [CodeToggleGroup.CREATE_ORACLE]: (
-              <div>
+              <Styled.Code>
                 <Details
                   layout="column"
                   items={[
@@ -131,23 +133,28 @@ export const NewMarketMessageDetailsDialog = ({
                     <Tag type={TagType.Number}>{oracleDataForAsset.length}</Tag>
                   )}
                 </Styled.Text0>
+                {'['}
                 {oracleDataForAsset?.map((exchangeConfig) => {
                   return (
-                    <Styled.Code key={exchangeConfig.exchange}>
+                    <Styled.Code
+                      key={exchangeConfig.exchange}
+                      style={{ padding: 0, margin: 0, paddingLeft: '0.5rem' }}
+                    >
                       {'{'}
                       {Object.keys(exchangeConfig).map((key) => (
                         <Styled.Line key={key}>
                           {key}: <span>{exchangeConfig[key as keyof typeof exchangeConfig]}</span>
                         </Styled.Line>
                       ))}
-                      {'}'}
+                      {'},'}
                     </Styled.Code>
                   );
                 })}
-              </div>
+                {']'}
+              </Styled.Code>
             ),
             [CodeToggleGroup.MSG_CREATE_PERPETUAL]: (
-              <div>
+              <Styled.Code>
                 <Details
                   layout="column"
                   items={[
@@ -183,10 +190,10 @@ export const NewMarketMessageDetailsDialog = ({
                     },
                   ]}
                 />
-              </div>
+              </Styled.Code>
             ),
             [CodeToggleGroup.MSG_CREATE_CLOB_PAIR]: (
-              <div>
+              <Styled.Code>
                 <Details
                   layout="column"
                   items={[
@@ -215,79 +222,76 @@ export const NewMarketMessageDetailsDialog = ({
                       label: 'subticks_per_tick',
                       value: `${assetData?.subticksPerTick}`,
                     },
-                  ]}
-                />
-              </div>
-            ),
-            [CodeToggleGroup.MSG_UPDATE_CLOB_PAIR]: (
-              <div>
-                <Details
-                  layout="column"
-                  items={[
                     {
-                      key: 'clob_id',
-                      label: 'clob_id',
-                      value: '34',
-                    },
-                    {
-                      key: 'perpetual_id',
-                      label: 'perpetual_id',
-                      value: '34',
-                    },
-                    {
-                      key: 'quantum_conversion_exponent',
-                      label: 'quantum_conversion_exponent',
-                      value: `${assetData?.quantumConversionExponent}`,
-                    },
-                    {
-                      key: 'step_base_quantums',
-                      label: 'step_base_quantums',
-                      value: `${assetData?.stepBaseQuantums}`,
-                    },
-                    {
-                      key: 'subticks_per_tick',
-                      label: 'subticks_per_tick',
-                      value: `${assetData?.subticksPerTick}`,
+                      key: 'status',
+                      label: 'status',
+                      value: 'INITIALIZING',
                     },
                   ]}
                 />
-              </div>
+              </Styled.Code>
             ),
             [CodeToggleGroup.MSG_DELAY_MESSAGE]: (
-              <div>
+              <Styled.Code>
                 <Details
                   layout="column"
                   items={[
                     {
                       key: 'delay_blocks',
                       label: 'delay_blocks',
-                      value: '10',
+                      value: `${DEFAULT_DELAY_BLOCK}`,
                     },
                   ]}
                 />
-              </div>
-            ),
-            [CodeToggleGroup.MSG_SUBMIT_PROPOSAL]: (
-              <div>
-                <Styled.Text0>title: </Styled.Text0>
-                <p>Add {ticker} perpetual market</p>
-
+                <div style={{ marginTop: '1rem' }}>MSG_UPDATE_CLOB_PAIR</div>
                 <Details
                   layout="column"
                   items={[
                     {
-                      key: 'initial_deposit_amount',
-                      label: 'initial_deposit_amount',
-                      value: `${INITIAL_DEPOSIT_AMOUNT}`,
+                      key: 'clob_id',
+                      label: 'clob_id',
+                      value: '34',
+                    },
+                    {
+                      key: 'perpetual_id',
+                      label: 'perpetual_id',
+                      value: '34',
+                    },
+                    {
+                      key: 'quantum_conversion_exponent',
+                      label: 'quantum_conversion_exponent',
+                      value: `${assetData?.quantumConversionExponent}`,
+                    },
+                    {
+                      key: 'step_base_quantums',
+                      label: 'step_base_quantums',
+                      value: `${assetData?.stepBaseQuantums}`,
+                    },
+                    {
+                      key: 'subticks_per_tick',
+                      label: 'subticks_per_tick',
+                      value: `${assetData?.subticksPerTick}`,
+                    },
+                    {
+                      key: 'status',
+                      label: 'status',
+                      value: 'ACTIVE',
                     },
                   ]}
                 />
+              </Styled.Code>
+            ),
+            [CodeToggleGroup.MSG_SUBMIT_PROPOSAL]: (
+              <Styled.Code>
+                <Styled.Text0>title: </Styled.Text0>
+                <Styled.Description>{getTitle(ticker)}</Styled.Description>
+
+                <Styled.Text0>initial_deposit_amount:</Styled.Text0>
+                <Styled.Description>{INITIAL_DEPOSIT_AMOUNT}</Styled.Description>
 
                 <Styled.Text0>summary: </Styled.Text0>
-                <p>
-                  {`Add the x/prices, x/perpetuals and x/clob parameters needed for a ${1} perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after ${2} blocks.`}
-                </p>
-              </div>
+                <Styled.Description>{getSummary(ticker, DEFAULT_DELAY_BLOCK)}</Styled.Description>
+              </Styled.Code>
             ),
           }[codeToggleGroup]
         }
@@ -330,5 +334,9 @@ Styled.Code = styled.div`
 `;
 
 Styled.Line = styled.pre`
-  margin-left: 0.5rem;
+  margin-left: 1rem;
+`;
+
+Styled.Description = styled.p`
+  margin-bottom: 1rem;
 `;
