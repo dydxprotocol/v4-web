@@ -186,7 +186,7 @@ export const useWalletConnection = () => {
         walletConnectionType: walletConnection?.type,
       };
     },
-    [isConnectedGraz, signerGraz, isConnectedWagmi, signerWagmi]
+    [isConnectedGraz, signerGraz, isConnectedWagmi, signerWagmi, login, ready, authenticated]
   );
 
   const disconnectWallet = useCallback(async () => {
