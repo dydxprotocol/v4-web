@@ -13,6 +13,7 @@ import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
+import { usePrivy } from '@privy-io/react-auth';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
@@ -26,6 +27,8 @@ export const ChooseWallet = () => {
   const displayedWallets = useDisplayedWallets();
 
   const { selectWalletType, selectedWalletType, selectedWalletError } = useAccounts();
+  
+  const { ready, authenticated } = usePrivy();
 
   return (
     <>
@@ -63,6 +66,14 @@ export const ChooseWallet = () => {
             </div>
           </Styled.WalletButton>
         ))}
+        <Styled.WalletButton
+            action={ButtonAction.Base}
+            key={'debug'}
+            onClick={() => console.log({ authenticated, ready })}
+            size={ButtonSize.Small}
+          >
+            Debug
+          </Styled.WalletButton>
       </Styled.Wallets>
 
       <Styled.Footer>
