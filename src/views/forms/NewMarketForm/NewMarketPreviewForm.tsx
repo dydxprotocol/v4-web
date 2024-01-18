@@ -23,11 +23,9 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 import { getOnboardingState } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
 
-import { isTruthy } from '@/lib/isTruthy';
-
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
-import { Input, InputType } from '@/components/Input';
+import { InputType } from '@/components/Input';
 import { FormInput } from '@/components/FormInput';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { CheckIcon } from '@/icons';
@@ -47,9 +45,12 @@ export const NewMarketPreviewForm = ({
 }: NewMarketPreviewFormProps) => {
   const { compositeClient } = useDydxClient();
   const { nativeTokenBalance } = useAccountBalance();
+  const dispatch = useDispatch();
 
   const { label, initialMarginFraction, maintenanceMarginFraction, impactNotional } =
     LIQUIDITY_TIERS[liquidityTier as unknown as keyof typeof LIQUIDITY_TIERS];
+
+  const isDisabled = nativeTokenBalance.lt(10_000);
 
   return (
     <Styled.Form
@@ -59,7 +60,7 @@ export const NewMarketPreviewForm = ({
       }}
     >
       <h2>Confirm new market proposal</h2>
-      <FormInput label="Market" type={InputType.Text} value={`${assetData.symbol}-USD`} />
+      <FormInput disabled label="Market" type={InputType.Text} value={`${assetData.symbol}-USD`} />
       <WithDetailsReceipt
         side="bottom"
         detailItems={[
@@ -88,12 +89,32 @@ export const NewMarketPreviewForm = ({
           },
         ]}
       >
-        <FormInput label="Liquidity tier" type={InputType.Text} value={label} />
+        <FormInput disabled label="Liquidity tier" type={InputType.Text} value={label} />
       </WithDetailsReceipt>
 
       <WithDetailsReceipt
         side="bottom"
         detailItems={[
+          {
+            key: 'message-details',
+            label: 'Message details',
+            value: (
+              <Button
+                action={ButtonAction.Navigation}
+                size={ButtonSize.Small}
+                onClick={() =>
+                  dispatch(
+                    openDialog({
+                      type: DialogTypes.NewMarketMessageDetails,
+                      dialogProps: { assetData },
+                    })
+                  )
+                }
+              >
+                View Details →
+              </Button>
+            ),
+          },
           {
             key: 'required-balance',
             label: 'Required balance',
@@ -105,7 +126,7 @@ export const NewMarketPreviewForm = ({
             value: (
               <DiffOutput
                 withDiff
-                hasInvalidNewValue={nativeTokenBalance.lt(10_000)}
+                hasInvalidNewValue={isDisabled}
                 sign={NumberSign.Negative}
                 fractionDigits={TOKEN_DECIMALS}
                 type={OutputType.Number}
@@ -120,7 +141,7 @@ export const NewMarketPreviewForm = ({
       </WithDetailsReceipt>
       <Styled.ButtonRow>
         <Button onClick={onBack}>Back</Button>
-        <Button type={ButtonType.Submit} action={ButtonAction.Primary}>
+        <Button type={ButtonType.Submit} action={ButtonAction.Primary} state={{ isDisabled }}>
           Propose new market
         </Button>
       </Styled.ButtonRow>
