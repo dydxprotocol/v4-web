@@ -188,8 +188,8 @@ export const NewMarketForm = () => {
                       )}
                     </Styled.Header>
                     <Styled.Details
-                      layout={isMobile ? 'grid' : 'rowColumns'}
-                      withSeparators
+                      layout={isMobile ? 'stackColumn' : 'rowColumns'}
+                      withSeparators={!isMobile}
                       items={[
                         {
                           key: 'imf',
