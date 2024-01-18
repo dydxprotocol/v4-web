@@ -66,14 +66,6 @@ export const ChooseWallet = () => {
             </div>
           </Styled.WalletButton>
         ))}
-        <Styled.WalletButton
-            action={ButtonAction.Base}
-            key={'debug'}
-            onClick={() => console.log({ authenticated, ready })}
-            size={ButtonSize.Small}
-          >
-            Debug
-          </Styled.WalletButton>
       </Styled.Wallets>
 
       <Styled.Footer>
