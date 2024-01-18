@@ -1,12 +1,19 @@
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+import { useStringGetter } from '@/hooks';
+
+import type { MarketAsset, PerpetualMarket } from '@/constants/abacus';
+import { DialogTypes } from '@/constants/dialogs';
 import { type MenuConfig } from '@/constants/menus';
 import { TradeLayouts } from '@/constants/layout';
+import { STRING_KEYS } from '@/constants/localization';
+import { AppRoute } from '@/constants/routes';
 
 import { AssetIcon } from '@/components/AssetIcon';
 
 import { AppTheme, setAppTheme } from '@/state/configs';
+import { openDialog } from '@/state/dialogs';
 import { setSelectedTradeLayout } from '@/state/layout';
 
 import { getAssets } from '@/state/assetsSelectors';
@@ -24,11 +31,16 @@ enum LayoutItems {
   setAlternativeLayout = 'SetAlternativeLayout',
 }
 
-enum TradeItems {
-  PlaceMarketOrder = 'PlaceMarketOrder',
-  PlaceLimitOrder = 'PlaceLimitOrder',
-  PlaceStopLimitOrder = 'PlaceStopLimitOrder',
+enum MoreItems {
+  Impersonate = 'Impersonate',
 }
+
+// TODO: Add trade items to cmdk menu
+// enum TradeItems {
+//   PlaceMarketOrder = 'PlaceMarketOrder',
+//   PlaceLimitOrder = 'PlaceLimitOrder',
+//   PlaceStopLimitOrder = 'PlaceStopLimitOrder',
+// }
 
 enum NavItems {
   NavigateToMarket = 'NavigateToMarket',
@@ -37,6 +49,7 @@ enum NavItems {
 export const useGlobalCommands = (): MenuConfig<string, string> => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const stringGetter = useStringGetter();
 
   const allPerpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
   const allAssets = useSelector(getAssets, shallowEqual) || {};
@@ -44,7 +57,7 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
   const joinedPerpetualMarketsAndAssets = Object.values(allPerpetualMarkets).map((market) => ({
     ...market,
     ...allAssets[market?.assetId],
-  }));
+  })) as (PerpetualMarket & MarketAsset)[];
 
   return [
     {
@@ -101,27 +114,19 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
         },
       ],
     },
-    // {
-    //   group: 'trading',
-    //   groupLabel: 'Trading',
-    //   items: [
-    //     {
-    //       value: TradeItems.PlaceMarketOrder,
-    //       label: 'Place Market Order',
-    //       onSelect: () => {},
-    //     },
-    //     {
-    //       value: TradeItems.PlaceLimitOrder,
-    //       label: 'Place Limit Order',
-    //       onSelect: () => {},
-    //     },
-    //     {
-    //       value: TradeItems.PlaceStopLimitOrder,
-    //       label: 'Place Stop Limit Order',
-    //       onSelect: () => {},
-    //     },
-    //   ],
-    // },
+    {
+      group: 'More',
+      groupLabel: stringGetter({ key: STRING_KEYS.MORE }),
+      items: [
+        {
+          value: MoreItems.Impersonate,
+          label: 'Impersonate',
+          onSelect: () => {
+            dispatch(openDialog({ type: DialogTypes.Impersonation }));
+          },
+        },
+      ],
+    },
     {
       group: 'navigation',
       groupLabel: 'Navigation',
@@ -129,13 +134,16 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
         {
           value: NavItems.NavigateToMarket,
           label: 'Navigate to Market',
-          subitems: joinedPerpetualMarketsAndAssets.map(({ market = '', name = '', id = '' }) => ({
-            value: market,
-            slotBefore: <AssetIcon symbol={id} />,
-            label: name,
-            tag: id,
-            onSelect: () => navigate(`/trade/${market}`),
-          })),
+          subitems: joinedPerpetualMarketsAndAssets.map((marketData) => {
+            const { market, name, id } = marketData ?? {};
+            return {
+              value: market ?? '',
+              slotBefore: <AssetIcon symbol={id} />,
+              label: name ?? '',
+              tag: id,
+              onSelect: () => navigate(`/trade/${market}`),
+            };
+          }),
         },
       ],
     },

@@ -1,9 +1,12 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { Root, Item } from '@radix-ui/react-radio-group';
+import { useDispatch, useSelector } from 'react-redux';
 
+import { OnboardingState } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
-import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { LIQUIDITY_TIERS, MOCK_DATA } from '@/constants/potentialMarkets';
 import { useAccountBalance, useDydxClient } from '@/hooks';
 
@@ -13,15 +16,34 @@ import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
-import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
+import { WithReceipt } from '@/components/WithReceipt';
+
+import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
+
+import { getOnboardingState } from '@/state/accountSelectors';
+import { openDialog } from '@/state/dialogs';
+
+import { isTruthy } from '@/lib/isTruthy';
 
 import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
+import { NewMarketPreviewForm } from './NewMarketPreviewForm';
+
+enum NewMarketFormStep {
+  SELECTION,
+  PREVIEW,
+}
 
 export const NewMarketForm = () => {
   const { compositeClient } = useDydxClient();
+  const dispatch = useDispatch();
+  const { nativeTokenBalance } = useAccountBalance();
+  const onboardingState = useSelector(getOnboardingState);
+  const isDisconnected = onboardingState === OnboardingState.Disconnected;
+
+  const [mode, setMode] = useState(NewMarketFormStep.SELECTION);
   const [assetToAdd, setAssetToAdd] = useState<(typeof MOCK_DATA)[number]>();
   const [liquidityTier, setLiquidityTier] = useState<string>();
-  const { nativeTokenBalance } = useAccountBalance();
 
   const alertMessage = useMemo(() => {
     if (nativeTokenBalance.lt(10_000)) {
@@ -40,15 +62,26 @@ export const NewMarketForm = () => {
     }
   }, [assetToAdd]);
 
-  console.log(MOCK_DATA);
+  if (NewMarketFormStep.PREVIEW === mode) {
+    if (assetToAdd && liquidityTier) {
+      return (
+        <NewMarketPreviewForm
+          assetData={assetToAdd}
+          liquidityTier={liquidityTier}
+          onBack={() => setMode(NewMarketFormStep.SELECTION)}
+        />
+      );
+    }
+  }
 
   return (
     <Styled.Form
       onSubmit={(e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // compositeClient?.validatorClient.post.send()
+        setMode(NewMarketFormStep.PREVIEW);
       }}
     >
+      <h2>Add Market</h2>
       <Styled.SearchSelectMenu
         items={[
           {
@@ -65,7 +98,11 @@ export const NewMarketForm = () => {
         ]}
         label="Market"
       >
-        {assetToAdd ? `${assetToAdd?.symbol}-USD` : 'e.g. "BTC-USD"'}
+        {assetToAdd ? (
+          <Styled.SelectedAsset>{assetToAdd?.symbol}-USD</Styled.SelectedAsset>
+        ) : (
+          'e.g. "BTC-USD"'
+        )}
       </Styled.SearchSelectMenu>
       {assetToAdd && (
         <>
@@ -83,7 +120,10 @@ export const NewMarketForm = () => {
                     value={tier}
                     selected={tier === liquidityTier}
                   >
-                    <Styled.Header style={{ marginLeft: '1rem' }}>{label}</Styled.Header>
+                    <Styled.Header style={{ marginLeft: '1rem' }}>
+                      {label}
+                      {tier === assetToAdd?.liquidityTier && <span> - Recommended ✨</span>}
+                    </Styled.Header>
                     <Styled.Details
                       layout="rowColumns"
                       withSeparators
@@ -112,7 +152,7 @@ export const NewMarketForm = () => {
                         },
                         {
                           key: 'impact-notional',
-                          label: 'Impact Notional',
+                          label: 'Impact notional',
                           value: <Output type={OutputType.Number} value={impactNotional} />,
                         },
                       ]}
@@ -127,29 +167,61 @@ export const NewMarketForm = () => {
       {alertMessage && (
         <AlertMessage type={alertMessage.type}>{alertMessage.message} </AlertMessage>
       )}
-      <WithDetailsReceipt
-        detailItems={[
-          {
-            key: 'dydx-required',
-            label: (
-              <span>
-                Required balance <Tag>DYDX</Tag>
-              </span>
-            ),
-            value: (
-              <Output
-                type={OutputType.Number}
-                value={10000}
-                slotRight={<Styled.Disclaimer>or more</Styled.Disclaimer>}
-              />
-            ),
-          },
-        ]}
+      <WithReceipt
+        slotReceipt={
+          <Styled.ReceiptDetails
+            items={[
+              assetToAdd && {
+                key: 'message-details',
+                label: <span>Message Details</span>,
+                value: (
+                  <Button
+                    action={ButtonAction.Navigation}
+                    size={ButtonSize.Small}
+                    onClick={() =>
+                      dispatch(
+                        openDialog({
+                          type: DialogTypes.NewMarketMessageDetails,
+                          dialogProps: { assetData: assetToAdd },
+                        })
+                      )
+                    }
+                  >
+                    View Details →
+                  </Button>
+                ),
+              },
+              {
+                key: 'dydx-required',
+                label: (
+                  <span>
+                    Required balance <Tag>DYDX</Tag>
+                  </span>
+                ),
+                value: (
+                  <Output
+                    type={OutputType.Number}
+                    value={10000}
+                    slotRight={<Styled.Disclaimer>or more</Styled.Disclaimer>}
+                  />
+                ),
+              },
+            ].filter(isTruthy)}
+          />
+        }
       >
-        <Button type={ButtonType.Submit} action={ButtonAction.Primary}>
-          Select Market
-        </Button>
-      </WithDetailsReceipt>
+        {isDisconnected ? (
+          <OnboardingTriggerButton />
+        ) : (
+          <Button
+            type={ButtonType.Submit}
+            state={{ isDisabled: !assetToAdd }}
+            action={ButtonAction.Primary}
+          >
+            Preview Market Proposal
+          </Button>
+        )}
+      </WithReceipt>
     </Styled.Form>
   );
 };
@@ -158,9 +230,15 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Form = styled.form`
   ${formMixins.transfersForm}
+  ${layoutMixins.stickyArea0}
+  --stickyArea0-background: transparent;
 `;
 
 Styled.SearchSelectMenu = styled(SearchSelectMenu)``;
+
+Styled.SelectedAsset = styled.span`
+  color: var(--color-text-2);
+`;
 
 Styled.Disclaimer = styled.div`
   font: var(--font-small);
@@ -196,4 +274,9 @@ Styled.LiquidityTierRadioButton = styled(Item)<{ selected?: boolean }>`
 Styled.Details = styled(Details)`
   margin-top: 0.5rem;
   padding: 0;
+`;
+
+Styled.ReceiptDetails = styled(Details)`
+  padding: 0.375rem 0.75rem 0.25rem;
+  font-size: 0.8125em;
 `;

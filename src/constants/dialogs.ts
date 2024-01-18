@@ -6,6 +6,7 @@ export enum DialogTypes {
   ExternalLink = 'ExternalLink',
   FillDetails = 'FillDetails',
   Help = 'Help',
+  Impersonation = 'Impersonation',
   ExternalNavKeplr = 'ExternalNavKeplr',
   MnemonicExport = 'MnemonicExport',
   MobileSignIn = 'MobileSignIn',
@@ -19,6 +20,7 @@ export enum DialogTypes {
   Transfer = 'Transfer',
   Withdraw = 'Withdraw',
   ManageFunds = 'ManageFunds',
+  NewMarketMessageDetails = 'NewMarketMessageDetails',
 }
 
 export enum TradeBoxDialogTypes {

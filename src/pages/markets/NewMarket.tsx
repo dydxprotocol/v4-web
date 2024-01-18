@@ -1,21 +1,18 @@
 import { useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
-import { CodeIcon } from '@radix-ui/react-icons';
+import { useNavigate } from 'react-router-dom';
 
-import { useAccountBalance, useBreakpoints, useDocumentTitle, useStringGetter } from '@/hooks';
-import { HelpCircleIcon } from '@/icons';
+import { AppRoute } from '@/constants/routes';
+import { useAccountBalance, useBreakpoints, useDocumentTitle } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { breakpoints } from '@/styles';
 
 import { Button } from '@/components/Button';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
+import { IconButton } from '@/components/IconButton';
+import { Icon, IconName } from '@/components/Icon';
 import { NewMarketForm } from '@/views/forms/NewMarketForm';
-
-enum NewMarketDisplay {
-  HOW_TO,
-  DETAILS,
-}
 
 const HOW_TO_ADD_MARKET_TEXT = [
   {
@@ -49,10 +46,10 @@ const StepItem = ({ step, subtitle, title }: { step: number; subtitle: string; t
 );
 
 const NewMarket = () => {
-  const stringGetter = useStringGetter();
   const { isNotTablet } = useBreakpoints();
   const { nativeTokenBalance } = useAccountBalance();
-  const [displayLeft, setDisplayLeft] = useState(NewMarketDisplay.HOW_TO);
+  const navigate = useNavigate();
+  const [displaySteps, setDisplaySteps] = useState(true);
 
   useDocumentTitle('New Market');
 
@@ -61,49 +58,35 @@ const NewMarket = () => {
       <Styled.HeaderSection>
         <Styled.ContentSectionHeader
           title="Suggest a new Market"
+          slotRight={
+            <IconButton iconName={IconName.Close} onClick={() => navigate(AppRoute.Markets)} />
+          }
           subtitle={isNotTablet && 'Add details in order to launch a new market'}
         />
       </Styled.HeaderSection>
       <Styled.Content>
-        {
-          {
-            [NewMarketDisplay.HOW_TO]: (
-              <div>
-                <Button
-                  slotLeft={<CodeIcon />}
-                  onClick={() => setDisplayLeft(NewMarketDisplay.DETAILS)}
-                >
-                  Show Details
-                </Button>
-                <h2>Steps to create a new market</h2>
-                {/* <div>{nativeTokenBalance.toString()}</div> */}
-
-                {HOW_TO_ADD_MARKET_TEXT.map((item) => (
-                  <StepItem
-                    key={item.step}
-                    step={item.step}
-                    title={item.title}
-                    subtitle={item.subtitle}
-                  />
-                ))}
-              </div>
-            ),
-            [NewMarketDisplay.DETAILS]: (
-              <div>
-                <Button
-                  onClick={() => setDisplayLeft(NewMarketDisplay.HOW_TO)}
-                  slotLeft={<HelpCircleIcon />}
-                >
-                  Show steps
-                </Button>
-
-                <span>Message details</span>
-              </div>
-            ),
-          }[displayLeft]
-        }
+        <div>
+          <Button
+            slotLeft={<Styled.Icon iconName={displaySteps ? IconName.Hide : IconName.HelpCircle} />}
+            onClick={() => setDisplaySteps(!displaySteps)}
+          >
+            {displaySteps ? 'Hide Steps' : 'Show Steps'}
+          </Button>
+          {displaySteps && (
+            <>
+              <h2>Steps to create a new market</h2>
+              {HOW_TO_ADD_MARKET_TEXT.map((item) => (
+                <StepItem
+                  key={item.step}
+                  step={item.step}
+                  title={item.title}
+                  subtitle={item.subtitle}
+                />
+              ))}
+            </>
+          )}
+        </div>
         <Styled.FormContainer>
-          <h2>Add Market</h2>
           <NewMarketForm />
         </Styled.FormContainer>
       </Styled.Content>
@@ -116,9 +99,21 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.Page = styled.div`
   ${layoutMixins.contentContainerPage}
   gap: 1.5rem;
+  /* align-items: center; */
+
+  > * {
+    --content-max-width: 80rem;
+    max-width: min(calc(100vw - 4rem), var(--content-max-width));
+  }
 
   @media ${breakpoints.tablet} {
-    gap: 0.75rem;
+    --stickyArea-topHeight: var(--page-header-height-mobile);
+    padding: 0 1rem 1rem;
+
+    > * {
+      max-width: calc(100vw - 2rem);
+      width: 100%;
+    }
   }
 `;
 
@@ -144,16 +139,27 @@ Styled.HeaderSection = styled.section`
 `;
 
 Styled.Content = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  max-width: 1200px;
+  display: flex;
+  flex-direction: row;
   gap: 2rem;
+  margin: 0 auto;
+
+  @media ${breakpoints.tablet} {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 0 auto;
+  }
 
   h2 {
     font: var(--font-large-medium);
     color: var(--color-text-2);
-    margin-bottom: 1rem;
+    margin: 1rem;
   }
+`;
+
+Styled.Icon = styled(Icon)`
+  width: 1.5rem;
 `;
 
 Styled.StepItem = styled.div`
@@ -192,9 +198,15 @@ Styled.Subtitle = styled.span`
 `;
 
 Styled.FormContainer = styled.div`
+  width: 30rem;
+  height: fit-content;
   border-radius: 1rem;
   background-color: var(--color-layer-3);
   padding: 1rem;
+
+  @media ${breakpoints.tablet} {
+    width: 100%;
+  }
 `;
 
 export default NewMarket;

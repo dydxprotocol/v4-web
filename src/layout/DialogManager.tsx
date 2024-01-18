@@ -24,9 +24,11 @@ import { TransferDialog } from '@/views/dialogs/TransferDialog';
 import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
 import { WithdrawDialog } from '@/views/dialogs/WithdrawDialog';
 import { ManageFundsDialog } from '@/views/dialogs/ManageFundsDialog';
+import { ImpersonationDialog } from '@/views/dialogs/ImpersonationDialog';
 
 import { OrderDetailsDialog } from '@/views/dialogs/DetailsDialog/OrderDetailsDialog';
 import { FillDetailsDialog } from '@/views/dialogs/DetailsDialog/FillDetailsDialog';
+import { NewMarketMessageDetailsDialog } from '@/views/dialogs/NewMarketMessageDetailsDialog';
 
 export const DialogManager = () => {
   const dispatch = useDispatch();
@@ -53,6 +55,7 @@ export const DialogManager = () => {
     [DialogTypes.ExchangeOffline]: <ExchangeOfflineDialog {...modalProps} />,
     [DialogTypes.FillDetails]: <FillDetailsDialog {...modalProps} />,
     [DialogTypes.Help]: <HelpDialog {...modalProps} />,
+    [DialogTypes.Impersonation]: <ImpersonationDialog {...modalProps} />,
     [DialogTypes.ExternalNavKeplr]: <ExternalNavKeplrDialog {...modalProps} />,
     [DialogTypes.ExternalLink]: <ExternalLinkDialog {...modalProps} />,
     [DialogTypes.MnemonicExport]: <MnemonicExportDialog {...modalProps} />,
@@ -67,5 +70,6 @@ export const DialogManager = () => {
     [DialogTypes.Transfer]: <TransferDialog {...modalProps} />,
     [DialogTypes.Withdraw]: <WithdrawDialog {...modalProps} />,
     [DialogTypes.ManageFunds]: <ManageFundsDialog {...modalProps} />,
+    [DialogTypes.NewMarketMessageDetails]: <NewMarketMessageDetailsDialog {...modalProps} />,
   }[type];
 };
