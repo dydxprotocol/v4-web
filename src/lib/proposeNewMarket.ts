@@ -38,7 +38,7 @@ const TYPE_URL_MSG_UPDATE_CLOB_PAIR = '/dydxprotocol.clob.MsgUpdateClobPair';
 const TYPE_URL_MSG_DELAY_MESSAGE = '/dydxprotocol.delaymsg.MsgDelayMessage';
 const TYPE_URL_MSG_SUBMIT_PROPOSAL = '/cosmos.gov.v1.MsgSubmitProposal';
 
-export const DEFAULT_DELAY_BLOCK = 30;
+export const DEFAULT_DELAY_BLOCK = 5;
 
 export function composeMsgCreateOracleMarket(
   market_id: number,
