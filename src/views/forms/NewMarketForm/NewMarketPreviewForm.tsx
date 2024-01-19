@@ -28,6 +28,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 type NewMarketPreviewFormProps = {
   assetData: (typeof POTENTIAL_MARKETS)[number];
+  clobPairId: number;
   liquidityTier: string;
   onBack: () => void;
   onSuccess: () => void;
@@ -35,6 +36,7 @@ type NewMarketPreviewFormProps = {
 
 export const NewMarketPreviewForm = ({
   assetData,
+  clobPairId,
   liquidityTier,
   onBack,
   onSuccess,
@@ -42,7 +44,7 @@ export const NewMarketPreviewForm = ({
   const { submitNewMarketProposal } = useSubaccount();
   const { nativeTokenBalance } = useAccountBalance();
   const dispatch = useDispatch();
-  const { chainTokenDenom } = useTokenConfigs();
+  const { chainTokenDenom, chainTokenLabel } = useTokenConfigs();
   const [errorMessage, setErrorMessage] = useState();
 
   const { label, initialMarginFraction, maintenanceMarginFraction, impactNotional } =
@@ -80,7 +82,7 @@ export const NewMarketPreviewForm = ({
         setErrorMessage(undefined);
         try {
           const response = await submitNewMarketProposal({
-            id: 34,
+            id: clobPairId,
             symbol: assetData.symbol,
             exponent: Number(assetData.priceExponent),
             minExchanges: Number(assetData.minExchanges),
@@ -178,7 +180,7 @@ export const NewMarketPreviewForm = ({
                   dispatch(
                     openDialog({
                       type: DialogTypes.NewMarketMessageDetails,
-                      dialogProps: { assetData, liquidityTier },
+                      dialogProps: { assetData, clobPairId, liquidityTier },
                     })
                   )
                 }
@@ -189,7 +191,11 @@ export const NewMarketPreviewForm = ({
           },
           {
             key: 'required-balance',
-            label: 'Required balance',
+            label: (
+              <span>
+                Required balance <Tag>{chainTokenLabel}</Tag>
+              </span>
+            ),
             value: (
               <Output
                 type={OutputType.Text}

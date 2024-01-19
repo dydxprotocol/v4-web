@@ -33,13 +33,12 @@ export const DELAY_ADDRESS = 'dydx1mkkvp26dngu6n8rmalaxyp3gwkjuzztq5zx6tr';
 export const NATIVE_TOKEN = 'adv4tnt';
 export const INITIAL_DEPOSIT_AMOUNT = 10_001_000_000_000_000_000_000;
 
-const TYPE_URL_MSG_CREATE_ORACLE_MARKET = '/dydxprotocol.prices.MsgCreateOracleMarket';
-const TYPE_URL_MSG_CREATE_PERPETUAL = '/dydxprotocol.perpetuals.MsgCreatePerpetual';
-const TYPE_URL_MSG_CREATE_CLOB_PAIR = '/dydxprotocol.clob.MsgCreateClobPair';
-const TYPE_URL_MSG_UPDATE_CLOB_PAIR = '/dydxprotocol.clob.MsgUpdateClobPair';
-const TYPE_URL_MSG_DELAY_MESSAGE = '/dydxprotocol.delaymsg.MsgDelayMessage';
-const TYPE_URL_MSG_SUBMIT_PROPOSAL = '/cosmos.gov.v1.MsgSubmitProposal';
-
+const TYPE_URL_MSG_CREATE_ORACLE_MARKET = "/dydxprotocol.prices.MsgCreateOracleMarket"
+const TYPE_URL_MSG_CREATE_PERPETUAL = "/dydxprotocol.perpetuals.MsgCreatePerpetual"
+const TYPE_URL_MSG_CREATE_CLOB_PAIR = "/dydxprotocol.clob.MsgCreateClobPair"
+const TYPE_URL_MSG_UPDATE_CLOB_PAIR = "/dydxprotocol.clob.MsgUpdateClobPair"
+const TYPE_URL_MSG_DELAY_MESSAGE = "/dydxprotocol.delaymsg.MsgDelayMessage"
+const TYPE_URL_MSG_SUBMIT_PROPOSAL = "/cosmos.gov.v1.MsgSubmitProposal"
 export const DEFAULT_DELAY_BLOCK = 5;
 
 export function composeMsgCreateOracleMarket(
@@ -173,7 +172,7 @@ export function composeMsgSubmitProposal(
 ): EncodeObject {
   const initial_deposit: Coin[] = [
     {
-      amount: MustBigNumber(initial_deposit_amount / 10 ** 18).toString(),
+      amount: MustBigNumber(initial_deposit_amount).toString(),
       denom: NATIVE_TOKEN,
     },
   ];
@@ -236,9 +235,6 @@ export function generateRegistry(): Registry {
     ['/dydxprotocol.sending.MsgWithdrawFromSubaccount', MsgWithdrawFromSubaccount as GeneratedType],
     ['/dydxprotocol.sending.MsgDepositToSubaccount', MsgDepositToSubaccount as GeneratedType],
 
-    // gov
-    ['/cosmos.gov.v1.MsgSubmitProposal', govtx.MsgSubmitProposal as GeneratedType],
-
     // default types
     ...defaultRegistryTypes,
   ]);
@@ -274,6 +270,7 @@ export function getAddNewMarketGovProposal({
   subticksPerTick: number;
 }): Promise<EncodeObject[]> {
   const registry: Registry = generateRegistry();
+  console.log(registry);
   const msgs: EncodeObject[] = [];
   const createOracleMarket = composeMsgCreateOracleMarket(
     id,
@@ -321,9 +318,7 @@ export function getAddNewMarketGovProposal({
     wrapMessageArrAsAny(registry, msgs), // IMPORTANT: must wrap messages in Any type.
     walletAddress
   );
-  const encodedObjects: Promise<EncodeObject[]> = new Promise((resolve) =>
-    resolve([submitProposal])
-  );
 
+  const encodedObjects: Promise<EncodeObject[]> = Promise.resolve([submitProposal]);
   return encodedObjects;
 }

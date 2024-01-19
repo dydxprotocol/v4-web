@@ -22,6 +22,7 @@ type ElementProps = {
   preventClose?: boolean;
   setIsOpen?: (open: boolean) => void;
   assetData?: (typeof POTENTIAL_MARKETS)[number];
+  clobPairId?: number;
   liquidityTier?: string;
 };
 
@@ -35,6 +36,7 @@ export enum CodeToggleGroup {
 
 export const NewMarketMessageDetailsDialog = ({
   assetData,
+  clobPairId,
   liquidityTier,
   preventClose,
   setIsOpen,
@@ -96,7 +98,7 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'id',
                       label: 'market_id',
-                      value: '34',
+                      value: `${clobPairId}`,
                     },
                     {
                       key: 'pair',
@@ -147,12 +149,12 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'perpetual_id',
                       label: 'perpetual_id',
-                      value: '34',
+                      value: `${clobPairId}`,
                     },
                     {
                       key: 'market_id',
                       label: 'market_id',
-                      value: '34',
+                      value: `${clobPairId}`,
                     },
                     {
                       key: 'ticker',
@@ -186,12 +188,12 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'clob_id',
                       label: 'clob_id',
-                      value: '34',
+                      value: `${clobPairId}`,
                     },
                     {
                       key: 'perpetual_id',
                       label: 'perpetual_id',
-                      value: '34',
+                      value: `${clobPairId}`,
                     },
                     {
                       key: 'quantum_conversion_exponent',
@@ -236,12 +238,12 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'clob_id',
                       label: 'clob_id',
-                      value: '34',
+                      value: `${clobPairId}`,
                     },
                     {
                       key: 'perpetual_id',
                       label: 'perpetual_id',
-                      value: '34',
+                      value: `${clobPairId}`,
                     },
                     {
                       key: 'quantum_conversion_exponent',

@@ -47,7 +47,7 @@ export const NewMarketForm = () => {
   const isDisconnected = onboardingState === OnboardingState.Disconnected;
   const { isMobile } = useBreakpoints();
   const marketIds = useSelector(getMarketIds, shallowEqual);
-  const { chainTokenDenom, chainTokenDecimals } = useTokenConfigs();
+  const { chainTokenLabel, chainTokenDecimals } = useTokenConfigs();
 
   const [step, setStep] = useState(NewMarketFormStep.SELECTION);
   const [assetToAdd, setAssetToAdd] = useState<(typeof POTENTIAL_MARKETS)[number]>();
@@ -82,6 +82,21 @@ export const NewMarketForm = () => {
     );
   }, [POTENTIAL_MARKETS, marketIds]);
 
+  // Given a ticker, return a unique clob pair id with basic hashing
+  const getNewClobPairId = (ticker: string): number => {
+    let hash = 2166136261n;
+    for (let i = 0; i < ticker.length; i++) {
+      hash ^= BigInt(ticker.charCodeAt(i));
+      hash *= 16777619n;
+    }
+    return Number(hash & 2147483647n);
+  };
+
+  const clobPairId = useMemo(() => {
+    if (!assetToAdd) return undefined;
+    return getNewClobPairId(assetToAdd.symbol);
+  }, [assetToAdd]);
+
   const tickSizeDecimal = useMemo(() => {
     if (!assetToAdd) return TOKEN_DECIMALS;
     const p = Math.floor(Math.log(Number(assetToAdd.referencePrice)));
@@ -93,10 +108,11 @@ export const NewMarketForm = () => {
   }
 
   if (NewMarketFormStep.PREVIEW === step) {
-    if (assetToAdd && liquidityTier) {
+    if (assetToAdd && liquidityTier && clobPairId) {
       return (
         <NewMarketPreviewForm
           assetData={assetToAdd}
+          clobPairId={clobPairId}
           liquidityTier={liquidityTier}
           onBack={() => setStep(NewMarketFormStep.SELECTION)}
           onSuccess={() => setStep(NewMarketFormStep.SUCCESS)}
@@ -123,7 +139,7 @@ export const NewMarketForm = () => {
             value={nativeTokenBalance}
             fractionDigits={2}
             slotRight={
-              <Tag style={{ marginTop: '0.25rem', marginLeft: '0.5ch' }}>{chainTokenDenom}</Tag>
+              <Tag style={{ marginTop: '0.25rem', marginLeft: '0.5ch' }}>{chainTokenLabel}</Tag>
             }
           />
         </span>
@@ -216,6 +232,7 @@ export const NewMarketForm = () => {
                         {
                           key: 'imf',
                           label: 'IMF',
+                          tooltip: 'initial-margin-fraction',
                           value: (
                             <Output
                               fractionDigits={2}
@@ -226,7 +243,8 @@ export const NewMarketForm = () => {
                         },
                         {
                           key: 'mmf',
-                          label: 'Maintenance margin',
+                          label: 'MMF',
+                          tooltip: 'maintenance-margin-fraction',
                           value: (
                             <Output
                               fractionDigits={2}
@@ -278,7 +296,7 @@ export const NewMarketForm = () => {
                       dispatch(
                         openDialog({
                           type: DialogTypes.NewMarketMessageDetails,
-                          dialogProps: { assetData: assetToAdd, liquidityTier },
+                          dialogProps: { assetData: assetToAdd, clobPairId, liquidityTier },
                         })
                       )
                     }
@@ -291,7 +309,7 @@ export const NewMarketForm = () => {
                 key: 'dydx-required',
                 label: (
                   <span>
-                    Required balance <Tag>DYDX</Tag>
+                    Required balance <Tag>{chainTokenLabel}</Tag>
                   </span>
                 ),
                 value: (

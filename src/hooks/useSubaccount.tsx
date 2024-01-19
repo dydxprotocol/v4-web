@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { shallowEqual, useSelector, useDispatch } from 'react-redux';
 import type { Nullable } from '@dydxprotocol/v4-abacus';
 import Long from 'long';
-import type { IndexedTx } from '@cosmjs/stargate';
+import { GasPrice, type IndexedTx } from '@cosmjs/stargate';
 import type { EncodeObject } from '@cosmjs/proto-signing';
 import { Method } from '@cosmjs/tendermint-rpc';
 
@@ -272,27 +272,27 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         undefined
       );
 
-      const resp = await compositeClient?.validatorClient.post.send(
+      const msgs = getAddNewMarketGovProposal({
+        walletAddress: localDydxWallet.address!,
+        id,
+        symbol,
+        exponent,
+        minExchanges,
+        minPriceChangePpm,
+        exchangeConfigJson,
+        atomicResolution,
+        defaultFundingPpm,
+        liquidityTier,
+        quantumConversionExponent,
+        stepBaseQuantums,
+        subticksPerTick,
+      });
+
+      const resp = await compositeClient?.send(
         localDydxWallet,
-        () =>
-          getAddNewMarketGovProposal({
-            walletAddress: localDydxWallet.address!,
-            id,
-            symbol,
-            exponent,
-            minExchanges,
-            minPriceChangePpm,
-            exchangeConfigJson,
-            atomicResolution,
-            defaultFundingPpm,
-            liquidityTier,
-            quantumConversionExponent,
-            stepBaseQuantums,
-            subticksPerTick,
-          }),
+        () => msgs,
         false,
-        undefined,
-        undefined,
+        compositeClient.validatorClient.post.defaultDydxGasPrice,
         undefined,
         () => account
       );
