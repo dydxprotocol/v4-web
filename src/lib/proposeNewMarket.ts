@@ -274,7 +274,7 @@ export function getAddNewMarketGovProposal({
   const msgs: EncodeObject[] = [];
   const createOracleMarket = composeMsgCreateOracleMarket(
     id,
-    symbol,
+    `${symbol}-USD`,
     exponent,
     minExchanges,
     minPriceChangePpm,
@@ -283,7 +283,7 @@ export function getAddNewMarketGovProposal({
   const createPerpetual = composeMsgCreatePerpetual(
     id,
     id,
-    symbol,
+    `${symbol}-USD`,
     atomicResolution,
     defaultFundingPpm,
     liquidityTier
@@ -312,9 +312,9 @@ export function getAddNewMarketGovProposal({
   msgs.push(delayMessage);
 
   const submitProposal = composeMsgSubmitProposal(
-    getTitle(symbol),
+    getTitle(`${symbol}-USD`),
     INITIAL_DEPOSIT_AMOUNT,
-    getSummary(symbol, DEFAULT_DELAY_BLOCK),
+    getSummary(`${symbol}-USD`, DEFAULT_DELAY_BLOCK),
     wrapMessageArrAsAny(registry, msgs), // IMPORTANT: must wrap messages in Any type.
     walletAddress
   );
