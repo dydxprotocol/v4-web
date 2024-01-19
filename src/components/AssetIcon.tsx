@@ -16,6 +16,7 @@ const assetIcons = {
   AVAX: '/currencies/avax.png',
   BCH: '/currencies/bch.png',
   BLUR: '/currencies/blur.png',
+  BONK: '/currencies/bonk.png',
   BTC: '/currencies/btc.png',
   CELO: '/currencies/celo.png',
   COMP: '/currencies/comp.png',
