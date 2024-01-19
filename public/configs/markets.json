@@ -69,6 +69,13 @@
     "whitepaperLink": "https://bitcoincash.org/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bitcoin-cash/"
   },
+  "BONK-USD": {
+    "name": "BONK COIN",
+    "tags": [],
+    "websiteLink": "https://bonkcoin.com/",
+    "whitepaperLink": "https://bonkcoin.com/",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bonk1/"
+  },
   "BLUR-USD": {
     "name": "Blur",
     "tags": [],
