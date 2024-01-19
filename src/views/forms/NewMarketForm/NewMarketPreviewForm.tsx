@@ -368,7 +368,7 @@ Styled.Disclaimer = styled.div`
 
 Styled.ButtonRow = styled.div`
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 1fr;
   gap: 1rem;
   width: 100%;
 `;
