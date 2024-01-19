@@ -275,25 +275,21 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       const resp = await compositeClient?.validatorClient.post.send(
         localDydxWallet,
         () =>
-          new Promise((resolve) =>
-            resolve([
-              getAddNewMarketGovProposal({
-                walletAddress: localDydxWallet.address!,
-                id,
-                symbol,
-                exponent,
-                minExchanges,
-                minPriceChangePpm,
-                exchangeConfigJson,
-                atomicResolution,
-                defaultFundingPpm,
-                liquidityTier,
-                quantumConversionExponent,
-                stepBaseQuantums,
-                subticksPerTick,
-              }),
-            ])
-          ),
+          getAddNewMarketGovProposal({
+            walletAddress: localDydxWallet.address!,
+            id,
+            symbol,
+            exponent,
+            minExchanges,
+            minPriceChangePpm,
+            exchangeConfigJson,
+            atomicResolution,
+            defaultFundingPpm,
+            liquidityTier,
+            quantumConversionExponent,
+            stepBaseQuantums,
+            subticksPerTick,
+          }),
         false,
         undefined,
         undefined,

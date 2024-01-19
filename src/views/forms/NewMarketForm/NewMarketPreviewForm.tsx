@@ -1,4 +1,4 @@
-import { FormEvent, useMemo } from 'react';
+import { FormEvent, useMemo, useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { useDispatch } from 'react-redux';
 import Long from 'long';
@@ -7,7 +7,7 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
-import { LIQUIDITY_TIERS, POTENTIAL_MARKETS } from '@/constants/potentialMarkets';
+import { EXCHANGE_CONFIGS, LIQUIDITY_TIERS, POTENTIAL_MARKETS } from '@/constants/potentialMarkets';
 import { useAccountBalance, useSubaccount, useTokenConfigs } from '@/hooks';
 import { LinkOutIcon } from '@/icons';
 
@@ -43,11 +43,18 @@ export const NewMarketPreviewForm = ({
   const { nativeTokenBalance } = useAccountBalance();
   const dispatch = useDispatch();
   const { chainTokenDenom } = useTokenConfigs();
+  const [errorMessage, setErrorMessage] = useState();
 
   const { label, initialMarginFraction, maintenanceMarginFraction, impactNotional } =
     LIQUIDITY_TIERS[liquidityTier as unknown as keyof typeof LIQUIDITY_TIERS];
 
   const alertMessage = useMemo(() => {
+    if (errorMessage) {
+      return {
+        type: AlertType.Error,
+        message: errorMessage,
+      };
+    }
     if (nativeTokenBalance.lt(10_000)) {
       return {
         type: AlertType.Error,
@@ -56,7 +63,7 @@ export const NewMarketPreviewForm = ({
     }
 
     return null;
-  }, [nativeTokenBalance]);
+  }, [nativeTokenBalance, errorMessage]);
 
   const tickSizeDecimal = useMemo(() => {
     if (!assetData) return TOKEN_DECIMALS;
@@ -70,14 +77,17 @@ export const NewMarketPreviewForm = ({
     <Styled.Form
       onSubmit={async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setErrorMessage(undefined);
         try {
           const response = await submitNewMarketProposal({
-            id: 31,
+            id: 34,
             symbol: assetData.symbol,
             exponent: Number(assetData.priceExponent),
             minExchanges: Number(assetData.minExchanges),
             minPriceChangePpm: Number(assetData.minPriceChange),
-            exchangeConfigJson: '', // TODO
+            exchangeConfigJson: JSON.stringify({
+              exchanges: EXCHANGE_CONFIGS[assetData.symbol as keyof typeof EXCHANGE_CONFIGS],
+            }),
             atomicResolution: Number(assetData.atomicResolution),
             liquidityTier: Number(liquidityTier),
             quantumConversionExponent: Number(assetData.quantumConversionExponent),
@@ -88,6 +98,7 @@ export const NewMarketPreviewForm = ({
           onSuccess();
         } catch (error) {
           console.error('[NewMarketPreviewForm] Error sending proposal', error);
+          setErrorMessage(error.message);
         }
       }}
     >
@@ -185,7 +196,7 @@ export const NewMarketPreviewForm = ({
                 value="10,000+"
                 slotRight={
                   <Styled.Icon
-                    hasError={nativeTokenBalance?.lt(10_000)}
+                    $hasError={nativeTokenBalance?.lt(10_000)}
                     iconName={
                       nativeTokenBalance?.gt(10_000) ? IconName.CheckCircle : IconName.CautionCircle
                     }
@@ -332,10 +343,10 @@ Styled.FormInput = styled(FormInput)`
   }
 `;
 
-Styled.Icon = styled(Icon)<{ hasError?: boolean }>`
+Styled.Icon = styled(Icon)<{ $hasError?: boolean }>`
   margin-left: 0.5ch;
 
-  ${({ hasError }) => (hasError ? 'color: var(--color-error);' : 'color: var(--color-success);')}
+  ${({ $hasError }) => ($hasError ? 'color: var(--color-error);' : 'color: var(--color-success);')}
 `;
 
 Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`

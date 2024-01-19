@@ -5,6 +5,7 @@ import { EXCHANGE_CONFIGS, POTENTIAL_MARKETS } from '@/constants/potentialMarket
 
 import { Details } from '@/components/Details';
 import { Dialog } from '@/components/Dialog';
+import { Output, OutputType } from '@/components/Output';
 import { Tag, TagType } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
@@ -272,7 +273,9 @@ export const NewMarketMessageDetailsDialog = ({
                 <Styled.Description>{getTitle(ticker)}</Styled.Description>
 
                 <Styled.Text0>initial_deposit_amount:</Styled.Text0>
-                <Styled.Description>{INITIAL_DEPOSIT_AMOUNT}</Styled.Description>
+                <Styled.Description>
+                  {<Output type={OutputType.Asset} value={INITIAL_DEPOSIT_AMOUNT / 10 ** 18} />}
+                </Styled.Description>
 
                 <Styled.Text0>summary: </Styled.Text0>
                 <Styled.Description>{getSummary(ticker, DEFAULT_DELAY_BLOCK)}</Styled.Description>

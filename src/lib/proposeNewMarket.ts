@@ -24,6 +24,8 @@ import {
 } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/sending/transfer';
 import { MsgCreateTransfer } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/sending/tx';
 
+import { MustBigNumber } from './numbers';
+
 // ------ Composers ------ //
 export const GOV_ADDRESS = 'dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky';
 export const DELAY_ADDRESS = 'dydx1mkkvp26dngu6n8rmalaxyp3gwkjuzztq5zx6tr';
@@ -171,7 +173,7 @@ export function composeMsgSubmitProposal(
 ): EncodeObject {
   const initial_deposit: Coin[] = [
     {
-      amount: initial_deposit_amount.toString(),
+      amount: MustBigNumber(initial_deposit_amount / 10 ** 18).toString(),
       denom: NATIVE_TOKEN,
     },
   ];
@@ -267,7 +269,7 @@ export function getAddNewMarketGovProposal({
   quantumConversionExponent: number;
   stepBaseQuantums: Long;
   subticksPerTick: number;
-}): EncodeObject {
+}): Promise<EncodeObject[]> {
   const registry: Registry = generateRegistry();
   const msgs: EncodeObject[] = [];
   const createOracleMarket = composeMsgCreateOracleMarket(
@@ -316,6 +318,9 @@ export function getAddNewMarketGovProposal({
     wrapMessageArrAsAny(registry, msgs), // IMPORTANT: must wrap messages in Any type.
     walletAddress
   );
+  const encodedObjects: Promise<EncodeObject[]> = new Promise((resolve) =>
+    resolve([submitProposal])
+  );
 
-  return submitProposal;
+  return encodedObjects;
 }

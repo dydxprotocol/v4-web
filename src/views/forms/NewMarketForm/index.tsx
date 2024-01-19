@@ -80,8 +80,6 @@ export const NewMarketForm = () => {
     );
   }, [POTENTIAL_MARKETS, marketIds]);
 
-  console.log(potentialMarkets);
-
   const tickSizeDecimal = useMemo(() => {
     if (!assetToAdd) return TOKEN_DECIMALS;
     const p = Math.floor(Math.log(Number(assetToAdd.referencePrice)));

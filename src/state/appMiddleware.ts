@@ -28,12 +28,12 @@ export default (store: any) => (next: any) => async (action: PayloadAction<any>)
       const { type: activeDialogType } = getActiveDialog(store.getState()) ?? {};
 
       if (status !== AbacusApiStatus.NORMAL && activeDialogType !== DialogTypes.ExchangeOffline) {
-        store.dispatch(
-          openDialog({
-            type: DialogTypes.ExchangeOffline,
-            dialogProps: { preventClose: !isDev },
-          })
-        );
+        // store.dispatch(
+        //   openDialog({
+        //     type: DialogTypes.ExchangeOffline,
+        //     dialogProps: { preventClose: !isDev },
+        //   })
+        // );
       }
 
       break;
