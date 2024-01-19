@@ -29,7 +29,7 @@ export const GOV_ADDRESS = 'dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky';
 export const DELAY_ADDRESS = 'dydx1mkkvp26dngu6n8rmalaxyp3gwkjuzztq5zx6tr';
 
 export const NATIVE_TOKEN = 'adv4tnt';
-export const INITIAL_DEPOSIT_AMOUNT = 1_000_000_000;
+export const INITIAL_DEPOSIT_AMOUNT = 10_001_000_000_000_000_000_000;
 
 const TYPE_URL_MSG_CREATE_ORACLE_MARKET = '/dydxprotocol.prices.MsgCreateOracleMarket';
 const TYPE_URL_MSG_CREATE_PERPETUAL = '/dydxprotocol.perpetuals.MsgCreatePerpetual';
