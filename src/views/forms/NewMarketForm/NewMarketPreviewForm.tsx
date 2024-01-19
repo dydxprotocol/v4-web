@@ -262,13 +262,10 @@ export const NewMarketProposalSent = ({ onBack }: NewMarketProposalSentProps) =>
       </Styled.OuterCircle>
       <h2>Submitted Proposal!</h2>
       <span>Your proposal has been successfully submitted onchain.</span>
-      <Styled.ButtonRow>
-        {/* <Button onClick={onBack}>Back</Button> */}
-        <Button type={ButtonType.Link} href="https://google.com" action={ButtonAction.Primary}>
+      <Button type={ButtonType.Link} href="https://google.com" action={ButtonAction.Primary}>
           View proposal
           <LinkOutIcon />
         </Button>
-      </Styled.ButtonRow>
     </Styled.ProposalSent>
   );
 };
@@ -368,7 +365,7 @@ Styled.Disclaimer = styled.div`
 
 Styled.ButtonRow = styled.div`
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 2fr;
   gap: 1rem;
   width: 100%;
 `;
