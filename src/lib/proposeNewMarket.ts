@@ -236,6 +236,9 @@ export function generateRegistry(): Registry {
     ['/dydxprotocol.sending.MsgWithdrawFromSubaccount', MsgWithdrawFromSubaccount as GeneratedType],
     ['/dydxprotocol.sending.MsgDepositToSubaccount', MsgDepositToSubaccount as GeneratedType],
 
+    // gov
+    ['/cosmos.gov.v1.MsgSubmitProposal', govtx.MsgSubmitProposal as GeneratedType],
+
     // default types
     ...defaultRegistryTypes,
   ]);
