@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { MOCK_ORACLE_DATA, MOCK_DATA } from '@/constants/potentialMarkets';
+import { EXCHANGE_CONFIGS, POTENTIAL_MARKETS } from '@/constants/potentialMarkets';
 
 import { Details } from '@/components/Details';
 import { Dialog } from '@/components/Dialog';
@@ -20,7 +20,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 type ElementProps = {
   preventClose?: boolean;
   setIsOpen?: (open: boolean) => void;
-  assetData?: (typeof MOCK_DATA)[number];
+  assetData?: (typeof POTENTIAL_MARKETS)[number];
   liquidityTier?: string;
 };
 
@@ -41,21 +41,8 @@ export const NewMarketMessageDetailsDialog = ({
   const [codeToggleGroup, setCodeToggleGroup] = useState(CodeToggleGroup.CREATE_ORACLE);
   const { symbol } = assetData ?? {};
 
-  const oracleData = useMemo(() => {
-    const oracleData: Record<string, (typeof MOCK_ORACLE_DATA)[number][]> = {};
-    Object.values(MOCK_ORACLE_DATA).forEach((exchangeConfig) => {
-      const baseAsset = exchangeConfig.base_asset;
-      if (oracleData[baseAsset]) {
-        oracleData[baseAsset].push(exchangeConfig);
-      } else {
-        oracleData[baseAsset] = [exchangeConfig];
-      }
-    });
-    return oracleData;
-  }, []);
-
-  const oracleDataForAsset = useMemo(() => {
-    return symbol ? oracleData[symbol] : undefined;
+  const exchangeConfig = useMemo(() => {
+    return symbol ? EXCHANGE_CONFIGS?.[symbol as keyof typeof EXCHANGE_CONFIGS] : undefined;
   }, [symbol]);
 
   const ticker = useMemo(() => `${symbol}-USD`, [symbol]);
@@ -129,21 +116,19 @@ export const NewMarketMessageDetailsDialog = ({
                 />
                 <Styled.Text0>
                   exchange_config_json{' '}
-                  {oracleDataForAsset && (
-                    <Tag type={TagType.Number}>{oracleDataForAsset.length}</Tag>
-                  )}
+                  {exchangeConfig && <Tag type={TagType.Number}>{exchangeConfig.length}</Tag>}
                 </Styled.Text0>
                 {'['}
-                {oracleDataForAsset?.map((exchangeConfig) => {
+                {exchangeConfig?.map((exchange) => {
                   return (
                     <Styled.Code
-                      key={exchangeConfig.exchange}
+                      key={exchange.exchangeName}
                       style={{ padding: 0, margin: 0, paddingLeft: '0.5rem' }}
                     >
                       {'{'}
-                      {Object.keys(exchangeConfig).map((key) => (
+                      {Object.keys(exchange).map((key) => (
                         <Styled.Line key={key}>
-                          {key}: <span>{exchangeConfig[key as keyof typeof exchangeConfig]}</span>
+                          {key}: <span>{exchange[key as keyof typeof exchange]}</span>
                         </Styled.Line>
                       ))}
                       {'},'}

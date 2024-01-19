@@ -237,7 +237,6 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   // ------ Submit proposal ------ //
   const submitNewMarketProposal = useCallback(
     async ({
-      walletAddress,
       id,
       symbol,
       exponent,
@@ -245,13 +244,12 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       minPriceChangePpm,
       exchangeConfigJson,
       atomicResolution,
-      defaultFundingPpm,
+      defaultFundingPpm = 0,
       liquidityTier,
       quantumConversionExponent,
       stepBaseQuantums,
       subticksPerTick,
     }: {
-      walletAddress: string;
       id: number;
       symbol: string;
       exponent: number;
@@ -259,7 +257,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       minPriceChangePpm: number;
       exchangeConfigJson: string;
       atomicResolution: number;
-      defaultFundingPpm: number;
+      defaultFundingPpm?: number;
       liquidityTier: number;
       quantumConversionExponent: number;
       stepBaseQuantums: Long;
@@ -277,22 +275,27 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       const resp = await compositeClient?.validatorClient.post.send(
         localDydxWallet,
         () =>
-          getAddNewMarketGovProposal({
-            walletAddress,
-            id,
-            symbol,
-            exponent,
-            minExchanges,
-            minPriceChangePpm,
-            exchangeConfigJson,
-            atomicResolution,
-            defaultFundingPpm,
-            liquidityTier,
-            quantumConversionExponent,
-            stepBaseQuantums,
-            subticksPerTick,
-          }),
+          new Promise((resolve) =>
+            resolve([
+              getAddNewMarketGovProposal({
+                walletAddress: localDydxWallet.address!,
+                id,
+                symbol,
+                exponent,
+                minExchanges,
+                minPriceChangePpm,
+                exchangeConfigJson,
+                atomicResolution,
+                defaultFundingPpm,
+                liquidityTier,
+                quantumConversionExponent,
+                stepBaseQuantums,
+                subticksPerTick,
+              }),
+            ])
+          ),
         false,
+        undefined,
         undefined,
         undefined,
         () => account
@@ -300,7 +303,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
       return resp;
     },
-    [compositeClient, subaccountClient]
+    [compositeClient, localDydxWallet]
   );
 
   // ------ Deposit/Withdraw Methods ------ //
@@ -490,5 +493,8 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     placeOrder,
     closePosition,
     cancelOrder,
+
+    // Governance Methods
+    submitNewMarketProposal,
   };
 };

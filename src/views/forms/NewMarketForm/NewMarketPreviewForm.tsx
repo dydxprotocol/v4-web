@@ -1,13 +1,14 @@
 import { FormEvent, useMemo } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { useDispatch } from 'react-redux';
+import Long from 'long';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
-import { LIQUIDITY_TIERS, MOCK_DATA } from '@/constants/potentialMarkets';
-import { useAccountBalance, useDydxClient, useTokenConfigs } from '@/hooks';
+import { LIQUIDITY_TIERS, POTENTIAL_MARKETS } from '@/constants/potentialMarkets';
+import { useAccountBalance, useSubaccount, useTokenConfigs } from '@/hooks';
 import { LinkOutIcon } from '@/icons';
 
 import { AlertMessage } from '@/components/AlertMessage';
@@ -26,7 +27,7 @@ import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 type NewMarketPreviewFormProps = {
-  assetData: (typeof MOCK_DATA)[number];
+  assetData: (typeof POTENTIAL_MARKETS)[number];
   liquidityTier: string;
   onBack: () => void;
   onSuccess: () => void;
@@ -38,7 +39,7 @@ export const NewMarketPreviewForm = ({
   onBack,
   onSuccess,
 }: NewMarketPreviewFormProps) => {
-  const { compositeClient } = useDydxClient();
+  const { submitNewMarketProposal } = useSubaccount();
   const { nativeTokenBalance } = useAccountBalance();
   const dispatch = useDispatch();
   const { chainTokenDenom } = useTokenConfigs();
@@ -70,8 +71,20 @@ export const NewMarketPreviewForm = ({
       onSubmit={async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-          // const response = await compositeClient?.validatorClient.post.send()
-
+          const response = await submitNewMarketProposal({
+            id: 31,
+            symbol: assetData.symbol,
+            exponent: Number(assetData.priceExponent),
+            minExchanges: Number(assetData.minExchanges),
+            minPriceChangePpm: Number(assetData.minPriceChange),
+            exchangeConfigJson: '', // TODO
+            atomicResolution: Number(assetData.atomicResolution),
+            liquidityTier: Number(liquidityTier),
+            quantumConversionExponent: Number(assetData.quantumConversionExponent),
+            stepBaseQuantums: Long.fromString(assetData.stepBaseQuantums),
+            subticksPerTick: Number(assetData.subticksPerTick),
+          });
+          console.log('response', response);
           onSuccess();
         } catch (error) {
           console.error('[NewMarketPreviewForm] Error sending proposal', error);

@@ -8,7 +8,7 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
-import { LIQUIDITY_TIERS, MOCK_DATA } from '@/constants/potentialMarkets';
+import { EXCHANGE_CONFIGS, LIQUIDITY_TIERS, POTENTIAL_MARKETS } from '@/constants/potentialMarkets';
 import { useAccountBalance, useBreakpoints, useTokenConfigs } from '@/hooks';
 
 import { AlertMessage } from '@/components/AlertMessage';
@@ -50,7 +50,7 @@ export const NewMarketForm = () => {
   const { chainTokenDenom, chainTokenDecimals } = useTokenConfigs();
 
   const [step, setStep] = useState(NewMarketFormStep.SELECTION);
-  const [assetToAdd, setAssetToAdd] = useState<(typeof MOCK_DATA)[number]>();
+  const [assetToAdd, setAssetToAdd] = useState<(typeof POTENTIAL_MARKETS)[number]>();
   const [liquidityTier, setLiquidityTier] = useState<string>();
   const [canModifyLiqTier, setCanModifyLiqTier] = useState(false);
 
@@ -72,12 +72,15 @@ export const NewMarketForm = () => {
   }, [assetToAdd]);
 
   const potentialMarkets = useMemo(() => {
-    return MOCK_DATA.filter(
+    return POTENTIAL_MARKETS.filter(
       (potentialMarket) =>
         potentialMarket.riskAssessment === 'Safe' &&
-        !marketIds.includes(`${potentialMarket.symbol}-USD`)
+        !marketIds.includes(`${potentialMarket.symbol}-USD`) &&
+        EXCHANGE_CONFIGS[potentialMarket.symbol as keyof typeof EXCHANGE_CONFIGS] !== undefined
     );
-  }, [MOCK_DATA, marketIds]);
+  }, [POTENTIAL_MARKETS, marketIds]);
+
+  console.log(potentialMarkets);
 
   const tickSizeDecimal = useMemo(() => {
     if (!assetToAdd) return TOKEN_DECIMALS;
@@ -130,7 +133,7 @@ export const NewMarketForm = () => {
           {
             group: 'markets',
             groupLabel: 'Markets',
-            items: potentialMarkets.map((potentialMarket: (typeof MOCK_DATA)[number]) => ({
+            items: potentialMarkets.map((potentialMarket: (typeof POTENTIAL_MARKETS)[number]) => ({
               value: potentialMarket.symbol,
               label: potentialMarket?.assetName ?? potentialMarket.symbol,
               tag: `${potentialMarket.symbol}-USD`,
