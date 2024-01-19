@@ -2,7 +2,6 @@ import { type Dispatch, type SetStateAction, useState, type ReactNode, useEffect
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
 import type { RouteData } from '@0xsquid/sdk';
-import { formatUnits } from 'viem';
 
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 
@@ -40,7 +39,8 @@ type ElementProps = {
   isLoading?: boolean;
 
   chainId?: string | number;
-  setError?: Dispatch<SetStateAction<Error | undefined>>;
+  setError?: Dispatch<SetStateAction<Error | null>>;
+  setRequireUserActionInWallet: (val: boolean) => void;
   slippage: number;
   slotError?: ReactNode;
   setSlippage: (slippage: number) => void;
@@ -58,6 +58,7 @@ export const DepositButtonAndReceipt = ({
   isDisabled,
   isLoading,
   slotError,
+  setRequireUserActionInWallet,
 }: ElementProps) => {
   const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
   const [isEditingSlippage, setIsEditingSlipapge] = useState(false);
@@ -66,19 +67,20 @@ export const DepositButtonAndReceipt = ({
   const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
 
   const { connectWallet, isConnectedWagmi } = useWalletConnection();
-  const [hasConnectWalletError, setHasConnectWalletError] = useState(false);
 
-  const attemptWalletConnect = async () => {
+  const connectWagmi = async () => {
     try {
+      setRequireUserActionInWallet(false);
       await connectWallet();
+      setRequireUserActionInWallet(false);
     } catch (e) {
-      setHasConnectWalletError(true);
+      setRequireUserActionInWallet(true);
     }
   };
 
   useEffect(() => {
     if (!isConnectedWagmi && canAccountTrade) {
-      attemptWalletConnect();
+      connectWagmi();
     }
   }, [isConnectedWagmi, canAccountTrade]);
 
@@ -98,7 +100,7 @@ export const DepositButtonAndReceipt = ({
     useSelector(getSubaccountBuyingPower, shallowEqual) || {};
 
   const { isCctp, summary, requestPayload } = useSelector(getTransferInputs, shallowEqual) || {};
-  const { usdcDecimals, usdcLabel } = useTokenConfigs();
+  const { usdcLabel } = useTokenConfigs();
 
   const feeSubitems: DetailsItem[] = [];
 
@@ -134,7 +136,9 @@ export const DepositButtonAndReceipt = ({
           {stringGetter({ key: STRING_KEYS.EXPECTED_DEPOSIT_AMOUNT })} <Tag>{usdcLabel}</Tag>
         </span>
       ),
-      value: <Output type={OutputType.Fiat} fractionDigits={TOKEN_DECIMALS} value={summary?.toAmount} />,
+      value: (
+        <Output type={OutputType.Fiat} fractionDigits={TOKEN_DECIMALS} value={summary?.toAmount} />
+      ),
       subitems: [
         {
           key: 'minimum-deposit-amount',
@@ -144,7 +148,11 @@ export const DepositButtonAndReceipt = ({
             </span>
           ),
           value: (
-            <Output type={OutputType.Fiat} fractionDigits={TOKEN_DECIMALS} value={summary?.toAmountMin} />
+            <Output
+              type={OutputType.Fiat}
+              fractionDigits={TOKEN_DECIMALS}
+              value={summary?.toAmountMin}
+            />
           ),
           tooltip: 'minimum-deposit-amount',
         },
@@ -272,13 +280,7 @@ export const DepositButtonAndReceipt = ({
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
       ) : !isConnectedWagmi ? (
-        <Button
-          action={ButtonAction.Primary}
-          onClick={connectWallet}
-          state={{ isLoading: !hasConnectWalletError }}
-        >
-          {stringGetter({ key: STRING_KEYS.CHECK_WALLET_FOR_REQUEST })}
-        </Button>
+        <Button action={ButtonAction.Primary} onClick={connectWallet} state={{ isLoading: true }} />
       ) : !isMatchingNetwork ? (
         <Button
           action={ButtonAction.Primary}
