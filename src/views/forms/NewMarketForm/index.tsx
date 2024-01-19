@@ -52,6 +52,7 @@ export const NewMarketForm = () => {
   const [step, setStep] = useState(NewMarketFormStep.SELECTION);
   const [assetToAdd, setAssetToAdd] = useState<(typeof POTENTIAL_MARKETS)[number]>();
   const [liquidityTier, setLiquidityTier] = useState<string>();
+  const [tempLiquidityTier, setTempLiquidityTier] = useState<string>();
   const [canModifyLiqTier, setCanModifyLiqTier] = useState(false);
 
   const alertMessage = useMemo(() => {
@@ -67,6 +68,7 @@ export const NewMarketForm = () => {
 
   useEffect(() => {
     if (assetToAdd) {
+      setTempLiquidityTier(assetToAdd.liquidityTier);
       setLiquidityTier(assetToAdd.liquidityTier);
     }
   }, [assetToAdd]);
@@ -155,21 +157,40 @@ export const NewMarketForm = () => {
         <>
           <div>Populated details</div>
           <div>
-            <Styled.Root value={liquidityTier} onValueChange={setLiquidityTier}>
+            <Styled.Root value={tempLiquidityTier} onValueChange={setTempLiquidityTier}>
               <Styled.Header>
-                Liquidity tier{' '}
-                <Button
-                  shape={ButtonShape.Pill}
-                  onClick={() => setCanModifyLiqTier(!canModifyLiqTier)}
-                >
-                  {canModifyLiqTier ? (
-                    'Cancel'
-                  ) : (
-                    <>
-                      Modify <Icon iconName={IconName.Pencil} />
-                    </>
+                Liquidity tier
+                <Styled.ButtonRow>
+                  <Button
+                    shape={ButtonShape.Pill}
+                    onClick={() => {
+                      if (canModifyLiqTier) {
+                        setTempLiquidityTier(liquidityTier);
+                      }
+                      setCanModifyLiqTier(!canModifyLiqTier);
+                    }}
+                  >
+                    {canModifyLiqTier ? (
+                      'Cancel'
+                    ) : (
+                      <>
+                        Modify <Icon iconName={IconName.Pencil} />
+                      </>
+                    )}
+                  </Button>
+                  {canModifyLiqTier && (
+                    <Button
+                      shape={ButtonShape.Pill}
+                      action={ButtonAction.Primary}
+                      onClick={() => {
+                        setLiquidityTier(tempLiquidityTier);
+                        setCanModifyLiqTier(false);
+                      }}
+                    >
+                      Save
+                    </Button>
                   )}
-                </Button>
+                </Styled.ButtonRow>
               </Styled.Header>
 
               {Object.keys(LIQUIDITY_TIERS).map((tier, idx) => {
@@ -179,7 +200,7 @@ export const NewMarketForm = () => {
                   <Styled.LiquidityTierRadioButton
                     key={tier}
                     value={tier}
-                    selected={tier === liquidityTier}
+                    selected={tier === tempLiquidityTier}
                     disabled={!canModifyLiqTier}
                   >
                     <Styled.Header style={{ marginLeft: '1rem' }}>
@@ -339,6 +360,16 @@ Styled.Header = styled.div`
   color: var(--color-text-2);
   font: var(--font-base-medium);
   justify-content: space-between;
+`;
+
+Styled.ButtonRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+
+  button {
+    min-width: 80px;
+  }
 `;
 
 Styled.Root = styled(Root)`

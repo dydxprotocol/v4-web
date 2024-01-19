@@ -255,9 +255,9 @@ export const NewMarketProposalSent = ({ onBack }: NewMarketProposalSentProps) =>
         </Styled.InnerCircle>
       </Styled.OuterCircle>
       <h2>Submitted Proposal!</h2>
-      <span>Your proposal is now going through governance.</span>
+      <span>Your proposal has been successfully submitted onchain.</span>
       <Styled.ButtonRow>
-        <Button onClick={onBack}>Back</Button>
+        {/* <Button onClick={onBack}>Back</Button> */}
         <Button type={ButtonType.Link} href="https://google.com" action={ButtonAction.Primary}>
           View proposal
           <LinkOutIcon />

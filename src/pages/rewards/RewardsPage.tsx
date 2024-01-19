@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { STRING_KEYS } from '@/constants/localization';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
-import { AppRoute } from '@/constants/routes';
+import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { useBreakpoints, useStringGetter, useURLConfigs } from '@/hooks';
 
@@ -24,6 +24,7 @@ import { DYDXBalancePanel } from './DYDXBalancePanel';
 import { MigratePanel } from './MigratePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
+import { Tag } from '@/components/Tag';
 
 const RewardsPage = () => {
   const dispatch = useDispatch();
@@ -62,6 +63,21 @@ const RewardsPage = () => {
       )}
 
       <Styled.PanelRow>
+        <Styled.Panel
+          slotHeaderContent={
+            <Styled.Title>
+              Add new market <Styled.NewTag>New</Styled.NewTag>
+            </Styled.Title>
+          }
+          slotRight={panelArrow}
+          onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
+        >
+          <Styled.Description>
+            Select a market, confirm details, and launch a governance proposal to add new asset to
+            dYdX Chain. Requires 10,000 unstaked DYDX.
+          </Styled.Description>
+        </Styled.Panel>
+
         <Styled.Panel
           slotHeaderContent={
             <Styled.Title>{stringGetter({ key: STRING_KEYS.GOVERNANCE })}</Styled.Title>
@@ -179,4 +195,9 @@ Styled.IconButton = styled(IconButton)`
 
 Styled.Arrow = styled.div`
   padding: 1rem;
+`;
+
+Styled.NewTag = styled(Tag)`
+  color: var(--color-accent);
+  background-color: var(--color-accent-faded);
 `;

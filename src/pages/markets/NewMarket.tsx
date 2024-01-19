@@ -20,19 +20,18 @@ const HOW_TO_ADD_MARKET_TEXT = [
     step: 1,
     title: 'Select market',
     subtitle:
-      'Search or choose from a list of markets you’d like to add. The list is pre-populated with markets that have been deemed “safe” to add to the Protocol. ',
+      'Search or choose from a list of markets you’d like to add. The list is pre-populated with markets that have been deemed “safe” to add to the Protocol.',
   },
   {
     step: 2,
     title: 'Confirm details',
-    subtitle:
-      'Once a market is selected, the Reference Price, Oracles, and Liquidity Tier will be populated.',
+    subtitle: 'Once a market is selected, all of its parameters will be automatically populated.',
   },
   {
     step: 3,
     title: 'Propose new market',
     subtitle:
-      'Sign a transaction that creates a proposal to add the new asset to dYdX Chain. This requires a balance of 10,000 DYDX.',
+      'Send a transaction that creates a proposal to add the new market to dYdX Chain. This requires a balance of 10,000 unstaked DYDX.',
   },
 ];
 
@@ -104,9 +103,9 @@ const NewMarket = () => {
               ))}
             </>
           )}
-          <>
+          {/* <>
             <h2>Proposals</h2>
-          </>
+          </> */}
         </div>
         <Styled.FormContainer>
           <NewMarketForm />
