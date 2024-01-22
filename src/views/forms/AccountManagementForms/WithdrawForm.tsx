@@ -149,7 +149,7 @@ export const WithdrawForm = () => {
         }
 
         if (isCctp && !abacusStateManager.chainTransactions.isNobleClientConnected) {
-          throw new Error('Noble client unable to initialize');
+          throw new Error('Noble RPC endpoint unaccessible');
         }
 
         setIsLoading(true);
