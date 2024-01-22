@@ -53,10 +53,11 @@ export const useDrawOrderbook = ({
 
   /**
    * Scale canvas using device pixel ratio to unblur drawn text
+   * @url https://stackoverflow.com/questions/15661339/how-do-i-fix-blurry-text-in-my-html5-canvas/65124939#65124939
    * @returns adjusted canvas width/height/rowHeight used in coordinates for drawing
    **/
   const { canvasWidth, canvasHeight, rowHeight } = useMemo(() => {
-    const devicePixelRatio = window.devicePixelRatio || 1;
+    const ratio = window.devicePixelRatio || 1;
 
     if (!canvas) {
       return {
@@ -67,27 +68,12 @@ export const useDrawOrderbook = ({
     }
 
     const ctx = canvas.getContext('2d');
-
-    const backingStoreRatio: number =
-      // @ts-expect-error - Backing store pixel ratio is not defined in types
-      (ctx?.webkitBackingStorePixelRatio as number) ||
-      // @ts-expect-error - Backing store pixel ratio is not defined in types
-      (ctx?.mozBackingStorePixelRatio as number) ||
-      // @ts-expect-error - Backing store pixel ratio is not defined in types
-      (ctx?.msBackingStorePixelRatio as number) ||
-      // @ts-expect-error - Backing store pixel ratio is not defined in types
-      (ctx?.oBackingStorePixelRatio as number) ||
-      // @ts-expect-error - Backing store pixel ratio is not defined in types
-      (ctx?.backingStorePixelRatio as number) ||
-      1;
-
-    const ratio = devicePixelRatio / backingStoreRatio;
     canvas.width = canvas.offsetWidth * ratio;
     canvas.height = canvas.offsetHeight * ratio;
 
     if (ctx) {
       ctx.scale(ratio, ratio);
-      ctx.font = '13.5px Satoshi';
+      ctx.font = '12px Satoshi';
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
       ctx.imageSmoothingQuality = 'high';
