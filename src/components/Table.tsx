@@ -33,15 +33,20 @@ import {
 
 import { useAsyncList } from 'react-stately';
 
-import { useBreakpoints } from '@/hooks';
+import { useBreakpoints, useStringGetter } from '@/hooks';
 import { MediaQueryKeys } from '@/hooks/useBreakpoints';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
+import { CaretIcon } from '@/icons';
+
+import { STRING_KEYS } from '@/constants/localization';
+
+import { MustBigNumber } from '@/lib/numbers';
 
 import { Icon, IconName } from './Icon';
 import { Tag } from './Tag';
-import { MustBigNumber } from '@/lib/numbers';
+import { Button } from './Button';
 
 export { TableCell } from './Table/TableCell';
 export { TableColumnHeader } from './Table/TableColumnHeader';
@@ -63,7 +68,7 @@ export type TableItem<TableRowData> = {
   onSelect?: (key: TableRowData) => void;
 };
 
-export type ColumnDef<TableRowData extends object> = {
+type ColumnDef<TableRowData extends object> = {
   columnKey: string;
   label: React.ReactNode;
   tag?: React.ReactNode;
@@ -90,12 +95,12 @@ export type ElementProps<TableRowData extends object | CustomRowConfig, TableRow
   selectionBehavior?: 'replace' | 'toggle';
   onRowAction?: (key: TableRowKey, row: TableRowData) => void;
   slotEmpty?: React.ReactNode;
-  numRowsToShow?: number;
+  initialNumRowsToShow?: number;
   // collection: TableCollection<string>;
   // children: React.ReactNode;
 };
 
-export type StyleProps = {
+type StyleProps = {
   hideHeader?: boolean;
   withGradientCardRows?: boolean;
   withFocusStickyRows?: boolean;
@@ -120,7 +125,7 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   selectionMode = 'single',
   selectionBehavior = 'toggle',
   slotEmpty,
-  numRowsToShow = data.length,
+  initialNumRowsToShow = data.length,
   // shouldRowRender,
 
   // collection,
@@ -136,6 +141,7 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   style,
 }: ElementProps<TableRowData, TableRowKey> & StyleProps) => {
   const [selectedKeys, setSelectedKeys] = useState(new Set<TableRowKey>());
+  const [numRowsToShow, setNumRowsToShow] = useState(initialNumRowsToShow);
 
   const currentBreakpoints = useBreakpoints();
   const shownColumns = columns.filter(
@@ -209,6 +215,12 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
             onRowAction &&
             ((key: TableRowKey) => onRowAction(key, data.find((row) => getRowKey(row) === key)!))
           }
+          numColumns={shownColumns.length}
+          onViewMoreClick={
+            numRowsToShow !== undefined && numRowsToShow < data.length
+              ? () => setNumRowsToShow(data.length)
+              : undefined
+          }
           // shouldRowRender={shouldRowRender}
           hideHeader={hideHeader}
           withGradientCardRows={withGradientCardRows}
@@ -267,6 +279,8 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
   onRowAction?: (key: TableRowKey) => void;
   // shouldRowRender?: (prevRowData: object, currentRowData: object) => boolean;
   children: CollectionChildren<TableRowData>;
+  numColumns: number;
+  onViewMoreClick?: () => void;
 
   hideHeader?: boolean;
   withGradientCardRows?: boolean;
@@ -276,7 +290,7 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
   withScrollSnapColumns?: boolean;
   withScrollSnapRows?: boolean;
 }) => {
-  const { selectionMode, selectionBehavior } = props;
+  const { selectionMode, selectionBehavior, numColumns, onViewMoreClick } = props;
 
   const state = useTableState<TableRowData>({
     ...props,
@@ -383,6 +397,9 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
             </TableRow>
           )
         )}
+        {onViewMoreClick ? (
+          <ViewMoreRow colSpan={numColumns} onClick={onViewMoreClick} />
+        ) : undefined}
       </TableBodyRowGroup>
     </Styled.Table>
   );
@@ -489,6 +506,23 @@ const TableColumnHeader = <TableRowData extends object>({
         )}
       </Styled.Row>
     </Styled.Th>
+  );
+};
+
+export const ViewMoreRow = ({ colSpan, onClick }: { colSpan: number; onClick: () => void }) => {
+  const stringGetter = useStringGetter();
+  return (
+    <Styled.Tr key="viewmore">
+      <Styled.Td
+        colSpan={colSpan}
+        onMouseDown={(e: MouseEvent) => e.preventDefault()}
+        onPointerDown={(e: MouseEvent) => e.preventDefault()}
+      >
+        <Styled.ViewMoreButton slotRight={<CaretIcon />} onClick={onClick}>
+          {stringGetter({ key: STRING_KEYS.VIEW_MORE })}
+        </Styled.ViewMoreButton>
+      </Styled.Td>
+    </Styled.Tr>
   );
 };
 
@@ -936,4 +970,16 @@ Styled.Tbody = styled.tbody<StyleProps>`
 Styled.Row = styled.div`
   ${layoutMixins.inlineRow}
   padding: var(--tableCell-padding);
+`;
+
+Styled.ViewMoreButton = styled(Button)`
+  --button-backgroundColor: var(--color-layer-2);
+  --button-textColor: var(--color-text-1);
+
+  width: 100%;
+
+  svg {
+    width: 0.675rem;
+    margin-left: 0.5ch;
+  }
 `;
