@@ -96,6 +96,7 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
         elapsedTime?: number;
         blockHeight?: number;
         indexerBlockHeight?: number;
+        trailingBlocks?: number;
       }
     : // Navigation
     T extends AnalyticsEvent.NavigatePage

@@ -10,6 +10,9 @@ import { STRING_KEYS, StringGetterFunction, TOOLTIP_STRING_KEYS } from '@/consta
 import { isMainnet } from '@/constants/networks';
 import { DydxChainAsset, wallets } from '@/constants/wallets';
 
+import { layoutMixins } from '@/styles/layoutMixins';
+import { headerMixins } from '@/styles/headerMixins';
+
 import {
   useAccounts,
   useBreakpoints,
@@ -35,10 +38,8 @@ import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
-
-import { layoutMixins } from '@/styles/layoutMixins';
-import { headerMixins } from '@/styles/headerMixins';
 import { MustBigNumber } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
@@ -178,7 +179,7 @@ export const AccountMenu = () => {
         },
         ...(onboardingState === OnboardingState.AccountConnected && hdKey
           ? [
-              !isMainnet && {
+              (!isMainnet || testFlags.showMobileSignInOption) && {
                 value: 'MobileQrSignIn',
                 icon: <Icon iconName={IconName.Qr} />,
                 label: stringGetter({ key: STRING_KEYS.TITLE_SIGN_INTO_MOBILE }),

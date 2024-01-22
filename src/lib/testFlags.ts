@@ -11,16 +11,16 @@ class TestFlags {
     const params = new URLSearchParams(queryParamsString);
 
     for (const [key, value] of params) {
-      this.queryParams[key] = value;
+      this.queryParams[key.toLowerCase()] = value;
     }
   }
 
   get displayInitializingMarkets() {
-    return !!this.queryParams.displayInitializingMarkets;
+    return !!this.queryParams.displayinitializingmarkets;
   }
 
-  get withCCTP() {
-    return !!this.queryParams.withCCTP;
+  get showMobileSignInOption() {
+    return !!this.queryParams.mobilesignin;
   }
 }
 

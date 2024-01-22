@@ -97,7 +97,7 @@ export const useAnalytics = () => {
   }, []);
 
   // AnalyticsEvent.NetworkStatus
-  const { height, indexerHeight, status } = useApiState();
+  const { height, indexerHeight, status, trailingBlocks} = useApiState();
 
   useEffect(() => {
     if (status) {
@@ -114,6 +114,7 @@ export const useAnalytics = () => {
         elapsedTime: lastSuccessfulIndexerRpcQuery && Date.now() - lastSuccessfulIndexerRpcQuery,
         blockHeight: height ?? undefined,
         indexerBlockHeight: indexerHeight ?? undefined,
+        trailingBlocks: trailingBlocks ?? undefined
       });
     }
   }, [status]);
