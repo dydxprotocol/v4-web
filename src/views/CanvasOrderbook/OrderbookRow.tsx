@@ -1,16 +1,14 @@
 import { forwardRef } from 'react';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
-import type { Nullable, OrderbookLine } from '@/constants/abacus';
+import type { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
+import { ORDERBOOK_ROW_HEIGHT } from '@/constants/orderbook';
 import { useStringGetter } from '@/hooks';
 
 import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
-
-export const ROW_HEIGHT = 24;
-export const ROW_PADDING_RIGHT = 8;
 
 type StyleProps = {
   side?: 'top' | 'bottom';
@@ -26,8 +24,8 @@ export const OrderbookRow = styled.div`
   display: flex;
   flex-shrink: 0;
   align-items: center;
-  height: ${ROW_HEIGHT}px;
-  min-height: ${ROW_HEIGHT}px;
+  height: ${ORDERBOOK_ROW_HEIGHT}px;
+  min-height: ${ORDERBOOK_ROW_HEIGHT}px;
   position: relative;
   padding-right: 0.5rem;
   font: var(--font-mini-book);

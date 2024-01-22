@@ -8,6 +8,6 @@ type CanvasProps = {
 
 export const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(
   ({ className, width, height }, canvasRef) => (
-    <canvas ref={canvasRef} className={className} width={width ?? 0} height={height ?? 0} />
+    <canvas ref={canvasRef} className={className} width={width} height={height} />
   )
 );

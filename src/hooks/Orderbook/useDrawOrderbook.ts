@@ -3,8 +3,7 @@ import { shallowEqual, useSelector } from 'react-redux';
 
 import type { PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { SMALL_USD_DECIMALS, TOKEN_DECIMALS } from '@/constants/numbers';
-
-import { ROW_HEIGHT, ROW_PADDING_RIGHT } from '@/views/CanvasOrderbook/OrderbookRow';
+import { ORDERBOOK_HEIGHT, ORDERBOOK_ROW_HEIGHT, ORDERBOOK_ROW_PADDING_RIGHT, ORDERBOOK_WIDTH } from '@/constants/orderbook';
 
 import { getCurrentMarketConfig, getCurrentMarketOrderbookMap } from '@/state/perpetualsSelectors';
 import { getAppTheme } from '@/state/configsSelectors';
@@ -30,8 +29,6 @@ type StyleProps = {
   histogramSide: 'left' | 'right';
 };
 
-export const ORDERBOOK_HEIGHT = 800;
-export const ORDERBOOK_WIDTH = 300;
 
 enum OrderbookRowAnimationType {
   REMOVE,
@@ -48,7 +45,7 @@ export const useDrawOrderbook = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvas = canvasRef.current;
   const currentOrderbookMap = useSelector(getCurrentMarketOrderbookMap, shallowEqual);
-  const { stepSizeDecimals = 2, tickSizeDecimals = 2 } =
+  const { stepSizeDecimals = TOKEN_DECIMALS, tickSizeDecimals = SMALL_USD_DECIMALS } =
     useSelector(getCurrentMarketConfig, shallowEqual) || {};
   const prevData = useRef<typeof data>(data);
   const theme = useSelector(getAppTheme, shallowEqual);
@@ -65,7 +62,7 @@ export const useDrawOrderbook = ({
       return {
         canvasWidth: ORDERBOOK_WIDTH / devicePixelRatio,
         canvasHeight: ORDERBOOK_HEIGHT / devicePixelRatio,
-        rowHeight: ROW_HEIGHT / devicePixelRatio,
+        rowHeight: ORDERBOOK_ROW_HEIGHT / devicePixelRatio,
       };
     }
 
@@ -99,7 +96,7 @@ export const useDrawOrderbook = ({
     return {
       canvasWidth: canvas.width / ratio,
       canvasHeight: canvas.height / ratio,
-      rowHeight: ROW_HEIGHT,
+      rowHeight: ORDERBOOK_ROW_HEIGHT,
     };
   }, [canvas]);
 
@@ -224,7 +221,7 @@ export const useDrawOrderbook = ({
       ctx.fillStyle = updatedTextColor ?? textColor;
       ctx.fillText(
         MustBigNumber(size).toFixed(stepSizeDecimals ?? TOKEN_DECIMALS),
-        getXByColumn({ canvasWidth, colIdx: 0 }) - ROW_PADDING_RIGHT,
+        getXByColumn({ canvasWidth, colIdx: 0 }) - ORDERBOOK_ROW_PADDING_RIGHT,
         y
       );
     }
@@ -234,7 +231,7 @@ export const useDrawOrderbook = ({
       ctx.fillStyle = textColor;
       ctx.fillText(
         MustBigNumber(price).toFixed(tickSizeDecimals ?? SMALL_USD_DECIMALS),
-        getXByColumn({ canvasWidth, colIdx: 1 }) - ROW_PADDING_RIGHT,
+        getXByColumn({ canvasWidth, colIdx: 1 }) - ORDERBOOK_ROW_PADDING_RIGHT,
         y
       );
     }
@@ -244,7 +241,7 @@ export const useDrawOrderbook = ({
       ctx.fillStyle = textColor;
       ctx.fillText(
         MustBigNumber(mine).toFixed(stepSizeDecimals ?? TOKEN_DECIMALS),
-        getXByColumn({ canvasWidth, colIdx: 2 }) - ROW_PADDING_RIGHT,
+        getXByColumn({ canvasWidth, colIdx: 2 }) - ORDERBOOK_ROW_PADDING_RIGHT,
         y
       );
     }

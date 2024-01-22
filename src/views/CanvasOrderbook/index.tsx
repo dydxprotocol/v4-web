@@ -4,11 +4,10 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import { Nullable, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
-
+import { ORDERBOOK_HEIGHT, ORDERBOOK_MAX_ROWS_PER_SIDE } from '@/constants/orderbook';
 import { useStringGetter } from '@/hooks';
 
 import {
-  ORDERBOOK_HEIGHT,
   useCalculateOrderbookData,
   useCenterOrderbook,
   useDrawOrderbook,
@@ -25,8 +24,6 @@ import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
 
 import { OrderbookRow, SpreadRow } from './OrderbookRow';
-
-const ORDERBOOK_MAX_ROWS_PER_SIDE = 30;
 
 type ElementProps = {
   maxRowsPerSide?: number;
@@ -103,7 +100,6 @@ export const CanvasOrderbook = forwardRef(
     const dispatch = useDispatch();
     const onRowAction = useCallback(
       (price: Nullable<number>) => {
-        console.log(price);
         if (currentInput === 'trade' && price) {
           dispatch(setTradeFormInputs({ limitPriceInput: price?.toString() }));
         }
