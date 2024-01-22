@@ -148,6 +148,10 @@ export const WithdrawForm = () => {
           throw new Error('Invalid request payload');
         }
 
+        if (isCctp && !abacusStateManager.chainTransactions.isNobleClientConnected) {
+          throw new Error('Noble RPC endpoint unaccessible');
+        }
+
         setIsLoading(true);
         setError(undefined);
 

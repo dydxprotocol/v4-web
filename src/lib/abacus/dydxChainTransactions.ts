@@ -56,6 +56,10 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     this.store = undefined;
   }
 
+  get isNobleClientConnected(): boolean {
+    return this.nobleClient?.isConnected ?? false;
+  }
+
   setStore(store: RootStore): void {
     this.store = store;
   }
