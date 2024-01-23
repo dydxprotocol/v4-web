@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { POTENTIAL_MARKETS } from '@/constants/potentialMarkets';
+import { useNextClobPairId } from '@/hooks';
 
 import { NewMarketSelectionStep } from './NewMarketSelectionStep';
 import { NewMarketPreviewStep } from './NewMarketPreviewStep';
@@ -17,20 +18,7 @@ export const NewMarketForm = () => {
   const [assetToAdd, setAssetToAdd] = useState<(typeof POTENTIAL_MARKETS)[number]>();
   const [liquidityTier, setLiquidityTier] = useState<string>();
 
-  // Given a ticker, return a unique clob pair id with basic hashing
-  const getNewClobPairId = (ticker: string): number => {
-    let hash = 2166136261n;
-    for (let i = 0; i < ticker.length; i++) {
-      hash ^= BigInt(ticker.charCodeAt(i));
-      hash *= 16777619n;
-    }
-    return Number(hash & 2147483647n);
-  };
-
-  const clobPairId = useMemo(() => {
-    if (!assetToAdd) return undefined;
-    return getNewClobPairId(assetToAdd.symbol);
-  }, [assetToAdd]);
+  const clobPairId = useNextClobPairId();
 
   if (NewMarketFormStep.SUCCESS === step) {
     return <NewMarketSuccessStep href="google.com" />;

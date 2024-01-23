@@ -116,6 +116,17 @@ const useDydxClientContext = () => {
   };
 
   // ------ Public Methods ------ //
+  const requestAllPerpetualMarkets = useCallback(async () => {
+    try {
+      const { markets } =
+        (await compositeClient?.indexerClient.markets.getPerpetualMarkets()) || {};
+      return markets || [];
+    } catch (error) {
+      log('useDydxClient/getPerpetualMarkets', error);
+      return [];
+    }
+  }, [compositeClient]);
+
   const requestCandles = useCallback(
     async ({
       marketId,
@@ -230,6 +241,7 @@ const useDydxClientContext = () => {
     getWalletFromEvmSignature,
 
     // Public Methods
+    requestAllPerpetualMarkets,
     getCandlesForDatafeed,
     screenAddresses,
   };

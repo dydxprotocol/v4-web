@@ -14,6 +14,7 @@ import { useInitializePage } from './useInitializePage';
 import { useIsFirstRender } from './useIsFirstRender';
 import { useLocaleSeparators } from './useLocaleSeparators';
 import { useLocalStorage } from './useLocalStorage';
+import { useNextClobPairId } from './useNextClobPairId';
 import { useNow } from './useNow';
 import { useOnClickOutside } from './useOnClickOutside';
 import { usePageTitlePriceUpdates } from './usePageTitlePriceUpdates';
@@ -42,6 +43,7 @@ export {
   useIsFirstRender,
   useLocaleSeparators,
   useLocalStorage,
+  useNextClobPairId,
   useNow,
   useOnClickOutside,
   usePageTitlePriceUpdates,
