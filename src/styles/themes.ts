@@ -1,6 +1,6 @@
 import { AppTheme } from '@/state/configs';
-import { ThemeColors } from '@/styles/colors/colors';
-import { ColorToken } from '@/styles/colors/base';
+import { ThemeColors } from '@/constants/styles/colors';
+import { ColorToken } from '@/constants/styles/base';
 
 const ClassicTheme: ThemeColors = {
   layer0: ColorToken.GrayBlue7,

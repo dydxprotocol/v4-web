@@ -12,12 +12,12 @@ export const GlobalStyle = createGlobalStyle`
     --color-layer-7: ${({ theme }) => theme.layer7};
 
     --color-border: ${({ theme }) => theme.borderDefault};
-    --color-border-white: ${({ theme }) => theme.borderButton}; //xcxc
-    --color-border-red: ${({ theme }) => theme.borderDestructive}; //xcxc
+    --color-border-white: ${({ theme }) => theme.borderButton};
+    --color-border-red: ${({ theme }) => theme.borderDestructive};
 
-    --color-text-0: ${({ theme }) => theme.textPrimary}; //xcxc
-    --color-text-1: ${({ theme }) => theme.textSecondary}; //xcxc
-    --color-text-2: ${({ theme }) => theme.textTertiary}; //xcxc
+    --color-text-0: ${({ theme }) => theme.textTertiary};
+    --color-text-1: ${({ theme }) => theme.textSecondary};
+    --color-text-2: ${({ theme }) => theme.textPrimary};
 
     --color-accent: ${({ theme }) => theme.accent};
     --color-favorite: ${({ theme }) => theme.favorite};
