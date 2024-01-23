@@ -2,11 +2,10 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { RiskLevels } from '@/constants/abacus';
 
-import { UsageColorFromRiskLevel } from '@/styles/globalStyle';
-
 import { Ring } from '@/components/Ring';
 
 import { abacusHelper } from '@/lib/abacus';
+import { UsageColorFromRiskLevel } from '@/lib/styles';
 
 type ElementProps = {
   value: number;
