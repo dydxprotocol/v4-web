@@ -6,7 +6,6 @@ export enum DialogTypes {
   ExternalLink = 'ExternalLink',
   FillDetails = 'FillDetails',
   Help = 'Help',
-  Impersonation = 'Impersonation',
   ExternalNavKeplr = 'ExternalNavKeplr',
   MnemonicExport = 'MnemonicExport',
   MobileSignIn = 'MobileSignIn',
