@@ -14,3 +14,7 @@ export const UsageColorFromRiskLevel = (riskLevel: RiskLevels) =>
       color: var(--color-risk-high);
     `,
   }[riskLevel.name]);
+
+export const generateFadedColorVariant = (colorHex: string, opacityHex: string) => {
+  return `${colorHex}${opacityHex}`;
+};

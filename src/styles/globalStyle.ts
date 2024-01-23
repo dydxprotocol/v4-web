@@ -19,7 +19,11 @@ export const GlobalStyle = createGlobalStyle`
     --color-text-1: ${({ theme }) => theme.textSecondary};
     --color-text-2: ${({ theme }) => theme.textPrimary};
 
+    --color-gradient-base-0: ${({ theme }) => theme.gradientBase0};
+    --color-gradient-base-1: ${({ theme }) => theme.gradientBase1};
+
     --color-accent: ${({ theme }) => theme.accent};
+    --color-accent-faded: ${({ theme }) => theme.accentFaded};
     --color-favorite: ${({ theme }) => theme.favorite};
 
     --color-success: ${({ theme }) => theme.success};
@@ -28,6 +32,8 @@ export const GlobalStyle = createGlobalStyle`
 
     --color-positive: ${({ theme }) => theme.positive};
     --color-negative: ${({ theme }) => theme.negative};
+    --color-gradient-positive: ${({ theme }) => theme.positiveFaded};
+    --color-gradient-negative: ${({ theme }) => theme.negativeFaded};
 
     --color-risk-low: ${({ theme }) => theme.riskLow};
     --color-risk-medium: ${({ theme }) => theme.riskMedium};

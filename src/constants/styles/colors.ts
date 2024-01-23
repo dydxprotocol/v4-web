@@ -1,10 +1,12 @@
 export type ThemeColors = LayerColors &
   BorderColors &
   TextColors &
+  GradientColors &
   AccentColors &
   StatusColors &
   DirectionalColors &
   RiskColors &
+  IconColors &
   ComponentColors;
 
 type LayerColors = {
@@ -30,8 +32,14 @@ type TextColors = {
   textTertiary: string;
 };
 
+type GradientColors = {
+  gradientBase0: string;
+  gradientBase1: string;
+};
+
 type AccentColors = {
   accent: string;
+  accentFaded: string;
   favorite: string;
 };
 
@@ -44,6 +52,8 @@ type StatusColors = {
 type DirectionalColors = {
   positive: string;
   negative: string;
+  positiveFaded: string;
+  negativeFaded: string;
 };
 
 type RiskColors = {
@@ -52,8 +62,16 @@ type RiskColors = {
   riskHigh: string;
 };
 
-type ComponentColors = {
-  toggleBackground: string;
-  inputBackground: string;
+type IconColors = {
   logoFill: string;
+  profileYellow: string;
+  profileRed: string;
+};
+
+type ComponentColors = {
+  inputBackground: string;
+  popoverBackground: string;
+  switchThumbActiveBackground: string;
+  toggleBackground: string;
+  tooltipBackground: string;
 };
