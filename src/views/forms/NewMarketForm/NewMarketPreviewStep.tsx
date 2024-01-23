@@ -9,7 +9,6 @@ import { DialogTypes } from '@/constants/dialogs';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 import { EXCHANGE_CONFIGS, LIQUIDITY_TIERS, POTENTIAL_MARKETS } from '@/constants/potentialMarkets';
 import { useAccountBalance, useSubaccount, useTokenConfigs } from '@/hooks';
-import { LinkOutIcon } from '@/icons';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
@@ -26,7 +25,7 @@ import { openDialog } from '@/state/dialogs';
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-type NewMarketPreviewFormProps = {
+type NewMarketPreviewStepProps = {
   assetData: (typeof POTENTIAL_MARKETS)[number];
   clobPairId: number;
   liquidityTier: string;
@@ -34,13 +33,13 @@ type NewMarketPreviewFormProps = {
   onSuccess: () => void;
 };
 
-export const NewMarketPreviewForm = ({
+export const NewMarketPreviewStep = ({
   assetData,
   clobPairId,
   liquidityTier,
   onBack,
   onSuccess,
-}: NewMarketPreviewFormProps) => {
+}: NewMarketPreviewStepProps) => {
   const { submitNewMarketProposal } = useSubaccount();
   const { nativeTokenBalance } = useAccountBalance();
   const dispatch = useDispatch();
@@ -73,7 +72,7 @@ export const NewMarketPreviewForm = ({
     return Math.abs(p - 3);
   }, [assetData]);
 
-  const isDisabled = false; // alertMessage !== null;
+  const isDisabled = alertMessage !== null;
 
   return (
     <Styled.Form
@@ -248,75 +247,9 @@ export const NewMarketPreviewForm = ({
   );
 };
 
-type NewMarketProposalSentProps = {
-  onBack: () => void;
-};
 
-export const NewMarketProposalSent = ({ onBack }: NewMarketProposalSentProps) => {
-  return (
-    <Styled.ProposalSent>
-      <Styled.OuterCircle>
-        <Styled.InnerCircle>
-          <Icon iconName={IconName.Check} />
-        </Styled.InnerCircle>
-      </Styled.OuterCircle>
-      <h2>Submitted Proposal!</h2>
-      <span>Your proposal has been successfully submitted onchain.</span>
-      <Button type={ButtonType.Link} href="https://google.com" action={ButtonAction.Primary}>
-          View proposal
-          <LinkOutIcon />
-        </Button>
-    </Styled.ProposalSent>
-  );
-};
 
 const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ProposalSent = styled.div`
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  padding: 1rem;
-
-  && {
-    h2 {
-      margin: 0 1rem;
-    }
-  }
-`;
-
-Styled.OuterCircle = styled.div`
-  width: 5.25rem;
-  height: 5.25rem;
-  min-width: 5.25rem;
-  height: 5.25rem;
-  border-radius: 50%;
-  background-color: var(--color-gradient-positive);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-Styled.InnerCircle = styled.div`
-  width: 2rem;
-  height: 2rem;
-  min-width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  background-color: var(--color-success);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  svg {
-    color: var(--color-layer-2);
-  }
-`;
 
 Styled.Form = styled.form`
   ${formMixins.transfersForm}
