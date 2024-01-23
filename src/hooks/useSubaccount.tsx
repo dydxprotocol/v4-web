@@ -201,6 +201,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
             value: {
               ...transaction.msg,
               timeoutTimestamp: transaction.msg.timeoutTimestamp
+                // Squid returns timeoutTimestamp as Long, but the signer expects BigInt
                 ? BigInt(Long.fromValue(transaction.msg.timeoutTimestamp).toString())
                 : undefined,
             },
