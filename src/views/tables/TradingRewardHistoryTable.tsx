@@ -31,7 +31,7 @@ const getTradingRewardHistoryTableColumnDef = ({
       [TradingRewardHistoryTableColumnKey.Event]: {
         columnKey: TradingRewardHistoryTableColumnKey.Event,
         getCellValue: (row) => row.startedAtInMilliseconds,
-        label: stringGetter({key: STRING_KEYS.EVENT}),
+        label: stringGetter({ key: STRING_KEYS.EVENT }),
         renderCell: ({ startedAtInMilliseconds, endedAtInMilliseconds }) => (
           <TableCell stacked>
             <Styled.Rewarded>{stringGetter({ key: STRING_KEYS.REWARDED })}</Styled.Rewarded>
@@ -97,16 +97,18 @@ export const TradingRewardHistoryTable = ({
   const { chainTokenLabel } = useTokenConfigs();
   const stringGetter = useStringGetter();
 
+  const tempConvertedArray = periodTradingRewards?.["r29_1"]?.["i_1"] ?? [];
+
   return (
     <Styled.Table
       label={stringGetter({ key: STRING_KEYS.REWARD_HISTORY })}
-      data={periodTradingRewards}
+      data={tempConvertedArray}
       getRowKey={(row: any) => row.startedAtInMilliseconds}
       columns={columnKeys.map((key: TradingRewardHistoryTableColumnKey) =>
         getTradingRewardHistoryTableColumnDef({
           key,
           chainTokenLabel,
-          stringGetter
+          stringGetter,
         })
       )}
       selectionBehavior="replace"

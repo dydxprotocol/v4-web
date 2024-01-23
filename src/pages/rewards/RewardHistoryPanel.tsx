@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
 
@@ -14,18 +14,14 @@ import {
 
 import { STRING_KEYS } from '@/constants/localization';
 
-import { ComingSoon } from '@/components/ComingSoon';
 import { Panel } from '@/components/Panel';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { TradingRewardHistoryTable } from '@/views/tables/TradingRewardHistoryTable';
-
-import { getHistoricalTradingRewards } from '@/state/accountSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 
 export const RewardHistoryPanel = () => {
   const stringGetter = useStringGetter();
-  const historicalTradingRewards = useSelector(getHistoricalTradingRewards, shallowEqual);
 
   const [selectedPeriod, setSelectedPeriod] = useState<HistoricaTradingRewardsPeriods>(
     abacusStateManager.getHistoricalTradingRewardPeriod() || HistoricaTradingRewardsPeriod.WEEKLY
@@ -33,11 +29,12 @@ export const RewardHistoryPanel = () => {
 
   const onSelectPeriod = useCallback(
     (periodName: string) => {
-      setSelectedPeriod(
+      const selectedPeriod =
         HISTORICAL_TRADING_REWARDS_PERIODS[
           periodName as keyof typeof HISTORICAL_TRADING_REWARDS_PERIODS
-        ]
-      );
+        ];
+      setSelectedPeriod(selectedPeriod);
+      abacusStateManager.setHistoricalTradingRewardPeriod(selectedPeriod);
     },
     [setSelectedPeriod, selectedPeriod]
   );
