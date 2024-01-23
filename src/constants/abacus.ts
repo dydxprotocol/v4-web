@@ -119,6 +119,13 @@ export const InputSelectionOption = Abacus.exchange.dydx.abacus.output.input.Sel
 // ------ Wallet ------ //
 export type Wallet = Abacus.exchange.dydx.abacus.output.Wallet;
 export type AccountBalance = Abacus.exchange.dydx.abacus.output.AccountBalance;
+export type TradingRewards = Abacus.exchange.dydx.abacus.output.TradingRewards;
+export type HistoricalTradingReward = Abacus.exchange.dydx.abacus.output.HistoricalTradingReward;
+export const HistoricaTradingRewardsPeriod =
+  Abacus.exchange.dydx.abacus.state.manager.HistoricaTradingRewardsPeriod;
+const historicalTradingRewardsPeriod = [...HistoricaTradingRewardsPeriod.values()] as const;
+export type HistoricaTradingRewardsPeriods = (typeof historicalTradingRewardsPeriod)[number];
+
 export type Subaccount = Abacus.exchange.dydx.abacus.output.Subaccount;
 export type SubaccountPosition = Abacus.exchange.dydx.abacus.output.SubaccountPosition;
 export type SubaccountOrder = Abacus.exchange.dydx.abacus.output.SubaccountOrder;
@@ -234,6 +241,15 @@ export const HISTORICAL_PNL_PERIODS: Record<
   [HistoricalPnlPeriod.Period7d.name]: HistoricalPnlPeriod.Period7d,
   [HistoricalPnlPeriod.Period30d.name]: HistoricalPnlPeriod.Period30d,
   [HistoricalPnlPeriod.Period90d.name]: HistoricalPnlPeriod.Period90d,
+};
+
+export const HISTORICAL_TRADING_REWARDS_PERIODS: Record<
+  KotlinIrEnumValues<typeof HistoricaTradingRewardsPeriod>,
+  HistoricaTradingRewardsPeriods
+> = {
+  [HistoricaTradingRewardsPeriod.MONTHLY.name]: HistoricaTradingRewardsPeriod.MONTHLY,
+  [HistoricaTradingRewardsPeriod.WEEKLY.name]: HistoricaTradingRewardsPeriod.WEEKLY,
+  [HistoricaTradingRewardsPeriod.DAILY.name]: HistoricaTradingRewardsPeriod.DAILY,
 };
 
 export const ORDER_STATUS_STRINGS: Record<KotlinIrEnumValues<typeof AbacusOrderStatus>, string> = {

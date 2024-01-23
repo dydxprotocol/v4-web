@@ -13,6 +13,7 @@ import type {
   HistoricalPnlPeriods,
   SubAccountHistoricalPNLs,
   UsageRestriction,
+  TradingRewards,
 } from '@/constants/abacus';
 
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
@@ -24,6 +25,7 @@ import { getLocalStorage } from '@/lib/localStorage';
 export type AccountState = {
   balances?: Record<string, AccountBalance>;
   stakingBalances?: Record<string, AccountBalance>;
+  tradingRewards?: TradingRewards;
   wallet?: Nullable<Wallet>;
   walletType?: WalletType;
 
@@ -179,6 +181,9 @@ export const accountSlice = createSlice({
     setStakingBalances: (state, action: PayloadAction<Record<string, AccountBalance>>) => {
       state.stakingBalances = action.payload;
     },
+    setTradingRewards: (state, action: PayloadAction<TradingRewards>) => {
+      state.tradingRewards = action.payload;
+    },
     addUncommittedOrderClientId: (state, action: PayloadAction<number>) => {
       state.uncommittedOrderClientIds.push(action.payload);
     },
@@ -206,6 +211,7 @@ export const {
   viewedOrders,
   setBalances,
   setStakingBalances,
+  setTradingRewards,
   addUncommittedOrderClientId,
   removeUncommittedOrderClientId,
 } = accountSlice.actions;

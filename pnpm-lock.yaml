@@ -1102,8 +1102,13 @@ packages:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
 
+<<<<<<< HEAD
   /@dydxprotocol/v4-abacus@1.3.2:
     resolution: {integrity: sha512-zo0IHjGMlJRKOYDgNqNFQ9GtBJKJP4+Y9YY7V0X3Wt61ppKAYzodaYQhc9V/RYchcZTtS/xkicLug444YrvehQ==}
+=======
+  /@dydxprotocol/v4-abacus@1.2.8:
+    resolution: {integrity: sha512-rW+9r3cymCFn054Spbw91CXprMpnP6f5C/lSNQ1ptoer5r6FlTUa1tu1+j3YaNSkazqigifK+Eu0IwDmvAS28w==}
+>>>>>>> 7aaa960 (add trading rewards)
     dev: false
 
   /@dydxprotocol/v4-client-js@1.0.17:

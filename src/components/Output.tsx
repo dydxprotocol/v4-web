@@ -65,6 +65,9 @@ type ElementProps = {
     resolution?: number;
     stripRelativeWords?: boolean;
   };
+  timeOptions?: {
+    useUTC?: boolean;
+  };
   tag?: React.ReactNode;
   withParentheses?: boolean;
   locale?: string;
@@ -89,6 +92,7 @@ export const Output = ({
   relativeTimeFormatOptions = {
     format: 'singleCharacter',
   },
+  timeOptions,
   tag,
   withParentheses,
   locale = navigator.language || 'en-US',
@@ -166,16 +170,21 @@ export const Output = ({
       if ((typeof value !== 'string' && typeof value !== 'number') || !value) return null;
       const date = new Date(value);
       const dateString = {
-        [OutputType.Date]: date.toLocaleString(selectedLocale, { dateStyle: 'medium' }),
+        [OutputType.Date]: date.toLocaleString(selectedLocale, {
+          dateStyle: 'medium',
+          timeZone: timeOptions?.useUTC ? 'UTC' : undefined,
+        }),
         [OutputType.DateTime]: date.toLocaleString(selectedLocale, {
           dateStyle: 'short',
           timeStyle: 'short',
+          timeZone: timeOptions?.useUTC ? 'UTC' : undefined,
         }),
         [OutputType.Time]: date.toLocaleString(selectedLocale, {
           hour12: false,
           hour: '2-digit',
           minute: '2-digit',
           second: '2-digit',
+          timeZone: timeOptions?.useUTC ? 'UTC' : undefined,
         }),
       }[type];
 
