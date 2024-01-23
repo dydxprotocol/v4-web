@@ -55,4 +55,5 @@ type RiskColors = {
 type ComponentColors = {
   toggleBackground: string;
   inputBackground: string;
+  logoFill: string;
 };

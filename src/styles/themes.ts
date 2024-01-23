@@ -36,6 +36,7 @@ const ClassicTheme: ThemeColors = {
 
   inputBackground: ColorToken.GrayBlue3,
   toggleBackground: ColorToken.GrayBlue3,
+  logoFill: ColorToken.White,
 };
 
 const DarkTheme: ThemeColors = {
@@ -72,6 +73,7 @@ const DarkTheme: ThemeColors = {
 
   inputBackground: ColorToken.DarkGray6,
   toggleBackground: ColorToken.DarkGray6,
+  logoFill: ColorToken.White,
 };
 
 const LightTheme: ThemeColors = {
@@ -108,6 +110,7 @@ const LightTheme: ThemeColors = {
 
   inputBackground: ColorToken.White,
   toggleBackground: ColorToken.LightGray4,
+  logoFill: ColorToken.Black,
 };
 
 export const Themes = {

@@ -7,7 +7,10 @@ import { getAppTheme } from '@/state/configsSelectors';
 import { Themes } from '@/styles/themes';
 
 export const AppThemeProvider = ({ ...props }) => {
-    const theme: AppTheme = useSelector(getAppTheme);
-
-    return <ThemeProvider theme={Themes[theme]} {...props} />
+    return <ThemeProvider theme={useAppThemeContext()} {...props} />
 };
+
+export const useAppThemeContext = () => {
+    const theme: AppTheme = useSelector(getAppTheme);
+    return Themes[theme];
+}
