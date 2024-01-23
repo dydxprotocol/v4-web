@@ -4,7 +4,8 @@ export type ThemeColors = LayerColors &
   AccentColors &
   StatusColors &
   DirectionalColors &
-  RiskColors;
+  RiskColors &
+  ComponentColors;
 
 type LayerColors = {
   layer0: string;
@@ -49,4 +50,9 @@ type RiskColors = {
   riskLow: string;
   riskMedium: string;
   riskHigh: string;
+};
+
+type ComponentColors = {
+  toggleBackground: string;
+  inputBackground: string;
 };

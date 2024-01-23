@@ -2,7 +2,7 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { type RiskLevels } from '@/constants/abacus';
 
-import { UsageColorFromRiskLevel } from '@/styles/colors';
+import { UsageColorFromRiskLevel } from '@/styles/globalStyle';
 
 import { abacusHelper } from '@/lib/abacus';
 type ElementProps = {

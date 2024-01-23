@@ -33,6 +33,9 @@ const ClassicTheme: ThemeColors = {
   riskLow: ColorToken.Green1,
   riskMedium: ColorToken.Yellow0,
   riskHigh: ColorToken.Red2,
+
+  inputBackground: ColorToken.GrayBlue3,
+  toggleBackground: ColorToken.GrayBlue3,
 };
 
 const DarkTheme: ThemeColors = {
@@ -66,6 +69,9 @@ const DarkTheme: ThemeColors = {
   riskLow: ColorToken.Green0,
   riskMedium: ColorToken.Yellow0,
   riskHigh: ColorToken.Red0,
+
+  inputBackground: ColorToken.DarkGray6,
+  toggleBackground: ColorToken.DarkGray6,
 };
 
 const LightTheme: ThemeColors = {
@@ -99,6 +105,9 @@ const LightTheme: ThemeColors = {
   riskLow: ColorToken.Green2,
   riskMedium: ColorToken.Yellow0,
   riskHigh: ColorToken.Red1,
+
+  inputBackground: ColorToken.White,
+  toggleBackground: ColorToken.LightGray4,
 };
 
 export const Themes = {
