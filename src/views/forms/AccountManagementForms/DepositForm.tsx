@@ -17,6 +17,7 @@ import type { EvmAddress } from '@/constants/wallets';
 import { useAccounts, useDebounce, useStringGetter, useSelectedNetwork } from '@/hooks';
 import { useAccountBalance, CHAIN_DEFAULT_TOKEN_ADDRESS } from '@/hooks/useAccountBalance';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
+import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
@@ -120,11 +121,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     });
 
     return () => {
-      abacusStateManager.clearTransferInputValues();
-      abacusStateManager.setTransferValue({
-        field: TransferInputField.type,
-        value: null,
-      });
+      abacusStateManager.resetInputState();
     };
   }, []);
 
@@ -368,6 +365,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     return <LoadingSpace id="DepositForm" />;
   }
 
+  const [requireUserActionInWallet, setRequireUserActionInWallet] = useState(false);
+
   return (
     <Styled.Form onSubmit={onSubmit}>
       <ChainSelectMenu selectedChain={chainIdStr || undefined} onSelectChain={onSelectChain} />
@@ -386,7 +385,11 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         />
       </Styled.WithDetailsReceipt>
       {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
-
+      {requireUserActionInWallet && (
+        <AlertMessage type={AlertType.Warning}>
+          {stringGetter({ key: STRING_KEYS.CHECK_WALLET_FOR_REQUEST })}
+        </AlertMessage>
+      )}
       <Styled.Footer>
         <DepositButtonAndReceipt
           isDisabled={isDisabled}
@@ -395,6 +398,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           setSlippage={onSetSlippage}
           slippage={slippage}
           sourceToken={sourceToken || undefined}
+          setRequireUserActionInWallet={setRequireUserActionInWallet}
+          setError={setError}
         />
       </Styled.Footer>
     </Styled.Form>

@@ -72,6 +72,7 @@ export const GenerateKeys = ({
       if (message) {
         log('GenerateKeys/switchNetwork', error, { walletErrorType });
         setError(message);
+        throw error;
       }
     }
   };
