@@ -173,6 +173,10 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       return parsedObj as T;
     }
 
+    if (typeof x === 'bigint') {
+      return x.toString() as T;
+    }
+
     throw new Error(`Unsupported data type: ${typeof x}`);
   }
 
@@ -363,7 +367,12 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     try {
       const ibcMsg = {
         typeUrl: params.msgTypeUrl, // '/ibc.applications.transfer.v1.MsgTransfer',
-        value: params.msg,
+        value: {
+          ...params.msg,
+          timeoutTimestamp: params.msg.timeoutTimestamp
+            ? BigInt(Long.fromValue(params.msg.timeoutTimestamp).toString())
+            : undefined,
+        },
       };
       const fee = await this.nobleClient.simulateTransaction([ibcMsg]);
 
@@ -413,7 +422,12 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       );
       const ibcMsg: EncodeObject = {
         typeUrl: parsedIbcPayload.msgTypeUrl,
-        value: parsedIbcPayload.msg,
+        value: {
+          ...parsedIbcPayload.msg,
+          timeoutTimestamp: parsedIbcPayload.msg.timeoutTimestamp
+            ? BigInt(Long.fromValue(parsedIbcPayload.msg.timeoutTimestamp).toString())
+            : undefined,
+        },
       };
 
       const tx = await this.compositeClient.send(
