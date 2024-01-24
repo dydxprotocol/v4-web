@@ -10,7 +10,7 @@ type ElementProps = {
 
 type StyleProps = {
   className?: string;
-  direction?: 'right' | 'left';
+  direction?: 'right' | 'left' | 'up' | 'down';
 };
 
 export type DiffArrowProps = ElementProps & StyleProps;
@@ -57,5 +57,11 @@ Styled.DiffArrowContainer = styled.span<DiffArrowProps>`
       left: css`
         transform: scaleX(-1);
       `,
+      up: css`
+        transform: rotate(-90deg);
+      `,
+      down: css`
+        transform: rotate(90deg);
+      `
     }[direction || 'right'])}
 `;
