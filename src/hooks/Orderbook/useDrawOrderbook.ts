@@ -3,7 +3,16 @@ import { shallowEqual, useSelector } from 'react-redux';
 
 import type { PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { SMALL_USD_DECIMALS, TOKEN_DECIMALS } from '@/constants/numbers';
-import { ORDERBOOK_HEIGHT, ORDERBOOK_ROW_HEIGHT, ORDERBOOK_ROW_PADDING_RIGHT, ORDERBOOK_WIDTH } from '@/constants/orderbook';
+
+import {
+  ORDERBOOK_ANIMATION_DURATION,
+  ORDERBOOK_HEIGHT,
+  ORDERBOOK_ROW_HEIGHT,
+  ORDERBOOK_ROW_PADDING_RIGHT,
+  ORDERBOOK_WIDTH,
+} from '@/constants/orderbook';
+
+import { Colors } from '@/styles/colors';
 
 import { getCurrentMarketConfig, getCurrentMarketOrderbookMap } from '@/state/perpetualsSelectors';
 import { getAppTheme } from '@/state/configsSelectors';
@@ -17,8 +26,6 @@ import {
   getYForElements,
 } from '@/lib/orderbookHelpers';
 
-import { Colors } from '@/styles/colors';
-
 type ElementProps = {
   data: Array<PerpetualMarketOrderbookLevel | undefined>;
   histogramRange: number;
@@ -28,7 +35,6 @@ type ElementProps = {
 type StyleProps = {
   histogramSide: 'left' | 'right';
 };
-
 
 enum OrderbookRowAnimationType {
   REMOVE,
@@ -142,7 +148,7 @@ export const useDrawOrderbook = ({
     const { bar: y } = getYForElements({ y: y1, rowHeight });
 
     if (ctx.roundRect) {
-      ctx.roundRect?.(
+      ctx.roundRect(
         bar.x1,
         y,
         bar.x2,
@@ -241,7 +247,7 @@ export const useDrawOrderbook = ({
   }: {
     ctx: CanvasRenderingContext2D;
     idx: number;
-    rowToRender: PerpetualMarketOrderbookLevel | undefined;
+    rowToRender?: PerpetualMarketOrderbookLevel;
     animationType?: OrderbookRowAnimationType;
   }) => {
     if (!rowToRender) return;
@@ -348,7 +354,7 @@ export const useDrawOrderbook = ({
           rowToRender: data[idx],
         });
       });
-    }, 400);
+    }, ORDERBOOK_ANIMATION_DURATION);
 
     prevData.current = data;
   }, [

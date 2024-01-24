@@ -155,13 +155,9 @@ export const CanvasOrderbook = forwardRef(
                         <Styled.Row
                           key={idx}
                           title={`${row.price}`}
-                          onClick={
-                            row?.price
-                              ? () => {
-                                  onRowAction(row.price);
-                                }
-                              : undefined
-                          }
+                          onClick={() => {
+                            onRowAction(row.price);
+                          }}
                         />
                       ) : (
                         <Styled.Row key={idx} />
