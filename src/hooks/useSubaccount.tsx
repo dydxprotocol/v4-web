@@ -198,7 +198,13 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
           );
           const ibcMsg: EncodeObject = {
             typeUrl: transaction.msgTypeUrl,
-            value: transaction.msg,
+            value: {
+              ...transaction.msg,
+              timeoutTimestamp: transaction.msg.timeoutTimestamp
+                // Squid returns timeoutTimestamp as Long, but the signer expects BigInt
+                ? BigInt(Long.fromValue(transaction.msg.timeoutTimestamp).toString())
+                : undefined,
+            },
           };
 
           return await compositeClient.send(
