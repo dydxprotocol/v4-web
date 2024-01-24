@@ -7,7 +7,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { breakpoints } from '@/styles';
 
 type PanelProps = {
-  slotHeaderContent?: string;
+  slotHeaderContent?: React.ReactNode;
   slotHeader?: React.ReactNode;
   slotRight?: React.ReactNode;
   children?: React.ReactNode;
