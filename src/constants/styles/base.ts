@@ -64,6 +64,7 @@ export enum ColorToken {
 /** Maps opacity to corresponding hex value */
 export enum OpacityToken {
   Opacity16 = '29',
+  Opacity20 = '33',
   Opacity66 = 'A8',
   Opacity90 = 'E6',
 }

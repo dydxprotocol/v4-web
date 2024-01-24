@@ -14,8 +14,8 @@ const ClassicTheme: ThemeColors = {
   layer7: ColorToken.GrayBlue0,
 
   borderDefault: ColorToken.GrayBlue2,
-  borderDestructive: ColorToken.Red2,
-  borderButton: ColorToken.White,
+  borderDestructive: generateFadedColorVariant(ColorToken.Red2, OpacityToken.Opacity20),
+  borderButton: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity20),
 
   textPrimary: ColorToken.LightGray2,
   textSecondary: ColorToken.GrayPurple1,
@@ -63,8 +63,8 @@ const DarkTheme: ThemeColors = {
   layer7: ColorToken.DarkGray2,
 
   borderDefault: ColorToken.DarkGray4,
-  borderDestructive: ColorToken.Red0,
-  borderButton: ColorToken.White,
+  borderDestructive: generateFadedColorVariant(ColorToken.Red0, OpacityToken.Opacity20),
+  borderButton: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity20),
 
   textPrimary: ColorToken.LightGray0,
   textSecondary: ColorToken.MediumGray0,
@@ -112,8 +112,8 @@ const LightTheme: ThemeColors = {
   layer7: ColorToken.MediumGray1,
 
   borderDefault: ColorToken.LightGray10,
-  borderDestructive: ColorToken.Red1,
-  borderButton: ColorToken.Black,
+  borderDestructive: generateFadedColorVariant(ColorToken.Red1, OpacityToken.Opacity20),
+  borderButton: generateFadedColorVariant(ColorToken.Black, OpacityToken.Opacity20),
 
   textPrimary: ColorToken.DarkGray12,
   textSecondary: ColorToken.DarkGray3,
