@@ -1,13 +1,10 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from 'react-query';
 
+import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
-import { useAccountBalance, useBreakpoints, useDocumentTitle, useDydxClient } from '@/hooks';
-
-import { layoutMixins } from '@/styles/layoutMixins';
-import { breakpoints } from '@/styles';
+import { useBreakpoints, useDocumentTitle, useDydxClient, useStringGetter } from '@/hooks';
 
 import { Button } from '@/components/Button';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
@@ -15,25 +12,8 @@ import { IconButton } from '@/components/IconButton';
 import { Icon, IconName } from '@/components/Icon';
 import { NewMarketForm } from '@/views/forms/NewMarketForm';
 
-const HOW_TO_ADD_MARKET_TEXT = [
-  {
-    step: 1,
-    title: 'Select market',
-    subtitle:
-      'Search or choose from a list of markets you’d like to add. The list is pre-populated with markets that have been deemed “safe” to add to the Protocol.',
-  },
-  {
-    step: 2,
-    title: 'Confirm details',
-    subtitle: 'Once a market is selected, all of its parameters will be automatically populated.',
-  },
-  {
-    step: 3,
-    title: 'Propose new market',
-    subtitle:
-      'Send a transaction that creates a proposal to add the new market to dYdX Chain. This requires a balance of 10,000 unstaked DYDX.',
-  },
-];
+import { layoutMixins } from '@/styles/layoutMixins';
+import { breakpoints } from '@/styles';
 
 const StepItem = ({ step, subtitle, title }: { step: number; subtitle: string; title: string }) => (
   <Styled.StepItem>
@@ -50,36 +30,39 @@ const NewMarket = () => {
   const { networkConfig } = useDydxClient();
   const navigate = useNavigate();
   const [displaySteps, setDisplaySteps] = useState(true);
+  const stringGetter = useStringGetter();
 
   useDocumentTitle('New Market');
 
-  // const { data, isLoading } = useQuery({
-  //   queryKey: ['market_proposals'],
-  //   queryFn: async () => {
-  //     const response = fetch(`${networkConfig?.validatorUrl}/cosmos/gov/v1/proposals`, {
-  //       headers: {
-  //         Accept: 'application/json',
-  //         'Content-Type': 'application/json',
-  //       },
-  //     });
-
-  //     return (await response).json();
-  //   },
-  //   refetchInterval: 10_000,
-  //   staleTime: 10_000,
-  // });
-
-  // console.log(data, isLoading);
+  const steps = useMemo(() => {
+    return [
+      {
+        step: 1,
+        title: stringGetter({ key: STRING_KEYS.ADD_MARKET_STEP_1_TITLE }),
+        subtitle: stringGetter({ key: STRING_KEYS.ADD_MARKET_STEP_1_DESCRIPTION }),
+      },
+      {
+        step: 2,
+        title: stringGetter({ key: STRING_KEYS.ADD_MARKET_STEP_2_TITLE }),
+        subtitle: stringGetter({ key: STRING_KEYS.ADD_MARKET_STEP_2_DESCRIPTION }),
+      },
+      {
+        step: 3,
+        title: stringGetter({ key: STRING_KEYS.ADD_MARKET_STEP_3_TITLE }),
+        subtitle: stringGetter({ key: STRING_KEYS.ADD_MARKET_STEP_3_DESCRIPTION }),
+      },
+    ];
+  }, [stringGetter]);
 
   return (
     <Styled.Page>
       <Styled.HeaderSection>
         <Styled.ContentSectionHeader
-          title="Suggest a new Market"
+          title={stringGetter({ key: STRING_KEYS.SUGGEST_NEW_MARKET })}
           slotRight={
             <IconButton iconName={IconName.Close} onClick={() => navigate(AppRoute.Markets)} />
           }
-          subtitle={isNotTablet && 'Add details in order to launch a new market'}
+          subtitle={isNotTablet && stringGetter({ key: STRING_KEYS.ADD_DETAILS_TO_LAUNCH_MARKET })}
         />
       </Styled.HeaderSection>
       <Styled.Content>
@@ -88,12 +71,14 @@ const NewMarket = () => {
             slotLeft={<Styled.Icon iconName={displaySteps ? IconName.Hide : IconName.HelpCircle} />}
             onClick={() => setDisplaySteps(!displaySteps)}
           >
-            {displaySteps ? 'Hide Steps' : 'Show Steps'}
+            {displaySteps
+              ? stringGetter({ key: STRING_KEYS.HIDE_STEPS })
+              : stringGetter({ key: STRING_KEYS.SHOW_STEPS })}
           </Button>
           {displaySteps && (
             <>
-              <h2>Steps to create a new market</h2>
-              {HOW_TO_ADD_MARKET_TEXT.map((item) => (
+              <h2>{stringGetter({ key: STRING_KEYS.STEPS_TO_CREATE })}</h2>
+              {steps.map((item) => (
                 <StepItem
                   key={item.step}
                   step={item.step}
@@ -103,9 +88,6 @@ const NewMarket = () => {
               ))}
             </>
           )}
-          {/* <>
-            <h2>Proposals</h2>
-          </> */}
         </div>
         <Styled.FormContainer>
           <NewMarketForm />
@@ -120,7 +102,6 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.Page = styled.div`
   ${layoutMixins.contentContainerPage}
   gap: 1.5rem;
-  /* align-items: center; */
 
   > * {
     --content-max-width: 80rem;

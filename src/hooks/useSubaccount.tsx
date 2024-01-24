@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { shallowEqual, useSelector, useDispatch } from 'react-redux';
 import type { Nullable } from '@dydxprotocol/v4-abacus';
 import Long from 'long';
-import { GasPrice, type IndexedTx } from '@cosmjs/stargate';
+import { type IndexedTx } from '@cosmjs/stargate';
 import type { EncodeObject } from '@cosmjs/proto-signing';
 import { Method } from '@cosmjs/tendermint-rpc';
 
@@ -16,7 +16,6 @@ import type {
 } from '@/constants/abacus';
 
 import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
-import { AnalyticsEvent } from '@/constants/analytics';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { DydxAddress } from '@/constants/wallets';
 
@@ -24,10 +23,7 @@ import { setSubaccount, setHistoricalPnl, removeUncommittedOrderClientId } from 
 import { getBalances } from '@/state/accountSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { track } from '@/lib/analytics';
 import { hashFromTx } from '@/lib/hashfromTx';
-import { MustBigNumber } from '@/lib/numbers';
-import { getAddNewMarketGovProposal } from '@/lib/proposeNewMarket';
 import { log } from '@/lib/telemetry';
 
 import { useAccounts } from './useAccounts';
@@ -234,74 +230,6 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     dispatch(setHistoricalPnl([] as unknown as SubAccountHistoricalPNLs));
   }, [dydxAddress]);
 
-  // ------ Submit proposal ------ //
-  const submitNewMarketProposal = useCallback(
-    async ({
-      id,
-      symbol,
-      exponent,
-      minExchanges,
-      minPriceChangePpm,
-      exchangeConfigJson,
-      atomicResolution,
-      defaultFundingPpm = 0,
-      liquidityTier,
-      quantumConversionExponent,
-      stepBaseQuantums,
-      subticksPerTick,
-    }: {
-      id: number;
-      symbol: string;
-      exponent: number;
-      minExchanges: number;
-      minPriceChangePpm: number;
-      exchangeConfigJson: string;
-      atomicResolution: number;
-      defaultFundingPpm?: number;
-      liquidityTier: number;
-      quantumConversionExponent: number;
-      stepBaseQuantums: Long;
-      subticksPerTick: number;
-    }) => {
-      if (!localDydxWallet || !localDydxWallet.address || !compositeClient) {
-        console.error('[useSubaccount/submitNewMarketProposal] Missing wallet or client');
-        return;
-      }
-      const account = compositeClient?.validatorClient.post.account(
-        localDydxWallet.address,
-        undefined
-      );
-
-      const msgs = getAddNewMarketGovProposal({
-        walletAddress: localDydxWallet.address!,
-        id,
-        symbol,
-        exponent,
-        minExchanges,
-        minPriceChangePpm,
-        exchangeConfigJson,
-        atomicResolution,
-        defaultFundingPpm,
-        liquidityTier,
-        quantumConversionExponent,
-        stepBaseQuantums,
-        subticksPerTick,
-      });
-
-      const resp = await compositeClient?.send(
-        localDydxWallet,
-        () => msgs,
-        false,
-        compositeClient.validatorClient.post.defaultDydxGasPrice,
-        undefined,
-        () => account
-      );
-
-      return resp;
-    },
-    [compositeClient, localDydxWallet]
-  );
-
   // ------ Deposit/Withdraw Methods ------ //
   const depositFunds = useCallback(
     async (balance: AccountBalance) => {
@@ -491,6 +419,5 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     cancelOrder,
 
     // Governance Methods
-    submitNewMarketProposal,
   };
 };

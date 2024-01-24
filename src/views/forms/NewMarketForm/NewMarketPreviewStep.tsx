@@ -1,14 +1,15 @@
 import { FormEvent, useMemo, useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { useDispatch } from 'react-redux';
-import Long from 'long';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
-import { EXCHANGE_CONFIGS, LIQUIDITY_TIERS, POTENTIAL_MARKETS } from '@/constants/potentialMarkets';
-import { useAccountBalance, useSubaccount, useTokenConfigs } from '@/hooks';
+import { LIQUIDITY_TIERS, type PotentialMarketItem } from '@/constants/potentialMarkets';
+import { useAccountBalance, useStringGetter, useTokenConfigs } from '@/hooks';
+import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
@@ -22,11 +23,13 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
 import { openDialog } from '@/state/dialogs';
 
+import { log } from '@/lib/telemetry';
+
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 type NewMarketPreviewStepProps = {
-  assetData: (typeof POTENTIAL_MARKETS)[number];
+  assetData: PotentialMarketItem;
   clobPairId: number;
   liquidityTier: string;
   onBack: () => void;
@@ -40,11 +43,12 @@ export const NewMarketPreviewStep = ({
   onBack,
   onSuccess,
 }: NewMarketPreviewStepProps) => {
-  const { submitNewMarketProposal } = useSubaccount();
   const { nativeTokenBalance } = useAccountBalance();
   const dispatch = useDispatch();
+  const stringGetter = useStringGetter();
   const { chainTokenDenom, chainTokenLabel } = useTokenConfigs();
   const [errorMessage, setErrorMessage] = useState();
+  const { exchangeConfigs } = usePotentialMarkets();
 
   const { label, initialMarginFraction, maintenanceMarginFraction, impactNotional } =
     LIQUIDITY_TIERS[liquidityTier as unknown as keyof typeof LIQUIDITY_TIERS];
@@ -59,7 +63,13 @@ export const NewMarketPreviewStep = ({
     if (nativeTokenBalance.lt(10_000)) {
       return {
         type: AlertType.Error,
-        message: 'You need at least 10,000 DYDX to add a market.',
+        message: stringGetter({
+          key: STRING_KEYS.NOT_ENOUGH_BALANCE,
+          params: {
+            NUM_TOKENS_REQUIRED: 10_000,
+            NATIVE_TOKEN_DENOM: chainTokenLabel,
+          },
+        }),
       };
     }
 
@@ -80,25 +90,24 @@ export const NewMarketPreviewStep = ({
         e.preventDefault();
         setErrorMessage(undefined);
         try {
-          const response = await submitNewMarketProposal({
-            id: clobPairId,
-            symbol: assetData.symbol,
-            exponent: Number(assetData.priceExponent),
-            minExchanges: Number(assetData.minExchanges),
-            minPriceChangePpm: Number(assetData.minPriceChange),
-            exchangeConfigJson: JSON.stringify({
-              exchanges: EXCHANGE_CONFIGS[assetData.symbol as keyof typeof EXCHANGE_CONFIGS],
-            }),
-            atomicResolution: Number(assetData.atomicResolution),
-            liquidityTier: Number(liquidityTier),
-            quantumConversionExponent: Number(assetData.quantumConversionExponent),
-            stepBaseQuantums: Long.fromString(assetData.stepBaseQuantums),
-            subticksPerTick: Number(assetData.subticksPerTick),
-          });
-          console.log('response', response);
+          // const response = await submitNewMarketProposal({
+          //   id: clobPairId,
+          //   symbol: assetData.baseAsset,
+          //   exponent: Number(assetData.priceExponent),
+          //   minExchanges: Number(assetData.minExchanges),
+          //   minPriceChangePpm: Number(assetData.minPriceChangePpm),
+          //   exchangeConfigJson: JSON.stringify({
+          //     exchanges: exchangeConfigs?.[assetData.baseAsset],
+          //   }),
+          //   atomicResolution: Number(assetData.atomicResolution),
+          //   liquidityTier: Number(liquidityTier),
+          //   quantumConversionExponent: Number(assetData.quantumConversionExponent),
+          //   stepBaseQuantums: Long.fromString(assetData.stepBaseQuantum),
+          //   subticksPerTick: Number(assetData.subticksPerTick),
+          // });
           onSuccess();
         } catch (error) {
-          console.error('[NewMarketPreviewForm] Error sending proposal', error);
+          log('NewMarketPreviewForm/submitNewMarketProposal', error);
           setErrorMessage(error.message);
         }
       }}
@@ -106,7 +115,7 @@ export const NewMarketPreviewStep = ({
       <h2>
         Confirm new market proposal
         <span>
-          Balance:{' '}
+          {stringGetter({ key: STRING_KEYS.BALANCE })}:{' '}
           <Output
             type={OutputType.Number}
             value={nativeTokenBalance}
@@ -119,9 +128,9 @@ export const NewMarketPreviewStep = ({
       </h2>
       <Styled.FormInput
         disabled
-        label="Market"
+        label={stringGetter({ key: STRING_KEYS.MARKET })}
         type={InputType.Text}
-        value={`${assetData.symbol}-USD`}
+        value={`${assetData.baseAsset}-USD`}
       />
       <Styled.WithDetailsReceipt
         side="bottom"
@@ -129,6 +138,7 @@ export const NewMarketPreviewStep = ({
           {
             key: 'imf',
             label: 'IMF',
+            tooltip: 'initial-margin-fraction',
             value: (
               <Output fractionDigits={2} type={OutputType.Number} value={initialMarginFraction} />
             ),
@@ -136,6 +146,7 @@ export const NewMarketPreviewStep = ({
           {
             key: 'mmf',
             label: 'MMF',
+            tooltip: 'maintenance-margin-fraction',
             value: (
               <Output
                 fractionDigits={2}
@@ -146,12 +157,17 @@ export const NewMarketPreviewStep = ({
           },
           {
             key: 'impact-notional',
-            label: 'Impact Notional',
+            label: stringGetter({ key: STRING_KEYS.IMPACT_NOTIONAL }),
             value: <Output type={OutputType.Fiat} value={impactNotional} />,
           },
         ]}
       >
-        <Styled.FormInput disabled label="Liquidity tier" type={InputType.Text} value={label} />
+        <Styled.FormInput
+          disabled
+          label={stringGetter({ key: STRING_KEYS.LIQUIDITY_TIER })}
+          type={InputType.Text}
+          value={label}
+        />
       </Styled.WithDetailsReceipt>
 
       <Styled.WithDetailsReceipt
@@ -159,7 +175,8 @@ export const NewMarketPreviewStep = ({
         detailItems={[
           {
             key: 'reference-price',
-            label: <span>Reference price</span>,
+            label: stringGetter({ key: STRING_KEYS.REFERENCE_PRICE }),
+            tooltip: 'reference-price',
             value: (
               <Output
                 type={OutputType.Fiat}
@@ -170,7 +187,7 @@ export const NewMarketPreviewStep = ({
           },
           {
             key: 'message-details',
-            label: 'Message details',
+            label: stringGetter({ key: STRING_KEYS.MESSAGE_DETAILS }),
             value: (
               <Button
                 action={ButtonAction.Navigation}
@@ -184,7 +201,7 @@ export const NewMarketPreviewStep = ({
                   )
                 }
               >
-                View Details →
+                {stringGetter({ key: STRING_KEYS.VIEW_DETAILS })} →
               </Button>
             ),
           },
@@ -192,7 +209,7 @@ export const NewMarketPreviewStep = ({
             key: 'required-balance',
             label: (
               <span>
-                Required balance <Tag>{chainTokenLabel}</Tag>
+                {stringGetter({ key: STRING_KEYS.REQUIRED_BALANCE })} <Tag>{chainTokenLabel}</Tag>
               </span>
             ),
             value: (
@@ -212,7 +229,7 @@ export const NewMarketPreviewStep = ({
           },
           {
             key: 'wallet-balance',
-            label: 'Wallet balance',
+            label: stringGetter({ key: STRING_KEYS.WALLET_BALANCE }),
             value: (
               <DiffOutput
                 withDiff
@@ -235,19 +252,15 @@ export const NewMarketPreviewStep = ({
       <Styled.ButtonRow>
         <Button onClick={onBack}>Back</Button>
         <Button type={ButtonType.Submit} action={ButtonAction.Primary} state={{ isDisabled }}>
-          Propose new market
+          {stringGetter({ key: STRING_KEYS.ADD_MARKET_STEP_3_TITLE })}
         </Button>
       </Styled.ButtonRow>
       <Styled.Disclaimer>
-        When you submit a proposal, 10,000 DYDX will be deducted from your wallet. After the
-        governance vote concludes, these tokens will be returned to your wallet, except if the
-        proposal is vetoed.
+        {stringGetter({ key: STRING_KEYS.PROPOSAL_DISCLAIMER })}
       </Styled.Disclaimer>
     </Styled.Form>
   );
 };
-
-
 
 const Styled: Record<string, AnyStyledComponent> = {};
 

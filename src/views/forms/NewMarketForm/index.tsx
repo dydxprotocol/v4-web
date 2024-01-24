@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { POTENTIAL_MARKETS } from '@/constants/potentialMarkets';
+import { type PotentialMarketItem } from '@/constants/potentialMarkets';
 import { useNextClobPairId } from '@/hooks';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
@@ -19,12 +19,11 @@ enum NewMarketFormStep {
 
 export const NewMarketForm = () => {
   const [step, setStep] = useState(NewMarketFormStep.SELECTION);
-  const [assetToAdd, setAssetToAdd] = useState<(typeof POTENTIAL_MARKETS)[number]>();
+  const [assetToAdd, setAssetToAdd] = useState<PotentialMarketItem>();
   const [liquidityTier, setLiquidityTier] = useState<string>();
 
   const clobPairId = useNextClobPairId();
-  const { potentialMarkets, exchangeConfigs, hasPotentialMarketsData } =
-    usePotentialMarkets() ?? {};
+  const { hasPotentialMarketsData } = usePotentialMarkets();
 
   if (!hasPotentialMarketsData) {
     return <Styled.LoadingSpace id="new-market-form" />;
@@ -53,6 +52,7 @@ export const NewMarketForm = () => {
       onConfirmMarket={() => setStep(NewMarketFormStep.PREVIEW)}
       shouldDisableConfirmButton={!assetToAdd || !liquidityTier || !clobPairId}
       assetToAdd={assetToAdd}
+      clobPairId={clobPairId}
       setAssetToAdd={setAssetToAdd}
       liquidityTier={liquidityTier}
       setLiquidityTier={setLiquidityTier}

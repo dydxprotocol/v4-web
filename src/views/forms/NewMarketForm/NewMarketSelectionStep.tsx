@@ -7,9 +7,17 @@ import { OnboardingState } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
-import { EXCHANGE_CONFIGS, LIQUIDITY_TIERS, POTENTIAL_MARKETS } from '@/constants/potentialMarkets';
-import { useAccountBalance, useBreakpoints, useTokenConfigs } from '@/hooks';
+
+import {
+  LIQUIDITY_TIERS,
+  NUM_ORACLES_TO_QUALIFY_AS_SAFE,
+  type PotentialMarketItem,
+} from '@/constants/potentialMarkets';
+
+import { useAccountBalance, useBreakpoints, useStringGetter, useTokenConfigs } from '@/hooks';
+import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
@@ -28,26 +36,28 @@ import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 
+import { breakpoints } from '@/styles';
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
-import { breakpoints } from '@/styles';
 
 type NewMarketSelectionStepProps = {
-   assetToAdd?: (typeof POTENTIAL_MARKETS)[number];
-   setAssetToAdd: (assetToAdd?: (typeof POTENTIAL_MARKETS)[number]) => void;
-   onConfirmMarket: () => void;
-   liquidityTier?: string;
-   setLiquidityTier: (liquidityTier?: string) => void;
-   shouldDisableConfirmButton?: boolean;
+  assetToAdd?: PotentialMarketItem;
+  clobPairId?: number;
+  setAssetToAdd: (assetToAdd?: PotentialMarketItem) => void;
+  onConfirmMarket: () => void;
+  liquidityTier?: string;
+  setLiquidityTier: (liquidityTier?: string) => void;
+  shouldDisableConfirmButton?: boolean;
 };
 
 export const NewMarketSelectionStep = ({
-   assetToAdd,
-   setAssetToAdd,
-   onConfirmMarket,
-   liquidityTier,
-   setLiquidityTier,
-   shouldDisableConfirmButton,
+  assetToAdd,
+  clobPairId,
+  setAssetToAdd,
+  onConfirmMarket,
+  liquidityTier,
+  setLiquidityTier,
+  shouldDisableConfirmButton,
 }: NewMarketSelectionStepProps) => {
   const dispatch = useDispatch();
   const { nativeTokenBalance } = useAccountBalance();
@@ -56,6 +66,8 @@ export const NewMarketSelectionStep = ({
   const { isMobile } = useBreakpoints();
   const marketIds = useSelector(getMarketIds, shallowEqual);
   const { chainTokenLabel } = useTokenConfigs();
+  const { potentialMarkets, exchangeConfigs } = usePotentialMarkets();
+  const stringGetter = useStringGetter();
 
   const [tempLiquidityTier, setTempLiquidityTier] = useState<string>();
   const [canModifyLiqTier, setCanModifyLiqTier] = useState(false);
@@ -64,12 +76,18 @@ export const NewMarketSelectionStep = ({
     if (nativeTokenBalance.lt(10_000)) {
       return {
         type: AlertType.Warning,
-        message: 'You need at least 10,000 DYDX to add a market.',
+        message: stringGetter({
+          key: STRING_KEYS.NOT_ENOUGH_BALANCE,
+          params: {
+            NUM_TOKENS_REQUIRED: 10_000,
+            NATIVE_TOKEN_DENOM: chainTokenLabel,
+          },
+        }),
       };
     }
 
     return null;
-  }, [nativeTokenBalance]);
+  }, [nativeTokenBalance, stringGetter]);
 
   useEffect(() => {
     if (assetToAdd) {
@@ -78,29 +96,14 @@ export const NewMarketSelectionStep = ({
     }
   }, [assetToAdd]);
 
-  const potentialMarkets = useMemo(() => {
-    return POTENTIAL_MARKETS.filter(
-      (potentialMarket) =>
-        potentialMarket.riskAssessment === 'Safe' &&
-        !marketIds.includes(`${potentialMarket.symbol}-USD`) &&
-        EXCHANGE_CONFIGS[potentialMarket.symbol as keyof typeof EXCHANGE_CONFIGS] !== undefined
+  const filteredPotentialMarkets = useMemo(() => {
+    return potentialMarkets?.filter(
+      ({ baseAsset, numOracles }) =>
+        exchangeConfigs?.[baseAsset] !== undefined &&
+        Number(numOracles) > NUM_ORACLES_TO_QUALIFY_AS_SAFE &&
+        !marketIds.includes(`${baseAsset}-USD`)
     );
-  }, [POTENTIAL_MARKETS, marketIds]);
-
-  // Given a ticker, return a unique clob pair id with basic hashing
-  const getNewClobPairId = (ticker: string): number => {
-    let hash = 2166136261n;
-    for (let i = 0; i < ticker.length; i++) {
-      hash ^= BigInt(ticker.charCodeAt(i));
-      hash *= 16777619n;
-    }
-    return Number(hash & 2147483647n);
-  };
-
-  const clobPairId = useMemo(() => {
-    if (!assetToAdd) return undefined;
-    return getNewClobPairId(assetToAdd.symbol);
-  }, [assetToAdd]);
+  }, [exchangeConfigs, potentialMarkets, marketIds]);
 
   const tickSizeDecimal = useMemo(() => {
     if (!assetToAdd) return TOKEN_DECIMALS;
@@ -116,9 +119,9 @@ export const NewMarketSelectionStep = ({
       }}
     >
       <h2>
-        Add Market
+        {stringGetter({ key: STRING_KEYS.ADD_A_MARKET })}
         <span>
-          Balance:{' '}
+          {stringGetter({ key: STRING_KEYS.BALANCE })}:{' '}
           <Output
             type={OutputType.Number}
             value={nativeTokenBalance}
@@ -133,22 +136,23 @@ export const NewMarketSelectionStep = ({
         items={[
           {
             group: 'markets',
-            groupLabel: 'Markets',
-            items: potentialMarkets.map((potentialMarket: (typeof POTENTIAL_MARKETS)[number]) => ({
-              value: potentialMarket.symbol,
-              label: potentialMarket?.assetName ?? potentialMarket.symbol,
-              tag: `${potentialMarket.symbol}-USD`,
-              onSelect: () => {
-                setAssetToAdd(potentialMarket);
-              },
-            })),
+            groupLabel: stringGetter({ key: STRING_KEYS.MARKETS }),
+            items:
+              filteredPotentialMarkets?.map((potentialMarket: PotentialMarketItem) => ({
+                value: potentialMarket.baseAsset,
+                label: potentialMarket?.assetName ?? potentialMarket.baseAsset,
+                tag: `${potentialMarket.baseAsset}-USD`,
+                onSelect: () => {
+                  setAssetToAdd(potentialMarket);
+                },
+              })) ?? [],
           },
         ]}
-        label="Market"
+        label={stringGetter({ key: STRING_KEYS.MARKETS })}
       >
         {assetToAdd ? (
           <Styled.SelectedAsset>
-            {assetToAdd?.assetName ?? assetToAdd.symbol} <Tag>{assetToAdd?.symbol}-USD</Tag>
+            {assetToAdd?.assetName ?? assetToAdd.baseAsset} <Tag>{assetToAdd?.baseAsset}-USD</Tag>
           </Styled.SelectedAsset>
         ) : (
           'e.g. "BTC-USD"'
@@ -160,7 +164,7 @@ export const NewMarketSelectionStep = ({
           <div>
             <Styled.Root value={tempLiquidityTier} onValueChange={setTempLiquidityTier}>
               <Styled.Header>
-                Liquidity tier
+                {stringGetter({ key: STRING_KEYS.LIQUIDITY_TIER })}
                 <Styled.ButtonRow>
                   <Button
                     shape={ButtonShape.Pill}
@@ -172,10 +176,11 @@ export const NewMarketSelectionStep = ({
                     }}
                   >
                     {canModifyLiqTier ? (
-                      'Cancel'
+                      stringGetter({ key: STRING_KEYS.CANCEL })
                     ) : (
                       <>
-                        Modify <Icon iconName={IconName.Pencil} />
+                        {stringGetter({ key: STRING_KEYS.MODIFY })}{' '}
+                        <Icon iconName={IconName.Pencil} />
                       </>
                     )}
                   </Button>
@@ -188,13 +193,13 @@ export const NewMarketSelectionStep = ({
                         setCanModifyLiqTier(false);
                       }}
                     >
-                      Save
+                      {stringGetter({ key: STRING_KEYS.SAVE })}
                     </Button>
                   )}
                 </Styled.ButtonRow>
               </Styled.Header>
 
-              {Object.keys(LIQUIDITY_TIERS).map((tier, idx) => {
+              {Object.keys(LIQUIDITY_TIERS).map((tier) => {
                 const { maintenanceMarginFraction, impactNotional, label, initialMarginFraction } =
                   LIQUIDITY_TIERS[tier as unknown as keyof typeof LIQUIDITY_TIERS];
                 return (
@@ -240,7 +245,7 @@ export const NewMarketSelectionStep = ({
                         },
                         {
                           key: 'impact-notional',
-                          label: 'Impact notional',
+                          label: stringGetter({ key: STRING_KEYS.IMPACT_NOTIONAL }),
                           value: <Output type={OutputType.Fiat} value={impactNotional} />,
                         },
                       ]}
@@ -261,7 +266,7 @@ export const NewMarketSelectionStep = ({
             items={[
               assetToAdd && {
                 key: 'reference-price',
-                label: <span>Reference price</span>,
+                label: stringGetter({ key: STRING_KEYS.REFERENCE_PRICE }),
                 value: (
                   <Output
                     type={OutputType.Fiat}
@@ -272,7 +277,7 @@ export const NewMarketSelectionStep = ({
               },
               assetToAdd && {
                 key: 'message-details',
-                label: <span>Message details</span>,
+                label: stringGetter({ key: STRING_KEYS.MESSAGE_DETAILS }),
                 value: (
                   <Button
                     action={ButtonAction.Navigation}
@@ -286,7 +291,7 @@ export const NewMarketSelectionStep = ({
                       )
                     }
                   >
-                    View Details →
+                    {stringGetter({ key: STRING_KEYS.VIEW_DETAILS })} →
                   </Button>
                 ),
               },
@@ -294,7 +299,8 @@ export const NewMarketSelectionStep = ({
                 key: 'dydx-required',
                 label: (
                   <span>
-                    Required balance <Tag>{chainTokenLabel}</Tag>
+                    {stringGetter({ key: STRING_KEYS.REQUIRED_BALANCE })}{' '}
+                    <Tag>{chainTokenLabel}</Tag>
                   </span>
                 ),
                 value: (
@@ -312,8 +318,12 @@ export const NewMarketSelectionStep = ({
         {isDisconnected ? (
           <OnboardingTriggerButton />
         ) : (
-          <Button type={ButtonType.Submit} state={{ isDisabled: shouldDisableConfirmButton }} action={ButtonAction.Primary}>
-            Preview Market Proposal
+          <Button
+            type={ButtonType.Submit}
+            state={{ isDisabled: shouldDisableConfirmButton }}
+            action={ButtonAction.Primary}
+          >
+            Preview market proposal
           </Button>
         )}
       </WithReceipt>

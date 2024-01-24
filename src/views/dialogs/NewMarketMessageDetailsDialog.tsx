@@ -1,7 +1,10 @@
 import { useMemo, useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { EXCHANGE_CONFIGS, POTENTIAL_MARKETS } from '@/constants/potentialMarkets';
+import { STRING_KEYS } from '@/constants/localization';
+import { PotentialMarketItem } from '@/constants/potentialMarkets';
+import { useStringGetter } from '@/hooks';
+import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
 import { Details } from '@/components/Details';
 import { Dialog } from '@/components/Dialog';
@@ -9,19 +12,12 @@ import { Output, OutputType } from '@/components/Output';
 import { Tag, TagType } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
-import {
-  DEFAULT_DELAY_BLOCK,
-  INITIAL_DEPOSIT_AMOUNT,
-  getSummary,
-  getTitle,
-} from '@/lib/proposeNewMarket';
-
 import { layoutMixins } from '@/styles/layoutMixins';
 
 type ElementProps = {
   preventClose?: boolean;
   setIsOpen?: (open: boolean) => void;
-  assetData?: (typeof POTENTIAL_MARKETS)[number];
+  assetData?: PotentialMarketItem;
   clobPairId?: number;
   liquidityTier?: string;
 };
@@ -42,13 +38,15 @@ export const NewMarketMessageDetailsDialog = ({
   setIsOpen,
 }: ElementProps) => {
   const [codeToggleGroup, setCodeToggleGroup] = useState(CodeToggleGroup.CREATE_ORACLE);
-  const { symbol } = assetData ?? {};
+  const { exchangeConfigs } = usePotentialMarkets();
+  const { baseAsset } = assetData ?? {};
+  const stringGetter = useStringGetter();
 
   const exchangeConfig = useMemo(() => {
-    return symbol ? EXCHANGE_CONFIGS?.[symbol as keyof typeof EXCHANGE_CONFIGS] : undefined;
-  }, [symbol]);
+    return baseAsset ? exchangeConfigs?.[baseAsset] : undefined;
+  }, [baseAsset]);
 
-  const ticker = useMemo(() => `${symbol}-USD`, [symbol]);
+  const ticker = useMemo(() => `${baseAsset}-USD`, [baseAsset]);
 
   const toggleGroupItems: Parameters<typeof ToggleGroup>[0]['items'] = useMemo(() => {
     return [
@@ -80,7 +78,7 @@ export const NewMarketMessageDetailsDialog = ({
       isOpen
       preventClose={preventClose}
       setIsOpen={setIsOpen}
-      title="Message Details - Advanced"
+      title={stringGetter({ key: STRING_KEYS.MESSAGE_DETAILS })}
     >
       <Styled.ProposedMessageDetails>
         <Styled.Tabs
@@ -113,7 +111,7 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'min-price-change-ppm',
                       label: 'min_price_change_ppm',
-                      value: `${assetData?.minPriceChange}`,
+                      value: `${assetData?.minPriceChangePpm}`,
                     },
                   ]}
                 />
@@ -203,7 +201,7 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'step_base_quantums',
                       label: 'step_base_quantums',
-                      value: `${assetData?.stepBaseQuantums}`,
+                      value: `${assetData?.stepBaseQuantum}`,
                     },
                     {
                       key: 'subticks_per_tick',
@@ -227,7 +225,7 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'delay_blocks',
                       label: 'delay_blocks',
-                      value: `${DEFAULT_DELAY_BLOCK}`,
+                      value: `0`, // TODO: DEFAULT_DELAY_BLOCKS
                     },
                   ]}
                 />
@@ -253,7 +251,7 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'step_base_quantums',
                       label: 'step_base_quantums',
-                      value: `${assetData?.stepBaseQuantums}`,
+                      value: `${assetData?.stepBaseQuantum}`,
                     },
                     {
                       key: 'subticks_per_tick',
@@ -272,15 +270,15 @@ export const NewMarketMessageDetailsDialog = ({
             [CodeToggleGroup.MSG_SUBMIT_PROPOSAL]: (
               <Styled.Code>
                 <Styled.Text0>title: </Styled.Text0>
-                <Styled.Description>{getTitle(ticker)}</Styled.Description>
+                <Styled.Description>Title Placeholder</Styled.Description>
 
                 <Styled.Text0>initial_deposit_amount:</Styled.Text0>
                 <Styled.Description>
-                  {<Output type={OutputType.Asset} value={INITIAL_DEPOSIT_AMOUNT / 10 ** 18} />}
+                  {<Output type={OutputType.Asset} value={0} />}
                 </Styled.Description>
 
                 <Styled.Text0>summary: </Styled.Text0>
-                <Styled.Description>{getSummary(ticker, DEFAULT_DELAY_BLOCK)}</Styled.Description>
+                <Styled.Description>Summary Placeholder</Styled.Description>
               </Styled.Code>
             ),
           }[codeToggleGroup]

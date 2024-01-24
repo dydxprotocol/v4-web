@@ -8,6 +8,7 @@ import type {
 } from '@/constants/potentialMarkets';
 
 import csvToArray from '@/lib/csvToArray';
+import { log } from '@/lib/telemetry';
 
 const PotentialMarketsContext = createContext<ReturnType<typeof usePotentialMarketsContext>>({
   potentialMarkets: undefined,
@@ -27,7 +28,7 @@ const EXCHANGE_CONFIG_FILE_PATH = '/configs/potentialMarketExchangeConfig.csv';
 const POTENTIAL_MARKETS_FILE_PATH = '/configs/potentialMarketParameters.csv';
 
 export const usePotentialMarketsContext = () => {
-  const [potentialMarkets, setPotentialMarkets] = useState<Record<string, PotentialMarketItem>>();
+  const [potentialMarkets, setPotentialMarkets] = useState<PotentialMarketItem[]>();
   const [exchangeConfigs, setExchangeConfigs] = useState<Record<string, ExchangeConfigItem[]>>();
 
   useEffect(() => {
@@ -39,53 +40,48 @@ export const usePotentialMarketsContext = () => {
             stringVal: data,
             splitter: ',',
           });
-          const parsedPotentialMarketMap = Object.fromEntries(
-            parsedData.map((item) => {
-              const {
-                base_asset,
-                reference_price,
-                num_oracles,
-                liquidity_tier,
-                asset_name,
-                p,
-                atomic_resolution,
-                min_exchanges,
-                min_price_change_ppm,
-                price_exponent,
-                step_base_quantum,
-                ticksize_exponent,
-                subticks_per_tick,
-                min_order_size,
-                quantum_conversion_exponent,
-              } = item;
-              return [
-                base_asset,
-                {
-                  // convert to camelCase
-                  baseAsset: base_asset,
-                  referencePrice: reference_price,
-                  numOracles: num_oracles,
-                  liquidityTier: liquidity_tier,
-                  assetName: asset_name,
-                  p,
-                  atomicResolution: atomic_resolution,
-                  minExchanges: min_exchanges,
-                  minPriceChangePpm: min_price_change_ppm,
-                  priceExponent: price_exponent,
-                  stepBaseQuantum: step_base_quantum,
-                  ticksizeExponent: ticksize_exponent,
-                  subticksPerTick: subticks_per_tick,
-                  minOrderSize: min_order_size,
-                  quantumConversionExponent: quantum_conversion_exponent,
-                },
-              ];
-            })
-          );
+          const parsedPotentialMarkets = parsedData.map((item) => {
+            const {
+              base_asset,
+              reference_price,
+              num_oracles,
+              liquidity_tier,
+              asset_name,
+              p,
+              atomic_resolution,
+              min_exchanges,
+              min_price_change_ppm,
+              price_exponent,
+              step_base_quantum,
+              ticksize_exponent,
+              subticks_per_tick,
+              min_order_size,
+              quantum_conversion_exponent,
+            } = item;
+            return {
+              // convert to camelCase
+              baseAsset: base_asset,
+              referencePrice: reference_price,
+              numOracles: num_oracles,
+              liquidityTier: liquidity_tier,
+              assetName: asset_name,
+              p,
+              atomicResolution: atomic_resolution,
+              minExchanges: min_exchanges,
+              minPriceChangePpm: min_price_change_ppm,
+              priceExponent: price_exponent,
+              stepBaseQuantum: step_base_quantum,
+              ticksizeExponent: ticksize_exponent,
+              subticksPerTick: subticks_per_tick,
+              minOrderSize: min_order_size,
+              quantumConversionExponent: quantum_conversion_exponent,
+            };
+          });
 
-          setPotentialMarkets(parsedPotentialMarketMap);
+          setPotentialMarkets(parsedPotentialMarkets);
         });
     } catch (error) {
-      console.error('Error in usePotentialMarketsCsv: ', error);
+      log('usePotentialMarkets/potentialMarkets', error);
       setPotentialMarkets(undefined);
     }
 
@@ -127,7 +123,7 @@ export const usePotentialMarketsContext = () => {
           setExchangeConfigs(exchangeConfigMap);
         });
     } catch (error) {
-      console.error('Error in usePotentialMarketsCsv: ', error);
+      log('usePotentialMarkets/exchangeConfigs', error);
       setExchangeConfigs(undefined);
     }
   }, []);
