@@ -36,8 +36,6 @@ import { openDialog } from '@/state/dialogs';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { getHydratedTradingData } from '@/lib/orders';
-import { tableMixins } from '@/styles/tableMixins';
-import { breakpoints } from '@/styles';
 
 const MOBILE_FILLS_PER_PAGE = 50;
 
