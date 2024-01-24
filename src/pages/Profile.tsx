@@ -264,8 +264,8 @@ Styled.ProfileIcon = styled.div`
   border-radius: 50%;
   background: linear-gradient(
     135deg,
-    var(--theme-classic-color-yellow) 0%,
-    var(--theme-classic-color-red) 100%
+    ${({ theme }) => theme.profileYellow} 0%,
+    ${({ theme }) => theme.profileRed} 100%
   );
 `;
 

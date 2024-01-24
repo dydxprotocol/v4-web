@@ -27,12 +27,7 @@ Styled.TooltipContent = styled.aside<{ accentColor?: string }>`
 
   ${popoverMixins.popover}
   --popover-radius: 0.5rem;
-  --popover-background-color: hsl(
-    var(--layer-base-hue),
-    var(--layer-base-saturation),
-    calc(var(--layer-base-lightness)),
-    0.9
-  );
+  --popover-background-color: ${({ theme }) => theme.popoverBackground};
   --popover-backdrop-filter: saturate(120%) blur(12px);
 
   display: grid;
