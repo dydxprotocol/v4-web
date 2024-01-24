@@ -1,7 +1,11 @@
 import { useState } from 'react';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { POTENTIAL_MARKETS } from '@/constants/potentialMarkets';
 import { useNextClobPairId } from '@/hooks';
+import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
 import { NewMarketSelectionStep } from './NewMarketSelectionStep';
 import { NewMarketPreviewStep } from './NewMarketPreviewStep';
@@ -19,6 +23,12 @@ export const NewMarketForm = () => {
   const [liquidityTier, setLiquidityTier] = useState<string>();
 
   const clobPairId = useNextClobPairId();
+  const { potentialMarkets, exchangeConfigs, hasPotentialMarketsData } =
+    usePotentialMarkets() ?? {};
+
+  if (!hasPotentialMarketsData) {
+    return <Styled.LoadingSpace id="new-market-form" />;
+  }
 
   if (NewMarketFormStep.SUCCESS === step) {
     return <NewMarketSuccessStep href="google.com" />;
@@ -49,3 +59,9 @@ export const NewMarketForm = () => {
     />
   );
 };
+
+const Styled: Record<string, AnyStyledComponent> = {};
+
+Styled.LoadingSpace = styled(LoadingSpace)`
+  min-height: 18.75rem;
+`;

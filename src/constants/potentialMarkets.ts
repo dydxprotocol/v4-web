@@ -1,3 +1,60 @@
+export type ExchangeConfigParsedCsv = Array<{
+  base_asset: string;
+  exchange: string;
+  pair: string;
+
+  adjust_by_market: string;
+  min_2_depth: string;
+  avg_30d_vol: string;
+  reference_price: string;
+  risk_assessment: string;
+  num_oracles: string;
+  liquidity_tier: string;
+  asset_name: string;
+}>;
+
+export type ExchangeConfigItem = {
+  exchangeName: string;
+  ticker: string;
+  adjustByMarket?: string;
+};
+
+export type PotentialMarketParsedCsv = Array<{
+  base_asset: string;
+  reference_price: string;
+  num_oracles: string;
+  liquidity_tier: string;
+  asset_name: string;
+  p: string;
+  atomic_resolution: string;
+  min_exchanges: string;
+  min_price_change_ppm: string;
+  price_exponent: string;
+  step_base_quantum: string;
+  ticksize_exponent: string;
+  subticks_per_tick: string;
+  min_order_size: string;
+  quantum_conversion_exponent: string;
+}>;
+
+export type PotentialMarketItem = {
+  baseAsset: string;
+  referencePrice: string;
+  numOracles: string;
+  liquidityTier: string;
+  assetName: string;
+  p: string;
+  atomicResolution: string;
+  minExchanges: string;
+  minPriceChangePpm: string;
+  priceExponent: string;
+  stepBaseQuantum: string;
+  ticksizeExponent: string;
+  subticksPerTick: string;
+  minOrderSize: string;
+  quantumConversionExponent: string;
+};
+
 export const POTENTIAL_MARKETS = [
   {
     symbol: '1INCH',

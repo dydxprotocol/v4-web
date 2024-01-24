@@ -27,6 +27,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { MarketFilter } from './MarketFilter';
+import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
 const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string) => void }) => {
   const [filter, setFilter] = useState(MarketFilters.ALL);
@@ -35,6 +36,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
   const [searchFilter, setSearchFilter] = useState<string>();
   const { filteredMarkets, marketFilters } = useMarketsData(filter, searchFilter);
   const navigate = useNavigate();
+  const { hasPotentialMarketsData } = usePotentialMarkets();
 
   return (
     <>
@@ -137,15 +139,17 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
                 })}
               </h2>
               <p>{stringGetter({ key: STRING_KEYS.MARKET_SEARCH_DOES_NOT_EXIST_YET })}</p>
-               <div>
-                <Button
-                  onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
-                  size={ButtonSize.Small}
-                >
-                  Propose new market
-                  {/* {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })} */}
-                </Button>
-              </div>
+              {hasPotentialMarketsData && (
+                <div>
+                  <Button
+                    onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
+                    size={ButtonSize.Small}
+                  >
+                    Propose new market
+                    {/* {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })} */}
+                  </Button>
+                </div>
+              )}
             </Styled.MarketNotFound>
           }
         />

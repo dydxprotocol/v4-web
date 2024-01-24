@@ -1,0 +1,140 @@
+import { createContext, useContext, useEffect, useState } from 'react';
+
+import type {
+  ExchangeConfigItem,
+  ExchangeConfigParsedCsv,
+  PotentialMarketItem,
+  PotentialMarketParsedCsv,
+} from '@/constants/potentialMarkets';
+
+import csvToArray from '@/lib/csvToArray';
+
+const PotentialMarketsContext = createContext<ReturnType<typeof usePotentialMarketsContext>>({
+  potentialMarkets: undefined,
+  exchangeConfigs: undefined,
+  hasPotentialMarketsData: false,
+});
+
+PotentialMarketsContext.displayName = 'PotentialMarkets';
+
+export const PotentialMarketsProvider = ({ ...props }) => (
+  <PotentialMarketsContext.Provider value={usePotentialMarketsContext()} {...props} />
+);
+
+export const usePotentialMarkets = () => useContext(PotentialMarketsContext);
+
+const EXCHANGE_CONFIG_FILE_PATH = '/configs/potentialMarketExchangeConfig.csv';
+const POTENTIAL_MARKETS_FILE_PATH = '/configs/potentialMarketParameters.csv';
+
+export const usePotentialMarketsContext = () => {
+  const [potentialMarkets, setPotentialMarkets] = useState<Record<string, PotentialMarketItem>>();
+  const [exchangeConfigs, setExchangeConfigs] = useState<Record<string, ExchangeConfigItem[]>>();
+
+  useEffect(() => {
+    try {
+      fetch(POTENTIAL_MARKETS_FILE_PATH)
+        .then((response) => response.text())
+        .then((data) => {
+          const parsedData = csvToArray<PotentialMarketParsedCsv>({
+            stringVal: data,
+            splitter: ',',
+          });
+          const parsedPotentialMarketMap = Object.fromEntries(
+            parsedData.map((item) => {
+              const {
+                base_asset,
+                reference_price,
+                num_oracles,
+                liquidity_tier,
+                asset_name,
+                p,
+                atomic_resolution,
+                min_exchanges,
+                min_price_change_ppm,
+                price_exponent,
+                step_base_quantum,
+                ticksize_exponent,
+                subticks_per_tick,
+                min_order_size,
+                quantum_conversion_exponent,
+              } = item;
+              return [
+                base_asset,
+                {
+                  // convert to camelCase
+                  baseAsset: base_asset,
+                  referencePrice: reference_price,
+                  numOracles: num_oracles,
+                  liquidityTier: liquidity_tier,
+                  assetName: asset_name,
+                  p,
+                  atomicResolution: atomic_resolution,
+                  minExchanges: min_exchanges,
+                  minPriceChangePpm: min_price_change_ppm,
+                  priceExponent: price_exponent,
+                  stepBaseQuantum: step_base_quantum,
+                  ticksizeExponent: ticksize_exponent,
+                  subticksPerTick: subticks_per_tick,
+                  minOrderSize: min_order_size,
+                  quantumConversionExponent: quantum_conversion_exponent,
+                },
+              ];
+            })
+          );
+
+          setPotentialMarkets(parsedPotentialMarketMap);
+        });
+    } catch (error) {
+      console.error('Error in usePotentialMarketsCsv: ', error);
+      setPotentialMarkets(undefined);
+    }
+
+    try {
+      fetch(EXCHANGE_CONFIG_FILE_PATH)
+        .then((response) => response.text())
+        .then((data) => {
+          const parsedData = csvToArray<ExchangeConfigParsedCsv>({
+            stringVal: data,
+            splitter: ',',
+          });
+          // create an object with the base_asset as the key and the value as an array of exchanges
+          const exchangeConfigMap = parsedData.reduce(
+            (acc: Record<string, ExchangeConfigItem[]>, curr) => {
+              const { base_asset, exchange, pair, adjust_by_market } = curr;
+              if (!acc[base_asset]) {
+                acc[base_asset] = [];
+              }
+
+              const exchangeItem: {
+                exchangeName: string;
+                ticker: string;
+                adjustByMarket?: string;
+              } = {
+                exchangeName: exchange,
+                ticker: pair,
+              };
+
+              if (adjust_by_market) {
+                exchangeItem.adjustByMarket = adjust_by_market;
+              }
+
+              acc[base_asset].push(exchangeItem);
+              return acc;
+            },
+            {}
+          );
+
+          setExchangeConfigs(exchangeConfigMap);
+        });
+    } catch (error) {
+      console.error('Error in usePotentialMarketsCsv: ', error);
+      setExchangeConfigs(undefined);
+    }
+  }, []);
+
+  return {
+    potentialMarkets,
+    exchangeConfigs,
+    hasPotentialMarketsData: Boolean(potentialMarkets && exchangeConfigs),
+  };
+};

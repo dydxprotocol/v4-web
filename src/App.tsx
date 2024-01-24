@@ -20,6 +20,7 @@ import { DialogAreaProvider, useDialogArea } from '@/hooks/useDialogArea';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
 import { LocalNotificationsProvider } from '@/hooks/useLocalNotifications';
+import { PotentialMarketsProvider } from '@/hooks/usePotentialMarkets';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
 
@@ -135,6 +136,7 @@ const providers = [
   wrapProvider(LocalNotificationsProvider),
   wrapProvider(NotificationsProvider),
   wrapProvider(DialogAreaProvider),
+  wrapProvider(PotentialMarketsProvider),
 ];
 
 const App = () => {

@@ -8,6 +8,7 @@ import { DialogTypes } from '@/constants/dialogs';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { useBreakpoints, useStringGetter, useURLConfigs } from '@/hooks';
+import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -32,6 +33,7 @@ const RewardsPage = () => {
   const { governanceLearnMore, stakingLearnMore } = useURLConfigs();
   const { isTablet, isNotTablet } = useBreakpoints();
   const navigate = useNavigate();
+  const { hasPotentialMarketsData } = usePotentialMarkets();
 
   const panelArrow = (
     <Styled.Arrow>
@@ -63,20 +65,22 @@ const RewardsPage = () => {
       )}
 
       <Styled.PanelRow>
-        <Styled.Panel
-          slotHeaderContent={
-            <Styled.Title>
-              Add new market <Styled.NewTag>New</Styled.NewTag>
-            </Styled.Title>
-          }
-          slotRight={panelArrow}
-          onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
-        >
-          <Styled.Description>
-            Select a market, confirm details, and launch a governance proposal to add new asset to
-            dYdX Chain. Requires 10,000 unstaked DYDX.
-          </Styled.Description>
-        </Styled.Panel>
+        {hasPotentialMarketsData && (
+          <Styled.Panel
+            slotHeaderContent={
+              <Styled.Title>
+                Add new market <Styled.NewTag>New</Styled.NewTag>
+              </Styled.Title>
+            }
+            slotRight={panelArrow}
+            onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
+          >
+            <Styled.Description>
+              Select a market, confirm details, and launch a governance proposal to add new asset to
+              dYdX Chain. Requires 10,000 unstaked DYDX.
+            </Styled.Description>
+          </Styled.Panel>
+        )}
 
         <Styled.Panel
           slotHeaderContent={
