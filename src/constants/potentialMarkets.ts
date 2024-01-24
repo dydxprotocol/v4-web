@@ -40,19 +40,19 @@ export type PotentialMarketParsedCsv = Array<{
 export type PotentialMarketItem = {
   baseAsset: string;
   referencePrice: string;
-  numOracles: string;
-  liquidityTier: string;
+  numOracles: number;
+  liquidityTier: number;
   assetName: string;
-  p: string;
-  atomicResolution: string;
-  minExchanges: string;
-  minPriceChangePpm: string;
-  priceExponent: string;
-  stepBaseQuantum: string;
-  ticksizeExponent: string;
-  subticksPerTick: string;
-  minOrderSize: string;
-  quantumConversionExponent: string;
+  p: number;
+  atomicResolution: number;
+  minExchanges: number;
+  minPriceChangePpm: number;
+  priceExponent: number;
+  stepBaseQuantum: number;
+  ticksizeExponent: number;
+  subticksPerTick: number;
+  minOrderSize: number;
+  quantumConversionExponent: number;
 };
 
 export const NUM_ORACLES_TO_QUALIFY_AS_SAFE = 6;

@@ -33,8 +33,8 @@ dependencies:
     specifier: ^1.0.13
     version: 1.0.13
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.15
-    version: 1.1.15
+    specifier: ^1.1.16
+    version: 1.1.16
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -1120,7 +1120,7 @@ packages:
       axios: 1.1.3
       bech32: 1.1.4
       bignumber.js: 9.1.1
-      ethereum-cryptography: 2.1.2
+      ethereum-cryptography: 2.1.3
       ethers: 6.6.1
       long: 4.0.0
       protobufjs: 6.11.4
@@ -1131,8 +1131,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.15:
-    resolution: {integrity: sha512-tniPEkz0QY+4C3t3zJvf/Smczx6ikllpIH4rtjOGnUuXrJjkWX7UO/+CHzUsi2jt/6sqDBoabTAcFGm4mov72w==}
+  /@dydxprotocol/v4-localization@1.1.16:
+    resolution: {integrity: sha512-VZ8fdhbi6hloFtio/ZckGwmJR5QTINzPItJ4qf4hS/GLjozwyNQi5QStC6v4jIO1lJmzbUOyCoJnHHuKMyQoZA==}
     dev: false
 
   /@dydxprotocol/v4-proto@3.0.0-dev.0:
@@ -2154,16 +2154,16 @@ packages:
       '@noble/hashes': 1.3.0
     dev: false
 
-  /@noble/curves@1.1.0:
-    resolution: {integrity: sha512-091oBExgENk/kGj3AZmtBDMpxQPDtxQABR2B9lb1JbVTs6ytdzZNwvhxQ4MWasRNEzlbEH8jCWFCwhF/Obj5AA==}
-    dependencies:
-      '@noble/hashes': 1.3.1
-    dev: false
-
   /@noble/curves@1.2.0:
     resolution: {integrity: sha512-oYclrNgRaM9SsBUBVbb8M6DTV7ZHRTKugureoYEncY5c65HOmRzvSiTE3y5CYaPYJA/GVkrhXEoF0M3Ya9PMnw==}
     dependencies:
       '@noble/hashes': 1.3.2
+    dev: false
+
+  /@noble/curves@1.3.0:
+    resolution: {integrity: sha512-t01iSXPuN+Eqzb4eBX0S5oubSqXbK/xXa1Ne18Hj8f9pStxztHCE2gfboSp/dZRLSqfuLpRK2nDXDK+W9puocA==}
+    dependencies:
+      '@noble/hashes': 1.3.3
     dev: false
 
   /@noble/ed25519@1.7.3:
@@ -5031,18 +5031,18 @@ packages:
       '@scure/base': 1.1.1
     dev: false
 
-  /@scure/bip32@1.3.1:
-    resolution: {integrity: sha512-osvveYtyzdEVbt3OfwwXFr4P2iVBL5u1Q3q4ONBfDY/UpOuXmOlbgwc1xECEboY8wIays8Yt6onaWMUdUbfl0A==}
-    dependencies:
-      '@noble/curves': 1.1.0
-      '@noble/hashes': 1.3.3
-      '@scure/base': 1.1.5
-    dev: false
-
   /@scure/bip32@1.3.2:
     resolution: {integrity: sha512-N1ZhksgwD3OBlwTv3R6KFEcPojl/W4ElJOeCZdi+vuI5QmTFwLq3OFf2zd2ROpKvxFdgZ6hUpb0dx9bVNEwYCA==}
     dependencies:
       '@noble/curves': 1.2.0
+      '@noble/hashes': 1.3.3
+      '@scure/base': 1.1.5
+    dev: false
+
+  /@scure/bip32@1.3.3:
+    resolution: {integrity: sha512-LJaN3HwRbfQK0X1xFSi0Q9amqOgzQnnDngIt+ZlsBC3Bm7/nE7K0kwshZHyaru79yIVRv/e1mQAjZyuZG6jOFQ==}
+    dependencies:
+      '@noble/curves': 1.3.0
       '@noble/hashes': 1.3.3
       '@scure/base': 1.1.5
     dev: false
@@ -5056,6 +5056,13 @@ packages:
 
   /@scure/bip39@1.2.1:
     resolution: {integrity: sha512-Z3/Fsz1yr904dduJD0NpiyRHhRYHdcnyh73FZWiV+/qhWi83wNJ3NWolYqCEN+ZWsUz2TWwajJggcRE9r1zUYg==}
+    dependencies:
+      '@noble/hashes': 1.3.3
+      '@scure/base': 1.1.5
+    dev: false
+
+  /@scure/bip39@1.2.2:
+    resolution: {integrity: sha512-HYf9TUXG80beW+hGAt3TRM8wU6pQoYur9iNypTROm42dorCGmLnFe3eWjz3gOq6G62H2WRh0FCzAR1PI+29zIA==}
     dependencies:
       '@noble/hashes': 1.3.3
       '@scure/base': 1.1.5
@@ -9296,13 +9303,13 @@ packages:
       fast-safe-stringify: 2.1.1
     dev: false
 
-  /ethereum-cryptography@2.1.2:
-    resolution: {integrity: sha512-Z5Ba0T0ImZ8fqXrJbpHcbpAvIswRte2wGNR/KePnu8GbbvgJ47lMxT/ZZPG6i9Jaht4azPDop4HaM00J0J59ug==}
+  /ethereum-cryptography@2.1.3:
+    resolution: {integrity: sha512-BlwbIL7/P45W8FGW2r7LGuvoEZ+7PWsniMvQ4p5s2xCyw9tmaDlpfsN9HjAucbF+t/qpVHwZUisgfK24TCW8aA==}
     dependencies:
-      '@noble/curves': 1.1.0
-      '@noble/hashes': 1.3.1
-      '@scure/bip32': 1.3.1
-      '@scure/bip39': 1.2.1
+      '@noble/curves': 1.3.0
+      '@noble/hashes': 1.3.3
+      '@scure/bip32': 1.3.3
+      '@scure/bip39': 1.2.2
     dev: false
 
   /ethers@5.7.2:

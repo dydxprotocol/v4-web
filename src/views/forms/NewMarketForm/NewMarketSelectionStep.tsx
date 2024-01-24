@@ -45,8 +45,8 @@ type NewMarketSelectionStepProps = {
   clobPairId?: number;
   setAssetToAdd: (assetToAdd?: PotentialMarketItem) => void;
   onConfirmMarket: () => void;
-  liquidityTier?: string;
-  setLiquidityTier: (liquidityTier?: string) => void;
+  liquidityTier?: number;
+  setLiquidityTier: (liquidityTier?: number) => void;
   shouldDisableConfirmButton?: boolean;
 };
 
@@ -69,7 +69,7 @@ export const NewMarketSelectionStep = ({
   const { potentialMarkets, exchangeConfigs } = usePotentialMarkets();
   const stringGetter = useStringGetter();
 
-  const [tempLiquidityTier, setTempLiquidityTier] = useState<string>();
+  const [tempLiquidityTier, setTempLiquidityTier] = useState<number>();
   const [canModifyLiqTier, setCanModifyLiqTier] = useState(false);
 
   const alertMessage = useMemo(() => {
@@ -100,7 +100,7 @@ export const NewMarketSelectionStep = ({
     return potentialMarkets?.filter(
       ({ baseAsset, numOracles }) =>
         exchangeConfigs?.[baseAsset] !== undefined &&
-        Number(numOracles) > NUM_ORACLES_TO_QUALIFY_AS_SAFE &&
+        Number(numOracles) >= NUM_ORACLES_TO_QUALIFY_AS_SAFE &&
         !marketIds.includes(`${baseAsset}-USD`)
     );
   }, [exchangeConfigs, potentialMarkets, marketIds]);
@@ -160,7 +160,7 @@ export const NewMarketSelectionStep = ({
       </Styled.SearchSelectMenu>
       {assetToAdd && (
         <>
-          <div>Populated details</div>
+          <div>{stringGetter({ key: STRING_KEYS.POPULATED_DETAILS })}</div>
           <div>
             <Styled.Root value={tempLiquidityTier} onValueChange={setTempLiquidityTier}>
               <Styled.Header>
@@ -205,14 +205,16 @@ export const NewMarketSelectionStep = ({
                 return (
                   <Styled.LiquidityTierRadioButton
                     key={tier}
-                    value={tier}
-                    selected={tier === tempLiquidityTier}
+                    value={Number(tier)}
+                    selected={Number(tier) === tempLiquidityTier}
                     disabled={!canModifyLiqTier}
                   >
                     <Styled.Header style={{ marginLeft: '1rem' }}>
                       {label}
-                      {tier === assetToAdd?.liquidityTier && (
-                        <Tag style={{ marginLeft: '0.5ch' }}>✨ Recommended</Tag>
+                      {Number(tier) === assetToAdd?.liquidityTier && (
+                        <Tag style={{ marginLeft: '0.5ch' }}>
+                          ✨ {stringGetter({ key: STRING_KEYS.RECOMMENDED })}
+                        </Tag>
                       )}
                     </Styled.Header>
                     <Styled.Details
@@ -304,11 +306,16 @@ export const NewMarketSelectionStep = ({
                   </span>
                 ),
                 value: (
-                  <Output
-                    type={OutputType.Number}
-                    value={10000}
-                    slotRight={<Styled.Disclaimer>or more</Styled.Disclaimer>}
-                  />
+                  <Styled.Disclaimer>
+                    {stringGetter({
+                      key: STRING_KEYS.OR_MORE,
+                      params: {
+                        NUMBER: (
+                          <Styled.Output useGrouping type={OutputType.Number} value={10000} />
+                        ),
+                      },
+                    })}
+                  </Styled.Disclaimer>
                 ),
               },
             ].filter(isTruthy)}
@@ -323,7 +330,7 @@ export const NewMarketSelectionStep = ({
             state={{ isDisabled: shouldDisableConfirmButton }}
             action={ButtonAction.Primary}
           >
-            Preview market proposal
+            {stringGetter({ key: STRING_KEYS.PREVIEW_MARKET_PROPOSAL })}
           </Button>
         )}
       </WithReceipt>
@@ -424,4 +431,8 @@ Styled.Details = styled(Details)`
 
 Styled.ReceiptDetails = styled(Details)`
   padding: 0.375rem 0.75rem 0.25rem;
+`;
+
+Styled.Output = styled(Output)`
+  display: inline-block;
 `;

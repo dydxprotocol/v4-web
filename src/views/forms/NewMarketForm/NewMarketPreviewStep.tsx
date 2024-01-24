@@ -31,7 +31,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 type NewMarketPreviewStepProps = {
   assetData: PotentialMarketItem;
   clobPairId: number;
-  liquidityTier: string;
+  liquidityTier: number;
   onBack: () => void;
   onSuccess: () => void;
 };
@@ -250,7 +250,7 @@ export const NewMarketPreviewStep = ({
         <AlertMessage type={alertMessage.type}>{alertMessage.message} </AlertMessage>
       )}
       <Styled.ButtonRow>
-        <Button onClick={onBack}>Back</Button>
+        <Button onClick={onBack}>{stringGetter({ key: STRING_KEYS.BACK })}</Button>
         <Button type={ButtonType.Submit} action={ButtonAction.Primary} state={{ isDisabled }}>
           {stringGetter({ key: STRING_KEYS.ADD_MARKET_STEP_3_TITLE })}
         </Button>

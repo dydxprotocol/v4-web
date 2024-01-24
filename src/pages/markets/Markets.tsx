@@ -32,7 +32,7 @@ const Markets = () => {
           slotRight={
             hasPotentialMarketsData && (
               <Button onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}>
-                Add a Market
+                {stringGetter({ key: STRING_KEYS.ADD_A_MARKET })}
               </Button>
             )
           }

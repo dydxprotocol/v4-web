@@ -9,6 +9,7 @@ import { MarketFilters, type MarketData } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 import { useStringGetter } from '@/hooks';
 import { useMarketsData } from '@/hooks/useMarketsData';
+import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
 import { popoverMixins } from '@/styles/popoverMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -27,7 +28,6 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { MarketFilter } from './MarketFilter';
-import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
 const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string) => void }) => {
   const [filter, setFilter] = useState(MarketFilters.ALL);
@@ -145,8 +145,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
                     onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
                     size={ButtonSize.Small}
                   >
-                    Propose new market
-                    {/* {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })} */}
+                    {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })}
                   </Button>
                 </div>
               )}

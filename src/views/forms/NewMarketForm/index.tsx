@@ -20,7 +20,7 @@ enum NewMarketFormStep {
 export const NewMarketForm = () => {
   const [step, setStep] = useState(NewMarketFormStep.SELECTION);
   const [assetToAdd, setAssetToAdd] = useState<PotentialMarketItem>();
-  const [liquidityTier, setLiquidityTier] = useState<string>();
+  const [liquidityTier, setLiquidityTier] = useState<number>();
 
   const clobPairId = useNextClobPairId();
   const { hasPotentialMarketsData } = usePotentialMarkets();
@@ -50,7 +50,7 @@ export const NewMarketForm = () => {
   return (
     <NewMarketSelectionStep
       onConfirmMarket={() => setStep(NewMarketFormStep.PREVIEW)}
-      shouldDisableConfirmButton={!assetToAdd || !liquidityTier || !clobPairId}
+      shouldDisableConfirmButton={!assetToAdd || liquidityTier === undefined || !clobPairId}
       assetToAdd={assetToAdd}
       clobPairId={clobPairId}
       setAssetToAdd={setAssetToAdd}

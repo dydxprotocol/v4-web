@@ -7,7 +7,7 @@ import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
-import { useBreakpoints, useStringGetter, useURLConfigs } from '@/hooks';
+import { useBreakpoints, useStringGetter, useTokenConfigs, useURLConfigs } from '@/hooks';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
 import { breakpoints } from '@/styles';
@@ -18,14 +18,15 @@ import { Panel } from '@/components/Panel';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Link } from '@/components/Link';
+import { Output, OutputType } from '@/components/Output';
+import { Tag } from '@/components/Tag';
 
 import { openDialog } from '@/state/dialogs';
 
 import { DYDXBalancePanel } from './DYDXBalancePanel';
-import { MigratePanel } from './MigratePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
+import { MigratePanel } from './MigratePanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
-import { Tag } from '@/components/Tag';
 
 const RewardsPage = () => {
   const dispatch = useDispatch();
@@ -34,6 +35,7 @@ const RewardsPage = () => {
   const { isTablet, isNotTablet } = useBreakpoints();
   const navigate = useNavigate();
   const { hasPotentialMarketsData } = usePotentialMarkets();
+  const { chainTokenLabel } = useTokenConfigs();
 
   const panelArrow = (
     <Styled.Arrow>
@@ -69,15 +71,23 @@ const RewardsPage = () => {
           <Styled.Panel
             slotHeaderContent={
               <Styled.Title>
-                Add new market <Styled.NewTag>New</Styled.NewTag>
+                {stringGetter({ key: STRING_KEYS.ADD_A_MARKET })}{' '}
+                <Styled.NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</Styled.NewTag>
               </Styled.Title>
             }
             slotRight={panelArrow}
             onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
           >
             <Styled.Description>
-              Select a market, confirm details, and launch a governance proposal to add new asset to
-              dYdX Chain. Requires 10,000 unstaked DYDX.
+              {stringGetter({
+                key: STRING_KEYS.NEW_MARKET_REWARDS_ENTRY_DESCRIPTION,
+                params: {
+                  REQUIRED_NUM_TOKENS: (
+                    <Styled.Output useGrouping type={OutputType.Number} value={10_000} />
+                  ),
+                  NATIVE_TOKEN_DENOM: chainTokenLabel,
+                },
+              })}
             </Styled.Description>
           </Styled.Panel>
         )}
@@ -199,6 +209,10 @@ Styled.IconButton = styled(IconButton)`
 
 Styled.Arrow = styled.div`
   padding: 1rem;
+`;
+
+Styled.Output = styled(Output)`
+  display: inline-block;
 `;
 
 Styled.NewTag = styled(Tag)`
