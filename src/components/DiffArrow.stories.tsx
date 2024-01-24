@@ -14,7 +14,7 @@ export const DiffArrowStory: Story<DiffArrowProps> = (args) => (
 
 DiffArrowStory.argTypes = {
   direction: {
-    options: ['left', 'right'],
+    options: ['left', 'right', 'up', 'down'],
     control: { type: 'select' },
     defaultValue: 'right',
   },

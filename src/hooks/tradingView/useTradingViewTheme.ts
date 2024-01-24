@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 import type { IChartingLibraryWidget, ThemeName } from 'public/tradingview/charting_library';
 
 import { AppTheme } from '@/state/configs';
-
 import { getAppTheme } from '@/state/configsSelectors';
 
 import { getWidgetOverrides } from '@/lib/tradingView/utils';
@@ -29,7 +28,7 @@ export const useTradingViewTheme = ({
   tvWidget: (IChartingLibraryWidget & { _id?: string; _ready?: boolean }) | null;
   isWidgetReady?: boolean;
 }) => {
-  const appTheme = useSelector(getAppTheme);
+  const appTheme: AppTheme = useSelector(getAppTheme);
 
   useEffect(() => {
     if (tvWidget && isWidgetReady) {

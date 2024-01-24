@@ -16,6 +16,7 @@ import {
 } from '@/hooks';
 import { DydxProvider } from '@/hooks/useDydxClient';
 import { AccountsProvider } from '@/hooks/useAccounts';
+import { AppThemeProvider } from '@/hooks/useAppTheme';
 import { DialogAreaProvider, useDialogArea } from '@/hooks/useDialogArea';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
@@ -36,6 +37,7 @@ import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 import { config } from '@/lib/wagmi';
 
 import { breakpoints } from '@/styles';
+import { GlobalStyle } from '@/styles/globalStyle';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { LoadingSpace } from './components/Loading/LoadingSpinner';
 
@@ -68,52 +70,55 @@ const Content = () => {
   const { chainTokenLabel } = useTokenConfigs();
 
   return (
-    <Styled.Content isShowingHeader={isShowingHeader} isShowingFooter={isShowingFooter}>
-      {isNotTablet && <HeaderDesktop />}
+    <>
+      <GlobalStyle />
+      <Styled.Content isShowingHeader={isShowingHeader} isShowingFooter={isShowingFooter}>
+        {isNotTablet && <HeaderDesktop />}
 
-      <Styled.Main>
-        <Suspense fallback={<LoadingSpace id="main" />}>
-          <Routes>
-            <Route path={AppRoute.Trade}>
-              <Route path=":market" element={<TradePage />} />
-              <Route path={AppRoute.Trade} element={<TradePage />} />
-            </Route>
+        <Styled.Main>
+          <Suspense fallback={<LoadingSpace id="main" />}>
+            <Routes>
+              <Route path={AppRoute.Trade}>
+                <Route path=":market" element={<TradePage />} />
+                <Route path={AppRoute.Trade} element={<TradePage />} />
+              </Route>
 
-            <Route path={AppRoute.Markets}>
-              <Route path={MarketsRoute.New} element={<NewMarket />} />
-              <Route path={AppRoute.Markets} element={<MarketsPage />} />
-            </Route>
-            <Route path={`/${chainTokenLabel}`} element={<RewardsPage />} />
-            {isTablet && (
-              <>
-                <Route path={AppRoute.Alerts} element={<AlertsPage />} />
-                <Route path={AppRoute.Profile} element={<ProfilePage />} />
-                <Route path={`${AppRoute.Settings}/*`} element={<SettingsPage />} />
-              </>
-            )}
+              <Route path={AppRoute.Markets}>
+                <Route path={MarketsRoute.New} element={<NewMarket />} />
+                <Route path={AppRoute.Markets} element={<MarketsPage />} />
+              </Route>
+              <Route path={`/${chainTokenLabel}`} element={<RewardsPage />} />
+              {isTablet && (
+                <>
+                  <Route path={AppRoute.Alerts} element={<AlertsPage />} />
+                  <Route path={AppRoute.Profile} element={<ProfilePage />} />
+                  <Route path={`${AppRoute.Settings}/*`} element={<SettingsPage />} />
+                </>
+              )}
 
-            <Route element={<GuardedMobileRoute />}>
-              <Route path={`${AppRoute.Portfolio}/*`} element={<PortfolioPage />} />
-            </Route>
+              <Route element={<GuardedMobileRoute />}>
+                <Route path={`${AppRoute.Portfolio}/*`} element={<PortfolioPage />} />
+              </Route>
 
-            <Route path={AppRoute.Terms} element={<TermsOfUsePage />} />
-            <Route path={AppRoute.Privacy} element={<PrivacyPolicyPage />} />
+              <Route path={AppRoute.Terms} element={<TermsOfUsePage />} />
+              <Route path={AppRoute.Privacy} element={<PrivacyPolicyPage />} />
 
-            <Route path="*" element={<Navigate to={DEFAULT_TRADE_ROUTE} replace />} />
-          </Routes>
-        </Suspense>
-      </Styled.Main>
+              <Route path="*" element={<Navigate to={DEFAULT_TRADE_ROUTE} replace />} />
+            </Routes>
+          </Suspense>
+        </Styled.Main>
 
-      {isTablet ? <FooterMobile /> : <FooterDesktop />}
+        {isTablet ? <FooterMobile /> : <FooterDesktop />}
 
-      <Styled.NotificationsToastArea />
+        <Styled.NotificationsToastArea />
 
-      <Styled.DialogArea ref={setDialogArea}>
-        <DialogManager />
-      </Styled.DialogArea>
+        <Styled.DialogArea ref={setDialogArea}>
+          <DialogManager />
+        </Styled.DialogArea>
 
-      <GlobalCommandDialog />
-    </Styled.Content>
+        <GlobalCommandDialog />
+      </Styled.Content>
+    </>
   );
 };
 
@@ -137,6 +142,7 @@ const providers = [
   wrapProvider(NotificationsProvider),
   wrapProvider(DialogAreaProvider),
   wrapProvider(PotentialMarketsProvider),
+  wrapProvider(AppThemeProvider),
 ];
 
 const App = () => {

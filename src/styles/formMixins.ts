@@ -21,7 +21,7 @@ export const formMixins: Record<
     --input-radius: 0.5em;
     --input-height: var(--form-input-height);
     --input-width: 100%;
-    --input-backgroundColor: var(--color-layer-4);
+    --input-backgroundColor: ${({ theme }) => theme.inputBackground};
     --input-borderColor: var(--color-layer-6);
 
     ${layoutMixins.row}

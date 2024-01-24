@@ -44,6 +44,7 @@ export const TradeSideToggle = memo(() => {
 const ToggleContainer = styled(ToggleGroup)<{ value: OrderSide }>`
   --toggle-radius: 0.5em;
   --toggle-color: var(--color-negative);
+  --toggle-background: ${({ theme }) => theme.toggleBackground};
 
   ${({ value }) =>
     value === OrderSide.BUY &&
@@ -52,7 +53,7 @@ const ToggleContainer = styled(ToggleGroup)<{ value: OrderSide }>`
     `}
 
   border-radius: var(--toggle-radius);
-  background-color: var(--color-layer-4);
+  background-color: var(--toggle-background);
   position: relative;
 
   > button {
