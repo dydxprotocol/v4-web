@@ -144,60 +144,54 @@ export const CanvasOrderbook = forwardRef(
           )}
 
           <Styled.OrderbookWrapper ref={orderbookRef}>
-            {!hasOrderbook ? (
-              <LoadingSpace id="canvas-orderbook" />
-            ) : (
-              <>
-                <Styled.OrderbookSideContainer $side="asks">
-                  <Styled.HoverRows $bottom>
-                    {asksSlice.map((row: PerpetualMarketOrderbookLevel | undefined, idx) =>
-                      row ? (
-                        <Styled.Row
-                          key={idx}
-                          title={`${row.price}`}
-                          onClick={() => {
-                            onRowAction(row.price);
-                          }}
-                        />
-                      ) : (
-                        <Styled.Row key={idx} />
-                      )
-                    )}
-                  </Styled.HoverRows>
-                  <Styled.OrderbookCanvas ref={asksCanvasRef} width="100%" height="100%" />
-                </Styled.OrderbookSideContainer>
+            <Styled.OrderbookSideContainer $side="asks">
+              <Styled.HoverRows $bottom>
+                {asksSlice.map((row: PerpetualMarketOrderbookLevel | undefined, idx) =>
+                  row ? (
+                    <Styled.Row
+                      key={idx}
+                      title={`${row.price}`}
+                      onClick={() => {
+                        onRowAction(row.price);
+                      }}
+                    />
+                  ) : (
+                    <Styled.Row key={idx} />
+                  )
+                )}
+              </Styled.HoverRows>
+              <Styled.OrderbookCanvas ref={asksCanvasRef} width="100%" height="100%" />
+            </Styled.OrderbookSideContainer>
 
-                <SpreadRow
-                  ref={spreadRowRef}
-                  spread={spread?.toNumber()}
-                  spreadPercent={spreadPercent}
-                  tickSizeDecimals={tickSizeDecimals}
-                />
+            <SpreadRow
+              ref={spreadRowRef}
+              spread={spread?.toNumber()}
+              spreadPercent={spreadPercent}
+              tickSizeDecimals={tickSizeDecimals}
+            />
 
-                <Styled.OrderbookSideContainer $side="bids">
-                  <Styled.HoverRows>
-                    {bidsSlice.map((row: PerpetualMarketOrderbookLevel | undefined, idx) =>
-                      row ? (
-                        <Styled.Row
-                          key={idx}
-                          title={`${row.price}`}
-                          onClick={
-                            row?.price
-                              ? () => {
-                                  onRowAction(row.price);
-                                }
-                              : undefined
-                          }
-                        />
-                      ) : (
-                        <Styled.Row key={idx} />
-                      )
-                    )}
-                  </Styled.HoverRows>
-                  <Styled.OrderbookCanvas ref={bidsCanvasRef} width="100%" height="100%" />
-                </Styled.OrderbookSideContainer>
-              </>
-            )}
+            <Styled.OrderbookSideContainer $side="bids">
+              <Styled.HoverRows>
+                {bidsSlice.map((row: PerpetualMarketOrderbookLevel | undefined, idx) =>
+                  row ? (
+                    <Styled.Row
+                      key={idx}
+                      title={`${row.price}`}
+                      onClick={
+                        row?.price
+                          ? () => {
+                              onRowAction(row.price);
+                            }
+                          : undefined
+                      }
+                    />
+                  ) : (
+                    <Styled.Row key={idx} />
+                  )
+                )}
+              </Styled.HoverRows>
+              <Styled.OrderbookCanvas ref={bidsCanvasRef} width="100%" height="100%" />
+            </Styled.OrderbookSideContainer>
           </Styled.OrderbookWrapper>
           {displaySide === 'bottom' && (
             <Styled.SpreadRow
@@ -208,6 +202,7 @@ export const CanvasOrderbook = forwardRef(
             />
           )}
         </Styled.OrderbookContent>
+        {!hasOrderbook && <LoadingSpace id="canvas-orderbook" />}
       </Styled.OrderbookContainer>
     );
   }
