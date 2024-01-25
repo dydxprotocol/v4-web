@@ -14,6 +14,7 @@ import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 
 import { getLocalStorage } from '@/lib/localStorage';
+import { processOrderbookToCreateMap } from '@/lib/orderbookHelpers';
 
 interface CandleDataByMarket {
   data: Record<string, Candle[]>;
@@ -26,6 +27,13 @@ export interface PerpetualsState {
   liveTrades?: Record<string, MarketTrade[]>;
   markets?: Record<string, PerpetualMarket>;
   orderbooks?: Record<string, MarketOrderbook>;
+  orderbooksMap?: Record<
+    string,
+    {
+      asks: Record<string, number>;
+      bids: Record<string, number>;
+    }
+  >;
   historicalFundings: Record<string, MarketHistoricalFunding[]>;
 }
 
@@ -35,6 +43,7 @@ const initialState: PerpetualsState = {
   liveTrades: {},
   markets: undefined,
   orderbooks: undefined,
+  orderbooksMap: undefined,
   historicalFundings: {},
 };
 
@@ -96,12 +105,24 @@ export const perpetualsSlice = createSlice({
     setOrderbook: (
       state: PerpetualsState,
       action: PayloadAction<{ orderbook?: Nullable<MarketOrderbook>; marketId: string }>
-    ) => ({
-      ...state,
-      orderbooks: merge({}, state.orderbooks, {
+    ) => {
+      state.orderbooks = merge({}, state.orderbooks, {
         [action.payload.marketId]: action.payload.orderbook,
-      }),
-    }),
+      });
+
+      const { newAsks, newBids } = processOrderbookToCreateMap({
+        orderbookMap: state.orderbooksMap?.[action.payload.marketId],
+        newOrderbook: action.payload.orderbook,
+      });
+
+      state.orderbooksMap = {
+        ...(state.orderbooksMap ?? {}),
+        [action.payload.marketId]: {
+          asks: newAsks,
+          bids: newBids,
+        },
+      };
+    },
     setTvChartResolution: (
       state: PerpetualsState,
       action: PayloadAction<{ marketId: string; resolution: string }>

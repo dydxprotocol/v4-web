@@ -163,6 +163,7 @@ Styled.SizeOutput = styled(Output)<StyleProps>`
 Styled.LiveTradesTable = styled(OrderbookTradesTable)<StyleProps>`
   tr {
     --histogram-bucket-size: 1;
+    background-color: var(--color-layer-2);
 
     &[data-side=${OrderSide.BUY}] {
       --accent-color: var(--color-positive);

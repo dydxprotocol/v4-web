@@ -12,7 +12,7 @@ import {
 import { StringGetterFunction } from '@/constants/localization';
 
 import { useBreakpoints } from '@/hooks';
-import { useOrderbookValuesForDepthChart } from '@/hooks/useOrderbookValues';
+import { useOrderbookValuesForDepthChart } from '@/hooks/Orderbook/useOrderbookValues';
 
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
@@ -83,18 +83,8 @@ export const DepthChart = ({
   const { stepSizeDecimals, tickSizeDecimals } =
     useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
 
-  const {
-    bids,
-    asks,
-    lowestBid,
-    highestBid,
-    lowestAsk,
-    highestAsk,
-    midMarketPrice,
-    spread,
-    spreadPercent,
-    orderbook,
-  } = useOrderbookValuesForDepthChart();
+  const { bids, asks, lowestBid, highestBid, lowestAsk, highestAsk, midMarketPrice, orderbook } =
+    useOrderbookValuesForDepthChart();
 
   // Chart state
 
