@@ -10,6 +10,7 @@ import {
   onboarding,
   Network,
   ValidatorConfig,
+  type ProposalStatus,
 } from '@dydxprotocol/v4-client-js';
 
 import type { ResolutionString } from 'public/tradingview/charting_library';
@@ -127,6 +128,25 @@ const useDydxClientContext = () => {
     }
   }, [compositeClient]);
 
+  /**
+   * @param proposalStatus - Optional filter for proposal status. If not provided, all proposals in ProposalStatus.VotingPeriod will be returned.
+   */
+  const requestAllGovernanceProposals = useCallback(
+    async (proposalStatus?: ProposalStatus) => {
+      try {
+        const allGovProposals = await compositeClient?.validatorClient.get.getAllGovProposals(
+          proposalStatus
+        );
+
+        return allGovProposals;
+      } catch (error) {
+        log('useDydxClient/getProposals', error);
+        return undefined;
+      }
+    },
+    [compositeClient]
+  );
+
   const requestCandles = useCallback(
     async ({
       marketId,
@@ -242,6 +262,7 @@ const useDydxClientContext = () => {
 
     // Public Methods
     requestAllPerpetualMarkets,
+    requestAllGovernanceProposals,
     getCandlesForDatafeed,
     screenAddresses,
   };

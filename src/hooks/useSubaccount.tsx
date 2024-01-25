@@ -6,7 +6,12 @@ import { type IndexedTx } from '@cosmjs/stargate';
 import type { EncodeObject } from '@cosmjs/proto-signing';
 import { Method } from '@cosmjs/tendermint-rpc';
 
-import { type LocalWallet, SubaccountClient } from '@dydxprotocol/v4-client-js';
+import {
+  type LocalWallet,
+  SubaccountClient,
+  type GovAddNewMarketParams,
+  utils,
+} from '@dydxprotocol/v4-client-js';
 
 import type {
   AccountBalance,
@@ -29,6 +34,7 @@ import { log } from '@/lib/telemetry';
 import { useAccounts } from './useAccounts';
 import { useTokenConfigs } from './useTokenConfigs';
 import { useDydxClient } from './useDydxClient';
+import { useGovernanceVariables } from './useGovernanceVariables';
 
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
 const SubaccountContext = createContext<SubaccountContextType>({} as SubaccountContextType);
@@ -198,8 +204,8 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
             value: {
               ...transaction.msg,
               timeoutTimestamp: transaction.msg.timeoutTimestamp
-                // Squid returns timeoutTimestamp as Long, but the signer expects BigInt
-                ? BigInt(Long.fromValue(transaction.msg.timeoutTimestamp).toString())
+                ? // Squid returns timeoutTimestamp as Long, but the signer expects BigInt
+                  BigInt(Long.fromValue(transaction.msg.timeoutTimestamp).toString())
                 : undefined,
             },
           };
@@ -409,6 +415,36 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     [subaccountClient]
   );
 
+  const { newMarketProposal } = useGovernanceVariables();
+
+  // ------ Governance Methods ------ //
+  const submitNewMarketProposal = useCallback(
+    async (params: GovAddNewMarketParams) => {
+      try {
+        if (!compositeClient) {
+          throw new Error('client not initialized');
+        } else if (!localDydxWallet) {
+          throw new Error('wallet not initialized');
+        } else if (!newMarketProposal) {
+          throw new Error('governance variables not initialized');
+        }
+
+        const response = await compositeClient?.submitGovAddNewMarketProposal(
+          localDydxWallet,
+          params,
+          utils.getGovAddNewMarketTitle(params.ticker),
+          utils.getGovAddNewMarketSummary(params.ticker, newMarketProposal.delayBlocks),
+          newMarketProposal.initialDepositAmount
+        );
+
+        return response;
+      } catch (error) {
+        log('useSubaccount/submitNewMarketProposal', error);
+      }
+    },
+    [compositeClient, localDydxWallet]
+  );
+
   return {
     // Deposit/Withdraw/Faucet Methods
     deposit,
@@ -425,5 +461,6 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     cancelOrder,
 
     // Governance Methods
+    submitNewMarketProposal,
   };
 };
