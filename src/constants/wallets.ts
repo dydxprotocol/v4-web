@@ -33,6 +33,7 @@ export enum WalletConnectionType {
   CosmosSigner = 'CosmosSigner',
   InjectedEip1193 = 'injectedEip1193',
   WalletConnect2 = 'walletConnect2',
+  TestWallet = 'TestWallet',
 }
 
 export enum WalletErrorType {
@@ -68,6 +69,9 @@ export const walletConnectionTypes: Record<WalletConnectionType, WalletConnectio
   [WalletConnectionType.CosmosSigner]: {
     name: 'CosmosSigner',
   },
+  [WalletConnectionType.TestWallet]: {
+    name: 'TestWallet',
+  },
 };
 
 // Wallets
@@ -88,7 +92,7 @@ export enum WalletType {
   TokenPocket = 'TOKEN_POCKET',
   TrustWallet = 'TRUST_WALLET',
   WalletConnect2 = 'WALLETCONNECT_2',
-  // TestWallet = 'TEST_WALLET',
+  TestWallet = 'TEST_WALLET',
   OtherWallet = 'OTHER_WALLET',
 }
 
@@ -242,6 +246,12 @@ export const wallets: Record<WalletType, WalletConfig> = {
     stringKey: STRING_KEYS.KEPLR,
     icon: KeplrIcon,
     connectionTypes: [WalletConnectionType.CosmosSigner],
+  },
+  [WalletType.TestWallet]: {
+    type: WalletType.TestWallet,
+    stringKey: STRING_KEYS.TEST_WALLET,
+    icon: GenericWalletIcon,
+    connectionTypes: [WalletConnectionType.TestWallet],
   },
 };
 

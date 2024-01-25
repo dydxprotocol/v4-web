@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { EvmDerivedAddresses } from '@/constants/account';
+import { STRING_KEYS } from '@/constants/localization';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
@@ -38,6 +39,7 @@ import { getWalletConnection, parseWalletError } from '@/lib/wallet';
 import { log } from '@/lib/telemetry';
 
 import { useStringGetter } from './useStringGetter';
+import { testFlags } from '@/lib/testFlags';
 
 export const useWalletConnection = () => {
   const stringGetter = useStringGetter();
@@ -138,6 +140,8 @@ export const useWalletConnection = () => {
               walletType: cosmosWalletType,
             });
           }
+        } else if (walletConnection.type === WalletConnectionType.TestWallet) {
+          saveEvmAddress(STRING_KEYS.TEST_WALLET as EvmAddress);
         } else {
           const isAccountConnected = Boolean(
             evmAddress && evmDerivedAddresses[evmAddress]?.encryptedSignature
@@ -223,6 +227,15 @@ export const useWalletConnection = () => {
 
     setSelectedWalletType(walletType);
   };
+
+  // On page load, if testFlag.address is set, connect to the test wallet.
+  useEffect(() => {
+    (async () => {
+      if (testFlags.addressOverride) {
+        setSelectedWalletType(WalletType.TestWallet);
+      }
+    })();
+  }, []);
 
   return {
     // Wallet connection

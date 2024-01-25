@@ -62,6 +62,12 @@ export const getWalletConnection = ({
           type: WalletConnectionType.CosmosSigner,
         };
       }
+
+      case WalletConnectionType.TestWallet: {
+        return {
+          type: WalletConnectionType.TestWallet,
+        };
+      }
     }
   }
 };
