@@ -125,7 +125,7 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   selectionMode = 'single',
   selectionBehavior = 'toggle',
   slotEmpty,
-  initialNumRowsToShow = data.length,
+  initialNumRowsToShow,
   // shouldRowRender,
 
   // collection,
@@ -142,6 +142,7 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
 }: ElementProps<TableRowData, TableRowKey> & StyleProps) => {
   const [selectedKeys, setSelectedKeys] = useState(new Set<TableRowKey>());
   const [numRowsToShow, setNumRowsToShow] = useState(initialNumRowsToShow);
+  const enableViewMore = numRowsToShow !== undefined;
 
   const currentBreakpoints = useBreakpoints();
   const shownColumns = columns.filter(
@@ -217,7 +218,7 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
           }
           numColumns={shownColumns.length}
           onViewMoreClick={
-            numRowsToShow !== undefined && numRowsToShow < data.length
+            enableViewMore && numRowsToShow < data.length
               ? () => setNumRowsToShow(data.length)
               : undefined
           }
@@ -245,7 +246,7 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
             )}
           </TableHeader>
 
-          <TableBody items={list.items.slice(0, numRowsToShow)}>
+          <TableBody items={enableViewMore ? list.items.slice(0, numRowsToShow) : list.items}>
             {(item) => (
               <Row key={getRowKey(item)}>
                 {(columnKey) => (
