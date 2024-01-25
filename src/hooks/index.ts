@@ -7,6 +7,7 @@ import { useDebounce } from './useDebounce';
 import { useInterval } from './useInterval';
 import { useDocumentTitle } from './useDocumentTitle';
 import { useDydxClient } from './useDydxClient';
+import { useGovernanceVariables } from './useGovernanceVariables';
 import { useAccountBalance } from './useAccountBalance';
 import { useAccounts } from './useAccounts';
 import { useAnalytics } from './useAnalytics';
@@ -35,6 +36,7 @@ export {
   useDebounce,
   useDocumentTitle,
   useDydxClient,
+  useGovernanceVariables,
   useAccountBalance,
   useAccounts,
   useAnalytics,
