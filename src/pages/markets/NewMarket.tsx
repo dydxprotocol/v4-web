@@ -5,15 +5,14 @@ import { useNavigate } from 'react-router-dom';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 import { useBreakpoints, useDocumentTitle, useDydxClient, useStringGetter } from '@/hooks';
+import { breakpoints } from '@/styles';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { IconButton } from '@/components/IconButton';
 import { Icon, IconName } from '@/components/Icon';
 import { NewMarketForm } from '@/views/forms/NewMarketForm';
-
-import { layoutMixins } from '@/styles/layoutMixins';
-import { breakpoints } from '@/styles';
 
 const StepItem = ({ step, subtitle, title }: { step: number; subtitle: string; title: string }) => (
   <Styled.StepItem>

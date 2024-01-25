@@ -6,14 +6,13 @@ import { STRING_KEYS } from '@/constants/localization';
 import { PotentialMarketItem } from '@/constants/potentialMarkets';
 import { useGovernanceVariables, useStringGetter } from '@/hooks';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';
 import { Dialog } from '@/components/Dialog';
 import { Output, OutputType } from '@/components/Output';
 import { Tag, TagType } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 type ElementProps = {
   preventClose?: boolean;

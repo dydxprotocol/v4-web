@@ -7,7 +7,6 @@ import {
   MsgCreatePerpetual,
   MsgDelayMessage,
   MsgUpdateClobPair,
-  ProposalStatus,
   TYPE_URL_MSG_CREATE_CLOB_PAIR,
   TYPE_URL_MSG_CREATE_ORACLE_MARKET,
   TYPE_URL_MSG_CREATE_PERPETUAL,
@@ -32,7 +31,7 @@ export const useNextClobPairId = () => {
 
   const { data: allGovProposals, status: allGovProposalsStatus } = useQuery({
     enabled: isConnected,
-    queryKey: 'requestAllGovernanceProposals',
+    queryKey: 'requestAllActiveGovernanceProposals',
     queryFn: () => requestAllGovernanceProposals(),
     refetchInterval: 10_000,
     staleTime: 10_000,
