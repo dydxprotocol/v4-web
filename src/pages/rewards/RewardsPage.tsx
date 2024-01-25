@@ -3,44 +3,28 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { ButtonAction, ButtonSize } from '@/constants/buttons';
-import { DialogTypes } from '@/constants/dialogs';
 import { AppRoute } from '@/constants/routes';
 
-import { useBreakpoints, useStringGetter, useURLConfigs } from '@/hooks';
+import { useBreakpoints, useStringGetter } from '@/hooks';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { BackButton } from '@/components/BackButton';
 import { Panel } from '@/components/Panel';
-import { IconName } from '@/components/Icon';
-import { IconButton } from '@/components/IconButton';
-import { Link } from '@/components/Link';
-
-import { openDialog } from '@/state/dialogs';
 
 import { DYDXBalancePanel } from './DYDXBalancePanel';
 import { MigratePanel } from './MigratePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
+import { GovernancePanel } from './GovernancePanel';
+import { StakingPanel } from './StakingPanel';
 
 const RewardsPage = () => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
-  const { governanceLearnMore, stakingLearnMore } = useURLConfigs();
   const { isTablet, isNotTablet } = useBreakpoints();
   const navigate = useNavigate();
-
-  const panelArrow = (
-    <Styled.Arrow>
-      <Styled.IconButton
-        action={ButtonAction.Base}
-        iconName={IconName.Arrow}
-        size={ButtonSize.Small}
-      />
-    </Styled.Arrow>
-  );
 
   return (
     <Styled.Page>
@@ -61,37 +45,12 @@ const RewardsPage = () => {
         </Styled.PanelRowIncentivesAndBalance>
       )}
 
-      <Styled.PanelRow>
-        <Styled.Panel
-          slotHeaderContent={
-            <Styled.Title>{stringGetter({ key: STRING_KEYS.GOVERNANCE })}</Styled.Title>
-          }
-          slotRight={panelArrow}
-          onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr }))}
-        >
-          <Styled.Description>
-            {stringGetter({ key: STRING_KEYS.GOVERNANCE_DESCRIPTION })}
-            <Link href={governanceLearnMore} onClick={(e) => e.stopPropagation()}>
-              {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
-            </Link>
-          </Styled.Description>
-        </Styled.Panel>
-
-        <Styled.Panel
-          slotHeaderContent={
-            <Styled.Title>{stringGetter({ key: STRING_KEYS.STAKING })}</Styled.Title>
-          }
-          slotRight={panelArrow}
-          onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr }))}
-        >
-          <Styled.Description>
-            {stringGetter({ key: STRING_KEYS.STAKING_DESCRIPTION })}
-            <Link href={stakingLearnMore} onClick={(e) => e.stopPropagation()}>
-              {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
-            </Link>
-          </Styled.Description>
-        </Styled.Panel>
-      </Styled.PanelRow>
+      {isNotTablet && (
+        <Styled.PanelRow>
+          <GovernancePanel />
+          <StakingPanel />
+        </Styled.PanelRow>
+      )}
 
       <RewardsHelpPanel />
     </Styled.Page>
@@ -140,24 +99,6 @@ Styled.Panel = styled(Panel)`
   height: fit-content;
 `;
 
-Styled.Title = styled.h3`
-  font: var(--font-medium-book);
-  color: var(--color-text-2);
-  margin-bottom: -1rem;
-`;
-
-Styled.Description = styled.div`
-  color: var(--color-text-0);
-  --link-color: var(--color-text-1);
-
-  a {
-    display: inline;
-    ::before {
-      content: ' ';
-    }
-  }
-`;
-
 Styled.PanelRow = styled.div`
   ${layoutMixins.gridEqualColumns}
   gap: 1.5rem;
@@ -170,13 +111,4 @@ Styled.PanelRow = styled.div`
 
 Styled.PanelRowIncentivesAndBalance = styled(Styled.PanelRow)`
   grid-template-columns: 2fr 1fr;
-`;
-
-Styled.IconButton = styled(IconButton)`
-  color: var(--color-text-0);
-  --color-border: var(--color-layer-6);
-`;
-
-Styled.Arrow = styled.div`
-  padding: 1rem;
 `;

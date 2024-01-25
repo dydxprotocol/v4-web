@@ -118,11 +118,7 @@ export const TransferForm = ({
     onChangeAsset(selectedAsset);
 
     return () => {
-      abacusStateManager.clearTransferInputValues();
-      abacusStateManager.setTransferValue({
-        field: TransferInputField.type,
-        value: null,
-      });
+      abacusStateManager.resetInputState();
     };
   }, []);
 

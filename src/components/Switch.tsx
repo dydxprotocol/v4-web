@@ -47,7 +47,7 @@ Styled.Root = styled(Root)`
   --switch-thumb-backgroundColor: var(--color-layer-6);
 
   --switch-active-backgroundColor: var(--color-accent);
-  --switch-active-thumb-backgroundColor: var(--color-white);
+  --switch-active-thumb-backgroundColor: ${({ theme }) => theme.switchThumbActiveBackground};
 
   position: relative;
   width: var(--switch-width);

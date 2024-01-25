@@ -5,29 +5,35 @@ import styled from 'styled-components';
 
 import { store } from '@/state/_store';
 
+import { GlobalStyle } from '@/styles/globalStyle';
+
 import { SelectMenu, SelectItem } from '@/components/SelectMenu';
 
+import { AppThemeProvider } from '@/hooks/useAppTheme';
+
+import { AppTheme, setAppTheme } from '@/state/configs';
 import { setLocaleLoaded } from '@/state/localization';
 
 import '@/index.css';
 import './ladle.css';
 
 export const StoryWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState('Default theme');
+  const [theme, setTheme] = useState(AppTheme.Classic);
 
   useEffect(() => {
+    store.dispatch(setAppTheme(theme));
     switch (theme) {
-      case 'Dark theme': {
+      case AppTheme.Dark: {
         document?.documentElement?.classList.remove('theme-light');
         document?.documentElement?.classList.add('theme-dark');
         break;
       }
-      case 'Light theme': {
+      case AppTheme.Light: {
         document?.documentElement?.classList.remove('theme-dark');
         document?.documentElement?.classList.add('theme-light');
         break;
       }
-      default: {
+      case AppTheme.Classic: {
         document?.documentElement?.classList.remove('theme-dark', 'theme-light');
         break;
       }
@@ -48,15 +54,15 @@ export const StoryWrapper: React.FC<{ children: React.ReactNode }> = ({ children
         >
           {[
             {
-              value: 'Default theme',
+              value: AppTheme.Classic,
               label: 'Default theme',
             },
             {
-              value: 'Dark theme',
+              value: AppTheme.Dark,
               label: 'Dark theme',
             },
             {
-              value: 'Light theme',
+              value: AppTheme.Light,
               label: 'Light theme',
             },
           ].map(({ value, label }) => (
@@ -69,8 +75,11 @@ export const StoryWrapper: React.FC<{ children: React.ReactNode }> = ({ children
         </SelectMenu>
       </StoryHeader>
       <hr />
-      <StoryContent>{children}</StoryContent>
-    </Provider>
+      <AppThemeProvider>
+        <GlobalStyle />
+        <StoryContent>{children}</StoryContent>
+      </AppThemeProvider>
+      </Provider>
   );
 };
 

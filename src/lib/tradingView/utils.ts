@@ -1,10 +1,8 @@
-import Color from 'color';
-import isEmpty from 'lodash/isEmpty';
-
 import { Candle, TradingViewBar, TradingViewSymbol } from '@/constants/candles';
-import { Colors } from '@/styles/colors';
 
 import { AppTheme } from '@/state/configs';
+
+import { Themes } from '@/styles/themes';
 
 export const mapCandle = ({
   startedAt,
@@ -49,42 +47,42 @@ export const getHistorySlice = ({
   return bars.filter(({ time }) => time >= fromMs);
 };
 
-export const getWidgetOverrides = (theme: AppTheme) => {
-  const colors = Colors[theme];
+export const getWidgetOverrides = (appTheme: AppTheme) => {
+  const theme = Themes[appTheme];
 
   return {
     overrides: {
-      'paneProperties.background': Color(colors.layer2).hex(),
-      'paneProperties.horzGridProperties.color': Color(colors.layer3).hex(),
-      'paneProperties.vertGridProperties.color': Color(colors.layer3).hex(),
+      'paneProperties.background': theme.layer2,
+      'paneProperties.horzGridProperties.color': theme.layer3,
+      'paneProperties.vertGridProperties.color': theme.layer3,
       'paneProperties.crossHairProperties.style': 1,
       'paneProperties.legendProperties.showBarChange': false,
       'paneProperties.backgroundType': 'solid',
 
       'mainSeriesProperties.style': 1,
-      'mainSeriesProperties.candleStyle.upColor': Color(colors.positive).hex(),
-      'mainSeriesProperties.candleStyle.borderUpColor': Color(colors.positive).hex(),
-      'mainSeriesProperties.candleStyle.wickUpColor': Color(colors.positive).hex(),
-      'mainSeriesProperties.candleStyle.downColor': Color(colors.negative).hex(),
-      'mainSeriesProperties.candleStyle.borderDownColor': Color(colors.negative).hex(),
-      'mainSeriesProperties.candleStyle.wickDownColor': Color(colors.negative).hex(),
+      'mainSeriesProperties.candleStyle.upColor': theme.positive,
+      'mainSeriesProperties.candleStyle.borderUpColor': theme.positive,
+      'mainSeriesProperties.candleStyle.wickUpColor': theme.positive,
+      'mainSeriesProperties.candleStyle.downColor': theme.negative,
+      'mainSeriesProperties.candleStyle.borderDownColor': theme.negative,
+      'mainSeriesProperties.candleStyle.wickDownColor': theme.negative,
       'mainSeriesProperties.statusViewStyle.symbolTextSource': 'ticker',
 
-      'scalesProperties.textColor': Color(colors.text1).hex(),
-      'scalesProperties.backgroundColor': Color(colors.layer2).hex(),
-      'scalesProperties.lineColor': Color(colors.layer3).hex(),
+      'scalesProperties.textColor': theme.textPrimary,
+      'scalesProperties.backgroundColor': theme.layer2,
+      'scalesProperties.lineColor': theme.layer3,
     },
     studies_overrides: {
-      'volume.volume.color.0': Color(colors.negative).hex(),
-      'volume.volume.color.1': Color(colors.positive).hex(),
+      'volume.volume.color.0': theme.negative,
+      'volume.volume.color.1': theme.positive,
       'volume.volume ma.visible': false,
-      'relative strength index.plot.color': Color(colors.accent).hex(),
+      'relative strength index.plot.color': theme.accent,
       'relative strength index.plot.linewidth': 1.5,
       'relative strength index.hlines background.color': '#134A9F',
     },
     loading_screen: {
-      backgroundColor: Color(colors.layer2).hex(),
-      foregroundColor: Color(colors.layer2).hex(),
+      backgroundColor: theme.layer2,
+      foregroundColor: theme.layer2,
     },
   };
 };

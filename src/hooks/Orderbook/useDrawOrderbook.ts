@@ -12,8 +12,6 @@ import {
   ORDERBOOK_WIDTH,
 } from '@/constants/orderbook';
 
-import { Colors } from '@/styles/colors';
-
 import { getCurrentMarketConfig, getCurrentMarketOrderbookMap } from '@/state/perpetualsSelectors';
 import { getAppTheme } from '@/state/configsSelectors';
 
@@ -25,6 +23,7 @@ import {
   getXByColumn,
   getYForElements,
 } from '@/lib/orderbookHelpers';
+import { useAppThemeContext } from '../useAppTheme';
 
 type ElementProps = {
   data: Array<PerpetualMarketOrderbookLevel | undefined>;
@@ -54,8 +53,7 @@ export const useDrawOrderbook = ({
   const { stepSizeDecimals = TOKEN_DECIMALS, tickSizeDecimals = SMALL_USD_DECIMALS } =
     useSelector(getCurrentMarketConfig, shallowEqual) || {};
   const prevData = useRef<typeof data>(data);
-  const theme = useSelector(getAppTheme, shallowEqual);
-  const color = Colors[theme];
+  const theme = useAppThemeContext();
 
   /**
    * Scale canvas using device pixel ratio to unblur drawn text
@@ -192,18 +190,18 @@ export const useDrawOrderbook = ({
 
     switch (animationType) {
       case OrderbookRowAnimationType.REMOVE: {
-        textColor = color.text1;
+        textColor = theme.textSecondary;
         break;
       }
 
       case OrderbookRowAnimationType.NEW: {
-        updatedTextColor = side === 'bid' ? color.positive : color.negative;
-        textColor = color.text2;
+        updatedTextColor = side === 'bid' ? theme.positive : theme.negative;
+        textColor = theme.textPrimary;
         break;
       }
 
       default: {
-        textColor = color.text2;
+        textColor = theme.textPrimary;
         break;
       }
     }
@@ -252,7 +250,7 @@ export const useDrawOrderbook = ({
   }) => {
     if (!rowToRender) return;
     const { depth, mine, price, size } = rowToRender;
-    const histogramAccentColor = side === 'bid' ? color.fadedGreen : color.fadedRed;
+    const histogramAccentColor = side === 'bid' ? theme.positiveFaded : theme.negativeFaded;
 
     // Depth Bar
     if (depth) {

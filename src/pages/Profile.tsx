@@ -5,7 +5,7 @@ import { useEnsName } from 'wagmi';
 import { useNavigate } from 'react-router-dom';
 
 import { ButtonSize } from '@/constants/buttons';
-import { TransferInputField, TransferType } from '@/constants/abacus';
+import { TransferType } from '@/constants/abacus';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -26,12 +26,13 @@ import { useAccounts, useStringGetter, useTokenConfigs } from '@/hooks';
 import { getOnboardingState } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
 
-import abacusStateManager from '@/lib/abacus';
 import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
 
 import { DYDXBalancePanel } from './rewards/DYDXBalancePanel';
 import { MigratePanel } from './rewards/MigratePanel';
+import { GovernancePanel } from './rewards/GovernancePanel';
+import { StakingPanel } from './rewards/StakingPanel';
 
 const ENS_CHAIN_ID = 1; // Ethereum
 
@@ -178,7 +179,7 @@ const Profile = () => {
           onClick={() => dispatch(openDialog({ type: DialogTypes.Help }))}
         />
       </Styled.EqualGrid>
-      
+
       <MigratePanel />
       <DYDXBalancePanel />
 
@@ -230,6 +231,9 @@ const Profile = () => {
           withInnerBorders={false}
         />
       </Styled.TablePanel>
+
+      <GovernancePanel />
+      <StakingPanel />
     </Styled.MobileProfileLayout>
   );
 };
@@ -243,6 +247,7 @@ Styled.MobileProfileLayout = styled.div`
 
   gap: 1rem;
   padding: 1.25rem 0.9rem;
+  max-width: 100vw;
 `;
 
 Styled.Header = styled.header`
@@ -259,8 +264,8 @@ Styled.ProfileIcon = styled.div`
   border-radius: 50%;
   background: linear-gradient(
     135deg,
-    var(--theme-classic-color-yellow) 0%,
-    var(--theme-classic-color-red) 100%
+    ${({ theme }) => theme.profileYellow} 0%,
+    ${({ theme }) => theme.profileRed} 100%
   );
 `;
 
@@ -337,7 +342,7 @@ Styled.Details = styled(Details)`
 
 Styled.RewardsPanel = styled(Panel)`
   align-self: flex-start;
-  
+
   &,
   > * {
     height: 100%;

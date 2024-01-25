@@ -110,12 +110,7 @@ Styled.Abbr = styled.abbr`
 
 Styled.Content = styled(Content)`
   --tooltip-backgroundColor: var(--color-layer-4);
-  --tooltip-backgroundColor: hsl(
-    var(--layer-base-hue),
-    var(--layer-base-saturation),
-    calc(var(--layer-base-lightness) + 4%),
-    0.66
-  );
+  --tooltip-backgroundColor: ${({ theme }) => theme.tooltipBackground};
 
   ${popoverMixins.popover}
   --popover-backgroundColor: var(--tooltip-backgroundColor);

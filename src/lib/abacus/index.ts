@@ -171,6 +171,15 @@ class AbacusStateManager {
     this.setTransferValue({ value: null, field: TransferInputField.usdcSize });
   };
 
+  resetInputState = () => {
+    this.clearTransferInputValues();
+    this.setTransferValue({
+      field: TransferInputField.type,
+      value: null,
+    });
+    this.clearTradeInputValues();
+  };
+
   // ------ Set Data ------ //
   setStore = (store: RootStore) => {
     this.store = store;
@@ -262,11 +271,7 @@ class AbacusStateManager {
   ) => this.stateManager.cancelOrder(orderId, callback);
 
   cctpWithdraw = (
-    callback: (
-      success: boolean,
-      parsingError: Nullable<ParsingError>,
-      data: string,
-    ) => void
+    callback: (success: boolean, parsingError: Nullable<ParsingError>, data: string) => void
   ): void => this.stateManager.commitCCTPWithdraw(callback);
 
   // ------ Utils ------ //

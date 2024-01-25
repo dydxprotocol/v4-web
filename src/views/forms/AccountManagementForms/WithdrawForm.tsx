@@ -101,11 +101,7 @@ export const WithdrawForm = () => {
     });
 
     return () => {
-      abacusStateManager.clearTransferInputValues();
-      abacusStateManager.setTransferValue({
-        field: TransferInputField.type,
-        value: null,
-      });
+      abacusStateManager.resetInputState();
     };
   }, []);
 
