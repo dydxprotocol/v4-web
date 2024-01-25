@@ -282,13 +282,22 @@ export const TRADE_TYPES: Record<
   [AbacusOrderType.takeProfitMarket.rawValue]: TradeTypes.TAKE_PROFIT_MARKET,
 
   [AbacusOrderType.liquidated.name]: null,
-  [AbacusOrderType.liquidation.name]: null,
+  [AbacusOrderType.liquidated.rawValue]: null,
 
   [AbacusOrderType.liquidation.name]: null,
   [AbacusOrderType.liquidation.rawValue]: null,
 
   [AbacusOrderType.trailingStop.name]: null,
   [AbacusOrderType.trailingStop.rawValue]: null,
+
+  [AbacusOrderType.offsetting.name]: null,
+  [AbacusOrderType.offsetting.rawValue]: null,
+
+  [AbacusOrderType.deleveraged.name]: null,
+  [AbacusOrderType.deleveraged.rawValue]: null,
+
+  [AbacusOrderType.finalSettlement.name]: null,
+  [AbacusOrderType.finalSettlement.rawValue]: null,
 };
 
 // Custom types involving Abacus
@@ -307,3 +316,9 @@ export type NetworkConfig = Partial<{
 }>;
 
 export type ConnectNetworkEvent = CustomEvent<Partial<NetworkConfig>>;
+
+export type PerpetualMarketOrderbookLevel = OrderbookLine & {
+  side?: 'ask' | 'bid';
+  mine: number;
+  key: string;
+};

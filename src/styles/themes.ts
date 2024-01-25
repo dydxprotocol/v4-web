@@ -1,5 +1,5 @@
 import { AppTheme } from '@/state/configs';
-import { ThemeColors } from '@/constants/styles/colors';
+import type { ThemeColors } from '@/constants/styles/colors';
 import { ColorToken, OpacityToken } from '@/constants/styles/base';
 import { generateFadedColorVariant } from '@/lib/styles';
 

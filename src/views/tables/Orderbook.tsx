@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { type OrderbookLine, TradeInputField } from '@/constants/abacus';
+import { type OrderbookLine } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { ORDERBOOK_MAX_ROWS_PER_SIDE } from '@/constants/orderbook';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
 
@@ -28,8 +29,6 @@ import { OrderbookTradesOutput, OrderbookTradesTable } from './OrderbookTradesTa
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
-
-const ORDERBOOK_MAX_ROWS_PER_SIDE = 35;
 
 type ElementProps = {
   maxRowsPerSide?: number;
