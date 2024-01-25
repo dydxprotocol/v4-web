@@ -8,6 +8,7 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { isMainnet } from '@/constants/networks';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 
 import {
@@ -16,8 +17,18 @@ import {
   type PotentialMarketItem,
 } from '@/constants/potentialMarkets';
 
-import { useAccountBalance, useBreakpoints, useStringGetter, useTokenConfigs } from '@/hooks';
+import {
+  useAccountBalance,
+  useBreakpoints,
+  useGovernanceVariables,
+  useStringGetter,
+  useTokenConfigs,
+} from '@/hooks';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+
+import { breakpoints } from '@/styles';
+import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
@@ -35,10 +46,7 @@ import { openDialog } from '@/state/dialogs';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
-
-import { breakpoints } from '@/styles';
-import { formMixins } from '@/styles/formMixins';
-import { layoutMixins } from '@/styles/layoutMixins';
+import { MustBigNumber } from '@/lib/numbers';
 
 type NewMarketSelectionStepProps = {
   assetToAdd?: PotentialMarketItem;
@@ -68,18 +76,20 @@ export const NewMarketSelectionStep = ({
   const { chainTokenLabel } = useTokenConfigs();
   const { potentialMarkets, exchangeConfigs } = usePotentialMarkets();
   const stringGetter = useStringGetter();
+  const { newMarketProposal } = useGovernanceVariables();
+  const initialDepositAmount = MustBigNumber(newMarketProposal.initialDepositAmount).div(1e18);
 
   const [tempLiquidityTier, setTempLiquidityTier] = useState<number>();
   const [canModifyLiqTier, setCanModifyLiqTier] = useState(false);
 
   const alertMessage = useMemo(() => {
-    if (nativeTokenBalance.lt(10_000)) {
+    if (nativeTokenBalance.lt(initialDepositAmount)) {
       return {
         type: AlertType.Warning,
         message: stringGetter({
           key: STRING_KEYS.NOT_ENOUGH_BALANCE,
           params: {
-            NUM_TOKENS_REQUIRED: 10_000,
+            NUM_TOKENS_REQUIRED: initialDepositAmount.toString(),
             NATIVE_TOKEN_DENOM: chainTokenLabel,
           },
         }),
@@ -311,7 +321,12 @@ export const NewMarketSelectionStep = ({
                       key: STRING_KEYS.OR_MORE,
                       params: {
                         NUMBER: (
-                          <Styled.Output useGrouping type={OutputType.Number} value={10000} />
+                          <Styled.Output
+                            useGrouping
+                            type={OutputType.Number}
+                            value={initialDepositAmount}
+                            fractionDigits={isMainnet ? 0 : 18}
+                          />
                         ),
                       },
                     })}

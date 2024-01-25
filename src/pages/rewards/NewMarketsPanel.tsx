@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { isMainnet } from '@/constants/networks';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { useStringGetter, useTokenConfigs } from '@/hooks';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+import { useGovernanceVariables } from '@/hooks/useGovernanceVariables';
 
 import { Panel } from '@/components/Panel';
 import { IconName } from '@/components/Icon';
@@ -14,11 +16,15 @@ import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 
+import { MustBigNumber } from '@/lib/numbers';
+
 export const NewMarketsPanel = () => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
   const { hasPotentialMarketsData } = usePotentialMarkets();
   const { chainTokenLabel } = useTokenConfigs();
+  const { newMarketProposal } = useGovernanceVariables();
+  const initialDepositAmount = MustBigNumber(newMarketProposal.initialDepositAmount).div(1e18);
 
   if (!hasPotentialMarketsData) return null;
 
@@ -46,7 +52,12 @@ export const NewMarketsPanel = () => {
           key: STRING_KEYS.NEW_MARKET_REWARDS_ENTRY_DESCRIPTION,
           params: {
             REQUIRED_NUM_TOKENS: (
-              <Styled.Output useGrouping type={OutputType.Number} value={10_000} />
+              <Styled.Output
+                useGrouping
+                type={OutputType.Number}
+                value={initialDepositAmount}
+                fractionDigits={isMainnet ? 0 : 18}
+              />
             ),
             NATIVE_TOKEN_DENOM: chainTokenLabel,
           },

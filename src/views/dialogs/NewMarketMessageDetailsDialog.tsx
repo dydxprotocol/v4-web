@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
+import { utils } from '@dydxprotocol/v4-client-js';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { PotentialMarketItem } from '@/constants/potentialMarkets';
-import { useStringGetter } from '@/hooks';
+import { useGovernanceVariables, useStringGetter } from '@/hooks';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
 import { Details } from '@/components/Details';
@@ -40,6 +41,7 @@ export const NewMarketMessageDetailsDialog = ({
   const [codeToggleGroup, setCodeToggleGroup] = useState(CodeToggleGroup.CREATE_ORACLE);
   const { exchangeConfigs } = usePotentialMarkets();
   const { baseAsset } = assetData ?? {};
+  const { newMarketProposal } = useGovernanceVariables();
   const stringGetter = useStringGetter();
 
   const exchangeConfig = useMemo(() => {
@@ -225,7 +227,13 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'delay_blocks',
                       label: 'delay_blocks',
-                      value: `0`, // TODO: DEFAULT_DELAY_BLOCKS
+                      value: (
+                        <Output
+                          type={OutputType.Asset}
+                          value={newMarketProposal.delayBlocks}
+                          fractionDigits={0}
+                        />
+                      ),
                     },
                   ]}
                 />
@@ -270,15 +278,23 @@ export const NewMarketMessageDetailsDialog = ({
             [CodeToggleGroup.MSG_SUBMIT_PROPOSAL]: (
               <Styled.Code>
                 <Styled.Text0>title: </Styled.Text0>
-                <Styled.Description>Title Placeholder</Styled.Description>
+                <Styled.Description>{utils.getGovAddNewMarketTitle(ticker)}</Styled.Description>
 
                 <Styled.Text0>initial_deposit_amount:</Styled.Text0>
                 <Styled.Description>
-                  {<Output type={OutputType.Asset} value={0} />}
+                  {
+                    <Output
+                      type={OutputType.Asset}
+                      value={newMarketProposal.delayBlocks}
+                      fractionDigits={0}
+                    />
+                  }
                 </Styled.Description>
 
                 <Styled.Text0>summary: </Styled.Text0>
-                <Styled.Description>Summary Placeholder</Styled.Description>
+                <Styled.Description>
+                  {utils.getGovAddNewMarketSummary(ticker, newMarketProposal.delayBlocks)}
+                </Styled.Description>
               </Styled.Code>
             ),
           }[codeToggleGroup]
@@ -319,6 +335,9 @@ Styled.Code = styled.div`
   border-radius: 10px;
   font-family: 'Fira Code', monospace;
   margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 `;
 
 Styled.Line = styled.pre`

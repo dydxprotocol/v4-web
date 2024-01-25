@@ -2,7 +2,7 @@ import { useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { type PotentialMarketItem } from '@/constants/potentialMarkets';
-import { useNextClobPairId } from '@/hooks';
+import { useNextClobPairId, useURLConfigs } from '@/hooks';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
@@ -21,27 +21,32 @@ export const NewMarketForm = () => {
   const [step, setStep] = useState(NewMarketFormStep.SELECTION);
   const [assetToAdd, setAssetToAdd] = useState<PotentialMarketItem>();
   const [liquidityTier, setLiquidityTier] = useState<number>();
+  const [proposalTxHash, setProposalTxHash] = useState<string>();
+  const { mintscan: mintscanTxUrl } = useURLConfigs();
 
-  const clobPairId = useNextClobPairId();
+  const { nextAvailableClobPairId } = useNextClobPairId();
   const { hasPotentialMarketsData } = usePotentialMarkets();
 
-  if (!hasPotentialMarketsData) {
+  if (!hasPotentialMarketsData || !nextAvailableClobPairId) {
     return <Styled.LoadingSpace id="new-market-form" />;
   }
 
-  if (NewMarketFormStep.SUCCESS === step) {
-    return <NewMarketSuccessStep href="google.com" />;
+  if (NewMarketFormStep.SUCCESS === step && proposalTxHash) {
+    return <NewMarketSuccessStep href={mintscanTxUrl.replace('{tx_hash}', proposalTxHash)} />;
   }
 
   if (NewMarketFormStep.PREVIEW === step) {
-    if (assetToAdd && liquidityTier && clobPairId) {
+    if (assetToAdd && liquidityTier && nextAvailableClobPairId) {
       return (
         <NewMarketPreviewStep
           assetData={assetToAdd}
-          clobPairId={clobPairId}
+          clobPairId={nextAvailableClobPairId}
           liquidityTier={liquidityTier}
           onBack={() => setStep(NewMarketFormStep.SELECTION)}
-          onSuccess={() => setStep(NewMarketFormStep.SUCCESS)}
+          onSuccess={(hash: string) => {
+            setProposalTxHash(hash);
+            setStep(NewMarketFormStep.SUCCESS);
+          }}
         />
       );
     }
@@ -50,9 +55,11 @@ export const NewMarketForm = () => {
   return (
     <NewMarketSelectionStep
       onConfirmMarket={() => setStep(NewMarketFormStep.PREVIEW)}
-      shouldDisableConfirmButton={!assetToAdd || liquidityTier === undefined || !clobPairId}
+      shouldDisableConfirmButton={
+        !assetToAdd || liquidityTier === undefined || !nextAvailableClobPairId
+      }
       assetToAdd={assetToAdd}
-      clobPairId={clobPairId}
+      clobPairId={nextAvailableClobPairId}
       setAssetToAdd={setAssetToAdd}
       liquidityTier={liquidityTier}
       setLiquidityTier={setLiquidityTier}

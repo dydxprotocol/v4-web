@@ -1,15 +1,29 @@
 import { FormEvent, useMemo, useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { useDispatch } from 'react-redux';
+import Long from 'long';
+import { encodeJson } from '@dydxprotocol/v4-client-js';
+import type { IndexedTx } from '@cosmjs/stargate';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { isMainnet } from '@/constants/networks';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 import { LIQUIDITY_TIERS, type PotentialMarketItem } from '@/constants/potentialMarkets';
-import { useAccountBalance, useStringGetter, useTokenConfigs } from '@/hooks';
+
+import {
+  useAccountBalance,
+  useGovernanceVariables,
+  useStringGetter,
+  useSubaccount,
+  useTokenConfigs,
+} from '@/hooks';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+
+import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
@@ -23,17 +37,15 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
 import { openDialog } from '@/state/dialogs';
 
+import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
-
-import { formMixins } from '@/styles/formMixins';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 type NewMarketPreviewStepProps = {
   assetData: PotentialMarketItem;
   clobPairId: number;
   liquidityTier: number;
   onBack: () => void;
-  onSuccess: () => void;
+  onSuccess: (hash: string) => void;
 };
 
 export const NewMarketPreviewStep = ({
@@ -49,9 +61,14 @@ export const NewMarketPreviewStep = ({
   const { chainTokenDenom, chainTokenLabel } = useTokenConfigs();
   const [errorMessage, setErrorMessage] = useState();
   const { exchangeConfigs } = usePotentialMarkets();
+  const { submitNewMarketProposal } = useSubaccount();
+  const { newMarketProposal } = useGovernanceVariables();
+  const initialDepositAmount = MustBigNumber(newMarketProposal.initialDepositAmount).div(1e18);
 
   const { label, initialMarginFraction, maintenanceMarginFraction, impactNotional } =
     LIQUIDITY_TIERS[liquidityTier as unknown as keyof typeof LIQUIDITY_TIERS];
+
+  const ticker = `${assetData.baseAsset}-USD`;
 
   const alertMessage = useMemo(() => {
     if (errorMessage) {
@@ -60,13 +77,13 @@ export const NewMarketPreviewStep = ({
         message: errorMessage,
       };
     }
-    if (nativeTokenBalance.lt(10_000)) {
+    if (nativeTokenBalance.lt(initialDepositAmount)) {
       return {
         type: AlertType.Error,
         message: stringGetter({
           key: STRING_KEYS.NOT_ENOUGH_BALANCE,
           params: {
-            NUM_TOKENS_REQUIRED: 10_000,
+            NUM_TOKENS_REQUIRED: initialDepositAmount.toString(),
             NATIVE_TOKEN_DENOM: chainTokenLabel,
           },
         }),
@@ -90,22 +107,36 @@ export const NewMarketPreviewStep = ({
         e.preventDefault();
         setErrorMessage(undefined);
         try {
-          // const response = await submitNewMarketProposal({
-          //   id: clobPairId,
-          //   symbol: assetData.baseAsset,
-          //   exponent: Number(assetData.priceExponent),
-          //   minExchanges: Number(assetData.minExchanges),
-          //   minPriceChangePpm: Number(assetData.minPriceChangePpm),
-          //   exchangeConfigJson: JSON.stringify({
-          //     exchanges: exchangeConfigs?.[assetData.baseAsset],
-          //   }),
-          //   atomicResolution: Number(assetData.atomicResolution),
-          //   liquidityTier: Number(liquidityTier),
-          //   quantumConversionExponent: Number(assetData.quantumConversionExponent),
-          //   stepBaseQuantums: Long.fromString(assetData.stepBaseQuantum),
-          //   subticksPerTick: Number(assetData.subticksPerTick),
-          // });
-          onSuccess();
+          const tx = await submitNewMarketProposal({
+            id: clobPairId,
+            ticker,
+            priceExponent: assetData.priceExponent,
+            minPriceChange: assetData.minPriceChangePpm,
+            minExchanges: assetData.minExchanges,
+            exchangeConfigJson: JSON.stringify({
+              exchanges: exchangeConfigs?.[assetData.baseAsset],
+            }),
+            atomicResolution: assetData.atomicResolution,
+            liquidityTier: liquidityTier,
+            quantumConversionExponent: assetData.quantumConversionExponent,
+            stepBaseQuantums: Long.fromNumber(assetData.stepBaseQuantum),
+            subticksPerTick: assetData.subticksPerTick,
+            delayBlocks: newMarketProposal.delayBlocks,
+          });
+
+          if ((tx as IndexedTx)?.code === 0) {
+            const encodedTx = encodeJson(tx);
+            const parsedTx = JSON.parse(encodedTx);
+            const hash = parsedTx.hash.toUpperCase();
+
+            if (!hash) {
+              throw new Error('Invalid transaction hash');
+            }
+
+            onSuccess(hash);
+          } else {
+            throw new Error('Transaction failed to commit.');
+          }
         } catch (error) {
           log('NewMarketPreviewForm/submitNewMarketProposal', error);
           setErrorMessage(error.message);
@@ -121,7 +152,7 @@ export const NewMarketPreviewStep = ({
             value={nativeTokenBalance}
             fractionDigits={2}
             slotRight={
-              <Tag style={{ marginTop: '0.25rem', marginLeft: '0.5ch' }}>{chainTokenDenom}</Tag>
+              <Tag style={{ marginTop: '0.25rem', marginLeft: '0.5ch' }}>{chainTokenLabel}</Tag>
             }
           />
         </span>
@@ -214,15 +245,21 @@ export const NewMarketPreviewStep = ({
             ),
             value: (
               <Output
-                type={OutputType.Text}
-                value="10,000+"
+                type={OutputType.Number}
+                value={initialDepositAmount.toString()}
+                fractionDigits={isMainnet ? 0 : 18}
                 slotRight={
-                  <Styled.Icon
-                    $hasError={nativeTokenBalance?.lt(10_000)}
-                    iconName={
-                      nativeTokenBalance?.gt(10_000) ? IconName.CheckCircle : IconName.CautionCircle
-                    }
-                  />
+                  <>
+                    {'+ '}
+                    <Styled.Icon
+                      $hasError={nativeTokenBalance?.lt(initialDepositAmount)}
+                      iconName={
+                        nativeTokenBalance?.gt(initialDepositAmount)
+                          ? IconName.CheckCircle
+                          : IconName.CautionCircle
+                      }
+                    />
+                  </>
                 }
               />
             ),
@@ -238,7 +275,7 @@ export const NewMarketPreviewStep = ({
                 fractionDigits={TOKEN_DECIMALS}
                 type={OutputType.Number}
                 value={nativeTokenBalance}
-                newValue={nativeTokenBalance.minus(10_000)}
+                newValue={nativeTokenBalance.minus(initialDepositAmount)}
               />
             ),
           },

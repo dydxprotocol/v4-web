@@ -1,42 +1,123 @@
-import { useQuery } from 'react-query';
-import { useDydxClient } from '@/hooks/useDydxClient';
 import { useMemo } from 'react';
+import { useQuery } from 'react-query';
+
+import {
+  MsgCreateClobPair,
+  MsgCreateOracleMarket,
+  MsgCreatePerpetual,
+  MsgDelayMessage,
+  MsgUpdateClobPair,
+  ProposalStatus,
+  TYPE_URL_MSG_CREATE_CLOB_PAIR,
+  TYPE_URL_MSG_CREATE_ORACLE_MARKET,
+  TYPE_URL_MSG_CREATE_PERPETUAL,
+  TYPE_URL_MSG_DELAY_MESSAGE,
+  TYPE_URL_MSG_UPDATE_CLOB_PAIR,
+} from '@dydxprotocol/v4-client-js';
+
 import type { PerpetualMarketResponse } from '@/constants/indexer';
+import { useDydxClient } from '@/hooks/useDydxClient';
 
 export const useNextClobPairId = () => {
-  const { isConnected, requestAllPerpetualMarkets } = useDydxClient();
+  const { isConnected, requestAllPerpetualMarkets, requestAllGovernanceProposals } =
+    useDydxClient();
 
-  const {
-    data: perpetualMarkets,
-    status,
-    isFetched,
-    isFetching,
-    isLoading,
-    isError,
-  } = useQuery({
+  const { data: perpetualMarkets, status: perpetualMarketsStatus } = useQuery({
     enabled: isConnected,
-    queryKey: 'PERPETUAL_MARKETS_QUERY',
+    queryKey: 'requestAllPerpetualMarkets',
     queryFn: requestAllPerpetualMarkets,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
     refetchInterval: 60_000,
     staleTime: 60_000,
   });
 
+  const { data: allGovProposals, status: allGovProposalsStatus } = useQuery({
+    enabled: isConnected,
+    queryKey: 'requestAllGovernanceProposals',
+    queryFn: () => requestAllGovernanceProposals(),
+    refetchInterval: 10_000,
+    staleTime: 10_000,
+  });
+
+  /**
+   *
+   * @param message from proposal. Each message is wrapped in a type any (on purpose).
+   * @param callback method used to compile all clobPairIds, perpetualIds, marketIds, etc.
+   */
+  const decodeMsgForClobPairId = (message: any, callback: (id?: number) => void): any => {
+    switch (message.typeUrl) {
+      case TYPE_URL_MSG_CREATE_ORACLE_MARKET: {
+        const { value } = message;
+        const decodedValue = MsgCreateOracleMarket.decode(value);
+        callback(decodedValue.params?.id);
+        break;
+      }
+      case TYPE_URL_MSG_CREATE_PERPETUAL: {
+        const { value } = message;
+        const decodedValue = MsgCreatePerpetual.decode(value);
+        callback(decodedValue.params?.id);
+        callback(decodedValue.params?.marketId);
+        break;
+      }
+      case TYPE_URL_MSG_CREATE_CLOB_PAIR: {
+        const { value } = message;
+        const decodedValue = MsgCreateClobPair.decode(value);
+        callback(decodedValue.clobPair?.id);
+        callback(decodedValue.clobPair?.perpetualClobMetadata?.perpetualId);
+        break;
+      }
+      case TYPE_URL_MSG_UPDATE_CLOB_PAIR: {
+        const { value } = message;
+        const decodedValue = MsgUpdateClobPair.decode(value);
+        callback(decodedValue.clobPair?.id);
+        callback(decodedValue.clobPair?.perpetualClobMetadata?.perpetualId);
+        break;
+      }
+      case TYPE_URL_MSG_DELAY_MESSAGE: {
+        const { value } = message;
+        const decodedValue = MsgDelayMessage.decode(value);
+        decodeMsgForClobPairId(decodedValue.msg, callback);
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  };
+
   const nextAvailableClobPairId = useMemo(() => {
+    const idsFromProposals: number[] = [];
+
+    if (allGovProposals && Object.values(allGovProposals.proposals).length > 0) {
+      const proposals = allGovProposals.proposals;
+      proposals.forEach((proposal) => {
+        if (proposal.messages) {
+          proposal.messages.map((message) => {
+            decodeMsgForClobPairId(message, (id?: number) => {
+              if (id) {
+                idsFromProposals.push(id);
+              }
+            });
+          });
+        }
+      });
+    }
+
     if (perpetualMarkets && Object.values(perpetualMarkets).length > 0) {
       const clobPairIds = Object.values(perpetualMarkets)?.map((perpetualMarket) =>
         Number((perpetualMarket as PerpetualMarketResponse).clobPairId)
       );
-      const nextAvailableClobPairId = Math.max(...clobPairIds) + 1;
+
+      const nextAvailableClobPairId = Math.max(...[...clobPairIds, ...idsFromProposals]) + 1;
+      console.log({ nextAvailableClobPairId, clobPairIds, idsFromProposals });
       return nextAvailableClobPairId;
     }
 
     return undefined;
-  }, [perpetualMarkets]);
+  }, [perpetualMarkets, allGovProposals]);
 
-  console.log(perpetualMarkets, nextAvailableClobPairId);
-
-  return nextAvailableClobPairId;
+  return {
+    allGovProposalsStatus,
+    perpetualMarketsStatus,
+    nextAvailableClobPairId,
+  };
 };
