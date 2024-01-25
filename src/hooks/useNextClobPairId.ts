@@ -108,7 +108,6 @@ export const useNextClobPairId = () => {
       );
 
       const nextAvailableClobPairId = Math.max(...[...clobPairIds, ...idsFromProposals]) + 1;
-      console.log({ nextAvailableClobPairId, clobPairIds, idsFromProposals });
       return nextAvailableClobPairId;
     }
 
