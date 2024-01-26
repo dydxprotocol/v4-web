@@ -9,6 +9,7 @@ import { getActiveDialog } from '@/state/dialogsSelectors';
 import { ClosePositionDialog } from '@/views/dialogs/ClosePositionDialog';
 import { DepositDialog } from '@/views/dialogs/DepositDialog';
 import { DisconnectDialog } from '@/views/dialogs/DisconnectDialog';
+import { DisplaySettingsDialog } from '@/views/dialogs/DisplaySettingsDialog';
 import { ExchangeOfflineDialog } from '@/views/dialogs/ExchangeOfflineDialog';
 import { HelpDialog } from '@/views/dialogs/HelpDialog';
 import { ExternalLinkDialog } from '@/views/dialogs/ExternalLinkDialog';
@@ -51,6 +52,7 @@ export const DialogManager = () => {
   return {
     [DialogTypes.ClosePosition]: <ClosePositionDialog {...modalProps} />,
     [DialogTypes.Deposit]: <DepositDialog {...modalProps} />,
+    [DialogTypes.DisplaySettings]: <DisplaySettingsDialog {...modalProps} />,
     [DialogTypes.DisconnectWallet]: <DisconnectDialog {...modalProps} />,
     [DialogTypes.ExchangeOffline]: <ExchangeOfflineDialog {...modalProps} />,
     [DialogTypes.FillDetails]: <FillDetailsDialog {...modalProps} />,

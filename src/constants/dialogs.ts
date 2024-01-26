@@ -2,6 +2,7 @@ export enum DialogTypes {
   ClosePosition = 'ClosePosition',
   Deposit = 'Deposit',
   DisconnectWallet = 'DisconnectWallet',
+  DisplaySettings = 'DisplaySettings',
   ExchangeOffline = 'ExchangeOffline',
   ExternalLink = 'ExternalLink',
   FillDetails = 'FillDetails',
