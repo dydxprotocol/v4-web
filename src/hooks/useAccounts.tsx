@@ -8,7 +8,13 @@ import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/co
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { LocalStorageKey, LOCAL_STORAGE_VERSIONS } from '@/constants/localStorage';
-import { DydxAddress, EvmAddress, PrivateInformation, WalletType } from '@/constants/wallets';
+import {
+  DydxAddress,
+  EvmAddress,
+  PrivateInformation,
+  TEST_WALLET_EVM_ADDRESS,
+  WalletType,
+} from '@/constants/wallets';
 
 import { setOnboardingState, setOnboardingGuard } from '@/state/account';
 import { forceOpenDialog } from '@/state/dialogs';
@@ -183,17 +189,16 @@ const useAccountsContext = () => {
       if (walletType === WalletType.TestWallet) {
         // Get override values. Use the testFlags value if it exists, otherwise use the previously
         // saved value where possible. If neither exist, use a default garbage value.
-        const evmAddressOverride: EvmAddress = STRING_KEYS.TEST_WALLET as unknown as EvmAddress;
-        const addressOverride: string = testFlags.addressOverride ||
-          evmDerivedAddresses?.[evmAddressOverride]?.dydxAddress ||
+        const addressOverride: DydxAddress = testFlags.addressOverride as DydxAddress ||
+          evmDerivedAddresses?.[TEST_WALLET_EVM_ADDRESS]?.dydxAddress as DydxAddress ||
           'dydx1';
 
         dispatch(setOnboardingState(OnboardingState.WalletConnected));
 
         // Set variables.
         saveEvmDerivedAccount({
-          evmAddress: evmAddressOverride,
-          dydxAddress: addressOverride as `dydx${string}`,
+          evmAddress: TEST_WALLET_EVM_ADDRESS,
+          dydxAddress: addressOverride,
         });
         const wallet = new LocalWallet();
         wallet.address = addressOverride;

@@ -364,3 +364,5 @@ export enum DydxChainAsset {
   USDC = 'usdc',
   CHAINTOKEN = 'chain',
 }
+
+export const TEST_WALLET_EVM_ADDRESS: EvmAddress = '0x0000000000000000000000000000000000000000';
