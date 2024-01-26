@@ -36,7 +36,10 @@ export const AdvancedTradeOptions = () => {
 
   const { duration, unit } = goodTil || {};
 
-  const needsExecution = executionOptions || needsPostOnly || needsReduceOnly;
+  const showPostOnly = (needsPostOnly || postOnlyTooltip);
+  const showReduceOnly = (needsReduceOnly || reduceOnlyTooltip);
+
+  const needsExecution = executionOptions || showPostOnly || showReduceOnly;
   const hasTimeInForce = timeInForceOptions?.toArray()?.length;
 
   return (
@@ -129,7 +132,7 @@ export const AdvancedTradeOptions = () => {
                 ))}
               </Styled.SelectMenu>
             )}
-            {(needsReduceOnly || reduceOnlyTooltip) && <Checkbox
+            {showReduceOnly && <Checkbox
                 checked={(reduceOnly && !reduceOnlyTooltip) || false}
                 disabled={!!reduceOnlyTooltip}
                 onCheckedChange={(checked) =>
@@ -146,7 +149,7 @@ export const AdvancedTradeOptions = () => {
                 }
               />
             }
-            {(needsPostOnly || postOnlyTooltip) && (
+            {showPostOnly && (
               <Checkbox
                 checked={(postOnly && !postOnlyTooltip) || false}
                 disabled={!!postOnlyTooltip}

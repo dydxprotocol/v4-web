@@ -10,7 +10,6 @@ import {
   type HumanReadablePlaceOrderPayload,
   type Nullable,
   TradeInputErrorAction,
-  TradeInputField,
   ValidationError,
 } from '@/constants/abacus';
 
@@ -96,6 +95,8 @@ export const TradeForm = ({
     needsGoodUntil,
     needsPostOnly,
     needsReduceOnly,
+    postOnlyTooltip,
+    reduceOnlyTooltip,
     timeInForceOptions,
     tradeErrors,
   } = useTradeFormData();
@@ -108,7 +109,7 @@ export const TradeForm = ({
   const { limitPriceInput, triggerPriceInput, trailingPercentInput } = tradeFormInputValues;
 
   const needsAdvancedOptions =
-    needsGoodUntil || timeInForceOptions || executionOptions || needsPostOnly || needsReduceOnly;
+    needsGoodUntil || timeInForceOptions || executionOptions || (needsPostOnly || postOnlyTooltip) || (needsReduceOnly || reduceOnlyTooltip);
 
   const tradeFormInputs: TradeBoxInputConfig[] = [];
 
