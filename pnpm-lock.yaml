@@ -27,8 +27,13 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
+<<<<<<< HEAD
     specifier: ^1.3.2
     version: 1.3.2
+=======
+    specifier: ^1.3.1
+    version: 1.3.1
+>>>>>>> c776db0 (bump packages)
   '@dydxprotocol/v4-client-js':
     specifier: ^1.0.17
     version: 1.0.17
@@ -1086,8 +1091,13 @@ packages:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
 
+<<<<<<< HEAD
   /@dydxprotocol/v4-abacus@1.3.2:
     resolution: {integrity: sha512-zo0IHjGMlJRKOYDgNqNFQ9GtBJKJP4+Y9YY7V0X3Wt61ppKAYzodaYQhc9V/RYchcZTtS/xkicLug444YrvehQ==}
+=======
+  /@dydxprotocol/v4-abacus@1.3.1:
+    resolution: {integrity: sha512-TUh+oySuHLDNf7/GucuautVSe12ebDvqCVq8bl6nntzCY3wuNIQ6eh+eL26BxGjv3Qm8VzXss3uxRtQoH9OA9Q==}
+>>>>>>> c776db0 (bump packages)
     dev: false
 
   /@dydxprotocol/v4-client-js@1.0.17:
