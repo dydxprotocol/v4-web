@@ -4,6 +4,8 @@ import { shallowEqual, useSelector } from 'react-redux';
 import { TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { isTruthy } from '@/lib/isTruthy';
+import { testFlags } from '@/lib/testFlags';
+
 import { useStringGetter } from '@/hooks';
 
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
@@ -60,7 +62,7 @@ export const SourceSelectMenu = ({
   return (
     <SearchSelectMenu
       items={[
-        exchangeItems.length > 0 && {
+        exchangeItems.length > 0 && testFlags.showCEXDepositOption && {
           group: 'exchanges',
           groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
           items: exchangeItems,
