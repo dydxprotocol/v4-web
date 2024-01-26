@@ -27,14 +27,14 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: ^1.2.5
-    version: 1.2.5
+    specifier: ^1.2.8
+    version: 1.2.8
   '@dydxprotocol/v4-client-js':
     specifier: ^1.0.17
     version: 1.0.17
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.11
-    version: 1.1.11
+    specifier: ^1.1.15
+    version: 1.1.15
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -1086,8 +1086,8 @@ packages:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.2.5:
-    resolution: {integrity: sha512-pB3Fv1bzJRUDp29kAN61daZ34gTSGrSTNh+/AP3TUB63/Q/gaXQVBf91xVcso4Hw23xM3FwIcrRK0cvOSWgXKg==}
+  /@dydxprotocol/v4-abacus@1.2.8:
+    resolution: {integrity: sha512-rW+9r3cymCFn054Spbw91CXprMpnP6f5C/lSNQ1ptoer5r6FlTUa1tu1+j3YaNSkazqigifK+Eu0IwDmvAS28w==}
     dev: false
 
   /@dydxprotocol/v4-client-js@1.0.17:
@@ -1119,8 +1119,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.11:
-    resolution: {integrity: sha512-ZHnyrWD1bEpvY1tctkcmSV6A5+hQSYBFwyjbiyOqepqDqrv24J5a3hlZU94lDyYf+7Sdk3alOvy9Z7Lpk59nvw==}
+  /@dydxprotocol/v4-localization@1.1.15:
+    resolution: {integrity: sha512-tniPEkz0QY+4C3t3zJvf/Smczx6ikllpIH4rtjOGnUuXrJjkWX7UO/+CHzUsi2jt/6sqDBoabTAcFGm4mov72w==}
     dev: false
 
   /@dydxprotocol/v4-proto@3.0.0-dev.0:
