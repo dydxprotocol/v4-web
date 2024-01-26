@@ -22,6 +22,10 @@ class TestFlags {
   get showMobileSignInOption() {
     return !!this.queryParams.mobilesignin;
   }
+
+  get addressOverride():string {
+    return this.queryParams.address;
+  }
 }
 
 export const testFlags = new TestFlags();
