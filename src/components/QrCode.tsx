@@ -11,6 +11,7 @@ type ElementProps = {
 };
 
 type StyleProps = {
+  className?: string;
   hasLogo?: boolean;
   size?: number;
 };
@@ -18,7 +19,7 @@ type StyleProps = {
 const DARK_LOGO_MARK_URL = '/logos/logo-mark-dark.svg';
 const LIGHT_LOGO_MARK_URL = '/logos/logo-mark-light.svg';
 
-export const QrCode = ({ value, hasLogo, size = 300 }: ElementProps & StyleProps) => {
+export const QrCode = ({ className, value, hasLogo, size = 300 }: ElementProps & StyleProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const appTheme: AppTheme = useSelector(getAppTheme);
 
@@ -74,7 +75,7 @@ export const QrCode = ({ value, hasLogo, size = 300 }: ElementProps & StyleProps
     }
   }, [appTheme, hasLogo]);
 
-  return <Styled.QrCode ref={ref} />;
+  return <Styled.QrCode className={className} ref={ref} />;
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};

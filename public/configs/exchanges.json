@@ -1,0 +1,8 @@
+[
+  {
+      "name": "coinbase",
+      "label": "Coinbase",
+      "icon": "/exchanges/coinbase.png",
+      "depositType": "noble"
+  }
+]

@@ -38,7 +38,7 @@ import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { Icon, IconName } from '@/components/Icon';
 
-import { ChainSelectMenu } from '@/views/forms/AccountManagementForms/ChainSelectMenu';
+import { SourceSelectMenu } from '@/views/forms/AccountManagementForms/SourceSelectMenu';
 
 import { getSubaccount } from '@/state/accountSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
@@ -374,7 +374,7 @@ export const WithdrawForm = () => {
             </span>
           }
         />
-        <ChainSelectMenu
+        <SourceSelectMenu
           label={stringGetter({ key: STRING_KEYS.NETWORK })}
           selectedChain={chainIdStr || undefined}
           onSelectChain={onSelectChain}
