@@ -4,7 +4,7 @@ import { utils } from '@dydxprotocol/v4-client-js';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { PotentialMarketItem } from '@/constants/potentialMarkets';
-import { useGovernanceVariables, useStringGetter } from '@/hooks';
+import { useGovernanceVariables, useStringGetter, useTokenConfigs } from '@/hooks';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -13,6 +13,9 @@ import { Dialog } from '@/components/Dialog';
 import { Output, OutputType } from '@/components/Output';
 import { Tag, TagType } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
+
+import { MustBigNumber } from '@/lib/numbers';
+import { isMainnet } from '@/constants/networks';
 
 type ElementProps = {
   preventClose?: boolean;
@@ -42,6 +45,7 @@ export const NewMarketMessageDetailsDialog = ({
   const { baseAsset } = assetData ?? {};
   const { newMarketProposal } = useGovernanceVariables();
   const stringGetter = useStringGetter();
+  const { chainTokenLabel } = useTokenConfigs();
 
   const exchangeConfig = useMemo(() => {
     return baseAsset ? exchangeConfigs?.[baseAsset] : undefined;
@@ -284,8 +288,9 @@ export const NewMarketMessageDetailsDialog = ({
                   {
                     <Output
                       type={OutputType.Asset}
-                      value={newMarketProposal.delayBlocks}
-                      fractionDigits={0}
+                      value={MustBigNumber(newMarketProposal.initialDepositAmount).div(1e18)}
+                      fractionDigits={isMainnet ? 0 : 18}
+                      tag={chainTokenLabel}
                     />
                   }
                 </Styled.Description>
