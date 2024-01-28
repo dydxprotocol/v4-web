@@ -39,7 +39,6 @@ import { openDialog } from '@/state/dialogs';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
-import { Checkbox } from '@/components/Checkbox';
 
 type NewMarketPreviewStepProps = {
   assetData: PotentialMarketItem;
@@ -59,7 +58,7 @@ export const NewMarketPreviewStep = ({
   const { nativeTokenBalance } = useAccountBalance();
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
-  const { chainTokenDenom, chainTokenLabel } = useTokenConfigs();
+  const { chainTokenLabel } = useTokenConfigs();
   const [errorMessage, setErrorMessage] = useState();
   const { exchangeConfigs } = usePotentialMarkets();
   const { submitNewMarketProposal } = useSubaccount();
@@ -107,43 +106,55 @@ export const NewMarketPreviewStep = ({
     <Styled.Form
       onSubmit={async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setErrorMessage(undefined);
-        dispatch(openDialog({ type: DialogTypes.NewMarketAgreement }));
-        // try {
-        //   const tx = await submitNewMarketProposal({
-        //     id: clobPairId,
-        //     ticker,
-        //     priceExponent: assetData.priceExponent,
-        //     minPriceChange: assetData.minPriceChangePpm,
-        //     minExchanges: assetData.minExchanges,
-        //     exchangeConfigJson: JSON.stringify({
-        //       exchanges: exchangeConfigs?.[assetData.baseAsset],
-        //     }),
-        //     atomicResolution: assetData.atomicResolution,
-        //     liquidityTier: liquidityTier,
-        //     quantumConversionExponent: assetData.quantumConversionExponent,
-        //     stepBaseQuantums: Long.fromNumber(assetData.stepBaseQuantum),
-        //     subticksPerTick: assetData.subticksPerTick,
-        //     delayBlocks: newMarketProposal.delayBlocks,
-        //   });
 
-        //   if ((tx as IndexedTx)?.code === 0) {
-        //     const encodedTx = encodeJson(tx);
-        //     const parsedTx = JSON.parse(encodedTx);
-        //     const hash = parsedTx.hash.toUpperCase();
+        if (!hasAcceptedTerms) {
+          dispatch(
+            openDialog({
+              type: DialogTypes.NewMarketAgreement,
+              dialogProps: {
+                acceptTerms: () => setHasAcceptedTerms(true),
+              },
+            })
+          );
+        } else {
+          setErrorMessage(undefined);
 
-        //     if (!hash) {
-        //       throw new Error('Invalid transaction hash');
-        //     }
+          try {
+            const tx = await submitNewMarketProposal({
+              id: clobPairId,
+              ticker,
+              priceExponent: assetData.priceExponent,
+              minPriceChange: assetData.minPriceChangePpm,
+              minExchanges: assetData.minExchanges,
+              exchangeConfigJson: JSON.stringify({
+                exchanges: exchangeConfigs?.[assetData.baseAsset],
+              }),
+              atomicResolution: assetData.atomicResolution,
+              liquidityTier: liquidityTier,
+              quantumConversionExponent: assetData.quantumConversionExponent,
+              stepBaseQuantums: Long.fromNumber(assetData.stepBaseQuantum),
+              subticksPerTick: assetData.subticksPerTick,
+              delayBlocks: newMarketProposal.delayBlocks,
+            });
 
-        //     onSuccess(hash);
-        //   } else {
-        //     throw new Error('Transaction failed to commit.');
-        //   }
-        // } catch (error) {
-        //   log('NewMarketPreviewForm/submitNewMarketProposal', error);
-        //   setErrorMessage(error.message);
-        // }
+            if ((tx as IndexedTx)?.code === 0) {
+              const encodedTx = encodeJson(tx);
+              const parsedTx = JSON.parse(encodedTx);
+              const hash = parsedTx.hash.toUpperCase();
+
+              if (!hash) {
+                throw new Error('Invalid transaction hash');
+              }
+
+              onSuccess(hash);
+            } else {
+              throw new Error('Transaction failed to commit.');
+            }
+          } catch (error) {
+            log('NewMarketPreviewForm/submitNewMarketProposal', error);
+            setErrorMessage(error.message);
+          }
+        }
       }}
     >
       <h2>
@@ -291,7 +302,9 @@ export const NewMarketPreviewStep = ({
       <Styled.ButtonRow>
         <Button onClick={onBack}>{stringGetter({ key: STRING_KEYS.BACK })}</Button>
         <Button type={ButtonType.Submit} action={ButtonAction.Primary} state={{ isDisabled }}>
-          {stringGetter({ key: STRING_KEYS.ADD_MARKET_STEP_3_TITLE })}
+          {hasAcceptedTerms
+            ? stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })
+            : stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TERMS })}
         </Button>
       </Styled.ButtonRow>
       <Styled.Disclaimer>
