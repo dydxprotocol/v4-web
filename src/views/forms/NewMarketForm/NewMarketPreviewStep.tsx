@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useCallback, useMemo, useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { useDispatch } from 'react-redux';
 import Long from 'long';
@@ -39,6 +39,7 @@ import { openDialog } from '@/state/dialogs';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
+import { Checkbox } from '@/components/Checkbox';
 
 type NewMarketPreviewStepProps = {
   assetData: PotentialMarketItem;
@@ -64,6 +65,7 @@ export const NewMarketPreviewStep = ({
   const { submitNewMarketProposal } = useSubaccount();
   const { newMarketProposal } = useGovernanceVariables();
   const initialDepositAmount = MustBigNumber(newMarketProposal.initialDepositAmount).div(1e18);
+  const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
 
   const { label, initialMarginFraction, maintenanceMarginFraction, impactNotional } =
     LIQUIDITY_TIERS[liquidityTier as unknown as keyof typeof LIQUIDITY_TIERS];
@@ -99,48 +101,49 @@ export const NewMarketPreviewStep = ({
     return Math.abs(p - 3);
   }, [assetData]);
 
-  const isDisabled = alertMessage !== null;
+  const isDisabled = false; //alertMessage !== null;
 
   return (
     <Styled.Form
       onSubmit={async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setErrorMessage(undefined);
-        try {
-          const tx = await submitNewMarketProposal({
-            id: clobPairId,
-            ticker,
-            priceExponent: assetData.priceExponent,
-            minPriceChange: assetData.minPriceChangePpm,
-            minExchanges: assetData.minExchanges,
-            exchangeConfigJson: JSON.stringify({
-              exchanges: exchangeConfigs?.[assetData.baseAsset],
-            }),
-            atomicResolution: assetData.atomicResolution,
-            liquidityTier: liquidityTier,
-            quantumConversionExponent: assetData.quantumConversionExponent,
-            stepBaseQuantums: Long.fromNumber(assetData.stepBaseQuantum),
-            subticksPerTick: assetData.subticksPerTick,
-            delayBlocks: newMarketProposal.delayBlocks,
-          });
+        dispatch(openDialog({ type: DialogTypes.NewMarketAgreement }));
+        // try {
+        //   const tx = await submitNewMarketProposal({
+        //     id: clobPairId,
+        //     ticker,
+        //     priceExponent: assetData.priceExponent,
+        //     minPriceChange: assetData.minPriceChangePpm,
+        //     minExchanges: assetData.minExchanges,
+        //     exchangeConfigJson: JSON.stringify({
+        //       exchanges: exchangeConfigs?.[assetData.baseAsset],
+        //     }),
+        //     atomicResolution: assetData.atomicResolution,
+        //     liquidityTier: liquidityTier,
+        //     quantumConversionExponent: assetData.quantumConversionExponent,
+        //     stepBaseQuantums: Long.fromNumber(assetData.stepBaseQuantum),
+        //     subticksPerTick: assetData.subticksPerTick,
+        //     delayBlocks: newMarketProposal.delayBlocks,
+        //   });
 
-          if ((tx as IndexedTx)?.code === 0) {
-            const encodedTx = encodeJson(tx);
-            const parsedTx = JSON.parse(encodedTx);
-            const hash = parsedTx.hash.toUpperCase();
+        //   if ((tx as IndexedTx)?.code === 0) {
+        //     const encodedTx = encodeJson(tx);
+        //     const parsedTx = JSON.parse(encodedTx);
+        //     const hash = parsedTx.hash.toUpperCase();
 
-            if (!hash) {
-              throw new Error('Invalid transaction hash');
-            }
+        //     if (!hash) {
+        //       throw new Error('Invalid transaction hash');
+        //     }
 
-            onSuccess(hash);
-          } else {
-            throw new Error('Transaction failed to commit.');
-          }
-        } catch (error) {
-          log('NewMarketPreviewForm/submitNewMarketProposal', error);
-          setErrorMessage(error.message);
-        }
+        //     onSuccess(hash);
+        //   } else {
+        //     throw new Error('Transaction failed to commit.');
+        //   }
+        // } catch (error) {
+        //   log('NewMarketPreviewForm/submitNewMarketProposal', error);
+        //   setErrorMessage(error.message);
+        // }
       }}
     >
       <h2>
@@ -202,7 +205,6 @@ export const NewMarketPreviewStep = ({
       </Styled.WithDetailsReceipt>
 
       <Styled.WithDetailsReceipt
-        side="bottom"
         detailItems={[
           {
             key: 'reference-price',
@@ -339,11 +341,20 @@ Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
   --details-item-fontSize: 1rem;
 `;
 
-Styled.Disclaimer = styled.div`
+Styled.CheckboxContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  padding: 1rem;
+  align-items: center;
+`;
+
+Styled.Disclaimer = styled.div<{ textAlign?: string }>`
   font: var(--font-small);
   color: var(--color-text-0);
   text-align: center;
   margin-left: 0.5ch;
+
+  ${({ textAlign }) => textAlign && `text-align: ${textAlign};`}
 `;
 
 Styled.ButtonRow = styled.div`

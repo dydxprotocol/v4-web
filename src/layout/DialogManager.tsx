@@ -28,6 +28,7 @@ import { ManageFundsDialog } from '@/views/dialogs/ManageFundsDialog';
 import { OrderDetailsDialog } from '@/views/dialogs/DetailsDialog/OrderDetailsDialog';
 import { FillDetailsDialog } from '@/views/dialogs/DetailsDialog/FillDetailsDialog';
 import { NewMarketMessageDetailsDialog } from '@/views/dialogs/NewMarketMessageDetailsDialog';
+import { NewMarketAgreementDialog } from '@/views/dialogs/NewMarketAgreementDialog';
 
 export const DialogManager = () => {
   const dispatch = useDispatch();
@@ -69,5 +70,6 @@ export const DialogManager = () => {
     [DialogTypes.Withdraw]: <WithdrawDialog {...modalProps} />,
     [DialogTypes.ManageFunds]: <ManageFundsDialog {...modalProps} />,
     [DialogTypes.NewMarketMessageDetails]: <NewMarketMessageDetailsDialog {...modalProps} />,
+    [DialogTypes.NewMarketAgreement]: <NewMarketAgreementDialog {...modalProps} />,
   }[type];
 };

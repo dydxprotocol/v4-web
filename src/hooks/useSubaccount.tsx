@@ -420,27 +420,23 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   // ------ Governance Methods ------ //
   const submitNewMarketProposal = useCallback(
     async (params: GovAddNewMarketParams) => {
-      try {
-        if (!compositeClient) {
-          throw new Error('client not initialized');
-        } else if (!localDydxWallet) {
-          throw new Error('wallet not initialized');
-        } else if (!newMarketProposal) {
-          throw new Error('governance variables not initialized');
-        }
-
-        const response = await compositeClient?.submitGovAddNewMarketProposal(
-          localDydxWallet,
-          params,
-          utils.getGovAddNewMarketTitle(params.ticker),
-          utils.getGovAddNewMarketSummary(params.ticker, newMarketProposal.delayBlocks),
-          newMarketProposal.initialDepositAmount
-        );
-
-        return response;
-      } catch (error) {
-        log('useSubaccount/submitNewMarketProposal', error);
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      } else if (!localDydxWallet) {
+        throw new Error('wallet not initialized');
+      } else if (!newMarketProposal) {
+        throw new Error('governance variables not initialized');
       }
+
+      const response = await compositeClient?.submitGovAddNewMarketProposal(
+        localDydxWallet,
+        params,
+        utils.getGovAddNewMarketTitle(params.ticker),
+        utils.getGovAddNewMarketSummary(params.ticker, newMarketProposal.delayBlocks),
+        newMarketProposal.initialDepositAmount
+      );
+
+      return response;
     },
     [compositeClient, localDydxWallet]
   );
