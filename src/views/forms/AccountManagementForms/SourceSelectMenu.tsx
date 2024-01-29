@@ -79,7 +79,7 @@ export const SourceSelectMenu = ({
       <Styled.ChainRow>
         {selectedChainOption ? (
           <>
-            <Styled.Img src={selectedChainOption.iconUrl} alt="" /> {selectedChainOption.string}
+            <Styled.Img src={selectedChainOption.iconUrl} alt="" /> {selectedChainOption.stringKey}
           </>
         ) : selectedExchangeOption ? (
           <>
