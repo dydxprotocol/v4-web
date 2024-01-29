@@ -3,8 +3,17 @@ import styled, { AnyStyledComponent } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { isMainnet } from '@/constants/networks';
 import { AppRoute } from '@/constants/routes';
-import { useBreakpoints, useDocumentTitle, useDydxClient, useStringGetter } from '@/hooks';
+
+import {
+  useBreakpoints,
+  useDocumentTitle,
+  useGovernanceVariables,
+  useStringGetter,
+  useTokenConfigs,
+} from '@/hooks';
+
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -13,6 +22,8 @@ import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { IconButton } from '@/components/IconButton';
 import { Icon, IconName } from '@/components/Icon';
 import { NewMarketForm } from '@/views/forms/NewMarketForm';
+
+import { MustBigNumber } from '@/lib/numbers';
 
 const StepItem = ({ step, subtitle, title }: { step: number; subtitle: string; title: string }) => (
   <Styled.StepItem>
@@ -26,10 +37,11 @@ const StepItem = ({ step, subtitle, title }: { step: number; subtitle: string; t
 
 const NewMarket = () => {
   const { isNotTablet } = useBreakpoints();
-  const { networkConfig } = useDydxClient();
+  const { newMarketProposal } = useGovernanceVariables();
   const navigate = useNavigate();
   const [displaySteps, setDisplaySteps] = useState(true);
   const stringGetter = useStringGetter();
+  const { chainTokenLabel } = useTokenConfigs();
 
   useDocumentTitle('New Market');
 
@@ -48,10 +60,18 @@ const NewMarket = () => {
       {
         step: 3,
         title: stringGetter({ key: STRING_KEYS.ADD_MARKET_STEP_3_TITLE }),
-        subtitle: stringGetter({ key: STRING_KEYS.ADD_MARKET_STEP_3_DESCRIPTION }),
+        subtitle: stringGetter({
+          key: STRING_KEYS.ADD_MARKET_STEP_3_DESCRIPTION,
+          params: {
+            REQUIRED_NUM_TOKENS: MustBigNumber(newMarketProposal?.initialDepositAmount)
+              .div(1e18)
+              .toFixed(isMainnet ? 0 : 18),
+            NATIVE_TOKEN_DENOM: chainTokenLabel,
+          },
+        }),
       },
     ];
-  }, [stringGetter]);
+  }, [stringGetter, newMarketProposal, chainTokenLabel]);
 
   return (
     <Styled.Page>
