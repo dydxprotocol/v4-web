@@ -3,6 +3,8 @@ import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import { Root, Item, Indicator } from '@radix-ui/react-radio-group';
 
+import { useStringGetter } from '@/hooks';
+
 import { AppTheme, setAppTheme } from '@/state/configs';
 import { getAppTheme } from '@/state/configsSelectors';
 
@@ -11,31 +13,25 @@ import { Themes } from '@/styles/themes';
 
 import { STRING_KEYS } from '@/constants/localization';
 
-import { Icon, IconName } from '@/components/Icon';
-
-import { Panel } from '@/components/Panel';
-
-import {
-    useStringGetter,
-  } from '@/hooks';
-
 import { Dialog } from '@/components/Dialog';
+import { Icon, IconName } from '@/components/Icon';
+import { Panel } from '@/components/Panel';
 import { HorizontalSeparatorFiller } from '@/components/Separator';
 
 type ElementProps = {
-    setIsOpen: (open: boolean) => void;
-  };
-  
+  setIsOpen: (open: boolean) => void;
+};
+
 export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
 
   const currentTheme: AppTheme = useSelector(getAppTheme);
-  
+
   const sectionHeader = (heading: string) => {
     return (
       <Styled.Header>
-        { heading }
+        {heading}
         <HorizontalSeparatorFiller />
       </Styled.Header>
     );
@@ -43,17 +39,21 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
 
   const themePanels = () => {
     return (
-      <Styled.Root value={currentTheme}> 
-        {[{
-          theme: AppTheme.Classic,
-          label: STRING_KEYS.CLASSIC_DARK
-        }, {
-          theme: AppTheme.Dark,
-          label: STRING_KEYS.DARK
-        }, {
-          theme: AppTheme.Light,
-          label: STRING_KEYS.LIGHT
-        }].map(({theme, label}) => (
+      <Styled.Root value={currentTheme}>
+        {[
+          {
+            theme: AppTheme.Classic,
+            label: STRING_KEYS.CLASSIC_DARK,
+          },
+          {
+            theme: AppTheme.Dark,
+            label: STRING_KEYS.DARK,
+          },
+          {
+            theme: AppTheme.Light,
+            label: STRING_KEYS.LIGHT,
+          },
+        ].map(({ theme, label }) => (
           <Item value={theme}>
             <Styled.Panel
               backgroundColor={Themes[theme].layer2}
@@ -61,7 +61,11 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
               onClick={() => {
                 dispatch(setAppTheme(theme));
               }}
-              slotHeader={<Styled.PanelHeader textColor={Themes[theme].textPrimary}>{stringGetter({ key: label })}</Styled.PanelHeader>}
+              slotHeader={
+                <Styled.PanelHeader textColor={Themes[theme].textPrimary}>
+                  {stringGetter({ key: label })}
+                </Styled.PanelHeader>
+              }
             >
               <Styled.Image src="/chart-bars.svg" />
               <Styled.Indicator>
@@ -71,17 +75,21 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
           </Item>
         ))}
       </Styled.Root>
-    )
-  }
+    );
+  };
 
   return (
-    <Dialog isOpen setIsOpen={setIsOpen} title={stringGetter({ key: STRING_KEYS.DISPLAY_SETTINGS })}>
+    <Dialog
+      isOpen
+      setIsOpen={setIsOpen}
+      title={stringGetter({ key: STRING_KEYS.DISPLAY_SETTINGS })}
+    >
       <Styled.Section>
         {sectionHeader(stringGetter({ key: STRING_KEYS.THEME }))}
         {themePanels()}
       </Styled.Section>
     </Dialog>
-  );    
+  );
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
@@ -101,7 +109,7 @@ Styled.Root = styled(Root)`
   gap: 1.5rem;
 `;
 
-Styled.Panel = styled(Panel)<{ backgroundColor: string, gridColor: string }>`
+Styled.Panel = styled(Panel)<{ backgroundColor: string; gridColor: string }>`
   --panel-content-paddingY: 0.25rem;
   --panel-content-paddingX: 0.25rem;
 
@@ -118,7 +126,11 @@ Styled.Panel = styled(Panel)<{ backgroundColor: string, gridColor: string }>`
     bottom: 0;
     right: 0;
 
-    background: radial-gradient(55% 35% at 50% 65%, transparent, var(--themePanel-backgroundColor) 100%);
+    background: radial-gradient(
+      55% 35% at 50% 65%,
+      transparent,
+      var(--themePanel-backgroundColor) 100%
+    );
     background-color: var(--themePanel-gridColor);
     mask-image: url('/chart-bars-background.svg');
     mask-size: cover;
@@ -137,12 +149,13 @@ Styled.PanelHeader = styled.h3<{ textColor: string }>`
   `}
 
   align-self: flex-start;
+  z-index: 1;
 `;
 
 Styled.Image = styled.img`
   width: 100%;
   height: auto;
-`
+`;
 
 Styled.Indicator = styled(Indicator)`
   --indicator-size: 1.25rem;
@@ -161,7 +174,7 @@ Styled.Indicator = styled(Indicator)`
   background-color: var(--color-accent);
   border-radius: 50%;
   color: var(--color-text-2);
-`
+`;
 
 Styled.CheckIcon = styled(Icon)`
   --icon-size: 0.625rem;

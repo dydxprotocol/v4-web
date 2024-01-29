@@ -181,8 +181,13 @@ export const AccountMenu = () => {
           onSelect: () => dispatch(openDialog({ type: DialogTypes.Preferences })),
         },
         {
-          value: 'Display Settings',
-          icon: theme === AppTheme.Light ? <Icon iconName={IconName.Sun} /> : <Icon iconName={IconName.Moon} />,
+          value: 'DisplaySettings',
+          icon:
+            theme === AppTheme.Light ? (
+              <Icon iconName={IconName.Sun} />
+            ) : (
+              <Icon iconName={IconName.Moon} />
+            ),
           label: stringGetter({ key: STRING_KEYS.DISPLAY_SETTINGS }),
           onSelect: () => dispatch(openDialog({ type: DialogTypes.DisplaySettings })),
         },
