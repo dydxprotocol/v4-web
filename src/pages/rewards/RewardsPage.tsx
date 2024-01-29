@@ -1,4 +1,4 @@
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled, { AnyStyledComponent, css } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -11,6 +11,8 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { BackButton } from '@/components/BackButton';
 
+import { testFlags } from '@/lib/testFlags';
+
 import { DYDXBalancePanel } from './DYDXBalancePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { MigratePanel } from './MigratePanel';
@@ -20,6 +22,7 @@ import { RewardHistoryPanel } from './RewardHistoryPanel';
 import { GovernancePanel } from './GovernancePanel';
 import { StakingPanel } from './StakingPanel';
 import { NewMarketsPanel } from './NewMarketsPanel';
+
 
 const RewardsPage = () => {
   const stringGetter = useStringGetter();
@@ -34,7 +37,7 @@ const RewardsPage = () => {
           {stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
         </Styled.MobileHeader>
       )}
-      <Styled.GridLayout>
+      <Styled.GridLayout showTradingRewards={testFlags.showTradingRewards}>
         {import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && <Styled.MigratePanel />}
 
         {isTablet ? (
@@ -46,11 +49,13 @@ const RewardsPage = () => {
           </>
         )}
 
-        <Styled.TradingRewardsColumn>
-          <TradingRewardsSummaryPanel />
-          {isTablet && <RewardsHelpPanel />}
-          <RewardHistoryPanel />
-        </Styled.TradingRewardsColumn>
+        {testFlags.showTradingRewards && (
+          <Styled.TradingRewardsColumn>
+            <TradingRewardsSummaryPanel />
+            {isTablet && <RewardsHelpPanel />}
+            <RewardHistoryPanel />
+          </Styled.TradingRewardsColumn>
+        )}
 
         {isNotTablet && (
           <Styled.OtherColumn>
@@ -101,7 +106,7 @@ Styled.MobileHeader = styled.header`
   background-color: var(--color-layer-2);
 `;
 
-Styled.GridLayout = styled.div`
+Styled.GridLayout = styled.div<{ showTradingRewards?: boolean }>`
   --gap: 1.5rem;
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -114,7 +119,16 @@ Styled.GridLayout = styled.div`
   grid-template-areas:
     'migrate migrate'
     'incentives balance'
-    'rewards other';
+    'other other';
+
+  ${({ showTradingRewards }) =>
+    showTradingRewards &&
+    css`
+      grid-template-areas:
+        'migrate migrate'
+        'incentives balance'
+        'rewards other';
+    `}
 
   @media ${breakpoints.tablet} {
     --gap: 1rem;

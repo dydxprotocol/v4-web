@@ -10,7 +10,7 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Output, OutputType } from '@/components/Output';
 import { Table, TableCell, type ColumnDef } from '@/components/Table';
 
-import { getHistoricalTradingRewards } from '@/state/accountSelectors';
+import { getHistoricalTradingRewardsForPeriod } from '@/state/accountSelectors';
 
 export enum TradingRewardHistoryTableColumnKey {
   Event = 'Event',
@@ -47,11 +47,18 @@ const getTradingRewardHistoryTableColumnDef = ({
                         timeOptions={{ useUTC: true }}
                       />
                       →
-                      <Output
-                        type={OutputType.Date}
-                        value={endedAtInMilliseconds}
-                        timeOptions={{ useUTC: true }}
-                      />
+                      {endedAtInMilliseconds ? (
+                        <Output
+                          type={OutputType.Date}
+                          value={endedAtInMilliseconds}
+                          timeOptions={{ useUTC: true }}
+                        />
+                      ) : (
+                        <Output
+                          type={OutputType.Text}
+                          value={stringGetter({ key: STRING_KEYS.TODAY })}
+                        />
+                      )}
                     </>
                   ),
                 },
@@ -92,17 +99,18 @@ export const TradingRewardHistoryTable = ({
   withOuterBorder,
   withInnerBorders = true,
 }: ElementProps & StyleProps) => {
-  const historicalTradingRewards = useSelector(getHistoricalTradingRewards, shallowEqual);
-  const periodTradingRewards = historicalTradingRewards?.get(period.name) ?? [];
-  const { chainTokenLabel } = useTokenConfigs();
   const stringGetter = useStringGetter();
+  const { chainTokenLabel } = useTokenConfigs();
 
-  const tempConvertedArray = periodTradingRewards?.["r29_1"]?.["i_1"] ?? [];
+  const periodTradingRewards = useSelector(
+    getHistoricalTradingRewardsForPeriod(period.name),
+    shallowEqual
+  );
 
   return (
     <Styled.Table
       label={stringGetter({ key: STRING_KEYS.REWARD_HISTORY })}
-      data={tempConvertedArray}
+      data={periodTradingRewards?.toArray() ?? []}
       getRowKey={(row: any) => row.startedAtInMilliseconds}
       columns={columnKeys.map((key: TradingRewardHistoryTableColumnKey) =>
         getTradingRewardHistoryTableColumnDef({

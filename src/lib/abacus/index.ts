@@ -11,6 +11,7 @@ import type {
   ParsingError,
   HistoricaTradingRewardsPeriods,
   HistoricaTradingRewardsPeriod,
+  HistoricalTradingReward,
 } from '@/constants/abacus';
 
 import {

@@ -6,23 +6,32 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { useStringGetter, useTokenConfigs } from '@/hooks';
 
 import { AssetIcon } from '@/components/AssetIcon';
-import { ComingSoon } from '@/components/ComingSoon';
 import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 
-import { getHistoricalTradingRewards } from '@/state/accountSelectors';
+import { getHistoricalTradingRewardsForPeriod } from '@/state/accountSelectors';
 
 export const TradingRewardsSummaryPanel = () => {
   const stringGetter = useStringGetter();
-  const historicalTradingRewards = useSelector(getHistoricalTradingRewards, shallowEqual);
-  const currentWeekTradingReward = historicalTradingRewards?.get('WEEKLY')?.firstOrNull();
   const { chainTokenLabel } = useTokenConfigs();
 
+  const currentWeekTradingRewards = useSelector(
+    getHistoricalTradingRewardsForPeriod('WEEKLY'),
+    shallowEqual
+  );
+  const currentWeekTradingReward = currentWeekTradingRewards?.firstOrNull();
+
   return (
-    <Panel slotHeader={<Styled.Header>{stringGetter({ key: STRING_KEYS.TRADING_REWARDS_SUMMARY })}</Styled.Header>}>
-      <Styled.Content>
-        {currentWeekTradingReward ? (
+    currentWeekTradingReward && (
+      <Panel
+        slotHeader={
+          <Styled.Header>
+            {stringGetter({ key: STRING_KEYS.TRADING_REWARDS_SUMMARY })}
+          </Styled.Header>
+        }
+      >
+        <Styled.Content>
           <Styled.TradingRewardsDetails
             layout="grid"
             items={[
@@ -47,11 +56,18 @@ export const TradingRewardsSummaryPanel = () => {
                         timeOptions={{ useUTC: true }}
                       />
                       →
-                      <Output
-                        type={OutputType.Date}
-                        value={currentWeekTradingReward.endedAtInMilliseconds}
-                        timeOptions={{ useUTC: true }}
-                      />
+                      {currentWeekTradingReward.endedAtInMilliseconds ? (
+                        <Output
+                          type={OutputType.Date}
+                          value={currentWeekTradingReward.endedAtInMilliseconds}
+                          timeOptions={{ useUTC: true }}
+                        />
+                      ) : (
+                        <Output
+                          type={OutputType.Text}
+                          value={stringGetter({ key: STRING_KEYS.TODAY })}
+                        />
+                      )}
                     </Styled.TimePeriod>
                   </Styled.Column>
                 ),
@@ -59,11 +75,9 @@ export const TradingRewardsSummaryPanel = () => {
               // TODO(@aforaleka): add all-time when supported
             ]}
           />
-        ) : (
-          <ComingSoon />
-        )}
-      </Styled.Content>
-    </Panel>
+        </Styled.Content>
+      </Panel>
+    )
   );
 };
 
