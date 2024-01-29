@@ -155,5 +155,10 @@
     "vitest": "^0.32.2",
     "w3name": "^1.0.8",
     "web3.storage": "^4.5.4"
+  },
+  "pnpm": {
+    "overrides": {
+      "follow-redirects": "1.15.3"
+    }
   }
 }
