@@ -16,7 +16,7 @@ import {
 } from '@/hooks';
 import { DydxProvider } from '@/hooks/useDydxClient';
 import { AccountsProvider } from '@/hooks/useAccounts';
-import { AppThemeProvider } from '@/hooks/useAppTheme';
+import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
 import { DialogAreaProvider, useDialogArea } from '@/hooks/useDialogArea';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
@@ -141,8 +141,7 @@ const providers = [
   wrapProvider(LocalNotificationsProvider),
   wrapProvider(NotificationsProvider),
   wrapProvider(DialogAreaProvider),
-  wrapProvider(PotentialMarketsProvider),
-  wrapProvider(AppThemeProvider),
+  wrapProvider(AppThemeAndColorModeProvider),
 ];
 
 const App = () => {

@@ -12,8 +12,14 @@ export enum AppTheme {
   Light = 'Light',
 }
 
+export enum AppColorMode {
+  GreenUp = 'GreenUp',
+  RedUp = 'RedUp',
+}
+
 export interface ConfigsState {
   appTheme: AppTheme;
+  appColorMode: AppColorMode;
   feeTiers?: kollections.List<FeeTier>;
   feeDiscounts?: FeeDiscount[];
   network?: NetworkConfigs;
@@ -41,6 +47,10 @@ const initialState: ConfigsState = {
     key: LocalStorageKey.SelectedTheme,
     defaultValue: AppTheme.Classic,
   }),
+  appColorMode: getLocalStorage({
+    key: LocalStorageKey.SelectedColorMode,
+    defaultValue: AppColorMode.GreenUp,
+  }),
   feeDiscounts: undefined,
   feeTiers: undefined,
   network: undefined,
@@ -61,6 +71,10 @@ export const configsSlice = createSlice({
       changeTheme(payload);
       state.appTheme = payload;
     },
+    setAppColorMode: (state: ConfigsState, { payload }: PayloadAction<AppColorMode>) => {
+      setLocalStorage({ key: LocalStorageKey.SelectedColorMode, value: payload });
+      state.appColorMode = payload;
+    },
     setConfigs: (state: ConfigsState, action: PayloadAction<Nullable<Configs>>) => ({
       ...state,
       ...action.payload,
@@ -72,4 +86,5 @@ export const configsSlice = createSlice({
   },
 });
 
-export const { setAppTheme, setConfigs, markLaunchIncentivesSeen } = configsSlice.actions;
+export const { setAppTheme, setAppColorMode, setConfigs, markLaunchIncentivesSeen } =
+  configsSlice.actions;

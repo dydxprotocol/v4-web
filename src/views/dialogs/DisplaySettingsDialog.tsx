@@ -5,8 +5,8 @@ import { Root, Item, Indicator } from '@radix-ui/react-radio-group';
 
 import { useStringGetter } from '@/hooks';
 
-import { AppTheme, setAppTheme } from '@/state/configs';
-import { getAppTheme } from '@/state/configsSelectors';
+import { AppTheme, AppColorMode, setAppTheme } from '@/state/configs';
+import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { Themes } from '@/styles/themes';
@@ -26,6 +26,7 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
 
   const currentTheme: AppTheme = useSelector(getAppTheme);
+  const currentColorMode: AppColorMode = useSelector(getAppColorMode);
 
   const sectionHeader = (heading: string) => {
     return (
@@ -56,13 +57,13 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
           <Styled.AppThemeItem
             key={theme}
             value={theme}
-            backgroundcolor={Themes[theme].layer2}
-            gridcolor={Themes[theme].borderDefault}
+            backgroundcolor={Themes[theme][currentColorMode].layer2}
+            gridcolor={Themes[theme][currentColorMode].borderDefault}
             onClick={() => {
               dispatch(setAppTheme(theme));
             }}
           >
-            <Styled.AppThemeHeader textcolor={Themes[theme].textPrimary}>
+            <Styled.AppThemeHeader textcolor={Themes[theme][currentColorMode].textPrimary}>
               {stringGetter({ key: label })}
             </Styled.AppThemeHeader>
             <Styled.Image src="/chart-bars.svg" />
