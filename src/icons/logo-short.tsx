@@ -1,7 +1,7 @@
-import { useAppThemeContext } from '@/hooks/useAppTheme';
+import { useAppThemeAndColorModeContext } from '@/hooks/useAppThemeAndColorMode';
 
 const LogoShortIcon: React.FC<{ id?: string }> = ({ id }: { id?: string }) => {
-  const theme = useAppThemeContext();
+  const theme = useAppThemeAndColorModeContext();
   const fill = theme.logoFill;
 
   return (

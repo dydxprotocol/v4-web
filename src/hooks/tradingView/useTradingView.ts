@@ -11,7 +11,7 @@ import { useDydxClient, useLocalStorage } from '@/hooks';
 import { store } from '@/state/_store';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
-import { getAppTheme } from '@/state/configsSelectors';
+import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketId, getMarketIds } from '@/state/perpetualsSelectors';
 
@@ -30,6 +30,7 @@ export const useTradingView = ({
 }) => {
   const marketId = useSelector(getCurrentMarketId);
   const appTheme = useSelector(getAppTheme);
+  const appColorMode = useSelector(getAppColorMode);
   const marketIds = useSelector(getMarketIds, shallowEqual);
   const selectedLocale = useSelector(getSelectedLocale);
   const selectedNetwork = useSelector(getSelectedNetwork);
@@ -46,7 +47,7 @@ export const useTradingView = ({
   useEffect(() => {
     if (hasMarkets && isClientConnected && marketId) {
       const widgetOptions = getWidgetOptions();
-      const widgetOverrides = getWidgetOverrides(appTheme);
+      const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
       const options = {
         // debug: true,
         ...widgetOptions,
@@ -75,7 +76,14 @@ export const useTradingView = ({
       tvWidgetRef.current = null;
       setIsChartReady(false);
     };
-  }, [getCandlesForDatafeed, isClientConnected, hasMarkets, selectedLocale, selectedNetwork, !!marketId]);
+  }, [
+    getCandlesForDatafeed,
+    isClientConnected,
+    hasMarkets,
+    selectedLocale,
+    selectedNetwork,
+    !!marketId,
+  ]);
 
   return { savedResolution };
 };
