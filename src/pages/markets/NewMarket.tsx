@@ -21,6 +21,7 @@ import { Button } from '@/components/Button';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { IconButton } from '@/components/IconButton';
 import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { NewMarketForm } from '@/views/forms/NewMarketForm';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -50,7 +51,16 @@ const NewMarket = () => {
       {
         step: 1,
         title: stringGetter({ key: STRING_KEYS.ADD_MARKET_STEP_1_TITLE }),
-        subtitle: stringGetter({ key: STRING_KEYS.ADD_MARKET_STEP_1_DESCRIPTION }),
+        subtitle: stringGetter({
+          key: STRING_KEYS.ADD_MARKET_STEP_1_DESCRIPTION,
+          params: {
+            HERE: (
+              <Styled.Link href={newMarketProposal.newMarketsMethodology}>
+                {stringGetter({ key: STRING_KEYS.HERE })}
+              </Styled.Link>
+            ),
+          },
+        }),
       },
       {
         step: 2,
@@ -216,6 +226,11 @@ Styled.Title = styled.span`
 
 Styled.Subtitle = styled.span`
   color: var(--color-text-0);
+`;
+
+Styled.Link = styled(Link)`
+  --link-color: var(--color-accent);
+  display: inline-block;
 `;
 
 Styled.FormContainer = styled.div`

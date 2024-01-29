@@ -158,7 +158,7 @@ export const NewMarketPreviewStep = ({
       }}
     >
       <h2>
-        Confirm new market proposal
+        {stringGetter({ key: STRING_KEYS.CONFIRM_NEW_MARKET_PROPOSAL })}
         <span>
           {stringGetter({ key: STRING_KEYS.BALANCE })}:{' '}
           <Output

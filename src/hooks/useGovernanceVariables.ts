@@ -5,6 +5,7 @@ export interface GovernanceVariables {
   newMarketProposal: {
     initialDepositAmount: number;
     delayBlocks: number;
+    newMarketsMethodology: string;
   };
 }
 
