@@ -17,7 +17,6 @@ import type { EvmAddress } from '@/constants/wallets';
 import { useAccounts, useDebounce, useStringGetter, useSelectedNetwork } from '@/hooks';
 import { useAccountBalance, CHAIN_DEFAULT_TOKEN_ADDRESS } from '@/hooks/useAccountBalance';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
-import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
@@ -41,10 +40,11 @@ import { getNobleChainId, NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 import { parseWalletError } from '@/lib/wallet';
 
-import { ChainSelectMenu } from './ChainSelectMenu';
+import { SourceSelectMenu } from './SourceSelectMenu';
 import { TokenSelectMenu } from './TokenSelectMenu';
 
 import { DepositButtonAndReceipt } from './DepositForm/DepositButtonAndReceipt';
+import { NobleDeposit } from '../NobleDeposit';
 
 type DepositFormProps = {
   onDeposit?: () => void;
@@ -57,13 +57,14 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { selectedNetwork } = useSelectedNetwork();
 
-  const { evmAddress, signerWagmi, publicClientWagmi } = useAccounts();
+  const { evmAddress, signerWagmi, publicClientWagmi, nobleAddress } = useAccounts();
 
   const { addTransferNotification } = useLocalNotifications();
 
   const {
     requestPayload,
     token,
+    exchange,
     chain: chainIdStr,
     resources,
     summary,
@@ -129,14 +130,21 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     if (error) onError?.();
   }, [error]);
 
-  const onSelectChain = useCallback((chain: string) => {
-    if (chain) {
+  const onSelectChain = useCallback((name: string, type: 'chain' | 'exchange') => {
+    if (name) {
       abacusStateManager.clearTransferInputValues();
-      abacusStateManager.setTransferValue({
-        field: TransferInputField.chain,
-        value: chain,
-      });
       setFromAmount('');
+      if (type === 'chain') {
+        abacusStateManager.setTransferValue({
+          field: TransferInputField.chain,
+          value: name,
+        });
+      } else {
+        abacusStateManager.setTransferValue({
+          field: TransferInputField.exchange,
+          value: name,
+        });
+      }
     }
   }, []);
 
@@ -369,39 +377,49 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
   return (
     <Styled.Form onSubmit={onSubmit}>
-      <ChainSelectMenu selectedChain={chainIdStr || undefined} onSelectChain={onSelectChain} />
-      <TokenSelectMenu selectedToken={sourceToken || undefined} onSelectToken={onSelectToken} />
-      <Styled.WithDetailsReceipt side="bottom" detailItems={amountInputReceipt}>
-        <FormInput
-          type={InputType.Number}
-          onChange={onChangeAmount}
-          label={stringGetter({ key: STRING_KEYS.AMOUNT })}
-          value={fromAmount}
-          slotRight={
-            <Styled.FormInputButton size={ButtonSize.XSmall} onClick={onClickMax}>
-              {stringGetter({ key: STRING_KEYS.MAX })}
-            </Styled.FormInputButton>
-          }
-        />
-      </Styled.WithDetailsReceipt>
-      {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
-      {requireUserActionInWallet && (
-        <AlertMessage type={AlertType.Warning}>
-          {stringGetter({ key: STRING_KEYS.CHECK_WALLET_FOR_REQUEST })}
-        </AlertMessage>
+      <SourceSelectMenu
+        selectedChain={chainIdStr || undefined}
+        selectedExchange={exchange || undefined}
+        onSelect={onSelectChain}
+      />
+      {exchange && nobleAddress ? (
+        <NobleDeposit />
+      ) : (
+        <>
+          <TokenSelectMenu selectedToken={sourceToken || undefined} onSelectToken={onSelectToken} />
+          <Styled.WithDetailsReceipt side="bottom" detailItems={amountInputReceipt}>
+            <FormInput
+              type={InputType.Number}
+              onChange={onChangeAmount}
+              label={stringGetter({ key: STRING_KEYS.AMOUNT })}
+              value={fromAmount}
+              slotRight={
+                <Styled.FormInputButton size={ButtonSize.XSmall} onClick={onClickMax}>
+                  {stringGetter({ key: STRING_KEYS.MAX })}
+                </Styled.FormInputButton>
+              }
+            />
+          </Styled.WithDetailsReceipt>
+          {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
+          {requireUserActionInWallet && (
+            <AlertMessage type={AlertType.Warning}>
+              {stringGetter({ key: STRING_KEYS.CHECK_WALLET_FOR_REQUEST })}
+            </AlertMessage>
+          )}
+          <Styled.Footer>
+            <DepositButtonAndReceipt
+              isDisabled={isDisabled}
+              isLoading={isLoading}
+              chainId={chainId || undefined}
+              setSlippage={onSetSlippage}
+              slippage={slippage}
+              sourceToken={sourceToken || undefined}
+              setRequireUserActionInWallet={setRequireUserActionInWallet}
+              setError={setError}
+            />
+          </Styled.Footer>
+        </>
       )}
-      <Styled.Footer>
-        <DepositButtonAndReceipt
-          isDisabled={isDisabled}
-          isLoading={isLoading}
-          chainId={chainId || undefined}
-          setSlippage={onSetSlippage}
-          slippage={slippage}
-          sourceToken={sourceToken || undefined}
-          setRequireUserActionInWallet={setRequireUserActionInWallet}
-          setError={setError}
-        />
-      </Styled.Footer>
     </Styled.Form>
   );
 };

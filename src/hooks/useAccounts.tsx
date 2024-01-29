@@ -161,6 +161,7 @@ const useAccountsContext = () => {
 
   // dYdX wallet / onboarding state
   const [localDydxWallet, setLocalDydxWallet] = useState<LocalWallet>();
+  const [localNobleWallet, setLocalNobleWallet] = useState<LocalWallet>();
   const [hdKey, setHdKey] = useState<PrivateInformation>();
 
   const dydxAccounts = useMemo(() => localDydxWallet?.accounts, [localDydxWallet]);
@@ -168,6 +169,11 @@ const useAccountsContext = () => {
   const dydxAddress = useMemo(
     () => localDydxWallet?.address as DydxAddress | undefined,
     [localDydxWallet]
+  );
+
+  const nobleAddress = useMemo(
+    () => localNobleWallet?.address,
+    [localNobleWallet]
   );
 
   const setWalletFromEvmSignature = async (signature: string) => {
@@ -251,6 +257,7 @@ const useAccountsContext = () => {
       if (hdKey?.mnemonic) {
         const nobleWallet = await LocalWallet.fromMnemonic(hdKey.mnemonic, NOBLE_BECH32_PREFIX);
         abacusStateManager.setNobleWallet(nobleWallet);
+        setLocalNobleWallet(nobleWallet);
       }
     };
     setNobleWallet();
@@ -349,6 +356,7 @@ const useAccountsContext = () => {
     localDydxWallet,
     dydxAccounts,
     dydxAddress,
+    nobleAddress,
 
     // Onboarding state
     saveHasAcknowledgedTerms,
