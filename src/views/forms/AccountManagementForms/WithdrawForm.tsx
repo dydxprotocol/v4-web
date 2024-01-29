@@ -377,7 +377,7 @@ export const WithdrawForm = () => {
         <SourceSelectMenu
           label={stringGetter({ key: STRING_KEYS.NETWORK })}
           selectedChain={chainIdStr || undefined}
-          onSelectChain={onSelectChain}
+          onSelect={onSelectChain}
         />
       </Styled.DestinationRow>
       <TokenSelectMenu selectedToken={toToken || undefined} onSelectToken={onSelectToken} />

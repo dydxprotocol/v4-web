@@ -3,8 +3,6 @@ import { shallowEqual, useSelector } from 'react-redux';
 
 import { TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
-import { isTruthy } from '@/lib/isTruthy';
-import { testFlags } from '@/lib/testFlags';
 
 import { useStringGetter } from '@/hooks';
 
@@ -15,18 +13,21 @@ import { popoverMixins } from '@/styles/popoverMixins';
 
 import { getTransferInputs } from '@/state/inputsSelectors';
 
+import { isTruthy } from '@/lib/isTruthy';
+import { testFlags } from '@/lib/testFlags';
+
 type ElementProps = {
   label?: string;
   selectedExchange?: string;
   selectedChain?: string;
-  onSelectChain: (name: string, type: 'chain' | 'exchange') => void;
+  onSelect: (name: string, type: 'chain' | 'exchange') => void;
 };
 
 export const SourceSelectMenu = ({
   label,
   selectedExchange,
   selectedChain,
-  onSelectChain,
+  onSelect,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions, resources } =
@@ -42,7 +43,7 @@ export const SourceSelectMenu = ({
     value: chain.type,
     label: chain.stringKey,
     onSelect: () => {
-      onSelectChain(chain.type, 'chain');
+      onSelect(chain.type, 'chain');
     },
     slotBefore: <Styled.Img src={chain.iconUrl} alt="" />,
   }));
@@ -51,7 +52,7 @@ export const SourceSelectMenu = ({
     value: exchange.type,
     label: exchange.string,
     onSelect: () => {
-      onSelectChain(exchange.type, 'exchange');
+      onSelect(exchange.type, 'exchange');
     },
     slotBefore: <Styled.Img src={exchange.iconUrl} alt="" />,
   }));
@@ -78,12 +79,12 @@ export const SourceSelectMenu = ({
       <Styled.ChainRow>
         {selectedChainOption ? (
           <>
-            <Styled.Img src={selectedChainOption.iconUrl} alt="" /> {selectedChainOption.stringKey}
+            <Styled.Img src={selectedChainOption.iconUrl} alt="" /> {selectedChainOption.string}
           </>
         ) : selectedExchangeOption ? (
           <>
             <Styled.Img src={selectedExchangeOption.iconUrl} alt="" />{' '}
-            {selectedExchangeOption.stringKey}
+            {selectedExchangeOption.string}
           </>
         ) : (
           stringGetter({ key: STRING_KEYS.SELECT_CHAIN })

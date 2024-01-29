@@ -8,7 +8,7 @@ import { Button, type ButtonStateConfig, type ButtonProps } from '@/components/B
 
 type ElementProps = {
   timeoutInSeconds: number;
-  finalSlot?: ReactNode;
+  slotFinal?: ReactNode;
 } & ButtonProps;
 
 export type TimeoutButtonProps = ElementProps;
@@ -16,7 +16,7 @@ export type TimeoutButtonProps = ElementProps;
 export const TimeoutButton = ({
   children,
   timeoutInSeconds,
-  finalSlot,
+  slotFinal,
   ...otherProps
 }: TimeoutButtonProps) => {
   const [timeoutDeadline] = useState(Date.now() + timeoutInSeconds * 1000);
@@ -25,7 +25,7 @@ export const TimeoutButton = ({
 
   const secondsLeft = Math.max(0, (timeoutDeadline - now) / 1000);
 
-  if (finalSlot && secondsLeft <= 0) return finalSlot;
+  if (slotFinal && secondsLeft <= 0) return slotFinal;
 
   return (
     <Button

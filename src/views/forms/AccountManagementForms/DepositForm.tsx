@@ -380,7 +380,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       <SourceSelectMenu
         selectedChain={chainIdStr || undefined}
         selectedExchange={exchange || undefined}
-        onSelectChain={onSelectChain}
+        onSelect={onSelectChain}
       />
       {exchange && nobleAddress ? (
         <NobleDeposit />

@@ -1,18 +1,21 @@
 import { useState } from 'react';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
+import { OpacityToken } from '@/constants/styles/base';
 import { STRING_KEYS } from '@/constants/localization';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { QrCode } from '@/components/QrCode';
+import { useAccounts, useStringGetter } from '@/hooks';
+
 import { CopyButton } from '@/components/CopyButton';
-import { TimeoutButton } from '@/components/TimeoutButton';
+import { QrCode } from '@/components/QrCode';
 import { Checkbox } from '@/components/Checkbox';
+import { Icon, IconName } from '@/components/Icon';
+import { TimeoutButton } from '@/components/TimeoutButton';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithReceipt } from '@/components/WithReceipt';
-import { Icon, IconName } from '@/components/Icon';
 
-import { useAccounts, useStringGetter } from '@/hooks';
+import { generateFadedColorVariant } from '@/lib/styles';
 
 export const NobleDeposit = () => {
   const [hasAcknowledged, setHasAcknowledged] = useState(false);
@@ -60,7 +63,7 @@ export const NobleDeposit = () => {
       >
         <TimeoutButton
           timeoutInSeconds={8}
-          finalSlot={<CopyButton state={{ isDisabled: !hasAcknowledged }} value={nobleAddress} />}
+          slotFinal={<CopyButton state={{ isDisabled: !hasAcknowledged }} value={nobleAddress} />}
         />
       </Styled.WithReceipt>
     </>
@@ -83,7 +86,10 @@ Styled.QrCodeContainer = styled.div`
   display: flex;
   justify-content: center;
 
+  padding: 0.5rem;
+
   background-color: var(--color-layer-2);
+  border-radius: 0.5rem;
 `;
 
 Styled.QrCode = styled(QrCode)`
@@ -119,7 +125,7 @@ Styled.CautionIconContainer = styled.div`
     content: '';
     width: 2.5rem;
     height: 2.5rem;
-    background-color: var(--color-warning);
-    opacity: 0.1;
+    background-color: ${({ theme }) =>
+      generateFadedColorVariant(theme.warning, OpacityToken.Opacity16)};
   }
 `;
