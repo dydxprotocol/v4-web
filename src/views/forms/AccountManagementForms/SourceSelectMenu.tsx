@@ -14,7 +14,6 @@ import { popoverMixins } from '@/styles/popoverMixins';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { testFlags } from '@/lib/testFlags';
 
 type ElementProps = {
   label?: string;
@@ -63,7 +62,7 @@ export const SourceSelectMenu = ({
   return (
     <SearchSelectMenu
       items={[
-        exchangeItems.length > 0 && testFlags.showCEXDepositOption && {
+        exchangeItems.length > 0 && {
           group: 'exchanges',
           groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
           items: exchangeItems,
