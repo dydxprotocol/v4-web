@@ -29,20 +29,18 @@ export const RewardsHelpPanel = () => {
     >
       <Accordion
         items={[
-          {
-            header: 'Who is eligible for trading rewards?',
-            content: 'All traders are eligible for trading rewards.',
-          },
-          {
-            header: 'How do trading rewards work?',
-            content:
-              'Immediately after each fill, trading rewards are sent directly to the trader’s dYdX Chain address, based on the amount of fees paid by the trader.',
-          },
-          {
-            header: 'How do I claim my rewards?',
-            content:
-              'Each block, trading rewards are automatically sent directly to the trader’s dYdX Chain address.',
-          },
+        {
+          header: stringGetter({ key: STRING_KEYS.FAQ_WHO_IS_ELIGIBLE_QUESTION }),
+          content: stringGetter({ key: STRING_KEYS.FAQ_WHO_IS_ELIGIBLE_ANSWER }),
+        },
+        {
+          header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_QUESTION }),
+          content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_ANSWER }),
+        },
+        {
+          header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_QUESTION }),
+          content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_ANSWER }),
+        },
         ]}
       />
     </Styled.HelpCard>
@@ -72,7 +70,7 @@ Styled.Header = styled.div`
   font: var(--font-small-book);
 
   @media ${breakpoints.notTablet} {
-    padding: 1.5rem 1.25rem;
+    padding: 1.5rem;
   }
 
   h3 {

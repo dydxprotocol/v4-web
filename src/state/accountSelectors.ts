@@ -9,6 +9,7 @@ import {
   AbacusOrderStatus,
   AbacusPositionSide,
   ORDER_SIDES,
+  HistoricalTradingReward,
 } from '@/constants/abacus';
 
 import { OnboardingState } from '@/constants/account';
@@ -348,6 +349,25 @@ export const getBalances = (state: RootState) => state.account?.balances;
  *  @returns user wallet staking balances
  * */
 export const getStakingBalances = (state: RootState) => state.account?.stakingBalances;
+
+/**
+ * @returns account all time trading rewards
+ */
+export const getTotalTradingRewards = (state: RootState) => state.account?.tradingRewards?.total;
+
+/**
+ * @returns account trading rewards aggregated by period
+ */
+export const getHistoricalTradingRewards = (state: RootState) =>
+  state.account?.tradingRewards?.historical;
+
+/**
+ * @returns account historical trading rewards for the specified perid
+ */
+export const getHistoricalTradingRewardsForPeriod = (period: string) =>
+  createSelector([getHistoricalTradingRewards], (historicalTradingRewards: any) =>
+    historicalTradingRewards?.get(period)
+  );
 
 /**
  * @returns UsageRestriction of the current session

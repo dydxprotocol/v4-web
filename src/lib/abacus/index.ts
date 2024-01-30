@@ -9,6 +9,9 @@ import type {
   TransferInputFields,
   HistoricalPnlPeriods,
   ParsingError,
+  HistoricaTradingRewardsPeriods,
+  HistoricaTradingRewardsPeriod,
+  HistoricalTradingReward,
 } from '@/constants/abacus';
 
 import {
@@ -227,6 +230,12 @@ class AbacusStateManager {
     this.stateManager.historicalPnlPeriod = period;
   };
 
+  setHistoricalTradingRewardPeriod = (
+    period: (typeof HistoricaTradingRewardsPeriod)[keyof typeof HistoricaTradingRewardsPeriod]
+  ) => {
+    this.stateManager.historicalTradingRewardPeriod = period;
+  };
+
   switchNetwork = (network: DydxNetwork) => {
     this.stateManager.environmentId = network;
 
@@ -277,6 +286,9 @@ class AbacusStateManager {
   // ------ Utils ------ //
   getHistoricalPnlPeriod = (): Nullable<HistoricalPnlPeriods> =>
     this.stateManager.historicalPnlPeriod;
+
+  getHistoricalTradingRewardPeriod = (): HistoricaTradingRewardsPeriods =>
+    this.stateManager.historicalTradingRewardPeriod;
 
   handleCandlesSubscription = ({
     channelId,

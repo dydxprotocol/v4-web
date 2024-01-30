@@ -68,7 +68,7 @@ export type TableItem<TableRowData> = {
   onSelect?: (key: TableRowData) => void;
 };
 
-type ColumnDef<TableRowData extends object> = {
+export type ColumnDef<TableRowData extends object> = {
   columnKey: string;
   label: React.ReactNode;
   tag?: React.ReactNode;
@@ -513,7 +513,7 @@ const TableColumnHeader = <TableRowData extends object>({
 export const ViewMoreRow = ({ colSpan, onClick }: { colSpan: number; onClick: () => void }) => {
   const stringGetter = useStringGetter();
   return (
-    <Styled.Tr key="viewmore">
+    <Styled.ViewMoreTr key="viewmore">
       <Styled.Td
         colSpan={colSpan}
         onMouseDown={(e: MouseEvent) => e.preventDefault()}
@@ -523,7 +523,7 @@ export const ViewMoreRow = ({ colSpan, onClick }: { colSpan: number; onClick: ()
           {stringGetter({ key: STRING_KEYS.VIEW_MORE })}
         </Styled.ViewMoreButton>
       </Styled.Td>
-    </Styled.Tr>
+    </Styled.ViewMoreTr>
   );
 };
 
@@ -672,6 +672,8 @@ Styled.TableWrapper = styled.div<{
   --table-firstColumn-cell-align: start; // start | center | end | var(--table-cell-align)
   --table-lastColumn-cell-align: end; // start | center | end | var(--table-cell-align)
   --tableCell-padding: 0 1rem;
+
+  --tableViewMore-borderColor: inherit;
 
   // Rules
 
@@ -983,4 +985,8 @@ Styled.ViewMoreButton = styled(Button)`
     width: 0.675rem;
     margin-left: 0.5ch;
   }
+`;
+
+Styled.ViewMoreTr = styled(Styled.Tr)`
+  --border-color: var(--tableViewMore-borderColor);
 `;

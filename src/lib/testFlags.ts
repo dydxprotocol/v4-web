@@ -26,6 +26,10 @@ class TestFlags {
   get addressOverride():string {
     return this.queryParams.address;
   }
+  
+  get showTradingRewards() {
+    return !!this.queryParams.tradingrewards;
+  }
 }
 
 export const testFlags = new TestFlags();
