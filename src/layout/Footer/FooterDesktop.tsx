@@ -126,7 +126,7 @@ Styled.StatusDot = styled.div<{ exchangeStatus: ExchangeStatus }>`
 
   background-color: ${({ exchangeStatus }) =>
     ({
-      [ExchangeStatus.Degraded]: css`var(--color-error)`,
+      [ExchangeStatus.Degraded]: css`var(--color-warning)`,
       [ExchangeStatus.Operational]: css`var(--color-success)`,
     }[exchangeStatus])};
 `;
