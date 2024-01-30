@@ -70,7 +70,7 @@ Styled.Header = styled.div`
   font: var(--font-small-book);
 
   @media ${breakpoints.notTablet} {
-    padding: 1.5rem 1.25rem;
+    padding: 1.5rem;
   }
 
   h3 {

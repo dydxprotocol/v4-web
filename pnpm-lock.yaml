@@ -30,8 +30,8 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.1
   '@dydxprotocol/v4-abacus':
-    specifier: file:/Users/alekacheung/Documents/dydx/v4/v4-abacus/build/packages/js/dydxprotocol-v4-abacus-1.3.3.tgz
-    version: file:../v4-abacus/build/packages/js/dydxprotocol-v4-abacus-1.3.3.tgz
+    specifier: ^1.3.4
+    version: 1.3.4
   '@dydxprotocol/v4-client-js':
     specifier: ^1.0.17
     version: 1.0.17
@@ -1101,6 +1101,10 @@ packages:
   /@cush/relative@1.0.0:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
+
+  /@dydxprotocol/v4-abacus@1.3.4:
+    resolution: {integrity: sha512-6P61ZEMFqDit5G1+1yQSrDQWT51ap1jqF+ba/oaSg30CMUuhD2+1z6lDtUZbPw5+TjE4f7UyN/LYBTwylSiobA==}
+    dev: false
 
   /@dydxprotocol/v4-client-js@1.0.17:
     resolution: {integrity: sha512-PbTKbzcS7VapuFRofkirUxkF9ThNS2tWYyr0asFOMUfebsQWMvTC1sYC/s1NZIiBeq3cFz9vKdZFbfsKi7Z1bw==}
@@ -14930,15 +14934,7 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
 
-<<<<<<< HEAD
-=======
-  file:../v4-abacus/build/packages/js/dydxprotocol-v4-abacus-1.3.1.tgz:
-    resolution: {integrity: sha512-WSK5kUe8kAc8iYlBtTWY3x6FttBWTGSxbBGuepS5klZpEHbeiOCEhm/P2UWdEreAyFzIzO/vDRrxPtRkLB65tg==, tarball: file:../v4-abacus/build/packages/js/dydxprotocol-v4-abacus-1.3.1.tgz}
-    name: '@dydxprotocol/v4-abacus'
-    version: 1.3.1
-    dev: false
 
->>>>>>> 2b7fa3c (add mocked data)
 settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false

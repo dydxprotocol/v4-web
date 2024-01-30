@@ -47,18 +47,11 @@ const getTradingRewardHistoryTableColumnDef = ({
                         timeOptions={{ useUTC: true }}
                       />
                       →
-                      {endedAtInMilliseconds ? (
-                        <Output
-                          type={OutputType.Date}
-                          value={endedAtInMilliseconds}
-                          timeOptions={{ useUTC: true }}
-                        />
-                      ) : (
-                        <Output
-                          type={OutputType.Text}
-                          value={stringGetter({ key: STRING_KEYS.TODAY })}
-                        />
-                      )}
+                      <Output
+                        type={OutputType.Date}
+                        value={endedAtInMilliseconds}
+                        timeOptions={{ useUTC: true }}
+                      />
                     </>
                   ),
                 },

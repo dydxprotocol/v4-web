@@ -56,18 +56,11 @@ export const TradingRewardsSummaryPanel = () => {
                         timeOptions={{ useUTC: true }}
                       />
                       →
-                      {currentWeekTradingReward.endedAtInMilliseconds ? (
-                        <Output
-                          type={OutputType.Date}
-                          value={currentWeekTradingReward.endedAtInMilliseconds}
-                          timeOptions={{ useUTC: true }}
-                        />
-                      ) : (
-                        <Output
-                          type={OutputType.Text}
-                          value={stringGetter({ key: STRING_KEYS.TODAY })}
-                        />
-                      )}
+                      <Output
+                        type={OutputType.Date}
+                        value={currentWeekTradingReward.endedAtInMilliseconds}
+                        timeOptions={{ useUTC: true }}
+                      />
                     </Styled.TimePeriod>
                   </Styled.Column>
                 ),
