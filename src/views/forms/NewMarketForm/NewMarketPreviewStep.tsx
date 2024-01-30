@@ -289,7 +289,7 @@ export const NewMarketPreviewStep = ({
                 sign={NumberSign.Negative}
                 fractionDigits={TOKEN_DECIMALS}
                 type={OutputType.Number}
-                value={nativeTokenBalance}
+                value={nativeTokenBalance.isZero() ? undefined : nativeTokenBalance}
                 newValue={nativeTokenBalance.minus(initialDepositAmountBN)}
               />
             ),
