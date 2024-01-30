@@ -77,19 +77,21 @@ export const NewMarketSelectionStep = ({
   const { potentialMarkets, exchangeConfigs } = usePotentialMarkets();
   const stringGetter = useStringGetter();
   const { newMarketProposal } = useGovernanceVariables();
-  const initialDepositAmount = MustBigNumber(newMarketProposal.initialDepositAmount).div(1e18);
+  const initialDepositAmountBN = MustBigNumber(newMarketProposal.initialDepositAmount).div(1e18);
+  const initialDepositAmountDecimals = isMainnet ? 0 : 18;
+  const initialDepositAmount = initialDepositAmountBN.toFixed(initialDepositAmountDecimals);
 
   const [tempLiquidityTier, setTempLiquidityTier] = useState<number>();
   const [canModifyLiqTier, setCanModifyLiqTier] = useState(false);
 
   const alertMessage = useMemo(() => {
-    if (nativeTokenBalance.lt(initialDepositAmount)) {
+    if (nativeTokenBalance.lt(initialDepositAmountBN)) {
       return {
         type: AlertType.Warning,
         message: stringGetter({
           key: STRING_KEYS.NOT_ENOUGH_BALANCE,
           params: {
-            NUM_TOKENS_REQUIRED: initialDepositAmount.toString(),
+            NUM_TOKENS_REQUIRED: initialDepositAmount,
             NATIVE_TOKEN_DENOM: chainTokenLabel,
           },
         }),
@@ -324,8 +326,8 @@ export const NewMarketSelectionStep = ({
                           <Styled.Output
                             useGrouping
                             type={OutputType.Number}
-                            value={initialDepositAmount}
-                            fractionDigits={isMainnet ? 0 : 18}
+                            value={initialDepositAmountBN}
+                            fractionDigits={initialDepositAmountDecimals}
                           />
                         ),
                       },

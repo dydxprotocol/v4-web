@@ -3,6 +3,7 @@ import styled, { AnyStyledComponent } from 'styled-components';
 import { utils } from '@dydxprotocol/v4-client-js';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { isMainnet } from '@/constants/networks';
 import { PotentialMarketItem } from '@/constants/potentialMarkets';
 import { useGovernanceVariables, useStringGetter, useTokenConfigs } from '@/hooks';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
@@ -15,7 +16,6 @@ import { Tag, TagType } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { MustBigNumber } from '@/lib/numbers';
-import { isMainnet } from '@/constants/networks';
 
 type ElementProps = {
   preventClose?: boolean;
@@ -46,6 +46,7 @@ export const NewMarketMessageDetailsDialog = ({
   const { newMarketProposal } = useGovernanceVariables();
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
+  const initialDepositAmountDecimals = isMainnet ? 0 : 18;
 
   const exchangeConfig = useMemo(() => {
     return baseAsset ? exchangeConfigs?.[baseAsset] : undefined;
@@ -289,7 +290,7 @@ export const NewMarketMessageDetailsDialog = ({
                     <Output
                       type={OutputType.Asset}
                       value={MustBigNumber(newMarketProposal.initialDepositAmount).div(1e18)}
-                      fractionDigits={isMainnet ? 0 : 18}
+                      fractionDigits={initialDepositAmountDecimals}
                       tag={chainTokenLabel}
                     />
                   }

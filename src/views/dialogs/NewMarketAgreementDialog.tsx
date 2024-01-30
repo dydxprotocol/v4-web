@@ -96,7 +96,7 @@ Styled.Content = styled.div`
 
   p {
     border-radius: 0.5rem;
-    padding: 0.5rem;
+    padding: 1rem;
     background-color: var(--color-layer-1);
   }
 `;

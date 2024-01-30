@@ -63,7 +63,9 @@ export const NewMarketPreviewStep = ({
   const { exchangeConfigs } = usePotentialMarkets();
   const { submitNewMarketProposal } = useSubaccount();
   const { newMarketProposal } = useGovernanceVariables();
-  const initialDepositAmount = MustBigNumber(newMarketProposal.initialDepositAmount).div(1e18);
+  const initialDepositAmountBN = MustBigNumber(newMarketProposal.initialDepositAmount).div(1e18);
+  const initialDepositAmountDecimals = isMainnet ? 0 : 18;
+  const initialDepositAmount = initialDepositAmountBN.toFixed(initialDepositAmountDecimals);
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
 
   const { label, initialMarginFraction, maintenanceMarginFraction, impactNotional } =
@@ -78,13 +80,13 @@ export const NewMarketPreviewStep = ({
         message: errorMessage,
       };
     }
-    if (nativeTokenBalance.lt(initialDepositAmount)) {
+    if (nativeTokenBalance.lt(initialDepositAmountBN)) {
       return {
         type: AlertType.Error,
         message: stringGetter({
           key: STRING_KEYS.NOT_ENOUGH_BALANCE,
           params: {
-            NUM_TOKENS_REQUIRED: initialDepositAmount.toString(),
+            NUM_TOKENS_REQUIRED: initialDepositAmount,
             NATIVE_TOKEN_DENOM: chainTokenLabel,
           },
         }),
@@ -100,7 +102,7 @@ export const NewMarketPreviewStep = ({
     return Math.abs(p - 3);
   }, [assetData]);
 
-  const isDisabled = false; //alertMessage !== null;
+  const isDisabled = alertMessage !== null;
 
   return (
     <Styled.Form
@@ -259,15 +261,15 @@ export const NewMarketPreviewStep = ({
             value: (
               <Output
                 type={OutputType.Number}
-                value={initialDepositAmount.toString()}
-                fractionDigits={isMainnet ? 0 : 18}
+                value={initialDepositAmount}
+                fractionDigits={initialDepositAmountDecimals}
                 slotRight={
                   <>
                     {'+ '}
                     <Styled.Icon
-                      $hasError={nativeTokenBalance?.lt(initialDepositAmount)}
+                      $hasError={nativeTokenBalance?.lt(initialDepositAmountBN)}
                       iconName={
-                        nativeTokenBalance?.gt(initialDepositAmount)
+                        nativeTokenBalance?.gt(initialDepositAmountBN)
                           ? IconName.CheckCircle
                           : IconName.CautionCircle
                       }
@@ -288,7 +290,7 @@ export const NewMarketPreviewStep = ({
                 fractionDigits={TOKEN_DECIMALS}
                 type={OutputType.Number}
                 value={nativeTokenBalance}
-                newValue={nativeTokenBalance.minus(initialDepositAmount)}
+                newValue={nativeTokenBalance.minus(initialDepositAmountBN)}
               />
             ),
           },
@@ -308,7 +310,13 @@ export const NewMarketPreviewStep = ({
         </Button>
       </Styled.ButtonRow>
       <Styled.Disclaimer>
-        {stringGetter({ key: STRING_KEYS.PROPOSAL_DISCLAIMER })}
+        {stringGetter({
+          key: STRING_KEYS.PROPOSAL_DISCLAIMER,
+          params: {
+            NUM_TOKENS_REQUIRED: initialDepositAmount,
+            NATIVE_TOKEN_DENOM: chainTokenLabel,
+          },
+        })}
       </Styled.Disclaimer>
     </Styled.Form>
   );
