@@ -286,6 +286,7 @@ export const NewMarketSelectionStep = ({
               assetToAdd && {
                 key: 'reference-price',
                 label: stringGetter({ key: STRING_KEYS.REFERENCE_PRICE }),
+                tooltip: 'reference-price',
                 value: (
                   <Output
                     type={OutputType.Fiat}

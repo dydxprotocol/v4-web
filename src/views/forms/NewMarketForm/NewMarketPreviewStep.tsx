@@ -281,7 +281,11 @@ export const NewMarketPreviewStep = ({
           },
           {
             key: 'wallet-balance',
-            label: stringGetter({ key: STRING_KEYS.WALLET_BALANCE }),
+            label: (
+              <span>
+                {stringGetter({ key: STRING_KEYS.WALLET_BALANCE })} <Tag>{chainTokenLabel}</Tag>
+              </span>
+            ),
             value: (
               <DiffOutput
                 withDiff
