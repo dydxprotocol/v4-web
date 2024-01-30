@@ -96,7 +96,7 @@ export const NewMarketMessageDetailsDialog = ({
           {
             [CodeToggleGroup.CREATE_ORACLE]: (
               <Styled.Code>
-                <Details
+                <Styled.Details
                   layout="column"
                   items={[
                     {
@@ -147,7 +147,7 @@ export const NewMarketMessageDetailsDialog = ({
             ),
             [CodeToggleGroup.MSG_CREATE_PERPETUAL]: (
               <Styled.Code>
-                <Details
+                <Styled.Details
                   layout="column"
                   items={[
                     {
@@ -186,7 +186,7 @@ export const NewMarketMessageDetailsDialog = ({
             ),
             [CodeToggleGroup.MSG_CREATE_CLOB_PAIR]: (
               <Styled.Code>
-                <Details
+                <Styled.Details
                   layout="column"
                   items={[
                     {
@@ -225,7 +225,7 @@ export const NewMarketMessageDetailsDialog = ({
             ),
             [CodeToggleGroup.MSG_DELAY_MESSAGE]: (
               <Styled.Code>
-                <Details
+                <Styled.Details
                   layout="column"
                   items={[
                     {
@@ -242,7 +242,7 @@ export const NewMarketMessageDetailsDialog = ({
                   ]}
                 />
                 <div style={{ marginTop: '1rem' }}>MSG_UPDATE_CLOB_PAIR</div>
-                <Details
+                <Styled.Details
                   layout="column"
                   items={[
                     {
@@ -345,7 +345,11 @@ Styled.Code = styled.div`
   margin-top: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0rem;
+`;
+
+Styled.Details = styled(Details)`
+  --details-item-height: 1.5rem;
 `;
 
 Styled.Line = styled.pre`

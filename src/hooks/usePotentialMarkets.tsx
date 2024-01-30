@@ -40,8 +40,8 @@ export const usePotentialMarketsContext = () => {
             stringVal: data,
             splitter: ',',
           });
-          const parsedPotentialMarkets = parsedData.map((item) => {
-            const {
+          const parsedPotentialMarkets = parsedData.map(
+            ({
               base_asset,
               reference_price,
               num_oracles,
@@ -57,8 +57,7 @@ export const usePotentialMarketsContext = () => {
               subticks_per_tick,
               min_order_size,
               quantum_conversion_exponent,
-            } = item;
-            return {
+            }) => ({
               // convert to camelCase
               baseAsset: base_asset,
               referencePrice: reference_price,
@@ -75,8 +74,8 @@ export const usePotentialMarketsContext = () => {
               subticksPerTick: Number(subticks_per_tick),
               minOrderSize: Number(min_order_size),
               quantumConversionExponent: Number(quantum_conversion_exponent),
-            };
-          });
+            })
+          );
 
           setPotentialMarkets(parsedPotentialMarkets);
         });

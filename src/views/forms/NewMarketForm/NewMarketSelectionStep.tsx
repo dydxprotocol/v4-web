@@ -229,7 +229,7 @@ export const NewMarketSelectionStep = ({
                       )}
                     </Styled.Header>
                     <Styled.Details
-                      layout={isMobile ? 'stackColumn' : 'rowColumns'}
+                      layout={isMobile ? 'grid' : 'rowColumns'}
                       withSeparators={!isMobile}
                       items={[
                         {
