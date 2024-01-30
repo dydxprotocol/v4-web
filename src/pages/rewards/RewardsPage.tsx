@@ -23,7 +23,6 @@ import { GovernancePanel } from './GovernancePanel';
 import { StakingPanel } from './StakingPanel';
 import { NewMarketsPanel } from './NewMarketsPanel';
 
-
 const RewardsPage = () => {
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
@@ -58,7 +57,7 @@ const RewardsPage = () => {
         )}
 
         {isNotTablet && (
-          <Styled.OtherColumn>
+          <Styled.OtherColumn showTradingRewards={testFlags.showTradingRewards}>
             <NewMarketsPanel />
             <GovernancePanel />
             <StakingPanel />
@@ -156,9 +155,20 @@ Styled.TradingRewardsColumn = styled.div`
   ${layoutMixins.flexColumn}
 `;
 
-Styled.OtherColumn = styled.div`
+Styled.OtherColumn = styled.div<{ showTradingRewards?: boolean }>`
   grid-area: other;
   ${layoutMixins.flexColumn}
+
+  ${({ showTradingRewards }) =>
+    !showTradingRewards &&
+    css`
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+
+      > section:last-of-type {
+        grid-column: 1 / -1;
+      }
+    `}
 `;
 
 Styled.RewardHistoryHeader = styled.div`
