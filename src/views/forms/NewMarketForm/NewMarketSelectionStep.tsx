@@ -127,7 +127,12 @@ export const NewMarketSelectionStep = ({
     <Styled.Form
       onSubmit={(e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        onConfirmMarket();
+        if (canModifyLiqTier) {
+          setLiquidityTier(tempLiquidityTier);
+          setCanModifyLiqTier(false);
+        } else {
+          onConfirmMarket();
+        }
       }}
     >
       <h2>
@@ -347,7 +352,9 @@ export const NewMarketSelectionStep = ({
             state={{ isDisabled: shouldDisableConfirmButton }}
             action={ButtonAction.Primary}
           >
-            {stringGetter({ key: STRING_KEYS.PREVIEW_MARKET_PROPOSAL })}
+            {canModifyLiqTier
+              ? stringGetter({ key: STRING_KEYS.SAVE })
+              : stringGetter({ key: STRING_KEYS.PREVIEW_MARKET_PROPOSAL })}
           </Button>
         )}
       </WithReceipt>
