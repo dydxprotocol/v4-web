@@ -6,14 +6,22 @@ import { NOBLE_BECH32_PREFIX, LocalWallet, type Subaccount } from '@dydxprotocol
 
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
 import { DialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
 import { LocalStorageKey, LOCAL_STORAGE_VERSIONS } from '@/constants/localStorage';
-import { DydxAddress, EvmAddress, PrivateInformation } from '@/constants/wallets';
+import {
+  DydxAddress,
+  EvmAddress,
+  PrivateInformation,
+  TEST_WALLET_EVM_ADDRESS,
+  WalletType,
+} from '@/constants/wallets';
 
 import { setOnboardingState, setOnboardingGuard } from '@/state/account';
 import { forceOpenDialog } from '@/state/dialogs';
 
 import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
+import { testFlags } from '@/lib/testFlags';
 
 import { useDydxClient } from './useDydxClient';
 import { useLocalStorage } from './useLocalStorage';
@@ -153,6 +161,7 @@ const useAccountsContext = () => {
 
   // dYdX wallet / onboarding state
   const [localDydxWallet, setLocalDydxWallet] = useState<LocalWallet>();
+  const [localNobleWallet, setLocalNobleWallet] = useState<LocalWallet>();
   const [hdKey, setHdKey] = useState<PrivateInformation>();
 
   const dydxAccounts = useMemo(() => localDydxWallet?.accounts, [localDydxWallet]);
@@ -160,6 +169,11 @@ const useAccountsContext = () => {
   const dydxAddress = useMemo(
     () => localDydxWallet?.address as DydxAddress | undefined,
     [localDydxWallet]
+  );
+
+  const nobleAddress = useMemo(
+    () => localNobleWallet?.address,
+    [localNobleWallet]
   );
 
   const setWalletFromEvmSignature = async (signature: string) => {
@@ -178,7 +192,26 @@ const useAccountsContext = () => {
 
   useEffect(() => {
     (async () => {
-      if (connectedDydxAddress && signerGraz) {
+      if (walletType === WalletType.TestWallet) {
+        // Get override values. Use the testFlags value if it exists, otherwise use the previously
+        // saved value where possible. If neither exist, use a default garbage value.
+        const addressOverride: DydxAddress = testFlags.addressOverride as DydxAddress ||
+          evmDerivedAddresses?.[TEST_WALLET_EVM_ADDRESS]?.dydxAddress as DydxAddress ||
+          'dydx1';
+
+        dispatch(setOnboardingState(OnboardingState.WalletConnected));
+
+        // Set variables.
+        saveEvmDerivedAccount({
+          evmAddress: TEST_WALLET_EVM_ADDRESS,
+          dydxAddress: addressOverride,
+        });
+        const wallet = new LocalWallet();
+        wallet.address = addressOverride;
+        setLocalDydxWallet(wallet);
+
+        dispatch(setOnboardingState(OnboardingState.AccountConnected));
+      } else if (connectedDydxAddress && signerGraz) {
         dispatch(setOnboardingState(OnboardingState.WalletConnected));
         try {
           setLocalDydxWallet(await LocalWallet.fromOfflineSigner(signerGraz));
@@ -224,6 +257,7 @@ const useAccountsContext = () => {
       if (hdKey?.mnemonic) {
         const nobleWallet = await LocalWallet.fromMnemonic(hdKey.mnemonic, NOBLE_BECH32_PREFIX);
         abacusStateManager.setNobleWallet(nobleWallet);
+        setLocalNobleWallet(nobleWallet);
       }
     };
     setNobleWallet();
@@ -322,6 +356,7 @@ const useAccountsContext = () => {
     localDydxWallet,
     dydxAccounts,
     dydxAddress,
+    nobleAddress,
 
     // Onboarding state
     saveHasAcknowledgedTerms,

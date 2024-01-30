@@ -96,6 +96,8 @@ export const useTradeFormData = () => {
           needsGoodUntil,
           needsPostOnly,
           needsReduceOnly,
+          postOnlyTooltip,
+          reduceOnlyTooltip,
           timeInForceOptions,
         } = tradeOptions || {};
 
@@ -111,6 +113,8 @@ export const useTradeFormData = () => {
           needsGoodUntil,
           needsPostOnly,
           needsReduceOnly,
+          postOnlyTooltip,
+          reduceOnlyTooltip,
           timeInForceOptions,
 
           tradeErrors,

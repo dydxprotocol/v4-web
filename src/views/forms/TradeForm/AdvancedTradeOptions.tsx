@@ -31,12 +31,15 @@ export const AdvancedTradeOptions = () => {
 
   const { execution, goodTil, postOnly, reduceOnly, timeInForce, type } = inputTradeData || {};
 
-  const { executionOptions, needsGoodUntil, needsPostOnly, needsReduceOnly, timeInForceOptions } =
+  const { executionOptions, needsGoodUntil, needsPostOnly, needsReduceOnly, postOnlyTooltip, reduceOnlyTooltip, timeInForceOptions } =
     currentTradeFormConfig || {};
 
   const { duration, unit } = goodTil || {};
 
-  const needsExecution = executionOptions || needsPostOnly || needsReduceOnly;
+  const showPostOnly = (needsPostOnly || postOnlyTooltip);
+  const showReduceOnly = (needsReduceOnly || reduceOnlyTooltip);
+
+  const needsExecution = executionOptions || showPostOnly || showReduceOnly;
   const hasTimeInForce = timeInForceOptions?.toArray()?.length;
 
   return (
@@ -129,26 +132,9 @@ export const AdvancedTradeOptions = () => {
                 ))}
               </Styled.SelectMenu>
             )}
-            {needsPostOnly && (
-              <Checkbox
-                checked={postOnly || false}
-                onCheckedChange={(checked) =>
-                  abacusStateManager.setTradeValue({
-                    value: checked,
-                    field: TradeInputField.postOnly,
-                  })
-                }
-                id="post-only"
-                label={
-                  <WithTooltip tooltip="post-only" side="right">
-                    {stringGetter({ key: STRING_KEYS.POST_ONLY })}
-                  </WithTooltip>
-                }
-              />
-            )}
-            {needsReduceOnly && (
-              <Checkbox
-                checked={reduceOnly || false}
+            {showReduceOnly && <Checkbox
+                checked={(reduceOnly && !reduceOnlyTooltip) || false}
+                disabled={!!reduceOnlyTooltip}
                 onCheckedChange={(checked) =>
                   abacusStateManager.setTradeValue({
                     value: checked,
@@ -157,8 +143,26 @@ export const AdvancedTradeOptions = () => {
                 }
                 id="reduce-only"
                 label={
-                  <WithTooltip tooltip="reduce-only" side="right">
+                  <WithTooltip tooltip={needsReduceOnly ? "reduce-only" : reduceOnlyTooltip?.titleStringKey.includes("REDUCE_ONLY_EXECUTION_IOC_FOK") ? "reduce-only-execution-ioc-fok" : "reduce-only-timeinforce-ioc-fok"} side="right">
                     {stringGetter({ key: STRING_KEYS.REDUCE_ONLY })}
+                  </WithTooltip>
+                }
+              />
+            }
+            {showPostOnly && (
+              <Checkbox
+                checked={(postOnly && !postOnlyTooltip) || false}
+                disabled={!!postOnlyTooltip}
+                onCheckedChange={(checked) =>
+                  abacusStateManager.setTradeValue({
+                    value: checked,
+                    field: TradeInputField.postOnly,
+                  })
+                }
+                id="post-only"
+                label={
+                  <WithTooltip tooltip={needsPostOnly ? "post-only" : "post-only-timeinforce-gtt"} side="right">
+                    {stringGetter({ key: STRING_KEYS.POST_ONLY })}
                   </WithTooltip>
                 }
               />
