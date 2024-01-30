@@ -15,7 +15,6 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
-import { Panel } from '@/components/Panel';
 import { HorizontalSeparatorFiller } from '@/components/Separator';
 
 type ElementProps = {
@@ -39,7 +38,7 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
 
   const themePanels = () => {
     return (
-      <Styled.Root value={currentTheme}>
+      <Styled.AppThemeRoot value={currentTheme}>
         {[
           {
             theme: AppTheme.Classic,
@@ -54,27 +53,25 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
             label: STRING_KEYS.LIGHT,
           },
         ].map(({ theme, label }) => (
-          <Item value={theme}>
-            <Styled.Panel
-              backgroundColor={Themes[theme].layer2}
-              gridColor={Themes[theme].borderDefault}
-              onClick={() => {
-                dispatch(setAppTheme(theme));
-              }}
-              slotHeader={
-                <Styled.PanelHeader textColor={Themes[theme].textPrimary}>
-                  {stringGetter({ key: label })}
-                </Styled.PanelHeader>
-              }
-            >
-              <Styled.Image src="/chart-bars.svg" />
-              <Styled.Indicator>
-                <Styled.CheckIcon iconName={IconName.Check} />
-              </Styled.Indicator>
-            </Styled.Panel>
-          </Item>
+          <Styled.AppThemeItem
+            key={theme}
+            value={theme}
+            backgroundcolor={Themes[theme].layer2}
+            gridcolor={Themes[theme].borderDefault}
+            onClick={() => {
+              dispatch(setAppTheme(theme));
+            }}
+          >
+            <Styled.AppThemeHeader textcolor={Themes[theme].textPrimary}>
+              {stringGetter({ key: label })}
+            </Styled.AppThemeHeader>
+            <Styled.Image src="/chart-bars.svg" />
+            <Styled.CheckIndicator>
+              <Styled.CheckIcon iconName={IconName.Check} />
+            </Styled.CheckIndicator>
+          </Styled.AppThemeItem>
         ))}
-      </Styled.Root>
+      </Styled.AppThemeRoot>
     );
   };
 
@@ -94,37 +91,59 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
-Styled.Section = styled.div`
+const gridStyle = css`
   display: grid;
   gap: 1.5rem;
+`;
+
+Styled.Section = styled.div`
+  ${gridStyle}
+  padding: 1rem 0;
 `;
 
 Styled.Header = styled.header`
   ${layoutMixins.inlineRow}
 `;
 
-Styled.Root = styled(Root)`
-  display: grid;
+Styled.AppThemeRoot = styled(Root)`
+  ${gridStyle}
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
 `;
 
-Styled.Panel = styled(Panel)<{ backgroundColor: string; gridColor: string }>`
-  --panel-content-paddingY: 0.25rem;
-  --panel-content-paddingX: 0.25rem;
+Styled.Item = styled(Item)`
+  --border-color: var(--color-border);
+  --item-padding: 0.75rem;
 
-  ${({ backgroundColor, gridColor }) => css`
-    --themePanel-backgroundColor: ${backgroundColor};
-    --themePanel-gridColor: ${gridColor};
+  &[data-state='checked'] {
+    --border-color: var(--color-accent);
+  }
+
+  border: solid var(--border-width) var(--border-color);
+  border-radius: 0.875rem;
+  padding: var(--item-padding);
+`;
+
+Styled.AppThemeItem = styled(Styled.Item)<{ backgroundcolor: string; gridcolor: string }>`
+  ${({ backgroundcolor, gridcolor }) => css`
+    --themePanel-backgroundColor: ${backgroundcolor};
+    --themePanel-gridColor: ${gridcolor};
   `}
 
-  &:before {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  background-color: var(--themePanel-backgroundColor);
+
+  &::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
+
+    border-radius: 0.875rem;
 
     background: radial-gradient(
       55% 35% at 50% 65%,
@@ -135,50 +154,46 @@ Styled.Panel = styled(Panel)<{ backgroundColor: string; gridColor: string }>`
     mask-image: url('/chart-bars-background.svg');
     mask-size: cover;
   }
-
-  position: relative;
-  padding: 0.75rem;
-
-  background-color: var(--themePanel-backgroundColor);
-  border: solid var(--border-width) var(--color-border);
 `;
 
-Styled.PanelHeader = styled.h3<{ textColor: string }>`
-  ${({ textColor }) => css`
-    color: ${textColor};
+Styled.AppThemeHeader = styled.h3<{ textcolor: string }>`
+  ${({ textcolor }) => css`
+    color: ${textcolor};
   `}
-
-  align-self: flex-start;
   z-index: 1;
 `;
 
 Styled.Image = styled.img`
   width: 100%;
   height: auto;
+  z-index: 1;
 `;
 
-Styled.Indicator = styled(Indicator)`
+const indicatorStyle = css`
   --indicator-size: 1.25rem;
+  --icon-size: 0.5rem;
 
   height: var(--indicator-size);
   width: var(--indicator-size);
 
-  position: absolute;
-  bottom: 0;
-  right: 0;
-
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+`;
+
+Styled.CheckIndicator = styled(Indicator)`
+  ${indicatorStyle}
+
+  position: absolute;
+  bottom: var(--item-padding);
+  right: var(--item-padding);
 
   background-color: var(--color-accent);
-  border-radius: 50%;
   color: var(--color-text-2);
 `;
 
 Styled.CheckIcon = styled(Icon)`
-  --icon-size: 0.625rem;
-
   width: var(--icon-size);
   height: var(--icon-size);
 `;
