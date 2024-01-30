@@ -12,8 +12,10 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Themes } from '@/styles/themes';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { NumberSign } from '@/constants/numbers';
 
 import { Dialog } from '@/components/Dialog';
+import { DiffArrow } from '@/components/DiffArrow';
 import { Icon, IconName } from '@/components/Icon';
 import { HorizontalSeparatorFiller } from '@/components/Separator';
 
