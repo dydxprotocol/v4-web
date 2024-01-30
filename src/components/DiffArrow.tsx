@@ -52,7 +52,7 @@ Styled.DiffArrowContainer = styled.span<DiffArrowProps>`
   ${({ direction }) =>
     ({
       right: css`
-        transform: scaleX(1); 
+        transform: scaleX(1);
       `,
       left: css`
         transform: scaleX(-1);
@@ -62,6 +62,6 @@ Styled.DiffArrowContainer = styled.span<DiffArrowProps>`
       `,
       down: css`
         transform: rotate(90deg);
-      `
+      `,
     }[direction || 'right'])}
 `;
