@@ -286,10 +286,10 @@ Styled.ConnectedIcon = styled.div`
   height: 0.5rem;
   width: 0.5rem;
   margin-right: 0.25rem;
-  background: var(--color-positive);
+  background: var(--color-success);
 
   border-radius: 50%;
-  box-shadow: 0 0 0 0.2rem var(--color-gradient-positive);
+  box-shadow: 0 0 0 0.2rem var(--color-gradient-success);
 `;
 
 Styled.Address = styled.h1`
@@ -318,7 +318,7 @@ Styled.ActionButton = styled(IconButton)<{ iconName?: IconName }>`
   ${({ iconName }) =>
     iconName === IconName.Close
       ? css`
-          --button-textColor: var(--color-negative);
+          --button-textColor: var(--color-error);
           --button-icon-size: 0.75em;
         `
       : iconName === IconName.Transfer &&

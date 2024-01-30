@@ -441,7 +441,7 @@ Styled.DestinationInputLabel = styled.span`
   ${layoutMixins.inlineRow}
 
   svg {
-    color: var(--color-positive);
+    color: var(--color-success);
   }
 `;
 

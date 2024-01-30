@@ -179,7 +179,7 @@ Styled.Icon = styled.div<{ state: 'complete' | 'default' }>`
   ${({ state }) =>
     ({
       ['complete']: css`
-        color: var(--color-positive);
+        color: var(--color-success);
       `,
       ['default']: css`
         color: var(--color-text-0);

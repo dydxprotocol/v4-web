@@ -231,7 +231,7 @@ Styled.CircleContainer = styled.div`
 `;
 
 Styled.Icon = styled(Icon)`
-  color: var(--color-negative);
+  color: var(--color-error);
 `;
 
 Styled.WithUsage = styled.div`

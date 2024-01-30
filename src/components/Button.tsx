@@ -102,13 +102,13 @@ const buttonActionVariants = {
 
   [ButtonAction.Create]: css`
     --button-textColor: var(--color-text-2);
-    --button-backgroundColor: var(--color-positive);
+    --button-backgroundColor: var(--color-success);
     --button-border: solid var(--border-width) var(--color-border-white);
   `,
 
   [ButtonAction.Destroy]: css`
     --button-textColor: var(--color-text-2);
-    --button-backgroundColor: var(--color-negative);
+    --button-backgroundColor: var(--color-error);
     --button-border: solid var(--border-width) var(--color-border-white);
   `,
 
@@ -119,7 +119,7 @@ const buttonActionVariants = {
   `,
 
   [ButtonAction.Reset]: css`
-    --button-textColor: var(--color-negative);
+    --button-textColor: var(--color-error);
     --button-backgroundColor: var(--color-layer-3);
     --button-border: solid var(--border-width) var(--color-border-red);
   `,

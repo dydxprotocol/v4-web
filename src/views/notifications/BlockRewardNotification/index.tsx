@@ -72,7 +72,7 @@ Styled.Notification = styled(Notification)`
 Styled.Output = styled(Output)`
   &:before {
     content: '+';
-    color: var(--color-positive);
+    color: var(--color-success);
     margin-right: 0.5ch;
   }
 `;
