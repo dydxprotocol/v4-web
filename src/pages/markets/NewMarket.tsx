@@ -106,7 +106,9 @@ const NewMarket = () => {
           </Button>
           {displaySteps && (
             <>
-              <h2>{stringGetter({ key: STRING_KEYS.STEPS_TO_CREATE })}</h2>
+              <Styled.StepsTitle>
+                {stringGetter({ key: STRING_KEYS.STEPS_TO_CREATE })}
+              </Styled.StepsTitle>
               {steps.map((item) => (
                 <StepItem
                   key={item.step}
@@ -149,8 +151,12 @@ Styled.Page = styled.div`
 `;
 
 Styled.ContentSectionHeader = styled(ContentSectionHeader)`
+  @media ${breakpoints.notTablet} {
+    padding: 1rem 0;
+  }
+
   @media ${breakpoints.tablet} {
-    padding: 1.25rem 1.875rem 0;
+    padding: 1.25rem 0;
 
     h3 {
       font: var(--font-extra-medium);
@@ -181,22 +187,26 @@ Styled.Content = styled.div`
     gap: 1rem;
     margin: 0 auto;
   }
+`;
 
-  h2 {
-    font: var(--font-large-medium);
-    color: var(--color-text-2);
-    margin: 1rem;
+Styled.StepsTitle = styled.h2`
+  font: var(--font-large-medium);
+  color: var(--color-text-2);
+  margin: 1rem;
+
+  @media ${breakpoints.tablet} {
+    margin: 1rem 0;
   }
 `;
 
 Styled.Icon = styled(Icon)`
-  width: 1.5rem;
+  margin-right: 0.5ch;
 `;
 
 Styled.StepItem = styled.div`
   display: flex;
   flex-direction: row;
-  gap: 0.5rem;
+  gap: 1rem;
   align-items: center;
   margin-bottom: 1rem;
 `;

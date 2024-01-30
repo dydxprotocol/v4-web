@@ -55,12 +55,7 @@ export const NewMarketAgreementDialog = ({ acceptTerms, setIsOpen }: ElementProp
           label={stringGetter({ key: STRING_KEYS.I_HAVE_READ_AND_AGREE })}
         />
         <Styled.ButtonRow>
-          <Button
-            action={ButtonAction.Base}
-            onClick={() => {
-              setIsOpen(false);
-            }}
-          >
+          <Button action={ButtonAction.Base} onClick={() => setIsOpen(false)}>
             {stringGetter({ key: STRING_KEYS.CANCEL })}
           </Button>
           <Button

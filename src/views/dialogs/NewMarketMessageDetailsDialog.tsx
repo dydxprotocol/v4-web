@@ -315,7 +315,7 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Content = styled.div`
   ${layoutMixins.column}
-  gap: 1rem;
+  gap: 0;
 `;
 
 Styled.ProposedMessageDetails = styled.div`
@@ -340,6 +340,7 @@ Styled.Code = styled.div`
   background-color: var(--color-layer-1);
   padding: 1rem;
   border-radius: 10px;
+  font: var(--font-mini-book);
   font-family: var(--fontFamily-monospace);
   margin-top: 1rem;
   display: flex;

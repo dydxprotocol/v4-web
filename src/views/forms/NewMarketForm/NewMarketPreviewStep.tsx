@@ -159,17 +159,15 @@ export const NewMarketPreviewStep = ({
     >
       <h2>
         {stringGetter({ key: STRING_KEYS.CONFIRM_NEW_MARKET_PROPOSAL })}
-        <span>
+        <Styled.Balance>
           {stringGetter({ key: STRING_KEYS.BALANCE })}:{' '}
           <Output
             type={OutputType.Number}
             value={nativeTokenBalance}
-            fractionDigits={2}
-            slotRight={
-              <Tag style={{ marginTop: '0.25rem', marginLeft: '0.5ch' }}>{chainTokenLabel}</Tag>
-            }
+            fractionDigits={TOKEN_DECIMALS}
+            slotRight={<Styled.Tag>{chainTokenLabel}</Styled.Tag>}
           />
-        </span>
+        </Styled.Balance>
       </h2>
       <Styled.FormInput
         disabled
@@ -233,7 +231,7 @@ export const NewMarketPreviewStep = ({
             key: 'message-details',
             label: stringGetter({ key: STRING_KEYS.MESSAGE_DETAILS }),
             value: (
-              <Button
+              <Styled.Button
                 action={ButtonAction.Navigation}
                 size={ButtonSize.Small}
                 onClick={() =>
@@ -246,7 +244,7 @@ export const NewMarketPreviewStep = ({
                 }
               >
                 {stringGetter({ key: STRING_KEYS.VIEW_DETAILS })} →
-              </Button>
+              </Styled.Button>
             ),
           },
           {
@@ -332,20 +330,26 @@ Styled.Form = styled.form`
   --stickyArea0-background: transparent;
 
   h2 {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+    ${layoutMixins.row}
     justify-content: space-between;
-
-    span {
-      display: flex;
-      align-items: center;
-    }
-
-    output {
-      margin-left: 0.5ch;
-    }
+    margin: 0;
+    font: var(--font-large-medium);
+    color: var(--color-text-2);
   }
+`;
+
+Styled.Balance = styled.span`
+  ${layoutMixins.inlineRow}
+  font: var(--font-small-book);
+  margin-top: 0.125rem;
+
+  output {
+    margin-left: 0.5ch;
+  }
+`;
+
+Styled.Tag = styled(Tag)`
+  margin-left: 0.5ch;
 `;
 
 Styled.FormInput = styled(FormInput)`
@@ -385,4 +389,8 @@ Styled.ButtonRow = styled.div`
   grid-template-columns: 1fr 2fr;
   gap: 1rem;
   width: 100%;
+`;
+
+Styled.Button = styled(Button)`
+  --button-padding: 0;
 `;

@@ -133,17 +133,15 @@ export const NewMarketSelectionStep = ({
     >
       <h2>
         {stringGetter({ key: STRING_KEYS.ADD_A_MARKET })}
-        <span>
+        <Styled.Balance>
           {stringGetter({ key: STRING_KEYS.BALANCE })}:{' '}
           <Output
             type={OutputType.Number}
             value={nativeTokenBalance}
-            fractionDigits={2}
-            slotRight={
-              <Tag style={{ marginTop: '0.25rem', marginLeft: '0.5ch' }}>{chainTokenLabel}</Tag>
-            }
+            fractionDigits={TOKEN_DECIMALS}
+            slotRight={<Styled.Tag>{chainTokenLabel}</Styled.Tag>}
           />
-        </span>
+        </Styled.Balance>
       </h2>
       <SearchSelectMenu
         items={[
@@ -295,7 +293,7 @@ export const NewMarketSelectionStep = ({
                 key: 'message-details',
                 label: stringGetter({ key: STRING_KEYS.MESSAGE_DETAILS }),
                 value: (
-                  <Button
+                  <Styled.Button
                     action={ButtonAction.Navigation}
                     size={ButtonSize.Small}
                     onClick={() =>
@@ -308,7 +306,7 @@ export const NewMarketSelectionStep = ({
                     }
                   >
                     {stringGetter({ key: STRING_KEYS.VIEW_DETAILS })} →
-                  </Button>
+                  </Styled.Button>
                 ),
               },
               {
@@ -367,20 +365,26 @@ Styled.Form = styled.form`
   --stickyArea0-background: transparent;
 
   h2 {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+    ${layoutMixins.row}
     justify-content: space-between;
-
-    span {
-      display: flex;
-      align-items: center;
-    }
-
-    output {
-      margin-left: 0.5ch;
-    }
+    margin: 0;
+    font: var(--font-large-medium);
+    color: var(--color-text-2);
   }
+`;
+
+Styled.Balance = styled.span`
+  ${layoutMixins.inlineRow}
+  font: var(--font-small-book);
+  margin-top: 0.125rem;
+
+  output {
+    margin-left: 0.5ch;
+  }
+`;
+
+Styled.Tag = styled(Tag)`
+  margin-left: 0.5ch;
 `;
 
 Styled.SelectedAsset = styled.span`
@@ -427,6 +431,7 @@ Styled.LiquidityTierRadioButton = styled(Item)<{ selected?: boolean }>`
   border-radius: 0.625rem;
   border: 1px solid var(--color-layer-6);
   padding: 1rem 0;
+  font: var(--font-mini-book);
 
   ${({ selected }) => selected && 'background-color: var(--color-layer-2)'}
 `;
@@ -454,4 +459,8 @@ Styled.ReceiptDetails = styled(Details)`
 
 Styled.Output = styled(Output)`
   display: inline-block;
+`;
+
+Styled.Button = styled(Button)`
+  --button-padding: 0;
 `;

@@ -17,6 +17,7 @@ import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 export const NewMarketsPanel = () => {
   const stringGetter = useStringGetter();
@@ -74,14 +75,6 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Description = styled.div`
   color: var(--color-text-0);
-  --link-color: var(--color-text-1);
-
-  a {
-    display: inline;
-    ::before {
-      content: ' ';
-    }
-  }
 `;
 
 Styled.IconButton = styled(IconButton)`
@@ -97,8 +90,7 @@ Styled.Title = styled.h3`
   font: var(--font-medium-book);
   color: var(--color-text-2);
   margin-bottom: -1rem;
-  display: flex;
-  align-items: center;
+  ${layoutMixins.inlineRow}
 `;
 
 Styled.Output = styled(Output)`
@@ -108,5 +100,4 @@ Styled.Output = styled(Output)`
 Styled.NewTag = styled(Tag)`
   color: var(--color-accent);
   background-color: var(--color-accent-faded);
-  margin-left: 0.5ch;
 `;
