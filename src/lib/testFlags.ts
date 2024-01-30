@@ -26,10 +26,6 @@ class TestFlags {
   get addressOverride():string {
     return this.queryParams.address;
   }
-
-  get showCEXDepositOption() {
-    return !!this.queryParams.cexdeposit;
-  }
 }
 
 export const testFlags = new TestFlags();
