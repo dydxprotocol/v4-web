@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 
+import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { type PotentialMarketItem } from '@/constants/potentialMarkets';
 import { useNextClobPairId, useURLConfigs } from '@/hooks';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
@@ -27,6 +28,12 @@ export const NewMarketForm = () => {
   const { nextAvailableClobPairId } = useNextClobPairId();
   const { hasPotentialMarketsData } = usePotentialMarkets();
 
+  const tickSizeDecimals = useMemo(() => {
+    if (!assetToAdd) return TOKEN_DECIMALS;
+    const p = Math.floor(Math.log(Number(assetToAdd.referencePrice)));
+    return Math.abs(p - 3);
+  }, [assetToAdd]);
+
   if (!hasPotentialMarketsData || !nextAvailableClobPairId) {
     return <Styled.LoadingSpace id="new-market-form" />;
   }
@@ -47,6 +54,7 @@ export const NewMarketForm = () => {
             setProposalTxHash(hash);
             setStep(NewMarketFormStep.SUCCESS);
           }}
+          tickSizeDecimals={tickSizeDecimals}
         />
       );
     }
@@ -55,14 +63,12 @@ export const NewMarketForm = () => {
   return (
     <NewMarketSelectionStep
       onConfirmMarket={() => setStep(NewMarketFormStep.PREVIEW)}
-      shouldDisableConfirmButton={
-        !assetToAdd || liquidityTier === undefined || !nextAvailableClobPairId
-      }
       assetToAdd={assetToAdd}
       clobPairId={nextAvailableClobPairId}
       setAssetToAdd={setAssetToAdd}
       liquidityTier={liquidityTier}
       setLiquidityTier={setLiquidityTier}
+      tickSizeDecimals={tickSizeDecimals}
     />
   );
 };

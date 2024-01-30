@@ -43,36 +43,33 @@ export const useNextClobPairId = () => {
    * @param callback method used to compile all clobPairIds, perpetualIds, marketIds, etc.
    */
   const decodeMsgForClobPairId = (message: any, callback: (id?: number) => void): any => {
-    switch (message.typeUrl) {
+    const { typeUrl, value } = message;
+
+    switch (typeUrl) {
       case TYPE_URL_MSG_CREATE_ORACLE_MARKET: {
-        const { value } = message;
         const decodedValue = MsgCreateOracleMarket.decode(value);
         callback(decodedValue.params?.id);
         break;
       }
       case TYPE_URL_MSG_CREATE_PERPETUAL: {
-        const { value } = message;
         const decodedValue = MsgCreatePerpetual.decode(value);
         callback(decodedValue.params?.id);
         callback(decodedValue.params?.marketId);
         break;
       }
       case TYPE_URL_MSG_CREATE_CLOB_PAIR: {
-        const { value } = message;
         const decodedValue = MsgCreateClobPair.decode(value);
         callback(decodedValue.clobPair?.id);
         callback(decodedValue.clobPair?.perpetualClobMetadata?.perpetualId);
         break;
       }
       case TYPE_URL_MSG_UPDATE_CLOB_PAIR: {
-        const { value } = message;
         const decodedValue = MsgUpdateClobPair.decode(value);
         callback(decodedValue.clobPair?.id);
         callback(decodedValue.clobPair?.perpetualClobMetadata?.perpetualId);
         break;
       }
       case TYPE_URL_MSG_DELAY_MESSAGE: {
-        const { value } = message;
         const decodedValue = MsgDelayMessage.decode(value);
         decodeMsgForClobPairId(decodedValue.msg, callback);
         break;

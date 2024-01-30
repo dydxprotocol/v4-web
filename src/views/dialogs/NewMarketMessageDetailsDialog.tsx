@@ -45,8 +45,8 @@ export const NewMarketMessageDetailsDialog = ({
   const { baseAsset } = assetData ?? {};
   const { newMarketProposal } = useGovernanceVariables();
   const stringGetter = useStringGetter();
-  const { chainTokenLabel } = useTokenConfigs();
-  const initialDepositAmountDecimals = isMainnet ? 0 : 18;
+  const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
+  const initialDepositAmountDecimals = isMainnet ? 0 : chainTokenDecimals;
 
   const exchangeConfig = useMemo(() => {
     return baseAsset ? exchangeConfigs?.[baseAsset] : undefined;
@@ -289,7 +289,9 @@ export const NewMarketMessageDetailsDialog = ({
                   {
                     <Output
                       type={OutputType.Asset}
-                      value={MustBigNumber(newMarketProposal.initialDepositAmount).div(1e18)}
+                      value={MustBigNumber(newMarketProposal.initialDepositAmount).div(
+                        Number(`1e${chainTokenDecimals}`)
+                      )}
                       fractionDigits={initialDepositAmountDecimals}
                       tag={chainTokenLabel}
                     />
@@ -338,7 +340,7 @@ Styled.Code = styled.div`
   background-color: var(--color-layer-1);
   padding: 1rem;
   border-radius: 10px;
-  font-family: 'Fira Code', monospace;
+  font-family: var(--fontFamily-monospace);
   margin-top: 1rem;
   display: flex;
   flex-direction: column;

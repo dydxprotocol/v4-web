@@ -22,10 +22,12 @@ export const NewMarketsPanel = () => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
   const { hasPotentialMarketsData } = usePotentialMarkets();
-  const { chainTokenLabel } = useTokenConfigs();
+  const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
   const { newMarketProposal } = useGovernanceVariables();
-  const initialDepositAmountBN = MustBigNumber(newMarketProposal.initialDepositAmount).div(1e18);
-  const initialDepositAmountDecimals = isMainnet ? 0 : 18;
+  const initialDepositAmountBN = MustBigNumber(newMarketProposal.initialDepositAmount).div(
+    Number(`1e${chainTokenDecimals}`)
+  );
+  const initialDepositAmountDecimals = isMainnet ? 0 : chainTokenDecimals;
 
   if (!hasPotentialMarketsData) return null;
 
@@ -95,11 +97,6 @@ Styled.Title = styled.h3`
   font: var(--font-medium-book);
   color: var(--color-text-2);
   margin-bottom: -1rem;
-`;
-
-Styled.IconButton = styled(IconButton)`
-  color: var(--color-text-0);
-  --color-border: var(--color-layer-6);
 `;
 
 Styled.Output = styled(Output)`

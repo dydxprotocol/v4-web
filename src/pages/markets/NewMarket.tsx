@@ -42,9 +42,9 @@ const NewMarket = () => {
   const navigate = useNavigate();
   const [displaySteps, setDisplaySteps] = useState(true);
   const stringGetter = useStringGetter();
-  const { chainTokenLabel } = useTokenConfigs();
+  const { chainTokenLabel, chainTokenDecimals } = useTokenConfigs();
 
-  useDocumentTitle('New Market');
+  useDocumentTitle(stringGetter({ key: STRING_KEYS.ADD_A_MARKET }));
 
   const steps = useMemo(() => {
     return [
@@ -74,8 +74,8 @@ const NewMarket = () => {
           key: STRING_KEYS.ADD_MARKET_STEP_3_DESCRIPTION,
           params: {
             REQUIRED_NUM_TOKENS: MustBigNumber(newMarketProposal?.initialDepositAmount)
-              .div(1e18)
-              .toFixed(isMainnet ? 0 : 18),
+              .div(Number(`1e${chainTokenDecimals}`))
+              .toFixed(isMainnet ? 0 : chainTokenDecimals),
             NATIVE_TOKEN_DENOM: chainTokenLabel,
           },
         }),

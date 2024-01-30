@@ -55,7 +55,7 @@ type NewMarketSelectionStepProps = {
   onConfirmMarket: () => void;
   liquidityTier?: number;
   setLiquidityTier: (liquidityTier?: number) => void;
-  shouldDisableConfirmButton?: boolean;
+  tickSizeDecimals: number;
 };
 
 export const NewMarketSelectionStep = ({
@@ -65,7 +65,7 @@ export const NewMarketSelectionStep = ({
   onConfirmMarket,
   liquidityTier,
   setLiquidityTier,
-  shouldDisableConfirmButton,
+  tickSizeDecimals,
 }: NewMarketSelectionStepProps) => {
   const dispatch = useDispatch();
   const { nativeTokenBalance } = useAccountBalance();
@@ -73,12 +73,14 @@ export const NewMarketSelectionStep = ({
   const isDisconnected = onboardingState === OnboardingState.Disconnected;
   const { isMobile } = useBreakpoints();
   const marketIds = useSelector(getMarketIds, shallowEqual);
-  const { chainTokenLabel } = useTokenConfigs();
+  const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
   const { potentialMarkets, exchangeConfigs } = usePotentialMarkets();
   const stringGetter = useStringGetter();
   const { newMarketProposal } = useGovernanceVariables();
-  const initialDepositAmountBN = MustBigNumber(newMarketProposal.initialDepositAmount).div(1e18);
-  const initialDepositAmountDecimals = isMainnet ? 0 : 18;
+  const initialDepositAmountBN = MustBigNumber(newMarketProposal.initialDepositAmount).div(
+    Number(`1e${chainTokenDecimals}`)
+  );
+  const initialDepositAmountDecimals = isMainnet ? 0 : chainTokenDecimals;
   const initialDepositAmount = initialDepositAmountBN.toFixed(initialDepositAmountDecimals);
 
   const [tempLiquidityTier, setTempLiquidityTier] = useState<number>();
@@ -117,12 +119,6 @@ export const NewMarketSelectionStep = ({
     );
   }, [exchangeConfigs, potentialMarkets, marketIds]);
 
-  const tickSizeDecimal = useMemo(() => {
-    if (!assetToAdd) return TOKEN_DECIMALS;
-    const p = Math.floor(Math.log(Number(assetToAdd.referencePrice)));
-    return Math.abs(p - 3);
-  }, [assetToAdd]);
-
   return (
     <Styled.Form
       onSubmit={(e: FormEvent<HTMLFormElement>) => {
@@ -149,7 +145,7 @@ export const NewMarketSelectionStep = ({
           />
         </span>
       </h2>
-      <Styled.SearchSelectMenu
+      <SearchSelectMenu
         items={[
           {
             group: 'markets',
@@ -174,7 +170,7 @@ export const NewMarketSelectionStep = ({
         ) : (
           'e.g. "BTC-USD"'
         )}
-      </Styled.SearchSelectMenu>
+      </SearchSelectMenu>
       {assetToAdd && (
         <>
           <div>{stringGetter({ key: STRING_KEYS.POPULATED_DETAILS })}</div>
@@ -291,7 +287,7 @@ export const NewMarketSelectionStep = ({
                   <Output
                     type={OutputType.Fiat}
                     value={assetToAdd.referencePrice}
-                    fractionDigits={tickSizeDecimal}
+                    fractionDigits={tickSizeDecimals}
                   />
                 ),
               },
@@ -350,7 +346,7 @@ export const NewMarketSelectionStep = ({
         ) : (
           <Button
             type={ButtonType.Submit}
-            state={{ isDisabled: shouldDisableConfirmButton }}
+            state={{ isDisabled: !assetToAdd || !liquidityTier === undefined || !clobPairId }}
             action={ButtonAction.Primary}
           >
             {canModifyLiqTier
@@ -386,8 +382,6 @@ Styled.Form = styled.form`
     }
   }
 `;
-
-Styled.SearchSelectMenu = styled(SearchSelectMenu)``;
 
 Styled.SelectedAsset = styled.span`
   color: var(--color-text-2);

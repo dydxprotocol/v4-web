@@ -46,6 +46,7 @@ type NewMarketPreviewStepProps = {
   liquidityTier: number;
   onBack: () => void;
   onSuccess: (hash: string) => void;
+  tickSizeDecimals: number;
 };
 
 export const NewMarketPreviewStep = ({
@@ -54,17 +55,20 @@ export const NewMarketPreviewStep = ({
   liquidityTier,
   onBack,
   onSuccess,
+  tickSizeDecimals,
 }: NewMarketPreviewStepProps) => {
   const { nativeTokenBalance } = useAccountBalance();
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
-  const { chainTokenLabel } = useTokenConfigs();
+  const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
   const [errorMessage, setErrorMessage] = useState();
   const { exchangeConfigs } = usePotentialMarkets();
   const { submitNewMarketProposal } = useSubaccount();
   const { newMarketProposal } = useGovernanceVariables();
-  const initialDepositAmountBN = MustBigNumber(newMarketProposal.initialDepositAmount).div(1e18);
-  const initialDepositAmountDecimals = isMainnet ? 0 : 18;
+  const initialDepositAmountBN = MustBigNumber(newMarketProposal.initialDepositAmount).div(
+    Number(`1e${chainTokenDecimals}`)
+  );
+  const initialDepositAmountDecimals = isMainnet ? 0 : chainTokenDecimals;
   const initialDepositAmount = initialDepositAmountBN.toFixed(initialDepositAmountDecimals);
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
 
@@ -95,12 +99,6 @@ export const NewMarketPreviewStep = ({
 
     return null;
   }, [nativeTokenBalance, errorMessage]);
-
-  const tickSizeDecimal = useMemo(() => {
-    if (!assetData) return TOKEN_DECIMALS;
-    const p = Math.floor(Math.log(Number(assetData.referencePrice)));
-    return Math.abs(p - 3);
-  }, [assetData]);
 
   const isDisabled = alertMessage !== null;
 
@@ -177,7 +175,7 @@ export const NewMarketPreviewStep = ({
         disabled
         label={stringGetter({ key: STRING_KEYS.MARKET })}
         type={InputType.Text}
-        value={`${assetData.baseAsset}-USD`}
+        value={ticker}
       />
       <Styled.WithDetailsReceipt
         side="bottom"
@@ -227,7 +225,7 @@ export const NewMarketPreviewStep = ({
               <Output
                 type={OutputType.Fiat}
                 value={assetData.referencePrice}
-                fractionDigits={tickSizeDecimal}
+                fractionDigits={tickSizeDecimals}
               />
             ),
           },
