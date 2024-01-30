@@ -24,7 +24,8 @@ export const NewMarketsPanel = () => {
   const { hasPotentialMarketsData } = usePotentialMarkets();
   const { chainTokenLabel } = useTokenConfigs();
   const { newMarketProposal } = useGovernanceVariables();
-  const initialDepositAmount = MustBigNumber(newMarketProposal.initialDepositAmount).div(1e18);
+  const initialDepositAmountBN = MustBigNumber(newMarketProposal.initialDepositAmount).div(1e18);
+  const initialDepositAmountDecimals = isMainnet ? 0 : 18;
 
   if (!hasPotentialMarketsData) return null;
 
@@ -55,8 +56,8 @@ export const NewMarketsPanel = () => {
               <Styled.Output
                 useGrouping
                 type={OutputType.Number}
-                value={initialDepositAmount}
-                fractionDigits={isMainnet ? 0 : 18}
+                value={initialDepositAmountBN}
+                fractionDigits={initialDepositAmountDecimals}
               />
             ),
             NATIVE_TOKEN_DENOM: chainTokenLabel,
