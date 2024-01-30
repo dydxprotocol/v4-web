@@ -11,6 +11,7 @@ import { setSelectedTradeLayout } from '@/state/layout';
 
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
+import { Asset, PerpetualMarket } from '@/constants/abacus';
 
 enum ThemeItems {
   SetClassicTheme = 'SetDefaultTheme',
@@ -44,7 +45,7 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
   const joinedPerpetualMarketsAndAssets = Object.values(allPerpetualMarkets).map((market) => ({
     ...market,
     ...allAssets[market?.assetId],
-  }));
+  })) as Array<PerpetualMarket & Asset>;
 
   return [
     {
@@ -129,10 +130,10 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
         {
           value: NavItems.NavigateToMarket,
           label: 'Navigate to Market',
-          subitems: joinedPerpetualMarketsAndAssets.map(({ market = '', name = '', id = '' }) => ({
-            value: market,
+          subitems: joinedPerpetualMarketsAndAssets.map(({ market, name, id }) => ({
+            value: market ?? '',
             slotBefore: <AssetIcon symbol={id} />,
-            label: name,
+            label: name ?? '',
             tag: id,
             onSelect: () => navigate(`/trade/${market}`),
           })),

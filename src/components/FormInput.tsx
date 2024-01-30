@@ -32,7 +32,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
       isValidationAttached={validationConfig?.attached}
     >
       <Styled.InputContainer hasSlotRight={!!slotRight}>
-        <Styled.WithLabel label={label} inputID={id}>
+        <Styled.WithLabel label={label} inputID={id} disabled={otherProps?.disabled}>
           <Input ref={ref} id={id} {...otherProps} />
         </Styled.WithLabel>
         {slotRight}
@@ -85,11 +85,11 @@ Styled.InputContainer = styled.div<{ hasSlotRight?: boolean }>`
     `}
 `;
 
-Styled.WithLabel = styled(WithLabel)`
+Styled.WithLabel = styled(WithLabel)<{ disabled?: boolean }>`
   ${formMixins.inputLabel}
 
   label {
-    cursor: text;
+    ${({ disabled }) => !disabled && 'cursor: text;'}
     padding: var(--form-input-paddingY) var(--form-input-paddingX) 0;
   }
 `;

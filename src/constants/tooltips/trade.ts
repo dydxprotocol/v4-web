@@ -57,10 +57,9 @@ export const tradeTooltips: TooltipStrings = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.INDEX_PRICE_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.INDEX_PRICE_BODY }),
   }),
-  'initial-margin-fraction': ({ stringGetter, urlConfigs }) => ({
+  'initial-margin-fraction': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.INITIAL_MARGIN_FRACTION_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.INITIAL_MARGIN_FRACTION_BODY }),
-    learnMoreLink: urlConfigs?.initialMarginFractionLearnMore,
   }),
   'initial-stop': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.INITIAL_STOP_TITLE }),
@@ -162,6 +161,10 @@ export const tradeTooltips: TooltipStrings = {
   'reduce-only-timeinforce-ioc-fok': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_TIMEINFORCE_IOC_FOK_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_TIMEINFORCE_IOC_FOK_BODY }),
+  }),
+  'reference-price': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.REFERENCE_PRICE_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.REFERENCE_PRICE_BODY }),
   }),
   spread: () => ({
     title: 'Spread',

@@ -5,7 +5,7 @@ import { WagmiConfig } from 'wagmi';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { GrazProvider } from 'graz';
 
-import { AppRoute, DEFAULT_TRADE_ROUTE } from '@/constants/routes';
+import { AppRoute, DEFAULT_TRADE_ROUTE, MarketsRoute } from '@/constants/routes';
 
 import {
   useBreakpoints,
@@ -21,6 +21,7 @@ import { DialogAreaProvider, useDialogArea } from '@/hooks/useDialogArea';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
 import { LocalNotificationsProvider } from '@/hooks/useLocalNotifications';
+import { PotentialMarketsProvider } from '@/hooks/usePotentialMarkets';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
 
@@ -44,6 +45,7 @@ import '@/styles/constants.css';
 import '@/styles/fonts.css';
 import '@/styles/web3modal.css';
 
+const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
 const PortfolioPage = lazy(() => import('@/pages/portfolio/Portfolio'));
 const AlertsPage = lazy(() => import('@/pages/AlertsPage'));
@@ -81,7 +83,10 @@ const Content = () => {
                 <Route path={AppRoute.Trade} element={<TradePage />} />
               </Route>
 
-              <Route path={AppRoute.Markets} element={<MarketsPage />} />
+              <Route path={AppRoute.Markets}>
+                <Route path={MarketsRoute.New} element={<NewMarket />} />
+                <Route path={AppRoute.Markets} element={<MarketsPage />} />
+              </Route>
               <Route path={`/${chainTokenLabel}`} element={<RewardsPage />} />
               {isTablet && (
                 <>
@@ -136,6 +141,7 @@ const providers = [
   wrapProvider(LocalNotificationsProvider),
   wrapProvider(NotificationsProvider),
   wrapProvider(DialogAreaProvider),
+  wrapProvider(PotentialMarketsProvider),
   wrapProvider(AppThemeProvider),
 ];
 

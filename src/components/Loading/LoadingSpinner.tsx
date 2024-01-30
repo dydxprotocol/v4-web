@@ -11,6 +11,7 @@ export const LoadingSpinner: React.FC<{
   return (
     <Styled.Spinner className={className}>
       <Styled.LoadingSpinnerSvg
+        id={id}
         width="38"
         height="38"
         viewBox="0 0 38 38"
