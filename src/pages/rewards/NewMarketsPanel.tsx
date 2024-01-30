@@ -35,7 +35,7 @@ export const NewMarketsPanel = () => {
     <Panel
       slotHeaderContent={
         <Styled.Title>
-          {stringGetter({ key: STRING_KEYS.ADD_A_MARKET })}{' '}
+          {stringGetter({ key: STRING_KEYS.ADD_A_MARKET })}
           <Styled.NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</Styled.NewTag>
         </Styled.Title>
       }
@@ -97,6 +97,8 @@ Styled.Title = styled.h3`
   font: var(--font-medium-book);
   color: var(--color-text-2);
   margin-bottom: -1rem;
+  display: flex;
+  align-items: center;
 `;
 
 Styled.Output = styled(Output)`
@@ -106,4 +108,5 @@ Styled.Output = styled(Output)`
 Styled.NewTag = styled(Tag)`
   color: var(--color-accent);
   background-color: var(--color-accent-faded);
+  margin-left: 0.5ch;
 `;
