@@ -28,7 +28,6 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
   const currentTheme: AppTheme = useSelector(getAppTheme);
   const currentColorMode: AppColorMode = useSelector(getAppColorMode);
 
-
   const sectionHeader = (heading: string) => {
     return (
       <Styled.Header>
@@ -318,9 +317,8 @@ Styled.CheckIndicator = styled(Indicator)`
   background-color: var(--color-accent);
   color: var(--color-text-2);
 `;
-g
+g;
 Styled.CheckIcon = styled(Icon)`
   width: var(--icon-size);
   height: var(--icon-size);
 `;
-
