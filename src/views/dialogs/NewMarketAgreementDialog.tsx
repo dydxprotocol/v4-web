@@ -18,9 +18,6 @@ type ElementProps = {
   setIsOpen: (open: boolean) => void;
 };
 
-const legalString =
-  'By checking this box, you acknowledge and understand that (a) the pre-populated list of markets does not reflect an endorsement of any particular asset or market, and should not be relied on as investment, legal or any other form of professional advice; (b) this list is not a recommendations of any specific market, and markets are included based on compatibility and functionality assessments from a technical standpoint using public data; and (c) you are encouraged to conduct your own research and consult qualified legal counsel to ensure compliance with the laws of any and all applicable jurisdictions. Additionally, you acknowledge and understand that by clicking “Propose new market”, you will create an on-chain governance proposal — more information about on-chain governance proposals can be found on dYdX Foundation’s documentation website, which is independent from and unaffiliated with the host and operator of this website. Use of this widget is prohibited in the U.S., Canada and sanctioned jurisdictions as described in the Terms of Use';
-
 export const NewMarketAgreementDialog = ({ acceptTerms, setIsOpen }: ElementProps) => {
   const [hasAcknowledged, setHasAcknowledged] = useState(false);
 
@@ -72,7 +69,7 @@ export const NewMarketAgreementDialog = ({ acceptTerms, setIsOpen }: ElementProp
               acceptTerms();
               setIsOpen(false);
             }}
-            disabled={!hasAcknowledged}
+            state={{ isDisabled: !hasAcknowledged }}
           >
             {stringGetter({ key: STRING_KEYS.CONTINUE })}
           </Button>
