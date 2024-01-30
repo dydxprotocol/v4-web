@@ -55,6 +55,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const stringGetter = useStringGetter();
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [requireUserActionInWallet, setRequireUserActionInWallet] = useState(false);
   const { selectedNetwork } = useSelectedNetwork();
 
   const { evmAddress, signerWagmi, publicClientWagmi, nobleAddress } = useAccounts();
@@ -372,8 +373,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   if (!resources) {
     return <LoadingSpace id="DepositForm" />;
   }
-
-  const [requireUserActionInWallet, setRequireUserActionInWallet] = useState(false);
 
   return (
     <Styled.Form onSubmit={onSubmit}>
