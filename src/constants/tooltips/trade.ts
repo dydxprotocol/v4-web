@@ -198,4 +198,7 @@ export const tradeTooltips: TooltipStrings = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.UNREALIZED_PNL_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.UNREALIZED_PNL_BODY }),
   }),
+  'reward-history': ({ stringGetter }) => ({
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.REWARD_HISTORY_BODY }),
+  }),
 } as const;

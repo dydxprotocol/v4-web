@@ -18,6 +18,7 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { TradingRewardHistoryTable } from '@/views/tables/TradingRewardHistoryTable';
 
 import abacusStateManager from '@/lib/abacus';
+import { WithTooltip } from '@/components/WithTooltip';
 
 export const RewardHistoryPanel = () => {
   const stringGetter = useStringGetter();
@@ -43,7 +44,9 @@ export const RewardHistoryPanel = () => {
       slotHeader={
         <Styled.Header>
           <Styled.Title>
-            <h3>{stringGetter({ key: STRING_KEYS.REWARD_HISTORY })}</h3>
+            <WithTooltip tooltip="reward-history">
+              <h3>{stringGetter({ key: STRING_KEYS.REWARD_HISTORY })}</h3>
+            </WithTooltip>
             <span>{stringGetter({ key: STRING_KEYS.REWARD_HISTORY_DESCRIPTION })}</span>
           </Styled.Title>
           <ToggleGroup
@@ -86,6 +89,7 @@ Styled.Header = styled.div`
 `;
 
 Styled.Title = styled.div`
+  ${layoutMixins.column}
   color: var(--color-text-0);
   font: var(--font-small-book);
 
