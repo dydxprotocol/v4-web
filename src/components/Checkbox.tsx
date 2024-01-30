@@ -83,7 +83,7 @@ Styled.Indicator = styled(Indicator)`
   color: var(--color-text-2);
 `;
 
-Styled.Label = styled.label<{ disabled: boolean }>`
+Styled.Label = styled.label<{ disabled?: boolean }>`
   cursor: pointer;
   color: var(--color-text-2);
 
