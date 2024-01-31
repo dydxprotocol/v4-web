@@ -35,6 +35,7 @@ export enum MobileSettingsRoute {
   Network = 'network',
 }
 
+export const BASE_ROUTE = import.meta.env.VITE_ROUTER_TYPE === 'hash' ? '/#' : '';
 export const TRADE_ROUTE = `${AppRoute.Trade}/:market`;
 export const PORTFOLIO_ROUTE = `${AppRoute.Portfolio}/:subroute`;
 export const HISTORY_ROUTE = `${AppRoute.Portfolio}/${PortfolioRoute.History}/:subroute`;
