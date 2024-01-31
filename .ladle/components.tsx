@@ -11,7 +11,13 @@ import { SelectMenu, SelectItem } from '@/components/SelectMenu';
 
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
 
-import { AppTheme, AppColorMode, setAppTheme, setAppColorMode } from '@/state/configs';
+import {
+  AppTheme,
+  AppThemeSystemSetting,
+  AppColorMode,
+  setAppThemeSetting,
+  setAppColorMode,
+} from '@/state/configs';
 import { setLocaleLoaded } from '@/state/localization';
 
 import '@/index.css';
@@ -22,7 +28,7 @@ export const StoryWrapper: React.FC<{ children: React.ReactNode }> = ({ children
   const [colorMode, setColorMode] = useState(AppColorMode.GreenUp);
 
   useEffect(() => {
-    store.dispatch(setAppTheme(theme));
+    store.dispatch(setAppThemeSetting(theme));
     store.dispatch(setAppColorMode(colorMode));
   }, [theme, colorMode]);
 
@@ -39,6 +45,10 @@ export const StoryWrapper: React.FC<{ children: React.ReactNode }> = ({ children
             {
               value: AppTheme.Classic,
               label: 'Default theme',
+            },
+            {
+              value: AppThemeSystemSetting.System,
+              label: 'System theme',
             },
             {
               value: AppTheme.Dark,

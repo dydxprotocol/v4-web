@@ -9,10 +9,10 @@ import {
   AppTheme,
   AppThemeSystemSetting,
   AppColorMode,
-  setAppTheme,
+  setAppThemeSetting,
   setAppColorMode,
 } from '@/state/configs';
-import { getAppTheme, getAppThemeSetting, getAppColorMode } from '@/state/configsSelectors';
+import { getAppThemeSetting, getAppColorMode } from '@/state/configsSelectors';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { Themes } from '@/styles/themes';
@@ -80,7 +80,7 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
               backgroundcolor={backgroundColor}
               gridcolor={gridColor}
               onClick={() => {
-                dispatch(setAppTheme(themeSetting));
+                dispatch(setAppThemeSetting(themeSetting));
               }}
             >
               <Styled.AppThemeHeader textcolor={textColor}>
