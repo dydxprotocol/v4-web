@@ -13,6 +13,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { AssetIcon } from '@/components/AssetIcon';
 
 const RewardsPage = lazy(() => import('./rewards/RewardsPage'));
+const StakingPage = lazy(() => import('./Staking'));
+const GovernancePage = lazy(() => import('./Governance'));
 
 export default () => {
   const { isTablet } = useBreakpoints();
@@ -23,8 +25,8 @@ export default () => {
     <Suspense fallback={<LoadingSpace id="token-page" />}>
       <Routes>
         <Route path={TokenRoute.TradingRewards} element={<RewardsPage />} />
-        <Route path={TokenRoute.StakingRewards} element={<div>Staking</div>} />
-        <Route path={TokenRoute.Governance} element={<div>Governance</div>} />
+        <Route path={TokenRoute.StakingRewards} element={<StakingPage />} />
+        <Route path={TokenRoute.Governance} element={<GovernancePage />} />
         <Route path="*" element={<Navigate to={TokenRoute.TradingRewards} replace />} />
       </Routes>
     </Suspense>
