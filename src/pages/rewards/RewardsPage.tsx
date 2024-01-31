@@ -14,11 +14,12 @@ import { BackButton } from '@/components/BackButton';
 import { Panel } from '@/components/Panel';
 
 import { DYDXBalancePanel } from './DYDXBalancePanel';
-import { MigratePanel } from './MigratePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
+import { MigratePanel } from './MigratePanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { GovernancePanel } from './GovernancePanel';
 import { StakingPanel } from './StakingPanel';
+import { NewMarketsPanel } from './NewMarketsPanel';
 
 const RewardsPage = () => {
   const dispatch = useDispatch();
@@ -44,9 +45,9 @@ const RewardsPage = () => {
           <DYDXBalancePanel />
         </Styled.PanelRowIncentivesAndBalance>
       )}
-
       {isNotTablet && (
         <Styled.PanelRow>
+          <NewMarketsPanel />
           <GovernancePanel />
           <StakingPanel />
         </Styled.PanelRow>

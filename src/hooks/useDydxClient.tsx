@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+
 import {
   BECH32_PREFIX,
   CompositeClient,
@@ -9,6 +10,7 @@ import {
   onboarding,
   Network,
   ValidatorConfig,
+  type ProposalStatus,
 } from '@dydxprotocol/v4-client-js';
 
 import type { ResolutionString } from 'public/tradingview/charting_library';
@@ -68,17 +70,21 @@ const useDydxClientContext = () => {
             new Network(
               selectedNetwork,
               new IndexerConfig(networkConfig.indexerUrl, networkConfig.websocketUrl),
-              new ValidatorConfig(networkConfig.validatorUrl, networkConfig.chainId,
+              new ValidatorConfig(
+                networkConfig.validatorUrl,
+                networkConfig.chainId,
                 {
                   USDC_DENOM: tokensConfigs[DydxChainAsset.USDC].denom,
                   USDC_DECIMALS: tokensConfigs[DydxChainAsset.USDC].decimals,
                   USDC_GAS_DENOM: tokensConfigs[DydxChainAsset.USDC].gasDenom,
                   CHAINTOKEN_DENOM: tokensConfigs[DydxChainAsset.CHAINTOKEN].denom,
                   CHAINTOKEN_DECIMALS: tokensConfigs[DydxChainAsset.CHAINTOKEN].decimals,
-                }, {
-                broadcastPollIntervalMs: 3_000,
-                broadcastTimeoutMs: 60_000,
-              })
+                },
+                {
+                  broadcastPollIntervalMs: 3_000,
+                  broadcastTimeoutMs: 60_000,
+                }
+              )
             )
           );
           setCompositeClient(initializedClient);
@@ -111,6 +117,36 @@ const useDydxClientContext = () => {
   };
 
   // ------ Public Methods ------ //
+  const requestAllPerpetualMarkets = useCallback(async () => {
+    try {
+      const { markets } =
+        (await compositeClient?.indexerClient.markets.getPerpetualMarkets()) || {};
+      return markets || [];
+    } catch (error) {
+      log('useDydxClient/getPerpetualMarkets', error);
+      return [];
+    }
+  }, [compositeClient]);
+
+  /**
+   * @param proposalStatus - Optional filter for proposal status. If not provided, all proposals in ProposalStatus.VotingPeriod will be returned.
+   */
+  const requestAllGovernanceProposals = useCallback(
+    async (proposalStatus?: ProposalStatus) => {
+      try {
+        const allGovProposals = await compositeClient?.validatorClient.get.getAllGovProposals(
+          proposalStatus
+        );
+
+        return allGovProposals;
+      } catch (error) {
+        log('useDydxClient/getProposals', error);
+        return undefined;
+      }
+    },
+    [compositeClient]
+  );
+
   const requestCandles = useCallback(
     async ({
       marketId,
@@ -225,6 +261,8 @@ const useDydxClientContext = () => {
     getWalletFromEvmSignature,
 
     // Public Methods
+    requestAllPerpetualMarkets,
+    requestAllGovernanceProposals,
     getCandlesForDatafeed,
     screenAddresses,
   };

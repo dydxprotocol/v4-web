@@ -3,23 +3,26 @@ import { useNavigate } from 'react-router-dom';
 import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
 import { useSelector } from 'react-redux';
 
+import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, type MarketData } from '@/constants/markets';
-import { AppRoute } from '@/constants/routes';
-
+import { AppRoute, MarketsRoute } from '@/constants/routes';
 import { useStringGetter } from '@/hooks';
+import { useMarketsData } from '@/hooks/useMarketsData';
+import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+
 import { popoverMixins } from '@/styles/popoverMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
+import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { Popover, TriggerType } from '@/components/Popover';
+import { ColumnDef, Table } from '@/components/Table';
 import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
-import { ColumnDef, Table } from '@/components/Table';
 
-import { useMarketsData } from '@/hooks/useMarketsData';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -32,6 +35,8 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
   const selectedLocale = useSelector(getSelectedLocale);
   const [searchFilter, setSearchFilter] = useState<string>();
   const { filteredMarkets, marketFilters } = useMarketsData(filter, searchFilter);
+  const navigate = useNavigate();
+  const { hasPotentialMarketsData } = usePotentialMarkets();
 
   return (
     <>
@@ -134,16 +139,16 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
                 })}
               </h2>
               <p>{stringGetter({ key: STRING_KEYS.MARKET_SEARCH_DOES_NOT_EXIST_YET })}</p>
-              {/* TODO TRCL-1693 - uncomment when feedback modal is finalized
-               <div>
-                <Button
-                  // TODO: uncomment when feedback modal is finalized
-                  // onClick={() => dispatch(openModal({ modalType: MODALS.FEEDBACK }))}
-                  size={ButtonSize.Small}
-                >
-                  {stringGetter({ key: STRING_KEYS.GIVE_FEEDBACK })}
-                </Button>
-              </div> */}
+              {hasPotentialMarketsData && (
+                <div>
+                  <Button
+                    onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
+                    size={ButtonSize.Small}
+                  >
+                    {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })}
+                  </Button>
+                </div>
+              )}
             </Styled.MarketNotFound>
           }
         />

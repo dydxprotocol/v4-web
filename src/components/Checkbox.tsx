@@ -24,15 +24,25 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   onCheckedChange,
   id,
   label,
-  disabled
+  disabled,
 }) => (
   <Styled.Container>
-    <Styled.Root className={className} checked={checked} disabled={disabled} onCheckedChange={onCheckedChange} id={id}>
+    <Styled.Root
+      className={className}
+      checked={checked}
+      disabled={disabled}
+      onCheckedChange={onCheckedChange}
+      id={id}
+    >
       <Styled.Indicator>
         <CheckIcon />
       </Styled.Indicator>
     </Styled.Root>
-    {label && <Styled.label disabled={disabled} htmlFor={id}>{label}</Styled.label>}
+    {label && (
+      <Styled.Label disabled={disabled} htmlFor={id}>
+        {label}
+      </Styled.Label>
+    )}
   </Styled.Container>
 );
 
@@ -42,10 +52,6 @@ Styled.Container = styled.div`
   ${layoutMixins.row}
   gap: 1ch;
   font: var(--font-small-book);
-
-  label {
-    cursor: pointer;
-  }
 `;
 
 Styled.Root = styled(Root)`
@@ -77,10 +83,14 @@ Styled.Indicator = styled(Indicator)`
   color: var(--color-text-2);
 `;
 
-Styled.label = styled.div<{ disabled: boolean; }>`
+Styled.Label = styled.label<{ disabled?: boolean }>`
+  cursor: pointer;
   color: var(--color-text-2);
 
-  ${({disabled}) => disabled && css`
-    color: var(--color-text-0);
-  `}
+  ${({ disabled }) =>
+    disabled &&
+    css`
+      cursor: not-allowed;
+      color: var(--color-text-0);
+    `}
 `;
