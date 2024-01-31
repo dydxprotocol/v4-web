@@ -2,12 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { ThemeProvider } from 'styled-components';
 
-import type {
-  AppTheme,
-  AppThemeSetting,
-  AppColorMode,
-  AppThemeSystemSetting,
-} from '@/state/configs';
+import { AppTheme, AppThemeSetting, AppColorMode, AppThemeSystemSetting } from '@/state/configs';
 import { getAppThemeSetting, getAppColorMode } from '@/state/configsSelectors';
 
 import { Themes } from '@/styles/themes';
