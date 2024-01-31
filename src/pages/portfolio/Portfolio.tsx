@@ -45,7 +45,8 @@ export default () => {
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
   const { nativeTokenBalance } = useAccountBalance();
 
-  const { numTotalPositions, numTotalOpenOrders } = useSelector(getTradeInfoNumbers, shallowEqual) || {};
+  const { numTotalPositions, numTotalOpenOrders } =
+    useSelector(getTradeInfoNumbers, shallowEqual) || {};
   const numPositions = shortenNumberForDisplay(numTotalPositions);
   const numOrders = shortenNumberForDisplay(numTotalOpenOrders);
 
@@ -129,9 +130,10 @@ export default () => {
                       label: (
                         <>
                           {stringGetter({ key: STRING_KEYS.POSITIONS })}
-                          {numPositions > 0 && (
-                            <Tag type={TagType.Number}> {numPositions} </Tag>
-                          )}
+                          {numPositions &&
+                            (typeof numPositions === 'string' || numPositions > 0) && (
+                              <Tag type={TagType.Number}> {numPositions} </Tag>
+                            )}
                         </>
                       ),
                       href: PortfolioRoute.Positions,
@@ -142,7 +144,7 @@ export default () => {
                       label: (
                         <>
                           {stringGetter({ key: STRING_KEYS.ORDERS })}
-                          {numOrders > 0 && (
+                          {numOrders && (typeof numOrders === 'string' || numOrders > 0) && (
                             <Tag type={TagType.Number}> {numOrders} </Tag>
                           )}
                         </>

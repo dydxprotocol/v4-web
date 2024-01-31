@@ -29,10 +29,10 @@ import { openDialog } from '@/state/dialogs';
 import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
 
-import { DYDXBalancePanel } from './rewards/DYDXBalancePanel';
-import { MigratePanel } from './rewards/MigratePanel';
-import { GovernancePanel } from './rewards/GovernancePanel';
-import { StakingPanel } from './rewards/StakingPanel';
+import { DYDXBalancePanel } from './token/rewards/DYDXBalancePanel';
+import { MigratePanel } from './token/rewards/MigratePanel';
+import { GovernancePanel } from './token/rewards/GovernancePanel';
+import { StakingPanel } from './token/rewards/StakingPanel';
 
 const ENS_CHAIN_ID = 1; // Ethereum
 
