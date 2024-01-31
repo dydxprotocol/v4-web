@@ -1,6 +1,18 @@
 import type { RootState } from './_store';
+import { AppTheme, AppThemeSystemSetting, AppThemeSetting } from './configs';
 
-export const getAppTheme = (state: RootState) => state.configs.appTheme;
+export const getAppThemeSetting = (state: RootState): AppThemeSetting => state.configs.appTheme;
+
+export const getAppTheme = (state: RootState): AppTheme => {
+  switch (state.configs.appTheme) {
+    case AppThemeSystemSetting.System:
+      return globalThis.matchMedia('(prefers-color-scheme: dark)').matches
+        ? AppTheme.Dark
+        : AppTheme.Light;
+    default:
+      return state.configs.appTheme;
+  }
+};
 
 export const getAppColorMode = (state: RootState) => state.configs.appColorMode;
 

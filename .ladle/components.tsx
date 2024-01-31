@@ -24,23 +24,6 @@ export const StoryWrapper: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     store.dispatch(setAppTheme(theme));
     store.dispatch(setAppColorMode(colorMode));
-
-    switch (theme) {
-      case AppTheme.Dark: {
-        document?.documentElement?.classList.remove('theme-light');
-        document?.documentElement?.classList.add('theme-dark');
-        break;
-      }
-      case AppTheme.Light: {
-        document?.documentElement?.classList.remove('theme-dark');
-        document?.documentElement?.classList.add('theme-light');
-        break;
-      }
-      case AppTheme.Classic: {
-        document?.documentElement?.classList.remove('theme-dark', 'theme-light');
-        break;
-      }
-    }
   }, [theme, colorMode]);
 
   useEffect(() => {
