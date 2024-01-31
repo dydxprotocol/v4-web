@@ -96,7 +96,7 @@ export type TooltipStrings = {
     urlConfigs?: LinksConfigs;
   }) => {
     title?: string;
-    body?: string;
+    body: string;
     learnMoreLink?: string;
   };
 };

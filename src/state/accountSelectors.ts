@@ -1,3 +1,4 @@
+import type { Nullable, kollections } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { createSelector } from 'reselect';
 
@@ -365,8 +366,13 @@ export const getHistoricalTradingRewards = (state: RootState) =>
  * @returns account historical trading rewards for the specified perid
  */
 export const getHistoricalTradingRewardsForPeriod = (period: string) =>
-  createSelector([getHistoricalTradingRewards], (historicalTradingRewards: any) =>
-    historicalTradingRewards?.get(period)
+  createSelector(
+    [getHistoricalTradingRewards],
+    (
+      historicalTradingRewards: Nullable<
+        kollections.Map<string, kollections.List<HistoricalTradingReward>>
+      >
+    ) => historicalTradingRewards?.get(period)
   );
 
 /**

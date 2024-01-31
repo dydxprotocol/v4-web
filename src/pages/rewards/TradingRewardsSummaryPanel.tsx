@@ -22,55 +22,51 @@ export const TradingRewardsSummaryPanel = () => {
   );
   const currentWeekTradingReward = currentWeekTradingRewards?.firstOrNull();
 
-  return (
-    currentWeekTradingReward && (
-      <Panel
-        slotHeader={
-          <Styled.Header>
-            {stringGetter({ key: STRING_KEYS.TRADING_REWARDS_SUMMARY })}
-          </Styled.Header>
-        }
-      >
-        <Styled.Content>
-          <Styled.TradingRewardsDetails
-            layout="grid"
-            items={[
-              {
-                key: 'week',
-                label: (
-                  <Styled.Label>
-                    <h4>{stringGetter({ key: STRING_KEYS.THIS_WEEK })}</h4>
-                  </Styled.Label>
-                ),
-                value: (
-                  <Styled.Column>
+  return !currentWeekTradingReward ? null : (
+    <Panel
+      slotHeader={
+        <Styled.Header>{stringGetter({ key: STRING_KEYS.TRADING_REWARDS_SUMMARY })}</Styled.Header>
+      }
+    >
+      <Styled.Content>
+        <Styled.TradingRewardsDetails
+          layout="grid"
+          items={[
+            {
+              key: 'week',
+              label: (
+                <Styled.Label>
+                  <h4>{stringGetter({ key: STRING_KEYS.THIS_WEEK })}</h4>
+                </Styled.Label>
+              ),
+              value: (
+                <Styled.Column>
+                  <Output
+                    slotRight={<Styled.AssetIcon symbol={chainTokenLabel} />}
+                    type={OutputType.Asset}
+                    value={currentWeekTradingReward.amount}
+                  />
+                  <Styled.TimePeriod>
                     <Output
-                      slotRight={<Styled.AssetIcon symbol={chainTokenLabel} />}
-                      type={OutputType.Asset}
-                      value={currentWeekTradingReward.amount}
+                      type={OutputType.Date}
+                      value={currentWeekTradingReward.startedAtInMilliseconds}
+                      timeOptions={{ useUTC: true }}
                     />
-                    <Styled.TimePeriod>
-                      <Output
-                        type={OutputType.Date}
-                        value={currentWeekTradingReward.startedAtInMilliseconds}
-                        timeOptions={{ useUTC: true }}
-                      />
-                      →
-                      <Output
-                        type={OutputType.Date}
-                        value={currentWeekTradingReward.endedAtInMilliseconds}
-                        timeOptions={{ useUTC: true }}
-                      />
-                    </Styled.TimePeriod>
-                  </Styled.Column>
-                ),
-              },
-              // TODO(@aforaleka): add all-time when supported
-            ]}
-          />
-        </Styled.Content>
-      </Panel>
-    )
+                    →
+                    <Output
+                      type={OutputType.Date}
+                      value={currentWeekTradingReward.endedAtInMilliseconds}
+                      timeOptions={{ useUTC: true }}
+                    />
+                  </Styled.TimePeriod>
+                </Styled.Column>
+              ),
+            },
+            // TODO(@aforaleka): add all-time when supported
+          ]}
+        />
+      </Styled.Content>
+    </Panel>
   );
 };
 

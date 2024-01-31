@@ -3,15 +3,14 @@ import type { LocalWallet } from '@dydxprotocol/v4-client-js';
 import type {
   ClosePositionInputFields,
   Nullable,
+  HistoricaTradingRewardsPeriod,
+  HistoricaTradingRewardsPeriods,
   HumanReadablePlaceOrderPayload,
   HumanReadableCancelOrderPayload,
   TradeInputFields,
   TransferInputFields,
   HistoricalPnlPeriods,
   ParsingError,
-  HistoricaTradingRewardsPeriods,
-  HistoricaTradingRewardsPeriod,
-  HistoricalTradingReward,
 } from '@/constants/abacus';
 
 import {
@@ -35,8 +34,6 @@ import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
 import type { RootStore } from '@/state/_store';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors';
-
-import { testFlags } from '@/lib/testFlags';
 
 import AbacusRest from './rest';
 import AbacusAnalytics from './analytics';

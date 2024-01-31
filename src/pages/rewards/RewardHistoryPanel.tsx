@@ -1,8 +1,6 @@
 import { useCallback, useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import breakpoints from '@/styles/breakpoints';
-import { layoutMixins } from '@/styles/layoutMixins';
 import { useStringGetter } from '@/hooks';
 
 import {
@@ -12,13 +10,15 @@ import {
 } from '@/constants/abacus';
 
 import { STRING_KEYS } from '@/constants/localization';
+import breakpoints from '@/styles/breakpoints';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Panel } from '@/components/Panel';
 import { ToggleGroup } from '@/components/ToggleGroup';
+import { WithTooltip } from '@/components/WithTooltip';
 import { TradingRewardHistoryTable } from '@/views/tables/TradingRewardHistoryTable';
 
 import abacusStateManager from '@/lib/abacus';
-import { WithTooltip } from '@/components/WithTooltip';
 
 export const RewardHistoryPanel = () => {
   const stringGetter = useStringGetter();

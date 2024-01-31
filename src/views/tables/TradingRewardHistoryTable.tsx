@@ -1,7 +1,7 @@
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
 
-import { HistoricaTradingRewardsPeriods } from '@/constants/abacus';
+import { HistoricaTradingRewardsPeriods, HistoricalTradingReward } from '@/constants/abacus';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 import { useStringGetter, useTokenConfigs } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -25,7 +25,7 @@ const getTradingRewardHistoryTableColumnDef = ({
   key: TradingRewardHistoryTableColumnKey;
   chainTokenLabel: string;
   stringGetter: StringGetterFunction;
-}): ColumnDef<any> => ({
+}): ColumnDef<HistoricalTradingReward> => ({
   ...(
     {
       [TradingRewardHistoryTableColumnKey.Event]: {
@@ -72,7 +72,7 @@ const getTradingRewardHistoryTableColumnDef = ({
           />
         ),
       },
-    } as Record<TradingRewardHistoryTableColumnKey, ColumnDef<any>>
+    } as Record<TradingRewardHistoryTableColumnKey, ColumnDef<HistoricalTradingReward>>
   )[key],
 });
 
