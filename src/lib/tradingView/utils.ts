@@ -1,6 +1,6 @@
 import { Candle, TradingViewBar, TradingViewSymbol } from '@/constants/candles';
 
-import { AppTheme, AppColorMode } from '@/state/configs';
+import type { AppTheme, AppColorMode } from '@/state/configs';
 
 import { Themes } from '@/styles/themes';
 
