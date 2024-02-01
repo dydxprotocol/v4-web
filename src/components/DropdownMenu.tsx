@@ -91,10 +91,10 @@ Styled.Item = styled(Item)<{ $highlightColor: 'accent' | 'positive' | 'negative'
         --item-highlighted-textColor: var(--color-accent);
       `,
       ['positive']: `
-        --item-highlighted-textColor: var(--color-positive);
+        --item-highlighted-textColor: var(--color-success);
       `,
       ['negative']: `
-        --item-highlighted-textColor: var(--color-negative);
+        --item-highlighted-textColor: var(--color-error);
       `,
     }[$highlightColor])}
 
