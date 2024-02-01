@@ -30,12 +30,13 @@ import {
   getSubaccountHistoricalPnl,
   getSubaccountId,
 } from '@/state/accountSelectors';
+import { AppTheme } from '@/state/configs';
+import { getAppTheme } from '@/state/configsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { formatRelativeTime } from '@/lib/dateTime';
 import { isTruthy } from '@/lib/isTruthy';
-
-import chartBackground from '/chart-background.png';
+import chartBackground from '/Dots-dark.png';
 
 enum PnlSide {
   Profit = 'Profit',
@@ -62,6 +63,9 @@ const MS_FOR_PERIOD = {
   [HistoricalPnlPeriod.Period90d.name]: 90 * timeUnits.day,
 };
 
+const DARK_CHART_BACKGROUND_URL = '/Dots-dark.svg';
+const LIGHT_CHART_BACKGROUND_URL = '/Dots-light.svg';
+
 type ElementProps = {
   onTooltipContext?: (tooltipContext: TooltipContextType<PnlDatum>) => void;
   onVisibleDataChange?: (data: Array<PnlDatum>) => void;
@@ -84,6 +88,7 @@ export const PnlChart = ({
 }: PnlChartProps) => {
   // const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
+  const appTheme = useSelector(getAppTheme);
   const { equity } = useSelector(getSubaccount, shallowEqual) || {};
   const now = useNow({ intervalMs: timeUnits.minute });
 
@@ -173,8 +178,11 @@ export const PnlChart = ({
 
   // const latestDatum = data?.[data.length - 1];
 
+  const chartBackground =
+    appTheme === AppTheme.Light ? LIGHT_CHART_BACKGROUND_URL : DARK_CHART_BACKGROUND_URL;
+
   return (
-    <Styled.Container className={className}>
+    <Styled.Container className={className} chartBackground={chartBackground}>
       <TimeSeriesChart
         id="pnl-chart"
         selectedLocale={selectedLocale}
@@ -358,9 +366,9 @@ export const PnlChart = ({
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
-Styled.Container = styled.div`
+Styled.Container = styled.div<{ chartBackground: string }>`
   position: relative;
-  background: url(${chartBackground}) no-repeat center center;
+  background: url(${({ chartBackground }) => chartBackground}) no-repeat center center;
 `;
 
 Styled.PeriodToggle = styled.div`

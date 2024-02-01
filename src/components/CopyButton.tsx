@@ -32,7 +32,7 @@ export const CopyButton = ({
 
     setCopied(true);
     navigator.clipboard.writeText(value);
-    setTimeout(() => setCopied(false), 500);
+    setTimeout(() => setCopied(false), 5000);
   };
 
   return buttonType === 'text' ? (
@@ -77,7 +77,7 @@ Styled.InlineRow = styled.div<{ copied: boolean }>`
         `
       : css`
           &:hover {
-            filter: brightness(1.1);
+            filter: brightness(var(--hover-filter-base));
             text-decoration: underline;
           }
         `}

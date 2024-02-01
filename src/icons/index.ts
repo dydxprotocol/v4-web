@@ -1,3 +1,4 @@
+import ChaosLabsIcon from './chaos-labs';
 export { default as AddressConnectorIcon } from './address-connector.svg';
 export { default as ArrowIcon } from './arrow.svg';
 export { default as Bar3Icon } from './bar3.svg';
@@ -34,7 +35,6 @@ export { default as HistoryIcon } from './history.svg';
 export { default as LeaderboardIcon } from './leaderboard.svg';
 export { default as LinkOutIcon } from './link-out.svg';
 export { default as LockIcon } from './lock.svg';
-export { default as LogoShortIcon } from './logo-short';
 export { default as MarketsIcon } from './markets.svg';
 export { default as MenuIcon } from './menu.svg';
 export { default as MigrateIcon } from './migrate.svg';
@@ -90,7 +90,9 @@ export { default as WebsiteIcon } from './website.svg';
 export { default as WhitepaperIcon } from './whitepaper.svg';
 
 // Logos
+export { default as ChaosLabsIcon } from './chaos-labs';
 export { default as EtherscanIcon } from './logos/etherscan.svg';
+export { default as LogoShortIcon } from './logo-short';
 
 // Trade
 export { default as OrderCanceledIcon } from './trade/order-canceled.svg';

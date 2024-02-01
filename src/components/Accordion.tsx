@@ -85,7 +85,7 @@ Styled.Trigger = styled(Trigger)`
   &:hover {
     ${Styled.Icon} {
       color: var(--color-text-2);
-      filter: brightness(1.1);
+      filter: brightness(var(--hover-filter-base));
     }
   }
 

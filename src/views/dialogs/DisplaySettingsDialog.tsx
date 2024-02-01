@@ -320,7 +320,7 @@ Styled.CheckIndicator = styled(Indicator)`
   right: var(--item-padding);
 
   background-color: var(--color-accent);
-  color: var(--color-text-2);
+  color: var(--color-text-button);
 `;
 
 Styled.CheckIcon = styled(Icon)`
