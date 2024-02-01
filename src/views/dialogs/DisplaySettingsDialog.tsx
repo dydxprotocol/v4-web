@@ -98,12 +98,12 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
           >
             <Styled.ColorPreferenceLabel>
               <Styled.ArrowIconContainer>
-                <Styled.Icon
+                <Styled.ArrowIcon
                   iconName={IconName.Arrow}
                   direction="up"
                   color={colorMode === AppColorMode.GreenUp ? 'green' : 'red'}
                 />
-                <Styled.Icon
+                <Styled.ArrowIcon
                   iconName={IconName.Arrow}
                   direction="down"
                   color={colorMode === AppColorMode.GreenUp ? 'red' : 'green'}
@@ -242,7 +242,7 @@ Styled.ArrowIconContainer = styled.div`
   gap: 0.5ch;
 `;
 
-Styled.Icon = styled(Icon)<{ direction: 'up' | 'down'; color: 'green' | 'red' }>`
+Styled.ArrowIcon = styled(Icon)<{ direction: 'up' | 'down'; color: 'green' | 'red' }>`
   ${({ direction }) =>
     ({
       ['up']: css`
