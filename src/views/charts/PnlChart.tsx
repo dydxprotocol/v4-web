@@ -209,7 +209,8 @@ export const PnlChart = ({
           })
             .format(Math.abs(value))
             .toLowerCase()
-        }        renderTooltip={() => <div />}
+        }
+        renderTooltip={() => <div />}
         onTooltipContext={onTooltipContext}
         onVisibleDataChange={onVisibleDataChange}
         onZoom={onZoomSnap}

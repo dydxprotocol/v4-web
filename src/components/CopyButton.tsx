@@ -32,7 +32,7 @@ export const CopyButton = ({
 
     setCopied(true);
     navigator.clipboard.writeText(value);
-    setTimeout(() => setCopied(false), 5000);
+    setTimeout(() => setCopied(false), 500);
   };
 
   return buttonType === 'text' ? (
