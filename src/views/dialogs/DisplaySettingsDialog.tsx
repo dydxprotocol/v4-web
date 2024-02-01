@@ -240,6 +240,11 @@ Styled.ColorPreferenceLabel = styled.div`
 Styled.ArrowIconContainer = styled.div`
   ${layoutMixins.column}
   gap: 0.5ch;
+
+  svg {
+    height: 0.75em;
+    width: 0.75em;
+  }
 `;
 
 Styled.ArrowIcon = styled(Icon)<{ direction: 'up' | 'down'; color: 'green' | 'red' }>`
