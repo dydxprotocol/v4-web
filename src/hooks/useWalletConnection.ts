@@ -115,7 +115,15 @@ export const useWalletConnection = () => {
   });
 
   const connectWallet = useCallback(
-    async ({ walletType, forceConnect }: { walletType?: WalletType; forceConnect?: boolean }) => {
+    async ({
+      walletType,
+      forceConnect,
+      isAccountConnected,
+    }: {
+      walletType?: WalletType;
+      forceConnect?: boolean;
+      isAccountConnected?: boolean;
+    }) => {
       if (!walletType) return { walletType, walletConnectionType };
 
       const walletConnection = getWalletConnection({ walletType });
@@ -143,9 +151,6 @@ export const useWalletConnection = () => {
         } else if (walletConnection.type === WalletConnectionType.TestWallet) {
           saveEvmAddress(STRING_KEYS.TEST_WALLET as EvmAddress);
         } else {
-          const isAccountConnected = Boolean(
-            evmAddress && evmDerivedAddresses[evmAddress]?.encryptedSignature
-          );
           // if account connected (via remember me), do not show wagmi popup until forceConnect
           if (!isConnectedWagmi && (forceConnect || !isAccountConnected)) {
             await connectWagmi({
@@ -195,6 +200,9 @@ export const useWalletConnection = () => {
         try {
           const { walletType, walletConnectionType } = await connectWallet({
             walletType: selectedWalletType,
+            isAccountConnected: Boolean(
+              evmAddress && evmDerivedAddresses[evmAddress]?.encryptedSignature
+            ),
           });
 
           setWalletType(walletType);
@@ -217,7 +225,7 @@ export const useWalletConnection = () => {
         await disconnectWallet();
       }
     })();
-  }, [selectedWalletType, signerWagmi, signerGraz]);
+  }, [selectedWalletType, signerWagmi, signerGraz, evmDerivedAddresses]);
 
   const selectWalletType = async (walletType: WalletType | undefined) => {
     if (selectedWalletType) {
