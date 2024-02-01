@@ -63,8 +63,8 @@ const MS_FOR_PERIOD = {
   [HistoricalPnlPeriod.Period90d.name]: 90 * timeUnits.day,
 };
 
-const DARK_CHART_BACKGROUND_URL = '/Dots-dark.svg';
-const LIGHT_CHART_BACKGROUND_URL = '/Dots-light.svg';
+const DARK_CHART_BACKGROUND_URL = '/chart-dots-background-dark.svg';
+const LIGHT_CHART_BACKGROUND_URL = '/chart-dots-background-light.svg';
 
 type ElementProps = {
   onTooltipContext?: (tooltipContext: TooltipContextType<PnlDatum>) => void;

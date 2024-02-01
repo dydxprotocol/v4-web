@@ -7,12 +7,13 @@ import { useStringGetter } from '@/hooks';
 
 import {
   AppTheme,
+  type AppThemeSetting,
   AppThemeSystemSetting,
   AppColorMode,
   setAppThemeSetting,
   setAppColorMode,
 } from '@/state/configs';
-import { getAppThemeSetting, getAppColorMode } from '@/state/configsSelectors';
+import { getAppTheme, getAppThemeSetting, getAppColorMode } from '@/state/configsSelectors';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { Themes } from '@/styles/themes';
@@ -33,7 +34,8 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
 
-  const currentTheme: AppTheme = useSelector(getAppThemeSetting);
+  const currentThemeSetting: AppThemeSetting = useSelector(getAppThemeSetting);
+  const currentTheme: AppTheme = useSelector(getAppTheme);
   const currentColorMode: AppColorMode = useSelector(getAppColorMode);
 
   const sectionHeader = (heading: string) => {
@@ -47,7 +49,7 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
 
   const themePanels = () => {
     return (
-      <Styled.AppThemeRoot value={currentTheme}>
+      <Styled.AppThemeRoot value={currentThemeSetting}>
         {[
           {
             themeSetting: AppTheme.Classic,
@@ -66,8 +68,7 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
             label: STRING_KEYS.LIGHT,
           },
         ].map(({ themeSetting, label }) => {
-          const theme =
-            themeSetting === AppThemeSystemSetting.System ? AppTheme.Dark : themeSetting;
+          const theme = themeSetting === AppThemeSystemSetting.System ? currentTheme : themeSetting;
 
           const backgroundColor = Themes[theme][currentColorMode].layer2;
           const gridColor = Themes[theme][currentColorMode].borderDefault;
