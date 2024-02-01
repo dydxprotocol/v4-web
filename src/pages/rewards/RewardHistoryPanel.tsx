@@ -5,8 +5,8 @@ import { useStringGetter } from '@/hooks';
 
 import {
   HISTORICAL_TRADING_REWARDS_PERIODS,
-  HistoricaTradingRewardsPeriod,
-  HistoricaTradingRewardsPeriods,
+  HistoricalTradingRewardsPeriod,
+  HistoricalTradingRewardsPeriods,
 } from '@/constants/abacus';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -23,8 +23,8 @@ import abacusStateManager from '@/lib/abacus';
 export const RewardHistoryPanel = () => {
   const stringGetter = useStringGetter();
 
-  const [selectedPeriod, setSelectedPeriod] = useState<HistoricaTradingRewardsPeriods>(
-    abacusStateManager.getHistoricalTradingRewardPeriod() || HistoricaTradingRewardsPeriod.WEEKLY
+  const [selectedPeriod, setSelectedPeriod] = useState<HistoricalTradingRewardsPeriods>(
+    abacusStateManager.getHistoricalTradingRewardPeriod() || HistoricalTradingRewardsPeriod.WEEKLY
   );
 
   const onSelectPeriod = useCallback(
@@ -52,15 +52,15 @@ export const RewardHistoryPanel = () => {
           <ToggleGroup
             items={[
               {
-                value: HistoricaTradingRewardsPeriod.MONTHLY.name,
+                value: HistoricalTradingRewardsPeriod.MONTHLY.name,
                 label: stringGetter({ key: STRING_KEYS.MONTHLY }),
               },
               {
-                value: HistoricaTradingRewardsPeriod.WEEKLY.name,
+                value: HistoricalTradingRewardsPeriod.WEEKLY.name,
                 label: stringGetter({ key: STRING_KEYS.WEEKLY }),
               },
               {
-                value: HistoricaTradingRewardsPeriod.DAILY.name,
+                value: HistoricalTradingRewardsPeriod.DAILY.name,
                 label: stringGetter({ key: STRING_KEYS.DAILY }),
               },
             ]}

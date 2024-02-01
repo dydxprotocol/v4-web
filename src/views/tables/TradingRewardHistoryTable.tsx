@@ -1,7 +1,7 @@
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
 
-import { HistoricaTradingRewardsPeriods, HistoricalTradingReward } from '@/constants/abacus';
+import { HistoricalTradingRewardsPeriods, HistoricalTradingReward } from '@/constants/abacus';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 import { useStringGetter, useTokenConfigs } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -10,7 +10,10 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Output, OutputType } from '@/components/Output';
 import { Table, TableCell, type ColumnDef } from '@/components/Table';
 
-import { getHistoricalTradingRewardsForPeriod } from '@/state/accountSelectors';
+import {
+  getHistoricalTradingRewards,
+  getHistoricalTradingRewardsForPeriod,
+} from '@/state/accountSelectors';
 
 export enum TradingRewardHistoryTableColumnKey {
   Event = 'Event',
@@ -78,7 +81,7 @@ const getTradingRewardHistoryTableColumnDef = ({
 
 type ElementProps = {
   columnKeys?: TradingRewardHistoryTableColumnKey[];
-  period: HistoricaTradingRewardsPeriods;
+  period: HistoricalTradingRewardsPeriods;
 };
 
 type StyleProps = {
@@ -112,6 +115,9 @@ export const TradingRewardHistoryTable = ({
           stringGetter,
         })
       )}
+      slotEmpty={
+        <div>{stringGetter({ key: STRING_KEYS.EMPTY_HISTORICAL_REWARDS_DESCRIPTION })}</div>
+      }
       selectionBehavior="replace"
       withOuterBorder={withOuterBorder}
       withInnerBorders={withInnerBorders}

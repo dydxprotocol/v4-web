@@ -10,17 +10,12 @@ import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 
-import { getHistoricalTradingRewardsForPeriod } from '@/state/accountSelectors';
+import { getHistoricalTradingRewardsForCurrentWeek } from '@/state/accountSelectors';
 
 export const TradingRewardsSummaryPanel = () => {
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
-
-  const currentWeekTradingRewards = useSelector(
-    getHistoricalTradingRewardsForPeriod('WEEKLY'),
-    shallowEqual
-  );
-  const currentWeekTradingReward = currentWeekTradingRewards?.firstOrNull();
+  const currentWeekTradingReward = useSelector(getHistoricalTradingRewardsForCurrentWeek);
 
   return !currentWeekTradingReward ? null : (
     <Panel

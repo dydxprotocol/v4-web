@@ -3,8 +3,8 @@ import type { LocalWallet } from '@dydxprotocol/v4-client-js';
 import type {
   ClosePositionInputFields,
   Nullable,
-  HistoricaTradingRewardsPeriod,
-  HistoricaTradingRewardsPeriods,
+  HistoricalTradingRewardsPeriod,
+  HistoricalTradingRewardsPeriods,
   HumanReadablePlaceOrderPayload,
   HumanReadableCancelOrderPayload,
   TradeInputFields,
@@ -228,7 +228,7 @@ class AbacusStateManager {
   };
 
   setHistoricalTradingRewardPeriod = (
-    period: (typeof HistoricaTradingRewardsPeriod)[keyof typeof HistoricaTradingRewardsPeriod]
+    period: (typeof HistoricalTradingRewardsPeriod)[keyof typeof HistoricalTradingRewardsPeriod]
   ) => {
     this.stateManager.historicalTradingRewardPeriod = period;
   };
@@ -284,7 +284,7 @@ class AbacusStateManager {
   getHistoricalPnlPeriod = (): Nullable<HistoricalPnlPeriods> =>
     this.stateManager.historicalPnlPeriod;
 
-  getHistoricalTradingRewardPeriod = (): HistoricaTradingRewardsPeriods =>
+  getHistoricalTradingRewardPeriod = (): HistoricalTradingRewardsPeriods =>
     this.stateManager.historicalTradingRewardPeriod;
 
   handleCandlesSubscription = ({

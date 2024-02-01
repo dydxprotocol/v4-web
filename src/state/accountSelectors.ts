@@ -11,6 +11,7 @@ import {
   AbacusPositionSide,
   ORDER_SIDES,
   HistoricalTradingReward,
+  HistoricalTradingRewardsPeriod,
 } from '@/constants/abacus';
 
 import { OnboardingState } from '@/constants/account';
@@ -374,6 +375,14 @@ export const getHistoricalTradingRewardsForPeriod = (period: string) =>
       >
     ) => historicalTradingRewards?.get(period)
   );
+
+/**
+ * @returns account historical trading rewards for the current week
+ */
+export const getHistoricalTradingRewardsForCurrentWeek = createSelector(
+  [getHistoricalTradingRewardsForPeriod(HistoricalTradingRewardsPeriod.WEEKLY.name)],
+  (historicalTradingRewards) => historicalTradingRewards?.firstOrNull()
+);
 
 /**
  * @returns UsageRestriction of the current session

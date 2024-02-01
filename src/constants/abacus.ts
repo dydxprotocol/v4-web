@@ -121,10 +121,10 @@ export type Wallet = Abacus.exchange.dydx.abacus.output.Wallet;
 export type AccountBalance = Abacus.exchange.dydx.abacus.output.AccountBalance;
 export type TradingRewards = Abacus.exchange.dydx.abacus.output.TradingRewards;
 export type HistoricalTradingReward = Abacus.exchange.dydx.abacus.output.HistoricalTradingReward;
-export const HistoricaTradingRewardsPeriod =
-  Abacus.exchange.dydx.abacus.state.manager.HistoricaTradingRewardsPeriod;
-const historicalTradingRewardsPeriod = [...HistoricaTradingRewardsPeriod.values()] as const;
-export type HistoricaTradingRewardsPeriods = (typeof historicalTradingRewardsPeriod)[number];
+export const HistoricalTradingRewardsPeriod =
+  Abacus.exchange.dydx.abacus.state.manager.HistoricalTradingRewardsPeriod;
+const historicalTradingRewardsPeriod = [...HistoricalTradingRewardsPeriod.values()] as const;
+export type HistoricalTradingRewardsPeriods = (typeof historicalTradingRewardsPeriod)[number];
 
 export type Subaccount = Abacus.exchange.dydx.abacus.output.Subaccount;
 export type SubaccountPosition = Abacus.exchange.dydx.abacus.output.SubaccountPosition;
@@ -244,12 +244,12 @@ export const HISTORICAL_PNL_PERIODS: Record<
 };
 
 export const HISTORICAL_TRADING_REWARDS_PERIODS: Record<
-  KotlinIrEnumValues<typeof HistoricaTradingRewardsPeriod>,
-  HistoricaTradingRewardsPeriods
+  KotlinIrEnumValues<typeof HistoricalTradingRewardsPeriod>,
+  HistoricalTradingRewardsPeriods
 > = {
-  [HistoricaTradingRewardsPeriod.MONTHLY.name]: HistoricaTradingRewardsPeriod.MONTHLY,
-  [HistoricaTradingRewardsPeriod.WEEKLY.name]: HistoricaTradingRewardsPeriod.WEEKLY,
-  [HistoricaTradingRewardsPeriod.DAILY.name]: HistoricaTradingRewardsPeriod.DAILY,
+  [HistoricalTradingRewardsPeriod.MONTHLY.name]: HistoricalTradingRewardsPeriod.MONTHLY,
+  [HistoricalTradingRewardsPeriod.WEEKLY.name]: HistoricalTradingRewardsPeriod.WEEKLY,
+  [HistoricalTradingRewardsPeriod.DAILY.name]: HistoricalTradingRewardsPeriod.DAILY,
 };
 
 export const ORDER_STATUS_STRINGS: Record<KotlinIrEnumValues<typeof AbacusOrderStatus>, string> = {

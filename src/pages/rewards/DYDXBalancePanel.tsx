@@ -22,7 +22,7 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 import { openDialog } from '@/state/dialogs';
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 
-export const DYDXBalancePanel = () => {
+export const DYDXBalancePanel = ({ className }: { className?: string }) => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
 
@@ -33,6 +33,7 @@ export const DYDXBalancePanel = () => {
 
   return (
     <Panel
+      className={className}
       slotHeader={
         <Styled.Header>
           <Styled.Title>

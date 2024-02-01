@@ -23,7 +23,10 @@ import { AppRoute, PortfolioRoute, HistoryRoute } from '@/constants/routes';
 import { wallets } from '@/constants/wallets';
 import { useAccounts, useStringGetter, useTokenConfigs } from '@/hooks';
 
-import { getOnboardingState } from '@/state/accountSelectors';
+import {
+  getHistoricalTradingRewardsForCurrentWeek,
+  getOnboardingState,
+} from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -51,6 +54,8 @@ const Profile = () => {
     address: evmAddress,
     chainId: ENS_CHAIN_ID,
   });
+
+  const currentWeekTradingReward = useSelector(getHistoricalTradingRewardsForCurrentWeek);
 
   const actions = [
     {
@@ -159,64 +164,62 @@ const Profile = () => {
           );
         })}
       </Styled.Actions>
-      <Styled.EqualGrid>
-        <Styled.PanelButton
-          slotHeader={
-            <Styled.InlineRow>
-              <Icon iconName={IconName.Gear} />
-              {stringGetter({ key: STRING_KEYS.SETTINGS })}
-            </Styled.InlineRow>
-          }
-          onClick={() => navigate(AppRoute.Settings)}
+
+      <Styled.SettingsButton
+        slotHeader={
+          <Styled.InlineRow>
+            <Icon iconName={IconName.Gear} />
+            {stringGetter({ key: STRING_KEYS.SETTINGS })}
+          </Styled.InlineRow>
+        }
+        onClick={() => navigate(AppRoute.Settings)}
+      />
+      <Styled.HelpButton
+        slotHeader={
+          <Styled.InlineRow>
+            <Icon iconName={IconName.HelpCircle} />
+            {stringGetter({ key: STRING_KEYS.HELP })}
+          </Styled.InlineRow>
+        }
+        onClick={() => dispatch(openDialog({ type: DialogTypes.Help }))}
+      />
+
+      <Styled.MigratePanel />
+
+      <Styled.DYDXBalancePanel />
+
+      <Styled.RewardsPanel
+        slotHeaderContent={stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
+        href={`/${chainTokenLabel}`}
+        hasSeparator
+      >
+        <Styled.Details
+          items={[
+            {
+              key: 'week-rewards',
+              label: stringGetter({ key: STRING_KEYS.THIS_WEEK }),
+              value: currentWeekTradingReward?.amount ?? '-',
+            },
+          ]}
+          layout="grid"
         />
-        <Styled.PanelButton
-          slotHeader={
-            <Styled.InlineRow>
-              <Icon iconName={IconName.HelpCircle} />
-              {stringGetter({ key: STRING_KEYS.HELP })}
-            </Styled.InlineRow>
-          }
-          onClick={() => dispatch(openDialog({ type: DialogTypes.Help }))}
+      </Styled.RewardsPanel>
+      <Styled.FeesPanel
+        slotHeaderContent={stringGetter({ key: STRING_KEYS.FEES })}
+        href={`${AppRoute.Portfolio}/${PortfolioRoute.Fees}`}
+        hasSeparator
+      >
+        <Styled.Details
+          items={[
+            { key: 'maker', label: stringGetter({ key: STRING_KEYS.MAKER }), value: '-' },
+            { key: 'taker', label: stringGetter({ key: STRING_KEYS.TAKER }), value: '-' },
+            { key: 'volume', label: stringGetter({ key: STRING_KEYS.VOLUME_30D }), value: '-' },
+          ]}
+          layout="grid"
         />
-      </Styled.EqualGrid>
+      </Styled.FeesPanel>
 
-      <MigratePanel />
-      <DYDXBalancePanel />
-
-      <Styled.EqualGrid>
-        <Styled.RewardsPanel
-          slotHeaderContent="Trading Rewards"
-          href={`/${chainTokenLabel}`}
-          hasSeparator
-        >
-          <Styled.Details
-            items={[
-              {
-                key: 'week-rewards',
-                label: stringGetter({ key: STRING_KEYS.THIS_WEEK }),
-                value: '-',
-              },
-            ]}
-            layout="grid"
-          />
-        </Styled.RewardsPanel>
-        <Panel
-          slotHeaderContent={stringGetter({ key: STRING_KEYS.FEES })}
-          href={`${AppRoute.Portfolio}/${PortfolioRoute.Fees}`}
-          hasSeparator
-        >
-          <Styled.Details
-            items={[
-              { key: 'maker', label: stringGetter({ key: STRING_KEYS.MAKER }), value: '-' },
-              { key: 'taker', label: stringGetter({ key: STRING_KEYS.TAKER }), value: '-' },
-              { key: 'volume', label: stringGetter({ key: STRING_KEYS.VOLUME_30D }), value: '-' },
-            ]}
-            layout="grid"
-          />
-        </Panel>
-      </Styled.EqualGrid>
-
-      <Styled.TablePanel
+      <Styled.HistoryPanel
         slotHeaderContent={stringGetter({ key: STRING_KEYS.HISTORY })}
         href={`${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.Trades}`}
         hasSeparator
@@ -230,10 +233,10 @@ const Profile = () => {
           ]}
           withInnerBorders={false}
         />
-      </Styled.TablePanel>
+      </Styled.HistoryPanel>
 
-      <GovernancePanel />
-      <StakingPanel />
+      <Styled.GovernancePanel />
+      <Styled.StakingPanel />
     </Styled.MobileProfileLayout>
   );
 };
@@ -245,14 +248,27 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.MobileProfileLayout = styled.div`
   ${layoutMixins.contentContainerPage}
 
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
   padding: 1.25rem 0.9rem;
   max-width: 100vw;
+
+  grid-template-areas:
+    'header header'
+    'actions actions'
+    'settings help'
+    'migrate migrate'
+    'balance balance'
+    'rewards fees'
+    'history history'
+    'governance governance'
+    'staking staking';
 `;
 
 Styled.Header = styled.header`
+  grid-area: header;
   ${layoutMixins.row}
-
   padding: 0 1rem;
 `;
 
@@ -299,6 +315,7 @@ Styled.Address = styled.h1`
 Styled.Actions = styled(Toolbar)`
   ${layoutMixins.spacedRow}
   --stickyArea-topHeight: 5rem;
+  grid-area: actions;
 
   > a,
   > label {
@@ -329,22 +346,16 @@ Styled.ActionButton = styled(IconButton)<{ iconName?: IconName }>`
         `}
 `;
 
-Styled.EqualGrid = styled.div`
-  ${layoutMixins.gridEqualColumns}
-
-  gap: 1rem;
-`;
-
 Styled.Details = styled(Details)`
   font: var(--font-small-book);
   --details-value-font: var(--font-medium-book);
 `;
 
 Styled.RewardsPanel = styled(Panel)`
+  grid-area: rewards;
   align-self: flex-start;
-
-  &,
-  > * {
+  height: 100%;
+  > div {
     height: 100%;
   }
 
@@ -353,7 +364,12 @@ Styled.RewardsPanel = styled(Panel)`
   }
 `;
 
-Styled.TablePanel = styled(Panel)`
+Styled.FeesPanel = styled(Panel)`
+  grid-area: fees;
+`;
+
+Styled.HistoryPanel = styled(Panel)`
+  grid-area: history;
   --panel-content-paddingY: 0;
   --panel-content-paddingX: 0;
 
@@ -392,4 +408,28 @@ Styled.InlineRow = styled.div`
 Styled.PanelButton = styled(Panel)`
   --panel-paddingY: 0
   --panel-paddingX:0;
+`;
+
+Styled.SettingsButton = styled(Styled.PanelButton)`
+  grid-area: settings;
+`;
+
+Styled.HelpButton = styled(Styled.PanelButton)`
+  grid-area: help;
+`;
+
+Styled.MigratePanel = styled(MigratePanel)`
+  grid-area: migrate;
+`;
+
+Styled.DYDXBalancePanel = styled(DYDXBalancePanel)`
+  grid-area: balance;
+`;
+
+Styled.GovernancePanel = styled(GovernancePanel)`
+  grid-area: governance;
+`;
+
+Styled.StakingPanel = styled(StakingPanel)`
+  grid-area: staking;
 `;
