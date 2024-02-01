@@ -203,7 +203,7 @@ export const AccountMenu = () => {
                 value: 'MnemonicExport',
                 icon: <Icon iconName={IconName.ExportKeys} />,
                 label: <span>{stringGetter({ key: STRING_KEYS.EXPORT_SECRET_PHRASE })}</span>,
-                highlightColor: 'negative',
+                highlightColor: 'destroy',
                 onSelect: () => dispatch(openDialog({ type: DialogTypes.MnemonicExport })),
               },
             ].filter(isTruthy)
@@ -212,7 +212,7 @@ export const AccountMenu = () => {
           value: 'Disconnect',
           icon: <Icon iconName={IconName.BoxClose} />,
           label: stringGetter({ key: STRING_KEYS.DISCONNECT }),
-          highlightColor: 'negative',
+          highlightColor: 'destroy',
           onSelect: () => dispatch(openDialog({ type: DialogTypes.DisconnectWallet })),
         },
       ].filter(isTruthy)}

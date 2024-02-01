@@ -12,10 +12,8 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Themes } from '@/styles/themes';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { NumberSign } from '@/constants/numbers';
 
 import { Dialog } from '@/components/Dialog';
-import { DiffArrow } from '@/components/DiffArrow';
 import { Icon, IconName } from '@/components/Icon';
 import { HorizontalSeparatorFiller } from '@/components/Separator';
 
@@ -99,20 +97,18 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
             }}
           >
             <Styled.ColorPreferenceLabel>
-              <Styled.DiffArrowContainer>
-                <Styled.DiffArrow
+              <Styled.ArrowIconContainer>
+                <Styled.Icon
+                  iconName={IconName.Arrow}
                   direction="up"
-                  sign={
-                    colorMode === AppColorMode.GreenUp ? NumberSign.Positive : NumberSign.Negative
-                  }
+                  color={colorMode === AppColorMode.GreenUp ? 'green' : 'red'}
                 />
-                <Styled.DiffArrow
+                <Styled.Icon
+                  iconName={IconName.Arrow}
                   direction="down"
-                  sign={
-                    colorMode === AppColorMode.GreenUp ? NumberSign.Negative : NumberSign.Positive
-                  }
+                  color={colorMode === AppColorMode.GreenUp ? 'red' : 'green'}
                 />
-              </Styled.DiffArrowContainer>
+              </Styled.ArrowIconContainer>
               {stringGetter({ key: label })}
             </Styled.ColorPreferenceLabel>
             <Styled.DotIndicator $selected={currentColorMode === colorMode} />
@@ -241,19 +237,31 @@ Styled.ColorPreferenceLabel = styled.div`
   gap: 1ch;
 `;
 
-Styled.DiffArrowContainer = styled.div`
+Styled.ArrowIconContainer = styled.div`
   ${layoutMixins.column}
   gap: 0.5ch;
 `;
 
-Styled.DiffArrow = styled(DiffArrow)`
-  --diffArrow-color-positive: var(--color-success);
-  --diffArrow-color-negative: var(--color-error);
+Styled.Icon = styled(Icon)<{ direction: 'up' | 'down'; color: 'green' | 'red' }>`
+  ${({ direction }) =>
+    ({
+      ['up']: css`
+        transform: rotate(-90deg);
+      `,
+      ['down']: css`
+        transform: rotate(90deg);
+      `,
+    }[direction])}
 
-  svg {
-    width: 0.75em;
-    height: 0.75em;
-  }
+  ${({ color }) =>
+    ({
+      ['green']: css`
+        color: var(--color-success);
+      `,
+      ['red']: css`
+        color: var(--color-error);
+      `,
+    }[color])}
 `;
 
 const indicatorStyle = css`

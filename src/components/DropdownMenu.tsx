@@ -13,7 +13,7 @@ export type DropdownMenuItem<T> = {
   label: React.ReactNode;
   onSelect?: () => void;
   separator?: boolean;
-  highlightColor?: 'accent' | 'positive' | 'negative';
+  highlightColor?: 'accent' | 'create' | 'destroy';
 };
 
 type StyleProps = {
@@ -82,7 +82,7 @@ Styled.Separator = styled(Separator)`
   margin: 0.25rem 1rem;
 `;
 
-Styled.Item = styled(Item)<{ $highlightColor: 'accent' | 'positive' | 'negative' }>`
+Styled.Item = styled(Item)<{ $highlightColor: 'accent' | 'create' | 'destroy' }>`
   ${popoverMixins.item}
   --item-font-size: var(--dropdownMenu-item-font-size);
   ${({ $highlightColor }) =>
@@ -90,10 +90,10 @@ Styled.Item = styled(Item)<{ $highlightColor: 'accent' | 'positive' | 'negative'
       ['accent']: `
         --item-highlighted-textColor: var(--color-accent);
       `,
-      ['positive']: `
+      ['create']: `
         --item-highlighted-textColor: var(--color-success);
       `,
-      ['negative']: `
+      ['destroy']: `
         --item-highlighted-textColor: var(--color-error);
       `,
     }[$highlightColor])}
