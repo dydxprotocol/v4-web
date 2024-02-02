@@ -32,9 +32,11 @@ import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { AppTheme } from '@/state/configs';
 import { openDialog } from '@/state/dialogs';
 
 import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
+import { getAppTheme } from '@/state/configsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
@@ -50,6 +52,7 @@ export const AccountMenu = () => {
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
   const { nativeTokenBalance } = useAccountBalance();
   const { usdcLabel, chainTokenLabel } = useTokenConfigs();
+  const theme = useSelector(getAppTheme);
 
   const { evmAddress, walletType, dydxAddress, hdKey } = useAccounts();
 
@@ -176,6 +179,17 @@ export const AccountMenu = () => {
           icon: <Icon iconName={IconName.Gear} />,
           label: stringGetter({ key: STRING_KEYS.PREFERENCES }),
           onSelect: () => dispatch(openDialog({ type: DialogTypes.Preferences })),
+        },
+        {
+          value: 'DisplaySettings',
+          icon:
+            theme === AppTheme.Light ? (
+              <Icon iconName={IconName.Sun} />
+            ) : (
+              <Icon iconName={IconName.Moon} />
+            ),
+          label: stringGetter({ key: STRING_KEYS.DISPLAY_SETTINGS }),
+          onSelect: () => dispatch(openDialog({ type: DialogTypes.DisplaySettings })),
         },
         ...(onboardingState === OnboardingState.AccountConnected && hdKey
           ? [
