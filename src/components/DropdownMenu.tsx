@@ -91,10 +91,10 @@ Styled.Item = styled(Item)<{ $highlightColor: 'accent' | 'create' | 'destroy' }>
         --item-highlighted-textColor: var(--color-accent);
       `,
       ['create']: `
-        --item-highlighted-textColor: var(--color-success);
+        --item-highlighted-textColor: var(--color-green);
       `,
       ['destroy']: `
-        --item-highlighted-textColor: var(--color-error);
+        --item-highlighted-textColor: var(--color-red);
       `,
     }[$highlightColor])}
 

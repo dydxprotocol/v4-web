@@ -323,7 +323,7 @@ Styled.ReceiptArea = styled.div`
 `;
 
 Styled.Green = styled.span`
-  color: var(--color-success);
+  color: var(--color-green);
 `;
 
 Styled.GreenCheckCircle = styled(GreenCheckCircle)`

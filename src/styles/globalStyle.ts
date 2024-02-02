@@ -2,6 +2,10 @@ import { createGlobalStyle } from 'styled-components';
 
 export const GlobalStyle = createGlobalStyle`
   :root {
+    --color-white: ${({ theme }) => theme.white};
+    --color-green: ${({ theme }) => theme.green};
+    --color-red: ${({ theme }) => theme.red};
+
     --color-layer-0: ${({ theme }) => theme.layer0};
     --color-layer-1: ${({ theme }) => theme.layer1};
     --color-layer-2: ${({ theme }) => theme.layer2};
