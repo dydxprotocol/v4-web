@@ -67,7 +67,12 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
             label: STRING_KEYS.LIGHT,
           },
         ].map(({ themeSetting, label }) => {
-          const theme = themeSetting === AppThemeSystemSetting.System ? currentTheme : themeSetting;
+          const theme =
+            themeSetting === AppThemeSystemSetting.System
+              ? globalThis.matchMedia('(prefers-color-scheme: dark)').matches
+                ? AppTheme.Dark
+                : AppTheme.Light
+              : themeSetting;
 
           const backgroundColor = Themes[theme][currentColorMode].layer2;
           const gridColor = Themes[theme][currentColorMode].borderDefault;
