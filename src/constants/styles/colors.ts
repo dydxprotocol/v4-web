@@ -1,4 +1,11 @@
-export type ThemeColors = LayerColors &
+import { AppColorMode } from '@/state/configs';
+
+export type Theme = {
+  [AppColorMode.GreenUp]: ThemeColorBase;
+  [AppColorMode.RedUp]: ThemeColorBase;
+};
+
+export type ThemeColorBase = LayerColors &
   BorderColors &
   TextColors &
   GradientColors &
@@ -47,8 +54,13 @@ type StatusColors = {
   success: string;
   warning: string;
   error: string;
+  successFaded: string;
+  warningFaded: string;
+  errorFaded: string;
 };
 
+/** ##InvertDirectionalColors
+ * When adding colors here, make sure to update linked function to invert colors for AppColorMode. */
 type DirectionalColors = {
   positive: string;
   negative: string;

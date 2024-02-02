@@ -453,6 +453,6 @@ Styled.FormInputButton = styled(Button)`
 Styled.CheckIcon = styled(Icon)`
   margin: 0 1ch;
 
-  color: var(--color-positive);
+  color: var(--color-success);
   font-size: 0.625rem;
 `;

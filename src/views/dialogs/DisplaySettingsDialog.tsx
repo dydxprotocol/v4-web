@@ -5,8 +5,8 @@ import { Root, Item, Indicator } from '@radix-ui/react-radio-group';
 
 import { useStringGetter } from '@/hooks';
 
-import { AppTheme, setAppTheme } from '@/state/configs';
-import { getAppTheme } from '@/state/configsSelectors';
+import { AppTheme, AppColorMode, setAppTheme, setAppColorMode } from '@/state/configs';
+import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { Themes } from '@/styles/themes';
@@ -26,6 +26,7 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
 
   const currentTheme: AppTheme = useSelector(getAppTheme);
+  const currentColorMode: AppColorMode = useSelector(getAppColorMode);
 
   const sectionHeader = (heading: string) => {
     return (
@@ -56,13 +57,13 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
           <Styled.AppThemeItem
             key={theme}
             value={theme}
-            backgroundcolor={Themes[theme].layer2}
-            gridcolor={Themes[theme].borderDefault}
+            backgroundcolor={Themes[theme][currentColorMode].layer2}
+            gridcolor={Themes[theme][currentColorMode].borderDefault}
             onClick={() => {
               dispatch(setAppTheme(theme));
             }}
           >
-            <Styled.AppThemeHeader textcolor={Themes[theme].textPrimary}>
+            <Styled.AppThemeHeader textcolor={Themes[theme][currentColorMode].textPrimary}>
               {stringGetter({ key: label })}
             </Styled.AppThemeHeader>
             <Styled.Image src="/chart-bars.svg" />
@@ -75,6 +76,48 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
     );
   };
 
+  const colorModeOptions = () => {
+    return (
+      <Styled.ColorPreferenceRoot value={currentColorMode}>
+        {[
+          {
+            colorMode: AppColorMode.GreenUp,
+            label: STRING_KEYS.GREEN_IS_UP,
+          },
+          {
+            colorMode: AppColorMode.RedUp,
+            label: STRING_KEYS.RED_IS_UP,
+          },
+        ].map(({ colorMode, label }) => (
+          <Styled.ColorPreferenceItem
+            key={colorMode}
+            value={colorMode}
+            onClick={() => {
+              dispatch(setAppColorMode(colorMode));
+            }}
+          >
+            <Styled.ColorPreferenceLabel>
+              <Styled.ArrowIconContainer>
+                <Styled.ArrowIcon
+                  iconName={IconName.Arrow}
+                  direction="up"
+                  color={colorMode === AppColorMode.GreenUp ? 'green' : 'red'}
+                />
+                <Styled.ArrowIcon
+                  iconName={IconName.Arrow}
+                  direction="down"
+                  color={colorMode === AppColorMode.GreenUp ? 'red' : 'green'}
+                />
+              </Styled.ArrowIconContainer>
+              {stringGetter({ key: label })}
+            </Styled.ColorPreferenceLabel>
+            <Styled.DotIndicator $selected={currentColorMode === colorMode} />
+          </Styled.ColorPreferenceItem>
+        ))}
+      </Styled.ColorPreferenceRoot>
+    );
+  };
+
   return (
     <Dialog
       isOpen
@@ -84,6 +127,10 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
       <Styled.Section>
         {sectionHeader(stringGetter({ key: STRING_KEYS.THEME }))}
         {themePanels()}
+      </Styled.Section>
+      <Styled.Section>
+        {sectionHeader(stringGetter({ key: STRING_KEYS.DIRECTION_COLOR_PREFERENCE }))}
+        {colorModeOptions()}
       </Styled.Section>
     </Dialog>
   );
@@ -110,6 +157,11 @@ Styled.AppThemeRoot = styled(Root)`
   grid-template-columns: 1fr 1fr;
 `;
 
+Styled.ColorPreferenceRoot = styled(Root)`
+  ${gridStyle}
+  grid-template-columns: 1fr;
+`;
+
 Styled.Item = styled(Item)`
   --border-color: var(--color-border);
   --item-padding: 0.75rem;
@@ -120,7 +172,17 @@ Styled.Item = styled(Item)`
 
   border: solid var(--border-width) var(--border-color);
   border-radius: 0.875rem;
+
   padding: var(--item-padding);
+`;
+
+Styled.ColorPreferenceItem = styled(Styled.Item)`
+  &[data-state='checked'] {
+    background-color: var(--color-layer-4);
+  }
+
+  ${layoutMixins.row}
+  justify-content: space-between;
 `;
 
 Styled.AppThemeItem = styled(Styled.Item)<{ backgroundcolor: string; gridcolor: string }>`
@@ -133,6 +195,7 @@ Styled.AppThemeItem = styled(Styled.Item)<{ backgroundcolor: string; gridcolor: 
   flex-direction: column;
   position: relative;
   width: 100%;
+
   background-color: var(--themePanel-backgroundColor);
 
   &::before {
@@ -169,6 +232,43 @@ Styled.Image = styled.img`
   z-index: 1;
 `;
 
+Styled.ColorPreferenceLabel = styled.div`
+  ${layoutMixins.inlineRow};
+  gap: 1ch;
+`;
+
+Styled.ArrowIconContainer = styled.div`
+  ${layoutMixins.column}
+  gap: 0.5ch;
+
+  svg {
+    height: 0.75em;
+    width: 0.75em;
+  }
+`;
+
+Styled.ArrowIcon = styled(Icon)<{ direction: 'up' | 'down'; color: 'green' | 'red' }>`
+  ${({ direction }) =>
+    ({
+      ['up']: css`
+        transform: rotate(-90deg);
+      `,
+      ['down']: css`
+        transform: rotate(90deg);
+      `,
+    }[direction])}
+
+  ${({ color }) =>
+    ({
+      ['green']: css`
+        color: var(--color-success);
+      `,
+      ['red']: css`
+        color: var(--color-error);
+      `,
+    }[color])}
+`;
+
 const indicatorStyle = css`
   --indicator-size: 1.25rem;
   --icon-size: 0.5rem;
@@ -182,9 +282,33 @@ const indicatorStyle = css`
   justify-content: center;
 `;
 
+Styled.DotIndicator = styled.div<{ $selected: boolean }>`
+  ${indicatorStyle}
+  --background-color: var(--color-layer-2);
+  --border-color: var(--color-border);
+
+  ${({ $selected }) =>
+    $selected &&
+    css`
+      --background-color: var(--color-accent);
+      --border-color: var(--color-accent);
+
+      &::after {
+        content: '';
+        display: block;
+        width: var(--icon-size);
+        height: var(--icon-size);
+        background-color: var(--color-layer-2);
+        border-radius: 50%;
+      }
+    `}
+
+  background-color: var(--background-color);
+  border: solid var(--border-width) var(--border-color);
+`;
+
 Styled.CheckIndicator = styled(Indicator)`
   ${indicatorStyle}
-
   position: absolute;
   bottom: var(--item-padding);
   right: var(--item-padding);

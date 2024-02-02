@@ -12,8 +12,9 @@ import {
   ORDERBOOK_WIDTH,
 } from '@/constants/orderbook';
 
+import { useAppThemeAndColorModeContext } from '@/hooks/useAppThemeAndColorMode';
+
 import { getCurrentMarketConfig, getCurrentMarketOrderbookMap } from '@/state/perpetualsSelectors';
-import { getAppTheme } from '@/state/configsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 
@@ -23,7 +24,6 @@ import {
   getXByColumn,
   getYForElements,
 } from '@/lib/orderbookHelpers';
-import { useAppThemeContext } from '../useAppTheme';
 
 type ElementProps = {
   data: Array<PerpetualMarketOrderbookLevel | undefined>;
@@ -53,7 +53,7 @@ export const useDrawOrderbook = ({
   const { stepSizeDecimals = TOKEN_DECIMALS, tickSizeDecimals = SMALL_USD_DECIMALS } =
     useSelector(getCurrentMarketConfig, shallowEqual) || {};
   const prevData = useRef<typeof data>(data);
-  const theme = useAppThemeContext();
+  const theme = useAppThemeAndColorModeContext();
 
   /**
    * Scale canvas using device pixel ratio to unblur drawn text

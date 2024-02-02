@@ -1,9 +1,9 @@
-import { AppTheme } from '@/state/configs';
-import type { ThemeColors } from '@/constants/styles/colors';
+import { AppTheme, AppColorMode } from '@/state/configs';
+import type { Theme, ThemeColorBase } from '@/constants/styles/colors';
 import { ColorToken, OpacityToken } from '@/constants/styles/base';
 import { generateFadedColorVariant } from '@/lib/styles';
 
-const ClassicTheme: ThemeColors = {
+const ClassicThemeBase: ThemeColorBase = {
   layer0: ColorToken.GrayBlue7,
   layer1: ColorToken.GrayBlue6,
   layer2: ColorToken.GrayBlue5,
@@ -31,6 +31,9 @@ const ClassicTheme: ThemeColors = {
   success: ColorToken.Green1,
   warning: ColorToken.Yellow0,
   error: ColorToken.Red2,
+  successFaded: generateFadedColorVariant(ColorToken.Green1, OpacityToken.Opacity16),
+  warningFaded: generateFadedColorVariant(ColorToken.Yellow0, OpacityToken.Opacity16),
+  errorFaded: generateFadedColorVariant(ColorToken.Red2, OpacityToken.Opacity16),
 
   positive: ColorToken.Green1,
   negative: ColorToken.Red2,
@@ -52,7 +55,7 @@ const ClassicTheme: ThemeColors = {
   tooltipBackground: generateFadedColorVariant(ColorToken.GrayBlue3, OpacityToken.Opacity66),
 };
 
-const DarkTheme: ThemeColors = {
+const DarkThemeBase: ThemeColorBase = {
   layer0: ColorToken.Black,
   layer1: ColorToken.DarkGray11,
   layer2: ColorToken.DarkGray13,
@@ -80,6 +83,9 @@ const DarkTheme: ThemeColors = {
   success: ColorToken.Green0,
   warning: ColorToken.Yellow0,
   error: ColorToken.Red0,
+  successFaded: generateFadedColorVariant(ColorToken.Green0, OpacityToken.Opacity16),
+  warningFaded: generateFadedColorVariant(ColorToken.Yellow0, OpacityToken.Opacity16),
+  errorFaded: generateFadedColorVariant(ColorToken.Red0, OpacityToken.Opacity16),
 
   positive: ColorToken.Green0,
   negative: ColorToken.Red0,
@@ -101,7 +107,7 @@ const DarkTheme: ThemeColors = {
   tooltipBackground: generateFadedColorVariant(ColorToken.DarkGray6, OpacityToken.Opacity66),
 };
 
-const LightTheme: ThemeColors = {
+const LightThemeBase: ThemeColorBase = {
   layer0: ColorToken.White,
   layer1: ColorToken.LightGray6,
   layer2: ColorToken.White,
@@ -129,6 +135,9 @@ const LightTheme: ThemeColors = {
   success: ColorToken.Green2,
   warning: ColorToken.Yellow0,
   error: ColorToken.Red1,
+  successFaded: generateFadedColorVariant(ColorToken.Green2, OpacityToken.Opacity16),
+  warningFaded: generateFadedColorVariant(ColorToken.Yellow0, OpacityToken.Opacity16),
+  errorFaded: generateFadedColorVariant(ColorToken.Red1, OpacityToken.Opacity16),
 
   positive: ColorToken.Green2,
   negative: ColorToken.Red1,
@@ -150,8 +159,22 @@ const LightTheme: ThemeColors = {
   tooltipBackground: generateFadedColorVariant(ColorToken.LightGray7, OpacityToken.Opacity66),
 };
 
+const generateTheme = (themeBase: ThemeColorBase): Theme => {
+  return {
+    [AppColorMode.GreenUp]: themeBase,
+    [AppColorMode.RedUp]: {
+      ...themeBase,
+      // #InvertDirectionalColors
+      positive: themeBase.negative,
+      negative: themeBase.positive,
+      positiveFaded: themeBase.negativeFaded,
+      negativeFaded: themeBase.positiveFaded,
+    },
+  };
+};
+
 export const Themes = {
-  [AppTheme.Classic]: ClassicTheme,
-  [AppTheme.Dark]: DarkTheme,
-  [AppTheme.Light]: LightTheme,
+  [AppTheme.Classic]: generateTheme(ClassicThemeBase),
+  [AppTheme.Dark]: generateTheme(DarkThemeBase),
+  [AppTheme.Light]: generateTheme(LightThemeBase),
 };

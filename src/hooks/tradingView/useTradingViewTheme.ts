@@ -3,8 +3,8 @@ import { useSelector } from 'react-redux';
 
 import type { IChartingLibraryWidget, ThemeName } from 'public/tradingview/charting_library';
 
-import { AppTheme } from '@/state/configs';
-import { getAppTheme } from '@/state/configsSelectors';
+import { AppColorMode, AppTheme } from '@/state/configs';
+import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
 
 import { getWidgetOverrides } from '@/lib/tradingView/utils';
 
@@ -29,6 +29,7 @@ export const useTradingViewTheme = ({
   isWidgetReady?: boolean;
 }) => {
   const appTheme: AppTheme = useSelector(getAppTheme);
+  const appColorMode: AppColorMode = useSelector(getAppColorMode);
 
   useEffect(() => {
     if (tvWidget && isWidgetReady) {
@@ -55,10 +56,24 @@ export const useTradingViewTheme = ({
             }
           }
 
-          const { overrides, studies_overrides } = getWidgetOverrides(appTheme);
+          const { overrides, studies_overrides } = getWidgetOverrides({ appTheme, appColorMode });
           tvWidget?.applyOverrides(overrides);
           tvWidget?.applyStudiesOverrides(studies_overrides);
+
+          // Necessary to update existing indicators
+          const volumeStudyId = tvWidget
+            ?.activeChart()
+            ?.getAllStudies()
+            ?.find((x) => x.name === 'Volume')?.id;
+
+          if (volumeStudyId) {
+            const volume = tvWidget?.activeChart()?.getStudyById(volumeStudyId);
+            volume.applyOverrides({
+              'volume.color.0': studies_overrides['volume.volume.color.0'],
+              'volume.color.1': studies_overrides['volume.volume.color.1'],
+            });
+          }
         });
     }
-  }, [appTheme]);
+  }, [appTheme, appColorMode]);
 };
