@@ -7,21 +7,20 @@ import { useStringGetter } from '@/hooks';
 
 import {
   AppTheme,
+  type AppThemeSetting,
   AppThemeSystemSetting,
   AppColorMode,
   setAppThemeSetting,
   setAppColorMode,
 } from '@/state/configs';
-import { getAppThemeSetting, getAppColorMode } from '@/state/configsSelectors';
+import { getAppTheme, getAppThemeSetting, getAppColorMode } from '@/state/configsSelectors';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { Themes } from '@/styles/themes';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { NumberSign } from '@/constants/numbers';
 
 import { Dialog } from '@/components/Dialog';
-import { DiffArrow } from '@/components/DiffArrow';
 import { Icon, IconName } from '@/components/Icon';
 import { HorizontalSeparatorFiller } from '@/components/Separator';
 
@@ -33,7 +32,8 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
 
-  const currentTheme: AppTheme = useSelector(getAppThemeSetting);
+  const currentThemeSetting: AppThemeSetting = useSelector(getAppThemeSetting);
+  const currentTheme: AppTheme = useSelector(getAppTheme);
   const currentColorMode: AppColorMode = useSelector(getAppColorMode);
 
   const sectionHeader = (heading: string) => {
@@ -48,7 +48,7 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
 
   const themePanels = () => {
     return (
-      <Styled.AppThemeRoot value={currentTheme}>
+      <Styled.AppThemeRoot value={currentThemeSetting}>
         {[
           {
             themeSetting: AppTheme.Classic,
@@ -67,8 +67,7 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
             label: STRING_KEYS.LIGHT,
           },
         ].map(({ themeSetting, label }) => {
-          const theme =
-            themeSetting === AppThemeSystemSetting.System ? AppTheme.Dark : themeSetting;
+          const theme = themeSetting === AppThemeSystemSetting.System ? currentTheme : themeSetting;
 
           const backgroundColor = Themes[theme][currentColorMode].layer2;
           const gridColor = Themes[theme][currentColorMode].borderDefault;
@@ -336,9 +335,9 @@ Styled.CheckIndicator = styled(Indicator)`
   right: var(--item-padding);
 
   background-color: var(--color-accent);
-  color: var(--color-text-2);
+  color: var(--color-text-button);
 `;
-g;
+
 Styled.CheckIcon = styled(Icon)`
   width: var(--icon-size);
   height: var(--icon-size);

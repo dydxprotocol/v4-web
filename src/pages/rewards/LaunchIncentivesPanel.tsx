@@ -7,6 +7,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 
+import { ChaosLabsIcon } from '@/icons';
+
 import breakpoints from '@/styles/breakpoints';
 import { useAccounts, useBreakpoints, useStringGetter } from '@/hooks';
 
@@ -114,7 +116,9 @@ const LaunchIncentivesContent = () => {
       <Styled.Description>
         {stringGetter({ key: STRING_KEYS.LAUNCH_INCENTIVES_DESCRIPTION })}{' '}
       </Styled.Description>
-      <Styled.ChaosLabsLogo src="/logos/chaos-labs.svg" />
+      <Styled.ChaosLabsLogo>
+        {stringGetter({ key: STRING_KEYS.POWERED_BY })} <ChaosLabsIcon />
+      </Styled.ChaosLabsLogo>
       <Styled.ButtonRow>
         <Styled.AboutButton
           action={ButtonAction.Base}
@@ -126,7 +130,7 @@ const LaunchIncentivesContent = () => {
               })
             );
           }}
-          slotRight={<Styled.LinkOutIcon iconName={IconName.LinkOut} />}
+          slotRight={<Icon iconName={IconName.LinkOut} />}
         >
           {stringGetter({ key: STRING_KEYS.ABOUT })}
         </Styled.AboutButton>
@@ -140,7 +144,7 @@ const LaunchIncentivesContent = () => {
               })
             );
           }}
-          slotRight={<Styled.LinkOutIcon iconName={IconName.LinkOut} />}
+          slotRight={<Icon iconName={IconName.LinkOut} />}
           slotLeft={<Icon iconName={IconName.Leaderboard} />}
         >
           {stringGetter({ key: STRING_KEYS.LEADERBOARD })}
@@ -153,7 +157,7 @@ const LaunchIncentivesContent = () => {
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Panel = styled(Panel)`
-  background-color: var(--color-layer-4);
+  background-color: var(--color-layer-3);
   width: 100%;
 `;
 
@@ -198,10 +202,6 @@ Styled.ButtonRow = styled.div`
 
 Styled.Button = styled(Button)`
   --button-padding: 0 1rem;
-`;
-
-Styled.LinkOutIcon = styled(Icon)`
-  color: var(--color-text-1);
 `;
 
 Styled.AboutButton = styled(Styled.Button)`
@@ -280,9 +280,10 @@ Styled.Image = styled.img`
   height: auto;
 `;
 
-Styled.ChaosLabsLogo = styled.img`
-  height: 1.25rem;
-  align-self: start;
+Styled.ChaosLabsLogo = styled.span`
+  display: flex;
+  gap: 0.5em;
+  font: var(--font-mini-medium);
 `;
 
 Styled.NewTag = styled(Tag)`

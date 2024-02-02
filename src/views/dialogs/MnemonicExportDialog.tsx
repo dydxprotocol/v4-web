@@ -189,7 +189,7 @@ Styled.WordList = styled.div<{ isShowing?: boolean }>`
   padding: 1rem;
 
   &:hover {
-    filter: brightness(1.1);
+    filter: brightness(var(--hover-filter-base));
   }
 
   > :first-child {

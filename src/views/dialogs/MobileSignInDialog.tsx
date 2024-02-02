@@ -183,7 +183,7 @@ Styled.QrCodeContainer = styled.figure<{ isShowing: boolean }>`
   transition: 0.2s;
 
   &:hover {
-    filter: brightness(1.1);
+    filter: brightness(var(--hover-filter-base));
   }
 
   > * {

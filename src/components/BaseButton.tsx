@@ -134,8 +134,8 @@ const ButtonStyle = css<StyleProps>`
 
   --button-textColor: var(--color-text-0);
   --button-backgroundColor: transparent;
-  --button-active-filter: brightness(0.9);
-  --button-hover-filter: brightness(1.1);
+  --button-active-filter: brightness(var(--active-filter));
+  --button-hover-filter: brightness(var(--hover-filter-base));
   --button-hover-textColor: var(--button-textColor);
 
   --button-radius: 0.5em;
