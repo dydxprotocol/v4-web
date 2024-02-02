@@ -141,6 +141,7 @@ const providers = [
   wrapProvider(LocalNotificationsProvider),
   wrapProvider(NotificationsProvider),
   wrapProvider(DialogAreaProvider),
+  wrapProvider(PotentialMarketsProvider),
   wrapProvider(AppThemeAndColorModeProvider),
 ];
 
