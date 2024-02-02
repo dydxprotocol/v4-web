@@ -6,18 +6,18 @@ import { TradeLayouts } from '@/constants/layout';
 
 import { AssetIcon } from '@/components/AssetIcon';
 
-import { AppTheme, setAppTheme } from '@/state/configs';
+import {
+  AppTheme,
+  AppThemeSystemSetting,
+  AppColorMode,
+  setAppThemeSetting,
+  setAppColorMode,
+} from '@/state/configs';
 import { setSelectedTradeLayout } from '@/state/layout';
 
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 import { Asset, PerpetualMarket } from '@/constants/abacus';
-
-enum ThemeItems {
-  SetClassicTheme = 'SetDefaultTheme',
-  SetLightTheme = 'SetLightTheme',
-  SetDarkTheme = 'SetDarkTheme',
-}
 
 enum LayoutItems {
   setDefaultLayout = 'SetDefaultLayout',
@@ -53,24 +53,51 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
       groupLabel: 'Themes',
       items: [
         {
-          value: ThemeItems.SetClassicTheme,
+          value: AppTheme.Classic,
           label: 'Set Classic Theme',
           onSelect: () => {
-            dispatch(setAppTheme(AppTheme.Classic));
+            dispatch(setAppThemeSetting(AppTheme.Classic));
           },
         },
         {
-          value: ThemeItems.SetLightTheme,
+          value: AppThemeSystemSetting.System,
+          label: 'Set System Theme',
+          onSelect: () => {
+            dispatch(setAppThemeSetting(AppThemeSystemSetting.System));
+          },
+        },
+        {
+          value: AppTheme.Light,
           label: 'Set Light Theme',
           onSelect: () => {
-            dispatch(setAppTheme(AppTheme.Light));
+            dispatch(setAppThemeSetting(AppTheme.Light));
           },
         },
         {
-          value: ThemeItems.SetDarkTheme,
+          value: AppTheme.Dark,
           label: 'Set Dark Theme',
           onSelect: () => {
-            dispatch(setAppTheme(AppTheme.Dark));
+            dispatch(setAppThemeSetting(AppTheme.Dark));
+          },
+        },
+      ],
+    },
+    {
+      group: 'colorPreferences',
+      groupLabel: 'Color Preferences',
+      items: [
+        {
+          value: AppColorMode.GreenUp,
+          label: 'Set Green is Up',
+          onSelect: () => {
+            dispatch(setAppColorMode(AppColorMode.GreenUp));
+          },
+        },
+        {
+          value: AppColorMode.RedUp,
+          label: 'Set Red is Up',
+          onSelect: () => {
+            dispatch(setAppColorMode(AppColorMode.RedUp));
           },
         },
       ],

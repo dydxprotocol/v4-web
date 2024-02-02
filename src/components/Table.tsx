@@ -782,7 +782,7 @@ Styled.Tr = styled.tr<{
       &:focus-visible,
       &:focus-within {
         --tableRow-currentBackgroundColor: var(--tableRow-hover-backgroundColor);
-        filter: brightness(1.1);
+        filter: brightness(var(--hover-filter-base));
       }
     `};
 

@@ -35,8 +35,8 @@ export const DropdownHeaderMenu = <MenuItemValue extends string>({
     <Root>
       <Styled.Trigger className={className} asChild>
         <div>
-        {children}
-        <Styled.DropdownIconButton iconName={IconName.Caret} isToggle />
+          {children}
+          <Styled.DropdownIconButton iconName={IconName.Caret} isToggle />
         </div>
       </Styled.Trigger>
       <Portal>
@@ -87,7 +87,7 @@ Styled.Trigger = styled(Trigger)`
   outline: none;
 
   :hover {
-    filter: brightness(1.1);
+    filter: brightness(var(--hover-filter-base));
   }
 `;
 

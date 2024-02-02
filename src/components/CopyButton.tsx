@@ -77,7 +77,7 @@ Styled.InlineRow = styled.div<{ copied: boolean }>`
         `
       : css`
           &:hover {
-            filter: brightness(1.1);
+            filter: brightness(var(--hover-filter-base));
             text-decoration: underline;
           }
         `}

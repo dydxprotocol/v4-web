@@ -1,6 +1,6 @@
 import { AppTheme, AppColorMode } from '@/state/configs';
 import type { Theme, ThemeColorBase } from '@/constants/styles/colors';
-import { ColorToken, OpacityToken } from '@/constants/styles/base';
+import { BrightnessFilterToken, ColorToken, OpacityToken } from '@/constants/styles/base';
 import { generateFadedColorVariant } from '@/lib/styles';
 
 const ClassicThemeBase: ThemeColorBase = {
@@ -20,6 +20,7 @@ const ClassicThemeBase: ThemeColorBase = {
   textPrimary: ColorToken.LightGray2,
   textSecondary: ColorToken.GrayPurple1,
   textTertiary: ColorToken.GrayPurple2,
+  textButton: ColorToken.LightGray2,
 
   gradientBase0: ColorToken.DarkGray9,
   gradientBase1: ColorToken.GrayBlue2,
@@ -53,6 +54,10 @@ const ClassicThemeBase: ThemeColorBase = {
   switchThumbActiveBackground: ColorToken.White,
   toggleBackground: ColorToken.GrayBlue3,
   tooltipBackground: generateFadedColorVariant(ColorToken.GrayBlue3, OpacityToken.Opacity66),
+
+  hoverFilterBase: BrightnessFilterToken.Lighten10,
+  hoverFilterVariant: BrightnessFilterToken.Lighten10,
+  activeFilter: BrightnessFilterToken.Darken10,
 };
 
 const DarkThemeBase: ThemeColorBase = {
@@ -72,6 +77,7 @@ const DarkThemeBase: ThemeColorBase = {
   textPrimary: ColorToken.LightGray0,
   textSecondary: ColorToken.MediumGray0,
   textTertiary: ColorToken.DarkGray0,
+  textButton: ColorToken.LightGray0,
 
   gradientBase0: ColorToken.DarkGray8,
   gradientBase1: ColorToken.DarkGray5,
@@ -105,6 +111,10 @@ const DarkThemeBase: ThemeColorBase = {
   switchThumbActiveBackground: ColorToken.White,
   toggleBackground: ColorToken.DarkGray6,
   tooltipBackground: generateFadedColorVariant(ColorToken.DarkGray6, OpacityToken.Opacity66),
+
+  hoverFilterBase: BrightnessFilterToken.Lighten10,
+  hoverFilterVariant: BrightnessFilterToken.Lighten10,
+  activeFilter: BrightnessFilterToken.Darken10,
 };
 
 const LightThemeBase: ThemeColorBase = {
@@ -124,6 +134,7 @@ const LightThemeBase: ThemeColorBase = {
   textPrimary: ColorToken.DarkGray12,
   textSecondary: ColorToken.DarkGray3,
   textTertiary: ColorToken.DarkGray1,
+  textButton: ColorToken.White,
 
   gradientBase0: ColorToken.LightGray8,
   gradientBase1: ColorToken.LightGray5,
@@ -157,6 +168,10 @@ const LightThemeBase: ThemeColorBase = {
   switchThumbActiveBackground: ColorToken.White,
   toggleBackground: ColorToken.LightGray4,
   tooltipBackground: generateFadedColorVariant(ColorToken.LightGray7, OpacityToken.Opacity66),
+
+  hoverFilterBase: BrightnessFilterToken.Darken5,
+  hoverFilterVariant: BrightnessFilterToken.Lighten10,
+  activeFilter: BrightnessFilterToken.Darken10,
 };
 
 const generateTheme = (themeBase: ThemeColorBase): Theme => {

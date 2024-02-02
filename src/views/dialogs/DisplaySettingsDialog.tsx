@@ -5,8 +5,15 @@ import { Root, Item, Indicator } from '@radix-ui/react-radio-group';
 
 import { useStringGetter } from '@/hooks';
 
-import { AppTheme, AppColorMode, setAppTheme, setAppColorMode } from '@/state/configs';
-import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
+import {
+  AppTheme,
+  type AppThemeSetting,
+  AppThemeSystemSetting,
+  AppColorMode,
+  setAppThemeSetting,
+  setAppColorMode,
+} from '@/state/configs';
+import { getAppTheme, getAppThemeSetting, getAppColorMode } from '@/state/configsSelectors';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { Themes } from '@/styles/themes';
@@ -25,12 +32,14 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
 
+  const currentThemeSetting: AppThemeSetting = useSelector(getAppThemeSetting);
   const currentTheme: AppTheme = useSelector(getAppTheme);
   const currentColorMode: AppColorMode = useSelector(getAppColorMode);
 
   const sectionHeader = (heading: string) => {
     return (
       <Styled.Header>
+        {heading}
         {heading}
         <HorizontalSeparatorFiller />
       </Styled.Header>
@@ -39,39 +48,56 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
 
   const themePanels = () => {
     return (
-      <Styled.AppThemeRoot value={currentTheme}>
+      <Styled.AppThemeRoot value={currentThemeSetting}>
         {[
           {
-            theme: AppTheme.Classic,
+            themeSetting: AppTheme.Classic,
             label: STRING_KEYS.CLASSIC_DARK,
           },
           {
-            theme: AppTheme.Dark,
+            themeSetting: AppThemeSystemSetting.System,
+            label: STRING_KEYS.SYSTEM,
+          },
+          {
+            themeSetting: AppTheme.Dark,
             label: STRING_KEYS.DARK,
           },
           {
-            theme: AppTheme.Light,
+            themeSetting: AppTheme.Light,
             label: STRING_KEYS.LIGHT,
           },
-        ].map(({ theme, label }) => (
-          <Styled.AppThemeItem
-            key={theme}
-            value={theme}
-            backgroundcolor={Themes[theme][currentColorMode].layer2}
-            gridcolor={Themes[theme][currentColorMode].borderDefault}
-            onClick={() => {
-              dispatch(setAppTheme(theme));
-            }}
-          >
-            <Styled.AppThemeHeader textcolor={Themes[theme][currentColorMode].textPrimary}>
-              {stringGetter({ key: label })}
-            </Styled.AppThemeHeader>
-            <Styled.Image src="/chart-bars.svg" />
-            <Styled.CheckIndicator>
-              <Styled.CheckIcon iconName={IconName.Check} />
-            </Styled.CheckIndicator>
-          </Styled.AppThemeItem>
-        ))}
+        ].map(({ themeSetting, label }) => {
+          const theme =
+            themeSetting === AppThemeSystemSetting.System
+              ? globalThis.matchMedia('(prefers-color-scheme: dark)').matches
+                ? AppTheme.Dark
+                : AppTheme.Light
+              : themeSetting;
+
+          const backgroundColor = Themes[theme][currentColorMode].layer2;
+          const gridColor = Themes[theme][currentColorMode].borderDefault;
+          const textColor = Themes[theme][currentColorMode].textPrimary;
+
+          return (
+            <Styled.AppThemeItem
+              key={themeSetting}
+              value={themeSetting}
+              backgroundcolor={backgroundColor}
+              gridcolor={gridColor}
+              onClick={() => {
+                dispatch(setAppThemeSetting(themeSetting));
+              }}
+            >
+              <Styled.AppThemeHeader textcolor={textColor}>
+                {stringGetter({ key: label })}
+              </Styled.AppThemeHeader>
+              <Styled.Image src="/chart-bars.svg" />
+              <Styled.CheckIndicator>
+                <Styled.CheckIcon iconName={IconName.Check} />
+              </Styled.CheckIndicator>
+            </Styled.AppThemeItem>
+          );
+        })}
       </Styled.AppThemeRoot>
     );
   };
@@ -314,7 +340,7 @@ Styled.CheckIndicator = styled(Indicator)`
   right: var(--item-padding);
 
   background-color: var(--color-accent);
-  color: var(--color-text-2);
+  color: var(--color-text-button);
 `;
 
 Styled.CheckIcon = styled(Icon)`

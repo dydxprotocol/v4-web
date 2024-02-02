@@ -12,13 +12,19 @@ export enum AppTheme {
   Light = 'Light',
 }
 
+export enum AppThemeSystemSetting {
+  System = 'System',
+}
+
+export type AppThemeSetting = AppTheme | AppThemeSystemSetting;
+
 export enum AppColorMode {
   GreenUp = 'GreenUp',
   RedUp = 'RedUp',
 }
 
 export interface ConfigsState {
-  appTheme: AppTheme;
+  appThemeSetting: AppThemeSetting;
   appColorMode: AppColorMode;
   feeTiers?: kollections.List<FeeTier>;
   feeDiscounts?: FeeDiscount[];
@@ -26,24 +32,8 @@ export interface ConfigsState {
   hasSeenLaunchIncentives: boolean;
 }
 
-const DOCUMENT_THEME_MAP = {
-  [AppTheme.Classic]: () => {
-    document?.documentElement?.classList.remove('theme-dark', 'theme-light');
-  },
-  [AppTheme.Dark]: () => {
-    document?.documentElement?.classList.remove('theme-light');
-    document?.documentElement?.classList.add('theme-dark');
-  },
-  [AppTheme.Light]: () => {
-    document?.documentElement?.classList.remove('theme-dark');
-    document?.documentElement?.classList.add('theme-light');
-  },
-};
-
-export const changeTheme = (theme: AppTheme) => DOCUMENT_THEME_MAP[theme]();
-
 const initialState: ConfigsState = {
-  appTheme: getLocalStorage({
+  appThemeSetting: getLocalStorage({
     key: LocalStorageKey.SelectedTheme,
     defaultValue: AppTheme.Classic,
   }),
@@ -60,16 +50,13 @@ const initialState: ConfigsState = {
   }),
 };
 
-changeTheme(initialState.appTheme);
-
 export const configsSlice = createSlice({
   name: 'Inputs',
   initialState,
   reducers: {
-    setAppTheme: (state: ConfigsState, { payload }: PayloadAction<AppTheme>) => {
+    setAppThemeSetting: (state: ConfigsState, { payload }: PayloadAction<AppThemeSetting>) => {
       setLocalStorage({ key: LocalStorageKey.SelectedTheme, value: payload });
-      changeTheme(payload);
-      state.appTheme = payload;
+      state.appThemeSetting = payload;
     },
     setAppColorMode: (state: ConfigsState, { payload }: PayloadAction<AppColorMode>) => {
       setLocalStorage({ key: LocalStorageKey.SelectedColorMode, value: payload });
@@ -86,5 +73,5 @@ export const configsSlice = createSlice({
   },
 });
 
-export const { setAppTheme, setAppColorMode, setConfigs, markLaunchIncentivesSeen } =
+export const { setAppThemeSetting, setAppColorMode, setConfigs, markLaunchIncentivesSeen } =
   configsSlice.actions;
