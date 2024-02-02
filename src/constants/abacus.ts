@@ -209,6 +209,9 @@ export const RestrictionType = Abacus.exchange.dydx.abacus.output.Restriction;
 const restrictionTypes = [...RestrictionType.values()] as const;
 export type RestrictionTypes = (typeof restrictionTypes)[number];
 
+// ------ Api data ------ //
+export const ApiData = Abacus.exchange.dydx.abacus.state.manager.ApiData;
+
 // ------ Enum Conversions ------ //
 type IfEquals<X, Y, A, B> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2
   ? A

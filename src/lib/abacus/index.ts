@@ -25,6 +25,7 @@ import {
   CoroutineTimer,
   TransferType,
   AbacusAppConfig,
+  ApiData,
 } from '@/constants/abacus';
 
 import { DEFAULT_MARKETID } from '@/constants/markets';
@@ -232,6 +233,9 @@ class AbacusStateManager {
   ) => {
     this.stateManager.historicalTradingRewardPeriod = period;
   };
+
+  refreshHistoricalTradingRewards = () =>
+    this.stateManager.refresh(ApiData.HISTORICAL_TRADING_REWARDS);
 
   switchNetwork = (network: DydxNetwork) => {
     this.stateManager.environmentId = network;

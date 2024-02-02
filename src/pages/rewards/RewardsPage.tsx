@@ -36,7 +36,10 @@ const RewardsPage = () => {
           {stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
         </Styled.MobileHeader>
       )}
-      <Styled.GridLayout showTradingRewards={testFlags.showTradingRewards}>
+      <Styled.GridLayout
+        showTradingRewards={testFlags.showTradingRewards}
+        showMigratePanel={import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet}
+      >
         {import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && <Styled.MigratePanel />}
 
         {isTablet ? (
@@ -105,7 +108,7 @@ Styled.MobileHeader = styled.header`
   background-color: var(--color-layer-2);
 `;
 
-Styled.GridLayout = styled.div<{ showTradingRewards?: boolean }>`
+Styled.GridLayout = styled.div<{ showTradingRewards?: boolean; showMigratePanel?: boolean }>`
   --gap: 1.5rem;
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -115,26 +118,40 @@ Styled.GridLayout = styled.div<{ showTradingRewards?: boolean }>`
     gap: var(--gap);
   }
 
-  grid-template-areas:
-    'migrate migrate'
-    'incentives balance'
-    'other other';
-
-  ${({ showTradingRewards }) =>
-    showTradingRewards &&
-    css`
-      grid-template-areas:
-        'migrate migrate'
-        'incentives balance'
-        'rewards other';
-    `}
+  ${({ showTradingRewards, showMigratePanel }) =>
+    showTradingRewards && showMigratePanel
+      ? css`
+          grid-template-areas:
+            'migrate migrate'
+            'incentives balance'
+            'rewards other';
+        `
+      : showTradingRewards
+      ? css`
+          grid-template-areas: 'incentives balance' 'rewards other';
+        `
+      : showMigratePanel
+      ? css`
+          grid-template-areas: 'migrate migrate' 'incentives balance' 'other other';
+        `
+      : css`
+          grid-template-areas: 'incentives balance' 'other other';
+        `};
 
   @media ${breakpoints.tablet} {
     --gap: 1rem;
     grid-template-columns: 1fr;
-    grid-template-areas:
-      'incentives'
-      'rewards';
+
+    ${({ showTradingRewards }) =>
+      showTradingRewards
+        ? css`
+            grid-template-areas:
+              'incentives'
+              'rewards';
+          `
+        : css`
+            grid-template-areas: 'incentives';
+          `}
   }
 `;
 

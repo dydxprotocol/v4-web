@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
 
@@ -12,10 +13,16 @@ import { Panel } from '@/components/Panel';
 
 import { getHistoricalTradingRewardsForCurrentWeek } from '@/state/accountSelectors';
 
+import abacusStateManager from '@/lib/abacus';
+
 export const TradingRewardsSummaryPanel = () => {
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
-  const currentWeekTradingReward = useSelector(getHistoricalTradingRewardsForCurrentWeek);
+  const currentWeekTradingReward = useSelector(getHistoricalTradingRewardsForCurrentWeek, shallowEqual);
+
+  useEffect(() => {
+    abacusStateManager.refreshHistoricalTradingRewards();
+  }, []);
 
   return !currentWeekTradingReward ? null : (
     <Panel
