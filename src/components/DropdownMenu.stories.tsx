@@ -7,6 +7,11 @@ import { StoryWrapper } from '.ladle/components';
 export const DropdownMenuStory: Story<Parameters<typeof DropdownMenu>> = (args) => {
   const exampleItems = [
     {
+      value: '0',
+      label: 'Item 0',
+      onSelect: () => alert('Item 0 action'),
+    },
+    {
       value: '1',
       label: 'Item 1 (accent)',
       onSelect: () => alert('Item 1 action'),
