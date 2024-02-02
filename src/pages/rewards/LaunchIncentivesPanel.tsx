@@ -282,8 +282,9 @@ Styled.Image = styled.img`
 
 Styled.ChaosLabsLogo = styled.span`
   display: flex;
+  align-items: center;
   gap: 0.5em;
-  font: var(--font-mini-medium);
+  font: var(--font-tiny-medium);
 `;
 
 Styled.NewTag = styled(Tag)`
