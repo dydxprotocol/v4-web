@@ -87,7 +87,7 @@ Styled.Icon = styled(Icon)<{ copied: boolean }>`
   ${({ copied }) =>
     copied &&
     css`
-      color: var(--color-positive);
+      color: var(--color-success);
     `}
 `;
 
@@ -96,7 +96,7 @@ Styled.IconButton = styled(IconButton)<{ copied: boolean }>`
     copied &&
     css`
       svg {
-        color: var(--color-positive);
+        color: var(--color-success);
       }
     `}
 `;

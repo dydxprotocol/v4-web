@@ -43,19 +43,19 @@ export const getStatusIconInfo = ({
     case AbacusOrderStatus.filled: {
       return {
         statusIcon: IconName.OrderFilled,
-        statusIconColor: `var(--color-positive)`,
+        statusIconColor: `var(--color-success)`,
       };
     }
     case AbacusOrderStatus.cancelled: {
       return {
         statusIcon: IconName.OrderCanceled,
-        statusIconColor: `var(--color-negative)`,
+        statusIconColor: `var(--color-error)`,
       };
     }
     case AbacusOrderStatus.canceling: {
       return {
         statusIcon: IconName.OrderPending,
-        statusIconColor: `var(--color-negative)`,
+        statusIconColor: `var(--color-error)`,
       };
     }
     case AbacusOrderStatus.untriggered: {

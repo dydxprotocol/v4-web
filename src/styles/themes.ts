@@ -31,6 +31,9 @@ const ClassicThemeBase: ThemeColorBase = {
   success: ColorToken.Green1,
   warning: ColorToken.Yellow0,
   error: ColorToken.Red2,
+  successFaded: generateFadedColorVariant(ColorToken.Green1, OpacityToken.Opacity16),
+  warningFaded: generateFadedColorVariant(ColorToken.Yellow0, OpacityToken.Opacity16),
+  errorFaded: generateFadedColorVariant(ColorToken.Red2, OpacityToken.Opacity16),
 
   positive: ColorToken.Green1,
   negative: ColorToken.Red2,
@@ -80,6 +83,9 @@ const DarkThemeBase: ThemeColorBase = {
   success: ColorToken.Green0,
   warning: ColorToken.Yellow0,
   error: ColorToken.Red0,
+  successFaded: generateFadedColorVariant(ColorToken.Green0, OpacityToken.Opacity16),
+  warningFaded: generateFadedColorVariant(ColorToken.Yellow0, OpacityToken.Opacity16),
+  errorFaded: generateFadedColorVariant(ColorToken.Red0, OpacityToken.Opacity16),
 
   positive: ColorToken.Green0,
   negative: ColorToken.Red0,
@@ -129,6 +135,9 @@ const LightThemeBase: ThemeColorBase = {
   success: ColorToken.Green2,
   warning: ColorToken.Yellow0,
   error: ColorToken.Red1,
+  successFaded: generateFadedColorVariant(ColorToken.Green2, OpacityToken.Opacity16),
+  warningFaded: generateFadedColorVariant(ColorToken.Yellow0, OpacityToken.Opacity16),
+  errorFaded: generateFadedColorVariant(ColorToken.Red1, OpacityToken.Opacity16),
 
   positive: ColorToken.Green2,
   negative: ColorToken.Red1,

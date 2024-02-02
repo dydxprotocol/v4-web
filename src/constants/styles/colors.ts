@@ -54,6 +54,9 @@ type StatusColors = {
   success: string;
   warning: string;
   error: string;
+  successFaded: string;
+  warningFaded: string;
+  errorFaded: string;
 };
 
 /** ##InvertDirectionalColors
