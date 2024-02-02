@@ -225,7 +225,7 @@ export const useWalletConnection = () => {
         await disconnectWallet();
       }
     })();
-  }, [selectedWalletType, signerWagmi, signerGraz, evmDerivedAddresses]);
+  }, [selectedWalletType, signerWagmi, signerGraz, evmDerivedAddresses, evmAddress]);
 
   const selectWalletType = async (walletType: WalletType | undefined) => {
     if (selectedWalletType) {
