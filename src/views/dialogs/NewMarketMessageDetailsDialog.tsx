@@ -128,7 +128,7 @@ export const NewMarketMessageDetailsDialog = ({
                 {'['}
                 {exchangeConfig?.map((exchange) => {
                   return (
-                    <Styled.Code
+                    <Styled.ExchangeObject
                       key={exchange.exchangeName}
                       style={{ padding: 0, margin: 0, paddingLeft: '0.5rem' }}
                     >
@@ -139,7 +139,7 @@ export const NewMarketMessageDetailsDialog = ({
                         </Styled.Line>
                       ))}
                       {'},'}
-                    </Styled.Code>
+                    </Styled.ExchangeObject>
                   );
                 })}
                 {']'}
@@ -337,15 +337,20 @@ Styled.Text0 = styled.span`
 `;
 
 Styled.Code = styled.div`
+  height: 16.25rem;
+  overflow: auto;
+  display: block;
   background-color: var(--color-layer-1);
   padding: 1rem;
   border-radius: 10px;
   font: var(--font-mini-book);
   font-family: var(--fontFamily-monospace);
   margin-top: 1rem;
-  display: flex;
-  flex-direction: column;
   gap: 0rem;
+`;
+
+Styled.ExchangeObject = styled.div`
+  padding: 1rem;
 `;
 
 Styled.Details = styled(Details)`

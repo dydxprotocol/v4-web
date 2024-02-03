@@ -433,7 +433,6 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         params,
         utils.getGovAddNewMarketTitle(params.ticker),
         utils.getGovAddNewMarketSummary(params.ticker, newMarketProposal.delayBlocks),
-        // @ts-ignore - Need to change type in v4-client-js
         BigInt(newMarketProposal.initialDepositAmount).toString()
       );
 
