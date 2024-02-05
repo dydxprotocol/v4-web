@@ -21,6 +21,7 @@ import {
   useSelectedNetwork,
   useStringGetter,
   useSubaccount,
+  useWithdrawalInfo,
 } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
@@ -75,6 +76,8 @@ export const WithdrawForm = () => {
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 0.1% slippage
   const debouncedAmount = useDebounce<string>(withdrawAmount, 500);
+  const { usdcWithdawalCapacity, withdrawalAndTransferGatingStatus } = useWithdrawalInfo();
+  console.log({ usdcWithdawalCapacity, withdrawalAndTransferGatingStatus });
 
   const isValidAddress = toAddress && isAddress(toAddress);
 
@@ -348,6 +351,8 @@ export const WithdrawForm = () => {
     sanctionedAddresses,
     stringGetter,
     summary,
+    withdrawalCapacity,
+    withdrawalTransferGateStatus,
   ]);
 
   const isDisabled =

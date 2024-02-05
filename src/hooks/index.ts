@@ -26,6 +26,7 @@ import { useStringGetter } from './useStringGetter';
 import { useSubaccount } from './useSubaccount';
 import { useTradeFormInputs } from './useTradeFormInputs';
 import { useURLConfigs } from './useURLConfigs';
+import { useWithdrawalInfo } from './useWithdrawalInfo';
 
 export {
   useApiState,
@@ -56,4 +57,5 @@ export {
   useSubaccount,
   useTradeFormInputs,
   useURLConfigs,
+  useWithdrawalInfo,
 };
