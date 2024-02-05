@@ -18,18 +18,24 @@
     <meta property="og:image:height" content="1260" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="dYdX" />
-    <meta name="smartbanner:title" content="dYdX Chain">
-    <meta name="smartbanner:author" content="dYdX Operations Services Ltd">
+    <!-- Smartbanner: Configure the mobile app -->
+    <meta name="smartbanner:title" content="{app_name}">
+    <meta name="smartbanner:author" content="{org_name}">
+    <!-- Smartbanner: Configure the iOS app -->
+    <meta name="smartbanner:icon-apple" content="{ios_icon_url}">
+    <meta name="smartbanner:button-url-apple" content="{ios_app_url}">
+    <!-- Smartbanner: Take out next line "smartbanner:api" after configuration -->
+    <meta name="smartbanner:api" content="true">
+    <!-- Smartbanner: The rest of the configurations can be kept as is -->
     <meta name="smartbanner:price" content="FREE">
     <meta name="smartbanner:price-suffix-apple" content=" - On the App Store">
-    <meta name="smartbanner:icon-apple" content="https://is1-ssl.mzstatic.com/image/thumb/Purple126/v4/1a/ba/5d/1aba5d13-e050-a69d-b758-68e349d822c1/AppIcon-1x_U007emarketing-0-7-0-85-220.png/246x0w.webp">
     <meta name="smartbanner:button" content="VIEW">
-    <meta name="smartbanner:button-url-apple" content="https://apps.apple.com/app/id6475599596">
     <meta name="smartbanner:enabled-platforms" content="ios">
     <meta name="smartbanner:close-label" content="Close">
     <meta name="smartbanner:exclude-user-agent-regex" content="^.*(Windows NT|Intel Mac OS X).*$">
     <link rel="stylesheet" href="node_modules/smartbanner.js/dist/smartbanner.min.css">
     <script src="node_modules/smartbanner.js/dist/smartbanner.min.js"></script>
+    <!-- Smartbanner: End configuration -->
   </head>
   <body>
     <div id="root"></div>
