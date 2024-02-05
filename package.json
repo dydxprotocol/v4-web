@@ -110,6 +110,8 @@
     "react-router-dom": "^6.14.0",
     "react-stately": "^3.23.0",
     "reselect": "^4.1.8",
+    "smart-app-banner": "^2.0.0",
+    "smartbanner.js": "^1.22.0",
     "styled-components": "^5.3.11",
     "use-latest": "^1.2.1",
     "viem": "^1.20.0",

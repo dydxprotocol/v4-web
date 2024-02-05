@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 overrides:
   follow-redirects: 1.15.3
 
@@ -238,6 +242,12 @@ dependencies:
   reselect:
     specifier: ^4.1.8
     version: 4.1.8
+  smart-app-banner:
+    specifier: ^2.0.0
+    version: 2.0.0
+  smartbanner.js:
+    specifier: ^1.22.0
+    version: 1.22.0
   styled-components:
     specifier: ^5.3.11
     version: 5.3.11(@babel/core@7.22.5)(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0)
@@ -8079,6 +8089,10 @@ packages:
     resolution: {integrity: sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==}
     dev: true
 
+  /component-query@0.0.3:
+    resolution: {integrity: sha512-VgebQseT1hz1Ps7vVp2uaSg+N/gsI5ts3AZUSnN6GMA2M82JH7o+qYifWhmVE/e8w/H48SJuA3nA9uX8zRe95Q==}
+    dev: false
+
   /concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
@@ -8119,6 +8133,10 @@ packages:
 
   /convert-source-map@1.9.0:
     resolution: {integrity: sha512-ASFBup0Mz1uyiIjANan1jzLQami9z1PoYSZCiiYW2FczPbenXc45FZdBZLzOT+r6+iciuEModtmCti+hjaAk0A==}
+
+  /cookie-cutter@0.2.0:
+    resolution: {integrity: sha512-eVyP5liHjDMCmGlp2OD+qoin5TJlwUBRjBKN8R2yJ3ePf8xqUtqmRP6e36ipe0nBm2lTiertH6iHPOptNQzAEw==}
+    dev: false
 
   /cookie-es@1.0.0:
     resolution: {integrity: sha512-mWYvfOLrfEc996hlKcdABeIiPHUPC6DM2QYZdGGOvhOTbA3tjm2eBwqlJpoFdjC89NI4Qt6h0Pu06Mp+1Pj5OQ==}
@@ -9600,6 +9618,12 @@ packages:
     engines: {node: 6.* || 8.* || >= 10.*}
     dev: false
 
+  /get-doc@1.0.4:
+    resolution: {integrity: sha512-eZ/XpGRr5A5bh3P+yLIZM7a21Tx95NtiUh/nI/qT3GcFzhJyYOL2CNXceej7fZOnacaiDtoQPxQsvpBD7/bMeg==}
+    dependencies:
+      has-dom: 1.0.1
+    dev: false
+
   /get-func-name@2.0.0:
     resolution: {integrity: sha512-Hm0ixYtaSZ/V7C8FJrtZIuBBI+iSgL+1Aq82zSu8VQNB4S3Gk8e7Qs3VwBDJAhmRZcFqkl3tQu36g/Foh5I5ig==}
     dev: true
@@ -9826,6 +9850,11 @@ packages:
   /has-bigints@1.0.2:
     resolution: {integrity: sha512-tSvCKtBr9lkF0Ex0aQiP9N+OpV4zi2r/Nee5VkRDbaqv35RLYMzbwQfFSZZH0kR+Rd6302UJZ2p/bJCEoR3VoQ==}
     dev: true
+
+  /has-dom@1.0.1:
+    resolution: {integrity: sha512-zjbpaHVws+dr8dygaKfICCV4pSeN4Ni1rdQs8yMxFK7aQMuzXpp6bFILtkwcni1aG67SctJgh0bIvddH5z3IBQ==}
+    engines: {node: '>=0.10.0'}
+    dev: false
 
   /has-flag@3.0.0:
     resolution: {integrity: sha512-sKJf1+ceQBr4SMkvQnBDNDtf4TXpVhVGateu0t918bl30FnbE2m4vNLX+VWe/dpjlb+HugGYzW7uQXH98HPEYw==}
@@ -13308,6 +13337,21 @@ packages:
     engines: {node: '>=12'}
     dev: true
 
+  /smart-app-banner@2.0.0:
+    resolution: {integrity: sha512-Z4Rb9OV6u+QnLyLTJW+gf2D4IZ51UUMRl6OTIKos1V/+QpzgyYtv9jdW1TiswNhBSCuRtNvX7+C7zxsbbmnJPA==}
+    dependencies:
+      component-query: 0.0.3
+      cookie-cutter: 0.2.0
+      get-doc: 1.0.4
+      object-assign: 4.1.1
+      ua-parser-js: 0.7.37
+    dev: false
+
+  /smartbanner.js@1.22.0:
+    resolution: {integrity: sha512-JhERLgwEPuzVdwAHds1J6txWBVq9BwmlAn+5VicrAfIOMO3ehNA7VHu8IIJNnW1LsElSCaLWxjdLjlEwLDqAvA==}
+    engines: {node: '>=10.24.1 <22.0.0'}
+    dev: false
+
   /sonic-boom@2.8.0:
     resolution: {integrity: sha512-kuonw1YOYYNOve5iHdSahXPOK49GqwA+LZhI6Wz/l0rP57iKyXXIHaRagOBHAPmGwJC6od2Z9zgvZ5loSgMlVg==}
     dependencies:
@@ -13948,6 +13992,10 @@ packages:
     resolution: {integrity: sha512-XH627E9vkeqhlZFQuL+UsyAXEnibT0kWR2FWONlr4sTjvxyJYnyefgrkyECLzM5NenmKzRAy2rR/OlYLA1HkZw==}
     engines: {node: '>=14.17'}
     hasBin: true
+
+  /ua-parser-js@0.7.37:
+    resolution: {integrity: sha512-xV8kqRKM+jhMvcHWUKthV9fNebIzrNy//2O9ZwWcfiBFR5f25XVZPLlEajk/sf3Ra15V92isyQqnIEXRDaZWEA==}
+    dev: false
 
   /ufo@1.2.0:
     resolution: {integrity: sha512-RsPyTbqORDNDxqAdQPQBpgqhWle1VcTSou/FraClYlHf6TZnQcGslpLcAphNR+sQW4q5lLWLbOsRlh9j24baQg==}
@@ -14912,7 +14960,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
