@@ -117,7 +117,7 @@ const LaunchIncentivesContent = () => {
         {stringGetter({ key: STRING_KEYS.LAUNCH_INCENTIVES_DESCRIPTION })}{' '}
       </Styled.Description>
       <Styled.ChaosLabsLogo>
-        {stringGetter({ key: STRING_KEYS.POWERED_BY })} <ChaosLabsIcon />
+        {stringGetter({ key: STRING_KEYS.POWERED_BY_ALL_CAPS })} <ChaosLabsIcon />
       </Styled.ChaosLabsLogo>
       <Styled.ButtonRow>
         <Styled.AboutButton
@@ -282,8 +282,9 @@ Styled.Image = styled.img`
 
 Styled.ChaosLabsLogo = styled.span`
   display: flex;
+  align-items: center;
   gap: 0.5em;
-  font: var(--font-mini-medium);
+  font: var(--font-tiny-medium);
 `;
 
 Styled.NewTag = styled(Tag)`
