@@ -3,6 +3,8 @@ import type { LocalWallet } from '@dydxprotocol/v4-client-js';
 import type {
   ClosePositionInputFields,
   Nullable,
+  HistoricalTradingRewardsPeriod,
+  HistoricalTradingRewardsPeriods,
   HumanReadablePlaceOrderPayload,
   HumanReadableCancelOrderPayload,
   TradeInputFields,
@@ -23,6 +25,7 @@ import {
   CoroutineTimer,
   TransferType,
   AbacusAppConfig,
+  ApiData,
 } from '@/constants/abacus';
 
 import { DEFAULT_MARKETID } from '@/constants/markets';
@@ -32,8 +35,6 @@ import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
 import type { RootStore } from '@/state/_store';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors';
-
-import { testFlags } from '@/lib/testFlags';
 
 import AbacusRest from './rest';
 import AbacusAnalytics from './analytics';
@@ -227,6 +228,15 @@ class AbacusStateManager {
     this.stateManager.historicalPnlPeriod = period;
   };
 
+  setHistoricalTradingRewardPeriod = (
+    period: (typeof HistoricalTradingRewardsPeriod)[keyof typeof HistoricalTradingRewardsPeriod]
+  ) => {
+    this.stateManager.historicalTradingRewardPeriod = period;
+  };
+
+  refreshHistoricalTradingRewards = () =>
+    this.stateManager.refresh(ApiData.HISTORICAL_TRADING_REWARDS);
+
   switchNetwork = (network: DydxNetwork) => {
     this.stateManager.environmentId = network;
 
@@ -277,6 +287,9 @@ class AbacusStateManager {
   // ------ Utils ------ //
   getHistoricalPnlPeriod = (): Nullable<HistoricalPnlPeriods> =>
     this.stateManager.historicalPnlPeriod;
+
+  getHistoricalTradingRewardPeriod = (): HistoricalTradingRewardsPeriods =>
+    this.stateManager.historicalTradingRewardPeriod;
 
   handleCandlesSubscription = ({
     channelId,
