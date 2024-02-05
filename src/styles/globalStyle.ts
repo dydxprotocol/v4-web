@@ -18,6 +18,7 @@ export const GlobalStyle = createGlobalStyle`
     --color-text-0: ${({ theme }) => theme.textTertiary};
     --color-text-1: ${({ theme }) => theme.textSecondary};
     --color-text-2: ${({ theme }) => theme.textPrimary};
+    --color-text-button: ${({ theme }) => theme.textButton};
 
     --color-gradient-base-0: ${({ theme }) => theme.gradientBase0};
     --color-gradient-base-1: ${({ theme }) => theme.gradientBase1};
@@ -29,6 +30,9 @@ export const GlobalStyle = createGlobalStyle`
     --color-success: ${({ theme }) => theme.success};
     --color-warning: ${({ theme }) => theme.warning};
     --color-error: ${({ theme }) => theme.error};
+    --color-gradient-success: ${({ theme }) => theme.successFaded};
+    --color-gradient-warning: ${({ theme }) => theme.warningFaded};
+    --color-gradient-error: ${({ theme }) => theme.errorFaded};
 
     --color-positive: ${({ theme }) => theme.positive};
     --color-negative: ${({ theme }) => theme.negative};
@@ -38,5 +42,9 @@ export const GlobalStyle = createGlobalStyle`
     --color-risk-low: ${({ theme }) => theme.riskLow};
     --color-risk-medium: ${({ theme }) => theme.riskMedium};
     --color-risk-high: ${({ theme }) => theme.riskHigh};
+
+    --hover-filter-base: ${({ theme }) => theme.hoverFilterBase};
+    --hover-filter-variant: ${({ theme }) => theme.hoverFilterVariant};
+    --active-filter: ${({ theme }) => theme.activeFilter};
   }
 `;

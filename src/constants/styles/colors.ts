@@ -1,4 +1,11 @@
-export type ThemeColors = LayerColors &
+import { AppColorMode } from '@/state/configs';
+
+export type Theme = {
+  [AppColorMode.GreenUp]: ThemeColorBase;
+  [AppColorMode.RedUp]: ThemeColorBase;
+};
+
+export type ThemeColorBase = LayerColors &
   BorderColors &
   TextColors &
   GradientColors &
@@ -7,7 +14,8 @@ export type ThemeColors = LayerColors &
   DirectionalColors &
   RiskColors &
   IconColors &
-  ComponentColors;
+  ComponentColors &
+  Filters;
 
 type LayerColors = {
   layer0: string;
@@ -30,6 +38,8 @@ type TextColors = {
   textPrimary: string;
   textSecondary: string;
   textTertiary: string;
+
+  textButton: string;
 };
 
 type GradientColors = {
@@ -47,8 +57,13 @@ type StatusColors = {
   success: string;
   warning: string;
   error: string;
+  successFaded: string;
+  warningFaded: string;
+  errorFaded: string;
 };
 
+/** ##InvertDirectionalColors
+ * When adding colors here, make sure to update linked function to invert colors for AppColorMode. */
 type DirectionalColors = {
   positive: string;
   negative: string;
@@ -74,4 +89,10 @@ type ComponentColors = {
   switchThumbActiveBackground: string;
   toggleBackground: string;
   tooltipBackground: string;
+};
+
+type Filters = {
+  hoverFilterBase: string;
+  hoverFilterVariant: string;
+  activeFilter: string;
 };

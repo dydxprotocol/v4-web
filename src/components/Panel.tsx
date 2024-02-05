@@ -6,7 +6,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { breakpoints } from '@/styles';
 
-type PanelProps = {
+type ElementProps = {
   slotHeaderContent?: React.ReactNode;
   slotHeader?: React.ReactNode;
   slotRight?: React.ReactNode;
@@ -16,10 +16,12 @@ type PanelProps = {
   onClick?: () => void;
 };
 
-type PanelStyleProps = {
+type StyleProps = {
   className?: string;
   hasSeparator?: boolean;
 };
+
+export type PanelProps = ElementProps & StyleProps;
 
 export const Panel = ({
   slotHeaderContent,
@@ -31,7 +33,7 @@ export const Panel = ({
   onClick,
   hasSeparator,
   className,
-}: PanelProps & PanelStyleProps) => (
+}: PanelProps) => (
   <Styled.Panel onClick={onClick} className={className}>
     <Styled.Left>
       {href ? (

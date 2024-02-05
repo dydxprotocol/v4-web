@@ -117,7 +117,7 @@ Styled.ConfirmButton = styled(Styled.IconButton)`
   --button-backgroundColor: hsla(203, 25%, 19%, 1);
 
   svg {
-    color: var(--color-positive);
+    color: var(--color-success);
   }
 `;
 
@@ -125,7 +125,7 @@ Styled.CancelButton = styled(Styled.IconButton)`
   --button-backgroundColor: hsla(296, 16%, 18%, 1);
 
   svg {
-    color: var(--color-negative);
+    color: var(--color-error);
     width: 0.8em;
     height: 0.8em;
 

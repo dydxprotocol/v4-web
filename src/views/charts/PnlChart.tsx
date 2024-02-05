@@ -9,33 +9,29 @@ import {
   HistoricalPnlPeriods,
   HISTORICAL_PNL_PERIODS,
 } from '@/constants/abacus';
-// import { STRING_KEYS } from '@/constants/localization';
 import { timeUnits } from '@/constants/time';
 import { breakpoints } from '@/styles';
 
-import { useBreakpoints, useNow /*, useStringGetter*/ } from '@/hooks';
+import { useBreakpoints, useNow } from '@/hooks';
 
-// import { Details } from '@/components/Details';
-import { Output /*, OutputType, ShowSign*/ } from '@/components/Output';
-// import { HorizontalSeparator } from '@/components/Separator';
+import { Output } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import type { TooltipContextType } from '@visx/xychart';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 import { AxisLabelOutput } from '@/components/visx/AxisLabelOutput';
-// import { TooltipContent } from '@/components/visx/TooltipContent';
 
 import {
   getSubaccount,
   getSubaccountHistoricalPnl,
   getSubaccountId,
 } from '@/state/accountSelectors';
+import { AppTheme } from '@/state/configs';
+import { getAppTheme } from '@/state/configsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { formatRelativeTime } from '@/lib/dateTime';
 import { isTruthy } from '@/lib/isTruthy';
-
-import chartBackground from '/chart-background.png';
 
 enum PnlSide {
   Profit = 'Profit',
@@ -62,6 +58,9 @@ const MS_FOR_PERIOD = {
   [HistoricalPnlPeriod.Period90d.name]: 90 * timeUnits.day,
 };
 
+const DARK_CHART_BACKGROUND_URL = '/chart-dots-background-dark.svg';
+const LIGHT_CHART_BACKGROUND_URL = '/chart-dots-background-light.svg';
+
 type ElementProps = {
   onTooltipContext?: (tooltipContext: TooltipContextType<PnlDatum>) => void;
   onVisibleDataChange?: (data: Array<PnlDatum>) => void;
@@ -82,8 +81,8 @@ export const PnlChart = ({
   selectedLocale,
   slotEmpty,
 }: PnlChartProps) => {
-  // const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
+  const appTheme = useSelector(getAppTheme);
   const { equity } = useSelector(getSubaccount, shallowEqual) || {};
   const now = useNow({ intervalMs: timeUnits.minute });
 
@@ -171,10 +170,11 @@ export const PnlChart = ({
     [pnlData, equity, selectedPeriod, now]
   );
 
-  // const latestDatum = data?.[data.length - 1];
+  const chartBackground =
+    appTheme === AppTheme.Light ? LIGHT_CHART_BACKGROUND_URL : DARK_CHART_BACKGROUND_URL;
 
   return (
-    <Styled.Container className={className}>
+    <Styled.Container className={className} chartBackground={chartBackground}>
       <TimeSeriesChart
         id="pnl-chart"
         selectedLocale={selectedLocale}
@@ -198,25 +198,6 @@ export const PnlChart = ({
             yAccessor: (datum) => datum?.equity,
             colorAccessor: () => 'var(--pnl-line-color)',
             getCurve: () => curveLinear,
-            // getCurve: ({ zoomDomain }) =>
-            //   PNL_TIME_RESOLUTION * 30 < zoomDomain && zoomDomain < PNL_TIME_RESOLUTION * 400
-            //     ? curveMonotoneX
-            //     : curveLinear,
-            // threshold: {
-            //   yAccessor: (datum) => datum?.netTransfers,
-            //   aboveAreaProps: {
-            //     fill: 'var(--color-positive)',
-            //     fillOpacity: 0.33,
-            //     strokeWidth: 1,
-            //     stroke: 'var(--color-positive)',
-            //   },
-            //   belowAreaProps: {
-            //     fill: 'var(--color-negative)',
-            //     fillOpacity: 0.33,
-            //     strokeWidth: 1,
-            //     stroke: 'var(--color-negative)',
-            //   },
-            // },
           },
         ]}
         tickFormatY={(value) =>
@@ -229,98 +210,6 @@ export const PnlChart = ({
             .format(Math.abs(value))
             .toLowerCase()
         }
-        // renderXAxisLabel={({ tooltipData }) => {
-        //   const tooltipDatum = tooltipData!.nearestDatum!.datum ?? latestDatum;
-
-        //   return (
-        //     <Styled.XAxisLabelOutput type={OutputType.DateTime} value={tooltipDatum.createdAt} />
-        //   );
-        // }}
-        // renderYAxisLabel={({ tooltipData }) => {
-        //   const tooltipDatum = tooltipData!.nearestDatum!.datum ?? latestDatum;
-
-        //   return (
-        //     <Styled.YAxisLabelOutput
-        //       type={OutputType.CompactFiat}
-        //       value={tooltipDatum.totalPnl}
-        //       accentColor={
-        //         {
-        //           [PnlSide.Loss]: 'var(--color-negative)',
-        //           [PnlSide.Profit]: 'var(--color-positive)',
-        //           [PnlSide.Flat]: 'var(--color-layer-6)',
-        //         }[tooltipDatum.side]
-        //       }
-        //     />
-        //   );
-        // }}
-        // renderTooltip={({ tooltipData }) => {
-        //   const { nearestDatum } = tooltipData || {};
-
-        //   const tooltipDatum = nearestDatum?.datum ?? latestDatum;
-
-        //   return (
-        //     <TooltipContent
-        //       accentColor={
-        //         {
-        //           [PnlSide.Loss]: 'var(--color-negative)',
-        //           [PnlSide.Profit]: 'var(--color-positive)',
-        //           [PnlSide.Flat]: 'var(--color-layer-6)',
-        //         }[tooltipDatum.side]
-        //       }
-        //     >
-        //       <Details
-        //         layout="column"
-        //         items={[
-        //           {
-        //             key: 'createdAt',
-        //             label: stringGetter({ key: STRING_KEYS.TIME }),
-        //             value: <Output type={OutputType.DateTime} value={tooltipDatum.createdAt} />,
-        //           },
-        //         ].filter(Boolean)}
-        //       />
-
-        //       <HorizontalSeparator />
-
-        //       <Details
-        //         layout="column"
-        //         items={[
-        //           {
-        //             key: 'netTransfers',
-        //             label: stringGetter({ key: STRING_KEYS.NET_TRANSFERS }),
-        //             value: <Output type={OutputType.Fiat} value={tooltipDatum.netTransfers} />,
-        //           },
-        //           {
-        //             key: 'equity',
-        //             label: {
-        //               [PnlSide.Profit]: stringGetter({
-        //                 key: STRING_KEYS.NET_PROFIT,
-        //               }),
-        //               [PnlSide.Loss]: stringGetter({
-        //                 key: STRING_KEYS.NET_LOSS,
-        //               }),
-        //               [PnlSide.Flat]: stringGetter({
-        //                 key: STRING_KEYS.NET_ZERO,
-        //               }),
-        //             }[tooltipDatum.side],
-        //             value: (
-        //               <Styled.SignedOutput
-        //                 type={OutputType.Fiat}
-        //                 value={tooltipDatum.equity}
-        //                 showSign={ShowSign.Both}
-        //                 side={tooltipDatum.side}
-        //               />
-        //             ),
-        //           },
-        //           {
-        //             key: 'totalPnl',
-        //             label: stringGetter({ key: STRING_KEYS.TOTAL_VALUE }), // stringGetter({ key: STRING_KEYS.EQUITY }),
-        //             value: <Output type={OutputType.Fiat} value={tooltipDatum.totalPnl} />,
-        //           },
-        //         ].filter(Boolean)}
-        //       />
-        //     </TooltipContent>
-        //   );
-        // }}
         renderTooltip={() => <div />}
         onTooltipContext={onTooltipContext}
         onVisibleDataChange={onVisibleDataChange}
@@ -358,9 +247,9 @@ export const PnlChart = ({
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
-Styled.Container = styled.div`
+Styled.Container = styled.div<{ chartBackground: string }>`
   position: relative;
-  background: url(${chartBackground}) no-repeat center center;
+  background: url(${({ chartBackground }) => chartBackground}) no-repeat center center;
 `;
 
 Styled.PeriodToggle = styled.div`

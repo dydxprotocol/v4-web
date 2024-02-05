@@ -1,6 +1,6 @@
 import { Candle, TradingViewBar, TradingViewSymbol } from '@/constants/candles';
 
-import { AppTheme } from '@/state/configs';
+import type { AppTheme, AppColorMode } from '@/state/configs';
 
 import { Themes } from '@/styles/themes';
 
@@ -47,8 +47,14 @@ export const getHistorySlice = ({
   return bars.filter(({ time }) => time >= fromMs);
 };
 
-export const getWidgetOverrides = (appTheme: AppTheme) => {
-  const theme = Themes[appTheme];
+export const getWidgetOverrides = ({
+  appTheme,
+  appColorMode,
+}: {
+  appTheme: AppTheme;
+  appColorMode: AppColorMode;
+}) => {
+  const theme = Themes[appTheme][appColorMode];
 
   return {
     overrides: {
