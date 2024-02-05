@@ -5,8 +5,9 @@ import type { IChartingLibraryWidget, ThemeName } from 'public/tradingview/chart
 
 import { AppColorMode, AppTheme } from '@/state/configs';
 import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
+import { getOrderLines } from '@/state/perpetualsSelectors';
 
-import { getWidgetOverrides } from '@/lib/tradingView/utils';
+import { getWidgetOverrides, getOrderLineColors } from '@/lib/tradingView/utils';
 
 /**
  * @description Method to define a type guard and check that an element is an IFRAME
@@ -31,14 +32,16 @@ export const useTradingViewTheme = ({
   const appTheme: AppTheme = useSelector(getAppTheme);
   const appColorMode: AppColorMode = useSelector(getAppColorMode);
 
+  const orderLines = useSelector(getOrderLines);
+
   useEffect(() => {
     if (tvWidget && isWidgetReady) {
       tvWidget
         .changeTheme?.(
           {
             [AppTheme.Classic]: '',
-            [AppTheme.Dark]: 'Dark',
-            [AppTheme.Light]: 'Light',
+            [AppTheme.Dark]: 'dark',
+            [AppTheme.Light]: 'light',
           }[appTheme] as ThemeName
         )
         .then(() => {
@@ -49,9 +52,17 @@ export const useTradingViewTheme = ({
 
             if (isIFrame(frame) && frame.contentWindow) {
               const innerHtml = frame.contentWindow.document.documentElement;
-
-              if (appTheme === AppTheme.Classic) {
-                innerHtml?.classList.remove('theme-dark', 'theme-light');
+              switch (appTheme) {
+                case AppTheme.Classic:
+                  innerHtml?.classList.remove('theme-dark', 'theme-light');
+                  break;
+                case AppTheme.Dark:
+                  innerHtml?.classList.remove('theme-light');
+                  innerHtml?.classList.add('theme-dark');
+                  break;
+                case AppTheme.Light:
+                  innerHtml?.classList.remove('theme-dark');
+                  innerHtml?.classList.add('theme-light');
               }
             }
           }
@@ -73,7 +84,22 @@ export const useTradingViewTheme = ({
               'volume.color.1': studies_overrides['volume.volume.color.1'],
             });
           }
+
+          // Necessary to update existing chart lines
+          Object.entries(orderLines).forEach(([key, line]) => {
+            const { orderColor, borderColor, backgroundColor, textColor, textButtonColor } =
+              getOrderLineColors({ side: key.split('-')[0], appTheme, appColorMode });
+
+            line
+              .setLineColor(orderColor)
+              .setQuantityBackgroundColor(orderColor)
+              .setQuantityBorderColor(borderColor)
+              .setBodyBackgroundColor(backgroundColor)
+              .setBodyBorderColor(borderColor)
+              .setBodyTextColor(textColor)
+              .setQuantityTextColor(textButtonColor);
+          });
         });
     }
-  }, [appTheme, appColorMode]);
+  }, [appTheme, appColorMode, isWidgetReady]);
 };

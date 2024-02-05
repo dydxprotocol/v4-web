@@ -1,28 +1,58 @@
 import { useEffect, useRef, useState } from 'react';
 import styled, { type AnyStyledComponent, css } from 'styled-components';
-import { useDispatch, useSelector } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
-import type { IChartingLibraryWidget, ResolutionString } from 'public/tradingview/charting_library';
+import { MustBigNumber } from '@/lib/numbers';
+import { getOrderLineColors } from '@/lib/tradingView/utils';
 
-import { DEFAULT_MARKETID } from '@/constants/markets';
+import type {
+  IChartingLibraryWidget,
+  IOrderLineAdapter,
+  ResolutionString,
+} from 'public/tradingview/charting_library';
+
+import {
+  AbacusOrderStatus,
+  AbacusOrderType,
+  KotlinIrEnumValues,
+  ORDER_TYPE_LABEL_MAPPING,
+} from '@/constants/abacus';
 import { DEFAULT_RESOLUTION, RESOLUTION_CHART_CONFIGS } from '@/constants/candles';
+import { DEFAULT_MARKETID } from '@/constants/markets';
+
+import { useStringGetter } from '@/hooks';
 import { useTradingView, useTradingViewTheme } from '@/hooks/tradingView';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
-import { setTvChartResolution } from '@/state/perpetuals';
-
-import { getCurrentMarketId, getSelectedResolutionForMarket } from '@/state/perpetualsSelectors';
+import { getCurrentMarketOrders } from '@/state/accountSelectors';
+import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
+import { setOrderLines, setTvChartResolution } from '@/state/perpetuals';
+import {
+  getCurrentMarketId,
+  getOrderLines,
+  getShouldShowOrderLines,
+  getSelectedResolutionForMarket,
+} from '@/state/perpetualsSelectors';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
 type TvWidget = IChartingLibraryWidget & { _id?: string; _ready?: boolean };
 
 export const TvChart = () => {
+  const dispatch = useDispatch();
+  const stringGetter = useStringGetter();
+
   const [isChartReady, setIsChartReady] = useState(false);
 
-  const dispatch = useDispatch();
+  const appTheme = useSelector(getAppTheme);
+  const appColorMode = useSelector(getAppColorMode);
+
   const currentMarketId: string = useSelector(getCurrentMarketId) || DEFAULT_MARKETID;
+  const currentMarketOrders = useSelector(getCurrentMarketOrders, shallowEqual);
+
+  const showOrderLines = useSelector(getShouldShowOrderLines);
+  const orderLines = useSelector(getOrderLines);
 
   const selectedResolution: string =
     useSelector(getSelectedResolutionForMarket(currentMarketId)) || DEFAULT_RESOLUTION;
@@ -47,6 +77,93 @@ export const TvChart = () => {
     };
 
     tvWidget?.activeChart().setVisibleRange(newRange, { percentRightMargin: 10 });
+  };
+
+  /**
+   * @description Hooks to handle state of show orders button
+   */
+
+  useEffect(() => {
+    if (!tvWidgetRef || !tvWidget || !isChartReady) {
+      return;
+    }
+
+    tvWidget.onChartReady(() => {
+      tvWidget.chart().dataReady(() => {
+        if (showOrderLines) {
+          drawOrderLines();
+        } else {
+          deleteOrderLines();
+        }
+      });
+    });
+  }, [showOrderLines, currentMarketOrders]);
+
+  const drawOrderLines = () => {
+    const updatedOrderLines: Record<string, IOrderLineAdapter> = {};
+    currentMarketOrders.forEach(
+      ({ id, type, status, side, cancelReason, remainingSize, triggerPrice, price }) => {
+        const key = `${side.rawValue}-${id}`;
+        const orderType = type.rawValue as KotlinIrEnumValues<typeof AbacusOrderType>;
+        const quantity = remainingSize ? remainingSize.toString() : '';
+
+        const orderString = stringGetter({
+          key: ORDER_TYPE_LABEL_MAPPING[orderType] || '',
+        });
+        const shouldShow =
+          !cancelReason &&
+          (status === AbacusOrderStatus.open || status === AbacusOrderStatus.untriggered);
+
+        const maybeOrderLine = key in orderLines ? orderLines[key] : null;
+
+        if (maybeOrderLine) {
+          if (!shouldShow) {
+            maybeOrderLine.remove();
+          } else if (maybeOrderLine.getQuantity() !== quantity) {
+            maybeOrderLine.setQuantity(quantity);
+          }
+          updatedOrderLines[key] = maybeOrderLine;
+          return;
+        } else if (!shouldShow) {
+          return;
+        } else {
+          const { orderColor, borderColor, backgroundColor, textColor, textButtonColor } =
+            getOrderLineColors({ side: side.rawValue, appTheme, appColorMode });
+
+          const orderPrice = triggerPrice ?? price;
+
+          const orderLine = tvWidget
+            ?.chart()
+            .createOrderLine({ disableUndo: false })
+            .setPrice(MustBigNumber(orderPrice).toNumber())
+            .setQuantity(quantity)
+            .setText(orderString)
+            .setLineColor(orderColor)
+            .setQuantityBackgroundColor(orderColor)
+            .setQuantityBorderColor(borderColor)
+            .setBodyBackgroundColor(backgroundColor)
+            .setBodyBorderColor(borderColor)
+            .setBodyTextColor(textColor)
+            .setQuantityTextColor(textButtonColor);
+
+          if (orderLine) {
+            updatedOrderLines[key] = orderLine;
+          }
+        }
+      }
+    );
+    dispatch(
+      setOrderLines({
+        orderLines: updatedOrderLines,
+      })
+    );
+  };
+
+  const deleteOrderLines = () => {
+    Object.values(orderLines).forEach((line) => {
+      line.remove();
+    });
+    dispatch(setOrderLines({ orderLines: {} }));
   };
 
   useEffect(() => {

@@ -1,19 +1,26 @@
-import { useEffect } from 'react';
-import { shallowEqual, useSelector } from 'react-redux';
+import { useEffect, useRef, useState } from 'react';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
 
 import { LanguageCode, ResolutionString, widget } from 'public/tradingview/charting_library';
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
-import { SUPPORTED_LOCALE_BASE_TAGS } from '@/constants/localization';
+import { SUPPORTED_LOCALE_BASE_TAGS, STRING_KEYS } from '@/constants/localization';
+
 import { LocalStorageKey } from '@/constants/localStorage';
-import { useDydxClient, useLocalStorage } from '@/hooks';
+
+import { useDydxClient, useLocalStorage, useStringGetter } from '@/hooks';
 import { store } from '@/state/_store';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
-import { getCurrentMarketId, getMarketIds } from '@/state/perpetualsSelectors';
+import { setShowOrderLines } from '@/state/perpetuals';
+import {
+  getCurrentMarketId,
+  getShouldShowOrderLines,
+  getMarketIds,
+} from '@/state/perpetualsSelectors';
 
 import { getDydxDatafeed } from '@/lib/tradingView/dydxfeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
@@ -28,9 +35,16 @@ export const useTradingView = ({
   tvWidgetRef: React.MutableRefObject<any>;
   setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
-  const marketId = useSelector(getCurrentMarketId);
+  const stringGetter = useStringGetter();
+  const dispatch = useDispatch();
+
   const appTheme = useSelector(getAppTheme);
   const appColorMode = useSelector(getAppColorMode);
+
+  const [displayOrdersButton, setDisplayOrdersButton] = useState(null);
+  const showOrderLines = useSelector(getShouldShowOrderLines);
+
+  const marketId = useSelector(getCurrentMarketId);
   const marketIds = useSelector(getMarketIds, shallowEqual);
   const selectedLocale = useSelector(getSelectedLocale);
   const selectedNetwork = useSelector(getSelectedNetwork);
@@ -45,11 +59,24 @@ export const useTradingView = ({
   const hasMarkets = marketIds.length > 0;
 
   useEffect(() => {
+    if (displayOrdersButton) {
+      displayOrdersButton.onclick = () => {
+        const newShowOrderLinesState = !showOrderLines;
+        if (newShowOrderLinesState) {
+          displayOrdersButton?.classList?.add('order-lines-active');
+        } else {
+          displayOrdersButton?.classList?.remove('order-lines-active');
+        }
+        dispatch(setShowOrderLines({ showOrderLines: newShowOrderLinesState }));
+      };
+    }
+  }, [displayOrdersButton, showOrderLines]);
+
+  useEffect(() => {
     if (hasMarkets && isClientConnected && marketId) {
       const widgetOptions = getWidgetOptions();
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
       const options = {
-        // debug: true,
         ...widgetOptions,
         ...widgetOverrides,
         datafeed: getDydxDatafeed(store, getCandlesForDatafeed),
@@ -63,6 +90,18 @@ export const useTradingView = ({
       tvWidgetRef.current = tvChartWidget;
 
       tvWidgetRef.current.onChartReady(() => {
+        tvWidgetRef?.current?.headerReady().then(() => {
+          const button = tvWidgetRef?.current?.createButton();
+
+          if (button) {
+            button.innerHTML = `<span>${stringGetter({
+              key: STRING_KEYS.ORDER_LINES,
+            })}</span> <div class="displayOrdersButton-toggle"></div>`;
+            button.setAttribute('title', stringGetter({ key: STRING_KEYS.ORDER_LINES_TOOLTIP }));
+            setDisplayOrdersButton(button);
+          }
+        });
+
         tvWidgetRef?.current?.subscribe('onAutoSaveNeeded', () =>
           tvWidgetRef?.current?.save((chartConfig: object) => setTvChartConfig(chartConfig))
         );
