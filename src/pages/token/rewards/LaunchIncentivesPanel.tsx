@@ -28,7 +28,7 @@ import { log } from '@/lib/telemetry';
 
 const SEASON_NUMBER = 2;
 
-export const LaunchIncentivesPanel = () => {
+export const LaunchIncentivesPanel = ({ className }: { className?: string }) => {
   const { isNotTablet } = useBreakpoints();
   const dispatch = useDispatch();
 
@@ -37,11 +37,15 @@ export const LaunchIncentivesPanel = () => {
   }, []);
 
   return isNotTablet ? (
-    <Styled.Panel slotHeader={<LaunchIncentivesTitle />} slotRight={<EstimatedRewards />}>
+    <Styled.Panel
+      className={className}
+      slotHeader={<LaunchIncentivesTitle />}
+      slotRight={<EstimatedRewards />}
+    >
       <LaunchIncentivesContent />
     </Styled.Panel>
   ) : (
-    <Styled.Panel>
+    <Styled.Panel className={className}>
       <Styled.Column>
         <EstimatedRewards />
         <LaunchIncentivesTitle />

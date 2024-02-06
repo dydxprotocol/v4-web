@@ -9,8 +9,9 @@ import { useBreakpoints, useStringGetter } from '@/hooks';
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { AttachedExpandingSection, DetachedSection } from '@/components/ContentSection';
 import { BackButton } from '@/components/BackButton';
+import { DetachedSection } from '@/components/ContentSection';
+import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 
 import { testFlags } from '@/lib/testFlags';
 
@@ -20,7 +21,6 @@ import { MigratePanel } from './MigratePanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
 import { RewardHistoryPanel } from './RewardHistoryPanel';
-import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 
 const RewardsPage = () => {
   const stringGetter = useStringGetter();
@@ -35,7 +35,7 @@ const RewardsPage = () => {
           slotLeft={<BackButton onClick={() => navigate(AppRoute.Profile)} />}
         />
       )}
-      <Styled.AttachedExpandingSection>
+      <DetachedSection>
         <Styled.GridLayout
           showTradingRewards={testFlags.showTradingRewards}
           showMigratePanel={import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet}
@@ -65,7 +65,7 @@ const RewardsPage = () => {
             </Styled.OtherColumn>
           )}
         </Styled.GridLayout>
-      </Styled.AttachedExpandingSection>
+      </DetachedSection>
     </div>
   );
 };
@@ -73,24 +73,6 @@ const RewardsPage = () => {
 export default RewardsPage;
 
 const Styled: Record<string, AnyStyledComponent> = {};
-
-// Styled.Page = styled.div`
-//   ${layoutMixins.contentContainerPage}
-//   padding: 2rem;
-//   align-items: center;
-//   > * {
-//     --content-max-width: 80rem;
-//     max-width: min(calc(100vw - 4rem), var(--content-max-width));
-//   }
-//   @media ${breakpoints.tablet} {
-//     --stickyArea-topHeight: var(--page-header-height-mobile);
-//     padding: 0 1rem 1rem;
-//     > * {
-//       max-width: calc(100vw - 2rem - var(--withSidebar-current-sidebarWidth));
-//       width: 100%;
-//     }
-//   }
-// `;
 
 Styled.MobileHeader = styled.header`
   ${layoutMixins.contentSectionDetachedScrollable}
@@ -102,8 +84,6 @@ Styled.MobileHeader = styled.header`
   color: var(--color-text-2);
   background-color: var(--color-layer-2);
 `;
-
-Styled.AttachedExpandingSection = styled(AttachedExpandingSection)``;
 
 Styled.GridLayout = styled.div<{ showTradingRewards?: boolean; showMigratePanel?: boolean }>`
   --gap: 1.5rem;
@@ -121,20 +101,33 @@ Styled.GridLayout = styled.div<{ showTradingRewards?: boolean; showMigratePanel?
       ? css`
           grid-template-areas:
             'migrate migrate'
-            'incentives balance'
+            'incentives incentives'
+            'balance balance'
             'rewards other';
         `
       : showTradingRewards
       ? css`
-          grid-template-areas: 'incentives balance' 'rewards other';
+          grid-template-areas:
+            'incentives balance'
+            'rewards other';
         `
       : showMigratePanel
       ? css`
-          grid-template-areas: 'migrate migrate' 'incentives balance' 'other other';
+          grid-template-areas:
+            'migrate migrate'
+            'incentives incentives'
+            'balance balance'
+            'other other';
         `
       : css`
-          grid-template-areas: 'incentives balance' 'other other';
+          grid-template-areas:
+            'incentives balance'
+            'other other';
         `};
+
+  @media ${breakpoints.notTablet} {
+    padding: 1rem;
+  }
 
   @media ${breakpoints.tablet} {
     --gap: 1rem;

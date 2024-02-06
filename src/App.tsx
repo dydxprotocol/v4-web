@@ -207,6 +207,7 @@ Styled.Content = styled.div<{ isShowingHeader: boolean; isShowingFooter: boolean
 
 Styled.Main = styled.main`
   ${layoutMixins.contentSectionAttached}
+  box-shadow: none;
 
   grid-area: Main;
 

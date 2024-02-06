@@ -5,7 +5,7 @@ import { useStringGetter } from '@/hooks';
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { AttachedExpandingSection } from '@/components/ContentSection';
+import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 
 import { GovernancePanel } from './rewards/GovernancePanel';
@@ -15,7 +15,7 @@ export default () => {
   const stringGetter = useStringGetter();
 
   return (
-    <AttachedExpandingSection>
+    <DetachedSection>
       <Styled.HeaderSection>
         <ContentSectionHeader
           title={stringGetter({ key: STRING_KEYS.GOVERNANCE })}
@@ -29,7 +29,7 @@ export default () => {
           <NewMarketsPanel />
         </Styled.Row>
       </Styled.ContentWrapper>
-    </AttachedExpandingSection>
+    </DetachedSection>
   );
 };
 
@@ -50,6 +50,7 @@ Styled.ContentWrapper = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1.5rem;
   max-width: 80rem;
+  padding: 0 1rem;
 `;
 
 Styled.Row = styled.div`
