@@ -12,7 +12,6 @@ import { isMainnet } from '@/constants/networks';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 
 import {
-  LIQUIDITY_TIERS,
   NUM_ORACLES_TO_QUALIFY_AS_SAFE,
   type PotentialMarketItem,
 } from '@/constants/potentialMarkets';
@@ -74,7 +73,7 @@ export const NewMarketSelectionStep = ({
   const { isMobile } = useBreakpoints();
   const marketIds = useSelector(getMarketIds, shallowEqual);
   const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
-  const { potentialMarkets, exchangeConfigs } = usePotentialMarkets();
+  const { potentialMarkets, exchangeConfigs, liquidityTiers } = usePotentialMarkets();
   const stringGetter = useStringGetter();
   const { newMarketProposal } = useGovernanceVariables();
   const initialDepositAmountBN = MustBigNumber(newMarketProposal.initialDepositAmount).div(
@@ -210,9 +209,9 @@ export const NewMarketSelectionStep = ({
                 </Styled.ButtonRow>
               </Styled.Header>
 
-              {Object.keys(LIQUIDITY_TIERS).map((tier) => {
+              {Object.keys(liquidityTiers).map((tier) => {
                 const { maintenanceMarginFraction, impactNotional, label, initialMarginFraction } =
-                  LIQUIDITY_TIERS[tier as unknown as keyof typeof LIQUIDITY_TIERS];
+                  liquidityTiers[tier as unknown as keyof typeof liquidityTiers];
                 return (
                   <Styled.LiquidityTierRadioButton
                     key={tier}
@@ -234,7 +233,7 @@ export const NewMarketSelectionStep = ({
                       items={[
                         {
                           key: 'imf',
-                          label: 'IMF',
+                          label: stringGetter({ key: STRING_KEYS.INITIAL_MARGIN_FRACTION_SHORT }),
                           tooltip: 'initial-margin-fraction',
                           value: (
                             <Output
@@ -246,7 +245,9 @@ export const NewMarketSelectionStep = ({
                         },
                         {
                           key: 'mmf',
-                          label: 'MMF',
+                          label: stringGetter({
+                            key: STRING_KEYS.MAINTENANCE_MARGIN_FRACTION_SHORT,
+                          }),
                           tooltip: 'maintenance-margin-fraction',
                           value: (
                             <Output
