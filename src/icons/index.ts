@@ -1,4 +1,3 @@
-import ChaosLabsIcon from './chaos-labs';
 export { default as AddressConnectorIcon } from './address-connector.svg';
 export { default as ArrowIcon } from './arrow.svg';
 export { default as Bar3Icon } from './bar3.svg';
@@ -62,6 +61,7 @@ export { default as StarIcon } from './star.svg';
 export { default as SunIcon } from './sun.svg';
 export { default as TerminalIcon } from './terminal.svg';
 export { default as TogglesMenuIcon } from './toggles-menu.svg';
+export { default as TokenIcon } from './token.svg';
 export { default as TradeIcon } from './trade.svg';
 export { default as TransferIcon } from './transfer.svg';
 export { default as TriangleIcon } from './triangle.svg';
