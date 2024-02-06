@@ -226,6 +226,8 @@ Styled.Item = styled.div<{
   justifyItems?: 'start' | 'end';
   withOverflow: boolean;
 }>`
+  white-space: normal;
+  
   ${({ layout }) => layout && itemLayoutVariants[layout]}
 
   ${({ justifyItems }) =>
