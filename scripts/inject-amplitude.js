@@ -25,7 +25,7 @@ if (AMPLITUDE_API_KEY) {
           (globalThis.amplitude.init(e${
             AMPLITUDE_SERVER_URL
               ? `, undefined, {
-                serverUrl: ${AMPLITUDE_SERVER_URL}
+                serverUrl: "${AMPLITUDE_SERVER_URL}"
               }`
               : ''
           }),
