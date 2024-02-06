@@ -38,6 +38,7 @@ import { GovernancePanel } from './token/rewards/GovernancePanel';
 import { StakingPanel } from './token/staking/StakingPanel';
 import { StrideStakingPanel } from './token/staking/StrideStakingPanel';
 import { NewMarketsPanel } from './token/rewards/NewMarketsPanel';
+import { breakpoints } from '@/styles';
 
 const ENS_CHAIN_ID = 1; // Ethereum
 
@@ -269,6 +270,21 @@ Styled.MobileProfileLayout = styled.div`
     'history history'
     'governance newMarkets'
     'keplr stride';
+
+  @media ${breakpoints.mobile} {
+    grid-template-areas:
+      'header header'
+      'actions actions'
+      'settings help'
+      'migrate migrate'
+      'balance balance'
+      'rewards fees'
+      'history history'
+      'governance governance'
+      'newMarkets newMarkets'
+      'keplr keplr'
+      'stride stride';
+  }
 `;
 
 Styled.Header = styled.header`
