@@ -23,7 +23,7 @@ export const StrideStakingPanel = ({ className }: { className?: string }) => {
       className={className}
       slotHeaderContent={
         <Styled.Title>
-          Liquid Stake with Stride <Tag>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>
+          Liquid Stake with Stride <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>
         </Styled.Title>
       }
       slotRight={<Styled.Img src="/third-party/stride.png" alt="" />}
