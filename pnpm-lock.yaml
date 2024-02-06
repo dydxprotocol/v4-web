@@ -26,8 +26,8 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: ^1.4.0
-    version: 1.4.0
+    specifier: file:/Users/alekacheung/Documents/dydx/v4/v4-abacus/build/packages/js/dydxprotocol-v4-abacus-1.4.2.tgz
+    version: file:../v4-abacus/build/packages/js/dydxprotocol-v4-abacus-1.4.2.tgz
   '@dydxprotocol/v4-client-js':
     specifier: ^1.0.20
     version: 1.0.20
@@ -1087,10 +1087,6 @@ packages:
   /@cush/relative@1.0.0:
     resolution: {integrity: sha512-RpfLEtTlyIxeNPGKcokS+p3BZII/Q3bYxryFRglh5H3A3T8q9fsLYm72VYAMEOOIBLEa8o93kFLiBDUWKrwXZA==}
     dev: true
-
-  /@dydxprotocol/v4-abacus@1.4.0:
-    resolution: {integrity: sha512-mkdkXQXTVF1K6UmZwIwLC9gjsXg+Nt3h5/iW+WriVv1cUMPmHfPyRWL31eDDvkVO5UeECf05kiYXPk1y+7dPuA==}
-    dev: false
 
   /@dydxprotocol/v4-client-js@1.0.20:
     resolution: {integrity: sha512-dXKW2NC1XlVVIRKvHWVDofLZSCPTJAaRY5eXzxH5CcXpnl2kdXorr7ykqWZxW0jHFPWWvRSJtUDqZN1qFrEe/w==}
@@ -14912,6 +14908,12 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
+
+  file:../v4-abacus/build/packages/js/dydxprotocol-v4-abacus-1.4.2.tgz:
+    resolution: {integrity: sha512-YD3RdvPTVVqjV1kmfTLuiAbRQUyraf88XimURekzeYXYhioodqxLFSdHU8Sp6BmyWP98TM4JaOCIeijoH0vgFQ==, tarball: file:../v4-abacus/build/packages/js/dydxprotocol-v4-abacus-1.4.2.tgz}
+    name: '@dydxprotocol/v4-abacus'
+    version: 1.4.2
+    dev: false
 
 settings:
   autoInstallPeers: true
