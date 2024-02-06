@@ -165,7 +165,7 @@ export const NewMarketSelectionStep = ({
             {assetToAdd?.assetName ?? assetToAdd.baseAsset} <Tag>{assetToAdd?.baseAsset}-USD</Tag>
           </Styled.SelectedAsset>
         ) : (
-          'e.g. "BTC-USD"'
+          `${stringGetter({ key: STRING_KEYS.EG })} "BTC-USD"`
         )}
       </SearchSelectMenu>
       {assetToAdd && (
