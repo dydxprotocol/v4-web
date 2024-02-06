@@ -35,7 +35,9 @@ import { truncateAddress } from '@/lib/wallet';
 import { DYDXBalancePanel } from './token/rewards/DYDXBalancePanel';
 import { MigratePanel } from './token/rewards/MigratePanel';
 import { GovernancePanel } from './token/rewards/GovernancePanel';
-import { StakingPanel } from './token/rewards/StakingPanel';
+import { StakingPanel } from './token/staking/StakingPanel';
+import { StrideStakingPanel } from './token/staking/StrideStakingPanel';
+import { NewMarketsPanel } from './token/rewards/NewMarketsPanel';
 
 const ENS_CHAIN_ID = 1; // Ethereum
 
@@ -236,7 +238,9 @@ const Profile = () => {
       </Styled.HistoryPanel>
 
       <Styled.GovernancePanel />
+      <Styled.NewMarketsPanel />
       <Styled.StakingPanel />
+      <Styled.StrideStakingPanel />
     </Styled.MobileProfileLayout>
   );
 };
@@ -262,8 +266,8 @@ Styled.MobileProfileLayout = styled.div`
     'balance balance'
     'rewards fees'
     'history history'
-    'governance governance'
-    'staking staking';
+    'governance newMarkets'
+    'staking stride';
 `;
 
 Styled.Header = styled.header`
@@ -431,5 +435,13 @@ Styled.GovernancePanel = styled(GovernancePanel)`
 `;
 
 Styled.StakingPanel = styled(StakingPanel)`
-  grid-area: staking;
+  grid-area: keplr;
+`;
+
+Styled.NewMarketsPanel = styled(NewMarketsPanel)`
+  grid-area: newMarkets;
+`;
+
+Styled.StrideStakingPanel = styled(StrideStakingPanel)`
+  grid-area: stride;
 `;

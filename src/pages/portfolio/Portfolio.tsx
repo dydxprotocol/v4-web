@@ -120,13 +120,21 @@ export default () => {
                   items: [
                     {
                       value: PortfolioRoute.Overview,
-                      slotBefore: <Styled.Icon iconName={IconName.Overview} />,
+                      slotBefore: (
+                        <Styled.IconContainer>
+                          <Icon iconName={IconName.Overview} />
+                        </Styled.IconContainer>
+                      ),
                       label: stringGetter({ key: STRING_KEYS.OVERVIEW }),
                       href: PortfolioRoute.Overview,
                     },
                     {
                       value: PortfolioRoute.Positions,
-                      slotBefore: <Styled.Icon iconName={IconName.Positions} />,
+                      slotBefore: (
+                        <Styled.IconContainer>
+                          <Icon iconName={IconName.Positions} />
+                        </Styled.IconContainer>
+                      ),
                       label: (
                         <>
                           {stringGetter({ key: STRING_KEYS.POSITIONS })}
@@ -140,7 +148,11 @@ export default () => {
                     },
                     {
                       value: PortfolioRoute.Orders,
-                      slotBefore: <Styled.Icon iconName={IconName.OrderPending} />,
+                      slotBefore: (
+                        <Styled.IconContainer>
+                          <Icon iconName={IconName.OrderPending} />
+                        </Styled.IconContainer>
+                      ),
                       label: (
                         <>
                           {stringGetter({ key: STRING_KEYS.ORDERS })}
@@ -153,13 +165,21 @@ export default () => {
                     },
                     {
                       value: PortfolioRoute.Fees,
-                      slotBefore: <Styled.Icon iconName={IconName.Calculator} />,
+                      slotBefore: (
+                        <Styled.IconContainer>
+                          <Icon iconName={IconName.Calculator} />
+                        </Styled.IconContainer>
+                      ),
                       label: stringGetter({ key: STRING_KEYS.FEES }),
                       href: PortfolioRoute.Fees,
                     },
                     {
                       value: PortfolioRoute.History,
-                      slotBefore: <Styled.Icon iconName={IconName.History} />,
+                      slotBefore: (
+                        <Styled.IconContainer>
+                          <Icon iconName={IconName.History} />
+                        </Styled.IconContainer>
+                      ),
                       label: stringGetter({ key: STRING_KEYS.HISTORY }),
                       href: PortfolioRoute.History,
                     },
@@ -234,16 +254,14 @@ Styled.NavigationMenu = styled(NavigationMenu)`
   padding-top: 0;
 `;
 
-Styled.Icon = styled(Icon)`
-  --icon-backgroundColor: var(--color-layer-4);
-
-  width: 1em;
-  height: 1em;
-
-  margin-left: -0.25em;
-
-  box-sizing: content-box;
-  background-color: var(--icon-backgroundColor);
+Styled.IconContainer = styled.div`
+  width: 1.5rem;
+  height: 1.5rem;
+  font-size: 0.75rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-layer-4);
   border-radius: 50%;
-  padding: 0.25em;
+  margin-left: -0.25rem;
 `;

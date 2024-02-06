@@ -1,32 +1,32 @@
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { STRING_KEYS } from '@/constants/localization';
-import { useStringGetter } from '@/hooks';
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { AttachedExpandingSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 
-import { GovernancePanel } from './rewards/GovernancePanel';
-import { NewMarketsPanel } from './rewards/NewMarketsPanel';
+import { StakingPanel } from './StakingPanel';
+import { StrideStakingPanel } from './StrideStakingPanel';
+import { DYDXBalancePanel } from '../rewards/DYDXBalancePanel';
+import { AttachedExpandingSection } from '@/components/ContentSection';
 
 export default () => {
-  const stringGetter = useStringGetter();
-
   return (
     <AttachedExpandingSection>
       <Styled.HeaderSection>
         <ContentSectionHeader
-          title={stringGetter({ key: STRING_KEYS.GOVERNANCE })}
-          subtitle="Participate in the ecosystem by voting on Governance proposals or submitting your own."
+          title="Staking Rewards"
+          subtitle="Stake to earn APR. Unstaking can take up to 30 days."
         />
       </Styled.HeaderSection>
 
       <Styled.ContentWrapper>
         <Styled.Row>
-          <GovernancePanel />
-          <NewMarketsPanel />
+          <Styled.InnerRow>
+            <StrideStakingPanel />
+            <StakingPanel />
+          </Styled.InnerRow>
+          <DYDXBalancePanel />
         </Styled.Row>
       </Styled.ContentWrapper>
     </AttachedExpandingSection>
@@ -55,5 +55,12 @@ Styled.ContentWrapper = styled.div`
 Styled.Row = styled.div`
   gap: 1rem;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 2fr 1fr;
+`;
+
+Styled.InnerRow = styled.div`
+  gap: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: fit-content;
 `;

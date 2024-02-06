@@ -1,40 +1,30 @@
 import styled, { AnyStyledComponent } from 'styled-components';
 import { useDispatch } from 'react-redux';
 
-import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { DialogTypes } from '@/constants/dialogs';
+import { useStringGetter, useTokenConfigs, useURLConfigs } from '@/hooks';
 
-import { useStringGetter, useURLConfigs } from '@/hooks';
-
-import { Panel } from '@/components/Panel';
-import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Link } from '@/components/Link';
+import { Panel } from '@/components/Panel';
 
 import { openDialog } from '@/state/dialogs';
 
-export const StakingPanel = () => {
+export const StrideStakingPanel = () => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
   const { stakingLearnMore } = useURLConfigs();
+  const { chainTokenLabel } = useTokenConfigs();
 
   return (
     <Panel
-      slotHeaderContent={<Styled.Title>{stringGetter({ key: STRING_KEYS.STAKING })}</Styled.Title>}
-      slotRight={
-        <Styled.Arrow>
-          <Styled.IconButton
-            action={ButtonAction.Base}
-            iconName={IconName.Arrow}
-            size={ButtonSize.Small}
-          />
-        </Styled.Arrow>
-      }
-      onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr }))}
+      slotHeaderContent={<Styled.Title>Liquid Stake with Stride</Styled.Title>}
+      slotRight={<Styled.Img src="/third-party/stride.png" alt="" />}
+      onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavStride }))}
     >
       <Styled.Description>
-        {stringGetter({ key: STRING_KEYS.STAKING_DESCRIPTION })}
+        {`Stake your ${chainTokenLabel} tokens for st${chainTokenLabel} which you can deploy around the ecosystem.`}
         <Link href={stakingLearnMore} onClick={(e) => e.stopPropagation()}>
           {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
         </Link>
@@ -44,6 +34,18 @@ export const StakingPanel = () => {
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
+
+Styled.Title = styled.h3`
+  font: var(--font-medium-book);
+  color: var(--color-text-2);
+  margin-bottom: -1rem;
+`;
+
+Styled.Img = styled.img`
+  width: 2rem;
+  height: 2rem;
+  margin-right: 1.5rem;
+`;
 
 Styled.Description = styled.div`
   color: var(--color-text-0);
@@ -60,14 +62,4 @@ Styled.Description = styled.div`
 Styled.IconButton = styled(IconButton)`
   color: var(--color-text-0);
   --color-border: var(--color-layer-6);
-`;
-
-Styled.Arrow = styled.div`
-  padding-right: 1.5rem;
-`;
-
-Styled.Title = styled.h3`
-  font: var(--font-medium-book);
-  color: var(--color-text-2);
-  margin-bottom: -1rem;
 `;
