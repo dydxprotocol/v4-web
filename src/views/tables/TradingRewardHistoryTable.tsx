@@ -121,7 +121,7 @@ export const TradingRewardHistoryTable = ({
       selectionBehavior="replace"
       withOuterBorder={withOuterBorder}
       withInnerBorders={withInnerBorders}
-      initialNumRowsToShow={5}
+      viewMoreConfig={{ initialNumRowsToShow: 5, numRowsPerPage: 10 }}
       withScrollSnapColumns
       withScrollSnapRows
     />
