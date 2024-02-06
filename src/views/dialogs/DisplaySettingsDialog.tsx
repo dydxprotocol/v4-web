@@ -40,7 +40,6 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
     return (
       <Styled.Header>
         {heading}
-        {heading}
         <HorizontalSeparatorFiller />
       </Styled.Header>
     );
