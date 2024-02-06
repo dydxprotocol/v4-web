@@ -335,7 +335,7 @@ Styled.ActionButton = styled(IconButton)<{ iconName?: IconName }>`
   ${({ iconName }) =>
     iconName === IconName.Close
       ? css`
-          --button-textColor: var(--color-error);
+          --button-textColor: var(--color-red);
           --button-icon-size: 0.75em;
         `
       : iconName === IconName.Transfer &&

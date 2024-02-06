@@ -306,7 +306,7 @@ export const TransferForm = ({
           label={
             <Styled.DestinationInputLabel>
               {stringGetter({ key: STRING_KEYS.DESTINATION })}
-              {isAddressValid && <Icon iconName={IconName.Check} />}
+              {isAddressValid && <Styled.CheckIcon iconName={IconName.Check} />}
             </Styled.DestinationInputLabel>
           }
           type={InputType.Text}
@@ -439,10 +439,10 @@ Styled.InlineRow = styled.span`
 
 Styled.DestinationInputLabel = styled.span`
   ${layoutMixins.inlineRow}
+`;
 
-  svg {
-    color: var(--color-success);
-  }
+Styled.CheckIcon = styled(Icon)`
+  color: var(--color-success);
 `;
 
 Styled.AddressValidationAlertMessage = styled(AlertMessage)`
