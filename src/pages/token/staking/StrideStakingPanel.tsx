@@ -8,6 +8,7 @@ import { useStringGetter, useTokenConfigs, useURLConfigs } from '@/hooks';
 import { IconButton } from '@/components/IconButton';
 import { Link } from '@/components/Link';
 import { Panel } from '@/components/Panel';
+import { Tag } from '@/components/Tag';
 
 import { openDialog } from '@/state/dialogs';
 
@@ -20,7 +21,11 @@ export const StrideStakingPanel = ({ className }: { className?: string }) => {
   return (
     <Panel
       className={className}
-      slotHeaderContent={<Styled.Title>Liquid Stake with Stride</Styled.Title>}
+      slotHeaderContent={
+        <Styled.Title>
+          Liquid Stake with Stride <Tag>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>
+        </Styled.Title>
+      }
       slotRight={<Styled.Img src="/third-party/stride.png" alt="" />}
       onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavStride }))}
     >
@@ -40,6 +45,10 @@ Styled.Title = styled.h3`
   font: var(--font-medium-book);
   color: var(--color-text-2);
   margin-bottom: -1rem;
+
+  display: flex;
+  align-items: center;
+  gap: 0.5ch;
 `;
 
 Styled.Img = styled.img`

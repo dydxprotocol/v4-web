@@ -61,6 +61,7 @@ export default () => {
                       ),
                       label: 'Staking Rewards', // stringGetter({ key: STRING_KEYS.STAKING_REWARDS }),
                       href: TokenRoute.StakingRewards,
+                      tag: stringGetter({ key: STRING_KEYS.NEW }),
                     },
                     {
                       value: TokenRoute.Governance,
