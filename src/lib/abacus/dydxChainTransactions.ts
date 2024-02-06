@@ -31,6 +31,7 @@ import {
   type HumanReadableTransferPayload,
 } from '@/constants/abacus';
 
+import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 import { ENVIRONMENT_CONFIG_MAP, DydxNetwork, isTestnet } from '@/constants/networks';
@@ -115,7 +116,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
             {
               broadcastPollIntervalMs: 3_000,
               broadcastTimeoutMs: 60_000,
-            }
+            },
+            DEFAULT_TRANSACTION_MEMO
           )
         )
       );
@@ -370,8 +372,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         value: {
           ...params.msg,
           timeoutTimestamp: params.msg.timeoutTimestamp
-            // Squid returns timeoutTimestamp as Long, but the signer expects BigInt
-            ? BigInt(Long.fromValue(params.msg.timeoutTimestamp).toString())
+            ? // Squid returns timeoutTimestamp as Long, but the signer expects BigInt
+              BigInt(Long.fromValue(params.msg.timeoutTimestamp).toString())
             : undefined,
         },
       };
@@ -387,7 +389,11 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       }
 
       ibcMsg.value.token.amount = amount.toString();
-      const tx = await this.nobleClient.send([ibcMsg]);
+      const tx = await this.nobleClient.send(
+        [ibcMsg],
+        undefined,
+        `${DEFAULT_TRANSACTION_MEMO} | ${this.nobleWallet?.address}`
+      );
 
       const parsedTx = this.parseToPrimitives(tx);
 
@@ -426,8 +432,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         value: {
           ...parsedIbcPayload.msg,
           timeoutTimestamp: parsedIbcPayload.msg.timeoutTimestamp
-            // Squid returns timeoutTimestamp as Long, but the signer expects BigInt
-            ? BigInt(Long.fromValue(parsedIbcPayload.msg.timeoutTimestamp).toString())
+            ? // Squid returns timeoutTimestamp as Long, but the signer expects BigInt
+              BigInt(Long.fromValue(parsedIbcPayload.msg.timeoutTimestamp).toString())
             : undefined,
         },
       };
