@@ -5,23 +5,24 @@ import { useSelectedNetwork } from '@/hooks';
 const FALLBACK_URL = 'https://help.dydx.exchange/';
 
 export interface LinksConfigs {
-  tos: string,
-  privacy: string,
-  mintscan: string,
-  mintscanBase: string,
-  feedback?: string,
-  help?: string,
-  blogs?: string,
-  foundation?: string,
-  initialMarginFractionLearnMore?: string,
-  reduceOnlyLearnMore?: string,
-  documentation?: string,
-  community?: string,
-  governanceLearnMore?: string,
-  stakingLearnMore?: string,
-  keplrDashboard?: string,
-  accountExportLearnMore?: string,
-  walletLearnMore?: string
+  tos: string;
+  privacy: string;
+  mintscan: string;
+  mintscanBase: string;
+  feedback?: string;
+  help?: string;
+  blogs?: string;
+  foundation?: string;
+  initialMarginFractionLearnMore?: string;
+  reduceOnlyLearnMore?: string;
+  documentation?: string;
+  community?: string;
+  governanceLearnMore?: string;
+  stakingLearnMore?: string;
+  keplrDashboard?: string;
+  strideZoneApp?: string;
+  accountExportLearnMore?: string;
+  walletLearnMore?: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {
@@ -44,6 +45,7 @@ export const useURLConfigs = (): LinksConfigs => {
     governanceLearnMore: linksConfigs.governanceLearnMore || FALLBACK_URL,
     stakingLearnMore: linksConfigs.stakingLearnMore || FALLBACK_URL,
     keplrDashboard: linksConfigs.keplrDashboard || FALLBACK_URL,
+    strideZoneApp: linksConfigs.strideZoneApp || FALLBACK_URL,
     accountExportLearnMore: linksConfigs.accountExportLearnMore || FALLBACK_URL,
     walletLearnMore: linksConfigs.walletLearnMore || FALLBACK_URL,
   };
