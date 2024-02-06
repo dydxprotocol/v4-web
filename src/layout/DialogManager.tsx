@@ -30,6 +30,7 @@ import { OrderDetailsDialog } from '@/views/dialogs/DetailsDialog/OrderDetailsDi
 import { FillDetailsDialog } from '@/views/dialogs/DetailsDialog/FillDetailsDialog';
 import { NewMarketMessageDetailsDialog } from '@/views/dialogs/NewMarketMessageDetailsDialog';
 import { NewMarketAgreementDialog } from '@/views/dialogs/NewMarketAgreementDialog';
+import { ExternalNavStrideDialog } from '@/views/dialogs/ExternalNavStrideDialog';
 
 export const DialogManager = () => {
   const dispatch = useDispatch();
@@ -59,6 +60,7 @@ export const DialogManager = () => {
     [DialogTypes.Help]: <HelpDialog {...modalProps} />,
     [DialogTypes.ExternalNavKeplr]: <ExternalNavKeplrDialog {...modalProps} />,
     [DialogTypes.ExternalLink]: <ExternalLinkDialog {...modalProps} />,
+    [DialogTypes.ExternalNavStride]: <ExternalNavStrideDialog {...modalProps} />,
     [DialogTypes.MnemonicExport]: <MnemonicExportDialog {...modalProps} />,
     [DialogTypes.MobileSignIn]: <MobileSignInDialog {...modalProps} />,
     [DialogTypes.Onboarding]: <OnboardingDialog {...modalProps} />,
