@@ -7,7 +7,6 @@ import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, StringGetterFunction, TOOLTIP_STRING_KEYS } from '@/constants/localization';
-import { isMainnet } from '@/constants/networks';
 import { DydxChainAsset, wallets } from '@/constants/wallets';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -41,7 +40,6 @@ import { getAppTheme } from '@/state/configsSelectors';
 import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
 import { MustBigNumber } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
@@ -193,7 +191,7 @@ export const AccountMenu = () => {
         },
         ...(onboardingState === OnboardingState.AccountConnected && hdKey
           ? [
-              (!isMainnet || testFlags.showMobileSignInOption) && {
+              {
                 value: 'MobileQrSignIn',
                 icon: <Icon iconName={IconName.Qr} />,
                 label: stringGetter({ key: STRING_KEYS.TITLE_SIGN_INTO_MOBILE }),
@@ -206,7 +204,7 @@ export const AccountMenu = () => {
                 highlightColor: 'destroy',
                 onSelect: () => dispatch(openDialog({ type: DialogTypes.MnemonicExport })),
               },
-            ].filter(isTruthy)
+            ]
           : []),
         {
           value: 'Disconnect',
