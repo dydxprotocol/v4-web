@@ -3,12 +3,13 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const AMPLITUDE_API_KEY = process.env.AMPLITUDE_API_KEY;
+const AMPLITUDE_SERVER_URL = process.env.AMPLITUDE_SERVER_URL;
 
 const currentPath = fileURLToPath(import.meta.url);
 const projectRoot = path.dirname(currentPath);
 const htmlFilePath = path.resolve(projectRoot, '../dist/index.html');
 
-if(AMPLITUDE_API_KEY){
+if (AMPLITUDE_API_KEY) {
   try {
     const html = await fs.readFile(htmlFilePath, 'utf-8');
 
@@ -18,8 +19,34 @@ if(AMPLITUDE_API_KEY){
         `;
 
     const amplitudeListenerScript = `<script type="module">
-        !function(){var e="${AMPLITUDE_API_KEY}";e&&(globalThis.amplitude.init(e),globalThis.amplitude.setOptOut(!1),globalThis.addEventListener("dydx:track",function(e){var t=e.detail.eventType,d=e.detail.eventData;globalThis.amplitude.track(t,d)}),globalThis.addEventListener("dydx:identify",function(e){var t=e.detail.property,d=e.detail.propertyValue;if("walletAddress"===t)globalThis.amplitude.setUserId(d);else{var i=new globalThis.amplitude.Identify;i.set(t,d),globalThis.amplitude.identify(i)}}),console.log("Amplitude enabled."))}();
-        </script>`;
+      !(function () {
+        var e = "${AMPLITUDE_API_KEY}";
+        e &&
+          (globalThis.amplitude.init(e${
+            AMPLITUDE_SERVER_URL
+              ? `, undefined, {
+                serverUrl: ${AMPLITUDE_SERVER_URL}
+              }`
+              : ''
+          }),
+          globalThis.amplitude.setOptOut(!1),
+          globalThis.addEventListener("dydx:track", function (e) {
+            var t = e.detail.eventType,
+              d = e.detail.eventData;
+            globalThis.amplitude.track(t, d);
+          }),
+          globalThis.addEventListener("dydx:identify", function (e) {
+            var t = e.detail.property,
+              d = e.detail.propertyValue;
+            if ("walletAddress" === t) globalThis.amplitude.setUserId(d);
+            else {
+              var i = new globalThis.amplitude.Identify();
+              i.set(t, d), globalThis.amplitude.identify(i);
+            }
+          }),
+          console.log("Amplitude enabled."));
+      })();
+    </script>`;
 
     const injectedHtml = html.replace(
       '<div id="root"></div>',
