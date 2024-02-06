@@ -56,12 +56,7 @@ export const ExternalNavStrideDialog = ({ setIsOpen }: ElementProps) => {
           onClick={openExternalNavDialog}
         >
           <span>
-            {stringGetter({
-              key: STRING_KEYS.NAVIGATE_TO_KEPLR,
-              params: {
-                STRONG_YES: <strong>{stringGetter({ key: STRING_KEYS.YES })}</strong>,
-              },
-            })}
+            <strong>{stringGetter({ key: STRING_KEYS.YES })}</strong>, Navigate to Stride Zone.
           </span>
 
           <Styled.IconButton

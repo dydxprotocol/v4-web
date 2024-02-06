@@ -14,13 +14,14 @@ import { Link } from '@/components/Link';
 
 import { openDialog } from '@/state/dialogs';
 
-export const GovernancePanel = () => {
+export const GovernancePanel = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
   const { governanceLearnMore } = useURLConfigs();
 
   return (
     <Panel
+      className={className}
       slotHeaderContent={
         <Styled.Title>{stringGetter({ key: STRING_KEYS.GOVERNANCE })}</Styled.Title>
       }

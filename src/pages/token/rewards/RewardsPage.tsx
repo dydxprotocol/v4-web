@@ -9,7 +9,7 @@ import { useBreakpoints, useStringGetter } from '@/hooks';
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { AttachedExpandingSection } from '@/components/ContentSection';
+import { AttachedExpandingSection, DetachedSection } from '@/components/ContentSection';
 import { BackButton } from '@/components/BackButton';
 
 import { testFlags } from '@/lib/testFlags';
@@ -20,6 +20,7 @@ import { MigratePanel } from './MigratePanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
 import { RewardHistoryPanel } from './RewardHistoryPanel';
+import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 
 const RewardsPage = () => {
   const stringGetter = useStringGetter();
@@ -27,14 +28,14 @@ const RewardsPage = () => {
   const navigate = useNavigate();
 
   return (
-    <AttachedExpandingSection>
+    <div>
       {isTablet && (
-        <Styled.MobileHeader>
-          <BackButton onClick={() => navigate(AppRoute.Profile)} />
-          {stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
-        </Styled.MobileHeader>
+        <ContentSectionHeader
+          title={stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
+          slotLeft={<BackButton onClick={() => navigate(AppRoute.Profile)} />}
+        />
       )}
-      <Styled.ContentWrapper>
+      <Styled.AttachedExpandingSection>
         <Styled.GridLayout
           showTradingRewards={testFlags.showTradingRewards}
           showMigratePanel={import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet}
@@ -64,8 +65,8 @@ const RewardsPage = () => {
             </Styled.OtherColumn>
           )}
         </Styled.GridLayout>
-      </Styled.ContentWrapper>
-    </AttachedExpandingSection>
+      </Styled.AttachedExpandingSection>
+    </div>
   );
 };
 
@@ -73,11 +74,23 @@ export default RewardsPage;
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
-Styled.ContentWrapper = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 1.5rem;
-  max-width: 80rem;
-`;
+// Styled.Page = styled.div`
+//   ${layoutMixins.contentContainerPage}
+//   padding: 2rem;
+//   align-items: center;
+//   > * {
+//     --content-max-width: 80rem;
+//     max-width: min(calc(100vw - 4rem), var(--content-max-width));
+//   }
+//   @media ${breakpoints.tablet} {
+//     --stickyArea-topHeight: var(--page-header-height-mobile);
+//     padding: 0 1rem 1rem;
+//     > * {
+//       max-width: calc(100vw - 2rem - var(--withSidebar-current-sidebarWidth));
+//       width: 100%;
+//     }
+//   }
+// `;
 
 Styled.MobileHeader = styled.header`
   ${layoutMixins.contentSectionDetachedScrollable}
@@ -90,11 +103,14 @@ Styled.MobileHeader = styled.header`
   background-color: var(--color-layer-2);
 `;
 
+Styled.AttachedExpandingSection = styled(AttachedExpandingSection)``;
+
 Styled.GridLayout = styled.div<{ showTradingRewards?: boolean; showMigratePanel?: boolean }>`
   --gap: 1.5rem;
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: var(--gap);
+  max-width: 80rem;
 
   > * {
     gap: var(--gap);
@@ -123,6 +139,8 @@ Styled.GridLayout = styled.div<{ showTradingRewards?: boolean; showMigratePanel?
   @media ${breakpoints.tablet} {
     --gap: 1rem;
     grid-template-columns: 1fr;
+    width: calc(100vw - 2rem);
+    margin: 0 auto;
 
     ${({ showTradingRewards }) =>
       showTradingRewards
@@ -168,14 +186,4 @@ Styled.OtherColumn = styled.div<{ showTradingRewards?: boolean }>`
         grid-column: 1 / -1;
       }
     `}
-`;
-
-Styled.RewardHistoryHeader = styled.div`
-  h3 {
-    font: var(--font-medium-book);
-    color: var(--color-text-2);
-  }
-
-  padding: 1rem 1.5rem 0;
-  margin-bottom: -0.5rem;
 `;

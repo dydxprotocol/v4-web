@@ -253,10 +253,11 @@ Styled.MobileProfileLayout = styled.div`
   ${layoutMixins.contentContainerPage}
 
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 1rem;
   padding: 1.25rem 0.9rem;
   max-width: 100vw;
+
+  grid-template-columns: 1fr 1fr;
 
   grid-template-areas:
     'header header'
@@ -267,7 +268,7 @@ Styled.MobileProfileLayout = styled.div`
     'rewards fees'
     'history history'
     'governance newMarkets'
-    'staking stride';
+    'keplr stride';
 `;
 
 Styled.Header = styled.header`

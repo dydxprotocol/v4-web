@@ -11,7 +11,7 @@ import { Panel } from '@/components/Panel';
 
 import { openDialog } from '@/state/dialogs';
 
-export const StrideStakingPanel = () => {
+export const StrideStakingPanel = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
   const { stakingLearnMore } = useURLConfigs();
@@ -19,6 +19,7 @@ export const StrideStakingPanel = () => {
 
   return (
     <Panel
+      className={className}
       slotHeaderContent={<Styled.Title>Liquid Stake with Stride</Styled.Title>}
       slotRight={<Styled.Img src="/third-party/stride.png" alt="" />}
       onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavStride }))}

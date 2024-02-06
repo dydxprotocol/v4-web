@@ -13,13 +13,14 @@ import { Link } from '@/components/Link';
 
 import { openDialog } from '@/state/dialogs';
 
-export const StakingPanel = () => {
+export const StakingPanel = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
   const { stakingLearnMore } = useURLConfigs();
 
   return (
     <Panel
+      className={className}
       slotHeaderContent={<Styled.Title>Stake with Keplr</Styled.Title>}
       slotRight={
         <Styled.Img
