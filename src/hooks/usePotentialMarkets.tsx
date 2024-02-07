@@ -1,18 +1,42 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-import type {
-  ExchangeConfigItem,
-  ExchangeConfigParsedCsv,
-  PotentialMarketItem,
-  PotentialMarketParsedCsv,
-} from '@/constants/potentialMarkets';
+import { STRING_KEYS } from '@/constants/localization';
+import type { ExchangeConfigItem, PotentialMarketItem } from '@/constants/potentialMarkets';
 
 import { log } from '@/lib/telemetry';
+
+import { useStringGetter } from './useStringGetter';
 
 const PotentialMarketsContext = createContext<ReturnType<typeof usePotentialMarketsContext>>({
   potentialMarkets: undefined,
   exchangeConfigs: undefined,
   hasPotentialMarketsData: false,
+  liquidityTiers: {
+    0: {
+      label: 'Large-cap',
+      initialMarginFraction: 0.05,
+      maintenanceMarginFraction: 0.03,
+      impactNotional: 10_000,
+    },
+    1: {
+      label: 'Mid-cap',
+      initialMarginFraction: 0.1,
+      maintenanceMarginFraction: 0.05,
+      impactNotional: 5_000,
+    },
+    2: {
+      label: 'Long-tail',
+      initialMarginFraction: 0.2,
+      maintenanceMarginFraction: 0.1,
+      impactNotional: 2_500,
+    },
+    3: {
+      label: 'Safety',
+      initialMarginFraction: 1,
+      maintenanceMarginFraction: 0.2,
+      impactNotional: 2_500,
+    },
+  },
 });
 
 PotentialMarketsContext.displayName = 'PotentialMarkets';
@@ -27,6 +51,7 @@ const EXCHANGE_CONFIG_FILE_PATH = '/configs/potentialMarketExchangeConfig.json';
 const POTENTIAL_MARKETS_FILE_PATH = '/configs/potentialMarketParameters.json';
 
 export const usePotentialMarketsContext = () => {
+  const stringGetter = useStringGetter();
   const [potentialMarkets, setPotentialMarkets] = useState<PotentialMarketItem[]>();
   const [exchangeConfigs, setExchangeConfigs] = useState<Record<string, ExchangeConfigItem[]>>();
 
@@ -54,9 +79,40 @@ export const usePotentialMarketsContext = () => {
     }
   }, []);
 
+  const liquidityTiers = useMemo(
+    () => ({
+      0: {
+        label: stringGetter({ key: STRING_KEYS.LARGE_CAP }),
+        initialMarginFraction: 0.05,
+        maintenanceMarginFraction: 0.03,
+        impactNotional: 10_000,
+      },
+      1: {
+        label: 'Mid-cap',
+        initialMarginFraction: 0.1,
+        maintenanceMarginFraction: 0.05,
+        impactNotional: 5_000,
+      },
+      2: {
+        label: stringGetter({ key: STRING_KEYS.LONG_TAIL }),
+        initialMarginFraction: 0.2,
+        maintenanceMarginFraction: 0.1,
+        impactNotional: 2_500,
+      },
+      3: {
+        label: stringGetter({ key: STRING_KEYS.SAFETY }),
+        initialMarginFraction: 1,
+        maintenanceMarginFraction: 0.2,
+        impactNotional: 2_500,
+      },
+    }),
+    [stringGetter]
+  );
+
   return {
     potentialMarkets,
     exchangeConfigs,
     hasPotentialMarketsData: Boolean(potentialMarkets && exchangeConfigs),
+    liquidityTiers,
   };
 };

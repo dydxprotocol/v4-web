@@ -40,9 +40,6 @@ const AlertContainer = styled.div<StyleProps>`
       case AlertType.Info: {
         return css`
           --alert-accent-color: var(--color-text-1);
-
-          --alert-default-background-opacity: 0.133; // Relative
-          // --alert-background: var(--color-layer-6); // Absolute
         `;
       }
       case AlertType.Success: {

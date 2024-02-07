@@ -11,7 +11,7 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
-import { LIQUIDITY_TIERS, type PotentialMarketItem } from '@/constants/potentialMarkets';
+import type { PotentialMarketItem } from '@/constants/potentialMarkets';
 
 import {
   useAccountBalance,
@@ -19,6 +19,7 @@ import {
   useStringGetter,
   useSubaccount,
   useTokenConfigs,
+  useURLConfigs,
 } from '@/hooks';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
@@ -31,6 +32,7 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
@@ -62,9 +64,10 @@ export const NewMarketPreviewStep = ({
   const stringGetter = useStringGetter();
   const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
   const [errorMessage, setErrorMessage] = useState();
-  const { exchangeConfigs } = usePotentialMarkets();
+  const { exchangeConfigs, liquidityTiers } = usePotentialMarkets();
   const { submitNewMarketProposal } = useSubaccount();
   const { newMarketProposal } = useGovernanceVariables();
+  const { newMarketProposalLearnMore } = useURLConfigs();
   const initialDepositAmountBN = MustBigNumber(newMarketProposal.initialDepositAmount).div(
     Number(`1e${chainTokenDecimals}`)
   );
@@ -73,7 +76,7 @@ export const NewMarketPreviewStep = ({
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
 
   const { label, initialMarginFraction, maintenanceMarginFraction, impactNotional } =
-    LIQUIDITY_TIERS[liquidityTier as unknown as keyof typeof LIQUIDITY_TIERS];
+    liquidityTiers[liquidityTier as unknown as keyof typeof liquidityTiers];
 
   const ticker = `${assetData.baseAsset}-USD`;
 
@@ -311,10 +314,15 @@ export const NewMarketPreviewStep = ({
       </Styled.ButtonRow>
       <Styled.Disclaimer>
         {stringGetter({
-          key: STRING_KEYS.PROPOSAL_DISCLAIMER,
+          key: STRING_KEYS.PROPOSAL_DISCLAIMER_1,
           params: {
             NUM_TOKENS_REQUIRED: initialDepositAmount,
             NATIVE_TOKEN_DENOM: chainTokenLabel,
+            HERE: (
+              <Styled.Link href={newMarketProposalLearnMore}>
+                {stringGetter({ key: STRING_KEYS.HERE })}
+              </Styled.Link>
+            ),
           },
         })}
       </Styled.Disclaimer>
@@ -393,4 +401,9 @@ Styled.ButtonRow = styled.div`
 
 Styled.Button = styled(Button)`
   --button-padding: 0;
+`;
+
+Styled.Link = styled(Link)`
+  --link-color: var(--color-accent);
+  display: inline;
 `;

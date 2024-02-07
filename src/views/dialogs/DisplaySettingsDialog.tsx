@@ -40,7 +40,6 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
     return (
       <Styled.Header>
         {heading}
-        {heading}
         <HorizontalSeparatorFiller />
       </Styled.Header>
     );
@@ -287,10 +286,10 @@ Styled.ArrowIcon = styled(Icon)<{ direction: 'up' | 'down'; color: 'green' | 're
   ${({ color }) =>
     ({
       ['green']: css`
-        color: var(--color-success);
+        color: var(--color-green);
       `,
       ['red']: css`
-        color: var(--color-error);
+        color: var(--color-red);
       `,
     }[color])}
 `;

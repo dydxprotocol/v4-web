@@ -18,6 +18,7 @@ export interface LinksConfigs {
   documentation?: string;
   community?: string;
   governanceLearnMore?: string;
+  newMarketProposalLearnMore: string;
   stakingLearnMore?: string;
   keplrDashboard?: string;
   strideZoneApp?: string;
@@ -43,6 +44,7 @@ export const useURLConfigs = (): LinksConfigs => {
     documentation: linksConfigs.documentation || FALLBACK_URL,
     community: linksConfigs.community || FALLBACK_URL,
     governanceLearnMore: linksConfigs.governanceLearnMore || FALLBACK_URL,
+    newMarketProposalLearnMore: linksConfigs.newMarketProposalLearnMore || FALLBACK_URL,
     stakingLearnMore: linksConfigs.stakingLearnMore || FALLBACK_URL,
     keplrDashboard: linksConfigs.keplrDashboard || FALLBACK_URL,
     strideZoneApp: linksConfigs.strideZoneApp || FALLBACK_URL,

@@ -95,7 +95,10 @@ export type ElementProps<TableRowData extends object | CustomRowConfig, TableRow
   selectionBehavior?: 'replace' | 'toggle';
   onRowAction?: (key: TableRowKey, row: TableRowData) => void;
   slotEmpty?: React.ReactNode;
-  initialNumRowsToShow?: number;
+  viewMoreConfig?: {
+    initialNumRowsToShow: number;
+    numRowsPerPage?: number;
+  };
   // collection: TableCollection<string>;
   // children: React.ReactNode;
 };
@@ -125,7 +128,7 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   selectionMode = 'single',
   selectionBehavior = 'toggle',
   slotEmpty,
-  initialNumRowsToShow,
+  viewMoreConfig,
   // shouldRowRender,
 
   // collection,
@@ -141,8 +144,18 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   style,
 }: ElementProps<TableRowData, TableRowKey> & StyleProps) => {
   const [selectedKeys, setSelectedKeys] = useState(new Set<TableRowKey>());
-  const [numRowsToShow, setNumRowsToShow] = useState(initialNumRowsToShow);
-  const enableViewMore = numRowsToShow !== undefined;
+  const [numRowsToShow, setNumRowsToShow] = useState(viewMoreConfig?.initialNumRowsToShow);
+  const enableViewMore = viewMoreConfig !== undefined;
+
+  const onViewMoreClick = () => {
+    if (!viewMoreConfig) return;
+    const { numRowsPerPage } = viewMoreConfig;
+    if (numRowsPerPage) {
+      setNumRowsToShow((prev) => (prev ?? 0) + numRowsPerPage);
+    } else {
+      setNumRowsToShow(data.length);
+    }
+  };
 
   const currentBreakpoints = useBreakpoints();
   const shownColumns = columns.filter(
@@ -218,9 +231,7 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
           }
           numColumns={shownColumns.length}
           onViewMoreClick={
-            enableViewMore && numRowsToShow < data.length
-              ? () => setNumRowsToShow(data.length)
-              : undefined
+            enableViewMore && numRowsToShow! < data.length ? onViewMoreClick : undefined
           }
           // shouldRowRender={shouldRowRender}
           hideHeader={hideHeader}
