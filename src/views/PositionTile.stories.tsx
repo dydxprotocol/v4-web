@@ -33,9 +33,11 @@ Styled.PositionInfoContainer = styled.div`
 
 PositionTileStory.args = {
   currentSize: 0.2,
-  oraclePrice: 1300,
+  notionalTotal: 1300,
   postOrderSize: 0.2,
   stepSizeDecimals: 3,
   symbol: 'ETH',
   tickSizeDecimals: 1,
+  isLoading: false,
+  showNarrowVariation: false,
 };

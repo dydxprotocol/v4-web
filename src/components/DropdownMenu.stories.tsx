@@ -4,8 +4,18 @@ import { DropdownMenu } from '@/components/DropdownMenu';
 
 import { StoryWrapper } from '.ladle/components';
 
-export const DropdownMenuStory: Story<Parameters<typeof DropdownMenu>> = (args) => {
-  const exampleItems = [
+export const DropdownMenuStory: Story<Parameters<typeof DropdownMenu>[0]> = (args) => {
+  return (
+    <StoryWrapper>
+      <DropdownMenu {...args}>
+        <span>Menu</span>
+      </DropdownMenu>
+    </StoryWrapper>
+  );
+};
+
+DropdownMenuStory.args = {
+  items: [
     {
       value: '0',
       label: 'Item 0',
@@ -29,18 +39,8 @@ export const DropdownMenuStory: Story<Parameters<typeof DropdownMenu>> = (args) 
       onSelect: () => alert('Item 3 action'),
       highlightColor: 'destroy',
     },
-  ];
-
-  return (
-    <StoryWrapper>
-      <DropdownMenu {...args} items={exampleItems}>
-        <span>Menu</span>
-      </DropdownMenu>
-    </StoryWrapper>
-  );
+  ],
 };
-
-DropdownMenuStory.args = {};
 
 DropdownMenuStory.argTypes = {
   align: {

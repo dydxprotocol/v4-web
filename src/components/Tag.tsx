@@ -1,20 +1,20 @@
 import styled, { css } from 'styled-components';
 
 export enum TagSize {
-  Small,
-  Medium,
+  Small = 'Small',
+  Medium = 'Medium',
 }
 
 export enum TagType {
-  Asset,
-  Side,
-  Number,
+  Asset = 'Asset',
+  Side = 'Side',
+  Number = 'Number',
 }
 
 export enum TagSign {
-  Positive,
-  Negative,
-  Neutral,
+  Positive = 'Positive',
+  Negative = 'Negative',
+  Neutral = 'Neutral',
 }
 
 type StyleProps = {

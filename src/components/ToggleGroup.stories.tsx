@@ -21,14 +21,20 @@ const ToggleGroupItems = [
   },
 ];
 
-export const ToggleGroupStory: Story<Parameters<typeof ToggleGroup>> = (args) => {
+export const ToggleGroupStory: Story<
+  Pick<Parameters<typeof ToggleGroup>[0], 'items' | 'size' | 'shape'>
+> = (args) => {
   const [value, setValue] = useState('0');
 
   return (
     <StoryWrapper>
-      <ToggleGroup items={ToggleGroupItems} value={value} onValueChange={setValue} {...args} />
+      <ToggleGroup value={value} onValueChange={setValue} {...args} />
     </StoryWrapper>
   );
+};
+
+ToggleGroupStory.args = {
+  items: ToggleGroupItems,
 };
 
 ToggleGroupStory.argTypes = {
