@@ -31,6 +31,7 @@ const assetIcons = {
   ETH: '/currencies/eth.png',
   FIL: '/currencies/fil.png',
   ICP: '/currencies/icp.png',
+  JUP: '/currencies/jup.png',
   LDO: '/currencies/ldo.png',
   LINK: '/currencies/link.png',
   LTC: '/currencies/ltc.png',

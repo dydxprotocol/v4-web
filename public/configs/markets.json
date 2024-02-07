@@ -176,6 +176,13 @@
     "whitepaperLink": "https://dfinity.org/whitepaper.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/internet-computer/"
   },
+  "JUP-USD": {
+    "name": "Jupiter",
+    "tags": ["Defi"],
+    "websiteLink": "https://station.jup.ag/",
+    "whitepaperLink": "https://station.jup.ag/blog/green-paper",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/jupiter-ag/"
+  },
   "LDO-USD": {
     "name": "Lido DAO",
     "tags": ["Defi"],
