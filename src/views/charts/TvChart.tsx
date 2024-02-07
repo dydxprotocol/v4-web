@@ -97,7 +97,7 @@ export const TvChart = () => {
         }
       });
     });
-  }, [showOrderLines, currentMarketOrders]);
+  }, [showOrderLines, currentMarketOrders, isChartReady]);
 
   const drawOrderLines = () => {
     const updatedOrderLines: Record<string, IOrderLineAdapter> = {};
@@ -131,12 +131,10 @@ export const TvChart = () => {
           const { orderColor, borderColor, backgroundColor, textColor, textButtonColor } =
             getOrderLineColors({ side: side.rawValue, appTheme, appColorMode });
 
-          const orderPrice = triggerPrice ?? price;
-
           const orderLine = tvWidget
             ?.chart()
             .createOrderLine({ disableUndo: false })
-            .setPrice(MustBigNumber(orderPrice).toNumber())
+            .setPrice(MustBigNumber(triggerPrice ?? price).toNumber())
             .setQuantity(quantity)
             .setText(orderString)
             .setLineColor(orderColor)
