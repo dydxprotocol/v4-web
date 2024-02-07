@@ -102,10 +102,10 @@ export const TvChart = () => {
   const drawOrderLines = () => {
     const updatedOrderLines: Record<string, IOrderLineAdapter> = {};
     currentMarketOrders.forEach(
-      ({ id, type, status, side, cancelReason, remainingSize, triggerPrice, price }) => {
+      ({ id, type, status, side, cancelReason, remainingSize, size, triggerPrice, price }) => {
         const key = `${side.rawValue}-${id}`;
         const orderType = type.rawValue as KotlinIrEnumValues<typeof AbacusOrderType>;
-        const quantity = remainingSize ? remainingSize.toString() : '';
+        const quantity = (remainingSize ?? size).toString();
 
         const orderString = stringGetter({
           key: ORDER_TYPE_LABEL_MAPPING[orderType] || '',
@@ -119,6 +119,7 @@ export const TvChart = () => {
         if (maybeOrderLine) {
           if (!shouldShow) {
             maybeOrderLine.remove();
+            return;
           } else if (maybeOrderLine.getQuantity() !== quantity) {
             maybeOrderLine.setQuantity(quantity);
           }
