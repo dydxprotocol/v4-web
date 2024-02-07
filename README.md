@@ -78,6 +78,7 @@ Set environment variables via `.env`.
 - `VITE_V3_TOKEN_ADDRESS` (optional): Address of the V3 $DYDX token.
 - `VITE_TOKEN_MIGRATION_URI` (optional): The URL of the token migration website.
 - `AMPLITUDE_API_KEY` (optional): Amplitude API key for enabling Amplitude; used with `pnpm run build:inject-amplitude`.
+- `AMPLITUDE_SERVER_URL` (optional): Custom Amplitude server URL
 - `BUGSNAG_API_KEY` (optional): API key for enabling Bugsnag; used with `pnpm run build:inject-bugsnag`.
 - `IOS_APP_ID` (optional): iOS app ID used for enabling deep linking to the iOS app; used with `pnpm run build:inject-app-deeplinks`.
 - `INTERCOM_APP_ID` (optional): Used for enabling Intercom; utilized with `pnpm run build:inject-intercom`.
