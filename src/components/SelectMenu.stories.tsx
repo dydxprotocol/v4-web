@@ -26,7 +26,7 @@ const exampleItems: { value: string; label: string }[] = [
   },
 ];
 
-export const SelectMenuStory: Story<Parameters<typeof SelectMenu>> = (args) => {
+export const SelectMenuStory: Story<Parameters<typeof SelectMenu>[0]> = (args) => {
   const [value, setValue] = useState(exampleItems[0].value);
   const [value2, setValue2] = useState(exampleItems[2].value);
 

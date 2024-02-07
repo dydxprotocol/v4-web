@@ -13,29 +13,11 @@ enum TabItem {
   Item3 = 'Item3',
 }
 
-const TabItems = [
-  {
-    value: TabItem.Item1,
-    label: 'Item 1',
-    content: <div>Item 1 Content</div>,
-  },
-  {
-    value: TabItem.Item2,
-    label: 'Item 2',
-    content: <div>Item 2 Content</div>,
-  },
-  {
-    value: TabItem.Item3,
-    label: 'Item 3',
-    content: <div>Item 3 Content</div>,
-  },
-];
-
-export const TabsStory: Story<Parameters<typeof Tabs>> = (args) => {
+export const TabsStory: Story<Parameters<typeof Tabs>[0]> = (args) => {
   return (
     <StoryWrapper>
       <Styled.Container>
-        <Tabs items={TabItems} {...args} />
+        <Tabs {...args} />
       </Styled.Container>
     </StoryWrapper>
   );
@@ -43,6 +25,23 @@ export const TabsStory: Story<Parameters<typeof Tabs>> = (args) => {
 
 TabsStory.args = {
   fullWidthTabs: false,
+  items: [
+    {
+      value: TabItem.Item1,
+      label: 'Item 1',
+      content: <div>Item 1 Content</div>,
+    },
+    {
+      value: TabItem.Item2,
+      label: 'Item 2',
+      content: <div>Item 2 Content</div>,
+    },
+    {
+      value: TabItem.Item3,
+      label: 'Item 3',
+      content: <div>Item 3 Content</div>,
+    },
+  ],
 };
 
 TabsStory.argTypes = {

@@ -9,7 +9,7 @@ import { StoryWrapper } from '.ladle/components';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-export const WithLabelStory: Story<Parameters<typeof WithLabel>> = (args) => {
+export const WithLabelStory: Story<Parameters<typeof WithLabel>[0]> = (args) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
 

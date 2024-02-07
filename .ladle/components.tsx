@@ -2,14 +2,24 @@ import '@/polyfills';
 import { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 import styled from 'styled-components';
+import { WagmiConfig } from 'wagmi';
+import { GrazProvider } from 'graz';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
-import { store } from '@/state/_store';
+import { SupportedLocales } from '@/constants/localization';
+
+import { AccountsProvider } from '@/hooks/useAccounts';
+import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
+import { DydxProvider } from '@/hooks/useDydxClient';
+import { DialogAreaProvider } from '@/hooks/useDialogArea';
+import { LocaleProvider } from '@/hooks/useLocaleSeparators';
+import { PotentialMarketsProvider } from '@/hooks/usePotentialMarkets';
+import { RestrictionProvider } from '@/hooks/useRestrictions';
+import { SubaccountProvider } from '@/hooks/useSubaccount';
 
 import { GlobalStyle } from '@/styles/globalStyle';
 
 import { SelectMenu, SelectItem } from '@/components/SelectMenu';
-
-import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
 
 import {
   AppTheme,
@@ -18,10 +28,37 @@ import {
   setAppThemeSetting,
   setAppColorMode,
 } from '@/state/configs';
-import { setLocaleLoaded } from '@/state/localization';
+
+import { setLocaleLoaded, setSelectedLocale } from '@/state/localization';
+import { store } from '@/state/_store';
+
+import { config } from '@/lib/wagmi';
 
 import '@/index.css';
 import './ladle.css';
+
+const queryClient = new QueryClient();
+
+const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
+  // eslint-disable-next-line react/display-name
+  return ({ children }: { children: React.ReactNode }) => (
+    <Component {...props}>{children}</Component>
+  );
+};
+
+const providers = [
+  wrapProvider(QueryClientProvider, { client: queryClient }),
+  wrapProvider(GrazProvider),
+  wrapProvider(WagmiConfig, { config }),
+  wrapProvider(LocaleProvider),
+  wrapProvider(RestrictionProvider),
+  wrapProvider(DydxProvider),
+  wrapProvider(AccountsProvider),
+  wrapProvider(SubaccountProvider),
+  wrapProvider(DialogAreaProvider),
+  wrapProvider(PotentialMarketsProvider),
+  wrapProvider(AppThemeAndColorModeProvider),
+];
 
 export const StoryWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState(AppTheme.Classic);
@@ -33,8 +70,19 @@ export const StoryWrapper: React.FC<{ children: React.ReactNode }> = ({ children
   }, [theme, colorMode]);
 
   useEffect(() => {
+    store.dispatch(setSelectedLocale({ locale: SupportedLocales.EN }));
     store.dispatch(setLocaleLoaded(true));
   }, []);
+
+  const content = [...providers].reverse().reduce(
+    (children, Provider) => {
+      return <Provider>{children}</Provider>;
+    },
+    <StoryContent>
+      <GlobalStyle />
+      {children}
+    </StoryContent>
+  );
 
   return (
     <Provider store={store}>
@@ -79,10 +127,7 @@ export const StoryWrapper: React.FC<{ children: React.ReactNode }> = ({ children
         </SelectMenu>
       </StoryHeader>
       <hr />
-      <AppThemeAndColorModeProvider>
-        <GlobalStyle />
-        <StoryContent>{children}</StoryContent>
-      </AppThemeAndColorModeProvider>
+      {content}
     </Provider>
   );
 };
