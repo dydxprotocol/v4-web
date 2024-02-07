@@ -24,7 +24,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
       slotHeaderContent={
         <Styled.Header>
           <Styled.Title>Stake with Keplr</Styled.Title>
-          <Styled.Img src="/wallets/keplr.png" alt={stringGetter({ key: STRING_KEYS.KEPLR })} />
+          <Styled.Img src="/third-party/keplr.png" alt={stringGetter({ key: STRING_KEYS.KEPLR })} />
         </Styled.Header>
       }
       onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr }))}
