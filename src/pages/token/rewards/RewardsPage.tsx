@@ -10,6 +10,8 @@ import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { BackButton } from '@/components/BackButton';
+import { DetachedSection } from '@/components/ContentSection';
+import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 
 import { testFlags } from '@/lib/testFlags';
 
@@ -19,9 +21,6 @@ import { MigratePanel } from './MigratePanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
 import { RewardHistoryPanel } from './RewardHistoryPanel';
-import { GovernancePanel } from './GovernancePanel';
-import { StakingPanel } from './StakingPanel';
-import { NewMarketsPanel } from './NewMarketsPanel';
 
 const RewardsPage = () => {
   const stringGetter = useStringGetter();
@@ -29,73 +28,51 @@ const RewardsPage = () => {
   const navigate = useNavigate();
 
   return (
-    <Styled.Page>
+    <div>
       {isTablet && (
-        <Styled.MobileHeader>
-          <BackButton onClick={() => navigate(AppRoute.Profile)} />
-          {stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
-        </Styled.MobileHeader>
+        <ContentSectionHeader
+          title={stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
+          slotLeft={<BackButton onClick={() => navigate(AppRoute.Profile)} />}
+        />
       )}
-      <Styled.GridLayout
-        showTradingRewards={testFlags.showTradingRewards}
-        showMigratePanel={import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet}
-      >
-        {import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && <Styled.MigratePanel />}
+      <DetachedSection>
+        <Styled.GridLayout
+          showTradingRewards={testFlags.showTradingRewards}
+          showMigratePanel={import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet}
+        >
+          {import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && <Styled.MigratePanel />}
 
-        {isTablet ? (
-          <Styled.LaunchIncentivesPanel />
-        ) : (
-          <>
+          {isTablet ? (
             <Styled.LaunchIncentivesPanel />
-            <Styled.DYDXBalancePanel />
-          </>
-        )}
+          ) : (
+            <>
+              <Styled.LaunchIncentivesPanel />
+              <Styled.DYDXBalancePanel />
+            </>
+          )}
 
-        {testFlags.showTradingRewards && (
-          <Styled.TradingRewardsColumn>
-            <TradingRewardsSummaryPanel />
-            {isTablet && <RewardsHelpPanel />}
-            <RewardHistoryPanel />
-          </Styled.TradingRewardsColumn>
-        )}
+          {testFlags.showTradingRewards && (
+            <Styled.TradingRewardsColumn>
+              <TradingRewardsSummaryPanel />
+              {isTablet && <RewardsHelpPanel />}
+              <RewardHistoryPanel />
+            </Styled.TradingRewardsColumn>
+          )}
 
-        {isNotTablet && (
-          <Styled.OtherColumn showTradingRewards={testFlags.showTradingRewards}>
-            <NewMarketsPanel />
-            <GovernancePanel />
-            <StakingPanel />
-            <RewardsHelpPanel />
-          </Styled.OtherColumn>
-        )}
-      </Styled.GridLayout>
-    </Styled.Page>
+          {isNotTablet && (
+            <Styled.OtherColumn showTradingRewards={testFlags.showTradingRewards}>
+              <RewardsHelpPanel />
+            </Styled.OtherColumn>
+          )}
+        </Styled.GridLayout>
+      </DetachedSection>
+    </div>
   );
 };
 
 export default RewardsPage;
 
 const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Page = styled.div`
-  ${layoutMixins.contentContainerPage}
-  padding: 2rem;
-  align-items: center;
-
-  > * {
-    --content-max-width: 80rem;
-    max-width: min(calc(100vw - 4rem), var(--content-max-width));
-  }
-
-  @media ${breakpoints.tablet} {
-    --stickyArea-topHeight: var(--page-header-height-mobile);
-    padding: 0 1rem 1rem;
-
-    > * {
-      max-width: calc(100vw - 2rem);
-      width: 100%;
-    }
-  }
-`;
 
 Styled.MobileHeader = styled.header`
   ${layoutMixins.contentSectionDetachedScrollable}
@@ -113,6 +90,7 @@ Styled.GridLayout = styled.div<{ showTradingRewards?: boolean; showMigratePanel?
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: var(--gap);
+  max-width: 80rem;
 
   > * {
     gap: var(--gap);
@@ -123,24 +101,39 @@ Styled.GridLayout = styled.div<{ showTradingRewards?: boolean; showMigratePanel?
       ? css`
           grid-template-areas:
             'migrate migrate'
-            'incentives balance'
+            'incentives incentives'
+            'balance balance'
             'rewards other';
         `
       : showTradingRewards
       ? css`
-          grid-template-areas: 'incentives balance' 'rewards other';
+          grid-template-areas:
+            'incentives balance'
+            'rewards other';
         `
       : showMigratePanel
       ? css`
-          grid-template-areas: 'migrate migrate' 'incentives balance' 'other other';
+          grid-template-areas:
+            'migrate migrate'
+            'incentives incentives'
+            'balance balance'
+            'other other';
         `
       : css`
-          grid-template-areas: 'incentives balance' 'other other';
+          grid-template-areas:
+            'incentives balance'
+            'other other';
         `};
+
+  @media ${breakpoints.notTablet} {
+    padding: 1rem;
+  }
 
   @media ${breakpoints.tablet} {
     --gap: 1rem;
     grid-template-columns: 1fr;
+    width: calc(100vw - 2rem);
+    margin: 0 auto;
 
     ${({ showTradingRewards }) =>
       showTradingRewards
@@ -186,14 +179,4 @@ Styled.OtherColumn = styled.div<{ showTradingRewards?: boolean }>`
         grid-column: 1 / -1;
       }
     `}
-`;
-
-Styled.RewardHistoryHeader = styled.div`
-  h3 {
-    font: var(--font-medium-book);
-    color: var(--color-text-2);
-  }
-
-  padding: 1rem 1.5rem 0;
-  margin-bottom: -0.5rem;
 `;

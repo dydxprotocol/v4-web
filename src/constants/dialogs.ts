@@ -5,6 +5,7 @@ export enum DialogTypes {
   DisplaySettings = 'DisplaySettings',
   ExchangeOffline = 'ExchangeOffline',
   ExternalLink = 'ExternalLink',
+  ExternalNavStride = 'ExternalNavStride',
   FillDetails = 'FillDetails',
   Help = 'Help',
   ExternalNavKeplr = 'ExternalNavKeplr',

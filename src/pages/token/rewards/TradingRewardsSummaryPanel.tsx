@@ -3,8 +3,8 @@ import styled, { AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { layoutMixins } from '@/styles/layoutMixins';
 import { useStringGetter, useTokenConfigs } from '@/hooks';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Details } from '@/components/Details';
@@ -18,7 +18,10 @@ import abacusStateManager from '@/lib/abacus';
 export const TradingRewardsSummaryPanel = () => {
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
-  const currentWeekTradingReward = useSelector(getHistoricalTradingRewardsForCurrentWeek, shallowEqual);
+  const currentWeekTradingReward = useSelector(
+    getHistoricalTradingRewardsForCurrentWeek,
+    shallowEqual
+  );
 
   useEffect(() => {
     abacusStateManager.refreshHistoricalTradingRewards();

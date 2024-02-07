@@ -33,7 +33,7 @@ export const useMarketsData = (
     return Object.values(allPerpetualMarkets)
       .filter(isTruthy)
       .map((marketData) => ({
-        asset: allAssets[marketData.assetId],
+        asset: allAssets[marketData.assetId] ?? {},
         tickSizeDecimals: marketData.configs?.tickSizeDecimals,
         ...marketData,
         ...marketData.perpetual,
@@ -46,9 +46,10 @@ export const useMarketsData = (
 
     if (searchFilter) {
       return filtered.filter(
-        ({ asset }) =>
+        ({ asset, id }) =>
           asset?.name?.toLocaleLowerCase().includes(searchFilter.toLowerCase()) ||
-          asset?.id?.toLocaleLowerCase().includes(searchFilter.toLowerCase())
+          asset?.id?.toLocaleLowerCase().includes(searchFilter.toLowerCase()) ||
+          id?.toLocaleLowerCase().includes(searchFilter.toLowerCase())
       );
     }
     return filtered;

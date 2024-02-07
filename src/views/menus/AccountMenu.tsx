@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { ElementType, memo } from 'react';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import type { Dispatch } from '@reduxjs/toolkit';
@@ -106,7 +106,7 @@ export const AccountMenu = () => {
               {walletType && (
                 <Styled.SourceIcon>
                   <Styled.ConnectorIcon iconName={IconName.AddressConnector} />
-                  <Icon iconComponent={wallets[walletType].icon} />
+                  <Icon iconComponent={wallets[walletType].icon as ElementType} />
                 </Styled.SourceIcon>
               )}
               <Styled.Column>
@@ -220,7 +220,7 @@ export const AccountMenu = () => {
       {onboardingState === OnboardingState.WalletConnected ? (
         <Styled.WarningIcon iconName={IconName.Warning} />
       ) : onboardingState === OnboardingState.AccountConnected ? (
-        walletType && <Icon iconComponent={wallets[walletType].icon} />
+        walletType && <Icon iconComponent={wallets[walletType].icon as ElementType} />
       ) : null}
       {!isTablet && <Styled.Address>{truncateAddress(dydxAddress)}</Styled.Address>}
     </Styled.DropdownMenu>

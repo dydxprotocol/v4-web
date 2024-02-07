@@ -4,9 +4,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEnsName } from 'wagmi';
 import { useNavigate } from 'react-router-dom';
 
-import { ButtonSize } from '@/constants/buttons';
 import { TransferType } from '@/constants/abacus';
-
+import { OnboardingState } from '@/constants/account';
+import { ButtonSize } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
+import { AppRoute, PortfolioRoute, HistoryRoute } from '@/constants/routes';
+import { wallets } from '@/constants/wallets';
+import { useAccounts, useStringGetter, useTokenConfigs } from '@/hooks';
+import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';
@@ -15,13 +21,6 @@ import { Icon, IconName } from '@/components/Icon';
 import { IconButton, type IconButtonProps } from '@/components/IconButton';
 import { Panel } from '@/components/Panel';
 import { Toolbar } from '@/components/Toolbar';
-
-import { OnboardingState } from '@/constants/account';
-import { DialogTypes } from '@/constants/dialogs';
-import { STRING_KEYS } from '@/constants/localization';
-import { AppRoute, PortfolioRoute, HistoryRoute } from '@/constants/routes';
-import { wallets } from '@/constants/wallets';
-import { useAccounts, useStringGetter, useTokenConfigs } from '@/hooks';
 
 import {
   getHistoricalTradingRewardsForCurrentWeek,
@@ -32,10 +31,12 @@ import { openDialog } from '@/state/dialogs';
 import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
 
-import { DYDXBalancePanel } from './rewards/DYDXBalancePanel';
-import { MigratePanel } from './rewards/MigratePanel';
-import { GovernancePanel } from './rewards/GovernancePanel';
-import { StakingPanel } from './rewards/StakingPanel';
+import { DYDXBalancePanel } from './token/rewards/DYDXBalancePanel';
+import { MigratePanel } from './token/rewards/MigratePanel';
+import { GovernancePanel } from './token/rewards/GovernancePanel';
+import { StakingPanel } from './token/staking/StakingPanel';
+import { StrideStakingPanel } from './token/staking/StrideStakingPanel';
+import { NewMarketsPanel } from './token/rewards/NewMarketsPanel';
 
 const ENS_CHAIN_ID = 1; // Ethereum
 
@@ -236,7 +237,9 @@ const Profile = () => {
       </Styled.HistoryPanel>
 
       <Styled.GovernancePanel />
+      <Styled.NewMarketsPanel />
       <Styled.StakingPanel />
+      <Styled.StrideStakingPanel />
     </Styled.MobileProfileLayout>
   );
 };
@@ -249,10 +252,11 @@ Styled.MobileProfileLayout = styled.div`
   ${layoutMixins.contentContainerPage}
 
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 1rem;
   padding: 1.25rem 0.9rem;
   max-width: 100vw;
+
+  grid-template-columns: 1fr 1fr;
 
   grid-template-areas:
     'header header'
@@ -262,8 +266,23 @@ Styled.MobileProfileLayout = styled.div`
     'balance balance'
     'rewards fees'
     'history history'
-    'governance governance'
-    'staking staking';
+    'governance newMarkets'
+    'keplr stride';
+
+  @media ${breakpoints.mobile} {
+    grid-template-areas:
+      'header header'
+      'actions actions'
+      'settings help'
+      'migrate migrate'
+      'balance balance'
+      'rewards fees'
+      'history history'
+      'governance governance'
+      'newMarkets newMarkets'
+      'keplr keplr'
+      'stride stride';
+  }
 `;
 
 Styled.Header = styled.header`
@@ -431,5 +450,13 @@ Styled.GovernancePanel = styled(GovernancePanel)`
 `;
 
 Styled.StakingPanel = styled(StakingPanel)`
-  grid-area: staking;
+  grid-area: keplr;
+`;
+
+Styled.NewMarketsPanel = styled(NewMarketsPanel)`
+  grid-area: newMarkets;
+`;
+
+Styled.StrideStakingPanel = styled(StrideStakingPanel)`
+  grid-area: stride;
 `;

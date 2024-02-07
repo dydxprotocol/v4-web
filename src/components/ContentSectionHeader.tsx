@@ -6,6 +6,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 type ElementProps = {
   title: string;
   subtitle?: React.ReactNode;
+  slotLeft?: React.ReactNode;
   slotRight?: React.ReactNode;
 };
 
@@ -16,14 +17,16 @@ type StyleProps = {
 export const ContentSectionHeader = ({
   title,
   subtitle,
+  slotLeft,
   slotRight,
   className,
 }: ElementProps & StyleProps) => (
   <Styled.ContentSectionHeader className={className}>
-    <div>
+    {slotLeft}
+    <Styled.Header>
       {title && <h3>{title}</h3>}
       {subtitle && <p>{subtitle}</p>}
-    </div>
+    </Styled.Header>
     {slotRight}
   </Styled.ContentSectionHeader>
 );
@@ -40,9 +43,15 @@ Styled.ContentSectionHeader = styled.header<StyleProps>`
 
   padding: 1rem var(--header-horizontal-padding);
 
-  > div {
-    ${layoutMixins.column}
+  @media ${breakpoints.tablet} {
+    flex-wrap: wrap;
+    --header-horizontal-padding: 1.25rem;
   }
+`;
+
+Styled.Header = styled.div`
+  ${layoutMixins.column}
+  flex: 1;
 
   h3 {
     color: var(--color-text-2);
@@ -53,10 +62,5 @@ Styled.ContentSectionHeader = styled.header<StyleProps>`
     color: var(--color-text-0);
     font: var(--font-small-book);
     margin-top: 0.25rem;
-  }
-
-  @media ${breakpoints.tablet} {
-    flex-wrap: wrap;
-    --header-horizontal-padding: 1.25rem;
   }
 `;
