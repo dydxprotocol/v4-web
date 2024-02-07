@@ -19,14 +19,17 @@ export const StrideStakingPanel = ({ className }: { className?: string }) => {
   const { chainTokenLabel } = useTokenConfigs();
 
   return (
-    <Panel
+    <Styled.Panel
       className={className}
       slotHeaderContent={
-        <Styled.Title>
-          Liquid Stake with Stride <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>
-        </Styled.Title>
+        <Styled.Header>
+          <Styled.Title>
+            Liquid Stake with Stride
+            <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>
+          </Styled.Title>
+          <Styled.Img src="/third-party/stride.png" alt="Stride" />
+        </Styled.Header>
       }
-      slotRight={<Styled.Img src="/third-party/stride.png" alt="" />}
       onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavStride }))}
     >
       <Styled.Description>
@@ -35,16 +38,32 @@ export const StrideStakingPanel = ({ className }: { className?: string }) => {
           {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
         </Link>
       </Styled.Description>
-    </Panel>
+    </Styled.Panel>
   );
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
+Styled.Panel = styled(Panel)`
+  align-items: start;
+
+  header {
+    justify-content: unset;
+    padding-bottom: 0;
+  }
+`;
+
+Styled.Header = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+`;
+
 Styled.Title = styled.h3`
   font: var(--font-medium-book);
   color: var(--color-text-2);
-  margin-bottom: -1rem;
 
   display: flex;
   align-items: center;
@@ -54,7 +73,7 @@ Styled.Title = styled.h3`
 Styled.Img = styled.img`
   width: 2rem;
   height: 2rem;
-  margin-right: 1.5rem;
+  margin-left: 0.5rem;
 `;
 
 Styled.Description = styled.div`

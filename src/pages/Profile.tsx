@@ -4,9 +4,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEnsName } from 'wagmi';
 import { useNavigate } from 'react-router-dom';
 
-import { ButtonSize } from '@/constants/buttons';
 import { TransferType } from '@/constants/abacus';
-
+import { OnboardingState } from '@/constants/account';
+import { ButtonSize } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
+import { AppRoute, PortfolioRoute, HistoryRoute } from '@/constants/routes';
+import { wallets } from '@/constants/wallets';
+import { useAccounts, useStringGetter, useTokenConfigs } from '@/hooks';
+import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';
@@ -15,13 +21,6 @@ import { Icon, IconName } from '@/components/Icon';
 import { IconButton, type IconButtonProps } from '@/components/IconButton';
 import { Panel } from '@/components/Panel';
 import { Toolbar } from '@/components/Toolbar';
-
-import { OnboardingState } from '@/constants/account';
-import { DialogTypes } from '@/constants/dialogs';
-import { STRING_KEYS } from '@/constants/localization';
-import { AppRoute, PortfolioRoute, HistoryRoute } from '@/constants/routes';
-import { wallets } from '@/constants/wallets';
-import { useAccounts, useStringGetter, useTokenConfigs } from '@/hooks';
 
 import {
   getHistoricalTradingRewardsForCurrentWeek,
@@ -38,7 +37,6 @@ import { GovernancePanel } from './token/rewards/GovernancePanel';
 import { StakingPanel } from './token/staking/StakingPanel';
 import { StrideStakingPanel } from './token/staking/StrideStakingPanel';
 import { NewMarketsPanel } from './token/rewards/NewMarketsPanel';
-import { breakpoints } from '@/styles';
 
 const ENS_CHAIN_ID = 1; // Ethereum
 

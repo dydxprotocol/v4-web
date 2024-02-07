@@ -19,14 +19,13 @@ export const StakingPanel = ({ className }: { className?: string }) => {
   const { stakingLearnMore } = useURLConfigs();
 
   return (
-    <Panel
+    <Styled.Panel
       className={className}
-      slotHeaderContent={<Styled.Title>Stake with Keplr</Styled.Title>}
-      slotRight={
-        <Styled.Img
-          src="/wallets/keplr.png"
-          alt={stringGetter({ key: STRING_KEYS.KEPLR_WALLET })}
-        />
+      slotHeaderContent={
+        <Styled.Header>
+          <Styled.Title>Stake with Keplr</Styled.Title>
+          <Styled.Img src="/wallets/keplr.png" alt={stringGetter({ key: STRING_KEYS.KEPLR })} />
+        </Styled.Header>
       }
       onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr }))}
     >
@@ -36,22 +35,38 @@ export const StakingPanel = ({ className }: { className?: string }) => {
           {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
         </Link>
       </Styled.Description>
-    </Panel>
+    </Styled.Panel>
   );
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
+Styled.Panel = styled(Panel)`
+  align-items: start;
+
+  header {
+    justify-content: unset;
+    padding-bottom: 0;
+  }
+`;
+
+Styled.Header = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+`;
+
 Styled.Title = styled.h3`
   font: var(--font-medium-book);
   color: var(--color-text-2);
-  margin-bottom: -1rem;
 `;
 
 Styled.Img = styled.img`
   width: 2rem;
   height: 2rem;
-  margin-right: 1.5rem;
+  margin-left: 0.5rem;
 `;
 
 Styled.Description = styled.div`
