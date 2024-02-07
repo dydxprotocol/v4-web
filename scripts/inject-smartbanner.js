@@ -3,18 +3,11 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// const SMARTBANNER_APP_NAME = process.env.SMARTBANNER_APP_NAME;
-// const SMARTBANNER_ORG_NAME = process.env.SMARTBANNER_ORG_NAME;
-// const SMARTBANNER_ICON_URL = process.env.SMARTBANNER_ICON_URL;
-// const SMARTBANNER_APPSTORE_URL = process.env.SMARTBANNER_APPSTORE_URL;
-// const SMARTBANNER_GOOGLEPLAY_URL = process.env.SMARTBANNER_GOOGLEPLAY_URL;
-
-const SMARTBANNER_APP_NAME = 'dYdX Chain';
-const SMARTBANNER_ORG_NAME = 'dYdX';
-const SMARTBANNER_ICON_URL =
-  'https://is1-ssl.mzstatic.com/image/thumb/Purple126/v4/1a/ba/5d/1aba5d13-e050-a69d-b758-68e349d822c1/AppIcon-1x_U007emarketing-0-7-0-85-220.png/246x0w.webp';
-const SMARTBANNER_APPSTORE_URL = 'https://apps.apple.com/app/id6475599596';
-const SMARTBANNER_GOOGLEPLAY_URL = undefined;
+const SMARTBANNER_APP_NAME = process.env.SMARTBANNER_APP_NAME;
+const SMARTBANNER_ORG_NAME = process.env.SMARTBANNER_ORG_NAME;
+const SMARTBANNER_ICON_URL = process.env.SMARTBANNER_ICON_URL;
+const SMARTBANNER_APPSTORE_URL = process.env.SMARTBANNER_APPSTORE_URL;
+const SMARTBANNER_GOOGLEPLAY_URL = process.env.SMARTBANNER_GOOGLEPLAY_URL;
 
 const currentPath = fileURLToPath(import.meta.url);
 const projectRoot = path.dirname(currentPath);
@@ -33,25 +26,26 @@ if (
     smartbanner = smartbanner
       .replace('SMARTBANNER_APP_NAME', SMARTBANNER_APP_NAME)
       .replace('SMARTBANNER_ORG_NAME', SMARTBANNER_ORG_NAME)
+      .replace('SMARTBANNER_ICON_URL', SMARTBANNER_ICON_URL)
       .replace('SMARTBANNER_ICON_URL', SMARTBANNER_ICON_URL);
 
     /* hardcoded injection depending on whether the app is available on App Store and/or Google Play */
 
     if (SMARTBANNER_APPSTORE_URL) {
-      smartbanner += `\n<meta name="smartbanner:button-url-apple" content="${SMARTBANNER_APPSTORE_URL}">`;
+      smartbanner = `\t<meta name="smartbanner:button-url-apple" content="${SMARTBANNER_APPSTORE_URL}">\n` + smartbanner;
     }
     if (SMARTBANNER_GOOGLEPLAY_URL) {
-      smartbanner += `\n<meta name="smartbanner:button-url-google" content="${SMARTBANNER_GOOGLEPLAY_URL}">`;
+      smartbanner = `\t<meta name="smartbanner:button-url-google" content="${SMARTBANNER_GOOGLEPLAY_URL}">\n` + smartbanner;
     }
     if (SMARTBANNER_APPSTORE_URL) {
       if (SMARTBANNER_GOOGLEPLAY_URL) {
-        smartbanner += `\n<meta name="smartbanner:enabled-platforms" content="android,ios">`;
+        smartbanner = `\t<meta name="smartbanner:enabled-platforms" content="android,ios">\n` + smartbanner;
       } else {
-        smartbanner += `\n<meta name="smartbanner:enabled-platforms" content="ios">`;
+        smartbanner = `\t<meta name="smartbanner:enabled-platforms" content="ios">\n` + smartbanner;
       }
     } else {
       if (SMARTBANNER_GOOGLEPLAY_URL) {
-        smartbanner += `\n<meta name="smartbanner:enabled-platforms" content="android">`;
+        smartbanner = `\t<meta name="smartbanner:enabled-platforms" content="android">\n` + smartbanner;
       }
     }
 
