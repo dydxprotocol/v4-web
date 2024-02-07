@@ -15,6 +15,7 @@
     "build:inject-bugsnag": "node scripts/inject-bugsnag.js",
     "build:inject-intercom": "node scripts/inject-intercom.js",
     "build:inject-statuspage": "node scripts/inject-statuspage.js",
+    "build:inject-smartbanner": "node scripts/inject-smartbanner.js",
     "deploy:ipfs": "node scripts/upload-ipfs.js --verbose",
     "deploy:update-ipns": "node scripts/update-ipns.js",
     "deploy:update-dnslink": "node scripts/update-dnslink.js",

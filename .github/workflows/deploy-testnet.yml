@@ -39,6 +39,7 @@ jobs:
           pnpm run build:inject-amplitude
           pnpm run build:inject-bugsnag
           pnpm run build:inject-statuspage
+          pnpm run build:inject-smartbanner
           sh scripts/inject-app-deeplinks.sh
 
       - name: Upload to IPFS via web3.storage

@@ -83,7 +83,7 @@ Set environment variables via `.env`.
 - `IOS_APP_ID` (optional): iOS app ID used for enabling deep linking to the iOS app; used with `pnpm run build:inject-app-deeplinks`.
 - `INTERCOM_APP_ID` (optional): Used for enabling Intercom; utilized with `pnpm run build:inject-intercom`.
 - `STATUS_PAGE_SCRIPT_URI` (optional): Used for enabling the status page; used with `pnpm run build:inject-statuspage`.
-
+- `SMARTBANNER_APP_NAME`, `SMARTBANNER_ORG_NAME`, `SMARTBANNER_ICON_URL`, `SMARTBANNER_APPSTORE_URL` (optional): Used for enabling the smart app banner; used with `pnpm run build:inject-smartbanner`.
 
 # Deployments
 
@@ -106,6 +106,9 @@ pnpm run build --mode testnet
 
 If you wish to incorporate analytics via Amplitude and Bugsnag, you can use our scripts:
 `pnpm run build:inject-amplitude` and `pnpm run build:inject-bugsnag`. You will need to provide your own API keys for these services. In the Environment Variables section, name the variables as `AMPLITUDE_API_KEY` and `BUGSNAG_API_KEY` and provide the respective keys as their values.
+
+If you wish to incorporate smart banner for iOS and/or Android apps, you can use our scripts:
+`pnpm run build:inject-smartbanner`. You will need to provide your own app configurations for these services. In the Environment Variables section, name the variables as `SMARTBANNER_APP_NAME`, `SMARTBANNER_ORG_NAME`, `SMARTBANNER_ICON_URL` and `SMARTBANNER_APPSTORE_URL` or `SMARTBANNER_GOOGLEPLAY_URL` and provide the respective values.
 
 For more details, check out Vercel's [official documentation](https://vercel.com/docs).
 
