@@ -133,6 +133,7 @@ const detailsLayoutVariants = {
   row: css`
     ${layoutMixins.row}
     align-self: stretch;
+    white-space: nowrap;
   `,
 
   rowColumns: css`
@@ -159,12 +160,16 @@ const itemLayoutVariants: Record<string, FlattenInterpolation<ThemeProps<any>>> 
 
     ${layoutMixins.spacedRow}
     gap: 0.5rem;
+    align-items: start;
+    padding: 0.5rem 0;
 
     min-height: var(--details-item-height);
 
-    > :last-child {
-      align-self: stretch;
+    > :first-child > abbr {
+      min-width: auto;
+    }
 
+    > :last-child {
       ${layoutMixins.row}
       ${layoutMixins.stickyRight}
 
@@ -217,8 +222,6 @@ Styled.Details = styled.dl<{
   --details-grid-numColumns: 2;
 
   ${({ layout }) => layout && detailsLayoutVariants[layout]}
-
-  white-space: nowrap;
 `;
 
 Styled.Item = styled.div<{
@@ -226,14 +229,12 @@ Styled.Item = styled.div<{
   justifyItems?: 'start' | 'end';
   withOverflow: boolean;
 }>`
-  white-space: normal;
-  
   ${({ layout }) => layout && itemLayoutVariants[layout]}
 
   ${({ justifyItems }) =>
     justifyItems === 'end' &&
     css`
-      &:nth-child(even) {
+      > :nth-child(even) {
         justify-items: end;
         text-align: end;
       }
@@ -245,6 +246,7 @@ Styled.Item = styled.div<{
     {
       column: css`
         &:not(:hover) > :first-child {
+          white-space: nowrap;
           overflow-x: hidden;
           text-overflow: ellipsis;
         }
