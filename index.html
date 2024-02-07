@@ -18,40 +18,9 @@
     <meta property="og:image:height" content="1260" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="dYdX" />
-    <!-- Smartbanner: Configure the mobile app -->
-    <meta name="smartbanner:title" content="{app_name}">
-    <meta name="smartbanner:author" content="{org_name}">
-    <meta name="smartbanner:icon-apple" content="{icon_url}">
-    <!-- Smartbanner: Configure the iOS app -->
-    <meta name="smartbanner:button-url-apple" content="{ios_app_url}">
-    <!-- Smartbanner: Take out next line "smartbanner:api" after configuration -->
-    <meta name="smartbanner:api" content="true">
-    <!-- Smartbanner: The rest of the configurations can be kept as is -->
-    <meta name="smartbanner:price" content="FREE">
-    <meta name="smartbanner:price-suffix-apple" content=" - On the App Store">
-    <meta name="smartbanner:button" content="VIEW">
-    <meta name="smartbanner:enabled-platforms" content="ios">
-    <meta name="smartbanner:close-label" content="Close">
-    <meta name="smartbanner:exclude-user-agent-regex" content="^.*(Windows NT|Safari).*$">
-    <link rel="stylesheet" href="node_modules/smartbanner.js/dist/smartbanner.min.css">
-    <script src="node_modules/smartbanner.js/dist/smartbanner.min.js"></script>
-    <!-- Smartbanner: End configuration -->
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      let onLoadHandlerForConflictTesting = function() {};
-      window.onload = onLoadHandlerForConflictTesting;
-      document.addEventListener('smartbanner.view', function() { console.log('smartbanner.view'); });
-      document.addEventListener('smartbanner.exit', function() { console.log('smartbanner.exit'); });
-      document.addEventListener('smartbanner.clickout', function() { console.log('smartbanner.clickout'); });
-  
-      // Manual smartbanner population:
-      //   1) set smartbanner:api meta tag to true above for manual smartbanner population
-      //   2) Uncomment below
-      //let apiHandler = function() { smartbanner.publish(); };
-      //window.onload = apiHandler;
-    </script>
   </body>
 </html>
