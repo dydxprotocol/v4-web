@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { shallowEqual, useSelector } from 'react-redux';
 import isEmpty from 'lodash/isEmpty';
 
 import { LanguageCode, ResolutionString, widget } from 'public/tradingview/charting_library';
@@ -15,12 +15,7 @@ import { store } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
-import { setShowOrderLines } from '@/state/perpetuals';
-import {
-  getCurrentMarketId,
-  getShouldShowOrderLines,
-  getMarketIds,
-} from '@/state/perpetualsSelectors';
+import { getCurrentMarketId, getMarketIds } from '@/state/perpetualsSelectors';
 
 import { getDydxDatafeed } from '@/lib/tradingView/dydxfeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
@@ -30,19 +25,17 @@ import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/
  */
 export const useTradingView = ({
   tvWidgetRef,
+  displayButtonRef,
   setIsChartReady,
 }: {
   tvWidgetRef: React.MutableRefObject<any>;
+  displayButtonRef: React.MutableRefObject<any>;
   setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
 
   const appTheme = useSelector(getAppTheme);
   const appColorMode = useSelector(getAppColorMode);
-
-  const [displayOrdersButton, setDisplayOrdersButton] = useState(null);
-  const showOrderLines = useSelector(getShouldShowOrderLines);
 
   const marketId = useSelector(getCurrentMarketId);
   const marketIds = useSelector(getMarketIds, shallowEqual);
@@ -57,20 +50,6 @@ export const useTradingView = ({
 
   const savedResolution = getSavedResolution({ savedConfig: savedTvChartConfig });
   const hasMarkets = marketIds.length > 0;
-
-  useEffect(() => {
-    if (displayOrdersButton) {
-      displayOrdersButton.onclick = () => {
-        const newShowOrderLinesState = !showOrderLines;
-        if (newShowOrderLinesState) {
-          displayOrdersButton?.classList?.add('order-lines-active');
-        } else {
-          displayOrdersButton?.classList?.remove('order-lines-active');
-        }
-        dispatch(setShowOrderLines({ showOrderLines: newShowOrderLinesState }));
-      };
-    }
-  }, [displayOrdersButton, showOrderLines]);
 
   useEffect(() => {
     if (hasMarkets && isClientConnected && marketId) {
@@ -98,8 +77,8 @@ export const useTradingView = ({
               key: STRING_KEYS.ORDER_LINES,
             })}</span> <div class="displayOrdersButton-toggle"></div>`;
             button.setAttribute('title', stringGetter({ key: STRING_KEYS.ORDER_LINES_TOOLTIP }));
-            setDisplayOrdersButton(button);
-          }
+            displayButtonRef.current = button;
+\          }
         });
 
         tvWidgetRef?.current?.subscribe('onAutoSaveNeeded', () =>

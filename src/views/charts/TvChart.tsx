@@ -27,32 +27,29 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
 import { getCurrentMarketOrders } from '@/state/accountSelectors';
 import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
-import { setOrderLines, setTvChartResolution } from '@/state/perpetuals';
-import {
-  getCurrentMarketId,
-  getOrderLines,
-  getShouldShowOrderLines,
-  getSelectedResolutionForMarket,
-} from '@/state/perpetualsSelectors';
+import { setTvChartResolution } from '@/state/perpetuals';
+import { getCurrentMarketId, getSelectedResolutionForMarket } from '@/state/perpetualsSelectors';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
 type TvWidget = IChartingLibraryWidget & { _id?: string; _ready?: boolean };
+
+let orderLines: Record<string, IOrderLineAdapter> = {};
 
 export const TvChart = () => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
 
   const [isChartReady, setIsChartReady] = useState(false);
+  const [showOrderLines, setShowOrderLines] = useState(false);
+
+  const displayButtonRef = useRef<HTMLElement | null>(null);
 
   const appTheme = useSelector(getAppTheme);
   const appColorMode = useSelector(getAppColorMode);
 
   const currentMarketId: string = useSelector(getCurrentMarketId) || DEFAULT_MARKETID;
   const currentMarketOrders = useSelector(getCurrentMarketOrders, shallowEqual);
-
-  const showOrderLines = useSelector(getShouldShowOrderLines);
-  const orderLines = useSelector(getOrderLines);
 
   const selectedResolution: string =
     useSelector(getSelectedResolutionForMarket(currentMarketId)) || DEFAULT_RESOLUTION;
@@ -63,8 +60,8 @@ export const TvChart = () => {
   const chart = isWidgetReady ? tvWidget?.chart() : undefined;
   const chartResolution = chart?.resolution?.();
 
-  const { savedResolution } = useTradingView({ tvWidgetRef, setIsChartReady });
-  useTradingViewTheme({ tvWidget, isWidgetReady });
+  const { savedResolution } = useTradingView({ tvWidgetRef, displayButtonRef, setIsChartReady });
+  useTradingViewTheme({ tvWidget, isWidgetReady, orderLines });
 
   const setVisibleRangeForResolution = ({ resolution }: { resolution: ResolutionString }) => {
     // Different resolutions have different timeframes to display data efficiently.
@@ -78,6 +75,20 @@ export const TvChart = () => {
 
     tvWidget?.activeChart().setVisibleRange(newRange, { percentRightMargin: 10 });
   };
+
+  useEffect(() => {
+    if (displayButtonRef && displayButtonRef.current) {
+      displayButtonRef.current.onclick = () => {
+        const newShowOrderLinesState = !showOrderLines;
+        if (newShowOrderLinesState) {
+          displayButtonRef.current?.classList?.add('order-lines-active');
+        } else {
+          displayButtonRef.current?.classList?.remove('order-lines-active');
+        }
+        setShowOrderLines(newShowOrderLinesState);
+      };
+    }
+  }, [isChartReady, showOrderLines]);
 
   /**
    * @description Hooks to handle state of show orders button
@@ -100,7 +111,6 @@ export const TvChart = () => {
   }, [showOrderLines, currentMarketOrders, isChartReady]);
 
   const drawOrderLines = () => {
-    const updatedOrderLines: Record<string, IOrderLineAdapter> = {};
     currentMarketOrders.forEach(
       ({ id, type, status, side, cancelReason, remainingSize, size, triggerPrice, price }) => {
         const key = `${side.rawValue}-${id}`;
@@ -119,12 +129,12 @@ export const TvChart = () => {
         if (maybeOrderLine) {
           if (!shouldShow) {
             maybeOrderLine.remove();
+            delete orderLines[key];
             return;
           } else if (maybeOrderLine.getQuantity() !== quantity) {
             maybeOrderLine.setQuantity(quantity);
+            return;
           }
-          updatedOrderLines[key] = maybeOrderLine;
-          return;
         } else if (!shouldShow) {
           return;
         } else {
@@ -146,15 +156,10 @@ export const TvChart = () => {
             .setQuantityTextColor(textButtonColor);
 
           if (orderLine) {
-            updatedOrderLines[key] = orderLine;
+            orderLines[key] = orderLine;
           }
         }
       }
-    );
-    dispatch(
-      setOrderLines({
-        orderLines: updatedOrderLines,
-      })
     );
   };
 
@@ -162,7 +167,7 @@ export const TvChart = () => {
     Object.values(orderLines).forEach((line) => {
       line.remove();
     });
-    dispatch(setOrderLines({ orderLines: {} }));
+    orderLines = {};
   };
 
   useEffect(() => {

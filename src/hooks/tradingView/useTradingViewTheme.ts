@@ -1,11 +1,14 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
-import type { IChartingLibraryWidget, ThemeName } from 'public/tradingview/charting_library';
+import type {
+  IChartingLibraryWidget,
+  IOrderLineAdapter,
+  ThemeName,
+} from 'public/tradingview/charting_library';
 
 import { AppColorMode, AppTheme } from '@/state/configs';
 import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
-import { getOrderLines } from '@/state/perpetualsSelectors';
 
 import { getWidgetOverrides, getOrderLineColors } from '@/lib/tradingView/utils';
 
@@ -23,16 +26,16 @@ const isIFrame = (element: HTMLElement | null): element is HTMLIFrameElement =>
  * In order to support our Classic along with Dark/Light, we are directly accessing the <html> within the iFrame.
  */
 export const useTradingViewTheme = ({
+  orderLines,
   tvWidget,
   isWidgetReady,
 }: {
+  orderLines: Record<string, IOrderLineAdapter>;
   tvWidget: (IChartingLibraryWidget & { _id?: string; _ready?: boolean }) | null;
   isWidgetReady?: boolean;
 }) => {
   const appTheme: AppTheme = useSelector(getAppTheme);
   const appColorMode: AppColorMode = useSelector(getAppColorMode);
-
-  const orderLines = useSelector(getOrderLines);
 
   useEffect(() => {
     if (tvWidget && isWidgetReady) {

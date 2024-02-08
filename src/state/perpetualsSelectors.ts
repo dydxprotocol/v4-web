@@ -153,15 +153,3 @@ export const getCurrentMarketNextFundingRate = createSelector(
   [getCurrentMarketData],
   (marketData) => marketData?.perpetual?.nextFundingRate
 );
-
-/**
- *
- * @returns boolean on whether we should show order lines
- */
-export const getShouldShowOrderLines = (state: RootState) => state.perpetuals.showOrderLines;
-
-/**
- *
- * @returns all order lines being shown on chart
- */
-export const getOrderLines = (state: RootState) => state.perpetuals.orderLines;

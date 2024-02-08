@@ -1,8 +1,6 @@
 import merge from 'lodash/merge';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import type { IOrderLineAdapter } from 'public/tradingview/charting_library';
-
 import type {
   MarketOrderbook,
   MarketTrade,
@@ -37,8 +35,6 @@ export interface PerpetualsState {
     }
   >;
   historicalFundings: Record<string, MarketHistoricalFunding[]>;
-  showOrderLines?: boolean;
-  orderLines: Record<string, IOrderLineAdapter>;
 }
 
 const initialState: PerpetualsState = {
@@ -49,8 +45,6 @@ const initialState: PerpetualsState = {
   orderbooks: undefined,
   orderbooksMap: undefined,
   historicalFundings: {},
-  showOrderLines: false,
-  orderLines: {},
 };
 
 const MAX_NUM_LIVE_TRADES = 100;
@@ -152,20 +146,6 @@ export const perpetualsSlice = createSlice({
     ) => {
       state.historicalFundings[action.payload.marketId] = action.payload.historicalFundings;
     },
-    setShowOrderLines: (
-      state: PerpetualsState,
-      action: PayloadAction<{ showOrderLines: boolean }>
-    ) => ({
-      ...state,
-      showOrderLines: action.payload.showOrderLines,
-    }),
-    setOrderLines: (
-      state: PerpetualsState,
-      action: PayloadAction<{ orderLines: Record<string, IOrderLineAdapter> }>
-    ) => ({
-      ...state,
-      orderLines: action.payload.orderLines,
-    }),
     resetPerpetualsState: () =>
       ({
         ...initialState,
@@ -183,7 +163,5 @@ export const {
   setOrderbook,
   setTvChartResolution,
   setHistoricalFundings,
-  setShowOrderLines,
-  setOrderLines,
   resetPerpetualsState,
 } = perpetualsSlice.actions;
