@@ -92,6 +92,10 @@ export const getWalletErrorType = ({ error }: { error: Error }) => {
     return WalletErrorType.ChainMismatch;
   }
 
+  if (messageLower.includes('switch chain')) {
+    return WalletErrorType.SwitchChainFailed;
+  }
+
   // ImToken - User canceled
   if (messageLower.includes('用户取消了操作')) {
     return WalletErrorType.UserCanceled;
@@ -113,13 +117,18 @@ export const parseWalletError = ({
 }) => {
   const walletErrorType = getWalletErrorType({ error });
   let message;
+  let isErrorExpected;
 
   switch (walletErrorType) {
     case WalletErrorType.ChainMismatch:
-    case WalletErrorType.UserCanceled: {
+    case WalletErrorType.UserCanceled:
+    case WalletErrorType.SwitchChainFailed: {
+      isErrorExpected = true;
+      message = error.message;
       break;
     }
     default: {
+      isErrorExpected = false;
       message = stringGetter({
         key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
         params: {
@@ -132,5 +141,6 @@ export const parseWalletError = ({
   return {
     walletErrorType,
     message,
+    isErrorExpected,
   };
 };

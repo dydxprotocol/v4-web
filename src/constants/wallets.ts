@@ -40,6 +40,7 @@ export enum WalletErrorType {
   // General
   ChainMismatch,
   UserCanceled,
+  SwitchChainFailed,
 
   // Non-Deterministic
   NonDeterministicWallet,
