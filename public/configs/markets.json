@@ -83,6 +83,13 @@
     "whitepaperLink": "https://docs.blur.foundation/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/blur-token/"
   },
+  "BNB-USD":{
+    "name": "BNB",
+    "tags": ["Layer 1"],
+    "websiteLink": "https://www.bnbchain.org/en",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bnb/"
+
+  },
   "CELO-USD": {
     "name": "Celo",
     "tags": [],
@@ -124,6 +131,13 @@
     "websiteLink": "https://polkadot.network/",
     "whitepaperLink": "https://polkadot.network/PolkaDotPaper.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/polkadot-new/"
+  },
+  "DYM-USD": {
+    "name": "Dymension",
+    "tags": [""],
+    "websiteLink": "https://dymension.xyz/",
+    "whitepaperLink": "https://docs.dymension.xyz/",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/dymension/"
   },
   "ENJ-USD": {
     "name": "Enjin",
@@ -175,13 +189,6 @@
     "websiteLink": "https://dfinity.org",
     "whitepaperLink": "https://dfinity.org/whitepaper.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/internet-computer/"
-  },
-  "JUP-USD": {
-    "name": "Jupiter",
-    "tags": ["Defi"],
-    "websiteLink": "https://station.jup.ag/",
-    "whitepaperLink": "https://station.jup.ag/blog/green-paper",
-    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/jupiter-ag/"
   },
   "LDO-USD": {
     "name": "Lido DAO",
@@ -363,6 +370,13 @@
     "websiteLink": "https://z.cash/",
     "whitepaperLink": "https://z.cash/technology/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/zcash/"
+  },
+  "ZETA-USD": {
+    "name": "ZetaChain",
+    "tags": ["Layer 1"],
+    "websiteLink": "https://www.zetachain.com/",
+    "whitepaperLink": "https://www.zetachain.com/whitepaper.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/zetachain/"
   },
   "ZRX-USD": {
     "name": "0x",
