@@ -36,8 +36,8 @@ dependencies:
     specifier: ^1.0.20
     version: 1.0.20
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.25
-    version: 1.1.25
+    specifier: ^1.1.26
+    version: 1.1.26
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -1323,8 +1323,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.25:
-    resolution: {integrity: sha512-84BJMybnZBrRnDpnHlMUcOYT1r0ODtgcdgrjdzTw8b0sViTY6ne9ob690fcn/vQO+6sEdDsdt+08ud0H+ZvyYg==}
+  /@dydxprotocol/v4-localization@1.1.26:
+    resolution: {integrity: sha512-u+J1J5Up8McwZOcDaG9GrH/A8p4vD2NU2CT2hPdYyKgEd28XeAYvv7bNAQRKdiBaqTePbbF5uB6TMAQnEGnb1A==}
     dev: false
 
   /@dydxprotocol/v4-proto@4.0.0-dev.0:
@@ -8882,7 +8882,7 @@ packages:
     resolution: {integrity: sha512-WIdaQ8uW1vIbYvNnAVunkC6yxTrneJC7VQ5UUQ0kuw8b0C0A39KTIpoQHCfc8tV7o9vF4niwRhdXEdfAgQEsQQ==}
     dependencies:
       cosmos-directory-types: 0.0.6
-      node-fetch-native: 1.6.1
+      node-fetch-native: 1.6.2
     dev: false
 
   /cosmos-directory-types@0.0.6:
@@ -12890,6 +12890,10 @@ packages:
 
   /node-fetch-native@1.6.1:
     resolution: {integrity: sha512-bW9T/uJDPAJB2YNYEpWzE54U5O3MQidXsOyTfnbKYtTtFexRvGzb1waphBN4ZwP6EcIvYYEOwW0b72BpAqydTw==}
+    dev: false
+
+  /node-fetch-native@1.6.2:
+    resolution: {integrity: sha512-69mtXOFZ6hSkYiXAVB5SqaRvrbITC/NPyqv7yuu/qw0nmgPyYbIMYYNIDhNtwPrzk0ptrimrLz/hhjvm4w5Z+w==}
     dev: false
 
   /node-fetch@2.6.12:
