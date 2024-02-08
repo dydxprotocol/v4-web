@@ -112,20 +112,32 @@ export const TvChart = () => {
 
   const drawOrderLines = () => {
     currentMarketOrders.forEach(
-      ({ id, type, status, side, cancelReason, remainingSize, size, triggerPrice, price }) => {
+      ({
+        id,
+        type,
+        status,
+        side,
+        cancelReason,
+        remainingSize,
+        size,
+        triggerPrice,
+        price,
+        trailingPercent,
+      }) => {
         const key = `${side.rawValue}-${id}`;
-        const orderType = type.rawValue as KotlinIrEnumValues<typeof AbacusOrderType>;
         const quantity = (remainingSize ?? size).toString();
 
-        const orderString = stringGetter({
+        const orderType = type.rawValue as KotlinIrEnumValues<typeof AbacusOrderType>;
+        const orderLabel = stringGetter({
           key: ORDER_TYPE_LABEL_MAPPING[orderType] || '',
         });
+        const orderString = trailingPercent ? `${orderLabel} ${trailingPercent}%` : orderLabel;
+
         const shouldShow =
           !cancelReason &&
           (status === AbacusOrderStatus.open || status === AbacusOrderStatus.untriggered);
 
         const maybeOrderLine = key in orderLines ? orderLines[key] : null;
-
         if (maybeOrderLine) {
           if (!shouldShow) {
             maybeOrderLine.remove();
@@ -135,9 +147,7 @@ export const TvChart = () => {
             maybeOrderLine.setQuantity(quantity);
             return;
           }
-        } else if (!shouldShow) {
-          return;
-        } else {
+        } else if (shouldShow) {
           const { orderColor, borderColor, backgroundColor, textColor, textButtonColor } =
             getOrderLineColors({ side: side.rawValue, appTheme, appColorMode });
 
