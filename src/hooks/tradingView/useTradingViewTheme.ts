@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import type {
   IChartingLibraryWidget,
   IOrderLineAdapter,
+  IPositionLineAdapter,
   ThemeName,
 } from 'public/tradingview/charting_library';
 
@@ -26,11 +27,11 @@ const isIFrame = (element: HTMLElement | null): element is HTMLIFrameElement =>
  * In order to support our Classic along with Dark/Light, we are directly accessing the <html> within the iFrame.
  */
 export const useTradingViewTheme = ({
-  orderLines,
+  chartLines,
   tvWidget,
   isWidgetReady,
 }: {
-  orderLines: Record<string, IOrderLineAdapter>;
+  chartLines: Record<string, IOrderLineAdapter | IPositionLineAdapter>;
   tvWidget: (IChartingLibraryWidget & { _id?: string; _ready?: boolean }) | null;
   isWidgetReady?: boolean;
 }) => {
@@ -89,14 +90,9 @@ export const useTradingViewTheme = ({
           }
 
           // Necessary to update existing chart lines
-          Object.entries(orderLines).forEach(([key, line]) => {
-            const {
-              maybeQuantityColor,
-              borderColor,
-              backgroundColor,
-              textColor,
-              textButtonColor,
-            } = getChartLineColors({ key: key.split('-')[0], appTheme, appColorMode });
+          Object.entries(chartLines).forEach(([key, line]) => {
+            const { maybeQuantityColor, borderColor, backgroundColor, textColor, textButtonColor } =
+              getChartLineColors({ key: key.split('-')[0], appTheme, appColorMode });
 
             if (maybeQuantityColor) {
               line.setLineColor(maybeQuantityColor).setQuantityBackgroundColor(maybeQuantityColor);
