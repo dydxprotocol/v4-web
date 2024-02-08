@@ -78,7 +78,7 @@ export const useTradingView = ({
             })}</span> <div class="displayOrdersButton-toggle"></div>`;
             button.setAttribute('title', stringGetter({ key: STRING_KEYS.ORDER_LINES_TOOLTIP }));
             displayButtonRef.current = button;
-\          }
+          }
         });
 
         tvWidgetRef?.current?.subscribe('onAutoSaveNeeded', () =>
