@@ -70,15 +70,14 @@ export const useTradingView = ({
 
       tvWidgetRef.current.onChartReady(() => {
         tvWidgetRef?.current?.headerReady().then(() => {
-          const button = tvWidgetRef?.current?.createButton();
-
-          if (button) {
-            button.innerHTML = `<span>${stringGetter({
-              key: STRING_KEYS.ORDER_LINES,
-            })}</span> <div class="displayOrdersButton-toggle"></div>`;
-            button.setAttribute('title', stringGetter({ key: STRING_KEYS.ORDER_LINES_TOOLTIP }));
-            displayButtonRef.current = button;
-          }
+          displayButtonRef.current = tvWidgetRef?.current?.createButton();
+          displayButtonRef.current.innerHTML = `<span>${stringGetter({
+            key: STRING_KEYS.ORDER_LINES,
+          })}</span> <div class="displayOrdersButton-toggle"></div>`;
+          displayButtonRef.current.setAttribute(
+            'title',
+            stringGetter({ key: STRING_KEYS.ORDER_LINES_TOOLTIP })
+          );
         });
 
         tvWidgetRef?.current?.subscribe('onAutoSaveNeeded', () =>
@@ -90,6 +89,8 @@ export const useTradingView = ({
     }
 
     return () => {
+      displayButtonRef.current?.remove();
+      displayButtonRef.current = null;
       tvWidgetRef.current?.remove();
       tvWidgetRef.current = null;
       setIsChartReady(false);

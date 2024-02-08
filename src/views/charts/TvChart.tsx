@@ -76,8 +76,21 @@ export const TvChart = () => {
     tvWidget?.activeChart().setVisibleRange(newRange, { percentRightMargin: 10 });
   };
 
+  /**
+   * @description Hook to handle changing markets
+   */
   useEffect(() => {
-    if (displayButtonRef && displayButtonRef.current) {
+    if (currentMarketId && isWidgetReady) {
+      const resolution = savedResolution || selectedResolution;
+      tvWidget?.setSymbol(currentMarketId, resolution as ResolutionString, () => {});
+    }
+  }, [currentMarketId, isWidgetReady]);
+
+  /**
+   * @description Hook to handle order line toggle state
+   */
+  useEffect(() => {
+    if (isChartReady && displayButtonRef && displayButtonRef.current) {
       displayButtonRef.current.onclick = () => {
         const newShowOrderLinesState = !showOrderLines;
         if (newShowOrderLinesState) {
@@ -91,26 +104,24 @@ export const TvChart = () => {
   }, [isChartReady, showOrderLines]);
 
   /**
-   * @description Hooks to handle state of show orders button
+   * @description Hook to handle drawing order lines
    */
-
   useEffect(() => {
-    if (!tvWidgetRef || !tvWidget || !isChartReady) {
-      return;
-    }
-
-    tvWidget.onChartReady(() => {
-      tvWidget.chart().dataReady(() => {
-        if (showOrderLines) {
-          drawOrderLines();
-        } else {
-          deleteOrderLines();
-        }
+    if (tvWidget && isChartReady) {
+      tvWidget.onChartReady(() => {
+        tvWidget.chart().dataReady(() => {
+          if (showOrderLines) {
+            drawOrderLines();
+          } else {
+            deleteOrderLines();
+          }
+        });
       });
-    });
-  }, [showOrderLines, currentMarketOrders, isChartReady]);
+    }
+  }, [isChartReady, showOrderLines, currentMarketOrders, currentMarketId]);
 
   const drawOrderLines = () => {
+    if (!currentMarketOrders) return;
     currentMarketOrders.forEach(
       ({
         id,
@@ -180,6 +191,9 @@ export const TvChart = () => {
     orderLines = {};
   };
 
+  /**
+   * @description Hook to handle changing chart resolution
+   */
   useEffect(() => {
     if (chartResolution) {
       if (chartResolution !== selectedResolution) {
@@ -189,16 +203,6 @@ export const TvChart = () => {
       setVisibleRangeForResolution({ resolution: chartResolution });
     }
   }, [chartResolution]);
-
-  /**
-   * @description Hook to handle changing markets
-   */
-  useEffect(() => {
-    if (currentMarketId && isWidgetReady) {
-      const resolution = savedResolution || selectedResolution;
-      tvWidget?.setSymbol(currentMarketId, resolution as ResolutionString, () => {});
-    }
-  }, [currentMarketId, isWidgetReady]);
 
   return (
     <Styled.PriceChart isChartReady={isChartReady}>

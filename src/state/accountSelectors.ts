@@ -177,7 +177,7 @@ export const getMarketOrders = (state: RootState): { [marketId: string]: Subacco
 export const getCurrentMarketOrders = createSelector(
   [getCurrentMarketId, getMarketOrders],
   (currentMarketId, marketOrders): SubaccountOrder[] =>
-    !currentMarketId ? [] : marketOrders[currentMarketId] ?? []
+    !currentMarketId ? [] : marketOrders[currentMarketId]
 );
 
 /**
