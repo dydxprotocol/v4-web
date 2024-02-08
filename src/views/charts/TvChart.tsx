@@ -77,6 +77,19 @@ export const TvChart = () => {
   };
 
   /**
+   * @description Hook to handle changing chart resolution
+   */
+  useEffect(() => {
+    if (chartResolution) {
+      if (chartResolution !== selectedResolution) {
+        dispatch(setTvChartResolution({ marketId: currentMarketId, resolution: chartResolution }));
+      }
+
+      setVisibleRangeForResolution({ resolution: chartResolution });
+    }
+  }, [chartResolution]);
+
+  /**
    * @description Hook to handle changing markets
    */
   useEffect(() => {
@@ -190,19 +203,6 @@ export const TvChart = () => {
     });
     orderLines = {};
   };
-
-  /**
-   * @description Hook to handle changing chart resolution
-   */
-  useEffect(() => {
-    if (chartResolution) {
-      if (chartResolution !== selectedResolution) {
-        dispatch(setTvChartResolution({ marketId: currentMarketId, resolution: chartResolution }));
-      }
-
-      setVisibleRangeForResolution({ resolution: chartResolution });
-    }
-  }, [chartResolution]);
 
   return (
     <Styled.PriceChart isChartReady={isChartReady}>
