@@ -5,18 +5,21 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
+import { useStringGetter } from '@/hooks';
 
 import { StakingPanel } from './StakingPanel';
 import { StrideStakingPanel } from './StrideStakingPanel';
 import { DYDXBalancePanel } from '../rewards/DYDXBalancePanel';
+import { STRING_KEYS } from '@/constants/localization';
 
 export default () => {
+  const stringGetter = useStringGetter();
   return (
     <DetachedSection>
       <Styled.HeaderSection>
         <ContentSectionHeader
-          title="Staking Rewards"
-          subtitle="Stake to earn APR. Unstaking can take up to 30 days."
+          title={stringGetter({ key: STRING_KEYS.STAKING_REWARDS })}
+          subtitle={stringGetter({ key: STRING_KEYS.STAKING_PAGE_SUBTITLE })}
         />
       </Styled.HeaderSection>
 

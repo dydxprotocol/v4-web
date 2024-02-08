@@ -24,7 +24,7 @@ export const StrideStakingPanel = ({ className }: { className?: string }) => {
       slotHeaderContent={
         <Styled.Header>
           <Styled.Title>
-            Liquid Stake with Stride
+            {stringGetter({ key: STRING_KEYS.LIQUID_STAKE_W_STRIDE })}
             <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>
           </Styled.Title>
           <Styled.Img src="/third-party/stride.png" alt="Stride" />
@@ -33,7 +33,10 @@ export const StrideStakingPanel = ({ className }: { className?: string }) => {
       onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavStride }))}
     >
       <Styled.Description>
-        {`Stake your ${chainTokenLabel} tokens for st${chainTokenLabel} which you can deploy around the ecosystem.`}
+        {stringGetter({
+          key: STRING_KEYS.LIQUID_STAKE_STRIDE_DESCRIPTION,
+          params: { TOKEN_DENOM: chainTokenLabel },
+        })}
         <Link href={stakingLearnMore} onClick={(e) => e.stopPropagation()}>
           {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
         </Link>

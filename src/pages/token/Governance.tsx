@@ -19,7 +19,7 @@ export default () => {
       <Styled.HeaderSection>
         <ContentSectionHeader
           title={stringGetter({ key: STRING_KEYS.GOVERNANCE })}
-          subtitle="Participate in the ecosystem by voting on Governance proposals or submitting your own."
+          subtitle={stringGetter({ key: STRING_KEYS.GOVERNANCE_PAGE_SUBTITLE })}
         />
       </Styled.HeaderSection>
 

@@ -59,7 +59,7 @@ export default () => {
                           <Icon iconName={IconName.CurrencySign} />
                         </Styled.IconContainer>
                       ),
-                      label: 'Staking Rewards', // stringGetter({ key: STRING_KEYS.STAKING_REWARDS }),
+                      label: stringGetter({ key: STRING_KEYS.STAKING_REWARDS }),
                       href: TokenRoute.StakingRewards,
                       tag: stringGetter({ key: STRING_KEYS.NEW }),
                     },

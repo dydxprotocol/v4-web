@@ -10,6 +10,10 @@ import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+import { useCallback } from 'react';
+import { useDispatch } from 'react-redux';
+import { closeDialog, openDialog } from '@/state/dialogs';
+import { DialogTypes } from '@/constants/dialogs';
 
 type ElementProps = {
   setIsOpen: (open: boolean) => void;
@@ -18,8 +22,20 @@ type ElementProps = {
 export const ExternalNavKeplrDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { keplrDashboard, accountExportLearnMore } = useURLConfigs();
-
+  const dispatch = useDispatch();
   const { isTablet } = useBreakpoints();
+
+  const onExternalNavDialog = useCallback(() => {
+    dispatch(closeDialog());
+    dispatch(
+      openDialog({
+        type: DialogTypes.ExternalLink,
+        dialogProps: {
+          link: keplrDashboard,
+        },
+      })
+    );
+  }, [dispatch]);
 
   return (
     <Dialog
@@ -29,7 +45,11 @@ export const ExternalNavKeplrDialog = ({ setIsOpen }: ElementProps) => {
       placement={isTablet ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
       <Styled.Content>
-        <Styled.Button type={ButtonType.Link} size={ButtonSize.XLarge} href={keplrDashboard}>
+        <Styled.Button
+          type={ButtonType.Button}
+          size={ButtonSize.XLarge}
+          onClick={onExternalNavDialog}
+        >
           <span>
             {stringGetter({
               key: STRING_KEYS.NAVIGATE_TO_KEPLR,
@@ -46,7 +66,11 @@ export const ExternalNavKeplrDialog = ({ setIsOpen }: ElementProps) => {
           />
         </Styled.Button>
 
-        <Styled.Button type={ButtonType.Link} size={ButtonSize.XLarge} href={accountExportLearnMore}>
+        <Styled.Button
+          type={ButtonType.Link}
+          size={ButtonSize.XLarge}
+          href={accountExportLearnMore}
+        >
           <span>
             {stringGetter({
               key: STRING_KEYS.LEARN_TO_EXPORT,

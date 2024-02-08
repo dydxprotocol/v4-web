@@ -33,15 +33,22 @@ export const ExternalNavStrideDialog = ({ setIsOpen }: ElementProps) => {
         dialogProps: {
           buttonText: (
             <Styled.Span>
-              Liquid Stake on Stride <Icon iconName={IconName.LinkOut} />
+              {stringGetter({ key: STRING_KEYS.LIQUID_STAKE_ON_STRIDE })}
+              <Icon iconName={IconName.LinkOut} />
             </Styled.Span>
           ),
           link: strideZoneApp,
-          title: 'Liquid staking and leaving website',
+          title: stringGetter({ key: STRING_KEYS.LIQUID_STAKING_AND_LEAVING }),
+          slotContent: stringGetter({
+            key: STRING_KEYS.LIQUID_STAKING_AND_LEAVING_DESCRIPTION,
+            params: {
+              CTA: stringGetter({ key: STRING_KEYS.LIQUID_STAKE_ON_STRIDE }),
+            },
+          }),
         },
       })
     );
-  }, [dispatch]);
+  }, [dispatch, stringGetter]);
 
   return (
     <Dialog
@@ -57,7 +64,12 @@ export const ExternalNavStrideDialog = ({ setIsOpen }: ElementProps) => {
           onClick={openExternalNavDialog}
         >
           <span>
-            <strong>{stringGetter({ key: STRING_KEYS.YES })}</strong>, Navigate to Stride Zone.
+            {stringGetter({
+              key: STRING_KEYS.NAVIGATE_TO_STRIDE,
+              params: {
+                STRONG_YES: <strong>{stringGetter({ key: STRING_KEYS.YES })}</strong>,
+              },
+            })}
           </span>
 
           <Styled.IconButton

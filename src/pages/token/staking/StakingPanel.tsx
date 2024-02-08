@@ -23,7 +23,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
       className={className}
       slotHeaderContent={
         <Styled.Header>
-          <Styled.Title>Stake with Keplr</Styled.Title>
+          <Styled.Title>{stringGetter({ key: STRING_KEYS.STAKE_WITH_KEPLR })}</Styled.Title>
           <Styled.Img src="/third-party/keplr.png" alt={stringGetter({ key: STRING_KEYS.KEPLR })} />
         </Styled.Header>
       }

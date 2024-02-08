@@ -88,7 +88,7 @@ export const usePotentialMarketsContext = () => {
         impactNotional: 10_000,
       },
       1: {
-        label: 'Mid-cap',
+        label: stringGetter({ key: STRING_KEYS.MID_CAP }),
         initialMarginFraction: 0.1,
         maintenanceMarginFraction: 0.05,
         impactNotional: 5_000,
