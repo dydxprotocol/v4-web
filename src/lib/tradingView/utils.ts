@@ -49,23 +49,24 @@ export const getHistorySlice = ({
   return bars.filter(({ time }) => time >= fromMs);
 };
 
-export const getOrderLineColors = ({
+export const getChartLineColors = ({
   appTheme,
   appColorMode,
-  side,
+  key,
 }: {
   appTheme: AppTheme;
   appColorMode: AppColorMode;
-  side: OrderSide;
+  key: OrderSide | 'position';
 }) => {
   const theme = Themes[appTheme][appColorMode];
-  const orderColor = {
+  const orderColors = {
     [OrderSide.BUY]: theme.positive,
     [OrderSide.SELL]: theme.negative,
-  }[side];
+    ['position']: null,
+  };
 
   return {
-    orderColor,
+    maybeQuantityColor: orderColors[key],
     borderColor: theme.borderDefault,
     backgroundColor: theme.layer1,
     textColor: theme.textTertiary,

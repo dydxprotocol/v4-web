@@ -10,7 +10,7 @@ import type {
 import { AppColorMode, AppTheme } from '@/state/configs';
 import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
 
-import { getWidgetOverrides, getOrderLineColors } from '@/lib/tradingView/utils';
+import { getWidgetOverrides, getChartLineColors } from '@/lib/tradingView/utils';
 
 /**
  * @description Method to define a type guard and check that an element is an IFRAME
@@ -90,12 +90,19 @@ export const useTradingViewTheme = ({
 
           // Necessary to update existing chart lines
           Object.entries(orderLines).forEach(([key, line]) => {
-            const { orderColor, borderColor, backgroundColor, textColor, textButtonColor } =
-              getOrderLineColors({ side: key.split('-')[0], appTheme, appColorMode });
+            const {
+              maybeQuantityColor,
+              borderColor,
+              backgroundColor,
+              textColor,
+              textButtonColor,
+            } = getChartLineColors({ key: key.split('-')[0], appTheme, appColorMode });
+
+            if (maybeQuantityColor) {
+              line.setLineColor(maybeQuantityColor).setQuantityBackgroundColor(maybeQuantityColor);
+            }
 
             line
-              .setLineColor(orderColor)
-              .setQuantityBackgroundColor(orderColor)
               .setQuantityBorderColor(borderColor)
               .setBodyBackgroundColor(backgroundColor)
               .setBodyBorderColor(borderColor)

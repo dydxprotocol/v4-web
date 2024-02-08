@@ -6,11 +6,13 @@ import styled, { type AnyStyledComponent, css } from 'styled-components';
 import type {
   IChartingLibraryWidget,
   IOrderLineAdapter,
+  IPositionLineAdapter,
   ResolutionString,
 } from 'public/tradingview/charting_library';
 
 import { AbacusOrderStatus } from '@/constants/abacus';
 import { DEFAULT_RESOLUTION, RESOLUTION_CHART_CONFIGS } from '@/constants/candles';
+import { STRING_KEYS } from '@/constants/localization';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { type OrderType, ORDER_TYPE_STRINGS } from '@/constants/trade';
 
@@ -19,7 +21,7 @@ import { useTradingView, useTradingViewTheme } from '@/hooks/tradingView';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
-import { getCurrentMarketOrders } from '@/state/accountSelectors';
+import { getCurrentMarketOrders, getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
 import { setTvChartResolution } from '@/state/perpetuals';
 import { getCurrentMarketId, getSelectedResolutionForMarket } from '@/state/perpetualsSelectors';
@@ -31,7 +33,7 @@ import { getOrderLineColors } from '@/lib/tradingView/utils';
 
 type TvWidget = IChartingLibraryWidget & { _id?: string; _ready?: boolean };
 
-let orderLines: Record<string, IOrderLineAdapter> = {};
+let chartLines: Record<string, IOrderLineAdapter | IPositionLineAdapter> = {};
 
 export const TvChart = () => {
   const dispatch = useDispatch();
@@ -47,6 +49,7 @@ export const TvChart = () => {
 
   const currentMarketId: string = useSelector(getCurrentMarketId) || DEFAULT_MARKETID;
   const currentMarketOrders = useSelector(getCurrentMarketOrders, shallowEqual);
+  const currentMarketPositionData = useSelector(getCurrentMarketPositionData, shallowEqual);
 
   const selectedResolution: string =
     useSelector(getSelectedResolutionForMarket(currentMarketId)) || DEFAULT_RESOLUTION;
@@ -58,7 +61,7 @@ export const TvChart = () => {
   const chartResolution = chart?.resolution?.();
 
   const { savedResolution } = useTradingView({ tvWidgetRef, displayButtonRef, setIsChartReady });
-  useTradingViewTheme({ tvWidget, isWidgetReady, orderLines });
+  useTradingViewTheme({ tvWidget, isWidgetReady, orderLines: chartLines });
 
   const setVisibleRangeForResolution = ({ resolution }: { resolution: ResolutionString }) => {
     // Different resolutions have different timeframes to display data efficiently.
@@ -114,7 +117,7 @@ export const TvChart = () => {
   }, [isChartReady, showOrderLines]);
 
   /**
-   * @description Hook to handle drawing order lines
+   * @description Hook to handle drawing chart lines
    */
   useEffect(() => {
     if (tvWidget && isChartReady) {
@@ -122,13 +125,68 @@ export const TvChart = () => {
         tvWidget.chart().dataReady(() => {
           if (showOrderLines) {
             drawOrderLines();
+            drawPositionLine();
           } else {
-            deleteOrderLines();
+            deleteChartLines();
           }
         });
       });
     }
-  }, [isChartReady, showOrderLines, currentMarketOrders, currentMarketId]);
+  }, [
+    isChartReady,
+    showOrderLines,
+    currentMarketOrders,
+    currentMarketPositionData,
+    currentMarketId,
+  ]);
+
+  const drawPositionLine = () => {
+    if (!currentMarketPositionData) return;
+    const { current: entryPrice } = currentMarketPositionData.entryPrice;
+    const { current: quantity } = currentMarketPositionData.size;
+
+    const key = `position-${currentMarketPositionData.id}`;
+    const price = MustBigNumber(entryPrice).toNumber();
+
+    const maybePositionLine = chartLines[key];
+    const shouldShow = quantity !== 0;
+
+    if (maybePositionLine) {
+      if (!shouldShow) {
+        maybePositionLine.remove();
+        delete chartLines[key];
+        return;
+      }
+      if (maybePositionLine.getQuantity() !== quantity) {
+        maybePositionLine.setQuantity(quantity);
+      }
+      if (maybePositionLine.getPrice() !== price) {
+        maybePositionLine.setPrice(price);
+      }
+    } else if (shouldShow) {
+      const { borderColor, backgroundColor, textColor, textButtonColor } = getChartLineColors({
+        appTheme,
+        appColorMode,
+        key: 'position',
+      });
+
+      const positionLine = tvWidget
+        ?.chart()
+        .createPositionLine({ disableUndo: false })
+        .setText(stringGetter({ key: STRING_KEYS.ENTRY_PRICE_SHORT }))
+        .setPrice(price)
+        .setQuantity(quantity)
+        .setQuantityBorderColor(borderColor)
+        .setBodyBackgroundColor(backgroundColor)
+        .setBodyBorderColor(borderColor)
+        .setBodyTextColor(textColor)
+        .setQuantityTextColor(textButtonColor);
+
+      if (positionLine) {
+        chartLines[key] = positionLine;
+      }
+    }
+  };
 
   const drawOrderLines = () => {
     if (!currentMarketOrders) return;
@@ -158,28 +216,27 @@ export const TvChart = () => {
           !cancelReason &&
           (status === AbacusOrderStatus.open || status === AbacusOrderStatus.untriggered);
 
-        const maybeOrderLine = key in orderLines ? orderLines[key] : null;
+        const maybeOrderLine = key in chartLines ? chartLines[key] : null;
         if (maybeOrderLine) {
           if (!shouldShow) {
             maybeOrderLine.remove();
-            delete orderLines[key];
+            delete chartLines[key];
             return;
           } else if (maybeOrderLine.getQuantity() !== quantity) {
             maybeOrderLine.setQuantity(quantity);
             return;
           }
         } else if (shouldShow) {
-          const { orderColor, borderColor, backgroundColor, textColor, textButtonColor } =
-            getOrderLineColors({ side: side.rawValue, appTheme, appColorMode });
-
+          const { maybeQuantityColor, borderColor, backgroundColor, textColor, textButtonColor } =
+            getChartLineColors({ key: side.rawValue, appTheme, appColorMode });
           const orderLine = tvWidget
             ?.chart()
             .createOrderLine({ disableUndo: false })
             .setPrice(MustBigNumber(triggerPrice ?? price).toNumber())
             .setQuantity(quantity)
             .setText(orderString)
-            .setLineColor(orderColor)
-            .setQuantityBackgroundColor(orderColor)
+            .setLineColor(maybeQuantityColor)
+            .setQuantityBackgroundColor(maybeQuantityColor)
             .setQuantityBorderColor(borderColor)
             .setBodyBackgroundColor(backgroundColor)
             .setBodyBorderColor(borderColor)
@@ -187,18 +244,18 @@ export const TvChart = () => {
             .setQuantityTextColor(textButtonColor);
 
           if (orderLine) {
-            orderLines[key] = orderLine;
+            chartLines[key] = orderLine;
           }
         }
       }
     );
   };
 
-  const deleteOrderLines = () => {
-    Object.values(orderLines).forEach((line) => {
+  const deleteChartLines = () => {
+    Object.values(chartLines).forEach((line) => {
       line.remove();
     });
-    orderLines = {};
+    chartLines = {};
   };
 
   return (
