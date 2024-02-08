@@ -26,7 +26,7 @@ export const DetailsDialog = ({ slotIcon, title, items, slotFooter, setIsOpen }:
       placement={isTablet ? DialogPlacement.Default : DialogPlacement.Sidebar}
     >
       <Styled.Content>
-        <Styled.Details withSeparators items={items} />
+        <Styled.Details withSeparators justifyItems="end" items={items} />
 
         <Styled.Footer>{slotFooter}</Styled.Footer>
       </Styled.Content>
