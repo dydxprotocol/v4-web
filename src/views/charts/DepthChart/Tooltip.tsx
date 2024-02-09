@@ -48,12 +48,12 @@ export const DepthChartTooltipContent = ({
       const depthChartSeries = nearestDatum.key as DepthChartSeries;
 
       return {
-        [DepthChartSeries.Bids]: MustBigNumber(nearestDatum?.datum.price)
-          .minus(chartPointAtPointer.price)
-          .div(nearestDatum?.datum.price),
-        [DepthChartSeries.Asks]: MustBigNumber(chartPointAtPointer.price)
+        [DepthChartSeries.Bids]: MustBigNumber(midMarketPrice)
           .minus(nearestDatum?.datum.price)
-          .div(chartPointAtPointer.price),
+          .div(midMarketPrice),
+        [DepthChartSeries.Asks]: MustBigNumber(nearestDatum?.datum.price)
+          .minus(midMarketPrice)
+          .div(midMarketPrice),
         [DepthChartSeries.MidMarket]: undefined,
       }[depthChartSeries];
     }
