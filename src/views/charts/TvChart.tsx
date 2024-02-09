@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
-import { MustBigNumber } from '@/lib/numbers';
-import { getOrderLineColors } from '@/lib/tradingView/utils';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import type {
   IChartingLibraryWidget,
@@ -11,14 +9,10 @@ import type {
   ResolutionString,
 } from 'public/tradingview/charting_library';
 
-import {
-  AbacusOrderStatus,
-  AbacusOrderType,
-  KotlinIrEnumValues,
-  ORDER_TYPE_LABEL_MAPPING,
-} from '@/constants/abacus';
+import { AbacusOrderStatus } from '@/constants/abacus';
 import { DEFAULT_RESOLUTION, RESOLUTION_CHART_CONFIGS } from '@/constants/candles';
 import { DEFAULT_MARKETID } from '@/constants/markets';
+import { type OrderType, ORDER_TYPE_STRINGS } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks';
 import { useTradingView, useTradingViewTheme } from '@/hooks/tradingView';
@@ -31,6 +25,9 @@ import { setTvChartResolution } from '@/state/perpetuals';
 import { getCurrentMarketId, getSelectedResolutionForMarket } from '@/state/perpetualsSelectors';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+
+import { MustBigNumber } from '@/lib/numbers';
+import { getOrderLineColors } from '@/lib/tradingView/utils';
 
 type TvWidget = IChartingLibraryWidget & { _id?: string; _ready?: boolean };
 
@@ -151,9 +148,9 @@ export const TvChart = () => {
         const key = `${side.rawValue}-${id}`;
         const quantity = (remainingSize ?? size).toString();
 
-        const orderType = type.rawValue as KotlinIrEnumValues<typeof AbacusOrderType>;
+        const orderType = type.rawValue as OrderType;
         const orderLabel = stringGetter({
-          key: ORDER_TYPE_LABEL_MAPPING[orderType] || '',
+          key: ORDER_TYPE_STRINGS[orderType].orderTypeKey,
         });
         const orderString = trailingPercent ? `${orderLabel} ${trailingPercent}%` : orderLabel;
 

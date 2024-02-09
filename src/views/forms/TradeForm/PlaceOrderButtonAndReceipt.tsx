@@ -5,7 +5,7 @@ import type { TradeInputSummary } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { TRADE_TYPE_STRINGS, MobilePlaceOrderSteps } from '@/constants/trade';
+import { ORDER_TYPE_STRINGS, MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { useStringGetter, useTokenConfigs } from '@/hooks';
 
@@ -184,7 +184,7 @@ export const PlaceOrderButtonAndReceipt = ({
               ORDER: stringGetter({
                 key: isClosePosition
                   ? STRING_KEYS.CLOSE_ORDER
-                  : TRADE_TYPE_STRINGS[selectedTradeType].tradeTypeKey,
+                  : ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey,
               }),
             },
           })}

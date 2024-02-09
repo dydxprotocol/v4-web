@@ -278,47 +278,6 @@ export const ORDER_STATUS_STRINGS: Record<KotlinIrEnumValues<typeof AbacusOrderS
   [AbacusOrderStatus.untriggered.rawValue]: STRING_KEYS.UNTRIGGERED,
 };
 
-export const ORDER_TYPE_LABEL_MAPPING: Record<
-  KotlinIrEnumValues<typeof AbacusOrderType>,
-  Nullable<TradeTypes>
-> = {
-  [AbacusOrderType.limit.name]: STRING_KEYS.LIMIT_ORDER_SHORT,
-  [AbacusOrderType.limit.rawValue]: STRING_KEYS.LIMIT_ORDER_SHORT,
-
-  [AbacusOrderType.market.name]: STRING_KEYS.MARKET,
-  [AbacusOrderType.market.rawValue]: STRING_KEYS.MARKET,
-
-  [AbacusOrderType.stopLimit.name]: STRING_KEYS.STOP_LIMIT,
-  [AbacusOrderType.stopLimit.rawValue]: STRING_KEYS.STOP_LIMIT,
-
-  [AbacusOrderType.stopMarket.name]: STRING_KEYS.STOP_MARKET,
-  [AbacusOrderType.stopMarket.rawValue]: STRING_KEYS.STOP_MARKET,
-
-  [AbacusOrderType.takeProfitLimit.name]: STRING_KEYS.TAKE_PROFIT,
-  [AbacusOrderType.takeProfitLimit.rawValue]: STRING_KEYS.TAKE_PROFIT,
-
-  [AbacusOrderType.takeProfitMarket.name]: STRING_KEYS.TAKE_PROFIT_MARKET,
-  [AbacusOrderType.takeProfitMarket.rawValue]: STRING_KEYS.TAKE_PROFIT_MARKET,
-
-  [AbacusOrderType.liquidated.name]: STRING_KEYS.LIQUIDATED,
-  [AbacusOrderType.liquidated.rawValue]: STRING_KEYS.LIQUIDATED,
-
-  [AbacusOrderType.liquidation.name]: STRING_KEYS.LIQUIDATION,
-  [AbacusOrderType.liquidation.rawValue]: STRING_KEYS.LIQUIDATION,
-
-  [AbacusOrderType.trailingStop.name]: STRING_KEYS.TRAILING_STOP,
-  [AbacusOrderType.trailingStop.rawValue]: STRING_KEYS.TRAILING_STOP,
-
-  [AbacusOrderType.offsetting.name]: STRING_KEYS.OFFSETTING,
-  [AbacusOrderType.offsetting.rawValue]: STRING_KEYS.OFFSETTING,
-
-  [AbacusOrderType.deleveraged.name]: STRING_KEYS.DELEVERAGED,
-  [AbacusOrderType.deleveraged.rawValue]: STRING_KEYS.DELEVERAGED,
-
-  [AbacusOrderType.finalSettlement.name]: STRING_KEYS.FINAL_SETTLEMENT,
-  [AbacusOrderType.finalSettlement.rawValue]: STRING_KEYS.FINAL_SETTLEMENT,
-};
-
 export const TRADE_TYPES: Record<
   KotlinIrEnumValues<typeof AbacusOrderType>,
   Nullable<TradeTypes>

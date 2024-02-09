@@ -4,7 +4,7 @@ import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
 import { STRING_KEYS, StringKey } from '@/constants/localization';
-import { TradeTypes, TRADE_TYPE_STRINGS, MobilePlaceOrderSteps } from '@/constants/trade';
+import { TradeTypes, ORDER_TYPE_STRINGS, MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
