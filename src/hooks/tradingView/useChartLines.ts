@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 
-import {
-  AbacusOrderStatus,
-} from '@/constants/abacus';
+import { AbacusOrderStatus } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { type OrderType, ORDER_TYPE_STRINGS } from '@/constants/trade';
 import type { ChartLine, ChartLineType, TvWidget } from '@/constants/tvchart';
@@ -104,7 +102,7 @@ export const useChartLines = ({
         .setQuantity(quantity);
 
       if (positionLine) {
-        setLineColors({ key: 'position', line: positionLine });
+        setLineColors({ chartLineType: 'position', line: positionLine });
         chartLines[key] = positionLine;
       }
     }
@@ -158,7 +156,7 @@ export const useChartLines = ({
             .setText(orderString);
 
           if (orderLine) {
-            setLineColors({ key: side.rawValue, line: orderLine });
+            setLineColors({ chartLineType: side.rawValue, line: orderLine });
             chartLines[key] = orderLine;
           }
         }
@@ -173,7 +171,13 @@ export const useChartLines = ({
     chartLines = {};
   };
 
-  const setLineColors = ({ chartLineType, line }: { chartLineType: ChartLineType; line: ChartLine }) => {
+  const setLineColors = ({
+    chartLineType,
+    line,
+  }: {
+    chartLineType: ChartLineType;
+    line: ChartLine;
+  }) => {
     const { maybeQuantityColor, borderColor, backgroundColor, textColor, textButtonColor } =
       getChartLineColors({
         appTheme,
