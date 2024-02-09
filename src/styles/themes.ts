@@ -4,6 +4,10 @@ import { BrightnessFilterToken, ColorToken, OpacityToken } from '@/constants/sty
 import { generateFadedColorVariant } from '@/lib/styles';
 
 const ClassicThemeBase: ThemeColorBase = {
+  white: ColorToken.White,
+  green: ColorToken.Green1,
+  red: ColorToken.Red2,
+
   layer0: ColorToken.GrayBlue7,
   layer1: ColorToken.GrayBlue6,
   layer2: ColorToken.GrayBlue5,
@@ -51,7 +55,6 @@ const ClassicThemeBase: ThemeColorBase = {
 
   inputBackground: ColorToken.GrayBlue3,
   popoverBackground: generateFadedColorVariant(ColorToken.GrayBlue4, OpacityToken.Opacity90),
-  switchThumbActiveBackground: ColorToken.White,
   toggleBackground: ColorToken.GrayBlue3,
   tooltipBackground: generateFadedColorVariant(ColorToken.GrayBlue3, OpacityToken.Opacity66),
 
@@ -61,6 +64,10 @@ const ClassicThemeBase: ThemeColorBase = {
 };
 
 const DarkThemeBase: ThemeColorBase = {
+  white: ColorToken.White,
+  green: ColorToken.Green0,
+  red: ColorToken.Red0,
+
   layer0: ColorToken.Black,
   layer1: ColorToken.DarkGray11,
   layer2: ColorToken.DarkGray13,
@@ -108,7 +115,6 @@ const DarkThemeBase: ThemeColorBase = {
 
   inputBackground: ColorToken.DarkGray6,
   popoverBackground: generateFadedColorVariant(ColorToken.DarkGray8, OpacityToken.Opacity90),
-  switchThumbActiveBackground: ColorToken.White,
   toggleBackground: ColorToken.DarkGray6,
   tooltipBackground: generateFadedColorVariant(ColorToken.DarkGray6, OpacityToken.Opacity66),
 
@@ -118,6 +124,10 @@ const DarkThemeBase: ThemeColorBase = {
 };
 
 const LightThemeBase: ThemeColorBase = {
+  white: ColorToken.White,
+  green: ColorToken.Green2,
+  red: ColorToken.Red1,
+
   layer0: ColorToken.White,
   layer1: ColorToken.LightGray6,
   layer2: ColorToken.White,
@@ -165,7 +175,6 @@ const LightThemeBase: ThemeColorBase = {
 
   inputBackground: ColorToken.White,
   popoverBackground: generateFadedColorVariant(ColorToken.LightGray8, OpacityToken.Opacity90),
-  switchThumbActiveBackground: ColorToken.White,
   toggleBackground: ColorToken.LightGray4,
   tooltipBackground: generateFadedColorVariant(ColorToken.LightGray7, OpacityToken.Opacity66),
 

@@ -5,7 +5,8 @@ export type Theme = {
   [AppColorMode.RedUp]: ThemeColorBase;
 };
 
-export type ThemeColorBase = LayerColors &
+export type ThemeColorBase = BaseColors &
+  LayerColors &
   BorderColors &
   TextColors &
   GradientColors &
@@ -16,6 +17,12 @@ export type ThemeColorBase = LayerColors &
   IconColors &
   ComponentColors &
   Filters;
+
+type BaseColors = {
+  white: string;
+  green: string;
+  red: string;
+};
 
 type LayerColors = {
   layer0: string;
@@ -86,7 +93,6 @@ type IconColors = {
 type ComponentColors = {
   inputBackground: string;
   popoverBackground: string;
-  switchThumbActiveBackground: string;
   toggleBackground: string;
   tooltipBackground: string;
 };

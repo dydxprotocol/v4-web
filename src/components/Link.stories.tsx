@@ -6,7 +6,7 @@ import { Link } from '@/components/Link';
 import { StoryWrapper } from '.ladle/components';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-export const LinkStory: Story<Parameters<typeof Link>> = (args) => {
+export const LinkStory: Story<Parameters<typeof Link>[0]> = (args) => {
   return (
     <StoryWrapper>
       <Styled.Container>

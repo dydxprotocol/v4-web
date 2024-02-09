@@ -4,7 +4,7 @@ import { Icon, IconName } from '@/components/Icon';
 
 import { StoryWrapper } from '.ladle/components';
 
-export const IconStory: Story<Parameters<typeof Icon>> = (args) => {
+export const IconStory: Story<Parameters<typeof Icon>[0]> = (args) => {
   return (
     <StoryWrapper>
       <Icon {...args} />

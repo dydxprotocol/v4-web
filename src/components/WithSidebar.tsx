@@ -106,8 +106,6 @@ Styled.Container = styled.div`
   --stickyArea1-leftGap: var(--border-width);
   min-height: var(--stickyArea-height);
 
-  ${layoutMixins.withOuterAndInnerBorders}
-
   display: grid;
   grid-template: var(--withSidebar-gridTemplate);
 `;
@@ -120,6 +118,7 @@ Styled.Side = styled.aside`
   ${layoutMixins.sticky}
   max-height: var(--stickyArea-height);
   backdrop-filter: none;
+  background-color: var(--color-layer-2);
 
   ${layoutMixins.stack}
 `;

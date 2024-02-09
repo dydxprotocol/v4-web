@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { ElementType, memo } from 'react';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import type { Dispatch } from '@reduxjs/toolkit';
@@ -7,7 +7,6 @@ import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, StringGetterFunction, TOOLTIP_STRING_KEYS } from '@/constants/localization';
-import { isMainnet } from '@/constants/networks';
 import { DydxChainAsset, wallets } from '@/constants/wallets';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -41,7 +40,6 @@ import { getAppTheme } from '@/state/configsSelectors';
 import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
 import { MustBigNumber } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
@@ -108,7 +106,7 @@ export const AccountMenu = () => {
               {walletType && (
                 <Styled.SourceIcon>
                   <Styled.ConnectorIcon iconName={IconName.AddressConnector} />
-                  <Icon iconComponent={wallets[walletType].icon} />
+                  <Icon iconComponent={wallets[walletType].icon as ElementType} />
                 </Styled.SourceIcon>
               )}
               <Styled.Column>
@@ -193,7 +191,7 @@ export const AccountMenu = () => {
         },
         ...(onboardingState === OnboardingState.AccountConnected && hdKey
           ? [
-              (!isMainnet || testFlags.showMobileSignInOption) && {
+              {
                 value: 'MobileQrSignIn',
                 icon: <Icon iconName={IconName.Qr} />,
                 label: stringGetter({ key: STRING_KEYS.TITLE_SIGN_INTO_MOBILE }),
@@ -206,7 +204,7 @@ export const AccountMenu = () => {
                 highlightColor: 'destroy',
                 onSelect: () => dispatch(openDialog({ type: DialogTypes.MnemonicExport })),
               },
-            ].filter(isTruthy)
+            ]
           : []),
         {
           value: 'Disconnect',
@@ -222,7 +220,7 @@ export const AccountMenu = () => {
       {onboardingState === OnboardingState.WalletConnected ? (
         <Styled.WarningIcon iconName={IconName.Warning} />
       ) : onboardingState === OnboardingState.AccountConnected ? (
-        walletType && <Icon iconComponent={wallets[walletType].icon} />
+        walletType && <Icon iconComponent={wallets[walletType].icon as ElementType} />
       ) : null}
       {!isTablet && <Styled.Address>{truncateAddress(dydxAddress)}</Styled.Address>}
     </Styled.DropdownMenu>

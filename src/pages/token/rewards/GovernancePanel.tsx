@@ -14,14 +14,17 @@ import { Link } from '@/components/Link';
 
 import { openDialog } from '@/state/dialogs';
 
-export const StakingPanel = () => {
+export const GovernancePanel = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
-  const { stakingLearnMore } = useURLConfigs();
+  const { governanceLearnMore } = useURLConfigs();
 
   return (
     <Panel
-      slotHeaderContent={<Styled.Title>{stringGetter({ key: STRING_KEYS.STAKING })}</Styled.Title>}
+      className={className}
+      slotHeaderContent={
+        <Styled.Title>{stringGetter({ key: STRING_KEYS.GOVERNANCE })}</Styled.Title>
+      }
       slotRight={
         <Styled.Arrow>
           <Styled.IconButton
@@ -34,8 +37,8 @@ export const StakingPanel = () => {
       onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr }))}
     >
       <Styled.Description>
-        {stringGetter({ key: STRING_KEYS.STAKING_DESCRIPTION })}
-        <Link href={stakingLearnMore} onClick={(e) => e.stopPropagation()}>
+        {stringGetter({ key: STRING_KEYS.GOVERNANCE_DESCRIPTION })}
+        <Link href={governanceLearnMore} onClick={(e) => e.stopPropagation()}>
           {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
         </Link>
       </Styled.Description>

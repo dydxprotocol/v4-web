@@ -16,6 +16,7 @@ import {
 import type { ResolutionString } from 'public/tradingview/charting_library';
 
 import type { ConnectNetworkEvent, NetworkConfig } from '@/constants/abacus';
+import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { type Candle, RESOLUTION_MAP } from '@/constants/candles';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { DydxChainAsset } from '@/constants/wallets';
@@ -83,7 +84,8 @@ const useDydxClientContext = () => {
                 {
                   broadcastPollIntervalMs: 3_000,
                   broadcastTimeoutMs: 60_000,
-                }
+                },
+                DEFAULT_TRANSACTION_MEMO
               )
             )
           );

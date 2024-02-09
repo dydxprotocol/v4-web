@@ -5,8 +5,24 @@ import { HashRouter } from 'react-router-dom';
 
 import { StoryWrapper } from '.ladle/components';
 
-export const NavigationMenuStory: Story<Parameters<typeof NavigationMenu>> = (args) => {
-  const exampleItems = [
+export const NavigationMenuStory: Story<
+  Pick<Parameters<typeof NavigationMenu>[0], 'items' | 'orientation' | 'submenuPlacement'>
+> = (args) => {
+  return (
+    <StoryWrapper>
+      <HashRouter
+        children={
+          <NavigationMenu {...args}>
+            <span>Menu</span>
+          </NavigationMenu>
+        }
+      />
+    </StoryWrapper>
+  );
+};
+
+NavigationMenuStory.args = {
+  items: [
     {
       group: 'navigation',
       groupLabel: 'Views',
@@ -93,22 +109,8 @@ export const NavigationMenuStory: Story<Parameters<typeof NavigationMenu>> = (ar
         },
       ],
     },
-  ];
-
-  return (
-    <StoryWrapper>
-      <HashRouter
-        children={
-          <NavigationMenu {...args} items={exampleItems}>
-            <span>Menu</span>
-          </NavigationMenu>
-        }
-      />
-    </StoryWrapper>
-  );
+  ],
 };
-
-NavigationMenuStory.args = {};
 
 NavigationMenuStory.argTypes = {
   orientation: {

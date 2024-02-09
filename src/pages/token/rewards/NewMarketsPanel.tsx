@@ -19,21 +19,22 @@ import { Tag } from '@/components/Tag';
 import { MustBigNumber } from '@/lib/numbers';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-export const NewMarketsPanel = () => {
+export const NewMarketsPanel = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
   const { hasPotentialMarketsData } = usePotentialMarkets();
   const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
   const { newMarketProposal } = useGovernanceVariables();
+  const initialDepositAmountDecimals = isMainnet ? 0 : 11;
   const initialDepositAmountBN = MustBigNumber(newMarketProposal.initialDepositAmount).div(
     Number(`1e${chainTokenDecimals}`)
   );
-  const initialDepositAmountDecimals = isMainnet ? 0 : chainTokenDecimals;
 
   if (!hasPotentialMarketsData) return null;
 
   return (
     <Panel
+      className={className}
       slotHeaderContent={
         <Styled.Title>
           {stringGetter({ key: STRING_KEYS.ADD_A_MARKET })}

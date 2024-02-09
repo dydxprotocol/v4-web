@@ -1,0 +1,22 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "exchange.dydx.trading.debug",
+      "sha256_cert_fingerprints": [
+        "8A:9C:CC:49:B0:35:9A:91:67:CB:98:B0:B5:87:92:5F:9E:B7:EF:CE:A0:47:57:85:A4:35:3E:0C:E1:56:9E:A2"
+      ]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "exchange.dydx.trading",
+      "sha256_cert_fingerprints": [
+        "B2:2D:CC:27:9D:52:05:98:63:C9:7B:34:36:70:A3:8E:00:31:28:08:2D:2E:70:76:C9:31:AE:F9:55:21:15:A5"
+      ]
+    }
+  }
+]

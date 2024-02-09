@@ -1,3 +1,4 @@
+import type { Nullable, kollections } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { createSelector } from 'reselect';
 
@@ -9,6 +10,8 @@ import {
   AbacusOrderStatus,
   AbacusPositionSide,
   ORDER_SIDES,
+  HistoricalTradingReward,
+  HistoricalTradingRewardsPeriod,
 } from '@/constants/abacus';
 
 import { OnboardingState } from '@/constants/account';
@@ -348,6 +351,38 @@ export const getBalances = (state: RootState) => state.account?.balances;
  *  @returns user wallet staking balances
  * */
 export const getStakingBalances = (state: RootState) => state.account?.stakingBalances;
+
+/**
+ * @returns account all time trading rewards
+ */
+export const getTotalTradingRewards = (state: RootState) => state.account?.tradingRewards?.total;
+
+/**
+ * @returns account trading rewards aggregated by period
+ */
+export const getHistoricalTradingRewards = (state: RootState) =>
+  state.account?.tradingRewards?.historical;
+
+/**
+ * @returns account historical trading rewards for the specified perid
+ */
+export const getHistoricalTradingRewardsForPeriod = (period: string) =>
+  createSelector(
+    [getHistoricalTradingRewards],
+    (
+      historicalTradingRewards: Nullable<
+        kollections.Map<string, kollections.List<HistoricalTradingReward>>
+      >
+    ) => historicalTradingRewards?.get(period)
+  );
+
+/**
+ * @returns account historical trading rewards for the current week
+ */
+export const getHistoricalTradingRewardsForCurrentWeek = createSelector(
+  [getHistoricalTradingRewardsForPeriod(HistoricalTradingRewardsPeriod.WEEKLY.name)],
+  (historicalTradingRewards) => historicalTradingRewards?.firstOrNull()
+);
 
 /**
  * @returns UsageRestriction of the current session

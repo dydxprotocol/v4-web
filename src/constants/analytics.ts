@@ -173,3 +173,5 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
         validatorUrl: string;
       }
     : never;
+
+export const DEFAULT_TRANSACTION_MEMO = 'dYdX Frontend (web)';

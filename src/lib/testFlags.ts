@@ -19,12 +19,12 @@ class TestFlags {
     return !!this.queryParams.displayinitializingmarkets;
   }
 
-  get showMobileSignInOption() {
-    return !!this.queryParams.mobilesignin;
-  }
-
   get addressOverride():string {
     return this.queryParams.address;
+  }
+  
+  get showTradingRewards() {
+    return !!this.queryParams.tradingrewards;
   }
 }
 

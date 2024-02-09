@@ -7,7 +7,7 @@ import { StoryWrapper } from '.ladle/components';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { InputType } from './Input';
 
-export const SearchInputStory: Story<Parameters<typeof SearchInput>> = (args) => (
+export const SearchInputStory: Story<Parameters<typeof SearchInput>[0]> = (args) => (
   <StoryWrapper>
     <Styled.Container>
       <SearchInput placeholder="Search something..." type={InputType.Search} />

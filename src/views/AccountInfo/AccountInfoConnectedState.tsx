@@ -173,7 +173,7 @@ export const AccountInfoConnectedState = () => {
                 <WithTooltip tooltip={tooltip} stringParams={stringParams}>
                   <Styled.WithUsage>
                     {label}
-                    {hasError ? <Styled.Icon iconName={IconName.CautionCircle} /> : slotRight}
+                    {hasError ? <Styled.CautionIcon iconName={IconName.CautionCircle} /> : slotRight}
                   </Styled.WithUsage>
                 </WithTooltip>
               ),
@@ -230,7 +230,7 @@ Styled.CircleContainer = styled.div`
   border-radius: 50%;
 `;
 
-Styled.Icon = styled(Icon)`
+Styled.CautionIcon = styled(Icon)`
   color: var(--color-error);
 `;
 

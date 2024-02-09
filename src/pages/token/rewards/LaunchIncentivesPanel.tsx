@@ -28,7 +28,7 @@ import { log } from '@/lib/telemetry';
 
 const SEASON_NUMBER = 2;
 
-export const LaunchIncentivesPanel = () => {
+export const LaunchIncentivesPanel = ({ className }: { className?: string }) => {
   const { isNotTablet } = useBreakpoints();
   const dispatch = useDispatch();
 
@@ -37,11 +37,15 @@ export const LaunchIncentivesPanel = () => {
   }, []);
 
   return isNotTablet ? (
-    <Styled.Panel slotHeader={<LaunchIncentivesTitle />} slotRight={<EstimatedRewards />}>
+    <Styled.Panel
+      className={className}
+      slotHeader={<LaunchIncentivesTitle />}
+      slotRight={<EstimatedRewards />}
+    >
       <LaunchIncentivesContent />
     </Styled.Panel>
   ) : (
-    <Styled.Panel>
+    <Styled.Panel className={className}>
       <Styled.Column>
         <EstimatedRewards />
         <LaunchIncentivesTitle />
@@ -117,7 +121,7 @@ const LaunchIncentivesContent = () => {
         {stringGetter({ key: STRING_KEYS.LAUNCH_INCENTIVES_DESCRIPTION })}{' '}
       </Styled.Description>
       <Styled.ChaosLabsLogo>
-        {stringGetter({ key: STRING_KEYS.POWERED_BY })} <ChaosLabsIcon />
+        {stringGetter({ key: STRING_KEYS.POWERED_BY_ALL_CAPS })} <ChaosLabsIcon />
       </Styled.ChaosLabsLogo>
       <Styled.ButtonRow>
         <Styled.AboutButton
@@ -282,8 +286,9 @@ Styled.Image = styled.img`
 
 Styled.ChaosLabsLogo = styled.span`
   display: flex;
+  align-items: center;
   gap: 0.5em;
-  font: var(--font-mini-medium);
+  font: var(--font-tiny-medium);
 `;
 
 Styled.NewTag = styled(Tag)`

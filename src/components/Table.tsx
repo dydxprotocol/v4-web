@@ -68,7 +68,7 @@ export type TableItem<TableRowData> = {
   onSelect?: (key: TableRowData) => void;
 };
 
-type ColumnDef<TableRowData extends object> = {
+export type ColumnDef<TableRowData extends object> = {
   columnKey: string;
   label: React.ReactNode;
   tag?: React.ReactNode;
@@ -95,7 +95,10 @@ export type ElementProps<TableRowData extends object | CustomRowConfig, TableRow
   selectionBehavior?: 'replace' | 'toggle';
   onRowAction?: (key: TableRowKey, row: TableRowData) => void;
   slotEmpty?: React.ReactNode;
-  initialNumRowsToShow?: number;
+  viewMoreConfig?: {
+    initialNumRowsToShow: number;
+    numRowsPerPage?: number;
+  };
   // collection: TableCollection<string>;
   // children: React.ReactNode;
 };
@@ -125,7 +128,7 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   selectionMode = 'single',
   selectionBehavior = 'toggle',
   slotEmpty,
-  initialNumRowsToShow,
+  viewMoreConfig,
   // shouldRowRender,
 
   // collection,
@@ -141,8 +144,18 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   style,
 }: ElementProps<TableRowData, TableRowKey> & StyleProps) => {
   const [selectedKeys, setSelectedKeys] = useState(new Set<TableRowKey>());
-  const [numRowsToShow, setNumRowsToShow] = useState(initialNumRowsToShow);
-  const enableViewMore = numRowsToShow !== undefined;
+  const [numRowsToShow, setNumRowsToShow] = useState(viewMoreConfig?.initialNumRowsToShow);
+  const enableViewMore = viewMoreConfig !== undefined;
+
+  const onViewMoreClick = () => {
+    if (!viewMoreConfig) return;
+    const { numRowsPerPage } = viewMoreConfig;
+    if (numRowsPerPage) {
+      setNumRowsToShow((prev) => (prev ?? 0) + numRowsPerPage);
+    } else {
+      setNumRowsToShow(data.length);
+    }
+  };
 
   const currentBreakpoints = useBreakpoints();
   const shownColumns = columns.filter(
@@ -218,9 +231,7 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
           }
           numColumns={shownColumns.length}
           onViewMoreClick={
-            enableViewMore && numRowsToShow < data.length
-              ? () => setNumRowsToShow(data.length)
-              : undefined
+            enableViewMore && numRowsToShow! < data.length ? onViewMoreClick : undefined
           }
           // shouldRowRender={shouldRowRender}
           hideHeader={hideHeader}
@@ -513,7 +524,7 @@ const TableColumnHeader = <TableRowData extends object>({
 export const ViewMoreRow = ({ colSpan, onClick }: { colSpan: number; onClick: () => void }) => {
   const stringGetter = useStringGetter();
   return (
-    <Styled.Tr key="viewmore">
+    <Styled.ViewMoreTr key="viewmore">
       <Styled.Td
         colSpan={colSpan}
         onMouseDown={(e: MouseEvent) => e.preventDefault()}
@@ -523,7 +534,7 @@ export const ViewMoreRow = ({ colSpan, onClick }: { colSpan: number; onClick: ()
           {stringGetter({ key: STRING_KEYS.VIEW_MORE })}
         </Styled.ViewMoreButton>
       </Styled.Td>
-    </Styled.Tr>
+    </Styled.ViewMoreTr>
   );
 };
 
@@ -672,6 +683,8 @@ Styled.TableWrapper = styled.div<{
   --table-firstColumn-cell-align: start; // start | center | end | var(--table-cell-align)
   --table-lastColumn-cell-align: end; // start | center | end | var(--table-cell-align)
   --tableCell-padding: 0 1rem;
+
+  --tableViewMore-borderColor: inherit;
 
   // Rules
 
@@ -983,4 +996,8 @@ Styled.ViewMoreButton = styled(Button)`
     width: 0.675rem;
     margin-left: 0.5ch;
   }
+`;
+
+Styled.ViewMoreTr = styled(Styled.Tr)`
+  --border-color: var(--tableViewMore-borderColor);
 `;
