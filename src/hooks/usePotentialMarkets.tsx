@@ -47,6 +47,7 @@ export const PotentialMarketsProvider = ({ ...props }) => (
 
 export const usePotentialMarkets = () => useContext(PotentialMarketsContext);
 
+// TODO: Yu-Jin - Change File paths
 const EXCHANGE_CONFIG_FILE_PATH = '/configs/potentialMarketExchangeConfig.json';
 const POTENTIAL_MARKETS_FILE_PATH = '/configs/potentialMarketParameters.json';
 
