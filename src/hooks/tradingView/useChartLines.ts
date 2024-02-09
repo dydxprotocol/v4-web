@@ -11,7 +11,7 @@ import {
 } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { type OrderType, ORDER_TYPE_STRINGS } from '@/constants/trade';
-import { TvWidget } from '@/constants/tvchart';
+import { ChartLine, TvWidget } from '@/constants/tvchart';
 
 import { useStringGetter } from '@/hooks';
 
@@ -21,7 +21,6 @@ import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
 import { MustBigNumber } from '@/lib/numbers';
 import { getChartLineColors } from '@/lib/tradingView/utils';
 
-type ChartLine = IOrderLineAdapter | IPositionLineAdapter;
 let chartLines: Record<string, ChartLine> = {};
 
 /**
