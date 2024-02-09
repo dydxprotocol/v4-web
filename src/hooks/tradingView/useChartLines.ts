@@ -8,11 +8,9 @@ import type { IOrderLineAdapter, IPositionLineAdapter } from 'public/tradingview
 
 import {
   AbacusOrderStatus,
-  AbacusOrderType,
-  KotlinIrEnumValues,
-  ORDER_TYPE_LABEL_MAPPING,
 } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { type OrderType, ORDER_TYPE_STRINGS } from '@/constants/trade';
 import { TvWidget } from '@/constants/tvchart';
 
 import { useStringGetter } from '@/hooks';
@@ -138,9 +136,9 @@ export const useChartLines = ({
         const key = `${side.rawValue}-${id}`;
         const quantity = (remainingSize ?? size).toString();
 
-        const orderType = type.rawValue as KotlinIrEnumValues<typeof AbacusOrderType>;
+        const orderType = type.rawValue as OrderType;
         const orderLabel = stringGetter({
-          key: ORDER_TYPE_LABEL_MAPPING[orderType] || '',
+          key: ORDER_TYPE_STRINGS[orderType].orderTypeKey,
         });
         const orderString = trailingPercent ? `${orderLabel} ${trailingPercent}%` : orderLabel;
 
