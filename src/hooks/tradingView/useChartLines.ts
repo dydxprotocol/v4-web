@@ -116,8 +116,6 @@ export const useChartLines = ({
   };
 
   const drawOrderLines = () => {
-    console.log('Xcxc calling draw order lines');
-
     if (!currentMarketOrders) return;
 
     currentMarketOrders.forEach(
