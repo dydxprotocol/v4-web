@@ -2,7 +2,7 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { Candle, TradingViewBar, TradingViewSymbol } from '@/constants/candles';
 
-import { AppTheme, type AppColorMode } from '@/state/configs';
+import { type AppColorMode, AppTheme } from '@/state/configs';
 
 import { Themes } from '@/styles/themes';
 

@@ -1,12 +1,14 @@
 import { useEffect } from 'react';
+
 import { useSelector } from 'react-redux';
 
 import type {
-  IChartingLibraryWidget,
   IOrderLineAdapter,
   IPositionLineAdapter,
   ThemeName,
 } from 'public/tradingview/charting_library';
+
+import { TvWidget } from '@/constants/tvchart';
 
 import { AppColorMode, AppTheme } from '@/state/configs';
 import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
@@ -32,7 +34,7 @@ export const useTradingViewTheme = ({
   isWidgetReady,
 }: {
   chartLines: Record<string, IOrderLineAdapter | IPositionLineAdapter>;
-  tvWidget: (IChartingLibraryWidget & { _id?: string; _ready?: boolean }) | null;
+  tvWidget: TvWidget | null;
   isWidgetReady?: boolean;
 }) => {
   const appTheme: AppTheme = useSelector(getAppTheme);

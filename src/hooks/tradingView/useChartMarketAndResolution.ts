@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
+
 import { useDispatch, useSelector } from 'react-redux';
 
-import type { IChartingLibraryWidget, ResolutionString } from 'public/tradingview/charting_library';
+import type { ResolutionString } from 'public/tradingview/charting_library';
 
 import { DEFAULT_RESOLUTION, RESOLUTION_CHART_CONFIGS } from '@/constants/candles';
 import { DEFAULT_MARKETID } from '@/constants/markets';
+import { TvWidget } from '@/constants/tvchart';
 
 import { setTvChartResolution } from '@/state/perpetuals';
 import { getCurrentMarketId, getSelectedResolutionForMarket } from '@/state/perpetualsSelectors';
@@ -18,9 +20,9 @@ export const useChartMarketAndResolution = ({
   isWidgetReady,
   savedResolution,
 }: {
-  tvWidget: (IChartingLibraryWidget & { _id?: string; _ready?: boolean }) | null;
+  tvWidget: TvWidget | null;
   isWidgetReady?: boolean;
-  savedResolution: ResolutionString | undefined;
+  savedResolution?: ResolutionString;
 }) => {
   const dispatch = useDispatch();
 

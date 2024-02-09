@@ -1,21 +1,10 @@
 import { useEffect, useState } from 'react';
+
 import { shallowEqual, useSelector } from 'react-redux';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
-import type {
-  IChartingLibraryWidget,
-  IOrderLineAdapter,
-  IPositionLineAdapter,
-} from 'public/tradingview/charting_library';
-
-import { MustBigNumber } from '@/lib/numbers';
-import { getChartLineColors } from '@/lib/tradingView/utils';
-
-import { useStringGetter } from '@/hooks';
-
-import { getCurrentMarketOrders, getCurrentMarketPositionData } from '@/state/accountSelectors';
-import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
+import type { IOrderLineAdapter, IPositionLineAdapter } from 'public/tradingview/charting_library';
 
 import {
   AbacusOrderStatus,
@@ -24,6 +13,15 @@ import {
   ORDER_TYPE_LABEL_MAPPING,
 } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { TvWidget } from '@/constants/tvchart';
+
+import { useStringGetter } from '@/hooks';
+
+import { getCurrentMarketOrders, getCurrentMarketPositionData } from '@/state/accountSelectors';
+import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
+
+import { MustBigNumber } from '@/lib/numbers';
+import { getChartLineColors } from '@/lib/tradingView/utils';
 
 type ChartLine = IOrderLineAdapter | IPositionLineAdapter;
 let chartLines: Record<string, ChartLine> = {};
@@ -37,7 +35,7 @@ export const useChartLines = ({
   displayButton,
   isChartReady,
 }: {
-  tvWidget: (IChartingLibraryWidget & { _id?: string; _ready?: boolean }) | null;
+  tvWidget: TvWidget | null;
   displayButton: HTMLElement | null;
   isChartReady?: boolean;
 }) => {

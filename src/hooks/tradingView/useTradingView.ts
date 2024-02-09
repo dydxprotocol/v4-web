@@ -1,17 +1,19 @@
 import { useEffect } from 'react';
+
 import { shallowEqual, useSelector } from 'react-redux';
+
 import isEmpty from 'lodash/isEmpty';
 
 import { LanguageCode, ResolutionString, widget } from 'public/tradingview/charting_library';
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { SUPPORTED_LOCALE_BASE_TAGS, STRING_KEYS } from '@/constants/localization';
-
 import { LocalStorageKey } from '@/constants/localStorage';
+import { TvWidget } from '@/constants/tvchart';
 
 import { useDydxClient, useLocalStorage, useStringGetter } from '@/hooks';
-import { store } from '@/state/_store';
 
+import { store } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
@@ -28,8 +30,8 @@ export const useTradingView = ({
   displayButtonRef,
   setIsChartReady,
 }: {
-  tvWidgetRef: React.MutableRefObject<any>;
-  displayButtonRef: React.MutableRefObject<any>;
+  tvWidgetRef: React.MutableRefObject<TvWidget | null>;
+  displayButtonRef: React.MutableRefObject<HTMLElement | null>;
   setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const stringGetter = useStringGetter();
@@ -70,14 +72,16 @@ export const useTradingView = ({
 
       tvWidgetRef.current.onChartReady(() => {
         tvWidgetRef?.current?.headerReady().then(() => {
-          displayButtonRef.current = tvWidgetRef?.current?.createButton();
-          displayButtonRef.current.innerHTML = `<span>${stringGetter({
-            key: STRING_KEYS.ORDER_LINES,
-          })}</span> <div class="displayOrdersButton-toggle"></div>`;
-          displayButtonRef.current.setAttribute(
-            'title',
-            stringGetter({ key: STRING_KEYS.ORDER_LINES_TOOLTIP })
-          );
+          if (displayButtonRef) {
+            displayButtonRef.current = tvWidgetRef?.current?.createButton();
+            displayButtonRef.current.innerHTML = `<span>${stringGetter({
+              key: STRING_KEYS.ORDER_LINES,
+            })}</span> <div class="displayOrdersButton-toggle"></div>`;
+            displayButtonRef.current.setAttribute(
+              'title',
+              stringGetter({ key: STRING_KEYS.ORDER_LINES_TOOLTIP })
+            );
+          }
         });
 
         tvWidgetRef?.current?.subscribe('onAutoSaveNeeded', () =>
