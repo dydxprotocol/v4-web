@@ -6,7 +6,7 @@ import type { ResolutionString } from 'public/tradingview/charting_library';
 
 import { DEFAULT_RESOLUTION, RESOLUTION_CHART_CONFIGS } from '@/constants/candles';
 import { DEFAULT_MARKETID } from '@/constants/markets';
-import { TvWidget } from '@/constants/tvchart';
+import type { TvWidget } from '@/constants/tvchart';
 
 import { setTvChartResolution } from '@/state/perpetuals';
 import { getCurrentMarketId, getSelectedResolutionForMarket } from '@/state/perpetualsSelectors';

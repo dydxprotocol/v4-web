@@ -4,7 +4,7 @@ import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import type { ResolutionString } from 'public/tradingview/charting_library';
 
-import { TvWidget } from '@/constants/tvchart';
+import type { TvWidget } from '@/constants/tvchart';
 
 import {
   useChartLines,
@@ -31,7 +31,7 @@ export const TvChart = () => {
   useChartMarketAndResolution({
     tvWidget,
     isWidgetReady,
-    savedResolution: savedResolution as ResolutionString,
+    savedResolution: savedResolution as ResolutionString | undefined,
   });
   const { chartLines } = useChartLines({ tvWidget, displayButton, isChartReady });
   useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });

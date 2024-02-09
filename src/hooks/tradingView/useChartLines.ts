@@ -2,16 +2,12 @@ import { useEffect, useState } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 
-import { OrderSide } from '@dydxprotocol/v4-client-js';
-
-import type { IOrderLineAdapter, IPositionLineAdapter } from 'public/tradingview/charting_library';
-
 import {
   AbacusOrderStatus,
 } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { type OrderType, ORDER_TYPE_STRINGS } from '@/constants/trade';
-import { ChartLine, TvWidget } from '@/constants/tvchart';
+import type { ChartLine, ChartLineType, TvWidget } from '@/constants/tvchart';
 
 import { useStringGetter } from '@/hooks';
 
@@ -177,12 +173,12 @@ export const useChartLines = ({
     chartLines = {};
   };
 
-  const setLineColors = ({ key, line }: { key: OrderSide | 'position'; line: ChartLine }) => {
+  const setLineColors = ({ chartLineType, line }: { chartLineType: ChartLineType; line: ChartLine }) => {
     const { maybeQuantityColor, borderColor, backgroundColor, textColor, textButtonColor } =
       getChartLineColors({
         appTheme,
         appColorMode,
-        key,
+        chartLineType,
       });
 
     line

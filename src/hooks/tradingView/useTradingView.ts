@@ -9,7 +9,7 @@ import { LanguageCode, ResolutionString, widget } from 'public/tradingview/chart
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { SUPPORTED_LOCALE_BASE_TAGS, STRING_KEYS } from '@/constants/localization';
 import { LocalStorageKey } from '@/constants/localStorage';
-import { TvWidget } from '@/constants/tvchart';
+import type { TvWidget } from '@/constants/tvchart';
 
 import { useDydxClient, useLocalStorage, useStringGetter } from '@/hooks';
 

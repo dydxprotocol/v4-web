@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 
 import type { ThemeName } from 'public/tradingview/charting_library';
 
-import { ChartLine, TvWidget } from '@/constants/tvchart';
+import type { ChartLine, TvWidget } from '@/constants/tvchart';
 
 import { AppColorMode, AppTheme } from '@/state/configs';
 import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
@@ -90,7 +90,7 @@ export const useTradingViewTheme = ({
           // Necessary to update existing chart lines
           Object.entries(chartLines).forEach(([key, line]) => {
             const { maybeQuantityColor, borderColor, backgroundColor, textColor, textButtonColor } =
-              getChartLineColors({ key: key.split('-')[0], appTheme, appColorMode });
+              getChartLineColors({ chartLineType: key.split('-')[0], appTheme, appColorMode });
 
             if (maybeQuantityColor) {
               line.setLineColor(maybeQuantityColor).setQuantityBackgroundColor(maybeQuantityColor);

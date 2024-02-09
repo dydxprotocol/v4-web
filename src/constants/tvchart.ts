@@ -1,3 +1,5 @@
+import { OrderSide } from '@dydxprotocol/v4-client-js';
+
 import type {
   IChartingLibraryWidget,
   IOrderLineAdapter,
@@ -7,3 +9,5 @@ import type {
 export type TvWidget = IChartingLibraryWidget & { _id?: string; _ready?: boolean };
 
 export type ChartLine = IOrderLineAdapter | IPositionLineAdapter;
+
+export type ChartLineType = OrderSide | 'position';

@@ -1,6 +1,7 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { Candle, TradingViewBar, TradingViewSymbol } from '@/constants/candles';
+import type { ChartLineType } from '@/constants/tvchart';
 
 import { type AppColorMode, AppTheme } from '@/state/configs';
 
@@ -52,11 +53,11 @@ export const getHistorySlice = ({
 export const getChartLineColors = ({
   appTheme,
   appColorMode,
-  key,
+  chartLineType,
 }: {
   appTheme: AppTheme;
   appColorMode: AppColorMode;
-  key: OrderSide | 'position';
+  chartLineType: ChartLineType;
 }) => {
   const theme = Themes[appTheme][appColorMode];
   const orderColors = {
@@ -66,7 +67,7 @@ export const getChartLineColors = ({
   };
 
   return {
-    maybeQuantityColor: orderColors[key],
+    maybeQuantityColor: orderColors[chartLineType],
     borderColor: theme.borderDefault,
     backgroundColor: theme.layer1,
     textColor: theme.textTertiary,
