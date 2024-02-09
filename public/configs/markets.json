@@ -87,6 +87,7 @@
     "name": "BNB",
     "tags": ["Layer 1"],
     "websiteLink": "https://www.bnbchain.org/en",
+    "whitepaperLink": "https://www.exodus.com/assets/docs/binance-coin-whitepaper.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bnb/"
 
   },
@@ -134,7 +135,7 @@
   },
   "DYM-USD": {
     "name": "Dymension",
-    "tags": [""],
+    "tags": [],
     "websiteLink": "https://dymension.xyz/",
     "whitepaperLink": "https://docs.dymension.xyz/dymension-litepaper/dymension-litepaper-index",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/dymension/"
