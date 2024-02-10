@@ -222,7 +222,7 @@
   },
   {
     "baseAsset": "BONK",
-    "referencePrice": 1.0481380626265717e-05,
+    "referencePrice": 1.0481380626265717e-5,
     "numOracles": 6,
     "liquidityTier": 2,
     "assetName": "Bonk Token",
@@ -817,7 +817,7 @@
   },
   {
     "baseAsset": "PEPE",
-    "referencePrice": 9.65894964791238e-07,
+    "referencePrice": 9.65894964791238e-7,
     "numOracles": 6,
     "liquidityTier": 2,
     "assetName": "Pepe",
@@ -919,7 +919,7 @@
   },
   {
     "baseAsset": "SHIB",
-    "referencePrice": 9.204638050039261e-06,
+    "referencePrice": 9.204638050039261e-6,
     "numOracles": 8,
     "liquidityTier": 1,
     "assetName": "Shiba Inu",
