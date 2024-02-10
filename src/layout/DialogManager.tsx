@@ -11,26 +11,27 @@ import { DepositDialog } from '@/views/dialogs/DepositDialog';
 import { DisconnectDialog } from '@/views/dialogs/DisconnectDialog';
 import { DisplaySettingsDialog } from '@/views/dialogs/DisplaySettingsDialog';
 import { ExchangeOfflineDialog } from '@/views/dialogs/ExchangeOfflineDialog';
+import { ExternalNavStrideDialog } from '@/views/dialogs/ExternalNavStrideDialog';
 import { HelpDialog } from '@/views/dialogs/HelpDialog';
 import { ExternalLinkDialog } from '@/views/dialogs/ExternalLinkDialog';
 import { ExternalNavKeplrDialog } from '@/views/dialogs/ExternalNavKeplrDialog';
+import { ManageFundsDialog } from '@/views/dialogs/ManageFundsDialog';
 import { MnemonicExportDialog } from '@/views/dialogs/MnemonicExportDialog';
 import { MobileSignInDialog } from '@/views/dialogs/MobileSignInDialog';
+import { NewMarketAgreementDialog } from '@/views/dialogs/NewMarketAgreementDialog';
+import { NewMarketMessageDetailsDialog } from '@/views/dialogs/NewMarketMessageDetailsDialog';
 import { OnboardingDialog } from '@/views/dialogs/OnboardingDialog';
 import { PreferencesDialog } from '@/views/dialogs/PreferencesDialog';
 import { RateLimitDialog } from '@/views/dialogs/RateLimitDialog';
 import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
+import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
-import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
 import { WithdrawDialog } from '@/views/dialogs/WithdrawDialog';
-import { ManageFundsDialog } from '@/views/dialogs/ManageFundsDialog';
+import { WithdrawalGateDialog } from '@/views/dialogs/WithdrawalGateDialog';
 
 import { OrderDetailsDialog } from '@/views/dialogs/DetailsDialog/OrderDetailsDialog';
 import { FillDetailsDialog } from '@/views/dialogs/DetailsDialog/FillDetailsDialog';
-import { NewMarketMessageDetailsDialog } from '@/views/dialogs/NewMarketMessageDetailsDialog';
-import { NewMarketAgreementDialog } from '@/views/dialogs/NewMarketAgreementDialog';
-import { ExternalNavStrideDialog } from '@/views/dialogs/ExternalNavStrideDialog';
 
 export const DialogManager = () => {
   const dispatch = useDispatch();
@@ -72,6 +73,7 @@ export const DialogManager = () => {
     [DialogTypes.Trade]: <TradeDialog {...modalProps} />,
     [DialogTypes.Transfer]: <TransferDialog {...modalProps} />,
     [DialogTypes.Withdraw]: <WithdrawDialog {...modalProps} />,
+    [DialogTypes.WithdrawalGated]: <WithdrawalGateDialog {...modalProps} />,
     [DialogTypes.ManageFunds]: <ManageFundsDialog {...modalProps} />,
     [DialogTypes.NewMarketMessageDetails]: <NewMarketMessageDetailsDialog {...modalProps} />,
     [DialogTypes.NewMarketAgreement]: <NewMarketAgreementDialog {...modalProps} />,

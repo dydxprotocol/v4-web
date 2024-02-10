@@ -22,6 +22,7 @@ import {
   useStringGetter,
   useSubaccount,
   useTokenConfigs,
+  useWithdrawalInfo,
 } from '@/hooks';
 
 import { formMixins } from '@/styles/formMixins';
@@ -65,6 +66,7 @@ export const TransferForm = ({
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
   const { selectedNetwork } = useSelectedNetwork();
   const { tokensConfigs, usdcLabel, chainTokenLabel } = useTokenConfigs();
+  useWithdrawalInfo({ isTransfer: true });
 
   const {
     address: recipientAddress,

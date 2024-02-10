@@ -47,6 +47,7 @@ type StyleProps = {
   hasHeaderBorder?: boolean;
   children?: React.ReactNode;
   className?: string;
+  stacked?: boolean;
   withAnimation?: boolean;
 };
 
@@ -81,6 +82,7 @@ export const Dialog = ({
   slotTrigger,
   slotHeaderInner,
   slotFooter,
+  stacked,
   withClose = true,
   placement = DialogPlacement.Default,
   portalContainer,
@@ -109,27 +111,48 @@ export const Dialog = ({
               e.preventDefault();
             }
           }}
+          $stacked={stacked}
           $withAnimation={withAnimation}
         >
-          <Styled.Header $withBorder={hasHeaderBorder}>
-            <Styled.HeaderTopRow>
-              {onBack && <BackButton onClick={onBack} />}
+          {stacked ? (
+            <Styled.StackedHeaderTopRow $withBorder={hasHeaderBorder}>
+              {onBack && <Styled.BackButton onClick={onBack} />}
 
-              {slotIcon && <Styled.Icon>{slotIcon}</Styled.Icon>}
-
-              {title && <Styled.Title>{title}</Styled.Title>}
+              {slotIcon}
 
               {!preventClose && withClose && (
-                <Styled.Close ref={closeButtonRef}>
+                <Styled.Close ref={closeButtonRef} $absolute={stacked}>
                   <Icon iconName={IconName.Close} />
                 </Styled.Close>
               )}
-            </Styled.HeaderTopRow>
 
-            {description && <Styled.Description>{description}</Styled.Description>}
+              {title && <Styled.Title>{title}</Styled.Title>}
 
-            {slotHeaderInner}
-          </Styled.Header>
+              {description && <Styled.Description>{description}</Styled.Description>}
+
+              {slotHeaderInner}
+            </Styled.StackedHeaderTopRow>
+          ) : (
+            <Styled.Header $withBorder={hasHeaderBorder}>
+              <Styled.HeaderTopRow>
+                {onBack && <BackButton onClick={onBack} />}
+
+                {slotIcon && <Styled.Icon>{slotIcon}</Styled.Icon>}
+
+                {title && <Styled.Title>{title}</Styled.Title>}
+
+                {!preventClose && withClose && (
+                  <Styled.Close ref={closeButtonRef}>
+                    <Icon iconName={IconName.Close} />
+                  </Styled.Close>
+                )}
+              </Styled.HeaderTopRow>
+
+              {description && <Styled.Description>{description}</Styled.Description>}
+
+              {slotHeaderInner}
+            </Styled.Header>
+          )}
 
           <Styled.Content>{children}</Styled.Content>
 
@@ -173,7 +196,11 @@ Styled.Overlay = styled(Overlay)`
   }
 `;
 
-Styled.Container = styled(Content)<{ placement: DialogPlacement; $withAnimation?: boolean }>`
+Styled.Container = styled(Content)<{
+  placement: DialogPlacement;
+  $stacked?: boolean;
+  $withAnimation?: boolean;
+}>`
   /* Params */
   --dialog-inset: 1rem;
   --dialog-width: 30rem;
@@ -353,6 +380,13 @@ Styled.Container = styled(Content)<{ placement: DialogPlacement; $withAnimation?
         bottom: 0;
       `,
     }[placement])}
+
+  ${({ $stacked }) =>
+    $stacked &&
+    css`
+      justify-content: center;
+      text-align: center;
+    `}
 `;
 
 Styled.Header = styled.header<{ $withBorder: boolean }>`
@@ -379,9 +413,21 @@ Styled.HeaderTopRow = styled.div`
   gap: var(--dialog-title-gap);
 `;
 
-Styled.HeaderTopRow = styled.div`
-  ${layoutMixins.row}
-  gap: var(--dialog-title-gap);
+Styled.StackedHeaderTopRow = styled.div<{ $withBorder: boolean }>`
+  ${layoutMixins.flexColumn}
+  align-items: center;
+  justify-content: center;
+  padding: var(--dialog-header-paddingTop) var(--dialog-header-paddingLeft)
+    var(--dialog-header-paddingBottom) var(--dialog-header-paddingRight);
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+
+  ${({ $withBorder }) =>
+    $withBorder &&
+    css`
+      ${layoutMixins.withOuterBorder};
+      background: var(--dialog-backgroundColor);
+    `};
 `;
 
 Styled.Content = styled.div`
@@ -412,7 +458,7 @@ Styled.Icon = styled.div`
   line-height: 1;
 `;
 
-Styled.Close = styled(Close)`
+Styled.Close = styled(Close)<{ $absolute?: boolean }>`
   width: 0.7813rem;
   height: 0.7813rem;
 
@@ -438,11 +484,25 @@ Styled.Close = styled(Close)`
     color: var(--color-text-2);
   }
 
+  ${({ $absolute }) =>
+    $absolute &&
+    css`
+      position: absolute;
+      right: var(--dialog-header-paddingRight);
+      top: var(--dialog-header-paddingTop);
+    `}
+
   @media ${breakpoints.tablet} {
     width: 1rem;
     height: 1rem;
     outline: none;
   }
+`;
+
+Styled.BackButton = styled(BackButton)`
+  position: absolute;
+  left: var(--dialog-header-paddingLeft);
+  top: var(--dialog-header-paddingTop);
 `;
 
 Styled.Title = styled(Title)`

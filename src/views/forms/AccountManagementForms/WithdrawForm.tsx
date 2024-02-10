@@ -11,7 +11,12 @@ import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { ENVIRONMENT_CONFIG_MAP, isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
-import { MAX_CCTP_TRANSFER_AMOUNT, MAX_PRICE_IMPACT, NumberSign } from '@/constants/numbers';
+import {
+  MAX_CCTP_TRANSFER_AMOUNT,
+  MAX_PRICE_IMPACT,
+  NumberSign,
+  TOKEN_DECIMALS,
+} from '@/constants/numbers';
 
 import {
   useAccounts,
@@ -21,6 +26,7 @@ import {
   useSelectedNetwork,
   useStringGetter,
   useSubaccount,
+  useTokenConfigs,
   useWithdrawalInfo,
 } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
@@ -76,8 +82,8 @@ export const WithdrawForm = () => {
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 0.1% slippage
   const debouncedAmount = useDebounce<string>(withdrawAmount, 500);
-  const { usdcWithdawalCapacity, withdrawalAndTransferGatingStatus } = useWithdrawalInfo();
-  console.log({ usdcWithdawalCapacity, withdrawalAndTransferGatingStatus });
+  const { usdcLabel } = useTokenConfigs();
+  const { usdcWithdawalCapacity } = useWithdrawalInfo({ isTransfer: false });
 
   const isValidAddress = toAddress && isAddress(toAddress);
 
@@ -126,7 +132,7 @@ export const WithdrawForm = () => {
           setError(undefined);
         }
       } catch (error) {
-        setError(error.message);
+        // setError(error.message);
       } finally {
         setIsLoading(false);
       }
@@ -290,55 +296,94 @@ export const WithdrawForm = () => {
 
   const { sanctionedAddresses } = useRestrictions();
 
-  const errorMessage = useMemo(() => {
+  const { alertType, errorMessage } = useMemo(() => {
     if (error) {
-      return error;
+      return {
+        errorMessage: error,
+      };
     }
 
     if (routeErrors) {
-      return routeErrorMessage
-        ? stringGetter({
-            key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-            params: { ERROR_MESSAGE: routeErrorMessage },
-          })
-        : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG });
+      return {
+        errorMessage: routeErrorMessage
+          ? stringGetter({
+              key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+              params: { ERROR_MESSAGE: routeErrorMessage },
+            })
+          : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG }),
+      };
     }
 
-    if (!toAddress) return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ADDRESS });
+    if (!toAddress) {
+      return {
+        alertType: AlertType.Warning,
+        errorMessage: stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ADDRESS }),
+      };
+    }
 
     if (sanctionedAddresses.has(toAddress))
-      return stringGetter({
-        key: STRING_KEYS.TRANSFER_INVALID_DYDX_ADDRESS,
-      });
+      return {
+        errorMessage: stringGetter({
+          key: STRING_KEYS.TRANSFER_INVALID_DYDX_ADDRESS,
+        }),
+      };
 
     if (debouncedAmountBN) {
       if (!chainIdStr) {
-        return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_CHAIN });
+        return {
+          errorMessage: stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_CHAIN }),
+        };
       } else if (!toToken) {
-        return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ASSET });
+        return {
+          errorMessage: stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ASSET }),
+        };
       }
     }
 
-    if (MustBigNumber(debouncedAmountBN).gt(MustBigNumber(freeCollateralBN))) {
-      return stringGetter({ key: STRING_KEYS.WITHDRAW_MORE_THAN_FREE });
+    if (debouncedAmountBN.gt(MustBigNumber(freeCollateralBN))) {
+      return {
+        errorMessage: stringGetter({ key: STRING_KEYS.WITHDRAW_MORE_THAN_FREE }),
+      };
     }
 
     if (isCctp) {
-      if (MustBigNumber(debouncedAmountBN).gte(MAX_CCTP_TRANSFER_AMOUNT)) {
-        return stringGetter({
-          key: STRING_KEYS.MAX_CCTP_TRANSFER_LIMIT_EXCEEDED,
-          params: {
-            MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
-          },
-        });
+      if (debouncedAmountBN.gte(MAX_CCTP_TRANSFER_AMOUNT)) {
+        return {
+          errorMessage: stringGetter({
+            key: STRING_KEYS.MAX_CCTP_TRANSFER_LIMIT_EXCEEDED,
+            params: {
+              MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
+            },
+          }),
+        };
       }
     }
 
     if (isMainnet && MustBigNumber(summary?.aggregatePriceImpact).gte(MAX_PRICE_IMPACT)) {
-      return stringGetter({ key: STRING_KEYS.PRICE_IMPACT_TOO_HIGH });
+      return { errorMessage: stringGetter({ key: STRING_KEYS.PRICE_IMPACT_TOO_HIGH }) };
     }
 
-    return undefined;
+    // Withdrawal Safety
+    if (usdcWithdawalCapacity.gt(0) && debouncedAmountBN.gt(usdcWithdawalCapacity)) {
+      return {
+        alertType: AlertType.Warning,
+        errorMessage: stringGetter({
+          key: STRING_KEYS.WITHDRAWAL_LIMIT_OVER,
+          params: {
+            USDC_LIMIT: (
+              <span>
+                {usdcWithdawalCapacity.toFormat(TOKEN_DECIMALS)}
+                <Styled.Tag>{usdcLabel}</Styled.Tag>
+              </span>
+            ),
+          },
+        }),
+      };
+    }
+
+    return {
+      errorMessage: undefined,
+    };
   }, [
     error,
     routeErrors,
@@ -351,8 +396,7 @@ export const WithdrawForm = () => {
     sanctionedAddresses,
     stringGetter,
     summary,
-    withdrawalCapacity,
-    withdrawalTransferGateStatus,
+    usdcWithdawalCapacity,
   ]);
 
   const isDisabled =
@@ -399,7 +443,11 @@ export const WithdrawForm = () => {
           }
         />
       </Styled.WithDetailsReceipt>
-      {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
+      {errorMessage && (
+        <Styled.AlertMessage type={alertType ?? AlertType.Error}>
+          {errorMessage}
+        </Styled.AlertMessage>
+      )}
       <Styled.Footer>
         <WithdrawButtonAndReceipt
           isDisabled={isDisabled}
@@ -415,6 +463,10 @@ export const WithdrawForm = () => {
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
+
+Styled.Tag = styled(Tag)`
+  margin-left: 0.5ch;
+`;
 
 Styled.DiffOutput = styled(DiffOutput)`
   --diffOutput-valueWithDiff-fontSize: 1em;
@@ -433,6 +485,10 @@ Styled.DestinationRow = styled.div`
   ${layoutMixins.spacedRow}
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
+`;
+
+Styled.AlertMessage = styled(AlertMessage)`
+  display: inline;
 `;
 
 Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`

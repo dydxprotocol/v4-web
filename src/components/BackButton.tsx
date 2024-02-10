@@ -7,7 +7,12 @@ type ElementProps = {
   onClick?: () => void;
 };
 
+type StyleProps = {
+  className?: string;
+};
+
 export const BackButton = ({
+  className,
   onClick = () => {
     // @ts-ignore
     const navigation = globalThis.navigation;
@@ -21,8 +26,9 @@ export const BackButton = ({
       navigation.navigate('/', { replace: true });
     }
   },
-}: ElementProps) => (
+}: ElementProps & StyleProps) => (
   <IconButton
+    className={className}
     onClick={onClick}
     iconName={IconName.ChevronLeft}
     size={ButtonSize.Small}
