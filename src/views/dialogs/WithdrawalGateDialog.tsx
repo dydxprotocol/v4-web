@@ -74,12 +74,12 @@ Styled.IconContainer = styled.div`
   justify-content: center;
   align-items: center;
 
-  width: 72px;
-  height: 72px;
+  width: 4.5rem;
+  height: 4.5rem;
   border-radius: 50%;
-  min-width: 72px;
-  min-height: 72px;
-  background-color: rgba(100, 100, 0, 0.1);
+  min-width: 4.5rem;
+  min-height: 4.5rem;
+  background-color: var(--color-gradient-warning);
 `;
 
 Styled.Icon = styled(Icon)`
