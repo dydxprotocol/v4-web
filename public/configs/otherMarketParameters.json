@@ -344,7 +344,7 @@
     "referencePrice": 17.72913244361432,
     "numOracles": 6,
     "liquidityTier": 2,
-    "assetName": "Ethereum Name Service (ENS)",
+    "assetName": "Ethereum Name Service",
     "p": 1.0,
     "atomicResolution": -7.0,
     "minExchanges": 3,
