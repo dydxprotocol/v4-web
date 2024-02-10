@@ -132,7 +132,7 @@ export const WithdrawForm = () => {
           setError(undefined);
         }
       } catch (error) {
-        // setError(error.message);
+        setError(error.message);
       } finally {
         setIsLoading(false);
       }
