@@ -166,11 +166,16 @@ export const GenerateKeys = ({
       setStatus(EvmDerivedAccountStatus.Derived);
     } catch (error) {
       setStatus(EvmDerivedAccountStatus.NotDerived);
-      const { message, walletErrorType } = parseWalletError({ error, stringGetter });
+      const { message, walletErrorType, isErrorExpected } = parseWalletError({
+        error,
+        stringGetter,
+      });
 
       if (message) {
         setError(message);
-        log('GenerateKeys/deriveKeys', error, { walletErrorType });
+        if (!isErrorExpected) {
+          log('GenerateKeys/deriveKeys', error, { walletErrorType });
+        }
       }
     }
   };

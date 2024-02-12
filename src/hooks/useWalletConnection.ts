@@ -163,17 +163,20 @@ export const useWalletConnection = () => {
           }
         }
       } catch (error) {
-        throw Object.assign(
-          new Error([error.message, error.cause?.message].filter(Boolean).join('\n')),
-          {
-            walletConnectionType: walletConnection?.type,
-          }
-        );
+        const { isErrorExpected } = parseWalletError({ error, stringGetter });
+        if (!isErrorExpected) {
+          throw Object.assign(
+            new Error([error.message, error.cause?.message].filter(Boolean).join('\n')),
+            {
+              walletConnectionType: walletConnection?.type,
+            }
+          );
+        }
       }
 
       return {
         walletType,
-        walletConnectionType: walletConnection.type,
+        walletConnectionType: walletConnection?.type,
       };
     },
     [isConnectedGraz, signerGraz, isConnectedWagmi, signerWagmi]
