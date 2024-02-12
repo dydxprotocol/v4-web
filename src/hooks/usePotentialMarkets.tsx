@@ -47,8 +47,9 @@ export const PotentialMarketsProvider = ({ ...props }) => (
 
 export const usePotentialMarkets = () => useContext(PotentialMarketsContext);
 
-const EXCHANGE_CONFIG_FILE_PATH = '/configs/potentialMarketExchangeConfig.json';
-const POTENTIAL_MARKETS_FILE_PATH = '/configs/potentialMarketParameters.json';
+
+const EXCHANGE_CONFIG_FILE_PATH = '/configs/otherMarketExchangeConfig.json';
+const POTENTIAL_MARKETS_FILE_PATH = '/configs/otherMarketParameters.json';
 
 export const usePotentialMarketsContext = () => {
   const stringGetter = useStringGetter();
@@ -88,7 +89,7 @@ export const usePotentialMarketsContext = () => {
         impactNotional: 10_000,
       },
       1: {
-        label: 'Mid-cap',
+        label: stringGetter({ key: STRING_KEYS.MID_CAP }),
         initialMarginFraction: 0.1,
         maintenanceMarginFraction: 0.05,
         impactNotional: 5_000,

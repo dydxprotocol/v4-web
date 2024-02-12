@@ -1,6 +1,9 @@
+import { useCallback } from 'react';
 import styled, { type AnyStyledComponent } from 'styled-components';
+import { useDispatch } from 'react-redux';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { useBreakpoints, useStringGetter, useURLConfigs } from '@/hooks';
 
@@ -8,6 +11,8 @@ import { Button } from '@/components/Button';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
+
+import { closeDialog, openDialog } from '@/state/dialogs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -18,8 +23,20 @@ type ElementProps = {
 export const ExternalNavKeplrDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { keplrDashboard, accountExportLearnMore } = useURLConfigs();
-
+  const dispatch = useDispatch();
   const { isTablet } = useBreakpoints();
+
+  const onExternalNavDialog = useCallback(() => {
+    dispatch(closeDialog());
+    dispatch(
+      openDialog({
+        type: DialogTypes.ExternalLink,
+        dialogProps: {
+          link: keplrDashboard,
+        },
+      })
+    );
+  }, [dispatch]);
 
   return (
     <Dialog
@@ -29,7 +46,11 @@ export const ExternalNavKeplrDialog = ({ setIsOpen }: ElementProps) => {
       placement={isTablet ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
       <Styled.Content>
-        <Styled.Button type={ButtonType.Link} size={ButtonSize.XLarge} href={keplrDashboard}>
+        <Styled.Button
+          type={ButtonType.Button}
+          size={ButtonSize.XLarge}
+          onClick={onExternalNavDialog}
+        >
           <span>
             {stringGetter({
               key: STRING_KEYS.NAVIGATE_TO_KEPLR,
@@ -46,7 +67,11 @@ export const ExternalNavKeplrDialog = ({ setIsOpen }: ElementProps) => {
           />
         </Styled.Button>
 
-        <Styled.Button type={ButtonType.Link} size={ButtonSize.XLarge} href={accountExportLearnMore}>
+        <Styled.Button
+          type={ButtonType.Link}
+          size={ButtonSize.XLarge}
+          href={accountExportLearnMore}
+        >
           <span>
             {stringGetter({
               key: STRING_KEYS.LEARN_TO_EXPORT,

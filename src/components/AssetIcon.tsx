@@ -16,6 +16,7 @@ const assetIcons = {
   AVAX: '/currencies/avax.png',
   BCH: '/currencies/bch.png',
   BLUR: '/currencies/blur.png',
+  BNB: '/currencies/bnb.png',
   BONK: '/currencies/bonk.png',
   BTC: '/currencies/btc.png',
   CELO: '/currencies/celo.png',
@@ -25,6 +26,7 @@ const assetIcons = {
   DOGE: '/currencies/doge.png',
   DOT: '/currencies/dot.png',
   DYDX: '/currencies/dydx.png',
+  DYM: '/currencies/dym.png',
   ENJ: '/currencies/enj.png',
   EOS: '/currencies/eos.png',
   ETC: '/currencies/etc.png',
@@ -62,6 +64,7 @@ const assetIcons = {
   XTZ: '/currencies/xtz.png',
   YFI: '/currencies/yfi.png',
   ZEC: '/currencies/zec.png',
+  ZETA: '/currencies/zeta.png',
   ZRX: '/currencies/zrx.png',
 } as const;
 

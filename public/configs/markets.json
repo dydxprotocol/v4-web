@@ -83,6 +83,14 @@
     "whitepaperLink": "https://docs.blur.foundation/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/blur-token/"
   },
+  "BNB-USD":{
+    "name": "BNB",
+    "tags": ["Layer 1"],
+    "websiteLink": "https://www.bnbchain.org/en",
+    "whitepaperLink": "https://www.exodus.com/assets/docs/binance-coin-whitepaper.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bnb/"
+
+  },
   "CELO-USD": {
     "name": "Celo",
     "tags": [],
@@ -124,6 +132,13 @@
     "websiteLink": "https://polkadot.network/",
     "whitepaperLink": "https://polkadot.network/PolkaDotPaper.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/polkadot-new/"
+  },
+  "DYM-USD": {
+    "name": "Dymension",
+    "tags": [],
+    "websiteLink": "https://dymension.xyz/",
+    "whitepaperLink": "https://docs.dymension.xyz/dymension-litepaper/dymension-litepaper-index",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/dymension/"
   },
   "ENJ-USD": {
     "name": "Enjin",
@@ -363,6 +378,13 @@
     "websiteLink": "https://z.cash/",
     "whitepaperLink": "https://z.cash/technology/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/zcash/"
+  },
+  "ZETA-USD": {
+    "name": "ZetaChain",
+    "tags": ["Layer 1"],
+    "websiteLink": "https://www.zetachain.com/",
+    "whitepaperLink": "https://www.zetachain.com/whitepaper.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/zetachain/"
   },
   "ZRX-USD": {
     "name": "0x",

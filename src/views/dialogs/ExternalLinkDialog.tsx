@@ -15,6 +15,7 @@ type ElementProps = {
   link: string;
   linkDescription?: string;
   title?: ReactNode;
+  slotContent?: ReactNode;
   setIsOpen: (open: boolean) => void;
 };
 
@@ -24,6 +25,7 @@ export const ExternalLinkDialog = ({
   link,
   linkDescription,
   title,
+  slotContent,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   return (
@@ -36,6 +38,7 @@ export const ExternalLinkDialog = ({
       }
     >
       <Styled.Content>
+        {slotContent}
         <p>{stringGetter({ key: STRING_KEYS.LEAVING_WEBSITE_DISCLAIMER })}.</p>
         <Button type={ButtonType.Link} action={ButtonAction.Primary} href={link}>
           {buttonText ?? stringGetter({ key: STRING_KEYS.CONTINUE })}
