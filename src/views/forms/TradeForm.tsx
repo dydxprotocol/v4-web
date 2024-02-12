@@ -1,7 +1,9 @@
-import { type FormEvent, useState, Ref, useCallback, useEffect } from 'react';
+import { type FormEvent, useState, Ref, useCallback } from 'react';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import type { NumberFormatValues, SourceInfo } from 'react-number-format';
+
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { AlertType } from '@/constants/alerts';
 
@@ -16,7 +18,7 @@ import {
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
-import { InputErrorData, TradeBoxKeys, MobilePlaceOrderSteps } from '@/constants/trade';
+import { InputErrorData, TradeBoxKeys, MobilePlaceOrderSteps, ORDER_TYPE_STRINGS } from '@/constants/trade';
 
 import { breakpoints } from '@/styles';
 import { useStringGetter, useSubaccount } from '@/hooks';
@@ -37,11 +39,11 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { Orderbook } from '@/views/tables/Orderbook';
 
 import { setTradeFormInputs } from '@/state/inputs';
-import { getCurrentInput, getTradeFormInputs, useTradeFormData } from '@/state/inputsSelectors';
+import { getCurrentInput, getInputTradeData, getTradeFormInputs, useTradeFormData } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { getTradeInputAlert } from '@/lib/tradeData';
+import { getSelectedOrderSide, getSelectedTradeType, getTradeInputAlert } from '@/lib/tradeData';
 
 import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
 import { TradeSizeInputs } from './TradeForm/TradeSizeInputs';
@@ -108,8 +110,21 @@ export const TradeForm = ({
   const tradeFormInputValues = useSelector(getTradeFormInputs, shallowEqual);
   const { limitPriceInput, triggerPriceInput, trailingPercentInput } = tradeFormInputValues;
 
+  const currentTradeData = useSelector(getInputTradeData, shallowEqual);
+
+  const { side, type } = currentTradeData || {};
+
+  const selectedTradeType = getSelectedTradeType(type);
+  const selectedOrderSide = getSelectedOrderSide(side);
+
   const needsAdvancedOptions =
-    needsGoodUntil || timeInForceOptions || executionOptions || (needsPostOnly || postOnlyTooltip) || (needsReduceOnly || reduceOnlyTooltip);
+    needsGoodUntil ||
+    timeInForceOptions ||
+    executionOptions ||
+    needsPostOnly ||
+    postOnlyTooltip ||
+    needsReduceOnly ||
+    reduceOnlyTooltip;
 
   const tradeFormInputs: TradeBoxInputConfig[] = [];
 
@@ -138,6 +153,11 @@ export const TradeForm = ({
     alertContent = inputAlert?.alertString;
     alertType = inputAlert?.type;
   }
+
+  const orderSideAction = {
+    [OrderSide.BUY]: ButtonAction.Create,
+    [OrderSide.SELL]: ButtonAction.Destroy,
+  }[selectedOrderSide];
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -319,9 +339,15 @@ export const TradeForm = ({
           isLoading={isPlacingOrder}
           hasValidationErrors={hasInputErrors}
           actionStringKey={inputAlert?.actionStringKey}
+          validationErrorString={alertContent}
           summary={summary ?? undefined}
           currentStep={currentStep}
           showDeposit={inputAlert?.errorAction === TradeInputErrorAction.DEPOSIT}
+          confirmButton={{
+            stringKey: ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey,
+            buttonTextStringKey: STRING_KEYS.PLACE_ORDER,
+            buttonAction: orderSideAction
+          }}
         />
       </Styled.Footer>
     </Styled.TradeForm>

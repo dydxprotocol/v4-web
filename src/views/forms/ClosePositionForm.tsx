@@ -14,6 +14,7 @@ import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/b
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { STRING_KEYS } from '@/constants/localization';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
+
 import { useBreakpoints, useIsFirstRender, useStringGetter, useSubaccount } from '@/hooks';
 import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
 
@@ -35,7 +36,6 @@ import { Orderbook, orderbookMixins, type OrderbookScrollBehavior } from '@/view
 import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
 
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
-
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getClosePositionInputErrors, getInputClosePositionData } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
@@ -291,9 +291,14 @@ export const ClosePositionForm = ({
           isLoading={isClosingPosition}
           hasValidationErrors={hasInputErrors}
           actionStringKey={inputAlert?.actionStringKey}
+          validationErrorString={alertContent}
           summary={summary ?? undefined}
           currentStep={currentStep}
-          isClosePosition
+          confirmButton={{
+            stringKey: STRING_KEYS.CLOSE_ORDER,
+            buttonTextStringKey: STRING_KEYS.CLOSE_POSITION,
+            buttonAction: ButtonAction.Destroy,
+          }}
         />
       </Styled.Footer>
     </Styled.ClosePositionForm>
