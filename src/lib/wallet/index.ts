@@ -92,8 +92,8 @@ export const getWalletErrorType = ({ error }: { error: Error }) => {
     return WalletErrorType.ChainMismatch;
   }
 
-  if (messageLower.includes('switch chain')) {
-    return WalletErrorType.SwitchChainFailed;
+  if (messageLower.includes('Missing or invalid. request() method: wallet_switchEthereumChain')) {
+    return WalletErrorType.SwitchChainMethodMissing;
   }
 
   // ImToken - User canceled
@@ -122,7 +122,7 @@ export const parseWalletError = ({
   switch (walletErrorType) {
     case WalletErrorType.ChainMismatch:
     case WalletErrorType.UserCanceled:
-    case WalletErrorType.SwitchChainFailed: {
+    case WalletErrorType.SwitchChainMethodMissing: {
       isErrorExpected = true;
       message = error.message;
       break;
