@@ -3,7 +3,7 @@ import { useSelector, shallowEqual } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { TRADE_TYPE_STRINGS } from '@/constants/trade';
+import { ORDER_TYPE_STRINGS } from '@/constants/trade';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -43,7 +43,7 @@ export const TradeDialogTrigger = () => {
             <Styled.TradeSummary>
               <Styled.TradeType>
                 <span>
-                  {stringGetter({ key: TRADE_TYPE_STRINGS[selectedTradeType].tradeTypeKey })}
+                  {stringGetter({ key: ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey })}
                 </span>
                 <OrderSideTag size={TagSize.Medium} orderSide={selectedOrderSide} />
               </Styled.TradeType>

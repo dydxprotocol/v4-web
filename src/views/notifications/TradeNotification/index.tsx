@@ -11,7 +11,7 @@ import {
 } from '@/constants/abacus';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { TRADE_TYPE_STRINGS, TradeTypes } from '@/constants/trade';
+import { ORDER_TYPE_STRINGS, TradeTypes } from '@/constants/trade';
 import { useStringGetter } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -48,7 +48,7 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
   const { assetId } = marketData ?? {};
   const orderType = ORDER_TYPE as KotlinIrEnumValues<typeof AbacusOrderType>;
   const tradeType = TRADE_TYPES[orderType];
-  const titleKey = tradeType && TRADE_TYPE_STRINGS[tradeType]?.tradeTypeKey;
+  const titleKey = tradeType && ORDER_TYPE_STRINGS[tradeType]?.orderTypeKey;
   const orderStatus = ORDER_STATUS as KotlinIrEnumValues<typeof AbacusOrderStatus>;
 
   return (

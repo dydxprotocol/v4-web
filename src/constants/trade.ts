@@ -4,7 +4,6 @@ import { AlertType } from '@/constants/alerts';
 import { STRING_KEYS } from '@/constants/localization';
 import { TimeUnitShort } from '@/constants/time';
 
-// TODO: rename to OrderType
 export enum TradeTypes {
   MARKET = 'MARKET',
   LIMIT = 'LIMIT',
@@ -14,6 +13,16 @@ export enum TradeTypes {
   TAKE_PROFIT_MARKET = 'TAKE_PROFIT_MARKET',
   TRAILING_STOP = 'TRAILING_STOP',
 }
+
+enum ClosingTradeTypes {
+  LIQUIDATED = 'LIQUIDATED',
+  LIQUIDATION = 'LIQUIDATION',
+  OFFSETTING = 'OFFSETTING',
+  DELEVERAGED = 'DELEVERAGED',
+  FINAL_SETTLEMENT = 'FINAL_SETTLEMENT',
+}
+
+export type OrderType = TradeTypes | ClosingTradeTypes;
 
 export enum TimeInForceOptions {
   GTT = 'GTT',
@@ -40,48 +49,73 @@ export const POSITION_SIDE_STRINGS: Record<PositionSide, string> = {
   [PositionSide.Short]: STRING_KEYS.SHORT_POSITION_SHORT,
 };
 
-export const TRADE_TYPE_STRINGS: Record<
-  TradeTypes,
+export const ORDER_TYPE_STRINGS: Record<
+  OrderType,
   {
-    tradeTypeKeyShort: string;
-    tradeTypeKey: string;
-    descriptionKey: string;
+    orderTypeKeyShort: string;
+    orderTypeKey: string;
+    descriptionKey: string | null;
   }
 > = {
   [TradeTypes.LIMIT]: {
-    tradeTypeKeyShort: STRING_KEYS.LIMIT_ORDER_SHORT,
-    tradeTypeKey: STRING_KEYS.LIMIT_ORDER,
+    orderTypeKeyShort: STRING_KEYS.LIMIT_ORDER_SHORT,
+    orderTypeKey: STRING_KEYS.LIMIT_ORDER,
     descriptionKey: STRING_KEYS.LIMIT_ORDER_DESCRIPTION,
   },
   [TradeTypes.MARKET]: {
-    tradeTypeKeyShort: STRING_KEYS.MARKET_ORDER_SHORT,
-    tradeTypeKey: STRING_KEYS.MARKET_ORDER,
+    orderTypeKeyShort: STRING_KEYS.MARKET_ORDER_SHORT,
+    orderTypeKey: STRING_KEYS.MARKET_ORDER,
     descriptionKey: STRING_KEYS.MARKET_ORDER_DESCRIPTION,
   },
   [TradeTypes.STOP_LIMIT]: {
-    tradeTypeKeyShort: STRING_KEYS.STOP_LIMIT,
-    tradeTypeKey: STRING_KEYS.STOP_LIMIT,
+    orderTypeKeyShort: STRING_KEYS.STOP_LIMIT,
+    orderTypeKey: STRING_KEYS.STOP_LIMIT,
     descriptionKey: STRING_KEYS.STOP_LIMIT_DESCRIPTION,
   },
   [TradeTypes.STOP_MARKET]: {
-    tradeTypeKeyShort: STRING_KEYS.STOP_MARKET,
-    tradeTypeKey: STRING_KEYS.STOP_MARKET,
+    orderTypeKeyShort: STRING_KEYS.STOP_MARKET,
+    orderTypeKey: STRING_KEYS.STOP_MARKET,
     descriptionKey: STRING_KEYS.STOP_MARKET_DESCRIPTION,
   },
   [TradeTypes.TAKE_PROFIT]: {
-    tradeTypeKeyShort: STRING_KEYS.TAKE_PROFIT_LIMIT,
-    tradeTypeKey: STRING_KEYS.TAKE_PROFIT_LIMIT,
+    orderTypeKeyShort: STRING_KEYS.TAKE_PROFIT_LIMIT,
+    orderTypeKey: STRING_KEYS.TAKE_PROFIT_LIMIT,
     descriptionKey: STRING_KEYS.TAKE_PROFIT_LIMIT_DESCRIPTION,
   },
   [TradeTypes.TAKE_PROFIT_MARKET]: {
-    tradeTypeKeyShort: STRING_KEYS.TAKE_PROFIT_MARKET,
-    tradeTypeKey: STRING_KEYS.TAKE_PROFIT_MARKET,
+    orderTypeKeyShort: STRING_KEYS.TAKE_PROFIT_MARKET,
+    orderTypeKey: STRING_KEYS.TAKE_PROFIT_MARKET,
     descriptionKey: STRING_KEYS.TAKE_PROFIT_MARKET_DESCRIPTION,
   },
   [TradeTypes.TRAILING_STOP]: {
-    tradeTypeKeyShort: STRING_KEYS.TRAILING_STOP,
-    tradeTypeKey: STRING_KEYS.TRAILING_STOP,
+    orderTypeKeyShort: STRING_KEYS.TRAILING_STOP,
+    orderTypeKey: STRING_KEYS.TRAILING_STOP,
     descriptionKey: STRING_KEYS.TRAILING_STOP_DESCRIPTION,
+  },
+  [ClosingTradeTypes.LIQUIDATED]: {
+    orderTypeKeyShort: STRING_KEYS.LIQUIDATED,
+    orderTypeKey: STRING_KEYS.LIQUIDATED,
+    descriptionKey: null,
+  },
+  [ClosingTradeTypes.LIQUIDATION]: {
+    orderTypeKeyShort: STRING_KEYS.LIQUIDATION,
+    orderTypeKey: STRING_KEYS.LIQUIDATION,
+    descriptionKey: null,
+  },
+  [ClosingTradeTypes.OFFSETTING]: {
+    orderTypeKeyShort: STRING_KEYS.OFFSETTING,
+    orderTypeKey: STRING_KEYS.OFFSETTING,
+    descriptionKey: null,
+  },
+  [ClosingTradeTypes.DELEVERAGED]: {
+    orderTypeKeyShort: STRING_KEYS.DELEVERAGED,
+    orderTypeKey: STRING_KEYS.DELEVERAGED,
+    descriptionKey: null,
+  },
+  [ClosingTradeTypes.FINAL_SETTLEMENT]: {
+    orderTypeKeyShort: STRING_KEYS.FINAL_SETTLEMENT,
+    orderTypeKey: STRING_KEYS.FINAL_SETTLEMENT,
+    descriptionKey: null,
   },
 };
 
