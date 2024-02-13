@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 overrides:
   follow-redirects: 1.15.3
 
@@ -32,8 +36,8 @@ dependencies:
     specifier: ^1.0.20
     version: 1.0.20
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.29
-    version: 1.1.29
+    specifier: ^1.1.30
+    version: 1.1.30
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -1319,8 +1323,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.29:
-    resolution: {integrity: sha512-o9lxsYl5ObqO9OUyxiKuUxoBmYZk0qGDeNxGScY8uMRq4Ahhz3BPxAC7jUYypCNAMpieiQjVGxMnnhIbwEkm2w==}
+  /@dydxprotocol/v4-localization@1.1.30:
+    resolution: {integrity: sha512-TZfWWRSOxcjLHs972wlJVVHkE7+DVqAUnGZSs24HYHsPtUkPhZiNXMOA2Vk9YddQxumhM79xIRH0cmJSe5DDUg==}
     dev: false
 
   /@dydxprotocol/v4-proto@4.0.0-dev.0:
@@ -16049,7 +16053,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
