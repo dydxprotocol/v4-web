@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
-import { shallowEqual, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { DEFAULT_DOCUMENT_TITLE } from '@/constants/routes';
 
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import {
-  getCurrentMarketData,
   getCurrentMarketId,
-  getCurrentMarketOrderbook,
+  getCurrentMarketMidMarketPrice,
+  getCurrentMarketOraclePrice,
 } from '@/state/perpetualsSelectors';
 
 import { useBreakpoints } from './useBreakpoints';
@@ -16,8 +16,8 @@ export const usePageTitlePriceUpdates = () => {
   const selectedLocale = useSelector(getSelectedLocale);
   const { isNotTablet } = useBreakpoints();
   const id = useSelector(getCurrentMarketId);
-  const oraclePrice = useSelector(getCurrentMarketData, shallowEqual)?.oraclePrice;
-  const orderbookMidMarketPrice = useSelector(getCurrentMarketOrderbook, shallowEqual)?.midPrice;
+  const oraclePrice = useSelector(getCurrentMarketOraclePrice);
+  const orderbookMidMarketPrice = useSelector(getCurrentMarketMidMarketPrice);
 
   const price = orderbookMidMarketPrice ?? oraclePrice;
 
