@@ -10,7 +10,7 @@ import { TransferInputField, TransferInputTokenResource, TransferType } from '@/
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP, isMainnet } from '@/constants/networks';
+import { isMainnet } from '@/constants/networks';
 import { MAX_CCTP_TRANSFER_AMOUNT, MAX_PRICE_IMPACT, NumberSign } from '@/constants/numbers';
 import type { EvmAddress } from '@/constants/wallets';
 
@@ -56,7 +56,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [requireUserActionInWallet, setRequireUserActionInWallet] = useState(false);
-  const { selectedNetwork } = useSelectedNetwork();
+  const { selectedDydxChainId } = useSelectedNetwork();
 
   const { evmAddress, signerWagmi, publicClientWagmi, nobleAddress } = useAccounts();
 
@@ -262,9 +262,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         if (txHash) {
           addTransferNotification({
             txHash: txHash,
-            toChainId: !isCctp
-              ? ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId
-              : getNobleChainId(),
+            toChainId: !isCctp ? selectedDydxChainId : getNobleChainId(),
             fromChainId: chainIdStr || undefined,
             toAmount: summary?.usdcSize || undefined,
             triggeredAt: Date.now(),

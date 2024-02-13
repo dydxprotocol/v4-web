@@ -9,7 +9,6 @@ import { TransferInputField, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { NumberSign } from '@/constants/numbers';
 import { DydxChainAsset } from '@/constants/wallets';
 
@@ -63,7 +62,7 @@ export const TransferForm = ({
   const { dydxAddress } = useAccounts();
   const { transfer } = useSubaccount();
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
-  const { selectedNetwork } = useSelectedNetwork();
+  const { selectedDydxChainId } = useSelectedNetwork();
   const { tokensConfigs, usdcLabel, chainTokenLabel } = useTokenConfigs();
 
   const {
@@ -239,7 +238,7 @@ export const TransferForm = ({
 
   const networkOptions = [
     {
-      chainId: ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId,
+      chainId: selectedDydxChainId,
       label: (
         <Styled.InlineRow>
           <AssetIcon symbol="DYDX" /> {stringGetter({ key: STRING_KEYS.DYDX_CHAIN })}
@@ -322,7 +321,7 @@ export const TransferForm = ({
         />
         <Styled.NetworkSelectMenu
           label={stringGetter({ key: STRING_KEYS.NETWORK })}
-          value={ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId}
+          value={selectedDydxChainId}
           slotTriggerAfter={null}
         >
           {networkOptions.map(({ chainId, label }) => (

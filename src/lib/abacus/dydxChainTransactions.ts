@@ -34,7 +34,13 @@ import {
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
-import { ENVIRONMENT_CONFIG_MAP, DydxNetwork, isTestnet } from '@/constants/networks';
+import {
+  ENVIRONMENT_CONFIG_MAP,
+  DydxNetwork,
+  isTestnet,
+  LINKS_CONFIG_MAP,
+  DydxChainId,
+} from '@/constants/networks';
 
 import { RootStore } from '@/state/_store';
 import { addUncommittedOrderClientId, removeUncommittedOrderClientId } from '@/state/account';
@@ -238,9 +244,10 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
       if (isTestnet) {
         console.log(
-          `${ENVIRONMENT_CONFIG_MAP[
-            this.compositeClient.network.getString() as DydxNetwork
-          ]?.links?.mintscan?.replace('{tx_hash}', hash.toString())}`
+          `${LINKS_CONFIG_MAP[
+            ENVIRONMENT_CONFIG_MAP[this.compositeClient.network.getString() as DydxNetwork]
+              .dydxChainId as DydxChainId
+          ]?.mintscan?.replace('{tx_hash}', hash.toString())}`
         );
       } else console.log(`txHash: ${hash}`);
 

@@ -18,10 +18,10 @@ import type { ResolutionString } from 'public/tradingview/charting_library';
 import type { ConnectNetworkEvent, NetworkConfig } from '@/constants/abacus';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { type Candle, RESOLUTION_MAP } from '@/constants/candles';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { ENVIRONMENT_CONFIG_MAP, TOKEN_CONFIG_MAP } from '@/constants/networks';
 import { DydxChainAsset } from '@/constants/wallets';
 
-import { getSelectedNetwork } from '@/state/appSelectors';
+import { getSelectedDydxChainId, getSelectedNetwork } from '@/state/appSelectors';
 
 import { log } from '@/lib/telemetry';
 
@@ -41,7 +41,8 @@ const useDydxClientContext = () => {
   // ------ Network ------ //
 
   const selectedNetwork = useSelector(getSelectedNetwork);
-  const tokensConfigs = ENVIRONMENT_CONFIG_MAP[selectedNetwork].tokens;
+  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
+  const tokensConfigs = TOKEN_CONFIG_MAP[selectedDydxChainId];
 
   const [networkConfig, setNetworkConfig] = useState<NetworkConfig>();
 

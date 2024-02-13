@@ -175,7 +175,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const { transferNotifications } = useLocalNotifications();
-      const { selectedNetwork } = useSelectedNetwork();
+      const { selectedDydxChainId } = useSelectedNetwork();
 
       useEffect(() => {
         for (const transfer of transferNotifications) {
@@ -184,7 +184,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           const icon = <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />;
 
           const transferType =
-            type ?? fromChainId === ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId
+            type ?? fromChainId === selectedDydxChainId
               ? TransferNotificationTypes.Withdrawal
               : TransferNotificationTypes.Deposit;
 

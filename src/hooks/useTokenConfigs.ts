@@ -1,4 +1,4 @@
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { TOKEN_CONFIG_MAP } from '@/constants/networks';
 import { DydxChainAsset } from '@/constants/wallets';
 
 import { useSelectedNetwork } from '@/hooks';
@@ -25,8 +25,8 @@ export const useTokenConfigs = (): {
   chainTokenDecimals: number;
   chainTokenLabel: string;
 } => {
-  const { selectedNetwork } = useSelectedNetwork();
-  const tokensConfigs = ENVIRONMENT_CONFIG_MAP[selectedNetwork].tokens;
+  const { selectedDydxChainId } = useSelectedNetwork();
+  const tokensConfigs = TOKEN_CONFIG_MAP[selectedDydxChainId];
 
   return { 
     tokensConfigs,

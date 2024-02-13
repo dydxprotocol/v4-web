@@ -11,7 +11,6 @@ import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
 
 type ElementProps = {
@@ -32,9 +31,8 @@ enum TransferStatusStep {
 
 export const TransferStatusSteps = ({ className, status, type }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const { selectedNetwork } = useSelectedNetwork();
+  const { selectedDydxChainId } = useSelectedNetwork();
   const { mintscan: mintscanTxUrl } = useURLConfigs();
-  const dydxChainId = ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId;
 
   const { currentStep, steps } = useMemo(() => {
     const routeStatus = status?.routeStatus;
@@ -55,7 +53,7 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
         link:
           type === TransferNotificationTypes.Deposit
             ? status?.fromChain?.transactionUrl
-            : routeStatus?.[0]?.chainId === dydxChainId && routeStatus[0].txHash
+            : routeStatus?.[0]?.chainId === selectedDydxChainId && routeStatus[0].txHash
             ? `${mintscanTxUrl?.replace('{tx_hash}', routeStatus[0].txHash.replace('0x', ''))}`
             : undefined,
       },
@@ -81,7 +79,7 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
         link:
           type === TransferNotificationTypes.Withdrawal
             ? status?.toChain?.transactionUrl
-            : currentStatus?.chainId === dydxChainId && currentStatus?.txHash
+            : currentStatus?.chainId === selectedDydxChainId && currentStatus?.txHash
             ? `${mintscanTxUrl?.replace('{tx_hash}', currentStatus.txHash.replace('0x', ''))}`
             : undefined,
       },

@@ -1,4 +1,4 @@
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { GOVERNANCE_CONFIG_MAP } from '@/constants/networks';
 import { useSelectedNetwork } from '@/hooks';
 
 export interface GovernanceVariables {
@@ -10,7 +10,7 @@ export interface GovernanceVariables {
 }
 
 export const useGovernanceVariables = (): GovernanceVariables => {
-  const { selectedNetwork } = useSelectedNetwork();
-  const governanceVars = ENVIRONMENT_CONFIG_MAP[selectedNetwork].governance as GovernanceVariables;
+  const { selectedDydxChainId } = useSelectedNetwork();
+  const governanceVars = GOVERNANCE_CONFIG_MAP[selectedDydxChainId] as GovernanceVariables;
   return governanceVars;
 };

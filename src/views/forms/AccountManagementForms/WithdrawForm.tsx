@@ -9,7 +9,7 @@ import { TransferInputField, TransferInputTokenResource, TransferType } from '@/
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP, isMainnet } from '@/constants/networks';
+import { isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
 import { MAX_CCTP_TRANSFER_AMOUNT, MAX_PRICE_IMPACT, NumberSign } from '@/constants/numbers';
 
@@ -54,7 +54,7 @@ export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
   const [error, setError] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
-  const { selectedNetwork } = useSelectedNetwork();
+  const { selectedDydxChainId } = useSelectedNetwork();
 
   const { sendSquidWithdraw } = useSubaccount();
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
@@ -177,9 +177,7 @@ export const WithdrawForm = () => {
             addTransferNotification({
               txHash: txHash,
               type: TransferNotificationTypes.Withdrawal,
-              fromChainId: !isCctp
-                ? ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId
-                : getNobleChainId(),
+              fromChainId: !isCctp ? selectedDydxChainId : getNobleChainId(),
               toChainId: chainIdStr || undefined,
               toAmount: debouncedAmountBN.toNumber(),
               triggeredAt: Date.now(),

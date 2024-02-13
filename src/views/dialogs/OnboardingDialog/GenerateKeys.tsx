@@ -25,7 +25,7 @@ import { Switch } from '@/components/Switch';
 import { WithReceipt } from '@/components/WithReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { getSelectedNetwork } from '@/state/appSelectors';
+import { getSelectedNetwork, getSelectedDydxChainId } from '@/state/appSelectors';
 
 import { track } from '@/lib/analytics';
 import { isTruthy } from '@/lib/isTruthy';
@@ -98,7 +98,8 @@ export const GenerateKeys = ({
     EvmDerivedAccountStatus.Derived,
   ].includes(status);
 
-  const signTypedData = getSignTypedData(selectedNetwork);
+  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
+  const signTypedData = getSignTypedData(selectedDydxChainId);
   const { signTypedDataAsync } = useSignTypedData({
     ...signTypedData,
     domain: {
