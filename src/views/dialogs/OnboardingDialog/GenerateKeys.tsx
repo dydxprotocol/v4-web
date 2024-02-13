@@ -44,7 +44,6 @@ export const GenerateKeys = ({
   onKeysDerived = () => {},
 }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const { isMobile } = useBreakpoints();
 
   const [shouldRememberMe, setShouldRememberMe] = useState(false);
 
@@ -66,15 +65,28 @@ export const GenerateKeys = ({
 
     try {
       await matchNetwork?.();
+      return true;
     } catch (error) {
-      const { message, walletErrorType } = parseWalletError({ error, stringGetter });
+      const { message, walletErrorType, isErrorExpected } = parseWalletError({
+        error,
+        stringGetter,
+      });
+
+      if (!isErrorExpected) {
+        log('GenerateKeys/switchNetwork', error, { walletErrorType });
+      }
 
       if (message) {
-        log('GenerateKeys/switchNetwork', error, { walletErrorType });
         setError(message);
-        throw error;
       }
+
+      return false;
     }
+  };
+
+  const switchNetworkAndDeriveKeys = async () => {
+    const networkSwitched = await switchNetwork();
+    if (networkSwitched) await deriveKeys();
   };
 
   // 2. Derive keys from EVM account
@@ -154,11 +166,16 @@ export const GenerateKeys = ({
       setStatus(EvmDerivedAccountStatus.Derived);
     } catch (error) {
       setStatus(EvmDerivedAccountStatus.NotDerived);
-      const { message, walletErrorType } = parseWalletError({ error, stringGetter });
+      const { message, walletErrorType, isErrorExpected } = parseWalletError({
+        error,
+        stringGetter,
+      });
 
       if (message) {
         setError(message);
-        log('GenerateKeys/deriveKeys', error, { walletErrorType });
+        if (!isErrorExpected) {
+          log('GenerateKeys/deriveKeys', error, { walletErrorType });
+        }
       }
     }
   };
@@ -231,7 +248,7 @@ export const GenerateKeys = ({
           {!isMatchingNetwork ? (
             <Button
               action={ButtonAction.Primary}
-              onClick={() => switchNetwork().then(deriveKeys).then(onKeysDerived)}
+              onClick={() => switchNetworkAndDeriveKeys().then(onKeysDerived)}
               state={{ isLoading: isSwitchingNetwork }}
             >
               {stringGetter({ key: STRING_KEYS.SWITCH_NETWORK })}
