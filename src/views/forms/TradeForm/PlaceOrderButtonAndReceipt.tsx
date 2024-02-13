@@ -23,7 +23,7 @@ import { getSubaccountId } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getCurrentInput } from '@/state/inputsSelectors';
 
-type ConfirmButton = {
+type ConfirmButtonConfig = {
   stringKey: string;
   buttonTextStringKey: string;
   buttonAction: ButtonAction;
@@ -37,7 +37,7 @@ type ElementProps = {
   validationErrorString?: string;
   currentStep?: MobilePlaceOrderSteps;
   showDeposit?: boolean;
-  confirmButton: ConfirmButton;
+  confirmButtonConfig: ConfirmButtonConfig;
 };
 
 export const PlaceOrderButtonAndReceipt = ({
@@ -48,7 +48,7 @@ export const PlaceOrderButtonAndReceipt = ({
   validationErrorString,
   currentStep,
   showDeposit,
-  confirmButton,
+  confirmButtonConfig,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
@@ -122,7 +122,7 @@ export const PlaceOrderButtonAndReceipt = ({
 
     [MobilePlaceOrderSteps.PreviewOrder]: {
       buttonTextStringKey: STRING_KEYS.CONFIRM_ORDER,
-      buttonAction: confirmButton.buttonAction,
+      buttonAction: confirmButtonConfig.buttonAction,
       buttonState: { isLoading },
     },
     [MobilePlaceOrderSteps.PlacingOrder]: {
@@ -139,13 +139,13 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const buttonAction = currentStep
     ? buttonStatesPerStep[currentStep].buttonAction
-    : confirmButton.buttonAction;
+    : confirmButtonConfig.buttonAction;
 
   let buttonTextStringKey = STRING_KEYS.UNAVAILABLE;
   if (currentStep) {
     buttonTextStringKey = buttonStatesPerStep[currentStep].buttonTextStringKey;
   } else if (shouldEnableTrade) {
-    buttonTextStringKey = confirmButton.buttonTextStringKey;
+    buttonTextStringKey = confirmButtonConfig.buttonTextStringKey;
   } else if (actionStringKey) {
     buttonTextStringKey = actionStringKey;
   }
@@ -179,7 +179,7 @@ export const PlaceOrderButtonAndReceipt = ({
         key: buttonTextStringKey,
         params: {
           ORDER: stringGetter({
-            key: confirmButton.stringKey,
+            key: confirmButtonConfig.stringKey,
           }),
         },
       })}

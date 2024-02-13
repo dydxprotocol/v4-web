@@ -294,7 +294,7 @@ export const ClosePositionForm = ({
           validationErrorString={alertContent}
           summary={summary ?? undefined}
           currentStep={currentStep}
-          confirmButton={{
+          confirmButtonConfig={{
             stringKey: STRING_KEYS.CLOSE_ORDER,
             buttonTextStringKey: STRING_KEYS.CLOSE_POSITION,
             buttonAction: ButtonAction.Destroy,

@@ -18,7 +18,12 @@ import {
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
-import { InputErrorData, TradeBoxKeys, MobilePlaceOrderSteps, ORDER_TYPE_STRINGS } from '@/constants/trade';
+import {
+  InputErrorData,
+  TradeBoxKeys,
+  MobilePlaceOrderSteps,
+  ORDER_TYPE_STRINGS,
+} from '@/constants/trade';
 
 import { breakpoints } from '@/styles';
 import { useStringGetter, useSubaccount } from '@/hooks';
@@ -39,7 +44,12 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { Orderbook } from '@/views/tables/Orderbook';
 
 import { setTradeFormInputs } from '@/state/inputs';
-import { getCurrentInput, getInputTradeData, getTradeFormInputs, useTradeFormData } from '@/state/inputsSelectors';
+import {
+  getCurrentInput,
+  getInputTradeData,
+  getTradeFormInputs,
+  useTradeFormData,
+} from '@/state/inputsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -343,10 +353,10 @@ export const TradeForm = ({
           summary={summary ?? undefined}
           currentStep={currentStep}
           showDeposit={inputAlert?.errorAction === TradeInputErrorAction.DEPOSIT}
-          confirmButton={{
+          confirmButtonConfig={{
             stringKey: ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey,
             buttonTextStringKey: STRING_KEYS.PLACE_ORDER,
-            buttonAction: orderSideAction
+            buttonAction: orderSideAction,
           }}
         />
       </Styled.Footer>
