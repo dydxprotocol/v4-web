@@ -1,6 +1,7 @@
 import styled, { AnyStyledComponent, css } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
+import { isMainnet } from '@/constants/networks';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
@@ -27,6 +28,8 @@ const RewardsPage = () => {
   const { isTablet, isNotTablet } = useBreakpoints();
   const navigate = useNavigate();
 
+  const showTradingRewards = testFlags.showTradingRewards || !isMainnet;
+
   return (
     <div>
       {isTablet && (
@@ -37,7 +40,7 @@ const RewardsPage = () => {
       )}
       <DetachedSection>
         <Styled.GridLayout
-          showTradingRewards={testFlags.showTradingRewards}
+          showTradingRewards={showTradingRewards}
           showMigratePanel={import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet}
         >
           {import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && <Styled.MigratePanel />}
@@ -51,7 +54,7 @@ const RewardsPage = () => {
             </>
           )}
 
-          {testFlags.showTradingRewards && (
+          {showTradingRewards && (
             <Styled.TradingRewardsColumn>
               <TradingRewardsSummaryPanel />
               {isTablet && <RewardsHelpPanel />}
@@ -60,7 +63,7 @@ const RewardsPage = () => {
           )}
 
           {isNotTablet && (
-            <Styled.OtherColumn showTradingRewards={testFlags.showTradingRewards}>
+            <Styled.OtherColumn showTradingRewards={showTradingRewards}>
               <RewardsHelpPanel />
             </Styled.OtherColumn>
           )}

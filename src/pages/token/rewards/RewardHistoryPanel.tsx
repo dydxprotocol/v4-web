@@ -9,16 +9,22 @@ import {
   HistoricalTradingRewardsPeriods,
 } from '@/constants/abacus';
 
+import { isMainnet } from '@/constants/networks';
 import { STRING_KEYS } from '@/constants/localization';
+
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithTooltip } from '@/components/WithTooltip';
 import { TradingRewardHistoryTable } from '@/views/tables/TradingRewardHistoryTable';
 
 import abacusStateManager from '@/lib/abacus';
+
+// TODO: set in env featureFlag config
+const REWARDS_HISTORY_START_DATE_MS = isMainnet ? 1706486400000 : 1704844800000;
 
 export const RewardHistoryPanel = () => {
   const stringGetter = useStringGetter();
@@ -47,7 +53,20 @@ export const RewardHistoryPanel = () => {
             <WithTooltip tooltip="reward-history">
               <h3>{stringGetter({ key: STRING_KEYS.REWARD_HISTORY })}</h3>
             </WithTooltip>
-            <span>{stringGetter({ key: STRING_KEYS.REWARD_HISTORY_DESCRIPTION })}</span>
+            <span>
+              {stringGetter({
+                key: STRING_KEYS.REWARD_HISTORY_DESCRIPTION,
+                params: {
+                  REWARDS_HISTORY_START_DATE: (
+                    <Styled.Output
+                      type={OutputType.Date}
+                      value={REWARDS_HISTORY_START_DATE_MS}
+                      timeOptions={{ useUTC: true }}
+                    />
+                  ),
+                },
+              })}
+            </span>
           </Styled.Title>
           <ToggleGroup
             items={[
@@ -102,4 +121,8 @@ Styled.Title = styled.div`
 Styled.Content = styled.div`
   ${layoutMixins.flexColumn}
   gap: 0.75rem;
+`;
+
+Styled.Output = styled(Output)`
+  display: inline;
 `;
