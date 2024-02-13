@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 
-import { AbacusOrderStatus } from '@/constants/abacus';
+import { AbacusOrderStatus, ORDER_SIDES, SubaccountOrder } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { type OrderType, ORDER_TYPE_STRINGS } from '@/constants/trade';
-import type { ChartLine, ChartLineType, TvWidget } from '@/constants/tvchart';
+import type { ChartLine, TvWidget } from '@/constants/tvchart';
 
 import { useStringGetter } from '@/hooks';
 
@@ -38,7 +38,7 @@ export const useChartLines = ({
   const appColorMode = useSelector(getAppColorMode);
 
   const currentMarketPositionData = useSelector(getCurrentMarketPositionData, shallowEqual);
-  const currentMarketOrders = useSelector(getCurrentMarketOrders, shallowEqual);
+  const currentMarketOrders: SubaccountOrder[] = useSelector(getCurrentMarketOrders, shallowEqual);
 
   useEffect(() => {
     if (isChartReady && displayButton) {
@@ -72,38 +72,44 @@ export const useChartLines = ({
   const drawPositionLine = () => {
     if (!currentMarketPositionData) return;
 
-    const { current: entryPrice } = currentMarketPositionData.entryPrice;
-    const { current: quantity } = currentMarketPositionData.size;
+    const entryPrice = currentMarketPositionData.entryPrice?.current;
+    const size = currentMarketPositionData.size?.current;
 
-    const key = `position-${currentMarketPositionData.id}`;
+    const key = currentMarketPositionData.id;
     const price = MustBigNumber(entryPrice).toNumber();
 
-    const maybePositionLine = chartLines[key];
-    const shouldShow = quantity !== 0;
+    const maybePositionLine = chartLines[key]?.line;
+    const shouldShow = size && size !== 0;
 
-    if (maybePositionLine) {
-      if (!shouldShow) {
+    if (!shouldShow) {
+      if (maybePositionLine) {
         maybePositionLine.remove();
         delete chartLines[key];
         return;
       }
-      if (maybePositionLine.getQuantity() !== quantity) {
-        maybePositionLine.setQuantity(quantity);
-      }
-      if (maybePositionLine.getPrice() !== price) {
-        maybePositionLine.setPrice(price);
-      }
-    } else if (shouldShow) {
-      const positionLine = tvWidget
-        ?.chart()
-        .createPositionLine({ disableUndo: false })
-        .setText(stringGetter({ key: STRING_KEYS.ENTRY_PRICE_SHORT }))
-        .setPrice(price)
-        .setQuantity(quantity);
+    } else {
+      const quantity = size.toString();
 
-      if (positionLine) {
-        setLineColors({ chartLineType: 'position', line: positionLine });
-        chartLines[key] = positionLine;
+      if (maybePositionLine) {
+        if (maybePositionLine.getQuantity() !== quantity) {
+          maybePositionLine.setQuantity(quantity);
+        }
+        if (maybePositionLine.getPrice() !== price) {
+          maybePositionLine.setPrice(price);
+        }
+      } else {
+        const positionLine = tvWidget
+          ?.chart()
+          .createPositionLine({ disableUndo: false })
+          .setText(stringGetter({ key: STRING_KEYS.ENTRY_PRICE_SHORT }))
+          .setPrice(price)
+          .setQuantity(quantity);
+
+        if (positionLine) {
+          const chartLine = { line: positionLine, chartLineType: 'position' };
+          setLineColors({ chartLine: chartLine });
+          chartLines[key] = chartLine;
+        }
       }
     }
   };
@@ -124,7 +130,7 @@ export const useChartLines = ({
         price,
         trailingPercent,
       }) => {
-        const key = `${side.rawValue}-${id}`;
+        const key = id;
         const quantity = (remainingSize ?? size).toString();
 
         const orderType = type.rawValue as OrderType;
@@ -137,7 +143,7 @@ export const useChartLines = ({
           !cancelReason &&
           (status === AbacusOrderStatus.open || status === AbacusOrderStatus.untriggered);
 
-        const maybeOrderLine = key in chartLines ? chartLines[key] : null;
+        const maybeOrderLine = chartLines[key]?.line;
         if (maybeOrderLine) {
           if (!shouldShow) {
             maybeOrderLine.remove();
@@ -156,8 +162,9 @@ export const useChartLines = ({
             .setText(orderString);
 
           if (orderLine) {
-            setLineColors({ chartLineType: side.rawValue, line: orderLine });
-            chartLines[key] = orderLine;
+            const chartLine = { line: orderLine, chartLineType: ORDER_SIDES[side.name] };
+            setLineColors({ chartLine: chartLine });
+            chartLines[key] = chartLine;
           }
         }
       }
@@ -165,19 +172,14 @@ export const useChartLines = ({
   };
 
   const deleteChartLines = () => {
-    Object.values(chartLines).forEach((line) => {
+    Object.values(chartLines).forEach(({ line }) => {
       line.remove();
     });
     chartLines = {};
   };
 
-  const setLineColors = ({
-    chartLineType,
-    line,
-  }: {
-    chartLineType: ChartLineType;
-    line: ChartLine;
-  }) => {
+  const setLineColors = ({ chartLine }: { chartLine: ChartLine }) => {
+    const { line, chartLineType } = chartLine;
     const { maybeQuantityColor, borderColor, backgroundColor, textColor, textButtonColor } =
       getChartLineColors({
         appTheme,

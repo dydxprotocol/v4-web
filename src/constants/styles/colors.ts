@@ -1,4 +1,12 @@
-import { AppColorMode } from '@/state/configs';
+import type { ThemeName } from 'public/tradingview/charting_library';
+
+import { AppColorMode, AppTheme } from '@/state/configs';
+
+export const THEME_NAMES: Record<AppTheme, ThemeName> = {
+  [AppTheme.Classic]: 'Classic',
+  [AppTheme.Dark]: 'Dark',
+  [AppTheme.Light]: 'Light',
+};
 
 export type Theme = {
   [AppColorMode.GreenUp]: ThemeColorBase;

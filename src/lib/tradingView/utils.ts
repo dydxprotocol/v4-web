@@ -1,6 +1,7 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { Candle, TradingViewBar, TradingViewSymbol } from '@/constants/candles';
+import { THEME_NAMES } from '@/constants/styles/colors';
 import type { ChartLineType } from '@/constants/tvchart';
 
 import { type AppColorMode, AppTheme } from '@/state/configs';
@@ -85,7 +86,7 @@ export const getWidgetOverrides = ({
   const theme = Themes[appTheme][appColorMode];
 
   return {
-    theme: appTheme === AppTheme.Dark ? 'dark' : AppTheme.Light ? 'light' : '',
+    theme: THEME_NAMES[appTheme],
     overrides: {
       'paneProperties.background': theme.layer2,
       'paneProperties.horzGridProperties.color': theme.layer3,

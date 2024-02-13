@@ -8,6 +8,9 @@ import type {
 
 export type TvWidget = IChartingLibraryWidget & { _id?: string; _ready?: boolean };
 
-export type ChartLine = IOrderLineAdapter | IPositionLineAdapter;
-
 export type ChartLineType = OrderSide | 'position';
+
+export type ChartLine = {
+  line: IOrderLineAdapter | IPositionLineAdapter;
+  chartLineType: ChartLineType;
+};

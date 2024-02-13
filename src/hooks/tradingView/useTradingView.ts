@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 
@@ -71,9 +71,9 @@ export const useTradingView = ({
       tvWidgetRef.current = tvChartWidget;
 
       tvWidgetRef.current.onChartReady(() => {
-        tvWidgetRef?.current?.headerReady().then(() => {
-          if (displayButtonRef) {
-            displayButtonRef.current = tvWidgetRef?.current?.createButton();
+        tvWidgetRef.current?.headerReady().then(() => {
+          if (displayButtonRef && tvWidgetRef.current) {
+            displayButtonRef.current = tvWidgetRef.current.createButton();
             displayButtonRef.current.innerHTML = `<span>${stringGetter({
               key: STRING_KEYS.ORDER_LINES,
             })}</span> <div class="displayOrdersButton-toggle"></div>`;
