@@ -1,16 +1,17 @@
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { useDispatch, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import type { TradeInputSummary } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { ORDER_TYPE_STRINGS, MobilePlaceOrderSteps } from '@/constants/trade';
+import { MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { useStringGetter, useTokenConfigs } from '@/hooks';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
+import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
@@ -20,30 +21,34 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccountId } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
-import { getCurrentInput, getInputTradeData } from '@/state/inputsSelectors';
+import { getCurrentInput } from '@/state/inputsSelectors';
 
-import { getSelectedOrderSide, getSelectedTradeType } from '@/lib/tradeData';
+type ConfirmButtonConfig = {
+  stringKey: string;
+  buttonTextStringKey: string;
+  buttonAction: ButtonAction;
+};
 
 type ElementProps = {
   isLoading: boolean;
-  isClosePosition?: boolean;
   actionStringKey?: string;
   summary?: TradeInputSummary;
   hasValidationErrors?: boolean;
+  validationErrorString?: string;
   currentStep?: MobilePlaceOrderSteps;
   showDeposit?: boolean;
-  showConnectWallet?: boolean;
+  confirmButtonConfig: ConfirmButtonConfig;
 };
 
 export const PlaceOrderButtonAndReceipt = ({
   isLoading,
-  isClosePosition,
   actionStringKey,
   summary,
   hasValidationErrors,
+  validationErrorString,
   currentStep,
   showDeposit,
-  showConnectWallet,
+  confirmButtonConfig,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
@@ -52,17 +57,11 @@ export const PlaceOrderButtonAndReceipt = ({
   const canAccountTrade = useSelector(calculateCanAccountTrade);
   const subaccountNumber = useSelector(getSubaccountId);
   const currentInput = useSelector(getCurrentInput);
-  const currentTradeData = useSelector(getInputTradeData, shallowEqual);
 
   const hasMissingData = subaccountNumber === undefined;
 
   const shouldEnableTrade =
     canAccountTrade && !hasMissingData && !hasValidationErrors && currentInput !== 'transfer';
-
-  const { side, type } = currentTradeData || {};
-
-  const selectedTradeType = getSelectedTradeType(type);
-  const selectedOrderSide = getSelectedOrderSide(side);
 
   const { fee, price: expectedPrice, total, reward } = summary || {};
 
@@ -110,11 +109,6 @@ export const PlaceOrderButtonAndReceipt = ({
     },
   ];
 
-  const orderSideAction = {
-    [OrderSide.BUY]: ButtonAction.Create,
-    [OrderSide.SELL]: ButtonAction.Destroy,
-  }[selectedOrderSide];
-
   const buttonStatesPerStep = {
     [MobilePlaceOrderSteps.EditOrder]: {
       buttonTextStringKey: shouldEnableTrade
@@ -128,7 +122,7 @@ export const PlaceOrderButtonAndReceipt = ({
 
     [MobilePlaceOrderSteps.PreviewOrder]: {
       buttonTextStringKey: STRING_KEYS.CONFIRM_ORDER,
-      buttonAction: isClosePosition ? ButtonAction.Destroy : orderSideAction,
+      buttonAction: confirmButtonConfig.buttonAction,
       buttonState: { isLoading },
     },
     [MobilePlaceOrderSteps.PlacingOrder]: {
@@ -145,15 +139,13 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const buttonAction = currentStep
     ? buttonStatesPerStep[currentStep].buttonAction
-    : isClosePosition
-    ? ButtonAction.Destroy
-    : orderSideAction;
+    : confirmButtonConfig.buttonAction;
 
   let buttonTextStringKey = STRING_KEYS.UNAVAILABLE;
   if (currentStep) {
     buttonTextStringKey = buttonStatesPerStep[currentStep].buttonTextStringKey;
   } else if (shouldEnableTrade) {
-    buttonTextStringKey = isClosePosition ? STRING_KEYS.CLOSE_POSITION : STRING_KEYS.PLACE_ORDER;
+    buttonTextStringKey = confirmButtonConfig.buttonTextStringKey;
   } else if (actionStringKey) {
     buttonTextStringKey = actionStringKey;
   }
@@ -165,31 +157,56 @@ export const PlaceOrderButtonAndReceipt = ({
         isLoading: isLoading || hasMissingData,
       };
 
+  const depositButton = (
+    <Button
+      action={ButtonAction.Primary}
+      onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
+    >
+      {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
+    </Button>
+  );
+
+  const submitButton = (
+    <Styled.Button
+      state={buttonState}
+      type={ButtonType.Submit}
+      action={buttonAction}
+      slotLeft={
+        hasValidationErrors ? <Styled.WarningIcon iconName={IconName.Warning} /> : undefined
+      }
+    >
+      {stringGetter({
+        key: buttonTextStringKey,
+        params: {
+          ORDER: stringGetter({
+            key: confirmButtonConfig.stringKey,
+          }),
+        },
+      })}
+    </Styled.Button>
+  );
+
   return (
     <WithDetailsReceipt detailItems={items}>
-      {!canAccountTrade || showConnectWallet ? (
+      {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
       ) : showDeposit ? (
-        <Button
-          action={ButtonAction.Primary}
-          onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
-        >
-          {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
-        </Button>
+        depositButton
       ) : (
-        <Button state={buttonState} type={ButtonType.Submit} action={buttonAction}>
-          {stringGetter({
-            key: buttonTextStringKey,
-            params: {
-              ORDER: stringGetter({
-                key: isClosePosition
-                  ? STRING_KEYS.CLOSE_ORDER
-                  : ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey,
-              }),
-            },
-          })}
-        </Button>
+        <WithTooltip tooltipString={hasValidationErrors ? validationErrorString : undefined}>
+          {submitButton}
+        </WithTooltip>
       )}
     </WithDetailsReceipt>
   );
 };
+
+const Styled: Record<string, AnyStyledComponent> = {};
+
+Styled.Button = styled(Button)`
+  width: 100%;
+`;
+
+Styled.WarningIcon = styled(Icon)`
+  color: var(--color-warning);
+`;
