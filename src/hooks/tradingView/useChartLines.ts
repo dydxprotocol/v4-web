@@ -144,27 +144,31 @@ export const useChartLines = ({
           (status === AbacusOrderStatus.open || status === AbacusOrderStatus.untriggered);
 
         const maybeOrderLine = chartLines[key]?.line;
-        if (maybeOrderLine) {
-          if (!shouldShow) {
+
+        if (!shouldShow) {
+          if (maybeOrderLine) {
             maybeOrderLine.remove();
             delete chartLines[key];
             return;
           }
-          if (maybeOrderLine.getQuantity() !== quantity) {
-            maybeOrderLine.setQuantity(quantity);
-          }
-        } else if (shouldShow) {
-          const orderLine = tvWidget
-            ?.chart()
-            .createOrderLine({ disableUndo: false })
-            .setPrice(MustBigNumber(triggerPrice ?? price).toNumber())
-            .setQuantity(quantity)
-            .setText(orderString);
+        } else {
+          if (maybeOrderLine) {
+            if (maybeOrderLine.getQuantity() !== quantity) {
+              maybeOrderLine.setQuantity(quantity);
+            }
+          } else {
+            const orderLine = tvWidget
+              ?.chart()
+              .createOrderLine({ disableUndo: false })
+              .setPrice(MustBigNumber(triggerPrice ?? price).toNumber())
+              .setQuantity(quantity)
+              .setText(orderString);
 
-          if (orderLine) {
-            const chartLine = { line: orderLine, chartLineType: ORDER_SIDES[side.name] };
-            setLineColors({ chartLine: chartLine });
-            chartLines[key] = chartLine;
+            if (orderLine) {
+              const chartLine = { line: orderLine, chartLineType: ORDER_SIDES[side.name] };
+              setLineColors({ chartLine: chartLine });
+              chartLines[key] = chartLine;
+            }
           }
         }
       }

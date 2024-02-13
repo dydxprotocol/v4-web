@@ -20,7 +20,7 @@ const isIFrame = (element: HTMLElement | null): element is HTMLIFrameElement =>
 
 /**
  * @description Hook to manage switching Themes
- * TradingView only handles 'dark' | 'light' themes.
+ * TradingView only handles 'Dark' | 'Light' themes.
  * In order to support our Classic along with Dark/Light, we are directly accessing the <html> within the iFrame.
  */
 export const useTradingViewTheme = ({
