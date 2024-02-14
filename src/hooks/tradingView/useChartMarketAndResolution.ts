@@ -27,19 +27,26 @@ export const useChartMarketAndResolution = ({
   const dispatch = useDispatch();
 
   const currentMarketId: string = useSelector(getCurrentMarketId) || DEFAULT_MARKETID;
+
   const selectedResolution: string =
     useSelector(getSelectedResolutionForMarket(currentMarketId)) || DEFAULT_RESOLUTION;
 
   const chart = isWidgetReady ? tvWidget?.chart() : undefined;
   const chartResolution = chart?.resolution?.();
 
+  /**
+   * @description Hook to handle changing markets - intentionally should avoid triggering on change of resolutions.
+   */
   useEffect(() => {
     if (currentMarketId && isWidgetReady) {
       const resolution = savedResolution || selectedResolution;
       tvWidget?.setSymbol(currentMarketId, resolution as ResolutionString, () => {});
     }
-  }, [currentMarketId, isWidgetReady, savedResolution, selectedResolution]);
+  }, [currentMarketId, isWidgetReady]);
 
+  /**
+   * @description Hook to handle changing chart resolution
+   */
   useEffect(() => {
     if (chartResolution) {
       if (chartResolution !== selectedResolution) {
