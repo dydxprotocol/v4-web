@@ -374,6 +374,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         placeOrderParams = abacusStateManager.closePosition(callback);
       } else {
         placeOrderParams = abacusStateManager.placeOrder(callback);
+
       }
 
       return placeOrderParams;

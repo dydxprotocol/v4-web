@@ -32,8 +32,8 @@ dependencies:
     specifier: ^1.0.20
     version: 1.0.20
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.28
-    version: 1.1.29
+    specifier: ^1.1.30
+    version: 1.1.30
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -1319,13 +1319,8 @@ packages:
       - utf-8-validate
     dev: false
 
-<<<<<<< HEAD
   /@dydxprotocol/v4-localization@1.1.30:
     resolution: {integrity: sha512-TZfWWRSOxcjLHs972wlJVVHkE7+DVqAUnGZSs24HYHsPtUkPhZiNXMOA2Vk9YddQxumhM79xIRH0cmJSe5DDUg==}
-=======
-  /@dydxprotocol/v4-localization@1.1.29:
-    resolution: {integrity: sha512-o9lxsYl5ObqO9OUyxiKuUxoBmYZk0qGDeNxGScY8uMRq4Ahhz3BPxAC7jUYypCNAMpieiQjVGxMnnhIbwEkm2w==}
->>>>>>> d67495d (bump abacus + use new env config format)
     dev: false
 
   /@dydxprotocol/v4-proto@4.0.0-dev.0:

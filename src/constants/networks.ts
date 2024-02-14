@@ -1,4 +1,4 @@
-import environments from '../../public/configs/env.json';
+import environments from '../../public/configs/v1/env.json';
 
 const CURRENT_MODE = ({
   production: 'MAINNET',
