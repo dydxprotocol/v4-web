@@ -76,5 +76,6 @@ export const Tag = styled.span<StyleProps>`
     isHighlighted &&
     css`
       background-color: var(--color-accent);
+      color: var(--color-text-button);
     `}
 `;
