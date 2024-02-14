@@ -325,7 +325,7 @@
   {
     "baseAsset": "DYM",
     "referencePrice": 5.544949130771594,
-    "numOracles": 5,
+    "numOracles": 6,
     "liquidityTier": 2,
     "assetName": "Dymension",
     "p": 0.0,
