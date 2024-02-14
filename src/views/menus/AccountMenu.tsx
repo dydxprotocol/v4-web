@@ -41,6 +41,14 @@ import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
 import { MustBigNumber } from '@/lib/numbers';
 
+function getOS() {
+  var uA = navigator.userAgent;
+  if ((/iPad|iPhone|iPod/.test(uA)) || (uA.includes('Mac') && 'ontouchend' in document)) return 'iOS';
+
+  var i, os = ['Windows', 'Android', 'Unix', 'Mac', 'Linux', 'BlackBerry'];
+  for (i = 0; i < os.length; i++) if (new RegExp(os[i],'i').test(uA)) return os[i];
+}
+
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
   const { mintscanBase } = useURLConfigs();
@@ -59,6 +67,13 @@ export const AccountMenu = () => {
   const onRecoverKeys = () => {
     dispatch(openDialog({ type: DialogTypes.Onboarding }));
   };
+
+  // const appStoreUrl = document.querySelector('meta[name="app-store-url"]')?.getAttribute('content');
+  // const googlePlayUrl = document.querySelector('meta[name="google-play-url"]')?.getAttribute('content');
+  const appStoreUrl = "http://example.com";
+  const googlePlayUrl = "http://example.com";
+  const os = getOS();
+  
 
   return onboardingState === OnboardingState.Disconnected ? (
     <OnboardingTriggerButton size={ButtonSize.XSmall} />
@@ -189,6 +204,29 @@ export const AccountMenu = () => {
           label: stringGetter({ key: STRING_KEYS.DISPLAY_SETTINGS }),
           onSelect: () => dispatch(openDialog({ type: DialogTypes.DisplaySettings })),
         },
+        ...((appStoreUrl && os != 'Android') || (googlePlayUrl && os != 'iOS')
+          ? [
+              {
+                value: 'MobileDownload',
+                icon: <Icon iconName={IconName.Qr} />,
+                label: "Download Mobile App",
+                onSelect: () => {
+                  switch (os) {
+                    case 'iOS':
+                      window.open(appStoreUrl, '_blank');
+                      break;
+
+                    case 'Android':
+                      window.open(googlePlayUrl, '_blank');
+                      
+                    default:
+                      dispatch(openDialog({ type: DialogTypes.MobileDownload }));
+                      break;
+                  }
+                },
+              },
+            ]
+          : []),
         ...(onboardingState === OnboardingState.AccountConnected && hdKey
           ? [
               {
