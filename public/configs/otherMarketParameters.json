@@ -274,7 +274,7 @@
   {
     "baseAsset": "CRV",
     "referencePrice": 0.48346754113361784,
-    "numOracles": 5,
+    "numOracles": 6,
     "liquidityTier": 2,
     "assetName": "Curve DAO Token",
     "p": -1.0,
@@ -597,7 +597,7 @@
   {
     "baseAsset": "JUP",
     "referencePrice": 0.4339790660244292,
-    "numOracles": 5,
+    "numOracles": 6,
     "liquidityTier": 2,
     "assetName": "Jupiter",
     "p": -1.0,
@@ -750,7 +750,7 @@
   {
     "baseAsset": "MKR",
     "referencePrice": 1943.1865605831852,
-    "numOracles": 5,
+    "numOracles": 6,
     "liquidityTier": 2,
     "assetName": "Maker",
     "p": 3.0,
@@ -869,7 +869,7 @@
   {
     "baseAsset": "RUNE",
     "referencePrice": 3.7264809096406806,
-    "numOracles": 5,
+    "numOracles": 6,
     "liquidityTier": 2,
     "assetName": "Thorchain",
     "p": 0.0,
@@ -1073,7 +1073,7 @@
   {
     "baseAsset": "WOO",
     "referencePrice": 0.2944897275608197,
-    "numOracles": 5,
+    "numOracles": 6,
     "liquidityTier": 2,
     "assetName": "Wootrade Network",
     "p": -1.0,
