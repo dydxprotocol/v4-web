@@ -165,7 +165,10 @@ export const useChartLines = ({
               .setText(orderString);
 
             if (orderLine) {
-              const chartLine = { line: orderLine, chartLineType: ORDER_SIDES[side.name] };
+              const chartLine: ChartLine = {
+                line: orderLine,
+                chartLineType: ORDER_SIDES[side.name],
+              };
               setLineColors({ chartLine: chartLine });
               chartLines[key] = chartLine;
             }
