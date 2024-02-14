@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useState, useEffect } from 'react';
 
 import { ButtonAction, ButtonState } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -8,6 +8,7 @@ import { Button, type ButtonStateConfig, type ButtonProps } from '@/components/B
 
 type ElementProps = {
   timeoutInSeconds: number;
+  onTimeOut?: () => void;
   slotFinal?: ReactNode;
 } & ButtonProps;
 
@@ -16,6 +17,7 @@ export type TimeoutButtonProps = ElementProps;
 export const TimeoutButton = ({
   children,
   timeoutInSeconds,
+  onTimeOut,
   slotFinal,
   ...otherProps
 }: TimeoutButtonProps) => {
@@ -24,6 +26,11 @@ export const TimeoutButton = ({
   const stringGetter = useStringGetter();
 
   const secondsLeft = Math.max(0, (timeoutDeadline - now) / 1000);
+
+  useEffect(() => {
+    if (secondsLeft > 0) return;
+    onTimeOut?.();
+  }, [secondsLeft]);
 
   if (slotFinal && secondsLeft <= 0) return slotFinal;
 

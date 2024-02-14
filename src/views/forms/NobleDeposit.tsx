@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import { OpacityToken } from '@/constants/styles/base';
 import { STRING_KEYS } from '@/constants/localization';
@@ -10,7 +10,6 @@ import { useAccounts, useStringGetter } from '@/hooks';
 import { CopyButton } from '@/components/CopyButton';
 import { QrCode } from '@/components/QrCode';
 import { Checkbox } from '@/components/Checkbox';
-import { Icon, IconName } from '@/components/Icon';
 import { TimeoutButton } from '@/components/TimeoutButton';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithReceipt } from '@/components/WithReceipt';
@@ -19,6 +18,7 @@ import { generateFadedColorVariant } from '@/lib/styles';
 
 export const NobleDeposit = () => {
   const [hasAcknowledged, setHasAcknowledged] = useState(false);
+  const [hasTimedout, setHasTimedout] = useState(false);
   const stringGetter = useStringGetter();
   const { nobleAddress } = useAccounts();
 
@@ -30,22 +30,20 @@ export const NobleDeposit = () => {
           {
             key: 'nobleAddress',
             label: stringGetter({ key: STRING_KEYS.NOBLE_ADDRESS }),
-            value: nobleAddress,
+            value:
+              hasAcknowledged && hasTimedout
+                ? nobleAddress
+                : stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TO_REVEAL }),
           },
         ]}
       >
-        <Styled.QrCodeContainer>
-          <Styled.QrCode size={432} value={nobleAddress || ''} />
-        </Styled.QrCodeContainer>
+        <Styled.QrCode
+          hasLogo
+          size={432}
+          value={nobleAddress || ''}
+          blurred={!hasAcknowledged || !hasTimedout}
+        />
       </WithDetailsReceipt>
-
-      <Styled.WaitingSpan>
-        <Styled.CautionIconContainer>
-          <Icon iconName={IconName.CautionCircleStroked} />
-        </Styled.CautionIconContainer>
-
-        <p>{stringGetter({ key: STRING_KEYS.NOBLE_WARNING })}</p>
-      </Styled.WaitingSpan>
 
       <Styled.WithReceipt
         slotReceipt={
@@ -63,7 +61,12 @@ export const NobleDeposit = () => {
       >
         <TimeoutButton
           timeoutInSeconds={8}
-          slotFinal={<CopyButton state={{ isDisabled: !hasAcknowledged }} value={nobleAddress} />}
+          onTimeOut={() => setHasTimedout(true)}
+          slotFinal={
+            <CopyButton state={{ isDisabled: !hasAcknowledged }} value={nobleAddress}>
+              {!hasAcknowledged ? stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_RISKS }) : undefined}
+            </CopyButton>
+          }
         />
       </Styled.WithReceipt>
     </>
@@ -82,23 +85,14 @@ Styled.WithReceipt = styled(WithReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
-Styled.QrCodeContainer = styled.div`
-  display: flex;
-  justify-content: center;
+Styled.QrCode = styled(QrCode)<{ blurred: number }>`
+  border-radius: 0.5em;
 
-  padding: 0.5rem;
-
-  background-color: var(--color-layer-2);
-  border-radius: 0.5rem;
-`;
-
-Styled.QrCode = styled(QrCode)`
-  max-height: 20rem;
-  width: fit-content;
-
-  svg {
-    max-height: 20rem;
-  }
+  ${({ blurred }) =>
+    blurred &&
+    css`
+      filter: blur(8px);
+    `}
 `;
 
 Styled.CheckboxContainer = styled.div`

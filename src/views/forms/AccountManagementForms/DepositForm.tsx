@@ -7,6 +7,7 @@ import { Abi, parseUnits } from 'viem';
 import erc20 from '@/abi/erc20.json';
 import erc20_usdt from '@/abi/erc20_usdt.json';
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
+import { AnalyticsEvent, AnalyticsEventData } from '@/constants/analytics';
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -48,7 +49,7 @@ import { DepositButtonAndReceipt } from './DepositForm/DepositButtonAndReceipt';
 import { NobleDeposit } from '../NobleDeposit';
 
 type DepositFormProps = {
-  onDeposit?: () => void;
+  onDeposit?: (event?: AnalyticsEventData<AnalyticsEvent.TransferDeposit>) => void;
   onError?: () => void;
 };
 
@@ -132,7 +133,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     if (error) onError?.();
   }, [error]);
 
-  const onSelectChain = useCallback((name: string, type: 'chain' | 'exchange') => {
+  const onSelectNetwork = useCallback((name: string, type: 'chain' | 'exchange') => {
     if (name) {
       abacusStateManager.clearTransferInputValues();
       setFromAmount('');
@@ -279,7 +280,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         setIsLoading(false);
       }
     },
-    [requestPayload, signerWagmi, chainId]
+    [requestPayload, signerWagmi, chainId, sourceToken, sourceChain]
   );
 
   const amountInputReceipt = [
@@ -378,7 +379,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       <SourceSelectMenu
         selectedChain={chainIdStr || undefined}
         selectedExchange={exchange || undefined}
-        onSelect={onSelectChain}
+        onSelect={onSelectNetwork}
       />
       {exchange && nobleAddress ? (
         <NobleDeposit />

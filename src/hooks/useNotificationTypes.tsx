@@ -179,8 +179,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       useEffect(() => {
         for (const transfer of transferNotifications) {
-          const { fromChainId, status, txHash, toAmount, type } = transfer;
-          const isFinished = Boolean(status) && status?.squidTransactionStatus !== 'ongoing';
+          const { fromChainId, status, txHash, toAmount, type, isExchange } = transfer;
+          const isFinished =
+            (Boolean(status) && status?.squidTransactionStatus !== 'ongoing') || isExchange;
           const icon = <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />;
 
           const transferType =

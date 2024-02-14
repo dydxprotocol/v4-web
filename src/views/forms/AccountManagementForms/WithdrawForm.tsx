@@ -55,6 +55,7 @@ import { getNobleChainId } from '@/lib/squid';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
+import { validateCosmosAddress } from '@/lib/addressUtils';
 
 export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
@@ -68,6 +69,7 @@ export const WithdrawForm = () => {
   const {
     requestPayload,
     token,
+    exchange,
     chain: chainIdStr,
     address: toAddress,
     resources,
@@ -180,14 +182,16 @@ export const WithdrawForm = () => {
             isCctp
           );
           if (txHash) {
+            const nobleChainId = getNobleChainId();
             addTransferNotification({
               txHash: txHash,
               type: TransferNotificationTypes.Withdrawal,
-              fromChainId: !isCctp ? selectedDydxChainId : getNobleChainId(),
-              toChainId: chainIdStr || undefined,
+              fromChainId: !isCctp ? selectedDydxChainId : nobleChainId,
+              toChainId: Boolean(exchange) ? nobleChainId : chainIdStr || undefined,
               toAmount: debouncedAmountBN.toNumber(),
               triggeredAt: Date.now(),
               isCctp,
+              isExchange: Boolean(exchange),
             });
             abacusStateManager.clearTransferInputValues();
             setWithdrawAmount('');
@@ -213,7 +217,16 @@ export const WithdrawForm = () => {
         setIsLoading(false);
       }
     },
-    [requestPayload, debouncedAmountBN, chainIdStr, toAddress, screenAddresses, stringGetter]
+    [
+      requestPayload,
+      debouncedAmountBN,
+      chainIdStr,
+      toAddress,
+      screenAddresses,
+      stringGetter,
+      selectedDydxChainId,
+      exchange,
+    ]
   );
 
   const onChangeAddress = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -246,13 +259,20 @@ export const WithdrawForm = () => {
     setWithdrawAmount(freeCollateralBN.toString());
   }, [freeCollateralBN, setWithdrawAmount]);
 
-  const onSelectChain = useCallback((chain: string) => {
-    if (chain) {
-      abacusStateManager.setTransferValue({
-        field: TransferInputField.chain,
-        value: chain,
-      });
+  const onSelectNetwork = useCallback((name: string, type: 'chain' | 'exchange') => {
+    if (name) {
       setWithdrawAmount('');
+      if (type === 'chain') {
+        abacusStateManager.setTransferValue({
+          field: TransferInputField.chain,
+          value: name,
+        });
+      } else {
+        abacusStateManager.setTransferValue({
+          field: TransferInputField.exchange,
+          value: name,
+        });
+      }
     }
   }, []);
 
@@ -313,7 +333,7 @@ export const WithdrawForm = () => {
       });
 
     if (debouncedAmountBN) {
-      if (!chainIdStr) {
+      if (!chainIdStr && !exchange) {
         return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_CHAIN });
       } else if (!toToken) {
         return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ASSET });
@@ -363,11 +383,13 @@ export const WithdrawForm = () => {
   const isDisabled =
     !!errorMessage ||
     !toToken ||
-    !chainIdStr ||
+    (!chainIdStr && !exchange) ||
     !toAddress ||
     debouncedAmountBN.isNaN() ||
     debouncedAmountBN.isZero() ||
     isLoading;
+
+  const isInvalidNobleAddress = exchange && toAddress && !validateCosmosAddress(toAddress, 'noble');
 
   return (
     <Styled.Form onSubmit={onSubmit}>
@@ -385,12 +407,21 @@ export const WithdrawForm = () => {
           }
         />
         <SourceSelectMenu
-          label={stringGetter({ key: STRING_KEYS.NETWORK })}
+          selectedExchange={exchange || undefined}
           selectedChain={chainIdStr || undefined}
-          onSelect={onSelectChain}
+          onSelect={onSelectNetwork}
         />
       </Styled.DestinationRow>
-      <TokenSelectMenu selectedToken={toToken || undefined} onSelectToken={onSelectToken} />
+      {isInvalidNobleAddress && (
+        <AlertMessage type={AlertType.Error}>
+          {stringGetter({ key: STRING_KEYS.NOBLE_ADDRESS_VALIDATION })}
+        </AlertMessage>
+      )}
+      <TokenSelectMenu
+        selectedToken={toToken || undefined}
+        onSelectToken={onSelectToken}
+        isExchange={Boolean(exchange)}
+      />
       <Styled.WithDetailsReceipt side="bottom" detailItems={amountInputReceipt}>
         <FormInput
           type={InputType.Number}

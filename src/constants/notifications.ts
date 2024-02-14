@@ -140,6 +140,7 @@ export type TransferNotifcation = {
   isCctp?: boolean;
   errorCount?: number;
   status?: StatusResponse;
+  isExchange?: boolean;
 };
 
 /**
