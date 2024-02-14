@@ -1,8 +1,10 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { Candle, TradingViewBar, TradingViewSymbol } from '@/constants/candles';
+import { THEME_NAMES } from '@/constants/styles/colors';
+import type { ChartLineType } from '@/constants/tvchart';
 
-import { AppTheme, type AppColorMode } from '@/state/configs';
+import { type AppColorMode, AppTheme } from '@/state/configs';
 
 import { Themes } from '@/styles/themes';
 
@@ -49,23 +51,24 @@ export const getHistorySlice = ({
   return bars.filter(({ time }) => time >= fromMs);
 };
 
-export const getOrderLineColors = ({
+export const getChartLineColors = ({
   appTheme,
   appColorMode,
-  side,
+  chartLineType,
 }: {
   appTheme: AppTheme;
   appColorMode: AppColorMode;
-  side: OrderSide;
+  chartLineType: ChartLineType;
 }) => {
   const theme = Themes[appTheme][appColorMode];
-  const orderColor = {
+  const orderColors = {
     [OrderSide.BUY]: theme.positive,
     [OrderSide.SELL]: theme.negative,
-  }[side];
+    ['position']: null,
+  };
 
   return {
-    orderColor,
+    maybeQuantityColor: orderColors[chartLineType],
     borderColor: theme.borderDefault,
     backgroundColor: theme.layer1,
     textColor: theme.textTertiary,
@@ -83,7 +86,7 @@ export const getWidgetOverrides = ({
   const theme = Themes[appTheme][appColorMode];
 
   return {
-    theme: appTheme === AppTheme.Dark ? 'dark' : AppTheme.Light ? 'light' : '',
+    theme: THEME_NAMES[appTheme],
     overrides: {
       'paneProperties.background': theme.layer2,
       'paneProperties.horzGridProperties.color': theme.layer3,
