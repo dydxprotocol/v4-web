@@ -56,6 +56,8 @@ import { getNobleChainId } from '@/lib/squid';
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
 import { validateCosmosAddress } from '@/lib/addressUtils';
+import { track } from '@/lib/analytics';
+import { AnalyticsEvent } from '@/constants/analytics';
 
 export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
@@ -183,11 +185,12 @@ export const WithdrawForm = () => {
           );
           if (txHash) {
             const nobleChainId = getNobleChainId();
+            const toChainId = Boolean(exchange) ? nobleChainId : chainIdStr || undefined;
             addTransferNotification({
               txHash: txHash,
               type: TransferNotificationTypes.Withdrawal,
               fromChainId: !isCctp ? selectedDydxChainId : nobleChainId,
-              toChainId: Boolean(exchange) ? nobleChainId : chainIdStr || undefined,
+              toChainId,
               toAmount: debouncedAmountBN.toNumber(),
               triggeredAt: Date.now(),
               isCctp,
@@ -195,6 +198,12 @@ export const WithdrawForm = () => {
             });
             abacusStateManager.clearTransferInputValues();
             setWithdrawAmount('');
+
+            track(AnalyticsEvent.TransferWithdraw, {
+              chainId: toChainId,
+              tokenAddress: toToken?.address || undefined,
+              tokenSymbol: toToken?.symbol || undefined,
+            });
           }
         }
       } catch (error) {
@@ -222,10 +231,11 @@ export const WithdrawForm = () => {
       debouncedAmountBN,
       chainIdStr,
       toAddress,
-      screenAddresses,
-      stringGetter,
       selectedDydxChainId,
       exchange,
+      toToken,
+      screenAddresses,
+      stringGetter,
     ]
   );
 
@@ -380,6 +390,10 @@ export const WithdrawForm = () => {
     summary,
   ]);
 
+  const isInvalidNobleAddress = Boolean(
+    exchange && toAddress && !validateCosmosAddress(toAddress, 'noble')
+  );
+
   const isDisabled =
     !!errorMessage ||
     !toToken ||
@@ -387,9 +401,8 @@ export const WithdrawForm = () => {
     !toAddress ||
     debouncedAmountBN.isNaN() ||
     debouncedAmountBN.isZero() ||
-    isLoading;
-
-  const isInvalidNobleAddress = exchange && toAddress && !validateCosmosAddress(toAddress, 'noble');
+    isLoading ||
+    isInvalidNobleAddress;
 
   return (
     <Styled.Form onSubmit={onSubmit}>

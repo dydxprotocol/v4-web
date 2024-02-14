@@ -259,8 +259,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         };
         const txHash = await signerWagmi.sendTransaction(tx);
 
-        onDeposit?.();
-
         if (txHash) {
           addTransferNotification({
             txHash: txHash,
@@ -272,6 +270,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           });
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');
+
+          onDeposit?.({
+            chainId: chainIdStr || undefined,
+            tokenAddress: sourceToken?.address || undefined,
+            tokenSymbol: sourceToken?.symbol || undefined,
+          });
         }
       } catch (error) {
         log('DepositForm/onSubmit', error);
