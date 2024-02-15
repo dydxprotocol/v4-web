@@ -40,7 +40,7 @@ import { getAppTheme } from '@/state/configsSelectors';
 import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
 import { MustBigNumber } from '@/lib/numbers';
-import { appStoreUrl } from '../dialogs/MobileDownloadDialog';
+import { mobileAppUrl } from '../dialogs/MobileDownloadDialog';
 
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
@@ -190,7 +190,7 @@ export const AccountMenu = () => {
           label: stringGetter({ key: STRING_KEYS.DISPLAY_SETTINGS }),
           onSelect: () => dispatch(openDialog({ type: DialogTypes.DisplaySettings })),
         },
-        ...(appStoreUrl
+        ...(mobileAppUrl
           ? [
               {
                 value: 'MobileDownload',
