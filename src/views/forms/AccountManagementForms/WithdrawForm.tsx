@@ -11,7 +11,12 @@ import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { ENVIRONMENT_CONFIG_MAP, isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
-import { MAX_CCTP_TRANSFER_AMOUNT, MAX_PRICE_IMPACT, NumberSign } from '@/constants/numbers';
+import {
+  MAX_CCTP_TRANSFER_AMOUNT,
+  MAX_PRICE_IMPACT,
+  MIN_CCTP_TRANSFER_AMOUNT,
+  NumberSign,
+} from '@/constants/numbers';
 
 import {
   useAccounts,
@@ -328,6 +333,12 @@ export const WithdrawForm = () => {
             MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
           },
         });
+      }
+      if (
+        !debouncedAmountBN.isZero() &&
+        MustBigNumber(debouncedAmountBN).lte(MIN_CCTP_TRANSFER_AMOUNT)
+      ) {
+        return 'Amount must be greater than 10 USDC';
       }
     }
 
