@@ -28,7 +28,7 @@ import { setSubaccount, setHistoricalPnl, removeUncommittedOrderClientId } from 
 import { getBalances } from '@/state/accountSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { hashFromTx } from '@/lib/hashfromTx';
+import { hashFromTx } from '@/lib/txUtils';
 import { log } from '@/lib/telemetry';
 
 import { useAccounts } from './useAccounts';

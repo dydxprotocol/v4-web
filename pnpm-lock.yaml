@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 overrides:
   follow-redirects: 1.15.3
 
@@ -30,8 +26,8 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: ^1.4.2
-    version: 1.4.2
+    specifier: ^1.4.5
+    version: 1.4.5
   '@dydxprotocol/v4-client-js':
     specifier: ^1.0.20
     version: 1.0.20
@@ -1290,8 +1286,8 @@ packages:
     resolution: {integrity: sha512-Gg5t+eR7vPJMAmhkFt6CZrzPd0EKpAslWwk5rFVYZpJsM8JG5KT9XQ99hgNM3Ov6ScNoIWbXkpX27F6A9cXR4Q==}
     dev: false
 
-  /@dydxprotocol/v4-abacus@1.4.2:
-    resolution: {integrity: sha512-+hugk0RulMwMthR2xCMYXohcC3sEYqVW/lmiq0RUuHZ9yrjmgy48xl0aZUmXGUYXyoiHXPS4AULhRKHQ4OOLwg==}
+  /@dydxprotocol/v4-abacus@1.4.5:
+    resolution: {integrity: sha512-LhJmpIaUkHCsSiHx+jdk+59euvGp2E+gGFelpfmOYpH1+enZgEXDQvWsgHSFEQxYP3mRiGG4uo+ZYNGdvffg7g==}
     dev: false
 
   /@dydxprotocol/v4-client-js@1.0.20:
@@ -16053,3 +16049,7 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false

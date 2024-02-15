@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { EvmDerivedAddresses } from '@/constants/account';
 import { STRING_KEYS } from '@/constants/localization';
 import { LocalStorageKey } from '@/constants/localStorage';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { ENVIRONMENT_CONFIG_MAP, WALLETS_CONFIG_MAP } from '@/constants/networks';
 
 import {
   type DydxAddress,
@@ -32,7 +32,7 @@ import {
   WalletType as CosmosWalletType,
 } from 'graz';
 
-import { getSelectedNetwork } from '@/state/appSelectors';
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 
 import { resolveWagmiConnector } from '@/lib/wagmi';
 import { getWalletConnection, parseWalletError } from '@/lib/wallet';
@@ -91,8 +91,8 @@ export const useWalletConnection = () => {
 
   // Wallet connection
 
-  const selectedNetwork = useSelector(getSelectedNetwork);
-  const walletConnectConfig = ENVIRONMENT_CONFIG_MAP[selectedNetwork].wallets.walletconnect;
+  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
+  const walletConnectConfig = WALLETS_CONFIG_MAP[selectedDydxChainId].walletconnect;
   const wagmiConnector = useMemo(
     () =>
       walletType && walletConnectionType
