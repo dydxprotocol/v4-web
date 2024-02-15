@@ -17,7 +17,6 @@ import {
   useAccounts,
   useDydxClient,
   useRestrictions,
-  useSelectedNetwork,
   useStringGetter,
   useSubaccount,
   useTokenConfigs,
@@ -40,6 +39,7 @@ import { TransferButtonAndReceipt } from '@/views/forms/TransferForm/TransferBut
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
 import { getSubaccount } from '@/state/accountSelectors';
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -62,7 +62,7 @@ export const TransferForm = ({
   const { dydxAddress } = useAccounts();
   const { transfer } = useSubaccount();
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
-  const { selectedDydxChainId } = useSelectedNetwork();
+  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
   const { tokensConfigs, usdcLabel, chainTokenLabel } = useTokenConfigs();
 
   const {

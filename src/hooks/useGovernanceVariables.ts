@@ -1,5 +1,8 @@
+import { useSelector } from 'react-redux';
+
 import { GOVERNANCE_CONFIG_MAP } from '@/constants/networks';
-import { useSelectedNetwork } from '@/hooks';
+
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 
 export interface GovernanceVariables {
   newMarketProposal: {
@@ -10,7 +13,7 @@ export interface GovernanceVariables {
 }
 
 export const useGovernanceVariables = (): GovernanceVariables => {
-  const { selectedDydxChainId } = useSelectedNetwork();
+  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
   const governanceVars = GOVERNANCE_CONFIG_MAP[selectedDydxChainId] as GovernanceVariables;
   return governanceVars;
 };

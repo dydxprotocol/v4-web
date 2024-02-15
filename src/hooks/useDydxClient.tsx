@@ -18,14 +18,13 @@ import type { ResolutionString } from 'public/tradingview/charting_library';
 import type { ConnectNetworkEvent, NetworkConfig } from '@/constants/abacus';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { type Candle, RESOLUTION_MAP } from '@/constants/candles';
-import { ENVIRONMENT_CONFIG_MAP, TOKEN_CONFIG_MAP } from '@/constants/networks';
-import { DydxChainAsset } from '@/constants/wallets';
 
-import { getSelectedDydxChainId, getSelectedNetwork } from '@/state/appSelectors';
+import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { log } from '@/lib/telemetry';
 
 import { useRestrictions } from './useRestrictions';
+import { useTokenConfigs } from './useTokenConfigs';
 
 type DydxContextType = ReturnType<typeof useDydxClientContext>;
 const DydxContext = createContext<DydxContextType>({} as DydxContextType);
@@ -41,8 +40,8 @@ const useDydxClientContext = () => {
   // ------ Network ------ //
 
   const selectedNetwork = useSelector(getSelectedNetwork);
-  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
-  const tokensConfigs = TOKEN_CONFIG_MAP[selectedDydxChainId];
+  const { usdcDenom, usdcDecimals, usdcGasDenom, chainTokenDenom, chainTokenDecimals } =
+    useTokenConfigs();
 
   const [networkConfig, setNetworkConfig] = useState<NetworkConfig>();
 
@@ -76,11 +75,11 @@ const useDydxClientContext = () => {
                 networkConfig.validatorUrl,
                 networkConfig.chainId,
                 {
-                  USDC_DENOM: tokensConfigs[DydxChainAsset.USDC].denom,
-                  USDC_DECIMALS: tokensConfigs[DydxChainAsset.USDC].decimals,
-                  USDC_GAS_DENOM: tokensConfigs[DydxChainAsset.USDC].gasDenom,
-                  CHAINTOKEN_DENOM: tokensConfigs[DydxChainAsset.CHAINTOKEN].denom,
-                  CHAINTOKEN_DECIMALS: tokensConfigs[DydxChainAsset.CHAINTOKEN].decimals,
+                  USDC_DENOM: usdcDenom,
+                  USDC_DECIMALS: usdcDecimals,
+                  USDC_GAS_DENOM: usdcGasDenom,
+                  CHAINTOKEN_DENOM: chainTokenDenom,
+                  CHAINTOKEN_DECIMALS: chainTokenDecimals,
                 },
                 {
                   broadcastPollIntervalMs: 3_000,

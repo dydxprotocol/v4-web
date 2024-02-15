@@ -40,6 +40,7 @@ import { Icon, IconName } from '@/components/Icon';
 
 import { SourceSelectMenu } from '@/views/forms/AccountManagementForms/SourceSelectMenu';
 
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { getSubaccount } from '@/state/accountSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
@@ -54,7 +55,7 @@ export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
   const [error, setError] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
-  const { selectedDydxChainId } = useSelectedNetwork();
+  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
 
   const { sendSquidWithdraw } = useSubaccount();
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};

@@ -32,6 +32,7 @@ import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -56,7 +57,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [requireUserActionInWallet, setRequireUserActionInWallet] = useState(false);
-  const { selectedDydxChainId } = useSelectedNetwork();
+  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
 
   const { evmAddress, signerWagmi, publicClientWagmi, nobleAddress } = useAccounts();
 

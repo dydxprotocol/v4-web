@@ -5,7 +5,6 @@ import { isEqual, groupBy } from 'lodash';
 import { useNavigate } from 'react-router-dom';
 
 import { DialogTypes } from '@/constants/dialogs';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { AppRoute } from '@/constants/routes';
 import { DydxChainAsset } from '@/constants/wallets';
 
@@ -23,7 +22,7 @@ import {
   TransferNotificationTypes,
 } from '@/constants/notifications';
 
-import { useSelectedNetwork, useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -36,6 +35,7 @@ import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelector
 import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 
 import { formatSeconds } from '@/lib/timeUtils';
 
@@ -175,7 +175,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const { transferNotifications } = useLocalNotifications();
-      const { selectedDydxChainId } = useSelectedNetwork();
+      const selectedDydxChainId = useSelector(getSelectedDydxChainId);
 
       useEffect(() => {
         for (const transfer of transferNotifications) {

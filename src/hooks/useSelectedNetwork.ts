@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { LocalStorageKey } from '@/constants/localStorage';
-import { DEFAULT_APP_ENVIRONMENT, DydxChainId, DydxNetwork, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { DEFAULT_APP_ENVIRONMENT, DydxNetwork } from '@/constants/networks';
 
 import { useAccounts, useLocalStorage } from '@/hooks';
 
@@ -14,7 +14,6 @@ import { validateAgainstAvailableEnvironments } from '@/lib/network';
 export const useSelectedNetwork = (): {
   switchNetwork: (network: DydxNetwork) => void;
   selectedNetwork: DydxNetwork;
-  selectedDydxChainId: DydxChainId;
 } => {
   const dispatch = useDispatch();
   const { disconnect } = useAccounts();
@@ -39,6 +38,5 @@ export const useSelectedNetwork = (): {
   return {
     switchNetwork,
     selectedNetwork,
-    selectedDydxChainId: ENVIRONMENT_CONFIG_MAP[selectedNetwork as DydxNetwork].dydxChainId as DydxChainId,
   };
 };
