@@ -10,18 +10,13 @@
     "name": "Ethereum Goerli"
   },
   {
-    "chainId": "42161",
-    "tokenAddress": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
-    "name": "Arbitrum"
-  },
-  {
     "chainId": "43114",
     "tokenAddress": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
     "name": "Avalanche"
   },
   {
     "chainId": "10",
-    "tokenAddress": "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+    "tokenAddress": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
     "name": "optimism"
   }
 ]
