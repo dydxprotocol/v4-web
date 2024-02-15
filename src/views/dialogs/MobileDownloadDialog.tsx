@@ -12,15 +12,24 @@ type ElementProps = {
 };
 
 /*
-  This implementation assumes "smartbanner:button-url-apple" and "smartbanner:button-url-google" are set to
-  the same value with onelink or other redirect URL.
-  Since there is no way to know what mobile device the user is using, we should give a onelink URL which
-  redirects to either iOS or Android app store depending on the mobile device used to scan the link.
+  When/if deployer deploys the web app with smartbanner, "smartbanner:button-url-apple" and/or 
+  "smartbanner:button-url-google" <meta> are set.
+  This implementation assumes "smartbanner:button-url-apple" and "smartbanner:button-url-google" 
+  are set to the same value with onelink or other redirect URL.
+  Since there is no way for the desktop web app to know what mobile device the user is using, 
+  we should give a onelink URL which redirects to either iOS or Android app store depending on 
+  the mobile device used to scan the link.
 */
-export const mobileAppUrl = 
-document.querySelector('meta[name="smartbanner:button-url-apple"]')?.getAttribute('content') ?? 
-document.querySelector('meta[name="smartbanner:button-url-google"]')?.getAttribute('content');
-// const mobileAppUrl = "http://example.com"; // for testing only
+
+// for testing only
+// export const mobileAppUrl = "http://example.com";
+
+// for testing to verify <meta> is retrieved by name, QR code should show "@dYdX" as value
+// export const mobileAppUrl = document.querySelector('meta[name="twitter:creator"]')?.getAttribute('content')
+
+export const mobileAppUrl =
+  document.querySelector('meta[name="smartbanner:button-url-apple"]')?.getAttribute('content') ?? 
+  document.querySelector('meta[name="smartbanner:button-url-google"]')?.getAttribute('content');
   
 const MobileQrCode = ({
   url,
