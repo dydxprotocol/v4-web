@@ -1,12 +1,27 @@
 [
-    {
-        "chainId": "1",
-        "tokenAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-        "name": "Ethereum"
-    },
-    {
-        "chainId": "5",
-        "tokenAddress": "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
-        "name": "Ethereum Goerli"
-    }
+  {
+    "chainId": "1",
+    "tokenAddress": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "name": "Ethereum"
+  },
+  {
+    "chainId": "5",
+    "tokenAddress": "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
+    "name": "Ethereum Goerli"
+  },
+  {
+    "chainId": "42161",
+    "tokenAddress": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+    "name": "Arbitrum"
+  },
+  {
+    "chainId": "43114",
+    "tokenAddress": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
+    "name": "Avalanche"
+  },
+  {
+    "chainId": "10",
+    "tokenAddress": "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+    "name": "optimism"
+  }
 ]
