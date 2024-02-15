@@ -93,7 +93,7 @@ const EstimatedRewards = () => {
         }),
       });
       const seasons = (await resp.json())?.data?.tradingSeasons;
-      return seasons[seasons.length - 1].label;
+      return seasons && seasons.length > 0 ? seasons[seasons.length - 1].label : undefined;
     },
     onError: (error: Error) => log('LaunchIncentives/fetchSeasonNumber', error),
   });
