@@ -4,13 +4,23 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog } from '@/components/Dialog';
 import { QrCode } from '@/components/QrCode';
+import { useStringGetter } from '@/hooks';
+import { STRING_KEYS } from '@/constants/localization';
 
 type ElementProps = {
   setIsOpen: (open: boolean) => void;
 };
 
-const appStoreUrl = document.querySelector('meta[name="smartbanner:button-url-apple"]')?.getAttribute('content');
-// const appStoreUrl = "http://example.com"; for testing only
+/*
+  This implementation assumes "smartbanner:button-url-apple" and "smartbanner:button-url-google" are set to
+  the same value with onelink or other redirect URL.
+  Since there is no way to know what mobile device the user is using, we should give a onelink URL which
+  redirects to either iOS or Android app store depending on the mobile device used to scan the link.
+*/
+export const mobileAppUrl = 
+document.querySelector('meta[name="smartbanner:button-url-apple"]')?.getAttribute('content') ?? 
+document.querySelector('meta[name="smartbanner:button-url-google"]')?.getAttribute('content');
+// const mobileAppUrl = "http://example.com"; // for testing only
   
 const MobileQrCode = ({
   url,
@@ -24,15 +34,22 @@ const MobileQrCode = ({
   );
 };
 
+/*
+MobileDownloadDialog should only been shown on desktop when mobileAppUrl has value. That's controlled by AccountMenu.tsx.
+*/
+
 export const MobileDownloadDialog = ({ setIsOpen }: ElementProps) => {
+  const stringGetter = useStringGetter();
   const content = (
       <>
-        <MobileQrCode url={appStoreUrl!} />
+        <MobileQrCode url={mobileAppUrl!} />
       </>
   );
 
   return (
-    <Dialog isOpen setIsOpen={setIsOpen} title="Scan and Download">
+    <Dialog isOpen setIsOpen={setIsOpen} title={
+        stringGetter({ key: STRING_KEYS.DOWNLOAD_MOBILE_APP })
+      }>
       <Styled.Content>{content}</Styled.Content>
     </Dialog>
   );

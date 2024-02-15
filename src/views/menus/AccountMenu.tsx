@@ -40,6 +40,7 @@ import { getAppTheme } from '@/state/configsSelectors';
 import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
 import { MustBigNumber } from '@/lib/numbers';
+import { appStoreUrl } from '../dialogs/MobileDownloadDialog';
 
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
@@ -59,10 +60,6 @@ export const AccountMenu = () => {
   const onRecoverKeys = () => {
     dispatch(openDialog({ type: DialogTypes.Onboarding }));
   };
-
-  const appStoreUrl = document.querySelector('meta[name="smartbanner:button-url-apple"]')?.getAttribute('content');
-  // const appStoreUrl = "http://example.com"; for testing
-  
 
   return onboardingState === OnboardingState.Disconnected ? (
     <OnboardingTriggerButton size={ButtonSize.XSmall} />
@@ -198,7 +195,7 @@ export const AccountMenu = () => {
               {
                 value: 'MobileDownload',
                 icon: <Icon iconName={IconName.Qr} />,
-                label: "Download Mobile App",
+                label: stringGetter({ key: STRING_KEYS.DOWNLOAD_MOBILE_APP }),
                 onSelect: () => {
                   dispatch(openDialog({ type: DialogTypes.MobileDownload }));
                 },
