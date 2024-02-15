@@ -35,8 +35,5 @@ export const useSelectedNetwork = (): {
     [dispatch, disconnect, setLocalStorageNetwork]
   );
 
-  return {
-    switchNetwork,
-    selectedNetwork,
-  };
+  return { switchNetwork, selectedNetwork };
 };
