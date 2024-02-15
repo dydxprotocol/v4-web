@@ -9,7 +9,9 @@ type ElementProps = {
   setIsOpen: (open: boolean) => void;
 };
 
-
+const appStoreUrl = document.querySelector('meta[name="smartbanner:button-url-apple"]')?.getAttribute('content');
+// const appStoreUrl = "http://example.com"; for testing only
+  
 const MobileQrCode = ({
   url,
 }: {
@@ -23,13 +25,9 @@ const MobileQrCode = ({
 };
 
 export const MobileDownloadDialog = ({ setIsOpen }: ElementProps) => {
-  const encryptionKey = "hello world!";
-
   const content = (
       <>
-        <MobileQrCode
-          url={encryptionKey}
-        />
+        <MobileQrCode url={appStoreUrl!} />
       </>
   );
 
