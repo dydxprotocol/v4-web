@@ -353,7 +353,7 @@
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/near-protocol/"
   },
   "ORDI-USD": {
-    "name": "ORDI",
+    "name": "Ordinals",
     "tags": ["NFT"],
     "websiteLink": "https://ordinals.com/",
     "whitepaperLink": "https://rodarmor.com/blog/",
