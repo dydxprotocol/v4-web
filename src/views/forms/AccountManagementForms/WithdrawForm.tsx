@@ -7,6 +7,7 @@ import { isAddress } from 'viem';
 
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
+import { AnalyticsEvent } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
@@ -57,7 +58,6 @@ import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
 import { validateCosmosAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics';
-import { AnalyticsEvent } from '@/constants/analytics';
 
 export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
@@ -183,9 +183,9 @@ export const WithdrawForm = () => {
             requestPayload.data,
             isCctp
           );
-          if (txHash) {
-            const nobleChainId = getNobleChainId();
-            const toChainId = Boolean(exchange) ? nobleChainId : chainIdStr || undefined;
+          const nobleChainId = getNobleChainId();
+          const toChainId = Boolean(exchange) ? nobleChainId : chainIdStr || undefined;
+          if (txHash && toChainId) {
             addTransferNotification({
               txHash: txHash,
               type: TransferNotificationTypes.Withdrawal,
