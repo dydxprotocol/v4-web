@@ -16,6 +16,7 @@ import {
   KeplrIcon,
   MathWalletIcon,
   MetaMaskIcon,
+  OkxWalletIcon,
   RainbowIcon,
   TokenPocketIcon,
   TrustWalletIcon,
@@ -89,6 +90,7 @@ export enum WalletType {
   // Ledger = 'LEDGER',
   MathWallet = 'MATH_WALLET',
   MetaMask = 'METAMASK',
+  OkxWallet = 'OKX_WALLET',
   Rainbow = 'RAINBOW_WALLET',
   TokenPocket = 'TOKEN_POCKET',
   TrustWallet = 'TRUST_WALLET',
@@ -102,6 +104,7 @@ const WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS = {
   imToken: 'ef333840daf915aafdc4a004525502d6d49d77bd9c65e0642dbaefb3c2893bef',
   TokenPocket: '20459438007b75f4f4acb98bf29aa3b800550309646d375da5fd4aac6c2a2c66',
   Trust: '4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0',
+  OkxWallet: '971e689d0a5be527bac79629b4ee9b925e82208e5168b733496a09c0faed0709',
   Rainbow: '1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369',
   Zerion: 'ecc4036f814562b41a5268adc86270fba1365471402006302e70169465b7ac18',
   Ledger: '19177a98252e07ddfc9af2083ba8e07ef627cb6103467ffebb3f8f4205fd7927',
@@ -212,6 +215,14 @@ export const wallets: Record<WalletType, WalletConfig> = {
     matchesInjectedEip1193: isMetaMask,
     walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.Metamask,
   },
+  [WalletType.OkxWallet]: {
+    type: WalletType.OkxWallet,
+    stringKey: STRING_KEYS.TRUST_WALLET,
+    icon: OkxWalletIcon,
+    connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
+    matchesInjectedEip1193: (provider) => provider.isOkxWallet,
+    walletconnect2Id: WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS.OkxWallet,
+  },
   [WalletType.Rainbow]: {
     type: WalletType.Rainbow,
     stringKey: STRING_KEYS.RAINBOW_WALLET,
@@ -276,6 +287,10 @@ export type WithInjectedWeb3Provider = {
   web3: {
     currentProvider: InjectedWeb3Provider;
   };
+};
+
+export type WithInjectedOkxWalletProvider = {
+  okxwallet: InjectedWeb3Provider;
 };
 
 // Wallet connections
