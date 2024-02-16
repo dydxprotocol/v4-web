@@ -2,7 +2,7 @@
  * @param hash location.hash
  * @returns path and query string if hash parameter is not empty
  */
-export const parseHash = (hash: string) => {
+export const parseLocationHash = (hash: string) => {
   if (!hash || hash.length === 0) return '';
 
   // Remove '#' and split by '?'

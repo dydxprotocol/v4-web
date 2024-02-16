@@ -35,7 +35,7 @@ import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
 import { DialogManager } from '@/layout/DialogManager';
 import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 
-import { parseHash } from '@/lib/urlUtils';
+import { parseLocationHash } from '@/lib/urlUtils';
 import { config } from '@/lib/wagmi';
 
 import { breakpoints } from '@/styles';
@@ -75,7 +75,7 @@ const Content = () => {
     if (location.hash === '') {
       return '';
     }
-    return parseHash(location.hash);
+    return parseLocationHash(location.hash);
   }, [location.hash]);
 
   return (

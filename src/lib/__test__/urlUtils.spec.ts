@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseHash } from '@/lib/urlUtils';
+import { parseLocationHash } from '@/lib/urlUtils';
 
-describe('parseHash', () => {
+describe('parseLocationHash', () => {
   it('returns the path separated from hash', () => {
     const hash = '#/markets';
-    expect(parseHash(hash)).toEqual('/markets');
+    expect(parseLocationHash(hash)).toEqual('/markets');
   });
   it('returns the path and query string separated from hash', () => {
     const hash = '#/markets?displayinitializingmarkets=true';
-    expect(parseHash(hash)).toEqual('/markets?displayinitializingmarkets=true');
+    expect(parseLocationHash(hash)).toEqual('/markets?displayinitializingmarkets=true');
   });
 });
