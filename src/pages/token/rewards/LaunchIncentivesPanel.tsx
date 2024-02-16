@@ -26,8 +26,6 @@ import { openDialog } from '@/state/dialogs';
 
 import { log } from '@/lib/telemetry';
 
-const SEASON_NUMBER = 2;
-
 export const LaunchIncentivesPanel = ({ className }: { className?: string }) => {
   const { isNotTablet } = useBreakpoints();
   const dispatch = useDispatch();
@@ -74,14 +72,38 @@ const EstimatedRewards = () => {
   const stringGetter = useStringGetter();
   const { dydxAddress } = useAccounts();
 
+  const { data: seasonNumber } = useQuery({
+    queryKey: 'chaos_labs_season_number',
+    queryFn: async () => {
+      const resp = await fetch('https://cloud.chaoslabs.co/query/ccar-perpetuals', {
+        method: 'POST',
+        headers: {
+          'apollographql-client-name': 'dydx-v4',
+          'content-type': 'application/json',
+          protocol: 'dydx-v4',
+        },
+        body: JSON.stringify({
+          operationName: 'TradingSeasons',
+          variables: {},
+          query: `query TradingSeasons {
+        tradingSeasons {
+          label
+        }
+      }`,
+        }),
+      });
+      const seasons = (await resp.json())?.data?.tradingSeasons;
+      return seasons && seasons.length > 0 ? seasons[seasons.length - 1].label : undefined;
+    },
+    onError: (error: Error) => log('LaunchIncentives/fetchSeasonNumber', error),
+  });
+
   const { data, isLoading } = useQuery({
     enabled: !!dydxAddress,
-    queryKey: `launch_incentives_rewards_${dydxAddress ?? ''}_${SEASON_NUMBER}`,
+    queryKey: `launch_incentives_rewards_${dydxAddress ?? ''}`,
     queryFn: async () => {
       if (!dydxAddress) return undefined;
-      const resp = await fetch(
-        `https://cloud.chaoslabs.co/query/api/dydx/points/${dydxAddress}?n=${SEASON_NUMBER}`
-      );
+      const resp = await fetch(`https://cloud.chaoslabs.co/query/api/dydx/points/${dydxAddress}`);
       return (await resp.json())?.incentivePoints;
     },
     onError: (error: Error) => log('LaunchIncentives/fetchPoints', error),
@@ -92,12 +114,14 @@ const EstimatedRewards = () => {
       <Styled.EstimatedRewardsCardContent>
         <div>
           <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}</span>
-          <Styled.Season>
-            {stringGetter({
-              key: STRING_KEYS.LAUNCH_INCENTIVES_SEASON_NUM,
-              params: { SEASON_NUMBER },
-            })}
-          </Styled.Season>
+          {seasonNumber !== undefined && (
+            <Styled.Season>
+              {stringGetter({
+                key: STRING_KEYS.LAUNCH_INCENTIVES_SEASON_NUM,
+                params: { SEASON_NUMBER: seasonNumber },
+              })}
+            </Styled.Season>
+          )}
         </div>
 
         <Styled.Points>
