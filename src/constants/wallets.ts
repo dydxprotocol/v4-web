@@ -217,7 +217,7 @@ export const wallets: Record<WalletType, WalletConfig> = {
   },
   [WalletType.OkxWallet]: {
     type: WalletType.OkxWallet,
-    stringKey: STRING_KEYS.TRUST_WALLET,
+    stringKey: STRING_KEYS.OKX_WALLET,
     icon: OkxWalletIcon,
     connectionTypes: [WalletConnectionType.InjectedEip1193, WalletConnectionType.WalletConnect2],
     matchesInjectedEip1193: (provider) => provider.isOkxWallet,
