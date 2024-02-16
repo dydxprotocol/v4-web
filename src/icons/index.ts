@@ -19,6 +19,7 @@ export { default as CoinMarketCapIcon } from './logos/coinmarketcap.svg';
 export { default as CoinsIcon } from './coins.svg';
 export { default as CommentIcon } from './comment.svg';
 export { default as CopyIcon } from './copy.svg';
+export { default as CurrencySignIcon } from './currency-sign.svg';
 export { default as DepositIcon } from './deposit.svg';
 export { default as DepthChartIcon } from './depth-chart.svg';
 export { default as DiscordIcon } from './discord.svg';
@@ -28,13 +29,13 @@ export { default as FileIcon } from './file.svg';
 export { default as FundingChartIcon } from './funding-chart.svg';
 export { default as GearIcon } from './gear.svg';
 export { default as GiftboxIcon } from './giftbox.svg';
+export { default as GovernanceIcon } from './governance.svg';
 export { default as HelpCircleIcon } from './help-circle.svg';
 export { default as HideIcon } from './hide.svg';
 export { default as HistoryIcon } from './history.svg';
 export { default as LeaderboardIcon } from './leaderboard.svg';
 export { default as LinkOutIcon } from './link-out.svg';
 export { default as LockIcon } from './lock.svg';
-export { default as LogoShortIcon } from './logo-short';
 export { default as MarketsIcon } from './markets.svg';
 export { default as MenuIcon } from './menu.svg';
 export { default as MigrateIcon } from './migrate.svg';
@@ -60,6 +61,7 @@ export { default as StarIcon } from './star.svg';
 export { default as SunIcon } from './sun.svg';
 export { default as TerminalIcon } from './terminal.svg';
 export { default as TogglesMenuIcon } from './toggles-menu.svg';
+export { default as TokenIcon } from './token.svg';
 export { default as TradeIcon } from './trade.svg';
 export { default as TransferIcon } from './transfer.svg';
 export { default as TriangleIcon } from './triangle.svg';
@@ -90,7 +92,9 @@ export { default as WebsiteIcon } from './website.svg';
 export { default as WhitepaperIcon } from './whitepaper.svg';
 
 // Logos
+export { default as ChaosLabsIcon } from './chaos-labs';
 export { default as EtherscanIcon } from './logos/etherscan.svg';
+export { default as LogoShortIcon } from './logo-short';
 
 // Trade
 export { default as OrderCanceledIcon } from './trade/order-canceled.svg';

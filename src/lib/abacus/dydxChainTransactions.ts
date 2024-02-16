@@ -31,9 +31,10 @@ import {
   type HumanReadableTransferPayload,
 } from '@/constants/abacus';
 
+import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
-import { ENVIRONMENT_CONFIG_MAP, DydxNetwork, isTestnet } from '@/constants/networks';
+import { DydxNetwork, isTestnet } from '@/constants/networks';
 
 import { RootStore } from '@/state/_store';
 import { addUncommittedOrderClientId, removeUncommittedOrderClientId } from '@/state/account';
@@ -42,7 +43,8 @@ import { openDialog } from '@/state/dialogs';
 import { StatefulOrderError } from '../errors';
 import { bytesToBigInt } from '../numbers';
 import { log } from '../telemetry';
-import { hashFromTx } from '../hashfromTx';
+import { hashFromTx, getMintscanTxLink } from '../txUtils';
+import { getDydxChainIdFromNetwork } from '../network';
 
 class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   private compositeClient: CompositeClient | undefined;
@@ -115,7 +117,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
             {
               broadcastPollIntervalMs: 3_000,
               broadcastTimeoutMs: 60_000,
-            }
+            },
+            DEFAULT_TRANSACTION_MEMO
           )
         )
       );
@@ -236,9 +239,10 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
       if (isTestnet) {
         console.log(
-          `${ENVIRONMENT_CONFIG_MAP[
-            this.compositeClient.network.getString() as DydxNetwork
-          ]?.links?.mintscan?.replace('{tx_hash}', hash.toString())}`
+          getMintscanTxLink(
+            getDydxChainIdFromNetwork(this.compositeClient.network.getString() as DydxNetwork),
+            hash
+          )
         );
       } else console.log(`txHash: ${hash}`);
 
@@ -370,8 +374,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         value: {
           ...params.msg,
           timeoutTimestamp: params.msg.timeoutTimestamp
-            // Squid returns timeoutTimestamp as Long, but the signer expects BigInt
-            ? BigInt(Long.fromValue(params.msg.timeoutTimestamp).toString())
+            ? // Squid returns timeoutTimestamp as Long, but the signer expects BigInt
+              BigInt(Long.fromValue(params.msg.timeoutTimestamp).toString())
             : undefined,
         },
       };
@@ -387,7 +391,11 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       }
 
       ibcMsg.value.token.amount = amount.toString();
-      const tx = await this.nobleClient.send([ibcMsg]);
+      const tx = await this.nobleClient.send(
+        [ibcMsg],
+        undefined,
+        `${DEFAULT_TRANSACTION_MEMO} | ${this.nobleWallet?.address}`
+      );
 
       const parsedTx = this.parseToPrimitives(tx);
 
@@ -426,8 +434,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         value: {
           ...parsedIbcPayload.msg,
           timeoutTimestamp: parsedIbcPayload.msg.timeoutTimestamp
-            // Squid returns timeoutTimestamp as Long, but the signer expects BigInt
-            ? BigInt(Long.fromValue(parsedIbcPayload.msg.timeoutTimestamp).toString())
+            ? // Squid returns timeoutTimestamp as Long, but the signer expects BigInt
+              BigInt(Long.fromValue(parsedIbcPayload.msg.timeoutTimestamp).toString())
             : undefined,
         },
       };

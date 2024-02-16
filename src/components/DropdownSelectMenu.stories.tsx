@@ -28,21 +28,22 @@ const exampleItems = [
   },
 ];
 
-export const DropdownSelectMenuStory: Story<Parameters<typeof DropdownSelectMenu>> = (args) => {
+export const DropdownSelectMenuStory: Story<
+  Pick<Parameters<typeof DropdownSelectMenu>[0], 'items' | 'align' | 'sideOffset' | 'disabled'>
+> = (args) => {
   const [item, setItem] = useState(exampleItems[0].value);
   return (
     <StoryWrapper>
-      <DropdownSelectMenu
-        items={exampleItems}
-        value={item}
-        onValueChange={(value) => setItem(value)}
-        {...args}
-      />
+      <DropdownSelectMenu value={item} onValueChange={(value) => setItem(value)} {...args} />
     </StoryWrapper>
   );
 };
 
-DropdownSelectMenuStory.args = {};
+DropdownSelectMenuStory.args = {
+  items: exampleItems,
+  sideOffset: 1,
+  disabled: false,
+};
 
 DropdownSelectMenuStory.argTypes = {
   align: {

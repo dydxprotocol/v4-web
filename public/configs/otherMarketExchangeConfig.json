@@ -1,0 +1,608 @@
+{
+  "1INCH": [
+    { "exchangeName": "Binance", "ticker": "1INCHUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "1INCH-USD" },
+    { "exchangeName": "Gate", "ticker": "1INCH_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kucoin", "ticker": "1INCH-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "1INCH-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "1INCH_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "AAVE": [
+    { "exchangeName": "Binance", "ticker": "AAVEUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "AAVE-USD" },
+    { "exchangeName": "Huobi", "ticker": "aaveusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "AAVEUSD" },
+    { "exchangeName": "Kucoin", "ticker": "AAVE-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "AAVE-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "AAVE_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "ADA": [
+    { "exchangeName": "Binance", "ticker": "ADAUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bitstamp", "ticker": "ADA/USD" },
+    { "exchangeName": "Bybit", "ticker": "ADAUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "ADA-USD" },
+    { "exchangeName": "Huobi", "ticker": "adausdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "ADAUSD" },
+    { "exchangeName": "Kucoin", "ticker": "ADA-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "ADA-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "ADA_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "AGIX": [
+    { "exchangeName": "Binance", "ticker": "AGIXUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "AGIXUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Gate", "ticker": "AGIX_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kucoin", "ticker": "AGIX-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "AGIX-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "AGIX_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "ALGO": [
+    { "exchangeName": "Binance", "ticker": "ALGOUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "ALGO-USD" },
+    { "exchangeName": "Kraken", "ticker": "ALGOUSD" },
+    { "exchangeName": "Kucoin", "ticker": "ALGO-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "ALGO-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "ALGO_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "APE": [
+    { "exchangeName": "Binance", "ticker": "APEUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "APE-USD" },
+    { "exchangeName": "Gate", "ticker": "APE_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "APEUSD" },
+    { "exchangeName": "Kucoin", "ticker": "APE-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "APE-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "APE_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "APT": [
+    { "exchangeName": "Binance", "ticker": "APTUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "APTUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "APT-USD" },
+    { "exchangeName": "Gate", "ticker": "APT_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Huobi", "ticker": "aptusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "APTUSD" },
+    { "exchangeName": "Kucoin", "ticker": "APT-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "APT-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "APT_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "ARB": [
+    { "exchangeName": "Binance", "ticker": "ARBUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "ARBUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "ARB-USD" },
+    { "exchangeName": "Huobi", "ticker": "arbusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "ARBUSD" },
+    { "exchangeName": "Kucoin", "ticker": "ARB-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "ARB-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "ARB_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "ATOM": [
+    { "exchangeName": "Binance", "ticker": "ATOMUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "ATOMUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "ATOM-USD" },
+    { "exchangeName": "Gate", "ticker": "ATOM_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "ATOMUSD" },
+    { "exchangeName": "Kucoin", "ticker": "ATOM-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "ATOM-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "ATOM_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "AVAX": [
+    { "exchangeName": "Binance", "ticker": "AVAXUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bitstamp", "ticker": "AVAX/USD" },
+    { "exchangeName": "Bybit", "ticker": "AVAXUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "AVAX-USD" },
+    { "exchangeName": "Huobi", "ticker": "avaxusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "AVAXUSD" },
+    { "exchangeName": "Kucoin", "ticker": "AVAX-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "AVAX-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "AVAX_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "BCH": [
+    { "exchangeName": "Binance", "ticker": "BCHUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bitstamp", "ticker": "BCH/USD" },
+    { "exchangeName": "Bybit", "ticker": "BCHUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "BCH-USD" },
+    { "exchangeName": "Huobi", "ticker": "bchusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "BCHUSD" },
+    { "exchangeName": "Kucoin", "ticker": "BCH-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "BCH-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "BCH_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "BLUR": [
+    { "exchangeName": "Binance", "ticker": "BLURUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "BLURUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "BLUR-USD" },
+    { "exchangeName": "Kraken", "ticker": "BLURUSD" },
+    { "exchangeName": "Kucoin", "ticker": "BLUR-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "BLUR-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "BLUR_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "BNB": [
+    { "exchangeName": "Binance", "ticker": "BNBUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "BNBUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Gate", "ticker": "BNB_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kucoin", "ticker": "BNB-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "BNB-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "BNB_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "BONK": [
+    { "exchangeName": "Binance", "ticker": "BONKUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "BONKUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "BONK-USD" },
+    { "exchangeName": "Kucoin", "ticker": "BONK-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "BONK-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "BONK_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "BTC": [
+    { "exchangeName": "Binance", "ticker": "BTCUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bitstamp", "ticker": "BTC/USD" },
+    { "exchangeName": "Bybit", "ticker": "BTCUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "BTC-USD" },
+    { "exchangeName": "Huobi", "ticker": "btcusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "BTCUSD" },
+    { "exchangeName": "Kucoin", "ticker": "BTC-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "BTC-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "BTC_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "CHZ": [
+    { "exchangeName": "Binance", "ticker": "CHZUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "CHZ-USD" },
+    { "exchangeName": "Kraken", "ticker": "CHZUSD" },
+    { "exchangeName": "Kucoin", "ticker": "CHZ-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "CHZ-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "CHZ_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "CRV": [
+    { "exchangeName": "Binance", "ticker": "CRVUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "CRV-USD" },
+    { "exchangeName": "Kraken", "ticker": "CRVUSD" },
+    { "exchangeName": "Kucoin", "ticker": "CRV-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "CRV-USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "DOGE": [
+    { "exchangeName": "Binance", "ticker": "DOGEUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "DOGEUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "DOGE-USD" },
+    { "exchangeName": "Huobi", "ticker": "dogeusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "DOGEUSD" },
+    { "exchangeName": "Kucoin", "ticker": "DOGE-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "DOGE-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "DOGE_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "DOT": [
+    { "exchangeName": "Binance", "ticker": "DOTUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "DOTUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "DOT-USD" },
+    { "exchangeName": "Huobi", "ticker": "dotusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "DOTUSD" },
+    { "exchangeName": "Kucoin", "ticker": "DOT-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "DOT-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "DOT_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "DYM": [
+    { "exchangeName": "Binance", "ticker": "DYMUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "DYMUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Gate", "ticker": "DYM_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kucoin", "ticker": "DYM-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "DYM_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "ENS": [
+    { "exchangeName": "Binance", "ticker": "ENSUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "ENS-USD" },
+    { "exchangeName": "Gate", "ticker": "ENS_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kucoin", "ticker": "ENS-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "ENS-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "ENS_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "EOS": [
+    { "exchangeName": "Binance", "ticker": "EOSUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "EOSUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "EOS-USD" },
+    { "exchangeName": "Gate", "ticker": "EOS_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "EOSUSD" },
+    { "exchangeName": "Kucoin", "ticker": "EOS-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "EOS-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "EOS_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "ETC": [
+    { "exchangeName": "Binance", "ticker": "ETCUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "ETCUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "ETC-USD" },
+    { "exchangeName": "Huobi", "ticker": "etcusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "ETCUSD" },
+    { "exchangeName": "Kucoin", "ticker": "ETC-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "ETC-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "ETC_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "ETH": [
+    { "exchangeName": "Binance", "ticker": "ETHUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bitstamp", "ticker": "ETH/USD" },
+    { "exchangeName": "Bybit", "ticker": "ETHUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "ETH-USD" },
+    { "exchangeName": "Huobi", "ticker": "ethusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "ETHUSD" },
+    { "exchangeName": "Kucoin", "ticker": "ETH-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "ETH-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "ETH_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "FET": [
+    { "exchangeName": "Binance", "ticker": "FETUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "FET-USD" },
+    { "exchangeName": "Kraken", "ticker": "FETUSD" },
+    { "exchangeName": "Kucoin", "ticker": "FET-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "FET-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "FET_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "FIL": [
+    { "exchangeName": "Binance", "ticker": "FILUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "FILUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "FIL-USD" },
+    { "exchangeName": "Huobi", "ticker": "filusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "FILUSD" },
+    { "exchangeName": "Kucoin", "ticker": "FIL-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "FIL-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "FIL_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "FTM": [
+    { "exchangeName": "Binance", "ticker": "FTMUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "FTMUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "FTMUSD" },
+    { "exchangeName": "Kucoin", "ticker": "FTM-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "FTM-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "FTM_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "GALA": [
+    { "exchangeName": "Binance", "ticker": "GALAUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "GALAUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Gate", "ticker": "GALA_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "GALAUSD" },
+    { "exchangeName": "Okx", "ticker": "GALA-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "GALA_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "GMT": [
+    { "exchangeName": "Binance", "ticker": "GMTUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "GMTUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "GMT-USD" },
+    { "exchangeName": "Gate", "ticker": "GMT_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kucoin", "ticker": "GMT-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "GMT-USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "GRT": [
+    { "exchangeName": "Binance", "ticker": "GRTUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "GRT-USD" },
+    { "exchangeName": "Gate", "ticker": "GRT_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "GRTUSD" },
+    { "exchangeName": "Kucoin", "ticker": "GRT-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "GRT-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "GRT_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "HBAR": [
+    { "exchangeName": "Binance", "ticker": "HBARUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "HBARUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "HBAR-USD" },
+    { "exchangeName": "Kucoin", "ticker": "HBAR-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "HBAR-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "HBAR_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "ICP": [
+    { "exchangeName": "Binance", "ticker": "ICPUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "ICPUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "ICP-USD" },
+    { "exchangeName": "Kraken", "ticker": "ICPUSD" },
+    { "exchangeName": "Kucoin", "ticker": "ICP-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "ICP-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "ICP_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "IMX": [
+    { "exchangeName": "Binance", "ticker": "IMXUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "IMX-USD" },
+    { "exchangeName": "Kraken", "ticker": "IMXUSD" },
+    { "exchangeName": "Kucoin", "ticker": "IMX-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "IMX-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "IMX_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "INJ": [
+    { "exchangeName": "Binance", "ticker": "INJUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "INJUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "INJ-USD" },
+    { "exchangeName": "Kraken", "ticker": "INJUSD" },
+    { "exchangeName": "Kucoin", "ticker": "INJ-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "INJ-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "INJ_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "JTO": [
+    { "exchangeName": "Binance", "ticker": "JTOUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "JTOUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "JTO-USD" },
+    { "exchangeName": "Kucoin", "ticker": "JTO-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "JTO-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "JTO_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "JUP": [
+    { "exchangeName": "Binance", "ticker": "JUPUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "JUPUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Gate", "ticker": "JUP_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "JUP-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "JUP_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "KAVA": [
+    { "exchangeName": "Binance", "ticker": "KAVAUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "KAVAUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "KAVA-USD" },
+    { "exchangeName": "Gate", "ticker": "KAVA_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "KAVAUSD" },
+    { "exchangeName": "Kucoin", "ticker": "KAVA-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "KAVA_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "LDO": [
+    { "exchangeName": "Binance", "ticker": "LDOUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "LDOUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "LDO-USD" },
+    { "exchangeName": "Kraken", "ticker": "LDOUSD" },
+    { "exchangeName": "Kucoin", "ticker": "LDO-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "LDO-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "LDO_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "LINK": [
+    { "exchangeName": "Binance", "ticker": "LINKUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bitstamp", "ticker": "LINK/USD" },
+    { "exchangeName": "Bybit", "ticker": "LINKUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "LINK-USD" },
+    { "exchangeName": "Kraken", "ticker": "LINKUSD" },
+    { "exchangeName": "Kucoin", "ticker": "LINK-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "LINK-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "LINK_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "LTC": [
+    { "exchangeName": "Binance", "ticker": "LTCUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bitstamp", "ticker": "LTC/USD" },
+    { "exchangeName": "Bybit", "ticker": "LTCUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "LTC-USD" },
+    { "exchangeName": "Huobi", "ticker": "ltcusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "LTCUSD" },
+    { "exchangeName": "Kucoin", "ticker": "LTC-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "LTC-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "LTC_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "MANA": [
+    { "exchangeName": "Binance", "ticker": "MANAUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "MANA-USD" },
+    { "exchangeName": "Gate", "ticker": "MANA_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "MANAUSD" },
+    { "exchangeName": "Kucoin", "ticker": "MANA-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "MANA-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "MANA_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "MASK": [
+    { "exchangeName": "Binance", "ticker": "MASKUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "MASKUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "MASK-USD" },
+    { "exchangeName": "Gate", "ticker": "MASK_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Huobi", "ticker": "maskusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kucoin", "ticker": "MASK-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "MASK-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "MASK_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "MATIC": [
+    { "exchangeName": "Binance", "ticker": "MATICUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bitstamp", "ticker": "MATIC/USD" },
+    { "exchangeName": "Bybit", "ticker": "MATICUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "MATIC-USD" },
+    { "exchangeName": "Huobi", "ticker": "maticusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "MATICUSD" },
+    { "exchangeName": "Kucoin", "ticker": "MATIC-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "MATIC-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "MATIC_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "MINA": [
+    { "exchangeName": "Binance", "ticker": "MINAUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "MINA-USD" },
+    { "exchangeName": "Gate", "ticker": "MINA_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "MINAUSD" },
+    { "exchangeName": "Okx", "ticker": "MINA-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "MINA_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "MKR": [
+    { "exchangeName": "Binance", "ticker": "MKRUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "MKR-USD" },
+    { "exchangeName": "Kraken", "ticker": "MKRUSD" },
+    { "exchangeName": "Kucoin", "ticker": "MKR-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "MKR-USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "NEAR": [
+    { "exchangeName": "Binance", "ticker": "NEARUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "NEARUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "NEAR-USD" },
+    { "exchangeName": "Huobi", "ticker": "nearusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "NEARUSD" },
+    { "exchangeName": "Kucoin", "ticker": "NEAR-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "NEAR-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "NEAR_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "OP": [
+    { "exchangeName": "Binance", "ticker": "OPUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "OPUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "OP-USD" },
+    { "exchangeName": "Gate", "ticker": "OP_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "OPUSD" },
+    { "exchangeName": "Kucoin", "ticker": "OP-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "OP-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "OP_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "ORDI": [
+    { "exchangeName": "Binance", "ticker": "ORDIUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "ORDIUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Gate", "ticker": "ORDI_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Huobi", "ticker": "ordiusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kucoin", "ticker": "ORDI-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "ORDI-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "ORDI_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "PEPE": [
+    { "exchangeName": "Binance", "ticker": "PEPEUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "PEPEUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "PEPEUSD" },
+    { "exchangeName": "Kucoin", "ticker": "PEPE-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "PEPE-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "PEPE_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "PYTH": [
+    { "exchangeName": "Binance", "ticker": "PYTHUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "PYTHUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Gate", "ticker": "PYTH_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kucoin", "ticker": "PYTH-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "PYTH-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "PYTH_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "RNDR": [
+    { "exchangeName": "Binance", "ticker": "RNDRUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "RNDR-USD" },
+    { "exchangeName": "Kraken", "ticker": "RNDRUSD" },
+    { "exchangeName": "Kucoin", "ticker": "RNDR-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "RNDR-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "RNDR_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "RUNE": [
+    { "exchangeName": "Binance", "ticker": "RUNEUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Gate", "ticker": "RUNE_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "RUNEUSD" },
+    { "exchangeName": "Kucoin", "ticker": "RUNE-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "RUNE_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "SAND": [
+    { "exchangeName": "Binance", "ticker": "SANDUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "SAND-USD" },
+    { "exchangeName": "Gate", "ticker": "SAND_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kucoin", "ticker": "SAND-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "SAND-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "SAND_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "SEI": [
+    { "exchangeName": "Binance", "ticker": "SEIUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "SEIUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "SEI-USD" },
+    { "exchangeName": "Huobi", "ticker": "seiusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "SEIUSD" },
+    { "exchangeName": "Kucoin", "ticker": "SEI-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "SEI_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "SHIB": [
+    { "exchangeName": "Binance", "ticker": "SHIBUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "SHIBUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "SHIB-USD" },
+    { "exchangeName": "Huobi", "ticker": "shibusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "SHIBUSD" },
+    { "exchangeName": "Kucoin", "ticker": "SHIB-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "SHIB-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "SHIB_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "SNX": [
+    { "exchangeName": "Binance", "ticker": "SNXUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "SNXUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "SNX-USD" },
+    { "exchangeName": "Kraken", "ticker": "SNXUSD" },
+    { "exchangeName": "Kucoin", "ticker": "SNX-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "SNX-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "SNX_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "SOL": [
+    { "exchangeName": "Binance", "ticker": "SOLUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bitstamp", "ticker": "SOL/USD" },
+    { "exchangeName": "Bybit", "ticker": "SOLUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "SOL-USD" },
+    { "exchangeName": "Huobi", "ticker": "solusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "SOLUSD" },
+    { "exchangeName": "Kucoin", "ticker": "SOL-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "SOL-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "SOL_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "STX": [
+    { "exchangeName": "Binance", "ticker": "STXUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "STXUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "STX-USD" },
+    { "exchangeName": "Gate", "ticker": "STX_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "STXUSD" },
+    { "exchangeName": "Kucoin", "ticker": "STX-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "STX-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "STX_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "SUI": [
+    { "exchangeName": "Binance", "ticker": "SUIUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "SUIUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "SUI-USD" },
+    { "exchangeName": "Huobi", "ticker": "suiusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "SUIUSD" },
+    { "exchangeName": "Kucoin", "ticker": "SUI-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "SUI-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "SUI_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "TIA": [
+    { "exchangeName": "Binance", "ticker": "TIAUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "TIAUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "TIA-USD" },
+    { "exchangeName": "Kraken", "ticker": "TIAUSD" },
+    { "exchangeName": "Kucoin", "ticker": "TIA-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "TIA-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "TIA_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "TRX": [
+    { "exchangeName": "Binance", "ticker": "TRXUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "TRXUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Gate", "ticker": "TRX_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Huobi", "ticker": "trxusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "TRXUSD" },
+    { "exchangeName": "Kucoin", "ticker": "TRX-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "TRX-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "TRX_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "UNI": [
+    { "exchangeName": "Binance", "ticker": "UNIUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "UNIUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "UNI-USD" },
+    { "exchangeName": "Kraken", "ticker": "UNIUSD" },
+    { "exchangeName": "Kucoin", "ticker": "UNI-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "UNI-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "UNI_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "WLD": [
+    { "exchangeName": "Binance", "ticker": "WLDUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "WLDUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Gate", "ticker": "WLD_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kucoin", "ticker": "WLD-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "WLD-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "WLD_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "WOO": [
+    { "exchangeName": "Binance", "ticker": "WOOUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Gate", "ticker": "WOO_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kucoin", "ticker": "WOO-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "WOO-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "WOO_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "XLM": [
+    { "exchangeName": "Binance", "ticker": "XLMUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bitstamp", "ticker": "XLM/USD" },
+    { "exchangeName": "Bybit", "ticker": "XLMUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "XLM-USD" },
+    { "exchangeName": "Kraken", "ticker": "XLMUSD" },
+    { "exchangeName": "Kucoin", "ticker": "XLM-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "XLM-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "XLM_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "XRP": [
+    { "exchangeName": "Binance", "ticker": "XRPUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bitstamp", "ticker": "XRP/USD" },
+    { "exchangeName": "Bybit", "ticker": "XRPUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "XRP-USD" },
+    { "exchangeName": "Huobi", "ticker": "xrpusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "XRPUSD" },
+    { "exchangeName": "Kucoin", "ticker": "XRP-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "XRP-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "XRP_USDT", "adjustByMarket": "USDT-USD" }
+  ],
+  "ZETA": [
+    { "exchangeName": "Bybit", "ticker": "ZETAUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "CoinbasePro", "ticker": "ZETA-USD" },
+    { "exchangeName": "Gate", "ticker": "ZETA_USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kucoin", "ticker": "ZETA-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "ZETA-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Mexc", "ticker": "ZETA_USDT", "adjustByMarket": "USDT-USD" }
+  ]
+}

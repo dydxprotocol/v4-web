@@ -272,7 +272,7 @@ Styled.AccountDetail = styled.div<{ gridArea: string }>`
 
 Styled.PnlChart = styled(PnlChart)<{ pnlDiffSign: NumberSign }>`
   grid-area: Chart;
-  background-color: var(--color-layer-1);
+  background-color: var(--color-layer-2);
 
   --pnl-line-color: ${({ pnlDiffSign }) =>
     ({

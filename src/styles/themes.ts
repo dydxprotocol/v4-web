@@ -1,9 +1,13 @@
-import { AppTheme } from '@/state/configs';
-import type { ThemeColors } from '@/constants/styles/colors';
-import { ColorToken, OpacityToken } from '@/constants/styles/base';
+import { AppTheme, AppColorMode } from '@/state/configs';
+import type { Theme, ThemeColorBase } from '@/constants/styles/colors';
+import { BrightnessFilterToken, ColorToken, OpacityToken } from '@/constants/styles/base';
 import { generateFadedColorVariant } from '@/lib/styles';
 
-const ClassicTheme: ThemeColors = {
+const ClassicThemeBase: ThemeColorBase = {
+  white: ColorToken.White,
+  green: ColorToken.Green1,
+  red: ColorToken.Red2,
+
   layer0: ColorToken.GrayBlue7,
   layer1: ColorToken.GrayBlue6,
   layer2: ColorToken.GrayBlue5,
@@ -20,6 +24,7 @@ const ClassicTheme: ThemeColors = {
   textPrimary: ColorToken.LightGray2,
   textSecondary: ColorToken.GrayPurple1,
   textTertiary: ColorToken.GrayPurple2,
+  textButton: ColorToken.LightGray2,
 
   gradientBase0: ColorToken.DarkGray9,
   gradientBase1: ColorToken.GrayBlue2,
@@ -31,6 +36,9 @@ const ClassicTheme: ThemeColors = {
   success: ColorToken.Green1,
   warning: ColorToken.Yellow0,
   error: ColorToken.Red2,
+  successFaded: generateFadedColorVariant(ColorToken.Green1, OpacityToken.Opacity16),
+  warningFaded: generateFadedColorVariant(ColorToken.Yellow0, OpacityToken.Opacity16),
+  errorFaded: generateFadedColorVariant(ColorToken.Red2, OpacityToken.Opacity16),
 
   positive: ColorToken.Green1,
   negative: ColorToken.Red2,
@@ -47,12 +55,19 @@ const ClassicTheme: ThemeColors = {
 
   inputBackground: ColorToken.GrayBlue3,
   popoverBackground: generateFadedColorVariant(ColorToken.GrayBlue4, OpacityToken.Opacity90),
-  switchThumbActiveBackground: ColorToken.White,
   toggleBackground: ColorToken.GrayBlue3,
   tooltipBackground: generateFadedColorVariant(ColorToken.GrayBlue3, OpacityToken.Opacity66),
+
+  hoverFilterBase: BrightnessFilterToken.Lighten10,
+  hoverFilterVariant: BrightnessFilterToken.Lighten10,
+  activeFilter: BrightnessFilterToken.Darken10,
 };
 
-const DarkTheme: ThemeColors = {
+const DarkThemeBase: ThemeColorBase = {
+  white: ColorToken.White,
+  green: ColorToken.Green0,
+  red: ColorToken.Red0,
+
   layer0: ColorToken.Black,
   layer1: ColorToken.DarkGray11,
   layer2: ColorToken.DarkGray13,
@@ -69,6 +84,7 @@ const DarkTheme: ThemeColors = {
   textPrimary: ColorToken.LightGray0,
   textSecondary: ColorToken.MediumGray0,
   textTertiary: ColorToken.DarkGray0,
+  textButton: ColorToken.LightGray0,
 
   gradientBase0: ColorToken.DarkGray8,
   gradientBase1: ColorToken.DarkGray5,
@@ -80,6 +96,9 @@ const DarkTheme: ThemeColors = {
   success: ColorToken.Green0,
   warning: ColorToken.Yellow0,
   error: ColorToken.Red0,
+  successFaded: generateFadedColorVariant(ColorToken.Green0, OpacityToken.Opacity16),
+  warningFaded: generateFadedColorVariant(ColorToken.Yellow0, OpacityToken.Opacity16),
+  errorFaded: generateFadedColorVariant(ColorToken.Red0, OpacityToken.Opacity16),
 
   positive: ColorToken.Green0,
   negative: ColorToken.Red0,
@@ -96,12 +115,19 @@ const DarkTheme: ThemeColors = {
 
   inputBackground: ColorToken.DarkGray6,
   popoverBackground: generateFadedColorVariant(ColorToken.DarkGray8, OpacityToken.Opacity90),
-  switchThumbActiveBackground: ColorToken.White,
   toggleBackground: ColorToken.DarkGray6,
   tooltipBackground: generateFadedColorVariant(ColorToken.DarkGray6, OpacityToken.Opacity66),
+
+  hoverFilterBase: BrightnessFilterToken.Lighten10,
+  hoverFilterVariant: BrightnessFilterToken.Lighten10,
+  activeFilter: BrightnessFilterToken.Darken10,
 };
 
-const LightTheme: ThemeColors = {
+const LightThemeBase: ThemeColorBase = {
+  white: ColorToken.White,
+  green: ColorToken.Green2,
+  red: ColorToken.Red1,
+
   layer0: ColorToken.White,
   layer1: ColorToken.LightGray6,
   layer2: ColorToken.White,
@@ -118,6 +144,7 @@ const LightTheme: ThemeColors = {
   textPrimary: ColorToken.DarkGray12,
   textSecondary: ColorToken.DarkGray3,
   textTertiary: ColorToken.DarkGray1,
+  textButton: ColorToken.White,
 
   gradientBase0: ColorToken.LightGray8,
   gradientBase1: ColorToken.LightGray5,
@@ -129,6 +156,9 @@ const LightTheme: ThemeColors = {
   success: ColorToken.Green2,
   warning: ColorToken.Yellow0,
   error: ColorToken.Red1,
+  successFaded: generateFadedColorVariant(ColorToken.Green2, OpacityToken.Opacity16),
+  warningFaded: generateFadedColorVariant(ColorToken.Yellow0, OpacityToken.Opacity16),
+  errorFaded: generateFadedColorVariant(ColorToken.Red1, OpacityToken.Opacity16),
 
   positive: ColorToken.Green2,
   negative: ColorToken.Red1,
@@ -145,13 +175,30 @@ const LightTheme: ThemeColors = {
 
   inputBackground: ColorToken.White,
   popoverBackground: generateFadedColorVariant(ColorToken.LightGray8, OpacityToken.Opacity90),
-  switchThumbActiveBackground: ColorToken.White,
   toggleBackground: ColorToken.LightGray4,
   tooltipBackground: generateFadedColorVariant(ColorToken.LightGray7, OpacityToken.Opacity66),
+
+  hoverFilterBase: BrightnessFilterToken.Darken5,
+  hoverFilterVariant: BrightnessFilterToken.Lighten10,
+  activeFilter: BrightnessFilterToken.Darken10,
+};
+
+const generateTheme = (themeBase: ThemeColorBase): Theme => {
+  return {
+    [AppColorMode.GreenUp]: themeBase,
+    [AppColorMode.RedUp]: {
+      ...themeBase,
+      // #InvertDirectionalColors
+      positive: themeBase.negative,
+      negative: themeBase.positive,
+      positiveFaded: themeBase.negativeFaded,
+      negativeFaded: themeBase.positiveFaded,
+    },
+  };
 };
 
 export const Themes = {
-  [AppTheme.Classic]: ClassicTheme,
-  [AppTheme.Dark]: DarkTheme,
-  [AppTheme.Light]: LightTheme,
+  [AppTheme.Classic]: generateTheme(ClassicThemeBase),
+  [AppTheme.Dark]: generateTheme(DarkThemeBase),
+  [AppTheme.Light]: generateTheme(LightThemeBase),
 };

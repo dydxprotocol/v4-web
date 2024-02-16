@@ -1,7 +1,9 @@
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { useSelector } from 'react-redux';
+
+import { TOKEN_CONFIG_MAP } from '@/constants/networks';
 import { DydxChainAsset } from '@/constants/wallets';
 
-import { useSelectedNetwork } from '@/hooks';
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 
 export const useTokenConfigs = (): {
   tokensConfigs: {
@@ -10,31 +12,33 @@ export const useTokenConfigs = (): {
       name: string;
       decimals: number;
       gasDenom?: string;
-    },
+    };
     [DydxChainAsset.CHAINTOKEN]: {
       denom: string;
       name: string;
       decimals: number;
       gasDenom?: string;
-    },
+    };
   };
   usdcDenom: string;
   usdcDecimals: number;
+  usdcGasDenom: string;
   usdcLabel: string;
   chainTokenDenom: string;
   chainTokenDecimals: number;
   chainTokenLabel: string;
 } => {
-  const { selectedNetwork } = useSelectedNetwork();
-  const tokensConfigs = ENVIRONMENT_CONFIG_MAP[selectedNetwork].tokens;
+  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
+  const tokensConfigs = TOKEN_CONFIG_MAP[selectedDydxChainId];
 
-  return { 
+  return {
     tokensConfigs,
-    usdcDenom: tokensConfigs[DydxChainAsset.USDC].denom, 
-    usdcDecimals: tokensConfigs[DydxChainAsset.USDC].decimals, 
+    usdcDenom: tokensConfigs[DydxChainAsset.USDC].denom,
+    usdcDecimals: tokensConfigs[DydxChainAsset.USDC].decimals,
+    usdcGasDenom: tokensConfigs[DydxChainAsset.USDC].gasDenom,
     usdcLabel: tokensConfigs[DydxChainAsset.USDC].name,
     chainTokenDenom: tokensConfigs[DydxChainAsset.CHAINTOKEN].denom,
-    chainTokenDecimals: tokensConfigs[DydxChainAsset.CHAINTOKEN].decimals, 
+    chainTokenDecimals: tokensConfigs[DydxChainAsset.CHAINTOKEN].decimals,
     chainTokenLabel: tokensConfigs[DydxChainAsset.CHAINTOKEN].name,
   };
 };

@@ -9,9 +9,14 @@ import { TransferInputField, TransferInputTokenResource, TransferType } from '@/
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP, isMainnet } from '@/constants/networks';
+import { isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
-import { MAX_CCTP_TRANSFER_AMOUNT, MAX_PRICE_IMPACT, NumberSign } from '@/constants/numbers';
+import {
+  MAX_CCTP_TRANSFER_AMOUNT,
+  MAX_PRICE_IMPACT,
+  MIN_CCTP_TRANSFER_AMOUNT,
+  NumberSign,
+} from '@/constants/numbers';
 
 import {
   useAccounts,
@@ -40,6 +45,7 @@ import { Icon, IconName } from '@/components/Icon';
 
 import { SourceSelectMenu } from '@/views/forms/AccountManagementForms/SourceSelectMenu';
 
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { getSubaccount } from '@/state/accountSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
@@ -54,7 +60,7 @@ export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
   const [error, setError] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
-  const { selectedNetwork } = useSelectedNetwork();
+  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
 
   const { sendSquidWithdraw } = useSubaccount();
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
@@ -177,9 +183,7 @@ export const WithdrawForm = () => {
             addTransferNotification({
               txHash: txHash,
               type: TransferNotificationTypes.Withdrawal,
-              fromChainId: !isCctp
-                ? ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId
-                : getNobleChainId(),
+              fromChainId: !isCctp ? selectedDydxChainId : getNobleChainId(),
               toChainId: chainIdStr || undefined,
               toAmount: debouncedAmountBN.toNumber(),
               triggeredAt: Date.now(),
@@ -329,6 +333,12 @@ export const WithdrawForm = () => {
           },
         });
       }
+      if (
+        !debouncedAmountBN.isZero() &&
+        MustBigNumber(debouncedAmountBN).lte(MIN_CCTP_TRANSFER_AMOUNT)
+      ) {
+        return 'Amount must be greater than 10 USDC';
+      }
     }
 
     if (isMainnet && MustBigNumber(summary?.aggregatePriceImpact).gte(MAX_PRICE_IMPACT)) {
@@ -453,6 +463,6 @@ Styled.FormInputButton = styled(Button)`
 Styled.CheckIcon = styled(Icon)`
   margin: 0 1ch;
 
-  color: var(--color-positive);
+  color: var(--color-success);
   font-size: 0.625rem;
 `;

@@ -80,7 +80,7 @@ Styled.Indicator = styled(Indicator)`
   align-items: center;
   justify-content: center;
 
-  color: var(--color-text-2);
+  color: var(--color-text-button);
 `;
 
 Styled.Label = styled.label<{ disabled?: boolean }>`

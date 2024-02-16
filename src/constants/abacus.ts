@@ -119,6 +119,13 @@ export const InputSelectionOption = Abacus.exchange.dydx.abacus.output.input.Sel
 // ------ Wallet ------ //
 export type Wallet = Abacus.exchange.dydx.abacus.output.Wallet;
 export type AccountBalance = Abacus.exchange.dydx.abacus.output.AccountBalance;
+export type TradingRewards = Abacus.exchange.dydx.abacus.output.TradingRewards;
+export type HistoricalTradingReward = Abacus.exchange.dydx.abacus.output.HistoricalTradingReward;
+export const HistoricalTradingRewardsPeriod =
+  Abacus.exchange.dydx.abacus.state.manager.HistoricalTradingRewardsPeriod;
+const historicalTradingRewardsPeriod = [...HistoricalTradingRewardsPeriod.values()] as const;
+export type HistoricalTradingRewardsPeriods = (typeof historicalTradingRewardsPeriod)[number];
+
 export type Subaccount = Abacus.exchange.dydx.abacus.output.Subaccount;
 export type SubaccountPosition = Abacus.exchange.dydx.abacus.output.SubaccountPosition;
 export type SubaccountOrder = Abacus.exchange.dydx.abacus.output.SubaccountOrder;
@@ -202,6 +209,9 @@ export const RestrictionType = Abacus.exchange.dydx.abacus.output.Restriction;
 const restrictionTypes = [...RestrictionType.values()] as const;
 export type RestrictionTypes = (typeof restrictionTypes)[number];
 
+// ------ Api data ------ //
+export const ApiData = Abacus.exchange.dydx.abacus.state.manager.ApiData;
+
 // ------ Enum Conversions ------ //
 type IfEquals<X, Y, A, B> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2
   ? A
@@ -234,6 +244,15 @@ export const HISTORICAL_PNL_PERIODS: Record<
   [HistoricalPnlPeriod.Period7d.name]: HistoricalPnlPeriod.Period7d,
   [HistoricalPnlPeriod.Period30d.name]: HistoricalPnlPeriod.Period30d,
   [HistoricalPnlPeriod.Period90d.name]: HistoricalPnlPeriod.Period90d,
+};
+
+export const HISTORICAL_TRADING_REWARDS_PERIODS: Record<
+  KotlinIrEnumValues<typeof HistoricalTradingRewardsPeriod>,
+  HistoricalTradingRewardsPeriods
+> = {
+  [HistoricalTradingRewardsPeriod.MONTHLY.name]: HistoricalTradingRewardsPeriod.MONTHLY,
+  [HistoricalTradingRewardsPeriod.WEEKLY.name]: HistoricalTradingRewardsPeriod.WEEKLY,
+  [HistoricalTradingRewardsPeriod.DAILY.name]: HistoricalTradingRewardsPeriod.DAILY,
 };
 
 export const ORDER_STATUS_STRINGS: Record<KotlinIrEnumValues<typeof AbacusOrderStatus>, string> = {

@@ -9,6 +9,7 @@ import { getActiveDialog } from '@/state/dialogsSelectors';
 import { ClosePositionDialog } from '@/views/dialogs/ClosePositionDialog';
 import { DepositDialog } from '@/views/dialogs/DepositDialog';
 import { DisconnectDialog } from '@/views/dialogs/DisconnectDialog';
+import { DisplaySettingsDialog } from '@/views/dialogs/DisplaySettingsDialog';
 import { ExchangeOfflineDialog } from '@/views/dialogs/ExchangeOfflineDialog';
 import { HelpDialog } from '@/views/dialogs/HelpDialog';
 import { ExternalLinkDialog } from '@/views/dialogs/ExternalLinkDialog';
@@ -29,6 +30,7 @@ import { OrderDetailsDialog } from '@/views/dialogs/DetailsDialog/OrderDetailsDi
 import { FillDetailsDialog } from '@/views/dialogs/DetailsDialog/FillDetailsDialog';
 import { NewMarketMessageDetailsDialog } from '@/views/dialogs/NewMarketMessageDetailsDialog';
 import { NewMarketAgreementDialog } from '@/views/dialogs/NewMarketAgreementDialog';
+import { ExternalNavStrideDialog } from '@/views/dialogs/ExternalNavStrideDialog';
 
 export const DialogManager = () => {
   const dispatch = useDispatch();
@@ -51,12 +53,14 @@ export const DialogManager = () => {
   return {
     [DialogTypes.ClosePosition]: <ClosePositionDialog {...modalProps} />,
     [DialogTypes.Deposit]: <DepositDialog {...modalProps} />,
+    [DialogTypes.DisplaySettings]: <DisplaySettingsDialog {...modalProps} />,
     [DialogTypes.DisconnectWallet]: <DisconnectDialog {...modalProps} />,
     [DialogTypes.ExchangeOffline]: <ExchangeOfflineDialog {...modalProps} />,
     [DialogTypes.FillDetails]: <FillDetailsDialog {...modalProps} />,
     [DialogTypes.Help]: <HelpDialog {...modalProps} />,
     [DialogTypes.ExternalNavKeplr]: <ExternalNavKeplrDialog {...modalProps} />,
     [DialogTypes.ExternalLink]: <ExternalLinkDialog {...modalProps} />,
+    [DialogTypes.ExternalNavStride]: <ExternalNavStrideDialog {...modalProps} />,
     [DialogTypes.MnemonicExport]: <MnemonicExportDialog {...modalProps} />,
     [DialogTypes.MobileSignIn]: <MobileSignInDialog {...modalProps} />,
     [DialogTypes.Onboarding]: <OnboardingDialog {...modalProps} />,

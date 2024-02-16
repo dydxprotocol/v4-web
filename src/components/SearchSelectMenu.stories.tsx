@@ -6,7 +6,7 @@ import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 
 import { StoryWrapper } from '.ladle/components';
 
-export const SearchSelectMenuStory: Story<Parameters<typeof SearchSelectMenu>> = (args) => {
+export const SearchSelectMenuStory: Story<Parameters<typeof SearchSelectMenu>[0]> = (args) => {
   const [selectedItem, setSelectedItem] = useState<string>();
 
   const exampleItems = [
@@ -24,10 +24,7 @@ export const SearchSelectMenuStory: Story<Parameters<typeof SearchSelectMenu>> =
   return (
     <StoryWrapper>
       <Container>
-        <SearchSelectMenu
-          {...args}
-          items={exampleItems}
-        >
+        <SearchSelectMenu {...args} items={exampleItems}>
           {!selectedItem ? <span>Search and Select</span> : <span>{selectedItem}</span>}
         </SearchSelectMenu>
       </Container>

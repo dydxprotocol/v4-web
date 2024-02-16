@@ -82,6 +82,6 @@ Styled.ActionButton = styled(IconButton)`
 
 Styled.CancelButton = styled(Styled.ActionButton)`
   &:not(:disabled) {
-    --button-textColor: var(--color-negative);
+    --button-textColor: var(--color-red);
   }
 `;

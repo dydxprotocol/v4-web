@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { ElementType, memo } from 'react';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import type { Dispatch } from '@reduxjs/toolkit';
@@ -7,7 +7,6 @@ import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, StringGetterFunction, TOOLTIP_STRING_KEYS } from '@/constants/localization';
-import { isMainnet } from '@/constants/networks';
 import { DydxChainAsset, wallets } from '@/constants/wallets';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -32,14 +31,15 @@ import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { AppTheme } from '@/state/configs';
 import { openDialog } from '@/state/dialogs';
 
 import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
+import { getAppTheme } from '@/state/configsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
 import { MustBigNumber } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
@@ -50,6 +50,7 @@ export const AccountMenu = () => {
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
   const { nativeTokenBalance } = useAccountBalance();
   const { usdcLabel, chainTokenLabel } = useTokenConfigs();
+  const theme = useSelector(getAppTheme);
 
   const { evmAddress, walletType, dydxAddress, hdKey } = useAccounts();
 
@@ -105,7 +106,7 @@ export const AccountMenu = () => {
               {walletType && (
                 <Styled.SourceIcon>
                   <Styled.ConnectorIcon iconName={IconName.AddressConnector} />
-                  <Icon iconComponent={wallets[walletType].icon} />
+                  <Icon iconComponent={wallets[walletType].icon as ElementType} />
                 </Styled.SourceIcon>
               )}
               <Styled.Column>
@@ -177,9 +178,20 @@ export const AccountMenu = () => {
           label: stringGetter({ key: STRING_KEYS.PREFERENCES }),
           onSelect: () => dispatch(openDialog({ type: DialogTypes.Preferences })),
         },
+        {
+          value: 'DisplaySettings',
+          icon:
+            theme === AppTheme.Light ? (
+              <Icon iconName={IconName.Sun} />
+            ) : (
+              <Icon iconName={IconName.Moon} />
+            ),
+          label: stringGetter({ key: STRING_KEYS.DISPLAY_SETTINGS }),
+          onSelect: () => dispatch(openDialog({ type: DialogTypes.DisplaySettings })),
+        },
         ...(onboardingState === OnboardingState.AccountConnected && hdKey
           ? [
-              (!isMainnet || testFlags.showMobileSignInOption) && {
+              {
                 value: 'MobileQrSignIn',
                 icon: <Icon iconName={IconName.Qr} />,
                 label: stringGetter({ key: STRING_KEYS.TITLE_SIGN_INTO_MOBILE }),
@@ -189,16 +201,16 @@ export const AccountMenu = () => {
                 value: 'MnemonicExport',
                 icon: <Icon iconName={IconName.ExportKeys} />,
                 label: <span>{stringGetter({ key: STRING_KEYS.EXPORT_SECRET_PHRASE })}</span>,
-                highlightColor: 'negative',
+                highlightColor: 'destroy',
                 onSelect: () => dispatch(openDialog({ type: DialogTypes.MnemonicExport })),
               },
-            ].filter(isTruthy)
+            ]
           : []),
         {
           value: 'Disconnect',
           icon: <Icon iconName={IconName.BoxClose} />,
           label: stringGetter({ key: STRING_KEYS.DISCONNECT }),
-          highlightColor: 'negative',
+          highlightColor: 'destroy',
           onSelect: () => dispatch(openDialog({ type: DialogTypes.DisconnectWallet })),
         },
       ].filter(isTruthy)}
@@ -208,7 +220,7 @@ export const AccountMenu = () => {
       {onboardingState === OnboardingState.WalletConnected ? (
         <Styled.WarningIcon iconName={IconName.Warning} />
       ) : onboardingState === OnboardingState.AccountConnected ? (
-        walletType && <Icon iconComponent={wallets[walletType].icon} />
+        walletType && <Icon iconComponent={wallets[walletType].icon as ElementType} />
       ) : null}
       {!isTablet && <Styled.Address>{truncateAddress(dydxAddress)}</Styled.Address>}
     </Styled.DropdownMenu>

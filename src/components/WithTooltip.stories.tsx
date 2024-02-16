@@ -6,7 +6,7 @@ import { tooltipStrings } from '@/constants/tooltips';
 
 import { StoryWrapper } from '.ladle/components';
 
-export const Tooltip: Story<Parameters<typeof WithTooltip>> = (args) => {
+export const Tooltip: Story<Parameters<typeof WithTooltip>[0]> = (args) => {
   return (
     <StoryWrapper>
       <WithTooltip {...args}>

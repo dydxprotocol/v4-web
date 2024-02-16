@@ -28,7 +28,7 @@ import { setSubaccount, setHistoricalPnl, removeUncommittedOrderClientId } from 
 import { getBalances } from '@/state/accountSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { hashFromTx } from '@/lib/hashfromTx';
+import { hashFromTx } from '@/lib/txUtils';
 import { log } from '@/lib/telemetry';
 
 import { useAccounts } from './useAccounts';
@@ -433,7 +433,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         params,
         utils.getGovAddNewMarketTitle(params.ticker),
         utils.getGovAddNewMarketSummary(params.ticker, newMarketProposal.delayBlocks),
-        newMarketProposal.initialDepositAmount
+        BigInt(newMarketProposal.initialDepositAmount).toString()
       );
 
       return response;

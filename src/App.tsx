@@ -16,7 +16,7 @@ import {
 } from '@/hooks';
 import { DydxProvider } from '@/hooks/useDydxClient';
 import { AccountsProvider } from '@/hooks/useAccounts';
-import { AppThemeProvider } from '@/hooks/useAppTheme';
+import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
 import { DialogAreaProvider, useDialogArea } from '@/hooks/useDialogArea';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
@@ -52,9 +52,9 @@ const AlertsPage = lazy(() => import('@/pages/AlertsPage'));
 const ProfilePage = lazy(() => import('@/pages/Profile'));
 const SettingsPage = lazy(() => import('@/pages/settings/Settings'));
 const TradePage = lazy(() => import('@/pages/trade/Trade'));
-const RewardsPage = lazy(() => import('@/pages/rewards/RewardsPage'));
 const TermsOfUsePage = lazy(() => import('@/pages/TermsOfUsePage'));
 const PrivacyPolicyPage = lazy(() => import('@/pages/PrivacyPolicyPage'));
+const TokenPage = lazy(() => import('@/pages/token/Token'));
 
 const queryClient = new QueryClient();
 
@@ -87,7 +87,7 @@ const Content = () => {
                 <Route path={MarketsRoute.New} element={<NewMarket />} />
                 <Route path={AppRoute.Markets} element={<MarketsPage />} />
               </Route>
-              <Route path={`/${chainTokenLabel}`} element={<RewardsPage />} />
+              <Route path={`/${chainTokenLabel}/*`} element={<TokenPage />} />
               {isTablet && (
                 <>
                   <Route path={AppRoute.Alerts} element={<AlertsPage />} />
@@ -142,7 +142,7 @@ const providers = [
   wrapProvider(NotificationsProvider),
   wrapProvider(DialogAreaProvider),
   wrapProvider(PotentialMarketsProvider),
-  wrapProvider(AppThemeProvider),
+  wrapProvider(AppThemeAndColorModeProvider),
 ];
 
 const App = () => {
@@ -207,6 +207,7 @@ Styled.Content = styled.div<{ isShowingHeader: boolean; isShowingFooter: boolean
 
 Styled.Main = styled.main`
   ${layoutMixins.contentSectionAttached}
+  box-shadow: none;
 
   grid-area: Main;
 

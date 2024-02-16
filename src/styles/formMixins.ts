@@ -38,7 +38,7 @@ export const formMixins: Record<
     border-radius: var(--input-radius);
 
     &:focus-within {
-      filter: brightness(1.1);
+      filter: brightness(var(--hover-filter-base));
     }
 
     @media ${breakpoints.tablet} {

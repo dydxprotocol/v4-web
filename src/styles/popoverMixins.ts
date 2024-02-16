@@ -21,8 +21,8 @@ export const popoverMixins = {
     --trigger-open-backgroundColor: var(--color-layer-1);
     --trigger-open-textColor: var(--color-text-2);
 
-    --trigger-active-filter: brightness(0.9);
-    --trigger-hover-filter: brightness(1.1);
+    --trigger-active-filter: brightness(var(--active-filter));
+    --trigger-hover-filter: brightness(var(--hover-filter-base));
 
     display: flex;
     align-items: center;
@@ -219,7 +219,7 @@ export const popoverMixins = {
       &[aria-selected="true"], // cmdk
       &[data-highlighted] // @radix-ui
       {
-        filter: brightness(1.1);
+        filter: brightness(var(--hover-filter-base));
         background-color: var(--item-highlighted-backgroundColor);
         color: var(--item-highlighted-textColor, var(--trigger-textColor, inherit)) !important;
         outline: none;

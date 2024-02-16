@@ -1,6 +1,10 @@
-import { Candle, TradingViewBar, TradingViewSymbol } from '@/constants/candles';
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 
-import { AppTheme } from '@/state/configs';
+import { Candle, TradingViewBar, TradingViewSymbol } from '@/constants/candles';
+import { THEME_NAMES } from '@/constants/styles/colors';
+import type { ChartLineType } from '@/constants/tvchart';
+
+import { type AppColorMode, AppTheme } from '@/state/configs';
 
 import { Themes } from '@/styles/themes';
 
@@ -47,10 +51,42 @@ export const getHistorySlice = ({
   return bars.filter(({ time }) => time >= fromMs);
 };
 
-export const getWidgetOverrides = (appTheme: AppTheme) => {
-  const theme = Themes[appTheme];
+export const getChartLineColors = ({
+  appTheme,
+  appColorMode,
+  chartLineType,
+}: {
+  appTheme: AppTheme;
+  appColorMode: AppColorMode;
+  chartLineType: ChartLineType;
+}) => {
+  const theme = Themes[appTheme][appColorMode];
+  const orderColors = {
+    [OrderSide.BUY]: theme.positive,
+    [OrderSide.SELL]: theme.negative,
+    ['position']: null,
+  };
 
   return {
+    maybeQuantityColor: orderColors[chartLineType],
+    borderColor: theme.borderDefault,
+    backgroundColor: theme.layer1,
+    textColor: theme.textTertiary,
+    textButtonColor: theme.textButton,
+  };
+};
+
+export const getWidgetOverrides = ({
+  appTheme,
+  appColorMode,
+}: {
+  appTheme: AppTheme;
+  appColorMode: AppColorMode;
+}) => {
+  const theme = Themes[appTheme][appColorMode];
+
+  return {
+    theme: THEME_NAMES[appTheme],
     overrides: {
       'paneProperties.background': theme.layer2,
       'paneProperties.horzGridProperties.color': theme.layer3,

@@ -24,7 +24,7 @@ import {
 
 import { isMetaMask } from '@/lib/wallet/providers';
 
-import { DydxNetwork, ENVIRONMENT_CONFIG_MAP } from './networks';
+import { DydxChainId, WALLETS_CONFIG_MAP } from './networks';
 
 // Wallet connection types
 
@@ -40,6 +40,7 @@ export enum WalletErrorType {
   // General
   ChainMismatch,
   UserCanceled,
+  SwitchChainMethodMissing,
 
   // Non-Deterministic
   NonDeterministicWallet,
@@ -290,17 +291,17 @@ export const COSMOS_DERIVATION_PATH = "m/44'/118'/0'/0/0";
 /**
  * @description typed data to sign for dYdX Chain onboarding
  */
-export const getSignTypedData = (selectedNetwork: DydxNetwork) =>
+export const getSignTypedData = (selectedDydxChainId: DydxChainId) =>
   ({
     primaryType: 'dYdX',
     domain: {
-      name: ENVIRONMENT_CONFIG_MAP[selectedNetwork].wallets.signTypedDataDomainName,
+      name: WALLETS_CONFIG_MAP[selectedDydxChainId].signTypedDataDomainName,
     },
     types: {
       dYdX: [{ name: 'action', type: 'string' }],
     },
     message: {
-      action: ENVIRONMENT_CONFIG_MAP[selectedNetwork].wallets.signTypedDataAction,
+      action: WALLETS_CONFIG_MAP[selectedDydxChainId].signTypedDataAction,
     },
   } as const);
 

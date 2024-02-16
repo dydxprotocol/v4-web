@@ -108,6 +108,12 @@ export const getCurrentMarketHistoricalFundings = createSelector(
 );
 
 /**
+ * @returns oracle price of the market the user is currently viewing
+ */
+export const getCurrentMarketOraclePrice = (state: RootState) =>
+  getCurrentMarketData(state)?.oraclePrice;
+
+/**
  * @returns Mid market price for the market the user is currently viewing
  */
 export const getCurrentMarketMidMarketPrice = (state: RootState) => {

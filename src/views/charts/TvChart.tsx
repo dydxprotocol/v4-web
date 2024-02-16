@@ -1,73 +1,40 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+
 import styled, { type AnyStyledComponent, css } from 'styled-components';
-import { useDispatch, useSelector } from 'react-redux';
 
-import type { IChartingLibraryWidget, ResolutionString } from 'public/tradingview/charting_library';
+import type { ResolutionString } from 'public/tradingview/charting_library';
 
-import { DEFAULT_MARKETID } from '@/constants/markets';
-import { DEFAULT_RESOLUTION, RESOLUTION_CHART_CONFIGS } from '@/constants/candles';
-import { useTradingView, useTradingViewTheme } from '@/hooks/tradingView';
+import type { TvWidget } from '@/constants/tvchart';
+
+import {
+  useChartLines,
+  useChartMarketAndResolution,
+  useTradingView,
+  useTradingViewTheme,
+} from '@/hooks/tradingView';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
-import { setTvChartResolution } from '@/state/perpetuals';
-
-import { getCurrentMarketId, getSelectedResolutionForMarket } from '@/state/perpetualsSelectors';
-
 import { layoutMixins } from '@/styles/layoutMixins';
-
-type TvWidget = IChartingLibraryWidget & { _id?: string; _ready?: boolean };
 
 export const TvChart = () => {
   const [isChartReady, setIsChartReady] = useState(false);
 
-  const dispatch = useDispatch();
-  const currentMarketId: string = useSelector(getCurrentMarketId) || DEFAULT_MARKETID;
-
-  const selectedResolution: string =
-    useSelector(getSelectedResolutionForMarket(currentMarketId)) || DEFAULT_RESOLUTION;
-
   const tvWidgetRef = useRef<TvWidget | null>(null);
   const tvWidget = tvWidgetRef.current;
   const isWidgetReady = tvWidget?._ready;
-  const chart = isWidgetReady ? tvWidget?.chart() : undefined;
-  const chartResolution = chart?.resolution?.();
 
-  const { savedResolution } = useTradingView({ tvWidgetRef, setIsChartReady });
-  useTradingViewTheme({ tvWidget, isWidgetReady });
+  const displayButtonRef = useRef<HTMLElement | null>(null);
+  const displayButton = displayButtonRef.current;
 
-  const setVisibleRangeForResolution = ({ resolution }: { resolution: ResolutionString }) => {
-    // Different resolutions have different timeframes to display data efficiently.
-    const { defaultRange } = RESOLUTION_CHART_CONFIGS[resolution];
-
-    // from/to values converted to epoch seconds
-    const newRange = {
-      from: (Date.now() - defaultRange) / 1000,
-      to: Date.now() / 1000,
-    };
-
-    tvWidget?.activeChart().setVisibleRange(newRange, { percentRightMargin: 10 });
-  };
-
-  useEffect(() => {
-    if (chartResolution) {
-      if (chartResolution !== selectedResolution) {
-        dispatch(setTvChartResolution({ marketId: currentMarketId, resolution: chartResolution }));
-      }
-
-      setVisibleRangeForResolution({ resolution: chartResolution });
-    }
-  }, [chartResolution]);
-
-  /**
-   * @description Hook to handle changing markets
-   */
-  useEffect(() => {
-    if (currentMarketId && isWidgetReady) {
-      const resolution = savedResolution || selectedResolution;
-      tvWidget?.setSymbol(currentMarketId, resolution as ResolutionString, () => {});
-    }
-  }, [currentMarketId, isWidgetReady]);
+  const { savedResolution } = useTradingView({ tvWidgetRef, displayButtonRef, setIsChartReady });
+  useChartMarketAndResolution({
+    tvWidget,
+    isWidgetReady,
+    savedResolution: savedResolution as ResolutionString | undefined,
+  });
+  const { chartLines } = useChartLines({ tvWidget, displayButton, isChartReady });
+  useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
 
   return (
     <Styled.PriceChart isChartReady={isChartReady}>

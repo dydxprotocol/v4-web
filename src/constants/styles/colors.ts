@@ -1,4 +1,20 @@
-export type ThemeColors = LayerColors &
+import type { ThemeName } from 'public/tradingview/charting_library';
+
+import { AppColorMode, AppTheme } from '@/state/configs';
+
+export const THEME_NAMES: Record<AppTheme, ThemeName> = {
+  [AppTheme.Classic]: 'Classic',
+  [AppTheme.Dark]: 'Dark',
+  [AppTheme.Light]: 'Light',
+};
+
+export type Theme = {
+  [AppColorMode.GreenUp]: ThemeColorBase;
+  [AppColorMode.RedUp]: ThemeColorBase;
+};
+
+export type ThemeColorBase = BaseColors &
+  LayerColors &
   BorderColors &
   TextColors &
   GradientColors &
@@ -7,7 +23,14 @@ export type ThemeColors = LayerColors &
   DirectionalColors &
   RiskColors &
   IconColors &
-  ComponentColors;
+  ComponentColors &
+  Filters;
+
+type BaseColors = {
+  white: string;
+  green: string;
+  red: string;
+};
 
 type LayerColors = {
   layer0: string;
@@ -30,6 +53,8 @@ type TextColors = {
   textPrimary: string;
   textSecondary: string;
   textTertiary: string;
+
+  textButton: string;
 };
 
 type GradientColors = {
@@ -47,8 +72,13 @@ type StatusColors = {
   success: string;
   warning: string;
   error: string;
+  successFaded: string;
+  warningFaded: string;
+  errorFaded: string;
 };
 
+/** ##InvertDirectionalColors
+ * When adding colors here, make sure to update linked function to invert colors for AppColorMode. */
 type DirectionalColors = {
   positive: string;
   negative: string;
@@ -71,7 +101,12 @@ type IconColors = {
 type ComponentColors = {
   inputBackground: string;
   popoverBackground: string;
-  switchThumbActiveBackground: string;
   toggleBackground: string;
   tooltipBackground: string;
+};
+
+type Filters = {
+  hoverFilterBase: string;
+  hoverFilterVariant: string;
+  activeFilter: string;
 };

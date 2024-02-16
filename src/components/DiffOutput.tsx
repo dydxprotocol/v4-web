@@ -75,7 +75,7 @@ Styled.DiffValue = styled.div<{ hasInvalidNewValue?: boolean }>`
   ${({ hasInvalidNewValue }) =>
     hasInvalidNewValue &&
     css`
-      color: var(--color-negative);
+      color: var(--color-error);
     `}
 `;
 

@@ -1,18 +1,21 @@
 import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import styled, { css, type AnyStyledComponent } from 'styled-components';
 import { StatusResponse } from '@0xsquid/sdk';
 
-import { useStringGetter, useSelectedNetwork, useURLConfigs } from '@/hooks';
+import { STRING_KEYS } from '@/constants/localization';
+import { TransferNotificationTypes } from '@/constants/notifications';
+
+import { useStringGetter, useURLConfigs } from '@/hooks';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Link } from '@/components/Link';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingDots } from '@/components/Loading/LoadingDots';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
-import { TransferNotificationTypes } from '@/constants/notifications';
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 
 type ElementProps = {
   status?: StatusResponse;
@@ -32,9 +35,8 @@ enum TransferStatusStep {
 
 export const TransferStatusSteps = ({ className, status, type }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const { selectedNetwork } = useSelectedNetwork();
+  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
   const { mintscan: mintscanTxUrl } = useURLConfigs();
-  const dydxChainId = ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId;
 
   const { currentStep, steps } = useMemo(() => {
     const routeStatus = status?.routeStatus;
@@ -55,7 +57,7 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
         link:
           type === TransferNotificationTypes.Deposit
             ? status?.fromChain?.transactionUrl
-            : routeStatus?.[0]?.chainId === dydxChainId && routeStatus[0].txHash
+            : routeStatus?.[0]?.chainId === selectedDydxChainId && routeStatus[0].txHash
             ? `${mintscanTxUrl?.replace('{tx_hash}', routeStatus[0].txHash.replace('0x', ''))}`
             : undefined,
       },
@@ -81,7 +83,7 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
         link:
           type === TransferNotificationTypes.Withdrawal
             ? status?.toChain?.transactionUrl
-            : currentStatus?.chainId === dydxChainId && currentStatus?.txHash
+            : currentStatus?.chainId === selectedDydxChainId && currentStatus?.txHash
             ? `${mintscanTxUrl?.replace('{tx_hash}', currentStatus.txHash.replace('0x', ''))}`
             : undefined,
       },
@@ -179,7 +181,7 @@ Styled.Icon = styled.div<{ state: 'complete' | 'default' }>`
   ${({ state }) =>
     ({
       ['complete']: css`
-        color: var(--color-positive);
+        color: var(--color-success);
       `,
       ['default']: css`
         color: var(--color-text-0);

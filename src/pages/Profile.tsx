@@ -4,9 +4,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEnsName } from 'wagmi';
 import { useNavigate } from 'react-router-dom';
 
-import { ButtonSize } from '@/constants/buttons';
 import { TransferType } from '@/constants/abacus';
-
+import { OnboardingState } from '@/constants/account';
+import { ButtonSize } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
+import { AppRoute, PortfolioRoute, HistoryRoute } from '@/constants/routes';
+import { wallets } from '@/constants/wallets';
+import { useAccounts, useStringGetter, useTokenConfigs } from '@/hooks';
+import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';
@@ -16,23 +22,21 @@ import { IconButton, type IconButtonProps } from '@/components/IconButton';
 import { Panel } from '@/components/Panel';
 import { Toolbar } from '@/components/Toolbar';
 
-import { OnboardingState } from '@/constants/account';
-import { DialogTypes } from '@/constants/dialogs';
-import { STRING_KEYS } from '@/constants/localization';
-import { AppRoute, PortfolioRoute, HistoryRoute } from '@/constants/routes';
-import { wallets } from '@/constants/wallets';
-import { useAccounts, useStringGetter, useTokenConfigs } from '@/hooks';
-
-import { getOnboardingState } from '@/state/accountSelectors';
+import {
+  getHistoricalTradingRewardsForCurrentWeek,
+  getOnboardingState,
+} from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
 
-import { DYDXBalancePanel } from './rewards/DYDXBalancePanel';
-import { MigratePanel } from './rewards/MigratePanel';
-import { GovernancePanel } from './rewards/GovernancePanel';
-import { StakingPanel } from './rewards/StakingPanel';
+import { DYDXBalancePanel } from './token/rewards/DYDXBalancePanel';
+import { MigratePanel } from './token/rewards/MigratePanel';
+import { GovernancePanel } from './token/rewards/GovernancePanel';
+import { StakingPanel } from './token/staking/StakingPanel';
+import { StrideStakingPanel } from './token/staking/StrideStakingPanel';
+import { NewMarketsPanel } from './token/rewards/NewMarketsPanel';
 
 const ENS_CHAIN_ID = 1; // Ethereum
 
@@ -51,6 +55,8 @@ const Profile = () => {
     address: evmAddress,
     chainId: ENS_CHAIN_ID,
   });
+
+  const currentWeekTradingReward = useSelector(getHistoricalTradingRewardsForCurrentWeek);
 
   const actions = [
     {
@@ -159,64 +165,62 @@ const Profile = () => {
           );
         })}
       </Styled.Actions>
-      <Styled.EqualGrid>
-        <Styled.PanelButton
-          slotHeader={
-            <Styled.InlineRow>
-              <Icon iconName={IconName.Gear} />
-              {stringGetter({ key: STRING_KEYS.SETTINGS })}
-            </Styled.InlineRow>
-          }
-          onClick={() => navigate(AppRoute.Settings)}
+
+      <Styled.SettingsButton
+        slotHeader={
+          <Styled.InlineRow>
+            <Icon iconName={IconName.Gear} />
+            {stringGetter({ key: STRING_KEYS.SETTINGS })}
+          </Styled.InlineRow>
+        }
+        onClick={() => navigate(AppRoute.Settings)}
+      />
+      <Styled.HelpButton
+        slotHeader={
+          <Styled.InlineRow>
+            <Icon iconName={IconName.HelpCircle} />
+            {stringGetter({ key: STRING_KEYS.HELP })}
+          </Styled.InlineRow>
+        }
+        onClick={() => dispatch(openDialog({ type: DialogTypes.Help }))}
+      />
+
+      <Styled.MigratePanel />
+
+      <Styled.DYDXBalancePanel />
+
+      <Styled.RewardsPanel
+        slotHeaderContent={stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
+        href={`/${chainTokenLabel}`}
+        hasSeparator
+      >
+        <Styled.Details
+          items={[
+            {
+              key: 'week-rewards',
+              label: stringGetter({ key: STRING_KEYS.THIS_WEEK }),
+              value: currentWeekTradingReward?.amount ?? '-',
+            },
+          ]}
+          layout="grid"
         />
-        <Styled.PanelButton
-          slotHeader={
-            <Styled.InlineRow>
-              <Icon iconName={IconName.HelpCircle} />
-              {stringGetter({ key: STRING_KEYS.HELP })}
-            </Styled.InlineRow>
-          }
-          onClick={() => dispatch(openDialog({ type: DialogTypes.Help }))}
+      </Styled.RewardsPanel>
+      <Styled.FeesPanel
+        slotHeaderContent={stringGetter({ key: STRING_KEYS.FEES })}
+        href={`${AppRoute.Portfolio}/${PortfolioRoute.Fees}`}
+        hasSeparator
+      >
+        <Styled.Details
+          items={[
+            { key: 'maker', label: stringGetter({ key: STRING_KEYS.MAKER }), value: '-' },
+            { key: 'taker', label: stringGetter({ key: STRING_KEYS.TAKER }), value: '-' },
+            { key: 'volume', label: stringGetter({ key: STRING_KEYS.VOLUME_30D }), value: '-' },
+          ]}
+          layout="grid"
         />
-      </Styled.EqualGrid>
+      </Styled.FeesPanel>
 
-      <MigratePanel />
-      <DYDXBalancePanel />
-
-      <Styled.EqualGrid>
-        <Styled.RewardsPanel
-          slotHeaderContent="Trading Rewards"
-          href={`/${chainTokenLabel}`}
-          hasSeparator
-        >
-          <Styled.Details
-            items={[
-              {
-                key: 'week-rewards',
-                label: stringGetter({ key: STRING_KEYS.THIS_WEEK }),
-                value: '-',
-              },
-            ]}
-            layout="grid"
-          />
-        </Styled.RewardsPanel>
-        <Panel
-          slotHeaderContent={stringGetter({ key: STRING_KEYS.FEES })}
-          href={`${AppRoute.Portfolio}/${PortfolioRoute.Fees}`}
-          hasSeparator
-        >
-          <Styled.Details
-            items={[
-              { key: 'maker', label: stringGetter({ key: STRING_KEYS.MAKER }), value: '-' },
-              { key: 'taker', label: stringGetter({ key: STRING_KEYS.TAKER }), value: '-' },
-              { key: 'volume', label: stringGetter({ key: STRING_KEYS.VOLUME_30D }), value: '-' },
-            ]}
-            layout="grid"
-          />
-        </Panel>
-      </Styled.EqualGrid>
-
-      <Styled.TablePanel
+      <Styled.HistoryPanel
         slotHeaderContent={stringGetter({ key: STRING_KEYS.HISTORY })}
         href={`${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.Trades}`}
         hasSeparator
@@ -230,10 +234,12 @@ const Profile = () => {
           ]}
           withInnerBorders={false}
         />
-      </Styled.TablePanel>
+      </Styled.HistoryPanel>
 
-      <GovernancePanel />
-      <StakingPanel />
+      <Styled.GovernancePanel />
+      <Styled.NewMarketsPanel />
+      <Styled.StakingPanel />
+      <Styled.StrideStakingPanel />
     </Styled.MobileProfileLayout>
   );
 };
@@ -245,14 +251,43 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.MobileProfileLayout = styled.div`
   ${layoutMixins.contentContainerPage}
 
+  display: grid;
   gap: 1rem;
   padding: 1.25rem 0.9rem;
   max-width: 100vw;
+
+  grid-template-columns: 1fr 1fr;
+
+  grid-template-areas:
+    'header header'
+    'actions actions'
+    'settings help'
+    'migrate migrate'
+    'balance balance'
+    'rewards fees'
+    'history history'
+    'governance newMarkets'
+    'keplr stride';
+
+  @media ${breakpoints.mobile} {
+    grid-template-areas:
+      'header header'
+      'actions actions'
+      'settings help'
+      'migrate migrate'
+      'balance balance'
+      'rewards fees'
+      'history history'
+      'governance governance'
+      'newMarkets newMarkets'
+      'keplr keplr'
+      'stride stride';
+  }
 `;
 
 Styled.Header = styled.header`
+  grid-area: header;
   ${layoutMixins.row}
-
   padding: 0 1rem;
 `;
 
@@ -286,10 +321,10 @@ Styled.ConnectedIcon = styled.div`
   height: 0.5rem;
   width: 0.5rem;
   margin-right: 0.25rem;
-  background: var(--color-positive);
+  background: var(--color-success);
 
   border-radius: 50%;
-  box-shadow: 0 0 0 0.2rem var(--color-gradient-positive);
+  box-shadow: 0 0 0 0.2rem var(--color-gradient-success);
 `;
 
 Styled.Address = styled.h1`
@@ -299,6 +334,7 @@ Styled.Address = styled.h1`
 Styled.Actions = styled(Toolbar)`
   ${layoutMixins.spacedRow}
   --stickyArea-topHeight: 5rem;
+  grid-area: actions;
 
   > a,
   > label {
@@ -318,7 +354,7 @@ Styled.ActionButton = styled(IconButton)<{ iconName?: IconName }>`
   ${({ iconName }) =>
     iconName === IconName.Close
       ? css`
-          --button-textColor: var(--color-negative);
+          --button-textColor: var(--color-red);
           --button-icon-size: 0.75em;
         `
       : iconName === IconName.Transfer &&
@@ -329,22 +365,16 @@ Styled.ActionButton = styled(IconButton)<{ iconName?: IconName }>`
         `}
 `;
 
-Styled.EqualGrid = styled.div`
-  ${layoutMixins.gridEqualColumns}
-
-  gap: 1rem;
-`;
-
 Styled.Details = styled(Details)`
   font: var(--font-small-book);
   --details-value-font: var(--font-medium-book);
 `;
 
 Styled.RewardsPanel = styled(Panel)`
+  grid-area: rewards;
   align-self: flex-start;
-
-  &,
-  > * {
+  height: 100%;
+  > div {
     height: 100%;
   }
 
@@ -353,7 +383,12 @@ Styled.RewardsPanel = styled(Panel)`
   }
 `;
 
-Styled.TablePanel = styled(Panel)`
+Styled.FeesPanel = styled(Panel)`
+  grid-area: fees;
+`;
+
+Styled.HistoryPanel = styled(Panel)`
+  grid-area: history;
   --panel-content-paddingY: 0;
   --panel-content-paddingX: 0;
 
@@ -392,4 +427,36 @@ Styled.InlineRow = styled.div`
 Styled.PanelButton = styled(Panel)`
   --panel-paddingY: 0
   --panel-paddingX:0;
+`;
+
+Styled.SettingsButton = styled(Styled.PanelButton)`
+  grid-area: settings;
+`;
+
+Styled.HelpButton = styled(Styled.PanelButton)`
+  grid-area: help;
+`;
+
+Styled.MigratePanel = styled(MigratePanel)`
+  grid-area: migrate;
+`;
+
+Styled.DYDXBalancePanel = styled(DYDXBalancePanel)`
+  grid-area: balance;
+`;
+
+Styled.GovernancePanel = styled(GovernancePanel)`
+  grid-area: governance;
+`;
+
+Styled.StakingPanel = styled(StakingPanel)`
+  grid-area: keplr;
+`;
+
+Styled.NewMarketsPanel = styled(NewMarketsPanel)`
+  grid-area: newMarkets;
+`;
+
+Styled.StrideStakingPanel = styled(StrideStakingPanel)`
+  grid-area: stride;
 `;

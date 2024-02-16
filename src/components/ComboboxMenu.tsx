@@ -50,11 +50,11 @@ export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extend
       label={title}
       // value={highlightedCommand}
       // onValueChange={setHighlightedCommand}
-      filter={(value: string, search: string) => {
+      filter={(value: string, search: string) =>
         value.replace(/ /g, '').toLowerCase().includes(search.replace(/ /g, '').toLowerCase())
           ? 1
-          : 0;
-      }}
+          : 0
+      }
       className={className}
       $withStickyLayout={withStickyLayout}
     >
