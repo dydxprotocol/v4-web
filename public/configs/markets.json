@@ -219,14 +219,14 @@
     "whitepaperLink": "https://galahackathon.com/v1.0.0/pdf/sdk-documentation.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/gala/"
   },
-  "GMT-USDT": {
+  "GMT-USD": {
     "name": "GMT",
     "tags": ["Gaming"],
     "websiteLink": "https://stepn.com/", 
     "whitepaperLink/": "https://whitepaper.stepn.com/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/green-metaverse-token/"
   },
-  "GRT-USDT": {
+  "GRT-USD": {
     "name": "The Graph",
     "tags": [],
     "websiteLink": "https://thegraph.com/", 
@@ -240,7 +240,7 @@
     "whitepaperLink": "http://whitepaper.helium.com",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/helium/"
   },
-  "HBAR-USDT": {
+  "HBAR-USD": {
     "name": "Hedera",
     "tags": [],
     "websiteLink": "https://hedera.com/", 
@@ -397,7 +397,7 @@
     "name": "The Sandbox",
     "tags": ["Gaming"],
     "websiteLink": "https://www.sandbox.game/en/",
-    "whitepaperLink": "https://installers.sandbox.game/The_Sandbox_Whitepaper_2020.pdf?_gl=1*gizc23*_gcl_au*MTc2MjE5MzA0MC4xNzA4MDM5NDc4*_ga*MTIxMjI3MzUzOS4xNzA4MDM5NDgx*_ga_R0TLSXCC02*MTcwODAzOTQ4MC4xLjEuMTcwODAzOTQ4MC42MC4wLjI5OTYxMTIxOA",
+    "whitepaperLink": "https://installers.sandbox.game/The_Sandbox_Whitepaper_2020.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/the-sandbox/"
   },
   "SEI-USD": {
