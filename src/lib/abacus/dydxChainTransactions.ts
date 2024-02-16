@@ -46,6 +46,10 @@ import { log } from '../telemetry';
 import { hashFromTx, getMintscanTxLink } from '../txUtils';
 import { getDydxChainIdFromNetwork } from '../network';
 
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString();
+};
+
 class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   private compositeClient: CompositeClient | undefined;
   private nobleClient: NobleClient | undefined;
@@ -537,7 +541,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         case TransactionType.CctpWithdraw: {
           const result = await this.cctpWithdraw(params);
           callback(result);
-          break;
           break;
         }
         default: {
