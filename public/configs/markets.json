@@ -20,6 +20,13 @@
     "whitepaperLink": "https://why.cardano.org/en/introduction/motivation/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/cardano/"
   },
+  "AGIX-USD": {
+    "name": "SingularityNET",
+    "tags": ["AI"],
+    "websiteLink": "https://public.singularitynet.io/whitepaper.pdf", 
+    "whitepaperLink": "https://public.singularitynet.io/whitepaper.pdf", 
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/singularitynet/"
+  },
   "ALGO-USD": {
     "name": "Algorand",
     "tags": ["Layer 1"],
@@ -78,7 +85,7 @@
   },
   "BLUR-USD": {
     "name": "Blur",
-    "tags": [],
+    "tags": ["NFT"],
     "websiteLink": "https://blur.io/",
     "whitepaperLink": "https://docs.blur.foundation/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/blur-token/"
@@ -90,6 +97,13 @@
     "whitepaperLink": "https://www.exodus.com/assets/docs/binance-coin-whitepaper.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bnb/"
 
+  },
+  "CHZ-USD": {
+    "name": "Chiliz",
+    "tags": ["Layer 1"],
+    "websiteLink": "https://www.chiliz.com/", 
+    "whitepaperLink": "https://www.chiliz.com/docs/litepaper-v1.1-20230703.pdf", 
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/chiliz/"
   },
   "CELO-USD": {
     "name": "Celo",
@@ -147,6 +161,13 @@
     "whitepaperLink": "https://cdn.enjin.io/downloads/whitepapers/enjin-coin/en.pdf/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/enjin-coin/"
   },
+  "ENS-USD": {
+    "name": "Ethereum Name Service",
+    "tags": [],
+    "websiteLink": "https://coinmarketcap.com/currencies/ethereum-name-service/", 
+    "whitepaperLink": "https://docs.ens.domains/", 
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/ethereum-name-service/"
+  },
   "EOS-USD": {
     "name": "EOS",
     "tags": ["Layer 1"],
@@ -170,12 +191,47 @@
     "displayStepSize": "0.001",
     "displayTickSize": "0.1"
   },
+  "FET-USD": {
+    "name": "Fetch.ai",
+    "tags": ["AI"],
+    "websiteLink": "https://fetch.ai/",
+    "whitepaperLink": "https://www.dropbox.com/s/gxptsecwdl3jjtn/David%20Minarsch%20-%202021-04-26%2010.34.17%20-%20paper_21_finalversion.pdf?e=1&dl=0",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/fetch/"
+  },
   "FIL-USD": {
     "name": "Filecoin",
     "tags": ["Layer 1"],
     "websiteLink": "https://filecoin.io/",
     "whitepaperLink": "https://filecoin.io/filecoin.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/filecoin/"
+  },
+  "FTM-USD": {
+    "name": "Fantom",
+    "tags": [],
+    "websiteLink": "https://fantom.foundation/",
+    "whitepaperLink": "https://fantom.foundation/_next/static/media/wp_fantom_v1.6.39329cdc5d0ee59684cbc6f228516383.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/fantom/"
+  },
+  "GALA-USD": {
+    "name": "Gala",
+    "tags": ["Gaming", "Layer 1"],
+    "websiteLink": "https://gala.com/",
+    "whitepaperLink": "https://galahackathon.com/v1.0.0/pdf/sdk-documentation.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/gala/"
+  },
+  "GMT-USD": {
+    "name": "GMT",
+    "tags": ["Gaming"],
+    "websiteLink": "https://stepn.com/", 
+    "whitepaperLink/": "https://whitepaper.stepn.com/",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/green-metaverse-token/"
+  },
+  "GRT-USD": {
+    "name": "The Graph",
+    "tags": [],
+    "websiteLink": "https://thegraph.com/", 
+    "whitepaperLink/": "https://github.com/graphprotocol/research/blob/master/papers/whitepaper/the-graph-whitepaper.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/the-graph/"
   },
   "HNT-USD": {
     "name": "Helium",
@@ -184,6 +240,13 @@
     "whitepaperLink": "http://whitepaper.helium.com",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/helium/"
   },
+  "HBAR-USD": {
+    "name": "Hedera",
+    "tags": [],
+    "websiteLink": "https://hedera.com/", 
+    "whitepaperLink/": "https://files.hedera.com/hh_whitepaper_v2.2-20230918.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/hedera/"
+  },
   "ICP-USD": {
     "name": "Internet Computer",
     "tags": ["Layer 1"],
@@ -191,12 +254,40 @@
     "whitepaperLink": "https://dfinity.org/whitepaper.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/internet-computer/"
   },
+  "IMX-USD": {
+    "name": "Immutable X",
+    "tags": ["Gaming", "Layer 2", "NFT"],
+    "websiteLink": "https://www.immutable.com/",
+    "whitepaperLink": "https://assets.website-files.com/646557ee455c3e16e4a9bcb3/6499367de527dd82ab7475a3_Immutable%20Whitepaper%20Update%202023%20(3).pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/immutable-x/"
+  },
+  "INJ-USD": {
+    "name": "Injective",
+    "tags": ["Layer 1", "Defi"],
+    "websiteLink": "https://injective.com/",
+    "whitepaperLink": "https://docs.injective.network/intro/01_overview.html",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/injective/"
+  },
+  "JTO-USD": {
+    "name": "Jito",
+    "tags": ["Defi"],
+    "websiteLink": "https://www.jito.network/",
+    "whitepaperLink": "https://github.com/jito-foundation",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/jito/"
+  },
   "JUP-USD": {
     "name": "Jupiter",
     "tags": ["Defi"],
     "websiteLink": "https://station.jup.ag/",
     "whitepaperLink": "https://station.jup.ag/blog/green-paper",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/jupiter-ag/"
+  },
+  "KAVA-USD": {
+    "name": "Kava",
+    "tags": ["Layer 1"],
+    "websiteLink": "https://www.kava.io/",
+    "whitepaperLink": "https://docsend.com/view/gwbwpc3",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/kava/"
   },
   "LDO-USD": {
     "name": "Lido DAO",
@@ -219,12 +310,33 @@
     "whitepaperLink": "https://litecoin.info/index.php/Main_Page",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/litecoin/"
   },
+  "MANA-USD": {
+    "name": "Decentraland",
+    "tags": ["AR/VR"],
+    "websiteLink": "https://decentraland.org/",
+    "whitepaperLink": "https://decentraland.org/whitepaper.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/decentraland/"
+  },
+  "MASK-USD": {
+    "name": "Mask Network",
+    "tags": [],
+    "websiteLink": "https://mask.io/",
+    "whitepaperLink": "https://masknetwork.medium.com/introducing-mask-network-maskbook-the-future-of-the-internet-5a973d874edd",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/mask-network/"
+  },
   "MATIC-USD": {
     "name": "Polygon",
     "tags": ["Layer 2"],
     "websiteLink": "https://polygon.technology/",
     "whitepaperLink": "https://polygon.technology/lightpaper-polygon.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/polygon/"
+  },
+  "MINA-USD": {
+    "name": "Mina",
+    "tags": ["Layer 1"],
+    "websiteLink": "https://minaprotocol.com/",
+    "whitepaperLink": "https://docs.minaprotocol.com/assets/economicsWhitepaper.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/mina/"
   },
   "MKR-USD": {
     "name": "Maker",
@@ -240,6 +352,13 @@
     "whitepaperLink": "https://near.org/papers/the-official-near-white-paper/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/near-protocol/"
   },
+  "ORDI-USD": {
+    "name": "ORDI",
+    "tags": ["NFT"],
+    "websiteLink": "https://ordinals.com/",
+    "whitepaperLink": "https://rodarmor.com/blog/",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/ordi/"
+  },
   "OP-USD": {
     "name": "Optimism",
     "tags": [],
@@ -253,12 +372,33 @@
     "websiteLink": "https://www.pepe.vip/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/pepe/"
   },
+  "PYTH-USD": {
+    "name": "Pyth Network",
+    "tags": [],
+    "websiteLink": "https://pyth.network/",
+    "whitepaperLink": "https://pyth.network/whitepaper_v2.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/pyth-network/"
+  },
+  "RNDR-USD": {
+    "name": "Render Token",
+    "tags": ["AI"],
+    "websiteLink": "https://rendernetwork.com/",
+    "whitepaperLink": "https://renderfoundation.com/whitepaper",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/render/"
+  },
   "RUNE-USD": {
     "name": "THORChain",
     "tags": ["Layer 1"],
     "websiteLink": "https://thorchain.org",
     "whitepaperLink": "https://whitepaper.io/document/709/thorchain-whitepaper",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/thorchain/"
+  },
+  "SAND-USD": {
+    "name": "The Sandbox",
+    "tags": ["Gaming"],
+    "websiteLink": "https://www.sandbox.game/en/",
+    "whitepaperLink": "https://installers.sandbox.game/The_Sandbox_Whitepaper_2020.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/the-sandbox/"
   },
   "SEI-USD": {
     "name": "Sei",
@@ -287,6 +427,13 @@
     "websiteLink": "https://solana.com/",
     "whitepaperLink": "https://solana.com/solana-whitepaper.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/solana/"
+  },
+  "STX-USD": {
+    "name": "Stacks",
+    "tags": ["Layer 2"],
+    "websiteLink": "https://www.stacks.co/",
+    "whitepaperLink": "https://gaia.blockstack.org/hub/1AxyPunHHAHiEffXWESKfbvmBpGQv138Fp/stacks.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/stacks/"
   },
   "SUI-USD": {
     "name": "Sui",
@@ -336,6 +483,13 @@
     "websiteLink": "https://worldcoin.org/",
     "whitepaperLink": "https://whitepaper.worldcoin.org/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/worldcoin-org/"
+  },
+  "WOO-USD": {
+    "name": "WOO Network",
+    "tags": ["Defi"],
+    "websiteLink": "https://woo.org/",
+    "whitepaperLink": "https://woo.org/Litepaper.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/wootrade/"
   },
   "XLM-USD": {
     "name": "Stellar",
