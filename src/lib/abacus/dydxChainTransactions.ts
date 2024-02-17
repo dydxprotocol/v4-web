@@ -34,7 +34,7 @@ import {
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
-import { DydxNetwork, isTestnet } from '@/constants/networks';
+import { DydxChainId, isTestnet } from '@/constants/networks';
 
 import { RootStore } from '@/state/_store';
 import { addUncommittedOrderClientId, removeUncommittedOrderClientId } from '@/state/account';
@@ -44,7 +44,6 @@ import { StatefulOrderError } from '../errors';
 import { bytesToBigInt } from '../numbers';
 import { log } from '../telemetry';
 import { hashFromTx, getMintscanTxLink } from '../txUtils';
-import { getDydxChainIdFromNetwork } from '../network';
 
 (BigInt.prototype as any).toJSON = function () {
   return this.toString();
@@ -243,10 +242,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
       if (isTestnet) {
         console.log(
-          getMintscanTxLink(
-            getDydxChainIdFromNetwork(this.compositeClient.network.getString() as DydxNetwork),
-            hash
-          )
+          getMintscanTxLink(this.compositeClient.network.getString() as DydxChainId, hash)
         );
       } else console.log(`txHash: ${hash}`);
 
