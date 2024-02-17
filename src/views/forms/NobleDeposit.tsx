@@ -85,7 +85,7 @@ Styled.WithReceipt = styled(WithReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
-Styled.QrCode = styled(QrCode)<{ blurred: number }>`
+Styled.QrCode = styled(QrCode)<{ blurred: boolean }>`
   border-radius: 0.5em;
 
   ${({ blurred }) =>

@@ -14,7 +14,6 @@ import { WithLabel } from '@/components/WithLabel';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
 import breakpoints from '@/styles/breakpoints';
-import { WithSeparators } from './Separator';
 
 type ElementProps = {
   asChild?: boolean;
