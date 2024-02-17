@@ -17,9 +17,10 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 type ElementProps = {
   selectedToken?: TransferInputTokenResource;
   onSelectToken: (token: TransferInputTokenResource) => void;
+  isExchange?: boolean;
 };
 
-export const TokenSelectMenu = ({ selectedToken, onSelectToken }: ElementProps) => {
+export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions, resources } =
     useSelector(getTransferInputs, shallowEqual) || {};
@@ -47,19 +48,24 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken }: ElementProps) 
         },
       ]}
       label={stringGetter({ key: STRING_KEYS.ASSET })}
-      withReceiptItems={[
-        {
-          key: 'swap',
-          label: stringGetter({ key: STRING_KEYS.SWAP }),
-          value: selectedToken && (
-            <>
-              <Tag>{type === TransferType.deposit ? selectedToken?.symbol : 'USDC'}</Tag>
-              <DiffArrow />
-              <Tag>{type === TransferType.deposit ? 'USDC' : selectedToken?.symbol}</Tag>
-            </>
-          ),
-        },
-      ]}
+      withSearch={!isExchange}
+      withReceiptItems={
+        !isExchange
+          ? [
+              {
+                key: 'swap',
+                label: stringGetter({ key: STRING_KEYS.SWAP }),
+                value: selectedToken && (
+                  <>
+                    <Tag>{type === TransferType.deposit ? selectedToken?.symbol : 'USDC'}</Tag>
+                    <DiffArrow />
+                    <Tag>{type === TransferType.deposit ? 'USDC' : selectedToken?.symbol}</Tag>
+                  </>
+                ),
+              },
+            ]
+          : undefined
+      }
     >
       <Styled.AssetRow>
         {selectedToken ? (

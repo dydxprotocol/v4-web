@@ -144,9 +144,17 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
         validatorUrl: string;
       }
     : T extends AnalyticsEvent.TransferDeposit
-    ? {}
+    ? {
+        chainId?: string;
+        tokenAddress?: string;
+        tokenSymbol?: string;
+      }
     : T extends AnalyticsEvent.TransferWithdraw
-    ? {}
+    ? {
+        chainId?: string;
+        tokenAddress?: string;
+        tokenSymbol?: string;
+      }
     : // Trading
     T extends AnalyticsEvent.TradeOrderTypeSelected
     ? {

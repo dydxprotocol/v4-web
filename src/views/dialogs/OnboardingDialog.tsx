@@ -105,8 +105,8 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
               <Styled.Content>
                 {isMainnet ? (
                   <DepositForm
-                    onDeposit={() => {
-                      track(AnalyticsEvent.TransferDeposit);
+                    onDeposit={(event) => {
+                      track(AnalyticsEvent.TransferDeposit, event);
                     }}
                   />
                 ) : (

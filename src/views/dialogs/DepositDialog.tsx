@@ -13,8 +13,6 @@ export const DepositDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { isMobile } = useBreakpoints();
 
-  const closeDialog = () => setIsOpen?.(false);
-
   return (
     <Dialog
       isOpen
@@ -22,7 +20,7 @@ export const DepositDialog = ({ setIsOpen }: ElementProps) => {
       title={stringGetter({ key: STRING_KEYS.DEPOSIT })}
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
-      <DepositDialogContent onDeposit={closeDialog} />
+      <DepositDialogContent />
     </Dialog>
   );
 };
