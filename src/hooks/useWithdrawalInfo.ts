@@ -20,7 +20,11 @@ import { useTokenConfigs } from './useTokenConfigs';
 
 const BLOCK_TIME = isMainnet ? 1_000 : 1_500;
 
-export const useWithdrawalInfo = ({ isTransfer }: { isTransfer?: boolean }) => {
+export const useWithdrawalInfo = ({
+  transferType,
+}: {
+  transferType: 'withdrawal' | 'transfer';
+}) => {
   const { getWithdrawalAndTransferGatingStatus, getWithdrawalCapacityByDenom } = useDydxClient();
   const { usdcDenom, usdcDecimals } = useTokenConfigs();
   const apiState = useSelector(getApiState, shallowEqual);
@@ -95,7 +99,7 @@ export const useWithdrawalInfo = ({ isTransfer }: { isTransfer?: boolean }) => {
         openDialog({
           type: DialogTypes.WithdrawalGated,
           dialogProps: {
-            isTransfer,
+            transferType,
             estimatedUnblockTime: withdrawalAndTransferGatingStatusValue.estimatedUnblockTime,
           },
         })

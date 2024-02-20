@@ -65,7 +65,7 @@ export const TransferForm = ({
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
   const selectedDydxChainId = useSelector(getSelectedDydxChainId);
   const { tokensConfigs, usdcLabel, chainTokenLabel } = useTokenConfigs();
-  useWithdrawalInfo({ isTransfer: true });
+  useWithdrawalInfo({ transferType: 'transfer' });
 
   const {
     address: recipientAddress,

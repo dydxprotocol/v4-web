@@ -12,14 +12,14 @@ import { Icon, IconName } from '@/components/Icon';
 
 type ElementProps = {
   setIsOpen: (open: boolean) => void;
-  isTransfer?: boolean;
+  transferType: 'withdrawal' | 'transfer';
   estimatedUnblockTime?: string | null;
 };
 
 export const WithdrawalGateDialog = ({
   setIsOpen,
-  isTransfer,
   estimatedUnblockTime,
+  transferType,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { withdrawalGateLearnMore } = useURLConfigs();
@@ -30,9 +30,10 @@ export const WithdrawalGateDialog = ({
       stacked
       setIsOpen={setIsOpen}
       title={
-        isTransfer
-          ? stringGetter({ key: STRING_KEYS.TRANSFERS_PAUSED })
-          : stringGetter({ key: STRING_KEYS.WITHDRAWALS_PAUSED })
+        {
+          withdrawal: stringGetter({ key: STRING_KEYS.WITHDRAWALS_PAUSED }),
+          transfer: stringGetter({ key: STRING_KEYS.TRANSFERS_PAUSED }),
+        }[transferType]
       }
       slotIcon={
         <Styled.IconContainer>

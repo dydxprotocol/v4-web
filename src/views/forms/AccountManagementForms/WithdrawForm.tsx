@@ -89,7 +89,7 @@ export const WithdrawForm = () => {
   const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 0.1% slippage
   const debouncedAmount = useDebounce<string>(withdrawAmount, 500);
   const { usdcLabel } = useTokenConfigs();
-  const { usdcWithdawalCapacity } = useWithdrawalInfo({ isTransfer: false });
+  const { usdcWithdawalCapacity } = useWithdrawalInfo({ transferType: 'withdrawal' });
 
   const isValidAddress = toAddress && isAddress(toAddress);
 
