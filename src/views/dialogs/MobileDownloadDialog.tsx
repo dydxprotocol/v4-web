@@ -24,12 +24,18 @@ type ElementProps = {
 // for testing only
 // export const mobileAppUrl = "http://example.com";
 
-// for testing to verify <meta> is retrieved by name, QR code should show "@dYdX" as value
-// export const mobileAppUrl = document.querySelector('meta[name="twitter:creator"]')?.getAttribute('content')
+let mobileAppUrl: string | undefined | null = undefined;
 
-export const mobileAppUrl =
-  document.querySelector('meta[name="smartbanner:button-url-apple"]')?.getAttribute('content') ?? 
-  document.querySelector('meta[name="smartbanner:button-url-google"]')?.getAttribute('content');
+export const getMobileAppUrl = () => {
+  if (!mobileAppUrl) {
+    mobileAppUrl =
+    // for testing to verify <meta> is retrieved by name, QR code should show "@dYdX" as value
+    // document.querySelector('meta[name="twitter:creator"]')?.getAttribute('content') ??
+    document.querySelector('meta[name="smartbanner:button-url-apple"]')?.getAttribute('content') ?? 
+    document.querySelector('meta[name="smartbanner:button-url-google"]')?.getAttribute('content');
+  }
+  return mobileAppUrl;
+}
   
 const MobileQrCode = ({
   url,
