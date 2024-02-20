@@ -34,7 +34,7 @@ import {
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
-import { ENVIRONMENT_CONFIG_MAP, DydxNetwork, isTestnet } from '@/constants/networks';
+import { DydxChainId, isTestnet } from '@/constants/networks';
 
 import { RootStore } from '@/state/_store';
 import { addUncommittedOrderClientId, removeUncommittedOrderClientId } from '@/state/account';
@@ -43,7 +43,11 @@ import { openDialog } from '@/state/dialogs';
 import { StatefulOrderError } from '../errors';
 import { bytesToBigInt } from '../numbers';
 import { log } from '../telemetry';
-import { hashFromTx } from '../hashfromTx';
+import { hashFromTx, getMintscanTxLink } from '../txUtils';
+
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString();
+};
 
 class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   private compositeClient: CompositeClient | undefined;
@@ -238,9 +242,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
       if (isTestnet) {
         console.log(
-          `${ENVIRONMENT_CONFIG_MAP[
-            this.compositeClient.network.getString() as DydxNetwork
-          ]?.links?.mintscan?.replace('{tx_hash}', hash.toString())}`
+          getMintscanTxLink(this.compositeClient.network.getString() as DydxChainId, hash)
         );
       } else console.log(`txHash: ${hash}`);
 
@@ -535,7 +537,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         case TransactionType.CctpWithdraw: {
           const result = await this.cctpWithdraw(params);
           callback(result);
-          break;
           break;
         }
         default: {

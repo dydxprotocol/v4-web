@@ -33,4 +33,9 @@ TagStory.argTypes = {
     control: { type: 'select' },
     defaultValue: undefined,
   },
+  isHighlighted: {
+    options: [true, false],
+    control: { type: 'select' },
+    defaultValue: false,
+  },
 };

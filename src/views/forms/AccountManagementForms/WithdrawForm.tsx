@@ -7,13 +7,15 @@ import { isAddress } from 'viem';
 
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
+import { AnalyticsEvent } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP, isMainnet } from '@/constants/networks';
+import { isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
 import {
   MAX_CCTP_TRANSFER_AMOUNT,
   MAX_PRICE_IMPACT,
+  MIN_CCTP_TRANSFER_AMOUNT,
   NumberSign,
   TOKEN_DECIMALS,
 } from '@/constants/numbers';
@@ -47,6 +49,7 @@ import { Icon, IconName } from '@/components/Icon';
 
 import { SourceSelectMenu } from '@/views/forms/AccountManagementForms/SourceSelectMenu';
 
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { getSubaccount } from '@/state/accountSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
@@ -56,12 +59,14 @@ import { getNobleChainId } from '@/lib/squid';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
+import { validateCosmosAddress } from '@/lib/addressUtils';
+import { track } from '@/lib/analytics';
 
 export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
   const [error, setError] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
-  const { selectedNetwork } = useSelectedNetwork();
+  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
 
   const { sendSquidWithdraw } = useSubaccount();
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
@@ -69,6 +74,7 @@ export const WithdrawForm = () => {
   const {
     requestPayload,
     token,
+    exchange,
     chain: chainIdStr,
     address: toAddress,
     resources,
@@ -182,20 +188,27 @@ export const WithdrawForm = () => {
             requestPayload.data,
             isCctp
           );
-          if (txHash) {
+          const nobleChainId = getNobleChainId();
+          const toChainId = Boolean(exchange) ? nobleChainId : chainIdStr || undefined;
+          if (txHash && toChainId) {
             addTransferNotification({
               txHash: txHash,
               type: TransferNotificationTypes.Withdrawal,
-              fromChainId: !isCctp
-                ? ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId
-                : getNobleChainId(),
-              toChainId: chainIdStr || undefined,
+              fromChainId: !isCctp ? selectedDydxChainId : nobleChainId,
+              toChainId,
               toAmount: debouncedAmountBN.toNumber(),
               triggeredAt: Date.now(),
               isCctp,
+              isExchange: Boolean(exchange),
             });
             abacusStateManager.clearTransferInputValues();
             setWithdrawAmount('');
+
+            track(AnalyticsEvent.TransferWithdraw, {
+              chainId: toChainId,
+              tokenAddress: toToken?.address || undefined,
+              tokenSymbol: toToken?.symbol || undefined,
+            });
           }
         }
       } catch (error) {
@@ -218,7 +231,17 @@ export const WithdrawForm = () => {
         setIsLoading(false);
       }
     },
-    [requestPayload, debouncedAmountBN, chainIdStr, toAddress, screenAddresses, stringGetter]
+    [
+      requestPayload,
+      debouncedAmountBN,
+      chainIdStr,
+      toAddress,
+      selectedDydxChainId,
+      exchange,
+      toToken,
+      screenAddresses,
+      stringGetter,
+    ]
   );
 
   const onChangeAddress = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -251,13 +274,20 @@ export const WithdrawForm = () => {
     setWithdrawAmount(freeCollateralBN.toString());
   }, [freeCollateralBN, setWithdrawAmount]);
 
-  const onSelectChain = useCallback((chain: string) => {
-    if (chain) {
-      abacusStateManager.setTransferValue({
-        field: TransferInputField.chain,
-        value: chain,
-      });
+  const onSelectNetwork = useCallback((name: string, type: 'chain' | 'exchange') => {
+    if (name) {
       setWithdrawAmount('');
+      if (type === 'chain') {
+        abacusStateManager.setTransferValue({
+          field: TransferInputField.chain,
+          value: name,
+        });
+      } else {
+        abacusStateManager.setTransferValue({
+          field: TransferInputField.exchange,
+          value: name,
+        });
+      }
     }
   }, []);
 
@@ -329,7 +359,7 @@ export const WithdrawForm = () => {
       };
 
     if (debouncedAmountBN) {
-      if (!chainIdStr) {
+      if (!chainIdStr && !exchange) {
         return {
           errorMessage: stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_CHAIN }),
         };
@@ -355,6 +385,14 @@ export const WithdrawForm = () => {
               MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
             },
           }),
+        };
+      }
+      if (
+        !debouncedAmountBN.isZero() &&
+        MustBigNumber(debouncedAmountBN).lte(MIN_CCTP_TRANSFER_AMOUNT)
+      ) {
+        return {
+          errorMessage: 'Amount must be greater than 10 USDC',
         };
       }
     }
@@ -399,14 +437,19 @@ export const WithdrawForm = () => {
     usdcWithdawalCapacity,
   ]);
 
+  const isInvalidNobleAddress = Boolean(
+    exchange && toAddress && !validateCosmosAddress(toAddress, 'noble')
+  );
+
   const isDisabled =
     !!errorMessage ||
     !toToken ||
-    !chainIdStr ||
+    (!chainIdStr && !exchange) ||
     !toAddress ||
     debouncedAmountBN.isNaN() ||
     debouncedAmountBN.isZero() ||
-    isLoading;
+    isLoading ||
+    isInvalidNobleAddress;
 
   return (
     <Styled.Form onSubmit={onSubmit}>
@@ -424,12 +467,21 @@ export const WithdrawForm = () => {
           }
         />
         <SourceSelectMenu
-          label={stringGetter({ key: STRING_KEYS.NETWORK })}
+          selectedExchange={exchange || undefined}
           selectedChain={chainIdStr || undefined}
-          onSelect={onSelectChain}
+          onSelect={onSelectNetwork}
         />
       </Styled.DestinationRow>
-      <TokenSelectMenu selectedToken={toToken || undefined} onSelectToken={onSelectToken} />
+      {isInvalidNobleAddress && (
+        <AlertMessage type={AlertType.Error}>
+          {stringGetter({ key: STRING_KEYS.NOBLE_ADDRESS_VALIDATION })}
+        </AlertMessage>
+      )}
+      <TokenSelectMenu
+        selectedToken={toToken || undefined}
+        onSelectToken={onSelectToken}
+        isExchange={Boolean(exchange)}
+      />
       <Styled.WithDetailsReceipt side="bottom" detailItems={amountInputReceipt}>
         <FormInput
           type={InputType.Number}

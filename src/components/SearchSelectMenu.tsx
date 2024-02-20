@@ -39,7 +39,7 @@ export const SearchSelectMenu = ({
   disabled,
   label,
   items,
-  withSearch,
+  withSearch = true,
   withReceiptItems,
 }: SearchSelectMenuProps) => {
   const [open, setOpen] = useState(false);
@@ -77,6 +77,7 @@ export const SearchSelectMenu = ({
             withSearch={withSearch}
             onItemSelected={() => setOpen(false)}
             withStickyLayout
+            $withSearch={withSearch}
           />
         </Styled.Popover>
       </Styled.WithDetailsReceipt>
@@ -127,7 +128,7 @@ Styled.Popover = styled(Popover)`
   box-shadow: none;
 `;
 
-Styled.ComboboxMenu = styled(ComboboxMenu)`
+Styled.ComboboxMenu = styled(ComboboxMenu)<{ $withSearch?: boolean }>`
   ${layoutMixins.withInnerHorizontalBorders}
 
   --comboboxMenu-backgroundColor: var(--color-layer-4);
@@ -140,7 +141,8 @@ Styled.ComboboxMenu = styled(ComboboxMenu)`
   --comboboxMenu-item-checked-textColor: var(--color-text-2);
   --comboboxMenu-item-highlighted-textColor: var(--color-text-2);
 
-  --stickyArea1-topHeight: var(--form-input-height);
+  --stickyArea1-topHeight: ${({ $withSearch }) =>
+    !$withSearch ? '0' : 'var(--form-input-height)'};
 
   input:focus-visible {
     outline: none;

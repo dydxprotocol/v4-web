@@ -1,12 +1,15 @@
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { useSelector } from 'react-redux';
 
-import { useSelectedNetwork } from '@/hooks';
+import { LINKS_CONFIG_MAP } from '@/constants/networks';
+
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 
 const FALLBACK_URL = 'https://help.dydx.exchange/';
 
 export interface LinksConfigs {
   tos: string;
   privacy: string;
+  statusPage: string;
   mintscan: string;
   mintscanBase: string;
   feedback?: string;
@@ -28,12 +31,13 @@ export interface LinksConfigs {
 }
 
 export const useURLConfigs = (): LinksConfigs => {
-  const { selectedNetwork } = useSelectedNetwork();
-  const linksConfigs = ENVIRONMENT_CONFIG_MAP[selectedNetwork].links as LinksConfigs;
+  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
+  const linksConfigs = LINKS_CONFIG_MAP[selectedDydxChainId] as LinksConfigs;
 
   return {
     tos: linksConfigs.tos,
     privacy: linksConfigs.privacy,
+    statusPage: linksConfigs.statusPage,
     mintscan: linksConfigs.mintscan,
     mintscanBase: linksConfigs.mintscanBase,
     feedback: linksConfigs.feedback || FALLBACK_URL,

@@ -32,7 +32,15 @@ export const ExternalNavKeplrDialog = ({ setIsOpen }: ElementProps) => {
       openDialog({
         type: DialogTypes.ExternalLink,
         dialogProps: {
+          buttonText: stringGetter({ key: STRING_KEYS.CONTINUE }),
           link: keplrDashboard,
+          title: stringGetter({ key: STRING_KEYS.LEAVING_WEBSITE_STAKING_GOVERNANCE }),
+          slotContent: stringGetter({
+            key: STRING_KEYS.STAKE_WITH_KEPLR_AND_LEAVING_DESCRIPTION,
+            params: {
+              CTA: stringGetter({ key: STRING_KEYS.CONTINUE }),
+            },
+          }),
         },
       })
     );

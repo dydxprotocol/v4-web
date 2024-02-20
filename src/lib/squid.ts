@@ -31,13 +31,13 @@ export const fetchSquidStatus = async (
 
   const response = await fetch(url, {
     headers: {
-      "x-integrator-id": integratorId || 'dYdX-api'
+      'x-integrator-id': integratorId || 'dYdX-api',
     },
   });
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error);
+    throw error;
   }
 
   return response.json();
@@ -45,4 +45,4 @@ export const fetchSquidStatus = async (
 
 export const getNobleChainId = () => {
   return isMainnet ? 'noble-1' : 'grand-1';
-}
+};
