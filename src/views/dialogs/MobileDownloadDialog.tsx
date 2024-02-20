@@ -56,9 +56,7 @@ MobileDownloadDialog should only been shown on desktop when mobileAppUrl has val
 export const MobileDownloadDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
   const content = (
-      <>
-        <MobileQrCode url={mobileAppUrl!} />
-      </>
+    <MobileQrCode url={mobileAppUrl!} />
   );
 
   return (
