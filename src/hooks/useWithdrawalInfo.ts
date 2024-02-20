@@ -15,6 +15,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { formatRelativeTime } from '@/lib/dateTime';
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
+import { log } from '@/lib/telemetry';
 
 import { useDydxClient } from './useDydxClient';
 import { useTokenConfigs } from './useTokenConfigs';
@@ -42,7 +43,7 @@ export const useWithdrawalInfo = ({
         const response = await getWithdrawalCapacityByDenom({ denom: usdcDenom });
         return JSON.parse(encodeJson(response, ByteArrayEncoding.BIGINT));
       } catch (error) {
-        console.error('error');
+        log('useWithdrawalInfo/getWithdrawalCapacityByDenom', error);
       }
     },
     refetchInterval: 60_000,
@@ -52,7 +53,13 @@ export const useWithdrawalInfo = ({
   const { data: withdrawalAndTransferGatingStatus } = useQuery({
     enabled: withdrawalSafetyEnabled,
     queryKey: 'withdrawalTransferGateStatus',
-    queryFn: getWithdrawalAndTransferGatingStatus,
+    queryFn: async () => {
+      try {
+        return await getWithdrawalAndTransferGatingStatus();
+      } catch (error) {
+        log('useWithdrawalInfo/getWithdrawalAndTransferGatingStatus', error);
+      }
+    },
     refetchInterval: 60_000,
     staleTime: 60_000,
   });
@@ -115,7 +122,7 @@ export const useWithdrawalInfo = ({
         })
       );
     }
-  }, [withdrawalAndTransferGatingStatusValue.isGated, withdrawalSafetyEnabled]);
+  }, [transferType, withdrawalAndTransferGatingStatusValue.isGated, withdrawalSafetyEnabled]);
 
   return {
     usdcWithdrawalCapacity: capacity,
