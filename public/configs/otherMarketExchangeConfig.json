@@ -513,6 +513,14 @@
     { "exchangeName": "Okx", "ticker": "SOL-USDT", "adjustByMarket": "USDT-USD" },
     { "exchangeName": "Mexc", "ticker": "SOL_USDT", "adjustByMarket": "USDT-USD" }
   ],
+  "STRK": [
+    { "exchangeName": "Binance", "ticker": "STRKUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Bybit", "ticker": "STRKUSDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Huobi", "ticker": "strkusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kucoin", "ticker": "STRK-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Okx", "ticker": "STRK-USDT", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Gate", "ticker": "STRK_USDT", "adjustByMarket": "USDT-USD" }
+  ],
   "STX": [
     { "exchangeName": "Binance", "ticker": "STXUSDT", "adjustByMarket": "USDT-USD" },
     { "exchangeName": "Bybit", "ticker": "STXUSDT", "adjustByMarket": "USDT-USD" },
