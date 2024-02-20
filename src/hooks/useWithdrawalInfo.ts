@@ -7,6 +7,7 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import { DialogTypes } from '@/constants/dialogs';
 import { isMainnet } from '@/constants/networks';
+import { useEnvFeatures } from './useEnvFeatures';
 
 import { getApiState } from '@/state/appSelectors';
 import { closeDialog, openDialog } from '@/state/dialogs';
@@ -31,8 +32,10 @@ export const useWithdrawalInfo = ({
   const { height } = apiState || {};
   const selectedLocale = useSelector(getSelectedLocale);
   const dispatch = useDispatch();
+  const { withdrawalSafetyEnabled } = useEnvFeatures();
 
-  const { data: usdcWithdawalCapacity } = useQuery({
+  const { data: usdcWithdrawalCapacity } = useQuery({
+    enabled: withdrawalSafetyEnabled,
     queryKey: 'usdcWithdrawalCapacity',
     queryFn: async () => {
       try {
@@ -47,6 +50,7 @@ export const useWithdrawalInfo = ({
   });
 
   const { data: withdrawalAndTransferGatingStatus } = useQuery({
+    enabled: withdrawalSafetyEnabled,
     queryKey: 'withdrawalTransferGateStatus',
     queryFn: getWithdrawalAndTransferGatingStatus,
     refetchInterval: 60_000,
@@ -54,8 +58,12 @@ export const useWithdrawalInfo = ({
   });
 
   const capacity = useMemo(() => {
-    const capacityList = usdcWithdawalCapacity?.limiterCapacityList;
+    const capacityList = usdcWithdrawalCapacity?.limiterCapacityList;
     if (!capacityList || capacityList.length < 2) {
+      if (!withdrawalSafetyEnabled) {
+        return BigNumber(Infinity);
+      }
+
       return BIG_NUMBERS.ZERO;
     }
 
@@ -63,14 +71,15 @@ export const useWithdrawalInfo = ({
     const dailyBN = MustBigNumber(daily);
     const weeklyBN = MustBigNumber(weekly);
     return BigNumber.minimum(dailyBN, weeklyBN).div(10 ** usdcDecimals);
-  }, [usdcDecimals, usdcWithdawalCapacity]);
+  }, [usdcDecimals, usdcWithdrawalCapacity]);
 
   const withdrawalAndTransferGatingStatusValue = useMemo(() => {
     const { withdrawalsAndTransfersUnblockedAtBlock } = withdrawalAndTransferGatingStatus ?? {};
     if (
       height &&
       withdrawalsAndTransfersUnblockedAtBlock &&
-      height < withdrawalsAndTransfersUnblockedAtBlock
+      height < withdrawalsAndTransfersUnblockedAtBlock &&
+      withdrawalSafetyEnabled
     ) {
       return {
         estimatedUnblockTime: formatRelativeTime(
@@ -87,12 +96,13 @@ export const useWithdrawalInfo = ({
       estimatedUnblockTime: null,
       isGated: false,
     };
-  }, [height, withdrawalAndTransferGatingStatus]);
+  }, [height, withdrawalAndTransferGatingStatus, withdrawalSafetyEnabled]);
 
   useEffect(() => {
     if (
       withdrawalAndTransferGatingStatusValue.isGated &&
-      withdrawalAndTransferGatingStatusValue.estimatedUnblockTime
+      withdrawalAndTransferGatingStatusValue.estimatedUnblockTime &&
+      withdrawalSafetyEnabled
     ) {
       dispatch(closeDialog());
       dispatch(
@@ -105,10 +115,10 @@ export const useWithdrawalInfo = ({
         })
       );
     }
-  }, [withdrawalAndTransferGatingStatusValue.isGated]);
+  }, [withdrawalAndTransferGatingStatusValue.isGated, withdrawalSafetyEnabled]);
 
   return {
-    usdcWithdawalCapacity: capacity,
+    usdcWithdrawalCapacity: capacity,
     withdrawalAndTransferGatingStatus,
   };
 };

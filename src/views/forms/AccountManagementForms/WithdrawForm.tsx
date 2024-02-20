@@ -89,7 +89,7 @@ export const WithdrawForm = () => {
   const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 0.1% slippage
   const debouncedAmount = useDebounce<string>(withdrawAmount, 500);
   const { usdcLabel } = useTokenConfigs();
-  const { usdcWithdawalCapacity } = useWithdrawalInfo({ transferType: 'withdrawal' });
+  const { usdcWithdrawalCapacity } = useWithdrawalInfo({ transferType: 'withdrawal' });
 
   const isValidAddress = toAddress && isAddress(toAddress);
 
@@ -402,7 +402,7 @@ export const WithdrawForm = () => {
     }
 
     // Withdrawal Safety
-    if (usdcWithdawalCapacity.gt(0) && debouncedAmountBN.gt(usdcWithdawalCapacity)) {
+    if (usdcWithdrawalCapacity.gt(0) && debouncedAmountBN.gt(usdcWithdrawalCapacity)) {
       return {
         alertType: AlertType.Warning,
         errorMessage: stringGetter({
@@ -410,7 +410,7 @@ export const WithdrawForm = () => {
           params: {
             USDC_LIMIT: (
               <span>
-                {usdcWithdawalCapacity.toFormat(TOKEN_DECIMALS)}
+                {usdcWithdrawalCapacity.toFormat(TOKEN_DECIMALS)}
                 <Styled.Tag>{usdcLabel}</Styled.Tag>
               </span>
             ),
@@ -434,7 +434,7 @@ export const WithdrawForm = () => {
     sanctionedAddresses,
     stringGetter,
     summary,
-    usdcWithdawalCapacity,
+    usdcWithdrawalCapacity,
   ]);
 
   const isInvalidNobleAddress = Boolean(
