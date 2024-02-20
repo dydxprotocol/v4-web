@@ -516,7 +516,7 @@
   "STRK": [
     { "exchangeName": "Binance", "ticker": "STRKUSDT", "adjustByMarket": "USDT-USD" },
     { "exchangeName": "Bybit", "ticker": "STRKUSDT", "adjustByMarket": "USDT-USD" },
-    { "exchangeName": "Huobi", "ticker": "strkusdt", "adjustByMarket": "USDT-USD" },
+    { "exchangeName": "Kraken", "ticker": "STRKUSD" },
     { "exchangeName": "Kucoin", "ticker": "STRK-USDT", "adjustByMarket": "USDT-USD" },
     { "exchangeName": "Okx", "ticker": "STRK-USDT", "adjustByMarket": "USDT-USD" },
     { "exchangeName": "Gate", "ticker": "STRK_USDT", "adjustByMarket": "USDT-USD" }
