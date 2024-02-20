@@ -82,24 +82,30 @@ const useLocalNotificationsContext = () => {
               isCctp,
               errorCount,
               status: currentStatus,
+              isExchange,
             } = transferNotification;
 
-            // @ts-ignore status.errors is not in the type definition but can be returned
-            // also error can some time come back as an empty object so we need to ignore for that
-            const hasErrors = !!currentStatus?.errors || 
-                 (currentStatus?.error && Object.keys(currentStatus.error).length !== 0);
+            const hasErrors =
+              // @ts-ignore status.errors is not in the type definition but can be returned
+              // also error can some time come back as an empty object so we need to ignore for that
+              !!currentStatus?.errors ||
+              (currentStatus?.error && Object.keys(currentStatus.error).length !== 0);
 
             if (
+              !isExchange &&
               !hasErrors &&
               (!currentStatus?.squidTransactionStatus ||
                 currentStatus?.squidTransactionStatus === 'ongoing')
             ) {
               try {
-                const status = await fetchSquidStatus({
-                  transactionId: txHash,
-                  toChainId,
-                  fromChainId,
-                }, isCctp);
+                const status = await fetchSquidStatus(
+                  {
+                    transactionId: txHash,
+                    toChainId,
+                    fromChainId,
+                  },
+                  isCctp
+                );
 
                 if (status) {
                   transferNotification.status = status;

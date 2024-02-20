@@ -40,7 +40,7 @@ export const TransferStatusNotification = ({
   const stringGetter = useStringGetter();
   const [open, setOpen] = useState<boolean>(false);
   const [secondsLeft, setSecondsLeft] = useState<number>(0);
-  const { fromChainId, status, txHash, toAmount } = transfer;
+  const { fromChainId, status, txHash, toAmount, isExchange } = transfer;
 
   // @ts-ignore status.errors is not in the type definition but can be returned
   const error = status?.errors?.length ? status?.errors[0] : status?.error;
@@ -54,6 +54,8 @@ export const TransferStatusNotification = ({
 
   useInterval({ callback: updateSecondsLeft });
 
+  const isComplete = status?.squidTransactionStatus === 'success' || isExchange;
+
   const inProgressStatusString =
     type === TransferNotificationTypes.Deposit
       ? secondsLeft > 0
@@ -65,10 +67,10 @@ export const TransferStatusNotification = ({
 
   const statusString =
     type === TransferNotificationTypes.Deposit
-      ? status?.squidTransactionStatus === 'success'
+      ? isComplete
         ? STRING_KEYS.DEPOSIT_COMPLETE
         : inProgressStatusString
-      : status?.squidTransactionStatus === 'success'
+      : isComplete
       ? STRING_KEYS.WITHDRAW_COMPLETE
       : inProgressStatusString;
 
@@ -108,12 +110,12 @@ export const TransferStatusNotification = ({
       slotIcon={isToast && slotIcon}
       slotTitle={slotTitle}
       slotCustomContent={
-        !status ? (
+        !status && !isExchange ? (
           <LoadingDots size={3} />
         ) : (
           <Styled.BridgingStatus>
             {content}
-            {!isToast && status?.squidTransactionStatus !== 'success' && !hasError && (
+            {!isToast && !isComplete && !hasError && (
               <Styled.TransferStatusSteps status={status} type={type} />
             )}
           </Styled.BridgingStatus>

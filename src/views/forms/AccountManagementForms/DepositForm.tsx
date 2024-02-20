@@ -7,10 +7,11 @@ import { Abi, parseUnits } from 'viem';
 import erc20 from '@/abi/erc20.json';
 import erc20_usdt from '@/abi/erc20_usdt.json';
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
+import { AnalyticsEvent, AnalyticsEventData } from '@/constants/analytics';
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP, isMainnet } from '@/constants/networks';
+import { isMainnet } from '@/constants/networks';
 import { MAX_CCTP_TRANSFER_AMOUNT, MAX_PRICE_IMPACT, NumberSign } from '@/constants/numbers';
 import type { EvmAddress } from '@/constants/wallets';
 
@@ -32,6 +33,7 @@ import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -47,7 +49,7 @@ import { DepositButtonAndReceipt } from './DepositForm/DepositButtonAndReceipt';
 import { NobleDeposit } from '../NobleDeposit';
 
 type DepositFormProps = {
-  onDeposit?: () => void;
+  onDeposit?: (event?: AnalyticsEventData<AnalyticsEvent.TransferDeposit>) => void;
   onError?: () => void;
 };
 
@@ -56,7 +58,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [requireUserActionInWallet, setRequireUserActionInWallet] = useState(false);
-  const { selectedNetwork } = useSelectedNetwork();
+  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
 
   const { evmAddress, signerWagmi, publicClientWagmi, nobleAddress } = useAccounts();
 
@@ -131,7 +133,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     if (error) onError?.();
   }, [error]);
 
-  const onSelectChain = useCallback((name: string, type: 'chain' | 'exchange') => {
+  const onSelectNetwork = useCallback((name: string, type: 'chain' | 'exchange') => {
     if (name) {
       abacusStateManager.clearTransferInputValues();
       setFromAmount('');
@@ -257,14 +259,10 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         };
         const txHash = await signerWagmi.sendTransaction(tx);
 
-        onDeposit?.();
-
         if (txHash) {
           addTransferNotification({
             txHash: txHash,
-            toChainId: !isCctp
-              ? ENVIRONMENT_CONFIG_MAP[selectedNetwork].dydxChainId
-              : getNobleChainId(),
+            toChainId: !isCctp ? selectedDydxChainId : getNobleChainId(),
             fromChainId: chainIdStr || undefined,
             toAmount: summary?.usdcSize || undefined,
             triggeredAt: Date.now(),
@@ -272,6 +270,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           });
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');
+
+          onDeposit?.({
+            chainId: chainIdStr || undefined,
+            tokenAddress: sourceToken?.address || undefined,
+            tokenSymbol: sourceToken?.symbol || undefined,
+          });
         }
       } catch (error) {
         log('DepositForm/onSubmit', error);
@@ -280,7 +284,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         setIsLoading(false);
       }
     },
-    [requestPayload, signerWagmi, chainId]
+    [requestPayload, signerWagmi, chainId, sourceToken, sourceChain]
   );
 
   const amountInputReceipt = [
@@ -379,7 +383,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       <SourceSelectMenu
         selectedChain={chainIdStr || undefined}
         selectedExchange={exchange || undefined}
-        onSelect={onSelectChain}
+        onSelect={onSelectNetwork}
       />
       {exchange && nobleAddress ? (
         <NobleDeposit />

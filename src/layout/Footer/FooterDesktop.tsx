@@ -3,9 +3,9 @@ import styled, { type AnyStyledComponent, css } from 'styled-components';
 import { AbacusApiStatus } from '@/constants/abacus';
 import { ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP, isDev } from '@/constants/networks';
+import { isDev } from '@/constants/networks';
 
-import { useApiState, useSelectedNetwork, useStringGetter } from '@/hooks';
+import { useApiState, useStringGetter, useURLConfigs } from '@/hooks';
 import { ChatIcon, LinkOutIcon } from '@/icons';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -28,8 +28,7 @@ enum ExchangeStatus {
 export const FooterDesktop = () => {
   const stringGetter = useStringGetter();
   const { height, indexerHeight, status, statusErrorMessage } = useApiState();
-  const { selectedNetwork } = useSelectedNetwork();
-  const { statusPage } = ENVIRONMENT_CONFIG_MAP[selectedNetwork].links;
+  const { statusPage } = useURLConfigs();
 
   const { exchangeStatus, label } =
     !status || status === AbacusApiStatus.NORMAL

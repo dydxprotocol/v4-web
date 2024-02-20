@@ -27,6 +27,8 @@ import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
+import { isTruthy } from '@/lib/isTruthy';
+
 import { SlippageEditor } from '../SlippageEditor';
 
 type ElementProps = {
@@ -55,7 +57,7 @@ export const WithdrawButtonAndReceipt = ({
   const stringGetter = useStringGetter();
 
   const { leverage } = useSelector(getSubaccount, shallowEqual) || {};
-  const { summary, requestPayload } = useSelector(getTransferInputs, shallowEqual) || {};
+  const { summary, requestPayload, exchange } = useSelector(getTransferInputs, shallowEqual) || {};
   const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
   const { usdcLabel } = useTokenConfigs();
 
@@ -92,7 +94,7 @@ export const WithdrawButtonAndReceipt = ({
       value: <Output type={OutputType.Fiat} value={totalFees} />,
       subitems: feeSubitems,
     },
-    {
+    !exchange && {
       key: 'exchange-rate',
       label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
       value: withdrawToken && typeof summary?.exchangeRate === 'number' && (
@@ -133,7 +135,9 @@ export const WithdrawButtonAndReceipt = ({
           {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
         </span>
       ),
-      value: <Output type={OutputType.Asset} value={summary?.toAmount} fractionDigits={TOKEN_DECIMALS} />,
+      value: (
+        <Output type={OutputType.Asset} value={summary?.toAmount} fractionDigits={TOKEN_DECIMALS} />
+      ),
       subitems: [
         {
           key: 'minimum-amount-received',
@@ -144,13 +148,17 @@ export const WithdrawButtonAndReceipt = ({
             </span>
           ),
           value: (
-            <Output type={OutputType.Asset} value={summary?.toAmountMin} fractionDigits={TOKEN_DECIMALS} />
+            <Output
+              type={OutputType.Asset}
+              value={summary?.toAmountMin}
+              fractionDigits={TOKEN_DECIMALS}
+            />
           ),
           tooltip: 'minimum-amount-received',
         },
       ],
     },
-    {
+    !exchange && {
       key: 'slippage',
       label: <span>{stringGetter({ key: STRING_KEYS.MAX_SLIPPAGE })}</span>,
       value: (
@@ -175,7 +183,7 @@ export const WithdrawButtonAndReceipt = ({
         />
       ),
     },
-  ];
+  ].filter(isTruthy);
 
   const isFormValid = !isDisabled && !isEditingSlippage;
 

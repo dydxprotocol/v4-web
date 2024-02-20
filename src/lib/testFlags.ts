@@ -19,12 +19,16 @@ class TestFlags {
     return !!this.queryParams.displayinitializingmarkets;
   }
 
-  get addressOverride():string {
+  get addressOverride(): string {
     return this.queryParams.address;
   }
-  
+
   get showTradingRewards() {
     return !!this.queryParams.tradingrewards;
+  }
+
+  get showCexWithdrawal() {
+    return !!this.queryParams.cexwithdrawal;
   }
 }
 
