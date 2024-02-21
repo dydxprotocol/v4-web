@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 overrides:
   follow-redirects: 1.15.3
 
@@ -26,14 +30,14 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: ^1.4.6
-    version: 1.4.6
+    specifier: ^1.4.9
+    version: 1.4.9
   '@dydxprotocol/v4-client-js':
     specifier: ^1.0.20
     version: 1.0.20
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.31
-    version: 1.1.31
+    specifier: ^1.1.34
+    version: 1.1.34
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -1286,8 +1290,8 @@ packages:
     resolution: {integrity: sha512-Gg5t+eR7vPJMAmhkFt6CZrzPd0EKpAslWwk5rFVYZpJsM8JG5KT9XQ99hgNM3Ov6ScNoIWbXkpX27F6A9cXR4Q==}
     dev: false
 
-  /@dydxprotocol/v4-abacus@1.4.6:
-    resolution: {integrity: sha512-qYq+4TizcMMxYVXckn0LCucWBe5N9ZNtD1XnowCAuBUUifHSgMGvao5OeZIKMgNM/udSKOXLss4zLy6dH/G2SA==}
+  /@dydxprotocol/v4-abacus@1.4.9:
+    resolution: {integrity: sha512-OnrD5Db7AGSxyQE+gWRmkBuXbkZMfSEDB+v2s+ft0zgd4D5j/WTZkk1RG0fn8ISV4AffoN5T24jBWxLfqVlmZw==}
     dev: false
 
   /@dydxprotocol/v4-client-js@1.0.20:
@@ -1319,8 +1323,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.31:
-    resolution: {integrity: sha512-plJVIgFAKq9/hA/gk5GgKgCQFsH3pNtDWfG/yHLDXyiGX0M0mMEi1bTNVs4podFVoHJu1nSL9YPFlpJ00FteGw==}
+  /@dydxprotocol/v4-localization@1.1.34:
+    resolution: {integrity: sha512-I7zivjv8gS+6b9n7/wh7PY9QEUDIIyLx9ugZ5K6ybar0xT/06yupOVdVE6iLivQ/IAsVi/RFHkD8bQd0DWCetg==}
     dev: false
 
   /@dydxprotocol/v4-proto@4.0.0-dev.0:
@@ -16049,7 +16053,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
