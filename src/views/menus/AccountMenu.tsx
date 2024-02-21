@@ -40,6 +40,7 @@ import { getAppTheme } from '@/state/configsSelectors';
 import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
 import { MustBigNumber } from '@/lib/numbers';
+import { getMobileAppUrl } from '../dialogs/MobileDownloadDialog';
 
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
@@ -189,6 +190,18 @@ export const AccountMenu = () => {
           label: stringGetter({ key: STRING_KEYS.DISPLAY_SETTINGS }),
           onSelect: () => dispatch(openDialog({ type: DialogTypes.DisplaySettings })),
         },
+        ...(getMobileAppUrl()
+          ? [
+              {
+                value: 'MobileDownload',
+                icon: <Icon iconName={IconName.Qr} />,
+                label: stringGetter({ key: STRING_KEYS.DOWNLOAD_MOBILE_APP }),
+                onSelect: () => {
+                  dispatch(openDialog({ type: DialogTypes.MobileDownload }));
+                },
+              },
+            ]
+          : []),
         ...(onboardingState === OnboardingState.AccountConnected && hdKey
           ? [
               {
