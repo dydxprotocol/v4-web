@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
+import { AnalyticsEvent } from '@/constants/analytics';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import {
   type Notification,
@@ -13,6 +14,7 @@ import {
 import { useLocalStorage } from './useLocalStorage';
 import { notificationTypes } from './useNotificationTypes';
 
+import { track } from '@/lib/analytics';
 import { renderSvgToDataUrl } from '../lib/renderSvgToDataUrl';
 
 type NotificationsContextType = ReturnType<typeof useNotificationsContext>;
@@ -82,6 +84,7 @@ const useNotificationsContext = () => {
         [NotificationType.AbacusGenerated]: true,
         [NotificationType.SquidTransfer]: true,
         [NotificationType.ReleaseUpdates]: true,
+        [NotificationType.ChaosLabs]: true,
         version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
       });
     }
@@ -176,8 +179,10 @@ const useNotificationsContext = () => {
     )
   );
 
-  const onNotificationAction = async (notification: Notification) =>
-    await actions[notification.type]?.(notification.id);
+  const onNotificationAction = async (notification: Notification) => {
+    track(AnalyticsEvent.NotificationAction, { type: notification.type, id: notification.id });
+    return await actions[notification.type]?.(notification.id);
+  };
 
   // Push notifications
   const [hasEnabledPush, setHasEnabledPush] = useLocalStorage({

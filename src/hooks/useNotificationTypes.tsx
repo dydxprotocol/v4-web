@@ -5,7 +5,7 @@ import { isEqual, groupBy } from 'lodash';
 import { useNavigate } from 'react-router-dom';
 
 import { DialogTypes } from '@/constants/dialogs';
-import { AppRoute } from '@/constants/routes';
+import { AppRoute, TokenRoute } from '@/constants/routes';
 import { DydxChainAsset } from '@/constants/wallets';
 
 import {
@@ -22,7 +22,7 @@ import {
   TransferNotificationTypes,
 } from '@/constants/notifications';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter, useTokenConfigs } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -278,6 +278,43 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
     useNotificationAction: () => {
       return () => {};
+    },
+  },
+  {
+    type: NotificationType.ChaosLabs,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const expirationDate = new Date('2024-03-08T23:59:59');
+      const currentDate = new Date();
+      useEffect(() => {
+        if (currentDate > expirationDate) return;
+        trigger(
+          'chaos-labs-s3',
+          {
+            icon: <AssetIcon symbol="DYDX" />,
+            title: stringGetter({ key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.TITLE' }),
+            body: stringGetter({
+              key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.BODY',
+              params: {
+                SEASON_NUMBER: '3',
+                PREV_SEASON_NUMBER: '1',
+                DYDX_AMOUNT: '34',
+                USDC_AMOUNT: '100',
+              },
+            }),
+            toastSensitivity: 'foreground',
+            groupKey: NotificationType.ChaosLabs,
+          },
+          []
+        );
+      }, [stringGetter]);
+    },
+    useNotificationAction: () => {
+      const { chainTokenLabel } = useTokenConfigs();
+      const navigate = useNavigate();
+      return () => {
+        navigate(`${chainTokenLabel}/${TokenRoute.TradingRewards}`);
+      };
     },
   },
 ];

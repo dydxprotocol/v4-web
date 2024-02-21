@@ -5,6 +5,7 @@ export enum NotificationType {
   AbacusGenerated = 'AbacusGenerated',
   SquidTransfer = 'SquidTransfer',
   ReleaseUpdates = 'ReleaseUpdates',
+  ChaosLabs = 'ChaosLabs',
 }
 
 export enum NotificationComponentType {}
