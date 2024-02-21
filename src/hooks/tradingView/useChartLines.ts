@@ -15,8 +15,6 @@ import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
 import { MustBigNumber } from '@/lib/numbers';
 import { getChartLineColors } from '@/lib/tradingView/utils';
 
-let chartLines: Record<string, ChartLine> = {};
-
 /**
  * @description Hook to handle drawing chart lines
  */
@@ -25,10 +23,12 @@ export const useChartLines = ({
   tvWidget,
   displayButton,
   isChartReady,
+  chartLinesRef,
 }: {
   tvWidget: TvWidget | null;
   displayButton: HTMLElement | null;
-  isChartReady?: boolean;
+  isChartReady: boolean;
+  chartLinesRef: React.MutableRefObject<Record<string, ChartLine>>;
 }) => {
   const [showOrderLines, setShowOrderLines] = useState(true);
 
@@ -42,26 +42,20 @@ export const useChartLines = ({
 
   useEffect(() => {
     if (isChartReady && displayButton) {
-      displayButton.onclick = () => {
-        const newShowOrderLinesState = !showOrderLines;
-        if (newShowOrderLinesState) {
-          displayButton?.classList?.add('order-lines-active');
-        } else {
-          displayButton?.classList?.remove('order-lines-active');
-        }
-        setShowOrderLines(newShowOrderLinesState);
-      };
+      displayButton.onclick = () => setShowOrderLines(!showOrderLines);
     }
   }, [isChartReady, showOrderLines]);
 
   useEffect(() => {
-    if (tvWidget && isChartReady) {
+    if (isChartReady && tvWidget) {
       tvWidget.onChartReady(() => {
         tvWidget.chart().dataReady(() => {
           if (showOrderLines) {
+            displayButton?.classList?.add('order-lines-active');
             drawOrderLines();
             drawPositionLine();
           } else {
+            displayButton?.classList?.remove('order-lines-active');
             deleteChartLines();
           }
         });
@@ -78,13 +72,13 @@ export const useChartLines = ({
     const key = currentMarketPositionData.id;
     const price = MustBigNumber(entryPrice).toNumber();
 
-    const maybePositionLine = chartLines[key]?.line;
+    const maybePositionLine = chartLinesRef.current[key]?.line;
     const shouldShow = size && size !== 0;
 
     if (!shouldShow) {
       if (maybePositionLine) {
         maybePositionLine.remove();
-        delete chartLines[key];
+        delete chartLinesRef.current[key];
         return;
       }
     } else {
@@ -106,9 +100,9 @@ export const useChartLines = ({
           .setQuantity(quantity);
 
         if (positionLine) {
-          const chartLine = { line: positionLine, chartLineType: 'position' };
+          const chartLine: ChartLine = { line: positionLine, chartLineType: 'position' };
           setLineColors({ chartLine: chartLine });
-          chartLines[key] = chartLine;
+          chartLinesRef.current[key] = chartLine;
         }
       }
     }
@@ -143,12 +137,12 @@ export const useChartLines = ({
           !cancelReason &&
           (status === AbacusOrderStatus.open || status === AbacusOrderStatus.untriggered);
 
-        const maybeOrderLine = chartLines[key]?.line;
+        const maybeOrderLine = chartLinesRef.current[key]?.line;
 
         if (!shouldShow) {
           if (maybeOrderLine) {
             maybeOrderLine.remove();
-            delete chartLines[key];
+            delete chartLinesRef.current[key];
             return;
           }
         } else {
@@ -170,7 +164,7 @@ export const useChartLines = ({
                 chartLineType: ORDER_SIDES[side.name],
               };
               setLineColors({ chartLine: chartLine });
-              chartLines[key] = chartLine;
+              chartLinesRef.current[key] = chartLine;
             }
           }
         }
@@ -179,10 +173,10 @@ export const useChartLines = ({
   };
 
   const deleteChartLines = () => {
-    Object.values(chartLines).forEach(({ line }) => {
+    Object.values(chartLinesRef.current).forEach(({ line }) => {
       line.remove();
     });
-    chartLines = {};
+    chartLinesRef.current = {};
   };
 
   const setLineColors = ({ chartLine }: { chartLine: ChartLine }) => {
@@ -204,6 +198,4 @@ export const useChartLines = ({
     maybeQuantityColor &&
       line.setLineColor(maybeQuantityColor).setQuantityBackgroundColor(maybeQuantityColor);
   };
-
-  return { chartLines };
 };
