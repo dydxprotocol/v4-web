@@ -1,0 +1,29 @@
+name: Workflow for Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  sync-release-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Git
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+      - name: Fetch all history
+        run: git fetch --unshallow || git fetch --all
+
+      - name: Check out the release branch
+        run: |
+          git checkout release || git checkout -b release
+
+      - name: Sync release branch to tag
+        run: |
+          git reset --hard ${{ github.ref }}
+          git push -f origin release
