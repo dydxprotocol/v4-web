@@ -9,7 +9,11 @@ import type { ChartLine, TvWidget } from '@/constants/tvchart';
 
 import { useStringGetter } from '@/hooks';
 
-import { getCurrentMarketOrders, getCurrentMarketPositionData } from '@/state/accountSelectors';
+import {
+  getCurrentMarketOrders,
+  getCurrentMarketPositionData,
+  getIsAccountConnected,
+} from '@/state/accountSelectors';
 import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -37,6 +41,8 @@ export const useChartLines = ({
   const appTheme = useSelector(getAppTheme);
   const appColorMode = useSelector(getAppColorMode);
 
+  const isAccountConnected = useSelector(getIsAccountConnected);
+
   const currentMarketPositionData = useSelector(getCurrentMarketPositionData, shallowEqual);
   const currentMarketOrders: SubaccountOrder[] = useSelector(getCurrentMarketOrders, shallowEqual);
 
@@ -45,6 +51,12 @@ export const useChartLines = ({
       displayButton.onclick = () => setShowOrderLines(!showOrderLines);
     }
   }, [isChartReady, showOrderLines]);
+
+  useEffect(() => {
+    if (!isAccountConnected) {
+      deleteChartLines();
+    }
+  }, [isAccountConnected]);
 
   useEffect(() => {
     if (isChartReady && tvWidget) {
