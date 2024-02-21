@@ -57,13 +57,15 @@ export const useChartLines = ({
   useEffect(() => {
     if (tvWidget && isChartReady) {
       tvWidget.onChartReady(() => {
-        tvWidget.chart().dataReady(() => {
-          if (showOrderLines) {
-            drawOrderLines();
-            drawPositionLine();
-          } else {
-            deleteChartLines();
-          }
+        tvWidget.headerReady().then(() => {
+          tvWidget.chart().dataReady(() => {
+            if (showOrderLines) {
+              drawOrderLines();
+              drawPositionLine();
+            } else {
+              deleteChartLines();
+            }
+          });
         });
       });
     }
