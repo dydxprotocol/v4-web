@@ -15,7 +15,7 @@ import { useLocalStorage } from './useLocalStorage';
 import { notificationTypes } from './useNotificationTypes';
 
 import { track } from '@/lib/analytics';
-import { renderSvgToDataUrl } from '../lib/renderSvgToDataUrl';
+import { renderSvgToDataUrl } from '@/lib/renderSvgToDataUrl';
 
 type NotificationsContextType = ReturnType<typeof useNotificationsContext>;
 
@@ -50,6 +50,7 @@ const useNotificationsContext = () => {
       defaultValue: {
         [NotificationType.AbacusGenerated]: true,
         [NotificationType.SquidTransfer]: true,
+        [NotificationType.ReleaseUpdates]: true,
         version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
       },
     });
@@ -84,7 +85,6 @@ const useNotificationsContext = () => {
         [NotificationType.AbacusGenerated]: true,
         [NotificationType.SquidTransfer]: true,
         [NotificationType.ReleaseUpdates]: true,
-        [NotificationType.ChaosLabs]: true,
         version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
       });
     }

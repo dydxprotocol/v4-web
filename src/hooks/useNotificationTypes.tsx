@@ -20,6 +20,7 @@ import {
   NotificationType,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
   TransferNotificationTypes,
+  ReleaseUpdateNotificationIds,
 } from '@/constants/notifications';
 
 import { useStringGetter, useTokenConfigs } from '@/hooks';
@@ -238,13 +239,16 @@ export const notificationTypes: NotificationTypeConfig[] = [
   {
     type: NotificationType.ReleaseUpdates,
     useTrigger: ({ trigger }) => {
+      const { chainTokenLabel } = useTokenConfigs();
       const stringGetter = useStringGetter();
+      const expirationDate = new Date('2024-03-08T23:59:59');
+      const currentDate = new Date();
 
       useEffect(() => {
         trigger(
-          'rewards-and-full-trading-live',
+          ReleaseUpdateNotificationIds.RewardsAndFullTradingLive,
           {
-            icon: <AssetIcon symbol="DYDX" />,
+            icon: <AssetIcon symbol={chainTokenLabel} />,
             title: stringGetter({ key: 'NOTIFICATIONS.RELEASE_REWARDS_AND_FULL_TRADING.TITLE' }),
             body: stringGetter({
               key: 'NOTIFICATIONS.RELEASE_REWARDS_AND_FULL_TRADING.BODY',
@@ -270,50 +274,40 @@ export const notificationTypes: NotificationTypeConfig[] = [
               },
             }),
             toastSensitivity: 'foreground',
-            groupKey: NotificationType.ReleaseUpdates,
+            groupKey: ReleaseUpdateNotificationIds.RewardsAndFullTradingLive,
           },
           []
         );
-      }, [stringGetter]);
-    },
-    useNotificationAction: () => {
-      return () => {};
-    },
-  },
-  {
-    type: NotificationType.ChaosLabs,
-    useTrigger: ({ trigger }) => {
-      const stringGetter = useStringGetter();
-      const expirationDate = new Date('2024-03-08T23:59:59');
-      const currentDate = new Date();
-      useEffect(() => {
-        if (currentDate > expirationDate) return;
-        trigger(
-          'chaos-labs-s3',
-          {
-            icon: <AssetIcon symbol="DYDX" />,
-            title: stringGetter({ key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.TITLE' }),
-            body: stringGetter({
-              key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.BODY',
-              params: {
-                SEASON_NUMBER: '3',
-                PREV_SEASON_NUMBER: '1',
-                DYDX_AMOUNT: '34',
-                USDC_AMOUNT: '100',
-              },
-            }),
-            toastSensitivity: 'foreground',
-            groupKey: NotificationType.ChaosLabs,
-          },
-          []
-        );
+        if (currentDate <= expirationDate) {
+          trigger(
+            ReleaseUpdateNotificationIds.IncentivesS3,
+            {
+              icon: <AssetIcon symbol={chainTokenLabel} />,
+              title: stringGetter({ key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.TITLE' }),
+              body: stringGetter({
+                key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.BODY',
+                params: {
+                  SEASON_NUMBER: '3',
+                  PREV_SEASON_NUMBER: '1',
+                  DYDX_AMOUNT: '34',
+                  USDC_AMOUNT: '100',
+                },
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.IncentivesS3,
+            },
+            []
+          );
+        }
       }, [stringGetter]);
     },
     useNotificationAction: () => {
       const { chainTokenLabel } = useTokenConfigs();
       const navigate = useNavigate();
-      return () => {
-        navigate(`${chainTokenLabel}/${TokenRoute.TradingRewards}`);
+      return (notificationId: string) => {
+        if (notificationId === ReleaseUpdateNotificationIds.IncentivesS3) {
+          navigate(`${chainTokenLabel}/${TokenRoute.TradingRewards}`);
+        }
       };
     },
   },

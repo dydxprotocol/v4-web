@@ -5,7 +5,6 @@ export enum NotificationType {
   AbacusGenerated = 'AbacusGenerated',
   SquidTransfer = 'SquidTransfer',
   ReleaseUpdates = 'ReleaseUpdates',
-  ChaosLabs = 'ChaosLabs',
 }
 
 export enum NotificationComponentType {}
@@ -143,6 +142,11 @@ export type TransferNotifcation = {
   status?: StatusResponse;
   isExchange?: boolean;
 };
+
+export enum ReleaseUpdateNotificationIds {
+  RewardsAndFullTradingLive = 'rewards-and-full-trading-live',
+  IncentivesS3 = 'incentives-s3',
+}
 
 /**
  * @description Struct to store whether a NotificationType should be triggered
