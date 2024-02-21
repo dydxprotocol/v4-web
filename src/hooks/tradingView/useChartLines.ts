@@ -30,7 +30,7 @@ export const useChartLines = ({
   displayButton: HTMLElement | null;
   isChartReady?: boolean;
 }) => {
-  const [showOrderLines, setShowOrderLines] = useState(false);
+  const [showOrderLines, setShowOrderLines] = useState(true);
 
   const stringGetter = useStringGetter();
 
