@@ -5,6 +5,7 @@ import {
   type InjectedCoinbaseWalletExtensionProvider,
   type WithInjectedEthereumProvider,
   type WithInjectedWeb3Provider,
+  type WithInjectedOkxWalletProvider,
 } from '@/constants/wallets';
 
 import { isTruthy } from '../isTruthy';
@@ -17,15 +18,6 @@ export const isMetaMask = (provider: ExternalProvider) => (
   /* not Coinbase Wallet browser extension */
   && (
     !(provider as InjectedCoinbaseWalletExtensionProvider).overrideIsMetaMask
-  )
-
-  /* not a MetaMask wannabe! */
-  && (
-    Reflect.ownKeys(provider).filter((key) =>
-      typeof key === 'string'
-      && key.match(/^is/)
-      && !['isConnected', 'isMetaMask'].includes(key)
-    ).length === 0
   )
 )
 
@@ -54,5 +46,10 @@ export const detectInjectedEip1193Providers = (): ExternalProvider[] => {
     ? ethereumProvider.providers
     : [];
 
-  return [...displacedProviders, ethereumProvider, web3Provider].filter(isTruthy);
+  const okxWalletProvider = (globalThis as typeof globalThis & WithInjectedOkxWalletProvider)
+    ?.okxwallet;
+
+  return [...displacedProviders, ethereumProvider, web3Provider, okxWalletProvider].filter(
+    isTruthy
+  );
 };
