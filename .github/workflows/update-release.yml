@@ -1,8 +1,10 @@
 name: Workflow for Release
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - 'release/v*'
+      - 'hotfix/v*'
 
 jobs:
   sync-release-branch:
@@ -18,6 +20,15 @@ jobs:
 
       - name: Fetch all history
         run: git fetch --unshallow || git fetch --all
+
+       - name: Determine Tag Type
+        id: tagtype
+        run: |
+          if [[ ${{ github.ref }} == refs/tags/release/v* ]]; then
+            echo "::set-output name=type::release"
+          elif [[ ${{ github.ref }} == refs/tags/hotfix/v* ]]; then
+            echo "::set-output name=type::hotfix"
+          fi
 
       - name: Check out the release branch
         run: |
