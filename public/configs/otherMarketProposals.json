@@ -1,0 +1,4491 @@
+[
+  {
+    "title": "Add 1INCH-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a 1INCH-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 50,
+          "pair": "1INCH-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"1INCHUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"1INCH-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"1INCH_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"1INCH-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"1INCH-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"1INCH_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 50,
+          "ticker": "EOS-USD",
+          "market_id": 50,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 50,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 50
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 50,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 50
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add AAVE-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a AAVE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 51,
+          "pair": "AAVE-USD",
+          "exponent": -8.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"AAVEUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"AAVE-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"aaveusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"AAVEUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"AAVE-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"AAVE-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"AAVE_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 51,
+          "ticker": "EOS-USD",
+          "market_id": 51,
+          "atomic_resolution": -7.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 51,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 51
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 51,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 51
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add ADA-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ADA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 52,
+          "pair": "ADA-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"ADAUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bitstamp\", \"ticker\": \"ADA/USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"ADAUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"ADA-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"adausdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"ADAUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"ADA-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"ADA-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"ADA_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 52,
+          "ticker": "EOS-USD",
+          "market_id": 52,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 52,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 52
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 52,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 52
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add AGIX-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a AGIX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 53,
+          "pair": "AGIX-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"AGIXUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"AGIXUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"AGIX_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"AGIX-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"AGIX-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"AGIX_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 53,
+          "ticker": "EOS-USD",
+          "market_id": 53,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 53,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 53
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 53,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 53
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add ALGO-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ALGO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 54,
+          "pair": "ALGO-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"ALGOUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"ALGO-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"ALGOUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"ALGO-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"ALGO-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"ALGO_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 54,
+          "ticker": "EOS-USD",
+          "market_id": 54,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 54,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 54
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 54,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 54
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add APE-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a APE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 55,
+          "pair": "APE-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"APEUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"APE-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"APE_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"APEUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"APE-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"APE-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"APE_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 55,
+          "ticker": "EOS-USD",
+          "market_id": 55,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 55,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 55
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 55,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 55
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add APT-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a APT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 56,
+          "pair": "APT-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"APTUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"APTUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"APT-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"APT_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"aptusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"APTUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"APT-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"APT-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"APT_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 56,
+          "ticker": "EOS-USD",
+          "market_id": 56,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 56,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 56
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 56,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 56
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add ARB-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ARB-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 57,
+          "pair": "ARB-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"ARBUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"ARBUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"ARB-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"arbusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"ARBUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"ARB-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"ARB-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"ARB_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 57,
+          "ticker": "EOS-USD",
+          "market_id": 57,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 57,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 57
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 57,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 57
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add ATOM-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ATOM-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 58,
+          "pair": "ATOM-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"ATOMUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"ATOMUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"ATOM-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"ATOM_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"ATOMUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"ATOM-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"ATOM-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"ATOM_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 58,
+          "ticker": "EOS-USD",
+          "market_id": 58,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 58,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 58
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 58,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 58
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add AVAX-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a AVAX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 59,
+          "pair": "AVAX-USD",
+          "exponent": -8.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"AVAXUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bitstamp\", \"ticker\": \"AVAX/USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"AVAXUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"AVAX-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"avaxusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"AVAXUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"AVAX-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"AVAX-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"AVAX_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 59,
+          "ticker": "EOS-USD",
+          "market_id": 59,
+          "atomic_resolution": -7.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 59,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 59
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 59,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 59
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add BCH-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BCH-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 60,
+          "pair": "BCH-USD",
+          "exponent": -7.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"BCHUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bitstamp\", \"ticker\": \"BCH/USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"BCHUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"BCH-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"bchusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"BCHUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"BCH-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"BCH-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"BCH_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 60,
+          "ticker": "EOS-USD",
+          "market_id": 60,
+          "atomic_resolution": -8.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 60,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 60
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 60,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 60
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add BLUR-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BLUR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 61,
+          "pair": "BLUR-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"BLURUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"BLURUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"BLUR-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"BLURUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"BLUR-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"BLUR-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"BLUR_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 61,
+          "ticker": "EOS-USD",
+          "market_id": 61,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 61,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 61
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 61,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 61
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add BNB-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BNB-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 62,
+          "pair": "BNB-USD",
+          "exponent": -7.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"BNBUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"BNBUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"BNB_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"BNB-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"BNB-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"BNB_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 62,
+          "ticker": "EOS-USD",
+          "market_id": 62,
+          "atomic_resolution": -8.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 62,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 62
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 62,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 62
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add BONK-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BONK-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 63,
+          "pair": "BONK-USD",
+          "exponent": -14.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"BONKUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"BONKUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"BONK-USD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"BONK-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"BONK-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"BONK_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 63,
+          "ticker": "EOS-USD",
+          "market_id": 63,
+          "atomic_resolution": -1.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 63,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 63
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 63,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 63
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add BTC-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BTC-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 64,
+          "pair": "BTC-USD",
+          "exponent": -5.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"BTCUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bitstamp\", \"ticker\": \"BTC/USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"BTCUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"BTC-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"btcusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"BTCUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"BTC-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"BTC-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"BTC_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 64,
+          "ticker": "EOS-USD",
+          "market_id": 64,
+          "atomic_resolution": -10.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 64,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 64
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 64,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 64
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add CHZ-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a CHZ-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 65,
+          "pair": "CHZ-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"CHZUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"CHZ-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"CHZUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"CHZ-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"CHZ-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"CHZ_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 65,
+          "ticker": "EOS-USD",
+          "market_id": 65,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 65,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 65
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 65,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 65
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add CRV-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a CRV-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 66,
+          "pair": "CRV-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"CRVUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"CRV-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"CRVUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"CRV-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"CRV-USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 66,
+          "ticker": "EOS-USD",
+          "market_id": 66,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 66,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 66
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 66,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 66
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add DOGE-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DOGE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 67,
+          "pair": "DOGE-USD",
+          "exponent": -11.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"DOGEUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"DOGEUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"DOGE-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"dogeusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"DOGEUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"DOGE-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"DOGE-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"DOGE_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 67,
+          "ticker": "EOS-USD",
+          "market_id": 67,
+          "atomic_resolution": -4.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 67,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 67
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 67,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 67
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add DOT-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DOT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 68,
+          "pair": "DOT-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"DOTUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"DOTUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"DOT-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"dotusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"DOTUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"DOT-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"DOT-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"DOT_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 68,
+          "ticker": "EOS-USD",
+          "market_id": 68,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 68,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 68
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 68,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 68
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add DYM-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DYM-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 69,
+          "pair": "DYM-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"DYMUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"DYMUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"DYM_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"DYM-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"DYM_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 69,
+          "ticker": "EOS-USD",
+          "market_id": 69,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 69,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 69
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 69,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 69
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add ENS-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ENS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 70,
+          "pair": "ENS-USD",
+          "exponent": -8.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"ENSUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"ENS-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"ENS_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"ENS-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"ENS-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"ENS_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 70,
+          "ticker": "EOS-USD",
+          "market_id": 70,
+          "atomic_resolution": -7.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 70,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 70
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 70,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 70
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add EOS-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a EOS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 71,
+          "pair": "EOS-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"EOSUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"EOSUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"EOS-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"EOS_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"EOSUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"EOS-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"EOS-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"EOS_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 71,
+          "ticker": "EOS-USD",
+          "market_id": 71,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 71,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 71
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 71,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 71
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add ETC-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ETC-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 72,
+          "pair": "ETC-USD",
+          "exponent": -8.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"ETCUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"ETCUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"ETC-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"etcusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"ETCUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"ETC-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"ETC-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"ETC_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 72,
+          "ticker": "EOS-USD",
+          "market_id": 72,
+          "atomic_resolution": -7.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 72,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 72
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 72,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 72
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add ETH-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ETH-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 73,
+          "pair": "ETH-USD",
+          "exponent": -6.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"ETHUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bitstamp\", \"ticker\": \"ETH/USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"ETHUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"ETH-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"ethusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"ETHUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"ETH-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"ETH-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"ETH_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 73,
+          "ticker": "EOS-USD",
+          "market_id": 73,
+          "atomic_resolution": -9.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 73,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 73
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 73,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 73
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add FET-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a FET-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 74,
+          "pair": "FET-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"FETUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"FET-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"FETUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"FET-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"FET-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"FET_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 74,
+          "ticker": "EOS-USD",
+          "market_id": 74,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 74,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 74
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 74,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 74
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add FIL-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a FIL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 75,
+          "pair": "FIL-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"FILUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"FILUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"FIL-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"filusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"FILUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"FIL-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"FIL-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"FIL_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 75,
+          "ticker": "EOS-USD",
+          "market_id": 75,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 75,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 75
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 75,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 75
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add FTM-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a FTM-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 76,
+          "pair": "FTM-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"FTMUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"FTMUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"FTMUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"FTM-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"FTM-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"FTM_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 76,
+          "ticker": "EOS-USD",
+          "market_id": 76,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 76,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 76
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 76,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 76
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add GALA-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a GALA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 77,
+          "pair": "GALA-USD",
+          "exponent": -11.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"GALAUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"GALAUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"GALA_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"GALAUSD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"GALA-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"GALA_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 77,
+          "ticker": "EOS-USD",
+          "market_id": 77,
+          "atomic_resolution": -4.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 77,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 77
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 77,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 77
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add GMT-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a GMT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 78,
+          "pair": "GMT-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"GMTUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"GMTUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"GMT-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"GMT_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"GMT-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"GMT-USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 78,
+          "ticker": "EOS-USD",
+          "market_id": 78,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 78,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 78
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 78,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 78
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add GRT-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a GRT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 79,
+          "pair": "GRT-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"GRTUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"GRT-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"GRT_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"GRTUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"GRT-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"GRT-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"GRT_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 79,
+          "ticker": "EOS-USD",
+          "market_id": 79,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 79,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 79
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 79,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 79
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add HBAR-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a HBAR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 80,
+          "pair": "HBAR-USD",
+          "exponent": -11.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"HBARUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"HBARUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"HBAR-USD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"HBAR-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"HBAR-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"HBAR_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 80,
+          "ticker": "EOS-USD",
+          "market_id": 80,
+          "atomic_resolution": -4.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 80,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 80
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 80,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 80
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add ICP-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ICP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 81,
+          "pair": "ICP-USD",
+          "exponent": -8.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"ICPUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"ICPUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"ICP-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"ICPUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"ICP-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"ICP-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"ICP_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 81,
+          "ticker": "EOS-USD",
+          "market_id": 81,
+          "atomic_resolution": -7.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 81,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 81
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 81,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 81
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add IMX-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a IMX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 82,
+          "pair": "IMX-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"IMXUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"IMX-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"IMXUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"IMX-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"IMX-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"IMX_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 82,
+          "ticker": "EOS-USD",
+          "market_id": 82,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 82,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 82
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 82,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 82
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add INJ-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a INJ-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 83,
+          "pair": "INJ-USD",
+          "exponent": -8.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"INJUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"INJUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"INJ-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"INJUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"INJ-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"INJ-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"INJ_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 83,
+          "ticker": "EOS-USD",
+          "market_id": 83,
+          "atomic_resolution": -7.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 83,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 83
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 83,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 83
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add JTO-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a JTO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 84,
+          "pair": "JTO-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"JTOUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"JTOUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"JTO-USD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"JTO-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"JTO-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"JTO_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 84,
+          "ticker": "EOS-USD",
+          "market_id": 84,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 84,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 84
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 84,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 84
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add JUP-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a JUP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 85,
+          "pair": "JUP-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"JUPUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"JUPUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"JUP_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"JUP-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"JUP_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 85,
+          "ticker": "EOS-USD",
+          "market_id": 85,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 85,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 85
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 85,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 85
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add KAVA-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a KAVA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 86,
+          "pair": "KAVA-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"KAVAUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"KAVAUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"KAVA-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"KAVA_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"KAVAUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"KAVA-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"KAVA_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 86,
+          "ticker": "EOS-USD",
+          "market_id": 86,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 86,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 86
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 86,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 86
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add LDO-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a LDO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 87,
+          "pair": "LDO-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"LDOUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"LDOUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"LDO-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"LDOUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"LDO-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"LDO-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"LDO_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 87,
+          "ticker": "EOS-USD",
+          "market_id": 87,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 87,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 87
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 87,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 87
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add LINK-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a LINK-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 88,
+          "pair": "LINK-USD",
+          "exponent": -8.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"LINKUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bitstamp\", \"ticker\": \"LINK/USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"LINKUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"LINK-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"LINKUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"LINK-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"LINK-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"LINK_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 88,
+          "ticker": "EOS-USD",
+          "market_id": 88,
+          "atomic_resolution": -7.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 88,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 88
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 88,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 88
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add LTC-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a LTC-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 89,
+          "pair": "LTC-USD",
+          "exponent": -8.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"LTCUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bitstamp\", \"ticker\": \"LTC/USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"LTCUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"LTC-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"ltcusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"LTCUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"LTC-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"LTC-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"LTC_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 89,
+          "ticker": "EOS-USD",
+          "market_id": 89,
+          "atomic_resolution": -7.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 89,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 89
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 89,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 89
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add MANA-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MANA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 90,
+          "pair": "MANA-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"MANAUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"MANA-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"MANA_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"MANAUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"MANA-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"MANA-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"MANA_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 90,
+          "ticker": "EOS-USD",
+          "market_id": 90,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 90,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 90
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 90,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 90
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add MASK-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MASK-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 91,
+          "pair": "MASK-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"MASKUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"MASKUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"MASK-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"MASK_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"maskusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"MASK-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"MASK-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"MASK_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 91,
+          "ticker": "EOS-USD",
+          "market_id": 91,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 91,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 91
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 91,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 91
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add MATIC-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MATIC-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 92,
+          "pair": "MATIC-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"MATICUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bitstamp\", \"ticker\": \"MATIC/USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"MATICUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"MATIC-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"maticusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"MATICUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"MATIC-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"MATIC-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"MATIC_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 92,
+          "ticker": "EOS-USD",
+          "market_id": 92,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 92,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 92
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 92,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 92
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add MINA-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MINA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 93,
+          "pair": "MINA-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"MINAUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"MINA-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"MINA_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"MINAUSD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"MINA-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"MINA_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 93,
+          "ticker": "EOS-USD",
+          "market_id": 93,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 93,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 93
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 93,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 93
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add MKR-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MKR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 94,
+          "pair": "MKR-USD",
+          "exponent": -6.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"MKRUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"MKR-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"MKRUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"MKR-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"MKR-USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 94,
+          "ticker": "EOS-USD",
+          "market_id": 94,
+          "atomic_resolution": -9.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 94,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 94
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 94,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 94
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add NEAR-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a NEAR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 95,
+          "pair": "NEAR-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"NEARUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"NEARUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"NEAR-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"nearusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"NEARUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"NEAR-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"NEAR-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"NEAR_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 95,
+          "ticker": "EOS-USD",
+          "market_id": 95,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 95,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 95
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 95,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 95
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add OP-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a OP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 96,
+          "pair": "OP-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"OPUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"OPUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"OP-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"OP_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"OPUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"OP-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"OP-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"OP_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 96,
+          "ticker": "EOS-USD",
+          "market_id": 96,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 96,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 96
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 96,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 96
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add ORDI-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ORDI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 97,
+          "pair": "ORDI-USD",
+          "exponent": -8.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"ORDIUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"ORDIUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"ORDI_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"ordiusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"ORDI-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"ORDI-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"ORDI_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 97,
+          "ticker": "EOS-USD",
+          "market_id": 97,
+          "atomic_resolution": -7.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 97,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 97
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 97,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 97
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add PEPE-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a PEPE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 98,
+          "pair": "PEPE-USD",
+          "exponent": -16.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"PEPEUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"PEPEUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"PEPEUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"PEPE-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"PEPE-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"PEPE_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 98,
+          "ticker": "EOS-USD",
+          "market_id": 98,
+          "atomic_resolution": 1.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 98,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 98
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 98,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 98
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add PYTH-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a PYTH-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 99,
+          "pair": "PYTH-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"PYTHUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"PYTHUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"PYTH_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"PYTH-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"PYTH-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"PYTH_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 99,
+          "ticker": "EOS-USD",
+          "market_id": 99,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 99,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 99
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 99,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 99
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add RNDR-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a RNDR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 100,
+          "pair": "RNDR-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"RNDRUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"RNDR-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"RNDRUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"RNDR-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"RNDR-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"RNDR_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 100,
+          "ticker": "EOS-USD",
+          "market_id": 100,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 100,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 100
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 100,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 100
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add RUNE-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a RUNE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 101,
+          "pair": "RUNE-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"RUNEUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"RUNE_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"RUNEUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"RUNE-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"RUNE_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 101,
+          "ticker": "EOS-USD",
+          "market_id": 101,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 101,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 101
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 101,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 101
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add SAND-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SAND-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 102,
+          "pair": "SAND-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"SANDUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"SAND-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"SAND_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"SAND-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"SAND-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"SAND_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 102,
+          "ticker": "EOS-USD",
+          "market_id": 102,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 102,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 102
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 102,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 102
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add SEI-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SEI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 103,
+          "pair": "SEI-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"SEIUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"SEIUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"SEI-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"seiusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"SEIUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"SEI-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"SEI_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 103,
+          "ticker": "EOS-USD",
+          "market_id": 103,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 103,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 103
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 103,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 103
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add SHIB-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SHIB-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 104,
+          "pair": "SHIB-USD",
+          "exponent": -15.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"SHIBUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"SHIBUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"SHIB-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"shibusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"SHIBUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"SHIB-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"SHIB-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"SHIB_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 104,
+          "ticker": "EOS-USD",
+          "market_id": 104,
+          "atomic_resolution": 0.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 104,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 104
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 104,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 104
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add SNX-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SNX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 105,
+          "pair": "SNX-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"SNXUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"SNXUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"SNX-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"SNXUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"SNX-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"SNX-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"SNX_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 105,
+          "ticker": "EOS-USD",
+          "market_id": 105,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 105,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 105
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 105,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 105
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add SOL-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SOL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 106,
+          "pair": "SOL-USD",
+          "exponent": -7.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"SOLUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bitstamp\", \"ticker\": \"SOL/USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"SOLUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"SOL-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"solusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"SOLUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"SOL-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"SOL-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"SOL_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 106,
+          "ticker": "EOS-USD",
+          "market_id": 106,
+          "atomic_resolution": -8.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 106,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 106
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 106,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 106
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add STX-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a STX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 107,
+          "pair": "STX-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"STXUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"STXUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"STX-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"STX_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"STXUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"STX-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"STX-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"STX_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 107,
+          "ticker": "EOS-USD",
+          "market_id": 107,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 107,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 107
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 107,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 107
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add SUI-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SUI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 108,
+          "pair": "SUI-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"SUIUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"SUIUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"SUI-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"suiusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"SUIUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"SUI-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"SUI-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"SUI_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 108,
+          "ticker": "EOS-USD",
+          "market_id": 108,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 108,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 108
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 108,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 108
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add TIA-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TIA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 109,
+          "pair": "TIA-USD",
+          "exponent": -8.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"TIAUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"TIAUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"TIA-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"TIAUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"TIA-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"TIA-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"TIA_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 109,
+          "ticker": "EOS-USD",
+          "market_id": 109,
+          "atomic_resolution": -7.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 109,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 109
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 109,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 109
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add TRX-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TRX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 110,
+          "pair": "TRX-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"TRXUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"TRXUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"TRX_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"trxusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"TRXUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"TRX-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"TRX-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"TRX_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 110,
+          "ticker": "EOS-USD",
+          "market_id": 110,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 110,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 110
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 110,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 110
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add UNI-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a UNI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 111,
+          "pair": "UNI-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"UNIUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"UNIUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"UNI-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"UNIUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"UNI-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"UNI-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"UNI_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 111,
+          "ticker": "EOS-USD",
+          "market_id": 111,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 111,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 111
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 111,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 111
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add WLD-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a WLD-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 112,
+          "pair": "WLD-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"WLDUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"WLDUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"WLD_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"WLD-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"WLD-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"WLD_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 112,
+          "ticker": "EOS-USD",
+          "market_id": 112,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 112,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 112
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 112,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 112
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add WOO-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a WOO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 113,
+          "pair": "WOO-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"WOOUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"WOO_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"WOO-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"WOO-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"WOO_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 113,
+          "ticker": "EOS-USD",
+          "market_id": 113,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 113,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 113
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 113,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 113
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add XLM-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a XLM-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 114,
+          "pair": "XLM-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"XLMUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bitstamp\", \"ticker\": \"XLM/USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"XLMUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"XLM-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"XLMUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"XLM-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"XLM-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"XLM_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 114,
+          "ticker": "EOS-USD",
+          "market_id": 114,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 114,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 114
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 114,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 114
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add XRP-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a XRP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 115,
+          "pair": "XRP-USD",
+          "exponent": -10.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 2500,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Binance\", \"ticker\": \"XRPUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Bitstamp\", \"ticker\": \"XRP/USD\"}, {\"exchangeName\": \"Bybit\", \"ticker\": \"XRPUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"XRP-USD\"}, {\"exchangeName\": \"Huobi\", \"ticker\": \"xrpusdt\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kraken\", \"ticker\": \"XRPUSD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"XRP-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"XRP-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"XRP_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 115,
+          "ticker": "EOS-USD",
+          "market_id": 115,
+          "atomic_resolution": -5.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 1
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 115,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 115
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 115,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 115
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  },
+  {
+    "title": "Add ZETA-USD perpetual market",
+    "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ZETA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "initial_deposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "messages": [
+      {
+        "@type": "/dydxprotocol.prices.MsgCreateOracleMarket",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 116,
+          "pair": "ZETA-USD",
+          "exponent": -9.0,
+          "min_exchanges": 3,
+          "min_price_change_ppm": 4000,
+          "exchange_config_json": "{\"exchanges\": [{\"exchangeName\": \"Bybit\", \"ticker\": \"ZETAUSDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"CoinbasePro\", \"ticker\": \"ZETA-USD\"}, {\"exchangeName\": \"Gate\", \"ticker\": \"ZETA_USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Kucoin\", \"ticker\": \"ZETA-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Okx\", \"ticker\": \"ZETA-USDT\", \"adjustByMarket\": \"USDT-USD\"}, {\"exchangeName\": \"Mexc\", \"ticker\": \"ZETA_USDT\", \"adjustByMarket\": \"USDT-USD\"}]}"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.perpetuals.MsgCreatePerpetual",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "params": {
+          "id": 116,
+          "ticker": "EOS-USD",
+          "market_id": 116,
+          "atomic_resolution": -6.0,
+          "default_funding_ppm": 0,
+          "liquidity_tier": 2
+        }
+      },
+      {
+        "@type": "/dydxprotocol.clob.MsgCreateClobPair",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "clob_pair": {
+          "id": 116,
+          "perpetual_clob_metadata": {
+            "perpetual_id": 116
+          },
+          "step_base_quantums": 1000000,
+          "subticks_per_tick": 1000000,
+          "quantum_conversion_exponent": -9,
+          "status": "STATUS_INITIALIZING"
+        }
+      },
+      {
+        "@type": "/dydxprotocol.delaymsg.MsgDelayMessage",
+        "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+        "msg": {
+          "@type": "/dydxprotocol.clob.MsgUpdateClobPair",
+          "authority": "dydx10d07y265gmmuvt4z0w9aw880jnsr700jnmapky",
+          "clob_pair": {
+            "id": 116,
+            "perpetual_clob_metadata": {
+              "perpetual_id": 116
+            },
+            "step_base_quantums": 1000000,
+            "subticks_per_tick": 1000000,
+            "quantum_conversion_exponent": -9,
+            "status": "STATUS_ACTIVE"
+          }
+        },
+        "delay_blocks": 3600
+      }
+    ]
+  }
+]
