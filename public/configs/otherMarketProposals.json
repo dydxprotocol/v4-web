@@ -1,5 +1,5 @@
-[
-  {
+{
+  "1INCH": {
     "title": "Add 1INCH-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a 1INCH-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -66,7 +66,7 @@
       }
     ]
   },
-  {
+  "AAVE": {
     "title": "Add AAVE-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a AAVE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -133,7 +133,7 @@
       }
     ]
   },
-  {
+  "ADA": {
     "title": "Add ADA-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ADA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -200,7 +200,7 @@
       }
     ]
   },
-  {
+  "AGIX": {
     "title": "Add AGIX-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a AGIX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -267,7 +267,7 @@
       }
     ]
   },
-  {
+  "ALGO": {
     "title": "Add ALGO-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ALGO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -334,7 +334,7 @@
       }
     ]
   },
-  {
+  "APE": {
     "title": "Add APE-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a APE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -401,7 +401,7 @@
       }
     ]
   },
-  {
+  "APT": {
     "title": "Add APT-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a APT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -468,7 +468,7 @@
       }
     ]
   },
-  {
+  "ARB": {
     "title": "Add ARB-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ARB-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -535,7 +535,7 @@
       }
     ]
   },
-  {
+  "ATOM": {
     "title": "Add ATOM-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ATOM-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -602,7 +602,7 @@
       }
     ]
   },
-  {
+  "AVAX": {
     "title": "Add AVAX-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a AVAX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -669,7 +669,7 @@
       }
     ]
   },
-  {
+  "BCH": {
     "title": "Add BCH-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BCH-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -736,7 +736,7 @@
       }
     ]
   },
-  {
+  "BLUR": {
     "title": "Add BLUR-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BLUR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -803,7 +803,7 @@
       }
     ]
   },
-  {
+  "BNB": {
     "title": "Add BNB-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BNB-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -870,7 +870,7 @@
       }
     ]
   },
-  {
+  "BONK": {
     "title": "Add BONK-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BONK-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -937,7 +937,7 @@
       }
     ]
   },
-  {
+  "BTC": {
     "title": "Add BTC-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BTC-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -1004,7 +1004,7 @@
       }
     ]
   },
-  {
+  "CHZ": {
     "title": "Add CHZ-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a CHZ-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -1071,7 +1071,7 @@
       }
     ]
   },
-  {
+  "CRV": {
     "title": "Add CRV-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a CRV-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -1138,7 +1138,7 @@
       }
     ]
   },
-  {
+  "DOGE": {
     "title": "Add DOGE-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DOGE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -1205,7 +1205,7 @@
       }
     ]
   },
-  {
+  "DOT": {
     "title": "Add DOT-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DOT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -1272,7 +1272,7 @@
       }
     ]
   },
-  {
+  "DYM": {
     "title": "Add DYM-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DYM-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -1339,7 +1339,7 @@
       }
     ]
   },
-  {
+  "ENS": {
     "title": "Add ENS-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ENS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -1406,7 +1406,7 @@
       }
     ]
   },
-  {
+  "EOS": {
     "title": "Add EOS-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a EOS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -1473,7 +1473,7 @@
       }
     ]
   },
-  {
+  "ETC": {
     "title": "Add ETC-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ETC-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -1540,7 +1540,7 @@
       }
     ]
   },
-  {
+  "ETH": {
     "title": "Add ETH-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ETH-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -1607,7 +1607,7 @@
       }
     ]
   },
-  {
+  "FET": {
     "title": "Add FET-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a FET-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -1674,7 +1674,7 @@
       }
     ]
   },
-  {
+  "FIL": {
     "title": "Add FIL-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a FIL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -1741,7 +1741,7 @@
       }
     ]
   },
-  {
+  "FTM": {
     "title": "Add FTM-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a FTM-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -1808,7 +1808,7 @@
       }
     ]
   },
-  {
+  "GALA": {
     "title": "Add GALA-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a GALA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -1875,7 +1875,7 @@
       }
     ]
   },
-  {
+  "GMT": {
     "title": "Add GMT-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a GMT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -1942,7 +1942,7 @@
       }
     ]
   },
-  {
+  "GRT": {
     "title": "Add GRT-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a GRT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -2009,7 +2009,7 @@
       }
     ]
   },
-  {
+  "HBAR": {
     "title": "Add HBAR-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a HBAR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -2076,7 +2076,7 @@
       }
     ]
   },
-  {
+  "ICP": {
     "title": "Add ICP-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ICP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -2143,7 +2143,7 @@
       }
     ]
   },
-  {
+  "IMX": {
     "title": "Add IMX-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a IMX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -2210,7 +2210,7 @@
       }
     ]
   },
-  {
+  "INJ": {
     "title": "Add INJ-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a INJ-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -2277,7 +2277,7 @@
       }
     ]
   },
-  {
+  "JTO": {
     "title": "Add JTO-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a JTO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -2344,7 +2344,7 @@
       }
     ]
   },
-  {
+  "JUP": {
     "title": "Add JUP-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a JUP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -2411,7 +2411,7 @@
       }
     ]
   },
-  {
+  "KAVA": {
     "title": "Add KAVA-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a KAVA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -2478,7 +2478,7 @@
       }
     ]
   },
-  {
+  "LDO": {
     "title": "Add LDO-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a LDO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -2545,7 +2545,7 @@
       }
     ]
   },
-  {
+  "LINK": {
     "title": "Add LINK-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a LINK-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -2612,7 +2612,7 @@
       }
     ]
   },
-  {
+  "LTC": {
     "title": "Add LTC-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a LTC-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -2679,7 +2679,7 @@
       }
     ]
   },
-  {
+  "MANA": {
     "title": "Add MANA-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MANA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -2746,7 +2746,7 @@
       }
     ]
   },
-  {
+  "MASK": {
     "title": "Add MASK-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MASK-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -2813,7 +2813,7 @@
       }
     ]
   },
-  {
+  "MATIC": {
     "title": "Add MATIC-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MATIC-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -2880,7 +2880,7 @@
       }
     ]
   },
-  {
+  "MINA": {
     "title": "Add MINA-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MINA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -2947,7 +2947,7 @@
       }
     ]
   },
-  {
+  "MKR": {
     "title": "Add MKR-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MKR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -3014,7 +3014,7 @@
       }
     ]
   },
-  {
+  "NEAR": {
     "title": "Add NEAR-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a NEAR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -3081,7 +3081,7 @@
       }
     ]
   },
-  {
+  "OP": {
     "title": "Add OP-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a OP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -3148,7 +3148,7 @@
       }
     ]
   },
-  {
+  "ORDI": {
     "title": "Add ORDI-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ORDI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -3215,7 +3215,7 @@
       }
     ]
   },
-  {
+  "PEPE": {
     "title": "Add PEPE-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a PEPE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -3282,7 +3282,7 @@
       }
     ]
   },
-  {
+  "PYTH": {
     "title": "Add PYTH-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a PYTH-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -3349,7 +3349,7 @@
       }
     ]
   },
-  {
+  "RNDR": {
     "title": "Add RNDR-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a RNDR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -3416,7 +3416,7 @@
       }
     ]
   },
-  {
+  "RUNE": {
     "title": "Add RUNE-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a RUNE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -3483,7 +3483,7 @@
       }
     ]
   },
-  {
+  "SAND": {
     "title": "Add SAND-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SAND-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -3550,7 +3550,7 @@
       }
     ]
   },
-  {
+  "SEI": {
     "title": "Add SEI-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SEI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -3617,7 +3617,7 @@
       }
     ]
   },
-  {
+  "SHIB": {
     "title": "Add SHIB-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SHIB-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -3684,7 +3684,7 @@
       }
     ]
   },
-  {
+  "SNX": {
     "title": "Add SNX-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SNX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -3751,7 +3751,7 @@
       }
     ]
   },
-  {
+  "SOL": {
     "title": "Add SOL-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SOL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -3818,7 +3818,7 @@
       }
     ]
   },
-  {
+  "STX": {
     "title": "Add STX-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a STX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -3885,7 +3885,7 @@
       }
     ]
   },
-  {
+  "SUI": {
     "title": "Add SUI-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SUI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -3952,7 +3952,7 @@
       }
     ]
   },
-  {
+  "TIA": {
     "title": "Add TIA-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TIA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -4019,7 +4019,7 @@
       }
     ]
   },
-  {
+  "TRX": {
     "title": "Add TRX-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TRX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -4086,7 +4086,7 @@
       }
     ]
   },
-  {
+  "UNI": {
     "title": "Add UNI-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a UNI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -4153,7 +4153,7 @@
       }
     ]
   },
-  {
+  "WLD": {
     "title": "Add WLD-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a WLD-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -4220,7 +4220,7 @@
       }
     ]
   },
-  {
+  "WOO": {
     "title": "Add WOO-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a WOO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -4287,7 +4287,7 @@
       }
     ]
   },
-  {
+  "XLM": {
     "title": "Add XLM-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a XLM-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -4354,7 +4354,7 @@
       }
     ]
   },
-  {
+  "XRP": {
     "title": "Add XRP-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a XRP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -4421,7 +4421,7 @@
       }
     ]
   },
-  {
+  "ZETA": {
     "title": "Add ZETA-USD perpetual market",
     "description": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ZETA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "initial_deposit": {
@@ -4488,4 +4488,4 @@
       }
     ]
   }
-]
+}
