@@ -2,7 +2,7 @@
   {
     "baseAsset": "1INCH",
     "referencePrice": 0.39073378198688125,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "1INCH",
     "p": -1.0,
@@ -19,7 +19,7 @@
   {
     "baseAsset": "AAVE",
     "referencePrice": 95.37783939975083,
-    "numOracles": 8,
+    "numOracles": 8.0,
     "liquidityTier": 1,
     "assetName": "AAVE",
     "p": 1.0,
@@ -36,7 +36,7 @@
   {
     "baseAsset": "ADA",
     "referencePrice": 0.5827266803058365,
-    "numOracles": 9,
+    "numOracles": 9.0,
     "liquidityTier": 1,
     "assetName": "Cardano",
     "p": -1.0,
@@ -53,7 +53,7 @@
   {
     "baseAsset": "AGIX",
     "referencePrice": 0.6381652589135048,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "SingularityNET",
     "p": -1.0,
@@ -70,7 +70,7 @@
   {
     "baseAsset": "ALGO",
     "referencePrice": 0.1863730890814612,
-    "numOracles": 7,
+    "numOracles": 7.0,
     "liquidityTier": 2,
     "assetName": "Algorand",
     "p": -1.0,
@@ -87,7 +87,7 @@
   {
     "baseAsset": "APE",
     "referencePrice": 1.4228353930208577,
-    "numOracles": 7,
+    "numOracles": 7.0,
     "liquidityTier": 2,
     "assetName": "ApeCoin",
     "p": 0.0,
@@ -104,7 +104,7 @@
   {
     "baseAsset": "API3",
     "referencePrice": 3.2309579682458938,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "API3",
     "p": 0.0,
@@ -121,7 +121,7 @@
   {
     "baseAsset": "APT",
     "referencePrice": 8.117822931323396,
-    "numOracles": 9,
+    "numOracles": 9.0,
     "liquidityTier": 1,
     "assetName": "Aptos",
     "p": 0.0,
@@ -138,7 +138,7 @@
   {
     "baseAsset": "ARB",
     "referencePrice": 1.7813497690325322,
-    "numOracles": 8,
+    "numOracles": 8.0,
     "liquidityTier": 1,
     "assetName": "Arbitrum",
     "p": 0.0,
@@ -155,7 +155,7 @@
   {
     "baseAsset": "ATOM",
     "referencePrice": 8.638203052222782,
-    "numOracles": 8,
+    "numOracles": 8.0,
     "liquidityTier": 1,
     "assetName": "Cosmos",
     "p": 0.0,
@@ -172,7 +172,7 @@
   {
     "baseAsset": "AVAX",
     "referencePrice": 36.30680023062304,
-    "numOracles": 9,
+    "numOracles": 9.0,
     "liquidityTier": 1,
     "assetName": "Avalanche",
     "p": 1.0,
@@ -189,7 +189,7 @@
   {
     "baseAsset": "BCH",
     "referencePrice": 262.9943877884527,
-    "numOracles": 9,
+    "numOracles": 9.0,
     "liquidityTier": 1,
     "assetName": "Bitcoin Cash",
     "p": 2.0,
@@ -206,7 +206,7 @@
   {
     "baseAsset": "BLUR",
     "referencePrice": 0.6715140754604568,
-    "numOracles": 7,
+    "numOracles": 7.0,
     "liquidityTier": 2,
     "assetName": "Blur",
     "p": -1.0,
@@ -223,7 +223,7 @@
   {
     "baseAsset": "BNB",
     "referencePrice": 313.86329814083246,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Binance Coin",
     "p": 2.0,
@@ -240,7 +240,7 @@
   {
     "baseAsset": "BONK",
     "referencePrice": 1.1543721116041828e-05,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Bonk Token",
     "p": -5.0,
@@ -257,7 +257,7 @@
   {
     "baseAsset": "BTC",
     "referencePrice": 51046.08193425492,
-    "numOracles": 9,
+    "numOracles": 9.0,
     "liquidityTier": 1,
     "assetName": "Bitcoin",
     "p": 4.0,
@@ -274,7 +274,7 @@
   {
     "baseAsset": "CHZ",
     "referencePrice": 0.1274383483284441,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Chiliz",
     "p": -1.0,
@@ -291,13 +291,13 @@
   {
     "baseAsset": "CRV",
     "referencePrice": 0.5761774963259517,
-    "numOracles": 6,
-    "liquidityTier": 2,
+    "numOracles": 8.0,
+    "liquidityTier": 1,
     "assetName": "Curve DAO Token",
     "p": -1.0,
     "atomicResolution": -5.0,
     "minExchanges": 3,
-    "minPriceChangePpm": 4000,
+    "minPriceChangePpm": 2500,
     "priceExponent": -10.0,
     "stepBaseQuantum": 1000000,
     "ticksizeExponent": -3,
@@ -308,7 +308,7 @@
   {
     "baseAsset": "DOGE",
     "referencePrice": 0.08406190875397743,
-    "numOracles": 8,
+    "numOracles": 8.0,
     "liquidityTier": 1,
     "assetName": "Dogecoin",
     "p": -2.0,
@@ -325,7 +325,7 @@
   {
     "baseAsset": "DOT",
     "referencePrice": 7.416960383763364,
-    "numOracles": 8,
+    "numOracles": 8.0,
     "liquidityTier": 1,
     "assetName": "Polkadot",
     "p": 0.0,
@@ -342,7 +342,7 @@
   {
     "baseAsset": "DYM",
     "referencePrice": 5.390702430697377,
-    "numOracles": 5,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Dymension",
     "p": 0.0,
@@ -359,7 +359,7 @@
   {
     "baseAsset": "ENS",
     "referencePrice": 17.567497311277098,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Ethereum Name Service (ENS)",
     "p": 1.0,
@@ -376,7 +376,7 @@
   {
     "baseAsset": "EOS",
     "referencePrice": 0.7038776853883683,
-    "numOracles": 8,
+    "numOracles": 8.0,
     "liquidityTier": 1,
     "assetName": "Eos",
     "p": -1.0,
@@ -393,7 +393,7 @@
   {
     "baseAsset": "ETC",
     "referencePrice": 25.552609804071665,
-    "numOracles": 8,
+    "numOracles": 8.0,
     "liquidityTier": 1,
     "assetName": "Ethereum Classic",
     "p": 1.0,
@@ -410,7 +410,7 @@
   {
     "baseAsset": "ETH",
     "referencePrice": 2943.1757865047784,
-    "numOracles": 9,
+    "numOracles": 9.0,
     "liquidityTier": 1,
     "assetName": "Ethereum",
     "p": 3.0,
@@ -427,7 +427,7 @@
   {
     "baseAsset": "FET",
     "referencePrice": 1.1185905724117349,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Fetch AI",
     "p": 0.0,
@@ -444,7 +444,7 @@
   {
     "baseAsset": "FIL",
     "referencePrice": 8.174008580420095,
-    "numOracles": 8,
+    "numOracles": 8.0,
     "liquidityTier": 1,
     "assetName": "Filecoin",
     "p": 0.0,
@@ -461,7 +461,7 @@
   {
     "baseAsset": "FTM",
     "referencePrice": 0.39691420670580596,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Fantom",
     "p": -1.0,
@@ -478,7 +478,7 @@
   {
     "baseAsset": "GALA",
     "referencePrice": 0.023724132506069317,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Gala",
     "p": -2.0,
@@ -495,7 +495,7 @@
   {
     "baseAsset": "GMT",
     "referencePrice": 0.21675579801798128,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "STEPN",
     "p": -1.0,
@@ -512,7 +512,7 @@
   {
     "baseAsset": "GRT",
     "referencePrice": 0.23746885486052283,
-    "numOracles": 7,
+    "numOracles": 7.0,
     "liquidityTier": 2,
     "assetName": "The Graph",
     "p": -1.0,
@@ -529,7 +529,7 @@
   {
     "baseAsset": "HBAR",
     "referencePrice": 0.11196531959055545,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Hedera Hashgraph",
     "p": -1.0,
@@ -546,7 +546,7 @@
   {
     "baseAsset": "ICP",
     "referencePrice": 12.481775262396523,
-    "numOracles": 7,
+    "numOracles": 7.0,
     "liquidityTier": 2,
     "assetName": "Internet Computer",
     "p": 1.0,
@@ -563,7 +563,7 @@
   {
     "baseAsset": "IMX",
     "referencePrice": 3.1656179148633856,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Immutable X",
     "p": 0.0,
@@ -580,7 +580,7 @@
   {
     "baseAsset": "INJ",
     "referencePrice": 33.506428060013285,
-    "numOracles": 7,
+    "numOracles": 7.0,
     "liquidityTier": 2,
     "assetName": "Injective Protocol",
     "p": 1.0,
@@ -597,7 +597,7 @@
   {
     "baseAsset": "JTO",
     "referencePrice": 2.0444478129338925,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Jito",
     "p": 0.0,
@@ -614,7 +614,7 @@
   {
     "baseAsset": "JUP",
     "referencePrice": 0.38803545375952414,
-    "numOracles": 5,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Jupiter",
     "p": -1.0,
@@ -631,7 +631,7 @@
   {
     "baseAsset": "KAVA",
     "referencePrice": 0.6469913852398425,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Kava",
     "p": -1.0,
@@ -648,7 +648,7 @@
   {
     "baseAsset": "LDO",
     "referencePrice": 3.089848247492856,
-    "numOracles": 7,
+    "numOracles": 7.0,
     "liquidityTier": 2,
     "assetName": "Lido DAO",
     "p": 0.0,
@@ -665,7 +665,7 @@
   {
     "baseAsset": "LINK",
     "referencePrice": 17.943496891093726,
-    "numOracles": 9,
+    "numOracles": 9.0,
     "liquidityTier": 1,
     "assetName": "ChainLink",
     "p": 1.0,
@@ -682,7 +682,7 @@
   {
     "baseAsset": "LTC",
     "referencePrice": 68.363567266356,
-    "numOracles": 9,
+    "numOracles": 9.0,
     "liquidityTier": 1,
     "assetName": "Litecoin",
     "p": 1.0,
@@ -699,7 +699,7 @@
   {
     "baseAsset": "MAGIC",
     "referencePrice": 1.0425360428382824,
-    "numOracles": 6,
+    "numOracles": 7.0,
     "liquidityTier": 2,
     "assetName": "MAGIC",
     "p": 0.0,
@@ -716,7 +716,7 @@
   {
     "baseAsset": "MANA",
     "referencePrice": 0.41309584584342407,
-    "numOracles": 7,
+    "numOracles": 7.0,
     "liquidityTier": 2,
     "assetName": "Decentraland",
     "p": -1.0,
@@ -733,7 +733,7 @@
   {
     "baseAsset": "MASK",
     "referencePrice": 3.8465219414229646,
-    "numOracles": 8,
+    "numOracles": 8.0,
     "liquidityTier": 1,
     "assetName": "Mask Network",
     "p": 0.0,
@@ -750,7 +750,7 @@
   {
     "baseAsset": "MATIC",
     "referencePrice": 0.9811552172261896,
-    "numOracles": 9,
+    "numOracles": 9.0,
     "liquidityTier": 1,
     "assetName": "Matic Network",
     "p": -1.0,
@@ -767,7 +767,7 @@
   {
     "baseAsset": "MINA",
     "referencePrice": 1.0478399468543635,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Mina",
     "p": 0.0,
@@ -784,7 +784,7 @@
   {
     "baseAsset": "MKR",
     "referencePrice": 1991.7970801983142,
-    "numOracles": 5,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Maker",
     "p": 3.0,
@@ -801,7 +801,7 @@
   {
     "baseAsset": "NEAR",
     "referencePrice": 3.25927603237528,
-    "numOracles": 7,
+    "numOracles": 7.0,
     "liquidityTier": 2,
     "assetName": "Near",
     "p": 0.0,
@@ -818,7 +818,7 @@
   {
     "baseAsset": "OP",
     "referencePrice": 3.1580880840772694,
-    "numOracles": 8,
+    "numOracles": 8.0,
     "liquidityTier": 1,
     "assetName": "Optimism",
     "p": 0.0,
@@ -835,7 +835,7 @@
   {
     "baseAsset": "ORDI",
     "referencePrice": 52.69357940803036,
-    "numOracles": 7,
+    "numOracles": 7.0,
     "liquidityTier": 2,
     "assetName": "Ordinals",
     "p": 1.0,
@@ -852,7 +852,7 @@
   {
     "baseAsset": "PEPE",
     "referencePrice": 1.2803302547988663e-06,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Pepe",
     "p": -6.0,
@@ -869,7 +869,7 @@
   {
     "baseAsset": "PYTH",
     "referencePrice": 0.4602775645861574,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Pyth Network",
     "p": -1.0,
@@ -886,7 +886,7 @@
   {
     "baseAsset": "RNDR",
     "referencePrice": 7.625891564822903,
-    "numOracles": 7,
+    "numOracles": 7.0,
     "liquidityTier": 2,
     "assetName": "Render Token",
     "p": 0.0,
@@ -903,7 +903,7 @@
   {
     "baseAsset": "RUNE",
     "referencePrice": 4.05457461310246,
-    "numOracles": 5,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Thorchain",
     "p": 0.0,
@@ -920,7 +920,7 @@
   {
     "baseAsset": "SAND",
     "referencePrice": 0.4264022028454682,
-    "numOracles": 7,
+    "numOracles": 7.0,
     "liquidityTier": 2,
     "assetName": "SAND",
     "p": -1.0,
@@ -937,7 +937,7 @@
   {
     "baseAsset": "SEI",
     "referencePrice": 0.8127936111305792,
-    "numOracles": 7,
+    "numOracles": 7.0,
     "liquidityTier": 2,
     "assetName": "Sei",
     "p": -1.0,
@@ -954,7 +954,7 @@
   {
     "baseAsset": "SHIB",
     "referencePrice": 9.509170971895197e-06,
-    "numOracles": 8,
+    "numOracles": 8.0,
     "liquidityTier": 1,
     "assetName": "Shiba Inu",
     "p": -6.0,
@@ -971,7 +971,7 @@
   {
     "baseAsset": "SNX",
     "referencePrice": 3.6597933035432573,
-    "numOracles": 7,
+    "numOracles": 7.0,
     "liquidityTier": 2,
     "assetName": "Synthetix Network Token",
     "p": 0.0,
@@ -988,7 +988,7 @@
   {
     "baseAsset": "SOL",
     "referencePrice": 101.37360320667266,
-    "numOracles": 9,
+    "numOracles": 9.0,
     "liquidityTier": 1,
     "assetName": "Solana",
     "p": 2.0,
@@ -1005,7 +1005,7 @@
   {
     "baseAsset": "STRK",
     "referencePrice": 2.0294558706526433,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Starknet",
     "p": 0.0,
@@ -1022,7 +1022,7 @@
   {
     "baseAsset": "STX",
     "referencePrice": 2.2074191553341698,
-    "numOracles": 8,
+    "numOracles": 8.0,
     "liquidityTier": 1,
     "assetName": "Stacks",
     "p": 0.0,
@@ -1039,7 +1039,7 @@
   {
     "baseAsset": "SUI",
     "referencePrice": 1.6520840670375465,
-    "numOracles": 8,
+    "numOracles": 8.0,
     "liquidityTier": 1,
     "assetName": "SuiNetwork",
     "p": 0.0,
@@ -1056,7 +1056,7 @@
   {
     "baseAsset": "TIA",
     "referencePrice": 16.408309989831825,
-    "numOracles": 7,
+    "numOracles": 7.0,
     "liquidityTier": 2,
     "assetName": "Celestia",
     "p": 1.0,
@@ -1073,7 +1073,7 @@
   {
     "baseAsset": "TRX",
     "referencePrice": 0.1213063298020745,
-    "numOracles": 8,
+    "numOracles": 8.0,
     "liquidityTier": 1,
     "assetName": "TRON",
     "p": -1.0,
@@ -1090,7 +1090,7 @@
   {
     "baseAsset": "UNI",
     "referencePrice": 10.665604571983115,
-    "numOracles": 7,
+    "numOracles": 7.0,
     "liquidityTier": 2,
     "assetName": "Uniswap",
     "p": 1.0,
@@ -1107,7 +1107,7 @@
   {
     "baseAsset": "WLD",
     "referencePrice": 6.9722211218248775,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Worldcoin WLD",
     "p": 0.0,
@@ -1124,7 +1124,7 @@
   {
     "baseAsset": "WOO",
     "referencePrice": 0.3754054899185099,
-    "numOracles": 5,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "Wootrade Network",
     "p": -1.0,
@@ -1141,7 +1141,7 @@
   {
     "baseAsset": "XLM",
     "referencePrice": 0.11482085318216871,
-    "numOracles": 8,
+    "numOracles": 8.0,
     "liquidityTier": 1,
     "assetName": "Stellar",
     "p": -1.0,
@@ -1158,7 +1158,7 @@
   {
     "baseAsset": "XRP",
     "referencePrice": 0.5353857739696989,
-    "numOracles": 9,
+    "numOracles": 9.0,
     "liquidityTier": 1,
     "assetName": "Ripple",
     "p": -1.0,
@@ -1175,7 +1175,7 @@
   {
     "baseAsset": "ZETA",
     "referencePrice": 1.9573870187743652,
-    "numOracles": 6,
+    "numOracles": 6.0,
     "liquidityTier": 2,
     "assetName": "ZetaChain",
     "p": 0.0,
