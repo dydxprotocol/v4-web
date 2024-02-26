@@ -2,7 +2,7 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { useAccounts, useStringGetter } from '@/hooks';
 
-import { AppRoute } from '@/constants/routes';
+import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 import { STRING_KEYS } from '@/constants/localization';
 import { ButtonAction } from '@/constants/buttons';
 
@@ -34,12 +34,12 @@ export const AcknowledgeTerms = ({ onClose, onContinue }: ElementProps) => {
           key: STRING_KEYS.TOS_TITLE,
           params: {
             TERMS_LINK: (
-              <Styled.Link href={`/#${AppRoute.Terms}`}>
+              <Styled.Link href={`${BASE_ROUTE}${AppRoute.Terms}`}>
                 {stringGetter({ key: STRING_KEYS.TERMS_OF_USE })}
               </Styled.Link>
             ),
             PRIVACY_POLICY_LINK: (
-              <Styled.Link href={`/#${AppRoute.Privacy}`}>
+              <Styled.Link href={`${BASE_ROUTE}${AppRoute.Privacy}`}>
                 {stringGetter({ key: STRING_KEYS.PRIVACY_POLICY })}
               </Styled.Link>
             ),

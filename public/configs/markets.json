@@ -428,6 +428,13 @@
     "whitepaperLink": "https://solana.com/solana-whitepaper.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/solana/"
   },
+  "STRK-USD": {
+    "name": "Starknet",
+    "tags": ["Layer 2"],
+    "websiteLink": "https://www.starknet.io/en",
+    "whitepaperLink": "https://docs.starknet.io/documentation/",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/starknet-token/"
+  },
   "STX-USD": {
     "name": "Stacks",
     "tags": ["Layer 2"],

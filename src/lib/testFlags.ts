@@ -26,10 +26,6 @@ class TestFlags {
   get showTradingRewards() {
     return !!this.queryParams.tradingrewards;
   }
-
-  get showCexWithdrawal() {
-    return !!this.queryParams.cexwithdrawal;
-  }
 }
 
 export const testFlags = new TestFlags();

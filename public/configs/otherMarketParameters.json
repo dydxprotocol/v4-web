@@ -969,6 +969,23 @@
     "quantumConversionExponent": -9
   },
   {
+    "baseAsset": "STRK",
+    "referencePrice": 2.05,
+    "numOracles": 6,
+    "liquidityTier": 2,
+    "assetName": "Starknet",
+    "p": 0.0,
+    "atomicResolution": -6.0,
+    "minExchanges": 3,
+    "minPriceChangePpm": 4000,
+    "priceExponent": -9.0,
+    "stepBaseQuantum": 1000000,
+    "ticksizeExponent": -3,
+    "subticksPerTick": 1000000,
+    "minOrderSize": 1000000,
+    "quantumConversionExponent": -9
+  },
+  {
     "baseAsset": "STX",
     "referencePrice": 1.5144048703611412,
     "numOracles": 8,

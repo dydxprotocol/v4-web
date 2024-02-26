@@ -11,6 +11,7 @@ export enum DialogTypes {
   ExternalNavKeplr = 'ExternalNavKeplr',
   ManageFunds = 'ManageFunds',
   MnemonicExport = 'MnemonicExport',
+  MobileDownload = 'MobileDownload',
   MobileSignIn = 'MobileSignIn',
   NewMarketAgreement = 'NewMarketAgreement',
   NewMarketMessageDetails = 'NewMarketMessageDetails',

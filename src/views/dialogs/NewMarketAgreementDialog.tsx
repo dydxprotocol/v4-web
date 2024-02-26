@@ -2,7 +2,7 @@ import { useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
-import { AppRoute } from '@/constants/routes';
+import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 import { STRING_KEYS } from '@/constants/localization';
 import { useStringGetter } from '@/hooks';
 import breakpoints from '@/styles/breakpoints';
@@ -40,7 +40,7 @@ export const NewMarketAgreementDialog = ({ acceptTerms, setIsOpen }: ElementProp
                 </Styled.Link>
               ),
               TERMS_OF_USE: (
-                <Styled.Link href={`/#${AppRoute.Terms}`}>
+                <Styled.Link href={`${BASE_ROUTE}${AppRoute.Terms}`}>
                   {stringGetter({ key: STRING_KEYS.TERMS_OF_USE })}
                 </Styled.Link>
               ),

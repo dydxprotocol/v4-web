@@ -66,10 +66,12 @@ This will automatically open your default browser at `http://localhost:61000`.
 
 Add or modify the relevant endpoints, links and options in `/public/configs/env.json`.
 You'll need to provide a Wallet Connect project id to enable onboarding and wallet connection:
+
 - Create a project on https://cloud.walletconnect.com/app
 - Copy over the project ID into this [field](https://github.com/dydxprotocol/v4-web/blob/67ecbd75b43e0c264b7b4d2d9b3d969830b0621c/public/configs/env.json#L822C33-L822C46)
 
 ## Part 4: Set Enviornment variables
+
 Set environment variables via `.env`.
 
 - `VITE_BASE_URL` (required): The base URL of the deployment (e.g., `https://www.example.com`).
@@ -96,10 +98,12 @@ Select "Import Git Repository" from your dashboard, and provide the URL of this 
 ### Step 2: Configure your project
 
 For the "Build & Development Settings", we recommend the following:
+
 - Framework Preset: `Vite`
 - Build Command (override): `pnpm run build`
 
 By default, the dev server runs in development mode and the build command runs in production mode. To override the default mode, you can pass in the `--mode` option flag. For example, if you want to build your app for testnet:
+
 ```
 pnpm run build --mode testnet
 ```
@@ -113,6 +117,14 @@ If you wish to incorporate smart banner for iOS and/or Android apps, you can use
 For more details, check out Vercel's [official documentation](https://vercel.com/docs).
 
 ## Deploying to IPFS
+
+### Must Enable HashRouting
+
+Add the following to `.env` file
+
+```
+VITE_ROUTER_TYPE=hash
+```
 
 ### web3.storage: deploy to IPFS via web3.storage using the provided script
 
@@ -150,12 +162,14 @@ Replace `your_cid` with the actual CID.
 We recommend that you add your website to Cloudflare for additional security settings.
 
 To block OFAC Sanctioned countries:
+
 1. Navigate Websites > Domain > Security > WAF
 
 2. Create Rule with the following settings:
-  * If incoming requests match
-`(ip.geoip.country eq "CU") or (ip.geoip.country eq "IR") or (ip.geoip.country eq "KP") or (ip.geoip.country eq "SY") or (ip.geoip.country eq "MM") or (ip.geoip.subdivision_1_iso_code eq "UA-09") or (ip.geoip.subdivision_1_iso_code eq "UA-14") or (ip.geoip.subdivision_1_iso_code eq "UA-43")`
-  * This rule will bring up a Cloudflare page when a restricted geography tries to access your site. You will have the option to display:
-    1. Custom Text
-      - (e.g. `Because you appear to be a resident of, or trading from, a jurisdiction that violates our terms of use, or have engaged in activity that violates our terms of use, you have been blocked. You may withdraw your funds from the protocol at any time.`)
-    2. Default Cloudflare WAF block page
+
+- If incoming requests match
+  `(ip.geoip.country eq "CU") or (ip.geoip.country eq "IR") or (ip.geoip.country eq "KP") or (ip.geoip.country eq "SY") or (ip.geoip.country eq "MM") or (ip.geoip.subdivision_1_iso_code eq "UA-09") or (ip.geoip.subdivision_1_iso_code eq "UA-14") or (ip.geoip.subdivision_1_iso_code eq "UA-43")`
+- This rule will bring up a Cloudflare page when a restricted geography tries to access your site. You will have the option to display:
+  1. Custom Text
+  - (e.g. `Because you appear to be a resident of, or trading from, a jurisdiction that violates our terms of use, or have engaged in activity that violates our terms of use, you have been blocked. You may withdraw your funds from the protocol at any time.`)
+  2. Default Cloudflare WAF block page

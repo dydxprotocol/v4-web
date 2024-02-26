@@ -81,6 +81,9 @@ export enum AnalyticsEvent {
   TradePlaceOrderConfirmed = 'TradePlaceOrderConfirmed',
   TradeCancelOrder = 'TradeCancelOrder',
   TradeCancelOrderConfirmed = 'TradeCancelOrderConfirmed',
+
+  // Notification
+  NotificationAction = 'NotificationAction',
 }
 
 export type AnalyticsEventData<T extends AnalyticsEvent> =
@@ -179,6 +182,12 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
         roundtripMs: number;
         /** URL/IP of node the order was sent to */
         validatorUrl: string;
+      }
+    : // Notifcation
+    T extends AnalyticsEvent.NotificationAction
+    ? {
+        type: string;
+        id: string;
       }
     : never;
 

@@ -18,6 +18,7 @@ import { ExternalNavKeplrDialog } from '@/views/dialogs/ExternalNavKeplrDialog';
 import { ManageFundsDialog } from '@/views/dialogs/ManageFundsDialog';
 import { MnemonicExportDialog } from '@/views/dialogs/MnemonicExportDialog';
 import { MobileSignInDialog } from '@/views/dialogs/MobileSignInDialog';
+import { MobileDownloadDialog } from '@/views/dialogs/MobileDownloadDialog';
 import { NewMarketAgreementDialog } from '@/views/dialogs/NewMarketAgreementDialog';
 import { NewMarketMessageDetailsDialog } from '@/views/dialogs/NewMarketMessageDetailsDialog';
 import { OnboardingDialog } from '@/views/dialogs/OnboardingDialog';
@@ -64,6 +65,7 @@ export const DialogManager = () => {
     [DialogTypes.ExternalNavStride]: <ExternalNavStrideDialog {...modalProps} />,
     [DialogTypes.MnemonicExport]: <MnemonicExportDialog {...modalProps} />,
     [DialogTypes.MobileSignIn]: <MobileSignInDialog {...modalProps} />,
+    [DialogTypes.MobileDownload]: <MobileDownloadDialog {...modalProps} />,
     [DialogTypes.Onboarding]: <OnboardingDialog {...modalProps} />,
     [DialogTypes.OrderDetails]: <OrderDetailsDialog {...modalProps} />,
     [DialogTypes.Preferences]: <PreferencesDialog {...modalProps} />,
