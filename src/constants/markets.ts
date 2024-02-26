@@ -12,12 +12,20 @@ export enum MarketFilters {
   ALL = 'all',
   LAYER_1 = 'Layer 1',
   DEFI = 'Defi',
+  AI = 'AI',
+  LAYER_2 = 'Layer 2',
+  NFT = 'NFT',
+  GAMING = 'Gaming',
 }
 
 export const MARKET_FILTER_LABELS = {
   [MarketFilters.ALL]: STRING_KEYS.ALL,
   [MarketFilters.LAYER_1]: STRING_KEYS.LAYER_1,
   [MarketFilters.DEFI]: STRING_KEYS.DEFI,
+  [MarketFilters.AI]: STRING_KEYS.DEFI,
+  [MarketFilters.LAYER_2]: STRING_KEYS.DEFI,
+  [MarketFilters.NFT]: STRING_KEYS.DEFI,
+  [MarketFilters.GAMING]: STRING_KEYS.DEFI,
 };
 
 export const DEFAULT_MARKETID = 'ETH-USD';
