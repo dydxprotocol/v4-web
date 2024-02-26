@@ -251,6 +251,16 @@ const useDydxClientContext = () => {
     [compositeClient]
   );
 
+  const getPerpetualMarketSparklines = useCallback(
+    async ({ period = 'SEVEN_DAYS' }: { period?: 'ONE_DAY' | 'SEVEN_DAYS' }) => {
+      if (compositeClient) {
+        return await compositeClient.indexerClient.markets.getPerpetualMarketSparklines(period);
+      }
+      return {};
+    },
+    [compositeClient]
+  );
+
   return {
     // Client initialization
     connect: setNetworkConfig,
@@ -266,6 +276,7 @@ const useDydxClientContext = () => {
     requestAllPerpetualMarkets,
     requestAllGovernanceProposals,
     getCandlesForDatafeed,
+    getPerpetualMarketSparklines,
     screenAddresses,
   };
 };

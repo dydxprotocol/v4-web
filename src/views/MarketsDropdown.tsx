@@ -7,8 +7,10 @@ import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, type MarketData } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
-import { useStringGetter } from '@/hooks';
+
+import { usePerpetualMarketSparklines, useStringGetter } from '@/hooks';
 import { useMarketsData } from '@/hooks/useMarketsData';
+import { SEVEN_DAY_SPARKLINE_ENTRIES } from '@/hooks/usePerpetualMarketSparklines';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
 import { popoverMixins } from '@/styles/popoverMixins';
@@ -37,6 +39,8 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
   const { filteredMarkets, marketFilters } = useMarketsData(filter, searchFilter);
   const navigate = useNavigate();
   const { hasPotentialMarketsData } = usePotentialMarkets();
+  const sparklineData = usePerpetualMarketSparklines();
+  console.log(sparklineData);
 
   return (
     <>
@@ -71,9 +75,11 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
                     <AssetIcon symbol={assetId} />
                     <h2>{id}</h2>
                     <Tag>{assetId}</Tag>
-                    {(line?.toArray() ?? []).length < 7 && (
-                      <Tag>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>
-                    )}
+                    {console.log(sparklineData[id])}
+                    {sparklineData?.[id] &&
+                      sparklineData[id].length < SEVEN_DAY_SPARKLINE_ENTRIES && (
+                        <Tag>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>
+                      )}
                   </Styled.MarketName>
                 ),
               },
