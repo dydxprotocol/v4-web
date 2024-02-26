@@ -1,5 +1,5 @@
-import { lazy, Suspense } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { lazy, Suspense, useMemo } from 'react';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 import { WagmiConfig } from 'wagmi';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -26,6 +26,7 @@ import { RestrictionProvider } from '@/hooks/useRestrictions';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
 
 import { GuardedMobileRoute } from '@/components/GuardedMobileRoute';
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
 import { HeaderDesktop } from '@/layout/Header/HeaderDesktop';
 import { FooterDesktop } from '@/layout/Footer/FooterDesktop';
@@ -34,12 +35,12 @@ import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
 import { DialogManager } from '@/layout/DialogManager';
 import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 
+import { parseLocationHash } from '@/lib/urlUtils';
 import { config } from '@/lib/wagmi';
 
 import { breakpoints } from '@/styles';
 import { GlobalStyle } from '@/styles/globalStyle';
 import { layoutMixins } from '@/styles/layoutMixins';
-import { LoadingSpace } from './components/Loading/LoadingSpinner';
 
 import '@/styles/constants.css';
 import '@/styles/fonts.css';
@@ -68,6 +69,14 @@ const Content = () => {
   const isShowingHeader = isNotTablet;
   const isShowingFooter = useShouldShowFooter();
   const { chainTokenLabel } = useTokenConfigs();
+  const location = useLocation();
+
+  const pathFromHash = useMemo(() => {
+    if (location.hash === '') {
+      return '';
+    }
+    return parseLocationHash(location.hash);
+  }, [location.hash]);
 
   return (
     <>
@@ -102,8 +111,10 @@ const Content = () => {
 
               <Route path={AppRoute.Terms} element={<TermsOfUsePage />} />
               <Route path={AppRoute.Privacy} element={<PrivacyPolicyPage />} />
-
-              <Route path="*" element={<Navigate to={DEFAULT_TRADE_ROUTE} replace />} />
+              <Route
+                path="*"
+                element={<Navigate to={pathFromHash || DEFAULT_TRADE_ROUTE} replace />}
+              />
             </Routes>
           </Suspense>
         </Styled.Main>

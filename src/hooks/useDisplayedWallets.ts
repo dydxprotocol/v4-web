@@ -10,9 +10,10 @@ export const useDisplayedWallets = () => {
     isDev && WalletType.Keplr,
 
     WalletType.WalletConnect2,
-    
+
     WalletType.CoinbaseWallet,
-    
+
+    WalletType.OkxWallet,
     // Hide these wallet options until they can be properly tested on mainnet
     // WalletType.ImToken,
     // WalletType.Rainbow,

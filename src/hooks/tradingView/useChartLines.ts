@@ -61,15 +61,17 @@ export const useChartLines = ({
   useEffect(() => {
     if (isChartReady && tvWidget) {
       tvWidget.onChartReady(() => {
-        tvWidget.chart().dataReady(() => {
-          if (showOrderLines) {
-            displayButton?.classList?.add('order-lines-active');
-            drawOrderLines();
-            drawPositionLine();
-          } else {
-            displayButton?.classList?.remove('order-lines-active');
-            deleteChartLines();
-          }
+        tvWidget.headerReady().then(() => {
+          tvWidget.chart().dataReady(() => {
+            if (showOrderLines) {
+              displayButton?.classList?.add('order-lines-active');
+              drawOrderLines();
+              drawPositionLine();
+            } else {
+              displayButton?.classList?.remove('order-lines-active');
+              deleteChartLines();
+            }
+          });
         });
       });
     }
