@@ -1,6 +1,7 @@
 import { useQuery } from 'react-query';
 
 import { timeUnits } from '@/constants/time';
+import type { PerpetualMarketSparklineResponse } from '@/constants/indexer';
 
 import { log } from '@/lib/telemetry';
 
@@ -12,7 +13,7 @@ export const SEVEN_DAY_SPARKLINE_ENTRIES = 42;
 export const usePerpetualMarketSparklines = () => {
   const { getPerpetualMarketSparklines } = useDydxClient();
 
-  const { data } = useQuery({
+  const { data } = useQuery<PerpetualMarketSparklineResponse | undefined>({
     queryKey: 'perpetualMarketSparklines',
     queryFn: () => {
       try {

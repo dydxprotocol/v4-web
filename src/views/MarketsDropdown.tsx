@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
 import { useSelector } from 'react-redux';
@@ -40,7 +40,84 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
   const navigate = useNavigate();
   const { hasPotentialMarketsData } = usePotentialMarkets();
   const sparklineData = usePerpetualMarketSparklines();
-  console.log(sparklineData);
+
+  const columns = useMemo(
+    () =>
+      [
+        {
+          columnKey: 'market',
+          getCellValue: (row) => row.market,
+          label: stringGetter({ key: STRING_KEYS.MARKET }),
+          renderCell: ({ assetId, id }) => (
+            <Styled.MarketName isFavorited={false}>
+              {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
+              <AssetIcon symbol={assetId} />
+              <h2>{id}</h2>
+              <Tag>{assetId}</Tag>
+              {console.log(sparklineData?.[id])}
+              {sparklineData?.[id] && sparklineData[id].length < SEVEN_DAY_SPARKLINE_ENTRIES && (
+                <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>
+              )}
+            </Styled.MarketName>
+          ),
+        },
+        {
+          columnKey: 'oraclePrice',
+          getCellValue: (row) => row.oraclePrice,
+          label: stringGetter({ key: STRING_KEYS.PRICE }),
+          renderCell: ({ oraclePrice, tickSizeDecimals }) => (
+            <Styled.Output
+              type={OutputType.Fiat}
+              value={oraclePrice}
+              fractionDigits={tickSizeDecimals}
+            />
+          ),
+        },
+        {
+          columnKey: 'priceChange24HPercent',
+          getCellValue: (row) => row.priceChange24HPercent,
+          label: stringGetter({ key: STRING_KEYS._24H }),
+          renderCell: ({ priceChange24HPercent }) => (
+            <Styled.InlineRow>
+              {!priceChange24HPercent ? (
+                <Styled.Output type={OutputType.Text} value={null} />
+              ) : (
+                <Styled.PriceChangeOutput
+                  type={OutputType.Percent}
+                  value={priceChange24HPercent}
+                  isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
+                />
+              )}
+            </Styled.InlineRow>
+          ),
+        },
+        {
+          columnKey: 'volume24H',
+          getCellValue: (row) => row.volume24H,
+          label: stringGetter({ key: STRING_KEYS.VOLUME }),
+          renderCell: ({ volume24H }) => (
+            <Styled.Output
+              type={OutputType.CompactFiat}
+              value={volume24H}
+              locale={selectedLocale}
+            />
+          ),
+        },
+        {
+          columnKey: 'openInterest',
+          getCellValue: (row) => row.openInterestUSDC,
+          label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
+          renderCell: (row) => (
+            <Styled.Output
+              type={OutputType.CompactFiat}
+              value={row.openInterestUSDC}
+              locale={selectedLocale}
+            />
+          ),
+        },
+      ] as ColumnDef<MarketData>[],
+    [stringGetter, !!sparklineData, selectedLocale]
+  );
 
   return (
     <>
@@ -63,82 +140,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
             direction: 'descending',
           }}
           label={stringGetter({ key: STRING_KEYS.MARKETS })}
-          columns={
-            [
-              {
-                columnKey: 'market',
-                getCellValue: (row) => row.market,
-                label: stringGetter({ key: STRING_KEYS.MARKET }),
-                renderCell: ({ assetId, id, line }) => (
-                  <Styled.MarketName isFavorited={false}>
-                    {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
-                    <AssetIcon symbol={assetId} />
-                    <h2>{id}</h2>
-                    <Tag>{assetId}</Tag>
-                    {console.log(sparklineData[id])}
-                    {sparklineData?.[id] &&
-                      sparklineData[id].length < SEVEN_DAY_SPARKLINE_ENTRIES && (
-                        <Tag>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>
-                      )}
-                  </Styled.MarketName>
-                ),
-              },
-              {
-                columnKey: 'oraclePrice',
-                getCellValue: (row) => row.oraclePrice,
-                label: stringGetter({ key: STRING_KEYS.PRICE }),
-                renderCell: ({ oraclePrice, tickSizeDecimals }) => (
-                  <Styled.Output
-                    type={OutputType.Fiat}
-                    value={oraclePrice}
-                    fractionDigits={tickSizeDecimals}
-                  />
-                ),
-              },
-              {
-                columnKey: 'priceChange24HPercent',
-                getCellValue: (row) => row.priceChange24HPercent,
-                label: stringGetter({ key: STRING_KEYS._24H }),
-                renderCell: ({ priceChange24HPercent }) => (
-                  <Styled.InlineRow>
-                    {!priceChange24HPercent ? (
-                      <Styled.Output type={OutputType.Text} value={null} />
-                    ) : (
-                      <Styled.PriceChangeOutput
-                        type={OutputType.Percent}
-                        value={priceChange24HPercent}
-                        isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
-                      />
-                    )}
-                  </Styled.InlineRow>
-                ),
-              },
-              {
-                columnKey: 'volume24H',
-                getCellValue: (row) => row.volume24H,
-                label: stringGetter({ key: STRING_KEYS.VOLUME }),
-                renderCell: ({ volume24H }) => (
-                  <Styled.Output
-                    type={OutputType.CompactFiat}
-                    value={volume24H}
-                    locale={selectedLocale}
-                  />
-                ),
-              },
-              {
-                columnKey: 'openInterest',
-                getCellValue: (row) => row.openInterestUSDC,
-                label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
-                renderCell: (row) => (
-                  <Styled.Output
-                    type={OutputType.CompactFiat}
-                    value={row.openInterestUSDC}
-                    locale={selectedLocale}
-                  />
-                ),
-              },
-            ] as ColumnDef<MarketData>[]
-          }
+          columns={columns}
           slotEmpty={
             <Styled.MarketNotFound>
               <h2>
