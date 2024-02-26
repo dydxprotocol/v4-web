@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 
@@ -27,16 +27,16 @@ export const useChartLines = ({
   tvWidget,
   displayButton,
   isChartReady,
-  chartLinesRef,
 }: {
   tvWidget: TvWidget | null;
   displayButton: HTMLElement | null;
   isChartReady: boolean;
-  chartLinesRef: React.MutableRefObject<Record<string, ChartLine>>;
 }) => {
   const [showOrderLines, setShowOrderLines] = useState(true);
 
   const stringGetter = useStringGetter();
+
+  const chartLinesRef = useRef<Record<string, ChartLine>>({});
 
   const appTheme = useSelector(getAppTheme);
   const appColorMode = useSelector(getAppColorMode);
@@ -212,4 +212,6 @@ export const useChartLines = ({
     maybeQuantityColor &&
       line.setLineColor(maybeQuantityColor).setQuantityBackgroundColor(maybeQuantityColor);
   };
+
+  return { chartLines: chartLinesRef.current };
 };

@@ -27,16 +27,13 @@ export const TvChart = () => {
   const displayButtonRef = useRef<HTMLElement | null>(null);
   const displayButton = displayButtonRef.current;
 
-  const chartLinesRef = useRef<Record<string, ChartLine>>({});
-  const chartLines = chartLinesRef.current;
-
   const { savedResolution } = useTradingView({ tvWidgetRef, displayButtonRef, setIsChartReady });
   useChartMarketAndResolution({
     tvWidget,
     isWidgetReady,
     savedResolution: savedResolution as ResolutionString | undefined,
   });
-  useChartLines({ tvWidget, displayButton, isChartReady, chartLinesRef });
+  const { chartLines } = useChartLines({ tvWidget, displayButton, isChartReady });
   useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
 
   return (
