@@ -4,7 +4,7 @@ import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import type { ResolutionString } from 'public/tradingview/charting_library';
 
-import type { ChartLine, TvWidget } from '@/constants/tvchart';
+import type { TvWidget } from '@/constants/tvchart';
 
 import {
   useChartLines,
