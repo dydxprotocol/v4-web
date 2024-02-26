@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 
@@ -9,13 +9,15 @@ import type { ChartLine, TvWidget } from '@/constants/tvchart';
 
 import { useStringGetter } from '@/hooks';
 
-import { getCurrentMarketOrders, getCurrentMarketPositionData } from '@/state/accountSelectors';
+import {
+  getCurrentMarketOrders,
+  getCurrentMarketPositionData,
+  getIsAccountConnected,
+} from '@/state/accountSelectors';
 import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { getChartLineColors } from '@/lib/tradingView/utils';
-
-let chartLines: Record<string, ChartLine> = {};
 
 /**
  * @description Hook to handle drawing chart lines
@@ -28,41 +30,45 @@ export const useChartLines = ({
 }: {
   tvWidget: TvWidget | null;
   displayButton: HTMLElement | null;
-  isChartReady?: boolean;
+  isChartReady: boolean;
 }) => {
-  const [showOrderLines, setShowOrderLines] = useState(false);
+  const [showOrderLines, setShowOrderLines] = useState(true);
 
   const stringGetter = useStringGetter();
 
+  const chartLinesRef = useRef<Record<string, ChartLine>>({});
+
   const appTheme = useSelector(getAppTheme);
   const appColorMode = useSelector(getAppColorMode);
+
+  const isAccountConnected = useSelector(getIsAccountConnected);
 
   const currentMarketPositionData = useSelector(getCurrentMarketPositionData, shallowEqual);
   const currentMarketOrders: SubaccountOrder[] = useSelector(getCurrentMarketOrders, shallowEqual);
 
   useEffect(() => {
     if (isChartReady && displayButton) {
-      displayButton.onclick = () => {
-        const newShowOrderLinesState = !showOrderLines;
-        if (newShowOrderLinesState) {
-          displayButton?.classList?.add('order-lines-active');
-        } else {
-          displayButton?.classList?.remove('order-lines-active');
-        }
-        setShowOrderLines(newShowOrderLinesState);
-      };
+      displayButton.onclick = () => setShowOrderLines(!showOrderLines);
     }
   }, [isChartReady, showOrderLines]);
 
   useEffect(() => {
-    if (tvWidget && isChartReady) {
+    if (!isAccountConnected) {
+      deleteChartLines();
+    }
+  }, [isAccountConnected]);
+
+  useEffect(() => {
+    if (isChartReady && tvWidget) {
       tvWidget.onChartReady(() => {
         tvWidget.headerReady().then(() => {
           tvWidget.chart().dataReady(() => {
             if (showOrderLines) {
+              displayButton?.classList?.add('order-lines-active');
               drawOrderLines();
               drawPositionLine();
             } else {
+              displayButton?.classList?.remove('order-lines-active');
               deleteChartLines();
             }
           });
@@ -80,13 +86,13 @@ export const useChartLines = ({
     const key = currentMarketPositionData.id;
     const price = MustBigNumber(entryPrice).toNumber();
 
-    const maybePositionLine = chartLines[key]?.line;
+    const maybePositionLine = chartLinesRef.current[key]?.line;
     const shouldShow = size && size !== 0;
 
     if (!shouldShow) {
       if (maybePositionLine) {
         maybePositionLine.remove();
-        delete chartLines[key];
+        delete chartLinesRef.current[key];
         return;
       }
     } else {
@@ -108,9 +114,9 @@ export const useChartLines = ({
           .setQuantity(quantity);
 
         if (positionLine) {
-          const chartLine = { line: positionLine, chartLineType: 'position' };
+          const chartLine: ChartLine = { line: positionLine, chartLineType: 'position' };
           setLineColors({ chartLine: chartLine });
-          chartLines[key] = chartLine;
+          chartLinesRef.current[key] = chartLine;
         }
       }
     }
@@ -145,12 +151,12 @@ export const useChartLines = ({
           !cancelReason &&
           (status === AbacusOrderStatus.open || status === AbacusOrderStatus.untriggered);
 
-        const maybeOrderLine = chartLines[key]?.line;
+        const maybeOrderLine = chartLinesRef.current[key]?.line;
 
         if (!shouldShow) {
           if (maybeOrderLine) {
             maybeOrderLine.remove();
-            delete chartLines[key];
+            delete chartLinesRef.current[key];
             return;
           }
         } else {
@@ -172,7 +178,7 @@ export const useChartLines = ({
                 chartLineType: ORDER_SIDES[side.name],
               };
               setLineColors({ chartLine: chartLine });
-              chartLines[key] = chartLine;
+              chartLinesRef.current[key] = chartLine;
             }
           }
         }
@@ -181,10 +187,10 @@ export const useChartLines = ({
   };
 
   const deleteChartLines = () => {
-    Object.values(chartLines).forEach(({ line }) => {
+    Object.values(chartLinesRef.current).forEach(({ line }) => {
       line.remove();
     });
-    chartLines = {};
+    chartLinesRef.current = {};
   };
 
   const setLineColors = ({ chartLine }: { chartLine: ChartLine }) => {
@@ -207,5 +213,5 @@ export const useChartLines = ({
       line.setLineColor(maybeQuantityColor).setQuantityBackgroundColor(maybeQuantityColor);
   };
 
-  return { chartLines };
+  return { chartLines: chartLinesRef.current };
 };

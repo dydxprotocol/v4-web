@@ -38,7 +38,7 @@ export const useChartMarketAndResolution = ({
    * @description Hook to handle changing markets - intentionally should avoid triggering on change of resolutions.
    */
   useEffect(() => {
-    if (currentMarketId && isWidgetReady) {
+    if (isWidgetReady && currentMarketId !== tvWidget?.activeChart().symbol()) {
       const resolution = savedResolution || selectedResolution;
       tvWidget?.setSymbol(currentMarketId, resolution as ResolutionString, () => {});
     }
