@@ -9,7 +9,7 @@ export type NewMarketParams = {
   ticker: string;
   priceExponent: number;
   minExchanges: number;
-  minPriceChangePpm: number;
+  minPriceChange: number;
   exchangeConfigJson: ExchangeConfigItem[];
   liquidityTier: number;
   atomicResolution: number;
@@ -18,9 +18,6 @@ export type NewMarketParams = {
   stepBaseQuantums: number;
   subticksPerTick: number;
   delayBlocks: number;
-
-  // todo: delete
-  quantum_conversion_exponent: number;
 };
 
 export type NewMarketProposal = {

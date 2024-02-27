@@ -45,7 +45,7 @@ export const NewMarketMessageDetailsDialog = ({
     ticker,
     exchangeConfigJson,
     minExchanges,
-    minPriceChangePpm,
+    minPriceChange,
     atomicResolution,
     quantumConversionExponent,
     stepBaseQuantums,
@@ -123,7 +123,7 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'min-price-change-ppm',
                       label: 'min_price_change_ppm',
-                      value: `${minPriceChangePpm}`,
+                      value: `${minPriceChange}`,
                     },
                   ]}
                 />

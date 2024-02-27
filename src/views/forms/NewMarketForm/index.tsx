@@ -25,7 +25,7 @@ export const NewMarketForm = () => {
   const [proposalTxHash, setProposalTxHash] = useState<string>();
   const { mintscan: mintscanTxUrl } = useURLConfigs();
 
-  const { nextAvailableClobPairId } = useNextClobPairId();
+  const { nextAvailableClobPairId, tickersFromProposals } = useNextClobPairId();
   const { hasPotentialMarketsData } = usePotentialMarkets();
 
   const tickSizeDecimals = useMemo(() => {
@@ -69,6 +69,7 @@ export const NewMarketForm = () => {
       liquidityTier={liquidityTier}
       setLiquidityTier={setLiquidityTier}
       tickSizeDecimals={tickSizeDecimals}
+      tickersFromProposals={tickersFromProposals}
     />
   );
 };

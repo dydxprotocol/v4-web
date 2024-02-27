@@ -5,7 +5,7 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import { OnboardingState } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
-import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
@@ -32,7 +32,6 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
-import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
@@ -55,6 +54,7 @@ type NewMarketSelectionStepProps = {
   liquidityTier?: number;
   setLiquidityTier: (liquidityTier?: number) => void;
   tickSizeDecimals: number;
+  tickersFromProposals: Set<string>;
 };
 
 export const NewMarketSelectionStep = ({
@@ -65,6 +65,7 @@ export const NewMarketSelectionStep = ({
   liquidityTier,
   setLiquidityTier,
   tickSizeDecimals,
+  tickersFromProposals,
 }: NewMarketSelectionStepProps) => {
   const dispatch = useDispatch();
   const { nativeTokenBalance } = useAccountBalance();
@@ -83,7 +84,6 @@ export const NewMarketSelectionStep = ({
   const initialDepositAmount = initialDepositAmountBN.toFixed(initialDepositAmountDecimals);
 
   const [tempLiquidityTier, setTempLiquidityTier] = useState<number>();
-  const [canModifyLiqTier, setCanModifyLiqTier] = useState(false);
 
   const alertMessage = useMemo(() => {
     if (nativeTokenBalance.lt(initialDepositAmountBN)) {
@@ -112,7 +112,9 @@ export const NewMarketSelectionStep = ({
   const filteredPotentialMarkets = useMemo(() => {
     return potentialMarkets?.filter(
       ({ params: { ticker, exchangeConfigJson } }) =>
-        exchangeConfigJson.length >= NUM_ORACLES_TO_QUALIFY_AS_SAFE && !marketIds.includes(ticker)
+        exchangeConfigJson.length >= NUM_ORACLES_TO_QUALIFY_AS_SAFE &&
+        !marketIds.includes(ticker) &&
+        !tickersFromProposals.has(ticker)
     );
   }, [potentialMarkets, marketIds]);
 
@@ -120,12 +122,7 @@ export const NewMarketSelectionStep = ({
     <Styled.Form
       onSubmit={(e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (canModifyLiqTier) {
-          setLiquidityTier(tempLiquidityTier);
-          setCanModifyLiqTier(false);
-        } else {
-          onConfirmMarket();
-        }
+        onConfirmMarket();
       }}
     >
       <h2>
@@ -173,51 +170,17 @@ export const NewMarketSelectionStep = ({
           <div>{stringGetter({ key: STRING_KEYS.POPULATED_DETAILS })}</div>
           <div>
             <Styled.Root value={tempLiquidityTier} onValueChange={setTempLiquidityTier}>
-              <Styled.Header>
-                {stringGetter({ key: STRING_KEYS.LIQUIDITY_TIER })}
-                {/* <Styled.ButtonRow>
-                  <Button
-                    shape={ButtonShape.Pill}
-                    onClick={() => {
-                      if (canModifyLiqTier) {
-                        setTempLiquidityTier(liquidityTier);
-                      }
-                      setCanModifyLiqTier(!canModifyLiqTier);
-                    }}
-                  >
-                    {canModifyLiqTier ? (
-                      stringGetter({ key: STRING_KEYS.CANCEL })
-                    ) : (
-                      <>
-                        {stringGetter({ key: STRING_KEYS.MODIFY })}{' '}
-                        <Icon iconName={IconName.Pencil} />
-                      </>
-                    )}
-                  </Button>
-                  {canModifyLiqTier && (
-                    <Button
-                      shape={ButtonShape.Pill}
-                      action={ButtonAction.Primary}
-                      onClick={() => {
-                        setLiquidityTier(tempLiquidityTier);
-                        setCanModifyLiqTier(false);
-                      }}
-                    >
-                      {stringGetter({ key: STRING_KEYS.SAVE })}
-                    </Button>
-                  )}
-                </Styled.ButtonRow> */}
-              </Styled.Header>
+              <Styled.Header>{stringGetter({ key: STRING_KEYS.LIQUIDITY_TIER })}</Styled.Header>
 
               {Object.keys(liquidityTiers).map((tier) => {
                 const { maintenanceMarginFraction, impactNotional, label, initialMarginFraction } =
                   liquidityTiers[tier as unknown as keyof typeof liquidityTiers];
                 return (
                   <Styled.LiquidityTierRadioButton
+                    disabled
                     key={tier}
                     value={Number(tier)}
                     selected={Number(tier) === tempLiquidityTier}
-                    disabled={!canModifyLiqTier}
                   >
                     <Styled.Header style={{ marginLeft: '1rem' }}>
                       {label}
@@ -348,9 +311,7 @@ export const NewMarketSelectionStep = ({
             state={{ isDisabled: !assetToAdd || !liquidityTier === undefined || !clobPairId }}
             action={ButtonAction.Primary}
           >
-            {canModifyLiqTier
-              ? stringGetter({ key: STRING_KEYS.SAVE })
-              : stringGetter({ key: STRING_KEYS.PREVIEW_MARKET_PROPOSAL })}
+            {stringGetter({ key: STRING_KEYS.PREVIEW_MARKET_PROPOSAL })}
           </Button>
         )}
       </WithReceipt>
@@ -404,16 +365,6 @@ Styled.Header = styled.div`
   color: var(--color-text-2);
   font: var(--font-base-medium);
   justify-content: space-between;
-`;
-
-Styled.ButtonRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 0.5rem;
-
-  button {
-    min-width: 80px;
-  }
 `;
 
 Styled.Root = styled(Root)`

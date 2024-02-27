@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useMemo, useState } from 'react';
+import { FormEvent, useMemo, useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { useDispatch } from 'react-redux';
 import Long from 'long';
@@ -74,6 +74,7 @@ export const NewMarketPreviewStep = ({
   const initialDepositAmountDecimals = isMainnet ? 0 : chainTokenDecimals;
   const initialDepositAmount = initialDepositAmountBN.toFixed(initialDepositAmountDecimals);
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { label, initialMarginFraction, maintenanceMarginFraction, impactNotional } =
     liquidityTiers[liquidityTier as unknown as keyof typeof liquidityTiers];
@@ -83,7 +84,7 @@ export const NewMarketPreviewStep = ({
     ticker,
     priceExponent,
     minExchanges,
-    minPriceChangePpm,
+    minPriceChange,
     exchangeConfigJson,
     atomicResolution,
     quantumConversionExponent,
@@ -131,23 +132,24 @@ export const NewMarketPreviewStep = ({
             })
           );
         } else {
+          setIsLoading(true);
           setErrorMessage(undefined);
 
           try {
             const tx = await submitNewMarketProposal({
               id: clobPairId,
               ticker,
-              priceExponent: priceExponent,
-              minPriceChange: minPriceChangePpm,
-              minExchanges: minExchanges,
+              priceExponent,
+              minPriceChange,
+              minExchanges,
               exchangeConfigJson: JSON.stringify({
                 exchanges: exchangeConfigJson,
               }),
-              atomicResolution: atomicResolution,
-              liquidityTier: liquidityTier,
-              quantumConversionExponent: quantumConversionExponent,
+              atomicResolution,
+              liquidityTier,
+              quantumConversionExponent,
               stepBaseQuantums: Long.fromNumber(stepBaseQuantums),
-              subticksPerTick: subticksPerTick,
+              subticksPerTick,
               delayBlocks: newMarketProposal.delayBlocks,
             });
 
@@ -167,6 +169,8 @@ export const NewMarketPreviewStep = ({
           } catch (error) {
             log('NewMarketPreviewForm/submitNewMarketProposal', error);
             setErrorMessage(error.message);
+          } finally {
+            setIsLoading(false);
           }
         }
       }}
@@ -317,7 +321,11 @@ export const NewMarketPreviewStep = ({
       )}
       <Styled.ButtonRow>
         <Button onClick={onBack}>{stringGetter({ key: STRING_KEYS.BACK })}</Button>
-        <Button type={ButtonType.Submit} action={ButtonAction.Primary} state={{ isDisabled }}>
+        <Button
+          type={ButtonType.Submit}
+          action={ButtonAction.Primary}
+          state={{ isDisabled, isLoading }}
+        >
           {hasAcceptedTerms
             ? stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })
             : stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TERMS })}
