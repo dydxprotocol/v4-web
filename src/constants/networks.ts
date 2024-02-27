@@ -1,7 +1,5 @@
 import environments from '../../public/configs/v1/env.json';
 
-// const CURRENT_MODE = 'MAINNET';
-
 const CURRENT_MODE = ({
   production: 'MAINNET',
   testnet: 'TESTNET',
