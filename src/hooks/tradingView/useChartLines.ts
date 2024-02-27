@@ -5,7 +5,7 @@ import { shallowEqual, useSelector } from 'react-redux';
 import { AbacusOrderStatus, ORDER_SIDES, SubaccountOrder } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { type OrderType, ORDER_TYPE_STRINGS } from '@/constants/trade';
-import type { ChartLine, TvWidget } from '@/constants/tvchart';
+import type { ChartLine, PositionLineType, TvWidget } from '@/constants/tvchart';
 
 import { useStringGetter } from '@/hooks';
 
@@ -66,7 +66,7 @@ export const useChartLines = ({
             if (showOrderLines) {
               displayButton?.classList?.add('order-lines-active');
               drawOrderLines();
-              drawPositionLine();
+              drawPositionLines();
             } else {
               displayButton?.classList?.remove('order-lines-active');
               deleteChartLines();
@@ -77,47 +77,75 @@ export const useChartLines = ({
     }
   }, [isChartReady, showOrderLines, currentMarketPositionData, currentMarketOrders]);
 
-  const drawPositionLine = () => {
+  const drawPositionLines = () => {
     if (!currentMarketPositionData) return;
 
     const entryPrice = currentMarketPositionData.entryPrice?.current;
+    const liquidationPrice = currentMarketPositionData.liquidationPrice?.current;
     const size = currentMarketPositionData.size?.current;
 
-    const key = currentMarketPositionData.id;
-    const price = MustBigNumber(entryPrice).toNumber();
+    const entryLineKey = `entry-${currentMarketPositionData.id}`;
+    const liquidationLineKey = `liquidation-${currentMarketPositionData.id}`;
 
+    maybeDrawPositionLine({
+      key: entryLineKey,
+      label: stringGetter({ key: STRING_KEYS.ENTRY_PRICE_SHORT }),
+      chartLineType: 'entry',
+      price: entryPrice,
+      size,
+    });
+
+    maybeDrawPositionLine({
+      key: liquidationLineKey,
+      label: stringGetter({ key: STRING_KEYS.LIQUIDATION }),
+      chartLineType: 'liquidation',
+      price: liquidationPrice,
+      size,
+    });
+  };
+
+  const maybeDrawPositionLine = ({
+    key,
+    label,
+    chartLineType,
+    price,
+    size,
+  }: {
+    key: string;
+    label: string;
+    chartLineType: PositionLineType;
+    price?: number | null;
+    size?: number | null;
+  }) => {
+    const shouldShow = size && size !== 0 && price;
     const maybePositionLine = chartLinesRef.current[key]?.line;
-    const shouldShow = size && size !== 0;
 
     if (!shouldShow) {
       if (maybePositionLine) {
         maybePositionLine.remove();
         delete chartLinesRef.current[key];
-        return;
+      }
+      return;
+    }
+
+    const formattedPrice = MustBigNumber(price).toNumber();
+
+    if (maybePositionLine) {
+      if (maybePositionLine.getPrice() !== formattedPrice) {
+        maybePositionLine.setPrice(formattedPrice);
       }
     } else {
-      const quantity = size.toString();
+      const positionLine = tvWidget
+        ?.chart()
+        .createPositionLine({ disableUndo: false })
+        .setText(label)
+        .setPrice(formattedPrice)
+        .setQuantity(null);
 
-      if (maybePositionLine) {
-        if (maybePositionLine.getQuantity() !== quantity) {
-          maybePositionLine.setQuantity(quantity);
-        }
-        if (maybePositionLine.getPrice() !== price) {
-          maybePositionLine.setPrice(price);
-        }
-      } else {
-        const positionLine = tvWidget
-          ?.chart()
-          .createPositionLine({ disableUndo: false })
-          .setText(stringGetter({ key: STRING_KEYS.ENTRY_PRICE_SHORT }))
-          .setPrice(price)
-          .setQuantity(quantity);
-
-        if (positionLine) {
-          const chartLine: ChartLine = { line: positionLine, chartLineType: 'position' };
-          setLineColors({ chartLine: chartLine });
-          chartLinesRef.current[key] = chartLine;
-        }
+      if (positionLine) {
+        const chartLine: ChartLine = { line: positionLine, chartLineType };
+        setLineColors({ chartLine: chartLine });
+        chartLinesRef.current[key] = chartLine;
       }
     }
   };

@@ -64,7 +64,8 @@ export const getChartLineColors = ({
   const orderColors = {
     [OrderSide.BUY]: theme.positive,
     [OrderSide.SELL]: theme.negative,
-    ['position']: null,
+    ['entry']: null,
+    ['liquidation']: theme.warning,
   };
 
   return {
