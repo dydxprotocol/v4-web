@@ -50,7 +50,7 @@
   },
   "ARB-USD": {
     "name": "Arbitrum",
-    "tags": [],
+    "tags": ["Layer 2"],
     "websiteLink": "https://arbitrum.io/",
     "whitepaperLink": "https://github.com/OffchainLabs/nitro",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/arbitrum/"
@@ -361,7 +361,7 @@
   },
   "OP-USD": {
     "name": "Optimism",
-    "tags": [],
+    "tags": ["Layer 2"],
     "websiteLink": "https://www.optimism.io/",
     "whitepaperLink": "https://github.com/ethereum-optimism",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/optimism-ethereum/"
