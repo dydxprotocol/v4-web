@@ -5,6 +5,7 @@ import type { Nullable, TradeState } from '@/constants/abacus';
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { DydxChainAsset } from '@/constants/wallets';
 
 import { useAccounts, useBreakpoints, useStringGetter } from '@/hooks';
 
@@ -14,6 +15,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 import { MarginUsageRing } from '@/components/MarginUsageRing';
 import { Output, OutputType } from '@/components/Output';
 import { UsageBars } from '@/components/UsageBars';
@@ -29,8 +31,6 @@ import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 import { isNumber, MustBigNumber } from '@/lib/numbers';
 
 import { AccountInfoDiffOutput } from './AccountInfoDiffOutput';
-import { DydxChainAsset } from '@/constants/wallets';
-import { IconButton } from '@/components/IconButton';
 
 enum AccountInfoItem {
   BuyingPower = 'buying-power',
