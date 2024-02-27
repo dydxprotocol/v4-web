@@ -112,9 +112,7 @@ export const NewMarketSelectionStep = ({
   const filteredPotentialMarkets = useMemo(() => {
     return potentialMarkets?.filter(
       ({ params: { ticker, exchangeConfigJson } }) =>
-        exchangeConfigJson.length >= NUM_ORACLES_TO_QUALIFY_AS_SAFE &&
-        !marketIds.includes(ticker) &&
-        !tickersFromProposals.has(ticker)
+        exchangeConfigJson.length >= NUM_ORACLES_TO_QUALIFY_AS_SAFE && !marketIds.includes(ticker)
     );
   }, [potentialMarkets, marketIds]);
 
@@ -148,6 +146,9 @@ export const NewMarketSelectionStep = ({
                   value: potentialMarket.baseAsset,
                   label: potentialMarket.meta.assetName,
                   tag: potentialMarket.params.ticker,
+                  slotAfter: tickersFromProposals.has(potentialMarket.params.ticker) && (
+                    <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.VOTING_LIVE })}</Tag>
+                  ),
                   onSelect: () => {
                     setAssetToAdd(potentialMarket);
                   },
