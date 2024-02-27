@@ -3,15 +3,24 @@ class TestFlags {
 
   constructor() {
     this.queryParams = {};
-    const hash = window.location.hash;
-    const queryIndex = hash.indexOf('?');
-    if (queryIndex === -1) return;
 
-    const queryParamsString = hash.substring(queryIndex + 1);
-    const params = new URLSearchParams(queryParamsString);
+    if (import.meta.env.VITE_ROUTER_TYPE === 'hash') {
+      const hash = window.location.hash;
+      const queryIndex = hash.indexOf('?');
+      if (queryIndex === -1) return;
 
-    for (const [key, value] of params) {
-      this.queryParams[key.toLowerCase()] = value;
+      const queryParamsString = hash.substring(queryIndex + 1);
+      const params = new URLSearchParams(queryParamsString);
+
+      for (const [key, value] of params) {
+        this.queryParams[key.toLowerCase()] = value;
+      }
+    } else {
+      const params = new URLSearchParams(window.location.search);
+
+      for (const [key, value] of params) {
+        this.queryParams[key.toLowerCase()] = value;
+      }
     }
   }
 
