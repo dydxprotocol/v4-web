@@ -94,7 +94,6 @@ export const AccountInfoConnectedState = () => {
               {stringGetter({ key: STRING_KEYS.DEPOSIT })}
             </Styled.Button>
             <Styled.IconButton
-              key={DialogTypes.Withdraw}
               action={ButtonAction.Base}
               shape={ButtonShape.Square}
               iconName={IconName.Send}
