@@ -2,7 +2,7 @@ import styled, { type AnyStyledComponent, css } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import type { Nullable, TradeState } from '@/constants/abacus';
-import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -29,6 +29,8 @@ import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 import { isNumber, MustBigNumber } from '@/lib/numbers';
 
 import { AccountInfoDiffOutput } from './AccountInfoDiffOutput';
+import { DydxChainAsset } from '@/constants/wallets';
+import { IconButton } from '@/components/IconButton';
 
 enum AccountInfoItem {
   BuyingPower = 'buying-power',
@@ -91,6 +93,13 @@ export const AccountInfoConnectedState = () => {
             >
               {stringGetter({ key: STRING_KEYS.DEPOSIT })}
             </Styled.Button>
+            <Styled.IconButton
+              key={DialogTypes.Withdraw}
+              action={ButtonAction.Base}
+              shape={ButtonShape.Square}
+              iconName={IconName.Send}
+              onClick={() => dispatch(openDialog({ type: DialogTypes.Transfer, dialogProps: {selectedAsset: DydxChainAsset.USDC} }))}
+            />
           </Styled.TransferButtons>
         </Styled.Header>
       )}
@@ -315,4 +324,15 @@ Styled.Button = styled(Button)`
     width: 1.25em;
     height: 1.25em;
   }
+`;
+
+Styled.IconButton = styled(IconButton)<{ iconName: IconName }>`
+  --button-padding: 0 0.25rem;
+  --button-border: solid var(--border-width) var(--color-layer-6);
+
+  ${({ iconName }) =>
+    [IconName.Withdraw, IconName.Deposit].includes(iconName) &&
+    css`
+      --button-icon-size: 1.375em;
+    `}
 `;
