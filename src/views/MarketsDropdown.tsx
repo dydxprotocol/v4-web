@@ -123,6 +123,14 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
           onChangeFilter={setFilter}
           onSearchTextChange={setSearchFilter}
         />
+        {hasPotentialMarketsData && (
+          <Button
+            onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
+            size={ButtonSize.Small}
+          >
+            {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })}
+          </Button>
+        )}
       </Styled.Toolbar>
       <Styled.ScrollArea>
         <Styled.Table
@@ -138,13 +146,30 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
           columns={columns}
           slotEmpty={
             <Styled.MarketNotFound>
-              <h2>
-                {stringGetter({
-                  key: STRING_KEYS.QUERY_NOT_FOUND,
-                  params: { QUERY: searchFilter ?? '' },
-                })}
-              </h2>
-              <p>{stringGetter({ key: STRING_KEYS.MARKET_SEARCH_DOES_NOT_EXIST_YET })}</p>
+              {filter === MarketFilters.NEW && !searchFilter ? (
+                <>
+                  <h2>
+                    {stringGetter({
+                      key: STRING_KEYS.QUERY_NOT_FOUND,
+                      params: { QUERY: stringGetter({ key: STRING_KEYS.NEW }) },
+                    })}
+                  </h2>
+                  {hasPotentialMarketsData && (
+                    <p>{stringGetter({ key: STRING_KEYS.ADD_DETAILS_TO_LAUNCH_MARKET })}</p>
+                  )}
+                </>
+              ) : (
+                <>
+                  <h2>
+                    {stringGetter({
+                      key: STRING_KEYS.QUERY_NOT_FOUND,
+                      params: { QUERY: searchFilter ?? '' },
+                    })}
+                  </h2>
+                  <p>{stringGetter({ key: STRING_KEYS.MARKET_SEARCH_DOES_NOT_EXIST_YET })}</p>
+                </>
+              )}
+
               {hasPotentialMarketsData && (
                 <div>
                   <Button
@@ -323,6 +348,7 @@ Styled.Popover = styled(Popover)`
 Styled.Toolbar = styled(Toolbar)`
   ${layoutMixins.stickyHeader}
   height: var(--stickyArea-topHeight);
+  gap: 0.5rem;
 
   border-bottom: solid var(--border-width) var(--color-border);
 `;
