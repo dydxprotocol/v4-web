@@ -22,7 +22,7 @@ jobs:
       - name: Fetch all history
         run: git fetch --unshallow || git fetch --all
 
-       - name: Determine Tag Type
+      - name: Determine Tag Type
         id: tagtype
         run: |
           if [[ ${{ github.ref }} == refs/tags/release/v* ]]; then
