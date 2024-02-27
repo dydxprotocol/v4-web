@@ -9,9 +9,12 @@ export enum DialogTypes {
   FillDetails = 'FillDetails',
   Help = 'Help',
   ExternalNavKeplr = 'ExternalNavKeplr',
+  ManageFunds = 'ManageFunds',
   MnemonicExport = 'MnemonicExport',
-  MobileSignIn = 'MobileSignIn',
   MobileDownload = 'MobileDownload',
+  MobileSignIn = 'MobileSignIn',
+  NewMarketAgreement = 'NewMarketAgreement',
+  NewMarketMessageDetails = 'NewMarketMessageDetails',
   Onboarding = 'Onboarding',
   OrderDetails = 'OrderDetails',
   Preferences = 'Preferences',
@@ -21,9 +24,7 @@ export enum DialogTypes {
   Trade = 'Trade',
   Transfer = 'Transfer',
   Withdraw = 'Withdraw',
-  ManageFunds = 'ManageFunds',
-  NewMarketMessageDetails = 'NewMarketMessageDetails',
-  NewMarketAgreement = 'NewMarketAgreement',
+  WithdrawalGated = 'WithdrawalGated',
 }
 
 export enum TradeBoxDialogTypes {
