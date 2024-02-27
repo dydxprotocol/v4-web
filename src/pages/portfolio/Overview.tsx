@@ -46,7 +46,6 @@ export const Overview = () => {
           }
           currentRoute={AppRoute.Portfolio}
           withGradientCardRows
-          withOuterBorder
         />
       </Styled.AttachedExpandingSection>
     </div>
