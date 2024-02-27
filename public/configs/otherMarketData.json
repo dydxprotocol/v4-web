@@ -6,8 +6,8 @@
       "id": 50,
       "ticker": "1INCH-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -45,10 +45,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -64,8 +63,8 @@
       "id": 51,
       "ticker": "AAVE-USD",
       "priceExponent": -8.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -112,10 +111,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -131,8 +129,8 @@
       "id": 52,
       "ticker": "ADA-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -183,10 +181,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -202,8 +199,8 @@
       "id": 53,
       "ticker": "AGIX-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -242,10 +239,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -261,8 +257,8 @@
       "id": 54,
       "ticker": "ALGO-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -304,10 +300,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -323,8 +318,8 @@
       "id": 55,
       "ticker": "APE-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -366,10 +361,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -385,8 +379,8 @@
       "id": 56,
       "ticker": "API3-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -424,10 +418,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -443,8 +436,8 @@
       "id": 57,
       "ticker": "APT-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -496,10 +489,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -515,8 +507,8 @@
       "id": 58,
       "ticker": "ARB-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -563,10 +555,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -582,8 +573,8 @@
       "id": 59,
       "ticker": "ATOM-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -630,10 +621,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -649,8 +639,8 @@
       "id": 60,
       "ticker": "AVAX-USD",
       "priceExponent": -8.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -701,10 +691,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -720,8 +709,8 @@
       "id": 61,
       "ticker": "BCH-USD",
       "priceExponent": -7.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -772,10 +761,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -791,8 +779,8 @@
       "id": 62,
       "ticker": "BLUR-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -834,10 +822,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -853,8 +840,8 @@
       "id": 63,
       "ticker": "BNB-USD",
       "priceExponent": -7.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -893,10 +880,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -912,8 +898,8 @@
       "id": 64,
       "ticker": "BONK-USD",
       "priceExponent": -14.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -951,10 +937,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -970,8 +955,8 @@
       "id": 65,
       "ticker": "BTC-USD",
       "priceExponent": -5.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -1022,10 +1007,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -1041,8 +1025,8 @@
       "id": 66,
       "ticker": "CHZ-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -1079,10 +1063,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -1098,8 +1081,8 @@
       "id": 67,
       "ticker": "CRV-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -1136,10 +1119,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -1155,8 +1137,8 @@
       "id": 68,
       "ticker": "DOGE-USD",
       "priceExponent": -11.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -1203,10 +1185,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -1222,8 +1203,8 @@
       "id": 69,
       "ticker": "DOT-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -1270,10 +1251,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -1289,8 +1269,8 @@
       "id": 70,
       "ticker": "DYM-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -1324,10 +1304,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -1343,8 +1322,8 @@
       "id": 71,
       "ticker": "ENS-USD",
       "priceExponent": -8.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -1382,10 +1361,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -1401,8 +1379,8 @@
       "id": 72,
       "ticker": "EOS-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -1449,10 +1427,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -1468,8 +1445,8 @@
       "id": 73,
       "ticker": "ETC-USD",
       "priceExponent": -8.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -1516,10 +1493,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -1535,8 +1511,8 @@
       "id": 74,
       "ticker": "ETH-USD",
       "priceExponent": -6.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -1587,10 +1563,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -1606,8 +1581,8 @@
       "id": 75,
       "ticker": "FET-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -1644,10 +1619,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -1663,8 +1637,8 @@
       "id": 76,
       "ticker": "FIL-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -1711,10 +1685,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -1730,8 +1703,8 @@
       "id": 77,
       "ticker": "FTM-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -1769,10 +1742,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -1788,8 +1760,8 @@
       "id": 78,
       "ticker": "GALA-USD",
       "priceExponent": -11.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -1827,10 +1799,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -1846,8 +1817,8 @@
       "id": 79,
       "ticker": "GMT-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -1885,10 +1856,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -1904,8 +1874,8 @@
       "id": 80,
       "ticker": "GRT-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -1947,10 +1917,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -1966,8 +1935,8 @@
       "id": 81,
       "ticker": "HBAR-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -2005,10 +1974,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -2024,8 +1992,8 @@
       "id": 82,
       "ticker": "ICP-USD",
       "priceExponent": -8.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -2067,10 +2035,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -2086,8 +2053,8 @@
       "id": 83,
       "ticker": "IMX-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -2124,10 +2091,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -2143,8 +2109,8 @@
       "id": 84,
       "ticker": "INJ-USD",
       "priceExponent": -8.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -2186,10 +2152,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -2205,8 +2170,8 @@
       "id": 85,
       "ticker": "JTO-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -2244,10 +2209,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -2263,8 +2227,8 @@
       "id": 86,
       "ticker": "JUP-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -2298,10 +2262,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -2317,8 +2280,8 @@
       "id": 87,
       "ticker": "KAVA-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -2355,10 +2318,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -2374,8 +2336,8 @@
       "id": 88,
       "ticker": "LDO-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -2417,10 +2379,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -2436,8 +2397,8 @@
       "id": 89,
       "ticker": "LINK-USD",
       "priceExponent": -8.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -2488,10 +2449,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -2507,8 +2467,8 @@
       "id": 90,
       "ticker": "LTC-USD",
       "priceExponent": -8.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -2559,10 +2519,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -2578,8 +2537,8 @@
       "id": 91,
       "ticker": "MAGIC-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -2617,10 +2576,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -2636,8 +2594,8 @@
       "id": 92,
       "ticker": "MANA-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -2679,10 +2637,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -2698,8 +2655,8 @@
       "id": 93,
       "ticker": "MASK-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -2747,10 +2704,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -2766,8 +2722,8 @@
       "id": 94,
       "ticker": "MATIC-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -2818,10 +2774,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -2837,8 +2792,8 @@
       "id": 95,
       "ticker": "MINA-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -2875,10 +2830,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -2894,8 +2848,8 @@
       "id": 96,
       "ticker": "MKR-USD",
       "priceExponent": -6.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -2927,10 +2881,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -2946,8 +2899,8 @@
       "id": 97,
       "ticker": "NEAR-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -2989,10 +2942,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -3008,8 +2960,8 @@
       "id": 98,
       "ticker": "OP-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -3056,10 +3008,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -3075,8 +3026,8 @@
       "id": 99,
       "ticker": "ORDI-USD",
       "priceExponent": -8.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -3120,10 +3071,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -3139,8 +3089,8 @@
       "id": 100,
       "ticker": "PEPE-USD",
       "priceExponent": -15.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -3178,10 +3128,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -3197,8 +3146,8 @@
       "id": 101,
       "ticker": "PYTH-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -3237,10 +3186,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -3256,8 +3204,8 @@
       "id": 102,
       "ticker": "RNDR-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -3299,10 +3247,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -3318,8 +3265,8 @@
       "id": 103,
       "ticker": "RUNE-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -3352,10 +3299,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -3371,8 +3317,8 @@
       "id": 104,
       "ticker": "SAND-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -3414,10 +3360,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -3433,8 +3378,8 @@
       "id": 105,
       "ticker": "SEI-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -3476,10 +3421,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -3495,8 +3439,8 @@
       "id": 106,
       "ticker": "SHIB-USD",
       "priceExponent": -15.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -3543,10 +3487,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -3562,8 +3505,8 @@
       "id": 107,
       "ticker": "SNX-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -3605,10 +3548,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -3624,8 +3566,8 @@
       "id": 108,
       "ticker": "SOL-USD",
       "priceExponent": -7.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -3676,10 +3618,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -3695,8 +3636,8 @@
       "id": 109,
       "ticker": "STRK-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -3734,10 +3675,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -3753,8 +3693,8 @@
       "id": 110,
       "ticker": "STX-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -3801,10 +3741,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -3820,8 +3759,8 @@
       "id": 111,
       "ticker": "SUI-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -3868,10 +3807,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -3887,8 +3825,8 @@
       "id": 112,
       "ticker": "TIA-USD",
       "priceExponent": -8.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -3930,10 +3868,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -3949,8 +3886,8 @@
       "id": 113,
       "ticker": "TRX-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -3998,10 +3935,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -4017,8 +3953,8 @@
       "id": 114,
       "ticker": "UNI-USD",
       "priceExponent": -8.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -4060,10 +3996,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -4079,8 +4014,8 @@
       "id": 115,
       "ticker": "WLD-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -4119,10 +4054,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -4138,8 +4072,8 @@
       "id": 116,
       "ticker": "WOO-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -4173,10 +4107,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -4192,8 +4125,8 @@
       "id": 117,
       "ticker": "XLM-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -4239,10 +4172,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -4258,8 +4190,8 @@
       "id": 118,
       "ticker": "XRP-USD",
       "priceExponent": -10.0,
+      "minPriceChange": 2500,
       "minExchanges": 3,
-      "minPriceChangePpm": 2500,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
@@ -4310,10 +4242,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
@@ -4329,8 +4260,8 @@
       "id": 119,
       "ticker": "ZETA-USD",
       "priceExponent": -9.0,
+      "minPriceChange": 4000,
       "minExchanges": 3,
-      "minPriceChangePpm": 4000,
       "exchangeConfigJson": [
         {
           "exchangeName": "Bybit",
@@ -4368,10 +4299,9 @@
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
       "subticksPerTick": 1000000,
-      "quantum_conversion_exponent": -9,
       "delayBlocks": 3600
     },
-    "initial_deposit": {
+    "initialDeposit": {
       "denom": "adydx",
       "amount": "10000000000000000000000"
     },
