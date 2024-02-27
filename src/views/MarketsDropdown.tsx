@@ -8,9 +8,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, type MarketData } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
-import { usePerpetualMarketSparklines, useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks';
 import { useMarketsData } from '@/hooks/useMarketsData';
-import { SEVEN_DAY_SPARKLINE_ENTRIES } from '@/hooks/usePerpetualMarketSparklines';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
 import { popoverMixins } from '@/styles/popoverMixins';
@@ -39,7 +38,6 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
   const { filteredMarkets, marketFilters } = useMarketsData(filter, searchFilter);
   const navigate = useNavigate();
   const { hasPotentialMarketsData } = usePotentialMarkets();
-  const sparklineData = usePerpetualMarketSparklines();
 
   const columns = useMemo(
     () =>
@@ -48,16 +46,13 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
           columnKey: 'market',
           getCellValue: (row) => row.market,
           label: stringGetter({ key: STRING_KEYS.MARKET }),
-          renderCell: ({ assetId, id }) => (
+          renderCell: ({ assetId, id, isNew }) => (
             <Styled.MarketName isFavorited={false}>
               {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
               <AssetIcon symbol={assetId} />
               <h2>{id}</h2>
               <Tag>{assetId}</Tag>
-              {console.log(sparklineData?.[id])}
-              {sparklineData?.[id] && sparklineData[id].length < SEVEN_DAY_SPARKLINE_ENTRIES && (
-                <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>
-              )}
+              {isNew && <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>}
             </Styled.MarketName>
           ),
         },
@@ -116,7 +111,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
           ),
         },
       ] as ColumnDef<MarketData>[],
-    [stringGetter, !!sparklineData, selectedLocale]
+    [stringGetter, selectedLocale]
   );
 
   return (

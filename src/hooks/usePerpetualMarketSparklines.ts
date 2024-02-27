@@ -11,9 +11,10 @@ const POLLING_MS = timeUnits.hour;
 export const SEVEN_DAY_SPARKLINE_ENTRIES = 42;
 
 export const usePerpetualMarketSparklines = () => {
-  const { getPerpetualMarketSparklines } = useDydxClient();
+  const { getPerpetualMarketSparklines, compositeClient } = useDydxClient();
 
   const { data } = useQuery<PerpetualMarketSparklineResponse | undefined>({
+    enabled: !!compositeClient,
     queryKey: 'perpetualMarketSparklines',
     queryFn: () => {
       try {
