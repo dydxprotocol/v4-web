@@ -117,7 +117,7 @@ export const useChartLines = ({
     price?: number | null;
     size?: number | null;
   }) => {
-    const shouldShow = size && size !== 0 && price;
+    const shouldShow = size && price;
     const maybePositionLine = chartLinesRef.current[key]?.line;
 
     if (!shouldShow) {
