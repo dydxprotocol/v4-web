@@ -13,7 +13,7 @@ import { TOKEN_DECIMALS } from '@/constants/numbers';
 
 import {
   NUM_ORACLES_TO_QUALIFY_AS_SAFE,
-  type PotentialMarketItem,
+  type NewMarketProposal,
 } from '@/constants/potentialMarkets';
 
 import {
@@ -48,9 +48,9 @@ import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 
 type NewMarketSelectionStepProps = {
-  assetToAdd?: PotentialMarketItem;
+  assetToAdd?: NewMarketProposal & { baseAsset: string };
   clobPairId?: number;
-  setAssetToAdd: (assetToAdd?: PotentialMarketItem) => void;
+  setAssetToAdd: (assetToAdd?: NewMarketProposal & { baseAsset: string }) => void;
   onConfirmMarket: () => void;
   liquidityTier?: number;
   setLiquidityTier: (liquidityTier?: number) => void;
@@ -73,7 +73,7 @@ export const NewMarketSelectionStep = ({
   const { isMobile } = useBreakpoints();
   const marketIds = useSelector(getMarketIds, shallowEqual);
   const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
-  const { potentialMarkets, exchangeConfigs, liquidityTiers } = usePotentialMarkets();
+  const { potentialMarkets, liquidityTiers } = usePotentialMarkets();
   const stringGetter = useStringGetter();
   const { newMarketProposal } = useGovernanceVariables();
   const initialDepositAmountBN = MustBigNumber(newMarketProposal.initialDepositAmount).div(
@@ -104,19 +104,17 @@ export const NewMarketSelectionStep = ({
 
   useEffect(() => {
     if (assetToAdd) {
-      setTempLiquidityTier(assetToAdd.liquidityTier);
-      setLiquidityTier(assetToAdd.liquidityTier);
+      setTempLiquidityTier(assetToAdd.params.liquidityTier);
+      setLiquidityTier(assetToAdd.params.liquidityTier);
     }
   }, [assetToAdd]);
 
   const filteredPotentialMarkets = useMemo(() => {
     return potentialMarkets?.filter(
-      ({ baseAsset, numOracles }) =>
-        exchangeConfigs?.[baseAsset] !== undefined &&
-        Number(numOracles) >= NUM_ORACLES_TO_QUALIFY_AS_SAFE &&
-        !marketIds.includes(`${baseAsset}-USD`)
+      ({ params: { ticker, exchangeConfigJson } }) =>
+        exchangeConfigJson.length >= NUM_ORACLES_TO_QUALIFY_AS_SAFE && !marketIds.includes(ticker)
     );
-  }, [exchangeConfigs, potentialMarkets, marketIds]);
+  }, [potentialMarkets, marketIds]);
 
   return (
     <Styled.Form
@@ -148,21 +146,23 @@ export const NewMarketSelectionStep = ({
             group: 'markets',
             groupLabel: stringGetter({ key: STRING_KEYS.MARKETS }),
             items:
-              filteredPotentialMarkets?.map((potentialMarket: PotentialMarketItem) => ({
-                value: potentialMarket.baseAsset,
-                label: potentialMarket?.assetName ?? potentialMarket.baseAsset,
-                tag: `${potentialMarket.baseAsset}-USD`,
-                onSelect: () => {
-                  setAssetToAdd(potentialMarket);
-                },
-              })) ?? [],
+              filteredPotentialMarkets?.map(
+                (potentialMarket: NewMarketProposal & { baseAsset: string }) => ({
+                  value: potentialMarket.baseAsset,
+                  label: potentialMarket.meta.assetName,
+                  tag: potentialMarket.params.ticker,
+                  onSelect: () => {
+                    setAssetToAdd(potentialMarket);
+                  },
+                })
+              ) ?? [],
           },
         ]}
         label={stringGetter({ key: STRING_KEYS.MARKETS })}
       >
         {assetToAdd ? (
           <Styled.SelectedAsset>
-            {assetToAdd?.assetName ?? assetToAdd.baseAsset} <Tag>{assetToAdd?.baseAsset}-USD</Tag>
+            {assetToAdd.meta.assetName} <Tag>{assetToAdd.params.ticker}</Tag>
           </Styled.SelectedAsset>
         ) : (
           `${stringGetter({ key: STRING_KEYS.EG })} "BTC-USD"`
@@ -175,7 +175,7 @@ export const NewMarketSelectionStep = ({
             <Styled.Root value={tempLiquidityTier} onValueChange={setTempLiquidityTier}>
               <Styled.Header>
                 {stringGetter({ key: STRING_KEYS.LIQUIDITY_TIER })}
-                <Styled.ButtonRow>
+                {/* <Styled.ButtonRow>
                   <Button
                     shape={ButtonShape.Pill}
                     onClick={() => {
@@ -206,7 +206,7 @@ export const NewMarketSelectionStep = ({
                       {stringGetter({ key: STRING_KEYS.SAVE })}
                     </Button>
                   )}
-                </Styled.ButtonRow>
+                </Styled.ButtonRow> */}
               </Styled.Header>
 
               {Object.keys(liquidityTiers).map((tier) => {
@@ -221,7 +221,7 @@ export const NewMarketSelectionStep = ({
                   >
                     <Styled.Header style={{ marginLeft: '1rem' }}>
                       {label}
-                      {Number(tier) === assetToAdd?.liquidityTier && (
+                      {Number(tier) === assetToAdd?.params.liquidityTier && (
                         <Tag style={{ marginLeft: '0.5ch' }}>
                           ✨ {stringGetter({ key: STRING_KEYS.RECOMMENDED })}
                         </Tag>
@@ -285,7 +285,7 @@ export const NewMarketSelectionStep = ({
                 value: (
                   <Output
                     type={OutputType.Fiat}
-                    value={assetToAdd.referencePrice}
+                    value={assetToAdd.meta?.referencePrice}
                     fractionDigits={tickSizeDecimals}
                   />
                 ),
@@ -433,6 +433,10 @@ Styled.LiquidityTierRadioButton = styled(Item)<{ selected?: boolean }>`
   border: 1px solid var(--color-layer-6);
   padding: 1rem 0;
   font: var(--font-mini-book);
+
+  &:disabled {
+    cursor: default;
+  }
 
   ${({ selected }) => selected && 'background-color: var(--color-layer-2)'}
 `;

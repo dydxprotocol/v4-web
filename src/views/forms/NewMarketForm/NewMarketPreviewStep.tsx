@@ -11,7 +11,7 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
-import type { PotentialMarketItem } from '@/constants/potentialMarkets';
+import type { NewMarketProposal } from '@/constants/potentialMarkets';
 
 import {
   useAccountBalance,
@@ -43,7 +43,7 @@ import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 
 type NewMarketPreviewStepProps = {
-  assetData: PotentialMarketItem;
+  assetData: NewMarketProposal & { baseAsset: string };
   clobPairId: number;
   liquidityTier: number;
   onBack: () => void;
@@ -64,7 +64,7 @@ export const NewMarketPreviewStep = ({
   const stringGetter = useStringGetter();
   const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
   const [errorMessage, setErrorMessage] = useState();
-  const { exchangeConfigs, liquidityTiers } = usePotentialMarkets();
+  const { liquidityTiers } = usePotentialMarkets();
   const { submitNewMarketProposal } = useSubaccount();
   const { newMarketProposal } = useGovernanceVariables();
   const { newMarketProposalLearnMore } = useURLConfigs();
@@ -78,7 +78,18 @@ export const NewMarketPreviewStep = ({
   const { label, initialMarginFraction, maintenanceMarginFraction, impactNotional } =
     liquidityTiers[liquidityTier as unknown as keyof typeof liquidityTiers];
 
-  const ticker = `${assetData.baseAsset}-USD`;
+  const { params, meta } = assetData ?? {};
+  const {
+    ticker,
+    priceExponent,
+    minExchanges,
+    minPriceChangePpm,
+    exchangeConfigJson,
+    atomicResolution,
+    quantumConversionExponent,
+    stepBaseQuantums,
+    subticksPerTick,
+  } = params ?? {};
 
   const alertMessage = useMemo(() => {
     if (errorMessage) {
@@ -126,17 +137,17 @@ export const NewMarketPreviewStep = ({
             const tx = await submitNewMarketProposal({
               id: clobPairId,
               ticker,
-              priceExponent: assetData.priceExponent,
-              minPriceChange: assetData.minPriceChangePpm,
-              minExchanges: assetData.minExchanges,
+              priceExponent: priceExponent,
+              minPriceChange: minPriceChangePpm,
+              minExchanges: minExchanges,
               exchangeConfigJson: JSON.stringify({
-                exchanges: exchangeConfigs?.[assetData.baseAsset],
+                exchanges: exchangeConfigJson,
               }),
-              atomicResolution: assetData.atomicResolution,
+              atomicResolution: atomicResolution,
               liquidityTier: liquidityTier,
-              quantumConversionExponent: assetData.quantumConversionExponent,
-              stepBaseQuantums: Long.fromNumber(assetData.stepBaseQuantum),
-              subticksPerTick: assetData.subticksPerTick,
+              quantumConversionExponent: quantumConversionExponent,
+              stepBaseQuantums: Long.fromNumber(stepBaseQuantums),
+              subticksPerTick: subticksPerTick,
               delayBlocks: newMarketProposal.delayBlocks,
             });
 
@@ -225,7 +236,7 @@ export const NewMarketPreviewStep = ({
             value: (
               <Output
                 type={OutputType.Fiat}
-                value={assetData.referencePrice}
+                value={meta.referencePrice}
                 fractionDigits={tickSizeDecimals}
               />
             ),
@@ -312,20 +323,22 @@ export const NewMarketPreviewStep = ({
             : stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TERMS })}
         </Button>
       </Styled.ButtonRow>
-      <Styled.Disclaimer>
-        {stringGetter({
-          key: STRING_KEYS.PROPOSAL_DISCLAIMER_1,
-          params: {
-            NUM_TOKENS_REQUIRED: initialDepositAmount,
-            NATIVE_TOKEN_DENOM: chainTokenLabel,
-            HERE: (
-              <Styled.Link href={newMarketProposalLearnMore}>
-                {stringGetter({ key: STRING_KEYS.HERE })}
-              </Styled.Link>
-            ),
-          },
-        })}
-      </Styled.Disclaimer>
+      <Styled.DisclaimerContainer>
+        <Styled.Disclaimer>
+          {stringGetter({
+            key: STRING_KEYS.PROPOSAL_DISCLAIMER_1,
+            params: {
+              NUM_TOKENS_REQUIRED: initialDepositAmount,
+              NATIVE_TOKEN_DENOM: chainTokenLabel,
+              HERE: (
+                <Styled.Link href={newMarketProposalLearnMore}>
+                  {stringGetter({ key: STRING_KEYS.HERE })}
+                </Styled.Link>
+              ),
+            },
+          })}
+        </Styled.Disclaimer>
+      </Styled.DisclaimerContainer>
     </Styled.Form>
   );
 };
@@ -383,8 +396,13 @@ Styled.CheckboxContainer = styled.div`
   align-items: center;
 `;
 
+Styled.DisclaimerContainer = styled.div`
+  min-width: 100%;
+  width: min-content;
+`;
+
 Styled.Disclaimer = styled.div<{ textAlign?: string }>`
-  font: var(--font-small);
+  font: var(--font-small-book);
   color: var(--color-text-0);
   text-align: center;
   margin-left: 0.5ch;

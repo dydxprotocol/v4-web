@@ -4,9 +4,8 @@ import { utils } from '@dydxprotocol/v4-client-js';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
-import { PotentialMarketItem } from '@/constants/potentialMarkets';
+import { NewMarketProposal } from '@/constants/potentialMarkets';
 import { useGovernanceVariables, useStringGetter, useTokenConfigs } from '@/hooks';
-import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';
@@ -20,7 +19,7 @@ import { MustBigNumber } from '@/lib/numbers';
 type ElementProps = {
   preventClose?: boolean;
   setIsOpen?: (open: boolean) => void;
-  assetData?: PotentialMarketItem;
+  assetData: NewMarketProposal & { baseAsset: string };
   clobPairId?: number;
   liquidityTier?: string;
 };
@@ -41,18 +40,25 @@ export const NewMarketMessageDetailsDialog = ({
   setIsOpen,
 }: ElementProps) => {
   const [codeToggleGroup, setCodeToggleGroup] = useState(CodeToggleGroup.CREATE_ORACLE);
-  const { exchangeConfigs } = usePotentialMarkets();
-  const { baseAsset } = assetData ?? {};
+  const { baseAsset, params, title } = assetData ?? {};
+  const {
+    ticker,
+    exchangeConfigJson,
+    minExchanges,
+    minPriceChangePpm,
+    atomicResolution,
+    quantumConversionExponent,
+    stepBaseQuantums,
+    subticksPerTick,
+  } = params ?? {};
   const { newMarketProposal } = useGovernanceVariables();
   const stringGetter = useStringGetter();
   const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
   const initialDepositAmountDecimals = isMainnet ? 0 : chainTokenDecimals;
 
   const exchangeConfig = useMemo(() => {
-    return baseAsset ? exchangeConfigs?.[baseAsset] : undefined;
+    return baseAsset ? exchangeConfigJson : undefined;
   }, [baseAsset]);
-
-  const ticker = useMemo(() => `${baseAsset}-USD`, [baseAsset]);
 
   const toggleGroupItems: Parameters<typeof ToggleGroup>[0]['items'] = useMemo(() => {
     return [
@@ -112,12 +118,12 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'min-exchanges',
                       label: 'min_exchanges',
-                      value: `${assetData?.minExchanges}`,
+                      value: `${minExchanges}`,
                     },
                     {
                       key: 'min-price-change-ppm',
                       label: 'min_price_change_ppm',
-                      value: `${assetData?.minPriceChangePpm}`,
+                      value: `${minPriceChangePpm}`,
                     },
                   ]}
                 />
@@ -168,7 +174,7 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'atomic_resolution',
                       label: 'atomic_resolution',
-                      value: `${assetData?.atomicResolution}`,
+                      value: `${atomicResolution}`,
                     },
                     {
                       key: 'default_funding_ppm',
@@ -202,17 +208,17 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'quantum_conversion_exponent',
                       label: 'quantum_conversion_exponent',
-                      value: `${assetData?.quantumConversionExponent}`,
+                      value: `${quantumConversionExponent}`,
                     },
                     {
                       key: 'step_base_quantums',
                       label: 'step_base_quantums',
-                      value: `${assetData?.stepBaseQuantum}`,
+                      value: `${stepBaseQuantums}`,
                     },
                     {
                       key: 'subticks_per_tick',
                       label: 'subticks_per_tick',
-                      value: `${assetData?.subticksPerTick}`,
+                      value: `${subticksPerTick}`,
                     },
                     {
                       key: 'status',
@@ -258,17 +264,17 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'quantum_conversion_exponent',
                       label: 'quantum_conversion_exponent',
-                      value: `${assetData?.quantumConversionExponent}`,
+                      value: `${quantumConversionExponent}`,
                     },
                     {
                       key: 'step_base_quantums',
                       label: 'step_base_quantums',
-                      value: `${assetData?.stepBaseQuantum}`,
+                      value: `${stepBaseQuantums}`,
                     },
                     {
                       key: 'subticks_per_tick',
                       label: 'subticks_per_tick',
-                      value: `${assetData?.subticksPerTick}`,
+                      value: `${subticksPerTick}`,
                     },
                     {
                       key: 'status',
@@ -282,7 +288,7 @@ export const NewMarketMessageDetailsDialog = ({
             [CodeToggleGroup.MSG_SUBMIT_PROPOSAL]: (
               <Styled.Code>
                 <Styled.Text0>title: </Styled.Text0>
-                <Styled.Description>{utils.getGovAddNewMarketTitle(ticker)}</Styled.Description>
+                <Styled.Description>{title}</Styled.Description>
 
                 <Styled.Text0>initial_deposit_amount:</Styled.Text0>
                 <Styled.Description>

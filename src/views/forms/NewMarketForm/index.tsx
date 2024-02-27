@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { TOKEN_DECIMALS } from '@/constants/numbers';
-import { type PotentialMarketItem } from '@/constants/potentialMarkets';
+import { type NewMarketProposal } from '@/constants/potentialMarkets';
 import { useNextClobPairId, useURLConfigs } from '@/hooks';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
@@ -20,7 +20,7 @@ enum NewMarketFormStep {
 
 export const NewMarketForm = () => {
   const [step, setStep] = useState(NewMarketFormStep.SELECTION);
-  const [assetToAdd, setAssetToAdd] = useState<PotentialMarketItem>();
+  const [assetToAdd, setAssetToAdd] = useState<NewMarketProposal & { baseAsset: string }>();
   const [liquidityTier, setLiquidityTier] = useState<number>();
   const [proposalTxHash, setProposalTxHash] = useState<string>();
   const { mintscan: mintscanTxUrl } = useURLConfigs();
@@ -30,7 +30,7 @@ export const NewMarketForm = () => {
 
   const tickSizeDecimals = useMemo(() => {
     if (!assetToAdd) return TOKEN_DECIMALS;
-    const p = Math.floor(Math.log(Number(assetToAdd.referencePrice)));
+    const p = Math.floor(Math.log(Number(assetToAdd.meta.referencePrice)));
     return Math.abs(p - 3);
   }, [assetToAdd]);
 

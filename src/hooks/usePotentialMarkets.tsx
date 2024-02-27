@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import { STRING_KEYS } from '@/constants/localization';
-import type { ExchangeConfigItem, PotentialMarketItem } from '@/constants/potentialMarkets';
+import type { NewMarketProposal } from '@/constants/potentialMarkets';
 
 import { log } from '@/lib/telemetry';
 
@@ -9,7 +9,6 @@ import { useStringGetter } from './useStringGetter';
 
 const PotentialMarketsContext = createContext<ReturnType<typeof usePotentialMarketsContext>>({
   potentialMarkets: undefined,
-  exchangeConfigs: undefined,
   hasPotentialMarketsData: false,
   liquidityTiers: {
     0: {
@@ -47,36 +46,27 @@ export const PotentialMarketsProvider = ({ ...props }) => (
 
 export const usePotentialMarkets = () => useContext(PotentialMarketsContext);
 
-
-const EXCHANGE_CONFIG_FILE_PATH = '/configs/otherMarketExchangeConfig.json';
-const POTENTIAL_MARKETS_FILE_PATH = '/configs/otherMarketParameters.json';
+const POTENTIAL_MARKETS_FILE_PATH = '/configs/otherMarketData.json';
 
 export const usePotentialMarketsContext = () => {
   const stringGetter = useStringGetter();
-  const [potentialMarkets, setPotentialMarkets] = useState<PotentialMarketItem[]>();
-  const [exchangeConfigs, setExchangeConfigs] = useState<Record<string, ExchangeConfigItem[]>>();
+  const [potentialMarkets, setPotentialMarkets] =
+    useState<(NewMarketProposal & { baseAsset: string })[]>();
 
   useEffect(() => {
     try {
       fetch(POTENTIAL_MARKETS_FILE_PATH)
         .then((response) => response.json())
-        .then((data) => {
-          setPotentialMarkets(data as PotentialMarketItem[]);
+        .then((data: Record<string, NewMarketProposal>) => {
+          const potentialMarkets = Object.entries(data).map(([key, value]) => ({
+            ...value,
+            baseAsset: key,
+          }));
+          setPotentialMarkets(potentialMarkets);
         });
     } catch (error) {
       log('usePotentialMarkets/potentialMarkets', error);
       setPotentialMarkets(undefined);
-    }
-
-    try {
-      fetch(EXCHANGE_CONFIG_FILE_PATH)
-        .then((response) => response.json())
-        .then((data) => {
-          setExchangeConfigs(data as Record<string, ExchangeConfigItem[]>);
-        });
-    } catch (error) {
-      log('usePotentialMarkets/exchangeConfigs', error);
-      setExchangeConfigs(undefined);
     }
   }, []);
 
@@ -112,8 +102,7 @@ export const usePotentialMarketsContext = () => {
 
   return {
     potentialMarkets,
-    exchangeConfigs,
-    hasPotentialMarketsData: Boolean(potentialMarkets && exchangeConfigs),
+    hasPotentialMarketsData: Boolean(potentialMarkets),
     liquidityTiers,
   };
 };
