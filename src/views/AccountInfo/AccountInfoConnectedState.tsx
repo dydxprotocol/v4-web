@@ -2,9 +2,10 @@ import styled, { type AnyStyledComponent, css } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import type { Nullable, TradeState } from '@/constants/abacus';
-import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { DydxChainAsset } from '@/constants/wallets';
 
 import { useAccounts, useBreakpoints, useStringGetter } from '@/hooks';
 
@@ -14,6 +15,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 import { MarginUsageRing } from '@/components/MarginUsageRing';
 import { Output, OutputType } from '@/components/Output';
 import { UsageBars } from '@/components/UsageBars';
@@ -91,6 +93,12 @@ export const AccountInfoConnectedState = () => {
             >
               {stringGetter({ key: STRING_KEYS.DEPOSIT })}
             </Styled.Button>
+            <Styled.IconButton
+              action={ButtonAction.Base}
+              shape={ButtonShape.Square}
+              iconName={IconName.Send}
+              onClick={() => dispatch(openDialog({ type: DialogTypes.Transfer, dialogProps: {selectedAsset: DydxChainAsset.USDC} }))}
+            />
           </Styled.TransferButtons>
         </Styled.Header>
       )}
@@ -315,4 +323,9 @@ Styled.Button = styled(Button)`
     width: 1.25em;
     height: 1.25em;
   }
+`;
+
+Styled.IconButton = styled(IconButton)`
+  --button-padding: 0 0.25rem;
+  --button-border: solid var(--border-width) var(--color-layer-6);
 `;
