@@ -326,13 +326,7 @@ Styled.Button = styled(Button)`
   }
 `;
 
-Styled.IconButton = styled(IconButton)<{ iconName: IconName }>`
+Styled.IconButton = styled(IconButton)`
   --button-padding: 0 0.25rem;
   --button-border: solid var(--border-width) var(--color-layer-6);
-
-  ${({ iconName }) =>
-    [IconName.Withdraw, IconName.Deposit].includes(iconName) &&
-    css`
-      --button-icon-size: 1.375em;
-    `}
 `;
