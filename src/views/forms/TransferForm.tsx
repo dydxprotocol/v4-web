@@ -20,6 +20,7 @@ import {
   useStringGetter,
   useSubaccount,
   useTokenConfigs,
+  useWithdrawalInfo,
 } from '@/hooks';
 
 import { formMixins } from '@/styles/formMixins';
@@ -64,6 +65,7 @@ export const TransferForm = ({
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
   const selectedDydxChainId = useSelector(getSelectedDydxChainId);
   const { tokensConfigs, usdcLabel, chainTokenLabel } = useTokenConfigs();
+  useWithdrawalInfo({ transferType: 'transfer' });
 
   const {
     address: recipientAddress,

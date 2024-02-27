@@ -7,6 +7,7 @@ import { useDebounce } from './useDebounce';
 import { useInterval } from './useInterval';
 import { useDocumentTitle } from './useDocumentTitle';
 import { useDydxClient } from './useDydxClient';
+import { useEnvFeatures } from './useEnvFeatures';
 import { useGovernanceVariables } from './useGovernanceVariables';
 import { useAccountBalance } from './useAccountBalance';
 import { useAccounts } from './useAccounts';
@@ -27,6 +28,7 @@ import { useStringGetter } from './useStringGetter';
 import { useSubaccount } from './useSubaccount';
 import { useTradeFormInputs } from './useTradeFormInputs';
 import { useURLConfigs } from './useURLConfigs';
+import { useWithdrawalInfo } from './useWithdrawalInfo';
 
 export {
   useApiState,
@@ -37,6 +39,7 @@ export {
   useDebounce,
   useDocumentTitle,
   useDydxClient,
+  useEnvFeatures,
   useGovernanceVariables,
   useAccountBalance,
   useAccounts,
@@ -58,4 +61,5 @@ export {
   useSubaccount,
   useTradeFormInputs,
   useURLConfigs,
+  useWithdrawalInfo,
 };

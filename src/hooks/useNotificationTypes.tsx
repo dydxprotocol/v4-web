@@ -245,39 +245,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const currentDate = new Date();
 
       useEffect(() => {
-        trigger(
-          ReleaseUpdateNotificationIds.RewardsAndFullTradingLive,
-          {
-            icon: <AssetIcon symbol={chainTokenLabel} />,
-            title: stringGetter({ key: 'NOTIFICATIONS.RELEASE_REWARDS_AND_FULL_TRADING.TITLE' }),
-            body: stringGetter({
-              key: 'NOTIFICATIONS.RELEASE_REWARDS_AND_FULL_TRADING.BODY',
-              params: {
-                DOS_BLOGPOST: (
-                  <$Link
-                    href="https://www.dydxopsdao.com/blog/deep-dive-full-trading"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {stringGetter({ key: STRING_KEYS.HERE })}
-                  </$Link>
-                ),
-                TRADING_BLOGPOST: (
-                  <$Link
-                    href="https://dydx.exchange/blog/v4-full-trading"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {stringGetter({ key: STRING_KEYS.HERE })}
-                  </$Link>
-                ),
-              },
-            }),
-            toastSensitivity: 'foreground',
-            groupKey: ReleaseUpdateNotificationIds.RewardsAndFullTradingLive,
-          },
-          []
-        );
         if (currentDate <= expirationDate) {
           trigger(
             ReleaseUpdateNotificationIds.IncentivesS3,

@@ -144,7 +144,6 @@ export type TransferNotifcation = {
 };
 
 export enum ReleaseUpdateNotificationIds {
-  RewardsAndFullTradingLive = 'rewards-and-full-trading-live',
   IncentivesS3 = 'incentives-s3',
 }
 

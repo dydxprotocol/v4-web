@@ -261,6 +261,17 @@ const useDydxClientContext = () => {
     [compositeClient]
   );
 
+  const getWithdrawalAndTransferGatingStatus = useCallback(async () => {
+    return await compositeClient?.validatorClient.get.GetWithdrawalAndTransferGatingStatus();
+  }, [compositeClient]);
+
+  const getWithdrawalCapacityByDenom = useCallback(
+    async ({ denom }: { denom: string }) => {
+      return await compositeClient?.validatorClient.get.getWithdrawalCapacityByDenom(denom);
+    },
+    [compositeClient]
+  );
+
   return {
     // Client initialization
     connect: setNetworkConfig,
@@ -278,5 +289,7 @@ const useDydxClientContext = () => {
     getCandlesForDatafeed,
     getPerpetualMarketSparklines,
     screenAddresses,
+    getWithdrawalAndTransferGatingStatus,
+    getWithdrawalCapacityByDenom,
   };
 };

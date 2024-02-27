@@ -27,6 +27,7 @@ export interface LinksConfigs {
   strideZoneApp?: string;
   accountExportLearnMore?: string;
   walletLearnMore?: string;
+  withdrawalGateLearnMore?: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {
@@ -54,5 +55,6 @@ export const useURLConfigs = (): LinksConfigs => {
     strideZoneApp: linksConfigs.strideZoneApp || FALLBACK_URL,
     accountExportLearnMore: linksConfigs.accountExportLearnMore || FALLBACK_URL,
     walletLearnMore: linksConfigs.walletLearnMore || FALLBACK_URL,
+    withdrawalGateLearnMore: linksConfigs.withdrawalGateLearnMore || FALLBACK_URL,
   };
 };
