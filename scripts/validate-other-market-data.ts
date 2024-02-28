@@ -10,6 +10,7 @@ const LocalWalletModule = await import('@dydxprotocol/v4-client-js/src/clients/m
 const LocalWallet = LocalWalletModule.default;
 import {
   CompositeClient,
+  GovAddNewMarketParams,
   LocalWallet as LocalWalletType,
   Network,
   ProposalStatus,
@@ -313,19 +314,24 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   }));
 
   // Send proposals (unless a market with that ticker already exists).
-  const allClobPairs = await client.validatorClient.get.getAllClobPairs();
-  // allClobPairs.clobPair[0].
-  let marketId = allClobPairs.clobPair.reduce((max, clobPair) => clobPair.id > max ? clobPair.id : max, 0);
+  const allPerps = await client.validatorClient.get.getAllPerpetuals();
+  const allTickers = allPerps.perpetual.map((perp) => perp.params!.ticker);
+  let marketId = allPerps.perpetual.reduce((max, perp) => perp.params!.id > max ? perp.params!.id : max, 0);
   let proposalId: Long = Long.fromInt(0);
   const marketsProposed = new Map<number, Proposal>();
   for (const proposal of proposals) {
+    if (allTickers.includes(proposal.params.ticker)) {
+      console.log(`Market with ticker ${proposal.params.ticker} already exists. Skipping proposal...`);
+      continue;
+    }
+
     // Increment marketId and proposalId.
     marketId++;
     proposalId = proposalId.add(1);
 
     // Send proposal.
     const exchangeConfigString = `{"exchanges":${JSON.stringify(proposal.params.exchangeConfigJson)}}`;
-    const tx = await client.submitGovAddNewMarketProposal(
+    const tx = await retry(() => client.submitGovAddNewMarketProposal(
       wallets[0],
       {
         id: marketId,
@@ -344,22 +350,22 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
       proposal.title,
       proposal.summary,
       MIN_DEPOSIT,
-    )
+    ));
     console.log(`Tx to add market ${marketId} with ticker ${proposal.params.ticker}`, tx);
 
     // Record proposed market.
     marketsProposed.set(marketId, proposal);
     
-    // Wait 15 seconds for proposal to be processed.
-    await sleep(15000);
+    // Wait 10 seconds for proposal to be processed.
+    await sleep(10000);
 
     // Vote YES on proposal.
     for (const wallet of wallets) {
-      await voteOnProposal(proposalId, client, wallet);
+      retry(() => voteOnProposal(proposalId, client, wallet));
     }
 
-    // Wait 15 seconds for votes to be processed.
-    await sleep(15000);
+    // Wait 10 seconds for votes to be processed.
+    await sleep(10000);
   }
 
   // Wait for voting period to end.
@@ -380,23 +386,22 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   await sleep(15 * 1000);
 
   // Check markets on chain.
-  console.log("\nChecking markets on chain...");
+  console.log("\nChecking price, clob pair, and perpetual on chain for each market proposed...");
   for (const [marketId, proposal] of marketsProposed.entries()) {
     // Validate price.
     const price = await client.validatorClient.get.getPrice(marketId);
-    console.log(`Price ${marketId}`, price);
     validatePrice(price.marketPrice!, proposal);
 
     // Validate clob pair.
     const clobPair = await client.validatorClient.get.getClobPair(marketId);
-    console.log(`ClobPair ${marketId}`, clobPair);
     validateClobPair(clobPair.clobPair!, proposal);
 
     // Validate perpetual.
     const perpetual = await client.validatorClient.get.getPerpetual(marketId);
-    console.log(`Perpetual ${marketId}`, perpetual);
     validatePerpetual(perpetual.perpetual!, proposal);
   }
+
+  console.log(`\nValidated ${marketsProposed.size} proposals against localnet`);
 }
 
 function validatePrice(price: MarketPrice, proposal: Proposal): void {
@@ -427,10 +432,6 @@ function validatePerpetual(perpetual: Perpetual, proposal: Proposal): void {
   if (perpetual.params!.liquidityTier !== proposal.params.liquidityTier) {
     throw new Error(`Liquidity tier mismatch for perpetual ${perpetual.params!.id}`);
   }
-}
-
-async function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function validateParamsSchema(proposal: Proposal): void {
@@ -485,6 +486,27 @@ function validateParamsSchema(proposal: Proposal): void {
   if (validateParams.errors) {
     console.error(validateParams.errors);
     throw new Error(`Json schema validation failed for proposal ${proposal.params.ticker}`);
+  }
+}
+
+async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function retry<T>(
+  fn: () => Promise<T>,
+  retries: number = 5,
+  delay: number = 2000,
+): Promise<T> {
+  try {
+    return await fn();
+  } catch (error) {
+    console.error(`Function ${fn.name} failed: ${error}. Retrying in ${delay}ms...`);
+    if (retries <= 0) {
+      throw error;
+    }
+    await sleep(delay);
+    return retry(fn, retries - 1, delay);
   }
 }
 
