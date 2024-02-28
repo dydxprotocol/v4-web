@@ -20,7 +20,7 @@ enum NewMarketFormStep {
 
 export const NewMarketForm = () => {
   const [step, setStep] = useState(NewMarketFormStep.SELECTION);
-  const [assetToAdd, setAssetToAdd] = useState<NewMarketProposal & { baseAsset: string }>();
+  const [assetToAdd, setAssetToAdd] = useState<NewMarketProposal>();
   const [liquidityTier, setLiquidityTier] = useState<number>();
   const [proposalTxHash, setProposalTxHash] = useState<string>();
   const { mintscan: mintscanTxUrl } = useURLConfigs();

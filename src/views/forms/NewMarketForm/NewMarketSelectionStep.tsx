@@ -47,9 +47,9 @@ import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 
 type NewMarketSelectionStepProps = {
-  assetToAdd?: NewMarketProposal & { baseAsset: string };
+  assetToAdd?: NewMarketProposal;
   clobPairId?: number;
-  setAssetToAdd: (assetToAdd?: NewMarketProposal & { baseAsset: string }) => void;
+  setAssetToAdd: (assetToAdd?: NewMarketProposal) => void;
   onConfirmMarket: () => void;
   liquidityTier?: number;
   setLiquidityTier: (liquidityTier?: number) => void;
@@ -141,19 +141,17 @@ export const NewMarketSelectionStep = ({
             group: 'markets',
             groupLabel: stringGetter({ key: STRING_KEYS.MARKETS }),
             items:
-              filteredPotentialMarkets?.map(
-                (potentialMarket: NewMarketProposal & { baseAsset: string }) => ({
-                  value: potentialMarket.baseAsset,
-                  label: potentialMarket.meta.assetName,
-                  tag: potentialMarket.params.ticker,
-                  slotAfter: tickersFromProposals.has(potentialMarket.params.ticker) && (
-                    <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.VOTING_LIVE })}</Tag>
-                  ),
-                  onSelect: () => {
-                    setAssetToAdd(potentialMarket);
-                  },
-                })
-              ) ?? [],
+              filteredPotentialMarkets?.map((potentialMarket: NewMarketProposal) => ({
+                value: potentialMarket.baseAsset,
+                label: potentialMarket.meta.assetName,
+                tag: potentialMarket.params.ticker,
+                slotAfter: tickersFromProposals.has(potentialMarket.params.ticker) && (
+                  <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.VOTING_LIVE })}</Tag>
+                ),
+                onSelect: () => {
+                  setAssetToAdd(potentialMarket);
+                },
+              })) ?? [],
           },
         ]}
         label={stringGetter({ key: STRING_KEYS.MARKETS })}

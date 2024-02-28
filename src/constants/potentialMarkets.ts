@@ -32,6 +32,7 @@ export type NewMarketProposal = {
     denom: string;
     amount: string;
   };
+  baseAsset: string;
 };
 
 export const NUM_ORACLES_TO_QUALIFY_AS_SAFE = 6;

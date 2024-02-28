@@ -19,7 +19,7 @@ import { MustBigNumber } from '@/lib/numbers';
 type ElementProps = {
   preventClose?: boolean;
   setIsOpen?: (open: boolean) => void;
-  assetData: NewMarketProposal & { baseAsset: string };
+  assetData: NewMarketProposal;
   clobPairId?: number;
   liquidityTier?: string;
 };

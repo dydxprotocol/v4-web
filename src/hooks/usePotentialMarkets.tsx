@@ -50,14 +50,13 @@ const POTENTIAL_MARKETS_FILE_PATH = '/configs/otherMarketData.json';
 
 export const usePotentialMarketsContext = () => {
   const stringGetter = useStringGetter();
-  const [potentialMarkets, setPotentialMarkets] =
-    useState<(NewMarketProposal & { baseAsset: string })[]>();
+  const [potentialMarkets, setPotentialMarkets] = useState<NewMarketProposal[]>();
 
   useEffect(() => {
     try {
       fetch(POTENTIAL_MARKETS_FILE_PATH)
         .then((response) => response.json())
-        .then((data: Record<string, NewMarketProposal>) => {
+        .then((data: Record<string, Omit<NewMarketProposal, 'baseAsset'>>) => {
           const potentialMarkets = Object.entries(data).map(([key, value]) => ({
             ...value,
             baseAsset: key,

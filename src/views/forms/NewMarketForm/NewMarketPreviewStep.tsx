@@ -43,7 +43,7 @@ import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 
 type NewMarketPreviewStepProps = {
-  assetData: NewMarketProposal & { baseAsset: string };
+  assetData: NewMarketProposal;
   clobPairId: number;
   liquidityTier: number;
   onBack: () => void;
