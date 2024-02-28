@@ -31,9 +31,6 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: 1.21
-      
-      - name: Install ts-node
-        run: pnpm add ts-node --save-dev
 
       - name: Checkout v4-chain repo
         uses: actions/checkout@v3
