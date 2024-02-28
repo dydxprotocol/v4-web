@@ -427,6 +427,7 @@ Styled.ButtonRow = styled.div`
 
 Styled.Button = styled(Button)`
   --button-padding: 0;
+  --button-height: auto;
 `;
 
 Styled.Link = styled(Link)`

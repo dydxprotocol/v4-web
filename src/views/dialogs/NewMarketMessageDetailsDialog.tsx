@@ -127,28 +127,32 @@ export const NewMarketMessageDetailsDialog = ({
                     },
                   ]}
                 />
-                <Styled.Text0>
-                  exchange_config_json{' '}
-                  {exchangeConfig && <Tag type={TagType.Number}>{exchangeConfig.length}</Tag>}
-                </Styled.Text0>
-                {'['}
-                {exchangeConfig?.map((exchange) => {
-                  return (
-                    <Styled.ExchangeObject
-                      key={exchange.exchangeName}
-                      style={{ padding: 0, margin: 0, paddingLeft: '0.5rem' }}
-                    >
-                      {'{'}
-                      {Object.keys(exchange).map((key) => (
-                        <Styled.Line key={key}>
-                          {key}: <span>{exchange[key as keyof typeof exchange]}</span>
-                        </Styled.Line>
-                      ))}
-                      {'},'}
-                    </Styled.ExchangeObject>
-                  );
-                })}
-                {']'}
+                <Styled.ExchangeConfigs>
+                  <Styled.Text0>
+                    exchange_config_json
+                    {exchangeConfig && (
+                      <Styled.Tag type={TagType.Number}>{exchangeConfig.length}</Styled.Tag>
+                    )}
+                  </Styled.Text0>
+                  {'['}
+                  {exchangeConfig?.map((exchange) => {
+                    return (
+                      <Styled.ExchangeObject
+                        key={exchange.exchangeName}
+                        style={{ padding: 0, margin: 0, paddingLeft: '0.5rem' }}
+                      >
+                        {'{'}
+                        {Object.keys(exchange).map((key) => (
+                          <Styled.Line key={key}>
+                            {key}: <span>{exchange[key as keyof typeof exchange]}</span>
+                          </Styled.Line>
+                        ))}
+                        {'},'}
+                      </Styled.ExchangeObject>
+                    );
+                  })}
+                  {']'}
+                </Styled.ExchangeConfigs>
               </Styled.Code>
             ),
             [CodeToggleGroup.MSG_CREATE_PERPETUAL]: (
@@ -247,7 +251,7 @@ export const NewMarketMessageDetailsDialog = ({
                     },
                   ]}
                 />
-                <div style={{ marginTop: '1rem' }}>MSG_UPDATE_CLOB_PAIR</div>
+                <div style={{ margin: '0.5rem 0' }}>MSG_UPDATE_CLOB_PAIR</div>
                 <Styled.Details
                   layout="column"
                   items={[
@@ -287,27 +291,38 @@ export const NewMarketMessageDetailsDialog = ({
             ),
             [CodeToggleGroup.MSG_SUBMIT_PROPOSAL]: (
               <Styled.Code>
-                <Styled.Text0>title: </Styled.Text0>
-                <Styled.Description>{title}</Styled.Description>
-
-                <Styled.Text0>initial_deposit_amount:</Styled.Text0>
-                <Styled.Description>
-                  {
-                    <Output
-                      type={OutputType.Asset}
-                      value={MustBigNumber(newMarketProposal.initialDepositAmount).div(
-                        Number(`1e${chainTokenDecimals}`)
-                      )}
-                      fractionDigits={initialDepositAmountDecimals}
-                      tag={chainTokenLabel}
-                    />
-                  }
-                </Styled.Description>
-
-                <Styled.Text0>summary: </Styled.Text0>
-                <Styled.Description>
-                  {utils.getGovAddNewMarketSummary(ticker, newMarketProposal.delayBlocks)}
-                </Styled.Description>
+                <Styled.Details
+                  items={[
+                    {
+                      key: 'title',
+                      label: 'title',
+                      value: title,
+                    },
+                    {
+                      key: 'initial_deposit_amount',
+                      label: 'initial_deposit_amount',
+                      value: (
+                        <Output
+                          type={OutputType.Asset}
+                          value={MustBigNumber(newMarketProposal.initialDepositAmount).div(
+                            Number(`1e${chainTokenDecimals}`)
+                          )}
+                          fractionDigits={initialDepositAmountDecimals}
+                          tag={chainTokenLabel}
+                        />
+                      ),
+                    },
+                    {
+                      key: 'summary',
+                      label: 'summary',
+                      value: (
+                        <Styled.Summary>
+                          {utils.getGovAddNewMarketSummary(ticker, newMarketProposal.delayBlocks)}
+                        </Styled.Summary>
+                      ),
+                    },
+                  ]}
+                />
               </Styled.Code>
             ),
           }[codeToggleGroup]
@@ -338,8 +353,20 @@ Styled.Tabs = styled(ToggleGroup)`
   overflow-x: auto;
 `;
 
+Styled.Details = styled(Details)`
+  --details-item-height: 1.5rem;
+`;
+
+Styled.ExchangeConfigs = styled.div`
+  margin-top: 0.5rem;
+`;
+
 Styled.Text0 = styled.span`
   color: var(--color-text-0);
+`;
+
+Styled.Tag = styled(Tag)`
+  margin: 0 0.5ch;
 `;
 
 Styled.Code = styled.div`
@@ -359,14 +386,15 @@ Styled.ExchangeObject = styled.div`
   padding: 1rem;
 `;
 
-Styled.Details = styled(Details)`
-  --details-item-height: 1.5rem;
-`;
-
 Styled.Line = styled.pre`
   margin-left: 1rem;
 `;
 
 Styled.Description = styled.p`
   margin-bottom: 1rem;
+`;
+
+Styled.Summary = styled.p`
+  text-align: justify;
+  margin-left: 0.5rem;
 `;

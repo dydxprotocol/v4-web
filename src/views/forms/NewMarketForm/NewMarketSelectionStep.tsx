@@ -418,4 +418,5 @@ Styled.Output = styled(Output)`
 
 Styled.Button = styled(Button)`
   --button-padding: 0;
+  --button-height: auto;
 `;
