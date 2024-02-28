@@ -350,16 +350,16 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
     // Record proposed market.
     marketsProposed.set(marketId, proposal);
     
-    // Wait 8 seconds for proposal to be processed.
-    await sleep(8000);
+    // Wait 10 seconds for proposal to be processed.
+    await sleep(10000);
 
     // Vote YES on proposal.
     for (const wallet of wallets) {
       await voteOnProposal(proposalId, client, wallet);
     }
 
-    // Wait 8 seconds for votes to be processed.
-    await sleep(8000);
+    // Wait 10 seconds for votes to be processed.
+    await sleep(10000);
   }
 
   // Wait for voting period to end.
