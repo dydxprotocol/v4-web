@@ -17,6 +17,32 @@ Pull requests are the best way to propose changes to the codebase (we use [Githu
 3. Make sure your code lints.
 4. Issue that pull request!
 
+## We use [Conventional Commits](https://github.com/conventional-changelog/commitlint)
+We use a commit-msg hook to check if your commit messages meet the conventional commit format.
+
+In general the pattern mostly looks like this:
+
+`type(scope?): subject`  #scope is optional; multiple scopes are supported (current delimiter options: "/", "\" and ",")
+
+### Real world examples can look like this:
+`chore: run tests on travis ci`
+`fix(server): send cors headers`
+`feat(blog): add comment section`
+
+Common types according to commitlint-config-conventional can be:
+
+build
+chore
+ci
+docs
+feat
+fix
+perf
+refactor
+revert
+style
+test
+
 ## Any contributions you make will be under the same License
 When you submit code changes, your submissions are understood to be under the same [License](https://github.com/dydxprotocol/v4-web/blob/master/LICENSE) that covers the project.
 

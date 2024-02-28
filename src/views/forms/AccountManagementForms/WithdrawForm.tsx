@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
+import styled from 'styled-components';
 import { isAddress } from 'viem';
 
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
@@ -17,47 +18,48 @@ import {
   MAX_PRICE_IMPACT,
   MIN_CCTP_TRANSFER_AMOUNT,
   NumberSign,
+  TOKEN_DECIMALS,
 } from '@/constants/numbers';
+import { WalletType } from '@/constants/wallets';
 
-import {
-  useAccounts,
-  useDebounce,
-  useDydxClient,
-  useRestrictions,
-  useSelectedNetwork,
-  useStringGetter,
-  useSubaccount,
-} from '@/hooks';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useDydxClient } from '@/hooks/useDydxClient';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
+import { useRestrictions } from '@/hooks/useRestrictions';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+import { useWithdrawalInfo } from '@/hooks/useWithdrawalInfo';
 
-import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
+import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { Link } from '@/components/Link';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
-import { Icon, IconName } from '@/components/Icon';
-
+import { WithTooltip } from '@/components/WithTooltip';
 import { SourceSelectMenu } from '@/views/forms/AccountManagementForms/SourceSelectMenu';
 
-import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { getSubaccount } from '@/state/accountSelectors';
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { validateCosmosAddress } from '@/lib/addressUtils';
+import { track } from '@/lib/analytics';
 import { MustBigNumber } from '@/lib/numbers';
 import { getNobleChainId } from '@/lib/squid';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
-import { validateCosmosAddress } from '@/lib/addressUtils';
-import { track } from '@/lib/analytics';
 
 export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
@@ -85,6 +87,8 @@ export const WithdrawForm = () => {
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 0.1% slippage
   const debouncedAmount = useDebounce<string>(withdrawAmount, 500);
+  const { usdcLabel } = useTokenConfigs();
+  const { usdcWithdrawalCapacity } = useWithdrawalInfo({ transferType: 'withdrawal' });
 
   const isValidAddress = toAddress && isAddress(toAddress);
 
@@ -195,6 +199,7 @@ export const WithdrawForm = () => {
               triggeredAt: Date.now(),
               isCctp,
               isExchange: Boolean(exchange),
+              requestId: requestPayload.requestId ?? undefined,
             });
             abacusStateManager.clearTransferInputValues();
             setWithdrawAmount('');
@@ -203,6 +208,13 @@ export const WithdrawForm = () => {
               chainId: toChainId,
               tokenAddress: toToken?.address || undefined,
               tokenSymbol: toToken?.symbol || undefined,
+              slippage: slippage || undefined,
+              gasFee: summary?.gasFee || undefined,
+              bridgeFee: summary?.bridgeFee || undefined,
+              exchangeRate: summary?.exchangeRate || undefined,
+              estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
+              toAmount: summary?.toAmount || undefined,
+              toAmountMin: summary?.toAmountMin || undefined,
             });
           }
         }
@@ -269,6 +281,17 @@ export const WithdrawForm = () => {
     setWithdrawAmount(freeCollateralBN.toString());
   }, [freeCollateralBN, setWithdrawAmount]);
 
+  const { walletType } = useAccounts();
+
+  useEffect(() => {
+    if (walletType === WalletType.Privy) {
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.exchange,
+        value: 'coinbase',
+      });
+    }
+  }, [walletType]);
+
   const onSelectNetwork = useCallback((name: string, type: 'chain' | 'exchange') => {
     if (name) {
       setWithdrawAmount('');
@@ -305,7 +328,7 @@ export const WithdrawForm = () => {
         </span>
       ),
       value: (
-        <Styled.DiffOutput
+        <$DiffOutput
           type={OutputType.Fiat}
           value={freeCollateral?.current}
           newValue={freeCollateral?.postOrder}
@@ -321,61 +344,100 @@ export const WithdrawForm = () => {
 
   const { sanctionedAddresses } = useRestrictions();
 
-  const errorMessage = useMemo(() => {
-    if (error) {
-      return error;
-    }
-
-    if (routeErrors) {
-      return routeErrorMessage
-        ? stringGetter({
-            key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
-            params: { ERROR_MESSAGE: routeErrorMessage },
-          })
-        : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG });
-    }
-
-    if (!toAddress) return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ADDRESS });
-
-    if (sanctionedAddresses.has(toAddress))
-      return stringGetter({
-        key: STRING_KEYS.TRANSFER_INVALID_DYDX_ADDRESS,
-      });
-
-    if (debouncedAmountBN) {
-      if (!chainIdStr && !exchange) {
-        return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_CHAIN });
-      } else if (!toToken) {
-        return stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ASSET });
-      }
-    }
-
-    if (MustBigNumber(debouncedAmountBN).gt(MustBigNumber(freeCollateralBN))) {
-      return stringGetter({ key: STRING_KEYS.WITHDRAW_MORE_THAN_FREE });
-    }
-
+  const { alertType, errorMessage } = useMemo(() => {
     if (isCctp) {
-      if (MustBigNumber(debouncedAmountBN).gte(MAX_CCTP_TRANSFER_AMOUNT)) {
-        return stringGetter({
-          key: STRING_KEYS.MAX_CCTP_TRANSFER_LIMIT_EXCEEDED,
-          params: {
-            MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
-          },
-        });
+      if (debouncedAmountBN.gte(MAX_CCTP_TRANSFER_AMOUNT)) {
+        return {
+          errorMessage: stringGetter({
+            key: STRING_KEYS.MAX_CCTP_TRANSFER_LIMIT_EXCEEDED,
+            params: {
+              MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
+            },
+          }),
+        };
       }
       if (
         !debouncedAmountBN.isZero() &&
         MustBigNumber(debouncedAmountBN).lte(MIN_CCTP_TRANSFER_AMOUNT)
       ) {
-        return 'Amount must be greater than 10 USDC';
+        return {
+          errorMessage: 'Amount must be greater than 10 USDC',
+        };
+      }
+    }
+    if (error) {
+      return {
+        errorMessage: error,
+      };
+    }
+
+    if (routeErrors) {
+      return {
+        errorMessage: routeErrorMessage
+          ? stringGetter({
+              key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
+              params: { ERROR_MESSAGE: routeErrorMessage },
+            })
+          : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG }),
+      };
+    }
+
+    if (!toAddress) {
+      return {
+        alertType: AlertType.Warning,
+        errorMessage: stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ADDRESS }),
+      };
+    }
+
+    if (sanctionedAddresses.has(toAddress))
+      return {
+        errorMessage: stringGetter({
+          key: STRING_KEYS.TRANSFER_INVALID_DYDX_ADDRESS,
+        }),
+      };
+
+    if (debouncedAmountBN) {
+      if (!chainIdStr && !exchange) {
+        return {
+          errorMessage: stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_CHAIN }),
+        };
+      } else if (!toToken) {
+        return {
+          errorMessage: stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ASSET }),
+        };
       }
     }
 
-    if (isMainnet && MustBigNumber(summary?.aggregatePriceImpact).gte(MAX_PRICE_IMPACT)) {
-      return stringGetter({ key: STRING_KEYS.PRICE_IMPACT_TOO_HIGH });
+    if (debouncedAmountBN.gt(MustBigNumber(freeCollateralBN))) {
+      return {
+        errorMessage: stringGetter({ key: STRING_KEYS.WITHDRAW_MORE_THAN_FREE }),
+      };
     }
 
-    return undefined;
+    if (isMainnet && MustBigNumber(summary?.aggregatePriceImpact).gte(MAX_PRICE_IMPACT)) {
+      return { errorMessage: stringGetter({ key: STRING_KEYS.PRICE_IMPACT_TOO_HIGH }) };
+    }
+
+    // Withdrawal Safety
+    if (usdcWithdrawalCapacity.gt(0) && debouncedAmountBN.gt(usdcWithdrawalCapacity)) {
+      return {
+        alertType: AlertType.Warning,
+        errorMessage: stringGetter({
+          key: STRING_KEYS.WITHDRAWAL_LIMIT_OVER,
+          params: {
+            USDC_LIMIT: (
+              <span>
+                {usdcWithdrawalCapacity.toFormat(TOKEN_DECIMALS)}
+                <$Tag>{usdcLabel}</$Tag>
+              </span>
+            ),
+          },
+        }),
+      };
+    }
+    return {
+      errorMessage: undefined,
+    };
   }, [
     error,
     routeErrors,
@@ -388,6 +450,7 @@ export const WithdrawForm = () => {
     sanctionedAddresses,
     stringGetter,
     summary,
+    usdcWithdrawalCapacity,
   ]);
 
   const isInvalidNobleAddress = Boolean(
@@ -405,8 +468,22 @@ export const WithdrawForm = () => {
     isInvalidNobleAddress;
 
   return (
-    <Styled.Form onSubmit={onSubmit}>
-      <Styled.DestinationRow>
+    <$Form onSubmit={onSubmit}>
+      <$Subheader>
+        {stringGetter({
+          key: STRING_KEYS.LOWEST_FEE_WITHDRAWALS,
+          params: {
+            LOWEST_FEE_TOKENS_TOOLTIP: (
+              <WithTooltip tooltip="lowest-fees">
+                {stringGetter({
+                  key: STRING_KEYS.SELECT_CHAINS,
+                })}
+              </WithTooltip>
+            ),
+          },
+        })}
+      </$Subheader>
+      <$DestinationRow>
         <FormInput
           type={InputType.Text}
           placeholder={stringGetter({ key: STRING_KEYS.ADDRESS })}
@@ -415,7 +492,7 @@ export const WithdrawForm = () => {
           label={
             <span>
               {stringGetter({ key: STRING_KEYS.DESTINATION })}{' '}
-              {isValidAddress ? <Styled.CheckIcon iconName={IconName.Check} /> : null}
+              {isValidAddress ? <$CheckIcon iconName={IconName.Check} /> : null}
             </span>
           }
         />
@@ -424,7 +501,7 @@ export const WithdrawForm = () => {
           selectedChain={chainIdStr || undefined}
           onSelect={onSelectNetwork}
         />
-      </Styled.DestinationRow>
+      </$DestinationRow>
       {isInvalidNobleAddress && (
         <AlertMessage type={AlertType.Error}>
           {stringGetter({ key: STRING_KEYS.NOBLE_ADDRESS_VALIDATION })}
@@ -435,21 +512,23 @@ export const WithdrawForm = () => {
         onSelectToken={onSelectToken}
         isExchange={Boolean(exchange)}
       />
-      <Styled.WithDetailsReceipt side="bottom" detailItems={amountInputReceipt}>
+      <$WithDetailsReceipt side="bottom" detailItems={amountInputReceipt}>
         <FormInput
           type={InputType.Number}
           onChange={onChangeAmount}
           value={withdrawAmount}
           label={stringGetter({ key: STRING_KEYS.AMOUNT })}
           slotRight={
-            <Styled.FormInputButton size={ButtonSize.XSmall} onClick={onClickMax}>
+            <$FormInputButton size={ButtonSize.XSmall} onClick={onClickMax}>
               {stringGetter({ key: STRING_KEYS.MAX })}
-            </Styled.FormInputButton>
+            </$FormInputButton>
           }
         />
-      </Styled.WithDetailsReceipt>
-      {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
-      <Styled.Footer>
+      </$WithDetailsReceipt>
+      {errorMessage && (
+        <$AlertMessage type={alertType ?? AlertType.Error}>{errorMessage}</$AlertMessage>
+      )}
+      <$Footer>
         <WithdrawButtonAndReceipt
           isDisabled={isDisabled}
           isLoading={isLoading}
@@ -458,37 +537,46 @@ export const WithdrawForm = () => {
           withdrawChain={chainIdStr || undefined}
           withdrawToken={toToken || undefined}
         />
-      </Styled.Footer>
-    </Styled.Form>
+      </$Footer>
+    </$Form>
   );
 };
+const $Subheader = styled.div`
+  color: var(--color-text-0);
+`;
 
-const Styled: Record<string, AnyStyledComponent> = {};
+const $Tag = styled(Tag)`
+  margin-left: 0.5ch;
+`;
 
-Styled.DiffOutput = styled(DiffOutput)`
+const $DiffOutput = styled(DiffOutput)`
   --diffOutput-valueWithDiff-fontSize: 1em;
 `;
 
-Styled.Form = styled.form`
+const $Form = styled.form`
   ${formMixins.transfersForm}
 `;
 
-Styled.Footer = styled.footer`
+const $Footer = styled.footer`
   ${formMixins.footer}
   --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
 `;
 
-Styled.DestinationRow = styled.div`
+const $DestinationRow = styled.div`
   ${layoutMixins.spacedRow}
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
 `;
 
-Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
+const $AlertMessage = styled(AlertMessage)`
+  display: inline;
+`;
+
+const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
-Styled.Link = styled(Link)`
+const $Link = styled(Link)`
   color: var(--color-accent);
 
   &:visited {
@@ -496,15 +584,15 @@ Styled.Link = styled(Link)`
   }
 `;
 
-Styled.TransactionInfo = styled.span`
+const $TransactionInfo = styled.span`
   ${layoutMixins.row}
 `;
 
-Styled.FormInputButton = styled(Button)`
+const $FormInputButton = styled(Button)`
   ${formMixins.inputInnerButton}
 `;
 
-Styled.CheckIcon = styled(Icon)`
+const $CheckIcon = styled(Icon)`
   margin: 0 1ch;
 
   color: var(--color-success);

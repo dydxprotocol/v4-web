@@ -1,8 +1,9 @@
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
+
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { useBreakpoints } from '@/hooks';
 import { Details, type DetailsItem } from '@/components/Details';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 
@@ -25,29 +26,26 @@ export const DetailsDialog = ({ slotIcon, title, items, slotFooter, setIsOpen }:
       title={title}
       placement={isTablet ? DialogPlacement.Default : DialogPlacement.Sidebar}
     >
-      <Styled.Content>
-        <Styled.Details withSeparators justifyItems="end" items={items} />
+      <$Content>
+        <$Details withSeparators justifyItems="end" items={items} />
 
-        <Styled.Footer>{slotFooter}</Styled.Footer>
-      </Styled.Content>
+        <$Footer>{slotFooter}</$Footer>
+      </$Content>
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.expandingColumnWithStickyFooter}
   --stickyFooterBackdrop-outsetX: var(--dialog-paddingX);
   --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
   gap: 1rem;
 `;
 
-Styled.Details = styled(Details)`
+const $Details = styled(Details)`
   font: var(--font-small-book);
 `;
 
-Styled.Footer = styled.footer`
+const $Footer = styled.footer`
   ${layoutMixins.gridEqualColumns}
   gap: 0.66rem;
 `;

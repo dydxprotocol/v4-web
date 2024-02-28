@@ -2,14 +2,14 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import assign from 'lodash/assign';
 
 import type {
+  ClosePositionInputs,
   InputError,
   Inputs,
   Nullable,
   TradeInputs,
-  ClosePositionInputs,
   TransferInputs,
+  TriggerOrdersInputs,
 } from '@/constants/abacus';
-
 import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
 
 type TradeFormInputs = typeof CLEARED_TRADE_INPUTS & typeof CLEARED_SIZE_INPUTS;
@@ -20,6 +20,7 @@ export interface InputsState {
   tradeFormInputs: TradeFormInputs;
   tradeInputs?: Nullable<TradeInputs>;
   closePositionInputs?: Nullable<ClosePositionInputs>;
+  triggerOrdersInputs?: Nullable<TriggerOrdersInputs>;
   transferInputs?: Nullable<TransferInputs>;
 }
 
@@ -39,7 +40,8 @@ export const inputsSlice = createSlice({
   initialState,
   reducers: {
     setInputs: (state, action: PayloadAction<Nullable<Inputs>>) => {
-      const { current, errors, trade, closePosition, transfer } = action.payload || {};
+      const { current, errors, trade, closePosition, transfer, triggerOrders } =
+        action.payload ?? {};
 
       return {
         ...state,
@@ -51,6 +53,7 @@ export const inputsSlice = createSlice({
           ...transfer,
           isCctp: !!transfer?.isCctp,
         } as Nullable<TransferInputs>,
+        triggerOrdersInputs: triggerOrders,
       };
     },
 

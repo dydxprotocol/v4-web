@@ -1,15 +1,18 @@
 import { useCallback } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
+
 import { shallowEqual, useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
+import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
-import { TradeTypes } from '@/constants/trade';
 import { STRING_KEYS, StringKey } from '@/constants/localization';
-import { useStringGetter } from '@/hooks';
+import { TradeTypes } from '@/constants/trade';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Tabs } from '@/components/Tabs';
+import { TabItem, Tabs } from '@/components/Tabs';
 
 import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';
 
@@ -18,7 +21,10 @@ import { isTruthy } from '@/lib/isTruthy';
 
 import { TradeForm } from './forms/TradeForm';
 
-const useTradeTypeOptions = () => {
+const useTradeTypeOptions = (): {
+  tradeTypeItems: TabItem<string>[];
+  selectedTradeType: TradeTypes;
+} => {
   const stringGetter = useStringGetter();
   const selectedTradeType = useSelector(
     createSelector(
@@ -44,11 +50,12 @@ const useTradeTypeOptions = () => {
           // All conditional orders labeled under "Stop Order"
           allTradeTypeItems?.length && {
             label: stringGetter({ key: STRING_KEYS.STOP_ORDER_SHORT }),
+            value: '',
             subitems: allTradeTypeItems
               ?.map(
                 ({ value, label }) =>
-                  value && {
-                    value: value as TradeTypes,
+                  value != null && {
+                    value,
                     label,
                   }
               )
@@ -60,7 +67,7 @@ const useTradeTypeOptions = () => {
 };
 
 export const TradeBoxOrderView = () => {
-  const onTradeTypeChange = useCallback((tradeType?: TradeTypes) => {
+  const onTradeTypeChange = useCallback((tradeType?: string) => {
     if (tradeType) {
       abacusStateManager.clearTradeInputValues();
       abacusStateManager.setTradeValue({ value: tradeType, field: TradeInputField.type });
@@ -70,27 +77,25 @@ export const TradeBoxOrderView = () => {
   const { selectedTradeType, tradeTypeItems } = useTradeTypeOptions();
 
   return (
-    <Styled.Tabs
+    <$Tabs
       key={selectedTradeType}
       value={selectedTradeType}
       items={tradeTypeItems}
       onValueChange={onTradeTypeChange}
       sharedContent={
-        <Styled.Container>
+        <$Container>
           <TradeForm />
-        </Styled.Container>
+        </$Container>
       }
       fullWidthTabs
     />
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.div`
+const $Container = styled.div`
   ${layoutMixins.scrollArea}
 `;
 
-Styled.Tabs = styled(Tabs)`
+const $Tabs = styled(Tabs)`
   overflow: hidden;
-`;
+` as typeof Tabs;

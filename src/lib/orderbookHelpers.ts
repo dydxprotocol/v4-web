@@ -1,5 +1,4 @@
 //  ------ Canvas helper methods ------ //
-
 import type { MarketOrderbook, Nullable, PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 
 /**

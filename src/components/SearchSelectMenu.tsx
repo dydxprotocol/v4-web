@@ -1,8 +1,14 @@
-import { type ReactNode, useState, useRef } from 'react';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import { useRef, useState, type ReactNode } from 'react';
+
+import styled, { css } from 'styled-components';
 
 import { type MenuConfig } from '@/constants/menus';
-import { useOnClickOutside } from '@/hooks';
+
+import { useOnClickOutside } from '@/hooks/useOnClickOutside';
+
+import breakpoints from '@/styles/breakpoints';
+import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { ComboboxMenu } from '@/components/ComboboxMenu';
 import { type DetailsItem } from '@/components/Details';
@@ -11,9 +17,7 @@ import { Popover, TriggerType } from '@/components/Popover';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithLabel } from '@/components/WithLabel';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-import { formMixins } from '@/styles/formMixins';
-import breakpoints from '@/styles/breakpoints';
+import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 
 type ElementProps = {
   asChild?: boolean;
@@ -36,7 +40,6 @@ export const SearchSelectMenu = ({
   asChild,
   children,
   className,
-  disabled,
   label,
   items,
   withSearch = true,
@@ -55,16 +58,16 @@ export const SearchSelectMenu = ({
   const Trigger = asChild ? (
     children
   ) : (
-    <Styled.MenuTrigger>
-      {label ? <Styled.WithLabel label={label}>{children}</Styled.WithLabel> : children}
-      <Styled.TriggerIcon iconName={IconName.Triangle} open={open} />
-    </Styled.MenuTrigger>
+    <$MenuTrigger>
+      {label ? <$WithLabel label={label}>{children}</$WithLabel> : children}
+      <$TriggerIcon iconName={IconName.Triangle} open={open} />
+    </$MenuTrigger>
   );
 
   return (
-    <Styled.SearchSelectMenu className={className} ref={searchSelectMenuRef}>
-      <Styled.WithDetailsReceipt detailItems={withReceiptItems} side="bottom">
-        <Styled.Popover
+    <$SearchSelectMenu className={className} ref={searchSelectMenuRef}>
+      <$WithDetailsReceipt detailItems={withReceiptItems} side="bottom">
+        <$Popover
           open={open}
           onOpenChange={setOpen}
           slotTrigger={Trigger}
@@ -72,26 +75,23 @@ export const SearchSelectMenu = ({
           fullWidth
           noBlur
         >
-          <Styled.ComboboxMenu
+          <$ComboboxMenu
             items={items}
             withSearch={withSearch}
             onItemSelected={() => setOpen(false)}
             withStickyLayout
             $withSearch={withSearch}
           />
-        </Styled.Popover>
-      </Styled.WithDetailsReceipt>
-    </Styled.SearchSelectMenu>
+        </$Popover>
+      </$WithDetailsReceipt>
+    </$SearchSelectMenu>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.SearchSelectMenu = styled.div`
+const $SearchSelectMenu = styled.div`
   ${layoutMixins.column}
 `;
 
-Styled.MenuTrigger = styled.div`
+const $MenuTrigger = styled.div`
   height: var(--form-input-height);
 
   ${layoutMixins.spacedRow}
@@ -103,7 +103,7 @@ Styled.MenuTrigger = styled.div`
   }
 `;
 
-Styled.WithLabel = styled(WithLabel)`
+const $WithLabel = styled(WithLabel)`
   ${formMixins.inputLabel}
 
   label {
@@ -111,7 +111,7 @@ Styled.WithLabel = styled(WithLabel)`
   }
 `;
 
-Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
+const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 
   abbr {
@@ -119,7 +119,7 @@ Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
   }
 `;
 
-Styled.Popover = styled(Popover)`
+const $Popover = styled(Popover)`
   max-height: 30vh;
   margin-top: 1rem;
   border: var(--border-width) solid var(--color-layer-6);
@@ -128,7 +128,10 @@ Styled.Popover = styled(Popover)`
   box-shadow: none;
 `;
 
-Styled.ComboboxMenu = styled(ComboboxMenu)<{ $withSearch?: boolean }>`
+type comboboxMenuStyleProps = { $withSearch?: boolean };
+const ComboboxMenuStyleType = getSimpleStyledOutputType(ComboboxMenu, {} as comboboxMenuStyleProps);
+
+const $ComboboxMenu = styled(ComboboxMenu)<comboboxMenuStyleProps>`
   ${layoutMixins.withInnerHorizontalBorders}
 
   --comboboxMenu-backgroundColor: var(--color-layer-4);
@@ -151,9 +154,9 @@ Styled.ComboboxMenu = styled(ComboboxMenu)<{ $withSearch?: boolean }>`
   border-radius: 0.5rem;
   max-height: 30vh;
   overflow: auto;
-`;
+` as typeof ComboboxMenuStyleType;
 
-Styled.TriggerIcon = styled(Icon)<{ open?: boolean }>`
+const $TriggerIcon = styled(Icon)<{ open?: boolean }>`
   width: 0.625rem;
   height: 0.375rem;
   color: var(--color-text-0);

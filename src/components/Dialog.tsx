@@ -1,24 +1,25 @@
 import { useRef } from 'react';
-import styled, { type AnyStyledComponent, keyframes, css } from 'styled-components';
 
 import {
-  Root,
-  Trigger,
-  Overlay,
-  Content,
-  Title,
-  Description,
   Close,
+  Content,
+  Description,
+  DialogCloseProps,
+  Overlay,
   Portal,
+  Root,
+  Title,
+  Trigger,
 } from '@radix-ui/react-dialog';
+import styled, { css, keyframes } from 'styled-components';
+
+import { useDialogArea } from '@/hooks/useDialogArea';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Icon, IconName } from '@/components/Icon';
 import { BackButton } from '@/components/BackButton';
-
-import { useDialogArea } from '@/hooks/useDialogArea';
+import { Icon, IconName } from '@/components/Icon';
 
 export enum DialogPlacement {
   Default = 'Default',
@@ -47,6 +48,7 @@ type StyleProps = {
   hasHeaderBorder?: boolean;
   children?: React.ReactNode;
   className?: string;
+  stacked?: boolean;
   withAnimation?: boolean;
 };
 
@@ -61,10 +63,11 @@ const DialogPortal = ({
   container?: HTMLElement;
   children: React.ReactNode;
 }) => {
-  const { dialogArea } = useDialogArea();
-
+  const {
+    dialogAreaRef: { current },
+  } = useDialogArea() ?? { dialogAreaRef: {} };
   return withPortal ? (
-    <Portal container={container ?? dialogArea}>{children}</Portal>
+    <Portal container={container ?? current}>{children}</Portal>
   ) : (
     <>{children}</>
   );
@@ -81,6 +84,7 @@ export const Dialog = ({
   slotTrigger,
   slotHeaderInner,
   slotFooter,
+  stacked,
   withClose = true,
   placement = DialogPlacement.Default,
   portalContainer,
@@ -89,7 +93,7 @@ export const Dialog = ({
   children,
   className,
 }: DialogProps) => {
-  const closeButtonRef = useRef<HTMLButtonElement>();
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   const showOverlay = ![DialogPlacement.Inline, DialogPlacement.FullScreen].includes(placement);
 
@@ -97,8 +101,8 @@ export const Dialog = ({
     <Root modal={showOverlay} open={isOpen} onOpenChange={setIsOpen}>
       {slotTrigger && <Trigger asChild>{slotTrigger}</Trigger>}
       <DialogPortal withPortal={placement !== DialogPlacement.Inline} container={portalContainer}>
-        {showOverlay && <Styled.Overlay />}
-        <Styled.Container
+        {showOverlay && <$Overlay />}
+        <$Container
           placement={placement}
           className={className}
           onEscapeKeyDown={() => {
@@ -109,40 +113,58 @@ export const Dialog = ({
               e.preventDefault();
             }
           }}
+          $stacked={stacked}
           $withAnimation={withAnimation}
         >
-          <Styled.Header $withBorder={hasHeaderBorder}>
-            <Styled.HeaderTopRow>
-              {onBack && <BackButton onClick={onBack} />}
+          {stacked ? (
+            <$StackedHeaderTopRow $withBorder={hasHeaderBorder}>
+              {onBack && <$BackButton onClick={onBack} />}
 
-              {slotIcon && <Styled.Icon>{slotIcon}</Styled.Icon>}
-
-              {title && <Styled.Title>{title}</Styled.Title>}
+              {slotIcon}
 
               {!preventClose && withClose && (
-                <Styled.Close ref={closeButtonRef}>
+                <$Close ref={closeButtonRef} $absolute={stacked}>
                   <Icon iconName={IconName.Close} />
-                </Styled.Close>
+                </$Close>
               )}
-            </Styled.HeaderTopRow>
 
-            {description && <Styled.Description>{description}</Styled.Description>}
+              {title && <$Title>{title}</$Title>}
 
-            {slotHeaderInner}
-          </Styled.Header>
+              {description && <$Description>{description}</$Description>}
 
-          <Styled.Content>{children}</Styled.Content>
+              {slotHeaderInner}
+            </$StackedHeaderTopRow>
+          ) : (
+            <$Header $withBorder={hasHeaderBorder}>
+              <$HeaderTopRow>
+                {onBack && <BackButton onClick={onBack} />}
 
-          {slotFooter && <Styled.Footer>{slotFooter}</Styled.Footer>}
-        </Styled.Container>
+                {slotIcon && <$Icon>{slotIcon}</$Icon>}
+
+                {title && <$Title>{title}</$Title>}
+
+                {!preventClose && withClose && (
+                  <$Close ref={closeButtonRef}>
+                    <Icon iconName={IconName.Close} />
+                  </$Close>
+                )}
+              </$HeaderTopRow>
+
+              {description && <$Description>{description}</$Description>}
+
+              {slotHeaderInner}
+            </$Header>
+          )}
+
+          <$Content>{children}</$Content>
+
+          {slotFooter && <$Footer>{slotFooter}</$Footer>}
+        </$Container>
       </DialogPortal>
     </Root>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Overlay = styled(Overlay)`
+const $Overlay = styled(Overlay)`
   z-index: 1;
 
   position: fixed;
@@ -173,7 +195,11 @@ Styled.Overlay = styled(Overlay)`
   }
 `;
 
-Styled.Container = styled(Content)<{ placement: DialogPlacement; $withAnimation?: boolean }>`
+const $Container = styled(Content)<{
+  placement: DialogPlacement;
+  $stacked?: boolean;
+  $withAnimation?: boolean;
+}>`
   /* Params */
   --dialog-inset: 1rem;
   --dialog-width: 30rem;
@@ -353,9 +379,16 @@ Styled.Container = styled(Content)<{ placement: DialogPlacement; $withAnimation?
         bottom: 0;
       `,
     }[placement])}
+
+  ${({ $stacked }) =>
+    $stacked &&
+    css`
+      justify-content: center;
+      text-align: center;
+    `}
 `;
 
-Styled.Header = styled.header<{ $withBorder: boolean }>`
+const $Header = styled.header<{ $withBorder: boolean }>`
   ${layoutMixins.stickyHeader}
 
   z-index: var(--dialog-header-z);
@@ -374,17 +407,29 @@ Styled.Header = styled.header<{ $withBorder: boolean }>`
     `};
 `;
 
-Styled.HeaderTopRow = styled.div`
+const $HeaderTopRow = styled.div`
   ${layoutMixins.row}
   gap: var(--dialog-title-gap);
 `;
 
-Styled.HeaderTopRow = styled.div`
-  ${layoutMixins.row}
-  gap: var(--dialog-title-gap);
+const $StackedHeaderTopRow = styled.div<{ $withBorder: boolean }>`
+  ${layoutMixins.flexColumn}
+  align-items: center;
+  justify-content: center;
+  padding: var(--dialog-header-paddingTop) var(--dialog-header-paddingLeft)
+    var(--dialog-header-paddingBottom) var(--dialog-header-paddingRight);
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+
+  ${({ $withBorder }) =>
+    $withBorder &&
+    css`
+      ${layoutMixins.withOuterBorder};
+      background: var(--dialog-backgroundColor);
+    `};
 `;
 
-Styled.Content = styled.div`
+const $Content = styled.div`
   flex: 1;
 
   ${layoutMixins.column}
@@ -402,7 +447,7 @@ Styled.Content = styled.div`
   isolation: isolate;
 `;
 
-Styled.Icon = styled.div`
+const $Icon = styled.div`
   ${layoutMixins.row}
 
   width: 1em;
@@ -412,7 +457,7 @@ Styled.Icon = styled.div`
   line-height: 1;
 `;
 
-Styled.Close = styled(Close)`
+const $Close = styled(Close)<{ $absolute?: boolean }>`
   width: 0.7813rem;
   height: 0.7813rem;
 
@@ -438,14 +483,30 @@ Styled.Close = styled(Close)`
     color: var(--color-text-2);
   }
 
+  ${({ $absolute }) =>
+    $absolute &&
+    css`
+      position: absolute;
+      right: var(--dialog-header-paddingRight);
+      top: var(--dialog-header-paddingTop);
+    `}
+
   @media ${breakpoints.tablet} {
     width: 1rem;
     height: 1rem;
     outline: none;
   }
+` as React.ForwardRefExoticComponent<
+  { $absolute?: boolean } & DialogCloseProps & React.RefAttributes<HTMLButtonElement>
+>;
+
+const $BackButton = styled(BackButton)`
+  position: absolute;
+  left: var(--dialog-header-paddingLeft);
+  top: var(--dialog-header-paddingTop);
 `;
 
-Styled.Title = styled(Title)`
+const $Title = styled(Title)`
   flex: 1;
 
   font: var(--font-large-medium);
@@ -455,13 +516,13 @@ Styled.Title = styled(Title)`
   text-overflow: ellipsis;
 `;
 
-Styled.Description = styled(Description)`
+const $Description = styled(Description)`
   margin-top: 0.5rem;
   color: var(--color-text-0);
   font: var(--font-base-book);
 `;
 
-Styled.Footer = styled.footer`
+const $Footer = styled.footer`
   display: grid;
   ${layoutMixins.stickyFooter}
   ${layoutMixins.withStickyFooterBackdrop}

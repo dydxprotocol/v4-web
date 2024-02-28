@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import { PositionSide } from '@/constants/trade';
-import { hasPositionSideChanged } from '../tradeData';
+
+import { BIG_NUMBERS, MustBigNumber } from '../numbers';
+import { calculatePositionMargin, hasPositionSideChanged } from '../tradeData';
 
 describe('hasPositionSideChanged', () => {
   describe('Should return false when the position side has not changed', () => {
@@ -74,5 +76,41 @@ describe('hasPositionSideChanged', () => {
         positionSideHasChanged: true,
       });
     });
+  });
+});
+
+describe('calculatePositionMargin', () => {
+  it('should calculate the position margin', () => {
+    expect(calculatePositionMargin({ notionalTotal: 100, adjustedMmf: 0.1 })).toEqual(
+      MustBigNumber(10)
+    );
+  });
+
+  it('should calculate the position margin with a notionalTotal of 0', () => {
+    expect(calculatePositionMargin({ notionalTotal: 0, adjustedMmf: 0.1 })).toEqual(
+      BIG_NUMBERS.ZERO
+    );
+  });
+
+  it('should calculate the position margin with a adjustedMmf of 0', () => {
+    expect(calculatePositionMargin({ notionalTotal: 100, adjustedMmf: 0 })).toEqual(
+      BIG_NUMBERS.ZERO
+    );
+  });
+
+  it('should calculate the position margin with a notionalTotal of 0 and a adjustedMmf of 0', () => {
+    expect(calculatePositionMargin({ notionalTotal: 0, adjustedMmf: 0 })).toEqual(BIG_NUMBERS.ZERO);
+  });
+
+  it('should calculate the position margin with a negative notionalTotal', () => {
+    expect(calculatePositionMargin({ notionalTotal: -100, adjustedMmf: 0.1 })).toEqual(
+      MustBigNumber(-10)
+    );
+  });
+
+  it('should handle undefined notionalTotal', () => {
+    expect(calculatePositionMargin({ notionalTotal: undefined, adjustedMmf: 0.1 })).toEqual(
+      BIG_NUMBERS.ZERO
+    );
   });
 });

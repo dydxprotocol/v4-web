@@ -1,0 +1,51 @@
+name: E2E Tests
+
+on:
+  deployment_status:
+jobs:
+  run-e2es:
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'deployment_status' &&
+      github.event.deployment_status.state == 'success'
+    steps:
+      - name: Check environment URL
+        id: check_env
+        run: |
+          if [[ "${{ github.event.deployment_status.environment_url }}" == *"v4-staging"* ]]; then
+            echo "::set-output name=should_run_tests::true"
+          else
+            echo "::set-output name=should_run_tests::false"
+            echo "This deployment does not require E2E tests. Exiting..."
+          fi
+
+      - name: Checkout
+        if: steps.check_env.outputs.should_run_tests == 'true'
+        uses: actions/checkout@v3
+
+      - name: Set up pnpm
+        if: steps.check_env.outputs.should_run_tests == 'true'
+        uses: dydxprotocol/setup-pnpm@v1
+
+      - name: Set up Node
+        if: steps.check_env.outputs.should_run_tests == 'true'
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: pnpm
+
+      - name: Install dependencies
+        if: steps.check_env.outputs.should_run_tests == 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          pnpm install --loglevel warn
+
+      - name: Run e2e tests
+        if: steps.check_env.outputs.should_run_tests == 'true'
+        env:
+          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+          E2E_ENVIRONMENT_PASSWORD: ${{ secrets.E2E_ENVIRONMENT_PASSWORD }}
+          E2E_ENVIRONMENT_URL: ${{ github.event.deployment_status.environment_url }}
+        run: pnpm run wdio

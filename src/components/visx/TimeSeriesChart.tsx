@@ -1,31 +1,34 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import styled, { AnyStyledComponent, keyframes } from 'styled-components';
 
-import { allTimeUnits } from '@/constants/time';
-import { useBreakpoints } from '@/hooks';
-import { useAnimationFrame } from '@/hooks/useAnimationFrame';
-import { layoutMixins } from '@/styles/layoutMixins';
-
+import { LinearGradient } from '@visx/gradient';
 import { ParentSize } from '@visx/responsive';
+import type { ScaleConfig } from '@visx/scale';
 import {
-  XYChart,
   Axis,
-  Grid,
   DataProvider,
   EventEmitterProvider,
-  LineSeries,
   GlyphSeries,
-  type Margin,
+  Grid,
+  LineSeries,
+  XYChart,
   type AxisScale,
+  type Margin,
   type TooltipContextType,
 } from '@visx/xychart';
-import type { ScaleConfig } from '@visx/scale';
-import { LinearGradient } from '@visx/gradient';
-import Tooltip from '@/components/visx/XYChartTooltipWithBounds';
 import { RenderTooltipParams } from '@visx/xychart/lib/components/Tooltip';
+import styled, { keyframes } from 'styled-components';
 
-import { clamp, lerp, map } from '@/lib/math';
+import { allTimeUnits } from '@/constants/time';
+
+import { useAnimationFrame } from '@/hooks/useAnimationFrame';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+
+import { layoutMixins } from '@/styles/layoutMixins';
+
+import Tooltip from '@/components/visx/XYChartTooltipWithBounds';
+
 import { formatAbsoluteTime } from '@/lib/dateTime';
+import { clamp, lerp, map } from '@/lib/math';
 import { objectEntries } from '@/lib/objectEntries';
 
 import { XYChartThreshold, type Threshold } from './XYChartThreshold';
@@ -155,11 +158,17 @@ export const TimeSeriesChart = <Datum extends {}>({
   useAnimationFrame(
     (elapsedMilliseconds) => {
       if (zoomDomainAnimateTo) {
-        setZoomDomain(
-          (zoomDomain) =>
-            zoomDomain &&
-            zoomDomain * (zoomDomainAnimateTo / zoomDomain) ** (elapsedMilliseconds * 0.0166)
-        );
+        setZoomDomain((zoomDomain) => {
+          if (!zoomDomain) return zoomDomain;
+
+          const newZoomDomain =
+            zoomDomain * (zoomDomainAnimateTo / zoomDomain) ** (elapsedMilliseconds * 0.01);
+
+          // clamp according to direction
+          return zoomDomainAnimateTo > zoomDomain
+            ? Math.min(newZoomDomain, zoomDomainAnimateTo)
+            : Math.max(newZoomDomain, zoomDomainAnimateTo);
+        });
       }
     },
     [zoomDomainAnimateTo]
@@ -167,7 +176,13 @@ export const TimeSeriesChart = <Datum extends {}>({
 
   // Computations
   const { zoom, domain, range, visibleData } = useMemo(() => {
-    if (!zoomDomain) return {};
+    if (!zoomDomain)
+      return {
+        zoom: 1,
+        domain: [0, 1] as [number, number],
+        range: [0, 1] as [number, number],
+        visibleData: data,
+      };
 
     const zoom = zoomDomain / minZoomDomain;
 
@@ -181,7 +196,6 @@ export const TimeSeriesChart = <Datum extends {}>({
     );
 
     const range = visibleData
-      .filter((datum) => xAccessor(datum) >= domain[0] && xAccessor(datum) <= domain[1])
       .map((datum) => yAccessor(datum))
       .reduce((range, y) => [Math.min(range[0], y), Math.max(range[1], y)] as const, [
         Infinity,
@@ -198,7 +212,9 @@ export const TimeSeriesChart = <Datum extends {}>({
   }, [visibleData]);
 
   // Events
-  const onWheel = ({ deltaX, deltaY }: WheelEvent) => {
+  const onWheel = ({ deltaX, deltaY }: React.WheelEvent) => {
+    if (!zoomDomain) return;
+
     setZoomDomain(
       clamp(
         Math.max(1e-320, Math.min(Number.MAX_SAFE_INTEGER, zoomDomain * Math.exp(deltaY / 1000))),
@@ -213,7 +229,7 @@ export const TimeSeriesChart = <Datum extends {}>({
   };
 
   return (
-    <Styled.Container onWheel={onWheel} className={className}>
+    <$Container onWheel={onWheel} className={className}>
       {data.length && zoomDomain ? (
         <DataProvider
           xScale={{
@@ -238,7 +254,7 @@ export const TimeSeriesChart = <Datum extends {}>({
           }}
         >
           <EventEmitterProvider>
-            <Styled.ParentSize>
+            <$ParentSize>
               {({ width, height }: { width: number; height: number }) => {
                 const numTicksX =
                   (width - (margin?.left ?? 0) - (margin?.right ?? 0)) / tickSpacingX;
@@ -334,7 +350,7 @@ export const TimeSeriesChart = <Datum extends {}>({
                     {!isMobile && (
                       <>
                         {margin?.left && margin.left > 0 && (
-                          <Styled.YAxisBackground x="0" y="0" width={margin.left} height="100%" />
+                          <$YAxisBackground x="0" y="0" width={margin.left} height="100%" />
                         )}
 
                         <Axis
@@ -396,7 +412,7 @@ export const TimeSeriesChart = <Datum extends {}>({
                   </XYChart>
                 );
               }}
-            </Styled.ParentSize>
+            </$ParentSize>
           </EventEmitterProvider>
         </DataProvider>
       ) : (
@@ -404,13 +420,11 @@ export const TimeSeriesChart = <Datum extends {}>({
       )}
 
       {children}
-    </Styled.Container>
+    </$Container>
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.div`
+const $Container = styled.div`
   ${layoutMixins.stack}
   width: 0;
   min-width: 100%;
@@ -449,7 +463,7 @@ Styled.Container = styled.div`
   }
 `;
 
-Styled.ParentSize = styled(ParentSize)`
+const $ParentSize = styled(ParentSize)`
   min-height: 0;
   display: grid;
 
@@ -457,7 +471,7 @@ Styled.ParentSize = styled(ParentSize)`
   overscroll-behavior: contain;
 `;
 
-Styled.YAxisBackground = styled.foreignObject`
+const $YAxisBackground = styled.foreignObject`
   background: var(--stickyArea-background);
 
   /* Safari */

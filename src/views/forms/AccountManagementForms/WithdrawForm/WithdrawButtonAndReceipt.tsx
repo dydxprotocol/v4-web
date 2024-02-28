@@ -1,26 +1,27 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
+
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
-import { formatUnits } from 'viem';
+import styled from 'styled-components';
 
 import { TransferInputTokenResource } from '@/constants/abacus';
-import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 
+import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { useStringGetter, useTokenConfigs } from '@/hooks';
-
 import { Button } from '@/components/Button';
-
 import { Details, DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
-import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 import { WithReceipt } from '@/components/WithReceipt';
+import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
@@ -46,13 +47,11 @@ export const WithdrawButtonAndReceipt = ({
   setSlippage,
 
   slippage,
-  withdrawChain,
   withdrawToken,
 
   isDisabled,
   isLoading,
 }: ElementProps) => {
-  const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
   const [isEditingSlippage, setIsEditingSlipapge] = useState(false);
   const stringGetter = useStringGetter();
 
@@ -60,103 +59,70 @@ export const WithdrawButtonAndReceipt = ({
   const { summary, requestPayload, exchange } = useSelector(getTransferInputs, shallowEqual) || {};
   const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
   const { usdcLabel } = useTokenConfigs();
+  const { connectionError } = useApiState();
 
-  const feeSubitems: DetailsItem[] = [];
-
-  if (typeof summary?.gasFee === 'number') {
-    feeSubitems.push({
-      key: 'gas-fees',
-      label: <span>{stringGetter({ key: STRING_KEYS.GAS_FEE })}</span>,
-      value: <Output type={OutputType.Fiat} value={summary?.gasFee} />,
-    });
-  }
-
-  if (typeof summary?.bridgeFee === 'number') {
-    feeSubitems.push({
-      key: 'bridge-fees',
-      label: <span>{stringGetter({ key: STRING_KEYS.BRIDGE_FEE })}</span>,
-      value: <Output type={OutputType.Fiat} value={summary?.bridgeFee} />,
-    });
-  }
-
-  const hasSubitems = feeSubitems.length > 0;
-
-  const showSubitemsToggle = showFeeBreakdown
-    ? stringGetter({ key: STRING_KEYS.HIDE_ALL_DETAILS })
-    : stringGetter({ key: STRING_KEYS.SHOW_ALL_DETAILS });
-
-  const totalFees = (summary?.bridgeFee || 0) + (summary?.gasFee || 0);
-
-  const submitButtonReceipt = [
-    {
-      key: 'total-fees',
-      label: <span>{stringGetter({ key: STRING_KEYS.TOTAL_FEES })}</span>,
-      value: <Output type={OutputType.Fiat} value={totalFees} />,
-      subitems: feeSubitems,
-    },
-    !exchange && {
-      key: 'exchange-rate',
-      label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
-      value: withdrawToken && typeof summary?.exchangeRate === 'number' && (
-        <Styled.ExchangeRate>
-          <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={usdcLabel} />
-          =
-          <Output
-            type={OutputType.Asset}
-            value={summary?.exchangeRate}
-            tag={withdrawToken?.symbol}
-          />
-        </Styled.ExchangeRate>
-      ),
-    },
-    {
-      key: 'estimated-route-duration',
-      label: <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_TIME })}</span>,
-      value: typeof summary?.estimatedRouteDuration === 'number' && (
-        <Output
-          type={OutputType.Text}
-          value={stringGetter({
-            key: STRING_KEYS.X_MINUTES_LOWERCASED,
-            params: {
-              X:
-                summary?.estimatedRouteDuration < 60
-                  ? '< 1'
-                  : Math.round(summary?.estimatedRouteDuration / 60),
-            },
-          })}
-        />
-      ),
-    },
+  const submitButtonReceipt: DetailsItem[] = [
     {
       key: 'expected-amount-received',
+
       label: (
-        <span>
-          {stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED })}{' '}
+        <$RowWithGap>
+          {stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED })}
           {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
-        </span>
+        </$RowWithGap>
       ),
       value: (
         <Output type={OutputType.Asset} value={summary?.toAmount} fractionDigits={TOKEN_DECIMALS} />
       ),
-      subitems: [
-        {
-          key: 'minimum-amount-received',
-          label: (
-            <span>
-              {stringGetter({ key: STRING_KEYS.MINIMUM_AMOUNT_RECEIVED })}{' '}
-              {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
-            </span>
-          ),
-          value: (
+    },
+    {
+      key: 'minimum-amount-received',
+      label: (
+        <$RowWithGap>
+          {stringGetter({ key: STRING_KEYS.MINIMUM_AMOUNT_RECEIVED })}
+          {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
+        </$RowWithGap>
+      ),
+      value: (
+        <Output
+          type={OutputType.Asset}
+          value={summary?.toAmountMin}
+          fractionDigits={TOKEN_DECIMALS}
+        />
+      ),
+      tooltip: 'minimum-amount-received',
+    },
+    !exchange && {
+      key: 'exchange-rate',
+      label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
+      value:
+        withdrawToken && typeof summary?.exchangeRate === 'number' ? (
+          <$RowWithGap>
+            <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={usdcLabel} />
+            =
             <Output
               type={OutputType.Asset}
-              value={summary?.toAmountMin}
-              fractionDigits={TOKEN_DECIMALS}
+              value={summary?.exchangeRate}
+              tag={withdrawToken?.symbol}
             />
-          ),
-          tooltip: 'minimum-amount-received',
-        },
-      ],
+          </$RowWithGap>
+        ) : undefined,
+    },
+    typeof summary?.gasFee === 'number' && {
+      key: 'gas-fees',
+      label: (
+        <WithTooltip tooltip="gas-fees">{stringGetter({ key: STRING_KEYS.GAS_FEE })}</WithTooltip>
+      ),
+      value: <Output type={OutputType.Fiat} value={summary?.gasFee} />,
+    },
+    typeof summary?.bridgeFee === 'number' && {
+      key: 'bridge-fees',
+      label: (
+        <WithTooltip tooltip="bridge-fees">
+          {stringGetter({ key: STRING_KEYS.BRIDGE_FEE })}
+        </WithTooltip>
+      ),
+      value: <Output type={OutputType.Fiat} value={summary?.bridgeFee} />,
     },
     !exchange && {
       key: 'slippage',
@@ -171,10 +137,29 @@ export const WithdrawButtonAndReceipt = ({
       ),
     },
     {
+      key: 'estimated-route-duration',
+      label: <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_TIME })}</span>,
+      value:
+        typeof summary?.estimatedRouteDuration === 'number' ? (
+          <Output
+            type={OutputType.Text}
+            value={stringGetter({
+              key: STRING_KEYS.X_MINUTES_LOWERCASED,
+              params: {
+                X:
+                  summary?.estimatedRouteDuration < 60
+                    ? '< 1'
+                    : Math.round(summary?.estimatedRouteDuration / 60),
+              },
+            })}
+          />
+        ) : undefined,
+    },
+    {
       key: 'leverage',
       label: <span>{stringGetter({ key: STRING_KEYS.ACCOUNT_LEVERAGE })}</span>,
       value: (
-        <Styled.DiffOutput
+        <$DiffOutput
           type={OutputType.Multiple}
           value={leverage?.current}
           newValue={leverage?.postOrder}
@@ -185,29 +170,11 @@ export const WithdrawButtonAndReceipt = ({
     },
   ].filter(isTruthy);
 
-  const isFormValid = !isDisabled && !isEditingSlippage;
+  const isFormValid =
+    !isDisabled && !isEditingSlippage && connectionError !== ConnectionErrorType.CHAIN_DISRUPTION;
 
   return (
-    <Styled.WithReceipt
-      slotReceipt={
-        <Styled.CollapsibleDetails>
-          <Styled.Details showSubitems={showFeeBreakdown} items={submitButtonReceipt} />
-          {hasSubitems && (
-            <Styled.DetailButtons>
-              <Styled.ToggleButton
-                shape={ButtonShape.Pill}
-                size={ButtonSize.XSmall}
-                isPressed={showFeeBreakdown}
-                onPressedChange={setShowFeeBreakdown}
-                slotLeft={<Icon iconName={IconName.Caret} />}
-              >
-                {showSubitemsToggle}
-              </Styled.ToggleButton>
-            </Styled.DetailButtons>
-          )}
-        </Styled.CollapsibleDetails>
-      }
-    >
+    <$WithReceipt slotReceipt={<$Details items={submitButtonReceipt} />}>
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
       ) : (
@@ -222,39 +189,32 @@ export const WithdrawButtonAndReceipt = ({
           {stringGetter({ key: STRING_KEYS.WITHDRAW })}
         </Button>
       )}
-    </Styled.WithReceipt>
+    </$WithReceipt>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.DiffOutput = styled(DiffOutput)`
+const $DiffOutput = styled(DiffOutput)`
   --diffOutput-valueWithDiff-fontSize: 1em;
 `;
 
-Styled.ExchangeRate = styled.span`
+const $RowWithGap = styled.span`
   ${layoutMixins.row}
   gap: 0.5ch;
 `;
 
-Styled.WithReceipt = styled(WithReceipt)`
+const $WithReceipt = styled(WithReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
-Styled.CollapsibleDetails = styled.div`
-  ${layoutMixins.column}
+const $Details = styled(Details)`
   padding: var(--form-input-paddingY) var(--form-input-paddingX);
-`;
-
-Styled.Details = styled(Details)`
   font-size: 0.8125em;
 `;
 
-Styled.DetailButtons = styled.div`
+const $DetailButtons = styled.div`
   ${layoutMixins.spacedRow}
 `;
 
-Styled.ToggleButton = styled(ToggleButton)`
+const $ToggleButton = styled(ToggleButton)`
   --button-toggle-off-backgroundColor: transparent;
   --button-toggle-on-backgroundColor: transparent;
   --button-toggle-on-textColor: var(--color-text-0);

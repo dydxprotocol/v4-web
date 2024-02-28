@@ -1,29 +1,34 @@
 import { useEffect, useRef } from 'react';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+
 import { shallowEqual, useSelector } from 'react-redux';
+import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { LARGE_TOKEN_DECIMALS, TINY_PERCENT_DECIMALS } from '@/constants/numbers';
-import { useBreakpoints, useStringGetter } from '@/hooks';
+
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';
+import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
+import { WithTooltip } from '@/components/WithTooltip';
+import { NextFundingTimer } from '@/views/NextFundingTimer';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-
 import {
   getCurrentMarketConfig,
   getCurrentMarketData,
   getCurrentMarketMidMarketPrice,
 } from '@/state/perpetualsSelectors';
 
-import { MustBigNumber } from '@/lib/numbers';
+import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 
-import { NextFundingTimer } from '@/views/NextFundingTimer';
 import { MidMarketPrice } from './MidMarketPrice';
 
 type ElementProps = {
@@ -38,6 +43,7 @@ enum MarketStats {
   Volume24H = 'Volume24H',
   Trades24H = 'Trades24H',
   NextFunding = 'NextFunding',
+  MaxLeverage = 'MaxLeverage',
 }
 
 const defaultMarketStatistics = Object.values(MarketStats);
@@ -46,7 +52,8 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
   const { id = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
-  const { tickSizeDecimals } = useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const { tickSizeDecimals, initialMarginFraction, effectiveInitialMarginFraction } =
+    useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
   const midMarketPrice = useSelector(getCurrentMarketMidMarketPrice);
   const lastMidMarketPrice = useRef(midMarketPrice);
   const currentMarketData = useSelector(getCurrentMarketData, shallowEqual);
@@ -68,6 +75,7 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
     [MarketStats.PriceChange24H]: priceChange24H,
     [MarketStats.Trades24H]: trades24H,
     [MarketStats.Volume24H]: volume24H,
+    [MarketStats.MaxLeverage]: undefined, // needs more complex logic
   };
 
   const labelMap = {
@@ -78,106 +86,48 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
     [MarketStats.PriceChange24H]: stringGetter({ key: STRING_KEYS.CHANGE_24H }),
     [MarketStats.Trades24H]: stringGetter({ key: STRING_KEYS.TRADES_24H }),
     [MarketStats.Volume24H]: stringGetter({ key: STRING_KEYS.VOLUME_24H }),
+    [MarketStats.MaxLeverage]: (
+      <WithTooltip tooltip="maximum-leverage">
+        {stringGetter({ key: STRING_KEYS.MAXIMUM_LEVERAGE })}
+      </WithTooltip>
+    ),
   };
 
   return (
-    <Styled.MarketDetailsItems>
+    <$MarketDetailsItems>
       {showMidMarketPrice && (
-        <Styled.MidMarketPrice>
+        <$MidMarketPrice>
           <MidMarketPrice />
           <VerticalSeparator />
-        </Styled.MidMarketPrice>
+        </$MidMarketPrice>
       )}
 
-      <Styled.Details
+      <$Details
         items={defaultMarketStatistics.map((stat) => ({
           key: stat,
           label: labelMap[stat],
           tooltip: stat,
-          // value: <output>{valueMap[stat]?.toString()}</output>,
-          value: (() => {
-            const value = valueMap[stat];
-            const valueBN = MustBigNumber(value);
-
-            const color = valueBN.isNegative() ? 'var(--color-negative)' : 'var(--color-positive)';
-
-            switch (stat) {
-              case MarketStats.OraclePrice: {
-                return (
-                  <Styled.Output
-                    type={OutputType.Fiat}
-                    value={value}
-                    fractionDigits={tickSizeDecimals}
-                  />
-                );
-              }
-              case MarketStats.OpenInterest: {
-                return (
-                  <Styled.Output
-                    type={OutputType.Number}
-                    value={value}
-                    tag={id}
-                    fractionDigits={LARGE_TOKEN_DECIMALS}
-                  />
-                );
-              }
-              case MarketStats.Funding1H: {
-                return (
-                  <Styled.Output
-                    type={OutputType.Percent}
-                    value={value}
-                    color={color}
-                    fractionDigits={TINY_PERCENT_DECIMALS}
-                  />
-                );
-              }
-              case MarketStats.NextFunding: {
-                return <NextFundingTimer />;
-              }
-              case MarketStats.PriceChange24H: {
-                return (
-                  <Styled.RowSpan color={!isLoading ? color : undefined}>
-                    {!isLoading && <TriangleIndicator value={valueBN} />}
-                    <Styled.Output
-                      type={OutputType.Fiat}
-                      value={valueBN.abs()}
-                      fractionDigits={tickSizeDecimals}
-                    />
-                    {!isLoading && (
-                      <Styled.Output
-                        type={OutputType.Percent}
-                        value={MustBigNumber(priceChange24HPercent).abs()}
-                        withParentheses
-                      />
-                    )}
-                  </Styled.RowSpan>
-                );
-              }
-              case MarketStats.Trades24H: {
-                return <Styled.Output type={OutputType.Number} value={value} fractionDigits={0} />;
-              }
-              case MarketStats.Volume24H: {
-                // $ with no decimals
-                return <Styled.Output type={OutputType.Fiat} value={value} fractionDigits={0} />;
-              }
-              default: {
-                // Default renderer
-                return <Styled.Output type={OutputType.Text} value={value} />;
-              }
-            }
-          })(),
+          value: (
+            <DetailsItem
+              value={valueMap[stat]}
+              stat={stat}
+              tickSizeDecimals={tickSizeDecimals}
+              id={id}
+              isLoading={isLoading}
+              priceChange24HPercent={priceChange24HPercent}
+              initialMarginFraction={initialMarginFraction}
+              effectiveInitialMarginFraction={effectiveInitialMarginFraction}
+            />
+          ),
         }))}
         isLoading={isLoading}
         layout={isTablet ? 'grid' : 'rowColumns'}
         withSeparators={!isTablet}
       />
-    </Styled.MarketDetailsItems>
+    </$MarketDetailsItems>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.MarketDetailsItems = styled.div`
+const $MarketDetailsItems = styled.div`
   @media ${breakpoints.notTablet} {
     ${layoutMixins.scrollArea}
     ${layoutMixins.row}
@@ -192,7 +142,7 @@ Styled.MarketDetailsItems = styled.div`
   }
 `;
 
-Styled.Details = styled(Details)`
+const $Details = styled(Details)`
   font: var(--font-mini-book);
 
   @media ${breakpoints.tablet} {
@@ -206,7 +156,7 @@ Styled.Details = styled(Details)`
   }
 `;
 
-Styled.MidMarketPrice = styled.div`
+const $MidMarketPrice = styled.div`
   ${layoutMixins.sticky}
   ${layoutMixins.row}
   font: var(--font-medium-medium);
@@ -217,7 +167,7 @@ Styled.MidMarketPrice = styled.div`
   gap: 1rem;
 `;
 
-Styled.Output = styled(Output)<{ color?: string }>`
+const $Output = styled(Output)<{ color?: string }>`
   ${layoutMixins.row}
 
   ${({ color }) =>
@@ -227,7 +177,7 @@ Styled.Output = styled(Output)<{ color?: string }>`
     `}
 `;
 
-Styled.RowSpan = styled.span<{ color?: string }>`
+const $RowSpan = styled.span<{ color?: string }>`
   ${layoutMixins.row}
 
   ${({ color }) =>
@@ -242,3 +192,96 @@ Styled.RowSpan = styled.span<{ color?: string }>`
 
   gap: 0.25rem;
 `;
+
+const DetailsItem = ({
+  value,
+  stat,
+  tickSizeDecimals,
+  id,
+  isLoading,
+  priceChange24HPercent,
+  initialMarginFraction,
+  effectiveInitialMarginFraction,
+}: {
+  value: number | null | undefined;
+  stat: MarketStats;
+  tickSizeDecimals: number | null | undefined;
+  id: string;
+  isLoading: boolean;
+  priceChange24HPercent: number | null | undefined;
+  initialMarginFraction: number | null | undefined;
+  effectiveInitialMarginFraction: number | null | undefined;
+}) => {
+  const valueBN = MustBigNumber(value);
+
+  const color = valueBN.isNegative() ? 'var(--color-negative)' : 'var(--color-positive)';
+
+  switch (stat) {
+    case MarketStats.OraclePrice: {
+      return <$Output type={OutputType.Fiat} value={value} fractionDigits={tickSizeDecimals} />;
+    }
+    case MarketStats.OpenInterest: {
+      return (
+        <$Output
+          type={OutputType.Number}
+          value={value}
+          tag={id}
+          fractionDigits={LARGE_TOKEN_DECIMALS}
+        />
+      );
+    }
+    case MarketStats.Funding1H: {
+      return (
+        <$Output
+          type={OutputType.Percent}
+          value={value}
+          color={color}
+          fractionDigits={TINY_PERCENT_DECIMALS}
+        />
+      );
+    }
+    case MarketStats.NextFunding: {
+      return <NextFundingTimer />;
+    }
+    case MarketStats.PriceChange24H: {
+      return (
+        <$RowSpan color={!isLoading ? color : undefined}>
+          {!isLoading && <TriangleIndicator value={valueBN} />}
+          <$Output type={OutputType.Fiat} value={valueBN.abs()} fractionDigits={tickSizeDecimals} />
+          {!isLoading && (
+            <$Output
+              type={OutputType.Percent}
+              value={MustBigNumber(priceChange24HPercent).abs()}
+              withParentheses
+            />
+          )}
+        </$RowSpan>
+      );
+    }
+    case MarketStats.Trades24H: {
+      return <$Output type={OutputType.Number} value={value} fractionDigits={0} />;
+    }
+    case MarketStats.Volume24H: {
+      // $ with no decimals
+      return <$Output type={OutputType.Fiat} value={value} fractionDigits={0} />;
+    }
+    case MarketStats.MaxLeverage: {
+      return (
+        <DiffOutput
+          value={initialMarginFraction ? BIG_NUMBERS.ONE.div(initialMarginFraction) : null}
+          newValue={
+            effectiveInitialMarginFraction
+              ? BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction)
+              : null
+          }
+          withDiff={initialMarginFraction !== effectiveInitialMarginFraction}
+          type={OutputType.Multiple}
+        />
+      );
+    }
+    default: {
+      // Default renderer
+      return <$Output type={OutputType.Text} value={value} />;
+    }
+  }
+};

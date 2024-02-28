@@ -1,18 +1,18 @@
-import styled, { type AnyStyledComponent, css } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled, { css } from 'styled-components';
 
 import { type Nullable } from '@/constants/abacus';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, USD_DECIMALS } from '@/constants/numbers';
 
-import { breakpoints } from '@/styles';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
-
 import { Button } from '@/components/Button';
-import { DetachedSection, DetachedScrollableSection } from '@/components/ContentSection';
+import { DetachedScrollableSection, DetachedSection } from '@/components/ContentSection';
 import { Details } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType, ShowSign } from '@/components/Output';
@@ -21,9 +21,9 @@ import { ToggleButton } from '@/components/ToggleButton';
 import { calculateIsAccountLoading } from '@/state/accountCalculators';
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-import { getActiveDialog, getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
-import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 import { closeDialogInTradeBox, openDialog, openDialogInTradeBox } from '@/state/dialogs';
+import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
+import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { BIG_NUMBERS, isNumber, MustBigNumber } from '@/lib/numbers';
@@ -62,15 +62,13 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
 
   const currentMarketAssetData = useSelector(getCurrentMarketAssetData, shallowEqual);
   const currentMarketConfigs = useSelector(getCurrentMarketConfig, shallowEqual);
-  const activeDialog = useSelector(getActiveDialog, shallowEqual);
-  const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog, shallowEqual);
+  const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog);
   const currentMarketPosition = useSelector(getCurrentMarketPositionData, shallowEqual);
   const isLoading = useSelector(calculateIsAccountLoading);
 
-  const { stepSizeDecimals, tickSizeDecimals } = currentMarketConfigs || {};
-  const { id } = currentMarketAssetData || {};
-  const { type: dialogType } = activeDialog || {};
-  const { type: tradeBoxDialogType } = activeTradeBoxDialog || {};
+  const { stepSizeDecimals, tickSizeDecimals } = currentMarketConfigs ?? {};
+  const { id } = currentMarketAssetData ?? {};
+  const { type: tradeBoxDialogType } = activeTradeBoxDialog ?? {};
 
   const {
     adjustedImf,
@@ -117,7 +115,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
     },
   ];
 
-  const { current: currentSize, postOrder: postOrderSize } = size || {};
+  const { current: currentSize, postOrder: postOrderSize } = size ?? {};
   const leverageBN = MustBigNumber(leverage?.current);
   const newLeverageBN = MustBigNumber(leverage?.postOrder);
   const maxLeverage = BIG_NUMBERS.ONE.div(MustBigNumber(adjustedImf?.postOrder));
@@ -188,7 +186,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       label: STRING_KEYS.LIQUIDATION_PRICE,
       tooltip: 'liquidation-price',
       tooltipParams: {
-        SYMBOL: id || '',
+        SYMBOL: id ?? '',
       },
       fractionDigits: tickSizeDecimals,
       hasInvalidNewValue: Boolean(newLeverageIsInvalid),
@@ -222,7 +220,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
         : MustBigNumber(realizedPnl?.current).lt(0)
         ? NumberSign.Negative
         : NumberSign.Neutral,
-      value: realizedPnl?.current || undefined,
+      value: realizedPnl?.current ?? undefined,
       withBaseFont: true,
     },
   ];
@@ -247,58 +245,54 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
     label: stringGetter({ key: label }),
     tooltip,
     tooltipParams,
-    value: (
-      <>
-        {useDiffOutput ? (
-          <Styled.DiffOutput
-            type={type}
-            value={value}
-            newValue={newValue}
-            fractionDigits={fractionDigits}
-            hasInvalidNewValue={hasInvalidNewValue}
-            layout={isTablet ? 'row' : 'column'}
-            sign={sign}
-            showSign={showSign}
-            withBaseFont={withBaseFont}
-            withDiff={isNumber(newValue) && value !== newValue}
-          />
-        ) : (
-          <Styled.Output
-            type={type}
-            value={value}
-            fractionDigits={fractionDigits}
-            showSign={showSign}
-            sign={sign}
-            slotRight={
-              percentValue && (
-                <Styled.Output
-                  type={OutputType.Percent}
-                  value={percentValue}
-                  sign={sign}
-                  showSign={showSign}
-                  withParentheses
-                  withBaseFont={withBaseFont}
-                  margin="0 0 0 0.5ch"
-                />
-              )
-            }
-            withBaseFont={withBaseFont}
-          />
-        )}
-      </>
+    value: useDiffOutput ? (
+      <$DiffOutput
+        type={type}
+        value={value}
+        newValue={newValue}
+        fractionDigits={fractionDigits}
+        hasInvalidNewValue={hasInvalidNewValue}
+        layout={isTablet ? 'row' : 'column'}
+        sign={sign}
+        showSign={showSign}
+        withBaseFont={withBaseFont}
+        withDiff={isNumber(newValue) && value !== newValue}
+      />
+    ) : (
+      <$Output
+        type={type}
+        value={value}
+        fractionDigits={fractionDigits}
+        showSign={showSign}
+        sign={sign}
+        slotRight={
+          percentValue && (
+            <$Output
+              type={OutputType.Percent}
+              value={percentValue}
+              sign={sign}
+              showSign={showSign}
+              withParentheses
+              withBaseFont={withBaseFont}
+              margin="0 0 0 0.5ch"
+            />
+          )
+        }
+        withBaseFont={withBaseFont}
+      />
     ),
   });
 
   const actions = (
-    <Styled.Actions>
+    <$Actions>
       {isTablet ? (
-        <Styled.ClosePositionButton
+        <$ClosePositionButton
           onClick={() => dispatch(openDialog({ type: DialogTypes.ClosePosition }))}
         >
           {stringGetter({ key: STRING_KEYS.CLOSE_POSITION })}
-        </Styled.ClosePositionButton>
+        </$ClosePositionButton>
       ) : (
-        <Styled.ClosePositionToggleButton
+        <$ClosePositionToggleButton
           isPressed={tradeBoxDialogType === TradeBoxDialogTypes.ClosePosition}
           onPressedChange={(isPressed: boolean) => {
             dispatch(
@@ -312,70 +306,70 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
           }}
         >
           {stringGetter({ key: STRING_KEYS.CLOSE_POSITION })}
-        </Styled.ClosePositionToggleButton>
+        </$ClosePositionToggleButton>
       )}
-    </Styled.Actions>
+    </$Actions>
   );
 
   if (showNarrowVariation) {
     return (
-      <Styled.MobilePositionInfo>
-        <Styled.DetachedSection>
+      <$MobilePositionInfo>
+        <$DetachedSection>
           <PositionTile
             currentSize={size?.current}
             notionalTotal={notionalTotal?.current}
             postOrderSize={size?.postOrder}
             stepSizeDecimals={stepSizeDecimals}
-            symbol={id || undefined}
+            symbol={id ?? undefined}
             tickSizeDecimals={tickSizeDecimals}
             showNarrowVariation={showNarrowVariation}
             isLoading={isLoading}
           />
 
-          <Styled.MobileDetails
+          <$MobileDetails
             items={[mainFieldsContent[0], mainFieldsContent[1]].map(createDetailItem)}
             layout="stackColumn"
             withSeparators
             isLoading={isLoading}
           />
-        </Styled.DetachedSection>
+        </$DetachedSection>
 
-        <Styled.DetachedScrollableSection>
-          <Styled.MobileDetails
+        <$DetachedScrollableSection>
+          <$MobileDetails
             items={[mainFieldsContent[2], mainFieldsContent[3]].map(createDetailItem)}
             layout="rowColumns"
             withSeparators
             isLoading={isLoading}
           />
-        </Styled.DetachedScrollableSection>
+        </$DetachedScrollableSection>
 
-        {!hasNoPositionInMarket && <Styled.DetachedSection>{actions}</Styled.DetachedSection>}
+        {!hasNoPositionInMarket && <$DetachedSection>{actions}</$DetachedSection>}
 
-        <Styled.DetachedSection>
-          <Styled.MobileDetails
+        <$DetachedSection>
+          <$MobileDetails
             items={detailFieldsContent.map(createDetailItem)}
             withSeparators
             isLoading={isLoading}
           />
-        </Styled.DetachedSection>
-      </Styled.MobilePositionInfo>
+        </$DetachedSection>
+      </$MobilePositionInfo>
     );
   }
 
   return (
-    <Styled.PositionInfo>
+    <$PositionInfo>
       <div>
         <PositionTile
           currentSize={size?.current}
           notionalTotal={notionalTotal?.current}
           postOrderSize={size?.postOrder}
           stepSizeDecimals={stepSizeDecimals}
-          symbol={id || undefined}
+          symbol={id ?? undefined}
           tickSizeDecimals={tickSizeDecimals}
           isLoading={isLoading}
         />
 
-        <Styled.PrimaryDetails
+        <$PrimaryDetails
           items={mainFieldsContent.map(createDetailItem)}
           justifyItems="end"
           layout="grid"
@@ -385,7 +379,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       </div>
 
       <div>
-        <Styled.SecondaryDetails
+        <$SecondaryDetails
           items={detailFieldsContent.map(createDetailItem)}
           withOverflow={false}
           withSeparators
@@ -394,13 +388,10 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
 
         {!hasNoPositionInMarket && actions}
       </div>
-    </Styled.PositionInfo>
+    </$PositionInfo>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.DiffOutput = styled(DiffOutput)`
+const $DiffOutput = styled(DiffOutput)`
   --diffOutput-gap: 0.125rem;
   --diffOutput-value-color: var(--color-text-2);
   --diffOutput-valueWithDiff-color: var(--color-text-0);
@@ -409,7 +400,7 @@ Styled.DiffOutput = styled(DiffOutput)`
   justify-items: inherit;
 `;
 
-Styled.PrimaryDetails = styled(Details)`
+const $PrimaryDetails = styled(Details)`
   font: var(--font-mini-book);
   --details-value-font: var(--font-base-book);
 
@@ -425,12 +416,12 @@ Styled.PrimaryDetails = styled(Details)`
   }
 `;
 
-Styled.SecondaryDetails = styled(Details)`
+const $SecondaryDetails = styled(Details)`
   font: var(--font-mini-book);
   --details-value-font: var(--font-small-book);
 `;
 
-Styled.MobileDetails = styled(Details)`
+const $MobileDetails = styled(Details)`
   font: var(--font-small-book);
   --details-value-font: var(--font-medium-medium);
 
@@ -441,7 +432,7 @@ Styled.MobileDetails = styled(Details)`
   }
 `;
 
-Styled.Actions = styled.footer`
+const $Actions = styled.footer`
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
@@ -455,13 +446,15 @@ Styled.Actions = styled.footer`
   }
 `;
 
-Styled.Output = styled(Output)<{ sign: NumberSign; smallText?: boolean; margin?: string }>`
+const $Output = styled(Output)<{ sign?: NumberSign; smallText?: boolean; margin?: string }>`
   color: ${({ sign }) =>
-    ({
-      [NumberSign.Positive]: `var(--color-positive)`,
-      [NumberSign.Negative]: `var(--color-negative)`,
-      [NumberSign.Neutral]: `var(--color-text-2)`,
-    }[sign])};
+    sign == null
+      ? undefined
+      : {
+          [NumberSign.Positive]: `var(--color-positive)`,
+          [NumberSign.Negative]: `var(--color-negative)`,
+          [NumberSign.Neutral]: `var(--color-text-2)`,
+        }[sign]};
 
   ${({ smallText }) =>
     smallText &&
@@ -473,7 +466,7 @@ Styled.Output = styled(Output)<{ sign: NumberSign; smallText?: boolean; margin?:
   ${({ margin }) => margin && `margin: ${margin};`}
 `;
 
-Styled.PositionInfo = styled.div`
+const $PositionInfo = styled.div`
   margin: 0 auto;
   width: 100%;
 
@@ -505,25 +498,25 @@ Styled.PositionInfo = styled.div`
   }
 `;
 
-Styled.DetachedSection = styled(DetachedSection)`
+const $DetachedSection = styled(DetachedSection)`
   padding: 0 1.5rem;
   position: relative;
 `;
 
-Styled.DetachedScrollableSection = styled(DetachedScrollableSection)`
+const $DetachedScrollableSection = styled(DetachedScrollableSection)`
   padding: 0 1.5rem;
 `;
 
-Styled.MobilePositionInfo = styled.div`
+const $MobilePositionInfo = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
 
-  > ${Styled.DetachedSection}:nth-child(1) {
+  > ${$DetachedSection}:nth-child(1) {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
 
-    > ${() => Styled.PositionTile} {
+    > ${() => $PositionTile} {
       flex: 2 9rem;
 
       // Icon + Tags
@@ -532,35 +525,35 @@ Styled.MobilePositionInfo = styled.div`
       }
     }
 
-    > ${Styled.MobileDetails} {
+    > ${$MobileDetails} {
       flex: 1 9rem;
     }
   }
 
-  > ${Styled.DetachedScrollableSection}:nth-child(2) {
+  > ${$DetachedScrollableSection}:nth-child(2) {
     // Profit/Loss Section
-    > ${Styled.MobileDetails} {
+    > ${$MobileDetails} {
       margin: 0 -1rem;
     }
   }
 
-  > ${Styled.DetachedSection}:nth-last-child(1) {
+  > ${$DetachedSection}:nth-last-child(1) {
     // Other Details Section
-    > ${Styled.MobileDetails} {
+    > ${$MobileDetails} {
       margin: 0 -0.25rem;
       --details-value-font: var(--font-base-book);
     }
   }
 `;
 
-Styled.PositionTile = styled(PositionTile)``;
+const $PositionTile = styled(PositionTile)``;
 
-Styled.ClosePositionButton = styled(Button)`
+const $ClosePositionButton = styled(Button)`
   --button-border: solid var(--border-width) var(--color-border-red);
   --button-textColor: var(--color-red);
 `;
 
-Styled.ClosePositionToggleButton = styled(ToggleButton)`
+const $ClosePositionToggleButton = styled(ToggleButton)`
   --button-border: solid var(--border-width) var(--color-border-red);
   --button-toggle-off-textColor: var(--color-red);
   --button-toggle-on-textColor: var(--color-red);

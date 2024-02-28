@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
+
 import type { Story } from '@ladle/react';
+import styled from 'styled-components';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DropdownHeaderMenu } from '@/components/DropdownHeaderMenu';
 
 import { StoryWrapper } from '.ladle/components';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 export const DropdownHeaderMenuStory: Story<Parameters<typeof DropdownHeaderMenu>> = (args) => {
   const [view, setView] = useState<string | undefined>();
@@ -45,15 +47,12 @@ export const DropdownHeaderMenuStory: Story<Parameters<typeof DropdownHeaderMenu
 
   return (
     <StoryWrapper>
-      <Styled.Container>
+      <$Container>
         <DropdownHeaderMenu items={exampleItems}>{view ?? 'Overview'}</DropdownHeaderMenu>
-      </Styled.Container>
+      </$Container>
     </StoryWrapper>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.section`
+const $Container = styled.section`
   ${layoutMixins.container}
 `;

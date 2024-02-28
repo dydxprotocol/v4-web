@@ -1,76 +1,109 @@
 import { ElementType, memo } from 'react';
-import styled, { AnyStyledComponent, css } from 'styled-components';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+
+import { usePrivy } from '@privy-io/react-auth';
 import type { Dispatch } from '@reduxjs/toolkit';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled, { css } from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
-import { STRING_KEYS, StringGetterFunction, TOOLTIP_STRING_KEYS } from '@/constants/localization';
-import { DydxChainAsset, wallets } from '@/constants/wallets';
-
-import { layoutMixins } from '@/styles/layoutMixins';
-import { headerMixins } from '@/styles/headerMixins';
-
 import {
-  useAccounts,
-  useBreakpoints,
-  useTokenConfigs,
-  useStringGetter,
-  useAccountBalance,
-  useURLConfigs,
-} from '@/hooks';
+  STRING_KEYS,
+  TOOLTIP_STRING_KEYS,
+  type StringGetterFunction,
+} from '@/constants/localization';
+import { isDev } from '@/constants/networks';
+import { DydxChainAsset, WalletType, wallets } from '@/constants/wallets';
 
-import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
+import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useComplianceState } from '@/hooks/useComplianceState';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
+
+import { DiscordIcon, GoogleIcon, TwitterIcon } from '@/icons';
+import { headerMixins } from '@/styles/headerMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { CopyButton } from '@/components/CopyButton';
 import { DropdownMenu } from '@/components/DropdownMenu';
-import { Output, OutputType } from '@/components/Output';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
+import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
-
-import { AppTheme } from '@/state/configs';
-import { openDialog } from '@/state/dialogs';
+import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
+import { AppTheme } from '@/state/configs';
 import { getAppTheme } from '@/state/configsSelectors';
+import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { truncateAddress } from '@/lib/wallet';
 import { MustBigNumber } from '@/lib/numbers';
+import { truncateAddress } from '@/lib/wallet';
+
 import { getMobileAppUrl } from '../dialogs/MobileDownloadDialog';
 
 export const AccountMenu = () => {
   const stringGetter = useStringGetter();
   const { mintscanBase } = useURLConfigs();
   const { isTablet } = useBreakpoints();
+  const { complianceState } = useComplianceState();
+
   const dispatch = useDispatch();
   const onboardingState = useSelector(getOnboardingState);
-  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
+  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) ?? {};
+
   const { nativeTokenBalance } = useAccountBalance();
   const { usdcLabel, chainTokenLabel } = useTokenConfigs();
   const theme = useSelector(getAppTheme);
 
   const { evmAddress, walletType, dydxAddress, hdKey } = useAccounts();
 
-  const usdcBalance = freeCollateral?.current || 0;
+  const privy = usePrivy();
+  const { google, discord, twitter } = privy?.user ?? {};
+
+  const usdcBalance = freeCollateral?.current ?? 0;
 
   const onRecoverKeys = () => {
     dispatch(openDialog({ type: DialogTypes.Onboarding }));
   };
 
+  let walletIcon;
+  if (onboardingState === OnboardingState.WalletConnected) {
+    walletIcon = <$WarningIcon iconName={IconName.Warning} />;
+  } else if (
+    onboardingState === OnboardingState.AccountConnected &&
+    walletType === WalletType.Privy
+  ) {
+    if (google) {
+      walletIcon = <Icon iconComponent={GoogleIcon as ElementType} />;
+    } else if (discord) {
+      walletIcon = <Icon iconComponent={DiscordIcon as ElementType} />;
+    } else if (twitter) {
+      walletIcon = <Icon iconComponent={TwitterIcon as ElementType} />;
+    } else {
+      walletIcon = <Icon iconComponent={wallets[walletType].icon as ElementType} />;
+    }
+  } else if (walletType) {
+    walletIcon = <Icon iconComponent={wallets[walletType].icon as ElementType} />;
+  }
+
   return onboardingState === OnboardingState.Disconnected ? (
     <OnboardingTriggerButton size={ButtonSize.XSmall} />
   ) : (
-    <Styled.DropdownMenu
+    <$DropdownMenu
       slotTopContent={
         onboardingState === OnboardingState.AccountConnected && (
-          <Styled.AccountInfo>
-            <Styled.AddressRow>
-              <Styled.AssetIcon symbol="DYDX" />
-              <Styled.Column>
+          <$AccountInfo>
+            <$AddressRow>
+              <$AssetIcon symbol="DYDX" />
+              <$Column>
                 <WithTooltip
                   slotTooltip={
                     <dl>
@@ -86,15 +119,13 @@ export const AccountMenu = () => {
                     </dl>
                   }
                 >
-                  <Styled.label>
-                    {stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}
-                  </Styled.label>
+                  <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
                 </WithTooltip>
-                <Styled.Address>{truncateAddress(dydxAddress)}</Styled.Address>
-              </Styled.Column>
-              <Styled.CopyButton buttonType="icon" value={dydxAddress} shape={ButtonShape.Square} />
+                <$Address>{truncateAddress(dydxAddress)}</$Address>
+              </$Column>
+              <$CopyButton buttonType="icon" value={dydxAddress} shape={ButtonShape.Square} />
               <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.MINTSCAN })}>
-                <Styled.IconButton
+                <$IconButton
                   action={ButtonAction.Base}
                   href={`${mintscanBase}/account/${dydxAddress}`}
                   iconName={IconName.LinkOut}
@@ -102,33 +133,34 @@ export const AccountMenu = () => {
                   type={ButtonType.Link}
                 />
               </WithTooltip>
-            </Styled.AddressRow>
-            <Styled.AddressRow>
-              {walletType && (
-                <Styled.SourceIcon>
-                  <Styled.ConnectorIcon iconName={IconName.AddressConnector} />
+            </$AddressRow>
+            {walletType && walletType !== WalletType.Privy && (
+              <$AddressRow>
+                <$SourceIcon>
+                  <$ConnectorIcon iconName={IconName.AddressConnector} />
                   <Icon iconComponent={wallets[walletType].icon as ElementType} />
-                </Styled.SourceIcon>
-              )}
-              <Styled.Column>
-                <Styled.label>{stringGetter({ key: STRING_KEYS.SOURCE_ADDRESS })}</Styled.label>
-                <Styled.Address>{truncateAddress(evmAddress, '0x')}</Styled.Address>
-              </Styled.Column>
-            </Styled.AddressRow>
-            <Styled.Balances>
+                </$SourceIcon>
+                <$Column>
+                  <$label>{stringGetter({ key: STRING_KEYS.SOURCE_ADDRESS })}</$label>
+                  <$Address>{truncateAddress(evmAddress, '0x')}</$Address>
+                </$Column>
+              </$AddressRow>
+            )}
+            <$Balances>
               <div>
                 <div>
-                  <Styled.label>
+                  <$label>
                     {stringGetter({
                       key: STRING_KEYS.ASSET_BALANCE,
                       params: { ASSET: chainTokenLabel },
                     })}
                     <AssetIcon symbol={chainTokenLabel} />
-                  </Styled.label>
-                  <Styled.BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
+                  </$label>
+                  <$BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
                 </div>
                 <AssetActions
                   asset={DydxChainAsset.CHAINTOKEN}
+                  complianceState={complianceState}
                   dispatch={dispatch}
                   hasBalance={nativeTokenBalance.gt(0)}
                   stringGetter={stringGetter}
@@ -136,39 +168,36 @@ export const AccountMenu = () => {
               </div>
               <div>
                 <div>
-                  <Styled.label>
+                  <$label>
                     {stringGetter({
                       key: STRING_KEYS.ASSET_BALANCE,
                       params: { ASSET: usdcLabel },
                     })}
                     <AssetIcon symbol="USDC" />
-                  </Styled.label>
-                  <Styled.BalanceOutput
-                    type={OutputType.Asset}
-                    value={usdcBalance}
-                    fractionDigits={2}
-                  />
+                  </$label>
+                  <$BalanceOutput type={OutputType.Asset} value={usdcBalance} fractionDigits={2} />
                 </div>
                 <AssetActions
                   asset={DydxChainAsset.USDC}
+                  complianceState={complianceState}
                   dispatch={dispatch}
                   hasBalance={MustBigNumber(usdcBalance).gt(0)}
                   stringGetter={stringGetter}
                   withOnboarding
                 />
               </div>
-            </Styled.Balances>
-          </Styled.AccountInfo>
+            </$Balances>
+          </$AccountInfo>
         )
       }
       items={[
         onboardingState === OnboardingState.WalletConnected && {
           value: 'ConnectToChain',
           label: (
-            <Styled.ConnectToChain>
+            <$ConnectToChain>
               <p>{stringGetter({ key: STRING_KEYS.MISSING_KEYS_DESCRIPTION })}</p>
               <OnboardingTriggerButton />
-            </Styled.ConnectToChain>
+            </$ConnectToChain>
           ),
           onSelect: onRecoverKeys,
           separator: true,
@@ -190,6 +219,18 @@ export const AccountMenu = () => {
           label: stringGetter({ key: STRING_KEYS.DISPLAY_SETTINGS }),
           onSelect: () => dispatch(openDialog({ type: DialogTypes.DisplaySettings })),
         },
+        ...(isDev
+          ? [
+              {
+                value: 'ComplianceConfig',
+                icon: <Icon iconName={IconName.Gear} />,
+                label: 'Compliance Config',
+                onSelect: () => {
+                  dispatch(openDialog({ type: DialogTypes.ComplianceConfig }));
+                },
+              },
+            ]
+          : []),
         ...(getMobileAppUrl()
           ? [
               {
@@ -214,7 +255,7 @@ export const AccountMenu = () => {
                 value: 'MnemonicExport',
                 icon: <Icon iconName={IconName.ExportKeys} />,
                 label: <span>{stringGetter({ key: STRING_KEYS.EXPORT_SECRET_PHRASE })}</span>,
-                highlightColor: 'destroy',
+                highlightColor: 'destroy' as const,
                 onSelect: () => dispatch(openDialog({ type: DialogTypes.MnemonicExport })),
               },
             ]
@@ -223,20 +264,16 @@ export const AccountMenu = () => {
           value: 'Disconnect',
           icon: <Icon iconName={IconName.BoxClose} />,
           label: stringGetter({ key: STRING_KEYS.DISCONNECT }),
-          highlightColor: 'destroy',
+          highlightColor: 'destroy' as const,
           onSelect: () => dispatch(openDialog({ type: DialogTypes.DisconnectWallet })),
         },
       ].filter(isTruthy)}
       align="end"
       sideOffset={16}
     >
-      {onboardingState === OnboardingState.WalletConnected ? (
-        <Styled.WarningIcon iconName={IconName.Warning} />
-      ) : onboardingState === OnboardingState.AccountConnected ? (
-        walletType && <Icon iconComponent={wallets[walletType].icon as ElementType} />
-      ) : null}
-      {!isTablet && <Styled.Address>{truncateAddress(dydxAddress)}</Styled.Address>}
-    </Styled.DropdownMenu>
+      {walletIcon}
+      {!isTablet && <$Address>{truncateAddress(dydxAddress)}</$Address>}
+    </$DropdownMenu>
   );
 };
 
@@ -244,89 +281,90 @@ const AssetActions = memo(
   ({
     asset,
     dispatch,
+    complianceState,
     withOnboarding,
     hasBalance,
     stringGetter,
   }: {
     asset: DydxChainAsset;
     dispatch: Dispatch;
+    complianceState: ComplianceStates;
     withOnboarding?: boolean;
     hasBalance?: boolean;
     stringGetter: StringGetterFunction;
   }) => (
-    <Styled.InlineRow>
+    <$InlineRow>
       {[
-        withOnboarding && {
-          dialogType: DialogTypes.Deposit,
-          iconName: IconName.Deposit,
-          tooltipStringKey: STRING_KEYS.DEPOSIT,
-        },
+        withOnboarding &&
+          complianceState === ComplianceStates.FULL_ACCESS && {
+            dialogType: DialogTypes.Deposit,
+            iconName: IconName.Deposit,
+            tooltipStringKey: STRING_KEYS.DEPOSIT,
+          },
         withOnboarding &&
           hasBalance && {
             dialogType: DialogTypes.Withdraw,
             iconName: IconName.Withdraw,
             tooltipStringKey: STRING_KEYS.WITHDRAW,
           },
-        hasBalance && {
-          dialogType: DialogTypes.Transfer,
-          dialogProps: { selectedAsset: asset },
-          iconName: IconName.Send,
-          tooltipStringKey: STRING_KEYS.TRANSFER,
-        },
+        hasBalance &&
+          complianceState === ComplianceStates.FULL_ACCESS && {
+            dialogType: DialogTypes.Transfer,
+            dialogProps: { selectedAsset: asset },
+            iconName: IconName.Send,
+            tooltipStringKey: STRING_KEYS.TRANSFER,
+          },
       ]
         .filter(isTruthy)
         .map(({ iconName, tooltipStringKey, dialogType, dialogProps }) => (
-          <Styled.WithTooltip
+          <$WithTooltip
             key={tooltipStringKey}
             tooltipString={stringGetter({ key: tooltipStringKey })}
           >
-            <Styled.IconButton
+            <$IconButton
               key={dialogType}
               action={ButtonAction.Base}
               shape={ButtonShape.Square}
               iconName={iconName}
               onClick={() => dispatch(openDialog({ type: dialogType, dialogProps }))}
             />
-          </Styled.WithTooltip>
+          </$WithTooltip>
         ))}
-    </Styled.InlineRow>
+    </$InlineRow>
   )
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.AccountInfo = styled.div`
+const $AccountInfo = styled.div`
   ${layoutMixins.flexColumn}
 
   gap: 1rem;
   padding: 1rem 1rem 0.5rem 1rem;
 `;
 
-Styled.Column = styled.div`
+const $Column = styled.div`
   ${layoutMixins.column}
 `;
 
-Styled.InlineRow = styled.div`
+const $InlineRow = styled.div`
   ${layoutMixins.inlineRow}
 `;
 
-Styled.AddressRow = styled.div`
+const $AddressRow = styled.div`
   ${layoutMixins.row}
 
   gap: 0.5rem;
 
-  ${Styled.Column} {
+  ${$Column} {
     margin-right: 0.5rem;
   }
 `;
 
-Styled.AssetIcon = styled(AssetIcon)`
+const $AssetIcon = styled(AssetIcon)`
   z-index: 2;
 
   font-size: 1.75rem;
 `;
 
-Styled.SourceIcon = styled.div`
+const $SourceIcon = styled.div`
   padding: 0.375rem;
   position: relative;
   z-index: 1;
@@ -338,13 +376,13 @@ Styled.SourceIcon = styled.div`
   background-color: #303045;
 `;
 
-Styled.ConnectorIcon = styled(Icon)`
+const $ConnectorIcon = styled(Icon)`
   position: absolute;
   top: -1.625rem;
   height: 1.75rem;
 `;
 
-Styled.label = styled.div`
+const $label = styled.div`
   ${layoutMixins.row}
 
   gap: 0.25rem;
@@ -356,7 +394,7 @@ Styled.label = styled.div`
   }
 `;
 
-Styled.Balances = styled.div`
+const $Balances = styled.div`
   ${layoutMixins.flexColumn}
 
   > div {
@@ -377,28 +415,28 @@ Styled.Balances = styled.div`
   }
 `;
 
-Styled.BalanceOutput = styled(Output)`
+const $BalanceOutput = styled(Output)`
   font-size: var(--fontSize-medium);
 `;
 
-Styled.DropdownMenu = styled(DropdownMenu)`
+const $DropdownMenu = styled(DropdownMenu)`
   ${headerMixins.dropdownTrigger}
 
   --dropdownMenu-item-font-size: 0.875rem;
   --popover-padding: 0 0 0.5rem 0;
-`;
+` as typeof DropdownMenu;
 
-Styled.WarningIcon = styled(Icon)`
+const $WarningIcon = styled(Icon)`
   font-size: 1.25rem;
   color: var(--color-warning);
 `;
 
-Styled.Address = styled.span`
+const $Address = styled.span`
   font: var(--font-base-book);
   font-feature-settings: var(--fontFeature-monoNumbers);
 `;
 
-Styled.ConnectToChain = styled(Styled.Column)`
+const $ConnectToChain = styled($Column)`
   max-width: 12em;
   gap: 0.5rem;
   text-align: center;
@@ -409,22 +447,23 @@ Styled.ConnectToChain = styled(Styled.Column)`
   }
 `;
 
-Styled.IconButton = styled(IconButton)<{ iconName: IconName }>`
+const $IconButton = styled(IconButton)`
   --button-padding: 0 0.25rem;
   --button-border: solid var(--border-width) var(--color-layer-6);
 
   ${({ iconName }) =>
+    iconName != null &&
     [IconName.Withdraw, IconName.Deposit].includes(iconName) &&
     css`
       --button-icon-size: 1.375em;
     `}
 `;
 
-Styled.CopyButton = styled(CopyButton)`
+const $CopyButton = styled(CopyButton)`
   --button-padding: 0 0.25rem;
   --button-border: solid var(--border-width) var(--color-layer-6);
 `;
 
-Styled.WithTooltip = styled(WithTooltip)`
+const $WithTooltip = styled(WithTooltip)`
   --tooltip-backgroundColor: var(--color-layer-5);
 `;

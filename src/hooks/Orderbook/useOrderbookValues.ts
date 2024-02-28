@@ -1,31 +1,32 @@
 import { useMemo } from 'react';
-import { shallowEqual, useSelector } from 'react-redux';
+
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { shallowEqual, useSelector } from 'react-redux';
 
-import { type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
-import { DepthChartSeries, DepthChartDatum } from '@/constants/charts';
+import { OrderbookLine, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
+import { DepthChartDatum, DepthChartSeries } from '@/constants/charts';
 
+import { getSubaccountOrderSizeBySideAndPrice } from '@/state/accountSelectors';
 import { getCurrentMarketOrderbook } from '@/state/perpetualsSelectors';
-import { getSubaccountOpenOrdersBySideAndPrice } from '@/state/accountSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 
 export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number }) => {
   const orderbook = useSelector(getCurrentMarketOrderbook, shallowEqual);
 
-  const openOrdersBySideAndPrice =
-    useSelector(getSubaccountOpenOrdersBySideAndPrice, shallowEqual) || {};
+  const subaccountOrderSizeBySideAndPrice =
+    useSelector(getSubaccountOrderSizeBySideAndPrice, shallowEqual) || {};
 
   return useMemo(() => {
     const asks: Array<PerpetualMarketOrderbookLevel | undefined> = (
       orderbook?.asks?.toArray() ?? []
     )
       .map(
-        (row, idx: number) =>
+        (row: OrderbookLine, idx: number) =>
           ({
             key: `ask-${idx}`,
             side: 'ask',
-            mine: openOrdersBySideAndPrice[OrderSide.SELL]?.[row.price]?.size,
+            mine: subaccountOrderSizeBySideAndPrice[OrderSide.SELL]?.[row.price],
             ...row,
           } as PerpetualMarketOrderbookLevel)
       )
@@ -35,11 +36,11 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
       orderbook?.bids?.toArray() ?? []
     )
       .map(
-        (row, idx: number) =>
+        (row: OrderbookLine, idx: number) =>
           ({
             key: `bid-${idx}`,
             side: 'bid',
-            mine: openOrdersBySideAndPrice[OrderSide.BUY]?.[row.price]?.size,
+            mine: subaccountOrderSizeBySideAndPrice[OrderSide.BUY]?.[row.price],
             ...row,
           } as PerpetualMarketOrderbookLevel)
       )
@@ -74,8 +75,8 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
     const spreadPercent = orderbook?.spreadPercent;
 
     const histogramRange = Math.max(
-      isNaN(Number(bids[bids.length - 1]?.depth)) ? 0 : Number(bids[bids.length - 1]?.depth),
-      isNaN(Number(asks[asks.length - 1]?.depth)) ? 0 : Number(asks[asks.length - 1]?.depth)
+      Number.isNaN(Number(bids[bids.length - 1]?.depth)) ? 0 : Number(bids[bids.length - 1]?.depth),
+      Number.isNaN(Number(asks[asks.length - 1]?.depth)) ? 0 : Number(asks[asks.length - 1]?.depth)
     );
 
     return {
@@ -86,7 +87,7 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
       histogramRange,
       hasOrderbook: !!orderbook,
     };
-  }, [orderbook, openOrdersBySideAndPrice]);
+  }, [orderbook, subaccountOrderSizeBySideAndPrice]);
 };
 
 export const useOrderbookValuesForDepthChart = () => {

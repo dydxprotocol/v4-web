@@ -3,10 +3,9 @@ import { useState } from 'react';
 import { TradeLayouts } from '@/constants/layout';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Tabs } from '@/components/Tabs';
-
 import { CanvasOrderbook } from '@/views/CanvasOrderbook';
 import { LiveTrades } from '@/views/tables/LiveTrades';
 
@@ -29,8 +28,8 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
     <Tabs
       fullWidthTabs
       value={value}
-      onValueChange={(value: Tab) => {
-        setValue(value);
+      onValueChange={(v: Tab) => {
+        setValue(v);
       }}
       items={[
         {

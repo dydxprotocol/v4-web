@@ -1,4 +1,4 @@
-import { timeUnits, allTimeUnits } from '@/constants/time';
+import { allTimeUnits, timeUnits } from '@/constants/time';
 
 // Given a literal from Intl.RelativeTimeFormat formatToParts,
 // strip out words/symbols unrelated to time unit
@@ -44,7 +44,7 @@ export const formatRelativeTime = (
     locale: string;
     relativeToTimestamp?: number;
     format?: 'long' | 'short' | 'narrow' | 'singleCharacter';
-    largestUnit: keyof typeof timeUnits;
+    largestUnit?: keyof typeof timeUnits;
     resolution?: number;
     stripRelativeWords?: boolean;
   }
@@ -54,8 +54,9 @@ export const formatRelativeTime = (
 
   const unitParts = [];
 
+  // eslint-disable-next-line no-restricted-syntax
   for (const [unit, amount] of Object.entries(timeUnits).slice(
-    Object.keys(timeUnits).findIndex((unit) => unit === largestUnit)
+    Object.keys(timeUnits).findIndex((u) => u === largestUnit)
   ))
     if (Math.abs(elapsed) >= amount) {
       unitParts.push(
@@ -72,6 +73,7 @@ export const formatRelativeTime = (
         }).formatToParts(sign * Math.floor(elapsed / amount), unit as keyof typeof timeUnits)
       );
 
+      // eslint-disable-next-line no-plusplus, no-param-reassign
       if (--resolution === 0) break;
 
       elapsed %= amount;
@@ -112,17 +114,43 @@ export const formatAbsoluteTime = (
 ) =>
   new Intl.DateTimeFormat(
     locale,
-    ({
-      millisecond: { hour: 'numeric', minute: 'numeric', second: 'numeric', fractionalSecondDigits: 3, hour12: false },
-      centisecond: { hour: 'numeric', minute: 'numeric', second: 'numeric', fractionalSecondDigits: 3, hour12: false },
-      decisecond: { hour: 'numeric', minute: 'numeric', second: 'numeric', fractionalSecondDigits: 2, hour12: false },
-      second: { hour: 'numeric', minute: 'numeric', second: 'numeric', fractionalSecondDigits: 1, hour12: false },
-      minute: { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false },
-      hour: { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false },
-      day: { hour: 'numeric', minute: 'numeric' },
-      threeDays: { weekday: 'short', hour: 'numeric' },
-      week: { weekday: 'short', hour: 'numeric' },
-      month: { month: 'numeric', day: 'numeric', hour: 'numeric' },
-      year: { year: 'numeric', month: 'numeric', day: 'numeric' },
-    } as const)[resolutionUnit]
+    (
+      {
+        millisecond: {
+          hour: 'numeric',
+          minute: 'numeric',
+          second: 'numeric',
+          fractionalSecondDigits: 3,
+          hour12: false,
+        },
+        centisecond: {
+          hour: 'numeric',
+          minute: 'numeric',
+          second: 'numeric',
+          fractionalSecondDigits: 3,
+          hour12: false,
+        },
+        decisecond: {
+          hour: 'numeric',
+          minute: 'numeric',
+          second: 'numeric',
+          fractionalSecondDigits: 2,
+          hour12: false,
+        },
+        second: {
+          hour: 'numeric',
+          minute: 'numeric',
+          second: 'numeric',
+          fractionalSecondDigits: 1,
+          hour12: false,
+        },
+        minute: { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false },
+        hour: { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false },
+        day: { hour: 'numeric', minute: 'numeric' },
+        threeDays: { weekday: 'short', hour: 'numeric' },
+        week: { weekday: 'short', hour: 'numeric' },
+        month: { month: 'numeric', day: 'numeric', hour: 'numeric' },
+        year: { year: 'numeric', month: 'numeric', day: 'numeric' },
+      } as const
+    )[resolutionUnit]
   ).format(timestamp);

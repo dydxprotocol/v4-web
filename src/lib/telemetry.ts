@@ -1,7 +1,8 @@
-import { isDev } from "@/constants/networks";
+import { isDev } from '@/constants/networks';
 
 export const log = (location: string, error: Error, metadata?: any) => {
   if (isDev) {
+    // eslint-disable-next-line no-console
     console.warn('telemetry/log:', { location, error, metadata });
   }
 

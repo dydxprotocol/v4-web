@@ -1,16 +1,16 @@
 import { useDispatch, useSelector } from 'react-redux';
 
-import { useStringGetter } from '@/hooks';
-
+import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { Button } from '@/components/Button';
 
-import { forceOpenDialog } from '@/state/dialogs';
 import { getOnboardingState } from '@/state/accountSelectors';
-import { OnboardingState } from '@/constants/account';
+import { forceOpenDialog } from '@/state/dialogs';
 
 type StyleProps = {
   size?: ButtonSize;

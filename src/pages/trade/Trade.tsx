@@ -1,35 +1,33 @@
 import { useRef, useState } from 'react';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+
 import { useSelector } from 'react-redux';
+import styled, { css } from 'styled-components';
+
+import { TradeLayouts } from '@/constants/layout';
+
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useCurrentMarketId } from '@/hooks/useCurrentMarketId';
+import { usePageTitlePriceUpdates } from '@/hooks/usePageTitlePriceUpdates';
+import { useTradeFormInputs } from '@/hooks/useTradeFormInputs';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { TradeLayouts } from '@/constants/layout';
-
-import {
-  useBreakpoints,
-  useCurrentMarketId,
-  usePageTitlePriceUpdates,
-  useTradeFormInputs,
-} from '@/hooks';
+import { DetachedSection } from '@/components/ContentSection';
+import { AccountInfo } from '@/views/AccountInfo';
+import { TradeBox } from '@/views/TradeBox';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
-import { DetachedSection } from '@/components/ContentSection';
-
-import { TradeHeaderMobile } from './TradeHeaderMobile';
+import { HorizontalPanel } from './HorizontalPanel';
 import { InnerPanel } from './InnerPanel';
 import { MarketSelectorAndStats } from './MarketSelectorAndStats';
-import { VerticalPanel } from './VerticalPanel';
-import { HorizontalPanel } from './HorizontalPanel';
 import { MobileBottomPanel } from './MobileBottomPanel';
 import { MobileTopPanel } from './MobileTopPanel';
 import { TradeDialogTrigger } from './TradeDialogTrigger';
-
-import { AccountInfo } from '@/views/AccountInfo';
-import { TradeBox } from '@/views/TradeBox';
+import { TradeHeaderMobile } from './TradeHeaderMobile';
+import { VerticalPanel } from './VerticalPanel';
 
 const TradePage = () => {
   const tradePageRef = useRef<HTMLDivElement>(null);
@@ -45,7 +43,7 @@ const TradePage = () => {
   useTradeFormInputs();
 
   return isTablet ? (
-    <Styled.TradeLayoutMobile>
+    <$TradeLayoutMobile>
       <TradeHeaderMobile />
 
       <div>
@@ -63,42 +61,39 @@ const TradePage = () => {
       </div>
 
       {canAccountTrade && <TradeDialogTrigger />}
-    </Styled.TradeLayoutMobile>
+    </$TradeLayoutMobile>
   ) : (
-    <Styled.TradeLayout
+    <$TradeLayout
       ref={tradePageRef}
       tradeLayout={tradeLayout}
       isHorizontalPanelOpen={isHorizontalPanelOpen}
     >
-      <Styled.Top>
+      <$Top>
         <MarketSelectorAndStats />
-      </Styled.Top>
+      </$Top>
 
-      <Styled.SideSection gridArea="Side">
+      <$SideSection gridArea="Side">
         <AccountInfo />
         <TradeBox />
-      </Styled.SideSection>
+      </$SideSection>
 
-      <Styled.GridSection gridArea="Vertical">
+      <$GridSection gridArea="Vertical">
         <VerticalPanel tradeLayout={tradeLayout} />
-      </Styled.GridSection>
+      </$GridSection>
 
-      <Styled.GridSection gridArea="Inner">
+      <$GridSection gridArea="Inner">
         <InnerPanel />
-      </Styled.GridSection>
+      </$GridSection>
 
-      <Styled.GridSection gridArea="Horizontal">
+      <$GridSection gridArea="Horizontal">
         <HorizontalPanel isOpen={isHorizontalPanelOpen} setIsOpen={setIsHorizontalPanelOpen} />
-      </Styled.GridSection>
-    </Styled.TradeLayout>
+      </$GridSection>
+    </$TradeLayout>
   );
 };
 
 export default TradePage;
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TradeLayout = styled.article<{
+const $TradeLayout = styled.article<{
   tradeLayout: TradeLayouts;
   isHorizontalPanelOpen: boolean;
 }>`
@@ -214,7 +209,7 @@ Styled.TradeLayout = styled.article<{
   }
 `;
 
-Styled.TradeLayoutMobile = styled.article`
+const $TradeLayoutMobile = styled.article`
   ${layoutMixins.contentContainerPage}
   min-height: 100%;
 
@@ -232,14 +227,14 @@ Styled.TradeLayoutMobile = styled.article`
   }
 `;
 
-Styled.Top = styled.header`
+const $Top = styled.header`
   grid-area: Top;
 `;
 
-Styled.GridSection = styled.section<{ gridArea: string }>`
+const $GridSection = styled.section<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
 `;
 
-Styled.SideSection = styled(Styled.GridSection)`
+const $SideSection = styled($GridSection)`
   grid-template-rows: auto minmax(0, 1fr);
 `;

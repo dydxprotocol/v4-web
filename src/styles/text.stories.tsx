@@ -1,5 +1,5 @@
 import type { Story } from '@ladle/react';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -9,7 +9,7 @@ const FONT_SIZES = ['tiny', 'mini', 'small', 'base', 'medium', 'large', 'extra']
 
 export const TextStory: Story = () => (
   <StoryWrapper>
-    <Styled.Table>
+    <$Table>
       <thead>
         <tr>
           <th>Regular(-)</th>
@@ -49,13 +49,10 @@ export const TextStory: Story = () => (
           </tr>
         ))}
       </tbody>
-    </Styled.Table>
+    </$Table>
   </StoryWrapper>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Table = styled.table`
+const $Table = styled.table`
   width: 100%;
   text-align: left;
   border-collapse: separate;

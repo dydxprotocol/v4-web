@@ -78,12 +78,12 @@ export const ORDER_TYPE_STRINGS: Record<
     descriptionKey: STRING_KEYS.STOP_MARKET_DESCRIPTION,
   },
   [TradeTypes.TAKE_PROFIT]: {
-    orderTypeKeyShort: STRING_KEYS.TAKE_PROFIT_LIMIT,
+    orderTypeKeyShort: STRING_KEYS.TAKE_PROFIT_LIMIT_SHORT,
     orderTypeKey: STRING_KEYS.TAKE_PROFIT_LIMIT,
     descriptionKey: STRING_KEYS.TAKE_PROFIT_LIMIT_DESCRIPTION,
   },
   [TradeTypes.TAKE_PROFIT_MARKET]: {
-    orderTypeKeyShort: STRING_KEYS.TAKE_PROFIT_MARKET,
+    orderTypeKeyShort: STRING_KEYS.TAKE_PROFIT_MARKET_SHORT,
     orderTypeKey: STRING_KEYS.TAKE_PROFIT_MARKET,
     descriptionKey: STRING_KEYS.TAKE_PROFIT_MARKET_DESCRIPTION,
   },
@@ -149,6 +149,7 @@ export enum MobilePlaceOrderSteps {
   PreviewOrder = 'PreviewOrder',
   PlacingOrder = 'PlacingOrder',
   Confirmation = 'Confirmation',
+  PlaceOrderFailed = 'PlaceOrderFailed',
 }
 
 export const CLEARED_TRADE_INPUTS = {
@@ -161,4 +162,30 @@ export const CLEARED_SIZE_INPUTS = {
   amountInput: '',
   usdAmountInput: '',
   leverageInput: '',
+};
+
+export enum PlaceOrderStatuses {
+  Submitted,
+  Placed,
+  Filled,
+}
+
+export enum CancelOrderStatuses {
+  Submitted,
+  Canceled,
+}
+
+export type LocalPlaceOrderData = {
+  marketId: string;
+  clientId: number;
+  orderId?: string;
+  orderType: TradeTypes;
+  submissionStatus: PlaceOrderStatuses;
+  errorStringKey?: string;
+};
+
+export type LocalCancelOrderData = {
+  orderId: string;
+  submissionStatus: CancelOrderStatuses;
+  errorStringKey?: string;
 };

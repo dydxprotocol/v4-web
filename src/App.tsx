@@ -1,50 +1,52 @@
 import { lazy, Suspense, useMemo } from 'react';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import styled, { AnyStyledComponent, css } from 'styled-components';
-import { WagmiConfig } from 'wagmi';
-import { QueryClient, QueryClientProvider } from 'react-query';
+
+import { PrivyProvider } from '@privy-io/react-auth';
+import { PrivyWagmiConnector } from '@privy-io/wagmi-connector';
 import { GrazProvider } from 'graz';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import styled, { css } from 'styled-components';
+import { WagmiConfig } from 'wagmi';
 
 import { AppRoute, DEFAULT_TRADE_ROUTE, MarketsRoute } from '@/constants/routes';
 
-import {
-  useBreakpoints,
-  useTokenConfigs,
-  useInitializePage,
-  useShouldShowFooter,
-  useAnalytics,
-} from '@/hooks';
-import { DydxProvider } from '@/hooks/useDydxClient';
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
 import { DialogAreaProvider, useDialogArea } from '@/hooks/useDialogArea';
+import { DydxProvider } from '@/hooks/useDydxClient';
+import { LocalNotificationsProvider } from '@/hooks/useLocalNotifications';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
-import { LocalNotificationsProvider } from '@/hooks/useLocalNotifications';
 import { PotentialMarketsProvider } from '@/hooks/usePotentialMarkets';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
 
+import { breakpoints } from '@/styles';
+import '@/styles/constants.css';
+import '@/styles/fonts.css';
+import { GlobalStyle } from '@/styles/globalStyle';
+import { layoutMixins } from '@/styles/layoutMixins';
+import '@/styles/web3modal.css';
+
 import { GuardedMobileRoute } from '@/components/GuardedMobileRoute';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
-
-import { HeaderDesktop } from '@/layout/Header/HeaderDesktop';
+import { DialogManager } from '@/layout/DialogManager';
 import { FooterDesktop } from '@/layout/Footer/FooterDesktop';
 import { FooterMobile } from '@/layout/Footer/FooterMobile';
+import { HeaderDesktop } from '@/layout/Header/HeaderDesktop';
 import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
-import { DialogManager } from '@/layout/DialogManager';
 import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 
 import { parseLocationHash } from '@/lib/urlUtils';
-import { config } from '@/lib/wagmi';
+import { config, configureChainsConfig, privyConfig } from '@/lib/wagmi';
 
-import { breakpoints } from '@/styles';
-import { GlobalStyle } from '@/styles/globalStyle';
-import { layoutMixins } from '@/styles/layoutMixins';
-
-import '@/styles/constants.css';
-import '@/styles/fonts.css';
-import '@/styles/web3modal.css';
+import { ComplianceStates } from './constants/compliance';
+import { useAnalytics } from './hooks/useAnalytics';
+import { useBreakpoints } from './hooks/useBreakpoints';
+import { useComplianceState } from './hooks/useComplianceState';
+import { useInitializePage } from './hooks/useInitializePage';
+import { useShouldShowFooter } from './hooks/useShouldShowFooter';
+import { useTokenConfigs } from './hooks/useTokenConfigs';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
@@ -60,8 +62,6 @@ const TokenPage = lazy(() => import('@/pages/token/Token'));
 const queryClient = new QueryClient();
 
 const Content = () => {
-  const { setDialogArea } = useDialogArea();
-
   useInitializePage();
   useAnalytics();
 
@@ -71,6 +71,8 @@ const Content = () => {
   const { chainTokenLabel } = useTokenConfigs();
   const location = useLocation();
 
+  const { complianceState } = useComplianceState();
+
   const pathFromHash = useMemo(() => {
     if (location.hash === '') {
       return '';
@@ -78,13 +80,14 @@ const Content = () => {
     return parseLocationHash(location.hash);
   }, [location.hash]);
 
+  const { dialogAreaRef } = useDialogArea() ?? {};
   return (
     <>
       <GlobalStyle />
-      <Styled.Content isShowingHeader={isShowingHeader} isShowingFooter={isShowingFooter}>
+      <$Content isShowingHeader={isShowingHeader} isShowingFooter={isShowingFooter}>
         {isNotTablet && <HeaderDesktop />}
 
-        <Styled.Main>
+        <$Main>
           <Suspense fallback={<LoadingSpace id="main" />}>
             <Routes>
               <Route path={AppRoute.Trade}>
@@ -96,7 +99,18 @@ const Content = () => {
                 <Route path={MarketsRoute.New} element={<NewMarket />} />
                 <Route path={AppRoute.Markets} element={<MarketsPage />} />
               </Route>
-              <Route path={`/${chainTokenLabel}/*`} element={<TokenPage />} />
+
+              <Route
+                path={`/${chainTokenLabel}/*`}
+                element={
+                  complianceState === ComplianceStates.FULL_ACCESS ? (
+                    <TokenPage />
+                  ) : (
+                    <Navigate to={DEFAULT_TRADE_ROUTE} />
+                  )
+                }
+              />
+
               {isTablet && (
                 <>
                   <Route path={AppRoute.Alerts} element={<AlertsPage />} />
@@ -117,18 +131,18 @@ const Content = () => {
               />
             </Routes>
           </Suspense>
-        </Styled.Main>
+        </$Main>
 
         {isTablet ? <FooterMobile /> : <FooterDesktop />}
 
-        <Styled.NotificationsToastArea />
+        <$NotificationsToastArea />
 
-        <Styled.DialogArea ref={setDialogArea}>
+        <$DialogArea ref={dialogAreaRef}>
           <DialogManager />
-        </Styled.DialogArea>
+        </$DialogArea>
 
         <GlobalCommandDialog />
-      </Styled.Content>
+      </$Content>
     </>
   );
 };
@@ -141,8 +155,13 @@ const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
 };
 
 const providers = [
+  wrapProvider(PrivyProvider, {
+    appId: import.meta.env.VITE_PRIVY_APP_ID ?? 'dummyappiddummyappiddummy',
+    config: privyConfig,
+  }),
   wrapProvider(QueryClientProvider, { client: queryClient }),
   wrapProvider(GrazProvider),
+  wrapProvider(PrivyWagmiConnector, { wagmiChainsConfig: configureChainsConfig }),
   wrapProvider(WagmiConfig, { config }),
   wrapProvider(LocaleProvider),
   wrapProvider(RestrictionProvider),
@@ -162,9 +181,7 @@ const App = () => {
   }, <Content />);
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Content = styled.div<{ isShowingHeader: boolean; isShowingFooter: boolean }>`
+const $Content = styled.div<{ isShowingHeader: boolean; isShowingFooter: boolean }>`
   /* Computed */
   --page-currentHeaderHeight: 0px;
   --page-currentFooterHeight: 0px;
@@ -188,12 +205,12 @@ Styled.Content = styled.div<{ isShowingHeader: boolean; isShowingFooter: boolean
         --page-currentFooterHeight: var(--page-footer-height-mobile);
       }
     `}
-
-  /* Rules */
-  ${layoutMixins.contentContainer}
-
-  ${layoutMixins.scrollArea}
-  --scrollArea-height: 100vh;
+  
+    /* Rules */
+    ${layoutMixins.contentContainer}
+  
+    ${layoutMixins.scrollArea}
+    --scrollArea-height: 100vh;
 
   @supports (-webkit-touch-callout: none) {
     height: -webkit-fill-available;
@@ -216,7 +233,7 @@ Styled.Content = styled.div<{ isShowingHeader: boolean; isShowingFooter: boolean
   transition: 0.3s var(--ease-out-expo);
 `;
 
-Styled.Main = styled.main`
+const $Main = styled.main`
   ${layoutMixins.contentSectionAttached}
   box-shadow: none;
 
@@ -227,12 +244,12 @@ Styled.Main = styled.main`
   position: relative;
 `;
 
-Styled.NotificationsToastArea = styled(NotificationsToastArea)`
+const $NotificationsToastArea = styled(NotificationsToastArea)`
   grid-area: Main;
   z-index: 2;
 `;
 
-Styled.DialogArea = styled.aside`
+const $DialogArea = styled.aside`
   position: fixed;
   height: 100%;
   z-index: 1;

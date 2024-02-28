@@ -1,7 +1,8 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
-import { StringGetterFunction, STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { AppRoute, MobileSettingsRoute } from '@/constants/routes';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { BackButton } from '@/components/BackButton';
@@ -39,16 +40,13 @@ export const SettingsHeader = ({
   const currentRoute = routeMap[pathname];
 
   return (
-    <Styled.SettingsHeader>
+    <$SettingsHeader>
       <BackButton />
-      <Styled.Label>{currentRoute?.label}</Styled.Label>
-    </Styled.SettingsHeader>
+      <$Label>{currentRoute?.label}</$Label>
+    </$SettingsHeader>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.SettingsHeader = styled.header`
+const $SettingsHeader = styled.header`
   --stickyArea-topHeight: var(--page-header-height-mobile);
 
   ${layoutMixins.stickyHeader}
@@ -59,7 +57,7 @@ Styled.SettingsHeader = styled.header`
   background-color: var(--color-layer-2);
 `;
 
-Styled.Label = styled.h1`
+const $Label = styled.h1`
   padding: 0.5rem;
   font: var(--font-extra-medium);
 `;

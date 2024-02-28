@@ -1,5 +1,5 @@
-import styled, { AnyStyledComponent } from 'styled-components';
 import type { Story } from '@ladle/react';
+import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -10,9 +10,9 @@ import { StoryWrapper } from '.ladle/components';
 export const MarginUsageRingStory: Story<{ value: number }> = (args) => {
   return (
     <StoryWrapper>
-      <Styled.Container>
+      <$Container>
         <MarginUsageRing value={args.value / 100} />
-      </Styled.Container>
+      </$Container>
     </StoryWrapper>
   );
 };
@@ -24,9 +24,9 @@ MarginUsageRingStory.args = {
 export const MarginUsageRingStyled: Story<{ value: number }> = (args) => {
   return (
     <StoryWrapper>
-      <Styled.Container>
-        <Styled.MarginUsageRing value={args.value / 100} />
-      </Styled.Container>
+      <$Container>
+        <$MarginUsageRing value={args.value / 100} />
+      </$Container>
     </StoryWrapper>
   );
 };
@@ -34,14 +34,11 @@ export const MarginUsageRingStyled: Story<{ value: number }> = (args) => {
 MarginUsageRingStyled.args = {
   value: 0,
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.MarginUsageRing = styled(MarginUsageRing)`
+const $MarginUsageRing = styled(MarginUsageRing)`
   color: var(--color-accent);
 `;
 
-Styled.Container = styled.section`
+const $Container = styled.section`
   background: var(--color-layer-3);
 
   ${layoutMixins.container}

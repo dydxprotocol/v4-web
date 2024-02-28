@@ -1,24 +1,33 @@
 import { lazy, Suspense } from 'react';
+
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import styled from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { HistoryRoute, PortfolioRoute } from '@/constants/routes';
-import { useAccountBalance, useBreakpoints, useDocumentTitle, useStringGetter } from '@/hooks';
+
+import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useComplianceState } from '@/hooks/useComplianceState';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
-import { FundingPaymentsTable } from '@/views/tables/FundingPaymentsTable';
-import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { Tag, TagType } from '@/components/Tag';
 import { WithSidebar } from '@/components/WithSidebar';
+import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
+import { FundingPaymentsTable } from '@/views/tables/FundingPaymentsTable';
+import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 
 import { getOnboardingState, getSubaccount, getTradeInfoNumbers } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
@@ -26,7 +35,6 @@ import { openDialog } from '@/state/dialogs';
 import { shortenNumberForDisplay } from '@/lib/numbers';
 
 import { PortfolioNavMobile } from './PortfolioNavMobile';
-import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
 const Overview = lazy(() => import('./Overview').then((module) => ({ default: module.Overview })));
 const Positions = lazy(() =>
@@ -36,21 +44,24 @@ const Orders = lazy(() => import('./Orders').then((module) => ({ default: module
 const Fees = lazy(() => import('./Fees').then((module) => ({ default: module.Fees })));
 const History = lazy(() => import('./History').then((module) => ({ default: module.History })));
 
-export default () => {
+const PortfolioPage = () => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
+  const { complianceState } = useComplianceState();
+
+  const initialPageSize = 20;
 
   const onboardingState = useSelector(getOnboardingState);
-  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
+  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) ?? {};
   const { nativeTokenBalance } = useAccountBalance();
 
   const { numTotalPositions, numTotalOpenOrders } =
-    useSelector(getTradeInfoNumbers, shallowEqual) || {};
+    useSelector(getTradeInfoNumbers, shallowEqual) ?? {};
   const numPositions = shortenNumberForDisplay(numTotalPositions);
   const numOrders = shortenNumberForDisplay(numTotalOpenOrders);
 
-  const usdcBalance = freeCollateral?.current || 0;
+  const usdcBalance = freeCollateral?.current ?? 0;
 
   useDocumentTitle(stringGetter({ key: STRING_KEYS.PORTFOLIO }));
 
@@ -67,6 +78,7 @@ export default () => {
             path={HistoryRoute.Trades}
             element={
               <FillsTable
+                initialPageSize={initialPageSize}
                 columnKeys={
                   isTablet
                     ? [
@@ -90,11 +102,21 @@ export default () => {
           />
           <Route
             path={HistoryRoute.Transfers}
-            element={<TransferHistoryTable withOuterBorder={isNotTablet} />}
+            element={
+              <TransferHistoryTable
+                initialPageSize={initialPageSize}
+                withOuterBorder={isNotTablet}
+              />
+            }
           />
           <Route
             path={HistoryRoute.Payments}
-            element={<FundingPaymentsTable withOuterBorder={isNotTablet} />}
+            element={
+              <FundingPaymentsTable
+                initialPageSize={initialPageSize}
+                withOuterBorder={isNotTablet}
+              />
+            }
           />
         </Route>
         <Route path="*" element={<Navigate to={PortfolioRoute.Overview} replace />} />
@@ -103,16 +125,16 @@ export default () => {
   );
 
   return isTablet ? (
-    <Styled.PortfolioMobile>
+    <$PortfolioMobile>
       <PortfolioNavMobile />
       {routesComponent}
-    </Styled.PortfolioMobile>
+    </$PortfolioMobile>
   ) : (
     <WithSidebar
       sidebar={
         isTablet ? null : (
-          <Styled.SideBar>
-            <Styled.NavigationMenu
+          <$SideBar>
+            <$NavigationMenu
               items={[
                 {
                   group: 'views',
@@ -121,9 +143,9 @@ export default () => {
                     {
                       value: PortfolioRoute.Overview,
                       slotBefore: (
-                        <Styled.IconContainer>
+                        <$IconContainer>
                           <Icon iconName={IconName.Overview} />
-                        </Styled.IconContainer>
+                        </$IconContainer>
                       ),
                       label: stringGetter({ key: STRING_KEYS.OVERVIEW }),
                       href: PortfolioRoute.Overview,
@@ -131,9 +153,9 @@ export default () => {
                     {
                       value: PortfolioRoute.Positions,
                       slotBefore: (
-                        <Styled.IconContainer>
+                        <$IconContainer>
                           <Icon iconName={IconName.Positions} />
-                        </Styled.IconContainer>
+                        </$IconContainer>
                       ),
                       label: (
                         <>
@@ -149,9 +171,9 @@ export default () => {
                     {
                       value: PortfolioRoute.Orders,
                       slotBefore: (
-                        <Styled.IconContainer>
+                        <$IconContainer>
                           <Icon iconName={IconName.OrderPending} />
-                        </Styled.IconContainer>
+                        </$IconContainer>
                       ),
                       label: (
                         <>
@@ -166,9 +188,9 @@ export default () => {
                     {
                       value: PortfolioRoute.Fees,
                       slotBefore: (
-                        <Styled.IconContainer>
+                        <$IconContainer>
                           <Icon iconName={IconName.Calculator} />
-                        </Styled.IconContainer>
+                        </$IconContainer>
                       ),
                       label: stringGetter({ key: STRING_KEYS.FEES }),
                       href: PortfolioRoute.Fees,
@@ -176,9 +198,9 @@ export default () => {
                     {
                       value: PortfolioRoute.History,
                       slotBefore: (
-                        <Styled.IconContainer>
+                        <$IconContainer>
                           <Icon iconName={IconName.History} />
-                        </Styled.IconContainer>
+                        </$IconContainer>
                       ),
                       label: stringGetter({ key: STRING_KEYS.HISTORY }),
                       href: PortfolioRoute.History,
@@ -188,13 +210,15 @@ export default () => {
               ]}
             />
             {onboardingState === OnboardingState.AccountConnected && (
-              <Styled.Footer>
-                <Button
-                  action={ButtonAction.Primary}
-                  onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
-                >
-                  {stringGetter({ key: STRING_KEYS.DEPOSIT })}
-                </Button>
+              <$Footer>
+                {complianceState === ComplianceStates.FULL_ACCESS && (
+                  <Button
+                    action={ButtonAction.Primary}
+                    onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
+                  >
+                    {stringGetter({ key: STRING_KEYS.DEPOSIT })}
+                  </Button>
+                )}
                 {usdcBalance > 0 && (
                   <Button
                     action={ButtonAction.Base}
@@ -203,17 +227,18 @@ export default () => {
                     {stringGetter({ key: STRING_KEYS.WITHDRAW })}
                   </Button>
                 )}
-                {(usdcBalance > 0 || nativeTokenBalance.gt(0)) && (
-                  <Button
-                    action={ButtonAction.Base}
-                    onClick={() => dispatch(openDialog({ type: DialogTypes.Transfer }))}
-                  >
-                    {stringGetter({ key: STRING_KEYS.TRANSFER })}
-                  </Button>
-                )}
-              </Styled.Footer>
+                {complianceState === ComplianceStates.FULL_ACCESS &&
+                  (usdcBalance > 0 || nativeTokenBalance.gt(0)) && (
+                    <Button
+                      action={ButtonAction.Base}
+                      onClick={() => dispatch(openDialog({ type: DialogTypes.Transfer }))}
+                    >
+                      {stringGetter({ key: STRING_KEYS.TRANSFER })}
+                    </Button>
+                  )}
+              </$Footer>
             )}
-          </Styled.SideBar>
+          </$SideBar>
         )
       }
     >
@@ -222,21 +247,21 @@ export default () => {
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
+export default PortfolioPage;
 
-Styled.PortfolioMobile = styled.div`
+const $PortfolioMobile = styled.div`
   min-height: 100%;
   ${layoutMixins.expandingColumnWithHeader}
 `;
 
-Styled.SideBar = styled.div`
+const $SideBar = styled.div`
   ${layoutMixins.flexColumn}
   justify-content: space-between;
 
   height: 100%;
 `;
 
-Styled.Footer = styled.div`
+const $Footer = styled.div`
   ${layoutMixins.row}
   flex-wrap: wrap;
 
@@ -249,12 +274,12 @@ Styled.Footer = styled.div`
   }
 `;
 
-Styled.NavigationMenu = styled(NavigationMenu)`
+const $NavigationMenu = styled(NavigationMenu)`
   padding: 0.5rem;
   padding-top: 0;
 `;
 
-Styled.IconContainer = styled.div`
+const $IconContainer = styled.div`
   width: 1.5rem;
   height: 1.5rem;
   font-size: 0.75rem;

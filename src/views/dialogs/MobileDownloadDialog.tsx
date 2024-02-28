@@ -1,11 +1,13 @@
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
+
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog } from '@/components/Dialog';
 import { QrCode } from '@/components/QrCode';
-import { useStringGetter } from '@/hooks';
-import { STRING_KEYS } from '@/constants/localization';
 
 type ElementProps = {
   setIsOpen: (open: boolean) => void;
@@ -24,28 +26,26 @@ type ElementProps = {
 // for testing only
 // export const mobileAppUrl = "http://example.com";
 
-let mobileAppUrl: string | undefined | null = undefined;
+let mobileAppUrl: string | undefined | null;
 
 export const getMobileAppUrl = () => {
   if (!mobileAppUrl) {
     mobileAppUrl =
-    // for testing to verify <meta> is retrieved by name, QR code should show "@dYdX" as value
-    // document.querySelector('meta[name="twitter:creator"]')?.getAttribute('content') ??
-    document.querySelector('meta[name="smartbanner:button-url-apple"]')?.getAttribute('content') ?? 
-    document.querySelector('meta[name="smartbanner:button-url-google"]')?.getAttribute('content');
+      // for testing to verify <meta> is retrieved by name, QR code should show "@dYdX" as value
+      // document.querySelector('meta[name="twitter:creator"]')?.getAttribute('content') ??
+      document
+        .querySelector('meta[name="smartbanner:button-url-apple"]')
+        ?.getAttribute('content') ??
+      document.querySelector('meta[name="smartbanner:button-url-google"]')?.getAttribute('content');
   }
   return mobileAppUrl;
-}
-  
-const MobileQrCode = ({
-  url,
-}: {
-  url: string;
-}) => {
+};
+
+const MobileQrCode = ({ url }: { url: string }) => {
   return (
-    <Styled.QrCodeContainer isShowing={true}>
+    <$QrCodeContainer isShowing>
       <QrCode hasLogo size={432} value={url} />
-    </Styled.QrCodeContainer>
+    </$QrCodeContainer>
   );
 };
 
@@ -55,22 +55,19 @@ MobileDownloadDialog should only been shown on desktop when mobileAppUrl has val
 
 export const MobileDownloadDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const content = (
-    <MobileQrCode url={mobileAppUrl!} />
-  );
+  const content = <MobileQrCode url={mobileAppUrl!} />;
 
   return (
-    <Dialog isOpen setIsOpen={setIsOpen} title={
-        stringGetter({ key: STRING_KEYS.DOWNLOAD_MOBILE_APP })
-      }>
-      <Styled.Content>{content}</Styled.Content>
+    <Dialog
+      isOpen
+      setIsOpen={setIsOpen}
+      title={stringGetter({ key: STRING_KEYS.DOWNLOAD_MOBILE_APP })}
+    >
+      <$Content>{content}</$Content>
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
 
@@ -89,13 +86,7 @@ Styled.Content = styled.div`
   }
 `;
 
-Styled.WaitingSpan = styled.span`
-  strong {
-    color: var(--color-warning);
-  }
-`;
-
-Styled.QrCodeContainer = styled.figure<{ isShowing: boolean }>`
+const $QrCodeContainer = styled.figure<{ isShowing: boolean }>`
   ${layoutMixins.stack}
 
   overflow: hidden;

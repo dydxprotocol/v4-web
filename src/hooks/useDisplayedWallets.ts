@@ -4,7 +4,7 @@ import { WalletType } from '@/constants/wallets';
 import { isTruthy } from '@/lib/isTruthy';
 
 export const useDisplayedWallets = () => {
-  return [
+  const displayedWallets = [
     WalletType.MetaMask,
 
     isDev && WalletType.Keplr,
@@ -22,6 +22,10 @@ export const useDisplayedWallets = () => {
     // WalletType.BitKeep,
     // WalletType.Coin98,
 
+    Boolean(import.meta.env.VITE_PRIVY_APP_ID) && WalletType.Privy,
+
     WalletType.OtherWallet,
   ].filter(isTruthy);
+
+  return displayedWallets;
 };

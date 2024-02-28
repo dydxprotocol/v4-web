@@ -1,15 +1,16 @@
-import { useCallback, useEffect, useState } from 'react';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import { useCallback, useState } from 'react';
+
+import { useDispatch } from 'react-redux';
+import styled from 'styled-components';
 
 import { AbacusOrderStatus, type OrderStatus } from '@/constants/abacus';
+import { ButtonShape } from '@/constants/buttons';
 
-import { useSubaccount } from '@/hooks';
-import { layoutMixins } from '@/styles/layoutMixins';
+import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
-import { Toolbar } from '@/components/Toolbar';
+import { ActionsTableCell } from '@/components/Table';
 
 import { clearOrder } from '@/state/account';
 
@@ -29,59 +30,33 @@ export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) 
 
   const onCancel = useCallback(async () => {
     setIsCanceling(true);
-    await cancelOrder({ orderId, onError: () => setIsCanceling(false) });
+    cancelOrder({ orderId, onError: () => setIsCanceling(false) });
   }, []);
 
   return (
-    <Styled.OrderActions>
-      <Styled.Toolbar>
-        {isOrderStatusClearable(status) ? (
-          <Styled.ActionButton
-            iconName={IconName.Close}
-            onClick={() => dispatch(clearOrder(orderId))}
-          />
-        ) : (
-          <Styled.CancelButton
-            iconName={IconName.Close}
-            state={{
-              isLoading: isCanceling || status === AbacusOrderStatus.canceling,
-              isDisabled: isCanceling || isDisabled || status === AbacusOrderStatus.canceling,
-            }}
-            onClick={onCancel}
-          />
-        )}
-      </Styled.Toolbar>
-    </Styled.OrderActions>
+    <ActionsTableCell>
+      <$CancelButton
+        key="cancelorder"
+        iconName={IconName.Close}
+        shape={ButtonShape.Square}
+        {...(isOrderStatusClearable(status)
+          ? { onClick: () => dispatch(clearOrder(orderId)) }
+          : {
+              onClick: onCancel,
+              state: {
+                isLoading: isCanceling || status === AbacusOrderStatus.canceling,
+                isDisabled: isCanceling || !!isDisabled || status === AbacusOrderStatus.canceling,
+              },
+            })}
+      />
+    </ActionsTableCell>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.OrderActions = styled.div`
-  ${layoutMixins.row};
-  justify-content: var(--table-cell-currentAlign);
-`;
-
-Styled.Toolbar = styled(Toolbar)`
-  width: 3rem;
-
-  padding: 0;
-  display: flex;
-  justify-content: center;
-`;
-
-Styled.ActionButton = styled(IconButton)`
-  --button-backgroundColor: transparent;
-  --button-border: none;
+const $CancelButton = styled(IconButton)`
+  --button-hover-textColor: var(--color-red);
 
   svg {
     width: 0.875em;
     height: 0.875em;
-  }
-`;
-
-Styled.CancelButton = styled(Styled.ActionButton)`
-  &:not(:disabled) {
-    --button-textColor: var(--color-red);
   }
 `;

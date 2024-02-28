@@ -1,19 +1,21 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
-import { shallowEqual, useSelector } from 'react-redux';
+import { useMemo } from 'react';
 
-import { HistoricalTradingRewardsPeriods, HistoricalTradingReward } from '@/constants/abacus';
-import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
-import { useStringGetter, useTokenConfigs } from '@/hooks';
+import { shallowEqual, useSelector } from 'react-redux';
+import styled from 'styled-components';
+
+import { HistoricalTradingReward, HistoricalTradingRewardsPeriods } from '@/constants/abacus';
+import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Output, OutputType } from '@/components/Output';
 import { Table, TableCell, type ColumnDef } from '@/components/Table';
 
-import {
-  getHistoricalTradingRewards,
-  getHistoricalTradingRewardsForPeriod,
-} from '@/state/accountSelectors';
+import { getHistoricalTradingRewardsForPeriod } from '@/state/accountSelectors';
 
 export enum TradingRewardHistoryTableColumnKey {
   Event = 'Event',
@@ -37,8 +39,8 @@ const getTradingRewardHistoryTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.EVENT }),
         renderCell: ({ startedAtInMilliseconds, endedAtInMilliseconds }) => (
           <TableCell stacked>
-            <Styled.Rewarded>{stringGetter({ key: STRING_KEYS.REWARDED })}</Styled.Rewarded>
-            <Styled.TimePeriod>
+            <$Rewarded>{stringGetter({ key: STRING_KEYS.REWARDED })}</$Rewarded>
+            <$TimePeriod>
               {stringGetter({
                 key: STRING_KEYS.FOR_TRADING,
                 params: {
@@ -59,7 +61,7 @@ const getTradingRewardHistoryTableColumnDef = ({
                   ),
                 },
               })}
-            </Styled.TimePeriod>
+            </$TimePeriod>
           </TableCell>
         ),
       },
@@ -71,7 +73,7 @@ const getTradingRewardHistoryTableColumnDef = ({
           <Output
             type={OutputType.Asset}
             value={amount}
-            slotRight={<Styled.AssetIcon symbol={chainTokenLabel} />}
+            slotRight={<$AssetIcon symbol={chainTokenLabel} />}
           />
         ),
       },
@@ -103,10 +105,12 @@ export const TradingRewardHistoryTable = ({
     shallowEqual
   );
 
+  const rewardsData = useMemo(() => periodTradingRewards?.toArray() ?? [], [periodTradingRewards]);
+
   return (
-    <Styled.Table
+    <$Table
       label={stringGetter({ key: STRING_KEYS.REWARD_HISTORY })}
-      data={periodTradingRewards?.toArray() ?? []}
+      data={rewardsData}
       getRowKey={(row: any) => row.startedAtInMilliseconds}
       columns={columnKeys.map((key: TradingRewardHistoryTableColumnKey) =>
         getTradingRewardHistoryTableColumnDef({
@@ -121,31 +125,28 @@ export const TradingRewardHistoryTable = ({
       selectionBehavior="replace"
       withOuterBorder={withOuterBorder}
       withInnerBorders={withInnerBorders}
-      viewMoreConfig={{ initialNumRowsToShow: 5, numRowsPerPage: 10 }}
+      initialPageSize={15}
       withScrollSnapColumns
       withScrollSnapRows
     />
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Table = styled(Table)`
+const $Table = styled(Table)`
   --tableCell-padding: 0.5rem 0;
-  --tableHeader-backgroundColor: var(--color-layer-3);
+  --tableStickyRow-backgroundColor: var(--color-layer-3);
   --tableRow-backgroundColor: var(--color-layer-3);
-  --tableViewMore-borderColor: var(--color-layer-3);
 
   tbody {
     font: var(--font-medium-book);
   }
-`;
+` as typeof Table;
 
-Styled.Rewarded = styled.span`
+const $Rewarded = styled.span`
   color: var(--color-text-2);
 `;
 
-Styled.TimePeriod = styled.div`
+const $TimePeriod = styled.div`
   ${layoutMixins.inlineRow}
 
   && {
@@ -159,6 +160,6 @@ Styled.TimePeriod = styled.div`
   }
 `;
 
-Styled.AssetIcon = styled(AssetIcon)`
+const $AssetIcon = styled(AssetIcon)`
   margin-left: 0.5ch;
 `;

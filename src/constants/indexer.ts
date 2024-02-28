@@ -21,3 +21,7 @@ export type PerpetualMarketResponse = {
   stepBaseQuantums: number;
   subticksPerTick: number;
 };
+
+export type PerpetualMarketSparklineResponse = {
+  [key: string]: number[];
+};

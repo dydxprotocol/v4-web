@@ -64,7 +64,11 @@ This will automatically open your default browser at `http://localhost:61000`.
 
 ## Part 3: Configuring environment
 
-Add or modify the relevant endpoints, links and options in `/public/configs/env.json`.
+Add or modify the relevant endpoints, links and options in `/public/configs/v1/env.json`.
+
+NOTE: There exists a deprecated file `/public/configs/env.json`. If you have users running older mobile versions you may
+need to keep feature flags between the two files in sync but may otherwise ignore it.
+
 You'll need to provide a Wallet Connect project id to enable onboarding and wallet connection:
 
 - Create a project on https://cloud.walletconnect.com/app
@@ -86,6 +90,90 @@ Set environment variables via `.env`.
 - `INTERCOM_APP_ID` (optional): Used for enabling Intercom; utilized with `pnpm run build:inject-intercom`.
 - `STATUS_PAGE_SCRIPT_URI` (optional): Used for enabling the status page; used with `pnpm run build:inject-statuspage`.
 - `SMARTBANNER_APP_NAME`, `SMARTBANNER_ORG_NAME`, `SMARTBANNER_ICON_URL`, `SMARTBANNER_APPSTORE_URL` (optional): Used for enabling the smart app banner; used with `pnpm run build:inject-smartbanner`.
+- `VITE_PRIVY_APP_ID` (optional): App ID used for enabling Privy authentication. For deployment of DYDX token holders use `clua5njf801bncvpa0woolzq4`.
+
+## Part 5: Configure entry points
+
+### HTML files
+
+Edit `scripts/generate-entry-points.js` and set up entry points according to your SEO needs. At least one entry point must be configured,
+i.e. at least one element must be present in the `ENTRY_POINTS` array. This array consists of objects of the form:
+
+```
+{
+    title: 'Page title',
+    description: 'Page description.',
+    fileName: 'HTML entry point file name, e.g.: index.html',
+},
+```
+
+The build script will traverse these entries and create files in `entry-points` directory, modifying the `template.html` file accordingly
+for each entry. The `rollupOptions` config option in `vite.config.ts` informs the framework about the location of all the entry points
+created above.
+
+### Rewrite rules
+
+Edit `vercel.json` and configure the `rewrites` configuration option. It is an array of objects of the form:
+
+```
+    {
+      "source": "Regexp for matching the URL path, e.g.: /portfolio(/?.*)",
+      "destination": "Entry point file to use, e.g.: /entry-points/portfolio.html"
+    },
+```
+
+Note: The first matching rule takes precedence over anything defined afterwards in the array.
+
+# Testing
+
+## Unit testing
+
+Run unit tests with the following command: `pnpm run test`
+
+## Functional Testing
+
+Functional testing is supported via Browserstack. To run the tests you need to set the following environment variables:
+
+- `BROWSERSTACK_USERNAME`: username of your browserstack account
+- `BROWSERSTACK_ACCESS_KEY`: access key of your browserstack account
+- `E2E_ENVIRONMENT_URL`: the URL you want to run the functional tests against
+
+To run the tests run: `pnpm run wdio`
+
+# Local Abacus Development
+
+## Directory structure
+
+Our tooling assumes that the [v4-abacus repo](https://github.com/dydxprotocol/v4-abacus) is checked out alongside v4-web:
+
+```
+--- parent folder
+ |___ v4-web
+ |___ v4-abacus
+```
+
+## Using your local v4-abacus repo
+
+Whenever you have changes in v4-abacus that you'd like to test in your local v4-web branch, use the following command:
+
+```
+pnpm run install-local-abacus --clean
+```
+
+The `--clean` option will do some extra cleaning, **it is not needed on subsequent runs.**
+
+## Reverting to remote abacus
+
+Revert any changes to @dydxprotocol/v4-abacus in package.json and pnpm-lock.yaml. If you haven't made any other package changes, you can use:
+
+```
+git restore main package.json
+git restore main pnpm-lock.yaml
+```
+
+Then run `pnpm install`
+
+**Remember to revert to remote abacus before making a PR.**
 
 # Deployments
 

@@ -2,12 +2,11 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import {
   AbacusOrderSide,
-  type Nullable,
-  type AbacusOrderSides,
   AbacusPositionSide,
   AbacusPositionSides,
+  type AbacusOrderSides,
+  type Nullable,
 } from '@/constants/abacus';
-
 import { PositionSide } from '@/constants/trade';
 
 /** @deprecated use ORDER_SIDES from constants/abacus */

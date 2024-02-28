@@ -1,14 +1,19 @@
 import type { ElementType } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-import { useAccountBalance, useAccounts, useTokenConfigs, useStringGetter } from '@/hooks';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { wallets, WalletType } from '@/constants/wallets';
+import { WalletType, wallets } from '@/constants/wallets';
+
+import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
@@ -19,8 +24,8 @@ import { Panel } from '@/components/Panel';
 import { Toolbar } from '@/components/Toolbar';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
-import { openDialog } from '@/state/dialogs';
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
+import { openDialog } from '@/state/dialogs';
 
 export const DYDXBalancePanel = ({ className }: { className?: string }) => {
   const dispatch = useDispatch();
@@ -35,12 +40,12 @@ export const DYDXBalancePanel = ({ className }: { className?: string }) => {
     <Panel
       className={className}
       slotHeader={
-        <Styled.Header>
-          <Styled.Title>
+        <$Header>
+          <$Title>
             <AssetIcon symbol={chainTokenLabel} />
             {chainTokenLabel}
-          </Styled.Title>
-          <Styled.ActionButtons>
+          </$Title>
+          <$ActionButtons>
             {!canAccountTrade ? (
               <OnboardingTriggerButton size={ButtonSize.Small} />
             ) : (
@@ -53,27 +58,27 @@ export const DYDXBalancePanel = ({ className }: { className?: string }) => {
                 {stringGetter({ key: STRING_KEYS.TRANSFER })}
               </Button>
             )}
-          </Styled.ActionButtons>
-        </Styled.Header>
+          </$ActionButtons>
+        </$Header>
       }
     >
-      <Styled.Content>
-        <Styled.WalletAndStakedBalance
+      <$Content>
+        <$WalletAndStakedBalance
           layout="grid"
           items={[
             {
               key: 'wallet',
               label: (
-                <Styled.Label>
+                <$Label>
                   <h4>{stringGetter({ key: STRING_KEYS.WALLET })}</h4>
-                  <Styled.IconContainer>
+                  <$IconContainer>
                     <Icon
                       iconComponent={
-                        wallets[walletType || WalletType.OtherWallet].icon as ElementType
+                        wallets[walletType ?? WalletType.OtherWallet].icon as ElementType
                       }
                     />
-                  </Styled.IconContainer>
-                </Styled.Label>
+                  </$IconContainer>
+                </$Label>
               ),
 
               value: <Output type={OutputType.Asset} value={nativeTokenBalance} />,
@@ -81,19 +86,19 @@ export const DYDXBalancePanel = ({ className }: { className?: string }) => {
             {
               key: 'staked',
               label: (
-                <Styled.Label>
+                <$Label>
                   <h4>{stringGetter({ key: STRING_KEYS.STAKED })}</h4>
-                  <Styled.IconContainer>
+                  <$IconContainer>
                     <Icon iconName={IconName.Lock} />
-                  </Styled.IconContainer>
-                </Styled.Label>
+                  </$IconContainer>
+                </$Label>
               ),
 
               value: <Output type={OutputType.Asset} value={nativeStakingBalance} />,
             },
           ]}
         />
-        <Styled.TotalBalance
+        <$TotalBalance
           items={[
             {
               key: 'totalBalance',
@@ -108,20 +113,17 @@ export const DYDXBalancePanel = ({ className }: { className?: string }) => {
             },
           ]}
         />
-      </Styled.Content>
+      </$Content>
     </Panel>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Header = styled.div`
+const $Header = styled.div`
   ${layoutMixins.spacedRow}
   gap: 1rem;
   padding: var(--panel-paddingY) var(--panel-paddingX) 0;
 `;
 
-Styled.Title = styled.h3`
+const $Title = styled.h3`
   ${layoutMixins.inlineRow}
   font: var(--font-medium-book);
   color: var(--color-text-2);
@@ -131,25 +133,19 @@ Styled.Title = styled.h3`
   }
 `;
 
-Styled.ActionButtons = styled(Toolbar)`
+const $ActionButtons = styled(Toolbar)`
   ${layoutMixins.inlineRow}
   --stickyArea-topHeight: max-content;
   gap: 0.5rem;
   padding: 0;
 `;
 
-Styled.ReceiveButton = styled(Button)`
-  --button-textColor: var(--color-text-2);
-  --button-backgroundColor: var(--color-layer-5);
-  --button-border: solid var(--border-width) var(--color-layer-6);
-`;
-
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.flexColumn}
   gap: 0.75rem;
 `;
 
-Styled.IconContainer = styled.div`
+const $IconContainer = styled.div`
   ${layoutMixins.stack}
 
   height: 1.5rem;
@@ -166,7 +162,7 @@ Styled.IconContainer = styled.div`
   }
 `;
 
-Styled.WalletAndStakedBalance = styled(Details)`
+const $WalletAndStakedBalance = styled(Details)`
   --details-item-backgroundColor: var(--color-layer-6);
 
   grid-template-columns: 1fr 1fr;
@@ -191,14 +187,14 @@ Styled.WalletAndStakedBalance = styled(Details)`
   }
 `;
 
-Styled.Label = styled.div`
+const $Label = styled.div`
   ${layoutMixins.spacedRow}
 
   font: var(--font-base-book);
   color: var(--color-text-1);
 `;
 
-Styled.TotalBalance = styled(Details)`
+const $TotalBalance = styled(Details)`
   div {
     --scrollArea-height: auto;
   }

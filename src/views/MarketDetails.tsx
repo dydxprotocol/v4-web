@@ -1,15 +1,20 @@
+import BigNumber from 'bignumber.js';
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
-import { STRING_KEYS, type StringKey } from '@/constants/localization';
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
+import { DiffOutput } from '@/components/DiffOutput';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 
@@ -23,8 +28,8 @@ import { MarketLinks } from './MarketLinks';
 export const MarketDetails: React.FC = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-  const { configs, market } = useSelector(getCurrentMarketData, shallowEqual) || {};
-  const { id, name, resources } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
+  const { configs, market } = useSelector(getCurrentMarketData, shallowEqual) ?? {};
+  const { id, name, resources } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
 
   if (!configs) return null;
 
@@ -32,6 +37,7 @@ export const MarketDetails: React.FC = () => {
     tickSize,
     stepSize,
     initialMarginFraction,
+    effectiveInitialMarginFraction,
     maintenanceMarginFraction,
     minOrderSize,
     stepSizeDecimals,
@@ -44,7 +50,11 @@ export const MarketDetails: React.FC = () => {
     secondaryDescriptionKey,
     websiteLink,
     whitepaperLink,
-  } = resources || {};
+  } = resources ?? {};
+
+  const preferEIMF = Boolean(
+    effectiveInitialMarginFraction && initialMarginFraction !== effectiveInitialMarginFraction
+  );
 
   const items = [
     {
@@ -97,9 +107,14 @@ export const MarketDetails: React.FC = () => {
       label: stringGetter({ key: STRING_KEYS.MAXIMUM_LEVERAGE }),
       tooltip: 'maximum-leverage',
       value: (
-        <Output
-          useGrouping
+        <DiffOutput
           value={initialMarginFraction ? BIG_NUMBERS.ONE.div(initialMarginFraction) : null}
+          newValue={
+            effectiveInitialMarginFraction
+              ? BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction)
+              : null
+          }
+          withDiff={preferEIMF}
           type={OutputType.Multiple}
         />
       ),
@@ -116,30 +131,39 @@ export const MarketDetails: React.FC = () => {
       key: 'initial-margin-fraction',
       label: stringGetter({ key: STRING_KEYS.INITIAL_MARGIN_FRACTION }),
       tooltip: 'initial-margin-fraction',
-      value: <Output useGrouping value={initialMarginFraction} type={OutputType.SmallPercent} />,
+      value: (
+        <DiffOutput
+          value={initialMarginFraction ? BigNumber(initialMarginFraction) : null}
+          newValue={
+            effectiveInitialMarginFraction ? BigNumber(effectiveInitialMarginFraction) : null
+          }
+          withDiff={preferEIMF}
+          type={OutputType.SmallPercent}
+        />
+      ),
     },
   ];
 
   return (
-    <Styled.MarketDetails>
-      <Styled.Header>
-        <Styled.WrapRow>
-          <Styled.MarketTitle>
+    <$MarketDetails>
+      <$Header>
+        <$WrapRow>
+          <$MarketTitle>
             <AssetIcon symbol={id} />
             {name}
-          </Styled.MarketTitle>
-          {isTablet && <Styled.MarketLinks />}
-        </Styled.WrapRow>
+          </$MarketTitle>
+          {isTablet && <$MarketLinks />}
+        </$WrapRow>
 
-        <Styled.MarketDescription>
+        <$MarketDescription>
           {primaryDescriptionKey && <p>{stringGetter({ key: `APP.${primaryDescriptionKey}` })}</p>}
           {secondaryDescriptionKey && (
             <p>{stringGetter({ key: `APP.${secondaryDescriptionKey}` })}</p>
           )}
-        </Styled.MarketDescription>
+        </$MarketDescription>
 
         {!isTablet && (
-          <Styled.Buttons>
+          <$Buttons>
             {whitepaperLink && (
               <Button
                 type={ButtonType.Link}
@@ -173,18 +197,16 @@ export const MarketDetails: React.FC = () => {
                 CoinmarketCap
               </Button>
             )}
-          </Styled.Buttons>
+          </$Buttons>
         )}
-      </Styled.Header>
+      </$Header>
 
-      <Styled.Details items={items} withSeparators />
-    </Styled.MarketDetails>
+      <$Details items={items} withSeparators />
+    </$MarketDetails>
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.MarketDetails = styled.div`
+const $MarketDetails = styled.div`
   margin: auto;
   width: 100%;
 
@@ -204,20 +226,17 @@ Styled.MarketDetails = styled.div`
     padding: 0 clamp(0.5rem, 7.5%, 2.5rem);
   }
 `;
-
-Styled.Header = styled.header`
+const $Header = styled.header`
   ${layoutMixins.column}
   gap: 1.25rem;
 `;
-
-Styled.WrapRow = styled.div`
+const $WrapRow = styled.div`
   ${layoutMixins.row}
   gap: 0.5rem;
 
   flex-wrap: wrap;
 `;
-
-Styled.MarketTitle = styled.h3`
+const $MarketTitle = styled.h3`
   ${layoutMixins.row}
   font: var(--font-large-medium);
   gap: 0.5rem;
@@ -227,12 +246,10 @@ Styled.MarketTitle = styled.h3`
     height: 2.25rem;
   }
 `;
-
-Styled.MarketLinks = styled(MarketLinks)`
+const $MarketLinks = styled(MarketLinks)`
   place-self: start end;
 `;
-
-Styled.MarketDescription = styled.div`
+const $MarketDescription = styled.div`
   ${layoutMixins.column}
   gap: 0.5em;
 
@@ -244,15 +261,13 @@ Styled.MarketDescription = styled.div`
     }
   }
 `;
-
-Styled.Buttons = styled.div`
+const $Buttons = styled.div`
   ${layoutMixins.row}
   flex-wrap: wrap;
   gap: 0.5rem;
 
   overflow-x: auto;
 `;
-
-Styled.Details = styled(Details)`
+const $Details = styled(Details)`
   font: var(--font-mini-book);
 `;

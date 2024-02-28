@@ -27,9 +27,12 @@ export type ThemeColorBase = BaseColors &
   Filters;
 
 type BaseColors = {
+  black: string;
   white: string;
   green: string;
   red: string;
+
+  whiteFaded: string;
 };
 
 type LayerColors = {

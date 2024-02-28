@@ -1,15 +1,16 @@
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { TransferInputField, TransferType } from '@/constants/abacus';
-import { STRING_KEYS } from '@/constants/localization';
 import { ButtonSize } from '@/constants/buttons';
-import { useStringGetter } from '@/hooks';
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { ToggleGroup } from '@/components/ToggleGroup';
-import { TransferForm } from '@/views/forms/TransferForm';
 import { WithdrawForm } from '@/views/forms/AccountManagementForms/WithdrawForm';
+import { TransferForm } from '@/views/forms/TransferForm';
 
 import { getTransferInputs } from '@/state/inputsSelectors';
 
@@ -24,7 +25,7 @@ type ElementProps = {
 
 export const ManageFundsDialog = ({ setIsOpen, selectedTransferType }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const { type } = useSelector(getTransferInputs, shallowEqual) || {};
+  const { type } = useSelector(getTransferInputs, shallowEqual) ?? {};
   const currentType = type?.rawValue ?? selectedTransferType ?? TransferType.deposit.rawValue;
 
   const closeDialog = () => setIsOpen?.(false);
@@ -48,12 +49,12 @@ export const ManageFundsDialog = ({ setIsOpen, selectedTransferType }: ElementPr
   };
 
   return (
-    <Styled.Dialog
+    <$Dialog
       isOpen
       setIsOpen={setIsOpen}
       placement={DialogPlacement.FullScreen}
       title={
-        <Styled.ToggleGroup
+        <$ToggleGroup
           items={Object.values(transferTypeConfig)}
           value={currentType}
           size={ButtonSize.Medium}
@@ -68,16 +69,14 @@ export const ManageFundsDialog = ({ setIsOpen, selectedTransferType }: ElementPr
       hasHeaderBorder
     >
       {transferTypeConfig[currentType].component}
-    </Styled.Dialog>
+    </$Dialog>
   );
 };
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Dialog = styled(Dialog)`
+const $Dialog = styled(Dialog)`
   --dialog-content-paddingTop: 1.5rem;
 `;
 
-Styled.ToggleGroup = styled(ToggleGroup)`
+const $ToggleGroup = styled(ToggleGroup)`
   overflow-x: auto;
 
   button {

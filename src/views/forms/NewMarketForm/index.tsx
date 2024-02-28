@@ -1,15 +1,18 @@
 import { useMemo, useState } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
+
+import styled from 'styled-components';
 
 import { TOKEN_DECIMALS } from '@/constants/numbers';
-import { type PotentialMarketItem } from '@/constants/potentialMarkets';
-import { useNextClobPairId, useURLConfigs } from '@/hooks';
+import { type NewMarketProposal } from '@/constants/potentialMarkets';
+
+import { useNextClobPairId } from '@/hooks/useNextClobPairId';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
-import { NewMarketSelectionStep } from './NewMarketSelectionStep';
 import { NewMarketPreviewStep } from './NewMarketPreviewStep';
+import { NewMarketSelectionStep } from './NewMarketSelectionStep';
 import { NewMarketSuccessStep } from './NewMarketSuccessStep';
 
 enum NewMarketFormStep {
@@ -20,22 +23,22 @@ enum NewMarketFormStep {
 
 export const NewMarketForm = () => {
   const [step, setStep] = useState(NewMarketFormStep.SELECTION);
-  const [assetToAdd, setAssetToAdd] = useState<PotentialMarketItem>();
+  const [assetToAdd, setAssetToAdd] = useState<NewMarketProposal>();
   const [liquidityTier, setLiquidityTier] = useState<number>();
   const [proposalTxHash, setProposalTxHash] = useState<string>();
   const { mintscan: mintscanTxUrl } = useURLConfigs();
 
-  const { nextAvailableClobPairId } = useNextClobPairId();
+  const { nextAvailableClobPairId, tickersFromProposals } = useNextClobPairId();
   const { hasPotentialMarketsData } = usePotentialMarkets();
 
   const tickSizeDecimals = useMemo(() => {
     if (!assetToAdd) return TOKEN_DECIMALS;
-    const p = Math.floor(Math.log(Number(assetToAdd.referencePrice)));
+    const p = Math.floor(Math.log(Number(assetToAdd.meta.referencePrice)));
     return Math.abs(p - 3);
   }, [assetToAdd]);
 
   if (!hasPotentialMarketsData || !nextAvailableClobPairId) {
-    return <Styled.LoadingSpace id="new-market-form" />;
+    return <$LoadingSpace id="new-market-form" />;
   }
 
   if (NewMarketFormStep.SUCCESS === step && proposalTxHash) {
@@ -69,12 +72,10 @@ export const NewMarketForm = () => {
       liquidityTier={liquidityTier}
       setLiquidityTier={setLiquidityTier}
       tickSizeDecimals={tickSizeDecimals}
+      tickersFromProposals={tickersFromProposals}
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.LoadingSpace = styled(LoadingSpace)`
+const $LoadingSpace = styled(LoadingSpace)`
   min-height: 18.75rem;
 `;

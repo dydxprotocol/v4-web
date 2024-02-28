@@ -3,9 +3,21 @@ import styled, { css, keyframes } from 'styled-components';
 import { breakpoints } from '@/styles';
 
 import { Output } from '@/components/Output';
-import { Table } from '@/components/Table';
+import { AllTableProps, BaseTableRowData, Table } from '@/components/Table';
 
-export const OrderbookTradesTable = styled(Table)<{ histogramSide: 'left' | 'right' }>`
+import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
+
+type OrderbookTradesTableStyleProps = { histogramSide?: 'left' | 'right' };
+const orderbookTradesTableType = getSimpleStyledOutputType(
+  Table,
+  {} as OrderbookTradesTableStyleProps
+);
+
+export const OrderbookTradesTable = <TableRowData extends BaseTableRowData>(
+  props: AllTableProps<TableRowData>
+) => <$OrderbookTradesTable {...props} paginationBehavior="showAll" />;
+
+const $OrderbookTradesTable = styled(Table)<OrderbookTradesTableStyleProps>`
   // Params
   --histogram-width: 100%;
 
@@ -91,7 +103,7 @@ export const OrderbookTradesTable = styled(Table)<{ histogramSide: 'left' | 'rig
       --histogram-width: calc(100% / var(--approximate-column-width));
     }
   }
-`;
+` as typeof orderbookTradesTableType;
 
 const colorAnimation = keyframes`
 20% {

@@ -1,9 +1,11 @@
-import { FormEvent, useCallback, useMemo, useState } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
-import { useDispatch } from 'react-redux';
-import Long from 'long';
-import { encodeJson } from '@dydxprotocol/v4-client-js';
+import { FormEvent, useMemo, useState } from 'react';
+
 import type { IndexedTx } from '@cosmjs/stargate';
+import { encodeJson } from '@dydxprotocol/v4-client-js';
+import { PerpetualMarketType } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
+import Long from 'long';
+import { useDispatch } from 'react-redux';
+import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -11,17 +13,15 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
-import type { PotentialMarketItem } from '@/constants/potentialMarkets';
+import type { NewMarketProposal } from '@/constants/potentialMarkets';
 
-import {
-  useAccountBalance,
-  useGovernanceVariables,
-  useStringGetter,
-  useSubaccount,
-  useTokenConfigs,
-  useURLConfigs,
-} from '@/hooks';
+import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useGovernanceVariables } from '@/hooks/useGovernanceVariables';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -41,9 +41,10 @@ import { openDialog } from '@/state/dialogs';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
+import { testFlags } from '@/lib/testFlags';
 
 type NewMarketPreviewStepProps = {
-  assetData: PotentialMarketItem;
+  assetData: NewMarketProposal;
   clobPairId: number;
   liquidityTier: number;
   onBack: () => void;
@@ -64,7 +65,7 @@ export const NewMarketPreviewStep = ({
   const stringGetter = useStringGetter();
   const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
   const [errorMessage, setErrorMessage] = useState();
-  const { exchangeConfigs, liquidityTiers } = usePotentialMarkets();
+  const { liquidityTiers } = usePotentialMarkets();
   const { submitNewMarketProposal } = useSubaccount();
   const { newMarketProposal } = useGovernanceVariables();
   const { newMarketProposalLearnMore } = useURLConfigs();
@@ -74,11 +75,24 @@ export const NewMarketPreviewStep = ({
   const initialDepositAmountDecimals = isMainnet ? 0 : chainTokenDecimals;
   const initialDepositAmount = initialDepositAmountBN.toFixed(initialDepositAmountDecimals);
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { label, initialMarginFraction, maintenanceMarginFraction, impactNotional } =
     liquidityTiers[liquidityTier as unknown as keyof typeof liquidityTiers];
 
-  const ticker = `${assetData.baseAsset}-USD`;
+  const { params, meta } = assetData ?? {};
+  const {
+    ticker,
+    priceExponent,
+    marketType,
+    minExchanges,
+    minPriceChange,
+    exchangeConfigJson,
+    atomicResolution,
+    quantumConversionExponent,
+    stepBaseQuantums,
+    subticksPerTick,
+  } = params ?? {};
 
   const alertMessage = useMemo(() => {
     if (errorMessage) {
@@ -106,7 +120,7 @@ export const NewMarketPreviewStep = ({
   const isDisabled = alertMessage !== null;
 
   return (
-    <Styled.Form
+    <$Form
       onSubmit={async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -120,23 +134,30 @@ export const NewMarketPreviewStep = ({
             })
           );
         } else {
+          setIsLoading(true);
           setErrorMessage(undefined);
 
           try {
             const tx = await submitNewMarketProposal({
               id: clobPairId,
               ticker,
-              priceExponent: assetData.priceExponent,
-              minPriceChange: assetData.minPriceChangePpm,
-              minExchanges: assetData.minExchanges,
+              priceExponent,
+              minPriceChange,
+              minExchanges,
               exchangeConfigJson: JSON.stringify({
-                exchanges: exchangeConfigs?.[assetData.baseAsset],
+                exchanges: exchangeConfigJson,
               }),
-              atomicResolution: assetData.atomicResolution,
-              liquidityTier: liquidityTier,
-              quantumConversionExponent: assetData.quantumConversionExponent,
-              stepBaseQuantums: Long.fromNumber(assetData.stepBaseQuantum),
-              subticksPerTick: assetData.subticksPerTick,
+              atomicResolution,
+              liquidityTier,
+              quantumConversionExponent,
+              // @ts-ignore - marketType is not required until v5
+              marketType: testFlags.withNewMarketType
+                ? marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
+                  ? PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED
+                  : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS
+                : undefined,
+              stepBaseQuantums: Long.fromNumber(stepBaseQuantums),
+              subticksPerTick,
               delayBlocks: newMarketProposal.delayBlocks,
             });
 
@@ -156,29 +177,31 @@ export const NewMarketPreviewStep = ({
           } catch (error) {
             log('NewMarketPreviewForm/submitNewMarketProposal', error);
             setErrorMessage(error.message);
+          } finally {
+            setIsLoading(false);
           }
         }
       }}
     >
       <h2>
         {stringGetter({ key: STRING_KEYS.CONFIRM_NEW_MARKET_PROPOSAL })}
-        <Styled.Balance>
+        <$Balance>
           {stringGetter({ key: STRING_KEYS.BALANCE })}:{' '}
           <Output
             type={OutputType.Number}
             value={nativeTokenBalance}
             fractionDigits={TOKEN_DECIMALS}
-            slotRight={<Styled.Tag>{chainTokenLabel}</Styled.Tag>}
+            slotRight={<$Tag>{chainTokenLabel}</$Tag>}
           />
-        </Styled.Balance>
+        </$Balance>
       </h2>
-      <Styled.FormInput
+      <$FormInput
         disabled
         label={stringGetter({ key: STRING_KEYS.MARKET })}
         type={InputType.Text}
         value={ticker}
       />
-      <Styled.WithDetailsReceipt
+      <$WithDetailsReceipt
         side="bottom"
         detailItems={[
           {
@@ -208,15 +231,15 @@ export const NewMarketPreviewStep = ({
           },
         ]}
       >
-        <Styled.FormInput
+        <$FormInput
           disabled
           label={stringGetter({ key: STRING_KEYS.LIQUIDITY_TIER })}
           type={InputType.Text}
           value={label}
         />
-      </Styled.WithDetailsReceipt>
+      </$WithDetailsReceipt>
 
-      <Styled.WithDetailsReceipt
+      <$WithDetailsReceipt
         detailItems={[
           {
             key: 'reference-price',
@@ -225,7 +248,7 @@ export const NewMarketPreviewStep = ({
             value: (
               <Output
                 type={OutputType.Fiat}
-                value={assetData.referencePrice}
+                value={meta.referencePrice}
                 fractionDigits={tickSizeDecimals}
               />
             ),
@@ -234,7 +257,7 @@ export const NewMarketPreviewStep = ({
             key: 'message-details',
             label: stringGetter({ key: STRING_KEYS.MESSAGE_DETAILS }),
             value: (
-              <Styled.Button
+              <$Button
                 action={ButtonAction.Navigation}
                 size={ButtonSize.Small}
                 onClick={() =>
@@ -247,7 +270,7 @@ export const NewMarketPreviewStep = ({
                 }
               >
                 {stringGetter({ key: STRING_KEYS.VIEW_DETAILS })} →
-              </Styled.Button>
+              </$Button>
             ),
           },
           {
@@ -265,7 +288,7 @@ export const NewMarketPreviewStep = ({
                 slotRight={
                   <>
                     {'+ '}
-                    <Styled.Icon
+                    <$Icon
                       $hasError={nativeTokenBalance?.lt(initialDepositAmountBN)}
                       iconName={
                         nativeTokenBalance?.gt(initialDepositAmountBN)
@@ -300,39 +323,42 @@ export const NewMarketPreviewStep = ({
         ]}
       >
         <div />
-      </Styled.WithDetailsReceipt>
+      </$WithDetailsReceipt>
       {alertMessage && (
         <AlertMessage type={alertMessage.type}>{alertMessage.message} </AlertMessage>
       )}
-      <Styled.ButtonRow>
+      <$ButtonRow>
         <Button onClick={onBack}>{stringGetter({ key: STRING_KEYS.BACK })}</Button>
-        <Button type={ButtonType.Submit} action={ButtonAction.Primary} state={{ isDisabled }}>
+        <Button
+          type={ButtonType.Submit}
+          action={ButtonAction.Primary}
+          state={{ isDisabled, isLoading }}
+        >
           {hasAcceptedTerms
             ? stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })
             : stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TERMS })}
         </Button>
-      </Styled.ButtonRow>
-      <Styled.Disclaimer>
-        {stringGetter({
-          key: STRING_KEYS.PROPOSAL_DISCLAIMER_1,
-          params: {
-            NUM_TOKENS_REQUIRED: initialDepositAmount,
-            NATIVE_TOKEN_DENOM: chainTokenLabel,
-            HERE: (
-              <Styled.Link href={newMarketProposalLearnMore}>
-                {stringGetter({ key: STRING_KEYS.HERE })}
-              </Styled.Link>
-            ),
-          },
-        })}
-      </Styled.Disclaimer>
-    </Styled.Form>
+      </$ButtonRow>
+      <$DisclaimerContainer>
+        <$Disclaimer>
+          {stringGetter({
+            key: STRING_KEYS.PROPOSAL_DISCLAIMER_1,
+            params: {
+              NUM_TOKENS_REQUIRED: initialDepositAmount,
+              NATIVE_TOKEN_DENOM: chainTokenLabel,
+              HERE: (
+                <$Link href={newMarketProposalLearnMore}>
+                  {stringGetter({ key: STRING_KEYS.HERE })}
+                </$Link>
+              ),
+            },
+          })}
+        </$Disclaimer>
+      </$DisclaimerContainer>
+    </$Form>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Form = styled.form`
+const $Form = styled.form`
   ${formMixins.transfersForm}
   ${layoutMixins.stickyArea0}
   --stickyArea0-background: transparent;
@@ -346,7 +372,7 @@ Styled.Form = styled.form`
   }
 `;
 
-Styled.Balance = styled.span`
+const $Balance = styled.span`
   ${layoutMixins.inlineRow}
   font: var(--font-small-book);
   margin-top: 0.125rem;
@@ -356,35 +382,40 @@ Styled.Balance = styled.span`
   }
 `;
 
-Styled.Tag = styled(Tag)`
+const $Tag = styled(Tag)`
   margin-left: 0.5ch;
 `;
 
-Styled.FormInput = styled(FormInput)`
+const $FormInput = styled(FormInput)`
   input {
     font-size: 1rem;
   }
 `;
 
-Styled.Icon = styled(Icon)<{ $hasError?: boolean }>`
+const $Icon = styled(Icon)<{ $hasError?: boolean }>`
   margin-left: 0.5ch;
 
   ${({ $hasError }) => ($hasError ? 'color: var(--color-error);' : 'color: var(--color-success);')}
 `;
 
-Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
+const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --details-item-fontSize: 1rem;
 `;
 
-Styled.CheckboxContainer = styled.div`
+const $CheckboxContainer = styled.div`
   display: flex;
   flex-direction: row;
   padding: 1rem;
   align-items: center;
 `;
 
-Styled.Disclaimer = styled.div<{ textAlign?: string }>`
-  font: var(--font-small);
+const $DisclaimerContainer = styled.div`
+  min-width: 100%;
+  width: min-content;
+`;
+
+const $Disclaimer = styled.div<{ textAlign?: string }>`
+  font: var(--font-small-book);
   color: var(--color-text-0);
   text-align: center;
   margin-left: 0.5ch;
@@ -392,18 +423,19 @@ Styled.Disclaimer = styled.div<{ textAlign?: string }>`
   ${({ textAlign }) => textAlign && `text-align: ${textAlign};`}
 `;
 
-Styled.ButtonRow = styled.div`
+const $ButtonRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 1rem;
   width: 100%;
 `;
 
-Styled.Button = styled(Button)`
+const $Button = styled(Button)`
   --button-padding: 0;
+  --button-height: auto;
 `;
 
-Styled.Link = styled(Link)`
+const $Link = styled(Link)`
   --link-color: var(--color-accent);
   display: inline;
 `;

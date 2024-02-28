@@ -4,9 +4,9 @@ import { Candle, TradingViewBar, TradingViewSymbol } from '@/constants/candles';
 import { THEME_NAMES } from '@/constants/styles/colors';
 import type { ChartLineType } from '@/constants/tvchart';
 
-import { type AppColorMode, AppTheme } from '@/state/configs';
-
 import { Themes } from '@/styles/themes';
+
+import { AppTheme, type AppColorMode } from '@/state/configs';
 
 export const mapCandle = ({
   startedAt,
@@ -24,14 +24,13 @@ export const mapCandle = ({
   volume: Math.ceil(Number(baseTokenVolume)),
 });
 
-export const getAllSymbols = (marketIds: string[]): TradingViewSymbol[] =>
-  marketIds.map((marketId) => ({
-    description: marketId,
-    exchange: 'dYdX',
-    full_name: marketId,
-    symbol: marketId,
-    type: 'crypto',
-  }));
+export const getSymbol = (marketId: string): TradingViewSymbol => ({
+  description: marketId,
+  exchange: 'dYdX',
+  full_name: marketId,
+  symbol: marketId,
+  type: 'crypto',
+});
 
 export const getHistorySlice = ({
   bars,
@@ -64,7 +63,8 @@ export const getChartLineColors = ({
   const orderColors = {
     [OrderSide.BUY]: theme.positive,
     [OrderSide.SELL]: theme.negative,
-    ['position']: null,
+    entry: null,
+    liquidation: theme.warning,
   };
 
   return {

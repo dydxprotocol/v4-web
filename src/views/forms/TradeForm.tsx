@@ -1,65 +1,79 @@
-import { type FormEvent, useState, Ref, useCallback } from 'react';
-import styled, { AnyStyledComponent, css } from 'styled-components';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import type { NumberFormatValues, SourceInfo } from 'react-number-format';
+import { Ref, useCallback, useState, type FormEvent } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-
-import { AlertType } from '@/constants/alerts';
+import type { NumberFormatValues, SourceInfo } from 'react-number-format';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled, { css } from 'styled-components';
 
 import {
+  ComplianceStatus,
   ErrorType,
+  MARGIN_MODE_STRINGS,
+  TradeInputErrorAction,
+  TradeInputField,
+  ValidationError,
   type HumanReadablePlaceOrderPayload,
   type Nullable,
-  TradeInputErrorAction,
-  ValidationError,
 } from '@/constants/abacus';
-
+import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
-import { STRING_KEYS } from '@/constants/localization';
+import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS, StringKey } from '@/constants/localization';
+import { NotificationType } from '@/constants/notifications';
 import { USD_DECIMALS } from '@/constants/numbers';
 import {
   InputErrorData,
-  TradeBoxKeys,
   MobilePlaceOrderSteps,
   ORDER_TYPE_STRINGS,
+  TradeBoxKeys,
+  TradeTypes,
 } from '@/constants/trade';
 
-import { breakpoints } from '@/styles';
-import { useStringGetter, useSubaccount } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useComplianceState } from '@/hooks/useComplianceState';
+import { useNotifications } from '@/hooks/useNotifications';
 import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
 
-import { layoutMixins } from '@/styles/layoutMixins';
+import { breakpoints } from '@/styles';
 import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
+import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 import { InputType } from '@/components/Input';
+import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
+import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithTooltip } from '@/components/WithTooltip';
-
 import { Orderbook } from '@/views/tables/Orderbook';
 
+import { openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { setTradeFormInputs } from '@/state/inputs';
 import {
   getCurrentInput,
   getInputTradeData,
+  getInputTradeOptions,
   getTradeFormInputs,
   useTradeFormData,
 } from '@/state/inputsSelectors';
-import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
+import { getCurrentMarketAssetId, getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { testFlags } from '@/lib/testFlags';
 import { getSelectedOrderSide, getSelectedTradeType, getTradeInputAlert } from '@/lib/tradeData';
 
 import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
-import { TradeSizeInputs } from './TradeForm/TradeSizeInputs';
-import { TradeSideToggle } from './TradeForm/TradeSideToggle';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 import { PositionPreview } from './TradeForm/PositionPreview';
+import { TradeSideToggle } from './TradeForm/TradeSideToggle';
+import { TradeSizeInputs } from './TradeForm/TradeSizeInputs';
 
 type TradeBoxInputConfig = {
   key: TradeBoxKeys;
@@ -88,13 +102,14 @@ export const TradeForm = ({
   onConfirm,
   className,
 }: ElementProps & StyleProps) => {
-  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [placeOrderError, setPlaceOrderError] = useState<string>();
   const [showOrderbook, setShowOrderbook] = useState(false);
 
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
   const { placeOrder } = useSubaccount();
+  const { isTablet } = useBreakpoints();
+  const { complianceMessage, complianceStatus } = useComplianceState();
 
   const {
     price,
@@ -114,6 +129,7 @@ export const TradeForm = ({
   } = useTradeFormData();
 
   const currentInput = useSelector(getCurrentInput);
+  const currentAssetId = useSelector(getCurrentMarketAssetId);
   const { tickSizeDecimals, stepSizeDecimals } =
     useSelector(getCurrentMarketConfig, shallowEqual) || {};
 
@@ -122,10 +138,25 @@ export const TradeForm = ({
 
   const currentTradeData = useSelector(getInputTradeData, shallowEqual);
 
-  const { side, type } = currentTradeData || {};
+  const { side, type, marginMode, targetLeverage } = currentTradeData || {};
 
   const selectedTradeType = getSelectedTradeType(type);
   const selectedOrderSide = getSelectedOrderSide(side);
+
+  const { typeOptions } = useSelector(getInputTradeOptions, shallowEqual) ?? {};
+
+  const allTradeTypeItems = (typeOptions?.toArray() ?? []).map(({ type, stringKey }) => ({
+    value: type as TradeTypes,
+    label: stringGetter({
+      key: stringKey as StringKey,
+    }),
+    slotBefore: <AssetIcon symbol={currentAssetId} />,
+  }));
+
+  const onTradeTypeChange = (tradeType: TradeTypes) => {
+    abacusStateManager.clearTradeInputValues();
+    abacusStateManager.setTradeValue({ value: tradeType, field: TradeInputField.type });
+  };
 
   const needsAdvancedOptions =
     needsGoodUntil ||
@@ -157,12 +188,21 @@ export const TradeForm = ({
     tickSizeDecimals,
   });
 
-  if (placeOrderError) {
+  const { getNotificationPreferenceForType } = useNotifications();
+  const isErrorShownInOrderStatusToast = getNotificationPreferenceForType(
+    NotificationType.OrderStatus
+  );
+
+  if (placeOrderError && !isErrorShownInOrderStatusToast) {
     alertContent = placeOrderError;
   } else if (inputAlert) {
-    alertContent = inputAlert?.alertString;
-    alertType = inputAlert?.type;
+    alertContent = inputAlert.alertString;
+    alertType = inputAlert.type;
   }
+
+  const shouldPromptUserToPlaceLimitOrder = ['MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE'].some(
+    (errorCode) => inputAlert?.code === errorCode
+  );
 
   const orderSideAction = {
     [OrderSide.BUY]: ButtonAction.Create,
@@ -178,6 +218,7 @@ export const TradeForm = ({
         break;
       }
       case MobilePlaceOrderSteps.PlacingOrder:
+      case MobilePlaceOrderSteps.PlaceOrderFailed:
       case MobilePlaceOrderSteps.Confirmation: {
         onConfirm?.();
         break;
@@ -192,9 +233,7 @@ export const TradeForm = ({
   };
 
   const onLastOrderIndexed = useCallback(() => {
-    if (!currentStep || currentStep === MobilePlaceOrderSteps.PlacingOrder) {
-      setIsPlacingOrder(false);
-      abacusStateManager.clearTradeInputValues({ shouldResetSize: true });
+    if (currentStep === MobilePlaceOrderSteps.PlacingOrder) {
       setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
     }
   }, [currentStep]);
@@ -203,22 +242,22 @@ export const TradeForm = ({
     callback: onLastOrderIndexed,
   });
 
-  const onPlaceOrder = async () => {
+  const onPlaceOrder = () => {
     setPlaceOrderError(undefined);
-    setIsPlacingOrder(true);
 
-    await placeOrder({
+    placeOrder({
       onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
         setPlaceOrderError(
           stringGetter({ key: errorParams?.errorStringKey || STRING_KEYS.SOMETHING_WENT_WRONG })
         );
-
-        setIsPlacingOrder(false);
+        setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
       },
       onSuccess: (placeOrderPayload?: Nullable<HumanReadablePlaceOrderPayload>) => {
         setUnIndexedClientId(placeOrderPayload?.clientId);
       },
     });
+
+    abacusStateManager.clearTradeInputValues({ shouldResetSize: true });
   };
 
   if (needsTriggerPrice) {
@@ -278,7 +317,7 @@ export const TradeForm = ({
   }
 
   return (
-    <Styled.TradeForm onSubmit={onSubmit} className={className}>
+    <$TradeForm onSubmit={onSubmit} className={className}>
       {currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder ? (
         <>
           <PositionPreview />
@@ -286,26 +325,67 @@ export const TradeForm = ({
         </>
       ) : (
         <>
-          <Styled.TopActionsRow>
-            <Styled.OrderbookButtons>
-              <Styled.OrderbookButton
-                slotRight={<Icon iconName={IconName.Caret} />}
-                onPressedChange={setShowOrderbook}
-                isPressed={showOrderbook}
-                hidePressedStyle
-              >
-                {!showOrderbook && stringGetter({ key: STRING_KEYS.ORDERBOOK })}
-              </Styled.OrderbookButton>
-              {/* TODO[TRCL-1411]: add orderbook scale functionality */}
-            </Styled.OrderbookButtons>
+          <$TopActionsRow>
+            {isTablet && (
+              <>
+                <$OrderbookButtons>
+                  <$OrderbookButton
+                    slotRight={<Icon iconName={IconName.Caret} />}
+                    onPressedChange={setShowOrderbook}
+                    isPressed={showOrderbook}
+                  >
+                    {!showOrderbook && stringGetter({ key: STRING_KEYS.ORDERBOOK })}
+                  </$OrderbookButton>
+                  {/* TODO[TRCL-1411]: add orderbook scale functionality */}
+                </$OrderbookButtons>
 
-            <TradeSideToggle />
-          </Styled.TopActionsRow>
+                <$ToggleGroup
+                  items={allTradeTypeItems}
+                  value={selectedTradeType}
+                  onValueChange={onTradeTypeChange}
+                />
+              </>
+            )}
 
-          <Styled.OrderbookAndInputs showOrderbook={showOrderbook}>
-            {showOrderbook && <Styled.Orderbook maxRowsPerSide={5} selectionBehavior="replace" />}
+            {!isTablet && (
+              <>
+                {testFlags.isolatedMargin && (
+                  <$MarginAndLeverageButtons>
+                    <Button
+                      onClick={() => {
+                        if (isTablet) {
+                          dispatch(openDialog({ type: DialogTypes.SelectMarginMode }));
+                        } else {
+                          dispatch(
+                            openDialogInTradeBox({ type: TradeBoxDialogTypes.SelectMarginMode })
+                          );
+                        }
+                      }}
+                    >
+                      {marginMode &&
+                        stringGetter({
+                          key: MARGIN_MODE_STRINGS[marginMode.rawValue],
+                        })}
+                    </Button>
 
-            <Styled.InputsColumn>
+                    <Button
+                      onClick={() => {
+                        dispatch(openDialog({ type: DialogTypes.AdjustTargetLeverage }));
+                      }}
+                    >
+                      <Output type={OutputType.Multiple} value={targetLeverage} />
+                    </Button>
+                  </$MarginAndLeverageButtons>
+                )}
+                <TradeSideToggle />
+              </>
+            )}
+          </$TopActionsRow>
+
+          <$OrderbookAndInputs showOrderbook={showOrderbook}>
+            {isTablet && showOrderbook && <$Orderbook maxRowsPerSide={5} />}
+
+            <$InputsColumn>
               {tradeFormInputs.map(
                 ({ key, inputType, label, onChange, validationConfig, value, decimals }) => (
                   <FormInput
@@ -325,15 +405,36 @@ export const TradeForm = ({
 
               {needsAdvancedOptions && <AdvancedTradeOptions />}
 
-              {alertContent && <AlertMessage type={alertType}>{alertContent}</AlertMessage>}
-            </Styled.InputsColumn>
-          </Styled.OrderbookAndInputs>
+              {complianceStatus === ComplianceStatus.CLOSE_ONLY && (
+                <AlertMessage type={AlertType.Error}>
+                  <$Message>{complianceMessage}</$Message>
+                </AlertMessage>
+              )}
+
+              {alertContent && (
+                <AlertMessage type={alertType}>
+                  <$Message>
+                    {alertContent}
+                    {shouldPromptUserToPlaceLimitOrder && (
+                      <$IconButton
+                        iconName={IconName.Arrow}
+                        shape={ButtonShape.Circle}
+                        action={ButtonAction.Navigation}
+                        size={ButtonSize.XSmall}
+                        onClick={() => onTradeTypeChange(TradeTypes.LIMIT)}
+                      />
+                    )}
+                  </$Message>
+                </AlertMessage>
+              )}
+            </$InputsColumn>
+          </$OrderbookAndInputs>
         </>
       )}
 
-      <Styled.Footer>
+      <$Footer>
         {isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder) && (
-          <Styled.ButtonRow>
+          <$ButtonRow>
             <Button
               type={ButtonType.Reset}
               action={ButtonAction.Reset}
@@ -343,10 +444,9 @@ export const TradeForm = ({
             >
               {stringGetter({ key: STRING_KEYS.CLEAR })}
             </Button>
-          </Styled.ButtonRow>
+          </$ButtonRow>
         )}
         <PlaceOrderButtonAndReceipt
-          isLoading={isPlacingOrder}
           hasValidationErrors={hasInputErrors}
           actionStringKey={inputAlert?.actionStringKey}
           validationErrorString={alertContent}
@@ -359,14 +459,12 @@ export const TradeForm = ({
             buttonAction: orderSideAction,
           }}
         />
-      </Styled.Footer>
-    </Styled.TradeForm>
+      </$Footer>
+    </$TradeForm>
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TradeForm = styled.form`
+const $TradeForm = styled.form`
   /* Params */
   --tradeBox-content-paddingTop: ;
   --tradeBox-content-paddingRight: ;
@@ -401,8 +499,16 @@ Styled.TradeForm = styled.form`
     }
   }
 `;
+const $MarginAndLeverageButtons = styled.div`
+  ${layoutMixins.inlineRow}
+  gap: 0.5rem;
+  margin-right: 0.5rem;
 
-Styled.TopActionsRow = styled.div`
+  button {
+    width: 100%;
+  }
+`;
+const $TopActionsRow = styled.div`
   display: grid;
   grid-auto-flow: column;
 
@@ -411,8 +517,7 @@ Styled.TopActionsRow = styled.div`
     gap: var(--form-input-gap);
   }
 `;
-
-Styled.OrderbookButtons = styled.div`
+const $OrderbookButtons = styled.div`
   ${layoutMixins.inlineRow}
   justify-content: space-between;
   gap: 0.25rem;
@@ -421,8 +526,7 @@ Styled.OrderbookButtons = styled.div`
     display: none;
   }
 `;
-
-Styled.OrderbookButton = styled(ToggleButton)`
+const $OrderbookButton = styled(ToggleButton)`
   --button-toggle-off-textColor: var(--color-text-1);
   --button-toggle-off-backgroundColor: transparent;
 
@@ -446,8 +550,7 @@ Styled.OrderbookButton = styled(ToggleButton)`
     }
   }
 `;
-
-Styled.OrderbookAndInputs = styled.div<{ showOrderbook: boolean }>`
+const $OrderbookAndInputs = styled.div<{ showOrderbook: boolean }>`
   @media ${breakpoints.tablet} {
     display: grid;
     align-items: flex-start;
@@ -466,8 +569,7 @@ Styled.OrderbookAndInputs = styled.div<{ showOrderbook: boolean }>`
           `}
   }
 `;
-
-Styled.Orderbook = styled(Orderbook)`
+const $Orderbook = styled(Orderbook)`
   width: 100%;
 
   @media ${breakpoints.notTablet} {
@@ -484,18 +586,39 @@ Styled.Orderbook = styled(Orderbook)`
     }
   }
 `;
+const $ToggleGroup = styled(ToggleGroup)`
+  overflow-x: auto;
 
-Styled.InputsColumn = styled.div`
+  button[data-state='off'] {
+    gap: 0;
+
+    img {
+      height: 0;
+    }
+  }
+` as typeof ToggleGroup;
+const $InputsColumn = styled.div`
   ${formMixins.inputsColumn}
 `;
+const $Message = styled.div`
+  ${layoutMixins.row}
+  gap: 0.75rem;
+`;
+const $IconButton = styled(IconButton)`
+  --button-backgroundColor: var(--color-white-faded);
+  flex-shrink: 0;
 
-Styled.ButtonRow = styled.div`
+  svg {
+    width: 1.25em;
+    height: 1.25em;
+  }
+`;
+const $ButtonRow = styled.div`
   ${layoutMixins.row}
   justify-self: end;
   padding: 0.5rem 0 0.5rem 0;
 `;
-
-Styled.Footer = styled.footer`
+const $Footer = styled.footer`
   ${formMixins.footer}
   --stickyFooterBackdrop-outsetY: var(--tradeBox-content-paddingBottom);
   backdrop-filter: none;

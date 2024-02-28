@@ -1,10 +1,12 @@
-import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
-import { Root, Trigger, Content } from '@radix-ui/react-collapsible';
+import React from 'react';
+
+import { Content, Root, Trigger } from '@radix-ui/react-collapsible';
+import styled, { css, keyframes } from 'styled-components';
 
 import { popoverMixins } from '@/styles/popoverMixins';
 
-import { HorizontalSeparatorFiller } from '@/components/Separator';
 import { Icon, IconName } from '@/components/Icon';
+import { HorizontalSeparatorFiller } from '@/components/Separator';
 
 type ElementProps = {
   defaultOpen?: boolean;
@@ -13,6 +15,7 @@ type ElementProps = {
   onOpenChange?: (open: boolean) => void;
   label: React.ReactNode;
   triggerIcon?: IconName;
+  slotTrigger?: React.ReactNode;
   children: React.ReactNode;
   withTrigger?: boolean;
 };
@@ -36,38 +39,47 @@ export const Collapsible = ({
   transitionDuration,
   triggerIcon = IconName.Caret,
   triggerIconSide = 'left',
+  slotTrigger,
   fullWidth,
   className,
   withTrigger = true,
-}: CollapsibleProps) => (
-  <Styled.Root defaultOpen={defaultOpen} open={open} onOpenChange={onOpenChange}>
-    {withTrigger && (
-      <Styled.Trigger className={className} disabled={disabled}>
-        {triggerIconSide === 'right' && (
-          <>
-            {label}
-            {fullWidth && <HorizontalSeparatorFiller />}
-          </>
-        )}
+}: CollapsibleProps) => {
+  const trigger = slotTrigger ? (
+    <$TriggerSlot>
+      {triggerIconSide === 'right' && label}
+      <Trigger className={className} disabled={disabled} asChild>
+        {slotTrigger}
+      </Trigger>
+      {triggerIconSide === 'left' && label}
+    </$TriggerSlot>
+  ) : (
+    <$Trigger className={className} disabled={disabled}>
+      {triggerIconSide === 'right' && (
+        <>
+          {label}
+          {fullWidth && <HorizontalSeparatorFiller />}
+        </>
+      )}
+      <$TriggerIcon>
+        <Icon iconName={triggerIcon} />
+      </$TriggerIcon>
+      {triggerIconSide === 'left' && (
+        <>
+          {fullWidth && <HorizontalSeparatorFiller />}
+          {label}
+        </>
+      )}
+    </$Trigger>
+  );
 
-        <Styled.TriggerIcon>
-          <Icon iconName={triggerIcon} />
-        </Styled.TriggerIcon>
-        {triggerIconSide === 'left' && (
-          <>
-            {fullWidth && <HorizontalSeparatorFiller />}
-            {label}
-          </>
-        )}
-      </Styled.Trigger>
-    )}
-    <Styled.Content $transitionDuration={transitionDuration}>{children}</Styled.Content>
-  </Styled.Root>
-);
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Root = styled(Root)`
+  return (
+    <$Root defaultOpen={defaultOpen} open={open} onOpenChange={onOpenChange}>
+      {withTrigger && trigger}
+      <$Content $transitionDuration={transitionDuration}>{children}</$Content>
+    </$Root>
+  );
+};
+const $Root = styled(Root)`
   display: grid;
 
   &[data-state='open'] {
@@ -75,26 +87,32 @@ Styled.Root = styled(Root)`
   }
 `;
 
-Styled.Trigger = styled(Trigger)`
+const $Trigger = styled(Trigger)`
   ${popoverMixins.trigger}
   --trigger-textColor: inherit;
   --trigger-icon-width: 0.75em;
   --trigger-icon-color: inherit;
 `;
 
-Styled.TriggerIcon = styled.span`
+const $TriggerSlot = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+`;
+
+const $TriggerIcon = styled.span`
   width: var(--trigger-icon-width);
 
   display: inline-flex;
   transition: rotate 0.3s var(--ease-out-expo);
   color: var(--trigger-icon-color);
 
-  ${Styled.Trigger}[data-state='open'] & {
+  ${$Trigger}[data-state='open'] & {
     rotate: -0.5turn;
   }
 `;
 
-Styled.Content = styled(Content)<{ $transitionDuration: number }>`
+const $Content = styled(Content)<{ $transitionDuration?: number }>`
   display: grid;
   --transition-duration: 0.25s;
 

@@ -4,56 +4,75 @@ import type { AbacusApiState, Nullable } from '@/constants/abacus';
 import { AbacusApiStatus } from '@/constants/abacus';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 
-import { getApiState } from '@/state/appSelectors';
+import { getApiState, getInitializationError } from '@/state/appSelectors';
 
 import { useStringGetter } from './useStringGetter';
 
-const getStatusErrorMessage = ({
+export enum ConnectionErrorType {
+  CHAIN_DISRUPTION = 'CHAIN_DISRUPTION',
+  INDEXER_TRAILING = 'INDEXER_TRAILING',
+}
+
+const ErrorMessageMap = {
+  [ConnectionErrorType.CHAIN_DISRUPTION]: {
+    title: STRING_KEYS.CHAIN_DISRUPTION_DETECTED,
+    body: STRING_KEYS.CHAIN_DISRUPTION_DETECTED_BODY,
+  },
+  [ConnectionErrorType.INDEXER_TRAILING]: {
+    title: STRING_KEYS.ORDERBOOK_LAGGING,
+    body: STRING_KEYS.ORDERBOOK_LAGGING_BODY,
+  },
+};
+
+const getConnectionError = ({
   apiState,
-  stringGetter,
+  initializationError,
 }: {
   apiState: Nullable<AbacusApiState>;
-  stringGetter: StringGetterFunction;
+  initializationError?: string;
 }) => {
-  const { haltedBlock, trailingBlocks, status } = apiState || {};
+  const { status } = apiState ?? {};
+
+  if (initializationError) {
+    return ConnectionErrorType.CHAIN_DISRUPTION;
+  }
 
   switch (status) {
-    case AbacusApiStatus.INDEXER_DOWN: {
-      return stringGetter({ key: STRING_KEYS.INDEXER_DOWN });
-    }
-    case AbacusApiStatus.INDEXER_HALTED: {
-      return stringGetter({
-        key: STRING_KEYS.INDEXER_HALTED,
-        params: { HALTED_BLOCK: haltedBlock },
-      });
-    }
     case AbacusApiStatus.INDEXER_TRAILING: {
-      return stringGetter({
-        key: STRING_KEYS.INDEXER_TRAILING,
-        params: { TRAILING_BLOCKS: trailingBlocks },
-      });
+      return ConnectionErrorType.INDEXER_TRAILING;
     }
-    case AbacusApiStatus.VALIDATOR_DOWN: {
-      return stringGetter({ key: STRING_KEYS.VALIDATOR_DOWN });
-    }
-    case AbacusApiStatus.VALIDATOR_HALTED: {
-      return stringGetter({
-        key: STRING_KEYS.VALIDATOR_HALTED,
-        params: { HALTED_BLOCK: haltedBlock },
-      });
-    }
+    case AbacusApiStatus.INDEXER_DOWN:
+    case AbacusApiStatus.INDEXER_HALTED:
+    case AbacusApiStatus.VALIDATOR_DOWN:
+    case AbacusApiStatus.VALIDATOR_HALTED:
     case AbacusApiStatus.UNKNOWN: {
-      return stringGetter({ key: STRING_KEYS.UNKNOWN_API_ERROR });
+      return ConnectionErrorType.CHAIN_DISRUPTION;
     }
     case AbacusApiStatus.NORMAL:
     default: {
-      return null;
+      return undefined;
     }
   }
 };
 
+const getStatusErrorMessage = ({
+  connectionError,
+  stringGetter,
+}: {
+  connectionError?: ConnectionErrorType;
+  stringGetter: StringGetterFunction;
+}) => {
+  if (connectionError && ErrorMessageMap[connectionError]) {
+    return {
+      title: stringGetter({ key: ErrorMessageMap[connectionError].title }),
+      body: stringGetter({ key: ErrorMessageMap[connectionError].body }),
+    };
+  }
+  return null;
+};
+
 export const getIndexerHeight = (apiState: Nullable<AbacusApiState>) => {
-  const { haltedBlock, trailingBlocks, status, height } = apiState || {};
+  const { haltedBlock, trailingBlocks, status, height } = apiState ?? {};
 
   switch (status) {
     case AbacusApiStatus.INDEXER_HALTED: {
@@ -71,8 +90,13 @@ export const getIndexerHeight = (apiState: Nullable<AbacusApiState>) => {
 export const useApiState = () => {
   const stringGetter = useStringGetter();
   const apiState = useSelector(getApiState, shallowEqual);
-  const { haltedBlock, height, status, trailingBlocks} = apiState ?? {};
-  const statusErrorMessage = getStatusErrorMessage({ apiState, stringGetter });
+  const initializationError = useSelector(getInitializationError);
+  const { haltedBlock, height, status, trailingBlocks } = apiState ?? {};
+  const connectionError = getConnectionError({
+    apiState,
+    initializationError,
+  });
+  const statusErrorMessage = getStatusErrorMessage({ connectionError, stringGetter });
   const indexerHeight = getIndexerHeight(apiState);
 
   return {
@@ -80,6 +104,7 @@ export const useApiState = () => {
     height,
     indexerHeight,
     status,
+    connectionError,
     statusErrorMessage,
     trailingBlocks,
   };

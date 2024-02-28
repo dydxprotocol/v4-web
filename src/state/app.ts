@@ -10,10 +10,12 @@ import { validateAgainstAvailableEnvironments } from '@/lib/network';
 export interface AppState {
   apiState: AbacusApiState | undefined;
   pageLoaded: boolean;
+  initializationError?: string;
   selectedNetwork: DydxNetwork;
 }
 
 const initialState: AppState = {
+  initializationError: undefined,
   apiState: undefined,
   pageLoaded: false,
   selectedNetwork: getLocalStorage({
@@ -40,8 +42,16 @@ export const appSlice = createSlice({
       ...state,
       selectedNetwork: action.payload,
     }),
+    setInitializationError: (state: AppState, action: PayloadAction<string>) => {
+      state.initializationError = action.payload;
+    },
   },
 });
 
-export const { initializeLocalization, initializeWebsocket, setApiState, setSelectedNetwork } =
-  appSlice.actions;
+export const {
+  initializeLocalization,
+  initializeWebsocket,
+  setApiState,
+  setSelectedNetwork,
+  setInitializationError,
+} = appSlice.actions;

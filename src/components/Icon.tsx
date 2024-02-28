@@ -11,12 +11,12 @@ import {
   BoxCloseIcon,
   CalculatorIcon,
   CaretIcon,
-  CautionCircleStrokeIcon,
   CautionCircleIcon,
+  CautionCircleStrokeIcon,
   ChaosLabsIcon,
   ChatIcon,
-  CheckIcon,
   CheckCircleIcon,
+  CheckIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   ClockIcon,
@@ -48,17 +48,18 @@ import {
   MigrateIcon,
   MintscanIcon,
   MoonIcon,
-  OrderbookIcon,
   OrderCanceledIcon,
   OrderFilledIcon,
   OrderOpenIcon,
   OrderPartiallyFilledIcon,
   OrderPendingIcon,
   OrderUntriggeredIcon,
+  OrderbookIcon,
   OverviewIcon,
   PencilIcon,
   PlayIcon,
   PlusIcon,
+  PositionPartialIcon,
   PositionsIcon,
   PriceChartIcon,
   PrivacyIcon,
@@ -68,10 +69,10 @@ import {
   SendIcon,
   ShareIcon,
   ShowIcon,
-  TogglesMenuIcon,
   StarIcon,
   SunIcon,
   TerminalIcon,
+  TogglesMenuIcon,
   TokenIcon,
   TradeIcon,
   TransferIcon,
@@ -81,6 +82,7 @@ import {
   WebsiteIcon,
   WhitepaperIcon,
   WithdrawIcon,
+  DownloadIcon,
 } from '@/icons';
 
 export enum IconName {
@@ -141,6 +143,7 @@ export enum IconName {
   Pencil = 'Pencil',
   Play = 'Play',
   Plus = 'Plus',
+  PositionPartial = 'PositionPartial',
   Positions = 'Positions',
   PriceChart = 'PriceChart',
   Privacy = 'Privacy',
@@ -163,6 +166,7 @@ export enum IconName {
   Website = 'Website',
   Whitepaper = 'Whitepaper',
   Withdraw = 'Withdraw',
+  Download = 'Download',
 }
 
 const icons = {
@@ -222,6 +226,7 @@ const icons = {
   [IconName.Pencil]: PencilIcon,
   [IconName.Play]: PlayIcon,
   [IconName.Plus]: PlusIcon,
+  [IconName.PositionPartial]: PositionPartialIcon,
   [IconName.Positions]: PositionsIcon,
   [IconName.PriceChart]: PriceChartIcon,
   [IconName.Privacy]: PrivacyIcon,
@@ -244,6 +249,7 @@ const icons = {
   [IconName.Website]: WebsiteIcon,
   [IconName.Whitepaper]: WhitepaperIcon,
   [IconName.Withdraw]: WithdrawIcon,
+  [IconName.Download]: DownloadIcon,
 } as Record<IconName, ElementType>;
 
 type ElementProps = {

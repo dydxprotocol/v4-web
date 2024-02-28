@@ -1,20 +1,38 @@
 import { useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { AppRoute } from '@/constants/routes';
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { AppRoute, PortfolioRoute } from '@/constants/routes';
+
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AttachedExpandingSection, DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
-
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
+
+import {
+  calculateShouldRenderActionsInPositionsTable,
+  calculateShouldRenderTriggersInPositionsTable,
+} from '@/state/accountCalculators';
+
+import { isTruthy } from '@/lib/isTruthy';
+import { testFlags } from '@/lib/testFlags';
 
 import { AccountDetailsAndHistory } from './AccountDetailsAndHistory';
 
 export const Overview = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
+  const navigate = useNavigate();
+
+  const showClosePositionAction = false;
+
+  const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
+  const shouldRenderActions = useSelector(
+    calculateShouldRenderActionsInPositionsTable(showClosePositionAction)
+  );
 
   return (
     <div>
@@ -22,7 +40,7 @@ export const Overview = () => {
         <AccountDetailsAndHistory />
       </DetachedSection>
 
-      <Styled.AttachedExpandingSection>
+      <$AttachedExpandingSection>
         <ContentSectionHeader title={stringGetter({ key: STRING_KEYS.OPEN_POSITIONS })} />
 
         <PositionsTable
@@ -35,26 +53,28 @@ export const Overview = () => {
                 ]
               : [
                   PositionsTableColumnKey.Market,
-                  PositionsTableColumnKey.Side,
                   PositionsTableColumnKey.Size,
-                  PositionsTableColumnKey.Leverage,
-                  PositionsTableColumnKey.LiquidationAndOraclePrice,
                   PositionsTableColumnKey.UnrealizedPnl,
-                  PositionsTableColumnKey.RealizedPnl,
+                  !testFlags.isolatedMargin && PositionsTableColumnKey.RealizedPnl,
                   PositionsTableColumnKey.AverageOpenAndClose,
-                ]
+                  PositionsTableColumnKey.LiquidationAndOraclePrice,
+                  shouldRenderTriggers && PositionsTableColumnKey.Triggers,
+                  shouldRenderActions && PositionsTableColumnKey.Actions,
+                ].filter(isTruthy)
           }
           currentRoute={AppRoute.Portfolio}
-          withGradientCardRows
+          navigateToOrders={() =>
+            navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
+              state: { from: AppRoute.Portfolio },
+            })
+          }
+          showClosePositionAction={showClosePositionAction}
           withOuterBorder
         />
-      </Styled.AttachedExpandingSection>
+      </$AttachedExpandingSection>
     </div>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.AttachedExpandingSection = styled(AttachedExpandingSection)`
+const $AttachedExpandingSection = styled(AttachedExpandingSection)`
   margin-top: 1rem;
 `;

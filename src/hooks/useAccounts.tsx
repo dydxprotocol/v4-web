@@ -1,23 +1,23 @@
-import { useCallback, useContext, createContext, useEffect, useState, useMemo } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { useDispatch } from 'react-redux';
+import { OfflineSigner } from '@cosmjs/proto-signing';
+import { LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
+import { usePrivy } from '@privy-io/react-auth';
 import { AES, enc } from 'crypto-js';
-import { NOBLE_BECH32_PREFIX, LocalWallet, type Subaccount } from '@dydxprotocol/v4-client-js';
+import { useDispatch } from 'react-redux';
 
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
-import { DialogTypes } from '@/constants/dialogs';
-import { STRING_KEYS } from '@/constants/localization';
-import { LocalStorageKey, LOCAL_STORAGE_VERSIONS } from '@/constants/localStorage';
+import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import {
   DydxAddress,
   EvmAddress,
   PrivateInformation,
   TEST_WALLET_EVM_ADDRESS,
+  WalletConnectionType,
   WalletType,
 } from '@/constants/wallets';
 
-import { setOnboardingState, setOnboardingGuard } from '@/state/account';
-import { forceOpenDialog } from '@/state/dialogs';
+import { setOnboardingGuard, setOnboardingState } from '@/state/account';
 
 import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
@@ -25,7 +25,7 @@ import { testFlags } from '@/lib/testFlags';
 
 import { useDydxClient } from './useDydxClient';
 import { useLocalStorage } from './useLocalStorage';
-import { useRestrictions } from './useRestrictions';
+import useSignForWalletDerivation from './useSignForWalletDerivation';
 import { useWalletConnection } from './useWalletConnection';
 
 const AccountsContext = createContext<ReturnType<typeof useAccountsContext> | undefined>(undefined);
@@ -75,6 +75,8 @@ const useAccountsContext = () => {
     setPreviousEvmAddress(evmAddress);
   }, [evmAddress]);
 
+  const { ready, authenticated } = usePrivy();
+
   // EVM → dYdX account derivation
 
   const [evmDerivedAddresses, saveEvmDerivedAddresses] = useLocalStorage({
@@ -89,17 +91,17 @@ const useAccountsContext = () => {
   }, []);
 
   const saveEvmDerivedAccount = ({
-    evmAddress,
+    evmAddressInner,
     dydxAddress,
   }: {
-    evmAddress: EvmAddress;
+    evmAddressInner: EvmAddress;
     dydxAddress?: DydxAddress;
   }) => {
     saveEvmDerivedAddresses({
       ...evmDerivedAddresses,
       version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.EvmDerivedAddresses],
-      [evmAddress]: {
-        ...evmDerivedAddresses[evmAddress],
+      [evmAddressInner]: {
+        ...evmDerivedAddresses[evmAddressInner],
         dydxAddress,
       },
     });
@@ -135,29 +137,24 @@ const useAccountsContext = () => {
   };
 
   // dYdXClient Onboarding & Account Helpers
-  const { compositeClient, getWalletFromEvmSignature } = useDydxClient();
+  const { indexerClient, getWalletFromEvmSignature } = useDydxClient();
   // dYdX subaccounts
   const [dydxSubaccounts, setDydxSubaccounts] = useState<Subaccount[] | undefined>();
 
-  const { getSubaccounts } = useMemo(
-    () => ({
-      getSubaccounts: async ({ dydxAddress }: { dydxAddress: DydxAddress }) => {
-        try {
-          const response = await compositeClient?.indexerClient.account.getSubaccounts(dydxAddress);
-          setDydxSubaccounts(response?.subaccounts);
-          return response?.subaccounts ?? [];
-        } catch (error) {
-          // 404 is expected if the user has no subaccounts
-          if (error.status === 404) {
-            return [];
-          } else {
-            throw error;
-          }
-        }
-      },
-    }),
-    [compositeClient]
-  );
+  const getSubaccounts = async ({ dydxAddress }: { dydxAddress: DydxAddress }) => {
+    try {
+      const response = await indexerClient.account.getSubaccounts(dydxAddress);
+      setDydxSubaccounts(response?.subaccounts);
+      return response?.subaccounts ?? [];
+    } catch (error) {
+      // 404 is expected if the user has no subaccounts
+      // 403 is expected if the user account is blocked
+      if (error.status === 404 || error.status === 403) {
+        return [];
+      }
+      throw error;
+    }
+  };
 
   // dYdX wallet / onboarding state
   const [localDydxWallet, setLocalDydxWallet] = useState<LocalWallet>();
@@ -171,10 +168,7 @@ const useAccountsContext = () => {
     [localDydxWallet]
   );
 
-  const nobleAddress = useMemo(
-    () => localNobleWallet?.address,
-    [localNobleWallet]
-  );
+  const nobleAddress = useMemo(() => localNobleWallet?.address, [localNobleWallet]);
 
   const setWalletFromEvmSignature = async (signature: string) => {
     const { wallet, mnemonic, privateKey, publicKey } = await getWalletFromEvmSignature({
@@ -186,24 +180,27 @@ const useAccountsContext = () => {
 
   useEffect(() => {
     if (evmAddress) {
-      saveEvmDerivedAccount({ evmAddress, dydxAddress });
+      saveEvmDerivedAccount({ evmAddressInner: evmAddress, dydxAddress });
     }
   }, [evmAddress, dydxAddress]);
+
+  const signTypedDataAsync = useSignForWalletDerivation();
 
   useEffect(() => {
     (async () => {
       if (walletType === WalletType.TestWallet) {
         // Get override values. Use the testFlags value if it exists, otherwise use the previously
         // saved value where possible. If neither exist, use a default garbage value.
-        const addressOverride: DydxAddress = testFlags.addressOverride as DydxAddress ||
-          evmDerivedAddresses?.[TEST_WALLET_EVM_ADDRESS]?.dydxAddress as DydxAddress ||
+        const addressOverride: DydxAddress =
+          (testFlags.addressOverride as DydxAddress) ||
+          (evmDerivedAddresses?.[TEST_WALLET_EVM_ADDRESS]?.dydxAddress as DydxAddress) ||
           'dydx1';
 
         dispatch(setOnboardingState(OnboardingState.WalletConnected));
 
         // Set variables.
         saveEvmDerivedAccount({
-          evmAddress: TEST_WALLET_EVM_ADDRESS,
+          evmAddressInner: TEST_WALLET_EVM_ADDRESS,
           dydxAddress: addressOverride,
         });
         const wallet = new LocalWallet();
@@ -214,7 +211,7 @@ const useAccountsContext = () => {
       } else if (connectedDydxAddress && signerGraz) {
         dispatch(setOnboardingState(OnboardingState.WalletConnected));
         try {
-          setLocalDydxWallet(await LocalWallet.fromOfflineSigner(signerGraz));
+          setLocalDydxWallet(await LocalWallet.fromOfflineSigner(signerGraz as OfflineSigner));
           dispatch(setOnboardingState(OnboardingState.AccountConnected));
         } catch (error) {
           log('useAccounts/setLocalDydxWallet', error);
@@ -225,7 +222,17 @@ const useAccountsContext = () => {
 
           const evmDerivedAccount = evmDerivedAddresses[evmAddress];
 
-          if (evmDerivedAccount?.encryptedSignature) {
+          if (walletConnectionType === WalletConnectionType.Privy && authenticated && ready) {
+            try {
+              const signature = await signTypedDataAsync();
+
+              await setWalletFromEvmSignature(signature);
+              dispatch(setOnboardingState(OnboardingState.AccountConnected));
+            } catch (error) {
+              log('useAccounts/decryptSignature', error);
+              forgetEvmSignature();
+            }
+          } else if (evmDerivedAccount?.encryptedSignature) {
             try {
               const signature = decryptSignature(evmDerivedAccount.encryptedSignature);
 
@@ -248,9 +255,9 @@ const useAccountsContext = () => {
 
   // abacus
   useEffect(() => {
-    if (dydxAddress) abacusStateManager.setAccount(localDydxWallet);
+    if (dydxAddress) abacusStateManager.setAccount(localDydxWallet, hdKey);
     else abacusStateManager.attemptDisconnectAccount();
-  }, [localDydxWallet]);
+  }, [localDydxWallet, hdKey]);
 
   useEffect(() => {
     const setNobleWallet = async () => {
@@ -285,7 +292,7 @@ const useAccountsContext = () => {
         value: hasAcknowledgedTerms,
       })
     );
-  }, [hasAcknowledgedTerms]);
+  }, [dispatch, hasAcknowledgedTerms]);
 
   useEffect(() => {
     const hasPreviousTransactions = Boolean(dydxSubaccounts?.length);
@@ -296,22 +303,7 @@ const useAccountsContext = () => {
         value: hasPreviousTransactions,
       })
     );
-  }, [dydxSubaccounts]);
-
-  // Restrictions
-  const { isBadActor, sanctionedAddresses } = useRestrictions();
-
-  useEffect(() => {
-    if (
-      dydxAddress &&
-      (isBadActor ||
-        sanctionedAddresses.has(dydxAddress) ||
-        (evmAddress && sanctionedAddresses.has(evmAddress)))
-    ) {
-      dispatch(forceOpenDialog({ type: DialogTypes.RestrictedWallet }));
-      disconnect();
-    }
-  }, [isBadActor, evmAddress, dydxAddress, sanctionedAddresses]);
+  }, [dispatch, dydxSubaccounts]);
 
   // Disconnect wallet / accounts
   const disconnectLocalDydxWallet = () => {

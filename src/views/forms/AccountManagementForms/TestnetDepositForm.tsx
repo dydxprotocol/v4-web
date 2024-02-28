@@ -1,20 +1,26 @@
-import { useState, type FormEvent, useEffect } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
+
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
-import { useAccounts, useStringGetter, useSubaccount } from '@/hooks';
+
+import { useAccounts } from '@/hooks/useAccounts';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
+
 import { formMixins } from '@/styles/formMixins';
 
-import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 import { Button } from '@/components/Button';
+import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 
+import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
 
 type DepositFormProps = {
@@ -40,8 +46,14 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
     }
   }, [subAccount]);
 
+  useEffect(() => {
+    return () => {
+      abacusStateManager.resetInputState();
+    };
+  }, []);
+
   return (
-    <Styled.Form
+    <$Form
       onSubmit={async (e: FormEvent) => {
         e.preventDefault();
 
@@ -74,7 +86,7 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
           },
         })}
       </p>
-      <Styled.Footer>
+      <$Footer>
         {!canAccountTrade ? (
           <OnboardingTriggerButton size={ButtonSize.Base} />
         ) : (
@@ -82,18 +94,15 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
             {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
           </Button>
         )}
-      </Styled.Footer>
-    </Styled.Form>
+      </$Footer>
+    </$Form>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Form = styled.form`
+const $Form = styled.form`
   ${formMixins.transfersForm}
 `;
 
-Styled.Footer = styled.footer`
+const $Footer = styled.footer`
   ${formMixins.footer}
   --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
 

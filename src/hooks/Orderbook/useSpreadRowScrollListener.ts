@@ -1,4 +1,4 @@
-import { type RefObject, useEffect, useState } from 'react';
+import { useEffect, useState, type RefObject } from 'react';
 
 export const useSpreadRowScrollListener = ({
   orderbookRef,

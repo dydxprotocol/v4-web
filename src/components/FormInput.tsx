@@ -1,9 +1,11 @@
-import { forwardRef } from 'react';
+import React, { forwardRef } from 'react';
+
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
-import { layoutMixins } from '@/styles/layoutMixins';
+
 import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Input, InputProps } from '@/components/Input';
@@ -14,7 +16,7 @@ type StyleProps = {
 };
 
 type ElementProps = {
-  label: React.ReactNode;
+  label?: React.ReactNode;
   slotRight?: React.ReactNode;
   validationConfig?: {
     attached?: boolean;
@@ -27,30 +29,26 @@ export type FormInputProps = ElementProps & StyleProps & InputProps;
 
 export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
   ({ id, label, slotRight, className, validationConfig, ...otherProps }, ref) => (
-    <Styled.FormInputContainer
-      className={className}
-      isValidationAttached={validationConfig?.attached}
-    >
-      <Styled.InputContainer hasSlotRight={!!slotRight}>
-        <Styled.WithLabel label={label} inputID={id} disabled={otherProps?.disabled}>
+    <$FormInputContainer className={className} isValidationAttached={validationConfig?.attached}>
+      <$InputContainer hasLabel={!!label} hasSlotRight={!!slotRight}>
+        {label ? (
+          <$WithLabel label={label} inputID={id} disabled={otherProps?.disabled}>
+            <Input ref={ref} id={id} {...otherProps} />
+          </$WithLabel>
+        ) : (
           <Input ref={ref} id={id} {...otherProps} />
-        </Styled.WithLabel>
+        )}
         {slotRight}
-      </Styled.InputContainer>
+      </$InputContainer>
       {validationConfig && (
-        <Styled.AlertMessage type={validationConfig.type}>
-          {validationConfig.message}
-        </Styled.AlertMessage>
+        <$AlertMessage type={validationConfig.type}>{validationConfig.message}</$AlertMessage>
       )}
-    </Styled.FormInputContainer>
+    </$FormInputContainer>
   )
 );
+const $AlertMessage = styled(AlertMessage)``;
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.AlertMessage = styled(AlertMessage)``;
-
-Styled.FormInputContainer = styled.div<{ isValidationAttached?: boolean }>`
+const $FormInputContainer = styled.div<{ isValidationAttached?: boolean }>`
   ${layoutMixins.flexColumn}
   gap: 0.5rem;
 
@@ -59,7 +57,7 @@ Styled.FormInputContainer = styled.div<{ isValidationAttached?: boolean }>`
     css`
       --input-radius: 0.5em 0.5em 0 0;
 
-      ${Styled.AlertMessage} {
+      ${$AlertMessage} {
         border-left: none;
         margin: 0;
         border-radius: 0 0 0.5em 0.5em;
@@ -67,10 +65,16 @@ Styled.FormInputContainer = styled.div<{ isValidationAttached?: boolean }>`
     `}
 `;
 
-Styled.InputContainer = styled.div<{ hasSlotRight?: boolean }>`
+const $InputContainer = styled.div<{ hasLabel?: boolean; hasSlotRight?: boolean }>`
   ${formMixins.inputContainer}
 
   input {
+    ${({ hasLabel }) =>
+      !hasLabel &&
+      css`
+        --form-input-paddingY: 0;
+      `}
+
     padding: var(--form-input-paddingY) var(--form-input-paddingX);
     padding-top: 0;
   }
@@ -85,7 +89,7 @@ Styled.InputContainer = styled.div<{ hasSlotRight?: boolean }>`
     `}
 `;
 
-Styled.WithLabel = styled(WithLabel)<{ disabled?: boolean }>`
+const $WithLabel = styled(WithLabel)<{ disabled?: boolean }>`
   ${formMixins.inputLabel}
 
   label {

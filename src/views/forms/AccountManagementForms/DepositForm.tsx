@@ -1,26 +1,35 @@
-import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
+import styled from 'styled-components';
 import { Abi, parseUnits } from 'viem';
 
 import erc20 from '@/abi/erc20.json';
 import erc20_usdt from '@/abi/erc20_usdt.json';
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
-import { AnalyticsEvent, AnalyticsEventData } from '@/constants/analytics';
 import { AlertType } from '@/constants/alerts';
+import { AnalyticsEvent, AnalyticsEventData } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
-import { MAX_CCTP_TRANSFER_AMOUNT, MAX_PRICE_IMPACT, NumberSign } from '@/constants/numbers';
-import type { EvmAddress } from '@/constants/wallets';
+import { TransferNotificationTypes } from '@/constants/notifications';
+import {
+  MAX_CCTP_TRANSFER_AMOUNT,
+  MAX_PRICE_IMPACT,
+  MIN_CCTP_TRANSFER_AMOUNT,
+  NumberSign,
+} from '@/constants/numbers';
+import { WalletType, type EvmAddress } from '@/constants/wallets';
 
-import { useAccounts, useDebounce, useStringGetter, useSelectedNetwork } from '@/hooks';
-import { useAccountBalance, CHAIN_DEFAULT_TOKEN_ADDRESS } from '@/hooks/useAccountBalance';
+import { CHAIN_DEFAULT_TOKEN_ADDRESS, useAccountBalance } from '@/hooks/useAccountBalance';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useDebounce } from '@/hooks/useDebounce';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
@@ -32,6 +41,7 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
+import { WithTooltip } from '@/components/WithTooltip';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
@@ -42,11 +52,10 @@ import { getNobleChainId, NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 import { parseWalletError } from '@/lib/wallet';
 
+import { NobleDeposit } from '../NobleDeposit';
+import { DepositButtonAndReceipt } from './DepositForm/DepositButtonAndReceipt';
 import { SourceSelectMenu } from './SourceSelectMenu';
 import { TokenSelectMenu } from './TokenSelectMenu';
-
-import { DepositButtonAndReceipt } from './DepositForm/DepositButtonAndReceipt';
-import { NobleDeposit } from '../NobleDeposit';
 
 type DepositFormProps = {
   onDeposit?: (event?: AnalyticsEventData<AnalyticsEvent.TransferDeposit>) => void;
@@ -132,6 +141,17 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   useEffect(() => {
     if (error) onError?.();
   }, [error]);
+
+  const { walletType } = useAccounts();
+
+  useEffect(() => {
+    if (walletType === WalletType.Privy) {
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.exchange,
+        value: 'coinbase',
+      });
+    }
+  }, [walletType]);
 
   const onSelectNetwork = useCallback((name: string, type: 'chain' | 'exchange') => {
     if (name) {
@@ -267,6 +287,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
             toAmount: summary?.usdcSize || undefined,
             triggeredAt: Date.now(),
             isCctp,
+            requestId: requestPayload.requestId ?? undefined,
+            type: TransferNotificationTypes.Deposit,
           });
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');
@@ -275,6 +297,13 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
             chainId: chainIdStr || undefined,
             tokenAddress: sourceToken?.address || undefined,
             tokenSymbol: sourceToken?.symbol || undefined,
+            slippage: slippage || undefined,
+            gasFee: summary?.gasFee || undefined,
+            bridgeFee: summary?.bridgeFee || undefined,
+            exchangeRate: summary?.exchangeRate || undefined,
+            estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
+            toAmount: summary?.toAmount || undefined,
+            toAmountMin: summary?.toAmountMin || undefined,
           });
         }
       } catch (error) {
@@ -313,7 +342,24 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     },
   ];
 
+  // TODO: abstract as much as possible to a util/hook and share between WithdrawForm
   const errorMessage = useMemo(() => {
+    if (isCctp) {
+      if (
+        !debouncedAmountBN.isZero() &&
+        MustBigNumber(debouncedAmountBN).lte(MIN_CCTP_TRANSFER_AMOUNT)
+      ) {
+        return 'Amount must be greater than 10 USDC';
+      }
+      if (MustBigNumber(debouncedAmountBN).gte(MAX_CCTP_TRANSFER_AMOUNT)) {
+        return stringGetter({
+          key: STRING_KEYS.MAX_CCTP_TRANSFER_LIMIT_EXCEEDED,
+          params: {
+            MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
+          },
+        });
+      }
+    }
     if (error) {
       return parseWalletError({ error, stringGetter }).message;
     }
@@ -339,17 +385,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       return stringGetter({ key: STRING_KEYS.DEPOSIT_MORE_THAN_BALANCE });
     }
 
-    if (isCctp) {
-      if (MustBigNumber(debouncedAmountBN).gte(MAX_CCTP_TRANSFER_AMOUNT)) {
-        return stringGetter({
-          key: STRING_KEYS.MAX_CCTP_TRANSFER_LIMIT_EXCEEDED,
-          params: {
-            MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
-          },
-        });
-      }
-    }
-
     if (isMainnet && MustBigNumber(summary?.aggregatePriceImpact).gte(MAX_PRICE_IMPACT)) {
       return stringGetter({ key: STRING_KEYS.PRICE_IMPACT_TOO_HIGH });
     }
@@ -365,6 +400,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     sourceToken,
     stringGetter,
     summary,
+    debouncedAmountBN,
   ]);
 
   const isDisabled =
@@ -377,9 +413,22 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   if (!resources) {
     return <LoadingSpace id="DepositForm" />;
   }
-
   return (
-    <Styled.Form onSubmit={onSubmit}>
+    <$Form onSubmit={onSubmit}>
+      <$Subheader>
+        {stringGetter({
+          key: STRING_KEYS.LOWEST_FEE_DEPOSITS,
+          params: {
+            LOWEST_FEE_TOKENS_TOOLTIP: (
+              <WithTooltip tooltip="lowest-fees-deposit">
+                {stringGetter({
+                  key: STRING_KEYS.SELECT_CHAINS,
+                })}
+              </WithTooltip>
+            ),
+          },
+        })}
+      </$Subheader>
       <SourceSelectMenu
         selectedChain={chainIdStr || undefined}
         selectedExchange={exchange || undefined}
@@ -390,26 +439,26 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       ) : (
         <>
           <TokenSelectMenu selectedToken={sourceToken || undefined} onSelectToken={onSelectToken} />
-          <Styled.WithDetailsReceipt side="bottom" detailItems={amountInputReceipt}>
+          <$WithDetailsReceipt side="bottom" detailItems={amountInputReceipt}>
             <FormInput
               type={InputType.Number}
               onChange={onChangeAmount}
               label={stringGetter({ key: STRING_KEYS.AMOUNT })}
               value={fromAmount}
               slotRight={
-                <Styled.FormInputButton size={ButtonSize.XSmall} onClick={onClickMax}>
+                <$FormInputButton size={ButtonSize.XSmall} onClick={onClickMax}>
                   {stringGetter({ key: STRING_KEYS.MAX })}
-                </Styled.FormInputButton>
+                </$FormInputButton>
               }
             />
-          </Styled.WithDetailsReceipt>
+          </$WithDetailsReceipt>
           {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
           {requireUserActionInWallet && (
             <AlertMessage type={AlertType.Warning}>
               {stringGetter({ key: STRING_KEYS.CHECK_WALLET_FOR_REQUEST })}
             </AlertMessage>
           )}
-          <Styled.Footer>
+          <$Footer>
             <DepositButtonAndReceipt
               isDisabled={isDisabled}
               isLoading={isLoading}
@@ -420,29 +469,30 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
               setRequireUserActionInWallet={setRequireUserActionInWallet}
               setError={setError}
             />
-          </Styled.Footer>
+          </$Footer>
         </>
       )}
-    </Styled.Form>
+    </$Form>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Form = styled.form`
+const $Form = styled.form`
   ${formMixins.transfersForm}
 `;
 
-Styled.Footer = styled.footer`
+const $Subheader = styled.div`
+  color: var(--color-text-0);
+`;
+
+const $Footer = styled.footer`
   ${formMixins.footer}
   --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
 `;
 
-Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
+const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
-Styled.Link = styled(Link)`
+const $Link = styled(Link)`
   color: var(--color-accent);
 
   &:visited {
@@ -450,10 +500,10 @@ Styled.Link = styled(Link)`
   }
 `;
 
-Styled.TransactionInfo = styled.span`
+const $TransactionInfo = styled.span`
   ${layoutMixins.row}
 `;
 
-Styled.FormInputButton = styled(Button)`
+const $FormInputButton = styled(Button)`
   ${formMixins.inputInnerButton}
 `;

@@ -5,8 +5,8 @@ import {
   type ThemeProps,
 } from 'styled-components';
 
-import { layoutMixins } from './layoutMixins';
 import breakpoints from './breakpoints';
+import { layoutMixins } from './layoutMixins';
 
 export const formMixins: Record<
   string,

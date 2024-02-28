@@ -1,19 +1,18 @@
 import { useState } from 'react';
+
 import type { Story } from '@ladle/react';
 import styled from 'styled-components';
 
-import { StoryWrapper } from '.ladle/components';
-
 import { Switch } from '@/components/Switch';
 
-type SwitchProps = Parameters<typeof Switch>;
+import { StoryWrapper } from '.ladle/components';
 
-export const SwitchStory: Story<SwitchProps> = (args: SwitchProps) => {
+export const SwitchStory: Story<Parameters<typeof Switch>[0]> = (args) => {
   const [checked, setChecked] = useState(false);
   return (
     <StoryWrapper>
-      <Switch checked={checked} onCheckedChange={setChecked} {...args} />
-      <StyledSwitch checked={checked} onCheckedChange={setChecked} {...args} />
+      <Switch {...args} checked={checked} onCheckedChange={setChecked} />
+      <StyledSwitch {...args} checked={checked} onCheckedChange={setChecked} />
     </StoryWrapper>
   );
 };

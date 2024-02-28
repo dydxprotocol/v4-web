@@ -1,22 +1,24 @@
 import type { ReactNode } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
-import { Content, Portal, Provider, Root, Trigger, Arrow } from '@radix-ui/react-tooltip';
+
+import { Arrow, Content, Portal, Provider, Root, Trigger } from '@radix-ui/react-tooltip';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { tooltipStrings } from '@/constants/tooltips';
 
-import { useStringGetter, useURLConfigs } from '@/hooks';
-
-import { Icon, IconName } from '@/components/Icon';
-import { Link } from '@/components/Link';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
 
+import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
+
 type ElementProps = {
   tooltip?: keyof typeof tooltipStrings;
   tooltipString?: string;
-  stringParams?: Record<string, string>;
+  stringParams?: Record<string, string | undefined>;
   withIcon?: boolean;
   children?: ReactNode;
   slotTooltip?: ReactNode;
@@ -66,38 +68,35 @@ export const WithTooltip = ({
     <Provider>
       <Root delayDuration={300}>
         <Trigger asChild>
-          <Styled.Abbr>
+          <$Abbr>
             {children}
-            {withIcon && <Styled.Icon iconName={IconName.HelpCircle} />}
-          </Styled.Abbr>
+            {withIcon && <$Icon iconName={IconName.HelpCircle} />}
+          </$Abbr>
         </Trigger>
 
         <Portal>
-          <Styled.Content sideOffset={8} side={side} align={align} className={className} asChild>
+          <$Content sideOffset={8} side={side} align={align} className={className} asChild>
             {slotTooltip ?? (
               <dl>
                 {tooltipTitle && <dt>{tooltipTitle}</dt>}
                 {tooltipBody && <dd>{tooltipBody}</dd>}
                 {tooltipLearnMore && (
                   <dd>
-                    <Styled.LearnMore href={tooltipLearnMore}>
+                    <$LearnMore href={tooltipLearnMore}>
                       {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
-                    </Styled.LearnMore>
+                    </$LearnMore>
                   </dd>
                 )}
-                <Styled.Arrow />
+                <$Arrow />
               </dl>
             )}
-          </Styled.Content>
+          </$Content>
         </Portal>
       </Root>
     </Provider>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Abbr = styled.abbr`
+const $Abbr = styled.abbr`
   ${layoutMixins.inlineRow}
 
   text-decoration: underline dashed 0px;
@@ -108,7 +107,7 @@ Styled.Abbr = styled.abbr`
   cursor: help;
 `;
 
-Styled.Content = styled(Content)`
+const $Content = styled(Content)`
   --tooltip-backgroundColor: var(--color-layer-4);
   --tooltip-backgroundColor: ${({ theme }) => theme.tooltipBackground};
 
@@ -138,7 +137,7 @@ Styled.Content = styled(Content)`
   }
 `;
 
-Styled.Arrow = styled(Arrow)`
+const $Arrow = styled(Arrow)`
   width: 0.75rem;
   height: 0.375rem;
 
@@ -147,10 +146,10 @@ Styled.Arrow = styled(Arrow)`
   }
 `;
 
-Styled.Icon = styled(Icon)`
+const $Icon = styled(Icon)`
   color: var(--color-text-0);
 `;
 
-Styled.LearnMore = styled(Link)`
+const $LearnMore = styled(Link)`
   --link-color: var(--color-accent);
 `;

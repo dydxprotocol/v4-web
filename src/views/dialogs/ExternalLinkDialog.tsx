@@ -1,14 +1,16 @@
 import type { ReactNode } from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
+
+import styled from 'styled-components';
 
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { useStringGetter } from '@/hooks';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 type ElementProps = {
   buttonText?: ReactNode;
@@ -37,20 +39,17 @@ export const ExternalLinkDialog = ({
         linkDescription ?? stringGetter({ key: STRING_KEYS.LEAVING_WEBSITE_DESCRIPTION })
       }
     >
-      <Styled.Content>
+      <$Content>
         {slotContent}
         <p>{stringGetter({ key: STRING_KEYS.LEAVING_WEBSITE_DISCLAIMER })}.</p>
         <Button type={ButtonType.Link} action={ButtonAction.Primary} href={link}>
           {buttonText ?? stringGetter({ key: STRING_KEYS.CONTINUE })}
         </Button>
-      </Styled.Content>
+      </$Content>
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1rem;
 

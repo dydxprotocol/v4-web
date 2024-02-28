@@ -1,6 +1,7 @@
 import { createSelector } from 'reselect';
 
 import { OnboardingState, OnboardingSteps } from '@/constants/account';
+import { ENVIRONMENT_CONFIG_MAP, type DydxNetwork } from '@/constants/networks';
 
 import {
   getOnboardingGuards,
@@ -8,6 +9,9 @@ import {
   getSubaccountId,
   getUncommittedOrderClientIds,
 } from '@/state/accountSelectors';
+import { getSelectedNetwork } from '@/state/appSelectors';
+
+import { testFlags } from '@/lib/testFlags';
 
 export const calculateOnboardingStep = createSelector(
   [getOnboardingState, getOnboardingGuards],
@@ -84,3 +88,26 @@ export const calculateIsAccountLoading = createSelector(
     );
   }
 );
+
+/**
+ * @description calculate whether positions table should render triggers column
+ */
+export const calculateShouldRenderTriggersInPositionsTable = createSelector(
+  [calculateIsAccountViewOnly, getSelectedNetwork],
+  (isAccountViewOnly: boolean, selectedNetwork: DydxNetwork) =>
+    !isAccountViewOnly && ENVIRONMENT_CONFIG_MAP[selectedNetwork].featureFlags.isSlTpEnabled
+);
+
+/**
+ * @description calculate whether positions table should render actions column
+ */
+export const calculateShouldRenderActionsInPositionsTable = (isCloseActionShown: boolean) =>
+  createSelector(
+    [calculateIsAccountViewOnly, calculateShouldRenderTriggersInPositionsTable],
+    (isAccountViewOnly: boolean, areTriggersRendered: boolean) => {
+      const hasActionsInColumn = testFlags.isolatedMargin
+        ? isCloseActionShown
+        : areTriggersRendered || isCloseActionShown;
+      return !isAccountViewOnly && hasActionsInColumn;
+    }
+  );

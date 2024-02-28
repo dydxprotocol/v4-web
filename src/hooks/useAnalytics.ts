@@ -1,48 +1,52 @@
 import { useEffect, useState } from 'react';
-import { useSelector, shallowEqual } from 'react-redux';
+
+import { shallowEqual, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 
-import { AnalyticsEvent, AnalyticsUserProperty } from '@/constants/analytics';
-
-import { track, identify } from '@/lib/analytics';
-
-import { useApiState } from './useApiState';
-import { useBreakpoints } from './useBreakpoints';
-import { useSelectedNetwork } from './useSelectedNetwork';
-import { useAccounts } from './useAccounts';
-import { useDydxClient } from './useDydxClient';
-
-import { getSelectedLocale } from '@/state/localizationSelectors';
-import { getOnboardingState, getSubaccountId } from '@/state/accountSelectors';
-import { calculateOnboardingStep } from '@/state/accountCalculators';
-import { getActiveDialog } from '@/state/dialogsSelectors';
+import {
+  AnalyticsEvent,
+  AnalyticsUserProperty,
+  lastSuccessfulWebsocketRequestByOrigin,
+} from '@/constants/analytics';
 import type { DialogTypes } from '@/constants/dialogs';
 
-import { getSelectedTradeType } from '@/lib/tradeData';
+import { calculateOnboardingStep } from '@/state/accountCalculators';
+import { getOnboardingState, getSubaccountId } from '@/state/accountSelectors';
+import { getActiveDialog } from '@/state/dialogsSelectors';
 import { getInputTradeData } from '@/state/inputsSelectors';
+import { getSelectedLocale } from '@/state/localizationSelectors';
+
+import { identify, track } from '@/lib/analytics';
+import { getSelectedTradeType } from '@/lib/tradeData';
+
+import { useAccounts } from './useAccounts';
+import { useApiState } from './useApiState';
+import { useBreakpoints } from './useBreakpoints';
+import { useDydxClient } from './useDydxClient';
+import { useSelectedNetwork } from './useSelectedNetwork';
 
 export const useAnalytics = () => {
-  const { walletType, walletConnectionType, evmAddress, dydxAddress, selectedWalletType } = useAccounts();
-  const { compositeClient } = useDydxClient();
+  const latestTag = import.meta.env.VITE_LAST_TAG;
+  const { walletType, walletConnectionType, evmAddress, dydxAddress, selectedWalletType } =
+    useAccounts();
+  const { indexerClient } = useDydxClient();
 
   /** User properties */
 
   // AnalyticsUserProperty.Breakpoint
   const breakpointMatches = useBreakpoints();
 
-  const breakpoint =
-    breakpointMatches.isMobile ?
-      'MOBILE'
-    : breakpointMatches.isTablet ?
-        'TABLET'
-    : breakpointMatches.isDesktopSmall ?
-        'DESKTOP_SMALL'
-    : breakpointMatches.isDesktopMedium ?
-        'DESKTOP_MEDIUM'
-    : breakpointMatches.isDesktopLarge ?
-        'DESKTOP_LARGE'
-    :
-      'UNSUPPORTED';
+  const breakpoint = breakpointMatches.isMobile
+    ? 'MOBILE'
+    : breakpointMatches.isTablet
+    ? 'TABLET'
+    : breakpointMatches.isDesktopSmall
+    ? 'DESKTOP_SMALL'
+    : breakpointMatches.isDesktopMedium
+    ? 'DESKTOP_MEDIUM'
+    : breakpointMatches.isDesktopLarge
+    ? 'DESKTOP_LARGE'
+    : 'UNSUPPORTED';
 
   useEffect(() => {
     identify(AnalyticsUserProperty.Breakpoint, breakpoint);
@@ -54,6 +58,13 @@ export const useAnalytics = () => {
   useEffect(() => {
     identify(AnalyticsUserProperty.Locale, selectedLocale);
   }, [selectedLocale]);
+
+  // AnalyticsUserProperty.Version
+  useEffect(() => {
+    if (latestTag !== undefined) {
+      identify(AnalyticsUserProperty.Version, latestTag.split(`release/v`).at(-1));
+    }
+  }, [latestTag]);
 
   // AnalyticsUserProperty.Network
   const { selectedNetwork } = useSelectedNetwork();
@@ -74,7 +85,7 @@ export const useAnalytics = () => {
 
   // AnalyticsUserProperty.WalletAddress
   useEffect(() => {
-    identify(AnalyticsUserProperty.WalletAddress, evmAddress || dydxAddress);
+    identify(AnalyticsUserProperty.WalletAddress, evmAddress ?? dydxAddress);
   }, [evmAddress, dydxAddress]);
 
   // AnalyticsUserProperty.DydxAddress
@@ -88,7 +99,6 @@ export const useAnalytics = () => {
     identify(AnalyticsUserProperty.SubaccountNumber, subaccountNumber);
   }, [subaccountNumber]);
 
-
   /** Events */
 
   // AnalyticsEvent.AppStart
@@ -97,11 +107,11 @@ export const useAnalytics = () => {
   }, []);
 
   // AnalyticsEvent.NetworkStatus
-  const { height, indexerHeight, status, trailingBlocks} = useApiState();
+  const { height, indexerHeight, status, trailingBlocks } = useApiState();
 
   useEffect(() => {
     if (status) {
-      const websocketEndpoint = compositeClient?.indexerClient?.config.websocketEndpoint;
+      const websocketEndpoint = indexerClient.config.websocketEndpoint;
 
       const lastSuccessfulIndexerRpcQuery =
         (websocketEndpoint &&
@@ -114,7 +124,7 @@ export const useAnalytics = () => {
         elapsedTime: lastSuccessfulIndexerRpcQuery && Date.now() - lastSuccessfulIndexerRpcQuery,
         blockHeight: height ?? undefined,
         indexerBlockHeight: indexerHeight ?? undefined,
-        trailingBlocks: trailingBlocks ?? undefined
+        trailingBlocks: trailingBlocks ?? undefined,
       });
     }
   }, [status]);
@@ -152,7 +162,11 @@ export const useAnalytics = () => {
     const onClick = (e: MouseEvent) => {
       const anchorElement = (e.target as Element).closest('a');
 
-      if (anchorElement instanceof HTMLAnchorElement && anchorElement.href && anchorElement.hostname !== globalThis.location.hostname)
+      if (
+        anchorElement instanceof HTMLAnchorElement &&
+        anchorElement.href &&
+        anchorElement.hostname !== globalThis.location.hostname
+      )
         track(AnalyticsEvent.NavigateExternal, { link: anchorElement.href });
     };
     globalThis.addEventListener('click', onClick);
@@ -176,8 +190,8 @@ export const useAnalytics = () => {
     }
   }, [onboardingState, currentOnboardingStep]);
 
-  // AnalyticsEvent.OnboardingConnectWallet
-  // AnalyticsEvent.OnboardingDisconnectWallet
+  // AnalyticsEvent.ConnectWallet
+  // AnalyticsEvent.DisconnectWallet
   const [previousSelectedWalletType, setPreviousSelectedWalletType] =
     useState<typeof selectedWalletType>();
 
@@ -209,6 +223,3 @@ export const useAnalytics = () => {
     }
   }, [selectedOrderType]);
 };
-
-export const lastSuccessfulRestRequestByOrigin: Record<URL['origin'], number> = {};
-export const lastSuccessfulWebsocketRequestByOrigin: Record<URL['origin'], number> = {};

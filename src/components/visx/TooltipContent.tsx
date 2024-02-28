@@ -1,4 +1,4 @@
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { popoverMixins } from '@/styles/popoverMixins';
 
@@ -11,12 +11,9 @@ type StyleProps = {
 };
 
 export const TooltipContent = ({ children, accentColor }: ElementProps & StyleProps) => (
-  <Styled.TooltipContent accentColor={accentColor}>{children}</Styled.TooltipContent>
+  <$TooltipContent accentColor={accentColor}>{children}</$TooltipContent>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TooltipContent = styled.aside<{ accentColor?: string }>`
+const $TooltipContent = styled.aside<{ accentColor?: string }>`
   --accent-color: currentColor;
 
   ${({ accentColor }) =>

@@ -1,24 +1,27 @@
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { useQuery } from 'react-query';
-import styled, { AnyStyledComponent } from 'styled-components';
 
-import { STRING_KEYS } from '@/constants/localization';
+import { useQuery } from 'react-query';
+import { useDispatch } from 'react-redux';
+import styled from 'styled-components';
+
 import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
+import { TOKEN_DECIMALS } from '@/constants/numbers';
+
+import { useAccounts } from '@/hooks/useAccounts';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useQueryChaosLabsIncentives } from '@/hooks/useQueryChaosLabsIncentives';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { ChaosLabsIcon } from '@/icons';
-
 import breakpoints from '@/styles/breakpoints';
-import { useAccounts, useBreakpoints, useStringGetter } from '@/hooks';
-
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Panel } from '@/components/Panel';
 import { Button } from '@/components/Button';
-
-import { Output, OutputType } from '@/components/Output';
 import { Icon, IconName } from '@/components/Icon';
+import { Output, OutputType } from '@/components/Output';
+import { Panel } from '@/components/Panel';
 import { Tag, TagSize } from '@/components/Tag';
 
 import { markLaunchIncentivesSeen } from '@/state/configs';
@@ -32,39 +35,39 @@ export const LaunchIncentivesPanel = ({ className }: { className?: string }) => 
 
   useEffect(() => {
     dispatch(markLaunchIncentivesSeen());
-  }, []);
+  }, [dispatch]);
 
   return isNotTablet ? (
-    <Styled.Panel
+    <$Panel
       className={className}
       slotHeader={<LaunchIncentivesTitle />}
       slotRight={<EstimatedRewards />}
     >
       <LaunchIncentivesContent />
-    </Styled.Panel>
+    </$Panel>
   ) : (
-    <Styled.Panel className={className}>
-      <Styled.Column>
+    <$Panel className={className}>
+      <$Column>
         <EstimatedRewards />
         <LaunchIncentivesTitle />
         <LaunchIncentivesContent />
-      </Styled.Column>
-    </Styled.Panel>
+      </$Column>
+    </$Panel>
   );
 };
 
 const LaunchIncentivesTitle = () => {
   const stringGetter = useStringGetter();
   return (
-    <Styled.Title>
+    <$Title>
       {stringGetter({
         key: STRING_KEYS.LAUNCH_INCENTIVES_TITLE,
         params: {
-          FOR_V4: <Styled.ForV4>{stringGetter({ key: STRING_KEYS.FOR_V4 })}</Styled.ForV4>,
+          FOR_V4: <$ForV4>{stringGetter({ key: STRING_KEYS.FOR_V4 })}</$ForV4>,
         },
       })}
-      <Styled.NewTag size={TagSize.Medium}>{stringGetter({ key: STRING_KEYS.NEW })}</Styled.NewTag>
-    </Styled.Title>
+      <$NewTag size={TagSize.Medium}>{stringGetter({ key: STRING_KEYS.NEW })}</$NewTag>
+    </$Title>
   );
 };
 
@@ -98,40 +101,37 @@ const EstimatedRewards = () => {
     onError: (error: Error) => log('LaunchIncentives/fetchSeasonNumber', error),
   });
 
-  const { data, isLoading } = useQuery({
-    enabled: !!dydxAddress,
-    queryKey: `launch_incentives_rewards_${dydxAddress ?? ''}`,
-    queryFn: async () => {
-      if (!dydxAddress) return undefined;
-      const resp = await fetch(`https://cloud.chaoslabs.co/query/api/dydx/points/${dydxAddress}`);
-      return (await resp.json())?.incentivePoints;
-    },
-    onError: (error: Error) => log('LaunchIncentives/fetchPoints', error),
-  });
+  const { data, isLoading } = useQueryChaosLabsIncentives({ dydxAddress, season: seasonNumber });
+  const { incentivePoints } = data ?? {};
 
   return (
-    <Styled.EstimatedRewardsCard>
-      <Styled.EstimatedRewardsCardContent>
+    <$EstimatedRewardsCard>
+      <$EstimatedRewardsCardContent>
         <div>
           <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_REWARDS })}</span>
           {seasonNumber !== undefined && (
-            <Styled.Season>
+            <$Season>
               {stringGetter({
                 key: STRING_KEYS.LAUNCH_INCENTIVES_SEASON_NUM,
                 params: { SEASON_NUMBER: seasonNumber },
               })}
-            </Styled.Season>
+            </$Season>
           )}
         </div>
 
-        <Styled.Points>
-          <Output type={OutputType.Number} value={data} isLoading={isLoading} fractionDigits={2} />
-          {data !== undefined && stringGetter({ key: STRING_KEYS.POINTS })}
-        </Styled.Points>
-      </Styled.EstimatedRewardsCardContent>
+        <$Points>
+          <Output
+            type={OutputType.Number}
+            value={incentivePoints}
+            isLoading={isLoading}
+            fractionDigits={TOKEN_DECIMALS}
+          />
+          {incentivePoints !== undefined && stringGetter({ key: STRING_KEYS.POINTS })}
+        </$Points>
+      </$EstimatedRewardsCardContent>
 
-      <Styled.Image src="/rewards-stars.svg" />
-    </Styled.EstimatedRewardsCard>
+      <$Image src="/rewards-stars.svg" />
+    </$EstimatedRewardsCard>
   );
 };
 
@@ -140,15 +140,15 @@ const LaunchIncentivesContent = () => {
   const dispatch = useDispatch();
 
   return (
-    <Styled.Column>
-      <Styled.Description>
+    <$Column>
+      <$Description>
         {stringGetter({ key: STRING_KEYS.LAUNCH_INCENTIVES_DESCRIPTION })}{' '}
-      </Styled.Description>
-      <Styled.ChaosLabsLogo>
+      </$Description>
+      <$ChaosLabsLogo>
         {stringGetter({ key: STRING_KEYS.POWERED_BY_ALL_CAPS })} <ChaosLabsIcon />
-      </Styled.ChaosLabsLogo>
-      <Styled.ButtonRow>
-        <Styled.AboutButton
+      </$ChaosLabsLogo>
+      <$ButtonRow>
+        <$AboutButton
           action={ButtonAction.Base}
           onClick={() => {
             dispatch(
@@ -161,8 +161,8 @@ const LaunchIncentivesContent = () => {
           slotRight={<Icon iconName={IconName.LinkOut} />}
         >
           {stringGetter({ key: STRING_KEYS.ABOUT })}
-        </Styled.AboutButton>
-        <Styled.Button
+        </$AboutButton>
+        <$Button
           action={ButtonAction.Primary}
           onClick={() => {
             dispatch(
@@ -176,24 +176,21 @@ const LaunchIncentivesContent = () => {
           slotLeft={<Icon iconName={IconName.Leaderboard} />}
         >
           {stringGetter({ key: STRING_KEYS.LEADERBOARD })}
-        </Styled.Button>
-      </Styled.ButtonRow>
-    </Styled.Column>
+        </$Button>
+      </$ButtonRow>
+    </$Column>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Panel = styled(Panel)`
+const $Panel = styled(Panel)`
   background-color: var(--color-layer-3);
   width: 100%;
 `;
 
-Styled.ForV4 = styled.span`
+const $ForV4 = styled.span`
   color: var(--color-text-0);
 `;
 
-Styled.Title = styled.h3`
+const $Title = styled.h3`
   ${layoutMixins.inlineRow}
   font: var(--font-medium-book);
   color: var(--color-text-2);
@@ -203,7 +200,7 @@ Styled.Title = styled.h3`
   }
 `;
 
-Styled.Description = styled.div`
+const $Description = styled.div`
   color: var(--color-text-0);
   --link-color: var(--color-text-1);
 
@@ -218,7 +215,7 @@ Styled.Description = styled.div`
   }
 `;
 
-Styled.ButtonRow = styled.div`
+const $ButtonRow = styled.div`
   ${layoutMixins.inlineRow}
   gap: 0.75rem;
   margin-top: 0.5rem;
@@ -228,22 +225,22 @@ Styled.ButtonRow = styled.div`
   }
 `;
 
-Styled.Button = styled(Button)`
+const $Button = styled(Button)`
   --button-padding: 0 1rem;
 `;
 
-Styled.AboutButton = styled(Styled.Button)`
+const $AboutButton = styled($Button)`
   --button-textColor: var(--color-text-2);
   --button-backgroundColor: var(--color-layer-6);
   --button-border: solid var(--border-width) var(--color-layer-7);
 `;
 
-Styled.Column = styled.div`
+const $Column = styled.div`
   ${layoutMixins.flexColumn}
   gap: 0.5rem;
 `;
 
-Styled.EstimatedRewardsCard = styled.div`
+const $EstimatedRewardsCard = styled.div`
   ${layoutMixins.spacedRow}
   padding: 1rem 1.25rem;
   min-width: 19rem;
@@ -263,7 +260,7 @@ Styled.EstimatedRewardsCard = styled.div`
   }
 `;
 
-Styled.EstimatedRewardsCardContent = styled.div`
+const $EstimatedRewardsCardContent = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1rem;
   height: 100%;
@@ -280,16 +277,12 @@ Styled.EstimatedRewardsCardContent = styled.div`
   }
 `;
 
-Styled.BackgroundDots = styled.img`
-  position: absolute;
-`;
-
-Styled.Season = styled.span`
+const $Season = styled.span`
   font: var(--font-small-book);
   color: var(--color-text-1);
 `;
 
-Styled.Points = styled.span`
+const $Points = styled.span`
   ${layoutMixins.inlineRow}
   gap: 0.25rem;
   font: var(--font-large-book);
@@ -300,7 +293,7 @@ Styled.Points = styled.span`
   }
 `;
 
-Styled.Image = styled.img`
+const $Image = styled.img`
   position: relative;
   float: right;
 
@@ -308,14 +301,14 @@ Styled.Image = styled.img`
   height: auto;
 `;
 
-Styled.ChaosLabsLogo = styled.span`
+const $ChaosLabsLogo = styled.span`
   display: flex;
   align-items: center;
   gap: 0.5em;
   font: var(--font-tiny-medium);
 `;
 
-Styled.NewTag = styled(Tag)`
+const $NewTag = styled(Tag)`
   color: var(--color-accent);
   background-color: var(--color-accent-faded);
 `;

@@ -1,38 +1,52 @@
-import { useSelector, shallowEqual } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { Key, useMemo } from 'react';
+
 import type { ColumnSize } from '@react-types/table';
+import { shallowEqual, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 import {
   type Asset,
   type Nullable,
+  type SubaccountOrder,
   type SubaccountPosition,
-  POSITION_SIDES,
 } from '@/constants/abacus';
-
-import { StringGetterFunction, STRING_KEYS } from '@/constants/localization';
-import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
+import { NumberSign, TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { EMPTY_ARR } from '@/constants/objects';
+import { AppRoute } from '@/constants/routes';
 import { PositionSide } from '@/constants/trade';
-import { useStringGetter } from '@/hooks';
+
 import { MediaQueryKeys } from '@/hooks/useBreakpoints';
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
-import { getExistingOpenPositions } from '@/state/accountSelectors';
+import { AssetIcon } from '@/components/AssetIcon';
+import { Icon, IconName } from '@/components/Icon';
+import { Output, OutputType, ShowSign } from '@/components/Output';
+import { Table, TableColumnHeader, type ColumnDef } from '@/components/Table';
+import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import { TableCell } from '@/components/Table/TableCell';
+import { PageSize } from '@/components/Table/TablePaginationRow';
+
+import {
+  calculateIsAccountViewOnly,
+  calculateShouldRenderTriggersInPositionsTable,
+} from '@/state/accountCalculators';
+import { getExistingOpenPositions, getSubaccountConditionalOrders } from '@/state/accountSelectors';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
-import { AssetIcon } from '@/components/AssetIcon';
-import { Icon, IconName } from '@/components/Icon';
-import { MarketTableCell } from '@/components/Table/MarketTableCell';
-import { Output, OutputType, ShowSign } from '@/components/Output';
-import { PositionSideTag } from '@/components/PositionSideTag';
-import { type ColumnDef, Table, TableColumnHeader } from '@/components/Table';
-import { TableCell } from '@/components/Table/TableCell';
-import { TagSize } from '@/components/Tag';
+import { MustBigNumber, getNumberSign } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
+import { orEmptyObj } from '@/lib/typeUtils';
 
-import { MustBigNumber } from '@/lib/numbers';
+import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
+import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
+import { PositionsTriggersCell } from './PositionsTable/PositionsTriggersCell';
 
 export enum PositionsTableColumnKey {
   Details = 'Details',
@@ -40,29 +54,42 @@ export enum PositionsTableColumnKey {
   PnL = 'PnL',
 
   Market = 'Market',
-  Side = 'Side',
   Size = 'Size',
-  Leverage = 'Leverage',
   LiquidationAndOraclePrice = 'LiquidationAndOraclePrice',
+  Margin = 'Margin',
   UnrealizedPnl = 'UnrealizedPnl',
   RealizedPnl = 'RealizedPnl',
   AverageOpenAndClose = 'AverageOpenAndClose',
+  NetFunding = 'NetFunding',
+  Triggers = 'Triggers',
+  Actions = 'Actions',
 }
 
 type PositionTableRow = {
   asset: Asset;
   oraclePrice: Nullable<number>;
   tickSizeDecimals: number;
+  fundingRate: Nullable<number>;
+  stopLossOrders: SubaccountOrder[];
+  takeProfitOrders: SubaccountOrder[];
 } & SubaccountPosition;
 
 const getPositionsTableColumnDef = ({
   key,
   stringGetter,
   width,
+  isAccountViewOnly,
+  showClosePositionAction,
+  shouldRenderTriggers,
+  navigateToOrders,
 }: {
   key: PositionsTableColumnKey;
   stringGetter: StringGetterFunction;
   width?: ColumnSize;
+  isAccountViewOnly: boolean;
+  showClosePositionAction: boolean;
+  shouldRenderTriggers: boolean;
+  navigateToOrders: (market: string) => void;
 }) => ({
   width,
   ...(
@@ -71,27 +98,27 @@ const getPositionsTableColumnDef = ({
         columnKey: 'details',
         getCellValue: (row) => row.id,
         label: stringGetter({ key: STRING_KEYS.DETAILS }),
-        renderCell: ({ id, asset, leverage, resources, size }) => (
-          <TableCell stacked slotLeft={<Styled.AssetIcon symbol={asset?.id} />}>
-            <Styled.HighlightOutput
+        renderCell: ({ asset, leverage, resources, size }) => (
+          <TableCell stacked slotLeft={<$AssetIcon symbol={asset?.id} />}>
+            <$HighlightOutput
               type={OutputType.Asset}
               value={size?.current}
               fractionDigits={TOKEN_DECIMALS}
               showSign={ShowSign.None}
               tag={asset?.id}
             />
-            <Styled.InlineRow>
-              <Styled.PositionSide>
+            <$InlineRow>
+              <$PositionSide>
                 {resources.sideStringKey?.current &&
                   stringGetter({ key: resources.sideStringKey?.current })}
-              </Styled.PositionSide>
-              <Styled.SecondaryColor>@</Styled.SecondaryColor>
-              <Styled.HighlightOutput
+              </$PositionSide>
+              <$SecondaryColor>@</$SecondaryColor>
+              <$HighlightOutput
                 type={OutputType.Multiple}
                 value={leverage?.current}
                 showSign={ShowSign.None}
               />
-            </Styled.InlineRow>
+            </$InlineRow>
           </TableCell>
         ),
       },
@@ -120,13 +147,13 @@ const getPositionsTableColumnDef = ({
         hideOnBreakpoint: MediaQueryKeys.isNotTablet,
         renderCell: ({ unrealizedPnl, unrealizedPnlPercent }) => (
           <TableCell stacked>
-            <Styled.OutputSigned
-              isNegative={MustBigNumber(unrealizedPnlPercent?.current).isNegative()}
+            <$OutputSigned
+              sign={getNumberSign(unrealizedPnlPercent?.current)}
               type={OutputType.Percent}
               value={unrealizedPnlPercent?.current}
               showSign={ShowSign.None}
             />
-            <Styled.HighlightOutput
+            <$HighlightOutput
               isNegative={MustBigNumber(unrealizedPnl?.current).isNegative()}
               type={OutputType.Fiat}
               value={unrealizedPnl?.current}
@@ -140,19 +167,14 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.id,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ id, asset }) => <MarketTableCell asset={asset} marketId={id} />,
-      },
-      [PositionsTableColumnKey.Side]: {
-        columnKey: 'market-side',
-        getCellValue: (row) => row.side?.current && POSITION_SIDES[row.side.current.name],
-        label: stringGetter({ key: STRING_KEYS.SIDE }),
-        renderCell: ({ side }) =>
-          side?.current && (
-            <PositionSideTag
-              positionSide={POSITION_SIDES[side.current.name]}
-              size={TagSize.Medium}
-            />
-          ),
+        renderCell: ({ id, asset, leverage }) => (
+          <MarketTableCell
+            asset={asset}
+            marketId={id}
+            leverage={leverage?.current ?? undefined}
+            isHighlighted
+          />
+        ),
       },
       [PositionsTableColumnKey.Size]: {
         columnKey: 'size',
@@ -161,11 +183,12 @@ const getPositionsTableColumnDef = ({
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         renderCell: ({ assetId, size, notionalTotal, tickSizeDecimals }) => (
           <TableCell stacked>
-            <Output
+            <$OutputSigned
               type={OutputType.Asset}
               value={size?.current}
               tag={assetId}
-              showSign={ShowSign.None}
+              showSign={ShowSign.Negative}
+              sign={getNumberSign(size?.current)}
             />
             <Output
               type={OutputType.Fiat}
@@ -175,13 +198,35 @@ const getPositionsTableColumnDef = ({
           </TableCell>
         ),
       },
-      [PositionsTableColumnKey.Leverage]: {
-        columnKey: 'leverage',
+      [PositionsTableColumnKey.Margin]: {
+        columnKey: 'margin',
         getCellValue: (row) => row.leverage?.current,
-        label: stringGetter({ key: STRING_KEYS.LEVERAGE }),
+        label: stringGetter({ key: STRING_KEYS.MARGIN }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ leverage }) => (
-          <Output type={OutputType.Multiple} value={leverage?.current} showSign={ShowSign.None} />
+        isActionable: true,
+        renderCell: ({ id, adjustedMmf, notionalTotal }) => (
+          <PositionsMarginCell id={id} notionalTotal={notionalTotal} adjustedMmf={adjustedMmf} />
+        ),
+      },
+      [PositionsTableColumnKey.NetFunding]: {
+        columnKey: 'netFunding',
+        getCellValue: (row) => row.netFunding,
+        label: (
+          <TableColumnHeader>
+            <span>{stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_SHORT })}</span>
+            <span>{stringGetter({ key: STRING_KEYS.RATE })}</span>
+          </TableColumnHeader>
+        ),
+        hideOnBreakpoint: MediaQueryKeys.isTablet,
+        renderCell: ({ netFunding, fundingRate }) => (
+          <TableCell stacked>
+            <$OutputSigned
+              sign={getNumberSign(netFunding)}
+              type={OutputType.Fiat}
+              value={netFunding}
+            />
+            <Output showSign={ShowSign.Negative} type={OutputType.Percent} value={fundingRate} />
+          </TableCell>
         ),
       },
       [PositionsTableColumnKey.LiquidationAndOraclePrice]: {
@@ -211,8 +256,8 @@ const getPositionsTableColumnDef = ({
         hideOnBreakpoint: MediaQueryKeys.isTablet,
         renderCell: ({ unrealizedPnl, unrealizedPnlPercent }) => (
           <TableCell stacked>
-            <Styled.OutputSigned
-              isNegative={MustBigNumber(unrealizedPnl?.current).isNegative()}
+            <$OutputSigned
+              sign={getNumberSign(unrealizedPnl?.current)}
               type={OutputType.Fiat}
               value={unrealizedPnl?.current}
             />
@@ -227,8 +272,8 @@ const getPositionsTableColumnDef = ({
         hideOnBreakpoint: MediaQueryKeys.isTablet,
         renderCell: ({ realizedPnl, realizedPnlPercent }) => (
           <TableCell stacked>
-            <Styled.OutputSigned
-              isNegative={MustBigNumber(realizedPnl?.current).isNegative()}
+            <$OutputSigned
+              sign={getNumberSign(realizedPnl?.current)}
               type={OutputType.Fiat}
               value={realizedPnl?.current}
               showSign={ShowSign.Negative}
@@ -240,8 +285,13 @@ const getPositionsTableColumnDef = ({
       [PositionsTableColumnKey.AverageOpenAndClose]: {
         columnKey: 'entryExitPrice',
         getCellValue: (row) => row.entryPrice?.current,
-        label: stringGetter({ key: STRING_KEYS.AVERAGE_OPEN_CLOSE }),
-        hideOnBreakpoint: MediaQueryKeys.isDesktopSmall,
+        label: (
+          <TableColumnHeader>
+            <span>{stringGetter({ key: STRING_KEYS.AVERAGE_OPEN_SHORT })}</span>
+            <span>{stringGetter({ key: STRING_KEYS.AVERAGE_CLOSE_SHORT })}</span>
+          </TableColumnHeader>
+        ),
+        hideOnBreakpoint: MediaQueryKeys.isTablet,
         renderCell: ({ entryPrice, exitPrice, tickSizeDecimals }) => (
           <TableCell stacked>
             <Output
@@ -253,6 +303,61 @@ const getPositionsTableColumnDef = ({
           </TableCell>
         ),
       },
+      [PositionsTableColumnKey.Triggers]: {
+        columnKey: 'triggers',
+        label: stringGetter({ key: STRING_KEYS.TRIGGERS }),
+        isActionable: true,
+        allowsSorting: false,
+        hideOnBreakpoint: MediaQueryKeys.isTablet,
+        renderCell: ({
+          id,
+          assetId,
+          tickSizeDecimals,
+          liquidationPrice,
+          side,
+          size,
+          stopLossOrders,
+          takeProfitOrders,
+        }) => (
+          <PositionsTriggersCell
+            marketId={id}
+            assetId={assetId}
+            tickSizeDecimals={tickSizeDecimals}
+            liquidationPrice={liquidationPrice?.current}
+            stopLossOrders={stopLossOrders}
+            takeProfitOrders={takeProfitOrders}
+            positionSide={side.current}
+            positionSize={size?.current}
+            isDisabled={isAccountViewOnly}
+            onViewOrdersClick={navigateToOrders}
+          />
+        ),
+      },
+      [PositionsTableColumnKey.Actions]: {
+        columnKey: 'actions',
+        label: stringGetter({
+          key:
+            shouldRenderTriggers && showClosePositionAction && !testFlags.isolatedMargin
+              ? STRING_KEYS.ACTIONS
+              : showClosePositionAction
+              ? STRING_KEYS.CLOSE
+              : STRING_KEYS.ACTION,
+        }),
+        isActionable: true,
+        allowsSorting: false,
+        hideOnBreakpoint: MediaQueryKeys.isTablet,
+        renderCell: ({ id, assetId, stopLossOrders, takeProfitOrders }) => (
+          <PositionsActionsCell
+            marketId={id}
+            assetId={assetId}
+            isDisabled={isAccountViewOnly}
+            showClosePositionAction={showClosePositionAction}
+            stopLossOrders={stopLossOrders}
+            takeProfitOrders={takeProfitOrders}
+            navigateToMarketOrders={navigateToOrders}
+          />
+        ),
+      },
     } as Record<PositionsTableColumnKey, ColumnDef<PositionTableRow>>
   )[key],
 });
@@ -261,7 +366,11 @@ type ElementProps = {
   columnKeys: PositionsTableColumnKey[];
   columnWidths?: Partial<Record<PositionsTableColumnKey, ColumnSize>>;
   currentRoute?: string;
+  currentMarket?: string;
+  showClosePositionAction: boolean;
+  initialPageSize?: PageSize;
   onNavigate?: () => void;
+  navigateToOrders: (market: string) => void;
 };
 
 type StyleProps = {
@@ -273,27 +382,70 @@ export const PositionsTable = ({
   columnKeys,
   columnWidths,
   currentRoute,
+  currentMarket,
+  showClosePositionAction,
+  initialPageSize,
   onNavigate,
+  navigateToOrders,
   withGradientCardRows,
   withOuterBorder,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
+  const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
 
-  const perpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
-  const assets = useSelector(getAssets, shallowEqual) || {};
-  const openPositions = useSelector(getExistingOpenPositions, shallowEqual) || [];
+  const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
+  const perpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
+  const assets = orEmptyObj(useSelector(getAssets, shallowEqual));
+  const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
 
-  const positionsData = openPositions.map((position: SubaccountPosition) => ({
-    tickSizeDecimals: perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
-    asset: assets?.[position.assetId],
-    oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
-    ...position,
-  })) as PositionTableRow[];
+  const openPositions = useSelector(getExistingOpenPositions, shallowEqual) ?? EMPTY_ARR;
+  const positions = useMemo(() => {
+    const marketPosition = openPositions.find((position) => position.id === currentMarket);
+    return currentMarket ? (marketPosition ? [marketPosition] : []) : openPositions;
+  }, [currentMarket, openPositions]);
+
+  const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } = useSelector(
+    getSubaccountConditionalOrders(isSlTpLimitOrdersEnabled),
+    {
+      equalityFn: (oldVal, newVal) => {
+        return (
+          shallowEqual(oldVal.stopLossOrders, newVal.stopLossOrders) &&
+          shallowEqual(oldVal.takeProfitOrders, newVal.takeProfitOrders)
+        );
+      },
+    }
+  );
+
+  const positionsData = useMemo(
+    () =>
+      positions.map((position: SubaccountPosition): PositionTableRow => {
+        // object splat ... doesn't copy getter defined properties
+        // eslint-disable-next-line prefer-object-spread
+        return Object.assign(
+          {},
+          {
+            tickSizeDecimals:
+              perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals ?? USD_DECIMALS,
+            asset: assets?.[position.assetId],
+            oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
+            fundingRate: perpetualMarkets?.[position.id]?.perpetual?.nextFundingRate,
+            stopLossOrders: allStopLossOrders.filter(
+              (order: SubaccountOrder) => order.marketId === position.id
+            ),
+            takeProfitOrders: allTakeProfitOrders.filter(
+              (order: SubaccountOrder) => order.marketId === position.id
+            ),
+          },
+          position
+        );
+      }),
+    [positions, perpetualMarkets, assets, allStopLossOrders, allTakeProfitOrders]
+  );
 
   return (
-    <Styled.Table
-      key="positions"
+    <$Table
+      key={currentMarket ?? 'positions'}
       label="Positions"
       defaultSortDescriptor={{
         column: 'market',
@@ -305,24 +457,33 @@ export const PositionsTable = ({
           key,
           stringGetter,
           width: columnWidths?.[key],
+          isAccountViewOnly,
+          showClosePositionAction,
+          shouldRenderTriggers,
+          navigateToOrders,
         })
       )}
       getRowKey={(row: PositionTableRow) => row.id}
-      onRowAction={(market: string) => {
-        navigate(`/trade/${market}`, {
-          state: { from: currentRoute },
-        });
-        onNavigate?.();
-      }}
+      onRowAction={
+        currentMarket
+          ? undefined
+          : (market: Key) => {
+              navigate(`${AppRoute.Trade}/${market}`, {
+                state: { from: currentRoute },
+              });
+              onNavigate?.();
+            }
+      }
       getRowAttributes={(row: PositionTableRow) => ({
         'data-side': row.side.current,
       })}
       slotEmpty={
         <>
-          <Styled.Icon iconName={IconName.Positions} />
+          <$Icon iconName={IconName.Positions} />
           <h4>{stringGetter({ key: STRING_KEYS.POSITIONS_EMPTY_STATE })}</h4>
         </>
       }
+      initialPageSize={initialPageSize}
       withGradientCardRows={withGradientCardRows}
       withOuterBorder={withOuterBorder}
       withInnerBorders
@@ -332,10 +493,7 @@ export const PositionsTable = ({
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Table = styled(Table)`
+const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
 
   tr {
@@ -358,27 +516,32 @@ Styled.Table = styled(Table)`
       --table-row-gradient-to-color: var(--color-gradient-negative);
     }
   }
-`;
+` as typeof Table;
 
-Styled.InlineRow = styled.div`
+const $InlineRow = styled.div`
   ${layoutMixins.inlineRow}
 `;
 
-Styled.AssetIcon = styled(AssetIcon)`
+const $AssetIcon = styled(AssetIcon)`
   ${layoutMixins.inlineRow}
   min-width: unset;
   font-size: 2.25rem;
 `;
 
-Styled.SecondaryColor = styled.span`
+const $SecondaryColor = styled.span`
   color: var(--color-text-0);
 `;
 
-Styled.OutputSigned = styled(Output)<{ isNegative?: boolean }>`
-  color: ${({ isNegative }) => (isNegative ? `var(--color-negative)` : `var(--color-positive)`)};
+const $OutputSigned = styled(Output)<{ sign: NumberSign }>`
+  color: ${({ sign }) =>
+    ({
+      [NumberSign.Positive]: `var(--color-positive)`,
+      [NumberSign.Negative]: `var(--color-negative)`,
+      [NumberSign.Neutral]: `var(--color-text-2)`,
+    }[sign])};
 `;
 
-Styled.HighlightOutput = styled(Output)<{ isNegative?: boolean }>`
+const $HighlightOutput = styled(Output)<{ isNegative?: boolean }>`
   color: var(--color-text-1);
   --secondary-item-color: currentColor;
   --output-sign-color: ${({ isNegative }) =>
@@ -389,12 +552,12 @@ Styled.HighlightOutput = styled(Output)<{ isNegative?: boolean }>`
       : `currentColor`};
 `;
 
-Styled.PositionSide = styled.span`
+const $PositionSide = styled.span`
   && {
     color: var(--side-color);
   }
 `;
 
-Styled.Icon = styled(Icon)`
+const $Icon = styled(Icon)`
   font-size: 3em;
 `;

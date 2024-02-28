@@ -1,12 +1,17 @@
-import { AppTheme, AppColorMode } from '@/state/configs';
-import type { Theme, ThemeColorBase } from '@/constants/styles/colors';
 import { BrightnessFilterToken, ColorToken, OpacityToken } from '@/constants/styles/base';
+import type { Theme, ThemeColorBase } from '@/constants/styles/colors';
+
+import { AppColorMode, AppTheme } from '@/state/configs';
+
 import { generateFadedColorVariant } from '@/lib/styles';
 
 const ClassicThemeBase: ThemeColorBase = {
+  black: ColorToken.Black,
   white: ColorToken.White,
   green: ColorToken.Green1,
   red: ColorToken.Red2,
+
+  whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
 
   layer0: ColorToken.GrayBlue7,
   layer1: ColorToken.GrayBlue6,
@@ -64,9 +69,12 @@ const ClassicThemeBase: ThemeColorBase = {
 };
 
 const DarkThemeBase: ThemeColorBase = {
+  black: ColorToken.Black,
   white: ColorToken.White,
   green: ColorToken.Green0,
   red: ColorToken.Red0,
+
+  whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
 
   layer0: ColorToken.Black,
   layer1: ColorToken.DarkGray11,
@@ -124,9 +132,12 @@ const DarkThemeBase: ThemeColorBase = {
 };
 
 const LightThemeBase: ThemeColorBase = {
+  black: ColorToken.Black,
   white: ColorToken.White,
   green: ColorToken.Green2,
   red: ColorToken.Red1,
+
+  whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
 
   layer0: ColorToken.White,
   layer1: ColorToken.LightGray6,

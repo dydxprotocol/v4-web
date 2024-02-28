@@ -1,55 +1,54 @@
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
+
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { breakpoints } from '@/styles';
-import { STRING_KEYS } from '@/constants/localization';
 import { layoutMixins } from '@/styles/layoutMixins';
-import { useStringGetter } from '@/hooks';
 
 import { Accordion } from '@/components/Accordion';
 import { Link } from '@/components/Link';
 import { Panel } from '@/components/Panel';
 
-const REWARDS_LEARN_MORE_LINK = ''; // to be configured
-
 export const RewardsHelpPanel = () => {
   const stringGetter = useStringGetter();
+  const { tradingRewardsLearnMore } = useURLConfigs();
 
   return (
-    <Styled.HelpCard
+    <$HelpCard
       slotHeader={
-        <Styled.Header>
+        <$Header>
           <h3>{stringGetter({ key: STRING_KEYS.HELP })}</h3>
-          {REWARDS_LEARN_MORE_LINK && (
-            <Link withIcon href={REWARDS_LEARN_MORE_LINK}>
+          {tradingRewardsLearnMore && (
+            <Link withIcon href={tradingRewardsLearnMore}>
               {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
             </Link>
           )}
-        </Styled.Header>
+        </$Header>
       }
     >
       <Accordion
         items={[
-        {
-          header: stringGetter({ key: STRING_KEYS.FAQ_WHO_IS_ELIGIBLE_QUESTION }),
-          content: stringGetter({ key: STRING_KEYS.FAQ_WHO_IS_ELIGIBLE_ANSWER }),
-        },
-        {
-          header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_QUESTION }),
-          content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_ANSWER }),
-        },
-        {
-          header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_QUESTION }),
-          content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_ANSWER }),
-        },
+          {
+            header: stringGetter({ key: STRING_KEYS.FAQ_WHO_IS_ELIGIBLE_QUESTION }),
+            content: stringGetter({ key: STRING_KEYS.FAQ_WHO_IS_ELIGIBLE_ANSWER }),
+          },
+          {
+            header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_QUESTION }),
+            content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_ANSWER }),
+          },
+          {
+            header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_QUESTION }),
+            content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_ANSWER }),
+          },
         ]}
       />
-    </Styled.HelpCard>
+    </$HelpCard>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.HelpCard = styled(Panel)`
+const $HelpCard = styled(Panel)`
   --panel-content-paddingX: 0;
   --panel-content-paddingY: 0;
   width: 100%;
@@ -60,7 +59,7 @@ Styled.HelpCard = styled(Panel)`
   text-align: start;
 `;
 
-Styled.Header = styled.div`
+const $Header = styled.div`
   ${layoutMixins.spacedRow}
   gap: 1ch;
 
@@ -77,8 +76,4 @@ Styled.Header = styled.div`
     font: var(--font-medium-book);
     color: var(--color-text-2);
   }
-`;
-
-Styled.Link = styled(Link)`
-  display: inline-flex;
 `;

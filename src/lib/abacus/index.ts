@@ -1,61 +1,72 @@
-import type { LocalWallet } from '@dydxprotocol/v4-client-js';
+import type { LocalWallet, SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 
 import type {
   ClosePositionInputFields,
-  Nullable,
+  HistoricalPnlPeriods,
   HistoricalTradingRewardsPeriod,
   HistoricalTradingRewardsPeriods,
-  HumanReadablePlaceOrderPayload,
   HumanReadableCancelOrderPayload,
+  HumanReadablePlaceOrderPayload,
+  HumanReadableTriggerOrdersPayload,
+  Nullable,
+  ParsingError,
   TradeInputFields,
   TransferInputFields,
-  HistoricalPnlPeriods,
-  ParsingError,
+  TriggerOrdersInputFields,
 } from '@/constants/abacus';
-
 import {
-  AsyncAbacusStateManager,
+  AbacusAppConfig,
   AbacusHelper,
+  ApiData,
+  AsyncAbacusStateManager,
   ClosePositionInputField,
+  ComplianceAction,
+  CoroutineTimer,
   HistoricalPnlPeriod,
+  IOImplementations,
   TradeInputField,
   TransferInputField,
-  IOImplementations,
-  UIImplementations,
-  CoroutineTimer,
   TransferType,
-  AbacusAppConfig,
-  ApiData,
+  TriggerOrdersInputField,
+  UIImplementations,
 } from '@/constants/abacus';
-
+import { Hdkey } from '@/constants/account';
 import { DEFAULT_MARKETID } from '@/constants/markets';
-import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork, isMainnet } from '@/constants/networks';
+import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork } from '@/constants/networks';
 import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
 
 import type { RootStore } from '@/state/_store';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors';
 
-import AbacusRest from './rest';
-import AbacusAnalytics from './analytics';
-import AbacusWebsocket from './websocket';
-import AbacusChainTransaction from './dydxChainTransactions';
-import AbacusStateNotifier from './stateNotification';
-import AbacusLocalizer from './localizer';
-import AbacusFormatter from './formatter';
-import AbacusThreading from './threading';
-import AbacusFileSystem from './filesystem';
 import { LocaleSeparators } from '../numbers';
+import AbacusAnalytics from './analytics';
+// eslint-disable-next-line import/no-cycle
+import AbacusChainTransaction from './dydxChainTransactions';
+import AbacusFileSystem from './filesystem';
+import AbacusFormatter from './formatter';
+import AbacusLocalizer from './localizer';
+import AbacusLogger from './logger';
+import AbacusRest from './rest';
+import AbacusStateNotifier from './stateNotification';
+import AbacusThreading from './threading';
+import AbacusWebsocket from './websocket';
 
 class AbacusStateManager {
   private store: RootStore | undefined;
+
   private currentMarket: string | undefined;
 
   stateManager: InstanceType<typeof AsyncAbacusStateManager>;
+
   websocket: AbacusWebsocket;
+
   stateNotifier: AbacusStateNotifier;
+
   analytics: AbacusAnalytics;
+
   abacusFormatter: AbacusFormatter;
+
   chainTransactions: AbacusChainTransaction;
 
   constructor() {
@@ -75,7 +86,8 @@ class AbacusStateManager {
       this.analytics,
       new AbacusThreading(),
       new CoroutineTimer(),
-      new AbacusFileSystem()
+      new AbacusFileSystem(),
+      new AbacusLogger()
     );
 
     const uiImplementations = new UIImplementations(
@@ -84,7 +96,11 @@ class AbacusStateManager {
       this.abacusFormatter
     );
 
-    const appConfigs = AbacusAppConfig.Companion.forWeb;
+    const appConfigs = new AbacusAppConfig(
+      false, // subscribeToCandles
+      true, // loadRemote
+      import.meta.env.MODE === 'development' && import.meta.env.VITE_ENABLE_ABACUS_LOGGING // enableLogger
+    );
     appConfigs.squidVersion = AbacusAppConfig.SquidVersion.V2;
 
     this.stateManager = new AsyncAbacusStateManager(
@@ -172,13 +188,38 @@ class AbacusStateManager {
     this.setTransferValue({ value: null, field: TransferInputField.usdcSize });
   };
 
+  clearTriggerOrdersInputValues = () => {
+    this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.size });
+
+    this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.stopLossOrderId });
+    this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.stopLossPrice });
+    this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.stopLossLimitPrice });
+    this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.stopLossPercentDiff });
+    this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.stopLossUsdcDiff });
+    this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.stopLossOrderType });
+
+    this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.takeProfitOrderId });
+    this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.takeProfitPrice });
+    this.setTriggerOrdersValue({
+      value: null,
+      field: TriggerOrdersInputField.takeProfitLimitPrice,
+    });
+    this.setTriggerOrdersValue({
+      value: null,
+      field: TriggerOrdersInputField.takeProfitPercentDiff,
+    });
+    this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.takeProfitUsdcDiff });
+    this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.takeProfitOrderType });
+  };
+
   resetInputState = () => {
     this.clearTransferInputValues();
     this.setTransferValue({
       field: TransferInputField.type,
       value: null,
     });
-    this.clearTradeInputValues();
+    this.clearTriggerOrdersInputValues();
+    this.clearTradeInputValues({ shouldResetSize: true });
   };
 
   // ------ Set Data ------ //
@@ -188,10 +229,11 @@ class AbacusStateManager {
     this.chainTransactions.setStore(store);
   };
 
-  setAccount = (localWallet?: LocalWallet) => {
+  setAccount = (localWallet?: LocalWallet, hdkey?: Hdkey) => {
     if (localWallet) {
       this.stateManager.accountAddress = localWallet.address;
       this.chainTransactions.setLocalWallet(localWallet);
+      if (hdkey) this.chainTransactions.setHdkey(hdkey);
     }
   };
 
@@ -214,12 +256,20 @@ class AbacusStateManager {
     this.stateManager.market = marketId;
   };
 
+  setSelectedGasDenom = (denom: SelectedGasDenom) => {
+    this.chainTransactions.setSelectedGasDenom(denom);
+  };
+
   setTradeValue = ({ value, field }: { value: any; field: TradeInputFields }) => {
     this.stateManager.trade(value, field);
   };
 
   setTransferValue = ({ value, field }: { value: any; field: TransferInputFields }) => {
     this.stateManager.transfer(value, field);
+  };
+
+  setTriggerOrdersValue = ({ value, field }: { value: any; field: TriggerOrdersInputFields }) => {
+    this.stateManager.triggerOrders(value, field);
   };
 
   setHistoricalPnlPeriod = (
@@ -280,9 +330,22 @@ class AbacusStateManager {
     ) => void
   ) => this.stateManager.cancelOrder(orderId, callback);
 
+  triggerOrders = (
+    callback: (
+      success: boolean,
+      parsingError: Nullable<ParsingError>,
+      data: Nullable<HumanReadableTriggerOrdersPayload>
+    ) => void
+  ): Nullable<HumanReadableTriggerOrdersPayload> => this.stateManager.commitTriggerOrders(callback);
+
   cctpWithdraw = (
     callback: (success: boolean, parsingError: Nullable<ParsingError>, data: string) => void
   ): void => this.stateManager.commitCCTPWithdraw(callback);
+
+  triggerCompliance = (
+    action: typeof ComplianceAction.VALID_SURVEY | typeof ComplianceAction.INVALID_SURVEY,
+    callback: (success: boolean, parsingError: Nullable<ParsingError>, data: string) => void
+  ): void => this.stateManager.triggerCompliance(action, callback);
 
   // ------ Utils ------ //
   getHistoricalPnlPeriod = (): Nullable<HistoricalPnlPeriods> =>

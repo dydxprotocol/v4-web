@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+
 import useLatest from 'use-latest';
 
 export type Handler = (event: MouseEvent) => void;
@@ -13,7 +14,7 @@ export const useOnClickOutside = ({
   const onClickOutsideRef = useLatest(onClickOutside);
 
   useEffect(() => {
-    if (!onClickOutside) return;
+    if (!onClickOutside) return undefined;
 
     const handleClickOutside: (e: MouseEvent) => void = (e) => {
       if (ref.current && onClickOutsideRef.current && !ref.current.contains(e.target as Node)) {
@@ -29,5 +30,5 @@ export const useOnClickOutside = ({
       clearTimeout(timeoutId);
       globalThis.removeEventListener('click', handleClickOutside);
     };
-  }, [!onClickOutside]);
+  }, [onClickOutside]);
 };

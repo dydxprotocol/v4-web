@@ -1,13 +1,12 @@
 import { createSelector } from 'reselect';
 
+import type { MarketHistoricalFunding } from '@/constants/abacus';
 import { FundingDirection } from '@/constants/markets';
 
 import {
-  getCurrentMarketNextFundingRate,
   getCurrentMarketHistoricalFundings,
+  getCurrentMarketNextFundingRate,
 } from '@/state/perpetualsSelectors';
-
-import type { MarketHistoricalFunding } from '@/constants/abacus';
 
 export const calculateFundingRateHistory = createSelector(
   [getCurrentMarketHistoricalFundings, getCurrentMarketNextFundingRate],

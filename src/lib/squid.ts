@@ -1,5 +1,6 @@
-import { isMainnet } from '@/constants/networks';
 import { GetStatus, StatusResponse } from '@0xsquid/sdk';
+
+import { isMainnet } from '@/constants/networks';
 
 export const NATIVE_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 
@@ -19,7 +20,8 @@ const getSquidStatusUrl = (isV2: boolean) => {
 export const fetchSquidStatus = async (
   params: GetStatus,
   isV2?: boolean,
-  integratorId?: string
+  integratorId?: string,
+  requestId?: string
 ): Promise<StatusResponse> => {
   const parsedParams: { [key: string]: string } = {
     transactionId: params.transactionId,
@@ -31,7 +33,8 @@ export const fetchSquidStatus = async (
 
   const response = await fetch(url, {
     headers: {
-      'x-integrator-id': integratorId || 'dYdX-api',
+      'x-integrator-id': integratorId ?? 'dYdX-api',
+      'x-request-id': requestId ?? '',
     },
   });
 

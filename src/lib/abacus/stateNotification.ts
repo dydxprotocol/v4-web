@@ -1,10 +1,11 @@
 import { kollections } from '@dydxprotocol/v4-abacus';
+import { fromPairs } from 'lodash';
 
 import type {
-  AccountBalance,
   AbacusApiState,
   AbacusNotification,
   AbacusStateNotificationProtocol,
+  AccountBalance,
   Asset,
   Nullable,
   ParsingErrors,
@@ -13,32 +14,32 @@ import type {
   PerpetualStateChanges,
   SubaccountOrder,
 } from '@/constants/abacus';
-
 import { Changes } from '@/constants/abacus';
 
 import type { RootStore } from '@/state/_store';
-
 import {
   setBalances,
-  setStakingBalances,
+  setCompliance,
   setFills,
   setFundingPayments,
   setHistoricalPnl,
   setLatestOrder,
   setRestrictionType,
+  setStakingBalances,
   setSubaccount,
+  setTradingRewards,
   setTransfers,
   setWallet,
-  setTradingRewards,
 } from '@/state/account';
-
 import { setApiState } from '@/state/app';
 import { setAssets } from '@/state/assets';
 import { setConfigs } from '@/state/configs';
 import { setInputs } from '@/state/inputs';
 import { updateNotifications } from '@/state/notifications';
 import { setHistoricalFundings, setLiveTrades, setMarkets, setOrderbook } from '@/state/perpetuals';
+
 import { isTruthy } from '../isTruthy';
+import { testFlags } from '../testFlags';
 
 class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   private store: RootStore | undefined;
@@ -47,13 +48,10 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
     this.store = undefined;
   }
 
-  environmentsChanged(): void {
-    return;
-  }
+  environmentsChanged(): void {}
 
   notificationsChanged(notifications: kollections.List<AbacusNotification>): void {
     this.store?.dispatch(updateNotifications(notifications.toArray()));
-    return;
   }
 
   stateChanged(
@@ -62,7 +60,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   ): void {
     if (!this.store) return;
     const { dispatch } = this.store;
-    const changes = new Set(incomingChanges?.changes.toArray() || []);
+    const changes = new Set(incomingChanges?.changes.toArray() ?? []);
     const marketIds = incomingChanges?.markets?.toArray();
     const subaccountNumbers = incomingChanges?.subaccountNumbers?.toArray();
 
@@ -71,7 +69,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         dispatch(
           setAssets(
             Object.fromEntries(
-              (updatedState?.assetIds()?.toArray() || []).map((assetId: string) => {
+              (updatedState?.assetIds()?.toArray() ?? []).map((assetId: string) => {
                 const assetData = updatedState?.asset(assetId);
                 return [assetId, assetData];
               })
@@ -82,17 +80,15 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
       if (changes.has(Changes.accountBalances)) {
         if (updatedState.account?.balances) {
-          const balances: Record<string, AccountBalance> = {};
-          for (const { k, v } of updatedState.account.balances.toArray()) {
-            balances[k] = v;
-          }
+          const balances: Record<string, AccountBalance> = fromPairs(
+            updatedState.account.balances.toArray().map(({ k, v }) => [k, v])
+          );
           dispatch(setBalances(balances));
         }
         if (updatedState.account?.stakingBalances) {
-          const stakingBalances: Record<string, AccountBalance> = {};
-          for (const { k, v } of updatedState.account.stakingBalances.toArray()) {
-            stakingBalances[k] = v;
-          }
+          const stakingBalances: Record<string, AccountBalance> = fromPairs(
+            updatedState.account.stakingBalances.toArray().map(({ k, v }) => [k, v])
+          );
           dispatch(setStakingBalances(stakingBalances));
         }
       }
@@ -119,7 +115,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         dispatch(
           setMarkets({
             markets: Object.fromEntries(
-              (marketIds || updatedState.marketIds()?.toArray() || [])
+              (marketIds ?? updatedState.marketIds()?.toArray() ?? [])
                 .map((marketId: string) => {
                   const marketData = updatedState.market(marketId);
                   return [marketId, marketData];
@@ -135,6 +131,14 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         dispatch(setRestrictionType(updatedState.restriction));
       }
 
+      if (
+        changes.has(Changes.compliance) &&
+        updatedState.compliance &&
+        testFlags.enableComplianceApi
+      ) {
+        dispatch(setCompliance(updatedState.compliance));
+      }
+
       subaccountNumbers?.forEach((subaccountId: number) => {
         if (subaccountId !== null) {
           if (changes.has(Changes.subaccount)) {
@@ -142,24 +146,24 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
           }
 
           if (changes.has(Changes.fills)) {
-            const fills = updatedState.subaccountFills(subaccountId)?.toArray() || [];
+            const fills = updatedState.subaccountFills(subaccountId)?.toArray() ?? [];
             dispatch(setFills(fills));
           }
 
           if (changes.has(Changes.fundingPayments)) {
             const fundingPayments =
-              updatedState.subaccountFundingPayments(subaccountId)?.toArray() || [];
+              updatedState.subaccountFundingPayments(subaccountId)?.toArray() ?? [];
             dispatch(setFundingPayments(fundingPayments));
           }
 
           if (changes.has(Changes.transfers)) {
-            const transfers = updatedState.subaccountTransfers(subaccountId)?.toArray() || [];
+            const transfers = updatedState.subaccountTransfers(subaccountId)?.toArray() ?? [];
             dispatch(setTransfers(transfers));
           }
 
           if (changes.has(Changes.historicalPnl)) {
             const historicalPnl =
-              updatedState.subaccountHistoricalPnl(subaccountId)?.toArray() || [];
+              updatedState.subaccountHistoricalPnl(subaccountId)?.toArray() ?? [];
             dispatch(setHistoricalPnl(historicalPnl));
           }
         }
@@ -175,12 +179,12 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         }
 
         if (changes.has(Changes.trades)) {
-          const trades = updatedState.marketTrades(market)?.toArray() || [];
+          const trades = updatedState.marketTrades(market)?.toArray() ?? [];
           dispatch(setLiveTrades({ trades, marketId: market }));
         }
 
         if (changes.has(Changes.historicalFundings)) {
-          const historicalFundings = updatedState.historicalFunding(market)?.toArray() || [];
+          const historicalFundings = updatedState.historicalFunding(market)?.toArray() ?? [];
 
           dispatch(
             setHistoricalFundings({
@@ -198,6 +202,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   }
 
   errorsEmitted(errors: ParsingErrors) {
+    // eslint-disable-next-line no-console
     console.error('parse errors', errors.toArray());
   }
 

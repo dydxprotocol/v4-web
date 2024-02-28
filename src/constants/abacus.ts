@@ -1,7 +1,8 @@
 import Abacus, { kollections } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { PositionSide, TradeTypes } from './trade';
+
 import { STRING_KEYS } from './localization';
+import { PositionSide, TradeTypes } from './trade';
 
 export type Nullable<T> = T | null | undefined;
 
@@ -43,6 +44,10 @@ export type AbacusFileSystemProtocol = Omit<
 >;
 export type AbacusTrackingProtocol = Omit<
   Abacus.exchange.dydx.abacus.protocols.TrackingProtocol,
+  '__doNotUseOrImplementIt'
+>;
+export type AbacusLoggingProtocol = Omit<
+  Abacus.exchange.dydx.abacus.protocols.LoggingProtocol,
   '__doNotUseOrImplementIt'
 >;
 
@@ -107,6 +112,7 @@ export type TradeInputs = Abacus.exchange.dydx.abacus.output.input.TradeInput;
 export type ClosePositionInputs = Abacus.exchange.dydx.abacus.output.input.ClosePositionInput;
 export type TradeInputSummary = Abacus.exchange.dydx.abacus.output.input.TradeInputSummary;
 export type TransferInputs = Abacus.exchange.dydx.abacus.output.input.TransferInput;
+export type TriggerOrdersInputs = Abacus.exchange.dydx.abacus.output.input.TriggerOrdersInput;
 export type InputError = Abacus.exchange.dydx.abacus.output.input.ValidationError;
 export type TransferInputTokenResource =
   Abacus.exchange.dydx.abacus.output.input.TransferInputTokenResource;
@@ -144,7 +150,7 @@ export type SubaccountTransfers = Abacus.exchange.dydx.abacus.output.SubaccountT
 // ------ Historical PnL ------ //
 export type SubAccountHistoricalPNL = Abacus.exchange.dydx.abacus.output.SubaccountHistoricalPNL;
 export type SubAccountHistoricalPNLs = Abacus.exchange.dydx.abacus.output.SubaccountHistoricalPNL[];
-export const HistoricalPnlPeriod = Abacus.exchange.dydx.abacus.protocols.HistoricalPnlPeriod;
+export const HistoricalPnlPeriod = Abacus.exchange.dydx.abacus.state.manager.HistoricalPnlPeriod;
 const historicalPnlPeriod = [...HistoricalPnlPeriod.values()] as const;
 export type HistoricalPnlPeriods = (typeof historicalPnlPeriod)[number];
 
@@ -174,20 +180,34 @@ export const ClosePositionInputField =
 const closePositionInputFields = [...ClosePositionInputField.values()] as const;
 export type ClosePositionInputFields = (typeof closePositionInputFields)[number];
 
+// ------ Trigger Order Items ------ //
+export const TriggerOrdersInputField =
+  Abacus.exchange.dydx.abacus.state.model.TriggerOrdersInputField;
+const triggerOrdersInputFields = [...TriggerOrdersInputField.values()] as const;
+export type TriggerOrdersInputFields = (typeof triggerOrdersInputFields)[number];
+export type TriggerOrdersInputPrice = Abacus.exchange.dydx.abacus.output.input.TriggerPrice;
+export type TriggerOrdersTriggerOrder = Abacus.exchange.dydx.abacus.output.input.TriggerOrder;
+
 export type ValidationError = Abacus.exchange.dydx.abacus.output.input.ValidationError;
 export const TradeInputErrorAction = Abacus.exchange.dydx.abacus.output.input.ErrorAction;
 export type AbacusOrderTypes = Abacus.exchange.dydx.abacus.output.input.OrderType;
 export type AbacusOrderSides = Abacus.exchange.dydx.abacus.output.input.OrderSide;
+export type AbacusOrderTimeInForces = Abacus.exchange.dydx.abacus.output.input.OrderTimeInForce;
 export const AbacusOrderType = Abacus.exchange.dydx.abacus.output.input.OrderType;
 export const AbacusOrderSide = Abacus.exchange.dydx.abacus.output.input.OrderSide;
+export const AbacusOrderTimeInForce = Abacus.exchange.dydx.abacus.output.input.OrderTimeInForce;
 
 export const AbacusPositionSide = Abacus.exchange.dydx.abacus.output.PositionSide;
 export type AbacusPositionSides = Abacus.exchange.dydx.abacus.output.PositionSide;
+
+export const AbacusMarginMode = Abacus.exchange.dydx.abacus.output.input.MarginMode;
 
 export type HumanReadablePlaceOrderPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadablePlaceOrderPayload;
 export type HumanReadableCancelOrderPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableCancelOrderPayload;
+export type HumanReadableTriggerOrdersPayload =
+  Abacus.exchange.dydx.abacus.state.manager.HumanReadableTriggerOrdersPayload;
 export type HumanReadableWithdrawPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableWithdrawPayload;
 export type HumanReadableTransferPayload =
@@ -208,6 +228,11 @@ export type UsageRestriction = Abacus.exchange.dydx.abacus.output.UsageRestricti
 export const RestrictionType = Abacus.exchange.dydx.abacus.output.Restriction;
 const restrictionTypes = [...RestrictionType.values()] as const;
 export type RestrictionTypes = (typeof restrictionTypes)[number];
+
+// ------ Compliance ------ //
+export const ComplianceStatus = Abacus.exchange.dydx.abacus.output.ComplianceStatus;
+export const ComplianceAction = Abacus.exchange.dydx.abacus.output.ComplianceAction;
+export type Compliance = Abacus.exchange.dydx.abacus.output.Compliance;
 
 // ------ Api data ------ //
 export const ApiData = Abacus.exchange.dydx.abacus.state.manager.ApiData;
@@ -274,8 +299,8 @@ export const ORDER_STATUS_STRINGS: Record<KotlinIrEnumValues<typeof AbacusOrderS
   [AbacusOrderStatus.pending.name]: STRING_KEYS.PENDING,
   [AbacusOrderStatus.pending.rawValue]: STRING_KEYS.PENDING,
 
-  [AbacusOrderStatus.untriggered.name]: STRING_KEYS.UNTRIGGERED,
-  [AbacusOrderStatus.untriggered.rawValue]: STRING_KEYS.UNTRIGGERED,
+  [AbacusOrderStatus.untriggered.name]: STRING_KEYS.CREATED,
+  [AbacusOrderStatus.untriggered.rawValue]: STRING_KEYS.CREATED,
 };
 
 export const TRADE_TYPES: Record<
@@ -317,6 +342,13 @@ export const TRADE_TYPES: Record<
 
   [AbacusOrderType.finalSettlement.name]: null,
   [AbacusOrderType.finalSettlement.rawValue]: null,
+};
+
+export const MARGIN_MODE_STRINGS: Record<string, string> = {
+  [AbacusMarginMode.cross.name]: STRING_KEYS.CROSS,
+  [AbacusMarginMode.cross.rawValue]: STRING_KEYS.CROSS,
+  [AbacusMarginMode.isolated.name]: STRING_KEYS.ISOLATED,
+  [AbacusMarginMode.isolated.rawValue]: STRING_KEYS.ISOLATED,
 };
 
 // Custom types involving Abacus

@@ -1,9 +1,10 @@
 import { forwardRef, type ElementType } from 'react';
-import styled, { AnyStyledComponent, css } from 'styled-components';
 
-import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import styled, { css } from 'styled-components';
 
-import { Button, type ButtonProps } from '@/components/Button';
+import { ButtonAction, ButtonShape, ButtonSize, ButtonState } from '@/constants/buttons';
+
+import { Button, ButtonStateConfig } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { ToggleButton, type ToggleButtonProps } from '@/components/ToggleButton';
 
@@ -11,9 +12,11 @@ type ElementProps = {
   isToggle?: boolean;
   iconName?: IconName;
   iconComponent?: ElementType;
+  action?: ButtonAction;
+  state?: ButtonState | ButtonStateConfig;
 };
 
-export type IconButtonProps = ElementProps & ButtonProps & ToggleButtonProps;
+export type IconButtonProps = ElementProps & ToggleButtonProps;
 
 export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, IconButtonProps>(
   (
@@ -35,19 +38,19 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
     ref
   ) => {
     return isToggle ? (
-      <Styled.IconToggleButton
+      <$IconToggleButton
         ref={ref}
         className={className}
         size={size}
         shape={shape}
         href={href}
-        onPressedChange={onPressedChange ?? onClick}
+        onPressedChange={onPressedChange ?? (onClick as any)} // TODO fix types
         {...otherProps}
       >
         <Icon iconName={iconName} iconComponent={iconComponent} />
-      </Styled.IconToggleButton>
+      </$IconToggleButton>
     ) : (
-      <Styled.IconButton
+      <$IconButton
         ref={ref}
         className={className}
         size={size}
@@ -57,13 +60,10 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
         {...otherProps}
       >
         <Icon iconName={iconName} iconComponent={iconComponent} />
-      </Styled.IconButton>
+      </$IconButton>
     );
   }
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
 const buttonMixin = css`
   // Params
   --button-icon-size: 1.125em;
@@ -75,10 +75,10 @@ const buttonMixin = css`
   }
 `;
 
-Styled.IconButton = styled(Button)`
+const $IconButton = styled(Button)`
   ${buttonMixin}
 `;
 
-Styled.IconToggleButton = styled(ToggleButton)`
+const $IconToggleButton = styled(ToggleButton)`
   ${buttonMixin}
 `;

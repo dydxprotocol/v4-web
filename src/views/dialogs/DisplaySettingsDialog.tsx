@@ -1,28 +1,27 @@
+import { Indicator, Item, Root } from '@radix-ui/react-radio-group';
 import { useDispatch, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import { Root, Item, Indicator } from '@radix-ui/react-radio-group';
+import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
-
-import {
-  AppTheme,
-  type AppThemeSetting,
-  AppThemeSystemSetting,
-  AppColorMode,
-  setAppThemeSetting,
-  setAppColorMode,
-} from '@/state/configs';
-import { getAppTheme, getAppThemeSetting, getAppColorMode } from '@/state/configsSelectors';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { Themes } from '@/styles/themes';
 
-import { STRING_KEYS } from '@/constants/localization';
-
 import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
 import { HorizontalSeparatorFiller } from '@/components/Separator';
+
+import {
+  AppColorMode,
+  AppTheme,
+  AppThemeSystemSetting,
+  setAppColorMode,
+  setAppThemeSetting,
+  type AppThemeSetting,
+} from '@/state/configs';
+import { getAppColorMode, getAppThemeSetting } from '@/state/configsSelectors';
 
 type ElementProps = {
   setIsOpen: (open: boolean) => void;
@@ -33,21 +32,20 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
 
   const currentThemeSetting: AppThemeSetting = useSelector(getAppThemeSetting);
-  const currentTheme: AppTheme = useSelector(getAppTheme);
   const currentColorMode: AppColorMode = useSelector(getAppColorMode);
 
   const sectionHeader = (heading: string) => {
     return (
-      <Styled.Header>
+      <$Header>
         {heading}
         <HorizontalSeparatorFiller />
-      </Styled.Header>
+      </$Header>
     );
   };
 
   const themePanels = () => {
     return (
-      <Styled.AppThemeRoot value={currentThemeSetting}>
+      <$AppThemeRoot value={currentThemeSetting}>
         {[
           {
             themeSetting: AppTheme.Classic,
@@ -78,7 +76,7 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
           const textColor = Themes[theme][currentColorMode].textPrimary;
 
           return (
-            <Styled.AppThemeItem
+            <$AppThemeItem
               key={themeSetting}
               value={themeSetting}
               backgroundcolor={backgroundColor}
@@ -87,23 +85,23 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
                 dispatch(setAppThemeSetting(themeSetting));
               }}
             >
-              <Styled.AppThemeHeader textcolor={textColor}>
+              <$AppThemeHeader textcolor={textColor}>
                 {stringGetter({ key: label })}
-              </Styled.AppThemeHeader>
-              <Styled.Image src="/chart-bars.svg" />
-              <Styled.CheckIndicator>
-                <Styled.CheckIcon iconName={IconName.Check} />
-              </Styled.CheckIndicator>
-            </Styled.AppThemeItem>
+              </$AppThemeHeader>
+              <$Image src="/chart-bars.svg" />
+              <$CheckIndicator>
+                <$CheckIcon iconName={IconName.Check} />
+              </$CheckIndicator>
+            </$AppThemeItem>
           );
         })}
-      </Styled.AppThemeRoot>
+      </$AppThemeRoot>
     );
   };
 
   const colorModeOptions = () => {
     return (
-      <Styled.ColorPreferenceRoot value={currentColorMode}>
+      <$ColorPreferenceRoot value={currentColorMode}>
         {[
           {
             colorMode: AppColorMode.GreenUp,
@@ -114,32 +112,32 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
             label: STRING_KEYS.RED_IS_UP,
           },
         ].map(({ colorMode, label }) => (
-          <Styled.ColorPreferenceItem
+          <$ColorPreferenceItem
             key={colorMode}
             value={colorMode}
             onClick={() => {
               dispatch(setAppColorMode(colorMode));
             }}
           >
-            <Styled.ColorPreferenceLabel>
-              <Styled.ArrowIconContainer>
-                <Styled.ArrowIcon
+            <$ColorPreferenceLabel>
+              <$ArrowIconContainer>
+                <$ArrowIcon
                   iconName={IconName.Arrow}
                   direction="up"
                   color={colorMode === AppColorMode.GreenUp ? 'green' : 'red'}
                 />
-                <Styled.ArrowIcon
+                <$ArrowIcon
                   iconName={IconName.Arrow}
                   direction="down"
                   color={colorMode === AppColorMode.GreenUp ? 'red' : 'green'}
                 />
-              </Styled.ArrowIconContainer>
+              </$ArrowIconContainer>
               {stringGetter({ key: label })}
-            </Styled.ColorPreferenceLabel>
-            <Styled.DotIndicator $selected={currentColorMode === colorMode} />
-          </Styled.ColorPreferenceItem>
+            </$ColorPreferenceLabel>
+            <$DotIndicator $selected={currentColorMode === colorMode} />
+          </$ColorPreferenceItem>
         ))}
-      </Styled.ColorPreferenceRoot>
+      </$ColorPreferenceRoot>
     );
   };
 
@@ -149,45 +147,42 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.DISPLAY_SETTINGS })}
     >
-      <Styled.Section>
+      <$Section>
         {sectionHeader(stringGetter({ key: STRING_KEYS.THEME }))}
         {themePanels()}
-      </Styled.Section>
-      <Styled.Section>
+      </$Section>
+      <$Section>
         {sectionHeader(stringGetter({ key: STRING_KEYS.DIRECTION_COLOR_PREFERENCE }))}
         {colorModeOptions()}
-      </Styled.Section>
+      </$Section>
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
 const gridStyle = css`
   display: grid;
   gap: 1.5rem;
 `;
 
-Styled.Section = styled.div`
+const $Section = styled.div`
   ${gridStyle}
   padding: 1rem 0;
 `;
 
-Styled.Header = styled.header`
+const $Header = styled.header`
   ${layoutMixins.inlineRow}
 `;
 
-Styled.AppThemeRoot = styled(Root)`
+const $AppThemeRoot = styled(Root)`
   ${gridStyle}
   grid-template-columns: 1fr 1fr;
 `;
 
-Styled.ColorPreferenceRoot = styled(Root)`
+const $ColorPreferenceRoot = styled(Root)`
   ${gridStyle}
   grid-template-columns: 1fr;
 `;
 
-Styled.Item = styled(Item)`
+const $Item = styled(Item)`
   --border-color: var(--color-border);
   --item-padding: 0.75rem;
 
@@ -201,7 +196,7 @@ Styled.Item = styled(Item)`
   padding: var(--item-padding);
 `;
 
-Styled.ColorPreferenceItem = styled(Styled.Item)`
+const $ColorPreferenceItem = styled($Item)`
   &[data-state='checked'] {
     background-color: var(--color-layer-4);
   }
@@ -210,7 +205,7 @@ Styled.ColorPreferenceItem = styled(Styled.Item)`
   justify-content: space-between;
 `;
 
-Styled.AppThemeItem = styled(Styled.Item)<{ backgroundcolor: string; gridcolor: string }>`
+const $AppThemeItem = styled($Item)<{ backgroundcolor: string; gridcolor: string }>`
   ${({ backgroundcolor, gridcolor }) => css`
     --themePanel-backgroundColor: ${backgroundcolor};
     --themePanel-gridColor: ${gridcolor};
@@ -244,51 +239,51 @@ Styled.AppThemeItem = styled(Styled.Item)<{ backgroundcolor: string; gridcolor: 
   }
 `;
 
-Styled.AppThemeHeader = styled.h3<{ textcolor: string }>`
+const $AppThemeHeader = styled.h3<{ textcolor: string }>`
   ${({ textcolor }) => css`
     color: ${textcolor};
   `}
   z-index: 1;
 `;
 
-Styled.Image = styled.img`
+const $Image = styled.img`
   width: 100%;
   height: auto;
   z-index: 1;
 `;
 
-Styled.ColorPreferenceLabel = styled.div`
+const $ColorPreferenceLabel = styled.div`
   ${layoutMixins.inlineRow};
   gap: 1ch;
 `;
 
-Styled.ArrowIconContainer = styled.div`
+const $ArrowIconContainer = styled.div`
   ${layoutMixins.column}
-  gap: 0.5ch;
+  gap: 0.25rem;
 
   svg {
-    height: 0.75em;
-    width: 0.75em;
+    height: 0.875em;
+    width: 0.875em;
   }
 `;
 
-Styled.ArrowIcon = styled(Icon)<{ direction: 'up' | 'down'; color: 'green' | 'red' }>`
+const $ArrowIcon = styled(Icon)<{ direction: 'up' | 'down'; color: 'green' | 'red' }>`
   ${({ direction }) =>
     ({
-      ['up']: css`
+      up: css`
         transform: rotate(-90deg);
       `,
-      ['down']: css`
+      down: css`
         transform: rotate(90deg);
       `,
     }[direction])}
 
   ${({ color }) =>
     ({
-      ['green']: css`
+      green: css`
         color: var(--color-green);
       `,
-      ['red']: css`
+      red: css`
         color: var(--color-red);
       `,
     }[color])}
@@ -307,7 +302,7 @@ const indicatorStyle = css`
   justify-content: center;
 `;
 
-Styled.DotIndicator = styled.div<{ $selected: boolean }>`
+const $DotIndicator = styled.div<{ $selected: boolean }>`
   ${indicatorStyle}
   --background-color: var(--color-layer-2);
   --border-color: var(--color-border);
@@ -332,7 +327,7 @@ Styled.DotIndicator = styled.div<{ $selected: boolean }>`
   border: solid var(--border-width) var(--border-color);
 `;
 
-Styled.CheckIndicator = styled(Indicator)`
+const $CheckIndicator = styled(Indicator)`
   ${indicatorStyle}
   position: absolute;
   bottom: var(--item-padding);
@@ -342,7 +337,7 @@ Styled.CheckIndicator = styled(Indicator)`
   color: var(--color-text-button);
 `;
 
-Styled.CheckIcon = styled(Icon)`
+const $CheckIcon = styled(Icon)`
   width: var(--icon-size);
   height: var(--icon-size);
 `;

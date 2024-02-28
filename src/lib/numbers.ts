@@ -1,5 +1,7 @@
 import { BigNumber } from 'bignumber.js';
 
+import { NumberSign } from '@/constants/numbers';
+
 export type BigNumberish = BigNumber | string | number;
 export type LocaleSeparators = { group?: string; decimal?: string };
 
@@ -8,7 +10,9 @@ export const BIG_NUMBERS = {
   ONE: new BigNumber(1),
 };
 
-export const MustBigNumber = (amount?: BigNumberish | null) => new BigNumber(amount || 0);
+export const MustBigNumber = (amount?: BigNumberish | null): BigNumber =>
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+  new BigNumber(amount || 0);
 
 /**
  * @description Rounds the input to the nearest multiple of `factor`, which must be non-zero.
@@ -75,8 +79,16 @@ export function bytesToBigInt(u: Uint8Array): bigint {
   if (u.length <= 1) {
     return BigInt(0);
   }
+  // eslint-disable-next-line no-bitwise
   const negated: boolean = (u[0] & 1) === 1;
   const hex: string = Buffer.from(u.slice(1)).toString('hex');
   const abs: bigint = BigInt(`0x${hex}`);
   return negated ? -abs : abs;
 }
+
+export const getNumberSign = (n: any): NumberSign =>
+  MustBigNumber(n).gt(0)
+    ? NumberSign.Positive
+    : MustBigNumber(n).lt(0)
+    ? NumberSign.Negative
+    : NumberSign.Neutral;

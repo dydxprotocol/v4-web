@@ -1,4 +1,4 @@
-import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 type ElementProps = {
   value: number;
@@ -15,7 +15,7 @@ export const Ring = ({ className, value, withAnimation }: ElementProps & StylePr
   const offset = Math.max(circumference - circumference * value, 0);
 
   return (
-    <Styled.Ring
+    <$Ring
       className={className}
       viewBox="0 0 32 32"
       fill="none"
@@ -40,13 +40,10 @@ export const Ring = ({ className, value, withAnimation }: ElementProps & StylePr
         strokeDasharray={circumference}
         strokeDashoffset={offset}
       />
-    </Styled.Ring>
+    </$Ring>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Ring = styled.svg<{ withAnimation?: boolean }>`
+const $Ring = styled.svg<{ withAnimation?: boolean }>`
   --ring-color: currentColor;
 
   transform: rotate(-90deg);

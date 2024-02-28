@@ -1,6 +1,7 @@
-import { useCommandMenu } from '@/hooks';
-import { useGlobalCommands } from '@/views/menus/useGlobalCommands';
+import { useCommandMenu } from '@/hooks/useCommandMenu';
+
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
+import { useGlobalCommands } from '@/views/menus/useGlobalCommands';
 
 export const GlobalCommandDialog = () => {
   const { isCommandMenuOpen, setIsCommandMenuOpen, closeCommandMenu } = useCommandMenu();

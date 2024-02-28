@@ -1,11 +1,17 @@
 import { useCallback } from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
+
 import { useDispatch } from 'react-redux';
+import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { useBreakpoints, useStringGetter, useURLConfigs } from '@/hooks';
+
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
@@ -13,8 +19,6 @@ import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 
 import { closeDialog, openDialog } from '@/state/dialogs';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 type ElementProps = {
   setIsOpen: (open: boolean) => void;
@@ -53,12 +57,8 @@ export const ExternalNavKeplrDialog = ({ setIsOpen }: ElementProps) => {
       title={stringGetter({ key: STRING_KEYS.HAVE_YOU_EXPORTED })}
       placement={isTablet ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
-      <Styled.Content>
-        <Styled.Button
-          type={ButtonType.Button}
-          size={ButtonSize.XLarge}
-          onClick={onExternalNavDialog}
-        >
+      <$Content>
+        <$Button type={ButtonType.Button} size={ButtonSize.XLarge} onClick={onExternalNavDialog}>
           <span>
             {stringGetter({
               key: STRING_KEYS.NAVIGATE_TO_KEPLR,
@@ -68,18 +68,14 @@ export const ExternalNavKeplrDialog = ({ setIsOpen }: ElementProps) => {
             })}
           </span>
 
-          <Styled.IconButton
+          <$IconButton
             action={ButtonAction.Base}
             iconName={IconName.Arrow}
             size={ButtonSize.XSmall}
           />
-        </Styled.Button>
+        </$Button>
 
-        <Styled.Button
-          type={ButtonType.Link}
-          size={ButtonSize.XLarge}
-          href={accountExportLearnMore}
-        >
+        <$Button type={ButtonType.Link} size={ButtonSize.XLarge} href={accountExportLearnMore}>
           <span>
             {stringGetter({
               key: STRING_KEYS.LEARN_TO_EXPORT,
@@ -89,32 +85,18 @@ export const ExternalNavKeplrDialog = ({ setIsOpen }: ElementProps) => {
             })}
           </span>
 
-          <Styled.IconButton
+          <$IconButton
             action={ButtonAction.Base}
             iconName={IconName.Arrow}
             size={ButtonSize.XSmall}
           />
-        </Styled.Button>
-      </Styled.Content>
+        </$Button>
+      </$Content>
     </Dialog>
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TextToggle = styled.div`
-  ${layoutMixins.stickyFooter}
-  color: var(--color-accent);
-  cursor: pointer;
-
-  margin-top: auto;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.stickyArea0}
   --stickyArea0-bottomHeight: 2rem;
   --stickyArea0-bottomGap: 1rem;
@@ -124,7 +106,7 @@ Styled.Content = styled.div`
   gap: 1rem;
 `;
 
-Styled.Button = styled(Button)`
+const $Button = styled(Button)`
   --button-font: var(--font-base-book);
   --button-padding: 0 1.5rem;
 
@@ -133,7 +115,7 @@ Styled.Button = styled(Button)`
   justify-content: space-between;
 `;
 
-Styled.IconButton = styled(IconButton)`
+const $IconButton = styled(IconButton)`
   color: var(--color-text-0);
   --color-border: var(--color-layer-6);
 `;

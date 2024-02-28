@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+
 import { shallowEqual, useSelector } from 'react-redux';
+import styled, { css } from 'styled-components';
 
 import { Nullable } from '@/constants/abacus';
 
@@ -9,7 +10,10 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { LoadingDots } from '@/components/Loading/LoadingDots';
 import { Output, OutputType } from '@/components/Output';
 
-import { getCurrentMarketConfig, getCurrentMarketMidMarketPrice } from '@/state/perpetualsSelectors';
+import {
+  getCurrentMarketConfig,
+  getCurrentMarketMidMarketPrice,
+} from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 
@@ -22,7 +26,8 @@ const getMidMarketPriceColor = ({
 }) => {
   if (MustBigNumber(midMarketPrice).lt(MustBigNumber(lastMidMarketPrice))) {
     return 'var(--color-negative)';
-  } else if (MustBigNumber(midMarketPrice).gt(MustBigNumber(lastMidMarketPrice))) {
+  }
+  if (MustBigNumber(midMarketPrice).gt(MustBigNumber(lastMidMarketPrice))) {
     return 'var(--color-positive)';
   }
 
@@ -44,7 +49,7 @@ export const MidMarketPrice = () => {
   }, [midMarketPrice]);
 
   return midMarketPrice !== undefined ? (
-    <Styled.Output
+    <$Output
       type={OutputType.Fiat}
       value={midMarketPrice}
       color={midMarketColor}
@@ -54,10 +59,7 @@ export const MidMarketPrice = () => {
     <LoadingDots size={5} />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Output = styled(Output)<{ color?: string }>`
+const $Output = styled(Output)<{ color?: string }>`
   ${layoutMixins.row}
 
   ${({ color }) =>

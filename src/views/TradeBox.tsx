@@ -1,18 +1,19 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
+import styled from 'styled-components';
 
-import { STRING_KEYS } from '@/constants/localization';
 import { TradeBoxDialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { useStringGetter } from '@/hooks';
-
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { ClosePositionForm } from '@/views/forms/ClosePositionForm';
+import { SelectMarginModeForm } from '@/views/forms/SelectMarginModeForm';
 
+import { closeDialogInTradeBox, openDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
-import { openDialogInTradeBox, closeDialogInTradeBox } from '@/state/dialogs';
 
 import abacusStateManager from '@/lib/abacus';
 
@@ -36,13 +37,19 @@ export const TradeBox = () => {
           abacusStateManager.clearClosePositionInputValues({ shouldFocusOnTradeInput: true });
         },
       },
+      [TradeBoxDialogTypes.SelectMarginMode]: {
+        title: stringGetter({ key: STRING_KEYS.MARGIN_MODE }),
+        content: (
+          <SelectMarginModeForm onChangeMarginMode={() => dispatch(closeDialogInTradeBox())} />
+        ),
+      },
     }[activeDialog.type];
 
   return (
-    <Styled.TradeBox>
+    <$TradeBox>
       <TradeBoxOrderView />
 
-      <Styled.Dialog
+      <$Dialog
         isOpen={!!activeDialog}
         title={activeDialogConfig?.title}
         setIsOpen={(isOpen: boolean) => {
@@ -56,14 +63,11 @@ export const TradeBox = () => {
         {...activeDialog?.dialogProps}
       >
         {activeDialogConfig?.content}
-      </Styled.Dialog>
-    </Styled.TradeBox>
+      </$Dialog>
+    </$TradeBox>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TradeBox = styled.section`
+const $TradeBox = styled.section`
   --tradeBox-content-paddingTop: 1rem;
   --tradeBox-content-paddingRight: 1rem;
   --tradeBox-content-paddingBottom: 1rem;
@@ -75,16 +79,16 @@ Styled.TradeBox = styled.section`
   ${layoutMixins.stack}
 `;
 
-Styled.Dialog = styled(Dialog)`
+const $Dialog = styled(Dialog)`
   --dialog-backgroundColor: var(--color-layer-2);
 
-  --dialog-paddingX: 1.5rem;
+  --dialog-paddingX: 1.25rem;
 
   --dialog-header-paddingTop: 1.25rem;
   --dialog-header-paddingBottom: 0.25rem;
 
   --dialog-content-paddingTop: 1rem;
-  --dialog-content-paddingRight: 1.5rem;
-  --dialog-content-paddingBottom: 1.25rem;
-  --dialog-content-paddingLeft: 1.5rem;
+  --dialog-content-paddingRight: 1rem;
+  --dialog-content-paddingBottom: 1rem;
+  --dialog-content-paddingLeft: 1rem;
 `;

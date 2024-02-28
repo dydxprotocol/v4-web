@@ -1,11 +1,11 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
-import { useSelectedNetwork } from '@/hooks';
-import { layoutMixins } from '@/styles/layoutMixins';
+import { useSelectedNetwork } from '@/hooks/useSelectedNetwork';
+
 import { headerMixins } from '@/styles/headerMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DropdownSelectMenu } from '@/components/DropdownSelectMenu';
-
 import { useNetworks } from '@/views/menus/useNetworks';
 
 type StyleProps = {
@@ -18,7 +18,7 @@ export const NetworkSelectMenu = ({ align, sideOffset }: StyleProps) => {
   const { switchNetwork, selectedNetwork } = useSelectedNetwork();
 
   return (
-    <Styled.DropdownSelectMenu
+    <$DropdownSelectMenu
       items={networks}
       value={selectedNetwork}
       onValueChange={switchNetwork}
@@ -27,10 +27,7 @@ export const NetworkSelectMenu = ({ align, sideOffset }: StyleProps) => {
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.DropdownSelectMenu = styled(DropdownSelectMenu)`
+const $DropdownSelectMenu = styled(DropdownSelectMenu)`
   ${headerMixins.dropdownTrigger}
 
   width: max-content;
@@ -41,4 +38,4 @@ Styled.DropdownSelectMenu = styled(DropdownSelectMenu)`
     min-width: 0;
     white-space: nowrap;
   }
-`;
+` as typeof DropdownSelectMenu;

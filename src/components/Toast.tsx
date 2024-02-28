@@ -1,15 +1,17 @@
-import { type MouseEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type MouseEvent } from 'react';
+
+import { Action, Close, Root } from '@radix-ui/react-toast';
 import styled, { keyframes } from 'styled-components';
-import { Root, Action, Close } from '@radix-ui/react-toast';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
-import { popoverMixins } from '@/styles/popoverMixins';
+
 import { breakpoints } from '@/styles';
+import { popoverMixins } from '@/styles/popoverMixins';
 
 import { Notification, type NotificationProps } from '@/components/Notification';
 
-import { IconButton } from './IconButton';
 import { IconName } from './Icon';
+import { IconButton } from './IconButton';
 
 type ElementProps = {
   isOpen?: boolean;
@@ -79,7 +81,7 @@ export const Toast = ({
           iconName={IconName.Close}
           shape={ButtonShape.Circle}
           size={ButtonSize.XSmall}
-          onClick={(e: MouseEvent) => e.stopPropagation()}
+          onClick={(e: React.MouseEvent) => e.stopPropagation()}
         />
       </Close>
 
@@ -93,10 +95,10 @@ export const Toast = ({
           slotTitleRight={slotTitleRight}
           slotDescription={slotDescription}
           slotAction={
-            actionDescription && (
-              <$Action asChild altText={actionAltText}>
+            Boolean(slotAction && actionAltText) && (
+              <Action asChild altText={actionAltText}>
                 {slotAction}
-              </$Action>
+              </Action>
             )
           }
         />
@@ -107,7 +109,7 @@ export const Toast = ({
 
 const $Root = styled(Root)`
   // Params
-  --toast-transition-duration: 0.5s;
+  --toast-transition-duration: 0.3s;
 
   // Computed
   --x: var(--radix-toast-swipe-move-x, 0px);
@@ -152,7 +154,7 @@ const $Root = styled(Root)`
           33% {
             /* scale: 1.05; */
             /* filter: brightness(120%); */
-            filter: drop-shadow(0 0 var(--color-text-1));
+            filter: drop-shadow(0 0 var(--color-text-0));
           }
         `} calc(var(--toast-transition-duration) * 3) 0.1s;
     }
@@ -260,8 +262,4 @@ const $CloseButton = styled(IconButton)`
     display: block;
     z-index: 2;
   }
-`;
-
-const $Action = styled(Action)`
-  margin-top: 0.5rem;
 `;

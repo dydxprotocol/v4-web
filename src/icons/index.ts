@@ -68,6 +68,7 @@ export { default as TriangleIcon } from './triangle.svg';
 export { default as TryAgainIcon } from './try-again.svg';
 export { default as WarningIcon } from './warning.svg';
 export { default as WithdrawIcon } from './withdraw.svg';
+export { default as DownloadIcon } from './download.svg';
 
 // Wallets
 export { default as BitkeepIcon } from './wallets/bitkeep.svg';
@@ -91,6 +92,11 @@ export { default as TrustWalletIcon } from './wallets/trust-wallet.svg';
 export { default as WalletConnectIcon } from './wallets/walletconnect.svg';
 export { default as WebsiteIcon } from './website.svg';
 export { default as WhitepaperIcon } from './whitepaper.svg';
+export { default as Discord2Icon } from './wallets/discord.svg';
+export { default as TwitterIcon } from './wallets/twitter.svg';
+export { default as GoogleIcon } from './wallets/google.svg';
+export { default as AppleIcon } from './wallets/apple.svg';
+export { default as EmailIcon } from './wallets/email.svg';
 
 // Logos
 export { default as ChaosLabsIcon } from './chaos-labs';
@@ -104,3 +110,5 @@ export { default as OrderOpenIcon } from './trade/order-open.svg';
 export { default as OrderPartiallyFilledIcon } from './trade/order-partially-filled.svg';
 export { default as OrderPendingIcon } from './trade/order-pending.svg';
 export { default as OrderUntriggeredIcon } from './trade/order-untriggered.svg';
+
+export { default as PositionPartialIcon } from './trade/position-partial.svg';

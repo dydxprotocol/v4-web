@@ -1,25 +1,33 @@
 import { useMemo } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
+
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { useStringGetter, useURLConfigs } from '@/hooks';
+import { MenuConfig } from '@/constants/menus';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
+
+import { breakpoints } from '@/styles';
 
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { Icon, IconName } from '@/components/Icon';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { breakpoints } from '@/styles';
 
 type ElementProps = {
   setIsOpen: (open: boolean) => void;
 };
+
+const latestCommit = import.meta.env.VITE_LAST_ORIGINAL_COMMIT;
+const latestVersion = import.meta.env.VITE_LAST_TAG;
 
 export const HelpDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { help: helpCenter, community } = useURLConfigs();
 
   const HELP_ITEMS = useMemo(
-    () => [
+    (): MenuConfig<string | number, string | number> => [
       {
         group: 'help-items',
         items: [
@@ -28,7 +36,9 @@ export const HelpDialog = ({ setIsOpen }: ElementProps) => {
             label: stringGetter({ key: STRING_KEYS.HELP_CENTER }),
             description: stringGetter({ key: STRING_KEYS.HELP_CENTER_DESCRIPTION }),
             onSelect: () => {
-              helpCenter && globalThis.open(helpCenter, '_blank');
+              if (helpCenter) {
+                globalThis.open(helpCenter, '_blank');
+              }
               setIsOpen(false);
             },
             slotBefore: <Icon iconName={IconName.File} />,
@@ -48,7 +58,9 @@ export const HelpDialog = ({ setIsOpen }: ElementProps) => {
             label: stringGetter({ key: STRING_KEYS.COMMUNITY }),
             description: stringGetter({ key: STRING_KEYS.COMMUNITY_DESCRIPTION }),
             onSelect: () => {
-              community && globalThis.open(community, '_blank');
+              if (community) {
+                globalThis.open(community, '_blank');
+              }
               setIsOpen(false);
             },
             slotBefore: <Icon iconName={IconName.Discord} />,
@@ -60,19 +72,33 @@ export const HelpDialog = ({ setIsOpen }: ElementProps) => {
   );
 
   return (
-    <Styled.ComboboxDialogMenu
+    <$ComboboxDialogMenu
       isOpen
       withSearch={false}
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.HELP })}
       items={HELP_ITEMS}
+      slotFooter={
+        latestCommit || latestVersion ? (
+          <$Footer>
+            {latestCommit && (
+              <span>
+                Release - <span title={latestCommit}> {`${latestCommit.substring(0, 7)}`}</span>
+              </span>
+            )}
+            {latestVersion && (
+              <span>
+                Version -{' '}
+                <span title={latestVersion}>{`${latestVersion.split(`release/v`).at(-1)}`}</span>
+              </span>
+            )}
+          </$Footer>
+        ) : undefined
+      }
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ComboboxDialogMenu = styled(ComboboxDialogMenu)`
+const $ComboboxDialogMenu = styled(ComboboxDialogMenu)`
   --dialog-content-paddingTop: 1rem;
   --dialog-content-paddingBottom: 1rem;
   --comboxDialogMenu-item-gap: 1rem;
@@ -80,4 +106,13 @@ Styled.ComboboxDialogMenu = styled(ComboboxDialogMenu)`
   @media ${breakpoints.notMobile} {
     --dialog-width: var(--dialog-small-width);
   }
+`;
+
+const $Footer = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  color: var(--color-text-0);
+  cursor: default;
+  user-select: text;
 `;

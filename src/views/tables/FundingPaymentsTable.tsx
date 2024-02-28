@@ -1,16 +1,19 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
-import { shallowEqual, useSelector } from 'react-redux';
 import { DateTime } from 'luxon';
+import { shallowEqual, useSelector } from 'react-redux';
+import styled from 'styled-components';
 
 import type { Asset, SubaccountFundingPayment } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
-import { useStringGetter } from '@/hooks';
+import { EMPTY_ARR } from '@/constants/objects';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
-import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { Output, OutputType } from '@/components/Output';
 import { Table, TableCell, type ColumnDef } from '@/components/Table';
+import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import { PageSize } from '@/components/Table/TablePaginationRow';
 
 import {
   getCurrentMarketFundingPayments,
@@ -22,9 +25,11 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 import { MustBigNumber } from '@/lib/numbers';
 import { getHydratedTradingData } from '@/lib/orders';
 import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 type ElementProps = {
   currentMarket?: string;
+  initialPageSize?: PageSize;
 };
 
 type StyleProps = {
@@ -39,16 +44,18 @@ export type FundingPaymentTableRow = {
 
 export const FundingPaymentsTable = ({
   currentMarket,
+  initialPageSize,
   withOuterBorder,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
 
-  const marketFundingPayments = useSelector(getCurrentMarketFundingPayments, shallowEqual) || [];
-  const allFundingPayments = useSelector(getSubaccountFundingPayments, shallowEqual) || [];
+  const marketFundingPayments =
+    useSelector(getCurrentMarketFundingPayments, shallowEqual) ?? EMPTY_ARR;
+  const allFundingPayments = useSelector(getSubaccountFundingPayments, shallowEqual) ?? EMPTY_ARR;
   const fundingPayments = currentMarket ? marketFundingPayments : allFundingPayments;
 
-  const allPerpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
-  const allAssets = useSelector(getAssets, shallowEqual) || {};
+  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
 
   const fundingPaymentsData = fundingPayments.map((fundingPayment: SubaccountFundingPayment) =>
     getHydratedTradingData({
@@ -59,7 +66,7 @@ export const FundingPaymentsTable = ({
   ) as FundingPaymentTableRow[];
 
   return (
-    <Styled.Table
+    <$Table
       key={currentMarket ?? 'all-fundingPayments'}
       label="FundingPayments"
       data={fundingPaymentsData}
@@ -97,7 +104,7 @@ export const FundingPaymentsTable = ({
             getCellValue: (row) => row.rate,
             label: stringGetter({ key: STRING_KEYS.FUNDING_RATE }),
             renderCell: (row) => (
-              <Styled.Output
+              <$Output
                 type={OutputType.SmallPercent}
                 value={row.rate}
                 isNegative={MustBigNumber(row.rate).isNegative()}
@@ -116,7 +123,7 @@ export const FundingPaymentsTable = ({
                   fractionDigits={stepSizeDecimals}
                   tag={asset.id}
                 />
-                <Styled.Output
+                <$Output
                   type={OutputType.Text}
                   value={
                     MustBigNumber(positionSize).isNegative()
@@ -138,11 +145,8 @@ export const FundingPaymentsTable = ({
           },
         ] as ColumnDef<FundingPaymentTableRow>[]
       ).filter(Boolean)}
-      slotEmpty={
-        <>
-          <h4>{stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_EMPTY_STATE })}</h4>
-        </>
-      }
+      slotEmpty={<h4>{stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_EMPTY_STATE })}</h4>}
+      initialPageSize={initialPageSize}
       withOuterBorder={withOuterBorder}
       withInnerBorders
       withScrollSnapColumns
@@ -151,14 +155,11 @@ export const FundingPaymentsTable = ({
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Table = styled(Table)`
+const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
-`;
+` as typeof Table;
 
-Styled.Output = styled(Output)<{ isNegative?: boolean }>`
+const $Output = styled(Output)<{ isNegative?: boolean }>`
   color: ${({ isNegative }) =>
     isNegative ? `var(--color-negative)` : `var(--color-positive)`} !important;
 `;

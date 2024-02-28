@@ -1,18 +1,18 @@
-import styled, { AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { layoutMixins } from '@/styles/layoutMixins';
-import { useStringGetter } from '@/hooks';
 
 import { AssetIcon } from '@/components/AssetIcon';
+import { PositionTile } from '@/views/PositionTile';
 
+import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketData } from '@/state/perpetualsSelectors';
-import { getCurrentMarketPositionData } from '@/state/accountSelectors';
-
-import { PositionTile } from '@/views/PositionTile';
 
 type ElementProps = {
   showNarrowVariation?: boolean;
@@ -23,12 +23,13 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
 
   const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
   const { configs, oraclePrice } = useSelector(getCurrentMarketData, shallowEqual) || {};
-  const { size: positionSize } = useSelector(getCurrentMarketPositionData, shallowEqual) || {};
+  const { size: positionSize, notionalTotal } =
+    useSelector(getCurrentMarketPositionData, shallowEqual) || {};
   const { stepSizeDecimals, tickSizeDecimals } = configs || {};
 
   return (
-    <Styled.PositionPreviewContainer>
-      <Styled.YourPosition>
+    <$PositionPreviewContainer>
+      <$YourPosition>
         {!showNarrowVariation && <AssetIcon symbol={id} />}
         <span>
           {stringGetter({
@@ -38,23 +39,20 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
             },
           })}
         </span>
-      </Styled.YourPosition>
+      </$YourPosition>
       <PositionTile
         currentSize={positionSize?.current}
-        oraclePrice={oraclePrice}
+        notionalTotal={notionalTotal?.current}
         postOrderSize={positionSize?.postOrder}
         stepSizeDecimals={stepSizeDecimals}
         symbol={id || undefined}
         tickSizeDecimals={tickSizeDecimals}
         showNarrowVariation={showNarrowVariation}
       />
-    </Styled.PositionPreviewContainer>
+    </$PositionPreviewContainer>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.PositionPreviewContainer = styled.div`
+const $PositionPreviewContainer = styled.div`
   ${layoutMixins.column}
   align-items: flex-start;
   width: 100%;
@@ -65,7 +63,7 @@ Styled.PositionPreviewContainer = styled.div`
   }
 `;
 
-Styled.YourPosition = styled.div`
+const $YourPosition = styled.div`
   ${layoutMixins.inlineRow}
   color: var(--color-text-0);
 

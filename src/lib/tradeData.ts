@@ -1,18 +1,16 @@
-import { type Location, matchPath } from 'react-router-dom';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-
-import { StringGetterFunction } from '@/constants/localization';
+import { matchPath, type Location } from 'react-router-dom';
 
 import {
-  type Nullable,
   AbacusOrderSide,
-  type AbacusOrderSides,
   AbacusOrderTypes,
-  ValidationError,
   ErrorType,
+  ValidationError,
+  type AbacusOrderSides,
+  type Nullable,
 } from '@/constants/abacus';
-
 import { AlertType } from '@/constants/alerts';
+import type { StringGetterFunction } from '@/constants/localization';
 import { PERCENT_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { TRADE_ROUTE } from '@/constants/routes';
 import { PositionSide, TradeTypes } from '@/constants/trade';
@@ -87,7 +85,7 @@ const formatErrorParam = ({
       return `$${dollarBN.toFixed(tickSizeDecimals ?? USD_DECIMALS)}`;
     }
     default: {
-      return value || '';
+      return value ?? '';
     }
   }
 };
@@ -106,10 +104,10 @@ export const getTradeInputAlert = ({
   stepSizeDecimals: Nullable<number>;
   tickSizeDecimals: Nullable<number>;
 }) => {
-  const inputAlerts = abacusInputErrors.map(({ action: errorAction, resources, type }) => {
+  const inputAlerts = abacusInputErrors.map(({ action: errorAction, resources, type, code }) => {
     const { action, text } = resources || {};
-    const { stringKey: actionStringKey } = action || {};
-    const { stringKey: alertStringKey, params: stringParams } = text || {};
+    const { stringKey: actionStringKey } = action ?? {};
+    const { stringKey: alertStringKey, params: stringParams } = text ?? {};
 
     const params =
       stringParams?.toArray() &&
@@ -128,8 +126,21 @@ export const getTradeInputAlert = ({
       alertStringKey,
       alertString: alertStringKey && stringGetter({ key: alertStringKey, params }),
       type: type === ErrorType.warning ? AlertType.Warning : AlertType.Error,
+      code,
     };
   });
 
   return inputAlerts?.[0];
+};
+
+export const calculatePositionMargin = ({
+  notionalTotal,
+  adjustedMmf,
+}: {
+  notionalTotal?: Nullable<number>;
+  adjustedMmf?: Nullable<number>;
+}) => {
+  const notionalTotalBN = MustBigNumber(notionalTotal);
+  const adjustedMmfBN = MustBigNumber(adjustedMmf);
+  return notionalTotalBN.times(adjustedMmfBN);
 };

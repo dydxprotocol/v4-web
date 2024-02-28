@@ -1,5 +1,5 @@
 import type { RootState } from './_store';
-import { AppTheme, AppThemeSystemSetting, AppThemeSetting } from './configs';
+import { AppTheme, AppThemeSetting, AppThemeSystemSetting } from './configs';
 
 export const getAppThemeSetting = (state: RootState): AppThemeSetting =>
   state.configs.appThemeSetting;
@@ -23,3 +23,6 @@ export const getFeeDiscounts = (state: RootState) => state.configs.feeDiscounts;
 
 export const getHasSeenLaunchIncentives = (state: RootState) =>
   state.configs.hasSeenLaunchIncentives;
+
+export const getDefaultToAllMarketsInPositionsOrdersFills = (state: RootState) =>
+  state.configs.defaultToAllMarketsInPositionsOrdersFills;

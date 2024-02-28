@@ -20,6 +20,13 @@
     "whitepaperLink": "https://why.cardano.org/en/introduction/motivation/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/cardano/"
   },
+  "AEVO-USD": {
+    "name": "Aevo",
+    "tags": ["Defi"],
+    "websiteLink": "https://www.aevo.xyz/",
+    "whitepaperLink": "https://docs.aevo.xyz/aevo-exchange/introduction",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/aevo/"
+  },
   "AGIX-USD": {
     "name": "SingularityNET",
     "tags": ["AI"],
@@ -41,6 +48,13 @@
     "whitepaperLink": "https://apecoin.com/about",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/apecoin-ape/"
   },
+  "API3-USD": {
+    "name": "API3",
+    "tags": [],
+    "websiteLink": "https://api3.org/",
+    "whitepaperLink": "https://drive.google.com/file/d/1JMVwk9pkGF7hvjkuu6ABA0-FrhRTzAwF/view",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/api3/"
+  },
   "APT-USD": {
     "name": "Aptos",
     "tags": ["Layer 1"],
@@ -50,10 +64,24 @@
   },
   "ARB-USD": {
     "name": "Arbitrum",
-    "tags": [],
+    "tags": ["Layer 2"],
     "websiteLink": "https://arbitrum.io/",
     "whitepaperLink": "https://github.com/OffchainLabs/nitro",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/arbitrum/"
+  },
+  "ARKM-USD": {
+    "name": "Arkham",
+    "tags": [],
+    "websiteLink": "https://www.arkhamintelligence.com/",
+    "whitepaperLink": "https://www.arkhamintelligence.com/whitepaper",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/arkham/"
+  },
+  "ASTR-USD": {
+    "name": "Astar",
+    "tags": ["Layer 2"],
+    "websiteLink": "https://astar.network/",
+    "whitepaperLink": "https://docs.astar.network/docs/getting-started",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/astar/"
   },
   "ATOM-USD": {
     "name": "Cosmos",
@@ -69,6 +97,13 @@
     "whitepaperLink": "https://assets.website-files.com/5d80307810123f5ffbb34d6e/6008d7bbf8b10d1eb01e7e16_Avalanche%20Platform%20Whitepaper.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/avalanche/"
   },
+  "AXL-USD": {
+    "name": "Axelar",
+    "tags": [],
+    "websiteLink": "https://axelar.network/",
+    "whitepaperLink": "https://axelar.network/axelar_whitepaper.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/axelar/"
+  },
   "BCH-USD": {
     "name": "Bitcoin Cash",
     "tags": ["Layer 1"],
@@ -76,9 +111,15 @@
     "whitepaperLink": "https://bitcoincash.org/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bitcoin-cash/"
   },
+  "BOME-USD": {
+    "name": "BOOK OF MEME",
+    "tags": ["Meme"],
+    "websiteLink": "https://llwapirxnupqu7xw2fspfidormcfar7ek2yp65nu7k5opjwhdywq.arweave.net/WuwHojdtHwp-9tFk8qBuiwRQR-RWsP91tPq656bHHi0",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/book-of-meme/"
+  },
   "BONK-USD": {
     "name": "BONK COIN",
-    "tags": [],
+    "tags": ["Meme"],
     "websiteLink": "https://bonkcoin.com/",
     "whitepaperLink": "https://bonkcoin.com/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bonk1/"
@@ -135,7 +176,7 @@
   },
   "DOGE-USD": {
     "name": "Dogecoin",
-    "tags": ["Layer 1"],
+    "tags": ["Layer 1", "Meme"],
     "websiteLink": "https://dogecoin.com/",
     "whitepaperLink": "https://github.com/dogecoin/dogecoin",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/dogecoin/"
@@ -146,6 +187,12 @@
     "websiteLink": "https://polkadot.network/",
     "whitepaperLink": "https://polkadot.network/PolkaDotPaper.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/polkadot-new/"
+  },
+  "DYDX-USD": {
+    "name": "dYdX",
+    "tags": ["Layer 1", "Defi"],
+    "websiteLink": "https://dydx.exchange/",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/dydx-chain/"
   },
   "DYM-USD": {
     "name": "Dymension",
@@ -191,6 +238,13 @@
     "displayStepSize": "0.001",
     "displayTickSize": "0.1"
   },
+  "ETHFI-USD": {
+    "name": "ether.fi",
+    "tags": [],
+    "websiteLink": "https://www.ether.fi/",
+    "whitepaperLink": "https://etherfi.gitbook.io/etherfi/ether.fi-whitepaper",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/ether-fi-ethfi/"
+  },
   "FET-USD": {
     "name": "Fetch.ai",
     "tags": ["AI"],
@@ -204,6 +258,13 @@
     "websiteLink": "https://filecoin.io/",
     "whitepaperLink": "https://filecoin.io/filecoin.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/filecoin/"
+  },
+  "FLR-USD": {
+    "name": "Flare",
+    "tags": ["Layer 1"],
+    "websiteLink": "https://flare.network/",
+    "whitepaperLink": "https://docs.flare.network/",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/flare/"
   },
   "FTM-USD": {
     "name": "Fantom",
@@ -310,6 +371,13 @@
     "whitepaperLink": "https://litecoin.info/index.php/Main_Page",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/litecoin/"
   },
+  "MAGIC-USD": {
+    "name": "MAGIC",
+    "tags": ["NFT"],
+    "websiteLink": "https://treasure.lol/",
+    "whitepaperLink": "https://files.treasure.lol/Treasure+Infinity+Chains+-+Litepaper+v1.0.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/magic-token/"
+  },
   "MANA-USD": {
     "name": "Decentraland",
     "tags": ["AR/VR"],
@@ -330,6 +398,13 @@
     "websiteLink": "https://polygon.technology/",
     "whitepaperLink": "https://polygon.technology/lightpaper-polygon.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/polygon/"
+  },
+  "MEME-USD": {
+    "name": "Memecoin",
+    "tags": ["Meme"],
+    "websiteLink": "https://www.memecoin.org/",
+    "whitepaperLink": "https://www.memecoin.org/whitepaper",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/meme/"
   },
   "MINA-USD": {
     "name": "Mina",
@@ -352,6 +427,13 @@
     "whitepaperLink": "https://near.org/papers/the-official-near-white-paper/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/near-protocol/"
   },
+  "OCEAN-USD": {
+    "name": "Ocean Protocol",
+    "tags": ["AI"],
+    "websiteLink": "https://oceanprotocol.com/",
+    "whitepaperLink": "https://oceanprotocol.com/tech-whitepaper.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/ocean-protocol/"
+  },
   "ORDI-USD": {
     "name": "Ordinals",
     "tags": ["NFT"],
@@ -361,16 +443,23 @@
   },
   "OP-USD": {
     "name": "Optimism",
-    "tags": [],
+    "tags": ["Layer 2"],
     "websiteLink": "https://www.optimism.io/",
     "whitepaperLink": "https://github.com/ethereum-optimism",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/optimism-ethereum/"
   },
   "PEPE-USD": {
     "name": "Pepe",
-    "tags": [],
+    "tags": ["Meme"],
     "websiteLink": "https://www.pepe.vip/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/pepe/"
+  },
+  "PORTAL-USD": {
+    "name": "PORTAL",
+    "tags": ["Gaming"],
+    "websiteLink": "https://www.portalgaming.com/",
+    "whitepaperLink": "https://portalxyz.nyc3.cdn.digitaloceanspaces.com/Portal_Whitepaper.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/portal-gaming/"
   },
   "PYTH-USD": {
     "name": "Pyth Network",
@@ -409,7 +498,7 @@
   },
   "SHIB-USD": {
     "name": "Shiba Inu",
-    "tags": [],
+    "tags": ["Meme"],
     "websiteLink": "https://shibatoken.com/",
     "whitepaperLink": "https://docs.shibatoken.com/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/shiba-inu/"
@@ -463,6 +552,13 @@
     "whitepaperLink": "https://arxiv.org/pdf/1905.09274.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/celestia/"
   },
+  "TON-USD": {
+    "name": "Toncoin",
+    "tags": ["Layer 1"],
+    "websiteLink": "https://ton.org/",
+    "whitepaperLink": "https://ton.org/whitepaper.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/toncoin/"
+  },
   "TRX-USD": {
     "name": "TRON",
     "tags": ["Defi"],
@@ -484,13 +580,19 @@
     "whitepaperLink": "https://uniswap.org/whitepaper-v3.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/uniswap/"
   },
+  "WIF-USD": {
+    "name": "dogwifhat",
+    "tags": ["Meme"],
+    "websiteLink": "https://dogwifcoin.org/",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/dogwifhat/"
+  },
   "WLD-USD": {
     "name": "Worldcoin",
     "tags": [],
     "websiteLink": "https://worldcoin.org/",
     "whitepaperLink": "https://whitepaper.worldcoin.org/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/worldcoin-org/"
-  },
+  }, 
   "WOO-USD": {
     "name": "WOO Network",
     "tags": ["Defi"],

@@ -1,22 +1,24 @@
-import { useEffect, useState } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
+import { useState } from 'react';
+
 import type { Story } from '@ladle/react';
+import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { TriangleIndicator, TriangleIndicatorProps } from '@/components/TriangleIndicator';
+import { TriangleIndicator } from '@/components/TriangleIndicator';
+
+import { MustBigNumber } from '@/lib/numbers';
 
 import { StoryWrapper } from '.ladle/components';
-import { MustBigNumber } from '@/lib/numbers';
 
 export const TriangleIndicatorStory: Story<{ value: number }> = (args) => {
   const [valueBN] = useState(MustBigNumber(args.value));
 
   return (
     <StoryWrapper>
-      <Styled.Container>
+      <$Container>
         <TriangleIndicator value={valueBN} />
-      </Styled.Container>
+      </$Container>
     </StoryWrapper>
   );
 };
@@ -24,10 +26,7 @@ export const TriangleIndicatorStory: Story<{ value: number }> = (args) => {
 TriangleIndicatorStory.args = {
   value: 0,
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.section`
+const $Container = styled.section`
   background: var(--color-layer-3);
 
   ${layoutMixins.container}

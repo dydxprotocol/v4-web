@@ -1,14 +1,20 @@
 import { useEffect, useMemo } from 'react';
+
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useMatch, useNavigate } from 'react-router-dom';
 
+import { SubaccountPosition } from '@/constants/abacus';
+import { TradeBoxDialogTypes } from '@/constants/dialogs';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
+
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
+import { getOpenPositions } from '@/state/accountSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { closeDialogInTradeBox } from '@/state/dialogs';
+import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { setCurrentMarketId } from '@/state/perpetuals';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
@@ -20,8 +26,10 @@ export const useCurrentMarketId = () => {
   const { marketId } = match?.params ?? {};
   const dispatch = useDispatch();
   const selectedNetwork = useSelector(getSelectedNetwork);
+  const openPositions = useSelector(getOpenPositions, shallowEqual);
   const marketIds = useSelector(getMarketIds, shallowEqual);
   const hasMarketIds = marketIds.length > 0;
+  const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog);
 
   const [lastViewedMarket, setLastViewedMarket] = useLocalStorage({
     key: LocalStorageKey.LastViewedMarket,
@@ -57,6 +65,15 @@ export const useCurrentMarketId = () => {
         // If marketId is valid, set currentMarketId
         setLastViewedMarket(marketId);
         dispatch(setCurrentMarketId(marketId));
+
+        if (
+          activeTradeBoxDialog?.type === TradeBoxDialogTypes.ClosePosition &&
+          openPositions?.find((position: SubaccountPosition) => position.id === marketId)
+        ) {
+          // Keep the close positions dialog open between market changes as long as there exists an open position
+          return;
+        }
+
         dispatch(closeDialogInTradeBox());
       }
     }

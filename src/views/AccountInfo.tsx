@@ -1,9 +1,11 @@
-import styled, { AnyStyledComponent, css } from 'styled-components';
 import { useSelector } from 'react-redux';
+import styled, { css } from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
 import { STRING_KEYS } from '@/constants/localization';
-import { useStringGetter } from '@/hooks';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
@@ -23,11 +25,11 @@ export const AccountInfo: React.FC = ({ className }: StyleProps) => {
   const canViewAccountInfo = useSelector(calculateCanViewAccount);
 
   return (
-    <Styled.AccountInfoSectionContainer className={className} showAccountInfo={canViewAccountInfo}>
+    <$AccountInfoSectionContainer className={className} showAccountInfo={canViewAccountInfo}>
       {onboardingState === OnboardingState.AccountConnected || canViewAccountInfo ? (
         <AccountInfoConnectedState />
       ) : (
-        <Styled.DisconnectedAccountInfoContainer>
+        <$DisconnectedAccountInfoContainer>
           <p>
             {stringGetter({
               key: {
@@ -37,15 +39,12 @@ export const AccountInfo: React.FC = ({ className }: StyleProps) => {
             })}
           </p>
           <OnboardingTriggerButton />
-        </Styled.DisconnectedAccountInfoContainer>
+        </$DisconnectedAccountInfoContainer>
       )}
-    </Styled.AccountInfoSectionContainer>
+    </$AccountInfoSectionContainer>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.DisconnectedAccountInfoContainer = styled.div`
+const $DisconnectedAccountInfoContainer = styled.div`
   margin: auto;
 
   ${layoutMixins.column}
@@ -59,7 +58,7 @@ Styled.DisconnectedAccountInfoContainer = styled.div`
   }
 `;
 
-Styled.AccountInfoSectionContainer = styled.div<{ showAccountInfo?: boolean }>`
+const $AccountInfoSectionContainer = styled.div<{ showAccountInfo?: boolean }>`
   ${layoutMixins.column}
   height: var(--account-info-section-height);
   min-height: var(--account-info-section-height);

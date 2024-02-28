@@ -1,9 +1,10 @@
 import { forwardRef } from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
 
-import { Icon, IconName } from '@/components/Icon';
+import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+
+import { Icon, IconName } from '@/components/Icon';
 
 type ElementProps = {
   analyticsConfig?: {
@@ -12,7 +13,7 @@ type ElementProps = {
   };
   children: React.ReactNode;
   href?: string;
-  onClick?: (e: MouseEvent) => void;
+  onClick?: (e: React.MouseEvent) => void;
   withIcon?: boolean;
 };
 
@@ -33,11 +34,11 @@ export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
     }: ElementProps & StyleProps,
     ref
   ) => (
-    <Styled.A
+    <$A
       ref={ref}
       className={className}
       href={href}
-      onClick={(e: MouseEvent) => {
+      onClick={(e: React.MouseEvent) => {
         if (analyticsConfig) {
           console.log(analyticsConfig);
         }
@@ -50,13 +51,10 @@ export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
     >
       {children}
       {withIcon && <Icon iconName={IconName.LinkOut} />}
-    </Styled.A>
+    </$A>
   )
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.A = styled.a<StyleProps>`
+const $A = styled.a<StyleProps>`
   --link-color: inherit;
   color: var(--link-color);
 

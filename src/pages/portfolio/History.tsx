@@ -1,14 +1,17 @@
 import { Outlet } from 'react-router-dom';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { HistoryRoute } from '@/constants/routes';
-import { useBreakpoints, useStringGetter } from '@/hooks';
 
-import styled, { AnyStyledComponent } from 'styled-components';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AttachedExpandingSection } from '@/components/ContentSection';
 import { NavigationMenu } from '@/components/NavigationMenu';
+import { ExportHistoryDropdown } from '@/views/ExportHistoryDropdown';
 
 export const History = () => {
   const stringGetter = useStringGetter();
@@ -17,8 +20,9 @@ export const History = () => {
   return (
     <AttachedExpandingSection>
       {isNotTablet && (
-        <Styled.NavigationMenu
+        <$NavigationMenu
           orientation="horizontal"
+          slotAfter={<Styled.ExportButton />}
           items={[
             {
               group: 'navigation',
@@ -50,10 +54,13 @@ export const History = () => {
     </AttachedExpandingSection>
   );
 };
-
 const Styled: Record<string, AnyStyledComponent> = {};
 
-Styled.NavigationMenu = styled(NavigationMenu)`
+Styled.ExportButton = styled(ExportHistoryDropdown)`
+  margin-left: auto;
+`;
+
+const $NavigationMenu = styled(NavigationMenu)`
   --header-horizontal-padding: 1rem;
 
   ${layoutMixins.contentSectionDetached}

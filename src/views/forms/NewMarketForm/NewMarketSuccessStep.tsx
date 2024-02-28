@@ -1,8 +1,10 @@
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { useStringGetter } from '@/hooks';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { LinkOutIcon } from '@/icons';
 
 import { Button } from '@/components/Button';
@@ -16,25 +18,22 @@ export const NewMarketSuccessStep = ({ href }: NewMarketSuccessStepProps) => {
   const stringGetter = useStringGetter();
 
   return (
-    <Styled.ProposalSent>
-      <Styled.OuterCircle>
-        <Styled.InnerCircle>
+    <$ProposalSent>
+      <$OuterCircle>
+        <$InnerCircle>
           <Icon iconName={IconName.Check} />
-        </Styled.InnerCircle>
-      </Styled.OuterCircle>
+        </$InnerCircle>
+      </$OuterCircle>
       <h2>{stringGetter({ key: STRING_KEYS.SUBMITTED_PROPOSAL })}</h2>
       <span>{stringGetter({ key: STRING_KEYS.PROPOSAL_SUBMISSION_SUCCESSFUL })}</span>
       <Button type={ButtonType.Link} href={href} action={ButtonAction.Primary}>
         {stringGetter({ key: STRING_KEYS.VIEW_PROPOSAL })}
         <LinkOutIcon />
       </Button>
-    </Styled.ProposalSent>
+    </$ProposalSent>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ProposalSent = styled.div`
+const $ProposalSent = styled.div`
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -50,7 +49,7 @@ Styled.ProposalSent = styled.div`
   }
 `;
 
-Styled.OuterCircle = styled.div`
+const $OuterCircle = styled.div`
   width: 5.25rem;
   height: 5.25rem;
   min-width: 5.25rem;
@@ -63,7 +62,7 @@ Styled.OuterCircle = styled.div`
   justify-content: center;
 `;
 
-Styled.InnerCircle = styled.div`
+const $InnerCircle = styled.div`
   width: 2rem;
   height: 2rem;
   min-width: 2rem;

@@ -1,7 +1,7 @@
 /* Constants */
 
 :root {
-  --fontFamily-base: "Satoshi", system-ui, -apple-system, Helvetica, Arial, sans-serif;
+  --fontFamily-base: 'Satoshi', system-ui, -apple-system, Helvetica, Arial, sans-serif;
   --fontFamily-monospace: Courier, monospace, var(--fontFamily-base);
 
   --fontWeight-base-0: 450;
@@ -22,18 +22,20 @@
   --fontWeight-regular: 400;
   --fontWeight-book: 450;
   --fontWeight-medium: 500;
+  --fontWeight-bold: 700;
 
   --font-tiny-regular: var(--fontWeight-regular) var(--fontSize-tiny) var(--fontFamily-base);
   --font-tiny-book: var(--fontWeight-book) var(--fontSize-tiny) var(--fontFamily-base);
   --font-tiny-medium: var(--fontWeight-medium) var(--fontSize-tiny) var(--fontFamily-base);
-  
+
   --font-mini-regular: var(--fontWeight-regular) var(--fontSize-mini) var(--fontFamily-base);
   --font-mini-book: var(--fontWeight-book) var(--fontSize-mini) var(--fontFamily-base);
   --font-mini-medium: var(--fontWeight-medium) var(--fontSize-mini) var(--fontFamily-base);
-  
+
   --font-small-regular: var(--fontWeight-regular) var(--fontSize-small) var(--fontFamily-base);
   --font-small-book: var(--fontWeight-book) var(--fontSize-small) var(--fontFamily-base);
   --font-small-medium: var(--fontWeight-medium) var(--fontSize-small) var(--fontFamily-base);
+  --font-small-bold: var(--fontWeight-bold) var(--fontSize-small) var(--fontFamily-base);
 
   --font-base-regular: var(--fontWeight-regular) var(--fontSize-base) var(--fontFamily-base);
   --font-base-book: var(--fontWeight-book) var(--fontSize-base) var(--fontFamily-base);
@@ -50,7 +52,7 @@
   --font-extra-regular: var(--fontWeight-regular) var(--fontSize-extra) var(--fontFamily-base);
   --font-extra-book: var(--fontWeight-book) var(--fontSize-extra) var(--fontFamily-base);
   --font-extra-medium: var(--fontWeight-medium) var(--fontSize-extra) var(--fontFamily-base);
-  
+
   --fontFeature-monoNumbers: 'tnum' on, 'lnum' on, 'zero' 1;
 }
 

@@ -1,9 +1,10 @@
-import { useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
 import { DateTime } from 'luxon';
+import { useSelector } from 'react-redux';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { useStringGetter } from '@/hooks';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { type DetailsItem } from '@/components/Details';
@@ -94,16 +95,13 @@ export const FillDetailsDialog = ({ fillId, setIsOpen }: ElementProps) => {
 
   return (
     <DetailsDialog
-      slotIcon={<Styled.AssetIcon symbol={asset?.id} />}
+      slotIcon={<$AssetIcon symbol={asset?.id} />}
       title={resources.typeStringKey && stringGetter({ key: resources.typeStringKey })}
       items={detailItems}
       setIsOpen={setIsOpen}
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.AssetIcon = styled(AssetIcon)`
+const $AssetIcon = styled(AssetIcon)`
   font-size: 1em;
 `;

@@ -1,26 +1,32 @@
-import { type FormEvent, useCallback, useEffect, useState } from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
+
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled from 'styled-components';
 
 import {
   ClosePositionInputField,
+  ErrorType,
   ValidationError,
   type HumanReadablePlaceOrderPayload,
   type Nullable,
-  ErrorType,
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
-import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { STRING_KEYS } from '@/constants/localization';
+import { NotificationType } from '@/constants/notifications';
+import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 
-import { useBreakpoints, useIsFirstRender, useStringGetter, useSubaccount } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useIsFirstRender } from '@/hooks/useIsFirstRender';
+import { useNotifications } from '@/hooks/useNotifications';
 import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { breakpoints } from '@/styles';
-import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
@@ -28,23 +34,20 @@ import { FormInput } from '@/components/FormInput';
 import { InputType } from '@/components/Input';
 import { Tag } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
-
-import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
-
-import { Orderbook, orderbookMixins, type OrderbookScrollBehavior } from '@/views/tables/Orderbook';
-
 import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
+import { Orderbook, orderbookMixins, type OrderbookScrollBehavior } from '@/views/tables/Orderbook';
 
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
+import { closeDialog } from '@/state/dialogs';
 import { getClosePositionInputErrors, getInputClosePositionData } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
-import { closeDialog } from '@/state/dialogs';
-import { getCurrentInput } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 import { getTradeInputAlert } from '@/lib/tradeData';
+
+import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 
 const MAX_KEY = 'MAX';
 
@@ -78,7 +81,6 @@ export const ClosePositionForm = ({
   const isFirstRender = useIsFirstRender();
 
   const [closePositionError, setClosePositionError] = useState<string | undefined>(undefined);
-  const [isClosingPosition, setIsClosingPosition] = useState(false);
 
   const { closePosition } = useSubaccount();
 
@@ -88,7 +90,6 @@ export const ClosePositionForm = ({
     useSelector(getCurrentMarketConfig, shallowEqual) || {};
   const { size: sizeData, summary } = useSelector(getInputClosePositionData, shallowEqual) || {};
   const { size, percent } = sizeData || {};
-  const currentInput = useSelector(getCurrentInput);
   const closePositionInputErrors = useSelector(getClosePositionInputErrors, shallowEqual);
   const currentPositionData = useSelector(getCurrentMarketPositionData, shallowEqual);
   const { size: currentPositionSize } = currentPositionData || {};
@@ -106,31 +107,34 @@ export const ClosePositionForm = ({
     tickSizeDecimals,
   });
 
+  const { getNotificationPreferenceForType } = useNotifications();
+  const isErrorShownInOrderStatusToast = getNotificationPreferenceForType(
+    NotificationType.OrderStatus
+  );
+
   let alertContent;
   let alertType = AlertType.Error;
 
-  if (closePositionError) {
+  if (closePositionError && !isErrorShownInOrderStatusToast) {
     alertContent = closePositionError;
   } else if (inputAlert) {
-    alertContent = inputAlert?.alertString;
-    alertType = inputAlert?.type;
+    alertContent = inputAlert.alertString;
+    alertType = inputAlert.type;
   }
 
   useEffect(() => {
     if (currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder) return;
 
-    if (currentInput !== 'closePosition') {
-      abacusStateManager.setClosePositionValue({
-        value: market,
-        field: ClosePositionInputField.market,
-      });
+    abacusStateManager.setClosePositionValue({
+      value: market,
+      field: ClosePositionInputField.market,
+    });
 
-      abacusStateManager.setClosePositionValue({
-        value: SIZE_PERCENT_OPTIONS[MAX_KEY],
-        field: ClosePositionInputField.percent,
-      });
-    }
-  }, [currentInput, market, currentStep]);
+    abacusStateManager.setClosePositionValue({
+      value: SIZE_PERCENT_OPTIONS[MAX_KEY],
+      field: ClosePositionInputField.percent,
+    });
+  }, [market, currentStep]);
 
   const onLastOrderIndexed = useCallback(() => {
     if (!isFirstRender) {
@@ -140,8 +144,6 @@ export const ClosePositionForm = ({
       if (currentStep === MobilePlaceOrderSteps.PlacingOrder) {
         setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
       }
-
-      setIsClosingPosition(false);
     }
   }, [currentStep, isFirstRender]);
 
@@ -169,7 +171,7 @@ export const ClosePositionForm = ({
     });
   };
 
-  const onSubmit = async (e: FormEvent) => {
+  const onSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     switch (currentStep) {
@@ -178,6 +180,7 @@ export const ClosePositionForm = ({
         break;
       }
       case MobilePlaceOrderSteps.PlacingOrder:
+      case MobilePlaceOrderSteps.PlaceOrderFailed:
       case MobilePlaceOrderSteps.Confirmation: {
         dispatch(closeDialog());
         break;
@@ -191,16 +194,15 @@ export const ClosePositionForm = ({
     }
   };
 
-  const onClosePosition = async () => {
+  const onClosePosition = () => {
     setClosePositionError(undefined);
-    setIsClosingPosition(true);
 
-    await closePosition({
+    closePosition({
       onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
         setClosePositionError(
           stringGetter({ key: errorParams?.errorStringKey || STRING_KEYS.SOMETHING_WENT_WRONG })
         );
-        setIsClosingPosition(false);
+        setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
       },
       onSuccess: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => {
         setUnIndexedClientId(placeOrderPayload?.clientId);
@@ -211,8 +213,8 @@ export const ClosePositionForm = ({
   const alertMessage = alertContent && <AlertMessage type={alertType}>{alertContent}</AlertMessage>;
 
   const inputs = (
-    <Styled.InputsColumn>
-      <Styled.FormInput
+    <$InputsColumn>
+      <$FormInput
         id="close-position-amount"
         label={
           <>
@@ -227,7 +229,7 @@ export const ClosePositionForm = ({
         max={currentSize !== null ? currentSizeBN.toNumber() : undefined}
       />
 
-      <Styled.ToggleGroup
+      <$ToggleGroup
         items={Object.entries(SIZE_PERCENT_OPTIONS).map(([key, value]) => ({
           label: key === MAX_KEY ? stringGetter({ key: STRING_KEYS.FULL_CLOSE }) : key,
           value: value.toString(),
@@ -238,34 +240,34 @@ export const ClosePositionForm = ({
       />
 
       {alertMessage}
-    </Styled.InputsColumn>
+    </$InputsColumn>
   );
 
   return (
-    <Styled.ClosePositionForm onSubmit={onSubmit} className={className}>
+    <$ClosePositionForm onSubmit={onSubmit} className={className}>
       {!isTablet ? (
         inputs
       ) : currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder ? (
-        <Styled.PreviewAndConfirmContent>
+        <$PreviewAndConfirmContent>
           <PositionPreview />
           {alertMessage}
-        </Styled.PreviewAndConfirmContent>
+        </$PreviewAndConfirmContent>
       ) : (
-        <Styled.MobileLayout>
-          <Styled.OrderbookScrollArea scrollBehavior="snapToCenterUnlessHovered">
-            <Styled.Orderbook hideHeader />
-          </Styled.OrderbookScrollArea>
+        <$MobileLayout>
+          <$OrderbookScrollArea scrollBehavior="snapToCenterUnlessHovered">
+            <$Orderbook hideHeader />
+          </$OrderbookScrollArea>
 
-          <Styled.Right>
+          <$Right>
             <PositionPreview showNarrowVariation />
             {inputs}
-          </Styled.Right>
-        </Styled.MobileLayout>
+          </$Right>
+        </$MobileLayout>
       )}
 
-      <Styled.Footer>
+      <$Footer>
         {size != null && (
-          <Styled.ButtonRow>
+          <$ButtonRow>
             <Button
               type={ButtonType.Reset}
               action={ButtonAction.Reset}
@@ -284,11 +286,10 @@ export const ClosePositionForm = ({
             >
               {stringGetter({ key: STRING_KEYS.CLEAR })}
             </Button>
-          </Styled.ButtonRow>
+          </$ButtonRow>
         )}
 
         <PlaceOrderButtonAndReceipt
-          isLoading={isClosingPosition}
           hasValidationErrors={hasInputErrors}
           actionStringKey={inputAlert?.actionStringKey}
           validationErrorString={alertContent}
@@ -300,14 +301,11 @@ export const ClosePositionForm = ({
             buttonAction: ButtonAction.Destroy,
           }}
         />
-      </Styled.Footer>
-    </Styled.ClosePositionForm>
+      </$Footer>
+    </$ClosePositionForm>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ClosePositionForm = styled.form`
+const $ClosePositionForm = styled.form`
   --form-rowGap: 1.25rem;
 
   ${layoutMixins.expandingColumnWithFooter}
@@ -330,12 +328,12 @@ Styled.ClosePositionForm = styled.form`
   }
 `;
 
-Styled.PreviewAndConfirmContent = styled.div`
+const $PreviewAndConfirmContent = styled.div`
   ${layoutMixins.flexColumn}
   gap: var(--form-input-gap);
 `;
 
-Styled.MobileLayout = styled.div`
+const $MobileLayout = styled.div`
   height: 0;
   // Apply dialog's top/left/right padding to inner scroll areas
   min-height: calc(100% + var(--dialog-content-paddingTop) + var(--dialog-content-paddingBottom));
@@ -347,7 +345,7 @@ Styled.MobileLayout = styled.div`
   gap: var(--form-input-gap);
 `;
 
-Styled.OrderbookScrollArea = styled.div<{
+const $OrderbookScrollArea = styled.div<{
   scrollBehavior: OrderbookScrollBehavior;
 }>`
   ${layoutMixins.stickyLeft}
@@ -372,12 +370,12 @@ Styled.OrderbookScrollArea = styled.div<{
   padding-bottom: var(--form-rowGap);
 `;
 
-Styled.Orderbook = styled(Orderbook)`
+const $Orderbook = styled(Orderbook)`
   min-height: 100%;
   --tableCell-padding: 0.5em 1em;
 `;
 
-Styled.Right = styled.div`
+const $Right = styled.div`
   height: 0;
   min-height: 100%;
   ${layoutMixins.scrollArea}
@@ -390,11 +388,11 @@ Styled.Right = styled.div`
   gap: 1rem;
 `;
 
-Styled.FormInput = styled(FormInput)`
+const $FormInput = styled(FormInput)`
   width: 100%;
 `;
 
-Styled.ToggleGroup = styled(ToggleGroup)`
+const $ToggleGroup = styled(ToggleGroup)`
   ${formMixins.inputToggleGroup}
 
   @media ${breakpoints.mobile} {
@@ -404,7 +402,7 @@ Styled.ToggleGroup = styled(ToggleGroup)`
   }
 `;
 
-Styled.Footer = styled.footer`
+const $Footer = styled.footer`
   ${layoutMixins.stickyFooter}
   backdrop-filter: none;
 
@@ -413,12 +411,12 @@ Styled.Footer = styled.footer`
   margin-top: auto;
 `;
 
-Styled.ButtonRow = styled.div`
+const $ButtonRow = styled.div`
   ${layoutMixins.row}
   justify-self: end;
   padding: 0.5rem 0 0.5rem 0;
 `;
 
-Styled.InputsColumn = styled.div`
+const $InputsColumn = styled.div`
   ${formMixins.inputsColumn}
 `;

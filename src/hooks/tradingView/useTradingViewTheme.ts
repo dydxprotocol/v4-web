@@ -6,9 +6,10 @@ import { THEME_NAMES } from '@/constants/styles/colors';
 import type { ChartLine, TvWidget } from '@/constants/tvchart';
 
 import { AppColorMode, AppTheme } from '@/state/configs';
-import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
+import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 
-import { getWidgetOverrides, getChartLineColors } from '@/lib/tradingView/utils';
+import { assertNever } from '@/lib/assertNever';
+import { getChartLineColors, getWidgetOverrides } from '@/lib/tradingView/utils';
 
 /**
  * @description Method to define a type guard and check that an element is an IFRAME
@@ -56,10 +57,15 @@ export const useTradingViewTheme = ({
               case AppTheme.Light:
                 innerHtml?.classList.remove('theme-dark');
                 innerHtml?.classList.add('theme-light');
+                break;
+              default:
+                assertNever(appTheme);
+                break;
             }
           }
         }
 
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         const { overrides, studies_overrides } = getWidgetOverrides({ appTheme, appColorMode });
         tvWidget?.applyOverrides(overrides);
         tvWidget?.applyStudiesOverrides(studies_overrides);
@@ -81,7 +87,7 @@ export const useTradingViewTheme = ({
         // Necessary to update existing chart lines
         Object.values(chartLines).forEach(({ chartLineType, line }) => {
           const { maybeQuantityColor, borderColor, backgroundColor, textColor, textButtonColor } =
-            getChartLineColors({ chartLineType: chartLineType, appTheme, appColorMode });
+            getChartLineColors({ chartLineType, appTheme, appColorMode });
 
           if (maybeQuantityColor) {
             line.setLineColor(maybeQuantityColor).setQuantityBackgroundColor(maybeQuantityColor);

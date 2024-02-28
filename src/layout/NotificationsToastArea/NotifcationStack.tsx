@@ -1,14 +1,17 @@
 import { useState } from 'react';
+
 import styled, { css } from 'styled-components';
 
+import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import {
+  NotificationStatus,
   type Notification,
   type NotificationDisplayData,
-  NotificationStatus,
 } from '@/constants/notifications';
-import { ButtonShape, ButtonSize } from '@/constants/buttons';
-import { useNotifications } from '@/hooks/useNotifications';
+
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useNotifications } from '@/hooks/useNotifications';
+
 import { ChevronLeftIcon } from '@/icons';
 import { breakpoints } from '@/styles';
 
@@ -68,9 +71,13 @@ export const NotificationStack = ({ notifications, className }: ElementProps & S
           slotCustomContent={displayData.renderCustomBody?.({ isToast: true, notification })}
           onClick={() => onNotificationAction(notification)}
           slotAction={
-            <Button size={ButtonSize.Small} onClick={() => onNotificationAction(notification)}>
-              {displayData.actionDescription}
-            </Button>
+            displayData.renderActionSlot ? (
+              displayData.renderActionSlot({ isToast: true, notification })
+            ) : displayData.actionDescription ? (
+              <Button size={ButtonSize.Small} onClick={() => onNotificationAction(notification)}>
+                {displayData.actionDescription}
+              </Button>
+            ) : undefined
           }
           actionDescription={displayData.actionDescription}
           actionAltText={displayData.actionAltText}

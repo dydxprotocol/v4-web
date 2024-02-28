@@ -1,14 +1,17 @@
 import React, { useMemo } from 'react';
-import styled from 'styled-components';
-import { layoutMixins } from '@/styles/layoutMixins';
+
 import { groupBy } from 'lodash';
+import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { type Notification, NotificationStatus } from '@/constants/notifications';
+import { NotificationStatus, type Notification } from '@/constants/notifications';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useStringGetter } from '@/hooks/useStringGetter';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
@@ -66,14 +69,14 @@ export const NotificationsMenu = ({
     () =>
       (Object.entries(notificationsByStatus) as unknown as [NotificationStatus, Notification[]][])
         .filter(([status]) => status < NotificationStatus.Cleared)
-        .map(([status, notifications]) => ({
+        .map(([status, innerNotifications]) => ({
           group: status,
           groupLabel: {
             [NotificationStatus.Triggered]: stringGetter({ key: STRING_KEYS.NEW }),
             [NotificationStatus.Seen]: 'Seen',
           }[status as number],
 
-          items: notifications
+          items: innerNotifications
             .sort(
               (n1, n2) =>
                 n2.timestamps[NotificationStatus.Triggered]! -
@@ -95,6 +98,7 @@ export const NotificationsMenu = ({
                   slotTitle={displayData.title}
                   slotDescription={displayData.body}
                   notification={notification}
+                  withClose={displayData.withClose}
                 />
               ),
               disabled: notification.status === NotificationStatus.Cleared,
@@ -104,7 +108,7 @@ export const NotificationsMenu = ({
               },
             })),
         }))
-        .filter(({ items }) => items.length),
+        .filter(({ items: allItems }) => allItems.length),
     [notificationsByStatus, getDisplayData, onNotificationAction, markSeen, stringGetter]
   );
 

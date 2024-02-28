@@ -1,12 +1,13 @@
-import styled, { AnyStyledComponent } from 'styled-components';
+/* eslint-disable no-irregular-whitespace */
+import styled from 'styled-components';
 
 import { articleMixins } from '@/styles/articleMixins';
 
 const TermsOfUsePage = () => (
-  <Styled.Article>
+  <$Article>
     <header>
       <h1>Sample Terms of Use</h1>
-      <span></span>
+      <span />
     </header>
     <div>
       <p>
@@ -1073,13 +1074,10 @@ const TermsOfUsePage = () => (
         <strong>19. CONTACT INFORMATION</strong>
       </p>
     </div>
-  </Styled.Article>
+  </$Article>
 );
 
 export default TermsOfUsePage;
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Article = styled.article`
+const $Article = styled.article`
   ${articleMixins.article}
 `;

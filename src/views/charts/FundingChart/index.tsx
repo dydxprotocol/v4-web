@@ -1,28 +1,31 @@
 import { useState } from 'react';
-import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+
 import { curveMonotoneX, curveStepAfter } from '@visx/curve';
+import type { TooltipContextType } from '@visx/xychart';
+import { shallowEqual, useSelector } from 'react-redux';
+import styled, { css } from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
 import { FundingRateResolution, type FundingChartDatum } from '@/constants/charts';
 import { STRING_KEYS } from '@/constants/localization';
 import { FundingDirection } from '@/constants/markets';
 import { SMALL_PERCENT_DECIMALS, TINY_PERCENT_DECIMALS } from '@/constants/numbers';
-import { useBreakpoints, useStringGetter } from '@/hooks';
+
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { breakpoints } from '@/styles';
 
-import { Output, OutputType } from '@/components/Output';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
+import { Output, OutputType } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
-
-import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 import { AxisLabelOutput } from '@/components/visx/AxisLabelOutput';
-import type { TooltipContextType } from '@visx/xychart';
+import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
 import { calculateFundingRateHistory } from '@/state/perpetualsCalculators';
 
 import { MustBigNumber } from '@/lib/numbers';
+
 import { FundingChartTooltipContent } from './Tooltip';
 
 const FUNDING_RATE_TIME_RESOLUTION = 60 * 60 * 1000; // 1 hour
@@ -91,13 +94,13 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
       renderXAxisLabel={({ tooltipData }) => {
         const tooltipDatum = tooltipData!.nearestDatum?.datum ?? latestDatum;
 
-        return <Styled.XAxisLabelOutput type={OutputType.DateTime} value={tooltipDatum.time} />;
+        return <$XAxisLabelOutput type={OutputType.DateTime} value={tooltipDatum.time} />;
       }}
       renderYAxisLabel={({ tooltipData }) => {
         const tooltipDatum = tooltipData!.nearestDatum?.datum ?? latestDatum;
 
         return (
-          <Styled.YAxisLabelOutput
+          <$YAxisLabelOutput
             type={OutputType.SmallPercent}
             value={getAllFundingRates(tooltipDatum.fundingRate)[fundingRateView]}
             accentColor={
@@ -117,12 +120,12 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
           latestDatum={latestDatum}
         />
       )}
-      onTooltipContext={(tooltipContext) => setTooltipContext(tooltipContext)}
+      onTooltipContext={(ttContext) => setTooltipContext(ttContext)}
       minZoomDomain={FUNDING_RATE_TIME_RESOLUTION * 4}
       numGridLines={1}
       slotEmpty={<LoadingSpace id="funding-chart-loading" />}
     >
-      <Styled.FundingRateToggle>
+      <$FundingRateToggle>
         <ToggleGroup
           items={Object.keys(FundingRateResolution).map((rate: string) => ({
             value: rate as FundingRateResolution,
@@ -137,15 +140,15 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
                 [FundingRateResolution.Annualized]: stringGetter({
                   key: STRING_KEYS.ANNUALIZED,
                 }),
-              }[rate] || '',
+              }[rate] ?? '',
           }))}
           value={fundingRateView}
           onValueChange={setFundingRateView}
           size={ButtonSize.XSmall}
         />
-      </Styled.FundingRateToggle>
+      </$FundingRateToggle>
 
-      <Styled.CurrentFundingRate isShowing={!tooltipContext?.tooltipOpen}>
+      <$CurrentFundingRate isShowing={!tooltipContext?.tooltipOpen}>
         <h4>
           {
             {
@@ -161,27 +164,24 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
             }[fundingRateView]
           }
         </h4>
-        <Styled.Output
+        <$Output
           type={OutputType.SmallPercent}
           value={latestFundingRate}
           fractionDigits={TINY_PERCENT_DECIMALS}
           isNegative={latestFundingRate < 0}
         />
-      </Styled.CurrentFundingRate>
+      </$CurrentFundingRate>
     </TimeSeriesChart>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.FundingRateToggle = styled.div`
+const $FundingRateToggle = styled.div`
   place-self: start end;
   isolation: isolate;
 
   margin: 1rem;
 `;
 
-Styled.CurrentFundingRate = styled.div<{ isShowing?: boolean }>`
+const $CurrentFundingRate = styled.div<{ isShowing?: boolean }>`
   place-self: start center;
   padding: clamp(1.5rem, 9rem - 15%, 4rem);
   pointer-events: none;
@@ -192,16 +192,6 @@ Styled.CurrentFundingRate = styled.div<{ isShowing?: boolean }>`
   border-radius: 50%;
 
   text-align: center;
-
-  /* Hover-based */
-  /*
-  transition: opacity var(--ease-out-expo) 0.25s 0.3s;
-
-  ${Styled.TimeSeriesChart}:hover ${Styled.FundingRateToggle}:not(:hover) + & {
-    opacity: 0;
-    transition-delay: 0s;
-  }
-  */
 
   /* Tooltip state-based */
   transition: opacity var(--ease-out-expo) 0.25s;
@@ -223,15 +213,15 @@ Styled.CurrentFundingRate = styled.div<{ isShowing?: boolean }>`
   }
 `;
 
-Styled.Output = styled(Output)<{ isNegative?: boolean }>`
+const $Output = styled(Output)<{ isNegative?: boolean }>`
   color: ${({ isNegative }) => (isNegative ? `var(--color-negative)` : `var(--color-positive)`)};
 `;
 
-Styled.XAxisLabelOutput = styled(AxisLabelOutput)`
+const $XAxisLabelOutput = styled(AxisLabelOutput)`
   box-shadow: 0 0 0.5rem var(--color-layer-2);
 `;
 
-Styled.YAxisLabelOutput = styled(AxisLabelOutput)`
+const $YAxisLabelOutput = styled(AxisLabelOutput)`
   --axisLabel-offset: 0.5rem;
 
   [data-side='left'] & {

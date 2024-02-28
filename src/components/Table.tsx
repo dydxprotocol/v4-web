@@ -1,61 +1,73 @@
-import React, { Fragment, Key, useCallback, useEffect, useMemo, useState } from 'react';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import React, { Key, useCallback, useEffect, useState } from 'react';
 
 import {
-  useTable,
-  useTableCell,
-  useTableColumnHeader,
-  useTableRow,
-  useTableHeaderRow,
-  useTableRowGroup,
-  useTableSelectAllCheckbox,
-  useTableSelectionCheckbox,
-  mergeProps,
-  useFocusRing,
-  useCollator,
-} from 'react-aria';
-
-import { type ColumnSize, type TableCollection } from '@react-types/table';
-import { type GridNode } from '@react-types/grid';
-
-import type { Node, SortDescriptor, SortDirection, CollectionChildren } from '@react-types/shared';
-
-import {
-  Cell,
-  // CollectionBuilderContext,
+  Cell, // CollectionBuilderContext,
   Column,
   Row,
   TableBody,
   TableHeader,
-  type TableState,
   useTableState,
+  type TableState,
 } from '@react-stately/table';
-
+import { type GridNode } from '@react-types/grid';
+import type { CollectionChildren, Node, SortDescriptor, SortDirection } from '@react-types/shared';
+import { type ColumnSize, type TableCollection } from '@react-types/table';
+import { isFunction } from 'lodash';
+import {
+  mergeProps,
+  useCollator,
+  useFocusRing,
+  useTable,
+  useTableCell,
+  useTableColumnHeader,
+  useTableHeaderRow,
+  useTableRow,
+  useTableRowGroup,
+} from 'react-aria';
 import { useAsyncList } from 'react-stately';
+import styled, { css } from 'styled-components';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
-import { MediaQueryKeys } from '@/hooks/useBreakpoints';
+import { MediaQueryKeys, useBreakpoints } from '@/hooks/useBreakpoints';
+import { useTablePagination } from '@/hooks/useTablePagination';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
-import { CaretIcon } from '@/icons';
-
-import { STRING_KEYS } from '@/constants/localization';
 
 import { MustBigNumber } from '@/lib/numbers';
 
 import { Icon, IconName } from './Icon';
+import { PAGE_SIZES, PageSize, TablePaginationRow } from './Table/TablePaginationRow';
 import { Tag } from './Tag';
-import { Button } from './Button';
 
+export { ActionsTableCell } from './Table/ActionsTableCell';
+
+// TODO: fix circular dependencies
+// eslint-disable-next-line import/no-cycle
+export { AssetTableCell } from './Table/AssetTableCell';
+
+// TODO: remove barrel files: https://www.npmjs.com/package/eslint-plugin-no-barrel-files
+// Reasoning why: https://dev.to/tassiofront/barrel-files-and-why-you-should-stop-using-them-now-bc4
+// eslint-disable-next-line import/no-cycle
+export { MarketTableCell } from './Table/MarketTableCell';
 export { TableCell } from './Table/TableCell';
 export { TableColumnHeader } from './Table/TableColumnHeader';
-export { MarketTableCell } from './Table/MarketTableCell';
 
 export type CustomRowConfig = {
   key: string;
   slotCustomRow: (..._: Parameters<typeof TableRow>) => React.ReactNode;
 };
+
+function isCustomRow<TableRowData extends object>(
+  v: TableRowData | CustomRowConfig
+): v is CustomRowConfig {
+  return (v as any).slotCustomRow != null && isFunction((v as any).slotCustomRow);
+}
+
+function isTableRowData<TableRowData extends object>(
+  v: TableRowData | CustomRowConfig
+): v is TableRowData {
+  return !isCustomRow(v);
+}
 
 export type TableItem<TableRowData> = {
   value: TableRowData;
@@ -68,7 +80,9 @@ export type TableItem<TableRowData> = {
   onSelect?: (key: TableRowData) => void;
 };
 
-export type ColumnDef<TableRowData extends object> = {
+export type BaseTableRowData = {};
+
+export type ColumnDef<TableRowData extends BaseTableRowData | CustomRowConfig> = {
   columnKey: string;
   label: React.ReactNode;
   tag?: React.ReactNode;
@@ -83,29 +97,24 @@ export type ColumnDef<TableRowData extends object> = {
   width?: ColumnSize;
 };
 
-export type ElementProps<TableRowData extends object | CustomRowConfig, TableRowKey extends Key> = {
+export type TableElementProps<TableRowData extends BaseTableRowData | CustomRowConfig> = {
   label?: string;
   columns: ColumnDef<TableRowData>[];
-  data: TableRowData[];
-  getRowKey: (rowData: TableRowData, rowIndex?: number) => TableRowKey;
+  data: Array<TableRowData | CustomRowConfig>;
+  getRowKey: (rowData: TableRowData, rowIndex?: number) => Key;
   getRowAttributes?: (rowData: TableRowData, rowIndex?: number) => Record<string, any>;
-  // shouldRowRender?: (prevRowData: object, currentRowData: object) => boolean;
   defaultSortDescriptor?: SortDescriptor;
   selectionMode?: 'multiple' | 'single';
   selectionBehavior?: 'replace' | 'toggle';
-  onRowAction?: (key: TableRowKey, row: TableRowData) => void;
+  onRowAction?: (key: Key, row: TableRowData) => void;
   slotEmpty?: React.ReactNode;
-  viewMoreConfig?: {
-    initialNumRowsToShow: number;
-    numRowsPerPage?: number;
-  };
-  // collection: TableCollection<string>;
-  // children: React.ReactNode;
+  initialPageSize?: PageSize;
+  paginationBehavior?: 'paginate' | 'showAll';
 };
 
-type StyleProps = {
+export type TableStyleProps = {
   hideHeader?: boolean;
-  withGradientCardRows?: boolean;
+  withGradientCardRows?: boolean; // TODO: CT-662
   withFocusStickyRows?: boolean;
   withOuterBorder?: boolean;
   withInnerBorders?: boolean;
@@ -117,7 +126,10 @@ type StyleProps = {
 
 export type TableConfig<TableRowData> = TableItem<TableRowData>[];
 
-export const Table = <TableRowData extends object, TableRowKey extends Key>({
+export type AllTableProps<TableRowData extends BaseTableRowData | CustomRowConfig> =
+  TableElementProps<TableRowData> & TableStyleProps & { style?: { [customProp: string]: number } };
+
+export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
   label = '',
   columns,
   data = [],
@@ -128,11 +140,8 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   selectionMode = 'single',
   selectionBehavior = 'toggle',
   slotEmpty,
-  viewMoreConfig,
-  // shouldRowRender,
-
-  // collection,
-  // children,
+  initialPageSize = 10,
+  paginationBehavior = 'paginate',
   hideHeader = false,
   withGradientCardRows = false,
   withFocusStickyRows = false,
@@ -142,20 +151,13 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   withScrollSnapRows = false,
   className,
   style,
-}: ElementProps<TableRowData, TableRowKey> & StyleProps) => {
-  const [selectedKeys, setSelectedKeys] = useState(new Set<TableRowKey>());
-  const [numRowsToShow, setNumRowsToShow] = useState(viewMoreConfig?.initialNumRowsToShow);
-  const enableViewMore = viewMoreConfig !== undefined;
+}: AllTableProps<TableRowData>) => {
+  const [selectedKeys, setSelectedKeys] = useState(new Set<Key>());
 
-  const onViewMoreClick = () => {
-    if (!viewMoreConfig) return;
-    const { numRowsPerPage } = viewMoreConfig;
-    if (numRowsPerPage) {
-      setNumRowsToShow((prev) => (prev ?? 0) + numRowsPerPage);
-    } else {
-      setNumRowsToShow(data.length);
-    }
-  };
+  const { currentPage, pageSize, pages, setCurrentPage, setPageSize } = useTablePagination({
+    initialPageSize,
+    totalRows: data.length,
+  });
 
   const currentBreakpoints = useBreakpoints();
   const shownColumns = columns.filter(
@@ -165,22 +167,22 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   const collator = useCollator();
 
   const sortFn = (
-    a: TableRowData,
-    b: TableRowData,
+    a: TableRowData | CustomRowConfig,
+    b: TableRowData | CustomRowConfig,
     sortColumn?: Key,
     sortDirection?: SortDirection
   ) => {
     if (!sortColumn) return 0;
 
-    const column = columns.find((column) => column.columnKey === sortColumn);
-    const first = column?.getCellValue(a);
-    const second = column?.getCellValue(b);
+    const column = columns.find((c) => c.columnKey === sortColumn);
+    const first = isCustomRow(a) ? 0 : column?.getCellValue(a);
+    const second = isCustomRow(b) ? 0 : column?.getCellValue(b);
 
     return (
       // Compare the items by the sorted column
-      (isNaN(first as number)
+      (Number.isNaN(Number(first))
         ? // String
-          collator.compare(first as string, second as string)
+          collator.compare(String(first), String(second))
         : // Number
           MustBigNumber(first).comparedTo(MustBigNumber(second))) *
       // Flip the direction if descending order is specified.
@@ -188,8 +190,15 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
     );
   };
 
-  const list = useAsyncList<TableRowData>({
-    getKey: getRowKey,
+  const internalGetRowKey = useCallback(
+    (row: TableRowData | CustomRowConfig) => {
+      return isCustomRow(row) ? row.key : getRowKey(row);
+    },
+    [getRowKey]
+  );
+
+  const list = useAsyncList<TableRowData | CustomRowConfig>({
+    getKey: internalGetRowKey,
     load: async ({ sortDescriptor }) => ({
       items: sortDescriptor?.column
         ? data.sort((a, b) => sortFn(a, b, sortDescriptor?.column, sortDescriptor?.direction))
@@ -203,12 +212,15 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
     }),
   });
 
+  // FIX: refactor table so we don't have to manually reload
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => list.reload(), [data]);
 
   const isEmpty = data.length === 0;
+  const shouldPaginate = paginationBehavior === 'paginate' && data.length > Math.min(...PAGE_SIZES);
 
   return (
-    <Styled.TableWrapper
+    <$TableWrapper
       className={className}
       style={style}
       isEmpty={isEmpty}
@@ -227,13 +239,12 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
           getRowAttributes={getRowAttributes}
           onRowAction={
             onRowAction &&
-            ((key: TableRowKey) => onRowAction(key, data.find((row) => getRowKey(row) === key)!))
+            ((key: Key) =>
+              onRowAction(
+                key,
+                data.filter(isTableRowData).find((row) => internalGetRowKey(row) === key)!
+              ))
           }
-          numColumns={shownColumns.length}
-          onViewMoreClick={
-            enableViewMore && numRowsToShow! < data.length ? onViewMoreClick : undefined
-          }
-          // shouldRowRender={shouldRowRender}
           hideHeader={hideHeader}
           withGradientCardRows={withGradientCardRows}
           withFocusStickyRows={withFocusStickyRows}
@@ -241,6 +252,19 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
           withInnerBorders={withInnerBorders}
           withScrollSnapColumns={withScrollSnapColumns}
           withScrollSnapRows={withScrollSnapRows}
+          numColumns={shownColumns.length}
+          paginationRow={
+            shouldPaginate ? (
+              <TablePaginationRow
+                currentPage={currentPage}
+                pageSize={pageSize}
+                pages={pages}
+                totalRows={data.length}
+                setCurrentPage={setCurrentPage}
+                setPageSize={setPageSize}
+              />
+            ) : undefined
+          }
         >
           <TableHeader columns={shownColumns}>
             {(column) => (
@@ -257,12 +281,19 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
             )}
           </TableHeader>
 
-          <TableBody items={enableViewMore ? list.items.slice(0, numRowsToShow) : list.items}>
+          <TableBody
+            items={
+              shouldPaginate && list.items.length > pageSize
+                ? list.items.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+                : list.items
+            }
+          >
             {(item) => (
-              <Row key={getRowKey(item)}>
+              <Row key={internalGetRowKey(item)}>
                 {(columnKey) => (
-                  <Cell key={`${getRowKey(item)}-${columnKey}`}>
-                    {columns.find((column) => column.columnKey === columnKey)?.renderCell?.(item)}
+                  <Cell key={`${internalGetRowKey(item)}-${columnKey}`}>
+                    {isTableRowData(item) &&
+                      columns.find((column) => column.columnKey === columnKey)?.renderCell?.(item)}
                   </Cell>
                 )}
               </Row>
@@ -270,29 +301,30 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
           </TableBody>
         </TableRoot>
       ) : (
-        <Styled.Empty withOuterBorder={withOuterBorder}>{slotEmpty}</Styled.Empty>
+        <$Empty withOuterBorder={withOuterBorder}>{slotEmpty}</$Empty>
       )}
-    </Styled.TableWrapper>
+    </$TableWrapper>
   );
 };
 
-const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey extends Key>(props: {
+// TODO: remove useless extends
+const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(props: {
   'aria-label'?: string;
   sortDescriptor?: SortDescriptor;
   onSortChange?: (descriptor: SortDescriptor) => void;
   selectionMode: 'multiple' | 'single';
   selectionBehavior: 'replace' | 'toggle';
-  selectedKeys: Set<TableRowKey>;
-  setSelectedKeys: (selectedKeys: Set<TableRowKey>) => void;
+  selectedKeys: Set<Key>;
+  setSelectedKeys: (selectedKeys: Set<Key>) => void;
   getRowAttributes?: (
     rowData: TableRowData,
     rowIndex?: number
   ) => Record<string, string | number | Record<string, string | number>>;
-  onRowAction?: (key: TableRowKey) => void;
-  // shouldRowRender?: (prevRowData: object, currentRowData: object) => boolean;
+  onRowAction?: (key: Key) => void;
   children: CollectionChildren<TableRowData>;
+
   numColumns: number;
-  onViewMoreClick?: () => void;
+  paginationRow?: React.ReactNode;
 
   hideHeader?: boolean;
   withGradientCardRows?: boolean;
@@ -302,7 +334,22 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
   withScrollSnapColumns?: boolean;
   withScrollSnapRows?: boolean;
 }) => {
-  const { selectionMode, selectionBehavior, numColumns, onViewMoreClick } = props;
+  const {
+    'aria-label': ariaLabel,
+    selectionMode,
+    selectionBehavior,
+    getRowAttributes,
+    onRowAction,
+    numColumns,
+    paginationRow,
+    hideHeader,
+    withGradientCardRows,
+    withFocusStickyRows,
+    withOuterBorder,
+    withInnerBorders,
+    withScrollSnapColumns,
+    withScrollSnapRows,
+  } = props;
 
   const state = useTableState<TableRowData>({
     ...props,
@@ -311,47 +358,44 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
 
   const ref = React.useRef<HTMLTableElement>(null);
   const { collection } = state;
+
   const { gridProps } = useTable(
     {
-      'aria-label': props['aria-label'],
-      onRowAction: props.onRowAction as (key: Key) => void,
+      'aria-label': ariaLabel,
+      onRowAction,
     },
     state,
     ref
   );
 
   return (
-    <Styled.Table
+    <$Table
       ref={ref}
       {...gridProps}
-      hideHeader={props.hideHeader}
-      withGradientCardRows={props.withGradientCardRows}
-      withOuterBorder={props.withOuterBorder}
-      withInnerBorders={props.withInnerBorders}
+      hideHeader={hideHeader}
+      withGradientCardRows={withGradientCardRows}
+      withOuterBorder={withOuterBorder}
+      withInnerBorders={withInnerBorders}
     >
       <TableHeadRowGroup
-        hidden={props.hideHeader}
-        withGradientCardRows={props.withGradientCardRows}
-        withInnerBorders={props.withInnerBorders}
+        hidden={hideHeader}
+        withGradientCardRows={withGradientCardRows}
+        withInnerBorders={withInnerBorders}
       >
         {collection.headerRows.map((headerRow) => (
           <TableHeaderRow
             key={headerRow.key}
             item={headerRow}
             state={state}
-            withScrollSnapRows={props.withScrollSnapRows}
+            withScrollSnapRows={withScrollSnapRows}
           >
-            {/* {Array.from(collection.getChildren!(headerRow.key), (column) => */}
             {[...headerRow.childNodes].map(
               (column) => (
-                // column.props.isSelectionCell ? (
-                //   <TableSelectAllCell key={column.key} column={column} state={state} />
-                // ) : (
                 <TableColumnHeader
                   key={column.key}
                   column={column}
                   state={state}
-                  withScrollSnapColumns={props.withScrollSnapColumns}
+                  withScrollSnapColumns={withScrollSnapColumns}
                 />
               )
               // )
@@ -361,20 +405,19 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
       </TableHeadRowGroup>
 
       <TableBodyRowGroup
-        withGradientCardRows={props.withGradientCardRows}
-        withInnerBorders={props.withInnerBorders}
-        withOuterBorder={props.withOuterBorder}
+        withGradientCardRows={withGradientCardRows}
+        withInnerBorders={withInnerBorders}
+        withOuterBorder={withOuterBorder}
       >
-        {/* {Array.from(collection.getChildren!(collection.body.key), (row) => */}
         {[...collection.body.childNodes].map((row) =>
           (row.value as CustomRowConfig)?.slotCustomRow ? (
             (row.value as CustomRowConfig).slotCustomRow({
               item: row,
               state,
-              ...props.getRowAttributes?.(row.value!),
-              withGradientCardRows: props.withGradientCardRows,
-              withFocusStickyRows: props.withFocusStickyRows,
-              withScrollSnapRows: props.withScrollSnapRows,
+              ...getRowAttributes?.(row.value!),
+              withGradientCardRows,
+              withFocusStickyRows,
+              withScrollSnapRows,
               children: null,
             })
           ) : (
@@ -382,18 +425,14 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
               key={row.key}
               item={row}
               state={state}
-              // shouldRowRender={props.shouldRowRender}
-              {...props.getRowAttributes?.(row.value)}
-              withGradientCardRows={props.withGradientCardRows}
-              withFocusStickyRows={props.withFocusStickyRows}
-              withScrollSnapRows={props.withScrollSnapRows}
+              hasRowAction={!!onRowAction}
+              {...getRowAttributes?.(row.value!)}
+              withGradientCardRows={withGradientCardRows}
+              withFocusStickyRows={withFocusStickyRows}
+              withScrollSnapRows={withScrollSnapRows}
             >
-              {/* {Array.from(collection.getChildren!(row.key), (cell) => */}
               {[...row.childNodes].map(
                 (cell) => (
-                  // cell.props.isSelectionCell ? (
-                  //   <TableCheckboxCell key={cell.key} cell={cell} state={state} />
-                  // ) : (
                   <TableCell
                     key={cell.key}
                     cell={cell}
@@ -409,11 +448,21 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
             </TableRow>
           )
         )}
-        {onViewMoreClick ? (
-          <ViewMoreRow colSpan={numColumns} onClick={onViewMoreClick} />
-        ) : undefined}
       </TableBodyRowGroup>
-    </Styled.Table>
+      {paginationRow && (
+        <$Tfoot>
+          <$PaginationTr key="pagination">
+            <td
+              colSpan={numColumns}
+              onMouseDown={(e) => e.preventDefault()}
+              onPointerDown={(e) => e.preventDefault()}
+            >
+              {paginationRow}
+            </td>
+          </$PaginationTr>
+        </$Tfoot>
+      )}
+    </$Table>
   );
 };
 
@@ -430,14 +479,14 @@ const TableHeadRowGroup = ({
   const { rowGroupProps } = useTableRowGroup();
 
   return (
-    <Styled.Thead
+    <$Thead
       {...rowGroupProps}
       hidden={hidden}
       withGradientCardRows={withGradientCardRows}
       withInnerBorders={withInnerBorders}
     >
       {children}
-    </Styled.Thead>
+    </$Thead>
   );
 };
 
@@ -446,22 +495,22 @@ const TableBodyRowGroup = ({
   withGradientCardRows,
   withInnerBorders,
   withOuterBorder,
-}: { children: React.ReactNode } & StyleProps) => {
+}: { children: React.ReactNode } & TableStyleProps) => {
   const { rowGroupProps } = useTableRowGroup();
 
   return (
-    <Styled.Tbody
+    <$Tbody
       {...rowGroupProps}
       withGradientCardRows={withGradientCardRows}
       withInnerBorders={withInnerBorders}
       withOuterBorder={withOuterBorder}
     >
       {children}
-    </Styled.Tbody>
+    </$Tbody>
   );
 };
 
-const TableHeaderRow = <TableRowData extends object>({
+const TableHeaderRow = <TableRowData extends BaseTableRowData>({
   item,
   state,
   children,
@@ -476,13 +525,13 @@ const TableHeaderRow = <TableRowData extends object>({
   const { rowProps } = useTableHeaderRow({ node: item }, state, ref);
 
   return (
-    <Styled.Tr ref={ref} {...rowProps} withScrollSnapRows={withScrollSnapRows}>
+    <$Tr ref={ref} {...rowProps} withScrollSnapRows={withScrollSnapRows}>
       {children}
-    </Styled.Tr>
+    </$Tr>
   );
 };
 
-const TableColumnHeader = <TableRowData extends object>({
+const TableColumnHeader = <TableRowData extends BaseTableRowData>({
   column,
   state,
   withScrollSnapColumns,
@@ -493,56 +542,40 @@ const TableColumnHeader = <TableRowData extends object>({
 }) => {
   const ref = React.useRef<HTMLTableCellElement>(null);
   const { columnHeaderProps } = useTableColumnHeader({ node: column }, state, ref);
-  const { isFocusVisible, focusProps } = useFocusRing();
+  const { focusProps } = useFocusRing();
 
   return (
-    <Styled.Th
+    <$Th
       {...mergeProps(columnHeaderProps, focusProps)}
-      colSpan={column.props.colspan}
       // data-focused={isFocusVisible || undefined}
       style={{ width: column.props?.width }}
       ref={ref}
       withScrollSnapColumns={withScrollSnapColumns}
     >
-      <Styled.Row>
+      <$Row>
         {column.rendered}
         {column.props.allowsSorting && (
-          <Styled.SortArrow
+          <$SortArrow
             aria-hidden="true"
             sortDirection={
-              state.sortDescriptor?.column === column.key && state.sortDescriptor?.direction
+              state.sortDescriptor?.column === column.key
+                ? state.sortDescriptor?.direction
+                : undefined
             }
           >
             <Icon iconName={IconName.Triangle} aria-hidden="true" />
-          </Styled.SortArrow>
+          </$SortArrow>
         )}
-      </Styled.Row>
-    </Styled.Th>
+      </$Row>
+    </$Th>
   );
 };
 
-export const ViewMoreRow = ({ colSpan, onClick }: { colSpan: number; onClick: () => void }) => {
-  const stringGetter = useStringGetter();
-  return (
-    <Styled.ViewMoreTr key="viewmore">
-      <Styled.Td
-        colSpan={colSpan}
-        onMouseDown={(e: MouseEvent) => e.preventDefault()}
-        onPointerDown={(e: MouseEvent) => e.preventDefault()}
-      >
-        <Styled.ViewMoreButton slotRight={<CaretIcon />} onClick={onClick}>
-          {stringGetter({ key: STRING_KEYS.VIEW_MORE })}
-        </Styled.ViewMoreButton>
-      </Styled.Td>
-    </Styled.ViewMoreTr>
-  );
-};
-
-export const TableRow = <TableRowData extends object>({
+export const TableRow = <TableRowData extends BaseTableRowData>({
   item,
   children,
   state,
-  // shouldRowRender,
+  hasRowAction,
   withGradientCardRows,
   withFocusStickyRows,
   withScrollSnapRows,
@@ -551,7 +584,7 @@ export const TableRow = <TableRowData extends object>({
   item: TableCollection<TableRowData>['rows'][number];
   children: React.ReactNode;
   state: TableState<TableRowData>;
-  // shouldRowRender?: (prevRowData: TableRowData, currentRowData: TableRowData) => boolean;
+  hasRowAction?: boolean;
   withGradientCardRows?: boolean;
   withFocusStickyRows?: boolean;
   withScrollSnapRows?: boolean;
@@ -559,7 +592,7 @@ export const TableRow = <TableRowData extends object>({
   const ref = React.useRef<HTMLTableRowElement>(null);
   const selectionManager = state.selectionManager;
   const isSelected = selectionManager.isSelected(item.key);
-  const isClickable = selectionManager.selectionBehavior === 'toggle';
+  const isClickable = selectionManager.selectionBehavior === 'toggle' && hasRowAction;
 
   const { rowProps, isPressed } = useTableRow(
     {
@@ -569,32 +602,25 @@ export const TableRow = <TableRowData extends object>({
     ref
   );
 
-  const { isFocusVisible, focusProps } = useFocusRing();
+  const { focusProps } = useFocusRing();
 
   return (
-    <Styled.Tr
+    <$Tr
       ref={ref}
       data-selected={isSelected}
-      // data-focused={isFocusVisible || undefined}
       $data-isPressed={isPressed}
       {...mergeProps(rowProps, focusProps)}
       {...attrs}
-      withGradientCardRows={withGradientCardRows}
       withFocusStickyRows={withFocusStickyRows}
       withScrollSnapRows={withScrollSnapRows}
       isClickable={isClickable}
     >
       {children}
-    </Styled.Tr>
+    </$Tr>
   );
 };
 
-// const TableRowMemo = React.memo(
-//   TableRow,
-//   (a, b) => !!b.shouldRowRender?.(a.item.value, b.item.value)
-// );
-
-const TableCell = <TableRowData extends object>({
+const TableCell = <TableRowData extends BaseTableRowData>({
   cell,
   state,
   isActionable,
@@ -605,10 +631,10 @@ const TableCell = <TableRowData extends object>({
 }) => {
   const ref = React.useRef<HTMLTableCellElement>(null);
   const { gridCellProps } = useTableCell({ node: cell }, state, ref);
-  const { isFocusVisible, focusProps } = useFocusRing();
+  const { focusProps } = useFocusRing();
 
   return (
-    <Styled.Td
+    <$Td
       {...mergeProps(
         isActionable
           ? {
@@ -625,55 +651,18 @@ const TableCell = <TableRowData extends object>({
       {/* <Styled.Row> */}
       {cell.rendered}
       {/* </Styled.Row> */}
-    </Styled.Td>
+    </$Td>
   );
 };
 
-// const TableSelectAllCell = ({ column, state }) => {
-//   const ref = React.useRef<HTMLTableHeaderCellElement>(null);
-//   const isSingleSelectionMode = state.selectionManager.selectionMode === 'single';
-//   const { columnHeaderProps } = useTableColumnHeader({ node: column }, state, ref);
-//   const { checkboxProps } = useTableSelectAllCheckbox(state);
-
-//   return (
-//     <Styled.Th
-//       {...columnHeaderProps}
-//       ref={ref}
-//     >
-//       {state.selectionManager.selectionMode === 'single' ? (
-//         <VisuallyHidden>{inputProps['aria-label']}</VisuallyHidden>
-//       ) : (
-//         <Checkbox {...checkboxProps} />
-//       )}
-//     </Styled.Th>
-//   );
-// };
-
-// const TableCheckboxCell = ({ cell, state }: { cell; state }) => {
-//   const ref = React.useRef<HTMLTableCellElement>(null);
-//   const { gridCellProps } = useTableCell({ node: cell }, state, ref);
-//   const { checkboxProps } = useTableSelectionCheckbox({ key: cell.parentKey }, state);
-
-//   return (
-//     <Styled.Td
-//       {...gridCellProps}
-//       ref={ref}
-//     >
-//       <Checkbox {...checkboxProps} />
-//     </Styled.Td>
-//   );
-// };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TableWrapper = styled.div<{
+const $TableWrapper = styled.div<{
   isEmpty: boolean;
   withGradientCardRows?: boolean;
   withOuterBorder: boolean;
 }>`
   // Params
-  --tableHeader-textColor: var(--color-text-0, inherit);
-  --tableHeader-backgroundColor: inherit;
+  --tableStickyRow-textColor: var(--color-text-0, inherit);
+  --tableStickyRow-backgroundColor: inherit;
   --table-header-height: 2rem;
 
   --tableRow-hover-backgroundColor: var(--color-layer-3);
@@ -683,8 +672,6 @@ Styled.TableWrapper = styled.div<{
   --table-firstColumn-cell-align: start; // start | center | end | var(--table-cell-align)
   --table-lastColumn-cell-align: end; // start | center | end | var(--table-cell-align)
   --tableCell-padding: 0 1rem;
-
-  --tableViewMore-borderColor: inherit;
 
   // Rules
 
@@ -705,7 +692,7 @@ Styled.TableWrapper = styled.div<{
     `}
 `;
 
-Styled.Empty = styled.div<{ withOuterBorder: boolean }>`
+const $Empty = styled.div<{ withOuterBorder: boolean }>`
   ${layoutMixins.column}
   height: 100%;
 
@@ -718,18 +705,22 @@ Styled.Empty = styled.div<{ withOuterBorder: boolean }>`
   font: var(--font-base-book);
 `;
 
-Styled.Table = styled.table<{
+type StyledTableStyleProps = {
   hideHeader?: boolean;
-  withGradientCardRows: boolean;
-  withOuterBorder: boolean;
-  withInnerBorders: boolean;
-  withSolidHeader: boolean;
-}>`
+  withGradientCardRows?: boolean;
+  withOuterBorder?: boolean;
+  withInnerBorders?: boolean;
+  withSolidHeader?: boolean;
+};
+
+const $Table = styled.table<StyledTableStyleProps>`
   align-self: start;
 
   ${layoutMixins.stickyArea1}
   --stickyArea1-background: var(--color-layer-2);
   --stickyArea1-topHeight: var(--table-header-height);
+  --stickyArea1-bottomHeight: var(--table-header-height);
+
   ${({ hideHeader }) =>
     hideHeader &&
     css`
@@ -775,10 +766,10 @@ Styled.Table = styled.table<{
   }
 `;
 
-Styled.Tr = styled.tr<{
+const $Tr = styled.tr<{
   isClickable?: boolean;
   withFocusStickyRows?: boolean;
-  withScrollSnapRows: boolean;
+  withScrollSnapRows?: boolean;
 }>`
   /* Computed */
   --tableRow-currentBackgroundColor: var(--tableRow-backgroundColor);
@@ -816,7 +807,7 @@ Styled.Tr = styled.tr<{
     `}
 `;
 
-Styled.Th = styled.th<{ withScrollSnapColumns: boolean }>`
+const $Th = styled.th<{ withScrollSnapColumns?: boolean }>`
   // Computed
   --table-cell-currentAlign: var(--table-cell-align);
 
@@ -838,7 +829,7 @@ Styled.Th = styled.th<{ withScrollSnapColumns: boolean }>`
   text-align: var(--table-cell-currentAlign);
 `;
 
-Styled.Td = styled.td`
+const $Td = styled.td`
   // Computed
   --table-cell-currentAlign: var(--table-cell-align);
 
@@ -859,7 +850,7 @@ Styled.Td = styled.td`
   }
 `;
 
-Styled.SortArrow = styled.span<{ sortDirection: 'ascending' | 'descending' }>`
+const $SortArrow = styled.span<{ sortDirection?: 'ascending' | 'descending' }>`
   float: right;
   margin-left: auto;
 
@@ -868,16 +859,16 @@ Styled.SortArrow = styled.span<{ sortDirection: 'ascending' | 'descending' }>`
 
   font-size: 0.375em;
 
-  ${Styled.Th}[aria-sort="none"] & {
+  ${$Th}[aria-sort="none"] & {
     visibility: hidden;
   }
 
-  ${Styled.Th}[aria-sort="ascending"] & {
+  ${$Th}[aria-sort="ascending"] & {
     transform: scaleY(-1);
   }
 `;
 
-Styled.Thead = styled.thead<StyleProps>`
+const $Thead = styled.thead<TableStyleProps>`
   ${layoutMixins.stickyHeader}
   scroll-snap-align: none;
   font: var(--font-mini-book);
@@ -886,8 +877,8 @@ Styled.Thead = styled.thead<StyleProps>`
     height: var(--stickyArea-topHeight);
   }
 
-  color: var(--tableHeader-textColor);
-  background-color: var(--tableHeader-backgroundColor);
+  color: var(--tableStickyRow-textColor);
+  background-color: var(--tableStickyRow-backgroundColor);
 
   ${({ withInnerBorders, withGradientCardRows }) =>
     withInnerBorders &&
@@ -897,13 +888,25 @@ Styled.Thead = styled.thead<StyleProps>`
     `}
 `;
 
-Styled.Tbody = styled.tbody<StyleProps>`
+const $Tfoot = styled.tfoot`
+  ${layoutMixins.stickyFooter}
+  scroll-snap-align: none;
+  font: var(--font-mini-book);
+
+  > * {
+    height: var(--stickyArea-bottomHeight);
+  }
+
+  color: var(--tableStickyRow-textColor);
+  background-color: var(--tableStickyRow-backgroundColor);
+`;
+
+const $Tbody = styled.tbody<TableStyleProps>`
   ${layoutMixins.stickyArea2}
   font: var(--font-small-book);
 
   // If <table> height is fixed with not enough rows to overflow, vertically center the rows
-  &:before,
-  &:after {
+  &:before {
     content: '';
     display: table-row;
   }
@@ -981,23 +984,11 @@ Styled.Tbody = styled.tbody<StyleProps>`
     `}
 `;
 
-Styled.Row = styled.div`
+const $Row = styled.div`
   ${layoutMixins.inlineRow}
   padding: var(--tableCell-padding);
 `;
 
-Styled.ViewMoreButton = styled(Button)`
-  --button-backgroundColor: var(--color-layer-2);
-  --button-textColor: var(--color-text-1);
-
-  width: 100%;
-
-  svg {
-    width: 0.675rem;
-    margin-left: 0.5ch;
-  }
-`;
-
-Styled.ViewMoreTr = styled(Styled.Tr)`
-  --border-color: var(--tableViewMore-borderColor);
+const $PaginationTr = styled.tr`
+  box-shadow: 0 calc(-1 * var(--border-width)) 0 0 var(--border-color);
 `;

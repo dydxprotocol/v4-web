@@ -3,8 +3,11 @@ import { createGlobalStyle } from 'styled-components';
 export const GlobalStyle = createGlobalStyle`
   :root {
     --color-white: ${({ theme }) => theme.white};
+    --color-black: ${({ theme }) => theme.black};
     --color-green: ${({ theme }) => theme.green};
     --color-red: ${({ theme }) => theme.red};
+
+    --color-white-faded: ${({ theme }) => theme.whiteFaded};
 
     --color-layer-0: ${({ theme }) => theme.layer0};
     --color-layer-1: ${({ theme }) => theme.layer1};

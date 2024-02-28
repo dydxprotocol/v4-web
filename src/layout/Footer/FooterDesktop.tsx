@@ -1,19 +1,23 @@
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { AbacusApiStatus } from '@/constants/abacus';
 import { ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 
-import { useApiState, useStringGetter, useURLConfigs } from '@/hooks';
-import { ChatIcon, LinkOutIcon } from '@/icons';
+import { useApiState } from '@/hooks/useApiState';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
+import { ChatIcon, LinkOutIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
+
+import { isPresent } from '@/lib/typeUtils';
 
 enum FooterItems {
   ChainHeight,
@@ -30,85 +34,90 @@ export const FooterDesktop = () => {
   const { height, indexerHeight, status, statusErrorMessage } = useApiState();
   const { statusPage } = useURLConfigs();
 
-  const { exchangeStatus, label } =
-    !status || status === AbacusApiStatus.NORMAL
-      ? {
-          exchangeStatus: ExchangeStatus.Operational,
-          label: stringGetter({ key: STRING_KEYS.OPERATIONAL }),
-        }
-      : {
-          exchangeStatus: ExchangeStatus.Degraded,
-          label: stringGetter({ key: STRING_KEYS.DEGRADED }),
-        };
+  const isStatusLoading = !status && !statusErrorMessage;
+
+  const { exchangeStatus, label } = isStatusLoading
+    ? {
+        exchangeStatus: undefined,
+        label: stringGetter({ key: STRING_KEYS.CONNECTING }),
+      }
+    : status === AbacusApiStatus.NORMAL
+    ? {
+        exchangeStatus: ExchangeStatus.Operational,
+        label: stringGetter({ key: STRING_KEYS.OPERATIONAL }),
+      }
+    : {
+        exchangeStatus: ExchangeStatus.Degraded,
+        label: stringGetter({ key: STRING_KEYS.DEGRADED }),
+      };
 
   return (
-    <Styled.Footer>
-      <Styled.Row>
+    <$Footer>
+      <$Row>
         <WithTooltip
           slotTooltip={
             statusErrorMessage && (
               <dl>
-                <dd>{statusErrorMessage}</dd>
+                <dd>{statusErrorMessage.body}</dd>
               </dl>
             )
           }
         >
-          <Styled.FooterButton
+          <$FooterButton
             type={statusPage ? ButtonType.Link : ButtonType.Button}
-            slotLeft={<Styled.StatusDot exchangeStatus={exchangeStatus} />}
+            slotLeft={<$StatusDot exchangeStatus={exchangeStatus} />}
             slotRight={statusPage && <LinkOutIcon />}
             size={ButtonSize.XSmall}
             state={{ isDisabled: !statusPage }}
             href={statusPage}
           >
             {label}
-          </Styled.FooterButton>
+          </$FooterButton>
         </WithTooltip>
 
         {globalThis?.Intercom && (
-          <Styled.FooterButton
+          <$FooterButton
             slotLeft={<ChatIcon />}
             size={ButtonSize.XSmall}
             onClick={() => globalThis.Intercom('show')}
           >
             {stringGetter({ key: STRING_KEYS.HELP_AND_SUPPORT })}
-          </Styled.FooterButton>
+          </$FooterButton>
         )}
-      </Styled.Row>
+      </$Row>
 
       {isDev && (
-        <Styled.Details
+        <$Details
           withSeparators
           items={[
             {
-              key: FooterItems.ChainHeight,
+              key: FooterItems.ChainHeight.toString(),
               label: 'Block Height',
               value: <Output useGrouping type={OutputType.Number} value={height} />,
             },
-            height !== indexerHeight && {
-              key: FooterItems.IndexerHeight,
-              label: 'Indexer Block Height',
-              value: (
-                <Styled.WarningOutput useGrouping type={OutputType.Number} value={indexerHeight} />
-              ),
-            },
-          ].filter(Boolean)}
+            height !== indexerHeight
+              ? {
+                  key: FooterItems.IndexerHeight.toString(),
+                  label: 'Indexer Block Height',
+                  value: (
+                    <$WarningOutput useGrouping type={OutputType.Number} value={indexerHeight} />
+                  ),
+                }
+              : undefined,
+          ].filter(isPresent)}
           layout="row"
         />
       )}
-    </Styled.Footer>
+    </$Footer>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Footer = styled.footer`
+const $Footer = styled.footer`
   ${layoutMixins.stickyFooter}
   ${layoutMixins.spacedRow}
   grid-area: Footer;
 `;
 
-Styled.Row = styled.div`
+const $Row = styled.div`
   ${layoutMixins.row}
   ${layoutMixins.spacedRow}
   width: var(--sidebar-width);
@@ -117,20 +126,22 @@ Styled.Row = styled.div`
   border-right: 1px solid var(--color-border);
 `;
 
-Styled.StatusDot = styled.div<{ exchangeStatus: ExchangeStatus }>`
+const $StatusDot = styled.div<{ exchangeStatus?: ExchangeStatus }>`
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
   margin-right: 0.25rem;
+  background-color: var(--color-text-0);
 
   background-color: ${({ exchangeStatus }) =>
-    ({
+    exchangeStatus &&
+    {
       [ExchangeStatus.Degraded]: css`var(--color-warning)`,
       [ExchangeStatus.Operational]: css`var(--color-success)`,
-    }[exchangeStatus])};
+    }[exchangeStatus]};
 `;
 
-Styled.FooterButton = styled(Button)`
+const $FooterButton = styled(Button)`
   --button-height: 1.5rem;
   --button-radius: 0.25rem;
   --button-backgroundColor: transparent;
@@ -147,11 +158,11 @@ Styled.FooterButton = styled(Button)`
   }
 `;
 
-Styled.WarningOutput = styled(Output)`
+const $WarningOutput = styled(Output)`
   color: var(--color-warning);
 `;
 
-Styled.Details = styled(Details)`
+const $Details = styled(Details)`
   ${layoutMixins.scrollArea}
   font: var(--font-tiny-book);
 `;

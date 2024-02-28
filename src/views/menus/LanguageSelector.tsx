@@ -1,13 +1,13 @@
 import { useDispatch, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
-import { SupportedLocales, SUPPORTED_LOCALE_STRING_LABELS } from '@/constants/localization';
+import { SUPPORTED_LOCALE_STRING_LABELS, SupportedLocales } from '@/constants/localization';
+
 import { headerMixins } from '@/styles/headerMixins';
 
 import { DropdownSelectMenu } from '@/components/DropdownSelectMenu';
 
 import { setSelectedLocale } from '@/state/localization';
-
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 type StyleProps = {
@@ -25,7 +25,7 @@ export const LanguageSelector = ({ align, sideOffset }: StyleProps) => {
   const selectedLocale = useSelector(getSelectedLocale);
 
   return (
-    <Styled.DropdownSelectMenu
+    <$DropdownSelectMenu
       items={localizationItems}
       value={selectedLocale}
       onValueChange={(locale: SupportedLocales) => dispatch(setSelectedLocale({ locale }))}
@@ -34,9 +34,6 @@ export const LanguageSelector = ({ align, sideOffset }: StyleProps) => {
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.DropdownSelectMenu = styled(DropdownSelectMenu)`
+const $DropdownSelectMenu = styled(DropdownSelectMenu)`
   ${headerMixins.dropdownTrigger}
-`;
+` as typeof DropdownSelectMenu;

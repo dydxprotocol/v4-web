@@ -1,5 +1,5 @@
-import { matchPath, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { matchPath, useLocation } from 'react-router-dom';
 
 import { TRADE_ROUTE } from '@/constants/routes';
 

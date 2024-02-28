@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
@@ -8,26 +9,26 @@ import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { TradeSizeInput } from '@/constants/trade';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
-import { layoutMixins } from '@/styles/layoutMixins';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { FormInput } from '@/components/FormInput';
+import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { Tag } from '@/components/Tag';
-import { WithTooltip } from '@/components/WithTooltip';
-import { Icon, IconName } from '@/components/Icon';
 import { ToggleButton } from '@/components/ToggleButton';
+import { WithTooltip } from '@/components/WithTooltip';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
-
 import {
-  getInputTradeSizeData,
   getInputTradeOptions,
+  getInputTradeSizeData,
   getTradeFormInputs,
 } from '@/state/inputsSelectors';
-
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -103,7 +104,7 @@ export const TradeSizeInputs = () => {
   };
 
   const inputToggleButton = (
-    <Styled.ToggleButton
+    <$ToggleButton
       isPressed={showUSDCInputOnTablet}
       onPressedChange={setShowUSDCInputOnTablet}
       size={ButtonSize.XSmall}
@@ -111,7 +112,7 @@ export const TradeSizeInputs = () => {
     >
       <Icon iconName={IconName.Trade} />
       {showUSDCInputOnTablet ? 'USD' : id}
-    </Styled.ToggleButton>
+    </$ToggleButton>
   );
 
   const sizeInput = (
@@ -139,7 +140,7 @@ export const TradeSizeInputs = () => {
       onInput={onUSDCInput}
       type={InputType.Currency}
       value={usdAmountInput || ''}
-      decimals={tickSizeDecimals || USD_DECIMALS}
+      decimals={tickSizeDecimals ?? USD_DECIMALS}
       label={
         <>
           <WithTooltip tooltip="order-amount-usd" stringParams={{ SYMBOL: id ?? '' }} side="right">
@@ -153,7 +154,7 @@ export const TradeSizeInputs = () => {
   );
 
   return (
-    <Styled.Column>
+    <$Column>
       {isTablet ? (
         showUSDCInputOnTablet ? (
           usdcInput
@@ -161,10 +162,10 @@ export const TradeSizeInputs = () => {
           sizeInput
         )
       ) : (
-        <Styled.Row>
+        <$Row>
           {sizeInput}
           {usdcInput}
-        </Styled.Row>
+        </$Row>
       )}
 
       {needsLeverage && (
@@ -175,23 +176,20 @@ export const TradeSizeInputs = () => {
           }
         />
       )}
-    </Styled.Column>
+    </$Column>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Column = styled.div`
+const $Column = styled.div`
   ${layoutMixins.flexColumn}
   gap: var(--form-input-gap);
 `;
 
-Styled.Row = styled.div`
+const $Row = styled.div`
   ${layoutMixins.gridEqualColumns}
   gap: var(--form-input-gap);
 `;
 
-Styled.ToggleButton = styled(ToggleButton)`
+const $ToggleButton = styled(ToggleButton)`
   ${formMixins.inputInnerToggleButton}
   --button-font: var(--font-tiny-book);
   --button-height: 2.25rem;

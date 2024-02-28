@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef } from 'react';
+
 import { shallowEqual, useSelector } from 'react-redux';
 
 import type { PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { SMALL_USD_DECIMALS, TOKEN_DECIMALS } from '@/constants/numbers';
-
 import {
   ORDERBOOK_ANIMATION_DURATION,
   ORDERBOOK_HEIGHT,
@@ -17,7 +17,6 @@ import { useAppThemeAndColorModeContext } from '@/hooks/useAppThemeAndColorMode'
 import { getCurrentMarketConfig, getCurrentMarketOrderbookMap } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
-
 import {
   getHistogramXValues,
   getRektFromIdx,
@@ -41,6 +40,8 @@ enum OrderbookRowAnimationType {
   NONE,
 }
 
+export type Rekt = { x1: number; x2: number; y1: number; y2: number };
+
 export const useDrawOrderbook = ({
   data,
   histogramRange,
@@ -51,7 +52,7 @@ export const useDrawOrderbook = ({
   const canvas = canvasRef.current;
   const currentOrderbookMap = useSelector(getCurrentMarketOrderbookMap, shallowEqual);
   const { stepSizeDecimals = TOKEN_DECIMALS, tickSizeDecimals = SMALL_USD_DECIMALS } =
-    useSelector(getCurrentMarketConfig, shallowEqual) || {};
+    useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
   const prevData = useRef<typeof data>(data);
   const theme = useAppThemeAndColorModeContext();
 
@@ -59,7 +60,7 @@ export const useDrawOrderbook = ({
    * Scale canvas using device pixel ratio to unblur drawn text
    * @url https://stackoverflow.com/questions/15661339/how-do-i-fix-blurry-text-in-my-html5-canvas/65124939#65124939
    * @returns adjusted canvas width/height/rowHeight used in coordinates for drawing
-   **/
+   * */
   const { canvasWidth, canvasHeight, rowHeight } = useMemo(() => {
     const ratio = window.devicePixelRatio || 1;
 
@@ -96,8 +97,8 @@ export const useDrawOrderbook = ({
     depthOrSizeValue,
     gradientMultiplier,
     histogramAccentColor,
-    histogramSide,
-    idx,
+    histogramSide: inHistogramSide,
+    rekt,
   }: {
     barType: 'depth' | 'size';
     ctx: CanvasRenderingContext2D;
@@ -105,15 +106,9 @@ export const useDrawOrderbook = ({
     gradientMultiplier: number;
     histogramAccentColor: string;
     histogramSide: 'left' | 'right';
-    idx: number;
+    rekt: Rekt;
   }) => {
-    const { x1, x2, y1, y2 } = getRektFromIdx({
-      idx,
-      rowHeight,
-      canvasWidth,
-      canvasHeight,
-      side,
-    });
+    const { x1, x2, y1, y2 } = rekt;
 
     // X values
     const maxHistogramBarWidth = x2 - x1 - (barType === 'size' ? 8 : 2);
@@ -125,7 +120,7 @@ export const useDrawOrderbook = ({
       barWidth,
       canvasWidth,
       gradientMultiplier,
-      histogramSide,
+      histogramSide: inHistogramSide,
     });
 
     // Gradient
@@ -151,7 +146,7 @@ export const useDrawOrderbook = ({
         y,
         bar.x2,
         rowHeight - 2,
-        histogramSide === 'right' ? [2, 0, 0, 2] : [0, 2, 2, 0]
+        inHistogramSide === 'right' ? [2, 0, 0, 2] : [0, 2, 2, 0]
       );
     } else {
       ctx.rect(bar.x1, y, bar.x2, rowHeight - 2);
@@ -163,25 +158,19 @@ export const useDrawOrderbook = ({
   const drawText = ({
     animationType = OrderbookRowAnimationType.NONE,
     ctx,
-    idx,
     mine,
     price,
     size,
+    rekt,
   }: {
     animationType?: OrderbookRowAnimationType;
     ctx: CanvasRenderingContext2D;
-    idx: number;
     mine?: number;
     price?: number;
     size?: number;
+    rekt: Rekt;
   }) => {
-    const { y1 } = getRektFromIdx({
-      idx,
-      rowHeight,
-      canvasWidth,
-      canvasHeight,
-      side,
-    });
+    const { y1 } = rekt;
 
     const { text: y } = getYForElements({ y: y1, rowHeight });
 
@@ -190,7 +179,7 @@ export const useDrawOrderbook = ({
 
     switch (animationType) {
       case OrderbookRowAnimationType.REMOVE: {
-        textColor = theme.textSecondary;
+        textColor = theme.textTertiary;
         break;
       }
 
@@ -251,6 +240,13 @@ export const useDrawOrderbook = ({
     if (!rowToRender) return;
     const { depth, mine, price, size } = rowToRender;
     const histogramAccentColor = side === 'bid' ? theme.positiveFaded : theme.negativeFaded;
+    const rekt = getRektFromIdx({
+      idx,
+      rowHeight,
+      canvasWidth,
+      canvasHeight,
+      side,
+    });
 
     // Depth Bar
     if (depth) {
@@ -261,7 +257,7 @@ export const useDrawOrderbook = ({
         gradientMultiplier: 1.3,
         histogramAccentColor,
         histogramSide,
-        idx,
+        rekt,
       });
     }
 
@@ -273,17 +269,17 @@ export const useDrawOrderbook = ({
       gradientMultiplier: 5,
       histogramAccentColor,
       histogramSide,
-      idx,
+      rekt,
     });
 
     // Size, Price, Mine
     drawText({
       animationType,
       ctx,
-      idx,
       mine,
       price,
       size,
+      rekt,
     });
   };
 
@@ -299,59 +295,24 @@ export const useDrawOrderbook = ({
     // Animate row removal and update
     const mapOfOrderbookPriceLevels =
       side && currentOrderbookMap?.[side === 'ask' ? 'asks' : 'bids'];
-    const empty: number[] = [];
-    const removed: number[] = [];
-    const updated: number[] = [];
 
     prevData.current.forEach((row, idx) => {
-      if (!row) {
-        empty.push(idx);
-        return;
-      }
+      if (!row) return;
+
+      let animationType = OrderbookRowAnimationType.NEW;
 
       if (mapOfOrderbookPriceLevels?.[row.price] === 0) {
-        removed.push(idx);
-        drawOrderbookRow({
-          ctx,
-          idx,
-          rowToRender: row,
-          animationType: OrderbookRowAnimationType.REMOVE,
-        });
-      } else if (mapOfOrderbookPriceLevels?.[row.price] === row?.size) {
-        drawOrderbookRow({
-          ctx,
-          idx,
-          rowToRender: data[idx],
-          animationType: OrderbookRowAnimationType.NONE,
-        });
-      } else {
-        updated.push(idx);
-        drawOrderbookRow({
-          ctx,
-          idx,
-          rowToRender: row,
-          animationType: OrderbookRowAnimationType.NEW,
-        });
+        animationType = OrderbookRowAnimationType.REMOVE;
+      } else if (mapOfOrderbookPriceLevels?.[row.price] === row.size) {
+        animationType = OrderbookRowAnimationType.NONE;
       }
+
+      drawOrderbookRow({ ctx, idx, rowToRender: row, animationType });
     });
 
     setTimeout(() => {
-      [...empty, ...removed, ...updated].forEach((idx) => {
-        const { x1, y1, x2, y2 } = getRektFromIdx({
-          idx,
-          rowHeight,
-          canvasWidth,
-          canvasHeight,
-          side,
-        });
-
-        ctx.clearRect(x1, y1, x2 - x1, y2 - y1);
-        drawOrderbookRow({
-          ctx,
-          idx,
-          rowToRender: data[idx],
-        });
-      });
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      data.forEach((row, idx) => drawOrderbookRow({ ctx, idx, rowToRender: row }));
     }, ORDERBOOK_ANIMATION_DURATION);
 
     prevData.current = data;

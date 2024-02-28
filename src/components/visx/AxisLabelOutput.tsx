@@ -1,24 +1,17 @@
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Output } from '../Output';
 
-type ElementProps = {
-  children: React.ReactNode;
-} & Parameters<typeof Output>[0];
+type ElementProps = Parameters<typeof Output>[0];
 
 type StyleProps = {
   accentColor?: string;
 };
 
-export const AxisLabelOutput = ({ children, accentColor, ...props }: ElementProps & StyleProps) => (
-  <Styled.AxisLabelOutput accentColor={accentColor} {...props}>
-    {children}
-  </Styled.AxisLabelOutput>
+export const AxisLabelOutput = ({ accentColor, ...props }: ElementProps & StyleProps) => (
+  <$AxisLabelOutput accentColor={accentColor} {...props} />
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.AxisLabelOutput = styled(Output)<{ accentColor?: string }>`
+const $AxisLabelOutput = styled(Output)<{ accentColor?: string }>`
   --accent-color: var(--color-layer-6);
 
   ${({ accentColor }) =>

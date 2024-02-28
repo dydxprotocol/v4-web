@@ -1,15 +1,18 @@
 import { useState } from 'react';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
 
-import { OpacityToken } from '@/constants/styles/base';
+import styled, { css } from 'styled-components';
+
 import { STRING_KEYS } from '@/constants/localization';
+import { OpacityToken } from '@/constants/styles/base';
+
+import { useAccounts } from '@/hooks/useAccounts';
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { useAccounts, useStringGetter } from '@/hooks';
-
+import { Checkbox } from '@/components/Checkbox';
 import { CopyButton } from '@/components/CopyButton';
 import { QrCode } from '@/components/QrCode';
-import { Checkbox } from '@/components/Checkbox';
 import { TimeoutButton } from '@/components/TimeoutButton';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithReceipt } from '@/components/WithReceipt';
@@ -34,10 +37,11 @@ export const NobleDeposit = () => {
               hasAcknowledged && hasTimedout
                 ? nobleAddress
                 : stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TO_REVEAL }),
+            allowUserSelection: true,
           },
         ]}
       >
-        <Styled.QrCode
+        <$QrCode
           hasLogo
           size={432}
           value={nobleAddress || ''}
@@ -45,9 +49,9 @@ export const NobleDeposit = () => {
         />
       </WithDetailsReceipt>
 
-      <Styled.WithReceipt
+      <$WithReceipt
         slotReceipt={
-          <Styled.CheckboxContainer>
+          <$CheckboxContainer>
             <Checkbox
               checked={hasAcknowledged}
               onCheckedChange={setHasAcknowledged}
@@ -56,7 +60,7 @@ export const NobleDeposit = () => {
                 key: STRING_KEYS.NOBLE_ACKNOWLEDGEMENT,
               })}
             />
-          </Styled.CheckboxContainer>
+          </$CheckboxContainer>
         }
       >
         <TimeoutButton
@@ -68,24 +72,21 @@ export const NobleDeposit = () => {
             </CopyButton>
           }
         />
-      </Styled.WithReceipt>
+      </$WithReceipt>
     </>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.WaitingSpan = styled.span`
+const $WaitingSpan = styled.span`
   ${layoutMixins.row}
   gap: 1rem;
   color: var(--color-text-1);
 `;
 
-Styled.WithReceipt = styled(WithReceipt)`
+const $WithReceipt = styled(WithReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
-Styled.QrCode = styled(QrCode)<{ blurred: boolean }>`
+const $QrCode = styled(QrCode)<{ blurred: boolean }>`
   border-radius: 0.5em;
 
   ${({ blurred }) =>
@@ -95,12 +96,12 @@ Styled.QrCode = styled(QrCode)<{ blurred: boolean }>`
     `}
 `;
 
-Styled.CheckboxContainer = styled.div`
+const $CheckboxContainer = styled.div`
   padding: 1rem;
   color: var(--color-text-0);
 `;
 
-Styled.CautionIconContainer = styled.div`
+const $CautionIconContainer = styled.div`
   ${layoutMixins.stack}
   min-width: 2.5rem;
   height: 2.5rem;

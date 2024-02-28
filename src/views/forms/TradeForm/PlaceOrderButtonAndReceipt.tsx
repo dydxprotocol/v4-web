@@ -1,13 +1,17 @@
 import { useDispatch, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled from 'styled-components';
 
 import type { TradeInputSummary } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 
-import { useStringGetter, useTokenConfigs } from '@/hooks';
+import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
+import { useComplianceState } from '@/hooks/useComplianceState';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
@@ -15,7 +19,6 @@ import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
-
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
@@ -30,7 +33,6 @@ type ConfirmButtonConfig = {
 };
 
 type ElementProps = {
-  isLoading: boolean;
   actionStringKey?: string;
   summary?: TradeInputSummary;
   hasValidationErrors?: boolean;
@@ -41,7 +43,6 @@ type ElementProps = {
 };
 
 export const PlaceOrderButtonAndReceipt = ({
-  isLoading,
   actionStringKey,
   summary,
   hasValidationErrors,
@@ -53,6 +54,8 @@ export const PlaceOrderButtonAndReceipt = ({
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
   const { chainTokenLabel } = useTokenConfigs();
+  const { connectionError } = useApiState();
+  const { complianceState } = useComplianceState();
 
   const canAccountTrade = useSelector(calculateCanAccountTrade);
   const subaccountNumber = useSelector(getSubaccountId);
@@ -60,8 +63,16 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const hasMissingData = subaccountNumber === undefined;
 
+  const tradingUnavailable =
+    complianceState === ComplianceStates.READ_ONLY ||
+    connectionError === ConnectionErrorType.CHAIN_DISRUPTION;
+
   const shouldEnableTrade =
-    canAccountTrade && !hasMissingData && !hasValidationErrors && currentInput !== 'transfer';
+    canAccountTrade &&
+    !hasMissingData &&
+    !hasValidationErrors &&
+    currentInput !== 'transfer' &&
+    !tradingUnavailable;
 
   const { fee, price: expectedPrice, total, reward } = summary || {};
 
@@ -109,6 +120,13 @@ export const PlaceOrderButtonAndReceipt = ({
     },
   ];
 
+  const returnToMarketState = () => ({
+    buttonTextStringKey: STRING_KEYS.RETURN_TO_MARKET,
+    buttonAction: ButtonAction.Secondary,
+    buttonState: {},
+    showValidatorError: false,
+  });
+
   const buttonStatesPerStep = {
     [MobilePlaceOrderSteps.EditOrder]: {
       buttonTextStringKey: shouldEnableTrade
@@ -118,23 +136,18 @@ export const PlaceOrderButtonAndReceipt = ({
         : STRING_KEYS.UNAVAILABLE,
       buttonAction: ButtonAction.Primary,
       buttonState: { isDisabled: !shouldEnableTrade, isLoading: hasMissingData },
+      showValidatorError: true,
     },
 
     [MobilePlaceOrderSteps.PreviewOrder]: {
       buttonTextStringKey: STRING_KEYS.CONFIRM_ORDER,
       buttonAction: confirmButtonConfig.buttonAction,
-      buttonState: { isLoading },
-    },
-    [MobilePlaceOrderSteps.PlacingOrder]: {
-      buttonTextStringKey: STRING_KEYS.RETURN_TO_MARKET,
-      buttonAction: ButtonAction.Secondary,
       buttonState: {},
+      showValidatorError: false,
     },
-    [MobilePlaceOrderSteps.Confirmation]: {
-      buttonTextStringKey: STRING_KEYS.RETURN_TO_MARKET,
-      buttonAction: ButtonAction.Secondary,
-      buttonState: {},
-    },
+    [MobilePlaceOrderSteps.PlacingOrder]: returnToMarketState(),
+    [MobilePlaceOrderSteps.PlaceOrderFailed]: returnToMarketState(),
+    [MobilePlaceOrderSteps.Confirmation]: returnToMarketState(),
   };
 
   const buttonAction = currentStep
@@ -142,7 +155,9 @@ export const PlaceOrderButtonAndReceipt = ({
     : confirmButtonConfig.buttonAction;
 
   let buttonTextStringKey = STRING_KEYS.UNAVAILABLE;
-  if (currentStep) {
+  if (tradingUnavailable) {
+    buttonTextStringKey = STRING_KEYS.UNAVAILABLE;
+  } else if (currentStep) {
     buttonTextStringKey = buttonStatesPerStep[currentStep].buttonTextStringKey;
   } else if (shouldEnableTrade) {
     buttonTextStringKey = confirmButtonConfig.buttonTextStringKey;
@@ -153,8 +168,8 @@ export const PlaceOrderButtonAndReceipt = ({
   const buttonState = currentStep
     ? buttonStatesPerStep[currentStep].buttonState
     : {
-        isDisabled: !shouldEnableTrade || isLoading,
-        isLoading: isLoading || hasMissingData,
+        isDisabled: !shouldEnableTrade,
+        isLoading: hasMissingData,
       };
 
   const depositButton = (
@@ -166,14 +181,15 @@ export const PlaceOrderButtonAndReceipt = ({
     </Button>
   );
 
+  const showValidatorErrors =
+    hasValidationErrors && (!currentStep || buttonStatesPerStep[currentStep].showValidatorError);
+
   const submitButton = (
-    <Styled.Button
+    <$Button
       state={buttonState}
       type={ButtonType.Submit}
       action={buttonAction}
-      slotLeft={
-        hasValidationErrors ? <Styled.WarningIcon iconName={IconName.Warning} /> : undefined
-      }
+      slotLeft={showValidatorErrors ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
     >
       {stringGetter({
         key: buttonTextStringKey,
@@ -183,30 +199,27 @@ export const PlaceOrderButtonAndReceipt = ({
           }),
         },
       })}
-    </Styled.Button>
+    </$Button>
   );
 
   return (
     <WithDetailsReceipt detailItems={items}>
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
-      ) : showDeposit ? (
+      ) : showDeposit && complianceState === ComplianceStates.FULL_ACCESS ? (
         depositButton
       ) : (
-        <WithTooltip tooltipString={hasValidationErrors ? validationErrorString : undefined}>
+        <WithTooltip tooltipString={showValidatorErrors ? validationErrorString : undefined}>
           {submitButton}
         </WithTooltip>
       )}
     </WithDetailsReceipt>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Button = styled(Button)`
+const $Button = styled(Button)`
   width: 100%;
 `;
 
-Styled.WarningIcon = styled(Icon)`
+const $WarningIcon = styled(Icon)`
   color: var(--color-warning);
 `;

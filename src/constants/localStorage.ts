@@ -7,6 +7,9 @@ export enum LocalStorageKey {
   OnboardingHasAcknowledgedTerms = 'dydx.OnboardingHasAcknowledgedTerms',
   EvmDerivedAddresses = 'dydx.EvmDerivedAddresses',
 
+  // Gas
+  SelectedGasDenom = 'dydx.SelectedGasDenom',
+
   // Notifications
   Notifications = 'dydx.Notifications',
   NotificationsLastUpdated = 'dydx.NotificationsLastUpdated',
@@ -24,11 +27,12 @@ export enum LocalStorageKey {
   SelectedTradeLayout = 'dydx.SelectedTradeLayout',
   TradingViewChartConfig = 'dydx.TradingViewChartConfig',
   HasSeenLaunchIncentives = 'dydx.HasSeenLaunchIncentives',
+  DefaultToAllMarketsInPositionsOrdersFills = 'dydx.DefaultToAllMarketsInPositionsOrdersFills',
 }
 
 export const LOCAL_STORAGE_VERSIONS = {
   [LocalStorageKey.EvmDerivedAddresses]: 'v2',
-  [LocalStorageKey.NotificationPreferences]: 'v1',
+  [LocalStorageKey.NotificationPreferences]: 'v2',
   [LocalStorageKey.TransferNotifications]: 'v1',
   [LocalStorageKey.Notifications]: 'v1',
   // TODO: version all localStorage keys

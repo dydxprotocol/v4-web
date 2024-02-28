@@ -1,6 +1,6 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual, useSelector } from 'react-redux';
+import styled from 'styled-components';
 
 import {
   AbacusOrderStatus,
@@ -9,20 +9,22 @@ import {
   ORDER_STATUS_STRINGS,
   TRADE_TYPES,
 } from '@/constants/abacus';
-
 import { STRING_KEYS } from '@/constants/localization';
-import { ORDER_TYPE_STRINGS, TradeTypes } from '@/constants/trade';
-import { useStringGetter } from '@/hooks';
+import { USD_DECIMALS } from '@/constants/numbers';
+import { ORDER_TYPE_STRINGS } from '@/constants/trade';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
-import { Details } from '@/components/Details';
+// eslint-disable-next-line import/no-cycle
 import { Notification, NotificationProps } from '@/components/Notification';
-import { OrderSideTag } from '@/components/OrderSideTag';
 import { OrderStatusIcon } from '@/views/OrderStatusIcon';
-import { Output, OutputType } from '@/components/Output';
 
 import { getMarketData } from '@/state/perpetualsSelectors';
+
+import { FillDetails } from './FillDetails';
 
 type ElementProps = {
   data: {
@@ -47,7 +49,7 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
   const marketData = useSelector(getMarketData(MARKET), shallowEqual);
   const { assetId } = marketData ?? {};
   const orderType = ORDER_TYPE as KotlinIrEnumValues<typeof AbacusOrderType>;
-  const tradeType = TRADE_TYPES[orderType];
+  const tradeType = TRADE_TYPES[orderType] ?? undefined;
   const titleKey = tradeType && ORDER_TYPE_STRINGS[tradeType]?.orderTypeKey;
   const orderStatus = ORDER_STATUS as KotlinIrEnumValues<typeof AbacusOrderStatus>;
 
@@ -58,70 +60,35 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
       slotIcon={<AssetIcon symbol={assetId} />}
       slotTitle={titleKey && stringGetter({ key: titleKey })}
       slotTitleRight={
-        <Styled.OrderStatus>
+        <$OrderStatus>
           {stringGetter({ key: ORDER_STATUS_STRINGS[orderStatus] })}
-          <Styled.OrderStatusIcon status={orderStatus} totalFilled={parseFloat(FILLED_AMOUNT)} />
-        </Styled.OrderStatus>
+          <$OrderStatusIcon status={orderStatus} />
+        </$OrderStatus>
       }
       slotCustomContent={
-        <Styled.Details
-          items={[
-            {
-              key: 'size',
-              label: (
-                <Styled.Label>
-                  {stringGetter({ key: STRING_KEYS.SIZE })}
-                  <OrderSideTag
-                    orderSide={SIDE === STRING_KEYS.BUY ? OrderSide.BUY : OrderSide.SELL}
-                  />
-                </Styled.Label>
-              ),
-              value: (
-                <Output type={OutputType.Asset} value={FILLED_AMOUNT} tag={marketData?.assetId} />
-              ),
-            },
-            {
-              key: 'price',
-              label: stringGetter({ key: STRING_KEYS.PRICE }),
-              value:
-                ORDER_TYPE === TradeTypes.MARKET ? (
-                  <span>{stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT })}</span>
-                ) : (
-                  <Output
-                    type={OutputType.Fiat}
-                    value={AVERAGE_PRICE}
-                    fractionDigits={marketData?.configs?.displayTickSizeDecimals}
-                  />
-                ),
-            },
-          ]}
+        <FillDetails
+          orderSide={SIDE === STRING_KEYS.BUY ? OrderSide.BUY : OrderSide.SELL}
+          tradeType={tradeType}
+          filledAmount={FILLED_AMOUNT}
+          assetId={marketData?.assetId}
+          averagePrice={AVERAGE_PRICE}
+          tickSizeDecimals={marketData?.configs?.displayTickSizeDecimals ?? USD_DECIMALS}
         />
       }
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Label = styled.span`
+const $Label = styled.span`
   ${layoutMixins.row}
   gap: 0.5ch;
 `;
 
-Styled.OrderStatus = styled(Styled.Label)`
+const $OrderStatus = styled($Label)`
   color: var(--color-text-0);
   font: var(--font-small-book);
 `;
 
-Styled.OrderStatusIcon = styled(OrderStatusIcon)`
+const $OrderStatusIcon = styled(OrderStatusIcon)`
   width: 0.9375rem;
   height: 0.9375rem;
-`;
-
-Styled.Details = styled(Details)`
-  --details-item-height: 1.5rem;
-
-  dd {
-    color: var(--color-text-2);
-  }
 `;

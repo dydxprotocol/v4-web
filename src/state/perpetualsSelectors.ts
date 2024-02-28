@@ -7,6 +7,11 @@ import { mapCandle } from '@/lib/tradingView/utils';
 import type { RootState } from './_store';
 
 /**
+ * @returns current market filter applied inside the markets page
+ */
+export const getMarketFilter = (state: RootState) => state.perpetuals.marketFilter;
+
+/**
  * @returns marketId of the market the user is currently viewing
  */
 export const getCurrentMarketId = (state: RootState) => state.perpetuals.currentMarketId;
@@ -15,7 +20,7 @@ export const getCurrentMarketId = (state: RootState) => state.perpetuals.current
  * @returns assetId of the currentMarket
  */
 export const getCurrentMarketAssetId = (state: RootState) => {
-  const currentMarketId = getCurrentMarketId(state) || '';
+  const currentMarketId = getCurrentMarketId(state) ?? '';
   return state.perpetuals?.markets?.[currentMarketId]?.assetId;
 };
 
@@ -81,7 +86,7 @@ export const getOrderbooks = (state: RootState) => state.perpetuals.orderbooks;
 export const getCurrentMarketOrderbook = (state: RootState) => {
   const orderbookData = getOrderbooks(state);
   const currentMarketId = getCurrentMarketId(state);
-  return orderbookData?.[currentMarketId || ''];
+  return orderbookData?.[currentMarketId ?? ''];
 };
 
 /**
@@ -90,7 +95,7 @@ export const getCurrentMarketOrderbook = (state: RootState) => {
 export const getCurrentMarketOrderbookMap = (state: RootState) => {
   const orderbookMap = state.perpetuals.orderbooksMap;
   const currentMarketId = getCurrentMarketId(state);
-  return orderbookMap?.[currentMarketId || ''];
+  return orderbookMap?.[currentMarketId ?? ''];
 };
 
 /**
@@ -159,3 +164,10 @@ export const getCurrentMarketNextFundingRate = createSelector(
   [getCurrentMarketData],
   (marketData) => marketData?.perpetual?.nextFundingRate
 );
+
+/**
+ * @param marketId
+ * @returns sparkline data for specified marketId
+ */
+export const getPerpetualMarketSparklineData = (marketId: string) => (state: RootState) =>
+  getPerpetualMarkets(state)?.[marketId]?.perpetual?.line?.toArray() ?? [];

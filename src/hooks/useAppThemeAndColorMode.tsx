@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
+
 import { useSelector } from 'react-redux';
 import { ThemeProvider } from 'styled-components';
 
-import { AppTheme, AppThemeSetting, AppColorMode, AppThemeSystemSetting } from '@/state/configs';
-import { getAppThemeSetting, getAppColorMode } from '@/state/configsSelectors';
-
 import { Themes } from '@/styles/themes';
+
+import { AppColorMode, AppTheme, AppThemeSetting, AppThemeSystemSetting } from '@/state/configs';
+import { getAppColorMode, getAppThemeSetting } from '@/state/configsSelectors';
+
+import { assertNever } from '@/lib/assertNever';
 
 export const AppThemeAndColorModeProvider = ({ ...props }) => {
   return <ThemeProvider theme={useAppThemeAndColorModeContext()} {...props} />;
@@ -22,7 +25,7 @@ export const useAppThemeAndColorModeContext = () => {
   );
 
   useEffect(() => {
-    const handler = (e) => {
+    const handler = (e: MediaQueryListEvent) => {
       if (e.matches) {
         setSystemPreference(AppTheme.Dark);
       } else {
@@ -41,6 +44,9 @@ export const useAppThemeAndColorModeContext = () => {
       case AppTheme.Dark:
       case AppTheme.Light:
         return themeSetting;
+      default:
+        assertNever(themeSetting, true);
+        return systemPreference;
     }
   };
 

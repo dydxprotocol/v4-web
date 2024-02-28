@@ -1,8 +1,10 @@
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
-import { useStringGetter } from '@/hooks';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog } from '@/components/Dialog';
@@ -23,23 +25,20 @@ export const RestrictedGeoDialog = ({ preventClose, setIsOpen }: ElementProps) =
       preventClose={preventClose}
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.REGION_NOT_PERMITTED_TITLE })}
-      slotIcon={<Styled.Icon iconName={IconName.Warning} />}
+      slotIcon={<$Icon iconName={IconName.Warning} />}
     >
-      <Styled.Content>
+      <$Content>
         {stringGetter({ key: STRING_KEYS.REGION_NOT_PERMITTED_SUBTITLE })}
         {isDev && <NetworkSelectMenu />}
-      </Styled.Content>
+      </$Content>
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Icon = styled(Icon)`
+const $Icon = styled(Icon)`
   color: var(--color-warning);
 `;
 
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
 `;

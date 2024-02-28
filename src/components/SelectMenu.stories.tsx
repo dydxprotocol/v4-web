@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
-import type { Story } from '@ladle/react';
 
-import { SelectMenu, SelectItem } from '@/components/SelectMenu';
+import type { Story } from '@ladle/react';
+import styled from 'styled-components';
+
+import { layoutMixins } from '@/styles/layoutMixins';
+
+import { SelectItem, SelectMenu } from '@/components/SelectMenu';
 
 import { StoryWrapper } from '.ladle/components';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 const exampleItems: { value: string; label: string }[] = [
   {
@@ -32,7 +34,7 @@ export const SelectMenuStory: Story<Parameters<typeof SelectMenu>[0]> = (args) =
 
   return (
     <StoryWrapper>
-      <Styled.Container>
+      <$Container>
         <SelectMenu value={value} onValueChange={setValue}>
           {exampleItems.map(({ value, label }) => (
             <SelectItem key={value} value={value} label={label} />
@@ -44,14 +46,11 @@ export const SelectMenuStory: Story<Parameters<typeof SelectMenu>[0]> = (args) =
             <SelectItem key={value} value={value} label={label} />
           ))}
         </SelectMenu>
-      </Styled.Container>
+      </$Container>
     </StoryWrapper>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.section`
+const $Container = styled.section`
   background: var(--color-layer-3);
 
   ${layoutMixins.container}

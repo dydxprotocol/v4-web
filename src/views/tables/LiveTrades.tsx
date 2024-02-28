@@ -1,11 +1,15 @@
 import { useMemo } from 'react';
-import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
-import { shallowEqual, useSelector } from 'react-redux';
+
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { shallowEqual, useSelector } from 'react-redux';
+import styled, { css, keyframes } from 'styled-components';
 
 import { MarketTrade } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { EMPTY_ARR } from '@/constants/objects';
+
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { breakpoints } from '@/styles';
 
@@ -15,9 +19,11 @@ import { Output, OutputType } from '@/components/Output';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketLiveTrades } from '@/state/perpetualsSelectors';
 
-import { OrderbookTradesOutput, OrderbookTradesTable } from './OrderbookTradesTable';
-import { getSelectedOrderSide } from '@/lib/tradeData';
+import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { isTruthy } from '@/lib/isTruthy';
+import { getSelectedOrderSide } from '@/lib/tradeData';
+
+import { OrderbookTradesOutput, OrderbookTradesTable } from './OrderbookTradesTable';
 
 const MAX_ORDERBOOK_BAR_SIZE = 0.4;
 const LARGE_TRADE_USD_VALUE = 10000;
@@ -41,10 +47,11 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
   const { isTablet } = useBreakpoints();
   const currentMarketAssetData = useSelector(getCurrentMarketAssetData, shallowEqual);
   const currentMarketConfig = useSelector(getCurrentMarketConfig, shallowEqual);
-  const currentMarketLiveTrades = useSelector(getCurrentMarketLiveTrades, shallowEqual) || [];
+  const currentMarketLiveTrades =
+    useSelector(getCurrentMarketLiveTrades, shallowEqual) ?? EMPTY_ARR;
 
   const { id = '' } = currentMarketAssetData ?? {};
-  const { stepSizeDecimals, tickSizeDecimals } = currentMarketConfig || {};
+  const { stepSizeDecimals, tickSizeDecimals } = currentMarketConfig ?? {};
 
   const rows = currentMarketLiveTrades.map(
     ({ createdAtMilliseconds, price, size, side }: MarketTrade, idx) => ({
@@ -62,7 +69,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
       getCellValue: (row: RowData) => row.createdAtMilliseconds,
       label: stringGetter({ key: STRING_KEYS.TIME }),
       renderCell: (row: RowData) => (
-        <Styled.TimeOutput type={OutputType.Time} value={row.createdAtMilliseconds} />
+        <$TimeOutput type={OutputType.Time} value={row.createdAtMilliseconds} />
       ),
     };
     return [
@@ -72,7 +79,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
         getCellValue: (row: RowData) => row.size,
         label: stringGetter({ key: STRING_KEYS.SIDE }),
         renderCell: (row: RowData) => (
-          <Styled.SideOutput
+          <$SideOutput
             type={OutputType.Text}
             value={stringGetter({
               key: row.side === OrderSide.BUY ? STRING_KEYS.BUY : STRING_KEYS.SELL,
@@ -86,7 +93,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
         label: stringGetter({ key: STRING_KEYS.SIZE }),
         tag: id,
         renderCell: (row: RowData) => (
-          <Styled.SizeOutput
+          <$SizeOutput
             type={OutputType.Asset}
             value={row.size}
             fractionDigits={stepSizeDecimals}
@@ -114,7 +121,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
   }, [stepSizeDecimals, tickSizeDecimals, id, histogramSide, stringGetter]);
 
   return (
-    <Styled.LiveTradesTable
+    <$LiveTradesTable
       className={className}
       key="live-trades"
       label="Recent Trades"
@@ -140,19 +147,16 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TimeOutput = styled(OrderbookTradesOutput)`
+const $TimeOutput = styled(OrderbookTradesOutput)`
   color: var(--color-text-0);
   font-feature-settings: var(--fontFeature-monoNumbers);
 `;
 
-Styled.SideOutput = styled(Output)`
+const $SideOutput = styled(Output)`
   color: var(--accent-color);
 `;
 
-Styled.SizeOutput = styled(Output)<StyleProps>`
+const $SizeOutput = styled(Output)<StyleProps>`
   color: var(--accent-color);
 
   @media ${breakpoints.tablet} {
@@ -160,7 +164,8 @@ Styled.SizeOutput = styled(Output)<StyleProps>`
   }
 `;
 
-Styled.LiveTradesTable = styled(OrderbookTradesTable)<StyleProps>`
+const liveTradesTableType = getSimpleStyledOutputType(OrderbookTradesTable, {} as StyleProps);
+const $LiveTradesTable = styled(OrderbookTradesTable)<StyleProps>`
   tr {
     --histogram-bucket-size: 1;
     background-color: var(--color-layer-2);
@@ -228,4 +233,4 @@ Styled.LiveTradesTable = styled(OrderbookTradesTable)<StyleProps>`
 
     font-size: 0.875em;
   }
-`;
+` as typeof liveTradesTableType;

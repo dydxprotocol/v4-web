@@ -1,27 +1,25 @@
 import { Fragment } from 'react';
 
-import styled, {
-  type AnyStyledComponent,
-  css,
-  type FlattenInterpolation,
-  ThemeProps,
-} from 'styled-components';
+import styled, { ThemeProps, css, type FlattenInterpolation } from 'styled-components';
+
+import { Nullable } from '@/constants/abacus';
+
+import { LoadingContext } from '@/contexts/LoadingContext';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { WithSeparators } from '@/components/Separator';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { LoadingContext } from '@/contexts/LoadingContext';
-
 export type DetailsItem = {
   key: string;
   tooltip?: string;
   tooltipParams?: Record<string, string>;
   label: string | JSX.Element;
-  value?: string | JSX.Element | undefined;
+  value?: Nullable<string> | JSX.Element | undefined;
   subitems?: DetailsItem[];
   withTooltipIcon?: boolean;
+  allowUserSelection?: boolean;
 };
 
 const DETAIL_LAYOUTS = {
@@ -63,8 +61,9 @@ const DetailItem = ({
   justifyItems,
   layout = 'column',
   withOverflow,
+  allowUserSelection,
 }: DetailsItem & StyleProps) => (
-  <Styled.Item justifyItems={justifyItems} layout={layout} withOverflow={withOverflow}>
+  <$Item justifyItems={justifyItems} layout={layout} withOverflow={withOverflow}>
     <dt>
       <WithTooltip
         tooltip={tooltip}
@@ -75,8 +74,8 @@ const DetailItem = ({
         {label}
       </WithTooltip>
     </dt>
-    <dd>{value ?? ''}</dd>
-  </Styled.Item>
+    <$DetailsItemValue allowUserSelection={allowUserSelection}>{value ?? ''}</$DetailsItemValue>
+  </$Item>
 );
 
 export const Details = ({
@@ -90,34 +89,46 @@ export const Details = ({
   withSeparators = false,
 }: ElementProps & StyleProps) => (
   <LoadingContext.Provider value={isLoading}>
-    <Styled.Details layout={layout} withSeparators={withSeparators} className={className}>
+    <$Details layout={layout} withSeparators={withSeparators} className={className}>
       <WithSeparators withSeparators={withSeparators} layout={DETAIL_LAYOUTS[layout]}>
-        {items.map(({ key, tooltip, tooltipParams, label, subitems, value, withTooltipIcon }) => (
-          <Fragment key={key}>
-            <DetailItem
-              {...{
-                key,
-                tooltip,
-                tooltipParams,
-                label,
-                value,
-                withTooltipIcon,
-                justifyItems,
-                layout,
-                withOverflow,
-              }}
-            />
-            {subitems && showSubitems && layout === 'column' && (
-              <Styled.SubDetails
-                items={subitems}
-                layout={DETAIL_LAYOUTS[layout]}
-                withSeparators={withSeparators}
+        {items.map(
+          ({
+            key,
+            tooltip,
+            tooltipParams,
+            label,
+            subitems,
+            value,
+            withTooltipIcon,
+            allowUserSelection,
+          }) => (
+            <Fragment key={key}>
+              <DetailItem
+                {...{
+                  key,
+                  tooltip,
+                  tooltipParams,
+                  label,
+                  value,
+                  withTooltipIcon,
+                  justifyItems,
+                  layout,
+                  withOverflow,
+                  allowUserSelection,
+                }}
               />
-            )}
-          </Fragment>
-        ))}
+              {subitems && showSubitems && layout === 'column' && (
+                <$SubDetails
+                  items={subitems}
+                  layout={DETAIL_LAYOUTS[layout]}
+                  withSeparators={withSeparators}
+                />
+              )}
+            </Fragment>
+          )
+        )}
       </WithSeparators>
-    </Styled.Details>
+    </$Details>
   </LoadingContext.Provider>
 );
 
@@ -209,10 +220,7 @@ const itemLayoutVariants: Record<string, FlattenInterpolation<ThemeProps<any>>> 
     gap: 0.375rem;
   `,
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Details = styled.dl<{
+const $Details = styled.dl<{
   layout: 'column' | 'row' | 'rowColumns' | 'grid' | 'stackColumn';
   withSeparators: boolean;
 }>`
@@ -224,10 +232,10 @@ Styled.Details = styled.dl<{
   ${({ layout }) => layout && detailsLayoutVariants[layout]}
 `;
 
-Styled.Item = styled.div<{
+const $Item = styled.div<{
   layout: 'column' | 'row' | 'rowColumns' | 'grid' | 'stackColumn';
   justifyItems?: 'start' | 'end';
-  withOverflow: boolean;
+  withOverflow?: boolean;
 }>`
   ${({ layout }) => layout && itemLayoutVariants[layout]}
 
@@ -290,7 +298,7 @@ Styled.Item = styled.div<{
   }
 `;
 
-Styled.SubDetails = styled(Details)`
+const $SubDetails = styled(Details)`
   padding-left: 1rem;
   position: relative;
 
@@ -304,4 +312,14 @@ Styled.SubDetails = styled(Details)`
     width: var(--details-subitem-borderWidth);
     border-radius: 0.25rem;
   }
+`;
+
+const $DetailsItemValue = styled.dd<{
+  allowUserSelection?: boolean;
+}>`
+  ${({ allowUserSelection }) =>
+    allowUserSelection &&
+    css`
+      user-select: all;
+    `}
 `;

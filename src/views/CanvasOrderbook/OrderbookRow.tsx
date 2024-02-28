@@ -1,11 +1,14 @@
 import { forwardRef } from 'react';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+
+import { BigNumber } from 'bignumber.js';
+import styled, { css } from 'styled-components';
 
 import type { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { ORDERBOOK_ROW_HEIGHT } from '@/constants/orderbook';
-import { useStringGetter } from '@/hooks';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
@@ -15,7 +18,7 @@ type StyleProps = {
 };
 
 type ElementProps = {
-  spread?: Nullable<number>;
+  spread?: Nullable<BigNumber | number>;
   spreadPercent?: Nullable<number>;
   tickSizeDecimals?: Nullable<number>;
 };
@@ -41,7 +44,7 @@ export const SpreadRow = forwardRef<HTMLDivElement, StyleProps & ElementProps>(
     const stringGetter = useStringGetter();
 
     return (
-      <Styled.SpreadRow ref={ref} side={side}>
+      <$SpreadRow ref={ref} side={side}>
         <span>
           <WithTooltip tooltip="spread">
             {stringGetter({ key: STRING_KEYS.ORDERBOOK_SPREAD })}
@@ -53,14 +56,11 @@ export const SpreadRow = forwardRef<HTMLDivElement, StyleProps & ElementProps>(
         <span>
           <Output type={OutputType.Percent} value={spreadPercent} />
         </span>
-      </Styled.SpreadRow>
+      </$SpreadRow>
     );
   }
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.SpreadRow = styled(OrderbookRow)<{ side?: 'top' | 'bottom' }>`
+const $SpreadRow = styled(OrderbookRow)<{ side?: 'top' | 'bottom' }>`
   height: 2rem;
   border-top: var(--border);
   border-bottom: var(--border);

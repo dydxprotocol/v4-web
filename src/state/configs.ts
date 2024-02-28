@@ -1,5 +1,5 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { kollections } from '@dydxprotocol/v4-abacus';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import type { Configs, FeeDiscount, FeeTier, NetworkConfigs, Nullable } from '@/constants/abacus';
 import { LocalStorageKey } from '@/constants/localStorage';
@@ -23,6 +23,11 @@ export enum AppColorMode {
   RedUp = 'RedUp',
 }
 
+export enum OtherPreference {
+  DisplayAllMarketsDefault = 'DisplayAllMarketsDefault',
+  GasToken = 'GasToken',
+}
+
 export interface ConfigsState {
   appThemeSetting: AppThemeSetting;
   appColorMode: AppColorMode;
@@ -30,6 +35,7 @@ export interface ConfigsState {
   feeDiscounts?: FeeDiscount[];
   network?: NetworkConfigs;
   hasSeenLaunchIncentives: boolean;
+  defaultToAllMarketsInPositionsOrdersFills: boolean;
 }
 
 const initialState: ConfigsState = {
@@ -48,12 +54,26 @@ const initialState: ConfigsState = {
     key: LocalStorageKey.HasSeenLaunchIncentives,
     defaultValue: false,
   }),
+  defaultToAllMarketsInPositionsOrdersFills: getLocalStorage({
+    key: LocalStorageKey.DefaultToAllMarketsInPositionsOrdersFills,
+    defaultValue: true,
+  }),
 };
 
 export const configsSlice = createSlice({
   name: 'Inputs',
   initialState,
   reducers: {
+    setDefaultToAllMarketsInPositionsOrdersFills: (
+      state: ConfigsState,
+      { payload }: PayloadAction<boolean>
+    ) => {
+      setLocalStorage({
+        key: LocalStorageKey.DefaultToAllMarketsInPositionsOrdersFills,
+        value: payload,
+      });
+      state.defaultToAllMarketsInPositionsOrdersFills = payload;
+    },
     setAppThemeSetting: (state: ConfigsState, { payload }: PayloadAction<AppThemeSetting>) => {
       setLocalStorage({ key: LocalStorageKey.SelectedTheme, value: payload });
       state.appThemeSetting = payload;
@@ -73,5 +93,10 @@ export const configsSlice = createSlice({
   },
 });
 
-export const { setAppThemeSetting, setAppColorMode, setConfigs, markLaunchIncentivesSeen } =
-  configsSlice.actions;
+export const {
+  setDefaultToAllMarketsInPositionsOrdersFills,
+  setAppThemeSetting,
+  setAppColorMode,
+  setConfigs,
+  markLaunchIncentivesSeen,
+} = configsSlice.actions;

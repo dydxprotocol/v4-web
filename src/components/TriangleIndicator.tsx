@@ -1,5 +1,5 @@
-import styled, { AnyStyledComponent, css } from 'styled-components';
 import BigNumber from 'bignumber.js';
+import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import { NumberSign } from '@/constants/numbers';
 
@@ -20,15 +20,12 @@ const getSign = (num: BigNumber) =>
 
 export const TriangleIndicator = ({ className, value }: TriangleIndicatorProps) => {
   return (
-    <Styled.TriangleIndicator className={className} sign={getSign(value)}>
+    <$TriangleIndicator className={className} sign={getSign(value)}>
       <Icon iconName={IconName.Triangle} />
-    </Styled.TriangleIndicator>
+    </$TriangleIndicator>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TriangleIndicator = styled.div<{ sign: NumberSign }>`
+const $TriangleIndicator = styled.div<{ sign: NumberSign }>`
   display: flex;
   align-items: center;
   height: 100%;

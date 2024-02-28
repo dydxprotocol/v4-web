@@ -1,33 +1,41 @@
-import { forwardRef, Ref } from 'react';
-import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
-import { NavLink, matchPath, useLocation } from 'react-router-dom';
-
-import { MenuConfig, MenuItem } from '@/constants/menus';
-
-import { isExternalLink } from '@/lib/isExternalLink';
-
-import { popoverMixins } from '@/styles/popoverMixins';
+import { Ref } from 'react';
 
 import {
-  Root,
-  List,
-  Trigger,
   Content,
   Item,
   Link,
+  List,
+  Root,
   Sub,
+  Trigger,
   Viewport,
 } from '@radix-ui/react-navigation-menu';
+import { NavLink, matchPath, useLocation } from 'react-router-dom';
+import styled, { css, keyframes } from 'styled-components';
+
+import { MenuConfig, MenuItem } from '@/constants/menus';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+import { popoverMixins } from '@/styles/popoverMixins';
 
-import { Tag } from './Tag';
+import { forwardRefFn, getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
+import { isExternalLink } from '@/lib/isExternalLink';
+
 import { Icon, IconName } from './Icon';
+import { Tag } from './Tag';
 
 type ElementProps<MenuItemValue extends string, MenuGroupValue extends string> = {
   items: MenuConfig<MenuItemValue, MenuGroupValue>;
   onSelectItem?: (value: MenuItemValue) => void;
   onSelectGroup?: (value: MenuGroupValue) => void;
+  /**
+   * Optional slot to add content before the menu item rendering area
+   */
+  slotBefore?: React.ReactNode;
+  /**
+   * Optional slot to add content after the menu item rendering area
+   */
+  slotAfter?: React.ReactNode;
 };
 
 type StyleProps = {
@@ -38,73 +46,75 @@ type StyleProps = {
   className?: string;
 };
 
-const NavItem = forwardRef(
-  <MenuItemValue extends string>(
-    {
-      value,
-      slotBefore,
-      label,
-      tag,
-      href,
-      slotAfter = isExternalLink(href) ? <Icon iconName={IconName.LinkOut} /> : undefined,
-      onSelect,
-      subitems,
-      ...props
-    }: MenuItem<MenuItemValue>,
-    ref: Ref<HTMLAnchorElement> | Ref<HTMLDivElement> | Ref<HTMLButtonElement>
-  ) => {
-    const location = useLocation();
+const NavItemWithRef = <MenuItemValue extends string>(
+  {
+    value,
+    slotBefore,
+    label,
+    tag,
+    href,
+    slotAfter = isExternalLink(href) ? <Icon iconName={IconName.LinkOut} /> : undefined,
+    onSelect,
+    subitems,
+    type,
+    ...props
+  }: MenuItem<MenuItemValue, string | number>,
+  ref: Ref<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement>
+) => {
+  const location = useLocation();
 
-    const children = (
-      <>
-        {slotBefore}
-        <span>
-          {label}
-          {tag && (
-            <>
-              {' '}
-              <Tag>{tag}</Tag>
-            </>
-          )}
-        </span>
-        {slotAfter}
-        {subitems?.length && <Styled.Icon iconName={IconName.Triangle} />}
-      </>
-    );
+  const children = (
+    <>
+      {slotBefore}
+      <span>
+        {label}
+        {tag && (
+          <>
+            {' '}
+            <Tag>{tag}</Tag>
+          </>
+        )}
+      </span>
+      {slotAfter}
+      {subitems?.length && <$Icon iconName={IconName.Triangle} />}
+    </>
+  );
 
-    return href ? (
-      <Link
-        active={!!matchPath(href, location.pathname)}
-        onSelect={() => onSelect?.(value)}
-        asChild
-        target={isExternalLink(href) ? '_blank' : undefined}
-      >
-        <NavLink to={href} ref={ref as Ref<HTMLAnchorElement>} {...props}>
-          {children}
-        </NavLink>
-      </Link>
-    ) : props.onClick ? (
-      <Link asChild onSelect={() => onSelect?.(value)}>
-        <button ref={ref as Ref<HTMLButtonElement>} {...props} type="button">
-          {children}
-        </button>
-      </Link>
-    ) : (
-      <div ref={ref as Ref<HTMLDivElement>} {...props}>
+  return href ? (
+    <Link
+      active={!!matchPath(href, location.pathname)}
+      onSelect={() => onSelect?.(value)}
+      asChild
+      target={isExternalLink(href) ? '_blank' : undefined}
+    >
+      <NavLink to={href} ref={ref as Ref<HTMLAnchorElement>} type={`${type}`} {...props}>
         {children}
-      </div>
-    );
-  }
-);
+      </NavLink>
+    </Link>
+  ) : props.onClick ? (
+    <Link asChild onSelect={() => onSelect?.(value)}>
+      <button ref={ref as Ref<HTMLButtonElement>} {...props} type="button">
+        {children}
+      </button>
+    </Link>
+  ) : (
+    <div ref={ref as Ref<HTMLDivElement>} {...props}>
+      {children}
+    </div>
+  );
+};
+
+const NavItem = forwardRefFn(NavItemWithRef);
 
 export const NavigationMenu = <MenuItemValue extends string, MenuGroupValue extends string>({
   onSelectItem,
-  onSelectGroup,
   items,
   orientation = 'vertical',
   itemOrientation = 'horizontal',
   submenuPlacement = 'inline', // orientation === 'horizontal' ? 'viewport' : 'inline',
   dir = 'ltr',
+  slotAfter,
+  slotBefore,
   className,
 }: ElementProps<MenuItemValue, MenuGroupValue> & StyleProps) => {
   const renderSubitems = ({
@@ -115,74 +125,71 @@ export const NavigationMenu = <MenuItemValue extends string, MenuGroupValue exte
     depth: number;
   }) => (
     <>
-      <Styled.SubMenuTrigger
+      <$SubMenuTrigger
         asChild
-        onPointerMove={(e: MouseEvent) => e.preventDefault()}
-        onPointerLeave={(e: MouseEvent) => e.preventDefault()}
+        onPointerMove={(e: React.MouseEvent) => e.preventDefault()}
+        onPointerLeave={(e: React.MouseEvent) => e.preventDefault()}
       >
-        <Styled.NavItem onSelect={onSelectGroup} orientation={itemOrientation} {...item} />
-      </Styled.SubMenuTrigger>
+        <$NavItem onSelect={onSelectItem} orientation={itemOrientation} {...item} />
+      </$SubMenuTrigger>
 
-      <Styled.Content
-        onPointerEnter={(e: MouseEvent) => e.preventDefault()}
-        onPointerLeave={(e: MouseEvent) => e.preventDefault()}
+      <$Content
+        onPointerEnter={(e: React.MouseEvent) => e.preventDefault()}
+        onPointerLeave={(e: React.MouseEvent) => e.preventDefault()}
         data-placement={submenuPlacement}
       >
-        <Styled.Sub data-placement={submenuPlacement}>
-          <Styled.List
+        <$Sub data-placement={submenuPlacement}>
+          <$List
             data-orientation={depth > 0 ? 'menu' : orientation === 'vertical' ? 'vertical' : 'menu'}
           >
             {item?.subitems?.map((subitem) => (
-              <Styled.ListItem key={subitem.value} value={subitem.value} data-item={subitem.value}>
+              <$ListItem key={subitem.value} value={subitem.value} data-item={subitem.value}>
                 {subitem?.subitems ? (
                   renderSubitems({ item: subitem, depth: depth + 1 })
                 ) : (
-                  <Styled.NavItem
-                    onSelect={onSelectItem}
-                    orientation={itemOrientation}
-                    {...subitem}
-                  />
+                  <$NavItem onSelect={onSelectItem} orientation={itemOrientation} {...subitem} />
                 )}
-              </Styled.ListItem>
+              </$ListItem>
             ))}
-          </Styled.List>
-        </Styled.Sub>
-      </Styled.Content>
+          </$List>
+        </$Sub>
+      </$Content>
     </>
   );
 
   return (
-    <Styled.Root orientation={orientation} dir={dir} className={className}>
+    <$Root orientation={orientation} dir={dir} className={className}>
+      {slotBefore}
+
       {items.map((group) => (
-        <Styled.Group key={group.group}>
+        <$Group key={group.group}>
           {group.groupLabel && (
-            <Styled.GroupHeader>
+            <$GroupHeader>
               <h3>{group.groupLabel}</h3>
-            </Styled.GroupHeader>
+            </$GroupHeader>
           )}
 
-          <Styled.List data-orientation={orientation}>
+          <$List data-orientation={orientation}>
             {group.items.map((item) => (
-              <Styled.ListItem key={item.value} value={item.value} data-item={item.value}>
+              <$ListItem key={item.value} value={item.value} data-item={item.value}>
                 {item.subitems ? (
                   renderSubitems({ item, depth: 0 })
                 ) : (
-                  <Styled.NavItem onSelect={onSelectItem} orientation={itemOrientation} {...item} />
+                  <$NavItem onSelect={onSelectItem} orientation={itemOrientation} {...item} />
                 )}
-              </Styled.ListItem>
+              </$ListItem>
             ))}
-          </Styled.List>
-        </Styled.Group>
+          </$List>
+        </$Group>
       ))}
 
-      {submenuPlacement === 'viewport' && <Styled.Viewport data-orientation={orientation} />}
-    </Styled.Root>
+      {submenuPlacement === 'viewport' && <$Viewport data-orientation={orientation} />}
+
+      {slotAfter}
+    </$Root>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Root = styled(Root)`
+const $Root = styled(Root)`
   /* Params */
   --navigationMenu-height: auto;
 
@@ -219,7 +226,7 @@ Styled.Root = styled(Root)`
   }
 `;
 
-Styled.Viewport = styled(Viewport)`
+const $Viewport = styled(Viewport)`
   ${popoverMixins.popover}
   ${popoverMixins.popoverAnimation}
   --popover-origin: center top;
@@ -253,14 +260,29 @@ Styled.Viewport = styled(Viewport)`
   }
 `;
 
-Styled.Content = styled(Content)`
+const $List = styled(List)`
+  align-self: center;
+
+  &[data-orientation='horizontal'] {
+    ${layoutMixins.row}
+    gap: 0.5rem;
+    align-items: start;
+  }
+
+  &[data-orientation='vertical'] {
+    ${layoutMixins.flexColumn}
+    gap: 0.25rem;
+  }
+`;
+
+const $Content = styled(Content)`
   ${popoverMixins.popoverAnimation}
   transform-origin: center top;
 
   &[data-placement='inline'] {
     max-height: 100vh;
 
-    ${Styled.List}[data-orientation="horizontal"] & {
+    ${$List}[data-orientation="horizontal"] & {
       /* position: absolute;
       top: calc(100% + var(--submenu-side-offset));
       left: 50%;
@@ -277,7 +299,7 @@ Styled.Content = styled(Content)`
       z-index: 2;
     }
 
-    ${Styled.List}[data-orientation="menu"] & {
+    ${$List}[data-orientation="menu"] & {
       position: absolute;
       left: 100%;
       top: 0;
@@ -325,26 +347,26 @@ Styled.Content = styled(Content)`
   }
 `;
 
-Styled.Sub = styled(Sub)`
+const $Sub = styled(Sub)`
   &[data-placement='inline'] {
     ${popoverMixins.popover}
     --popover-width: max-content;
     overflow: visible;
 
-    ${Styled.List}[data-orientation="vertical"] > & {
+    ${$List}[data-orientation="vertical"] > & {
       margin-top: var(--gap, 0.25rem);
 
       padding: 0.5rem;
     }
 
-    ${Styled.List}[data-orientation="menu"] & {
+    ${$List}[data-orientation="menu"] & {
       border-top-left-radius: 0 !important;
     }
   }
 `;
 
-Styled.Group = styled.section`
-  ${Styled.Root}[data-orientation="vertical"] & {
+const $Group = styled.section`
+  ${$Root}[data-orientation="vertical"] & {
     ${layoutMixins.stickyArea0}
     --stickyArea0-topHeight: 3rem;
   }
@@ -354,7 +376,7 @@ Styled.Group = styled.section`
   color: var(--color-text-0);
 `;
 
-Styled.GroupHeader = styled.header`
+const $GroupHeader = styled.header`
   ${layoutMixins.stickyHeader}
   ${layoutMixins.row}
 
@@ -362,31 +384,16 @@ Styled.GroupHeader = styled.header`
   font: var(--font-small-medium);
 `;
 
-Styled.List = styled(List)`
-  align-self: center;
-
-  &[data-orientation='horizontal'] {
-    ${layoutMixins.row}
-    gap: 0.5rem;
-    align-items: start;
-  }
-
-  &[data-orientation='vertical'] {
-    ${layoutMixins.flexColumn}
-    gap: 0.25rem;
-  }
-`;
-
-Styled.ListItem = styled(Item)`
+const $ListItem = styled(Item)`
   display: grid;
   position: relative;
 
-  ${Styled.List}[data-orientation="horizontal"] > & {
+  ${$List}[data-orientation="horizontal"] > & {
     gap: var(--submenu-side-offset);
   }
 `;
 
-Styled.SubMenuTrigger = styled(Trigger)`
+const $SubMenuTrigger = styled(Trigger)`
   border-radius: var(--navigationMenu-item-radius);
   outline-offset: -2px;
 
@@ -397,7 +404,10 @@ Styled.SubMenuTrigger = styled(Trigger)`
   }
 `;
 
-Styled.NavItem = styled(NavItem)<{ orientation: 'horizontal' | 'vertical' }>`
+type navItemStyleProps = { orientation: 'horizontal' | 'vertical' };
+const NavItemTypeTemp = getSimpleStyledOutputType(NavItem, {} as navItemStyleProps);
+
+const $NavItem = styled(NavItem)<navItemStyleProps>`
   ${({ subitems }) =>
     subitems?.length
       ? css`
@@ -446,11 +456,11 @@ Styled.NavItem = styled(NavItem)<{ orientation: 'horizontal' | 'vertical' }>`
 
   /* Border-radius! */
 
-  ${Styled.List}[data-orientation="menu"] & {
+  ${$List}[data-orientation="menu"] & {
     --item-radius: 0;
   }
 
-  ${Styled.List}[data-orientation="menu"] > ${Styled.ListItem}:first-child > & {
+  ${$List}[data-orientation="menu"] > ${$ListItem}:first-child > & {
     border-top-left-radius: var(--popover-radius);
 
     &:not([data-state='open']) {
@@ -458,7 +468,7 @@ Styled.NavItem = styled(NavItem)<{ orientation: 'horizontal' | 'vertical' }>`
     }
   }
 
-  ${Styled.List}[data-orientation="menu"] > ${Styled.ListItem}:last-child > & {
+  ${$List}[data-orientation="menu"] > ${$ListItem}:last-child > & {
     border-bottom-left-radius: var(--popover-radius);
 
     &:not([data-state='open']) {
@@ -466,16 +476,16 @@ Styled.NavItem = styled(NavItem)<{ orientation: 'horizontal' | 'vertical' }>`
     }
   }
 
-  ${Styled.List}[data-orientation="menu"] ${Styled.List}[data-orientation="menu"] > ${Styled.ListItem}:first-child > & {
+  ${$List}[data-orientation="menu"] ${$List}[data-orientation="menu"] > ${$ListItem}:first-child > & {
     border-top-left-radius: 0;
   }
-`;
+` as typeof NavItemTypeTemp;
 
-Styled.Icon = styled(Icon)`
+const $Icon = styled(Icon)`
   font-size: 0.375em;
   transition: rotate 0.3s var(--ease-out-expo);
 
-  ${Styled.List}[data-orientation="menu"] & {
+  ${$List}[data-orientation="menu"] & {
     rotate: -0.25turn;
   }
 `;

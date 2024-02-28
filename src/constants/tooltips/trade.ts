@@ -1,4 +1,4 @@
-import { type TooltipStrings, TOOLTIP_STRING_KEYS } from '@/constants/localization';
+import { TOOLTIP_STRING_KEYS, type TooltipStrings } from '@/constants/localization';
 
 export const tradeTooltips: TooltipStrings = {
   'account-leverage': ({ stringGetter }) => ({
@@ -57,9 +57,10 @@ export const tradeTooltips: TooltipStrings = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.INDEX_PRICE_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.INDEX_PRICE_BODY }),
   }),
-  'initial-margin-fraction': ({ stringGetter }) => ({
+  'initial-margin-fraction': ({ stringGetter, urlConfigs }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.INITIAL_MARGIN_FRACTION_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.INITIAL_MARGIN_FRACTION_BODY }),
+    learnMoreLink: urlConfigs?.initialMarginFractionLearnMore,
   }),
   'initial-stop': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.INITIAL_STOP_TITLE }),
@@ -84,6 +85,14 @@ export const tradeTooltips: TooltipStrings = {
   'liquidation-price-general': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.LIQUIDATION_PRICE_GENERAL_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.LIQUIDATION_PRICE_GENERAL_BODY }),
+  }),
+  'liquidation-warning-long': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.STOP_LOSS_BELOW_LIQUIDATION_PRICE_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.STOP_LOSS_BELOW_LIQUIDATION_PRICE_BODY }),
+  }),
+  'liquidation-warning-short': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.STOP_LOSS_ABOVE_LIQUIDATION_PRICE_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.STOP_LOSS_ABOVE_LIQUIDATION_PRICE_BODY }),
   }),
   liquidity: ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.LIQUIDITY_TITLE }),
@@ -132,6 +141,14 @@ export const tradeTooltips: TooltipStrings = {
   'order-amount-usd': ({ stringGetter, stringParams }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.ORDER_AMOUNT_USD_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.ORDER_AMOUNT_USD_BODY, params: stringParams }),
+  }),
+  'partial-close-stop-loss': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.PARTIAL_CLOSE_STOP_LOSS_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.PARTIAL_CLOSE_STOP_LOSS_BODY }),
+  }),
+  'partial-close-take-profit': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.PARTIAL_CLOSE_TAKE_PROFIT_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.PARTIAL_CLOSE_TAKE_PROFIT_BODY }),
   }),
   'post-only': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.POST_ONLY_TITLE }),

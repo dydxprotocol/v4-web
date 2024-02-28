@@ -1,26 +1,31 @@
-import styled, { AnyStyledComponent, css } from 'styled-components';
-import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import styled, { css } from 'styled-components';
 import { useEnsName } from 'wagmi';
-import { useNavigate } from 'react-router-dom';
 
 import { TransferType } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
 import { ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { AppRoute, PortfolioRoute, HistoryRoute } from '@/constants/routes';
+import { AppRoute, HistoryRoute, PortfolioRoute } from '@/constants/routes';
 import { wallets } from '@/constants/wallets';
-import { useAccounts, useStringGetter, useTokenConfigs } from '@/hooks';
+
+import { useAccounts } from '@/hooks/useAccounts';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { AssetIcon } from '@/components/AssetIcon';
 import { Details } from '@/components/Details';
-import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton, type IconButtonProps } from '@/components/IconButton';
+import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 import { Toolbar } from '@/components/Toolbar';
+import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 
 import {
   getHistoricalTradingRewardsForCurrentWeek,
@@ -32,13 +37,21 @@ import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
 
 import { DYDXBalancePanel } from './token/rewards/DYDXBalancePanel';
-import { MigratePanel } from './token/rewards/MigratePanel';
 import { GovernancePanel } from './token/rewards/GovernancePanel';
+import { MigratePanel } from './token/rewards/MigratePanel';
+import { NewMarketsPanel } from './token/rewards/NewMarketsPanel';
 import { StakingPanel } from './token/staking/StakingPanel';
 import { StrideStakingPanel } from './token/staking/StrideStakingPanel';
-import { NewMarketsPanel } from './token/rewards/NewMarketsPanel';
 
 const ENS_CHAIN_ID = 1; // Ethereum
+
+type Action = {
+  key: string;
+  label: string;
+  icon: IconButtonProps;
+  href?: string;
+  onClick?: () => void;
+};
 
 const Profile = () => {
   const stringGetter = useStringGetter();
@@ -58,7 +71,7 @@ const Profile = () => {
 
   const currentWeekTradingReward = useSelector(getHistoricalTradingRewardsForCurrentWeek);
 
-  const actions = [
+  const actions: Action[] = [
     {
       key: 'deposit',
       label: stringGetter({ key: STRING_KEYS.DEPOSIT }),
@@ -121,38 +134,30 @@ const Profile = () => {
             dispatch(openDialog({ type: DialogTypes.Onboarding }));
           },
         },
-  ].filter(isTruthy) as {
-    key: string;
-    label: string;
-    icon: IconButtonProps;
-    href?: string;
-    onClick?: () => void;
-  }[];
+  ].filter(isTruthy);
 
   return (
-    <Styled.MobileProfileLayout>
-      <Styled.Header>
-        <Styled.ProfileIcon />
+    <$MobileProfileLayout>
+      <$Header>
+        <$ProfileIcon />
         <div>
-          <Styled.Address>
-            {isConnected ? ensName || truncateAddress(dydxAddress) : '-'}
-          </Styled.Address>
+          <$Address>{isConnected ? ensName ?? truncateAddress(dydxAddress) : '-'}</$Address>
           {isConnected && walletType ? (
-            <Styled.SubHeader>
-              <Styled.ConnectedIcon />
+            <$SubHeader>
+              <$ConnectedIcon />
               <span>{stringGetter({ key: STRING_KEYS.CONNECTED_TO })}</span>
               <span>{stringGetter({ key: wallets[walletType].stringKey })}</span>
-            </Styled.SubHeader>
+            </$SubHeader>
           ) : (
             <span>-</span>
           )}
         </div>
-      </Styled.Header>
-      <Styled.Actions withSeparators={false}>
+      </$Header>
+      <$Actions withSeparators={false}>
         {actions.map(({ key, label, href, icon, onClick }) => {
           const action = (
             <>
-              <Styled.ActionButton {...icon} size={ButtonSize.Large} onClick={onClick} />
+              <$ActionButton {...icon} size={ButtonSize.Large} onClick={onClick} />
               <span>{label}</span>
             </>
           );
@@ -161,56 +166,63 @@ const Profile = () => {
               {action}
             </Link>
           ) : (
+            // eslint-disable-next-line jsx-a11y/label-has-associated-control
             <label key={key}>{action}</label>
           );
         })}
-      </Styled.Actions>
+      </$Actions>
 
-      <Styled.SettingsButton
+      <$SettingsButton
         slotHeader={
-          <Styled.InlineRow>
+          <$InlineRow>
             <Icon iconName={IconName.Gear} />
             {stringGetter({ key: STRING_KEYS.SETTINGS })}
-          </Styled.InlineRow>
+          </$InlineRow>
         }
         onClick={() => navigate(AppRoute.Settings)}
       />
-      <Styled.HelpButton
+      <$HelpButton
         slotHeader={
-          <Styled.InlineRow>
+          <$InlineRow>
             <Icon iconName={IconName.HelpCircle} />
             {stringGetter({ key: STRING_KEYS.HELP })}
-          </Styled.InlineRow>
+          </$InlineRow>
         }
         onClick={() => dispatch(openDialog({ type: DialogTypes.Help }))}
       />
 
-      <Styled.MigratePanel />
+      <$MigratePanel />
 
-      <Styled.DYDXBalancePanel />
+      <$DYDXBalancePanel />
 
-      <Styled.RewardsPanel
+      <$RewardsPanel
         slotHeaderContent={stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
         href={`/${chainTokenLabel}`}
         hasSeparator
       >
-        <Styled.Details
+        <$Details
           items={[
             {
               key: 'week-rewards',
               label: stringGetter({ key: STRING_KEYS.THIS_WEEK }),
-              value: currentWeekTradingReward?.amount ?? '-',
+              value: (
+                <Output
+                  slotRight={<$AssetIcon symbol={chainTokenLabel} />}
+                  type={OutputType.Asset}
+                  value={currentWeekTradingReward?.amount}
+                />
+              ),
             },
           ]}
           layout="grid"
         />
-      </Styled.RewardsPanel>
-      <Styled.FeesPanel
+      </$RewardsPanel>
+      <$FeesPanel
         slotHeaderContent={stringGetter({ key: STRING_KEYS.FEES })}
         href={`${AppRoute.Portfolio}/${PortfolioRoute.Fees}`}
         hasSeparator
       >
-        <Styled.Details
+        <$Details
           items={[
             { key: 'maker', label: stringGetter({ key: STRING_KEYS.MAKER }), value: '-' },
             { key: 'taker', label: stringGetter({ key: STRING_KEYS.TAKER }), value: '-' },
@@ -218,9 +230,9 @@ const Profile = () => {
           ]}
           layout="grid"
         />
-      </Styled.FeesPanel>
+      </$FeesPanel>
 
-      <Styled.HistoryPanel
+      <$HistoryPanel
         slotHeaderContent={stringGetter({ key: STRING_KEYS.HISTORY })}
         href={`${AppRoute.Portfolio}/${PortfolioRoute.History}/${HistoryRoute.Trades}`}
         hasSeparator
@@ -234,21 +246,18 @@ const Profile = () => {
           ]}
           withInnerBorders={false}
         />
-      </Styled.HistoryPanel>
+      </$HistoryPanel>
 
-      <Styled.GovernancePanel />
-      <Styled.NewMarketsPanel />
-      <Styled.StakingPanel />
-      <Styled.StrideStakingPanel />
-    </Styled.MobileProfileLayout>
+      <$GovernancePanel />
+      <$NewMarketsPanel />
+      <$StakingPanel />
+      <$StrideStakingPanel />
+    </$MobileProfileLayout>
   );
 };
 
 export default Profile;
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.MobileProfileLayout = styled.div`
+const $MobileProfileLayout = styled.div`
   ${layoutMixins.contentContainerPage}
 
   display: grid;
@@ -285,13 +294,13 @@ Styled.MobileProfileLayout = styled.div`
   }
 `;
 
-Styled.Header = styled.header`
+const $Header = styled.header`
   grid-area: header;
   ${layoutMixins.row}
   padding: 0 1rem;
 `;
 
-Styled.ProfileIcon = styled.div`
+const $ProfileIcon = styled.div`
   width: 4rem;
   height: 4rem;
   margin-right: 1rem;
@@ -304,7 +313,7 @@ Styled.ProfileIcon = styled.div`
   );
 `;
 
-Styled.SubHeader = styled.div`
+const $SubHeader = styled.div`
   ${layoutMixins.row}
   gap: 0.25rem;
 
@@ -317,7 +326,7 @@ Styled.SubHeader = styled.div`
   }
 `;
 
-Styled.ConnectedIcon = styled.div`
+const $ConnectedIcon = styled.div`
   height: 0.5rem;
   width: 0.5rem;
   margin-right: 0.25rem;
@@ -327,11 +336,11 @@ Styled.ConnectedIcon = styled.div`
   box-shadow: 0 0 0 0.2rem var(--color-gradient-success);
 `;
 
-Styled.Address = styled.h1`
+const $Address = styled.h1`
   font: var(--font-extra-medium);
 `;
 
-Styled.Actions = styled(Toolbar)`
+const $Actions = styled(Toolbar)`
   ${layoutMixins.spacedRow}
   --stickyArea-topHeight: 5rem;
   grid-area: actions;
@@ -348,7 +357,7 @@ Styled.Actions = styled(Toolbar)`
   }
 `;
 
-Styled.ActionButton = styled(IconButton)<{ iconName?: IconName }>`
+const $ActionButton = styled(IconButton)<{ iconName?: IconName }>`
   margin-bottom: 0.5rem;
 
   ${({ iconName }) =>
@@ -365,12 +374,12 @@ Styled.ActionButton = styled(IconButton)<{ iconName?: IconName }>`
         `}
 `;
 
-Styled.Details = styled(Details)`
+const $Details = styled(Details)`
   font: var(--font-small-book);
   --details-value-font: var(--font-medium-book);
 `;
 
-Styled.RewardsPanel = styled(Panel)`
+const $RewardsPanel = styled(Panel)`
   grid-area: rewards;
   align-self: flex-start;
   height: 100%;
@@ -383,11 +392,11 @@ Styled.RewardsPanel = styled(Panel)`
   }
 `;
 
-Styled.FeesPanel = styled(Panel)`
+const $FeesPanel = styled(Panel)`
   grid-area: fees;
 `;
 
-Styled.HistoryPanel = styled(Panel)`
+const $HistoryPanel = styled(Panel)`
   grid-area: history;
   --panel-content-paddingY: 0;
   --panel-content-paddingX: 0;
@@ -418,45 +427,49 @@ Styled.HistoryPanel = styled(Panel)`
   }
 `;
 
-Styled.InlineRow = styled.div`
+const $InlineRow = styled.div`
   ${layoutMixins.inlineRow}
   padding: 1rem;
   gap: 0.5rem;
 `;
 
-Styled.PanelButton = styled(Panel)`
+const $PanelButton = styled(Panel)`
   --panel-paddingY: 0
   --panel-paddingX:0;
 `;
 
-Styled.SettingsButton = styled(Styled.PanelButton)`
+const $SettingsButton = styled($PanelButton)`
   grid-area: settings;
 `;
 
-Styled.HelpButton = styled(Styled.PanelButton)`
+const $HelpButton = styled($PanelButton)`
   grid-area: help;
 `;
 
-Styled.MigratePanel = styled(MigratePanel)`
+const $MigratePanel = styled(MigratePanel)`
   grid-area: migrate;
 `;
 
-Styled.DYDXBalancePanel = styled(DYDXBalancePanel)`
+const $DYDXBalancePanel = styled(DYDXBalancePanel)`
   grid-area: balance;
 `;
 
-Styled.GovernancePanel = styled(GovernancePanel)`
+const $GovernancePanel = styled(GovernancePanel)`
   grid-area: governance;
 `;
 
-Styled.StakingPanel = styled(StakingPanel)`
+const $StakingPanel = styled(StakingPanel)`
   grid-area: keplr;
 `;
 
-Styled.NewMarketsPanel = styled(NewMarketsPanel)`
+const $NewMarketsPanel = styled(NewMarketsPanel)`
   grid-area: newMarkets;
 `;
 
-Styled.StrideStakingPanel = styled(StrideStakingPanel)`
+const $StrideStakingPanel = styled(StrideStakingPanel)`
   grid-area: stride;
+`;
+
+const $AssetIcon = styled(AssetIcon)`
+  margin-left: 0.5ch;
 `;

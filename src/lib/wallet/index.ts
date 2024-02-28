@@ -1,11 +1,10 @@
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
-
 import {
-  type WalletConnection,
-  wallets,
   WalletConnectionType,
   WalletErrorType,
   WalletType,
+  wallets,
+  type WalletConnection,
 } from '@/constants/wallets';
 
 import { detectInjectedEip1193Providers } from './providers';
@@ -27,9 +26,11 @@ export const getWalletConnection = ({
 }): WalletConnection | undefined => {
   const walletConfig = wallets[walletType];
 
+  // eslint-disable-next-line no-restricted-syntax
   for (const connectionType of walletConfig.connectionTypes) {
     switch (connectionType) {
       case WalletConnectionType.InjectedEip1193: {
+        // eslint-disable-next-line no-restricted-syntax
         for (const provider of detectInjectedEip1193Providers()) {
           if (walletConfig.matchesInjectedEip1193?.(provider)) {
             /* @ts-ignore */
@@ -41,35 +42,39 @@ export const getWalletConnection = ({
             };
           }
         }
-
         break;
       }
-
       case WalletConnectionType.WalletConnect2: {
         return {
           type: WalletConnectionType.WalletConnect2,
         };
       }
-
       case WalletConnectionType.CoinbaseWalletSdk: {
         return {
           type: WalletConnectionType.CoinbaseWalletSdk,
         };
       }
-
       case WalletConnectionType.CosmosSigner: {
         return {
           type: WalletConnectionType.CosmosSigner,
         };
       }
-
       case WalletConnectionType.TestWallet: {
         return {
           type: WalletConnectionType.TestWallet,
         };
       }
+      case WalletConnectionType.Privy: {
+        return {
+          type: WalletConnectionType.Privy,
+        };
+      }
+      default: {
+        continue;
+      }
     }
   }
+  return undefined;
 };
 
 export const getWalletErrorType = ({ error }: { error: Error }) => {

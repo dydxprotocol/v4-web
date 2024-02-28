@@ -1,28 +1,61 @@
 import { useEffect, useMemo, useState } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
+
+import { SelectedGasDenom } from '@dydxprotocol/v4-client-js';
+import { useDispatch, useSelector } from 'react-redux';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { NotificationType } from '@/constants/notifications';
+import { NotificationCategoryPreferences } from '@/constants/notifications';
 
-import { useStringGetter } from '@/hooks';
+import { useDydxClient } from '@/hooks/useDydxClient';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { Switch } from '@/components/Switch';
 
+import { OtherPreference, setDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configs';
+import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
+
+import { isTruthy } from '@/lib/isTruthy';
+
 export const usePreferenceMenu = () => {
+  const dispatch = useDispatch();
   const stringGetter = useStringGetter();
 
   // Notifications
   const { notificationPreferences, setNotificationPreferences } = useNotifications();
   const [enabledNotifs, setEnabledNotifs] = useState(notificationPreferences);
 
-  const toggleNotifPreference = (type: NotificationType) =>
+  const currentDisplayAllMarketDefault = useSelector(getDefaultToAllMarketsInPositionsOrdersFills);
+  const [defaultToAllMarkets, setDefaultToAllMarkets] = useState(currentDisplayAllMarketDefault);
+
+  const toggleNotifPreference = (type: NotificationCategoryPreferences) =>
     setEnabledNotifs((prev) => ({ ...prev, [type]: !prev[type] }));
 
   useEffect(() => {
     setNotificationPreferences(enabledNotifs);
   }, [enabledNotifs]);
+
+  useEffect(() => {
+    setDefaultToAllMarkets(currentDisplayAllMarketDefault);
+  }, [currentDisplayAllMarketDefault]);
+
+  const getItem = (
+    notificationCategory: NotificationCategoryPreferences,
+    labelStringKey: string
+  ) => ({
+    value: notificationCategory,
+    label: stringGetter({ key: labelStringKey }),
+    slotAfter: (
+      <Switch
+        name={notificationCategory}
+        checked={enabledNotifs[notificationCategory]}
+        onCheckedChange={() => null}
+      />
+    ),
+    onSelect: () => toggleNotifPreference(notificationCategory),
+  });
 
   const notificationSection = useMemo(
     () => ({
@@ -30,47 +63,69 @@ export const usePreferenceMenu = () => {
       groupLabel: stringGetter({ key: STRING_KEYS.NOTIFICATIONS }),
       items: [
         {
-          value: NotificationType.AbacusGenerated,
-          label: stringGetter({ key: STRING_KEYS.TRADING }),
-          slotAfter: (
-            <Switch
-              name={NotificationType.AbacusGenerated}
-              checked={enabledNotifs[NotificationType.AbacusGenerated]}
-              onCheckedChange={(enabled: boolean) => null}
-            />
-          ),
-          onSelect: () => toggleNotifPreference(NotificationType.AbacusGenerated),
+          value: NotificationCategoryPreferences.General,
+          labelStringKey: STRING_KEYS.GENERAL,
         },
         {
-          value: NotificationType.SquidTransfer,
-          label: stringGetter({ key: STRING_KEYS.TRANSFERS }),
-          slotAfter: (
-            <Switch
-              name={NotificationType.SquidTransfer}
-              checked={enabledNotifs[NotificationType.SquidTransfer]}
-              onCheckedChange={(enabled: boolean) => null}
-            />
-          ),
-          onSelect: () => toggleNotifPreference(NotificationType.SquidTransfer),
+          value: NotificationCategoryPreferences.Transfers,
+          labelStringKey: STRING_KEYS.TRANSFERS,
         },
         {
-          value: NotificationType.ReleaseUpdates,
-          label: "Release Updates",
-          slotAfter: (
-            <Switch
-              name={NotificationType.ReleaseUpdates}
-              checked={enabledNotifs[NotificationType.ReleaseUpdates]}
-              onCheckedChange={(enabled: boolean) => null}
-            />
-          ),
-          onSelect: () => toggleNotifPreference(NotificationType.ReleaseUpdates),
-        }
-      ],
+          value: NotificationCategoryPreferences.Trading,
+          labelStringKey: STRING_KEYS.TRADING,
+        },
+      ]
+        .filter(isTruthy)
+        .map(({ value, labelStringKey }) => getItem(value, labelStringKey)),
     }),
     [stringGetter, enabledNotifs]
   );
 
-  return [notificationSection];
+  const { setSelectedGasDenom, selectedGasDenom } = useDydxClient();
+
+  const otherSection = useMemo(
+    () => ({
+      group: 'Other',
+      groupLabel: stringGetter({ key: STRING_KEYS.OTHER }),
+      items: [
+        {
+          value: OtherPreference.DisplayAllMarketsDefault,
+          label: stringGetter({ key: STRING_KEYS.DEFAULT_TO_ALL_MARKETS_IN_POSITIONS }),
+          slotAfter: (
+            <Switch
+              name={OtherPreference.DisplayAllMarketsDefault}
+              checked={defaultToAllMarkets}
+              onCheckedChange={() => null}
+            />
+          ),
+          onSelect: () => {
+            dispatch(setDefaultToAllMarketsInPositionsOrdersFills(!defaultToAllMarkets));
+          },
+        },
+        {
+          value: OtherPreference.GasToken,
+          label: 'Pay gas with USDC',
+          slotAfter: (
+            <Switch
+              name={OtherPreference.GasToken}
+              checked={selectedGasDenom === SelectedGasDenom.USDC}
+              onCheckedChange={() => null}
+            />
+          ),
+          onSelect: () => {
+            setSelectedGasDenom(
+              selectedGasDenom === SelectedGasDenom.USDC
+                ? SelectedGasDenom.NATIVE
+                : SelectedGasDenom.USDC
+            );
+          },
+        },
+      ],
+    }),
+    [stringGetter, defaultToAllMarkets, selectedGasDenom, setSelectedGasDenom]
+  );
+
+  return [notificationSection, otherSection];
 };
 
 type ElementProps = {
@@ -82,7 +137,7 @@ export const PreferencesDialog = ({ setIsOpen }: ElementProps) => {
   const preferenceItems = usePreferenceMenu();
 
   return (
-    <Styled.ComboboxDialogMenu
+    <$ComboboxDialogMenu
       isOpen
       title={stringGetter({ key: STRING_KEYS.PREFERENCES })}
       items={preferenceItems}
@@ -90,9 +145,6 @@ export const PreferencesDialog = ({ setIsOpen }: ElementProps) => {
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ComboboxDialogMenu = styled(ComboboxDialogMenu)`
+const $ComboboxDialogMenu = styled(ComboboxDialogMenu)`
   --dialog-content-paddingBottom: 0.5rem;
 `;

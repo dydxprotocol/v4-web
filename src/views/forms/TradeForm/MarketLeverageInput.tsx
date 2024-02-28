@@ -1,6 +1,6 @@
-import { shallowEqual, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { shallowEqual, useSelector } from 'react-redux';
+import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';
@@ -8,9 +8,10 @@ import { STRING_KEYS } from '@/constants/localization';
 import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 import { PositionSide } from '@/constants/trade';
 
-import { useStringGetter } from '@/hooks';
-import { formMixins } from '@/styles/formMixins';
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { breakpoints } from '@/styles';
+import { formMixins } from '@/styles/formMixins';
 
 import { Input, InputType } from '@/components/Input';
 import { PositionSideTag } from '@/components/PositionSideTag';
@@ -46,7 +47,7 @@ export const MarketLeverageInput = ({
   const { leverage, size: currentPositionSize } = currentPositionData || {};
   const { current: currentSize, postOrder: postOrderSize } = currentPositionSize || {};
   const { current: currentLeverage, postOrder: postOrderLeverage } = leverage || {};
-  const { initialMarginFraction } = currentMarketConfig || {};
+  const { initialMarginFraction, effectiveInitialMarginFraction } = currentMarketConfig || {};
   const { side } = inputTradeData || {};
   const orderSide = getSelectedOrderSide(side);
 
@@ -55,19 +56,24 @@ export const MarketLeverageInput = ({
     postOrderSize,
   });
 
-  const maxLeverage = initialMarginFraction
-    ? BIG_NUMBERS.ONE.div(initialMarginFraction)
-    : MustBigNumber(10);
+  const preferredIMF = effectiveInitialMarginFraction ?? initialMarginFraction;
+
+  const maxLeverage = preferredIMF ? BIG_NUMBERS.ONE.div(preferredIMF) : MustBigNumber(10);
+
+  const leverageOptions = maxLeverage.lt(10) ? [1, 2, 3, 4, 5] : [1, 2, 3, 5, 10];
 
   const leveragePosition = postOrderLeverage ? newPositionSide : currentPositionSide;
 
   const getSignedLeverage = (newLeverage: string | number) => {
     const newLeverageBN = MustBigNumber(newLeverage);
+    const newLeverageBNCapped = newLeverageBN.isGreaterThan(maxLeverage)
+      ? maxLeverage
+      : newLeverageBN;
     const newLeverageSignedBN =
       leveragePosition === PositionSide.Short ||
       (leveragePosition === PositionSide.None && orderSide === OrderSide.SELL)
-        ? newLeverageBN.abs().negated()
-        : newLeverageBN.abs();
+        ? newLeverageBNCapped.abs().negated()
+        : newLeverageBNCapped.abs();
 
     return newLeverageSignedBN.toFixed(LEVERAGE_DECIMALS);
   };
@@ -100,7 +106,7 @@ export const MarketLeverageInput = ({
     });
   };
 
-  const onLeverageSideToggle = (e: Event) => {
+  const onLeverageSideToggle = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
 
     if (leveragePosition === PositionSide.None) return;
@@ -121,8 +127,8 @@ export const MarketLeverageInput = ({
 
   return (
     <>
-      <Styled.InputContainer>
-        <Styled.WithLabel
+      <$InputContainer>
+        <$WithLabel
           key="leverage"
           label={
             <>
@@ -130,13 +136,13 @@ export const MarketLeverageInput = ({
                 {stringGetter({ key: STRING_KEYS.LEVERAGE })}
               </WithTooltip>
 
-              <Styled.LeverageSide onClick={onLeverageSideToggle}>
+              <$LeverageSide onClick={onLeverageSideToggle}>
                 <PositionSideTag positionSide={leveragePosition} />
-              </Styled.LeverageSide>
+              </$LeverageSide>
             </>
           }
         >
-          <Styled.LeverageSlider
+          <$LeverageSlider
             leverage={currentLeverage}
             leverageInputValue={getSignedLeverage(leverageInputValue)}
             maxLeverage={maxLeverage}
@@ -144,21 +150,22 @@ export const MarketLeverageInput = ({
             positionSide={currentPositionSide}
             setLeverageInputValue={setLeverageInputValue}
           />
-        </Styled.WithLabel>
-        <Styled.InnerInputContainer>
+        </$WithLabel>
+        <$InnerInputContainer>
           <Input
             onInput={onLeverageInput}
             placeholder={`${MustBigNumber(currentLeverage).abs().toFixed(LEVERAGE_DECIMALS)}×`}
             type={InputType.Leverage}
             value={leverageInputValue ?? ''}
           />
-        </Styled.InnerInputContainer>
-      </Styled.InputContainer>
+        </$InnerInputContainer>
+      </$InputContainer>
 
-      <Styled.ToggleGroup
-        items={[1, 2, 3, 5, 10].map((leverageAmount: number) => ({
+      <$ToggleGroup
+        items={leverageOptions.map((leverageAmount: number) => ({
           label: `${leverageAmount}×`,
           value: MustBigNumber(leverageAmount).toFixed(LEVERAGE_DECIMALS),
+          disabled: maxLeverage.lt(leverageAmount),
         }))}
         value={MustBigNumber(formattedLeverageValue).abs().toFixed(LEVERAGE_DECIMALS)} // sign agnostic
         onValueChange={updateLeverage}
@@ -167,10 +174,7 @@ export const MarketLeverageInput = ({
     </>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.InputContainer = styled.div`
+const $InputContainer = styled.div`
   ${formMixins.inputContainer}
   --input-height: 3.5rem;
 
@@ -181,15 +185,15 @@ Styled.InputContainer = styled.div`
   }
 `;
 
-Styled.WithLabel = styled(WithLabel)`
+const $WithLabel = styled(WithLabel)`
   ${formMixins.inputLabel}
 `;
 
-Styled.LeverageSlider = styled(LeverageSlider)`
+const $LeverageSlider = styled(LeverageSlider)`
   margin-top: 0.25rem;
 `;
 
-Styled.InnerInputContainer = styled.div`
+const $InnerInputContainer = styled.div`
   ${formMixins.inputContainer}
   --input-backgroundColor: var(--color-layer-5);
   --input-borderColor: var(--color-layer-7);
@@ -208,10 +212,10 @@ Styled.InnerInputContainer = styled.div`
   }
 `;
 
-Styled.LeverageSide = styled.div`
+const $LeverageSide = styled.div`
   cursor: pointer;
 `;
 
-Styled.ToggleGroup = styled(ToggleGroup)`
+const $ToggleGroup = styled(ToggleGroup)`
   ${formMixins.inputToggleGroup}
 `;

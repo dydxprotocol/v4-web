@@ -1,8 +1,5 @@
-import styled from 'styled-components';
-
 import { Provider, Viewport } from '@radix-ui/react-toast';
-
-import { layoutMixins } from '@/styles/layoutMixins';
+import styled from 'styled-components';
 
 type ElementProps = {
   swipeDirection: 'up' | 'down' | 'left' | 'right';
@@ -27,7 +24,7 @@ export const ToastArea = ({ swipeDirection, children, className }: ToastAreaProp
 const $ToastArea = styled.aside`
   // Params
   --toasts-gap: 0.5rem;
-  
+
   // Rules
   z-index: 1;
 

@@ -1,8 +1,7 @@
 import { useRef, useState } from 'react';
 
-import styled, { type AnyStyledComponent, css } from 'styled-components';
-
 import type { ResolutionString } from 'public/tradingview/charting_library';
+import styled, { css } from 'styled-components';
 
 import type { TvWidget } from '@/constants/tvchart';
 
@@ -13,9 +12,9 @@ import {
   useTradingViewTheme,
 } from '@/hooks/tradingView';
 
-import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
-
 import { layoutMixins } from '@/styles/layoutMixins';
+
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
 export const TvChart = () => {
   const [isChartReady, setIsChartReady] = useState(false);
@@ -37,17 +36,14 @@ export const TvChart = () => {
   useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
 
   return (
-    <Styled.PriceChart isChartReady={isChartReady}>
+    <$PriceChart isChartReady={isChartReady}>
       {!isChartReady && <LoadingSpace id="tv-chart-loading" />}
 
       <div id="tv-price-chart" />
-    </Styled.PriceChart>
+    </$PriceChart>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.PriceChart = styled.div<{ isChartReady?: boolean }>`
+const $PriceChart = styled.div<{ isChartReady?: boolean }>`
   ${layoutMixins.stack}
 
   height: 100%;

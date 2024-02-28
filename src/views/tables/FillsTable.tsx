@@ -1,41 +1,44 @@
-import { useEffect } from 'react';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { Key, useEffect, useMemo } from 'react';
+
+import { Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { ColumnSize } from '@react-types/table';
-import { Nullable } from '@dydxprotocol/v4-abacus';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled, { css } from 'styled-components';
 
 import { type Asset, type SubaccountFill } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
-import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
+import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
+import { EMPTY_ARR } from '@/constants/objects';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
-import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { Table, TableCell, TableColumnHeader, type ColumnDef } from '@/components/Table';
+import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 
+import { viewedFills } from '@/state/account';
 import {
   getCurrentMarketFills,
   getHasUnseenFillUpdates,
   getSubaccountFills,
 } from '@/state/accountSelectors';
-
 import { getAssets } from '@/state/assetsSelectors';
-import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
-import { viewedFills } from '@/state/account';
-
 import { openDialog } from '@/state/dialogs';
+import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { getHydratedTradingData } from '@/lib/orders';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 const MOBILE_FILLS_PER_PAGE = 50;
 
@@ -88,7 +91,7 @@ const getFillsTableColumnDef = ({
           key: STRING_KEYS.AMOUNT,
         })}`,
         renderCell: ({ resources, size, stepSizeDecimals, asset: { id } }) => (
-          <TableCell stacked slotLeft={<Styled.AssetIcon symbol={id} />}>
+          <TableCell stacked slotLeft={<$AssetIcon symbol={id} />}>
             <span>
               {resources.typeStringKey ? stringGetter({ key: resources.typeStringKey }) : null}
             </span>
@@ -109,21 +112,21 @@ const getFillsTableColumnDef = ({
         })}`,
         renderCell: ({ fee, orderSide, price, resources, tickSizeDecimals }) => (
           <TableCell stacked>
-            <Styled.InlineRow>
-              <Styled.Side side={orderSide}>
+            <$InlineRow>
+              <$Side side={orderSide}>
                 {resources.sideStringKey ? stringGetter({ key: resources.sideStringKey }) : null}
-              </Styled.Side>
-              <Styled.SecondaryColor>@</Styled.SecondaryColor>
+              </$Side>
+              <$SecondaryColor>@</$SecondaryColor>
               <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
-            </Styled.InlineRow>
-            <Styled.InlineRow>
-              <Styled.BaseColor>
+            </$InlineRow>
+            <$InlineRow>
+              <$BaseColor>
                 {resources.liquidityStringKey
                   ? stringGetter({ key: resources.liquidityStringKey })
                   : null}
-              </Styled.BaseColor>
+              </$BaseColor>
               <Output type={OutputType.Fiat} value={fee} />
-            </Styled.InlineRow>
+            </$InlineRow>
           </TableCell>
         ),
       },
@@ -132,7 +135,7 @@ const getFillsTableColumnDef = ({
         getCellValue: (row) => row.createdAtMilliseconds,
         label: stringGetter({ key: STRING_KEYS.TIME }),
         renderCell: ({ createdAtMilliseconds }) => (
-          <Styled.TimeOutput
+          <$TimeOutput
             type={OutputType.RelativeTime}
             relativeTimeFormatOptions={{ format: 'singleCharacter' }}
             value={createdAtMilliseconds}
@@ -150,17 +153,17 @@ const getFillsTableColumnDef = ({
         getCellValue: (row) => row.marketId,
         label: stringGetter({ key: STRING_KEYS.ACTION }),
         renderCell: ({ asset, orderSide }) => (
-          <Styled.TableCell>
-            <Styled.Side side={orderSide}>
+          <$TableCell>
+            <$Side side={orderSide}>
               {stringGetter({
                 key: {
                   [OrderSide.BUY]: STRING_KEYS.BUY,
                   [OrderSide.SELL]: STRING_KEYS.SELL,
                 }[orderSide],
               })}
-            </Styled.Side>
+            </$Side>
             <Output type={OutputType.Text} value={asset?.id} />
-          </Styled.TableCell>
+          </$TableCell>
         ),
       },
       [FillsTableColumnKey.Liquidity]: {
@@ -290,6 +293,7 @@ type ElementProps = {
   columnKeys: FillsTableColumnKey[];
   columnWidths?: Partial<Record<FillsTableColumnKey, ColumnSize>>;
   currentMarket?: string;
+  initialPageSize?: PageSize;
 };
 
 type StyleProps = {
@@ -302,6 +306,7 @@ export const FillsTable = ({
   columnKeys,
   columnWidths,
   currentMarket,
+  initialPageSize,
   withGradientCardRows,
   withOuterBorder,
   withInnerBorders = true,
@@ -310,12 +315,12 @@ export const FillsTable = ({
   const dispatch = useDispatch();
   const { isMobile, isTablet } = useBreakpoints();
 
-  const marketFills = useSelector(getCurrentMarketFills, shallowEqual) || [];
-  const allFills = useSelector(getSubaccountFills, shallowEqual) || [];
+  const marketFills = useSelector(getCurrentMarketFills, shallowEqual) ?? EMPTY_ARR;
+  const allFills = useSelector(getSubaccountFills, shallowEqual) ?? EMPTY_ARR;
   const fills = currentMarket ? marketFills : allFills;
 
-  const allPerpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
-  const allAssets = useSelector(getAssets, shallowEqual) || {};
+  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
 
   const hasUnseenFillUpdates = useSelector(getHasUnseenFillUpdates);
 
@@ -325,23 +330,27 @@ export const FillsTable = ({
 
   const symbol = currentMarket ? allAssets[allPerpetualMarkets[currentMarket]?.assetId]?.id : null;
 
-  const fillsData = fills.map((fill: SubaccountFill) =>
-    getHydratedTradingData({
-      data: fill,
-      assets: allAssets,
-      perpetualMarkets: allPerpetualMarkets,
-    })
-  ) as FillTableRow[];
+  const fillsData = useMemo(
+    () =>
+      fills.map((fill: SubaccountFill) =>
+        getHydratedTradingData({
+          data: fill,
+          assets: allAssets,
+          perpetualMarkets: allPerpetualMarkets,
+        })
+      ) as FillTableRow[],
+    [fills, allPerpetualMarkets, allAssets]
+  );
 
   return (
-    <Styled.Table
+    <$Table
       key={currentMarket ?? 'all-fills'}
       label="Fills"
       data={
         isMobile && withGradientCardRows ? fillsData.slice(0, MOBILE_FILLS_PER_PAGE) : fillsData
       }
       getRowKey={(row: FillTableRow) => row.id}
-      onRowAction={(key: string) =>
+      onRowAction={(key: Key) =>
         dispatch(
           openDialog({
             type: DialogTypes.FillDetails,
@@ -349,7 +358,7 @@ export const FillsTable = ({
           })
         )
       }
-      columns={columnKeys.map((key: FillsTableColumnKey, index: number) =>
+      columns={columnKeys.map((key: FillsTableColumnKey) =>
         getFillsTableColumnDef({
           key,
           isTablet,
@@ -360,10 +369,11 @@ export const FillsTable = ({
       )}
       slotEmpty={
         <>
-          <Styled.Icon iconName={IconName.History} />
+          <$Icon iconName={IconName.History} />
           <h4>{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</h4>
         </>
       }
+      initialPageSize={initialPageSize}
       withOuterBorder={withOuterBorder}
       withInnerBorders={withInnerBorders}
       withScrollSnapColumns
@@ -372,42 +382,39 @@ export const FillsTable = ({
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Table = styled(Table)`
+const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
-`;
+` as typeof Table;
 
-Styled.TableCell = styled(TableCell)`
+const $TableCell = styled(TableCell)`
   gap: 0.25rem;
 `;
 
-Styled.InlineRow = styled.div`
+const $InlineRow = styled.div`
   ${layoutMixins.inlineRow}
 `;
 
-Styled.Icon = styled(Icon)`
+const $Icon = styled(Icon)`
   font-size: 3em;
 `;
 
-Styled.AssetIcon = styled(AssetIcon)`
+const $AssetIcon = styled(AssetIcon)`
   font-size: 2.25rem;
 `;
 
-Styled.SecondaryColor = styled.span`
+const $SecondaryColor = styled.span`
   color: var(--color-text-0);
 `;
 
-Styled.BaseColor = styled.span`
+const $BaseColor = styled.span`
   color: var(--color-text-1);
 `;
 
-Styled.TimeOutput = styled(Output)`
+const $TimeOutput = styled(Output)`
   color: var(--color-text-0);
 `;
 
-Styled.Side = styled.span<{ side: OrderSide }>`
+const $Side = styled.span<{ side: OrderSide }>`
   ${({ side }) =>
     ({
       [OrderSide.BUY]: css`

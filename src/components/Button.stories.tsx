@@ -1,6 +1,12 @@
 import type { Story } from '@ladle/react';
 
-import { ButtonAction, ButtonShape, ButtonSize, ButtonState, ButtonType } from '@/constants/buttons';
+import {
+  ButtonAction,
+  ButtonShape,
+  ButtonSize,
+  ButtonState,
+  ButtonType,
+} from '@/constants/buttons';
 
 import { Button, type ButtonProps } from '@/components/Button';
 

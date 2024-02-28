@@ -1,18 +1,19 @@
 import { useCallback } from 'react';
-import { shallowEqual, useSelector } from 'react-redux';
-import { useBalance } from 'wagmi';
+
 import { StargateClient } from '@cosmjs/stargate';
 import { useQuery } from 'react-query';
+import { shallowEqual, useSelector } from 'react-redux';
 import { formatUnits } from 'viem';
+import { useBalance } from 'wagmi';
 
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { EvmAddress } from '@/constants/wallets';
 
-import { convertBech32Address } from '@/lib/addressUtils';
-import { MustBigNumber } from '@/lib/numbers';
-
 import { getBalances, getStakingBalances } from '@/state/accountSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
+
+import { convertBech32Address } from '@/lib/addressUtils';
+import { MustBigNumber } from '@/lib/numbers';
 
 import { useAccounts } from './useAccounts';
 import { useTokenConfigs } from './useTokenConfigs';
@@ -74,6 +75,7 @@ export const useAccountBalance = ({
 
       return formatUnits(BigInt(balanceAsCoin.amount), decimals);
     }
+    return undefined;
   }, [addressOrDenom, chainId, rpc]);
 
   const cosmosQuery = useQuery({
@@ -87,7 +89,7 @@ export const useAccountBalance = ({
     staleTime: 10_000,
   });
 
-  const { formatted: evmBalance } = evmQuery.data || {};
+  const { formatted: evmBalance } = evmQuery.data ?? {};
   const balance = isCosmosChain ? cosmosQuery.data : evmBalance;
 
   const nativeTokenCoinBalance = balances?.[chainTokenDenom];

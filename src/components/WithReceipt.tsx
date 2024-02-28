@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+
+import styled, { css } from 'styled-components';
 
 type ElementProps = {
   slotReceipt?: ReactNode;
@@ -23,23 +24,17 @@ export const WithReceipt = ({
     return <>{children}</>;
   }
 
-  const receipt = <Styled.SlotReceipt>{slotReceipt}</Styled.SlotReceipt>;
+  const receipt = <$SlotReceipt>{slotReceipt}</$SlotReceipt>;
 
   return (
-    <Styled.WithReceipt
-      className={className}
-      hideReceipt={hideReceipt}
-    >
+    <$WithReceipt className={className} hideReceipt={hideReceipt}>
       {side === 'top' && receipt}
       {children}
       {side === 'bottom' && receipt}
-    </Styled.WithReceipt>
+    </$WithReceipt>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.WithReceipt = styled.div<{ hideReceipt?: boolean }>`
+const $WithReceipt = styled.div<{ hideReceipt?: boolean }>`
   --withReceipt-backgroundColor: var(--color-layer-1);
   display: grid;
 
@@ -51,11 +46,11 @@ Styled.WithReceipt = styled.div<{ hideReceipt?: boolean }>`
     css`
       background-color: transparent;
 
-      ${Styled.SlotReceipt} {
+      ${$SlotReceipt} {
         height: 0;
         opacity: 0;
       }
     `}
 `;
 
-Styled.SlotReceipt = styled.div``;
+const $SlotReceipt = styled.div``;

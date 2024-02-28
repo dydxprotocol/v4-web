@@ -1,55 +1,59 @@
-import { createConfig, configureChains, mainnet, Chain } from 'wagmi';
-import { goerli } from 'wagmi/chains';
-
+// Custom connectors
+import type { ExternalProvider } from '@ethersproject/providers';
+import type { PrivyClientConfig } from '@privy-io/react-auth';
 import {
   arbitrum,
   arbitrumGoerli,
   avalanche,
   avalancheFuji,
-  bsc,
-  bscTestnet,
-  optimism,
-  optimismGoerli,
   base,
   baseGoerli,
-  polygon,
-  polygonMumbai,
+  bsc,
+  bscTestnet,
+  celo,
+  celoAlfajores,
+  fantom,
+  fantomTestnet,
+  filecoin,
+  filecoinHyperspace,
+  kava,
   linea,
   lineaTestnet,
   mantle,
   mantleTestnet,
-  moonbeam,
   moonbaseAlpha,
-  filecoin,
-  filecoinHyperspace,
-  fantom,
-  fantomTestnet,
-  celo,
-  celoAlfajores,
+  moonbeam,
+  optimism,
+  optimismGoerli,
+  polygon,
+  polygonMumbai,
   scroll,
-  kava,
   sepolia,
 } from 'viem/chains';
-
-import { alchemyProvider } from 'wagmi/providers/alchemy';
-import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
-import { publicProvider } from 'wagmi/providers/public';
-
+import { Chain, configureChains, createConfig, mainnet } from 'wagmi';
+import { goerli } from 'wagmi/chains';
 import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet';
 import { InjectedConnector } from 'wagmi/connectors/injected';
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
+import { alchemyProvider } from 'wagmi/providers/alchemy';
+import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
+import { publicProvider } from 'wagmi/providers/public';
 
+import { LocalStorageKey } from '@/constants/localStorage';
+import { DEFAULT_APP_ENVIRONMENT, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import {
-  type WalletConnection,
+  WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS,
   WalletConnectionType,
-  type WalletType,
   walletConnectionTypes,
   wallets,
-  WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS,
+  type WalletConnection,
+  type WalletType,
 } from '@/constants/wallets';
 
 import { isTruthy } from './isTruthy';
+import { getLocalStorage } from './localStorage';
+import { validateAgainstAvailableEnvironments } from './network';
 
 // Config
 
@@ -85,7 +89,26 @@ export const WAGMI_SUPPORTED_CHAINS: Chain[] = [
   kava,
 ];
 
-const { chains, publicClient, webSocketPublicClient } = configureChains(
+const defaultSelectedNetwork = getLocalStorage({
+  key: LocalStorageKey.SelectedNetwork,
+  defaultValue: DEFAULT_APP_ENVIRONMENT,
+  validateFn: validateAgainstAvailableEnvironments,
+});
+const defaultChainId = Number(ENVIRONMENT_CONFIG_MAP[defaultSelectedNetwork].ethereumChainId);
+
+export const privyConfig: PrivyClientConfig = {
+  embeddedWallets: {
+    createOnLogin: 'users-without-wallets',
+    requireUserPasswordOnCreate: false,
+    noPromptOnSignature: true,
+  },
+  appearance: {
+    theme: '#28283c',
+  },
+  defaultChain: defaultChainId === mainnet.id ? mainnet : sepolia,
+};
+
+export const configureChainsConfig = configureChains(
   WAGMI_SUPPORTED_CHAINS,
   [
     import.meta.env.VITE_ALCHEMY_API_KEY &&
@@ -96,6 +119,7 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
     publicProvider(),
   ].filter(isTruthy)
 );
+const { chains, publicClient, webSocketPublicClient } = configureChainsConfig;
 
 const injectedConnectorOptions = {
   chains,
@@ -133,6 +157,8 @@ const getWalletconnect2ConnectorOptions = (
     qrModalOptions: {
       themeMode: 'dark' as const,
       themeVariables: {
+        // TODO: figure out why --wcm-accent-color isn't considered a known property
+        // @ts-ignore
         '--wcm-accent-color': '#5973fe',
         '--wcm-font-family': 'var(--fontFamily-base)',
       },
@@ -165,10 +191,6 @@ export const config = createConfig({
   publicClient,
   webSocketPublicClient,
 });
-
-// Custom connectors
-
-import type { ExternalProvider } from '@ethersproject/providers';
 
 // Create a custom wagmi InjectedConnector using a specific injected EIP-1193 provider (instead of wagmi's default detection logic)
 const createInjectedConnectorWithProvider = (provider: ExternalProvider) =>

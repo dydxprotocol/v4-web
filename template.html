@@ -11,13 +11,26 @@
     <meta name="twitter:creator" content="@dYdX" />
     <meta property="og:url" content="%VITE_BASE_URL%" />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="%VITE_BASE_URL%/dydx-testnet.png" />
+    <meta property="og:image" content="%VITE_BASE_URL%/og-image.png" />
     <meta property="og:image:alt" content="dYdX" />
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="2400" />
     <meta property="og:image:height" content="1260" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:site_name" content="dYdX" />
+    <script>
+      if (typeof globalThis === 'undefined') {
+        (function () {
+          if (typeof self !== 'undefined') {
+            self.globalThis = self;
+          } else if (typeof window !== 'undefined') {
+            window.globalThis = window;
+          } else if (typeof global !== 'undefined') {
+            global.globalThis = global;
+          }
+        })();
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

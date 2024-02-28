@@ -1,16 +1,17 @@
-import styled, { AnyStyledComponent } from 'styled-components';
 import { useDispatch } from 'react-redux';
+import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
-import { STRING_KEYS } from '@/constants/localization';
 import { DialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter, useURLConfigs } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
-import { Panel } from '@/components/Panel';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Link } from '@/components/Link';
+import { Panel } from '@/components/Panel';
 
 import { openDialog } from '@/state/dialogs';
 
@@ -22,33 +23,28 @@ export const GovernancePanel = ({ className }: { className?: string }) => {
   return (
     <Panel
       className={className}
-      slotHeaderContent={
-        <Styled.Title>{stringGetter({ key: STRING_KEYS.GOVERNANCE })}</Styled.Title>
-      }
+      slotHeaderContent={<$Title>{stringGetter({ key: STRING_KEYS.GOVERNANCE })}</$Title>}
       slotRight={
-        <Styled.Arrow>
-          <Styled.IconButton
+        <$Arrow>
+          <$IconButton
             action={ButtonAction.Base}
             iconName={IconName.Arrow}
             size={ButtonSize.Small}
           />
-        </Styled.Arrow>
+        </$Arrow>
       }
       onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr }))}
     >
-      <Styled.Description>
+      <$Description>
         {stringGetter({ key: STRING_KEYS.GOVERNANCE_DESCRIPTION })}
         <Link href={governanceLearnMore} onClick={(e) => e.stopPropagation()}>
           {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
         </Link>
-      </Styled.Description>
+      </$Description>
     </Panel>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Description = styled.div`
+const $Description = styled.div`
   color: var(--color-text-0);
   --link-color: var(--color-text-1);
 
@@ -60,16 +56,16 @@ Styled.Description = styled.div`
   }
 `;
 
-Styled.IconButton = styled(IconButton)`
+const $IconButton = styled(IconButton)`
   color: var(--color-text-0);
   --color-border: var(--color-layer-6);
 `;
 
-Styled.Arrow = styled.div`
+const $Arrow = styled.div`
   padding-right: 1.5rem;
 `;
 
-Styled.Title = styled.h3`
+const $Title = styled.h3`
   font: var(--font-medium-book);
   color: var(--color-text-2);
   margin-bottom: -1rem;

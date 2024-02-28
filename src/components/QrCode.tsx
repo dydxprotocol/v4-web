@@ -1,10 +1,11 @@
 import { useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
-import QRCodeStyling from 'qr-code-styling';
 
-import { getAppTheme } from '@/state/configsSelectors';
+import QRCodeStyling from 'qr-code-styling';
+import { useSelector } from 'react-redux';
+import styled from 'styled-components';
+
 import { AppTheme } from '@/state/configs';
+import { getAppTheme } from '@/state/configsSelectors';
 
 type ElementProps = {
   value: string;
@@ -75,12 +76,9 @@ export const QrCode = ({ className, value, hasLogo, size = 300 }: ElementProps &
     }
   }, [appTheme, hasLogo]);
 
-  return <Styled.QrCode className={className} ref={ref} />;
+  return <$QrCode className={className} ref={ref} />;
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.QrCode = styled.div`
+const $QrCode = styled.div`
   width: 100%;
   cursor: none;
   border-radius: 0.75em;

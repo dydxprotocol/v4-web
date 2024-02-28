@@ -1,18 +1,20 @@
-import { memo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
+import { Key, memo, useMemo, useState } from 'react';
+
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import styled, { css, keyframes } from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, type MarketData } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
-import { useStringGetter } from '@/hooks';
+
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { popoverMixins } from '@/styles/popoverMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
+import { popoverMixins } from '@/styles/popoverMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
@@ -29,7 +31,7 @@ import { MustBigNumber } from '@/lib/numbers';
 
 import { MarketFilter } from './MarketFilter';
 
-const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string) => void }) => {
+const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) => void }) => {
   const [filter, setFilter] = useState(MarketFilters.ALL);
   const stringGetter = useStringGetter();
   const selectedLocale = useSelector(getSelectedLocale);
@@ -38,18 +40,85 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
   const navigate = useNavigate();
   const { hasPotentialMarketsData } = usePotentialMarkets();
 
+  const columns = useMemo(
+    () =>
+      [
+        {
+          columnKey: 'market',
+          getCellValue: (row) => row.market,
+          label: stringGetter({ key: STRING_KEYS.MARKET }),
+          renderCell: ({ assetId, id, isNew }) => (
+            <$MarketName isFavorited={false}>
+              {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
+              <AssetIcon symbol={assetId} />
+              <h2>{id}</h2>
+              <Tag>{assetId}</Tag>
+              {isNew && <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>}
+            </$MarketName>
+          ),
+        },
+        {
+          columnKey: 'oraclePrice',
+          getCellValue: (row) => row.oraclePrice,
+          label: stringGetter({ key: STRING_KEYS.PRICE }),
+          renderCell: ({ oraclePrice, tickSizeDecimals }) => (
+            <$Output type={OutputType.Fiat} value={oraclePrice} fractionDigits={tickSizeDecimals} />
+          ),
+        },
+        {
+          columnKey: 'priceChange24HPercent',
+          getCellValue: (row) => row.priceChange24HPercent,
+          label: stringGetter({ key: STRING_KEYS._24H }),
+          renderCell: ({ priceChange24HPercent }) => (
+            <$InlineRow>
+              {!priceChange24HPercent ? (
+                <$Output type={OutputType.Text} value={null} />
+              ) : (
+                <$PriceChangeOutput
+                  type={OutputType.Percent}
+                  value={priceChange24HPercent}
+                  isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
+                />
+              )}
+            </$InlineRow>
+          ),
+        },
+        {
+          columnKey: 'volume24H',
+          getCellValue: (row) => row.volume24H,
+          label: stringGetter({ key: STRING_KEYS.VOLUME }),
+          renderCell: ({ volume24H }) => (
+            <$Output type={OutputType.CompactFiat} value={volume24H} locale={selectedLocale} />
+          ),
+        },
+        {
+          columnKey: 'openInterest',
+          getCellValue: (row) => row.openInterestUSDC,
+          label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
+          renderCell: (row) => (
+            <$Output
+              type={OutputType.CompactFiat}
+              value={row.openInterestUSDC}
+              locale={selectedLocale}
+            />
+          ),
+        },
+      ] as ColumnDef<MarketData>[],
+    [stringGetter, selectedLocale]
+  );
+
   return (
     <>
-      <Styled.Toolbar>
+      <$Toolbar>
         <MarketFilter
           selectedFilter={filter}
           filters={marketFilters as MarketFilters[]}
           onChangeFilter={setFilter}
           onSearchTextChange={setSearchFilter}
         />
-      </Styled.Toolbar>
-      <Styled.ScrollArea>
-        <Styled.Table
+      </$Toolbar>
+      <$ScrollArea>
+        <$Table
           withInnerBorders
           data={filteredMarkets}
           getRowKey={(row: MarketData) => row.id}
@@ -59,86 +128,34 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
             direction: 'descending',
           }}
           label={stringGetter({ key: STRING_KEYS.MARKETS })}
-          columns={
-            [
-              {
-                columnKey: 'market',
-                getCellValue: (row) => row.market,
-                label: stringGetter({ key: STRING_KEYS.MARKET }),
-                renderCell: ({ assetId, id }) => (
-                  <Styled.MarketName isFavorited={false}>
-                    {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
-                    <AssetIcon symbol={assetId} />
-                    <h2>{id}</h2>
-                    <Tag>{assetId}</Tag>
-                  </Styled.MarketName>
-                ),
-              },
-              {
-                columnKey: 'oraclePrice',
-                getCellValue: (row) => row.oraclePrice,
-                label: stringGetter({ key: STRING_KEYS.PRICE }),
-                renderCell: ({ oraclePrice, tickSizeDecimals }) => (
-                  <Styled.Output
-                    type={OutputType.Fiat}
-                    value={oraclePrice}
-                    fractionDigits={tickSizeDecimals}
-                  />
-                ),
-              },
-              {
-                columnKey: 'priceChange24HPercent',
-                getCellValue: (row) => row.priceChange24HPercent,
-                label: stringGetter({ key: STRING_KEYS._24H }),
-                renderCell: ({ priceChange24HPercent }) => (
-                  <Styled.InlineRow>
-                    {!priceChange24HPercent ? (
-                      <Styled.Output type={OutputType.Text} value={null} />
-                    ) : (
-                      <Styled.PriceChangeOutput
-                        type={OutputType.Percent}
-                        value={priceChange24HPercent}
-                        isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
-                      />
-                    )}
-                  </Styled.InlineRow>
-                ),
-              },
-              {
-                columnKey: 'volume24H',
-                getCellValue: (row) => row.volume24H,
-                label: stringGetter({ key: STRING_KEYS.VOLUME }),
-                renderCell: ({ volume24H }) => (
-                  <Styled.Output
-                    type={OutputType.CompactFiat}
-                    value={volume24H}
-                    locale={selectedLocale}
-                  />
-                ),
-              },
-              {
-                columnKey: 'openInterest',
-                getCellValue: (row) => row.openInterestUSDC,
-                label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
-                renderCell: (row) => (
-                  <Styled.Output
-                    type={OutputType.CompactFiat}
-                    value={row.openInterestUSDC}
-                    locale={selectedLocale}
-                  />
-                ),
-              },
-            ] as ColumnDef<MarketData>[]
-          }
+          columns={columns}
+          initialPageSize={15}
           slotEmpty={
-            <Styled.MarketNotFound>
-              <h2>
-                {stringGetter({
-                  key: STRING_KEYS.QUERY_NOT_FOUND,
-                  params: { QUERY: searchFilter ?? '' },
-                })}
-              </h2>
-              <p>{stringGetter({ key: STRING_KEYS.MARKET_SEARCH_DOES_NOT_EXIST_YET })}</p>
+            <$MarketNotFound>
+              {filter === MarketFilters.NEW && !searchFilter ? (
+                <>
+                  <h2>
+                    {stringGetter({
+                      key: STRING_KEYS.QUERY_NOT_FOUND,
+                      params: { QUERY: stringGetter({ key: STRING_KEYS.NEW }) },
+                    })}
+                  </h2>
+                  {hasPotentialMarketsData && (
+                    <p>{stringGetter({ key: STRING_KEYS.ADD_DETAILS_TO_LAUNCH_MARKET })}</p>
+                  )}
+                </>
+              ) : (
+                <>
+                  <h2>
+                    {stringGetter({
+                      key: STRING_KEYS.QUERY_NOT_FOUND,
+                      params: { QUERY: searchFilter ?? '' },
+                    })}
+                  </h2>
+                  <p>{stringGetter({ key: STRING_KEYS.MARKET_SEARCH_DOES_NOT_EXIST_YET })}</p>
+                </>
+              )}
+
               {hasPotentialMarketsData && (
                 <div>
                   <Button
@@ -149,27 +166,27 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
                   </Button>
                 </div>
               )}
-            </Styled.MarketNotFound>
+            </$MarketNotFound>
           }
         />
-      </Styled.ScrollArea>
+      </$ScrollArea>
     </>
   );
 };
 
-export const MarketsDropdown: React.FC<{ currentMarketId?: string; symbol: string | null }> = memo(
-  ({ currentMarketId, symbol = '' }) => {
+export const MarketsDropdown = memo(
+  ({ currentMarketId, symbol = '' }: { currentMarketId?: string; symbol: string | null }) => {
     const [isOpen, setIsOpen] = useState(false);
     const stringGetter = useStringGetter();
     const navigate = useNavigate();
 
     return (
-      <Styled.Popover
+      <$Popover
         open={isOpen}
         onOpenChange={setIsOpen}
         sideOffset={1}
         slotTrigger={
-          <Styled.TriggerContainer $isOpen={isOpen}>
+          <$TriggerContainer $isOpen={isOpen}>
             {isOpen ? (
               <h2>{stringGetter({ key: STRING_KEYS.SELECT_MARKET })}</h2>
             ) : (
@@ -180,28 +197,26 @@ export const MarketsDropdown: React.FC<{ currentMarketId?: string; symbol: strin
             )}
             <p>
               {stringGetter({ key: isOpen ? STRING_KEYS.TAP_TO_CLOSE : STRING_KEYS.ALL_MARKETS })}
-              <Styled.DropdownIcon aria-hidden="true">
+              <$DropdownIcon aria-hidden="true">
                 <Icon iconName={IconName.Triangle} aria-hidden="true" />
-              </Styled.DropdownIcon>
+              </$DropdownIcon>
             </p>
-          </Styled.TriggerContainer>
+          </$TriggerContainer>
         }
         triggerType={TriggerType.MarketDropdown}
       >
         <MarketsDropdownContent
-          onRowAction={(market: string) => {
+          onRowAction={(market: Key) => {
             navigate(`${AppRoute.Trade}/${market}`);
             setIsOpen(false);
           }}
         />
-      </Styled.Popover>
+      </$Popover>
     );
   }
 );
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.MarketName = styled.div<{ isFavorited: boolean }>`
+const $MarketName = styled.div<{ isFavorited: boolean }>`
   ${layoutMixins.row}
   gap: 0.5rem;
 
@@ -222,7 +237,7 @@ Styled.MarketName = styled.div<{ isFavorited: boolean }>`
     `}
 `;
 
-Styled.TriggerContainer = styled.div<{ $isOpen: boolean }>`
+const $TriggerContainer = styled.div<{ $isOpen: boolean }>`
   --marketsDropdown-width: var(--sidebar-width);
   width: var(--sidebar-width);
 
@@ -261,24 +276,22 @@ Styled.TriggerContainer = styled.div<{ $isOpen: boolean }>`
   }
 `;
 
-Styled.DropdownIcon = styled.span`
+const $DropdownIcon = styled.span`
   margin-left: auto;
 
   display: inline-flex;
   transition: transform 0.3s var(--ease-out-expo);
 
   font-size: 0.375rem;
-
-  ${Styled.Trigger}[data-state='open'] & {
-    transform: scaleY(-1);
-  }
 `;
 
-Styled.Popover = styled(Popover)`
+const $Popover = styled(Popover)`
   ${popoverMixins.popover}
   --popover-item-height: 3.375rem;
   --popover-backgroundColor: var(--color-layer-2);
-  --stickyArea-topHeight: var(--popover-item-height);
+  --stickyArea-topHeight: 6.125rem;
+
+  --toolbar-height: var(--stickyArea-topHeight);
 
   height: calc(
     100vh - var(--page-header-height) - var(--market-info-row-height) - var(--page-footer-height)
@@ -314,19 +327,21 @@ Styled.Popover = styled(Popover)`
   }
 `;
 
-Styled.Toolbar = styled(Toolbar)`
+const $Toolbar = styled(Toolbar)`
   ${layoutMixins.stickyHeader}
-  height: var(--stickyArea-topHeight);
-
+  height: var(--toolbar-height);
+  gap: 0.5rem;
   border-bottom: solid var(--border-width) var(--color-border);
 `;
 
-Styled.ScrollArea = styled.div`
+const $ScrollArea = styled.div`
   ${layoutMixins.scrollArea}
-  height: calc(100% - var(--popover-item-height));
+  height: calc(100% - var(--toolbar-height));
 `;
 
-Styled.Table = styled(Table)`
+const $Table = styled(Table)`
+  --tableCell-padding: 0.5rem 1rem;
+
   thead {
     --stickyArea-totalInsetTop: 0px;
     --stickyArea-totalInsetBottom: 0px;
@@ -335,25 +350,34 @@ Styled.Table = styled(Table)`
     }
   }
 
+  tfoot {
+    --stickyArea-totalInsetTop: 0px;
+    --stickyArea-totalInsetBottom: 3px;
+
+    tr {
+      height: var(--stickyArea-bottomHeight);
+    }
+  }
+
   tr {
     height: var(--popover-item-height);
   }
-`;
+` as typeof Table;
 
-Styled.InlineRow = styled.div`
+const $InlineRow = styled.div`
   ${layoutMixins.inlineRow}
 `;
 
-Styled.Output = styled(Output)<{ isNegative?: boolean }>`
+const $Output = styled(Output)<{ isNegative?: boolean }>`
   color: ${({ isNegative }) => (isNegative ? `var(--color-negative)` : `var(--color-positive)`)};
   color: var(--color-text-2);
 `;
 
-Styled.PriceChangeOutput = styled(Output)<{ isNegative?: boolean }>`
+const $PriceChangeOutput = styled(Output)<{ isNegative?: boolean }>`
   color: ${({ isNegative }) => (isNegative ? `var(--color-negative)` : `var(--color-positive)`)};
 `;
 
-Styled.MarketNotFound = styled.div`
+const $MarketNotFound = styled.div`
   ${layoutMixins.column}
   justify-content: center;
   align-items: center;

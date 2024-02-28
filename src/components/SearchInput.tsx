@@ -1,100 +1,75 @@
-import { useEffect, useRef, useState } from 'react';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import { useRef, useState } from 'react';
+
+import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { IconName } from '@/components/Icon';
+import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
-import { Input, type InputProps } from '@/components/Input';
+import { Input, InputType, type InputProps } from '@/components/Input';
 
 type ElementProps = {
-  onOpenChange?: (isOpen: boolean) => void;
   onTextChange?: (value: string) => void;
 };
 
 export type SearchInputProps = ElementProps & InputProps;
 
-export const SearchInput = ({
-  type,
-  placeholder,
-  onOpenChange,
-  onTextChange,
-}: SearchInputProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+export const SearchInput = ({ placeholder, onTextChange }: SearchInputProps) => {
   const [value, setValue] = useState('');
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  useEffect(() => {
-    if (isOpen) inputRef?.current?.focus();
-  }, [inputRef, isOpen]);
-
   return (
-    <Styled.Search>
-      <Styled.IconButton
-        iconName={isOpen ? IconName.Close : IconName.Search}
-        isToggle
-        isPressed={isOpen}
-        onPressedChange={(isPressed: boolean) => {
-          setIsOpen(isPressed);
-          onOpenChange?.(isPressed);
-
-          if (!isPressed) {
-            onTextChange?.('');
-            setValue('');
-          }
-        }}
-      />
-      <Styled.Input
+    <$Search>
+      <$Icon iconName={IconName.Search} />
+      <$Input
         autoFocus
         ref={inputRef}
         value={value}
-        isOpen={isOpen}
-        type={type}
+        type={InputType.Search}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           setValue(e.target.value);
           onTextChange?.(e.target.value);
         }}
-        disabled={!isOpen}
         placeholder={placeholder}
       />
-    </Styled.Search>
+      {value.length > 0 && (
+        <$IconButton
+          iconName={IconName.Close}
+          onClick={() => {
+            setValue('');
+          }}
+        />
+      )}
+    </$Search>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Search = styled.div`
+const $Search = styled.div`
   ${layoutMixins.row}
-
+  width: auto;
+  height: 2rem;
+  background-color: var(--color-layer-3);
+  color: ${({ theme }) => theme.textTertiary};
+  border-radius: 2.5rem;
+  border: solid var(--border-width) var(--color-layer-6);
+  padding: 0 1rem;
+  gap: 0.375rem;
   justify-content: end;
-  width: 100%;
-  height: 100%;
 `;
 
-Styled.Input = styled(Input)<{ isOpen: boolean }>`
-  max-width: 0;
-
-  @media (prefers-reduced-motion: no-preference) {
-    transition: max-width 0.45s var(--ease-out-expo);
-  }
-
-  ${({ isOpen }) =>
-    isOpen &&
-    css`
-      padding-left: 0.5rem;
-      max-width: 100%;
-    `}
+const $Input = styled(Input)`
+  max-width: 100%;
+  border-radius: 0;
 `;
 
-Styled.IconButton = styled(IconButton)<{ iconName: IconName.Close | IconName.Search }>`
-  --button-toggle-on-backgroundColor: var(--color-layer-3);
-  --button-toggle-on-textColor: var(--color-text-0);
+const $IconButton = styled(IconButton)`
+  --button-icon-size: 0.5rem;
+  --button-border: none;
+  --button-backgroundColor: transparent;
+  color: ${({ theme }) => theme.textSecondary};
+  width: 1.5rem;
+  height: 1.5rem;
+`;
 
-  ${({ iconName }) =>
-    iconName === IconName.Close &&
-    css`
-      svg {
-        height: 0.875em;
-      }
-    `}
+const $Icon = styled(Icon)`
+  color: ${({ theme }) => theme.textSecondary};
 `;

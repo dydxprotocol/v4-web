@@ -1,12 +1,14 @@
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 import { DydxChainAsset } from '@/constants/wallets';
 
-import { useAccountBalance, useTokenConfigs, useStringGetter } from '@/hooks';
+import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
@@ -103,7 +105,7 @@ export const TransferButtonAndReceipt = ({
   ].filter(isTruthy);
 
   return (
-    <Styled.WithDetailsReceipt detailItems={transferDetailItems}>
+    <$WithDetailsReceipt detailItems={transferDetailItems}>
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
       ) : (
@@ -115,13 +117,10 @@ export const TransferButtonAndReceipt = ({
           {stringGetter({ key: STRING_KEYS.CONFIRM_TRANSFER })}
         </Button>
       )}
-    </Styled.WithDetailsReceipt>
+    </$WithDetailsReceipt>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
+const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 
   dl {

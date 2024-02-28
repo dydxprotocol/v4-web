@@ -1,40 +1,51 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { shallowEqual, useSelector, useDispatch } from 'react-redux';
-import type { Nullable } from '@dydxprotocol/v4-abacus';
-import Long from 'long';
-import { type IndexedTx } from '@cosmjs/stargate';
-import type { EncodeObject } from '@cosmjs/proto-signing';
-import { Method } from '@cosmjs/tendermint-rpc';
 
+import type { EncodeObject } from '@cosmjs/proto-signing';
+import { type IndexedTx } from '@cosmjs/stargate';
+import { Method } from '@cosmjs/tendermint-rpc';
+import type { Nullable } from '@dydxprotocol/v4-abacus';
 import {
-  type LocalWallet,
   SubaccountClient,
-  type GovAddNewMarketParams,
   utils,
+  type GovAddNewMarketParams,
+  type LocalWallet,
 } from '@dydxprotocol/v4-client-js';
+import Long from 'long';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import type {
   AccountBalance,
+  HumanReadableCancelOrderPayload,
   HumanReadablePlaceOrderPayload,
+  HumanReadableTriggerOrdersPayload,
   ParsingError,
   SubAccountHistoricalPNLs,
 } from '@/constants/abacus';
-
 import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
+import { STRING_KEYS } from '@/constants/localization';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
+import { TradeTypes } from '@/constants/trade';
 import { DydxAddress } from '@/constants/wallets';
 
-import { setSubaccount, setHistoricalPnl, removeUncommittedOrderClientId } from '@/state/account';
+import {
+  cancelOrderConfirmed,
+  cancelOrderFailed,
+  cancelOrderSubmitted,
+  placeOrderFailed,
+  placeOrderSubmitted,
+  setHistoricalPnl,
+  setSubaccount,
+} from '@/state/account';
 import { getBalances } from '@/state/accountSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { hashFromTx } from '@/lib/txUtils';
 import { log } from '@/lib/telemetry';
+import { hashFromTx } from '@/lib/txUtils';
 
 import { useAccounts } from './useAccounts';
-import { useTokenConfigs } from './useTokenConfigs';
 import { useDydxClient } from './useDydxClient';
 import { useGovernanceVariables } from './useGovernanceVariables';
+import { useTokenConfigs } from './useTokenConfigs';
 
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
 const SubaccountContext = createContext<SubaccountContextType>({} as SubaccountContextType);
@@ -55,7 +66,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   const { usdcDenom, usdcDecimals } = useTokenConfigs();
   const { compositeClient, faucetClient } = useDydxClient();
 
-  const { getFaucetFunds } = useMemo(
+  const { getFaucetFunds, getNativeTokens } = useMemo(
     () => ({
       getFaucetFunds: async ({
         dydxAddress,
@@ -63,7 +74,10 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       }: {
         dydxAddress: DydxAddress;
         subaccountNumber: number;
-      }) => await faucetClient?.fill(dydxAddress, subaccountNumber, 100),
+      }) => faucetClient?.fill(dydxAddress, subaccountNumber, 100),
+
+      getNativeTokens: async ({ dydxAddress }: { dydxAddress: DydxAddress }) =>
+        faucetClient?.fillNative(dydxAddress),
     }),
     [faucetClient]
   );
@@ -224,7 +238,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     [compositeClient]
   );
 
-  const [subaccountNumber, setSubaccountNumber] = useState(0);
+  const [subaccountNumber] = useState(0);
 
   useEffect(() => {
     abacusStateManager.setSubaccountNumber(subaccountNumber);
@@ -250,8 +264,8 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       const amount = parseFloat(balance.amount) - AMOUNT_RESERVED_FOR_GAS_USDC;
 
       if (amount > 0) {
-        const subaccountClient = new SubaccountClient(localDydxWallet, 0);
-        await depositToSubaccount({ amount, subaccountClient });
+        const newSubaccountClient = new SubaccountClient(localDydxWallet, 0);
+        await depositToSubaccount({ amount, subaccountClient: newSubaccountClient });
       }
     },
     [localDydxWallet, depositToSubaccount]
@@ -269,10 +283,10 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   const deposit = useCallback(
     async (amount: number) => {
       if (!subaccountClient) {
-        return;
+        return undefined;
       }
 
-      return await depositToSubaccount({ subaccountClient, amount });
+      return depositToSubaccount({ subaccountClient, amount });
     },
     [subaccountClient, depositToSubaccount]
   );
@@ -280,10 +294,10 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   const withdraw = useCallback(
     async (amount: number) => {
       if (!subaccountClient) {
-        return;
+        return undefined;
       }
 
-      return await withdrawFromSubaccount({ subaccountClient, amount });
+      return withdrawFromSubaccount({ subaccountClient, amount });
     },
     [subaccountClient, withdrawFromSubaccount]
   );
@@ -293,7 +307,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   const transfer = useCallback(
     async (amount: number, recipient: string, coinDenom: string) => {
       if (!subaccountClient) {
-        return;
+        return undefined;
       }
       return (await (coinDenom === usdcDenom
         ? transferFromSubaccountToAddress
@@ -305,23 +319,24 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   const sendSquidWithdraw = useCallback(
     async (amount: number, payload: string, isCctp?: boolean) => {
       const cctpWithdraw = () => {
-        return new Promise<string>((resolve, reject) =>
+        return new Promise<string>((resolve, reject) => {
           abacusStateManager.cctpWithdraw((success, error, data) => {
             const parsedData = JSON.parse(data);
+            // eslint-disable-next-line eqeqeq
             if (success && parsedData?.code == 0) {
               resolve(parsedData?.transactionHash);
             } else {
               reject(error);
             }
-          })
-        );
+          });
+        });
       };
       if (isCctp) {
-        return await cctpWithdraw();
+        return cctpWithdraw();
       }
 
       if (!subaccountClient) {
-        return;
+        return undefined;
       }
       const tx = await sendSquidWithdrawFromSubaccount({ subaccountClient, amount, payload });
       return hashFromTx(tx?.hash);
@@ -331,19 +346,22 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
   // ------ Faucet Methods ------ //
   const requestFaucetFunds = useCallback(async () => {
-    if (!dydxAddress) return;
-
     try {
-      await getFaucetFunds({ dydxAddress, subaccountNumber });
+      if (!dydxAddress) throw new Error('dydxAddress is not connected');
+
+      await Promise.all([
+        getFaucetFunds({ dydxAddress, subaccountNumber }),
+        getNativeTokens({ dydxAddress }),
+      ]);
     } catch (error) {
       log('useSubaccount/getFaucetFunds', error);
       throw error;
     }
-  }, [dydxAddress, getFaucetFunds, subaccountNumber]);
+  }, [dydxAddress, getFaucetFunds, getNativeTokens, subaccountNumber]);
 
   // ------ Trading Methods ------ //
   const placeOrder = useCallback(
-    async ({
+    ({
       isClosePosition = false,
       onError,
       onSuccess,
@@ -363,7 +381,12 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
           onError?.({ errorStringKey: parsingError?.stringKey });
 
           if (data?.clientId !== undefined) {
-            dispatch(removeUncommittedOrderClientId(data.clientId));
+            dispatch(
+              placeOrderFailed({
+                clientId: data.clientId,
+                errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
+              })
+            );
           }
         }
       };
@@ -376,24 +399,34 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         placeOrderParams = abacusStateManager.placeOrder(callback);
       }
 
+      if (placeOrderParams?.clientId) {
+        dispatch(
+          placeOrderSubmitted({
+            marketId: placeOrderParams.marketId,
+            clientId: placeOrderParams.clientId,
+            orderType: placeOrderParams.type as TradeTypes,
+          })
+        );
+      }
+
       return placeOrderParams;
     },
     [subaccountClient]
   );
 
   const closePosition = useCallback(
-    async ({
+    ({
       onError,
       onSuccess,
     }: {
       onError: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
       onSuccess?: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => void;
-    }) => await placeOrder({ isClosePosition: true, onError, onSuccess }),
+    }) => placeOrder({ isClosePosition: true, onError, onSuccess }),
     [placeOrder]
   );
 
   const cancelOrder = useCallback(
-    async ({
+    ({
       orderId,
       onError,
       onSuccess,
@@ -404,13 +437,92 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     }) => {
       const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
         if (success) {
+          dispatch(cancelOrderConfirmed(orderId));
           onSuccess?.();
         } else {
+          dispatch(
+            cancelOrderFailed({
+              orderId,
+              errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
+            })
+          );
           onError?.({ errorStringKey: parsingError?.stringKey });
         }
       };
 
+      dispatch(cancelOrderSubmitted(orderId));
       abacusStateManager.cancelOrder(orderId, callback);
+    },
+    [subaccountClient]
+  );
+
+  // ------ Trigger Orders Methods ------ //
+  const placeTriggerOrders = useCallback(
+    async ({
+      onError,
+      onSuccess,
+    }: {
+      onError?: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
+      onSuccess?: () => void;
+    } = {}) => {
+      const callback = (
+        success: boolean,
+        parsingError?: Nullable<ParsingError>,
+        data?: Nullable<HumanReadableTriggerOrdersPayload>
+      ) => {
+        const placeOrderPayloads = data?.placeOrderPayloads.toArray() ?? [];
+        const cancelOrderPayloads = data?.cancelOrderPayloads.toArray() ?? [];
+
+        if (success) {
+          onSuccess?.();
+
+          cancelOrderPayloads.forEach((payload: HumanReadableCancelOrderPayload) => {
+            dispatch(cancelOrderConfirmed(payload.orderId));
+          });
+        } else {
+          onError?.({ errorStringKey: parsingError?.stringKey });
+
+          placeOrderPayloads.forEach((payload: HumanReadablePlaceOrderPayload) => {
+            dispatch(
+              placeOrderFailed({
+                clientId: payload.clientId,
+                errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
+              })
+            );
+          });
+
+          cancelOrderPayloads.forEach((payload: HumanReadableCancelOrderPayload) => {
+            dispatch(
+              cancelOrderFailed({
+                orderId: payload.orderId,
+                errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
+              })
+            );
+          });
+        }
+      };
+
+      const triggerOrderParams = abacusStateManager.triggerOrders(callback);
+
+      triggerOrderParams?.placeOrderPayloads
+        .toArray()
+        .forEach((payload: HumanReadablePlaceOrderPayload) => {
+          dispatch(
+            placeOrderSubmitted({
+              marketId: payload.marketId,
+              clientId: payload.clientId,
+              orderType: payload.type as TradeTypes,
+            })
+          );
+        });
+
+      triggerOrderParams?.cancelOrderPayloads
+        .toArray()
+        .forEach((payload: HumanReadableCancelOrderPayload) => {
+          dispatch(cancelOrderSubmitted(payload.orderId));
+        });
+
+      return triggerOrderParams;
     },
     [subaccountClient]
   );
@@ -455,6 +567,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     placeOrder,
     closePosition,
     cancelOrder,
+    placeTriggerOrders,
 
     // Governance Methods
     submitNewMarketProposal,

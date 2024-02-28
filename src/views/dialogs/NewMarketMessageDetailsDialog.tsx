@@ -1,13 +1,16 @@
 import { useMemo, useState } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
+
 import { utils } from '@dydxprotocol/v4-client-js';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { MenuItem } from '@/constants/menus';
 import { isMainnet } from '@/constants/networks';
-import { PotentialMarketItem } from '@/constants/potentialMarkets';
-import { useGovernanceVariables, useStringGetter, useTokenConfigs } from '@/hooks';
-import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
-import { layoutMixins } from '@/styles/layoutMixins';
+import { NewMarketProposal } from '@/constants/potentialMarkets';
+
+import { useGovernanceVariables } from '@/hooks/useGovernanceVariables';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { Details } from '@/components/Details';
 import { Dialog } from '@/components/Dialog';
@@ -20,7 +23,7 @@ import { MustBigNumber } from '@/lib/numbers';
 type ElementProps = {
   preventClose?: boolean;
   setIsOpen?: (open: boolean) => void;
-  assetData?: PotentialMarketItem;
+  assetData: NewMarketProposal;
   clobPairId?: number;
   liquidityTier?: string;
 };
@@ -41,20 +44,28 @@ export const NewMarketMessageDetailsDialog = ({
   setIsOpen,
 }: ElementProps) => {
   const [codeToggleGroup, setCodeToggleGroup] = useState(CodeToggleGroup.CREATE_ORACLE);
-  const { exchangeConfigs } = usePotentialMarkets();
-  const { baseAsset } = assetData ?? {};
+  const { baseAsset, params, title } = assetData ?? {};
+  const {
+    ticker,
+    marketType,
+    exchangeConfigJson,
+    minExchanges,
+    minPriceChange,
+    atomicResolution,
+    quantumConversionExponent,
+    stepBaseQuantums,
+    subticksPerTick,
+  } = params ?? {};
   const { newMarketProposal } = useGovernanceVariables();
   const stringGetter = useStringGetter();
   const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
   const initialDepositAmountDecimals = isMainnet ? 0 : chainTokenDecimals;
 
   const exchangeConfig = useMemo(() => {
-    return baseAsset ? exchangeConfigs?.[baseAsset] : undefined;
+    return baseAsset ? exchangeConfigJson : undefined;
   }, [baseAsset]);
 
-  const ticker = useMemo(() => `${baseAsset}-USD`, [baseAsset]);
-
-  const toggleGroupItems: Parameters<typeof ToggleGroup>[0]['items'] = useMemo(() => {
+  const toggleGroupItems: MenuItem<CodeToggleGroup>[] = useMemo(() => {
     return [
       {
         value: CodeToggleGroup.CREATE_ORACLE,
@@ -86,8 +97,8 @@ export const NewMarketMessageDetailsDialog = ({
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.MESSAGE_DETAILS })}
     >
-      <Styled.ProposedMessageDetails>
-        <Styled.Tabs
+      <$ProposedMessageDetails>
+        <$Tabs
           items={toggleGroupItems}
           value={codeToggleGroup}
           onValueChange={setCodeToggleGroup}
@@ -95,8 +106,8 @@ export const NewMarketMessageDetailsDialog = ({
         {
           {
             [CodeToggleGroup.CREATE_ORACLE]: (
-              <Styled.Code>
-                <Styled.Details
+              <$Code>
+                <$Details
                   layout="column"
                   items={[
                     {
@@ -112,42 +123,44 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'min-exchanges',
                       label: 'min_exchanges',
-                      value: `${assetData?.minExchanges}`,
+                      value: `${minExchanges}`,
                     },
                     {
                       key: 'min-price-change-ppm',
                       label: 'min_price_change_ppm',
-                      value: `${assetData?.minPriceChangePpm}`,
+                      value: `${minPriceChange}`,
                     },
                   ]}
                 />
-                <Styled.Text0>
-                  exchange_config_json{' '}
-                  {exchangeConfig && <Tag type={TagType.Number}>{exchangeConfig.length}</Tag>}
-                </Styled.Text0>
-                {'['}
-                {exchangeConfig?.map((exchange) => {
-                  return (
-                    <Styled.ExchangeObject
-                      key={exchange.exchangeName}
-                      style={{ padding: 0, margin: 0, paddingLeft: '0.5rem' }}
-                    >
-                      {'{'}
-                      {Object.keys(exchange).map((key) => (
-                        <Styled.Line key={key}>
-                          {key}: <span>{exchange[key as keyof typeof exchange]}</span>
-                        </Styled.Line>
-                      ))}
-                      {'},'}
-                    </Styled.ExchangeObject>
-                  );
-                })}
-                {']'}
-              </Styled.Code>
+                <$ExchangeConfigs>
+                  <$Text0>
+                    exchange_config_json
+                    {exchangeConfig && <$Tag type={TagType.Number}>{exchangeConfig.length}</$Tag>}
+                  </$Text0>
+                  [
+                  {exchangeConfig?.map((exchange) => {
+                    return (
+                      <$ExchangeObject
+                        key={exchange.exchangeName}
+                        style={{ padding: 0, margin: 0, paddingLeft: '0.5rem' }}
+                      >
+                        {'{'}
+                        {Object.keys(exchange).map((key) => (
+                          <$Line key={key}>
+                            {key}: <span>{exchange[key as keyof typeof exchange]}</span>
+                          </$Line>
+                        ))}
+                        {'},'}
+                      </$ExchangeObject>
+                    );
+                  })}
+                  ]
+                </$ExchangeConfigs>
+              </$Code>
             ),
             [CodeToggleGroup.MSG_CREATE_PERPETUAL]: (
-              <Styled.Code>
-                <Styled.Details
+              <$Code>
+                <$Details
                   layout="column"
                   items={[
                     {
@@ -168,7 +181,7 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'atomic_resolution',
                       label: 'atomic_resolution',
-                      value: `${assetData?.atomicResolution}`,
+                      value: `${atomicResolution}`,
                     },
                     {
                       key: 'default_funding_ppm',
@@ -180,13 +193,18 @@ export const NewMarketMessageDetailsDialog = ({
                       label: 'liquidity_tier',
                       value: liquidityTier,
                     },
+                    {
+                      key: 'market_type',
+                      label: 'market_type',
+                      value: marketType ?? 'PERPETUAL_MARKET_TYPE_CROSS',
+                    },
                   ]}
                 />
-              </Styled.Code>
+              </$Code>
             ),
             [CodeToggleGroup.MSG_CREATE_CLOB_PAIR]: (
-              <Styled.Code>
-                <Styled.Details
+              <$Code>
+                <$Details
                   layout="column"
                   items={[
                     {
@@ -202,17 +220,17 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'quantum_conversion_exponent',
                       label: 'quantum_conversion_exponent',
-                      value: `${assetData?.quantumConversionExponent}`,
+                      value: `${quantumConversionExponent}`,
                     },
                     {
                       key: 'step_base_quantums',
                       label: 'step_base_quantums',
-                      value: `${assetData?.stepBaseQuantum}`,
+                      value: `${stepBaseQuantums}`,
                     },
                     {
                       key: 'subticks_per_tick',
                       label: 'subticks_per_tick',
-                      value: `${assetData?.subticksPerTick}`,
+                      value: `${subticksPerTick}`,
                     },
                     {
                       key: 'status',
@@ -221,11 +239,11 @@ export const NewMarketMessageDetailsDialog = ({
                     },
                   ]}
                 />
-              </Styled.Code>
+              </$Code>
             ),
             [CodeToggleGroup.MSG_DELAY_MESSAGE]: (
-              <Styled.Code>
-                <Styled.Details
+              <$Code>
+                <$Details
                   layout="column"
                   items={[
                     {
@@ -241,8 +259,8 @@ export const NewMarketMessageDetailsDialog = ({
                     },
                   ]}
                 />
-                <div style={{ marginTop: '1rem' }}>MSG_UPDATE_CLOB_PAIR</div>
-                <Styled.Details
+                <div style={{ margin: '0.5rem 0' }}>MSG_UPDATE_CLOB_PAIR</div>
+                <$Details
                   layout="column"
                   items={[
                     {
@@ -258,17 +276,17 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'quantum_conversion_exponent',
                       label: 'quantum_conversion_exponent',
-                      value: `${assetData?.quantumConversionExponent}`,
+                      value: `${quantumConversionExponent}`,
                     },
                     {
                       key: 'step_base_quantums',
                       label: 'step_base_quantums',
-                      value: `${assetData?.stepBaseQuantum}`,
+                      value: `${stepBaseQuantums}`,
                     },
                     {
                       key: 'subticks_per_tick',
                       label: 'subticks_per_tick',
-                      value: `${assetData?.subticksPerTick}`,
+                      value: `${subticksPerTick}`,
                     },
                     {
                       key: 'status',
@@ -277,48 +295,52 @@ export const NewMarketMessageDetailsDialog = ({
                     },
                   ]}
                 />
-              </Styled.Code>
+              </$Code>
             ),
             [CodeToggleGroup.MSG_SUBMIT_PROPOSAL]: (
-              <Styled.Code>
-                <Styled.Text0>title: </Styled.Text0>
-                <Styled.Description>{utils.getGovAddNewMarketTitle(ticker)}</Styled.Description>
-
-                <Styled.Text0>initial_deposit_amount:</Styled.Text0>
-                <Styled.Description>
-                  {
-                    <Output
-                      type={OutputType.Asset}
-                      value={MustBigNumber(newMarketProposal.initialDepositAmount).div(
-                        Number(`1e${chainTokenDecimals}`)
-                      )}
-                      fractionDigits={initialDepositAmountDecimals}
-                      tag={chainTokenLabel}
-                    />
-                  }
-                </Styled.Description>
-
-                <Styled.Text0>summary: </Styled.Text0>
-                <Styled.Description>
-                  {utils.getGovAddNewMarketSummary(ticker, newMarketProposal.delayBlocks)}
-                </Styled.Description>
-              </Styled.Code>
+              <$Code>
+                <$Details
+                  items={[
+                    {
+                      key: 'title',
+                      label: 'title',
+                      value: title,
+                    },
+                    {
+                      key: 'initial_deposit_amount',
+                      label: 'initial_deposit_amount',
+                      value: (
+                        <Output
+                          type={OutputType.Asset}
+                          value={MustBigNumber(newMarketProposal.initialDepositAmount).div(
+                            Number(`1e${chainTokenDecimals}`)
+                          )}
+                          fractionDigits={initialDepositAmountDecimals}
+                          tag={chainTokenLabel}
+                        />
+                      ),
+                    },
+                    {
+                      key: 'summary',
+                      label: 'summary',
+                      value: (
+                        <$Summary>
+                          {utils.getGovAddNewMarketSummary(ticker, newMarketProposal.delayBlocks)}
+                        </$Summary>
+                      ),
+                    },
+                  ]}
+                />
+              </$Code>
             ),
           }[codeToggleGroup]
         }
-      </Styled.ProposedMessageDetails>
+      </$ProposedMessageDetails>
     </Dialog>
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Content = styled.div`
-  ${layoutMixins.column}
-  gap: 0;
-`;
-
-Styled.ProposedMessageDetails = styled.div`
+const $ProposedMessageDetails = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -328,15 +350,27 @@ Styled.ProposedMessageDetails = styled.div`
   border-radius: 10px;
 `;
 
-Styled.Tabs = styled(ToggleGroup)`
+const $Tabs = styled(ToggleGroup)`
   overflow-x: auto;
+` as typeof ToggleGroup;
+
+const $Details = styled(Details)`
+  --details-item-height: 1.5rem;
 `;
 
-Styled.Text0 = styled.span`
+const $ExchangeConfigs = styled.div`
+  margin-top: 0.5rem;
+`;
+
+const $Text0 = styled.span`
   color: var(--color-text-0);
 `;
 
-Styled.Code = styled.div`
+const $Tag = styled(Tag)`
+  margin: 0 0.5ch;
+`;
+
+const $Code = styled.div`
   height: 16.25rem;
   overflow: auto;
   display: block;
@@ -349,18 +383,15 @@ Styled.Code = styled.div`
   gap: 0rem;
 `;
 
-Styled.ExchangeObject = styled.div`
+const $ExchangeObject = styled.div`
   padding: 1rem;
 `;
 
-Styled.Details = styled(Details)`
-  --details-item-height: 1.5rem;
-`;
-
-Styled.Line = styled.pre`
+const $Line = styled.pre`
   margin-left: 1rem;
 `;
 
-Styled.Description = styled.p`
-  margin-bottom: 1rem;
+const $Summary = styled.p`
+  text-align: justify;
+  margin-left: 0.5rem;
 `;

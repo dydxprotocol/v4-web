@@ -1,26 +1,31 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
+import BigNumber from 'bignumber.js';
+import isEmpty from 'lodash/isEmpty';
+import {
+  LanguageCode,
+  ResolutionString,
+  widget as Widget,
+} from 'public/tradingview/charting_library';
 import { shallowEqual, useSelector } from 'react-redux';
 
-import isEmpty from 'lodash/isEmpty';
-
-import { LanguageCode, ResolutionString, widget } from 'public/tradingview/charting_library';
-
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
-import { SUPPORTED_LOCALE_BASE_TAGS, STRING_KEYS } from '@/constants/localization';
 import { LocalStorageKey } from '@/constants/localStorage';
+import { STRING_KEYS, SUPPORTED_LOCALE_BASE_TAGS } from '@/constants/localization';
 import type { TvWidget } from '@/constants/tvchart';
-
-import { useDydxClient, useLocalStorage, useStringGetter } from '@/hooks';
 
 import { store } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
-import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
+import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketId, getMarketIds } from '@/state/perpetualsSelectors';
 
 import { getDydxDatafeed } from '@/lib/tradingView/dydxfeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
+
+import { useDydxClient } from '../useDydxClient';
+import { useLocalStorage } from '../useLocalStorage';
+import { useStringGetter } from '../useStringGetter';
 
 /**
  * @description Hook to initialize TradingView Chart
@@ -43,7 +48,8 @@ export const useTradingView = ({
   const marketIds = useSelector(getMarketIds, shallowEqual);
   const selectedLocale = useSelector(getSelectedLocale);
   const selectedNetwork = useSelector(getSelectedNetwork);
-  const { getCandlesForDatafeed, isConnected: isClientConnected } = useDydxClient();
+
+  const { getCandlesForDatafeed, getMarketTickSize } = useDydxClient();
 
   const [savedTvChartConfig, setTvChartConfig] = useLocalStorage<object | undefined>({
     key: LocalStorageKey.TradingViewChartConfig,
@@ -51,23 +57,41 @@ export const useTradingView = ({
   });
 
   const savedResolution = getSavedResolution({ savedConfig: savedTvChartConfig });
+
+  const [initialPriceScale, setInitialPriceScale] = useState<number | null>(null);
+
   const hasMarkets = marketIds.length > 0;
+  const hasPriceScaleInfo = initialPriceScale !== null || hasMarkets;
 
   useEffect(() => {
-    if (hasMarkets && isClientConnected && marketId) {
+    // we only need tick size from current market for the price scale settings
+    // if markets haven't been loaded via abacus, get the current market info from indexer
+    (async () => {
+      if (marketId && !hasPriceScaleInfo) {
+        const marketTickSize = await getMarketTickSize(marketId);
+        const priceScale = BigNumber(10).exponentiatedBy(
+          BigNumber(marketTickSize).decimalPlaces() ?? 2
+        );
+        setInitialPriceScale(priceScale.toNumber());
+      }
+    })();
+  }, [marketId, hasPriceScaleInfo]);
+
+  useEffect(() => {
+    if (marketId && hasPriceScaleInfo) {
       const widgetOptions = getWidgetOptions();
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
       const options = {
         ...widgetOptions,
         ...widgetOverrides,
-        datafeed: getDydxDatafeed(store, getCandlesForDatafeed),
-        interval: (savedResolution || DEFAULT_RESOLUTION) as ResolutionString,
+        datafeed: getDydxDatafeed(store, getCandlesForDatafeed, initialPriceScale),
+        interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
         locale: SUPPORTED_LOCALE_BASE_TAGS[selectedLocale] as LanguageCode,
         symbol: marketId,
         saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
       };
 
-      const tvChartWidget = new widget(options);
+      const tvChartWidget = new Widget(options);
       tvWidgetRef.current = tvChartWidget;
 
       tvWidgetRef.current.onChartReady(() => {
@@ -99,14 +123,7 @@ export const useTradingView = ({
       tvWidgetRef.current = null;
       setIsChartReady(false);
     };
-  }, [
-    getCandlesForDatafeed,
-    isClientConnected,
-    hasMarkets,
-    selectedLocale,
-    selectedNetwork,
-    !!marketId,
-  ]);
+  }, [selectedLocale, selectedNetwork, !!marketId, hasPriceScaleInfo]);
 
   return { savedResolution };
 };

@@ -1,34 +1,30 @@
-import { useDispatch, useSelector, shallowEqual } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import { type MenuConfig } from '@/constants/menus';
+import { Asset, PerpetualMarket } from '@/constants/abacus';
 import { TradeLayouts } from '@/constants/layout';
+import { type MenuConfig } from '@/constants/menus';
+import { AppRoute } from '@/constants/routes';
 
 import { AssetIcon } from '@/components/AssetIcon';
 
+import { getAssets } from '@/state/assetsSelectors';
 import {
+  AppColorMode,
   AppTheme,
   AppThemeSystemSetting,
-  AppColorMode,
-  setAppThemeSetting,
   setAppColorMode,
+  setAppThemeSetting,
 } from '@/state/configs';
 import { setSelectedTradeLayout } from '@/state/layout';
-
-import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
-import { Asset, PerpetualMarket } from '@/constants/abacus';
+
+import { orEmptyObj } from '@/lib/typeUtils';
 
 enum LayoutItems {
   setDefaultLayout = 'SetDefaultLayout',
   setReverseLayout = 'SetReverseLayout',
   setAlternativeLayout = 'SetAlternativeLayout',
-}
-
-enum TradeItems {
-  PlaceMarketOrder = 'PlaceMarketOrder',
-  PlaceLimitOrder = 'PlaceLimitOrder',
-  PlaceStopLimitOrder = 'PlaceStopLimitOrder',
 }
 
 enum NavItems {
@@ -39,12 +35,12 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const allPerpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
-  const allAssets = useSelector(getAssets, shallowEqual) || {};
+  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
 
   const joinedPerpetualMarketsAndAssets = Object.values(allPerpetualMarkets).map((market) => ({
     ...market,
-    ...allAssets[market?.assetId],
+    ...(market != null ? allAssets[market.assetId] : {}),
   })) as Array<PerpetualMarket & Asset>;
 
   return [
@@ -162,7 +158,7 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
             slotBefore: <AssetIcon symbol={id} />,
             label: name ?? '',
             tag: id,
-            onSelect: () => navigate(`/trade/${market}`),
+            onSelect: () => navigate(`${AppRoute.Trade}/${market}`),
           })),
         },
       ],

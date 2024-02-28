@@ -1,0 +1,52 @@
+name: Validate Other Market Data
+
+on:
+  pull_request:
+    paths:
+      - 'public/configs/otherMarketData.json'
+      - 'scripts/validate-other-market-data.ts'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Set up pnpm
+        uses: dydxprotocol/setup-pnpm@v1
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: pnpm
+
+      - name: Install dependencies
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          pnpm install --loglevel warn
+      
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.21
+
+      - name: Checkout v4-chain repo
+        uses: actions/checkout@v3
+        with:
+          repository: 'dydxprotocol/v4-chain'
+          ref: 'd4e0f0d1ac28f128c787e40c5a0cdc7c481e6c42'
+          path: 'v4-chain'
+
+      - name: Start v4 localnet
+        run: |
+          cd v4-chain/protocol
+          echo "Building v4-chain/protocol..."
+          make build
+          echo "Starting localnet..."
+          DOCKER_BUILDKIT=1 make localnet-startd
+      
+      - name: Validate other market data
+        run: pnpx tsx scripts/validate-other-market-data.ts

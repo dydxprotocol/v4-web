@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 type StyleProps = {
@@ -35,21 +36,25 @@ const AlertContainer = styled.div<StyleProps>`
       case AlertType.Error: {
         return css`
           --alert-accent-color: var(--color-error);
+          --alert-background: var(--color-gradient-error);
         `;
       }
       case AlertType.Info: {
         return css`
           --alert-accent-color: var(--color-text-1);
+          --alert-background: var(--color-layer-7);
         `;
       }
       case AlertType.Success: {
         return css`
           --alert-accent-color: var(--color-success);
+          --alert-background: var(--color-gradient-success);
         `;
       }
       case AlertType.Warning: {
         return css`
           --alert-accent-color: var(--color-warning);
+          --alert-background: var(--color-gradient-warning);
         `;
       }
       default:

@@ -1,25 +1,26 @@
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+
 import { Trigger } from '@radix-ui/react-tabs';
+import { useSelector } from 'react-redux';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { useStringGetter } from '@/hooks';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from '@/components/Icon';
 import { Tabs } from '@/components/Tabs';
 import { ToggleButton } from '@/components/ToggleButton';
-
-import { getSelectedLocale } from '@/state/localizationSelectors';
-
 import { AccountInfo } from '@/views/AccountInfo';
 import { DepthChart } from '@/views/charts/DepthChart';
-import { Orderbook } from '@/views/tables/Orderbook';
-import { LiveTrades } from '@/views/tables/LiveTrades';
 import { FundingChart } from '@/views/charts/FundingChart';
 import { TvChart } from '@/views/charts/TvChart';
+import { LiveTrades } from '@/views/tables/LiveTrades';
+import { Orderbook } from '@/views/tables/Orderbook';
+
+import { getSelectedLocale } from '@/state/localizationSelectors';
 
 enum Tab {
   Account = 'Account',
@@ -27,15 +28,16 @@ enum Tab {
   Depth = 'Depth',
   Funding = 'Funding',
   OrderBook = 'OrderBook',
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   LiveTrades = 'LiveTrades',
 }
 
 const TabButton = ({ value, label, icon }: { value: Tab; label: string; icon: IconName }) => (
   <Trigger asChild value={value}>
-    <Styled.TabButton>
+    <$TabButton>
       <Icon iconName={icon} />
       <span>{label}</span>
-    </Styled.TabButton>
+    </$TabButton>
   </Trigger>
 );
 
@@ -47,7 +49,7 @@ export const MobileTopPanel = () => {
 
   const items = [
     {
-      content: <Styled.AccountInfo />,
+      content: <$AccountInfo />,
       label: stringGetter({ key: STRING_KEYS.WALLET }),
       value: Tab.Account,
       icon: IconName.Coins,
@@ -73,9 +75,9 @@ export const MobileTopPanel = () => {
     },
     {
       content: (
-        <Styled.ScrollableTableContainer>
+        <$ScrollableTableContainer>
           <Orderbook histogramSide="right" layout="horizontal" hideHeader />
-        </Styled.ScrollableTableContainer>
+        </$ScrollableTableContainer>
       ),
       label: stringGetter({ key: STRING_KEYS.ORDERBOOK_SHORT }),
       value: Tab.OrderBook,
@@ -83,9 +85,9 @@ export const MobileTopPanel = () => {
     },
     {
       content: (
-        <Styled.ScrollableTableContainer>
+        <$ScrollableTableContainer>
           <LiveTrades histogramSide="left" />
-        </Styled.ScrollableTableContainer>
+        </$ScrollableTableContainer>
       ),
       label: stringGetter({ key: STRING_KEYS.RECENT }),
       value: Tab.LiveTrades,
@@ -94,7 +96,7 @@ export const MobileTopPanel = () => {
   ];
 
   return (
-    <Styled.Tabs
+    <$Tabs
       value={value}
       onValueChange={setValue}
       items={items.map((item) => ({
@@ -108,10 +110,7 @@ export const MobileTopPanel = () => {
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Tabs = styled(Tabs)`
+const $Tabs = styled(Tabs)`
   --scrollArea-height: 20rem;
   --stickyArea0-background: var(--color-layer-2);
   --tabContent-height: calc(20rem - 2rem - var(--tabs-currentHeight));
@@ -129,9 +128,9 @@ Styled.Tabs = styled(Tabs)`
       gap: 0.5rem;
     }
   }
-`;
+` as typeof Tabs;
 
-Styled.TabButton = styled(ToggleButton)`
+const $TabButton = styled(ToggleButton)`
   padding: 0 0.5rem;
 
   span {
@@ -155,11 +154,11 @@ Styled.TabButton = styled(ToggleButton)`
   }
 `;
 
-Styled.AccountInfo = styled(AccountInfo)`
+const $AccountInfo = styled(AccountInfo)`
   --account-info-section-height: var(--tabContent-height);
 `;
 
-Styled.ScrollableTableContainer = styled.div`
+const $ScrollableTableContainer = styled.div`
   ${layoutMixins.scrollArea}
   --scrollArea-height: var(--tabContent-height);
   --stickyArea0-topGap: 0px;

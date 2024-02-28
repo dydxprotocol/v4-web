@@ -1,29 +1,27 @@
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
 import {
   STRING_KEYS,
-  SupportedLocales,
   SUPPORTED_LOCALE_STRING_LABELS,
+  SupportedLocales,
 } from '@/constants/localization';
-
 import type { MenuItem } from '@/constants/menus';
 import { DydxNetwork } from '@/constants/networks';
 import { AppRoute, MobileSettingsRoute } from '@/constants/routes';
 
-import { useStringGetter, useSelectedNetwork } from '@/hooks';
+import { useSelectedNetwork } from '@/hooks/useSelectedNetwork';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { ComingSoonSpace } from '@/components/ComingSoon';
 import { PageMenu } from '@/components/PageMenu';
 import { PageMenuItemType } from '@/components/PageMenu/PageMenuItem';
-
-import { setSelectedLocale } from '@/state/localization';
-
-import { getSelectedLocale } from '@/state/localizationSelectors';
-
 import { useNetworks } from '@/views/menus/useNetworks';
 
+import { setSelectedLocale } from '@/state/localization';
+import { getSelectedLocale } from '@/state/localizationSelectors';
+
 import { SettingsHeader } from './SettingsHeader';
-import { ComingSoonSpace } from '@/components/ComingSoon';
 
 const SettingsPage = () => {
   const stringGetter = useStringGetter();

@@ -1,10 +1,13 @@
-import styled, { AnyStyledComponent } from 'styled-components';
-import { useDispatch } from 'react-redux';
 import { Close } from '@radix-ui/react-dialog';
+import { useDispatch } from 'react-redux';
+import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { useAccounts, useStringGetter } from '@/hooks';
+
+import { useAccounts } from '@/hooks/useAccounts';
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
@@ -28,9 +31,9 @@ export const DisconnectDialog = ({ setIsOpen }: ElementProps) => {
 
   return (
     <Dialog isOpen setIsOpen={setIsOpen} title={stringGetter({ key: STRING_KEYS.DISCONNECT })}>
-      <Styled.Content>
+      <$Content>
         <p>{stringGetter({ key: STRING_KEYS.DISCONNECT_CONFIRMATION })}</p>
-        <Styled.ButtonRow>
+        <$ButtonRow>
           <Close asChild>
             <Button action={ButtonAction.Destroy} onClick={disconnect}>
               {stringGetter({ key: STRING_KEYS.DISCONNECT })}
@@ -39,22 +42,19 @@ export const DisconnectDialog = ({ setIsOpen }: ElementProps) => {
           <Close asChild>
             <Button onClick={onCancel}>{stringGetter({ key: STRING_KEYS.CANCEL })}</Button>
           </Close>
-        </Styled.ButtonRow>
-      </Styled.Content>
+        </$ButtonRow>
+      </$Content>
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ButtonRow = styled.div`
+const $ButtonRow = styled.div`
   ${layoutMixins.row}
 
   gap: 0.5rem;
   justify-content: end;
 `;
 
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
 `;

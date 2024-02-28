@@ -1,84 +1,84 @@
-import { useState } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
-import { useDispatch } from 'react-redux';
+import { ElementType } from 'react';
+
+import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
-import { STRING_KEYS } from '@/constants/localization';
-
-import { WalletType, wallets } from '@/constants/wallets';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
+import { WalletType, wallets } from '@/constants/wallets';
+
+import { useAccounts } from '@/hooks/useAccounts';
+import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
+
+import { breakpoints } from '@/styles';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { Icon } from '@/components/Icon';
 import { Link } from '@/components/Link';
 
-import { useAccounts, useStringGetter, useURLConfigs } from '@/hooks';
-import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
-
-import { breakpoints } from '@/styles';
-import { layoutMixins } from '@/styles/layoutMixins';
-
-export const ChooseWallet = () => {
+export const ChooseWallet = ({
+  onChooseWallet,
+}: {
+  onChooseWallet: (walletType: WalletType) => void;
+}) => {
   const stringGetter = useStringGetter();
   const { walletLearnMore } = useURLConfigs();
 
   const displayedWallets = useDisplayedWallets();
 
-  const { selectWalletType, selectedWalletType, selectedWalletError } = useAccounts();
+  const { selectedWalletType, selectedWalletError } = useAccounts();
 
   return (
     <>
       {selectedWalletType && selectedWalletError && (
-        <Styled.AlertMessage type={AlertType.Error}>
-          {
-            <h4>
-              {stringGetter({
-                key: STRING_KEYS.COULD_NOT_CONNECT,
-                params: {
-                  WALLET: stringGetter({
-                    key: wallets[selectedWalletType].stringKey,
-                  }),
-                },
-              })}
-            </h4>
-          }
+        <$AlertMessage type={AlertType.Error}>
+          <h4>
+            {stringGetter({
+              key: STRING_KEYS.COULD_NOT_CONNECT,
+              params: {
+                WALLET: stringGetter({
+                  key: wallets[selectedWalletType].stringKey,
+                }),
+              },
+            })}
+          </h4>
           {selectedWalletError}
-        </Styled.AlertMessage>
+        </$AlertMessage>
       )}
 
-      <Styled.Wallets>
+      <$Wallets>
         {displayedWallets.map((walletType) => (
-          <Styled.WalletButton
+          <$WalletButton
             action={ButtonAction.Base}
             key={walletType}
-            onClick={() => selectWalletType(walletType)}
-            slotLeft={<Styled.Icon iconComponent={wallets[walletType].icon} />}
+            onClick={() => onChooseWallet(walletType)}
+            slotLeft={<$Icon iconComponent={wallets[walletType].icon as ElementType} />}
             size={ButtonSize.Small}
           >
-            <div>{stringGetter({ key: wallets[walletType].stringKey })}</div>
-          </Styled.WalletButton>
+            {stringGetter({ key: wallets[walletType].stringKey })}
+          </$WalletButton>
         ))}
-      </Styled.Wallets>
+      </$Wallets>
 
-      <Styled.Footer>
+      <$Footer>
         <Link href={walletLearnMore} withIcon>
           {stringGetter({ key: STRING_KEYS.ABOUT_WALLETS })}
         </Link>
-      </Styled.Footer>
+      </$Footer>
     </>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.AlertMessage = styled(AlertMessage)`
+const $AlertMessage = styled(AlertMessage)`
   h4 {
     font: var(--font-small-medium);
   }
 `;
 
-Styled.Wallets = styled.div`
+const $Wallets = styled.div`
   gap: 0.5rem;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
@@ -97,7 +97,7 @@ Styled.Wallets = styled.div`
   } */
 `;
 
-Styled.WalletButton = styled(Button)`
+const $WalletButton = styled(Button)`
   justify-content: start;
   gap: 0.5rem;
 
@@ -110,12 +110,12 @@ Styled.WalletButton = styled(Button)`
   }
 `;
 
-Styled.Icon = styled(Icon)`
+const $Icon = styled(Icon)`
   width: 1.5em;
   height: 1.5em;
 `;
 
-Styled.Footer = styled.footer`
+const $Footer = styled.footer`
   ${layoutMixins.spacedRow}
   justify-content: center;
   margin-top: auto;

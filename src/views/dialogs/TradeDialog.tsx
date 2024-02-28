@@ -1,26 +1,29 @@
 import { useState } from 'react';
-import { shallowEqual, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent, css } from 'styled-components';
 
-import { TradeInputField } from '@/constants/abacus';
-import { STRING_KEYS, StringKey } from '@/constants/localization';
-import { TradeTypes, ORDER_TYPE_STRINGS, MobilePlaceOrderSteps } from '@/constants/trade';
+import { useDispatch } from 'react-redux';
+import styled, { css } from 'styled-components';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { DialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
+import { MobilePlaceOrderSteps } from '@/constants/trade';
+
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { AssetIcon } from '@/components/AssetIcon';
+import { Button } from '@/components/Button';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
-import { TradeForm } from '@/views/forms/TradeForm';
+import { Icon, IconName } from '@/components/Icon';
 import { Ring } from '@/components/Ring';
-import { ToggleGroup } from '@/components/ToggleGroup';
+import { TradeForm } from '@/views/forms/TradeForm';
 
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';
+import { openDialog } from '@/state/dialogs';
 
-import abacusStateManager from '@/lib/abacus';
-import { getSelectedTradeType } from '@/lib/tradeData';
+import { testFlags } from '@/lib/testFlags';
+
+import { TradeSideToggle } from '../forms/TradeForm/TradeSideToggle';
 
 type ElementProps = {
   isOpen?: boolean;
@@ -30,29 +33,12 @@ type ElementProps = {
 
 export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) => {
   const { isMobile } = useBreakpoints();
+  const dispatch = useDispatch();
   const stringGetter = useStringGetter();
-  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
-  const currentTradeData = useSelector(getInputTradeData, shallowEqual);
-  const { type } = currentTradeData || {};
-  const selectedTradeType = getSelectedTradeType(type);
-  const { typeOptions } = useSelector(getInputTradeOptions, shallowEqual) ?? {};
-
-  const allTradeTypeItems = (typeOptions?.toArray() ?? []).map(({ type, stringKey }) => ({
-    value: type,
-    label: stringGetter({
-      key: stringKey as StringKey,
-    }),
-    slotBefore: <AssetIcon symbol={id} />,
-  }));
 
   const [currentStep, setCurrentStep] = useState<MobilePlaceOrderSteps>(
     MobilePlaceOrderSteps.EditOrder
   );
-
-  const onTradeTypeChange = (tradeType: TradeTypes) => {
-    abacusStateManager.clearTradeInputValues();
-    abacusStateManager.setTradeValue({ value: tradeType, field: TradeInputField.type });
-  };
 
   const onCloseDialog = () => {
     setCurrentStep(MobilePlaceOrderSteps.EditOrder);
@@ -60,7 +46,7 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
   };
 
   return (
-    <Styled.Dialog
+    <$Dialog
       isOpen={isOpen}
       setIsOpen={(open: boolean) => (open ? setIsOpen?.(true) : onCloseDialog())}
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
@@ -69,47 +55,66 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
       hasHeaderBorder
       {...{
         [MobilePlaceOrderSteps.EditOrder]: {
-          title: (
-            <Styled.ToggleGroup
-              items={allTradeTypeItems}
-              value={selectedTradeType}
-              onValueChange={onTradeTypeChange}
-            />
+          title: testFlags.isolatedMargin ? (
+            <$EditTradeHeader>
+              <Button
+                onClick={() => {
+                  dispatch(
+                    openDialog({
+                      type: DialogTypes.SelectMarginMode,
+                    })
+                  );
+                }}
+              >
+                {stringGetter({ key: STRING_KEYS.CROSS })}
+              </Button>
+
+              <Button
+                onClick={() => {
+                  dispatch(openDialog({ type: DialogTypes.AdjustTargetLeverage }));
+                }}
+              >
+                1x
+              </Button>
+
+              <TradeSideToggle />
+            </$EditTradeHeader>
+          ) : (
+            <TradeSideToggle />
           ),
         },
         [MobilePlaceOrderSteps.PreviewOrder]: {
           title: (
-            <Styled.PreviewTitle>
-              {stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_TITLE })}
-            </Styled.PreviewTitle>
+            <$PreviewTitle>{stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_TITLE })}</$PreviewTitle>
           ),
           description: stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_DESCRIPTION }),
         },
         [MobilePlaceOrderSteps.PlacingOrder]: {
           title: stringGetter({ key: STRING_KEYS.PLACING_ORDER_TITLE }),
           description: stringGetter({ key: STRING_KEYS.PLACING_ORDER_DESCRIPTION }),
-          slotIcon: <Styled.Ring withAnimation value={0.25} />,
+          slotIcon: <$Ring withAnimation value={0.25} />,
         },
-        // TODO(@aforaleka): add error state if trade didn't actually go through
+        [MobilePlaceOrderSteps.PlaceOrderFailed]: {
+          title: stringGetter({ key: STRING_KEYS.PLACE_ORDER_FAILED }),
+          description: stringGetter({ key: STRING_KEYS.PLACE_ORDER_FAILED_DESCRIPTION }),
+          slotIcon: <$WarningIcon iconName={IconName.Warning} />,
+        },
         [MobilePlaceOrderSteps.Confirmation]: {
           title: stringGetter({ key: STRING_KEYS.CONFIRMED_TITLE }),
           description: stringGetter({ key: STRING_KEYS.CONFIRMED_DESCRIPTION }),
-          slotIcon: <Styled.GreenCheckCircle />,
+          slotIcon: <$GreenCheckCircle />,
         },
       }[currentStep]}
     >
-      <Styled.TradeForm
+      <$TradeForm
         currentStep={currentStep}
         setCurrentStep={setCurrentStep}
         onConfirm={onCloseDialog}
       />
-    </Styled.Dialog>
+    </$Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
+const $Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
   --dialog-backgroundColor: var(--color-layer-2);
   --dialog-header-height: 1rem;
   --dialog-content-paddingTop: 0;
@@ -126,34 +131,33 @@ Styled.Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
     `}
 `;
 
-Styled.ToggleGroup = styled(ToggleGroup)`
-  overflow-x: auto;
-
-  button[data-state='off'] {
-    gap: 0;
-
-    img {
-      height: 0;
-    }
-  }
+const $EditTradeHeader = styled.div`
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 0.5rem;
 `;
 
-Styled.TradeForm = styled(TradeForm)`
+const $TradeForm = styled(TradeForm)`
   --tradeBox-content-paddingTop: 1rem;
   --tradeBox-content-paddingRight: 1.5rem;
   --tradeBox-content-paddingBottom: 1.5rem;
   --tradeBox-content-paddingLeft: 1.5rem;
 `;
 
-Styled.Ring = styled(Ring)`
+const $Ring = styled(Ring)`
   --ring-color: var(--color-accent);
 `;
 
-Styled.GreenCheckCircle = styled(GreenCheckCircle)`
+const $GreenCheckCircle = styled(GreenCheckCircle)`
   --icon-size: 2rem;
 `;
 
-Styled.PreviewTitle = styled.div`
+const $WarningIcon = styled(Icon)`
+  color: var(--color-warning);
+  font-size: 1.5rem;
+`;
+
+const $PreviewTitle = styled.div`
   ${layoutMixins.inlineRow}
   height: var(--dialog-icon-size);
 `;

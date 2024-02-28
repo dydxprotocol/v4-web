@@ -1,8 +1,8 @@
 import React, { type MouseEvent } from 'react';
+
 import styled, { css } from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
-
 import {
   NotificationStatus,
   type Notification as NotificationDataType,
@@ -10,11 +10,11 @@ import {
 
 import { useNotifications } from '@/hooks/useNotifications';
 
-import { popoverMixins } from '@/styles/popoverMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
+import { popoverMixins } from '@/styles/popoverMixins';
 
-import { IconButton } from '@/components/IconButton';
 import { IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
 
 type ElementProps = {
@@ -52,6 +52,7 @@ export const Notification = ({
   withClose = !isToast,
 }: NotificationProps) => {
   const { markCleared, markSeen } = useNotifications();
+  const slotContentOrDescription = slotCustomContent ?? slotDescription;
 
   return (
     <$Container className={className} isToast={isToast} onClick={onClick}>
@@ -73,7 +74,7 @@ export const Notification = ({
                 iconName={IconName.Close}
                 shape={ButtonShape.Square}
                 size={ButtonSize.XSmall}
-                onClick={(e: MouseEvent) => {
+                onClick={(e: React.MouseEvent) => {
                   e.stopPropagation();
 
                   if (notification.status < NotificationStatus.Seen) {
@@ -87,7 +88,7 @@ export const Notification = ({
           </$ActionItems>
         )}
       </$Header>
-      <$Description>{slotCustomContent ?? slotDescription}</$Description>
+      {slotContentOrDescription && <$Description>{slotContentOrDescription}</$Description>}
       {slotAction && <$Action>{slotAction}</$Action>}
     </$Container>
   );
@@ -121,13 +122,12 @@ const $Container = styled.div<{ isToast?: boolean }>`
 const $Header = styled.header`
   ${layoutMixins.row}
   position: relative;
+  gap: 0.5rem;
 `;
 
 const $Icon = styled.div`
   ${layoutMixins.row}
   float: left;
-
-  margin-right: 0.5rem;
 
   line-height: 1;
 
@@ -152,6 +152,7 @@ const $Description = styled.div`
   margin-top: 0.5rem;
   color: var(--color-text-0);
   font: var(--font-small-book);
+  white-space: break-spaces;
 `;
 
 const $Action = styled.div`

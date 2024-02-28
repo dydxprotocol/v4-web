@@ -1,16 +1,14 @@
 // Forked from original XYChart Tooltip to use TooltipWithBounds instead of TooltipInPortal:
 // https://github.com/airbnb/visx/blob/master/packages/visx-xychart/src/components/Tooltip.tsx
-
 import React, { Fragment, useCallback, useContext, useEffect } from 'react';
 
+import { Group } from '@visx/group';
+import { PickD3Scale } from '@visx/scale';
 import { TooltipWithBounds } from '@visx/tooltip';
 import type { TooltipProps as BaseTooltipProps } from '@visx/tooltip/lib/tooltips/Tooltip';
-import { PickD3Scale } from '@visx/scale';
-import { Group } from '@visx/group';
-
 import {
-  TooltipContext,
   DataContext,
+  TooltipContext,
   type GlyphProps as RenderGlyphProps,
   type TooltipContextType,
 } from '@visx/xychart';
@@ -66,7 +64,7 @@ export type TooltipProps<Datum extends object> = {
     onTooltipContext?: (tooltipContext: TooltipContextType<Datum>) => void;
   };
 
-function DefaultGlyph<Datum extends object>(props: RenderTooltipGlyphProps<Datum>) {
+const DefaultGlyph = <Datum extends object>(props: RenderTooltipGlyphProps<Datum>) => {
   const { theme } = useContext(DataContext) || {};
 
   return (
@@ -81,13 +79,13 @@ function DefaultGlyph<Datum extends object>(props: RenderTooltipGlyphProps<Datum
       {...props.glyphStyle}
     />
   );
-}
+};
 
 function defaultRenderGlyph<Datum extends object>(props: RenderTooltipGlyphProps<Datum>) {
   return <DefaultGlyph {...props} />;
 }
 
-function TooltipInner<Datum extends object>({
+const TooltipInner = <Datum extends object>({
   horizontalCrosshairStyle,
   glyphStyle,
   onTooltipContext,
@@ -105,7 +103,7 @@ function TooltipInner<Datum extends object>({
   snapCrosshairToDatumY = true,
   verticalCrosshairStyle,
   ...tooltipProps
-}: TooltipProps<Datum>) {
+}: TooltipProps<Datum>) => {
   const {
     colorScale,
     theme,
@@ -293,7 +291,7 @@ function TooltipInner<Datum extends object>({
       </foreignObject>
     </g>
   ) : null;
-}
+};
 
 /**
  * This is a wrapper component which bails early if tooltip is not visible.

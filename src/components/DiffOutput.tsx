@@ -1,9 +1,9 @@
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DiffArrow, type DiffArrowProps } from '@/components/DiffArrow';
-import { Output, type OutputProps, OutputType } from '@/components/Output';
+import { Output, OutputType, type OutputProps } from '@/components/Output';
 
 import { BigNumberish } from '@/lib/numbers';
 
@@ -38,7 +38,7 @@ export const DiffOutput = ({
   value,
   newValue,
 }: DiffOutputProps) => (
-  <Styled.DiffOutput className={className} layout={layout} withDiff={withDiff}>
+  <$DiffOutput className={className} layout={layout} withDiff={withDiff}>
     <Output
       fractionDigits={fractionDigits}
       tag={tag}
@@ -49,7 +49,7 @@ export const DiffOutput = ({
       withBaseFont={withBaseFont}
     />
     {withDiff && (
-      <Styled.DiffValue hasInvalidNewValue={hasInvalidNewValue}>
+      <$DiffValue hasInvalidNewValue={hasInvalidNewValue}>
         <DiffArrow direction={direction} sign={sign} />
         <Output
           fractionDigits={fractionDigits}
@@ -60,14 +60,11 @@ export const DiffOutput = ({
           showSign={showSign}
           withBaseFont={withBaseFont}
         />
-      </Styled.DiffValue>
+      </$DiffValue>
     )}
-  </Styled.DiffOutput>
+  </$DiffOutput>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.DiffValue = styled.div<{ hasInvalidNewValue?: boolean }>`
+const $DiffValue = styled.div<{ hasInvalidNewValue?: boolean }>`
   ${layoutMixins.row}
   gap: 0.25rem;
   color: var(--color-text-2);
@@ -79,7 +76,7 @@ Styled.DiffValue = styled.div<{ hasInvalidNewValue?: boolean }>`
     `}
 `;
 
-Styled.DiffOutput = styled.div<{ layout: 'row' | 'column'; withDiff?: boolean }>`
+const $DiffOutput = styled.div<{ layout: 'row' | 'column'; withDiff?: boolean }>`
   --diffOutput-gap: 0.25rem;
   --diffOutput-value-color: var(--color-text-1);
   --diffOutput-newValue-color: var(--color-text-2);
@@ -94,10 +91,10 @@ Styled.DiffOutput = styled.div<{ layout: 'row' | 'column'; withDiff?: boolean }>
 
   ${({ layout }) =>
     ({
-      ['row']: `
+      row: `
         ${layoutMixins.row}
       `,
-      ['column']: `
+      column: `
         ${layoutMixins.column}
       `,
     }[layout])}

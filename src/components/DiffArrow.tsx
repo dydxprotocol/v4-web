@@ -16,14 +16,11 @@ type StyleProps = {
 export type DiffArrowProps = ElementProps & StyleProps;
 
 export const DiffArrow = ({ className, direction = 'right', sign }: DiffArrowProps) => (
-  <Styled.DiffArrowContainer className={className} direction={direction} sign={sign}>
+  <$DiffArrowContainer className={className} direction={direction} sign={sign}>
     <Icon iconName={IconName.Arrow} />
-  </Styled.DiffArrowContainer>
+  </$DiffArrowContainer>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.DiffArrowContainer = styled.span<DiffArrowProps>`
+const $DiffArrowContainer = styled.span<DiffArrowProps>`
   --diffArrow-color: inherit;
   --diffArrow-color-positive: var(--color-positive);
   --diffArrow-color-negative: var(--color-negative);
@@ -33,8 +30,8 @@ Styled.DiffArrowContainer = styled.span<DiffArrowProps>`
   color: var(--diffArrow-color);
 
   svg {
-    width: 0.5em;
-    height: 0.5em;
+    width: 0.75em;
+    height: 0.75em;
   }
 
   ${({ sign }) =>

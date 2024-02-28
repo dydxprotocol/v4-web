@@ -1,7 +1,22 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import styled, { AnyStyledComponent, css, keyframes } from 'styled-components';
-import { useSelector, shallowEqual } from 'react-redux';
+
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { curveStepAfter } from '@visx/curve';
+import { LinearGradient } from '@visx/gradient';
+import { Point } from '@visx/point';
+import {
+  AreaSeries,
+  Axis,
+  DataProvider,
+  EventEmitterProvider, // AnimatedAxis,
+  Grid, // AnimatedGrid,
+  LineSeries, // AnimatedAreaSeries,
+  buildChartTheme,
+  darkTheme,
+  type EventHandlerParams,
+} from '@visx/xychart';
+import { shallowEqual, useSelector } from 'react-redux';
+import styled, { keyframes } from 'styled-components';
 
 import {
   DepthChartDatum,
@@ -11,32 +26,17 @@ import {
 } from '@/constants/charts';
 import { StringGetterFunction } from '@/constants/localization';
 
-import { useBreakpoints } from '@/hooks';
 import { useOrderbookValuesForDepthChart } from '@/hooks/Orderbook/useOrderbookValues';
-
-import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-
-import { XYChartWithPointerEvents } from '@/components/visx/XYChartWithPointerEvents';
-import {
-  Axis, // AnimatedAxis,
-  Grid, // AnimatedGrid,
-  LineSeries,
-  AreaSeries, // AnimatedAreaSeries,
-  buildChartTheme,
-  darkTheme,
-  DataProvider,
-  EventEmitterProvider,
-  type EventHandlerParams,
-} from '@visx/xychart';
-import { LinearGradient } from '@visx/gradient';
-import { curveStepAfter } from '@visx/curve';
-import { Point } from '@visx/point';
-import Tooltip from '@/components/visx/XYChartTooltipWithBounds';
-import { AxisLabelOutput } from '@/components/visx/AxisLabelOutput';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { OutputType } from '@/components/Output';
+import { AxisLabelOutput } from '@/components/visx/AxisLabelOutput';
+import Tooltip from '@/components/visx/XYChartTooltipWithBounds';
+import { XYChartWithPointerEvents } from '@/components/visx/XYChartWithPointerEvents';
+
+import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
+import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 
@@ -119,25 +119,26 @@ export const DepthChart = ({
     if (!(zoomDomain && midMarketPrice && asks.length && bids.length))
       return { domain: [0, 0] as const, range: [0, 0] as const };
 
-    const domain = [
+    const newDomain = [
       clamp(midMarketPrice - zoomDomain, 0, highestBid.price),
       clamp(midMarketPrice + zoomDomain, lowestAsk.price, highestAsk.price),
     ] as const;
 
-    const range = [
+    const newRange = [
       0,
       [...bids, ...asks]
-        .filter((datum) => datum.price >= domain[0] && datum.price <= domain[1])
+        .filter((datum) => datum.price >= newDomain[0] && datum.price <= newDomain[1])
         .map((datum) => datum.depth)
         .reduce((a, b) => Math.max(a, b), 0),
     ] as const;
 
-    return { domain, range };
+    return { domain: newDomain, range: newRange };
   }, [orderbook, zoomDomain]);
 
   const getChartPoint = useCallback(
     (point: Point | EventHandlerParams<object>) => {
-      let price, size;
+      let price;
+      let size;
       if (point instanceof Point) {
         const { x, y } = point as Point;
         price = x;
@@ -167,7 +168,7 @@ export const DepthChart = ({
   const onDepthChartZoom = ({
     deltaY,
     wheelDelta = deltaY,
-  }: WheelEvent & { wheelDelta?: number }) => {
+  }: React.WheelEvent & { wheelDelta?: number }) => {
     setZoomDomain(
       clamp(
         Math.max(
@@ -181,7 +182,7 @@ export const DepthChart = ({
   };
 
   return (
-    <Styled.Container onWheel={onDepthChartZoom}>
+    <$Container onWheel={onDepthChartZoom}>
       <DataProvider
         theme={theme}
         xScale={{
@@ -211,7 +212,7 @@ export const DepthChart = ({
             }}
             onPointerUp={(point) => point && onChartClick?.(getChartPoint(point))}
             onPointerMove={(point) => point && setChartPointAtPointer(getChartPoint(point))}
-            onPointerPressedChange={(isPointerPressed) => setIsPointerPressed(isPointerPressed)}
+            onPointerPressedChange={(pointerPressed) => setIsPointerPressed(pointerPressed)}
           >
             <Axis
               orientation="bottom"
@@ -315,7 +316,7 @@ export const DepthChart = ({
               verticalCrosshairStyle={{ strokeWidth: 1, strokeDasharray: '5 5', opacity: 0.7 }}
               snapCrosshairToDatumX={!isEditingOrder}
               renderXAxisLabel={({ tooltipData }) => (
-                <Styled.XAxisLabelOutput
+                <$XAxisLabelOutput
                   type={OutputType.Fiat}
                   value={
                     isEditingOrder && chartPointAtPointer
@@ -341,7 +342,7 @@ export const DepthChart = ({
               snapCrosshairToDatumY={!isEditingOrder}
               renderYAxisLabel={({ tooltipData }) =>
                 (isEditingOrder || tooltipData!.nearestDatum?.datum.depth) && (
-                  <Styled.YAxisLabelOutput
+                  <$YAxisLabelOutput
                     type={OutputType.Asset}
                     value={
                       isEditingOrder && chartPointAtPointer
@@ -385,13 +386,10 @@ export const DepthChart = ({
           </XYChartWithPointerEvents>
         </EventEmitterProvider>
       </DataProvider>
-    </Styled.Container>
+    </$Container>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.div`
+const $Container = styled.div`
   width: 0;
   min-width: 100%;
   height: 0;
@@ -430,11 +428,11 @@ Styled.Container = styled.div`
   }
 `;
 
-Styled.XAxisLabelOutput = styled(AxisLabelOutput)`
+const $XAxisLabelOutput = styled(AxisLabelOutput)`
   box-shadow: 0 0 0.5rem var(--color-layer-2);
 `;
 
-Styled.YAxisLabelOutput = styled(AxisLabelOutput)`
+const $YAxisLabelOutput = styled(AxisLabelOutput)`
   --axisLabel-offset: 0.5rem;
 
   [data-side='left'] & {

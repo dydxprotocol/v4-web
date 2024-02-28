@@ -1,12 +1,16 @@
 import { useCallback, useMemo } from 'react';
+
 import { Nullable } from '@dydxprotocol/v4-abacus';
-import styled, { AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
+import styled from 'styled-components';
 
 import { FeeTier } from '@/constants/abacus';
-import { FEE_DECIMALS } from '@/constants/numbers';
 import { STRING_KEYS } from '@/constants/localization';
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { FEE_DECIMALS } from '@/constants/numbers';
+
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tableMixins } from '@/styles/tableMixins';
@@ -43,69 +47,60 @@ export const Fees = () => {
   }, [userStats]);
 
   const AdditionalConditions = useCallback(
-    ({
-      totalShare,
-      makerShare,
-      isAdditional,
-    }: {
+    (conditions: {
       totalShare: Nullable<number>;
       makerShare: Nullable<number>;
       isAdditional?: boolean;
-    }) => (
-      <Styled.AdditionalConditions>
-        {!isAdditional && !totalShare && !makerShare && <Output type={OutputType.Text} />}
-        {!!totalShare && (
-          <Styled.AdditionalConditionsText>
-            {isAdditional && stringGetter({ key: STRING_KEYS.AND })}{' '}
-            {stringGetter({ key: STRING_KEYS.EXCHANGE_MARKET_SHARE })}{' '}
-            <Styled.Highlighted>{'>'}</Styled.Highlighted>{' '}
-            <Styled.HighlightOutput
-              type={OutputType.Percent}
-              value={totalShare}
-              fractionDigits={0}
-            />
-          </Styled.AdditionalConditionsText>
-        )}
-        {!!makerShare && (
-          <Styled.AdditionalConditionsText>
-            {isAdditional && stringGetter({ key: STRING_KEYS.AND })}{' '}
-            {stringGetter({ key: STRING_KEYS.MAKER_MARKET_SHARE })}{' '}
-            <Styled.Highlighted>{'>'}</Styled.Highlighted>{' '}
-            <Styled.HighlightOutput
-              type={OutputType.Percent}
-              value={makerShare}
-              fractionDigits={0}
-            />
-          </Styled.AdditionalConditionsText>
-        )}
-      </Styled.AdditionalConditions>
-    ),
+    }) => {
+      const { totalShare, makerShare, isAdditional } = conditions;
+      return (
+        <$AdditionalConditions>
+          {!isAdditional && !totalShare && !makerShare && <Output type={OutputType.Text} />}
+          {!!totalShare && (
+            <$AdditionalConditionsText>
+              {isAdditional && stringGetter({ key: STRING_KEYS.AND })}{' '}
+              {stringGetter({ key: STRING_KEYS.EXCHANGE_MARKET_SHARE })}{' '}
+              <$Highlighted>{'>'}</$Highlighted>{' '}
+              <$HighlightOutput type={OutputType.Percent} value={totalShare} fractionDigits={0} />
+            </$AdditionalConditionsText>
+          )}
+          {!!makerShare && (
+            <$AdditionalConditionsText>
+              {isAdditional && stringGetter({ key: STRING_KEYS.AND })}{' '}
+              {stringGetter({ key: STRING_KEYS.MAKER_MARKET_SHARE })}{' '}
+              <$Highlighted>{'>'}</$Highlighted>{' '}
+              <$HighlightOutput type={OutputType.Percent} value={makerShare} fractionDigits={0} />
+            </$AdditionalConditionsText>
+          )}
+        </$AdditionalConditions>
+      );
+    },
     [stringGetter]
   );
 
   return (
     <AttachedExpandingSection>
       {isNotTablet && <ContentSectionHeader title={stringGetter({ key: STRING_KEYS.FEES })} />}
-      <Styled.ContentWrapper>
-        <Styled.FeesDetails
+      <$ContentWrapper>
+        <$FeesDetails
           layout="grid"
           items={[
             {
               key: 'volume',
               label: (
-                <Styled.CardLabel>
+                <$CardLabel>
                   <span>{stringGetter({ key: STRING_KEYS.TRAILING_VOLUME })}</span>
                   <span>{stringGetter({ key: STRING_KEYS._30D })}</span>
-                </Styled.CardLabel>
+                </$CardLabel>
               ),
               value: <Output type={OutputType.Fiat} value={volume} />,
             },
           ]}
         />
 
-        <Styled.FeeTable
+        <$FeeTable
           label="Fee Tiers"
-          data={feeTiers || []}
+          data={feeTiers ?? []}
           getRowKey={(row: FeeTier) => row.tier}
           getRowAttributes={(row: FeeTier) => ({
             'data-yours': row.tier === userFeeTier,
@@ -118,14 +113,14 @@ export const Fees = () => {
                 label: stringGetter({ key: STRING_KEYS.TIER }),
                 allowsSorting: false,
                 renderCell: ({ tier }) => (
-                  <Styled.Tier>
-                    <Styled.Output type={OutputType.Text} value={tier} />
+                  <$Tier>
+                    <$Output type={OutputType.Text} value={tier} />
                     {tier === userFeeTier && (
-                      <Styled.YouTag size={TagSize.Medium}>
+                      <$YouTag size={TagSize.Medium}>
                         {stringGetter({ key: STRING_KEYS.YOU })}
-                      </Styled.YouTag>
+                      </$YouTag>
                     )}
-                  </Styled.Tier>
+                  </$Tier>
                 ),
               },
               {
@@ -133,14 +128,14 @@ export const Fees = () => {
                 getCellValue: (row) => row.volume,
                 label: stringGetter({ key: STRING_KEYS.VOLUME_30D }),
                 allowsSorting: false,
-                renderCell: ({ symbol, volume, makerShare, totalShare }) => (
+                renderCell: ({ symbol, volume: vol, makerShare, totalShare }) => (
                   <>
                     <span>{`${
                       symbol in EQUALITY_SYMBOL_MAP
                         ? EQUALITY_SYMBOL_MAP[symbol as keyof typeof EQUALITY_SYMBOL_MAP]
                         : symbol
                     } `}</span>
-                    <Styled.HighlightOutput type={OutputType.CompactFiat} value={volume} />
+                    <$HighlightOutput type={OutputType.CompactFiat} value={vol} />
                     {isTablet &&
                       AdditionalConditions({ totalShare, makerShare, isAdditional: true })}
                   </>
@@ -160,7 +155,7 @@ export const Fees = () => {
                 label: stringGetter({ key: STRING_KEYS.MAKER }),
                 allowsSorting: false,
                 renderCell: ({ maker }) => (
-                  <Styled.HighlightOutput
+                  <$HighlightOutput
                     type={OutputType.SmallPercent}
                     value={maker}
                     fractionDigits={FEE_DECIMALS}
@@ -173,7 +168,7 @@ export const Fees = () => {
                 label: stringGetter({ key: STRING_KEYS.TAKER }),
                 allowsSorting: false,
                 renderCell: ({ taker }) => (
-                  <Styled.HighlightOutput
+                  <$HighlightOutput
                     type={OutputType.SmallPercent}
                     value={taker}
                     fractionDigits={FEE_DECIMALS}
@@ -183,24 +178,22 @@ export const Fees = () => {
             ] as ColumnDef<FeeTier>[]
           ).filter(isTruthy)}
           selectionBehavior="replace"
+          paginationBehavior="showAll"
           withOuterBorder={isNotTablet}
           withInnerBorders
         />
-      </Styled.ContentWrapper>
+      </$ContentWrapper>
     </AttachedExpandingSection>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ContentWrapper = styled.div`
+const $ContentWrapper = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1.5rem;
   max-width: 100vw;
 `;
 
-Styled.AdditionalConditions = styled.div`
-  ${tableMixins.cellContentColumn}
+const $AdditionalConditions = styled.div`
+  ${tableMixins.stackedWithSecondaryStyling}
   justify-content: end;
 
   color: var(--color-text-0);
@@ -211,7 +204,7 @@ Styled.AdditionalConditions = styled.div`
   }
 `;
 
-Styled.AdditionalConditionsText = styled.span`
+const $AdditionalConditionsText = styled.span`
   display: flex;
   gap: 0.5ch;
 
@@ -226,7 +219,7 @@ Styled.AdditionalConditionsText = styled.span`
   }
 `;
 
-Styled.FeesDetails = styled(Details)`
+const $FeesDetails = styled(Details)`
   gap: 1rem;
 
   @media ${breakpoints.notTablet} {
@@ -261,12 +254,12 @@ Styled.FeesDetails = styled(Details)`
   }
 `;
 
-Styled.TextRow = styled.div`
+const $TextRow = styled.div`
   ${layoutMixins.inlineRow}
   gap: 0.25rem;
 `;
 
-Styled.CardLabel = styled(Styled.TextRow)`
+const $CardLabel = styled($TextRow)`
   font: var(--font-small-book);
 
   color: var(--color-text-1);
@@ -280,7 +273,7 @@ Styled.CardLabel = styled(Styled.TextRow)`
   }
 `;
 
-Styled.FeeTable = styled(Table)`
+const $FeeTable = styled(Table)`
   --tableCell-padding: 0.5rem 1.5rem;
   --bordered-content-border-radius: 0.625rem;
   --table-cell-align: end;
@@ -303,26 +296,26 @@ Styled.FeeTable = styled(Table)`
   }
 
   @media ${breakpoints.notTablet} {
-    --tableHeader-backgroundColor: var(--color-layer-1);
+    --tableStickyRow-backgroundColor: var(--color-layer-1);
   }
-`;
+` as typeof Table;
 
-Styled.Output = styled(Output)`
+const $Output = styled(Output)`
   color: var(--color-text-0);
 `;
 
-Styled.Highlighted = styled.strong`
+const $Highlighted = styled.strong`
   color: var(--color-text-1);
 `;
 
-Styled.HighlightOutput = styled(Output)`
+const $HighlightOutput = styled(Output)`
   color: var(--color-text-1);
 `;
 
-Styled.Tier = styled(Styled.TextRow)`
+const $Tier = styled($TextRow)`
   gap: 0.5rem;
 `;
 
-Styled.YouTag = styled(Tag)`
+const $YouTag = styled(Tag)`
   color: var(--color-text-1);
 `;

@@ -20,7 +20,7 @@ export const PageMenuItem = <MenuItemValue extends string>({
       // TODO: implement toggle item component when needed for notifications settings
       return null;
     case PageMenuItemType.RadioGroup:
-      return <PageMenuRadioGroupItem {...(props)} />;
+      return <PageMenuRadioGroupItem {...props} />;
     default:
       return null;
   }

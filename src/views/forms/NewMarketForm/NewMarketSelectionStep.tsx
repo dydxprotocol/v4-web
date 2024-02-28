@@ -1,29 +1,27 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
-import { Root, Item } from '@radix-ui/react-radio-group';
+
+import { Item, Root } from '@radix-ui/react-radio-group';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
-import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { isMainnet } from '@/constants/networks';
+import { isDev, isMainnet } from '@/constants/networks';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
-
 import {
   NUM_ORACLES_TO_QUALIFY_AS_SAFE,
-  type PotentialMarketItem,
+  type NewMarketProposal,
 } from '@/constants/potentialMarkets';
 
-import {
-  useAccountBalance,
-  useBreakpoints,
-  useGovernanceVariables,
-  useStringGetter,
-  useTokenConfigs,
-} from '@/hooks';
+import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useGovernanceVariables } from '@/hooks/useGovernanceVariables';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { breakpoints } from '@/styles';
 import { formMixins } from '@/styles/formMixins';
@@ -32,12 +30,10 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
-import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
-import { Tag } from '@/components/Tag';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
+import { Tag } from '@/components/Tag';
 import { WithReceipt } from '@/components/WithReceipt';
-
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { getOnboardingState } from '@/state/accountSelectors';
@@ -48,13 +44,14 @@ import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 
 type NewMarketSelectionStepProps = {
-  assetToAdd?: PotentialMarketItem;
+  assetToAdd?: NewMarketProposal;
   clobPairId?: number;
-  setAssetToAdd: (assetToAdd?: PotentialMarketItem) => void;
+  setAssetToAdd: (assetToAdd?: NewMarketProposal) => void;
   onConfirmMarket: () => void;
   liquidityTier?: number;
   setLiquidityTier: (liquidityTier?: number) => void;
   tickSizeDecimals: number;
+  tickersFromProposals: Set<string>;
 };
 
 export const NewMarketSelectionStep = ({
@@ -65,6 +62,7 @@ export const NewMarketSelectionStep = ({
   liquidityTier,
   setLiquidityTier,
   tickSizeDecimals,
+  tickersFromProposals,
 }: NewMarketSelectionStepProps) => {
   const dispatch = useDispatch();
   const { nativeTokenBalance } = useAccountBalance();
@@ -73,7 +71,7 @@ export const NewMarketSelectionStep = ({
   const { isMobile } = useBreakpoints();
   const marketIds = useSelector(getMarketIds, shallowEqual);
   const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
-  const { potentialMarkets, exchangeConfigs, liquidityTiers } = usePotentialMarkets();
+  const { potentialMarkets, liquidityTiers } = usePotentialMarkets();
   const stringGetter = useStringGetter();
   const { newMarketProposal } = useGovernanceVariables();
   const initialDepositAmountBN = MustBigNumber(newMarketProposal.initialDepositAmount).div(
@@ -82,8 +80,7 @@ export const NewMarketSelectionStep = ({
   const initialDepositAmountDecimals = isMainnet ? 0 : chainTokenDecimals;
   const initialDepositAmount = initialDepositAmountBN.toFixed(initialDepositAmountDecimals);
 
-  const [tempLiquidityTier, setTempLiquidityTier] = useState<number>();
-  const [canModifyLiqTier, setCanModifyLiqTier] = useState(false);
+  const [tempLiquidityTier, setTempLiquidityTier] = useState<string>();
 
   const alertMessage = useMemo(() => {
     if (nativeTokenBalance.lt(initialDepositAmountBN)) {
@@ -104,43 +101,50 @@ export const NewMarketSelectionStep = ({
 
   useEffect(() => {
     if (assetToAdd) {
-      setTempLiquidityTier(assetToAdd.liquidityTier);
-      setLiquidityTier(assetToAdd.liquidityTier);
+      setTempLiquidityTier('' + assetToAdd.params.liquidityTier);
+      setLiquidityTier(assetToAdd.params.liquidityTier);
     }
   }, [assetToAdd]);
 
   const filteredPotentialMarkets = useMemo(() => {
     return potentialMarkets?.filter(
-      ({ baseAsset, numOracles }) =>
-        exchangeConfigs?.[baseAsset] !== undefined &&
-        Number(numOracles) >= NUM_ORACLES_TO_QUALIFY_AS_SAFE &&
-        !marketIds.includes(`${baseAsset}-USD`)
+      ({ params: { ticker, exchangeConfigJson, marketType }, meta }) => {
+        if (marketIds.includes(ticker)) {
+          return false;
+        }
+
+        // Disable Isolated markets if the user is not on Staging or Local deployment
+        if (marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED') {
+          return isDev && exchangeConfigJson.length > 0;
+        }
+
+        if (exchangeConfigJson.length >= NUM_ORACLES_TO_QUALIFY_AS_SAFE) {
+          return true;
+        }
+
+        return false;
+      }
     );
-  }, [exchangeConfigs, potentialMarkets, marketIds]);
+  }, [potentialMarkets, marketIds]);
 
   return (
-    <Styled.Form
+    <$Form
       onSubmit={(e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (canModifyLiqTier) {
-          setLiquidityTier(tempLiquidityTier);
-          setCanModifyLiqTier(false);
-        } else {
-          onConfirmMarket();
-        }
+        onConfirmMarket();
       }}
     >
       <h2>
         {stringGetter({ key: STRING_KEYS.ADD_A_MARKET })}
-        <Styled.Balance>
+        <$Balance>
           {stringGetter({ key: STRING_KEYS.BALANCE })}:{' '}
           <Output
             type={OutputType.Number}
             value={nativeTokenBalance}
             fractionDigits={TOKEN_DECIMALS}
-            slotRight={<Styled.Tag>{chainTokenLabel}</Styled.Tag>}
+            slotRight={<$Tag>{chainTokenLabel}</$Tag>}
           />
-        </Styled.Balance>
+        </$Balance>
       </h2>
       <SearchSelectMenu
         items={[
@@ -148,10 +152,13 @@ export const NewMarketSelectionStep = ({
             group: 'markets',
             groupLabel: stringGetter({ key: STRING_KEYS.MARKETS }),
             items:
-              filteredPotentialMarkets?.map((potentialMarket: PotentialMarketItem) => ({
+              filteredPotentialMarkets?.map((potentialMarket: NewMarketProposal) => ({
                 value: potentialMarket.baseAsset,
-                label: potentialMarket?.assetName ?? potentialMarket.baseAsset,
-                tag: `${potentialMarket.baseAsset}-USD`,
+                label: potentialMarket.meta.assetName,
+                tag: potentialMarket.params.ticker,
+                slotAfter: tickersFromProposals.has(potentialMarket.params.ticker) && (
+                  <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.VOTING_LIVE })}</Tag>
+                ),
                 onSelect: () => {
                   setAssetToAdd(potentialMarket);
                 },
@@ -161,9 +168,9 @@ export const NewMarketSelectionStep = ({
         label={stringGetter({ key: STRING_KEYS.MARKETS })}
       >
         {assetToAdd ? (
-          <Styled.SelectedAsset>
-            {assetToAdd?.assetName ?? assetToAdd.baseAsset} <Tag>{assetToAdd?.baseAsset}-USD</Tag>
-          </Styled.SelectedAsset>
+          <$SelectedAsset>
+            {assetToAdd.meta.assetName} <Tag>{assetToAdd.params.ticker}</Tag>
+          </$SelectedAsset>
         ) : (
           `${stringGetter({ key: STRING_KEYS.EG })} "BTC-USD"`
         )}
@@ -172,62 +179,28 @@ export const NewMarketSelectionStep = ({
         <>
           <div>{stringGetter({ key: STRING_KEYS.POPULATED_DETAILS })}</div>
           <div>
-            <Styled.Root value={tempLiquidityTier} onValueChange={setTempLiquidityTier}>
-              <Styled.Header>
-                {stringGetter({ key: STRING_KEYS.LIQUIDITY_TIER })}
-                <Styled.ButtonRow>
-                  <Button
-                    shape={ButtonShape.Pill}
-                    onClick={() => {
-                      if (canModifyLiqTier) {
-                        setTempLiquidityTier(liquidityTier);
-                      }
-                      setCanModifyLiqTier(!canModifyLiqTier);
-                    }}
-                  >
-                    {canModifyLiqTier ? (
-                      stringGetter({ key: STRING_KEYS.CANCEL })
-                    ) : (
-                      <>
-                        {stringGetter({ key: STRING_KEYS.MODIFY })}{' '}
-                        <Icon iconName={IconName.Pencil} />
-                      </>
-                    )}
-                  </Button>
-                  {canModifyLiqTier && (
-                    <Button
-                      shape={ButtonShape.Pill}
-                      action={ButtonAction.Primary}
-                      onClick={() => {
-                        setLiquidityTier(tempLiquidityTier);
-                        setCanModifyLiqTier(false);
-                      }}
-                    >
-                      {stringGetter({ key: STRING_KEYS.SAVE })}
-                    </Button>
-                  )}
-                </Styled.ButtonRow>
-              </Styled.Header>
+            <$Root value={tempLiquidityTier} onValueChange={setTempLiquidityTier}>
+              <$Header>{stringGetter({ key: STRING_KEYS.LIQUIDITY_TIER })}</$Header>
 
               {Object.keys(liquidityTiers).map((tier) => {
                 const { maintenanceMarginFraction, impactNotional, label, initialMarginFraction } =
                   liquidityTiers[tier as unknown as keyof typeof liquidityTiers];
                 return (
-                  <Styled.LiquidityTierRadioButton
+                  <$LiquidityTierRadioButton
+                    disabled
                     key={tier}
-                    value={Number(tier)}
-                    selected={Number(tier) === tempLiquidityTier}
-                    disabled={!canModifyLiqTier}
+                    value={tier}
+                    selected={Number(tier) === Number(tempLiquidityTier)}
                   >
-                    <Styled.Header style={{ marginLeft: '1rem' }}>
+                    <$Header style={{ marginLeft: '1rem' }}>
                       {label}
-                      {Number(tier) === assetToAdd?.liquidityTier && (
+                      {Number(tier) === assetToAdd?.params.liquidityTier && (
                         <Tag style={{ marginLeft: '0.5ch' }}>
                           ✨ {stringGetter({ key: STRING_KEYS.RECOMMENDED })}
                         </Tag>
                       )}
-                    </Styled.Header>
-                    <Styled.Details
+                    </$Header>
+                    <$Details
                       layout={isMobile ? 'grid' : 'rowColumns'}
                       withSeparators={!isMobile}
                       items={[
@@ -264,10 +237,10 @@ export const NewMarketSelectionStep = ({
                         },
                       ]}
                     />
-                  </Styled.LiquidityTierRadioButton>
+                  </$LiquidityTierRadioButton>
                 );
               })}
-            </Styled.Root>
+            </$Root>
           </div>
         </>
       )}
@@ -276,7 +249,7 @@ export const NewMarketSelectionStep = ({
       )}
       <WithReceipt
         slotReceipt={
-          <Styled.ReceiptDetails
+          <$ReceiptDetails
             items={[
               assetToAdd && {
                 key: 'reference-price',
@@ -285,7 +258,7 @@ export const NewMarketSelectionStep = ({
                 value: (
                   <Output
                     type={OutputType.Fiat}
-                    value={assetToAdd.referencePrice}
+                    value={assetToAdd.meta?.referencePrice}
                     fractionDigits={tickSizeDecimals}
                   />
                 ),
@@ -294,7 +267,7 @@ export const NewMarketSelectionStep = ({
                 key: 'message-details',
                 label: stringGetter({ key: STRING_KEYS.MESSAGE_DETAILS }),
                 value: (
-                  <Styled.Button
+                  <$Button
                     action={ButtonAction.Navigation}
                     size={ButtonSize.Small}
                     onClick={() =>
@@ -307,7 +280,7 @@ export const NewMarketSelectionStep = ({
                     }
                   >
                     {stringGetter({ key: STRING_KEYS.VIEW_DETAILS })} →
-                  </Styled.Button>
+                  </$Button>
                 ),
               },
               {
@@ -319,12 +292,12 @@ export const NewMarketSelectionStep = ({
                   </span>
                 ),
                 value: (
-                  <Styled.Disclaimer>
+                  <$Disclaimer>
                     {stringGetter({
                       key: STRING_KEYS.OR_MORE,
                       params: {
                         NUMBER: (
-                          <Styled.Output
+                          <$Output
                             useGrouping
                             type={OutputType.Number}
                             value={initialDepositAmountBN}
@@ -333,7 +306,7 @@ export const NewMarketSelectionStep = ({
                         ),
                       },
                     })}
-                  </Styled.Disclaimer>
+                  </$Disclaimer>
                 ),
               },
             ].filter(isTruthy)}
@@ -348,19 +321,14 @@ export const NewMarketSelectionStep = ({
             state={{ isDisabled: !assetToAdd || !liquidityTier === undefined || !clobPairId }}
             action={ButtonAction.Primary}
           >
-            {canModifyLiqTier
-              ? stringGetter({ key: STRING_KEYS.SAVE })
-              : stringGetter({ key: STRING_KEYS.PREVIEW_MARKET_PROPOSAL })}
+            {stringGetter({ key: STRING_KEYS.PREVIEW_MARKET_PROPOSAL })}
           </Button>
         )}
       </WithReceipt>
-    </Styled.Form>
+    </$Form>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Form = styled.form`
+const $Form = styled.form`
   ${formMixins.transfersForm}
   ${layoutMixins.stickyArea0}
   --stickyArea0-background: transparent;
@@ -374,7 +342,7 @@ Styled.Form = styled.form`
   }
 `;
 
-Styled.Balance = styled.span`
+const $Balance = styled.span`
   ${layoutMixins.inlineRow}
   font: var(--font-small-book);
   margin-top: 0.125rem;
@@ -384,20 +352,20 @@ Styled.Balance = styled.span`
   }
 `;
 
-Styled.Tag = styled(Tag)`
+const $Tag = styled(Tag)`
   margin-left: 0.5ch;
 `;
 
-Styled.SelectedAsset = styled.span`
+const $SelectedAsset = styled.span`
   color: var(--color-text-2);
 `;
 
-Styled.Disclaimer = styled.div`
+const $Disclaimer = styled.div`
   color: var(--color-text-0);
   margin-left: 0.5ch;
 `;
 
-Styled.Header = styled.div`
+const $Header = styled.div`
   display: flex;
   flex: 1;
   align-items: center;
@@ -406,17 +374,7 @@ Styled.Header = styled.div`
   justify-content: space-between;
 `;
 
-Styled.ButtonRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 0.5rem;
-
-  button {
-    min-width: 80px;
-  }
-`;
-
-Styled.Root = styled(Root)`
+const $Root = styled(Root)`
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -424,9 +382,9 @@ Styled.Root = styled(Root)`
   border-radius: 10px;
   border: 1px solid var(--color-layer-6);
   background-color: var(--color-layer-4);
-`;
+` as typeof Root;
 
-Styled.LiquidityTierRadioButton = styled(Item)<{ selected?: boolean }>`
+const $LiquidityTierRadioButton = styled(Item)<{ selected?: boolean }>`
   display: flex;
   flex-direction: column;
   border-radius: 0.625rem;
@@ -434,10 +392,14 @@ Styled.LiquidityTierRadioButton = styled(Item)<{ selected?: boolean }>`
   padding: 1rem 0;
   font: var(--font-mini-book);
 
+  &:disabled {
+    cursor: default;
+  }
+
   ${({ selected }) => selected && 'background-color: var(--color-layer-2)'}
 `;
 
-Styled.Details = styled(Details)`
+const $Details = styled(Details)`
   margin-top: 0.5rem;
   padding: 0;
 
@@ -454,14 +416,15 @@ Styled.Details = styled(Details)`
   }
 `;
 
-Styled.ReceiptDetails = styled(Details)`
+const $ReceiptDetails = styled(Details)`
   padding: 0.375rem 0.75rem 0.25rem;
 `;
 
-Styled.Output = styled(Output)`
+const $Output = styled(Output)`
   display: inline-block;
 `;
 
-Styled.Button = styled(Button)`
+const $Button = styled(Button)`
   --button-padding: 0;
+  --button-height: auto;
 `;

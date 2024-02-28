@@ -1,27 +1,31 @@
 import { useMemo, useState } from 'react';
-import styled, { AnyStyledComponent, css } from 'styled-components';
-import { shallowEqual, useSelector } from 'react-redux';
+
 import { TooltipContextType } from '@visx/xychart';
 import BigNumber from 'bignumber.js';
+import { shallowEqual, useSelector } from 'react-redux';
+import styled, { css } from 'styled-components';
 
 import type { Nullable } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
+import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
-import { useBreakpoints, useStringGetter } from '@/hooks';
+
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useComplianceState } from '@/hooks/useComplianceState';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
-import { getSelectedLocale } from '@/state/localizationSelectors';
-
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { WithLabel } from '@/components/WithLabel';
-
 import { PnlChart, type PnlDatum } from '@/views/charts/PnlChart';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
+
+import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
@@ -46,7 +50,7 @@ export const usePortfolioValues = ({
             timeStyle: 'short',
           })
         : stringGetter({ key: STRING_KEYS.PORTFOLIO_VALUE }),
-    [activeDatum, stringGetter]
+    [activeDatum, selectedLocale, stringGetter]
   );
 
   const accountEquity = useMemo(
@@ -55,7 +59,7 @@ export const usePortfolioValues = ({
   );
 
   const earliestVisibleDatum = visibleData?.[0];
-  const latestVisibleDatum = visibleData?.[visibleData?.length - 1];
+  const latestVisibleDatum = visibleData?.[(visibleData?.length ?? 1) - 1];
 
   const pnl = useMemo(() => {
     let pnlDiff;
@@ -77,6 +81,7 @@ export const usePortfolioValues = ({
         sign: fullTimeframeDiff.gte(0) ? NumberSign.Positive : NumberSign.Negative,
       };
     }
+    return undefined;
   }, [activeDatum, earliestVisibleDatum, latestVisibleDatum]);
 
   return {
@@ -84,18 +89,19 @@ export const usePortfolioValues = ({
     accountEquity,
     pnlDiff: pnl?.pnlDiff,
     pnlDiffPercent: pnl?.pnlDiffPercent,
-    pnlDiffSign: pnl?.sign || NumberSign.Neutral,
+    pnlDiffSign: pnl?.sign ?? NumberSign.Neutral,
   };
 };
 
 export const AccountDetailsAndHistory = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
+  const { complianceState } = useComplianceState();
   const selectedLocale = useSelector(getSelectedLocale);
   const onboardingState = useSelector(getOnboardingState);
 
   const { buyingPower, equity, freeCollateral, leverage, marginUsage } =
-    useSelector(getSubaccount, shallowEqual) || {};
+    useSelector(getSubaccount, shallowEqual) ?? {};
 
   const [tooltipContext, setTooltipContext] = useState<TooltipContextType<PnlDatum>>();
 
@@ -136,44 +142,46 @@ export const AccountDetailsAndHistory = () => {
   ].filter(isTruthy);
 
   return (
-    <Styled.AccountDetailsAndHistory>
-      <Styled.AccountValue>
-        <Styled.WithLabel label={accountValueLabel}>
-          <Styled.AccountEquity>
+    <$AccountDetailsAndHistory>
+      <$AccountValue>
+        <$WithLabel label={accountValueLabel}>
+          <$AccountEquity>
             <Output
               type={OutputType.Fiat}
               value={accountEquity}
               roundingMode={BigNumber.ROUND_FLOOR}
               withBaseFont
             />
-          </Styled.AccountEquity>
-          <Styled.PnlDiff isPositive={MustBigNumber(pnlDiff).gte(0)}>
+          </$AccountEquity>
+          <$PnlDiff isPositive={MustBigNumber(pnlDiff).gte(0)}>
             {pnlDiff && <TriangleIndicator value={MustBigNumber(pnlDiff)} />}
             <Output type={OutputType.Fiat} showSign={ShowSign.None} value={pnlDiff} />
             {pnlDiffPercent && MustBigNumber(pnlDiffPercent).isFinite() && (
-              <Styled.OutputInParentheses type={OutputType.Percent} value={pnlDiffPercent} />
+              <$OutputInParentheses type={OutputType.Percent} value={pnlDiffPercent} />
             )}
-          </Styled.PnlDiff>
-        </Styled.WithLabel>
-      </Styled.AccountValue>
+          </$PnlDiff>
+        </$WithLabel>
+      </$AccountValue>
 
       {accountDetailsConfig.map(({ key, labelKey, type, value }) => (
-        <Styled.AccountDetail key={key} gridArea={key}>
-          <Styled.WithLabel label={stringGetter({ key: labelKey })}>
+        <$AccountDetail key={key} gridArea={key}>
+          <$WithLabel label={stringGetter({ key: labelKey })}>
             <Output type={type} value={value} />
-          </Styled.WithLabel>
-        </Styled.AccountDetail>
+          </$WithLabel>
+        </$AccountDetail>
       ))}
 
-      <Styled.PnlChart
+      <$PnlChart
         pnlDiffSign={pnlDiffSign}
         onTooltipContext={setTooltipContext}
         onVisibleDataChange={setVisibleData}
         selectedLocale={selectedLocale}
         slotEmpty={
-          <Styled.EmptyChart>
-            {onboardingState !== OnboardingState.AccountConnected && (
-              <Styled.OnboardingCard>
+          <$EmptyChart>
+            {complianceState === ComplianceStates.READ_ONLY ? (
+              <$EmptyCard>{stringGetter({ key: STRING_KEYS.BLOCKED_MESSAGE })}</$EmptyCard>
+            ) : onboardingState !== OnboardingState.AccountConnected ? (
+              <$EmptyCard>
                 <p>
                   {stringGetter({
                     key: {
@@ -183,18 +191,15 @@ export const AccountDetailsAndHistory = () => {
                   })}
                 </p>
                 <OnboardingTriggerButton />
-              </Styled.OnboardingCard>
-            )}
-          </Styled.EmptyChart>
+              </$EmptyCard>
+            ) : null}
+          </$EmptyChart>
         }
       />
-    </Styled.AccountDetailsAndHistory>
+    </$AccountDetailsAndHistory>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.AccountDetailsAndHistory = styled.div<{ isSidebarOpen: boolean }>`
+const $AccountDetailsAndHistory = styled.div<{ isSidebarOpen?: boolean }>`
   height: 100%;
 
   display: grid;
@@ -216,7 +221,7 @@ Styled.AccountDetailsAndHistory = styled.div<{ isSidebarOpen: boolean }>`
   }
 `;
 
-Styled.WithLabel = styled(WithLabel)`
+const $WithLabel = styled(WithLabel)`
   --label-textColor: var(--color-text-0);
 
   label {
@@ -224,7 +229,7 @@ Styled.WithLabel = styled(WithLabel)`
   }
 `;
 
-Styled.AccountValue = styled.div`
+const $AccountValue = styled.div`
   grid-area: PortfolioValue;
 
   padding: 1.25rem;
@@ -234,12 +239,12 @@ Styled.AccountValue = styled.div`
   }
 `;
 
-Styled.AccountEquity = styled.div`
+const $AccountEquity = styled.div`
   font: var(--font-extra-book);
   color: var(--color-text-2);
 `;
 
-Styled.PnlDiff = styled.div<{ isPositive: boolean }>`
+const $PnlDiff = styled.div<{ isPositive: boolean }>`
   color: var(--color-negative);
   display: flex;
   flex-direction: row;
@@ -253,7 +258,7 @@ Styled.PnlDiff = styled.div<{ isPositive: boolean }>`
     `}
 `;
 
-Styled.OutputInParentheses = styled(Output)`
+const $OutputInParentheses = styled(Output)`
   &:before {
     content: '(';
   }
@@ -262,7 +267,7 @@ Styled.OutputInParentheses = styled(Output)`
   }
 `;
 
-Styled.AccountDetail = styled.div<{ gridArea: string }>`
+const $AccountDetail = styled.div<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
 
   padding: 1.25rem;
@@ -270,7 +275,7 @@ Styled.AccountDetail = styled.div<{ gridArea: string }>`
   align-items: center;
 `;
 
-Styled.PnlChart = styled(PnlChart)<{ pnlDiffSign: NumberSign }>`
+const $PnlChart = styled(PnlChart)<{ pnlDiffSign: NumberSign }>`
   grid-area: Chart;
   background-color: var(--color-layer-2);
 
@@ -282,12 +287,12 @@ Styled.PnlChart = styled(PnlChart)<{ pnlDiffSign: NumberSign }>`
     }[pnlDiffSign])};
 `;
 
-Styled.EmptyChart = styled.div`
+const $EmptyChart = styled.div`
   display: grid;
   cursor: default;
 `;
 
-Styled.OnboardingCard = styled.div`
+const $EmptyCard = styled.div`
   width: 16.75rem;
 
   ${layoutMixins.column};

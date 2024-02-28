@@ -1,8 +1,9 @@
 import React, { PropsWithChildren, useContext, useState } from 'react';
 
-import { Point } from '@visx/point';
 import { localPoint } from '@visx/event';
-import { XYChart, DataContext, type EventHandlerParams } from '@visx/xychart';
+import { Point } from '@visx/point';
+import { DataContext, XYChart, type EventHandlerParams } from '@visx/xychart';
+
 import { getScaleBandwidth } from '@/components/visx/getScaleBandwidth';
 
 export const XYChartWithPointerEvents = ({

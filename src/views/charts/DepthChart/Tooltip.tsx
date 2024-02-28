@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { RenderTooltipParams } from '@visx/xychart/lib/components/Tooltip';
 import { shallowEqual, useSelector } from 'react-redux';
@@ -12,12 +13,12 @@ import {
 } from '@/constants/charts';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
 import { useOrderbookValuesForDepthChart } from '@/hooks/Orderbook/useOrderbookValues';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { TooltipContent } from '@/components/visx/TooltipContent';
 import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
+import { TooltipContent } from '@/components/visx/TooltipContent';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 
@@ -38,13 +39,13 @@ export const DepthChartTooltipContent = ({
   tickSizeDecimals,
   tooltipData,
 }: DepthChartTooltipProps) => {
-  const { nearestDatum } = tooltipData || {};
+  const { nearestDatum } = tooltipData ?? {};
   const stringGetter = useStringGetter();
   const { spread, spreadPercent, midMarketPrice } = useOrderbookValuesForDepthChart();
   const { id = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
 
   const priceImpact = useMemo(() => {
-    if (nearestDatum) {
+    if (nearestDatum && midMarketPrice) {
       const depthChartSeries = nearestDatum.key as DepthChartSeries;
 
       return {
@@ -57,6 +58,7 @@ export const DepthChartTooltipContent = ({
         [DepthChartSeries.MidMarket]: undefined,
       }[depthChartSeries];
     }
+
     return undefined;
   }, [nearestDatum, chartPointAtPointer.price]);
 
@@ -200,8 +202,8 @@ export const DepthChartTooltipContent = ({
                       useGrouping
                       type={OutputType.Fiat}
                       value={
-                        nearestDatum
-                          ? nearestDatum?.datum.price * nearestDatum?.datum.depth
+                        nearestDatum != null
+                          ? nearestDatum.datum.price * nearestDatum.datum.depth
                           : undefined
                       }
                     />

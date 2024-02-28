@@ -1,21 +1,33 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  ReactElement,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import { AnalyticsEvent } from '@/constants/analytics';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import {
+  NotificationCategoryPreferences,
+  NotificationStatus,
+  NotificationType,
+  NotificationTypeCategory,
+  SingleSessionNotificationTypes,
   type Notification,
   type NotificationDisplayData,
   type NotificationPreferences,
   type Notifications,
-  NotificationStatus,
-  NotificationType,
 } from '@/constants/notifications';
-
-import { useLocalStorage } from './useLocalStorage';
-import { notificationTypes } from './useNotificationTypes';
 
 import { track } from '@/lib/analytics';
 import { renderSvgToDataUrl } from '@/lib/renderSvgToDataUrl';
+
+import { useLocalStorage } from './useLocalStorage';
+// eslint-disable-next-line import/no-cycle
+import { notificationTypes } from './useNotificationTypes';
 
 type NotificationsContextType = ReturnType<typeof useNotificationsContext>;
 
@@ -33,11 +45,11 @@ export const useNotifications = () => useContext(NotificationsContext)!;
 
 const useNotificationsContext = () => {
   // Local storage
-  // const [notifications, setNotifications] = useState<Notifications>({});
-  const [notifications, setNotifications] = useLocalStorage<Notifications>({
+  const [localStorageNotifications, setLocalStorageNotifications] = useLocalStorage<Notifications>({
     key: LocalStorageKey.Notifications,
     defaultValue: {},
   });
+  const [notifications, setNotifications] = useState<Notifications>(localStorageNotifications);
 
   const [notificationsLastUpdated, setNotificationsLastUpdated] = useLocalStorage<number>({
     key: LocalStorageKey.NotificationsLastUpdated,
@@ -48,16 +60,28 @@ const useNotificationsContext = () => {
     useLocalStorage<NotificationPreferences>({
       key: LocalStorageKey.NotificationPreferences,
       defaultValue: {
-        [NotificationType.AbacusGenerated]: true,
-        [NotificationType.SquidTransfer]: true,
-        [NotificationType.ReleaseUpdates]: true,
+        [NotificationCategoryPreferences.General]: true,
+        [NotificationCategoryPreferences.Transfers]: true,
+        [NotificationCategoryPreferences.Trading]: true,
+        [NotificationCategoryPreferences.MustSee]: true,
         version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
       },
     });
 
   useEffect(() => {
     setNotificationsLastUpdated(Date.now());
-  }, [notifications]);
+  }, [notifications, setNotificationsLastUpdated]);
+
+  useEffect(() => {
+    // save notifications to localstorage, but filter out single session notifications
+    const originalEntries = Object.entries(notifications);
+    const filteredEntries = originalEntries.filter(
+      ([, value]) => !SingleSessionNotificationTypes.includes(value.type)
+    );
+
+    const newNotifications = Object.fromEntries(filteredEntries);
+    setLocalStorageNotifications(newNotifications);
+  }, [notifications, setLocalStorageNotifications]);
 
   const getKey = useCallback(
     <T extends string | number>(notification: Pick<Notification<T>, 'type' | 'id'>) =>
@@ -72,7 +96,7 @@ const useNotificationsContext = () => {
 
   const getDisplayData = useCallback(
     (notification: Notification) => notificationsDisplayData[getKey(notification)],
-    [notificationsDisplayData]
+    [getKey, notificationsDisplayData]
   );
 
   // Check for version changes
@@ -82,9 +106,10 @@ const useNotificationsContext = () => {
       LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences]
     ) {
       setNotificationPreferences({
-        [NotificationType.AbacusGenerated]: true,
-        [NotificationType.SquidTransfer]: true,
-        [NotificationType.ReleaseUpdates]: true,
+        [NotificationCategoryPreferences.General]: true,
+        [NotificationCategoryPreferences.Transfers]: true,
+        [NotificationCategoryPreferences.Trading]: true,
+        [NotificationCategoryPreferences.MustSee]: true,
         version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
       });
     }
@@ -95,9 +120,12 @@ const useNotificationsContext = () => {
     (notification: Notification, status: NotificationStatus) => {
       notification.status = status;
       notification.timestamps[notification.status] = Date.now();
-      setNotifications({ ...notifications, [getKey(notification)]: notification });
+      setNotifications((ns) => ({
+        ...ns,
+        [getKey(notification)]: notification,
+      }));
     },
-    [notifications, getKey]
+    [getKey]
   );
 
   const { markUnseen, markSeen, markCleared } = useMemo(
@@ -122,14 +150,16 @@ const useNotificationsContext = () => {
   );
 
   const markAllCleared = useCallback(() => {
-    for (const notification of Object.values(notifications)) {
-      markCleared(notification);
-    }
+    Object.values(notifications).forEach((n) => markCleared(n));
   }, [notifications, markCleared]);
 
   // Trigger
-  for (const { type, useTrigger } of notificationTypes)
+  // eslint-disable-next-line no-restricted-syntax
+  for (const { type, useTrigger } of notificationTypes) {
+    const notificationCategory = NotificationTypeCategory[type];
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     useTrigger({
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       trigger: useCallback(
         (id, displayData, updateKey, isNew = true) => {
           const key = getKey({ type, id });
@@ -137,26 +167,26 @@ const useNotificationsContext = () => {
           const notification = notifications[key];
 
           // Filter out notifications that are not enabled
-          if (notificationPreferences[type] !== false) {
+          if (notificationPreferences[notificationCategory] !== false) {
             // New unique key - create new notification
             if (!notification) {
-              const notification = (notifications[key] = {
+              const thisNotification = (notifications[key] = {
                 id,
                 type,
                 timestamps: {},
                 updateKey,
               } as Notification);
               updateStatus(
-                notification,
+                thisNotification,
                 isNew ? NotificationStatus.Triggered : NotificationStatus.Cleared
               );
             } else if (JSON.stringify(updateKey) !== JSON.stringify(notification.updateKey)) {
               // updateKey changed - update existing notification
 
-              const notification = notifications[key];
+              const thisNotification = notifications[key];
 
-              notification.updateKey = updateKey;
-              updateStatus(notification, NotificationStatus.Updated);
+              thisNotification.updateKey = updateKey;
+              updateStatus(thisNotification, NotificationStatus.Updated);
             }
           } else {
             // Notification is disabled - remove it
@@ -166,22 +196,24 @@ const useNotificationsContext = () => {
           notificationsDisplayData[key] = displayData;
           setNotificationsDisplayData({ ...notificationsDisplayData });
         },
-        [notifications, updateStatus, notificationPreferences[type]]
+        [notifications, updateStatus, notificationPreferences[notificationCategory]]
       ),
 
       lastUpdated: notificationsLastUpdated,
     });
+  }
 
   // Actions
   const actions = Object.fromEntries(
     notificationTypes.map(
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       ({ type, useNotificationAction }) => [type, useNotificationAction?.()] as const
     )
   );
 
-  const onNotificationAction = async (notification: Notification) => {
+  const onNotificationAction = (notification: Notification) => {
     track(AnalyticsEvent.NotificationAction, { type: notification.type, id: notification.id });
-    return await actions[notification.type]?.(notification.id);
+    return actions[notification.type]?.(notification.id);
   };
 
   // Push notifications
@@ -214,6 +246,7 @@ const useNotificationsContext = () => {
     (async () => {
       if (!hasEnabledPush) return;
 
+      // eslint-disable-next-line no-restricted-syntax
       for (const notification of Object.values(notifications))
         if (
           notification.status < NotificationStatus.Seen &&
@@ -223,25 +256,23 @@ const useNotificationsContext = () => {
           const displayData = getDisplayData(notification);
 
           const iconUrl =
-            displayData.icon && (await renderSvgToDataUrl(displayData.icon).catch(() => undefined));
+            displayData.icon &&
+            // eslint-disable-next-line no-await-in-loop
+            (await renderSvgToDataUrl(displayData.icon as ReactElement<any, 'svg'>).catch(
+              () => undefined
+            ));
 
           const pushNotification = new globalThis.Notification(displayData.title, {
             renotify: true,
             tag: getKey(notification),
             data: notification,
-            description: displayData.body,
-            icon: iconUrl ?? '/favicon.svg',
-            badge: iconUrl ?? '/favicon.svg',
-            image: iconUrl ?? '/favicon.svg',
-            vibrate: displayData.toastSensitivity === 'foreground',
+            body: displayData.body,
+            icon: iconUrl?.toString() ?? '/favicon.svg',
+            badge: iconUrl?.toString() ?? '/favicon.svg',
+            image: iconUrl?.toString() ?? '/favicon.svg',
+            vibrate: displayData.toastSensitivity === 'foreground' ? 200 : undefined,
             requireInteraction: displayData.toastDuration === Infinity,
-            // actions: [
-            //   {
-            //     action: displayData.actionDescription,
-            //     title: displayData.actionDescription,
-            //   }
-            // ].slice(0, globalThis.Notification.maxActions),
-          });
+          } as any);
 
           pushNotification.addEventListener('click', () => {
             onNotificationAction(notification);
@@ -287,7 +318,7 @@ const useNotificationsContext = () => {
     notificationPreferences,
     setNotificationPreferences,
     getNotificationPreferenceForType: useCallback(
-      (type: NotificationType) => notificationPreferences[type],
+      (type: NotificationType) => notificationPreferences[NotificationTypeCategory[type]],
       [notificationPreferences]
     ),
   };

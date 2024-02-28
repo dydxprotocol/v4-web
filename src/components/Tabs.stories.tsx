@@ -1,5 +1,5 @@
 import type { Story } from '@ladle/react';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -16,9 +16,9 @@ enum TabItem {
 export const TabsStory: Story<Parameters<typeof Tabs>[0]> = (args) => {
   return (
     <StoryWrapper>
-      <Styled.Container>
+      <$Container>
         <Tabs {...args} />
-      </Styled.Container>
+      </$Container>
     </StoryWrapper>
   );
 };
@@ -51,10 +51,7 @@ TabsStory.argTypes = {
     defaultValue: TabItem.Item1,
   },
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.section`
+const $Container = styled.section`
   background: var(--color-layer-3);
   width: 400px;
 

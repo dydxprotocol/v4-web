@@ -1,22 +1,23 @@
 import { useEffect } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
+
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled from 'styled-components';
 
 import { AbacusApiStatus } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 
-import { useApiState, useStringGetter } from '@/hooks';
+import { useApiState } from '@/hooks/useApiState';
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog } from '@/components/Dialog';
-import { Link } from '@/components/Link';
 import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
 
-import { closeDialog } from '@/state/dialogs';
-
 import { getSelectedNetwork } from '@/state/appSelectors';
+import { closeDialog } from '@/state/dialogs';
 import { getActiveDialog } from '@/state/dialogsSelectors';
 
 type ElementProps = {
@@ -44,22 +45,14 @@ export const ExchangeOfflineDialog = ({ preventClose, setIsOpen }: ElementProps)
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.UNAVAILABLE })}
     >
-      <Styled.Content>
-        <p>{statusErrorMessage}</p>
+      <$Content>
+        <p>{statusErrorMessage?.body}</p>
         {isDev && <NetworkSelectMenu />}
-      </Styled.Content>
+      </$Content>
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
-`;
-
-Styled.Link = styled(Link)`
-  display: contents;
-  --link-color: var(--color-accent);
 `;
