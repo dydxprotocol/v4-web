@@ -11,8 +11,7 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "1INCHUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "1INCHUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -20,22 +19,15 @@
         },
         {
           "exchangeName": "Gate",
-          "ticker": "1INCH_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "1INCH_USDT"
         },
         {
-          "exchangeName": "Kucoin",
-          "ticker": "1INCH-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "1INCH_USDT"
         },
         {
           "exchangeName": "Okx",
           "ticker": "1INCH-USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "Mexc",
-          "ticker": "1INCH_USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -53,7 +45,7 @@
     },
     "meta": {
       "assetName": "1INCH",
-      "referencePrice": 0.39073378198688125
+      "referencePrice": 0.3966861241674319
     }
   },
   "AAVE": {
@@ -62,19 +54,17 @@
     "params": {
       "id": 51,
       "ticker": "AAVE-USD",
-      "priceExponent": -8.0,
+      "priceExponent": -7.0,
       "minPriceChange": 2500,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "AAVEUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "AAVEUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "AAVEUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "AAVEUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -82,8 +72,7 @@
         },
         {
           "exchangeName": "Huobi",
-          "ticker": "aaveusdt",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "aaveusdt"
         },
         {
           "exchangeName": "Kraken",
@@ -95,18 +84,17 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "AAVE-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "AAVE_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "AAVE_USDT",
+          "exchangeName": "Okx",
+          "ticker": "AAVE-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
       "liquidityTier": 1,
-      "atomicResolution": -7.0,
+      "atomicResolution": -8.0,
       "quantumConversionExponent": -9,
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
@@ -119,7 +107,7 @@
     },
     "meta": {
       "assetName": "AAVE",
-      "referencePrice": 95.37783939975083
+      "referencePrice": 104.83736081933587
     }
   },
   "ADA": {
@@ -134,8 +122,7 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "ADAUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "ADAUSDT"
         },
         {
           "exchangeName": "Bitstamp",
@@ -143,8 +130,7 @@
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "ADAUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "ADAUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -152,8 +138,7 @@
         },
         {
           "exchangeName": "Huobi",
-          "ticker": "adausdt",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "adausdt"
         },
         {
           "exchangeName": "Kraken",
@@ -165,13 +150,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "ADA-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "ADA_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "ADA_USDT",
+          "exchangeName": "Okx",
+          "ticker": "ADA-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -189,7 +173,7 @@
     },
     "meta": {
       "assetName": "Cardano",
-      "referencePrice": 0.5827266803058365
+      "referencePrice": 0.6292460490734019
     }
   },
   "AGIX": {
@@ -204,18 +188,15 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "AGIXUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "AGIXUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "AGIXUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "AGIXUSDT"
         },
         {
           "exchangeName": "Gate",
-          "ticker": "AGIX_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "AGIX_USDT"
         },
         {
           "exchangeName": "Kucoin",
@@ -223,13 +204,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "AGIX-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "AGIX_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "AGIX_USDT",
+          "exchangeName": "Okx",
+          "ticker": "AGIX-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -247,7 +227,7 @@
     },
     "meta": {
       "assetName": "SingularityNET",
-      "referencePrice": 0.6381652589135048
+      "referencePrice": 0.5898686926076652
     }
   },
   "ALGO": {
@@ -262,13 +242,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "ALGOUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "ALGOUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "ALGOUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "ALGOUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -284,13 +262,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "ALGO-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "ALGO_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "ALGO_USDT",
+          "exchangeName": "Okx",
+          "ticker": "ALGO-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -308,7 +285,7 @@
     },
     "meta": {
       "assetName": "Algorand",
-      "referencePrice": 0.1863730890814612
+      "referencePrice": 0.21273113173609787
     }
   },
   "APE": {
@@ -323,8 +300,7 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "APEUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "APEUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -332,8 +308,7 @@
         },
         {
           "exchangeName": "Gate",
-          "ticker": "APE_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "APE_USDT"
         },
         {
           "exchangeName": "Kraken",
@@ -345,13 +320,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "APE-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "APE_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "APE_USDT",
+          "exchangeName": "Okx",
+          "ticker": "APE-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -369,7 +343,7 @@
     },
     "meta": {
       "assetName": "ApeCoin",
-      "referencePrice": 1.4228353930208577
+      "referencePrice": 1.6308576179056646
     }
   },
   "API3": {
@@ -384,8 +358,7 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "API3USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "API3USDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -393,8 +366,7 @@
         },
         {
           "exchangeName": "Gate",
-          "ticker": "API3_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "API3_USDT"
         },
         {
           "exchangeName": "Kucoin",
@@ -402,13 +374,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "API3-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "API3_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "API3_USDT",
+          "exchangeName": "Okx",
+          "ticker": "API3-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -426,7 +397,7 @@
     },
     "meta": {
       "assetName": "API3",
-      "referencePrice": 3.2309579682458938
+      "referencePrice": 3.3406633010517193
     }
   },
   "APT": {
@@ -435,19 +406,17 @@
     "params": {
       "id": 57,
       "ticker": "APT-USD",
-      "priceExponent": -9.0,
+      "priceExponent": -8.0,
       "minPriceChange": 2500,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "APTUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "APTUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "APTUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "APTUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -455,13 +424,11 @@
         },
         {
           "exchangeName": "Gate",
-          "ticker": "APT_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "APT_USDT"
         },
         {
           "exchangeName": "Huobi",
-          "ticker": "aptusdt",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "aptusdt"
         },
         {
           "exchangeName": "Kraken",
@@ -473,18 +440,17 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "APT-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "APT_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "APT_USDT",
+          "exchangeName": "Okx",
+          "ticker": "APT-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
       "liquidityTier": 1,
-      "atomicResolution": -6.0,
+      "atomicResolution": -7.0,
       "quantumConversionExponent": -9,
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
@@ -497,7 +463,7 @@
     },
     "meta": {
       "assetName": "Aptos",
-      "referencePrice": 8.117822931323396
+      "referencePrice": 10.330982476976015
     }
   },
   "ARB": {
@@ -512,13 +478,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "ARBUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "ARBUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "ARBUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "ARBUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -526,8 +490,7 @@
         },
         {
           "exchangeName": "Huobi",
-          "ticker": "arbusdt",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "arbusdt"
         },
         {
           "exchangeName": "Kraken",
@@ -539,13 +502,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "ARB-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "ARB_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "ARB_USDT",
+          "exchangeName": "Okx",
+          "ticker": "ARB-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -563,7 +525,7 @@
     },
     "meta": {
       "assetName": "Arbitrum",
-      "referencePrice": 1.7813497690325322
+      "referencePrice": 1.8956399613558021
     }
   },
   "ATOM": {
@@ -578,13 +540,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "ATOMUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "ATOMUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "ATOMUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "ATOMUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -592,8 +552,7 @@
         },
         {
           "exchangeName": "Gate",
-          "ticker": "ATOM_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "ATOM_USDT"
         },
         {
           "exchangeName": "Kraken",
@@ -605,13 +564,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "ATOM-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "ATOM_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "ATOM_USDT",
+          "exchangeName": "Okx",
+          "ticker": "ATOM-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -629,7 +587,7 @@
     },
     "meta": {
       "assetName": "Cosmos",
-      "referencePrice": 8.638203052222782
+      "referencePrice": 9.925548485029399
     }
   },
   "AVAX": {
@@ -644,8 +602,7 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "AVAXUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "AVAXUSDT"
         },
         {
           "exchangeName": "Bitstamp",
@@ -653,8 +610,7 @@
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "AVAXUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "AVAXUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -662,8 +618,7 @@
         },
         {
           "exchangeName": "Huobi",
-          "ticker": "avaxusdt",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "avaxusdt"
         },
         {
           "exchangeName": "Kraken",
@@ -675,13 +630,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "AVAX-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "AVAX_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "AVAX_USDT",
+          "exchangeName": "Okx",
+          "ticker": "AVAX-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -699,7 +653,7 @@
     },
     "meta": {
       "assetName": "Avalanche",
-      "referencePrice": 36.30680023062304
+      "referencePrice": 39.383217043236996
     }
   },
   "BCH": {
@@ -714,8 +668,7 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "BCHUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "BCHUSDT"
         },
         {
           "exchangeName": "Bitstamp",
@@ -723,8 +676,7 @@
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "BCHUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "BCHUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -732,8 +684,7 @@
         },
         {
           "exchangeName": "Huobi",
-          "ticker": "bchusdt",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "bchusdt"
         },
         {
           "exchangeName": "Kraken",
@@ -745,13 +696,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "BCH-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "BCH_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "BCH_USDT",
+          "exchangeName": "Okx",
+          "ticker": "BCH-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -769,7 +719,7 @@
     },
     "meta": {
       "assetName": "Bitcoin Cash",
-      "referencePrice": 262.9943877884527
+      "referencePrice": 299.17116831492086
     }
   },
   "BLUR": {
@@ -784,13 +734,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "BLURUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "BLURUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "BLURUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "BLURUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -806,13 +754,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "BLUR-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "BLUR_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "BLUR_USDT",
+          "exchangeName": "Okx",
+          "ticker": "BLUR-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -830,7 +777,7 @@
     },
     "meta": {
       "assetName": "Blur",
-      "referencePrice": 0.6715140754604568
+      "referencePrice": 0.7392118958605716
     }
   },
   "BNB": {
@@ -845,18 +792,19 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "BNBUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "BNBUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "BNBUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "BNBUSDT"
         },
         {
           "exchangeName": "Gate",
-          "ticker": "BNB_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "BNB_USDT"
+        },
+        {
+          "exchangeName": "Huobi",
+          "ticker": "bnbusdt"
         },
         {
           "exchangeName": "Kucoin",
@@ -864,13 +812,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "BNB-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "BNB_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "BNB_USDT",
+          "exchangeName": "Okx",
+          "ticker": "BNB-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -888,7 +835,7 @@
     },
     "meta": {
       "assetName": "Binance Coin",
-      "referencePrice": 313.86329814083246
+      "referencePrice": 350.508195807556
     }
   },
   "BONK": {
@@ -903,13 +850,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "BONKUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "BONKUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "BONKUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "BONKUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -921,13 +866,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "BONK-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "BONK_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "BONK_USDT",
+          "exchangeName": "Okx",
+          "ticker": "BONK-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -945,7 +889,7 @@
     },
     "meta": {
       "assetName": "Bonk Token",
-      "referencePrice": 1.1543721116041828e-05
+      "referencePrice": 1.570491815136097e-05
     }
   },
   "CHZ": {
@@ -960,8 +904,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "CHZUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "CHZUSDT"
+        },
+        {
+          "exchangeName": "Bybit",
+          "ticker": "CHZUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -977,13 +924,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "CHZ-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "CHZ_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "CHZ_USDT",
+          "exchangeName": "Okx",
+          "ticker": "CHZ-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -1001,7 +947,7 @@
     },
     "meta": {
       "assetName": "Chiliz",
-      "referencePrice": 0.1274383483284441
+      "referencePrice": 0.13965484207530804
     }
   },
   "CRV": {
@@ -1016,8 +962,7 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "CRVUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "CRVUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -1033,13 +978,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "CRV-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "CRV_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "CRV_USDT",
+          "exchangeName": "Okx",
+          "ticker": "CRV-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -1057,7 +1001,7 @@
     },
     "meta": {
       "assetName": "Curve DAO Token",
-      "referencePrice": 0.5761774963259517
+      "referencePrice": 0.598037758777971
     }
   },
   "DOT": {
@@ -1072,13 +1016,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "DOTUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "DOTUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "DOTUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "DOTUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -1086,8 +1028,7 @@
         },
         {
           "exchangeName": "Huobi",
-          "ticker": "dotusdt",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "dotusdt"
         },
         {
           "exchangeName": "Kraken",
@@ -1099,13 +1040,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "DOT-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "DOT_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "DOT_USDT",
+          "exchangeName": "Okx",
+          "ticker": "DOT-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -1123,7 +1063,7 @@
     },
     "meta": {
       "assetName": "Polkadot",
-      "referencePrice": 7.416960383763364
+      "referencePrice": 8.324611522776786
     }
   },
   "DYM": {
@@ -1138,18 +1078,15 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "DYMUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "DYMUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "DYMUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "DYMUSDT"
         },
         {
           "exchangeName": "Gate",
-          "ticker": "DYM_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "DYM_USDT"
         },
         {
           "exchangeName": "Kucoin",
@@ -1158,8 +1095,7 @@
         },
         {
           "exchangeName": "Mexc",
-          "ticker": "DYM_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "DYM_USDT"
         }
       ],
       "liquidityTier": 2,
@@ -1176,7 +1112,7 @@
     },
     "meta": {
       "assetName": "Dymension",
-      "referencePrice": 5.390702430697377
+      "referencePrice": 4.830779193870302
     }
   },
   "ENS": {
@@ -1191,8 +1127,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "ENSUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "ENSUSDT"
+        },
+        {
+          "exchangeName": "Bybit",
+          "ticker": "ENSUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -1200,8 +1139,7 @@
         },
         {
           "exchangeName": "Gate",
-          "ticker": "ENS_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "ENS_USDT"
         },
         {
           "exchangeName": "Kucoin",
@@ -1209,13 +1147,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "ENS-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "ENS_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "ENS_USDT",
+          "exchangeName": "Okx",
+          "ticker": "ENS-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -1233,7 +1170,7 @@
     },
     "meta": {
       "assetName": "Ethereum Name Service (ENS)",
-      "referencePrice": 17.567497311277098
+      "referencePrice": 18.693837993081054
     }
   },
   "EOS": {
@@ -1248,13 +1185,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "EOSUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "EOSUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "EOSUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "EOSUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -1262,8 +1197,7 @@
         },
         {
           "exchangeName": "Gate",
-          "ticker": "EOS_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "EOS_USDT"
         },
         {
           "exchangeName": "Kraken",
@@ -1275,13 +1209,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "EOS-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "EOS_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "EOS_USDT",
+          "exchangeName": "Okx",
+          "ticker": "EOS-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -1299,7 +1232,7 @@
     },
     "meta": {
       "assetName": "Eos",
-      "referencePrice": 0.7038776853883683
+      "referencePrice": 0.7305419368548176
     }
   },
   "FET": {
@@ -1314,8 +1247,7 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "FETUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "FETUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -1331,13 +1263,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "FET-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "FET_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "FET_USDT",
+          "exchangeName": "Okx",
+          "ticker": "FET-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -1355,7 +1286,7 @@
     },
     "meta": {
       "assetName": "Fetch AI",
-      "referencePrice": 1.1185905724117349
+      "referencePrice": 1.2148314903513866
     }
   },
   "FIL": {
@@ -1370,13 +1301,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "FILUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "FILUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "FILUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "FILUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -1384,8 +1313,7 @@
         },
         {
           "exchangeName": "Huobi",
-          "ticker": "filusdt",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "filusdt"
         },
         {
           "exchangeName": "Kraken",
@@ -1397,13 +1325,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "FIL-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "FIL_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "FIL_USDT",
+          "exchangeName": "Okx",
+          "ticker": "FIL-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -1421,7 +1348,7 @@
     },
     "meta": {
       "assetName": "Filecoin",
-      "referencePrice": 8.174008580420095
+      "referencePrice": 7.746168572104081
     }
   },
   "FTM": {
@@ -1436,13 +1363,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "FTMUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "FTMUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "FTMUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "FTMUSDT"
         },
         {
           "exchangeName": "Kraken",
@@ -1454,13 +1379,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "FTM-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "FTM_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "FTM_USDT",
+          "exchangeName": "Okx",
+          "ticker": "FTM-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -1478,7 +1402,7 @@
     },
     "meta": {
       "assetName": "Fantom",
-      "referencePrice": 0.39691420670580596
+      "referencePrice": 0.4707340513720217
     }
   },
   "GALA": {
@@ -1493,31 +1417,27 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "GALAUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "GALAUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "GALAUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "GALAUSDT"
         },
         {
           "exchangeName": "Gate",
-          "ticker": "GALA_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "GALA_USDT"
         },
         {
           "exchangeName": "Kraken",
           "ticker": "GALAUSD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "GALA-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "GALA_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "GALA_USDT",
+          "exchangeName": "Okx",
+          "ticker": "GALA-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -1535,7 +1455,7 @@
     },
     "meta": {
       "assetName": "Gala",
-      "referencePrice": 0.023724132506069317
+      "referencePrice": 0.03213206883552558
     }
   },
   "GMT": {
@@ -1550,13 +1470,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "GMTUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "GMTUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "GMTUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "GMTUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -1564,8 +1482,7 @@
         },
         {
           "exchangeName": "Gate",
-          "ticker": "GMT_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "GMT_USDT"
         },
         {
           "exchangeName": "Kucoin",
@@ -1592,7 +1509,7 @@
     },
     "meta": {
       "assetName": "STEPN",
-      "referencePrice": 0.21675579801798128
+      "referencePrice": 0.23696662086502504
     }
   },
   "GRT": {
@@ -1607,8 +1524,7 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "GRTUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "GRTUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -1616,8 +1532,7 @@
         },
         {
           "exchangeName": "Gate",
-          "ticker": "GRT_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "GRT_USDT"
         },
         {
           "exchangeName": "Kraken",
@@ -1629,13 +1544,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "GRT-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "GRT_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "GRT_USDT",
+          "exchangeName": "Okx",
+          "ticker": "GRT-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -1653,7 +1567,7 @@
     },
     "meta": {
       "assetName": "The Graph",
-      "referencePrice": 0.23746885486052283
+      "referencePrice": 0.24368837668837492
     }
   },
   "HBAR": {
@@ -1668,13 +1582,15 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "HBARUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "HBARUSDT"
+        },
+        {
+          "exchangeName": "Bitstamp",
+          "ticker": "HBAR/USD"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "HBARUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "HBARUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -1686,13 +1602,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "HBAR-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "HBAR_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "HBAR_USDT",
+          "exchangeName": "Okx",
+          "ticker": "HBAR-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -1710,7 +1625,7 @@
     },
     "meta": {
       "assetName": "Hedera Hashgraph",
-      "referencePrice": 0.11196531959055545
+      "referencePrice": 0.1126649600424805
     }
   },
   "ICP": {
@@ -1725,13 +1640,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "ICPUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "ICPUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "ICPUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "ICPUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -1747,13 +1660,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "ICP-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "ICP_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "ICP_USDT",
+          "exchangeName": "Okx",
+          "ticker": "ICP-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -1771,7 +1683,7 @@
     },
     "meta": {
       "assetName": "Internet Computer",
-      "referencePrice": 12.481775262396523
+      "referencePrice": 12.784903391947456
     }
   },
   "IMX": {
@@ -1786,8 +1698,7 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "IMXUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "IMXUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -1803,13 +1714,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "IMX-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "IMX_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "IMX_USDT",
+          "exchangeName": "Okx",
+          "ticker": "IMX-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -1827,7 +1737,7 @@
     },
     "meta": {
       "assetName": "Immutable X",
-      "referencePrice": 3.1656179148633856
+      "referencePrice": 3.3034772175980667
     }
   },
   "INJ": {
@@ -1842,13 +1752,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "INJUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "INJUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "INJUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "INJUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -1864,13 +1772,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "INJ-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "INJ_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "INJ_USDT",
+          "exchangeName": "Okx",
+          "ticker": "INJ-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -1888,7 +1795,7 @@
     },
     "meta": {
       "assetName": "Injective Protocol",
-      "referencePrice": 33.506428060013285
+      "referencePrice": 39.802409914697094
     }
   },
   "JTO": {
@@ -1903,13 +1810,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "JTOUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "JTOUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "JTOUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "JTOUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -1921,13 +1826,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "JTO-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "JTO_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "JTO_USDT",
+          "exchangeName": "Okx",
+          "ticker": "JTO-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -1945,7 +1849,7 @@
     },
     "meta": {
       "assetName": "Jito",
-      "referencePrice": 2.0444478129338925
+      "referencePrice": 2.2661481137140487
     }
   },
   "JUP": {
@@ -1960,27 +1864,23 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "JUPUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "JUPUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "JUPUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "JUPUSDT"
         },
         {
           "exchangeName": "Gate",
-          "ticker": "JUP_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "JUP_USDT"
+        },
+        {
+          "exchangeName": "Mexc",
+          "ticker": "JUP_USDT"
         },
         {
           "exchangeName": "Okx",
           "ticker": "JUP-USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "Mexc",
-          "ticker": "JUP_USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -1998,7 +1898,7 @@
     },
     "meta": {
       "assetName": "Jupiter",
-      "referencePrice": 0.38803545375952414
+      "referencePrice": 0.4039649329420863
     }
   },
   "KAVA": {
@@ -2013,8 +1913,7 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "KAVAUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "KAVAUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -2022,8 +1921,7 @@
         },
         {
           "exchangeName": "Gate",
-          "ticker": "KAVA_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "KAVA_USDT"
         },
         {
           "exchangeName": "Kraken",
@@ -2036,8 +1934,7 @@
         },
         {
           "exchangeName": "Mexc",
-          "ticker": "KAVA_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "KAVA_USDT"
         }
       ],
       "liquidityTier": 2,
@@ -2054,7 +1951,7 @@
     },
     "meta": {
       "assetName": "Kava",
-      "referencePrice": 0.6469913852398425
+      "referencePrice": 0.6860890586481236
     }
   },
   "LDO": {
@@ -2069,13 +1966,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "LDOUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "LDOUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "LDOUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "LDOUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -2091,13 +1986,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "LDO-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "LDO_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "LDO_USDT",
+          "exchangeName": "Okx",
+          "ticker": "LDO-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -2115,7 +2009,7 @@
     },
     "meta": {
       "assetName": "Lido DAO",
-      "referencePrice": 3.089848247492856
+      "referencePrice": 3.381257745885646
     }
   },
   "LINK": {
@@ -2130,8 +2024,7 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "LINKUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "LINKUSDT"
         },
         {
           "exchangeName": "Bitstamp",
@@ -2139,8 +2032,7 @@
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "LINKUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "LINKUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -2148,8 +2040,7 @@
         },
         {
           "exchangeName": "Huobi",
-          "ticker": "linkusdt",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "linkusdt"
         },
         {
           "exchangeName": "Kraken",
@@ -2161,13 +2052,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "LINK-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "LINK_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "LINK_USDT",
+          "exchangeName": "Okx",
+          "ticker": "LINK-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -2185,7 +2075,7 @@
     },
     "meta": {
       "assetName": "ChainLink",
-      "referencePrice": 17.943496891093726
+      "referencePrice": 19.489301466102674
     }
   },
   "MAGIC": {
@@ -2195,13 +2085,12 @@
       "id": 91,
       "ticker": "MAGIC-USD",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 2500,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "MAGICUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "MAGICUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -2209,26 +2098,23 @@
         },
         {
           "exchangeName": "Gate",
-          "ticker": "MAGIC_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "MAGIC_USDT"
         },
         {
           "exchangeName": "Huobi",
-          "ticker": "magicusdt",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "magicusdt"
+        },
+        {
+          "exchangeName": "Mexc",
+          "ticker": "MAGIC_USDT"
         },
         {
           "exchangeName": "Okx",
           "ticker": "MAGIC-USDT",
           "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "Mexc",
-          "ticker": "MAGIC_USDT",
-          "adjustByMarket": "USDT-USD"
         }
       ],
-      "liquidityTier": 2,
+      "liquidityTier": 1,
       "atomicResolution": -6.0,
       "quantumConversionExponent": -9,
       "defaultFundingPpm": 0,
@@ -2242,7 +2128,7 @@
     },
     "meta": {
       "assetName": "MAGIC",
-      "referencePrice": 1.0425360428382824
+      "referencePrice": 1.0388669841315712
     }
   },
   "MANA": {
@@ -2257,8 +2143,7 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "MANAUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "MANAUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -2266,8 +2151,7 @@
         },
         {
           "exchangeName": "Gate",
-          "ticker": "MANA_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "MANA_USDT"
         },
         {
           "exchangeName": "Kraken",
@@ -2279,13 +2163,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "MANA-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "MANA_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "MANA_USDT",
+          "exchangeName": "Okx",
+          "ticker": "MANA-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -2303,7 +2186,7 @@
     },
     "meta": {
       "assetName": "Decentraland",
-      "referencePrice": 0.41309584584342407
+      "referencePrice": 0.4893958726739106
     }
   },
   "MASK": {
@@ -2318,13 +2201,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "MASKUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "MASKUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "MASKUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "MASKUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -2332,13 +2213,11 @@
         },
         {
           "exchangeName": "Gate",
-          "ticker": "MASK_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "MASK_USDT"
         },
         {
           "exchangeName": "Huobi",
-          "ticker": "maskusdt",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "maskusdt"
         },
         {
           "exchangeName": "Kucoin",
@@ -2346,13 +2225,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "MASK-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "MASK_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "MASK_USDT",
+          "exchangeName": "Okx",
+          "ticker": "MASK-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -2370,7 +2248,7 @@
     },
     "meta": {
       "assetName": "Mask Network",
-      "referencePrice": 3.8465219414229646
+      "referencePrice": 3.9847406870966444
     }
   },
   "MATIC": {
@@ -2379,14 +2257,13 @@
     "params": {
       "id": 94,
       "ticker": "MATIC-USD",
-      "priceExponent": -10.0,
+      "priceExponent": -9.0,
       "minPriceChange": 2500,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "MATICUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "MATICUSDT"
         },
         {
           "exchangeName": "Bitstamp",
@@ -2394,8 +2271,7 @@
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "MATICUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "MATICUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -2403,8 +2279,7 @@
         },
         {
           "exchangeName": "Huobi",
-          "ticker": "maticusdt",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "maticusdt"
         },
         {
           "exchangeName": "Kraken",
@@ -2416,18 +2291,17 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "MATIC-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "MATIC_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "MATIC_USDT",
+          "exchangeName": "Okx",
+          "ticker": "MATIC-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
       "liquidityTier": 1,
-      "atomicResolution": -5.0,
+      "atomicResolution": -6.0,
       "quantumConversionExponent": -9,
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
@@ -2440,7 +2314,7 @@
     },
     "meta": {
       "assetName": "Matic Network",
-      "referencePrice": 0.9811552172261896
+      "referencePrice": 1.0179292388947758
     }
   },
   "MINA": {
@@ -2455,8 +2329,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "MINAUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "MINAUSDT"
+        },
+        {
+          "exchangeName": "Bybit",
+          "ticker": "MINAUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -2464,21 +2341,19 @@
         },
         {
           "exchangeName": "Gate",
-          "ticker": "MINA_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "MINA_USDT"
         },
         {
           "exchangeName": "Kraken",
           "ticker": "MINAUSD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "MINA-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "MINA_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "MINA_USDT",
+          "exchangeName": "Okx",
+          "ticker": "MINA-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -2496,7 +2371,7 @@
     },
     "meta": {
       "assetName": "Mina",
-      "referencePrice": 1.0478399468543635
+      "referencePrice": 1.1054302125268296
     }
   },
   "MKR": {
@@ -2511,8 +2386,7 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "MKRUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "MKRUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -2547,7 +2421,7 @@
     },
     "meta": {
       "assetName": "Maker",
-      "referencePrice": 1991.7970801983142
+      "referencePrice": 2153.4610728123016
     }
   },
   "NEAR": {
@@ -2562,13 +2436,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "NEARUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "NEARUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "NEARUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "NEARUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -2584,13 +2456,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "NEAR-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "NEAR_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "NEAR_USDT",
+          "exchangeName": "Okx",
+          "ticker": "NEAR-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -2608,7 +2479,7 @@
     },
     "meta": {
       "assetName": "Near",
-      "referencePrice": 3.25927603237528
+      "referencePrice": 3.885398076460016
     }
   },
   "OP": {
@@ -2623,13 +2494,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "OPUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "OPUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "OPUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "OPUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -2637,8 +2506,7 @@
         },
         {
           "exchangeName": "Gate",
-          "ticker": "OP_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "OP_USDT"
         },
         {
           "exchangeName": "Kraken",
@@ -2650,13 +2518,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "OP-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "OP_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "OP_USDT",
+          "exchangeName": "Okx",
+          "ticker": "OP-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -2674,7 +2541,7 @@
     },
     "meta": {
       "assetName": "Optimism",
-      "referencePrice": 3.1580880840772694
+      "referencePrice": 3.289460206770676
     }
   },
   "ORDI": {
@@ -2689,23 +2556,19 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "ORDIUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "ORDIUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "ORDIUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "ORDIUSDT"
         },
         {
           "exchangeName": "Gate",
-          "ticker": "ORDI_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "ORDI_USDT"
         },
         {
           "exchangeName": "Huobi",
-          "ticker": "ordiusdt",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "ordiusdt"
         },
         {
           "exchangeName": "Kucoin",
@@ -2713,13 +2576,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "ORDI-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "ORDI_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "ORDI_USDT",
+          "exchangeName": "Okx",
+          "ticker": "ORDI-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -2737,7 +2599,7 @@
     },
     "meta": {
       "assetName": "Ordinals",
-      "referencePrice": 52.69357940803036
+      "referencePrice": 64.35966259032894
     }
   },
   "PEPE": {
@@ -2752,13 +2614,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "PEPEUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "PEPEUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "PEPEUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "PEPEUSDT"
         },
         {
           "exchangeName": "Kraken",
@@ -2770,13 +2630,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "PEPE-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "PEPE_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "PEPE_USDT",
+          "exchangeName": "Okx",
+          "ticker": "PEPE-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -2794,7 +2653,7 @@
     },
     "meta": {
       "assetName": "Pepe",
-      "referencePrice": 1.2803302547988663e-06
+      "referencePrice": 3.0601588672342177e-06
     }
   },
   "PYTH": {
@@ -2809,18 +2668,15 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "PYTHUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "PYTHUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "PYTHUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "PYTHUSDT"
         },
         {
           "exchangeName": "Gate",
-          "ticker": "PYTH_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "PYTH_USDT"
         },
         {
           "exchangeName": "Kucoin",
@@ -2828,13 +2684,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "PYTH-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "PYTH_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "PYTH_USDT",
+          "exchangeName": "Okx",
+          "ticker": "PYTH-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -2852,7 +2707,7 @@
     },
     "meta": {
       "assetName": "Pyth Network",
-      "referencePrice": 0.4602775645861574
+      "referencePrice": 0.5615405479478425
     }
   },
   "RNDR": {
@@ -2867,13 +2722,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "RNDRUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "RNDRUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "RNDRUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "RNDRUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -2889,13 +2742,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "RNDR-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "RNDR_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "RNDR_USDT",
+          "exchangeName": "Okx",
+          "ticker": "RNDR-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -2913,7 +2765,7 @@
     },
     "meta": {
       "assetName": "Render Token",
-      "referencePrice": 7.625891564822903
+      "referencePrice": 7.475866745568033
     }
   },
   "RUNE": {
@@ -2928,13 +2780,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "RUNEUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "RUNEUSDT"
         },
         {
           "exchangeName": "Gate",
-          "ticker": "RUNE_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "RUNE_USDT"
         },
         {
           "exchangeName": "Kraken",
@@ -2947,8 +2797,7 @@
         },
         {
           "exchangeName": "Mexc",
-          "ticker": "RUNE_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "RUNE_USDT"
         }
       ],
       "liquidityTier": 2,
@@ -2965,7 +2814,7 @@
     },
     "meta": {
       "assetName": "Thorchain",
-      "referencePrice": 4.05457461310246
+      "referencePrice": 4.892431967824898
     }
   },
   "SAND": {
@@ -2980,8 +2829,7 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "SANDUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "SANDUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -2989,8 +2837,7 @@
         },
         {
           "exchangeName": "Gate",
-          "ticker": "SAND_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "SAND_USDT"
         },
         {
           "exchangeName": "Kraken",
@@ -3002,13 +2849,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "SAND-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "SAND_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "SAND_USDT",
+          "exchangeName": "Okx",
+          "ticker": "SAND-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -3026,7 +2872,7 @@
     },
     "meta": {
       "assetName": "SAND",
-      "referencePrice": 0.4264022028454682
+      "referencePrice": 0.4758632026204051
     }
   },
   "SEI": {
@@ -3041,13 +2887,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "SEIUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "SEIUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "SEIUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "SEIUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -3055,8 +2899,7 @@
         },
         {
           "exchangeName": "Huobi",
-          "ticker": "seiusdt",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "seiusdt"
         },
         {
           "exchangeName": "Kraken",
@@ -3069,8 +2912,7 @@
         },
         {
           "exchangeName": "Mexc",
-          "ticker": "SEI_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "SEI_USDT"
         }
       ],
       "liquidityTier": 2,
@@ -3087,7 +2929,7 @@
     },
     "meta": {
       "assetName": "Sei",
-      "referencePrice": 0.8127936111305792
+      "referencePrice": 0.8809012184071214
     }
   },
   "SHIB": {
@@ -3096,19 +2938,17 @@
     "params": {
       "id": 106,
       "ticker": "SHIB-USD",
-      "priceExponent": -15.0,
+      "priceExponent": -14.0,
       "minPriceChange": 2500,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "SHIBUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "SHIBUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "SHIBUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "SHIBUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -3116,8 +2956,7 @@
         },
         {
           "exchangeName": "Huobi",
-          "ticker": "shibusdt",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "shibusdt"
         },
         {
           "exchangeName": "Kraken",
@@ -3129,18 +2968,17 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "SHIB-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "SHIB_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "SHIB_USDT",
+          "exchangeName": "Okx",
+          "ticker": "SHIB-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
       "liquidityTier": 1,
-      "atomicResolution": 0.0,
+      "atomicResolution": -1.0,
       "quantumConversionExponent": -9,
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
@@ -3153,7 +2991,7 @@
     },
     "meta": {
       "assetName": "Shiba Inu",
-      "referencePrice": 9.509170971895197e-06
+      "referencePrice": 1.1242764885435432e-05
     }
   },
   "SNX": {
@@ -3168,13 +3006,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "SNXUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "SNXUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "SNXUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "SNXUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -3190,13 +3026,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "SNX-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "SNX_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "SNX_USDT",
+          "exchangeName": "Okx",
+          "ticker": "SNX-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -3214,7 +3049,7 @@
     },
     "meta": {
       "assetName": "Synthetix Network Token",
-      "referencePrice": 3.6597933035432573
+      "referencePrice": 3.8493100609005504
     }
   },
   "SOL": {
@@ -3229,8 +3064,7 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "SOLUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "SOLUSDT"
         },
         {
           "exchangeName": "Bitstamp",
@@ -3238,8 +3072,7 @@
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "SOLUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "SOLUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -3247,8 +3080,7 @@
         },
         {
           "exchangeName": "Huobi",
-          "ticker": "solusdt",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "solusdt"
         },
         {
           "exchangeName": "Kraken",
@@ -3260,13 +3092,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "SOL-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "SOL_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "SOL_USDT",
+          "exchangeName": "Okx",
+          "ticker": "SOL-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -3284,7 +3115,7 @@
     },
     "meta": {
       "assetName": "Solana",
-      "referencePrice": 101.37360320667266
+      "referencePrice": 112.09559568272485
     }
   },
   "STRK": {
@@ -3299,13 +3130,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "STRKUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "STRKUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "STRKUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "STRKUSDT"
         },
         {
           "exchangeName": "Kraken",
@@ -3317,13 +3146,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "STRK-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "STRK_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "STRK_USDT",
+          "exchangeName": "Okx",
+          "ticker": "STRK-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -3341,7 +3169,7 @@
     },
     "meta": {
       "assetName": "Starknet",
-      "referencePrice": 2.0294558706526433
+      "referencePrice": 1.8806104243797563
     }
   },
   "STX": {
@@ -3356,13 +3184,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "STXUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "STXUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "STXUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "STXUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -3370,8 +3196,7 @@
         },
         {
           "exchangeName": "Gate",
-          "ticker": "STX_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "STX_USDT"
         },
         {
           "exchangeName": "Kraken",
@@ -3383,13 +3208,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "STX-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "STX_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "STX_USDT",
+          "exchangeName": "Okx",
+          "ticker": "STX-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -3407,7 +3231,7 @@
     },
     "meta": {
       "assetName": "Stacks",
-      "referencePrice": 2.2074191553341698
+      "referencePrice": 2.7287333294092
     }
   },
   "SUI": {
@@ -3422,13 +3246,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "SUIUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "SUIUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "SUIUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "SUIUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -3436,8 +3258,7 @@
         },
         {
           "exchangeName": "Huobi",
-          "ticker": "suiusdt",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "suiusdt"
         },
         {
           "exchangeName": "Kraken",
@@ -3449,13 +3270,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "SUI-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "SUI_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "SUI_USDT",
+          "exchangeName": "Okx",
+          "ticker": "SUI-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -3473,7 +3293,7 @@
     },
     "meta": {
       "assetName": "SuiNetwork",
-      "referencePrice": 1.6520840670375465
+      "referencePrice": 1.6061805673254659
     }
   },
   "TIA": {
@@ -3488,13 +3308,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "TIAUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "TIAUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "TIAUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "TIAUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -3510,13 +3328,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "TIA-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "TIA_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "TIA_USDT",
+          "exchangeName": "Okx",
+          "ticker": "TIA-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -3534,7 +3351,7 @@
     },
     "meta": {
       "assetName": "Celestia",
-      "referencePrice": 16.408309989831825
+      "referencePrice": 16.608660132856535
     }
   },
   "TRX": {
@@ -3549,23 +3366,19 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "TRXUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "TRXUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "TRXUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "TRXUSDT"
         },
         {
           "exchangeName": "Gate",
-          "ticker": "TRX_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "TRX_USDT"
         },
         {
           "exchangeName": "Huobi",
-          "ticker": "trxusdt",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "trxusdt"
         },
         {
           "exchangeName": "Kraken",
@@ -3577,13 +3390,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "TRX-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "TRX_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "TRX_USDT",
+          "exchangeName": "Okx",
+          "ticker": "TRX-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -3601,7 +3413,7 @@
     },
     "meta": {
       "assetName": "TRON",
-      "referencePrice": 0.1213063298020745
+      "referencePrice": 0.12503512971871664
     }
   },
   "UNI": {
@@ -3611,22 +3423,24 @@
       "id": 114,
       "ticker": "UNI-USD",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 2500,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "UNIUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "UNIUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "UNIUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "UNIUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
           "ticker": "UNI-USD"
+        },
+        {
+          "exchangeName": "Huobi",
+          "ticker": "uniusdt"
         },
         {
           "exchangeName": "Kraken",
@@ -3638,17 +3452,16 @@
           "adjustByMarket": "USDT-USD"
         },
         {
+          "exchangeName": "Mexc",
+          "ticker": "UNI_USDT"
+        },
+        {
           "exchangeName": "Okx",
           "ticker": "UNI-USDT",
           "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "Mexc",
-          "ticker": "UNI_USDT",
-          "adjustByMarket": "USDT-USD"
         }
       ],
-      "liquidityTier": 2,
+      "liquidityTier": 1,
       "atomicResolution": -7.0,
       "quantumConversionExponent": -9,
       "defaultFundingPpm": 0,
@@ -3662,7 +3475,7 @@
     },
     "meta": {
       "assetName": "Uniswap",
-      "referencePrice": 10.665604571983115
+      "referencePrice": 10.722057378892252
     }
   },
   "WLD": {
@@ -3677,18 +3490,15 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "WLDUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "WLDUSDT"
         },
         {
           "exchangeName": "Bybit",
-          "ticker": "WLDUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "WLDUSDT"
         },
         {
           "exchangeName": "Gate",
-          "ticker": "WLD_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "WLD_USDT"
         },
         {
           "exchangeName": "Kucoin",
@@ -3696,13 +3506,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "WLD-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "WLD_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "WLD_USDT",
+          "exchangeName": "Okx",
+          "ticker": "WLD-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -3720,7 +3529,7 @@
     },
     "meta": {
       "assetName": "Worldcoin WLD",
-      "referencePrice": 6.9722211218248775
+      "referencePrice": 6.4815207894411495
     }
   },
   "WOO": {
@@ -3735,13 +3544,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
-          "ticker": "WOOUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "WOOUSDT"
         },
         {
           "exchangeName": "Gate",
-          "ticker": "WOO_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "WOO_USDT"
         },
         {
           "exchangeName": "Kucoin",
@@ -3749,13 +3556,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "WOO-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "WOO_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "WOO_USDT",
+          "exchangeName": "Okx",
+          "ticker": "WOO-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -3773,7 +3579,7 @@
     },
     "meta": {
       "assetName": "Wootrade Network",
-      "referencePrice": 0.3754054899185099
+      "referencePrice": 0.41338689624114655
     }
   },
   "ZETA": {
@@ -3788,8 +3594,7 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Bybit",
-          "ticker": "ZETAUSDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "ZETAUSDT"
         },
         {
           "exchangeName": "CoinbasePro",
@@ -3797,8 +3602,7 @@
         },
         {
           "exchangeName": "Gate",
-          "ticker": "ZETA_USDT",
-          "adjustByMarket": "USDT-USD"
+          "ticker": "ZETA_USDT"
         },
         {
           "exchangeName": "Kucoin",
@@ -3806,13 +3610,12 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Okx",
-          "ticker": "ZETA-USDT",
-          "adjustByMarket": "USDT-USD"
+          "exchangeName": "Mexc",
+          "ticker": "ZETA_USDT"
         },
         {
-          "exchangeName": "Mexc",
-          "ticker": "ZETA_USDT",
+          "exchangeName": "Okx",
+          "ticker": "ZETA-USDT",
           "adjustByMarket": "USDT-USD"
         }
       ],
@@ -3830,7 +3633,7 @@
     },
     "meta": {
       "assetName": "ZetaChain",
-      "referencePrice": 1.9573870187743652
+      "referencePrice": 2.0541895078713597
     }
   }
 }
