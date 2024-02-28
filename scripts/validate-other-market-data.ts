@@ -6,9 +6,11 @@ import { EncodeObject } from '@cosmjs/proto-signing';
 import { Account, StdFee } from '@cosmjs/stargate';
 import { BroadcastTxSyncResponse } from '@cosmjs/tendermint-rpc/build/tendermint37';
 import { Method } from '@cosmjs/tendermint-rpc';
-import * as clientJs from '@dydxprotocol/v4-client-js';
+const LocalWalletModule = await import('@dydxprotocol/v4-client-js/src/clients/modules/local-wallet');
+const LocalWallet = LocalWalletModule.default;
 import {
   CompositeClient,
+  LocalWallet as LocalWalletType,
   Network,
   ProposalStatus,
   TransactionOptions,
@@ -267,7 +269,7 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
 async function voteOnProposal(
   proposalId: Long,
   client: CompositeClient,
-  wallet: clientJs.LocalWallet,
+  wallet: LocalWalletType,
 ): Promise<void> {
   // Construct Tx.
   const encodedVote: EncodeObject = {
@@ -306,8 +308,8 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   // Initialize wallets.
   const network = Network.local();
   const client = await CompositeClient.connect(network);
-  const wallets: clientJs.LocalWallet[] = await Promise.all(MNEMONICS.map((mnemonic) => {
-    return clientJs.LocalWallet.fromMnemonic(mnemonic, 'dydx');
+  const wallets: LocalWalletType[] = await Promise.all(MNEMONICS.map((mnemonic) => {
+    return LocalWallet.fromMnemonic(mnemonic, 'dydx');
   }));
 
   // Send proposals (unless a market with that ticker already exists).
