@@ -80,7 +80,7 @@ export const AccountInfoConnectedState = () => {
             <Styled.Button
               state={{ isDisabled: !dydxAccounts }}
               onClick={() => dispatch(openDialog({ type: DialogTypes.Withdraw }))}
-              shape={ButtonShape.Pill}
+              shape={ButtonShape.Rectangle}
               size={ButtonSize.XSmall}
             >
               {stringGetter({ key: STRING_KEYS.WITHDRAW })}
@@ -88,17 +88,25 @@ export const AccountInfoConnectedState = () => {
             <Styled.Button
               state={{ isDisabled: !dydxAccounts }}
               onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
-              shape={ButtonShape.Pill}
+              shape={ButtonShape.Rectangle}
               size={ButtonSize.XSmall}
             >
               {stringGetter({ key: STRING_KEYS.DEPOSIT })}
             </Styled.Button>
-            <Styled.IconButton
-              action={ButtonAction.Base}
-              shape={ButtonShape.Square}
-              iconName={IconName.Send}
-              onClick={() => dispatch(openDialog({ type: DialogTypes.Transfer, dialogProps: {selectedAsset: DydxChainAsset.USDC} }))}
-            />
+            <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.TRANSFER })}>
+              <Styled.IconButton
+                shape={ButtonShape.Square}
+                iconName={IconName.Send}
+                onClick={() =>
+                  dispatch(
+                    openDialog({
+                      type: DialogTypes.Transfer,
+                      dialogProps: { selectedAsset: DydxChainAsset.USDC },
+                    })
+                  )
+                }
+              />
+            </WithTooltip>
           </Styled.TransferButtons>
         </Styled.Header>
       )}
@@ -181,7 +189,11 @@ export const AccountInfoConnectedState = () => {
                 <WithTooltip tooltip={tooltip} stringParams={stringParams}>
                   <Styled.WithUsage>
                     {label}
-                    {hasError ? <Styled.CautionIcon iconName={IconName.CautionCircle} /> : slotRight}
+                    {hasError ? (
+                      <Styled.CautionIcon iconName={IconName.CautionCircle} />
+                    ) : (
+                      slotRight
+                    )}
                   </Styled.WithUsage>
                 </WithTooltip>
               ),
