@@ -241,6 +241,9 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
     if (!(exchange.exchangeName in EXCHANGE_INFO)) {
       throw new Error(`Exchange ${exchange.exchangeName} not supported`);
     }
+    if (!/usd$/i.test(exchange.ticker) && exchange.adjustByMarket === undefined || exchange.adjustByMarket === "") {
+      throw new Error(`adjustByMarket is not set for ticker ${exchange.ticker} on exchange ${exchange.exchangeName}`);
+    }
     const { url, tickers, parseResp } = EXCHANGE_INFO[exchange.exchangeName];
 
     // TODO: Skip Bybit exchange until we can query from non-US IP.
