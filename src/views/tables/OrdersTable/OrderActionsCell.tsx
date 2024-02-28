@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { useCallback, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { AbacusOrderStatus, type OrderStatus } from '@/constants/abacus';
+import { ButtonShape } from '@/constants/buttons';
 
 import { useSubaccount } from '@/hooks';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
@@ -35,21 +35,19 @@ export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) 
   return (
     <Styled.OrderActions>
       <Styled.Toolbar>
-        {isOrderStatusClearable(status) ? (
-          <Styled.ActionButton
-            iconName={IconName.Close}
-            onClick={() => dispatch(clearOrder(orderId))}
-          />
-        ) : (
-          <Styled.CancelButton
-            iconName={IconName.Close}
-            state={{
-              isLoading: isCanceling || status === AbacusOrderStatus.canceling,
-              isDisabled: isCanceling || isDisabled || status === AbacusOrderStatus.canceling,
-            }}
-            onClick={onCancel}
-          />
-        )}
+        <Styled.CancelButton
+          iconName={IconName.Close}
+          shape={ButtonShape.Square}
+          {...(isOrderStatusClearable(status)
+            ? { onClick: () => dispatch(clearOrder(orderId)) }
+            : {
+                onClick: onCancel,
+                state: {
+                  isLoading: isCanceling || status === AbacusOrderStatus.canceling,
+                  isDisabled: isCanceling || isDisabled || status === AbacusOrderStatus.canceling,
+                },
+              })}
+        />
       </Styled.Toolbar>
     </Styled.OrderActions>
   );
@@ -58,30 +56,23 @@ export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) 
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.OrderActions = styled.div`
-  ${layoutMixins.row};
-  justify-content: var(--table-cell-currentAlign);
+  display: flex;
+  justify-content: flex-end;
 `;
 
 Styled.Toolbar = styled(Toolbar)`
   width: 3rem;
-
   padding: 0;
+
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
 `;
 
-Styled.ActionButton = styled(IconButton)`
-  --button-backgroundColor: transparent;
-  --button-border: none;
+Styled.CancelButton = styled(IconButton)`
+  --button-hover-textColor: var(--color-red);
 
   svg {
     width: 0.875em;
     height: 0.875em;
-  }
-`;
-
-Styled.CancelButton = styled(Styled.ActionButton)`
-  &:not(:disabled) {
-    --button-textColor: var(--color-red);
   }
 `;
