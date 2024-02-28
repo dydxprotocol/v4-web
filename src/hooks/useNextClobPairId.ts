@@ -42,36 +42,41 @@ export const useNextClobPairId = () => {
    * @param message from proposal. Each message is wrapped in a type any (on purpose).
    * @param callback method used to compile all clobPairIds, perpetualIds, marketIds, etc.
    */
-  const decodeMsgForClobPairId = (message: any, callback: (id?: number) => void): any => {
+  const decodeMsgForClobPairId = (
+    message: any,
+    addIdFromProposal: (id?: number) => void,
+    addTickerFromProposal: (ticker?: string) => void
+  ): any => {
     const { typeUrl, value } = message;
 
     switch (typeUrl) {
       case TYPE_URL_MSG_CREATE_ORACLE_MARKET: {
         const decodedValue = MsgCreateOracleMarket.decode(value);
-        callback(decodedValue.params?.id);
+        addIdFromProposal(decodedValue.params?.id);
+        addTickerFromProposal(decodedValue.params?.pair);
         break;
       }
       case TYPE_URL_MSG_CREATE_PERPETUAL: {
         const decodedValue = MsgCreatePerpetual.decode(value);
-        callback(decodedValue.params?.id);
-        callback(decodedValue.params?.marketId);
+        addIdFromProposal(decodedValue.params?.id);
+        addIdFromProposal(decodedValue.params?.marketId);
         break;
       }
       case TYPE_URL_MSG_CREATE_CLOB_PAIR: {
         const decodedValue = MsgCreateClobPair.decode(value);
-        callback(decodedValue.clobPair?.id);
-        callback(decodedValue.clobPair?.perpetualClobMetadata?.perpetualId);
+        addIdFromProposal(decodedValue.clobPair?.id);
+        addIdFromProposal(decodedValue.clobPair?.perpetualClobMetadata?.perpetualId);
         break;
       }
       case TYPE_URL_MSG_UPDATE_CLOB_PAIR: {
         const decodedValue = MsgUpdateClobPair.decode(value);
-        callback(decodedValue.clobPair?.id);
-        callback(decodedValue.clobPair?.perpetualClobMetadata?.perpetualId);
+        addIdFromProposal(decodedValue.clobPair?.id);
+        addIdFromProposal(decodedValue.clobPair?.perpetualClobMetadata?.perpetualId);
         break;
       }
       case TYPE_URL_MSG_DELAY_MESSAGE: {
         const decodedValue = MsgDelayMessage.decode(value);
-        decodeMsgForClobPairId(decodedValue.msg, callback);
+        decodeMsgForClobPairId(decodedValue.msg, addIdFromProposal, addTickerFromProposal);
         break;
       }
       default: {
@@ -80,19 +85,28 @@ export const useNextClobPairId = () => {
     }
   };
 
-  const nextAvailableClobPairId = useMemo(() => {
+  const { nextAvailableClobPairId, tickersFromProposals } = useMemo(() => {
     const idsFromProposals: number[] = [];
+    const tickersFromProposals: Set<string> = new Set();
+
+    const addIdFromProposal = (id?: number) => {
+      if (id) {
+        idsFromProposals.push(id);
+      }
+    };
+
+    const addTickerFromProposal = (ticker?: string) => {
+      if (ticker) {
+        tickersFromProposals.add(ticker);
+      }
+    };
 
     if (allGovProposals && Object.values(allGovProposals.proposals).length > 0) {
       const proposals = allGovProposals.proposals;
       proposals.forEach((proposal) => {
         if (proposal.messages) {
           proposal.messages.map((message) => {
-            decodeMsgForClobPairId(message, (id?: number) => {
-              if (id) {
-                idsFromProposals.push(id);
-              }
-            });
+            decodeMsgForClobPairId(message, addIdFromProposal, addTickerFromProposal);
           });
         }
       });
@@ -104,15 +118,19 @@ export const useNextClobPairId = () => {
       );
 
       const nextAvailableClobPairId = Math.max(...[...clobPairIds, ...idsFromProposals]) + 1;
-      return nextAvailableClobPairId;
+      return { nextAvailableClobPairId, tickersFromProposals };
     }
 
-    return undefined;
+    return {
+      nextAvailableClobPairId: undefined,
+      tickersFromProposals,
+    };
   }, [perpetualMarkets, allGovProposals]);
 
   return {
     allGovProposalsStatus,
     perpetualMarketsStatus,
     nextAvailableClobPairId,
+    tickersFromProposals,
   };
 };

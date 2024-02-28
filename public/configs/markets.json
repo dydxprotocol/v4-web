@@ -41,6 +41,13 @@
     "whitepaperLink": "https://apecoin.com/about",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/apecoin-ape/"
   },
+  "API3-USD": {
+    "name": "API3",
+    "tags": [],
+    "websiteLink": "https://api3.org/",
+    "whitepaperLink": "https://drive.google.com/file/d/1JMVwk9pkGF7hvjkuu6ABA0-FrhRTzAwF/view",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/api3/"
+  },
   "APT-USD": {
     "name": "Aptos",
     "tags": ["Layer 1"],
@@ -309,6 +316,13 @@
     "websiteLink": "https://litecoin.org/",
     "whitepaperLink": "https://litecoin.info/index.php/Main_Page",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/litecoin/"
+  },
+  "MAGIC-USD": {
+    "name": "MAGIC",
+    "tags": ["NFT"],
+    "websiteLink": "https://treasure.lol/",
+    "whitepaperLink": "https://files.treasure.lol/Treasure+Infinity+Chains+-+Litepaper+v1.0.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/magic-token/"
   },
   "MANA-USD": {
     "name": "Decentraland",
