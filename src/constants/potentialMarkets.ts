@@ -4,22 +4,35 @@ export type ExchangeConfigItem = {
   adjustByMarket?: string;
 };
 
-export type PotentialMarketItem = {
-  baseAsset: string;
-  referencePrice: string;
-  numOracles: number;
-  liquidityTier: number;
-  assetName: string;
-  p: number;
-  atomicResolution: number;
-  minExchanges: number;
-  minPriceChangePpm: number;
+export type NewMarketParams = {
+  id: number;
+  ticker: string;
   priceExponent: number;
-  stepBaseQuantum: number;
-  ticksizeExponent: number;
-  subticksPerTick: number;
-  minOrderSize: number;
+  minExchanges: number;
+  minPriceChange: number;
+  exchangeConfigJson: ExchangeConfigItem[];
+  liquidityTier: number;
+  atomicResolution: number;
   quantumConversionExponent: number;
+  defaultFundingPpm: number;
+  stepBaseQuantums: number;
+  subticksPerTick: number;
+  delayBlocks: number;
+};
+
+export type NewMarketProposal = {
+  title: string;
+  summary: string;
+  params: NewMarketParams;
+  meta: {
+    assetName: string;
+    referencePrice: number;
+  };
+  initial_deposit: {
+    denom: string;
+    amount: string;
+  };
+  baseAsset: string;
 };
 
 export const NUM_ORACLES_TO_QUALIFY_AS_SAFE = 6;

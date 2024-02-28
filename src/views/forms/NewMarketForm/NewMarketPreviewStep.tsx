@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useMemo, useState } from 'react';
+import { FormEvent, useMemo, useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { useDispatch } from 'react-redux';
 import Long from 'long';
@@ -11,7 +11,7 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
-import type { PotentialMarketItem } from '@/constants/potentialMarkets';
+import type { NewMarketProposal } from '@/constants/potentialMarkets';
 
 import {
   useAccountBalance,
@@ -43,7 +43,7 @@ import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 
 type NewMarketPreviewStepProps = {
-  assetData: PotentialMarketItem;
+  assetData: NewMarketProposal;
   clobPairId: number;
   liquidityTier: number;
   onBack: () => void;
@@ -64,7 +64,7 @@ export const NewMarketPreviewStep = ({
   const stringGetter = useStringGetter();
   const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
   const [errorMessage, setErrorMessage] = useState();
-  const { exchangeConfigs, liquidityTiers } = usePotentialMarkets();
+  const { liquidityTiers } = usePotentialMarkets();
   const { submitNewMarketProposal } = useSubaccount();
   const { newMarketProposal } = useGovernanceVariables();
   const { newMarketProposalLearnMore } = useURLConfigs();
@@ -74,11 +74,23 @@ export const NewMarketPreviewStep = ({
   const initialDepositAmountDecimals = isMainnet ? 0 : chainTokenDecimals;
   const initialDepositAmount = initialDepositAmountBN.toFixed(initialDepositAmountDecimals);
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { label, initialMarginFraction, maintenanceMarginFraction, impactNotional } =
     liquidityTiers[liquidityTier as unknown as keyof typeof liquidityTiers];
 
-  const ticker = `${assetData.baseAsset}-USD`;
+  const { params, meta } = assetData ?? {};
+  const {
+    ticker,
+    priceExponent,
+    minExchanges,
+    minPriceChange,
+    exchangeConfigJson,
+    atomicResolution,
+    quantumConversionExponent,
+    stepBaseQuantums,
+    subticksPerTick,
+  } = params ?? {};
 
   const alertMessage = useMemo(() => {
     if (errorMessage) {
@@ -120,23 +132,24 @@ export const NewMarketPreviewStep = ({
             })
           );
         } else {
+          setIsLoading(true);
           setErrorMessage(undefined);
 
           try {
             const tx = await submitNewMarketProposal({
               id: clobPairId,
               ticker,
-              priceExponent: assetData.priceExponent,
-              minPriceChange: assetData.minPriceChangePpm,
-              minExchanges: assetData.minExchanges,
+              priceExponent,
+              minPriceChange,
+              minExchanges,
               exchangeConfigJson: JSON.stringify({
-                exchanges: exchangeConfigs?.[assetData.baseAsset],
+                exchanges: exchangeConfigJson,
               }),
-              atomicResolution: assetData.atomicResolution,
-              liquidityTier: liquidityTier,
-              quantumConversionExponent: assetData.quantumConversionExponent,
-              stepBaseQuantums: Long.fromNumber(assetData.stepBaseQuantum),
-              subticksPerTick: assetData.subticksPerTick,
+              atomicResolution,
+              liquidityTier,
+              quantumConversionExponent,
+              stepBaseQuantums: Long.fromNumber(stepBaseQuantums),
+              subticksPerTick,
               delayBlocks: newMarketProposal.delayBlocks,
             });
 
@@ -156,6 +169,8 @@ export const NewMarketPreviewStep = ({
           } catch (error) {
             log('NewMarketPreviewForm/submitNewMarketProposal', error);
             setErrorMessage(error.message);
+          } finally {
+            setIsLoading(false);
           }
         }
       }}
@@ -225,7 +240,7 @@ export const NewMarketPreviewStep = ({
             value: (
               <Output
                 type={OutputType.Fiat}
-                value={assetData.referencePrice}
+                value={meta.referencePrice}
                 fractionDigits={tickSizeDecimals}
               />
             ),
@@ -306,26 +321,32 @@ export const NewMarketPreviewStep = ({
       )}
       <Styled.ButtonRow>
         <Button onClick={onBack}>{stringGetter({ key: STRING_KEYS.BACK })}</Button>
-        <Button type={ButtonType.Submit} action={ButtonAction.Primary} state={{ isDisabled }}>
+        <Button
+          type={ButtonType.Submit}
+          action={ButtonAction.Primary}
+          state={{ isDisabled, isLoading }}
+        >
           {hasAcceptedTerms
             ? stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })
             : stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TERMS })}
         </Button>
       </Styled.ButtonRow>
-      <Styled.Disclaimer>
-        {stringGetter({
-          key: STRING_KEYS.PROPOSAL_DISCLAIMER_1,
-          params: {
-            NUM_TOKENS_REQUIRED: initialDepositAmount,
-            NATIVE_TOKEN_DENOM: chainTokenLabel,
-            HERE: (
-              <Styled.Link href={newMarketProposalLearnMore}>
-                {stringGetter({ key: STRING_KEYS.HERE })}
-              </Styled.Link>
-            ),
-          },
-        })}
-      </Styled.Disclaimer>
+      <Styled.DisclaimerContainer>
+        <Styled.Disclaimer>
+          {stringGetter({
+            key: STRING_KEYS.PROPOSAL_DISCLAIMER_1,
+            params: {
+              NUM_TOKENS_REQUIRED: initialDepositAmount,
+              NATIVE_TOKEN_DENOM: chainTokenLabel,
+              HERE: (
+                <Styled.Link href={newMarketProposalLearnMore}>
+                  {stringGetter({ key: STRING_KEYS.HERE })}
+                </Styled.Link>
+              ),
+            },
+          })}
+        </Styled.Disclaimer>
+      </Styled.DisclaimerContainer>
     </Styled.Form>
   );
 };
@@ -383,8 +404,13 @@ Styled.CheckboxContainer = styled.div`
   align-items: center;
 `;
 
+Styled.DisclaimerContainer = styled.div`
+  min-width: 100%;
+  width: min-content;
+`;
+
 Styled.Disclaimer = styled.div<{ textAlign?: string }>`
-  font: var(--font-small);
+  font: var(--font-small-book);
   color: var(--color-text-0);
   text-align: center;
   margin-left: 0.5ch;

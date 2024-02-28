@@ -152,7 +152,7 @@ Styled.Page = styled.div`
 
 Styled.ContentSectionHeader = styled(ContentSectionHeader)`
   @media ${breakpoints.notTablet} {
-    padding: 1rem 0;
+    padding: 1rem;
   }
 
   @media ${breakpoints.tablet} {
