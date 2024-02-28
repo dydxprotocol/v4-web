@@ -10,9 +10,14 @@ jobs:
   sync-release-branch:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Git
         run: |
@@ -36,6 +41,8 @@ jobs:
           git checkout release || git checkout -b release
 
       - name: Sync release branch to tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
         run: |
           git reset --hard ${{ github.ref }}
           git push -f origin release
