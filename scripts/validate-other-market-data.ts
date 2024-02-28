@@ -267,24 +267,27 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
   }
 }
 
-async function voteOnProposal(
-  proposalId: Long,
+// Vote YES on all `proposalIds` from `wallet`.
+async function voteOnProposals(
+  proposalIds: number[],
   client: CompositeClient,
   wallet: LocalWalletType,
 ): Promise<void> {
   // Construct Tx.
-  const encodedVote: EncodeObject = {
-    typeUrl: '/cosmos.gov.v1.MsgVote',
-    value: {
-      proposalId,
-      voter: wallet.address!,
-      option: VoteOption.VOTE_OPTION_YES,
-      metadata: '',
-    } as MsgVote,
-  }
+  const encodedVotes: EncodeObject[] = proposalIds.map((proposalId) => {
+    return {
+      typeUrl: '/cosmos.gov.v1.MsgVote',
+      value: {
+        proposalId: Long.fromNumber(proposalId),
+        voter: wallet.address!,
+        option: VoteOption.VOTE_OPTION_YES,
+        metadata: '',
+      } as MsgVote,
+    } as EncodeObject;
+  });
   const account: Account = await client.validatorClient.get.getAccount(wallet.address!);
   const signedTx = await wallet.signTransaction(
-    [encodedVote],
+    encodedVotes,
     {
       sequence: account.sequence,
       accountNumber: account.accountNumber,
@@ -299,9 +302,9 @@ async function voteOnProposal(
     Method.BroadcastTxSync,
   );
   if ((resp as BroadcastTxSyncResponse).code) {
-    throw new Error(`Failed to vote on proposal ${proposalId}`);
+    throw new Error(`Failed to vote on proposals ${proposalIds}`);
   } else {
-    console.log(`Voted on proposal ${proposalId} with wallet ${wallet.address}`);
+    console.log(`Voted on proposals ${proposalIds} with wallet ${wallet.address}`);
   }
 }
 
@@ -313,55 +316,58 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
     return LocalWallet.fromMnemonic(mnemonic, 'dydx');
   }));
 
-  // Send proposals (unless a market with that ticker already exists).
+  // Send proposals to add all markets (unless a market with that ticker already exists).
   const allPerps = await client.validatorClient.get.getAllPerpetuals();
   const allTickers = allPerps.perpetual.map((perp) => perp.params!.ticker);
-  let marketId = allPerps.perpetual.reduce((max, perp) => perp.params!.id > max ? perp.params!.id : max, 0);
-  let proposalId: Long = Long.fromInt(0);
-  const marketsProposed = new Map<number, Proposal>();
-  for (const proposal of proposals) {
-    if (allTickers.includes(proposal.params.ticker)) {
-      console.log(`Market with ticker ${proposal.params.ticker} already exists. Skipping proposal...`);
-      continue;
+  const filteredProposals = proposals.filter((proposal) => !allTickers.includes(proposal.params.ticker));
+  const numExistingMarkets = allPerps.perpetual.reduce((max, perp) => perp.params!.id > max ? perp.params!.id : max, 0);
+  const marketsProposed = new Map<number, Proposal>(); // marketId -> Proposal
+
+  for (let i = 0; i < filteredProposals.length; i += 4) {
+    // Send out proposals in groups of 4 or fewer.
+    const proposalsToSend = filteredProposals.slice(i, i + 4);
+    const proposalIds: number[] = [];
+    for (let j = 0; j < proposalsToSend.length; j++) {
+      // Use wallets[j] to send out proposalsToSend[j]
+      const proposal = proposalsToSend[j];
+      const proposalId: number = i + j + 1;
+      const marketId: number = numExistingMarkets + proposalId
+
+      // Send proposal.
+      const exchangeConfigString = `{"exchanges":${JSON.stringify(proposal.params.exchangeConfigJson)}}`;
+      const tx = await retry(() => client.submitGovAddNewMarketProposal(
+        wallets[j],
+        {
+          id: marketId,
+          ticker: proposal.params.ticker,
+          priceExponent: proposal.params.priceExponent,
+          minPriceChange: proposal.params.minPriceChange,
+          minExchanges: proposal.params.minExchanges,
+          exchangeConfigJson: exchangeConfigString,
+          liquidityTier: proposal.params.liquidityTier,
+          atomicResolution: proposal.params.atomicResolution,
+          quantumConversionExponent: proposal.params.quantumConversionExponent,
+          stepBaseQuantums: Long.fromNumber(proposal.params.stepBaseQuantums),
+          subticksPerTick: proposal.params.subticksPerTick,
+          delayBlocks: proposal.params.delayBlocks,
+        },
+        proposal.title,
+        proposal.summary,
+        MIN_DEPOSIT,
+      ));
+      console.log(`Tx by wallet ${j} to add market ${marketId} with ticker ${proposal.params.ticker}`, tx);
+
+      // Record proposed market.
+      marketsProposed.set(marketId, proposal);
+      proposalIds.push(proposalId);
     }
 
-    // Increment marketId and proposalId.
-    marketId++;
-    proposalId = proposalId.add(1);
-
-    // Send proposal.
-    const exchangeConfigString = `{"exchanges":${JSON.stringify(proposal.params.exchangeConfigJson)}}`;
-    const tx = await retry(() => client.submitGovAddNewMarketProposal(
-      wallets[0],
-      {
-        id: marketId,
-        ticker: proposal.params.ticker,
-        priceExponent: proposal.params.priceExponent,
-        minPriceChange: proposal.params.minPriceChange,
-        minExchanges: proposal.params.minExchanges,
-        exchangeConfigJson: exchangeConfigString,
-        liquidityTier: proposal.params.liquidityTier,
-        atomicResolution: proposal.params.atomicResolution,
-        quantumConversionExponent: proposal.params.quantumConversionExponent,
-        stepBaseQuantums: Long.fromNumber(proposal.params.stepBaseQuantums),
-        subticksPerTick: proposal.params.subticksPerTick,
-        delayBlocks: proposal.params.delayBlocks,
-      },
-      proposal.title,
-      proposal.summary,
-      MIN_DEPOSIT,
-    ));
-    console.log(`Tx to add market ${marketId} with ticker ${proposal.params.ticker}`, tx);
-
-    // Record proposed market.
-    marketsProposed.set(marketId, proposal);
-    
-    // Wait 10 seconds for proposal to be processed.
+    // Wait 10 seconds for proposals to be processed.
     await sleep(10000);
 
-    // Vote YES on proposal.
+    // Vote YES on proposals from every wallet.
     for (const wallet of wallets) {
-      retry(() => voteOnProposal(proposalId, client, wallet));
+      retry(() => voteOnProposals(proposalIds, client, wallet));
     }
 
     // Wait 10 seconds for votes to be processed.
