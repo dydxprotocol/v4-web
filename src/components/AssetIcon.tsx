@@ -61,6 +61,7 @@ const assetIcons = {
   ORDI: '/currencies/ordi.png',
   OP: '/currencies/op.png',
   PEPE: '/currencies/pepe.png',
+  PORTAL: '/currencies/portal.png',
   PYTH: '/currencies/pyth.png',
   RNDR: '/currencies/rndr.png',
   RUNE: '/currencies/rune.png',
