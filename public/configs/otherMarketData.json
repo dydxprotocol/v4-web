@@ -3853,7 +3853,7 @@
       "amount": "10000000000000000000000"
     },
     "meta": {
-      "assetName": "ZetaChain",
+      "assetName": "ZetaChainChanged",
       "referencePrice": 2.0541895078713597
     }
   }
