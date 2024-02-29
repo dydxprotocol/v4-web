@@ -25,7 +25,6 @@ import {
   Table,
   TableCell,
   TableColumnHeader,
-  ActionsTableCell,
   MarketTableCell,
   type ColumnDef,
 } from '@/components/Table';
@@ -358,14 +357,14 @@ export const OrdersTable = ({
       getRowAttributes={(row: OrderTableRow) => ({
         'data-clearable': isOrderStatusClearable(row.status),
       })}
-      onRowAction={(key: string) => {
+      onRowAction={(key: string) =>
         dispatch(
           openDialog({
             type: DialogTypes.OrderDetails,
             dialogProps: { orderId: key },
           })
-        );
-      }}
+        )
+      }
       columns={columnKeys.map((key: OrdersTableColumnKey, index: number) =>
         getOrdersTableColumnDef({
           key,
