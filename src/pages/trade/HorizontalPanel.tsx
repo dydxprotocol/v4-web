@@ -14,7 +14,6 @@ import { Tag, TagType } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
-// import { FundingPaymentsTable } from '@/views/tables/FundingPaymentsTable';
 import { OrdersTable, OrdersTableColumnKey } from '@/views/tables/OrdersTable';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
@@ -34,6 +33,7 @@ import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsS
 
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 import { PositionInfo } from '@/views/PositionInfo';
 
@@ -110,6 +110,10 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     PositionsTableColumnKey.UnrealizedPnl,
                     PositionsTableColumnKey.RealizedPnl,
                     PositionsTableColumnKey.AverageOpenAndClose,
+                    ...(testFlags.closePositionsFromPositionsTable ||
+                    testFlags.configureSlTpFromPositionsTable
+                      ? [PositionsTableColumnKey.Actions]
+                      : []),
                   ]
             }
             onNavigate={() => setView(PanelView.CurrentMarket)}
