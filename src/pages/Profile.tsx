@@ -1,8 +1,8 @@
-import styled, { AnyStyledComponent, css } from 'styled-components';
-import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { useEnsName } from 'wagmi';
+import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import styled, { AnyStyledComponent, css } from 'styled-components';
+import { useEnsName } from 'wagmi';
 
 import { TransferType } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
@@ -11,16 +11,18 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, PortfolioRoute, HistoryRoute } from '@/constants/routes';
 import { wallets } from '@/constants/wallets';
+
 import { useAccounts, useStringGetter, useTokenConfigs } from '@/hooks';
+
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';
-import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton, type IconButtonProps } from '@/components/IconButton';
 import { Panel } from '@/components/Panel';
 import { Toolbar } from '@/components/Toolbar';
+import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 
 import {
   getHistoricalTradingRewardsForCurrentWeek,
@@ -32,11 +34,11 @@ import { isTruthy } from '@/lib/isTruthy';
 import { truncateAddress } from '@/lib/wallet';
 
 import { DYDXBalancePanel } from './token/rewards/DYDXBalancePanel';
-import { MigratePanel } from './token/rewards/MigratePanel';
 import { GovernancePanel } from './token/rewards/GovernancePanel';
+import { MigratePanel } from './token/rewards/MigratePanel';
+import { NewMarketsPanel } from './token/rewards/NewMarketsPanel';
 import { StakingPanel } from './token/staking/StakingPanel';
 import { StrideStakingPanel } from './token/staking/StrideStakingPanel';
-import { NewMarketsPanel } from './token/rewards/NewMarketsPanel';
 
 const ENS_CHAIN_ID = 1; // Ethereum
 

@@ -1,15 +1,17 @@
 import { useState } from 'react';
+
 import styled, { type AnyStyledComponent, css } from 'styled-components';
 
-import { OpacityToken } from '@/constants/styles/base';
 import { STRING_KEYS } from '@/constants/localization';
-import { layoutMixins } from '@/styles/layoutMixins';
+import { OpacityToken } from '@/constants/styles/base';
 
 import { useAccounts, useStringGetter } from '@/hooks';
 
+import { layoutMixins } from '@/styles/layoutMixins';
+
+import { Checkbox } from '@/components/Checkbox';
 import { CopyButton } from '@/components/CopyButton';
 import { QrCode } from '@/components/QrCode';
-import { Checkbox } from '@/components/Checkbox';
 import { TimeoutButton } from '@/components/TimeoutButton';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithReceipt } from '@/components/WithReceipt';

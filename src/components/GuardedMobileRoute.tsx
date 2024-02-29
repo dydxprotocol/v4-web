@@ -1,16 +1,15 @@
 import { useEffect, useRef } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 import { DialogTypes } from '@/constants/dialogs';
 
 import { useBreakpoints } from '@/hooks';
 
-import { openDialog } from '@/state/dialogs';
-
-import { getActiveDialog } from '@/state/dialogsSelectors';
-
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
+import { openDialog } from '@/state/dialogs';
+import { getActiveDialog } from '@/state/dialogsSelectors';
 
 export const GuardedMobileRoute = () => {
   const { isTablet } = useBreakpoints();

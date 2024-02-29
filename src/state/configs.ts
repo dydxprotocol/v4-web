@@ -1,5 +1,5 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { kollections } from '@dydxprotocol/v4-abacus';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import type { Configs, FeeDiscount, FeeTier, NetworkConfigs, Nullable } from '@/constants/abacus';
 import { LocalStorageKey } from '@/constants/localStorage';

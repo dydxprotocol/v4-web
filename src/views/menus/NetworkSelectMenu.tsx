@@ -1,11 +1,11 @@
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { useSelectedNetwork } from '@/hooks';
-import { layoutMixins } from '@/styles/layoutMixins';
+
 import { headerMixins } from '@/styles/headerMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DropdownSelectMenu } from '@/components/DropdownSelectMenu';
-
 import { useNetworks } from '@/views/menus/useNetworks';
 
 type StyleProps = {

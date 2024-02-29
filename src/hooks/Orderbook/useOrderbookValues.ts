@@ -1,12 +1,13 @@
 import { useMemo } from 'react';
-import { shallowEqual, useSelector } from 'react-redux';
+
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { shallowEqual, useSelector } from 'react-redux';
 
 import { type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { DepthChartSeries, DepthChartDatum } from '@/constants/charts';
 
-import { getCurrentMarketOrderbook } from '@/state/perpetualsSelectors';
 import { getSubaccountOpenOrdersBySideAndPrice } from '@/state/accountSelectors';
+import { getCurrentMarketOrderbook } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 

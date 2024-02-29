@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import { RestrictionType } from '@/constants/abacus';
@@ -6,6 +7,7 @@ import { DialogTypes } from '@/constants/dialogs';
 
 import { getRestrictionType } from '@/state/accountSelectors';
 import { forceOpenDialog } from '@/state/dialogs';
+
 import { isTruthy } from '@/lib/isTruthy';
 
 const useRestrictionContext = () => {

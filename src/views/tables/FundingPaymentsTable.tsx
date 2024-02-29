@@ -1,16 +1,17 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
-import { shallowEqual, useSelector } from 'react-redux';
 import { DateTime } from 'luxon';
+import { shallowEqual, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import type { Asset, SubaccountFundingPayment } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useStringGetter } from '@/hooks';
 
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
-import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { Output, OutputType } from '@/components/Output';
 import { Table, TableCell, type ColumnDef } from '@/components/Table';
+import { MarketTableCell } from '@/components/Table/MarketTableCell';
 
 import {
   getCurrentMarketFundingPayments,

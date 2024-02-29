@@ -1,8 +1,8 @@
 import React, { type MouseEvent } from 'react';
+
 import styled, { css } from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
-
 import {
   NotificationStatus,
   type Notification as NotificationDataType,
@@ -10,11 +10,11 @@ import {
 
 import { useNotifications } from '@/hooks/useNotifications';
 
-import { popoverMixins } from '@/styles/popoverMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
+import { popoverMixins } from '@/styles/popoverMixins';
 
-import { IconButton } from '@/components/IconButton';
 import { IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
 
 type ElementProps = {

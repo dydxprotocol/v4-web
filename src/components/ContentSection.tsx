@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 export const DetachedSection = styled.section`

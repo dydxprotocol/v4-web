@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
-import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
-import { shallowEqual, useSelector } from 'react-redux';
+
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { shallowEqual, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
 
 import { MarketTrade } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useBreakpoints, useStringGetter } from '@/hooks';
 
 import { breakpoints } from '@/styles';
@@ -15,9 +17,10 @@ import { Output, OutputType } from '@/components/Output';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketLiveTrades } from '@/state/perpetualsSelectors';
 
-import { OrderbookTradesOutput, OrderbookTradesTable } from './OrderbookTradesTable';
-import { getSelectedOrderSide } from '@/lib/tradeData';
 import { isTruthy } from '@/lib/isTruthy';
+import { getSelectedOrderSide } from '@/lib/tradeData';
+
+import { OrderbookTradesOutput, OrderbookTradesTable } from './OrderbookTradesTable';
 
 const MAX_ORDERBOOK_BAR_SIZE = 0.4;
 const LARGE_TRADE_USD_VALUE = 10000;

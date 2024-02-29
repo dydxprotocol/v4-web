@@ -1,13 +1,15 @@
 import { useState } from 'react';
+
 import { useDispatch, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent, css } from 'styled-components';
-
-import { useStringGetter, useSubaccount } from '@/hooks';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AbacusOrderStatus, AbacusOrderTypes, type Nullable } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS, type StringKey } from '@/constants/localization';
+
+import { useStringGetter, useSubaccount } from '@/hooks';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
@@ -18,14 +20,12 @@ import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { type OrderTableRow } from '@/views/tables/OrdersTable';
 
+import { clearOrder } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getOrderDetails } from '@/state/accountSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
-import { clearOrder } from '@/state/account';
-
 import { MustBigNumber } from '@/lib/numbers';
-
 import {
   isOrderStatusClearable,
   isMarketOrderType,

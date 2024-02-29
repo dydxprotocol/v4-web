@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
@@ -7,14 +8,15 @@ import { STRING_KEYS, StringKey } from '@/constants/localization';
 import { TradeTypes, ORDER_TYPE_STRINGS, MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
-import { TradeForm } from '@/views/forms/TradeForm';
 import { Ring } from '@/components/Ring';
 import { ToggleGroup } from '@/components/ToggleGroup';
+import { TradeForm } from '@/views/forms/TradeForm';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';

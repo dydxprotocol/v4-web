@@ -1,14 +1,17 @@
 import { useMemo } from 'react';
+
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useStringGetter, useURLConfigs } from '@/hooks';
+
+import { breakpoints } from '@/styles';
 
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { Icon, IconName } from '@/components/Icon';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { breakpoints } from '@/styles';
 
 type ElementProps = {
   setIsOpen: (open: boolean) => void;

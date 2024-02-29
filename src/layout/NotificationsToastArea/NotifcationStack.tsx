@@ -1,14 +1,17 @@
 import { useState } from 'react';
+
 import styled, { css } from 'styled-components';
 
+import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import {
   type Notification,
   type NotificationDisplayData,
   NotificationStatus,
 } from '@/constants/notifications';
-import { ButtonShape, ButtonSize } from '@/constants/buttons';
-import { useNotifications } from '@/hooks/useNotifications';
+
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useNotifications } from '@/hooks/useNotifications';
+
 import { ChevronLeftIcon } from '@/icons';
 import { breakpoints } from '@/styles';
 

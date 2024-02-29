@@ -1,10 +1,11 @@
 import { useState } from 'react';
+
 import type { Story } from '@ladle/react';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 
-import { StoryWrapper } from '.ladle/components';
 import { ToggleGroup } from './ToggleGroup';
+import { StoryWrapper } from '.ladle/components';
 
 const ToggleGroupItems = [
   {

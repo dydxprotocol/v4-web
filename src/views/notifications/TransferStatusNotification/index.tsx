@@ -1,13 +1,14 @@
 import { useCallback, useState, useMemo, MouseEvent } from 'react';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
 
-import { useInterval, useStringGetter } from '@/hooks';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 import { STRING_KEYS } from '@/constants/localization';
 import { TransferNotifcation, TransferNotificationTypes } from '@/constants/notifications';
 
-import { formatSeconds } from '@/lib/timeUtils';
+import { useInterval, useStringGetter } from '@/hooks';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Collapsible } from '@/components/Collapsible';
@@ -17,7 +18,7 @@ import { Notification, NotificationProps } from '@/components/Notification';
 import { Output, OutputType } from '@/components/Output';
 import { WithReceipt } from '@/components/WithReceipt';
 
-import { layoutMixins } from '@/styles/layoutMixins';
+import { formatSeconds } from '@/lib/timeUtils';
 
 import { TransferStatusSteps } from './TransferStatusSteps';
 

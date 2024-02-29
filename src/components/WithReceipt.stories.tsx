@@ -1,7 +1,6 @@
 import type { Story } from '@ladle/react';
 
 import { Button } from '@/components/Button';
-
 import { WithReceipt } from '@/components/WithReceipt';
 
 import { StoryWrapper } from '.ladle/components';

@@ -1,12 +1,14 @@
 import { useMemo } from 'react';
+
 import { groupBy } from 'lodash';
 import styled from 'styled-components';
 
+import { NotificationStatus } from '@/constants/notifications';
+
+import { useNotifications } from '@/hooks/useNotifications';
+
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
-
-import { NotificationStatus } from '@/constants/notifications';
-import { useNotifications } from '@/hooks/useNotifications';
 
 import { NotificationStack } from './NotifcationStack';
 

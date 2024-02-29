@@ -1,8 +1,7 @@
 import { useRef, useState } from 'react';
 
-import styled, { type AnyStyledComponent, css } from 'styled-components';
-
 import type { ResolutionString } from 'public/tradingview/charting_library';
+import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import type { TvWidget } from '@/constants/tvchart';
 
@@ -13,9 +12,9 @@ import {
   useTradingViewTheme,
 } from '@/hooks/tradingView';
 
-import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
-
 import { layoutMixins } from '@/styles/layoutMixins';
+
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
 export const TvChart = () => {
   const [isChartReady, setIsChartReady] = useState(false);

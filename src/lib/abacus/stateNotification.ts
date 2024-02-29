@@ -13,11 +13,9 @@ import type {
   PerpetualStateChanges,
   SubaccountOrder,
 } from '@/constants/abacus';
-
 import { Changes } from '@/constants/abacus';
 
 import type { RootStore } from '@/state/_store';
-
 import {
   setBalances,
   setStakingBalances,
@@ -31,13 +29,13 @@ import {
   setWallet,
   setTradingRewards,
 } from '@/state/account';
-
 import { setApiState } from '@/state/app';
 import { setAssets } from '@/state/assets';
 import { setConfigs } from '@/state/configs';
 import { setInputs } from '@/state/inputs';
 import { updateNotifications } from '@/state/notifications';
 import { setHistoricalFundings, setLiveTrades, setMarkets, setOrderbook } from '@/state/perpetuals';
+
 import { isTruthy } from '../isTruthy';
 
 class AbacusStateNotifier implements AbacusStateNotificationProtocol {

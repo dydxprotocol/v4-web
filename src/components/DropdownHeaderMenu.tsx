@@ -1,15 +1,16 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
 import { Root, Trigger, Content, Portal, Item } from '@radix-ui/react-dropdown-menu';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { type MenuItem } from '@/constants/menus';
 
-import { popoverMixins } from '@/styles/popoverMixins';
-import { layoutMixins } from '@/styles/layoutMixins';
-import { breakpoints } from '@/styles';
 import { useBreakpoints } from '@/hooks';
 
-import { IconButton } from '@/components/IconButton';
+import { breakpoints } from '@/styles';
+import { layoutMixins } from '@/styles/layoutMixins';
+import { popoverMixins } from '@/styles/popoverMixins';
+
 import { IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 
 type ElementProps<MenuItemValue extends string> = {
   items: MenuItem<MenuItemValue>[];

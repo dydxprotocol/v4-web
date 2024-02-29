@@ -1,13 +1,14 @@
 import type { RenderTooltipParams } from '@visx/xychart/lib/components/Tooltip';
-import { TooltipContent } from '@/components/visx/TooltipContent';
 
 import { FundingRateResolution, type FundingChartDatum } from '@/constants/charts';
 import { STRING_KEYS } from '@/constants/localization';
 import { FundingDirection } from '@/constants/markets';
+
 import { useStringGetter } from '@/hooks';
 
 import { Details, DetailsItem } from '@/components/Details';
 import { Output, OutputType, ShowSign } from '@/components/Output';
+import { TooltipContent } from '@/components/visx/TooltipContent';
 
 type FundingChartTooltipProps = {
   fundingRateView: FundingRateResolution;

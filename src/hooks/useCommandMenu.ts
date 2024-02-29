@@ -5,9 +5,9 @@ export const useCommandMenu = () => {
 
   useEffect(() => {
     document.addEventListener('keydown', (event: KeyboardEvent) => {
-      if(event.key === 'k' && (event.ctrlKey || event.metaKey))
-        setIsCommandMenuOpen(!isCommandMenuOpen)
-    })
+      if (event.key === 'k' && (event.ctrlKey || event.metaKey))
+        setIsCommandMenuOpen(!isCommandMenuOpen);
+    });
   }, []);
 
   return {

@@ -1,12 +1,15 @@
 import { useCallback } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
+
 import { shallowEqual, useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
-import { TradeTypes } from '@/constants/trade';
 import { STRING_KEYS, StringKey } from '@/constants/localization';
+import { TradeTypes } from '@/constants/trade';
+
 import { useStringGetter } from '@/hooks';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Tabs } from '@/components/Tabs';

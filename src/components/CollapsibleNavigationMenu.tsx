@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+
+import { Root, List, Item, Sub, Link } from '@radix-ui/react-navigation-menu';
 import _ from 'lodash';
 import { matchPath, NavLink, useLocation } from 'react-router-dom';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import { type MenuItem } from '@/constants/menus';
 
-import { Root, List, Item, Sub, Link } from '@radix-ui/react-navigation-menu';
-
 import { popoverMixins } from '@/styles/popoverMixins';
+
 import { Collapsible } from './Collapsible';
 
 type ElementProps<MenuItemValue extends string> = {
@@ -27,20 +28,13 @@ const NavItem = <MenuItemValue extends string>({
   const location = useLocation();
 
   return !href ? null : (
-    <Item
-      asChild
-      key={value}
-      value={value}
-    >
+    <Item asChild key={value} value={value}>
       <Link
         asChild
         active={!!matchPath(href, location.pathname)}
         onSelect={() => onSelect?.(value)}
       >
-        <NavLink
-          to={href}
-          {...props}
-        >
+        <NavLink to={href} {...props}>
           {label}
         </NavLink>
       </Link>
@@ -69,11 +63,7 @@ export const CollapsibleNavigationMenu = <MenuItemValue extends string>({
       <Styled.List>
         {items.map((item) =>
           !item.subitems ? (
-            <Styled.NavItem
-              key={item.value}
-              onSelect={onSelectItem}
-              {...item}
-            />
+            <Styled.NavItem key={item.value} onSelect={onSelectItem} {...item} />
           ) : (
             <Collapsible
               key={item.value}
@@ -88,11 +78,7 @@ export const CollapsibleNavigationMenu = <MenuItemValue extends string>({
             >
               <Styled.Sub defaultValue={item.subitems?.[0]}>
                 {item.subitems.map((subitem: MenuItem<MenuItemValue>) => (
-                  <Styled.NavItem
-                    key={subitem.value}
-                    onSelect={onSelectItem}
-                    {...subitem}
-                  />
+                  <Styled.NavItem key={subitem.value} onSelect={onSelectItem} {...subitem} />
                 ))}
               </Styled.Sub>
             </Collapsible>

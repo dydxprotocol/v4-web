@@ -3,11 +3,11 @@ import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
+
 import { useBreakpoints, useStringGetter } from '@/hooks';
 
 import { AttachedExpandingSection, DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
-
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
 import { AccountDetailsAndHistory } from './AccountDetailsAndHistory';

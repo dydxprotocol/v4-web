@@ -3,7 +3,9 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS, type StringKey } from '@/constants/localization';
+
 import { useBreakpoints, useStringGetter } from '@/hooks';
+
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 

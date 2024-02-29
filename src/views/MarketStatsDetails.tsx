@@ -1,10 +1,13 @@
 import { useEffect, useRef } from 'react';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+
 import { shallowEqual, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { LARGE_TOKEN_DECIMALS, TINY_PERCENT_DECIMALS } from '@/constants/numbers';
+
 import { useBreakpoints, useStringGetter } from '@/hooks';
+
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -12,9 +15,9 @@ import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
+import { NextFundingTimer } from '@/views/NextFundingTimer';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-
 import {
   getCurrentMarketConfig,
   getCurrentMarketData,
@@ -23,7 +26,6 @@ import {
 
 import { MustBigNumber } from '@/lib/numbers';
 
-import { NextFundingTimer } from '@/views/NextFundingTimer';
 import { MidMarketPrice } from './MidMarketPrice';
 
 type ElementProps = {

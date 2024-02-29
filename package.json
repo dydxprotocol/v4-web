@@ -120,6 +120,7 @@
     "@babel/core": "^7.22.5",
     "@dydxprotocol/v4-proto": "^3.0.0",
     "@ladle/react": "^4.0.2",
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/color": "^3.0.3",
     "@types/crypto-js": "^4.1.1",
     "@types/luxon": "^3.3.0",

@@ -6,8 +6,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 
 import { useApiState, useStringGetter, useURLConfigs } from '@/hooks';
-import { ChatIcon, LinkOutIcon } from '@/icons';
 
+import { ChatIcon, LinkOutIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';

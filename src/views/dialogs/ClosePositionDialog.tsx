@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
@@ -6,16 +7,17 @@ import { STRING_KEYS } from '@/constants/localization';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
-import { ClosePositionForm } from '@/views/forms/ClosePositionForm';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
+import { Output, OutputType } from '@/components/Output';
 import { Ring } from '@/components/Ring';
 import { VerticalSeparator } from '@/components/Separator';
 import { MidMarketPrice } from '@/views/MidMarketPrice';
-import { Output, OutputType } from '@/components/Output';
+import { ClosePositionForm } from '@/views/forms/ClosePositionForm';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketData } from '@/state/perpetualsSelectors';

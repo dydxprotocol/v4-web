@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import type { Story } from '@ladle/react';
 
 import { Input, InputType, InputProps } from '@/components/Input';

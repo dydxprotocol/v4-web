@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -55,7 +56,7 @@ export const usePreferenceMenu = () => {
         },
         {
           value: NotificationType.ReleaseUpdates,
-          label: "Release Updates",
+          label: 'Release Updates',
           slotAfter: (
             <Switch
               name={NotificationType.ReleaseUpdates}
@@ -64,7 +65,7 @@ export const usePreferenceMenu = () => {
             />
           ),
           onSelect: () => toggleNotifPreference(NotificationType.ReleaseUpdates),
-        }
+        },
       ],
     }),
     [stringGetter, enabledNotifs]

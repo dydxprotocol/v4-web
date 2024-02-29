@@ -7,7 +7,6 @@ import {
   AbacusPositionSide,
   AbacusPositionSides,
 } from '@/constants/abacus';
-
 import { PositionSide } from '@/constants/trade';
 
 /** @deprecated use ORDER_SIDES from constants/abacus */

@@ -16,13 +16,13 @@ CopyButtonStory.args = {
 
 CopyButtonStory.argTypes = {
   buttonType: {
-    options: ["text", "icon", "default"],
+    options: ['text', 'icon', 'default'],
     control: { type: 'select' },
-    defaultValue: "default",
+    defaultValue: 'default',
   },
   children: {
     options: ['some text to copy'],
     control: { type: 'select' },
     defaultValue: undefined,
-  }
+  },
 };

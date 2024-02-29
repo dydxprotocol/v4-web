@@ -1,4 +1,5 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+
 import { FundingDirection } from './markets';
 
 // ------ Depth Chart ------ //

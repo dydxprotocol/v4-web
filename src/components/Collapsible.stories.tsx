@@ -2,8 +2,8 @@ import type { Story } from '@ladle/react';
 
 import { Collapsible, type CollapsibleProps } from '@/components/Collapsible';
 
-import { StoryWrapper } from '.ladle/components';
 import { IconName } from './Icon';
+import { StoryWrapper } from '.ladle/components';
 
 export const CollapsibleStory: Story<CollapsibleProps> = (args) => (
   <StoryWrapper>

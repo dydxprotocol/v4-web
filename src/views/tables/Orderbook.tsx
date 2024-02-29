@@ -1,23 +1,17 @@
 import { useCallback, useMemo } from 'react';
+
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
 
-import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { type OrderbookLine } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { ORDERBOOK_MAX_ROWS_PER_SIDE } from '@/constants/orderbook';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
 
-import { calculateCanViewAccount } from '@/state/accountCalculators';
-import { setTradeFormInputs } from '@/state/inputs';
-
-import { getSubaccountOpenOrdersBySideAndPrice } from '@/state/accountSelectors';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-import { getCurrentMarketConfig, getCurrentMarketOrderbook } from '@/state/perpetualsSelectors';
-import { getCurrentInput } from '@/state/inputsSelectors';
-
-import { MustBigNumber } from '@/lib/numbers';
+import { breakpoints } from '@/styles';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
@@ -25,10 +19,16 @@ import { Output, OutputType } from '@/components/Output';
 import { type CustomRowConfig, TableRow } from '@/components/Table';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { OrderbookTradesOutput, OrderbookTradesTable } from './OrderbookTradesTable';
+import { calculateCanViewAccount } from '@/state/accountCalculators';
+import { getSubaccountOpenOrdersBySideAndPrice } from '@/state/accountSelectors';
+import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
+import { setTradeFormInputs } from '@/state/inputs';
+import { getCurrentInput } from '@/state/inputsSelectors';
+import { getCurrentMarketConfig, getCurrentMarketOrderbook } from '@/state/perpetualsSelectors';
 
-import { breakpoints } from '@/styles';
-import { layoutMixins } from '@/styles/layoutMixins';
+import { MustBigNumber } from '@/lib/numbers';
+
+import { OrderbookTradesOutput, OrderbookTradesTable } from './OrderbookTradesTable';
 
 type ElementProps = {
   maxRowsPerSide?: number;

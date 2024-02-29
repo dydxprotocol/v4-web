@@ -1,10 +1,10 @@
-import styled, { AnyStyledComponent, css } from 'styled-components';
 import { Link } from 'react-router-dom';
+import styled, { AnyStyledComponent, css } from 'styled-components';
+
+import { breakpoints } from '@/styles';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from '@/components/Icon';
-
-import { layoutMixins } from '@/styles/layoutMixins';
-import { breakpoints } from '@/styles';
 
 type ElementProps = {
   slotHeaderContent?: React.ReactNode;

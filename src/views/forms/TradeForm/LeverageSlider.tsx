@@ -1,14 +1,15 @@
 import { useCallback, useMemo } from 'react';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { Root, Thumb, Track } from '@radix-ui/react-slider';
 import _ from 'lodash';
-import { OrderSide } from '@dydxprotocol/v4-client-js';
+import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
 import { PositionSide } from '@/constants/trade';
 
-import { MustBigNumber, type BigNumberish } from '@/lib/numbers';
 import abacusStateManager from '@/lib/abacus';
+import { MustBigNumber, type BigNumberish } from '@/lib/numbers';
 
 type ElementProps = {
   leverage?: BigNumberish | null;

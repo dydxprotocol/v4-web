@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
-import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
+
 import { Root, Trigger, Content, Portal } from '@radix-ui/react-popover';
 import { useRect } from '@radix-ui/react-use-rect';
+import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
 
 import { popoverMixins } from '@/styles/popoverMixins';
 

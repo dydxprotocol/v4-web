@@ -1,10 +1,12 @@
 import { forwardRef } from 'react';
+
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import type { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { ORDERBOOK_ROW_HEIGHT } from '@/constants/orderbook';
+
 import { useStringGetter } from '@/hooks';
 
 import { Output, OutputType } from '@/components/Output';

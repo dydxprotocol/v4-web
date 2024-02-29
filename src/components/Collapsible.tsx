@@ -1,10 +1,10 @@
-import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
 import { Root, Trigger, Content } from '@radix-ui/react-collapsible';
+import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
 
 import { popoverMixins } from '@/styles/popoverMixins';
 
-import { HorizontalSeparatorFiller } from '@/components/Separator';
 import { Icon, IconName } from '@/components/Icon';
+import { HorizontalSeparatorFiller } from '@/components/Separator';
 
 type ElementProps = {
   defaultOpen?: boolean;

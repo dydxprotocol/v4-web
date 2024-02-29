@@ -1,9 +1,11 @@
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { breakpoints } from '@/styles';
 import { STRING_KEYS } from '@/constants/localization';
-import { layoutMixins } from '@/styles/layoutMixins';
+
 import { useStringGetter } from '@/hooks';
+
+import { breakpoints } from '@/styles';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Accordion } from '@/components/Accordion';
 import { Link } from '@/components/Link';
@@ -29,18 +31,18 @@ export const RewardsHelpPanel = () => {
     >
       <Accordion
         items={[
-        {
-          header: stringGetter({ key: STRING_KEYS.FAQ_WHO_IS_ELIGIBLE_QUESTION }),
-          content: stringGetter({ key: STRING_KEYS.FAQ_WHO_IS_ELIGIBLE_ANSWER }),
-        },
-        {
-          header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_QUESTION }),
-          content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_ANSWER }),
-        },
-        {
-          header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_QUESTION }),
-          content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_ANSWER }),
-        },
+          {
+            header: stringGetter({ key: STRING_KEYS.FAQ_WHO_IS_ELIGIBLE_QUESTION }),
+            content: stringGetter({ key: STRING_KEYS.FAQ_WHO_IS_ELIGIBLE_ANSWER }),
+          },
+          {
+            header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_QUESTION }),
+            content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_ANSWER }),
+          },
+          {
+            header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_QUESTION }),
+            content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_ANSWER }),
+          },
         ]}
       />
     </Styled.HelpCard>

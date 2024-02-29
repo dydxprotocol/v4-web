@@ -1,10 +1,10 @@
 import type { Story } from '@ladle/react';
-import { StoryWrapper } from '.ladle/components';
-
 import styled, { AnyStyledComponent } from 'styled-components';
+
 import { breakpoints } from '@/styles';
 
 import { PositionTile } from './PositionTile';
+import { StoryWrapper } from '.ladle/components';
 
 export const PositionTileStory: Story<Parameters<typeof PositionTile>[0]> = (args) => (
   <StoryWrapper>

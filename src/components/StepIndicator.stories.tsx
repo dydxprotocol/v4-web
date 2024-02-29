@@ -1,8 +1,7 @@
 import type { Story } from '@ladle/react';
 
-import { StoryWrapper } from '.ladle/components';
-
 import { StepIndicator, type StepIndicatorProps } from './StepIndicator';
+import { StoryWrapper } from '.ladle/components';
 
 export const StepIndicatorStory: Story<StepIndicatorProps> = (args) => (
   <StoryWrapper>

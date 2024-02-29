@@ -1,18 +1,18 @@
-import styled, { AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
-import { layoutMixins } from '@/styles/layoutMixins';
 import { useStringGetter } from '@/hooks';
 
-import { AssetIcon } from '@/components/AssetIcon';
+import { layoutMixins } from '@/styles/layoutMixins';
 
+import { AssetIcon } from '@/components/AssetIcon';
+import { PositionTile } from '@/views/PositionTile';
+
+import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketData } from '@/state/perpetualsSelectors';
-import { getCurrentMarketPositionData } from '@/state/accountSelectors';
-
-import { PositionTile } from '@/views/PositionTile';
 
 type ElementProps = {
   showNarrowVariation?: boolean;

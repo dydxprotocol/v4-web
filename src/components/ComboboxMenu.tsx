@@ -1,10 +1,12 @@
 import { Fragment, type ReactNode, useState } from 'react';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+
 import { Command } from 'cmdk';
+import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import { MenuItem, type MenuConfig } from '@/constants/menus';
-import { popoverMixins } from '@/styles/popoverMixins';
+
 import { layoutMixins } from '@/styles/layoutMixins';
+import { popoverMixins } from '@/styles/popoverMixins';
 
 import { Tag } from '@/components/Tag';
 

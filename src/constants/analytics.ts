@@ -1,10 +1,10 @@
+import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
+import type { OnboardingState, OnboardingSteps } from './account';
+import type { DialogTypes } from './dialogs';
 import type { SupportedLocales } from './localization';
 import type { DydxNetwork } from './networks';
-import type { OnboardingState, OnboardingSteps } from './account';
-import type { DydxAddress, WalletType, WalletConnectionType, EvmAddress } from './wallets';
-import type { DialogTypes } from './dialogs';
 import type { TradeTypes } from './trade';
-import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
+import type { DydxAddress, WalletType, WalletConnectionType, EvmAddress } from './wallets';
 
 // User properties
 export enum AnalyticsUserProperty {

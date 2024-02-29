@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { TransferInputField, TransferType } from '@/constants/abacus';
 import { AnalyticsEvent } from '@/constants/analytics';
 import { isMainnet } from '@/constants/networks';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DepositForm } from '@/views/forms/AccountManagementForms/DepositForm';

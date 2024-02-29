@@ -1,8 +1,10 @@
-import { getTradeFormInputs } from '@/state/inputsSelectors';
 import { useEffect } from 'react';
+
 import { shallowEqual, useSelector } from 'react-redux';
 
 import { TradeInputField } from '@/constants/abacus';
+
+import { getTradeFormInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 

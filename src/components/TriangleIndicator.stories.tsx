@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
+
 import type { Story } from '@ladle/react';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { TriangleIndicator, TriangleIndicatorProps } from '@/components/TriangleIndicator';
 
-import { StoryWrapper } from '.ladle/components';
 import { MustBigNumber } from '@/lib/numbers';
+
+import { StoryWrapper } from '.ladle/components';
 
 export const TriangleIndicatorStory: Story<{ value: number }> = (args) => {
   const [valueBN] = useState(MustBigNumber(args.value));

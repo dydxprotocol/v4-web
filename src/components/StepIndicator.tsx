@@ -16,7 +16,7 @@ export type StepIndicatorProps = ElementProps & StyleProps;
 export const StepIndicator = ({ className, currentStepIndex, totalSteps }: StepIndicatorProps) => (
   <Styled.StepIndicator
     className={className}
-    progress={(currentStepIndex - 1) / (totalSteps - 1) * 100}
+    progress={((currentStepIndex - 1) / (totalSteps - 1)) * 100}
   >
     {[...Array(totalSteps)].map((_, i) => (
       <Styled.Step

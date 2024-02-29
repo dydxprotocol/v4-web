@@ -1,7 +1,5 @@
 import { DateTime } from 'luxon';
 
-import { STRING_KEYS } from '@/constants/localization';
-
 import {
   AbacusOrderStatus,
   AbacusOrderType,
@@ -14,6 +12,7 @@ import {
   type OrderStatus,
   type PerpetualMarket,
 } from '@/constants/abacus';
+import { STRING_KEYS } from '@/constants/localization';
 
 import { IconName } from '@/components/Icon';
 

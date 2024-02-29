@@ -1,7 +1,22 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import styled, { AnyStyledComponent, css, keyframes } from 'styled-components';
-import { useSelector, shallowEqual } from 'react-redux';
+
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { curveStepAfter } from '@visx/curve';
+import { LinearGradient } from '@visx/gradient';
+import { Point } from '@visx/point';
+import {
+  Axis, // AnimatedAxis,
+  Grid, // AnimatedGrid,
+  LineSeries,
+  AreaSeries, // AnimatedAreaSeries,
+  buildChartTheme,
+  darkTheme,
+  DataProvider,
+  EventEmitterProvider,
+  type EventHandlerParams,
+} from '@visx/xychart';
+import { useSelector, shallowEqual } from 'react-redux';
+import styled, { AnyStyledComponent, css, keyframes } from 'styled-components';
 
 import {
   DepthChartDatum,
@@ -14,29 +29,14 @@ import { StringGetterFunction } from '@/constants/localization';
 import { useBreakpoints } from '@/hooks';
 import { useOrderbookValuesForDepthChart } from '@/hooks/Orderbook/useOrderbookValues';
 
-import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-
-import { XYChartWithPointerEvents } from '@/components/visx/XYChartWithPointerEvents';
-import {
-  Axis, // AnimatedAxis,
-  Grid, // AnimatedGrid,
-  LineSeries,
-  AreaSeries, // AnimatedAreaSeries,
-  buildChartTheme,
-  darkTheme,
-  DataProvider,
-  EventEmitterProvider,
-  type EventHandlerParams,
-} from '@visx/xychart';
-import { LinearGradient } from '@visx/gradient';
-import { curveStepAfter } from '@visx/curve';
-import { Point } from '@visx/point';
-import Tooltip from '@/components/visx/XYChartTooltipWithBounds';
-import { AxisLabelOutput } from '@/components/visx/AxisLabelOutput';
-
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { OutputType } from '@/components/Output';
+import { AxisLabelOutput } from '@/components/visx/AxisLabelOutput';
+import Tooltip from '@/components/visx/XYChartTooltipWithBounds';
+import { XYChartWithPointerEvents } from '@/components/visx/XYChartWithPointerEvents';
+
+import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
+import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 

@@ -1,5 +1,4 @@
 // Mock data for offline testing
-
 import type { MarketHistoricalFunding } from './abacus';
 import { timeUnits } from './time';
 

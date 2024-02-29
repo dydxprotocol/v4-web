@@ -15,7 +15,6 @@ import type {
   UsageRestriction,
   TradingRewards,
 } from '@/constants/abacus';
-
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { WalletType } from '@/constants/wallets';

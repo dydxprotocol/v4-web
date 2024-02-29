@@ -1,31 +1,30 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
-import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { ButtonShape } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
-import { LogoShortIcon, BellStrokeIcon } from '@/icons';
-
-import { headerMixins } from '@/styles/headerMixins';
-import { layoutMixins } from '@/styles/layoutMixins';
-import breakpoints from '@/styles/breakpoints';
 
 import { useTokenConfigs, useStringGetter, useURLConfigs } from '@/hooks';
+
+import { LogoShortIcon, BellStrokeIcon } from '@/icons';
+import breakpoints from '@/styles/breakpoints';
+import { headerMixins } from '@/styles/headerMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { VerticalSeparator } from '@/components/Separator';
-
 import { AccountMenu } from '@/views/menus/AccountMenu';
+import { LanguageSelector } from '@/views/menus/LanguageSelector';
 import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
 import { NotificationsMenu } from '@/views/menus/NotificationsMenu';
-import { LanguageSelector } from '@/views/menus/LanguageSelector';
 
-import { openDialog } from '@/state/dialogs';
 import { getHasSeenLaunchIncentives } from '@/state/configsSelectors';
+import { openDialog } from '@/state/dialogs';
 
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();

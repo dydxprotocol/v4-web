@@ -1,6 +1,8 @@
 import { useContext, createContext, useState } from 'react';
 
-const DialogAreaContext = createContext<ReturnType<typeof useDialogAreaContext> | undefined>(undefined);
+const DialogAreaContext = createContext<ReturnType<typeof useDialogAreaContext> | undefined>(
+  undefined
+);
 
 DialogAreaContext.displayName = 'DialogArea';
 
@@ -15,6 +17,6 @@ const useDialogAreaContext = () => {
 
   return {
     dialogArea,
-    setDialogArea
+    setDialogArea,
   };
 };

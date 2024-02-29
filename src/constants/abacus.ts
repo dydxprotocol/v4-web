@@ -1,7 +1,8 @@
 import Abacus, { kollections } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { PositionSide, TradeTypes } from './trade';
+
 import { STRING_KEYS } from './localization';
+import { PositionSide, TradeTypes } from './trade';
 
 export type Nullable<T> = T | null | undefined;
 

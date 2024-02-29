@@ -1,15 +1,15 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks';
 
-import { SearchSelectMenu } from '@/components/SearchSelectMenu';
-
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
+
+import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 
 import { getTransferInputs } from '@/state/inputsSelectors';
 

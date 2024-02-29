@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
+
 import { useDispatch } from 'react-redux';
 
 import { LocalStorageKey } from '@/constants/localStorage';
-
 import { DEFAULT_APP_ENVIRONMENT, type DydxNetwork } from '@/constants/networks';
 
 import { useLocalStorage } from '@/hooks';

@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
+
+import { StatusResponse } from '@0xsquid/sdk';
 import { useSelector } from 'react-redux';
 import styled, { css, type AnyStyledComponent } from 'styled-components';
-import { StatusResponse } from '@0xsquid/sdk';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { TransferNotificationTypes } from '@/constants/notifications';
@@ -10,8 +11,8 @@ import { useStringGetter, useURLConfigs } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Link } from '@/components/Link';
 import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { LoadingDots } from '@/components/Loading/LoadingDots';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 
