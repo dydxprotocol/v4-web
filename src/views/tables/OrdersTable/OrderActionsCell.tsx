@@ -37,6 +37,7 @@ export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) 
     <ActionsTableCell
       children={[
         <Styled.CancelButton
+          key="cancelorder"
           iconName={IconName.Close}
           shape={ButtonShape.Square}
           {...(isOrderStatusClearable(status)

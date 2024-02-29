@@ -21,6 +21,7 @@ export const PositionsActionsCell = ({ isDisabled }: ElementProps) => {
       children={[
         testFlags.configureSlTpFromPositionsTable && (
           <Styled.TriggersButton
+            key="edittriggers"
             onClick={onTriggersButtonClick}
             iconName={IconName.Pencil}
             shape={ButtonShape.Square}
@@ -29,6 +30,7 @@ export const PositionsActionsCell = ({ isDisabled }: ElementProps) => {
         ),
         testFlags.closePositionsFromPositionsTable && (
           <Styled.CloseButton
+            key="closepositions"
             onClick={onCloseButtonClick}
             iconName={IconName.Close}
             shape={ButtonShape.Square}
