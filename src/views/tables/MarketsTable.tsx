@@ -2,22 +2,26 @@ import { useMemo, useState } from 'react';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
+import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, type MarketData } from '@/constants/markets';
 import { FUNDING_DECIMALS, LARGE_TOKEN_DECIMALS } from '@/constants/numbers';
-import { AppRoute } from '@/constants/routes';
+import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
 import { useMarketsData } from '@/hooks/useMarketsData';
+import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
+import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
 import { type ColumnDef, MarketTableCell, Table, TableCell } from '@/components/Table';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { MarketFilter } from '@/views/MarketFilter';
+import { Toolbar } from '@/components/Toolbar';
 
 import { MustBigNumber } from '@/lib/numbers';
 
@@ -25,9 +29,11 @@ export const MarketsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
   const [filter, setFilter] = useState(MarketFilters.ALL);
+  const [searchFilter, setSearchFilter] = useState<string>();
   const navigate = useNavigate();
 
-  const { filteredMarkets, marketFilters } = useMarketsData(filter);
+  const { filteredMarkets, marketFilters } = useMarketsData(filter, searchFilter);
+  const { hasPotentialMarketsData } = usePotentialMarkets();
 
   const columns = useMemo<ColumnDef<MarketData>[]>(
     () =>
@@ -171,16 +177,15 @@ export const MarketsTable = ({ className }: { className?: string }) => {
 
   return (
     <>
-      {isTablet && (
-        <Styled.FilterWrapper>
-          <MarketFilter
-            selectedFilter={filter}
-            filters={marketFilters as MarketFilters[]}
-            onChangeFilter={setFilter}
-            withoutSearch
-          />
-        </Styled.FilterWrapper>
-      )}
+      <Toolbar>
+        <MarketFilter
+          selectedFilter={filter}
+          filters={marketFilters as MarketFilters[]}
+          onChangeFilter={setFilter}
+          onSearchTextChange={setSearchFilter}
+        />
+      </Toolbar>
+
       <Styled.Table
         withInnerBorders
         withOuterBorder={!isTablet}
@@ -196,16 +201,50 @@ export const MarketsTable = ({ className }: { className?: string }) => {
         }}
         columns={columns}
         className={className}
+        slotEmpty={
+          <Styled.MarketNotFound>
+            {filter === MarketFilters.NEW && !searchFilter ? (
+              <>
+                <h2>
+                  {stringGetter({
+                    key: STRING_KEYS.QUERY_NOT_FOUND,
+                    params: { QUERY: stringGetter({ key: STRING_KEYS.NEW }) },
+                  })}
+                </h2>
+                {hasPotentialMarketsData && (
+                  <p>{stringGetter({ key: STRING_KEYS.ADD_DETAILS_TO_LAUNCH_MARKET })}</p>
+                )}
+              </>
+            ) : (
+              <>
+                <h2>
+                  {stringGetter({
+                    key: STRING_KEYS.QUERY_NOT_FOUND,
+                    params: { QUERY: searchFilter ?? '' },
+                  })}
+                </h2>
+                <p>{stringGetter({ key: STRING_KEYS.MARKET_SEARCH_DOES_NOT_EXIST_YET })}</p>
+              </>
+            )}
+
+            {hasPotentialMarketsData && (
+              <div>
+                <Button
+                  onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
+                  size={ButtonSize.Small}
+                >
+                  {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })}
+                </Button>
+              </div>
+            )}
+          </Styled.MarketNotFound>
+        }
       />
     </>
   );
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.FilterWrapper = styled.div`
-  padding: 0 1rem;
-`;
 
 Styled.Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
@@ -250,4 +289,18 @@ Styled.Output = styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`
       : isPositive
       ? `var(--color-positive)`
       : `var(--color-text-1)`};
+`;
+
+Styled.MarketNotFound = styled.div`
+  ${layoutMixins.column}
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  padding: 2rem 1.5rem;
+
+  h2 {
+    font: var(--font-medium-book);
+    font-weight: 500;
+  }
 `;

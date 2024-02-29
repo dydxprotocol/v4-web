@@ -251,6 +251,16 @@ const useDydxClientContext = () => {
     [compositeClient]
   );
 
+  const getPerpetualMarketSparklines = useCallback(
+    async ({ period = 'SEVEN_DAYS' }: { period?: 'ONE_DAY' | 'SEVEN_DAYS' }) => {
+      if (compositeClient) {
+        return await compositeClient.indexerClient.markets.getPerpetualMarketSparklines(period);
+      }
+      return {};
+    },
+    [compositeClient]
+  );
+
   const getWithdrawalAndTransferGatingStatus = useCallback(async () => {
     return await compositeClient?.validatorClient.get.GetWithdrawalAndTransferGatingStatus();
   }, [compositeClient]);
@@ -277,6 +287,7 @@ const useDydxClientContext = () => {
     requestAllPerpetualMarkets,
     requestAllGovernanceProposals,
     getCandlesForDatafeed,
+    getPerpetualMarketSparklines,
     screenAddresses,
     getWithdrawalAndTransferGatingStatus,
     getWithdrawalCapacityByDenom,

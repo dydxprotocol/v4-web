@@ -20,6 +20,7 @@ import { useNextClobPairId } from './useNextClobPairId';
 import { useNow } from './useNow';
 import { useOnClickOutside } from './useOnClickOutside';
 import { usePageTitlePriceUpdates } from './usePageTitlePriceUpdates';
+import { usePerpetualMarketSparklines } from './usePerpetualMarketSparklines';
 import { useRestrictions } from './useRestrictions';
 import { useShouldShowFooter } from './useShouldShowFooter';
 import { useSelectedNetwork } from './useSelectedNetwork';
@@ -52,6 +53,7 @@ export {
   useNow,
   useOnClickOutside,
   usePageTitlePriceUpdates,
+  usePerpetualMarketSparklines,
   useRestrictions,
   useShouldShowFooter,
   useSelectedNetwork,

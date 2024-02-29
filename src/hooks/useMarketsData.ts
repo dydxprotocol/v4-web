@@ -2,6 +2,10 @@ import { useMemo } from 'react';
 import { useSelector, shallowEqual } from 'react-redux';
 
 import { MarketFilters, MARKET_FILTER_LABELS, type MarketData } from '@/constants/markets';
+import {
+  SEVEN_DAY_SPARKLINE_ENTRIES,
+  usePerpetualMarketSparklines,
+} from '@/hooks/usePerpetualMarketSparklines';
 
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
@@ -16,6 +20,21 @@ const filterFunctions = {
   [MarketFilters.DEFI]: (market: MarketData) => {
     return market.asset.tags?.toArray().includes('Defi');
   },
+  [MarketFilters.LAYER_2]: (market: MarketData) => {
+    return market.asset.tags?.toArray().includes('Layer 2');
+  },
+  [MarketFilters.NFT]: (market: MarketData) => {
+    return market.asset.tags?.toArray().includes('NFT');
+  },
+  [MarketFilters.GAMING]: (market: MarketData) => {
+    return market.asset.tags?.toArray().includes('Gaming');
+  },
+  [MarketFilters.AI]: (market: MarketData) => {
+    return market.asset.tags?.toArray().includes('AI');
+  },
+  [MarketFilters.NEW]: (market: MarketData) => {
+    return market.isNew;
+  },
 };
 
 export const useMarketsData = (
@@ -28,6 +47,7 @@ export const useMarketsData = (
 } => {
   const allPerpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
   const allAssets = useSelector(getAssets, shallowEqual) || {};
+  const sparklineData = usePerpetualMarketSparklines();
 
   const markets = useMemo(() => {
     return Object.values(allPerpetualMarkets)
@@ -35,6 +55,9 @@ export const useMarketsData = (
       .map((marketData) => ({
         asset: allAssets[marketData.assetId] ?? {},
         tickSizeDecimals: marketData.configs?.tickSizeDecimals,
+        isNew: Boolean(
+          sparklineData && sparklineData?.[marketData.id]?.length < SEVEN_DAY_SPARKLINE_ENTRIES
+        ),
         ...marketData,
         ...marketData.perpetual,
         ...marketData.configs,
@@ -58,6 +81,7 @@ export const useMarketsData = (
   const marketFilters = useMemo(
     () => [
       MarketFilters.ALL,
+      MarketFilters.NEW,
       ...Object.keys(MARKET_FILTER_LABELS).filter((marketFilter) =>
         markets.some((market) => market.asset?.tags?.toArray().some((tag) => tag === marketFilter))
       ),
