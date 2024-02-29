@@ -112,9 +112,9 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     PositionsTableColumnKey.AverageOpenAndClose,
                     ...(testFlags.closePositionsFromPositionsTable ||
                     testFlags.configureSlTpFromPositionsTable
-                      ? [PositionsTableColumnKey.Actions]
+                      ? [!isAccountViewOnly && PositionsTableColumnKey.Actions]
                       : []),
-                  ]
+                  ].filter(isTruthy)
             }
             onNavigate={() => setView(PanelView.CurrentMarket)}
           />
