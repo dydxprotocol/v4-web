@@ -365,16 +365,16 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
       proposalIds.push(proposalId);
     }
 
-    // Wait 5 seconds for proposals to be processed.
-    await sleep(5000);
+    // Wait 6 seconds for proposals to be processed.
+    await sleep(6000);
 
     // Vote YES on proposals from every wallet.
     for (const wallet of wallets) {
       retry(() => voteOnProposals(proposalIds, client, wallet));
     }
 
-    // Wait 5 seconds for votes to be processed.
-    await sleep(5000);
+    // Wait 6 seconds for votes to be processed.
+    await sleep(6000);
   }
 
   // Wait for voting period to end.
@@ -509,7 +509,7 @@ async function sleep(ms: number): Promise<void> {
 async function retry<T>(
   fn: () => Promise<T>,
   retries: number = 5,
-  delay: number = 2000,
+  delay: number = 2500,
 ): Promise<T> {
   try {
     return await fn();
