@@ -1,4 +1,4 @@
-import { isDev } from "@/constants/networks";
+import { isDev } from '@/constants/networks';
 
 export const log = (location: string, error: Error, metadata?: any) => {
   if (isDev) {

@@ -2,14 +2,15 @@ import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { TransferInputField, TransferType } from '@/constants/abacus';
-import { STRING_KEYS } from '@/constants/localization';
 import { ButtonSize } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
+
 import { useStringGetter } from '@/hooks';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { ToggleGroup } from '@/components/ToggleGroup';
-import { TransferForm } from '@/views/forms/TransferForm';
 import { WithdrawForm } from '@/views/forms/AccountManagementForms/WithdrawForm';
+import { TransferForm } from '@/views/forms/TransferForm';
 
 import { getTransferInputs } from '@/state/inputsSelectors';
 

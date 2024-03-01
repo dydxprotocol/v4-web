@@ -1,12 +1,14 @@
 import { memo } from 'react';
-import styled, { css } from 'styled-components';
-import { shallowEqual, useSelector } from 'react-redux';
+
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { shallowEqual, useSelector } from 'react-redux';
+import styled, { css } from 'styled-components';
 
 import { AbacusOrderSide } from '@/constants/abacus';
+import { TradeInputField } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { TradeInputField } from '@/constants/abacus';
+
 import { useStringGetter } from '@/hooks';
 
 import { ToggleGroup } from '@/components/ToggleGroup';

@@ -1,6 +1,5 @@
-import { createConfig, configureChains, mainnet, Chain } from 'wagmi';
-import { goerli } from 'wagmi/chains';
-
+// Custom connectors
+import type { ExternalProvider } from '@ethersproject/providers';
 import {
   arbitrum,
   arbitrumGoerli,
@@ -30,15 +29,15 @@ import {
   kava,
   sepolia,
 } from 'viem/chains';
-
-import { alchemyProvider } from 'wagmi/providers/alchemy';
-import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
-import { publicProvider } from 'wagmi/providers/public';
-
+import { createConfig, configureChains, mainnet, Chain } from 'wagmi';
+import { goerli } from 'wagmi/chains';
 import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet';
 import { InjectedConnector } from 'wagmi/connectors/injected';
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
+import { alchemyProvider } from 'wagmi/providers/alchemy';
+import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
+import { publicProvider } from 'wagmi/providers/public';
 
 import {
   type WalletConnection,
@@ -165,10 +164,6 @@ export const config = createConfig({
   publicClient,
   webSocketPublicClient,
 });
-
-// Custom connectors
-
-import type { ExternalProvider } from '@ethersproject/providers';
 
 // Create a custom wagmi InjectedConnector using a specific injected EIP-1193 provider (instead of wagmi's default detection logic)
 const createInjectedConnectorWithProvider = (provider: ExternalProvider) =>

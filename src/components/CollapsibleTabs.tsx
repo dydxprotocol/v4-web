@@ -1,26 +1,25 @@
 import { type ReactNode, useState } from 'react';
-import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
-
-import {
-  Content as TabsContent,
-  List as TabsList,
-  Root as TabsRoot,
-  Trigger as TabsTrigger,
-} from '@radix-ui/react-tabs';
 
 import {
   Content as CollapsibleContent,
   Root as CollapsibleRoot,
   Trigger as CollapsibleTrigger,
 } from '@radix-ui/react-collapsible';
+import {
+  Content as TabsContent,
+  List as TabsList,
+  Root as TabsRoot,
+  Trigger as TabsTrigger,
+} from '@radix-ui/react-tabs';
+import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { IconButton } from '@/components/IconButton';
 import { IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
+import { type TabItem } from '@/components/Tabs';
 import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
-import { type TabItem } from '@/components/Tabs';
 
 type ElementProps<TabItemsValue> = {
   defaultValue?: TabItemsValue;

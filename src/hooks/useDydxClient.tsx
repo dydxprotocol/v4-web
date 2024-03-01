@@ -1,5 +1,4 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 
 import {
   BECH32_PREFIX,
@@ -12,8 +11,8 @@ import {
   ValidatorConfig,
   type ProposalStatus,
 } from '@dydxprotocol/v4-client-js';
-
 import type { ResolutionString } from 'public/tradingview/charting_library';
+import { useSelector } from 'react-redux';
 
 import type { ConnectNetworkEvent, NetworkConfig } from '@/constants/abacus';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';

@@ -1,5 +1,4 @@
 import { DateTime } from 'luxon';
-
 import type {
   DatafeedConfiguration,
   ErrorCallback,
@@ -13,21 +12,21 @@ import type {
 } from 'public/tradingview/charting_library';
 
 import { Candle, RESOLUTION_MAP } from '@/constants/candles';
+
 import { useDydxClient } from '@/hooks';
 
 import { RootStore } from '@/state/_store';
 import { setCandles } from '@/state/perpetuals';
-
 import {
   getMarketConfig,
   getMarketIds,
   getPerpetualBarsForPriceChart,
 } from '@/state/perpetualsSelectors';
 
+import { log } from '../../telemetry';
+import { getAllSymbols, getHistorySlice, mapCandle } from '../utils';
 import { lastBarsCache } from './cache';
 import { subscribeOnStream, unsubscribeFromStream } from './streaming';
-import { getAllSymbols, getHistorySlice, mapCandle } from '../utils';
-import { log } from '../../telemetry';
 
 const timezone = DateTime.local().get('zoneName') as unknown as Timezone;
 

@@ -6,6 +6,7 @@ import type {
 } from 'public/tradingview/charting_library';
 
 import { RESOLUTION_MAP } from '@/constants/candles';
+
 import abacusStateManager from '@/lib/abacus';
 
 import { subscriptionsByChannelId } from './cache';

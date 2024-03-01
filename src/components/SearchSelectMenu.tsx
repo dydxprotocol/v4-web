@@ -1,8 +1,14 @@
 import { type ReactNode, useState, useRef } from 'react';
+
 import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import { type MenuConfig } from '@/constants/menus';
+
 import { useOnClickOutside } from '@/hooks';
+
+import breakpoints from '@/styles/breakpoints';
+import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { ComboboxMenu } from '@/components/ComboboxMenu';
 import { type DetailsItem } from '@/components/Details';
@@ -10,10 +16,6 @@ import { Icon, IconName } from '@/components/Icon';
 import { Popover, TriggerType } from '@/components/Popover';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithLabel } from '@/components/WithLabel';
-
-import { layoutMixins } from '@/styles/layoutMixins';
-import { formMixins } from '@/styles/formMixins';
-import breakpoints from '@/styles/breakpoints';
 
 type ElementProps = {
   asChild?: boolean;

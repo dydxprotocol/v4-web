@@ -1,7 +1,8 @@
 import { Dispatch, forwardRef, SetStateAction } from 'react';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+
 import { NumericFormat, type NumberFormatValues, type SourceInfo } from 'react-number-format';
 import type { SyntheticInputEvent } from 'react-number-format/types/types';
+import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import {
   LEVERAGE_DECIMALS,
@@ -10,8 +11,9 @@ import {
   USD_DECIMALS,
 } from '@/constants/numbers';
 
-import { BIG_NUMBERS } from '@/lib/numbers';
 import { useLocaleSeparators } from '@/hooks';
+
+import { BIG_NUMBERS } from '@/lib/numbers';
 
 export enum InputType {
   Currency = 'Currency',

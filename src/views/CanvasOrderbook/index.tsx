@@ -1,12 +1,13 @@
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import { Nullable, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { ORDERBOOK_HEIGHT, ORDERBOOK_MAX_ROWS_PER_SIDE } from '@/constants/orderbook';
-import { useStringGetter } from '@/hooks';
 
+import { useStringGetter } from '@/hooks';
 import {
   useCalculateOrderbookData,
   useCenterOrderbook,
@@ -19,9 +20,9 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Tag } from '@/components/Tag';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
+import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { OrderbookRow, SpreadRow } from './OrderbookRow';
 

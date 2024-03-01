@@ -1,5 +1,5 @@
-import type { ExternalProvider } from '@ethersproject/providers';
 import { type onboarding } from '@dydxprotocol/v4-client-js';
+import type { ExternalProvider } from '@ethersproject/providers';
 import type { suggestChain } from 'graz';
 
 import { STRING_KEYS } from '@/constants/localization';

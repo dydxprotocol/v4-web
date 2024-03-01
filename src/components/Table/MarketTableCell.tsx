@@ -1,6 +1,7 @@
 import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import type { Asset } from '@/constants/abacus';
+
 import { breakpoints } from '@/styles';
 
 import { AssetIcon } from '@/components/AssetIcon';

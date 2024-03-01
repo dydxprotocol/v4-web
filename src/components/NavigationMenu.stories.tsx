@@ -1,7 +1,7 @@
 import type { Story } from '@ladle/react';
+import { HashRouter } from 'react-router-dom';
 
 import { NavigationMenu } from '@/components/NavigationMenu';
-import { HashRouter } from 'react-router-dom';
 
 import { StoryWrapper } from '.ladle/components';
 

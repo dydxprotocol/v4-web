@@ -1,13 +1,13 @@
-import styled, { AnyStyledComponent } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-
-import { breakpoints } from '@/styles';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
+
 import { useBreakpoints, useDocumentTitle, useStringGetter } from '@/hooks';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
+import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';

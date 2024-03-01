@@ -1,5 +1,6 @@
-import { isMainnet } from '@/constants/networks';
 import { GetStatus, StatusResponse } from '@0xsquid/sdk';
+
+import { isMainnet } from '@/constants/networks';
 
 export const NATIVE_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 

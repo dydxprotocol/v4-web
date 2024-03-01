@@ -386,6 +386,13 @@
     "websiteLink": "https://www.pepe.vip/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/pepe/"
   },
+  "PORTAL-USD": {
+    "name": "PORTAL",
+    "tags": ["Gaming"],
+    "websiteLink": "https://www.portalgaming.com/",
+    "whitepaperLink": "https://portalxyz.nyc3.cdn.digitaloceanspaces.com/Portal_Whitepaper.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/portal-gaming/"
+  },
   "PYTH-USD": {
     "name": "Pyth Network",
     "tags": [],

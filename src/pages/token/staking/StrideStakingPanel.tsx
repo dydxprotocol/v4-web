@@ -1,8 +1,9 @@
-import styled, { AnyStyledComponent } from 'styled-components';
 import { useDispatch } from 'react-redux';
+import styled, { AnyStyledComponent } from 'styled-components';
 
-import { STRING_KEYS } from '@/constants/localization';
 import { DialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
+
 import { useStringGetter, useTokenConfigs, useURLConfigs } from '@/hooks';
 
 import { IconButton } from '@/components/IconButton';

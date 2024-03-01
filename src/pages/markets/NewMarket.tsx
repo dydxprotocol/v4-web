@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
+
 import { useNavigate } from 'react-router-dom';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
@@ -19,8 +20,8 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
-import { IconButton } from '@/components/IconButton';
 import { Icon, IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 import { Link } from '@/components/Link';
 import { NewMarketForm } from '@/views/forms/NewMarketForm';
 

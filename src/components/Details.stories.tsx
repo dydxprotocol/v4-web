@@ -1,11 +1,11 @@
 import type { Story } from '@ladle/react';
+import styled, { type AnyStyledComponent } from 'styled-components';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';
 
 import { StoryWrapper } from '.ladle/components';
-
-import styled, { type AnyStyledComponent } from 'styled-components';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 export const DetailsStory: Story<Parameters<typeof Details>[0]> = (args) => (
   <StoryWrapper>

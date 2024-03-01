@@ -1,16 +1,17 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
-import { STRING_KEYS } from '@/constants/localization';
 import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
+import { STRING_KEYS } from '@/constants/localization';
+
 import { useStringGetter } from '@/hooks';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DiffArrow } from '@/components/DiffArrow';
 import { Icon, IconName } from '@/components/Icon';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 import { Tag } from '@/components/Tag';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { getTransferInputs } from '@/state/inputsSelectors';
 

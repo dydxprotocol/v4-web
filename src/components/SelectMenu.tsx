@@ -1,6 +1,6 @@
 import React from 'react';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
 
+import { CheckIcon } from '@radix-ui/react-icons';
 import {
   Root,
   Value,
@@ -13,12 +13,13 @@ import {
   Portal,
   Icon as SelectIcon,
 } from '@radix-ui/react-select';
-import { CheckIcon } from '@radix-ui/react-icons';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
-import { popoverMixins } from '@/styles/popoverMixins';
 import { formMixins } from '@/styles/formMixins';
+import { popoverMixins } from '@/styles/popoverMixins';
 
 import { WithLabel } from '@/components/WithLabel';
+
 import { Icon, IconName } from './Icon';
 
 export const SelectMenu = <T extends string>({

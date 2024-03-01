@@ -1,8 +1,9 @@
 import { useContext } from 'react';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+
 import BigNumber from 'bignumber.js';
-import { useSelector } from 'react-redux';
 import { DateTime } from 'luxon';
+import { useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import {
   LEVERAGE_DECIMALS,
@@ -12,21 +13,22 @@ import {
   TOKEN_DECIMALS,
   USD_DECIMALS,
 } from '@/constants/numbers';
-
 import { UNICODE } from '@/constants/unicode';
-import { useLocaleSeparators, useStringGetter } from '@/hooks';
-import { layoutMixins } from '@/styles/layoutMixins';
-
-import { LoadingOutput } from './Loading/LoadingOutput';
-import { RelativeTime } from '@/components/RelativeTime';
-import { Tag } from '@/components/Tag';
 
 import { LoadingContext } from '@/contexts/LoadingContext';
+import { useLocaleSeparators, useStringGetter } from '@/hooks';
+
+import { layoutMixins } from '@/styles/layoutMixins';
+
+import { RelativeTime } from '@/components/RelativeTime';
+import { Tag } from '@/components/Tag';
 
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { type BigNumberish, MustBigNumber, isNumber } from '@/lib/numbers';
 import { getStringsForDateTimeDiff, getTimestamp } from '@/lib/timeUtils';
+
+import { LoadingOutput } from './Loading/LoadingOutput';
 
 export enum OutputType {
   Text = 'Text',

@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
+
 import type { Story } from '@ladle/react';
+import styled, { AnyStyledComponent } from 'styled-components';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DropdownHeaderMenu } from '@/components/DropdownHeaderMenu';
 
 import { StoryWrapper } from '.ladle/components';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 export const DropdownHeaderMenuStory: Story<Parameters<typeof DropdownHeaderMenu>> = (args) => {
   const [view, setView] = useState<string | undefined>();

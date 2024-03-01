@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
+
 import { useNavigate } from 'react-router-dom';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -19,9 +20,9 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
 import { type ColumnDef, MarketTableCell, Table, TableCell } from '@/components/Table';
+import { Toolbar } from '@/components/Toolbar';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { MarketFilter } from '@/views/MarketFilter';
-import { Toolbar } from '@/components/Toolbar';
 
 import { MustBigNumber } from '@/lib/numbers';
 

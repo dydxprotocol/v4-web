@@ -1,17 +1,17 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { shallowEqual, useSelector, useDispatch } from 'react-redux';
-import type { Nullable } from '@dydxprotocol/v4-abacus';
-import Long from 'long';
-import { type IndexedTx } from '@cosmjs/stargate';
-import type { EncodeObject } from '@cosmjs/proto-signing';
-import { Method } from '@cosmjs/tendermint-rpc';
 
+import type { EncodeObject } from '@cosmjs/proto-signing';
+import { type IndexedTx } from '@cosmjs/stargate';
+import { Method } from '@cosmjs/tendermint-rpc';
+import type { Nullable } from '@dydxprotocol/v4-abacus';
 import {
   type LocalWallet,
   SubaccountClient,
   type GovAddNewMarketParams,
   utils,
 } from '@dydxprotocol/v4-client-js';
+import Long from 'long';
+import { shallowEqual, useSelector, useDispatch } from 'react-redux';
 
 import type {
   AccountBalance,
@@ -19,7 +19,6 @@ import type {
   ParsingError,
   SubAccountHistoricalPNLs,
 } from '@/constants/abacus';
-
 import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { DydxAddress } from '@/constants/wallets';
@@ -28,13 +27,13 @@ import { setSubaccount, setHistoricalPnl, removeUncommittedOrderClientId } from 
 import { getBalances } from '@/state/accountSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { hashFromTx } from '@/lib/txUtils';
 import { log } from '@/lib/telemetry';
+import { hashFromTx } from '@/lib/txUtils';
 
 import { useAccounts } from './useAccounts';
-import { useTokenConfigs } from './useTokenConfigs';
 import { useDydxClient } from './useDydxClient';
 import { useGovernanceVariables } from './useGovernanceVariables';
+import { useTokenConfigs } from './useTokenConfigs';
 
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
 const SubaccountContext = createContext<SubaccountContextType>({} as SubaccountContextType);

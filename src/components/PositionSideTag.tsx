@@ -1,4 +1,5 @@
 import { POSITION_SIDE_STRINGS, PositionSide } from '@/constants/trade';
+
 import { useStringGetter } from '@/hooks';
 
 import { Tag, TagSign, TagSize, TagType } from '@/components/Tag';
@@ -21,7 +22,11 @@ export const PositionSideTag = ({ positionSide, size }: ElementProps & StyleProp
   const stringGetter = useStringGetter();
 
   return (
-    <Tag size={size} type={TagType.Side} sign={positionSideTagSign[positionSide || PositionSide.None]}>
+    <Tag
+      size={size}
+      type={TagType.Side}
+      sign={positionSideTagSign[positionSide || PositionSide.None]}
+    >
       {stringGetter({ key: POSITION_SIDE_STRINGS[positionSide || PositionSide.None] })}
     </Tag>
   );

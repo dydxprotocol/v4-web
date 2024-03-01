@@ -2,6 +2,7 @@ import { useSelector } from 'react-redux';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, PortfolioRoute } from '@/constants/routes';
+
 import { useBreakpoints, useStringGetter } from '@/hooks';
 
 import { AttachedExpandingSection } from '@/components/ContentSection';

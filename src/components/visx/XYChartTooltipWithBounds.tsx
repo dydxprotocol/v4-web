@@ -1,13 +1,11 @@
 // Forked from original XYChart Tooltip to use TooltipWithBounds instead of TooltipInPortal:
 // https://github.com/airbnb/visx/blob/master/packages/visx-xychart/src/components/Tooltip.tsx
-
 import React, { Fragment, useCallback, useContext, useEffect } from 'react';
 
+import { Group } from '@visx/group';
+import { PickD3Scale } from '@visx/scale';
 import { TooltipWithBounds } from '@visx/tooltip';
 import type { TooltipProps as BaseTooltipProps } from '@visx/tooltip/lib/tooltips/Tooltip';
-import { PickD3Scale } from '@visx/scale';
-import { Group } from '@visx/group';
-
 import {
   TooltipContext,
   DataContext,

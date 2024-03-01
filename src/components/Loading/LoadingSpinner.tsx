@@ -1,5 +1,6 @@
-import { layoutMixins } from '@/styles/layoutMixins';
 import styled, { type AnyStyledComponent, keyframes } from 'styled-components';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 // In some strange cases, hiding a spinner on one part of the page causes the linearGradient to
 // be hidden on all other instances of the page. An id can be passed in to prevent this.

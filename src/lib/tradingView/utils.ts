@@ -4,9 +4,9 @@ import { Candle, TradingViewBar, TradingViewSymbol } from '@/constants/candles';
 import { THEME_NAMES } from '@/constants/styles/colors';
 import type { ChartLineType } from '@/constants/tvchart';
 
-import { type AppColorMode, AppTheme } from '@/state/configs';
-
 import { Themes } from '@/styles/themes';
+
+import { type AppColorMode, AppTheme } from '@/state/configs';
 
 export const mapCandle = ({
   startedAt,

@@ -1,10 +1,11 @@
 import React from 'react';
+
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { type MenuConfig } from '@/constants/menus';
 
-import { Dialog, DialogPlacement, type DialogProps } from '@/components/Dialog';
 import { ComboboxMenu, type ComboboxMenuProps } from '@/components/ComboboxMenu';
+import { Dialog, DialogPlacement, type DialogProps } from '@/components/Dialog';
 
 type ElementProps<MenuItemValue extends string | number, MenuGroupValue extends string | number> = {
   title?: React.ReactNode;

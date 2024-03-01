@@ -1,7 +1,8 @@
 import { memo, useMemo, useState } from 'react';
+
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
-import { useSelector } from 'react-redux';
 
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -12,8 +13,8 @@ import { useStringGetter } from '@/hooks';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
-import { popoverMixins } from '@/styles/popoverMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
+import { popoverMixins } from '@/styles/popoverMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';

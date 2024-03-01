@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
-import styled, { css } from 'styled-components';
 
 import { Separator } from '@radix-ui/react-separator';
+import styled, { css } from 'styled-components';
 
 const StyledSeparator = styled(Separator)`
   flex: 0 !important;

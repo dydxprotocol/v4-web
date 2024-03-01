@@ -1,5 +1,5 @@
-import styled, { AnyStyledComponent } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -7,17 +7,18 @@ import { isMainnet } from '@/constants/networks';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { useStringGetter, useTokenConfigs } from '@/hooks';
-import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useGovernanceVariables } from '@/hooks/useGovernanceVariables';
+import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
-import { Panel } from '@/components/Panel';
+import { layoutMixins } from '@/styles/layoutMixins';
+
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
+import { Panel } from '@/components/Panel';
 import { Tag } from '@/components/Tag';
 
 import { MustBigNumber } from '@/lib/numbers';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 export const NewMarketsPanel = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();

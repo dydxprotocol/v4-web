@@ -1,10 +1,11 @@
 import { useState } from 'react';
+
 import type { Story } from '@ladle/react';
 import styled from 'styled-components';
 
-import { StoryWrapper } from '.ladle/components';
-
 import { Switch } from '@/components/Switch';
+
+import { StoryWrapper } from '.ladle/components';
 
 type SwitchProps = Parameters<typeof Switch>;
 

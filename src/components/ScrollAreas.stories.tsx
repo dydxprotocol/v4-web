@@ -1,8 +1,9 @@
-import styled, { AnyStyledComponent } from 'styled-components';
 import type { Story } from '@ladle/react';
+import styled, { AnyStyledComponent } from 'styled-components';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { StoryWrapper } from '.ladle/components';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 export const ScrollAreasStory: Story<{}> = (args) => (
   <StoryWrapper>
@@ -158,7 +159,7 @@ export const ScrollAreasStory: Story<{}> = (args) => (
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
-Styled.ScrollArea = styled.section<{ width: string, height: string, }>`
+Styled.ScrollArea = styled.section<{ width: string; height: string }>`
   ${layoutMixins.container}
   ${layoutMixins.scrollArea}
 

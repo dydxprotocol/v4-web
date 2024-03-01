@@ -1,6 +1,5 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
-
 import { Root, Thumb } from '@radix-ui/react-switch';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 type ElementProps = {
   checked: boolean;

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
@@ -12,7 +13,7 @@ import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { MobileTabs } from '@/components/Tabs';
 import { Tag, TagType } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
-
+import { PositionInfo } from '@/views/PositionInfo';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { OrdersTable, OrdersTableColumnKey } from '@/views/tables/OrdersTable';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
@@ -21,21 +22,17 @@ import {
   calculateHasUncommittedOrders,
   calculateIsAccountViewOnly,
 } from '@/state/accountCalculators';
-
 import {
   getCurrentMarketTradeInfoNumbers,
   getHasUnseenFillUpdates,
   getHasUnseenOrderUpdates,
   getTradeInfoNumbers,
 } from '@/state/accountSelectors';
-
 import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
-
-import { PositionInfo } from '@/views/PositionInfo';
 
 enum InfoSection {
   Position = 'Position',

@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { useSignTypedData } from 'wagmi';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
-import { useSelector } from 'react-redux';
+
 import { AES } from 'crypto-js';
+import { useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent, css } from 'styled-components';
+import { useSignTypedData } from 'wagmi';
 
 import { EvmDerivedAccountStatus } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';

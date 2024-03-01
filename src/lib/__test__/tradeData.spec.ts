@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { PositionSide } from '@/constants/trade';
+
 import { hasPositionSideChanged } from '../tradeData';
 
 describe('hasPositionSideChanged', () => {

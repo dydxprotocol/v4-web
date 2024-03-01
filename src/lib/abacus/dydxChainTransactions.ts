@@ -1,9 +1,7 @@
-import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
-import Long from 'long';
-import type { IndexedTx } from '@cosmjs/stargate';
-import { GAS_MULTIPLIER, encodeJson } from '@dydxprotocol/v4-client-js';
 import { EncodeObject } from '@cosmjs/proto-signing';
-
+import type { IndexedTx } from '@cosmjs/stargate';
+import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
+import { GAS_MULTIPLIER, encodeJson } from '@dydxprotocol/v4-client-js';
 import {
   CompositeClient,
   IndexerConfig,
@@ -18,6 +16,7 @@ import {
   OrderTimeInForce,
   OrderExecution,
 } from '@dydxprotocol/v4-client-js';
+import Long from 'long';
 
 import {
   type AbacusDYDXChainTransactionsProtocol,
@@ -30,11 +29,10 @@ import {
   type HumanReadableWithdrawPayload,
   type HumanReadableTransferPayload,
 } from '@/constants/abacus';
-
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { DialogTypes } from '@/constants/dialogs';
-import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 import { DydxChainId, isTestnet } from '@/constants/networks';
+import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 
 import { RootStore } from '@/state/_store';
 import { addUncommittedOrderClientId, removeUncommittedOrderClientId } from '@/state/account';

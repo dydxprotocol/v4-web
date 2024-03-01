@@ -1,18 +1,21 @@
 import { type Dispatch, type SetStateAction, useEffect, useState, useRef } from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
+
 import type { NumberFormatValues } from 'react-number-format';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useStringGetter } from '@/hooks';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { WithConfirmationPopover } from '@/components/WithConfirmationPopover';
+import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
 import { Input, InputType } from '@/components/Input';
 import { Output, OutputType } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
-import { FormInput } from '@/components/FormInput';
+import { WithConfirmationPopover } from '@/components/WithConfirmationPopover';
 
 enum EditorState {
   Viewing = 'Viewing',

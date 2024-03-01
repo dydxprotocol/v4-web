@@ -1,4 +1,5 @@
 import { type ChangeEvent, useState } from 'react';
+
 import type { Story } from '@ladle/react';
 
 import {
@@ -6,8 +7,8 @@ import {
   WithConfirmationPopoverProps,
 } from '@/components/WithConfirmationPopover';
 
-import { StoryWrapper } from '.ladle/components';
 import { Input, InputType } from './Input';
+import { StoryWrapper } from '.ladle/components';
 
 export const WithConfirmationPopoverStory: Story<WithConfirmationPopoverProps> = (args) => {
   const [textValue, setTextValue] = useState('');

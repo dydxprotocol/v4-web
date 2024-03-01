@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+
 import { shallowEqual, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import { Nullable } from '@/constants/abacus';
 
@@ -9,7 +10,10 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { LoadingDots } from '@/components/Loading/LoadingDots';
 import { Output, OutputType } from '@/components/Output';
 
-import { getCurrentMarketConfig, getCurrentMarketMidMarketPrice } from '@/state/perpetualsSelectors';
+import {
+  getCurrentMarketConfig,
+  getCurrentMarketMidMarketPrice,
+} from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 

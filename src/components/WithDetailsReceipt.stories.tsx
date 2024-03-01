@@ -1,10 +1,9 @@
 import type { Story } from '@ladle/react';
 
 import { Button } from '@/components/Button';
-
 import { WithDetailsReceipt, WithDetailsReceiptProps } from '@/components/WithDetailsReceipt';
-import { type DetailsItem } from './Details';
 
+import { type DetailsItem } from './Details';
 import { StoryWrapper } from '.ladle/components';
 
 const detailItems: DetailsItem[] = [

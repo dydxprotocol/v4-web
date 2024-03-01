@@ -1,6 +1,17 @@
 import React, { Fragment, Key, useCallback, useEffect, useMemo, useState } from 'react';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
 
+import {
+  Cell, // CollectionBuilderContext,
+  Column,
+  Row,
+  TableBody,
+  TableHeader,
+  type TableState,
+  useTableState,
+} from '@react-stately/table';
+import { type GridNode } from '@react-types/grid';
+import type { Node, SortDescriptor, SortDirection, CollectionChildren } from '@react-types/shared';
+import { type ColumnSize, type TableCollection } from '@react-types/table';
 import {
   useTable,
   useTableCell,
@@ -14,39 +25,23 @@ import {
   useFocusRing,
   useCollator,
 } from 'react-aria';
-
-import { type ColumnSize, type TableCollection } from '@react-types/table';
-import { type GridNode } from '@react-types/grid';
-
-import type { Node, SortDescriptor, SortDirection, CollectionChildren } from '@react-types/shared';
-
-import {
-  Cell,
-  // CollectionBuilderContext,
-  Column,
-  Row,
-  TableBody,
-  TableHeader,
-  type TableState,
-  useTableState,
-} from '@react-stately/table';
-
 import { useAsyncList } from 'react-stately';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
+
+import { STRING_KEYS } from '@/constants/localization';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
 import { MediaQueryKeys } from '@/hooks/useBreakpoints';
 
+import { CaretIcon } from '@/icons';
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
-import { CaretIcon } from '@/icons';
-
-import { STRING_KEYS } from '@/constants/localization';
 
 import { MustBigNumber } from '@/lib/numbers';
 
+import { Button } from './Button';
 import { Icon, IconName } from './Icon';
 import { Tag } from './Tag';
-import { Button } from './Button';
 
 export { TableCell } from './Table/TableCell';
 export { TableColumnHeader } from './Table/TableColumnHeader';

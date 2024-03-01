@@ -1,9 +1,11 @@
 import { useState } from 'react';
+
+import { Trigger } from '@radix-ui/react-tabs';
 import { useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
-import { Trigger } from '@radix-ui/react-tabs';
 
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useStringGetter } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -11,15 +13,14 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Icon, IconName } from '@/components/Icon';
 import { Tabs } from '@/components/Tabs';
 import { ToggleButton } from '@/components/ToggleButton';
-
-import { getSelectedLocale } from '@/state/localizationSelectors';
-
 import { AccountInfo } from '@/views/AccountInfo';
 import { DepthChart } from '@/views/charts/DepthChart';
-import { Orderbook } from '@/views/tables/Orderbook';
-import { LiveTrades } from '@/views/tables/LiveTrades';
 import { FundingChart } from '@/views/charts/FundingChart';
 import { TvChart } from '@/views/charts/TvChart';
+import { LiveTrades } from '@/views/tables/LiveTrades';
+import { Orderbook } from '@/views/tables/Orderbook';
+
+import { getSelectedLocale } from '@/state/localizationSelectors';
 
 enum Tab {
   Account = 'Account',

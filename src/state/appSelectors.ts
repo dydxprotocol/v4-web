@@ -1,4 +1,5 @@
 import { DydxChainId, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+
 import type { RootState } from './_store';
 
 export const getApiState = (state: RootState) => state.app.apiState;
