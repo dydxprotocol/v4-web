@@ -87,7 +87,7 @@ export const usePreferenceMenu = () => {
     [stringGetter, enabledNotifs]
   );
 
-  const miscSection = useMemo(
+  const otherSection = useMemo(
     () => ({
       group: 'Other',
       groupLabel: stringGetter({key: STRING_KEYS.OTHER}),
@@ -111,7 +111,7 @@ export const usePreferenceMenu = () => {
     [stringGetter, defaultToAllMarkets]
   );
 
-  return [notificationSection, miscSection];
+  return [notificationSection, otherSection];
 };
 
 type ElementProps = {
