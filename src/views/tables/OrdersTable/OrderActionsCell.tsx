@@ -10,12 +10,11 @@ import { useSubaccount } from '@/hooks';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
-import { Toolbar } from '@/components/Toolbar';
+import { ActionsTableCell } from '@/components/Table';
 
 import { clearOrder } from '@/state/account';
 
 import { isOrderStatusClearable } from '@/lib/orders';
-import { ActionsTableCell } from '@/components/Table';
 
 type ElementProps = {
   orderId: string;
@@ -35,9 +34,8 @@ export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) 
   }, []);
 
   return (
-    <ActionsTableCell
-      children={[
-        <Styled.CancelButton
+    <ActionsTableCell>
+      <Styled.CancelButton
           key="cancelorder"
           iconName={IconName.Close}
           shape={ButtonShape.Square}
@@ -50,9 +48,8 @@ export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) 
                   isDisabled: isCanceling || isDisabled || status === AbacusOrderStatus.canceling,
                 },
               })}
-        />,
-      ]}
-    />
+        />
+    </ActionsTableCell>
   );
 };
 

@@ -10,15 +10,14 @@ import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
-import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
+import { calculateShouldRenderActionsInPositionsTable } from '@/state/accountCalculators';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { testFlags } from '@/lib/testFlags';
 
 export const Positions = () => {
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
-  const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
+  const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable);
 
   return (
     <AttachedExpandingSection>
@@ -41,10 +40,7 @@ export const Positions = () => {
                 PositionsTableColumnKey.UnrealizedPnl,
                 PositionsTableColumnKey.RealizedPnl,
                 PositionsTableColumnKey.AverageOpenAndClose,
-                ...(testFlags.closePositionsFromPositionsTable ||
-                testFlags.configureSlTpFromPositionsTable
-                  ? [!isAccountViewOnly && PositionsTableColumnKey.Actions]
-                  : []),
+                shouldRenderActions && PositionsTableColumnKey.Actions
               ].filter(isTruthy)
         }
         currentRoute={`${AppRoute.Portfolio}/${PortfolioRoute.Positions}`}

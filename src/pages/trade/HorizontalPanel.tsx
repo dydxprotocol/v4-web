@@ -21,6 +21,7 @@ import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/Position
 import {
   calculateHasUncommittedOrders,
   calculateIsAccountViewOnly,
+  calculateShouldRenderActionsInPositionsTable,
 } from '@/state/accountCalculators';
 import {
   getCurrentMarketTradeInfoNumbers,
@@ -32,7 +33,6 @@ import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsS
 
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 enum InfoSection {
   Position = 'Position',
@@ -68,6 +68,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const hasUnseenOrderUpdates = useSelector(getHasUnseenOrderUpdates);
   const hasUnseenFillUpdates = useSelector(getHasUnseenFillUpdates);
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
+  const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable);
   const isWaitingForOrderToIndex = useSelector(calculateHasUncommittedOrders);
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
 
@@ -107,10 +108,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     PositionsTableColumnKey.UnrealizedPnl,
                     PositionsTableColumnKey.RealizedPnl,
                     PositionsTableColumnKey.AverageOpenAndClose,
-                    ...(testFlags.closePositionsFromPositionsTable ||
-                    testFlags.configureSlTpFromPositionsTable
-                      ? [!isAccountViewOnly && PositionsTableColumnKey.Actions]
-                      : []),
+                   shouldRenderActions && PositionsTableColumnKey.Actions,
                   ].filter(isTruthy)
             }
             onNavigate={() => setView(PanelView.CurrentMarket)}

@@ -17,9 +17,8 @@ export const PositionsActionsCell = ({ isDisabled }: ElementProps) => {
   const onCloseButtonClick = () => {};
 
   return (
-    <ActionsTableCell
-      children={[
-        testFlags.configureSlTpFromPositionsTable && (
+    <ActionsTableCell>
+        {testFlags.configureSlTpFromPositionsTable && (
           <Styled.TriggersButton
             key="edittriggers"
             onClick={onTriggersButtonClick}
@@ -27,8 +26,8 @@ export const PositionsActionsCell = ({ isDisabled }: ElementProps) => {
             shape={ButtonShape.Square}
             isDisabled={isDisabled}
           />
-        ),
-        testFlags.closePositionsFromPositionsTable && (
+        )}
+        {testFlags.closePositionsFromPositionsTable && (
           <Styled.CloseButton
             key="closepositions"
             onClick={onCloseButtonClick}
@@ -36,9 +35,8 @@ export const PositionsActionsCell = ({ isDisabled }: ElementProps) => {
             shape={ButtonShape.Square}
             isDisabled={isDisabled}
           />
-        ),
-      ]}
-    />
+        )}
+    </ActionsTableCell>
   );
 };
 
