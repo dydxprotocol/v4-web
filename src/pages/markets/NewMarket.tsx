@@ -33,7 +33,7 @@ const StepItem = ({
   title,
 }: {
   step: number;
-  subtitle: ReactNode;
+  subtitle: React.ReactNode;
   title: string;
 }) => (
   <Styled.StepItem>
