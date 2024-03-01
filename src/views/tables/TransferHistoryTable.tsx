@@ -5,7 +5,7 @@ import type { ColumnSize } from '@react-types/table';
 import { type SubaccountTransfer } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
-import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
+import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 
 import { useBreakpoints, useStringGetter, useURLConfigs } from '@/hooks';
 

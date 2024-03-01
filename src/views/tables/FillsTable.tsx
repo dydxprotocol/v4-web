@@ -7,7 +7,7 @@ import { Nullable } from '@dydxprotocol/v4-abacus';
 
 import { type Asset, type SubaccountFill } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
-import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
+import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
 

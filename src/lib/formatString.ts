@@ -3,9 +3,11 @@ import React from 'react';
 
 const PLACEHOLDER_REGEX = /(\{[\d|\w]+\})/;
 
-const formatString = (
+export type StringGetterParams = Record<string, any>;
+
+const formatString = <T extends StringGetterParams>(
   str: string,
-  params: { [key: string]: string | React.ReactNode } = {}
+  params?: T
 ): string | Array<string | React.ReactNode> => {
   let hasObject = false;
   const res = (str || '')
@@ -14,7 +16,7 @@ const formatString = (
     .map((textPart, index) => {
       if (textPart.match(PLACEHOLDER_REGEX)) {
         const matchedKey = textPart.slice(1, -1);
-        let valueForPlaceholder = params[matchedKey];
+        let valueForPlaceholder = params?.[matchedKey];
 
         if (React.isValidElement(valueForPlaceholder)) {
           hasObject = true;

@@ -10,7 +10,7 @@ import {
   POSITION_SIDES,
 } from '@/constants/abacus';
 
-import { StringGetterFunction, STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { PositionSide } from '@/constants/trade';
 import { useStringGetter } from '@/hooks';

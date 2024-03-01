@@ -1,7 +1,7 @@
 import { type Location, matchPath } from 'react-router-dom';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
-import { StringGetterFunction } from '@/constants/localization';
+import type { StringGetterFunction } from '@/constants/localization';
 
 import {
   type Nullable,

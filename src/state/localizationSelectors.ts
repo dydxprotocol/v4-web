@@ -1,8 +1,12 @@
-import type { ReactNode } from 'react';
 import { createSelector } from 'reselect';
 import _ from 'lodash';
 
-import { EN_LOCALE_DATA, LocaleData, SupportedLocales } from '@/constants/localization';
+import {
+  EN_LOCALE_DATA,
+  LocaleData,
+  StringGetterFunction,
+  SupportedLocales,
+} from '@/constants/localization';
 
 import formatString from '@/lib/formatString';
 
@@ -32,18 +36,23 @@ export const getSelectedLocale = (state: RootState): SupportedLocales =>
  * @param state
  * @returns
  */
-export const getStringGetterForLocaleData = (localeData: LocaleData) => {
-  return ({
-    key,
-    params = {},
-  }: {
-    key: any;
-    params?: Parameters<typeof formatString>[1];
-  }): string | ReactNode[] => {
+export const getStringGetterForLocaleData = (
+  localeData: LocaleData,
+  isLocaleLoaded: boolean
+): StringGetterFunction => {
+  // @ts-expect-error TODO: formatString return doesn't match StringGetterFunction
+  return (props) => {
     // Fallback to english whenever a key doesn't exist for other languages
-    const formattedString: string = _.get(localeData, key) || _.get(EN_LOCALE_DATA, key) || '';
+    if (isLocaleLoaded) {
+      const formattedString: string =
+        localeData || EN_LOCALE_DATA
+          ? _.get(localeData, props.key) || _.get(EN_LOCALE_DATA, props.key)
+          : '';
 
-    return formatString(formattedString, params);
+      return formatString(formattedString, props?.params);
+    }
+
+    return '';
   };
 };
 
@@ -52,6 +61,6 @@ export const getStringGetterForLocaleData = (localeData: LocaleData) => {
  * @returns
  */
 export const getLocaleStringGetter = createSelector(
-  [getSelectedLocaleData],
+  [getSelectedLocaleData, getIsLocaleLoaded],
   getStringGetterForLocaleData
 );

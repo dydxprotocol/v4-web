@@ -6,7 +6,11 @@ import type { Dispatch } from '@reduxjs/toolkit';
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
-import { STRING_KEYS, StringGetterFunction, TOOLTIP_STRING_KEYS } from '@/constants/localization';
+import {
+  STRING_KEYS,
+  type StringGetterFunction,
+  TOOLTIP_STRING_KEYS,
+} from '@/constants/localization';
 import { DydxChainAsset, wallets } from '@/constants/wallets';
 
 import { layoutMixins } from '@/styles/layoutMixins';

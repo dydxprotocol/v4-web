@@ -9,7 +9,7 @@ import {
   DepthChartSeries,
   SERIES_KEY_FOR_ORDER_SIDE,
 } from '@/constants/charts';
-import { StringGetterFunction } from '@/constants/localization';
+import type { StringGetterFunction } from '@/constants/localization';
 
 import { useBreakpoints } from '@/hooks';
 import { useOrderbookValuesForDepthChart } from '@/hooks/Orderbook/useOrderbookValues';

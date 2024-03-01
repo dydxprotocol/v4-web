@@ -46,9 +46,9 @@ const parseStringParamsForNotification = ({
 }: {
   stringGetter: StringGetterFunction;
   value: unknown;
-}): string => {
+}) => {
   if (STRING_KEY_VALUES[value as StringKey]) {
-    return stringGetter({ key: value as StringKey });
+    return stringGetter({ key: value as string });
   }
 
   return value as string;
