@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  ReactElement,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import { AnalyticsEvent } from '@/constants/analytics';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
@@ -223,17 +231,20 @@ const useNotificationsContext = () => {
           const displayData = getDisplayData(notification);
 
           const iconUrl =
-            displayData.icon && (await renderSvgToDataUrl(displayData.icon).catch(() => undefined));
+            displayData.icon &&
+            (await renderSvgToDataUrl(displayData.icon as ReactElement<any, 'svg'>).catch(
+              () => undefined
+            ));
 
           const pushNotification = new globalThis.Notification(displayData.title, {
             renotify: true,
             tag: getKey(notification),
             data: notification,
-            description: displayData.body,
-            icon: iconUrl ?? '/favicon.svg',
-            badge: iconUrl ?? '/favicon.svg',
-            image: iconUrl ?? '/favicon.svg',
-            vibrate: displayData.toastSensitivity === 'foreground',
+            body: displayData.body,
+            icon: iconUrl?.toString() ?? '/favicon.svg',
+            badge: iconUrl?.toString() ?? '/favicon.svg',
+            image: iconUrl?.toString() ?? '/favicon.svg',
+            vibrate: displayData.toastSensitivity === 'foreground' ? 200 : undefined,
             requireInteraction: displayData.toastDuration === Infinity,
             // actions: [
             //   {

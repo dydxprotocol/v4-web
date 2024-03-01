@@ -9,16 +9,16 @@ import { breakpoints } from '@/styles';
 import { StoryWrapper } from '.ladle/components';
 import { LeverageSlider } from './LeverageSlider';
 
-export const LeverageSliderStory: Story<Parameters<typeof LeverageSlider>> = (args) => {
+export const LeverageSliderStory: Story<Parameters<typeof LeverageSlider>[0]> = (args) => {
   const [leverage, setLeverage] = useState('');
 
   return (
     <StoryWrapper>
       <Styled.PositionInfoContainer>
         <LeverageSlider
+          {...args}
           leverageInputValue={leverage}
           setLeverageInputValue={setLeverage}
-          {...args}
         />
       </Styled.PositionInfoContainer>
     </StoryWrapper>

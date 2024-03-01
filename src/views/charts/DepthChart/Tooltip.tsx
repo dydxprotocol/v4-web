@@ -44,7 +44,7 @@ export const DepthChartTooltipContent = ({
   const { id = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
 
   const priceImpact = useMemo(() => {
-    if (nearestDatum) {
+    if (nearestDatum && midMarketPrice) {
       const depthChartSeries = nearestDatum.key as DepthChartSeries;
 
       return {
@@ -57,6 +57,7 @@ export const DepthChartTooltipContent = ({
         [DepthChartSeries.MidMarket]: undefined,
       }[depthChartSeries];
     }
+
     return undefined;
   }, [nearestDatum, chartPointAtPointer.price]);
 

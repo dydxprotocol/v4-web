@@ -1,16 +1,7 @@
 import styled from 'styled-components';
 
 import { AbacusOrderStatus } from '@/constants/abacus';
-
-import {
-  OrderCanceledIcon,
-  OrderFilledIcon,
-  OrderOpenIcon,
-  OrderPartiallyFilledIcon,
-  OrderPendingIcon,
-} from '@/icons';
-
-import { Icon } from '@/components/Icon';
+import { Icon, IconName } from '@/components/Icon';
 
 type ElementProps = {
   status: string;
@@ -22,44 +13,44 @@ type StyleProps = {
 };
 
 export const OrderStatusIcon = ({ className, status, totalFilled }: ElementProps & StyleProps) => {
-  const { iconComponent, color } = {
+  const { iconName, color } = {
     [AbacusOrderStatus.open.rawValue]:
       totalFilled > 0
         ? {
-            iconComponent: OrderPartiallyFilledIcon,
+            iconName: IconName.OrderPartiallyFilled,
             color: 'var(--color-warning)',
           }
         : {
-            iconComponent: OrderOpenIcon,
+            iconName: IconName.OrderOpen,
             color: 'var(--color-text-2)',
           },
     [AbacusOrderStatus.partiallyFilled.rawValue]: {
-      iconComponent: OrderPartiallyFilledIcon,
+      iconName: IconName.OrderPartiallyFilled,
       color: 'var(--color-warning)',
     },
     [AbacusOrderStatus.filled.rawValue]: {
-      iconComponent: OrderFilledIcon,
+      iconName: IconName.OrderFilled,
       color: 'var(--color-success)',
     },
     [AbacusOrderStatus.cancelled.rawValue]: {
-      iconComponent: OrderCanceledIcon,
+      iconName: IconName.OrderCanceled,
       color: 'var(--color-error)',
     },
     [AbacusOrderStatus.canceling.rawValue]: {
-      iconComponent: OrderPendingIcon,
+      iconName: IconName.OrderPending,
       color: 'var(--color-error)',
     },
     [AbacusOrderStatus.pending.rawValue]: {
-      iconComponent: OrderPendingIcon,
+      iconName: IconName.OrderPending,
       color: 'var(--color-text-2)',
     },
     [AbacusOrderStatus.untriggered.rawValue]: {
-      iconComponent: OrderPendingIcon,
+      iconName: IconName.OrderPending,
       color: 'var(--color-text-2)',
     },
   }[status];
 
-  return <$Icon className={className} iconComponent={iconComponent} color={color} />;
+  return <$Icon className={className} iconName={iconName} color={color} />;
 };
 
 const $Icon = styled(Icon)<{ color: string }>`

@@ -16,7 +16,7 @@ import { popoverMixins } from '@/styles/popoverMixins';
 type ElementProps = {
   tooltip?: keyof typeof tooltipStrings;
   tooltipString?: string;
-  stringParams?: Record<string, string>;
+  stringParams?: Record<string, string | undefined>;
   withIcon?: boolean;
   children?: ReactNode;
   slotTooltip?: ReactNode;

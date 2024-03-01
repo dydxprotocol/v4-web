@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { createSelector } from 'reselect';
 import _ from 'lodash';
 
@@ -37,8 +38,8 @@ export const getStringGetterForLocaleData = (localeData: LocaleData) => {
     params = {},
   }: {
     key: any;
-    params?: { [key: string]: string | React.ReactNode };
-  }): string | Array<string | React.ReactNode> => {
+    params?: Parameters<typeof formatString>[1];
+  }): string | ReactNode[] => {
     // Fallback to english whenever a key doesn't exist for other languages
     const formattedString: string = _.get(localeData, key) || _.get(EN_LOCALE_DATA, key) || '';
 

@@ -140,7 +140,7 @@ export const useChartLines = ({
         .createPositionLine({ disableUndo: false })
         .setText(label)
         .setPrice(formattedPrice)
-        .setQuantity(null);
+        .setQuantity('');
 
       if (positionLine) {
         const chartLine: ChartLine = { line: positionLine, chartLineType };

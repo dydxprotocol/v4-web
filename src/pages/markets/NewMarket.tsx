@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { type ReactNode, useMemo, useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,7 +26,15 @@ import { NewMarketForm } from '@/views/forms/NewMarketForm';
 
 import { MustBigNumber } from '@/lib/numbers';
 
-const StepItem = ({ step, subtitle, title }: { step: number; subtitle: string; title: string }) => (
+const StepItem = ({
+  step,
+  subtitle,
+  title,
+}: {
+  step: number;
+  subtitle: ReactNode;
+  title: string;
+}) => (
   <Styled.StepItem>
     <Styled.StepNumber>{step}</Styled.StepNumber>
     <Styled.Column>

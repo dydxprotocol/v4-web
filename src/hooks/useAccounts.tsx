@@ -27,6 +27,7 @@ import { useDydxClient } from './useDydxClient';
 import { useLocalStorage } from './useLocalStorage';
 import { useRestrictions } from './useRestrictions';
 import { useWalletConnection } from './useWalletConnection';
+import { OfflineSigner } from '@cosmjs/proto-signing';
 
 const AccountsContext = createContext<ReturnType<typeof useAccountsContext> | undefined>(undefined);
 
@@ -171,10 +172,7 @@ const useAccountsContext = () => {
     [localDydxWallet]
   );
 
-  const nobleAddress = useMemo(
-    () => localNobleWallet?.address,
-    [localNobleWallet]
-  );
+  const nobleAddress = useMemo(() => localNobleWallet?.address, [localNobleWallet]);
 
   const setWalletFromEvmSignature = async (signature: string) => {
     const { wallet, mnemonic, privateKey, publicKey } = await getWalletFromEvmSignature({
@@ -195,8 +193,9 @@ const useAccountsContext = () => {
       if (walletType === WalletType.TestWallet) {
         // Get override values. Use the testFlags value if it exists, otherwise use the previously
         // saved value where possible. If neither exist, use a default garbage value.
-        const addressOverride: DydxAddress = testFlags.addressOverride as DydxAddress ||
-          evmDerivedAddresses?.[TEST_WALLET_EVM_ADDRESS]?.dydxAddress as DydxAddress ||
+        const addressOverride: DydxAddress =
+          (testFlags.addressOverride as DydxAddress) ||
+          (evmDerivedAddresses?.[TEST_WALLET_EVM_ADDRESS]?.dydxAddress as DydxAddress) ||
           'dydx1';
 
         dispatch(setOnboardingState(OnboardingState.WalletConnected));
@@ -214,7 +213,7 @@ const useAccountsContext = () => {
       } else if (connectedDydxAddress && signerGraz) {
         dispatch(setOnboardingState(OnboardingState.WalletConnected));
         try {
-          setLocalDydxWallet(await LocalWallet.fromOfflineSigner(signerGraz));
+          setLocalDydxWallet(await LocalWallet.fromOfflineSigner(signerGraz as OfflineSigner));
           dispatch(setOnboardingState(OnboardingState.AccountConnected));
         } catch (error) {
           log('useAccounts/setLocalDydxWallet', error);
