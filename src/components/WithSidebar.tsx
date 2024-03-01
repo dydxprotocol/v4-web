@@ -1,16 +1,18 @@
 import React from 'react';
+
 import { useDispatch, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent, keyframes } from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useStringGetter } from '@/hooks';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { ToggleButton } from '@/components/ToggleButton';
 import { Icon, IconName } from '@/components/Icon';
+import { ToggleButton } from '@/components/ToggleButton';
 
 import { setIsSidebarOpen } from '@/state/layout';
 import { getIsSidebarOpen } from '@/state/layoutSelectors';

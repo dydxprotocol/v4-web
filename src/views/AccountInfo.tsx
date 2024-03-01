@@ -1,9 +1,11 @@
-import styled, { AnyStyledComponent, css } from 'styled-components';
 import { useSelector } from 'react-redux';
+import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useStringGetter } from '@/hooks';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';

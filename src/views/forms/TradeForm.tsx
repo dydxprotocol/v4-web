@@ -1,11 +1,9 @@
 import { type FormEvent, useState, Ref, useCallback } from 'react';
-import styled, { AnyStyledComponent, css } from 'styled-components';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import type { NumberFormatValues, SourceInfo } from 'react-number-format';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-
-import { AlertType } from '@/constants/alerts';
+import type { NumberFormatValues, SourceInfo } from 'react-number-format';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import {
   ErrorType,
@@ -14,7 +12,7 @@ import {
   TradeInputErrorAction,
   ValidationError,
 } from '@/constants/abacus';
-
+import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
@@ -25,12 +23,12 @@ import {
   ORDER_TYPE_STRINGS,
 } from '@/constants/trade';
 
-import { breakpoints } from '@/styles';
 import { useStringGetter, useSubaccount } from '@/hooks';
 import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
 
-import { layoutMixins } from '@/styles/layoutMixins';
+import { breakpoints } from '@/styles';
 import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
@@ -40,7 +38,6 @@ import { InputType } from '@/components/Input';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 import { WithTooltip } from '@/components/WithTooltip';
-
 import { Orderbook } from '@/views/tables/Orderbook';
 
 import { setTradeFormInputs } from '@/state/inputs';
@@ -56,10 +53,10 @@ import abacusStateManager from '@/lib/abacus';
 import { getSelectedOrderSide, getSelectedTradeType, getTradeInputAlert } from '@/lib/tradeData';
 
 import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
-import { TradeSizeInputs } from './TradeForm/TradeSizeInputs';
-import { TradeSideToggle } from './TradeForm/TradeSideToggle';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 import { PositionPreview } from './TradeForm/PositionPreview';
+import { TradeSideToggle } from './TradeForm/TradeSideToggle';
+import { TradeSizeInputs } from './TradeForm/TradeSizeInputs';
 
 type TradeBoxInputConfig = {
   key: TradeBoxKeys;

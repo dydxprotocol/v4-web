@@ -1,6 +1,12 @@
 import type { Story } from '@ladle/react';
 
-import { ButtonAction, ButtonShape, ButtonSize, ButtonState, ButtonType } from '@/constants/buttons';
+import {
+  ButtonAction,
+  ButtonShape,
+  ButtonSize,
+  ButtonState,
+  ButtonType,
+} from '@/constants/buttons';
 
 import { IconName } from '@/components/Icon';
 import { IconButton, type IconButtonProps } from '@/components/IconButton';
@@ -54,5 +60,5 @@ IconButtonStory.argTypes = {
     options: [true, false],
     control: { type: 'select' },
     defaultValue: false,
-  }
+  },
 };

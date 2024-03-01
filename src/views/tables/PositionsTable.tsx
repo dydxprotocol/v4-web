@@ -1,7 +1,7 @@
-import { useSelector, shallowEqual } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
-import { useNavigate } from 'react-router-dom';
 import type { ColumnSize } from '@react-types/table';
+import { useSelector, shallowEqual } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import {
   type Asset,
@@ -9,28 +9,28 @@ import {
   type SubaccountPosition,
   POSITION_SIDES,
 } from '@/constants/abacus';
-
-import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
+import { StringGetterFunction, STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { PositionSide } from '@/constants/trade';
+
 import { useStringGetter } from '@/hooks';
 import { MediaQueryKeys } from '@/hooks/useBreakpoints';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
-import { getExistingOpenPositions } from '@/state/accountSelectors';
-import { getAssets } from '@/state/assetsSelectors';
-import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
-
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
-import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { PositionSideTag } from '@/components/PositionSideTag';
 import { type ColumnDef, Table, TableColumnHeader } from '@/components/Table';
+import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TagSize } from '@/components/Tag';
+
+import { getExistingOpenPositions } from '@/state/accountSelectors';
+import { getAssets } from '@/state/assetsSelectors';
+import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 

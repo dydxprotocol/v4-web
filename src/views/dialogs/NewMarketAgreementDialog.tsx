@@ -1,10 +1,13 @@
 import { useState } from 'react';
+
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
-import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 import { STRING_KEYS } from '@/constants/localization';
+import { AppRoute, BASE_ROUTE } from '@/constants/routes';
+
 import { useStringGetter } from '@/hooks';
+
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 

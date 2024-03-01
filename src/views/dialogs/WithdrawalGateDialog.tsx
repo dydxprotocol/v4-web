@@ -2,7 +2,9 @@ import styled, { AnyStyledComponent } from 'styled-components';
 
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useStringGetter, useURLConfigs } from '@/hooks';
+
 import { LinkOutIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';
 

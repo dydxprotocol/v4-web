@@ -2,5 +2,19 @@
   "printWidth": 100,
   "singleQuote": true,
   "trailingComma": "es5",
-  "jsxBracketSameLine": false
+  "jsxBracketSameLine": false,
+  "plugins": ["@trivago/prettier-plugin-sort-imports"],
+  "importOrder": [
+    "^./polyfills$",
+    "^react$",
+    "<THIRD_PARTY_MODULES>",
+    "^@/(constants|abi)(.*)$",
+    "^@/(hooks|contexts)(.*)$",
+    "^@/(styles|icons)(.*)$",
+    "^@/(components|views|pages|layout)(.*)$",
+    "^@/state(.*)$",
+    "^@/lib(.*)$",
+    "^[./]"
+  ],
+  "importOrderSeparation": true
 }

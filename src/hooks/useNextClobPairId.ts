@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { useQuery } from 'react-query';
 
 import {
   MsgCreateClobPair,
@@ -13,8 +12,10 @@ import {
   TYPE_URL_MSG_DELAY_MESSAGE,
   TYPE_URL_MSG_UPDATE_CLOB_PAIR,
 } from '@dydxprotocol/v4-client-js';
+import { useQuery } from 'react-query';
 
 import type { PerpetualMarketResponse } from '@/constants/indexer';
+
 import { useDydxClient } from '@/hooks/useDydxClient';
 
 export const useNextClobPairId = () => {

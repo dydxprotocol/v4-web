@@ -1,11 +1,12 @@
 import { type ReactNode } from 'react';
-import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
+
 import { Content, List, Root, Trigger } from '@radix-ui/react-tabs';
+import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
+
+import { type MenuItem } from '@/constants/menus';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
-
-import { type MenuItem } from '@/constants/menus';
 
 import { DropdownSelectMenu } from '@/components/DropdownSelectMenu';
 import { Tag } from '@/components/Tag';

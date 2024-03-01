@@ -1,7 +1,6 @@
 import type { AbacusWebsocketProtocol } from '@/constants/abacus';
 import type { TradingViewBar } from '@/constants/candles';
 import { isDev } from '@/constants/networks';
-
 import {
   PING_INTERVAL_MS,
   PONG_TIMEOUT_MS,
@@ -10,8 +9,8 @@ import {
 } from '@/constants/websocket';
 
 import { lastSuccessfulWebsocketRequestByOrigin } from '@/hooks/useAnalytics';
-import { testFlags } from '@/lib/testFlags';
 
+import { testFlags } from '@/lib/testFlags';
 import { subscriptionsByChannelId } from '@/lib/tradingView/dydxfeed/cache';
 import { mapCandle } from '@/lib/tradingView/utils';
 

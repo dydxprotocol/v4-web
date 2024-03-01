@@ -1,9 +1,10 @@
 import { lazy, Suspense, useMemo } from 'react';
+
+import { GrazProvider } from 'graz';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 import { WagmiConfig } from 'wagmi';
-import { QueryClient, QueryClientProvider } from 'react-query';
-import { GrazProvider } from 'graz';
 
 import { AppRoute, DEFAULT_TRADE_ROUTE, MarketsRoute } from '@/constants/routes';
 
@@ -14,37 +15,35 @@ import {
   useShouldShowFooter,
   useAnalytics,
 } from '@/hooks';
-import { DydxProvider } from '@/hooks/useDydxClient';
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
 import { DialogAreaProvider, useDialogArea } from '@/hooks/useDialogArea';
+import { DydxProvider } from '@/hooks/useDydxClient';
+import { LocalNotificationsProvider } from '@/hooks/useLocalNotifications';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
-import { LocalNotificationsProvider } from '@/hooks/useLocalNotifications';
 import { PotentialMarketsProvider } from '@/hooks/usePotentialMarkets';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
 
+import { breakpoints } from '@/styles';
+import '@/styles/constants.css';
+import '@/styles/fonts.css';
+import { GlobalStyle } from '@/styles/globalStyle';
+import { layoutMixins } from '@/styles/layoutMixins';
+import '@/styles/web3modal.css';
+
 import { GuardedMobileRoute } from '@/components/GuardedMobileRoute';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
-
-import { HeaderDesktop } from '@/layout/Header/HeaderDesktop';
+import { DialogManager } from '@/layout/DialogManager';
 import { FooterDesktop } from '@/layout/Footer/FooterDesktop';
 import { FooterMobile } from '@/layout/Footer/FooterMobile';
+import { HeaderDesktop } from '@/layout/Header/HeaderDesktop';
 import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
-import { DialogManager } from '@/layout/DialogManager';
 import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 
 import { parseLocationHash } from '@/lib/urlUtils';
 import { config } from '@/lib/wagmi';
-
-import { breakpoints } from '@/styles';
-import { GlobalStyle } from '@/styles/globalStyle';
-import { layoutMixins } from '@/styles/layoutMixins';
-
-import '@/styles/constants.css';
-import '@/styles/fonts.css';
-import '@/styles/web3modal.css';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));

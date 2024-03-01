@@ -1,20 +1,17 @@
 import { type ReactNode, useEffect } from 'react';
-import styled from 'styled-components';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+
 import { isEqual, groupBy } from 'lodash';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 import { DialogTypes } from '@/constants/dialogs';
-import { AppRoute, TokenRoute } from '@/constants/routes';
-import { DydxChainAsset } from '@/constants/wallets';
-
 import {
   STRING_KEYS,
   STRING_KEY_VALUES,
   type StringGetterFunction,
   type StringKey,
 } from '@/constants/localization';
-
 import {
   type NotificationTypeConfig,
   NotificationType,
@@ -22,6 +19,8 @@ import {
   TransferNotificationTypes,
   ReleaseUpdateNotificationIds,
 } from '@/constants/notifications';
+import { AppRoute, TokenRoute } from '@/constants/routes';
+import { DydxChainAsset } from '@/constants/wallets';
 
 import { useStringGetter, useTokenConfigs } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
@@ -33,10 +32,10 @@ import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
 import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
-import { getSelectedDydxChainId } from '@/state/appSelectors';
 
 import { formatSeconds } from '@/lib/timeUtils';
 

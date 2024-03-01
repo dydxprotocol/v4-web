@@ -1,5 +1,4 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-
 import type {
   IChartingLibraryWidget,
   IOrderLineAdapter,

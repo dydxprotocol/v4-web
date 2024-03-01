@@ -1,12 +1,12 @@
-import styled, { AnyStyledComponent } from 'styled-components';
 import { Link } from 'react-router-dom';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import type { MenuItem } from '@/constants/menus';
 
-import { Icon, IconName } from '@/components/Icon';
-
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
+
+import { Icon, IconName } from '@/components/Icon';
 
 export const PageMenuNavigationItem = <
   MenuItemValue extends string,

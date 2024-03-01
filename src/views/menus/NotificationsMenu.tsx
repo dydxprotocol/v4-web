@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
-import styled from 'styled-components';
-import { layoutMixins } from '@/styles/layoutMixins';
+
 import { groupBy } from 'lodash';
+import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -9,6 +9,8 @@ import { type Notification, NotificationStatus } from '@/constants/notifications
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
 import { useNotifications } from '@/hooks/useNotifications';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';

@@ -1,28 +1,29 @@
 import { useEffect, useState } from 'react';
+
 import { useSelector, shallowEqual } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 
 import { AnalyticsEvent, AnalyticsUserProperty } from '@/constants/analytics';
-
-import { track, identify } from '@/lib/analytics';
-
-import { useApiState } from './useApiState';
-import { useBreakpoints } from './useBreakpoints';
-import { useSelectedNetwork } from './useSelectedNetwork';
-import { useAccounts } from './useAccounts';
-import { useDydxClient } from './useDydxClient';
-
-import { getSelectedLocale } from '@/state/localizationSelectors';
-import { getOnboardingState, getSubaccountId } from '@/state/accountSelectors';
-import { calculateOnboardingStep } from '@/state/accountCalculators';
-import { getActiveDialog } from '@/state/dialogsSelectors';
 import type { DialogTypes } from '@/constants/dialogs';
 
-import { getSelectedTradeType } from '@/lib/tradeData';
+import { calculateOnboardingStep } from '@/state/accountCalculators';
+import { getOnboardingState, getSubaccountId } from '@/state/accountSelectors';
+import { getActiveDialog } from '@/state/dialogsSelectors';
 import { getInputTradeData } from '@/state/inputsSelectors';
+import { getSelectedLocale } from '@/state/localizationSelectors';
+
+import { track, identify } from '@/lib/analytics';
+import { getSelectedTradeType } from '@/lib/tradeData';
+
+import { useAccounts } from './useAccounts';
+import { useApiState } from './useApiState';
+import { useBreakpoints } from './useBreakpoints';
+import { useDydxClient } from './useDydxClient';
+import { useSelectedNetwork } from './useSelectedNetwork';
 
 export const useAnalytics = () => {
-  const { walletType, walletConnectionType, evmAddress, dydxAddress, selectedWalletType } = useAccounts();
+  const { walletType, walletConnectionType, evmAddress, dydxAddress, selectedWalletType } =
+    useAccounts();
   const { compositeClient } = useDydxClient();
 
   /** User properties */
@@ -30,19 +31,17 @@ export const useAnalytics = () => {
   // AnalyticsUserProperty.Breakpoint
   const breakpointMatches = useBreakpoints();
 
-  const breakpoint =
-    breakpointMatches.isMobile ?
-      'MOBILE'
-    : breakpointMatches.isTablet ?
-        'TABLET'
-    : breakpointMatches.isDesktopSmall ?
-        'DESKTOP_SMALL'
-    : breakpointMatches.isDesktopMedium ?
-        'DESKTOP_MEDIUM'
-    : breakpointMatches.isDesktopLarge ?
-        'DESKTOP_LARGE'
-    :
-      'UNSUPPORTED';
+  const breakpoint = breakpointMatches.isMobile
+    ? 'MOBILE'
+    : breakpointMatches.isTablet
+    ? 'TABLET'
+    : breakpointMatches.isDesktopSmall
+    ? 'DESKTOP_SMALL'
+    : breakpointMatches.isDesktopMedium
+    ? 'DESKTOP_MEDIUM'
+    : breakpointMatches.isDesktopLarge
+    ? 'DESKTOP_LARGE'
+    : 'UNSUPPORTED';
 
   useEffect(() => {
     identify(AnalyticsUserProperty.Breakpoint, breakpoint);
@@ -88,7 +87,6 @@ export const useAnalytics = () => {
     identify(AnalyticsUserProperty.SubaccountNumber, subaccountNumber);
   }, [subaccountNumber]);
 
-
   /** Events */
 
   // AnalyticsEvent.AppStart
@@ -97,7 +95,7 @@ export const useAnalytics = () => {
   }, []);
 
   // AnalyticsEvent.NetworkStatus
-  const { height, indexerHeight, status, trailingBlocks} = useApiState();
+  const { height, indexerHeight, status, trailingBlocks } = useApiState();
 
   useEffect(() => {
     if (status) {
@@ -114,7 +112,7 @@ export const useAnalytics = () => {
         elapsedTime: lastSuccessfulIndexerRpcQuery && Date.now() - lastSuccessfulIndexerRpcQuery,
         blockHeight: height ?? undefined,
         indexerBlockHeight: indexerHeight ?? undefined,
-        trailingBlocks: trailingBlocks ?? undefined
+        trailingBlocks: trailingBlocks ?? undefined,
       });
     }
   }, [status]);
@@ -152,7 +150,11 @@ export const useAnalytics = () => {
     const onClick = (e: MouseEvent) => {
       const anchorElement = (e.target as Element).closest('a');
 
-      if (anchorElement instanceof HTMLAnchorElement && anchorElement.href && anchorElement.hostname !== globalThis.location.hostname)
+      if (
+        anchorElement instanceof HTMLAnchorElement &&
+        anchorElement.href &&
+        anchorElement.hostname !== globalThis.location.hostname
+      )
         track(AnalyticsEvent.NavigateExternal, { link: anchorElement.href });
     };
     globalThis.addEventListener('click', onClick);

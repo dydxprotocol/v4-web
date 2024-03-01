@@ -1,6 +1,7 @@
 import { type FormEvent, useCallback, useEffect, useState } from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
+
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import {
   ClosePositionInputField,
@@ -11,16 +12,16 @@ import {
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
-import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { STRING_KEYS } from '@/constants/localization';
+import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { useBreakpoints, useIsFirstRender, useStringGetter, useSubaccount } from '@/hooks';
 import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
 
 import { breakpoints } from '@/styles';
-import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
@@ -28,23 +29,21 @@ import { FormInput } from '@/components/FormInput';
 import { InputType } from '@/components/Input';
 import { Tag } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
-
-import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
-
-import { Orderbook, orderbookMixins, type OrderbookScrollBehavior } from '@/views/tables/Orderbook';
-
 import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
+import { Orderbook, orderbookMixins, type OrderbookScrollBehavior } from '@/views/tables/Orderbook';
 
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-import { getClosePositionInputErrors, getInputClosePositionData } from '@/state/inputsSelectors';
-import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
 import { closeDialog } from '@/state/dialogs';
+import { getClosePositionInputErrors, getInputClosePositionData } from '@/state/inputsSelectors';
 import { getCurrentInput } from '@/state/inputsSelectors';
+import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 import { getTradeInputAlert } from '@/lib/tradeData';
+
+import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 
 const MAX_KEY = 'MAX';
 

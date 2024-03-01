@@ -1,10 +1,12 @@
-import styled, { AnyStyledComponent } from 'styled-components';
-import { useDispatch } from 'react-redux';
 import { Close } from '@radix-ui/react-dialog';
+import { useDispatch } from 'react-redux';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useAccounts, useStringGetter } from '@/hooks';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';

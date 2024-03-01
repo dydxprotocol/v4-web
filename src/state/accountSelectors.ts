@@ -13,14 +13,13 @@ import {
   HistoricalTradingReward,
   HistoricalTradingRewardsPeriod,
 } from '@/constants/abacus';
-
 import { OnboardingState } from '@/constants/account';
 
 import { getHydratedTradingData } from '@/lib/orders';
-import type { RootState } from './_store';
 
-import { getCurrentMarketId, getPerpetualMarkets } from './perpetualsSelectors';
+import type { RootState } from './_store';
 import { getAssets } from './assetsSelectors';
+import { getCurrentMarketId, getPerpetualMarkets } from './perpetualsSelectors';
 
 /**
  * @param state

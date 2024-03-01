@@ -1,13 +1,13 @@
 import { useCallback, useContext, createContext, useEffect, useState, useMemo } from 'react';
 
-import { useDispatch } from 'react-redux';
-import { AES, enc } from 'crypto-js';
 import { NOBLE_BECH32_PREFIX, LocalWallet, type Subaccount } from '@dydxprotocol/v4-client-js';
+import { AES, enc } from 'crypto-js';
+import { useDispatch } from 'react-redux';
 
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
 import { DialogTypes } from '@/constants/dialogs';
-import { STRING_KEYS } from '@/constants/localization';
 import { LocalStorageKey, LOCAL_STORAGE_VERSIONS } from '@/constants/localStorage';
+import { STRING_KEYS } from '@/constants/localization';
 import {
   DydxAddress,
   EvmAddress,

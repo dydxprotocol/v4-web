@@ -8,7 +8,7 @@ type ElementProps = {
 export const useInterval = ({ callback, periodInMs = 1000 }: ElementProps) => {
   useEffect(() => {
     callback?.();
-    
+
     const interval = setInterval(() => {
       callback?.();
     }, periodInMs);

@@ -1,7 +1,5 @@
-import { type Location, matchPath } from 'react-router-dom';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-
-import type { StringGetterFunction } from '@/constants/localization';
+import { type Location, matchPath } from 'react-router-dom';
 
 import {
   type Nullable,
@@ -11,8 +9,8 @@ import {
   ValidationError,
   ErrorType,
 } from '@/constants/abacus';
-
 import { AlertType } from '@/constants/alerts';
+import type { StringGetterFunction } from '@/constants/localization';
 import { PERCENT_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { TRADE_ROUTE } from '@/constants/routes';
 import { PositionSide, TradeTypes } from '@/constants/trade';

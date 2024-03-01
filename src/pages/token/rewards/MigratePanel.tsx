@@ -1,20 +1,20 @@
-import styled, { AnyStyledComponent } from 'styled-components';
 import { useSelector } from 'react-redux';
+import styled, { AnyStyledComponent } from 'styled-components';
 
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
-import { STRING_KEYS } from '@/constants/localization';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
 import { useAccountBalance, useBreakpoints, useStringGetter } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Details } from '@/components/Details';
-import { Panel } from '@/components/Panel';
 import { Button } from '@/components/Button';
-import { Link } from '@/components/Link';
+import { Details } from '@/components/Details';
 import { IconName, Icon } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
+import { Panel } from '@/components/Panel';
 import { VerticalSeparator } from '@/components/Separator';
 import { Tag } from '@/components/Tag';
 import { WithReceipt } from '@/components/WithReceipt';

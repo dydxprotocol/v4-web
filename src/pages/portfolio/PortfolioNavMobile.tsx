@@ -1,9 +1,11 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
-import { AppRoute, HistoryRoute, PortfolioRoute } from '@/constants/routes';
 import { STRING_KEYS } from '@/constants/localization';
+import { AppRoute, HistoryRoute, PortfolioRoute } from '@/constants/routes';
+
 import { useStringGetter } from '@/hooks';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { BackButton } from '@/components/BackButton';

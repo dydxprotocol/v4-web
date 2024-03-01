@@ -1,10 +1,12 @@
 import { useEffect, useMemo } from 'react';
+
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useMatch, useNavigate } from 'react-router-dom';
 
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
+
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 import { getSelectedNetwork } from '@/state/appSelectors';

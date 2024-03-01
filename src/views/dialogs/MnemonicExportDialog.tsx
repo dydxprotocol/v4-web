@@ -1,17 +1,20 @@
 import { useState } from 'react';
+
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useAccounts, useStringGetter } from '@/hooks';
+
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
+import { Checkbox } from '@/components/Checkbox';
 import { CopyButton } from '@/components/CopyButton';
 import { Dialog } from '@/components/Dialog';
-import { Checkbox } from '@/components/Checkbox';
 import { Icon, IconName } from '@/components/Icon';
 import { TimeoutButton } from '@/components/TimeoutButton';
 import { ToggleButton } from '@/components/ToggleButton';

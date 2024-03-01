@@ -1,8 +1,8 @@
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useStringGetter } from '@/hooks';
 
 import { MobileTabs } from '@/components/Tabs';
-
 import { MarketDetails } from '@/views/MarketDetails';
 import { MarketStatsDetails } from '@/views/MarketStatsDetails';
 

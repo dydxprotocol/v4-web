@@ -1,8 +1,8 @@
 import type { Story } from '@ladle/react';
 
-import { WithTooltip } from '@/components/WithTooltip';
-
 import { tooltipStrings } from '@/constants/tooltips';
+
+import { WithTooltip } from '@/components/WithTooltip';
 
 import { StoryWrapper } from '.ladle/components';
 

@@ -1,24 +1,28 @@
 import { lazy, Suspense } from 'react';
+
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { HistoryRoute, PortfolioRoute } from '@/constants/routes';
+
 import { useAccountBalance, useBreakpoints, useDocumentTitle, useStringGetter } from '@/hooks';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
-import { FundingPaymentsTable } from '@/views/tables/FundingPaymentsTable';
-import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { Tag, TagType } from '@/components/Tag';
 import { WithSidebar } from '@/components/WithSidebar';
+import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
+import { FundingPaymentsTable } from '@/views/tables/FundingPaymentsTable';
+import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 
 import { getOnboardingState, getSubaccount, getTradeInfoNumbers } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
@@ -26,7 +30,6 @@ import { openDialog } from '@/state/dialogs';
 import { shortenNumberForDisplay } from '@/lib/numbers';
 
 import { PortfolioNavMobile } from './PortfolioNavMobile';
-import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
 const Overview = lazy(() => import('./Overview').then((module) => ({ default: module.Overview })));
 const Positions = lazy(() =>

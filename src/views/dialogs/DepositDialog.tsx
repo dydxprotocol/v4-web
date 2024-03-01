@@ -1,4 +1,5 @@
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useBreakpoints, useStringGetter } from '@/hooks';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';

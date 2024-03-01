@@ -1,8 +1,9 @@
+import { DateTime } from 'luxon';
 import { useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
-import { DateTime } from 'luxon';
 
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useStringGetter } from '@/hooks';
 
 import { AssetIcon } from '@/components/AssetIcon';

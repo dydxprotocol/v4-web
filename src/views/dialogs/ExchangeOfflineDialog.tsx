@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
+
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { AbacusApiStatus } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
@@ -8,15 +9,15 @@ import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 
 import { useApiState, useStringGetter } from '@/hooks';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog } from '@/components/Dialog';
 import { Link } from '@/components/Link';
 import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
 
-import { closeDialog } from '@/state/dialogs';
-
 import { getSelectedNetwork } from '@/state/appSelectors';
+import { closeDialog } from '@/state/dialogs';
 import { getActiveDialog } from '@/state/dialogsSelectors';
 
 type ElementProps = {

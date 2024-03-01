@@ -1,16 +1,18 @@
 import styled, { AnyStyledComponent } from 'styled-components';
 
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks';
+
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
-import { useStringGetter } from '@/hooks';
 
+import { DYDXBalancePanel } from '../rewards/DYDXBalancePanel';
 import { StakingPanel } from './StakingPanel';
 import { StrideStakingPanel } from './StrideStakingPanel';
-import { DYDXBalancePanel } from '../rewards/DYDXBalancePanel';
-import { STRING_KEYS } from '@/constants/localization';
 
 export default () => {
   const stringGetter = useStringGetter();

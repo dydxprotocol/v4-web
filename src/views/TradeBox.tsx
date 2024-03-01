@@ -1,18 +1,18 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
-import { STRING_KEYS } from '@/constants/localization';
 import { TradeBoxDialogTypes } from '@/constants/dialogs';
-
-import { layoutMixins } from '@/styles/layoutMixins';
+import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { ClosePositionForm } from '@/views/forms/ClosePositionForm';
 
-import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { openDialogInTradeBox, closeDialogInTradeBox } from '@/state/dialogs';
+import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 

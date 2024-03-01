@@ -19,11 +19,11 @@ import {
   NotificationType,
 } from '@/constants/notifications';
 
-import { useLocalStorage } from './useLocalStorage';
-import { notificationTypes } from './useNotificationTypes';
-
 import { track } from '@/lib/analytics';
 import { renderSvgToDataUrl } from '@/lib/renderSvgToDataUrl';
+
+import { useLocalStorage } from './useLocalStorage';
+import { notificationTypes } from './useNotificationTypes';
 
 type NotificationsContextType = ReturnType<typeof useNotificationsContext>;
 

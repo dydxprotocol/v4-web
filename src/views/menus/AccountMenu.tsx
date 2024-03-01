@@ -1,7 +1,8 @@
 import { ElementType, memo } from 'react';
-import styled, { AnyStyledComponent, css } from 'styled-components';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+
 import type { Dispatch } from '@reduxjs/toolkit';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -13,9 +14,6 @@ import {
 } from '@/constants/localization';
 import { DydxChainAsset, wallets } from '@/constants/wallets';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-import { headerMixins } from '@/styles/headerMixins';
-
 import {
   useAccounts,
   useBreakpoints,
@@ -25,25 +23,27 @@ import {
   useURLConfigs,
 } from '@/hooks';
 
-import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
+import { headerMixins } from '@/styles/headerMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { CopyButton } from '@/components/CopyButton';
 import { DropdownMenu } from '@/components/DropdownMenu';
-import { Output, OutputType } from '@/components/Output';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
+import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
-
-import { AppTheme } from '@/state/configs';
-import { openDialog } from '@/state/dialogs';
+import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
+import { AppTheme } from '@/state/configs';
 import { getAppTheme } from '@/state/configsSelectors';
+import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { truncateAddress } from '@/lib/wallet';
 import { MustBigNumber } from '@/lib/numbers';
+import { truncateAddress } from '@/lib/wallet';
+
 import { getMobileAppUrl } from '../dialogs/MobileDownloadDialog';
 
 export const AccountMenu = () => {

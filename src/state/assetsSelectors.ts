@@ -1,5 +1,4 @@
 import type { RootState } from './_store';
-
 import { getCurrentMarketData } from './perpetualsSelectors';
 
 /**

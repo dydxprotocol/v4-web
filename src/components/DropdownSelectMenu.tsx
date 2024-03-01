@@ -1,5 +1,5 @@
 import { cloneElement } from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
+
 import {
   Root,
   Trigger,
@@ -10,14 +10,15 @@ import {
   Portal,
 } from '@radix-ui/react-dropdown-menu';
 import { CheckIcon } from '@radix-ui/react-icons';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { type MenuItem } from '@/constants/menus';
 
+import { layoutMixins } from '@/styles/layoutMixins';
+import { popoverMixins } from '@/styles/popoverMixins';
+
 import { Icon, IconName } from '@/components/Icon';
 import { Tag } from '@/components/Tag';
-
-import { popoverMixins } from '@/styles/popoverMixins';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 type ElementProps<MenuItemValue extends string> = {
   disabled?: boolean;

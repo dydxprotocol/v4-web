@@ -1,19 +1,23 @@
 import { useMemo, useState } from 'react';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+
 import { AES } from 'crypto-js';
+import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useAccounts, useStringGetter } from '@/hooks';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
+import { QrCode } from '@/components/QrCode';
 import { TimeoutButton } from '@/components/TimeoutButton';
 import { ToggleButton } from '@/components/ToggleButton';
-import { QrCode } from '@/components/QrCode';
+
 import { log } from '@/lib/telemetry';
 
 type ElementProps = {

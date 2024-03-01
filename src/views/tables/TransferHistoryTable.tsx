@@ -1,6 +1,6 @@
-import styled, { type AnyStyledComponent, css } from 'styled-components';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import type { ColumnSize } from '@react-types/table';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import { type SubaccountTransfer } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
@@ -20,8 +20,8 @@ import { Output, OutputType } from '@/components/Output';
 import { Table, TableCell, TableColumnHeader, type ColumnDef } from '@/components/Table';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
-import { getSubaccountTransfers } from '@/state/accountSelectors';
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
+import { getSubaccountTransfers } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { truncateAddress } from '@/lib/wallet';

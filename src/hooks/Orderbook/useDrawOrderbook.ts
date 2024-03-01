@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef } from 'react';
+
 import { shallowEqual, useSelector } from 'react-redux';
 
 import type { PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { SMALL_USD_DECIMALS, TOKEN_DECIMALS } from '@/constants/numbers';
-
 import {
   ORDERBOOK_ANIMATION_DURATION,
   ORDERBOOK_HEIGHT,
@@ -17,7 +17,6 @@ import { useAppThemeAndColorModeContext } from '@/hooks/useAppThemeAndColorMode'
 import { getCurrentMarketConfig, getCurrentMarketOrderbookMap } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
-
 import {
   getHistogramXValues,
   getRektFromIdx,

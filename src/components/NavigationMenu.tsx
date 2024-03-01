@@ -1,12 +1,4 @@
 import { forwardRef, Ref } from 'react';
-import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
-import { NavLink, matchPath, useLocation } from 'react-router-dom';
-
-import { MenuConfig, MenuItem } from '@/constants/menus';
-
-import { isExternalLink } from '@/lib/isExternalLink';
-
-import { popoverMixins } from '@/styles/popoverMixins';
 
 import {
   Root,
@@ -18,11 +10,18 @@ import {
   Sub,
   Viewport,
 } from '@radix-ui/react-navigation-menu';
+import { NavLink, matchPath, useLocation } from 'react-router-dom';
+import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
+
+import { MenuConfig, MenuItem } from '@/constants/menus';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+import { popoverMixins } from '@/styles/popoverMixins';
 
-import { Tag } from './Tag';
+import { isExternalLink } from '@/lib/isExternalLink';
+
 import { Icon, IconName } from './Icon';
+import { Tag } from './Tag';
 
 type ElementProps<MenuItemValue extends string, MenuGroupValue extends string> = {
   items: MenuConfig<MenuItemValue, MenuGroupValue>;

@@ -1,11 +1,15 @@
 import { useCallback } from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
+
 import { useDispatch } from 'react-redux';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useBreakpoints, useStringGetter, useURLConfigs } from '@/hooks';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
@@ -13,8 +17,6 @@ import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 
 import { closeDialog, openDialog } from '@/state/dialogs';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 type ElementProps = {
   setIsOpen: (open: boolean) => void;

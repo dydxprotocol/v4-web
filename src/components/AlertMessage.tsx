@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 type StyleProps = {

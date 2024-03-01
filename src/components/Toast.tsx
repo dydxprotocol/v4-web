@@ -1,15 +1,17 @@
 import { type MouseEvent, useEffect, useRef, useState } from 'react';
-import styled, { keyframes } from 'styled-components';
+
 import { Root, Action, Close } from '@radix-ui/react-toast';
+import styled, { keyframes } from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
-import { popoverMixins } from '@/styles/popoverMixins';
+
 import { breakpoints } from '@/styles';
+import { popoverMixins } from '@/styles/popoverMixins';
 
 import { Notification, type NotificationProps } from '@/components/Notification';
 
-import { IconButton } from './IconButton';
 import { IconName } from './Icon';
+import { IconButton } from './IconButton';
 
 type ElementProps = {
   isOpen?: boolean;

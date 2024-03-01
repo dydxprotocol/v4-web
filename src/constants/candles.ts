@@ -1,4 +1,5 @@
 import { ResolutionString } from 'public/tradingview/charting_library';
+
 import { timeUnits } from './time';
 
 export interface Candle {

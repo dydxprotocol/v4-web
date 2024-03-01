@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+
 import useLatest from 'use-latest';
 
 export type Handler = (event: MouseEvent) => void;

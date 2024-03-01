@@ -1,11 +1,14 @@
 import { useMemo, useState } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
+
 import { utils } from '@dydxprotocol/v4-client-js';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { NewMarketProposal } from '@/constants/potentialMarkets';
+
 import { useGovernanceVariables, useStringGetter, useTokenConfigs } from '@/hooks';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';

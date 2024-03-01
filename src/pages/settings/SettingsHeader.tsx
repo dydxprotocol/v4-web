@@ -2,6 +2,7 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { type StringGetterFunction, STRING_KEYS } from '@/constants/localization';
 import { AppRoute, MobileSettingsRoute } from '@/constants/routes';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { BackButton } from '@/components/BackButton';

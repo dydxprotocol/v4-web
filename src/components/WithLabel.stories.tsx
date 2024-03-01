@@ -1,13 +1,14 @@
 import { useState } from 'react';
+
 import type { Story } from '@ladle/react';
+import styled, { type AnyStyledComponent } from 'styled-components';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Input, InputType } from '@/components/Input';
 import { WithLabel } from '@/components/WithLabel';
 
 import { StoryWrapper } from '.ladle/components';
-
-import styled, { type AnyStyledComponent } from 'styled-components';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 export const WithLabelStory: Story<Parameters<typeof WithLabel>[0]> = (args) => {
   const [firstName, setFirstName] = useState('');

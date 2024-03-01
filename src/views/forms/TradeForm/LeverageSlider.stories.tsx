@@ -1,13 +1,15 @@
 import { useState } from 'react';
+
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { Story } from '@ladle/react';
 import styled, { AnyStyledComponent } from 'styled-components';
-import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { PositionSide } from '@/constants/trade';
+
 import { breakpoints } from '@/styles';
 
-import { StoryWrapper } from '.ladle/components';
 import { LeverageSlider } from './LeverageSlider';
+import { StoryWrapper } from '.ladle/components';
 
 export const LeverageSliderStory: Story<Parameters<typeof LeverageSlider>[0]> = (args) => {
   const [leverage, setLeverage] = useState('');

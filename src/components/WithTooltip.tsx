@@ -1,17 +1,18 @@
 import type { ReactNode } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
+
 import { Content, Portal, Provider, Root, Trigger, Arrow } from '@radix-ui/react-tooltip';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { tooltipStrings } from '@/constants/tooltips';
 
 import { useStringGetter, useURLConfigs } from '@/hooks';
 
-import { Icon, IconName } from '@/components/Icon';
-import { Link } from '@/components/Link';
-
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
+
+import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 
 type ElementProps = {
   tooltip?: keyof typeof tooltipStrings;

@@ -1,13 +1,14 @@
 import { useState } from 'react';
+
 import { useSelector, shallowEqual } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { ORDER_TYPE_STRINGS } from '@/constants/trade';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 import { useStringGetter } from '@/hooks';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';

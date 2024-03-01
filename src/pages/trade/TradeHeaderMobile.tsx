@@ -1,20 +1,20 @@
-import styled, { AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { AppRoute } from '@/constants/routes';
-import { layoutMixins } from '@/styles/layoutMixins';
 
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-import { getCurrentMarketData } from '@/state/perpetualsSelectors';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { BackButton } from '@/components/BackButton';
 import { Output, OutputType } from '@/components/Output';
+import { MidMarketPrice } from '@/views/MidMarketPrice';
+
+import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
+import { getCurrentMarketData } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
-
-import { MidMarketPrice } from '@/views/MidMarketPrice';
 
 export const TradeHeaderMobile = () => {
   const { name, id } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};

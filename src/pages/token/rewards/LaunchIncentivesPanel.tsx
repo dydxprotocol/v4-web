@@ -1,24 +1,23 @@
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+
 import { useQuery } from 'react-query';
+import { useDispatch } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { STRING_KEYS } from '@/constants/localization';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
 
-import { ChaosLabsIcon } from '@/icons';
-
-import breakpoints from '@/styles/breakpoints';
 import { useAccounts, useBreakpoints, useStringGetter } from '@/hooks';
 
+import { ChaosLabsIcon } from '@/icons';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Panel } from '@/components/Panel';
 import { Button } from '@/components/Button';
-
-import { Output, OutputType } from '@/components/Output';
 import { Icon, IconName } from '@/components/Icon';
+import { Output, OutputType } from '@/components/Output';
+import { Panel } from '@/components/Panel';
 import { Tag, TagSize } from '@/components/Tag';
 
 import { markLaunchIncentivesSeen } from '@/state/configs';

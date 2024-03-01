@@ -7,10 +7,11 @@ import {
   type Ref,
 } from 'react';
 
-import styled, { AnyStyledComponent } from 'styled-components';
 import { Anchor, Content, Portal, Root, Trigger } from '@radix-ui/react-popover';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { ButtonType } from '@/constants/buttons';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { IconName } from '@/components/Icon';
