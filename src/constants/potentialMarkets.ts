@@ -35,4 +35,4 @@ export type NewMarketProposal = {
   baseAsset: string;
 };
 
-export const NUM_ORACLES_TO_QUALIFY_AS_SAFE = 6;
+export const NUM_ORACLES_TO_QUALIFY_AS_SAFE = 5;
