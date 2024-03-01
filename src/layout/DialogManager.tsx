@@ -2,23 +2,21 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { DialogTypes } from '@/constants/dialogs';
 
-import { closeDialog, openDialog } from '@/state/dialogs';
-
-import { getActiveDialog } from '@/state/dialogsSelectors';
-
 import { ClosePositionDialog } from '@/views/dialogs/ClosePositionDialog';
 import { DepositDialog } from '@/views/dialogs/DepositDialog';
+import { FillDetailsDialog } from '@/views/dialogs/DetailsDialog/FillDetailsDialog';
+import { OrderDetailsDialog } from '@/views/dialogs/DetailsDialog/OrderDetailsDialog';
 import { DisconnectDialog } from '@/views/dialogs/DisconnectDialog';
 import { DisplaySettingsDialog } from '@/views/dialogs/DisplaySettingsDialog';
 import { ExchangeOfflineDialog } from '@/views/dialogs/ExchangeOfflineDialog';
-import { ExternalNavStrideDialog } from '@/views/dialogs/ExternalNavStrideDialog';
-import { HelpDialog } from '@/views/dialogs/HelpDialog';
 import { ExternalLinkDialog } from '@/views/dialogs/ExternalLinkDialog';
 import { ExternalNavKeplrDialog } from '@/views/dialogs/ExternalNavKeplrDialog';
+import { ExternalNavStrideDialog } from '@/views/dialogs/ExternalNavStrideDialog';
+import { HelpDialog } from '@/views/dialogs/HelpDialog';
 import { ManageFundsDialog } from '@/views/dialogs/ManageFundsDialog';
 import { MnemonicExportDialog } from '@/views/dialogs/MnemonicExportDialog';
-import { MobileSignInDialog } from '@/views/dialogs/MobileSignInDialog';
 import { MobileDownloadDialog } from '@/views/dialogs/MobileDownloadDialog';
+import { MobileSignInDialog } from '@/views/dialogs/MobileSignInDialog';
 import { NewMarketAgreementDialog } from '@/views/dialogs/NewMarketAgreementDialog';
 import { NewMarketMessageDetailsDialog } from '@/views/dialogs/NewMarketMessageDetailsDialog';
 import { OnboardingDialog } from '@/views/dialogs/OnboardingDialog';
@@ -31,8 +29,8 @@ import { TransferDialog } from '@/views/dialogs/TransferDialog';
 import { WithdrawDialog } from '@/views/dialogs/WithdrawDialog';
 import { WithdrawalGateDialog } from '@/views/dialogs/WithdrawalGateDialog';
 
-import { OrderDetailsDialog } from '@/views/dialogs/DetailsDialog/OrderDetailsDialog';
-import { FillDetailsDialog } from '@/views/dialogs/DetailsDialog/FillDetailsDialog';
+import { closeDialog, openDialog } from '@/state/dialogs';
+import { getActiveDialog } from '@/state/dialogsSelectors';
 
 export const DialogManager = () => {
   const dispatch = useDispatch();

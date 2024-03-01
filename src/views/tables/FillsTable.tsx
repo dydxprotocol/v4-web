@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+
+import { Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { ColumnSize } from '@react-types/table';
-import { Nullable } from '@dydxprotocol/v4-abacus';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import { type Asset, type SubaccountFill } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
@@ -16,23 +17,21 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
-import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { Table, TableCell, TableColumnHeader, type ColumnDef } from '@/components/Table';
+import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { TagSize } from '@/components/Tag';
 
+import { viewedFills } from '@/state/account';
 import {
   getCurrentMarketFills,
   getHasUnseenFillUpdates,
   getSubaccountFills,
 } from '@/state/accountSelectors';
-
 import { getAssets } from '@/state/assetsSelectors';
-import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
-import { viewedFills } from '@/state/account';
-
 import { openDialog } from '@/state/dialogs';
+import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { getHydratedTradingData } from '@/lib/orders';

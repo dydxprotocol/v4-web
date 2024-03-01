@@ -1,5 +1,5 @@
-import merge from 'lodash/merge';
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import merge from 'lodash/merge';
 
 import type {
   MarketOrderbook,
@@ -8,7 +8,6 @@ import type {
   PerpetualMarket,
   MarketHistoricalFunding,
 } from '@/constants/abacus';
-
 import { Candle, RESOLUTION_MAP } from '@/constants/candles';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID } from '@/constants/markets';

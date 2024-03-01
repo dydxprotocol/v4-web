@@ -1,16 +1,16 @@
 import { useCallback, useState } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
 
-import { useStringGetter } from '@/hooks';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import {
   HISTORICAL_TRADING_REWARDS_PERIODS,
   HistoricalTradingRewardsPeriod,
   HistoricalTradingRewardsPeriods,
 } from '@/constants/abacus';
-
-import { isMainnet } from '@/constants/networks';
 import { STRING_KEYS } from '@/constants/localization';
+import { isMainnet } from '@/constants/networks';
+
+import { useStringGetter } from '@/hooks';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';

@@ -1,5 +1,5 @@
-import styled, { type AnyStyledComponent, css } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import type { Nullable, TradeState } from '@/constants/abacus';
 import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
@@ -21,10 +21,9 @@ import { Output, OutputType } from '@/components/Output';
 import { UsageBars } from '@/components/UsageBars';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { openDialog } from '@/state/dialogs';
-
 import { calculateIsAccountLoading } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
+import { openDialog } from '@/state/dialogs';
 import { getInputErrors } from '@/state/inputsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 

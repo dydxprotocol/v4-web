@@ -1,13 +1,13 @@
 import { useEffect, useMemo } from 'react';
-import { useQuery } from 'react-query';
-import BigNumber from 'bignumber.js';
+
 import { encodeJson } from '@dydxprotocol/v4-client-js';
 import { ByteArrayEncoding } from '@dydxprotocol/v4-client-js/build/src/lib/helpers';
+import BigNumber from 'bignumber.js';
+import { useQuery } from 'react-query';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import { DialogTypes } from '@/constants/dialogs';
 import { isMainnet } from '@/constants/networks';
-import { useEnvFeatures } from './useEnvFeatures';
 
 import { getApiState } from '@/state/appSelectors';
 import { closeDialog, openDialog } from '@/state/dialogs';
@@ -18,6 +18,7 @@ import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 
 import { useDydxClient } from './useDydxClient';
+import { useEnvFeatures } from './useEnvFeatures';
 import { useTokenConfigs } from './useTokenConfigs';
 
 const BLOCK_TIME = isMainnet ? 1_000 : 1_500;

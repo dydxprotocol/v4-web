@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
-
 import type { ResolutionString } from 'public/tradingview/charting_library';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { DEFAULT_RESOLUTION, RESOLUTION_CHART_CONFIGS } from '@/constants/candles';
 import { DEFAULT_MARKETID } from '@/constants/markets';

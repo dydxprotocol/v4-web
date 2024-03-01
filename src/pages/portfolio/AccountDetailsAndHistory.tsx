@@ -1,27 +1,28 @@
 import { useMemo, useState } from 'react';
-import styled, { AnyStyledComponent, css } from 'styled-components';
-import { shallowEqual, useSelector } from 'react-redux';
+
 import { TooltipContextType } from '@visx/xychart';
 import BigNumber from 'bignumber.js';
+import { shallowEqual, useSelector } from 'react-redux';
+import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import type { Nullable } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
+
 import { useBreakpoints, useStringGetter } from '@/hooks';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
-import { getSelectedLocale } from '@/state/localizationSelectors';
-
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { WithLabel } from '@/components/WithLabel';
-
 import { PnlChart, type PnlDatum } from '@/views/charts/PnlChart';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
+
+import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';

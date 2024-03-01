@@ -1,8 +1,8 @@
-import styled, { AnyStyledComponent, css } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import styled, { AnyStyledComponent, css } from 'styled-components';
 
-import { isMainnet } from '@/constants/networks';
 import { STRING_KEYS } from '@/constants/localization';
+import { isMainnet } from '@/constants/networks';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
@@ -19,9 +19,9 @@ import { testFlags } from '@/lib/testFlags';
 import { DYDXBalancePanel } from './DYDXBalancePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { MigratePanel } from './MigratePanel';
+import { RewardHistoryPanel } from './RewardHistoryPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
-import { RewardHistoryPanel } from './RewardHistoryPanel';
 
 const RewardsPage = () => {
   const stringGetter = useStringGetter();

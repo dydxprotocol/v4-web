@@ -1,5 +1,5 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -7,12 +7,13 @@ import { DEFAULT_MARKETID } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
 
 import { useShouldShowFooter, useStringGetter } from '@/hooks';
+
+import { BellIcon, MarketsIcon, PortfolioIcon, ProfileIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { NavigationMenu } from '@/components/NavigationMenu';
 import { Icon, IconName } from '@/components/Icon';
-import { BellIcon, MarketsIcon, PortfolioIcon, ProfileIcon } from '@/icons';
 import { IconButton } from '@/components/IconButton';
+import { NavigationMenu } from '@/components/NavigationMenu';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { openDialog } from '@/state/dialogs';

@@ -1,12 +1,12 @@
 import { useSelector } from 'react-redux';
 
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useBreakpoints, useStringGetter } from '@/hooks';
 
-import { OrdersTable, OrdersTableColumnKey } from '@/views/tables/OrdersTable';
-
-import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { AttachedExpandingSection } from '@/components/ContentSection';
+import { ContentSectionHeader } from '@/components/ContentSectionHeader';
+import { OrdersTable, OrdersTableColumnKey } from '@/views/tables/OrdersTable';
 
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 

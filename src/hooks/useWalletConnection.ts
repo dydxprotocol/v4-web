@@ -1,11 +1,25 @@
 import { useCallback, useEffect, useState, useMemo } from 'react';
+
+import {
+  useSuggestChainAndConnect as useConnectGraz,
+  useAccount as useAccountGraz,
+  useDisconnect as useDisconnectGraz,
+  useOfflineSigners as useOfflineSignersGraz,
+  WalletType as CosmosWalletType,
+} from 'graz';
 import { useSelector } from 'react-redux';
+import {
+  useConnect as useConnectWagmi,
+  useAccount as useAccountWagmi,
+  useDisconnect as useDisconnectWagmi,
+  usePublicClient as usePublicClientWagmi,
+  useWalletClient as useWalletClientWagmi,
+} from 'wagmi';
 
 import { EvmDerivedAddresses } from '@/constants/account';
-import { STRING_KEYS } from '@/constants/localization';
 import { LocalStorageKey } from '@/constants/localStorage';
+import { STRING_KEYS } from '@/constants/localization';
 import { ENVIRONMENT_CONFIG_MAP, WALLETS_CONFIG_MAP } from '@/constants/networks';
-
 import {
   type DydxAddress,
   type EvmAddress,
@@ -17,29 +31,14 @@ import {
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
-import {
-  useConnect as useConnectWagmi,
-  useAccount as useAccountWagmi,
-  useDisconnect as useDisconnectWagmi,
-  usePublicClient as usePublicClientWagmi,
-  useWalletClient as useWalletClientWagmi,
-} from 'wagmi';
-import {
-  useSuggestChainAndConnect as useConnectGraz,
-  useAccount as useAccountGraz,
-  useDisconnect as useDisconnectGraz,
-  useOfflineSigners as useOfflineSignersGraz,
-  WalletType as CosmosWalletType,
-} from 'graz';
-
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 
+import { log } from '@/lib/telemetry';
+import { testFlags } from '@/lib/testFlags';
 import { resolveWagmiConnector } from '@/lib/wagmi';
 import { getWalletConnection, parseWalletError } from '@/lib/wallet';
-import { log } from '@/lib/telemetry';
 
 import { useStringGetter } from './useStringGetter';
-import { testFlags } from '@/lib/testFlags';
 
 export const useWalletConnection = () => {
   const stringGetter = useStringGetter();

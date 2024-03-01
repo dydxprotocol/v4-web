@@ -1,15 +1,14 @@
 import { type ElementType, useState, useEffect } from 'react';
+
+import { useSelector } from 'react-redux';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
+import { EvmDerivedAccountStatus, OnboardingSteps } from '@/constants/account';
 import { AnalyticsEvent } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
-import { EvmDerivedAccountStatus, OnboardingSteps } from '@/constants/account';
 import { wallets } from '@/constants/wallets';
 
-import { calculateOnboardingStep } from '@/state/accountCalculators';
-
-import { useSelector } from 'react-redux';
 import { useAccounts, useBreakpoints, useStringGetter } from '@/hooks';
 
 import { breakpoints } from '@/styles';
@@ -19,15 +18,16 @@ import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { Icon } from '@/components/Icon';
 import { Ring } from '@/components/Ring';
-
 import { TestnetDepositForm } from '@/views/forms/AccountManagementForms/TestnetDepositForm';
+
+import { calculateOnboardingStep } from '@/state/accountCalculators';
 
 import { track } from '@/lib/analytics';
 
+import { DepositForm } from '../forms/AccountManagementForms/DepositForm';
 import { AcknowledgeTerms } from './OnboardingDialog/AcknowledgeTerms';
 import { ChooseWallet } from './OnboardingDialog/ChooseWallet';
 import { GenerateKeys } from './OnboardingDialog/GenerateKeys';
-import { DepositForm } from '../forms/AccountManagementForms/DepositForm';
 
 type ElementProps = {
   setIsOpen?: (open: boolean) => void;

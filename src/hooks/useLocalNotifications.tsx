@@ -1,8 +1,10 @@
 import { createContext, useContext, useCallback, useEffect, useMemo } from 'react';
+
 import { useQuery } from 'react-query';
 
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import { type TransferNotifcation } from '@/constants/notifications';
+
 import { useAccounts } from '@/hooks/useAccounts';
 
 import { fetchSquidStatus, STATUS_ERROR_GRACE_PERIOD } from '@/lib/squid';

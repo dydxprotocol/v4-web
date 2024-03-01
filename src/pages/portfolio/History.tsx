@@ -1,10 +1,11 @@
 import { Outlet } from 'react-router-dom';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { HistoryRoute } from '@/constants/routes';
+
 import { useBreakpoints, useStringGetter } from '@/hooks';
 
-import styled, { AnyStyledComponent } from 'styled-components';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AttachedExpandingSection } from '@/components/ContentSection';

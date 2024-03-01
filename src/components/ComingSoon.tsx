@@ -1,7 +1,9 @@
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useStringGetter } from '@/hooks';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 export const ComingSoon = () => {

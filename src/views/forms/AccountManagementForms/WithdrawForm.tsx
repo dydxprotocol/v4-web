@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
+
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent } from 'styled-components';
 import { isAddress } from 'viem';
 
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
@@ -33,34 +34,33 @@ import {
 } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
-import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
+import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { Link } from '@/components/Link';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
-import { Icon, IconName } from '@/components/Icon';
-
 import { SourceSelectMenu } from '@/views/forms/AccountManagementForms/SourceSelectMenu';
 
-import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { getSubaccount } from '@/state/accountSelectors';
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { validateCosmosAddress } from '@/lib/addressUtils';
+import { track } from '@/lib/analytics';
 import { MustBigNumber } from '@/lib/numbers';
 import { getNobleChainId } from '@/lib/squid';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
-import { validateCosmosAddress } from '@/lib/addressUtils';
-import { track } from '@/lib/analytics';
 
 export const WithdrawForm = () => {
   const stringGetter = useStringGetter();

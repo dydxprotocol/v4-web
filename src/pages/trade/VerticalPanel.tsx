@@ -6,7 +6,6 @@ import { STRING_KEYS } from '@/constants/localization';
 import { useStringGetter } from '@/hooks';
 
 import { Tabs } from '@/components/Tabs';
-
 import { CanvasOrderbook } from '@/views/CanvasOrderbook';
 import { LiveTrades } from '@/views/tables/LiveTrades';
 

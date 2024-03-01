@@ -1,9 +1,10 @@
 import { type FormEvent, useEffect, useMemo, useState } from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
-import { type NumberFormatValues } from 'react-number-format';
-import { shallowEqual, useSelector } from 'react-redux';
-import type { SyntheticInputEvent } from 'react-number-format/types/types';
+
 import { validation } from '@dydxprotocol/v4-client-js';
+import { type NumberFormatValues } from 'react-number-format';
+import type { SyntheticInputEvent } from 'react-number-format/types/types';
+import { shallowEqual, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { TransferInputField, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
@@ -36,8 +37,8 @@ import { OutputType } from '@/components/Output';
 import { SelectItem, SelectMenu } from '@/components/SelectMenu';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
-import { TransferButtonAndReceipt } from '@/views/forms/TransferForm/TransferButtonAndReceipt';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
+import { TransferButtonAndReceipt } from '@/views/forms/TransferForm/TransferButtonAndReceipt';
 
 import { getSubaccount } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';

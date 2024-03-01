@@ -1,9 +1,10 @@
 import { forwardRef } from 'react';
+
 import styled, { type AnyStyledComponent } from 'styled-components';
 
-import { Icon, IconName } from '@/components/Icon';
-
 import { layoutMixins } from '@/styles/layoutMixins';
+
+import { Icon, IconName } from '@/components/Icon';
 
 type ElementProps = {
   analyticsConfig?: {

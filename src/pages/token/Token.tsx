@@ -1,10 +1,13 @@
 import { Suspense, lazy } from 'react';
+
 import { Navigate, Route, Routes } from 'react-router-dom';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { TokenRoute } from '@/constants/routes';
+
 import { useBreakpoints, useStringGetter } from '@/hooks';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from '@/components/Icon';

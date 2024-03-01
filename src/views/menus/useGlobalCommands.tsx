@@ -1,11 +1,13 @@
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import { type MenuConfig } from '@/constants/menus';
+import { Asset, PerpetualMarket } from '@/constants/abacus';
 import { TradeLayouts } from '@/constants/layout';
+import { type MenuConfig } from '@/constants/menus';
 
 import { AssetIcon } from '@/components/AssetIcon';
 
+import { getAssets } from '@/state/assetsSelectors';
 import {
   AppTheme,
   AppThemeSystemSetting,
@@ -14,10 +16,7 @@ import {
   setAppColorMode,
 } from '@/state/configs';
 import { setSelectedTradeLayout } from '@/state/layout';
-
-import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
-import { Asset, PerpetualMarket } from '@/constants/abacus';
 
 enum LayoutItems {
   setDefaultLayout = 'SetDefaultLayout',

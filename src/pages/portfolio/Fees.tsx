@@ -1,12 +1,15 @@
 import { useCallback, useMemo } from 'react';
+
 import { Nullable } from '@dydxprotocol/v4-abacus';
-import styled, { AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { FeeTier } from '@/constants/abacus';
-import { FEE_DECIMALS } from '@/constants/numbers';
 import { STRING_KEYS } from '@/constants/localization';
+import { FEE_DECIMALS } from '@/constants/numbers';
+
 import { useBreakpoints, useStringGetter } from '@/hooks';
+
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tableMixins } from '@/styles/tableMixins';

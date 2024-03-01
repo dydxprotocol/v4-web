@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+
 import { useSelector } from 'react-redux';
 
 import { DEFAULT_DOCUMENT_TITLE } from '@/constants/routes';

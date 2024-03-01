@@ -2,8 +2,8 @@ import type { Story } from '@ladle/react';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 
-import { StoryWrapper } from '.ladle/components';
 import { ToggleButton } from './ToggleButton';
+import { StoryWrapper } from '.ladle/components';
 
 export const ToggleButtonStory: Story<Parameters<typeof ToggleButton>[0]> = (args) => (
   <StoryWrapper>

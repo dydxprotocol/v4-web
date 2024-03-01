@@ -1,14 +1,15 @@
 import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
+
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent } from 'styled-components';
 import { Abi, parseUnits } from 'viem';
 
 import erc20 from '@/abi/erc20.json';
 import erc20_usdt from '@/abi/erc20_usdt.json';
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
-import { AnalyticsEvent, AnalyticsEventData } from '@/constants/analytics';
 import { AlertType } from '@/constants/alerts';
+import { AnalyticsEvent, AnalyticsEventData } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
@@ -19,8 +20,8 @@ import { useAccounts, useDebounce, useStringGetter, useSelectedNetwork } from '@
 import { useAccountBalance, CHAIN_DEFAULT_TOKEN_ADDRESS } from '@/hooks/useAccountBalance';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
-import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
@@ -42,11 +43,10 @@ import { getNobleChainId, NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 import { parseWalletError } from '@/lib/wallet';
 
+import { NobleDeposit } from '../NobleDeposit';
+import { DepositButtonAndReceipt } from './DepositForm/DepositButtonAndReceipt';
 import { SourceSelectMenu } from './SourceSelectMenu';
 import { TokenSelectMenu } from './TokenSelectMenu';
-
-import { DepositButtonAndReceipt } from './DepositForm/DepositButtonAndReceipt';
-import { NobleDeposit } from '../NobleDeposit';
 
 type DepositFormProps = {
   onDeposit?: (event?: AnalyticsEventData<AnalyticsEvent.TransferDeposit>) => void;

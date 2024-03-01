@@ -1,14 +1,16 @@
 import type { ElementType } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-import { useAccountBalance, useAccounts, useTokenConfigs, useStringGetter } from '@/hooks';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { wallets, WalletType } from '@/constants/wallets';
+
+import { useAccountBalance, useAccounts, useTokenConfigs, useStringGetter } from '@/hooks';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
@@ -19,8 +21,8 @@ import { Panel } from '@/components/Panel';
 import { Toolbar } from '@/components/Toolbar';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
-import { openDialog } from '@/state/dialogs';
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
+import { openDialog } from '@/state/dialogs';
 
 export const DYDXBalancePanel = ({ className }: { className?: string }) => {
   const dispatch = useDispatch();

@@ -1,15 +1,17 @@
 import { useMemo, useState } from 'react';
+
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { type NewMarketProposal } from '@/constants/potentialMarkets';
+
 import { useNextClobPairId, useURLConfigs } from '@/hooks';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 
-import { NewMarketSelectionStep } from './NewMarketSelectionStep';
 import { NewMarketPreviewStep } from './NewMarketPreviewStep';
+import { NewMarketSelectionStep } from './NewMarketSelectionStep';
 import { NewMarketSuccessStep } from './NewMarketSuccessStep';
 
 enum NewMarketFormStep {

@@ -1,5 +1,4 @@
 import { useRef } from 'react';
-import styled, { type AnyStyledComponent, keyframes, css } from 'styled-components';
 
 import {
   Root,
@@ -11,14 +10,15 @@ import {
   Close,
   Portal,
 } from '@radix-ui/react-dialog';
+import styled, { type AnyStyledComponent, keyframes, css } from 'styled-components';
+
+import { useDialogArea } from '@/hooks/useDialogArea';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Icon, IconName } from '@/components/Icon';
 import { BackButton } from '@/components/BackButton';
-
-import { useDialogArea } from '@/hooks/useDialogArea';
+import { Icon, IconName } from '@/components/Icon';
 
 export enum DialogPlacement {
   Default = 'Default',

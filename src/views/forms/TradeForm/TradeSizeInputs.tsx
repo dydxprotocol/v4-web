@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
@@ -9,25 +10,24 @@ import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { TradeSizeInput } from '@/constants/trade';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
-import { layoutMixins } from '@/styles/layoutMixins';
+
 import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { FormInput } from '@/components/FormInput';
+import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { Tag } from '@/components/Tag';
-import { WithTooltip } from '@/components/WithTooltip';
-import { Icon, IconName } from '@/components/Icon';
 import { ToggleButton } from '@/components/ToggleButton';
+import { WithTooltip } from '@/components/WithTooltip';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
-
 import {
   getInputTradeSizeData,
   getInputTradeOptions,
   getTradeFormInputs,
 } from '@/state/inputsSelectors';
-
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';

@@ -1,11 +1,9 @@
+import { Root, Item, Header, Trigger, Content } from '@radix-ui/react-accordion';
 import styled, { keyframes, type AnyStyledComponent } from 'styled-components';
 
-import { Root, Item, Header, Trigger, Content } from '@radix-ui/react-accordion';
-
-import { layoutMixins } from '@/styles/layoutMixins';
-import { breakpoints } from '@/styles';
-
 import { PlusIcon } from '@/icons';
+import { breakpoints } from '@/styles';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 export type AccordionItem = {
   header: React.ReactNode;

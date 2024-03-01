@@ -1,8 +1,9 @@
 import styled, { AnyStyledComponent } from 'styled-components';
 
+import { useBreakpoints } from '@/hooks';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { useBreakpoints } from '@/hooks';
 import { Details, type DetailsItem } from '@/components/Details';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 

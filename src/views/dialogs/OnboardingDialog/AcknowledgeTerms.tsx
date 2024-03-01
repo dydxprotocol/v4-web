@@ -1,13 +1,13 @@
 import styled, { type AnyStyledComponent } from 'styled-components';
 
+import { ButtonAction } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
+import { AppRoute, BASE_ROUTE } from '@/constants/routes';
+
 import { useAccounts, useStringGetter } from '@/hooks';
 
-import { AppRoute, BASE_ROUTE } from '@/constants/routes';
-import { STRING_KEYS } from '@/constants/localization';
-import { ButtonAction } from '@/constants/buttons';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 import { formMixins } from '@/styles/formMixins';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Link } from '@/components/Link';

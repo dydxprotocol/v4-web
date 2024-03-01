@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import type { Story } from '@ladle/react';
 
 import { Checkbox, CheckboxProps } from '@/components/Checkbox';
@@ -28,5 +29,5 @@ CheckboxStory.argTypes = {
     options: [true, false],
     control: { type: 'select' },
     defaultValue: false,
-  }
-}
+  },
+};

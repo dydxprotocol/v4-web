@@ -1,15 +1,15 @@
-import styled, { type AnyStyledComponent, css } from 'styled-components';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import { type Nullable } from '@/constants/abacus';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, USD_DECIMALS } from '@/constants/numbers';
 
+import { useBreakpoints, useStringGetter } from '@/hooks';
+
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
-
-import { useBreakpoints, useStringGetter } from '@/hooks';
 
 import { Button } from '@/components/Button';
 import { DetachedSection, DetachedScrollableSection } from '@/components/ContentSection';
@@ -21,9 +21,9 @@ import { ToggleButton } from '@/components/ToggleButton';
 import { calculateIsAccountLoading } from '@/state/accountCalculators';
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
+import { closeDialogInTradeBox, openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { getActiveDialog, getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
-import { closeDialogInTradeBox, openDialog, openDialogInTradeBox } from '@/state/dialogs';
 
 import abacusStateManager from '@/lib/abacus';
 import { BIG_NUMBERS, isNumber, MustBigNumber } from '@/lib/numbers';

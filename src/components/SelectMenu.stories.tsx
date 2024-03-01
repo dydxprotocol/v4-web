@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
+
 import type { Story } from '@ladle/react';
+import styled, { AnyStyledComponent } from 'styled-components';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { SelectMenu, SelectItem } from '@/components/SelectMenu';
 
 import { StoryWrapper } from '.ladle/components';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 const exampleItems: { value: string; label: string }[] = [
   {

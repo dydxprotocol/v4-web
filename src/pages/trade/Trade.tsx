@@ -1,9 +1,7 @@
 import { useRef, useState } from 'react';
-import styled, { AnyStyledComponent, css } from 'styled-components';
-import { useSelector } from 'react-redux';
 
-import { breakpoints } from '@/styles';
-import { layoutMixins } from '@/styles/layoutMixins';
+import { useSelector } from 'react-redux';
+import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import { TradeLayouts } from '@/constants/layout';
 
@@ -14,22 +12,24 @@ import {
   useTradeFormInputs,
 } from '@/hooks';
 
+import { breakpoints } from '@/styles';
+import { layoutMixins } from '@/styles/layoutMixins';
+
+import { DetachedSection } from '@/components/ContentSection';
+import { AccountInfo } from '@/views/AccountInfo';
+import { TradeBox } from '@/views/TradeBox';
+
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
-import { DetachedSection } from '@/components/ContentSection';
-
-import { TradeHeaderMobile } from './TradeHeaderMobile';
+import { HorizontalPanel } from './HorizontalPanel';
 import { InnerPanel } from './InnerPanel';
 import { MarketSelectorAndStats } from './MarketSelectorAndStats';
-import { VerticalPanel } from './VerticalPanel';
-import { HorizontalPanel } from './HorizontalPanel';
 import { MobileBottomPanel } from './MobileBottomPanel';
 import { MobileTopPanel } from './MobileTopPanel';
 import { TradeDialogTrigger } from './TradeDialogTrigger';
-
-import { AccountInfo } from '@/views/AccountInfo';
-import { TradeBox } from '@/views/TradeBox';
+import { TradeHeaderMobile } from './TradeHeaderMobile';
+import { VerticalPanel } from './VerticalPanel';
 
 const TradePage = () => {
   const tradePageRef = useRef<HTMLDivElement>(null);

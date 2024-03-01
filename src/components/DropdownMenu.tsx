@@ -1,11 +1,12 @@
 import { type Ref, forwardRef } from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import { Fragment } from 'react';
+
 import { Root, Trigger, Content, Portal, Item, Separator } from '@radix-ui/react-dropdown-menu';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { popoverMixins } from '@/styles/popoverMixins';
 
 import { Icon, IconName } from '@/components/Icon';
-import { Fragment } from 'react';
 
 export type DropdownMenuItem<T> = {
   value: T;

@@ -1,6 +1,6 @@
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
-import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { TradeInputField } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';
@@ -9,8 +9,9 @@ import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 import { PositionSide } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks';
-import { formMixins } from '@/styles/formMixins';
+
 import { breakpoints } from '@/styles';
+import { formMixins } from '@/styles/formMixins';
 
 import { Input, InputType } from '@/components/Input';
 import { PositionSideTag } from '@/components/PositionSideTag';

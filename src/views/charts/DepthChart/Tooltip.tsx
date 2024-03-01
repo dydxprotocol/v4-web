@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { RenderTooltipParams } from '@visx/xychart/lib/components/Tooltip';
 import { shallowEqual, useSelector } from 'react-redux';
@@ -15,9 +16,9 @@ import { STRING_KEYS } from '@/constants/localization';
 import { useStringGetter } from '@/hooks';
 import { useOrderbookValuesForDepthChart } from '@/hooks/Orderbook/useOrderbookValues';
 
-import { TooltipContent } from '@/components/visx/TooltipContent';
 import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
+import { TooltipContent } from '@/components/visx/TooltipContent';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 

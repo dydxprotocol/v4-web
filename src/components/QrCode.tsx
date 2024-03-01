@@ -1,10 +1,11 @@
 import { useEffect, useRef } from 'react';
+
+import QRCodeStyling from 'qr-code-styling';
 import { useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
-import QRCodeStyling from 'qr-code-styling';
 
-import { getAppTheme } from '@/state/configsSelectors';
 import { AppTheme } from '@/state/configs';
+import { getAppTheme } from '@/state/configsSelectors';
 
 type ElementProps = {
   value: string;

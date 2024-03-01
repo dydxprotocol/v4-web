@@ -9,7 +9,6 @@ import type {
   ClosePositionInputs,
   TransferInputs,
 } from '@/constants/abacus';
-
 import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
 
 type TradeFormInputs = typeof CLEARED_TRADE_INPUTS & typeof CLEARED_SIZE_INPUTS;

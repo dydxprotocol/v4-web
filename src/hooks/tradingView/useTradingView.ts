@@ -1,14 +1,12 @@
 import React, { useEffect } from 'react';
 
+import isEmpty from 'lodash/isEmpty';
+import { LanguageCode, ResolutionString, widget } from 'public/tradingview/charting_library';
 import { shallowEqual, useSelector } from 'react-redux';
 
-import isEmpty from 'lodash/isEmpty';
-
-import { LanguageCode, ResolutionString, widget } from 'public/tradingview/charting_library';
-
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
-import { SUPPORTED_LOCALE_BASE_TAGS, STRING_KEYS } from '@/constants/localization';
 import { LocalStorageKey } from '@/constants/localStorage';
+import { SUPPORTED_LOCALE_BASE_TAGS, STRING_KEYS } from '@/constants/localization';
 import type { TvWidget } from '@/constants/tvchart';
 
 import { useDydxClient, useLocalStorage, useStringGetter } from '@/hooks';

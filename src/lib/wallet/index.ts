@@ -1,5 +1,4 @@
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
-
 import {
   type WalletConnection,
   wallets,

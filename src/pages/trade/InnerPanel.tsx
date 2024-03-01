@@ -1,21 +1,22 @@
 import { useState } from 'react';
+
 import { useSelector } from 'react-redux';
 
 import { TradeInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useStringGetter } from '@/hooks';
+
+import { Tabs } from '@/components/Tabs';
+import { MarketDetails } from '@/views/MarketDetails';
+import { MarketLinks } from '@/views/MarketLinks';
+import { DepthChart } from '@/views/charts/DepthChart';
+import { FundingChart } from '@/views/charts/FundingChart';
+import { TvChart } from '@/views/charts/TvChart';
 
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-
-import { Tabs } from '@/components/Tabs';
-
-import { MarketDetails } from '@/views/MarketDetails';
-import { MarketLinks } from '@/views/MarketLinks';
-import { TvChart } from '@/views/charts/TvChart';
-import { DepthChart } from '@/views/charts/DepthChart';
-import { FundingChart } from '@/views/charts/FundingChart';
 
 enum Tab {
   Price = 'Price',

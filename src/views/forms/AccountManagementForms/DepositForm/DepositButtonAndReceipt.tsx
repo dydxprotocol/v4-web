@@ -1,11 +1,11 @@
 import { type Dispatch, type SetStateAction, useState, type ReactNode, useEffect } from 'react';
-import styled, { type AnyStyledComponent } from 'styled-components';
-import { shallowEqual, useSelector } from 'react-redux';
-import type { RouteData } from '@0xsquid/sdk';
 
-import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
+import type { RouteData } from '@0xsquid/sdk';
+import { shallowEqual, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { TransferInputTokenResource } from '@/constants/abacus';
+import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 

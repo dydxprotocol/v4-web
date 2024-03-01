@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import { DateTime } from 'luxon';
+
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { ColumnSize } from '@react-types/table';
 import type { Dispatch } from '@reduxjs/toolkit';
+import { DateTime } from 'luxon';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import { Asset, Nullable, SubaccountOrder } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
@@ -12,6 +13,7 @@ import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
+
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
@@ -20,7 +22,6 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
-
 import {
   Table,
   TableCell,
@@ -28,33 +29,28 @@ import {
   MarketTableCell,
   type ColumnDef,
 } from '@/components/Table';
-
 import { TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { viewedOrders } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-
 import {
   getCurrentMarketOrders,
   getHasUnseenOrderUpdates,
   getSubaccountUnclearedOrders,
 } from '@/state/accountSelectors';
-
 import { getAssets } from '@/state/assetsSelectors';
+import { openDialog } from '@/state/dialogs';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
-import { viewedOrders } from '@/state/account';
-import { openDialog } from '@/state/dialogs';
-
 import { MustBigNumber } from '@/lib/numbers';
-import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
-
 import {
   getHydratedTradingData,
   getStatusIconInfo,
   isMarketOrderType,
   isOrderStatusClearable,
 } from '@/lib/orders';
+import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
 
 import { OrderActionsCell } from './OrdersTable/OrderActionsCell';
 

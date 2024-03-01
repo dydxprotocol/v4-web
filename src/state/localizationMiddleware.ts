@@ -1,17 +1,17 @@
-import type { PayloadAction } from '@reduxjs/toolkit';
 import {
   LOCALE_DATA,
   NOTIFICATIONS,
   SupportedLocale,
   TOOLTIPS,
 } from '@dydxprotocol/v4-localization';
+import type { PayloadAction } from '@reduxjs/toolkit';
 
+import { LocalStorageKey } from '@/constants/localStorage';
 import {
   type LocaleData,
   SUPPORTED_BASE_TAGS_LOCALE_MAPPING,
   SupportedLocales,
 } from '@/constants/localization';
-import { LocalStorageKey } from '@/constants/localStorage';
 
 import { initializeLocalization } from '@/state/app';
 import { setLocaleData, setLocaleLoaded, setSelectedLocale } from '@/state/localization';

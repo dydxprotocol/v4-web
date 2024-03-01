@@ -1,9 +1,17 @@
+import { Root, Item, Indicator } from '@radix-ui/react-radio-group';
 import { useDispatch, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
-import { Root, Item, Indicator } from '@radix-ui/react-radio-group';
+import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks';
+
+import { layoutMixins } from '@/styles/layoutMixins';
+import { Themes } from '@/styles/themes';
+
+import { Dialog } from '@/components/Dialog';
+import { Icon, IconName } from '@/components/Icon';
+import { HorizontalSeparatorFiller } from '@/components/Separator';
 
 import {
   AppTheme,
@@ -14,15 +22,6 @@ import {
   setAppColorMode,
 } from '@/state/configs';
 import { getAppTheme, getAppThemeSetting, getAppColorMode } from '@/state/configsSelectors';
-
-import { layoutMixins } from '@/styles/layoutMixins';
-import { Themes } from '@/styles/themes';
-
-import { STRING_KEYS } from '@/constants/localization';
-
-import { Dialog } from '@/components/Dialog';
-import { Icon, IconName } from '@/components/Icon';
-import { HorizontalSeparatorFiller } from '@/components/Separator';
 
 type ElementProps = {
   setIsOpen: (open: boolean) => void;

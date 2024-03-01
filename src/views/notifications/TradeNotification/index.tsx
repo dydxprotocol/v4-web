@@ -1,6 +1,6 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import {
   AbacusOrderStatus,
@@ -9,18 +9,19 @@ import {
   ORDER_STATUS_STRINGS,
   TRADE_TYPES,
 } from '@/constants/abacus';
-
 import { STRING_KEYS } from '@/constants/localization';
 import { ORDER_TYPE_STRINGS, TradeTypes } from '@/constants/trade';
+
 import { useStringGetter } from '@/hooks';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Details } from '@/components/Details';
 import { Notification, NotificationProps } from '@/components/Notification';
 import { OrderSideTag } from '@/components/OrderSideTag';
-import { OrderStatusIcon } from '@/views/OrderStatusIcon';
 import { Output, OutputType } from '@/components/Output';
+import { OrderStatusIcon } from '@/views/OrderStatusIcon';
 
 import { getMarketData } from '@/state/perpetualsSelectors';
 

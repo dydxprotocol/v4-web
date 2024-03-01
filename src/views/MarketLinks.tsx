@@ -2,6 +2,7 @@ import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { ButtonType } from '@/constants/buttons';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { IconName } from '@/components/Icon';

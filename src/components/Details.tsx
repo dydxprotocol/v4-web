@@ -7,12 +7,12 @@ import styled, {
   ThemeProps,
 } from 'styled-components';
 
+import { LoadingContext } from '@/contexts/LoadingContext';
+
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { WithSeparators } from '@/components/Separator';
 import { WithTooltip } from '@/components/WithTooltip';
-
-import { LoadingContext } from '@/contexts/LoadingContext';
 
 export type DetailsItem = {
   key: string;

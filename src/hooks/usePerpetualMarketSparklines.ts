@@ -1,7 +1,7 @@
 import { useQuery } from 'react-query';
 
-import { timeUnits } from '@/constants/time';
 import type { PerpetualMarketSparklineResponse } from '@/constants/indexer';
+import { timeUnits } from '@/constants/time';
 
 import { log } from '@/lib/telemetry';
 

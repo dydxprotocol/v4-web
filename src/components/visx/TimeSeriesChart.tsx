@@ -1,12 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import styled, { AnyStyledComponent, keyframes } from 'styled-components';
 
-import { allTimeUnits } from '@/constants/time';
-import { useBreakpoints } from '@/hooks';
-import { useAnimationFrame } from '@/hooks/useAnimationFrame';
-import { layoutMixins } from '@/styles/layoutMixins';
-
+import { LinearGradient } from '@visx/gradient';
 import { ParentSize } from '@visx/responsive';
+import type { ScaleConfig } from '@visx/scale';
 import {
   XYChart,
   Axis,
@@ -19,13 +15,20 @@ import {
   type AxisScale,
   type TooltipContextType,
 } from '@visx/xychart';
-import type { ScaleConfig } from '@visx/scale';
-import { LinearGradient } from '@visx/gradient';
-import Tooltip from '@/components/visx/XYChartTooltipWithBounds';
 import { RenderTooltipParams } from '@visx/xychart/lib/components/Tooltip';
+import styled, { AnyStyledComponent, keyframes } from 'styled-components';
 
-import { clamp, lerp, map } from '@/lib/math';
+import { allTimeUnits } from '@/constants/time';
+
+import { useBreakpoints } from '@/hooks';
+import { useAnimationFrame } from '@/hooks/useAnimationFrame';
+
+import { layoutMixins } from '@/styles/layoutMixins';
+
+import Tooltip from '@/components/visx/XYChartTooltipWithBounds';
+
 import { formatAbsoluteTime } from '@/lib/dateTime';
+import { clamp, lerp, map } from '@/lib/math';
 import { objectEntries } from '@/lib/objectEntries';
 
 import { XYChartThreshold, type Threshold } from './XYChartThreshold';

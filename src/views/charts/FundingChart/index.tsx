@@ -1,28 +1,30 @@
 import { useState } from 'react';
+
+import { curveMonotoneX, curveStepAfter } from '@visx/curve';
+import type { TooltipContextType } from '@visx/xychart';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent, css } from 'styled-components';
-import { curveMonotoneX, curveStepAfter } from '@visx/curve';
 
 import { ButtonSize } from '@/constants/buttons';
 import { FundingRateResolution, type FundingChartDatum } from '@/constants/charts';
 import { STRING_KEYS } from '@/constants/localization';
 import { FundingDirection } from '@/constants/markets';
 import { SMALL_PERCENT_DECIMALS, TINY_PERCENT_DECIMALS } from '@/constants/numbers';
+
 import { useBreakpoints, useStringGetter } from '@/hooks';
 
 import { breakpoints } from '@/styles';
 
-import { Output, OutputType } from '@/components/Output';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
+import { Output, OutputType } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
-
-import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 import { AxisLabelOutput } from '@/components/visx/AxisLabelOutput';
-import type { TooltipContextType } from '@visx/xychart';
+import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
 import { calculateFundingRateHistory } from '@/state/perpetualsCalculators';
 
 import { MustBigNumber } from '@/lib/numbers';
+
 import { FundingChartTooltipContent } from './Tooltip';
 
 const FUNDING_RATE_TIME_RESOLUTION = 60 * 60 * 1000; // 1 hour

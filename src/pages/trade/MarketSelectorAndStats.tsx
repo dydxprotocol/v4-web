@@ -1,12 +1,11 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
 import { shallowEqual, useSelector } from 'react-redux';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { VerticalSeparator } from '@/components/Separator';
-
-import { MarketsDropdown } from '@/views/MarketsDropdown';
 import { MarketStatsDetails } from '@/views/MarketStatsDetails';
+import { MarketsDropdown } from '@/views/MarketsDropdown';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';

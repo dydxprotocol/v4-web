@@ -12,7 +12,6 @@ import type {
   HistoricalPnlPeriods,
   ParsingError,
 } from '@/constants/abacus';
-
 import {
   AsyncAbacusStateManager,
   AbacusHelper,
@@ -27,7 +26,6 @@ import {
   AbacusAppConfig,
   ApiData,
 } from '@/constants/abacus';
-
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork, isMainnet } from '@/constants/networks';
 import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
@@ -36,16 +34,16 @@ import type { RootStore } from '@/state/_store';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors';
 
-import AbacusRest from './rest';
-import AbacusAnalytics from './analytics';
-import AbacusWebsocket from './websocket';
-import AbacusChainTransaction from './dydxChainTransactions';
-import AbacusStateNotifier from './stateNotification';
-import AbacusLocalizer from './localizer';
-import AbacusFormatter from './formatter';
-import AbacusThreading from './threading';
-import AbacusFileSystem from './filesystem';
 import { LocaleSeparators } from '../numbers';
+import AbacusAnalytics from './analytics';
+import AbacusChainTransaction from './dydxChainTransactions';
+import AbacusFileSystem from './filesystem';
+import AbacusFormatter from './formatter';
+import AbacusLocalizer from './localizer';
+import AbacusRest from './rest';
+import AbacusStateNotifier from './stateNotification';
+import AbacusThreading from './threading';
+import AbacusWebsocket from './websocket';
 
 class AbacusStateManager {
   private store: RootStore | undefined;

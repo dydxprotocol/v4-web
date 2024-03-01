@@ -57,7 +57,7 @@ class AbacusRest implements AbacusRestProtocol {
         const data = await response.text();
 
         callback(data, response.status);
-        
+
         try {
           lastSuccessfulRestRequestByOrigin[new URL(url).origin] = Date.now();
         } catch {}

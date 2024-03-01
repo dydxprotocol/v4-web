@@ -1,12 +1,13 @@
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useStringGetter } from '@/hooks';
 
 import { Details } from '@/components/Details';
+import { Icon, IconName } from '@/components/Icon';
 import { Notification, NotificationProps } from '@/components/Notification';
 import { Output, OutputType } from '@/components/Output';
-import { Icon, IconName } from '@/components/Icon';
 
 type ElementProps = {
   data: {

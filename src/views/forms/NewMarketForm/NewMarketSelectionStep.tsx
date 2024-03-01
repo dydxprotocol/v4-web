@@ -1,7 +1,8 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
+
 import { Root, Item } from '@radix-ui/react-radio-group';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
@@ -10,7 +11,6 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
-
 import {
   NUM_ORACLES_TO_QUALIFY_AS_SAFE,
   type NewMarketProposal,
@@ -33,10 +33,9 @@ import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
-import { Tag } from '@/components/Tag';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
+import { Tag } from '@/components/Tag';
 import { WithReceipt } from '@/components/WithReceipt';
-
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { getOnboardingState } from '@/state/accountSelectors';

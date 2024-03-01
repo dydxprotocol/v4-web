@@ -15,7 +15,6 @@ import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
-
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';

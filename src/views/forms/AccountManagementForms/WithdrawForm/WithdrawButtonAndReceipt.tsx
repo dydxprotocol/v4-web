@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 import { formatUnits } from 'viem';
@@ -8,12 +9,11 @@ import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/b
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 import { useStringGetter, useTokenConfigs } from '@/hooks';
 
-import { Button } from '@/components/Button';
+import { layoutMixins } from '@/styles/layoutMixins';
 
+import { Button } from '@/components/Button';
 import { Details, DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Icon, IconName } from '@/components/Icon';

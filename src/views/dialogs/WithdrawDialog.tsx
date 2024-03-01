@@ -1,13 +1,13 @@
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useBreakpoints, useStringGetter } from '@/hooks';
 
-import { Dialog, DialogPlacement } from '@/components/Dialog';
-
-import { WithdrawForm } from '@/views/forms/AccountManagementForms/WithdrawForm';
-
 import { layoutMixins } from '@/styles/layoutMixins';
+
+import { Dialog, DialogPlacement } from '@/components/Dialog';
+import { WithdrawForm } from '@/views/forms/AccountManagementForms/WithdrawForm';
 
 type ElementProps = {
   setIsOpen: (open: boolean) => void;

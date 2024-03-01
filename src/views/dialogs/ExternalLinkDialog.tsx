@@ -1,14 +1,16 @@
 import type { ReactNode } from 'react';
+
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+
 import { useStringGetter } from '@/hooks';
+
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 type ElementProps = {
   buttonText?: ReactNode;

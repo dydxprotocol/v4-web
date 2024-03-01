@@ -1,8 +1,13 @@
 import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+
+import {
+  curveLinear,
+  /*, curveMonotoneX*/
+} from '@visx/curve';
+import type { TooltipContextType } from '@visx/xychart';
+import debounce from 'lodash/debounce';
 import { useSelector, shallowEqual } from 'react-redux';
 import styled, { AnyStyledComponent, css } from 'styled-components';
-import { curveLinear /*, curveMonotoneX*/ } from '@visx/curve';
-import debounce from 'lodash/debounce';
 
 import {
   HistoricalPnlPeriod,
@@ -10,16 +15,15 @@ import {
   HISTORICAL_PNL_PERIODS,
 } from '@/constants/abacus';
 import { timeUnits } from '@/constants/time';
-import { breakpoints } from '@/styles';
 
 import { useBreakpoints, useNow } from '@/hooks';
 
+import { breakpoints } from '@/styles';
+
 import { Output } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
-
-import type { TooltipContextType } from '@visx/xychart';
-import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 import { AxisLabelOutput } from '@/components/visx/AxisLabelOutput';
+import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
 import {
   getSubaccount,

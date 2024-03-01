@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import BigNumber from 'bignumber.js';
+import { describe, expect, it } from 'vitest';
 
 import { getFractionDigits, isNumber, roundToNearestFactor } from '../numbers';
 

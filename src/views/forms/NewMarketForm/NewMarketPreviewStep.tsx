@@ -1,9 +1,10 @@
 import { FormEvent, useMemo, useState } from 'react';
-import styled, { AnyStyledComponent } from 'styled-components';
-import { useDispatch } from 'react-redux';
-import Long from 'long';
-import { encodeJson } from '@dydxprotocol/v4-client-js';
+
 import type { IndexedTx } from '@cosmjs/stargate';
+import { encodeJson } from '@dydxprotocol/v4-client-js';
+import Long from 'long';
+import { useDispatch } from 'react-redux';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';

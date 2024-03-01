@@ -1,18 +1,19 @@
+import styled, { AnyStyledComponent, css } from 'styled-components';
+
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 import { PositionSide } from '@/constants/trade';
 
-import { isNumber, MustBigNumber } from '@/lib/numbers';
-import { hasPositionSideChanged } from '@/lib/tradeData';
+import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
-import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { DiffArrow } from '@/components/DiffArrow';
+import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { PositionSideTag } from '@/components/PositionSideTag';
 import { TagSize } from '@/components/Tag';
 
-import styled, { AnyStyledComponent, css } from 'styled-components';
-import { layoutMixins } from '@/styles/layoutMixins';
+import { isNumber, MustBigNumber } from '@/lib/numbers';
+import { hasPositionSideChanged } from '@/lib/tradeData';
 
 type ElementProps = {
   currentSize?: number | null;

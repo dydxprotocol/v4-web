@@ -1,11 +1,11 @@
-import { MemoryRouter } from 'react-router-dom';
 import type { Story } from '@ladle/react';
+import { MemoryRouter } from 'react-router-dom';
 
 import type { MenuGroup } from '@/constants/menus';
 
 import { PageMenu } from '@/components/PageMenu';
-import { PageMenuItemType } from './PageMenu/PageMenuItem';
 
+import { PageMenuItemType } from './PageMenu/PageMenuItem';
 import { StoryWrapper } from '.ladle/components';
 
 export const PageMenuStory: Story<MenuGroup<string, string, PageMenuItemType>> = (args) => {
