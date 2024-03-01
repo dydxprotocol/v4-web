@@ -81,6 +81,7 @@ import {
   WebsiteIcon,
   WhitepaperIcon,
   WithdrawIcon,
+  DownloadIcon,
 } from '@/icons';
 
 export enum IconName {
@@ -163,6 +164,7 @@ export enum IconName {
   Website = 'Website',
   Whitepaper = 'Whitepaper',
   Withdraw = 'Withdraw',
+  Download = 'Download',
 }
 
 const icons = {
@@ -244,6 +246,7 @@ const icons = {
   [IconName.Website]: WebsiteIcon,
   [IconName.Whitepaper]: WhitepaperIcon,
   [IconName.Withdraw]: WithdrawIcon,
+  [IconName.Download]: DownloadIcon,
 } as Record<IconName, ElementType>;
 
 type ElementProps = {

@@ -82,6 +82,12 @@ export enum AnalyticsEvent {
   TradeCancelOrder = 'TradeCancelOrder',
   TradeCancelOrderConfirmed = 'TradeCancelOrderConfirmed',
 
+  // Export CSV
+  ExportButtonClick = 'ExportCSVClick',
+  ExportTradesCheckboxClick = 'ExportTradesCheckboxClick',
+  ExportTransfersCheckboxClick = 'ExportTransfersCheckboxClick',
+  ExportDownloadClick = 'ExportDownloadClick',
+
   // Notification
   NotificationAction = 'NotificationAction',
 }
@@ -188,6 +194,19 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
     ? {
         type: string;
         id: string;
+      }
+    : T extends AnalyticsEvent.ExportDownloadClick
+    ? {
+        trades: boolean;
+        transfers: boolean;
+      }
+    : T extends AnalyticsEvent.ExportTradesCheckboxClick
+    ? {
+        value: boolean;
+      }
+    : T extends AnalyticsEvent.ExportTransfersCheckboxClick
+    ? {
+        value: boolean;
       }
     : never;
 

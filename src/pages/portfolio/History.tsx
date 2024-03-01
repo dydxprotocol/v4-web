@@ -9,6 +9,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AttachedExpandingSection } from '@/components/ContentSection';
 import { NavigationMenu } from '@/components/NavigationMenu';
+import { ExportHistoryDropdown } from '@/views/ExportHistoryDropdown';
 
 export const History = () => {
   const stringGetter = useStringGetter();
@@ -19,6 +20,7 @@ export const History = () => {
       {isNotTablet && (
         <Styled.NavigationMenu
           orientation="horizontal"
+          slotAfter={<Styled.ExportButton />}
           items={[
             {
               group: 'navigation',
@@ -52,6 +54,10 @@ export const History = () => {
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
+
+Styled.ExportButton = styled(ExportHistoryDropdown)`
+  margin-left: auto;
+`;
 
 Styled.NavigationMenu = styled(NavigationMenu)`
   --header-horizontal-padding: 1rem;
