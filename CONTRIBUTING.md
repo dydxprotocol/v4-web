@@ -22,12 +22,13 @@ We use a commit-msg hook to check if your commit messages meet the conventional 
 
 In general the pattern mostly looks like this:
 
-type(scope?): subject  #scope is optional; multiple scopes are supported (current delimiter options: "/", "\" and ",")
+`type(scope?): subject`  #scope is optional; multiple scopes are supported (current delimiter options: "/", "\" and ",")
 
 ### Real world examples can look like this:
-chore: run tests on travis ci
-fix(server): send cors headers
-feat(blog): add comment section
+`chore: run tests on travis ci`
+`fix(server): send cors headers`
+`feat(blog): add comment section`
+
 Common types according to commitlint-config-conventional can be:
 
 build
