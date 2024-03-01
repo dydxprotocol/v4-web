@@ -10,20 +10,36 @@ import { useNotifications } from '@/hooks/useNotifications';
 
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { Switch } from '@/components/Switch';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { setDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configs';
+import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
 
 export const usePreferenceMenu = () => {
+  const dispatch = useDispatch();
   const stringGetter = useStringGetter();
 
   // Notifications
   const { notificationPreferences, setNotificationPreferences } = useNotifications();
   const [enabledNotifs, setEnabledNotifs] = useState(notificationPreferences);
 
+  const currentDisplayAllMarketDefault = useSelector(getDefaultToAllMarketsInPositionsOrdersFills);
+  const [defaultToAllMarkets, setDefaultToAllMarkets] = useState(currentDisplayAllMarketDefault);
+
   const toggleNotifPreference = (type: NotificationType) =>
     setEnabledNotifs((prev) => ({ ...prev, [type]: !prev[type] }));
+
+  enum OtherPreference {
+    DisplayAllMarketsDefault = 'DisplayAllMarketsDefault',
+  }
 
   useEffect(() => {
     setNotificationPreferences(enabledNotifs);
   }, [enabledNotifs]);
+
+  useEffect(() => {
+    setDefaultToAllMarkets(currentDisplayAllMarketDefault);
+  }, [currentDisplayAllMarketDefault]);
 
   const notificationSection = useMemo(
     () => ({
@@ -71,7 +87,31 @@ export const usePreferenceMenu = () => {
     [stringGetter, enabledNotifs]
   );
 
-  return [notificationSection];
+  const miscSection = useMemo(
+    () => ({
+      group: 'Other',
+      groupLabel: stringGetter({key: STRING_KEYS.OTHER}),
+      items: [
+        {
+          value: OtherPreference.DisplayAllMarketsDefault,
+          label: stringGetter({key: STRING_KEYS.DEFAULT_TO_ALL_MARKETS_IN_POSITIONS}),
+          slotAfter: (
+            <Switch
+              name={OtherPreference.DisplayAllMarketsDefault}
+              checked={defaultToAllMarkets}
+              onCheckedChange={(enabled: boolean) => null}
+            />
+          ),
+          onSelect: () => {
+            dispatch(setDefaultToAllMarketsInPositionsOrdersFills(!defaultToAllMarkets));
+          },
+        },
+      ],
+    }),
+    [stringGetter, defaultToAllMarkets]
+  );
+
+  return [notificationSection, miscSection];
 };
 
 type ElementProps = {

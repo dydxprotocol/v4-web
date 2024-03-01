@@ -23,3 +23,6 @@ export const getFeeDiscounts = (state: RootState) => state.configs.feeDiscounts;
 
 export const getHasSeenLaunchIncentives = (state: RootState) =>
   state.configs.hasSeenLaunchIncentives;
+
+export const getDefaultToAllMarketsInPositionsOrdersFills = (state: RootState) =>
+  state.configs.defaultToAllMarketsInPositionsOrdersFills;

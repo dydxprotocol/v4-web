@@ -34,6 +34,8 @@ import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsS
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
 
+import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
+
 enum InfoSection {
   Position = 'Position',
   Orders = 'Orders',
@@ -55,7 +57,8 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
 
-  const [view, setView] = useState<PanelView>(PanelView.CurrentMarket);
+  const allMarkets = useSelector(getDefaultToAllMarketsInPositionsOrdersFills);
+  const [view, setView] = useState<PanelView>(allMarkets ? PanelView.AllMarkets : PanelView.CurrentMarket);
   const currentMarketId = useSelector(getCurrentMarketId);
   const currentMarketAssetId = useSelector(getCurrentMarketAssetId);
 
