@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import {
+  AbacusOrderType,
   type Asset,
   type Nullable,
   type SubaccountPosition,
@@ -29,13 +30,18 @@ import { TableCell } from '@/components/Table/TableCell';
 import { TagSize } from '@/components/Tag';
 
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-import { getExistingOpenPositions } from '@/state/accountSelectors';
+import { getExistingOpenPositions, getSubaccountOpenOrders } from '@/state/accountSelectors';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { isStopLossOrder, isTakeProfitOrder } from '@/lib/orders';
 
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
+import {
+  type PositionTableConditionalOrder,
+  PositionsTriggersCell,
+} from './PositionsTable/PositionsTriggersCell';
 
 export enum PositionsTableColumnKey {
   Details = 'Details',
@@ -50,6 +56,7 @@ export enum PositionsTableColumnKey {
   UnrealizedPnl = 'UnrealizedPnl',
   RealizedPnl = 'RealizedPnl',
   AverageOpenAndClose = 'AverageOpenAndClose',
+  Triggers = 'Triggers',
   Actions = 'Actions',
 }
 
@@ -57,6 +64,8 @@ type PositionTableRow = {
   asset: Asset;
   oraclePrice: Nullable<number>;
   tickSizeDecimals: number;
+  stopLossOrders: PositionTableConditionalOrder[];
+  takeProfitOrders: PositionTableConditionalOrder[];
 } & SubaccountPosition;
 
 const getPositionsTableColumnDef = ({
@@ -259,6 +268,21 @@ const getPositionsTableColumnDef = ({
           </TableCell>
         ),
       },
+      [PositionsTableColumnKey.Triggers]: {
+        columnKey: 'triggers',
+        label: stringGetter({ key: STRING_KEYS.TRIGGERS }),
+        isActionable: true,
+        allowsSorting: false,
+        hideOnBreakpoint: MediaQueryKeys.isTablet,
+        renderCell: ({ size, stopLossOrders, takeProfitOrders }) => (
+          <PositionsTriggersCell
+            stopLossOrders={stopLossOrders}
+            takeProfitOrders={takeProfitOrders}
+            positionSize={size?.current}
+            isDisabled={isAccountViewOnly}
+          />
+        ),
+      },
       [PositionsTableColumnKey.Actions]: {
         columnKey: 'actions',
         label: stringGetter({ key: STRING_KEYS.ACTION }), // TODO: CT-639
@@ -298,13 +322,21 @@ export const PositionsTable = ({
   const perpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
   const assets = useSelector(getAssets, shallowEqual) || {};
   const openPositions = useSelector(getExistingOpenPositions, shallowEqual) || [];
+  const openOrders = useSelector(getSubaccountOpenOrders, shallowEqual) || [];
+
+  const stopLossOrders = openOrders.filter(isStopLossOrder); //xcc check to make sure we don't count filled / cancelled orders
+  const takeProfitOrders = openOrders.filter(isTakeProfitOrder);
+
+  console.log('Xcxc sl', stopLossOrders, takeProfitOrders, openPositions);
 
   const positionsData = openPositions.map((position: SubaccountPosition) => ({
     tickSizeDecimals: perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
     asset: assets?.[position.assetId],
     oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
+    stopLossOrders: stopLossOrders.filter((order) => order.marketId === position.id),
+    takeProfitOrders: takeProfitOrders.filter((order) => order.marketId === position.id),
     ...position,
-  })) as PositionTableRow[];
+  })) as PositionTableRow[]; //xcxc
 
   return (
     <Styled.Table
