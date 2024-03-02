@@ -15,13 +15,13 @@ import { Tag, TagType } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { PositionInfo } from '@/views/PositionInfo';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
-// import { FundingPaymentsTable } from '@/views/tables/FundingPaymentsTable';
 import { OrdersTable, OrdersTableColumnKey } from '@/views/tables/OrdersTable';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
 import {
   calculateHasUncommittedOrders,
   calculateIsAccountViewOnly,
+  calculateShouldRenderActionsInPositionsTable,
 } from '@/state/accountCalculators';
 import {
   getCurrentMarketTradeInfoNumbers,
@@ -68,6 +68,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const hasUnseenOrderUpdates = useSelector(getHasUnseenOrderUpdates);
   const hasUnseenFillUpdates = useSelector(getHasUnseenFillUpdates);
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
+  const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable);
   const isWaitingForOrderToIndex = useSelector(calculateHasUncommittedOrders);
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
 
@@ -107,7 +108,8 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     PositionsTableColumnKey.UnrealizedPnl,
                     PositionsTableColumnKey.RealizedPnl,
                     PositionsTableColumnKey.AverageOpenAndClose,
-                  ]
+                   shouldRenderActions && PositionsTableColumnKey.Actions,
+                  ].filter(isTruthy)
             }
             onNavigate={() => setView(PanelView.CurrentMarket)}
           />

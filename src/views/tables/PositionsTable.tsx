@@ -28,11 +28,14 @@ import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TagSize } from '@/components/Tag';
 
+import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getExistingOpenPositions } from '@/state/accountSelectors';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
+
+import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
 
 export enum PositionsTableColumnKey {
   Details = 'Details',
@@ -47,6 +50,7 @@ export enum PositionsTableColumnKey {
   UnrealizedPnl = 'UnrealizedPnl',
   RealizedPnl = 'RealizedPnl',
   AverageOpenAndClose = 'AverageOpenAndClose',
+  Actions = 'Actions',
 }
 
 type PositionTableRow = {
@@ -59,10 +63,12 @@ const getPositionsTableColumnDef = ({
   key,
   stringGetter,
   width,
+  isAccountViewOnly,
 }: {
   key: PositionsTableColumnKey;
   stringGetter: StringGetterFunction;
   width?: ColumnSize;
+  isAccountViewOnly: boolean;
 }) => ({
   width,
   ...(
@@ -253,6 +259,14 @@ const getPositionsTableColumnDef = ({
           </TableCell>
         ),
       },
+      [PositionsTableColumnKey.Actions]: {
+        columnKey: 'actions',
+        label: stringGetter({ key: STRING_KEYS.ACTION }), // TODO: CT-639
+        isActionable: true,
+        allowsSorting: false,
+        hideOnBreakpoint: MediaQueryKeys.isTablet,
+        renderCell: ({}) => <PositionsActionsCell isDisabled={isAccountViewOnly} />,
+      },
     } as Record<PositionsTableColumnKey, ColumnDef<PositionTableRow>>
   )[key],
 });
@@ -280,6 +294,7 @@ export const PositionsTable = ({
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
 
+  const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
   const perpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
   const assets = useSelector(getAssets, shallowEqual) || {};
   const openPositions = useSelector(getExistingOpenPositions, shallowEqual) || [];
@@ -305,6 +320,7 @@ export const PositionsTable = ({
           key,
           stringGetter,
           width: columnWidths?.[key],
+          isAccountViewOnly,
         })
       )}
       getRowKey={(row: PositionTableRow) => row.id}

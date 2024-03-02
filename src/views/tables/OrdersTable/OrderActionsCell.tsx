@@ -10,7 +10,7 @@ import { useSubaccount } from '@/hooks';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
-import { Toolbar } from '@/components/Toolbar';
+import { ActionsTableCell } from '@/components/Table';
 
 import { clearOrder } from '@/state/account';
 
@@ -34,9 +34,9 @@ export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) 
   }, []);
 
   return (
-    <Styled.OrderActions>
-      <Styled.Toolbar>
-        <Styled.CancelButton
+    <ActionsTableCell>
+      <Styled.CancelButton
+          key="cancelorder"
           iconName={IconName.Close}
           shape={ButtonShape.Square}
           {...(isOrderStatusClearable(status)
@@ -49,25 +49,11 @@ export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) 
                 },
               })}
         />
-      </Styled.Toolbar>
-    </Styled.OrderActions>
+    </ActionsTableCell>
   );
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.OrderActions = styled.div`
-  display: flex;
-  justify-content: flex-end;
-`;
-
-Styled.Toolbar = styled(Toolbar)`
-  width: 3rem;
-  padding: 0;
-
-  display: flex;
-  justify-content: flex-end;
-`;
 
 Styled.CancelButton = styled(IconButton)`
   --button-hover-textColor: var(--color-red);

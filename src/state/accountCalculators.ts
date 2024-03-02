@@ -9,6 +9,8 @@ import {
   getUncommittedOrderClientIds,
 } from '@/state/accountSelectors';
 
+import { testFlags } from '@/lib/testFlags';
+
 export const calculateOnboardingStep = createSelector(
   [getOnboardingState, getOnboardingGuards],
   (onboardingState: OnboardingState, onboardingGuards: ReturnType<typeof getOnboardingGuards>) => {
@@ -83,4 +85,14 @@ export const calculateIsAccountLoading = createSelector(
       hasPreviousTransactions
     );
   }
+);
+
+/**
+ * @description calculate whether positions table should render actions column
+ */
+export const calculateShouldRenderActionsInPositionsTable = createSelector(
+  [calculateIsAccountViewOnly],
+  (isAccountViewOnly: boolean) =>
+    !isAccountViewOnly &&
+    (testFlags.closePositionsFromPositionsTable || testFlags.configureSlTpFromPositionsTable)
 );

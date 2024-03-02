@@ -45,6 +45,7 @@ import { Tag } from './Tag';
 
 export { TableCell } from './Table/TableCell';
 export { TableColumnHeader } from './Table/TableColumnHeader';
+export { ActionsTableCell } from './Table/ActionsTableCell';
 export { MarketTableCell } from './Table/MarketTableCell';
 
 export type CustomRowConfig = {
