@@ -20,16 +20,17 @@ export const MarketFilter = ({
   filters,
   onChangeFilter,
   onSearchTextChange,
+  hideNewMarketButton,
 }: {
   selectedFilter: MarketFilters;
   filters: MarketFilters[];
   onChangeFilter: (filter: MarketFilters) => void;
   onSearchTextChange?: (filter: string) => void;
+  hideNewMarketButton?: boolean;
 }) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
   const { hasPotentialMarketsData } = usePotentialMarkets();
-  const { isTablet } = useBreakpoints();
 
   return (
     <Styled.MarketFilter>
@@ -46,7 +47,7 @@ export const MarketFilter = ({
             value={selectedFilter}
             onValueChange={onChangeFilter}
           />
-          {hasPotentialMarketsData && !isTablet && (
+          {hasPotentialMarketsData && !hideNewMarketButton && (
             <Button
               onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
               size={ButtonSize.Small}

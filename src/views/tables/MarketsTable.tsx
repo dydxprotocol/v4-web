@@ -180,6 +180,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
     <>
       <Toolbar>
         <MarketFilter
+          hideNewMarketButton
           selectedFilter={filter}
           filters={marketFilters as MarketFilters[]}
           onChangeFilter={setFilter}
