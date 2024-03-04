@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import { AbacusOrderTimeInForces, AbacusOrderTypes, Nullable } from '@/constants/abacus';
@@ -26,6 +27,7 @@ export type PositionTableConditionalOrder = {
 type ElementProps = {
   stopLossOrders: PositionTableConditionalOrder[];
   takeProfitOrders: PositionTableConditionalOrder[];
+  onViewOrdersClick?: () => void;
   positionSize?: number | null;
   isDisabled?: boolean;
 };
@@ -33,14 +35,11 @@ type ElementProps = {
 export const PositionsTriggersCell = ({
   stopLossOrders,
   takeProfitOrders,
+  onViewOrdersClick,
   positionSize,
   isDisabled, // TODO: CT-656 Disable onViewOrdersClick behavior when isDisabled
 }: ElementProps) => {
   const stringGetter = useStringGetter();
-
-  const onViewOrdersClick = () => {
-    // TODO: CT-655
-  };
 
   const renderOutput = ({
     label,

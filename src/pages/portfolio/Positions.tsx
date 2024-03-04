@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, PortfolioRoute } from '@/constants/routes';
@@ -7,16 +8,19 @@ import { useBreakpoints, useStringGetter } from '@/hooks';
 
 import { AttachedExpandingSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
-
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
-import { calculateShouldRenderActionsInPositionsTable, calculateShouldRenderTriggersInPositionsTable} from '@/state/accountCalculators';
+import {
+  calculateShouldRenderActionsInPositionsTable,
+  calculateShouldRenderTriggersInPositionsTable,
+} from '@/state/accountCalculators';
 
 import { isTruthy } from '@/lib/isTruthy';
 
 export const Positions = () => {
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
+  const navigate = useNavigate();
 
   const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
   const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable);
@@ -43,11 +47,16 @@ export const Positions = () => {
                 PositionsTableColumnKey.RealizedPnl,
                 PositionsTableColumnKey.AverageOpenAndClose,
                 shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-                shouldRenderActions && PositionsTableColumnKey.Actions
+                shouldRenderActions && PositionsTableColumnKey.Actions,
               ].filter(isTruthy)
         }
         currentRoute={`${AppRoute.Portfolio}/${PortfolioRoute.Positions}`}
         withOuterBorder={isNotTablet}
+        navigateToOrders={() =>
+          navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
+            state: { from: AppRoute.Portfolio },
+          })
+        }
       />
     </AttachedExpandingSection>
   );

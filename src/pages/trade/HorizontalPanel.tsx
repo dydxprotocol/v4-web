@@ -57,6 +57,8 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const { isTablet } = useBreakpoints();
 
   const [view, setView] = useState<PanelView>(PanelView.CurrentMarket);
+  const [tab, setTab] = useState<InfoSection>(InfoSection.Position);
+
   const currentMarketId = useSelector(getCurrentMarketId);
   const currentMarketAssetId = useSelector(getCurrentMarketAssetId);
 
@@ -115,6 +117,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                   ].filter(isTruthy)
             }
             onNavigate={() => setView(PanelView.CurrentMarket)}
+            navigateToOrders={() => setTab(InfoSection.Orders)}
           />
         ),
       },
@@ -222,7 +225,9 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     <MobileTabs defaultValue={InfoSection.Position} items={tabItems} withBorders={false} />
   ) : (
     <Styled.CollapsibleTabs
-      defaultValue={InfoSection.Position}
+      defaultTab={InfoSection.Position}
+      tab={tab}
+      setTab={setTab}
       defaultOpen={isOpen}
       onOpenChange={setIsOpen}
       slotToolbar={
@@ -249,7 +254,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
           }}
         />
       }
-      items={tabItems}
+      tabItems={tabItems}
     />
   );
 };
