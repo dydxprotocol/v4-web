@@ -11,6 +11,22 @@ const htmlFilePath = path.resolve(projectRoot, '../dist/index.html');
 try {
   const html = await fs.readFile(htmlFilePath, 'utf-8');
 
+  const globalThisPolyfill = `
+  <script>
+    if (typeof globalThis === 'undefined') {
+      (function () {
+        if (typeof self !== 'undefined') {
+          self.globalThis = self;
+        } else if (typeof window !== 'undefined') {
+          window.globalThis = window;
+        } else if (typeof global !== 'undefined') {
+          global.globalThis = global;
+        }
+      })();
+    }
+  </script>
+`;
+
   const scripts = `
     <script src="//d2wy8f7a9ursnm.cloudfront.net/v7/bugsnag.min.js"></script>
 
@@ -70,7 +86,7 @@ try {
 
   const injectedHtml = html.replace(
     '<div id="root"></div>',
-    `<div id="root"></div>\n${scripts}\n`
+    `<div id="root"></div>\n${globalThisPolyfill}\n${scripts}\n`
   );
 
   await fs.writeFile(htmlFilePath, injectedHtml, 'utf-8');
