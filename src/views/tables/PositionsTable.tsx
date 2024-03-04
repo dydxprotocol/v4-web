@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import {
-  AbacusOrderType,
   type Asset,
   type Nullable,
   type SubaccountPosition,
