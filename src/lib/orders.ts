@@ -12,7 +12,6 @@ import {
   type OrderStatus,
   type PerpetualMarket,
 } from '@/constants/abacus';
-
 import { STRING_KEYS } from '@/constants/localization';
 import { TimeInForceOptions } from '@/constants/trade';
 
@@ -94,7 +93,7 @@ export const isStopLossOrder = (order: SubaccountOrder) =>
     ({ ordinal }) => ordinal === order.type.ordinal
   ) &&
   order.reduceOnly &&
-  order.timeInForce?.name === TimeInForceOptions.IOC; // is it possible for reduceONly + size > what we have
+  order.timeInForce?.name === TimeInForceOptions.IOC;
 
 export const isTakeProfitOrder = (order: SubaccountOrder) =>
   [AbacusOrderType.takeProfitLimit, AbacusOrderType.takeProfitMarket].some(

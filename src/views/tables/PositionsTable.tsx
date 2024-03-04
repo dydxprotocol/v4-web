@@ -324,10 +324,8 @@ export const PositionsTable = ({
   const openPositions = useSelector(getExistingOpenPositions, shallowEqual) || [];
   const openOrders = useSelector(getSubaccountOpenOrders, shallowEqual) || [];
 
-  const stopLossOrders = openOrders.filter(isStopLossOrder); //xcc check to make sure we don't count filled / cancelled orders
+  const stopLossOrders = openOrders.filter(isStopLossOrder); 
   const takeProfitOrders = openOrders.filter(isTakeProfitOrder);
-
-  console.log('Xcxc sl', stopLossOrders, takeProfitOrders, openPositions);
 
   const positionsData = openPositions.map((position: SubaccountPosition) => ({
     tickSizeDecimals: perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
@@ -336,7 +334,7 @@ export const PositionsTable = ({
     stopLossOrders: stopLossOrders.filter((order) => order.marketId === position.id),
     takeProfitOrders: takeProfitOrders.filter((order) => order.marketId === position.id),
     ...position,
-  })) as PositionTableRow[]; //xcxc
+  })) as PositionTableRow[];
 
   return (
     <Styled.Table
