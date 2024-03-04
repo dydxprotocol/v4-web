@@ -23,7 +23,7 @@ export const useAppThemeAndColorModeContext = () => {
   );
 
   useEffect(() => {
-    const handler = (e) => {
+    const handler = (e: MediaQueryListEvent) => {
       if (e.matches) {
         setSystemPreference(AppTheme.Dark);
       } else {

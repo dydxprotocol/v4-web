@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import type { Story } from '@ladle/react';
 
 import { AlertType } from '@/constants/alerts';
@@ -11,23 +9,16 @@ import { InputType } from '@/components/Input';
 import { StoryWrapper } from '.ladle/components';
 
 export const FormInputWithValidationStory: Story<FormInputProps> = (args) => {
-  const [value, setValue] = useState('');
-
   return (
     <StoryWrapper>
-      <FormInput
-        {...args}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
-        value={value}
-      />
+      <FormInput {...args} />
     </StoryWrapper>
   );
 };
 
 FormInputWithValidationStory.args = {
   decimals: 2,
-  max: '',
-  min: '',
+  max: 100,
   placeholder: '',
   validationConfig: {
     attached: false,
@@ -44,24 +35,17 @@ FormInputWithValidationStory.argTypes = {
   },
 };
 
-export const FormInputStoryWithSlotOuterRight: Story<FormInputProps> = (args) => {
-  const [value, setValue] = useState('');
+export const FormInputStoryWithSlotRight: Story<FormInputProps> = (args) => {
   return (
     <StoryWrapper>
-      <FormInput
-        {...args}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value)}
-        slotOuterRight={<Button>Submit</Button>}
-        value={value}
-      />
+      <FormInput slotRight={<Button>Submit</Button>} {...args} />
     </StoryWrapper>
   );
 };
 
-FormInputStoryWithSlotOuterRight.args = {
+FormInputStoryWithSlotRight.args = {
   decimals: 2,
-  max: '',
-  min: '',
+  max: 100,
   placeholder: '',
   validationConfig: {
     attached: false,
@@ -70,7 +54,7 @@ FormInputStoryWithSlotOuterRight.args = {
   },
 };
 
-FormInputStoryWithSlotOuterRight.argTypes = {
+FormInputStoryWithSlotRight.argTypes = {
   type: {
     options: Object.values(InputType),
     control: { type: 'select' },

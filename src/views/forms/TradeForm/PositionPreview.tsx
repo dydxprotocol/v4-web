@@ -23,7 +23,8 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
 
   const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
   const { configs, oraclePrice } = useSelector(getCurrentMarketData, shallowEqual) || {};
-  const { size: positionSize } = useSelector(getCurrentMarketPositionData, shallowEqual) || {};
+  const { size: positionSize, notionalTotal } =
+    useSelector(getCurrentMarketPositionData, shallowEqual) || {};
   const { stepSizeDecimals, tickSizeDecimals } = configs || {};
 
   return (
@@ -41,7 +42,7 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
       </Styled.YourPosition>
       <PositionTile
         currentSize={positionSize?.current}
-        oraclePrice={oraclePrice}
+        notionalTotal={notionalTotal?.current}
         postOrderSize={positionSize?.postOrder}
         stepSizeDecimals={stepSizeDecimals}
         symbol={id || undefined}
