@@ -1,5 +1,3 @@
-import { ReactNode } from 'react';
-
 import {
   APP_STRING_KEYS,
   ERRORS_STRING_KEYS,
@@ -11,6 +9,8 @@ import {
 } from '@dydxprotocol/v4-localization';
 
 import { type LinksConfigs } from '@/hooks/useURLConfigs';
+
+import formatString from '@/lib/formatString';
 
 export { TOOLTIP_STRING_KEYS } from '@dydxprotocol/v4-localization';
 
@@ -48,12 +48,19 @@ export type StringKey = keyof typeof STRING_KEYS;
 
 export type LocaleData = typeof EN_LOCALE_DATA;
 
-export type StringGetterFunction = (a: {
+export type StringGetterParams = Record<string, any>;
+
+export type StringGetterFunction = <T extends StringGetterParams>({
+  key,
+  params,
+}: {
   key: string;
-  params?: {
-    [key: string]: ReactNode;
-  };
-}) => string;
+  params?: T;
+}) => T extends {
+  [K in keyof T]: T[K] extends string | number ? any : T[K] extends JSX.Element ? any : never;
+}
+  ? string
+  : ReturnType<typeof formatString>;
 
 export const SUPPORTED_LOCALE_STRING_LABELS: { [key in SupportedLocales]: string } = {
   [SupportedLocales.EN]: 'English',
@@ -95,8 +102,8 @@ export type TooltipStrings = {
     stringParams?: any;
     urlConfigs?: LinksConfigs;
   }) => {
-    title?: string;
-    body: string;
+    title?: React.ReactNode;
+    body: React.ReactNode;
     learnMoreLink?: string;
   };
 };

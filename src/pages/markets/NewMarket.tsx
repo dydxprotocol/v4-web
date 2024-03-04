@@ -27,7 +27,15 @@ import { NewMarketForm } from '@/views/forms/NewMarketForm';
 
 import { MustBigNumber } from '@/lib/numbers';
 
-const StepItem = ({ step, subtitle, title }: { step: number; subtitle: string; title: string }) => (
+const StepItem = ({
+  step,
+  subtitle,
+  title,
+}: {
+  step: number;
+  subtitle: React.ReactNode;
+  title: string;
+}) => (
   <Styled.StepItem>
     <Styled.StepNumber>{step}</Styled.StepNumber>
     <Styled.Column>

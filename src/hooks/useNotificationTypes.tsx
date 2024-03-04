@@ -45,12 +45,12 @@ const parseStringParamsForNotification = ({
 }: {
   stringGetter: StringGetterFunction;
   value: unknown;
-}): ReactNode => {
+}) => {
   if (STRING_KEY_VALUES[value as StringKey]) {
-    return stringGetter({ key: value as StringKey });
+    return stringGetter({ key: value as string });
   }
 
-  return value as ReactNode;
+  return value as string;
 };
 
 export const notificationTypes: NotificationTypeConfig[] = [

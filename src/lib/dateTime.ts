@@ -44,7 +44,7 @@ export const formatRelativeTime = (
     locale: string;
     relativeToTimestamp?: number;
     format?: 'long' | 'short' | 'narrow' | 'singleCharacter';
-    largestUnit: keyof typeof timeUnits;
+    largestUnit?: keyof typeof timeUnits;
     resolution?: number;
     stripRelativeWords?: boolean;
   }

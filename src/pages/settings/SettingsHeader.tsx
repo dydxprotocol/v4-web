@@ -1,6 +1,6 @@
 import styled, { type AnyStyledComponent } from 'styled-components';
 
-import { StringGetterFunction, STRING_KEYS } from '@/constants/localization';
+import { type StringGetterFunction, STRING_KEYS } from '@/constants/localization';
 import { AppRoute, MobileSettingsRoute } from '@/constants/routes';
 
 import { layoutMixins } from '@/styles/layoutMixins';

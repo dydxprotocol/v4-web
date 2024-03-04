@@ -2,7 +2,7 @@ import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { HistoricalTradingRewardsPeriods, HistoricalTradingReward } from '@/constants/abacus';
-import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
+import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 
 import { useStringGetter, useTokenConfigs } from '@/hooks';
 

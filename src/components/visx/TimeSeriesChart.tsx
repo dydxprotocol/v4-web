@@ -170,7 +170,13 @@ export const TimeSeriesChart = <Datum extends {}>({
 
   // Computations
   const { zoom, domain, range, visibleData } = useMemo(() => {
-    if (!zoomDomain) return {};
+    if (!zoomDomain)
+      return {
+        zoom: 1,
+        domain: [0, 1] as [number, number],
+        range: [0, 1] as [number, number],
+        visibleData: data,
+      };
 
     const zoom = zoomDomain / minZoomDomain;
 
@@ -202,6 +208,8 @@ export const TimeSeriesChart = <Datum extends {}>({
 
   // Events
   const onWheel = ({ deltaX, deltaY }: WheelEvent) => {
+    if (!zoomDomain) return;
+
     setZoomDomain(
       clamp(
         Math.max(1e-320, Math.min(Number.MAX_SAFE_INTEGER, zoomDomain * Math.exp(deltaY / 1000))),

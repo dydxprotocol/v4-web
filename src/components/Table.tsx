@@ -379,7 +379,7 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
               item={row}
               state={state}
               // shouldRowRender={props.shouldRowRender}
-              {...props.getRowAttributes?.(row.value)}
+              {...props.getRowAttributes?.(row.value!)}
               withGradientCardRows={props.withGradientCardRows}
               withFocusStickyRows={props.withFocusStickyRows}
               withScrollSnapRows={props.withScrollSnapRows}
