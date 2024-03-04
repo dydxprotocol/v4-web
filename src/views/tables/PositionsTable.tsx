@@ -9,6 +9,7 @@ import {
   type Nullable,
   type SubaccountPosition,
   POSITION_SIDES,
+  SubaccountOrder,
 } from '@/constants/abacus';
 import { StringGetterFunction, STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
@@ -324,8 +325,16 @@ export const PositionsTable = ({
   const openPositions = useSelector(getExistingOpenPositions, shallowEqual) || [];
   const openOrders = useSelector(getSubaccountOpenOrders, shallowEqual) || [];
 
-  const stopLossOrders = openOrders.filter(isStopLossOrder); 
-  const takeProfitOrders = openOrders.filter(isTakeProfitOrder);
+  const stopLossOrders: SubaccountOrder[] = [];
+  const takeProfitOrders: SubaccountOrder[] = [];
+
+  openOrders.map((order: SubaccountOrder) => {
+    if (isStopLossOrder(order)) {
+      stopLossOrders.push(order);
+    } else if (isTakeProfitOrder(order)) {
+      takeProfitOrders.push(order);
+    }
+  });
 
   const positionsData = openPositions.map((position: SubaccountPosition) => ({
     tickSizeDecimals: perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
@@ -334,7 +343,7 @@ export const PositionsTable = ({
     stopLossOrders: stopLossOrders.filter((order) => order.marketId === position.id),
     takeProfitOrders: takeProfitOrders.filter((order) => order.marketId === position.id),
     ...position,
-  })) as PositionTableRow[];
+  }));
 
   return (
     <Styled.Table

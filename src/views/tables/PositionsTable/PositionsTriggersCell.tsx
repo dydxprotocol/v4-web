@@ -1,6 +1,6 @@
 import styled, { type AnyStyledComponent, css } from 'styled-components';
 
-import { AbacusOrderType, AbacusOrderTypes } from '@/constants/abacus';
+import { AbacusOrderTypes, Nullable } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -17,7 +17,7 @@ import { isMarketOrderType } from '@/lib/orders';
 export type PositionTableConditionalOrder = {
   price: number;
   size: number;
-  triggerPrice: number;
+  triggerPrice: Nullable<number>;
   type: AbacusOrderTypes;
 };
 
@@ -32,11 +32,13 @@ export const PositionsTriggersCell = ({
   stopLossOrders,
   takeProfitOrders,
   positionSize,
-  isDisabled, // TODO: CT-656 Disable onMultipleOrdersClick behavior when isDisabled
+  isDisabled, // TODO: CT-656 Disable onViewOrdersClick behavior when isDisabled
 }: ElementProps) => {
   const stringGetter = useStringGetter();
 
-  const onMultipleOrdersClick = () => {};
+  const onViewOrdersClick = () => {
+    // TODO: CT-655
+  };
 
   const renderOutput = ({
     label,
@@ -53,7 +55,7 @@ export const PositionsTriggersCell = ({
         type={ButtonType.Link}
         action={ButtonAction.Navigation}
         size={ButtonSize.XSmall}
-        onClick={onMultipleOrdersClick}
+        onClick={onViewOrdersClick}
       >
         {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
         {<Icon iconName={IconName.Arrow} />}
@@ -105,11 +107,13 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Cell = styled.div`
   ${layoutMixins.column}
-  gap: 0.5ch;
+  gap: 0.25em;
 `;
 
 Styled.Row = styled.span`
   ${layoutMixins.inlineRow}
+
+  --item-height: 1.25rem;
 `;
 
 Styled.Label = styled.div<{ warning?: boolean }>`
@@ -118,7 +122,7 @@ Styled.Label = styled.div<{ warning?: boolean }>`
   border-radius: 0.5em;
   display: flex;
   font: var(--font-tiny-book);
-  height: 1.25rem;
+  height: var(--item-height);
   padding: 0 0.25rem;
 
   ${({ warning }) =>
@@ -134,6 +138,6 @@ Styled.Output = styled(Output)`
 `;
 
 Styled.Button = styled(Button)`
-  --button-height: 1.25rem;
+  --button-height: var(--item-height);
   --button-padding: 0;
 `;
