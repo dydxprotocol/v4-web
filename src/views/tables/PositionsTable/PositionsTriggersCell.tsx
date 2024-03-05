@@ -1,8 +1,13 @@
 import styled, { type AnyStyledComponent, css } from 'styled-components';
 
+import {
+  OrderTimeInForce,
+} from '@dydxprotocol/v4-client-js';
+
 import { AbacusOrderTypes, Nullable } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { TimeInForceOptions } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks';
 
@@ -18,6 +23,7 @@ export type PositionTableConditionalOrder = {
   price: number;
   size: number;
   triggerPrice: Nullable<number>;
+  timeInForce: OrderTimeInForce;
   type: AbacusOrderTypes;
 };
 
@@ -69,10 +75,10 @@ export const PositionsTriggersCell = ({
         </>
       );
     } else if (orders.length === 1) {
-      const { price, size, triggerPrice, type } = orders[0];
+      const { price, size, triggerPrice, timeInForce, type } = orders[0];
 
       const isPartial = !!(positionSize && Math.abs(size) < Math.abs(positionSize));
-      const shouldRenderValue = isMarketOrderType(type) || price === triggerPrice;
+      const shouldRenderValue = timeInForce.name === TimeInForceOptions.IOC && (isMarketOrderType(type) || price === triggerPrice);
 
       return shouldRenderValue ? (
         <>

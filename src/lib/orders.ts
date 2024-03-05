@@ -92,15 +92,15 @@ export const isStopLossOrder = (order: SubaccountOrder) =>
   [AbacusOrderType.stopLimit, AbacusOrderType.stopMarket].some(
     ({ ordinal }) => ordinal === order.type.ordinal
   ) &&
-  order.reduceOnly &&
-  order.timeInForce?.name === TimeInForceOptions.IOC;
+  [TimeInForceOptions.IOC, TimeInForceOptions.FOK].includes(order.timeInForce.name) &&
+  order.reduceOnly;
 
 export const isTakeProfitOrder = (order: SubaccountOrder) =>
   [AbacusOrderType.takeProfitLimit, AbacusOrderType.takeProfitMarket].some(
     ({ ordinal }) => ordinal === order.type.ordinal
   ) &&
-  order.reduceOnly &&
-  order.timeInForce?.name === TimeInForceOptions.IOC;
+  [TimeInForceOptions.IOC, TimeInForceOptions.FOK].includes(order.timeInForce.name) &&
+  order.reduceOnly;
 
 export const relativeTimeString = ({
   timeInMs,
