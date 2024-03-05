@@ -20,7 +20,7 @@ import { type CustomRowConfig, TableRow } from '@/components/Table';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
-import { getSubaccountOpenOrdersBySideAndPrice } from '@/state/accountSelectors';
+import { getSubaccountOpenStatusOrdersBySideAndPrice } from '@/state/accountSelectors';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
@@ -51,7 +51,7 @@ const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number 
   const orderbook = useSelector(getCurrentMarketOrderbook, shallowEqual);
 
   const openOrdersBySideAndPrice =
-    useSelector(getSubaccountOpenOrdersBySideAndPrice, shallowEqual) || {};
+    useSelector(getSubaccountOpenStatusOrdersBySideAndPrice, shallowEqual) || {};
 
   return useMemo(() => {
     const asks = (orderbook?.asks?.toArray() ?? [])
