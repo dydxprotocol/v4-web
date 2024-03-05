@@ -23,6 +23,10 @@ export enum AppColorMode {
   RedUp = 'RedUp',
 }
 
+export enum OtherPreference {
+  DisplayAllMarketsDefault = 'DisplayAllMarketsDefault',
+}
+
 export interface ConfigsState {
   appThemeSetting: AppThemeSetting;
   appColorMode: AppColorMode;

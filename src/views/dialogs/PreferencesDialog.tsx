@@ -12,7 +12,7 @@ import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { Switch } from '@/components/Switch';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { setDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configs';
+import { OtherPreference, setDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configs';
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
 
 export const usePreferenceMenu = () => {
@@ -28,10 +28,6 @@ export const usePreferenceMenu = () => {
 
   const toggleNotifPreference = (type: NotificationType) =>
     setEnabledNotifs((prev) => ({ ...prev, [type]: !prev[type] }));
-
-  enum OtherPreference {
-    DisplayAllMarketsDefault = 'DisplayAllMarketsDefault',
-  }
 
   useEffect(() => {
     setNotificationPreferences(enabledNotifs);
