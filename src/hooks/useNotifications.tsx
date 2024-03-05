@@ -67,6 +67,16 @@ const useNotificationsContext = () => {
     setNotificationsLastUpdated(Date.now());
   }, [notifications]);
 
+  const clearAbacusGeneratedNotifications = useCallback((notifications: Notifications) => {
+    const newNotifications:Notifications = {}
+    for (const [key, value] of Object.entries(notifications)) {
+      if (value.type != NotificationType.AbacusGenerated) {
+        newNotifications[getKey(value)] = value
+      }
+    }
+    setNotifications(newNotifications)
+  }, [notifications])
+
   const getKey = useCallback(
     <T extends string | number>(notification: Pick<Notification<T>, 'type' | 'id'>) =>
       `${notification.type}/${notification.id}`,
@@ -85,6 +95,11 @@ const useNotificationsContext = () => {
 
   // Check for version changes
   useEffect(() => {
+    const MAX_NOTIFICATIONS = 50;
+    if (Object.keys(notifications).length > MAX_NOTIFICATIONS) {
+      clearAbacusGeneratedNotifications(notifications)
+    }
+
     if (
       notificationPreferences.version !==
       LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences]
