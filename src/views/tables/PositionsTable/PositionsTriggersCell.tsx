@@ -25,14 +25,16 @@ export type PositionTableConditionalOrder = {
 };
 
 type ElementProps = {
+  market: string;
   stopLossOrders: PositionTableConditionalOrder[];
   takeProfitOrders: PositionTableConditionalOrder[];
-  onViewOrdersClick?: () => void;
+  onViewOrdersClick: (market: string) => void;
   positionSize?: number | null;
   isDisabled?: boolean;
 };
 
 export const PositionsTriggersCell = ({
+  market,
   stopLossOrders,
   takeProfitOrders,
   onViewOrdersClick,
@@ -56,7 +58,7 @@ export const PositionsTriggersCell = ({
         type={ButtonType.Link}
         action={ButtonAction.Navigation}
         size={ButtonSize.XSmall}
-        onClick={onViewOrdersClick}
+        onClick={() => onViewOrdersClick(market)}
       >
         {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
         {<Icon iconName={IconName.Arrow} />}

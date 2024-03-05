@@ -80,7 +80,7 @@ const getPositionsTableColumnDef = ({
   stringGetter: StringGetterFunction;
   width?: ColumnSize;
   isAccountViewOnly: boolean;
-  navigateToOrders?: () => void;
+  navigateToOrders: (market: string) => void;
 }) => ({
   width,
   ...(
@@ -277,8 +277,9 @@ const getPositionsTableColumnDef = ({
         isActionable: true,
         allowsSorting: false,
         hideOnBreakpoint: MediaQueryKeys.isTablet,
-        renderCell: ({ size, stopLossOrders, takeProfitOrders }) => (
+        renderCell: ({ id, size, stopLossOrders, takeProfitOrders }) => (
           <PositionsTriggersCell
+            market={id}
             stopLossOrders={stopLossOrders}
             takeProfitOrders={takeProfitOrders}
             positionSize={size?.current}
@@ -304,7 +305,7 @@ type ElementProps = {
   columnWidths?: Partial<Record<PositionsTableColumnKey, ColumnSize>>;
   currentRoute?: string;
   onNavigate?: () => void;
-  navigateToOrders?: () => void;
+  navigateToOrders: (market: string) => void;
 };
 
 type StyleProps = {

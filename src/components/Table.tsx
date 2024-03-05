@@ -101,7 +101,7 @@ export type ElementProps<TableRowData extends object | CustomRowConfig, TableRow
 
 type StyleProps = {
   hideHeader?: boolean;
-  withGradientCardRows?: boolean;
+  withGradientCardRows?: boolean; // TODO: CT-662
   withFocusStickyRows?: boolean;
   withOuterBorder?: boolean;
   withInnerBorders?: boolean;
