@@ -118,7 +118,11 @@ const useNotificationsContext = () => {
     (notification: Notification, status: NotificationStatus) => {
       notification.status = status;
       notification.timestamps[notification.status] = Date.now();
-      setNotifications({ ...notifications, [getKey(notification)]: notification });
+      // Don't save AbacusGenerated notifcations to LocalStorage, these are triggered by
+      // Orders, Fills, Trading Rewards etc. and we don't need to know if they've already been seen
+      if (notification.type != NotificationType.AbacusGenerated) {
+        setNotifications({ ...notifications, [getKey(notification)]: notification });
+      }
     },
     [notifications, getKey]
   );
