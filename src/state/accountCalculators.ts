@@ -88,6 +88,14 @@ export const calculateIsAccountLoading = createSelector(
 );
 
 /**
+ * @description calculate whether positions table should render triggers column
+ */
+export const calculateShouldRenderTriggersInPositionsTable = createSelector(
+  [calculateIsAccountViewOnly],
+  (isAccountViewOnly: boolean) => !isAccountViewOnly && testFlags.configureSlTpFromPositionsTable
+);
+
+/**
  * @description calculate whether positions table should render actions column
  */
 export const calculateShouldRenderActionsInPositionsTable = createSelector(

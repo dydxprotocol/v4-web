@@ -10,13 +10,15 @@ import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
-import { calculateShouldRenderActionsInPositionsTable } from '@/state/accountCalculators';
+import { calculateShouldRenderActionsInPositionsTable, calculateShouldRenderTriggersInPositionsTable} from '@/state/accountCalculators';
 
 import { isTruthy } from '@/lib/isTruthy';
 
 export const Positions = () => {
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
+
+  const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
   const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable);
 
   return (
@@ -40,6 +42,7 @@ export const Positions = () => {
                 PositionsTableColumnKey.UnrealizedPnl,
                 PositionsTableColumnKey.RealizedPnl,
                 PositionsTableColumnKey.AverageOpenAndClose,
+                shouldRenderTriggers && PositionsTableColumnKey.Triggers,
                 shouldRenderActions && PositionsTableColumnKey.Actions
               ].filter(isTruthy)
         }

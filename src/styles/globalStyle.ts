@@ -3,6 +3,7 @@ import { createGlobalStyle } from 'styled-components';
 export const GlobalStyle = createGlobalStyle`
   :root {
     --color-white: ${({ theme }) => theme.white};
+    --color-black: ${({ theme }) => theme.black};
     --color-green: ${({ theme }) => theme.green};
     --color-red: ${({ theme }) => theme.red};
 

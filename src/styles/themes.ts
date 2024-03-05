@@ -4,6 +4,7 @@ import { BrightnessFilterToken, ColorToken, OpacityToken } from '@/constants/sty
 import { generateFadedColorVariant } from '@/lib/styles';
 
 const ClassicThemeBase: ThemeColorBase = {
+  black: ColorToken.Black,
   white: ColorToken.White,
   green: ColorToken.Green1,
   red: ColorToken.Red2,
@@ -64,6 +65,7 @@ const ClassicThemeBase: ThemeColorBase = {
 };
 
 const DarkThemeBase: ThemeColorBase = {
+  black: ColorToken.Black,
   white: ColorToken.White,
   green: ColorToken.Green0,
   red: ColorToken.Red0,
@@ -124,6 +126,7 @@ const DarkThemeBase: ThemeColorBase = {
 };
 
 const LightThemeBase: ThemeColorBase = {
+  black: ColorToken.Black,
   white: ColorToken.White,
   green: ColorToken.Green2,
   red: ColorToken.Red1,
