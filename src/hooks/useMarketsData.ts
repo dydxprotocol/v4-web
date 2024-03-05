@@ -34,6 +34,9 @@ const filterFunctions = {
   [MarketFilters.AI]: (market: MarketData) => {
     return market.asset.tags?.toArray().includes('AI');
   },
+  [MarketFilters.MEME]: (market: MarketData) => {
+    return market.asset.tags?.toArray().includes('Meme');
+  },
   [MarketFilters.NEW]: (market: MarketData) => {
     return market.isNew;
   },
