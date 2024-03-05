@@ -178,7 +178,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
 
   return (
     <>
-      <Toolbar>
+      <Styled.Toolbar>
         <MarketFilter
           hideNewMarketButton
           selectedFilter={filter}
@@ -186,7 +186,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
           onChangeFilter={setFilter}
           onSearchTextChange={setSearchFilter}
         />
-      </Toolbar>
+      </Styled.Toolbar>
 
       <Styled.Table
         withInnerBorders
@@ -247,6 +247,11 @@ export const MarketsTable = ({ className }: { className?: string }) => {
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
+
+Styled.Toolbar = styled(Toolbar)`
+  max-width: 100vw;
+  overflow: hidden;
+`;
 
 Styled.Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}

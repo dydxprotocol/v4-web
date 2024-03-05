@@ -68,6 +68,7 @@ Styled.MarketFilter = styled.div`
   justify-content: space-between;
   gap: 0.75rem;
   flex: 1;
+  overflow: hidden;
 `;
 
 Styled.ToggleGroupContainer = styled.div`
