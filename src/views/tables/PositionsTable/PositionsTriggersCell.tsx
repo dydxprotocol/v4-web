@@ -71,7 +71,9 @@ export const PositionsTriggersCell = ({
           {triggerLabel()} <Styled.Output type={OutputType.Fiat} value={null} />
         </>
       );
-    } else if (orders.length === 1) {
+    }
+
+    if (orders.length === 1) {
       const { price, size, triggerPrice, timeInForce, type } = orders[0];
 
       const isPartial = !!(positionSize && Math.abs(size) < Math.abs(positionSize));
@@ -79,26 +81,23 @@ export const PositionsTriggersCell = ({
         timeInForce?.name === TimeInForceOptions.IOC &&
         (isMarketOrderType(type) || price === triggerPrice);
 
-      return shouldRenderValue ? (
-        <>
-          {triggerLabel(isPartial)}
-          <Styled.Output type={OutputType.Fiat} value={triggerPrice} />
-          {/* // TODO: CT-654 Update styling + confirm logic for partial positions */}
-        </>
-      ) : (
-        <>
-          {triggerLabel()}
-          {viewOrdersButton}
-        </>
-      );
-    } else {
-      return (
-        <>
-          {triggerLabel()}
-          {viewOrdersButton}
-        </>
-      );
+      if (shouldRenderValue) {
+        return (
+          <>
+            {triggerLabel(isPartial)}
+            <Styled.Output type={OutputType.Fiat} value={triggerPrice} />
+            {/* // TODO: CT-654 Update styling + confirm logic for partial positions */}
+          </>
+        );
+      }
     }
+
+    return (
+      <>
+        {triggerLabel()}
+        {viewOrdersButton}
+      </>
+    );
   };
   return (
     <Styled.Cell>
