@@ -2,6 +2,7 @@ import { DateTime } from 'luxon';
 
 import {
   AbacusOrderStatus,
+  AbacusOrderTimeInForce,
   AbacusOrderType,
   AbacusOrderTypes,
   type Asset,
@@ -13,7 +14,6 @@ import {
   type PerpetualMarket,
 } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
-import { TimeInForceOptions } from '@/constants/trade';
 
 import { IconName } from '@/components/Icon';
 
@@ -92,14 +92,18 @@ export const isStopLossOrder = (order: SubaccountOrder) =>
   [AbacusOrderType.stopLimit, AbacusOrderType.stopMarket].some(
     ({ ordinal }) => ordinal === order.type.ordinal
   ) &&
-  [TimeInForceOptions.IOC, TimeInForceOptions.FOK].includes(order.timeInForce.name) &&
+  [AbacusOrderTimeInForce.IOC, AbacusOrderTimeInForce.FOK].some(
+    ({ ordinal }) => ordinal === order.timeInForce?.ordinal
+  ) &&
   order.reduceOnly;
 
 export const isTakeProfitOrder = (order: SubaccountOrder) =>
   [AbacusOrderType.takeProfitLimit, AbacusOrderType.takeProfitMarket].some(
     ({ ordinal }) => ordinal === order.type.ordinal
   ) &&
-  [TimeInForceOptions.IOC, TimeInForceOptions.FOK].includes(order.timeInForce.name) &&
+  [AbacusOrderTimeInForce.IOC, AbacusOrderTimeInForce.FOK].some(
+    ({ ordinal }) => ordinal === order.timeInForce?.ordinal
+  ) &&
   order.reduceOnly;
 
 export const relativeTimeString = ({
