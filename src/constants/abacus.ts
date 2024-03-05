@@ -179,6 +179,7 @@ export type ValidationError = Abacus.exchange.dydx.abacus.output.input.Validatio
 export const TradeInputErrorAction = Abacus.exchange.dydx.abacus.output.input.ErrorAction;
 export type AbacusOrderTypes = Abacus.exchange.dydx.abacus.output.input.OrderType;
 export type AbacusOrderSides = Abacus.exchange.dydx.abacus.output.input.OrderSide;
+export type AbacusOrderTimeInForces = Abacus.exchange.dydx.abacus.output.input.OrderTimeInForce;
 export const AbacusOrderType = Abacus.exchange.dydx.abacus.output.input.OrderType;
 export const AbacusOrderSide = Abacus.exchange.dydx.abacus.output.input.OrderSide;
 export const AbacusOrderTimeInForce = Abacus.exchange.dydx.abacus.output.input.OrderTimeInForce;
