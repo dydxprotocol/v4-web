@@ -30,8 +30,8 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: ^1.4.13
-    version: 1.4.13
+    specifier: file:/Users/aleka/Documents/dydx/v4-abacus/build/packages/js/dydxprotocol-v4-abacus-1.4.13.tgz
+    version: file:../v4-abacus/build/packages/js/dydxprotocol-v4-abacus-1.4.13.tgz
   '@dydxprotocol/v4-client-js':
     specifier: ^1.0.21
     version: 1.0.21
@@ -1509,10 +1509,6 @@ packages:
 
   /@cosmjs/utils@0.32.2:
     resolution: {integrity: sha512-Gg5t+eR7vPJMAmhkFt6CZrzPd0EKpAslWwk5rFVYZpJsM8JG5KT9XQ99hgNM3Ov6ScNoIWbXkpX27F6A9cXR4Q==}
-    dev: false
-
-  /@dydxprotocol/v4-abacus@1.4.13:
-    resolution: {integrity: sha512-+Avd0TvbdQ4OvwwMOpQgLMW0+yQ87FTYTWHZIkmsMsBH5yoYHG751i2bsGp0z+VUKMScCpcibUIGFkgTqLHIlA==}
     dev: false
 
   /@dydxprotocol/v4-client-js@1.0.21:
@@ -16556,3 +16552,9 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
+
+  file:../v4-abacus/build/packages/js/dydxprotocol-v4-abacus-1.4.13.tgz:
+    resolution: {integrity: sha512-BJq3V2u9kapcVTBGG+CUsmK6dPS84omfDy66ESBsKNh/i0+XGeSr30U0aJxFvdzYMumXH+Q5YaHgImTf5gV1Yg==, tarball: file:../v4-abacus/build/packages/js/dydxprotocol-v4-abacus-1.4.13.tgz}
+    name: '@dydxprotocol/v4-abacus'
+    version: 1.4.13
+    dev: false

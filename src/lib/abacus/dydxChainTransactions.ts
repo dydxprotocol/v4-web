@@ -1,7 +1,7 @@
 import { EncodeObject } from '@cosmjs/proto-signing';
 import type { IndexedTx } from '@cosmjs/stargate';
 import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
-import { GAS_MULTIPLIER, encodeJson } from '@dydxprotocol/v4-client-js';
+import { GAS_MULTIPLIER, OrderFlags, encodeJson } from '@dydxprotocol/v4-client-js';
 import {
   CompositeClient,
   IndexerConfig,
@@ -16,6 +16,7 @@ import {
   OrderTimeInForce,
   OrderExecution,
 } from '@dydxprotocol/v4-client-js';
+import { calculateOrderFlags } from '@dydxprotocol/v4-client-js/build/src/clients/helpers/chain-helpers';
 import Long from 'long';
 
 import {
@@ -41,6 +42,7 @@ import { openDialog } from '@/state/dialogs';
 import { StatefulOrderError } from '../errors';
 import { bytesToBigInt } from '../numbers';
 import { log } from '../telemetry';
+import TransactionQueue from '../transactionQueue';
 import { hashFromTx, getMintscanTxLink } from '../txUtils';
 
 (BigInt.prototype as any).toJSON = function () {
@@ -53,10 +55,15 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   private store: RootStore | undefined;
   private localWallet: LocalWallet | undefined;
   private nobleWallet: LocalWallet | undefined;
+  private transactionQueue: TransactionQueue;
 
   constructor() {
     this.compositeClient = undefined;
     this.store = undefined;
+    this.transactionQueue = new TransactionQueue(
+      this.placeOrderTransaction.bind(this),
+      this.cancelOrderTransaction.bind(this)
+    );
   }
 
   get isNobleClientConnected(): boolean {
@@ -503,13 +510,34 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
       switch (type) {
         case TransactionType.PlaceOrder: {
-          const result = await this.placeOrderTransaction(params);
-          callback(result);
+          const isLongTermOrder =
+            calculateOrderFlags(params.type, params.timeInForce) === OrderFlags.LONG_TERM;
+
+          if (isLongTermOrder) {
+            this.transactionQueue.enqueue({
+              type,
+              payload: params,
+              callback,
+            });
+          } else {
+            const result = await this.placeOrderTransaction(params);
+            callback(result);
+          }
+
           break;
         }
         case TransactionType.CancelOrder: {
-          const result = await this.cancelOrderTransaction(params);
-          callback(result);
+          if (params.orderFlags === OrderFlags.LONG_TERM) {
+            this.transactionQueue.enqueue({
+              type,
+              payload: params,
+              callback,
+            });
+          } else {
+            const result = await this.cancelOrderTransaction(params);
+            callback(result);
+          }
+
           break;
         }
         case TransactionType.simulateWithdraw: {
