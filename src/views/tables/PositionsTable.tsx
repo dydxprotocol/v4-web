@@ -6,9 +6,9 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 import {
   type Asset,
   type Nullable,
+  type SubaccountOrder,
   type SubaccountPosition,
   POSITION_SIDES,
-  SubaccountOrder,
 } from '@/constants/abacus';
 import { StringGetterFunction, STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
