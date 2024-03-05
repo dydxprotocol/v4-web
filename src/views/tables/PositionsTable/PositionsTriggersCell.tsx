@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import { AbacusOrderTimeInForces, AbacusOrderTypes, Nullable } from '@/constants/abacus';
