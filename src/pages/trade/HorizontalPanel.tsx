@@ -31,6 +31,7 @@ import {
   getTradeInfoNumbers,
 } from '@/state/accountSelectors';
 import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
@@ -57,7 +58,8 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
 
-  const [view, setView] = useState<PanelView>(PanelView.CurrentMarket);
+  const allMarkets = useSelector(getDefaultToAllMarketsInPositionsOrdersFills);
+  const [view, setView] = useState<PanelView>(allMarkets ? PanelView.AllMarkets : PanelView.CurrentMarket);
   const currentMarketId = useSelector(getCurrentMarketId);
   const currentMarketAssetId = useSelector(getCurrentMarketAssetId);
 
