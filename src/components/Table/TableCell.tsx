@@ -1,6 +1,5 @@
 import styled, { type AnyStyledComponent } from 'styled-components';
 
-import { layoutMixins } from '@/styles/layoutMixins';
 import { tableMixins } from '@/styles/tableMixins';
 
 export const TableCell = ({

@@ -18,6 +18,7 @@ export enum MarketFilters {
   AI = 'AI',
   NFT = 'NFT',
   GAMING = 'Gaming',
+  MEME = 'Meme',
 }
 
 export const MARKET_FILTER_LABELS = {
@@ -29,6 +30,7 @@ export const MARKET_FILTER_LABELS = {
   [MarketFilters.AI]: STRING_KEYS.AI,
   [MarketFilters.NFT]: STRING_KEYS.NFT,
   [MarketFilters.GAMING]: STRING_KEYS.GAMING,
+  [MarketFilters.MEME]: STRING_KEYS.MEME,
 };
 
 export const DEFAULT_MARKETID = 'ETH-USD';
