@@ -30,11 +30,10 @@ import {
   getTradeInfoNumbers,
 } from '@/state/accountSelectors';
 import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsSelectors';
+import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
-
-import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
 
 enum InfoSection {
   Position = 'Position',
