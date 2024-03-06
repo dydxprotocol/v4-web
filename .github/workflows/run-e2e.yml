@@ -3,8 +3,25 @@ name: E2E Tests
 on:
   deployment_status:
 jobs:
+  check-environment:
+    runs-on: ubuntu-latest
+    outputs:
+      is_correct_env: ${{ steps.check_env.outputs.correct_env }}
+    if: >
+      github.event_name == 'deployment_status' &&
+      github.event.deployment_status.state == 'success'
+    steps:
+      - id: check_env
+        run: |
+          if [[ "${{ github.event.deployment_status.environment_url }}" == *"v4-testnet"* || "${{ github.event.deployment_status.environment_url }}" == *"v4-staging"* ]]; then
+            echo "::set-output name=correct_env::true"
+          else
+            echo "::set-output name=correct_env::false"
+          fi
+
   run-e2es:
-    if: github.event_name == 'deployment_status' && github.event.deployment_status.state == 'success'
+    needs: check-environment
+    if: needs.check-environment.outputs.is_correct_env == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Dump GitHub context
