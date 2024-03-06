@@ -2,7 +2,10 @@ import styled, { AnyStyledComponent } from 'styled-components';
 
 import { type SubaccountPosition } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
+
+import { useStringGetter } from '@/hooks';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
@@ -22,9 +25,14 @@ export const PositionsMarginCell = ({
   isDisabled,
   notionalTotal,
 }: PositionsMarginCellProps) => {
+  const stringGetter = useStringGetter();
   const notionalTotalBN = MustBigNumber(notionalTotal?.current);
   const adjustedMmfBN = MustBigNumber(adjustedMmf?.current);
   const margin = notionalTotalBN.times(adjustedMmfBN).toFixed(USD_DECIMALS);
+
+  const marginModeLabel = true
+    ? stringGetter({ key: STRING_KEYS.CROSS })
+    : stringGetter({ key: STRING_KEYS.ISOLATED });
 
   return (
     <TableCell
@@ -39,7 +47,7 @@ export const PositionsMarginCell = ({
       }
     >
       <Output type={OutputType.Fiat} value={margin} showSign={ShowSign.None} />
-      {true ? <span>Cross</span> : <span>Isolated</span>}
+      <span>{marginModeLabel}</span>
     </TableCell>
   );
 };
