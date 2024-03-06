@@ -3,7 +3,6 @@ import styled, { AnyStyledComponent } from 'styled-components';
 import { type SubaccountPosition } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { USD_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter } from '@/hooks';
 
@@ -28,7 +27,7 @@ export const PositionsMarginCell = ({
   const stringGetter = useStringGetter();
   const notionalTotalBN = MustBigNumber(notionalTotal?.current);
   const adjustedMmfBN = MustBigNumber(adjustedMmf?.current);
-  const margin = notionalTotalBN.times(adjustedMmfBN).toFixed(USD_DECIMALS);
+  const margin = notionalTotalBN.times(adjustedMmfBN);
 
   const marginModeLabel = true
     ? stringGetter({ key: STRING_KEYS.CROSS })
