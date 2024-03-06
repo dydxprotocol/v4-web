@@ -5,8 +5,8 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 import { Input, type InputProps, InputType } from '@/components/Input';
-import { IconButton } from './IconButton';
 
 type ElementProps = {
   onTextChange?: (value: string) => void;
@@ -14,18 +14,13 @@ type ElementProps = {
 
 export type SearchInputProps = ElementProps & InputProps;
 
-export const SearchInput = ({
-  placeholder,
-  onTextChange,
-}: SearchInputProps) => {
+export const SearchInput = ({ placeholder, onTextChange }: SearchInputProps) => {
   const [value, setValue] = useState('');
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   return (
     <Styled.Search>
-      <Icon
-        iconName={IconName.Search}
-      />
+      <Icon iconName={IconName.Search} />
       <Styled.Input
         autoFocus
         ref={inputRef}
@@ -37,12 +32,14 @@ export const SearchInput = ({
         }}
         placeholder={placeholder}
       />
-      {value.length > 0 && <Styled.IconButton
-        iconName={IconName.Close}
-        onClick={() => {
-          setValue('');
-        }}
-      />}
+      {value.length > 0 && (
+        <Styled.IconButton
+          iconName={IconName.Close}
+          onClick={() => {
+            setValue('');
+          }}
+        />
+      )}
     </Styled.Search>
   );
 };
@@ -68,6 +65,8 @@ Styled.Input = styled(Input)`
 
 Styled.IconButton = styled(IconButton)`
   --button-icon-size: 0.5rem;
+  --button-border: none;
+  --button-backgroundColor: transparent;
   width: 1.5rem;
   height: 1.5rem;
 `;
