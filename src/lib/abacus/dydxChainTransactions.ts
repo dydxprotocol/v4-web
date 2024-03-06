@@ -510,32 +510,24 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
       switch (type) {
         case TransactionType.PlaceOrder: {
-          const isLongTermOrder =
-            calculateOrderFlags(params.type, params.timeInForce) === OrderFlags.LONG_TERM;
+          const isShortTermOrder =
+            calculateOrderFlags(params.type, params.timeInForce) === OrderFlags.SHORT_TERM;
 
-          if (isLongTermOrder) {
-            this.transactionQueue.enqueue({
-              type,
-              payload: params,
-              callback,
-            });
-          } else {
+          if (isShortTermOrder) {
             const result = await this.placeOrderTransaction(params);
             callback(result);
+          } else {
+            this.transactionQueue.enqueue({ type, payload: params, callback });
           }
 
           break;
         }
         case TransactionType.CancelOrder: {
-          if (params.orderFlags === OrderFlags.LONG_TERM) {
-            this.transactionQueue.enqueue({
-              type,
-              payload: params,
-              callback,
-            });
-          } else {
+          if (params.orderFlags === OrderFlags.SHORT_TERM) {
             const result = await this.cancelOrderTransaction(params);
             callback(result);
+          } else {
+            this.transactionQueue.enqueue({ type, payload: params, callback });
           }
 
           break;
