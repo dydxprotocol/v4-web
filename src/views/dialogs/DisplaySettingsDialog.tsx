@@ -263,11 +263,11 @@ Styled.ColorPreferenceLabel = styled.div`
 
 Styled.ArrowIconContainer = styled.div`
   ${layoutMixins.column}
-  gap: 0.5ch;
+  gap: 0.25rem;
 
   svg {
-    height: 0.75em;
-    width: 0.75em;
+    height: 0.875em;
+    width: 0.875em;
   }
 `;
 

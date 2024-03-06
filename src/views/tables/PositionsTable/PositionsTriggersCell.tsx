@@ -60,7 +60,7 @@ export const PositionsTriggersCell = ({
         onClick={() => onViewOrdersClick(market)}
       >
         {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
-        {<Icon iconName={IconName.Arrow} />}
+        {<Styled.ArrowIcon iconName={IconName.Arrow} />}
       </Styled.Button>
     );
 
@@ -143,4 +143,8 @@ Styled.Output = styled(Output)`
 Styled.Button = styled(Button)`
   --button-height: var(--item-height);
   --button-padding: 0;
+`;
+
+Styled.ArrowIcon = styled(Icon)`
+  stroke-width: 2;
 `;

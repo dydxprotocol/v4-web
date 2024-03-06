@@ -64,6 +64,7 @@ export const Overview = () => {
               state: { from: AppRoute.Portfolio },
             })
           }
+          withOuterBorder
         />
       </Styled.AttachedExpandingSection>
     </div>
