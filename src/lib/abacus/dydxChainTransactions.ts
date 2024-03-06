@@ -42,8 +42,8 @@ import { openDialog } from '@/state/dialogs';
 import { StatefulOrderError } from '../errors';
 import { bytesToBigInt } from '../numbers';
 import { log } from '../telemetry';
-import TransactionQueue from '../transactionQueue';
 import { hashFromTx, getMintscanTxLink } from '../txUtils';
+import StatefulOrdersTransactionQueue from './statefulOrdersTransactionQueue';
 
 (BigInt.prototype as any).toJSON = function () {
   return this.toString();
@@ -55,12 +55,12 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   private store: RootStore | undefined;
   private localWallet: LocalWallet | undefined;
   private nobleWallet: LocalWallet | undefined;
-  private transactionQueue: TransactionQueue;
+  private statefulOrdersTransactionQueue: StatefulOrdersTransactionQueue;
 
   constructor() {
     this.compositeClient = undefined;
     this.store = undefined;
-    this.transactionQueue = new TransactionQueue(
+    this.statefulOrdersTransactionQueue = new StatefulOrdersTransactionQueue(
       this.placeOrderTransaction.bind(this),
       this.cancelOrderTransaction.bind(this)
     );
@@ -517,7 +517,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
             const result = await this.placeOrderTransaction(params);
             callback(result);
           } else {
-            this.transactionQueue.enqueue({ type, payload: params, callback });
+            this.statefulOrdersTransactionQueue.enqueue({ type, payload: params, callback });
           }
 
           break;
@@ -527,7 +527,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
             const result = await this.cancelOrderTransaction(params);
             callback(result);
           } else {
-            this.transactionQueue.enqueue({ type, payload: params, callback });
+            this.statefulOrdersTransactionQueue.enqueue({ type, payload: params, callback });
           }
 
           break;

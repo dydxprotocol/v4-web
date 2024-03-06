@@ -33,8 +33,8 @@ dependencies:
     specifier: file:/Users/aleka/Documents/dydx/v4-abacus/build/packages/js/dydxprotocol-v4-abacus-1.4.13.tgz
     version: file:../v4-abacus/build/packages/js/dydxprotocol-v4-abacus-1.4.13.tgz
   '@dydxprotocol/v4-client-js':
-    specifier: ^1.0.21
-    version: 1.0.21
+    specifier: ^1.0.22
+    version: 1.0.25
   '@dydxprotocol/v4-localization':
     specifier: ^1.1.45
     version: 1.1.45
@@ -1511,8 +1511,8 @@ packages:
     resolution: {integrity: sha512-Gg5t+eR7vPJMAmhkFt6CZrzPd0EKpAslWwk5rFVYZpJsM8JG5KT9XQ99hgNM3Ov6ScNoIWbXkpX27F6A9cXR4Q==}
     dev: false
 
-  /@dydxprotocol/v4-client-js@1.0.21:
-    resolution: {integrity: sha512-ZdlXs9DkdsyoE8ajOnZPYuOo7XDlKB3XiO7POGnbv9ZHGV63R+sxypiL2bHv7CLgXKoAvbsFq+3XdGHp5cE9Ww==}
+  /@dydxprotocol/v4-client-js@1.0.25:
+    resolution: {integrity: sha512-WBJHq2asJExqgA2zQZL6H7DKx4golG96HANcUOtZDbe9RwhjZGPb7v9XMN3iBPBH4VJQSWrI6rSNRwxJ3H04Ww==}
     dependencies:
       '@cosmjs/amino': 0.32.2
       '@cosmjs/encoding': 0.32.2

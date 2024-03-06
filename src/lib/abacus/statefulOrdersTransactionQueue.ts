@@ -1,4 +1,4 @@
-import Abacus from '@dydxprotocol/v4-abacus';
+import type { Nullable } from '@dydxprotocol/v4-abacus';
 
 import {
   type HumanReadableCancelOrderPayload,
@@ -7,9 +7,11 @@ import {
   TransactionType,
 } from '@/constants/abacus';
 
+import { log } from '../telemetry';
+
 interface TransactionParams {
   type: TransactionTypes;
-  callback: (p0: Abacus.Nullable<string>) => void;
+  callback: (p0: Nullable<string>) => void;
 }
 
 interface PlaceOrderParams extends TransactionParams {
@@ -20,12 +22,11 @@ interface CancelOrderParams extends TransactionParams {
   payload: HumanReadableCancelOrderPayload;
 }
 
-type AnyTransactionParams = PlaceOrderParams | CancelOrderParams;
+type OrdersTransactionParams = PlaceOrderParams | CancelOrderParams;
 
-class TransactionQueue {
-  private queue: Array<{ params: AnyTransactionParams; status: string }>;
+class StatefulOrdersTransactionQueue {
+  private queue: Array<{ params: OrdersTransactionParams; status: string }>;
   private isProcessing: boolean;
-
   private placeOrder: (params: HumanReadablePlaceOrderPayload) => Promise<string>;
   private cancelOrder: (params: HumanReadableCancelOrderPayload) => Promise<string>;
 
@@ -35,12 +36,11 @@ class TransactionQueue {
   ) {
     this.queue = [];
     this.isProcessing = false;
-
     this.placeOrder = placeOrder;
     this.cancelOrder = cancelOrder;
   }
 
-  enqueue(params: AnyTransactionParams): void {
+  enqueue(params: OrdersTransactionParams): void {
     this.queue.push({
       params,
       status: 'pending',
@@ -48,12 +48,11 @@ class TransactionQueue {
     this.processQueue();
   }
 
-
   private dequeue(): void {
     this.queue.shift();
   }
 
-  private peek(): { params: AnyTransactionParams; status: string } | null {
+  private peek(): { params: OrdersTransactionParams; status: string } | null {
     return this.queue.length > 0 ? this.queue[0] : null;
   }
 
@@ -71,8 +70,8 @@ class TransactionQueue {
           currentTransaction.params.callback(result);
           currentTransaction.status = 'sent';
         } catch (error) {
-          // Expected errors are handled within the transaction functions
-          // log
+          // Expected errors are handled within the placeOrder/cancelOrder functions
+          log('DydxChainTransactions/statefulOrdersTransactionQueue', error);
           currentTransaction.status = 'failed';
         } finally {
           this.dequeue();
@@ -83,16 +82,16 @@ class TransactionQueue {
     this.isProcessing = false;
   }
 
-  private async sendTransaction(params: AnyTransactionParams): Promise<any> {
+  private async sendTransaction(params: OrdersTransactionParams): Promise<any> {
     switch (params.type) {
       case TransactionType.PlaceOrder:
         return this.placeOrder((params as PlaceOrderParams).payload);
       case TransactionType.CancelOrder:
         return this.cancelOrder((params as CancelOrderParams).payload);
       default:
-        throw new Error('Unsupported transaction type');
+        throw new Error(`Unsupported transaction type: ${params.type}`);
     }
   }
 }
 
-export default TransactionQueue;
+export default StatefulOrdersTransactionQueue;
