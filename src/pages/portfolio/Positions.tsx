@@ -7,12 +7,15 @@ import { useBreakpoints, useStringGetter } from '@/hooks';
 
 import { AttachedExpandingSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
-
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
-import { calculateShouldRenderActionsInPositionsTable, calculateShouldRenderTriggersInPositionsTable} from '@/state/accountCalculators';
+import {
+  calculateShouldRenderActionsInPositionsTable,
+  calculateShouldRenderTriggersInPositionsTable,
+} from '@/state/accountCalculators';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { testFlags } from '@/lib/testFlags';
 
 export const Positions = () => {
   const stringGetter = useStringGetter();
@@ -39,11 +42,12 @@ export const Positions = () => {
                 PositionsTableColumnKey.Size,
                 PositionsTableColumnKey.Leverage,
                 PositionsTableColumnKey.LiquidationAndOraclePrice,
+                testFlags.isolatedMargin && PositionsTableColumnKey.Margin,
                 PositionsTableColumnKey.UnrealizedPnl,
                 PositionsTableColumnKey.RealizedPnl,
                 PositionsTableColumnKey.AverageOpenAndClose,
                 shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-                shouldRenderActions && PositionsTableColumnKey.Actions
+                shouldRenderActions && PositionsTableColumnKey.Actions,
               ].filter(isTruthy)
         }
         currentRoute={`${AppRoute.Portfolio}/${PortfolioRoute.Positions}`}

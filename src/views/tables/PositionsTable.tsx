@@ -38,6 +38,7 @@ import { MustBigNumber } from '@/lib/numbers';
 import { isStopLossOrder, isTakeProfitOrder } from '@/lib/orders';
 
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
+import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
 import {
   type PositionTableConditionalOrder,
   PositionsTriggersCell,
@@ -53,6 +54,7 @@ export enum PositionsTableColumnKey {
   Size = 'Size',
   Leverage = 'Leverage',
   LiquidationAndOraclePrice = 'LiquidationAndOraclePrice',
+  Margin = 'Margin',
   UnrealizedPnl = 'UnrealizedPnl',
   RealizedPnl = 'RealizedPnl',
   AverageOpenAndClose = 'AverageOpenAndClose',
@@ -197,6 +199,16 @@ const getPositionsTableColumnDef = ({
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         renderCell: ({ leverage }) => (
           <Output type={OutputType.Multiple} value={leverage?.current} showSign={ShowSign.None} />
+        ),
+      },
+      [PositionsTableColumnKey.Margin]: {
+        columnKey: 'margin',
+        getCellValue: (row) => row.leverage?.current,
+        label: stringGetter({ key: STRING_KEYS.MARGIN }),
+        hideOnBreakpoint: MediaQueryKeys.isMobile,
+        isActionable: true,
+        renderCell: ({ notionalTotal, adjustedMmf }) => (
+          <PositionsMarginCell notionalTotal={notionalTotal} adjustedMmf={adjustedMmf} />
         ),
       },
       [PositionsTableColumnKey.LiquidationAndOraclePrice]: {
