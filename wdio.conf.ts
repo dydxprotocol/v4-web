@@ -81,48 +81,48 @@ export const config: Options.Testrunner = {
         osVersion: '10',
       },
     },
-    // {
-    //   browserName: 'firefox',
-    //   'bstack:options': {
-    //     os: 'Windows',
-    //     osVersion: '10',
-    //   },
-    // },
-    // {
-    //   browserName: 'safari',
-    //   'bstack:options': {
-    //     os: 'OS X',
-    //     osVersion: 'Big Sur',
-    //   },
-    // },
-    // {
-    //   browserName: 'chrome',
-    //   'bstack:options': {
-    //     os: 'OS X',
-    //     osVersion: 'Big Sur',
-    //   },
-    // },
-    // {
-    //   browserName: 'edge',
-    //   'bstack:options': {
-    //     os: 'Windows',
-    //     osVersion: '10',
-    //   },
-    // },
-    // {
-    //   browserName: 'safari',
-    //   'bstack:options': {
-    //     deviceName: 'iPhone 14 Pro Max',
-    //     osVersion: '16',
-    //   },
-    // },
-    // {
-    //   browserName: 'chrome',
-    //   'bstack:options': {
-    //     deviceName: 'Samsung Galaxy S23 Ultra',
-    //     osVersion: '13.0',
-    //   },
-    // },
+    {
+      browserName: 'firefox',
+      'bstack:options': {
+        os: 'Windows',
+        osVersion: '10',
+      },
+    },
+    {
+      browserName: 'safari',
+      'bstack:options': {
+        os: 'OS X',
+        osVersion: 'Big Sur',
+      },
+    },
+    {
+      browserName: 'chrome',
+      'bstack:options': {
+        os: 'OS X',
+        osVersion: 'Big Sur',
+      },
+    },
+    {
+      browserName: 'edge',
+      'bstack:options': {
+        os: 'Windows',
+        osVersion: '10',
+      },
+    },
+    {
+      browserName: 'safari',
+      'bstack:options': {
+        deviceName: 'iPhone 14 Pro Max',
+        osVersion: '16',
+      },
+    },
+    {
+      browserName: 'chrome',
+      'bstack:options': {
+        deviceName: 'Samsung Galaxy S23 Ultra',
+        osVersion: '13.0',
+      },
+    },
   ],
 
   //
