@@ -32,6 +32,7 @@ import {
   getHasUnseenOrderUpdates,
   getTradeInfoNumbers,
 } from '@/state/accountSelectors';
+import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
 import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -59,7 +60,10 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const navigate = useNavigate();
   const { isTablet } = useBreakpoints();
 
-  const [view, setView] = useState<PanelView>(PanelView.CurrentMarket);
+  const allMarkets = useSelector(getDefaultToAllMarketsInPositionsOrdersFills);
+  const [view, setView] = useState<PanelView>(
+    allMarkets ? PanelView.AllMarkets : PanelView.CurrentMarket
+  );
   const [tab, setTab] = useState<InfoSection>(InfoSection.Position);
 
   const currentMarketId = useSelector(getCurrentMarketId);

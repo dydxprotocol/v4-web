@@ -24,6 +24,7 @@ export enum LocalStorageKey {
   SelectedTradeLayout = 'dydx.SelectedTradeLayout',
   TradingViewChartConfig = 'dydx.TradingViewChartConfig',
   HasSeenLaunchIncentives = 'dydx.HasSeenLaunchIncentives',
+  DefaultToAllMarketsInPositionsOrdersFills = 'dydx.DefaultToAllMarketsInPositionsOrdersFills',
 }
 
 export const LOCAL_STORAGE_VERSIONS = {
