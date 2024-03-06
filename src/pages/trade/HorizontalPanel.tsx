@@ -34,6 +34,7 @@ import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsS
 
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 enum InfoSection {
   Position = 'Position',
@@ -107,7 +108,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     PositionsTableColumnKey.Size,
                     PositionsTableColumnKey.Leverage,
                     PositionsTableColumnKey.LiquidationAndOraclePrice,
-                    PositionsTableColumnKey.Margin,
+                    testFlags.isolatedMargin && PositionsTableColumnKey.Margin,
                     PositionsTableColumnKey.UnrealizedPnl,
                     PositionsTableColumnKey.RealizedPnl,
                     PositionsTableColumnKey.AverageOpenAndClose,
