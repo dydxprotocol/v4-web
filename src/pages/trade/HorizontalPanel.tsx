@@ -107,6 +107,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     PositionsTableColumnKey.Size,
                     PositionsTableColumnKey.Leverage,
                     PositionsTableColumnKey.LiquidationAndOraclePrice,
+                    PositionsTableColumnKey.Margin,
                     PositionsTableColumnKey.UnrealizedPnl,
                     PositionsTableColumnKey.RealizedPnl,
                     PositionsTableColumnKey.AverageOpenAndClose,

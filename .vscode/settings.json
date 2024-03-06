@@ -1,3 +1,5 @@
 {
-    "explorer.sortOrder": "mixed"
+    "explorer.sortOrder": "mixed",
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
 }
