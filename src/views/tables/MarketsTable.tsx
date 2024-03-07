@@ -195,7 +195,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
         getRowKey={(row: MarketData) => row.market}
         label="Markets"
         onRowAction={(market: string) =>
-          navigate(`/trade/${market}`, { state: { from: AppRoute.Markets } })
+          navigate(`${AppRoute.Trade}/${market}`, { state: { from: AppRoute.Markets } })
         }
         defaultSortDescriptor={{
           column: 'volume24H',

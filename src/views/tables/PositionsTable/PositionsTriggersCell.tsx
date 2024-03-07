@@ -24,23 +24,23 @@ export type PositionTableConditionalOrder = {
 };
 
 type ElementProps = {
+  market: string;
   stopLossOrders: PositionTableConditionalOrder[];
   takeProfitOrders: PositionTableConditionalOrder[];
+  onViewOrdersClick: (market: string) => void;
   positionSize?: number | null;
   isDisabled?: boolean;
 };
 
 export const PositionsTriggersCell = ({
+  market,
   stopLossOrders,
   takeProfitOrders,
+  onViewOrdersClick,
   positionSize,
   isDisabled, // TODO: CT-656 Disable onViewOrdersClick behavior when isDisabled
 }: ElementProps) => {
   const stringGetter = useStringGetter();
-
-  const onViewOrdersClick = () => {
-    // TODO: CT-655
-  };
 
   const renderOutput = ({
     label,
@@ -57,10 +57,10 @@ export const PositionsTriggersCell = ({
         type={ButtonType.Link}
         action={ButtonAction.Navigation}
         size={ButtonSize.XSmall}
-        onClick={onViewOrdersClick}
+        onClick={() => onViewOrdersClick(market)}
       >
         {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
-        {<Icon iconName={IconName.Arrow} />}
+        {<Styled.ArrowIcon iconName={IconName.Arrow} />}
       </Styled.Button>
     );
 
@@ -90,7 +90,7 @@ export const PositionsTriggersCell = ({
         );
       }
     }
-    
+
     return (
       <>
         {triggerLabel()}
@@ -143,4 +143,8 @@ Styled.Output = styled(Output)`
 Styled.Button = styled(Button)`
   --button-height: var(--item-height);
   --button-padding: 0;
+`;
+
+Styled.ArrowIcon = styled(Icon)`
+  stroke-width: 2;
 `;

@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, PortfolioRoute } from '@/constants/routes';
@@ -20,6 +21,7 @@ import { testFlags } from '@/lib/testFlags';
 export const Positions = () => {
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
+  const navigate = useNavigate();
 
   const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
   const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable);
@@ -52,6 +54,11 @@ export const Positions = () => {
         }
         currentRoute={`${AppRoute.Portfolio}/${PortfolioRoute.Positions}`}
         withOuterBorder={isNotTablet}
+        navigateToOrders={() =>
+          navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
+            state: { from: AppRoute.Portfolio },
+          })
+        }
       />
     </AttachedExpandingSection>
   );

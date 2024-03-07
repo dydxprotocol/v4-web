@@ -12,6 +12,7 @@ import {
 } from '@/constants/abacus';
 import { StringGetterFunction, STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { AppRoute } from '@/constants/routes';
 import { PositionSide } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks';
@@ -75,11 +76,13 @@ const getPositionsTableColumnDef = ({
   stringGetter,
   width,
   isAccountViewOnly,
+  navigateToOrders,
 }: {
   key: PositionsTableColumnKey;
   stringGetter: StringGetterFunction;
   width?: ColumnSize;
   isAccountViewOnly: boolean;
+  navigateToOrders: (market: string) => void;
 }) => ({
   width,
   ...(
@@ -286,12 +289,14 @@ const getPositionsTableColumnDef = ({
         isActionable: true,
         allowsSorting: false,
         hideOnBreakpoint: MediaQueryKeys.isTablet,
-        renderCell: ({ size, stopLossOrders, takeProfitOrders }) => (
+        renderCell: ({ id, size, stopLossOrders, takeProfitOrders }) => (
           <PositionsTriggersCell
+            market={id}
             stopLossOrders={stopLossOrders}
             takeProfitOrders={takeProfitOrders}
             positionSize={size?.current}
             isDisabled={isAccountViewOnly}
+            onViewOrdersClick={navigateToOrders}
           />
         ),
       },
@@ -312,6 +317,7 @@ type ElementProps = {
   columnWidths?: Partial<Record<PositionsTableColumnKey, ColumnSize>>;
   currentRoute?: string;
   onNavigate?: () => void;
+  navigateToOrders: (market: string) => void;
 };
 
 type StyleProps = {
@@ -324,6 +330,7 @@ export const PositionsTable = ({
   columnWidths,
   currentRoute,
   onNavigate,
+  navigateToOrders,
   withGradientCardRows,
   withOuterBorder,
 }: ElementProps & StyleProps) => {
@@ -371,11 +378,12 @@ export const PositionsTable = ({
           stringGetter,
           width: columnWidths?.[key],
           isAccountViewOnly,
+          navigateToOrders,
         })
       )}
       getRowKey={(row: PositionTableRow) => row.id}
       onRowAction={(market: string) => {
-        navigate(`/trade/${market}`, {
+        navigate(`${AppRoute.Trade}/${market}`, {
           state: { from: currentRoute },
         });
         onNavigate?.();

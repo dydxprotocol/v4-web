@@ -1,8 +1,9 @@
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { AppRoute } from '@/constants/routes';
+import { AppRoute, PortfolioRoute } from '@/constants/routes';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
 
@@ -10,11 +11,22 @@ import { AttachedExpandingSection, DetachedSection } from '@/components/ContentS
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
+import {
+  calculateShouldRenderActionsInPositionsTable,
+  calculateShouldRenderTriggersInPositionsTable,
+} from '@/state/accountCalculators';
+
+import { isTruthy } from '@/lib/isTruthy';
+
 import { AccountDetailsAndHistory } from './AccountDetailsAndHistory';
 
 export const Overview = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
+  const navigate = useNavigate();
+
+  const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
+  const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable);
 
   return (
     <div>
@@ -42,10 +54,17 @@ export const Overview = () => {
                   PositionsTableColumnKey.UnrealizedPnl,
                   PositionsTableColumnKey.RealizedPnl,
                   PositionsTableColumnKey.AverageOpenAndClose,
-                ]
+                  shouldRenderTriggers && PositionsTableColumnKey.Triggers,
+                  shouldRenderActions && PositionsTableColumnKey.Actions,
+                ].filter(isTruthy)
           }
           currentRoute={AppRoute.Portfolio}
-          withGradientCardRows
+          navigateToOrders={() =>
+            navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
+              state: { from: AppRoute.Portfolio },
+            })
+          }
+          withOuterBorder
         />
       </Styled.AttachedExpandingSection>
     </div>
