@@ -67,20 +67,21 @@ const useNotificationsContext = () => {
     setNotificationsLastUpdated(Date.now());
   }, [notifications]);
 
-  const clearAbacusGeneratedNotifications = useCallback((notifications: Notifications) => {
-    const originalEntries = Object.entries(notifications);
-    const filteredEntries = originalEntries.filter(
-      ([, value]) => value.type !== NotificationType.AbacusGenerated
-    );
+  const clearAbacusGeneratedNotifications = useCallback(
+    (notifications: Notifications) => {
+      const originalEntries = Object.entries(notifications);
+      const filteredEntries = originalEntries.filter(
+        ([, value]) => value.type !== NotificationType.AbacusGenerated
+      );
 
-    // Only update if the number of notifications has changed
-    if (filteredEntries.length !== originalEntries.length) {
-      const newNotifications = Object.fromEntries(
-      filteredEntries.map(([key, value]) => [getKey(value), value])
-    );
-    setNotifications(newNotifications);
-    }
-  }, [notifications])
+      // Only update if the number of notifications has changed
+      if (filteredEntries.length !== originalEntries.length) {
+        const newNotifications = Object.fromEntries(filteredEntries);
+        setNotifications(newNotifications);
+      }
+    },
+    [notifications]
+  );
 
   const getKey = useCallback(
     <T extends string | number>(notification: Pick<Notification<T>, 'type' | 'id'>) =>
@@ -100,7 +101,7 @@ const useNotificationsContext = () => {
 
   // Check for version changes
   useEffect(() => {
-      clearAbacusGeneratedNotifications(notifications)
+    clearAbacusGeneratedNotifications(notifications);
 
     if (
       notificationPreferences.version !==
