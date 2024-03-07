@@ -68,13 +68,18 @@ const useNotificationsContext = () => {
   }, [notifications]);
 
   const clearAbacusGeneratedNotifications = useCallback((notifications: Notifications) => {
-    const newNotifications:Notifications = {}
-    for (const [key, value] of Object.entries(notifications)) {
-      if (value.type != NotificationType.AbacusGenerated) {
-        newNotifications[getKey(value)] = value
-      }
+    const originalEntries = Object.entries(notifications);
+    const filteredEntries = originalEntries.filter(
+      ([, value]) => value.type !== NotificationType.AbacusGenerated
+    );
+
+    // Only update if the number of notifications has changed
+    if (filteredEntries.length !== originalEntries.length) {
+      const newNotifications = Object.fromEntries(
+      filteredEntries.map(([key, value]) => [getKey(value), value])
+    );
+    setNotifications(newNotifications);
     }
-    setNotifications(newNotifications)
   }, [notifications])
 
   const getKey = useCallback(
@@ -95,10 +100,7 @@ const useNotificationsContext = () => {
 
   // Check for version changes
   useEffect(() => {
-    const MAX_NOTIFICATIONS = 50;
-    if (Object.keys(notifications).length > MAX_NOTIFICATIONS) {
       clearAbacusGeneratedNotifications(notifications)
-    }
 
     if (
       notificationPreferences.version !==
