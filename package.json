@@ -27,9 +27,11 @@
     "ladle-p": "ladle preview",
     "lint": "eslint --ext .ts,.tsx src/",
     "fix-lint": "eslint --fix --ext .ts,.tsx src/",
-    "test": "vitest",
+    "test": "vitest run",
     "tsc": "tsc",
-    "postinstall": "tar -xzC public -f tradingview/tradingview.tgz"
+    "postinstall": "tar -xzC public -f tradingview/tradingview.tgz",
+    "prepare": "husky",
+    "commitlint": "commitlint --edit"
   },
   "packageManager": "pnpm@8.6.6",
   "dependencies": {
@@ -118,6 +120,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.22.5",
+    "@commitlint/cli": "^19.0.3",
+    "@commitlint/config-conventional": "^19.0.3",
     "@dydxprotocol/v4-proto": "^3.0.0",
     "@ladle/react": "^4.0.2",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
@@ -149,6 +153,7 @@
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^9.0.11",
     "minimist": "^1.2.8",
     "node-fetch": "^3.3.1",
     "pnpm": "^8.6.6",
