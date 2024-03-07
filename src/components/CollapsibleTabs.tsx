@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from 'react';
+import { Dispatch, type ReactNode, SetStateAction } from 'react';
 
 import {
   Content as CollapsibleContent,
@@ -22,8 +22,10 @@ import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
 
 type ElementProps<TabItemsValue> = {
-  defaultValue?: TabItemsValue;
-  items: TabItem<TabItemsValue>[];
+  defaultTab?: TabItemsValue;
+  tab: TabItemsValue;
+  setTab?: Dispatch<SetStateAction<string>>;
+  tabItems: TabItem<TabItemsValue>[];
   slotToolbar?: ReactNode;
   defaultOpen?: boolean;
   onOpenChange?: (isOpen: boolean) => void;
@@ -37,8 +39,10 @@ type StyleProps = {
 export type CollapsibleTabsProps<TabItemsValue> = ElementProps<TabItemsValue> & StyleProps;
 
 export const CollapsibleTabs = <TabItemsValue extends string>({
-  defaultValue,
-  items,
+  defaultTab,
+  tab,
+  setTab,
+  tabItems,
   slotToolbar,
   defaultOpen,
   onOpenChange,
@@ -47,16 +51,14 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
 
   className,
 }: CollapsibleTabsProps<TabItemsValue>) => {
-  const [value, setValue] = useState(defaultValue);
-
-  const currentItem = items.find((item) => item.value === value);
+  const currentTab = tabItems.find((tabItem) => tabItem.value === tab);
 
   return (
     <Styled.TabsRoot
       className={className}
-      defaultValue={defaultValue}
-      value={value}
-      onValueChange={setValue}
+      defaultValue={defaultTab}
+      value={tab}
+      onValueChange={setTab}
       asChild
     >
       <Styled.CollapsibleRoot
@@ -66,21 +68,21 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
       >
         <Styled.Header>
           <Styled.TabsList $fullWidthTabs={fullWidthTabs}>
-            {items.map((item) => (
+            {tabItems.map(({value, label, tag, slotRight}) => (
               <Styled.TabsTrigger
-                key={item.value}
-                value={item.value}
+                key={value}
+                value={value}
                 onClick={() => onOpenChange?.(true)}
               >
-                {item.label}
-                {item.tag && <Tag>{item.tag}</Tag>}
-                {item.slotRight}
+                {label}
+                {tag && <Tag>{tag}</Tag>}
+                {slotRight}
               </Styled.TabsTrigger>
             ))}
           </Styled.TabsList>
 
           <Styled.Toolbar>
-            {currentItem?.slotToolbar || slotToolbar}
+            {currentTab?.slotToolbar || slotToolbar}
             <CollapsibleTrigger asChild>
               <Styled.IconButton iconName={IconName.Caret} isToggle />
             </CollapsibleTrigger>
@@ -88,7 +90,7 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
         </Styled.Header>
 
         <Styled.CollapsibleContent>
-          {items.map(({ asChild, value, content }) => (
+          {tabItems.map(({ asChild, value, content }) => (
             <Styled.TabsContent key={value} asChild={asChild} value={value}>
               {content}
             </Styled.TabsContent>

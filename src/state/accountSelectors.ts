@@ -103,14 +103,25 @@ export const getSubaccountUnclearedOrders = createSelector(
 
 /**
  * @param state
- * @returns list of orders that are in the open status
+ * @returns list of orders that have not been filled or cancelled
  */
 export const getSubaccountOpenOrders = createSelector([getSubaccountOrders], (orders) =>
+  orders?.filter(
+    (order) =>
+      order.status !== AbacusOrderStatus.filled && order.status !== AbacusOrderStatus.cancelled
+  )
+);
+
+/**
+ * @param state
+ * @returns list of orders that are in the open status
+ */
+export const getSubaccountOpenStatusOrders = createSelector([getSubaccountOrders], (orders) =>
   orders?.filter((order) => order.status === AbacusOrderStatus.open)
 );
 
-export const getSubaccountOpenOrdersBySideAndPrice = createSelector(
-  [getSubaccountOpenOrders],
+export const getSubaccountOpenStatusOrdersBySideAndPrice = createSelector(
+  [getSubaccountOpenStatusOrders],
   (openOrders = []) => {
     const ordersBySide: Partial<Record<OrderSide, Record<number, SubaccountOrder>>> = {};
     openOrders.forEach((order) => {

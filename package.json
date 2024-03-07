@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc && vite build",
     "build:inject-app-deeplinks": "sh scripts/inject-app-deeplinks.sh",
     "build:inject-amplitude": "node scripts/inject-amplitude.js",
     "build:inject-bugsnag": "node scripts/inject-bugsnag.js",
@@ -44,7 +44,7 @@
     "@cosmjs/tendermint-rpc": "^0.32.1",
     "@dydxprotocol/v4-abacus": "^1.4.13",
     "@dydxprotocol/v4-client-js": "^1.0.20",
-    "@dydxprotocol/v4-localization": "^1.1.36",
+    "@dydxprotocol/v4-localization": "^1.1.45",
     "@ethersproject/providers": "^5.7.2",
     "@js-joda/core": "^5.5.3",
     "@radix-ui/react-accordion": "^1.1.2",

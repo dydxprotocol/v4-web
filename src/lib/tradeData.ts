@@ -10,7 +10,7 @@ import {
   ErrorType,
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
-import { StringGetterFunction } from '@/constants/localization';
+import type { StringGetterFunction } from '@/constants/localization';
 import { PERCENT_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { TRADE_ROUTE } from '@/constants/routes';
 import { PositionSide, TradeTypes } from '@/constants/trade';

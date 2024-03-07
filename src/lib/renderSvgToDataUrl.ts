@@ -21,8 +21,8 @@ const applyComputedStyles = (html: string) => {
 const toDataUrl = (bytes: string, type = 'image/svg+xml') =>
   new Promise<string | ArrayBuffer | null>((resolve, reject) => {
     Object.assign(new FileReader(), {
-      onload: (e) => resolve(e.target.result),
-      onerror: (e) => reject(e.target.error),
+      onload: (e: ProgressEvent<FileReader>) => resolve(e.target?.result ?? null),
+      onerror: (e: ProgressEvent<FileReader>) => reject(e.target?.error),
     }).readAsDataURL(new File([bytes], '', { type }));
   });
 

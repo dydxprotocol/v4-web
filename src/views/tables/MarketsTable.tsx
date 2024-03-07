@@ -178,14 +178,15 @@ export const MarketsTable = ({ className }: { className?: string }) => {
 
   return (
     <>
-      <Toolbar>
+      <Styled.Toolbar>
         <MarketFilter
+          hideNewMarketButton
           selectedFilter={filter}
           filters={marketFilters as MarketFilters[]}
           onChangeFilter={setFilter}
           onSearchTextChange={setSearchFilter}
         />
-      </Toolbar>
+      </Styled.Toolbar>
 
       <Styled.Table
         withInnerBorders
@@ -194,7 +195,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
         getRowKey={(row: MarketData) => row.market}
         label="Markets"
         onRowAction={(market: string) =>
-          navigate(`/trade/${market}`, { state: { from: AppRoute.Markets } })
+          navigate(`${AppRoute.Trade}/${market}`, { state: { from: AppRoute.Markets } })
         }
         defaultSortDescriptor={{
           column: 'volume24H',
@@ -246,6 +247,11 @@ export const MarketsTable = ({ className }: { className?: string }) => {
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
+
+Styled.Toolbar = styled(Toolbar)`
+  max-width: 100vw;
+  overflow: hidden;
+`;
 
 Styled.Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}

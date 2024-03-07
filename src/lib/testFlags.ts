@@ -35,6 +35,18 @@ class TestFlags {
   get showTradingRewards() {
     return !!this.queryParams.tradingrewards;
   }
+
+  get closePositionsFromPositionsTable() {
+    return !!this.queryParams.closepositions;
+  }
+
+  get configureSlTpFromPositionsTable() {
+    return !!this.queryParams.sltp;
+  }
+
+  get isolatedMargin() {
+    return !!this.queryParams.isolatedmargin;
+  }
 }
 
 export const testFlags = new TestFlags();

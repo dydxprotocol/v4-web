@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  ReactElement,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import { AnalyticsEvent } from '@/constants/analytics';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
@@ -59,6 +67,22 @@ const useNotificationsContext = () => {
     setNotificationsLastUpdated(Date.now());
   }, [notifications]);
 
+  const clearAbacusGeneratedNotifications = useCallback(
+    (notifications: Notifications) => {
+      const originalEntries = Object.entries(notifications);
+      const filteredEntries = originalEntries.filter(
+        ([, value]) => value.type !== NotificationType.AbacusGenerated
+      );
+
+      // Only update if the number of notifications has changed
+      if (filteredEntries.length !== originalEntries.length) {
+        const newNotifications = Object.fromEntries(filteredEntries);
+        setNotifications(newNotifications);
+      }
+    },
+    [notifications]
+  );
+
   const getKey = useCallback(
     <T extends string | number>(notification: Pick<Notification<T>, 'type' | 'id'>) =>
       `${notification.type}/${notification.id}`,
@@ -77,6 +101,8 @@ const useNotificationsContext = () => {
 
   // Check for version changes
   useEffect(() => {
+    clearAbacusGeneratedNotifications(notifications);
+
     if (
       notificationPreferences.version !==
       LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences]
@@ -95,7 +121,11 @@ const useNotificationsContext = () => {
     (notification: Notification, status: NotificationStatus) => {
       notification.status = status;
       notification.timestamps[notification.status] = Date.now();
-      setNotifications({ ...notifications, [getKey(notification)]: notification });
+      // Don't save AbacusGenerated notifcations to LocalStorage, these are triggered by
+      // Orders, Fills, Trading Rewards etc. and we don't need to know if they've already been seen
+      if (notification.type != NotificationType.AbacusGenerated) {
+        setNotifications({ ...notifications, [getKey(notification)]: notification });
+      }
     },
     [notifications, getKey]
   );
@@ -223,17 +253,20 @@ const useNotificationsContext = () => {
           const displayData = getDisplayData(notification);
 
           const iconUrl =
-            displayData.icon && (await renderSvgToDataUrl(displayData.icon).catch(() => undefined));
+            displayData.icon &&
+            (await renderSvgToDataUrl(displayData.icon as ReactElement<any, 'svg'>).catch(
+              () => undefined
+            ));
 
           const pushNotification = new globalThis.Notification(displayData.title, {
             renotify: true,
             tag: getKey(notification),
             data: notification,
-            description: displayData.body,
-            icon: iconUrl ?? '/favicon.svg',
-            badge: iconUrl ?? '/favicon.svg',
-            image: iconUrl ?? '/favicon.svg',
-            vibrate: displayData.toastSensitivity === 'foreground',
+            body: displayData.body,
+            icon: iconUrl?.toString() ?? '/favicon.svg',
+            badge: iconUrl?.toString() ?? '/favicon.svg',
+            image: iconUrl?.toString() ?? '/favicon.svg',
+            vibrate: displayData.toastSensitivity === 'foreground' ? 200 : undefined,
             requireInteraction: displayData.toastDuration === Infinity,
             // actions: [
             //   {

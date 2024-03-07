@@ -45,6 +45,7 @@ import { Tag } from './Tag';
 
 export { TableCell } from './Table/TableCell';
 export { TableColumnHeader } from './Table/TableColumnHeader';
+export { ActionsTableCell } from './Table/ActionsTableCell';
 export { MarketTableCell } from './Table/MarketTableCell';
 
 export type CustomRowConfig = {
@@ -100,7 +101,7 @@ export type ElementProps<TableRowData extends object | CustomRowConfig, TableRow
 
 type StyleProps = {
   hideHeader?: boolean;
-  withGradientCardRows?: boolean;
+  withGradientCardRows?: boolean; // TODO: CT-662
   withFocusStickyRows?: boolean;
   withOuterBorder?: boolean;
   withInnerBorders?: boolean;
@@ -378,7 +379,7 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
               item={row}
               state={state}
               // shouldRowRender={props.shouldRowRender}
-              {...props.getRowAttributes?.(row.value)}
+              {...props.getRowAttributes?.(row.value!)}
               withGradientCardRows={props.withGradientCardRows}
               withFocusStickyRows={props.withFocusStickyRows}
               withScrollSnapRows={props.withScrollSnapRows}

@@ -27,6 +27,7 @@ import { useDydxClient } from './useDydxClient';
 import { useLocalStorage } from './useLocalStorage';
 import { useRestrictions } from './useRestrictions';
 import { useWalletConnection } from './useWalletConnection';
+import { OfflineSigner } from '@cosmjs/proto-signing';
 
 const AccountsContext = createContext<ReturnType<typeof useAccountsContext> | undefined>(undefined);
 
@@ -212,7 +213,7 @@ const useAccountsContext = () => {
       } else if (connectedDydxAddress && signerGraz) {
         dispatch(setOnboardingState(OnboardingState.WalletConnected));
         try {
-          setLocalDydxWallet(await LocalWallet.fromOfflineSigner(signerGraz));
+          setLocalDydxWallet(await LocalWallet.fromOfflineSigner(signerGraz as OfflineSigner));
           dispatch(setOnboardingState(OnboardingState.AccountConnected));
         } catch (error) {
           log('useAccounts/setLocalDydxWallet', error);

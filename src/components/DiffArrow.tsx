@@ -33,8 +33,8 @@ Styled.DiffArrowContainer = styled.span<DiffArrowProps>`
   color: var(--diffArrow-color);
 
   svg {
-    width: 0.5em;
-    height: 0.5em;
+    width: 0.75em;
+    height: 0.75em;
   }
 
   ${({ sign }) =>

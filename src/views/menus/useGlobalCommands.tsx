@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Asset, PerpetualMarket } from '@/constants/abacus';
 import { TradeLayouts } from '@/constants/layout';
 import { type MenuConfig } from '@/constants/menus';
+import { AppRoute } from '@/constants/routes';
 
 import { AssetIcon } from '@/components/AssetIcon';
 
@@ -161,7 +162,7 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
             slotBefore: <AssetIcon symbol={id} />,
             label: name ?? '',
             tag: id,
-            onSelect: () => navigate(`/trade/${market}`),
+            onSelect: () => navigate(`${AppRoute.Trade}/${market}`),
           })),
         },
       ],

@@ -6,7 +6,7 @@ import { shallowEqual, useSelector } from 'react-redux';
 import { type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { DepthChartSeries, DepthChartDatum } from '@/constants/charts';
 
-import { getSubaccountOpenOrdersBySideAndPrice } from '@/state/accountSelectors';
+import { getSubaccountOpenStatusOrdersBySideAndPrice } from '@/state/accountSelectors';
 import { getCurrentMarketOrderbook } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -15,7 +15,7 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
   const orderbook = useSelector(getCurrentMarketOrderbook, shallowEqual);
 
   const openOrdersBySideAndPrice =
-    useSelector(getSubaccountOpenOrdersBySideAndPrice, shallowEqual) || {};
+    useSelector(getSubaccountOpenStatusOrdersBySideAndPrice, shallowEqual) || {};
 
   return useMemo(() => {
     const asks: Array<PerpetualMarketOrderbookLevel | undefined> = (

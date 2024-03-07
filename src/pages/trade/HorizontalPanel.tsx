@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
 
@@ -15,13 +17,14 @@ import { Tag, TagType } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { PositionInfo } from '@/views/PositionInfo';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
-// import { FundingPaymentsTable } from '@/views/tables/FundingPaymentsTable';
 import { OrdersTable, OrdersTableColumnKey } from '@/views/tables/OrdersTable';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
 import {
   calculateHasUncommittedOrders,
   calculateIsAccountViewOnly,
+  calculateShouldRenderActionsInPositionsTable,
+  calculateShouldRenderTriggersInPositionsTable,
 } from '@/state/accountCalculators';
 import {
   getCurrentMarketTradeInfoNumbers,
@@ -29,10 +32,12 @@ import {
   getHasUnseenOrderUpdates,
   getTradeInfoNumbers,
 } from '@/state/accountSelectors';
+import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
 import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 enum InfoSection {
   Position = 'Position',
@@ -53,9 +58,15 @@ type ElementProps = {
 
 export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
+  const navigate = useNavigate();
   const { isTablet } = useBreakpoints();
 
-  const [view, setView] = useState<PanelView>(PanelView.CurrentMarket);
+  const allMarkets = useSelector(getDefaultToAllMarketsInPositionsOrdersFills);
+  const [view, setView] = useState<PanelView>(
+    allMarkets ? PanelView.AllMarkets : PanelView.CurrentMarket
+  );
+  const [tab, setTab] = useState<InfoSection>(InfoSection.Position);
+
   const currentMarketId = useSelector(getCurrentMarketId);
   const currentMarketAssetId = useSelector(getCurrentMarketAssetId);
 
@@ -68,6 +79,8 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const hasUnseenOrderUpdates = useSelector(getHasUnseenOrderUpdates);
   const hasUnseenFillUpdates = useSelector(getHasUnseenFillUpdates);
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
+  const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
+  const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable);
   const isWaitingForOrderToIndex = useSelector(calculateHasUncommittedOrders);
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
 
@@ -104,12 +117,24 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     PositionsTableColumnKey.Size,
                     PositionsTableColumnKey.Leverage,
                     PositionsTableColumnKey.LiquidationAndOraclePrice,
+                    testFlags.isolatedMargin && PositionsTableColumnKey.Margin,
                     PositionsTableColumnKey.UnrealizedPnl,
                     PositionsTableColumnKey.RealizedPnl,
                     PositionsTableColumnKey.AverageOpenAndClose,
-                  ]
+                    shouldRenderTriggers && PositionsTableColumnKey.Triggers,
+                    shouldRenderActions && PositionsTableColumnKey.Actions,
+                  ].filter(isTruthy)
             }
             onNavigate={() => setView(PanelView.CurrentMarket)}
+            navigateToOrders={(market: string) => {
+              navigate(`${AppRoute.Trade}/${market}`, {
+                state: {
+                  from: AppRoute.Trade,
+                },
+              });
+              setView(PanelView.CurrentMarket);
+              setTab(InfoSection.Orders);
+            }}
           />
         ),
       },
@@ -217,7 +242,9 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     <MobileTabs defaultValue={InfoSection.Position} items={tabItems} withBorders={false} />
   ) : (
     <Styled.CollapsibleTabs
-      defaultValue={InfoSection.Position}
+      defaultTab={InfoSection.Position}
+      tab={tab}
+      setTab={setTab}
       defaultOpen={isOpen}
       onOpenChange={setIsOpen}
       slotToolbar={
@@ -244,7 +271,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
           }}
         />
       }
-      items={tabItems}
+      tabItems={tabItems}
     />
   );
 };

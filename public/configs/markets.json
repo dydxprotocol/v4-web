@@ -76,6 +76,13 @@
     "whitepaperLink": "https://assets.website-files.com/5d80307810123f5ffbb34d6e/6008d7bbf8b10d1eb01e7e16_Avalanche%20Platform%20Whitepaper.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/avalanche/"
   },
+  "AXL-USD": {
+    "name": "Axelar",
+    "tags": [],
+    "websiteLink": "https://axelar.network/",
+    "whitepaperLink": "https://axelar.network/axelar_whitepaper.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/axelar/"
+  },
   "BCH-USD": {
     "name": "Bitcoin Cash",
     "tags": ["Layer 1"],
@@ -85,7 +92,7 @@
   },
   "BONK-USD": {
     "name": "BONK COIN",
-    "tags": [],
+    "tags": ["Meme"],
     "websiteLink": "https://bonkcoin.com/",
     "whitepaperLink": "https://bonkcoin.com/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bonk1/"
@@ -142,7 +149,7 @@
   },
   "DOGE-USD": {
     "name": "Dogecoin",
-    "tags": ["Layer 1"],
+    "tags": ["Layer 1", "Meme"],
     "websiteLink": "https://dogecoin.com/",
     "whitepaperLink": "https://github.com/dogecoin/dogecoin",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/dogecoin/"
@@ -345,6 +352,13 @@
     "whitepaperLink": "https://polygon.technology/lightpaper-polygon.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/polygon/"
   },
+  "MEME-USD": {
+    "name": "Memecoin",
+    "tags": ["Meme"],
+    "websiteLink": "https://www.memecoin.org/",
+    "whitepaperLink": "https://www.memecoin.org/whitepaper",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/meme/"
+  },
   "MINA-USD": {
     "name": "Mina",
     "tags": ["Layer 1"],
@@ -366,6 +380,13 @@
     "whitepaperLink": "https://near.org/papers/the-official-near-white-paper/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/near-protocol/"
   },
+  "OCEAN-USD": {
+    "name": "Ocean Protocol",
+    "tags": ["AI"],
+    "websiteLink": "https://oceanprotocol.com/",
+    "whitepaperLink": "https://oceanprotocol.com/tech-whitepaper.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/ocean-protocol/"
+  },
   "ORDI-USD": {
     "name": "Ordinals",
     "tags": ["NFT"],
@@ -382,7 +403,7 @@
   },
   "PEPE-USD": {
     "name": "Pepe",
-    "tags": [],
+    "tags": ["Meme"],
     "websiteLink": "https://www.pepe.vip/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/pepe/"
   },
@@ -430,7 +451,7 @@
   },
   "SHIB-USD": {
     "name": "Shiba Inu",
-    "tags": [],
+    "tags": ["Meme"],
     "websiteLink": "https://shibatoken.com/",
     "whitepaperLink": "https://docs.shibatoken.com/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/shiba-inu/"

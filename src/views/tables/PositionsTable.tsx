@@ -6,11 +6,13 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 import {
   type Asset,
   type Nullable,
+  type SubaccountOrder,
   type SubaccountPosition,
   POSITION_SIDES,
 } from '@/constants/abacus';
 import { StringGetterFunction, STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { AppRoute } from '@/constants/routes';
 import { PositionSide } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks';
@@ -28,11 +30,20 @@ import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TagSize } from '@/components/Tag';
 
-import { getExistingOpenPositions } from '@/state/accountSelectors';
+import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
+import { getExistingOpenPositions, getSubaccountOpenOrders } from '@/state/accountSelectors';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { isStopLossOrder, isTakeProfitOrder } from '@/lib/orders';
+
+import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
+import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
+import {
+  type PositionTableConditionalOrder,
+  PositionsTriggersCell,
+} from './PositionsTable/PositionsTriggersCell';
 
 export enum PositionsTableColumnKey {
   Details = 'Details',
@@ -44,25 +55,34 @@ export enum PositionsTableColumnKey {
   Size = 'Size',
   Leverage = 'Leverage',
   LiquidationAndOraclePrice = 'LiquidationAndOraclePrice',
+  Margin = 'Margin',
   UnrealizedPnl = 'UnrealizedPnl',
   RealizedPnl = 'RealizedPnl',
   AverageOpenAndClose = 'AverageOpenAndClose',
+  Triggers = 'Triggers',
+  Actions = 'Actions',
 }
 
 type PositionTableRow = {
   asset: Asset;
   oraclePrice: Nullable<number>;
   tickSizeDecimals: number;
+  stopLossOrders: PositionTableConditionalOrder[];
+  takeProfitOrders: PositionTableConditionalOrder[];
 } & SubaccountPosition;
 
 const getPositionsTableColumnDef = ({
   key,
   stringGetter,
   width,
+  isAccountViewOnly,
+  navigateToOrders,
 }: {
   key: PositionsTableColumnKey;
   stringGetter: StringGetterFunction;
   width?: ColumnSize;
+  isAccountViewOnly: boolean;
+  navigateToOrders: (market: string) => void;
 }) => ({
   width,
   ...(
@@ -184,6 +204,16 @@ const getPositionsTableColumnDef = ({
           <Output type={OutputType.Multiple} value={leverage?.current} showSign={ShowSign.None} />
         ),
       },
+      [PositionsTableColumnKey.Margin]: {
+        columnKey: 'margin',
+        getCellValue: (row) => row.leverage?.current,
+        label: stringGetter({ key: STRING_KEYS.MARGIN }),
+        hideOnBreakpoint: MediaQueryKeys.isMobile,
+        isActionable: true,
+        renderCell: ({ notionalTotal, adjustedMmf }) => (
+          <PositionsMarginCell notionalTotal={notionalTotal} adjustedMmf={adjustedMmf} />
+        ),
+      },
       [PositionsTableColumnKey.LiquidationAndOraclePrice]: {
         columnKey: 'price',
         getCellValue: (row) => row.liquidationPrice?.current,
@@ -253,6 +283,31 @@ const getPositionsTableColumnDef = ({
           </TableCell>
         ),
       },
+      [PositionsTableColumnKey.Triggers]: {
+        columnKey: 'triggers',
+        label: stringGetter({ key: STRING_KEYS.TRIGGERS }),
+        isActionable: true,
+        allowsSorting: false,
+        hideOnBreakpoint: MediaQueryKeys.isTablet,
+        renderCell: ({ id, size, stopLossOrders, takeProfitOrders }) => (
+          <PositionsTriggersCell
+            market={id}
+            stopLossOrders={stopLossOrders}
+            takeProfitOrders={takeProfitOrders}
+            positionSize={size?.current}
+            isDisabled={isAccountViewOnly}
+            onViewOrdersClick={navigateToOrders}
+          />
+        ),
+      },
+      [PositionsTableColumnKey.Actions]: {
+        columnKey: 'actions',
+        label: stringGetter({ key: STRING_KEYS.ACTION }), // TODO: CT-639
+        isActionable: true,
+        allowsSorting: false,
+        hideOnBreakpoint: MediaQueryKeys.isTablet,
+        renderCell: ({}) => <PositionsActionsCell isDisabled={isAccountViewOnly} />,
+      },
     } as Record<PositionsTableColumnKey, ColumnDef<PositionTableRow>>
   )[key],
 });
@@ -262,6 +317,7 @@ type ElementProps = {
   columnWidths?: Partial<Record<PositionsTableColumnKey, ColumnSize>>;
   currentRoute?: string;
   onNavigate?: () => void;
+  navigateToOrders: (market: string) => void;
 };
 
 type StyleProps = {
@@ -274,22 +330,38 @@ export const PositionsTable = ({
   columnWidths,
   currentRoute,
   onNavigate,
+  navigateToOrders,
   withGradientCardRows,
   withOuterBorder,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
 
+  const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
   const perpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
   const assets = useSelector(getAssets, shallowEqual) || {};
   const openPositions = useSelector(getExistingOpenPositions, shallowEqual) || [];
+  const openOrders = useSelector(getSubaccountOpenOrders, shallowEqual) || [];
+
+  const stopLossOrders: SubaccountOrder[] = [];
+  const takeProfitOrders: SubaccountOrder[] = [];
+
+  openOrders.map((order: SubaccountOrder) => {
+    if (isStopLossOrder(order)) {
+      stopLossOrders.push(order);
+    } else if (isTakeProfitOrder(order)) {
+      takeProfitOrders.push(order);
+    }
+  });
 
   const positionsData = openPositions.map((position: SubaccountPosition) => ({
     tickSizeDecimals: perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
     asset: assets?.[position.assetId],
     oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
+    stopLossOrders: stopLossOrders.filter((order) => order.marketId === position.id),
+    takeProfitOrders: takeProfitOrders.filter((order) => order.marketId === position.id),
     ...position,
-  })) as PositionTableRow[];
+  }));
 
   return (
     <Styled.Table
@@ -305,11 +377,13 @@ export const PositionsTable = ({
           key,
           stringGetter,
           width: columnWidths?.[key],
+          isAccountViewOnly,
+          navigateToOrders,
         })
       )}
       getRowKey={(row: PositionTableRow) => row.id}
       onRowAction={(market: string) => {
-        navigate(`/trade/${market}`, {
+        navigate(`${AppRoute.Trade}/${market}`, {
           state: { from: currentRoute },
         });
         onNavigate?.();

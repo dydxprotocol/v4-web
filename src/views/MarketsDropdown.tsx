@@ -124,14 +124,6 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
           onChangeFilter={setFilter}
           onSearchTextChange={setSearchFilter}
         />
-        {hasPotentialMarketsData && (
-          <Button
-            onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
-            size={ButtonSize.Small}
-          >
-            {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })}
-          </Button>
-        )}
       </Styled.Toolbar>
       <Styled.ScrollArea>
         <Styled.Table
@@ -310,7 +302,7 @@ Styled.Popover = styled(Popover)`
   ${popoverMixins.popover}
   --popover-item-height: 3.375rem;
   --popover-backgroundColor: var(--color-layer-2);
-  --stickyArea-topHeight: var(--popover-item-height);
+  --stickyArea-topHeight: 6.125rem;
 
   height: calc(
     100vh - var(--page-header-height) - var(--market-info-row-height) - var(--page-footer-height)
@@ -350,7 +342,6 @@ Styled.Toolbar = styled(Toolbar)`
   ${layoutMixins.stickyHeader}
   height: var(--stickyArea-topHeight);
   gap: 0.5rem;
-
   border-bottom: solid var(--border-width) var(--color-border);
 `;
 
