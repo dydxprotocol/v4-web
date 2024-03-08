@@ -47,18 +47,15 @@ export const PositionsTriggersCell = ({
   const showLiquidationWarning = (order: SubaccountOrder) => {
     if (!isStopLossOrder(order) || !liquidationPrice) {
       return false;
-    } else if (
+    }
+    return (
       (positionSide === AbacusPositionSide.SHORT && order.price > liquidationPrice) ||
       (positionSide === AbacusPositionSide.LONG && order.price < liquidationPrice)
-    ) {
-      return true;
-    }
-    return false;
+    );
   };
 
   const viewOrdersButton = (
     <Styled.Button
-      type={ButtonType.Link}
       action={ButtonAction.Navigation}
       size={ButtonSize.XSmall}
       onClick={() => onViewOrdersClick(market)}
@@ -77,8 +74,8 @@ export const PositionsTriggersCell = ({
       const styledLabel = <Styled.Label warning={liquidationWarningSide}>{label}</Styled.Label>;
       return liquidationWarningSide ? (
         <WithHovercard
-          align={'start'}
-          side={'left'}
+          align="start"
+          side="left"
           hovercard={
             liquidationWarningSide === AbacusPositionSide.LONG
               ? 'liquidation-warning-long'
@@ -126,8 +123,8 @@ export const PositionsTriggersCell = ({
             <Styled.Output type={OutputType.Fiat} value={triggerPrice} />
             {isPartialPosition && (
               <WithHovercard
-                align={'end'}
-                side={'top'}
+                align="end"
+                side="top"
                 hovercard={
                   isStopLossOrder(order) ? 'partial-close-stop-loss' : 'partial-close-take-profit'
                 }
