@@ -210,8 +210,8 @@ const getPositionsTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.MARGIN }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         isActionable: true,
-        renderCell: ({ notionalTotal, adjustedMmf }) => (
-          <PositionsMarginCell notionalTotal={notionalTotal} adjustedMmf={adjustedMmf} />
+        renderCell: ({ id, adjustedMmf, notionalTotal }) => (
+          <PositionsMarginCell id={id} notionalTotal={notionalTotal} adjustedMmf={adjustedMmf} />
         ),
       },
       [PositionsTableColumnKey.LiquidationAndOraclePrice]: {
