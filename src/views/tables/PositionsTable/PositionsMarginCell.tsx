@@ -15,7 +15,7 @@ import { TableCell } from '@/components/Table/TableCell';
 
 import { openDialog } from '@/state/dialogs';
 
-import { MustBigNumber } from '@/lib/numbers';
+import { calculatePositionMargin } from '@/lib/tradeData';
 
 type PositionsMarginCellProps = {
   id: SubaccountPosition['id'];
@@ -30,9 +30,10 @@ export const PositionsMarginCell = ({
 }: PositionsMarginCellProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
-  const notionalTotalBN = MustBigNumber(notionalTotal?.current);
-  const adjustedMmfBN = MustBigNumber(adjustedMmf?.current);
-  const margin = notionalTotalBN.times(adjustedMmfBN);
+  const margin = calculatePositionMargin({
+    notionalTotal: notionalTotal?.current,
+    adjustedMmf: adjustedMmf?.current,
+  });
   const perpetualMarketType = 'CROSS'; // Todo: Replace with perpetualMarketType when available
 
   const marginModeLabel =
