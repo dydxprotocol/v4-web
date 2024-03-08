@@ -32,10 +32,6 @@ class TestFlags {
     return this.queryParams.address;
   }
 
-  get showTradingRewards() {
-    return !!this.queryParams.tradingrewards;
-  }
-
   get closePositionsFromPositionsTable() {
     return !!this.queryParams.closepositions;
   }

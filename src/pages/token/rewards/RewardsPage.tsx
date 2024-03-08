@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { isMainnet } from '@/constants/networks';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
@@ -13,8 +12,6 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { BackButton } from '@/components/BackButton';
 import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
-
-import { testFlags } from '@/lib/testFlags';
 
 import { DYDXBalancePanel } from './DYDXBalancePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
@@ -28,8 +25,6 @@ const RewardsPage = () => {
   const { isTablet, isNotTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  const showTradingRewards = testFlags.showTradingRewards || !isMainnet;
-
   return (
     <div>
       {isTablet && (
@@ -39,10 +34,7 @@ const RewardsPage = () => {
         />
       )}
       <DetachedSection>
-        <Styled.GridLayout
-          showTradingRewards={showTradingRewards}
-          showMigratePanel={import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet}
-        >
+        <Styled.GridLayout showMigratePanel={import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet}>
           {import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && <Styled.MigratePanel />}
 
           {isTablet ? (
@@ -54,16 +46,14 @@ const RewardsPage = () => {
             </>
           )}
 
-          {showTradingRewards && (
-            <Styled.TradingRewardsColumn>
-              <TradingRewardsSummaryPanel />
-              {isTablet && <RewardsHelpPanel />}
-              <RewardHistoryPanel />
-            </Styled.TradingRewardsColumn>
-          )}
+          <Styled.TradingRewardsColumn>
+            <TradingRewardsSummaryPanel />
+            {isTablet && <RewardsHelpPanel />}
+            <RewardHistoryPanel />
+          </Styled.TradingRewardsColumn>
 
           {isNotTablet && (
-            <Styled.OtherColumn showTradingRewards={showTradingRewards}>
+            <Styled.OtherColumn>
               <RewardsHelpPanel />
             </Styled.OtherColumn>
           )}
@@ -88,7 +78,7 @@ Styled.MobileHeader = styled.header`
   background-color: var(--color-layer-2);
 `;
 
-Styled.GridLayout = styled.div<{ showTradingRewards?: boolean; showMigratePanel?: boolean }>`
+Styled.GridLayout = styled.div<{ showMigratePanel?: boolean }>`
   --gap: 1.5rem;
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -99,34 +89,20 @@ Styled.GridLayout = styled.div<{ showTradingRewards?: boolean; showMigratePanel?
     gap: var(--gap);
   }
 
-  ${({ showTradingRewards, showMigratePanel }) =>
-    showTradingRewards && showMigratePanel
+  ${({ showMigratePanel }) =>
+    showMigratePanel
       ? css`
           grid-template-areas:
             'migrate migrate'
             'incentives incentives'
             'balance balance'
             'rewards other';
-        `
-      : showTradingRewards
-      ? css`
-          grid-template-areas:
-            'incentives balance'
-            'rewards other';
-        `
-      : showMigratePanel
-      ? css`
-          grid-template-areas:
-            'migrate migrate'
-            'incentives incentives'
-            'balance balance'
-            'other other';
         `
       : css`
           grid-template-areas:
             'incentives balance'
-            'other other';
-        `};
+            'rewards other';
+        `}
 
   @media ${breakpoints.notTablet} {
     padding: 1rem;
@@ -138,16 +114,9 @@ Styled.GridLayout = styled.div<{ showTradingRewards?: boolean; showMigratePanel?
     width: calc(100vw - 2rem);
     margin: 0 auto;
 
-    ${({ showTradingRewards }) =>
-      showTradingRewards
-        ? css`
-            grid-template-areas:
-              'incentives'
-              'rewards';
-          `
-        : css`
-            grid-template-areas: 'incentives';
-          `}
+    grid-template-areas:
+      'incentives'
+      'rewards';
   }
 `;
 
@@ -168,18 +137,7 @@ Styled.TradingRewardsColumn = styled.div`
   ${layoutMixins.flexColumn}
 `;
 
-Styled.OtherColumn = styled.div<{ showTradingRewards?: boolean }>`
+Styled.OtherColumn = styled.div`
   grid-area: other;
   ${layoutMixins.flexColumn}
-
-  ${({ showTradingRewards }) =>
-    !showTradingRewards &&
-    css`
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-
-      > section:last-of-type {
-        grid-column: 1 / -1;
-      }
-    `}
 `;
