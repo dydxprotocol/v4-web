@@ -22,7 +22,7 @@ import {
 } from '@/constants/wallets';
 
 import { setOnboardingState, setOnboardingGuard } from '@/state/account';
-import { getSelectedNetwork } from '@/state/appSelectors';
+import { getSelectedDydxChainId, getSelectedNetwork } from '@/state/appSelectors';
 import { forceOpenDialog } from '@/state/dialogs';
 
 import abacusStateManager from '@/lib/abacus';
@@ -193,11 +193,11 @@ const useAccountsContext = () => {
     }
   }, [evmAddress, dydxAddress]);
 
+  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
   const selectedNetwork = useSelector(getSelectedNetwork);
-
   const chainId = Number(ENVIRONMENT_CONFIG_MAP[selectedNetwork].ethereumChainId);
 
-  const signTypedData = getSignTypedData(selectedNetwork);
+  const signTypedData = getSignTypedData(selectedDydxChainId);
   const { signTypedDataAsync } = useSignTypedData({
     ...signTypedData,
     domain: {
