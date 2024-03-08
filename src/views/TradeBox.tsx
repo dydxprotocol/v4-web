@@ -10,6 +10,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { ClosePositionForm } from '@/views/forms/ClosePositionForm';
+import { SelectMarginModeForm } from '@/views/forms/SelectMarginModeForm';
 
 import { openDialogInTradeBox, closeDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
@@ -35,6 +36,10 @@ export const TradeBox = () => {
         onClose: () => {
           abacusStateManager.clearClosePositionInputValues({ shouldFocusOnTradeInput: true });
         },
+      },
+      [TradeBoxDialogTypes.SelectMarginMode]: {
+        title: stringGetter({ key: STRING_KEYS.MARGIN_MODE }),
+        content: <SelectMarginModeForm />,
       },
     }[activeDialog.type];
 

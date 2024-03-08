@@ -25,6 +25,7 @@ import { PreferencesDialog } from '@/views/dialogs/PreferencesDialog';
 import { RateLimitDialog } from '@/views/dialogs/RateLimitDialog';
 import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
 import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
+import { SelectMarginModeDialog } from '@/views/dialogs/SelectMarginModeDialog';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
 import { WithdrawDialog } from '@/views/dialogs/WithdrawDialog';
@@ -72,6 +73,7 @@ export const DialogManager = () => {
     [DialogTypes.RateLimit]: <RateLimitDialog {...modalProps} />,
     [DialogTypes.RestrictedGeo]: <RestrictedGeoDialog {...modalProps} />,
     [DialogTypes.RestrictedWallet]: <RestrictedWalletDialog {...modalProps} />,
+    [DialogTypes.SelectMarginMode]: <SelectMarginModeDialog {...modalProps} />,
     [DialogTypes.Trade]: <TradeDialog {...modalProps} />,
     [DialogTypes.Transfer]: <TransferDialog {...modalProps} />,
     [DialogTypes.Withdraw]: <WithdrawDialog {...modalProps} />,

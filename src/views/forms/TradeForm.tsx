@@ -14,6 +14,7 @@ import {
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
+import { TradeBoxDialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 import {
@@ -23,7 +24,7 @@ import {
   ORDER_TYPE_STRINGS,
 } from '@/constants/trade';
 
-import { useStringGetter, useSubaccount } from '@/hooks';
+import { useBreakpoints, useStringGetter, useSubaccount } from '@/hooks';
 import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
 
 import { breakpoints } from '@/styles';
@@ -40,6 +41,7 @@ import { ToggleButton } from '@/components/ToggleButton';
 import { WithTooltip } from '@/components/WithTooltip';
 import { Orderbook } from '@/views/tables/Orderbook';
 
+import { openDialogInTradeBox } from '@/state/dialogs';
 import { setTradeFormInputs } from '@/state/inputs';
 import {
   getCurrentInput,
@@ -92,6 +94,7 @@ export const TradeForm = ({
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
   const { placeOrder } = useSubaccount();
+  const { isTablet } = useBreakpoints();
 
   const {
     price,
@@ -284,23 +287,36 @@ export const TradeForm = ({
       ) : (
         <>
           <Styled.TopActionsRow>
-            <Styled.OrderbookButtons>
-              <Styled.OrderbookButton
-                slotRight={<Icon iconName={IconName.Caret} />}
-                onPressedChange={setShowOrderbook}
-                isPressed={showOrderbook}
-                hidePressedStyle
+            {isTablet && (
+              <Styled.OrderbookButtons>
+                <Styled.OrderbookButton
+                  slotRight={<Icon iconName={IconName.Caret} />}
+                  onPressedChange={setShowOrderbook}
+                  isPressed={showOrderbook}
+                  hidePressedStyle
+                >
+                  {!showOrderbook && stringGetter({ key: STRING_KEYS.ORDERBOOK })}
+                </Styled.OrderbookButton>
+                {/* TODO[TRCL-1411]: add orderbook scale functionality */}
+              </Styled.OrderbookButtons>
+            )}
+            {!isTablet && (
+              <Styled.MarginModeEntryPoint
+                onClick={() =>
+                  dispatch(openDialogInTradeBox({ type: TradeBoxDialogTypes.SelectMarginMode }))
+                }
               >
-                {!showOrderbook && stringGetter({ key: STRING_KEYS.ORDERBOOK })}
-              </Styled.OrderbookButton>
-              {/* TODO[TRCL-1411]: add orderbook scale functionality */}
-            </Styled.OrderbookButtons>
+                {stringGetter({ key: STRING_KEYS.CROSS })}
+              </Styled.MarginModeEntryPoint>
+            )}
 
             <TradeSideToggle />
           </Styled.TopActionsRow>
 
           <Styled.OrderbookAndInputs showOrderbook={showOrderbook}>
-            {showOrderbook && <Styled.Orderbook maxRowsPerSide={5} selectionBehavior="replace" />}
+            {isTablet && showOrderbook && (
+              <Styled.Orderbook maxRowsPerSide={5} selectionBehavior="replace" />
+            )}
 
             <Styled.InputsColumn>
               {tradeFormInputs.map(
@@ -480,6 +496,10 @@ Styled.Orderbook = styled(Orderbook)`
       display: none;
     }
   }
+`;
+
+Styled.MarginModeEntryPoint = styled(Button)`
+  margin-right: 1rem;
 `;
 
 Styled.InputsColumn = styled.div`
