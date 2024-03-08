@@ -245,7 +245,7 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
 };
 
 async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promise<void> {
-  exchangeConfigJson.forEach(async (exchange) => {
+  for (const exchange of exchangeConfigJson) {
     if (!(exchange.exchangeName in EXCHANGE_INFO)) {
       throw new Error(`Exchange ${exchange.exchangeName} not supported`);
     }
@@ -281,7 +281,7 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
       throw new Error(`Ticker ${exchange.ticker} not found for exchange ${exchange.exchangeName}`);
     }
     console.log(`Validated ticker ${exchange.ticker} for exchange ${exchange.exchangeName}`);
-  });
+  }
 }
 
 // Vote YES on all `proposalIds` from `wallet`.
