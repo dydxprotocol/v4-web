@@ -1,0 +1,114 @@
+import { Root, Item } from '@radix-ui/react-radio-group';
+import styled, { AnyStyledComponent } from 'styled-components';
+
+import { MenuItem } from '@/constants/menus';
+
+import { Icon, IconName } from './Icon';
+
+type RadioItem<MenuItemValue extends string> = Pick<
+  MenuItem<MenuItemValue>,
+  'value' | 'label' | 'disabled'
+> & {
+  body?: React.ReactNode;
+};
+
+type RadioButtonCardsProps<MenuItemValue extends string> = {
+  className?: string;
+  slotTop?: React.ReactNode;
+  slotBottom?: React.ReactNode;
+  radioItems: RadioItem<MenuItemValue>[];
+} & Parameters<typeof Root>[0];
+
+export const RadioButtonCards = <MenuItemValue extends string>({
+  className,
+  value,
+  onValueChange,
+  radioItems,
+  slotTop,
+  slotBottom,
+}: RadioButtonCardsProps<MenuItemValue>) => {
+  return (
+    <Styled.Root value={value} onValueChange={onValueChange} className={className}>
+      {slotTop}
+      {radioItems.map((item) => (
+        <Styled.RadioButtonCard key={item.value} value={item.value} disabled={item.disabled}>
+          <Styled.CardHeader>
+            {item.label}
+            {value === item.value ? (
+              <Styled.CheckIcon iconName={IconName.Check} />
+            ) : (
+              <Styled.EmptyIcon />
+            )}
+          </Styled.CardHeader>
+          {item.body}
+        </Styled.RadioButtonCard>
+      ))}
+      {slotBottom}
+    </Styled.Root>
+  );
+};
+
+const Styled: Record<string, AnyStyledComponent> = {};
+
+Styled.Root = styled(Root)`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+
+  --radio-button-cards-item-padding: ;
+  --radio-button-cards-item-checked-backgroundColor: ;
+  --radio-button-cards-item-disabled-backgroundColor: ;
+  --radio-button-cards-item-backgroundColor: ;
+`;
+
+Styled.RadioButtonCard = styled(Item)`
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.625rem;
+  background-color: var(--radio-button-cards-item-backgroundColor, transparent);
+  border: 1px solid var(--color-layer-6);
+  padding: var(--radio-button-cards-item-padding, 1rem);
+  font: var(--font-mini-book);
+
+  &:disabled {
+    cursor: default;
+    background-color: var(--radio-button-cards-item-disabled-backgroundColor, transparent);
+  }
+
+  &[data-state='checked'] {
+    background-color: var(--radio-button-cards-item-checked-backgroundColor, var(--color-layer-2));
+  }
+`;
+
+Styled.CardHeader = styled.div`
+  display: flex;
+  flex: 1;
+  align-self: stretch;
+  align-items: center;
+  color: var(--color-text-2);
+  font: var(--font-base-medium);
+  justify-content: space-between;
+  gap: 1rem;
+`;
+
+Styled.CheckIcon = styled(Icon)`
+  width: 1rem;
+  height: 1rem;
+  padding: 0.25rem;
+
+  border-radius: 50%;
+
+  color: var(--color-text-1);
+  background-color: var(--color-accent);
+`;
+
+Styled.EmptyIcon = styled.div`
+  width: 1rem;
+  height: 1rem;
+
+  box-shadow: 0 0 0 0.1rem var(--color-layer-5);
+  border-radius: 50%;
+
+  background-color: var(--color-layer-0);
+`;
