@@ -139,9 +139,7 @@ export const PositionsTriggersCell = ({
                 align={'end'}
                 side={'top'}
                 hovercard={
-                  isStopLossOrder(order)
-                    ? 'partial-close-stop-loss'
-                    : 'partial-close-takeProfit'
+                  isStopLossOrder(order) ? 'partial-close-stop-loss' : 'partial-close-take-profit'
                 }
                 slotButton={
                   <Button
