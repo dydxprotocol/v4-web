@@ -47,24 +47,3 @@ Styled.Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
 `;
-
-Styled.ToggleGroup = styled(ToggleGroup)`
-  ${formMixins.inputToggleGroup}
-`;
-
-Styled.GradientCard = styled(GradientCard)`
-  ${layoutMixins.spacedRow}
-  height: 4rem;
-  border-radius: 0.5rem;
-  padding: 0.75rem 1rem;
-  align-items: center;
-`;
-
-Styled.Column = styled.div`
-  ${layoutMixins.column}
-  font: var(--font-small-medium);
-`;
-
-Styled.TertiarySpan = styled.span`
-  color: var(--color-text-0);
-`;
