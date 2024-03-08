@@ -67,22 +67,6 @@ const useNotificationsContext = () => {
     setNotificationsLastUpdated(Date.now());
   }, [notifications]);
 
-  const clearAbacusGeneratedNotifications = useCallback(
-    (notifications: Notifications) => {
-      const originalEntries = Object.entries(notifications);
-      const filteredEntries = originalEntries.filter(
-        ([, value]) => value.type !== NotificationType.AbacusGenerated
-      );
-
-      // Only update if the number of notifications has changed
-      if (filteredEntries.length !== originalEntries.length) {
-        const newNotifications = Object.fromEntries(filteredEntries);
-        setNotifications(newNotifications);
-      }
-    },
-    [notifications]
-  );
-
   const getKey = useCallback(
     <T extends string | number>(notification: Pick<Notification<T>, 'type' | 'id'>) =>
       `${notification.type}/${notification.id}`,
@@ -101,8 +85,6 @@ const useNotificationsContext = () => {
 
   // Check for version changes
   useEffect(() => {
-    clearAbacusGeneratedNotifications(notifications);
-
     if (
       notificationPreferences.version !==
       LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences]
@@ -121,11 +103,7 @@ const useNotificationsContext = () => {
     (notification: Notification, status: NotificationStatus) => {
       notification.status = status;
       notification.timestamps[notification.status] = Date.now();
-      // Don't save AbacusGenerated notifcations to LocalStorage, these are triggered by
-      // Orders, Fills, Trading Rewards etc. and we don't need to know if they've already been seen
-      if (notification.type != NotificationType.AbacusGenerated) {
-        setNotifications({ ...notifications, [getKey(notification)]: notification });
-      }
+      setNotifications({ ...notifications, [getKey(notification)]: notification });
     },
     [notifications, getKey]
   );
