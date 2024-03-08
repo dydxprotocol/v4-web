@@ -1,6 +1,3 @@
-import { useState } from 'react';
-
-import { useDispatch } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
@@ -8,12 +5,11 @@ import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { WalletType, wallets } from '@/constants/wallets';
 
-import { useAccounts, useStringGetter, useURLConfigs } from '@/hooks';
+import { useAccounts, useBreakpoints, useStringGetter, useURLConfigs } from '@/hooks';
 import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
-import { usePrivy } from '@privy-io/react-auth';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
@@ -27,8 +23,8 @@ export const ChooseWallet = () => {
   const displayedWallets = useDisplayedWallets();
 
   const { selectWalletType, selectedWalletType, selectedWalletError } = useAccounts();
-  
-  const { ready, authenticated } = usePrivy();
+
+  const { isMobile } = useBreakpoints();
 
   return (
     <>
@@ -62,7 +58,7 @@ export const ChooseWallet = () => {
             <div>
               {walletType !== WalletType.Privy && import.meta.env.VITE_PRIVY_APP_ID
                 ? stringGetter({ key: wallets[walletType].stringKey })
-                : 'Socials (Email, SMS, etc.)'}
+                : `Socials ${isMobile ? '' : '(Email, SMS, etc.)'}`}
             </div>
           </Styled.WalletButton>
         ))}
