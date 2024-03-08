@@ -7,8 +7,10 @@ import styled, { AnyStyledComponent } from 'styled-components';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { TOKEN_DECIMALS } from '@/constants/numbers';
 
 import { useAccounts, useBreakpoints, useStringGetter } from '@/hooks';
+import { useQueryChaosLabsIncentives } from '@/hooks/useQueryChaosLabsIncentives';
 
 import { ChaosLabsIcon } from '@/icons';
 import breakpoints from '@/styles/breakpoints';
@@ -97,16 +99,8 @@ const EstimatedRewards = () => {
     onError: (error: Error) => log('LaunchIncentives/fetchSeasonNumber', error),
   });
 
-  const { data, isLoading } = useQuery({
-    enabled: !!dydxAddress,
-    queryKey: `launch_incentives_rewards_${dydxAddress ?? ''}`,
-    queryFn: async () => {
-      if (!dydxAddress) return undefined;
-      const resp = await fetch(`https://cloud.chaoslabs.co/query/api/dydx/points/${dydxAddress}`);
-      return (await resp.json())?.incentivePoints;
-    },
-    onError: (error: Error) => log('LaunchIncentives/fetchPoints', error),
-  });
+  const { data, isLoading } = useQueryChaosLabsIncentives({ dydxAddress, season: seasonNumber });
+  const { incentivePoints } = data ?? {};
 
   return (
     <Styled.EstimatedRewardsCard>
@@ -124,8 +118,13 @@ const EstimatedRewards = () => {
         </div>
 
         <Styled.Points>
-          <Output type={OutputType.Number} value={data} isLoading={isLoading} fractionDigits={2} />
-          {data !== undefined && stringGetter({ key: STRING_KEYS.POINTS })}
+          <Output
+            type={OutputType.Number}
+            value={incentivePoints}
+            isLoading={isLoading}
+            fractionDigits={TOKEN_DECIMALS}
+          />
+          {incentivePoints !== undefined && stringGetter({ key: STRING_KEYS.POINTS })}
         </Styled.Points>
       </Styled.EstimatedRewardsCardContent>
 
