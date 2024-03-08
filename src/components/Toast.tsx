@@ -94,13 +94,7 @@ export const Toast = ({
           slotTitleLeft={slotTitleLeft}
           slotTitleRight={slotTitleRight}
           slotDescription={slotDescription}
-          slotAction={
-            actionDescription && (
-              <$Action asChild altText={actionAltText}>
-                {slotAction}
-              </$Action>
-            )
-          }
+          slotAction={slotAction}
         />
       )}
     </$Root>
@@ -262,8 +256,4 @@ const $CloseButton = styled(IconButton)`
     display: block;
     z-index: 2;
   }
-`;
-
-const $Action = styled(Action)`
-  margin-top: 0.5rem;
 `;

@@ -17,6 +17,7 @@ import {
   type Notifications,
   NotificationStatus,
   NotificationType,
+  SingleSessionNotificationTypes,
 } from '@/constants/notifications';
 
 import { track } from '@/lib/analytics';
@@ -41,11 +42,11 @@ export const useNotifications = () => useContext(NotificationsContext)!;
 
 const useNotificationsContext = () => {
   // Local storage
-  // const [notifications, setNotifications] = useState<Notifications>({});
-  const [notifications, setNotifications] = useLocalStorage<Notifications>({
+  const [localStorageNotifications, setLocalStorageNotifications] = useLocalStorage<Notifications>({
     key: LocalStorageKey.Notifications,
     defaultValue: {},
   });
+  const [notifications, setNotifications] = useState<Notifications>(localStorageNotifications);
 
   const [notificationsLastUpdated, setNotificationsLastUpdated] = useLocalStorage<number>({
     key: LocalStorageKey.NotificationsLastUpdated,
@@ -59,6 +60,7 @@ const useNotificationsContext = () => {
         [NotificationType.AbacusGenerated]: true,
         [NotificationType.SquidTransfer]: true,
         [NotificationType.ReleaseUpdates]: true,
+        [NotificationType.ApiError]: true,
         version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
       },
     });
@@ -66,6 +68,33 @@ const useNotificationsContext = () => {
   useEffect(() => {
     setNotificationsLastUpdated(Date.now());
   }, [notifications]);
+
+  useEffect(() => {
+    // save notifications to localstorage, but filter out single session notifications
+    const originalEntries = Object.entries(notifications);
+    const filteredEntries = originalEntries.filter(
+      ([, value]) => !SingleSessionNotificationTypes.includes(value.type)
+    );
+
+    const newNotifications = Object.fromEntries(filteredEntries);
+    setLocalStorageNotifications(newNotifications);
+  }, [notifications]);
+
+  const clearAbacusGeneratedNotifications = useCallback(
+    (notifications: Notifications) => {
+      const originalEntries = Object.entries(notifications);
+      const filteredEntries = originalEntries.filter(
+        ([, value]) => value.type !== NotificationType.AbacusGenerated
+      );
+
+      // Only update if the number of notifications has changed
+      if (filteredEntries.length !== originalEntries.length) {
+        const newNotifications = Object.fromEntries(filteredEntries);
+        setNotifications(newNotifications);
+      }
+    },
+    [notifications]
+  );
 
   const getKey = useCallback(
     <T extends string | number>(notification: Pick<Notification<T>, 'type' | 'id'>) =>
@@ -93,6 +122,7 @@ const useNotificationsContext = () => {
         [NotificationType.AbacusGenerated]: true,
         [NotificationType.SquidTransfer]: true,
         [NotificationType.ReleaseUpdates]: true,
+        [NotificationType.ApiError]: true,
         version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
       });
     }

@@ -4,46 +4,45 @@ import type { AbacusApiState, Nullable } from '@/constants/abacus';
 import { AbacusApiStatus } from '@/constants/abacus';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 
-import { getApiState } from '@/state/appSelectors';
+import { getApiState, getInitializationError } from '@/state/appSelectors';
 
 import { useStringGetter } from './useStringGetter';
 
 const getStatusErrorMessage = ({
   apiState,
+  initializationError,
   stringGetter,
 }: {
   apiState: Nullable<AbacusApiState>;
+  initializationError?: string;
   stringGetter: StringGetterFunction;
 }) => {
-  const { haltedBlock, trailingBlocks, status } = apiState || {};
+  const { status } = apiState || {};
+
+  const chainDisruptionMessages = {
+    title: stringGetter({ key: STRING_KEYS.CHAIN_DISRUPTION_DETECTED }),
+    body: stringGetter({ key: STRING_KEYS.CHAIN_DISRUPTION_DETECTED_BODY }),
+  };
+
+  const indexerTrailingMessages = {
+    title: stringGetter({ key: STRING_KEYS.ORDERBOOK_LAGGING }),
+    body: stringGetter({ key: STRING_KEYS.ORDERBOOK_LAGGING_BODY }),
+  };
+
+  if (initializationError) {
+    return chainDisruptionMessages;
+  }
 
   switch (status) {
-    case AbacusApiStatus.INDEXER_DOWN: {
-      return stringGetter({ key: STRING_KEYS.INDEXER_DOWN });
-    }
-    case AbacusApiStatus.INDEXER_HALTED: {
-      return stringGetter({
-        key: STRING_KEYS.INDEXER_HALTED,
-        params: { HALTED_BLOCK: haltedBlock },
-      });
-    }
     case AbacusApiStatus.INDEXER_TRAILING: {
-      return stringGetter({
-        key: STRING_KEYS.INDEXER_TRAILING,
-        params: { TRAILING_BLOCKS: trailingBlocks },
-      });
+      return indexerTrailingMessages;
     }
-    case AbacusApiStatus.VALIDATOR_DOWN: {
-      return stringGetter({ key: STRING_KEYS.VALIDATOR_DOWN });
-    }
-    case AbacusApiStatus.VALIDATOR_HALTED: {
-      return stringGetter({
-        key: STRING_KEYS.VALIDATOR_HALTED,
-        params: { HALTED_BLOCK: haltedBlock },
-      });
-    }
+    case AbacusApiStatus.INDEXER_DOWN:
+    case AbacusApiStatus.INDEXER_HALTED:
+    case AbacusApiStatus.VALIDATOR_DOWN:
+    case AbacusApiStatus.VALIDATOR_HALTED:
     case AbacusApiStatus.UNKNOWN: {
-      return stringGetter({ key: STRING_KEYS.UNKNOWN_API_ERROR });
+      return chainDisruptionMessages;
     }
     case AbacusApiStatus.NORMAL:
     default: {
@@ -71,8 +70,9 @@ export const getIndexerHeight = (apiState: Nullable<AbacusApiState>) => {
 export const useApiState = () => {
   const stringGetter = useStringGetter();
   const apiState = useSelector(getApiState, shallowEqual);
+  const initializationError = useSelector(getInitializationError);
   const { haltedBlock, height, status, trailingBlocks } = apiState ?? {};
-  const statusErrorMessage = getStatusErrorMessage({ apiState, stringGetter });
+  const statusErrorMessage = getStatusErrorMessage({ apiState, initializationError, stringGetter });
   const indexerHeight = getIndexerHeight(apiState);
 
   return {

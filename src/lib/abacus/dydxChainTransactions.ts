@@ -36,6 +36,7 @@ import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 
 import { RootStore } from '@/state/_store';
 import { addUncommittedOrderClientId, removeUncommittedOrderClientId } from '@/state/account';
+import { setInitializationError } from '@/state/app';
 import { openDialog } from '@/state/dialogs';
 
 import { StatefulOrderError } from '../errors';
@@ -144,8 +145,10 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       callback(JSON.stringify({ success: true }));
     } catch (error) {
       this.store?.dispatch(
-        openDialog({ type: DialogTypes.ExchangeOffline, dialogProps: { preventClose: true } })
+        // openDialog({ type: DialogTypes.ExchangeOffline, dialogProps: { preventClose: true } })
+        setInitializationError(error?.message ?? 'Unknown error')
       );
+      console.log('ExchangeOfflineDialog', error);
       log('DydxChainTransactions/connectNetwork', error);
     }
   }
