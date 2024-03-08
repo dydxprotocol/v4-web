@@ -21,14 +21,11 @@ import { WithHovercard } from '@/components/WithHovercard';
 
 import { isMarketOrderType, isStopLossOrder } from '@/lib/orders';
 
-export type PositionTableConditionalOrder = {
-  liquidationPrice: Nullable<number>;
-} & SubaccountOrder;
-
 type ElementProps = {
   market: string;
-  stopLossOrders: PositionTableConditionalOrder[];
-  takeProfitOrders: PositionTableConditionalOrder[];
+  liquidationPrice: Nullable<number>;
+  stopLossOrders: SubaccountOrder[];
+  takeProfitOrders: SubaccountOrder[];
   onViewOrdersClick: (market: string) => void;
   positionSide: Nullable<AbacusPositionSides>;
   positionSize: Nullable<number>;
@@ -37,6 +34,7 @@ type ElementProps = {
 
 export const PositionsTriggersCell = ({
   market,
+  liquidationPrice,
   stopLossOrders,
   takeProfitOrders,
   onViewOrdersClick,
@@ -46,8 +44,9 @@ export const PositionsTriggersCell = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
 
-  const showLiquidationWarning = (order: PositionTableConditionalOrder) => {
-    const { liquidationPrice, price } = order;
+  const showLiquidationWarning = (order: SubaccountOrder) => {
+    const { price } = order;
+    console.log(order, liquidationPrice, price, positionSide);
 
     if (!isStopLossOrder(order) || !liquidationPrice) {
       return false;
@@ -77,7 +76,7 @@ export const PositionsTriggersCell = ({
     orders,
   }: {
     label: string;
-    orders: PositionTableConditionalOrder[];
+    orders: SubaccountOrder[];
   }) => {
     const triggerLabel = ({
       liquidationWarningSide,
