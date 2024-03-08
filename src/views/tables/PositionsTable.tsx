@@ -289,11 +289,12 @@ const getPositionsTableColumnDef = ({
         isActionable: true,
         allowsSorting: false,
         hideOnBreakpoint: MediaQueryKeys.isTablet,
-        renderCell: ({ id, size, stopLossOrders, takeProfitOrders }) => (
+        renderCell: ({ id, side, size, stopLossOrders, takeProfitOrders }) => (
           <PositionsTriggersCell
             market={id}
             stopLossOrders={stopLossOrders}
             takeProfitOrders={takeProfitOrders}
+            positionSide={side.current}
             positionSize={size?.current}
             isDisabled={isAccountViewOnly}
             onViewOrdersClick={navigateToOrders}
