@@ -45,14 +45,11 @@ export const PositionsTriggersCell = ({
   const stringGetter = useStringGetter();
 
   const showLiquidationWarning = (order: SubaccountOrder) => {
-    const { price } = order;
-    console.log(order, liquidationPrice, price, positionSide);
-
     if (!isStopLossOrder(order) || !liquidationPrice) {
       return false;
     } else if (
-      (positionSide === AbacusPositionSide.SHORT && price > liquidationPrice) ||
-      (positionSide === AbacusPositionSide.LONG && price < liquidationPrice)
+      (positionSide === AbacusPositionSide.SHORT && order.price > liquidationPrice) ||
+      (positionSide === AbacusPositionSide.LONG && order.price < liquidationPrice)
     ) {
       return true;
     }
@@ -71,13 +68,7 @@ export const PositionsTriggersCell = ({
     </Styled.Button>
   );
 
-  const renderOutput = ({
-    label,
-    orders,
-  }: {
-    label: string;
-    orders: SubaccountOrder[];
-  }) => {
+  const renderOutput = ({ label, orders }: { label: string; orders: SubaccountOrder[] }) => {
     const triggerLabel = ({
       liquidationWarningSide,
     }: {
