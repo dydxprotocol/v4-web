@@ -1,11 +1,10 @@
-import { type ReactNode, useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { isEqual, groupBy } from 'lodash';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { AbacusApiStatus } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import {
   STRING_KEYS,
@@ -36,7 +35,7 @@ import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
 import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
-import { getApiState, getSelectedDydxChainId } from '@/state/appSelectors';
+import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
