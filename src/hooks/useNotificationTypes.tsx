@@ -24,6 +24,7 @@ import { DydxChainAsset } from '@/constants/wallets';
 
 import { useAccounts, useStringGetter, useTokenConfigs } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
+import { useQueryChaosLabsIncentives } from '@/hooks/useQueryChaosLabsIncentives';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
@@ -39,8 +40,6 @@ import { getAbacusNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import { formatSeconds } from '@/lib/timeUtils';
-
-import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
 
 const parseStringParamsForNotification = ({
   stringGetter,
@@ -283,15 +282,15 @@ export const notificationTypes: NotificationTypeConfig[] = [
             ReleaseUpdateNotificationIds.IncentivesDistributedS2,
             {
               icon: <AssetIcon symbol={chainTokenLabel} />,
-              title: 'Season 2 Launch Rewards Distributed',
-              body: `Season 2 rewards: +${dydxRewards} ${chainTokenLabel}`,
+              title: 'Season 2 launch rewards have been distributed!',
+              body: `Season 2 rewards: +${dydxRewards ?? 0} ${chainTokenLabel}`,
               renderCustomBody({ isToast, notification }) {
                 return (
                   <IncentiveSeasonDistributionNotification
                     isToast={isToast}
                     notification={notification}
                     data={{
-                      points: dydxRewards,
+                      points: dydxRewards ?? 0,
                       chainTokenLabel,
                     }}
                   />

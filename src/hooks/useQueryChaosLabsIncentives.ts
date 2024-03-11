@@ -4,6 +4,12 @@ import type { DydxAddress } from '@/constants/wallets';
 
 import { log } from '@/lib/telemetry';
 
+type ChaosLabsIncentivesResponse = {
+  dydxRewards: number;
+  incentivePoints: number;
+  marketMakingIncentivePoints: number;
+};
+
 export const useQueryChaosLabsIncentives = ({
   dydxAddress,
   season,
@@ -11,7 +17,7 @@ export const useQueryChaosLabsIncentives = ({
   dydxAddress?: DydxAddress;
   season?: number;
 }) => {
-  return useQuery({
+  return useQuery<ChaosLabsIncentivesResponse | undefined, Error>({
     enabled: !!dydxAddress,
     queryKey: ['launch_incentives_rewards', dydxAddress, season],
     queryFn: async () => {
