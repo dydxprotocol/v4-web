@@ -60,6 +60,8 @@ export const MarketLeverageInput = ({
     ? BIG_NUMBERS.ONE.div(initialMarginFraction)
     : MustBigNumber(10);
 
+  const leverageOptions = maxLeverage.lt(10) ? [1, 2, 3, 4, 5] : [1, 2, 3, 5, 10];
+
   const leveragePosition = postOrderLeverage ? newPositionSide : currentPositionSide;
 
   const getSignedLeverage = (newLeverage: string | number) => {
@@ -157,12 +159,10 @@ export const MarketLeverageInput = ({
       </Styled.InputContainer>
 
       <Styled.ToggleGroup
-        items={(maxLeverage.lt(10) ? [1, 2, 3, 4, 5] : [1, 2, 3, 5, 10]).map(
-          (leverageAmount: number) => ({
-            label: `${leverageAmount}×`,
-            value: MustBigNumber(leverageAmount).toFixed(LEVERAGE_DECIMALS),
-          })
-        )}
+        items={leverageOptions.map((leverageAmount: number) => ({
+          label: `${leverageAmount}×`,
+          value: MustBigNumber(leverageAmount).toFixed(LEVERAGE_DECIMALS),
+        }))}
         value={MustBigNumber(formattedLeverageValue).abs().toFixed(LEVERAGE_DECIMALS)} // sign agnostic
         onValueChange={updateLeverage}
         shape={ButtonShape.Rectangle}
