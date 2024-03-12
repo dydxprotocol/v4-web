@@ -131,3 +131,15 @@ export const getTradeInputAlert = ({
 
   return inputAlerts?.[0];
 };
+
+export const calculatePositionMargin = ({
+  notionalTotal,
+  adjustedMmf,
+}: {
+  notionalTotal?: Nullable<number>;
+  adjustedMmf?: Nullable<number>;
+}) => {
+  const notionalTotalBN = MustBigNumber(notionalTotal);
+  const adjustedMmfBN = MustBigNumber(adjustedMmf);
+  return notionalTotalBN.times(adjustedMmfBN);
+};

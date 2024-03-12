@@ -1,4 +1,5 @@
 export enum DialogTypes {
+  AdjustIsolatedMargin = 'AdjustIsolatedMargin',
   ClosePosition = 'ClosePosition',
   Deposit = 'Deposit',
   DisconnectWallet = 'DisconnectWallet',
