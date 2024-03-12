@@ -468,6 +468,11 @@ Styled.TradeForm = styled.form`
 Styled.MarginAndLeverageButtons = styled.div`
   ${layoutMixins.inlineRow}
   gap: 0.5rem;
+  margin-right: 0.5rem;
+
+  button {
+    width: 100%;
+  }
 `;
 
 Styled.TopActionsRow = styled.div`
