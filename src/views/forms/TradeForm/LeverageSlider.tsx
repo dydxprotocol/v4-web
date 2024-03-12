@@ -1,12 +1,13 @@
 import { useCallback, useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { Root, Thumb, Track } from '@radix-ui/react-slider';
 import _ from 'lodash';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
 import { PositionSide } from '@/constants/trade';
+
+import { Slider } from '@/components/Slider';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber, type BigNumberish } from '@/lib/numbers';
@@ -98,117 +99,44 @@ export const LeverageSlider = ({
   };
 
   return (
-    <Styled.SliderContainer midpoint={midpoint} orderSide={orderSide} className={className}>
-      <Styled.Root
-        aria-label="MarketLeverage"
+    <Styled.SliderContainer className={className}>
+      <Styled.Slider
+        label="MarketLeverage"
         min={min}
         max={max}
         step={0.1}
-        value={[Math.min(Math.max(leverageInputNumber, min), max)]}
-        onValueChange={onSliderDrag}
+        value={Math.min(Math.max(leverageInputNumber, min), max)}
+        onSliderDrag={onSliderDrag}
         onValueCommit={onValueCommit}
-      >
-        <Styled.Track />
-        <Styled.Thumb />
-      </Styled.Root>
+        midpoint={midpoint}
+        orderSide={orderSide}
+      />
     </Styled.SliderContainer>
   );
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
-Styled.Root = styled(Root)`
-  // make thumb covers the start of the track
-  --radix-slider-thumb-transform: translateX(-65%) !important;
+Styled.Slider = styled(Slider)<{ midpoint?: number; orderSide: OrderSide }>`
+  --slider-track-backgroundColor: var(--color-layer-4);
 
-  position: relative;
-
-  display: flex;
-  align-items: center;
-
-  user-select: none;
-
-  height: 100%;
+  ${({ midpoint, orderSide }) => css`
+    --slider-track-background: linear-gradient(
+      90deg,
+      var(--color-negative) 0%,
+      var(--color-layer-7)
+        ${midpoint
+          ? midpoint
+          : orderSide === OrderSide.BUY
+          ? 0
+          : orderSide === OrderSide.SELL
+          ? 100
+          : 50}%,
+      var(--color-positive) 100%
+    );
+  `}
 `;
 
-Styled.Track = styled(Track)`
-  position: relative;
-
-  display: flex;
-  flex-grow: 1;
-  align-items: center;
-
-  height: 0.5rem;
-  margin-right: 0.25rem; // make thumb covers the end of the track
-
-  cursor: pointer;
-
-  &:before {
-    content: '';
-    width: 100%;
-    height: 100%;
-
-    background: linear-gradient(
-        90deg,
-        transparent,
-        transparent 15%,
-        var(--slider-backgroundColor) 15%,
-        var(--slider-backgroundColor) 50%,
-        transparent 50%,
-        transparent 65%,
-        var(--slider-backgroundColor) 65%
-      )
-      0 0 / 0.6rem;
-  }
-`;
-
-Styled.Thumb = styled(Thumb)`
+Styled.SliderContainer = styled.div`
   height: 1.375rem;
-  width: 1.375rem;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  background-color: var(--color-layer-6);
-  opacity: 0.8;
-
-  border: 1.5px solid var(--color-layer-7);
-  border-radius: 50%;
-
-  cursor: grab;
-`;
-
-Styled.SliderContainer = styled.div<{ midpoint?: number; orderSide: OrderSide }>`
-  --slider-backgroundColor: var(--color-layer-4);
-  --slider-track-gradient-positive: linear-gradient(
-    90deg,
-    var(--color-layer-7),
-    var(--color-positive)
-  );
-  --slider-track-gradient-negative: linear-gradient(
-    90deg,
-    var(--color-negative),
-    var(--color-layer-7)
-  );
-
-  height: 1.375rem;
-
-  ${Styled.Track} {
-    ${({ midpoint, orderSide }) => css`
-      background: linear-gradient(
-        90deg,
-        var(--color-negative) 0%,
-        var(--color-layer-7)
-          ${midpoint
-            ? midpoint
-            : orderSide === OrderSide.BUY
-            ? 0
-            : orderSide === OrderSide.SELL
-            ? 100
-            : 50}%,
-        var(--color-positive) 100%
-      );
-    `}
-  }
 `;
