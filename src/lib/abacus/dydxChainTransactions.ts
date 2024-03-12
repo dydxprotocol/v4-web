@@ -144,11 +144,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       globalThis.dispatchEvent(customEvent);
       callback(JSON.stringify({ success: true }));
     } catch (error) {
-      this.store?.dispatch(
-        // openDialog({ type: DialogTypes.ExchangeOffline, dialogProps: { preventClose: true } })
-        setInitializationError(error?.message ?? 'Unknown error')
-      );
-      console.log('ExchangeOfflineDialog', error);
+      this.store?.dispatch(setInitializationError(error?.message ?? 'Unknown error'));
       log('DydxChainTransactions/connectNetwork', error);
     }
   }

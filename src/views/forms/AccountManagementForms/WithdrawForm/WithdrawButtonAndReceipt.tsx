@@ -10,6 +10,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter, useTokenConfigs } from '@/hooks';
+import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -60,6 +61,7 @@ export const WithdrawButtonAndReceipt = ({
   const { summary, requestPayload, exchange } = useSelector(getTransferInputs, shallowEqual) || {};
   const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
   const { usdcLabel } = useTokenConfigs();
+  const { connectionError } = useApiState();
 
   const feeSubitems: DetailsItem[] = [];
 
@@ -185,7 +187,8 @@ export const WithdrawButtonAndReceipt = ({
     },
   ].filter(isTruthy);
 
-  const isFormValid = !isDisabled && !isEditingSlippage;
+  const isFormValid =
+    !isDisabled && !isEditingSlippage && connectionError !== ConnectionErrorType.CHAIN_DISRUPTION;
 
   return (
     <Styled.WithReceipt

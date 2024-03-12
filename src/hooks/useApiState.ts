@@ -8,47 +8,67 @@ import { getApiState, getInitializationError } from '@/state/appSelectors';
 
 import { useStringGetter } from './useStringGetter';
 
-const getStatusErrorMessage = ({
+export enum ConnectionErrorType {
+  CHAIN_DISRUPTION = 'CHAIN_DISRUPTION',
+  INDEXER_TRAILING = 'INDEXER_TRAILING',
+}
+
+const ErrorMessageMap = {
+  [ConnectionErrorType.CHAIN_DISRUPTION]: {
+    title: STRING_KEYS.CHAIN_DISRUPTION_DETECTED,
+    body: STRING_KEYS.CHAIN_DISRUPTION_DETECTED_BODY,
+  },
+  [ConnectionErrorType.INDEXER_TRAILING]: {
+    title: STRING_KEYS.ORDERBOOK_LAGGING,
+    body: STRING_KEYS.ORDERBOOK_LAGGING_BODY,
+  },
+};
+
+const getConnectionError = ({
   apiState,
   initializationError,
-  stringGetter,
 }: {
   apiState: Nullable<AbacusApiState>;
   initializationError?: string;
-  stringGetter: StringGetterFunction;
 }) => {
   const { status } = apiState || {};
 
-  const chainDisruptionMessages = {
-    title: stringGetter({ key: STRING_KEYS.CHAIN_DISRUPTION_DETECTED }),
-    body: stringGetter({ key: STRING_KEYS.CHAIN_DISRUPTION_DETECTED_BODY }),
-  };
-
-  const indexerTrailingMessages = {
-    title: stringGetter({ key: STRING_KEYS.ORDERBOOK_LAGGING }),
-    body: stringGetter({ key: STRING_KEYS.ORDERBOOK_LAGGING_BODY }),
-  };
-
   if (initializationError) {
-    return chainDisruptionMessages;
+    return ConnectionErrorType.CHAIN_DISRUPTION;
   }
 
   switch (status) {
     case AbacusApiStatus.INDEXER_TRAILING: {
-      return indexerTrailingMessages;
+      return ConnectionErrorType.INDEXER_TRAILING;
     }
     case AbacusApiStatus.INDEXER_DOWN:
     case AbacusApiStatus.INDEXER_HALTED:
     case AbacusApiStatus.VALIDATOR_DOWN:
     case AbacusApiStatus.VALIDATOR_HALTED:
     case AbacusApiStatus.UNKNOWN: {
-      return chainDisruptionMessages;
+      return ConnectionErrorType.CHAIN_DISRUPTION;
     }
     case AbacusApiStatus.NORMAL:
     default: {
-      return null;
+      return undefined;
     }
   }
+};
+
+const getStatusErrorMessage = ({
+  connectionError,
+  stringGetter,
+}: {
+  connectionError?: ConnectionErrorType;
+  stringGetter: StringGetterFunction;
+}) => {
+  if (connectionError && ErrorMessageMap[connectionError]) {
+    return {
+      title: stringGetter({ key: ErrorMessageMap[connectionError].title }),
+      body: stringGetter({ key: ErrorMessageMap[connectionError].body }),
+    };
+  }
+  return null;
 };
 
 export const getIndexerHeight = (apiState: Nullable<AbacusApiState>) => {
@@ -72,7 +92,11 @@ export const useApiState = () => {
   const apiState = useSelector(getApiState, shallowEqual);
   const initializationError = useSelector(getInitializationError);
   const { haltedBlock, height, status, trailingBlocks } = apiState ?? {};
-  const statusErrorMessage = getStatusErrorMessage({ apiState, initializationError, stringGetter });
+  const connectionError = getConnectionError({
+    apiState,
+    initializationError,
+  });
+  const statusErrorMessage = getStatusErrorMessage({ connectionError, stringGetter });
   const indexerHeight = getIndexerHeight(apiState);
 
   return {
@@ -80,6 +104,7 @@ export const useApiState = () => {
     height,
     indexerHeight,
     status,
+    connectionError,
     statusErrorMessage,
     trailingBlocks,
   };
