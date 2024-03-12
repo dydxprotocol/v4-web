@@ -17,9 +17,11 @@ import { useAccounts, useStringGetter, useTokenConfigs } from '@/hooks';
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { AssetIcon } from '@/components/AssetIcon';
 import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton, type IconButtonProps } from '@/components/IconButton';
+import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 import { Toolbar } from '@/components/Toolbar';
 import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
@@ -201,7 +203,13 @@ const Profile = () => {
             {
               key: 'week-rewards',
               label: stringGetter({ key: STRING_KEYS.THIS_WEEK }),
-              value: currentWeekTradingReward?.amount ?? '-',
+              value: (
+                <Output
+                  slotRight={<Styled.AssetIcon symbol={chainTokenLabel} />}
+                  type={OutputType.Asset}
+                  value={currentWeekTradingReward?.amount}
+                />
+              ),
             },
           ]}
           layout="grid"
@@ -461,4 +469,8 @@ Styled.NewMarketsPanel = styled(NewMarketsPanel)`
 
 Styled.StrideStakingPanel = styled(StrideStakingPanel)`
   grid-area: stride;
+`;
+
+Styled.AssetIcon = styled(AssetIcon)`
+  margin-left: 0.5ch;
 `;
