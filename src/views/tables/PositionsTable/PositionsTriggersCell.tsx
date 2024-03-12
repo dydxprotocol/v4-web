@@ -1,6 +1,11 @@
 import styled, { type AnyStyledComponent, css } from 'styled-components';
 
-import { AbacusOrderTimeInForces, AbacusOrderTypes, Nullable } from '@/constants/abacus';
+import {
+  AbacusPositionSide,
+  Nullable,
+  type AbacusPositionSides,
+  type SubaccountOrder,
+} from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { TimeInForceOptions } from '@/constants/trade';
@@ -12,80 +17,133 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
+import { WithHovercard } from '@/components/WithHovercard';
 
-import { isMarketOrderType } from '@/lib/orders';
-
-export type PositionTableConditionalOrder = {
-  price: number;
-  size: number;
-  triggerPrice: Nullable<number>;
-  timeInForce: Nullable<AbacusOrderTimeInForces>;
-  type: AbacusOrderTypes;
-};
+import { isMarketOrderType, isStopLossOrder } from '@/lib/orders';
 
 type ElementProps = {
   market: string;
-  stopLossOrders: PositionTableConditionalOrder[];
-  takeProfitOrders: PositionTableConditionalOrder[];
+  liquidationPrice: Nullable<number>;
+  stopLossOrders: SubaccountOrder[];
+  takeProfitOrders: SubaccountOrder[];
   onViewOrdersClick: (market: string) => void;
-  positionSize?: number | null;
+  positionSide: Nullable<AbacusPositionSides>;
+  positionSize: Nullable<number>;
   isDisabled?: boolean;
 };
 
 export const PositionsTriggersCell = ({
   market,
+  liquidationPrice,
   stopLossOrders,
   takeProfitOrders,
   onViewOrdersClick,
+  positionSide,
   positionSize,
   isDisabled, // TODO: CT-656 Disable onViewOrdersClick behavior when isDisabled
 }: ElementProps) => {
   const stringGetter = useStringGetter();
 
-  const renderOutput = ({
-    label,
-    orders,
-  }: {
-    label: string;
-    orders: PositionTableConditionalOrder[];
-  }) => {
-    const triggerLabel = (warning: boolean = false) => (
-      <Styled.Label warning={warning}>{label}</Styled.Label>
+  const showLiquidationWarning = (order: SubaccountOrder) => {
+    if (!isStopLossOrder(order) || !liquidationPrice) {
+      return false;
+    }
+    return (
+      (positionSide === AbacusPositionSide.SHORT && order.price > liquidationPrice) ||
+      (positionSide === AbacusPositionSide.LONG && order.price < liquidationPrice)
     );
-    const viewOrdersButton = (
-      <Styled.Button
-        type={ButtonType.Link}
-        action={ButtonAction.Navigation}
-        size={ButtonSize.XSmall}
-        onClick={() => onViewOrdersClick(market)}
-      >
-        {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
-        {<Styled.ArrowIcon iconName={IconName.Arrow} />}
-      </Styled.Button>
-    );
+  };
+
+  const viewOrdersButton = (
+    <Styled.Button
+      action={ButtonAction.Navigation}
+      size={ButtonSize.XSmall}
+      onClick={() => onViewOrdersClick(market)}
+    >
+      {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
+      {<Styled.ArrowIcon iconName={IconName.Arrow} />}
+    </Styled.Button>
+  );
+
+  const renderOutput = ({ label, orders }: { label: string; orders: SubaccountOrder[] }) => {
+    const triggerLabel = ({
+      liquidationWarningSide,
+    }: {
+      liquidationWarningSide?: Nullable<AbacusPositionSides>;
+    }) => {
+      const styledLabel = <Styled.Label warning={liquidationWarningSide}>{label}</Styled.Label>;
+      return liquidationWarningSide ? (
+        <WithHovercard
+          align="start"
+          side="left"
+          hovercard={
+            liquidationWarningSide === AbacusPositionSide.LONG
+              ? 'liquidation-warning-long'
+              : 'liquidation-warning-short'
+          }
+          slotButton={
+            <Button
+              action={ButtonAction.Primary}
+              size={ButtonSize.Small}
+              onClick={() => null} // TODO: CT-663 Implement onClick functionality
+            >
+              {stringGetter({ key: STRING_KEYS.EDIT_STOP_LOSS })}
+            </Button>
+          }
+          slotTrigger={styledLabel}
+        />
+      ) : (
+        styledLabel
+      );
+    };
 
     if (orders.length === 0) {
       return (
         <>
-          {triggerLabel()} <Styled.Output type={OutputType.Fiat} value={null} />
+          {triggerLabel({})} <Styled.Output type={OutputType.Fiat} value={null} />
         </>
       );
     }
 
     if (orders.length === 1) {
-      const { price, size, triggerPrice, timeInForce, type } = orders[0];
+      const order = orders[0];
+      const { price, size, triggerPrice, timeInForce, type } = order;
 
-      const isPartial = !!(positionSize && Math.abs(size) < Math.abs(positionSize));
       const shouldRenderValue =
         timeInForce?.name === TimeInForceOptions.IOC &&
         (isMarketOrderType(type) || price === triggerPrice);
 
       if (shouldRenderValue) {
+        const isPartialPosition = !!(positionSize && Math.abs(size) < Math.abs(positionSize));
+        const liquidationWarningSide = showLiquidationWarning(order) ? positionSide : undefined;
+
         return (
           <>
-            {triggerLabel(isPartial)}
+            {triggerLabel({ liquidationWarningSide })}
             <Styled.Output type={OutputType.Fiat} value={triggerPrice} />
-            {/* // TODO: CT-654 Update styling + confirm logic for partial positions */}
+            {isPartialPosition && (
+              <WithHovercard
+                align="end"
+                side="top"
+                hovercard={
+                  isStopLossOrder(order) ? 'partial-close-stop-loss' : 'partial-close-take-profit'
+                }
+                slotButton={
+                  <Button
+                    action={ButtonAction.Primary}
+                    size={ButtonSize.Small}
+                    onClick={() => null} // TODO: CT-663 Implement onClick functionality
+                  >
+                    {stringGetter({ key: STRING_KEYS.EDIT_STOP_LOSS })}
+                  </Button>
+                }
+                slotTrigger={
+                  <Styled.PartialFillIcon>
+                    <Icon iconName={IconName.PositionPartial} />
+                  </Styled.PartialFillIcon>
+                }
+              />
+            )}
           </>
         );
       }
@@ -93,7 +151,7 @@ export const PositionsTriggersCell = ({
 
     return (
       <>
-        {triggerLabel()}
+        {triggerLabel({})}
         {viewOrdersButton}
       </>
     );
@@ -111,6 +169,8 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.Cell = styled.div`
   ${layoutMixins.column}
   gap: 0.25em;
+
+  color: var(--color-text-1);
 `;
 
 Styled.Row = styled.span`
@@ -143,8 +203,18 @@ Styled.Output = styled(Output)`
 Styled.Button = styled(Button)`
   --button-height: var(--item-height);
   --button-padding: 0;
+  --button-textColor: var(--color-text-1);
 `;
 
 Styled.ArrowIcon = styled(Icon)`
   stroke-width: 2;
+`;
+
+Styled.PartialFillIcon = styled.span`
+  svg {
+    display: block;
+
+    width: 0.875em;
+    height: 0.875em;
+  }
 `;

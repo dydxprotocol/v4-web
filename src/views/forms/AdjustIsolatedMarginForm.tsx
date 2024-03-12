@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useMemo, useState } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
@@ -74,6 +74,51 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
 
   const { freeCollateral, marginUsage } = useSelector(getSubaccount, shallowEqual) ?? {};
 
+  const renderDiffOutput = ({
+    type,
+    value,
+    newValue,
+    withDiff,
+  }: Pick<Parameters<typeof DiffOutput>[0], 'type' | 'value' | 'newValue' | 'withDiff'>) => (
+    <DiffOutput type={type} value={value} newValue={newValue} withDiff={withDiff} />
+  );
+
+  const {
+    freeCollateralDiffOutput,
+    marginUsageDiffOutput,
+    positionMarginDiffOutput,
+    leverageDiffOutput,
+  } = useMemo(
+    () => ({
+      freeCollateralDiffOutput: renderDiffOutput({
+        withDiff:
+          !!freeCollateral?.postOrder && freeCollateral?.current !== freeCollateral?.postOrder,
+        value: freeCollateral?.current,
+        newValue: freeCollateral?.postOrder,
+        type: OutputType.Number,
+      }),
+      marginUsageDiffOutput: renderDiffOutput({
+        withDiff: !!marginUsage?.postOrder && marginUsage?.current !== marginUsage?.postOrder,
+        value: marginUsage?.current,
+        newValue: marginUsage?.postOrder,
+        type: OutputType.Percent,
+      }),
+      positionMarginDiffOutput: renderDiffOutput({
+        withDiff: !!positionMargin.postOrder && positionMargin.current !== positionMargin.postOrder,
+        value: positionMargin.current,
+        newValue: positionMargin.postOrder,
+        type: OutputType.Fiat,
+      }),
+      leverageDiffOutput: renderDiffOutput({
+        withDiff: !!leverage?.postOrder && leverage?.current !== leverage?.postOrder,
+        value: leverage?.current,
+        newValue: leverage?.postOrder,
+        type: OutputType.Multiple,
+      }),
+    }),
+    [freeCollateral, marginUsage, positionMargin, leverage]
+  );
+
   const formConfig =
     marginAction === MarginAction.ADD
       ? {
@@ -83,60 +128,24 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
             {
               key: 'cross-free-collateral',
               label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
-              value: (
-                <DiffOutput
-                  withDiff={
-                    !!freeCollateral?.postOrder &&
-                    freeCollateral?.current !== freeCollateral?.postOrder
-                  }
-                  value={freeCollateral?.current}
-                  newValue={freeCollateral?.postOrder}
-                  type={OutputType.Number}
-                />
-              ),
+              value: freeCollateralDiffOutput,
             },
             {
               key: 'cross-margin-usage',
               label: stringGetter({ key: STRING_KEYS.CROSS_MARGIN_USAGE }),
-              value: (
-                <DiffOutput
-                  withDiff={
-                    !!marginUsage?.postOrder && marginUsage?.current !== marginUsage?.postOrder
-                  }
-                  value={marginUsage?.current}
-                  newValue={marginUsage?.postOrder}
-                  type={OutputType.Percent}
-                />
-              ),
+              value: marginUsageDiffOutput,
             },
           ],
           receiptItems: [
             {
               key: 'margin',
               label: stringGetter({ key: STRING_KEYS.POSITION_MARGIN }),
-              value: (
-                <DiffOutput
-                  withDiff={
-                    !!positionMargin.postOrder &&
-                    positionMargin.current !== positionMargin.postOrder
-                  }
-                  value={positionMargin.current}
-                  newValue={positionMargin.postOrder}
-                  type={OutputType.Fiat}
-                />
-              ),
+              value: positionMarginDiffOutput,
             },
             {
               key: 'leverage',
               label: stringGetter({ key: STRING_KEYS.POSITION_LEVERAGE }),
-              value: (
-                <DiffOutput
-                  withDiff={!!leverage?.postOrder && leverage?.current !== leverage?.postOrder}
-                  value={leverage?.current}
-                  newValue={leverage?.postOrder}
-                  type={OutputType.Multiple}
-                />
-              ),
+              value: leverageDiffOutput,
             },
           ],
         }
@@ -147,60 +156,24 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
             {
               key: 'margin',
               label: stringGetter({ key: STRING_KEYS.POSITION_MARGIN }),
-              value: (
-                <DiffOutput
-                  withDiff={
-                    !!positionMargin.postOrder &&
-                    positionMargin.current !== positionMargin.postOrder
-                  }
-                  value={positionMargin.current}
-                  newValue={positionMargin.postOrder}
-                  type={OutputType.Fiat}
-                />
-              ),
+              value: positionMarginDiffOutput,
             },
             {
               key: 'leverage',
               label: stringGetter({ key: STRING_KEYS.POSITION_LEVERAGE }),
-              value: (
-                <DiffOutput
-                  withDiff={!!leverage?.postOrder && leverage?.current !== leverage?.postOrder}
-                  value={leverage?.current}
-                  newValue={leverage?.postOrder}
-                  type={OutputType.Multiple}
-                />
-              ),
+              value: leverageDiffOutput,
             },
           ],
           receiptItems: [
             {
               key: 'cross-free-collateral',
               label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
-              value: (
-                <DiffOutput
-                  withDiff={
-                    !!freeCollateral?.postOrder &&
-                    freeCollateral?.current !== freeCollateral?.postOrder
-                  }
-                  value={freeCollateral?.current}
-                  newValue={freeCollateral?.postOrder}
-                  type={OutputType.Number}
-                />
-              ),
+              value: freeCollateralDiffOutput,
             },
             {
               key: 'cross-margin-usage',
               label: stringGetter({ key: STRING_KEYS.CROSS_MARGIN_USAGE }),
-              value: (
-                <DiffOutput
-                  withDiff={
-                    !!marginUsage?.postOrder && marginUsage?.current !== marginUsage?.postOrder
-                  }
-                  value={marginUsage?.current}
-                  newValue={marginUsage?.postOrder}
-                  type={OutputType.Percent}
-                />
-              ),
+              value: marginUsageDiffOutput,
             },
           ],
         };
