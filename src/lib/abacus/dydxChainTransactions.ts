@@ -30,14 +30,12 @@ import {
   type HumanReadableTransferPayload,
 } from '@/constants/abacus';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
-import { DialogTypes } from '@/constants/dialogs';
 import { DydxChainId, isTestnet } from '@/constants/networks';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 
 import { RootStore } from '@/state/_store';
 import { addUncommittedOrderClientId, removeUncommittedOrderClientId } from '@/state/account';
 import { setInitializationError } from '@/state/app';
-import { openDialog } from '@/state/dialogs';
 
 import { StatefulOrderError } from '../errors';
 import { bytesToBigInt } from '../numbers';

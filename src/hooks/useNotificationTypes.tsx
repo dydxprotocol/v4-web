@@ -335,6 +335,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               body: statusErrorMessage.body,
               toastSensitivity: 'foreground',
               groupKey: NotificationType.ApiError,
+              actionAltText: stringGetter({ key: STRING_KEYS.STATUS_PAGE }),
               renderActionSlot: () => (
                 <Link href={statusPage}>{stringGetter({ key: STRING_KEYS.STATUS_PAGE })} →</Link>
               ),

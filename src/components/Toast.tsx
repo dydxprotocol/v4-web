@@ -94,7 +94,13 @@ export const Toast = ({
           slotTitleLeft={slotTitleLeft}
           slotTitleRight={slotTitleRight}
           slotDescription={slotDescription}
-          slotAction={slotAction}
+          slotAction={
+            Boolean(slotAction && actionAltText) && (
+              <Action asChild altText={actionAltText}>
+                {slotAction}
+              </Action>
+            )
+          }
         />
       )}
     </$Root>
