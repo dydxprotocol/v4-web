@@ -11,17 +11,19 @@ import {
   type Nullable,
   TradeInputErrorAction,
   ValidationError,
+  TradeInputField,
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
-import { TradeBoxDialogTypes } from '@/constants/dialogs';
-import { STRING_KEYS } from '@/constants/localization';
+import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS, StringKey } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 import {
   InputErrorData,
   TradeBoxKeys,
   MobilePlaceOrderSteps,
   ORDER_TYPE_STRINGS,
+  TradeTypes,
 } from '@/constants/trade';
 
 import { useBreakpoints, useStringGetter, useSubaccount } from '@/hooks';
@@ -32,26 +34,30 @@ import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
+import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
+import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithTooltip } from '@/components/WithTooltip';
 import { Orderbook } from '@/views/tables/Orderbook';
 
-import { openDialogInTradeBox } from '@/state/dialogs';
+import { openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { setTradeFormInputs } from '@/state/inputs';
 import {
   getCurrentInput,
   getInputTradeData,
+  getInputTradeOptions,
   getTradeFormInputs,
   useTradeFormData,
 } from '@/state/inputsSelectors';
-import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
+import { getCurrentMarketAssetId, getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { testFlags } from '@/lib/testFlags';
 import { getSelectedOrderSide, getSelectedTradeType, getTradeInputAlert } from '@/lib/tradeData';
 
 import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
@@ -114,6 +120,7 @@ export const TradeForm = ({
   } = useTradeFormData();
 
   const currentInput = useSelector(getCurrentInput);
+  const currentAssetId = useSelector(getCurrentMarketAssetId);
   const { tickSizeDecimals, stepSizeDecimals } =
     useSelector(getCurrentMarketConfig, shallowEqual) || {};
 
@@ -126,6 +133,21 @@ export const TradeForm = ({
 
   const selectedTradeType = getSelectedTradeType(type);
   const selectedOrderSide = getSelectedOrderSide(side);
+
+  const { typeOptions } = useSelector(getInputTradeOptions, shallowEqual) ?? {};
+
+  const allTradeTypeItems = (typeOptions?.toArray() ?? []).map(({ type, stringKey }) => ({
+    value: type,
+    label: stringGetter({
+      key: stringKey as StringKey,
+    }),
+    slotBefore: <AssetIcon symbol={currentAssetId} />,
+  }));
+
+  const onTradeTypeChange = (tradeType: TradeTypes) => {
+    abacusStateManager.clearTradeInputValues();
+    abacusStateManager.setTradeValue({ value: tradeType, field: TradeInputField.type });
+  };
 
   const needsAdvancedOptions =
     needsGoodUntil ||
@@ -288,29 +310,57 @@ export const TradeForm = ({
         <>
           <Styled.TopActionsRow>
             {isTablet && (
-              <Styled.OrderbookButtons>
-                <Styled.OrderbookButton
-                  slotRight={<Icon iconName={IconName.Caret} />}
-                  onPressedChange={setShowOrderbook}
-                  isPressed={showOrderbook}
-                  hidePressedStyle
-                >
-                  {!showOrderbook && stringGetter({ key: STRING_KEYS.ORDERBOOK })}
-                </Styled.OrderbookButton>
-                {/* TODO[TRCL-1411]: add orderbook scale functionality */}
-              </Styled.OrderbookButtons>
-            )}
-            {!isTablet && (
-              <Styled.MarginModeEntryPoint
-                onClick={() =>
-                  dispatch(openDialogInTradeBox({ type: TradeBoxDialogTypes.SelectMarginMode }))
-                }
-              >
-                {stringGetter({ key: STRING_KEYS.CROSS })}
-              </Styled.MarginModeEntryPoint>
+              <>
+                <Styled.OrderbookButtons>
+                  <Styled.OrderbookButton
+                    slotRight={<Icon iconName={IconName.Caret} />}
+                    onPressedChange={setShowOrderbook}
+                    isPressed={showOrderbook}
+                    hidePressedStyle
+                  >
+                    {!showOrderbook && stringGetter({ key: STRING_KEYS.ORDERBOOK })}
+                  </Styled.OrderbookButton>
+                  {/* TODO[TRCL-1411]: add orderbook scale functionality */}
+                </Styled.OrderbookButtons>
+
+                <Styled.ToggleGroup
+                  items={allTradeTypeItems}
+                  value={selectedTradeType}
+                  onValueChange={onTradeTypeChange}
+                />
+              </>
             )}
 
-            <TradeSideToggle />
+            {!isTablet && (
+              <>
+                {testFlags.isolatedMargin && (
+                  <Styled.MarginAndLeverageButtons>
+                    <Button
+                      onClick={() => {
+                        if (isTablet) {
+                          dispatch(openDialog({ type: DialogTypes.SelectMarginMode }));
+                        } else {
+                          dispatch(
+                            openDialogInTradeBox({ type: TradeBoxDialogTypes.SelectMarginMode })
+                          );
+                        }
+                      }}
+                    >
+                      {stringGetter({ key: STRING_KEYS.CROSS })}
+                    </Button>
+
+                    <Button
+                      onClick={() => {
+                        dispatch(openDialog({ type: DialogTypes.AdjustTargetLeverage }));
+                      }}
+                    >
+                      5x
+                    </Button>
+                  </Styled.MarginAndLeverageButtons>
+                )}
+                <TradeSideToggle />
+              </>
+            )}
           </Styled.TopActionsRow>
 
           <Styled.OrderbookAndInputs showOrderbook={showOrderbook}>
@@ -415,6 +465,11 @@ Styled.TradeForm = styled.form`
   }
 `;
 
+Styled.MarginAndLeverageButtons = styled.div`
+  ${layoutMixins.inlineRow}
+  gap: 0.5rem;
+`;
+
 Styled.TopActionsRow = styled.div`
   display: grid;
   grid-auto-flow: column;
@@ -498,8 +553,16 @@ Styled.Orderbook = styled(Orderbook)`
   }
 `;
 
-Styled.MarginModeEntryPoint = styled(Button)`
-  margin-right: 1rem;
+Styled.ToggleGroup = styled(ToggleGroup)`
+  overflow-x: auto;
+
+  button[data-state='off'] {
+    gap: 0;
+
+    img {
+      height: 0;
+    }
+  }
 `;
 
 Styled.InputsColumn = styled.div`

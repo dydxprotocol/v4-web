@@ -39,7 +39,9 @@ export const TradeBox = () => {
       },
       [TradeBoxDialogTypes.SelectMarginMode]: {
         title: stringGetter({ key: STRING_KEYS.MARGIN_MODE }),
-        content: <SelectMarginModeForm />,
+        content: (
+          <SelectMarginModeForm onChangeMarginMode={() => dispatch(closeDialogInTradeBox())} />
+        ),
       },
     }[activeDialog.type];
 
