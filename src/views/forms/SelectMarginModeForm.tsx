@@ -12,10 +12,17 @@ import { formMixins } from '@/styles/formMixins';
 import { Button } from '@/components/Button';
 import { RadioButtonCards } from '@/components/RadioButtonCards';
 
-export const SelectMarginModeForm = () => {
-  const stringGetter = useStringGetter();
-  const onSubmit = () => {};
+export const SelectMarginModeForm = ({
+  onChangeMarginMode,
+}: {
+  onChangeMarginMode?: () => void;
+}) => {
   const [marginMode, setMarginMode] = useState<string>('cross');
+
+  const stringGetter = useStringGetter();
+  const onSubmit = () => {
+    onChangeMarginMode?.();
+  };
 
   const getLabel = (marginMode: string) =>
     ({

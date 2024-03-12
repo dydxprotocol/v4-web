@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { DialogTypes } from '@/constants/dialogs';
 
 import { AdjustIsolatedMarginDialog } from '@/views/dialogs/AdjustIsolatedMarginDialog';
+import { AdjustTargetLeverageDialog } from '@/views/dialogs/AdjustTargetLeverageDialog';
 import { ClosePositionDialog } from '@/views/dialogs/ClosePositionDialog';
 import { DepositDialog } from '@/views/dialogs/DepositDialog';
 import { FillDetailsDialog } from '@/views/dialogs/DetailsDialog/FillDetailsDialog';
@@ -54,6 +55,7 @@ export const DialogManager = () => {
 
   return {
     [DialogTypes.AdjustIsolatedMargin]: <AdjustIsolatedMarginDialog {...modalProps} />,
+    [DialogTypes.AdjustTargetLeverage]: <AdjustTargetLeverageDialog {...modalProps} />,
     [DialogTypes.ClosePosition]: <ClosePositionDialog {...modalProps} />,
     [DialogTypes.Deposit]: <DepositDialog {...modalProps} />,
     [DialogTypes.DisplaySettings]: <DisplaySettingsDialog {...modalProps} />,
