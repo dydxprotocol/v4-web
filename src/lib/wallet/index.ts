@@ -73,6 +73,12 @@ export const getWalletConnection = ({
           type: WalletConnectionType.Email,
         };
       }
+
+      case WalletConnectionType.OAuth: {
+        return {
+          type: WalletConnectionType.OAuth,
+        };
+      }
     }
   }
 };

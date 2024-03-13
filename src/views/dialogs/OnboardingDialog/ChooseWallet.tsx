@@ -55,11 +55,7 @@ export const ChooseWallet = () => {
             slotLeft={<Styled.Icon iconComponent={wallets[walletType].icon} />}
             size={ButtonSize.Small}
           >
-            <div>
-              {walletType !== WalletType.Email && import.meta.env.VITE_PRIVY_APP_ID
-                ? stringGetter({ key: wallets[walletType].stringKey })
-                : `Socials ${isMobile ? '' : '(Email, SMS, etc.)'}`}
-            </div>
+            {stringGetter({ key: wallets[walletType].stringKey })}
           </Styled.WalletButton>
         ))}
       </Styled.Wallets>

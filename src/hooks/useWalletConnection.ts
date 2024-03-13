@@ -134,9 +134,7 @@ export const useWalletConnection = () => {
         if (!walletConnection) {
           throw new Error('Onboarding: No wallet connection found.');
         } else if (walletConnection.type === WalletConnectionType.Email) {
-          if (!isConnectedWagmi && !authenticated && ready) {
-            login();
-          }
+        } else if (walletConnection.type === WalletConnectionType.OAuth) {
         } else if (walletConnection.type === WalletConnectionType.CosmosSigner) {
           const cosmosWalletType = {
             [WalletType.Keplr as string]: CosmosWalletType.KEPLR,
@@ -149,7 +147,7 @@ export const useWalletConnection = () => {
           }
 
           if (!isConnectedGraz) {
-            await connectGraz({
+            connectGraz({
               chainInfo: DYDX_CHAIN_INFO,
               walletType: cosmosWalletType,
             });

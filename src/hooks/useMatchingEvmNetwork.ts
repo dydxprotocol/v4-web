@@ -30,7 +30,10 @@ export const useMatchingEvmNetwork = ({
 
   const matchNetwork = useCallback(async () => {
     if (!isMatchingNetwork) {
-      if (walletConnectionType === WalletConnectionType.Email) {
+      if (
+        walletConnectionType &&
+        [WalletConnectionType.Email, WalletConnectionType.OAuth].includes(walletConnectionType)
+      ) {
         await switchNetworkAsyncPrivy?.(Number(chainId));
       } else {
         await switchNetworkAsync?.(Number(chainId));

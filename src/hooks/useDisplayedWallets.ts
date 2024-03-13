@@ -23,6 +23,8 @@ export const useDisplayedWallets = () => {
     // WalletType.Coin98,
 
     WalletType.Email,
+    WalletType.Discord,
+    WalletType.Twitter,
     WalletType.OtherWallet,
   ].filter(isTruthy);
 };
