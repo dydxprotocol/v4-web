@@ -83,16 +83,21 @@ const useAccountsContext = () => {
     setPreviousEvmAddress(evmAddress);
   }, [evmAddress]);
 
+  const { ready, authenticated } = usePrivy();
+
   // Create a wallet once the user has authenticated via Privy. Embedded wallets are not created on initial login.
   useEffect(() => {
-    if (
-      !evmAddress &&
-      walletConnectionType &&
-      [WalletConnectionType.OAuth, WalletConnectionType.Email].includes(walletConnectionType)
-    ) {
-      createWallet();
-    }
-  }, [walletConnectionType, evmAddress]);
+    (async function () {
+      if (
+        !evmAddress &&
+        walletConnectionType &&
+        [WalletConnectionType.OAuth, WalletConnectionType.Email].includes(walletConnectionType) &&
+        authenticated
+      ) {
+        await createWallet();
+      }
+    })();
+  }, [walletConnectionType, evmAddress, authenticated]);
 
   // EVM → dYdX account derivation
 
@@ -218,7 +223,6 @@ const useAccountsContext = () => {
       chainId,
     },
   });
-  const { ready, authenticated } = usePrivy();
 
   useEffect(() => {
     (async () => {
