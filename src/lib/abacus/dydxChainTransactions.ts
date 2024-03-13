@@ -30,13 +30,12 @@ import {
   type HumanReadableTransferPayload,
 } from '@/constants/abacus';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
-import { DialogTypes } from '@/constants/dialogs';
 import { DydxChainId, isTestnet } from '@/constants/networks';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 
 import { RootStore } from '@/state/_store';
 import { addUncommittedOrderClientId, removeUncommittedOrderClientId } from '@/state/account';
-import { openDialog } from '@/state/dialogs';
+import { setInitializationError } from '@/state/app';
 
 import { StatefulOrderError } from '../errors';
 import { bytesToBigInt } from '../numbers';
@@ -143,9 +142,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       globalThis.dispatchEvent(customEvent);
       callback(JSON.stringify({ success: true }));
     } catch (error) {
-      this.store?.dispatch(
-        openDialog({ type: DialogTypes.ExchangeOffline, dialogProps: { preventClose: true } })
-      );
+      this.store?.dispatch(setInitializationError(error?.message ?? 'Unknown error'));
       log('DydxChainTransactions/connectNetwork', error);
     }
   }
