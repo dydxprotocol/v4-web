@@ -278,19 +278,19 @@ export const wallets: Record<WalletType, WalletConfig> = {
   },
   [WalletType.Email]: {
     type: WalletType.Email,
-    stringKey: STRING_KEYS.KEPLR,
+    stringKey: 'Email',
     icon: GenericWalletIcon,
     connectionTypes: [WalletConnectionType.Email],
   },
   [WalletType.Discord]: {
     type: WalletType.Discord,
-    stringKey: STRING_KEYS.KEPLR,
+    stringKey: 'Discord',
     icon: GenericWalletIcon,
     connectionTypes: [WalletConnectionType.OAuth],
   },
   [WalletType.Twitter]: {
     type: WalletType.Twitter,
-    stringKey: STRING_KEYS.KEPLR,
+    stringKey: 'Twitter',
     icon: GenericWalletIcon,
     connectionTypes: [WalletConnectionType.OAuth],
   },
