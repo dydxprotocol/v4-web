@@ -32,7 +32,6 @@ export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
 
   const currentThemeSetting: AppThemeSetting = useSelector(getAppThemeSetting);
-  const currentTheme: AppTheme = useSelector(getAppTheme);
   const currentColorMode: AppColorMode = useSelector(getAppColorMode);
 
   const sectionHeader = (heading: string) => {

@@ -305,7 +305,15 @@ const getPositionsTableColumnDef = ({
         isActionable: true,
         allowsSorting: false,
         hideOnBreakpoint: MediaQueryKeys.isTablet,
-        renderCell: ({}) => <PositionsActionsCell isDisabled={isAccountViewOnly} />,
+        renderCell: ({ id, assetId, stopLossOrders, takeProfitOrders }) => (
+          <PositionsActionsCell
+            marketId={id}
+            assetId={assetId}
+            isDisabled={isAccountViewOnly}
+            stopLossOrders={stopLossOrders}
+            takeProfitOrders={takeProfitOrders}
+          />
+        ),
       },
     } as Record<PositionsTableColumnKey, ColumnDef<PositionTableRow>>
   )[key],

@@ -23,6 +23,7 @@ export enum DialogTypes {
   RestrictedGeo = 'RestrictedGeo',
   RestrictedWallet = 'RestrictedWallet',
   Trade = 'Trade',
+  Triggers = 'Triggers',
   Transfer = 'Transfer',
   Withdraw = 'Withdraw',
   WithdrawalGated = 'WithdrawalGated',
