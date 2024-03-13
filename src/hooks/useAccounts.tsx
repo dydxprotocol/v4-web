@@ -61,6 +61,8 @@ const useAccountsContext = () => {
     signerGraz,
   } = useWalletConnection();
 
+  const { createWallet } = usePrivy();
+
   // EVM wallet connection
   const [previousEvmAddress, setPreviousEvmAddress] = useState(evmAddress);
 
@@ -80,6 +82,17 @@ const useAccountsContext = () => {
 
     setPreviousEvmAddress(evmAddress);
   }, [evmAddress]);
+
+  // Create a wallet once the user has authenticated via Privy. Embedded wallets are not created on initial login.
+  useEffect(() => {
+    if (
+      !evmAddress &&
+      walletConnectionType &&
+      [WalletConnectionType.OAuth, WalletConnectionType.Email].includes(walletConnectionType)
+    ) {
+      createWallet();
+    }
+  }, [walletConnectionType, evmAddress]);
 
   // EVM → dYdX account derivation
 
