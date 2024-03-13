@@ -62,7 +62,7 @@ const useLocalNotificationsContext = () => {
 
         updatedNotifications[dydxAddress] = [
           ...notifications,
-          ...(updatedNotifications[dydxAddress]?.slice(notifications.length) || []),
+          ...(updatedNotifications[dydxAddress] || []).slice(notifications.length),
         ];
 
         return updatedNotifications;
