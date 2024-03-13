@@ -21,9 +21,10 @@ type ElementProps = {
   marketId: string;
   stopLossOrders: SubaccountOrder[];
   takeProfitOrders: SubaccountOrder[];
+  onViewOrdersClick: () => void;
 };
 
-export const TriggersForm = ({ marketId, stopLossOrders, takeProfitOrders }: ElementProps) => {
+export const TriggersForm = ({ marketId, stopLossOrders, takeProfitOrders, onViewOrdersClick }: ElementProps) => {
   const stringGetter = useStringGetter();
 
   const { asset, entryPrice, stepSizeDecimals, tickSizeDecimals, oraclePrice } =
@@ -58,6 +59,7 @@ export const TriggersForm = ({ marketId, stopLossOrders, takeProfitOrders }: Ele
             output: STRING_KEYS.GAIN,
           }}
           orders={takeProfitOrders}
+          onViewOrdersClick={onViewOrdersClick}
         ></TriggerOrderInputs>
       }
       {
@@ -71,6 +73,7 @@ export const TriggersForm = ({ marketId, stopLossOrders, takeProfitOrders }: Ele
           }}
           orders={stopLossOrders}
           tickSizeDecimals={tickSizeDecimals}
+          onViewOrdersClick={onViewOrdersClick}
         ></TriggerOrderInputs>
       }
       {

@@ -19,6 +19,7 @@ type ElementProps = {
   stopLossOrders: SubaccountOrder[];
   takeProfitOrders: SubaccountOrder[];
   isDisabled?: boolean;
+  navigateToMarketOrders: (market: string) => void;
 };
 
 export const PositionsActionsCell = ({
@@ -27,6 +28,7 @@ export const PositionsActionsCell = ({
   stopLossOrders,
   takeProfitOrders,
   isDisabled,
+  navigateToMarketOrders,
 }: ElementProps) => {
   const dispatch = useDispatch();
 
@@ -46,6 +48,7 @@ export const PositionsActionsCell = ({
                   assetId,
                   stopLossOrders,
                   takeProfitOrders,
+                  navigateToMarketOrders,
                 },
               })
             )

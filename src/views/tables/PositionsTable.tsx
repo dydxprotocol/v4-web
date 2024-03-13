@@ -312,6 +312,7 @@ const getPositionsTableColumnDef = ({
             isDisabled={isAccountViewOnly}
             stopLossOrders={stopLossOrders}
             takeProfitOrders={takeProfitOrders}
+            navigateToMarketOrders={navigateToOrders}
           />
         ),
       },

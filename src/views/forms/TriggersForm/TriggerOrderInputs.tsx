@@ -31,6 +31,7 @@ type ElementProps = {
   };
   orders: SubaccountOrder[];
   tickSizeDecimals?: number;
+  onViewOrdersClick: () => void;
 };
 
 export const TriggerOrderInputs = ({
@@ -39,6 +40,7 @@ export const TriggerOrderInputs = ({
   stringKeys,
   orders,
   tickSizeDecimals,
+  onViewOrdersClick,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
 
@@ -79,7 +81,7 @@ export const TriggerOrderInputs = ({
   const multipleOrdersButton = () => (
     <Styled.MultipleOrdersContainer>
       {stringGetter({ key: STRING_KEYS.MULTIPLE_ORDERS_FOUND })}
-      <Styled.ViewAllButton action={ButtonAction.Navigation}>
+      <Styled.ViewAllButton action={ButtonAction.Navigation} onClick={onViewOrdersClick}>
         {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
         {<Styled.ArrowIcon iconName={IconName.Arrow} />}
       </Styled.ViewAllButton>
