@@ -32,7 +32,7 @@ import { DydxChainId, WALLETS_CONFIG_MAP } from './networks';
 export enum WalletConnectionType {
   CoinbaseWalletSdk = 'coinbaseWalletSdk',
   CosmosSigner = 'CosmosSigner',
-  Privy = 'Privy',
+  Email = 'Email',
   InjectedEip1193 = 'injectedEip1193',
   WalletConnect2 = 'walletConnect2',
   TestWallet = 'TestWallet',
@@ -75,8 +75,8 @@ export const walletConnectionTypes: Record<WalletConnectionType, WalletConnectio
   [WalletConnectionType.TestWallet]: {
     name: 'TestWallet',
   },
-  [WalletConnectionType.Privy]: {
-    name: 'Privy',
+  [WalletConnectionType.Email]: {
+    name: 'Email',
   },
 };
 
@@ -101,7 +101,7 @@ export enum WalletType {
   WalletConnect2 = 'WALLETCONNECT_2',
   TestWallet = 'TEST_WALLET',
   OtherWallet = 'OTHER_WALLET',
-  Privy = 'PRIVY',
+  Email = 'EMAIL',
 }
 
 const WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS = {
@@ -270,11 +270,11 @@ export const wallets: Record<WalletType, WalletConfig> = {
     icon: GenericWalletIcon,
     connectionTypes: [WalletConnectionType.TestWallet],
   },
-  [WalletType.Privy]: {
-    type: WalletType.Privy,
+  [WalletType.Email]: {
+    type: WalletType.Email,
     stringKey: STRING_KEYS.KEPLR,
     icon: GenericWalletIcon,
-    connectionTypes: [WalletConnectionType.Privy],
+    connectionTypes: [WalletConnectionType.Email],
   },
 };
 

@@ -22,7 +22,7 @@ export const useDisplayedWallets = () => {
     // WalletType.BitKeep,
     // WalletType.Coin98,
 
-    WalletType.Privy,
+    WalletType.Email,
     WalletType.OtherWallet,
   ].filter(isTruthy);
 };

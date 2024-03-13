@@ -68,9 +68,9 @@ export const getWalletConnection = ({
         };
       }
 
-      case WalletConnectionType.Privy: {
+      case WalletConnectionType.Email: {
         return {
-          type: WalletConnectionType.Privy,
+          type: WalletConnectionType.Email,
         };
       }
     }

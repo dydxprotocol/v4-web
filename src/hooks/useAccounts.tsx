@@ -243,7 +243,7 @@ const useAccountsContext = () => {
 
           const evmDerivedAccount = evmDerivedAddresses[evmAddress];
 
-          if (walletConnectionType === WalletConnectionType.Privy && authenticated && ready) {
+          if (walletConnectionType === WalletConnectionType.Email && authenticated && ready) {
             try {
               const signature = await signTypedDataAsync();
 
