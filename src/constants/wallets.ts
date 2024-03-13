@@ -33,6 +33,7 @@ export enum WalletConnectionType {
   CoinbaseWalletSdk = 'coinbaseWalletSdk',
   CosmosSigner = 'CosmosSigner',
   Email = 'Email',
+  OAuth = 'OAuth',
   InjectedEip1193 = 'injectedEip1193',
   WalletConnect2 = 'walletConnect2',
   TestWallet = 'TestWallet',
@@ -78,6 +79,9 @@ export const walletConnectionTypes: Record<WalletConnectionType, WalletConnectio
   [WalletConnectionType.Email]: {
     name: 'Email',
   },
+  [WalletConnectionType.OAuth]: {
+    name: 'OAuth',
+  },
 };
 
 // Wallets
@@ -102,6 +106,8 @@ export enum WalletType {
   TestWallet = 'TEST_WALLET',
   OtherWallet = 'OTHER_WALLET',
   Email = 'EMAIL',
+  Discord = 'DISCORD',
+  Twitter = 'TWITTER',
 }
 
 const WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS = {
@@ -275,6 +281,18 @@ export const wallets: Record<WalletType, WalletConfig> = {
     stringKey: STRING_KEYS.KEPLR,
     icon: GenericWalletIcon,
     connectionTypes: [WalletConnectionType.Email],
+  },
+  [WalletType.Discord]: {
+    type: WalletType.Discord,
+    stringKey: STRING_KEYS.KEPLR,
+    icon: GenericWalletIcon,
+    connectionTypes: [WalletConnectionType.OAuth],
+  },
+  [WalletType.Twitter]: {
+    type: WalletType.Twitter,
+    stringKey: STRING_KEYS.KEPLR,
+    icon: GenericWalletIcon,
+    connectionTypes: [WalletConnectionType.OAuth],
   },
 };
 
