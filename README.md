@@ -87,6 +87,22 @@ Set environment variables via `.env`.
 - `STATUS_PAGE_SCRIPT_URI` (optional): Used for enabling the status page; used with `pnpm run build:inject-statuspage`.
 - `SMARTBANNER_APP_NAME`, `SMARTBANNER_ORG_NAME`, `SMARTBANNER_ICON_URL`, `SMARTBANNER_APPSTORE_URL` (optional): Used for enabling the smart app banner; used with `pnpm run build:inject-smartbanner`.
 
+# Testing
+
+## Unit testing
+
+Run unit tests with the following command: `pnpm run test`
+
+## Functional Testing
+
+Functional testing is supported via Browserstack. To run the tests you need to set the following environment variables:
+
+- `BROWSERSTACK_USERNAME`: username of your browserstack account
+- `BROWSERSTACK_ACCESS_KEY`: access key of your browserstack account
+- `E2E_ENVIRONMENT_URL`: the URL you want to run the functional tests against
+
+To run the tests run: `pnpm run wdio`
+
 # Deployments
 
 ## Deploying with Vercel

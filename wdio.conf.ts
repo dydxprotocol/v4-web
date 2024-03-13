@@ -123,6 +123,13 @@ export const config: Options.Testrunner = {
         osVersion: '13.0',
       },
     },
+    {
+      browserName: 'safari',
+      'bstack:options': {
+        deviceName: 'iPad Pro 12.9 2022',
+        osVersion: '16',
+      },
+    },
   ],
 
   //
