@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, useMemo } from 'react';
 
-import { usePrivy, useLogout } from '@privy-io/react-auth';
+import { usePrivy, useLogout, useLoginWithOAuth } from '@privy-io/react-auth';
 import {
   useSuggestChainAndConnect as useConnectGraz,
   useAccount as useAccountGraz,
@@ -114,6 +114,7 @@ export const useWalletConnection = () => {
     defaultValue: {} as EvmDerivedAddresses,
   });
   const { login, ready, authenticated } = usePrivy();
+  const { initOAuth } = useLoginWithOAuth();
   const { logout } = useLogout();
 
   const connectWallet = useCallback(
@@ -135,6 +136,12 @@ export const useWalletConnection = () => {
           throw new Error('Onboarding: No wallet connection found.');
         } else if (walletConnection.type === WalletConnectionType.Email) {
         } else if (walletConnection.type === WalletConnectionType.OAuth) {
+          const provider = wallets[walletType].oAuthProvider;
+          if (provider) {
+            initOAuth({
+              provider,
+            });
+          }
         } else if (walletConnection.type === WalletConnectionType.CosmosSigner) {
           const cosmosWalletType = {
             [WalletType.Keplr as string]: CosmosWalletType.KEPLR,

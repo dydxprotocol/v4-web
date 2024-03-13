@@ -129,6 +129,11 @@ export const WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS = Object.values(
   WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS
 );
 
+enum OAuthProvider {
+  Discord = 'discord',
+  Twitter = 'twitter',
+}
+
 type WalletConfig = {
   type: WalletType;
   stringKey: string;
@@ -136,6 +141,7 @@ type WalletConfig = {
   connectionTypes: WalletConnectionType[];
   matchesInjectedEip1193?: (provider: ExternalProvider & any) => boolean;
   walletconnect2Id?: string;
+  oAuthProvider?: OAuthProvider;
 };
 
 export const wallets: Record<WalletType, WalletConfig> = {
@@ -287,12 +293,14 @@ export const wallets: Record<WalletType, WalletConfig> = {
     stringKey: 'Discord',
     icon: GenericWalletIcon,
     connectionTypes: [WalletConnectionType.OAuth],
+    oAuthProvider: OAuthProvider.Discord,
   },
   [WalletType.Twitter]: {
     type: WalletType.Twitter,
     stringKey: 'Twitter',
     icon: GenericWalletIcon,
     connectionTypes: [WalletConnectionType.OAuth],
+    oAuthProvider: OAuthProvider.Twitter,
   },
 };
 
