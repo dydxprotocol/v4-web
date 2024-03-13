@@ -21,6 +21,8 @@ import {
   TokenPocketIcon,
   TrustWalletIcon,
   WalletConnectIcon,
+  Discord2Icon,
+  TwitterIcon,
 } from '@/icons';
 
 import { isMetaMask } from '@/lib/wallet/providers';
@@ -291,14 +293,14 @@ export const wallets: Record<WalletType, WalletConfig> = {
   [WalletType.Discord]: {
     type: WalletType.Discord,
     stringKey: 'Discord',
-    icon: GenericWalletIcon,
+    icon: Discord2Icon,
     connectionTypes: [WalletConnectionType.OAuth],
     oAuthProvider: OAuthProvider.Discord,
   },
   [WalletType.Twitter]: {
     type: WalletType.Twitter,
     stringKey: 'Twitter',
-    icon: GenericWalletIcon,
+    icon: TwitterIcon,
     connectionTypes: [WalletConnectionType.OAuth],
     oAuthProvider: OAuthProvider.Twitter,
   },

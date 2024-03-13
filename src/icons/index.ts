@@ -91,6 +91,8 @@ export { default as TrustWalletIcon } from './wallets/trust-wallet.svg';
 export { default as WalletConnectIcon } from './wallets/walletconnect.svg';
 export { default as WebsiteIcon } from './website.svg';
 export { default as WhitepaperIcon } from './whitepaper.svg';
+export { default as Discord2Icon } from './wallets/discord.svg';
+export { default as TwitterIcon } from './twitter.svg';
 
 // Logos
 export { default as ChaosLabsIcon } from './chaos-labs';
