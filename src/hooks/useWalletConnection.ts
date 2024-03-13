@@ -113,7 +113,7 @@ export const useWalletConnection = () => {
     key: LocalStorageKey.EvmDerivedAddresses,
     defaultValue: {} as EvmDerivedAddresses,
   });
-  const { login, ready, authenticated } = usePrivy();
+  const { ready, authenticated } = usePrivy();
   const { initOAuth } = useLoginWithOAuth();
   const { logout } = useLogout();
 
@@ -136,11 +136,13 @@ export const useWalletConnection = () => {
           throw new Error('Onboarding: No wallet connection found.');
         } else if (walletConnection.type === WalletConnectionType.Email) {
         } else if (walletConnection.type === WalletConnectionType.OAuth) {
-          const provider = wallets[walletType].oAuthProvider;
-          if (provider) {
-            initOAuth({
-              provider,
-            });
+          if (!isConnectedWagmi && !authenticated && ready) {
+            const provider = wallets[walletType].oAuthProvider;
+            if (provider) {
+              initOAuth({
+                provider,
+              });
+            }
           }
         } else if (walletConnection.type === WalletConnectionType.CosmosSigner) {
           const cosmosWalletType = {
@@ -190,7 +192,7 @@ export const useWalletConnection = () => {
         walletConnectionType: walletConnection?.type,
       };
     },
-    [isConnectedGraz, signerGraz, isConnectedWagmi, signerWagmi, login, ready, authenticated]
+    [isConnectedGraz, signerGraz, isConnectedWagmi, signerWagmi, ready, authenticated, initOAuth]
   );
 
   const disconnectWallet = useCallback(async () => {
