@@ -13,6 +13,7 @@ const assetIcons = {
   ALGO: '/currencies/algo.png',
   APE: '/currencies/ape.png',
   API3: '/currencies/api3.png',
+  ARKM: '/currencies/arkm.png',
   APT: '/currencies/apt.png',
   ARB: '/currencies/arb.png',
   ATOM: '/currencies/atom.png',
