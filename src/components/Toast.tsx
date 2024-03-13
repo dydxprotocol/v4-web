@@ -95,10 +95,10 @@ export const Toast = ({
           slotTitleRight={slotTitleRight}
           slotDescription={slotDescription}
           slotAction={
-            actionDescription && (
-              <$Action asChild altText={actionAltText}>
+            Boolean(slotAction && actionAltText) && (
+              <Action asChild altText={actionAltText}>
                 {slotAction}
-              </$Action>
+              </Action>
             )
           }
         />
@@ -262,8 +262,4 @@ const $CloseButton = styled(IconButton)`
     display: block;
     z-index: 2;
   }
-`;
-
-const $Action = styled(Action)`
-  margin-top: 0.5rem;
 `;

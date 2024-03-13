@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { isEqual, groupBy } from 'lodash';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
@@ -22,12 +22,13 @@ import {
 import { AppRoute, TokenRoute } from '@/constants/routes';
 import { DydxChainAsset } from '@/constants/wallets';
 
-import { useAccounts, useStringGetter, useTokenConfigs } from '@/hooks';
+import { useAccounts, useApiState, useStringGetter, useTokenConfigs, useURLConfigs } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useQueryChaosLabsIncentives } from '@/hooks/useQueryChaosLabsIncentives';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
@@ -317,6 +318,37 @@ export const notificationTypes: NotificationTypeConfig[] = [
       };
     },
   },
+  {
+    type: NotificationType.ApiError,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const { statusErrorMessage } = useApiState();
+      const { statusPage } = useURLConfigs();
+
+      useEffect(() => {
+        if (statusErrorMessage) {
+          trigger(
+            NotificationType.ApiError,
+            {
+              icon: <$WarningIcon iconName={IconName.Warning} />,
+              title: statusErrorMessage.title,
+              body: statusErrorMessage.body,
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.ApiError,
+              actionAltText: stringGetter({ key: STRING_KEYS.STATUS_PAGE }),
+              renderActionSlot: () => (
+                <Link href={statusPage}>{stringGetter({ key: STRING_KEYS.STATUS_PAGE })} →</Link>
+              ),
+            },
+            []
+          );
+        }
+      }, [stringGetter, statusErrorMessage?.body, statusErrorMessage?.title]);
+    },
+    useNotificationAction: () => {
+      return () => {};
+    },
+  },
 ];
 
 const $Icon = styled.img`
@@ -324,6 +356,6 @@ const $Icon = styled.img`
   width: 1.5rem;
 `;
 
-const $Link = styled.a`
-  --link-color: var(--color-text-2);
+const $WarningIcon = styled(Icon)`
+  color: var(--color-warning);
 `;

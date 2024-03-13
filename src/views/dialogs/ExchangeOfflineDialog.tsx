@@ -46,7 +46,7 @@ export const ExchangeOfflineDialog = ({ preventClose, setIsOpen }: ElementProps)
       title={stringGetter({ key: STRING_KEYS.UNAVAILABLE })}
     >
       <Styled.Content>
-        <p>{statusErrorMessage}</p>
+        <p>{statusErrorMessage?.body}</p>
         {isDev && <NetworkSelectMenu />}
       </Styled.Content>
     </Dialog>
