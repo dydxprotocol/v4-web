@@ -8,6 +8,7 @@ const assetIcons = {
   '1INCH': '/currencies/1inch.png',
   AAVE: '/currencies/aave.png',
   ADA: '/currencies/ada.png',
+  AEVO: '/currencies/aevo.png',
   AGIX: '/currencies/agix.png',
   ALGO: '/currencies/algo.png',
   APE: '/currencies/ape.png',

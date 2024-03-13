@@ -20,6 +20,13 @@
     "whitepaperLink": "https://why.cardano.org/en/introduction/motivation/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/cardano/"
   },
+  "AEVO-USD": {
+    "name": "Aevo",
+    "tags": ["Defi"],
+    "websiteLink": "https://www.aevo.xyz/",
+    "whitepaperLink": "https://docs.aevo.xyz/aevo-exchange/introduction",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/aevo/"
+  },
   "AGIX-USD": {
     "name": "SingularityNET",
     "tags": ["AI"],
@@ -61,6 +68,13 @@
     "websiteLink": "https://arbitrum.io/",
     "whitepaperLink": "https://github.com/OffchainLabs/nitro",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/arbitrum/"
+  },
+  "ARKM-USD": {
+    "name": "Arkham",
+    "tags": [""],
+    "websiteLink": "https://www.arkhamintelligence.com/",
+    "whitepaperLink": "https://www.arkhamintelligence.com/whitepaper",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/arkham/"
   },
   "ATOM-USD": {
     "name": "Cosmos",
