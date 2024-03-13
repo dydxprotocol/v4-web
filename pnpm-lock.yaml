@@ -30,8 +30,8 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: ^1.4.13
-    version: 1.4.13
+    specifier: ^1.6.3
+    version: 1.6.3
   '@dydxprotocol/v4-client-js':
     specifier: ^1.0.20
     version: 1.0.20
@@ -1562,8 +1562,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.4.13:
-    resolution: {integrity: sha512-+Avd0TvbdQ4OvwwMOpQgLMW0+yQ87FTYTWHZIkmsMsBH5yoYHG751i2bsGp0z+VUKMScCpcibUIGFkgTqLHIlA==}
+  /@dydxprotocol/v4-abacus@1.6.3:
+    resolution: {integrity: sha512-CVrkZuxhiJSbTBEf/1VrP97196JDAOgo0L/zx12v9IJJFOz0VK2kguueR1etSoxvc4UqeNW2rqQhOxfPpNdUvQ==}
     dev: false
 
   /@dydxprotocol/v4-client-js@1.0.20:

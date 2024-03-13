@@ -13,6 +13,7 @@ import { AnalyticsEvent, AnalyticsEventData } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
+import { TransferNotificationTypes } from '@/constants/notifications';
 import { MAX_CCTP_TRANSFER_AMOUNT, MAX_PRICE_IMPACT, NumberSign } from '@/constants/numbers';
 import type { EvmAddress } from '@/constants/wallets';
 
@@ -267,6 +268,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
             toAmount: summary?.usdcSize || undefined,
             triggeredAt: Date.now(),
             isCctp,
+            requestId: requestPayload.requestId ?? undefined,
           });
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');

@@ -200,6 +200,7 @@ export const WithdrawForm = () => {
               triggeredAt: Date.now(),
               isCctp,
               isExchange: Boolean(exchange),
+              requestId: requestPayload.requestId ?? undefined,
             });
             abacusStateManager.clearTransferInputValues();
             setWithdrawAmount('');

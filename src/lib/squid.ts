@@ -20,7 +20,8 @@ const getSquidStatusUrl = (isV2: boolean) => {
 export const fetchSquidStatus = async (
   params: GetStatus,
   isV2?: boolean,
-  integratorId?: string
+  integratorId?: string,
+  requestId?: string
 ): Promise<StatusResponse> => {
   const parsedParams: { [key: string]: string } = {
     transactionId: params.transactionId,
@@ -33,6 +34,7 @@ export const fetchSquidStatus = async (
   const response = await fetch(url, {
     headers: {
       'x-integrator-id': integratorId || 'dYdX-api',
+      'x-request-id': requestId || '',
     },
   });
 
