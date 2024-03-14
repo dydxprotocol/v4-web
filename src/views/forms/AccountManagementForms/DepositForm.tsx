@@ -276,13 +276,13 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
             chainId: chainIdStr || undefined,
             tokenAddress: sourceToken?.address || undefined,
             tokenSymbol: sourceToken?.symbol || undefined,
-            slippage: slippage ?? -1,
-            gasFee: summary?.gasFee ?? -1,
-            bridgeFee: summary?.bridgeFee ?? -1,
-            exchangeRate: summary?.exchangeRate ?? -1,
-            estimatedRouteDuration: summary?.estimatedRouteDuration ?? -1,
-            toAmount: summary?.toAmount ?? -1,
-            toAmountMin: summary?.toAmountMin  ?? -1,
+            slippage: slippage || undefined,
+            gasFee: summary?.gasFee || undefined,
+            bridgeFee: summary?.bridgeFee || undefined,
+            exchangeRate: summary?.exchangeRate || undefined,
+            estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
+            toAmount: summary?.toAmount || undefined,
+            toAmountMin: summary?.toAmountMin || undefined,
           });
         }
       } catch (error) {

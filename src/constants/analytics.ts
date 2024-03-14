@@ -151,26 +151,26 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
         chainId?: string;
         tokenAddress?: string;
         tokenSymbol?: string;
-        slippage: number;
-        gasFee: number;
-        bridgeFee: number;
-        exchangeRate: number;
-        estimatedRouteDuration: number;
-        toAmount: number;
-        toAmountMin: number;
+        slippage?: number;
+        gasFee?: number;
+        bridgeFee?: number;
+        exchangeRate?: number;
+        estimatedRouteDuration?: number;
+        toAmount?: number;
+        toAmountMin?: number;
       }
     : T extends AnalyticsEvent.TransferWithdraw
     ? {
         chainId?: string;
         tokenAddress?: string;
         tokenSymbol?: string;
-        slippage: number;
-        gasFee: number;
-        bridgeFee: number;
-        exchangeRate: number;
-        estimatedRouteDuration: number;
-        toAmount: number;
-        toAmountMin: number;
+        slippage?: number;
+        gasFee?: number;
+        bridgeFee?: number;
+        exchangeRate?: number;
+        estimatedRouteDuration?: number;
+        toAmount?: number;
+        toAmountMin?: number;
       }
     : // Trading
     T extends AnalyticsEvent.TradeOrderTypeSelected
