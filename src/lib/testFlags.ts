@@ -43,6 +43,14 @@ class TestFlags {
   get isolatedMargin() {
     return !!this.queryParams.isolatedmargin;
   }
+
+  get displaySocialLogin() {
+    return !!this.queryParams.displaySocialLogin;
+  }
+
+  get displayEmailLogin() {
+    return !!this.queryParams.displayEmailLogin;
+  }
 }
 
 export const testFlags = new TestFlags();
