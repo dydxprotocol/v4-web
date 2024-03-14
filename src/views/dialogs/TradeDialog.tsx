@@ -1,28 +1,28 @@
 import { useState } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
-import { TradeInputField } from '@/constants/abacus';
-import { STRING_KEYS, StringKey } from '@/constants/localization';
-import { TradeTypes, ORDER_TYPE_STRINGS, MobilePlaceOrderSteps } from '@/constants/trade';
+import { DialogTypes } from '@/constants/dialogs';
+import { STRING_KEYS } from '@/constants/localization';
+import { MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { AssetIcon } from '@/components/AssetIcon';
+import { Button } from '@/components/Button';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { Ring } from '@/components/Ring';
-import { ToggleGroup } from '@/components/ToggleGroup';
 import { TradeForm } from '@/views/forms/TradeForm';
 
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
-import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';
+import { openDialog } from '@/state/dialogs';
+import { getInputTradeData } from '@/state/inputsSelectors';
 
-import abacusStateManager from '@/lib/abacus';
-import { getSelectedTradeType } from '@/lib/tradeData';
+import { testFlags } from '@/lib/testFlags';
+
+import { TradeSideToggle } from '../forms/TradeForm/TradeSideToggle';
 
 type ElementProps = {
   isOpen?: boolean;
@@ -32,29 +32,13 @@ type ElementProps = {
 
 export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) => {
   const { isMobile } = useBreakpoints();
+  const dispatch = useDispatch();
   const stringGetter = useStringGetter();
-  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const currentTradeData = useSelector(getInputTradeData, shallowEqual);
-  const { type } = currentTradeData || {};
-  const selectedTradeType = getSelectedTradeType(type);
-  const { typeOptions } = useSelector(getInputTradeOptions, shallowEqual) ?? {};
-
-  const allTradeTypeItems = (typeOptions?.toArray() ?? []).map(({ type, stringKey }) => ({
-    value: type,
-    label: stringGetter({
-      key: stringKey as StringKey,
-    }),
-    slotBefore: <AssetIcon symbol={id} />,
-  }));
 
   const [currentStep, setCurrentStep] = useState<MobilePlaceOrderSteps>(
     MobilePlaceOrderSteps.EditOrder
   );
-
-  const onTradeTypeChange = (tradeType: TradeTypes) => {
-    abacusStateManager.clearTradeInputValues();
-    abacusStateManager.setTradeValue({ value: tradeType, field: TradeInputField.type });
-  };
 
   const onCloseDialog = () => {
     setCurrentStep(MobilePlaceOrderSteps.EditOrder);
@@ -71,12 +55,32 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
       hasHeaderBorder
       {...{
         [MobilePlaceOrderSteps.EditOrder]: {
-          title: (
-            <Styled.ToggleGroup
-              items={allTradeTypeItems}
-              value={selectedTradeType}
-              onValueChange={onTradeTypeChange}
-            />
+          title: testFlags.isolatedMargin ? (
+            <Styled.EditTradeHeader>
+              <Button
+                onClick={() => {
+                  dispatch(
+                    openDialog({
+                      type: DialogTypes.SelectMarginMode,
+                    })
+                  );
+                }}
+              >
+                {stringGetter({ key: STRING_KEYS.CROSS })}
+              </Button>
+
+              <Button
+                onClick={() => {
+                  dispatch(openDialog({ type: DialogTypes.AdjustTargetLeverage }));
+                }}
+              >
+                1x
+              </Button>
+
+              <TradeSideToggle />
+            </Styled.EditTradeHeader>
+          ) : (
+            <TradeSideToggle />
           ),
         },
         [MobilePlaceOrderSteps.PreviewOrder]: {
@@ -128,16 +132,10 @@ Styled.Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
     `}
 `;
 
-Styled.ToggleGroup = styled(ToggleGroup)`
-  overflow-x: auto;
-
-  button[data-state='off'] {
-    gap: 0;
-
-    img {
-      height: 0;
-    }
-  }
+Styled.EditTradeHeader = styled.div`
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 0.5rem;
 `;
 
 Styled.TradeForm = styled(TradeForm)`

@@ -1,5 +1,6 @@
 export enum DialogTypes {
   AdjustIsolatedMargin = 'AdjustIsolatedMargin',
+  AdjustTargetLeverage = 'AdjustTargetLeverage',
   ClosePosition = 'ClosePosition',
   Deposit = 'Deposit',
   DisconnectWallet = 'DisconnectWallet',
@@ -22,6 +23,7 @@ export enum DialogTypes {
   RateLimit = 'RateLimit',
   RestrictedGeo = 'RestrictedGeo',
   RestrictedWallet = 'RestrictedWallet',
+  SelectMarginMode = 'SelectMarginMode',
   Trade = 'Trade',
   Transfer = 'Transfer',
   Withdraw = 'Withdraw',
@@ -30,4 +32,5 @@ export enum DialogTypes {
 
 export enum TradeBoxDialogTypes {
   ClosePosition = 'ClosePosition',
+  SelectMarginMode = 'SelectMarginMode',
 }
