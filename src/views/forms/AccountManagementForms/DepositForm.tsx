@@ -267,6 +267,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
             toAmount: summary?.usdcSize || undefined,
             triggeredAt: Date.now(),
             isCctp,
+            requestId: requestPayload.requestId ?? undefined,
           });
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');

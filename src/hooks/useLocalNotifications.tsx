@@ -57,11 +57,18 @@ const useLocalNotificationsContext = () => {
   const setTransferNotifications = useCallback(
     (notifications: TransferNotifcation[]) => {
       if (!dydxAddress) return;
-      const updatedNotifications = { ...allTransferNotifications };
-      updatedNotifications[dydxAddress] = notifications;
-      setAllTransferNotifications(updatedNotifications);
+      setAllTransferNotifications((currentAllNotifications) => {
+        const updatedNotifications = { ...currentAllNotifications };
+
+        updatedNotifications[dydxAddress] = [
+          ...notifications,
+          ...(updatedNotifications[dydxAddress] || []).slice(notifications.length),
+        ];
+
+        return updatedNotifications;
+      });
     },
-    [setAllTransferNotifications, dydxAddress]
+    [setAllTransferNotifications, dydxAddress, allTransferNotifications]
   );
 
   const addTransferNotification = useCallback(
@@ -85,6 +92,7 @@ const useLocalNotificationsContext = () => {
               errorCount,
               status: currentStatus,
               isExchange,
+              requestId,
             } = transferNotification;
 
             const hasErrors =
@@ -106,7 +114,9 @@ const useLocalNotificationsContext = () => {
                     toChainId,
                     fromChainId,
                   },
-                  isCctp
+                  isCctp,
+                  undefined,
+                  requestId
                 );
 
                 if (status) {

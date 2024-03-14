@@ -155,6 +155,7 @@ export type TransferNotifcation = {
   errorCount?: number;
   status?: StatusResponse;
   isExchange?: boolean;
+  requestId?: string;
 };
 
 export enum ReleaseUpdateNotificationIds {
