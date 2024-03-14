@@ -57,6 +57,7 @@ export enum WalletErrorType {
 type WalletConnectionTypeConfig = {
   name: string;
   wagmiConnectorId?: string;
+  isPrivy?: boolean;
 };
 
 export const walletConnectionTypes: Record<WalletConnectionType, WalletConnectionTypeConfig> = {
@@ -80,9 +81,11 @@ export const walletConnectionTypes: Record<WalletConnectionType, WalletConnectio
   },
   [WalletConnectionType.Email]: {
     name: 'Email',
+    isPrivy: true,
   },
   [WalletConnectionType.OAuth]: {
     name: 'OAuth',
+    isPrivy: true,
   },
 };
 
@@ -355,6 +358,10 @@ export type WithInjectedOkxWalletProvider = {
 export type WalletConnection = {
   type: WalletConnectionType;
   provider?: ExternalProvider;
+};
+
+export const isPrivyWalletConnection = (walletConnectionType?: WalletConnectionType) => {
+  return walletConnectionType && walletConnectionTypes[walletConnectionType]?.isPrivy;
 };
 
 // dYdX Chain wallets
