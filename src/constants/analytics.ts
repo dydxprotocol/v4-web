@@ -151,12 +151,16 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
         chainId?: string;
         tokenAddress?: string;
         tokenSymbol?: string;
+        slippage: number;
+        gasFee: number;
       }
     : T extends AnalyticsEvent.TransferWithdraw
     ? {
         chainId?: string;
         tokenAddress?: string;
         tokenSymbol?: string;
+        slippage: number;
+        gasFee: number;
       }
     : // Trading
     T extends AnalyticsEvent.TradeOrderTypeSelected

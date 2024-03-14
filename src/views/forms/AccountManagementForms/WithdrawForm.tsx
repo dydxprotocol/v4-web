@@ -209,6 +209,8 @@ export const WithdrawForm = () => {
               chainId: toChainId,
               tokenAddress: toToken?.address || undefined,
               tokenSymbol: toToken?.symbol || undefined,
+              slippage: slippage || undefined,
+              gasFee: summary?.gasFee || undefined,
             });
           }
         }

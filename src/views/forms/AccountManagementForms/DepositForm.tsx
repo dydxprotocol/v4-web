@@ -276,6 +276,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
             chainId: chainIdStr || undefined,
             tokenAddress: sourceToken?.address || undefined,
             tokenSymbol: sourceToken?.symbol || undefined,
+            slippage: slippage || undefined,
+            gasFee: summary?.gasFee || undefined,
           });
         }
       } catch (error) {
