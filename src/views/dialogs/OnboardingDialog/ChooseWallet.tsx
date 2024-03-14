@@ -47,34 +47,30 @@ export const ChooseWallet = () => {
         </Styled.AlertMessage>
       )}
 
-      {selectedWalletType === WalletType.Email ? (
-        <div>email</div>
-      ) : (
-        <Styled.Wallets>
-          {displayedWallets.map((walletType) => (
-            <Styled.WalletButton
-              action={ButtonAction.Base}
-              key={walletType}
-              onClick={() => selectWalletType(walletType)}
-              slotLeft={<Styled.Icon iconComponent={wallets[walletType].icon} />}
-              size={ButtonSize.Small}
-            >
-              {walletType === WalletType.Discord && 'Discord'}
-              {walletType === WalletType.Email && 'Email'}
-              {walletType === WalletType.Twitter && 'Twitter'}
-              {walletType === WalletType.Apple && 'Apple'}
-              {walletType === WalletType.Google && 'Google'}
-              {![
-                WalletType.Discord,
-                WalletType.Email,
-                WalletType.Twitter,
-                WalletType.Apple,
-                WalletType.Google,
-              ].includes(walletType) && stringGetter({ key: wallets[walletType].stringKey })}
-            </Styled.WalletButton>
-          ))}
-        </Styled.Wallets>
-      )}
+      <Styled.Wallets>
+        {displayedWallets.map((walletType) => (
+          <Styled.WalletButton
+            action={ButtonAction.Base}
+            key={walletType}
+            onClick={() => selectWalletType(walletType)}
+            slotLeft={<Styled.Icon iconComponent={wallets[walletType].icon} />}
+            size={ButtonSize.Small}
+          >
+            {walletType === WalletType.Discord && 'Discord'}
+            {walletType === WalletType.Email && 'Email'}
+            {walletType === WalletType.Twitter && 'Twitter'}
+            {walletType === WalletType.Apple && 'Apple'}
+            {walletType === WalletType.Google && 'Google'}
+            {![
+              WalletType.Discord,
+              WalletType.Email,
+              WalletType.Twitter,
+              WalletType.Apple,
+              WalletType.Google,
+            ].includes(walletType) && stringGetter({ key: wallets[walletType].stringKey })}
+          </Styled.WalletButton>
+        ))}
+      </Styled.Wallets>
 
       <Styled.Footer>
         <Link href={walletLearnMore} withIcon>
