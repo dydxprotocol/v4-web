@@ -153,6 +153,11 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
         tokenSymbol?: string;
         slippage: number;
         gasFee: number;
+        bridgeFee: number;
+        exchangeRate: number;
+        estimatedRouteDuration: number;
+        toAmount: number;
+        toAmountMin: number;
       }
     : T extends AnalyticsEvent.TransferWithdraw
     ? {
@@ -161,6 +166,11 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
         tokenSymbol?: string;
         slippage: number;
         gasFee: number;
+        bridgeFee: number;
+        exchangeRate: number;
+        estimatedRouteDuration: number;
+        toAmount: number;
+        toAmountMin: number;
       }
     : // Trading
     T extends AnalyticsEvent.TradeOrderTypeSelected
