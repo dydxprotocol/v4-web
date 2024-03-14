@@ -110,6 +110,8 @@ export enum WalletType {
   Email = 'EMAIL',
   Discord = 'DISCORD',
   Twitter = 'TWITTER',
+  Google = 'GOOGLE',
+  Apple = 'APPLE',
 }
 
 const WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS = {
@@ -134,6 +136,8 @@ export const WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS = Object.values(
 enum OAuthProvider {
   Discord = 'discord',
   Twitter = 'twitter',
+  Google = 'google',
+  Apple = 'apple',
 }
 
 type WalletConfig = {
@@ -303,6 +307,20 @@ export const wallets: Record<WalletType, WalletConfig> = {
     icon: TwitterIcon,
     connectionTypes: [WalletConnectionType.OAuth],
     oAuthProvider: OAuthProvider.Twitter,
+  },
+  [WalletType.Google]: {
+    type: WalletType.Google,
+    stringKey: 'Google',
+    icon: GenericWalletIcon,
+    connectionTypes: [WalletConnectionType.OAuth],
+    oAuthProvider: OAuthProvider.Google,
+  },
+  [WalletType.Apple]: {
+    type: WalletType.Apple,
+    stringKey: 'Apple',
+    icon: GenericWalletIcon,
+    connectionTypes: [WalletConnectionType.OAuth],
+    oAuthProvider: OAuthProvider.Apple,
   },
 };
 

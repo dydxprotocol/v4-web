@@ -25,6 +25,9 @@ export const useDisplayedWallets = () => {
     WalletType.Email,
     WalletType.Discord,
     WalletType.Twitter,
+    WalletType.Google,
+    WalletType.Apple,
+
     WalletType.OtherWallet,
   ].filter(isTruthy);
 };
