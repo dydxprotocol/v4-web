@@ -91,7 +91,6 @@ export const privyConfig: PrivyClientConfig = {
     requireUserPasswordOnCreate: false,
     noPromptOnSignature: true,
   },
-  loginMethods: ['email', 'sms', 'twitter', 'google', 'apple'],
   appearance: {
     theme: '#28283c',
   },
