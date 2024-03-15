@@ -12,7 +12,7 @@ jobs:
       - name: Check environment URL
         id: check_env
         run: |
-          if [[ "${{ github.event.deployment_status.environment_url }}" == *"v4-testnet"* || "${{ github.event.deployment_status.environment_url }}" == *"v4-staging"* ]]; then
+          if [[ "${{ github.event.deployment_status.environment_url }}" == *"v4-testnet"* ]]; then
             echo "::set-output name=should_run_tests::true"
           else
             echo "::set-output name=should_run_tests::false"

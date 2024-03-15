@@ -200,6 +200,7 @@ export const WithdrawForm = () => {
               triggeredAt: Date.now(),
               isCctp,
               isExchange: Boolean(exchange),
+              requestId: requestPayload.requestId ?? undefined,
             });
             abacusStateManager.clearTransferInputValues();
             setWithdrawAmount('');
@@ -208,6 +209,13 @@ export const WithdrawForm = () => {
               chainId: toChainId,
               tokenAddress: toToken?.address || undefined,
               tokenSymbol: toToken?.symbol || undefined,
+              slippage: slippage || undefined,
+              gasFee: summary?.gasFee || undefined,
+              bridgeFee: summary?.bridgeFee || undefined,
+              exchangeRate: summary?.exchangeRate || undefined,
+              estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
+              toAmount: summary?.toAmount || undefined,
+              toAmountMin: summary?.toAmountMin || undefined,
             });
           }
         }

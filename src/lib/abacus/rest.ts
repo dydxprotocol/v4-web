@@ -5,7 +5,7 @@ import type { AbacusRestProtocol } from '@/constants/abacus';
 import { lastSuccessfulRestRequestByOrigin } from '@/hooks/useAnalytics';
 
 type Headers = Nullable<kollections.Map<string, string>>;
-type FetchResponseCallback = (p0: Nullable<string>, p1: number) => void;
+type FetchResponseCallback = (p0: Nullable<string>, p1: number, p2: Nullable<string>) => void;
 
 class AbacusRest implements AbacusRestProtocol {
   get(url: string, headers: Headers, callback: FetchResponseCallback): void {
@@ -48,21 +48,27 @@ class AbacusRest implements AbacusRestProtocol {
     };
 
     if (!url) {
-      callback(null, 0);
+      callback(null, 0, null);
       return;
     }
 
     fetch(url, options)
       .then(async (response) => {
         const data = await response.text();
+        const headersObj: Record<string, string> = {};
+        for (let [key, value] of response.headers) {
+          headersObj[key] = value;
+        }
+        // Stringify the headers object
+        const headersJson = JSON.stringify(headersObj);
 
-        callback(data, response.status);
+        callback(data, response.status, headersJson);
 
         try {
           lastSuccessfulRestRequestByOrigin[new URL(url).origin] = Date.now();
         } catch {}
       })
-      .catch(() => callback(null, 0)); // Network error or request couldn't be made
+      .catch(() => callback(null, 0, null)); // Network error or request couldn't be made
   }
 
   private mapToHeaders(map: Headers): HeadersInit {

@@ -93,14 +93,12 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
       freeCollateralDiffOutput: renderDiffOutput({
         withDiff:
           !!freeCollateral?.postOrder && freeCollateral?.current !== freeCollateral?.postOrder,
-
         value: freeCollateral?.current,
         newValue: freeCollateral?.postOrder,
         type: OutputType.Number,
       }),
       marginUsageDiffOutput: renderDiffOutput({
         withDiff: !!marginUsage?.postOrder && marginUsage?.current !== marginUsage?.postOrder,
-
         value: marginUsage?.current,
         newValue: marginUsage?.postOrder,
         type: OutputType.Percent,
