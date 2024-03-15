@@ -245,11 +245,18 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
 };
 
 async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promise<void> {
+  const exchanges: Set<ExchangeName> = new Set();
   for (const exchange of exchangeConfigJson) {
     if (!(exchange.exchangeName in EXCHANGE_INFO)) {
       throw new Error(`Exchange ${exchange.exchangeName} not supported`);
     }
+    // Each exchange should be unique.
+    if (exchanges.has(exchange.exchangeName)) {
+      throw new Error(`Found duplicate exchange: ${exchange.exchangeName}`);
+    }
+    exchanges.add(exchange.exchangeName);
 
+    // `adjustByMarket` should be set if ticker doesn't end in usd or USD.
     if (
       (!/usd$/i.test(exchange.ticker) && exchange.adjustByMarket === undefined) ||
       exchange.adjustByMarket === ''
