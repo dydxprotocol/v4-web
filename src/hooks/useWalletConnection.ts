@@ -136,12 +136,17 @@ export const useWalletConnection = () => {
           throw new Error('Onboarding: No wallet connection found.');
         } else if (walletConnection.type === WalletConnectionType.Email) {
         } else if (walletConnection.type === WalletConnectionType.OAuth) {
-          if (!isConnectedWagmi && !authenticated && ready) {
+          if (!isConnectedWagmi && ready && !authenticated) {
             const provider = wallets[walletType].oAuthProvider;
             if (provider) {
-              initOAuth({
-                provider,
-              });
+              try {
+                await initOAuth({
+                  provider,
+                });
+              } catch (error) {
+                setSelectedWalletError(error.message);
+                log('useWalletConnection/connectWallet', error);
+              }
             }
           }
         } else if (walletConnection.type === WalletConnectionType.CosmosSigner) {
