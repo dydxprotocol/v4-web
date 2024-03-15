@@ -57,6 +57,7 @@ Styled.Root = styled(Root)`
   padding: 1rem;
 
   --radio-button-cards-item-padding: ;
+  --radio-button-cards-item-gap: ;
   --radio-button-cards-item-checked-backgroundColor: ;
   --radio-button-cards-item-disabled-backgroundColor: ;
   --radio-button-cards-item-backgroundColor: ;
@@ -70,6 +71,8 @@ Styled.RadioButtonCard = styled(Item)`
   border: 1px solid var(--color-layer-6);
   padding: var(--radio-button-cards-item-padding, 1rem);
   font: var(--font-mini-book);
+  text-align: left;
+  gap: var(--radio-button-cards-item-gap, 0.5rem);
 
   &:disabled {
     cursor: default;

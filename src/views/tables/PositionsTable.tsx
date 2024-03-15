@@ -40,10 +40,7 @@ import { isStopLossOrder, isTakeProfitOrder } from '@/lib/orders';
 
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
-import {
-  type PositionTableConditionalOrder,
-  PositionsTriggersCell,
-} from './PositionsTable/PositionsTriggersCell';
+import { PositionsTriggersCell } from './PositionsTable/PositionsTriggersCell';
 
 export enum PositionsTableColumnKey {
   Details = 'Details',
@@ -67,8 +64,8 @@ type PositionTableRow = {
   asset: Asset;
   oraclePrice: Nullable<number>;
   tickSizeDecimals: number;
-  stopLossOrders: PositionTableConditionalOrder[];
-  takeProfitOrders: PositionTableConditionalOrder[];
+  stopLossOrders: SubaccountOrder[];
+  takeProfitOrders: SubaccountOrder[];
 } & SubaccountPosition;
 
 const getPositionsTableColumnDef = ({
@@ -210,8 +207,8 @@ const getPositionsTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.MARGIN }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         isActionable: true,
-        renderCell: ({ notionalTotal, adjustedMmf }) => (
-          <PositionsMarginCell notionalTotal={notionalTotal} adjustedMmf={adjustedMmf} />
+        renderCell: ({ id, adjustedMmf, notionalTotal }) => (
+          <PositionsMarginCell id={id} notionalTotal={notionalTotal} adjustedMmf={adjustedMmf} />
         ),
       },
       [PositionsTableColumnKey.LiquidationAndOraclePrice]: {
@@ -289,11 +286,13 @@ const getPositionsTableColumnDef = ({
         isActionable: true,
         allowsSorting: false,
         hideOnBreakpoint: MediaQueryKeys.isTablet,
-        renderCell: ({ id, size, stopLossOrders, takeProfitOrders }) => (
+        renderCell: ({ id, liquidationPrice, side, size, stopLossOrders, takeProfitOrders }) => (
           <PositionsTriggersCell
             market={id}
+            liquidationPrice={liquidationPrice?.current}
             stopLossOrders={stopLossOrders}
             takeProfitOrders={takeProfitOrders}
+            positionSide={side.current}
             positionSize={size?.current}
             isDisabled={isAccountViewOnly}
             onViewOrdersClick={navigateToOrders}

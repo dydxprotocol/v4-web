@@ -7,7 +7,8 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 
-import { useStringGetter, useTokenConfigs } from '@/hooks';
+import { useApiState, useStringGetter, useTokenConfigs } from '@/hooks';
+import { ConnectionErrorType } from '@/hooks/useApiState';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
@@ -52,6 +53,7 @@ export const PlaceOrderButtonAndReceipt = ({
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
   const { chainTokenLabel } = useTokenConfigs();
+  const { connectionError } = useApiState();
 
   const canAccountTrade = useSelector(calculateCanAccountTrade);
   const subaccountNumber = useSelector(getSubaccountId);
@@ -60,7 +62,11 @@ export const PlaceOrderButtonAndReceipt = ({
   const hasMissingData = subaccountNumber === undefined;
 
   const shouldEnableTrade =
-    canAccountTrade && !hasMissingData && !hasValidationErrors && currentInput !== 'transfer';
+    canAccountTrade &&
+    !hasMissingData &&
+    !hasValidationErrors &&
+    currentInput !== 'transfer' &&
+    connectionError !== ConnectionErrorType.CHAIN_DISRUPTION;
 
   const { fee, price: expectedPrice, total, reward } = summary || {};
 

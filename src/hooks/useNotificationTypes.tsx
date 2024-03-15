@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { isEqual, groupBy } from 'lodash';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
@@ -22,12 +22,15 @@ import {
 import { AppRoute, TokenRoute } from '@/constants/routes';
 import { DydxChainAsset } from '@/constants/wallets';
 
-import { useStringGetter, useTokenConfigs } from '@/hooks';
+import { useAccounts, useApiState, useStringGetter, useTokenConfigs, useURLConfigs } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
+import { useQueryChaosLabsIncentives } from '@/hooks/useQueryChaosLabsIncentives';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
+import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
@@ -242,6 +245,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
       const expirationDate = new Date('2024-03-08T23:59:59');
       const currentDate = new Date();
+      const { dydxAddress } = useAccounts();
+      const { data, status } = useQueryChaosLabsIncentives({
+        dydxAddress,
+        season: 2,
+      });
+
+      const { dydxRewards } = data ?? {};
 
       useEffect(() => {
         if (currentDate <= expirationDate) {
@@ -266,15 +276,77 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
       }, [stringGetter]);
+
+      useEffect(() => {
+        if (dydxAddress && status === 'success') {
+          trigger(
+            ReleaseUpdateNotificationIds.IncentivesDistributedS2,
+            {
+              icon: <AssetIcon symbol={chainTokenLabel} />,
+              title: 'Season 2 launch rewards have been distributed!',
+              body: `Season 2 rewards: +${dydxRewards ?? 0} ${chainTokenLabel}`,
+              renderCustomBody({ isToast, notification }) {
+                return (
+                  <IncentiveSeasonDistributionNotification
+                    isToast={isToast}
+                    notification={notification}
+                    data={{
+                      points: dydxRewards ?? 0,
+                      chainTokenLabel,
+                    }}
+                  />
+                );
+              },
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.IncentivesDistributedS2,
+            },
+            []
+          );
+        }
+      }, [dydxAddress, status, dydxRewards]);
     },
     useNotificationAction: () => {
       const { chainTokenLabel } = useTokenConfigs();
       const navigate = useNavigate();
+
       return (notificationId: string) => {
         if (notificationId === ReleaseUpdateNotificationIds.IncentivesS3) {
           navigate(`${chainTokenLabel}/${TokenRoute.TradingRewards}`);
+        } else if (notificationId === ReleaseUpdateNotificationIds.IncentivesDistributedS2) {
+          navigate(`${chainTokenLabel}/${TokenRoute.StakingRewards}`);
         }
       };
+    },
+  },
+  {
+    type: NotificationType.ApiError,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const { statusErrorMessage } = useApiState();
+      const { statusPage } = useURLConfigs();
+
+      useEffect(() => {
+        if (statusErrorMessage) {
+          trigger(
+            NotificationType.ApiError,
+            {
+              icon: <$WarningIcon iconName={IconName.Warning} />,
+              title: statusErrorMessage.title,
+              body: statusErrorMessage.body,
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.ApiError,
+              actionAltText: stringGetter({ key: STRING_KEYS.STATUS_PAGE }),
+              renderActionSlot: () => (
+                <Link href={statusPage}>{stringGetter({ key: STRING_KEYS.STATUS_PAGE })} →</Link>
+              ),
+            },
+            []
+          );
+        }
+      }, [stringGetter, statusErrorMessage?.body, statusErrorMessage?.title]);
+    },
+    useNotificationAction: () => {
+      return () => {};
     },
   },
 ];
@@ -284,6 +356,6 @@ const $Icon = styled.img`
   width: 1.5rem;
 `;
 
-const $Link = styled.a`
-  --link-color: var(--color-text-2);
+const $WarningIcon = styled(Icon)`
+  color: var(--color-warning);
 `;

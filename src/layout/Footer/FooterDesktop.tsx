@@ -48,7 +48,7 @@ export const FooterDesktop = () => {
           slotTooltip={
             statusErrorMessage && (
               <dl>
-                <dd>{statusErrorMessage}</dd>
+                <dd>{statusErrorMessage.body}</dd>
               </dl>
             )
           }

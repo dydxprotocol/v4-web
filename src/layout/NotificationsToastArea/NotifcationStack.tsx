@@ -71,9 +71,13 @@ export const NotificationStack = ({ notifications, className }: ElementProps & S
           slotCustomContent={displayData.renderCustomBody?.({ isToast: true, notification })}
           onClick={() => onNotificationAction(notification)}
           slotAction={
-            <Button size={ButtonSize.Small} onClick={() => onNotificationAction(notification)}>
-              {displayData.actionDescription}
-            </Button>
+            displayData.renderActionSlot ? (
+              displayData.renderActionSlot({ isToast: true, notification })
+            ) : displayData.actionDescription ? (
+              <Button size={ButtonSize.Small} onClick={() => onNotificationAction(notification)}>
+                {displayData.actionDescription}
+              </Button>
+            ) : undefined
           }
           actionDescription={displayData.actionDescription}
           actionAltText={displayData.actionAltText}

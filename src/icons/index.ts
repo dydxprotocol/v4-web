@@ -106,3 +106,5 @@ export { default as OrderOpenIcon } from './trade/order-open.svg';
 export { default as OrderPartiallyFilledIcon } from './trade/order-partially-filled.svg';
 export { default as OrderPendingIcon } from './trade/order-pending.svg';
 export { default as OrderUntriggeredIcon } from './trade/order-untriggered.svg';
+
+export { default as PositionPartialIcon } from './trade/position-partial.svg';

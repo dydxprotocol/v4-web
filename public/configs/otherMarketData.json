@@ -48,7 +48,7 @@
     },
     "meta": {
       "assetName": "1INCH",
-      "referencePrice": 0.6248960925378749
+      "referencePrice": 0.6766775494092417
     }
   },
   "AAVE": {
@@ -114,7 +114,7 @@
     },
     "meta": {
       "assetName": "AAVE",
-      "referencePrice": 125.51373836568101
+      "referencePrice": 143.42514657596658
     }
   },
   "ADA": {
@@ -184,14 +184,67 @@
     },
     "meta": {
       "assetName": "Cardano",
-      "referencePrice": 0.7395349904195859
+      "referencePrice": 0.7544538694800131
+    }
+  },
+  "AEVO": {
+    "title": "Add AEVO-USD perpetual market",
+    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a AEVO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "params": {
+      "id": 3,
+      "ticker": "AEVO-USD",
+      "priceExponent": -9.0,
+      "minPriceChange": 4000,
+      "minExchanges": 3,
+      "exchangeConfigJson": [
+        {
+          "exchangeName": "Binance",
+          "ticker": "AEVOUSDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Bybit",
+          "ticker": "AEVOUSDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Gate",
+          "ticker": "AEVO_USDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Mexc",
+          "ticker": "AEVO_USDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Okx",
+          "ticker": "AEVO-USDT",
+          "adjustByMarket": "USDT-USD"
+        }
+      ],
+      "liquidityTier": 2,
+      "atomicResolution": -6.0,
+      "quantumConversionExponent": -9,
+      "defaultFundingPpm": 0,
+      "stepBaseQuantums": 1000000,
+      "subticksPerTick": 1000000,
+      "delayBlocks": 3600
+    },
+    "initialDeposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "meta": {
+      "assetName": "Aevo",
+      "referencePrice": 3.09
     }
   },
   "AGIX": {
     "title": "Add AGIX-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a AGIX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 3,
+      "id": 4,
       "ticker": "AGIX-USD",
       "priceExponent": -9.0,
       "minPriceChange": 4000,
@@ -210,6 +263,11 @@
         {
           "exchangeName": "Gate",
           "ticker": "AGIX_USDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Huobi",
+          "ticker": "agixusdt",
           "adjustByMarket": "USDT-USD"
         },
         {
@@ -242,14 +300,14 @@
     },
     "meta": {
       "assetName": "SingularityNET",
-      "referencePrice": 1.1620054639639115
+      "referencePrice": 1.2192966301480404
     }
   },
   "ALGO": {
     "title": "Add ALGO-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ALGO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 4,
+      "id": 5,
       "ticker": "ALGO-USD",
       "priceExponent": -10.0,
       "minPriceChange": 4000,
@@ -303,14 +361,14 @@
     },
     "meta": {
       "assetName": "Algorand",
-      "referencePrice": 0.2690371562196638
+      "referencePrice": 0.31554658702017174
     }
   },
   "APE": {
     "title": "Add APE-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a APE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 5,
+      "id": 6,
       "ticker": "APE-USD",
       "priceExponent": -9.0,
       "minPriceChange": 2500,
@@ -369,14 +427,14 @@
     },
     "meta": {
       "assetName": "ApeCoin",
-      "referencePrice": 2.2047051361264858
+      "referencePrice": 2.4355358305915904
     }
   },
   "API3": {
     "title": "Add API3-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a API3-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 6,
+      "id": 7,
       "ticker": "API3-USD",
       "priceExponent": -9.0,
       "minPriceChange": 4000,
@@ -426,14 +484,14 @@
     },
     "meta": {
       "assetName": "API3",
-      "referencePrice": 3.6228075469450514
+      "referencePrice": 3.9308646592457595
     }
   },
   "APT": {
     "title": "Add APT-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a APT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 7,
+      "id": 8,
       "ticker": "APT-USD",
       "priceExponent": -8.0,
       "minPriceChange": 2500,
@@ -497,14 +555,14 @@
     },
     "meta": {
       "assetName": "Aptos",
-      "referencePrice": 13.514869314063201
+      "referencePrice": 13.255480134488053
     }
   },
   "ARB": {
     "title": "Add ARB-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ARB-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 8,
+      "id": 9,
       "ticker": "ARB-USD",
       "priceExponent": -9.0,
       "minPriceChange": 2500,
@@ -563,14 +621,67 @@
     },
     "meta": {
       "assetName": "Arbitrum",
-      "referencePrice": 2.0956685590323034
+      "referencePrice": 2.1329951839124446
+    }
+  },
+  "ARKM": {
+    "title": "Add ARKM-USD perpetual market",
+    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ARKM-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "params": {
+      "id": 10,
+      "ticker": "ARKM-USD",
+      "priceExponent": -9.0,
+      "minPriceChange": 4000,
+      "minExchanges": 3,
+      "exchangeConfigJson": [
+        {
+          "exchangeName": "Binance",
+          "ticker": "ARKMUSDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Bybit",
+          "ticker": "ARKMUSDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Gate",
+          "ticker": "ARKM_USDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Kucoin",
+          "ticker": "ARKM-USDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Mexc",
+          "ticker": "ARKM_USDT",
+          "adjustByMarket": "USDT-USD"
+        }
+      ],
+      "liquidityTier": 2,
+      "atomicResolution": -6.0,
+      "quantumConversionExponent": -9,
+      "defaultFundingPpm": 0,
+      "stepBaseQuantums": 1000000,
+      "subticksPerTick": 1000000,
+      "delayBlocks": 3600
+    },
+    "initialDeposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "meta": {
+      "assetName": "Arkham",
+      "referencePrice": 3.045547206865627
     }
   },
   "ASTR": {
     "title": "Add ASTR-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ASTR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 9,
+      "id": 11,
       "ticker": "ASTR-USD",
       "priceExponent": -10.0,
       "minPriceChange": 4000,
@@ -620,14 +731,14 @@
     },
     "meta": {
       "assetName": "ASTR",
-      "referencePrice": 0.15385173815454836
+      "referencePrice": 0.16250328555803756
     }
   },
   "ATOM": {
     "title": "Add ATOM-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ATOM-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 10,
+      "id": 12,
       "ticker": "ATOM-USD",
       "priceExponent": -8.0,
       "minPriceChange": 2500,
@@ -691,14 +802,14 @@
     },
     "meta": {
       "assetName": "Cosmos",
-      "referencePrice": 13.848070490069393
+      "referencePrice": 13.621628131034775
     }
   },
   "AVAX": {
     "title": "Add AVAX-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a AVAX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 11,
+      "id": 13,
       "ticker": "AVAX-USD",
       "priceExponent": -8.0,
       "minPriceChange": 2500,
@@ -761,24 +872,19 @@
     },
     "meta": {
       "assetName": "Avalanche",
-      "referencePrice": 43.16953349053368
+      "referencePrice": 53.922078800250375
     }
   },
   "AXL": {
     "title": "Add AXL-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a AXL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 12,
+      "id": 14,
       "ticker": "AXL-USD",
       "priceExponent": -9.0,
       "minPriceChange": 4000,
       "minExchanges": 3,
       "exchangeConfigJson": [
-        {
-          "exchangeName": "Binance",
-          "ticker": "AXLUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
         {
           "exchangeName": "Binance",
           "ticker": "AXLUSDT",
@@ -799,8 +905,9 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Kraken",
-          "ticker": "WAXLUSD"
+          "exchangeName": "Kucoin",
+          "ticker": "WAXL-USDT",
+          "adjustByMarket": "USDT-USD"
         }
       ],
       "liquidityTier": 2,
@@ -817,14 +924,14 @@
     },
     "meta": {
       "assetName": "Axelar",
-      "referencePrice": 2.073175738636364
+      "referencePrice": 2.0739662166611783
     }
   },
   "BCH": {
     "title": "Add BCH-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BCH-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 13,
+      "id": 15,
       "ticker": "BCH-USD",
       "priceExponent": -7.0,
       "minPriceChange": 2500,
@@ -887,14 +994,14 @@
     },
     "meta": {
       "assetName": "Bitcoin Cash",
-      "referencePrice": 416.81993014944743
+      "referencePrice": 438.19507575757575
     }
   },
   "BLUR": {
     "title": "Add BLUR-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BLUR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 14,
+      "id": 16,
       "ticker": "BLUR-USD",
       "priceExponent": -10.0,
       "minPriceChange": 4000,
@@ -948,14 +1055,14 @@
     },
     "meta": {
       "assetName": "Blur",
-      "referencePrice": 0.6708782345087165
+      "referencePrice": 0.7039484863441925
     }
   },
   "BNB": {
     "title": "Add BNB-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BNB-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 15,
+      "id": 17,
       "ticker": "BNB-USD",
       "priceExponent": -7.0,
       "minPriceChange": 4000,
@@ -1011,14 +1118,14 @@
     },
     "meta": {
       "assetName": "Binance Coin",
-      "referencePrice": 441.03998362042546
+      "referencePrice": 569.5618390309498
     }
   },
   "BONK": {
     "title": "Add BONK-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BONK-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 16,
+      "id": 18,
       "ticker": "BONK-USD",
       "priceExponent": -14.0,
       "minPriceChange": 4000,
@@ -1068,14 +1175,14 @@
     },
     "meta": {
       "assetName": "Bonk Token",
-      "referencePrice": 2.8530574692304236e-05
+      "referencePrice": 2.9735217574822832e-05
     }
   },
   "CHZ": {
     "title": "Add CHZ-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a CHZ-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 18,
+      "id": 20,
       "ticker": "CHZ-USD",
       "priceExponent": -10.0,
       "minPriceChange": 4000,
@@ -1098,11 +1205,6 @@
         {
           "exchangeName": "Kraken",
           "ticker": "CHZUSD"
-        },
-        {
-          "exchangeName": "Kucoin",
-          "ticker": "CHZ-USDT",
-          "adjustByMarket": "USDT-USD"
         },
         {
           "exchangeName": "Mexc",
@@ -1129,70 +1231,14 @@
     },
     "meta": {
       "assetName": "Chiliz",
-      "referencePrice": 0.14894731739660474
-    }
-  },
-  "CRV": {
-    "title": "Add CRV-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a CRV-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 19,
-      "ticker": "CRV-USD",
-      "priceExponent": -10.0,
-      "minPriceChange": 2500,
-      "minExchanges": 3,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "Binance",
-          "ticker": "CRVUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "CoinbasePro",
-          "ticker": "CRV-USD"
-        },
-        {
-          "exchangeName": "Kraken",
-          "ticker": "CRVUSD"
-        },
-        {
-          "exchangeName": "Kucoin",
-          "ticker": "CRV-USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "Mexc",
-          "ticker": "CRV_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "Okx",
-          "ticker": "CRV-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 1,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Curve DAO Token",
-      "referencePrice": 0.7876814637379574
+      "referencePrice": 0.16067179183949754
     }
   },
   "DOT": {
     "title": "Add DOT-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DOT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 21,
+      "id": 23,
       "ticker": "DOT-USD",
       "priceExponent": -8.0,
       "minPriceChange": 2500,
@@ -1255,14 +1301,14 @@
     },
     "meta": {
       "assetName": "Polkadot",
-      "referencePrice": 10.471274423888344
+      "referencePrice": 10.933460049182367
     }
   },
   "DYM": {
     "title": "Add DYM-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DYM-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 22,
+      "id": 24,
       "ticker": "DYM-USD",
       "priceExponent": -9.0,
       "minPriceChange": 4000,
@@ -1308,14 +1354,14 @@
     },
     "meta": {
       "assetName": "Dymension",
-      "referencePrice": 6.530892597704427
+      "referencePrice": 7.200957652116414
     }
   },
   "ENS": {
     "title": "Add ENS-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ENS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 23,
+      "id": 25,
       "ticker": "ENS-USD",
       "priceExponent": -8.0,
       "minPriceChange": 4000,
@@ -1370,14 +1416,14 @@
     },
     "meta": {
       "assetName": "Ethereum Name Service (ENS)",
-      "referencePrice": 25.13300713002989
+      "referencePrice": 25.90225023339026
     }
   },
   "EOS": {
     "title": "Add EOS-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a EOS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 24,
+      "id": 26,
       "ticker": "EOS-USD",
       "priceExponent": -9.0,
       "minPriceChange": 2500,
@@ -1436,14 +1482,14 @@
     },
     "meta": {
       "assetName": "Eos",
-      "referencePrice": 1.1077822873068868
+      "referencePrice": 1.191086672247967
     }
   },
   "FET": {
     "title": "Add FET-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a FET-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 27,
+      "id": 29,
       "ticker": "FET-USD",
       "priceExponent": -9.0,
       "minPriceChange": 4000,
@@ -1497,16 +1543,16 @@
     },
     "meta": {
       "assetName": "Fetch AI",
-      "referencePrice": 2.6456183716135864
+      "referencePrice": 2.683592158154861
     }
   },
   "FIL": {
     "title": "Add FIL-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a FIL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 28,
+      "id": 30,
       "ticker": "FIL-USD",
-      "priceExponent": -9.0,
+      "priceExponent": -8.0,
       "minPriceChange": 2500,
       "minExchanges": 3,
       "exchangeConfigJson": [
@@ -1550,7 +1596,7 @@
         }
       ],
       "liquidityTier": 1,
-      "atomicResolution": -6.0,
+      "atomicResolution": -7.0,
       "quantumConversionExponent": -9,
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
@@ -1563,14 +1609,14 @@
     },
     "meta": {
       "assetName": "Filecoin",
-      "referencePrice": 9.873245494109177
+      "referencePrice": 10.77289794798364
     }
   },
   "FLOKI": {
     "title": "Add FLOKI-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a FLOKI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 29,
+      "id": 31,
       "ticker": "FLOKI-USD",
       "priceExponent": -13.0,
       "minPriceChange": 4000,
@@ -1616,14 +1662,14 @@
     },
     "meta": {
       "assetName": "FLOKI",
-      "referencePrice": 0.00013132389608106975
+      "referencePrice": 0.00027241940832454213
     }
   },
   "FLOW": {
     "title": "Add FLOW-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a FLOW-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 30,
+      "id": 32,
       "ticker": "FLOW-USD",
       "priceExponent": -9.0,
       "minPriceChange": 4000,
@@ -1672,14 +1718,14 @@
     },
     "meta": {
       "assetName": "Flow - Dapper Labs",
-      "referencePrice": 1.3304793001078308
+      "referencePrice": 1.6096639833503317
     }
   },
   "FTM": {
     "title": "Add FTM-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a FTM-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 31,
+      "id": 33,
       "ticker": "FTM-USD",
       "priceExponent": -10.0,
       "minPriceChange": 4000,
@@ -1729,14 +1775,14 @@
     },
     "meta": {
       "assetName": "Fantom",
-      "referencePrice": 0.781384341713908
+      "referencePrice": 0.833031506512671
     }
   },
   "GALA": {
     "title": "Add GALA-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a GALA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 32,
+      "id": 34,
       "ticker": "GALA-USD",
       "priceExponent": -11.0,
       "minPriceChange": 4000,
@@ -1786,14 +1832,14 @@
     },
     "meta": {
       "assetName": "Gala",
-      "referencePrice": 0.043371105561270634
+      "referencePrice": 0.07230756319115317
     }
   },
   "GMT": {
     "title": "Add GMT-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a GMT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 33,
+      "id": 35,
       "ticker": "GMT-USD",
       "priceExponent": -10.0,
       "minPriceChange": 4000,
@@ -1824,6 +1870,11 @@
           "adjustByMarket": "USDT-USD"
         },
         {
+          "exchangeName": "Mexc",
+          "ticker": "GMT_USDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
           "exchangeName": "Okx",
           "ticker": "GMT-USDT",
           "adjustByMarket": "USDT-USD"
@@ -1843,14 +1894,14 @@
     },
     "meta": {
       "assetName": "STEPN",
-      "referencePrice": 0.3122613910896196
+      "referencePrice": 0.37246760365406206
     }
   },
   "GRT": {
     "title": "Add GRT-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a GRT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 34,
+      "id": 36,
       "ticker": "GRT-USD",
       "priceExponent": -10.0,
       "minPriceChange": 2500,
@@ -1909,14 +1960,14 @@
     },
     "meta": {
       "assetName": "The Graph",
-      "referencePrice": 0.33343911370791335
+      "referencePrice": 0.44712911060655225
     }
   },
   "HBAR": {
     "title": "Add HBAR-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a HBAR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 35,
+      "id": 37,
       "ticker": "HBAR-USD",
       "priceExponent": -10.0,
       "minPriceChange": 4000,
@@ -1970,14 +2021,14 @@
     },
     "meta": {
       "assetName": "Hedera Hashgraph",
-      "referencePrice": 0.13290721056239596
+      "referencePrice": 0.13347393677022673
     }
   },
   "ICP": {
     "title": "Add ICP-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ICP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 36,
+      "id": 38,
       "ticker": "ICP-USD",
       "priceExponent": -8.0,
       "minPriceChange": 4000,
@@ -2031,14 +2082,14 @@
     },
     "meta": {
       "assetName": "Internet Computer",
-      "referencePrice": 14.891197714097116
+      "referencePrice": 14.509381244543222
     }
   },
   "IMX": {
     "title": "Add IMX-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a IMX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 37,
+      "id": 39,
       "ticker": "IMX-USD",
       "priceExponent": -9.0,
       "minPriceChange": 4000,
@@ -2046,6 +2097,11 @@
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
+          "ticker": "IMXUSDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Bybit",
           "ticker": "IMXUSDT",
           "adjustByMarket": "USDT-USD"
         },
@@ -2087,14 +2143,14 @@
     },
     "meta": {
       "assetName": "Immutable X",
-      "referencePrice": 3.2577740332428315
+      "referencePrice": 3.5062661535967465
     }
   },
   "INJ": {
     "title": "Add INJ-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a INJ-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 38,
+      "id": 40,
       "ticker": "INJ-USD",
       "priceExponent": -8.0,
       "minPriceChange": 4000,
@@ -2148,14 +2204,14 @@
     },
     "meta": {
       "assetName": "Injective Protocol",
-      "referencePrice": 42.04406732925299
+      "referencePrice": 49.35899272018906
     }
   },
   "JTO": {
     "title": "Add JTO-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a JTO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 39,
+      "id": 41,
       "ticker": "JTO-USD",
       "priceExponent": -9.0,
       "minPriceChange": 4000,
@@ -2205,14 +2261,14 @@
     },
     "meta": {
       "assetName": "Jito",
-      "referencePrice": 2.8396567864997975
+      "referencePrice": 2.7972074064762515
     }
   },
   "JUP": {
     "title": "Add JUP-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a JUP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 40,
+      "id": 42,
       "ticker": "JUP-USD",
       "priceExponent": -10.0,
       "minPriceChange": 4000,
@@ -2258,16 +2314,16 @@
     },
     "meta": {
       "assetName": "Jupiter",
-      "referencePrice": 0.6948878394223935
+      "referencePrice": 0.8514742972171221
     }
   },
   "KAVA": {
     "title": "Add KAVA-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a KAVA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 41,
+      "id": 43,
       "ticker": "KAVA-USD",
-      "priceExponent": -10.0,
+      "priceExponent": -9.0,
       "minPriceChange": 4000,
       "minExchanges": 3,
       "exchangeConfigJson": [
@@ -2301,7 +2357,7 @@
         }
       ],
       "liquidityTier": 2,
-      "atomicResolution": -5.0,
+      "atomicResolution": -6.0,
       "quantumConversionExponent": -9,
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
@@ -2314,14 +2370,14 @@
     },
     "meta": {
       "assetName": "Kava",
-      "referencePrice": 0.9792562741469687
+      "referencePrice": 1.1017387195385184
     }
   },
   "LDO": {
     "title": "Add LDO-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a LDO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 42,
+      "id": 44,
       "ticker": "LDO-USD",
       "priceExponent": -9.0,
       "minPriceChange": 4000,
@@ -2375,14 +2431,14 @@
     },
     "meta": {
       "assetName": "Lido DAO",
-      "referencePrice": 3.3834613536313642
+      "referencePrice": 3.450117101105843
     }
   },
   "LINK": {
     "title": "Add LINK-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a LINK-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 43,
+      "id": 45,
       "ticker": "LINK-USD",
       "priceExponent": -8.0,
       "minPriceChange": 2500,
@@ -2445,14 +2501,14 @@
     },
     "meta": {
       "assetName": "ChainLink",
-      "referencePrice": 20.016257300454246
+      "referencePrice": 20.617932395515933
     }
   },
   "MAGIC": {
     "title": "Add MAGIC-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MAGIC-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 45,
+      "id": 47,
       "ticker": "MAGIC-USD",
       "priceExponent": -9.0,
       "minPriceChange": 4000,
@@ -2503,14 +2559,14 @@
     },
     "meta": {
       "assetName": "MAGIC",
-      "referencePrice": 1.2950055207166318
+      "referencePrice": 1.430630412027721
     }
   },
   "MANA": {
     "title": "Add MANA-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MANA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 46,
+      "id": 48,
       "ticker": "MANA-USD",
       "priceExponent": -10.0,
       "minPriceChange": 4000,
@@ -2533,11 +2589,6 @@
         {
           "exchangeName": "Kraken",
           "ticker": "MANAUSD"
-        },
-        {
-          "exchangeName": "Kucoin",
-          "ticker": "MANA-USDT",
-          "adjustByMarket": "USDT-USD"
         },
         {
           "exchangeName": "Mexc",
@@ -2564,14 +2615,14 @@
     },
     "meta": {
       "assetName": "Decentraland",
-      "referencePrice": 0.679076242286457
+      "referencePrice": 0.7631902048351489
     }
   },
   "MASK": {
     "title": "Add MASK-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MASK-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 47,
+      "id": 49,
       "ticker": "MASK-USD",
       "priceExponent": -9.0,
       "minPriceChange": 2500,
@@ -2631,14 +2682,14 @@
     },
     "meta": {
       "assetName": "Mask Network",
-      "referencePrice": 4.861003491074927
+      "referencePrice": 5.085112799652506
     }
   },
   "MATIC": {
     "title": "Add MATIC-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MATIC-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 48,
+      "id": 50,
       "ticker": "MATIC-USD",
       "priceExponent": -9.0,
       "minPriceChange": 2500,
@@ -2701,14 +2752,14 @@
     },
     "meta": {
       "assetName": "Matic Network",
-      "referencePrice": 1.1393451433119397
+      "referencePrice": 1.2361634881422916
     }
   },
   "MEME": {
     "title": "Add MEME-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MEME-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 49,
+      "id": 51,
       "ticker": "MEME-USD",
       "priceExponent": -11.0,
       "minPriceChange": 4000,
@@ -2754,14 +2805,14 @@
     },
     "meta": {
       "assetName": "Memecoin",
-      "referencePrice": 0.040033822083393455
+      "referencePrice": 0.046104397324021155
     }
   },
   "MINA": {
     "title": "Add MINA-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MINA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 50,
+      "id": 52,
       "ticker": "MINA-USD",
       "priceExponent": -9.0,
       "minPriceChange": 4000,
@@ -2815,14 +2866,14 @@
     },
     "meta": {
       "assetName": "Mina",
-      "referencePrice": 1.3286167261174293
+      "referencePrice": 1.5238523159799293
     }
   },
   "MKR": {
     "title": "Add MKR-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MKR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 51,
+      "id": 53,
       "ticker": "MKR-USD",
       "priceExponent": -6.0,
       "minPriceChange": 4000,
@@ -2840,11 +2891,6 @@
         {
           "exchangeName": "Kraken",
           "ticker": "MKRUSD"
-        },
-        {
-          "exchangeName": "Kucoin",
-          "ticker": "MKR-USDT",
-          "adjustByMarket": "USDT-USD"
         },
         {
           "exchangeName": "Mexc",
@@ -2871,14 +2917,14 @@
     },
     "meta": {
       "assetName": "Maker",
-      "referencePrice": 2088.756960971341
+      "referencePrice": 2789.140859388399
     }
   },
   "NEAR": {
     "title": "Add NEAR-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a NEAR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 52,
+      "id": 54,
       "ticker": "NEAR-USD",
       "priceExponent": -9.0,
       "minPriceChange": 4000,
@@ -2932,14 +2978,14 @@
     },
     "meta": {
       "assetName": "Near",
-      "referencePrice": 5.643916838010082
+      "referencePrice": 8.003453273250365
     }
   },
   "OCEAN": {
     "title": "Add OCEAN-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a OCEAN-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 53,
+      "id": 55,
       "ticker": "OCEAN-USD",
       "priceExponent": -9.0,
       "minPriceChange": 4000,
@@ -2983,14 +3029,14 @@
     },
     "meta": {
       "assetName": "Ocean Protocol",
-      "referencePrice": 1.1654474254643163
+      "referencePrice": 1.196978844983501
     }
   },
   "OP": {
     "title": "Add OP-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a OP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 54,
+      "id": 56,
       "ticker": "OP-USD",
       "priceExponent": -9.0,
       "minPriceChange": 2500,
@@ -3049,14 +3095,14 @@
     },
     "meta": {
       "assetName": "Optimism",
-      "referencePrice": 4.585534192062935
+      "referencePrice": 4.447422500620496
     }
   },
   "ORDI": {
     "title": "Add ORDI-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ORDI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 55,
+      "id": 57,
       "ticker": "ORDI-USD",
       "priceExponent": -8.0,
       "minPriceChange": 4000,
@@ -3112,14 +3158,14 @@
     },
     "meta": {
       "assetName": "Ordinals",
-      "referencePrice": 75.97998501905357
+      "referencePrice": 81.03705914947444
     }
   },
   "PEPE": {
     "title": "Add PEPE-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a PEPE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 56,
+      "id": 58,
       "ticker": "PEPE-USD",
       "priceExponent": -15.0,
       "minPriceChange": 2500,
@@ -3178,14 +3224,14 @@
     },
     "meta": {
       "assetName": "Pepe",
-      "referencePrice": 6.80787663004898e-06
+      "referencePrice": 8.743496396859167e-06
     }
   },
   "PYTH": {
     "title": "Add PYTH-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a PYTH-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 57,
+      "id": 59,
       "ticker": "PYTH-USD",
       "priceExponent": -10.0,
       "minPriceChange": 4000,
@@ -3236,16 +3282,16 @@
     },
     "meta": {
       "assetName": "Pyth Network",
-      "referencePrice": 0.6565980556575783
+      "referencePrice": 0.8952471538001412
     }
   },
   "RNDR": {
     "title": "Add RNDR-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a RNDR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 58,
+      "id": 60,
       "ticker": "RNDR-USD",
-      "priceExponent": -9.0,
+      "priceExponent": -8.0,
       "minPriceChange": 4000,
       "minExchanges": 3,
       "exchangeConfigJson": [
@@ -3284,7 +3330,7 @@
         }
       ],
       "liquidityTier": 2,
-      "atomicResolution": -6.0,
+      "atomicResolution": -7.0,
       "quantumConversionExponent": -9,
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
@@ -3297,21 +3343,26 @@
     },
     "meta": {
       "assetName": "Render Token",
-      "referencePrice": 9.866577698131609
+      "referencePrice": 11.34656280050645
     }
   },
   "RUNE": {
     "title": "Add RUNE-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a RUNE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 59,
+      "id": 61,
       "ticker": "RUNE-USD",
-      "priceExponent": -9.0,
+      "priceExponent": -8.0,
       "minPriceChange": 4000,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
           "exchangeName": "Binance",
+          "ticker": "RUNEUSDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Bybit",
           "ticker": "RUNEUSDT",
           "adjustByMarket": "USDT-USD"
         },
@@ -3336,7 +3387,7 @@
         }
       ],
       "liquidityTier": 2,
-      "atomicResolution": -6.0,
+      "atomicResolution": -7.0,
       "quantumConversionExponent": -9,
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
@@ -3349,14 +3400,14 @@
     },
     "meta": {
       "assetName": "Thorchain",
-      "referencePrice": 5.846719270268706
+      "referencePrice": 11.015414000861423
     }
   },
   "SAND": {
     "title": "Add SAND-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SAND-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 60,
+      "id": 62,
       "ticker": "SAND-USD",
       "priceExponent": -10.0,
       "minPriceChange": 4000,
@@ -3410,14 +3461,14 @@
     },
     "meta": {
       "assetName": "SAND",
-      "referencePrice": 0.6927766634209677
+      "referencePrice": 0.7607803043820107
     }
   },
   "SEI": {
     "title": "Add SEI-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SEI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 61,
+      "id": 63,
       "ticker": "SEI-USD",
       "priceExponent": -10.0,
       "minPriceChange": 4000,
@@ -3471,14 +3522,14 @@
     },
     "meta": {
       "assetName": "Sei",
-      "referencePrice": 0.8124534678253695
+      "referencePrice": 0.9041392028762854
     }
   },
   "SHIB": {
     "title": "Add SHIB-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SHIB-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 62,
+      "id": 64,
       "ticker": "SHIB-USD",
       "priceExponent": -14.0,
       "minPriceChange": 2500,
@@ -3537,14 +3588,14 @@
     },
     "meta": {
       "assetName": "Shiba Inu",
-      "referencePrice": 3.1672520154366605e-05
+      "referencePrice": 3.2373808595789904e-05
     }
   },
   "SNX": {
     "title": "Add SNX-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SNX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 63,
+      "id": 65,
       "ticker": "SNX-USD",
       "priceExponent": -9.0,
       "minPriceChange": 4000,
@@ -3593,14 +3644,14 @@
     },
     "meta": {
       "assetName": "Synthetix Network Token",
-      "referencePrice": 4.47592460971758
+      "referencePrice": 5.031177101574428
     }
   },
   "SOL": {
     "title": "Add SOL-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SOL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 64,
+      "id": 66,
       "ticker": "SOL-USD",
       "priceExponent": -7.0,
       "minPriceChange": 2500,
@@ -3663,14 +3714,14 @@
     },
     "meta": {
       "assetName": "Solana",
-      "referencePrice": 141.79269705896837
+      "referencePrice": 153.7483185339431
     }
   },
   "STRK": {
     "title": "Add STRK-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a STRK-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 65,
+      "id": 67,
       "ticker": "STRK-USD",
       "priceExponent": -9.0,
       "minPriceChange": 4000,
@@ -3725,14 +3776,14 @@
     },
     "meta": {
       "assetName": "Starknet",
-      "referencePrice": 2.387434003160279
+      "referencePrice": 2.5038329532608206
     }
   },
   "STX": {
     "title": "Add STX-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a STX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 66,
+      "id": 68,
       "ticker": "STX-USD",
       "priceExponent": -9.0,
       "minPriceChange": 2500,
@@ -3791,14 +3842,14 @@
     },
     "meta": {
       "assetName": "Stacks",
-      "referencePrice": 2.839476510202325
+      "referencePrice": 3.0643701829735046
     }
   },
   "SUI": {
     "title": "Add SUI-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SUI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 67,
+      "id": 69,
       "ticker": "SUI-USD",
       "priceExponent": -9.0,
       "minPriceChange": 2500,
@@ -3857,14 +3908,14 @@
     },
     "meta": {
       "assetName": "SuiNetwork",
-      "referencePrice": 1.5311216766954452
+      "referencePrice": 1.6201399266319836
     }
   },
   "TIA": {
     "title": "Add TIA-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TIA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 68,
+      "id": 70,
       "ticker": "TIA-USD",
       "priceExponent": -8.0,
       "minPriceChange": 4000,
@@ -3918,14 +3969,14 @@
     },
     "meta": {
       "assetName": "Celestia",
-      "referencePrice": 16.29421325708612
+      "referencePrice": 17.49411334410238
     }
   },
   "TRX": {
     "title": "Add TRX-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TRX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 69,
+      "id": 71,
       "ticker": "TRX-USD",
       "priceExponent": -10.0,
       "minPriceChange": 2500,
@@ -3985,14 +4036,14 @@
     },
     "meta": {
       "assetName": "TRON",
-      "referencePrice": 0.13737368394240806
+      "referencePrice": 0.131788935821485
     }
   },
   "UNI": {
     "title": "Add UNI-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a UNI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 70,
+      "id": 72,
       "ticker": "UNI-USD",
       "priceExponent": -8.0,
       "minPriceChange": 2500,
@@ -4055,14 +4106,14 @@
     },
     "meta": {
       "assetName": "Uniswap",
-      "referencePrice": 14.96301259548937
+      "referencePrice": 14.218319828722004
     }
   },
   "WLD": {
     "title": "Add WLD-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a WLD-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 71,
+      "id": 73,
       "ticker": "WLD-USD",
       "priceExponent": -9.0,
       "minPriceChange": 4000,
@@ -4081,6 +4132,11 @@
         {
           "exchangeName": "Gate",
           "ticker": "WLD_USDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Huobi",
+          "ticker": "wldusdt",
           "adjustByMarket": "USDT-USD"
         },
         {
@@ -4113,14 +4169,14 @@
     },
     "meta": {
       "assetName": "Worldcoin WLD",
-      "referencePrice": 7.339512690363419
+      "referencePrice": 9.775883890309547
     }
   },
   "WOO": {
     "title": "Add WOO-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a WOO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 72,
+      "id": 74,
       "ticker": "WOO-USD",
       "priceExponent": -10.0,
       "minPriceChange": 4000,
@@ -4166,14 +4222,14 @@
     },
     "meta": {
       "assetName": "Wootrade Network",
-      "referencePrice": 0.6125486483324709
+      "referencePrice": 0.5763323756002177
     }
   },
   "ZETA": {
     "title": "Add ZETA-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ZETA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 75,
+      "id": 77,
       "ticker": "ZETA-USD",
       "priceExponent": -9.0,
       "minPriceChange": 4000,
@@ -4223,7 +4279,7 @@
     },
     "meta": {
       "assetName": "ZetaChain",
-      "referencePrice": 2.3044076343037565
+      "referencePrice": 2.368550494197801
     }
   }
 }

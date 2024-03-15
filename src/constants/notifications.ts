@@ -5,7 +5,13 @@ export enum NotificationType {
   AbacusGenerated = 'AbacusGenerated',
   SquidTransfer = 'SquidTransfer',
   ReleaseUpdates = 'ReleaseUpdates',
+  ApiError = 'ApiError',
 }
+
+export const SingleSessionNotificationTypes = [
+  NotificationType.AbacusGenerated,
+  NotificationType.ApiError,
+];
 
 export enum NotificationComponentType {}
 
@@ -100,6 +106,14 @@ export type NotificationDisplayData = {
 
   actionDescription?: string;
 
+  renderActionSlot?: ({
+    isToast,
+    notification,
+  }: {
+    isToast?: boolean;
+    notification: Notification;
+  }) => React.ReactNode; // Custom Notification
+
   /** Screen reader: instructions for performing toast action after its timer expires */
   actionAltText?: string;
 
@@ -141,10 +155,12 @@ export type TransferNotifcation = {
   errorCount?: number;
   status?: StatusResponse;
   isExchange?: boolean;
+  requestId?: string;
 };
 
 export enum ReleaseUpdateNotificationIds {
   IncentivesS3 = 'incentives-s3',
+  IncentivesDistributedS2 = 'incentives-distributed-s2',
 }
 
 /**

@@ -61,6 +61,11 @@ export const getExistingOpenPositions = createSelector([getOpenPositions], (allO
   allOpenPositions?.filter((position) => position.side.current !== AbacusPositionSide.NONE)
 );
 
+export const getOpenPositionFromId = (marketId: string) =>
+  createSelector([getOpenPositions], (allOpenPositions) =>
+    allOpenPositions?.find(({ id }) => id === marketId)
+  );
+
 /**
  * @param state
  * @returns AccountPositions of the current market

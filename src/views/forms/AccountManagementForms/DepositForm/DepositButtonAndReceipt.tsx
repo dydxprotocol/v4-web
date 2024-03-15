@@ -9,7 +9,8 @@ import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/b
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 
-import { useStringGetter, useTokenConfigs } from '@/hooks';
+import { useApiState, useStringGetter, useTokenConfigs } from '@/hooks';
+import { ConnectionErrorType } from '@/hooks/useApiState';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 
@@ -67,6 +68,7 @@ export const DepositButtonAndReceipt = ({
   const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
 
   const { connectWallet, isConnectedWagmi } = useWalletConnection();
+  const { connectionError } = useApiState();
 
   const connectWagmi = async () => {
     try {
@@ -253,7 +255,8 @@ export const DepositButtonAndReceipt = ({
     },
   ].filter(isTruthy);
 
-  const isFormValid = !isDisabled && !isEditingSlippage;
+  const isFormValid =
+    !isDisabled && !isEditingSlippage && connectionError !== ConnectionErrorType.CHAIN_DISRUPTION;
 
   return (
     <Styled.WithReceipt
