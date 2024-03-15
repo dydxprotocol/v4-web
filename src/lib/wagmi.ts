@@ -88,7 +88,7 @@ export const WAGMI_SUPPORTED_CHAINS: Chain[] = [
 export const privyConfig: PrivyClientConfig = {
   embeddedWallets: {
     createOnLogin: 'users-without-wallets',
-    requireUserPasswordOnCreate: true,
+    requireUserPasswordOnCreate: false,
     noPromptOnSignature: true,
   },
   loginMethods: ['email', 'sms', 'twitter', 'google', 'apple'],
