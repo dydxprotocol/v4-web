@@ -104,6 +104,12 @@
     "whitepaperLink": "https://bitcoincash.org/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bitcoin-cash/"
   },
+  "BOME-USD": {
+    "name": "BOOK OF MEME",
+    "tags": ["Meme"],
+    "websiteLink": "https://llwapirxnupqu7xw2fspfidormcfar7ek2yp65nu7k5opjwhdywq.arweave.net/WuwHojdtHwp-9tFk8qBuiwRQR-RWsP91tPq656bHHi0",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/book-of-meme/"
+  },
   "BONK-USD": {
     "name": "BONK COIN",
     "tags": ["Meme"],

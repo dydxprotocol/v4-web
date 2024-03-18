@@ -22,6 +22,7 @@ const assetIcons = {
   BCH: '/currencies/bch.png',
   BLUR: '/currencies/blur.png',
   BNB: '/currencies/bnb.png',
+  BOME: '/currencies/bome.png',
   BONK: '/currencies/bonk.png',
   BTC: '/currencies/btc.png',
   CELO: '/currencies/celo.png',
