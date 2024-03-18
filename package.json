@@ -22,6 +22,7 @@
     "coverage": "vitest run --coverage",
     "clean-install": "rm -rf node_modules/ && pnpm i",
     "preview": "vite preview",
+    "install-local-abacus": "node scripts/install-local-abacus",
     "ladle": "ladle serve",
     "ladle-b": "ladle build",
     "ladle-p": "ladle preview",
