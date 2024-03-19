@@ -45,11 +45,11 @@ class TestFlags {
   }
 
   get displaySocialLogin() {
-    return !!this.queryParams.displaySocialLogin;
+    return !!this.queryParams.displaysociallogin;
   }
 
   get displayEmailLogin() {
-    return !!this.queryParams.displayEmailLogin;
+    return !!this.queryParams.displayemaillogin;
   }
 }
 
