@@ -45,7 +45,7 @@ import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
 import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 
 import { parseLocationHash } from '@/lib/urlUtils';
-import { config, privyConfig } from '@/lib/wagmi';
+import { config, configureChainsConfig, privyConfig } from '@/lib/wagmi';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
@@ -148,7 +148,7 @@ const providers = [
   }),
   wrapProvider(QueryClientProvider, { client: queryClient }),
   wrapProvider(GrazProvider),
-  wrapProvider(PrivyWagmiConnector, { wagmiChainsConfig: config }),
+  wrapProvider(PrivyWagmiConnector, { wagmiChainsConfig: configureChainsConfig }),
   wrapProvider(WagmiConfig, { config }),
   wrapProvider(LocaleProvider),
   wrapProvider(RestrictionProvider),
