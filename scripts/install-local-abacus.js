@@ -2,10 +2,9 @@ import { execSync } from 'child_process';
 
 console.log("Cleaning up any previously built abacus packages...")
 try {
-    execSync('rm ../v4-abacus/build/packages/*.tgz', { stdio: "inherit" });
+    execSync('rm ../v4-abacus/build/packages/*.tgz', { stdio: "inherit" });   
 } catch (error) {
-    console.error('Error cleaning up:', error);
-    process.exit(1); 
+    // Don't fail if we didn't find any previously built packages.
 }
 
 console.log("Building abacus...")
