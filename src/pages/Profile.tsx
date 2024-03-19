@@ -44,6 +44,14 @@ import { StrideStakingPanel } from './token/staking/StrideStakingPanel';
 
 const ENS_CHAIN_ID = 1; // Ethereum
 
+type Action = {
+  key: string;
+  label: string;
+  icon: IconButtonProps;
+  href?: string;
+  onClick?: () => void;
+};
+
 const Profile = () => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
@@ -62,7 +70,7 @@ const Profile = () => {
 
   const currentWeekTradingReward = useSelector(getHistoricalTradingRewardsForCurrentWeek);
 
-  const actions = [
+  const actions: Action[] = [
     {
       key: 'deposit',
       label: stringGetter({ key: STRING_KEYS.DEPOSIT }),
@@ -125,13 +133,7 @@ const Profile = () => {
             dispatch(openDialog({ type: DialogTypes.Onboarding }));
           },
         },
-  ].filter(isTruthy) as {
-    key: string;
-    label: string;
-    icon: IconButtonProps;
-    href?: string;
-    onClick?: () => void;
-  }[];
+  ].filter(isTruthy);
 
   return (
     <Styled.MobileProfileLayout>
