@@ -40,6 +40,8 @@ import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import { publicProvider } from 'wagmi/providers/public';
 
+import { LocalStorageKey } from '@/constants/localStorage';
+import { DEFAULT_APP_ENVIRONMENT, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import {
   type WalletConnection,
   WalletConnectionType,
@@ -50,6 +52,8 @@ import {
 } from '@/constants/wallets';
 
 import { isTruthy } from './isTruthy';
+import { getLocalStorage } from './localStorage';
+import { validateAgainstAvailableEnvironments } from './network';
 
 // Config
 
@@ -85,6 +89,13 @@ export const WAGMI_SUPPORTED_CHAINS: Chain[] = [
   kava,
 ];
 
+const defaultSelectedNetwork = getLocalStorage({
+  key: LocalStorageKey.SelectedNetwork,
+  defaultValue: DEFAULT_APP_ENVIRONMENT,
+  validateFn: validateAgainstAvailableEnvironments,
+});
+const defaultChainId = Number(ENVIRONMENT_CONFIG_MAP[defaultSelectedNetwork].ethereumChainId);
+
 export const privyConfig: PrivyClientConfig = {
   embeddedWallets: {
     createOnLogin: 'users-without-wallets',
@@ -94,7 +105,7 @@ export const privyConfig: PrivyClientConfig = {
   appearance: {
     theme: '#28283c',
   },
-  defaultChain: sepolia,
+  defaultChain: defaultChainId === mainnet.id ? mainnet : sepolia,
 };
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
