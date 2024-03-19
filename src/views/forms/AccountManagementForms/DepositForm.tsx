@@ -14,7 +14,7 @@ import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { MAX_CCTP_TRANSFER_AMOUNT, MAX_PRICE_IMPACT, NumberSign } from '@/constants/numbers';
-import type { EvmAddress } from '@/constants/wallets';
+import { isPrivyWalletConnection, type EvmAddress } from '@/constants/wallets';
 
 import { useAccounts, useDebounce, useStringGetter, useSelectedNetwork } from '@/hooks';
 import { useAccountBalance, CHAIN_DEFAULT_TOKEN_ADDRESS } from '@/hooks/useAccountBalance';
@@ -41,7 +41,7 @@ import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 import { getNobleChainId, NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
-import { parseWalletError } from '@/lib/wallet';
+import { getWalletConnection, parseWalletError } from '@/lib/wallet';
 
 import { NobleDeposit } from '../NobleDeposit';
 import { DepositButtonAndReceipt } from './DepositForm/DepositButtonAndReceipt';
@@ -132,6 +132,19 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   useEffect(() => {
     if (error) onError?.();
   }, [error]);
+
+  const { walletType } = useAccounts();
+  const walletConnectionType = walletType ? getWalletConnection({ walletType })?.type : undefined;
+  const isPrivy = isPrivyWalletConnection(walletConnectionType);
+
+  useEffect(() => {
+    if (isPrivy) {
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.exchange,
+        value: 'coinbase',
+      });
+    }
+  }, [isPrivy]);
 
   const onSelectNetwork = useCallback((name: string, type: 'chain' | 'exchange') => {
     if (name) {

@@ -3,8 +3,9 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { WalletConnectionType, isPrivyWalletConnection } from '@/constants/wallets';
 
-import { useStringGetter } from '@/hooks';
+import { useAccounts, useStringGetter } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
@@ -15,6 +16,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { testFlags } from '@/lib/testFlags';
+import { getWalletConnection } from '@/lib/wallet';
 
 type ElementProps = {
   label?: string;
@@ -29,6 +31,10 @@ export const SourceSelectMenu = ({
   selectedChain,
   onSelect,
 }: ElementProps) => {
+  const { walletType } = useAccounts();
+  const walletConnectionType = walletType ? getWalletConnection({ walletType })?.type : undefined;
+  const isPrivy = isPrivyWalletConnection(walletConnectionType);
+
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions, resources } =
     useSelector(getTransferInputs, shallowEqual) || {};
@@ -68,11 +74,12 @@ export const SourceSelectMenu = ({
           groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
           items: exchangeItems,
         },
-        chainItems.length > 0 && {
-          group: 'chains',
-          groupLabel: stringGetter({ key: STRING_KEYS.CHAINS }),
-          items: chainItems,
-        },
+        !isPrivy &&
+          chainItems.length > 0 && {
+            group: 'chains',
+            groupLabel: stringGetter({ key: STRING_KEYS.CHAINS }),
+            items: chainItems,
+          },
       ].filter(isTruthy)}
       label={label || (type === TransferType.deposit ? 'Source' : 'Destination')}
     >
