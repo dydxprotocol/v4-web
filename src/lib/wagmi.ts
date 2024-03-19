@@ -97,7 +97,7 @@ export const privyConfig: PrivyClientConfig = {
   defaultChain: sepolia,
 };
 
-export const configureChainsConfig = configureChains(
+const { chains, publicClient, webSocketPublicClient } = configureChains(
   WAGMI_SUPPORTED_CHAINS,
   [
     import.meta.env.VITE_ALCHEMY_API_KEY &&
@@ -108,7 +108,6 @@ export const configureChainsConfig = configureChains(
     publicProvider(),
   ].filter(isTruthy)
 );
-const { chains, publicClient, webSocketPublicClient } = configureChainsConfig;
 
 const injectedConnectorOptions = {
   chains,
