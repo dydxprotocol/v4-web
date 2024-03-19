@@ -45,7 +45,7 @@ import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
 import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 
 import { parseLocationHash } from '@/lib/urlUtils';
-import { config, privyConfig } from '@/lib/wagmi';
+import { config, configureChainsConfig, privyConfig } from '@/lib/wagmi';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
@@ -134,40 +134,42 @@ const Content = () => {
   );
 };
 
-const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
-  // eslint-disable-next-line react/display-name
-  return ({ children }: { children: React.ReactNode }) => (
-    <Component {...props}>{children}</Component>
-  );
-};
-
-const providers = [
-  wrapProvider(PrivyProvider, {
-    appId: import.meta.env.VITE_PRIVY_APP_ID,
-    config: privyConfig,
-  }),
-  wrapProvider(QueryClientProvider, { client: queryClient }),
-  wrapProvider(GrazProvider),
-  wrapProvider(PrivyWagmiConnector, { wagmiChainsConfig: config }),
-  wrapProvider(WagmiConfig, { config }),
-  wrapProvider(LocaleProvider),
-  wrapProvider(RestrictionProvider),
-  wrapProvider(DydxProvider),
-  wrapProvider(AccountsProvider),
-  wrapProvider(SubaccountProvider),
-  wrapProvider(LocalNotificationsProvider),
-  wrapProvider(NotificationsProvider),
-  wrapProvider(DialogAreaProvider),
-  wrapProvider(PotentialMarketsProvider),
-  wrapProvider(AppThemeAndColorModeProvider),
-];
-
-const App = () => {
-  return [...providers].reverse().reduce((children, Provider) => {
-    return <Provider>{children}</Provider>;
-  }, <Content />);
-};
-
+const App = () => (
+  <AppThemeAndColorModeProvider>
+    <PotentialMarketsProvider>
+      <DialogAreaProvider>
+        <NotificationsProvider>
+          <LocalNotificationsProvider>
+            <SubaccountProvider>
+              <AccountsProvider>
+                <DydxProvider>
+                  <RestrictionProvider>
+                    <LocaleProvider>
+                      <WagmiConfig config={config}>
+                        <PrivyWagmiConnector wagmiChainsConfig={configureChainsConfig}>
+                          <GrazProvider>
+                            <QueryClientProvider client={queryClient}>
+                              <PrivyProvider
+                                appId={import.meta.env.VITE_PRIVY_APP_ID}
+                                config={privyConfig}
+                              >
+                                <Content />
+                              </PrivyProvider>
+                            </QueryClientProvider>
+                          </GrazProvider>
+                        </PrivyWagmiConnector>
+                      </WagmiConfig>
+                    </LocaleProvider>
+                  </RestrictionProvider>
+                </DydxProvider>
+              </AccountsProvider>
+            </SubaccountProvider>
+          </LocalNotificationsProvider>
+        </NotificationsProvider>
+      </DialogAreaProvider>
+    </PotentialMarketsProvider>
+  </AppThemeAndColorModeProvider>
+);
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Content = styled.div<{ isShowingHeader: boolean; isShowingFooter: boolean }>`
