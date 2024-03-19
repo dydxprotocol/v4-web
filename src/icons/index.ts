@@ -93,6 +93,8 @@ export { default as WebsiteIcon } from './website.svg';
 export { default as WhitepaperIcon } from './whitepaper.svg';
 export { default as Discord2Icon } from './wallets/discord.svg';
 export { default as TwitterIcon } from './wallets/twitter.svg';
+export { default as GoogleIcon } from './wallets/google.svg';
+export { default as AppleIcon } from './wallets/apple.svg';
 
 // Logos
 export { default as ChaosLabsIcon } from './chaos-labs';
