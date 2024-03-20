@@ -76,6 +76,13 @@
     "whitepaperLink": "https://www.arkhamintelligence.com/whitepaper",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/arkham/"
   },
+  "ASTR-USD": {
+    "name": "Astar",
+    "tags": ["Layer 2"],
+    "websiteLink": "https://astar.network/",
+    "whitepaperLink": "https://docs.astar.network/docs/getting-started",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/astar/"
+  },
   "ATOM-USD": {
     "name": "Cosmos",
     "tags": ["Layer 1"],
