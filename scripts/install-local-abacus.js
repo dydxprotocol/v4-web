@@ -23,5 +23,13 @@ try {
     console.error('Error installing abacus:', error);
     process.exit(1); 
 }
+console.log("Successfully installed local abacus package.")
 
-console.log("Successfully installed local abacus package - restart pnpm dev")
+console.log("Generating local-abacus-hash...")
+try {
+    execSync("find ../v4-abacus/build/packages -name '*.tgz' | head -n 1 | shasum > local-abacus-hash", { stdio: "inherit" });
+} catch (error) {
+    console.error('Error generating local-abacus-hash:', error);
+    console.error('You may need to manually restart pnpm dev.')
+    process.exit(1); 
+}
