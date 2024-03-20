@@ -25,6 +25,7 @@ export enum DialogTypes {
   RestrictedWallet = 'RestrictedWallet',
   SelectMarginMode = 'SelectMarginMode',
   Trade = 'Trade',
+  Triggers = 'Triggers',
   Transfer = 'Transfer',
   Withdraw = 'Withdraw',
   WithdrawalGated = 'WithdrawalGated',

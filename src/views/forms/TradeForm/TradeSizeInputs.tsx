@@ -139,7 +139,7 @@ export const TradeSizeInputs = () => {
       onInput={onUSDCInput}
       type={InputType.Currency}
       value={usdAmountInput || ''}
-      decimals={tickSizeDecimals || USD_DECIMALS}
+      decimals={tickSizeDecimals ?? USD_DECIMALS}
       label={
         <>
           <WithTooltip tooltip="order-amount-usd" stringParams={{ SYMBOL: id ?? '' }} side="right">

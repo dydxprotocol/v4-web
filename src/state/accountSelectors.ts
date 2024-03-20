@@ -16,6 +16,7 @@ import {
 import { OnboardingState } from '@/constants/account';
 
 import { getHydratedTradingData } from '@/lib/orders';
+import { getHydratedPositionData } from '@/lib/positions';
 
 import type { RootState } from './_store';
 import { getAssets } from './assetsSelectors';
@@ -52,6 +53,22 @@ export const getSubaccountHistoricalPnl = (state: RootState) => state.account?.h
  */
 export const getOpenPositions = (state: RootState) =>
   state.account.subaccount?.openPositions?.toArray();
+
+/**
+ * @param marketId
+ * @returns user's position details with the given marketId
+ */
+
+export const getPositionDetails = (marketId: string) =>
+  createSelector(
+    [getExistingOpenPositions, getAssets, getPerpetualMarkets],
+    (positions, assets, perpetualMarkets) => {
+      const matchingPosition = positions?.find((position) => position.id === marketId);
+      return matchingPosition
+        ? getHydratedPositionData({ data: matchingPosition, assets, perpetualMarkets })
+        : undefined;
+    }
+  );
 
 /**
  * @param state

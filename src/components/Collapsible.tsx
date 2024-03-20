@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { Root, Trigger, Content } from '@radix-ui/react-collapsible';
 import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
 
@@ -13,6 +15,7 @@ type ElementProps = {
   onOpenChange?: (open: boolean) => void;
   label: React.ReactNode;
   triggerIcon?: IconName;
+  slotTrigger?: React.ReactNode;
   children: React.ReactNode;
   withTrigger?: boolean;
 };
@@ -36,34 +39,48 @@ export const Collapsible = ({
   transitionDuration,
   triggerIcon = IconName.Caret,
   triggerIconSide = 'left',
+  slotTrigger,
   fullWidth,
   className,
   withTrigger = true,
-}: CollapsibleProps) => (
-  <Styled.Root defaultOpen={defaultOpen} open={open} onOpenChange={onOpenChange}>
-    {withTrigger && (
-      <Styled.Trigger className={className} disabled={disabled}>
-        {triggerIconSide === 'right' && (
-          <>
-            {label}
-            {fullWidth && <HorizontalSeparatorFiller />}
-          </>
-        )}
-
+}: CollapsibleProps) => {
+  const trigger = slotTrigger ? (
+    <Styled.TriggerSlot>
+      {triggerIconSide === 'right' && label}
+      <Trigger className={className} disabled={disabled} asChild>
+        {slotTrigger}
+      </Trigger>
+      {triggerIconSide === 'left' && label}
+    </Styled.TriggerSlot>
+  ) : (
+    <Styled.Trigger className={className} disabled={disabled}>
+      {triggerIconSide === 'right' && (
+        <>
+          {label}
+          {fullWidth && <HorizontalSeparatorFiller />}
+        </>
+      )}
+      {
         <Styled.TriggerIcon>
           <Icon iconName={triggerIcon} />
         </Styled.TriggerIcon>
-        {triggerIconSide === 'left' && (
-          <>
-            {fullWidth && <HorizontalSeparatorFiller />}
-            {label}
-          </>
-        )}
-      </Styled.Trigger>
-    )}
-    <Styled.Content $transitionDuration={transitionDuration}>{children}</Styled.Content>
-  </Styled.Root>
-);
+      }
+      {triggerIconSide === 'left' && (
+        <>
+          {fullWidth && <HorizontalSeparatorFiller />}
+          {label}
+        </>
+      )}
+    </Styled.Trigger>
+  );
+
+  return (
+    <Styled.Root defaultOpen={defaultOpen} open={open} onOpenChange={onOpenChange}>
+      {withTrigger && trigger}
+      <Styled.Content $transitionDuration={transitionDuration}>{children}</Styled.Content>
+    </Styled.Root>
+  );
+};
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
@@ -80,6 +97,12 @@ Styled.Trigger = styled(Trigger)`
   --trigger-textColor: inherit;
   --trigger-icon-width: 0.75em;
   --trigger-icon-color: inherit;
+`;
+
+Styled.TriggerSlot = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
 `;
 
 Styled.TriggerIcon = styled.span`

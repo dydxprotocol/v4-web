@@ -29,6 +29,7 @@ import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
 import { SelectMarginModeDialog } from '@/views/dialogs/SelectMarginModeDialog';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
+import { TriggersDialog } from '@/views/dialogs/TriggersDialog';
 import { WithdrawDialog } from '@/views/dialogs/WithdrawDialog';
 import { WithdrawalGateDialog } from '@/views/dialogs/WithdrawalGateDialog';
 
@@ -61,14 +62,17 @@ export const DialogManager = () => {
     [DialogTypes.DisplaySettings]: <DisplaySettingsDialog {...modalProps} />,
     [DialogTypes.DisconnectWallet]: <DisconnectDialog {...modalProps} />,
     [DialogTypes.ExchangeOffline]: <ExchangeOfflineDialog {...modalProps} />,
+    [DialogTypes.ExternalLink]: <ExternalLinkDialog {...modalProps} />,
+    [DialogTypes.ExternalNavKeplr]: <ExternalNavKeplrDialog {...modalProps} />,
+    [DialogTypes.ExternalNavStride]: <ExternalNavStrideDialog {...modalProps} />,
     [DialogTypes.FillDetails]: <FillDetailsDialog {...modalProps} />,
     [DialogTypes.Help]: <HelpDialog {...modalProps} />,
-    [DialogTypes.ExternalNavKeplr]: <ExternalNavKeplrDialog {...modalProps} />,
-    [DialogTypes.ExternalLink]: <ExternalLinkDialog {...modalProps} />,
-    [DialogTypes.ExternalNavStride]: <ExternalNavStrideDialog {...modalProps} />,
+    [DialogTypes.ManageFunds]: <ManageFundsDialog {...modalProps} />,
     [DialogTypes.MnemonicExport]: <MnemonicExportDialog {...modalProps} />,
-    [DialogTypes.MobileSignIn]: <MobileSignInDialog {...modalProps} />,
     [DialogTypes.MobileDownload]: <MobileDownloadDialog {...modalProps} />,
+    [DialogTypes.MobileSignIn]: <MobileSignInDialog {...modalProps} />,
+    [DialogTypes.NewMarketAgreement]: <NewMarketAgreementDialog {...modalProps} />,
+    [DialogTypes.NewMarketMessageDetails]: <NewMarketMessageDetailsDialog {...modalProps} />,
     [DialogTypes.Onboarding]: <OnboardingDialog {...modalProps} />,
     [DialogTypes.OrderDetails]: <OrderDetailsDialog {...modalProps} />,
     [DialogTypes.Preferences]: <PreferencesDialog {...modalProps} />,
@@ -78,10 +82,8 @@ export const DialogManager = () => {
     [DialogTypes.SelectMarginMode]: <SelectMarginModeDialog {...modalProps} />,
     [DialogTypes.Trade]: <TradeDialog {...modalProps} />,
     [DialogTypes.Transfer]: <TransferDialog {...modalProps} />,
+    [DialogTypes.Triggers]: <TriggersDialog {...modalProps} />,
     [DialogTypes.Withdraw]: <WithdrawDialog {...modalProps} />,
     [DialogTypes.WithdrawalGated]: <WithdrawalGateDialog {...modalProps} />,
-    [DialogTypes.ManageFunds]: <ManageFundsDialog {...modalProps} />,
-    [DialogTypes.NewMarketMessageDetails]: <NewMarketMessageDetailsDialog {...modalProps} />,
-    [DialogTypes.NewMarketAgreement]: <NewMarketAgreementDialog {...modalProps} />,
   }[type];
 };

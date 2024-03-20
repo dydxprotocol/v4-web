@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import React, { forwardRef } from 'react';
 
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
@@ -16,7 +16,7 @@ type StyleProps = {
 };
 
 type ElementProps = {
-  label: React.ReactNode;
+  label?: React.ReactNode;
   slotRight?: React.ReactNode;
   validationConfig?: {
     attached?: boolean;
@@ -33,10 +33,14 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
       className={className}
       isValidationAttached={validationConfig?.attached}
     >
-      <Styled.InputContainer hasSlotRight={!!slotRight}>
-        <Styled.WithLabel label={label} inputID={id} disabled={otherProps?.disabled}>
+      <Styled.InputContainer hasLabel={!!label} hasSlotRight={!!slotRight}>
+        {label ? (
+          <Styled.WithLabel label={label} inputID={id} disabled={otherProps?.disabled}>
+            <Input ref={ref} id={id} {...otherProps} />
+          </Styled.WithLabel>
+        ) : (
           <Input ref={ref} id={id} {...otherProps} />
-        </Styled.WithLabel>
+        )}
         {slotRight}
       </Styled.InputContainer>
       {validationConfig && (
@@ -69,10 +73,16 @@ Styled.FormInputContainer = styled.div<{ isValidationAttached?: boolean }>`
     `}
 `;
 
-Styled.InputContainer = styled.div<{ hasSlotRight?: boolean }>`
+Styled.InputContainer = styled.div<{ hasLabel?: boolean; hasSlotRight?: boolean }>`
   ${formMixins.inputContainer}
 
   input {
+    ${({ hasLabel }) =>
+      !hasLabel &&
+      css`
+        --form-input-paddingY: 0;
+      `}
+
     padding: var(--form-input-paddingY) var(--form-input-paddingX);
     padding-top: 0;
   }
