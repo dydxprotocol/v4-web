@@ -11,7 +11,7 @@ import { Accordion } from '@/components/Accordion';
 import { Link } from '@/components/Link';
 import { Panel } from '@/components/Panel';
 
-const REWARDS_LEARN_MORE_LINK = ''; // to be configured
+const REWARDS_LEARN_MORE_LINK = 'https://docs.dydx.exchange/rewards/trading_rewards';
 
 export const RewardsHelpPanel = () => {
   const stringGetter = useStringGetter();
