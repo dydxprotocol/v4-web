@@ -1,9 +1,8 @@
 import { Buffer } from 'buffer';
 
-// @ts-ignore
-globalThis.process ??= { env: {} }; // Minimal process polyfill
-globalThis.global ??= globalThis;
-globalThis.Buffer ??= Buffer;
+globalThis.process = globalThis.process || { env: {} }; // Minimal process polyfill
+globalThis.global = globalThis.global || globalThis;
+globalThis.Buffer = globalThis.Buffer || Buffer;
 
 declare global {
   interface WindowEventMap {

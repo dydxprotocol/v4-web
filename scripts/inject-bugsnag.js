@@ -68,10 +68,7 @@ try {
       })      
     </script>`;
 
-  const injectedHtml = html.replace(
-    '<div id="root"></div>',
-    `<div id="root"></div>\n${scripts}\n`
-  );
+  const injectedHtml = html.replace('<div id="root"></div>', `<div id="root"></div>\n${scripts}\n`);
 
   await fs.writeFile(htmlFilePath, injectedHtml, 'utf-8');
 
