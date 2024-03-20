@@ -41,7 +41,9 @@ export const TriggersForm = ({
 
   // The triggers form does not support editing multiple stop loss or take profit orders - so if both have
   // multiple, we hide the triggers button CTA
-  const shouldShowEditTriggersButton = !(stopLossOrders.length > 1 && takeProfitOrders.length > 1);
+  const existsEditableOrCreatableOrders = !(
+    stopLossOrders.length > 1 && takeProfitOrders.length > 1
+  );
 
   const priceInfo = (
     <Styled.PriceBox>
@@ -59,46 +61,42 @@ export const TriggersForm = ({
   return (
     <Styled.Form>
       {priceInfo}
-      {
-        <TriggerOrderInputs
-          symbol={symbol}
-          tooltipId="take-profit"
-          stringKeys={{
-            header: STRING_KEYS.TAKE_PROFIT,
-            price: STRING_KEYS.TP_PRICE,
-            output: STRING_KEYS.GAIN,
-          }}
-          orders={takeProfitOrders}
-          onViewOrdersClick={onViewOrdersClick}
-        />
-      }
-      {
-        <TriggerOrderInputs
-          symbol={symbol}
-          tooltipId="stop-loss"
-          stringKeys={{
-            header: STRING_KEYS.STOP_LOSS,
-            price: STRING_KEYS.SL_PRICE,
-            output: STRING_KEYS.LOSS,
-          }}
-          orders={stopLossOrders}
-          tickSizeDecimals={tickSizeDecimals}
-          onViewOrdersClick={onViewOrdersClick}
-        />
-      }
-      {
-        <AdvancedTriggersOptions
-          symbol={symbol}
-          stepSizeDecimals={stepSizeDecimals}
-          tickSizeDecimals={tickSizeDecimals}
-        />
-      }
-      {shouldShowEditTriggersButton && (
-        <Button action={ButtonAction.Primary} state={{ isDisabled }}>
-          {isEditingExistingTriggers
-            ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })
-            : stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
-        </Button>
+      <TriggerOrderInputs
+        symbol={symbol}
+        tooltipId="take-profit"
+        stringKeys={{
+          header: STRING_KEYS.TAKE_PROFIT,
+          price: STRING_KEYS.TP_PRICE,
+          output: STRING_KEYS.GAIN,
+        }}
+        orders={takeProfitOrders}
+        onViewOrdersClick={onViewOrdersClick}
+      />
+      <TriggerOrderInputs
+        symbol={symbol}
+        tooltipId="stop-loss"
+        stringKeys={{
+          header: STRING_KEYS.STOP_LOSS,
+          price: STRING_KEYS.SL_PRICE,
+          output: STRING_KEYS.LOSS,
+        }}
+        orders={stopLossOrders}
+        tickSizeDecimals={tickSizeDecimals}
+        onViewOrdersClick={onViewOrdersClick}
+      />
+      {existsEditableOrCreatableOrders && (
+        <>
+          <AdvancedTriggersOptions
+            symbol={symbol}
+            stepSizeDecimals={stepSizeDecimals}
+            tickSizeDecimals={tickSizeDecimals}
+          />
+          <Button action={ButtonAction.Primary} state={{ isDisabled }}>
+            {isEditingExistingTriggers
+              ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })
+              : stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
+          </Button>
+        </>
       )}
     </Styled.Form>
   );

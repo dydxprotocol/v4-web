@@ -286,9 +286,18 @@ const getPositionsTableColumnDef = ({
         isActionable: true,
         allowsSorting: false,
         hideOnBreakpoint: MediaQueryKeys.isTablet,
-        renderCell: ({ id, liquidationPrice, side, size, stopLossOrders, takeProfitOrders }) => (
+        renderCell: ({
+          id,
+          assetId,
+          liquidationPrice,
+          side,
+          size,
+          stopLossOrders,
+          takeProfitOrders,
+        }) => (
           <PositionsTriggersCell
-            market={id}
+            marketId={id}
+            assetId={assetId}
             liquidationPrice={liquidationPrice?.current}
             stopLossOrders={stopLossOrders}
             takeProfitOrders={takeProfitOrders}

@@ -1,3 +1,4 @@
+import { useDispatch } from 'react-redux';
 import styled, { type AnyStyledComponent, css } from 'styled-components';
 
 import {
@@ -7,6 +8,7 @@ import {
   type SubaccountOrder,
 } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { TimeInForceOptions } from '@/constants/trade';
 
@@ -19,21 +21,25 @@ import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { WithHovercard } from '@/components/WithHovercard';
 
+import { openDialog } from '@/state/dialogs';
+
 import { isMarketOrderType, isStopLossOrder } from '@/lib/orders';
 
 type ElementProps = {
-  market: string;
+  marketId: string;
+  assetId: string;
   liquidationPrice: Nullable<number>;
   stopLossOrders: SubaccountOrder[];
   takeProfitOrders: SubaccountOrder[];
-  onViewOrdersClick: (market: string) => void;
+  onViewOrdersClick: (marketId: string) => void;
   positionSide: Nullable<AbacusPositionSides>;
   positionSize: Nullable<number>;
   isDisabled?: boolean;
 };
 
 export const PositionsTriggersCell = ({
-  market,
+  marketId,
+  assetId,
   liquidationPrice,
   stopLossOrders,
   takeProfitOrders,
@@ -43,6 +49,7 @@ export const PositionsTriggersCell = ({
   isDisabled, // TODO: CT-656 Disable onViewOrdersClick behavior when isDisabled
 }: ElementProps) => {
   const stringGetter = useStringGetter();
+  const dispatch = useDispatch();
 
   const showLiquidationWarning = (order: SubaccountOrder) => {
     if (!isStopLossOrder(order) || !liquidationPrice) {
@@ -54,11 +61,26 @@ export const PositionsTriggersCell = ({
     );
   };
 
+  const openTriggersDialog = () => {
+    dispatch(
+      openDialog({
+        type: DialogTypes.Triggers,
+        dialogProps: {
+          marketId,
+          assetId,
+          stopLossOrders,
+          takeProfitOrders,
+          navigateToMarketOrders: () => onViewOrdersClick(marketId),
+        },
+      })
+    );
+  };
+
   const viewOrdersButton = (
     <Styled.Button
       action={ButtonAction.Navigation}
       size={ButtonSize.XSmall}
-      onClick={() => onViewOrdersClick(market)}
+      onClick={() => onViewOrdersClick(marketId)}
     >
       {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
       {<Styled.ArrowIcon iconName={IconName.Arrow} />}
@@ -85,7 +107,7 @@ export const PositionsTriggersCell = ({
             <Button
               action={ButtonAction.Primary}
               size={ButtonSize.Small}
-              onClick={() => null} // TODO: CT-663 Implement onClick functionality
+              onClick={openTriggersDialog}
             >
               {stringGetter({ key: STRING_KEYS.EDIT_STOP_LOSS })}
             </Button>
@@ -132,9 +154,13 @@ export const PositionsTriggersCell = ({
                   <Button
                     action={ButtonAction.Primary}
                     size={ButtonSize.Small}
-                    onClick={() => null} // TODO: CT-663 Implement onClick functionality
+                    onClick={openTriggersDialog}
                   >
-                    {stringGetter({ key: STRING_KEYS.EDIT_STOP_LOSS })}
+                    {stringGetter({
+                      key: isStopLossOrder(order)
+                        ? STRING_KEYS.EDIT_STOP_LOSS
+                        : STRING_KEYS.EDIT_STOP_LOSS, // TODO: CT-704 update to EDIT_TAKE_PROFIT
+                    })}
                   </Button>
                 }
                 slotTrigger={
