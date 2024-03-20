@@ -75,7 +75,7 @@ export const TriggerOrderInputs = ({
         },
       ]}
       onValueChange={onValueChange}
-    ></DropdownSelectMenu>
+    />
   );
 
   const multipleOrdersButton = () => (

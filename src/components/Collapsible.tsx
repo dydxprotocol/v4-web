@@ -103,7 +103,6 @@ Styled.TriggerSlot = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5em;
-  padding: 0.5em 0;
 `;
 
 Styled.TriggerIcon = styled.span`

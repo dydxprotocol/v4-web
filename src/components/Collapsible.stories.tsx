@@ -29,7 +29,7 @@ CollapsibleStoryWithIconTrigger.args = {
 
 CollapsibleStoryWithIconTrigger.argTypes = {
   triggerIcon: {
-    options: [...Object.values(IconName)],
+    options: Object.values(IconName),
     control: { type: 'select' },
     defaultValue: IconName.Caret,
   },
@@ -46,7 +46,7 @@ export const CollapsibleStoryWithSlotTrigger: Story<CollapsibleProps> = (args) =
     <StoryWrapper>
       <Collapsible
         {...args}
-        slotTrigger={<Checkbox checked={checked} onCheckedChange={setChecked}></Checkbox>}
+        slotTrigger={<Checkbox checked={checked} onCheckedChange={setChecked}/>}
         open={checked}
         onOpenChange={setChecked}
       >

@@ -48,7 +48,7 @@ export const OrderSizeInput = ({
       {/* TODO: CT-625 Update with values from abacus */}
       <Styled.SizeInputRow>
         <Styled.OrderSizeSlider className={className} stepSizeDecimals={stepSizeDecimals} />
-        <FormInput label="" type={InputType.Number} slotRight={<Tag>{symbol}</Tag>} />
+        <FormInput type={InputType.Number} slotRight={<Tag>{symbol}</Tag>} />
       </Styled.SizeInputRow>
     </Collapsible>
   );

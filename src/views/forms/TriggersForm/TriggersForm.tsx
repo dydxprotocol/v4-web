@@ -24,7 +24,12 @@ type ElementProps = {
   onViewOrdersClick: () => void;
 };
 
-export const TriggersForm = ({ marketId, stopLossOrders, takeProfitOrders, onViewOrdersClick }: ElementProps) => {
+export const TriggersForm = ({
+  marketId,
+  stopLossOrders,
+  takeProfitOrders,
+  onViewOrdersClick,
+}: ElementProps) => {
   const stringGetter = useStringGetter();
 
   const { asset, entryPrice, stepSizeDecimals, tickSizeDecimals, oraclePrice } =
@@ -32,6 +37,11 @@ export const TriggersForm = ({ marketId, stopLossOrders, takeProfitOrders, onVie
   const symbol = asset?.id ?? '';
 
   const isDisabled = false; // TODO: CT-625 Update based on whether values are populated based on abacus
+  const isEditingExistingTriggers = stopLossOrders.length > 0 || takeProfitOrders.length > 0;
+
+  // The triggers form does not support editing multiple stop loss or take profit orders - so if both have
+  // multiple, we hide the triggers button CTA
+  const shouldShowEditTriggersButton = !(stopLossOrders.length > 1 && takeProfitOrders.length > 1);
 
   const priceInfo = (
     <Styled.PriceBox>
@@ -52,7 +62,7 @@ export const TriggersForm = ({ marketId, stopLossOrders, takeProfitOrders, onVie
       {
         <TriggerOrderInputs
           symbol={symbol}
-          tooltipId={'take-profit'}
+          tooltipId="take-profit"
           stringKeys={{
             header: STRING_KEYS.TAKE_PROFIT,
             price: STRING_KEYS.TP_PRICE,
@@ -60,12 +70,12 @@ export const TriggersForm = ({ marketId, stopLossOrders, takeProfitOrders, onVie
           }}
           orders={takeProfitOrders}
           onViewOrdersClick={onViewOrdersClick}
-        ></TriggerOrderInputs>
+        />
       }
       {
         <TriggerOrderInputs
           symbol={symbol}
-          tooltipId={'stop-loss'}
+          tooltipId="stop-loss"
           stringKeys={{
             header: STRING_KEYS.STOP_LOSS,
             price: STRING_KEYS.SL_PRICE,
@@ -74,20 +84,22 @@ export const TriggersForm = ({ marketId, stopLossOrders, takeProfitOrders, onVie
           orders={stopLossOrders}
           tickSizeDecimals={tickSizeDecimals}
           onViewOrdersClick={onViewOrdersClick}
-        ></TriggerOrderInputs>
+        />
       }
       {
         <AdvancedTriggersOptions
           symbol={symbol}
           stepSizeDecimals={stepSizeDecimals}
           tickSizeDecimals={tickSizeDecimals}
-        ></AdvancedTriggersOptions>
+        />
       }
-      <Button action={ButtonAction.Primary} state={{ isDisabled }}>
-        {isDisabled
-          ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })
-          : stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
-      </Button>
+      {shouldShowEditTriggersButton && (
+        <Button action={ButtonAction.Primary} state={{ isDisabled }}>
+          {isEditingExistingTriggers
+            ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })
+            : stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
+        </Button>
+      )}
     </Styled.Form>
   );
 };
@@ -103,11 +115,14 @@ Styled.PriceBox = styled.div`
   background-color: var(--color-layer-2);
   border-radius: 0.5em;
   font: var(--font-base-medium);
+
+  display: grid;
+  gap: 0.625em;
+  padding: 0.625em 0.75em;
 `;
 
 Styled.PriceRow = styled.div`
-  ${layoutMixins.spacedRow}
-  padding: 0.625em 0.75em;
+  ${layoutMixins.spacedRow};
 `;
 
 Styled.PriceLabel = styled.h3`

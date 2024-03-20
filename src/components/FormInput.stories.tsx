@@ -20,6 +20,7 @@ FormInputWithValidationStory.args = {
   decimals: 2,
   max: 100,
   placeholder: '',
+  label: 'label',
   validationConfig: {
     attached: false,
     type: AlertType.Error,
@@ -47,6 +48,7 @@ FormInputStoryWithSlotRight.args = {
   decimals: 2,
   max: 100,
   placeholder: '',
+  label: 'label',
   validationConfig: {
     attached: false,
     type: AlertType.Error,

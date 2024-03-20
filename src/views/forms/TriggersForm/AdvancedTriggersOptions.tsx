@@ -31,15 +31,15 @@ export const AdvancedTriggersOptions = ({
 
   return (
     <Styled.Container>
-      {
-        <Styled.Header>
-          {stringGetter({ key: STRING_KEYS.ADVANCED })}
-          {<HorizontalSeparatorFiller />}
-        </Styled.Header>
-      }
+      <Styled.Header>
+        {stringGetter({ key: STRING_KEYS.ADVANCED })}
+        <HorizontalSeparatorFiller />
+      </Styled.Header>
       {/* TODO: CT-625 Update with values from abacus */}
-      {<OrderSizeInput className={className} symbol={symbol} stepSizeDecimals={stepSizeDecimals} />}
-      {<LimitPriceInputs className={className} tickSizeDecimals={tickSizeDecimals} />}
+      <Styled.Content>
+        <OrderSizeInput className={className} symbol={symbol} stepSizeDecimals={stepSizeDecimals} />
+        <LimitPriceInputs className={className} tickSizeDecimals={tickSizeDecimals} />
+      </Styled.Content>
     </Styled.Container>
   );
 };
@@ -56,4 +56,9 @@ Styled.Header = styled.h3`
   color: var(--color-text-0);
 
   margin-bottom: 0.5rem;
+`;
+
+Styled.Content = styled.div`
+  display: grid;
+  gap: 0.5em;
 `;

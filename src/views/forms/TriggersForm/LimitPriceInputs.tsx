@@ -31,6 +31,7 @@ export const LimitPriceInputs = ({ tickSizeDecimals, className }: ElementProps &
   return (
     <>
       <Collapsible
+        className={className}
         slotTrigger={
           <Checkbox checked={shouldShowLimitPrice} onCheckedChange={setShouldShowLimitPrice} />
         }
@@ -45,21 +46,21 @@ export const LimitPriceInputs = ({ tickSizeDecimals, className }: ElementProps &
           <Styled.InputsRow>
             <FormInput
               id="TP-limit"
-              decimals={tickSizeDecimals || USD_DECIMALS}
+              decimals={tickSizeDecimals ?? USD_DECIMALS}
               label={
                 <>
                   {stringGetter({ key: STRING_KEYS.TP_LIMIT })}
-                  {<Tag>USD</Tag>}
+                  <Tag>USD</Tag>
                 </>
               }
             />
             <FormInput
               id="SL-limit"
-              decimals={tickSizeDecimals || USD_DECIMALS}
+              decimals={tickSizeDecimals ?? USD_DECIMALS}
               label={
                 <>
                   {stringGetter({ key: STRING_KEYS.SL_LIMIT })}
-                  {<Tag>USD</Tag>}
+                  <Tag>USD</Tag>
                 </>
               }
             />
