@@ -2,7 +2,7 @@ import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter, useURLConfigs } from '@/hooks';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -11,18 +11,17 @@ import { Accordion } from '@/components/Accordion';
 import { Link } from '@/components/Link';
 import { Panel } from '@/components/Panel';
 
-const REWARDS_LEARN_MORE_LINK = 'https://docs.dydx.exchange/rewards/trading_rewards';
-
 export const RewardsHelpPanel = () => {
   const stringGetter = useStringGetter();
+  const { tradingRewardsLearnMore } = useURLConfigs();
 
   return (
     <Styled.HelpCard
       slotHeader={
         <Styled.Header>
           <h3>{stringGetter({ key: STRING_KEYS.HELP })}</h3>
-          {REWARDS_LEARN_MORE_LINK && (
-            <Link withIcon href={REWARDS_LEARN_MORE_LINK}>
+          {tradingRewardsLearnMore && (
+            <Link withIcon href={tradingRewardsLearnMore}>
               {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
             </Link>
           )}
