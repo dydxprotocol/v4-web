@@ -245,13 +245,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
       const expirationDate = new Date('2024-03-08T23:59:59');
       const currentDate = new Date();
-      const { dydxAddress } = useAccounts();
-      const { data, status } = useQueryChaosLabsIncentives({
-        dydxAddress,
-        season: 2,
-      });
-
-      const { dydxRewards } = data ?? {};
 
       useEffect(() => {
         if (currentDate <= expirationDate) {
@@ -277,33 +270,44 @@ export const notificationTypes: NotificationTypeConfig[] = [
         }
       }, [stringGetter]);
 
-      useEffect(() => {
-        if (dydxAddress && status === 'success') {
-          trigger(
-            ReleaseUpdateNotificationIds.IncentivesDistributedS2,
-            {
-              icon: <AssetIcon symbol={chainTokenLabel} />,
-              title: 'Season 2 launch rewards have been distributed!',
-              body: `Season 2 rewards: +${dydxRewards ?? 0} ${chainTokenLabel}`,
-              renderCustomBody({ isToast, notification }) {
-                return (
-                  <IncentiveSeasonDistributionNotification
-                    isToast={isToast}
-                    notification={notification}
-                    data={{
-                      points: dydxRewards ?? 0,
-                      chainTokenLabel,
-                    }}
-                  />
-                );
-              },
-              toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.IncentivesDistributedS2,
-            },
-            []
-          );
-        }
-      }, [dydxAddress, status, dydxRewards]);
+      /**
+       * @description Re-use for future Season 3 rewards distribution
+       **/
+      // const { dydxAddress } = useAccounts();
+      // const { data, status } = useQueryChaosLabsIncentives({
+      //   dydxAddress,
+      //   season: 2,
+      // });
+      //
+      // const { dydxRewards } = data ?? {};
+      //
+      // useEffect(() => {
+      //   if (dydxAddress && status === 'success') {
+      //     trigger(
+      //       ReleaseUpdateNotificationIds.IncentivesDistributedS2,
+      //       {
+      //         icon: <AssetIcon symbol={chainTokenLabel} />,
+      //         title: 'Season 2 launch rewards have been distributed!',
+      //         body: `Season 2 rewards: +${dydxRewards ?? 0} ${chainTokenLabel}`,
+      //         renderCustomBody({ isToast, notification }) {
+      //           return (
+      //             <IncentiveSeasonDistributionNotification
+      //               isToast={isToast}
+      //               notification={notification}
+      //               data={{
+      //                 points: dydxRewards ?? 0,
+      //                 chainTokenLabel,
+      //               }}
+      //             />
+      //           );
+      //         },
+      //         toastSensitivity: 'foreground',
+      //         groupKey: ReleaseUpdateNotificationIds.IncentivesDistributedS2,
+      //       },
+      //       []
+      //     );
+      //   }
+      // }, [dydxAddress, status, dydxRewards]);
     },
     useNotificationAction: () => {
       const { chainTokenLabel } = useTokenConfigs();
