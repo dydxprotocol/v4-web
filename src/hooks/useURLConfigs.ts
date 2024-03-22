@@ -7,25 +7,27 @@ import { getSelectedDydxChainId } from '@/state/appSelectors';
 const FALLBACK_URL = 'https://help.dydx.exchange/';
 
 export interface LinksConfigs {
-  tos: string;
-  privacy: string;
-  statusPage: string;
+  accountExportLearnMore?: string;
+  blogs?: string;
+  community?: string;
+  documentation?: string;
+  feedback?: string;
+  foundation?: string;
+  governanceLearnMore?: string;
+  help?: string;
+  initialMarginFractionLearnMore?: string;
+  keplrDashboard?: string;
+  launchIncentive?: string;
   mintscan: string;
   mintscanBase: string;
-  feedback?: string;
-  help?: string;
-  blogs?: string;
-  foundation?: string;
-  initialMarginFractionLearnMore?: string;
-  reduceOnlyLearnMore?: string;
-  documentation?: string;
-  community?: string;
-  governanceLearnMore?: string;
   newMarketProposalLearnMore: string;
+  privacy: string;
+  reduceOnlyLearnMore?: string;
+  statusPage: string;
   stakingLearnMore?: string;
-  keplrDashboard?: string;
   strideZoneApp?: string;
-  accountExportLearnMore?: string;
+  tos: string;
+  tradingRewardsLearnMore?: string;
   walletLearnMore?: string;
   withdrawalGateLearnMore?: string;
 }
@@ -35,25 +37,27 @@ export const useURLConfigs = (): LinksConfigs => {
   const linksConfigs = LINKS_CONFIG_MAP[selectedDydxChainId] as LinksConfigs;
 
   return {
-    tos: linksConfigs.tos,
-    privacy: linksConfigs.privacy,
-    statusPage: linksConfigs.statusPage,
+    accountExportLearnMore: linksConfigs.accountExportLearnMore || FALLBACK_URL,
+    blogs: linksConfigs.blogs || FALLBACK_URL,
+    community: linksConfigs.community || FALLBACK_URL,
+    documentation: linksConfigs.documentation || FALLBACK_URL,
+    feedback: linksConfigs.feedback || FALLBACK_URL,
+    foundation: linksConfigs.foundation || FALLBACK_URL,
+    governanceLearnMore: linksConfigs.governanceLearnMore || FALLBACK_URL,
+    help: linksConfigs.help || FALLBACK_URL,
+    initialMarginFractionLearnMore: linksConfigs.initialMarginFractionLearnMore || FALLBACK_URL,
+    keplrDashboard: linksConfigs.keplrDashboard || FALLBACK_URL,
+    launchIncentive: linksConfigs.launchIncentive || FALLBACK_URL,
     mintscan: linksConfigs.mintscan,
     mintscanBase: linksConfigs.mintscanBase,
-    feedback: linksConfigs.feedback || FALLBACK_URL,
-    help: linksConfigs.help || FALLBACK_URL,
-    blogs: linksConfigs.blogs || FALLBACK_URL,
-    foundation: linksConfigs.foundation || FALLBACK_URL,
-    initialMarginFractionLearnMore: linksConfigs.initialMarginFractionLearnMore || FALLBACK_URL,
-    reduceOnlyLearnMore: linksConfigs.reduceOnlyLearnMore || FALLBACK_URL,
-    documentation: linksConfigs.documentation || FALLBACK_URL,
-    community: linksConfigs.community || FALLBACK_URL,
-    governanceLearnMore: linksConfigs.governanceLearnMore || FALLBACK_URL,
     newMarketProposalLearnMore: linksConfigs.newMarketProposalLearnMore || FALLBACK_URL,
+    privacy: linksConfigs.privacy,
+    reduceOnlyLearnMore: linksConfigs.reduceOnlyLearnMore || FALLBACK_URL,
+    statusPage: linksConfigs.statusPage,
     stakingLearnMore: linksConfigs.stakingLearnMore || FALLBACK_URL,
-    keplrDashboard: linksConfigs.keplrDashboard || FALLBACK_URL,
     strideZoneApp: linksConfigs.strideZoneApp || FALLBACK_URL,
-    accountExportLearnMore: linksConfigs.accountExportLearnMore || FALLBACK_URL,
+    tos: linksConfigs.tos,
+    tradingRewardsLearnMore: linksConfigs.tradingRewardsLearnMore || FALLBACK_URL,
     walletLearnMore: linksConfigs.walletLearnMore || FALLBACK_URL,
     withdrawalGateLearnMore: linksConfigs.withdrawalGateLearnMore || FALLBACK_URL,
   };
