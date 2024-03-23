@@ -59,6 +59,7 @@ const useDydxClientContext = () => {
   const [compositeClient, setCompositeClient] = useState<CompositeClient>();
   const [faucetClient, setFaucetClient] = useState<FaucetClient>();
 
+  // assume there's only one option for indexer endpoints
   const indexerEndpoints = ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.indexers[0];
   const indexerConfig = new IndexerConfig(indexerEndpoints.api, indexerEndpoints.socket);
   const indexerClient = new IndexerClient(indexerConfig);
