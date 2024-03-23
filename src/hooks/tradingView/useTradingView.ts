@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 import isEmpty from 'lodash/isEmpty';
 import { LanguageCode, ResolutionString, widget } from 'public/tradingview/charting_library';
-import { shallowEqual, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { LocalStorageKey } from '@/constants/localStorage';
