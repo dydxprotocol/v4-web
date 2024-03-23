@@ -24,7 +24,7 @@ import { useSelectedNetwork } from './useSelectedNetwork';
 export const useAnalytics = () => {
   const { walletType, walletConnectionType, evmAddress, dydxAddress, selectedWalletType } =
     useAccounts();
-  const { compositeClient } = useDydxClient();
+  const { indexerClient } = useDydxClient();
 
   /** User properties */
 
@@ -99,7 +99,7 @@ export const useAnalytics = () => {
 
   useEffect(() => {
     if (status) {
-      const websocketEndpoint = compositeClient?.indexerClient?.config.websocketEndpoint;
+      const websocketEndpoint = indexerClient.config.websocketEndpoint;
 
       const lastSuccessfulIndexerRpcQuery =
         (websocketEndpoint &&
