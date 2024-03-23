@@ -19,11 +19,11 @@ import type { PerpetualMarketResponse } from '@/constants/indexer';
 import { useDydxClient } from '@/hooks/useDydxClient';
 
 export const useNextClobPairId = () => {
-  const { isConnected, requestAllPerpetualMarkets, requestAllGovernanceProposals } =
+  const { isCompositeClientConnected, requestAllPerpetualMarkets, requestAllGovernanceProposals } =
     useDydxClient();
 
   const { data: perpetualMarkets, status: perpetualMarketsStatus } = useQuery({
-    enabled: isConnected,
+    enabled: true,
     queryKey: 'requestAllPerpetualMarkets',
     queryFn: requestAllPerpetualMarkets,
     refetchInterval: 60_000,
@@ -31,7 +31,7 @@ export const useNextClobPairId = () => {
   });
 
   const { data: allGovProposals, status: allGovProposalsStatus } = useQuery({
-    enabled: isConnected,
+    enabled: isCompositeClientConnected,
     queryKey: 'requestAllActiveGovernanceProposals',
     queryFn: () => requestAllGovernanceProposals(),
     refetchInterval: 10_000,
