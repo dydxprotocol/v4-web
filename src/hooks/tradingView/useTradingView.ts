@@ -38,10 +38,9 @@ export const useTradingView = ({
   const appColorMode = useSelector(getAppColorMode);
 
   const marketId = useSelector(getCurrentMarketId);
-  const marketIds = useSelector(getMarketIds, shallowEqual);
   const selectedLocale = useSelector(getSelectedLocale);
   const selectedNetwork = useSelector(getSelectedNetwork);
-  const { getCandlesForDatafeed, isConnected: isClientConnected } = useDydxClient();
+  const { getCandlesForDatafeed } = useDydxClient();
 
   const [savedTvChartConfig, setTvChartConfig] = useLocalStorage<object | undefined>({
     key: LocalStorageKey.TradingViewChartConfig,
@@ -49,46 +48,43 @@ export const useTradingView = ({
   });
 
   const savedResolution = getSavedResolution({ savedConfig: savedTvChartConfig });
-  const hasMarkets = marketIds.length > 0;
 
   useEffect(() => {
-    if (hasMarkets && isClientConnected && marketId) {
-      const widgetOptions = getWidgetOptions();
-      const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
-      const options = {
-        ...widgetOptions,
-        ...widgetOverrides,
-        datafeed: getDydxDatafeed(store, getCandlesForDatafeed),
-        interval: (savedResolution || DEFAULT_RESOLUTION) as ResolutionString,
-        locale: SUPPORTED_LOCALE_BASE_TAGS[selectedLocale] as LanguageCode,
-        symbol: marketId,
-        saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
-      };
+    const widgetOptions = getWidgetOptions();
+    const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
+    const options = {
+      ...widgetOptions,
+      ...widgetOverrides,
+      datafeed: getDydxDatafeed(store, getCandlesForDatafeed),
+      interval: (savedResolution || DEFAULT_RESOLUTION) as ResolutionString,
+      locale: SUPPORTED_LOCALE_BASE_TAGS[selectedLocale] as LanguageCode,
+      symbol: marketId,
+      saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
+    };
 
-      const tvChartWidget = new widget(options);
-      tvWidgetRef.current = tvChartWidget;
+    const tvChartWidget = new widget(options);
+    tvWidgetRef.current = tvChartWidget;
 
-      tvWidgetRef.current.onChartReady(() => {
-        tvWidgetRef.current?.headerReady().then(() => {
-          if (displayButtonRef && tvWidgetRef.current) {
-            displayButtonRef.current = tvWidgetRef.current.createButton();
-            displayButtonRef.current.innerHTML = `<span>${stringGetter({
-              key: STRING_KEYS.ORDER_LINES,
-            })}</span> <div class="displayOrdersButton-toggle"></div>`;
-            displayButtonRef.current.setAttribute(
-              'title',
-              stringGetter({ key: STRING_KEYS.ORDER_LINES_TOOLTIP })
-            );
-          }
-        });
-
-        tvWidgetRef?.current?.subscribe('onAutoSaveNeeded', () =>
-          tvWidgetRef?.current?.save((chartConfig: object) => setTvChartConfig(chartConfig))
-        );
-
-        setIsChartReady(true);
+    tvWidgetRef.current.onChartReady(() => {
+      tvWidgetRef.current?.headerReady().then(() => {
+        if (displayButtonRef && tvWidgetRef.current) {
+          displayButtonRef.current = tvWidgetRef.current.createButton();
+          displayButtonRef.current.innerHTML = `<span>${stringGetter({
+            key: STRING_KEYS.ORDER_LINES,
+          })}</span> <div class="displayOrdersButton-toggle"></div>`;
+          displayButtonRef.current.setAttribute(
+            'title',
+            stringGetter({ key: STRING_KEYS.ORDER_LINES_TOOLTIP })
+          );
+        }
       });
-    }
+
+      tvWidgetRef?.current?.subscribe('onAutoSaveNeeded', () =>
+        tvWidgetRef?.current?.save((chartConfig: object) => setTvChartConfig(chartConfig))
+      );
+
+      setIsChartReady(true);
+    });
 
     return () => {
       displayButtonRef.current?.remove();
@@ -97,14 +93,7 @@ export const useTradingView = ({
       tvWidgetRef.current = null;
       setIsChartReady(false);
     };
-  }, [
-    getCandlesForDatafeed,
-    isClientConnected,
-    hasMarkets,
-    selectedLocale,
-    selectedNetwork,
-    !!marketId,
-  ]);
+  }, [selectedLocale, selectedNetwork]);
 
   return { savedResolution };
 };
