@@ -12,19 +12,16 @@ import type {
 } from 'public/tradingview/charting_library';
 
 import { Candle, RESOLUTION_MAP } from '@/constants/candles';
+import { DEFAULT_MARKETID } from '@/constants/markets';
 
 import { useDydxClient } from '@/hooks';
 
 import { RootStore } from '@/state/_store';
 import { setCandles } from '@/state/perpetuals';
-import {
-  getMarketConfig,
-  getMarketIds,
-  getPerpetualBarsForPriceChart,
-} from '@/state/perpetualsSelectors';
+import { getCurrentMarketId, getPerpetualBarsForPriceChart } from '@/state/perpetualsSelectors';
 
 import { log } from '../../telemetry';
-import { getAllSymbols, getHistorySlice, mapCandle } from '../utils';
+import { getSymbol, getHistorySlice, mapCandle } from '../utils';
 import { lastBarsCache } from './cache';
 import { subscribeOnStream, unsubscribeFromStream } from './streaming';
 
@@ -69,18 +66,9 @@ export const getDydxDatafeed = (
     onSymbolResolvedCallback: ResolveCallback,
     onResolveErrorCallback: ErrorCallback
   ) => {
-    const marketIds = getMarketIds(store.getState());
-    const symbols = getAllSymbols(marketIds);
-    const symbolItem = symbols.find(({ symbol }: any) => symbol === symbolName);
-
-    if (!symbolItem) {
-      onResolveErrorCallback('cannot resolve symbol');
-      return;
-    }
-
-    const { tickSizeDecimals } = getMarketConfig(symbolItem.symbol)(store.getState()) || {};
-
-    const pricescale = tickSizeDecimals ? 10 ** tickSizeDecimals : 100;
+    const marketId = getCurrentMarketId(store.getState());
+    const symbolItem = getSymbol(marketId || DEFAULT_MARKETID);
+    const pricescale = 100;
 
     const symbolInfo: LibrarySymbolInfo = {
       ticker: symbolItem.full_name,
