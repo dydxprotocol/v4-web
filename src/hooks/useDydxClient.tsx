@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import {
   BECH32_PREFIX,
@@ -24,6 +24,7 @@ import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { log } from '@/lib/telemetry';
 
+import { useEndpointsConfig } from './useEndpointsConfig';
 import { useRestrictions } from './useRestrictions';
 import { useTokenConfigs } from './useTokenConfigs';
 
@@ -59,10 +60,11 @@ const useDydxClientContext = () => {
   const [compositeClient, setCompositeClient] = useState<CompositeClient>();
   const [faucetClient, setFaucetClient] = useState<FaucetClient>();
 
-  // assume there's only one option for indexer endpoints
-  const indexerEndpoints = ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints.indexers[0];
-  const indexerConfig = new IndexerConfig(indexerEndpoints.api, indexerEndpoints.socket);
-  const indexerClient = new IndexerClient(indexerConfig);
+  const { indexer: indexerEndpoints } = useEndpointsConfig();
+  const indexerClient = useMemo(() => {
+    const config = new IndexerConfig(indexerEndpoints.api, indexerEndpoints.socket);
+    return new IndexerClient(config);
+  }, [indexerEndpoints]);
 
   useEffect(() => {
     (async () => {
@@ -231,30 +233,23 @@ const useDydxClientContext = () => {
   const { updateSanctionedAddresses } = useRestrictions();
 
   const screenAddresses = async ({ addresses }: { addresses: string[] }) => {
-    if (compositeClient) {
-      const promises = addresses.map((address) => indexerClient.utility.screen(address));
+    const promises = addresses.map((address) => indexerClient.utility.screen(address));
 
-      const results = await Promise.all(promises);
+    const results = await Promise.all(promises);
 
-      const screenedAddresses = Object.fromEntries(
-        addresses.map((address, index) => [address, results[index]?.restricted])
-      );
+    const screenedAddresses = Object.fromEntries(
+      addresses.map((address, index) => [address, results[index]?.restricted])
+    );
 
-      updateSanctionedAddresses(screenedAddresses);
-      return screenedAddresses;
-    }
+    updateSanctionedAddresses(screenedAddresses);
+    return screenedAddresses;
   };
 
   const getPerpetualMarketSparklines = async ({
     period = 'SEVEN_DAYS',
   }: {
     period?: 'ONE_DAY' | 'SEVEN_DAYS';
-  }) => {
-    if (compositeClient) {
-      return await indexerClient.markets.getPerpetualMarketSparklines(period);
-    }
-    return {};
-  };
+  }) => indexerClient.markets.getPerpetualMarketSparklines(period);
 
   const getWithdrawalAndTransferGatingStatus = useCallback(async () => {
     return await compositeClient?.validatorClient.get.GetWithdrawalAndTransferGatingStatus();
