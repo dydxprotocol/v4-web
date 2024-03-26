@@ -68,41 +68,43 @@ export const useTradingView = ({
   }, [marketId!!, hasMarkets]);
 
   useEffect(() => {
-    const widgetOptions = getWidgetOptions();
-    const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
-    const options = {
-      ...widgetOptions,
-      ...widgetOverrides,
-      datafeed: getDydxDatafeed(store, getCandlesForDatafeed, initialPriceScale),
-      interval: (savedResolution || DEFAULT_RESOLUTION) as ResolutionString,
-      locale: SUPPORTED_LOCALE_BASE_TAGS[selectedLocale] as LanguageCode,
-      symbol: marketId,
-      saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
-    };
+    if (marketId) {
+      const widgetOptions = getWidgetOptions();
+      const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
+      const options = {
+        ...widgetOptions,
+        ...widgetOverrides,
+        datafeed: getDydxDatafeed(store, getCandlesForDatafeed, initialPriceScale),
+        interval: (savedResolution || DEFAULT_RESOLUTION) as ResolutionString,
+        locale: SUPPORTED_LOCALE_BASE_TAGS[selectedLocale] as LanguageCode,
+        symbol: marketId,
+        saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
+      };
 
-    const tvChartWidget = new widget(options);
-    tvWidgetRef.current = tvChartWidget;
+      const tvChartWidget = new widget(options);
+      tvWidgetRef.current = tvChartWidget;
 
-    tvWidgetRef.current.onChartReady(() => {
-      tvWidgetRef.current?.headerReady().then(() => {
-        if (displayButtonRef && tvWidgetRef.current) {
-          displayButtonRef.current = tvWidgetRef.current.createButton();
-          displayButtonRef.current.innerHTML = `<span>${stringGetter({
-            key: STRING_KEYS.ORDER_LINES,
-          })}</span> <div class="displayOrdersButton-toggle"></div>`;
-          displayButtonRef.current.setAttribute(
-            'title',
-            stringGetter({ key: STRING_KEYS.ORDER_LINES_TOOLTIP })
-          );
-        }
+      tvWidgetRef.current.onChartReady(() => {
+        tvWidgetRef.current?.headerReady().then(() => {
+          if (displayButtonRef && tvWidgetRef.current) {
+            displayButtonRef.current = tvWidgetRef.current.createButton();
+            displayButtonRef.current.innerHTML = `<span>${stringGetter({
+              key: STRING_KEYS.ORDER_LINES,
+            })}</span> <div class="displayOrdersButton-toggle"></div>`;
+            displayButtonRef.current.setAttribute(
+              'title',
+              stringGetter({ key: STRING_KEYS.ORDER_LINES_TOOLTIP })
+            );
+          }
+        });
+
+        tvWidgetRef?.current?.subscribe('onAutoSaveNeeded', () =>
+          tvWidgetRef?.current?.save((chartConfig: object) => setTvChartConfig(chartConfig))
+        );
+
+        setIsChartReady(true);
       });
-
-      tvWidgetRef?.current?.subscribe('onAutoSaveNeeded', () =>
-        tvWidgetRef?.current?.save((chartConfig: object) => setTvChartConfig(chartConfig))
-      );
-
-      setIsChartReady(true);
-    });
+    }
 
     return () => {
       displayButtonRef.current?.remove();
@@ -111,7 +113,7 @@ export const useTradingView = ({
       tvWidgetRef.current = null;
       setIsChartReady(false);
     };
-  }, [selectedLocale, selectedNetwork, initialPriceScale]);
+  }, [selectedLocale, selectedNetwork, initialPriceScale, marketId!!]);
 
   return { savedResolution };
 };
