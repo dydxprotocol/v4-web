@@ -1,5 +1,6 @@
 import { ElementType, memo } from 'react';
 
+import { usePrivy } from '@privy-io/react-auth';
 import type { Dispatch } from '@reduxjs/toolkit';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent, css } from 'styled-components';
@@ -12,7 +13,7 @@ import {
   type StringGetterFunction,
   TOOLTIP_STRING_KEYS,
 } from '@/constants/localization';
-import { DydxChainAsset, wallets } from '@/constants/wallets';
+import { DydxChainAsset, WalletType, wallets } from '@/constants/wallets';
 
 import {
   useAccounts,
@@ -23,6 +24,7 @@ import {
   useURLConfigs,
 } from '@/hooks';
 
+import { DiscordIcon, GoogleIcon, TwitterIcon } from '@/icons';
 import { headerMixins } from '@/styles/headerMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -59,11 +61,33 @@ export const AccountMenu = () => {
 
   const { evmAddress, walletType, dydxAddress, hdKey } = useAccounts();
 
+  const privy = usePrivy();
+
   const usdcBalance = freeCollateral?.current || 0;
 
   const onRecoverKeys = () => {
     dispatch(openDialog({ type: DialogTypes.Onboarding }));
   };
+
+  let walletIcon;
+  if (onboardingState === OnboardingState.WalletConnected) {
+    walletIcon = <Styled.WarningIcon iconName={IconName.Warning} />;
+  } else if (
+    onboardingState === OnboardingState.AccountConnected &&
+    walletType === WalletType.Privy
+  ) {
+    if (privy?.user?.google) {
+      walletIcon = <Icon iconComponent={GoogleIcon as ElementType} />;
+    } else if (privy?.user?.discord) {
+      walletIcon = <Icon iconComponent={DiscordIcon as ElementType} />;
+    } else if (privy?.user?.twitter) {
+      walletIcon = <Icon iconComponent={TwitterIcon as ElementType} />;
+    } else {
+      walletIcon = <Icon iconComponent={wallets[walletType].icon as ElementType} />;
+    }
+  } else if (walletType) {
+    walletIcon = <Icon iconComponent={wallets[walletType].icon as ElementType} />;
+  }
 
   return onboardingState === OnboardingState.Disconnected ? (
     <OnboardingTriggerButton size={ButtonSize.XSmall} />
@@ -108,7 +132,7 @@ export const AccountMenu = () => {
               </WithTooltip>
             </Styled.AddressRow>
             <Styled.AddressRow>
-              {walletType && (
+              {walletType && walletType !== WalletType.Privy && (
                 <Styled.SourceIcon>
                   <Styled.ConnectorIcon iconName={IconName.AddressConnector} />
                   <Icon iconComponent={wallets[walletType].icon as ElementType} />
@@ -234,11 +258,7 @@ export const AccountMenu = () => {
       align="end"
       sideOffset={16}
     >
-      {onboardingState === OnboardingState.WalletConnected ? (
-        <Styled.WarningIcon iconName={IconName.Warning} />
-      ) : onboardingState === OnboardingState.AccountConnected ? (
-        walletType && <Icon iconComponent={wallets[walletType].icon as ElementType} />
-      ) : null}
+      {walletIcon}
       {!isTablet && <Styled.Address>{truncateAddress(dydxAddress)}</Styled.Address>}
     </Styled.DropdownMenu>
   );

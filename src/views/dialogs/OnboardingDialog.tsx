@@ -65,7 +65,7 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
             description: 'Select your wallet from these supported options.',
             children: (
               <Styled.Content>
-                <ChooseWallet />
+                <ChooseWallet setIsOpen={setIsOpenFromDialog} />
               </Styled.Content>
             ),
           },

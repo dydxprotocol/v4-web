@@ -1,5 +1,7 @@
 import { lazy, Suspense, useMemo } from 'react';
 
+import { PrivyProvider } from '@privy-io/react-auth';
+import { PrivyWagmiConnector } from '@privy-io/wagmi-connector';
 import { GrazProvider } from 'graz';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
@@ -43,7 +45,7 @@ import { NotificationsToastArea } from '@/layout/NotificationsToastArea';
 import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 
 import { parseLocationHash } from '@/lib/urlUtils';
-import { config } from '@/lib/wagmi';
+import { config, configureChainsConfig, privyConfig } from '@/lib/wagmi';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
@@ -140,8 +142,13 @@ const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
 };
 
 const providers = [
+  wrapProvider(PrivyProvider, {
+    appId: import.meta.env.VITE_PRIVY_APP_ID,
+    config: privyConfig,
+  }),
   wrapProvider(QueryClientProvider, { client: queryClient }),
   wrapProvider(GrazProvider),
+  wrapProvider(PrivyWagmiConnector, { wagmiChainsConfig: configureChainsConfig }),
   wrapProvider(WagmiConfig, { config }),
   wrapProvider(LocaleProvider),
   wrapProvider(RestrictionProvider),

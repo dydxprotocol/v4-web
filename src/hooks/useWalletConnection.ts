@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, useMemo } from 'react';
 
+import { usePrivy, useLogout, useLogin } from '@privy-io/react-auth';
 import {
   useSuggestChainAndConnect as useConnectGraz,
   useAccount as useAccountGraz,
@@ -19,7 +20,7 @@ import {
 import { EvmDerivedAddresses } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP, WALLETS_CONFIG_MAP } from '@/constants/networks';
+import { WALLETS_CONFIG_MAP } from '@/constants/networks';
 import {
   type DydxAddress,
   type EvmAddress,
@@ -112,6 +113,15 @@ export const useWalletConnection = () => {
     key: LocalStorageKey.EvmDerivedAddresses,
     defaultValue: {} as EvmDerivedAddresses,
   });
+  const { ready, authenticated } = usePrivy();
+  const { login } = useLogin({
+    onError: (error) => {
+      if (error !== 'exited_auth_flow') {
+        setSelectedWalletError('Privy login failed');
+      }
+    },
+  });
+  const { logout } = useLogout();
 
   const connectWallet = useCallback(
     async ({
@@ -130,6 +140,10 @@ export const useWalletConnection = () => {
       try {
         if (!walletConnection) {
           throw new Error('Onboarding: No wallet connection found.');
+        } else if (walletConnection.type === WalletConnectionType.Privy) {
+          if (!isConnectedWagmi && ready && !authenticated) {
+            login();
+          }
         } else if (walletConnection.type === WalletConnectionType.CosmosSigner) {
           const cosmosWalletType = {
             [WalletType.Keplr as string]: CosmosWalletType.KEPLR,
@@ -142,7 +156,7 @@ export const useWalletConnection = () => {
           }
 
           if (!isConnectedGraz) {
-            await connectGraz({
+            connectGraz({
               chainInfo: DYDX_CHAIN_INFO,
               walletType: cosmosWalletType,
             });
@@ -178,7 +192,7 @@ export const useWalletConnection = () => {
         walletConnectionType: walletConnection?.type,
       };
     },
-    [isConnectedGraz, signerGraz, isConnectedWagmi, signerWagmi]
+    [isConnectedGraz, signerGraz, isConnectedWagmi, signerWagmi, ready, authenticated, login]
   );
 
   const disconnectWallet = useCallback(async () => {
@@ -187,12 +201,21 @@ export const useWalletConnection = () => {
 
     if (isConnectedWagmi) await disconnectWagmi();
     if (isConnectedGraz) await disconnectGraz();
+    if (authenticated) await logout();
   }, [isConnectedGraz, isConnectedWagmi]);
 
   // Wallet selection
 
   const [selectedWalletType, setSelectedWalletType] = useState<WalletType | undefined>(walletType);
   const [selectedWalletError, setSelectedWalletError] = useState<string>();
+
+  async function disconnectSelectedWallet() {
+    setSelectedWalletType(undefined);
+    setWalletType(undefined);
+    setWalletConnectionType(undefined);
+
+    await disconnectWallet();
+  }
 
   useEffect(() => {
     (async () => {
@@ -221,10 +244,7 @@ export const useWalletConnection = () => {
           }
         }
       } else {
-        setWalletType(undefined);
-        setWalletConnectionType(undefined);
-
-        await disconnectWallet();
+        await disconnectSelectedWallet();
       }
     })();
   }, [selectedWalletType, signerWagmi, signerGraz, evmDerivedAddresses, evmAddress]);

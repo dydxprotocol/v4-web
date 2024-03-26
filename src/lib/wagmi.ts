@@ -1,5 +1,6 @@
 // Custom connectors
 import type { ExternalProvider } from '@ethersproject/providers';
+import type { PrivyClientConfig } from '@privy-io/react-auth';
 import {
   arbitrum,
   arbitrumGoerli,
@@ -39,6 +40,8 @@ import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import { publicProvider } from 'wagmi/providers/public';
 
+import { LocalStorageKey } from '@/constants/localStorage';
+import { DEFAULT_APP_ENVIRONMENT, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import {
   type WalletConnection,
   WalletConnectionType,
@@ -49,6 +52,8 @@ import {
 } from '@/constants/wallets';
 
 import { isTruthy } from './isTruthy';
+import { getLocalStorage } from './localStorage';
+import { validateAgainstAvailableEnvironments } from './network';
 
 // Config
 
@@ -84,7 +89,26 @@ export const WAGMI_SUPPORTED_CHAINS: Chain[] = [
   kava,
 ];
 
-const { chains, publicClient, webSocketPublicClient } = configureChains(
+const defaultSelectedNetwork = getLocalStorage({
+  key: LocalStorageKey.SelectedNetwork,
+  defaultValue: DEFAULT_APP_ENVIRONMENT,
+  validateFn: validateAgainstAvailableEnvironments,
+});
+const defaultChainId = Number(ENVIRONMENT_CONFIG_MAP[defaultSelectedNetwork].ethereumChainId);
+
+export const privyConfig: PrivyClientConfig = {
+  embeddedWallets: {
+    createOnLogin: 'users-without-wallets',
+    requireUserPasswordOnCreate: false,
+    noPromptOnSignature: true,
+  },
+  appearance: {
+    theme: '#28283c',
+  },
+  defaultChain: defaultChainId === mainnet.id ? mainnet : sepolia,
+};
+
+export const configureChainsConfig = configureChains(
   WAGMI_SUPPORTED_CHAINS,
   [
     import.meta.env.VITE_ALCHEMY_API_KEY &&
@@ -95,6 +119,7 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
     publicProvider(),
   ].filter(isTruthy)
 );
+const { chains, publicClient, webSocketPublicClient } = configureChainsConfig;
 
 const injectedConnectorOptions = {
   chains,
