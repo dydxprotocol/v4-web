@@ -18,7 +18,6 @@ import { useSelector } from 'react-redux';
 import type { ConnectNetworkEvent, NetworkConfig } from '@/constants/abacus';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { type Candle, RESOLUTION_MAP } from '@/constants/candles';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
 
@@ -134,6 +133,16 @@ const useDydxClientContext = () => {
     } catch (error) {
       log('useDydxClient/getPerpetualMarkets', error);
       return [];
+    }
+  };
+
+  const getMarketTickSize = async (marketId: string) => {
+    try {
+      const { markets } = (await indexerClient.markets.getPerpetualMarkets(marketId)) || {};
+      console.log({ markets });
+      return markets?.[marketId]?.tickSize;
+    } catch (error) {
+      log('useDydxClient/getMarketTickSize', error);
     }
   };
 
@@ -278,6 +287,7 @@ const useDydxClientContext = () => {
     requestAllPerpetualMarkets,
     requestAllGovernanceProposals,
     getCandlesForDatafeed,
+    getMarketTickSize,
     getPerpetualMarketSparklines,
     screenAddresses,
     getWithdrawalAndTransferGatingStatus,
