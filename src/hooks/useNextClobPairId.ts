@@ -23,7 +23,6 @@ export const useNextClobPairId = () => {
     useDydxClient();
 
   const { data: perpetualMarkets, status: perpetualMarketsStatus } = useQuery({
-    enabled: true,
     queryKey: 'requestAllPerpetualMarkets',
     queryFn: requestAllPerpetualMarkets,
     refetchInterval: 60_000,
