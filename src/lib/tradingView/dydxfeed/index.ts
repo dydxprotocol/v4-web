@@ -18,7 +18,7 @@ import { useDydxClient } from '@/hooks';
 
 import { RootStore } from '@/state/_store';
 import { setCandles } from '@/state/perpetuals';
-import { getCurrentMarketId, getPerpetualBarsForPriceChart } from '@/state/perpetualsSelectors';
+import { getMarketConfig, getPerpetualBarsForPriceChart } from '@/state/perpetualsSelectors';
 
 import { log } from '../../telemetry';
 import { getSymbol, getHistorySlice, mapCandle } from '../utils';
@@ -46,10 +46,11 @@ const configurationData: DatafeedConfiguration = {
 
 export const getDydxDatafeed = (
   store: RootStore,
-  getCandlesForDatafeed: ReturnType<typeof useDydxClient>['getCandlesForDatafeed']
+  getCandlesForDatafeed: ReturnType<typeof useDydxClient>['getCandlesForDatafeed'],
+  initialPriceScale: number
 ) => ({
   onReady: (callback: OnReadyCallback) => {
-    setTimeout(() => callback(configurationData));
+    callback(configurationData);
   },
 
   searchSymbols: (
@@ -66,9 +67,10 @@ export const getDydxDatafeed = (
     onSymbolResolvedCallback: ResolveCallback,
     onResolveErrorCallback: ErrorCallback
   ) => {
-    const marketId = getCurrentMarketId(store.getState());
-    const symbolItem = getSymbol(marketId || DEFAULT_MARKETID);
-    const pricescale = 100;
+    const symbolItem = getSymbol(symbolName || DEFAULT_MARKETID);
+    const { tickSizeDecimals } = getMarketConfig(symbolItem.symbol)(store.getState()) || {};
+
+    const pricescale = tickSizeDecimals ? 10 ** tickSizeDecimals : initialPriceScale;
 
     const symbolInfo: LibrarySymbolInfo = {
       ticker: symbolItem.full_name,
@@ -92,7 +94,7 @@ export const getDydxDatafeed = (
       format: 'price',
     };
 
-    setTimeout(() => onSymbolResolvedCallback(symbolInfo), 0);
+    onSymbolResolvedCallback(symbolInfo);
   },
 
   getBars: async (

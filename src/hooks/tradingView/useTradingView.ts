@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
+import BigNumber from 'bignumber.js';
 import isEmpty from 'lodash/isEmpty';
 import { LanguageCode, ResolutionString, widget } from 'public/tradingview/charting_library';
-import { useSelector } from 'react-redux';
+import { shallowEqual, useSelector } from 'react-redux';
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { LocalStorageKey } from '@/constants/localStorage';
@@ -38,9 +39,11 @@ export const useTradingView = ({
   const appColorMode = useSelector(getAppColorMode);
 
   const marketId = useSelector(getCurrentMarketId);
+  const marketIds = useSelector(getMarketIds, shallowEqual);
   const selectedLocale = useSelector(getSelectedLocale);
   const selectedNetwork = useSelector(getSelectedNetwork);
-  const { getCandlesForDatafeed } = useDydxClient();
+
+  const { getCandlesForDatafeed, getMarketTickSize } = useDydxClient();
 
   const [savedTvChartConfig, setTvChartConfig] = useLocalStorage<object | undefined>({
     key: LocalStorageKey.TradingViewChartConfig,
@@ -48,6 +51,21 @@ export const useTradingView = ({
   });
 
   const savedResolution = getSavedResolution({ savedConfig: savedTvChartConfig });
+  const hasMarkets = marketIds.length > 0;
+
+  const [initialPriceScale, setInitialPriceScale] = useState(100);
+
+  useEffect(() => {
+    (async () => {
+      if (marketId && !hasMarkets) {
+        const marketTickSize = await getMarketTickSize(marketId);
+        const priceScale = BigNumber(10).exponentiatedBy(
+          BigNumber(marketTickSize).decimalPlaces() ?? 2
+        );
+        setInitialPriceScale(priceScale.toNumber());
+      }
+    })();
+  }, [marketId!!, hasMarkets]);
 
   useEffect(() => {
     const widgetOptions = getWidgetOptions();
@@ -55,7 +73,7 @@ export const useTradingView = ({
     const options = {
       ...widgetOptions,
       ...widgetOverrides,
-      datafeed: getDydxDatafeed(store, getCandlesForDatafeed),
+      datafeed: getDydxDatafeed(store, getCandlesForDatafeed, initialPriceScale),
       interval: (savedResolution || DEFAULT_RESOLUTION) as ResolutionString,
       locale: SUPPORTED_LOCALE_BASE_TAGS[selectedLocale] as LanguageCode,
       symbol: marketId,
@@ -93,7 +111,7 @@ export const useTradingView = ({
       tvWidgetRef.current = null;
       setIsChartReady(false);
     };
-  }, [selectedLocale, selectedNetwork]);
+  }, [selectedLocale, selectedNetwork, initialPriceScale]);
 
   return { savedResolution };
 };
