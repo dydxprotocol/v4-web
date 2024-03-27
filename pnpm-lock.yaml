@@ -30,8 +30,8 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: ^1.6.12
-    version: 1.6.12
+    specifier: ^1.6.17
+    version: 1.6.17
   '@dydxprotocol/v4-client-js':
     specifier: ^1.0.25
     version: 1.0.26
@@ -1562,8 +1562,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.6.12:
-    resolution: {integrity: sha512-sb9HODI0Sjk8WKXVK+1fWiWhWStII7DVDeDquE6xCqmJhViT/TpXUGF4DA4fkc56X2eGEpEgbz0uX+NW+lZD0Q==}
+  /@dydxprotocol/v4-abacus@1.6.17:
+    resolution: {integrity: sha512-QYUI8m45LreNBVK570CWu/vwCUV+LG2/sEyC6J6ur83ETdMKqKduiDh/8azNdUxOKxOrwI+p2GjDUvWdRI1low==}
     dev: false
 
   /@dydxprotocol/v4-client-js@1.0.26:
@@ -10117,7 +10117,7 @@ packages:
     resolution: {integrity: sha512-WIdaQ8uW1vIbYvNnAVunkC6yxTrneJC7VQ5UUQ0kuw8b0C0A39KTIpoQHCfc8tV7o9vF4niwRhdXEdfAgQEsQQ==}
     dependencies:
       cosmos-directory-types: 0.0.6
-      node-fetch-native: 1.6.2
+      node-fetch-native: 1.6.4
     dev: false
 
   /cosmos-directory-types@0.0.6:
@@ -15291,6 +15291,10 @@ packages:
 
   /node-fetch-native@1.6.2:
     resolution: {integrity: sha512-69mtXOFZ6hSkYiXAVB5SqaRvrbITC/NPyqv7yuu/qw0nmgPyYbIMYYNIDhNtwPrzk0ptrimrLz/hhjvm4w5Z+w==}
+    dev: false
+
+  /node-fetch-native@1.6.4:
+    resolution: {integrity: sha512-IhOigYzAKHd244OC0JIMIUrjzctirCmPkaIfhDeGcEETWof5zKYUW7e7MYvChGWh/4CJeXEgsRyGzuF334rOOQ==}
     dev: false
 
   /node-fetch@2.6.12:
