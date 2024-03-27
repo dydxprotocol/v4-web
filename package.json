@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "pnpm run build:generate-entry-points && tsc && vite build",
+    "build": "tsc && vite build",
     "build:inject-app-deeplinks": "sh scripts/inject-app-deeplinks.sh",
     "build:inject-amplitude": "node scripts/inject-amplitude.js",
     "build:inject-bugsnag": "node scripts/inject-bugsnag.js",
