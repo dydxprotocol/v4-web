@@ -18,6 +18,7 @@ import {
   DEFAULT_TOAST_AUTO_CLOSE_MS,
   TransferNotificationTypes,
   ReleaseUpdateNotificationIds,
+  GovernanceUpdateNotificationIds,
 } from '@/constants/notifications';
 import { AppRoute, TokenRoute } from '@/constants/routes';
 import { DydxChainAsset } from '@/constants/wallets';
@@ -32,7 +33,11 @@ import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotifi
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 
-import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
+import {
+  getOpenPositionFromId,
+  getSubaccountFills,
+  getSubaccountOrders,
+} from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
@@ -316,6 +321,38 @@ export const notificationTypes: NotificationTypeConfig[] = [
           navigate(`${chainTokenLabel}/${TokenRoute.TradingRewards}`);
         } else if (notificationId === ReleaseUpdateNotificationIds.IncentivesDistributedS2) {
           navigate(`${chainTokenLabel}/${TokenRoute.StakingRewards}`);
+        }
+      };
+    },
+  },
+  {
+    type: NotificationType.GovernanceUpdate,
+    useTrigger: ({ trigger }) => {
+      const wooPositions = useSelector(getOpenPositionFromId('WOO-USD'), shallowEqual);
+
+      useEffect(() => {
+        const expirationDate = new Date('2024-03-08T23:59:59');
+        const currentDate = new Date();
+
+        if (currentDate <= expirationDate) {
+          trigger(
+            GovernanceUpdateNotificationIds.WooLiquidityTierUpdate,
+            {
+              icon: <AssetIcon symbol="WOO" />,
+              title: 'Proposal to update WOO-USD',
+              body: 'The community has launched a proposal to update the liquidity tier of WOO-USD has been submitted. Vote now or click to view how it affects you.',
+              toastSensitivity: 'foreground',
+              groupKey: GovernanceUpdateNotificationIds.WooLiquidityTierUpdate,
+            },
+            []
+          );
+        }
+      }, [!!wooPositions]);
+    },
+    useNotificationAction: () => {
+      return (notificationId: string) => {
+        if (notificationId === GovernanceUpdateNotificationIds.WooLiquidityTierUpdate) {
+          globalThis.open();
         }
       };
     },

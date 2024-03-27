@@ -3,9 +3,10 @@ import { StatusResponse } from '@0xsquid/sdk';
 /** implemented in useNotificationTypes */
 export enum NotificationType {
   AbacusGenerated = 'AbacusGenerated',
-  SquidTransfer = 'SquidTransfer',
-  ReleaseUpdates = 'ReleaseUpdates',
   ApiError = 'ApiError',
+  GovernanceUpdate = 'GovernanceUpdate',
+  ReleaseUpdates = 'ReleaseUpdates',
+  SquidTransfer = 'SquidTransfer',
 }
 
 export const SingleSessionNotificationTypes = [
@@ -161,6 +162,10 @@ export type TransferNotifcation = {
 export enum ReleaseUpdateNotificationIds {
   IncentivesS3 = 'incentives-s3',
   IncentivesDistributedS2 = 'incentives-distributed-s2',
+}
+
+export enum GovernanceUpdateNotificationIds {
+  WooLiquidityTierUpdate = 'woo-liquidity-tier-update',
 }
 
 /**
