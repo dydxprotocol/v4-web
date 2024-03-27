@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 
+import { shallowEqual, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { Nullable } from '@/constants/abacus';
-import { TriggerOrder } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 
@@ -17,12 +16,14 @@ import { FormInput } from '@/components/FormInput';
 import { Tag } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { getTriggerOrdersInputs } from '@/state/inputsSelectors';
+
 import { isConditionalLimitOrderType } from '@/lib/orders';
 
 type ElementProps = {
-  stopLossOrder?: Nullable<TriggerOrder>;
-  takeProfitOrder?: Nullable<TriggerOrder>;
   tickSizeDecimals?: number;
+  multipleTakeProfitOrders: boolean;
+  multipleStopLossOrders: boolean;
 };
 
 type StyleProps = {
@@ -30,12 +31,15 @@ type StyleProps = {
 };
 
 export const LimitPriceInputs = ({
-  stopLossOrder,
-  takeProfitOrder,
   tickSizeDecimals,
+  multipleTakeProfitOrders, // xcxc maybe pull this up into state
+  multipleStopLossOrders,
   className,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
+
+  const { stopLossOrder, takeProfitOrder } =
+    useSelector(getTriggerOrdersInputs, shallowEqual) || {};
 
   const [shouldShowLimitPrice, setShouldShowLimitPrice] = useState(false);
 
@@ -48,12 +52,16 @@ export const LimitPriceInputs = ({
     );
   }, [stopLossOrder, takeProfitOrder]); // xcxc this might break if you're updating the order type
 
-  const onCheckLimit = (checked: boolean) => {
-    if (!checked) {
-      // should signify it is a market order now
+  const onCheckLimit = (newChecked: boolean) => {
+    if (!newChecked) {
+      // xcxc should signify it is a market order now
+      // should look at both orders and update the type 
     }
-    setShouldShowLimitPrice(checked);
+    // we don't want to update types here if checked, not until they type
+    setShouldShowLimitPrice(newChecked);
   };
+
+  console.log('xcxc', stopLossOrder, takeProfitOrder);
 
   return (
     <>
@@ -71,36 +79,40 @@ export const LimitPriceInputs = ({
       >
         {
           <Styled.InputsRow>
-            <FormInput
-              id="TP-limit"
-              decimals={tickSizeDecimals ?? USD_DECIMALS}
-              value={
-                isConditionalLimitOrderType(takeProfitOrder?.type)
-                  ? takeProfitOrder?.price?.limitPrice
-                  : null
-              }
-              label={
-                <>
-                  {stringGetter({ key: STRING_KEYS.TP_LIMIT })}
-                  <Tag>USD</Tag>
-                </>
-              }
-            />
-            <FormInput
-              id="SL-limit"
-              decimals={tickSizeDecimals ?? USD_DECIMALS}
-              value={
-                isConditionalLimitOrderType(stopLossOrder?.type)
-                  ? stopLossOrder?.price?.limitPrice
-                  : null
-              }
-              label={
-                <>
-                  {stringGetter({ key: STRING_KEYS.SL_LIMIT })}
-                  <Tag>USD</Tag>
-                </>
-              }
-            />
+            {!multipleTakeProfitOrders && (
+              <FormInput
+                id="TP-limit"
+                decimals={tickSizeDecimals ?? USD_DECIMALS}
+                value={
+                  isConditionalLimitOrderType(takeProfitOrder?.type)
+                    ? takeProfitOrder?.price?.limitPrice
+                    : null
+                }
+                label={
+                  <>
+                    {stringGetter({ key: STRING_KEYS.TP_LIMIT })}
+                    <Tag>USD</Tag>
+                  </>
+                }
+              />
+            )}
+            {!multipleStopLossOrders && (
+              <FormInput
+                id="SL-limit"
+                decimals={tickSizeDecimals ?? USD_DECIMALS}
+                value={
+                  isConditionalLimitOrderType(stopLossOrder?.type)
+                    ? stopLossOrder?.price?.limitPrice
+                    : null
+                }
+                label={
+                  <>
+                    {stringGetter({ key: STRING_KEYS.SL_LIMIT })}
+                    <Tag>USD</Tag>
+                  </>
+                }
+              />
+            )}
           </Styled.InputsRow>
         }
       </Collapsible>

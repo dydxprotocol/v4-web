@@ -20,7 +20,7 @@ export interface InputsState {
   tradeFormInputs: TradeFormInputs;
   tradeInputs?: Nullable<TradeInputs>;
   closePositionInputs?: Nullable<ClosePositionInputs>;
-  triggerInputs: Nullable<TriggerOrdersInputs>;
+  triggerOrdersInputs: Nullable<TriggerOrdersInputs>;
   transferInputs?: Nullable<TransferInputs>;
 }
 
@@ -33,7 +33,7 @@ const initialState: InputsState = {
   },
   tradeInputs: undefined,
   transferInputs: undefined,
-  triggerInputs: undefined,
+  triggerOrdersInputs: undefined,
 };
 
 export const inputsSlice = createSlice({
@@ -49,7 +49,7 @@ export const inputsSlice = createSlice({
         current: current?.rawValue,
         inputErrors: errors?.toArray(),
         tradeInputs: trade,
-        triggerInputs: triggerOrders,
+        triggerOrdersInputs: triggerOrders,
         closePositionInputs: closePosition,
         transferInputs: {
           ...transfer,

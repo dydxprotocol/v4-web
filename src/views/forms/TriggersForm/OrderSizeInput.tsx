@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
+import { shallowEqual, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { TriggerOrder } from '@/constants/abacus';
-import { Nullable } from '@/constants/abacus';
+import { TriggerOrdersInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { TOKEN_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter } from '@/hooks';
 
@@ -15,12 +16,16 @@ import { InputType } from '@/components/Input';
 import { Tag } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { getTriggerOrdersInputs } from '@/state/inputsSelectors';
+
+import abacusStateManager from '@/lib/abacus';
+import { MustBigNumber } from '@/lib/numbers';
+
 import { OrderSizeSlider } from './OrderSizeSlider';
 
 type ElementProps = {
   symbol: string;
-  stopLossOrder?: Nullable<TriggerOrder>;
-  takeProfitOrder?: Nullable<TriggerOrder>;
+  positionSize?: number;
   stepSizeDecimals?: number;
 };
 
@@ -30,12 +35,20 @@ type StyleProps = {
 
 export const OrderSizeInput = ({
   symbol,
-  stopLossOrder,
-  takeProfitOrder,
+  positionSize,
   stepSizeDecimals,
   className,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
+
+  const { size } = useSelector(getTriggerOrdersInputs, shallowEqual) || {};
+  const sizeBN = MustBigNumber(size);
+  const sizeInputNumber = sizeBN.toFixed(stepSizeDecimals || TOKEN_DECIMALS);
+
+  console.log('Xcxc2', size, sizeInputNumber);
+
+  const { stopLossOrder, takeProfitOrder } =
+    useSelector(getTriggerOrdersInputs, shallowEqual) || {};
 
   const [shouldShowCustomAmount, setShouldShowCustomAmount] = useState(false);
 
@@ -43,6 +56,23 @@ export const OrderSizeInput = ({
     const notFullAmount = false;
     setShouldShowCustomAmount(notFullAmount);
   }, [stopLossOrder, takeProfitOrder]); // xcxc this might break if you're updating the order type
+
+  const onSizeInput = ({
+    floatValue,
+    formattedValue,
+  }: {
+    floatValue?: number;
+    formattedValue: string;
+  }) => {
+    const newSize = floatValue && positionSize ? Math.min(floatValue, positionSize) : null;
+    abacusStateManager.setTriggerOrdersValue({
+      value:
+        formattedValue === ''
+          ? null
+          : MustBigNumber(newSize).toFixed(stepSizeDecimals || TOKEN_DECIMALS),
+      field: TriggerOrdersInputField.size,
+    });
+  };
 
   return (
     <Collapsible
@@ -58,8 +88,17 @@ export const OrderSizeInput = ({
     >
       {/* TODO: CT-625 Update with values from abacus */}
       <Styled.SizeInputRow>
-        <Styled.OrderSizeSlider className={className} stepSizeDecimals={stepSizeDecimals} />
-        <FormInput type={InputType.Number} slotRight={<Tag>{symbol}</Tag>} />
+        <Styled.OrderSizeSlider
+          className={className}
+          positionSize={positionSize}
+          stepSizeDecimals={stepSizeDecimals}
+        />
+        <FormInput
+          type={InputType.Number}
+          value={sizeInputNumber}
+          slotRight={<Tag>{symbol}</Tag>}
+          onInput={onSizeInput}
+        />
       </Styled.SizeInputRow>
     </Collapsible>
   );

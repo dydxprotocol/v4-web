@@ -1,7 +1,6 @@
+import { shallowEqual, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { TriggerOrder } from '@/constants/abacus';
-import { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks';
@@ -10,13 +9,17 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { HorizontalSeparatorFiller } from '@/components/Separator';
 
+import { getTriggerOrdersInputs } from '@/state/inputsSelectors';
+
 import { LimitPriceInputs } from './LimitPriceInputs';
 import { OrderSizeInput } from './OrderSizeInput';
 
 type ElementProps = {
   symbol: string;
-  stopLossOrder?: Nullable<TriggerOrder>;
-  takeProfitOrder?: Nullable<TriggerOrder>;
+  positionSize?: number;
+  multipleTakeProfitOrders: boolean;
+  multipleStopLossOrders: boolean;
+  differingOrderSizes: boolean;
   stepSizeDecimals?: number;
   tickSizeDecimals?: number;
 };
@@ -27,8 +30,10 @@ type StyleProps = {
 
 export const AdvancedTriggersOptions = ({
   symbol,
-  stopLossOrder,
-  takeProfitOrder,
+  positionSize,
+  multipleTakeProfitOrders,
+  multipleStopLossOrders,
+  differingOrderSizes,
   stepSizeDecimals,
   tickSizeDecimals,
   className,
@@ -42,18 +47,19 @@ export const AdvancedTriggersOptions = ({
         <HorizontalSeparatorFiller />
       </Styled.Header>
       <Styled.Content>
-        <OrderSizeInput
-          className={className}
-          symbol={symbol}
-          stepSizeDecimals={stepSizeDecimals}
-          stopLossOrder={stopLossOrder}
-          takeProfitOrder={takeProfitOrder}
-        />
+        {!differingOrderSizes && (
+          <OrderSizeInput
+            className={className}
+            symbol={symbol}
+            positionSize={positionSize}
+            stepSizeDecimals={stepSizeDecimals}
+          />
+        )}
         <LimitPriceInputs
           className={className}
+          multipleTakeProfitOrders={multipleTakeProfitOrders}
+          multipleStopLossOrders={multipleStopLossOrders}
           tickSizeDecimals={tickSizeDecimals}
-          stopLossOrder={stopLossOrder}
-          takeProfitOrder={takeProfitOrder}
         />
       </Styled.Content>
     </Styled.Container>

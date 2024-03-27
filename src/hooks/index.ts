@@ -27,6 +27,7 @@ import { useStringGetter } from './useStringGetter';
 import { useSubaccount } from './useSubaccount';
 import { useTokenConfigs } from './useTokenConfigs';
 import { useTradeFormInputs } from './useTradeFormInputs';
+import { useTriggerOrdersFormInputs } from './useTriggerOrdersFormInputs';
 import { useURLConfigs } from './useURLConfigs';
 import { useWithdrawalInfo } from './useWithdrawalInfo';
 
@@ -60,6 +61,7 @@ export {
   useStringGetter,
   useSubaccount,
   useTradeFormInputs,
+  useTriggerOrdersFormInputs,
   useURLConfigs,
   useWithdrawalInfo,
 };

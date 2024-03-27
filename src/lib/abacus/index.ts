@@ -175,17 +175,14 @@ class AbacusStateManager {
   clearTriggerOrdersInputValues = () => {
     this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.size });
 
-    this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.stopLossOrderType });
+    this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.stopLossOrderId });
     this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.stopLossPrice });
     this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.stopLossLimitPrice });
     this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.stopLossPercentDiff });
     this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.stopLossUsdcDiff });
-    this.setTriggerOrdersValue({
-      value: null,
-      field: TriggerOrdersInputField.stopLossPriceDiffInput,
-    });
+    // xcxc do we need to clear the type of order?
 
-    this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.takeProfitOrderType });
+    this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.takeProfitOrderId });
     this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.takeProfitPrice });
     this.setTriggerOrdersValue({
       value: null,
@@ -196,10 +193,7 @@ class AbacusStateManager {
       field: TriggerOrdersInputField.takeProfitPercentDiff,
     });
     this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.takeProfitUsdcDiff });
-    this.setTriggerOrdersValue({
-      value: null,
-      field: TriggerOrdersInputField.takeProfitPriceDiffInput,
-    });
+    // xcxc do we need to clear the type of order?
   };
 
   resetInputState = () => {
@@ -209,7 +203,7 @@ class AbacusStateManager {
       value: null,
     });
     this.clearTradeInputValues();
-    this.clearTriggerOrdersInputValues();
+    this.clearTriggerOrdersInputValues(); // xcxc do we need to clear here?
   };
 
   // ------ Set Data ------ //

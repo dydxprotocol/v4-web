@@ -5,7 +5,7 @@ import styled, { AnyStyledComponent } from 'styled-components';
 
 import {
   type TriggerOrdersInputPrice,
-  type TriggerOrder,
+  type TriggerOrdersTriggerOrder,
   Nullable,
   type SubaccountOrder,
   TriggerOrdersInputs,
@@ -39,7 +39,6 @@ type ElementProps = {
     price: string;
     output: string;
   };
-  // orders: SubaccountOrder[];
   tickSizeDecimals?: number;
   onViewOrdersClick: () => void;
 
@@ -55,7 +54,6 @@ export const TriggerOrderInputs = ({
   symbol,
   tooltipId,
   stringKeys,
-  // orders,
   tickSizeDecimals,
   onViewOrdersClick,
   onTriggerPriceChange,

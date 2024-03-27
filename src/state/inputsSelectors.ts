@@ -85,7 +85,7 @@ export const getTransferInputs = (state: RootState) => state.inputs.transferInpu
  * @param state
  * @returns TriggerOrdersInputs
  */
-export const getTriggerOrdersInputs = (state: RootState) => state.inputs.triggerInputs;
+export const getTriggerOrdersInputs = (state: RootState) => state.inputs.triggerOrdersInputs;
 
 /**
  * @param state
