@@ -87,6 +87,38 @@ Set environment variables via `.env`.
 - `STATUS_PAGE_SCRIPT_URI` (optional): Used for enabling the status page; used with `pnpm run build:inject-statuspage`.
 - `SMARTBANNER_APP_NAME`, `SMARTBANNER_ORG_NAME`, `SMARTBANNER_ICON_URL`, `SMARTBANNER_APPSTORE_URL` (optional): Used for enabling the smart app banner; used with `pnpm run build:inject-smartbanner`.
 
+## Part 5: Configure entry points
+
+### HTML files
+
+Edit `scripts/generate-entry-points.js` and set up entry points according to your SEO needs. At least one entry point must be configured,
+i.e. at least one element must be present in the `ENTRY_POINTS` array. This array consists of objects of the form: 
+
+```
+{
+    title: 'Page title',
+    description: 'Page description.',
+    fileName: 'HTML entry point file name, e.g.: index.html',
+},
+```
+
+The build script will traverse these entries and create files in `entry-points` directory, modifying the `template.html` file accordingly
+for each entry. The `rollupOptions` config option in `vite.config.ts` informs the framework about the location of all the entry points
+created above.
+
+### Rewrite rules
+
+Edit `vercel.json` and configure the `rewrites` configuration option. It is an array of objects of the form:
+
+```
+    {
+      "source": "Regexp for matching the URL path, e.g.: /portfolio(/?.*)",
+      "destination": "Entry point file to use, e.g.: /entry-points/portfolio.html"
+    },
+```
+
+Note: The first matching rule takes precedence over anything defined afterwards in the array.
+
 # Testing
 
 ## Unit testing

@@ -1,3 +1,9 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "buildCommand": "pnpm run build:generate-entry-points && vite build --mode staging && pnpm run build:inject-app-deeplinks",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/entry-points/index.html"
+    }
+  ]
 }
