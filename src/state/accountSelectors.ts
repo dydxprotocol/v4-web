@@ -145,11 +145,15 @@ export const getSubaccountOpenStatusOrders = createSelector([getSubaccountOrders
 export const getSubaccountOpenStatusOrdersBySideAndPrice = createSelector(
   [getSubaccountOpenStatusOrders],
   (openOrders = []) => {
-    const ordersBySide: Partial<Record<OrderSide, Record<number, SubaccountOrder>>> = {};
+    const ordersBySide: Partial<Record<OrderSide, Record<number, SubaccountOrder[]>>> = {};
     openOrders.forEach((order) => {
       const side = ORDER_SIDES[order.side.name];
       const byPrice = (ordersBySide[side] ??= {});
-      byPrice[order.price] = order;
+      if (byPrice[order.price]) {
+        byPrice[order.price].push(order);
+      } else {
+        byPrice[order.price] = [order];
+      }
     });
     return ordersBySide;
   }

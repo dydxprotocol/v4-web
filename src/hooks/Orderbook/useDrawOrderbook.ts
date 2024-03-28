@@ -295,45 +295,24 @@ export const useDrawOrderbook = ({
     // Animate row removal and update
     const mapOfOrderbookPriceLevels =
       side && currentOrderbookMap?.[side === 'ask' ? 'asks' : 'bids'];
-    const empty: number[] = [];
-    const removed: number[] = [];
-    const updated: number[] = [];
-    const unchanged: number[] = [];
 
     prevData.current.forEach((row, idx) => {
-      if (!row) {
-        empty.push(idx);
-        return;
-      }
+      if (!row) return;
 
       let animationType = OrderbookRowAnimationType.NEW;
 
       if (mapOfOrderbookPriceLevels?.[row.price] === 0) {
-        removed.push(idx);
         animationType = OrderbookRowAnimationType.REMOVE;
       } else if (mapOfOrderbookPriceLevels?.[row.price] === row.size) {
-        unchanged.push(idx);
         animationType = OrderbookRowAnimationType.NONE;
-      } else {
-        updated.push(idx);
       }
 
       drawOrderbookRow({ ctx, idx, rowToRender: row, animationType });
     });
 
     setTimeout(() => {
-      [...empty, ...removed, ...updated, ...unchanged].forEach((idx) => {
-        const { x1, y1, x2, y2 } = getRektFromIdx({
-          idx,
-          rowHeight,
-          canvasWidth,
-          canvasHeight,
-          side,
-        });
-
-        ctx.clearRect(x1, y1, x2 - x1, y2 - y1);
-        drawOrderbookRow({ ctx, idx, rowToRender: data[idx] });
-      });
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      prevData.current.forEach((row, idx) => drawOrderbookRow({ ctx, idx, rowToRender: row }));
     }, ORDERBOOK_ANIMATION_DURATION);
 
     prevData.current = data;

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import _ from 'lodash';
 import { shallowEqual, useSelector } from 'react-redux';
 
 import { type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
@@ -26,7 +27,10 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
           ({
             key: `ask-${idx}`,
             side: 'ask',
-            mine: openOrdersBySideAndPrice[OrderSide.SELL]?.[row.price]?.size,
+            mine: _.sumBy(
+              openOrdersBySideAndPrice[OrderSide.SELL]?.[row.price],
+              (order) => order.price
+            ),
             ...row,
           } as PerpetualMarketOrderbookLevel)
       )
@@ -40,7 +44,10 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
           ({
             key: `bid-${idx}`,
             side: 'bid',
-            mine: openOrdersBySideAndPrice[OrderSide.BUY]?.[row.price]?.size,
+            mine: _.sumBy(
+              openOrdersBySideAndPrice[OrderSide.BUY]?.[row.price],
+              (order) => order.size
+            ),
             ...row,
           } as PerpetualMarketOrderbookLevel)
       )

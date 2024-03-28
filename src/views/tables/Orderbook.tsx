@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import _ from 'lodash';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
 
@@ -60,7 +61,7 @@ const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number 
           ({
             key: `ask-${idx}`,
             side: 'ask',
-            mine: openOrdersBySideAndPrice[OrderSide.SELL]?.[row.price]?.size,
+            mine: _.sumBy(openOrdersBySideAndPrice[OrderSide.SELL]?.[row.price], (row) => row.size),
             ...row,
           } as RowData)
       )
@@ -72,7 +73,7 @@ const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number 
           ({
             key: `bid-${idx}`,
             side: 'bid',
-            mine: openOrdersBySideAndPrice[OrderSide.BUY]?.[row.price]?.size,
+            mine: _.sumBy(openOrdersBySideAndPrice[OrderSide.BUY]?.[row.price], (row) => row.size),
             ...row,
           } as RowData)
       )
