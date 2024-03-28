@@ -31,7 +31,7 @@ dependencies:
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
     specifier: ^1.6.17
-    version: 1.6.17
+    version: 1.6.19
   '@dydxprotocol/v4-client-js':
     specifier: ^1.0.25
     version: 1.0.26
@@ -403,6 +403,9 @@ devDependencies:
   prettier:
     specifier: ^2.8.8
     version: 2.8.8
+  rollup-plugin-sourcemaps:
+    specifier: ^0.6.3
+    version: 0.6.3(@types/node@20.3.1)(rollup@2.79.1)
   ts-node:
     specifier: ^10.9.2
     version: 10.9.2(@types/node@20.3.1)(typescript@5.1.3)
@@ -426,7 +429,7 @@ devDependencies:
     version: 0.4.0(vite@4.3.9)
   vite-plugin-svgr:
     specifier: ^3.2.0
-    version: 3.2.0(vite@4.3.9)
+    version: 3.2.0(rollup@2.79.1)(vite@4.3.9)
   vitest:
     specifier: ^0.32.2
     version: 0.32.2(webdriverio@8.33.1)
@@ -1562,8 +1565,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.6.17:
-    resolution: {integrity: sha512-QYUI8m45LreNBVK570CWu/vwCUV+LG2/sEyC6J6ur83ETdMKqKduiDh/8azNdUxOKxOrwI+p2GjDUvWdRI1low==}
+  /@dydxprotocol/v4-abacus@1.6.19:
+    resolution: {integrity: sha512-IYqUfs3t0X1ikymYe92nLEpvZFdninRmrfU6kAMT1p9T/sjjCV4bLrsPbaZJxm6rzebxY37Ryd8KIqr/KeNQnw==}
     dev: false
 
   /@dydxprotocol/v4-client-js@1.0.26:
@@ -5920,7 +5923,19 @@ packages:
     engines: {node: '>=14'}
     dev: false
 
-  /@rollup/pluginutils@5.0.3:
+  /@rollup/pluginutils@3.1.0(rollup@2.79.1):
+    resolution: {integrity: sha512-GksZ6pr6TpIjHm8h9lSQ8pi8BE9VeubNT0OMJ3B5uZJ8pz73NPiqOtCog/x2/QzM1ENChPKxMDhiQuRHsqc+lg==}
+    engines: {node: '>= 8.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0
+    dependencies:
+      '@types/estree': 0.0.39
+      estree-walker: 1.0.1
+      picomatch: 2.3.1
+      rollup: 2.79.1
+    dev: true
+
+  /@rollup/pluginutils@5.0.3(rollup@2.79.1):
     resolution: {integrity: sha512-hfllNN4a80rwNQ9QCxhxuHCGHMAvabXqxNdaChUSSadMre7t4iEUI6fFAhBOn/eIYTgYVhBv7vCLsAJ4u3lf3g==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -5932,6 +5947,7 @@ packages:
       '@types/estree': 1.0.1
       estree-walker: 2.0.2
       picomatch: 2.3.1
+      rollup: 2.79.1
     dev: true
 
   /@rollup/rollup-android-arm-eabi@4.9.6:
@@ -6825,6 +6841,10 @@ packages:
     resolution: {integrity: sha512-3qvGd0z8F2ENTGr/GG1yViqfiKmRfrXVx5sJyHGFu3z7m5g5utCQtGp/g29JnjflhtQJBv1WDQukHiT58xPcYQ==}
     dependencies:
       '@types/estree': 1.0.5
+    dev: true
+
+  /@types/estree@0.0.39:
+    resolution: {integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==}
     dev: true
 
   /@types/estree@1.0.1:
@@ -9079,6 +9099,12 @@ packages:
   /asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
+  /atob@2.1.2:
+    resolution: {integrity: sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==}
+    engines: {node: '>= 4.5.0'}
+    hasBin: true
+    dev: true
+
   /atomic-sleep@1.0.0:
     resolution: {integrity: sha512-kNOjDqAh7px0XWNI+4QbzoiR/nTkHAWNud2uvnJquD1/x5a7EQZMJT0AczqK0Qn67oY/TTQ1LbUKajZpp3I9tQ==}
     engines: {node: '>=8.0.0'}
@@ -10410,7 +10436,6 @@ packages:
   /decode-uri-component@0.2.2:
     resolution: {integrity: sha512-FqUYQ+8o158GyGTrMFJms9qh3CqTKvAqgqsTnkLI8sKu0028orqBhxNMFkFen0zGyg6epACD32pjVk58ngIErQ==}
     engines: {node: '>=0.10'}
-    dev: false
 
   /decode-uri-component@0.4.1:
     resolution: {integrity: sha512-+8VxcR21HhTy8nOt6jf20w0c9CADrw1O8d+VZ/YzzCt4bJ3uBjw+D1q2osAB8RnpwwaeYBxy0HyKQxD5JBMuuQ==}
@@ -11502,6 +11527,10 @@ packages:
     dependencies:
       '@types/estree-jsx': 1.0.0
       '@types/unist': 3.0.2
+    dev: true
+
+  /estree-walker@1.0.1:
+    resolution: {integrity: sha512-1fMXF3YP4pZZVozF8j/ZLfvnR8NSIljt56UhbZ5PeeDmmGHpgpdwQt7ITlGvYaQukCvuBRMLEiKiYC+oeIg4cg==}
     dev: true
 
   /estree-walker@2.0.2:
@@ -15289,10 +15318,6 @@ packages:
     engines: {node: '>=10.5.0'}
     dev: true
 
-  /node-fetch-native@1.6.2:
-    resolution: {integrity: sha512-69mtXOFZ6hSkYiXAVB5SqaRvrbITC/NPyqv7yuu/qw0nmgPyYbIMYYNIDhNtwPrzk0ptrimrLz/hhjvm4w5Z+w==}
-    dev: false
-
   /node-fetch-native@1.6.4:
     resolution: {integrity: sha512-IhOigYzAKHd244OC0JIMIUrjzctirCmPkaIfhDeGcEETWof5zKYUW7e7MYvChGWh/4CJeXEgsRyGzuF334rOOQ==}
     dev: false
@@ -15484,7 +15509,7 @@ packages:
     resolution: {integrity: sha512-s1ZCMmQWXy4b5K/TW9i/DtiN8Ku+xCiHcjQ6/J/nDdssirrQNOoB165Zu8EqLMA2lln1JUth9a0aW9Ap2ctrUg==}
     dependencies:
       destr: 2.0.2
-      node-fetch-native: 1.6.2
+      node-fetch-native: 1.6.4
       ufo: 1.3.2
     dev: false
 
@@ -16874,6 +16899,30 @@ packages:
       inherits: 2.0.4
     dev: false
 
+  /rollup-plugin-sourcemaps@0.6.3(@types/node@20.3.1)(rollup@2.79.1):
+    resolution: {integrity: sha512-paFu+nT1xvuO1tPFYXGe+XnQvg4Hjqv/eIhG8i5EspfYYPBKL57X7iVbfv55aNVASg3dzWvES9dmWsL2KhfByw==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      '@types/node': '>=10.0.0'
+      rollup: '>=0.31.2'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+    dependencies:
+      '@rollup/pluginutils': 3.1.0(rollup@2.79.1)
+      '@types/node': 20.3.1
+      rollup: 2.79.1
+      source-map-resolve: 0.6.0
+    dev: true
+
+  /rollup@2.79.1:
+    resolution: {integrity: sha512-uKxbd0IhMZOhjAiD5oAFp7BqvkA4Dv47qpOCtaNvng4HBwdbWtdOh8f5nZNuk2rp51PMGk3bzfWu5oayNEuYnw==}
+    engines: {node: '>=10.0.0'}
+    hasBin: true
+    optionalDependencies:
+      fsevents: 2.3.3
+    dev: true
+
   /rollup@3.28.0:
     resolution: {integrity: sha512-d7zhvo1OUY2SXSM6pfNjgD5+d0Nz87CUp4mt8l/GgVP3oBsPwzNvSzyu1me6BSG9JIgWNTVcafIXBIyM8yQ3yw==}
     engines: {node: '>=14.18.0', npm: '>=8.0.0'}
@@ -17200,6 +17249,14 @@ packages:
   /source-map-js@1.0.2:
     resolution: {integrity: sha512-R0XvVJ9WusLiqTCEiGCmICCMplcCkIwwR11mOSD9CR5u+IXYdiseeEuXCVAjS54zqwkLcPNnmU4OeJ6tUrWhDw==}
     engines: {node: '>=0.10.0'}
+    dev: true
+
+  /source-map-resolve@0.6.0:
+    resolution: {integrity: sha512-KXBr9d/fO/bWo97NXsPIAW1bFSBOuCnjbNTBMO7N59hsv5i9yzRDfcYwwt0l04+VqnKC+EwzvJZIP/qkuMgR/w==}
+    deprecated: See https://github.com/lydell/source-map-resolve#deprecated
+    dependencies:
+      atob: 2.1.2
+      decode-uri-component: 0.2.2
     dev: true
 
   /source-map-support@0.5.21:
@@ -18040,7 +18097,7 @@ packages:
       consola: 3.2.3
       defu: 6.1.3
       mime: 3.0.0
-      node-fetch-native: 1.6.2
+      node-fetch-native: 1.6.4
       pathe: 1.1.1
     dev: false
 
@@ -18191,7 +18248,7 @@ packages:
       listhen: 1.5.5
       lru-cache: 10.1.0
       mri: 1.2.0
-      node-fetch-native: 1.6.2
+      node-fetch-native: 1.6.4
       ofetch: 1.3.3
       ufo: 1.3.2
     transitivePeerDependencies:
@@ -18510,12 +18567,12 @@ packages:
       vite: 4.3.9(@types/node@20.3.1)
     dev: true
 
-  /vite-plugin-svgr@3.2.0(vite@4.3.9):
+  /vite-plugin-svgr@3.2.0(rollup@2.79.1)(vite@4.3.9):
     resolution: {integrity: sha512-Uvq6niTvhqJU6ga78qLKBFJSDvxWhOnyfQSoKpDPMAGxJPo5S3+9hyjExE5YDj6Lpa4uaLkGc1cBgxXov+LjSw==}
     peerDependencies:
       vite: ^2.6.0 || 3 || 4
     dependencies:
-      '@rollup/pluginutils': 5.0.3
+      '@rollup/pluginutils': 5.0.3(rollup@2.79.1)
       '@svgr/core': 7.0.0
       '@svgr/plugin-jsx': 7.0.0
       vite: 4.3.9(@types/node@20.3.1)
