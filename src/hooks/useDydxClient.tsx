@@ -139,7 +139,6 @@ const useDydxClientContext = () => {
   const getMarketTickSize = async (marketId: string) => {
     try {
       const { markets } = (await indexerClient.markets.getPerpetualMarkets(marketId)) || {};
-      console.log({ markets });
       return markets?.[marketId]?.tickSize;
     } catch (error) {
       log('useDydxClient/getMarketTickSize', error);
