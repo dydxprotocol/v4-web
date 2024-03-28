@@ -1,5 +1,6 @@
 import { useCallback, useContext, createContext, useEffect, useState, useMemo } from 'react';
 
+import { OfflineSigner } from '@cosmjs/proto-signing';
 import { NOBLE_BECH32_PREFIX, LocalWallet, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { AES, enc } from 'crypto-js';
 import { useDispatch } from 'react-redux';
@@ -27,7 +28,6 @@ import { useDydxClient } from './useDydxClient';
 import { useLocalStorage } from './useLocalStorage';
 import { useRestrictions } from './useRestrictions';
 import { useWalletConnection } from './useWalletConnection';
-import { OfflineSigner } from '@cosmjs/proto-signing';
 
 const AccountsContext = createContext<ReturnType<typeof useAccountsContext> | undefined>(undefined);
 
@@ -136,29 +136,24 @@ const useAccountsContext = () => {
   };
 
   // dYdXClient Onboarding & Account Helpers
-  const { compositeClient, getWalletFromEvmSignature } = useDydxClient();
+  const { indexerClient, getWalletFromEvmSignature } = useDydxClient();
   // dYdX subaccounts
   const [dydxSubaccounts, setDydxSubaccounts] = useState<Subaccount[] | undefined>();
 
-  const { getSubaccounts } = useMemo(
-    () => ({
-      getSubaccounts: async ({ dydxAddress }: { dydxAddress: DydxAddress }) => {
-        try {
-          const response = await compositeClient?.indexerClient.account.getSubaccounts(dydxAddress);
-          setDydxSubaccounts(response?.subaccounts);
-          return response?.subaccounts ?? [];
-        } catch (error) {
-          // 404 is expected if the user has no subaccounts
-          if (error.status === 404) {
-            return [];
-          } else {
-            throw error;
-          }
-        }
-      },
-    }),
-    [compositeClient]
-  );
+  const getSubaccounts = async ({ dydxAddress }: { dydxAddress: DydxAddress }) => {
+    try {
+      const response = await indexerClient.account.getSubaccounts(dydxAddress);
+      setDydxSubaccounts(response?.subaccounts);
+      return response?.subaccounts ?? [];
+    } catch (error) {
+      // 404 is expected if the user has no subaccounts
+      if (error.status === 404) {
+        return [];
+      } else {
+        throw error;
+      }
+    }
+  };
 
   // dYdX wallet / onboarding state
   const [localDydxWallet, setLocalDydxWallet] = useState<LocalWallet>();

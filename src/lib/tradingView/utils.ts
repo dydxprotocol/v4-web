@@ -24,14 +24,13 @@ export const mapCandle = ({
   volume: Math.ceil(Number(baseTokenVolume)),
 });
 
-export const getAllSymbols = (marketIds: string[]): TradingViewSymbol[] =>
-  marketIds.map((marketId) => ({
-    description: marketId,
-    exchange: 'dYdX',
-    full_name: marketId,
-    symbol: marketId,
-    type: 'crypto',
-  }));
+export const getSymbol = (marketId: string): TradingViewSymbol => ({
+  description: marketId,
+  exchange: 'dYdX',
+  full_name: marketId,
+  symbol: marketId,
+  type: 'crypto',
+});
 
 export const getHistorySlice = ({
   bars,
