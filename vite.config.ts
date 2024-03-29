@@ -1,3 +1,4 @@
+import fs from 'fs';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { defineConfig } from 'vite';
@@ -76,5 +77,10 @@ export default defineConfig(({ mode }) => ({
       '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
       '**/e2e/**',
     ],
+  },
+  build: {
+    rollupOptions: {
+      input: fs.readdirSync('entry-points').map(file => `/entry-points/${file}`)
+    },
   },
 }));
