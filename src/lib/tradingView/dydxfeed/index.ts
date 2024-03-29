@@ -50,7 +50,7 @@ export const getDydxDatafeed = (
   initialPriceScale: number
 ) => ({
   onReady: (callback: OnReadyCallback) => {
-    callback(configurationData);
+    setTimeout(() => callback(configurationData), 0);
   },
 
   searchSymbols: (
@@ -94,7 +94,7 @@ export const getDydxDatafeed = (
       format: 'price',
     };
 
-    onSymbolResolvedCallback(symbolInfo);
+    setTimeout(() => onSymbolResolvedCallback(symbolInfo), 0);
   },
 
   getBars: async (
