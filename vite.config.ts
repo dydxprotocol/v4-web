@@ -3,11 +3,17 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import svgr from 'vite-plugin-svgr';
 import ViteRestart from 'vite-plugin-restart';
+import sourcemaps from 'rollup-plugin-sourcemaps';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   define: {
     'process.env': {},
+  },
+  rollupOptions: {
+    // Needed for Abacus sourcemaps since Rollup doesn't load external sourcemaps by default.
+    // https://github.com/vitejs/vite/issues/11743
+    plugins: mode === 'development' ? [sourcemaps()] : []
   },
   resolve: {
     alias: [
