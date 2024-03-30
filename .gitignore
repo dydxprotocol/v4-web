@@ -15,6 +15,9 @@ dist-ssr
 *.key
 .env
 
+index.html
+entry_points/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
