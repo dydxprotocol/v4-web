@@ -10,7 +10,8 @@ import { AppRoute } from '@/constants/routes';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
-import { closeDialogInTradeBox } from '@/state/dialogs';
+import { closeDialogInTradeBox, openDialogInTradeBox } from '@/state/dialogs';
+import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { setCurrentMarketId } from '@/state/perpetuals';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
@@ -24,6 +25,7 @@ export const useCurrentMarketId = () => {
   const selectedNetwork = useSelector(getSelectedNetwork);
   const marketIds = useSelector(getMarketIds, shallowEqual);
   const hasMarketIds = marketIds.length > 0;
+  const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog, shallowEqual);
 
   const [lastViewedMarket, setLastViewedMarket] = useLocalStorage({
     key: LocalStorageKey.LastViewedMarket,
@@ -60,6 +62,10 @@ export const useCurrentMarketId = () => {
         setLastViewedMarket(marketId);
         dispatch(setCurrentMarketId(marketId));
         dispatch(closeDialogInTradeBox());
+        if (activeTradeBoxDialog) {
+          // Reopen active trade box dialog with cleared values
+          dispatch(openDialogInTradeBox(activeTradeBoxDialog));
+        }
       }
     }
   }, [hasMarketIds, marketId]);

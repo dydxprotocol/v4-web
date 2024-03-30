@@ -55,7 +55,8 @@ export const Overview = () => {
                   PositionsTableColumnKey.RealizedPnl,
                   PositionsTableColumnKey.AverageOpenAndClose,
                   shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-                  shouldRenderActions && PositionsTableColumnKey.Actions,
+                  // TODO: CT-503 re-enable when close positions dialog is created
+                  // shouldRenderActions && PositionsTableColumnKey.Actions,
                 ].filter(isTruthy)
           }
           currentRoute={AppRoute.Portfolio}
