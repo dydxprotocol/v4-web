@@ -90,19 +90,17 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     showCurrentMarket ? numOpenOrders : numTotalOpenOrders
   );
 
-  const showCurrentMarketForPosition = isTablet || (!testFlags.closePositionsFromPositionsTable && view === PanelView.CurrentMarket)
-
   const tabItems = useMemo(
     () => [
       {
         value: InfoSection.Position,
         label: stringGetter({
-          key: showCurrentMarketForPosition ? STRING_KEYS.POSITION : STRING_KEYS.POSITIONS,
+          key: isTablet ? STRING_KEYS.POSITION : STRING_KEYS.POSITIONS,
         }),
 
-        tag: showCurrentMarketForPosition ? null : shortenNumberForDisplay(numTotalPositions),
+        tag: isTablet ? null : shortenNumberForDisplay(numTotalPositions),
 
-        content: showCurrentMarketForPosition ? (
+        content: isTablet ? (
           <PositionInfo showNarrowVariation={isTablet} />
         ) : (
           <PositionsTable

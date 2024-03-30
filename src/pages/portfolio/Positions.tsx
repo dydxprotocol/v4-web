@@ -11,7 +11,6 @@ import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
 import {
-  calculateShouldRenderActionsInPositionsTable,
   calculateShouldRenderTriggersInPositionsTable,
 } from '@/state/accountCalculators';
 
@@ -24,7 +23,8 @@ export const Positions = () => {
   const navigate = useNavigate();
 
   const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
-  const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable);
+  // TODO: CT-503
+  // const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable);
 
   return (
     <AttachedExpandingSection>

@@ -81,8 +81,7 @@ export const PositionsActionsCell = ({
           isDisabled={isDisabled}
         />
       )}
-      {testFlags.closePositionsFromPositionsTable && (
-        <Styled.CloseButtonToggle
+      {<Styled.CloseButtonToggle
           key="closepositions"
           isToggle={true}
           isPressed={
@@ -93,7 +92,7 @@ export const PositionsActionsCell = ({
           shape={ButtonShape.Square}
           isDisabled={isDisabled}
         />
-      )}
+      }
     </ActionsTableCell>
   );
 };
