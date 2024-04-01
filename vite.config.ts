@@ -1,10 +1,17 @@
-import fs from 'fs';
 import react from '@vitejs/plugin-react';
+import fs from 'fs';
 import path from 'path';
-import { defineConfig } from 'vite';
-import svgr from 'vite-plugin-svgr';
-import ViteRestart from 'vite-plugin-restart';
 import sourcemaps from 'rollup-plugin-sourcemaps';
+import { defineConfig } from 'vite';
+import ViteRestart from 'vite-plugin-restart';
+import svgr from 'vite-plugin-svgr';
+
+const entryPointsDir = path.join(__dirname, 'entry-points');
+const entryPointsExist = fs.existsSync(entryPointsDir);
+
+const entryPoints = entryPointsExist
+  ? fs.readdirSync(entryPointsDir).map((file) => `/entry-points/${file}`)
+  : [];
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -14,7 +21,7 @@ export default defineConfig(({ mode }) => ({
   rollupOptions: {
     // Needed for Abacus sourcemaps since Rollup doesn't load external sourcemaps by default.
     // https://github.com/vitejs/vite/issues/11743
-    plugins: mode === 'development' ? [sourcemaps()] : []
+    plugins: mode === 'development' ? [sourcemaps()] : [],
   },
   resolve: {
     alias: [
@@ -62,10 +69,8 @@ export default defineConfig(({ mode }) => ({
     // Workaround is to use ViteRestart plugin + a generated file to trigger the restart.
     // See https://github.com/vitejs/vite/issues/8619
     ViteRestart({
-      restart: [
-        'local-abacus-hash',
-      ]
-    })
+      restart: ['local-abacus-hash'],
+    }),
   ],
   publicDir: 'public',
   test: {
@@ -80,7 +85,7 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     rollupOptions: {
-      input: fs.readdirSync('entry-points').map(file => `/entry-points/${file}`)
+      input: entryPoints,
     },
   },
 }));
