@@ -95,10 +95,10 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
       {
         value: InfoSection.Position,
         label: stringGetter({
-          key: isTablet ? STRING_KEYS.POSITION : STRING_KEYS.POSITIONS,
+          key: showCurrentMarket ? STRING_KEYS.POSITION : STRING_KEYS.POSITIONS,
         }),
 
-        tag: isTablet ? null : shortenNumberForDisplay(numTotalPositions),
+        tag: showCurrentMarket ? null : shortenNumberForDisplay(numTotalPositions),
 
         content: isTablet ? (
           <PositionInfo showNarrowVariation={isTablet} />
