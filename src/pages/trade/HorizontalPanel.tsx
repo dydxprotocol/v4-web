@@ -104,6 +104,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
           <PositionInfo showNarrowVariation={isTablet} />
         ) : (
           <PositionsTable
+            currentMarket={showCurrentMarket ? currentMarketId : undefined}
             columnKeys={
               isTablet
                 ? [

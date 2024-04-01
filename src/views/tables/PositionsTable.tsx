@@ -31,7 +31,11 @@ import { TableCell } from '@/components/Table/TableCell';
 import { TagSize } from '@/components/Tag';
 
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-import { getExistingOpenPositions, getSubaccountOpenOrders } from '@/state/accountSelectors';
+import {
+  getCurrentMarketPositionData,
+  getExistingOpenPositions,
+  getSubaccountOpenOrders,
+} from '@/state/accountSelectors';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
@@ -333,6 +337,7 @@ type ElementProps = {
   columnKeys: PositionsTableColumnKey[];
   columnWidths?: Partial<Record<PositionsTableColumnKey, ColumnSize>>;
   currentRoute?: string;
+  currentMarket?: string;
   onNavigate?: () => void;
   navigateToOrders: (market: string) => void;
 };
@@ -346,6 +351,7 @@ export const PositionsTable = ({
   columnKeys,
   columnWidths,
   currentRoute,
+  currentMarket,
   onNavigate,
   navigateToOrders,
   withGradientCardRows,
@@ -357,8 +363,12 @@ export const PositionsTable = ({
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
   const perpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
   const assets = useSelector(getAssets, shallowEqual) || {};
-  const openPositions = useSelector(getExistingOpenPositions, shallowEqual) || [];
   const openOrders = useSelector(getSubaccountOpenOrders, shallowEqual) || [];
+
+  const openPositions = useSelector(getExistingOpenPositions, shallowEqual) || [];
+  const positions = currentMarket
+    ? openPositions.filter((position) => position.id == currentMarket)
+    : openPositions;
 
   const stopLossOrders: SubaccountOrder[] = [];
   const takeProfitOrders: SubaccountOrder[] = [];
@@ -371,7 +381,7 @@ export const PositionsTable = ({
     }
   });
 
-  const positionsData = openPositions.map((position: SubaccountPosition) => ({
+  const positionsData = positions.map((position: SubaccountPosition) => ({
     tickSizeDecimals: perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
     asset: assets?.[position.assetId],
     oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
@@ -382,7 +392,7 @@ export const PositionsTable = ({
 
   return (
     <Styled.Table
-      key="positions"
+      key={currentMarket ?? 'positions'}
       label="Positions"
       defaultSortDescriptor={{
         column: 'market',
@@ -399,12 +409,16 @@ export const PositionsTable = ({
         })
       )}
       getRowKey={(row: PositionTableRow) => row.id}
-      onRowAction={(market: string) => {
-        navigate(`${AppRoute.Trade}/${market}`, {
-          state: { from: currentRoute },
-        });
-        onNavigate?.();
-      }}
+      onRowAction={
+        currentMarket
+          ? null
+          : (market: string) => {
+              navigate(`${AppRoute.Trade}/${market}`, {
+                state: { from: currentRoute },
+              });
+              onNavigate?.();
+            }
+      }
       getRowAttributes={(row: PositionTableRow) => ({
         'data-side': row.side.current,
       })}

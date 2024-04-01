@@ -8,7 +8,6 @@ import { NumberSign, USD_DECIMALS } from '@/constants/numbers';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
 
-import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
@@ -63,7 +62,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
   const currentMarketAssetData = useSelector(getCurrentMarketAssetData, shallowEqual);
   const currentMarketConfigs = useSelector(getCurrentMarketConfig, shallowEqual);
   const activeDialog = useSelector(getActiveDialog, shallowEqual);
-  const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog, shallowEqual);
+  const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog);
   const currentMarketPosition = useSelector(getCurrentMarketPositionData, shallowEqual);
   const isLoading = useSelector(calculateIsAccountLoading);
 

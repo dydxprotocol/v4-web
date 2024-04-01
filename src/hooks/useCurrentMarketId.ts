@@ -25,7 +25,7 @@ export const useCurrentMarketId = () => {
   const selectedNetwork = useSelector(getSelectedNetwork);
   const marketIds = useSelector(getMarketIds, shallowEqual);
   const hasMarketIds = marketIds.length > 0;
-  const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog, shallowEqual);
+  const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog);
 
   const [lastViewedMarket, setLastViewedMarket] = useLocalStorage({
     key: LocalStorageKey.LastViewedMarket,

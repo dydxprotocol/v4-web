@@ -1,4 +1,4 @@
-import { useDispatch, useSelector, shallowEqual } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled, { AnyStyledComponent } from 'styled-components';
 
@@ -39,7 +39,7 @@ export const PositionsActionsCell = ({
   const navigate = useNavigate();
 
   const currentMarketId = useSelector(getCurrentMarketId);
-  const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog, shallowEqual);
+  const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog);
   const { type: tradeBoxDialogType } = activeTradeBoxDialog || {};
 
   const onCloseButtonToggle = (isPressed: boolean) => {
@@ -81,18 +81,17 @@ export const PositionsActionsCell = ({
           isDisabled={isDisabled}
         />
       )}
-      {<Styled.CloseButtonToggle
-          key="closepositions"
-          isToggle={true}
-          isPressed={
-            tradeBoxDialogType === TradeBoxDialogTypes.ClosePosition && currentMarketId === marketId
-          }
-          onPressedChange={onCloseButtonToggle}
-          iconName={IconName.Close}
-          shape={ButtonShape.Square}
-          isDisabled={isDisabled}
-        />
-      }
+      <Styled.CloseButtonToggle
+        key="closepositions"
+        isToggle={true}
+        isPressed={
+          tradeBoxDialogType === TradeBoxDialogTypes.ClosePosition && currentMarketId === marketId
+        }
+        onPressedChange={onCloseButtonToggle}
+        iconName={IconName.Close}
+        shape={ButtonShape.Square}
+        isDisabled={isDisabled}
+      />
     </ActionsTableCell>
   );
 };
