@@ -53,7 +53,7 @@ export const useTradingView = ({
   const savedResolution = getSavedResolution({ savedConfig: savedTvChartConfig });
   const hasMarkets = marketIds.length > 0;
 
-  const [initialPriceScale, setInitialPriceScale] = useState(100);
+  const [initialPriceScale, setInitialPriceScale] = useState<number | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -68,7 +68,7 @@ export const useTradingView = ({
   }, [marketId!!, hasMarkets]);
 
   useEffect(() => {
-    if (marketId) {
+    if (marketId && initialPriceScale !== null) {
       const widgetOptions = getWidgetOptions();
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
       const options = {
@@ -113,7 +113,7 @@ export const useTradingView = ({
       tvWidgetRef.current = null;
       setIsChartReady(false);
     };
-  }, [selectedLocale, selectedNetwork, initialPriceScale, marketId!!]);
+  }, [selectedLocale, selectedNetwork, initialPriceScale, !!marketId]);
 
   return { savedResolution };
 };
