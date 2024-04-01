@@ -80,12 +80,6 @@ export const DepositButtonAndReceipt = ({
     }
   };
 
-  useEffect(() => {
-    if (!isConnectedWagmi && canAccountTrade) {
-      connectWagmi();
-    }
-  }, [isConnectedWagmi, canAccountTrade]);
-
   const {
     matchNetwork: switchNetwork,
     isSwitchingNetwork,
@@ -283,7 +277,9 @@ export const DepositButtonAndReceipt = ({
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
       ) : !isConnectedWagmi ? (
-        <Button action={ButtonAction.Primary} onClick={connectWallet} state={{ isLoading: true }} />
+        <Button action={ButtonAction.Primary} onClick={connectWagmi}>
+          {stringGetter({ key: STRING_KEYS.RECONNECT_WALLET })}
+        </Button>
       ) : !isMatchingNetwork ? (
         <Button
           action={ButtonAction.Primary}
