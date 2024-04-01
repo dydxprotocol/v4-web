@@ -129,50 +129,44 @@ export const PositionsTriggersCell = ({
 
     if (orders.length === 1) {
       const order = orders[0];
-      const { price, size, triggerPrice, timeInForce, type } = order;
+      const { size, triggerPrice } = order;
 
-      const shouldRenderValue =
-        timeInForce?.name === TimeInForceOptions.IOC &&
-        (isMarketOrderType(type) || price === triggerPrice);
+      const isPartialPosition = !!(positionSize && Math.abs(size) < Math.abs(positionSize));
+      const liquidationWarningSide = showLiquidationWarning(order) ? positionSide : undefined;
 
-      if (shouldRenderValue) {
-        const isPartialPosition = !!(positionSize && Math.abs(size) < Math.abs(positionSize));
-        const liquidationWarningSide = showLiquidationWarning(order) ? positionSide : undefined;
-
-        return (
-          <>
-            {triggerLabel({ liquidationWarningSide })}
-            <Styled.Output type={OutputType.Fiat} value={triggerPrice} />
-            {isPartialPosition && (
-              <WithHovercard
-                align="end"
-                side="top"
-                hovercard={
-                  isStopLossOrder(order) ? 'partial-close-stop-loss' : 'partial-close-take-profit'
-                }
-                slotButton={
-                  <Button
-                    action={ButtonAction.Primary}
-                    size={ButtonSize.Small}
-                    onClick={openTriggersDialog}
-                  >
-                    {stringGetter({
-                      key: isStopLossOrder(order)
-                        ? STRING_KEYS.EDIT_STOP_LOSS
-                        : STRING_KEYS.EDIT_STOP_LOSS, // TODO: CT-704 update to EDIT_TAKE_PROFIT
-                    })}
-                  </Button>
-                }
-                slotTrigger={
-                  <Styled.PartialFillIcon>
-                    <Icon iconName={IconName.PositionPartial} />
-                  </Styled.PartialFillIcon>
-                }
-              />
-            )}
-          </>
-        );
-      }
+      return (
+        <>
+          {triggerLabel({ liquidationWarningSide })}
+          <Styled.Output type={OutputType.Fiat} value={triggerPrice} />
+          {isPartialPosition && (
+            <WithHovercard
+              align="end"
+              side="top"
+              hovercard={
+                isStopLossOrder(order) ? 'partial-close-stop-loss' : 'partial-close-take-profit'
+              }
+              slotButton={
+                <Button
+                  action={ButtonAction.Primary}
+                  size={ButtonSize.Small}
+                  onClick={openTriggersDialog}
+                >
+                  {stringGetter({
+                    key: isStopLossOrder(order)
+                      ? STRING_KEYS.EDIT_STOP_LOSS
+                      : STRING_KEYS.EDIT_STOP_LOSS, // TODO: CT-704 update to EDIT_TAKE_PROFIT
+                  })}
+                </Button>
+              }
+              slotTrigger={
+                <Styled.PartialFillIcon>
+                  <Icon iconName={IconName.PositionPartial} />
+                </Styled.PartialFillIcon>
+              }
+            />
+          )}
+        </>
+      );
     }
 
     return (
@@ -182,6 +176,7 @@ export const PositionsTriggersCell = ({
       </>
     );
   };
+  
   return (
     <Styled.Cell>
       <Styled.Row>{renderOutput({ label: 'TP', orders: takeProfitOrders })}</Styled.Row>

@@ -9,6 +9,8 @@ import {
   type SubaccountOrder,
   type SubaccountPosition,
   POSITION_SIDES,
+  AbacusPositionSide,
+  AbacusOrderSide,
 } from '@/constants/abacus';
 import { StringGetterFunction, STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
@@ -371,14 +373,21 @@ export const PositionsTable = ({
     }
   });
 
-  const positionsData = openPositions.map((position: SubaccountPosition) => ({
-    tickSizeDecimals: perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
-    asset: assets?.[position.assetId],
-    oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
-    stopLossOrders: stopLossOrders.filter((order) => order.marketId === position.id),
-    takeProfitOrders: takeProfitOrders.filter((order) => order.marketId === position.id),
-    ...position,
-  }));
+  const positionsData = openPositions.map((position: SubaccountPosition) => {
+    const orderSideForConditionalOrder =
+      position.side.current === AbacusPositionSide.LONG
+        ? AbacusOrderSide.sell
+        : AbacusOrderSide.buy;
+        
+    return {
+      tickSizeDecimals: perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
+      asset: assets?.[position.assetId],
+      oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
+      stopLossOrders: stopLossOrders.filter((order) => order.marketId === position.id && order.side === orderSideForConditionalOrder),
+      takeProfitOrders: takeProfitOrders.filter((order) => order.marketId === position.id && order.side === orderSideForConditionalOrder),
+      ...position,
+    };
+  });
 
   return (
     <Styled.Table

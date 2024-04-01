@@ -11,6 +11,8 @@ import { TriggersForm } from '@/views/forms/TriggersForm/TriggersForm';
 
 import { closeDialog } from '@/state/dialogs';
 
+import abacusStateManager from '@/lib/abacus';
+
 type ElementProps = {
   marketId: string;
   assetId: string;
@@ -33,10 +35,15 @@ export const TriggersDialog = ({
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
 
+  const onCloseDialog = () => {
+    abacusStateManager.clearTriggerOrdersInputValues();
+    setIsOpen?.(false);
+  };
+
   return (
     <Dialog
       isOpen
-      setIsOpen={setIsOpen}
+      setIsOpen={(open: boolean) => (open ? setIsOpen?.(true) : onCloseDialog())}
       title={stringGetter({ key: STRING_KEYS.PRICE_TRIGGERS })}
       slotIcon={<AssetIcon symbol={assetId} />}
     >

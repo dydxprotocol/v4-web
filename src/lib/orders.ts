@@ -88,23 +88,21 @@ export const isMarketOrderType = (type?: AbacusOrderTypes) =>
     AbacusOrderType.trailingStop,
   ].some(({ ordinal }) => ordinal === type.ordinal);
 
+export const isLimitOrderType = (type?: AbacusOrderTypes) =>
+  type &&
+  [AbacusOrderType.limit, AbacusOrderType.stopLimit, AbacusOrderType.takeProfitLimit].some(
+    ({ ordinal }) => ordinal === type.ordinal
+  );
+
 export const isStopLossOrder = (order: SubaccountOrder) =>
   [AbacusOrderType.stopLimit, AbacusOrderType.stopMarket].some(
     ({ ordinal }) => ordinal === order.type.ordinal
-  ) &&
-  [AbacusOrderTimeInForce.IOC, AbacusOrderTimeInForce.FOK].some(
-    ({ ordinal }) => ordinal === order.timeInForce?.ordinal
-  ) &&
-  order.reduceOnly;
+  ) && order.reduceOnly;
 
 export const isTakeProfitOrder = (order: SubaccountOrder) =>
   [AbacusOrderType.takeProfitLimit, AbacusOrderType.takeProfitMarket].some(
     ({ ordinal }) => ordinal === order.type.ordinal
-  ) &&
-  [AbacusOrderTimeInForce.IOC, AbacusOrderTimeInForce.FOK].some(
-    ({ ordinal }) => ordinal === order.timeInForce?.ordinal
-  ) &&
-  order.reduceOnly;
+  ) && order.reduceOnly;
 
 export const relativeTimeString = ({
   timeInMs,
