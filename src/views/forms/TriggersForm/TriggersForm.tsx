@@ -22,6 +22,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getPositionDetails } from '@/state/accountSelectors';
 import { closeDialog } from '@/state/dialogs';
 
@@ -47,6 +48,7 @@ export const TriggersForm = ({
   const dispatch = useDispatch();
 
   const { placeTriggerOrders } = useSubaccount();
+  const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
 
   const { asset, entryPrice, size, stepSizeDecimals, tickSizeDecimals, oraclePrice } =
     useSelector(getPositionDetails(marketId)) || {};
@@ -95,7 +97,7 @@ export const TriggersForm = ({
       <Styled.Button
         action={ButtonAction.Primary}
         type={ButtonType.Submit}
-        state={{ isDisabled: hasInputErrors }}
+        state={{ isDisabled: hasInputErrors || isAccountViewOnly }}
         slotLeft={hasInputErrors ? <Styled.WarningIcon iconName={IconName.Warning} /> : undefined}
       >
         {hasInputErrors
@@ -140,7 +142,7 @@ export const TriggersForm = ({
         <>
           <AdvancedTriggersOptions
             symbol={symbol}
-            existsLimitOrder={existsLimitOrder}
+            existsLimitOrder={!!existsLimitOrder}
             size={inputSize}
             positionSize={size?.current ? Math.abs(size?.current) : null}
             differingOrderSizes={differingOrderSizes}
