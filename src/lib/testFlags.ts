@@ -37,8 +37,7 @@ class TestFlags {
   }
 
   get configureSlTpFromPositionsTable() {
-    return true;
-    // return !!this.queryParams.sltp;
+    return !!this.queryParams.sltp;
   }
 
   get isolatedMargin() {
