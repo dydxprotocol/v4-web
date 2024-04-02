@@ -269,8 +269,8 @@ devDependencies:
     specifier: ^19.0.3
     version: 19.0.3
   '@dydxprotocol/v4-proto':
-    specifier: ^3.0.0
-    version: 3.0.0
+    specifier: 5.0.0-dev.0
+    version: 5.0.0-dev.0
   '@ladle/react':
     specifier: ^4.0.2
     version: 4.0.2(@types/node@20.3.1)(@types/react@18.2.14)(react-dom@18.2.0)(react@18.2.0)(typescript@5.1.3)
@@ -1602,17 +1602,10 @@ packages:
     resolution: {integrity: sha512-+bvA+08OrWmnLhgiXVbchou0Gatdw5LcPZn2gQVNwWnhWVuTWJwilNsp+OKES/mXyWxCqHMQNR3+oOt/d8hoKQ==}
     dev: false
 
-  /@dydxprotocol/v4-proto@3.0.0:
-    resolution: {integrity: sha512-G7TVNLigv9VMJ88GK+JJyqWyrf44cG9IEjDiPlBCArC424mYsfSfpfhMUeTcRdoP9TYYRtpR93o9IdwquBGTNw==}
-    dependencies:
-      protobufjs: 6.11.4
-    dev: true
-
   /@dydxprotocol/v4-proto@5.0.0-dev.0:
     resolution: {integrity: sha512-AdwfSF/nWyunEyhJudY1b3tniFLZJDs5XtRZAH9uIw76TYeBaDtuF3NQZhgyFJgWAnrPh2a4YphPTUeaqe1feQ==}
     dependencies:
       protobufjs: 6.11.4
-    dev: false
 
   /@emotion/is-prop-valid@1.2.1:
     resolution: {integrity: sha512-61Mf7Ufx4aDxx1xlDeOm8aFFigGHE4z+0sKCa+IHCeZKiyP9RLD0Mmx7m8b9/Cf37f7NAvQOOJAbQQGVr5uERw==}

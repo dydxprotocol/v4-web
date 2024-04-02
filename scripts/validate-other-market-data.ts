@@ -1,21 +1,16 @@
 /* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable no-plusplus */
-/* eslint-disable no-console */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable no-await-in-loop */
-import Ajv from 'ajv';
-import axios from 'axios';
-import { readFileSync } from 'fs';
 
+/* eslint-disable no-plusplus */
+
+/* eslint-disable no-console */
+
+/* eslint-disable no-restricted-syntax */
+
+/* eslint-disable no-await-in-loop */
 import { EncodeObject } from '@cosmjs/proto-signing';
 import { Account, StdFee } from '@cosmjs/stargate';
-import { BroadcastTxSyncResponse } from '@cosmjs/tendermint-rpc/build/tendermint37';
 import { Method } from '@cosmjs/tendermint-rpc';
-import { MsgVote } from '@dydxprotocol/v4-proto/src/codegen/cosmos/gov/v1/tx';
-import { ClobPair } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/clob/clob_pair';
-import { Perpetual } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
-import { MarketPrice } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/prices/market_price';
-
+import { BroadcastTxSyncResponse } from '@cosmjs/tendermint-rpc/build/tendermint37';
 import {
   CompositeClient,
   LocalWallet as LocalWalletType,
@@ -24,7 +19,16 @@ import {
   TransactionOptions,
   VoteOption,
 } from '@dydxprotocol/v4-client-js';
-
+import { MsgVote } from '@dydxprotocol/v4-proto/src/codegen/cosmos/gov/v1/tx';
+import { ClobPair } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/clob/clob_pair';
+import {
+  Perpetual,
+  PerpetualMarketType,
+} from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
+import { MarketPrice } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/prices/market_price';
+import Ajv from 'ajv';
+import axios from 'axios';
+import { readFileSync } from 'fs';
 import Long from 'long';
 
 const LocalWalletModule = await import(
@@ -90,6 +94,11 @@ interface Proposal {
   title: string;
   summary: string;
   params: Params;
+  meta: {
+    assetName: string;
+    referencePrice: number;
+    marketType: 'PERPETUAL_MARKET_TYPE_ISOLATED' | 'PERPETUAL_MARKET_TYPE_CROSS';
+  };
 }
 
 enum ExchangeName {
@@ -384,6 +393,10 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
             stepBaseQuantums: Long.fromNumber(proposal.params.stepBaseQuantums),
             subticksPerTick: proposal.params.subticksPerTick,
             delayBlocks: proposal.params.delayBlocks,
+            marketType:
+              proposal.meta?.marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
+                ? PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED
+                : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS,
           },
           proposal.title,
           proposal.summary,
