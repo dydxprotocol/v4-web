@@ -61,7 +61,7 @@ export const useTradingView = ({
     // we only need tick size from current market for the price scale settings
     // if markets haven't been loaded via abacus, get the current market info from indexer
     (async () => {
-      if (marketId && !hasMarkets) {
+      if (marketId && !hasPriceScaleInfo) {
         const marketTickSize = await getMarketTickSize(marketId);
         const priceScale = BigNumber(10).exponentiatedBy(
           BigNumber(marketTickSize).decimalPlaces() ?? 2
@@ -69,7 +69,7 @@ export const useTradingView = ({
         setInitialPriceScale(priceScale.toNumber());
       }
     })();
-  }, [!!marketId, hasMarkets]);
+  }, [marketId, hasPriceScaleInfo]);
 
   useEffect(() => {
     if (marketId && hasPriceScaleInfo) {
