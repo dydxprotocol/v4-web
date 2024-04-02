@@ -312,7 +312,7 @@ export const useDrawOrderbook = ({
 
     setTimeout(() => {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      prevData.current.forEach((row, idx) => drawOrderbookRow({ ctx, idx, rowToRender: row }));
+      data.forEach((row, idx) => drawOrderbookRow({ ctx, idx, rowToRender: row }));
     }, ORDERBOOK_ANIMATION_DURATION);
 
     prevData.current = data;
