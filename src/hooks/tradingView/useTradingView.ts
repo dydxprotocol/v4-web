@@ -51,13 +51,17 @@ export const useTradingView = ({
   });
 
   const savedResolution = getSavedResolution({ savedConfig: savedTvChartConfig });
-  const hasMarkets = marketIds.length > 0;
 
   const [initialPriceScale, setInitialPriceScale] = useState<number | null>(null);
 
+  const hasMarkets = marketIds.length > 0;
+  const hasPriceScaleInfo = initialPriceScale !== null || hasMarkets;
+
   useEffect(() => {
+    // we only need tick size from current market for the price scale settings
+    // if markets haven't been loaded via abacus, get the current market info from indexer
     (async () => {
-      if (marketId && !hasMarkets) {
+      if (marketId && !hasPriceScaleInfo) {
         const marketTickSize = await getMarketTickSize(marketId);
         const priceScale = BigNumber(10).exponentiatedBy(
           BigNumber(marketTickSize).decimalPlaces() ?? 2
@@ -65,10 +69,10 @@ export const useTradingView = ({
         setInitialPriceScale(priceScale.toNumber());
       }
     })();
-  }, [marketId!!, hasMarkets]);
+  }, [marketId, hasPriceScaleInfo]);
 
   useEffect(() => {
-    if (marketId && initialPriceScale !== null) {
+    if (marketId && hasPriceScaleInfo) {
       const widgetOptions = getWidgetOptions();
       const widgetOverrides = getWidgetOverrides({ appTheme, appColorMode });
       const options = {
@@ -113,7 +117,7 @@ export const useTradingView = ({
       tvWidgetRef.current = null;
       setIsChartReady(false);
     };
-  }, [selectedLocale, selectedNetwork, initialPriceScale, !!marketId]);
+  }, [selectedLocale, selectedNetwork, !!marketId, hasPriceScaleInfo]);
 
   return { savedResolution };
 };
