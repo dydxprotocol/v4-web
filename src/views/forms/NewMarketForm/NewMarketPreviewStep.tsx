@@ -2,6 +2,7 @@ import { FormEvent, useMemo, useState } from 'react';
 
 import type { IndexedTx } from '@cosmjs/stargate';
 import { encodeJson } from '@dydxprotocol/v4-client-js';
+import { PerpetualMarketType } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
 import Long from 'long';
 import { useDispatch } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
@@ -149,6 +150,10 @@ export const NewMarketPreviewStep = ({
               atomicResolution,
               liquidityTier,
               quantumConversionExponent,
+              marketType:
+                meta.marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
+                  ? PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED
+                  : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS,
               stepBaseQuantums: Long.fromNumber(stepBaseQuantums),
               subticksPerTick,
               delayBlocks: newMarketProposal.delayBlocks,

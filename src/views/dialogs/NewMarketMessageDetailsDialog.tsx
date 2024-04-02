@@ -43,7 +43,7 @@ export const NewMarketMessageDetailsDialog = ({
   setIsOpen,
 }: ElementProps) => {
   const [codeToggleGroup, setCodeToggleGroup] = useState(CodeToggleGroup.CREATE_ORACLE);
-  const { baseAsset, params, title } = assetData ?? {};
+  const { baseAsset, params, title, meta } = assetData ?? {};
   const {
     ticker,
     exchangeConfigJson,
@@ -192,6 +192,11 @@ export const NewMarketMessageDetailsDialog = ({
                       key: 'liquidity_tier',
                       label: 'liquidity_tier',
                       value: liquidityTier,
+                    },
+                    {
+                      key: 'market_type',
+                      label: 'market_type',
+                      value: meta?.marketType ?? 'PERPETUAL_MARKET_TYPE_CROSS',
                     },
                   ]}
                 />

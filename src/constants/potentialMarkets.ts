@@ -27,6 +27,7 @@ export type NewMarketProposal = {
   meta: {
     assetName: string;
     referencePrice: number;
+    marketType: 'PERPETUAL_MARKET_TYPE_ISOLATED' | 'PERPETUAL_MARKET_TYPE_CROSS';
   };
   initial_deposit: {
     denom: string;

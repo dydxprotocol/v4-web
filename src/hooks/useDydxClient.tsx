@@ -260,7 +260,7 @@ const useDydxClientContext = () => {
   }) => indexerClient.markets.getPerpetualMarketSparklines(period);
 
   const getWithdrawalAndTransferGatingStatus = useCallback(async () => {
-    return await compositeClient?.validatorClient.get.GetWithdrawalAndTransferGatingStatus();
+    return await compositeClient?.validatorClient.get.getWithdrawalAndTransferGatingStatus();
   }, [compositeClient]);
 
   const getWithdrawalCapacityByDenom = useCallback(

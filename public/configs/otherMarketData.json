@@ -4348,5 +4348,147 @@
       "assetName": "ZetaChain",
       "referencePrice": 2.0407896082608614
     }
+  },
+  "THETA": {
+    "title": "Add THETA-USD perpetual market",
+    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a THETA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "params": {
+      "id": 1692,
+      "ticker": "THETA-USD",
+      "priceExponent": -9.0,
+      "minPriceChange": 4000,
+      "minExchanges": 1,
+      "exchangeConfigJson": [
+        {
+          "exchangeName": "Binance",
+          "ticker": "THETAUSDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Bybit",
+          "ticker": "THETAUSDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Gate",
+          "ticker": "THETA_USDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Huobi",
+          "ticker": "thetausdt",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Kucoin",
+          "ticker": "THETA-USDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Okx",
+          "ticker": "THETA-USDT",
+          "adjustByMarket": "USDT-USD"
+        }
+      ],
+      "liquidityTier": 2,
+      "atomicResolution": -6.0,
+      "quantumConversionExponent": -9,
+      "defaultFundingPpm": 0,
+      "stepBaseQuantums": 1000000,
+      "subticksPerTick": 1000000,
+      "delayBlocks": 3600
+    },
+    "initialDeposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "meta": {
+      "assetName": "Theta Network",
+      "referencePrice": 2.673191190960826,
+      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED"
+    }
+  },
+  "STETH": {
+    "title": "Add STETH-USD perpetual market",
+    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a STETH-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "params": {
+      "id": 1624,
+      "ticker": "STETH-USD",
+      "priceExponent": -6.0,
+      "minPriceChange": 4000,
+      "minExchanges": 1,
+      "exchangeConfigJson": [
+        {
+          "exchangeName": "Bybit",
+          "ticker": "STETHUSDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Huobi",
+          "ticker": "stethusdt",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Mexc",
+          "ticker": "STETH_USDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Okx",
+          "ticker": "STETH-USDT",
+          "adjustByMarket": "USDT-USD"
+        }
+      ],
+      "liquidityTier": 2,
+      "atomicResolution": -9.0,
+      "quantumConversionExponent": -9,
+      "defaultFundingPpm": 0,
+      "stepBaseQuantums": 1000000,
+      "subticksPerTick": 1000000,
+      "delayBlocks": 3600
+    },
+    "initialDeposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "meta": {
+      "assetName": "Lido Staked ETH",
+      "referencePrice": 3348.4945630719635,
+      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED"
+    }
+  },
+  "DEGEN": {
+    "title": "Add DEGEN-USD perpetual market",
+    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DEGEN-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "params": {
+      "id": 434,
+      "ticker": "DEGEN-USD",
+      "priceExponent": -16.0,
+      "minPriceChange": 4000,
+      "minExchanges": 1,
+      "exchangeConfigJson": [
+        {
+          "exchangeName": "Mexc",
+          "ticker": "DEGEN_USDT",
+          "adjustByMarket": "USDT-USD"
+        }
+      ],
+      "liquidityTier": 2,
+      "atomicResolution": 1.0,
+      "quantumConversionExponent": -9,
+      "defaultFundingPpm": 0,
+      "stepBaseQuantums": 1000000,
+      "subticksPerTick": 1000000,
+      "delayBlocks": 3600
+    },
+    "initialDeposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "meta": {
+      "assetName": "DEGEN Index",
+      "referencePrice": 6.660343656981412e-07,
+      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED"
+    }
   }
 }
