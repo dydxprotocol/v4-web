@@ -1,10 +1,11 @@
-import { useCallback } from 'react';
+import { Dispatch, SetStateAction, useCallback } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
+import { PanelView, InfoSection } from '@/constants/horizontalPanel';
 import { STRING_KEYS, StringKey } from '@/constants/localization';
 import { TradeTypes } from '@/constants/trade';
 
@@ -62,7 +63,12 @@ const useTradeTypeOptions = () => {
   };
 };
 
-export const TradeBoxOrderView = () => {
+type ElementProps = {
+  setTab: Dispatch<SetStateAction<InfoSection>>;
+  setView: Dispatch<SetStateAction<PanelView>>;
+};
+
+export const TradeBoxOrderView = ({ setTab, setView }: ElementProps) => {
   const onTradeTypeChange = useCallback((tradeType?: TradeTypes) => {
     if (tradeType) {
       abacusStateManager.clearTradeInputValues();
@@ -80,7 +86,7 @@ export const TradeBoxOrderView = () => {
       onValueChange={onTradeTypeChange}
       sharedContent={
         <Styled.Container>
-          <TradeForm />
+          <TradeForm setTab={setTab} setView={setView} />
         </Styled.Container>
       }
       fullWidthTabs

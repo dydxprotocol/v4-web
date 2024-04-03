@@ -1,7 +1,10 @@
+import { Dispatch, SetStateAction } from 'react';
+
 import { useDispatch, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { TradeBoxDialogTypes } from '@/constants/dialogs';
+import { PanelView, InfoSection } from '@/constants/horizontalPanel';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks';
@@ -19,7 +22,12 @@ import abacusStateManager from '@/lib/abacus';
 
 import { TradeBoxOrderView } from './TradeBoxOrderView';
 
-export const TradeBox = () => {
+type ElementProps = {
+  setTab: Dispatch<SetStateAction<InfoSection>>;
+  setView: Dispatch<SetStateAction<PanelView>>;
+};
+
+export const TradeBox = ({ setTab, setView }: ElementProps) => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
 
@@ -47,7 +55,7 @@ export const TradeBox = () => {
 
   return (
     <Styled.TradeBox>
-      <TradeBoxOrderView />
+      <TradeBoxOrderView setTab={setTab} setView={setView} />
 
       <Styled.Dialog
         isOpen={!!activeDialog}

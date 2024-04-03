@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import type { ColumnSize } from '@react-types/table';
 import { useSelector, shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -33,12 +31,14 @@ import { TableCell } from '@/components/Table/TableCell';
 import { TagSize } from '@/components/Tag';
 
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-import { getExistingOpenPositions, getSubaccountOpenOrders } from '@/state/accountSelectors';
+import {
+  getExistingOpenPositions,
+  getSubaccountConditionalOrdersForMarket,
+} from '@/state/accountSelectors';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
-import { isStopLossOrder, isTakeProfitOrder } from '@/lib/orders';
 
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
@@ -360,32 +360,23 @@ export const PositionsTable = ({
   const perpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
   const assets = useSelector(getAssets, shallowEqual) || {};
   const openPositions = useSelector(getExistingOpenPositions, shallowEqual) || [];
-  const openOrders = useSelector(getSubaccountOpenOrders, shallowEqual) || [];
 
-  const stopLossOrders: SubaccountOrder[] = [];
-  const takeProfitOrders: SubaccountOrder[] = [];
+  const positionsData = openPositions.map((position: SubaccountPosition) => {
+    const marketId = position.id;
+    const { stopLossOrders, takeProfitOrders } = useSelector(
+      getSubaccountConditionalOrdersForMarket(marketId),
+      shallowEqual
+    );
 
-  openOrders.map((order: SubaccountOrder) => {
-    if (isStopLossOrder(order)) {
-      stopLossOrders.push(order);
-    } else if (isTakeProfitOrder(order)) {
-      takeProfitOrders.push(order);
-    }
+    return {
+      tickSizeDecimals: perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
+      asset: assets?.[position.assetId],
+      oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
+      stopLossOrders,
+      takeProfitOrders,
+      ...position,
+    };
   });
-
-  const positionsData = useMemo(
-    () =>
-      openPositions.map((position: SubaccountPosition) => ({
-        tickSizeDecimals:
-          perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
-        asset: assets?.[position.assetId],
-        oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
-        stopLossOrders: stopLossOrders.filter((order) => order.marketId === position.id),
-        takeProfitOrders: takeProfitOrders.filter((order) => order.marketId === position.id),
-        ...position,
-      })),
-    [openPositions, perpetualMarkets, assets, openOrders]
-  );
 
   return (
     <Styled.Table

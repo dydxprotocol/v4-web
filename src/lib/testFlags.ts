@@ -40,6 +40,10 @@ class TestFlags {
     return !!this.queryParams.sltp;
   }
 
+  get enableConditionalLimitOrders() {
+    return !!this.queryParams.conditionalLimit;
+  }
+
   get isolatedMargin() {
     return !!this.queryParams.isolatedmargin;
   }

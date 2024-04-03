@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
+import { PanelView, InfoSection } from '@/constants/horizontalPanel';
 import { TradeLayouts } from '@/constants/layout';
 
 import {
@@ -20,6 +21,7 @@ import { AccountInfo } from '@/views/AccountInfo';
 import { TradeBox } from '@/views/TradeBox';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
+import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
 import { HorizontalPanel } from './HorizontalPanel';
@@ -40,9 +42,25 @@ const TradePage = () => {
   const canAccountTrade = useSelector(calculateCanAccountTrade);
 
   const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
+  const allMarkets = useSelector(getDefaultToAllMarketsInPositionsOrdersFills);
+  const [view, setView] = useState<PanelView>(
+    allMarkets ? PanelView.AllMarkets : PanelView.CurrentMarket
+  );
+  const [tab, setTab] = useState<InfoSection>(InfoSection.Position);
 
   usePageTitlePriceUpdates();
   useTradeFormInputs();
+
+  const horizontalPanel = (
+    <HorizontalPanel
+      tab={tab}
+      view={view}
+      setTab={setTab}
+      setView={setView}
+      isOpen={isHorizontalPanelOpen}
+      setIsOpen={setIsHorizontalPanelOpen}
+    />
+  );
 
   return isTablet ? (
     <Styled.TradeLayoutMobile>
@@ -53,9 +71,7 @@ const TradePage = () => {
           <MobileTopPanel />
         </DetachedSection>
 
-        <DetachedSection>
-          <HorizontalPanel />
-        </DetachedSection>
+        <DetachedSection>{horizontalPanel}</DetachedSection>
 
         <DetachedSection>
           <MobileBottomPanel />
@@ -76,7 +92,7 @@ const TradePage = () => {
 
       <Styled.SideSection gridArea="Side">
         <AccountInfo />
-        <TradeBox />
+        <TradeBox setTab={setTab} setView={setView} />
       </Styled.SideSection>
 
       <Styled.GridSection gridArea="Vertical">
@@ -87,9 +103,7 @@ const TradePage = () => {
         <InnerPanel />
       </Styled.GridSection>
 
-      <Styled.GridSection gridArea="Horizontal">
-        <HorizontalPanel isOpen={isHorizontalPanelOpen} setIsOpen={setIsHorizontalPanelOpen} />
-      </Styled.GridSection>
+      <Styled.GridSection gridArea="Horizontal">{horizontalPanel}</Styled.GridSection>
     </Styled.TradeLayout>
   );
 };
