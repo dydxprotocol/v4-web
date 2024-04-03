@@ -51,17 +51,6 @@ const TradePage = () => {
   usePageTitlePriceUpdates();
   useTradeFormInputs();
 
-  const horizontalPanel = (
-    <HorizontalPanel
-      tab={tab}
-      view={view}
-      setTab={setTab}
-      setView={setView}
-      isOpen={isHorizontalPanelOpen}
-      setIsOpen={setIsHorizontalPanelOpen}
-    />
-  );
-
   return isTablet ? (
     <Styled.TradeLayoutMobile>
       <TradeHeaderMobile />
@@ -71,7 +60,9 @@ const TradePage = () => {
           <MobileTopPanel />
         </DetachedSection>
 
-        <DetachedSection>{horizontalPanel}</DetachedSection>
+        <DetachedSection>
+          <HorizontalPanel tab={tab} view={view} setTab={setTab} setView={setView} />
+        </DetachedSection>
 
         <DetachedSection>
           <MobileBottomPanel />
@@ -103,7 +94,16 @@ const TradePage = () => {
         <InnerPanel />
       </Styled.GridSection>
 
-      <Styled.GridSection gridArea="Horizontal">{horizontalPanel}</Styled.GridSection>
+      <Styled.GridSection gridArea="Horizontal">
+        <HorizontalPanel
+          tab={tab}
+          view={view}
+          setTab={setTab}
+          setView={setView}
+          isOpen={isHorizontalPanelOpen}
+          setIsOpen={setIsHorizontalPanelOpen}
+        />
+      </Styled.GridSection>
     </Styled.TradeLayout>
   );
 };
