@@ -13,9 +13,6 @@ import {
   TradeInputErrorAction,
   ValidationError,
   TradeInputField,
-  SubaccountOrder,
-  AbacusPositionSide,
-  AbacusOrderSide,
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -53,7 +50,8 @@ import { Orderbook } from '@/views/tables/Orderbook';
 
 import {
   getCurrentMarketPositionData,
-  getSubaccountConditionalOrdersForMarket,
+  getIsAccountConnected,
+  getSubaccountConditionalOrders,
 } from '@/state/accountSelectors';
 import { openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { setTradeFormInputs } from '@/state/inputs';
@@ -74,6 +72,7 @@ import abacusStateManager from '@/lib/abacus';
 import { testFlags } from '@/lib/testFlags';
 import { getSelectedOrderSide, getSelectedTradeType, getTradeInputAlert } from '@/lib/tradeData';
 
+import { SubaccountOrder } from '../../constants/abacus';
 import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 import { PositionPreview } from './TradeForm/PositionPreview';
@@ -138,6 +137,7 @@ export const TradeForm = ({
     tradeErrors,
   } = useTradeFormData();
 
+  const isAccountConnected = useSelector(getIsAccountConnected);
   const currentInput = useSelector(getCurrentInput);
   const currentAssetId = useSelector(getCurrentMarketAssetId);
   const currentMarketId = useSelector(getCurrentMarketId);
@@ -157,9 +157,16 @@ export const TradeForm = ({
 
   const { typeOptions } = useSelector(getInputTradeOptions, shallowEqual) ?? {};
 
-  const { stopLossOrders, takeProfitOrders } = useSelector(
-    getSubaccountConditionalOrdersForMarket(currentMarketId),
+  const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } = useSelector(
+    getSubaccountConditionalOrders,
     shallowEqual
+  );
+
+  const stopLossOrders = allStopLossOrders.filter(
+    (order: SubaccountOrder) => order.marketId === currentMarketId
+  );
+  const takeProfitOrders = allTakeProfitOrders.filter(
+    (order: SubaccountOrder) => order.marketId === currentMarketId
   );
 
   const allTradeTypeItems = (typeOptions?.toArray() ?? []).map(({ type, stringKey }) => ({
@@ -326,7 +333,9 @@ export const TradeForm = ({
   }
 
   const showAddTriggersButton =
-    testFlags.configureSlTpFromPositionsTable && currentMarketPosition.size?.current !== 0;
+    testFlags.configureSlTpFromPositionsTable &&
+    isAccountConnected &&
+    currentMarketPosition.size?.current !== 0;
   const showClearButton =
     isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder);
 

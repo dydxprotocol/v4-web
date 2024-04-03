@@ -41,7 +41,7 @@ class TestFlags {
   }
 
   get enableConditionalLimitOrders() {
-    return !!this.queryParams.conditionalLimit;
+    return !!this.queryParams.sltplimit;
   }
 
   get isolatedMargin() {

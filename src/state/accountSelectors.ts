@@ -139,17 +139,16 @@ export const getSubaccountOpenOrders = createSelector([getSubaccountOrders], (or
  * @param state
  * @returns list of conditional orders that have not been filled or cancelled for subaccount's position in given market
  */
-export const getSubaccountConditionalOrdersForMarket = (marketId?: string) =>
-  createSelector([getSubaccountOrders, getCurrentMarketPositionData], (allOpenOrders, position) => {
+export const getSubaccountConditionalOrders = createSelector(
+  [getSubaccountOrders, getCurrentMarketPositionData],
+  (allOpenOrders, position) => {
     const orderSideForConditionalOrder =
       position?.side?.current === AbacusPositionSide.LONG
         ? AbacusOrderSide.sell
         : AbacusOrderSide.buy;
-    const conditionalOrders = marketId
-      ? allOpenOrders?.filter(
-          (order) => order.marketId === marketId && order.side === orderSideForConditionalOrder
-        )
-      : [];
+    const conditionalOrders = allOpenOrders?.filter(
+      (order) => order.side === orderSideForConditionalOrder
+    );
 
     const stopLossOrders: SubaccountOrder[] = [];
     const takeProfitOrders: SubaccountOrder[] = [];
@@ -163,7 +162,8 @@ export const getSubaccountConditionalOrdersForMarket = (marketId?: string) =>
     });
 
     return { stopLossOrders, takeProfitOrders };
-  });
+  }
+);
 
 /**
  * @param state
