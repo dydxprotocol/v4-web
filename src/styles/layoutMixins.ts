@@ -53,6 +53,11 @@ export const layoutMixins: Record<
     min-width: max-content;
   `,
 
+  flexWrap: css`
+    display: flex;
+    flex-wrap: wrap;
+  `,
+
   // A column with a fixed header and expanding content
   expandingColumnWithHeader: css`
     // Expand if within a flexColumn

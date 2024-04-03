@@ -22,7 +22,7 @@ export const UnopenedIsolatedPositions = ({ onViewOrders }: UnopenedIsolatedPosi
       </Styled.Button>
 
       {isVisible && (
-        <Styled.CardRow>
+        <Styled.Cards>
           <PotentialPositionCard onViewOrders={onViewOrders} />
           <PotentialPositionCard onViewOrders={onViewOrders} />
           <PotentialPositionCard onViewOrders={onViewOrders} />
@@ -32,7 +32,7 @@ export const UnopenedIsolatedPositions = ({ onViewOrders }: UnopenedIsolatedPosi
           <PotentialPositionCard onViewOrders={onViewOrders} />
           <PotentialPositionCard onViewOrders={onViewOrders} />
           <PotentialPositionCard onViewOrders={onViewOrders} />
-        </Styled.CardRow>
+        </Styled.Cards>
       )}
     </Styled.UnopenedIsolatedPositions>
   );
@@ -40,11 +40,14 @@ export const UnopenedIsolatedPositions = ({ onViewOrders }: UnopenedIsolatedPosi
 
 const Styled = {
   UnopenedIsolatedPositions: styled.div`
-    overflow: hidden;
+    overflow: auto;
     border-top: var(--border);
   `,
   Button: styled(Button)<{ isOpen?: boolean }>`
+    position: sticky;
+    top: 0;
     gap: 1rem;
+    backdrop-filter: blur(4px) contrast(1.01);
     background-color: transparent;
     border: none;
     margin: 0 1rem;
@@ -57,9 +60,8 @@ const Styled = {
       }
     `}
   `,
-  CardRow: styled.div`
-    ${layoutMixins.row}
-    overflow-x: auto;
+  Cards: styled.div`
+    ${layoutMixins.flexWrap}
     gap: 1rem;
     scroll-snap-align: none;
     padding: 0 1rem 1rem;
