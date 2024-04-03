@@ -325,7 +325,8 @@ export const TradeForm = ({
     });
   }
 
-  const showAddTriggersButton = testFlags.configureSlTpFromPositionsTable && currentMarketPosition;
+  const showAddTriggersButton =
+    testFlags.configureSlTpFromPositionsTable && currentMarketPosition.size?.current !== 0;
   const showClearButton =
     isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder);
 
