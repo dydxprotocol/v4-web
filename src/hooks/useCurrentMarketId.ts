@@ -3,12 +3,15 @@ import { useEffect, useMemo } from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useMatch, useNavigate } from 'react-router-dom';
 
+import { SubaccountPosition } from '@/constants/abacus';
+import { TradeBoxDialogTypes } from '@/constants/dialogs';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
+import { getOpenPositions, getPositionDetails } from '@/state/accountSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { closeDialogInTradeBox, openDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
@@ -23,6 +26,7 @@ export const useCurrentMarketId = () => {
   const { marketId } = match?.params ?? {};
   const dispatch = useDispatch();
   const selectedNetwork = useSelector(getSelectedNetwork);
+  const openPositions = useSelector(getOpenPositions, shallowEqual);
   const marketIds = useSelector(getMarketIds, shallowEqual);
   const hasMarketIds = marketIds.length > 0;
   const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog);
@@ -64,7 +68,12 @@ export const useCurrentMarketId = () => {
         dispatch(closeDialogInTradeBox());
         if (activeTradeBoxDialog) {
           // Reopen active trade box dialog with cleared values
-          dispatch(openDialogInTradeBox(activeTradeBoxDialog));
+          if (
+            activeTradeBoxDialog.type === TradeBoxDialogTypes.ClosePosition &&
+            openPositions?.find((position: SubaccountPosition) => position.id === marketId)
+          ) {
+            dispatch(openDialogInTradeBox(activeTradeBoxDialog));
+          }
         }
       }
     }

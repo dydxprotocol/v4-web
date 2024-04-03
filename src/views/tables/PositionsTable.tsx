@@ -33,11 +33,7 @@ import { TableCell } from '@/components/Table/TableCell';
 import { TagSize } from '@/components/Tag';
 
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-import {
-  getCurrentMarketPositionData,
-  getExistingOpenPositions,
-  getSubaccountOpenOrders,
-} from '@/state/accountSelectors';
+import { getExistingOpenPositions, getSubaccountOpenOrders } from '@/state/accountSelectors';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
@@ -368,9 +364,8 @@ export const PositionsTable = ({
   const openOrders = useSelector(getSubaccountOpenOrders, shallowEqual) || [];
 
   const openPositions = useSelector(getExistingOpenPositions, shallowEqual) || [];
-  const positions = currentMarket
-    ? openPositions.filter((position) => position.id == currentMarket)
-    : openPositions;
+  const marketPosition = openPositions.find((position) => position.id == currentMarket);
+  const positions = currentMarket ? (marketPosition ? [marketPosition] : []) : openPositions;
 
   const stopLossOrders: SubaccountOrder[] = [];
   const takeProfitOrders: SubaccountOrder[] = [];
