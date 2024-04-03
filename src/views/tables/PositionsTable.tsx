@@ -11,8 +11,6 @@ import {
   type SubaccountOrder,
   type SubaccountPosition,
   POSITION_SIDES,
-  AbacusPositionSide,
-  AbacusOrderSide,
 } from '@/constants/abacus';
 import { StringGetterFunction, STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
