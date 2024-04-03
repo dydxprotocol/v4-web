@@ -51,7 +51,7 @@ import { Orderbook } from '@/views/tables/Orderbook';
 import {
   getCurrentMarketPositionData,
   getIsAccountConnected,
-  getSubaccountConditionalOrders,
+  getSubaccountConditionalOrdersForCurrentMarket,
 } from '@/state/accountSelectors';
 import { openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { setTradeFormInputs } from '@/state/inputs';
@@ -72,7 +72,6 @@ import abacusStateManager from '@/lib/abacus';
 import { testFlags } from '@/lib/testFlags';
 import { getSelectedOrderSide, getSelectedTradeType, getTradeInputAlert } from '@/lib/tradeData';
 
-import { SubaccountOrder } from '../../constants/abacus';
 import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 import { PositionPreview } from './TradeForm/PositionPreview';
@@ -157,16 +156,9 @@ export const TradeForm = ({
 
   const { typeOptions } = useSelector(getInputTradeOptions, shallowEqual) ?? {};
 
-  const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } = useSelector(
-    getSubaccountConditionalOrders,
+  const { stopLossOrders, takeProfitOrders } = useSelector(
+    getSubaccountConditionalOrdersForCurrentMarket,
     shallowEqual
-  );
-
-  const stopLossOrders = allStopLossOrders.filter(
-    (order: SubaccountOrder) => order.marketId === currentMarketId
-  );
-  const takeProfitOrders = allTakeProfitOrders.filter(
-    (order: SubaccountOrder) => order.marketId === currentMarketId
   );
 
   const allTradeTypeItems = (typeOptions?.toArray() ?? []).map(({ type, stringKey }) => ({

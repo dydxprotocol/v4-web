@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import type { ColumnSize } from '@react-types/table';
 import { useSelector, shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -364,20 +366,25 @@ export const PositionsTable = ({
     shallowEqual
   );
 
-  const positionsData = openPositions.map((position: SubaccountPosition) => {
-    return {
-      tickSizeDecimals: perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
-      asset: assets?.[position.assetId],
-      oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
-      stopLossOrders: allStopLossOrders.filter(
-        (order: SubaccountOrder) => order.marketId === position.id
-      ),
-      takeProfitOrders: allTakeProfitOrders.filter(
-        (order: SubaccountOrder) => order.marketId === position.id
-      ),
-      ...position,
-    };
-  });
+  const positionsData = useMemo(
+    () =>
+      openPositions.map((position: SubaccountPosition) => {
+        return {
+          tickSizeDecimals:
+            perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
+          asset: assets?.[position.assetId],
+          oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
+          stopLossOrders: allStopLossOrders.filter(
+            (order: SubaccountOrder) => order.marketId === position.id
+          ),
+          takeProfitOrders: allTakeProfitOrders.filter(
+            (order: SubaccountOrder) => order.marketId === position.id
+          ),
+          ...position,
+        };
+      }),
+    [openPositions, perpetualMarkets, assets, allStopLossOrders, allTakeProfitOrders]
+  );
 
   return (
     <Styled.Table
