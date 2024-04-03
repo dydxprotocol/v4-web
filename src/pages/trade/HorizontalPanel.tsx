@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -38,6 +38,8 @@ import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsS
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
+
+import { UnopenedIsolatedPositions } from './UnopenedIsolatedPositions';
 
 enum InfoSection {
   Position = 'Position',
@@ -90,6 +92,16 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     showCurrentMarket ? numOpenOrders : numTotalOpenOrders
   );
 
+  const onViewOrders = useCallback((market: string) => {
+    navigate(`${AppRoute.Trade}/${market}`, {
+      state: {
+        from: AppRoute.Trade,
+      },
+    });
+    setView(PanelView.CurrentMarket);
+    setTab(InfoSection.Orders);
+  }, []);
+
   const tabItems = useMemo(
     () => [
       {
@@ -103,39 +115,33 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
         content: showCurrentMarket ? (
           <PositionInfo showNarrowVariation={isTablet} />
         ) : (
-          <PositionsTable
-            columnKeys={
-              isTablet
-                ? [
-                    PositionsTableColumnKey.Details,
-                    PositionsTableColumnKey.IndexEntry,
-                    PositionsTableColumnKey.PnL,
-                  ]
-                : [
-                    PositionsTableColumnKey.Market,
-                    PositionsTableColumnKey.Side,
-                    PositionsTableColumnKey.Size,
-                    PositionsTableColumnKey.Leverage,
-                    PositionsTableColumnKey.LiquidationAndOraclePrice,
-                    testFlags.isolatedMargin && PositionsTableColumnKey.Margin,
-                    PositionsTableColumnKey.UnrealizedPnl,
-                    PositionsTableColumnKey.RealizedPnl,
-                    PositionsTableColumnKey.AverageOpenAndClose,
-                    shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-                    shouldRenderActions && PositionsTableColumnKey.Actions,
-                  ].filter(isTruthy)
-            }
-            onNavigate={() => setView(PanelView.CurrentMarket)}
-            navigateToOrders={(market: string) => {
-              navigate(`${AppRoute.Trade}/${market}`, {
-                state: {
-                  from: AppRoute.Trade,
-                },
-              });
-              setView(PanelView.CurrentMarket);
-              setTab(InfoSection.Orders);
-            }}
-          />
+          <>
+            <PositionsTable
+              columnKeys={
+                isTablet
+                  ? [
+                      PositionsTableColumnKey.Details,
+                      PositionsTableColumnKey.IndexEntry,
+                      PositionsTableColumnKey.PnL,
+                    ]
+                  : [
+                      PositionsTableColumnKey.Market,
+                      PositionsTableColumnKey.Side,
+                      PositionsTableColumnKey.Size,
+                      PositionsTableColumnKey.Leverage,
+                      PositionsTableColumnKey.LiquidationAndOraclePrice,
+                      testFlags.isolatedMargin && PositionsTableColumnKey.Margin,
+                      PositionsTableColumnKey.UnrealizedPnl,
+                      PositionsTableColumnKey.RealizedPnl,
+                      PositionsTableColumnKey.AverageOpenAndClose,
+                      shouldRenderTriggers && PositionsTableColumnKey.Triggers,
+                      shouldRenderActions && PositionsTableColumnKey.Actions,
+                    ].filter(isTruthy)
+              }
+              onNavigate={() => setView(PanelView.CurrentMarket)}
+              navigateToOrders={onViewOrders}
+            />
+          </>
         ),
       },
       {
@@ -238,58 +244,68 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     ]
   );
 
+  const slotBottom = {
+    [InfoSection.Position]: testFlags.isolatedMargin && (
+      <UnopenedIsolatedPositions onViewOrders={onViewOrders} />
+    ),
+    [InfoSection.Orders]: null,
+    [InfoSection.Fills]: null,
+    [InfoSection.Payments]: null,
+  }[tab];
+
   return isTablet ? (
     <MobileTabs defaultValue={InfoSection.Position} items={tabItems} withBorders={false} />
   ) : (
-    <Styled.CollapsibleTabs
-      defaultTab={InfoSection.Position}
-      tab={tab}
-      setTab={setTab}
-      defaultOpen={isOpen}
-      onOpenChange={setIsOpen}
-      slotToolbar={
-        <ToggleGroup
-          items={[
-            {
-              value: PanelView.AllMarkets,
-              label: stringGetter({ key: STRING_KEYS.ALL }),
-            },
-            {
-              value: PanelView.CurrentMarket,
-              ...(currentMarketAssetId
-                ? {
-                    slotBefore: <Styled.AssetIcon symbol={currentMarketAssetId} />,
-                    label: currentMarketAssetId,
-                  }
-                : { label: stringGetter({ key: STRING_KEYS.MARKET }) }),
-            },
-          ]}
-          value={view}
-          onValueChange={setView}
-          onInteraction={() => {
-            setIsOpen?.(true);
-          }}
-        />
-      }
-      tabItems={tabItems}
-    />
+    <>
+      <Styled.CollapsibleTabs
+        defaultTab={InfoSection.Position}
+        tab={tab}
+        setTab={setTab}
+        defaultOpen={isOpen}
+        onOpenChange={setIsOpen}
+        slotToolbar={
+          <ToggleGroup
+            items={[
+              {
+                value: PanelView.AllMarkets,
+                label: stringGetter({ key: STRING_KEYS.ALL }),
+              },
+              {
+                value: PanelView.CurrentMarket,
+                ...(currentMarketAssetId
+                  ? {
+                      slotBefore: <Styled.AssetIcon symbol={currentMarketAssetId} />,
+                      label: currentMarketAssetId,
+                    }
+                  : { label: stringGetter({ key: STRING_KEYS.MARKET }) }),
+              },
+            ]}
+            value={view}
+            onValueChange={setView}
+            onInteraction={() => {
+              setIsOpen?.(true);
+            }}
+          />
+        }
+        tabItems={tabItems}
+      />
+      {slotBottom}
+    </>
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
+const Styled = {
+  AssetIcon: styled(AssetIcon)`
+    font-size: 1.5em;
+  `,
+  CollapsibleTabs: styled(CollapsibleTabs)`
+    --tableHeader-backgroundColor: var(--color-layer-3);
 
-Styled.AssetIcon = styled(AssetIcon)`
-  font-size: 1.5em;
-`;
-
-Styled.CollapsibleTabs = styled(CollapsibleTabs)`
-  --tableHeader-backgroundColor: var(--color-layer-3);
-
-  header {
-    background-color: var(--color-layer-2);
-  }
-`;
-
-Styled.LoadingSpinner = styled(LoadingSpinner)`
-  --spinner-width: 1rem;
-`;
+    header {
+      background-color: var(--color-layer-2);
+    }
+  ` as typeof CollapsibleTabs<InfoSection>,
+  LoadingSpinner: styled(LoadingSpinner)`
+    --spinner-width: 1rem;
+  `,
+};

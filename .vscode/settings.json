@@ -1,5 +1,10 @@
 {
     "explorer.sortOrder": "mixed",
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "files.watcherExclude": {
+        "**/.git": true,
+        "**/node_modules/*": true,
+        "**/node_modules/@dydxprotocol/v4-abacus": false
+    }
 }

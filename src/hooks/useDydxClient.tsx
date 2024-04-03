@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import {
   BECH32_PREFIX,
@@ -10,6 +10,7 @@ import {
   Network,
   ValidatorConfig,
   type ProposalStatus,
+  IndexerClient,
 } from '@dydxprotocol/v4-client-js';
 import type { ResolutionString } from 'public/tradingview/charting_library';
 import { useSelector } from 'react-redux';
@@ -22,6 +23,7 @@ import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { log } from '@/lib/telemetry';
 
+import { useEndpointsConfig } from './useEndpointsConfig';
 import { useRestrictions } from './useRestrictions';
 import { useTokenConfigs } from './useTokenConfigs';
 
@@ -56,6 +58,12 @@ const useDydxClientContext = () => {
 
   const [compositeClient, setCompositeClient] = useState<CompositeClient>();
   const [faucetClient, setFaucetClient] = useState<FaucetClient>();
+
+  const { indexer: indexerEndpoints } = useEndpointsConfig();
+  const indexerClient = useMemo(() => {
+    const config = new IndexerConfig(indexerEndpoints.api, indexerEndpoints.socket);
+    return new IndexerClient(config);
+  }, [indexerEndpoints]);
 
   useEffect(() => {
     (async () => {
@@ -118,16 +126,24 @@ const useDydxClientContext = () => {
   };
 
   // ------ Public Methods ------ //
-  const requestAllPerpetualMarkets = useCallback(async () => {
+  const requestAllPerpetualMarkets = async () => {
     try {
-      const { markets } =
-        (await compositeClient?.indexerClient.markets.getPerpetualMarkets()) || {};
+      const { markets } = (await indexerClient.markets.getPerpetualMarkets()) || {};
       return markets || [];
     } catch (error) {
       log('useDydxClient/getPerpetualMarkets', error);
       return [];
     }
-  }, [compositeClient]);
+  };
+
+  const getMarketTickSize = async (marketId: string) => {
+    try {
+      const { markets } = (await indexerClient.markets.getPerpetualMarkets(marketId)) || {};
+      return markets?.[marketId]?.tickSize;
+    } catch (error) {
+      log('useDydxClient/getMarketTickSize', error);
+    }
+  };
 
   /**
    * @param proposalStatus - Optional filter for proposal status. If not provided, all proposals in ProposalStatus.VotingPeriod will be returned.
@@ -148,117 +164,100 @@ const useDydxClientContext = () => {
     [compositeClient]
   );
 
-  const requestCandles = useCallback(
-    async ({
-      marketId,
-      marketType = 'perpetualMarkets',
-      resolution,
-      fromIso,
-      toIso,
-    }: {
-      marketId: string;
-      marketType?: string;
-      resolution: ResolutionString;
-      fromIso?: string;
-      toIso?: string;
-    }): Promise<Candle[]> => {
-      try {
-        const { candles } =
-          (await compositeClient?.indexerClient.markets.getPerpetualMarketCandles(
-            marketId,
-            RESOLUTION_MAP[resolution],
-            fromIso,
-            toIso
-          )) || {};
-        return candles || [];
-      } catch (error) {
-        log('useDydxClient/getPerpetualMarketCandles', error);
-        return [];
-      }
-    },
-    [compositeClient]
-  );
-
-  const getCandlesForDatafeed = useCallback(
-    async ({
-      marketId,
-      resolution,
-      fromMs,
-      toMs,
-    }: {
-      marketId: string;
-      resolution: ResolutionString;
-      fromMs: number;
-      toMs: number;
-    }) => {
-      const fromIso = new Date(fromMs).toISOString();
-      let toIso = new Date(toMs).toISOString();
-      const candlesInRange: Candle[] = [];
-
-      while (true) {
-        const candles = await requestCandles({
+  const requestCandles = async ({
+    marketId,
+    marketType = 'perpetualMarkets',
+    resolution,
+    fromIso,
+    toIso,
+  }: {
+    marketId: string;
+    marketType?: string;
+    resolution: ResolutionString;
+    fromIso?: string;
+    toIso?: string;
+  }): Promise<Candle[]> => {
+    try {
+      const { candles } =
+        (await indexerClient.markets.getPerpetualMarketCandles(
           marketId,
-          resolution,
+          RESOLUTION_MAP[resolution],
           fromIso,
-          toIso,
-        });
+          toIso
+        )) || {};
+      return candles || [];
+    } catch (error) {
+      log('useDydxClient/getPerpetualMarketCandles', error);
+      return [];
+    }
+  };
 
-        if (!candles || candles.length === 0) {
-          break;
-        }
+  const getCandlesForDatafeed = async ({
+    marketId,
+    resolution,
+    fromMs,
+    toMs,
+  }: {
+    marketId: string;
+    resolution: ResolutionString;
+    fromMs: number;
+    toMs: number;
+  }) => {
+    const fromIso = new Date(fromMs).toISOString();
+    let toIso = new Date(toMs).toISOString();
+    const candlesInRange: Candle[] = [];
 
-        candlesInRange.push(...candles);
-        const length = candlesInRange.length;
+    while (true) {
+      const candles = await requestCandles({
+        marketId,
+        resolution,
+        fromIso,
+        toIso,
+      });
 
-        if (length) {
-          const oldestTime = new Date(candlesInRange[length - 1].startedAt).getTime();
+      if (!candles || candles.length === 0) {
+        break;
+      }
 
-          if (oldestTime > fromMs) {
-            toIso = candlesInRange[length - 1].startedAt;
-          } else {
-            break;
-          }
+      candlesInRange.push(...candles);
+      const length = candlesInRange.length;
+
+      if (length) {
+        const oldestTime = new Date(candlesInRange[length - 1].startedAt).getTime();
+
+        if (oldestTime > fromMs) {
+          toIso = candlesInRange[length - 1].startedAt;
         } else {
           break;
         }
+      } else {
+        break;
       }
+    }
 
-      return candlesInRange;
-    },
-    [requestCandles]
-  );
+    return candlesInRange;
+  };
 
   const { updateSanctionedAddresses } = useRestrictions();
 
-  const screenAddresses = useCallback(
-    async ({ addresses }: { addresses: string[] }) => {
-      if (compositeClient) {
-        const promises = addresses.map((address) =>
-          compositeClient.indexerClient.utility.screen(address)
-        );
+  const screenAddresses = async ({ addresses }: { addresses: string[] }) => {
+    const promises = addresses.map((address) => indexerClient.utility.screen(address));
 
-        const results = await Promise.all(promises);
+    const results = await Promise.all(promises);
 
-        const screenedAddresses = Object.fromEntries(
-          addresses.map((address, index) => [address, results[index]?.restricted])
-        );
+    const screenedAddresses = Object.fromEntries(
+      addresses.map((address, index) => [address, results[index]?.restricted])
+    );
 
-        updateSanctionedAddresses(screenedAddresses);
-        return screenedAddresses;
-      }
-    },
-    [compositeClient]
-  );
+    updateSanctionedAddresses(screenedAddresses);
+    return screenedAddresses;
+  };
 
-  const getPerpetualMarketSparklines = useCallback(
-    async ({ period = 'SEVEN_DAYS' }: { period?: 'ONE_DAY' | 'SEVEN_DAYS' }) => {
-      if (compositeClient) {
-        return await compositeClient.indexerClient.markets.getPerpetualMarketSparklines(period);
-      }
-      return {};
-    },
-    [compositeClient]
-  );
+  const getPerpetualMarketSparklines = async ({
+    period = 'SEVEN_DAYS',
+  }: {
+    period?: 'ONE_DAY' | 'SEVEN_DAYS';
+  }) => indexerClient.markets.getPerpetualMarketSparklines(period);
 
   const getWithdrawalAndTransferGatingStatus = useCallback(async () => {
     return await compositeClient?.validatorClient.get.GetWithdrawalAndTransferGatingStatus();
@@ -277,7 +276,8 @@ const useDydxClientContext = () => {
     networkConfig,
     compositeClient,
     faucetClient,
-    isConnected: !!compositeClient,
+    indexerClient,
+    isCompositeClientConnected: !!compositeClient,
 
     // Wallet Methods
     getWalletFromEvmSignature,
@@ -286,6 +286,7 @@ const useDydxClientContext = () => {
     requestAllPerpetualMarkets,
     requestAllGovernanceProposals,
     getCandlesForDatafeed,
+    getMarketTickSize,
     getPerpetualMarketSparklines,
     screenAddresses,
     getWithdrawalAndTransferGatingStatus,

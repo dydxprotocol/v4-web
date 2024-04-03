@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { ColumnSize } from '@react-types/table';
@@ -336,13 +336,17 @@ export const OrdersTable = ({
 
   const symbol = currentMarket ? allAssets[allPerpetualMarkets[currentMarket]?.assetId]?.id : null;
 
-  const ordersData = orders.map((order: SubaccountOrder) =>
-    getHydratedTradingData({
-      data: order,
-      assets: allAssets,
-      perpetualMarkets: allPerpetualMarkets,
-    })
-  ) as OrderTableRow[];
+  const ordersData = useMemo(
+    () =>
+      orders.map((order: SubaccountOrder) =>
+        getHydratedTradingData({
+          data: order,
+          assets: allAssets,
+          perpetualMarkets: allPerpetualMarkets,
+        })
+      ) as OrderTableRow[],
+    [orders, allPerpetualMarkets, allAssets]
+  );
 
   return (
     <Styled.Table

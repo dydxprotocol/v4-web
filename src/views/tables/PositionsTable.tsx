@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import type { ColumnSize } from '@react-types/table';
 import { useSelector, shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -371,14 +373,19 @@ export const PositionsTable = ({
     }
   });
 
-  const positionsData = openPositions.map((position: SubaccountPosition) => ({
-    tickSizeDecimals: perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
-    asset: assets?.[position.assetId],
-    oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
-    stopLossOrders: stopLossOrders.filter((order) => order.marketId === position.id),
-    takeProfitOrders: takeProfitOrders.filter((order) => order.marketId === position.id),
-    ...position,
-  }));
+  const positionsData = useMemo(
+    () =>
+      openPositions.map((position: SubaccountPosition) => ({
+        tickSizeDecimals:
+          perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
+        asset: assets?.[position.assetId],
+        oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
+        stopLossOrders: stopLossOrders.filter((order) => order.marketId === position.id),
+        takeProfitOrders: takeProfitOrders.filter((order) => order.marketId === position.id),
+        ...position,
+      })),
+    [openPositions, perpetualMarkets, assets, openOrders]
+  );
 
   return (
     <Styled.Table

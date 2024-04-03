@@ -82,7 +82,11 @@ class AbacusStateManager {
       this.abacusFormatter
     );
 
-    const appConfigs = AbacusAppConfig.Companion.forWeb;
+    const appConfigs = new AbacusAppConfig(
+      false, // subscribeToCandles
+      true, // loadRemote
+      import.meta.env.MODE === 'development' // enableLogger
+    );
     appConfigs.squidVersion = AbacusAppConfig.SquidVersion.V2;
 
     this.stateManager = new AsyncAbacusStateManager(
