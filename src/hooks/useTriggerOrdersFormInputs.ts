@@ -32,7 +32,7 @@ export const useTriggerOrdersFormInputs = ({
     setInputSize(absSize);
     abacusStateManager.setTriggerOrdersValue({
       field: TriggerOrdersInputField.size,
-      value: MustBigNumber(absSize).toString(),
+      value: size != null ? MustBigNumber(absSize).toString() : null,
     });
   };
 
@@ -43,6 +43,10 @@ export const useTriggerOrdersFormInputs = ({
         {
           field: TriggerOrdersInputField.stopLossOrderId,
           value: stopLossOrder.id,
+        },
+        {
+          field: TriggerOrdersInputField.stopLossOrderSize,
+          value: stopLossOrder.size,
         },
         {
           field: TriggerOrdersInputField.stopLossPrice,
@@ -71,6 +75,10 @@ export const useTriggerOrdersFormInputs = ({
         {
           field: TriggerOrdersInputField.takeProfitOrderId,
           value: takeProfitOrder.id,
+        },
+        {
+          field: TriggerOrdersInputField.takeProfitOrderSize,
+          value: takeProfitOrder.size,
         },
         {
           field: TriggerOrdersInputField.takeProfitPrice,

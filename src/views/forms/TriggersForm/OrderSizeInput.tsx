@@ -22,6 +22,7 @@ import { OrderSizeSlider } from './OrderSizeSlider';
 
 type ElementProps = {
   symbol: string;
+  differingOrderSizes: boolean;
   size: number | null;
   positionSize: number | null;
   stepSizeDecimals?: number;
@@ -33,6 +34,7 @@ type StyleProps = {
 
 export const OrderSizeInput = ({
   symbol,
+  differingOrderSizes,
   size,
   positionSize,
   stepSizeDecimals,
@@ -60,11 +62,11 @@ export const OrderSizeInput = ({
   };
 
   const setAbacusSize = (newSize: number | null) => {
-    const newSizeBN = MustBigNumber(
+    const newSizeString = MustBigNumber(
       newSize && positionSize ? Math.min(positionSize, newSize) : newSize
-    );
+    ).toString();
     abacusStateManager.setTriggerOrdersValue({
-      value: newSizeBN.toString(),
+      value: newSize != null ? newSizeString.toString() : null,
       field: TriggerOrdersInputField.size,
     });
   };
@@ -75,18 +77,30 @@ export const OrderSizeInput = ({
       setAbacusSize(floatValue);
     } else {
       setOrderSize(null);
-      setAbacusSize(null); 
+      setAbacusSize(null);
     }
   };
 
   return (
     <Collapsible
       slotTrigger={
-        <Checkbox checked={shouldShowCustomAmount} onCheckedChange={onCustomAmountToggle} />
+        <WithTooltip
+          tooltipString={
+            differingOrderSizes
+              ? 'You have two different order sizes. Please update the order sizes manually through the orders tab.'
+              : undefined
+          }
+        >
+          <Checkbox
+            disabled={differingOrderSizes}
+            checked={shouldShowCustomAmount}
+            onCheckedChange={onCustomAmountToggle}
+          />
+        </WithTooltip>
       }
       open={shouldShowCustomAmount}
       label={
-        <WithTooltip tooltip="custom-amount">
+        <WithTooltip tooltip={'custom-amount'}>
           {stringGetter({ key: STRING_KEYS.CUSTOM_AMOUNT })}
         </WithTooltip>
       }

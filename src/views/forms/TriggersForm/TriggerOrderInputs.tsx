@@ -61,7 +61,7 @@ export const TriggerOrderInputs = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
 
-  const [inputType, setInputType] = useState<InputChangeType>(InputType.Percent);
+  const [inputType, setInputType] = useState<InputChangeType>(InputType.Currency);
 
   const { triggerPrice, percentDiff, usdcDiff } = price ?? {};
 
@@ -178,10 +178,11 @@ export const TriggerOrderInputs = ({
               label={stringGetter({ key: stringKeys.output })}
               decimals={getDecimalsForInputType(inputType)}
               type={inputType}
-              slotRight={priceDiffSelector({
-                value: inputType,
-                onValueChange: (value: InputChangeType) => setInputType(value),
-              })}
+              // TODO: CT-694 re-enable when we determine a percentage diff calculation
+              // slotRight={priceDiffSelector({
+              //   value: inputType,
+              //   onValueChange: (value: InputChangeType) => setInputType(value),
+              // })}
               value={
                 inputType === InputType.Percent
                   ? percentDiff

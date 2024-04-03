@@ -48,15 +48,14 @@ export const AdvancedTriggersOptions = ({
         <HorizontalSeparatorFiller />
       </Styled.Header>
       <Styled.Content>
-        {!differingOrderSizes && (
           <OrderSizeInput
             className={className}
+            differingOrderSizes={differingOrderSizes}
             symbol={symbol}
             size={size}
             positionSize={positionSize}
             stepSizeDecimals={stepSizeDecimals}
           />
-        )}
         <LimitPriceInputs
           className={className}
           existsLimitOrder={existsLimitOrder}
