@@ -8,6 +8,8 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { HorizontalSeparatorFiller } from '@/components/Separator';
 
+import { testFlags } from '@/lib/testFlags';
+
 import { LimitPriceInputs } from './LimitPriceInputs';
 import { OrderSizeInput } from './OrderSizeInput';
 
@@ -48,21 +50,23 @@ export const AdvancedTriggersOptions = ({
         <HorizontalSeparatorFiller />
       </Styled.Header>
       <Styled.Content>
-          <OrderSizeInput
-            className={className}
-            differingOrderSizes={differingOrderSizes}
-            symbol={symbol}
-            size={size}
-            positionSize={positionSize}
-            stepSizeDecimals={stepSizeDecimals}
-          />
-        <LimitPriceInputs
+        <OrderSizeInput
           className={className}
-          existsLimitOrder={existsLimitOrder}
-          multipleTakeProfitOrders={multipleTakeProfitOrders}
-          multipleStopLossOrders={multipleStopLossOrders}
-          tickSizeDecimals={tickSizeDecimals}
+          differingOrderSizes={differingOrderSizes}
+          symbol={symbol}
+          size={size}
+          positionSize={positionSize}
+          stepSizeDecimals={stepSizeDecimals}
         />
+        {testFlags.enableConditionalLimitOrders && (
+          <LimitPriceInputs
+            className={className}
+            existsLimitOrder={existsLimitOrder}
+            multipleTakeProfitOrders={multipleTakeProfitOrders}
+            multipleStopLossOrders={multipleStopLossOrders}
+            tickSizeDecimals={tickSizeDecimals}
+          />
+        )}
       </Styled.Content>
     </Styled.Container>
   );

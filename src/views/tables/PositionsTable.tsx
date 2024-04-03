@@ -33,12 +33,11 @@ import { TableCell } from '@/components/Table/TableCell';
 import { TagSize } from '@/components/Tag';
 
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-import { getExistingOpenPositions, getSubaccountOpenOrders } from '@/state/accountSelectors';
+import { getExistingOpenPositions, getSubaccountConditionalOrders } from '@/state/accountSelectors';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
-import { isStopLossOrder, isTakeProfitOrder } from '@/lib/orders';
 
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
@@ -360,31 +359,22 @@ export const PositionsTable = ({
   const perpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
   const assets = useSelector(getAssets, shallowEqual) || {};
   const openPositions = useSelector(getExistingOpenPositions, shallowEqual) || [];
-  const openOrders = useSelector(getSubaccountOpenOrders, shallowEqual) || [];
-
-  const stopLossOrders: SubaccountOrder[] = [];
-  const takeProfitOrders: SubaccountOrder[] = [];
-
-  openOrders.map((order: SubaccountOrder) => {
-    if (isStopLossOrder(order)) {
-      stopLossOrders.push(order);
-    } else if (isTakeProfitOrder(order)) {
-      takeProfitOrders.push(order);
-    }
-  });
+  const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } = useSelector(
+    getSubaccountConditionalOrders,
+    shallowEqual
+  );
 
   const positionsData = openPositions.map((position: SubaccountPosition) => {
-    const orderSideForConditionalOrder =
-      position.side.current === AbacusPositionSide.LONG
-        ? AbacusOrderSide.sell
-        : AbacusOrderSide.buy;
-        
     return {
       tickSizeDecimals: perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
       asset: assets?.[position.assetId],
       oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
-      stopLossOrders: stopLossOrders.filter((order) => order.marketId === position.id && order.side === orderSideForConditionalOrder),
-      takeProfitOrders: takeProfitOrders.filter((order) => order.marketId === position.id && order.side === orderSideForConditionalOrder),
+      stopLossOrders: allStopLossOrders.filter(
+        (order: SubaccountOrder) => order.marketId === position.id
+      ),
+      takeProfitOrders: allTakeProfitOrders.filter(
+        (order: SubaccountOrder) => order.marketId === position.id
+      ),
       ...position,
     };
   });
@@ -401,7 +391,7 @@ export const PositionsTable = ({
       columns={columnKeys.map((key: PositionsTableColumnKey) =>
         getPositionsTableColumnDef({
           key,
-          stringGetter,
+        stringGetter,
           width: columnWidths?.[key],
           isAccountViewOnly,
           navigateToOrders,

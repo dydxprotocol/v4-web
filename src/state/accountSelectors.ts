@@ -12,10 +12,11 @@ import {
   ORDER_SIDES,
   HistoricalTradingReward,
   HistoricalTradingRewardsPeriod,
+  AbacusOrderSide,
 } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
 
-import { getHydratedTradingData } from '@/lib/orders';
+import { getHydratedTradingData, isStopLossOrder, isTakeProfitOrder } from '@/lib/orders';
 import { getHydratedPositionData } from '@/lib/positions';
 
 import type { RootState } from './_store';
@@ -132,6 +133,36 @@ export const getSubaccountOpenOrders = createSelector([getSubaccountOrders], (or
     (order) =>
       order.status !== AbacusOrderStatus.filled && order.status !== AbacusOrderStatus.cancelled
   )
+);
+
+/**
+ * @param state
+ * @returns list of conditional orders that have not been filled or cancelled for subaccount's position in given market
+ */
+export const getSubaccountConditionalOrders = createSelector(
+  [getSubaccountOrders, getCurrentMarketPositionData],
+  (allOpenOrders, position) => {
+    const orderSideForConditionalOrder =
+      position?.side?.current === AbacusPositionSide.LONG
+        ? AbacusOrderSide.sell
+        : AbacusOrderSide.buy;
+    const conditionalOrders = allOpenOrders?.filter(
+      (order) => order.side === orderSideForConditionalOrder
+    );
+
+    const stopLossOrders: SubaccountOrder[] = [];
+    const takeProfitOrders: SubaccountOrder[] = [];
+
+    conditionalOrders?.forEach((order: SubaccountOrder) => {
+      if (isStopLossOrder(order)) {
+        stopLossOrders.push(order);
+      } else if (isTakeProfitOrder(order)) {
+        takeProfitOrders.push(order);
+      }
+    });
+
+    return { stopLossOrders, takeProfitOrders };
+  }
 );
 
 /**

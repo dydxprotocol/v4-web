@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { Dispatch, SetStateAction, useMemo } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
+import { PanelView, InfoSection } from '@/constants/horizontalPanel';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
@@ -32,48 +33,40 @@ import {
   getHasUnseenOrderUpdates,
   getTradeInfoNumbers,
 } from '@/state/accountSelectors';
-import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
 import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
 
-enum InfoSection {
-  Position = 'Position',
-  Orders = 'Orders',
-  Fills = 'Fills',
-  Payments = 'Payments',
-}
-
-enum PanelView {
-  AllMarkets = 'AllMarkets',
-  CurrentMarket = 'CurrentMarket',
-}
-
 type ElementProps = {
+  tab: InfoSection;
+  view: PanelView;
+  setTab: Dispatch<SetStateAction<InfoSection>>;
+  setView: Dispatch<SetStateAction<PanelView>>;
   isOpen?: boolean;
   setIsOpen?: (isOpen: boolean) => void;
 };
 
-export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
+export const HorizontalPanel = ({
+  tab,
+  view,
+  setTab,
+  setView,
+  isOpen = true,
+  setIsOpen,
+}: ElementProps) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
   const { isTablet } = useBreakpoints();
 
-  const allMarkets = useSelector(getDefaultToAllMarketsInPositionsOrdersFills);
-  const [view, setView] = useState<PanelView>(
-    allMarkets ? PanelView.AllMarkets : PanelView.CurrentMarket
-  );
-  const [tab, setTab] = useState<InfoSection>(InfoSection.Position);
-
   const currentMarketId = useSelector(getCurrentMarketId);
   const currentMarketAssetId = useSelector(getCurrentMarketAssetId);
 
-  const { numTotalPositions, numTotalOpenOrders, numTotalFills, numTotalFundingPayments } =
+  const { numTotalPositions, numTotalOpenOrders, numTotalFills } =
     useSelector(getTradeInfoNumbers, shallowEqual) || {};
 
-  const { numOpenOrders, numFills, numFundingPayments } =
+  const { numOpenOrders, numFills } =
     useSelector(getCurrentMarketTradeInfoNumbers, shallowEqual) || {};
 
   const hasUnseenOrderUpdates = useSelector(getHasUnseenOrderUpdates);

@@ -47,7 +47,7 @@ const configurationData: DatafeedConfiguration = {
 export const getDydxDatafeed = (
   store: RootStore,
   getCandlesForDatafeed: ReturnType<typeof useDydxClient>['getCandlesForDatafeed'],
-  initialPriceScale: number
+  initialPriceScale: number | null
 ) => ({
   onReady: (callback: OnReadyCallback) => {
     setTimeout(() => callback(configurationData), 0);
@@ -70,7 +70,7 @@ export const getDydxDatafeed = (
     const symbolItem = getSymbol(symbolName || DEFAULT_MARKETID);
     const { tickSizeDecimals } = getMarketConfig(symbolItem.symbol)(store.getState()) || {};
 
-    const pricescale = tickSizeDecimals ? 10 ** tickSizeDecimals : initialPriceScale;
+    const pricescale = tickSizeDecimals ? 10 ** tickSizeDecimals : initialPriceScale ?? 100;
 
     const symbolInfo: LibrarySymbolInfo = {
       ticker: symbolItem.full_name,

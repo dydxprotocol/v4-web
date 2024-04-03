@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
@@ -12,10 +14,7 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Output, OutputType } from '@/components/Output';
 import { Table, TableCell, type ColumnDef } from '@/components/Table';
 
-import {
-  getHistoricalTradingRewards,
-  getHistoricalTradingRewardsForPeriod,
-} from '@/state/accountSelectors';
+import { getHistoricalTradingRewardsForPeriod } from '@/state/accountSelectors';
 
 export enum TradingRewardHistoryTableColumnKey {
   Event = 'Event',
@@ -105,10 +104,12 @@ export const TradingRewardHistoryTable = ({
     shallowEqual
   );
 
+  const rewardsData = useMemo(() => periodTradingRewards?.toArray() ?? [], [periodTradingRewards]);
+
   return (
     <Styled.Table
       label={stringGetter({ key: STRING_KEYS.REWARD_HISTORY })}
-      data={periodTradingRewards?.toArray() ?? []}
+      data={rewardsData}
       getRowKey={(row: any) => row.startedAtInMilliseconds}
       columns={columnKeys.map((key: TradingRewardHistoryTableColumnKey) =>
         getTradingRewardHistoryTableColumnDef({

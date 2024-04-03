@@ -154,7 +154,7 @@ export const PositionsTriggersCell = ({
                   {stringGetter({
                     key: isStopLossOrder(order)
                       ? STRING_KEYS.EDIT_STOP_LOSS
-                      : STRING_KEYS.EDIT_STOP_LOSS, // TODO: CT-704 update to EDIT_TAKE_PROFIT
+                      : STRING_KEYS.EDIT_TAKE_PROFIT,
                   })}
                 </Button>
               }
