@@ -422,7 +422,8 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
     ProposalStatus.PROPOSAL_STATUS_FAILED
   );
   if (proposalsFailed.proposals.length > 0) {
-    throw new Error(`Some proposals failed: ${proposalsFailed}`);
+    const failedIds = proposalsFailed.proposals.map((proposal) => proposal.id);
+    throw new Error(`Proposals ${failedIds} failed: ${proposalsFailed.proposals}`);
   }
 
   // Wait for prices to update.
