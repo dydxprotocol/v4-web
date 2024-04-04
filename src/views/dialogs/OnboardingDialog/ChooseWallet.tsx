@@ -1,6 +1,3 @@
-import { useState } from 'react';
-
-import { useDispatch } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
@@ -19,13 +16,17 @@ import { Button } from '@/components/Button';
 import { Icon } from '@/components/Icon';
 import { Link } from '@/components/Link';
 
-export const ChooseWallet = () => {
+export const ChooseWallet = ({
+  onChooseWallet,
+}: {
+  onChooseWallet: (walletType: WalletType) => void;
+}) => {
   const stringGetter = useStringGetter();
   const { walletLearnMore } = useURLConfigs();
 
   const displayedWallets = useDisplayedWallets();
 
-  const { selectWalletType, selectedWalletType, selectedWalletError } = useAccounts();
+  const { selectedWalletType, selectedWalletError } = useAccounts();
 
   return (
     <>
@@ -52,11 +53,11 @@ export const ChooseWallet = () => {
           <Styled.WalletButton
             action={ButtonAction.Base}
             key={walletType}
-            onClick={() => selectWalletType(walletType)}
+            onClick={() => onChooseWallet(walletType)}
             slotLeft={<Styled.Icon iconComponent={wallets[walletType].icon} />}
             size={ButtonSize.Small}
           >
-            <div>{stringGetter({ key: wallets[walletType].stringKey })}</div>
+            {stringGetter({ key: wallets[walletType].stringKey })}
           </Styled.WalletButton>
         ))}
       </Styled.Wallets>

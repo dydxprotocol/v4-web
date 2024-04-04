@@ -2,9 +2,10 @@ import { isDev } from '@/constants/networks';
 import { WalletType } from '@/constants/wallets';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { testFlags } from '@/lib/testFlags';
 
 export const useDisplayedWallets = () => {
-  return [
+  const displayedWallets = [
     WalletType.MetaMask,
 
     isDev && WalletType.Keplr,
@@ -22,6 +23,10 @@ export const useDisplayedWallets = () => {
     // WalletType.BitKeep,
     // WalletType.Coin98,
 
+    testFlags.displayPrivyLogin && WalletType.Privy,
+
     WalletType.OtherWallet,
   ].filter(isTruthy);
+
+  return displayedWallets;
 };

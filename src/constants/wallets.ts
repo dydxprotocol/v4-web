@@ -11,6 +11,8 @@ import {
   CoinbaseIcon,
   Coin98Icon,
   GenericWalletIcon,
+  AppleIcon,
+  GoogleIcon,
   HuobiIcon,
   ImTokenIcon,
   KeplrIcon,
@@ -21,6 +23,9 @@ import {
   TokenPocketIcon,
   TrustWalletIcon,
   WalletConnectIcon,
+  Discord2Icon,
+  TwitterIcon,
+  EmailIcon,
 } from '@/icons';
 
 import { isMetaMask } from '@/lib/wallet/providers';
@@ -32,6 +37,7 @@ import { DydxChainId, WALLETS_CONFIG_MAP } from './networks';
 export enum WalletConnectionType {
   CoinbaseWalletSdk = 'coinbaseWalletSdk',
   CosmosSigner = 'CosmosSigner',
+  Privy = 'Privy',
   InjectedEip1193 = 'injectedEip1193',
   WalletConnect2 = 'walletConnect2',
   TestWallet = 'TestWallet',
@@ -74,6 +80,9 @@ export const walletConnectionTypes: Record<WalletConnectionType, WalletConnectio
   [WalletConnectionType.TestWallet]: {
     name: 'TestWallet',
   },
+  [WalletConnectionType.Privy]: {
+    name: 'Privy',
+  },
 };
 
 // Wallets
@@ -97,6 +106,7 @@ export enum WalletType {
   WalletConnect2 = 'WALLETCONNECT_2',
   TestWallet = 'TEST_WALLET',
   OtherWallet = 'OTHER_WALLET',
+  Privy = 'PRIVY',
 }
 
 const WALLET_CONNECT_EXPLORER_RECOMMENDED_WALLETS = {
@@ -264,6 +274,12 @@ export const wallets: Record<WalletType, WalletConfig> = {
     stringKey: STRING_KEYS.TEST_WALLET,
     icon: GenericWalletIcon,
     connectionTypes: [WalletConnectionType.TestWallet],
+  },
+  [WalletType.Privy]: {
+    type: WalletType.Privy,
+    stringKey: STRING_KEYS.TEST_WALLET,
+    icon: EmailIcon,
+    connectionTypes: [WalletConnectionType.Privy],
   },
 };
 
