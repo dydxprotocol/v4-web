@@ -7,7 +7,7 @@ import { EvmDerivedAccountStatus, OnboardingSteps } from '@/constants/account';
 import { AnalyticsEvent } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
-import { wallets } from '@/constants/wallets';
+import { WalletType, wallets } from '@/constants/wallets';
 
 import { useAccounts, useBreakpoints, useStringGetter } from '@/hooks';
 
@@ -39,7 +39,7 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { isMobile } = useBreakpoints();
 
-  const { disconnect, walletType } = useAccounts();
+  const { selectWalletType, disconnect, walletType } = useAccounts();
 
   const currentOnboardingStep = useSelector(calculateOnboardingStep);
 
@@ -54,6 +54,13 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
     setIsOpen?.(open);
   };
 
+  const onChooseWallet = (walletType: WalletType) => {
+    if (walletType === WalletType.Privy) {
+      setIsOpenFromDialog(false);
+    }
+    selectWalletType(walletType);
+  };
+
   return (
     <Styled.Dialog
       isOpen={Boolean(currentOnboardingStep)}
@@ -65,7 +72,7 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
             description: 'Select your wallet from these supported options.',
             children: (
               <Styled.Content>
-                <ChooseWallet />
+                <ChooseWallet onChooseWallet={onChooseWallet} />
               </Styled.Content>
             ),
           },
