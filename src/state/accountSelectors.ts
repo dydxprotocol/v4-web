@@ -239,16 +239,20 @@ export const getSubaccountOpenStatusOrders = createSelector([getSubaccountOrders
   orders?.filter((order) => order.status === AbacusOrderStatus.open)
 );
 
-export const getSubaccountOpenStatusOrdersBySideAndPrice = createSelector(
+export const getSubaccountOrderSizeBySideAndPrice = createSelector(
   [getSubaccountOpenStatusOrders],
   (openOrders = []) => {
-    const ordersBySide: Partial<Record<OrderSide, Record<number, SubaccountOrder>>> = {};
-    openOrders.forEach((order) => {
+    const orderSizeBySideAndPrice: Partial<Record<OrderSide, Record<number, number>>> = {};
+    openOrders.forEach((order: SubaccountOrder) => {
       const side = ORDER_SIDES[order.side.name];
-      const byPrice = (ordersBySide[side] ??= {});
-      byPrice[order.price] = order;
+      const byPrice = (orderSizeBySideAndPrice[side] ??= {});
+      if (byPrice[order.price]) {
+        byPrice[order.price] += order.size;
+      } else {
+        byPrice[order.price] = order.size;
+      }
     });
-    return ordersBySide;
+    return orderSizeBySideAndPrice;
   }
 );
 

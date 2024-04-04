@@ -20,7 +20,7 @@ import { type CustomRowConfig, TableRow } from '@/components/Table';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
-import { getSubaccountOpenStatusOrdersBySideAndPrice } from '@/state/accountSelectors';
+import { getSubaccountOrderSizeBySideAndPrice } from '@/state/accountSelectors';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
@@ -50,8 +50,8 @@ type RowData = Pick<OrderbookLine, 'depth' | 'offset' | 'price' | 'size'> & {
 const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number }) => {
   const orderbook = useSelector(getCurrentMarketOrderbook, shallowEqual);
 
-  const openOrdersBySideAndPrice =
-    useSelector(getSubaccountOpenStatusOrdersBySideAndPrice, shallowEqual) || {};
+  const subaccountOrderSizeBySideAndPrice =
+    useSelector(getSubaccountOrderSizeBySideAndPrice, shallowEqual) || {};
 
   return useMemo(() => {
     const asks = (orderbook?.asks?.toArray() ?? [])
@@ -60,8 +60,7 @@ const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number 
           ({
             key: `ask-${idx}`,
             side: 'ask',
-            mine: openOrdersBySideAndPrice[OrderSide.SELL]?.[row.price]?.size,
-            ...row,
+            mine: subaccountOrderSizeBySideAndPrice[OrderSide.SELL]?.[row.price],
           } as RowData)
       )
       .slice(0, maxRowsPerSide);
@@ -72,7 +71,7 @@ const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number 
           ({
             key: `bid-${idx}`,
             side: 'bid',
-            mine: openOrdersBySideAndPrice[OrderSide.BUY]?.[row.price]?.size,
+            mine: subaccountOrderSizeBySideAndPrice[OrderSide.BUY]?.[row.price],
             ...row,
           } as RowData)
       )
@@ -141,7 +140,7 @@ const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number 
     }
 
     return { asks, bids, spread, spreadPercent, histogramRange, hasOrderbook: !!orderbook };
-  }, [orderbook, openOrdersBySideAndPrice]);
+  }, [orderbook, subaccountOrderSizeBySideAndPrice]);
 };
 
 const OrderbookTable = ({
