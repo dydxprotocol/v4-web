@@ -1,35 +1,46 @@
 import { execSync } from 'child_process';
 
-console.log("Cleaning up any previously built abacus packages...")
-try {
-    execSync('rm ../v4-abacus/build/packages/*.tgz', { stdio: "inherit" });   
-} catch (error) {
-    // Don't fail if we didn't find any previously built packages.
+const clean = process.argv.includes('--clean');
+
+if (clean) {
+    infoMessage("Running deep clean.")
+    nonFatalExec('pnpm remove @dydxprotocol/v4-abacus') // remove abacus from node_modules
+    nonFatalExec('cd ../v4-abacus && ./gradlew clean') // cleanup gradle build outputs
+    nonFatalExec('cd ../v4-abacus && ./gradlew --stop') // stop any running gradle daemons
+    nonFatalExec('rm -rf ~/.gradle/caches') // nuke the gradle cache
 }
 
-console.log("Building abacus...")
-try {
-    execSync('cd ../v4-abacus && ./gradlew packJsPackage', { stdio: "inherit" });
-} catch (error) {
-    console.error('Error building abacus:', error);
-    process.exit(1); 
+infoMessage("Cleaning up any previously built abacus packages...")
+nonFatalExec('rm ../v4-abacus/build/packages/*.tgz')
+
+infoMessage("Building abacus...")
+fatalExec('cd ../v4-abacus && ./gradlew packJsPackage');
+
+infoMessage("Installing local abacus package...")
+fatalExec("find ../v4-abacus/build/packages -name '*.tgz' | head -n 1 | xargs pnpm install");
+infoMessage("Successfully installed local abacus package.")
+
+infoMessage("Generating local-abacus-hash...")
+fatalExec("find ../v4-abacus/build/packages -name '*.tgz' | head -n 1 | shasum > local-abacus-hash");
+
+infoMessage("Vite dev server should have restarted automatically.")
+
+function nonFatalExec(cmd) {
+    try {
+        execSync(cmd, { stdio: "inherit" });   
+    } catch (error) {
+        // Do nothing.
+    }   
 }
 
-
-console.log("Installing local abacus package...")
-try {
-    execSync("find ../v4-abacus/build/packages -name '*.tgz' | head -n 1 | xargs pnpm install", { stdio: "inherit" });
-} catch (error) {
-    console.error('Error installing abacus:', error);
-    process.exit(1); 
+function fatalExec(cmd) {
+    try {
+        execSync(cmd, { stdio: "inherit" });   
+    } catch (error) {
+        process.exit(1); 
+    }   
 }
-console.log("Successfully installed local abacus package.")
 
-console.log("Generating local-abacus-hash...")
-try {
-    execSync("find ../v4-abacus/build/packages -name '*.tgz' | head -n 1 | shasum > local-abacus-hash", { stdio: "inherit" });
-} catch (error) {
-    console.error('Error generating local-abacus-hash:', error);
-    console.error('You may need to manually restart pnpm dev.')
-    process.exit(1); 
+function infoMessage(message) {
+    console.log("\n**** install-local-abacus.js: "+message+"\n")
 }

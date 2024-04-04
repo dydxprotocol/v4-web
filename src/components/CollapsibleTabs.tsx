@@ -24,7 +24,7 @@ import { Toolbar } from '@/components/Toolbar';
 type ElementProps<TabItemsValue> = {
   defaultTab?: TabItemsValue;
   tab: TabItemsValue;
-  setTab?: Dispatch<SetStateAction<string>>;
+  setTab?: Dispatch<SetStateAction<TabItemsValue>>;
   tabItems: TabItem<TabItemsValue>[];
   slotToolbar?: ReactNode;
   defaultOpen?: boolean;
@@ -68,12 +68,8 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
       >
         <Styled.Header>
           <Styled.TabsList $fullWidthTabs={fullWidthTabs}>
-            {tabItems.map(({value, label, tag, slotRight}) => (
-              <Styled.TabsTrigger
-                key={value}
-                value={value}
-                onClick={() => onOpenChange?.(true)}
-              >
+            {tabItems.map(({ value, label, tag, slotRight }) => (
+              <Styled.TabsTrigger key={value} value={value} onClick={() => onOpenChange?.(true)}>
                 {label}
                 {tag && <Tag>{tag}</Tag>}
                 {slotRight}
