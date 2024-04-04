@@ -30,8 +30,8 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: file:../v4-abacus/build/packages/js/dydxprotocol-v4-abacus-1.6.26.tgz
-    version: file:../v4-abacus/build/packages/js/dydxprotocol-v4-abacus-1.6.26.tgz
+    specifier: ^1.6.28
+    version: 1.6.28
   '@dydxprotocol/v4-client-js':
     specifier: ^1.0.25
     version: 1.0.26
@@ -1564,6 +1564,13 @@ packages:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
+
+  /@dydxprotocol/v4-abacus@1.6.28:
+    resolution: {integrity: sha512-q6dYmQTfZx+m8iXvaEaHDGkUxQJ6IVCGSnXJsXQkEDFVg5kqu9Gy0QUO+nFkmGJ6gQVKslKCXVVxmxYVxRJtdQ==}
+    dependencies:
+      '@js-joda/core': 3.2.0
+      format-util: 1.0.5
+    dev: false
 
   /@dydxprotocol/v4-client-js@1.0.26:
     resolution: {integrity: sha512-lsesLZo6Zxr6BMf+WQQpC8RNhtl6Va/Yp6SRdvCX0tqQ55+K2xLcYHLZ0py6EWwjsmnkoCTXYN6l4cIQFCvY4w==}
@@ -8719,6 +8726,7 @@ packages:
     engines: {node: '>=6.5'}
     dependencies:
       event-target-shim: 5.0.1
+    dev: true
 
   /accepts@1.3.8:
     resolution: {integrity: sha512-PYAthTa2m2VKxuvSD3DPC/Gy+U+sOA1LAuT8mkmRuvw+NACSaeXEQ+NHcVF7rONl6qcaxV3Uuemwawk+7+SJLw==}
@@ -11678,6 +11686,7 @@ packages:
     resolution: {integrity: sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==}
     engines: {node: '>=6'}
     requiresBuild: true
+    dev: true
 
   /eventemitter3@4.0.7:
     resolution: {integrity: sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==}
@@ -15360,18 +15369,6 @@ packages:
         optional: true
     dependencies:
       whatwg-url: 5.0.0
-
-  /node-fetch@2.6.7:
-    resolution: {integrity: sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==}
-    engines: {node: 4.x || >=6.0.0}
-    peerDependencies:
-      encoding: ^0.1.0
-    peerDependenciesMeta:
-      encoding:
-        optional: true
-    dependencies:
-      whatwg-url: 5.0.0
-    dev: false
 
   /node-fetch@3.3.1:
     resolution: {integrity: sha512-cRVc/kyto/7E5shrWca1Wsea4y6tL9iYJE5FBCius3JQfb/4P4I295PfhgbJQBLTx6lATE4z+wK0rPM4VS2uow==}
@@ -19417,19 +19414,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
-
-  file:../v4-abacus/build/packages/js/dydxprotocol-v4-abacus-1.6.26.tgz:
-    resolution: {integrity: sha512-5vICvyzqeuS2jEnLSC/I73KyK+RMATrpBKHJ7JWj135NzrIflVN97Lasy2sZ89SXNMhh7SnwZJ+mopo8mUPAew==, tarball: file:../v4-abacus/build/packages/js/dydxprotocol-v4-abacus-1.6.26.tgz}
-    name: '@dydxprotocol/v4-abacus'
-    version: 1.6.26
-    dependencies:
-      '@js-joda/core': 3.2.0
-      abort-controller: 3.0.0
-      format-util: 1.0.5
-      node-fetch: 2.6.7
-      ws: 8.5.0
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - utf-8-validate
-    dev: false
