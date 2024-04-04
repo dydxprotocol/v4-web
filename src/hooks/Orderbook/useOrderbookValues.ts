@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import _ from 'lodash';
 import { shallowEqual, useSelector } from 'react-redux';
 
 import { OrderbookLine, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';

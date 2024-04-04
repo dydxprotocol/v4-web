@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import _ from 'lodash';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
 
