@@ -13,6 +13,7 @@ import {
   type StringGetterFunction,
   TOOLTIP_STRING_KEYS,
 } from '@/constants/localization';
+import { isDev } from '@/constants/networks';
 import { DydxChainAsset, WalletType, wallets } from '@/constants/wallets';
 
 import {
@@ -219,6 +220,18 @@ export const AccountMenu = () => {
           label: stringGetter({ key: STRING_KEYS.DISPLAY_SETTINGS }),
           onSelect: () => dispatch(openDialog({ type: DialogTypes.DisplaySettings })),
         },
+        ...(isDev
+          ? [
+              {
+                value: 'ComplianceConfig',
+                icon: <Icon iconName={IconName.Gear} />,
+                label: 'Compliance Config',
+                onSelect: () => {
+                  dispatch(openDialog({ type: DialogTypes.ComplianceConfig }));
+                },
+              },
+            ]
+          : []),
         ...(getMobileAppUrl()
           ? [
               {
