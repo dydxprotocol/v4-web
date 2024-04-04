@@ -5,6 +5,7 @@ import { DialogTypes } from '@/constants/dialogs';
 import { AdjustIsolatedMarginDialog } from '@/views/dialogs/AdjustIsolatedMarginDialog';
 import { AdjustTargetLeverageDialog } from '@/views/dialogs/AdjustTargetLeverageDialog';
 import { ClosePositionDialog } from '@/views/dialogs/ClosePositionDialog';
+import { ComplianceConfigDialog } from '@/views/dialogs/ComplianceConfigDialog';
 import { DepositDialog } from '@/views/dialogs/DepositDialog';
 import { FillDetailsDialog } from '@/views/dialogs/DetailsDialog/FillDetailsDialog';
 import { OrderDetailsDialog } from '@/views/dialogs/DetailsDialog/OrderDetailsDialog';
@@ -58,6 +59,7 @@ export const DialogManager = () => {
     [DialogTypes.AdjustIsolatedMargin]: <AdjustIsolatedMarginDialog {...modalProps} />,
     [DialogTypes.AdjustTargetLeverage]: <AdjustTargetLeverageDialog {...modalProps} />,
     [DialogTypes.ClosePosition]: <ClosePositionDialog {...modalProps} />,
+    [DialogTypes.ComplianceConfig]: <ComplianceConfigDialog {...modalProps} />,
     [DialogTypes.Deposit]: <DepositDialog {...modalProps} />,
     [DialogTypes.DisplaySettings]: <DisplaySettingsDialog {...modalProps} />,
     [DialogTypes.DisconnectWallet]: <DisconnectDialog {...modalProps} />,

@@ -12,12 +12,14 @@ export interface AppState {
   pageLoaded: boolean;
   initializationError?: string;
   selectedNetwork: DydxNetwork;
+  geo?: string;
 }
 
 const initialState: AppState = {
   initializationError: undefined,
   apiState: undefined,
   pageLoaded: false,
+  geo: undefined,
   selectedNetwork: getLocalStorage({
     key: LocalStorageKey.SelectedNetwork,
     defaultValue: DEFAULT_APP_ENVIRONMENT,
@@ -45,6 +47,9 @@ export const appSlice = createSlice({
     setInitializationError: (state: AppState, action: PayloadAction<string>) => {
       state.initializationError = action.payload;
     },
+    setGeo: (state: AppState, action: PayloadAction<string>) => {
+      state.geo = action.payload;
+    },
   },
 });
 
@@ -54,4 +59,5 @@ export const {
   setApiState,
   setSelectedNetwork,
   setInitializationError,
+  setGeo,
 } = appSlice.actions;
