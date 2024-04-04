@@ -10,7 +10,6 @@ import {
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { TimeInForceOptions } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks';
 
@@ -23,7 +22,7 @@ import { WithHovercard } from '@/components/WithHovercard';
 
 import { openDialog } from '@/state/dialogs';
 
-import { isMarketOrderType, isStopLossOrder } from '@/lib/orders';
+import { isStopLossOrder } from '@/lib/orders';
 
 type ElementProps = {
   marketId: string;
@@ -46,10 +45,12 @@ export const PositionsTriggersCell = ({
   onViewOrdersClick,
   positionSide,
   positionSize,
-  isDisabled, // TODO: CT-656 Disable onViewOrdersClick behavior when isDisabled
+  isDisabled,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
+
+  const onViewOrders = isDisabled ? null : () => onViewOrdersClick(marketId);
 
   const showLiquidationWarning = (order: SubaccountOrder) => {
     if (!isStopLossOrder(order) || !liquidationPrice) {
@@ -70,7 +71,7 @@ export const PositionsTriggersCell = ({
           assetId,
           stopLossOrders,
           takeProfitOrders,
-          navigateToMarketOrders: () => onViewOrdersClick(marketId),
+          navigateToMarketOrders: onViewOrders
         },
       })
     );
@@ -80,7 +81,7 @@ export const PositionsTriggersCell = ({
     <Styled.Button
       action={ButtonAction.Navigation}
       size={ButtonSize.XSmall}
-      onClick={() => onViewOrdersClick(marketId)}
+      onClick={onViewOrders}
     >
       {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
       {<Styled.ArrowIcon iconName={IconName.Arrow} />}

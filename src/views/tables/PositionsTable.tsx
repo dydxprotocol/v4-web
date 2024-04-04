@@ -396,7 +396,7 @@ export const PositionsTable = ({
       columns={columnKeys.map((key: PositionsTableColumnKey) =>
         getPositionsTableColumnDef({
           key,
-        stringGetter,
+          stringGetter,
           width: columnWidths?.[key],
           isAccountViewOnly,
           navigateToOrders,

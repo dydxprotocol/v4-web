@@ -84,13 +84,7 @@ export const OrderSizeInput = ({
   return (
     <Collapsible
       slotTrigger={
-        <WithTooltip
-          tooltipString={
-            differingOrderSizes
-              ? 'You have two different order sizes. Please update the order sizes manually through the orders tab.'
-              : undefined
-          }
-        >
+        <WithTooltip tooltip={differingOrderSizes ? 'unequal-order-sizes' : undefined}>
           <Checkbox
             disabled={differingOrderSizes}
             checked={shouldShowCustomAmount}
@@ -100,12 +94,11 @@ export const OrderSizeInput = ({
       }
       open={shouldShowCustomAmount}
       label={
-        <WithTooltip tooltip={'custom-amount'}>
+        <WithTooltip tooltip="custom-amount">
           {stringGetter({ key: STRING_KEYS.CUSTOM_AMOUNT })}
         </WithTooltip>
       }
     >
-      {/* TODO: CT-625 Update with values from abacus */}
       <Styled.SizeInputRow>
         <Styled.OrderSizeSlider
           setAbacusSize={setAbacusSize}

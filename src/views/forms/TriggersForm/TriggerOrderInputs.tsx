@@ -159,7 +159,6 @@ export const TriggerOrderInputs = ({
           multipleOrdersButton()
         ) : (
           <>
-            {/* TODO: CT-625 Update with values from abacus */}
             <FormInput
               id={`${tooltipId}-price`}
               label={

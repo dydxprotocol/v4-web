@@ -92,32 +92,15 @@ export const TriggersForm = ({
     </Styled.PriceBox>
   );
 
-  const submitButton = (
-    <WithTooltip tooltipString={hasInputErrors ? inputAlert?.alertString : undefined}>
-      <Styled.Button
-        action={ButtonAction.Primary}
-        type={ButtonType.Submit}
-        state={{ isDisabled: hasInputErrors || isAccountViewOnly }}
-        slotLeft={hasInputErrors ? <Styled.WarningIcon iconName={IconName.Warning} /> : undefined}
-      >
-        {hasInputErrors
-          ? stringGetter({
-              key: inputAlert?.actionStringKey ?? STRING_KEYS.UNAVAILABLE,
-            })
-          : isEditingExistingOrder
-          ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })
-          : stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
-      </Styled.Button>
-    </WithTooltip>
-  );
-
   const onSubmitOrders = async () => {
     await placeTriggerOrders({
       onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
-        // TODO: https://linear.app/dydx/issue/CT-628/[placeholder]-toasts
+        // TODO: CT-628 Trigger a toast
+        console.log('Xcxc error', errorParams);
       },
       onSuccess: (triggerOrdersPayload?: Nullable<HumanReadableTriggerOrdersPayload>) => {
-        // TODO: https://linear.app/dydx/issue/CT-628/[placeholder]-toasts
+        // TODO: CT-628 Trigger a toast
+        console.log('Xcxc triggerOrdersPayload', triggerOrdersPayload);
         dispatch(closeDialog());
       },
     });
@@ -151,7 +134,24 @@ export const TriggersForm = ({
             stepSizeDecimals={stepSizeDecimals}
             tickSizeDecimals={tickSizeDecimals}
           />
-          {submitButton}
+          <WithTooltip tooltipString={hasInputErrors ? inputAlert?.alertString : undefined}>
+            <Styled.Button
+              action={ButtonAction.Primary}
+              type={ButtonType.Submit}
+              state={{ isDisabled: hasInputErrors || isAccountViewOnly }}
+              slotLeft={
+                hasInputErrors ? <Styled.WarningIcon iconName={IconName.Warning} /> : undefined
+              }
+            >
+              {hasInputErrors
+                ? stringGetter({
+                    key: inputAlert?.actionStringKey ?? STRING_KEYS.UNAVAILABLE,
+                  })
+                : isEditingExistingOrder
+                ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })
+                : stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
+            </Styled.Button>
+          </WithTooltip>
         </>
       )}
     </Styled.Form>
