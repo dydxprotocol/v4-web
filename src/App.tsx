@@ -143,7 +143,7 @@ const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
 
 const providers = [
   wrapProvider(PrivyProvider, {
-    appId: import.meta.env.VITE_PRIVY_APP_ID,
+    appId: import.meta.env.VITE_PRIVY_APP_ID ?? 'dummyappiddummyappiddummy',
     config: privyConfig,
   }),
   wrapProvider(QueryClientProvider, { client: queryClient }),

@@ -23,7 +23,7 @@ export const useDisplayedWallets = () => {
     // WalletType.BitKeep,
     // WalletType.Coin98,
 
-    testFlags.displayPrivyLogin && WalletType.Privy,
+    testFlags.displayPrivyLogin && import.meta.env.VITE_PRIVY_APP_ID && WalletType.Privy,
 
     WalletType.OtherWallet,
   ].filter(isTruthy);

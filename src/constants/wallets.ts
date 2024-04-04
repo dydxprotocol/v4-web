@@ -11,8 +11,6 @@ import {
   CoinbaseIcon,
   Coin98Icon,
   GenericWalletIcon,
-  AppleIcon,
-  GoogleIcon,
   HuobiIcon,
   ImTokenIcon,
   KeplrIcon,
@@ -23,8 +21,6 @@ import {
   TokenPocketIcon,
   TrustWalletIcon,
   WalletConnectIcon,
-  Discord2Icon,
-  TwitterIcon,
   EmailIcon,
 } from '@/icons';
 
@@ -277,7 +273,7 @@ export const wallets: Record<WalletType, WalletConfig> = {
   },
   [WalletType.Privy]: {
     type: WalletType.Privy,
-    stringKey: STRING_KEYS.TEST_WALLET,
+    stringKey: STRING_KEYS.EMAIL_OR_SOCIAL,
     icon: EmailIcon,
     connectionTypes: [WalletConnectionType.Privy],
   },

@@ -4,13 +4,11 @@ import { OfflineSigner } from '@cosmjs/proto-signing';
 import { NOBLE_BECH32_PREFIX, LocalWallet, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
 import { AES, enc } from 'crypto-js';
-import { useDispatch, useSelector } from 'react-redux';
-import { useSignTypedData } from 'wagmi';
+import { useDispatch } from 'react-redux';
 
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
 import { DialogTypes } from '@/constants/dialogs';
 import { LocalStorageKey, LOCAL_STORAGE_VERSIONS } from '@/constants/localStorage';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import {
   DydxAddress,
   EvmAddress,
@@ -18,11 +16,9 @@ import {
   TEST_WALLET_EVM_ADDRESS,
   WalletType,
   WalletConnectionType,
-  getSignTypedData,
 } from '@/constants/wallets';
 
 import { setOnboardingState, setOnboardingGuard } from '@/state/account';
-import { getSelectedDydxChainId, getSelectedNetwork } from '@/state/appSelectors';
 import { forceOpenDialog } from '@/state/dialogs';
 
 import abacusStateManager from '@/lib/abacus';
@@ -32,6 +28,7 @@ import { testFlags } from '@/lib/testFlags';
 import { useDydxClient } from './useDydxClient';
 import { useLocalStorage } from './useLocalStorage';
 import { useRestrictions } from './useRestrictions';
+import useSignForWalletDerivation from './useSignForWalletDerivation';
 import { useWalletConnection } from './useWalletConnection';
 
 const AccountsContext = createContext<ReturnType<typeof useAccountsContext> | undefined>(undefined);
@@ -190,18 +187,7 @@ const useAccountsContext = () => {
     }
   }, [evmAddress, dydxAddress]);
 
-  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
-  const selectedNetwork = useSelector(getSelectedNetwork);
-  const chainId = Number(ENVIRONMENT_CONFIG_MAP[selectedNetwork].ethereumChainId);
-
-  const signTypedData = getSignTypedData(selectedDydxChainId);
-  const { signTypedDataAsync } = useSignTypedData({
-    ...signTypedData,
-    domain: {
-      ...signTypedData.domain,
-      chainId,
-    },
-  });
+  const signTypedDataAsync = useSignForWalletDerivation();
 
   useEffect(() => {
     (async () => {
