@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { Dispatch, SetStateAction, useMemo } from 'react';
-=======
-import { useCallback, useMemo, useState } from 'react';
->>>>>>> 21ec34855e7771fcc2892857dd209b3f38d3d4d6
+import { Dispatch, SetStateAction, useCallback, useMemo } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';

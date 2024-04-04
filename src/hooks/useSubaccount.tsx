@@ -431,15 +431,8 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       ) => {
         if (success) {
           onSuccess?.(data);
-          console.log('xcxc success', data?.cancelOrderPayloads, data?.placeOrderPayloads);
         } else {
-          console.log('xcxc error2', data?.cancelOrderPayloads, data?.placeOrderPayloads);
           onError?.({ errorStringKey: parsingError?.stringKey });
-          data?.placeOrderPayloads.forEach((payload: HumanReadablePlaceOrderPayload) => {
-            // if (payload.clientId !== undefined) {
-            //   dispatch(removeUncommittedOrderClientId(payload.clientId));
-            // }
-          });
         }
       };
 

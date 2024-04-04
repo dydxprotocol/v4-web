@@ -29,15 +29,15 @@ export const useTriggerOrdersFormInputs = ({
 
   const setSize = (size: number | null) => {
     const absSize = size ? Math.abs(size) : null;
-    setInputSize(absSize);
     abacusStateManager.setTriggerOrdersValue({
       field: TriggerOrdersInputField.size,
-      value: size != null ? MustBigNumber(absSize).toString() : null,
+      value: absSize != null ? MustBigNumber(absSize).toString() : null,
     });
+    setInputSize(absSize);
   };
 
-  // Initialize trigger order data on mount
   useEffect(() => {
+    // Initialize trigger order data on mount
     if (stopLossOrder) {
       [
         {
@@ -114,7 +114,7 @@ export const useTriggerOrdersFormInputs = ({
     } else if (takeProfitOrder?.size) {
       setSize(takeProfitOrder?.size);
     } else {
-      // Default to full position size
+      // Default to full position size for initial order creation
       setSize(positionSize);
     }
   }, []);
@@ -128,9 +128,13 @@ export const useTriggerOrdersFormInputs = ({
 
   return {
     inputErrors,
+    // True when user is editing an existing order; false when creating completely new orders
     isEditingExistingOrder: stopLossOrder || takeProfitOrder,
+    // True if an SL + TP order exist, and if they are set on different order sizes
     differingOrderSizes,
+    // Default input size to be shown on custom amount slider, null if different order sizes
     inputSize,
+    // Boolean to signify whether the limit box should be checked on initial render of the triggers order form
     existsLimitOrder:
       (stopLossOrder && isLimitOrderType(stopLossOrder.type)) ||
       (takeProfitOrder && isLimitOrderType(takeProfitOrder.type)),

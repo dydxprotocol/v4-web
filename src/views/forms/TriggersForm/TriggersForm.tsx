@@ -26,6 +26,7 @@ import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getPositionDetails } from '@/state/accountSelectors';
 import { closeDialog } from '@/state/dialogs';
 
+import abacusStateManager from '@/lib/abacus';
 import { getTradeInputAlert } from '@/lib/tradeData';
 
 import { AdvancedTriggersOptions } from './AdvancedTriggersOptions';
@@ -92,16 +93,20 @@ export const TriggersForm = ({
     </Styled.PriceBox>
   );
 
+  const closeAndClearDialog = () => {
+    dispatch(closeDialog());
+    abacusStateManager.clearTriggerOrdersInputValues();
+  };
+
   const onSubmitOrders = async () => {
     await placeTriggerOrders({
       onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
         // TODO: CT-628 Trigger a toast
-        console.log('Xcxc error', errorParams);
+        closeAndClearDialog();
       },
       onSuccess: (triggerOrdersPayload?: Nullable<HumanReadableTriggerOrdersPayload>) => {
         // TODO: CT-628 Trigger a toast
-        console.log('Xcxc triggerOrdersPayload', triggerOrdersPayload);
-        dispatch(closeDialog());
+        closeAndClearDialog();
       },
     });
   };
