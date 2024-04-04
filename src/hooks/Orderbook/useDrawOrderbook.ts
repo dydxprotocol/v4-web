@@ -143,13 +143,13 @@ export const useDrawOrderbook = ({
     if (ctx.roundRect) {
       ctx.roundRect(
         bar.x1,
-        y + 1,
+        y,
         bar.x2,
-        rowHeight - 4,
-        histogramSide === 'right' ? [1, 0, 0, 1] : [0, 1, 1, 0]
+        rowHeight - 2,
+        histogramSide === 'right' ? [2, 0, 0, 2] : [0, 2, 2, 0]
       );
     } else {
-      ctx.rect(bar.x1, y + 1, bar.x2, rowHeight - 4);
+      ctx.rect(bar.x1, y, bar.x2, rowHeight - 2);
     }
 
     ctx.fill();
