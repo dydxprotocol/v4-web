@@ -196,6 +196,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         clientId,
         timeInForce,
         goodTilTimeInSeconds,
+        goodTilBlock,
         execution,
         postOnly,
         reduceOnly,
@@ -223,7 +224,10 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         execution as OrderExecution,
         postOnly ?? undefined,
         reduceOnly ?? undefined,
-        triggerPrice ?? undefined
+        triggerPrice ?? undefined,
+        undefined,
+        undefined,
+        goodTilBlock ?? undefined
       );
 
       // Handle stateful orders
