@@ -2,22 +2,27 @@ import { useCallback, useContext, createContext, useEffect, useState, useMemo } 
 
 import { OfflineSigner } from '@cosmjs/proto-signing';
 import { NOBLE_BECH32_PREFIX, LocalWallet, type Subaccount } from '@dydxprotocol/v4-client-js';
+import { usePrivy } from '@privy-io/react-auth';
 import { AES, enc } from 'crypto-js';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useSignTypedData } from 'wagmi';
 
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
 import { DialogTypes } from '@/constants/dialogs';
 import { LocalStorageKey, LOCAL_STORAGE_VERSIONS } from '@/constants/localStorage';
-import { STRING_KEYS } from '@/constants/localization';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import {
   DydxAddress,
   EvmAddress,
   PrivateInformation,
   TEST_WALLET_EVM_ADDRESS,
   WalletType,
+  WalletConnectionType,
+  getSignTypedData,
 } from '@/constants/wallets';
 
 import { setOnboardingState, setOnboardingGuard } from '@/state/account';
+import { getSelectedDydxChainId, getSelectedNetwork } from '@/state/appSelectors';
 import { forceOpenDialog } from '@/state/dialogs';
 
 import abacusStateManager from '@/lib/abacus';
@@ -75,6 +80,8 @@ const useAccountsContext = () => {
 
     setPreviousEvmAddress(evmAddress);
   }, [evmAddress]);
+
+  const { ready, authenticated } = usePrivy();
 
   // EVM → dYdX account derivation
 
@@ -183,6 +190,19 @@ const useAccountsContext = () => {
     }
   }, [evmAddress, dydxAddress]);
 
+  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
+  const selectedNetwork = useSelector(getSelectedNetwork);
+  const chainId = Number(ENVIRONMENT_CONFIG_MAP[selectedNetwork].ethereumChainId);
+
+  const signTypedData = getSignTypedData(selectedDydxChainId);
+  const { signTypedDataAsync } = useSignTypedData({
+    ...signTypedData,
+    domain: {
+      ...signTypedData.domain,
+      chainId,
+    },
+  });
+
   useEffect(() => {
     (async () => {
       if (walletType === WalletType.TestWallet) {
@@ -219,7 +239,17 @@ const useAccountsContext = () => {
 
           const evmDerivedAccount = evmDerivedAddresses[evmAddress];
 
-          if (evmDerivedAccount?.encryptedSignature) {
+          if (walletConnectionType === WalletConnectionType.Privy && authenticated && ready) {
+            try {
+              const signature = await signTypedDataAsync();
+
+              await setWalletFromEvmSignature(signature);
+              dispatch(setOnboardingState(OnboardingState.AccountConnected));
+            } catch (error) {
+              log('useAccounts/decryptSignature', error);
+              forgetEvmSignature();
+            }
+          } else if (evmDerivedAccount?.encryptedSignature) {
             try {
               const signature = decryptSignature(evmDerivedAccount.encryptedSignature);
 
