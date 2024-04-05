@@ -378,6 +378,7 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
               key={row.key}
               item={row}
               state={state}
+              hasRowAction={!!(props.onRowAction)}
               // shouldRowRender={props.shouldRowRender}
               {...props.getRowAttributes?.(row.value!)}
               withGradientCardRows={props.withGradientCardRows}
@@ -539,6 +540,7 @@ export const TableRow = <TableRowData extends object>({
   children,
   state,
   // shouldRowRender,
+  hasRowAction,
   withGradientCardRows,
   withFocusStickyRows,
   withScrollSnapRows,
@@ -548,6 +550,7 @@ export const TableRow = <TableRowData extends object>({
   children: React.ReactNode;
   state: TableState<TableRowData>;
   // shouldRowRender?: (prevRowData: TableRowData, currentRowData: TableRowData) => boolean;
+  hasRowAction?: boolean;
   withGradientCardRows?: boolean;
   withFocusStickyRows?: boolean;
   withScrollSnapRows?: boolean;
@@ -555,7 +558,7 @@ export const TableRow = <TableRowData extends object>({
   const ref = React.useRef<HTMLTableRowElement>(null);
   const selectionManager = state.selectionManager;
   const isSelected = selectionManager.isSelected(item.key);
-  const isClickable = selectionManager.selectionBehavior === 'toggle';
+  const isClickable = selectionManager.selectionBehavior === 'toggle' && hasRowAction;
 
   const { rowProps, isPressed } = useTableRow(
     {

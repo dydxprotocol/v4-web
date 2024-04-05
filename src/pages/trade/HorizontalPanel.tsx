@@ -112,36 +112,35 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
 
         tag: showCurrentMarket ? null : shortenNumberForDisplay(numTotalPositions),
 
-        content: showCurrentMarket ? (
+        content: isTablet ? (
           <PositionInfo showNarrowVariation={isTablet} />
         ) : (
-          <>
-            <PositionsTable
-              columnKeys={
-                isTablet
-                  ? [
-                      PositionsTableColumnKey.Details,
-                      PositionsTableColumnKey.IndexEntry,
-                      PositionsTableColumnKey.PnL,
-                    ]
-                  : [
-                      PositionsTableColumnKey.Market,
-                      PositionsTableColumnKey.Side,
-                      PositionsTableColumnKey.Size,
-                      PositionsTableColumnKey.Leverage,
-                      PositionsTableColumnKey.LiquidationAndOraclePrice,
-                      testFlags.isolatedMargin && PositionsTableColumnKey.Margin,
-                      PositionsTableColumnKey.UnrealizedPnl,
-                      PositionsTableColumnKey.RealizedPnl,
-                      PositionsTableColumnKey.AverageOpenAndClose,
-                      shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-                      shouldRenderActions && PositionsTableColumnKey.Actions,
-                    ].filter(isTruthy)
-              }
-              onNavigate={() => setView(PanelView.CurrentMarket)}
-              navigateToOrders={onViewOrders}
-            />
-          </>
+          <PositionsTable
+            currentMarket={showCurrentMarket ? currentMarketId : undefined}
+            columnKeys={
+              isTablet
+                ? [
+                    PositionsTableColumnKey.Details,
+                    PositionsTableColumnKey.IndexEntry,
+                    PositionsTableColumnKey.PnL,
+                  ]
+                : [
+                    PositionsTableColumnKey.Market,
+                    PositionsTableColumnKey.Side,
+                    PositionsTableColumnKey.Size,
+                    PositionsTableColumnKey.Leverage,
+                    PositionsTableColumnKey.LiquidationAndOraclePrice,
+                    testFlags.isolatedMargin && PositionsTableColumnKey.Margin,
+                    PositionsTableColumnKey.UnrealizedPnl,
+                    PositionsTableColumnKey.RealizedPnl,
+                    PositionsTableColumnKey.AverageOpenAndClose,
+                    shouldRenderTriggers && PositionsTableColumnKey.Triggers,
+                    shouldRenderActions && PositionsTableColumnKey.Actions,
+                  ].filter(isTruthy)
+            }
+            onNavigate={() => setView(PanelView.CurrentMarket)}
+            navigateToOrders={onViewOrders}
+          />
         ),
       },
       {
