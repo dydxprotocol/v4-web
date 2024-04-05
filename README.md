@@ -86,13 +86,14 @@ Set environment variables via `.env`.
 - `INTERCOM_APP_ID` (optional): Used for enabling Intercom; utilized with `pnpm run build:inject-intercom`.
 - `STATUS_PAGE_SCRIPT_URI` (optional): Used for enabling the status page; used with `pnpm run build:inject-statuspage`.
 - `SMARTBANNER_APP_NAME`, `SMARTBANNER_ORG_NAME`, `SMARTBANNER_ICON_URL`, `SMARTBANNER_APPSTORE_URL` (optional): Used for enabling the smart app banner; used with `pnpm run build:inject-smartbanner`.
+- `VITE_PRIVY_APP_ID` (optional): App ID used for enabling Privy authentication. For deployment of DYDX token holders use `clua5njf801bncvpa0woolzq4`.
 
 ## Part 5: Configure entry points
 
 ### HTML files
 
 Edit `scripts/generate-entry-points.js` and set up entry points according to your SEO needs. At least one entry point must be configured,
-i.e. at least one element must be present in the `ENTRY_POINTS` array. This array consists of objects of the form: 
+i.e. at least one element must be present in the `ENTRY_POINTS` array. This array consists of objects of the form:
 
 ```
 {

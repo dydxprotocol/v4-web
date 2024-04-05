@@ -20,13 +20,13 @@ import {
   NumberSign,
   TOKEN_DECIMALS,
 } from '@/constants/numbers';
+import { WalletType } from '@/constants/wallets';
 
 import {
   useAccounts,
   useDebounce,
   useDydxClient,
   useRestrictions,
-  useSelectedNetwork,
   useStringGetter,
   useSubaccount,
   useTokenConfigs,
@@ -281,6 +281,17 @@ export const WithdrawForm = () => {
   const onClickMax = useCallback(() => {
     setWithdrawAmount(freeCollateralBN.toString());
   }, [freeCollateralBN, setWithdrawAmount]);
+
+  const { walletType } = useAccounts();
+
+  useEffect(() => {
+    if (walletType === WalletType.Privy) {
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.exchange,
+        value: 'coinbase',
+      });
+    }
+  }, [walletType]);
 
   const onSelectNetwork = useCallback((name: string, type: 'chain' | 'exchange') => {
     if (name) {
