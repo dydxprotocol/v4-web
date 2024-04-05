@@ -117,11 +117,7 @@ export const NewMarketSelectionStep = ({
 
         // Disable Isolated markets if the user is not on Staging or Local deployment
         if (marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED') {
-          if (isDev && exchangeConfigJson.length > 0) {
-            return true;
-          }
-
-          return false;
+          return isDev && exchangeConfigJson.length > 0;
         }
 
         if (exchangeConfigJson.length >= NUM_ORACLES_TO_QUALIFY_AS_SAFE) {

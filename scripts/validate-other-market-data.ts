@@ -95,10 +95,6 @@ interface Proposal {
   title: string;
   summary: string;
   params: Params;
-  meta: {
-    assetName: string;
-    referencePrice: number;
-  };
 }
 
 enum ExchangeName {
