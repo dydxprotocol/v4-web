@@ -361,7 +361,14 @@ export const PositionsTable = ({
   const openPositions = useSelector(getExistingOpenPositions, shallowEqual) || [];
   const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } = useSelector(
     getSubaccountConditionalOrders,
-    shallowEqual
+    {
+      equalityFn: (oldVal, newVal) => {
+        return (
+          shallowEqual(oldVal.stopLossOrders, newVal.stopLossOrders) &&
+          shallowEqual(oldVal.takeProfitOrders, newVal.takeProfitOrders)
+        );
+      },
+    }
   );
 
   const positionsData = useMemo(
