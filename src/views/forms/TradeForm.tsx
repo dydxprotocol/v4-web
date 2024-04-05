@@ -1,9 +1,8 @@
-import { type FormEvent, useState, Ref, useCallback, Dispatch, SetStateAction } from 'react';
+import { type FormEvent, useState, Ref, useCallback } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { NumberFormatValues, SourceInfo } from 'react-number-format';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import {
@@ -17,10 +16,8 @@ import {
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
-import { PanelView, InfoSection } from '@/constants/horizontalPanel';
 import { STRING_KEYS, StringKey } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
-import { AppRoute } from '@/constants/routes';
 import {
   InputErrorData,
   TradeBoxKeys,
@@ -48,11 +45,6 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithTooltip } from '@/components/WithTooltip';
 import { Orderbook } from '@/views/tables/Orderbook';
 
-import {
-  getCurrentMarketPositionData,
-  getIsAccountConnected,
-  getSubaccountConditionalOrdersForCurrentMarket,
-} from '@/state/accountSelectors';
 import { openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { setTradeFormInputs } from '@/state/inputs';
 import {
@@ -62,11 +54,7 @@ import {
   getTradeFormInputs,
   useTradeFormData,
 } from '@/state/inputsSelectors';
-import {
-  getCurrentMarketAssetId,
-  getCurrentMarketConfig,
-  getCurrentMarketId,
-} from '@/state/perpetualsSelectors';
+import { getCurrentMarketAssetId, getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { testFlags } from '@/lib/testFlags';
@@ -93,8 +81,6 @@ type ElementProps = {
   currentStep?: MobilePlaceOrderSteps;
   setCurrentStep?: (step: MobilePlaceOrderSteps) => void;
   onConfirm?: () => void;
-  setTab: Dispatch<SetStateAction<InfoSection>>;
-  setView: Dispatch<SetStateAction<PanelView>>;
 };
 
 type StyleProps = {
@@ -105,8 +91,6 @@ export const TradeForm = ({
   currentStep,
   setCurrentStep,
   onConfirm,
-  setTab,
-  setView,
   className,
 }: ElementProps & StyleProps) => {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
@@ -115,7 +99,6 @@ export const TradeForm = ({
 
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
-  const navigate = useNavigate();
   const { placeOrder } = useSubaccount();
   const { isTablet } = useBreakpoints();
 
@@ -136,11 +119,8 @@ export const TradeForm = ({
     tradeErrors,
   } = useTradeFormData();
 
-  const isAccountConnected = useSelector(getIsAccountConnected);
   const currentInput = useSelector(getCurrentInput);
   const currentAssetId = useSelector(getCurrentMarketAssetId);
-  const currentMarketId = useSelector(getCurrentMarketId);
-  const currentMarketPosition = useSelector(getCurrentMarketPositionData, shallowEqual) || {};
   const { tickSizeDecimals, stepSizeDecimals } =
     useSelector(getCurrentMarketConfig, shallowEqual) || {};
 
@@ -155,11 +135,6 @@ export const TradeForm = ({
   const selectedOrderSide = getSelectedOrderSide(side);
 
   const { typeOptions } = useSelector(getInputTradeOptions, shallowEqual) ?? {};
-
-  const { stopLossOrders, takeProfitOrders } = useSelector(
-    getSubaccountConditionalOrdersForCurrentMarket,
-    shallowEqual
-  );
 
   const allTradeTypeItems = (typeOptions?.toArray() ?? []).map(({ type, stringKey }) => ({
     value: type,
@@ -324,13 +299,6 @@ export const TradeForm = ({
     });
   }
 
-  const showAddTriggersButton =
-    testFlags.configureSlTpFromPositionsTable &&
-    isAccountConnected &&
-    currentMarketPosition.size?.current !== 0;
-  const showClearButton =
-    isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder);
-
   return (
     <Styled.TradeForm onSubmit={onSubmit} className={className}>
       {currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder ? (
@@ -427,52 +395,17 @@ export const TradeForm = ({
       )}
 
       <Styled.Footer>
-        {(showAddTriggersButton || showClearButton) && (
+        {isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder) && (
           <Styled.ButtonRow>
-            {showAddTriggersButton && (
-              <Styled.TriggersButton
-                type={ButtonType.Button}
-                action={ButtonAction.Secondary}
-                shape={ButtonShape.Pill}
-                size={ButtonSize.XSmall}
-                slotLeft={<Styled.PlusIcon iconName={IconName.Plus} />}
-                onClick={() =>
-                  dispatch(
-                    openDialog({
-                      type: DialogTypes.Triggers,
-                      dialogProps: {
-                        marketId: currentMarketId,
-                        assetId: currentAssetId,
-                        stopLossOrders,
-                        takeProfitOrders,
-                        navigateToMarketOrders: (market: string) => {
-                          navigate(`${AppRoute.Trade}/${market}`, {
-                            state: {
-                              from: AppRoute.Trade,
-                            },
-                          });
-                          setView(PanelView.CurrentMarket);
-                          setTab(InfoSection.Orders);
-                        },
-                      },
-                    })
-                  )
-                }
-              >
-                {stringGetter({ key: STRING_KEYS.ADD_TP_OR_SL })}
-              </Styled.TriggersButton>
-            )}
-            {showClearButton && (
-              <Styled.ClearButton
-                type={ButtonType.Reset}
-                action={ButtonAction.Reset}
-                shape={ButtonShape.Pill}
-                size={ButtonSize.XSmall}
-                onClick={() => abacusStateManager.clearTradeInputValues({ shouldResetSize: true })}
-              >
-                {stringGetter({ key: STRING_KEYS.CLEAR })}
-              </Styled.ClearButton>
-            )}
+            <Button
+              type={ButtonType.Reset}
+              action={ButtonAction.Reset}
+              shape={ButtonShape.Pill}
+              size={ButtonSize.XSmall}
+              onClick={() => abacusStateManager.clearTradeInputValues({ shouldResetSize: true })}
+            >
+              {stringGetter({ key: STRING_KEYS.CLEAR })}
+            </Button>
           </Styled.ButtonRow>
         )}
         <PlaceOrderButtonAndReceipt
@@ -645,20 +578,6 @@ Styled.ButtonRow = styled.div`
   ${layoutMixins.row}
   justify-self: end;
   padding: 0.5rem 0 0.5rem 0;
-  width: 100%;
-`;
-
-Styled.TriggersButton = styled(Button)`
-  margin-right: auto;
-`;
-
-Styled.PlusIcon = styled(Icon)`
-  width: 0.75em;
-  height: 0.75em;
-`;
-
-Styled.ClearButton = styled(Button)`
-  margin-left: auto;
 `;
 
 Styled.Footer = styled.footer`
