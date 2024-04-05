@@ -67,6 +67,12 @@ export const getWalletConnection = ({
           type: WalletConnectionType.TestWallet,
         };
       }
+
+      case WalletConnectionType.Privy: {
+        return {
+          type: WalletConnectionType.Privy,
+        };
+      }
     }
   }
 };

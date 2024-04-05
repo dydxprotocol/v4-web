@@ -39,6 +39,10 @@ class TestFlags {
   get isolatedMargin() {
     return !!this.queryParams.isolatedmargin;
   }
+
+  get displayPrivyLogin() {
+    return !!this.queryParams.displayprivylogin || true;
+  }
 }
 
 export const testFlags = new TestFlags();

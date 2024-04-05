@@ -1,12 +1,6 @@
 import type { AbacusWebsocketProtocol } from '@/constants/abacus';
 import type { TradingViewBar } from '@/constants/candles';
 import { isDev } from '@/constants/networks';
-import {
-  PING_INTERVAL_MS,
-  PONG_TIMEOUT_MS,
-  OUTGOING_PING_MESSAGE,
-  PONG_MESSAGE_TYPE,
-} from '@/constants/websocket';
 
 import { lastSuccessfulWebsocketRequestByOrigin } from '@/hooks/useAnalytics';
 
@@ -24,7 +18,6 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
   private connectedCallback: ((p0: boolean) => void) | null = null;
   private receivedCallback: ((p0: string) => void) | null = null;
 
-  private pingPongTimer?: NodeJS.Timer;
   private disconnectTimer?: NodeJS.Timer;
   private reconnectTimer?: NodeJS.Timer;
   private currentCandleId: string | undefined;
@@ -98,13 +91,6 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
     this.socket.onopen = () => {
       this.isConnecting = false;
       if (this.socket?.readyState === WebSocket.OPEN) {
-        this.pingPongTimer = setInterval(() => {
-          if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-            this.socket.send(OUTGOING_PING_MESSAGE);
-          }
-        }, PING_INTERVAL_MS);
-        this._setDisconnectTimeout();
-
         this._setReconnectInterval();
 
         if (this.currentCandleId) {
@@ -122,63 +108,58 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
       try {
         const parsedMessage = JSON.parse(m.data);
 
-        if (parsedMessage?.type === PONG_MESSAGE_TYPE) {
-          clearTimeout(this.disconnectTimer);
-          this._setDisconnectTimeout();
-        } else {
-          let shouldProcess = true;
+        let shouldProcess = true;
 
-          switch (parsedMessage?.channel) {
-            case 'v4_orderbook': {
-              shouldProcess = import.meta.env.VITE_ABACUS_PROCESS_ORDERBOOK !== '0';
-              break;
+        switch (parsedMessage?.channel) {
+          case 'v4_orderbook': {
+            shouldProcess = import.meta.env.VITE_ABACUS_PROCESS_ORDERBOOK !== '0';
+            break;
+          }
+          case 'v4_candles': {
+            shouldProcess = false;
+            const { id, contents } = parsedMessage;
+
+            if (id && contents) {
+              const subscriptionItem = subscriptionsByChannelId.get(id);
+              const updatedCandle = contents[0];
+
+              if (updatedCandle && subscriptionItem) {
+                const bar: TradingViewBar = mapCandle(updatedCandle);
+                subscriptionItem.lastBar = bar;
+
+                // send data to every subscriber of that symbol
+                Object.values(subscriptionItem.handlers).forEach((handler: any) =>
+                  handler.callback(bar)
+                );
+              }
             }
-            case 'v4_candles': {
+
+            break;
+          }
+          case 'v4_markets': {
+            if (testFlags.displayInitializingMarkets) {
               shouldProcess = false;
-              const { id, contents } = parsedMessage;
+              const { contents } = parsedMessage;
 
-              if (id && contents) {
-                const subscriptionItem = subscriptionsByChannelId.get(id);
-                const updatedCandle = contents[0];
-
-                if (updatedCandle && subscriptionItem) {
-                  const bar: TradingViewBar = mapCandle(updatedCandle);
-                  subscriptionItem.lastBar = bar;
-
-                  // send data to every subscriber of that symbol
-                  Object.values(subscriptionItem.handlers).forEach((handler: any) =>
-                    handler.callback(bar)
-                  );
+              Object.keys(contents.markets ?? {}).forEach((market: any) => {
+                const status = contents.markets[market].status;
+                if (status === 'INITIALIZING') {
+                  contents.markets[market].status = 'ONLINE';
                 }
-              }
+              });
 
-              break;
+              this.receivedCallback?.(JSON.stringify(parsedMessage));
             }
-            case 'v4_markets': {
-              if (testFlags.displayInitializingMarkets) {
-                shouldProcess = false;
-                const { contents } = parsedMessage;
 
-                Object.keys(contents.markets ?? {}).forEach((market: any) => {
-                  const status = contents.markets[market].status;
-                  if (status === 'INITIALIZING') {
-                    contents.markets[market].status = 'ONLINE';
-                  }
-                });
-
-                this.receivedCallback?.(JSON.stringify(parsedMessage));
-              }
-
-              break;
-            }
-            default: {
-              break;
-            }
+            break;
           }
-
-          if (shouldProcess && this.receivedCallback) {
-            this.receivedCallback(m.data);
+          default: {
+            break;
           }
+        }
+
+        if (shouldProcess && this.receivedCallback) {
+          this.receivedCallback(m.data);
         }
 
         lastSuccessfulWebsocketRequestByOrigin[new URL(this.url!).origin] = Date.now();
@@ -207,9 +188,6 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
     this.socket?.close();
     this.socket = null;
 
-    clearInterval(this.pingPongTimer);
-    delete this.pingPongTimer;
-
     clearInterval(this.disconnectTimer);
     delete this.disconnectTimer;
 
@@ -229,12 +207,6 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
         this._initializeSocket();
       }
     }, RECONNECT_INTERVAL_MS);
-  };
-
-  private _setDisconnectTimeout = () => {
-    this.disconnectTimer = setTimeout(() => {
-      this._clearSocket();
-    }, PONG_TIMEOUT_MS);
   };
 }
 
