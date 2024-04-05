@@ -1,16 +1,21 @@
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { type SubaccountOrder } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';
-import { DialogTypes } from '@/constants/dialogs';
+import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
+import { AppRoute } from '@/constants/routes';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { ActionsTableCell } from '@/components/Table';
 
-import { openDialog } from '@/state/dialogs';
+import { closeDialogInTradeBox, openDialog, openDialogInTradeBox } from '@/state/dialogs';
+import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
+import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
+import abacusStateManager from '@/lib/abacus';
 import { testFlags } from '@/lib/testFlags';
 
 type ElementProps = {
@@ -31,8 +36,26 @@ export const PositionsActionsCell = ({
   navigateToMarketOrders,
 }: ElementProps) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const onCloseButtonClick = () => {};
+  const currentMarketId = useSelector(getCurrentMarketId);
+  const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog);
+  const { type: tradeBoxDialogType } = activeTradeBoxDialog || {};
+
+  const onCloseButtonToggle = (isPressed: boolean) => {
+    navigate(`${AppRoute.Trade}/${marketId}`);
+    dispatch(
+      isPressed
+        ? openDialogInTradeBox({
+            type: TradeBoxDialogTypes.ClosePosition,
+          })
+        : closeDialogInTradeBox()
+    );
+
+    if (!isPressed) {
+      abacusStateManager.clearClosePositionInputValues({ shouldFocusOnTradeInput: true });
+    }
+  };
 
   return (
     <ActionsTableCell>
@@ -58,15 +81,17 @@ export const PositionsActionsCell = ({
           isDisabled={isDisabled}
         />
       )}
-      {testFlags.closePositionsFromPositionsTable && (
-        <Styled.CloseButton
-          key="closepositions"
-          onClick={onCloseButtonClick}
-          iconName={IconName.Close}
-          shape={ButtonShape.Square}
-          isDisabled={isDisabled}
-        />
-      )}
+      <Styled.CloseButtonToggle
+        key="closepositions"
+        isToggle={true}
+        isPressed={
+          tradeBoxDialogType === TradeBoxDialogTypes.ClosePosition && currentMarketId === marketId
+        }
+        onPressedChange={onCloseButtonToggle}
+        iconName={IconName.Close}
+        shape={ButtonShape.Square}
+        isDisabled={isDisabled}
+      />
     </ActionsTableCell>
   );
 };
@@ -80,8 +105,9 @@ Styled.TriggersButton = styled(IconButton)`
   }
 `;
 
-Styled.CloseButton = styled(IconButton)`
+Styled.CloseButtonToggle = styled(IconButton)`
   --button-hover-textColor: var(--color-red);
+  --button-toggle-on-textColor: var(--color-red);
 
   svg {
     width: 0.875em;
