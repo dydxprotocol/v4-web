@@ -365,17 +365,10 @@ export const PositionsTable = ({
   const marketPosition = openPositions.find((position) => position.id == currentMarket);
   const positions = currentMarket ? (marketPosition ? [marketPosition] : []) : openPositions;
 
-  const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } = useSelector(
-    getSubaccountConditionalOrders,
-    {
-      equalityFn: (oldVal, newVal) => {
-        return (
-          shallowEqual(oldVal.stopLossOrders, newVal.stopLossOrders) &&
-          shallowEqual(oldVal.takeProfitOrders, newVal.takeProfitOrders)
-        );
-      },
-    }
-  );
+  const conditionalOrders = useSelector(getSubaccountConditionalOrders, shallowEqual);
+
+  const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } =
+    conditionalOrders;
 
   const positionsData = useMemo(
     () =>
@@ -394,7 +387,7 @@ export const PositionsTable = ({
           ...position,
         };
       }),
-    [openPositions, perpetualMarkets, assets, allStopLossOrders, allTakeProfitOrders]
+    [openPositions, perpetualMarkets, assets, conditionalOrders]
   );
 
   return (
