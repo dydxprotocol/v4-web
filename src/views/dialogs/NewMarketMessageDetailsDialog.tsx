@@ -43,7 +43,7 @@ export const NewMarketMessageDetailsDialog = ({
   setIsOpen,
 }: ElementProps) => {
   const [codeToggleGroup, setCodeToggleGroup] = useState(CodeToggleGroup.CREATE_ORACLE);
-  const { baseAsset, params, title, meta } = assetData ?? {};
+  const { baseAsset, params, title } = assetData ?? {};
   const {
     ticker,
     marketType,

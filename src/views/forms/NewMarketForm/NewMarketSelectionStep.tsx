@@ -44,7 +44,6 @@ import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 type NewMarketSelectionStepProps = {
   assetToAdd?: NewMarketProposal;
