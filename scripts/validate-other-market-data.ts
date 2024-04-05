@@ -435,12 +435,13 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
     ProposalStatus.PROPOSAL_STATUS_FAILED
   );
   if (proposalsFailed.proposals.length > 0) {
-    throw new Error(`Some proposals failed: ${proposalsFailed}`);
+    const failedIds = proposalsFailed.proposals.map((proposal) => proposal.id);
+    throw new Error(`Proposals ${failedIds} failed: ${proposalsFailed.proposals}`);
   }
 
   // Wait for prices to update.
-  console.log('\nWaiting for 15 seconds for prices to update...');
-  await sleep(15 * 1000);
+  console.log('\nWaiting for 300 seconds for prices to update...');
+  await sleep(300 * 1000);
 
   // Check markets on chain.
   console.log('\nChecking price, clob pair, and perpetual on chain for each market proposed...');
