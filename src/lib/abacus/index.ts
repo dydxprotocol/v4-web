@@ -189,11 +189,17 @@ class AbacusStateManager {
 
     this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.takeProfitOrderId });
     this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.takeProfitPrice });
-    this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.takeProfitLimitPrice });
-    this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.takeProfitPercentDiff });
+    this.setTriggerOrdersValue({
+      value: null,
+      field: TriggerOrdersInputField.takeProfitLimitPrice,
+    });
+    this.setTriggerOrdersValue({
+      value: null,
+      field: TriggerOrdersInputField.takeProfitPercentDiff,
+    });
     this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.takeProfitUsdcDiff });
     this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.takeProfitOrderType });
-  }
+  };
 
   resetInputState = () => {
     this.clearTransferInputValues();
@@ -202,7 +208,7 @@ class AbacusStateManager {
       value: null,
     });
     this.clearTradeInputValues();
-    this.clearTransferInputValues();
+    this.clearTriggerOrdersInputValues();
   };
 
   // ------ Set Data ------ //

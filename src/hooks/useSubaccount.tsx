@@ -435,12 +435,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
           onError?.({ errorStringKey: parsingError?.stringKey });
         }
       };
-
-      let triggerOrdersParams;
-
-      triggerOrdersParams = abacusStateManager.triggerOrders(callback);
-
-      return triggerOrdersParams;
+      return abacusStateManager.triggerOrders(callback);
     },
     [subaccountClient]
   );
