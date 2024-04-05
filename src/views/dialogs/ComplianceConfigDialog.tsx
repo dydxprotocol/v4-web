@@ -1,14 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { ComplianceStatus } from '@/constants/compliance';
-import { STRING_KEYS } from '@/constants/localization';
-import { NotificationType } from '@/constants/notifications';
-
-import { useStringGetter } from '@/hooks';
-import { useNotifications } from '@/hooks/useNotifications';
+import { ComplianceStatus, RestrictedGeo } from '@/constants/compliance';
 
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { Switch } from '@/components/Switch';
@@ -17,8 +12,6 @@ import { setCompliance } from '@/state/account';
 import { getComplianceStatus } from '@/state/accountSelectors';
 import { setGeo } from '@/state/app';
 import { getGeo } from '@/state/appSelectors';
-import { OtherPreference, setDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configs';
-import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
 
 const complianceStatusOptions = [
   { status: ComplianceStatus.COMPLIANT, label: 'Compliant' },
@@ -32,7 +25,7 @@ export const usePreferenceMenu = () => {
 
   const complianceStatus = useSelector(getComplianceStatus, shallowEqual);
   const geo = useSelector(getGeo, shallowEqual);
-  const restrictedGeo = geo === 'US' || geo === 'CA';
+  const geoRestricted = Boolean(geo && RestrictedGeo.includes(geo));
 
   const notificationSection = useMemo(
     () => ({
@@ -44,7 +37,7 @@ export const usePreferenceMenu = () => {
         onSelect: () => dispatch(setCompliance({ status })),
         slotAfter: (
           <Switch
-            name={NotificationType.AbacusGenerated}
+            name="CompliaceStatus"
             checked={complianceStatus === status}
             onCheckedChange={() => null} // Assuming the onChange logic is to be defined or is unnecessary
           />
@@ -62,19 +55,15 @@ export const usePreferenceMenu = () => {
           value: 'RestrictGeo',
           label: 'Simulate Restricted Geo',
           slotAfter: (
-            <Switch
-              name={OtherPreference.DisplayAllMarketsDefault}
-              checked={restrictedGeo}
-              onCheckedChange={() => null}
-            />
+            <Switch name="RestrictGeo" checked={geoRestricted} onCheckedChange={() => null} />
           ),
           onSelect: () => {
-            dispatch(restrictedGeo ? setGeo('') : setGeo('US'));
+            dispatch(geoRestricted ? setGeo('') : setGeo('US'));
           },
         },
       ],
     }),
-    [restrictedGeo]
+    [geoRestricted]
   );
 
   return [otherSection, notificationSection];
