@@ -46,6 +46,7 @@ export const NewMarketMessageDetailsDialog = ({
   const { baseAsset, params, title } = assetData ?? {};
   const {
     ticker,
+    marketType,
     exchangeConfigJson,
     minExchanges,
     minPriceChange,
@@ -192,6 +193,11 @@ export const NewMarketMessageDetailsDialog = ({
                       key: 'liquidity_tier',
                       label: 'liquidity_tier',
                       value: liquidityTier,
+                    },
+                    {
+                      key: 'market_type',
+                      label: 'market_type',
+                      value: marketType ?? 'PERPETUAL_MARKET_TYPE_CROSS',
                     },
                   ]}
                 />
