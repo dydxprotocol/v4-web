@@ -46,6 +46,7 @@ export const NewMarketMessageDetailsDialog = ({
   const { baseAsset, params, title, meta } = assetData ?? {};
   const {
     ticker,
+    marketType,
     exchangeConfigJson,
     minExchanges,
     minPriceChange,
@@ -196,7 +197,7 @@ export const NewMarketMessageDetailsDialog = ({
                     {
                       key: 'market_type',
                       label: 'market_type',
-                      value: meta?.marketType ?? 'PERPETUAL_MARKET_TYPE_CROSS',
+                      value: marketType ?? 'PERPETUAL_MARKET_TYPE_CROSS',
                     },
                   ]}
                 />
