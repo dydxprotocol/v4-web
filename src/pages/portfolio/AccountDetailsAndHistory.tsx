@@ -7,6 +7,7 @@ import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import type { Nullable } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
+import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
@@ -21,6 +22,7 @@ import { WithLabel } from '@/components/WithLabel';
 import { PnlChart, type PnlDatum } from '@/views/charts/PnlChart';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
+import { calculateComplianceState } from '@/state/accountCalculators';
 import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
@@ -94,6 +96,7 @@ export const AccountDetailsAndHistory = () => {
   const { isTablet } = useBreakpoints();
   const selectedLocale = useSelector(getSelectedLocale);
   const onboardingState = useSelector(getOnboardingState);
+  const complianceState = useSelector(calculateComplianceState, shallowEqual);
 
   const { buyingPower, equity, freeCollateral, leverage, marginUsage } =
     useSelector(getSubaccount, shallowEqual) || {};
@@ -173,8 +176,14 @@ export const AccountDetailsAndHistory = () => {
         selectedLocale={selectedLocale}
         slotEmpty={
           <Styled.EmptyChart>
-            {onboardingState !== OnboardingState.AccountConnected && (
-              <Styled.OnboardingCard>
+            {complianceState === ComplianceStates.READ_ONLY ? (
+              <Styled.EmptyCard>
+                Perpetuals are not available to any persons who are residents of, are located or
+                incorporated in, or have a registered agent in a blocked country or a restricted
+                territory. More details can be found in our Terms of Use
+              </Styled.EmptyCard>
+            ) : onboardingState !== OnboardingState.AccountConnected ? (
+              <Styled.EmptyCard>
                 <p>
                   {stringGetter({
                     key: {
@@ -184,8 +193,8 @@ export const AccountDetailsAndHistory = () => {
                   })}
                 </p>
                 <OnboardingTriggerButton />
-              </Styled.OnboardingCard>
-            )}
+              </Styled.EmptyCard>
+            ) : null}
           </Styled.EmptyChart>
         }
       />
@@ -288,7 +297,7 @@ Styled.EmptyChart = styled.div`
   cursor: default;
 `;
 
-Styled.OnboardingCard = styled.div`
+Styled.EmptyCard = styled.div`
   width: 16.75rem;
 
   ${layoutMixins.column};

@@ -12,3 +12,11 @@ export enum ComplianceStatus {
   CLOSE_ONLY = 'CLOSE_ONLY',
   BLOCKED = 'BLOCKED',
 }
+
+export enum ComplianceStates {
+  FULLACCESS = 'FUllACCESS',
+  READ_ONLY = 'READ_ONLY',
+  CLOSE_ONLY = 'CLOSE_ONLY',
+}
+
+export const RestrictedGeo = ['US', 'CA'];

@@ -1,15 +1,19 @@
 import { createSelector } from 'reselect';
 
 import { OnboardingState, OnboardingSteps } from '@/constants/account';
+import { ComplianceStates, ComplianceStatus, RestrictedGeo } from '@/constants/compliance';
 
 import {
   getOnboardingGuards,
   getOnboardingState,
   getSubaccountId,
   getUncommittedOrderClientIds,
+  getComplianceStatus,
 } from '@/state/accountSelectors';
 
 import { testFlags } from '@/lib/testFlags';
+
+import { getGeo } from './appSelectors';
 
 export const calculateOnboardingStep = createSelector(
   [getOnboardingState, getOnboardingGuards],
@@ -101,4 +105,20 @@ export const calculateShouldRenderTriggersInPositionsTable = createSelector(
 export const calculateShouldRenderActionsInPositionsTable = createSelector(
   [calculateIsAccountViewOnly],
   (isAccountViewOnly: boolean) => !isAccountViewOnly
+);
+
+/**
+ * @description calculate the compliance state
+ */
+export const calculateComplianceState = createSelector(
+  [getComplianceStatus, getGeo],
+  (status?: string, geo?: string) => {
+    if (status === ComplianceStatus.FIRST_STRIKE || status === ComplianceStatus.CLOSE_ONLY) {
+      return ComplianceStates.CLOSE_ONLY;
+    }
+    if (status === ComplianceStatus.BLOCKED || RestrictedGeo.includes(geo || '')) {
+      return ComplianceStates.READ_ONLY;
+    }
+    return ComplianceStates.FULLACCESS;
+  }
 );
