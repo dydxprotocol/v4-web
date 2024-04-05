@@ -4659,6 +4659,7 @@
     "params": {
       "id": 1692,
       "ticker": "THETA-USD",
+      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
       "minPriceChange": 4000,
       "minExchanges": 1,
@@ -4708,8 +4709,7 @@
     },
     "meta": {
       "assetName": "Theta Network",
-      "referencePrice": 2.673191190960826,
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED"
+      "referencePrice": 2.673191190960826
     }
   },
   "STETH": {
@@ -4718,6 +4718,7 @@
     "params": {
       "id": 1624,
       "ticker": "STETH-USD",
+      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -6.0,
       "minPriceChange": 4000,
       "minExchanges": 1,
@@ -4757,8 +4758,7 @@
     },
     "meta": {
       "assetName": "Lido Staked ETH",
-      "referencePrice": 3348.4945630719635,
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED"
+      "referencePrice": 3348.4945630719635
     }
   },
   "DEGEN": {
@@ -4767,6 +4767,7 @@
     "params": {
       "id": 434,
       "ticker": "DEGEN-USD",
+      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -16.0,
       "minPriceChange": 4000,
       "minExchanges": 1,
@@ -4791,8 +4792,7 @@
     },
     "meta": {
       "assetName": "DEGEN Index",
-      "referencePrice": 6.660343656981412e-07,
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED"
+      "referencePrice": 6.660343656981412e-07
     }
   }
 }

@@ -77,6 +77,7 @@ interface Exchange {
 interface Params {
   id: number;
   ticker: string;
+  marketType: 'PERPETUAL_MARKET_TYPE_ISOLATED' | 'PERPETUAL_MARKET_TYPE_CROSS';
   priceExponent: number;
   minPriceChange: number;
   minExchanges: number;
@@ -97,7 +98,6 @@ interface Proposal {
   meta: {
     assetName: string;
     referencePrice: number;
-    marketType: 'PERPETUAL_MARKET_TYPE_ISOLATED' | 'PERPETUAL_MARKET_TYPE_CROSS';
   };
 }
 
@@ -394,7 +394,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
             subticksPerTick: proposal.params.subticksPerTick,
             delayBlocks: proposal.params.delayBlocks,
             marketType:
-              proposal.meta?.marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
+              proposal.params.marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
                 ? PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED
                 : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS,
           },

@@ -43,6 +43,7 @@ import { openDialog } from '@/state/dialogs';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
+import { testFlags } from '@/lib/testFlags';
 
 type NewMarketPreviewStepProps = {
   assetData: NewMarketProposal;
@@ -85,6 +86,7 @@ export const NewMarketPreviewStep = ({
   const {
     ticker,
     priceExponent,
+    marketType,
     minExchanges,
     minPriceChange,
     exchangeConfigJson,
@@ -151,7 +153,7 @@ export const NewMarketPreviewStep = ({
               liquidityTier,
               quantumConversionExponent,
               marketType:
-                meta.marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
+                marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
                   ? PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED
                   : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS,
               stepBaseQuantums: Long.fromNumber(stepBaseQuantums),

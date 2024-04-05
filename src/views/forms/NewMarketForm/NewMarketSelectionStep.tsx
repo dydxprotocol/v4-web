@@ -9,7 +9,7 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { isMainnet } from '@/constants/networks';
+import { isDev, isMainnet } from '@/constants/networks';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import {
   NUM_ORACLES_TO_QUALIFY_AS_SAFE,
@@ -44,6 +44,7 @@ import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 type NewMarketSelectionStepProps = {
   assetToAdd?: NewMarketProposal;
@@ -109,18 +110,28 @@ export const NewMarketSelectionStep = ({
   }, [assetToAdd]);
 
   const filteredPotentialMarkets = useMemo(() => {
-    return potentialMarkets?.filter(({ params: { ticker, exchangeConfigJson }, meta }) => {
-      if (marketIds.includes(ticker)) {
+    return potentialMarkets?.filter(
+      ({ params: { ticker, exchangeConfigJson, marketType }, meta }) => {
+        if (marketIds.includes(ticker)) {
+          return false;
+        }
+
+        // Disable Isolated markets if the user is not on Staging or Local deployment
+        if (marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED') {
+          if (isDev && exchangeConfigJson.length > 0) {
+            return true;
+          }
+
+          return false;
+        }
+
+        if (exchangeConfigJson.length >= NUM_ORACLES_TO_QUALIFY_AS_SAFE) {
+          return true;
+        }
+
         return false;
       }
-      if (exchangeConfigJson.length >= NUM_ORACLES_TO_QUALIFY_AS_SAFE) {
-        return true;
-      }
-      if (exchangeConfigJson.length > 0 && meta?.marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED') {
-        return true;
-      }
-      return false;
-    });
+    );
   }, [potentialMarkets, marketIds]);
 
   return (

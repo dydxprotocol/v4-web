@@ -41,7 +41,8 @@ export const useWithdrawalInfo = ({
     queryKey: 'usdcWithdrawalCapacity',
     queryFn: async () => {
       try {
-        return await getWithdrawalCapacityByDenom({ denom: usdcDenom });
+        const response = await getWithdrawalCapacityByDenom({ denom: usdcDenom });
+        return JSON.parse(encodeJson(response, ByteArrayEncoding.BIGINT));
       } catch (error) {
         log('useWithdrawalInfo/getWithdrawalCapacityByDenom', error);
       }
@@ -75,9 +76,7 @@ export const useWithdrawalInfo = ({
     }
 
     const [{ capacity: daily }, { capacity: weekly }] = capacityList;
-    // @ts-expect-error Response doesn't account for encoding
     const dailyBN = MustBigNumber(daily);
-    // @ts-expect-error Response doesn't account for encoding
     const weeklyBN = MustBigNumber(weekly);
     return BigNumber.minimum(dailyBN, weeklyBN).div(10 ** usdcDecimals);
   }, [usdcDecimals, usdcWithdrawalCapacity]);

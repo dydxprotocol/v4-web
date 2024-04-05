@@ -7,6 +7,7 @@ export type ExchangeConfigItem = {
 export type NewMarketParams = {
   id: number;
   ticker: string;
+  marketType: 'PERPETUAL_MARKET_TYPE_ISOLATED' | 'PERPETUAL_MARKET_TYPE_CROSS';
   priceExponent: number;
   minExchanges: number;
   minPriceChange: number;
@@ -27,7 +28,6 @@ export type NewMarketProposal = {
   meta: {
     assetName: string;
     referencePrice: number;
-    marketType: 'PERPETUAL_MARKET_TYPE_ISOLATED' | 'PERPETUAL_MARKET_TYPE_CROSS';
   };
   initial_deposit: {
     denom: string;
