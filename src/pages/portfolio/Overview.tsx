@@ -12,7 +12,6 @@ import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
 import {
-  calculateShouldRenderActionsInPositionsTable,
   calculateShouldRenderTriggersInPositionsTable,
 } from '@/state/accountCalculators';
 
@@ -26,7 +25,8 @@ export const Overview = () => {
   const navigate = useNavigate();
 
   const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
-  const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable);
+  // TODO: CT-503
+  // const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable); 
 
   return (
     <div>
@@ -55,7 +55,8 @@ export const Overview = () => {
                   PositionsTableColumnKey.RealizedPnl,
                   PositionsTableColumnKey.AverageOpenAndClose,
                   shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-                  shouldRenderActions && PositionsTableColumnKey.Actions,
+                  // TODO: CT-503 re-enable when close positions dialog is created
+                  // shouldRenderActions && PositionsTableColumnKey.Actions,
                 ].filter(isTruthy)
           }
           currentRoute={AppRoute.Portfolio}

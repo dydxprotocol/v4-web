@@ -100,7 +100,5 @@ export const calculateShouldRenderTriggersInPositionsTable = createSelector(
  */
 export const calculateShouldRenderActionsInPositionsTable = createSelector(
   [calculateIsAccountViewOnly],
-  (isAccountViewOnly: boolean) =>
-    !isAccountViewOnly &&
-    (testFlags.closePositionsFromPositionsTable || testFlags.configureSlTpFromPositionsTable)
+  (isAccountViewOnly: boolean) => !isAccountViewOnly
 );

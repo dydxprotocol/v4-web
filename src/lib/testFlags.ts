@@ -32,10 +32,6 @@ class TestFlags {
     return this.queryParams.address;
   }
 
-  get closePositionsFromPositionsTable() {
-    return !!this.queryParams.closepositions;
-  }
-
   get configureSlTpFromPositionsTable() {
     return !!this.queryParams.sltp;
   }
