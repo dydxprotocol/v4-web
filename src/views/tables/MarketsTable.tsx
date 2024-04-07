@@ -251,6 +251,18 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.Toolbar = styled(Toolbar)`
   max-width: 100vw;
   overflow: hidden;
+  margin-bottom: 1.125rem;
+  padding-left: 0.375rem;
+  padding-right: 0;
+
+  @media ${breakpoints.desktopSmall} {
+    padding-right: 0.375rem;
+  }
+
+  @media ${breakpoints.tablet} {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 `;
 
 Styled.Table = styled(Table)`

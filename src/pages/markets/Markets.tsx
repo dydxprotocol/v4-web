@@ -52,11 +52,6 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Page = styled.div`
   ${layoutMixins.contentContainerPage}
-  gap: 1.5rem;
-
-  @media ${breakpoints.tablet} {
-    gap: 0.75rem;
-  }
 `;
 
 Styled.ContentSectionHeader = styled(ContentSectionHeader)`
@@ -80,11 +75,13 @@ Styled.ContentSectionHeader = styled(ContentSectionHeader)`
 Styled.HeaderSection = styled.section`
   ${layoutMixins.contentSectionDetached}
 
+  margin-bottom: 2rem;
+
   @media ${breakpoints.tablet} {
     ${layoutMixins.flexColumn}
     gap: 1rem;
 
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
   }
 `;
 
