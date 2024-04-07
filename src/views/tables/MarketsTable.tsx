@@ -19,7 +19,7 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
-import { type ColumnDef, MarketTableCell, Table, TableCell } from '@/components/Table';
+import { type ColumnDef, AssetTableCell, Table, TableCell } from '@/components/Table';
 import { Toolbar } from '@/components/Toolbar';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { MarketFilter } from '@/views/MarketFilter';
@@ -44,7 +44,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               columnKey: 'market',
               getCellValue: (row) => row.market,
               label: stringGetter({ key: STRING_KEYS.MARKET }),
-              renderCell: ({ asset, id }) => <Styled.MarketTableCell asset={asset} marketId={id} />,
+              renderCell: ({ asset }) => <Styled.AssetTableCell asset={asset} />,
             },
             {
               columnKey: 'price',
@@ -89,7 +89,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               columnKey: 'market',
               getCellValue: (row) => row.market,
               label: stringGetter({ key: STRING_KEYS.MARKET }),
-              renderCell: ({ asset, id }) => <Styled.MarketTableCell asset={asset} marketId={id} />,
+              renderCell: ({ asset }) => <Styled.AssetTableCell asset={asset} />,
             },
             {
               columnKey: 'oraclePrice',
@@ -190,7 +190,6 @@ export const MarketsTable = ({ className }: { className?: string }) => {
 
       <Styled.Table
         withInnerBorders
-        withOuterBorder={!isTablet}
         data={filteredMarkets}
         getRowKey={(row: MarketData) => row.market}
         label="Markets"
@@ -251,7 +250,7 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.Toolbar = styled(Toolbar)`
   max-width: 100vw;
   overflow: hidden;
-  margin-bottom: 1.125rem;
+  margin-bottom: 0.625rem;
   padding-left: 0.375rem;
   padding-right: 0;
 
@@ -275,7 +274,7 @@ Styled.Table = styled(Table)`
   }
 `;
 
-Styled.MarketTableCell = styled(MarketTableCell)`
+Styled.AssetTableCell = styled(AssetTableCell)`
   @media ${breakpoints.tablet} {
     span:first-child {
       font: var(--font-medium-book);

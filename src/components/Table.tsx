@@ -47,6 +47,7 @@ export { TableCell } from './Table/TableCell';
 export { TableColumnHeader } from './Table/TableColumnHeader';
 export { ActionsTableCell } from './Table/ActionsTableCell';
 export { MarketTableCell } from './Table/MarketTableCell';
+export { AssetTableCell } from './Table/AssetTableCell';
 
 export type CustomRowConfig = {
   key: string;
@@ -378,7 +379,7 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
               key={row.key}
               item={row}
               state={state}
-              hasRowAction={!!(props.onRowAction)}
+              hasRowAction={!!props.onRowAction}
               // shouldRowRender={props.shouldRowRender}
               {...props.getRowAttributes?.(row.value!)}
               withGradientCardRows={props.withGradientCardRows}
