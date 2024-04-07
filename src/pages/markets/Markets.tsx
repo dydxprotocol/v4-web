@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import styled, { AnyStyledComponent } from 'styled-components';
 
+import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
@@ -28,10 +29,12 @@ const Markets = () => {
       <Styled.HeaderSection>
         <Styled.ContentSectionHeader
           title={stringGetter({ key: STRING_KEYS.MARKETS })}
-          subtitle={isNotTablet && stringGetter({ key: STRING_KEYS.DISCOVER_NEW_ASSETS })}
           slotRight={
             hasPotentialMarketsData && (
-              <Button onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}>
+              <Button
+                action={ButtonAction.Primary}
+                onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
+              >
                 {stringGetter({ key: STRING_KEYS.ADD_A_MARKET })}
               </Button>
             )
@@ -57,7 +60,15 @@ Styled.Page = styled.div`
 `;
 
 Styled.ContentSectionHeader = styled(ContentSectionHeader)`
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+
+  h3 {
+    font: var(--font-extra-medium);
+  }
+
   @media ${breakpoints.tablet} {
+    margin-top: 0;
     padding: 1.25rem 1.875rem 0;
 
     h3 {
