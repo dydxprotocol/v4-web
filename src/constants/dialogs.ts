@@ -10,6 +10,7 @@ export enum DialogTypes {
   ExternalLink = 'ExternalLink',
   ExternalNavStride = 'ExternalNavStride',
   FillDetails = 'FillDetails',
+  GeoCompliance = 'GeoCompliance',
   Help = 'Help',
   ExternalNavKeplr = 'ExternalNavKeplr',
   ManageFunds = 'ManageFunds',

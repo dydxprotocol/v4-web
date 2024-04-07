@@ -3,15 +3,19 @@ import { useMemo } from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { ComplianceStatus, RestrictedGeo } from '@/constants/compliance';
+import type { Compliance } from '@/constants/abacus';
+import { ComplianceStatus } from '@/constants/abacus';
+import { ButtonAction } from '@/constants/buttons';
+import { BLOCKED_COUNTRIES, CountryCodes, OFAC_SANCTIONED_COUNTRIES } from '@/constants/geo';
 
+import { useAccounts, useDydxClient } from '@/hooks';
+
+import { Button } from '@/components/Button';
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { Switch } from '@/components/Switch';
 
 import { setCompliance } from '@/state/account';
-import { getComplianceStatus } from '@/state/accountSelectors';
-import { setGeo } from '@/state/app';
-import { getGeo } from '@/state/appSelectors';
+import { getComplianceStatus, getGeo } from '@/state/accountSelectors';
 
 const complianceStatusOptions = [
   { status: ComplianceStatus.COMPLIANT, label: 'Compliant' },
@@ -25,7 +29,9 @@ export const usePreferenceMenu = () => {
 
   const complianceStatus = useSelector(getComplianceStatus, shallowEqual);
   const geo = useSelector(getGeo, shallowEqual);
-  const geoRestricted = Boolean(geo && RestrictedGeo.includes(geo));
+  const geoRestricted = Boolean(
+    geo && [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes)
+  );
 
   const notificationSection = useMemo(
     () => ({
@@ -34,7 +40,7 @@ export const usePreferenceMenu = () => {
       items: complianceStatusOptions.map(({ status, label }) => ({
         value: status,
         label: label,
-        onSelect: () => dispatch(setCompliance({ status })),
+        onSelect: () => dispatch(setCompliance({ geo, status } as Compliance)),
         slotAfter: (
           <Switch
             name="CompliaceStatus"
@@ -58,7 +64,11 @@ export const usePreferenceMenu = () => {
             <Switch name="RestrictGeo" checked={geoRestricted} onCheckedChange={() => null} />
           ),
           onSelect: () => {
-            dispatch(geoRestricted ? setGeo('') : setGeo('US'));
+            dispatch(
+              geoRestricted
+                ? setCompliance({ geo: '', status: complianceStatus } as Compliance)
+                : setCompliance({ geo: 'US', status: complianceStatus } as Compliance)
+            );
           },
         },
       ],
@@ -75,6 +85,23 @@ type ElementProps = {
 
 export const ComplianceConfigDialog = ({ setIsOpen }: ElementProps) => {
   const preferenceItems = usePreferenceMenu();
+  const complianceStatus = useSelector(getComplianceStatus, shallowEqual);
+
+  const { dydxAddress } = useAccounts();
+  const { compositeClient } = useDydxClient();
+
+  const submit = async () => {
+    const endpoint = `${compositeClient?.indexerClient.config.restEndpoint}/v4/compliance/setStatus`;
+    if (dydxAddress) {
+      await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ address: dydxAddress, status: complianceStatus?.rawValue }),
+      });
+    }
+  };
 
   return (
     <Styled.ComboboxDialogMenu
@@ -82,7 +109,11 @@ export const ComplianceConfigDialog = ({ setIsOpen }: ElementProps) => {
       title="Compliance Settings (Dev Only)"
       items={preferenceItems}
       setIsOpen={setIsOpen}
-    />
+    >
+      <Button action={ButtonAction.Primary} onClick={() => submit()}>
+        Submit
+      </Button>
+    </Styled.ComboboxDialogMenu>
   );
 };
 

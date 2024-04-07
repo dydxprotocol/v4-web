@@ -12,6 +12,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useComplianceState } from '@/hooks/useComplianceState';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -22,7 +23,6 @@ import { WithLabel } from '@/components/WithLabel';
 import { PnlChart, type PnlDatum } from '@/views/charts/PnlChart';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
-import { calculateComplianceState } from '@/state/accountCalculators';
 import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
@@ -94,9 +94,9 @@ export const usePortfolioValues = ({
 export const AccountDetailsAndHistory = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
+  const { complianceState } = useComplianceState();
   const selectedLocale = useSelector(getSelectedLocale);
   const onboardingState = useSelector(getOnboardingState);
-  const complianceState = useSelector(calculateComplianceState, shallowEqual);
 
   const { buyingPower, equity, freeCollateral, leverage, marginUsage } =
     useSelector(getSubaccount, shallowEqual) || {};

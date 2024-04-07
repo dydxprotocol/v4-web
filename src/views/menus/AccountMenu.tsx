@@ -7,6 +7,7 @@ import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import {
   STRING_KEYS,
@@ -24,6 +25,7 @@ import {
   useAccountBalance,
   useURLConfigs,
 } from '@/hooks';
+import { useComplianceState } from '@/hooks/useComplianceState';
 
 import { DiscordIcon, GoogleIcon, TwitterIcon } from '@/icons';
 import { headerMixins } from '@/styles/headerMixins';
@@ -53,9 +55,12 @@ export const AccountMenu = () => {
   const stringGetter = useStringGetter();
   const { mintscanBase } = useURLConfigs();
   const { isTablet } = useBreakpoints();
+  const { complianceState } = useComplianceState();
+
   const dispatch = useDispatch();
   const onboardingState = useSelector(getOnboardingState);
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
+
   const { nativeTokenBalance } = useAccountBalance();
   const { usdcLabel, chainTokenLabel } = useTokenConfigs();
   const theme = useSelector(getAppTheme);
@@ -159,6 +164,7 @@ export const AccountMenu = () => {
                 </div>
                 <AssetActions
                   asset={DydxChainAsset.CHAINTOKEN}
+                  complianceState={complianceState}
                   dispatch={dispatch}
                   hasBalance={nativeTokenBalance.gt(0)}
                   stringGetter={stringGetter}
@@ -181,6 +187,7 @@ export const AccountMenu = () => {
                 </div>
                 <AssetActions
                   asset={DydxChainAsset.USDC}
+                  complianceState={complianceState}
                   dispatch={dispatch}
                   hasBalance={MustBigNumber(usdcBalance).gt(0)}
                   stringGetter={stringGetter}
@@ -282,23 +289,26 @@ const AssetActions = memo(
   ({
     asset,
     dispatch,
+    complianceState,
     withOnboarding,
     hasBalance,
     stringGetter,
   }: {
     asset: DydxChainAsset;
     dispatch: Dispatch;
+    complianceState: ComplianceStates;
     withOnboarding?: boolean;
     hasBalance?: boolean;
     stringGetter: StringGetterFunction;
   }) => (
     <Styled.InlineRow>
       {[
-        withOnboarding && {
-          dialogType: DialogTypes.Deposit,
-          iconName: IconName.Deposit,
-          tooltipStringKey: STRING_KEYS.DEPOSIT,
-        },
+        withOnboarding &&
+          complianceState === ComplianceStates.FULLACCESS && {
+            dialogType: DialogTypes.Deposit,
+            iconName: IconName.Deposit,
+            tooltipStringKey: STRING_KEYS.DEPOSIT,
+          },
         withOnboarding &&
           hasBalance && {
             dialogType: DialogTypes.Withdraw,

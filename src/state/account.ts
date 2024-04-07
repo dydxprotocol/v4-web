@@ -14,9 +14,9 @@ import type {
   SubAccountHistoricalPNLs,
   UsageRestriction,
   TradingRewards,
+  Compliance,
 } from '@/constants/abacus';
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
-import { ComplianceReason, ComplianceStatus } from '@/constants/compliance';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { WalletType } from '@/constants/wallets';
 
@@ -46,10 +46,7 @@ export type AccountState = {
   uncommittedOrderClientIds: number[];
 
   restriction?: Nullable<UsageRestriction>;
-  compliance: {
-    status: ComplianceStatus;
-    reason?: ComplianceReason;
-  };
+  compliance?: Compliance;
 };
 
 const initialState: AccountState = {
@@ -89,9 +86,7 @@ const initialState: AccountState = {
 
   // Restriction
   restriction: undefined,
-  compliance: {
-    status: ComplianceStatus.COMPLIANT,
-  },
+  compliance: undefined,
 };
 
 export const accountSlice = createSlice({
@@ -154,10 +149,7 @@ export const accountSlice = createSlice({
     setRestrictionType: (state, action: PayloadAction<Nullable<UsageRestriction>>) => {
       state.restriction = action.payload;
     },
-    setCompliance: (
-      state,
-      action: PayloadAction<{ status: ComplianceStatus; reason?: ComplianceReason }>
-    ) => {
+    setCompliance: (state, action: PayloadAction<Compliance>) => {
       state.compliance = action.payload;
     },
     setSubaccount: (state, action: PayloadAction<Nullable<Subaccount>>) => {

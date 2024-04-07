@@ -153,6 +153,9 @@ const useAccountsContext = () => {
       // 404 is expected if the user has no subaccounts
       if (error.status === 404) {
         return [];
+      } else if (error.status === 403) {
+        console.log(error);
+        return [];
       } else {
         throw error;
       }

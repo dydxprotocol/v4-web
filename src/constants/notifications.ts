@@ -6,11 +6,13 @@ export enum NotificationType {
   SquidTransfer = 'SquidTransfer',
   ReleaseUpdates = 'ReleaseUpdates',
   ApiError = 'ApiError',
+  ComplianceAlert = 'ComplianceAlert',
 }
 
 export const SingleSessionNotificationTypes = [
   NotificationType.AbacusGenerated,
   NotificationType.ApiError,
+  NotificationType.ComplianceAlert,
 ];
 
 export enum NotificationComponentType {}
@@ -136,6 +138,8 @@ export type NotificationDisplayData = {
      Push notification: requires interaction.
    */
   toastDuration?: number;
+
+  withClose?: boolean; // Show close button for Notification
 };
 
 export enum TransferNotificationTypes {
