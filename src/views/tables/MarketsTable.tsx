@@ -121,26 +121,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                       />
                     )}
                   </Styled.InlineRow>
-                  <Output
-                    type={OutputType.Fiat}
-                    value={MustBigNumber(priceChange24H).abs()}
-                    fractionDigits={tickSizeDecimals}
-                  />
                 </TableCell>
-              ),
-            },
-            {
-              columnKey: 'nextFundingRate',
-              getCellValue: (row) => row.nextFundingRate,
-              label: stringGetter({ key: STRING_KEYS.FUNDING_RATE_1H_SHORT }),
-              renderCell: (row) => (
-                <Styled.Output
-                  type={OutputType.Percent}
-                  fractionDigits={FUNDING_DECIMALS}
-                  value={row.nextFundingRate}
-                  isPositive={MustBigNumber(row.nextFundingRate).gt(0)}
-                  isNegative={MustBigNumber(row.nextFundingRate).isNegative()}
-                />
               ),
             },
             {
@@ -171,6 +152,20 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               getCellValue: (row) => row.trades24H,
               label: stringGetter({ key: STRING_KEYS.TRADES_24H }),
               renderCell: (row) => <Output type={OutputType.Number} value={row.trades24H} />,
+            },
+            {
+              columnKey: 'nextFundingRate',
+              getCellValue: (row) => row.nextFundingRate,
+              label: stringGetter({ key: STRING_KEYS.FUNDING_RATE_1H_SHORT }),
+              renderCell: (row) => (
+                <Styled.Output
+                  type={OutputType.Percent}
+                  fractionDigits={FUNDING_DECIMALS}
+                  value={row.nextFundingRate}
+                  isPositive={MustBigNumber(row.nextFundingRate).gt(0)}
+                  isNegative={MustBigNumber(row.nextFundingRate).isNegative()}
+                />
+              ),
             },
           ] as ColumnDef<MarketData>[]),
     [stringGetter, isTablet]
@@ -305,6 +300,7 @@ Styled.Output = styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`
       : isPositive
       ? `var(--color-positive)`
       : `var(--color-text-1)`};
+  font: var(--font-base-medium);
 `;
 
 Styled.MarketNotFound = styled.div`
