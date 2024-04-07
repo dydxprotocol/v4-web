@@ -6,11 +6,13 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { HistoryRoute, PortfolioRoute } from '@/constants/routes';
 
 import { useAccountBalance, useBreakpoints, useDocumentTitle, useStringGetter } from '@/hooks';
+import { useComplianceState } from '@/hooks/useComplianceState';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -43,6 +45,7 @@ export default () => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
+  const { complianceState } = useComplianceState();
 
   const onboardingState = useSelector(getOnboardingState);
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
@@ -192,12 +195,14 @@ export default () => {
             />
             {onboardingState === OnboardingState.AccountConnected && (
               <Styled.Footer>
-                <Button
-                  action={ButtonAction.Primary}
-                  onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
-                >
-                  {stringGetter({ key: STRING_KEYS.DEPOSIT })}
-                </Button>
+                {complianceState === ComplianceStates.FULLACCESS && (
+                  <Button
+                    action={ButtonAction.Primary}
+                    onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
+                  >
+                    {stringGetter({ key: STRING_KEYS.DEPOSIT })}
+                  </Button>
+                )}
                 {usdcBalance > 0 && (
                   <Button
                     action={ButtonAction.Base}

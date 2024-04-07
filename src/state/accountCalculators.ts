@@ -1,19 +1,15 @@
 import { createSelector } from 'reselect';
 
 import { OnboardingState, OnboardingSteps } from '@/constants/account';
-import { ComplianceStates, ComplianceStatus, RestrictedGeo } from '@/constants/compliance';
 
 import {
   getOnboardingGuards,
   getOnboardingState,
   getSubaccountId,
   getUncommittedOrderClientIds,
-  getComplianceStatus,
 } from '@/state/accountSelectors';
 
 import { testFlags } from '@/lib/testFlags';
-
-import { getGeo } from './appSelectors';
 
 export const calculateOnboardingStep = createSelector(
   [getOnboardingState, getOnboardingGuards],

@@ -28,6 +28,7 @@ import {
   setTransfers,
   setWallet,
   setTradingRewards,
+  setCompliance,
 } from '@/state/account';
 import { setApiState } from '@/state/app';
 import { setAssets } from '@/state/assets';
@@ -131,6 +132,10 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
       if (changes.has(Changes.restriction)) {
         dispatch(setRestrictionType(updatedState.restriction));
+      }
+
+      if (changes.has(Changes.compliance) && updatedState.compliance) {
+        dispatch(setCompliance(updatedState.compliance));
       }
 
       subaccountNumbers?.forEach((subaccountId: number) => {
