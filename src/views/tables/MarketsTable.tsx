@@ -96,7 +96,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               getCellValue: (row) => row.oraclePrice,
               label: stringGetter({ key: STRING_KEYS.ORACLE_PRICE }),
               renderCell: ({ oraclePrice, tickSizeDecimals }) => (
-                <Output
+                <Styled.TabletOutput
                   type={OutputType.Fiat}
                   value={oraclePrice}
                   fractionDigits={tickSizeDecimals}
@@ -286,10 +286,8 @@ Styled.AssetTableCell = styled(AssetTableCell)`
 `;
 
 Styled.TabletOutput = styled(Output)`
-  @media ${breakpoints.tablet} {
-    font: var(--font-medium-book);
-    color: var(--color-text-2);
-  }
+  font: var(--font-medium-book);
+  color: var(--color-text-2);
 `;
 
 Styled.InlineRow = styled.div`
