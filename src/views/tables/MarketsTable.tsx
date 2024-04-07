@@ -22,6 +22,7 @@ import { Output, OutputType } from '@/components/Output';
 import { type ColumnDef, AssetTableCell, Table, TableCell } from '@/components/Table';
 import { Toolbar } from '@/components/Toolbar';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
+import { SparklineChart } from '@/components/visx/SparklineChart';
 import { MarketFilter } from '@/views/MarketFilter';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -104,10 +105,28 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               ),
             },
             {
+              columnKey: 'priceChange24HChart',
+              getCellValue: (row) => row.oneDaySparkline,
+              label: stringGetter({ key: STRING_KEYS.LAST_24H }),
+              renderCell: ({ oneDaySparkline, priceChange24HPercent }) => (
+                <div style={{ width: 50, height: 50 }}>
+                  <SparklineChart
+                    data={(oneDaySparkline ?? []).map((datum, index) => ({
+                      x: index + 1,
+                      y: parseFloat(datum.toString()),
+                    }))}
+                    xAccessor={(datum) => datum.x}
+                    yAccessor={(datum) => datum.y}
+                    positive={MustBigNumber(priceChange24HPercent).gt(0)}
+                  />
+                </div>
+              ),
+            },
+            {
               columnKey: 'priceChange24HPercent',
               getCellValue: (row) => row.priceChange24HPercent,
               label: stringGetter({ key: STRING_KEYS.CHANGE_24H }),
-              renderCell: ({ priceChange24H, priceChange24HPercent, tickSizeDecimals }) => (
+              renderCell: ({ priceChange24HPercent }) => (
                 <TableCell stacked>
                   <Styled.InlineRow>
                     {!priceChange24HPercent ? (
