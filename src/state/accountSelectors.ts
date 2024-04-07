@@ -13,6 +13,7 @@ import {
   HistoricalTradingReward,
   HistoricalTradingRewardsPeriod,
   AbacusOrderSide,
+  SubaccountPosition,
 } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
 
@@ -54,7 +55,7 @@ export const getSubaccountHistoricalPnl = (state: RootState) => state.account?.h
  */
 export const getOpenPositions = (state: RootState) =>
   state.account.subaccount?.openPositions?.toArray();
-
+g;
 /**
  * @param marketId
  * @returns user's position details with the given marketId
@@ -160,11 +161,28 @@ export const getSubaccountOpenOrders = createSelector([getSubaccountOrders], (or
 
 /**
  * @param state
+ * @returns Record of SubaccountOrders that have not been filled or cancelled, indexed by marketId
+ */
+export const getMarketSubaccountOpenOrders = (
+  state: RootState
+): {
+  [marketId: string]: SubaccountOrder[];
+} => {
+  const orders = getSubaccountOpenOrders(state);
+  return (orders ?? []).reduce((marketOrders, order) => {
+    marketOrders[order.marketId] ??= [];
+    marketOrders[order.marketId].push(order);
+    return marketOrders;
+  }, {} as { [marketId: string]: SubaccountOrder[] });
+};
+
+/**
+ * @param state
  * @returns list of conditional orders that have not been filled or cancelled for all subaccount positions
  */
 export const getSubaccountConditionalOrders = createSelector(
-  [getSubaccountOpenOrders, getOpenPositions],
-  (allOpenOrders, positions) => {
+  [getMarketSubaccountOpenOrders, getOpenPositions],
+  (openOrdersByMarketId, positions) => {
     const stopLossOrders: SubaccountOrder[] = [];
     const takeProfitOrders: SubaccountOrder[] = [];
 
@@ -173,14 +191,13 @@ export const getSubaccountConditionalOrders = createSelector(
         position?.side?.current === AbacusPositionSide.LONG
           ? AbacusOrderSide.sell
           : AbacusOrderSide.buy;
-      const conditionalOrders = allOpenOrders?.filter(
-        (order) => order.marketId === position.id && order.side === orderSideForConditionalOrder
-      );
+
+      const conditionalOrders = openOrdersByMarketId[position.id];
 
       conditionalOrders?.forEach((order: SubaccountOrder) => {
-        if (isStopLossOrder(order)) {
+        if (order.side === orderSideForConditionalOrder && isStopLossOrder(order)) {
           stopLossOrders.push(order);
-        } else if (isTakeProfitOrder(order)) {
+        } else if (order.side === orderSideForConditionalOrder && isTakeProfitOrder(order)) {
           takeProfitOrders.push(order);
         }
       });
