@@ -55,7 +55,7 @@ export const getSubaccountHistoricalPnl = (state: RootState) => state.account?.h
  */
 export const getOpenPositions = (state: RootState) =>
   state.account.subaccount?.openPositions?.toArray();
-g;
+
 /**
  * @param marketId
  * @returns user's position details with the given marketId
