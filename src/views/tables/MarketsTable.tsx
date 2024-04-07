@@ -125,33 +125,28 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               ),
             },
             {
-              columnKey: 'openInterest',
-              getCellValue: (row) => row.openInterestUSDC,
-              label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
-              renderCell: (row) => (
-                <TableCell stacked>
-                  <Output type={OutputType.Fiat} value={row.openInterestUSDC} />
-
-                  <Output
-                    fractionDigits={LARGE_TOKEN_DECIMALS}
-                    type={OutputType.Number}
-                    value={row.openInterest}
-                    tag={row.asset?.id}
-                  />
-                </TableCell>
-              ),
-            },
-            {
               columnKey: 'volume24H',
               getCellValue: (row) => row.volume24H,
               label: stringGetter({ key: STRING_KEYS.VOLUME_24H }),
-              renderCell: (row) => <Output type={OutputType.Fiat} value={row.volume24H} />,
+              renderCell: (row) => (
+                <Styled.NumberOutput type={OutputType.CompactFiat} value={row.volume24H} />
+              ),
             },
             {
               columnKey: 'trades24H',
               getCellValue: (row) => row.trades24H,
-              label: stringGetter({ key: STRING_KEYS.TRADES_24H }),
-              renderCell: (row) => <Output type={OutputType.Number} value={row.trades24H} />,
+              label: stringGetter({ key: STRING_KEYS.TRADES }),
+              renderCell: (row) => (
+                <Styled.NumberOutput type={OutputType.CompactNumber} value={row.trades24H} />
+              ),
+            },
+            {
+              columnKey: 'openInterest',
+              getCellValue: (row) => row.openInterestUSDC,
+              label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
+              renderCell: (row) => (
+                <Styled.NumberOutput type={OutputType.CompactFiat} value={row.openInterestUSDC} />
+              ),
             },
             {
               columnKey: 'nextFundingRate',
@@ -291,6 +286,11 @@ Styled.InlineRow = styled.div`
 
 Styled.TabletPriceChange = styled(Styled.InlineRow)`
   font: var(--font-small-book);
+`;
+
+Styled.NumberOutput = styled(Output)`
+  font: var(--font-base-medium);
+  color: var(--color-text-2);
 `;
 
 Styled.Output = styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`
