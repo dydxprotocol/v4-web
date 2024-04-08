@@ -33,12 +33,11 @@ import { TableCell } from '@/components/Table/TableCell';
 import { TagSize } from '@/components/Tag';
 
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-import { getExistingOpenPositions, getSubaccountOpenOrders } from '@/state/accountSelectors';
+import { getExistingOpenPositions, getSubaccountConditionalOrders } from '@/state/accountSelectors';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
-import { isStopLossOrder, isTakeProfitOrder } from '@/lib/orders';
 
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
@@ -361,35 +360,41 @@ export const PositionsTable = ({
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
   const perpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
   const assets = useSelector(getAssets, shallowEqual) || {};
-  const openOrders = useSelector(getSubaccountOpenOrders, shallowEqual) || [];
 
   const openPositions = useSelector(getExistingOpenPositions, shallowEqual) || [];
   const marketPosition = openPositions.find((position) => position.id == currentMarket);
   const positions = currentMarket ? (marketPosition ? [marketPosition] : []) : openPositions;
 
-  const stopLossOrders: SubaccountOrder[] = [];
-  const takeProfitOrders: SubaccountOrder[] = [];
-
-  openOrders.map((order: SubaccountOrder) => {
-    if (isStopLossOrder(order)) {
-      stopLossOrders.push(order);
-    } else if (isTakeProfitOrder(order)) {
-      takeProfitOrders.push(order);
+  const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } = useSelector(
+    getSubaccountConditionalOrders,
+    {
+      equalityFn: (oldVal, newVal) => {
+        return (
+          shallowEqual(oldVal.stopLossOrders, newVal.stopLossOrders) &&
+          shallowEqual(oldVal.takeProfitOrders, newVal.takeProfitOrders)
+        );
+      },
     }
-  });
+  );
 
   const positionsData = useMemo(
     () =>
-      positions.map((position: SubaccountPosition) => ({
-        tickSizeDecimals:
-          perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
-        asset: assets?.[position.assetId],
-        oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
-        stopLossOrders: stopLossOrders.filter((order) => order.marketId === position.id),
-        takeProfitOrders: takeProfitOrders.filter((order) => order.marketId === position.id),
-        ...position,
-      })),
-    [positions, perpetualMarkets, assets, openOrders]
+      positions.map((position: SubaccountPosition) => {
+        return {
+          tickSizeDecimals:
+            perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
+          asset: assets?.[position.assetId],
+          oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
+          stopLossOrders: allStopLossOrders.filter(
+            (order: SubaccountOrder) => order.marketId === position.id
+          ),
+          takeProfitOrders: allTakeProfitOrders.filter(
+            (order: SubaccountOrder) => order.marketId === position.id
+          ),
+          ...position,
+        };
+      }),
+    [positions, perpetualMarkets, assets, allStopLossOrders, allTakeProfitOrders]
   );
 
   return (

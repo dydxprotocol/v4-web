@@ -8,6 +8,8 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { HorizontalSeparatorFiller } from '@/components/Separator';
 
+import { testFlags } from '@/lib/testFlags';
+
 import { LimitPriceInputs } from './LimitPriceInputs';
 import { OrderSizeInput } from './OrderSizeInput';
 
@@ -38,7 +40,9 @@ export const AdvancedTriggersOptions = ({
       {/* TODO: CT-625 Update with values from abacus */}
       <Styled.Content>
         <OrderSizeInput className={className} symbol={symbol} stepSizeDecimals={stepSizeDecimals} />
-        <LimitPriceInputs className={className} tickSizeDecimals={tickSizeDecimals} />
+        {testFlags.enableConditionalLimitOrders && (
+          <LimitPriceInputs className={className} tickSizeDecimals={tickSizeDecimals} />
+        )}
       </Styled.Content>
     </Styled.Container>
   );

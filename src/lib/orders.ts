@@ -20,6 +20,8 @@ import { IconName } from '@/components/Icon';
 import { convertAbacusOrderSide } from '@/lib/abacus/conversions';
 import { MustBigNumber } from '@/lib/numbers';
 
+import { testFlags } from './testFlags';
+
 export const getStatusIconInfo = ({
   status,
   totalFilled,
@@ -88,23 +90,19 @@ export const isMarketOrderType = (type?: AbacusOrderTypes) =>
     AbacusOrderType.trailingStop,
   ].some(({ ordinal }) => ordinal === type.ordinal);
 
-export const isStopLossOrder = (order: SubaccountOrder) =>
-  [AbacusOrderType.stopLimit, AbacusOrderType.stopMarket].some(
-    ({ ordinal }) => ordinal === order.type.ordinal
-  ) &&
-  [AbacusOrderTimeInForce.IOC, AbacusOrderTimeInForce.FOK].some(
-    ({ ordinal }) => ordinal === order.timeInForce?.ordinal
-  ) &&
-  order.reduceOnly;
+export const isStopLossOrder = (order: SubaccountOrder) => {
+  const validOrderTypes = testFlags.enableConditionalLimitOrders
+    ? [AbacusOrderType.stopLimit, AbacusOrderType.stopMarket]
+    : [AbacusOrderType.stopMarket];
+  return validOrderTypes.some(({ ordinal }) => ordinal === order.type.ordinal) && order.reduceOnly;
+};
 
-export const isTakeProfitOrder = (order: SubaccountOrder) =>
-  [AbacusOrderType.takeProfitLimit, AbacusOrderType.takeProfitMarket].some(
-    ({ ordinal }) => ordinal === order.type.ordinal
-  ) &&
-  [AbacusOrderTimeInForce.IOC, AbacusOrderTimeInForce.FOK].some(
-    ({ ordinal }) => ordinal === order.timeInForce?.ordinal
-  ) &&
-  order.reduceOnly;
+export const isTakeProfitOrder = (order: SubaccountOrder) => {
+  const validOrderTypes = testFlags.enableConditionalLimitOrders
+    ? [AbacusOrderType.takeProfitLimit, AbacusOrderType.takeProfitMarket]
+    : [AbacusOrderType.takeProfitMarket];
+  return validOrderTypes.some(({ ordinal }) => ordinal === order.type.ordinal) && order.reduceOnly;
+};
 
 export const relativeTimeString = ({
   timeInMs,
