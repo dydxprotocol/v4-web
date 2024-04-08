@@ -7,7 +7,7 @@ import {
   type AbacusPositionSides,
   type SubaccountOrder,
 } from '@/constants/abacus';
-import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 

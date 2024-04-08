@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+gimport { useMemo } from 'react';
 
 import type { ColumnSize } from '@react-types/table';
 import { useSelector, shallowEqual } from 'react-redux';
@@ -394,7 +394,7 @@ export const PositionsTable = ({
           ...position,
         };
       }),
-    [openPositions, perpetualMarkets, assets, allStopLossOrders, allTakeProfitOrders]
+    [positions, perpetualMarkets, assets, allStopLossOrders, allTakeProfitOrders]
   );
 
   return (

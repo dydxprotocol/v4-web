@@ -30,8 +30,8 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: ^1.6.31
-    version: 1.6.31
+    specifier: ^1.6.32
+    version: 1.6.32
   '@dydxprotocol/v4-client-js':
     specifier: ^1.0.25
     version: 1.0.26
@@ -1587,8 +1587,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.6.31:
-    resolution: {integrity: sha512-VFNnXD70E6UPltxbX2GDOVa+oq2RvHW30/qHR5OEAqxR6R0SFHuDxYOmWuLo4T66/ru2WsVhk5q/3HcvsMQMwA==}
+  /@dydxprotocol/v4-abacus@1.6.32:
+    resolution: {integrity: sha512-IZ4+yBfzzsqHrhZ++BahLWY+/F7ORujsfReyjlkBlyFQrCoscsfu/WpH8ICG99t4kYaR9AQxHUdUeRerILmMzQ==}
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
