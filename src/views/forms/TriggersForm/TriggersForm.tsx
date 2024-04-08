@@ -84,11 +84,11 @@ export const TriggersForm = ({
     <Styled.PriceBox>
       <Styled.PriceRow>
         <Styled.PriceLabel>{stringGetter({ key: STRING_KEYS.AVG_ENTRY_PRICE })}</Styled.PriceLabel>
-        <Styled.Price type={OutputType.Fiat} value={entryPrice?.current} />
+        <Styled.Price type={OutputType.Fiat} value={entryPrice?.current} fractionDigits={tickSizeDecimals} />
       </Styled.PriceRow>
       <Styled.PriceRow>
         <Styled.PriceLabel>{stringGetter({ key: STRING_KEYS.ORACLE_PRICE })}</Styled.PriceLabel>
-        <Styled.Price type={OutputType.Fiat} value={oraclePrice} />
+        <Styled.Price type={OutputType.Fiat} value={oraclePrice} fractionDigits={tickSizeDecimals} />
       </Styled.PriceRow>
     </Styled.PriceBox>
   );
@@ -130,7 +130,7 @@ export const TriggersForm = ({
         <>
           <AdvancedTriggersOptions
             symbol={symbol}
-            existsLimitOrder={!!existsLimitOrder}
+            existsLimitOrder={existsLimitOrder}
             size={inputSize}
             positionSize={size?.current ? Math.abs(size?.current) : null}
             differingOrderSizes={differingOrderSizes}

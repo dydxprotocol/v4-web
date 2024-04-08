@@ -27,6 +27,7 @@ import { isStopLossOrder } from '@/lib/orders';
 type ElementProps = {
   marketId: string;
   assetId: string;
+  tickSizeDecimals: number;
   liquidationPrice: Nullable<number>;
   stopLossOrders: SubaccountOrder[];
   takeProfitOrders: SubaccountOrder[];
@@ -39,6 +40,7 @@ type ElementProps = {
 export const PositionsTriggersCell = ({
   marketId,
   assetId,
+  tickSizeDecimals,
   liquidationPrice,
   stopLossOrders,
   takeProfitOrders,
@@ -138,7 +140,7 @@ export const PositionsTriggersCell = ({
       return (
         <>
           {triggerLabel({ liquidationWarningSide })}
-          <Styled.Output type={OutputType.Fiat} value={triggerPrice} />
+          <Styled.Output type={OutputType.Fiat} value={triggerPrice} fractionDigits={tickSizeDecimals} />
           {isPartialPosition && (
             <WithHovercard
               align="end"

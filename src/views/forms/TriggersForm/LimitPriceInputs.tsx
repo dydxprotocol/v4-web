@@ -28,7 +28,7 @@ import { MustBigNumber } from '@/lib/numbers';
 
 type ElementProps = {
   existsLimitOrder: boolean;
-  multipleTakeProfitOrders: boolean; 
+  multipleTakeProfitOrders: boolean;
   multipleStopLossOrders: boolean;
   tickSizeDecimals?: number;
 };
@@ -49,16 +49,12 @@ export const LimitPriceInputs = ({
   const { stopLossOrder, takeProfitOrder } =
     useSelector(getTriggerOrdersInputs, shallowEqual) || {};
 
-  const [shouldShowLimitPrice, setShouldShowLimitPrice] = useState(false);
+  const [shouldShowLimitPrice, setShouldShowLimitPrice] = useState(existsLimitOrder);
 
   const decimals = tickSizeDecimals ?? USD_DECIMALS;
 
-  useEffect(() => {
-    setShouldShowLimitPrice(existsLimitOrder);
-  }, [existsLimitOrder]);
-
-  const onToggleLimit = (limitToggled: boolean) => {
-    if (!limitToggled) {
+  const onToggleLimit = (isLimitChecked: boolean) => {
+    if (!isLimitChecked) {
       abacusStateManager.setTriggerOrdersValue({
         value: AbacusOrderType.takeProfitMarket.rawValue,
         field: TriggerOrdersInputField.takeProfitOrderType,
@@ -76,7 +72,7 @@ export const LimitPriceInputs = ({
         field: TriggerOrdersInputField.stopLossLimitPrice,
       });
     }
-    setShouldShowLimitPrice(limitToggled);
+    setShouldShowLimitPrice(isLimitChecked);
   };
 
   const onLimitInput =

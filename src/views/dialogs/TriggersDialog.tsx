@@ -11,15 +11,12 @@ import { TriggersForm } from '@/views/forms/TriggersForm/TriggersForm';
 
 import { closeDialog } from '@/state/dialogs';
 
-import abacusStateManager from '@/lib/abacus';
-
 type ElementProps = {
   marketId: string;
   assetId: string;
   stopLossOrders: SubaccountOrder[];
   takeProfitOrders: SubaccountOrder[];
   navigateToMarketOrders: (market: string) => void;
-
   setIsOpen: (open: boolean) => void;
 };
 
@@ -29,21 +26,15 @@ export const TriggersDialog = ({
   stopLossOrders,
   takeProfitOrders,
   navigateToMarketOrders,
-
   setIsOpen,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
 
-  const onCloseDialog = () => {
-    abacusStateManager.clearTriggerOrdersInputValues();
-    setIsOpen?.(false);
-  };
-
   return (
     <Dialog
       isOpen
-      setIsOpen={(open: boolean) => (open ? setIsOpen?.(true) : onCloseDialog())}
+      setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.PRICE_TRIGGERS })}
       slotIcon={<AssetIcon symbol={assetId} />}
     >

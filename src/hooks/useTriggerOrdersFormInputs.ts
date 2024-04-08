@@ -117,6 +117,10 @@ export const useTriggerOrdersFormInputs = ({
       // Default to full position size for initial order creation
       setSize(positionSize);
     }
+
+    return () => {
+      abacusStateManager.clearTriggerOrdersInputValues();
+    };
   }, []);
 
   useEffect(() => {
@@ -135,8 +139,9 @@ export const useTriggerOrdersFormInputs = ({
     // Default input size to be shown on custom amount slider, null if different order sizes
     inputSize,
     // Boolean to signify whether the limit box should be checked on initial render of the triggers order form
-    existsLimitOrder:
+    existsLimitOrder: !!(
       (stopLossOrder && isLimitOrderType(stopLossOrder.type)) ||
-      (takeProfitOrder && isLimitOrderType(takeProfitOrder.type)),
+      (takeProfitOrder && isLimitOrderType(takeProfitOrder.type))
+    ),
   };
 };
