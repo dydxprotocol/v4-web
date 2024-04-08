@@ -394,7 +394,7 @@ export const PositionsTable = ({
           ...position,
         };
       }),
-    [openPositions, perpetualMarkets, assets, allStopLossOrders, allTakeProfitOrders]
+    [positions, perpetualMarkets, assets, allStopLossOrders, allTakeProfitOrders]
   );
 
   return (
