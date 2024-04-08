@@ -30,16 +30,22 @@ export const FooterDesktop = () => {
   const { height, indexerHeight, status, statusErrorMessage } = useApiState();
   const { statusPage } = useURLConfigs();
 
-  const { exchangeStatus, label } =
-    !status || status === AbacusApiStatus.NORMAL
-      ? {
-          exchangeStatus: ExchangeStatus.Operational,
-          label: stringGetter({ key: STRING_KEYS.OPERATIONAL }),
-        }
-      : {
-          exchangeStatus: ExchangeStatus.Degraded,
-          label: stringGetter({ key: STRING_KEYS.DEGRADED }),
-        };
+  const isStatusLoading = !status && !statusErrorMessage;
+
+  const { exchangeStatus, label } = isStatusLoading
+    ? {
+        exchangeStatus: undefined,
+        label: stringGetter({ key: STRING_KEYS.CONNECTING }),
+      }
+    : status === AbacusApiStatus.NORMAL
+    ? {
+        exchangeStatus: ExchangeStatus.Operational,
+        label: stringGetter({ key: STRING_KEYS.OPERATIONAL }),
+      }
+    : {
+        exchangeStatus: ExchangeStatus.Degraded,
+        label: stringGetter({ key: STRING_KEYS.DEGRADED }),
+      };
 
   return (
     <Styled.Footer>
@@ -117,17 +123,19 @@ Styled.Row = styled.div`
   border-right: 1px solid var(--color-border);
 `;
 
-Styled.StatusDot = styled.div<{ exchangeStatus: ExchangeStatus }>`
+Styled.StatusDot = styled.div<{ exchangeStatus?: ExchangeStatus }>`
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
   margin-right: 0.25rem;
+  background-color: var(--color-text-0);
 
   background-color: ${({ exchangeStatus }) =>
-    ({
+    exchangeStatus &&
+    {
       [ExchangeStatus.Degraded]: css`var(--color-warning)`,
       [ExchangeStatus.Operational]: css`var(--color-success)`,
-    }[exchangeStatus])};
+    }[exchangeStatus]};
 `;
 
 Styled.FooterButton = styled(Button)`
