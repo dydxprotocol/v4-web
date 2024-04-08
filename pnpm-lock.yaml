@@ -30,8 +30,8 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: ^1.6.20
-    version: 1.6.22
+    specifier: ^1.6.32
+    version: 1.6.32
   '@dydxprotocol/v4-client-js':
     specifier: ^1.0.25
     version: 1.0.26
@@ -1587,8 +1587,11 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.6.22:
-    resolution: {integrity: sha512-A10isY6Klt6SuSZMioxq2n4DHLXBVjWH0eLOJkMxwFACfxLE0HeWD2sglgXK3qbDBd9RZ4rlnCC/2d8b+zreFA==}
+  /@dydxprotocol/v4-abacus@1.6.32:
+    resolution: {integrity: sha512-IZ4+yBfzzsqHrhZ++BahLWY+/F7ORujsfReyjlkBlyFQrCoscsfu/WpH8ICG99t4kYaR9AQxHUdUeRerILmMzQ==}
+    dependencies:
+      '@js-joda/core': 3.2.0
+      format-util: 1.0.5
     dev: false
 
   /@dydxprotocol/v4-client-js@1.0.26:
@@ -2684,6 +2687,10 @@ packages:
       '@jridgewell/resolve-uri': 3.1.1
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
+
+  /@js-joda/core@3.2.0:
+    resolution: {integrity: sha512-PMqgJ0sw5B7FKb2d5bWYIoxjri+QlW/Pys7+Rw82jSH0QN3rB05jZ/VrrsUdh1w4+i2kw9JOejXGq/KhDOX7Kg==}
+    dev: false
 
   /@js-joda/core@5.5.3:
     resolution: {integrity: sha512-7dqNYwG8gCt4hfg5PKgM7xLEcgSBcx/UgC92OMnhMmvAnq11QzDFPrxUkNR/u5kn17WWLZ8beZ4A3Qrz4pZcmQ==}
@@ -12695,6 +12702,10 @@ packages:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       mime-types: 2.1.35
+
+  /format-util@1.0.5:
+    resolution: {integrity: sha512-varLbTj0e0yVyRpqQhuWV+8hlePAgaoFRhNFj50BNjEIrw1/DphHSObtqwskVCPWNgzwPoQrZAbfa/SBiicNeg==}
+    dev: false
 
   /formdata-node@5.0.1:
     resolution: {integrity: sha512-8xnIjMYGKPj+rY2BTbAmpqVpi8der/2FT4d9f7J32FlsCpO5EzZPq3C/N56zdv8KweHzVF6TGijsS1JT6r1H2g==}
