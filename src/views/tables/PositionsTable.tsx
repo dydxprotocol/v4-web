@@ -13,7 +13,7 @@ import {
   POSITION_SIDES,
 } from '@/constants/abacus';
 import { StringGetterFunction, STRING_KEYS } from '@/constants/localization';
-import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { NumberSign, TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { AppRoute } from '@/constants/routes';
 import { PositionSide } from '@/constants/trade';
 
@@ -37,7 +37,7 @@ import { getExistingOpenPositions, getSubaccountConditionalOrders } from '@/stat
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
-import { MustBigNumber } from '@/lib/numbers';
+import { MustBigNumber, getNumberSign } from '@/lib/numbers';
 
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
@@ -57,6 +57,7 @@ export enum PositionsTableColumnKey {
   UnrealizedPnl = 'UnrealizedPnl',
   RealizedPnl = 'RealizedPnl',
   AverageOpenAndClose = 'AverageOpenAndClose',
+  NetFunding = 'NetFunding',
   Triggers = 'Triggers',
   Actions = 'Actions',
 }
@@ -89,7 +90,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'details',
         getCellValue: (row) => row.id,
         label: stringGetter({ key: STRING_KEYS.DETAILS }),
-        renderCell: ({ id, asset, leverage, resources, size }) => (
+        renderCell: ({ asset, leverage, resources, size }) => (
           <TableCell stacked slotLeft={<Styled.AssetIcon symbol={asset?.id} />}>
             <Styled.HighlightOutput
               type={OutputType.Asset}
@@ -139,7 +140,7 @@ const getPositionsTableColumnDef = ({
         renderCell: ({ unrealizedPnl, unrealizedPnlPercent }) => (
           <TableCell stacked>
             <Styled.OutputSigned
-              isNegative={MustBigNumber(unrealizedPnlPercent?.current).isNegative()}
+              sign={getNumberSign(unrealizedPnlPercent?.current)}
               type={OutputType.Percent}
               value={unrealizedPnlPercent?.current}
               showSign={ShowSign.None}
@@ -240,7 +241,7 @@ const getPositionsTableColumnDef = ({
         renderCell: ({ unrealizedPnl, unrealizedPnlPercent }) => (
           <TableCell stacked>
             <Styled.OutputSigned
-              isNegative={MustBigNumber(unrealizedPnl?.current).isNegative()}
+              sign={getNumberSign(unrealizedPnl?.current)}
               type={OutputType.Fiat}
               value={unrealizedPnl?.current}
             />
@@ -256,7 +257,7 @@ const getPositionsTableColumnDef = ({
         renderCell: ({ realizedPnl, realizedPnlPercent }) => (
           <TableCell stacked>
             <Styled.OutputSigned
-              isNegative={MustBigNumber(realizedPnl?.current).isNegative()}
+              sign={getNumberSign(realizedPnl?.current)}
               type={OutputType.Fiat}
               value={realizedPnl?.current}
               showSign={ShowSign.Negative}
@@ -269,7 +270,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'entryExitPrice',
         getCellValue: (row) => row.entryPrice?.current,
         label: stringGetter({ key: STRING_KEYS.AVERAGE_OPEN_CLOSE }),
-        hideOnBreakpoint: MediaQueryKeys.isDesktopSmall,
+        hideOnBreakpoint: MediaQueryKeys.isTablet,
         renderCell: ({ entryPrice, exitPrice, tickSizeDecimals }) => (
           <TableCell stacked>
             <Output
@@ -278,6 +279,21 @@ const getPositionsTableColumnDef = ({
               fractionDigits={tickSizeDecimals}
             />
             <Output type={OutputType.Fiat} value={exitPrice} fractionDigits={tickSizeDecimals} />
+          </TableCell>
+        ),
+      },
+      [PositionsTableColumnKey.NetFunding]: {
+        columnKey: 'netFunding',
+        getCellValue: (row) => row.netFunding,
+        label: stringGetter({ key: STRING_KEYS.NET_FUNDING }),
+        hideOnBreakpoint: MediaQueryKeys.isTablet,
+        renderCell: ({ netFunding }) => (
+          <TableCell>
+            <Styled.OutputSigned
+              sign={getNumberSign(netFunding)}
+              type={OutputType.Fiat}
+              value={netFunding}
+            />
           </TableCell>
         ),
       },
@@ -488,8 +504,13 @@ Styled.SecondaryColor = styled.span`
   color: var(--color-text-0);
 `;
 
-Styled.OutputSigned = styled(Output)<{ isNegative?: boolean }>`
-  color: ${({ isNegative }) => (isNegative ? `var(--color-negative)` : `var(--color-positive)`)};
+Styled.OutputSigned = styled(Output)<{ sign: NumberSign }>`
+  color: ${({ sign }) =>
+    ({
+      [NumberSign.Positive]: `var(--color-positive)`,
+      [NumberSign.Negative]: `var(--color-negative)`,
+      [NumberSign.Neutral]: `var(--color-text-2)`,
+    }[sign])};
 `;
 
 Styled.HighlightOutput = styled(Output)<{ isNegative?: boolean }>`
