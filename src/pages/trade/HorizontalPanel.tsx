@@ -134,6 +134,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     PositionsTableColumnKey.UnrealizedPnl,
                     PositionsTableColumnKey.RealizedPnl,
                     PositionsTableColumnKey.AverageOpenAndClose,
+                    PositionsTableColumnKey.NetFunding,
                     shouldRenderTriggers && PositionsTableColumnKey.Triggers,
                     shouldRenderActions && PositionsTableColumnKey.Actions,
                   ].filter(isTruthy)
