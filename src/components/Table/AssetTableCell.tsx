@@ -58,6 +58,5 @@ Styled.AssetID = styled.span`
 
 Styled.Asset = styled.span<{ stacked?: boolean }>`
   color: var(--color-text-1);
-  font: var(--font-medium-medium);
-  line-height: ${({ stacked }) => (stacked ? '1' : undefined)};
+  font: ${({ stacked }) => (stacked ? 'var(--font-small-medium)' : 'var(--font-medium-medium)')};
 `;
