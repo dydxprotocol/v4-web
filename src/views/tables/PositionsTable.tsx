@@ -290,6 +290,7 @@ const getPositionsTableColumnDef = ({
         renderCell: ({
           id,
           assetId,
+          tickSizeDecimals,
           liquidationPrice,
           side,
           size,
@@ -299,6 +300,7 @@ const getPositionsTableColumnDef = ({
           <PositionsTriggersCell
             marketId={id}
             assetId={assetId}
+            tickSizeDecimals={tickSizeDecimals}
             liquidationPrice={liquidationPrice?.current}
             stopLossOrders={stopLossOrders}
             takeProfitOrders={takeProfitOrders}

@@ -16,6 +16,7 @@ import { shallowEqual, useSelector, useDispatch } from 'react-redux';
 import type {
   AccountBalance,
   HumanReadablePlaceOrderPayload,
+  HumanReadableTriggerOrdersPayload,
   ParsingError,
   SubAccountHistoricalPNLs,
 } from '@/constants/abacus';
@@ -414,6 +415,31 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     [subaccountClient]
   );
 
+  // ------ Trigger Orders Methods ------ //
+  const placeTriggerOrders = useCallback(
+    async ({
+      onError,
+      onSuccess,
+    }: {
+      onError: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
+      onSuccess?: (triggerOrdersPayload: Nullable<HumanReadableTriggerOrdersPayload>) => void;
+    }) => {
+      const callback = (
+        success: boolean,
+        parsingError?: Nullable<ParsingError>,
+        data?: Nullable<HumanReadableTriggerOrdersPayload>
+      ) => {
+        if (success) {
+          onSuccess?.(data);
+        } else {
+          onError?.({ errorStringKey: parsingError?.stringKey });
+        }
+      };
+      return abacusStateManager.triggerOrders(callback);
+    },
+    [subaccountClient]
+  );
+
   const { newMarketProposal } = useGovernanceVariables();
 
   // ------ Governance Methods ------ //
@@ -454,6 +480,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     placeOrder,
     closePosition,
     cancelOrder,
+    placeTriggerOrders,
 
     // Governance Methods
     submitNewMarketProposal,

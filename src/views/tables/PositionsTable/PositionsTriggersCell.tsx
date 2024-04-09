@@ -7,10 +7,9 @@ import {
   type AbacusPositionSides,
   type SubaccountOrder,
 } from '@/constants/abacus';
-import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { TimeInForceOptions } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks';
 
@@ -23,11 +22,12 @@ import { WithHovercard } from '@/components/WithHovercard';
 
 import { openDialog } from '@/state/dialogs';
 
-import { isMarketOrderType, isStopLossOrder } from '@/lib/orders';
+import { isStopLossOrder } from '@/lib/orders';
 
 type ElementProps = {
   marketId: string;
   assetId: string;
+  tickSizeDecimals: number;
   liquidationPrice: Nullable<number>;
   stopLossOrders: SubaccountOrder[];
   takeProfitOrders: SubaccountOrder[];
@@ -40,16 +40,19 @@ type ElementProps = {
 export const PositionsTriggersCell = ({
   marketId,
   assetId,
+  tickSizeDecimals,
   liquidationPrice,
   stopLossOrders,
   takeProfitOrders,
   onViewOrdersClick,
   positionSide,
   positionSize,
-  isDisabled, // TODO: CT-656 Disable onViewOrdersClick behavior when isDisabled
+  isDisabled,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
+
+  const onViewOrders = isDisabled ? null : () => onViewOrdersClick(marketId);
 
   const showLiquidationWarning = (order: SubaccountOrder) => {
     if (!isStopLossOrder(order) || !liquidationPrice) {
@@ -70,7 +73,7 @@ export const PositionsTriggersCell = ({
           assetId,
           stopLossOrders,
           takeProfitOrders,
-          navigateToMarketOrders: () => onViewOrdersClick(marketId),
+          navigateToMarketOrders: onViewOrders
         },
       })
     );
@@ -80,7 +83,7 @@ export const PositionsTriggersCell = ({
     <Styled.Button
       action={ButtonAction.Navigation}
       size={ButtonSize.XSmall}
-      onClick={() => onViewOrdersClick(marketId)}
+      onClick={onViewOrders}
     >
       {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
       {<Styled.ArrowIcon iconName={IconName.Arrow} />}
@@ -129,7 +132,7 @@ export const PositionsTriggersCell = ({
 
     if (orders.length === 1) {
       const order = orders[0];
-      const { price, size, triggerPrice, timeInForce, type } = order;
+      const { size, triggerPrice } = order;
 
       const isPartialPosition = !!(positionSize && Math.abs(size) < Math.abs(positionSize));
       const liquidationWarningSide = showLiquidationWarning(order) ? positionSide : undefined;
@@ -137,7 +140,7 @@ export const PositionsTriggersCell = ({
       return (
         <>
           {triggerLabel({ liquidationWarningSide })}
-          <Styled.Output type={OutputType.Fiat} value={triggerPrice} />
+          <Styled.Output type={OutputType.Fiat} value={triggerPrice} fractionDigits={tickSizeDecimals} />
           {isPartialPosition && (
             <WithHovercard
               align="end"
@@ -176,6 +179,7 @@ export const PositionsTriggersCell = ({
       </>
     );
   };
+  
   return (
     <Styled.Cell>
       <Styled.Row>{renderOutput({ label: 'TP', orders: takeProfitOrders })}</Styled.Row>

@@ -13,7 +13,6 @@ import {
   HistoricalTradingReward,
   HistoricalTradingRewardsPeriod,
   AbacusOrderSide,
-  SubaccountPosition,
 } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
 

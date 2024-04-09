@@ -90,6 +90,12 @@ export const isMarketOrderType = (type?: AbacusOrderTypes) =>
     AbacusOrderType.trailingStop,
   ].some(({ ordinal }) => ordinal === type.ordinal);
 
+export const isLimitOrderType = (type?: AbacusOrderTypes) =>
+  type &&
+  [AbacusOrderType.limit, AbacusOrderType.stopLimit, AbacusOrderType.takeProfitLimit].some(
+    ({ ordinal }) => ordinal === type.ordinal
+  );
+
 export const isStopLossOrder = (order: SubaccountOrder) => {
   const validOrderTypes = testFlags.enableConditionalLimitOrders
     ? [AbacusOrderType.stopLimit, AbacusOrderType.stopMarket]
