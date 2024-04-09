@@ -9,6 +9,7 @@ export enum NotificationType {
   TriggerOrder = 'TriggerOrder',
   ReleaseUpdates = 'ReleaseUpdates',
   ApiError = 'ApiError',
+  OrderSubmiited = 'OrderSubmitted',
 }
 
 export const SingleSessionNotificationTypes = [
@@ -180,25 +181,12 @@ export type TriggerOrderNotification = {
   type: TriggerOrderNotificationTypes;
 };
 
-export enum SubmitOrderNotificationTypes {
-  Cancel = 'cancel',
-  Place = 'place',
-}
-
 export enum SubmitOrderStatuses {
   Submitted = 'submitted',
   Placed = 'placed',
   Filled = 'filled',
   Failed = 'failed',
 }
-
-export type SubmitOrderNotification = {
-  id: string;
-  type: SubmitOrderNotificationTypes;
-  orderClientId: Number;
-  status: SubmitOrderStatuses;
-  errorMessage?: string;
-};
 
 export enum ReleaseUpdateNotificationIds {
   IncentivesS4 = 'incentives-s4',

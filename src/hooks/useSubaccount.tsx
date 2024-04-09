@@ -34,6 +34,7 @@ import { hashFromTx } from '@/lib/txUtils';
 import { useAccounts } from './useAccounts';
 import { useDydxClient } from './useDydxClient';
 import { useGovernanceVariables } from './useGovernanceVariables';
+import { useSubmitOrderNotifications } from './useSubmitOrderNotifications';
 import { useTokenConfigs } from './useTokenConfigs';
 
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
@@ -341,9 +342,11 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     }
   }, [dydxAddress, getFaucetFunds, subaccountNumber]);
 
+  const { orderFailed } = useSubmitOrderNotifications();
+
   // ------ Trading Methods ------ //
   const placeOrder = useCallback(
-    async ({
+    ({
       isClosePosition = false,
       onError,
       onSuccess,
@@ -363,6 +366,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
           onError?.({ errorStringKey: parsingError?.stringKey });
 
           if (data?.clientId !== undefined) {
+            orderFailed(data.clientId);
             dispatch(removeUncommittedOrderClientId(data.clientId));
           }
         }
@@ -382,13 +386,13 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   );
 
   const closePosition = useCallback(
-    async ({
+    ({
       onError,
       onSuccess,
     }: {
       onError: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
       onSuccess?: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => void;
-    }) => await placeOrder({ isClosePosition: true, onError, onSuccess }),
+    }) => placeOrder({ isClosePosition: true, onError, onSuccess }),
     [placeOrder]
   );
 

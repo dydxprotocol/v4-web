@@ -1,9 +1,17 @@
-import { createContext, useContext, useCallback, useState } from 'react';
+import { createContext, useContext, useCallback, useState, useEffect } from 'react';
+
+import _ from 'lodash';
+import { shallowEqual, useSelector } from 'react-redux';
+
+import { SubmitOrderStatuses } from '@/constants/notifications';
+import { TradeTypes } from '@/constants/trade';
 
 import {
-  SubmitOrderNotificationTypes,
-  type SubmitOrderNotification,
-} from '@/constants/notifications';
+  getSubaccountFilledOrderClientIds,
+  getSubaccountOpenOrderClientIds,
+} from '@/state/accountSelectors';
+
+import { isTruthy } from '@/lib/isTruthy';
 
 const SubmitOrderNotificationsContext = createContext<
   ReturnType<typeof useSubmitOrderNotificationsContext> | undefined
@@ -20,53 +28,91 @@ export const SubmitOrderNotificationsProvider = ({ ...props }) => (
 
 export const useSubmitOrderNotifications = () => useContext(SubmitOrderNotificationsContext)!;
 
-export const getSubmitOrderNotificationId = ({
-  type,
-  orderClientId,
-}: {
-  type: SubmitOrderNotificationTypes;
-  orderClientId: Number;
-}) => `${type}-order-${orderClientId}`;
+export type LocalOrderData = {
+  marketId: string;
+  clientId: number;
+  orderType?: TradeTypes;
+  price?: number;
+  tickSizeDecimals?: number;
+  submissionStatus?: SubmitOrderStatuses;
+};
 
 const useSubmitOrderNotificationsContext = () => {
-  const [submitOrderNotifications, setSubmitOrderNotifications] = useState<
-    SubmitOrderNotification[]
-  >([]);
+  const [submittedOrderClientIds, setSubmittedOrderClientIds] = useState<number[]>([]);
+  const [indexedOrderClientIds, setIndexedOrderClientIds] = useState<number[]>([]);
+  const [localFilledOrderClientIds, setLocalFilledOrderClientIds] = useState<number[]>([]);
+  const [failedOrderClientIds, setFailedOrderClientIds] = useState<number[]>([]);
+  const [localOrdersData, setLocalOrdersData] = useState<LocalOrderData[]>([]);
 
-  const addSubmitOrderNotification = useCallback(
-    (notification: SubmitOrderNotification) =>
-      setSubmitOrderNotifications((notifications) => [...notifications, notification]),
-    [submitOrderNotifications]
-  );
+  const openOrderClientIds = useSelector(getSubaccountOpenOrderClientIds, shallowEqual);
+  const filledOrderClientIds = useSelector(getSubaccountFilledOrderClientIds, shallowEqual);
 
-  const replaceOrderNotification = useCallback(
-    (existingOrderNotificationIdx: number, newNotification: SubmitOrderNotification) => {
-      const existingNotifications = [...submitOrderNotifications];
-      existingNotifications.splice(existingOrderNotificationIdx, 1)[0];
-      setSubmitOrderNotifications([...existingNotifications, newNotification]);
+  useEffect(() => {
+    const indexed = _.intersection(submittedOrderClientIds, openOrderClientIds).filter(isTruthy);
+    setIndexedOrderClientIds(indexed);
+  }, [openOrderClientIds, submittedOrderClientIds]);
+
+  useEffect(() => {
+    const filled = _.intersection(indexedOrderClientIds, filledOrderClientIds).filter(isTruthy);
+    setLocalFilledOrderClientIds(filled);
+  }, [indexedOrderClientIds, filledOrderClientIds]);
+
+  const storeOrder = useCallback(
+    ({
+      marketId,
+      clientId,
+      orderType,
+      price,
+      tickSizeDecimals,
+      submissionStatus = SubmitOrderStatuses.Submitted,
+    }: LocalOrderData) => {
+      setSubmittedOrderClientIds((ids) => [...ids, clientId]);
+      setLocalOrdersData((ordersData) => [
+        ...ordersData,
+        {
+          marketId,
+          clientId,
+          orderType,
+          price,
+          tickSizeDecimals,
+          submissionStatus,
+        },
+      ]);
     },
-    [submitOrderNotifications]
+    [submittedOrderClientIds]
   );
 
-  const addOrUpdateSubmitOrderNotification = useCallback(
-    (notification: SubmitOrderNotification) => {
-      const { orderClientId } = notification;
-      const existingNotifications = [...submitOrderNotifications];
-      const existingOrderNotificationIdx = existingNotifications.findIndex(
-        (notification) => notification.orderClientId === orderClientId
-      );
-
-      if (existingOrderNotificationIdx !== undefined) {
-        replaceOrderNotification(existingOrderNotificationIdx, notification);
-      } else {
-        addSubmitOrderNotification(notification);
-      }
-    },
-    [submitOrderNotifications]
+  const orderFailed = useCallback(
+    (orderClientId: number) => setFailedOrderClientIds((ids) => [...ids, orderClientId]),
+    [failedOrderClientIds]
   );
+
+  // update submission status
+  useEffect(() => {
+    setLocalOrdersData((ordersData) =>
+      ordersData.map((orderData) => {
+        const clientId = orderData.clientId;
+        let submissionStatus = orderData.submissionStatus; // intially submitted
+        if (localFilledOrderClientIds.includes(clientId)) {
+          submissionStatus = SubmitOrderStatuses.Filled;
+        } else if (indexedOrderClientIds.includes(clientId)) {
+          submissionStatus = SubmitOrderStatuses.Placed;
+        } else if (failedOrderClientIds.includes(clientId)) {
+          submissionStatus = SubmitOrderStatuses.Failed;
+        }
+
+        return {
+          ...orderData,
+          submissionStatus,
+        };
+      })
+    );
+  }, [indexedOrderClientIds, localFilledOrderClientIds, failedOrderClientIds]);
 
   return {
-    submitOrderNotifications,
-    addOrUpdateSubmitOrderNotification,
+    storeOrder,
+    submittedOrderClientIds,
+    orderFailed,
+    localOrdersData,
   };
 };

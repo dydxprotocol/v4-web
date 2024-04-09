@@ -11,6 +11,8 @@ import {
   type Nullable,
   type OrderStatus,
   type PerpetualMarket,
+  KotlinIrEnumValues,
+  TRADE_TYPES,
 } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -131,3 +133,6 @@ export const getHydratedTradingData = ({
   tickSizeDecimals: perpetualMarkets?.[data.marketId]?.configs?.tickSizeDecimals,
   ...('side' in data && { orderSide: convertAbacusOrderSide(data.side) }),
 });
+
+export const getTradeType = (orderType: string) =>
+  TRADE_TYPES[orderType as KotlinIrEnumValues<typeof AbacusOrderType>];

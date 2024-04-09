@@ -192,7 +192,7 @@ export const ClosePositionForm = ({
     setClosePositionError(undefined);
     setIsClosingPosition(true);
 
-    await closePosition({
+    closePosition({
       onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
         setClosePositionError(
           stringGetter({ key: errorParams?.errorStringKey || STRING_KEYS.SOMETHING_WENT_WRONG })

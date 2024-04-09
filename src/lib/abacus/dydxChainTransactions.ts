@@ -208,6 +208,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
       setTimeout(() => {
         this.store?.dispatch(removeUncommittedOrderClientId(clientId));
+        // TODO(@aforaleka) dispatch order failed notification
       }, UNCOMMITTED_ORDER_TIMEOUT_MS);
 
       // Place order

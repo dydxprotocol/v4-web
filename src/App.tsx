@@ -47,6 +47,8 @@ import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 import { parseLocationHash } from '@/lib/urlUtils';
 import { config, configureChainsConfig, privyConfig } from '@/lib/wagmi';
 
+import { SubmitOrderNotificationsProvider } from './hooks/useSubmitOrderNotifications';
+
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
 const PortfolioPage = lazy(() => import('@/pages/portfolio/Portfolio'));
@@ -154,6 +156,7 @@ const providers = [
   wrapProvider(RestrictionProvider),
   wrapProvider(DydxProvider),
   wrapProvider(AccountsProvider),
+  wrapProvider(SubmitOrderNotificationsProvider),
   wrapProvider(SubaccountProvider),
   wrapProvider(LocalNotificationsProvider),
   wrapProvider(NotificationsProvider),

@@ -24,6 +24,7 @@ import { DydxChainAsset } from '@/constants/wallets';
 
 import { useAccounts, useApiState, useStringGetter, useTokenConfigs, useURLConfigs } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
+import { useSubmitOrderNotifications } from '@/hooks/useSubmitOrderNotifications';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
@@ -31,11 +32,16 @@ import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
+import { SubmitOrderNotification } from '@/views/notifications/SubmitOrderNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 import { TriggerOrderNotification } from '@/views/notifications/TriggerOrderNotification';
 
-import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
+import {
+  getOrderIdToOrders,
+  getSubaccountFills,
+  getSubaccountOrders,
+} from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
@@ -66,6 +72,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const abacusNotifications = useSelector(getAbacusNotifications, isEqual);
+      const orderIdToOrders = useSelector(getOrderIdToOrders, shallowEqual);
+      const { localOrdersData } = useSubmitOrderNotifications();
 
       useEffect(() => {
         for (const abacusNotif of abacusNotifications) {
@@ -80,6 +88,12 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
           switch (abacusNotificationType) {
             case 'order': {
+              const clientId = orderIdToOrders[id]?.clientId;
+              const localOrderExists =
+                clientId &&
+                localOrdersData.some((order) => order.clientId === orderIdToOrders[id]?.clientId);
+              if (localOrderExists) return; // already handled
+
               trigger(
                 abacusNotif.id,
                 {
@@ -404,6 +418,40 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
       }, [stringGetter, statusErrorMessage?.body, statusErrorMessage?.title]);
+    },
+    useNotificationAction: () => {
+      return () => {};
+    },
+  },
+  {
+    type: NotificationType.OrderSubmiited,
+    useTrigger: ({ trigger }) => {
+      const { localOrdersData } = useSubmitOrderNotifications();
+
+      useEffect(() => {
+        for (const localOrder of localOrdersData) {
+          trigger(
+            localOrder.clientId.toString(),
+            {
+              icon: null,
+              title: 'order submitted',
+              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+              toastSensitivity: 'foreground',
+              groupKey: NotificationType.OrderSubmiited,
+              renderCustomBody: ({ isToast, notification }) => (
+                <SubmitOrderNotification
+                  isToast={isToast}
+                  orderClientId={localOrder.clientId}
+                  localOrder={localOrder}
+                  notification={notification}
+                />
+              ),
+            },
+            [localOrder.submissionStatus],
+            true
+          );
+        }
+      }, [localOrdersData]);
     },
     useNotificationAction: () => {
       return () => {};
