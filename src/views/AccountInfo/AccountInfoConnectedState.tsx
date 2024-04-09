@@ -88,29 +88,31 @@ export const AccountInfoConnectedState = () => {
               {stringGetter({ key: STRING_KEYS.WITHDRAW })}
             </Styled.Button>
             {complianceState === ComplianceStates.FULLACCESS && (
-              <Styled.Button
-                state={{ isDisabled: !dydxAccounts }}
-                onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
-                shape={ButtonShape.Rectangle}
-                size={ButtonSize.XSmall}
-              >
-                {stringGetter({ key: STRING_KEYS.DEPOSIT })}
-              </Styled.Button>
+              <>
+                <Styled.Button
+                  state={{ isDisabled: !dydxAccounts }}
+                  onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
+                  shape={ButtonShape.Rectangle}
+                  size={ButtonSize.XSmall}
+                >
+                  {stringGetter({ key: STRING_KEYS.DEPOSIT })}
+                </Styled.Button>
+                <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.TRANSFER })}>
+                  <Styled.IconButton
+                    shape={ButtonShape.Square}
+                    iconName={IconName.Send}
+                    onClick={() =>
+                      dispatch(
+                        openDialog({
+                          type: DialogTypes.Transfer,
+                          dialogProps: { selectedAsset: DydxChainAsset.USDC },
+                        })
+                      )
+                    }
+                  />
+                </WithTooltip>
+              </>
             )}
-            <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.TRANSFER })}>
-              <Styled.IconButton
-                shape={ButtonShape.Square}
-                iconName={IconName.Send}
-                onClick={() =>
-                  dispatch(
-                    openDialog({
-                      type: DialogTypes.Transfer,
-                      dialogProps: { selectedAsset: DydxChainAsset.USDC },
-                    })
-                  )
-                }
-              />
-            </WithTooltip>
           </Styled.TransferButtons>
         </Styled.Header>
       )}
