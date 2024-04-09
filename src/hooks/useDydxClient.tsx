@@ -170,12 +170,14 @@ const useDydxClientContext = () => {
     resolution,
     fromIso,
     toIso,
+    limit,
   }: {
     marketId: string;
     marketType?: string;
     resolution: ResolutionString;
     fromIso?: string;
     toIso?: string;
+    limit?: number;
   }): Promise<Candle[]> => {
     try {
       const { candles } =
@@ -183,7 +185,8 @@ const useDydxClientContext = () => {
           marketId,
           RESOLUTION_MAP[resolution],
           fromIso,
-          toIso
+          toIso,
+          limit
         )) || {};
       return candles || [];
     } catch (error) {
@@ -286,6 +289,7 @@ const useDydxClientContext = () => {
     requestAllPerpetualMarkets,
     requestAllGovernanceProposals,
     getCandlesForDatafeed,
+    getCandles: requestCandles,
     getMarketTickSize,
     getPerpetualMarketSparklines,
     screenAddresses,
