@@ -4,6 +4,7 @@ import { curveNatural } from '@visx/curve';
 import { LinearGradient } from '@visx/gradient';
 import { ParentSize } from '@visx/responsive';
 import { Axis, LineSeries, XYChart, buildChartTheme, darkTheme } from '@visx/xychart';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 interface SparklineChartProps<Datum extends {}> {
   data: Datum[];
@@ -24,8 +25,8 @@ export const SparklineChart = <Datum extends {}>(props: SparklineChartProps<Datu
   const { data, positive, xAccessor, yAccessor } = props;
 
   return (
-    <ParentSize>
-      {({ height, width }) => (
+    <Styled.ParentSize>
+      {({ height, width }: { width: number; height: number }) => (
         <XYChart
           width={width}
           height={height}
@@ -70,6 +71,14 @@ export const SparklineChart = <Datum extends {}>(props: SparklineChartProps<Datu
           />
         </XYChart>
       )}
-    </ParentSize>
+    </Styled.ParentSize>
   );
 };
+
+const Styled: Record<string, AnyStyledComponent> = {};
+
+Styled.ParentSize = styled(ParentSize)`
+  & > svg {
+    overflow: visible;
+  }
+`;
