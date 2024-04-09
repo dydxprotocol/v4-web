@@ -159,7 +159,7 @@ export type TransferNotifcation = {
 };
 
 export enum ReleaseUpdateNotificationIds {
-  IncentivesS3 = 'incentives-s3',
+  IncentivesS4 = 'incentives-s4',
   IncentivesDistributedS2 = 'incentives-distributed-s2',
 }
 

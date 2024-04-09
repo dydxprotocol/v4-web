@@ -241,27 +241,27 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const { chainTokenLabel } = useTokenConfigs();
       const stringGetter = useStringGetter();
-      const expirationDate = new Date('2024-03-08T23:59:59');
+      const expirationDate = new Date('2024-05-09T23:59:59');
       const currentDate = new Date();
 
       useEffect(() => {
         if (currentDate <= expirationDate) {
           trigger(
-            ReleaseUpdateNotificationIds.IncentivesS3,
+            ReleaseUpdateNotificationIds.IncentivesS4,
             {
               icon: <AssetIcon symbol={chainTokenLabel} />,
               title: stringGetter({ key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.TITLE' }),
               body: stringGetter({
                 key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.BODY',
                 params: {
-                  SEASON_NUMBER: '3',
-                  PREV_SEASON_NUMBER: '1',
-                  DYDX_AMOUNT: '34',
-                  USDC_AMOUNT: '100',
+                  SEASON_NUMBER: '4',
+                  PREV_SEASON_NUMBER: '2',
+                  DYDX_AMOUNT: '16',
+                  USDC_AMOUNT: '50',
                 },
               }),
               toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.IncentivesS3,
+              groupKey: ReleaseUpdateNotificationIds.IncentivesS4,
             },
             []
           );
@@ -312,7 +312,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const navigate = useNavigate();
 
       return (notificationId: string) => {
-        if (notificationId === ReleaseUpdateNotificationIds.IncentivesS3) {
+        if (notificationId === ReleaseUpdateNotificationIds.IncentivesS4) {
           navigate(`${chainTokenLabel}/${TokenRoute.TradingRewards}`);
         } else if (notificationId === ReleaseUpdateNotificationIds.IncentivesDistributedS2) {
           navigate(`${chainTokenLabel}/${TokenRoute.StakingRewards}`);
