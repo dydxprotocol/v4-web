@@ -58,66 +58,68 @@ export const AdvancedTradeOptions = () => {
       fullWidth
     >
       <Styled.AdvancedInputsContainer>
-        <Styled.AdvancedInputsRow needsGoodUntil={needsGoodUntil}>
-          {hasTimeInForce && (
-            <Styled.SelectMenu
-              value={timeInForce}
-              onValueChange={(selectedTimeInForceOption: string) =>
-                abacusStateManager.setTradeValue({
-                  value: selectedTimeInForceOption,
-                  field: TradeInputField.timeInForceType,
-                })
-              }
-              label={stringGetter({ key: STRING_KEYS.TIME_IN_FORCE })}
-            >
-              {timeInForceOptions.toArray().map(({ type, stringKey }) => (
-                <Styled.SelectItem
-                  key={type}
-                  value={type}
-                  label={stringGetter({ key: stringKey as StringKey })}
-                />
-              ))}
-            </Styled.SelectMenu>
-          )}
-          {needsGoodUntil && (
-            <Styled.FormInput
-              id="trade-good-til-time"
-              type={InputType.Number}
-              decimals={INTEGER_DECIMALS}
-              label={stringGetter({
-                key: hasTimeInForce ? STRING_KEYS.TIME : STRING_KEYS.GOOD_TIL_TIME,
-              })}
-              onChange={({ value }: NumberFormatValues) => {
-                abacusStateManager.setTradeValue({
-                  value: Number(value),
-                  field: TradeInputField.goodTilDuration,
-                });
-              }}
-              value={duration ?? ''}
-              slotRight={
-                <Styled.InnerSelectMenu
-                  value={unit}
-                  onValueChange={(goodTilTimeTimescale: string) => {
-                    abacusStateManager.setTradeValue({
-                      value: goodTilTimeTimescale,
-                      field: TradeInputField.goodTilUnit,
-                    });
-                  }}
-                >
-                  {Object.values(TimeUnitShort).map((goodTilTimeTimescale: TimeUnitShort) => (
-                    <Styled.InnerSelectItem
-                      key={goodTilTimeTimescale}
-                      value={goodTilTimeTimescale}
-                      label={stringGetter({
-                        key: GOOD_TIL_TIME_TIMESCALE_STRINGS[goodTilTimeTimescale],
-                      })}
-                    />
-                  ))}
-                </Styled.InnerSelectMenu>
-              }
-            />
-          )}
-        </Styled.AdvancedInputsRow>
+        {(hasTimeInForce || needsGoodUntil) && (
+          <Styled.AdvancedInputsRow>
+            {hasTimeInForce && (
+              <Styled.SelectMenu
+                value={timeInForce}
+                onValueChange={(selectedTimeInForceOption: string) =>
+                  abacusStateManager.setTradeValue({
+                    value: selectedTimeInForceOption,
+                    field: TradeInputField.timeInForceType,
+                  })
+                }
+                label={stringGetter({ key: STRING_KEYS.TIME_IN_FORCE })}
+              >
+                {timeInForceOptions.toArray().map(({ type, stringKey }) => (
+                  <Styled.SelectItem
+                    key={type}
+                    value={type}
+                    label={stringGetter({ key: stringKey as StringKey })}
+                  />
+                ))}
+              </Styled.SelectMenu>
+            )}
+            {needsGoodUntil && (
+              <Styled.FormInput
+                id="trade-good-til-time"
+                type={InputType.Number}
+                decimals={INTEGER_DECIMALS}
+                label={stringGetter({
+                  key: hasTimeInForce ? STRING_KEYS.TIME : STRING_KEYS.GOOD_TIL_TIME,
+                })}
+                onChange={({ value }: NumberFormatValues) => {
+                  abacusStateManager.setTradeValue({
+                    value: Number(value),
+                    field: TradeInputField.goodTilDuration,
+                  });
+                }}
+                value={duration ?? ''}
+                slotRight={
+                  <Styled.InnerSelectMenu
+                    value={unit}
+                    onValueChange={(goodTilTimeTimescale: string) => {
+                      abacusStateManager.setTradeValue({
+                        value: goodTilTimeTimescale,
+                        field: TradeInputField.goodTilUnit,
+                      });
+                    }}
+                  >
+                    {Object.values(TimeUnitShort).map((goodTilTimeTimescale: TimeUnitShort) => (
+                      <Styled.InnerSelectItem
+                        key={goodTilTimeTimescale}
+                        value={goodTilTimeTimescale}
+                        label={stringGetter({
+                          key: GOOD_TIL_TIME_TIMESCALE_STRINGS[goodTilTimeTimescale],
+                        })}
+                      />
+                    ))}
+                  </Styled.InnerSelectMenu>
+                }
+              />
+            )}
+          </Styled.AdvancedInputsRow>
+        )}
         {needsExecution && (
           <>
             {executionOptions && (
@@ -234,7 +236,7 @@ Styled.InnerSelectItem = styled(SelectItem)`
   ${formMixins.inputInnerSelectMenuItem}
 `;
 
-Styled.AdvancedInputsRow = styled.div<{ needsGoodUntil: boolean }>`
+Styled.AdvancedInputsRow = styled.div`
   ${layoutMixins.gridEqualColumns}
   gap: var(--form-input-gap);
 `;
