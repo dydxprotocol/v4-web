@@ -6,7 +6,7 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, type MarketData } from '@/constants/markets';
-import { FUNDING_DECIMALS, LARGE_TOKEN_DECIMALS } from '@/constants/numbers';
+import { FUNDING_DECIMALS } from '@/constants/numbers';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
@@ -45,7 +45,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               columnKey: 'market',
               getCellValue: (row) => row.market,
               label: stringGetter({ key: STRING_KEYS.MARKET }),
-              renderCell: ({ asset }) => <Styled.AssetTableCell asset={asset} />,
+              renderCell: ({ asset }) => <AssetTableCell asset={asset} />,
             },
             {
               columnKey: 'price',
@@ -90,7 +90,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               columnKey: 'market',
               getCellValue: (row) => row.market,
               label: stringGetter({ key: STRING_KEYS.MARKET }),
-              renderCell: ({ asset }) => <Styled.AssetTableCell asset={asset} />,
+              renderCell: ({ asset }) => <AssetTableCell asset={asset} />,
             },
             {
               columnKey: 'oraclePrice',
@@ -121,6 +121,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                   />
                 </div>
               ),
+              allowsSorting: false,
             },
             {
               columnKey: 'priceChange24HPercent',
@@ -279,17 +280,6 @@ Styled.Table = styled(Table)`
   @media ${breakpoints.tablet} {
     table {
       max-width: 100vw;
-    }
-  }
-`;
-
-Styled.AssetTableCell = styled(AssetTableCell)`
-  @media ${breakpoints.tablet} {
-    span:first-child {
-      font: var(--font-medium-book);
-    }
-    span:last-child {
-      font: var(--font-mini-regular);
     }
   }
 `;
