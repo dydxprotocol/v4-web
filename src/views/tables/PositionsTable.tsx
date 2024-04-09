@@ -90,7 +90,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'details',
         getCellValue: (row) => row.id,
         label: stringGetter({ key: STRING_KEYS.DETAILS }),
-        renderCell: ({ id, asset, leverage, resources, size }) => (
+        renderCell: ({ asset, leverage, resources, size }) => (
           <TableCell stacked slotLeft={<Styled.AssetIcon symbol={asset?.id} />}>
             <Styled.HighlightOutput
               type={OutputType.Asset}
@@ -270,7 +270,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'entryExitPrice',
         getCellValue: (row) => row.entryPrice?.current,
         label: stringGetter({ key: STRING_KEYS.AVERAGE_OPEN_CLOSE }),
-        hideOnBreakpoint: MediaQueryKeys.isDesktopSmall,
+        hideOnBreakpoint: MediaQueryKeys.isTablet,
         renderCell: ({ entryPrice, exitPrice, tickSizeDecimals }) => (
           <TableCell stacked>
             <Output
@@ -286,7 +286,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'netFunding',
         getCellValue: (row) => row.netFunding,
         label: stringGetter({ key: STRING_KEYS.NET_FUNDING }),
-        hideOnBreakpoint: MediaQueryKeys.isDesktopSmall,
+        hideOnBreakpoint: MediaQueryKeys.isTablet,
         renderCell: ({ netFunding }) => (
           <TableCell>
             <Styled.OutputSigned

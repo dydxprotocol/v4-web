@@ -52,7 +52,6 @@ export const Overview = () => {
                   PositionsTableColumnKey.UnrealizedPnl,
                   PositionsTableColumnKey.RealizedPnl,
                   PositionsTableColumnKey.AverageOpenAndClose,
-                  PositionsTableColumnKey.NetFunding,
                   shouldRenderTriggers && PositionsTableColumnKey.Triggers,
                   // TODO: CT-503 re-enable when close positions dialog is created
                   // shouldRenderActions && PositionsTableColumnKey.Actions,
