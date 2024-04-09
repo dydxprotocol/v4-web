@@ -61,7 +61,7 @@ export const TriggerOrderInputs = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
 
-  const [inputType, setInputType] = useState<InputChangeType>(InputType.Percent);
+  const [inputType, setInputType] = useState<InputChangeType>(InputType.Currency);
 
   const { triggerPrice, percentDiff, usdcDiff } = price ?? {};
 
