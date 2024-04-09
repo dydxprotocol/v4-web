@@ -20,6 +20,7 @@ import { useNow } from './useNow';
 import { useOnClickOutside } from './useOnClickOutside';
 import { usePageTitlePriceUpdates } from './usePageTitlePriceUpdates';
 import { usePerpetualMarketSparklines } from './usePerpetualMarketSparklines';
+import { usePerpetualMarketsStats } from './usePerpetualMarketsStats';
 import { useRestrictions } from './useRestrictions';
 import { useSelectedNetwork } from './useSelectedNetwork';
 import { useShouldShowFooter } from './useShouldShowFooter';
@@ -62,4 +63,5 @@ export {
   useTradeFormInputs,
   useURLConfigs,
   useWithdrawalInfo,
+  usePerpetualMarketsStats,
 };
