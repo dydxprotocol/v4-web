@@ -3,6 +3,7 @@ import styled, { AnyStyledComponent } from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { MarketFilters } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { useDocumentTitle, useStringGetter } from '@/hooks';
@@ -14,6 +15,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Button } from '@/components/Button';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { ExchangeBillboards } from '@/views/ExchangeBillboards';
+import { MarketsCompactTable } from '@/views/tables/MarketsCompactTable';
 import { MarketsTable } from '@/views/tables/MarketsTable';
 
 const Markets = () => {
@@ -41,6 +43,12 @@ const Markets = () => {
         />
         <Styled.StatsSection>
           <Styled.ExchangeBillboards />
+          <Styled.MarketsStats>
+            <MarketsCompactTable filters={MarketFilters.NEW} />
+          </Styled.MarketsStats>
+          <Styled.MarketsStats>
+            <MarketsCompactTable />
+          </Styled.MarketsStats>
         </Styled.StatsSection>
       </Styled.HeaderSection>
 
@@ -88,7 +96,7 @@ Styled.HeaderSection = styled.section`
 
 Styled.StatsSection = styled.section`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
 
   @media ${breakpoints.desktopSmall} {
@@ -99,6 +107,11 @@ Styled.StatsSection = styled.section`
   @media ${breakpoints.tablet} {
     ${layoutMixins.column}
   }
+`;
+
+Styled.MarketsStats = styled.div`
+  background: var(--color-layer-3);
+  border-radius: 0.625rem;
 `;
 
 Styled.ExchangeBillboards = styled(ExchangeBillboards)`

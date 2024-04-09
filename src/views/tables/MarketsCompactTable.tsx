@@ -16,6 +16,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { Button } from '@/components/Button';
+import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { type ColumnDef, AssetTableCell, Table, TableCell } from '@/components/Table';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
@@ -33,7 +34,6 @@ export const MarketsCompactTable = (props: PropsWithChildren<MarketsCompactTable
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  // TODO: Pass filters here for `New`
   const { filteredMarkets } = useMarketsData(filters);
 
   const columns = useMemo<ColumnDef<MarketData>[]>(
@@ -80,6 +80,37 @@ export const MarketsCompactTable = (props: PropsWithChildren<MarketsCompactTable
             </TableCell>
           ),
         },
+        filters === MarketFilters.NEW
+          ? {
+              columnKey: 'listing',
+              getCellValue: (row) => row.isNew,
+              renderCell: ({ asset }) => (
+                <Styled.DetailsCell>
+                  <Styled.RecentlyListed>
+                    <span>Listed</span>
+                    <span>14 hrs ago</span>
+                  </Styled.RecentlyListed>
+                  <Icon iconName={IconName.ChevronRight} />
+                </Styled.DetailsCell>
+              ),
+            }
+          : {
+              columnKey: 'openInterest',
+              getCellValue: (row) => row.isNew,
+              renderCell: ({ asset, openInterestUSDC, openInterest }) => (
+                <Styled.DetailsCell>
+                  <Styled.RecentlyListed>
+                    <Styled.NumberOutput type={OutputType.CompactFiat} value={openInterestUSDC} />
+                    <Styled.NumberOutput
+                      type={OutputType.CompactNumber}
+                      value={openInterest}
+                      slotRight={` ${asset.id}`}
+                    />
+                  </Styled.RecentlyListed>
+                  <Icon iconName={IconName.ChevronRight} />
+                </Styled.DetailsCell>
+              ),
+            },
       ] as ColumnDef<MarketData>[],
     [stringGetter, isTablet]
   );
@@ -188,5 +219,37 @@ Styled.MarketNotFound = styled.div`
 
   & button {
     color: var(--color-accent);
+  }
+`;
+
+Styled.DetailsCell = styled(TableCell)`
+  ${layoutMixins.row}
+  gap: 0.75rem;
+
+  & > svg {
+    opacity: 0.4;
+  }
+`;
+
+Styled.RecentlyListed = styled.div`
+  ${layoutMixins.column}
+  gap: 0.125rem;
+
+  & > span,
+  & > output {
+    text-align: right;
+    justify-content: flex-end;
+  }
+
+  & > span:first-child,
+  & > output:last-child {
+    color: var(--color-text-0);
+    font: var(--font-mini-medium);
+  }
+
+  & > span:last-child,
+  & > output:first-child {
+    color: var(--color-text-1);
+    font: var(--font-small-medium);
   }
 `;
