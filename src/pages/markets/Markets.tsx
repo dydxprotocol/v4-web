@@ -39,7 +39,9 @@ const Markets = () => {
             )
           }
         />
-        <Styled.ExchangeBillboards />
+        <Styled.StatsSection>
+          <Styled.ExchangeBillboards />
+        </Styled.StatsSection>
       </Styled.HeaderSection>
 
       <Styled.MarketsTable />
@@ -81,6 +83,21 @@ Styled.HeaderSection = styled.section`
     gap: 1rem;
 
     margin-bottom: 1rem;
+  }
+`;
+
+Styled.StatsSection = styled.section`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+
+  @media ${breakpoints.desktopSmall} {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  @media ${breakpoints.tablet} {
+    ${layoutMixins.column}
   }
 `;
 
