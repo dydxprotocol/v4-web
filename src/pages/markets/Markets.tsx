@@ -5,7 +5,7 @@ import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
-import { useBreakpoints, useDocumentTitle, useStringGetter } from '@/hooks';
+import { useDocumentTitle, useStringGetter } from '@/hooks';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 
 import { breakpoints } from '@/styles';
@@ -18,7 +18,6 @@ import { MarketsTable } from '@/views/tables/MarketsTable';
 
 const Markets = () => {
   const stringGetter = useStringGetter();
-  const { isNotTablet } = useBreakpoints();
   const navigate = useNavigate();
   const { hasPotentialMarketsData } = usePotentialMarkets();
 
@@ -40,7 +39,7 @@ const Markets = () => {
             )
           }
         />
-        <Styled.ExchangeBillboards isSearching={false} searchQuery="" />
+        <Styled.ExchangeBillboards />
       </Styled.HeaderSection>
 
       <Styled.MarketsTable />
