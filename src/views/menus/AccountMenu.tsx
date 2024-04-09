@@ -315,12 +315,13 @@ const AssetActions = memo(
             iconName: IconName.Withdraw,
             tooltipStringKey: STRING_KEYS.WITHDRAW,
           },
-        hasBalance && {
-          dialogType: DialogTypes.Transfer,
-          dialogProps: { selectedAsset: asset },
-          iconName: IconName.Send,
-          tooltipStringKey: STRING_KEYS.TRANSFER,
-        },
+        hasBalance &&
+          complianceState === ComplianceStates.FULLACCESS && {
+            dialogType: DialogTypes.Transfer,
+            dialogProps: { selectedAsset: asset },
+            iconName: IconName.Send,
+            tooltipStringKey: STRING_KEYS.TRANSFER,
+          },
       ]
         .filter(isTruthy)
         .map(({ iconName, tooltipStringKey, dialogType, dialogProps }) => (

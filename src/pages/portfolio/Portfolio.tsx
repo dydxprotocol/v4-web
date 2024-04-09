@@ -211,14 +211,15 @@ export default () => {
                     {stringGetter({ key: STRING_KEYS.WITHDRAW })}
                   </Button>
                 )}
-                {(usdcBalance > 0 || nativeTokenBalance.gt(0)) && (
-                  <Button
-                    action={ButtonAction.Base}
-                    onClick={() => dispatch(openDialog({ type: DialogTypes.Transfer }))}
-                  >
-                    {stringGetter({ key: STRING_KEYS.TRANSFER })}
-                  </Button>
-                )}
+                {complianceState === ComplianceStates.FULLACCESS &&
+                  (usdcBalance > 0 || nativeTokenBalance.gt(0)) && (
+                    <Button
+                      action={ButtonAction.Base}
+                      onClick={() => dispatch(openDialog({ type: DialogTypes.Transfer }))}
+                    >
+                      {stringGetter({ key: STRING_KEYS.TRANSFER })}
+                    </Button>
+                  )}
               </Styled.Footer>
             )}
           </Styled.SideBar>
