@@ -29,6 +29,7 @@ export const SparklineChart = <Datum extends {}>(props: SparklineChartProps<Datu
         <XYChart
           width={width}
           height={height}
+          margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
           xScale={{
             type: 'linear',
             clamp: false,
