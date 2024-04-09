@@ -11,9 +11,7 @@ import { AttachedExpandingSection, DetachedSection } from '@/components/ContentS
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
-import {
-  calculateShouldRenderTriggersInPositionsTable,
-} from '@/state/accountCalculators';
+import { calculateShouldRenderTriggersInPositionsTable } from '@/state/accountCalculators';
 
 import { isTruthy } from '@/lib/isTruthy';
 
@@ -26,7 +24,7 @@ export const Overview = () => {
 
   const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
   // TODO: CT-503
-  // const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable); 
+  // const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable);
 
   return (
     <div>
@@ -54,6 +52,7 @@ export const Overview = () => {
                   PositionsTableColumnKey.UnrealizedPnl,
                   PositionsTableColumnKey.RealizedPnl,
                   PositionsTableColumnKey.AverageOpenAndClose,
+                  PositionsTableColumnKey.NetFunding,
                   shouldRenderTriggers && PositionsTableColumnKey.Triggers,
                   // TODO: CT-503 re-enable when close positions dialog is created
                   // shouldRenderActions && PositionsTableColumnKey.Actions,

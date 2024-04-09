@@ -10,9 +10,7 @@ import { AttachedExpandingSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
-import {
-  calculateShouldRenderTriggersInPositionsTable,
-} from '@/state/accountCalculators';
+import { calculateShouldRenderTriggersInPositionsTable } from '@/state/accountCalculators';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { testFlags } from '@/lib/testFlags';
@@ -48,6 +46,7 @@ export const Positions = () => {
                 PositionsTableColumnKey.UnrealizedPnl,
                 PositionsTableColumnKey.RealizedPnl,
                 PositionsTableColumnKey.AverageOpenAndClose,
+                PositionsTableColumnKey.NetFunding,
                 shouldRenderTriggers && PositionsTableColumnKey.Triggers,
                 // TODO: CT-503 re-enable when close positions dialog is created
                 // shouldRenderActions && PositionsTableColumnKey.Actions,
