@@ -1,5 +1,6 @@
 import styled, { type AnyStyledComponent } from 'styled-components';
 
+import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { usePerpetualMarketsStats, useStringGetter } from '@/hooks';
@@ -7,6 +8,7 @@ import { usePerpetualMarketsStats, useStringGetter } from '@/hooks';
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
+import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { SparklineChart } from '@/components/visx/SparklineChart';
@@ -53,32 +55,45 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
           value: feeEarned,
           type: OutputType.CompactFiat,
           chartData: feeEarnedChart,
+          linkLabelKey: STRING_KEYS.LEARN_MORE_ARROW,
+          link: '#',
         },
-      ].map(({ key, labelKey, tagKey, value, fractionDigits, type, chartData }) => (
-        <Styled.BillboardContainer key={key}>
-          <Styled.BillboardStat>
-            <Styled.BillboardTitle>
-              <label>{stringGetter({ key: labelKey })}</label>
-              <Tag>{stringGetter({ key: tagKey })}</Tag>
-            </Styled.BillboardTitle>
-            <Styled.Output
-              useGrouping
-              fractionDigits={fractionDigits}
-              type={type}
-              value={value}
-              withBaseFont
-            />
-          </Styled.BillboardStat>
-          <Styled.BillboardChart>
-            <SparklineChart
-              data={chartData}
-              xAccessor={(datum) => datum.x}
-              yAccessor={(datum) => datum.y}
-              positive={true}
-            />
-          </Styled.BillboardChart>
-        </Styled.BillboardContainer>
-      ))}
+      ].map(
+        ({ key, labelKey, tagKey, value, fractionDigits, type, chartData, link, linkLabelKey }) => (
+          <Styled.BillboardContainer key={key}>
+            <Styled.BillboardStat>
+              <Styled.BillboardTitle>
+                <label>{stringGetter({ key: labelKey })}</label>
+                <Tag>{stringGetter({ key: tagKey })}</Tag>
+              </Styled.BillboardTitle>
+              <Styled.Output
+                useGrouping
+                fractionDigits={fractionDigits}
+                type={type}
+                value={value}
+                withBaseFont
+              />
+              {link && linkLabelKey ? (
+                <Styled.BillboardLink
+                  size={ButtonSize.Small}
+                  type={ButtonType.Link}
+                  action={ButtonAction.Navigation}
+                >
+                  {stringGetter({ key: linkLabelKey })}
+                </Styled.BillboardLink>
+              ) : null}
+            </Styled.BillboardStat>
+            <Styled.BillboardChart>
+              <SparklineChart
+                data={chartData}
+                xAccessor={(datum) => datum.x}
+                yAccessor={(datum) => datum.y}
+                positive={true}
+              />
+            </Styled.BillboardChart>
+          </Styled.BillboardContainer>
+        )
+      )}
     </Styled.MarketBillboardsWrapper>
   );
 };
@@ -104,6 +119,13 @@ Styled.BillboardContainer = styled.div`
 Styled.BillboardChart = styled.div`
   width: 130px;
   height: 40px;
+`;
+
+Styled.BillboardLink = styled(Button)`
+  --button-height: unset;
+  --button-padding: 0;
+  color: var(--color-accent);
+  justify-content: flex-start;
 `;
 
 Styled.BillboardTitle = styled.div`
