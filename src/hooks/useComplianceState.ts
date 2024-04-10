@@ -4,6 +4,7 @@ import { ComplianceStatus } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { BLOCKED_COUNTRIES, CountryCodes, OFAC_SANCTIONED_COUNTRIES } from '@/constants/geo';
 import { STRING_KEYS } from '@/constants/localization';
+import { isMainnet } from '@/constants/networks';
 
 import { getComplianceStatus, getGeo } from '@/state/accountSelectors';
 
@@ -25,25 +26,26 @@ export const useComplianceState = () => {
     complianceState = ComplianceStates.CLOSE_ONLY;
   } else if (
     complianceStatus === ComplianceStatus.BLOCKED ||
-    (geo && [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes))
+    (geo &&
+      [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes) &&
+      isMainnet)
   ) {
     complianceState = ComplianceStates.READ_ONLY;
   }
 
   if (complianceStatus === ComplianceStatus.FIRST_STRIKE) {
-    complianceMessage = 'Click to view →';
+    complianceMessage = `${stringGetter({ key: STRING_KEYS.CLICK_TO_VIEW })} →`;
   } else if (complianceStatus === ComplianceStatus.CLOSE_ONLY) {
-    complianceMessage =
-      'Because you appear to be a resident of, or trading from, a jurisdiction that violates our terms of use, or have engaged in activity that violates our terms of use, you have been blocked. You have until {DATE RETURNED FROM INDEXER} to withdraw your funds before your access to the frontend is blocked. If you believe there has been an error, please email {CONFIG EMAIL}.';
+    // TODO: add email and date to STRING_KEYS.CLOSE_ONLY_MESSAGE
+    complianceMessage = stringGetter({ key: STRING_KEYS.CLOSE_ONLY_MESSAGE });
   } else if (complianceStatus === ComplianceStatus.BLOCKED) {
-    complianceMessage =
-      'Because you appear to be a resident of, or trading from, a jurisdiction that violates our terms of use and previously have been given an opportunity to redress circumstances that led to restrictions on your account, you have been permanently blocked. If you believe there has been an error, please email {CONFIG EMAIL}.';
+    // TODO: add email to STRING_KEYS.PERMANENTLY_BLOCKED_MESSAGE
+    complianceMessage = stringGetter({ key: STRING_KEYS.PERMANENTLY_BLOCKED_MESSAGE });
   } else if (
     geo &&
     [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes)
   ) {
-    complianceMessage =
-      'Perpetuals are not available to any persons who are residents of, are located or incorporated in, or have a registered agent in a blocked country or a restricted territory. More details can be found in our Terms of Use [LINK]';
+    complianceMessage = stringGetter({ key: STRING_KEYS.BLOCKED_MESSAGE });
   }
 
   return {
