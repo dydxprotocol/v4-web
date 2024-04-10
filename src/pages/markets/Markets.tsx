@@ -1,9 +1,11 @@
+import { useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { MarketFilters } from '@/constants/markets';
+import { MarketFilters, MarketSorting } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { useDocumentTitle, useStringGetter } from '@/hooks';
@@ -14,6 +16,8 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
+import { Tag } from '@/components/Tag';
+import { ToggleGroup } from '@/components/ToggleGroup';
 import { ExchangeBillboards } from '@/views/ExchangeBillboards';
 import { MarketsCompactTable } from '@/views/tables/MarketsCompactTable';
 import { MarketsTable } from '@/views/tables/MarketsTable';
@@ -22,6 +26,7 @@ const Markets = () => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
   const { hasPotentialMarketsData } = usePotentialMarkets();
+  const [sorting, setSorting] = useState(MarketSorting.GAINERS);
 
   useDocumentTitle(stringGetter({ key: STRING_KEYS.MARKETS }));
 
@@ -44,10 +49,35 @@ const Markets = () => {
         <Styled.StatsSection>
           <Styled.ExchangeBillboards />
           <Styled.MarketsStats>
+            <Styled.MarketsStatsHeader>
+              <h4>Recently Listed</h4>
+              <Styled.NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</Styled.NewTag>
+            </Styled.MarketsStatsHeader>
             <MarketsCompactTable filters={MarketFilters.NEW} />
           </Styled.MarketsStats>
           <Styled.MarketsStats>
-            <MarketsCompactTable />
+            <Styled.MarketsStatsHeader>
+              <h4>Biggest Movers</h4>
+              <Tag>{stringGetter({ key: STRING_KEYS._24H })}</Tag>
+
+              <Styled.ToggleGroupContainer>
+                <ToggleGroup
+                  items={[
+                    {
+                      label: 'Gainers',
+                      value: 'gainers',
+                    },
+                    {
+                      label: 'Losers',
+                      value: 'losers',
+                    },
+                  ]}
+                  value={sorting}
+                  onValueChange={setSorting}
+                />
+              </Styled.ToggleGroupContainer>
+            </Styled.MarketsStatsHeader>
+            <MarketsCompactTable sorting={sorting} />
           </Styled.MarketsStats>
         </Styled.StatsSection>
       </Styled.HeaderSection>
@@ -61,6 +91,39 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Page = styled.div`
   ${layoutMixins.contentContainerPage}
+`;
+
+Styled.NewTag = styled(Tag)`
+  background-color: var(--color-accent-faded);
+  color: var(--color-accent);
+  text-transform: uppercase;
+`;
+
+Styled.ToggleGroupContainer = styled.div`
+  ${layoutMixins.row}
+  margin-left: auto;
+
+  & button {
+    --button-toggle-off-backgroundColor: var(--color-layer-3);
+    --button-toggle-off-textColor: var(--color-text-1);
+    --border-color: var(--color-layer-6);
+    --button-height: 1.75rem;
+    --button-padding: 0 0.75rem;
+    --button-font: var(--font-mini-book);
+  }
+`;
+
+Styled.MarketsStatsHeader = styled.div`
+  ${layoutMixins.row}
+
+  justify-content: space-between;
+  padding: 1.125rem 1.5rem;
+  gap: 0.375rem;
+
+  & h4 {
+    font: var(--font-base-medium);
+    color: var(--color-text-2);
+  }
 `;
 
 Styled.ContentSectionHeader = styled(ContentSectionHeader)`
