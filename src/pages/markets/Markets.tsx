@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { ButtonAction } from '@/constants/buttons';
+import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, MarketSorting } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
@@ -52,6 +52,10 @@ const Markets = () => {
             <Styled.MarketsStatsHeader>
               <h4>Recently Listed</h4>
               <Styled.NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</Styled.NewTag>
+
+              <Styled.ViewAll type={ButtonType.Link} action={ButtonAction.Navigation}>
+                View all →
+              </Styled.ViewAll>
             </Styled.MarketsStatsHeader>
             <MarketsCompactTable filters={MarketFilters.NEW} />
           </Styled.MarketsStats>
@@ -91,6 +95,11 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Page = styled.div`
   ${layoutMixins.contentContainerPage}
+`;
+
+Styled.ViewAll = styled(Button)`
+  color: var(--color-accent);
+  margin-left: auto;
 `;
 
 Styled.NewTag = styled(Tag)`
