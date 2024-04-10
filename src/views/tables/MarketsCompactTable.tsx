@@ -176,6 +176,10 @@ Styled.Table = styled(Table)`
     padding: 1rem;
   }
 
+  @media ${breakpoints.desktopSmall} {
+    --tableCell-padding: 0.5rem 0.5rem;
+  }
+
   @media ${breakpoints.tablet} {
     table {
       max-width: 100vw;
