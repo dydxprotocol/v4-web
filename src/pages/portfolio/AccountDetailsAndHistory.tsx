@@ -178,9 +178,7 @@ export const AccountDetailsAndHistory = () => {
           <Styled.EmptyChart>
             {complianceState === ComplianceStates.READ_ONLY ? (
               <Styled.EmptyCard>
-                Perpetuals are not available to any persons who are residents of, are located or
-                incorporated in, or have a registered agent in a blocked country or a restricted
-                territory. More details can be found in our Terms of Use
+                {stringGetter({ key: STRING_KEYS.BLOCKED_MESSAGE })}
               </Styled.EmptyCard>
             ) : onboardingState !== OnboardingState.AccountConnected ? (
               <Styled.EmptyCard>

@@ -67,13 +67,13 @@ export const GeoComplianceDialog = ({ setIsOpen }: ElementProps) => {
           <Button action={ButtonAction.Primary}>{stringGetter({ key: STRING_KEYS.SUBMIT })}</Button>
         </Styled.Form>
       ) : (
-        <>
+        <Styled.Form>
           <p>{stringGetter({ key: STRING_KEYS.COMPLIANCE_BODY_FIRST_OFFENSE_1 })}</p>
           <p>{stringGetter({ key: STRING_KEYS.COMPLIANCE_BODY_FIRST_OFFENSE_2 })}</p>
           <Button action={ButtonAction.Primary} onClick={() => setShowForm(true)}>
             {stringGetter({ key: STRING_KEYS.CONTINUE })}
           </Button>
-        </>
+        </Styled.Form>
       )}
     </Dialog>
   );
