@@ -90,13 +90,19 @@ export const LimitPriceInputs = ({
     <>
       <Collapsible
         className={className}
-        slotTrigger={<Checkbox checked={shouldShowLimitPrice} onCheckedChange={onToggleLimit} />}
-        open={shouldShowLimitPrice}
-        label={
-          <WithTooltip tooltip="limit-price">
-            {stringGetter({ key: STRING_KEYS.LIMIT_PRICE })}
-          </WithTooltip>
+        slotTrigger={
+          <Checkbox
+            id="sltp-limit"
+            checked={shouldShowLimitPrice}
+            onCheckedChange={onToggleLimit}
+            label={
+              <WithTooltip tooltip="limit-price">
+                <Styled.Label>{stringGetter({ key: STRING_KEYS.LIMIT_PRICE })}</Styled.Label>
+              </WithTooltip>
+            }
+          />
         }
+        open={shouldShowLimitPrice}
       >
         {
           <Styled.InputsRow>
@@ -140,4 +146,9 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.InputsRow = styled.span`
   ${layoutMixins.flexEqualColumns}
   gap: 1ch;
+`;
+
+Styled.Label = styled.div`
+  font: var(--font-base-book);
+  color: var(--color-text-1);
 `;

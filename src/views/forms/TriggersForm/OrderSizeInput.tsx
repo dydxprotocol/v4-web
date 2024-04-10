@@ -86,18 +86,19 @@ export const OrderSizeInput = ({
       slotTrigger={
         <WithTooltip tooltip={differingOrderSizes ? 'unequal-order-sizes' : undefined}>
           <Checkbox
+            id="order-size"
             disabled={differingOrderSizes}
             checked={shouldShowCustomAmount}
             onCheckedChange={onCustomAmountToggle}
+            label={
+              <WithTooltip tooltip="custom-amount">
+                <Styled.Label>{stringGetter({ key: STRING_KEYS.CUSTOM_AMOUNT })}</Styled.Label>
+              </WithTooltip>
+            }
           />
         </WithTooltip>
       }
       open={shouldShowCustomAmount}
-      label={
-        <WithTooltip tooltip="custom-amount">
-          {stringGetter({ key: STRING_KEYS.CUSTOM_AMOUNT })}
-        </WithTooltip>
-      }
     >
       <Styled.SizeInputRow>
         <Styled.OrderSizeSlider
@@ -128,4 +129,9 @@ Styled.SizeInputRow = styled.div`
   display: flex;
   align-items: center;
   gap: 0.25rem;
+`;
+
+Styled.Label = styled.div`
+  font: var(--font-base-book);
+  color: var(--color-text-1);
 `;

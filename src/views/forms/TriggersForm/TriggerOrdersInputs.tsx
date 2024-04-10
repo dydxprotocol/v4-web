@@ -6,6 +6,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { getTriggerOrdersInputs } from '@/state/inputsSelectors';
 
 import { TriggerOrderInputs } from './TriggerOrderInputs';
+import { NumberSign } from '@/constants/numbers';
 
 type ElementProps = {
   symbol: string;
@@ -32,9 +33,11 @@ export const TriggerOrdersInputs = ({
         tooltipId="take-profit"
         stringKeys={{
           header: STRING_KEYS.TAKE_PROFIT,
+          headerDiff: STRING_KEYS.PROFIT, // xcxc 
           price: STRING_KEYS.TP_PRICE,
           output: STRING_KEYS.GAIN,
         }}
+        signedDiff={NumberSign.Positive}
         inputOrderFields={{
           triggerPriceField: TriggerOrdersInputField.takeProfitPrice,
           percentDiffField: TriggerOrdersInputField.takeProfitPercentDiff,
@@ -50,9 +53,11 @@ export const TriggerOrdersInputs = ({
         tooltipId="stop-loss"
         stringKeys={{
           header: STRING_KEYS.STOP_LOSS,
+          headerDiff: STRING_KEYS.LOSS,
           price: STRING_KEYS.SL_PRICE,
           output: STRING_KEYS.LOSS,
         }}
+        signedDiff={NumberSign.Negative}
         inputOrderFields={{
           triggerPriceField: TriggerOrdersInputField.stopLossPrice,
           percentDiffField: TriggerOrdersInputField.stopLossPercentDiff,
