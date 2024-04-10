@@ -5,7 +5,7 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { MarketFilters, type MarketData } from '@/constants/markets';
+import { MarketFilters, MarketSorting, type MarketData } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
@@ -26,10 +26,11 @@ import { MustBigNumber } from '@/lib/numbers';
 interface MarketsCompactTableProps {
   className?: string;
   filters?: MarketFilters;
+  sorting?: MarketSorting;
 }
 
 export const MarketsCompactTable = (props: PropsWithChildren<MarketsCompactTableProps>) => {
-  const { className, filters } = props;
+  const { className, filters, sorting } = props;
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
@@ -123,11 +124,33 @@ export const MarketsCompactTable = (props: PropsWithChildren<MarketsCompactTable
     [stringGetter, isTablet]
   );
 
+  const sortedMarkets = useMemo(() => {
+    const sortingFunction = (marketA: MarketData, marketB: MarketData) => {
+      if (marketA.priceChange24HPercent == null && marketB.priceChange24HPercent == null) {
+        return 0;
+      }
+
+      if (marketA.priceChange24HPercent == null) {
+        return 1;
+      }
+
+      if (marketB.priceChange24HPercent == null) {
+        return -1;
+      }
+
+      return sorting === MarketSorting.GAINERS
+        ? marketB.priceChange24HPercent - marketA.priceChange24HPercent
+        : marketA.priceChange24HPercent - marketB.priceChange24HPercent;
+    };
+
+    return filteredMarkets.sort(sortingFunction);
+  }, [sorting, filteredMarkets]);
+
   return (
     <Styled.Table
       withInnerBorders
       hideHeader
-      data={filteredMarkets.slice(0, 5)}
+      data={sortedMarkets.slice(0, 5)}
       getRowKey={(row: MarketData) => row.market}
       label="Markets"
       onRowAction={(market: string) =>
@@ -162,7 +185,16 @@ Styled.Table = styled(Table)`
   --tableCell-padding: 0.625rem 1.5rem;
   --tableRow-backgroundColor: var(--color-layer-3);
   --tableHeader-backgroundColor: var(--color-layer-3);
-  border-radius: 0.625rem;
+  border-bottom-right-radius: 0.625rem;
+  border-bottom-left-radius: 0.625rem;
+
+  & table {
+    --stickyArea1-background: var(--color-layer-5);
+  }
+
+  & tr > td:nth-child(2) {
+    --tableCell-padding: 0.625rem 0;
+  }
 
   & tr:last-child {
     box-shadow: none;
@@ -178,6 +210,10 @@ Styled.Table = styled(Table)`
 
   @media ${breakpoints.desktopSmall} {
     --tableCell-padding: 0.5rem 0.5rem;
+
+    & tr > td:nth-child(2) {
+      --tableCell-padding: 0.625rem 0;
+    }
   }
 
   @media ${breakpoints.tablet} {

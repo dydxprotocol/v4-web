@@ -11,6 +11,11 @@ export type MarketData = {
   PerpetualMarket['perpetual'] &
   PerpetualMarket['configs'];
 
+export enum MarketSorting {
+  GAINERS = 'gainers',
+  LOSERS = 'losers',
+}
+
 export enum MarketFilters {
   ALL = 'all',
   NEW = 'new',
