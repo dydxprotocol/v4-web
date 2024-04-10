@@ -15,10 +15,6 @@ type ExchangeBillboardsProps = {
   className?: string;
 };
 
-const endDate = new Date();
-const startDate = new Date();
-startDate.setDate(startDate.getDate() - 1);
-
 export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ className }) => {
   const stringGetter = useStringGetter();
 
@@ -55,7 +51,7 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
           labelKey: STRING_KEYS.EARNED,
           tagKey: STRING_KEYS._24H,
           value: feeEarned,
-          type: OutputType.CompactNumber,
+          type: OutputType.CompactFiat,
           chartData: feeEarnedChart,
         },
       ].map(({ key, labelKey, tagKey, value, fractionDigits, type, chartData }) => (
