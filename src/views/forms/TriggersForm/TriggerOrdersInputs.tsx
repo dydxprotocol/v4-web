@@ -2,11 +2,11 @@ import { shallowEqual, useSelector } from 'react-redux';
 
 import { TriggerOrdersInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { NumberSign } from '@/constants/numbers';
 
 import { getTriggerOrdersInputs } from '@/state/inputsSelectors';
 
 import { TriggerOrderInputs } from './TriggerOrderInputs';
-import { NumberSign } from '@/constants/numbers';
 
 type ElementProps = {
   symbol: string;
@@ -33,17 +33,17 @@ export const TriggerOrdersInputs = ({
         tooltipId="take-profit"
         stringKeys={{
           header: STRING_KEYS.TAKE_PROFIT,
-          headerDiff: STRING_KEYS.PROFIT, // xcxc 
+          headerDiff: STRING_KEYS.PROFIT_COLON,
           price: STRING_KEYS.TP_PRICE,
           output: STRING_KEYS.GAIN,
         }}
-        signedDiff={NumberSign.Positive}
         inputOrderFields={{
           triggerPriceField: TriggerOrdersInputField.takeProfitPrice,
           percentDiffField: TriggerOrdersInputField.takeProfitPercentDiff,
           usdcDiffField: TriggerOrdersInputField.takeProfitUsdcDiff,
         }}
         isMultiple={multipleTakeProfitOrders}
+        isNegativeDiff={false}
         price={takeProfitOrder?.price}
         tickSizeDecimals={tickSizeDecimals}
         onViewOrdersClick={onViewOrdersClick}
@@ -53,17 +53,17 @@ export const TriggerOrdersInputs = ({
         tooltipId="stop-loss"
         stringKeys={{
           header: STRING_KEYS.STOP_LOSS,
-          headerDiff: STRING_KEYS.LOSS,
+          headerDiff: STRING_KEYS.LOSS_COLON,
           price: STRING_KEYS.SL_PRICE,
           output: STRING_KEYS.LOSS,
         }}
-        signedDiff={NumberSign.Negative}
         inputOrderFields={{
           triggerPriceField: TriggerOrdersInputField.stopLossPrice,
           percentDiffField: TriggerOrdersInputField.stopLossPercentDiff,
           usdcDiffField: TriggerOrdersInputField.stopLossUsdcDiff,
         }}
         isMultiple={multipleStopLossOrders}
+        isNegativeDiff={true}
         price={stopLossOrder?.price}
         tickSizeDecimals={tickSizeDecimals}
         onViewOrdersClick={onViewOrdersClick}

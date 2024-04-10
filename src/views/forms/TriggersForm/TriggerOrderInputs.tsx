@@ -36,8 +36,6 @@ type InputOrderFields = {
   usdcDiffField: TriggerOrdersInputFields;
 };
 
-type ProfitOutputType = OutputType.Fiat | OutputType.Percent;
-
 type ElementProps = {
   symbol: string;
   tooltipId: string;
@@ -143,8 +141,7 @@ export const TriggerOrderInputs = ({
       ? MustBigNumber(percentDiff).div(100).toNumber()
       : null;
 
-    const outputType: ProfitOutputType =
-      inputType === InputType.Percent ? OutputType.Fiat : OutputType.Percent;
+    const outputType = inputType === InputType.Percent ? OutputType.Fiat : OutputType.Percent;
     const value = outputType === OutputType.Fiat ? usdcDiff : formattedPercentDiff;
 
     return {

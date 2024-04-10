@@ -90,12 +90,12 @@ export const OrderSizeInput = ({
             disabled={differingOrderSizes}
             checked={shouldShowCustomAmount}
             onCheckedChange={onCustomAmountToggle}
-            label={
-              <WithTooltip tooltip="custom-amount">
-                <Styled.Label>{stringGetter({ key: STRING_KEYS.CUSTOM_AMOUNT })}</Styled.Label>
-              </WithTooltip>
-            }
           />
+        </WithTooltip>
+      }
+      label={
+        <WithTooltip tooltip="custom-amount">
+          {stringGetter({ key: STRING_KEYS.CUSTOM_AMOUNT })}
         </WithTooltip>
       }
       open={shouldShowCustomAmount}
@@ -129,9 +129,4 @@ Styled.SizeInputRow = styled.div`
   display: flex;
   align-items: center;
   gap: 0.25rem;
-`;
-
-Styled.Label = styled.div`
-  font: var(--font-base-book);
-  color: var(--color-text-1);
 `;
