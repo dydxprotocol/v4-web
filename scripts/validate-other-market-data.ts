@@ -21,7 +21,7 @@ import {
   TransactionOptions,
   VoteOption,
 } from '@dydxprotocol/v4-client-js';
-import Registry from '@dydxprotocol/v4-client-js/src/clients/lib/registry';
+import * as Registry from '@dydxprotocol/v4-client-js/src/clients/lib/registry';
 import { MsgVote } from '@dydxprotocol/v4-proto/src/codegen/cosmos/gov/v1/tx';
 import { ClobPair } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/clob/clob_pair';
 import { Perpetual } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
