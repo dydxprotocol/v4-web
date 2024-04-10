@@ -53,23 +53,47 @@ export const useMarketsData = (
   const allPerpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
   const allAssets = useSelector(getAssets, shallowEqual) || {};
   const sevenDaysSparklineData = usePerpetualMarketSparklines();
-  const oneDaySparklineData = usePerpetualMarketSparklines({ period: 'ONE_DAY' });
+  const oneDaySparklineData = usePerpetualMarketSparklines({
+    period: 'ONE_DAY',
+    refetchInterval: undefined,
+  });
+
+  console.log(sevenDaysSparklineData);
 
   const markets = useMemo(() => {
     return Object.values(allPerpetualMarkets)
       .filter(isTruthy)
-      .map((marketData) => ({
-        asset: allAssets[marketData.assetId] ?? {},
-        tickSizeDecimals: marketData.configs?.tickSizeDecimals,
-        isNew: Boolean(
-          sevenDaysSparklineData &&
-            sevenDaysSparklineData?.[marketData.id]?.length < SEVEN_DAY_SPARKLINE_ENTRIES
-        ),
-        oneDaySparkline: oneDaySparklineData?.[marketData.id] ?? [],
-        ...marketData,
-        ...marketData.perpetual,
-        ...marketData.configs,
-      })) as MarketData[];
+      .map((marketData) => {
+        const sevenDaySparklineEntries = sevenDaysSparklineData?.[marketData.id]?.length ?? 0;
+        const isNew = Boolean(
+          sevenDaysSparklineData && sevenDaySparklineEntries < SEVEN_DAY_SPARKLINE_ENTRIES
+        );
+
+        /**
+         * There is no date in the services to determine when it was listed, but we can calculate it approximately.
+         * Keeping in mind that the `/sparklines` service using the period `SEVEN_DAYS` as a parameter,
+         * returns a maximum of 6 entries for each day with a timeframe of 4 hours.
+         * For this it is possible to estimate the listing date as follows:
+         * `Hours elapsed since listing = (Total sparklines entries * 6)`
+         */
+        let listingDate: Date | undefined = undefined;
+
+        if (isNew) {
+          listingDate = new Date();
+          listingDate.setHours(listingDate.getHours() - sevenDaySparklineEntries * 4);
+        }
+
+        return {
+          asset: allAssets[marketData.assetId] ?? {},
+          tickSizeDecimals: marketData.configs?.tickSizeDecimals,
+          isNew,
+          listingDate,
+          oneDaySparkline: oneDaySparklineData?.[marketData.id] ?? [],
+          ...marketData,
+          ...marketData.perpetual,
+          ...marketData.configs,
+        };
+      }) as MarketData[];
   }, [allPerpetualMarkets, allAssets, oneDaySparklineData, sevenDaysSparklineData]);
 
   const filteredMarkets = useMemo(() => {

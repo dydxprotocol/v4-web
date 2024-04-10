@@ -84,11 +84,19 @@ export const MarketsCompactTable = (props: PropsWithChildren<MarketsCompactTable
           ? {
               columnKey: 'listing',
               getCellValue: (row) => row.isNew,
-              renderCell: ({ asset }) => (
+              renderCell: ({ listingDate }) => (
                 <Styled.DetailsCell>
                   <Styled.RecentlyListed>
                     <span>Listed</span>
-                    <span>14 hrs ago</span>
+                    {listingDate && (
+                      <Styled.RelativeTimeOutput
+                        type={OutputType.RelativeTime}
+                        relativeTimeFormatOptions={{
+                          format: 'singleCharacter',
+                        }}
+                        value={listingDate.getTime()}
+                      />
+                    )}
                   </Styled.RecentlyListed>
                   <Icon iconName={IconName.ChevronRight} />
                 </Styled.DetailsCell>
@@ -100,8 +108,8 @@ export const MarketsCompactTable = (props: PropsWithChildren<MarketsCompactTable
               renderCell: ({ asset, openInterestUSDC, openInterest }) => (
                 <Styled.DetailsCell>
                   <Styled.RecentlyListed>
-                    <Styled.NumberOutput type={OutputType.CompactFiat} value={openInterestUSDC} />
-                    <Styled.NumberOutput
+                    <Output type={OutputType.CompactFiat} value={openInterestUSDC} />
+                    <Styled.InterestOutput
                       type={OutputType.CompactNumber}
                       value={openInterest}
                       slotRight={` ${asset.id}`}
@@ -190,11 +198,6 @@ Styled.TabletPriceChange = styled(Styled.InlineRow)`
   }
 `;
 
-Styled.NumberOutput = styled(Output)`
-  font: var(--font-base-medium);
-  color: var(--color-text-2);
-`;
-
 Styled.Output = styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`
   color: ${({ isNegative, isPositive }) =>
     isNegative
@@ -241,8 +244,7 @@ Styled.RecentlyListed = styled.div`
     justify-content: flex-end;
   }
 
-  & > span:first-child,
-  & > output:last-child {
+  & > span:first-child {
     color: var(--color-text-0);
     font: var(--font-mini-medium);
   }
@@ -252,4 +254,14 @@ Styled.RecentlyListed = styled.div`
     color: var(--color-text-1);
     font: var(--font-small-medium);
   }
+`;
+
+Styled.InterestOutput = styled(Output)`
+  color: var(--color-text-0);
+  font: var(--font-mini-medium);
+`;
+
+Styled.RelativeTimeOutput = styled(Output)`
+  color: var(--color-text-1);
+  font: var(--font-small-medium);
 `;

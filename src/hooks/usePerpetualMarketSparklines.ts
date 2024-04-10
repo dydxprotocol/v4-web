@@ -16,10 +16,11 @@ export const ONE_DAY_SPARKLINE_ENTRIES = 24;
 
 interface UsePerpetualMarketSparklinesProps {
   period?: 'ONE_DAY' | 'SEVEN_DAYS';
+  refetchInterval?: number;
 }
 
 export const usePerpetualMarketSparklines = (props: UsePerpetualMarketSparklinesProps = {}) => {
-  const { period = 'SEVEN_DAYS' } = props;
+  const { period = 'SEVEN_DAYS', refetchInterval = POLLING_MS } = props;
   const { getPerpetualMarketSparklines, compositeClient } = useDydxClient();
 
   const { data } = useQuery<PerpetualMarketSparklineResponse | undefined>({
@@ -32,7 +33,7 @@ export const usePerpetualMarketSparklines = (props: UsePerpetualMarketSparklines
         log('usePerpetualMarketSparklines', error);
       }
     },
-    refetchInterval: POLLING_MS,
+    refetchInterval,
     refetchOnWindowFocus: false,
   });
 

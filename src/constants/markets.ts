@@ -6,6 +6,7 @@ export type MarketData = {
   tickSizeDecimals: number;
   oneDaySparkline?: number[];
   isNew?: boolean;
+  listingDate?: Date;
 } & PerpetualMarket &
   PerpetualMarket['perpetual'] &
   PerpetualMarket['configs'];
