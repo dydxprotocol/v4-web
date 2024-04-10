@@ -90,7 +90,13 @@ export const LimitPriceInputs = ({
     <>
       <Collapsible
         className={className}
-        slotTrigger={<Checkbox checked={shouldShowLimitPrice} onCheckedChange={onToggleLimit} />}
+        slotTrigger={
+          <Checkbox
+            id="sltp-limit"
+            checked={shouldShowLimitPrice}
+            onCheckedChange={onToggleLimit}
+          />
+        }
         open={shouldShowLimitPrice}
         label={
           <WithTooltip tooltip="limit-price">
