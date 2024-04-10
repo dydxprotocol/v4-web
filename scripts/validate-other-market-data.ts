@@ -361,6 +361,7 @@ export async function submitNewMarketProposalDydx(
       params.ticker,
       params.atomicResolution,
       params.liquidityTier,
+      params.marketType,
     );
 
     // x/clob.MsgCreateClobPair
