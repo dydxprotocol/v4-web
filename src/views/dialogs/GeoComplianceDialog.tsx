@@ -41,7 +41,9 @@ const CountrySelector = ({ label }: { label: string }) => {
       label={label}
       withSearch
     >
-      <Styled.SelectedCountry>{selectedCountry || 'Select a country'}</Styled.SelectedCountry>
+      <Styled.SelectedCountry>
+        {selectedCountry || stringGetter({ key: STRING_KEYS.SELECT_A_COUNTRY })}
+      </Styled.SelectedCountry>
     </SearchSelectMenu>
   );
 };
@@ -55,19 +57,23 @@ export const GeoComplianceDialog = ({ setIsOpen }: ElementProps) => {
     <Dialog
       isOpen
       setIsOpen={setIsOpen}
-      title={'Compliance Request'}
+      title={stringGetter({ key: STRING_KEYS.COMPLIANCE_REQUEST })}
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
       {showForm ? (
         <Styled.Form>
-          <CountrySelector label="Country of Residance" />
-          <CountrySelector label="Trading Location" />
+          <CountrySelector label={stringGetter({ key: STRING_KEYS.COUNTRY_OF_RESIDENCE })} />
+          <CountrySelector label={stringGetter({ key: STRING_KEYS.TRADING_LOCATION })} />
           <Button action={ButtonAction.Primary}>{stringGetter({ key: STRING_KEYS.SUBMIT })}</Button>
         </Styled.Form>
       ) : (
-        <Button action={ButtonAction.Primary} onClick={() => setShowForm(true)}>
-          {stringGetter({ key: STRING_KEYS.CONTINUE })}
-        </Button>
+        <>
+          <p>{stringGetter({ key: STRING_KEYS.COMPLIANCE_BODY_FIRST_OFFENSE_1 })}</p>
+          <p>{stringGetter({ key: STRING_KEYS.COMPLIANCE_BODY_FIRST_OFFENSE_2 })}</p>
+          <Button action={ButtonAction.Primary} onClick={() => setShowForm(true)}>
+            {stringGetter({ key: STRING_KEYS.CONTINUE })}
+          </Button>
+        </>
       )}
     </Dialog>
   );

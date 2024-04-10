@@ -424,7 +424,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
         if (complianceState !== ComplianceStates.FULLACCESS) {
           const displayData: NotificationDisplayData = {
             icon: <$WarningIcon iconName={IconName.Warning} />,
-            title: 'Compliance Warning',
+            title: stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING }),
             body: complianceMessage,
             toastSensitivity: 'foreground',
             groupKey: NotificationType.ComplianceAlert,
