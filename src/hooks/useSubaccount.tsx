@@ -36,7 +36,7 @@ import { useAccounts } from './useAccounts';
 import { useDydxClient } from './useDydxClient';
 import { useGovernanceVariables } from './useGovernanceVariables';
 import { useTokenConfigs } from './useTokenConfigs';
-import { submitNewMarketProposalDydx } from 'scripts/validate-other-market-data';
+import { submitNewMarketProposalDydx } from '../../scripts/validate-other-market-data';
 
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
 const SubaccountContext = createContext<SubaccountContextType>({} as SubaccountContextType);
