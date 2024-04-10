@@ -7,24 +7,25 @@
 /* eslint-disable no-restricted-syntax */
 
 /* eslint-disable no-await-in-loop */
+// import { submitNewMarketProposalDydx } from '@/hooks/useSubaccount';
 import { EncodeObject } from '@cosmjs/proto-signing';
-import { Account, StdFee } from '@cosmjs/stargate';
+import { Account, StdFee, IndexedTx } from '@cosmjs/stargate';
 import { Method } from '@cosmjs/tendermint-rpc';
-import { BroadcastTxSyncResponse } from '@cosmjs/tendermint-rpc/build/tendermint37';
+import { BroadcastTxAsyncResponse, BroadcastTxSyncResponse } from '@cosmjs/tendermint-rpc/build/tendermint37';
 import {
   CompositeClient,
   LocalWallet as LocalWalletType,
+  type GovAddNewMarketParams,
   Network,
   ProposalStatus,
   TransactionOptions,
   VoteOption,
 } from '@dydxprotocol/v4-client-js';
+import Registry from '@dydxprotocol/v4-client-js/src/clients/lib/registry';
 import { MsgVote } from '@dydxprotocol/v4-proto/src/codegen/cosmos/gov/v1/tx';
 import { ClobPair } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/clob/clob_pair';
-import {
-  Perpetual,
-  PerpetualMarketType,
-} from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
+import { Perpetual } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
+import { PerpetualMarketType } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
 import { MarketPrice } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/prices/market_price';
 import Ajv from 'ajv';
 import axios from 'axios';
@@ -337,6 +338,84 @@ async function voteOnProposals(
   }
 }
 
+export async function submitNewMarketProposalDydx(
+  compositeClient: CompositeClient,
+  wallet: LocalWalletType,
+  params: GovAddNewMarketParams,
+  title: string,
+  summary: string,
+  initialDepositAmount: string,
+  memo?: string,
+): Promise<BroadcastTxAsyncResponse | BroadcastTxSyncResponse | IndexedTx> {
+  const msg: Promise<EncodeObject[]> = new Promise((resolve) => {
+    const composer = compositeClient.validatorClient.post.composer;
+    const registry = Registry.generateRegistry();
+    const msgs: EncodeObject[] = [];
+
+    const existingMarketId = 1000001
+
+    // x/perpetuals.MsgCreatePerpetual
+    const createPerpetual = composer.composeMsgCreatePerpetual(
+      params.id,
+      existingMarketId,
+      params.ticker,
+      params.atomicResolution,
+      params.liquidityTier,
+    );
+
+    // x/clob.MsgCreateClobPair
+    const createClobPair = composer.composeMsgCreateClobPair(
+      params.id,
+      params.id,
+      params.quantumConversionExponent,
+      params.stepBaseQuantums,
+      params.subticksPerTick,
+    );
+
+    // x/clob.MsgUpdateClobPair
+    const updateClobPair = composer.composeMsgUpdateClobPair(
+      params.id,
+      params.id,
+      params.quantumConversionExponent,
+      params.stepBaseQuantums,
+      params.subticksPerTick,
+    );
+
+    // x/delaymsg.MsgDelayMessage
+    const delayMessage = composer.composeMsgDelayMessage(
+      // IMPORTANT: must wrap messages in Any type to fit into delaymsg.
+      composer.wrapMessageAsAny(registry, updateClobPair),
+      params.delayBlocks,
+    );
+
+    // The order matters.
+    msgs.push(createPerpetual);
+    msgs.push(createClobPair);
+    msgs.push(delayMessage);
+
+    // x/gov.v1.MsgSubmitProposal
+    const submitProposal = composer.composeMsgSubmitProposal(
+      title,
+      initialDepositAmount,
+      compositeClient.validatorClient.config.denoms, // use the client denom.
+      summary,
+      // IMPORTANT: must wrap messages in Any type for gov's submit proposal.
+      composer.wrapMessageArrAsAny(registry, msgs),
+      wallet.address!, // proposer
+    );
+
+    resolve([submitProposal]);
+  });
+
+  return compositeClient.send(
+    wallet,
+    () => msg,
+    false,
+    undefined,
+    memo,
+  );
+}
+
 async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   // Initialize wallets.
   const network = Network.local();
@@ -373,7 +452,35 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
       const exchangeConfigString = `{"exchanges":${JSON.stringify(
         proposal.params.exchangeConfigJson
       )}}`;
+
       const tx = await retry(() =>
+        proposal.params.ticker.toLowerCase() === 'dydx-usd' ?
+        submitNewMarketProposalDydx(
+          client,
+          wallets[j],
+          {
+            id: marketId,
+            ticker: proposal.params.ticker,
+            priceExponent: proposal.params.priceExponent,
+            minPriceChange: proposal.params.minPriceChange,
+            minExchanges: proposal.params.minExchanges,
+            exchangeConfigJson: exchangeConfigString,
+            liquidityTier: proposal.params.liquidityTier,
+            atomicResolution: proposal.params.atomicResolution,
+            quantumConversionExponent: proposal.params.quantumConversionExponent,
+            stepBaseQuantums: Long.fromNumber(proposal.params.stepBaseQuantums),
+            subticksPerTick: proposal.params.subticksPerTick,
+            delayBlocks: proposal.params.delayBlocks,
+            marketType:
+              proposal.params.marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
+                ? PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED
+                : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS,
+          },
+          proposal.title,
+          proposal.summary,
+          MIN_DEPOSIT
+        )
+        :
         client.submitGovAddNewMarketProposal(
           wallets[j],
           {

@@ -9,6 +9,7 @@ import {
   SubaccountClient,
   type GovAddNewMarketParams,
   utils,
+  CompositeClient,
 } from '@dydxprotocol/v4-client-js';
 import Long from 'long';
 import { shallowEqual, useSelector, useDispatch } from 'react-redux';
@@ -35,6 +36,7 @@ import { useAccounts } from './useAccounts';
 import { useDydxClient } from './useDydxClient';
 import { useGovernanceVariables } from './useGovernanceVariables';
 import { useTokenConfigs } from './useTokenConfigs';
+import { submitNewMarketProposalDydx } from 'scripts/validate-other-market-data';
 
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
 const SubaccountContext = createContext<SubaccountContextType>({} as SubaccountContextType);
@@ -453,15 +455,26 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         throw new Error('governance variables not initialized');
       }
 
-      const response = await compositeClient.submitGovAddNewMarketProposal(
-        localDydxWallet,
-        params,
-        utils.getGovAddNewMarketTitle(params.ticker),
-        utils.getGovAddNewMarketSummary(params.ticker, newMarketProposal.delayBlocks),
-        BigInt(newMarketProposal.initialDepositAmount).toString()
-      );
-
-      return response;
+      if (params.ticker.toLowerCase() === 'dydx-usd') {
+        const response = await submitNewMarketProposalDydx(
+          compositeClient,
+          localDydxWallet,
+          params,
+          utils.getGovAddNewMarketTitle(params.ticker),
+          utils.getGovAddNewMarketSummary(params.ticker, newMarketProposal.delayBlocks),
+          BigInt(newMarketProposal.initialDepositAmount).toString()
+        );
+        return response;
+      } else {
+        const response = await compositeClient.submitGovAddNewMarketProposal(
+          localDydxWallet,
+          params,
+          utils.getGovAddNewMarketTitle(params.ticker),
+          utils.getGovAddNewMarketSummary(params.ticker, newMarketProposal.delayBlocks),
+          BigInt(newMarketProposal.initialDepositAmount).toString()
+        );
+        return response;
+      }
     },
     [compositeClient, localDydxWallet]
   );
