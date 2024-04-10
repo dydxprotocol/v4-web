@@ -86,6 +86,9 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       input: entryPoints,
+      external: [
+        "scripts",
+      ],
     },
   },
 }));
