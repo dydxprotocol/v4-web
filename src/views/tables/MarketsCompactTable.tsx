@@ -192,8 +192,16 @@ Styled.Table = styled(Table)`
     --stickyArea1-background: var(--color-layer-5);
   }
 
+  & tr > td:nth-child(1) {
+    --tableCell-padding: 0.625rem 0.625rem 0.625rem 1.5rem;
+  }
+
   & tr > td:nth-child(2) {
     --tableCell-padding: 0.625rem 0;
+  }
+
+  & tr > td:nth-child(3) {
+    --tableCell-padding: 0.625rem 1.5rem 0.625rem 0.625rem;
   }
 
   & tr:last-child {
