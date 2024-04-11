@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
@@ -25,12 +26,16 @@ import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { SparklineChart } from '@/components/visx/SparklineChart';
 import { MarketFilter } from '@/views/MarketFilter';
 
+import { setMarketFilter } from '@/state/perpetuals';
+import { getMarketFilter } from '@/state/perpetualsSelectors';
+
 import { MustBigNumber } from '@/lib/numbers';
 
 export const MarketsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-  const [filter, setFilter] = useState(MarketFilters.ALL);
+  const dispatch = useDispatch();
+  const filter: MarketFilters = useSelector(getMarketFilter);
   const [searchFilter, setSearchFilter] = useState<string>();
   const navigate = useNavigate();
 
@@ -185,6 +190,10 @@ export const MarketsTable = ({ className }: { className?: string }) => {
           ] as ColumnDef<MarketData>[]),
     [stringGetter, isTablet]
   );
+
+  const setFilter = (filter: MarketFilters) => {
+    dispatch(setMarketFilter(filter));
+  };
 
   return (
     <>

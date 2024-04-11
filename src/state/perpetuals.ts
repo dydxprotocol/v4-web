@@ -10,7 +10,7 @@ import type {
 } from '@/constants/abacus';
 import { Candle, RESOLUTION_MAP } from '@/constants/candles';
 import { LocalStorageKey } from '@/constants/localStorage';
-import { DEFAULT_MARKETID } from '@/constants/markets';
+import { DEFAULT_MARKETID, MarketFilters } from '@/constants/markets';
 
 import { getLocalStorage } from '@/lib/localStorage';
 import { processOrderbookToCreateMap } from '@/lib/orderbookHelpers';
@@ -34,6 +34,7 @@ export interface PerpetualsState {
     }
   >;
   historicalFundings: Record<string, MarketHistoricalFunding[]>;
+  marketFilter: MarketFilters;
 }
 
 const initialState: PerpetualsState = {
@@ -44,6 +45,7 @@ const initialState: PerpetualsState = {
   orderbooks: undefined,
   orderbooksMap: undefined,
   historicalFundings: {},
+  marketFilter: MarketFilters.ALL,
 };
 
 const MAX_NUM_LIVE_TRADES = 100;
@@ -52,6 +54,9 @@ export const perpetualsSlice = createSlice({
   name: 'Perpetuals',
   initialState,
   reducers: {
+    setMarketFilter: (state: PerpetualsState, action: PayloadAction<MarketFilters>) => {
+      state.marketFilter = action.payload;
+    },
     setCurrentMarketId: (state: PerpetualsState, action: PayloadAction<string>) => {
       state.currentMarketId = action.payload;
     },
@@ -163,4 +168,5 @@ export const {
   setTvChartResolution,
   setHistoricalFundings,
   resetPerpetualsState,
+  setMarketFilter,
 } = perpetualsSlice.actions;

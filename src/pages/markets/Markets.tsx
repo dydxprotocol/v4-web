@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled, { AnyStyledComponent } from 'styled-components';
 
@@ -22,13 +23,22 @@ import { ExchangeBillboards } from '@/views/ExchangeBillboards';
 import { MarketsCompactTable } from '@/views/tables/MarketsCompactTable';
 import { MarketsTable } from '@/views/tables/MarketsTable';
 
+import { setMarketFilter } from '@/state/perpetuals';
+import { getMarketFilter } from '@/state/perpetualsSelectors';
+
 const Markets = () => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const filter: MarketFilters = useSelector(getMarketFilter);
   const { hasPotentialMarketsData } = usePotentialMarkets();
   const [sorting, setSorting] = useState(MarketSorting.GAINERS);
 
   useDocumentTitle(stringGetter({ key: STRING_KEYS.MARKETS }));
+
+  const setNewFilter = () => {
+    dispatch(setMarketFilter(MarketFilters.NEW));
+  };
 
   return (
     <Styled.Page>
@@ -53,7 +63,11 @@ const Markets = () => {
               <h4>Recently Listed</h4>
               <Styled.NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</Styled.NewTag>
 
-              <Styled.ViewAll type={ButtonType.Link} action={ButtonAction.Navigation}>
+              <Styled.ViewAll
+                type={ButtonType.Link}
+                action={ButtonAction.Navigation}
+                onClick={setNewFilter}
+              >
                 View all →
               </Styled.ViewAll>
             </Styled.MarketsStatsHeader>
