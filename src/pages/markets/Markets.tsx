@@ -98,7 +98,7 @@ Styled.Page = styled.div`
 `;
 
 Styled.ViewAll = styled(Button)`
-  color: var(--color-accent);
+  --button-textColor: var(--color-accent);
   margin-left: auto;
 `;
 

@@ -56,7 +56,7 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
           type: OutputType.CompactFiat,
           chartData: feeEarnedChart,
           linkLabelKey: STRING_KEYS.LEARN_MORE_ARROW,
-          link: '#',
+          link: import.meta.env.VITE_MARKETS_EARNED_BY_STAKERS_LEARN_MORE_URL,
         },
       ].map(
         ({ key, labelKey, tagKey, value, fractionDigits, type, chartData, link, linkLabelKey }) => (
@@ -75,6 +75,7 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
               />
               {link && linkLabelKey ? (
                 <Styled.BillboardLink
+                  href={link}
                   size={ButtonSize.Small}
                   type={ButtonType.Link}
                   action={ButtonAction.Navigation}
@@ -122,9 +123,9 @@ Styled.BillboardChart = styled.div`
 `;
 
 Styled.BillboardLink = styled(Button)`
+  --button-textColor: var(--color-accent);
   --button-height: unset;
   --button-padding: 0;
-  color: var(--color-accent);
   justify-content: flex-start;
 `;
 
