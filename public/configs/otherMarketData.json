@@ -1400,6 +1400,69 @@
       "referencePrice": 8.643348405784515
     }
   },
+  "DYDX": {
+    "title": "Add DYDX-USD perpetual market",
+    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DYDX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "params": {
+      "id": 25,
+      "ticker": "DYDX-USD",
+      "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
+      "priceExponent": -9.0,
+      "minPriceChange": 2500,
+      "minExchanges": 3,
+      "exchangeConfigJson": [
+        {
+          "exchangeName": "Binance",
+          "ticker": "DYDXUSDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Bybit",
+          "ticker": "DYDXUSDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Gate",
+          "ticker": "DYDX_USDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Kraken",
+          "ticker": "DYDXUSD"
+        },
+        {
+          "exchangeName": "Kucoin",
+          "ticker": "DYDX-USDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Mexc",
+          "ticker": "DYDX_USDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Okx",
+          "ticker": "DYDX-USDT",
+          "adjustByMarket": "USDT-USD"
+        }
+      ],
+      "liquidityTier": 2,
+      "atomicResolution": -6.0,
+      "quantumConversionExponent": -9,
+      "defaultFundingPpm": 0,
+      "stepBaseQuantums": 1000000,
+      "subticksPerTick": 1000000,
+      "delayBlocks": 3600
+    },
+    "initialDeposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "meta": {
+      "assetName": "dYdX",
+      "referencePrice": 3.091510823499587
+    }
+  },
   "EGLD": {
     "title": "Add EGLD-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a EGLD-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
