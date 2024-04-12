@@ -7,7 +7,7 @@ export type ExchangeConfigItem = {
 export type NewMarketParams = {
   id: number;
   ticker: string;
-  marketType: 'PERPETUAL_MARKET_TYPE_ISOLATED' | 'PERPETUAL_MARKET_TYPE_CROSS';
+  marketType?: 'PERPETUAL_MARKET_TYPE_ISOLATED' | 'PERPETUAL_MARKET_TYPE_CROSS';
   priceExponent: number;
   minExchanges: number;
   minPriceChange: number;
