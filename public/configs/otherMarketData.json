@@ -2064,11 +2064,73 @@
       "referencePrice": 1.1556986926618635
     }
   },
+  "FLR": {
+    "title": "Add FLR-USD perpetual market",
+    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a FLR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "params": {
+      "id": 38,
+      "ticker": "FLR-USD",
+      "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
+      "priceExponent": -11.0,
+      "minPriceChange": 4000,
+      "minExchanges": 3,
+      "exchangeConfigJson": [
+        {
+          "exchangeName": "Bybit",
+          "ticker": "FLRUSDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "CoinbasePro",
+          "ticker": "FLR-USD"
+        },
+        {
+          "exchangeName": "Gate",
+          "ticker": "FLR_USDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Huobi",
+          "ticker": "flrusdt",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Kraken",
+          "ticker": "FLRUSD"
+        },
+        {
+          "exchangeName": "Mexc",
+          "ticker": "FLR_USDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Okx",
+          "ticker": "FLR-USDT",
+          "adjustByMarket": "USDT-USD"
+        }
+      ],
+      "liquidityTier": 2,
+      "atomicResolution": -4.0,
+      "quantumConversionExponent": -9,
+      "defaultFundingPpm": 0,
+      "stepBaseQuantums": 1000000,
+      "subticksPerTick": 1000000,
+      "delayBlocks": 3600
+    },
+    "initialDeposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "meta": {
+      "assetName": "FlareNetworks",
+      "referencePrice": 0.035960406604597095
+    }
+  },
   "FTM": {
     "title": "Add FTM-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a FTM-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 38,
+      "id": 39,
       "ticker": "FTM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
@@ -2126,7 +2188,7 @@
     "title": "Add GALA-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a GALA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 39,
+      "id": 40,
       "ticker": "GALA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -11.0,
@@ -2184,7 +2246,7 @@
     "title": "Add GMT-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a GMT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 40,
+      "id": 41,
       "ticker": "GMT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
@@ -2242,7 +2304,7 @@
     "title": "Add GRT-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a GRT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 41,
+      "id": 42,
       "ticker": "GRT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
@@ -2309,7 +2371,7 @@
     "title": "Add HBAR-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a HBAR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 42,
+      "id": 43,
       "ticker": "HBAR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -11.0,
@@ -2367,7 +2429,7 @@
     "title": "Add ICP-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ICP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 43,
+      "id": 44,
       "ticker": "ICP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -8.0,
@@ -2429,7 +2491,7 @@
     "title": "Add IMX-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a IMX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 44,
+      "id": 45,
       "ticker": "IMX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -2491,7 +2553,7 @@
     "title": "Add INJ-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a INJ-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 45,
+      "id": 46,
       "ticker": "INJ-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -8.0,
@@ -2553,7 +2615,7 @@
     "title": "Add JASMY-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a JASMY-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 46,
+      "id": 47,
       "ticker": "JASMY-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -11.0,
@@ -2606,7 +2668,7 @@
     "title": "Add JTO-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a JTO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 47,
+      "id": 48,
       "ticker": "JTO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -2664,7 +2726,7 @@
     "title": "Add JUP-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a JUP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 48,
+      "id": 49,
       "ticker": "JUP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -2718,7 +2780,7 @@
     "title": "Add KAVA-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a KAVA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 49,
+      "id": 50,
       "ticker": "KAVA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
@@ -2775,7 +2837,7 @@
     "title": "Add LDO-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a LDO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 50,
+      "id": 51,
       "ticker": "LDO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -2837,7 +2899,7 @@
     "title": "Add LINK-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a LINK-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 51,
+      "id": 52,
       "ticker": "LINK-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -8.0,
@@ -2908,7 +2970,7 @@
     "title": "Add MASK-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MASK-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 54,
+      "id": 55,
       "ticker": "MASK-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -2976,7 +3038,7 @@
     "title": "Add MATIC-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MATIC-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 55,
+      "id": 56,
       "ticker": "MATIC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
@@ -3047,7 +3109,7 @@
     "title": "Add MEME-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MEME-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 56,
+      "id": 57,
       "ticker": "MEME-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -11.0,
@@ -3101,7 +3163,7 @@
     "title": "Add MINA-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MINA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 57,
+      "id": 58,
       "ticker": "MINA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
@@ -3158,7 +3220,7 @@
     "title": "Add MKR-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MKR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 58,
+      "id": 59,
       "ticker": "MKR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -6.0,
@@ -3220,7 +3282,7 @@
     "title": "Add NEAR-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a NEAR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 59,
+      "id": 60,
       "ticker": "NEAR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -3287,7 +3349,7 @@
     "title": "Add OCEAN-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a OCEAN-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 60,
+      "id": 61,
       "ticker": "OCEAN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -3344,7 +3406,7 @@
     "title": "Add OP-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a OP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 61,
+      "id": 62,
       "ticker": "OP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -3416,7 +3478,7 @@
     "title": "Add ORDI-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ORDI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 62,
+      "id": 63,
       "ticker": "ORDI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -8.0,
@@ -3475,7 +3537,7 @@
     "title": "Add PENDLE-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a PENDLE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 63,
+      "id": 64,
       "ticker": "PENDLE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -3529,7 +3591,7 @@
     "title": "Add PEOPLE-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a PEOPLE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 64,
+      "id": 65,
       "ticker": "PEOPLE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -11.0,
@@ -3588,7 +3650,7 @@
     "title": "Add PEPE-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a PEPE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 65,
+      "id": 66,
       "ticker": "PEPE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -15.0,
@@ -3651,7 +3713,7 @@
     "title": "Add PYTH-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a PYTH-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 66,
+      "id": 67,
       "ticker": "PYTH-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
@@ -3710,7 +3772,7 @@
     "title": "Add QNT-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a QNT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 67,
+      "id": 68,
       "ticker": "QNT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -7.0,
@@ -3763,7 +3825,7 @@
     "title": "Add RNDR-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a RNDR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 68,
+      "id": 69,
       "ticker": "RNDR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -3825,7 +3887,7 @@
     "title": "Add RUNE-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a RUNE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 69,
+      "id": 70,
       "ticker": "RUNE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -3883,7 +3945,7 @@
     "title": "Add SAND-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SAND-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 70,
+      "id": 71,
       "ticker": "SAND-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
@@ -3950,7 +4012,7 @@
     "title": "Add SEI-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SEI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 71,
+      "id": 72,
       "ticker": "SEI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
@@ -4012,7 +4074,7 @@
     "title": "Add SHIB-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SHIB-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 72,
+      "id": 73,
       "ticker": "SHIB-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -14.0,
@@ -4083,7 +4145,7 @@
     "title": "Add SNX-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SNX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 73,
+      "id": 74,
       "ticker": "SNX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -4145,7 +4207,7 @@
     "title": "Add SOL-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SOL-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 74,
+      "id": 75,
       "ticker": "SOL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -7.0,
@@ -4216,7 +4278,7 @@
     "title": "Add STRK-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a STRK-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 75,
+      "id": 76,
       "ticker": "STRK-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -4283,7 +4345,7 @@
     "title": "Add STX-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a STX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 76,
+      "id": 77,
       "ticker": "STX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -4350,7 +4412,7 @@
     "title": "Add SUI-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SUI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 77,
+      "id": 78,
       "ticker": "SUI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -4417,7 +4479,7 @@
     "title": "Add TIA-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TIA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 78,
+      "id": 79,
       "ticker": "TIA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -8.0,
@@ -4479,7 +4541,7 @@
     "title": "Add TNSR-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TNSR-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 79,
+      "id": 80,
       "ticker": "TNSR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -4537,7 +4599,7 @@
     "title": "Add TON-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TON-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 80,
+      "id": 81,
       "ticker": "TON-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -4591,7 +4653,7 @@
     "title": "Add TRX-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TRX-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 81,
+      "id": 82,
       "ticker": "TRX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
@@ -4659,7 +4721,7 @@
     "title": "Add UNI-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a UNI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 82,
+      "id": 83,
       "ticker": "UNI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -4730,7 +4792,7 @@
     "title": "Add W-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a W-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 83,
+      "id": 84,
       "ticker": "W-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
@@ -4794,7 +4856,7 @@
     "title": "Add WIF-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a WIF-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 84,
+      "id": 85,
       "ticker": "WIF-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -4845,14 +4907,14 @@
     },
     "meta": {
       "assetName": "dogwifhat",
-      "referencePrice": 3.2657972577068595
+      "referencePrice": 3.2657504734743874
     }
   },
   "WLD": {
     "title": "Add WLD-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a WLD-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 85,
+      "id": 86,
       "ticker": "WLD-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -4916,7 +4978,7 @@
     "title": "Add XAI-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a XAI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 86,
+      "id": 87,
       "ticker": "XAI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
@@ -4970,7 +5032,7 @@
     "title": "Add XTZ-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a XTZ-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 89,
+      "id": 90,
       "ticker": "XTZ-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -5032,7 +5094,7 @@
     "title": "Add YGG-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a YGG-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 90,
+      "id": 91,
       "ticker": "YGG-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -5090,7 +5152,7 @@
     "title": "Add ZETA-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a ZETA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 91,
+      "id": 92,
       "ticker": "ZETA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
