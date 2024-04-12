@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { useDispatch, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -10,10 +11,12 @@ import { useNotifications } from '@/hooks/useNotifications';
 
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { Switch } from '@/components/Switch';
-import { useDispatch, useSelector } from 'react-redux';
 
 import { OtherPreference, setDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configs';
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
+
+import { isTruthy } from '@/lib/isTruthy';
+import { testFlags } from '@/lib/testFlags';
 
 export const usePreferenceMenu = () => {
   const dispatch = useDispatch();
@@ -66,6 +69,18 @@ export const usePreferenceMenu = () => {
           ),
           onSelect: () => toggleNotifPreference(NotificationType.SquidTransfer),
         },
+        testFlags.configureSlTpFromPositionsTable && {
+          value: NotificationType.TriggerOrder,
+          label: 'TP/SL', // TODO: CT-767
+          slotAfter: (
+            <Switch
+              name={NotificationType.TriggerOrder}
+              checked={enabledNotifs[NotificationType.TriggerOrder]}
+              onCheckedChange={(enabled: boolean) => null}
+            />
+          ),
+          onSelect: () => toggleNotifPreference(NotificationType.TriggerOrder),
+        },
         {
           value: NotificationType.ReleaseUpdates,
           label: 'Release Updates',
@@ -78,7 +93,7 @@ export const usePreferenceMenu = () => {
           ),
           onSelect: () => toggleNotifPreference(NotificationType.ReleaseUpdates),
         },
-      ],
+      ].filter(isTruthy),
     }),
     [stringGetter, enabledNotifs]
   );
@@ -86,11 +101,11 @@ export const usePreferenceMenu = () => {
   const otherSection = useMemo(
     () => ({
       group: 'Other',
-      groupLabel: stringGetter({key: STRING_KEYS.OTHER}),
+      groupLabel: stringGetter({ key: STRING_KEYS.OTHER }),
       items: [
         {
           value: OtherPreference.DisplayAllMarketsDefault,
-          label: stringGetter({key: STRING_KEYS.DEFAULT_TO_ALL_MARKETS_IN_POSITIONS}),
+          label: stringGetter({ key: STRING_KEYS.DEFAULT_TO_ALL_MARKETS_IN_POSITIONS }),
           slotAfter: (
             <Switch
               name={OtherPreference.DisplayAllMarketsDefault}

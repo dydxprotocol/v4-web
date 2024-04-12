@@ -1,11 +1,12 @@
 import styled from 'styled-components';
 
 import { AbacusOrderStatus } from '@/constants/abacus';
+
 import { Icon, IconName } from '@/components/Icon';
 
 type ElementProps = {
   status: string;
-  totalFilled: number;
+  totalFilled?: number;
 };
 
 type StyleProps = {
@@ -15,7 +16,7 @@ type StyleProps = {
 export const OrderStatusIcon = ({ className, status, totalFilled }: ElementProps & StyleProps) => {
   const { iconName, color } = {
     [AbacusOrderStatus.open.rawValue]:
-      totalFilled > 0
+      totalFilled && totalFilled > 0
         ? {
             iconName: IconName.OrderPartiallyFilled,
             color: 'var(--color-warning)',

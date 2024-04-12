@@ -35,7 +35,7 @@ export const getInputErrors = (state: RootState) => state.inputs.inputErrors;
 
 /**
  * @param state
- * @returns trade or closePosition transfer, depending on which form was last edited.
+ * @returns trade, closePosition, transfer, or triggerOrders depending on which form was last edited.
  */
 export const getCurrentInput = (state: RootState) => state.inputs.current;
 

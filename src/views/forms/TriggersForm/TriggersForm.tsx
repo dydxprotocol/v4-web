@@ -1,4 +1,4 @@
-import { FormEvent } from 'react';
+import { FormEvent, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
@@ -9,11 +9,20 @@ import {
   ErrorType,
   HumanReadableTriggerOrdersPayload,
   Nullable,
+  HumanReadableCancelOrderPayload,
+  HumanReadablePlaceOrderPayload,
+  TRADE_TYPES,
 } from '@/constants/abacus';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import {
+  TriggerOrderNotificationTypes,
+  TriggerOrderOrderType,
+  TriggerOrderStatus,
+} from '@/constants/notifications';
 
 import { useStringGetter, useSubaccount, useTriggerOrdersFormInputs } from '@/hooks';
+import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -26,7 +35,6 @@ import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getPositionDetails } from '@/state/accountSelectors';
 import { closeDialog } from '@/state/dialogs';
 
-import abacusStateManager from '@/lib/abacus';
 import { getTradeInputAlert } from '@/lib/tradeData';
 
 import { AdvancedTriggersOptions } from './AdvancedTriggersOptions';
@@ -48,19 +56,28 @@ export const TriggersForm = ({
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
 
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+
   const { placeTriggerOrders } = useSubaccount();
+  const { addTriggerOrderNotification } = useLocalNotifications();
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
 
   const { asset, entryPrice, size, stepSizeDecimals, tickSizeDecimals, oraclePrice } =
     useSelector(getPositionDetails(marketId)) || {};
 
-  const { differingOrderSizes, inputErrors, inputSize, isEditingExistingOrder, existsLimitOrder } =
-    useTriggerOrdersFormInputs({
-      marketId,
-      positionSize: size?.current ?? null,
-      stopLossOrder: stopLossOrders.length === 1 ? stopLossOrders[0] : undefined,
-      takeProfitOrder: takeProfitOrders.length === 1 ? takeProfitOrders[0] : undefined,
-    });
+  const {
+    differingOrderSizes,
+    inputErrors,
+    inputSize,
+    existingStopLossOrder,
+    existingTakeProfitOrder,
+    existsLimitOrder,
+  } = useTriggerOrdersFormInputs({
+    marketId,
+    positionSize: size?.current ?? null,
+    stopLossOrder: stopLossOrders.length === 1 ? stopLossOrders[0] : undefined,
+    takeProfitOrder: takeProfitOrders.length === 1 ? takeProfitOrders[0] : undefined,
+  });
 
   const symbol = asset?.id ?? '';
   const multipleTakeProfitOrders = takeProfitOrders.length > 1;
@@ -84,29 +101,92 @@ export const TriggersForm = ({
     <Styled.PriceBox>
       <Styled.PriceRow>
         <Styled.PriceLabel>{stringGetter({ key: STRING_KEYS.AVG_ENTRY_PRICE })}</Styled.PriceLabel>
-        <Styled.Price type={OutputType.Fiat} value={entryPrice?.current} fractionDigits={tickSizeDecimals} />
+        <Styled.Price
+          type={OutputType.Fiat}
+          value={entryPrice?.current}
+          fractionDigits={tickSizeDecimals}
+        />
       </Styled.PriceRow>
       <Styled.PriceRow>
         <Styled.PriceLabel>{stringGetter({ key: STRING_KEYS.ORACLE_PRICE })}</Styled.PriceLabel>
-        <Styled.Price type={OutputType.Fiat} value={oraclePrice} fractionDigits={tickSizeDecimals} />
+        <Styled.Price
+          type={OutputType.Fiat}
+          value={oraclePrice}
+          fractionDigits={tickSizeDecimals}
+        />
       </Styled.PriceRow>
     </Styled.PriceBox>
   );
 
-  const closeAndClearDialog = () => {
-    dispatch(closeDialog());
-    abacusStateManager.clearTriggerOrdersInputValues();
+  const triggerNotificationForCancelOrderPayloads = (
+    triggerPayload: HumanReadableTriggerOrdersPayload,
+    isError?: boolean
+  ) => {
+    const { cancelOrderPayloads } = triggerPayload || {};
+
+    if (cancelOrderPayloads && cancelOrderPayloads.toString() != '[]') {
+      cancelOrderPayloads.toArray().map((payload: HumanReadableCancelOrderPayload) => {
+        const existingOrder =
+          payload.orderId === existingStopLossOrder?.id
+            ? existingStopLossOrder
+            : payload.orderId === existingTakeProfitOrder?.id
+            ? existingTakeProfitOrder
+            : null;
+
+        if (existingOrder) {
+          addTriggerOrderNotification({
+            assetId: symbol,
+            clientId: payload.clientId,
+            orderType: TRADE_TYPES[existingOrder.type],
+            price: existingOrder.triggerPrice,
+            status: isError ? TriggerOrderStatus.Error : TriggerOrderStatus.Success,
+            tickSizeDecimals,
+            type: TriggerOrderNotificationTypes.Cancelled,
+          });
+        }
+      });
+    }
+  };
+
+  const triggerNotificationForPlaceOrderPayloads = (
+    triggerPayload: HumanReadableTriggerOrdersPayload,
+    isError?: boolean
+  ) => {
+    const { placeOrderPayloads } = triggerPayload || {};
+
+    if (placeOrderPayloads && placeOrderPayloads.toString() != '[]') {
+      placeOrderPayloads.toArray().map((payload: HumanReadablePlaceOrderPayload) => {
+        addTriggerOrderNotification({
+          assetId: symbol,
+          clientId: payload.clientId,
+          orderType: TRADE_TYPES[payload.type],
+          price: payload.triggerPrice || undefined,
+          status: isError ? TriggerOrderStatus.Error : TriggerOrderStatus.Success,
+          tickSizeDecimals,
+          type: TriggerOrderNotificationTypes.Created,
+        });
+      });
+    }
   };
 
   const onSubmitOrders = async () => {
+    setIsPlacingOrder(true);
+
     await placeTriggerOrders({
-      onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
-        // TODO: CT-628 Trigger a toast
-        closeAndClearDialog();
+      onError: (
+        triggerOrdersPayload?: Nullable<HumanReadableTriggerOrdersPayload>,
+        errorParams?: { errorStringKey?: Nullable<string> }
+      ) => {
+        triggerNotificationForCancelOrderPayloads(triggerOrdersPayload, true);
+        triggerNotificationForPlaceOrderPayloads(triggerOrdersPayload, true);
+        setIsPlacingOrder(false);
+        dispatch(closeDialog());
       },
-      onSuccess: (triggerOrdersPayload?: Nullable<HumanReadableTriggerOrdersPayload>) => {
-        // TODO: CT-628 Trigger a toast
-        closeAndClearDialog();
+      onSuccess: (triggerOrdersPayload: Nullable<HumanReadableTriggerOrdersPayload>) => {
+        triggerNotificationForCancelOrderPayloads(triggerOrdersPayload);
+        triggerNotificationForPlaceOrderPayloads(triggerOrdersPayload);
+        setIsPlacingOrder(false);
+        dispatch(closeDialog());
       },
     });
   };
@@ -143,7 +223,7 @@ export const TriggersForm = ({
             <Styled.Button
               action={ButtonAction.Primary}
               type={ButtonType.Submit}
-              state={{ isDisabled: hasInputErrors || isAccountViewOnly }}
+              state={{ isDisabled: hasInputErrors || isAccountViewOnly, isLoading: isPlacingOrder }}
               slotLeft={
                 hasInputErrors ? <Styled.WarningIcon iconName={IconName.Warning} /> : undefined
               }
@@ -152,7 +232,7 @@ export const TriggersForm = ({
                 ? stringGetter({
                     key: inputAlert?.actionStringKey ?? STRING_KEYS.UNAVAILABLE,
                   })
-                : isEditingExistingOrder
+                : !!(existingStopLossOrder || existingTakeProfitOrder)
                 ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })
                 : stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
             </Styled.Button>
