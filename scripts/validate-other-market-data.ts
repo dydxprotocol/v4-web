@@ -20,8 +20,7 @@ import {
   VoteOption,
 } from '@dydxprotocol/v4-client-js';
 import {
-  Perpetual,
-  PerpetualMarketType,
+  Perpetual, // PerpetualMarketType,
 } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
 import { MsgVote } from '@dydxprotocol/v4-proto/src/codegen/cosmos/gov/v1/tx';
 import { ClobPair } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/clob/clob_pair';
@@ -376,6 +375,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
       const tx = await retry(() =>
         client.submitGovAddNewMarketProposal(
           wallets[j],
+          // @ts-ignore: marketType is not a valid parameter for addNewMarketProposal
           {
             id: marketId,
             ticker: proposal.params.ticker,
@@ -389,10 +389,10 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
             stepBaseQuantums: Long.fromNumber(proposal.params.stepBaseQuantums),
             subticksPerTick: proposal.params.subticksPerTick,
             delayBlocks: proposal.params.delayBlocks,
-            marketType:
-              proposal.params.marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
-                ? PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED
-                : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS,
+            // marketType:
+            //   proposal.params.marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
+            //     ? PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED
+            //     : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS,
           },
           proposal.title,
           proposal.summary,
