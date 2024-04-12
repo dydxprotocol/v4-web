@@ -152,6 +152,7 @@ export const NewMarketPreviewStep = ({
               atomicResolution,
               liquidityTier,
               quantumConversionExponent,
+              // @ts-ignore - marketType is not required until v5
               marketType: testFlags.withNewMarketType
                 ? marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
                   ? PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED
