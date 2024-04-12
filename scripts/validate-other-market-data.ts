@@ -22,7 +22,6 @@ import {
 import { MsgVote } from '@dydxprotocol/v4-proto/src/codegen/cosmos/gov/v1/tx';
 import { ClobPair } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/clob/clob_pair';
 import { Perpetual } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
-import { PerpetualMarketType } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
 import { MarketPrice } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/prices/market_price';
 import Ajv from 'ajv';
 import axios from 'axios';
@@ -75,7 +74,6 @@ interface Exchange {
 interface Params {
   id: number;
   ticker: string;
-  marketType: 'PERPETUAL_MARKET_TYPE_ISOLATED' | 'PERPETUAL_MARKET_TYPE_CROSS';
   priceExponent: number;
   minPriceChange: number;
   minExchanges: number;
@@ -387,10 +385,6 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
             stepBaseQuantums: Long.fromNumber(proposal.params.stepBaseQuantums),
             subticksPerTick: proposal.params.subticksPerTick,
             delayBlocks: proposal.params.delayBlocks,
-            marketType:
-              proposal.params.marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
-                ? PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED
-                : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS,
           },
           proposal.title,
           proposal.summary,
