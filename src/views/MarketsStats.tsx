@@ -21,7 +21,12 @@ import { setMarketFilter } from '@/state/perpetuals';
 import { ExchangeBillboards } from './ExchangeBillboards';
 import { MarketsCompactTable } from './tables/MarketsCompactTable';
 
-export const MarketsStats = () => {
+interface MarketsStatsProps {
+  className?: string;
+}
+
+export const MarketsStats = (props: MarketsStatsProps) => {
+  const { className } = props;
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
   const [sorting, setSorting] = useState(MarketSorting.GAINERS);
@@ -31,7 +36,7 @@ export const MarketsStats = () => {
   };
 
   return (
-    <Styled.MarketsStats>
+    <Styled.MarketsStats className={className}>
       <Styled.ExchangeBillboards />
       <Styled.Section>
         <Styled.SectionHeader>
