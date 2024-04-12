@@ -263,7 +263,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
           if (title && body) {
             trigger(
-              `${orderType}-${clientId.toString()}`,
+              `${type}-${clientId.toString()}`,
               {
                 icon: assetIcon,
                 title: title,
