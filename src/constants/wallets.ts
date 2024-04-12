@@ -334,7 +334,7 @@ export type PrivateInformation = ReturnType<typeof onboarding.deriveHDKeyFromEth
 export type EvmAddress = `0x${string}`;
 export type DydxAddress = `dydx${string}`;
 
-export const DYDX_CHAIN_INFO: Parameters<typeof suggestChain>[0] = {
+export const DYDX_CHAIN_INFO: Parameters<typeof suggestChain>[0]['chainInfo'] = {
   rpc: 'https://dydx-testnet-archive.allthatnode.com:26657',
   rest: 'https://dydx-testnet-archive.allthatnode.com:1317',
   chainId: 'dydx-testnet-4',
