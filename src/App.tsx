@@ -40,6 +40,7 @@ import { parseLocationHash } from '@/lib/urlUtils';
 import { config, privyConfig } from '@/lib/wagmi';
 
 import { RestrictionWarning } from './components/RestrictionWarning';
+import { DYDX_CHAIN_INFO } from './constants/wallets';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useInitializePage } from './hooks/useInitializePage';
@@ -157,7 +158,11 @@ const providers = [
   }),
   wrapProvider(StatsigProvider),
   wrapProvider(QueryClientProvider, { client: queryClient }),
-  wrapProvider(GrazProvider),
+  wrapProvider(GrazProvider, {
+    grazOptions: {
+      chains: [DYDX_CHAIN_INFO],
+    },
+  }),
   wrapProvider(WagmiProvider, { config, reconnectOnMount: false }),
   wrapProvider(LocaleProvider),
   wrapProvider(RestrictionProvider),
