@@ -58,8 +58,6 @@ export const useMarketsData = (
     refetchInterval: undefined,
   });
 
-  console.log(sevenDaysSparklineData);
-
   const markets = useMemo(() => {
     return Object.values(allPerpetualMarkets)
       .filter(isTruthy)
