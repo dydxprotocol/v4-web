@@ -170,16 +170,10 @@ export enum TriggerOrderStatus {
   Error = 'error',
 }
 
-export type TriggerOrderTypes =
-  | TradeTypes.STOP_LIMIT
-  | TradeTypes.STOP_MARKET
-  | TradeTypes.TAKE_PROFIT
-  | TradeTypes.TAKE_PROFIT_MARKET;
-
 export type TriggerOrderNotification = {
   assetId: string;
   clientId: number;
-  orderType: TriggerOrderTypes;
+  orderType?: TradeTypes;
   price?: number;
   status: TriggerOrderStatus;
   tickSizeDecimals?: number;

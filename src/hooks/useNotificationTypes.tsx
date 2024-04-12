@@ -261,28 +261,30 @@ export const notificationTypes: NotificationTypeConfig[] = [
             stringGetter,
           });
 
-          trigger(
-            `${orderType}-${clientId.toString()}`,
-            {
-              icon: assetIcon,
-              title: title,
-              body: body,
-              renderCustomBody: ({ isToast, notification }) => (
-                <TriggerOrderNotification
-                  status={status}
-                  type={type}
-                  slotIcon={assetIcon}
-                  slotTitle={title}
-                  slotDescription={body}
-                  isToast={isToast}
-                  notification={notification}
-                />
-              ),
-              toastSensitivity: 'foreground',
-              groupKey: NotificationType.TriggerOrder,
-            },
-            []
-          );
+          if (title && body) {
+            trigger(
+              `${orderType}-${clientId.toString()}`,
+              {
+                icon: assetIcon,
+                title: title,
+                body: body,
+                renderCustomBody: ({ isToast, notification }) => (
+                  <TriggerOrderNotification
+                    status={status}
+                    type={type}
+                    slotIcon={assetIcon}
+                    slotTitle={title}
+                    slotDescription={body}
+                    isToast={isToast}
+                    notification={notification}
+                  />
+                ),
+                toastSensitivity: 'foreground',
+                groupKey: NotificationType.TriggerOrder,
+              },
+              []
+            );
+          }
         }
       }, [triggerOrderNotifications, stringGetter]);
     },

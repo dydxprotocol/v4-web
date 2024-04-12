@@ -12,14 +12,13 @@ import {
   HumanReadableCancelOrderPayload,
   HumanReadablePlaceOrderPayload,
   TRADE_TYPES,
+  KotlinIrEnumValues,
+  AbacusOrderType,
 } from '@/constants/abacus';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import {
-  TriggerOrderNotificationTypes,
-  TriggerOrderOrderType,
-  TriggerOrderStatus,
-} from '@/constants/notifications';
+import { TriggerOrderNotificationTypes, TriggerOrderStatus } from '@/constants/notifications';
+import { TradeTypes } from '@/constants/trade';
 
 import { useStringGetter, useSubaccount, useTriggerOrdersFormInputs } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
@@ -119,7 +118,7 @@ export const TriggersForm = ({
   );
 
   const triggerNotificationForCancelOrderPayloads = (
-    triggerPayload: HumanReadableTriggerOrdersPayload,
+    triggerPayload: Nullable<HumanReadableTriggerOrdersPayload>,
     isError?: boolean
   ) => {
     const { cancelOrderPayloads } = triggerPayload || {};
@@ -137,8 +136,8 @@ export const TriggersForm = ({
           addTriggerOrderNotification({
             assetId: symbol,
             clientId: payload.clientId,
-            orderType: TRADE_TYPES[existingOrder.type],
-            price: existingOrder.triggerPrice,
+            orderType: (existingOrder.type.rawValue as TradeTypes) || undefined,
+            price: existingOrder.triggerPrice || undefined,
             status: isError ? TriggerOrderStatus.Error : TriggerOrderStatus.Success,
             tickSizeDecimals,
             type: TriggerOrderNotificationTypes.Cancelled,
@@ -149,7 +148,7 @@ export const TriggersForm = ({
   };
 
   const triggerNotificationForPlaceOrderPayloads = (
-    triggerPayload: HumanReadableTriggerOrdersPayload,
+    triggerPayload: Nullable<HumanReadableTriggerOrdersPayload>,
     isError?: boolean
   ) => {
     const { placeOrderPayloads } = triggerPayload || {};
@@ -159,7 +158,8 @@ export const TriggersForm = ({
         addTriggerOrderNotification({
           assetId: symbol,
           clientId: payload.clientId,
-          orderType: TRADE_TYPES[payload.type],
+          orderType:
+            TRADE_TYPES[payload.type as KotlinIrEnumValues<typeof AbacusOrderType>] || undefined,
           price: payload.triggerPrice || undefined,
           status: isError ? TriggerOrderStatus.Error : TriggerOrderStatus.Success,
           tickSizeDecimals,

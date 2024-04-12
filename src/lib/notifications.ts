@@ -120,5 +120,10 @@ export const getTitleAndBodyForTriggerOrderNotification = ({
               };
           }
       }
+    default:
+      return {
+        title: null,
+        body: null,
+      };
   }
 };
