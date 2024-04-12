@@ -11,7 +11,10 @@ import { AttachedExpandingSection, DetachedSection } from '@/components/ContentS
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
-import { calculateShouldRenderTriggersInPositionsTable } from '@/state/accountCalculators';
+import {
+  calculateShouldRenderTriggersInPositionsTable,
+  calculateShouldRenderActionsInPositionsTable,
+} from '@/state/accountCalculators';
 
 import { isTruthy } from '@/lib/isTruthy';
 
@@ -23,8 +26,8 @@ export const Overview = () => {
   const navigate = useNavigate();
 
   const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
-  // TODO: CT-503
-  // const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable);
+  const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable);
+  const showClosePositionAction = false;
 
   return (
     <div>
@@ -53,8 +56,7 @@ export const Overview = () => {
                   PositionsTableColumnKey.RealizedPnl,
                   PositionsTableColumnKey.AverageOpenAndClose,
                   shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-                  // TODO: CT-503 re-enable when close positions dialog is created
-                  // shouldRenderActions && PositionsTableColumnKey.Actions,
+                  shouldRenderActions(showClosePositionAction) && PositionsTableColumnKey.Actions,
                 ].filter(isTruthy)
           }
           currentRoute={AppRoute.Portfolio}
@@ -63,6 +65,7 @@ export const Overview = () => {
               state: { from: AppRoute.Portfolio },
             })
           }
+          showClosePositionAction={showClosePositionAction}
           withOuterBorder
         />
       </Styled.AttachedExpandingSection>

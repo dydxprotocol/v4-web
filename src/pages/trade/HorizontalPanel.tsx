@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
@@ -72,10 +72,10 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const currentMarketId = useSelector(getCurrentMarketId);
   const currentMarketAssetId = useSelector(getCurrentMarketAssetId);
 
-  const { numTotalPositions, numTotalOpenOrders, numTotalFills, numTotalFundingPayments } =
+  const { numTotalPositions, numTotalOpenOrders, numTotalFills } =
     useSelector(getTradeInfoNumbers, shallowEqual) || {};
 
-  const { numOpenOrders, numFills, numFundingPayments } =
+  const { numOpenOrders, numFills } =
     useSelector(getCurrentMarketTradeInfoNumbers, shallowEqual) || {};
 
   const hasUnseenOrderUpdates = useSelector(getHasUnseenOrderUpdates);
@@ -86,8 +86,9 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const isWaitingForOrderToIndex = useSelector(calculateHasUncommittedOrders);
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
 
-  const fillsTagNumber = shortenNumberForDisplay(showCurrentMarket ? numFills : numTotalFills);
+  const showClosePositionAction = true;
 
+  const fillsTagNumber = shortenNumberForDisplay(showCurrentMarket ? numFills : numTotalFills);
   const ordersTagNumber = shortenNumberForDisplay(
     showCurrentMarket ? numOpenOrders : numTotalOpenOrders
   );
@@ -136,9 +137,10 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     PositionsTableColumnKey.AverageOpenAndClose,
                     PositionsTableColumnKey.NetFunding,
                     shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-                    shouldRenderActions && PositionsTableColumnKey.Actions,
+                    shouldRenderActions(showClosePositionAction) && PositionsTableColumnKey.Actions,
                   ].filter(isTruthy)
             }
+            showClosePositionAction={showClosePositionAction}
             onNavigate={() => setView(PanelView.CurrentMarket)}
             navigateToOrders={onViewOrders}
           />
