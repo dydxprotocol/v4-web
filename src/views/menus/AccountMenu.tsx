@@ -109,23 +109,27 @@ export const AccountMenu = () => {
             <$AddressRow>
               <$AssetIcon symbol="DYDX" />
               <$Column>
-                <WithTooltip
-                  slotTooltip={
-                    <dl>
-                      <dt>
-                        {stringGetter({
-                          key: TOOLTIP_STRING_KEYS.DYDX_ADDRESS_BODY,
-                          params: {
-                            DYDX_ADDRESS: <strong>{truncateAddress(dydxAddress)}</strong>,
-                            EVM_ADDRESS: truncateAddress(evmAddress, '0x'),
-                          },
-                        })}
-                      </dt>
-                    </dl>
-                  }
-                >
+                {walletType && walletType !== WalletType.Keplr ? (
+                  <WithTooltip
+                    slotTooltip={
+                      <dl>
+                        <dt>
+                          {stringGetter({
+                            key: TOOLTIP_STRING_KEYS.DYDX_ADDRESS_BODY,
+                            params: {
+                              DYDX_ADDRESS: <strong>{truncateAddress(dydxAddress)}</strong>,
+                              EVM_ADDRESS: truncateAddress(evmAddress, '0x'),
+                            },
+                          })}
+                        </dt>
+                      </dl>
+                    }
+                  >
+                    <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
+                  </WithTooltip>
+                ) : (
                   <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
-                </WithTooltip>
+                )}
                 <$Address>{truncateAddress(dydxAddress)}</$Address>
               </$Column>
               <$CopyButton buttonType="icon" value={dydxAddress} shape={ButtonShape.Square} />
@@ -139,7 +143,7 @@ export const AccountMenu = () => {
                 />
               </WithTooltip>
             </$AddressRow>
-            {walletType && walletType !== WalletType.Privy && (
+            {walletType && ![WalletType.Privy, WalletType.Keplr].includes(walletType) && (
               <$AddressRow>
                 <$SourceIcon>
                   <$ConnectorIcon iconName={IconName.AddressConnector} />

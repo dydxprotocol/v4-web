@@ -1,4 +1,3 @@
-import { isDev } from '@/constants/networks';
 import { WalletType } from '@/constants/wallets';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -7,7 +6,7 @@ export const useDisplayedWallets = () => {
   const displayedWallets = [
     WalletType.MetaMask,
 
-    isDev && WalletType.Keplr,
+    WalletType.Keplr,
 
     WalletType.WalletConnect2,
 

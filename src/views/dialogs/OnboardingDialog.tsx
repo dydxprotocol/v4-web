@@ -50,7 +50,7 @@ export const OnboardingDialog = ({ setIsOpen }: DialogProps<OnboardingDialogProp
   };
 
   const onChooseWallet = (wType: WalletType) => {
-    if (wType === WalletType.Privy) {
+    if ([WalletType.Privy, WalletType.Keplr].includes(wType)) {
       setIsOpenFromDialog(false);
     }
     selectWalletType(wType);
