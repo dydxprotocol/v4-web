@@ -71,7 +71,7 @@ export const usePreferenceMenu = () => {
         },
         testFlags.configureSlTpFromPositionsTable && {
           value: NotificationType.TriggerOrder,
-          label: 'TP/SL', // TODO: CT-767
+          label: stringGetter({ key: STRING_KEYS.TAKE_PROFIT_STOP_LOSS }),
           slotAfter: (
             <Switch
               name={NotificationType.TriggerOrder}
