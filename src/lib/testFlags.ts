@@ -51,6 +51,10 @@ class TestFlags {
   get withNewMarketType() {
     return !!this.queryParams.withnewmarkettype;
   }
+
+  get enableComplianceApi() {
+    return !!this.queryParams.complianceapi;
+  }
 }
 
 export const testFlags = new TestFlags();
