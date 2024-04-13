@@ -334,20 +334,85 @@ export type PrivateInformation = ReturnType<typeof onboarding.deriveHDKeyFromEth
 export type EvmAddress = `0x${string}`;
 export type DydxAddress = `dydx${string}`;
 
-export const DYDX_CHAIN_INFO: Parameters<typeof suggestChain>[0]['chainInfo'] = {
-  rpc: 'https://dydx-testnet-archive.allthatnode.com:26657',
-  rest: 'https://dydx-testnet-archive.allthatnode.com:1317',
-  chainId: 'dydx-testnet-4',
-  chainName: 'dYdX Public Testnet',
+export const DYDX_MAINNET_CHAIN_INFO: Parameters<typeof suggestChain>[0]['chainInfo'] = {
+  rpc: 'https://rpc-dydx.keplr.app',
+  rest: 'https://lcd-dydx.keplr.app',
+  chainId: 'dydx-mainnet-1',
+  chainName: 'dYdX',
   chainSymbolImageUrl:
-    'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/dydx-testnet-4/chain.png',
+    'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/dydx-mainnet/adydx.png',
+  stakeCurrency: {
+    coinDenom: 'DYDX',
+    coinDecimals: 18,
+    coinMinimalDenom: 'adydx',
+    coinImageUrl:
+      'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/dydx-mainnet/adydx.png',
+    coinGeckoId: 'dydx-chain',
+  },
+  bip44: {
+    coinType: 118,
+  },
   bech32Config: {
-    bech32PrefixAccPub: 'dydxpub',
-    bech32PrefixValPub: 'dydxvaloperpub',
     bech32PrefixAccAddr: 'dydx',
-    bech32PrefixConsPub: 'dydxvalconspub',
+    bech32PrefixAccPub: 'dydxpub',
     bech32PrefixValAddr: 'dydxvaloper',
+    bech32PrefixValPub: 'dydxvaloperpub',
     bech32PrefixConsAddr: 'dydxvalcons',
+    bech32PrefixConsPub: 'dydxvalconspub',
+  },
+  currencies: [
+    {
+      coinDenom: 'DYDX',
+      coinDecimals: 18,
+      coinMinimalDenom: 'adydx',
+      coinImageUrl:
+        'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/dydx-mainnet/adydx.png',
+      coinGeckoId: 'dydx-chain',
+    },
+  ],
+  feeCurrencies: [
+    {
+      coinDenom: 'DYDX',
+      coinDecimals: 18,
+      coinMinimalDenom: 'adydx',
+      coinImageUrl:
+        'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/dydx-mainnet/adydx.png',
+      coinGeckoId: 'dydx-chain',
+      gasPriceStep: {
+        low: 12500000000,
+        average: 12500000000,
+        high: 20000000000,
+      },
+    },
+    {
+      coinDenom: 'USDC',
+      coinMinimalDenom: 'ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5',
+      coinDecimals: 6,
+      gasPriceStep: {
+        low: 0.025,
+        average: 0.025,
+        high: 0.03,
+      },
+    },
+  ],
+  walletUrlForStaking: 'https://wallet.keplr.app/chains/dydx',
+  features: [],
+};
+
+export const DYDX_TESTNET_CHAIN_INFO: Parameters<typeof suggestChain>[0]['chainInfo'] = {
+  rpc: 'https://rpc-dydx-testnet.keplr.app',
+  rest: 'https://lcd-dydx-testnet.keplr.app',
+  chainId: 'dydx-testnet-4',
+  chainName: 'dydx Testnet',
+  chainSymbolImageUrl:
+    'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/dydx-testnet/chain.png',
+  bech32Config: {
+    bech32PrefixAccAddr: 'dydx',
+    bech32PrefixAccPub: 'dydxpub',
+    bech32PrefixValAddr: 'dydxvaloper',
+    bech32PrefixValPub: 'dydxvaloperpub',
+    bech32PrefixConsAddr: 'dydxvalcons',
+    bech32PrefixConsPub: 'dydxvalconspub',
   },
   bip44: {
     coinType: 118,
@@ -363,22 +428,17 @@ export const DYDX_CHAIN_INFO: Parameters<typeof suggestChain>[0]['chainInfo'] = 
       coinDecimals: 18,
       coinMinimalDenom: 'adv4tnt',
     },
-    {
-      coinDenom: 'USDC',
-      coinDecimals: 6,
-      coinMinimalDenom: 'ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5',
-    },
   ],
   feeCurrencies: [
     {
       coinDenom: 'DV4TNT',
       coinDecimals: 18,
       coinMinimalDenom: 'adv4tnt',
-    },
-    {
-      coinDenom: 'USDC',
-      coinDecimals: 6,
-      coinMinimalDenom: 'ibc/8E27BA2D5493AF5636760E354E46004562C46AB7EC0CC4C1CA14E9E20E2545B5',
+      gasPriceStep: {
+        low: 25000000000,
+        average: 25000000000,
+        high: 50000000000,
+      },
     },
   ],
   features: [],

@@ -8,6 +8,8 @@ import { Provider } from 'react-redux';
 import styled from 'styled-components';
 
 import { SupportedLocales } from '@/constants/localization';
+import { isDev } from '@/constants/networks';
+import { DYDX_MAINNET_CHAIN_INFO, DYDX_TESTNET_CHAIN_INFO } from '@/constants/wallets';
 
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';

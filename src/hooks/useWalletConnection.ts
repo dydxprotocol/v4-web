@@ -4,7 +4,7 @@ import { useLogin, useLogout, useMfa, useMfaEnrollment, usePrivy } from '@privy-
 import {
   WalletType as CosmosWalletType,
   useAccount as useAccountGraz,
-  useSuggestChainAndConnect as useConnectGraz,
+  useConnect as useConnectGraz,
   useDisconnect as useDisconnectGraz,
   useOfflineSigners as useOfflineSignersGraz,
 } from 'graz';
@@ -20,9 +20,10 @@ import {
 import { EvmDerivedAddresses } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
-import { WALLETS_CONFIG_MAP } from '@/constants/networks';
+import { WALLETS_CONFIG_MAP, isDev } from '@/constants/networks';
 import {
-  DYDX_CHAIN_INFO,
+  DYDX_MAINNET_CHAIN_INFO,
+  DYDX_TESTNET_CHAIN_INFO,
   WalletConnectionType,
   WalletType,
   wallets,
@@ -97,7 +98,7 @@ export const useWalletConnection = () => {
 
   const { connectAsync: connectWagmi } = useConnectWagmi();
   const { reconnectAsync: reconnectWagmi } = useReconnectWagmi();
-  const { suggestAndConnect: connectGraz } = useConnectGraz();
+  const { connectAsync: connectGraz } = useConnectGraz();
   const [evmDerivedAddresses] = useLocalStorage({
     key: LocalStorageKey.EvmDerivedAddresses,
     defaultValue: {} as EvmDerivedAddresses,
@@ -154,7 +155,7 @@ export const useWalletConnection = () => {
 
           if (!isConnectedGraz) {
             await connectGraz({
-              chainInfo: DYDX_CHAIN_INFO,
+              chainId: isDev ? DYDX_TESTNET_CHAIN_INFO.chainId : DYDX_MAINNET_CHAIN_INFO.chainId,
               walletType: cosmosWalletType,
             });
           }
