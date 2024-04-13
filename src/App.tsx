@@ -39,8 +39,9 @@ import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 import { parseLocationHash } from '@/lib/urlUtils';
 import { config, configureChainsConfig, privyConfig } from '@/lib/wagmi';
 
-import { DYDX_CHAIN_INFO } from './constants/wallets';
 import { ComplianceStates } from './constants/compliance';
+import { isDev } from './constants/networks';
+import { DYDX_MAINNET_CHAIN_INFO, DYDX_TESTNET_CHAIN_INFO } from './constants/wallets';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useComplianceState } from './hooks/useComplianceState';
@@ -163,7 +164,7 @@ const providers = [
   wrapProvider(QueryClientProvider, { client: queryClient }),
   wrapProvider(GrazProvider, {
     grazOptions: {
-      chains: [DYDX_CHAIN_INFO],
+      chains: [isDev ? DYDX_TESTNET_CHAIN_INFO : DYDX_MAINNET_CHAIN_INFO],
     },
   }),
   wrapProvider(PrivyWagmiConnector, { wagmiChainsConfig: configureChainsConfig }),

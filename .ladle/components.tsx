@@ -10,6 +10,8 @@ import styled from 'styled-components';
 import { WagmiConfig } from 'wagmi';
 
 import { SupportedLocales } from '@/constants/localization';
+import { isDev } from '@/constants/networks';
+import { DYDX_MAINNET_CHAIN_INFO, DYDX_TESTNET_CHAIN_INFO } from '@/constants/wallets';
 
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
@@ -48,7 +50,11 @@ const wrapProvider = (Component: React.ComponentType<any>, props?: any) => {
 
 const providers = [
   wrapProvider(QueryClientProvider, { client: queryClient }),
-  wrapProvider(GrazProvider),
+  wrapProvider(GrazProvider, {
+    grazOptions: {
+      chains: [isDev ? DYDX_TESTNET_CHAIN_INFO : DYDX_MAINNET_CHAIN_INFO],
+    },
+  }),
   wrapProvider(WagmiConfig, { config }),
   wrapProvider(LocaleProvider),
   wrapProvider(RestrictionProvider),
