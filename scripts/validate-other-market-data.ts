@@ -442,6 +442,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   // Check markets on chain.
   console.log('\nChecking price, clob pair, and perpetual on chain for each market proposed...');
   for (const [marketId, proposal] of marketsProposed.entries()) {
+    console.log(marketId);
     // Validate price.
     const price = await client.validatorClient.get.getPrice(marketId);
     validatePrice(price.marketPrice!, proposal);
