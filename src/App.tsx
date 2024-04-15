@@ -40,7 +40,13 @@ import { parseLocationHash } from '@/lib/urlUtils';
 import { config, privyConfig } from '@/lib/wagmi';
 
 import { RestrictionWarning } from './components/RestrictionWarning';
-import { DYDX_CHAIN_INFO } from './constants/wallets';
+import { isMainnet } from './constants/networks';
+import {
+  DYDX_MAINNET_CHAIN_INFO,
+  DYDX_TESTNET_CHAIN_INFO,
+  NOBLE_MAINNET_CHAIN_INFO,
+  NOBLE_TESTNET_CHAIN_INFO,
+} from './constants/wallets';
 import { useAnalytics } from './hooks/useAnalytics';
 import { useBreakpoints } from './hooks/useBreakpoints';
 import { useInitializePage } from './hooks/useInitializePage';
@@ -160,7 +166,9 @@ const providers = [
   wrapProvider(QueryClientProvider, { client: queryClient }),
   wrapProvider(GrazProvider, {
     grazOptions: {
-      chains: [DYDX_CHAIN_INFO],
+      chains: isMainnet
+        ? [DYDX_MAINNET_CHAIN_INFO, NOBLE_MAINNET_CHAIN_INFO]
+        : [DYDX_TESTNET_CHAIN_INFO, NOBLE_TESTNET_CHAIN_INFO],
     },
   }),
   wrapProvider(WagmiProvider, { config, reconnectOnMount: false }),
