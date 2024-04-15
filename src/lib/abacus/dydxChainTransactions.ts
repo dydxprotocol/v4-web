@@ -1,5 +1,5 @@
 import { EncodeObject } from '@cosmjs/proto-signing';
-import { type IndexedTx } from '@cosmjs/stargate';
+import { GasPrice, type IndexedTx } from '@cosmjs/stargate';
 import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
 import {
   CompositeClient,
@@ -33,8 +33,9 @@ import {
 } from '@/constants/abacus';
 import { Hdkey } from '@/constants/account';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
-import { DydxChainId, isTestnet } from '@/constants/networks';
+import { DydxChainId, isMainnet, isTestnet } from '@/constants/networks';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
+import { NOBLE_MAINNET_CHAIN_INFO, NOBLE_TESTNET_CHAIN_INFO } from '@/constants/wallets';
 
 import { type RootStore } from '@/state/_store';
 // TODO Fix cycle
@@ -398,7 +399,15 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
             : undefined,
         },
       };
-      const fee = await this.nobleClient.simulateTransaction([ibcMsg]);
+
+      const averageGasPriceStep = (
+        isMainnet ? NOBLE_MAINNET_CHAIN_INFO : NOBLE_TESTNET_CHAIN_INFO
+      ).feeCurrencies.find((currency) => currency.coinMinimalDenom === 'uusdc')?.gasPriceStep
+        ?.average;
+      const nobleGasPrice = averageGasPriceStep
+        ? GasPrice.fromString(`${averageGasPriceStep}uusdc`)
+        : undefined;
+      const fee = await this.nobleClient.simulateTransaction([ibcMsg], nobleGasPrice);
 
       // take out fee from amount before sweeping
       const amount =
@@ -481,7 +490,15 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         typeUrl: params.typeUrl, // '/circle.cctp.v1.MsgDepositForBurn',
         value: params.value,
       };
-      const fee = await this.nobleClient.simulateTransaction([ibcMsg]);
+
+      const averageGasPriceStep = (
+        isMainnet ? NOBLE_MAINNET_CHAIN_INFO : NOBLE_TESTNET_CHAIN_INFO
+      ).feeCurrencies.find((currency) => currency.coinMinimalDenom === 'uusdc')?.gasPriceStep
+        ?.average;
+      const nobleGasPrice = averageGasPriceStep
+        ? GasPrice.fromString(`${averageGasPriceStep}uusdc`)
+        : undefined;
+      const fee = await this.nobleClient.simulateTransaction([ibcMsg], nobleGasPrice);
 
       // take out fee from amount before sweeping
       const amount =
