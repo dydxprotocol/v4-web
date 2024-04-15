@@ -143,6 +143,12 @@ export const MarketsCompactTable = (props: PropsWithChildren<MarketsCompactTable
         : marketA.priceChange24HPercent - marketB.priceChange24HPercent;
     };
 
+    if (sorting === MarketSorting.LOSERS) {
+      return filteredMarkets
+        .filter((market) => !!market.priceChange24HPercent && market.priceChange24HPercent < 0)
+        .sort(sortingFunction);
+    }
+
     return filteredMarkets.sort(sortingFunction);
   }, [sorting, filteredMarkets]);
 
@@ -219,14 +225,34 @@ Styled.Table = styled(Table)`
   @media ${breakpoints.desktopSmall} {
     --tableCell-padding: 0.5rem 0.5rem;
 
+    & tr > td:nth-child(1) {
+      --tableCell-padding: 0.5rem 0.5rem;
+    }
+
     & tr > td:nth-child(2) {
-      --tableCell-padding: 0.625rem 0;
+      --tableCell-padding: 0.5rem 0;
+    }
+
+    & tr > td:nth-child(3) {
+      --tableCell-padding: 0.5rem 0.5rem;
     }
   }
 
   @media ${breakpoints.tablet} {
     table {
       max-width: 100vw;
+    }
+
+    & tr > td:nth-child(1) {
+      --tableCell-padding: 0.5rem 0.625rem 0.5rem 1rem;
+    }
+
+    & tr > td:nth-child(2) {
+      --tableCell-padding: 0.5rem 0;
+    }
+
+    & tr > td:nth-child(3) {
+      --tableCell-padding: 0.5rem 1rem 0.5rem 0.625rem;
     }
   }
 `;
