@@ -10,8 +10,13 @@ import styled from 'styled-components';
 import { WagmiConfig } from 'wagmi';
 
 import { SupportedLocales } from '@/constants/localization';
-import { isDev } from '@/constants/networks';
-import { DYDX_MAINNET_CHAIN_INFO, DYDX_TESTNET_CHAIN_INFO } from '@/constants/wallets';
+import { isMainnet } from '@/constants/networks';
+import {
+  DYDX_MAINNET_CHAIN_INFO,
+  DYDX_TESTNET_CHAIN_INFO,
+  NOBLE_MAINNET_CHAIN_INFO,
+  NOBLE_TESTNET_CHAIN_INFO,
+} from '@/constants/wallets';
 
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
@@ -52,7 +57,9 @@ const providers = [
   wrapProvider(QueryClientProvider, { client: queryClient }),
   wrapProvider(GrazProvider, {
     grazOptions: {
-      chains: [isDev ? DYDX_TESTNET_CHAIN_INFO : DYDX_MAINNET_CHAIN_INFO],
+      chains: isMainnet
+        ? [DYDX_MAINNET_CHAIN_INFO, NOBLE_MAINNET_CHAIN_INFO]
+        : [DYDX_TESTNET_CHAIN_INFO, NOBLE_TESTNET_CHAIN_INFO],
     },
   }),
   wrapProvider(WagmiConfig, { config }),

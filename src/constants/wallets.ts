@@ -444,6 +444,134 @@ export const DYDX_TESTNET_CHAIN_INFO: Parameters<typeof suggestChain>[0]['chainI
   features: [],
 };
 
+export const NOBLE_MAINNET_CHAIN_INFO: Parameters<typeof suggestChain>[0]['chainInfo'] = {
+  rpc: 'https://rpc-noble.keplr.app',
+  rest: 'https://lcd-noble.keplr.app',
+  chainId: 'noble-1',
+  chainName: 'Noble',
+  chainSymbolImageUrl:
+    'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/noble/chain.png',
+  bip44: {
+    coinType: 118,
+  },
+  bech32Config: {
+    bech32PrefixAccAddr: 'noble',
+    bech32PrefixAccPub: 'noblepub',
+    bech32PrefixValAddr: 'noblevaloper',
+    bech32PrefixValPub: 'noblevaloperpub',
+    bech32PrefixConsAddr: 'noblevalcons',
+    bech32PrefixConsPub: 'noblevalconspub',
+  },
+  currencies: [
+    {
+      coinDenom: 'USDC',
+      coinMinimalDenom: 'uusdc',
+      coinDecimals: 6,
+      coinGeckoId: 'usd-coin',
+      coinImageUrl:
+        'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/noble/uusdc.png',
+    },
+    {
+      coinDenom: 'FRNZ',
+      coinMinimalDenom: 'ufrienzies',
+      coinDecimals: 6,
+      coinImageUrl:
+        'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/noble/ufrienzies.png',
+    },
+  ],
+  feeCurrencies: [
+    {
+      coinDenom: 'USDC',
+      coinMinimalDenom: 'uusdc',
+      coinDecimals: 6,
+      coinGeckoId: 'usd-coin',
+      coinImageUrl:
+        'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/noble/uusdc.png',
+      gasPriceStep: {
+        low: 0.1,
+        average: 0.1,
+        high: 0.2,
+      },
+    },
+    {
+      coinDenom: 'ATOM',
+      coinMinimalDenom: 'ibc/EF48E6B1A1A19F47ECAEA62F5670C37C0580E86A9E88498B7E393EB6F49F33C0',
+      coinDecimals: 6,
+      gasPriceStep: {
+        low: 0.01,
+        average: 0.01,
+        high: 0.02,
+      },
+    },
+  ],
+  features: [],
+};
+
+export const NOBLE_TESTNET_CHAIN_INFO: Parameters<typeof suggestChain>[0]['chainInfo'] = {
+  chainId: 'grand-1',
+  chainName: 'Grand',
+  rpc: 'https://rpc.testnet.noble.strange.love',
+  rest: 'https://api.testnet.noble.strange.love/',
+  nodeProvider: {
+    name: 'Strangelove',
+    email: 'support@strange.love',
+    website: 'https://strange.love/',
+  },
+  chainSymbolImageUrl:
+    'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/grand/chain.png',
+  stakeCurrency: {
+    coinDenom: 'STAKE',
+    coinMinimalDenom: 'ustake',
+    coinDecimals: 6,
+  },
+  bip44: {
+    coinType: 118,
+  },
+  bech32Config: {
+    bech32PrefixAccAddr: 'noble',
+    bech32PrefixAccPub: 'noblepub',
+    bech32PrefixValAddr: 'noblevaloper',
+    bech32PrefixValPub: 'noblevaloperpub',
+    bech32PrefixConsAddr: 'noblevalcons',
+    bech32PrefixConsPub: 'noblevalconspub',
+  },
+  currencies: [
+    {
+      coinDenom: 'USDC',
+      coinMinimalDenom: 'uusdc',
+      coinDecimals: 6,
+      coinImageUrl:
+        'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/grand/uusdc.png',
+    },
+    {
+      coinDenom: 'STAKE',
+      coinMinimalDenom: 'ustake',
+      coinDecimals: 6,
+      coinImageUrl:
+        'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/grand/ustake.png',
+    },
+    {
+      coinDenom: 'LOVE',
+      coinMinimalDenom: 'ulove',
+      coinDecimals: 6,
+    },
+  ],
+  feeCurrencies: [
+    {
+      coinDenom: 'USDC',
+      coinMinimalDenom: 'uusdc',
+      coinDecimals: 6,
+      coinImageUrl:
+        'https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/grand/uusdc.png',
+      gasPriceStep: {
+        low: 0.1,
+        average: 0.1,
+        high: 0.2,
+      },
+    },
+  ],
+  features: [],
+};
 // TODO: export this type from abacus instead
 export enum DydxChainAsset {
   USDC = 'usdc',
