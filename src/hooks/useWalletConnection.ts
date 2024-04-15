@@ -70,7 +70,9 @@ export const useWalletConnection = () => {
   const { data: dydxAccountGraz, isConnected: isConnectedGraz } = useAccountGraz({
     chainId: dydxChainId,
   });
-  const { data: signerGraz } = useOfflineSignersGraz();
+  const { data: signerGraz } = useOfflineSignersGraz({
+    chainId: dydxChainId,
+  });
   const { disconnectAsync: disconnectGraz } = useDisconnectGraz();
 
   const dydxAddressGraz = dydxAccountGraz?.bech32Address;
