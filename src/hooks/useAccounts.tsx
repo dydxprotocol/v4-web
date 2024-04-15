@@ -1,9 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { OfflineSigner } from '@cosmjs/proto-signing';
 import { LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
 import { AES, enc } from 'crypto-js';
+import { useAccount as useAccountGraz } from 'graz';
 
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
@@ -22,6 +22,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 import { isBlockedGeo } from '@/lib/compliance';
+import { getNobleChainId } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 import { testFlags } from '@/lib/testFlags';
 import { sleep } from '@/lib/timeUtils';
@@ -144,9 +145,13 @@ const useAccountsContext = () => {
   };
 
   // dYdXClient Onboarding & Account Helpers
+  const nobleChainId = getNobleChainId();
   const { indexerClient, getWalletFromEvmSignature } = useDydxClient();
   // dYdX subaccounts
   const [dydxSubaccounts, setDydxSubaccounts] = useState<Subaccount[] | undefined>();
+  const { data: nobleAccountGraz, isConnected: isConnectedGraz } = useAccountGraz({
+    chainId: nobleChainId,
+  });
 
   const getSubaccounts = async ({ dydxAddress }: { dydxAddress: DydxAddress }) => {
     try {
@@ -175,7 +180,12 @@ const useAccountsContext = () => {
     [localDydxWallet]
   );
 
-  const nobleAddress = useMemo(() => localNobleWallet?.address, [localNobleWallet]);
+  const nobleAddress = useMemo(() => {
+    if (walletType === WalletType.Keplr && isConnectedGraz) {
+      return nobleAccountGraz?.bech32Address;
+    }
+    return localNobleWallet?.address;
+  }, [localNobleWallet, walletType, isConnectedGraz, nobleAccountGraz]);
 
   const setWalletFromEvmSignature = async (signature: string) => {
     const { wallet, mnemonic, privateKey, publicKey } = await getWalletFromEvmSignature({
