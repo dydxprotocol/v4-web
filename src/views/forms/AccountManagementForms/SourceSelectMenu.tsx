@@ -69,7 +69,7 @@ export const SourceSelectMenu = ({
     }))
     .filter(
       (chain) =>
-        type === TransferType.deposit || (!!cctpTokenssByChainId[chain.value] && CCTPWithdrawalOnly)
+        type === TransferType.deposit || !!cctpTokenssByChainId[chain.value] || !CCTPWithdrawalOnly
     );
 
   const exchangeItems = Object.values(exchanges).map((exchange) => ({

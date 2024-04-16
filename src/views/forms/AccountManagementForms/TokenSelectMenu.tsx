@@ -54,7 +54,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
     }))
     .filter(
       (chain) =>
-        type === TransferType.deposit || (!!cctpTokensByAddress[chain.value] && CCTPWithdrawalOnly)
+        type === TransferType.deposit || !!cctpTokensByAddress[chain.value] || !CCTPWithdrawalOnly
     );
 
   return (
