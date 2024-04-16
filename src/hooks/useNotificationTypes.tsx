@@ -250,11 +250,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
             ReleaseUpdateNotificationIds.IncentivesS4,
             {
               icon: <AssetIcon symbol={chainTokenLabel} />,
-              title: stringGetter({ key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.TITLE' }),
+              title: stringGetter({
+                key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.TITLE',
+                params: { SEASON_NUMBER: '4' },
+              }),
               body: stringGetter({
                 key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.BODY',
                 params: {
-                  SEASON_NUMBER: '4',
                   PREV_SEASON_NUMBER: '2',
                   DYDX_AMOUNT: '16',
                   USDC_AMOUNT: '50',
