@@ -17,6 +17,8 @@ import { Popover, TriggerType } from '@/components/Popover';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithLabel } from '@/components/WithLabel';
 
+import cctpTokens from '../../public/configs/cctp.json';
+
 type ElementProps = {
   asChild?: boolean;
   children: ReactNode;
@@ -33,6 +35,12 @@ type StyleProps = {
 };
 
 export type SearchSelectMenuProps = ElementProps & StyleProps;
+
+type TokenInfo = {
+  chainId: string;
+  tokenAddress: string;
+  name: string;
+};
 
 export const SearchSelectMenu = ({
   asChild,
@@ -53,6 +61,15 @@ export const SearchSelectMenu = ({
     },
     ref: searchSelectMenuRef,
   });
+
+  const cctpChainsById = cctpTokens.reduce((acc, token) => {
+    // Check if the key for this chainId already exists
+    if (!acc[token.chainId]) {
+      acc[token.chainId] = []; // Initialize it with an empty array if not existing
+    }
+    acc[token.chainId].push(token); // Push the current token into the corresponding array
+    return acc;
+  }, {} as Record<string, TokenInfo[]>);
 
   const Trigger = asChild ? (
     children

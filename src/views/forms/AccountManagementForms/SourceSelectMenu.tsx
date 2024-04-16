@@ -5,7 +5,7 @@ import { TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { WalletType } from '@/constants/wallets';
 
-import { useAccounts, useStringGetter } from '@/hooks';
+import { useAccounts, useEnvFeatures, useStringGetter } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
@@ -16,11 +16,19 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 
+import cctpTokens from '../../../../public/configs/cctp.json';
+
 type ElementProps = {
   label?: string;
   selectedExchange?: string;
   selectedChain?: string;
   onSelect: (name: string, type: 'chain' | 'exchange') => void;
+};
+
+export type TokenInfo = {
+  chainId: string;
+  tokenAddress: string;
+  name: string;
 };
 
 export const SourceSelectMenu = ({
@@ -30,6 +38,7 @@ export const SourceSelectMenu = ({
   onSelect,
 }: ElementProps) => {
   const { walletType } = useAccounts();
+  const { CCTPWithdrawalOnly } = useEnvFeatures();
 
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions, resources } =
@@ -41,14 +50,27 @@ export const SourceSelectMenu = ({
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.exchanges?.toArray() ||
     [];
 
-  const chainItems = Object.values(chains).map((chain) => ({
-    value: chain.type,
-    label: chain.stringKey,
-    onSelect: () => {
-      onSelect(chain.type, 'chain');
-    },
-    slotBefore: <Styled.Img src={chain.iconUrl} alt="" />,
-  }));
+  const cctpTokenssByChainId = cctpTokens.reduce((acc, token) => {
+    if (!acc[token.chainId]) {
+      acc[token.chainId] = [];
+    }
+    acc[token.chainId].push(token);
+    return acc;
+  }, {} as Record<string, TokenInfo[]>);
+
+  const chainItems = Object.values(chains)
+    .map((chain) => ({
+      value: chain.type,
+      label: chain.stringKey,
+      onSelect: () => {
+        onSelect(chain.type, 'chain');
+      },
+      slotBefore: <Styled.Img src={chain.iconUrl} alt="" />,
+    }))
+    .filter(
+      (chain) =>
+        type === TransferType.deposit || (!!cctpTokenssByChainId[chain.value] && CCTPWithdrawalOnly)
+    );
 
   const exchangeItems = Object.values(exchanges).map((exchange) => ({
     value: exchange.type,
