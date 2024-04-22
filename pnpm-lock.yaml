@@ -30,8 +30,8 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: ^1.6.42
-    version: 1.6.42
+    specifier: ^1.6.43
+    version: 1.6.43
   '@dydxprotocol/v4-client-js':
     specifier: ^1.1.7
     version: 1.1.7
@@ -1587,8 +1587,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.6.42:
-    resolution: {integrity: sha512-7OQXuZWof8fV8ojGWFGfniNJ0ivy5EN6Ye9ILhovKVaPgX2gUMw//AGyhkJsOLzDH89xI7Bhoqb9pv6fw5FLEw==}
+  /@dydxprotocol/v4-abacus@1.6.43:
+    resolution: {integrity: sha512-bgkEABYmiOnK7nBwo14n1vjNIDCidAqZctUf6yYvSqeUp1Y+cyEMPnfL8dueaOEXtO8YBHzB80PG2BBiX58Bag==}
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
@@ -1624,10 +1624,7 @@ packages:
     dev: false
 
   /@dydxprotocol/v4-localization@1.1.64:
-    resolution:
-      {
-        integrity: sha512-H6ftaXHRoSghLCnBFjljmpLaQ7QW3fOKPLy4TYGGHtEs1KnInG2RSMvB87U3YOE5QbhEmTlKPAtEKDTBHzZAgg==,
-      }
+    resolution: {integrity: sha512-H6ftaXHRoSghLCnBFjljmpLaQ7QW3fOKPLy4TYGGHtEs1KnInG2RSMvB87U3YOE5QbhEmTlKPAtEKDTBHzZAgg==}
     dev: false
 
   /@dydxprotocol/v4-proto@5.0.0-dev.0:
