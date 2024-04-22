@@ -23,9 +23,10 @@ export const Positions = () => {
   const { isTablet, isNotTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
-  const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable);
   const showClosePositionAction = false;
+
+  const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
+  const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable(showClosePositionAction));
 
   return (
     <AttachedExpandingSection>
@@ -51,7 +52,7 @@ export const Positions = () => {
                 PositionsTableColumnKey.AverageOpenAndClose,
                 PositionsTableColumnKey.NetFunding,
                 shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-                shouldRenderActions(showClosePositionAction) && PositionsTableColumnKey.Actions,
+                shouldRenderActions && PositionsTableColumnKey.Actions,
               ].filter(isTruthy)
         }
         currentRoute={`${AppRoute.Portfolio}/${PortfolioRoute.Positions}`}

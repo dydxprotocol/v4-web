@@ -25,9 +25,10 @@ export const Overview = () => {
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
-  const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable);
   const showClosePositionAction = false;
+
+  const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
+  const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable(showClosePositionAction));
 
   return (
     <div>
@@ -56,7 +57,7 @@ export const Overview = () => {
                   PositionsTableColumnKey.RealizedPnl,
                   PositionsTableColumnKey.AverageOpenAndClose,
                   shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-                  shouldRenderActions(showClosePositionAction) && PositionsTableColumnKey.Actions,
+                  shouldRenderActions && PositionsTableColumnKey.Actions,
                 ].filter(isTruthy)
           }
           currentRoute={AppRoute.Portfolio}

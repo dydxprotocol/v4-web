@@ -98,8 +98,9 @@ export const calculateShouldRenderTriggersInPositionsTable = createSelector(
 /**
  * @description calculate whether positions table should render actions column
  */
-export const calculateShouldRenderActionsInPositionsTable = createSelector(
-  [calculateIsAccountViewOnly, calculateShouldRenderTriggersInPositionsTable],
-  (isAccountViewOnly: boolean, areTriggersRendered: boolean) => (isCloseActionShown: boolean) =>
-    !isAccountViewOnly && (areTriggersRendered || isCloseActionShown)
-);
+export const calculateShouldRenderActionsInPositionsTable = (isCloseActionShown: boolean) =>
+  createSelector(
+    [calculateIsAccountViewOnly, calculateShouldRenderTriggersInPositionsTable],
+    (isAccountViewOnly: boolean, areTriggersRendered: boolean) =>
+      !isAccountViewOnly && (areTriggersRendered || isCloseActionShown)
+  );

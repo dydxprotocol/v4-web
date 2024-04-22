@@ -78,15 +78,17 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const { numOpenOrders, numFills } =
     useSelector(getCurrentMarketTradeInfoNumbers, shallowEqual) || {};
 
+  const showClosePositionAction = true;
+
   const hasUnseenOrderUpdates = useSelector(getHasUnseenOrderUpdates);
   const hasUnseenFillUpdates = useSelector(getHasUnseenFillUpdates);
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
   const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
-  const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable);
+  const shouldRenderActions = useSelector(
+    calculateShouldRenderActionsInPositionsTable(showClosePositionAction)
+  );
   const isWaitingForOrderToIndex = useSelector(calculateHasUncommittedOrders);
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
-
-  const showClosePositionAction = true;
 
   const fillsTagNumber = shortenNumberForDisplay(showCurrentMarket ? numFills : numTotalFills);
   const ordersTagNumber = shortenNumberForDisplay(
@@ -137,7 +139,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     PositionsTableColumnKey.AverageOpenAndClose,
                     PositionsTableColumnKey.NetFunding,
                     shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-                    shouldRenderActions(showClosePositionAction) && PositionsTableColumnKey.Actions,
+                    shouldRenderActions && PositionsTableColumnKey.Actions,
                   ].filter(isTruthy)
             }
             showClosePositionAction={showClosePositionAction}
