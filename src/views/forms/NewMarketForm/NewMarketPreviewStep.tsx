@@ -152,10 +152,12 @@ export const NewMarketPreviewStep = ({
               atomicResolution,
               liquidityTier,
               quantumConversionExponent,
-              marketType:
-                marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
+              // @ts-ignore - marketType is not required until v5
+              marketType: testFlags.withNewMarketType
+                ? marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
                   ? PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED
-                  : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS,
+                  : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS
+                : undefined,
               stepBaseQuantums: Long.fromNumber(stepBaseQuantums),
               subticksPerTick,
               delayBlocks: newMarketProposal.delayBlocks,

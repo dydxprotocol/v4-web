@@ -7,6 +7,7 @@ import { getSelectedNetwork } from '@/state/appSelectors';
 export interface EnvironmentFeatures {
   reduceOnlySupported: boolean;
   withdrawalSafetyEnabled: boolean;
+  CCTPWithdrawalOnly: boolean;
 }
 
 export const useEnvFeatures = (): EnvironmentFeatures => {

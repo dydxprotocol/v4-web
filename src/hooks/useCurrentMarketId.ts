@@ -65,16 +65,16 @@ export const useCurrentMarketId = () => {
         // If marketId is valid, set currentMarketId
         setLastViewedMarket(marketId);
         dispatch(setCurrentMarketId(marketId));
-        dispatch(closeDialogInTradeBox());
-        if (activeTradeBoxDialog) {
-          // Reopen active trade box dialog with cleared values
-          if (
-            activeTradeBoxDialog.type === TradeBoxDialogTypes.ClosePosition &&
-            openPositions?.find((position: SubaccountPosition) => position.id === marketId)
-          ) {
-            dispatch(openDialogInTradeBox(activeTradeBoxDialog));
-          }
+
+        if (
+          activeTradeBoxDialog?.type === TradeBoxDialogTypes.ClosePosition &&
+          openPositions?.find((position: SubaccountPosition) => position.id === marketId)
+        ) {
+          // Keep the close positions dialog open between market changes as long as there exists an open position
+          return;
         }
+
+        dispatch(closeDialogInTradeBox());
       }
     }
   }, [hasMarketIds, marketId]);
