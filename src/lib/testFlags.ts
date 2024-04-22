@@ -47,6 +47,10 @@ class TestFlags {
   get displayPrivyLogin() {
     return !!this.queryParams.displayprivylogin || true;
   }
+
+  get withNewMarketType() {
+    return !!this.queryParams.withnewmarkettype;
+  }
 }
 
 export const testFlags = new TestFlags();

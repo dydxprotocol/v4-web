@@ -4,7 +4,7 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useEnvFeatures, useStringGetter } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -14,6 +14,9 @@ import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 import { Tag } from '@/components/Tag';
 
 import { getTransferInputs } from '@/state/inputsSelectors';
+
+import cctpTokens from '../../../../public/configs/cctp.json';
+import { TokenInfo } from './SourceSelectMenu';
 
 type ElementProps = {
   selectedToken?: TransferInputTokenResource;
@@ -25,19 +28,34 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions, resources } =
     useSelector(getTransferInputs, shallowEqual) || {};
+  const { CCTPWithdrawalOnly } = useEnvFeatures();
+
   const tokens =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() || [];
 
-  const tokenItems = Object.values(tokens).map((token) => ({
-    value: token.type,
-    label: token.stringKey,
-    onSelect: () => {
-      const selectedToken = resources?.tokenResources?.get(token.type);
-      selectedToken && onSelectToken(selectedToken);
-    },
-    slotBefore: <Styled.Img src={token.iconUrl} alt="" />,
-    tag: resources?.tokenResources?.get(token.type)?.symbol,
-  }));
+  const cctpTokensByAddress = cctpTokens.reduce((acc, token) => {
+    if (!acc[token.tokenAddress]) {
+      acc[token.tokenAddress] = [];
+    }
+    acc[token.tokenAddress].push(token);
+    return acc;
+  }, {} as Record<string, TokenInfo[]>);
+
+  const tokenItems = Object.values(tokens)
+    .map((token) => ({
+      value: token.type,
+      label: token.stringKey,
+      onSelect: () => {
+        const selectedToken = resources?.tokenResources?.get(token.type);
+        selectedToken && onSelectToken(selectedToken);
+      },
+      slotBefore: <Styled.Img src={token.iconUrl} alt="" />,
+      tag: resources?.tokenResources?.get(token.type)?.symbol,
+    }))
+    .filter(
+      (chain) =>
+        type === TransferType.deposit || !!cctpTokensByAddress[chain.value] || !CCTPWithdrawalOnly
+    );
 
   return (
     <SearchSelectMenu
