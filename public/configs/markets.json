@@ -192,8 +192,7 @@
     "name": "dYdX",
     "tags": ["Layer 1", "Defi"],
     "websiteLink": "https://dydx.exchange/",
-    "whitepaperLink": "",
-    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/dydx/"
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/dydx-chain/"
   },
   "DYM-USD": {
     "name": "Dymension",
