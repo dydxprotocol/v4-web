@@ -188,6 +188,13 @@
     "whitepaperLink": "https://polkadot.network/PolkaDotPaper.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/polkadot-new/"
   },
+  "DYDX-USD": {
+    "name": "dYdX",
+    "tags": ["Layer 1", "Defi"],
+    "websiteLink": "https://dydx.exchange/",
+    "whitepaperLink": "",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/dydx/"
+  },
   "DYM-USD": {
     "name": "Dymension",
     "tags": [],
