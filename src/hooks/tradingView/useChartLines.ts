@@ -4,7 +4,6 @@ import { shallowEqual, useSelector } from 'react-redux';
 
 import { AbacusOrderStatus, ORDER_SIDES, SubaccountOrder } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
-import { USD_DECIMALS } from '@/constants/numbers';
 import { type OrderType, ORDER_TYPE_STRINGS } from '@/constants/trade';
 import type { ChartLine, PositionLineType, TvWidget } from '@/constants/tvchart';
 
@@ -16,7 +15,7 @@ import {
   getIsAccountConnected,
 } from '@/state/accountSelectors';
 import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
-import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
+import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { getChartLineColors } from '@/lib/tradingView/utils';
@@ -45,11 +44,13 @@ export const useChartLines = ({
 
   const isAccountConnected = useSelector(getIsAccountConnected);
 
+  const currentMarketId = useSelector(getCurrentMarketId);
   const currentMarketPositionData = useSelector(getCurrentMarketPositionData, shallowEqual);
   const currentMarketOrders: SubaccountOrder[] = useSelector(getCurrentMarketOrders, shallowEqual);
 
-  const { tickSizeDecimals = USD_DECIMALS } =
-    useSelector(getCurrentMarketConfig, shallowEqual) || {};
+  useEffect(() => {
+    return () => deleteChartLines();
+  }, [currentMarketId]);
 
   useEffect(() => {
     if (isChartReady && displayButton) {
@@ -133,7 +134,7 @@ export const useChartLines = ({
       return;
     }
 
-    const formattedPrice = MustBigNumber(price).toFixed(tickSizeDecimals).toString();
+    const formattedPrice = MustBigNumber(price).toNumber();
     const quantity = Math.abs(size).toString();
 
     if (maybePositionLine) {
@@ -147,9 +148,9 @@ export const useChartLines = ({
       const positionLine = tvWidget
         ?.chart()
         .createPositionLine({ disableUndo: false })
-        .setText(label)
         .setPrice(formattedPrice)
-        .setQuantity(quantity);
+        .setQuantity(quantity)
+        .setText(label);
 
       if (positionLine) {
         const chartLine: ChartLine = { line: positionLine, chartLineType };
@@ -189,9 +190,7 @@ export const useChartLines = ({
           (status === AbacusOrderStatus.open || status === AbacusOrderStatus.untriggered);
 
         const maybeOrderLine = chartLinesRef.current[key]?.line;
-        const formattedPrice = MustBigNumber(triggerPrice ?? price)
-          .toFixed(tickSizeDecimals)
-          .toString();
+        const formattedPrice = MustBigNumber(triggerPrice ?? price).toNumber();
 
         if (!shouldShow) {
           if (maybeOrderLine) {
@@ -202,7 +201,7 @@ export const useChartLines = ({
         } else {
           if (maybeOrderLine) {
             if (maybeOrderLine.getPrice() !== formattedPrice) {
-              maybeOrderLine.setQuantity(formattedPrice);
+              maybeOrderLine.setPrice(formattedPrice);
             }
             if (maybeOrderLine.getQuantity() !== quantity) {
               maybeOrderLine.setQuantity(quantity);
