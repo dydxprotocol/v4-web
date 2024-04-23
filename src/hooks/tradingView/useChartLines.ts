@@ -129,10 +129,14 @@ export const useChartLines = ({
     }
 
     const formattedPrice = MustBigNumber(price).toNumber();
+    const quantity = Math.abs(size).toString();
 
     if (maybePositionLine) {
       if (maybePositionLine.getPrice() !== formattedPrice) {
         maybePositionLine.setPrice(formattedPrice);
+      }
+      if (size && maybePositionLine.getQuantity() !== quantity) {
+        maybePositionLine.setQuantity(quantity)
       }
     } else {
       const positionLine = tvWidget
@@ -140,7 +144,7 @@ export const useChartLines = ({
         .createPositionLine({ disableUndo: false })
         .setText(label)
         .setPrice(formattedPrice)
-        .setQuantity('');
+        .setQuantity(quantity);
 
       if (positionLine) {
         const chartLine: ChartLine = { line: positionLine, chartLineType };
