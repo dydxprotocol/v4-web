@@ -135,8 +135,8 @@ export const useChartLines = ({
       if (maybePositionLine.getPrice() !== formattedPrice) {
         maybePositionLine.setPrice(formattedPrice);
       }
-      if (size && maybePositionLine.getQuantity() !== quantity) {
-        maybePositionLine.setQuantity(quantity)
+      if (maybePositionLine.getQuantity() !== quantity) {
+        maybePositionLine.setQuantity(quantity);
       }
     } else {
       const positionLine = tvWidget
