@@ -25,6 +25,7 @@ import { Tag } from '@/components/Tag';
 
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
+import { formatZeroNumbers } from '@/lib/formatZeroNumbers';
 import { type BigNumberish, MustBigNumber, isNumber } from '@/lib/numbers';
 import { getStringsForDateTimeDiff, getTimestamp } from '@/lib/timeUtils';
 
@@ -62,6 +63,7 @@ type ElementProps = {
   slotRight?: React.ReactNode;
   useGrouping?: boolean;
   roundingMode?: BigNumber.RoundingMode;
+  compressZeros?: boolean;
   relativeTimeFormatOptions?: {
     format: 'long' | 'short' | 'narrow' | 'singleCharacter';
     resolution?: number;
@@ -90,6 +92,7 @@ export const Output = ({
   showSign = ShowSign.Negative,
   slotRight,
   useGrouping = true,
+  compressZeros = false,
   roundingMode = BigNumber.ROUND_HALF_UP,
   relativeTimeFormatOptions = {
     format: 'singleCharacter',
@@ -268,16 +271,68 @@ export const Output = ({
                 valueBN.toFormat(fractionDigits ?? 0, roundingMode, {
                   ...format,
                 }),
-              [OutputType.Fiat]: () =>
-                valueBN.toFormat(fractionDigits ?? USD_DECIMALS, roundingMode, {
-                  ...format,
-                  prefix: '$',
-                }),
-              [OutputType.SmallFiat]: () =>
-                valueBN.toFormat(fractionDigits ?? SMALL_USD_DECIMALS, roundingMode, {
-                  ...format,
-                  prefix: '$',
-                }),
+              [OutputType.Fiat]: () => {
+                const formattedValue = valueBN.toFormat(
+                  fractionDigits ?? USD_DECIMALS,
+                  roundingMode,
+                  {
+                    ...format,
+                    prefix: '$',
+                  }
+                );
+
+                const { significantDigits, decimalDigits, zeros } = formatZeroNumbers(
+                  formattedValue,
+                  true
+                );
+
+                if (compressZeros) {
+                  return (
+                    <div>
+                      {significantDigits}.
+                      {Boolean(zeros) && (
+                        <>
+                          0<sub title={formattedValue}>{zeros}</sub>
+                        </>
+                      )}
+                      {decimalDigits}
+                    </div>
+                  );
+                }
+
+                return formattedValue;
+              },
+              [OutputType.SmallFiat]: () => {
+                const formattedValue = valueBN.toFormat(
+                  fractionDigits ?? SMALL_USD_DECIMALS,
+                  roundingMode,
+                  {
+                    ...format,
+                    prefix: '$',
+                  }
+                );
+
+                const { significantDigits, decimalDigits, zeros } = formatZeroNumbers(
+                  formattedValue,
+                  true
+                );
+
+                if (compressZeros) {
+                  return (
+                    <div>
+                      {significantDigits}.
+                      {Boolean(zeros) && (
+                        <>
+                          0<sub title={formattedValue}>{zeros}</sub>
+                        </>
+                      )}
+                      {decimalDigits}
+                    </div>
+                  );
+                }
+
+                return formattedValue;
+              },
               [OutputType.CompactFiat]: () => {
                 if (!isNumber(value)) {
                   throw new Error('value must be a number for compact fiat output');

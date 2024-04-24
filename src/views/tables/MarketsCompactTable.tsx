@@ -59,6 +59,7 @@ export const MarketsCompactTable = (props: PropsWithChildren<MarketsCompactTable
                 type={OutputType.Fiat}
                 value={oraclePrice}
                 fractionDigits={tickSizeDecimals}
+                compressZeros
                 withBaseFont
               />
               <Styled.TabletPriceChange>
