@@ -17,7 +17,6 @@ type ElementProps = {
   stopLossOrders: SubaccountOrder[];
   takeProfitOrders: SubaccountOrder[];
   navigateToMarketOrders: (market: string) => void;
-
   setIsOpen: (open: boolean) => void;
 };
 
@@ -27,7 +26,6 @@ export const TriggersDialog = ({
   stopLossOrders,
   takeProfitOrders,
   navigateToMarketOrders,
-
   setIsOpen,
 }: ElementProps) => {
   const stringGetter = useStringGetter();

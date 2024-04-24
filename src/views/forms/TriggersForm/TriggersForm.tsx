@@ -1,21 +1,43 @@
-import { useSelector } from 'react-redux';
+import { FormEvent, useState } from 'react';
+
+import { useDispatch, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
-import { type SubaccountOrder } from '@/constants/abacus';
-import { ButtonAction } from '@/constants/buttons';
+import {
+  ValidationError,
+  type SubaccountOrder,
+  ErrorType,
+  HumanReadableTriggerOrdersPayload,
+  Nullable,
+  HumanReadableCancelOrderPayload,
+  HumanReadablePlaceOrderPayload,
+  TRADE_TYPES,
+  KotlinIrEnumValues,
+  AbacusOrderType,
+} from '@/constants/abacus';
+import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { TriggerOrderNotificationTypes, TriggerOrderStatus } from '@/constants/notifications';
+import { TradeTypes } from '@/constants/trade';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter, useSubaccount, useTriggerOrdersFormInputs } from '@/hooks';
+import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
+import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
+import { WithTooltip } from '@/components/WithTooltip';
 
+import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getPositionDetails } from '@/state/accountSelectors';
+import { closeDialog } from '@/state/dialogs';
+
+import { getTradeInputAlert } from '@/lib/tradeData';
 
 import { AdvancedTriggersOptions } from './AdvancedTriggersOptions';
-import { TriggerOrderInputs } from './TriggerOrderInputs';
+import { TriggerOrdersInputs } from './TriggerOrdersInputs';
 
 type ElementProps = {
   marketId: string;
@@ -31,56 +53,156 @@ export const TriggersForm = ({
   onViewOrdersClick,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
+  const dispatch = useDispatch();
 
-  const { asset, entryPrice, stepSizeDecimals, tickSizeDecimals, oraclePrice } =
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+
+  const { placeTriggerOrders } = useSubaccount();
+  const { addTriggerOrderNotification } = useLocalNotifications();
+  const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
+
+  const { asset, entryPrice, size, stepSizeDecimals, tickSizeDecimals, oraclePrice } =
     useSelector(getPositionDetails(marketId)) || {};
-  const symbol = asset?.id ?? '';
 
-  const isDisabled = false; // TODO: CT-625 Update based on whether values are populated based on abacus
-  const isEditingExistingTriggers = stopLossOrders.length > 0 || takeProfitOrders.length > 0;
+  const {
+    differingOrderSizes,
+    inputErrors,
+    inputSize,
+    existingStopLossOrder,
+    existingTakeProfitOrder,
+    existsLimitOrder,
+  } = useTriggerOrdersFormInputs({
+    marketId,
+    positionSize: size?.current ?? null,
+    stopLossOrder: stopLossOrders.length === 1 ? stopLossOrders[0] : undefined,
+    takeProfitOrder: takeProfitOrders.length === 1 ? takeProfitOrders[0] : undefined,
+  });
+
+  const symbol = asset?.id ?? '';
+  const multipleTakeProfitOrders = takeProfitOrders.length > 1;
+  const multipleStopLossOrders = stopLossOrders.length > 1;
+
+  const hasInputErrors = inputErrors?.some(
+    (error: ValidationError) => error.type !== ErrorType.warning
+  );
+  const inputAlert = getTradeInputAlert({
+    abacusInputErrors: inputErrors ?? [],
+    stringGetter,
+    stepSizeDecimals,
+    tickSizeDecimals,
+  });
 
   // The triggers form does not support editing multiple stop loss or take profit orders - so if both have
   // multiple, we hide the triggers button CTA
-  const existsEditableOrCreatableOrders = !(
-    stopLossOrders.length > 1 && takeProfitOrders.length > 1
-  );
+  const existsEditableOrCreatableOrders = !(multipleTakeProfitOrders && multipleStopLossOrders);
 
   const priceInfo = (
     <Styled.PriceBox>
       <Styled.PriceRow>
         <Styled.PriceLabel>{stringGetter({ key: STRING_KEYS.AVG_ENTRY_PRICE })}</Styled.PriceLabel>
-        <Styled.Price type={OutputType.Fiat} value={entryPrice?.current} />
+        <Styled.Price
+          type={OutputType.Fiat}
+          value={entryPrice?.current}
+          fractionDigits={tickSizeDecimals}
+        />
       </Styled.PriceRow>
       <Styled.PriceRow>
         <Styled.PriceLabel>{stringGetter({ key: STRING_KEYS.ORACLE_PRICE })}</Styled.PriceLabel>
-        <Styled.Price type={OutputType.Fiat} value={oraclePrice} />
+        <Styled.Price
+          type={OutputType.Fiat}
+          value={oraclePrice}
+          fractionDigits={tickSizeDecimals}
+        />
       </Styled.PriceRow>
     </Styled.PriceBox>
   );
 
+  const triggerNotificationForCancelOrderPayloads = (
+    triggerPayload: Nullable<HumanReadableTriggerOrdersPayload>,
+    isError?: boolean
+  ) => {
+    const { cancelOrderPayloads } = triggerPayload || {};
+
+    if (cancelOrderPayloads && cancelOrderPayloads.toString() != '[]') {
+      cancelOrderPayloads.toArray().map((payload: HumanReadableCancelOrderPayload) => {
+        const existingOrder =
+          payload.orderId === existingStopLossOrder?.id
+            ? existingStopLossOrder
+            : payload.orderId === existingTakeProfitOrder?.id
+            ? existingTakeProfitOrder
+            : null;
+
+        if (existingOrder) {
+          addTriggerOrderNotification({
+            assetId: symbol,
+            clientId: payload.clientId,
+            orderType: (existingOrder.type.rawValue as TradeTypes) || undefined,
+            price: existingOrder.triggerPrice || undefined,
+            status: isError ? TriggerOrderStatus.Error : TriggerOrderStatus.Success,
+            tickSizeDecimals,
+            type: TriggerOrderNotificationTypes.Cancelled,
+          });
+        }
+      });
+    }
+  };
+
+  const triggerNotificationForPlaceOrderPayloads = (
+    triggerPayload: Nullable<HumanReadableTriggerOrdersPayload>,
+    isError?: boolean
+  ) => {
+    const { placeOrderPayloads } = triggerPayload || {};
+
+    if (placeOrderPayloads && placeOrderPayloads.toString() != '[]') {
+      placeOrderPayloads.toArray().map((payload: HumanReadablePlaceOrderPayload) => {
+        addTriggerOrderNotification({
+          assetId: symbol,
+          clientId: payload.clientId,
+          orderType:
+            TRADE_TYPES[payload.type as KotlinIrEnumValues<typeof AbacusOrderType>] || undefined,
+          price: payload.triggerPrice || undefined,
+          status: isError ? TriggerOrderStatus.Error : TriggerOrderStatus.Success,
+          tickSizeDecimals,
+          type: TriggerOrderNotificationTypes.Created,
+        });
+      });
+    }
+  };
+
+  const onSubmitOrders = async () => {
+    setIsPlacingOrder(true);
+
+    await placeTriggerOrders({
+      onError: (
+        triggerOrdersPayload?: Nullable<HumanReadableTriggerOrdersPayload>,
+        errorParams?: { errorStringKey?: Nullable<string> }
+      ) => {
+        triggerNotificationForCancelOrderPayloads(triggerOrdersPayload, true);
+        triggerNotificationForPlaceOrderPayloads(triggerOrdersPayload, true);
+        setIsPlacingOrder(false);
+        dispatch(closeDialog());
+      },
+      onSuccess: (triggerOrdersPayload: Nullable<HumanReadableTriggerOrdersPayload>) => {
+        triggerNotificationForCancelOrderPayloads(triggerOrdersPayload);
+        triggerNotificationForPlaceOrderPayloads(triggerOrdersPayload);
+        setIsPlacingOrder(false);
+        dispatch(closeDialog());
+      },
+    });
+  };
+
+  const onSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    onSubmitOrders();
+  };
+
   return (
-    <Styled.Form>
+    <Styled.Form onSubmit={onSubmit}>
       {priceInfo}
-      <TriggerOrderInputs
+      <TriggerOrdersInputs
         symbol={symbol}
-        tooltipId="take-profit"
-        stringKeys={{
-          header: STRING_KEYS.TAKE_PROFIT,
-          price: STRING_KEYS.TP_PRICE,
-          output: STRING_KEYS.GAIN,
-        }}
-        orders={takeProfitOrders}
-        onViewOrdersClick={onViewOrdersClick}
-      />
-      <TriggerOrderInputs
-        symbol={symbol}
-        tooltipId="stop-loss"
-        stringKeys={{
-          header: STRING_KEYS.STOP_LOSS,
-          price: STRING_KEYS.SL_PRICE,
-          output: STRING_KEYS.LOSS,
-        }}
-        orders={stopLossOrders}
+        multipleTakeProfitOrders={multipleTakeProfitOrders}
+        multipleStopLossOrders={multipleStopLossOrders}
         tickSizeDecimals={tickSizeDecimals}
         onViewOrdersClick={onViewOrdersClick}
       />
@@ -88,14 +210,33 @@ export const TriggersForm = ({
         <>
           <AdvancedTriggersOptions
             symbol={symbol}
+            existsLimitOrder={existsLimitOrder}
+            size={inputSize}
+            positionSize={size?.current ? Math.abs(size?.current) : null}
+            differingOrderSizes={differingOrderSizes}
+            multipleTakeProfitOrders={multipleTakeProfitOrders}
+            multipleStopLossOrders={multipleStopLossOrders}
             stepSizeDecimals={stepSizeDecimals}
             tickSizeDecimals={tickSizeDecimals}
           />
-          <Button action={ButtonAction.Primary} state={{ isDisabled }}>
-            {isEditingExistingTriggers
-              ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })
-              : stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
-          </Button>
+          <WithTooltip tooltipString={hasInputErrors ? inputAlert?.alertString : undefined}>
+            <Styled.Button
+              action={ButtonAction.Primary}
+              type={ButtonType.Submit}
+              state={{ isDisabled: hasInputErrors || isAccountViewOnly, isLoading: isPlacingOrder }}
+              slotLeft={
+                hasInputErrors ? <Styled.WarningIcon iconName={IconName.Warning} /> : undefined
+              }
+            >
+              {hasInputErrors
+                ? stringGetter({
+                    key: inputAlert?.actionStringKey ?? STRING_KEYS.UNAVAILABLE,
+                  })
+                : !!(existingStopLossOrder || existingTakeProfitOrder)
+                ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })
+                : stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
+            </Styled.Button>
+          </WithTooltip>
         </>
       )}
     </Styled.Form>
@@ -129,4 +270,12 @@ Styled.PriceLabel = styled.h3`
 
 Styled.Price = styled(Output)`
   color: var(--color-text-2);
+`;
+
+Styled.Button = styled(Button)`
+  width: 100%;
+`;
+
+Styled.WarningIcon = styled(Icon)`
+  color: var(--color-warning);
 `;

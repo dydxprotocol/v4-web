@@ -24,6 +24,7 @@ type ElementProps = {
   stopLossOrders: SubaccountOrder[];
   takeProfitOrders: SubaccountOrder[];
   isDisabled?: boolean;
+  showClosePositionAction: boolean;
   navigateToMarketOrders: (market: string) => void;
 };
 
@@ -33,6 +34,7 @@ export const PositionsActionsCell = ({
   stopLossOrders,
   takeProfitOrders,
   isDisabled,
+  showClosePositionAction,
   navigateToMarketOrders,
 }: ElementProps) => {
   const dispatch = useDispatch();
@@ -81,17 +83,19 @@ export const PositionsActionsCell = ({
           isDisabled={isDisabled}
         />
       )}
-      <Styled.CloseButtonToggle
-        key="closepositions"
-        isToggle={true}
-        isPressed={
-          tradeBoxDialogType === TradeBoxDialogTypes.ClosePosition && currentMarketId === marketId
-        }
-        onPressedChange={onCloseButtonToggle}
-        iconName={IconName.Close}
-        shape={ButtonShape.Square}
-        isDisabled={isDisabled}
-      />
+      {showClosePositionAction && (
+        <Styled.CloseButtonToggle
+          key="closepositions"
+          isToggle={true}
+          isPressed={
+            tradeBoxDialogType === TradeBoxDialogTypes.ClosePosition && currentMarketId === marketId
+          }
+          onPressedChange={onCloseButtonToggle}
+          iconName={IconName.Close}
+          shape={ButtonShape.Square}
+          isDisabled={isDisabled}
+        />
+      )}
     </ActionsTableCell>
   );
 };

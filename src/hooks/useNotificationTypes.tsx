@@ -28,9 +28,11 @@ import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
+import { Output, OutputType } from '@/components/Output';
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
+import { TriggerOrderNotification } from '@/views/notifications/TriggerOrderNotification';
 
 import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
@@ -38,6 +40,7 @@ import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
+import { getTitleAndBodyForTriggerOrderNotification } from '@/lib/notifications';
 import { formatSeconds } from '@/lib/timeUtils';
 
 const parseStringParamsForNotification = ({
@@ -237,31 +240,86 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
   },
   {
+    type: NotificationType.TriggerOrder,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const { triggerOrderNotifications } = useLocalNotifications();
+
+      useEffect(() => {
+        for (const triggerOrder of triggerOrderNotifications) {
+          const { assetId, clientId, orderType, price, status, tickSizeDecimals, type } =
+            triggerOrder;
+
+          const assetIcon = <AssetIcon symbol={assetId} />;
+          const formattedPrice = (
+            <$Output value={price} type={OutputType.Fiat} fractionDigits={tickSizeDecimals} />
+          );
+
+          const { title, body } = getTitleAndBodyForTriggerOrderNotification({
+            notification: triggerOrder,
+            formattedPrice: formattedPrice,
+            stringGetter,
+          });
+
+          if (title && body) {
+            trigger(
+              `${type}-${clientId.toString()}`,
+              {
+                icon: assetIcon,
+                title: title,
+                body: body,
+                renderCustomBody: ({ isToast, notification }) => (
+                  <TriggerOrderNotification
+                    status={status}
+                    type={type}
+                    slotIcon={assetIcon}
+                    slotTitle={title}
+                    slotDescription={body}
+                    isToast={isToast}
+                    notification={notification}
+                  />
+                ),
+                toastSensitivity: 'foreground',
+                groupKey: NotificationType.TriggerOrder,
+              },
+              []
+            );
+          }
+        }
+      }, [triggerOrderNotifications, stringGetter]);
+    },
+    useNotificationAction: () => {
+      return () => {};
+    },
+  },
+  {
     type: NotificationType.ReleaseUpdates,
     useTrigger: ({ trigger }) => {
       const { chainTokenLabel } = useTokenConfigs();
       const stringGetter = useStringGetter();
-      const expirationDate = new Date('2024-03-08T23:59:59');
+      const expirationDate = new Date('2024-05-09T23:59:59');
       const currentDate = new Date();
 
       useEffect(() => {
         if (currentDate <= expirationDate) {
           trigger(
-            ReleaseUpdateNotificationIds.IncentivesS3,
+            ReleaseUpdateNotificationIds.IncentivesS4,
             {
               icon: <AssetIcon symbol={chainTokenLabel} />,
-              title: stringGetter({ key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.TITLE' }),
+              title: stringGetter({
+                key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.TITLE',
+                params: { SEASON_NUMBER: '4' },
+              }),
               body: stringGetter({
                 key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.BODY',
                 params: {
-                  SEASON_NUMBER: '3',
-                  PREV_SEASON_NUMBER: '1',
-                  DYDX_AMOUNT: '34',
-                  USDC_AMOUNT: '100',
+                  PREV_SEASON_NUMBER: '2',
+                  DYDX_AMOUNT: '16',
+                  USDC_AMOUNT: '50',
                 },
               }),
               toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.IncentivesS3,
+              groupKey: ReleaseUpdateNotificationIds.IncentivesS4,
             },
             []
           );
@@ -312,7 +370,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const navigate = useNavigate();
 
       return (notificationId: string) => {
-        if (notificationId === ReleaseUpdateNotificationIds.IncentivesS3) {
+        if (notificationId === ReleaseUpdateNotificationIds.IncentivesS4) {
           navigate(`${chainTokenLabel}/${TokenRoute.TradingRewards}`);
         } else if (notificationId === ReleaseUpdateNotificationIds.IncentivesDistributedS2) {
           navigate(`${chainTokenLabel}/${TokenRoute.StakingRewards}`);
@@ -360,4 +418,8 @@ const $Icon = styled.img`
 
 const $WarningIcon = styled(Icon)`
   color: var(--color-warning);
+`;
+
+const $Output = styled(Output)`
+  display: inline-block;
 `;

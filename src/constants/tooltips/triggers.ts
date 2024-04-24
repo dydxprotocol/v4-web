@@ -17,4 +17,8 @@ export const triggersTooltips: TooltipStrings = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.TAKE_PROFIT_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.TAKE_PROFIT_BODY }),
   }),
+  'unequal-order-sizes': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.UNEQUAL_ORDER_SIZES_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.UNEQUAL_ORDER_SIZES_BODY }),
+  }),
 } as const;

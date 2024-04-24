@@ -12,10 +12,11 @@ import {
   ORDER_SIDES,
   HistoricalTradingReward,
   HistoricalTradingRewardsPeriod,
+  AbacusOrderSide,
 } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
 
-import { getHydratedTradingData } from '@/lib/orders';
+import { getHydratedTradingData, isStopLossOrder, isTakeProfitOrder } from '@/lib/orders';
 import { getHydratedPositionData } from '@/lib/positions';
 
 import type { RootState } from './_store';
@@ -125,6 +126,29 @@ export const getSubaccountUnclearedOrders = createSelector(
 
 /**
  * @param state
+ * @returns Record of SubaccountOrders indexed by marketId
+ */
+export const getMarketOrders = (state: RootState): { [marketId: string]: SubaccountOrder[] } => {
+  const orders = getSubaccountUnclearedOrders(state);
+  return (orders ?? []).reduce((marketOrders, order) => {
+    marketOrders[order.marketId] ??= [];
+    marketOrders[order.marketId].push(order);
+    return marketOrders;
+  }, {} as { [marketId: string]: SubaccountOrder[] });
+};
+
+/**
+ * @param state
+ * @returns SubaccountOrders of the current market
+ */
+export const getCurrentMarketOrders = createSelector(
+  [getCurrentMarketId, getMarketOrders],
+  (currentMarketId, marketOrders): SubaccountOrder[] =>
+    !currentMarketId ? [] : marketOrders[currentMarketId]
+);
+
+/**
+ * @param state
  * @returns list of orders that have not been filled or cancelled
  */
 export const getSubaccountOpenOrders = createSelector([getSubaccountOrders], (orders) =>
@@ -132,6 +156,54 @@ export const getSubaccountOpenOrders = createSelector([getSubaccountOrders], (or
     (order) =>
       order.status !== AbacusOrderStatus.filled && order.status !== AbacusOrderStatus.cancelled
   )
+);
+
+/**
+ * @param state
+ * @returns Record of SubaccountOrders that have not been filled or cancelled, indexed by marketId
+ */
+export const getMarketSubaccountOpenOrders = (
+  state: RootState
+): {
+  [marketId: string]: SubaccountOrder[];
+} => {
+  const orders = getSubaccountOpenOrders(state);
+  return (orders ?? []).reduce((marketOrders, order) => {
+    marketOrders[order.marketId] ??= [];
+    marketOrders[order.marketId].push(order);
+    return marketOrders;
+  }, {} as { [marketId: string]: SubaccountOrder[] });
+};
+
+/**
+ * @param state
+ * @returns list of conditional orders that have not been filled or cancelled for all subaccount positions
+ */
+export const getSubaccountConditionalOrders = createSelector(
+  [getMarketSubaccountOpenOrders, getOpenPositions],
+  (openOrdersByMarketId, positions) => {
+    const stopLossOrders: SubaccountOrder[] = [];
+    const takeProfitOrders: SubaccountOrder[] = [];
+
+    positions?.forEach((position) => {
+      const orderSideForConditionalOrder =
+        position?.side?.current === AbacusPositionSide.LONG
+          ? AbacusOrderSide.sell
+          : AbacusOrderSide.buy;
+
+      const conditionalOrders = openOrdersByMarketId[position.id];
+
+      conditionalOrders?.forEach((order: SubaccountOrder) => {
+        if (order.side === orderSideForConditionalOrder && isStopLossOrder(order)) {
+          stopLossOrders.push(order);
+        } else if (order.side === orderSideForConditionalOrder && isTakeProfitOrder(order)) {
+          takeProfitOrders.push(order);
+        }
+      });
+    });
+
+    return { stopLossOrders, takeProfitOrders };
+  }
 );
 
 /**
@@ -192,29 +264,6 @@ export const getOrderDetails = (orderId: string) =>
         : undefined;
     }
   );
-
-/**
- * @param state
- * @returns Record of SubaccountOrders indexed by marketId
- */
-export const getMarketOrders = (state: RootState): { [marketId: string]: SubaccountOrder[] } => {
-  const orders = getSubaccountUnclearedOrders(state);
-  return (orders ?? []).reduce((marketOrders, order) => {
-    marketOrders[order.marketId] ??= [];
-    marketOrders[order.marketId].push(order);
-    return marketOrders;
-  }, {} as { [marketId: string]: SubaccountOrder[] });
-};
-
-/**
- * @param state
- * @returns SubaccountOrders of the current market
- */
-export const getCurrentMarketOrders = createSelector(
-  [getCurrentMarketId, getMarketOrders],
-  (currentMarketId, marketOrders): SubaccountOrder[] =>
-    !currentMarketId ? [] : marketOrders[currentMarketId]
-);
 
 /**
  * @param state

@@ -13,7 +13,7 @@ import {
   POSITION_SIDES,
 } from '@/constants/abacus';
 import { StringGetterFunction, STRING_KEYS } from '@/constants/localization';
-import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { NumberSign, TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { AppRoute } from '@/constants/routes';
 import { PositionSide } from '@/constants/trade';
 
@@ -33,12 +33,11 @@ import { TableCell } from '@/components/Table/TableCell';
 import { TagSize } from '@/components/Tag';
 
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-import { getExistingOpenPositions, getSubaccountOpenOrders } from '@/state/accountSelectors';
+import { getExistingOpenPositions, getSubaccountConditionalOrders } from '@/state/accountSelectors';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
-import { MustBigNumber } from '@/lib/numbers';
-import { isStopLossOrder, isTakeProfitOrder } from '@/lib/orders';
+import { MustBigNumber, getNumberSign } from '@/lib/numbers';
 
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
@@ -58,6 +57,7 @@ export enum PositionsTableColumnKey {
   UnrealizedPnl = 'UnrealizedPnl',
   RealizedPnl = 'RealizedPnl',
   AverageOpenAndClose = 'AverageOpenAndClose',
+  NetFunding = 'NetFunding',
   Triggers = 'Triggers',
   Actions = 'Actions',
 }
@@ -75,12 +75,14 @@ const getPositionsTableColumnDef = ({
   stringGetter,
   width,
   isAccountViewOnly,
+  showClosePositionAction,
   navigateToOrders,
 }: {
   key: PositionsTableColumnKey;
   stringGetter: StringGetterFunction;
   width?: ColumnSize;
   isAccountViewOnly: boolean;
+  showClosePositionAction: boolean;
   navigateToOrders: (market: string) => void;
 }) => ({
   width,
@@ -90,7 +92,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'details',
         getCellValue: (row) => row.id,
         label: stringGetter({ key: STRING_KEYS.DETAILS }),
-        renderCell: ({ id, asset, leverage, resources, size }) => (
+        renderCell: ({ asset, leverage, resources, size }) => (
           <TableCell stacked slotLeft={<Styled.AssetIcon symbol={asset?.id} />}>
             <Styled.HighlightOutput
               type={OutputType.Asset}
@@ -140,7 +142,7 @@ const getPositionsTableColumnDef = ({
         renderCell: ({ unrealizedPnl, unrealizedPnlPercent }) => (
           <TableCell stacked>
             <Styled.OutputSigned
-              isNegative={MustBigNumber(unrealizedPnlPercent?.current).isNegative()}
+              sign={getNumberSign(unrealizedPnlPercent?.current)}
               type={OutputType.Percent}
               value={unrealizedPnlPercent?.current}
               showSign={ShowSign.None}
@@ -241,7 +243,7 @@ const getPositionsTableColumnDef = ({
         renderCell: ({ unrealizedPnl, unrealizedPnlPercent }) => (
           <TableCell stacked>
             <Styled.OutputSigned
-              isNegative={MustBigNumber(unrealizedPnl?.current).isNegative()}
+              sign={getNumberSign(unrealizedPnl?.current)}
               type={OutputType.Fiat}
               value={unrealizedPnl?.current}
             />
@@ -257,7 +259,7 @@ const getPositionsTableColumnDef = ({
         renderCell: ({ realizedPnl, realizedPnlPercent }) => (
           <TableCell stacked>
             <Styled.OutputSigned
-              isNegative={MustBigNumber(realizedPnl?.current).isNegative()}
+              sign={getNumberSign(realizedPnl?.current)}
               type={OutputType.Fiat}
               value={realizedPnl?.current}
               showSign={ShowSign.Negative}
@@ -270,7 +272,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'entryExitPrice',
         getCellValue: (row) => row.entryPrice?.current,
         label: stringGetter({ key: STRING_KEYS.AVERAGE_OPEN_CLOSE }),
-        hideOnBreakpoint: MediaQueryKeys.isDesktopSmall,
+        hideOnBreakpoint: MediaQueryKeys.isTablet,
         renderCell: ({ entryPrice, exitPrice, tickSizeDecimals }) => (
           <TableCell stacked>
             <Output
@@ -279,6 +281,21 @@ const getPositionsTableColumnDef = ({
               fractionDigits={tickSizeDecimals}
             />
             <Output type={OutputType.Fiat} value={exitPrice} fractionDigits={tickSizeDecimals} />
+          </TableCell>
+        ),
+      },
+      [PositionsTableColumnKey.NetFunding]: {
+        columnKey: 'netFunding',
+        getCellValue: (row) => row.netFunding,
+        label: stringGetter({ key: STRING_KEYS.NET_FUNDING }),
+        hideOnBreakpoint: MediaQueryKeys.isTablet,
+        renderCell: ({ netFunding }) => (
+          <TableCell>
+            <Styled.OutputSigned
+              sign={getNumberSign(netFunding)}
+              type={OutputType.Fiat}
+              value={netFunding}
+            />
           </TableCell>
         ),
       },
@@ -291,6 +308,7 @@ const getPositionsTableColumnDef = ({
         renderCell: ({
           id,
           assetId,
+          tickSizeDecimals,
           liquidationPrice,
           side,
           size,
@@ -300,6 +318,7 @@ const getPositionsTableColumnDef = ({
           <PositionsTriggersCell
             marketId={id}
             assetId={assetId}
+            tickSizeDecimals={tickSizeDecimals}
             liquidationPrice={liquidationPrice?.current}
             stopLossOrders={stopLossOrders}
             takeProfitOrders={takeProfitOrders}
@@ -321,6 +340,7 @@ const getPositionsTableColumnDef = ({
             marketId={id}
             assetId={assetId}
             isDisabled={isAccountViewOnly}
+            showClosePositionAction={showClosePositionAction}
             stopLossOrders={stopLossOrders}
             takeProfitOrders={takeProfitOrders}
             navigateToMarketOrders={navigateToOrders}
@@ -336,6 +356,7 @@ type ElementProps = {
   columnWidths?: Partial<Record<PositionsTableColumnKey, ColumnSize>>;
   currentRoute?: string;
   currentMarket?: string;
+  showClosePositionAction: boolean;
   onNavigate?: () => void;
   navigateToOrders: (market: string) => void;
 };
@@ -350,6 +371,7 @@ export const PositionsTable = ({
   columnWidths,
   currentRoute,
   currentMarket,
+  showClosePositionAction,
   onNavigate,
   navigateToOrders,
   withGradientCardRows,
@@ -361,35 +383,41 @@ export const PositionsTable = ({
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
   const perpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
   const assets = useSelector(getAssets, shallowEqual) || {};
-  const openOrders = useSelector(getSubaccountOpenOrders, shallowEqual) || [];
 
   const openPositions = useSelector(getExistingOpenPositions, shallowEqual) || [];
   const marketPosition = openPositions.find((position) => position.id == currentMarket);
   const positions = currentMarket ? (marketPosition ? [marketPosition] : []) : openPositions;
 
-  const stopLossOrders: SubaccountOrder[] = [];
-  const takeProfitOrders: SubaccountOrder[] = [];
-
-  openOrders.map((order: SubaccountOrder) => {
-    if (isStopLossOrder(order)) {
-      stopLossOrders.push(order);
-    } else if (isTakeProfitOrder(order)) {
-      takeProfitOrders.push(order);
+  const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } = useSelector(
+    getSubaccountConditionalOrders,
+    {
+      equalityFn: (oldVal, newVal) => {
+        return (
+          shallowEqual(oldVal.stopLossOrders, newVal.stopLossOrders) &&
+          shallowEqual(oldVal.takeProfitOrders, newVal.takeProfitOrders)
+        );
+      },
     }
-  });
+  );
 
   const positionsData = useMemo(
     () =>
-      positions.map((position: SubaccountPosition) => ({
-        tickSizeDecimals:
-          perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
-        asset: assets?.[position.assetId],
-        oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
-        stopLossOrders: stopLossOrders.filter((order) => order.marketId === position.id),
-        takeProfitOrders: takeProfitOrders.filter((order) => order.marketId === position.id),
-        ...position,
-      })),
-    [positions, perpetualMarkets, assets, openOrders]
+      positions.map((position: SubaccountPosition) => {
+        return {
+          tickSizeDecimals:
+            perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
+          asset: assets?.[position.assetId],
+          oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
+          stopLossOrders: allStopLossOrders.filter(
+            (order: SubaccountOrder) => order.marketId === position.id
+          ),
+          takeProfitOrders: allTakeProfitOrders.filter(
+            (order: SubaccountOrder) => order.marketId === position.id
+          ),
+          ...position,
+        };
+      }),
+    [positions, perpetualMarkets, assets, allStopLossOrders, allTakeProfitOrders]
   );
 
   return (
@@ -407,6 +435,7 @@ export const PositionsTable = ({
           stringGetter,
           width: columnWidths?.[key],
           isAccountViewOnly,
+          showClosePositionAction,
           navigateToOrders,
         })
       )}
@@ -481,8 +510,13 @@ Styled.SecondaryColor = styled.span`
   color: var(--color-text-0);
 `;
 
-Styled.OutputSigned = styled(Output)<{ isNegative?: boolean }>`
-  color: ${({ isNegative }) => (isNegative ? `var(--color-negative)` : `var(--color-positive)`)};
+Styled.OutputSigned = styled(Output)<{ sign: NumberSign }>`
+  color: ${({ sign }) =>
+    ({
+      [NumberSign.Positive]: `var(--color-positive)`,
+      [NumberSign.Negative]: `var(--color-negative)`,
+      [NumberSign.Neutral]: `var(--color-text-2)`,
+    }[sign])};
 `;
 
 Styled.HighlightOutput = styled(Output)<{ isNegative?: boolean }>`

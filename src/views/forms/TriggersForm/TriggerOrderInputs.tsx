@@ -2,10 +2,14 @@ import { useState } from 'react';
 
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { type SubaccountOrder } from '@/constants/abacus';
-import { ButtonAction } from '@/constants/buttons';
+import {
+  TriggerOrdersInputPrice,
+  type TriggerOrdersInputFields,
+  Nullable,
+} from '@/constants/abacus';
+import { ButtonAction, ButtonType, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { PERCENT_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { NumberSign, PERCENT_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter } from '@/hooks';
 
@@ -16,20 +20,35 @@ import { DropdownSelectMenu } from '@/components/DropdownSelectMenu';
 import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
+import { Output, OutputType, ShowSign } from '@/components/Output';
+import { VerticalSeparator } from '@/components/Separator';
 import { Tag } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import abacusStateManager from '@/lib/abacus';
+import { MustBigNumber, getNumberSign } from '@/lib/numbers';
+
 type InputChangeType = InputType.Currency | InputType.Percent;
+
+type InputOrderFields = {
+  triggerPriceField: TriggerOrdersInputFields;
+  percentDiffField: TriggerOrdersInputFields;
+  usdcDiffField: TriggerOrdersInputFields;
+};
 
 type ElementProps = {
   symbol: string;
   tooltipId: string;
   stringKeys: {
     header: string;
+    headerDiff: string;
     price: string;
     output: string;
   };
-  orders: SubaccountOrder[];
+  inputOrderFields: InputOrderFields;
+  isMultiple: boolean;
+  isNegativeDiff: boolean;
+  price: Nullable<TriggerOrdersInputPrice>;
   tickSizeDecimals?: number;
   onViewOrdersClick: () => void;
 };
@@ -38,13 +57,75 @@ export const TriggerOrderInputs = ({
   symbol,
   tooltipId,
   stringKeys,
-  orders,
+  inputOrderFields,
+  isMultiple,
+  isNegativeDiff,
+  price,
   tickSizeDecimals,
   onViewOrdersClick,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
 
   const [inputType, setInputType] = useState<InputChangeType>(InputType.Percent);
+
+  const { triggerPrice, percentDiff, usdcDiff } = price ?? {};
+
+  const clearPriceInputFields = () => {
+    abacusStateManager.setTriggerOrdersValue({
+      value: null,
+      field: inputOrderFields.triggerPriceField,
+    });
+    abacusStateManager.setTriggerOrdersValue({
+      value: null,
+      field: inputOrderFields.percentDiffField,
+    });
+    abacusStateManager.setTriggerOrdersValue({
+      value: null,
+      field: inputOrderFields.usdcDiffField,
+    });
+  };
+
+  const onTriggerPriceInput = ({
+    floatValue,
+    formattedValue,
+  }: {
+    floatValue?: number;
+    formattedValue: string;
+  }) => {
+    const newPrice = MustBigNumber(floatValue).toFixed(tickSizeDecimals ?? USD_DECIMALS);
+    abacusStateManager.setTriggerOrdersValue({
+      value: formattedValue === '' || newPrice === 'NaN' ? null : newPrice,
+      field: inputOrderFields.triggerPriceField,
+    });
+  };
+
+  const onPercentageDiffInput = ({
+    floatValue,
+    formattedValue,
+  }: {
+    floatValue?: number;
+    formattedValue: string;
+  }) => {
+    const newPercentage = MustBigNumber(floatValue).toFixed(PERCENT_DECIMALS);
+    abacusStateManager.setTriggerOrdersValue({
+      value: formattedValue === '' || newPercentage === 'NaN' ? null : newPercentage,
+      field: inputOrderFields.percentDiffField,
+    });
+  };
+
+  const onUsdcDiffInput = ({
+    floatValue,
+    formattedValue,
+  }: {
+    floatValue?: number;
+    formattedValue: string;
+  }) => {
+    const newAmount = MustBigNumber(floatValue).toFixed(tickSizeDecimals ?? USD_DECIMALS);
+    abacusStateManager.setTriggerOrdersValue({
+      value: formattedValue === '' || newAmount === 'NaN' ? null : newAmount,
+      field: inputOrderFields.usdcDiffField,
+    });
+  };
 
   const getDecimalsForInputType = (inputType: InputChangeType) => {
     switch (inputType) {
@@ -53,6 +134,32 @@ export const TriggerOrderInputs = ({
       case InputType.Percent:
         return PERCENT_DECIMALS;
     }
+  };
+
+  const getOutputDiffData = () => {
+    const formattedPercentDiff = percentDiff
+      ? MustBigNumber(percentDiff).div(100).toNumber()
+      : null;
+
+    const outputType = inputType === InputType.Percent ? OutputType.Fiat : OutputType.Percent;
+    const value = outputType === OutputType.Fiat ? usdcDiff : formattedPercentDiff;
+
+    return {
+      outputType,
+      outputValue: value && isNegativeDiff ? value * -1 : value,
+    };
+  };
+
+  const signedOutput = () => {
+    const { outputType, outputValue } = getOutputDiffData();
+    return (
+      <Styled.SignedOutput
+        sign={getNumberSign(outputValue)}
+        showSign={ShowSign.Both}
+        type={outputType}
+        value={outputValue}
+      />
+    );
   };
 
   const priceDiffSelector = ({
@@ -88,46 +195,106 @@ export const TriggerOrderInputs = ({
     </Styled.MultipleOrdersContainer>
   );
 
-  return (
+  const headerTooltip = () => (
+    <WithTooltip tooltip={tooltipId}>{stringGetter({ key: stringKeys.header })}</WithTooltip>
+  );
+
+  return isMultiple ? (
     <Styled.TriggerRow key={tooltipId}>
-      <WithTooltip tooltip={tooltipId}>
-        <h3>{stringGetter({ key: stringKeys.header })}</h3>
-      </WithTooltip>
+      <Styled.Heading>{headerTooltip()}</Styled.Heading>
+      <Styled.InlineRow>{multipleOrdersButton()}</Styled.InlineRow>
+    </Styled.TriggerRow>
+  ) : (
+    <Styled.TriggerRow key={tooltipId}>
+      <Styled.Heading>
+        {headerTooltip()}
+        <Styled.HeadingInfo>
+          {stringGetter({ key: stringKeys.headerDiff })}
+          {signedOutput()}
+          <Styled.VerticalSeparator />
+          <Styled.ClearButton
+            action={ButtonAction.Destroy}
+            size={ButtonSize.Base}
+            type={ButtonType.Button}
+            onClick={clearPriceInputFields}
+          >
+            {stringGetter({ key: STRING_KEYS.CLEAR })}
+          </Styled.ClearButton>
+        </Styled.HeadingInfo>
+      </Styled.Heading>
       <Styled.InlineRow>
-        {orders.length > 1 ? (
-          multipleOrdersButton()
-        ) : (
-          <>
-            {/* TODO: CT-625 Update with values from abacus */}
-            <FormInput
-              id={`${tooltipId}-price`}
-              label={
-                <>
-                  {stringGetter({ key: stringKeys.price })} {<Tag>{symbol}</Tag>}
-                </>
-              }
-              type={InputType.Currency}
-              decimals={tickSizeDecimals}
-              value={orders.length === 1 ? orders[0].triggerPrice : null}
-            />
-            <FormInput
-              id={`${tooltipId}-priceDiff`}
-              label={stringGetter({ key: stringKeys.output })}
-              decimals={getDecimalsForInputType(inputType)}
-              type={InputType.Number}
-              slotRight={priceDiffSelector({
-                value: inputType,
-                onValueChange: (value: InputChangeType) => setInputType(value),
-              })}
-            />
-          </>
-        )}
+        <FormInput
+          id={`${tooltipId}-price`}
+          label={
+            <>
+              {stringGetter({ key: stringKeys.price })} <Tag>{symbol}</Tag>
+            </>
+          }
+          type={InputType.Currency}
+          decimals={tickSizeDecimals}
+          value={triggerPrice}
+          onInput={onTriggerPriceInput}
+          allowNegative={true}
+        />
+        <FormInput
+          id={`${tooltipId}-priceDiff`}
+          label={stringGetter({ key: stringKeys.output })}
+          decimals={getDecimalsForInputType(inputType)}
+          type={inputType}
+          slotRight={priceDiffSelector({
+            value: inputType,
+            onValueChange: (value: InputChangeType) => setInputType(value),
+          })}
+          value={
+            inputType === InputType.Percent
+              ? percentDiff
+                ? MustBigNumber(percentDiff).toFixed(PERCENT_DECIMALS)
+                : null
+              : usdcDiff
+          }
+          onInput={inputType === InputType.Percent ? onPercentageDiffInput : onUsdcDiffInput}
+          allowNegative={true}
+        />
       </Styled.InlineRow>
     </Styled.TriggerRow>
   );
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
+
+Styled.Heading = styled.div`
+  ${layoutMixins.spacedRow}
+`;
+
+Styled.HeadingInfo = styled.div`
+  ${layoutMixins.row}
+  font: var(--font-base-book);
+  gap: 0.5em;
+  color: var(--color-text-0);
+`;
+
+Styled.SignedOutput = styled(Output)<{ sign: NumberSign }>`
+  color: ${({ sign }) =>
+    ({
+      [NumberSign.Positive]: `var(--color-positive)`,
+      [NumberSign.Negative]: `var(--color-negative)`,
+      [NumberSign.Neutral]: `var(--color-text-2)`,
+    }[sign])};
+`;
+
+Styled.VerticalSeparator = styled(VerticalSeparator)`
+  && {
+    height: 1.5rem;
+  }
+`;
+
+Styled.ClearButton = styled(Button)`
+  --button-backgroundColor: transparent;
+  --button-border: none;
+  --button-height: 1.5rem;
+  --button-textColor: var(--color-red);
+  --button-padding: 0;
+`;
 
 Styled.TriggerRow = styled.div`
   ${layoutMixins.column}

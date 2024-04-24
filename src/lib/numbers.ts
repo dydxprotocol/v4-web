@@ -1,5 +1,7 @@
 import { BigNumber } from 'bignumber.js';
 
+import { NumberSign } from '@/constants/numbers';
+
 export type BigNumberish = BigNumber | string | number;
 export type LocaleSeparators = { group?: string; decimal?: string };
 
@@ -80,3 +82,10 @@ export function bytesToBigInt(u: Uint8Array): bigint {
   const abs: bigint = BigInt(`0x${hex}`);
   return negated ? -abs : abs;
 }
+
+export const getNumberSign = (n: any): NumberSign =>
+  MustBigNumber(n).gt(0)
+    ? NumberSign.Positive
+    : MustBigNumber(n).lt(0)
+    ? NumberSign.Negative
+    : NumberSign.Neutral;

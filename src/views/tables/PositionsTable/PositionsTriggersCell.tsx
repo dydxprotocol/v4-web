@@ -7,10 +7,9 @@ import {
   type AbacusPositionSides,
   type SubaccountOrder,
 } from '@/constants/abacus';
-import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { TimeInForceOptions } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks';
 
@@ -23,11 +22,12 @@ import { WithHovercard } from '@/components/WithHovercard';
 
 import { openDialog } from '@/state/dialogs';
 
-import { isMarketOrderType, isStopLossOrder } from '@/lib/orders';
+import { isStopLossOrder } from '@/lib/orders';
 
 type ElementProps = {
   marketId: string;
   assetId: string;
+  tickSizeDecimals: number;
   liquidationPrice: Nullable<number>;
   stopLossOrders: SubaccountOrder[];
   takeProfitOrders: SubaccountOrder[];
@@ -40,24 +40,29 @@ type ElementProps = {
 export const PositionsTriggersCell = ({
   marketId,
   assetId,
+  tickSizeDecimals,
   liquidationPrice,
   stopLossOrders,
   takeProfitOrders,
   onViewOrdersClick,
   positionSide,
   positionSize,
-  isDisabled, // TODO: CT-656 Disable onViewOrdersClick behavior when isDisabled
+  isDisabled,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
+
+  const onViewOrders = isDisabled ? null : () => onViewOrdersClick(marketId);
 
   const showLiquidationWarning = (order: SubaccountOrder) => {
     if (!isStopLossOrder(order) || !liquidationPrice) {
       return false;
     }
     return (
-      (positionSide === AbacusPositionSide.SHORT && order.price > liquidationPrice) ||
-      (positionSide === AbacusPositionSide.LONG && order.price < liquidationPrice)
+      (positionSide === AbacusPositionSide.SHORT &&
+        (order.triggerPrice ?? order.price) > liquidationPrice) ||
+      (positionSide === AbacusPositionSide.LONG &&
+        (order.triggerPrice ?? order.price) < liquidationPrice)
     );
   };
 
@@ -70,18 +75,14 @@ export const PositionsTriggersCell = ({
           assetId,
           stopLossOrders,
           takeProfitOrders,
-          navigateToMarketOrders: () => onViewOrdersClick(marketId),
+          navigateToMarketOrders: onViewOrders,
         },
       })
     );
   };
 
   const viewOrdersButton = (
-    <Styled.Button
-      action={ButtonAction.Navigation}
-      size={ButtonSize.XSmall}
-      onClick={() => onViewOrdersClick(marketId)}
-    >
+    <Styled.Button action={ButtonAction.Navigation} size={ButtonSize.XSmall} onClick={onViewOrders}>
       {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
       {<Styled.ArrowIcon iconName={IconName.Arrow} />}
     </Styled.Button>
@@ -129,50 +130,48 @@ export const PositionsTriggersCell = ({
 
     if (orders.length === 1) {
       const order = orders[0];
-      const { price, size, triggerPrice, timeInForce, type } = order;
+      const { size, triggerPrice } = order;
 
-      const shouldRenderValue =
-        timeInForce?.name === TimeInForceOptions.IOC &&
-        (isMarketOrderType(type) || price === triggerPrice);
+      const isPartialPosition = !!(positionSize && Math.abs(size) < Math.abs(positionSize));
+      const liquidationWarningSide = showLiquidationWarning(order) ? positionSide : undefined;
 
-      if (shouldRenderValue) {
-        const isPartialPosition = !!(positionSize && Math.abs(size) < Math.abs(positionSize));
-        const liquidationWarningSide = showLiquidationWarning(order) ? positionSide : undefined;
-
-        return (
-          <>
-            {triggerLabel({ liquidationWarningSide })}
-            <Styled.Output type={OutputType.Fiat} value={triggerPrice} />
-            {isPartialPosition && (
-              <WithHovercard
-                align="end"
-                side="top"
-                hovercard={
-                  isStopLossOrder(order) ? 'partial-close-stop-loss' : 'partial-close-take-profit'
-                }
-                slotButton={
-                  <Button
-                    action={ButtonAction.Primary}
-                    size={ButtonSize.Small}
-                    onClick={openTriggersDialog}
-                  >
-                    {stringGetter({
-                      key: isStopLossOrder(order)
-                        ? STRING_KEYS.EDIT_STOP_LOSS
-                        : STRING_KEYS.EDIT_STOP_LOSS, // TODO: CT-704 update to EDIT_TAKE_PROFIT
-                    })}
-                  </Button>
-                }
-                slotTrigger={
-                  <Styled.PartialFillIcon>
-                    <Icon iconName={IconName.PositionPartial} />
-                  </Styled.PartialFillIcon>
-                }
-              />
-            )}
-          </>
-        );
-      }
+      return (
+        <>
+          {triggerLabel({ liquidationWarningSide })}
+          <Styled.Output
+            type={OutputType.Fiat}
+            value={triggerPrice}
+            fractionDigits={tickSizeDecimals}
+          />
+          {isPartialPosition && (
+            <WithHovercard
+              align="end"
+              side="top"
+              hovercard={
+                isStopLossOrder(order) ? 'partial-close-stop-loss' : 'partial-close-take-profit'
+              }
+              slotButton={
+                <Button
+                  action={ButtonAction.Primary}
+                  size={ButtonSize.Small}
+                  onClick={openTriggersDialog}
+                >
+                  {stringGetter({
+                    key: isStopLossOrder(order)
+                      ? STRING_KEYS.EDIT_STOP_LOSS
+                      : STRING_KEYS.EDIT_TAKE_PROFIT,
+                  })}
+                </Button>
+              }
+              slotTrigger={
+                <Styled.PartialFillIcon>
+                  <Icon iconName={IconName.PositionPartial} />
+                </Styled.PartialFillIcon>
+              }
+            />
+          )}
+        </>
+      );
     }
 
     return (
@@ -182,6 +181,7 @@ export const PositionsTriggersCell = ({
       </>
     );
   };
+
   return (
     <Styled.Cell>
       <Styled.Row>{renderOutput({ label: 'TP', orders: takeProfitOrders })}</Styled.Row>

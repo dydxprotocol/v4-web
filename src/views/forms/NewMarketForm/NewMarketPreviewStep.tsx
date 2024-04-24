@@ -2,6 +2,7 @@ import { FormEvent, useMemo, useState } from 'react';
 
 import type { IndexedTx } from '@cosmjs/stargate';
 import { encodeJson } from '@dydxprotocol/v4-client-js';
+import { PerpetualMarketType } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
 import Long from 'long';
 import { useDispatch } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
@@ -42,6 +43,7 @@ import { openDialog } from '@/state/dialogs';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
+import { testFlags } from '@/lib/testFlags';
 
 type NewMarketPreviewStepProps = {
   assetData: NewMarketProposal;
@@ -84,6 +86,7 @@ export const NewMarketPreviewStep = ({
   const {
     ticker,
     priceExponent,
+    marketType,
     minExchanges,
     minPriceChange,
     exchangeConfigJson,
@@ -149,6 +152,12 @@ export const NewMarketPreviewStep = ({
               atomicResolution,
               liquidityTier,
               quantumConversionExponent,
+              // @ts-ignore - marketType is not required until v5
+              marketType: testFlags.withNewMarketType
+                ? marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
+                  ? PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED
+                  : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS
+                : undefined,
               stepBaseQuantums: Long.fromNumber(stepBaseQuantums),
               subticksPerTick,
               delayBlocks: newMarketProposal.delayBlocks,

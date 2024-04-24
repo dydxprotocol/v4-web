@@ -12,6 +12,7 @@ import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/Position
 
 import {
   calculateShouldRenderTriggersInPositionsTable,
+  calculateShouldRenderActionsInPositionsTable,
 } from '@/state/accountCalculators';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -22,9 +23,10 @@ export const Positions = () => {
   const { isTablet, isNotTablet } = useBreakpoints();
   const navigate = useNavigate();
 
+  const showClosePositionAction = false;
+
   const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
-  // TODO: CT-503
-  // const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable);
+  const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable(showClosePositionAction));
 
   return (
     <AttachedExpandingSection>
@@ -48,13 +50,14 @@ export const Positions = () => {
                 PositionsTableColumnKey.UnrealizedPnl,
                 PositionsTableColumnKey.RealizedPnl,
                 PositionsTableColumnKey.AverageOpenAndClose,
+                PositionsTableColumnKey.NetFunding,
                 shouldRenderTriggers && PositionsTableColumnKey.Triggers,
-                // TODO: CT-503 re-enable when close positions dialog is created
-                // shouldRenderActions && PositionsTableColumnKey.Actions,
+                shouldRenderActions && PositionsTableColumnKey.Actions,
               ].filter(isTruthy)
         }
         currentRoute={`${AppRoute.Portfolio}/${PortfolioRoute.Positions}`}
         withOuterBorder={isNotTablet}
+        showClosePositionAction={showClosePositionAction}
         navigateToOrders={() =>
           navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
             state: { from: AppRoute.Portfolio },
