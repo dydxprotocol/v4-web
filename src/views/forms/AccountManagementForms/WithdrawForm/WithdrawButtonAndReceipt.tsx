@@ -64,10 +64,10 @@ export const WithdrawButtonAndReceipt = ({
     {
       key: 'expected-amount-received',
       label: (
-        <span>
-          {stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED })}{' '}
+        <Styled.RowWithGap>
+          {stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED })}
           {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
-        </span>
+        </Styled.RowWithGap>
       ),
       value: (
         <Output type={OutputType.Asset} value={summary?.toAmount} fractionDigits={TOKEN_DECIMALS} />
@@ -76,10 +76,10 @@ export const WithdrawButtonAndReceipt = ({
     {
       key: 'minimum-amount-received',
       label: (
-        <span>
-          {stringGetter({ key: STRING_KEYS.MINIMUM_AMOUNT_RECEIVED })}{' '}
+        <Styled.RowWithGap>
+          {stringGetter({ key: STRING_KEYS.MINIMUM_AMOUNT_RECEIVED })}
           {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
-        </span>
+        </Styled.RowWithGap>
       ),
       value: (
         <Output
@@ -94,7 +94,7 @@ export const WithdrawButtonAndReceipt = ({
       key: 'exchange-rate',
       label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
       value: withdrawToken && typeof summary?.exchangeRate === 'number' && (
-        <Styled.ExchangeRate>
+        <Styled.RowWithGap>
           <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={usdcLabel} />
           =
           <Output
@@ -102,7 +102,7 @@ export const WithdrawButtonAndReceipt = ({
             value={summary?.exchangeRate}
             tag={withdrawToken?.symbol}
           />
-        </Styled.ExchangeRate>
+        </Styled.RowWithGap>
       ),
     },
     typeof summary?.gasFee === 'number' && {
@@ -203,7 +203,7 @@ Styled.DiffOutput = styled(DiffOutput)`
   --diffOutput-valueWithDiff-fontSize: 1em;
 `;
 
-Styled.ExchangeRate = styled.span`
+Styled.RowWithGap = styled.span`
   ${layoutMixins.row}
   gap: 0.5ch;
 `;
