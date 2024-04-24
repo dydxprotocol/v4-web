@@ -329,9 +329,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
         }
       }, [stringGetter]);
 
-      /**
-       * @description Re-use for future Season 3 rewards distribution
-       **/
       const { dydxAddress } = useAccounts();
       const { data, status } = useQueryChaosLabsIncentives({
         dydxAddress,
