@@ -477,7 +477,7 @@ export const WithdrawForm = () => {
         USDC withdrawals to&#32;
         <WithTooltip
           tooltipString={`USDC withdrawals on ${CCTP_TOKEN_NAMES_CAPITALIZED.join(
-            ','
+            ', '
           )} have the lowest fees`}
         >
           select chains
