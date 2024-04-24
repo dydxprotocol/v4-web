@@ -1,11 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
-import { formatUnits } from 'viem';
 
 import { TransferInputTokenResource } from '@/constants/abacus';
-import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 
@@ -15,9 +14,8 @@ import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
-import { Details, DetailsItem } from '@/components/Details';
+import { Details } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
-import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
@@ -48,13 +46,11 @@ export const WithdrawButtonAndReceipt = ({
   setSlippage,
 
   slippage,
-  withdrawChain,
   withdrawToken,
 
   isDisabled,
   isLoading,
 }: ElementProps) => {
-  const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
   const [isEditingSlippage, setIsEditingSlipapge] = useState(false);
   const stringGetter = useStringGetter();
 
@@ -179,7 +175,7 @@ export const WithdrawButtonAndReceipt = ({
     <Styled.WithReceipt
       slotReceipt={
         <Styled.CollapsibleDetails>
-          <Styled.Details showSubitems={showFeeBreakdown} items={submitButtonReceipt} />
+          <Styled.Details items={submitButtonReceipt} />
         </Styled.CollapsibleDetails>
       }
     >
