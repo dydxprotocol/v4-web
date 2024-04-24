@@ -82,7 +82,6 @@ type ElementProps = {
   currentStep?: MobilePlaceOrderSteps;
   setCurrentStep?: (step: MobilePlaceOrderSteps) => void;
   onConfirm?: () => void;
-  setCurrentTradeType: (tradeType: TradeTypes) => void;
 };
 
 type StyleProps = {
@@ -93,7 +92,6 @@ export const TradeForm = ({
   currentStep,
   setCurrentStep,
   onConfirm,
-  setCurrentTradeType,
   className,
 }: ElementProps & StyleProps) => {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
@@ -397,22 +395,18 @@ export const TradeForm = ({
 
               {alertContent && (
                 <AlertMessage type={alertType}>
-                  {shouldPromptUserToPlaceLimitOrder ? (
-                    <Styled.MessageWithPrompt>
-                      {alertContent}
-                      {
-                        <Styled.IconButton
-                          iconName={IconName.Arrow}
-                          shape={ButtonShape.Circle}
-                          action={ButtonAction.Navigation}
-                          size={ButtonSize.XSmall}
-                          onClick={() => setCurrentTradeType(TradeTypes.LIMIT)}
-                        ></Styled.IconButton>
-                      }
-                    </Styled.MessageWithPrompt>
-                  ) : (
-                    alertContent
-                  )}
+                  <Styled.Message>
+                    {alertContent}
+                    {shouldPromptUserToPlaceLimitOrder && (
+                      <Styled.IconButton
+                        iconName={IconName.Arrow}
+                        shape={ButtonShape.Circle}
+                        action={ButtonAction.Navigation}
+                        size={ButtonSize.XSmall}
+                        onClick={() => onTradeTypeChange(TradeTypes.LIMIT)}
+                      ></Styled.IconButton>
+                    )}
+                  </Styled.Message>
                 </AlertMessage>
               )}
             </Styled.InputsColumn>
@@ -600,7 +594,7 @@ Styled.InputsColumn = styled.div`
   ${formMixins.inputsColumn}
 `;
 
-Styled.MessageWithPrompt = styled.div`
+Styled.Message = styled.div`
   ${layoutMixins.row}
   gap: 0.75rem;
 `;
