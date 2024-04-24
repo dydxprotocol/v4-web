@@ -404,7 +404,7 @@ export const TradeForm = ({
                         action={ButtonAction.Navigation}
                         size={ButtonSize.XSmall}
                         onClick={() => onTradeTypeChange(TradeTypes.LIMIT)}
-                      ></Styled.IconButton>
+                      />
                     )}
                   </Styled.Message>
                 </AlertMessage>
