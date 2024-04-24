@@ -80,7 +80,7 @@ export const TradeBoxOrderView = () => {
       onValueChange={onTradeTypeChange}
       sharedContent={
         <Styled.Container>
-          <TradeForm />
+          <TradeForm setCurrentTradeType={onTradeTypeChange} />
         </Styled.Container>
       }
       fullWidthTabs

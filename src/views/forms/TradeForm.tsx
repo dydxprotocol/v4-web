@@ -38,6 +38,7 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 import { InputType } from '@/components/Input';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
@@ -81,6 +82,7 @@ type ElementProps = {
   currentStep?: MobilePlaceOrderSteps;
   setCurrentStep?: (step: MobilePlaceOrderSteps) => void;
   onConfirm?: () => void;
+  setCurrentTradeType: (tradeType: TradeTypes) => void;
 };
 
 type StyleProps = {
@@ -91,6 +93,7 @@ export const TradeForm = ({
   currentStep,
   setCurrentStep,
   onConfirm,
+  setCurrentTradeType,
   className,
 }: ElementProps & StyleProps) => {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
@@ -185,6 +188,10 @@ export const TradeForm = ({
     alertContent = inputAlert?.alertString;
     alertType = inputAlert?.type;
   }
+
+  const isLiquidationError = ['MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE'].some(
+    (errorCode) => inputAlert?.code === errorCode
+  );
 
   const orderSideAction = {
     [OrderSide.BUY]: ButtonAction.Create,
@@ -388,7 +395,26 @@ export const TradeForm = ({
 
               {needsAdvancedOptions && <AdvancedTradeOptions />}
 
-              {alertContent && <AlertMessage type={alertType}>{alertContent}</AlertMessage>}
+              {alertContent && (
+                <AlertMessage type={alertType}>
+                  {isLiquidationError ? (
+                    <Styled.MessageWithPrompt>
+                      {alertContent}
+                      {
+                        <Styled.IconButton
+                          iconName={IconName.Arrow}
+                          shape={ButtonShape.Circle}
+                          action={ButtonAction.Navigation}
+                          size={ButtonSize.XSmall}
+                          onClick={() => setCurrentTradeType(TradeTypes.LIMIT)}
+                        ></Styled.IconButton>
+                      }
+                    </Styled.MessageWithPrompt>
+                  ) : (
+                    alertContent
+                  )}
+                </AlertMessage>
+              )}
             </Styled.InputsColumn>
           </Styled.OrderbookAndInputs>
         </>
@@ -572,6 +598,21 @@ Styled.ToggleGroup = styled(ToggleGroup)`
 
 Styled.InputsColumn = styled.div`
   ${formMixins.inputsColumn}
+`;
+
+Styled.MessageWithPrompt = styled.div`
+  ${layoutMixins.row}
+  gap: 0.75rem;
+`;
+
+Styled.IconButton = styled(IconButton)`
+  --button-backgroundColor: var(--color-white-faded);
+  flex-shrink: 0;
+
+  svg {
+    width: 1.25em;
+    height: 1.25em;
+  }
 `;
 
 Styled.ButtonRow = styled.div`

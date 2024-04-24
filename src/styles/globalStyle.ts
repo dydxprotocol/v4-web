@@ -7,6 +7,8 @@ export const GlobalStyle = createGlobalStyle`
     --color-green: ${({ theme }) => theme.green};
     --color-red: ${({ theme }) => theme.red};
 
+    --color-white-faded: ${({ theme }) => theme.whiteFaded};
+
     --color-layer-0: ${({ theme }) => theme.layer0};
     --color-layer-1: ${({ theme }) => theme.layer1};
     --color-layer-2: ${({ theme }) => theme.layer2};
