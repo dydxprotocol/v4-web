@@ -22,7 +22,7 @@ import {
 import { AppRoute, TokenRoute } from '@/constants/routes';
 import { DydxChainAsset } from '@/constants/wallets';
 
-import { useApiState, useStringGetter, useTokenConfigs, useURLConfigs } from '@/hooks';
+import { useAccounts, useApiState, useStringGetter, useTokenConfigs, useURLConfigs } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -30,6 +30,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
+import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 import { TriggerOrderNotification } from '@/views/notifications/TriggerOrderNotification';
@@ -42,6 +43,8 @@ import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import { getTitleAndBodyForTriggerOrderNotification } from '@/lib/notifications';
 import { formatSeconds } from '@/lib/timeUtils';
+
+import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
 
 const parseStringParamsForNotification = ({
   stringGetter,
@@ -329,41 +332,41 @@ export const notificationTypes: NotificationTypeConfig[] = [
       /**
        * @description Re-use for future Season 3 rewards distribution
        **/
-      // const { dydxAddress } = useAccounts();
-      // const { data, status } = useQueryChaosLabsIncentives({
-      //   dydxAddress,
-      //   season: 2,
-      // });
-      //
-      // const { dydxRewards } = data ?? {};
-      //
-      // useEffect(() => {
-      //   if (dydxAddress && status === 'success') {
-      //     trigger(
-      //       ReleaseUpdateNotificationIds.IncentivesDistributedS2,
-      //       {
-      //         icon: <AssetIcon symbol={chainTokenLabel} />,
-      //         title: 'Season 2 launch rewards have been distributed!',
-      //         body: `Season 2 rewards: +${dydxRewards ?? 0} ${chainTokenLabel}`,
-      //         renderCustomBody({ isToast, notification }) {
-      //           return (
-      //             <IncentiveSeasonDistributionNotification
-      //               isToast={isToast}
-      //               notification={notification}
-      //               data={{
-      //                 points: dydxRewards ?? 0,
-      //                 chainTokenLabel,
-      //               }}
-      //             />
-      //           );
-      //         },
-      //         toastSensitivity: 'foreground',
-      //         groupKey: ReleaseUpdateNotificationIds.IncentivesDistributedS2,
-      //       },
-      //       []
-      //     );
-      //   }
-      // }, [dydxAddress, status, dydxRewards]);
+      const { dydxAddress } = useAccounts();
+      const { data, status } = useQueryChaosLabsIncentives({
+        dydxAddress,
+        season: 3,
+      });
+
+      const { dydxRewards } = data ?? {};
+
+      useEffect(() => {
+        if (dydxAddress && status === 'success') {
+          trigger(
+            ReleaseUpdateNotificationIds.IncentivesDistributedS3,
+            {
+              icon: <AssetIcon symbol={chainTokenLabel} />,
+              title: 'Season 3 launch rewards have been distributed!',
+              body: `Season 3 rewards: +${dydxRewards ?? 0} ${chainTokenLabel}`,
+              renderCustomBody({ isToast, notification }) {
+                return (
+                  <IncentiveSeasonDistributionNotification
+                    isToast={isToast}
+                    notification={notification}
+                    data={{
+                      points: dydxRewards ?? 0,
+                      chainTokenLabel,
+                    }}
+                  />
+                );
+              },
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.IncentivesDistributedS3,
+            },
+            []
+          );
+        }
+      }, [dydxAddress, status, dydxRewards]);
     },
     useNotificationAction: () => {
       const { chainTokenLabel } = useTokenConfigs();
@@ -372,7 +375,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       return (notificationId: string) => {
         if (notificationId === ReleaseUpdateNotificationIds.IncentivesS4) {
           navigate(`${chainTokenLabel}/${TokenRoute.TradingRewards}`);
-        } else if (notificationId === ReleaseUpdateNotificationIds.IncentivesDistributedS2) {
+        } else if (notificationId === ReleaseUpdateNotificationIds.IncentivesDistributedS3) {
           navigate(`${chainTokenLabel}/${TokenRoute.StakingRewards}`);
         }
       };
