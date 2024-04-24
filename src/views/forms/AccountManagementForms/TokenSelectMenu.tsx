@@ -1,7 +1,8 @@
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
-import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
+import { SelectionOption, TransferInputTokenResource, TransferType } from '@/constants/abacus';
+import { CCTP_TOKEN_NAMES_LOWER_CASE } from '@/constants/cctp';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useEnvFeatures, useStringGetter } from '@/hooks';
@@ -24,6 +25,11 @@ type ElementProps = {
   isExchange?: boolean;
 };
 
+export const tokenIsCCTPToken = (token: SelectionOption): boolean => {
+  if (!token?.stringKey) return false;
+  return CCTP_TOKEN_NAMES_LOWER_CASE.includes(token.stringKey.toLowerCase());
+};
+
 export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions, resources } =
@@ -32,7 +38,6 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
 
   const tokens =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() || [];
-
   const cctpTokensByAddress = cctpTokens.reduce((acc, token) => {
     if (!acc[token.tokenAddress]) {
       acc[token.tokenAddress] = [];
@@ -40,7 +45,6 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
     acc[token.tokenAddress].push(token);
     return acc;
   }, {} as Record<string, TokenInfo[]>);
-
   const tokenItems = Object.values(tokens)
     .map((token) => ({
       value: token.type,
@@ -50,6 +54,12 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
         selectedToken && onSelectToken(selectedToken);
       },
       slotBefore: <Styled.Img src={token.iconUrl} alt="" />,
+      slotAfter: tokenIsCCTPToken(token) ? (
+        <Styled.Text>
+          <Styled.GreenHighlight>Lowest fees&#32;</Styled.GreenHighlight>
+          with USDC
+        </Styled.Text>
+      ) : null,
       tag: resources?.tokenResources?.get(token.type)?.symbol,
     }))
     .filter(
@@ -101,6 +111,15 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
+
+Styled.Text = styled.div`
+  font: var(--font-small-regular);
+  color: var(--color-text-0);
+`;
+
+Styled.GreenHighlight = styled.span`
+  color: var(--color-green);
+`;
 
 Styled.AssetRow = styled.div`
   ${layoutMixins.row}

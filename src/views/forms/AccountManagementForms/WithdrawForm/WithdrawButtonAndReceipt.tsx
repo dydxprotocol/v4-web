@@ -22,6 +22,7 @@ import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 import { WithReceipt } from '@/components/WithReceipt';
+import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
@@ -63,38 +64,35 @@ export const WithdrawButtonAndReceipt = ({
   const { usdcLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
 
-  const feeSubitems: DetailsItem[] = [];
-
-  if (typeof summary?.gasFee === 'number') {
-    feeSubitems.push({
-      key: 'gas-fees',
-      label: <span>{stringGetter({ key: STRING_KEYS.GAS_FEE })}</span>,
-      value: <Output type={OutputType.Fiat} value={summary?.gasFee} />,
-    });
-  }
-
-  if (typeof summary?.bridgeFee === 'number') {
-    feeSubitems.push({
-      key: 'bridge-fees',
-      label: <span>{stringGetter({ key: STRING_KEYS.BRIDGE_FEE })}</span>,
-      value: <Output type={OutputType.Fiat} value={summary?.bridgeFee} />,
-    });
-  }
-
-  const hasSubitems = feeSubitems.length > 0;
-
-  const showSubitemsToggle = showFeeBreakdown
-    ? stringGetter({ key: STRING_KEYS.HIDE_ALL_DETAILS })
-    : stringGetter({ key: STRING_KEYS.SHOW_ALL_DETAILS });
-
-  const totalFees = (summary?.bridgeFee || 0) + (summary?.gasFee || 0);
-
   const submitButtonReceipt = [
     {
-      key: 'total-fees',
-      label: <span>{stringGetter({ key: STRING_KEYS.TOTAL_FEES })}</span>,
-      value: <Output type={OutputType.Fiat} value={totalFees} />,
-      subitems: feeSubitems,
+      key: 'expected-amount-received',
+      label: (
+        <span>
+          {stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED })}{' '}
+          {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
+        </span>
+      ),
+      value: (
+        <Output type={OutputType.Asset} value={summary?.toAmount} fractionDigits={TOKEN_DECIMALS} />
+      ),
+    },
+    {
+      key: 'minimum-amount-received',
+      label: (
+        <span>
+          {stringGetter({ key: STRING_KEYS.MINIMUM_AMOUNT_RECEIVED })}{' '}
+          {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
+        </span>
+      ),
+      value: (
+        <Output
+          type={OutputType.Asset}
+          value={summary?.toAmountMin}
+          fractionDigits={TOKEN_DECIMALS}
+        />
+      ),
+      tooltip: 'minimum-amount-received',
     },
     !exchange && {
       key: 'exchange-rate',
@@ -109,6 +107,36 @@ export const WithdrawButtonAndReceipt = ({
             tag={withdrawToken?.symbol}
           />
         </Styled.ExchangeRate>
+      ),
+    },
+    typeof summary?.gasFee === 'number' && {
+      key: 'gas-fees',
+      label: (
+        <WithTooltip tooltipString="Gas fees are transaction fees on the source chain, in this case dYdX">
+          {stringGetter({ key: STRING_KEYS.GAS_FEE })}
+        </WithTooltip>
+      ),
+      value: <Output type={OutputType.Fiat} value={summary?.gasFee} />,
+    },
+    {
+      key: 'bridge-fees',
+      label: (
+        <WithTooltip tooltipString="Bridge fees are paid to other protocols in order to complete the bridge, transferring, and swapping required for this withdrawal.">
+          {stringGetter({ key: STRING_KEYS.BRIDGE_FEE })}
+        </WithTooltip>
+      ),
+      value: <Output type={OutputType.Fiat} value={summary?.bridgeFee} />,
+    },
+    !exchange && {
+      key: 'slippage',
+      label: <span>{stringGetter({ key: STRING_KEYS.MAX_SLIPPAGE })}</span>,
+      value: (
+        <SlippageEditor
+          disabled
+          slippage={slippage}
+          setIsEditing={setIsEditingSlipapge}
+          setSlippage={setSlippage}
+        />
       ),
     },
     {
@@ -126,49 +154,6 @@ export const WithdrawButtonAndReceipt = ({
                   : Math.round(summary?.estimatedRouteDuration / 60),
             },
           })}
-        />
-      ),
-    },
-    {
-      key: 'expected-amount-received',
-      label: (
-        <span>
-          {stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED })}{' '}
-          {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
-        </span>
-      ),
-      value: (
-        <Output type={OutputType.Asset} value={summary?.toAmount} fractionDigits={TOKEN_DECIMALS} />
-      ),
-      subitems: [
-        {
-          key: 'minimum-amount-received',
-          label: (
-            <span>
-              {stringGetter({ key: STRING_KEYS.MINIMUM_AMOUNT_RECEIVED })}{' '}
-              {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
-            </span>
-          ),
-          value: (
-            <Output
-              type={OutputType.Asset}
-              value={summary?.toAmountMin}
-              fractionDigits={TOKEN_DECIMALS}
-            />
-          ),
-          tooltip: 'minimum-amount-received',
-        },
-      ],
-    },
-    !exchange && {
-      key: 'slippage',
-      label: <span>{stringGetter({ key: STRING_KEYS.MAX_SLIPPAGE })}</span>,
-      value: (
-        <SlippageEditor
-          disabled
-          slippage={slippage}
-          setIsEditing={setIsEditingSlipapge}
-          setSlippage={setSlippage}
         />
       ),
     },
@@ -195,19 +180,6 @@ export const WithdrawButtonAndReceipt = ({
       slotReceipt={
         <Styled.CollapsibleDetails>
           <Styled.Details showSubitems={showFeeBreakdown} items={submitButtonReceipt} />
-          {hasSubitems && (
-            <Styled.DetailButtons>
-              <Styled.ToggleButton
-                shape={ButtonShape.Pill}
-                size={ButtonSize.XSmall}
-                isPressed={showFeeBreakdown}
-                onPressedChange={setShowFeeBreakdown}
-                slotLeft={<Icon iconName={IconName.Caret} />}
-              >
-                {showSubitemsToggle}
-              </Styled.ToggleButton>
-            </Styled.DetailButtons>
-          )}
         </Styled.CollapsibleDetails>
       }
     >

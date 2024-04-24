@@ -10,6 +10,7 @@ import { TransferInputField, TransferInputTokenResource, TransferType } from '@/
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvent } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
+import { CCTP_TOKEN_NAMES_CAPITALIZED } from '@/constants/cctp';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
@@ -47,6 +48,7 @@ import { Link } from '@/components/Link';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
+import { WithTooltip } from '@/components/WithTooltip';
 import { SourceSelectMenu } from '@/views/forms/AccountManagementForms/SourceSelectMenu';
 
 import { getSubaccount } from '@/state/accountSelectors';
@@ -469,9 +471,19 @@ export const WithdrawForm = () => {
     debouncedAmountBN.isZero() ||
     isLoading ||
     isInvalidNobleAddress;
-
   return (
     <Styled.Form onSubmit={onSubmit}>
+      <Styled.Subheader>
+        USDC withdrawals to&#32;
+        <WithTooltip
+          tooltipString={`USDC withdrawals on ${CCTP_TOKEN_NAMES_CAPITALIZED.join(
+            ','
+          )} have the lowest fees`}
+        >
+          select chains
+        </WithTooltip>
+        &#32;have the lowest fees. Other withdrawals may have additional third-party fees
+      </Styled.Subheader>
       <Styled.DestinationRow>
         <FormInput
           type={InputType.Text}
@@ -534,6 +546,10 @@ export const WithdrawForm = () => {
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
+
+Styled.Subheader = styled.div`
+  color: var(--color-text-0);
+`;
 
 Styled.Tag = styled(Tag)`
   margin-left: 0.5ch;
