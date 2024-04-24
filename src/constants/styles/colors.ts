@@ -31,6 +31,8 @@ type BaseColors = {
   white: string;
   green: string;
   red: string;
+
+  whiteFaded: string;
 };
 
 type LayerColors = {
