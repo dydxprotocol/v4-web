@@ -189,7 +189,7 @@ export const TradeForm = ({
     alertType = inputAlert?.type;
   }
 
-  const isLiquidationError = ['MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE'].some(
+  const shouldPromptUserToPlaceLimitOrder = ['MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE'].some(
     (errorCode) => inputAlert?.code === errorCode
   );
 
@@ -397,7 +397,7 @@ export const TradeForm = ({
 
               {alertContent && (
                 <AlertMessage type={alertType}>
-                  {isLiquidationError ? (
+                  {shouldPromptUserToPlaceLimitOrder ? (
                     <Styled.MessageWithPrompt>
                       {alertContent}
                       {
