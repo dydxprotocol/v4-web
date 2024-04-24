@@ -304,7 +304,7 @@ const AssetActions = memo(
     <Styled.InlineRow>
       {[
         withOnboarding &&
-          complianceState === ComplianceStates.FULLACCESS && {
+          complianceState === ComplianceStates.FULL_ACCESS && {
             dialogType: DialogTypes.Deposit,
             iconName: IconName.Deposit,
             tooltipStringKey: STRING_KEYS.DEPOSIT,
@@ -316,7 +316,7 @@ const AssetActions = memo(
             tooltipStringKey: STRING_KEYS.WITHDRAW,
           },
         hasBalance &&
-          complianceState === ComplianceStates.FULLACCESS && {
+          complianceState === ComplianceStates.FULL_ACCESS && {
             dialogType: DialogTypes.Transfer,
             dialogProps: { selectedAsset: asset },
             iconName: IconName.Send,

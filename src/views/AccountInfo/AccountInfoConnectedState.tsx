@@ -87,7 +87,7 @@ export const AccountInfoConnectedState = () => {
             >
               {stringGetter({ key: STRING_KEYS.WITHDRAW })}
             </Styled.Button>
-            {complianceState === ComplianceStates.FULLACCESS && (
+            {complianceState === ComplianceStates.FULL_ACCESS && (
               <>
                 <Styled.Button
                   state={{ isDisabled: !dydxAccounts }}
@@ -117,7 +117,7 @@ export const AccountInfoConnectedState = () => {
         </Styled.Header>
       )}
       <Styled.Stack>
-        {!showHeader && !isTablet && complianceState === ComplianceStates.FULLACCESS && (
+        {!showHeader && !isTablet && complianceState === ComplianceStates.FULL_ACCESS && (
           <Styled.CornerButton
             state={{ isDisabled: !dydxAccounts }}
             onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}

@@ -107,7 +107,7 @@ const Content = () => {
               <Route
                 path={`/${chainTokenLabel}/*`}
                 element={
-                  complianceState === ComplianceStates.FULLACCESS ? (
+                  complianceState === ComplianceStates.FULL_ACCESS ? (
                     <TokenPage />
                   ) : (
                     <Navigate to={DEFAULT_TRADE_ROUTE} />

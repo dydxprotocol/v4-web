@@ -421,7 +421,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const { complianceMessage, complianceState, complianceStatus } = useComplianceState();
 
       useEffect(() => {
-        if (complianceState !== ComplianceStates.FULLACCESS) {
+        if (complianceState !== ComplianceStates.FULL_ACCESS) {
           const displayData: NotificationDisplayData = {
             icon: <$WarningIcon iconName={IconName.Warning} />,
             title: stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING }),
@@ -431,7 +431,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             withClose: false,
           };
 
-          trigger(NotificationType.ComplianceAlert, displayData, []);
+          trigger(`${NotificationType.ComplianceAlert}-${complianceStatus}`, displayData, []);
         }
       }, [stringGetter, complianceMessage, complianceState, complianceStatus]);
     },

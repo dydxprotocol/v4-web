@@ -15,7 +15,10 @@ export const useComplianceState = () => {
   const complianceStatus = useSelector(getComplianceStatus, shallowEqual);
   const geo = useSelector(getGeo, shallowEqual);
 
-  let complianceState = ComplianceStates.FULLACCESS;
+  let complianceState = ComplianceStates.FULL_ACCESS;
+
+  let isBlockedGeo =
+    geo && [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes);
 
   let complianceMessage;
 
@@ -24,12 +27,7 @@ export const useComplianceState = () => {
     complianceStatus === ComplianceStatus.CLOSE_ONLY
   ) {
     complianceState = ComplianceStates.CLOSE_ONLY;
-  } else if (
-    complianceStatus === ComplianceStatus.BLOCKED ||
-    (geo &&
-      [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes) &&
-      isMainnet)
-  ) {
+  } else if (complianceStatus === ComplianceStatus.BLOCKED || (isBlockedGeo && isMainnet)) {
     complianceState = ComplianceStates.READ_ONLY;
   }
 
@@ -41,10 +39,7 @@ export const useComplianceState = () => {
   } else if (complianceStatus === ComplianceStatus.BLOCKED) {
     // TODO: add email to STRING_KEYS.PERMANENTLY_BLOCKED_MESSAGE
     complianceMessage = stringGetter({ key: STRING_KEYS.PERMANENTLY_BLOCKED_MESSAGE });
-  } else if (
-    geo &&
-    [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes)
-  ) {
+  } else if (isBlockedGeo) {
     complianceMessage = stringGetter({ key: STRING_KEYS.BLOCKED_MESSAGE });
   }
 

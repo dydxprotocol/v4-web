@@ -36,13 +36,8 @@ dependencies:
     specifier: ^1.1.7
     version: 1.1.7
   '@dydxprotocol/v4-localization':
-<<<<<<< HEAD
     specifier: ^1.1.66
     version: 1.1.66
-=======
-    specifier: ^1.1.62
-    version: 1.1.65
->>>>>>> b3508d6e (bump localizatoin)
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -1628,21 +1623,8 @@ packages:
       - utf-8-validate
     dev: false
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   /@dydxprotocol/v4-localization@1.1.66:
     resolution: {integrity: sha512-VCFZWuUeEaBlQaLdUThyNSN2ywJWrjRMpaL33VszCcjTtI2/BsKQegV10d+Jb6xnT/zGHv9h0pPZqDEgHtN2MQ==}
-=======
-  /@dydxprotocol/v4-localization@1.1.61:
-    resolution:
-      {
-        integrity: sha512-NIo5aneLmUKqYrzpKOEopdXtWSVZ4bCgIc4f99j7ngEP2/8t0HqgSu/2Z/fFqy10yX4vRb6Ii1wsOFBCMfjozQ==,
-      }
->>>>>>> 819d1ede (bump abacus, remove transfer)
-=======
-  /@dydxprotocol/v4-localization@1.1.65:
-    resolution: {integrity: sha512-u2JZcxdM6XX4LAYGE3P6NaqmqePAMK4GVZsneXCLj5kKsSIHwhCT+A/trHlEPhASLvRQ2UCjuqlzDe/9fcT7pA==}
->>>>>>> b3508d6e (bump localizatoin)
     dev: false
 
   /@dydxprotocol/v4-proto@5.0.0-dev.0:
@@ -12316,7 +12298,6 @@ packages:
       is-hex-prefixed: 1.0.0
       strip-hex-prefix: 1.0.0
     dev: false
-    bundledDependencies: false
 
   /event-emitter@0.3.5:
     resolution: {integrity: sha512-D9rRn9y7kLPnJ+hMq7S/nhvoKwwvVJahBi2BPmx3bvbsEdK3W9ii8cBSGjP+72/LnM4n6fo3+dkCX5FeTQruXA==}

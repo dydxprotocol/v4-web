@@ -3,10 +3,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
+import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
 
 import { useStringGetter } from '@/hooks';
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useNotifications } from '@/hooks/useNotifications';
 
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
@@ -21,6 +23,7 @@ import { testFlags } from '@/lib/testFlags';
 export const usePreferenceMenu = () => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
+  const { complianceState } = useComplianceState();
 
   // Notifications
   const { notificationPreferences, setNotificationPreferences } = useNotifications();

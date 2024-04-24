@@ -70,7 +70,6 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const shouldEnableTrade =
     canAccountTrade &&
-    complianceState !== ComplianceStates.READ_ONLY &&
     !hasMissingData &&
     !hasValidationErrors &&
     currentInput !== 'transfer' &&
