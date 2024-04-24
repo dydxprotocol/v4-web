@@ -1,7 +1,8 @@
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
-import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
+import { SelectionOption, TransferInputTokenResource, TransferType } from '@/constants/abacus';
+import { CCTP_TOKEN_NAMES_LOWER_CASE } from '@/constants/cctp';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useEnvFeatures, useStringGetter } from '@/hooks';
