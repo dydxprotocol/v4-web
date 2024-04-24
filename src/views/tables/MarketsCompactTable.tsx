@@ -170,13 +170,13 @@ export const MarketsCompactTable = (props: PropsWithChildren<MarketsCompactTable
       className={className}
       slotEmpty={
         <Styled.MarketNotFound>
-          <p>No recently listed markets</p>
+          <p>{stringGetter({ key: STRING_KEYS.NO_RECENTLY_LISTED_MARKETS })}</p>
           <Button
             onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
             size={ButtonSize.Small}
             action={ButtonAction.Navigation}
           >
-            {stringGetter({ key: STRING_KEYS.ADD_A_MARKET })}
+            {stringGetter({ key: STRING_KEYS.ADD_NEW_MARKET })}
           </Button>
         </Styled.MarketNotFound>
       }

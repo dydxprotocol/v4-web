@@ -40,7 +40,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
       <Styled.ExchangeBillboards />
       <Styled.Section>
         <Styled.SectionHeader>
-          <h4>Recently Listed</h4>
+          <h4>{stringGetter({ key: STRING_KEYS.RECENTLY_LISTED })}</h4>
           <Styled.NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</Styled.NewTag>
 
           <Styled.ViewAll
@@ -48,25 +48,25 @@ export const MarketsStats = (props: MarketsStatsProps) => {
             action={ButtonAction.Navigation}
             onClick={setNewFilter}
           >
-            View all →
+            {stringGetter({ key: STRING_KEYS.VIEW })} →
           </Styled.ViewAll>
         </Styled.SectionHeader>
         <MarketsCompactTable filters={MarketFilters.NEW} />
       </Styled.Section>
       <Styled.Section>
         <Styled.SectionHeader>
-          <h4>Biggest Movers</h4>
+          <h4>{stringGetter({ key: STRING_KEYS.BIGGEST_MOVERS })}</h4>
           <Tag>{stringGetter({ key: STRING_KEYS._24H })}</Tag>
 
           <Styled.ToggleGroupContainer>
             <ToggleGroup
               items={[
                 {
-                  label: 'Gainers',
+                  label: stringGetter({ key: STRING_KEYS.GAINERS }),
                   value: 'gainers',
                 },
                 {
-                  label: 'Losers',
+                  label: stringGetter({ key: STRING_KEYS.LOSERS }),
                   value: 'losers',
                 },
               ]}

@@ -50,7 +50,7 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
         },
         {
           key: 'fee-earned-stakers',
-          labelKey: STRING_KEYS.EARNED,
+          labelKey: STRING_KEYS.EARNED_BY_STAKERS,
           tagKey: STRING_KEYS._24H,
           value: feeEarned,
           type: OutputType.CompactFiat,
