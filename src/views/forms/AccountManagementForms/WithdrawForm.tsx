@@ -10,7 +10,6 @@ import { TransferInputField, TransferInputTokenResource, TransferType } from '@/
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvent } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
-import { CCTP_TOKEN_NAMES_CAPITALIZED } from '@/constants/cctp';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';

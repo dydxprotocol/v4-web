@@ -1980,7 +1980,7 @@ packages:
       protobufjs: 6.11.4
       ws: 8.15.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
-      - bufferutil
+      - bufferutil  
       - debug
       - utf-8-validate
     dev: false
