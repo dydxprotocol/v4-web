@@ -10,7 +10,6 @@ import { TransferInputField, TransferInputTokenResource, TransferType } from '@/
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvent } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
-import { CCTP_TOKEN_NAMES_CAPITALIZED } from '@/constants/cctp';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
@@ -474,15 +473,14 @@ export const WithdrawForm = () => {
   return (
     <Styled.Form onSubmit={onSubmit}>
       <Styled.Subheader>
-        USDC withdrawals to&#32;
-        <WithTooltip
-          tooltipString={`USDC withdrawals on ${CCTP_TOKEN_NAMES_CAPITALIZED.join(
-            ', '
-          )} have the lowest fees`}
-        >
-          select chains
-        </WithTooltip>
-        &#32;have the lowest fees. Other withdrawals may have additional third-party fees
+        {stringGetter({
+          key: STRING_KEYS.LOWEST_FEE_WITHDRAWALS,
+          params: {
+            LOWEST_FEE_TOKENS_TOOLTIP: (
+              <WithTooltip tooltip="lowest-fees">select chains</WithTooltip>
+            ),
+          },
+        })}
       </Styled.Subheader>
       <Styled.DestinationRow>
         <FormInput

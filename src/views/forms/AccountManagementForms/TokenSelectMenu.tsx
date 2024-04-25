@@ -2,7 +2,7 @@ import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { SelectionOption, TransferInputTokenResource, TransferType } from '@/constants/abacus';
-import { CCTP_TOKEN_NAMES_LOWER_CASE } from '@/constants/cctp';
+import { CCTP_CHAIN_NAMES_LOWER_CASE } from '@/constants/cctp';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useEnvFeatures, useStringGetter } from '@/hooks';
@@ -25,10 +25,13 @@ type ElementProps = {
   isExchange?: boolean;
 };
 
-export const tokenIsCCTPToken = (token: SelectionOption): boolean => {
-  if (!token?.stringKey) return false;
-  return CCTP_TOKEN_NAMES_LOWER_CASE.includes(token.stringKey.toLowerCase());
-};
+const cctpTokensByAddress = cctpTokens.reduce((acc, token) => {
+  if (!acc[token.tokenAddress]) {
+    acc[token.tokenAddress] = [];
+  }
+  acc[token.tokenAddress].push(token);
+  return acc;
+}, {} as Record<string, TokenInfo[]>);
 
 export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: ElementProps) => {
   const stringGetter = useStringGetter();
@@ -38,13 +41,6 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
 
   const tokens =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() || [];
-  const cctpTokensByAddress = cctpTokens.reduce((acc, token) => {
-    if (!acc[token.tokenAddress]) {
-      acc[token.tokenAddress] = [];
-    }
-    acc[token.tokenAddress].push(token);
-    return acc;
-  }, {} as Record<string, TokenInfo[]>);
   const tokenItems = Object.values(tokens)
     .map((token) => ({
       value: token.type,
@@ -54,7 +50,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
         selectedToken && onSelectToken(selectedToken);
       },
       slotBefore: <Styled.Img src={token.iconUrl} alt="" />,
-      slotAfter: tokenIsCCTPToken(token) ? (
+      slotAfter: !!cctpTokensByAddress[token.type] ? (
         <Styled.Text>
           <Styled.GreenHighlight>Lowest fees&#32;</Styled.GreenHighlight>
           with USDC

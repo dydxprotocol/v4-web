@@ -5,7 +5,7 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { TransferInputTokenResource } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
-import { STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS, TOOLTIP_STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter, useTokenConfigs } from '@/hooks';
@@ -108,16 +108,14 @@ export const WithdrawButtonAndReceipt = ({
     typeof summary?.gasFee === 'number' && {
       key: 'gas-fees',
       label: (
-        <WithTooltip tooltipString="Gas fees are transaction fees on the source chain, in this case dYdX">
-          {stringGetter({ key: STRING_KEYS.GAS_FEE })}
-        </WithTooltip>
+        <WithTooltip tooltip="gas-fees">{stringGetter({ key: STRING_KEYS.GAS_FEE })}</WithTooltip>
       ),
-      value: <Output type={OutputType.Fiat} value={summary?.gasFee} />,
+      value: <Output type={OutputType.Fiat} value={10} />,
     },
-    {
+    typeof summary?.bridgeFee === 'number' && {
       key: 'bridge-fees',
       label: (
-        <WithTooltip tooltipString="Bridge fees are paid to other protocols in order to complete the bridge, transferring, and swapping required for this withdrawal.">
+        <WithTooltip tooltip="bridge-fees">
           {stringGetter({ key: STRING_KEYS.BRIDGE_FEE })}
         </WithTooltip>
       ),
