@@ -182,7 +182,7 @@ export type TriggerOrderNotification = {
 
 export enum ReleaseUpdateNotificationIds {
   IncentivesS4 = 'incentives-s4',
-  IncentivesDistributedS2 = 'incentives-distributed-s2',
+  IncentivesDistributedS3 = 'incentives-distributed-s3',
 }
 
 /**
