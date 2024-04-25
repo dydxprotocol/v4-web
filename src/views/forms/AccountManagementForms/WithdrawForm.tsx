@@ -469,6 +469,7 @@ export const WithdrawForm = () => {
     debouncedAmountBN.isZero() ||
     isLoading ||
     isInvalidNobleAddress;
+
   return (
     <Styled.Form onSubmit={onSubmit}>
       <Styled.Subheader>
