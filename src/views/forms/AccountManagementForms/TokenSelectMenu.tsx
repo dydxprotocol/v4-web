@@ -51,8 +51,14 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
       slotBefore: <Styled.Img src={token.iconUrl} alt="" />,
       slotAfter: !!cctpTokensByAddress[token.type] && (
         <Styled.Text>
-          <Styled.GreenHighlight>Lowest fees&#32;</Styled.GreenHighlight>
-          with USDC
+          {stringGetter({
+            key: STRING_KEYS.LOWEST_FEES_WITH_USDC,
+            params: {
+              LOWEST_FEES_HIGHLIGHT_TEXT: (
+                <Styled.GreenHighlight>Lowest fees&#32;</Styled.GreenHighlight>
+              ),
+            },
+          })}
         </Styled.Text>
       ),
       tag: resources?.tokenResources?.get(token.type)?.symbol,

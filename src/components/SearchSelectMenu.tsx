@@ -62,15 +62,6 @@ export const SearchSelectMenu = ({
     ref: searchSelectMenuRef,
   });
 
-  const cctpChainsById = cctpTokens.reduce((acc, token) => {
-    // Check if the key for this chainId already exists
-    if (!acc[token.chainId]) {
-      acc[token.chainId] = []; // Initialize it with an empty array if not existing
-    }
-    acc[token.chainId].push(token); // Push the current token into the corresponding array
-    return acc;
-  }, {} as Record<string, TokenInfo[]>);
-
   const Trigger = asChild ? (
     children
   ) : (

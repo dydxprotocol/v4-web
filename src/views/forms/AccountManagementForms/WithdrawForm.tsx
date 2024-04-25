@@ -438,7 +438,6 @@ export const WithdrawForm = () => {
         }),
       };
     }
-
     return {
       errorMessage: undefined,
     };
@@ -470,6 +469,7 @@ export const WithdrawForm = () => {
     debouncedAmountBN.isZero() ||
     isLoading ||
     isInvalidNobleAddress;
+
   return (
     <Styled.Form onSubmit={onSubmit}>
       <Styled.Subheader>
@@ -477,7 +477,11 @@ export const WithdrawForm = () => {
           key: STRING_KEYS.LOWEST_FEE_WITHDRAWALS,
           params: {
             LOWEST_FEE_TOKENS_TOOLTIP: (
-              <WithTooltip tooltip="lowest-fees">select chains</WithTooltip>
+              <WithTooltip tooltip="lowest-fees">
+                {stringGetter({
+                  key: STRING_KEYS.SELECT_CHAINS,
+                })}
+              </WithTooltip>
             ),
           },
         })}
