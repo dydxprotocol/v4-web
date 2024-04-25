@@ -1,8 +1,7 @@
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
-import { SelectionOption, TransferInputTokenResource, TransferType } from '@/constants/abacus';
-import { CCTP_CHAIN_NAMES_LOWER_CASE } from '@/constants/cctp';
+import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useEnvFeatures, useStringGetter } from '@/hooks';
@@ -50,17 +49,17 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
         selectedToken && onSelectToken(selectedToken);
       },
       slotBefore: <Styled.Img src={token.iconUrl} alt="" />,
-      slotAfter: !!cctpTokensByAddress[token.type] ? (
+      slotAfter: !!cctpTokensByAddress[token.type] && (
         <Styled.Text>
           <Styled.GreenHighlight>Lowest fees&#32;</Styled.GreenHighlight>
           with USDC
         </Styled.Text>
-      ) : null,
+      ),
       tag: resources?.tokenResources?.get(token.type)?.symbol,
     }))
     .filter(
-      (chain) =>
-        type === TransferType.deposit || !!cctpTokensByAddress[chain.value] || !CCTPWithdrawalOnly
+      (token) =>
+        type === TransferType.deposit || !!cctpTokensByAddress[token.value] || !CCTPWithdrawalOnly
     );
 
   return (
