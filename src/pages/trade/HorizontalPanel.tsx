@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
@@ -72,22 +72,25 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const currentMarketId = useSelector(getCurrentMarketId);
   const currentMarketAssetId = useSelector(getCurrentMarketAssetId);
 
-  const { numTotalPositions, numTotalOpenOrders, numTotalFills, numTotalFundingPayments } =
+  const { numTotalPositions, numTotalOpenOrders, numTotalFills } =
     useSelector(getTradeInfoNumbers, shallowEqual) || {};
 
-  const { numOpenOrders, numFills, numFundingPayments } =
+  const { numOpenOrders, numFills } =
     useSelector(getCurrentMarketTradeInfoNumbers, shallowEqual) || {};
+
+  const showClosePositionAction = true;
 
   const hasUnseenOrderUpdates = useSelector(getHasUnseenOrderUpdates);
   const hasUnseenFillUpdates = useSelector(getHasUnseenFillUpdates);
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
   const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
-  const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable);
+  const shouldRenderActions = useSelector(
+    calculateShouldRenderActionsInPositionsTable(showClosePositionAction)
+  );
   const isWaitingForOrderToIndex = useSelector(calculateHasUncommittedOrders);
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
 
   const fillsTagNumber = shortenNumberForDisplay(showCurrentMarket ? numFills : numTotalFills);
-
   const ordersTagNumber = shortenNumberForDisplay(
     showCurrentMarket ? numOpenOrders : numTotalOpenOrders
   );
@@ -139,6 +142,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     shouldRenderActions && PositionsTableColumnKey.Actions,
                   ].filter(isTruthy)
             }
+            showClosePositionAction={showClosePositionAction}
             onNavigate={() => setView(PanelView.CurrentMarket)}
             navigateToOrders={onViewOrders}
           />

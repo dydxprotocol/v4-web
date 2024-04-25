@@ -7,7 +7,7 @@ export enum ComplianceReason {
 }
 
 export enum ComplianceStates {
-  FULLACCESS = 'FUllACCESS',
+  FULL_ACCESS = 'FUll_ACCESS',
   READ_ONLY = 'READ_ONLY',
   CLOSE_ONLY = 'CLOSE_ONLY',
 }

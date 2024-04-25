@@ -195,7 +195,7 @@ export default () => {
             />
             {onboardingState === OnboardingState.AccountConnected && (
               <Styled.Footer>
-                {complianceState === ComplianceStates.FULLACCESS && (
+                {complianceState === ComplianceStates.FULL_ACCESS && (
                   <Button
                     action={ButtonAction.Primary}
                     onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
@@ -211,7 +211,7 @@ export default () => {
                     {stringGetter({ key: STRING_KEYS.WITHDRAW })}
                   </Button>
                 )}
-                {complianceState === ComplianceStates.FULLACCESS &&
+                {complianceState === ComplianceStates.FULL_ACCESS &&
                   (usdcBalance > 0 || nativeTokenBalance.gt(0)) && (
                     <Button
                       action={ButtonAction.Base}

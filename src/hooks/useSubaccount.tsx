@@ -421,7 +421,10 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       onError,
       onSuccess,
     }: {
-      onError: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
+      onError: (
+        triggerOrdersPayload: Nullable<HumanReadableTriggerOrdersPayload>,
+        onErrorParams?: { errorStringKey?: Nullable<string> }
+      ) => void;
       onSuccess?: (triggerOrdersPayload: Nullable<HumanReadableTriggerOrdersPayload>) => void;
     }) => {
       const callback = (
@@ -432,7 +435,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         if (success) {
           onSuccess?.(data);
         } else {
-          onError?.({ errorStringKey: parsingError?.stringKey });
+          onError?.(data, { errorStringKey: parsingError?.stringKey });
         }
       };
       return abacusStateManager.triggerOrders(callback);

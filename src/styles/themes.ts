@@ -11,6 +11,8 @@ const ClassicThemeBase: ThemeColorBase = {
   green: ColorToken.Green1,
   red: ColorToken.Red2,
 
+  whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
+
   layer0: ColorToken.GrayBlue7,
   layer1: ColorToken.GrayBlue6,
   layer2: ColorToken.GrayBlue5,
@@ -72,6 +74,8 @@ const DarkThemeBase: ThemeColorBase = {
   green: ColorToken.Green0,
   red: ColorToken.Red0,
 
+  whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
+
   layer0: ColorToken.Black,
   layer1: ColorToken.DarkGray11,
   layer2: ColorToken.DarkGray13,
@@ -132,6 +136,8 @@ const LightThemeBase: ThemeColorBase = {
   white: ColorToken.White,
   green: ColorToken.Green2,
   red: ColorToken.Red1,
+
+  whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
 
   layer0: ColorToken.White,
   layer1: ColorToken.LightGray6,

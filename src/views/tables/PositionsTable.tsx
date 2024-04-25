@@ -75,12 +75,14 @@ const getPositionsTableColumnDef = ({
   stringGetter,
   width,
   isAccountViewOnly,
+  showClosePositionAction,
   navigateToOrders,
 }: {
   key: PositionsTableColumnKey;
   stringGetter: StringGetterFunction;
   width?: ColumnSize;
   isAccountViewOnly: boolean;
+  showClosePositionAction: boolean;
   navigateToOrders: (market: string) => void;
 }) => ({
   width,
@@ -338,6 +340,7 @@ const getPositionsTableColumnDef = ({
             marketId={id}
             assetId={assetId}
             isDisabled={isAccountViewOnly}
+            showClosePositionAction={showClosePositionAction}
             stopLossOrders={stopLossOrders}
             takeProfitOrders={takeProfitOrders}
             navigateToMarketOrders={navigateToOrders}
@@ -353,6 +356,7 @@ type ElementProps = {
   columnWidths?: Partial<Record<PositionsTableColumnKey, ColumnSize>>;
   currentRoute?: string;
   currentMarket?: string;
+  showClosePositionAction: boolean;
   onNavigate?: () => void;
   navigateToOrders: (market: string) => void;
 };
@@ -367,6 +371,7 @@ export const PositionsTable = ({
   columnWidths,
   currentRoute,
   currentMarket,
+  showClosePositionAction,
   onNavigate,
   navigateToOrders,
   withGradientCardRows,
@@ -430,6 +435,7 @@ export const PositionsTable = ({
           stringGetter,
           width: columnWidths?.[key],
           isAccountViewOnly,
+          showClosePositionAction,
           navigateToOrders,
         })
       )}

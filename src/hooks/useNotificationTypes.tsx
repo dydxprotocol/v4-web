@@ -25,15 +25,18 @@ import {
 import { AppRoute, TokenRoute } from '@/constants/routes';
 import { DydxChainAsset } from '@/constants/wallets';
 
-import { useApiState, useStringGetter, useTokenConfigs, useURLConfigs } from '@/hooks';
+import { useAccounts, useApiState, useStringGetter, useTokenConfigs, useURLConfigs } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
+import { Output, OutputType } from '@/components/Output';
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
+import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
+import { TriggerOrderNotification } from '@/views/notifications/TriggerOrderNotification';
 
 import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
@@ -41,9 +44,11 @@ import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
+import { getTitleAndBodyForTriggerOrderNotification } from '@/lib/notifications';
 import { formatSeconds } from '@/lib/timeUtils';
 
 import { useComplianceState } from './useComplianceState';
+import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
 
 const parseStringParamsForNotification = ({
   stringGetter,
@@ -242,6 +247,59 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
   },
   {
+    type: NotificationType.TriggerOrder,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const { triggerOrderNotifications } = useLocalNotifications();
+
+      useEffect(() => {
+        for (const triggerOrder of triggerOrderNotifications) {
+          const { assetId, clientId, orderType, price, status, tickSizeDecimals, type } =
+            triggerOrder;
+
+          const assetIcon = <AssetIcon symbol={assetId} />;
+          const formattedPrice = (
+            <$Output value={price} type={OutputType.Fiat} fractionDigits={tickSizeDecimals} />
+          );
+
+          const { title, body } = getTitleAndBodyForTriggerOrderNotification({
+            notification: triggerOrder,
+            formattedPrice: formattedPrice,
+            stringGetter,
+          });
+
+          if (title && body) {
+            trigger(
+              `${type}-${clientId.toString()}`,
+              {
+                icon: assetIcon,
+                title: title,
+                body: body,
+                renderCustomBody: ({ isToast, notification }) => (
+                  <TriggerOrderNotification
+                    status={status}
+                    type={type}
+                    slotIcon={assetIcon}
+                    slotTitle={title}
+                    slotDescription={body}
+                    isToast={isToast}
+                    notification={notification}
+                  />
+                ),
+                toastSensitivity: 'foreground',
+                groupKey: NotificationType.TriggerOrder,
+              },
+              []
+            );
+          }
+        }
+      }, [triggerOrderNotifications, stringGetter]);
+    },
+    useNotificationAction: () => {
+      return () => {};
+    },
+  },
+  {
     type: NotificationType.ReleaseUpdates,
     useTrigger: ({ trigger }) => {
       const { chainTokenLabel } = useTokenConfigs();
@@ -275,44 +333,41 @@ export const notificationTypes: NotificationTypeConfig[] = [
         }
       }, [stringGetter]);
 
-      /**
-       * @description Re-use for future Season 3 rewards distribution
-       **/
-      // const { dydxAddress } = useAccounts();
-      // const { data, status } = useQueryChaosLabsIncentives({
-      //   dydxAddress,
-      //   season: 2,
-      // });
-      //
-      // const { dydxRewards } = data ?? {};
-      //
-      // useEffect(() => {
-      //   if (dydxAddress && status === 'success') {
-      //     trigger(
-      //       ReleaseUpdateNotificationIds.IncentivesDistributedS2,
-      //       {
-      //         icon: <AssetIcon symbol={chainTokenLabel} />,
-      //         title: 'Season 2 launch rewards have been distributed!',
-      //         body: `Season 2 rewards: +${dydxRewards ?? 0} ${chainTokenLabel}`,
-      //         renderCustomBody({ isToast, notification }) {
-      //           return (
-      //             <IncentiveSeasonDistributionNotification
-      //               isToast={isToast}
-      //               notification={notification}
-      //               data={{
-      //                 points: dydxRewards ?? 0,
-      //                 chainTokenLabel,
-      //               }}
-      //             />
-      //           );
-      //         },
-      //         toastSensitivity: 'foreground',
-      //         groupKey: ReleaseUpdateNotificationIds.IncentivesDistributedS2,
-      //       },
-      //       []
-      //     );
-      //   }
-      // }, [dydxAddress, status, dydxRewards]);
+      const { dydxAddress } = useAccounts();
+      const { data, status } = useQueryChaosLabsIncentives({
+        dydxAddress,
+        season: 3,
+      });
+
+      const { dydxRewards } = data ?? {};
+
+      useEffect(() => {
+        if (dydxAddress && status === 'success') {
+          trigger(
+            ReleaseUpdateNotificationIds.IncentivesDistributedS3,
+            {
+              icon: <AssetIcon symbol={chainTokenLabel} />,
+              title: 'Season 3 launch rewards have been distributed!',
+              body: `Season 3 rewards: +${dydxRewards ?? 0} ${chainTokenLabel}`,
+              renderCustomBody({ isToast, notification }) {
+                return (
+                  <IncentiveSeasonDistributionNotification
+                    isToast={isToast}
+                    notification={notification}
+                    data={{
+                      points: dydxRewards ?? 0,
+                      chainTokenLabel,
+                    }}
+                  />
+                );
+              },
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.IncentivesDistributedS3,
+            },
+            []
+          );
+        }
+      }, [dydxAddress, status, dydxRewards]);
     },
     useNotificationAction: () => {
       const { chainTokenLabel } = useTokenConfigs();
@@ -321,7 +376,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       return (notificationId: string) => {
         if (notificationId === ReleaseUpdateNotificationIds.IncentivesS4) {
           navigate(`${chainTokenLabel}/${TokenRoute.TradingRewards}`);
-        } else if (notificationId === ReleaseUpdateNotificationIds.IncentivesDistributedS2) {
+        } else if (notificationId === ReleaseUpdateNotificationIds.IncentivesDistributedS3) {
           navigate(`${chainTokenLabel}/${TokenRoute.StakingRewards}`);
         }
       };
@@ -366,7 +421,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const { complianceMessage, complianceState, complianceStatus } = useComplianceState();
 
       useEffect(() => {
-        if (complianceState !== ComplianceStates.FULLACCESS) {
+        if (complianceState !== ComplianceStates.FULL_ACCESS) {
           const displayData: NotificationDisplayData = {
             icon: <$WarningIcon iconName={IconName.Warning} />,
             title: stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING }),
@@ -376,7 +431,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             withClose: false,
           };
 
-          trigger(NotificationType.ComplianceAlert, displayData, []);
+          trigger(`${NotificationType.ComplianceAlert}-${complianceStatus}`, displayData, []);
         }
       }, [stringGetter, complianceMessage, complianceState, complianceStatus]);
     },
@@ -404,4 +459,8 @@ const $Icon = styled.img`
 
 const $WarningIcon = styled(Icon)`
   color: var(--color-warning);
+`;
+
+const $Output = styled(Output)`
+  display: inline-block;
 `;

@@ -34,6 +34,7 @@ export const HeaderDesktop = () => {
   const { documentation, community, mintscanBase } = useURLConfigs();
   const dispatch = useDispatch();
   const { chainTokenLabel } = useTokenConfigs();
+  const { complianceState } = useComplianceState();
 
   const hasSeenLaunchIncentives = useSelector(getHasSeenLaunchIncentives);
   const { complianceState } = useComplianceState();
@@ -57,7 +58,7 @@ export const HeaderDesktop = () => {
           label: stringGetter({ key: STRING_KEYS.MARKETS }),
           href: AppRoute.Markets,
         },
-        complianceState === ComplianceStates.FULLACCESS && {
+        complianceState === ComplianceStates.FULL_ACCESS && {
           value: chainTokenLabel,
           label: chainTokenLabel,
           href: `/${chainTokenLabel}`,

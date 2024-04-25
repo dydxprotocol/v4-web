@@ -132,8 +132,8 @@ export const useTriggerOrdersFormInputs = ({
 
   return {
     inputErrors,
-    // True when user is editing an existing order; false when creating completely new orders
-    isEditingExistingOrder: stopLossOrder || takeProfitOrder,
+    existingStopLossOrder: stopLossOrder,
+    existingTakeProfitOrder: takeProfitOrder,
     // True if an SL + TP order exist, and if they are set on different order sizes
     differingOrderSizes,
     // Default input size to be shown on custom amount slider, null if different order sizes

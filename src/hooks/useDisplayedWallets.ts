@@ -2,7 +2,6 @@ import { isDev } from '@/constants/networks';
 import { WalletType } from '@/constants/wallets';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { testFlags } from '@/lib/testFlags';
 
 export const useDisplayedWallets = () => {
   const displayedWallets = [
@@ -23,7 +22,7 @@ export const useDisplayedWallets = () => {
     // WalletType.BitKeep,
     // WalletType.Coin98,
 
-    Boolean(testFlags.displayPrivyLogin && import.meta.env.VITE_PRIVY_APP_ID) && WalletType.Privy,
+    Boolean(import.meta.env.VITE_PRIVY_APP_ID) && WalletType.Privy,
 
     WalletType.OtherWallet,
   ].filter(isTruthy);

@@ -59,8 +59,10 @@ export const PositionsTriggersCell = ({
       return false;
     }
     return (
-      (positionSide === AbacusPositionSide.SHORT && order.price > liquidationPrice) ||
-      (positionSide === AbacusPositionSide.LONG && order.price < liquidationPrice)
+      (positionSide === AbacusPositionSide.SHORT &&
+        (order.triggerPrice ?? order.price) > liquidationPrice) ||
+      (positionSide === AbacusPositionSide.LONG &&
+        (order.triggerPrice ?? order.price) < liquidationPrice)
     );
   };
 
@@ -73,18 +75,14 @@ export const PositionsTriggersCell = ({
           assetId,
           stopLossOrders,
           takeProfitOrders,
-          navigateToMarketOrders: onViewOrders
+          navigateToMarketOrders: onViewOrders,
         },
       })
     );
   };
 
   const viewOrdersButton = (
-    <Styled.Button
-      action={ButtonAction.Navigation}
-      size={ButtonSize.XSmall}
-      onClick={onViewOrders}
-    >
+    <Styled.Button action={ButtonAction.Navigation} size={ButtonSize.XSmall} onClick={onViewOrders}>
       {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
       {<Styled.ArrowIcon iconName={IconName.Arrow} />}
     </Styled.Button>
@@ -140,7 +138,11 @@ export const PositionsTriggersCell = ({
       return (
         <>
           {triggerLabel({ liquidationWarningSide })}
-          <Styled.Output type={OutputType.Fiat} value={triggerPrice} fractionDigits={tickSizeDecimals} />
+          <Styled.Output
+            type={OutputType.Fiat}
+            value={triggerPrice}
+            fractionDigits={tickSizeDecimals}
+          />
           {isPartialPosition && (
             <WithHovercard
               align="end"
@@ -179,7 +181,7 @@ export const PositionsTriggersCell = ({
       </>
     );
   };
-  
+
   return (
     <Styled.Cell>
       <Styled.Row>{renderOutput({ label: 'TP', orders: takeProfitOrders })}</Styled.Row>
