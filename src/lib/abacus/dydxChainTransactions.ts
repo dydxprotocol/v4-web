@@ -1,3 +1,6 @@
+import { rawSecp256k1PubkeyToRawAddress } from '@cosmjs/amino';
+import { Secp256k1, sha256 } from '@cosmjs/crypto';
+import { toBech32 } from '@cosmjs/encoding';
 import { EncodeObject } from '@cosmjs/proto-signing';
 import type { IndexedTx } from '@cosmjs/stargate';
 import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
@@ -29,6 +32,7 @@ import {
   type HumanReadableWithdrawPayload,
   type HumanReadableTransferPayload,
 } from '@/constants/abacus';
+import { Hdkey } from '@/constants/account';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { DydxChainId, isTestnet } from '@/constants/networks';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
@@ -50,6 +54,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   private compositeClient: CompositeClient | undefined;
   private nobleClient: NobleClient | undefined;
   private store: RootStore | undefined;
+  private hdkey: Hdkey | undefined;
   private localWallet: LocalWallet | undefined;
   private nobleWallet: LocalWallet | undefined;
 
@@ -64,6 +69,10 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
   setStore(store: RootStore): void {
     this.store = store;
+  }
+
+  setHdkey(hdkey: Hdkey) {
+    this.hdkey = hdkey;
   }
 
   setLocalWallet(localWallet: LocalWallet) {
@@ -494,6 +503,41 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     }
   }
 
+  async signCompliancePayload(params: {
+    message: string;
+    action: string;
+    status: string;
+  }): Promise<string> {
+    if (!this.hdkey?.privateKey || !this.hdkey?.publicKey) {
+      throw new Error('Missing hdkey');
+    }
+
+    try {
+      const rawAddress = rawSecp256k1PubkeyToRawAddress(this.hdkey.publicKey);
+      console.log(toBech32('dydx', rawAddress));
+
+      const { message, action, status } = params;
+      const timestamp = Math.floor(Date.now() / 1000);
+      const messageToSign: string = `${message}:${action}"${status || ''}:${timestamp}`;
+      const messageHash = sha256(Buffer.from(messageToSign));
+
+      const signed = await Secp256k1.createSignature(messageHash, this.hdkey.privateKey);
+      const signedMessage = signed.toFixedLength();
+
+      return JSON.stringify({
+        signedMessage: Buffer.from(signedMessage).toString('base64'),
+        publicKey: Buffer.from(this.hdkey.publicKey).toString('base64'),
+        timestamp,
+      });
+    } catch (error) {
+      log('DydxChainTransactions/signComplianceMessage', error);
+
+      return JSON.stringify({
+        error,
+      });
+    }
+  }
+
   async transaction(
     type: TransactionTypes,
     paramsInJson: Abacus.Nullable<string>,
@@ -535,6 +579,11 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         }
         case TransactionType.CctpWithdraw: {
           const result = await this.cctpWithdraw(params);
+          callback(result);
+          break;
+        }
+        case TransactionType.SignCompliancePayload: {
+          const result = await this.signCompliancePayload(params);
           callback(result);
           break;
         }

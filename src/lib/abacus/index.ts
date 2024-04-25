@@ -29,6 +29,7 @@ import {
   type TriggerOrdersInputFields,
   TriggerOrdersInputField,
 } from '@/constants/abacus';
+import { Hdkey } from '@/constants/account';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork, isMainnet } from '@/constants/networks';
 import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
@@ -218,10 +219,11 @@ class AbacusStateManager {
     this.chainTransactions.setStore(store);
   };
 
-  setAccount = (localWallet?: LocalWallet) => {
+  setAccount = (localWallet?: LocalWallet, hdkey?: Hdkey) => {
     if (localWallet) {
       this.stateManager.accountAddress = localWallet.address;
       this.chainTransactions.setLocalWallet(localWallet);
+      if (hdkey) this.chainTransactions.setHdkey(hdkey);
     }
   };
 

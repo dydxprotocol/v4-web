@@ -3,25 +3,12 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import { RestrictionType } from '@/constants/abacus';
-import { DialogTypes } from '@/constants/dialogs';
 
 import { getRestrictionType } from '@/state/accountSelectors';
-import { forceOpenDialog } from '@/state/dialogs';
-
-import { isTruthy } from '@/lib/isTruthy';
 
 const useRestrictionContext = () => {
-  const dispatch = useDispatch();
   const restrictionType = useSelector(getRestrictionType, shallowEqual);
   const [sanctionedAddresses, setSanctionedAddresses] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (restrictionType === RestrictionType.GEO_RESTRICTED) {
-      dispatch(
-        forceOpenDialog({ type: DialogTypes.RestrictedGeo, dialogProps: { preventClose: true } })
-      );
-    }
-  }, [restrictionType, dispatch]);
 
   const updateSanctionedAddresses = useCallback(
     (screenedAddresses: { [address: string]: boolean }) => {

@@ -259,9 +259,9 @@ const useAccountsContext = () => {
 
   // abacus
   useEffect(() => {
-    if (dydxAddress) abacusStateManager.setAccount(localDydxWallet);
+    if (dydxAddress) abacusStateManager.setAccount(localDydxWallet, hdKey);
     else abacusStateManager.attemptDisconnectAccount();
-  }, [localDydxWallet]);
+  }, [localDydxWallet, hdKey]);
 
   useEffect(() => {
     const setNobleWallet = async () => {
@@ -308,21 +308,6 @@ const useAccountsContext = () => {
       })
     );
   }, [dydxSubaccounts]);
-
-  // Restrictions
-  const { isBadActor, sanctionedAddresses } = useRestrictions();
-
-  useEffect(() => {
-    if (
-      dydxAddress &&
-      (isBadActor ||
-        sanctionedAddresses.has(dydxAddress) ||
-        (evmAddress && sanctionedAddresses.has(evmAddress)))
-    ) {
-      dispatch(forceOpenDialog({ type: DialogTypes.RestrictedWallet }));
-      disconnect();
-    }
-  }, [isBadActor, evmAddress, dydxAddress, sanctionedAddresses]);
 
   // Disconnect wallet / accounts
   const disconnectLocalDydxWallet = () => {

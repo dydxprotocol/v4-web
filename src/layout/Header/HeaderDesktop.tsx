@@ -37,7 +37,6 @@ export const HeaderDesktop = () => {
   const { complianceState } = useComplianceState();
 
   const hasSeenLaunchIncentives = useSelector(getHasSeenLaunchIncentives);
-  const { complianceState } = useComplianceState();
 
   const navItems = [
     {

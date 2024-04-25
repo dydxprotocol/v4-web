@@ -98,7 +98,7 @@ export const ComplianceConfigDialog = ({ setIsOpen }: ElementProps) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ address: dydxAddress, status: complianceStatus?.rawValue }),
+        body: JSON.stringify({ address: dydxAddress, status: complianceStatus?.name }),
       });
     }
   };
