@@ -118,18 +118,16 @@ export const ClosePositionForm = ({
   useEffect(() => {
     if (currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder) return;
 
-    if (currentInput !== 'closePosition') {
-      abacusStateManager.setClosePositionValue({
-        value: market,
-        field: ClosePositionInputField.market,
-      });
+    abacusStateManager.setClosePositionValue({
+      value: market,
+      field: ClosePositionInputField.market,
+    });
 
-      abacusStateManager.setClosePositionValue({
-        value: SIZE_PERCENT_OPTIONS[MAX_KEY],
-        field: ClosePositionInputField.percent,
-      });
-    }
-  }, [currentInput, market, currentStep]);
+    abacusStateManager.setClosePositionValue({
+      value: SIZE_PERCENT_OPTIONS[MAX_KEY],
+      field: ClosePositionInputField.percent,
+    });
+  }, [market, currentStep]);
 
   const onLastOrderIndexed = useCallback(() => {
     if (!isFirstRender) {

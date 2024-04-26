@@ -108,6 +108,7 @@ export type TradeInputs = Abacus.exchange.dydx.abacus.output.input.TradeInput;
 export type ClosePositionInputs = Abacus.exchange.dydx.abacus.output.input.ClosePositionInput;
 export type TradeInputSummary = Abacus.exchange.dydx.abacus.output.input.TradeInputSummary;
 export type TransferInputs = Abacus.exchange.dydx.abacus.output.input.TransferInput;
+export type TriggerOrdersInputs = Abacus.exchange.dydx.abacus.output.input.TriggerOrdersInput;
 export type InputError = Abacus.exchange.dydx.abacus.output.input.ValidationError;
 export type TransferInputTokenResource =
   Abacus.exchange.dydx.abacus.output.input.TransferInputTokenResource;
@@ -175,6 +176,14 @@ export const ClosePositionInputField =
 const closePositionInputFields = [...ClosePositionInputField.values()] as const;
 export type ClosePositionInputFields = (typeof closePositionInputFields)[number];
 
+// ------ Trigger Order Items ------ //
+export const TriggerOrdersInputField =
+  Abacus.exchange.dydx.abacus.state.model.TriggerOrdersInputField;
+const triggerOrdersInputFields = [...TriggerOrdersInputField.values()] as const;
+export type TriggerOrdersInputFields = (typeof triggerOrdersInputFields)[number];
+export type TriggerOrdersInputPrice = Abacus.exchange.dydx.abacus.output.input.TriggerPrice;
+export type TriggerOrdersTriggerOrder = Abacus.exchange.dydx.abacus.output.input.TriggerOrder;
+
 export type ValidationError = Abacus.exchange.dydx.abacus.output.input.ValidationError;
 export const TradeInputErrorAction = Abacus.exchange.dydx.abacus.output.input.ErrorAction;
 export type AbacusOrderTypes = Abacus.exchange.dydx.abacus.output.input.OrderType;
@@ -191,6 +200,8 @@ export type HumanReadablePlaceOrderPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadablePlaceOrderPayload;
 export type HumanReadableCancelOrderPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableCancelOrderPayload;
+export type HumanReadableTriggerOrdersPayload =
+  Abacus.exchange.dydx.abacus.state.manager.HumanReadableTriggerOrdersPayload;
 export type HumanReadableWithdrawPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableWithdrawPayload;
 export type HumanReadableTransferPayload =

@@ -1,21 +1,16 @@
 /* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable no-plusplus */
-/* eslint-disable no-console */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable no-await-in-loop */
-import Ajv from 'ajv';
-import axios from 'axios';
-import { readFileSync } from 'fs';
 
+/* eslint-disable no-plusplus */
+
+/* eslint-disable no-console */
+
+/* eslint-disable no-restricted-syntax */
+
+/* eslint-disable no-await-in-loop */
 import { EncodeObject } from '@cosmjs/proto-signing';
 import { Account, StdFee } from '@cosmjs/stargate';
-import { BroadcastTxSyncResponse } from '@cosmjs/tendermint-rpc/build/tendermint37';
 import { Method } from '@cosmjs/tendermint-rpc';
-import { MsgVote } from '@dydxprotocol/v4-proto/src/codegen/cosmos/gov/v1/tx';
-import { ClobPair } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/clob/clob_pair';
-import { Perpetual } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
-import { MarketPrice } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/prices/market_price';
-
+import { BroadcastTxSyncResponse } from '@cosmjs/tendermint-rpc/build/tendermint37';
 import {
   CompositeClient,
   LocalWallet as LocalWalletType,
@@ -24,7 +19,15 @@ import {
   TransactionOptions,
   VoteOption,
 } from '@dydxprotocol/v4-client-js';
-
+import {
+  Perpetual, // PerpetualMarketType,
+} from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
+import { MsgVote } from '@dydxprotocol/v4-proto/src/codegen/cosmos/gov/v1/tx';
+import { ClobPair } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/clob/clob_pair';
+import { MarketPrice } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/prices/market_price';
+import Ajv from 'ajv';
+import axios from 'axios';
+import { readFileSync } from 'fs';
 import Long from 'long';
 
 const LocalWalletModule = await import(
@@ -73,6 +76,7 @@ interface Exchange {
 interface Params {
   id: number;
   ticker: string;
+  marketType: 'PERPETUAL_MARKET_TYPE_ISOLATED' | 'PERPETUAL_MARKET_TYPE_CROSS';
   priceExponent: number;
   minPriceChange: number;
   minExchanges: number;
@@ -371,6 +375,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
       const tx = await retry(() =>
         client.submitGovAddNewMarketProposal(
           wallets[j],
+          // @ts-ignore: marketType is not a valid parameter for addNewMarketProposal
           {
             id: marketId,
             ticker: proposal.params.ticker,
@@ -384,6 +389,10 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
             stepBaseQuantums: Long.fromNumber(proposal.params.stepBaseQuantums),
             subticksPerTick: proposal.params.subticksPerTick,
             delayBlocks: proposal.params.delayBlocks,
+            // marketType:
+            //   proposal.params.marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
+            //     ? PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED
+            //     : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS,
           },
           proposal.title,
           proposal.summary,
@@ -433,8 +442,10 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   // Check markets on chain.
   console.log('\nChecking price, clob pair, and perpetual on chain for each market proposed...');
   for (const [marketId, proposal] of marketsProposed.entries()) {
+    console.log(`\nChecking ${proposal?.params?.ticker}`);
+    const isDydxUsd = proposal.params.ticker.toLowerCase() === 'dydx-usd';
     // Validate price.
-    const price = await client.validatorClient.get.getPrice(marketId);
+    const price = await client.validatorClient.get.getPrice(isDydxUsd ? 1000001 : marketId);
     validatePrice(price.marketPrice!, proposal);
 
     // Validate clob pair.
