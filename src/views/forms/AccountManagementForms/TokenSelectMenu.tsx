@@ -55,7 +55,9 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
             key: STRING_KEYS.LOWEST_FEES_WITH_USDC,
             params: {
               LOWEST_FEES_HIGHLIGHT_TEXT: (
-                <Styled.GreenHighlight>Lowest fees&#32;</Styled.GreenHighlight>
+                <Styled.GreenHighlight>
+                  {stringGetter({ key: STRING_KEYS.LOWEST_FEES_HIGHLIGHT_TEXT })}
+                </Styled.GreenHighlight>
               ),
             },
           })}
