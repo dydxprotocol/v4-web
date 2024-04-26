@@ -292,7 +292,7 @@ export const Output = ({
                       {significantDigits}.
                       {Boolean(zeros) && (
                         <>
-                          0<sub title={formattedValue}>{zeros}</sub>
+                          0<Styled.Sub title={formattedValue}>{zeros}</Styled.Sub>
                         </>
                       )}
                       {decimalDigits}
@@ -323,7 +323,7 @@ export const Output = ({
                       {significantDigits}.
                       {Boolean(zeros) && (
                         <>
-                          0<sub title={formattedValue}>{zeros}</sub>
+                          0<Styled.Sub title={formattedValue}>{zeros}</Styled.Sub>
                         </>
                       )}
                       {decimalDigits}
@@ -411,6 +411,10 @@ Styled.Output = styled.output<{ withParentheses?: boolean }>`
       --output-beforeString: '(';
       --output-afterString: ')';
     `}
+`;
+
+Styled.Sub = styled.sub`
+  font-size: 0.85em;
 `;
 
 Styled.Tag = styled(Tag)`
