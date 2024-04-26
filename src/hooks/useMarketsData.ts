@@ -53,10 +53,6 @@ export const useMarketsData = (
   const allPerpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
   const allAssets = useSelector(getAssets, shallowEqual) || {};
   const sevenDaysSparklineData = usePerpetualMarketSparklines();
-  const oneDaySparklineData = usePerpetualMarketSparklines({
-    period: 'ONE_DAY',
-    refetchInterval: undefined,
-  });
 
   const markets = useMemo(() => {
     return Object.values(allPerpetualMarkets)
@@ -86,13 +82,12 @@ export const useMarketsData = (
           tickSizeDecimals: marketData.configs?.tickSizeDecimals,
           isNew,
           listingDate,
-          oneDaySparkline: oneDaySparklineData?.[marketData.id] ?? [],
           ...marketData,
           ...marketData.perpetual,
           ...marketData.configs,
         };
       }) as MarketData[];
-  }, [allPerpetualMarkets, allAssets, oneDaySparklineData, sevenDaysSparklineData]);
+  }, [allPerpetualMarkets, allAssets, sevenDaysSparklineData]);
 
   const filteredMarkets = useMemo(() => {
     const filtered = markets.filter(filterFunctions[filter]);
