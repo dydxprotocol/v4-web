@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import styled, { AnyStyledComponent } from 'styled-components';
 
@@ -20,6 +20,11 @@ type ElementProps = {
 export const HelpDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { help: helpCenter, community } = useURLConfigs();
+
+  useEffect(() => {
+    const latestCommit = import.meta.env.VITE_LAST_ORIGINAL_COMMIT;
+    console.log('latestCommit', latestCommit);
+  }, []);
 
   const HELP_ITEMS = useMemo(
     () => [
