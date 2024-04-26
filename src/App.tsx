@@ -19,7 +19,7 @@ import {
 } from '@/hooks';
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
-import { DialogAreaProvider, useDialogArea } from '@/hooks/useDialogArea';
+import { DialogAreaProvider } from '@/hooks/useDialogArea';
 import { DydxProvider } from '@/hooks/useDydxClient';
 import { LocalNotificationsProvider } from '@/hooks/useLocalNotifications';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
@@ -61,8 +61,6 @@ const TokenPage = lazy(() => import('@/pages/token/Token'));
 const queryClient = new QueryClient();
 
 const Content = () => {
-  const setDialogArea = useDialogArea()?.setDialogArea;
-
   useInitializePage();
   useAnalytics();
 
