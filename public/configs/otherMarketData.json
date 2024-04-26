@@ -4316,7 +4316,7 @@
           "adjustByMarket": "USDT-USD"
         }
       ],
-      "liquidityTier": 2,
+      "liquidityTier": 1,
       "atomicResolution": -6.0,
       "quantumConversionExponent": -9,
       "defaultFundingPpm": 0,
