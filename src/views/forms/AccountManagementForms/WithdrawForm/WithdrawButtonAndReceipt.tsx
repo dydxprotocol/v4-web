@@ -133,36 +133,6 @@ export const WithdrawButtonAndReceipt = ({
         />
       ),
     },
-    typeof summary?.gasFee === 'number' && {
-      key: 'gas-fees',
-      label: (
-        <WithTooltip tooltipString="Gas fees are transaction fees on the source chain, in this case dYdX">
-          {stringGetter({ key: STRING_KEYS.GAS_FEE })}
-        </WithTooltip>
-      ),
-      value: <Output type={OutputType.Fiat} value={10} />,
-    },
-    typeof summary?.bridgeFee === 'number' && {
-      key: 'bridge-fees',
-      label: (
-        <WithTooltip tooltip="bridge-fees">
-          {stringGetter({ key: STRING_KEYS.BRIDGE_FEE })}
-        </WithTooltip>
-      ),
-      value: <Output type={OutputType.Fiat} value={summary?.bridgeFee} />,
-    },
-    !exchange && {
-      key: 'slippage',
-      label: <span>{stringGetter({ key: STRING_KEYS.MAX_SLIPPAGE })}</span>,
-      value: (
-        <SlippageEditor
-          disabled
-          slippage={slippage}
-          setIsEditing={setIsEditingSlipapge}
-          setSlippage={setSlippage}
-        />
-      ),
-    },
     {
       key: 'estimated-route-duration',
       label: <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_TIME })}</span>,
