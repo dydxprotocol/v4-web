@@ -33,6 +33,7 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
+import { WithTooltip } from '@/components/WithTooltip';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
@@ -74,6 +75,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     errors: routeErrors,
     errorMessage: routeErrorMessage,
     isCctp,
+    depositOptions,
   } = useSelector(getTransferInputs, shallowEqual) || {};
   const chainId = chainIdStr ? parseInt(chainIdStr) : undefined;
 
@@ -87,6 +89,10 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     () => (chainIdStr ? resources?.chainResources?.get(chainIdStr) : undefined),
     [chainId, resources]
   );
+
+  const sourceChainName = depositOptions?.chains
+    ?.toArray()
+    .find((chain) => chain.type === chainIdStr)?.stringKey;
 
   const [fromAmount, setFromAmount] = useState('');
   const [slippage, setSlippage] = useState(isCctp ? 0 : 0.01); // 1% slippage
@@ -396,9 +402,22 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   if (!resources) {
     return <LoadingSpace id="DepositForm" />;
   }
-
   return (
     <Styled.Form onSubmit={onSubmit}>
+      <Styled.Subheader>
+        {stringGetter({
+          key: STRING_KEYS.LOWEST_FEE_DEPOSITS,
+          params: {
+            LOWEST_FEE_TOKENS_TOOLTIP: (
+              <WithTooltip tooltip="lowest-fees">
+                {stringGetter({
+                  key: STRING_KEYS.SELECT_CHAINS,
+                })}
+              </WithTooltip>
+            ),
+          },
+        })}
+      </Styled.Subheader>
       <SourceSelectMenu
         selectedChain={chainIdStr || undefined}
         selectedExchange={exchange || undefined}
@@ -433,6 +452,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
               isDisabled={isDisabled}
               isLoading={isLoading}
               chainId={chainId || undefined}
+              sourceChainName={sourceChainName || ''}
               setSlippage={onSetSlippage}
               slippage={slippage}
               sourceToken={sourceToken || undefined}
@@ -450,6 +470,10 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Form = styled.form`
   ${formMixins.transfersForm}
+`;
+
+Styled.Subheader = styled.div`
+  color: var(--color-text-0);
 `;
 
 Styled.Footer = styled.footer`
