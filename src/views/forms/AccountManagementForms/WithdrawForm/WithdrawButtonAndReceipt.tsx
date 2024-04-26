@@ -5,7 +5,7 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { TransferInputTokenResource } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
-import { STRING_KEYS, TOOLTIP_STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter, useTokenConfigs } from '@/hooks';
@@ -170,13 +170,7 @@ export const WithdrawButtonAndReceipt = ({
     !isDisabled && !isEditingSlippage && connectionError !== ConnectionErrorType.CHAIN_DISRUPTION;
 
   return (
-    <Styled.WithReceipt
-      slotReceipt={
-        <Styled.CollapsibleDetails>
-          <Styled.Details items={submitButtonReceipt} />
-        </Styled.CollapsibleDetails>
-      }
-    >
+    <Styled.WithReceipt slotReceipt={<Styled.Details items={submitButtonReceipt} />}>
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
       ) : (
@@ -210,12 +204,8 @@ Styled.WithReceipt = styled(WithReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
-Styled.CollapsibleDetails = styled.div`
-  ${layoutMixins.column}
-  padding: var(--form-input-paddingY) var(--form-input-paddingX);
-`;
-
 Styled.Details = styled(Details)`
+  padding: var(--form-input-paddingY) var(--form-input-paddingX);
   font-size: 0.8125em;
 `;
 
