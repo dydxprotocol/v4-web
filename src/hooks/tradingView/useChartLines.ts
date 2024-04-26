@@ -15,6 +15,7 @@ import {
   getIsAccountConnected,
 } from '@/state/accountSelectors';
 import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
+import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { getChartLineColors } from '@/lib/tradingView/utils';
@@ -43,8 +44,13 @@ export const useChartLines = ({
 
   const isAccountConnected = useSelector(getIsAccountConnected);
 
+  const currentMarketId = useSelector(getCurrentMarketId);
   const currentMarketPositionData = useSelector(getCurrentMarketPositionData, shallowEqual);
   const currentMarketOrders: SubaccountOrder[] = useSelector(getCurrentMarketOrders, shallowEqual);
+
+  useEffect(() => {
+    return () => deleteChartLines();
+  }, [currentMarketId]);
 
   useEffect(() => {
     if (isChartReady && displayButton) {
@@ -117,7 +123,7 @@ export const useChartLines = ({
     price?: number | null;
     size?: number | null;
   }) => {
-    const shouldShow = size && price;
+    const shouldShow = !!(size && price);
     const maybePositionLine = chartLinesRef.current[key]?.line;
 
     if (!shouldShow) {
@@ -129,18 +135,22 @@ export const useChartLines = ({
     }
 
     const formattedPrice = MustBigNumber(price).toNumber();
+    const quantity = Math.abs(size).toString();
 
     if (maybePositionLine) {
       if (maybePositionLine.getPrice() !== formattedPrice) {
         maybePositionLine.setPrice(formattedPrice);
       }
+      if (maybePositionLine.getQuantity() !== quantity) {
+        maybePositionLine.setQuantity(quantity);
+      }
     } else {
       const positionLine = tvWidget
         ?.chart()
         .createPositionLine({ disableUndo: false })
-        .setText(label)
         .setPrice(formattedPrice)
-        .setQuantity('');
+        .setQuantity(quantity)
+        .setText(label);
 
       if (positionLine) {
         const chartLine: ChartLine = { line: positionLine, chartLineType };
@@ -180,6 +190,7 @@ export const useChartLines = ({
           (status === AbacusOrderStatus.open || status === AbacusOrderStatus.untriggered);
 
         const maybeOrderLine = chartLinesRef.current[key]?.line;
+        const formattedPrice = MustBigNumber(triggerPrice ?? price).toNumber();
 
         if (!shouldShow) {
           if (maybeOrderLine) {
@@ -189,6 +200,9 @@ export const useChartLines = ({
           }
         } else {
           if (maybeOrderLine) {
+            if (maybeOrderLine.getPrice() !== formattedPrice) {
+              maybeOrderLine.setPrice(formattedPrice);
+            }
             if (maybeOrderLine.getQuantity() !== quantity) {
               maybeOrderLine.setQuantity(quantity);
             }
@@ -196,7 +210,7 @@ export const useChartLines = ({
             const orderLine = tvWidget
               ?.chart()
               .createOrderLine({ disableUndo: false })
-              .setPrice(MustBigNumber(triggerPrice ?? price).toNumber())
+              .setPrice(formattedPrice)
               .setQuantity(quantity)
               .setText(orderString);
 
