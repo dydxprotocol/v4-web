@@ -440,7 +440,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const { complianceStatus } = useComplianceState();
 
       return () => {
-        if (complianceStatus === ComplianceStatus.FIRST_STRIKE) {
+        if (complianceStatus === ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY) {
           dispatch(
             openDialog({
               type: DialogTypes.GeoCompliance,

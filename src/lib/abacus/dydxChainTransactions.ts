@@ -1,6 +1,4 @@
-import { rawSecp256k1PubkeyToRawAddress } from '@cosmjs/amino';
 import { Secp256k1, sha256 } from '@cosmjs/crypto';
-import { toBech32 } from '@cosmjs/encoding';
 import { EncodeObject } from '@cosmjs/proto-signing';
 import type { IndexedTx } from '@cosmjs/stargate';
 import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
@@ -41,6 +39,7 @@ import { RootStore } from '@/state/_store';
 import { addUncommittedOrderClientId, removeUncommittedOrderClientId } from '@/state/account';
 import { setInitializationError } from '@/state/app';
 
+import { signCompliancePayload } from '../compliance';
 import { StatefulOrderError } from '../errors';
 import { bytesToBigInt } from '../numbers';
 import { log } from '../telemetry';
@@ -513,19 +512,15 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     }
 
     try {
-      const rawAddress = rawSecp256k1PubkeyToRawAddress(this.hdkey.publicKey);
-      console.log(toBech32('dydx', rawAddress));
-
-      const { message, action, status } = params;
-      const timestamp = Math.floor(Date.now() / 1000);
-      const messageToSign: string = `${message}:${action}"${status || ''}:${timestamp}`;
-      const messageHash = sha256(Buffer.from(messageToSign));
-
-      const signed = await Secp256k1.createSignature(messageHash, this.hdkey.privateKey);
-      const signedMessage = signed.toFixedLength();
+      const { signedMessage, timestamp } = await signCompliancePayload(
+        params.message,
+        params.action,
+        params.status,
+        this.hdkey
+      );
 
       return JSON.stringify({
-        signedMessage: Buffer.from(signedMessage).toString('base64'),
+        signedMessage,
         publicKey: Buffer.from(this.hdkey.publicKey).toString('base64'),
         timestamp,
       });
