@@ -124,7 +124,7 @@ const Content = () => {
 
         <Styled.NotificationsToastArea />
 
-        <Styled.DialogArea ref={setDialogArea}>
+        <Styled.DialogArea>
           <DialogManager />
         </Styled.DialogArea>
 
