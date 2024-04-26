@@ -409,7 +409,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
           key: STRING_KEYS.LOWEST_FEE_DEPOSITS,
           params: {
             LOWEST_FEE_TOKENS_TOOLTIP: (
-              <WithTooltip tooltip="lowest-fees">
+              <WithTooltip tooltip="lowest-fees-deposit">
                 {stringGetter({
                   key: STRING_KEYS.SELECT_CHAINS,
                 })}
