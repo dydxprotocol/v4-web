@@ -10,7 +10,7 @@ export const DialogAreaProvider = ({ ...props }) => (
   <DialogAreaContext.Provider value={useDialogAreaContext()} {...props} />
 );
 
-export const useDialogArea = () => useContext(DialogAreaContext)!;
+export const useDialogArea = () => useContext(DialogAreaContext);
 
 const useDialogAreaContext = () => {
   const [dialogArea, setDialogArea] = useState<HTMLElement>();
