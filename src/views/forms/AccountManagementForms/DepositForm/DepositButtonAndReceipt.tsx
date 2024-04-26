@@ -93,10 +93,8 @@ export const DepositButtonAndReceipt = ({
   const { current: buyingPower, postOrder: newBuyingPower } =
     useSelector(getSubaccountBuyingPower, shallowEqual) || {};
 
-  const { summary: summary2, requestPayload } = useSelector(getTransferInputs, shallowEqual) || {};
+  const { summary, requestPayload } = useSelector(getTransferInputs, shallowEqual) || {};
   const { usdcLabel } = useTokenConfigs();
-
-  const summary: any = { ...summary2, gasFee: 10, bridgeFee: 100 };
 
   const submitButtonReceipt = [
     {
