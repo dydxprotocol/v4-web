@@ -17,8 +17,6 @@ import { Popover, TriggerType } from '@/components/Popover';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithLabel } from '@/components/WithLabel';
 
-import cctpTokens from '../../public/configs/cctp.json';
-
 type ElementProps = {
   asChild?: boolean;
   children: ReactNode;
@@ -36,17 +34,10 @@ type StyleProps = {
 
 export type SearchSelectMenuProps = ElementProps & StyleProps;
 
-type TokenInfo = {
-  chainId: string;
-  tokenAddress: string;
-  name: string;
-};
-
 export const SearchSelectMenu = ({
   asChild,
   children,
   className,
-  disabled,
   label,
   items,
   withSearch = true,
