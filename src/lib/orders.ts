@@ -19,8 +19,6 @@ import { IconName } from '@/components/Icon';
 import { convertAbacusOrderSide } from '@/lib/abacus/conversions';
 import { MustBigNumber } from '@/lib/numbers';
 
-import { testFlags } from './testFlags';
-
 export const getStatusIconInfo = ({
   status,
   totalFilled,
@@ -95,15 +93,15 @@ export const isLimitOrderType = (type?: AbacusOrderTypes) =>
     ({ ordinal }) => ordinal === type.ordinal
   );
 
-export const isStopLossOrder = (order: SubaccountOrder) => {
-  const validOrderTypes = testFlags.enableConditionalLimitOrders
+export const isStopLossOrder = (order: SubaccountOrder, isSlTpLimitOrdersEnabled: boolean) => {
+  const validOrderTypes = isSlTpLimitOrdersEnabled
     ? [AbacusOrderType.stopLimit, AbacusOrderType.stopMarket]
     : [AbacusOrderType.stopMarket];
   return validOrderTypes.some(({ ordinal }) => ordinal === order.type.ordinal) && order.reduceOnly;
 };
 
-export const isTakeProfitOrder = (order: SubaccountOrder) => {
-  const validOrderTypes = testFlags.enableConditionalLimitOrders
+export const isTakeProfitOrder = (order: SubaccountOrder, isSlTpLimitOrdersEnabled: boolean) => {
+  const validOrderTypes = isSlTpLimitOrdersEnabled
     ? [AbacusOrderType.takeProfitLimit, AbacusOrderType.takeProfitMarket]
     : [AbacusOrderType.takeProfitMarket];
   return validOrderTypes.some(({ ordinal }) => ordinal === order.type.ordinal) && order.reduceOnly;

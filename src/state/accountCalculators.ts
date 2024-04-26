@@ -2,14 +2,14 @@ import { createSelector } from 'reselect';
 
 import { OnboardingState, OnboardingSteps } from '@/constants/account';
 
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
+
 import {
   getOnboardingGuards,
   getOnboardingState,
   getSubaccountId,
   getUncommittedOrderClientIds,
 } from '@/state/accountSelectors';
-
-import { testFlags } from '@/lib/testFlags';
 
 export const calculateOnboardingStep = createSelector(
   [getOnboardingState, getOnboardingGuards],
@@ -92,7 +92,7 @@ export const calculateIsAccountLoading = createSelector(
  */
 export const calculateShouldRenderTriggersInPositionsTable = createSelector(
   [calculateIsAccountViewOnly],
-  (isAccountViewOnly: boolean) => !isAccountViewOnly && testFlags.configureSlTpFromPositionsTable
+  (isAccountViewOnly: boolean) => !isAccountViewOnly && useEnvFeatures().isSlTpEnabled
 );
 
 /**

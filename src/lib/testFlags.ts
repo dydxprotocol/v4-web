@@ -32,14 +32,6 @@ class TestFlags {
     return this.queryParams.address;
   }
 
-  get configureSlTpFromPositionsTable() {
-    return !!this.queryParams.sltp;
-  }
-
-  get enableConditionalLimitOrders() {
-    return !!this.queryParams.sltplimit;
-  }
-
   get isolatedMargin() {
     return !!this.queryParams.isolatedmargin;
   }
