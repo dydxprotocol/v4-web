@@ -337,7 +337,10 @@ const getPositionsTableColumnDef = ({
       [PositionsTableColumnKey.Actions]: {
         columnKey: 'actions',
         label: stringGetter({
-          key: shouldRenderTriggers ? STRING_KEYS.ACTIONS : STRING_KEYS.ACTION,
+          key:
+            shouldRenderTriggers && showClosePositionAction
+              ? STRING_KEYS.ACTIONS
+              : STRING_KEYS.ACTION,
         }),
         isActionable: true,
         allowsSorting: false,
