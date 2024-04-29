@@ -28,7 +28,7 @@ import { openDialog } from '@/state/dialogs';
 
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
-  const { documentation, community, mintscanBase } = useURLConfigs();
+  const { documentation, community, mintscanBase, exchangeStats } = useURLConfigs();
   const dispatch = useDispatch();
   const { chainTokenLabel } = useTokenConfigs();
 
@@ -101,6 +101,12 @@ export const HeaderDesktop = () => {
                 e.preventDefault();
                 dispatch(openDialog({ type: DialogTypes.Help }));
               },
+            },
+            {
+              value: 'STATS',
+              slotBefore: <Icon iconName={IconName.FundingChart} />,
+              label: stringGetter({ key: STRING_KEYS.STATISTICS }),
+              href: exchangeStats,
             },
           ],
         },
