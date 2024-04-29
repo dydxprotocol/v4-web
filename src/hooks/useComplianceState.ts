@@ -2,7 +2,6 @@ import { shallowEqual, useSelector } from 'react-redux';
 
 import { ComplianceStatus } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
-import { BLOCKED_COUNTRIES, CountryCodes, OFAC_SANCTIONED_COUNTRIES } from '@/constants/geo';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 
@@ -26,10 +25,7 @@ export const useComplianceState = () => {
     complianceStatus === ComplianceStatus.CLOSE_ONLY
   ) {
     complianceState = ComplianceStates.CLOSE_ONLY;
-  } else if (
-    complianceStatus === ComplianceStatus.BLOCKED ||
-    (geo && isBlockedGeo(geo) && isMainnet)
-  ) {
+  } else if (complianceStatus === ComplianceStatus.BLOCKED || (geo && isBlockedGeo(geo))) {
     complianceState = ComplianceStates.READ_ONLY;
   }
 
