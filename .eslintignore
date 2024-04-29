@@ -12,3 +12,9 @@ commitlint.config.ts
 /src/menus
 /src/pages
 /src/views
+
+# components dir is being worked on
+/src/components/*
+
+# unignored components
+!/src/components/Table.tsx
