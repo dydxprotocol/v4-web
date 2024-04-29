@@ -4,16 +4,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import {
-  ValidationError,
-  type SubaccountOrder,
+  AbacusOrderType,
   ErrorType,
-  HumanReadableTriggerOrdersPayload,
-  Nullable,
   HumanReadableCancelOrderPayload,
   HumanReadablePlaceOrderPayload,
-  TRADE_TYPES,
+  HumanReadableTriggerOrdersPayload,
   KotlinIrEnumValues,
-  AbacusOrderType,
+  Nullable,
+  TRADE_TYPES,
+  ValidationError,
+  type SubaccountOrder,
 } from '@/constants/abacus';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';

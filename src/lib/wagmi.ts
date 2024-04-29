@@ -6,31 +6,31 @@ import {
   arbitrumGoerli,
   avalanche,
   avalancheFuji,
-  bsc,
-  bscTestnet,
-  optimism,
-  optimismGoerli,
   base,
   baseGoerli,
-  polygon,
-  polygonMumbai,
+  bsc,
+  bscTestnet,
+  celo,
+  celoAlfajores,
+  fantom,
+  fantomTestnet,
+  filecoin,
+  filecoinHyperspace,
+  kava,
   linea,
   lineaTestnet,
   mantle,
   mantleTestnet,
-  moonbeam,
   moonbaseAlpha,
-  filecoin,
-  filecoinHyperspace,
-  fantom,
-  fantomTestnet,
-  celo,
-  celoAlfajores,
+  moonbeam,
+  optimism,
+  optimismGoerli,
+  polygon,
+  polygonMumbai,
   scroll,
-  kava,
   sepolia,
 } from 'viem/chains';
-import { createConfig, configureChains, mainnet, Chain } from 'wagmi';
+import { Chain, configureChains, createConfig, mainnet } from 'wagmi';
 import { goerli } from 'wagmi/chains';
 import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet';
 import { InjectedConnector } from 'wagmi/connectors/injected';
@@ -43,12 +43,12 @@ import { publicProvider } from 'wagmi/providers/public';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_APP_ENVIRONMENT, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import {
-  type WalletConnection,
+  WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS,
   WalletConnectionType,
-  type WalletType,
   walletConnectionTypes,
   wallets,
-  WALLET_CONNECT_EXPLORER_RECOMMENDED_IDS,
+  type WalletConnection,
+  type WalletType,
 } from '@/constants/wallets';
 
 import { isTruthy } from './isTruthy';

@@ -5,13 +5,13 @@ import { type IndexedTx } from '@cosmjs/stargate';
 import { Method } from '@cosmjs/tendermint-rpc';
 import type { Nullable } from '@dydxprotocol/v4-abacus';
 import {
-  type LocalWallet,
   SubaccountClient,
-  type GovAddNewMarketParams,
   utils,
+  type GovAddNewMarketParams,
+  type LocalWallet,
 } from '@dydxprotocol/v4-client-js';
 import Long from 'long';
-import { shallowEqual, useSelector, useDispatch } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import type {
   AccountBalance,
@@ -24,7 +24,7 @@ import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { DydxAddress } from '@/constants/wallets';
 
-import { setSubaccount, setHistoricalPnl, removeUncommittedOrderClientId } from '@/state/account';
+import { removeUncommittedOrderClientId, setHistoricalPnl, setSubaccount } from '@/state/account';
 import { getBalances } from '@/state/accountSelectors';
 
 import abacusStateManager from '@/lib/abacus';

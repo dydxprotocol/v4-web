@@ -1,5 +1,5 @@
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import { type Nullable } from '@/constants/abacus';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
@@ -11,7 +11,7 @@ import { useBreakpoints, useStringGetter } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
-import { DetachedSection, DetachedScrollableSection } from '@/components/ContentSection';
+import { DetachedScrollableSection, DetachedSection } from '@/components/ContentSection';
 import { Details } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType, ShowSign } from '@/components/Output';

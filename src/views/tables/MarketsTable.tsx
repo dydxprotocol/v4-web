@@ -19,7 +19,7 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
-import { type ColumnDef, MarketTableCell, Table, TableCell } from '@/components/Table';
+import { MarketTableCell, Table, TableCell, type ColumnDef } from '@/components/Table';
 import { Toolbar } from '@/components/Toolbar';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { MarketFilter } from '@/views/MarketFilter';

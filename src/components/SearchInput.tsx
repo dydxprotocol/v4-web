@@ -6,7 +6,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
-import { Input, type InputProps, InputType } from '@/components/Input';
+import { Input, InputType, type InputProps } from '@/components/Input';
 
 type ElementProps = {
   onTextChange?: (value: string) => void;

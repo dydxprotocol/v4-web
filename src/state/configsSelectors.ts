@@ -1,5 +1,5 @@
 import type { RootState } from './_store';
-import { AppTheme, AppThemeSystemSetting, AppThemeSetting } from './configs';
+import { AppTheme, AppThemeSetting, AppThemeSystemSetting } from './configs';
 
 export const getAppThemeSetting = (state: RootState): AppThemeSetting =>
   state.configs.appThemeSetting;

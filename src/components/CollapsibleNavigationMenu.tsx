@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { Root, List, Item, Sub, Link } from '@radix-ui/react-navigation-menu';
-import _ from 'lodash';
-import { matchPath, NavLink, useLocation } from 'react-router-dom';
+import { Item, Link, List, Root, Sub } from '@radix-ui/react-navigation-menu';
+import { NavLink, matchPath, useLocation } from 'react-router-dom';
 import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import { type MenuItem } from '@/constants/menus';

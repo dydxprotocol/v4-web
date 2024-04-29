@@ -1,6 +1,6 @@
 import type { Story } from '@ladle/react';
 
-import { Input, InputType, InputProps } from '@/components/Input';
+import { Input, InputProps, InputType } from '@/components/Input';
 
 import { StoryWrapper } from '.ladle/components';
 

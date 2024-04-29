@@ -1,6 +1,6 @@
 import { forwardRef, type Ref } from 'react';
 
-import { Root, Item } from '@radix-ui/react-toggle-group';
+import { Item, Root } from '@radix-ui/react-toggle-group';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';

@@ -3,11 +3,11 @@ import { useState } from 'react';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import {
+  Nullable,
   TriggerOrdersInputPrice,
   type TriggerOrdersInputFields,
-  Nullable,
 } from '@/constants/abacus';
-import { ButtonAction, ButtonType, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, PERCENT_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 

@@ -6,7 +6,6 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter, useURLConfigs } from '@/hooks';
 
-import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Link } from '@/components/Link';
 import { Panel } from '@/components/Panel';

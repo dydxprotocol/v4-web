@@ -1,10 +1,10 @@
 import { Fragment } from 'react';
 
 import styled, {
-  type AnyStyledComponent,
-  css,
-  type FlattenInterpolation,
   ThemeProps,
+  css,
+  type AnyStyledComponent,
+  type FlattenInterpolation,
 } from 'styled-components';
 
 import { LoadingContext } from '@/contexts/LoadingContext';

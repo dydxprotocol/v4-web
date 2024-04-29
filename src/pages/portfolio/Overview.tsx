@@ -12,8 +12,8 @@ import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
 import {
-  calculateShouldRenderTriggersInPositionsTable,
   calculateShouldRenderActionsInPositionsTable,
+  calculateShouldRenderTriggersInPositionsTable,
 } from '@/state/accountCalculators';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -28,7 +28,9 @@ export const Overview = () => {
   const showClosePositionAction = false;
 
   const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
-  const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable(showClosePositionAction));
+  const shouldRenderActions = useSelector(
+    calculateShouldRenderActionsInPositionsTable(showClosePositionAction)
+  );
 
   return (
     <div>

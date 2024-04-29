@@ -10,17 +10,17 @@ import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/b
 import { DialogTypes } from '@/constants/dialogs';
 import {
   STRING_KEYS,
-  type StringGetterFunction,
   TOOLTIP_STRING_KEYS,
+  type StringGetterFunction,
 } from '@/constants/localization';
 import { DydxChainAsset, WalletType, wallets } from '@/constants/wallets';
 
 import {
+  useAccountBalance,
   useAccounts,
   useBreakpoints,
-  useTokenConfigs,
   useStringGetter,
-  useAccountBalance,
+  useTokenConfigs,
   useURLConfigs,
 } from '@/hooks';
 

@@ -6,9 +6,9 @@ import styled, { AnyStyledComponent } from 'styled-components';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { wallets, WalletType } from '@/constants/wallets';
+import { WalletType, wallets } from '@/constants/wallets';
 
-import { useAccountBalance, useAccounts, useTokenConfigs, useStringGetter } from '@/hooks';
+import { useAccountBalance, useAccounts, useStringGetter, useTokenConfigs } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
