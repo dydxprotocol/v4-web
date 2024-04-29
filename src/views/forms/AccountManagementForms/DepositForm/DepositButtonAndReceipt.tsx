@@ -155,7 +155,7 @@ export const DepositButtonAndReceipt = ({
     typeof summary?.bridgeFee === 'number' && {
       key: 'bridge-fees',
       label: (
-        <WithTooltip tooltip="bridge-fees">
+        <WithTooltip tooltip="bridge-fees-deposit">
           {stringGetter({ key: STRING_KEYS.BRIDGE_FEE })}
         </WithTooltip>
       ),
