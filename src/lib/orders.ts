@@ -5,12 +5,12 @@ import {
   AbacusOrderType,
   AbacusOrderTypes,
   type Asset,
-  type SubaccountFill,
-  type SubaccountFundingPayment,
-  type SubaccountOrder,
   type Nullable,
   type OrderStatus,
   type PerpetualMarket,
+  type SubaccountFill,
+  type SubaccountFundingPayment,
+  type SubaccountOrder,
 } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 

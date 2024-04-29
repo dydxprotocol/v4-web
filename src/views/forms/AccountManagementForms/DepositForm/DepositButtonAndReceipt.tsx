@@ -1,4 +1,4 @@
-import { type Dispatch, type SetStateAction, useState, type ReactNode, useEffect } from 'react';
+import { useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
 
 import type { RouteData } from '@0xsquid/sdk';
 import { shallowEqual, useSelector } from 'react-redux';

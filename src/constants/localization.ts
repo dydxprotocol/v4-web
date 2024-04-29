@@ -2,10 +2,10 @@ import {
   APP_STRING_KEYS,
   ERRORS_STRING_KEYS,
   LOCALE_DATA,
+  NOTIFICATIONS,
+  NOTIFICATIONS_STRING_KEYS,
   TOOLTIPS,
   WARNINGS_STRING_KEYS,
-  NOTIFICATIONS_STRING_KEYS,
-  NOTIFICATIONS,
 } from '@dydxprotocol/v4-localization';
 
 import { type LinksConfigs } from '@/hooks/useURLConfigs';

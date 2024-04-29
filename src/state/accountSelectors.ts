@@ -3,16 +3,16 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { createSelector } from 'reselect';
 
 import {
-  type AbacusOrderStatuses,
-  type SubaccountOrder,
-  type SubaccountFill,
-  type SubaccountFundingPayment,
+  AbacusOrderSide,
   AbacusOrderStatus,
   AbacusPositionSide,
-  ORDER_SIDES,
   HistoricalTradingReward,
   HistoricalTradingRewardsPeriod,
-  AbacusOrderSide,
+  ORDER_SIDES,
+  type AbacusOrderStatuses,
+  type SubaccountFill,
+  type SubaccountFundingPayment,
+  type SubaccountOrder,
 } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
 

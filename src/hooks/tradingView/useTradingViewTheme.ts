@@ -6,9 +6,9 @@ import { THEME_NAMES } from '@/constants/styles/colors';
 import type { ChartLine, TvWidget } from '@/constants/tvchart';
 
 import { AppColorMode, AppTheme } from '@/state/configs';
-import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
+import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 
-import { getWidgetOverrides, getChartLineColors } from '@/lib/tradingView/utils';
+import { getChartLineColors, getWidgetOverrides } from '@/lib/tradingView/utils';
 
 /**
  * @description Method to define a type guard and check that an element is an IFRAME

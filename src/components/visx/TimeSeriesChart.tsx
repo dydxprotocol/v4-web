@@ -4,15 +4,15 @@ import { LinearGradient } from '@visx/gradient';
 import { ParentSize } from '@visx/responsive';
 import type { ScaleConfig } from '@visx/scale';
 import {
-  XYChart,
   Axis,
-  Grid,
   DataProvider,
   EventEmitterProvider,
-  LineSeries,
   GlyphSeries,
-  type Margin,
+  Grid,
+  LineSeries,
+  XYChart,
   type AxisScale,
+  type Margin,
   type TooltipContextType,
 } from '@visx/xychart';
 import { RenderTooltipParams } from '@visx/xychart/lib/components/Tooltip';

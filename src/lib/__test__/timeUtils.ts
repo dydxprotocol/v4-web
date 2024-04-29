@@ -3,11 +3,11 @@ import { describe, expect, it } from 'vitest';
 
 import { MustBigNumber } from '@/lib/numbers';
 import {
-  getTimestamp,
   getStringsForDateTimeDiff,
   getStringsForTimeInterval,
-  getTimeTillNextUnit,
   getTimeString,
+  getTimeTillNextUnit,
+  getTimestamp,
 } from '@/lib/timeUtils';
 
 describe('getTimestamp', () => {

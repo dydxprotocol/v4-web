@@ -1,9 +1,9 @@
-import { Fragment, type ReactNode, useState } from 'react';
+import { Fragment, useState, type ReactNode } from 'react';
 
 import { Command } from 'cmdk';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
-import { MenuItem, type MenuConfig } from '@/constants/menus';
+import { type MenuConfig } from '@/constants/menus';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';

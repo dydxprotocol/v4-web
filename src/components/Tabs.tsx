@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 
 import { Content, List, Root, Trigger } from '@radix-ui/react-tabs';
-import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
+import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
 
 import { type MenuItem } from '@/constants/menus';
 

@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import type { Story } from '@ladle/react';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { TriangleIndicator, TriangleIndicatorProps } from '@/components/TriangleIndicator';
+import { TriangleIndicator } from '@/components/TriangleIndicator';
 
 import { MustBigNumber } from '@/lib/numbers';
 

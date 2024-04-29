@@ -1,17 +1,17 @@
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { usePrivy, useLogout, useLogin } from '@privy-io/react-auth';
+import { useLogin, useLogout, usePrivy } from '@privy-io/react-auth';
 import {
-  useSuggestChainAndConnect as useConnectGraz,
+  WalletType as CosmosWalletType,
   useAccount as useAccountGraz,
+  useSuggestChainAndConnect as useConnectGraz,
   useDisconnect as useDisconnectGraz,
   useOfflineSigners as useOfflineSignersGraz,
-  WalletType as CosmosWalletType,
 } from 'graz';
 import { useSelector } from 'react-redux';
 import {
-  useConnect as useConnectWagmi,
   useAccount as useAccountWagmi,
+  useConnect as useConnectWagmi,
   useDisconnect as useDisconnectWagmi,
   usePublicClient as usePublicClientWagmi,
   useWalletClient as useWalletClientWagmi,
@@ -22,12 +22,12 @@ import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
 import { WALLETS_CONFIG_MAP } from '@/constants/networks';
 import {
-  type DydxAddress,
-  type EvmAddress,
+  DYDX_CHAIN_INFO,
   WalletConnectionType,
   WalletType,
   wallets,
-  DYDX_CHAIN_INFO,
+  type DydxAddress,
+  type EvmAddress,
 } from '@/constants/wallets';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';

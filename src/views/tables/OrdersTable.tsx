@@ -23,10 +23,10 @@ import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import {
+  MarketTableCell,
   Table,
   TableCell,
   TableColumnHeader,
-  MarketTableCell,
   type ColumnDef,
 } from '@/components/Table';
 import { TagSize } from '@/components/Tag';

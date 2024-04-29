@@ -4,7 +4,7 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual, useSelector } from 'react-redux';
 
 import { OrderbookLine, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
-import { DepthChartSeries, DepthChartDatum } from '@/constants/charts';
+import { DepthChartDatum, DepthChartSeries } from '@/constants/charts';
 
 import { getSubaccountOrderSizeBySideAndPrice } from '@/state/accountSelectors';
 import { getCurrentMarketOrderbook } from '@/state/perpetualsSelectors';

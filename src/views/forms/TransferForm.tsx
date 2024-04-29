@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import { validation } from '@dydxprotocol/v4-client-js';
 import { type NumberFormatValues } from 'react-number-format';

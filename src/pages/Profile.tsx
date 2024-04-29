@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 import { useEnsName } from 'wagmi';
 
@@ -9,7 +8,7 @@ import { OnboardingState } from '@/constants/account';
 import { ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { AppRoute, PortfolioRoute, HistoryRoute } from '@/constants/routes';
+import { AppRoute, HistoryRoute, PortfolioRoute } from '@/constants/routes';
 import { wallets } from '@/constants/wallets';
 
 import { useAccounts, useStringGetter, useTokenConfigs } from '@/hooks';

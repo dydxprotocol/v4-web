@@ -7,9 +7,9 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
-import { useTokenConfigs, useStringGetter, useURLConfigs } from '@/hooks';
+import { useStringGetter, useTokenConfigs, useURLConfigs } from '@/hooks';
 
-import { LogoShortIcon, BellStrokeIcon } from '@/icons';
+import { BellStrokeIcon, LogoShortIcon } from '@/icons';
 import breakpoints from '@/styles/breakpoints';
 import { headerMixins } from '@/styles/headerMixins';
 import { layoutMixins } from '@/styles/layoutMixins';

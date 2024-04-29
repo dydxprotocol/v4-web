@@ -1,6 +1,6 @@
-import { type MouseEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type MouseEvent } from 'react';
 
-import { Root, Action, Close } from '@radix-ui/react-toast';
+import { Action, Close, Root } from '@radix-ui/react-toast';
 import styled, { keyframes } from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';

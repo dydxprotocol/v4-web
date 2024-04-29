@@ -2,11 +2,11 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import merge from 'lodash/merge';
 
 import type {
+  MarketHistoricalFunding,
   MarketOrderbook,
   MarketTrade,
   Nullable,
   PerpetualMarket,
-  MarketHistoricalFunding,
 } from '@/constants/abacus';
 import { Candle, RESOLUTION_MAP } from '@/constants/candles';
 import { LocalStorageKey } from '@/constants/localStorage';

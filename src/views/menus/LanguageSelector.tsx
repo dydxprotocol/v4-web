@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
-import { SupportedLocales, SUPPORTED_LOCALE_STRING_LABELS } from '@/constants/localization';
+import { SUPPORTED_LOCALE_STRING_LABELS, SupportedLocales } from '@/constants/localization';
 
 import { headerMixins } from '@/styles/headerMixins';
 

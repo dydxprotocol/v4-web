@@ -2,35 +2,35 @@ import type { LocalWallet } from '@dydxprotocol/v4-client-js';
 
 import type {
   ClosePositionInputFields,
-  Nullable,
+  HistoricalPnlPeriods,
   HistoricalTradingRewardsPeriod,
   HistoricalTradingRewardsPeriods,
-  HumanReadablePlaceOrderPayload,
   HumanReadableCancelOrderPayload,
+  HumanReadablePlaceOrderPayload,
+  HumanReadableTriggerOrdersPayload,
+  Nullable,
+  ParsingError,
   TradeInputFields,
   TransferInputFields,
-  HistoricalPnlPeriods,
-  ParsingError,
-  HumanReadableTriggerOrdersPayload,
 } from '@/constants/abacus';
 import {
-  AsyncAbacusStateManager,
+  AbacusAppConfig,
   AbacusHelper,
+  ApiData,
+  AsyncAbacusStateManager,
   ClosePositionInputField,
+  CoroutineTimer,
   HistoricalPnlPeriod,
+  IOImplementations,
   TradeInputField,
   TransferInputField,
-  IOImplementations,
-  UIImplementations,
-  CoroutineTimer,
   TransferType,
-  AbacusAppConfig,
-  ApiData,
-  type TriggerOrdersInputFields,
   TriggerOrdersInputField,
+  UIImplementations,
+  type TriggerOrdersInputFields,
 } from '@/constants/abacus';
 import { DEFAULT_MARKETID } from '@/constants/markets';
-import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork, isMainnet } from '@/constants/networks';
+import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork } from '@/constants/networks';
 import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
 
 import type { RootStore } from '@/state/_store';

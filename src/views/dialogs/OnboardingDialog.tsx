@@ -1,4 +1,4 @@
-import { type ElementType, useState, useEffect } from 'react';
+import { useEffect, useState, type ElementType } from 'react';
 
 import { useSelector } from 'react-redux';
 import styled, { AnyStyledComponent, css } from 'styled-components';

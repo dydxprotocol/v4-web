@@ -1,4 +1,4 @@
-import { type Dispatch, type SetStateAction, useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 
 import type { NumberFormatValues } from 'react-number-format';
 import styled, { type AnyStyledComponent } from 'styled-components';
@@ -12,7 +12,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
-import { Input, InputType } from '@/components/Input';
+import { InputType } from '@/components/Input';
 import { Output, OutputType } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithConfirmationPopover } from '@/components/WithConfirmationPopover';

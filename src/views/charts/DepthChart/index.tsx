@@ -5,18 +5,18 @@ import { curveStepAfter } from '@visx/curve';
 import { LinearGradient } from '@visx/gradient';
 import { Point } from '@visx/point';
 import {
-  Axis, // AnimatedAxis,
+  AreaSeries,
+  Axis,
+  DataProvider,
+  EventEmitterProvider, // AnimatedAxis,
   Grid, // AnimatedGrid,
-  LineSeries,
-  AreaSeries, // AnimatedAreaSeries,
+  LineSeries, // AnimatedAreaSeries,
   buildChartTheme,
   darkTheme,
-  DataProvider,
-  EventEmitterProvider,
   type EventHandlerParams,
 } from '@visx/xychart';
-import { useSelector, shallowEqual } from 'react-redux';
-import styled, { AnyStyledComponent, css, keyframes } from 'styled-components';
+import { shallowEqual, useSelector } from 'react-redux';
+import styled, { AnyStyledComponent, keyframes } from 'styled-components';
 
 import {
   DepthChartDatum,

@@ -1,8 +1,8 @@
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import type { Nullable, TradeState } from '@/constants/abacus';
-import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
+import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { DydxChainAsset } from '@/constants/wallets';
