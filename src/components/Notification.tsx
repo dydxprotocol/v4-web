@@ -52,6 +52,7 @@ export const Notification = ({
   withClose = !isToast,
 }: NotificationProps) => {
   const { markCleared, markSeen } = useNotifications();
+  const slotContentOrDescription = slotCustomContent ?? slotDescription;
 
   return (
     <$Container className={className} isToast={isToast} onClick={onClick}>
@@ -87,7 +88,7 @@ export const Notification = ({
           </$ActionItems>
         )}
       </$Header>
-      <$Description>{slotCustomContent ?? slotDescription}</$Description>
+      {slotContentOrDescription && <$Description>{slotContentOrDescription}</$Description>}
       {slotAction && <$Action>{slotAction}</$Action>}
     </$Container>
   );

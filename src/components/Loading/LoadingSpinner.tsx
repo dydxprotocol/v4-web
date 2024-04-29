@@ -61,6 +61,7 @@ Styled.Spinner = styled.div`
 
 Styled.LoadingSpinnerSvg = styled.svg`
   width: var(--spinner-width);
+  height: auto;
 
   animation: ${keyframes`
     to {

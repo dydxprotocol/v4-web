@@ -154,7 +154,7 @@ const $Root = styled(Root)`
           33% {
             /* scale: 1.05; */
             /* filter: brightness(120%); */
-            filter: drop-shadow(0 0 var(--color-text-1));
+            filter: drop-shadow(0 0 var(--color-text-0));
           }
         `} calc(var(--toast-transition-duration) * 3) 0.1s;
     }

@@ -10,6 +10,7 @@ import {
   TRADE_TYPES,
 } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { USD_DECIMALS } from '@/constants/numbers';
 import { ORDER_TYPE_STRINGS, TradeTypes } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks';
@@ -48,7 +49,7 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
   const marketData = useSelector(getMarketData(MARKET), shallowEqual);
   const { assetId } = marketData ?? {};
   const orderType = ORDER_TYPE as KotlinIrEnumValues<typeof AbacusOrderType>;
-  const tradeType = TRADE_TYPES[orderType];
+  const tradeType = TRADE_TYPES[orderType] ?? undefined;
   const titleKey = tradeType && ORDER_TYPE_STRINGS[tradeType]?.orderTypeKey;
   const orderStatus = ORDER_STATUS as KotlinIrEnumValues<typeof AbacusOrderStatus>;
 
@@ -65,39 +66,63 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
         </Styled.OrderStatus>
       }
       slotCustomContent={
-        <Styled.Details
-          items={[
-            {
-              key: 'size',
-              label: (
-                <Styled.Label>
-                  {stringGetter({ key: STRING_KEYS.SIZE })}
-                  <OrderSideTag
-                    orderSide={SIDE === STRING_KEYS.BUY ? OrderSide.BUY : OrderSide.SELL}
-                  />
-                </Styled.Label>
-              ),
-              value: (
-                <Output type={OutputType.Asset} value={FILLED_AMOUNT} tag={marketData?.assetId} />
-              ),
-            },
-            {
-              key: 'price',
-              label: stringGetter({ key: STRING_KEYS.PRICE }),
-              value:
-                ORDER_TYPE === TradeTypes.MARKET ? (
-                  <span>{stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT })}</span>
-                ) : (
-                  <Output
-                    type={OutputType.Fiat}
-                    value={AVERAGE_PRICE}
-                    fractionDigits={marketData?.configs?.displayTickSizeDecimals}
-                  />
-                ),
-            },
-          ]}
+        <FillDetails
+          orderSide={SIDE === STRING_KEYS.BUY ? OrderSide.BUY : OrderSide.SELL}
+          tradeType={tradeType}
+          filledAmount={FILLED_AMOUNT}
+          assetId={marketData?.assetId}
+          averagePrice={AVERAGE_PRICE}
+          tickSizeDecimals={marketData?.configs?.displayTickSizeDecimals ?? USD_DECIMALS}
         />
       }
+    />
+  );
+};
+
+export const FillDetails = ({
+  orderSide,
+  tradeType,
+  filledAmount,
+  assetId,
+  averagePrice,
+  tickSizeDecimals,
+}: {
+  orderSide: OrderSide;
+  tradeType?: TradeTypes;
+  filledAmount: any;
+  assetId?: string;
+  averagePrice?: any;
+  tickSizeDecimals?: number;
+}) => {
+  const stringGetter = useStringGetter();
+  return (
+    <Styled.Details
+      items={[
+        {
+          key: 'size',
+          label: (
+            <Styled.Label>
+              {stringGetter({ key: STRING_KEYS.SIZE })}
+              <OrderSideTag orderSide={orderSide} />
+            </Styled.Label>
+          ),
+          value: <Output type={OutputType.Asset} value={filledAmount} tag={assetId} />,
+        },
+        {
+          key: 'price',
+          label: stringGetter({ key: STRING_KEYS.PRICE }),
+          value:
+            tradeType === TradeTypes.MARKET ? (
+              <span>{stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT })}</span>
+            ) : (
+              <Output
+                type={OutputType.Fiat}
+                value={averagePrice}
+                fractionDigits={tickSizeDecimals}
+              />
+            ),
+        },
+      ]}
     />
   );
 };
@@ -120,9 +145,17 @@ Styled.OrderStatusIcon = styled(OrderStatusIcon)`
 `;
 
 Styled.Details = styled(Details)`
-  --details-item-height: 1.5rem;
+  --details-item-height: 1rem;
 
   dd {
     color: var(--color-text-2);
+  }
+
+  div {
+    padding: 0.25rem 0;
+  }
+
+  div:last-of-type {
+    padding-bottom: 0;
   }
 `;

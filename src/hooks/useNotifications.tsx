@@ -135,9 +135,12 @@ const useNotificationsContext = () => {
     (notification: Notification, status: NotificationStatus) => {
       notification.status = status;
       notification.timestamps[notification.status] = Date.now();
-      setNotifications({ ...notifications, [getKey(notification)]: notification });
+      setNotifications((notifications) => ({
+        ...notifications,
+        [getKey(notification)]: notification,
+      }));
     },
-    [notifications, getKey]
+    [getKey]
   );
 
   const { markUnseen, markSeen, markCleared } = useMemo(
