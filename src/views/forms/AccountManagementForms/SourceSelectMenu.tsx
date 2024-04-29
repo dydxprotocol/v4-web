@@ -90,11 +90,13 @@ export const SourceSelectMenu = ({
           groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
           items: exchangeItems,
         },
-        chainItems.length > 0 && {
-          group: 'chains',
-          groupLabel: stringGetter({ key: STRING_KEYS.CHAINS }),
-          items: chainItems,
-        },
+        // only unblock privy wallets for withdrawals
+        type === TransferType.withdrawal &&
+          chainItems.length > 0 && {
+            group: 'chains',
+            groupLabel: stringGetter({ key: STRING_KEYS.CHAINS }),
+            items: chainItems,
+          },
       ].filter(isTruthy)}
       label={label || (type === TransferType.deposit ? 'Source' : 'Destination')}
     >
