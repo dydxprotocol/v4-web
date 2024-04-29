@@ -17,7 +17,7 @@ import { useWalletConnection } from '@/hooks/useWalletConnection';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
-import { Details, DetailsItem } from '@/components/Details';
+import { Details } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
@@ -45,7 +45,6 @@ type ElementProps = {
   setSlippage: (slippage: number) => void;
   sourceToken?: TransferInputTokenResource;
   squidRoute?: RouteData;
-  sourceChainName?: string;
 };
 
 export const DepositButtonAndReceipt = ({
@@ -54,7 +53,6 @@ export const DepositButtonAndReceipt = ({
   slippage,
   setSlippage,
   sourceToken,
-  sourceChainName,
   isDisabled,
   isLoading,
   slotError,
@@ -93,8 +91,16 @@ export const DepositButtonAndReceipt = ({
   const { current: buyingPower, postOrder: newBuyingPower } =
     useSelector(getSubaccountBuyingPower, shallowEqual) || {};
 
-  const { summary, requestPayload } = useSelector(getTransferInputs, shallowEqual) || {};
+  const {
+    summary,
+    requestPayload,
+    depositOptions,
+    chain: chainIdStr,
+  } = useSelector(getTransferInputs, shallowEqual) || {};
   const { usdcLabel } = useTokenConfigs();
+
+  const sourceChainName =
+    depositOptions?.chains?.toArray().find((chain) => chain.type === chainIdStr)?.stringKey || '';
 
   const submitButtonReceipt = [
     {
