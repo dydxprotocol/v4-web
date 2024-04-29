@@ -90,7 +90,6 @@ export const SourceSelectMenu = ({
           groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
           items: exchangeItems,
         },
-
         chainItems.length > 0 && {
           group: 'chains',
           groupLabel: stringGetter({ key: STRING_KEYS.CHAINS }),
