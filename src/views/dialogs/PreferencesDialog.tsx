@@ -6,8 +6,7 @@ import styled, { AnyStyledComponent } from 'styled-components';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
 
-import { useStringGetter } from '@/hooks';
-import { useEnvFeatures } from '@/hooks';
+import { useEnvFeatures, useStringGetter } from '@/hooks';
 import { useNotifications } from '@/hooks/useNotifications';
 
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';

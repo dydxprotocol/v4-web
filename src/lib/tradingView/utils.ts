@@ -6,7 +6,7 @@ import type { ChartLineType } from '@/constants/tvchart';
 
 import { Themes } from '@/styles/themes';
 
-import { type AppColorMode, AppTheme } from '@/state/configs';
+import { AppTheme, type AppColorMode } from '@/state/configs';
 
 export const mapCandle = ({
   startedAt,

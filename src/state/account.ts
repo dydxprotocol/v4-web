@@ -2,18 +2,18 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import type {
   AccountBalance,
-  SubaccountFill,
+  HistoricalPnlPeriods,
   Nullable,
+  SubAccountHistoricalPNLs,
   Subaccount,
+  SubaccountFill,
   SubaccountFills,
   SubaccountFundingPayments,
-  Wallet,
   SubaccountOrder,
   SubaccountTransfers,
-  HistoricalPnlPeriods,
-  SubAccountHistoricalPNLs,
-  UsageRestriction,
   TradingRewards,
+  UsageRestriction,
+  Wallet,
 } from '@/constants/abacus';
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';

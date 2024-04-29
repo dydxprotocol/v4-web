@@ -1,9 +1,9 @@
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DiffArrow, type DiffArrowProps } from '@/components/DiffArrow';
-import { Output, type OutputProps, OutputType } from '@/components/Output';
+import { Output, OutputType, type OutputProps } from '@/components/Output';
 
 import { BigNumberish } from '@/lib/numbers';
 

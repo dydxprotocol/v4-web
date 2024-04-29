@@ -1,4 +1,4 @@
-import { Dispatch, type ReactNode, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, type ReactNode } from 'react';
 
 import {
   Content as CollapsibleContent,
@@ -11,7 +11,7 @@ import {
   Root as TabsRoot,
   Trigger as TabsTrigger,
 } from '@radix-ui/react-tabs';
-import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
+import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

@@ -8,8 +8,6 @@ import { DialogTypes } from '@/constants/dialogs';
 import { getRestrictionType } from '@/state/accountSelectors';
 import { forceOpenDialog } from '@/state/dialogs';
 
-import { isTruthy } from '@/lib/isTruthy';
-
 const useRestrictionContext = () => {
   const dispatch = useDispatch();
   const restrictionType = useSelector(getRestrictionType, shallowEqual);

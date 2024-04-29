@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { AbacusOrderStatus, AbacusOrderTypes, type Nullable } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
@@ -27,10 +27,10 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import {
-  isOrderStatusClearable,
-  isMarketOrderType,
-  relativeTimeString,
   getStatusIconInfo,
+  isMarketOrderType,
+  isOrderStatusClearable,
+  relativeTimeString,
 } from '@/lib/orders';
 
 type ElementProps = {

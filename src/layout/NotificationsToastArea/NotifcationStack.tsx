@@ -4,9 +4,9 @@ import styled, { css } from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import {
+  NotificationStatus,
   type Notification,
   type NotificationDisplayData,
-  NotificationStatus,
 } from '@/constants/notifications';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';

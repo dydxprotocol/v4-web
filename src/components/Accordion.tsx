@@ -1,4 +1,4 @@
-import { Root, Item, Header, Trigger, Content } from '@radix-ui/react-accordion';
+import { Content, Header, Item, Root, Trigger } from '@radix-ui/react-accordion';
 import styled, { keyframes, type AnyStyledComponent } from 'styled-components';
 
 import { PlusIcon } from '@/icons';

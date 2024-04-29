@@ -8,7 +8,6 @@ import { useStringGetter } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { BackButton } from '@/components/BackButton';
 import { DropdownHeaderMenu } from '@/components/DropdownHeaderMenu';
 
 export const PortfolioNavMobile = () => {

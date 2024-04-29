@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { OpacityToken } from '@/constants/styles/base';

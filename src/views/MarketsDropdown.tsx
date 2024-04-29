@@ -2,7 +2,7 @@ import { memo, useMemo, useState } from 'react';
 
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
+import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';

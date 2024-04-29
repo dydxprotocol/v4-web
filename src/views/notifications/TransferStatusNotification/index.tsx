@@ -1,4 +1,4 @@
-import { useCallback, useState, useMemo, MouseEvent } from 'react';
+import { MouseEvent, useCallback, useState } from 'react';
 
 import styled, { css, type AnyStyledComponent } from 'styled-components';
 

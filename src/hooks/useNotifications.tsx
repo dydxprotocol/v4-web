@@ -11,13 +11,13 @@ import {
 import { AnalyticsEvent } from '@/constants/analytics';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import {
+  NotificationStatus,
+  NotificationType,
+  SingleSessionNotificationTypes,
   type Notification,
   type NotificationDisplayData,
   type NotificationPreferences,
   type Notifications,
-  NotificationStatus,
-  NotificationType,
-  SingleSessionNotificationTypes,
 } from '@/constants/notifications';
 
 import { track } from '@/lib/analytics';

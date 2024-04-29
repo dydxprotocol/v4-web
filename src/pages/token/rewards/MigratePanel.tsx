@@ -11,7 +11,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
-import { IconName, Icon } from '@/components/Icon';
+import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';

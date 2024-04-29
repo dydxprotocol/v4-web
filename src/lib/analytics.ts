@@ -1,8 +1,8 @@
 import type {
-  AnalyticsUserProperty,
-  AnalyticsUserPropertyValue,
   AnalyticsEvent,
   AnalyticsEventData,
+  AnalyticsUserProperty,
+  AnalyticsUserPropertyValue,
 } from '@/constants/analytics';
 
 const DEBUG_ANALYTICS = false;

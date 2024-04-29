@@ -1,16 +1,16 @@
 import { useRef } from 'react';
 
 import {
-  Root,
-  Trigger,
-  Overlay,
-  Content,
-  Title,
-  Description,
   Close,
+  Content,
+  Description,
+  Overlay,
   Portal,
+  Root,
+  Title,
+  Trigger,
 } from '@radix-ui/react-dialog';
-import styled, { type AnyStyledComponent, keyframes, css } from 'styled-components';
+import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
 
 import { useDialogArea } from '@/hooks/useDialogArea';
 

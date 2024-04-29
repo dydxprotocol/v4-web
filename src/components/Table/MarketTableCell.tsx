@@ -1,4 +1,4 @@
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import type { Asset } from '@/constants/abacus';
 

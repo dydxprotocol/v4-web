@@ -1,4 +1,4 @@
-import { type ChangeEvent, useState } from 'react';
+import { useState, type ChangeEvent } from 'react';
 
 import type { Story } from '@ladle/react';
 
