@@ -33,6 +33,7 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
+import { WithTooltip } from '@/components/WithTooltip';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
@@ -396,9 +397,22 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   if (!resources) {
     return <LoadingSpace id="DepositForm" />;
   }
-
   return (
     <Styled.Form onSubmit={onSubmit}>
+      <Styled.Subheader>
+        {stringGetter({
+          key: STRING_KEYS.LOWEST_FEE_DEPOSITS,
+          params: {
+            LOWEST_FEE_TOKENS_TOOLTIP: (
+              <WithTooltip tooltip="lowest-fees-deposit">
+                {stringGetter({
+                  key: STRING_KEYS.SELECT_CHAINS,
+                })}
+              </WithTooltip>
+            ),
+          },
+        })}
+      </Styled.Subheader>
       <SourceSelectMenu
         selectedChain={chainIdStr || undefined}
         selectedExchange={exchange || undefined}
@@ -450,6 +464,10 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Form = styled.form`
   ${formMixins.transfersForm}
+`;
+
+Styled.Subheader = styled.div`
+  color: var(--color-text-0);
 `;
 
 Styled.Footer = styled.footer`
