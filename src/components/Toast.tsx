@@ -109,7 +109,7 @@ export const Toast = ({
 
 const $Root = styled(Root)`
   // Params
-  --toast-transition-duration: 0.5s;
+  --toast-transition-duration: 0.3s;
 
   // Computed
   --x: var(--radix-toast-swipe-move-x, 0px);

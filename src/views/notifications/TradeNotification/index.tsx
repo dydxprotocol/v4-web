@@ -11,20 +11,19 @@ import {
 } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
-import { ORDER_TYPE_STRINGS, TradeTypes } from '@/constants/trade';
+import { ORDER_TYPE_STRINGS } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
-import { Details } from '@/components/Details';
 import { Notification, NotificationProps } from '@/components/Notification';
-import { OrderSideTag } from '@/components/OrderSideTag';
-import { Output, OutputType } from '@/components/Output';
 import { OrderStatusIcon } from '@/views/OrderStatusIcon';
 
 import { getMarketData } from '@/state/perpetualsSelectors';
+
+import { FillDetails } from './FillDetails';
 
 type ElementProps = {
   data: {
@@ -79,54 +78,6 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
   );
 };
 
-export const FillDetails = ({
-  orderSide,
-  tradeType,
-  filledAmount,
-  assetId,
-  averagePrice,
-  tickSizeDecimals,
-}: {
-  orderSide: OrderSide;
-  tradeType?: TradeTypes;
-  filledAmount: any;
-  assetId?: string;
-  averagePrice?: any;
-  tickSizeDecimals?: number;
-}) => {
-  const stringGetter = useStringGetter();
-  return (
-    <Styled.Details
-      items={[
-        {
-          key: 'size',
-          label: (
-            <Styled.Label>
-              {stringGetter({ key: STRING_KEYS.SIZE })}
-              <OrderSideTag orderSide={orderSide} />
-            </Styled.Label>
-          ),
-          value: <Output type={OutputType.Asset} value={filledAmount} tag={assetId} />,
-        },
-        {
-          key: 'price',
-          label: stringGetter({ key: STRING_KEYS.PRICE }),
-          value:
-            tradeType === TradeTypes.MARKET ? (
-              <span>{stringGetter({ key: STRING_KEYS.MARKET_ORDER_SHORT })}</span>
-            ) : (
-              <Output
-                type={OutputType.Fiat}
-                value={averagePrice}
-                fractionDigits={tickSizeDecimals}
-              />
-            ),
-        },
-      ]}
-    />
-  );
-};
-
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Label = styled.span`
@@ -142,20 +93,4 @@ Styled.OrderStatus = styled(Styled.Label)`
 Styled.OrderStatusIcon = styled(OrderStatusIcon)`
   width: 0.9375rem;
   height: 0.9375rem;
-`;
-
-Styled.Details = styled(Details)`
-  --details-item-height: 1rem;
-
-  dd {
-    color: var(--color-text-2);
-  }
-
-  div {
-    padding: 0.25rem 0;
-  }
-
-  div:last-of-type {
-    padding-bottom: 0;
-  }
 `;
