@@ -179,32 +179,39 @@ export const getMarketSubaccountOpenOrders = (
  * @param state
  * @returns list of conditional orders that have not been filled or cancelled for all subaccount positions
  */
-export const getSubaccountConditionalOrders = createSelector(
-  [getMarketSubaccountOpenOrders, getOpenPositions],
-  (openOrdersByMarketId, positions) => {
-    const stopLossOrders: SubaccountOrder[] = [];
-    const takeProfitOrders: SubaccountOrder[] = [];
+export const getSubaccountConditionalOrders = (isSlTpLimitOrdersEnabled: boolean) =>
+  createSelector(
+    [getMarketSubaccountOpenOrders, getOpenPositions],
+    (openOrdersByMarketId, positions) => {
+      const stopLossOrders: SubaccountOrder[] = [];
+      const takeProfitOrders: SubaccountOrder[] = [];
 
-    positions?.forEach((position) => {
-      const orderSideForConditionalOrder =
-        position?.side?.current === AbacusPositionSide.LONG
-          ? AbacusOrderSide.sell
-          : AbacusOrderSide.buy;
+      positions?.forEach((position) => {
+        const orderSideForConditionalOrder =
+          position?.side?.current === AbacusPositionSide.LONG
+            ? AbacusOrderSide.sell
+            : AbacusOrderSide.buy;
 
-      const conditionalOrders = openOrdersByMarketId[position.id];
+        const conditionalOrders = openOrdersByMarketId[position.id];
 
-      conditionalOrders?.forEach((order: SubaccountOrder) => {
-        if (order.side === orderSideForConditionalOrder && isStopLossOrder(order)) {
-          stopLossOrders.push(order);
-        } else if (order.side === orderSideForConditionalOrder && isTakeProfitOrder(order)) {
-          takeProfitOrders.push(order);
-        }
+        conditionalOrders?.forEach((order: SubaccountOrder) => {
+          if (
+            order.side === orderSideForConditionalOrder &&
+            isStopLossOrder(order, isSlTpLimitOrdersEnabled)
+          ) {
+            stopLossOrders.push(order);
+          } else if (
+            order.side === orderSideForConditionalOrder &&
+            isTakeProfitOrder(order, isSlTpLimitOrdersEnabled)
+          ) {
+            takeProfitOrders.push(order);
+          }
+        });
       });
-    });
 
-    return { stopLossOrders, takeProfitOrders };
-  }
-);
+      return { stopLossOrders, takeProfitOrders };
+    }
+  );
 
 /**
  * @param state

@@ -7,6 +7,8 @@ import { ButtonShape } from '@/constants/buttons';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { AppRoute } from '@/constants/routes';
 
+import { useEnvFeatures } from '@/hooks';
+
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { ActionsTableCell } from '@/components/Table';
@@ -16,7 +18,6 @@ import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { testFlags } from '@/lib/testFlags';
 
 type ElementProps = {
   marketId: string;
@@ -39,6 +40,7 @@ export const PositionsActionsCell = ({
 }: ElementProps) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { isSlTpEnabled } = useEnvFeatures();
 
   const currentMarketId = useSelector(getCurrentMarketId);
   const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog);
@@ -61,7 +63,7 @@ export const PositionsActionsCell = ({
 
   return (
     <ActionsTableCell>
-      {testFlags.configureSlTpFromPositionsTable && (
+      {isSlTpEnabled && (
         <Styled.TriggersButton
           key="edittriggers"
           onClick={() =>
