@@ -530,7 +530,7 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
     >
       <Styled.Row>
         {column.rendered}
-        {column.allowsSorting && (
+        {column.props.allowsSorting && (
           <Styled.SortArrow
             aria-hidden="true"
             sortDirection={
