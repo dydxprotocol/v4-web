@@ -162,12 +162,6 @@ export const getSubaccountOpenOrderClientIds = createSelector([getSubaccountOpen
   orders?.map((order) => order.clientId)
 );
 
-export const getSubaccountFilledOrderClientIds = createSelector([getSubaccountOrders], (orders) =>
-  orders
-    ?.filter((order) => order.status === AbacusOrderStatus.filled)
-    ?.map((order) => order.clientId)
-);
-
 export const getOrderByClientId = (orderClientId: number) =>
   createSelector([getSubaccountOrders], (orders) =>
     orders?.find((order) => order.clientId === orderClientId)

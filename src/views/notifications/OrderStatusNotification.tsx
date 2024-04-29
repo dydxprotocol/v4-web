@@ -58,10 +58,6 @@ export const OrderStatusNotification = ({
   let orderStatusIcon = <Styled.LoadingSpinner />;
 
   switch (submissionStatus) {
-    case OrderSubmissionStatuses.Failed:
-      orderStatusStringKey = STRING_KEYS.FAILED;
-      orderStatusIcon = <Styled.WarningIcon iconName={IconName.Warning} />;
-      break;
     case OrderSubmissionStatuses.Placed:
     case OrderSubmissionStatuses.Filled:
       if (indexedOrderStatus) {
@@ -74,6 +70,11 @@ export const OrderStatusNotification = ({
       break;
     case OrderSubmissionStatuses.Submitted:
     default:
+      if (localOrder.errorStringKey) {
+        orderStatusStringKey = STRING_KEYS.FAILED;
+        orderStatusIcon = <Styled.WarningIcon iconName={IconName.Warning} />;
+        // TODO(@aforaleka) replace trade form error with this depending on preferences
+      }
       break;
   }
 

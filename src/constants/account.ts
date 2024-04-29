@@ -1,3 +1,4 @@
+import { StringKey } from './localization';
 import { OrderSubmissionStatuses } from './notifications';
 import { TradeTypes } from './trade';
 import type { DydxAddress, EvmAddress } from './wallets';
@@ -54,4 +55,5 @@ export type LocalOrderData = {
   orderId?: string;
   orderType?: TradeTypes;
   submissionStatus: OrderSubmissionStatuses;
+  errorStringKey?: StringKey;
 };

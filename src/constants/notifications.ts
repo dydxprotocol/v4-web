@@ -183,10 +183,9 @@ export type TriggerOrderNotification = {
 };
 
 export enum OrderSubmissionStatuses {
-  Submitted = 'submitted',
-  Placed = 'placed',
-  Filled = 'filled',
-  Failed = 'failed',
+  Submitted,
+  Placed,
+  Filled,
 }
 
 export enum ReleaseUpdateNotificationIds {

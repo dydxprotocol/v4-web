@@ -21,6 +21,7 @@ import type {
   SubAccountHistoricalPNLs,
 } from '@/constants/abacus';
 import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
+import { STRING_KEYS } from '@/constants/localization';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { TradeTypes } from '@/constants/trade';
 import { DydxAddress } from '@/constants/wallets';
@@ -369,7 +370,12 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
           onError?.({ errorStringKey: parsingError?.stringKey });
 
           if (data?.clientId !== undefined) {
-            dispatch(submittedOrderFailed(data.clientId));
+            dispatch(
+              submittedOrderFailed({
+                clientId: data.clientId,
+                errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
+              })
+            );
           }
         }
       };

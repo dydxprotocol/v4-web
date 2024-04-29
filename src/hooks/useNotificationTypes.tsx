@@ -427,13 +427,12 @@ export const notificationTypes: NotificationTypeConfig[] = [
   {
     type: NotificationType.OrderStatus,
     useTrigger: ({ trigger }) => {
-      const localOrdersData = useSelector(getSubmittedOrders, isEqual);
+      const localOrdersData = useSelector(getSubmittedOrders, shallowEqual);
       const stringGetter = useStringGetter();
 
       useEffect(() => {
         for (const localOrder of localOrdersData) {
           const key = localOrder.clientId.toString();
-          console.log(localOrder.submissionStatus);
           trigger(
             key,
             {

@@ -17,6 +17,7 @@ import type {
 } from '@/constants/abacus';
 import { LocalOrderData, OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
+import { STRING_KEYS, StringKey } from '@/constants/localization';
 import { OrderSubmissionStatuses } from '@/constants/notifications';
 import { TradeTypes } from '@/constants/trade';
 import { WalletType } from '@/constants/wallets';
@@ -110,7 +111,7 @@ export const accountSlice = createSlice({
         hasUnseenFillUpdates: state.hasUnseenFillUpdates || hasNewFillUpdates,
         submittedOrders: hasNewFillUpdates
           ? state.submittedOrders.map((order) =>
-              order.submissionStatus !== OrderSubmissionStatuses.Filled &&
+              order.submissionStatus < OrderSubmissionStatuses.Filled &&
               order.orderId &&
               filledOrderIds.includes(order.orderId)
                 ? {
@@ -137,8 +138,7 @@ export const accountSlice = createSlice({
           (uncommittedClientId) => uncommittedClientId !== clientId
         );
         state.submittedOrders = state.submittedOrders.map((order) =>
-          order.clientId === clientId &&
-          order.submissionStatus === OrderSubmissionStatuses.Submitted
+          order.clientId === clientId && order.submissionStatus < OrderSubmissionStatuses.Placed
             ? {
                 ...order,
                 orderId: id,
@@ -221,22 +221,28 @@ export const accountSlice = createSlice({
       });
       state.uncommittedOrderClientIds.push(action.payload.clientId);
     },
-    submittedOrderFailed: (state, action: PayloadAction<number>) => {
+    submittedOrderFailed: (
+      state,
+      action: PayloadAction<{ clientId: number; errorStringKey: StringKey }>
+    ) => {
       state.submittedOrders = state.submittedOrders.map((order) =>
-        order.clientId === action.payload
+        order.clientId === action.payload.clientId
           ? {
               ...order,
-              submissionStatus: OrderSubmissionStatuses.Failed,
+              errorStringKey: action.payload.errorStringKey,
             }
           : order
       );
       state.uncommittedOrderClientIds = state.uncommittedOrderClientIds.filter(
-        (id) => id !== action.payload
+        (id) => id !== action.payload.clientId
       );
     },
     submittedOrderTimeout: (state, action: PayloadAction<number>) => {
       if (state.uncommittedOrderClientIds.includes(action.payload)) {
-        submittedOrderFailed(action.payload);
+        submittedOrderFailed({
+          clientId: action.payload,
+          errorStringKey: STRING_KEYS.SOMETHING_WENT_WRONG,
+        });
       }
     },
   },
