@@ -1,6 +1,5 @@
 import type { Nullable, kollections } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import _ from 'lodash';
 import { createSelector } from 'reselect';
 
 import {
@@ -167,10 +166,6 @@ export const getSubaccountFilledOrderClientIds = createSelector([getSubaccountOr
   orders
     ?.filter((order) => order.status === AbacusOrderStatus.filled)
     ?.map((order) => order.clientId)
-);
-
-export const getOrderIdToOrders = createSelector([getSubaccountOrders], (orders) =>
-  _.keyBy(orders, (order) => order.id)
 );
 
 export const getOrderByClientId = (orderClientId: number) =>

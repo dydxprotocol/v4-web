@@ -28,7 +28,6 @@ import {
 
 import { useBreakpoints, useStringGetter, useSubaccount } from '@/hooks';
 import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
-import { useSubmitOrderNotifications } from '@/hooks/useSubmitOrderNotifications';
 
 import { breakpoints } from '@/styles';
 import { formMixins } from '@/styles/formMixins';
@@ -56,11 +55,7 @@ import {
   getTradeFormInputs,
   useTradeFormData,
 } from '@/state/inputsSelectors';
-import {
-  getCurrentMarketAssetId,
-  getCurrentMarketConfig,
-  getCurrentMarketId,
-} from '@/state/perpetualsSelectors';
+import { getCurrentMarketAssetId, getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { testFlags } from '@/lib/testFlags';
@@ -126,7 +121,6 @@ export const TradeForm = ({
   } = useTradeFormData();
 
   const currentInput = useSelector(getCurrentInput);
-  const currentMarketId = useSelector(getCurrentMarketId);
   const currentAssetId = useSelector(getCurrentMarketAssetId);
   const { tickSizeDecimals, stepSizeDecimals } =
     useSelector(getCurrentMarketConfig, shallowEqual) || {};
@@ -235,13 +229,11 @@ export const TradeForm = ({
     callback: onLastOrderIndexed,
   });
 
-  const { storeOrder } = useSubmitOrderNotifications();
-
   const onPlaceOrder = () => {
     setPlaceOrderError(undefined);
     setIsPlacingOrder(true);
 
-    const payload = placeOrder({
+    placeOrder({
       onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
         setIsPlacingOrder(false);
         setPlaceOrderError(
@@ -252,16 +244,6 @@ export const TradeForm = ({
         setUnIndexedClientId(placeOrderPayload?.clientId);
       },
     });
-
-    if (payload?.clientId) {
-      storeOrder({
-        marketId: currentMarketId!!,
-        clientId: payload.clientId,
-        orderType: payload.type as TradeTypes,
-        price: payload.price,
-        tickSizeDecimals: tickSizeDecimals ?? USD_DECIMALS,
-      });
-    }
 
     abacusStateManager.clearTradeInputValues({ shouldResetSize: true });
   };

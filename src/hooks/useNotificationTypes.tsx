@@ -24,7 +24,7 @@ import { DydxChainAsset } from '@/constants/wallets';
 
 import { useAccounts, useApiState, useStringGetter, useTokenConfigs, useURLConfigs } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
-import { useSubmitOrderNotifications } from '@/hooks/useSubmitOrderNotifications';
+import { useOrderStatusNotifications } from '@/hooks/useOrderStatusNotifications';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
@@ -32,16 +32,12 @@ import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
-import { SubmitOrderNotification } from '@/views/notifications/SubmitOrderNotification';
+import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 import { TriggerOrderNotification } from '@/views/notifications/TriggerOrderNotification';
 
-import {
-  getOrderIdToOrders,
-  getSubaccountFills,
-  getSubaccountOrders,
-} from '@/state/accountSelectors';
+import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
@@ -72,8 +68,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const abacusNotifications = useSelector(getAbacusNotifications, isEqual);
-      const orderIdToOrders = useSelector(getOrderIdToOrders, shallowEqual);
-      const { localOrdersData } = useSubmitOrderNotifications();
+      const orders = useSelector(getSubaccountOrders, shallowEqual) || [];
+      const ordersById = groupBy(orders, 'id');
+      const { localOrdersData } = useOrderStatusNotifications();
 
       useEffect(() => {
         for (const abacusNotif of abacusNotifications) {
@@ -88,11 +85,12 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
           switch (abacusNotificationType) {
             case 'order': {
-              const clientId = orderIdToOrders[id]?.clientId;
+              const order = ordersById[id]?.[0];
+              const clientId: number | undefined = order?.clientId ?? undefined;
               const localOrderExists =
-                clientId &&
-                localOrdersData.some((order) => order.clientId === orderIdToOrders[id]?.clientId);
-              if (localOrderExists) return; // already handled
+                clientId && localOrdersData.some((order) => order.clientId === clientId);
+
+              if (localOrderExists) return; // already handled by OrderStatusNotification
 
               trigger(
                 abacusNotif.id,
@@ -424,22 +422,24 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
   },
   {
-    type: NotificationType.OrderSubmiited,
+    type: NotificationType.OrderStatus,
     useTrigger: ({ trigger }) => {
-      const { localOrdersData } = useSubmitOrderNotifications();
+      const { localOrdersData } = useOrderStatusNotifications();
+      const stringGetter = useStringGetter();
 
       useEffect(() => {
         for (const localOrder of localOrdersData) {
+          const key = localOrder.clientId.toString();
           trigger(
-            localOrder.clientId.toString(),
+            key,
             {
               icon: null,
-              title: 'order submitted',
+              title: stringGetter({ key: STRING_KEYS.ORDER_STATUS }),
+              toastSensitivity: 'background',
+              groupKey: key, // do not collapse
               toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
-              toastSensitivity: 'foreground',
-              groupKey: NotificationType.OrderSubmiited,
               renderCustomBody: ({ isToast, notification }) => (
-                <SubmitOrderNotification
+                <OrderStatusNotification
                   isToast={isToast}
                   orderClientId={localOrder.clientId}
                   localOrder={localOrder}
@@ -454,7 +454,20 @@ export const notificationTypes: NotificationTypeConfig[] = [
       }, [localOrdersData]);
     },
     useNotificationAction: () => {
-      return () => {};
+      const dispatch = useDispatch();
+      const orders = useSelector(getSubaccountOrders, shallowEqual) || [];
+
+      return (orderClientId: string) => {
+        const order = orders.find((order) => order.clientId?.toString() === orderClientId);
+        if (order) {
+          dispatch(
+            openDialog({
+              type: DialogTypes.OrderDetails,
+              dialogProps: { orderId: order.id },
+            })
+          );
+        }
+      };
     },
   },
 ];

@@ -9,12 +9,13 @@ export enum NotificationType {
   TriggerOrder = 'TriggerOrder',
   ReleaseUpdates = 'ReleaseUpdates',
   ApiError = 'ApiError',
-  OrderSubmiited = 'OrderSubmitted',
+  OrderStatus = 'OrderStatus',
 }
 
 export const SingleSessionNotificationTypes = [
   NotificationType.AbacusGenerated,
   NotificationType.ApiError,
+  NotificationType.OrderStatus,
 ];
 
 export enum NotificationComponentType {}
@@ -181,7 +182,7 @@ export type TriggerOrderNotification = {
   type: TriggerOrderNotificationTypes;
 };
 
-export enum SubmitOrderStatuses {
+export enum OrderSubmissionStatuses {
   Submitted = 'submitted',
   Placed = 'placed',
   Filled = 'filled',

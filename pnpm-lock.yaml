@@ -1947,7 +1947,10 @@ packages:
     dev: true
 
   /@dydxprotocol/v4-abacus@1.6.50:
-    resolution: {integrity: sha512-+VN0RSY1Cgh9O8+1sQ6EWRvHozhomOvG+s3WkEqMe/rC2pPV12t3O4EM568uSxtI34v13TX6/NV+oNjvYx0Y7w==}
+    resolution:
+      {
+        integrity: sha512-+VN0RSY1Cgh9O8+1sQ6EWRvHozhomOvG+s3WkEqMe/rC2pPV12t3O4EM568uSxtI34v13TX6/NV+oNjvYx0Y7w==,
+      }
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
@@ -1986,7 +1989,10 @@ packages:
     dev: false
 
   /@dydxprotocol/v4-localization@1.1.74:
-    resolution: {integrity: sha512-Hw8zLs3Yi5Kts/IMdQa55dd87jrwbarM690pJSZwDPe4DI1pMca1BWVNGA3y8+nbth5ASc65JZpU6ny/HPUF6A==}
+    resolution:
+      {
+        integrity: sha512-Hw8zLs3Yi5Kts/IMdQa55dd87jrwbarM690pJSZwDPe4DI1pMca1BWVNGA3y8+nbth5ASc65JZpU6ny/HPUF6A==,
+      }
     dev: false
 
   /@dydxprotocol/v4-proto@5.0.0-dev.0:

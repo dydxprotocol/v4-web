@@ -9,12 +9,13 @@ import {
   SubaccountFill,
   SubaccountOrder,
 } from '@/constants/abacus';
-import { SubmitOrderStatuses } from '@/constants/notifications';
+import { STRING_KEYS } from '@/constants/localization';
+import { OrderSubmissionStatuses } from '@/constants/notifications';
 import { USD_DECIMALS } from '@/constants/numbers';
 import { ORDER_TYPE_STRINGS } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks';
-import { LocalOrderData } from '@/hooks/useSubmitOrderNotifications';
+import { LocalOrderData } from '@/hooks/useOrderStatusNotifications';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -29,7 +30,7 @@ import { getMarketData } from '@/state/perpetualsSelectors';
 import { getTradeType } from '@/lib/orders';
 
 import { OrderStatusIcon } from '../OrderStatusIcon';
-import { FillDetails } from './TradeNotification';
+import { FillDetails } from './TradeNotification/FillDetails';
 
 type ElementProps = {
   orderClientId: number;
@@ -38,7 +39,7 @@ type ElementProps = {
   fill?: SubaccountFill;
 };
 
-export const SubmitOrderNotification = ({
+export const OrderStatusNotification = ({
   isToast,
   orderClientId,
   localOrder,
@@ -53,23 +54,26 @@ export const SubmitOrderNotification = ({
   const indexedOrderStatus = order?.status?.rawValue;
   const submissionStatus = localOrder.submissionStatus;
 
-  let orderStatusString = 'Submitted';
+  let orderStatusStringKey = STRING_KEYS.SUBMITTED;
   let orderStatusIcon = <Styled.LoadingSpinner />;
 
   switch (submissionStatus) {
-    case SubmitOrderStatuses.Failed:
-      orderStatusString = 'Failed';
+    case OrderSubmissionStatuses.Failed:
+      orderStatusStringKey = STRING_KEYS.FAILED;
       orderStatusIcon = <Styled.WarningIcon iconName={IconName.Warning} />;
       break;
-    default:
+    case OrderSubmissionStatuses.Placed:
+    case OrderSubmissionStatuses.Filled:
       if (indexedOrderStatus) {
-        orderStatusString = stringGetter({
-          key: ORDER_STATUS_STRINGS[
+        orderStatusStringKey =
+          ORDER_STATUS_STRINGS[
             indexedOrderStatus as unknown as KotlinIrEnumValues<typeof AbacusOrderStatus>
-          ],
-        });
+          ];
         orderStatusIcon = <Styled.OrderStatusIcon status={indexedOrderStatus} />;
       }
+      break;
+    case OrderSubmissionStatuses.Submitted:
+    default:
       break;
   }
 
@@ -81,11 +85,12 @@ export const SubmitOrderNotification = ({
       slotTitle={titleKey && stringGetter({ key: titleKey })}
       slotTitleRight={
         <Styled.OrderStatus>
-          {orderStatusString}
+          {stringGetter({ key: orderStatusStringKey })}
           {orderStatusIcon}
         </Styled.OrderStatus>
       }
       slotCustomContent={
+        submissionStatus === OrderSubmissionStatuses.Filled &&
         order &&
         fill && (
           <FillDetails

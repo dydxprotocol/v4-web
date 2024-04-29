@@ -22,6 +22,7 @@ import type {
 } from '@/constants/abacus';
 import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
+import { TradeTypes } from '@/constants/trade';
 import { DydxAddress } from '@/constants/wallets';
 
 import { setSubaccount, setHistoricalPnl, removeUncommittedOrderClientId } from '@/state/account';
@@ -34,7 +35,7 @@ import { hashFromTx } from '@/lib/txUtils';
 import { useAccounts } from './useAccounts';
 import { useDydxClient } from './useDydxClient';
 import { useGovernanceVariables } from './useGovernanceVariables';
-import { useSubmitOrderNotifications } from './useSubmitOrderNotifications';
+import { useOrderStatusNotifications } from './useOrderStatusNotifications';
 import { useTokenConfigs } from './useTokenConfigs';
 
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
@@ -342,7 +343,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     }
   }, [dydxAddress, getFaucetFunds, subaccountNumber]);
 
-  const { orderFailed } = useSubmitOrderNotifications();
+  const { storeOrder, orderFailed } = useOrderStatusNotifications();
 
   // ------ Trading Methods ------ //
   const placeOrder = useCallback(
@@ -378,6 +379,15 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         placeOrderParams = abacusStateManager.closePosition(callback);
       } else {
         placeOrderParams = abacusStateManager.placeOrder(callback);
+      }
+
+      if (placeOrderParams?.clientId) {
+        storeOrder(
+          placeOrderParams.marketId,
+          placeOrderParams.clientId,
+          placeOrderParams.type as TradeTypes,
+          placeOrderParams.price
+        );
       }
 
       return placeOrderParams;

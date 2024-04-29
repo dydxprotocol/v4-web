@@ -24,6 +24,7 @@ import { DydxProvider } from '@/hooks/useDydxClient';
 import { LocalNotificationsProvider } from '@/hooks/useLocalNotifications';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
+import { OrderStatusNotificationsProvider } from '@/hooks/useOrderStatusNotifications';
 import { PotentialMarketsProvider } from '@/hooks/usePotentialMarkets';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
@@ -46,8 +47,6 @@ import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 
 import { parseLocationHash } from '@/lib/urlUtils';
 import { config, configureChainsConfig, privyConfig } from '@/lib/wagmi';
-
-import { SubmitOrderNotificationsProvider } from './hooks/useSubmitOrderNotifications';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
@@ -156,7 +155,7 @@ const providers = [
   wrapProvider(RestrictionProvider),
   wrapProvider(DydxProvider),
   wrapProvider(AccountsProvider),
-  wrapProvider(SubmitOrderNotificationsProvider),
+  wrapProvider(OrderStatusNotificationsProvider),
   wrapProvider(SubaccountProvider),
   wrapProvider(LocalNotificationsProvider),
   wrapProvider(NotificationsProvider),

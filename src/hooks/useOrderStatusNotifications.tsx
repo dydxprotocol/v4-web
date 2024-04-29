@@ -3,7 +3,7 @@ import { createContext, useContext, useCallback, useState, useEffect } from 'rea
 import _ from 'lodash';
 import { shallowEqual, useSelector } from 'react-redux';
 
-import { SubmitOrderStatuses } from '@/constants/notifications';
+import { OrderSubmissionStatuses } from '@/constants/notifications';
 import { TradeTypes } from '@/constants/trade';
 
 import {
@@ -13,60 +13,52 @@ import {
 
 import { isTruthy } from '@/lib/isTruthy';
 
-const SubmitOrderNotificationsContext = createContext<
-  ReturnType<typeof useSubmitOrderNotificationsContext> | undefined
+const OrderStatusNotificationsContext = createContext<
+  ReturnType<typeof useOrderStatusNotificationsContext> | undefined
 >(undefined);
 
-SubmitOrderNotificationsContext.displayName = 'SubmitOrderNotifications';
+OrderStatusNotificationsContext.displayName = 'OrderStatusNotifications';
 
-export const SubmitOrderNotificationsProvider = ({ ...props }) => (
-  <SubmitOrderNotificationsContext.Provider
-    value={useSubmitOrderNotificationsContext()}
+export const OrderStatusNotificationsProvider = ({ ...props }) => (
+  <OrderStatusNotificationsContext.Provider
+    value={useOrderStatusNotificationsContext()}
     {...props}
   />
 );
 
-export const useSubmitOrderNotifications = () => useContext(SubmitOrderNotificationsContext)!;
+export const useOrderStatusNotifications = () => useContext(OrderStatusNotificationsContext)!;
 
 export type LocalOrderData = {
   marketId: string;
   clientId: number;
   orderType?: TradeTypes;
   price?: number;
-  tickSizeDecimals?: number;
-  submissionStatus?: SubmitOrderStatuses;
+  submissionStatus: OrderSubmissionStatuses;
 };
 
-const useSubmitOrderNotificationsContext = () => {
-  const [submittedOrderClientIds, setSubmittedOrderClientIds] = useState<number[]>([]);
+const useOrderStatusNotificationsContext = () => {
+  const [localOrderClientIds, setLocalOrderClientIds] = useState<number[]>([]);
   const [indexedOrderClientIds, setIndexedOrderClientIds] = useState<number[]>([]);
   const [localFilledOrderClientIds, setLocalFilledOrderClientIds] = useState<number[]>([]);
   const [failedOrderClientIds, setFailedOrderClientIds] = useState<number[]>([]);
   const [localOrdersData, setLocalOrdersData] = useState<LocalOrderData[]>([]);
 
-  const openOrderClientIds = useSelector(getSubaccountOpenOrderClientIds, shallowEqual);
-  const filledOrderClientIds = useSelector(getSubaccountFilledOrderClientIds, shallowEqual);
+  const allOpenOrderClientIds = useSelector(getSubaccountOpenOrderClientIds, shallowEqual);
+  const allFilledOrderClientIds = useSelector(getSubaccountFilledOrderClientIds, shallowEqual);
 
   useEffect(() => {
-    const indexed = _.intersection(submittedOrderClientIds, openOrderClientIds).filter(isTruthy);
+    const indexed = _.intersection(localOrderClientIds, allOpenOrderClientIds).filter(isTruthy);
     setIndexedOrderClientIds(indexed);
-  }, [openOrderClientIds, submittedOrderClientIds]);
+  }, [allOpenOrderClientIds, localOrderClientIds]);
 
   useEffect(() => {
-    const filled = _.intersection(indexedOrderClientIds, filledOrderClientIds).filter(isTruthy);
+    const filled = _.intersection(indexedOrderClientIds, allFilledOrderClientIds).filter(isTruthy);
     setLocalFilledOrderClientIds(filled);
-  }, [indexedOrderClientIds, filledOrderClientIds]);
+  }, [indexedOrderClientIds, allFilledOrderClientIds]);
 
   const storeOrder = useCallback(
-    ({
-      marketId,
-      clientId,
-      orderType,
-      price,
-      tickSizeDecimals,
-      submissionStatus = SubmitOrderStatuses.Submitted,
-    }: LocalOrderData) => {
-      setSubmittedOrderClientIds((ids) => [...ids, clientId]);
+    (marketId: string, clientId: number, orderType: TradeTypes, price?: number) => {
+      setLocalOrderClientIds((ids) => [...ids, clientId]);
       setLocalOrdersData((ordersData) => [
         ...ordersData,
         {
@@ -74,17 +66,16 @@ const useSubmitOrderNotificationsContext = () => {
           clientId,
           orderType,
           price,
-          tickSizeDecimals,
-          submissionStatus,
+          submissionStatus: OrderSubmissionStatuses.Submitted,
         },
       ]);
     },
-    [submittedOrderClientIds]
+    []
   );
 
   const orderFailed = useCallback(
     (orderClientId: number) => setFailedOrderClientIds((ids) => [...ids, orderClientId]),
-    [failedOrderClientIds]
+    []
   );
 
   // update submission status
@@ -94,11 +85,11 @@ const useSubmitOrderNotificationsContext = () => {
         const clientId = orderData.clientId;
         let submissionStatus = orderData.submissionStatus; // intially submitted
         if (localFilledOrderClientIds.includes(clientId)) {
-          submissionStatus = SubmitOrderStatuses.Filled;
+          submissionStatus = OrderSubmissionStatuses.Filled;
         } else if (indexedOrderClientIds.includes(clientId)) {
-          submissionStatus = SubmitOrderStatuses.Placed;
+          submissionStatus = OrderSubmissionStatuses.Placed;
         } else if (failedOrderClientIds.includes(clientId)) {
-          submissionStatus = SubmitOrderStatuses.Failed;
+          submissionStatus = OrderSubmissionStatuses.Failed;
         }
 
         return {
@@ -111,7 +102,6 @@ const useSubmitOrderNotificationsContext = () => {
 
   return {
     storeOrder,
-    submittedOrderClientIds,
     orderFailed,
     localOrdersData,
   };

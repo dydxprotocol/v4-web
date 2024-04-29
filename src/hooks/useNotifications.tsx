@@ -62,6 +62,7 @@ const useNotificationsContext = () => {
         [NotificationType.TriggerOrder]: true,
         [NotificationType.ReleaseUpdates]: true,
         [NotificationType.ApiError]: true,
+        [NotificationType.OrderStatus]: true,
         version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
       },
     });
@@ -121,6 +122,7 @@ const useNotificationsContext = () => {
     ) {
       setNotificationPreferences({
         [NotificationType.AbacusGenerated]: true,
+        [NotificationType.OrderStatus]: true,
         [NotificationType.SquidTransfer]: true,
         [NotificationType.ReleaseUpdates]: true,
         [NotificationType.TriggerOrder]: true,
