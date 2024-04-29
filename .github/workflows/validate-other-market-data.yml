@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'public/configs/otherMarketData.json'
+      - 'scripts/validate-other-market-data.ts'
 
 jobs:
   validate:
