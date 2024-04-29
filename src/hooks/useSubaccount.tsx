@@ -25,7 +25,12 @@ import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { TradeTypes } from '@/constants/trade';
 import { DydxAddress } from '@/constants/wallets';
 
-import { setSubaccount, setHistoricalPnl, removeUncommittedOrderClientId } from '@/state/account';
+import {
+  setSubaccount,
+  setHistoricalPnl,
+  submittedOrderFailed,
+  submittedOrder,
+} from '@/state/account';
 import { getBalances } from '@/state/accountSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -35,7 +40,6 @@ import { hashFromTx } from '@/lib/txUtils';
 import { useAccounts } from './useAccounts';
 import { useDydxClient } from './useDydxClient';
 import { useGovernanceVariables } from './useGovernanceVariables';
-import { useOrderStatusNotifications } from './useOrderStatusNotifications';
 import { useTokenConfigs } from './useTokenConfigs';
 
 type SubaccountContextType = ReturnType<typeof useSubaccountContext>;
@@ -343,8 +347,6 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     }
   }, [dydxAddress, getFaucetFunds, subaccountNumber]);
 
-  const { storeOrder, orderFailed } = useOrderStatusNotifications();
-
   // ------ Trading Methods ------ //
   const placeOrder = useCallback(
     ({
@@ -367,8 +369,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
           onError?.({ errorStringKey: parsingError?.stringKey });
 
           if (data?.clientId !== undefined) {
-            orderFailed(data.clientId);
-            dispatch(removeUncommittedOrderClientId(data.clientId));
+            dispatch(submittedOrderFailed(data.clientId));
           }
         }
       };
@@ -382,11 +383,12 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       }
 
       if (placeOrderParams?.clientId) {
-        storeOrder(
-          placeOrderParams.marketId,
-          placeOrderParams.clientId,
-          placeOrderParams.type as TradeTypes,
-          placeOrderParams.price
+        dispatch(
+          submittedOrder({
+            marketId: placeOrderParams.marketId,
+            clientId: placeOrderParams.clientId,
+            orderType: placeOrderParams.type as TradeTypes,
+          })
         );
       }
 

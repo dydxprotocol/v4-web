@@ -9,13 +9,13 @@ import {
   SubaccountFill,
   SubaccountOrder,
 } from '@/constants/abacus';
+import { LocalOrderData } from '@/constants/account';
 import { STRING_KEYS } from '@/constants/localization';
 import { OrderSubmissionStatuses } from '@/constants/notifications';
 import { USD_DECIMALS } from '@/constants/numbers';
 import { ORDER_TYPE_STRINGS } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks';
-import { LocalOrderData } from '@/hooks/useOrderStatusNotifications';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -90,7 +90,6 @@ export const OrderStatusNotification = ({
         </Styled.OrderStatus>
       }
       slotCustomContent={
-        submissionStatus === OrderSubmissionStatuses.Filled &&
         order &&
         fill && (
           <FillDetails

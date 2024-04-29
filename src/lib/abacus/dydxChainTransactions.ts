@@ -34,7 +34,7 @@ import { DydxChainId, isTestnet } from '@/constants/networks';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 
 import { RootStore } from '@/state/_store';
-import { addUncommittedOrderClientId, removeUncommittedOrderClientId } from '@/state/account';
+import { submittedOrderTimeout } from '@/state/account';
 import { setInitializationError } from '@/state/app';
 
 import { StatefulOrderError } from '../errors';
@@ -203,12 +203,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         triggerPrice,
       } = params || {};
 
-      // Observe uncommitted order
-      this.store?.dispatch(addUncommittedOrderClientId(clientId));
-
       setTimeout(() => {
-        this.store?.dispatch(removeUncommittedOrderClientId(clientId));
-        // TODO(@aforaleka) dispatch order failed notification
+        this.store?.dispatch(submittedOrderTimeout(clientId));
       }, UNCOMMITTED_ORDER_TIMEOUT_MS);
 
       // Place order

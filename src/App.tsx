@@ -24,7 +24,6 @@ import { DydxProvider } from '@/hooks/useDydxClient';
 import { LocalNotificationsProvider } from '@/hooks/useLocalNotifications';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { NotificationsProvider } from '@/hooks/useNotifications';
-import { OrderStatusNotificationsProvider } from '@/hooks/useOrderStatusNotifications';
 import { PotentialMarketsProvider } from '@/hooks/usePotentialMarkets';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
@@ -155,7 +154,6 @@ const providers = [
   wrapProvider(RestrictionProvider),
   wrapProvider(DydxProvider),
   wrapProvider(AccountsProvider),
-  wrapProvider(OrderStatusNotificationsProvider),
   wrapProvider(SubaccountProvider),
   wrapProvider(LocalNotificationsProvider),
   wrapProvider(NotificationsProvider),

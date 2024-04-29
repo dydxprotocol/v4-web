@@ -24,7 +24,6 @@ import { DydxChainAsset } from '@/constants/wallets';
 
 import { useAccounts, useApiState, useStringGetter, useTokenConfigs, useURLConfigs } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
-import { useOrderStatusNotifications } from '@/hooks/useOrderStatusNotifications';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
@@ -37,7 +36,11 @@ import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 import { TriggerOrderNotification } from '@/views/notifications/TriggerOrderNotification';
 
-import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
+import {
+  getSubaccountFills,
+  getSubaccountOrders,
+  getSubmittedOrders,
+} from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
@@ -70,7 +73,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const abacusNotifications = useSelector(getAbacusNotifications, isEqual);
       const orders = useSelector(getSubaccountOrders, shallowEqual) || [];
       const ordersById = groupBy(orders, 'id');
-      const { localOrdersData } = useOrderStatusNotifications();
+      const localOrdersData = useSelector(getSubmittedOrders, shallowEqual);
 
       useEffect(() => {
         for (const abacusNotif of abacusNotifications) {
@@ -424,12 +427,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
   {
     type: NotificationType.OrderStatus,
     useTrigger: ({ trigger }) => {
-      const { localOrdersData } = useOrderStatusNotifications();
+      const localOrdersData = useSelector(getSubmittedOrders, isEqual);
       const stringGetter = useStringGetter();
 
       useEffect(() => {
         for (const localOrder of localOrdersData) {
           const key = localOrder.clientId.toString();
+          console.log(localOrder.submissionStatus);
           trigger(
             key,
             {

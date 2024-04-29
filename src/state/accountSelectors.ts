@@ -277,6 +277,8 @@ export const getLatestOrderStatus = createSelector(
 export const getUncommittedOrderClientIds = (state: RootState) =>
   state.account.uncommittedOrderClientIds;
 
+export const getSubmittedOrders = (state: RootState) => state.account.submittedOrders;
+
 /**
  * @param orderId
  * @returns order details with the given orderId
