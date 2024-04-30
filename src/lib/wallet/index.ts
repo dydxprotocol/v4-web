@@ -1,10 +1,10 @@
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 import {
-  type WalletConnection,
-  wallets,
   WalletConnectionType,
   WalletErrorType,
   WalletType,
+  wallets,
+  type WalletConnection,
 } from '@/constants/wallets';
 
 import { detectInjectedEip1193Providers } from './providers';

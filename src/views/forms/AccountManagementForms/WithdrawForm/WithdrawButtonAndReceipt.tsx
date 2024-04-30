@@ -1,11 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
-import { formatUnits } from 'viem';
 
 import { TransferInputTokenResource } from '@/constants/abacus';
-import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 
@@ -15,13 +14,13 @@ import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
-import { Details, DetailsItem } from '@/components/Details';
+import { Details } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
-import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 import { WithReceipt } from '@/components/WithReceipt';
+import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
@@ -47,13 +46,11 @@ export const WithdrawButtonAndReceipt = ({
   setSlippage,
 
   slippage,
-  withdrawChain,
   withdrawToken,
 
   isDisabled,
   isLoading,
 }: ElementProps) => {
-  const [showFeeBreakdown, setShowFeeBreakdown] = useState(false);
   const [isEditingSlippage, setIsEditingSlipapge] = useState(false);
   const stringGetter = useStringGetter();
 
@@ -63,44 +60,41 @@ export const WithdrawButtonAndReceipt = ({
   const { usdcLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
 
-  const feeSubitems: DetailsItem[] = [];
-
-  if (typeof summary?.gasFee === 'number') {
-    feeSubitems.push({
-      key: 'gas-fees',
-      label: <span>{stringGetter({ key: STRING_KEYS.GAS_FEE })}</span>,
-      value: <Output type={OutputType.Fiat} value={summary?.gasFee} />,
-    });
-  }
-
-  if (typeof summary?.bridgeFee === 'number') {
-    feeSubitems.push({
-      key: 'bridge-fees',
-      label: <span>{stringGetter({ key: STRING_KEYS.BRIDGE_FEE })}</span>,
-      value: <Output type={OutputType.Fiat} value={summary?.bridgeFee} />,
-    });
-  }
-
-  const hasSubitems = feeSubitems.length > 0;
-
-  const showSubitemsToggle = showFeeBreakdown
-    ? stringGetter({ key: STRING_KEYS.HIDE_ALL_DETAILS })
-    : stringGetter({ key: STRING_KEYS.SHOW_ALL_DETAILS });
-
-  const totalFees = (summary?.bridgeFee || 0) + (summary?.gasFee || 0);
-
   const submitButtonReceipt = [
     {
-      key: 'total-fees',
-      label: <span>{stringGetter({ key: STRING_KEYS.TOTAL_FEES })}</span>,
-      value: <Output type={OutputType.Fiat} value={totalFees} />,
-      subitems: feeSubitems,
+      key: 'expected-amount-received',
+      label: (
+        <Styled.RowWithGap>
+          {stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED })}
+          {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
+        </Styled.RowWithGap>
+      ),
+      value: (
+        <Output type={OutputType.Asset} value={summary?.toAmount} fractionDigits={TOKEN_DECIMALS} />
+      ),
+    },
+    {
+      key: 'minimum-amount-received',
+      label: (
+        <Styled.RowWithGap>
+          {stringGetter({ key: STRING_KEYS.MINIMUM_AMOUNT_RECEIVED })}
+          {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
+        </Styled.RowWithGap>
+      ),
+      value: (
+        <Output
+          type={OutputType.Asset}
+          value={summary?.toAmountMin}
+          fractionDigits={TOKEN_DECIMALS}
+        />
+      ),
+      tooltip: 'minimum-amount-received',
     },
     !exchange && {
       key: 'exchange-rate',
       label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
       value: withdrawToken && typeof summary?.exchangeRate === 'number' && (
-        <Styled.ExchangeRate>
+        <Styled.RowWithGap>
           <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={usdcLabel} />
           =
           <Output
@@ -108,7 +102,35 @@ export const WithdrawButtonAndReceipt = ({
             value={summary?.exchangeRate}
             tag={withdrawToken?.symbol}
           />
-        </Styled.ExchangeRate>
+        </Styled.RowWithGap>
+      ),
+    },
+    typeof summary?.gasFee === 'number' && {
+      key: 'gas-fees',
+      label: (
+        <WithTooltip tooltip="gas-fees">{stringGetter({ key: STRING_KEYS.GAS_FEE })}</WithTooltip>
+      ),
+      value: <Output type={OutputType.Fiat} value={10} />,
+    },
+    typeof summary?.bridgeFee === 'number' && {
+      key: 'bridge-fees',
+      label: (
+        <WithTooltip tooltip="bridge-fees">
+          {stringGetter({ key: STRING_KEYS.BRIDGE_FEE })}
+        </WithTooltip>
+      ),
+      value: <Output type={OutputType.Fiat} value={summary?.bridgeFee} />,
+    },
+    !exchange && {
+      key: 'slippage',
+      label: <span>{stringGetter({ key: STRING_KEYS.MAX_SLIPPAGE })}</span>,
+      value: (
+        <SlippageEditor
+          disabled
+          slippage={slippage}
+          setIsEditing={setIsEditingSlipapge}
+          setSlippage={setSlippage}
+        />
       ),
     },
     {
@@ -126,49 +148,6 @@ export const WithdrawButtonAndReceipt = ({
                   : Math.round(summary?.estimatedRouteDuration / 60),
             },
           })}
-        />
-      ),
-    },
-    {
-      key: 'expected-amount-received',
-      label: (
-        <span>
-          {stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED })}{' '}
-          {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
-        </span>
-      ),
-      value: (
-        <Output type={OutputType.Asset} value={summary?.toAmount} fractionDigits={TOKEN_DECIMALS} />
-      ),
-      subitems: [
-        {
-          key: 'minimum-amount-received',
-          label: (
-            <span>
-              {stringGetter({ key: STRING_KEYS.MINIMUM_AMOUNT_RECEIVED })}{' '}
-              {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
-            </span>
-          ),
-          value: (
-            <Output
-              type={OutputType.Asset}
-              value={summary?.toAmountMin}
-              fractionDigits={TOKEN_DECIMALS}
-            />
-          ),
-          tooltip: 'minimum-amount-received',
-        },
-      ],
-    },
-    !exchange && {
-      key: 'slippage',
-      label: <span>{stringGetter({ key: STRING_KEYS.MAX_SLIPPAGE })}</span>,
-      value: (
-        <SlippageEditor
-          disabled
-          slippage={slippage}
-          setIsEditing={setIsEditingSlipapge}
-          setSlippage={setSlippage}
         />
       ),
     },
@@ -191,26 +170,7 @@ export const WithdrawButtonAndReceipt = ({
     !isDisabled && !isEditingSlippage && connectionError !== ConnectionErrorType.CHAIN_DISRUPTION;
 
   return (
-    <Styled.WithReceipt
-      slotReceipt={
-        <Styled.CollapsibleDetails>
-          <Styled.Details showSubitems={showFeeBreakdown} items={submitButtonReceipt} />
-          {hasSubitems && (
-            <Styled.DetailButtons>
-              <Styled.ToggleButton
-                shape={ButtonShape.Pill}
-                size={ButtonSize.XSmall}
-                isPressed={showFeeBreakdown}
-                onPressedChange={setShowFeeBreakdown}
-                slotLeft={<Icon iconName={IconName.Caret} />}
-              >
-                {showSubitemsToggle}
-              </Styled.ToggleButton>
-            </Styled.DetailButtons>
-          )}
-        </Styled.CollapsibleDetails>
-      }
-    >
+    <Styled.WithReceipt slotReceipt={<Styled.Details items={submitButtonReceipt} />}>
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
       ) : (
@@ -235,7 +195,7 @@ Styled.DiffOutput = styled(DiffOutput)`
   --diffOutput-valueWithDiff-fontSize: 1em;
 `;
 
-Styled.ExchangeRate = styled.span`
+Styled.RowWithGap = styled.span`
   ${layoutMixins.row}
   gap: 0.5ch;
 `;
@@ -244,12 +204,8 @@ Styled.WithReceipt = styled(WithReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
-Styled.CollapsibleDetails = styled.div`
-  ${layoutMixins.column}
-  padding: var(--form-input-paddingY) var(--form-input-paddingX);
-`;
-
 Styled.Details = styled(Details)`
+  padding: var(--form-input-paddingY) var(--form-input-paddingX);
   font-size: 0.8125em;
 `;
 

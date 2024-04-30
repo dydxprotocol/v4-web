@@ -3,16 +3,16 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { createSelector } from 'reselect';
 
 import {
-  type AbacusOrderStatuses,
-  type SubaccountOrder,
-  type SubaccountFill,
-  type SubaccountFundingPayment,
+  AbacusOrderSide,
   AbacusOrderStatus,
   AbacusPositionSide,
-  ORDER_SIDES,
   HistoricalTradingReward,
   HistoricalTradingRewardsPeriod,
-  AbacusOrderSide,
+  ORDER_SIDES,
+  type AbacusOrderStatuses,
+  type SubaccountFill,
+  type SubaccountFundingPayment,
+  type SubaccountOrder,
 } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
 
@@ -179,32 +179,39 @@ export const getMarketSubaccountOpenOrders = (
  * @param state
  * @returns list of conditional orders that have not been filled or cancelled for all subaccount positions
  */
-export const getSubaccountConditionalOrders = createSelector(
-  [getMarketSubaccountOpenOrders, getOpenPositions],
-  (openOrdersByMarketId, positions) => {
-    const stopLossOrders: SubaccountOrder[] = [];
-    const takeProfitOrders: SubaccountOrder[] = [];
+export const getSubaccountConditionalOrders = (isSlTpLimitOrdersEnabled: boolean) =>
+  createSelector(
+    [getMarketSubaccountOpenOrders, getOpenPositions],
+    (openOrdersByMarketId, positions) => {
+      const stopLossOrders: SubaccountOrder[] = [];
+      const takeProfitOrders: SubaccountOrder[] = [];
 
-    positions?.forEach((position) => {
-      const orderSideForConditionalOrder =
-        position?.side?.current === AbacusPositionSide.LONG
-          ? AbacusOrderSide.sell
-          : AbacusOrderSide.buy;
+      positions?.forEach((position) => {
+        const orderSideForConditionalOrder =
+          position?.side?.current === AbacusPositionSide.LONG
+            ? AbacusOrderSide.sell
+            : AbacusOrderSide.buy;
 
-      const conditionalOrders = openOrdersByMarketId[position.id];
+        const conditionalOrders = openOrdersByMarketId[position.id];
 
-      conditionalOrders?.forEach((order: SubaccountOrder) => {
-        if (order.side === orderSideForConditionalOrder && isStopLossOrder(order)) {
-          stopLossOrders.push(order);
-        } else if (order.side === orderSideForConditionalOrder && isTakeProfitOrder(order)) {
-          takeProfitOrders.push(order);
-        }
+        conditionalOrders?.forEach((order: SubaccountOrder) => {
+          if (
+            order.side === orderSideForConditionalOrder &&
+            isStopLossOrder(order, isSlTpLimitOrdersEnabled)
+          ) {
+            stopLossOrders.push(order);
+          } else if (
+            order.side === orderSideForConditionalOrder &&
+            isTakeProfitOrder(order, isSlTpLimitOrdersEnabled)
+          ) {
+            takeProfitOrders.push(order);
+          }
+        });
       });
-    });
 
-    return { stopLossOrders, takeProfitOrders };
-  }
-);
+      return { stopLossOrders, takeProfitOrders };
+    }
+  );
 
 /**
  * @param state
@@ -478,3 +485,13 @@ export const getUsageRestriction = (state: RootState) => state.account.restricti
  * @returns RestrictionType from the current session
  */
 export const getRestrictionType = (state: RootState) => state.account.restriction?.restriction;
+
+/**
+ * @returns compliance status of the current session
+ */
+export const getComplianceStatus = (state: RootState) => state.account.compliance?.status;
+
+/**
+ * @returns compliance geo of the current session
+ */
+export const getGeo = (state: RootState) => state.account.compliance?.geo;

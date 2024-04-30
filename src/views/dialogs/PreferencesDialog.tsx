@@ -6,7 +6,7 @@ import styled, { AnyStyledComponent } from 'styled-components';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
 
-import { useStringGetter } from '@/hooks';
+import { useEnvFeatures, useStringGetter } from '@/hooks';
 import { useNotifications } from '@/hooks/useNotifications';
 
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
@@ -16,11 +16,11 @@ import { OtherPreference, setDefaultToAllMarketsInPositionsOrdersFills } from '@
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { testFlags } from '@/lib/testFlags';
 
 export const usePreferenceMenu = () => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
+  const { isSlTpEnabled } = useEnvFeatures();
 
   // Notifications
   const { notificationPreferences, setNotificationPreferences } = useNotifications();
@@ -69,7 +69,7 @@ export const usePreferenceMenu = () => {
           ),
           onSelect: () => toggleNotifPreference(NotificationType.SquidTransfer),
         },
-        testFlags.configureSlTpFromPositionsTable && {
+        isSlTpEnabled && {
           value: NotificationType.TriggerOrder,
           label: stringGetter({ key: STRING_KEYS.TAKE_PROFIT_STOP_LOSS }),
           slotAfter: (

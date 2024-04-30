@@ -9,7 +9,7 @@ import { useEnvFeatures, useStringGetter } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DiffArrow } from '@/components/DiffArrow';
-import { Icon, IconName } from '@/components/Icon';
+import { Icon } from '@/components/Icon';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 import { Tag } from '@/components/Tag';
 
@@ -24,6 +24,14 @@ type ElementProps = {
   isExchange?: boolean;
 };
 
+const cctpTokensByAddress = cctpTokens.reduce((acc, token) => {
+  if (!acc[token.tokenAddress]) {
+    acc[token.tokenAddress] = [];
+  }
+  acc[token.tokenAddress].push(token);
+  return acc;
+}, {} as Record<string, TokenInfo[]>);
+
 export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions, resources } =
@@ -32,14 +40,6 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
 
   const tokens =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() || [];
-
-  const cctpTokensByAddress = cctpTokens.reduce((acc, token) => {
-    if (!acc[token.tokenAddress]) {
-      acc[token.tokenAddress] = [];
-    }
-    acc[token.tokenAddress].push(token);
-    return acc;
-  }, {} as Record<string, TokenInfo[]>);
 
   const tokenItems = Object.values(tokens)
     .map((token) => ({
@@ -50,12 +50,27 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
         selectedToken && onSelectToken(selectedToken);
       },
       slotBefore: <Styled.Img src={token.iconUrl} alt="" />,
+      slotAfter: !!cctpTokensByAddress[token.type] && (
+        <Styled.Text>
+          {stringGetter({
+            key: STRING_KEYS.LOWEST_FEES_WITH_USDC,
+            params: {
+              LOWEST_FEES_HIGHLIGHT_TEXT: (
+                <Styled.GreenHighlight>
+                  {stringGetter({ key: STRING_KEYS.LOWEST_FEES_HIGHLIGHT_TEXT })}
+                </Styled.GreenHighlight>
+              ),
+            },
+          })}
+        </Styled.Text>
+      ),
       tag: resources?.tokenResources?.get(token.type)?.symbol,
     }))
     .filter(
-      (chain) =>
-        type === TransferType.deposit || !!cctpTokensByAddress[chain.value] || !CCTPWithdrawalOnly
-    );
+      (token) =>
+        type === TransferType.deposit || !!cctpTokensByAddress[token.value] || !CCTPWithdrawalOnly
+    )
+    .sort((token) => (!!cctpTokensByAddress[token.value] ? -1 : 1));
 
   return (
     <SearchSelectMenu
@@ -101,6 +116,15 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
+
+Styled.Text = styled.div`
+  font: var(--font-small-regular);
+  color: var(--color-text-0);
+`;
+
+Styled.GreenHighlight = styled.span`
+  color: var(--color-green);
+`;
 
 Styled.AssetRow = styled.div`
   ${layoutMixins.row}

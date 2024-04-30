@@ -1,11 +1,11 @@
 import type { ExternalProvider } from '@ethersproject/providers';
 
 import {
-  type InjectedEthereumProvider,
   type InjectedCoinbaseWalletExtensionProvider,
+  type InjectedEthereumProvider,
   type WithInjectedEthereumProvider,
-  type WithInjectedWeb3Provider,
   type WithInjectedOkxWalletProvider,
+  type WithInjectedWeb3Provider,
 } from '@/constants/wallets';
 
 import { isTruthy } from '../isTruthy';

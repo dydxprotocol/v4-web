@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
 
-import { isEqual, groupBy } from 'lodash';
+import { groupBy, isEqual } from 'lodash';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { ComplianceStatus } from '@/constants/abacus';
+import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import {
   STRING_KEYS,
@@ -13,11 +15,12 @@ import {
   type StringKey,
 } from '@/constants/localization';
 import {
-  type NotificationTypeConfig,
-  NotificationType,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
-  TransferNotificationTypes,
+  NotificationDisplayData,
+  NotificationType,
   ReleaseUpdateNotificationIds,
+  TransferNotificationTypes,
+  type NotificationTypeConfig,
 } from '@/constants/notifications';
 import { AppRoute, TokenRoute } from '@/constants/routes';
 import { DydxChainAsset } from '@/constants/wallets';
@@ -44,6 +47,7 @@ import { getMarketIds } from '@/state/perpetualsSelectors';
 import { getTitleAndBodyForTriggerOrderNotification } from '@/lib/notifications';
 import { formatSeconds } from '@/lib/timeUtils';
 
+import { useComplianceState } from './useComplianceState';
 import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
 
 const parseStringParamsForNotification = ({
@@ -395,6 +399,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               body: statusErrorMessage.body,
               toastSensitivity: 'foreground',
               groupKey: NotificationType.ApiError,
+              withClose: false,
               actionAltText: stringGetter({ key: STRING_KEYS.STATUS_PAGE }),
               renderActionSlot: () => (
                 <Link href={statusPage}>{stringGetter({ key: STRING_KEYS.STATUS_PAGE })} →</Link>
@@ -407,6 +412,42 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
     useNotificationAction: () => {
       return () => {};
+    },
+  },
+  {
+    type: NotificationType.ComplianceAlert,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const { complianceMessage, complianceState, complianceStatus } = useComplianceState();
+
+      useEffect(() => {
+        if (complianceState !== ComplianceStates.FULL_ACCESS) {
+          const displayData: NotificationDisplayData = {
+            icon: <$WarningIcon iconName={IconName.Warning} />,
+            title: stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING }),
+            body: complianceMessage,
+            toastSensitivity: 'foreground',
+            groupKey: NotificationType.ComplianceAlert,
+            withClose: false,
+          };
+
+          trigger(`${NotificationType.ComplianceAlert}-${complianceStatus}`, displayData, []);
+        }
+      }, [stringGetter, complianceMessage, complianceState, complianceStatus]);
+    },
+    useNotificationAction: () => {
+      const dispatch = useDispatch();
+      const { complianceStatus } = useComplianceState();
+
+      return () => {
+        if (complianceStatus === ComplianceStatus.FIRST_STRIKE) {
+          dispatch(
+            openDialog({
+              type: DialogTypes.GeoCompliance,
+            })
+          );
+        }
+      };
     },
   },
 ];

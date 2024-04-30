@@ -119,7 +119,7 @@ export const useTriggerOrdersFormInputs = ({
     }
 
     return () => {
-      abacusStateManager.clearTriggerOrdersInputValues();
+      abacusStateManager.resetInputState();
     };
   }, []);
 

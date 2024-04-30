@@ -1,14 +1,18 @@
+import { useEffect } from 'react';
+
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
+import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS, StringKey } from '@/constants/localization';
 import { INTEGER_DECIMALS } from '@/constants/numbers';
 import { TimeUnitShort } from '@/constants/time';
 import { GOOD_TIL_TIME_TIMESCALE_STRINGS } from '@/constants/trade';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useComplianceState } from '@/hooks/useComplianceState';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -17,7 +21,7 @@ import { Checkbox } from '@/components/Checkbox';
 import { Collapsible } from '@/components/Collapsible';
 import { FormInput } from '@/components/FormInput';
 import { InputType } from '@/components/Input';
-import { SelectMenu, SelectItem } from '@/components/SelectMenu';
+import { SelectItem, SelectMenu } from '@/components/SelectMenu';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';
@@ -27,6 +31,8 @@ import abacusStateManager from '@/lib/abacus';
 export const AdvancedTradeOptions = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
+  const { complianceState } = useComplianceState();
+
   const currentTradeFormConfig = useSelector(getInputTradeOptions, shallowEqual);
   const inputTradeData = useSelector(getInputTradeData, shallowEqual);
 
@@ -49,6 +55,15 @@ export const AdvancedTradeOptions = () => {
 
   const needsExecution = executionOptions || showPostOnly || showReduceOnly;
   const hasTimeInForce = timeInForceOptions?.toArray()?.length;
+
+  useEffect(() => {
+    if (complianceState === ComplianceStates.CLOSE_ONLY) {
+      abacusStateManager.setTradeValue({
+        value: true,
+        field: TradeInputField.reduceOnly,
+      });
+    }
+  }, [complianceState]);
 
   return (
     <Styled.Collapsible
@@ -144,8 +159,12 @@ export const AdvancedTradeOptions = () => {
             )}
             {showReduceOnly && (
               <Checkbox
-                checked={(reduceOnly && !reduceOnlyTooltip) || false}
-                disabled={!!reduceOnlyTooltip}
+                checked={
+                  (reduceOnly && !reduceOnlyTooltip) ||
+                  complianceState === ComplianceStates.CLOSE_ONLY ||
+                  false
+                }
+                disabled={!!reduceOnlyTooltip || complianceState === ComplianceStates.CLOSE_ONLY}
                 onCheckedChange={(checked) =>
                   abacusStateManager.setTradeValue({
                     value: checked,

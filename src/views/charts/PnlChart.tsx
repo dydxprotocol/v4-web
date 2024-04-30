@@ -1,18 +1,15 @@
-import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 
-import {
-  curveLinear,
-  /*, curveMonotoneX*/
-} from '@visx/curve';
+import { curveLinear } from '@visx/curve';
 import type { TooltipContextType } from '@visx/xychart';
 import debounce from 'lodash/debounce';
-import { useSelector, shallowEqual } from 'react-redux';
+import { shallowEqual, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import {
+  HISTORICAL_PNL_PERIODS,
   HistoricalPnlPeriod,
   HistoricalPnlPeriods,
-  HISTORICAL_PNL_PERIODS,
 } from '@/constants/abacus';
 import { timeUnits } from '@/constants/time';
 

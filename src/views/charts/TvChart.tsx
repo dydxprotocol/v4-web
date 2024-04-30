@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 
 import type { ResolutionString } from 'public/tradingview/charting_library';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import type { TvWidget } from '@/constants/tvchart';
 

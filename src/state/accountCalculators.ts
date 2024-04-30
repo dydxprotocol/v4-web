@@ -1,6 +1,7 @@
 import { createSelector } from 'reselect';
 
 import { OnboardingState, OnboardingSteps } from '@/constants/account';
+import { ENVIRONMENT_CONFIG_MAP, type DydxNetwork } from '@/constants/networks';
 
 import {
   getOnboardingGuards,
@@ -8,8 +9,7 @@ import {
   getSubaccountId,
   getUncommittedOrderClientIds,
 } from '@/state/accountSelectors';
-
-import { testFlags } from '@/lib/testFlags';
+import { getSelectedNetwork } from '@/state/appSelectors';
 
 export const calculateOnboardingStep = createSelector(
   [getOnboardingState, getOnboardingGuards],
@@ -91,8 +91,9 @@ export const calculateIsAccountLoading = createSelector(
  * @description calculate whether positions table should render triggers column
  */
 export const calculateShouldRenderTriggersInPositionsTable = createSelector(
-  [calculateIsAccountViewOnly],
-  (isAccountViewOnly: boolean) => !isAccountViewOnly && testFlags.configureSlTpFromPositionsTable
+  [calculateIsAccountViewOnly, getSelectedNetwork],
+  (isAccountViewOnly: boolean, selectedNetwork: DydxNetwork) =>
+    !isAccountViewOnly && ENVIRONMENT_CONFIG_MAP[selectedNetwork].featureFlags.isSlTpEnabled
 );
 
 /**

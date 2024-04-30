@@ -1,13 +1,15 @@
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import type { Nullable, TradeState } from '@/constants/abacus';
-import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
+import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { DydxChainAsset } from '@/constants/wallets';
 
 import { useAccounts, useBreakpoints, useStringGetter } from '@/hooks';
+import { useComplianceState } from '@/hooks/useComplianceState';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -50,6 +52,7 @@ export const AccountInfoConnectedState = () => {
 
   const dispatch = useDispatch();
   const { isTablet } = useBreakpoints();
+  const { complianceState } = useComplianceState();
 
   const { dydxAccounts } = useAccounts();
 
@@ -84,33 +87,37 @@ export const AccountInfoConnectedState = () => {
             >
               {stringGetter({ key: STRING_KEYS.WITHDRAW })}
             </Styled.Button>
-            <Styled.Button
-              state={{ isDisabled: !dydxAccounts }}
-              onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
-              shape={ButtonShape.Rectangle}
-              size={ButtonSize.XSmall}
-            >
-              {stringGetter({ key: STRING_KEYS.DEPOSIT })}
-            </Styled.Button>
-            <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.TRANSFER })}>
-              <Styled.IconButton
-                shape={ButtonShape.Square}
-                iconName={IconName.Send}
-                onClick={() =>
-                  dispatch(
-                    openDialog({
-                      type: DialogTypes.Transfer,
-                      dialogProps: { selectedAsset: DydxChainAsset.USDC },
-                    })
-                  )
-                }
-              />
-            </WithTooltip>
+            {complianceState === ComplianceStates.FULL_ACCESS && (
+              <>
+                <Styled.Button
+                  state={{ isDisabled: !dydxAccounts }}
+                  onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
+                  shape={ButtonShape.Rectangle}
+                  size={ButtonSize.XSmall}
+                >
+                  {stringGetter({ key: STRING_KEYS.DEPOSIT })}
+                </Styled.Button>
+                <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.TRANSFER })}>
+                  <Styled.IconButton
+                    shape={ButtonShape.Square}
+                    iconName={IconName.Send}
+                    onClick={() =>
+                      dispatch(
+                        openDialog({
+                          type: DialogTypes.Transfer,
+                          dialogProps: { selectedAsset: DydxChainAsset.USDC },
+                        })
+                      )
+                    }
+                  />
+                </WithTooltip>
+              </>
+            )}
           </Styled.TransferButtons>
         </Styled.Header>
       )}
       <Styled.Stack>
-        {!showHeader && !isTablet && (
+        {!showHeader && !isTablet && complianceState === ComplianceStates.FULL_ACCESS && (
           <Styled.CornerButton
             state={{ isDisabled: !dydxAccounts }}
             onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}

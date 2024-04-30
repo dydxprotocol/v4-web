@@ -36,19 +36,19 @@ export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) 
   return (
     <ActionsTableCell>
       <Styled.CancelButton
-          key="cancelorder"
-          iconName={IconName.Close}
-          shape={ButtonShape.Square}
-          {...(isOrderStatusClearable(status)
-            ? { onClick: () => dispatch(clearOrder(orderId)) }
-            : {
-                onClick: onCancel,
-                state: {
-                  isLoading: isCanceling || status === AbacusOrderStatus.canceling,
-                  isDisabled: isCanceling || isDisabled || status === AbacusOrderStatus.canceling,
-                },
-              })}
-        />
+        key="cancelorder"
+        iconName={IconName.Close}
+        shape={ButtonShape.Square}
+        {...(isOrderStatusClearable(status)
+          ? { onClick: () => dispatch(clearOrder(orderId)) }
+          : {
+              onClick: onCancel,
+              state: {
+                isLoading: isCanceling || status === AbacusOrderStatus.canceling,
+                isDisabled: isCanceling || isDisabled || status === AbacusOrderStatus.canceling,
+              },
+            })}
+      />
     </ActionsTableCell>
   );
 };

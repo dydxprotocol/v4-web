@@ -8,9 +8,9 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 
 import { LocalStorageKey } from '@/constants/localStorage';
 import {
-  type LocaleData,
   SUPPORTED_BASE_TAGS_LOCALE_MAPPING,
   SupportedLocales,
+  type LocaleData,
 } from '@/constants/localization';
 
 import { initializeLocalization } from '@/state/app';

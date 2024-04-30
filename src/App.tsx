@@ -4,6 +4,7 @@ import { PrivyProvider } from '@privy-io/react-auth';
 import { PrivyWagmiConnector } from '@privy-io/wagmi-connector';
 import { GrazProvider } from 'graz';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { useSelector } from 'react-redux';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { WagmiConfig } from 'wagmi';
@@ -11,11 +12,11 @@ import { WagmiConfig } from 'wagmi';
 import { AppRoute, DEFAULT_TRADE_ROUTE, MarketsRoute } from '@/constants/routes';
 
 import {
+  useAnalytics,
   useBreakpoints,
-  useTokenConfigs,
   useInitializePage,
   useShouldShowFooter,
-  useAnalytics,
+  useTokenConfigs,
 } from '@/hooks';
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
@@ -47,6 +48,9 @@ import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 import { parseLocationHash } from '@/lib/urlUtils';
 import { config, configureChainsConfig, privyConfig } from '@/lib/wagmi';
 
+import { ComplianceStates } from './constants/compliance';
+import { useComplianceState } from './hooks/useComplianceState';
+
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
 const PortfolioPage = lazy(() => import('@/pages/portfolio/Portfolio'));
@@ -69,6 +73,8 @@ const Content = () => {
   const isShowingFooter = useShouldShowFooter();
   const { chainTokenLabel } = useTokenConfigs();
   const location = useLocation();
+
+  const { complianceState } = useComplianceState();
 
   const pathFromHash = useMemo(() => {
     if (location.hash === '') {
@@ -96,7 +102,18 @@ const Content = () => {
                 <Route path={MarketsRoute.New} element={<NewMarket />} />
                 <Route path={AppRoute.Markets} element={<MarketsPage />} />
               </Route>
-              <Route path={`/${chainTokenLabel}/*`} element={<TokenPage />} />
+
+              <Route
+                path={`/${chainTokenLabel}/*`}
+                element={
+                  complianceState === ComplianceStates.FULL_ACCESS ? (
+                    <TokenPage />
+                  ) : (
+                    <Navigate to={DEFAULT_TRADE_ROUTE} />
+                  )
+                }
+              />
+
               {isTablet && (
                 <>
                   <Route path={AppRoute.Alerts} element={<AlertsPage />} />

@@ -1,8 +1,6 @@
 import { Provider, Viewport } from '@radix-ui/react-toast';
 import styled from 'styled-components';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
 type ElementProps = {
   swipeDirection: 'up' | 'down' | 'left' | 'right';
   children: React.ReactNode;

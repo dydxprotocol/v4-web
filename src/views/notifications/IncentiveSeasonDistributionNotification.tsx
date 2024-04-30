@@ -1,8 +1,5 @@
 import styled, { type AnyStyledComponent } from 'styled-components';
 
-import { ButtonSize } from '@/constants/buttons';
-
-import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 import { Notification, NotificationProps } from '@/components/Notification';
