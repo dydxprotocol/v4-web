@@ -22,8 +22,6 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
 
   const {
     stats: { volume24HUSDC, openInterestUSDC, feeEarned },
-    volume24HUSDCChart,
-    openInterestUSDCChart,
     feeEarnedChart,
   } = usePerpetualMarketsStats();
 
@@ -37,7 +35,6 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
           value: volume24HUSDC || undefined,
           fractionDigits: 0,
           type: OutputType.CompactFiat,
-          chartData: volume24HUSDCChart,
         },
         {
           key: 'open-interest',
@@ -46,7 +43,6 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
           value: openInterestUSDC || undefined,
           fractionDigits: 0,
           type: OutputType.CompactFiat,
-          chartData: openInterestUSDCChart,
         },
         {
           key: 'fee-earned-stakers',
@@ -84,14 +80,18 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
                 </Styled.BillboardLink>
               ) : null}
             </Styled.BillboardStat>
-            <Styled.BillboardChart>
-              <SparklineChart
-                data={chartData}
-                xAccessor={(datum) => datum.x}
-                yAccessor={(datum) => datum.y}
-                positive={true}
-              />
-            </Styled.BillboardChart>
+            {chartData ? (
+              <Styled.BillboardChart>
+                <SparklineChart
+                  data={chartData}
+                  xAccessor={(datum) => datum.x}
+                  yAccessor={(datum) => datum.y}
+                  positive={true}
+                />
+              </Styled.BillboardChart>
+            ) : (
+              false
+            )}
           </Styled.BillboardContainer>
         )
       )}

@@ -3,9 +3,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { MarketFilters, MarketSorting } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { useDocumentTitle, useStringGetter } from '@/hooks';
