@@ -1,4 +1,4 @@
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import { AbacusApiStatus } from '@/constants/abacus';
 import { ButtonSize, ButtonType } from '@/constants/buttons';

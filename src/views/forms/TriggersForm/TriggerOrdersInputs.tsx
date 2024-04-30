@@ -2,7 +2,6 @@ import { shallowEqual, useSelector } from 'react-redux';
 
 import { TriggerOrdersInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
-import { NumberSign } from '@/constants/numbers';
 
 import { getTriggerOrdersInputs } from '@/state/inputsSelectors';
 

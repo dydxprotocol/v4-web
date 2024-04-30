@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { type Notification, NotificationStatus } from '@/constants/notifications';
+import { NotificationStatus, type Notification } from '@/constants/notifications';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
 import { useNotifications } from '@/hooks/useNotifications';

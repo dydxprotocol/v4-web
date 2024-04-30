@@ -24,8 +24,8 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import {
-  getInputTradeSizeData,
   getInputTradeOptions,
+  getInputTradeSizeData,
   getTradeFormInputs,
 } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';

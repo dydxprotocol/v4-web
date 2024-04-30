@@ -1,4 +1,4 @@
-import { type Asset, type PerpetualMarket, SubaccountPosition, Nullable } from '@/constants/abacus';
+import { Nullable, SubaccountPosition, type Asset, type PerpetualMarket } from '@/constants/abacus';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 
 type HydratedPositionData = SubaccountPosition & {
@@ -6,7 +6,7 @@ type HydratedPositionData = SubaccountPosition & {
   stepSizeDecimals: number;
   tickSizeDecimals: number;
   oraclePrice: Nullable<number>;
-}
+};
 
 export const getHydratedPositionData = ({
   data,

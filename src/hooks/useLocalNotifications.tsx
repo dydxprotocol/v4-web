@@ -1,9 +1,9 @@
-import { createContext, useContext, useCallback, useEffect, useMemo } from 'react';
+import { createContext, useCallback, useContext, useEffect } from 'react';
 
 import { useQuery } from 'react-query';
 
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
-import type { TriggerOrderNotification, TransferNotifcation } from '@/constants/notifications';
+import type { TransferNotifcation, TriggerOrderNotification } from '@/constants/notifications';
 
 import { useAccounts } from '@/hooks/useAccounts';
 

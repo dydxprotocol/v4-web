@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 
-import { useSelector, shallowEqual } from 'react-redux';
+import { shallowEqual, useSelector } from 'react-redux';
 
-import { MarketFilters, MARKET_FILTER_LABELS, type MarketData } from '@/constants/markets';
+import { MARKET_FILTER_LABELS, MarketFilters, type MarketData } from '@/constants/markets';
 
 import {
   SEVEN_DAY_SPARKLINE_ENTRIES,

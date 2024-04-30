@@ -21,7 +21,7 @@ import { Checkbox } from '@/components/Checkbox';
 import { Collapsible } from '@/components/Collapsible';
 import { FormInput } from '@/components/FormInput';
 import { InputType } from '@/components/Input';
-import { SelectMenu, SelectItem } from '@/components/SelectMenu';
+import { SelectItem, SelectMenu } from '@/components/SelectMenu';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';

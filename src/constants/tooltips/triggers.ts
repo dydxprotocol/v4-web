@@ -1,4 +1,4 @@
-import { type TooltipStrings, TOOLTIP_STRING_KEYS } from '@/constants/localization';
+import { TOOLTIP_STRING_KEYS, type TooltipStrings } from '@/constants/localization';
 
 export const triggersTooltips: TooltipStrings = {
   'custom-amount': ({ stringGetter }) => ({

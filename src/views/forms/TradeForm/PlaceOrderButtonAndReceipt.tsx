@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import type { TradeInputSummary } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';

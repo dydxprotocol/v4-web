@@ -1,4 +1,4 @@
-import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
@@ -16,8 +16,8 @@ import { isMainnet } from '@/constants/networks';
 import { MAX_CCTP_TRANSFER_AMOUNT, MAX_PRICE_IMPACT, NumberSign } from '@/constants/numbers';
 import { WalletType, type EvmAddress } from '@/constants/wallets';
 
-import { useAccounts, useDebounce, useStringGetter, useSelectedNetwork } from '@/hooks';
-import { useAccountBalance, CHAIN_DEFAULT_TOKEN_ADDRESS } from '@/hooks/useAccountBalance';
+import { useAccounts, useDebounce, useStringGetter } from '@/hooks';
+import { CHAIN_DEFAULT_TOKEN_ADDRESS, useAccountBalance } from '@/hooks/useAccountBalance';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { formMixins } from '@/styles/formMixins';
@@ -33,6 +33,7 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
+import { WithTooltip } from '@/components/WithTooltip';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
@@ -41,7 +42,7 @@ import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 import { getNobleChainId, NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
-import { getWalletConnection, parseWalletError } from '@/lib/wallet';
+import { parseWalletError } from '@/lib/wallet';
 
 import { NobleDeposit } from '../NobleDeposit';
 import { DepositButtonAndReceipt } from './DepositForm/DepositButtonAndReceipt';
@@ -396,9 +397,22 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   if (!resources) {
     return <LoadingSpace id="DepositForm" />;
   }
-
   return (
     <Styled.Form onSubmit={onSubmit}>
+      <Styled.Subheader>
+        {stringGetter({
+          key: STRING_KEYS.LOWEST_FEE_DEPOSITS,
+          params: {
+            LOWEST_FEE_TOKENS_TOOLTIP: (
+              <WithTooltip tooltip="lowest-fees-deposit">
+                {stringGetter({
+                  key: STRING_KEYS.SELECT_CHAINS,
+                })}
+              </WithTooltip>
+            ),
+          },
+        })}
+      </Styled.Subheader>
       <SourceSelectMenu
         selectedChain={chainIdStr || undefined}
         selectedExchange={exchange || undefined}
@@ -450,6 +464,10 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Form = styled.form`
   ${formMixins.transfersForm}
+`;
+
+Styled.Subheader = styled.div`
+  color: var(--color-text-0);
 `;
 
 Styled.Footer = styled.footer`

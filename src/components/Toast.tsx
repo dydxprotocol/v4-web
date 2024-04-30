@@ -1,6 +1,6 @@
-import { type MouseEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type MouseEvent } from 'react';
 
-import { Root, Action, Close } from '@radix-ui/react-toast';
+import { Action, Close, Root } from '@radix-ui/react-toast';
 import styled, { keyframes } from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
@@ -109,7 +109,7 @@ export const Toast = ({
 
 const $Root = styled(Root)`
   // Params
-  --toast-transition-duration: 0.5s;
+  --toast-transition-duration: 0.3s;
 
   // Computed
   --x: var(--radix-toast-swipe-move-x, 0px);
@@ -154,7 +154,7 @@ const $Root = styled(Root)`
           33% {
             /* scale: 1.05; */
             /* filter: brightness(120%); */
-            filter: drop-shadow(0 0 var(--color-text-1));
+            filter: drop-shadow(0 0 var(--color-text-0));
           }
         `} calc(var(--toast-transition-duration) * 3) 0.1s;
     }

@@ -1,10 +1,10 @@
 import { kollections } from '@dydxprotocol/v4-abacus';
 
 import type {
-  AccountBalance,
   AbacusApiState,
   AbacusNotification,
   AbacusStateNotificationProtocol,
+  AccountBalance,
   Asset,
   Nullable,
   ParsingErrors,
@@ -18,17 +18,17 @@ import { Changes } from '@/constants/abacus';
 import type { RootStore } from '@/state/_store';
 import {
   setBalances,
-  setStakingBalances,
+  setCompliance,
   setFills,
   setFundingPayments,
   setHistoricalPnl,
   setLatestOrder,
   setRestrictionType,
+  setStakingBalances,
   setSubaccount,
+  setTradingRewards,
   setTransfers,
   setWallet,
-  setTradingRewards,
-  setCompliance,
 } from '@/state/account';
 import { setApiState } from '@/state/app';
 import { setAssets } from '@/state/assets';
