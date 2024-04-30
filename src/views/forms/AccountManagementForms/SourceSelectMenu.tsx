@@ -5,7 +5,7 @@ import { TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { WalletType } from '@/constants/wallets';
 
-import { useEnvFeatures, useStringGetter } from '@/hooks';
+import { useAccounts, useEnvFeatures, useStringGetter } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
@@ -83,7 +83,7 @@ export const SourceSelectMenu = ({
 
   const selectedChainOption = chains.find((item) => item.type === selectedChain);
   const selectedExchangeOption = exchanges.find((item) => item.type === selectedExchange);
-  const isNotPrivyDeposit = type === TransferType.deposit && walletType !== WalletType.Privy;
+  const isNotPrivyDeposit = type === TransferType.withdrawal || walletType !== WalletType.Privy;
 
   return (
     <SearchSelectMenu
