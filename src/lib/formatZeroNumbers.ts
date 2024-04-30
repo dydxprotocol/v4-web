@@ -26,6 +26,7 @@ export const formatZeroNumbers = (formattedValue: string, zerosThreshold: number
     return {
       currencySign,
       significantDigits: formattedValue.substring(significantDigitsSubStart, punctIdx),
+      punctuationSymbol,
       zeros: 0,
       decimalDigits: formattedValue.substring(punctIdx + 1),
     };
@@ -38,6 +39,7 @@ export const formatZeroNumbers = (formattedValue: string, zerosThreshold: number
     return {
       currencySign,
       significantDigits: formattedValue.substring(significantDigitsSubStart, punctIdx),
+      punctuationSymbol,
       zeros: 0,
       decimalDigits: charsAfterPunct,
     };
@@ -51,5 +53,6 @@ export const formatZeroNumbers = (formattedValue: string, zerosThreshold: number
     significantDigits: formattedValue.substring(significantDigitsSubStart, punctIdx),
     zeros: canDisplayZeros ? zerosCount : 0,
     decimalDigits: otherDigits,
+    punctuationSymbol,
   };
 };
