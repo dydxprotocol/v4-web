@@ -70,7 +70,7 @@ export const SourceSelectMenu = ({
         onSelect(chain.type, 'chain');
       },
       slotBefore: <Styled.Img src={chain.iconUrl} alt="" />,
-      [lowestFeesDecoratorProp]: (
+      [lowestFeesDecoratorProp]: !!cctpTokensByChainId[chain.type] && (
         <Styled.Text>
           {stringGetter({
             key: STRING_KEYS.LOWEST_FEES_WITH_USDC,
