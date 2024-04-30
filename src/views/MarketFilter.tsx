@@ -53,7 +53,10 @@ export const MarketFilter = ({
           </Button>
         )}
       </Styled.ToggleGroupContainer>
-      <SearchInput placeholder={'Search'} onTextChange={onSearchTextChange} />
+      <SearchInput
+        placeholder={stringGetter({ key: STRING_KEYS.SEARCH_MARKETS })}
+        onTextChange={onSearchTextChange}
+      />
     </Styled.MarketFilter>
   );
 };
