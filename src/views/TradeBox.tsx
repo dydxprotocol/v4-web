@@ -12,7 +12,7 @@ import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { ClosePositionForm } from '@/views/forms/ClosePositionForm';
 import { SelectMarginModeForm } from '@/views/forms/SelectMarginModeForm';
 
-import { openDialogInTradeBox, closeDialogInTradeBox } from '@/state/dialogs';
+import { closeDialogInTradeBox, openDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 
 import abacusStateManager from '@/lib/abacus';

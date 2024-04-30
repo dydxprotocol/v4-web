@@ -1,14 +1,14 @@
-import { type FormEvent, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import {
   ClosePositionInputField,
+  ErrorType,
   ValidationError,
   type HumanReadablePlaceOrderPayload,
   type Nullable,
-  ErrorType,
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -35,8 +35,11 @@ import { Orderbook, orderbookMixins, type OrderbookScrollBehavior } from '@/view
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { closeDialog } from '@/state/dialogs';
-import { getClosePositionInputErrors, getInputClosePositionData } from '@/state/inputsSelectors';
-import { getCurrentInput } from '@/state/inputsSelectors';
+import {
+  getClosePositionInputErrors,
+  getCurrentInput,
+  getInputClosePositionData,
+} from '@/state/inputsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';

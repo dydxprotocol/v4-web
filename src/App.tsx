@@ -12,11 +12,11 @@ import { WagmiConfig } from 'wagmi';
 import { AppRoute, DEFAULT_TRADE_ROUTE, MarketsRoute } from '@/constants/routes';
 
 import {
+  useAnalytics,
   useBreakpoints,
-  useTokenConfigs,
   useInitializePage,
   useShouldShowFooter,
-  useAnalytics,
+  useTokenConfigs,
 } from '@/hooks';
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';

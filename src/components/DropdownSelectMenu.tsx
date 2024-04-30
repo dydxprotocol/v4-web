@@ -1,13 +1,13 @@
 import { cloneElement } from 'react';
 
 import {
-  Root,
-  Trigger,
   Content,
   ItemIndicator,
+  Portal,
   RadioGroup,
   RadioItem,
-  Portal,
+  Root,
+  Trigger,
 } from '@radix-ui/react-dropdown-menu';
 import { CheckIcon } from '@radix-ui/react-icons';
 import styled, { type AnyStyledComponent } from 'styled-components';

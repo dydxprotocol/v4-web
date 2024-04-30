@@ -4,8 +4,7 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import { AbacusOrderSide } from '@/constants/abacus';
-import { TradeInputField } from '@/constants/abacus';
+import { AbacusOrderSide, TradeInputField } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 

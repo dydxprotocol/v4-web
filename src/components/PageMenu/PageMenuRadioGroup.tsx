@@ -1,4 +1,4 @@
-import { Root, Item } from '@radix-ui/react-radio-group';
+import { Item, Root } from '@radix-ui/react-radio-group';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import type { MenuItem } from '@/constants/menus';

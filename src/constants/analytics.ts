@@ -4,7 +4,7 @@ import type { DialogTypes } from './dialogs';
 import type { SupportedLocales } from './localization';
 import type { DydxNetwork } from './networks';
 import type { TradeTypes } from './trade';
-import type { DydxAddress, WalletType, WalletConnectionType, EvmAddress } from './wallets';
+import type { DydxAddress, EvmAddress, WalletConnectionType, WalletType } from './wallets';
 
 // User properties
 export enum AnalyticsUserProperty {

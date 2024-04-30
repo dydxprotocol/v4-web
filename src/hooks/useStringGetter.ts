@@ -1,4 +1,4 @@
-import { useSelector, shallowEqual } from 'react-redux';
+import { shallowEqual, useSelector } from 'react-redux';
 
 import type { StringGetterFunction } from '@/constants/localization';
 

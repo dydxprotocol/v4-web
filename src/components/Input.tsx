@@ -2,7 +2,7 @@ import { Dispatch, forwardRef, SetStateAction } from 'react';
 
 import { NumericFormat, type NumberFormatValues, type SourceInfo } from 'react-number-format';
 import type { SyntheticInputEvent } from 'react-number-format/types/types';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import {
   LEVERAGE_DECIMALS,

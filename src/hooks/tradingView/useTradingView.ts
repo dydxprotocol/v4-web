@@ -7,14 +7,14 @@ import { shallowEqual, useSelector } from 'react-redux';
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { LocalStorageKey } from '@/constants/localStorage';
-import { SUPPORTED_LOCALE_BASE_TAGS, STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS, SUPPORTED_LOCALE_BASE_TAGS } from '@/constants/localization';
 import type { TvWidget } from '@/constants/tvchart';
 
 import { useDydxClient, useLocalStorage, useStringGetter } from '@/hooks';
 
 import { store } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
-import { getAppTheme, getAppColorMode } from '@/state/configsSelectors';
+import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketId, getMarketIds } from '@/state/perpetualsSelectors';
 

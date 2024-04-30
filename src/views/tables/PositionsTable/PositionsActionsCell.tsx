@@ -8,6 +8,7 @@ import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { AppRoute } from '@/constants/routes';
 
+import { useEnvFeatures } from '@/hooks';
 import { useComplianceState } from '@/hooks/useComplianceState';
 
 import { IconName } from '@/components/Icon';
@@ -19,7 +20,6 @@ import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { testFlags } from '@/lib/testFlags';
 
 type ElementProps = {
   marketId: string;
@@ -43,6 +43,7 @@ export const PositionsActionsCell = ({
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { complianceState } = useComplianceState();
+  const { isSlTpEnabled } = useEnvFeatures();
 
   const currentMarketId = useSelector(getCurrentMarketId);
   const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog);
@@ -65,29 +66,28 @@ export const PositionsActionsCell = ({
 
   return (
     <ActionsTableCell>
-      {testFlags.configureSlTpFromPositionsTable &&
-        complianceState === ComplianceStates.FULL_ACCESS && (
-          <Styled.TriggersButton
-            key="edittriggers"
-            onClick={() =>
-              dispatch(
-                openDialog({
-                  type: DialogTypes.Triggers,
-                  dialogProps: {
-                    marketId,
-                    assetId,
-                    stopLossOrders,
-                    takeProfitOrders,
-                    navigateToMarketOrders,
-                  },
-                })
-              )
-            }
-            iconName={IconName.Pencil}
-            shape={ButtonShape.Square}
-            isDisabled={isDisabled}
-          />
-        )}
+      {isSlTpEnabled && complianceState === ComplianceStates.FULL_ACCESS && (
+        <Styled.TriggersButton
+          key="edittriggers"
+          onClick={() =>
+            dispatch(
+              openDialog({
+                type: DialogTypes.Triggers,
+                dialogProps: {
+                  marketId,
+                  assetId,
+                  stopLossOrders,
+                  takeProfitOrders,
+                  navigateToMarketOrders,
+                },
+              })
+            )
+          }
+          iconName={IconName.Pencil}
+          shape={ButtonShape.Square}
+          isDisabled={isDisabled}
+        />
+      )}
       {showClosePositionAction && (
         <Styled.CloseButtonToggle
           key="closepositions"

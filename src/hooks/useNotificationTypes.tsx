@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { isEqual, groupBy } from 'lodash';
+import { groupBy, isEqual } from 'lodash';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -15,12 +15,12 @@ import {
   type StringKey,
 } from '@/constants/localization';
 import {
-  type NotificationTypeConfig,
-  NotificationType,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
-  TransferNotificationTypes,
-  ReleaseUpdateNotificationIds,
   NotificationDisplayData,
+  NotificationType,
+  ReleaseUpdateNotificationIds,
+  TransferNotificationTypes,
+  type NotificationTypeConfig,
 } from '@/constants/notifications';
 import { AppRoute, TokenRoute } from '@/constants/routes';
 import { DydxChainAsset } from '@/constants/wallets';

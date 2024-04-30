@@ -1,8 +1,8 @@
 import { type MenuItem } from '@/constants/menus';
 import {
   AVAILABLE_ENVIRONMENTS,
-  type DydxNetwork,
   ENVIRONMENT_CONFIG_MAP,
+  type DydxNetwork,
 } from '@/constants/networks';
 
 export const useNetworks = (): MenuItem<DydxNetwork>[] =>

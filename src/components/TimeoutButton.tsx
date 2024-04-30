@@ -1,11 +1,11 @@
-import { type ReactNode, useState, useEffect } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 import { ButtonAction, ButtonState } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useNow, useStringGetter } from '@/hooks';
 
-import { Button, type ButtonStateConfig, type ButtonProps } from '@/components/Button';
+import { Button, type ButtonProps, type ButtonStateConfig } from '@/components/Button';
 
 type ElementProps = {
   timeoutInSeconds: number;

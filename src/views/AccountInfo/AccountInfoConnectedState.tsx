@@ -1,5 +1,5 @@
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import type { Nullable, TradeState } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';

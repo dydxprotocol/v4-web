@@ -11,9 +11,9 @@ import { AppRoute } from '@/constants/routes';
 
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
-import { getOpenPositions, getPositionDetails } from '@/state/accountSelectors';
+import { getOpenPositions } from '@/state/accountSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
-import { closeDialogInTradeBox, openDialogInTradeBox } from '@/state/dialogs';
+import { closeDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { setCurrentMarketId } from '@/state/perpetuals';
 import { getMarketIds } from '@/state/perpetualsSelectors';

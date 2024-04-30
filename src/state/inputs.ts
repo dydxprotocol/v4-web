@@ -2,11 +2,11 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import assign from 'lodash/assign';
 
 import type {
+  ClosePositionInputs,
   InputError,
   Inputs,
   Nullable,
   TradeInputs,
-  ClosePositionInputs,
   TransferInputs,
   TriggerOrdersInputs,
 } from '@/constants/abacus';

@@ -2,13 +2,11 @@ import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useEnvFeatures, useStringGetter } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { HorizontalSeparatorFiller } from '@/components/Separator';
-
-import { testFlags } from '@/lib/testFlags';
 
 import { LimitPriceInputs } from './LimitPriceInputs';
 import { OrderSizeInput } from './OrderSizeInput';
@@ -42,6 +40,7 @@ export const AdvancedTriggersOptions = ({
   className,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
+  const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
 
   return (
     <Styled.Container>
@@ -58,7 +57,7 @@ export const AdvancedTriggersOptions = ({
           positionSize={positionSize}
           stepSizeDecimals={stepSizeDecimals}
         />
-        {testFlags.enableConditionalLimitOrders && (
+        {isSlTpLimitOrdersEnabled && (
           <LimitPriceInputs
             className={className}
             existsLimitOrder={existsLimitOrder}
