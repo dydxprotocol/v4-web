@@ -58,6 +58,8 @@ export const SourceSelectMenu = ({
     return acc;
   }, {} as Record<string, TokenInfo[]>);
 
+  const lowestFeesDecoratorProp = type === TransferType.deposit ? 'slotAfter' : 'description';
+
   const chainItems = Object.values(chains)
     .map((chain) => ({
       value: chain.type,
@@ -66,11 +68,26 @@ export const SourceSelectMenu = ({
         onSelect(chain.type, 'chain');
       },
       slotBefore: <Styled.Img src={chain.iconUrl} alt="" />,
+      [lowestFeesDecoratorProp]: (
+        <Styled.Text>
+          {stringGetter({
+            key: STRING_KEYS.LOWEST_FEES_WITH_USDC,
+            params: {
+              LOWEST_FEES_HIGHLIGHT_TEXT: (
+                <Styled.GreenHighlight>
+                  {stringGetter({ key: STRING_KEYS.LOWEST_FEES_HIGHLIGHT_TEXT })}
+                </Styled.GreenHighlight>
+              ),
+            },
+          })}
+        </Styled.Text>
+      ),
     }))
     .filter(
       (chain) =>
         type === TransferType.deposit || !!cctpTokenssByChainId[chain.value] || !CCTPWithdrawalOnly
-    );
+    )
+    .sort((chain) => (!!cctpTokenssByChainId[chain.value] ? -1 : 1));
 
   const exchangeItems = Object.values(exchanges).map((exchange) => ({
     value: exchange.type,
@@ -136,4 +153,13 @@ Styled.ChainRow = styled.div`
   gap: 0.5rem;
   color: var(--color-text-2);
   font: var(--font-base-book);
+`;
+
+Styled.Text = styled.div`
+  font: var(--font-small-regular);
+  color: var(--color-text-0);
+`;
+
+Styled.GreenHighlight = styled.span`
+  color: var(--color-green);
 `;
