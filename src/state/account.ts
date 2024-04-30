@@ -131,6 +131,9 @@ export const accountSlice = createSlice({
                 : order
             )
           : state.submittedOrders,
+        canceledOrders: hasNewFillUpdates
+          ? state.canceledOrders.filter((order) => !filledOrderIds.includes(order.orderId))
+          : state.canceledOrders,
       };
     },
     setFundingPayments: (state, action: PayloadAction<any>) => {
