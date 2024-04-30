@@ -1,4 +1,3 @@
-import { Secp256k1, sha256 } from '@cosmjs/crypto';
 import { EncodeObject } from '@cosmjs/proto-signing';
 import type { IndexedTx } from '@cosmjs/stargate';
 import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
@@ -40,7 +39,7 @@ import { RootStore } from '@/state/_store';
 import { addUncommittedOrderClientId, removeUncommittedOrderClientId } from '@/state/account';
 import { setInitializationError } from '@/state/app';
 
-import { signCompliancePayload } from '../compliance';
+import { signComplianceSignature } from '../compliance';
 import { StatefulOrderError } from '../errors';
 import { bytesToBigInt } from '../numbers';
 import { log } from '../telemetry';
@@ -513,7 +512,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     }
 
     try {
-      const { signedMessage, timestamp } = await signCompliancePayload(
+      const { signedMessage, timestamp } = await signComplianceSignature(
         params.message,
         params.action,
         params.status,

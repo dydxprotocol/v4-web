@@ -14,10 +14,9 @@ import { formMixins } from '@/styles/formMixins';
 
 import { Button } from '@/components/Button';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
-import { FormInput } from '@/components/FormInput';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 
-import { isBlockedGeo, signCompliancePayload } from '@/lib/compliance';
+import { isBlockedGeo, signComplianceSignature } from '@/lib/compliance';
 
 type ElementProps = {
   setIsOpen?: (open: boolean) => void;
@@ -25,11 +24,11 @@ type ElementProps = {
 
 const CountrySelector = ({
   label,
-  selected,
+  selectedCountry,
   onSelect,
 }: {
   label: string;
-  selected: string;
+  selectedCountry: string;
   onSelect: (country: string) => void;
 }) => {
   const stringGetter = useStringGetter();
@@ -53,7 +52,7 @@ const CountrySelector = ({
       withSearch
     >
       <Styled.SelectedCountry>
-        {selected || stringGetter({ key: STRING_KEYS.SELECT_A_COUNTRY })}
+        {selectedCountry || stringGetter({ key: STRING_KEYS.SELECT_A_COUNTRY })}
       </Styled.SelectedCountry>
     </SearchSelectMenu>
   );
@@ -84,7 +83,7 @@ export const GeoComplianceDialog = ({ setIsOpen }: ElementProps) => {
         residence && isBlockedGeo(COUNTRIES_MAP[residence])
           ? ComplianceAction.INVALID_SURVEY.name
           : ComplianceAction.VALID_SURVEY.name;
-      const { signedMessage, timestamp } = await signCompliancePayload(
+      const { signedMessage, timestamp } = await signComplianceSignature(
         message,
         action,
         complianceStatus.name,
@@ -120,12 +119,12 @@ export const GeoComplianceDialog = ({ setIsOpen }: ElementProps) => {
         <Styled.Form>
           <CountrySelector
             label={stringGetter({ key: STRING_KEYS.COUNTRY_OF_RESIDENCE })}
-            selected={residence}
+            selectedCountry={residence}
             onSelect={setResidence}
           />
           <CountrySelector
             label={stringGetter({ key: STRING_KEYS.TRADING_LOCATION })}
-            selected={tradingLoaction}
+            selectedCountry={tradingLoaction}
             onSelect={settradingLoaction}
           />
           <Button action={ButtonAction.Primary} onClick={() => submit()}>
