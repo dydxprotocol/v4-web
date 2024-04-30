@@ -40,6 +40,9 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
 
   const tokens =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() || [];
+
+  console.log('tokens by addy', cctpTokensByAddress);
+  console.log('all tokens', tokens);
   const tokenItems = Object.values(tokens)
     .map((token) => ({
       value: token.type,
