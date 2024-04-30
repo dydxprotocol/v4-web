@@ -32,7 +32,6 @@ type ConfirmButtonConfig = {
 };
 
 type ElementProps = {
-  isLoading: boolean;
   actionStringKey?: string;
   summary?: TradeInputSummary;
   hasValidationErrors?: boolean;
@@ -43,7 +42,6 @@ type ElementProps = {
 };
 
 export const PlaceOrderButtonAndReceipt = ({
-  isLoading,
   actionStringKey,
   summary,
   hasValidationErrors,
@@ -121,6 +119,13 @@ export const PlaceOrderButtonAndReceipt = ({
     },
   ];
 
+  const returnToMarketState = {
+    buttonTextStringKey: STRING_KEYS.RETURN_TO_MARKET,
+    buttonAction: ButtonAction.Secondary,
+    buttonState: {},
+    showValidatorError: false,
+  };
+
   const buttonStatesPerStep = {
     [MobilePlaceOrderSteps.EditOrder]: {
       buttonTextStringKey: shouldEnableTrade
@@ -130,23 +135,18 @@ export const PlaceOrderButtonAndReceipt = ({
         : STRING_KEYS.UNAVAILABLE,
       buttonAction: ButtonAction.Primary,
       buttonState: { isDisabled: !shouldEnableTrade, isLoading: hasMissingData },
+      showValidatorError: true,
     },
 
     [MobilePlaceOrderSteps.PreviewOrder]: {
       buttonTextStringKey: STRING_KEYS.CONFIRM_ORDER,
       buttonAction: confirmButtonConfig.buttonAction,
-      buttonState: { isLoading },
-    },
-    [MobilePlaceOrderSteps.PlacingOrder]: {
-      buttonTextStringKey: STRING_KEYS.RETURN_TO_MARKET,
-      buttonAction: ButtonAction.Secondary,
       buttonState: {},
+      showValidatorError: false,
     },
-    [MobilePlaceOrderSteps.Confirmation]: {
-      buttonTextStringKey: STRING_KEYS.RETURN_TO_MARKET,
-      buttonAction: ButtonAction.Secondary,
-      buttonState: {},
-    },
+    [MobilePlaceOrderSteps.PlacingOrder]: returnToMarketState,
+    [MobilePlaceOrderSteps.PlaceOrderFailed]: returnToMarketState,
+    [MobilePlaceOrderSteps.Confirmation]: returnToMarketState,
   };
 
   const buttonAction = currentStep
@@ -167,8 +167,8 @@ export const PlaceOrderButtonAndReceipt = ({
   const buttonState = currentStep
     ? buttonStatesPerStep[currentStep].buttonState
     : {
-        isDisabled: !shouldEnableTrade || isLoading,
-        isLoading: isLoading || hasMissingData,
+        isDisabled: !shouldEnableTrade,
+        isLoading: hasMissingData,
       };
 
   const depositButton = (
@@ -180,13 +180,16 @@ export const PlaceOrderButtonAndReceipt = ({
     </Button>
   );
 
+  const showValidatorErrors =
+    hasValidationErrors && (!currentStep || buttonStatesPerStep[currentStep].showValidatorError);
+
   const submitButton = (
     <Styled.Button
       state={buttonState}
       type={ButtonType.Submit}
       action={buttonAction}
       slotLeft={
-        hasValidationErrors ? <Styled.WarningIcon iconName={IconName.Warning} /> : undefined
+        showValidatorErrors ? <Styled.WarningIcon iconName={IconName.Warning} /> : undefined
       }
     >
       {stringGetter({
@@ -207,7 +210,7 @@ export const PlaceOrderButtonAndReceipt = ({
       ) : showDeposit && complianceState === ComplianceStates.FULL_ACCESS ? (
         depositButton
       ) : (
-        <WithTooltip tooltipString={hasValidationErrors ? validationErrorString : undefined}>
+        <WithTooltip tooltipString={showValidatorErrors ? validationErrorString : undefined}>
           {submitButton}
         </WithTooltip>
       )}
