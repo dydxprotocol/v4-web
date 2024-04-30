@@ -110,6 +110,25 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               ),
             },
             {
+              columnKey: 'priceChange24HChart',
+              getCellValue: (row) => row.oneDaySparkline,
+              label: stringGetter({ key: STRING_KEYS.LAST_24H }),
+              renderCell: ({ oneDaySparkline, priceChange24HPercent }) => (
+                <div style={{ width: 50, height: 50 }}>
+                  <SparklineChart
+                    data={(oneDaySparkline ?? []).map((datum, index) => ({
+                      x: index + 1,
+                      y: parseFloat(datum.toString()),
+                    }))}
+                    xAccessor={(datum) => datum.x}
+                    yAccessor={(datum) => datum.y}
+                    positive={MustBigNumber(priceChange24HPercent).gt(0)}
+                  />
+                </div>
+              ),
+              allowsSorting: false,
+            },
+            {
               columnKey: 'priceChange24HPercent',
               getCellValue: (row) => row.priceChange24HPercent,
               label: stringGetter({ key: STRING_KEYS.CHANGE_24H }),

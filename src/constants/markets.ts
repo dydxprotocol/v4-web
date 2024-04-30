@@ -4,6 +4,7 @@ import { STRING_KEYS } from '@/constants/localization';
 export type MarketData = {
   asset: Asset;
   tickSizeDecimals: number;
+  oneDaySparkline?: number[];
   isNew?: boolean;
   listingDate?: Date;
 } & PerpetualMarket &
