@@ -18,7 +18,7 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
   const { asset, stacked, className } = props;
 
   return (
-    <Styled.TableCell
+    <TableCell
       className={className}
       slotLeft={<Styled.AssetIcon stacked={stacked} symbol={asset?.id} />}
     >
@@ -26,15 +26,11 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
         <Styled.Asset stacked={stacked}>{asset?.name}</Styled.Asset>
         {stacked ? <Styled.AssetID>{asset?.id}</Styled.AssetID> : <Tag>{asset?.id}</Tag>}
       </Styled.TableCellContent>
-    </Styled.TableCell>
+    </TableCell>
   );
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TableCell = styled(TableCell)`
-  gap: 0.75rem;
-`;
 
 Styled.TableCellContent = styled.div<{ stacked?: boolean }>`
   gap: ${({ stacked }) => (stacked ? '0.125rem' : '0.75rem')};
