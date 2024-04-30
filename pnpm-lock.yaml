@@ -1633,13 +1633,8 @@ packages:
       - utf-8-validate
     dev: false
 
-<<<<<<< HEAD
   /@dydxprotocol/v4-localization@1.1.81:
     resolution: {integrity: sha512-vul5Yw5cQecHNDiTEKsJxwFgERzmooR88PNZ9bz/0JytSQCnLvC0l+hHFFnFovwlFeR5uaVSiWVzMfxawit8EQ==}
-=======
-  /@dydxprotocol/v4-localization@1.1.79:
-    resolution: {integrity: sha512-s8PTh+Q1p5lj8KJwdzElkyks4CWWEqjG6Elot4nnIjWqryupFbTwtcR+dgOTANbXbz/h440IP6rdlZbTMUD5Lw==}
->>>>>>> adcaa93 (submitted -> submitting for new orders)
     dev: false
 
   /@dydxprotocol/v4-proto@5.0.0-dev.0:

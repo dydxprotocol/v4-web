@@ -158,16 +158,6 @@ export const getSubaccountOpenOrders = createSelector([getSubaccountOrders], (or
   )
 );
 
-export const getOrderByClientId = (orderClientId: number) =>
-  createSelector([getSubaccountOrders], (orders) =>
-    orders?.find((order) => order.clientId === orderClientId)
-  );
-
-export const getFillByClientId = (orderClientId: number) =>
-  createSelector([getSubaccountFills, getOrderByClientId(orderClientId)], (fills, order) =>
-    fills?.find((fill) => fill.orderId === order?.id)
-  );
-
 /**
  * @param state
  * @returns order with the specified client id

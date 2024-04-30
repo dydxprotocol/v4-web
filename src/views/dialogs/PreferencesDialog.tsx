@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS, StringKey } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
 
 import { useEnvFeatures, useStringGetter } from '@/hooks';
@@ -40,6 +40,19 @@ export const usePreferenceMenu = () => {
     setDefaultToAllMarkets(currentDisplayAllMarketDefault);
   }, [currentDisplayAllMarketDefault]);
 
+  const getItem = (notificationType: NotificationType, labelStringKey: StringKey) => ({
+    value: notificationType,
+    label: stringGetter({ key: labelStringKey }),
+    slotAfter: (
+      <Switch
+        name={notificationType}
+        checked={enabledNotifs[notificationType]}
+        onCheckedChange={(enabled: boolean) => null}
+      />
+    ),
+    onSelect: () => toggleNotifPreference(notificationType),
+  });
+
   const notificationSection = useMemo(
     () => ({
       group: 'Notifications',
@@ -47,53 +60,27 @@ export const usePreferenceMenu = () => {
       items: [
         {
           value: NotificationType.AbacusGenerated,
-          label: stringGetter({ key: STRING_KEYS.TRADING }),
-          slotAfter: (
-            <Switch
-              name={NotificationType.AbacusGenerated}
-              checked={enabledNotifs[NotificationType.AbacusGenerated]}
-              onCheckedChange={(enabled: boolean) => null}
-            />
-          ),
-          onSelect: () => toggleNotifPreference(NotificationType.AbacusGenerated),
+          labelStringKey: STRING_KEYS.TRADING,
+        },
+        {
+          value: NotificationType.OrderStatus,
+          labelStringKey: STRING_KEYS.ORDER_STATUS,
         },
         {
           value: NotificationType.SquidTransfer,
-          label: stringGetter({ key: STRING_KEYS.TRANSFERS }),
-          slotAfter: (
-            <Switch
-              name={NotificationType.SquidTransfer}
-              checked={enabledNotifs[NotificationType.SquidTransfer]}
-              onCheckedChange={(enabled: boolean) => null}
-            />
-          ),
-          onSelect: () => toggleNotifPreference(NotificationType.SquidTransfer),
+          labelStringKey: STRING_KEYS.TRANSFERS,
         },
         isSlTpEnabled && {
           value: NotificationType.TriggerOrder,
-          label: stringGetter({ key: STRING_KEYS.TAKE_PROFIT_STOP_LOSS }),
-          slotAfter: (
-            <Switch
-              name={NotificationType.TriggerOrder}
-              checked={enabledNotifs[NotificationType.TriggerOrder]}
-              onCheckedChange={(enabled: boolean) => null}
-            />
-          ),
-          onSelect: () => toggleNotifPreference(NotificationType.TriggerOrder),
+          labelStringKey: STRING_KEYS.TAKE_PROFIT_STOP_LOSS,
         },
         {
           value: NotificationType.ReleaseUpdates,
-          label: stringGetter({ key: STRING_KEYS.RELEASE_UPDATES }),
-          slotAfter: (
-            <Switch
-              name={NotificationType.ReleaseUpdates}
-              checked={enabledNotifs[NotificationType.ReleaseUpdates]}
-              onCheckedChange={(enabled: boolean) => null}
-            />
-          ),
-          onSelect: () => toggleNotifPreference(NotificationType.ReleaseUpdates),
+          labelStringKey: STRING_KEYS.RELEASE_UPDATES,
         },
-      ].filter(isTruthy),
+      ]
+        .filter(isTruthy)
+        .map(({ value, labelStringKey }) => getItem(value, labelStringKey as StringKey)),
     }),
     [stringGetter, enabledNotifs]
   );
@@ -110,7 +97,7 @@ export const usePreferenceMenu = () => {
             <Switch
               name={OtherPreference.DisplayAllMarketsDefault}
               checked={defaultToAllMarkets}
-              onCheckedChange={(enabled: boolean) => null}
+              onCheckedChange={() => null}
             />
           ),
           onSelect: () => {
