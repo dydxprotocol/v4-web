@@ -207,8 +207,8 @@ class AbacusStateManager {
       field: TransferInputField.type,
       value: null,
     });
-    this.clearTradeInputValues();
     this.clearTriggerOrdersInputValues();
+    this.clearTradeInputValues({ shouldResetSize: true });
   };
 
   // ------ Set Data ------ //
