@@ -6,8 +6,6 @@ import {
   KotlinIrEnumValues,
   ORDER_SIDES,
   ORDER_STATUS_STRINGS,
-  SubaccountFill,
-  SubaccountOrder,
 } from '@/constants/abacus';
 import { LocalOrderData } from '@/constants/account';
 import { STRING_KEYS } from '@/constants/localization';
@@ -33,21 +31,17 @@ import { OrderStatusIcon } from '../OrderStatusIcon';
 import { FillDetails } from './TradeNotification/FillDetails';
 
 type ElementProps = {
-  orderClientId: number;
   localOrder: LocalOrderData;
-  order?: SubaccountOrder;
-  fill?: SubaccountFill;
 };
 
 export const OrderStatusNotification = ({
   isToast,
-  orderClientId,
   localOrder,
   notification,
 }: NotificationProps & ElementProps) => {
   const stringGetter = useStringGetter();
-  const order = useSelector(getOrderByClientId(orderClientId), shallowEqual);
-  const fill = useSelector(getFillByClientId(orderClientId), shallowEqual);
+  const order = useSelector(getOrderByClientId(localOrder.clientId), shallowEqual);
+  const fill = useSelector(getFillByClientId(localOrder.clientId), shallowEqual);
   const marketData = useSelector(getMarketData(localOrder.marketId), shallowEqual);
   const { assetId } = marketData ?? {};
   const titleKey = localOrder.orderType && ORDER_TYPE_STRINGS[localOrder.orderType]?.orderTypeKey;
@@ -115,7 +109,7 @@ Styled.Label = styled.span`
 `;
 
 Styled.OrderStatus = styled(Styled.Label)`
-  color: var(--color-text-1);
+  color: var(--color-text-0);
   font: var(--font-small-book);
 `;
 

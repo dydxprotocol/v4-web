@@ -514,7 +514,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
               renderCustomBody: ({ isToast, notification }) => (
                 <OrderStatusNotification
                   isToast={isToast}
-                  orderClientId={localOrder.clientId}
                   localOrder={localOrder}
                   notification={notification}
                 />

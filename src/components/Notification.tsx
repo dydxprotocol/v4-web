@@ -122,13 +122,12 @@ const $Container = styled.div<{ isToast?: boolean }>`
 const $Header = styled.header`
   ${layoutMixins.row}
   position: relative;
+  gap: 0.5rem;
 `;
 
 const $Icon = styled.div`
   ${layoutMixins.row}
   float: left;
-
-  margin-right: 0.5rem;
 
   line-height: 1;
 
