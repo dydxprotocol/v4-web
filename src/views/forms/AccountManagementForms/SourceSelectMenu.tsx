@@ -41,7 +41,7 @@ export const SourceSelectMenu = ({
   const { CCTPWithdrawalOnly } = useEnvFeatures();
 
   const stringGetter = useStringGetter();
-  const { type, depositOptions, withdrawalOptions, resources } =
+  const { type, depositOptions, withdrawalOptions } =
     useSelector(getTransferInputs, shallowEqual) || {};
   const chains =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.chains?.toArray() || [];
@@ -50,7 +50,7 @@ export const SourceSelectMenu = ({
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.exchanges?.toArray() ||
     [];
 
-  const cctpTokenssByChainId = cctpTokens.reduce((acc, token) => {
+  const cctpTokensByChainId = cctpTokens.reduce((acc, token) => {
     if (!acc[token.chainId]) {
       acc[token.chainId] = [];
     }
@@ -87,9 +87,9 @@ export const SourceSelectMenu = ({
     }))
     .filter(
       (chain) =>
-        type === TransferType.deposit || !!cctpTokenssByChainId[chain.value] || !CCTPWithdrawalOnly
+        type === TransferType.deposit || !!cctpTokensByChainId[chain.value] || !CCTPWithdrawalOnly
     )
-    .sort((chain) => (!!cctpTokenssByChainId[chain.value] ? -1 : 1));
+    .sort((chain) => (!!cctpTokensByChainId[chain.value] ? -1 : 1));
 
   const exchangeItems = Object.values(exchanges).map((exchange) => ({
     value: exchange.type,
