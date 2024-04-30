@@ -62,6 +62,7 @@ const useNotificationsContext = () => {
         [NotificationType.TriggerOrder]: true,
         [NotificationType.ReleaseUpdates]: true,
         [NotificationType.ApiError]: true,
+        [NotificationType.ComplianceAlert]: true,
         version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
       },
     });
@@ -125,6 +126,7 @@ const useNotificationsContext = () => {
         [NotificationType.ReleaseUpdates]: true,
         [NotificationType.TriggerOrder]: true,
         [NotificationType.ApiError]: true,
+        [NotificationType.ComplianceAlert]: true,
         version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
       });
     }

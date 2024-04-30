@@ -3,12 +3,14 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 
 import type { TradeInputSummary } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { useApiState, useStringGetter, useTokenConfigs } from '@/hooks';
 import { ConnectionErrorType } from '@/hooks/useApiState';
+import { useComplianceState } from '@/hooks/useComplianceState';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
@@ -54,6 +56,7 @@ export const PlaceOrderButtonAndReceipt = ({
   const dispatch = useDispatch();
   const { chainTokenLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
+  const { complianceState } = useComplianceState();
 
   const canAccountTrade = useSelector(calculateCanAccountTrade);
   const subaccountNumber = useSelector(getSubaccountId);
@@ -61,12 +64,16 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const hasMissingData = subaccountNumber === undefined;
 
+  const tradingUnavailable =
+    complianceState === ComplianceStates.READ_ONLY ||
+    connectionError === ConnectionErrorType.CHAIN_DISRUPTION;
+
   const shouldEnableTrade =
     canAccountTrade &&
     !hasMissingData &&
     !hasValidationErrors &&
     currentInput !== 'transfer' &&
-    connectionError !== ConnectionErrorType.CHAIN_DISRUPTION;
+    !tradingUnavailable;
 
   const { fee, price: expectedPrice, total, reward } = summary || {};
 
@@ -147,7 +154,9 @@ export const PlaceOrderButtonAndReceipt = ({
     : confirmButtonConfig.buttonAction;
 
   let buttonTextStringKey = STRING_KEYS.UNAVAILABLE;
-  if (currentStep) {
+  if (tradingUnavailable) {
+    buttonTextStringKey = STRING_KEYS.UNAVAILABLE;
+  } else if (currentStep) {
     buttonTextStringKey = buttonStatesPerStep[currentStep].buttonTextStringKey;
   } else if (shouldEnableTrade) {
     buttonTextStringKey = confirmButtonConfig.buttonTextStringKey;

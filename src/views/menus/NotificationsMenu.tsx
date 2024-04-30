@@ -97,6 +97,7 @@ export const NotificationsMenu = ({
                   slotTitle={displayData.title}
                   slotDescription={displayData.body}
                   notification={notification}
+                  withClose={displayData.withClose}
                 />
               ),
               disabled: notification.status === NotificationStatus.Cleared,

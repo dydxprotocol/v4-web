@@ -7,10 +7,12 @@ import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import type { Nullable } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
+import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useComplianceState } from '@/hooks/useComplianceState';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -92,6 +94,7 @@ export const usePortfolioValues = ({
 export const AccountDetailsAndHistory = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
+  const { complianceState } = useComplianceState();
   const selectedLocale = useSelector(getSelectedLocale);
   const onboardingState = useSelector(getOnboardingState);
 
@@ -173,8 +176,12 @@ export const AccountDetailsAndHistory = () => {
         selectedLocale={selectedLocale}
         slotEmpty={
           <Styled.EmptyChart>
-            {onboardingState !== OnboardingState.AccountConnected && (
-              <Styled.OnboardingCard>
+            {complianceState === ComplianceStates.READ_ONLY ? (
+              <Styled.EmptyCard>
+                {stringGetter({ key: STRING_KEYS.BLOCKED_MESSAGE })}
+              </Styled.EmptyCard>
+            ) : onboardingState !== OnboardingState.AccountConnected ? (
+              <Styled.EmptyCard>
                 <p>
                   {stringGetter({
                     key: {
@@ -184,8 +191,8 @@ export const AccountDetailsAndHistory = () => {
                   })}
                 </p>
                 <OnboardingTriggerButton />
-              </Styled.OnboardingCard>
-            )}
+              </Styled.EmptyCard>
+            ) : null}
           </Styled.EmptyChart>
         }
       />
@@ -288,7 +295,7 @@ Styled.EmptyChart = styled.div`
   cursor: default;
 `;
 
-Styled.OnboardingCard = styled.div`
+Styled.EmptyCard = styled.div`
   width: 16.75rem;
 
   ${layoutMixins.column};

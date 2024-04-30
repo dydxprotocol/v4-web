@@ -485,3 +485,13 @@ export const getUsageRestriction = (state: RootState) => state.account.restricti
  * @returns RestrictionType from the current session
  */
 export const getRestrictionType = (state: RootState) => state.account.restriction?.restriction;
+
+/**
+ * @returns compliance status of the current session
+ */
+export const getComplianceStatus = (state: RootState) => state.account.compliance?.status;
+
+/**
+ * @returns compliance geo of the current session
+ */
+export const getGeo = (state: RootState) => state.account.compliance?.geo;

@@ -6,6 +6,7 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import {
+  ComplianceStatus,
   ErrorType,
   TradeInputErrorAction,
   TradeInputField,
@@ -27,6 +28,7 @@ import {
 } from '@/constants/trade';
 
 import { useBreakpoints, useStringGetter, useSubaccount } from '@/hooks';
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
 
 import { breakpoints } from '@/styles';
@@ -102,6 +104,7 @@ export const TradeForm = ({
   const stringGetter = useStringGetter();
   const { placeOrder } = useSubaccount();
   const { isTablet } = useBreakpoints();
+  const { complianceMessage, complianceStatus } = useComplianceState();
 
   const {
     price,
@@ -392,6 +395,12 @@ export const TradeForm = ({
               <TradeSizeInputs />
 
               {needsAdvancedOptions && <AdvancedTradeOptions />}
+
+              {complianceStatus === ComplianceStatus.CLOSE_ONLY && (
+                <AlertMessage type={AlertType.Error}>
+                  <Styled.Message>{complianceMessage}</Styled.Message>
+                </AlertMessage>
+              )}
 
               {alertContent && (
                 <AlertMessage type={alertType}>

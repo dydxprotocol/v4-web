@@ -36,12 +36,12 @@ class TestFlags {
     return !!this.queryParams.isolatedmargin;
   }
 
-  get displayPrivyLogin() {
-    return !!this.queryParams.displayprivylogin || true;
-  }
-
   get withNewMarketType() {
     return !!this.queryParams.withnewmarkettype;
+  }
+
+  get enableComplianceApi() {
+    return !!this.queryParams.complianceapi;
   }
 }
 
