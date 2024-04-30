@@ -10,12 +10,14 @@ export enum NotificationType {
   ReleaseUpdates = 'ReleaseUpdates',
   ApiError = 'ApiError',
   ComplianceAlert = 'ComplianceAlert',
+  OrderStatus = 'OrderStatus',
 }
 
 export const SingleSessionNotificationTypes = [
   NotificationType.AbacusGenerated,
   NotificationType.ApiError,
   NotificationType.ComplianceAlert,
+  NotificationType.OrderStatus,
 ];
 
 export enum NotificationComponentType {}
@@ -183,6 +185,12 @@ export type TriggerOrderNotification = {
   tickSizeDecimals?: number;
   type: TriggerOrderNotificationTypes;
 };
+
+export enum OrderSubmissionStatuses {
+  Submitted,
+  Placed,
+  Filled,
+}
 
 export enum ReleaseUpdateNotificationIds {
   RevampedConditionalOrders = 'revamped-conditional-orders',

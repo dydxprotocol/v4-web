@@ -158,6 +158,16 @@ export const getSubaccountOpenOrders = createSelector([getSubaccountOrders], (or
   )
 );
 
+export const getOrderByClientId = (orderClientId: number) =>
+  createSelector([getSubaccountOrders], (orders) =>
+    orders?.find((order) => order.clientId === orderClientId)
+  );
+
+export const getFillByClientId = (orderClientId: number) =>
+  createSelector([getSubaccountFills, getOrderByClientId(orderClientId)], (fills, order) =>
+    fills?.find((fill) => fill.orderId === order?.id)
+  );
+
 /**
  * @param state
  * @returns Record of SubaccountOrders that have not been filled or cancelled, indexed by marketId
@@ -256,6 +266,8 @@ export const getLatestOrderStatus = createSelector(
  */
 export const getUncommittedOrderClientIds = (state: RootState) =>
   state.account.uncommittedOrderClientIds;
+
+export const getSubmittedOrders = (state: RootState) => state.account.submittedOrders;
 
 /**
  * @param orderId
