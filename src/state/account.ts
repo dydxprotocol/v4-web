@@ -19,7 +19,7 @@ import type {
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
-import { OrderSubmissionStatuses, type LocalOrderData, type TradeTypes } from '@/constants/trade';
+import { LocalOrderData, OrderSubmissionStatuses, type TradeTypes } from '@/constants/trade';
 import { WalletType } from '@/constants/wallets';
 
 import { getLocalStorage } from '@/lib/localStorage';
