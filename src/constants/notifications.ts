@@ -186,6 +186,12 @@ export type TriggerOrderNotification = {
   type: TriggerOrderNotificationTypes;
 };
 
+export enum OrderSubmissionStatuses {
+  Submitted,
+  Placed,
+  Filled,
+}
+
 export enum ReleaseUpdateNotificationIds {
   RevampedConditionalOrders = 'revamped-conditional-orders',
   IncentivesS4 = 'incentives-s4',
