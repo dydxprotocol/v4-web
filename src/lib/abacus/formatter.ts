@@ -1,6 +1,6 @@
 import type { AbacusFormatterProtocol } from '@/constants/abacus';
 
-import { type LocaleSeparators, MustBigNumber, getFractionDigits } from '../numbers';
+import { MustBigNumber, getFractionDigits, type LocaleSeparators } from '../numbers';
 
 class AbacusFormatter implements AbacusFormatterProtocol {
   localeSeparators: LocaleSeparators;

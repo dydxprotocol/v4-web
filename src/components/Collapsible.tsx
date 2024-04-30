@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Root, Trigger, Content } from '@radix-ui/react-collapsible';
+import { Content, Root, Trigger } from '@radix-ui/react-collapsible';
 import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
 
 import { popoverMixins } from '@/styles/popoverMixins';

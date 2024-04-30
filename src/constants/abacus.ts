@@ -223,6 +223,10 @@ export const RestrictionType = Abacus.exchange.dydx.abacus.output.Restriction;
 const restrictionTypes = [...RestrictionType.values()] as const;
 export type RestrictionTypes = (typeof restrictionTypes)[number];
 
+// ------ Compliance ------ //
+export const ComplianceStatus = Abacus.exchange.dydx.abacus.output.ComplianceStatus;
+export type Compliance = Abacus.exchange.dydx.abacus.output.Compliance;
+
 // ------ Api data ------ //
 export const ApiData = Abacus.exchange.dydx.abacus.state.manager.ApiData;
 

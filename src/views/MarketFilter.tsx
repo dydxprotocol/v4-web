@@ -3,7 +3,7 @@ import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { MarketFilters, MARKET_FILTER_LABELS } from '@/constants/markets';
+import { MARKET_FILTER_LABELS, MarketFilters } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { useStringGetter } from '@/hooks';

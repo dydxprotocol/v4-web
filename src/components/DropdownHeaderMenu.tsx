@@ -1,4 +1,4 @@
-import { Root, Trigger, Content, Portal, Item } from '@radix-ui/react-dropdown-menu';
+import { Content, Item, Portal, Root, Trigger } from '@radix-ui/react-dropdown-menu';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { type MenuItem } from '@/constants/menus';

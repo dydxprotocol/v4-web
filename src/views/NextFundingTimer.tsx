@@ -1,10 +1,10 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { useInterval } from '@/hooks';
 
 import { Output, OutputType } from '@/components/Output';
 
-import { getTimeTillNextUnit, formatSeconds } from '@/lib/timeUtils';
+import { formatSeconds, getTimeTillNextUnit } from '@/lib/timeUtils';
 
 export const NextFundingTimer = () => {
   const [secondsLeft, setSecondsLeft] = useState<number | undefined>();

@@ -7,8 +7,8 @@ import { PickD3Scale } from '@visx/scale';
 import { TooltipWithBounds } from '@visx/tooltip';
 import type { TooltipProps as BaseTooltipProps } from '@visx/tooltip/lib/tooltips/Tooltip';
 import {
-  TooltipContext,
   DataContext,
+  TooltipContext,
   type GlyphProps as RenderGlyphProps,
   type TooltipContextType,
 } from '@visx/xychart';

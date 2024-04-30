@@ -8,6 +8,8 @@ export interface EnvironmentFeatures {
   reduceOnlySupported: boolean;
   withdrawalSafetyEnabled: boolean;
   CCTPWithdrawalOnly: boolean;
+  isSlTpEnabled: boolean;
+  isSlTpLimitOrdersEnabled: boolean;
 }
 
 export const useEnvFeatures = (): EnvironmentFeatures => {

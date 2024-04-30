@@ -1,13 +1,13 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { type Location, matchPath } from 'react-router-dom';
+import { matchPath, type Location } from 'react-router-dom';
 
 import {
-  type Nullable,
   AbacusOrderSide,
-  type AbacusOrderSides,
   AbacusOrderTypes,
-  ValidationError,
   ErrorType,
+  ValidationError,
+  type AbacusOrderSides,
+  type Nullable,
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import type { StringGetterFunction } from '@/constants/localization';
@@ -104,7 +104,7 @@ export const getTradeInputAlert = ({
   stepSizeDecimals: Nullable<number>;
   tickSizeDecimals: Nullable<number>;
 }) => {
-  const inputAlerts = abacusInputErrors.map(({ action: errorAction, resources, type }) => {
+  const inputAlerts = abacusInputErrors.map(({ action: errorAction, resources, type, code }) => {
     const { action, text } = resources || {};
     const { stringKey: actionStringKey } = action || {};
     const { stringKey: alertStringKey, params: stringParams } = text || {};
@@ -126,6 +126,7 @@ export const getTradeInputAlert = ({
       alertStringKey,
       alertString: alertStringKey && stringGetter({ key: alertStringKey, params }),
       type: type === ErrorType.warning ? AlertType.Warning : AlertType.Error,
+      code,
     };
   });
 

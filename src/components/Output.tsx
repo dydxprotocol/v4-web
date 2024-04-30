@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import BigNumber from 'bignumber.js';
 import { DateTime } from 'luxon';
 import { useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import {
   LEVERAGE_DECIMALS,
@@ -26,7 +26,7 @@ import { Tag } from '@/components/Tag';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { formatZeroNumbers } from '@/lib/formatZeroNumbers';
-import { type BigNumberish, MustBigNumber, isNumber } from '@/lib/numbers';
+import { MustBigNumber, isNumber, type BigNumberish } from '@/lib/numbers';
 import { getStringsForDateTimeDiff, getTimestamp } from '@/lib/timeUtils';
 
 import { CompressedNumberOutput } from './CompressedNumberOutput';

@@ -1,8 +1,5 @@
 import styled, { type AnyStyledComponent } from 'styled-components';
 
-import { ButtonSize } from '@/constants/buttons';
-
-import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 import { Notification, NotificationProps } from '@/components/Notification';
@@ -29,14 +26,13 @@ export const IncentiveSeasonDistributionNotification = ({
       isToast={isToast}
       notification={notification}
       slotIcon={<Icon iconName={IconName.RewardStar} />}
-      slotTitle="Season 2 launch rewards have been distributed!"
-      slotAction={<Button size={ButtonSize.Small}>Stake now!</Button>}
+      slotTitle="Season 3 launch rewards have been distributed!"
       slotCustomContent={
         <Styled.Details
           items={[
             {
               key: 'season_distribution',
-              label: 'Season 2 rewards',
+              label: 'Season 3 rewards',
               value: <Styled.Output type={OutputType.Asset} value={points} tag={chainTokenLabel} />,
             },
           ]}

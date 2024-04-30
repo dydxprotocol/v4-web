@@ -2,18 +2,17 @@ import React from 'react';
 
 import { CheckIcon } from '@radix-ui/react-icons';
 import {
-  Root,
-  Value,
-  Viewport,
-  Trigger,
   Content,
   Item,
-  ItemText,
   ItemIndicator,
+  ItemText,
   Portal,
-  Icon as SelectIcon,
+  Root,
+  Trigger,
+  Value,
+  Viewport,
 } from '@radix-ui/react-select';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { formMixins } from '@/styles/formMixins';
 import { popoverMixins } from '@/styles/popoverMixins';

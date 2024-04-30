@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import {
   AbacusPositionSide,
@@ -11,7 +11,7 @@ import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useEnvFeatures, useStringGetter } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -51,11 +51,12 @@ export const PositionsTriggersCell = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
+  const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
 
   const onViewOrders = isDisabled ? null : () => onViewOrdersClick(marketId);
 
   const showLiquidationWarning = (order: SubaccountOrder) => {
-    if (!isStopLossOrder(order) || !liquidationPrice) {
+    if (!isStopLossOrder(order, isSlTpLimitOrdersEnabled) || !liquidationPrice) {
       return false;
     }
     return (
@@ -148,7 +149,9 @@ export const PositionsTriggersCell = ({
               align="end"
               side="top"
               hovercard={
-                isStopLossOrder(order) ? 'partial-close-stop-loss' : 'partial-close-take-profit'
+                isStopLossOrder(order, isSlTpLimitOrdersEnabled)
+                  ? 'partial-close-stop-loss'
+                  : 'partial-close-take-profit'
               }
               slotButton={
                 <Button
@@ -157,7 +160,7 @@ export const PositionsTriggersCell = ({
                   onClick={openTriggersDialog}
                 >
                   {stringGetter({
-                    key: isStopLossOrder(order)
+                    key: isStopLossOrder(order, isSlTpLimitOrdersEnabled)
                       ? STRING_KEYS.EDIT_STOP_LOSS
                       : STRING_KEYS.EDIT_TAKE_PROFIT,
                   })}

@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent, css, keyframes } from 'styled-components';
+import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
 
 import { type OrderbookLine } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -16,7 +16,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Details } from '@/components/Details';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
-import { type CustomRowConfig, TableRow } from '@/components/Table';
+import { TableRow, type CustomRowConfig } from '@/components/Table';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';

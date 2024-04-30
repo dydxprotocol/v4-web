@@ -1,33 +1,34 @@
 import { EncodeObject } from '@cosmjs/proto-signing';
 import type { IndexedTx } from '@cosmjs/stargate';
 import Abacus, { type Nullable } from '@dydxprotocol/v4-abacus';
-import { GAS_MULTIPLIER, encodeJson } from '@dydxprotocol/v4-client-js';
 import {
   CompositeClient,
+  GAS_MULTIPLIER,
   IndexerConfig,
-  type LocalWallet,
   Network,
   NetworkOptimizer,
   NobleClient,
-  SubaccountClient,
-  ValidatorConfig,
-  OrderType,
+  OrderExecution,
   OrderSide,
   OrderTimeInForce,
-  OrderExecution,
+  OrderType,
+  SubaccountClient,
+  ValidatorConfig,
+  encodeJson,
+  type LocalWallet,
 } from '@dydxprotocol/v4-client-js';
 import Long from 'long';
 
 import {
-  type AbacusDYDXChainTransactionsProtocol,
   QueryType,
-  type QueryTypes,
   TransactionType,
-  type TransactionTypes,
-  type HumanReadablePlaceOrderPayload,
+  type AbacusDYDXChainTransactionsProtocol,
   type HumanReadableCancelOrderPayload,
-  type HumanReadableWithdrawPayload,
+  type HumanReadablePlaceOrderPayload,
   type HumanReadableTransferPayload,
+  type HumanReadableWithdrawPayload,
+  type QueryTypes,
+  type TransactionTypes,
 } from '@/constants/abacus';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { DydxChainId, isTestnet } from '@/constants/networks';
@@ -40,7 +41,7 @@ import { setInitializationError } from '@/state/app';
 import { StatefulOrderError } from '../errors';
 import { bytesToBigInt } from '../numbers';
 import { log } from '../telemetry';
-import { hashFromTx, getMintscanTxLink } from '../txUtils';
+import { getMintscanTxLink, hashFromTx } from '../txUtils';
 
 (BigInt.prototype as any).toJSON = function () {
   return this.toString();

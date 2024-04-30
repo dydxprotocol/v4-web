@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
@@ -47,6 +47,7 @@ import { Link } from '@/components/Link';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
+import { WithTooltip } from '@/components/WithTooltip';
 import { SourceSelectMenu } from '@/views/forms/AccountManagementForms/SourceSelectMenu';
 
 import { getSubaccount } from '@/state/accountSelectors';
@@ -437,7 +438,6 @@ export const WithdrawForm = () => {
         }),
       };
     }
-
     return {
       errorMessage: undefined,
     };
@@ -472,6 +472,20 @@ export const WithdrawForm = () => {
 
   return (
     <Styled.Form onSubmit={onSubmit}>
+      <Styled.Subheader>
+        {stringGetter({
+          key: STRING_KEYS.LOWEST_FEE_WITHDRAWALS,
+          params: {
+            LOWEST_FEE_TOKENS_TOOLTIP: (
+              <WithTooltip tooltip="lowest-fees">
+                {stringGetter({
+                  key: STRING_KEYS.SELECT_CHAINS,
+                })}
+              </WithTooltip>
+            ),
+          },
+        })}
+      </Styled.Subheader>
       <Styled.DestinationRow>
         <FormInput
           type={InputType.Text}
@@ -534,6 +548,10 @@ export const WithdrawForm = () => {
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
+
+Styled.Subheader = styled.div`
+  color: var(--color-text-0);
+`;
 
 Styled.Tag = styled(Tag)`
   margin-left: 0.5ch;

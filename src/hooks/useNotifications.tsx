@@ -11,13 +11,13 @@ import {
 import { AnalyticsEvent } from '@/constants/analytics';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import {
+  NotificationStatus,
+  NotificationType,
+  SingleSessionNotificationTypes,
   type Notification,
   type NotificationDisplayData,
   type NotificationPreferences,
   type Notifications,
-  NotificationStatus,
-  NotificationType,
-  SingleSessionNotificationTypes,
 } from '@/constants/notifications';
 
 import { track } from '@/lib/analytics';
@@ -62,6 +62,7 @@ const useNotificationsContext = () => {
         [NotificationType.TriggerOrder]: true,
         [NotificationType.ReleaseUpdates]: true,
         [NotificationType.ApiError]: true,
+        [NotificationType.ComplianceAlert]: true,
         version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
       },
     });
@@ -125,6 +126,7 @@ const useNotificationsContext = () => {
         [NotificationType.ReleaseUpdates]: true,
         [NotificationType.TriggerOrder]: true,
         [NotificationType.ApiError]: true,
+        [NotificationType.ComplianceAlert]: true,
         version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
       });
     }
@@ -135,9 +137,12 @@ const useNotificationsContext = () => {
     (notification: Notification, status: NotificationStatus) => {
       notification.status = status;
       notification.timestamps[notification.status] = Date.now();
-      setNotifications({ ...notifications, [getKey(notification)]: notification });
+      setNotifications((notifications) => ({
+        ...notifications,
+        [getKey(notification)]: notification,
+      }));
     },
-    [notifications, getKey]
+    [getKey]
   );
 
   const { markUnseen, markSeen, markCleared } = useMemo(

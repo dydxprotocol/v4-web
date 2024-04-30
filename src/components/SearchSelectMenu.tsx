@@ -1,6 +1,6 @@
-import { type ReactNode, useState, useRef } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import { type MenuConfig } from '@/constants/menus';
 
@@ -16,8 +16,6 @@ import { Icon, IconName } from '@/components/Icon';
 import { Popover, TriggerType } from '@/components/Popover';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithLabel } from '@/components/WithLabel';
-
-import cctpTokens from '../../public/configs/cctp.json';
 
 type ElementProps = {
   asChild?: boolean;
@@ -36,17 +34,10 @@ type StyleProps = {
 
 export type SearchSelectMenuProps = ElementProps & StyleProps;
 
-type TokenInfo = {
-  chainId: string;
-  tokenAddress: string;
-  name: string;
-};
-
 export const SearchSelectMenu = ({
   asChild,
   children,
   className,
-  disabled,
   label,
   items,
   withSearch = true,
@@ -61,15 +52,6 @@ export const SearchSelectMenu = ({
     },
     ref: searchSelectMenuRef,
   });
-
-  const cctpChainsById = cctpTokens.reduce((acc, token) => {
-    // Check if the key for this chainId already exists
-    if (!acc[token.chainId]) {
-      acc[token.chainId] = []; // Initialize it with an empty array if not existing
-    }
-    acc[token.chainId].push(token); // Push the current token into the corresponding array
-    return acc;
-  }, {} as Record<string, TokenInfo[]>);
 
   const Trigger = asChild ? (
     children

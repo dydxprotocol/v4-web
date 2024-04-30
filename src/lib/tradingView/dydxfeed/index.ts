@@ -21,7 +21,7 @@ import { setCandles } from '@/state/perpetuals';
 import { getMarketConfig, getPerpetualBarsForPriceChart } from '@/state/perpetualsSelectors';
 
 import { log } from '../../telemetry';
-import { getSymbol, getHistorySlice, mapCandle } from '../utils';
+import { getHistorySlice, getSymbol, mapCandle } from '../utils';
 import { lastBarsCache } from './cache';
 import { subscribeOnStream, unsubscribeFromStream } from './streaming';
 

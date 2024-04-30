@@ -7,7 +7,8 @@
   {
     "chainId": "5",
     "tokenAddress": "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
-    "name": "Ethereum Goerli"
+    "name": "Ethereum Goerli",
+    "isTestnet": true
   },
   {
     "chainId": "43114",

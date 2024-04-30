@@ -5,7 +5,7 @@ import styled, { AnyStyledComponent } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { SelectMenu, SelectItem } from '@/components/SelectMenu';
+import { SelectItem, SelectMenu } from '@/components/SelectMenu';
 
 import { StoryWrapper } from '.ladle/components';
 

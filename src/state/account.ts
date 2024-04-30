@@ -2,18 +2,19 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import type {
   AccountBalance,
-  SubaccountFill,
+  Compliance,
+  HistoricalPnlPeriods,
   Nullable,
+  SubAccountHistoricalPNLs,
   Subaccount,
+  SubaccountFill,
   SubaccountFills,
   SubaccountFundingPayments,
-  Wallet,
   SubaccountOrder,
   SubaccountTransfers,
-  HistoricalPnlPeriods,
-  SubAccountHistoricalPNLs,
-  UsageRestriction,
   TradingRewards,
+  UsageRestriction,
+  Wallet,
 } from '@/constants/abacus';
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
@@ -45,6 +46,7 @@ export type AccountState = {
   uncommittedOrderClientIds: number[];
 
   restriction?: Nullable<UsageRestriction>;
+  compliance?: Compliance;
 };
 
 const initialState: AccountState = {
@@ -84,6 +86,7 @@ const initialState: AccountState = {
 
   // Restriction
   restriction: undefined,
+  compliance: undefined,
 };
 
 export const accountSlice = createSlice({
@@ -146,6 +149,9 @@ export const accountSlice = createSlice({
     setRestrictionType: (state, action: PayloadAction<Nullable<UsageRestriction>>) => {
       state.restriction = action.payload;
     },
+    setCompliance: (state, action: PayloadAction<Compliance>) => {
+      state.compliance = action.payload;
+    },
     setSubaccount: (state, action: PayloadAction<Nullable<Subaccount>>) => {
       const existingOrderIds = state.subaccount?.orders
         ? state.subaccount.orders.toArray().map((order) => order.id)
@@ -204,6 +210,7 @@ export const {
   setOnboardingState,
   setHistoricalPnl,
   setRestrictionType,
+  setCompliance,
   setSubaccount,
   setWallet,
   viewedFills,

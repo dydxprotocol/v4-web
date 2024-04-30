@@ -1,4 +1,4 @@
-import { timeUnits, allTimeUnits } from '@/constants/time';
+import { allTimeUnits, timeUnits } from '@/constants/time';
 
 // Given a literal from Intl.RelativeTimeFormat formatToParts,
 // strip out words/symbols unrelated to time unit

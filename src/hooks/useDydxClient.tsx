@@ -4,20 +4,20 @@ import {
   BECH32_PREFIX,
   CompositeClient,
   FaucetClient,
+  IndexerClient,
   IndexerConfig,
   LocalWallet,
-  onboarding,
   Network,
   ValidatorConfig,
+  onboarding,
   type ProposalStatus,
-  IndexerClient,
 } from '@dydxprotocol/v4-client-js';
 import type { ResolutionString } from 'public/tradingview/charting_library';
 import { useSelector } from 'react-redux';
 
 import type { ConnectNetworkEvent, NetworkConfig } from '@/constants/abacus';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
-import { type Candle, RESOLUTION_MAP } from '@/constants/candles';
+import { RESOLUTION_MAP, type Candle } from '@/constants/candles';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
 

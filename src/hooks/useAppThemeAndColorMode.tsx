@@ -5,8 +5,8 @@ import { ThemeProvider } from 'styled-components';
 
 import { Themes } from '@/styles/themes';
 
-import { AppTheme, AppThemeSetting, AppColorMode, AppThemeSystemSetting } from '@/state/configs';
-import { getAppThemeSetting, getAppColorMode } from '@/state/configsSelectors';
+import { AppColorMode, AppTheme, AppThemeSetting, AppThemeSystemSetting } from '@/state/configs';
+import { getAppColorMode, getAppThemeSetting } from '@/state/configsSelectors';
 
 export const AppThemeAndColorModeProvider = ({ ...props }) => {
   return <ThemeProvider theme={useAppThemeAndColorModeContext()} {...props} />;

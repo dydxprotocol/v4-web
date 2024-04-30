@@ -9,11 +9,13 @@ export enum NotificationType {
   TriggerOrder = 'TriggerOrder',
   ReleaseUpdates = 'ReleaseUpdates',
   ApiError = 'ApiError',
+  ComplianceAlert = 'ComplianceAlert',
 }
 
 export const SingleSessionNotificationTypes = [
   NotificationType.AbacusGenerated,
   NotificationType.ApiError,
+  NotificationType.ComplianceAlert,
 ];
 
 export enum NotificationComponentType {}
@@ -139,6 +141,8 @@ export type NotificationDisplayData = {
      Push notification: requires interaction.
    */
   toastDuration?: number;
+
+  withClose?: boolean; // Show close button for Notification
 };
 
 export enum TransferNotificationTypes {
@@ -182,7 +186,7 @@ export type TriggerOrderNotification = {
 
 export enum ReleaseUpdateNotificationIds {
   IncentivesS4 = 'incentives-s4',
-  IncentivesDistributedS2 = 'incentives-distributed-s2',
+  IncentivesDistributedS3 = 'incentives-distributed-s3',
 }
 
 /**

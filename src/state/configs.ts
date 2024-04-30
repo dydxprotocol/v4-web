@@ -55,7 +55,7 @@ const initialState: ConfigsState = {
   }),
   defaultToAllMarketsInPositionsOrdersFills: getLocalStorage({
     key: LocalStorageKey.DefaultToAllMarketsInPositionsOrdersFills,
-    defaultValue: false,
+    defaultValue: true,
   }),
 };
 
