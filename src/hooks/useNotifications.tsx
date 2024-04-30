@@ -213,6 +213,7 @@ const useNotificationsContext = () => {
         [notifications, updateStatus, notificationPreferences[notificationCategory]]
       ),
 
+      notificationPreferences,
       lastUpdated: notificationsLastUpdated,
     });
   }

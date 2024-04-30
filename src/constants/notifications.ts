@@ -72,6 +72,7 @@ export type NotificationTypeConfig<
       isNew?: boolean
     ) => void;
 
+    notificationPreferences: NotificationPreferences;
     lastUpdated: number;
   }) => void;
 
