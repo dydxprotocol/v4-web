@@ -34,12 +34,14 @@ import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
+import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 import { TriggerOrderNotification } from '@/views/notifications/TriggerOrderNotification';
 
 import {
+  getCanceledOrders,
   getSubaccountFills,
   getSubaccountOrders,
   getSubmittedOrders,
@@ -498,6 +500,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
     type: NotificationType.OrderStatus,
     useTrigger: ({ trigger }) => {
       const localOrdersData = useSelector(getSubmittedOrders, shallowEqual);
+      const localCanceledOrders = useSelector(getCanceledOrders, shallowEqual);
+      const allOrders = useSelector(getSubaccountOrders, shallowEqual);
       const stringGetter = useStringGetter();
 
       useEffect(() => {
@@ -524,6 +528,36 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
       }, [localOrdersData]);
+
+      useEffect(() => {
+        for (const localCancel of localCanceledOrders) {
+          // share same notification with existing local order if exists
+          const key = (
+            allOrders?.find((order) => order.id === localCancel.orderId)?.clientId ??
+            localCancel.orderId
+          ).toString();
+
+          trigger(
+            key,
+            {
+              icon: null,
+              title: stringGetter({ key: STRING_KEYS.ORDER_STATUS }),
+              toastSensitivity: 'background',
+              groupKey: key,
+              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+              renderCustomBody: ({ isToast, notification }) => (
+                <OrderCancelNotification
+                  isToast={isToast}
+                  localCancel={localCancel}
+                  notification={notification}
+                />
+              ),
+            },
+            [localCancel.submissionStatus],
+            true
+          );
+        }
+      }, [localCanceledOrders]);
     },
     useNotificationAction: () => {
       const dispatch = useDispatch();

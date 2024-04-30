@@ -170,11 +170,22 @@ export enum OrderSubmissionStatuses {
   Filled,
 }
 
+export enum OrderCancelStatuses {
+  Submitted,
+  Canceled,
+}
+
 export type LocalOrderData = {
   marketId: string;
   clientId: number;
   orderId?: string;
   orderType: TradeTypes;
   submissionStatus: OrderSubmissionStatuses;
+  errorStringKey?: string;
+};
+
+export type CancelOrderData = {
+  orderId: string;
+  submissionStatus: OrderCancelStatuses;
   errorStringKey?: string;
 };

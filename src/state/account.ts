@@ -19,7 +19,13 @@ import type {
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
-import { OrderSubmissionStatuses, type LocalOrderData, type TradeTypes } from '@/constants/trade';
+import {
+  CancelOrderData,
+  OrderCancelStatuses,
+  OrderSubmissionStatuses,
+  type LocalOrderData,
+  type TradeTypes,
+} from '@/constants/trade';
 import { WalletType } from '@/constants/wallets';
 
 import { getLocalStorage } from '@/lib/localStorage';
@@ -47,6 +53,7 @@ export type AccountState = {
   historicalPnlPeriod?: HistoricalPnlPeriods;
   uncommittedOrderClientIds: number[];
   submittedOrders: LocalOrderData[];
+  canceledOrders: CancelOrderData[];
 
   restriction?: Nullable<UsageRestriction>;
   compliance?: Compliance;
@@ -87,6 +94,7 @@ const initialState: AccountState = {
   uncommittedOrderClientIds: [],
   historicalPnlPeriod: undefined,
   submittedOrders: [],
+  canceledOrders: [],
 
   // Restriction
   restriction: undefined,
@@ -250,6 +258,29 @@ export const accountSlice = createSlice({
         });
       }
     },
+    submittedCancelOrder: (state, action: PayloadAction<string>) => {
+      state.canceledOrders.push({
+        orderId: action.payload,
+        submissionStatus: OrderCancelStatuses.Submitted,
+      });
+    },
+    orderCanceledConfirmed: (state, action: PayloadAction<string>) => {
+      state.canceledOrders = state.canceledOrders.map((order) =>
+        order.orderId === action.payload
+          ? { ...order, submissionStatus: OrderCancelStatuses.Canceled }
+          : order
+      );
+    },
+    cancelOrderFailed: (
+      state,
+      action: PayloadAction<{ orderId: string; errorStringKey: string }>
+    ) => {
+      state.canceledOrders.map((order) =>
+        order.orderId === action.payload.orderId
+          ? { ...order, errorStringKey: action.payload.errorStringKey }
+          : order
+      );
+    },
   },
 });
 
@@ -274,4 +305,7 @@ export const {
   submittedOrder,
   submittedOrderFailed,
   submittedOrderTimeout,
+  submittedCancelOrder,
+  orderCanceledConfirmed,
+  cancelOrderFailed,
 } = accountSlice.actions;

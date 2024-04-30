@@ -160,6 +160,13 @@ export const getSubaccountOpenOrders = createSelector([getSubaccountOrders], (or
 
 /**
  * @param state
+ * @returns order with the specified id
+ */
+export const getOrderById = (orderId: string) =>
+  createSelector([getSubaccountOrders], (orders) => orders?.find((order) => order.id === orderId));
+
+/**
+ * @param state
  * @returns order with the specified client id
  */
 export const getOrderByClientId = (orderClientId: number) =>
@@ -279,6 +286,8 @@ export const getUncommittedOrderClientIds = (state: RootState) =>
  * @returns a list of locally submitted orders for the current FE session
  */
 export const getSubmittedOrders = (state: RootState) => state.account.submittedOrders;
+
+export const getCanceledOrders = (state: RootState) => state.account.canceledOrders;
 
 /**
  * @param orderId

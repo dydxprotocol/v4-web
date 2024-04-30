@@ -267,8 +267,15 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       throw new Error('Missing compositeClient or localWallet');
     }
 
-    const { subaccountNumber, clientId, orderFlags, clobPairId, goodTilBlock, goodTilBlockTime } =
-      params ?? {};
+    const {
+      orderId,
+      subaccountNumber,
+      clientId,
+      orderFlags,
+      clobPairId,
+      goodTilBlock,
+      goodTilBlockTime,
+    } = params ?? {};
 
     try {
       const tx = await this.compositeClient?.cancelRawOrder(
