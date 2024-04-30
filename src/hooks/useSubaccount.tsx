@@ -418,7 +418,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   );
 
   const cancelOrder = useCallback(
-    async ({
+    ({
       orderId,
       onError,
       onSuccess,
