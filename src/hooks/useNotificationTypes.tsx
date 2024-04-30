@@ -72,7 +72,7 @@ const parseStringParamsForNotification = ({
 export const notificationTypes: NotificationTypeConfig[] = [
   {
     type: NotificationType.AbacusGenerated,
-    useTrigger: ({ trigger }) => {
+    useTrigger: ({ trigger, notificationPreferences }) => {
       const stringGetter = useStringGetter();
       const abacusNotifications = useSelector(getAbacusNotifications, isEqual);
       const orders = useSelector(getSubaccountOrders, shallowEqual) || [];
@@ -92,12 +92,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
           switch (abacusNotificationType) {
             case 'order': {
-              const order = ordersById[id]?.[0];
-              const clientId: number | undefined = order?.clientId ?? undefined;
-              const localOrderExists =
-                clientId && localOrdersData.some((order) => order.clientId === clientId);
+              if (notificationPreferences[NotificationType.OrderStatus]) {
+                const order = ordersById[id]?.[0];
+                const clientId: number | undefined = order?.clientId ?? undefined;
+                const localOrderExists =
+                  clientId && localOrdersData.some((order) => order.clientId === clientId);
 
-              if (localOrderExists) return; // already handled by OrderStatusNotification
+                if (localOrderExists) return; // already handled by OrderStatusNotification
+              }
 
               trigger(
                 abacusNotif.id,
