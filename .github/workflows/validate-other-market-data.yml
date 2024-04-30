@@ -36,8 +36,8 @@ jobs:
       - name: Checkout v4-chain repo
         uses: actions/checkout@v3
         with:
-          repository: 'dydxprotocol/v4-chain'
-          ref: 'd866d2be9361e6809a01804a1b9434a6cd4355ca'
+          repository: 'skip-mev/v4-chain'
+          ref: '943312c3a641757dd9e84a40fc34786b11751a9c'
           path: 'v4-chain'
       
       - name: Start v4 localnet
