@@ -19,7 +19,7 @@ import {
 } from '@/hooks';
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
-import { DialogAreaProvider } from '@/hooks/useDialogArea';
+import { DialogAreaProvider, useDialogArea } from '@/hooks/useDialogArea';
 import { DydxProvider } from '@/hooks/useDydxClient';
 import { LocalNotificationsProvider } from '@/hooks/useLocalNotifications';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
@@ -77,6 +77,7 @@ const Content = () => {
     return parseLocationHash(location.hash);
   }, [location.hash]);
 
+  const dialogAreaRef = useDialogArea()?.dialogAreaRef;
   return (
     <>
       <GlobalStyle />
@@ -122,7 +123,7 @@ const Content = () => {
 
         <Styled.NotificationsToastArea />
 
-        <Styled.DialogArea>
+        <Styled.DialogArea ref={dialogAreaRef}>
           <DialogManager />
         </Styled.DialogArea>
 

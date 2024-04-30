@@ -1,4 +1,4 @@
-import { useContext, createContext, useState } from 'react';
+import { useContext, createContext, useState, useRef, useEffect } from 'react';
 
 const DialogAreaContext = createContext<ReturnType<typeof useDialogAreaContext> | undefined>(
   undefined
@@ -14,9 +14,15 @@ export const useDialogArea = () => useContext(DialogAreaContext);
 
 const useDialogAreaContext = () => {
   const [dialogArea, setDialogArea] = useState<HTMLElement>();
-
+  const dialogAreaRef = useRef(null);
+  useEffect(() => {
+    if (!dialogArea && dialogAreaRef?.current) {
+      setDialogArea(dialogAreaRef?.current);
+    }
+  }, [dialogAreaRef]);
   return {
     dialogArea,
     setDialogArea,
+    dialogAreaRef,
   };
 };
