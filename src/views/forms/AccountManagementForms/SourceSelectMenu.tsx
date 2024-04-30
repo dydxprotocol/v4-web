@@ -58,6 +58,8 @@ export const SourceSelectMenu = ({
     return acc;
   }, {} as Record<string, TokenInfo[]>);
 
+  // withdrawals SourceSelectMenu is half width size so we must throw the decorator text
+  // in the description prop (renders below the item label) instead of in the slotAfter
   const lowestFeesDecoratorProp = type === TransferType.deposit ? 'slotAfter' : 'description';
 
   const chainItems = Object.values(chains)
