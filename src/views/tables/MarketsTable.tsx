@@ -200,6 +200,8 @@ export const MarketsTable = ({ className }: { className?: string }) => {
       <Styled.Toolbar>
         <MarketFilter
           hideNewMarketButton
+          compactLayout
+          searchPlaceholderKey={STRING_KEYS.SEARCH_MARKETS}
           selectedFilter={filter}
           filters={marketFilters as MarketFilters[]}
           onChangeFilter={setFilter}
