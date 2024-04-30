@@ -3,6 +3,7 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { WalletType } from '@/constants/wallets';
 
 import { useEnvFeatures, useStringGetter } from '@/hooks';
 
@@ -36,6 +37,7 @@ export const SourceSelectMenu = ({
   selectedChain,
   onSelect,
 }: ElementProps) => {
+  const { walletType } = useAccounts();
   const { CCTPWithdrawalOnly } = useEnvFeatures();
 
   const stringGetter = useStringGetter();
@@ -81,6 +83,7 @@ export const SourceSelectMenu = ({
 
   const selectedChainOption = chains.find((item) => item.type === selectedChain);
   const selectedExchangeOption = exchanges.find((item) => item.type === selectedExchange);
+  const isNotPrivyDeposit = type === TransferType.deposit && walletType !== WalletType.Privy;
 
   return (
     <SearchSelectMenu
@@ -90,8 +93,8 @@ export const SourceSelectMenu = ({
           groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
           items: exchangeItems,
         },
-        // only unblock privy wallets for withdrawals
-        type === TransferType.withdrawal &&
+        // only block privy wallets for deposits
+        isNotPrivyDeposit &&
           chainItems.length > 0 && {
             group: 'chains',
             groupLabel: stringGetter({ key: STRING_KEYS.CHAINS }),
