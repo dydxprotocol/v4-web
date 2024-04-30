@@ -1946,10 +1946,10 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.6.55:
+  /@dydxprotocol/v4-abacus@1.6.54:
     resolution:
       {
-        integrity: sha512-tiIK4uEnOaG+Ay4Q8Pen1rj3bm2Okz51bkFlY8HG6ZDng8OYvZbdQNMuiz2l7F1tpe8oKRG6lTxHe44kRNSrWg==,
+        integrity: sha512-lmAaUlDq1Swx8T7bNWOpF3WRqhrEDEulrE1BDcab9b3wCA3hT9buFBU7e73JryBqDRVCyuqDIvIF0VDqZsCAKQ==,
       }
     dependencies:
       '@js-joda/core': 3.2.0
@@ -1988,10 +1988,10 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.81:
+  /@dydxprotocol/v4-localization@1.1.79:
     resolution:
       {
-        integrity: sha512-vul5Yw5cQecHNDiTEKsJxwFgERzmooR88PNZ9bz/0JytSQCnLvC0l+hHFFnFovwlFeR5uaVSiWVzMfxawit8EQ==,
+        integrity: sha512-s8PTh+Q1p5lj8KJwdzElkyks4CWWEqjG6Elot4nnIjWqryupFbTwtcR+dgOTANbXbz/h440IP6rdlZbTMUD5Lw==,
       }
     dev: false
 
