@@ -8,12 +8,9 @@ const countZeros = (decimalDigits: string): number => {
   return zeroCount;
 };
 
-export const formatZeroNumbers = (
-  formattedValue: string,
-  hasCurrencySymbol: boolean,
-  zerosThreshold: number = 4
-) => {
+export const formatZeroNumbers = (formattedValue: string, zerosThreshold: number = 4) => {
   const punctuationSymbol = formattedValue.match(/[.,]/g)?.pop();
+  const hasCurrencySymbol = formattedValue.match(/^[^\d]/)?.pop() !== undefined;
   const significantDigitsSubStart = hasCurrencySymbol ? 1 : 0;
   const currencySign = hasCurrencySymbol ? formattedValue[0] : undefined;
 
