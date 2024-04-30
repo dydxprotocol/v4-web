@@ -52,6 +52,7 @@ export const OrderStatusNotification = ({
 
   let orderStatusStringKey = STRING_KEYS.SUBMITTING;
   let orderStatusIcon = <Styled.LoadingSpinner />;
+  let customContent = null;
 
   switch (submissionStatus) {
     case OrderSubmissionStatuses.Placed:
@@ -66,12 +67,24 @@ export const OrderStatusNotification = ({
           ];
         orderStatusIcon = <Styled.OrderStatusIcon status={indexedOrderStatus} />;
       }
+      if (order && fill) {
+        customContent = (
+          <FillDetails
+            orderSide={ORDER_SIDES[order.side.name]}
+            tradeType={getTradeType(order.type.rawValue) ?? undefined}
+            filledAmount={order.totalFilled}
+            assetId={assetId}
+            averagePrice={order.price}
+            tickSizeDecimals={marketData?.configs?.displayTickSizeDecimals ?? USD_DECIMALS}
+          />
+        );
+      }
       break;
     default: // OrderSubmissionStatuses.Submitted
       if (localOrder.errorStringKey) {
         orderStatusStringKey = STRING_KEYS.ERROR;
         orderStatusIcon = <Styled.WarningIcon iconName={IconName.Warning} />;
-        // TODO(@aforaleka) replace trade form error with this depending on preferences
+        customContent = <span>{stringGetter({ key: localOrder.errorStringKey })}</span>;
       }
       break;
   }
@@ -88,19 +101,7 @@ export const OrderStatusNotification = ({
           {orderStatusIcon}
         </Styled.OrderStatus>
       }
-      slotCustomContent={
-        order &&
-        fill && (
-          <FillDetails
-            orderSide={ORDER_SIDES[order.side.name]}
-            tradeType={getTradeType(order.type.rawValue) ?? undefined}
-            filledAmount={order.totalFilled}
-            assetId={assetId}
-            averagePrice={order.price}
-            tickSizeDecimals={marketData?.configs?.displayTickSizeDecimals ?? USD_DECIMALS}
-          />
-        )
-      }
+      slotCustomContent={customContent}
     />
   );
 };
