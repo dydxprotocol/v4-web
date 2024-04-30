@@ -66,30 +66,7 @@ export const PositionsActionsCell = ({
 
   return (
     <ActionsTableCell>
-      {testFlags.configureSlTpFromPositionsTable &&
-        complianceState === ComplianceStates.FULL_ACCESS && (
-          <Styled.TriggersButton
-            key="edittriggers"
-            onClick={() =>
-              dispatch(
-                openDialog({
-                  type: DialogTypes.Triggers,
-                  dialogProps: {
-                    marketId,
-                    assetId,
-                    stopLossOrders,
-                    takeProfitOrders,
-                    navigateToMarketOrders,
-                  },
-                })
-              )
-            }
-            iconName={IconName.Pencil}
-            shape={ButtonShape.Square}
-            isDisabled={isDisabled}
-          />
-        )}
-      {isSlTpEnabled && (
+      {isSlTpEnabled && complianceState === ComplianceStates.FULL_ACCESS && (
         <Styled.TriggersButton
           key="edittriggers"
           onClick={() =>
