@@ -494,9 +494,6 @@ const $Output = styled(Output)`
   display: inline-block;
 `;
 
-const $Body = styled.p`
-  white-space: nowrap;
-`;
 const $Link = styled(Link)`
   --link-color: var(--color-accent);
   display: inline-block;
