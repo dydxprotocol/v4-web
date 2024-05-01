@@ -7,11 +7,13 @@ import {
   ORDER_SIDES,
   ORDER_STATUS_STRINGS,
 } from '@/constants/abacus';
-import { LocalOrderData } from '@/constants/account';
 import { STRING_KEYS } from '@/constants/localization';
-import { OrderSubmissionStatuses } from '@/constants/notifications';
 import { USD_DECIMALS } from '@/constants/numbers';
-import { ORDER_TYPE_STRINGS } from '@/constants/trade';
+import {
+  ORDER_TYPE_STRINGS,
+  OrderSubmissionStatuses,
+  type LocalOrderData,
+} from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks';
 
@@ -55,6 +57,9 @@ export const OrderStatusNotification = ({
     case OrderSubmissionStatuses.Placed:
     case OrderSubmissionStatuses.Filled:
       if (indexedOrderStatus) {
+        // skip pending / best effort open state -> still show as submitted (loading)
+        if (indexedOrderStatus === AbacusOrderStatus.pending.rawValue) break;
+
         orderStatusStringKey =
           ORDER_STATUS_STRINGS[
             indexedOrderStatus as unknown as KotlinIrEnumValues<typeof AbacusOrderStatus>
@@ -62,10 +67,9 @@ export const OrderStatusNotification = ({
         orderStatusIcon = <Styled.OrderStatusIcon status={indexedOrderStatus} />;
       }
       break;
-    case OrderSubmissionStatuses.Submitted:
-    default:
+    default: // OrderSubmissionStatuses.Submitted
       if (localOrder.errorStringKey) {
-        orderStatusStringKey = STRING_KEYS.FAILED;
+        orderStatusStringKey = STRING_KEYS.ERROR;
         orderStatusIcon = <Styled.WarningIcon iconName={IconName.Warning} />;
         // TODO(@aforaleka) replace trade form error with this depending on preferences
       }

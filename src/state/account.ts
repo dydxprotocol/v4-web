@@ -16,11 +16,10 @@ import type {
   UsageRestriction,
   Wallet,
 } from '@/constants/abacus';
-import { LocalOrderData, OnboardingGuard, OnboardingState } from '@/constants/account';
+import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
-import { STRING_KEYS, StringKey } from '@/constants/localization';
-import { OrderSubmissionStatuses } from '@/constants/notifications';
-import { TradeTypes } from '@/constants/trade';
+import { STRING_KEYS } from '@/constants/localization';
+import { OrderSubmissionStatuses, type LocalOrderData, type TradeTypes } from '@/constants/trade';
 import { WalletType } from '@/constants/wallets';
 
 import { getLocalStorage } from '@/lib/localStorage';
@@ -229,7 +228,7 @@ export const accountSlice = createSlice({
     },
     submittedOrderFailed: (
       state,
-      action: PayloadAction<{ clientId: number; errorStringKey: StringKey }>
+      action: PayloadAction<{ clientId: number; errorStringKey: string }>
     ) => {
       state.submittedOrders = state.submittedOrders.map((order) =>
         order.clientId === action.payload.clientId
@@ -247,7 +246,7 @@ export const accountSlice = createSlice({
       if (state.uncommittedOrderClientIds.includes(action.payload)) {
         submittedOrderFailed({
           clientId: action.payload,
-          errorStringKey: STRING_KEYS.SOMETHING_WENT_WRONG as StringKey,
+          errorStringKey: STRING_KEYS.SOMETHING_WENT_WRONG,
         });
       }
     },
