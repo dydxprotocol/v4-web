@@ -13,7 +13,7 @@ export const DialogAreaProvider = ({ ...props }) => (
 export const useDialogArea = () => useContext(DialogAreaContext);
 
 const useDialogAreaContext = () => {
-  const dialogAreaRef = useRef(null);
+  const dialogAreaRef = useRef<HTMLElement>(null);
   return {
     dialogAreaRef,
   };

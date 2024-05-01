@@ -62,9 +62,11 @@ const DialogPortal = ({
   container?: HTMLElement;
   children: React.ReactNode;
 }) => {
-  const dialogArea = useDialogArea()?.dialogAreaRef.current;
+  const {
+    dialogAreaRef: { current },
+  } = useDialogArea() ?? { dialogAreaRef: {} };
   return withPortal ? (
-    <Portal container={container ?? dialogArea}>{children}</Portal>
+    <Portal container={container ?? current}>{children}</Portal>
   ) : (
     <>{children}</>
   );

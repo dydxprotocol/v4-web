@@ -83,7 +83,7 @@ const Content = () => {
     return parseLocationHash(location.hash);
   }, [location.hash]);
 
-  const dialogAreaRef = useDialogArea()?.dialogAreaRef;
+  const { dialogAreaRef } = useDialogArea() ?? {};
   return (
     <>
       <GlobalStyle />
