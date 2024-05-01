@@ -72,7 +72,6 @@ export type NotificationTypeConfig<
       isNew?: boolean
     ) => void;
 
-    notificationPreferences: NotificationPreferences;
     lastUpdated: number;
   }) => void;
 
@@ -205,12 +204,6 @@ export type TriggerOrderNotification = {
   tickSizeDecimals?: number;
   type: TriggerOrderNotificationTypes;
 };
-
-export enum OrderSubmissionStatuses {
-  Submitted,
-  Placed,
-  Filled,
-}
 
 export enum ReleaseUpdateNotificationIds {
   RevampedConditionalOrders = 'revamped-conditional-orders',
