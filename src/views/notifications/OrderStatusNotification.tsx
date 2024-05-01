@@ -50,7 +50,7 @@ export const OrderStatusNotification = ({
   const indexedOrderStatus = order?.status?.rawValue;
   const submissionStatus = localOrder.submissionStatus;
 
-  let orderStatusStringKey = STRING_KEYS.SUBMITTED;
+  let orderStatusStringKey = STRING_KEYS.SUBMITTING;
   let orderStatusIcon = <Styled.LoadingSpinner />;
 
   switch (submissionStatus) {
