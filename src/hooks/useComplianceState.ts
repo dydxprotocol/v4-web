@@ -25,7 +25,10 @@ export const useComplianceState = () => {
     complianceStatus === ComplianceStatus.CLOSE_ONLY
   ) {
     complianceState = ComplianceStates.CLOSE_ONLY;
-  } else if (complianceStatus === ComplianceStatus.BLOCKED || (geo && isBlockedGeo(geo))) {
+  } else if (
+    complianceStatus === ComplianceStatus.BLOCKED ||
+    (geo && isBlockedGeo(geo) && isMainnet)
+  ) {
     complianceState = ComplianceStates.READ_ONLY;
   }
 

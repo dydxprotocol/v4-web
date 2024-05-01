@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { ComplianceAction, ComplianceStatus } from '@/constants/abacus';
+import { ComplianceAction, Nullable, ParsingError } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
 import { COUNTRIES_MAP } from '@/constants/geo';
 import { STRING_KEYS } from '@/constants/localization';
@@ -16,7 +16,9 @@ import { Button } from '@/components/Button';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 
-import { isBlockedGeo, signComplianceSignature } from '@/lib/compliance';
+import abacusStateManager from '@/lib/abacus';
+import { isBlockedGeo } from '@/lib/compliance';
+import { log } from '@/lib/telemetry';
 
 type ElementProps = {
   setIsOpen?: (open: boolean) => void;
@@ -71,41 +73,19 @@ export const GeoComplianceDialog = ({ setIsOpen }: ElementProps) => {
   const { isMobile } = useBreakpoints();
 
   const submit = async () => {
-    const endpoint = `${compositeClient?.indexerClient.config.restEndpoint}/v4/compliance/geoblock`;
-    if (
-      dydxAddress &&
-      complianceStatus &&
-      complianceStatus !== ComplianceStatus.UNKNOWN &&
-      hdKey?.publicKey
-    ) {
-      const message = 'Compliance verification message';
-      const action =
-        residence && isBlockedGeo(COUNTRIES_MAP[residence])
-          ? ComplianceAction.INVALID_SURVEY.name
-          : ComplianceAction.VALID_SURVEY.name;
-      const { signedMessage, timestamp } = await signComplianceSignature(
-        message,
-        action,
-        complianceStatus.name,
-        hdKey
-      );
-      await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          address: dydxAddress,
-          message: message,
-          currentStatus: complianceStatus?.name,
-          action,
-          signedMessage,
-          pubkey: Buffer.from(hdKey.publicKey).toString('base64'),
-          timestamp,
-        }),
-      });
-      setIsOpen?.(false);
-    }
+    const action =
+      residence && isBlockedGeo(COUNTRIES_MAP[residence])
+        ? ComplianceAction.INVALID_SURVEY
+        : ComplianceAction.VALID_SURVEY;
+
+    const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
+      if (success) {
+        setIsOpen?.(false);
+      } else {
+        log('useWithdrawalInfo/getWithdrawalCapacityByDenom', new Error(parsingError?.message));
+      }
+    };
+    abacusStateManager.triggerCompliance(action, callback);
   };
 
   return (
