@@ -114,7 +114,7 @@ enum ExchangeName {
   Okx = 'Okx',
 }
 
-interface PrometheusTimeSerie {
+interface PrometheusTimeSeries {
   // value of the time serie
   value : number;
 }
@@ -539,7 +539,7 @@ function makePrometheusRateQuery(prometheus: PrometheusDriver, query: string, st
       series.forEach((s) => {
         const values = s.values;
         let totalSuccessRate = 0;
-        values.forEach((v : PrometheusTimeSerie) => {
+        values.forEach((v : PrometheusTimeSeries) => {
           // take the average of all success-rates over the interval
           if (!isNaN(v.value)) { // we see NaN when there have been no successes from the provider
             totalSuccessRate += v.value;
