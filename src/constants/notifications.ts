@@ -13,6 +13,25 @@ export enum NotificationType {
   OrderStatus = 'OrderStatus',
 }
 
+export enum NotificationCategoryPreferences {
+  General = 'General', // release updates
+  Transfers = 'Transfers', // transfers
+  Trading = 'Trading', // order status, positions / liquidations, trading rewards
+  MustSee = 'MustSee', // cannot be hidden: compliance, api errors
+}
+
+export const NotificationTypeCategory: {
+  [key in NotificationType]: NotificationCategoryPreferences;
+} = {
+  [NotificationType.ReleaseUpdates]: NotificationCategoryPreferences.General,
+  [NotificationType.SquidTransfer]: NotificationCategoryPreferences.Transfers,
+  [NotificationType.AbacusGenerated]: NotificationCategoryPreferences.Trading,
+  [NotificationType.TriggerOrder]: NotificationCategoryPreferences.Trading,
+  [NotificationType.OrderStatus]: NotificationCategoryPreferences.Trading,
+  [NotificationType.ApiError]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.ComplianceAlert]: NotificationCategoryPreferences.MustSee,
+};
+
 export const SingleSessionNotificationTypes = [
   NotificationType.AbacusGenerated,
   NotificationType.ApiError,
@@ -53,7 +72,6 @@ export type NotificationTypeConfig<
       isNew?: boolean
     ) => void;
 
-    notificationPreferences: NotificationPreferences;
     lastUpdated: number;
   }) => void;
 
@@ -187,12 +205,6 @@ export type TriggerOrderNotification = {
   type: TriggerOrderNotificationTypes;
 };
 
-export enum OrderSubmissionStatuses {
-  Submitted,
-  Placed,
-  Filled,
-}
-
 export enum ReleaseUpdateNotificationIds {
   RevampedConditionalOrders = 'revamped-conditional-orders',
   IncentivesS4 = 'incentives-s4',
@@ -200,10 +212,10 @@ export enum ReleaseUpdateNotificationIds {
 }
 
 /**
- * @description Struct to store whether a NotificationType should be triggered
+ * @description Struct to store whether a NotificationType belonging to each NotificationCategoryType should be triggered
  */
 export type NotificationPreferences = {
-  [key in NotificationType]: boolean;
+  [key in NotificationCategoryPreferences]: boolean;
 } & { version: string };
 
 export const DEFAULT_TOAST_AUTO_CLOSE_MS = 5000;

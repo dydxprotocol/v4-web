@@ -1,6 +1,3 @@
-import { StringKey } from './localization';
-import { OrderSubmissionStatuses } from './notifications';
-import { TradeTypes } from './trade';
 import type { DydxAddress, EvmAddress } from './wallets';
 
 export enum OnboardingSteps {
@@ -54,12 +51,3 @@ export type Hdkey = {
 };
 
 export const AMOUNT_RESERVED_FOR_GAS_USDC = 0.1;
-
-export type LocalOrderData = {
-  marketId: string;
-  clientId: number;
-  orderId?: string;
-  orderType?: TradeTypes;
-  submissionStatus: OrderSubmissionStatuses;
-  errorStringKey?: StringKey;
-};

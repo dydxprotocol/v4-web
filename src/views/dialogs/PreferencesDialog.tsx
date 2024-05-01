@@ -3,8 +3,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { STRING_KEYS, StringKey } from '@/constants/localization';
-import { NotificationType } from '@/constants/notifications';
+import { STRING_KEYS } from '@/constants/localization';
+import { NotificationCategoryPreferences } from '@/constants/notifications';
 
 import { useEnvFeatures, useStringGetter } from '@/hooks';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -29,7 +29,7 @@ export const usePreferenceMenu = () => {
   const currentDisplayAllMarketDefault = useSelector(getDefaultToAllMarketsInPositionsOrdersFills);
   const [defaultToAllMarkets, setDefaultToAllMarkets] = useState(currentDisplayAllMarketDefault);
 
-  const toggleNotifPreference = (type: NotificationType) =>
+  const toggleNotifPreference = (type: NotificationCategoryPreferences) =>
     setEnabledNotifs((prev) => ({ ...prev, [type]: !prev[type] }));
 
   useEffect(() => {
@@ -40,17 +40,20 @@ export const usePreferenceMenu = () => {
     setDefaultToAllMarkets(currentDisplayAllMarketDefault);
   }, [currentDisplayAllMarketDefault]);
 
-  const getItem = (notificationType: NotificationType, labelStringKey: StringKey) => ({
-    value: notificationType,
+  const getItem = (
+    notificationCategory: NotificationCategoryPreferences,
+    labelStringKey: string
+  ) => ({
+    value: notificationCategory,
     label: stringGetter({ key: labelStringKey }),
     slotAfter: (
       <Switch
-        name={notificationType}
-        checked={enabledNotifs[notificationType]}
+        name={notificationCategory}
+        checked={enabledNotifs[notificationCategory]}
         onCheckedChange={(enabled: boolean) => null}
       />
     ),
-    onSelect: () => toggleNotifPreference(notificationType),
+    onSelect: () => toggleNotifPreference(notificationCategory),
   });
 
   const notificationSection = useMemo(
@@ -59,28 +62,20 @@ export const usePreferenceMenu = () => {
       groupLabel: stringGetter({ key: STRING_KEYS.NOTIFICATIONS }),
       items: [
         {
-          value: NotificationType.AbacusGenerated,
-          labelStringKey: STRING_KEYS.TRADING,
+          value: NotificationCategoryPreferences.General,
+          labelStringKey: STRING_KEYS.GENERAL,
         },
         {
-          value: NotificationType.OrderStatus,
-          labelStringKey: STRING_KEYS.ORDER_STATUS,
-        },
-        {
-          value: NotificationType.SquidTransfer,
+          value: NotificationCategoryPreferences.Transfers,
           labelStringKey: STRING_KEYS.TRANSFERS,
         },
-        isSlTpEnabled && {
-          value: NotificationType.TriggerOrder,
-          labelStringKey: STRING_KEYS.TAKE_PROFIT_STOP_LOSS,
-        },
         {
-          value: NotificationType.ReleaseUpdates,
-          labelStringKey: STRING_KEYS.RELEASE_UPDATES,
+          value: NotificationCategoryPreferences.Trading,
+          labelStringKey: STRING_KEYS.TRADING,
         },
       ]
         .filter(isTruthy)
-        .map(({ value, labelStringKey }) => getItem(value, labelStringKey as StringKey)),
+        .map(({ value, labelStringKey }) => getItem(value, labelStringKey)),
     }),
     [stringGetter, enabledNotifs]
   );

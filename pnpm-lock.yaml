@@ -36,13 +36,8 @@ dependencies:
     specifier: ^1.1.7
     version: 1.1.7
   '@dydxprotocol/v4-localization':
-<<<<<<< HEAD
     specifier: ^1.1.81
     version: 1.1.81
-=======
-    specifier: ^1.1.79
-    version: 1.1.79
->>>>>>> adcaa93 (submitted -> submitting for new orders)
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -1592,13 +1587,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-<<<<<<< HEAD
   /@dydxprotocol/v4-abacus@1.6.55:
     resolution: {integrity: sha512-tiIK4uEnOaG+Ay4Q8Pen1rj3bm2Okz51bkFlY8HG6ZDng8OYvZbdQNMuiz2l7F1tpe8oKRG6lTxHe44kRNSrWg==}
-=======
-  /@dydxprotocol/v4-abacus@1.6.54:
-    resolution: {integrity: sha512-lmAaUlDq1Swx8T7bNWOpF3WRqhrEDEulrE1BDcab9b3wCA3hT9buFBU7e73JryBqDRVCyuqDIvIF0VDqZsCAKQ==}
->>>>>>> adcaa93 (submitted -> submitting for new orders)
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
