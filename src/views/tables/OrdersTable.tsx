@@ -46,12 +46,13 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 import { MustBigNumber } from '@/lib/numbers';
 import {
   getHydratedTradingData,
-  getStatusIconInfo,
+  getOrderStatusInfo,
   isMarketOrderType,
   isOrderStatusClearable,
 } from '@/lib/orders';
 import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
 
+import { OrderStatusIcon } from '../OrderStatusIcon';
 import { OrderActionsCell } from './OrdersTable/OrderActionsCell';
 
 export enum OrdersTableColumnKey {
@@ -106,25 +107,18 @@ const getOrdersTableColumnDef = ({
         columnKey: 'status',
         getCellValue: (row) => row.status.name,
         label: stringGetter({ key: STRING_KEYS.STATUS }),
-        renderCell: ({ status, totalFilled, resources }) => {
-          const { statusIcon, statusIconColor, statusStringKey } = getStatusIconInfo({
-            status,
-            totalFilled,
-          });
-
+        renderCell: ({ status, resources }) => {
           return (
             <TableCell>
               <Styled.WithTooltip
                 tooltipString={
-                  statusStringKey
-                    ? stringGetter({ key: statusStringKey })
-                    : resources.statusStringKey
+                  resources.statusStringKey
                     ? stringGetter({ key: resources.statusStringKey })
                     : undefined
                 }
                 side="right"
               >
-                <Styled.StatusIcon iconName={statusIcon} color={statusIconColor} />
+                <OrderStatusIcon status={status.rawValue} />
               </Styled.WithTooltip>
               {resources.typeStringKey && stringGetter({ key: resources.typeStringKey })}
             </TableCell>
@@ -227,10 +221,7 @@ const getOrdersTableColumnDef = ({
           key: STRING_KEYS.FILL,
         })}`,
         renderCell: ({ asset, createdAtMilliseconds, size, status, totalFilled, resources }) => {
-          const { statusIconColor, statusStringKey } = getStatusIconInfo({
-            status,
-            totalFilled,
-          });
+          const { statusIconColor } = getOrderStatusInfo({ status: status.rawValue });
 
           return (
             <TableCell
@@ -250,9 +241,7 @@ const getOrdersTableColumnDef = ({
               }
             >
               <span>
-                {statusStringKey
-                  ? stringGetter({ key: statusStringKey })
-                  : resources.statusStringKey && stringGetter({ key: resources.statusStringKey })}
+                {resources.statusStringKey && stringGetter({ key: resources.statusStringKey })}
               </span>
               <Styled.InlineRow>
                 <Output
@@ -455,10 +444,6 @@ Styled.StatusDot = styled.div<{ color: string }>`
   border: 2px solid var(--tableRow-currentBackgroundColor);
 
   background-color: ${({ color }) => color};
-`;
-
-Styled.StatusIcon = styled(Icon)<{ color: string }>`
-  color: ${({ color }) => color};
 `;
 
 Styled.WithTooltip = styled(WithTooltip)`
