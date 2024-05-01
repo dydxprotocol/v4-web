@@ -7,8 +7,7 @@ import { ButtonAction } from '@/constants/buttons';
 import { COUNTRIES_MAP } from '@/constants/geo';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useAccounts, useBreakpoints, useDydxClient, useStringGetter } from '@/hooks';
-import { useComplianceState } from '@/hooks/useComplianceState';
+import { useBreakpoints, useStringGetter } from '@/hooks';
 
 import { formMixins } from '@/styles/formMixins';
 
@@ -62,9 +61,6 @@ const CountrySelector = ({
 
 export const GeoComplianceDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const { compositeClient } = useDydxClient();
-  const { complianceStatus } = useComplianceState();
-  const { dydxAddress, hdKey } = useAccounts();
 
   const [residence, setResidence] = useState('');
   const [tradingLoaction, settradingLoaction] = useState('');

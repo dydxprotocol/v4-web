@@ -25,9 +25,11 @@ import { Tag } from '@/components/Tag';
 
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
+import { formatZeroNumbers } from '@/lib/formatZeroNumbers';
 import { MustBigNumber, isNumber, type BigNumberish } from '@/lib/numbers';
 import { getStringsForDateTimeDiff, getTimestamp } from '@/lib/timeUtils';
 
+import { CompressedNumberOutput } from './CompressedNumberOutput';
 import { LoadingOutput } from './Loading/LoadingOutput';
 
 export enum OutputType {
@@ -62,6 +64,7 @@ type ElementProps = {
   slotRight?: React.ReactNode;
   useGrouping?: boolean;
   roundingMode?: BigNumber.RoundingMode;
+  compressZeros?: boolean;
   relativeTimeFormatOptions?: {
     format: 'long' | 'short' | 'narrow' | 'singleCharacter';
     resolution?: number;
@@ -90,6 +93,7 @@ export const Output = ({
   showSign = ShowSign.Negative,
   slotRight,
   useGrouping = true,
+  compressZeros = false,
   roundingMode = BigNumber.ROUND_HALF_UP,
   relativeTimeFormatOptions = {
     format: 'singleCharacter',
@@ -256,62 +260,103 @@ export const Output = ({
                   throw new Error('value must be a number for compact number output');
                 }
 
-                return Intl.NumberFormat(locale, {
-                  style: 'decimal',
-                  notation: 'compact',
-                  maximumSignificantDigits: 3,
-                })
-                  .format(Math.abs(value))
-                  .toLowerCase();
+                return (
+                  <CompressedNumberOutput
+                    value={Intl.NumberFormat(locale, {
+                      style: 'decimal',
+                      notation: 'compact',
+                      maximumSignificantDigits: 3,
+                    })
+                      .format(Math.abs(value))
+                      .toLowerCase()}
+                    compressZeros={compressZeros}
+                  />
+                );
               },
-              [OutputType.Number]: () =>
-                valueBN.toFormat(fractionDigits ?? 0, roundingMode, {
-                  ...format,
-                }),
-              [OutputType.Fiat]: () =>
-                valueBN.toFormat(fractionDigits ?? USD_DECIMALS, roundingMode, {
-                  ...format,
-                  prefix: '$',
-                }),
-              [OutputType.SmallFiat]: () =>
-                valueBN.toFormat(fractionDigits ?? SMALL_USD_DECIMALS, roundingMode, {
-                  ...format,
-                  prefix: '$',
-                }),
+              [OutputType.Number]: () => (
+                <CompressedNumberOutput
+                  value={valueBN.toFormat(fractionDigits ?? 0, roundingMode, {
+                    ...format,
+                  })}
+                  compressZeros={compressZeros}
+                />
+              ),
+              [OutputType.Fiat]: () => (
+                <CompressedNumberOutput
+                  value={valueBN.toFormat(fractionDigits ?? USD_DECIMALS, roundingMode, {
+                    ...format,
+                    prefix: '$',
+                  })}
+                  compressZeros={compressZeros}
+                />
+              ),
+              [OutputType.SmallFiat]: () => (
+                <CompressedNumberOutput
+                  value={valueBN.toFormat(fractionDigits ?? SMALL_USD_DECIMALS, roundingMode, {
+                    ...format,
+                    prefix: '$',
+                  })}
+                  compressZeros={compressZeros}
+                />
+              ),
               [OutputType.CompactFiat]: () => {
                 if (!isNumber(value)) {
                   throw new Error('value must be a number for compact fiat output');
                 }
-                return Intl.NumberFormat(locale, {
-                  style: 'currency',
-                  currency: 'USD',
-                  notation: 'compact',
-                  maximumSignificantDigits: 3,
-                })
-                  .format(Math.abs(value))
-                  .toLowerCase();
+
+                return (
+                  <CompressedNumberOutput
+                    value={Intl.NumberFormat(locale, {
+                      style: 'currency',
+                      currency: 'USD',
+                      notation: 'compact',
+                      maximumSignificantDigits: 3,
+                    })
+                      .format(Math.abs(value))
+                      .toLowerCase()}
+                    compressZeros={compressZeros}
+                  />
+                );
               },
-              [OutputType.Asset]: () =>
-                valueBN.toFormat(fractionDigits ?? TOKEN_DECIMALS, roundingMode, {
-                  ...format,
-                }),
-              [OutputType.Percent]: () =>
-                valueBN.times(100).toFormat(fractionDigits ?? PERCENT_DECIMALS, roundingMode, {
-                  ...format,
-                  suffix: '%',
-                }),
-              [OutputType.SmallPercent]: () =>
-                valueBN
-                  .times(100)
-                  .toFormat(fractionDigits ?? SMALL_PERCENT_DECIMALS, roundingMode, {
+              [OutputType.Asset]: () => (
+                <CompressedNumberOutput
+                  value={valueBN.toFormat(fractionDigits ?? TOKEN_DECIMALS, roundingMode, {
                     ...format,
-                    suffix: '%',
-                  }),
-              [OutputType.Multiple]: () =>
-                valueBN.toFormat(fractionDigits ?? LEVERAGE_DECIMALS, roundingMode, {
-                  ...format,
-                  suffix: '×',
-                }),
+                  })}
+                  compressZeros={compressZeros}
+                />
+              ),
+              [OutputType.Percent]: () => (
+                <CompressedNumberOutput
+                  value={valueBN
+                    .times(100)
+                    .toFormat(fractionDigits ?? PERCENT_DECIMALS, roundingMode, {
+                      ...format,
+                      suffix: '%',
+                    })}
+                  compressZeros={compressZeros}
+                />
+              ),
+              [OutputType.SmallPercent]: () => (
+                <CompressedNumberOutput
+                  value={valueBN
+                    .times(100)
+                    .toFormat(fractionDigits ?? SMALL_PERCENT_DECIMALS, roundingMode, {
+                      ...format,
+                      suffix: '%',
+                    })}
+                  compressZeros={compressZeros}
+                />
+              ),
+              [OutputType.Multiple]: () => (
+                <CompressedNumberOutput
+                  value={valueBN.toFormat(fractionDigits ?? LEVERAGE_DECIMALS, roundingMode, {
+                    ...format,
+                    suffix: '×',
+                  })}
+                  compressZeros={compressZeros}
+                />
+              ),
             }[type]()}
           {slotRight}
           {tag && <Styled.Tag>{tag}</Styled.Tag>}

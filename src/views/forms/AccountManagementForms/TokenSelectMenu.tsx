@@ -40,6 +40,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
 
   const tokens =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() || [];
+
   const tokenItems = Object.values(tokens)
     .map((token) => ({
       value: token.type,
@@ -68,7 +69,8 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
     .filter(
       (token) =>
         type === TransferType.deposit || !!cctpTokensByAddress[token.value] || !CCTPWithdrawalOnly
-    );
+    )
+    .sort((token) => (!!cctpTokensByAddress[token.value] ? -1 : 1));
 
   return (
     <SearchSelectMenu

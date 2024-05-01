@@ -43,6 +43,7 @@ import { Tag } from './Tag';
 
 export { ActionsTableCell } from './Table/ActionsTableCell';
 export { MarketTableCell } from './Table/MarketTableCell';
+export { AssetTableCell } from './Table/AssetTableCell';
 export { TableCell } from './Table/TableCell';
 export { TableColumnHeader } from './Table/TableColumnHeader';
 

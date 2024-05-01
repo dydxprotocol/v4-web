@@ -275,6 +275,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 icon: assetIcon,
                 title: title,
                 body: body,
+                toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
                 renderCustomBody: ({ isToast, notification }) => (
                   <TriggerOrderNotification
                     status={status}

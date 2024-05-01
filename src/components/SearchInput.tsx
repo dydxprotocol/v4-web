@@ -20,7 +20,7 @@ export const SearchInput = ({ placeholder, onTextChange }: SearchInputProps) => 
 
   return (
     <Styled.Search>
-      <Icon iconName={IconName.Search} />
+      <Styled.Icon iconName={IconName.Search} />
       <Styled.Input
         autoFocus
         ref={inputRef}
@@ -48,13 +48,14 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Search = styled.div`
   ${layoutMixins.row}
-  width: 100%;
+  width: auto;
   height: 2rem;
-  background-color: var(--color-layer-1);
+  background-color: var(--color-layer-3);
+  color: ${({ theme }) => theme.textTertiary};
   border-radius: 2.5rem;
   border: solid var(--border-width) var(--color-layer-6);
-  padding: 0 0.75rem;
-  gap: 0.5rem;
+  padding: 0 1rem;
+  gap: 0.375rem;
   justify-content: end;
 `;
 
@@ -67,6 +68,11 @@ Styled.IconButton = styled(IconButton)`
   --button-icon-size: 0.5rem;
   --button-border: none;
   --button-backgroundColor: transparent;
+  color: ${({ theme }) => theme.textSecondary};
   width: 1.5rem;
   height: 1.5rem;
+`;
+
+Styled.Icon = styled(Icon)`
+  color: ${({ theme }) => theme.textSecondary};
 `;
