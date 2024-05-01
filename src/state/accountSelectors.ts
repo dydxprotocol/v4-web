@@ -275,8 +275,6 @@ export const getLatestOrderStatus = createSelector(
 export const getUncommittedOrderClientIds = (state: RootState) =>
   state.account.uncommittedOrderClientIds;
 
-export const getSubmittedOrders = (state: RootState) => state.account.submittedOrders;
-
 /**
  * @returns a list of locally submitted orders for the current FE session
  */
