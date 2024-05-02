@@ -30,14 +30,16 @@ import {
   type QueryTypes,
   type TransactionTypes,
 } from '@/constants/abacus';
+import { Hdkey } from '@/constants/account';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { DydxChainId, isTestnet } from '@/constants/networks';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 
 import { RootStore } from '@/state/_store';
-import { addUncommittedOrderClientId, removeUncommittedOrderClientId } from '@/state/account';
+import { submittedOrderTimeout } from '@/state/account';
 import { setInitializationError } from '@/state/app';
 
+import { signComplianceSignature } from '../compliance';
 import { StatefulOrderError } from '../errors';
 import { bytesToBigInt } from '../numbers';
 import { log } from '../telemetry';
@@ -51,6 +53,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   private compositeClient: CompositeClient | undefined;
   private nobleClient: NobleClient | undefined;
   private store: RootStore | undefined;
+  private hdkey: Hdkey | undefined;
   private localWallet: LocalWallet | undefined;
   private nobleWallet: LocalWallet | undefined;
 
@@ -65,6 +68,10 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
   setStore(store: RootStore): void {
     this.store = store;
+  }
+
+  setHdkey(hdkey: Hdkey) {
+    this.hdkey = hdkey;
   }
 
   setLocalWallet(localWallet: LocalWallet) {
@@ -204,11 +211,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         triggerPrice,
       } = params || {};
 
-      // Observe uncommitted order
-      this.store?.dispatch(addUncommittedOrderClientId(clientId));
-
       setTimeout(() => {
-        this.store?.dispatch(removeUncommittedOrderClientId(clientId));
+        this.store?.dispatch(submittedOrderTimeout(clientId));
       }, UNCOMMITTED_ORDER_TIMEOUT_MS);
 
       // Place order
@@ -495,6 +499,37 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     }
   }
 
+  async signCompliancePayload(params: {
+    message: string;
+    action: string;
+    status: string;
+  }): Promise<string> {
+    if (!this.hdkey?.privateKey || !this.hdkey?.publicKey) {
+      throw new Error('Missing hdkey');
+    }
+
+    try {
+      const { signedMessage, timestamp } = await signComplianceSignature(
+        params.message,
+        params.action,
+        params.status,
+        this.hdkey
+      );
+
+      return JSON.stringify({
+        signedMessage,
+        publicKey: Buffer.from(this.hdkey.publicKey).toString('base64'),
+        timestamp,
+      });
+    } catch (error) {
+      log('DydxChainTransactions/signComplianceMessage', error);
+
+      return JSON.stringify({
+        error,
+      });
+    }
+  }
+
   async transaction(
     type: TransactionTypes,
     paramsInJson: Abacus.Nullable<string>,
@@ -536,6 +571,11 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         }
         case TransactionType.CctpWithdraw: {
           const result = await this.cctpWithdraw(params);
+          callback(result);
+          break;
+        }
+        case TransactionType.SignCompliancePayload: {
+          const result = await this.signCompliancePayload(params);
           callback(result);
           break;
         }

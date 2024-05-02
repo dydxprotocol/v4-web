@@ -11,7 +11,6 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Details } from '@/components/Details';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
-import { OrderStatusIcon } from '@/views/OrderStatusIcon';
 
 export const FillDetails = ({
   orderSide,
@@ -66,16 +65,6 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.Label = styled.span`
   ${layoutMixins.row}
   gap: 0.5ch;
-`;
-
-Styled.OrderStatus = styled(Styled.Label)`
-  color: var(--color-text-0);
-  font: var(--font-small-book);
-`;
-
-Styled.OrderStatusIcon = styled(OrderStatusIcon)`
-  width: 0.9375rem;
-  height: 0.9375rem;
 `;
 
 Styled.Details = styled(Details)`

@@ -21,10 +21,17 @@ import type {
   SubAccountHistoricalPNLs,
 } from '@/constants/abacus';
 import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
+import { STRING_KEYS } from '@/constants/localization';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
+import { TradeTypes } from '@/constants/trade';
 import { DydxAddress } from '@/constants/wallets';
 
-import { removeUncommittedOrderClientId, setHistoricalPnl, setSubaccount } from '@/state/account';
+import {
+  setHistoricalPnl,
+  setSubaccount,
+  submittedOrder,
+  submittedOrderFailed,
+} from '@/state/account';
 import { getBalances } from '@/state/accountSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -343,7 +350,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
   // ------ Trading Methods ------ //
   const placeOrder = useCallback(
-    async ({
+    ({
       isClosePosition = false,
       onError,
       onSuccess,
@@ -363,7 +370,12 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
           onError?.({ errorStringKey: parsingError?.stringKey });
 
           if (data?.clientId !== undefined) {
-            dispatch(removeUncommittedOrderClientId(data.clientId));
+            dispatch(
+              submittedOrderFailed({
+                clientId: data.clientId,
+                errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
+              })
+            );
           }
         }
       };
@@ -376,19 +388,29 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         placeOrderParams = abacusStateManager.placeOrder(callback);
       }
 
+      if (placeOrderParams?.clientId) {
+        dispatch(
+          submittedOrder({
+            marketId: placeOrderParams.marketId,
+            clientId: placeOrderParams.clientId,
+            orderType: placeOrderParams.type as TradeTypes,
+          })
+        );
+      }
+
       return placeOrderParams;
     },
     [subaccountClient]
   );
 
   const closePosition = useCallback(
-    async ({
+    ({
       onError,
       onSuccess,
     }: {
       onError: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
       onSuccess?: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => void;
-    }) => await placeOrder({ isClosePosition: true, onError, onSuccess }),
+    }) => placeOrder({ isClosePosition: true, onError, onSuccess }),
     [placeOrder]
   );
 

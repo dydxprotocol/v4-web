@@ -34,11 +34,16 @@ import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
+import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 import { TriggerOrderNotification } from '@/views/notifications/TriggerOrderNotification';
 
-import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
+import {
+  getSubaccountFills,
+  getSubaccountOrders,
+  getSubmittedOrders,
+} from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
@@ -70,6 +75,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const abacusNotifications = useSelector(getAbacusNotifications, isEqual);
+      const orders = useSelector(getSubaccountOrders, shallowEqual) || [];
+      const ordersById = groupBy(orders, 'id');
+      const localOrdersData = useSelector(getSubmittedOrders, shallowEqual);
 
       useEffect(() => {
         for (const abacusNotif of abacusNotifications) {
@@ -84,6 +92,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
           switch (abacusNotificationType) {
             case 'order': {
+              const order = ordersById[id]?.[0];
+              const clientId: number | undefined = order?.clientId ?? undefined;
+              const localOrderExists =
+                clientId && localOrdersData.some((order) => order.clientId === clientId);
+
+              if (localOrderExists) return; // already handled by OrderStatusNotification
+
               trigger(
                 abacusNotif.id,
                 {
@@ -469,10 +484,58 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const { complianceStatus } = useComplianceState();
 
       return () => {
-        if (complianceStatus === ComplianceStatus.FIRST_STRIKE) {
+        if (complianceStatus === ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY) {
           dispatch(
             openDialog({
               type: DialogTypes.GeoCompliance,
+            })
+          );
+        }
+      };
+    },
+  },
+  {
+    type: NotificationType.OrderStatus,
+    useTrigger: ({ trigger }) => {
+      const localOrdersData = useSelector(getSubmittedOrders, shallowEqual);
+      const stringGetter = useStringGetter();
+
+      useEffect(() => {
+        for (const localOrder of localOrdersData) {
+          const key = localOrder.clientId.toString();
+          trigger(
+            key,
+            {
+              icon: null,
+              title: stringGetter({ key: STRING_KEYS.ORDER_STATUS }),
+              toastSensitivity: 'background',
+              groupKey: key, // do not collapse
+              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+              renderCustomBody: ({ isToast, notification }) => (
+                <OrderStatusNotification
+                  isToast={isToast}
+                  localOrder={localOrder}
+                  notification={notification}
+                />
+              ),
+            },
+            [localOrder.submissionStatus],
+            true
+          );
+        }
+      }, [localOrdersData]);
+    },
+    useNotificationAction: () => {
+      const dispatch = useDispatch();
+      const orders = useSelector(getSubaccountOrders, shallowEqual) || [];
+
+      return (orderClientId: string) => {
+        const order = orders.find((order) => order.clientId?.toString() === orderClientId);
+        if (order) {
+          dispatch(
+            openDialog({
+              type: DialogTypes.OrderDetails,
+              dialogProps: { orderId: order.id },
             })
           );
         }

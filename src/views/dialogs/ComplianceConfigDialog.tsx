@@ -22,6 +22,7 @@ const complianceStatusOptions = [
   { status: ComplianceStatus.BLOCKED, label: 'Blocked' },
   { status: ComplianceStatus.CLOSE_ONLY, label: 'Close Only' },
   { status: ComplianceStatus.FIRST_STRIKE, label: 'First Strike' },
+  { status: ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY, label: 'First Strike Close Only' },
 ];
 
 export const usePreferenceMenu = () => {
