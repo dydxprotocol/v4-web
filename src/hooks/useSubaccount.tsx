@@ -464,12 +464,35 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
             placeOrderPayloads.toString() != '[]' &&
             placeOrderPayloads.toArray().forEach((payload: HumanReadablePlaceOrderPayload) => {
               if (payload.clientId !== undefined) {
-                dispatch(removeUncommittedOrderClientId(payload.clientId));
+                dispatch(
+                  submittedOrderFailed({
+                    clientId: payload.clientId,
+                    errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
+                  })
+                );
               }
             });
         }
       };
-      return abacusStateManager.triggerOrders(callback);
+
+      const triggerOrderParams = abacusStateManager.triggerOrders(callback);
+      const { placeOrderPayloads } = triggerOrderParams || {};
+
+      placeOrderPayloads &&
+        placeOrderPayloads.toString() != '[]' &&
+        placeOrderPayloads.toArray().forEach((payload: HumanReadablePlaceOrderPayload) => {
+          if (payload.clientId) {
+            dispatch(
+              submittedOrder({
+                marketId: payload.marketId,
+                clientId: payload.clientId,
+                orderType: payload.type as TradeTypes,
+              })
+            );
+          }
+        });
+
+      return triggerOrderParams;
     },
     [subaccountClient]
   );
