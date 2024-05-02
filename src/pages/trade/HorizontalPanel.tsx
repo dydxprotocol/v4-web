@@ -250,7 +250,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
 
   const slotBottom = {
     [InfoSection.Position]: testFlags.isolatedMargin && (
-      <UnopenedIsolatedPositions onViewOrders={onViewOrders} />
+      <Styled.UnopenedIsolatedPositions onViewOrders={onViewOrders} />
     ),
     [InfoSection.Orders]: null,
     [InfoSection.Fills]: null,
@@ -293,7 +293,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
         }
         tabItems={tabItems}
       />
-      {slotBottom}
+      {isOpen && slotBottom}
     </>
   );
 };
@@ -311,5 +311,8 @@ const Styled = {
   ` as typeof CollapsibleTabs<InfoSection>,
   LoadingSpinner: styled(LoadingSpinner)`
     --spinner-width: 1rem;
+  `,
+  UnopenedIsolatedPositions: styled(UnopenedIsolatedPositions)`
+    margin-top: auto;
   `,
 };

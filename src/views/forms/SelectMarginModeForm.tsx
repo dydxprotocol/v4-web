@@ -1,8 +1,7 @@
-import { useState, type FormEvent } from 'react';
+import { shallowEqual, useSelector } from 'react-redux';
+import styled from 'styled-components';
 
-import styled, { AnyStyledComponent } from 'styled-components';
-
-import { ButtonAction, ButtonType } from '@/constants/buttons';
+import { AbacusMarginMode, MARGIN_MODE_STRINGS, TradeInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks';
@@ -12,38 +11,37 @@ import { formMixins } from '@/styles/formMixins';
 import { Button } from '@/components/Button';
 import { RadioButtonCards } from '@/components/RadioButtonCards';
 
+import { getInputTradeMarginMode } from '@/state/inputsSelectors';
+
+import abacusStateManager from '@/lib/abacus';
+
 export const SelectMarginModeForm = ({
   onChangeMarginMode,
 }: {
   onChangeMarginMode?: () => void;
 }) => {
-  const [marginMode, setMarginMode] = useState<string>('cross');
+  const marginMode = useSelector(getInputTradeMarginMode, shallowEqual);
+  const marginModeValue = marginMode?.rawValue;
 
   const stringGetter = useStringGetter();
-  const onSubmit = () => {
+
+  const setMarginMode = (value: string) => {
+    abacusStateManager.setTradeValue({
+      value,
+      field: TradeInputField.marginMode,
+    });
     onChangeMarginMode?.();
   };
 
-  const getLabel = (marginMode: string) =>
-    ({
-      cross: stringGetter({ key: STRING_KEYS.CROSS_MARGIN }),
-      isolated: stringGetter({ key: STRING_KEYS.ISOLATED_MARGIN }),
-    }[marginMode]);
-
   return (
-    <Styled.Form
-      onSubmit={(e: FormEvent) => {
-        e.preventDefault();
-        onSubmit();
-      }}
-    >
+    <Styled.Form>
       <Styled.RadioButtonCards
-        value={marginMode}
+        value={marginModeValue}
         onValueChange={setMarginMode}
         radioItems={[
           {
-            value: 'cross',
-            label: getLabel('cross'),
+            value: AbacusMarginMode.cross.rawValue,
+            label: stringGetter({ key: MARGIN_MODE_STRINGS[AbacusMarginMode.cross.rawValue] }),
             body: (
               <Styled.TertiarySpan>
                 {stringGetter({ key: STRING_KEYS.CROSS_MARGIN_DESCRIPTION })}
@@ -51,8 +49,8 @@ export const SelectMarginModeForm = ({
             ),
           },
           {
-            value: 'isolated',
-            label: getLabel('isolated'),
+            value: AbacusMarginMode.isolated.rawValue,
+            label: stringGetter({ key: MARGIN_MODE_STRINGS[AbacusMarginMode.isolated.rawValue] }),
             body: (
               <Styled.TertiarySpan>
                 {stringGetter({ key: STRING_KEYS.ISOLATED_MARGIN_DESCRIPTION })}
@@ -61,30 +59,23 @@ export const SelectMarginModeForm = ({
           },
         ]}
       />
-
-      <Styled.Button action={ButtonAction.Primary} type={ButtonType.Submit}>
-        {stringGetter({ key: STRING_KEYS.SELECT, params: { SELECTION: getLabel(marginMode) } })}
-      </Styled.Button>
     </Styled.Form>
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
+const Styled = {
+  Form: styled.form`
+    ${formMixins.transfersForm}
+  `,
+  RadioButtonCards: styled(RadioButtonCards)`
+    padding: 0;
 
-Styled.Form = styled.form`
-  ${formMixins.transfersForm}
-`;
-
-Styled.RadioButtonCards = styled(RadioButtonCards)`
-  padding: 0;
-
-  --radio-button-cards-item-checked-backgroundColor: var(--color-layer-1);
-`;
-
-Styled.TertiarySpan = styled.span`
-  color: var(--color-text-0);
-`;
-
-Styled.Button = styled(Button)`
-  width: 100%;
-`;
+    --radio-button-cards-item-checked-backgroundColor: var(--color-layer-1);
+  `,
+  TertiarySpan: styled.span`
+    color: var(--color-text-0);
+  `,
+  Button: styled(Button)`
+    width: 100%;
+  `,
+};

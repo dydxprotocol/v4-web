@@ -9,13 +9,17 @@ import { Icon, IconName } from '@/components/Icon';
 import { PotentialPositionCard } from '@/components/PotentialPositionCard';
 
 type UnopenedIsolatedPositionsProps = {
+  className?: string;
   onViewOrders: (marketId: string) => void;
 };
 
-export const UnopenedIsolatedPositions = ({ onViewOrders }: UnopenedIsolatedPositionsProps) => {
+export const UnopenedIsolatedPositions = ({
+  className,
+  onViewOrders,
+}: UnopenedIsolatedPositionsProps) => {
   const [isVisible, setIsVisible] = useState(false);
   return (
-    <Styled.UnopenedIsolatedPositions>
+    <Styled.UnopenedIsolatedPositions className={className}>
       <Styled.Button isOpen={isVisible} onClick={() => setIsVisible(!isVisible)}>
         Unopened Isolated Positions
         <Icon iconName={IconName.Caret} />

@@ -24,7 +24,7 @@ export const AdjustTargetLeverageDialog = ({ setIsOpen }: ElementProps) => {
       title={stringGetter({ key: STRING_KEYS.ADJUST_TARGET_LEVERAGE })}
     >
       <Styled.Content>
-        <AdjustTargetLeverageForm />
+        <AdjustTargetLeverageForm onSetTargetLeverage={() => setIsOpen?.(false)} />
       </Styled.Content>
     </Dialog>
   );

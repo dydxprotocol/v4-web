@@ -8,6 +8,7 @@ import styled, { AnyStyledComponent, css } from 'styled-components';
 import {
   ComplianceStatus,
   ErrorType,
+  MARGIN_MODE_STRINGS,
   TradeInputErrorAction,
   TradeInputField,
   ValidationError,
@@ -44,6 +45,7 @@ import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { InputType } from '@/components/Input';
+import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
@@ -134,7 +136,7 @@ export const TradeForm = ({
 
   const currentTradeData = useSelector(getInputTradeData, shallowEqual);
 
-  const { side, type } = currentTradeData || {};
+  const { side, type, marginMode, targetLeverage } = currentTradeData || {};
 
   const selectedTradeType = getSelectedTradeType(type);
   const selectedOrderSide = getSelectedOrderSide(side);
@@ -359,7 +361,9 @@ export const TradeForm = ({
                         }
                       }}
                     >
-                      {stringGetter({ key: STRING_KEYS.CROSS })}
+                      {stringGetter({
+                        key: MARGIN_MODE_STRINGS[marginMode?.rawValue ?? ''],
+                      })}
                     </Button>
 
                     <Button
@@ -367,7 +371,7 @@ export const TradeForm = ({
                         dispatch(openDialog({ type: DialogTypes.AdjustTargetLeverage }));
                       }}
                     >
-                      5x
+                      <Output type={OutputType.Multiple} value={targetLeverage} />
                     </Button>
                   </Styled.MarginAndLeverageButtons>
                 )}

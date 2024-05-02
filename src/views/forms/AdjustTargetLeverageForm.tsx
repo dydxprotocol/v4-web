@@ -4,7 +4,8 @@ import { NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { ButtonAction, ButtonShape } from '@/constants/buttons';
+import { TradeInputField } from '@/constants/abacus';
+import { ButtonAction, ButtonShape, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { LEVERAGE_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 
@@ -23,25 +24,37 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithLabel } from '@/components/WithLabel';
 
 import { getSubaccount } from '@/state/accountSelectors';
+import { getInputTradeTargetLeverage } from '@/state/inputsSelectors';
 
+import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 
-export const AdjustTargetLeverageForm = () => {
+export const AdjustTargetLeverageForm = ({
+  onSetTargetLeverage,
+}: {
+  onSetTargetLeverage: (value: string) => void;
+}) => {
   const stringGetter = useStringGetter();
   const { buyingPower } = useSelector(getSubaccount, shallowEqual) ?? {};
 
   /**
    * @todo: Replace with Abacus functionality
    */
-  const [leverage, setLeverage] = useState('');
+  const taregetLeverage = useSelector(getInputTradeTargetLeverage);
+  const [leverage, setLeverage] = useState(taregetLeverage?.toString() ?? '');
   const leverageBN = MustBigNumber(leverage);
-  const onSubmit = () => {};
 
   return (
     <Styled.Form
       onSubmit={(e: FormEvent) => {
         e.preventDefault();
-        onSubmit();
+
+        abacusStateManager.setTradeValue({
+          value: leverage,
+          field: TradeInputField.targetLeverage,
+        });
+
+        onSetTargetLeverage?.(leverage);
       }}
     >
       <Styled.InputContainer>
@@ -108,7 +121,7 @@ export const AdjustTargetLeverageForm = () => {
           },
         ]}
       >
-        <Button action={ButtonAction.Primary}>
+        <Button type={ButtonType.Submit} action={ButtonAction.Primary}>
           {stringGetter({ key: STRING_KEYS.CONFIRM_LEVERAGE })}
         </Button>
       </WithDetailsReceipt>
