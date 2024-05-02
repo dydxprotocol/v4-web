@@ -83,7 +83,7 @@ export const usePreferenceMenu = () => {
         },
         {
           value: NotificationType.ReleaseUpdates,
-          label: 'Release Updates',
+          label: stringGetter({ key: STRING_KEYS.RELEASE_UPDATES }),
           slotAfter: (
             <Switch
               name={NotificationType.ReleaseUpdates}

@@ -305,11 +305,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const { chainTokenLabel } = useTokenConfigs();
       const stringGetter = useStringGetter();
-      const expirationDate = new Date('2024-05-09T23:59:59');
+
+      const incentivesExpirationDate = new Date('2024-05-09T23:59:59');
+      const conditionalOrdersExpirationDate = new Date('2024-06-01T23:59:59');
+
       const currentDate = new Date();
 
       useEffect(() => {
-        if (currentDate <= expirationDate) {
+        if (currentDate <= incentivesExpirationDate) {
           trigger(
             ReleaseUpdateNotificationIds.IncentivesS4,
             {
@@ -328,6 +331,31 @@ export const notificationTypes: NotificationTypeConfig[] = [
               }),
               toastSensitivity: 'foreground',
               groupKey: ReleaseUpdateNotificationIds.IncentivesS4,
+            },
+            []
+          );
+        }
+
+        if (currentDate <= conditionalOrdersExpirationDate) {
+          trigger(
+            ReleaseUpdateNotificationIds.RevampedConditionalOrders,
+            {
+              icon: <AssetIcon symbol={chainTokenLabel} />,
+              title: stringGetter({
+                key: 'NOTIFICATIONS.CONDITIONAL_ORDERS_REVAMP.TITLE',
+              }),
+              body: stringGetter({
+                key: 'NOTIFICATIONS.CONDITIONAL_ORDERS_REVAMP.BODY',
+                params: {
+                  TWITTER_LINK: (
+                    <$Link href="https://twitter.com/dYdX/status/1785339109268935042">
+                      {stringGetter({ key: STRING_KEYS.HERE })}
+                    </$Link>
+                  ),
+                },
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.RevampedConditionalOrders,
             },
             []
           );
@@ -463,5 +491,10 @@ const $WarningIcon = styled(Icon)`
 `;
 
 const $Output = styled(Output)`
+  display: inline-block;
+`;
+
+const $Link = styled(Link)`
+  --link-color: var(--color-accent);
   display: inline-block;
 `;

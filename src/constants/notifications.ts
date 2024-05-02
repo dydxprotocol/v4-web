@@ -185,6 +185,7 @@ export type TriggerOrderNotification = {
 };
 
 export enum ReleaseUpdateNotificationIds {
+  RevampedConditionalOrders = 'revamped-conditional-orders',
   IncentivesS4 = 'incentives-s4',
   IncentivesDistributedS3 = 'incentives-distributed-s3',
 }
