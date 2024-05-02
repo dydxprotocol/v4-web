@@ -119,12 +119,12 @@ export const PlaceOrderButtonAndReceipt = ({
     },
   ];
 
-  const returnToMarketState = {
+  const returnToMarketState = () => ({
     buttonTextStringKey: STRING_KEYS.RETURN_TO_MARKET,
     buttonAction: ButtonAction.Secondary,
     buttonState: {},
     showValidatorError: false,
-  };
+  });
 
   const buttonStatesPerStep = {
     [MobilePlaceOrderSteps.EditOrder]: {
@@ -144,9 +144,9 @@ export const PlaceOrderButtonAndReceipt = ({
       buttonState: {},
       showValidatorError: false,
     },
-    [MobilePlaceOrderSteps.PlacingOrder]: returnToMarketState,
-    [MobilePlaceOrderSteps.PlaceOrderFailed]: returnToMarketState,
-    [MobilePlaceOrderSteps.Confirmation]: returnToMarketState,
+    [MobilePlaceOrderSteps.PlacingOrder]: returnToMarketState(),
+    [MobilePlaceOrderSteps.PlaceOrderFailed]: returnToMarketState(),
+    [MobilePlaceOrderSteps.Confirmation]: returnToMarketState(),
   };
 
   const buttonAction = currentStep
