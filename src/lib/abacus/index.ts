@@ -19,6 +19,7 @@ import {
   ApiData,
   AsyncAbacusStateManager,
   ClosePositionInputField,
+  ComplianceAction,
   CoroutineTimer,
   HistoricalPnlPeriod,
   IOImplementations,
@@ -29,6 +30,7 @@ import {
   UIImplementations,
   type TriggerOrdersInputFields,
 } from '@/constants/abacus';
+import { Hdkey } from '@/constants/account';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork } from '@/constants/networks';
 import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
@@ -218,10 +220,11 @@ class AbacusStateManager {
     this.chainTransactions.setStore(store);
   };
 
-  setAccount = (localWallet?: LocalWallet) => {
+  setAccount = (localWallet?: LocalWallet, hdkey?: Hdkey) => {
     if (localWallet) {
       this.stateManager.accountAddress = localWallet.address;
       this.chainTransactions.setLocalWallet(localWallet);
+      if (hdkey) this.chainTransactions.setHdkey(hdkey);
     }
   };
 
@@ -325,6 +328,11 @@ class AbacusStateManager {
   cctpWithdraw = (
     callback: (success: boolean, parsingError: Nullable<ParsingError>, data: string) => void
   ): void => this.stateManager.commitCCTPWithdraw(callback);
+
+  triggerCompliance = (
+    action: typeof ComplianceAction.VALID_SURVEY | typeof ComplianceAction.INVALID_SURVEY,
+    callback: (success: boolean, parsingError: Nullable<ParsingError>, data: string) => void
+  ): void => this.stateManager.triggerCompliance(action, callback);
 
   // ------ Utils ------ //
   getHistoricalPnlPeriod = (): Nullable<HistoricalPnlPeriods> =>

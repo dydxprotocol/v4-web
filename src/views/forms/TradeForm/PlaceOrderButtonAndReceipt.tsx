@@ -204,7 +204,7 @@ export const PlaceOrderButtonAndReceipt = ({
     <WithDetailsReceipt detailItems={items}>
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
-      ) : showDeposit ? (
+      ) : showDeposit && complianceState === ComplianceStates.FULL_ACCESS ? (
         depositButton
       ) : (
         <WithTooltip tooltipString={hasValidationErrors ? validationErrorString : undefined}>

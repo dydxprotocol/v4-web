@@ -44,4 +44,10 @@ export type EvmDerivedAddresses = {
   };
 };
 
+export type Hdkey = {
+  mnemonic: string;
+  privateKey: Uint8Array | null;
+  publicKey: Uint8Array | null;
+};
+
 export const AMOUNT_RESERVED_FOR_GAS_USDC = 0.1;
