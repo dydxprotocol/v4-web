@@ -13,10 +13,12 @@ import {
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { NotificationType } from '@/constants/notifications';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { useBreakpoints, useIsFirstRender, useStringGetter, useSubaccount } from '@/hooks';
+import { useNotifications } from '@/hooks/useNotifications';
 import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
 
 import { breakpoints } from '@/styles';
@@ -35,11 +37,7 @@ import { Orderbook, orderbookMixins, type OrderbookScrollBehavior } from '@/view
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { closeDialog } from '@/state/dialogs';
-import {
-  getClosePositionInputErrors,
-  getCurrentInput,
-  getInputClosePositionData,
-} from '@/state/inputsSelectors';
+import { getClosePositionInputErrors, getInputClosePositionData } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -90,7 +88,6 @@ export const ClosePositionForm = ({
     useSelector(getCurrentMarketConfig, shallowEqual) || {};
   const { size: sizeData, summary } = useSelector(getInputClosePositionData, shallowEqual) || {};
   const { size, percent } = sizeData || {};
-  const currentInput = useSelector(getCurrentInput);
   const closePositionInputErrors = useSelector(getClosePositionInputErrors, shallowEqual);
   const currentPositionData = useSelector(getCurrentMarketPositionData, shallowEqual);
   const { size: currentPositionSize } = currentPositionData || {};
@@ -108,14 +105,19 @@ export const ClosePositionForm = ({
     tickSizeDecimals,
   });
 
+  const { getNotificationPreferenceForType } = useNotifications();
+  const isErrorShownInOrderStatusToast = getNotificationPreferenceForType(
+    NotificationType.OrderStatus
+  );
+
   let alertContent;
   let alertType = AlertType.Error;
 
-  if (closePositionError) {
+  if (closePositionError && !isErrorShownInOrderStatusToast) {
     alertContent = closePositionError;
   } else if (inputAlert) {
-    alertContent = inputAlert?.alertString;
-    alertType = inputAlert?.type;
+    alertContent = inputAlert.alertString;
+    alertType = inputAlert.type;
   }
 
   useEffect(() => {

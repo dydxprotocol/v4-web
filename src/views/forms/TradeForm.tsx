@@ -18,6 +18,7 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, StringKey } from '@/constants/localization';
+import { NotificationType } from '@/constants/notifications';
 import { USD_DECIMALS } from '@/constants/numbers';
 import {
   InputErrorData,
@@ -29,6 +30,7 @@ import {
 
 import { useBreakpoints, useStringGetter, useSubaccount } from '@/hooks';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useNotifications } from '@/hooks/useNotifications';
 import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
 
 import { breakpoints } from '@/styles';
@@ -183,11 +185,16 @@ export const TradeForm = ({
     tickSizeDecimals,
   });
 
-  if (placeOrderError) {
+  const { getNotificationPreferenceForType } = useNotifications();
+  const isErrorShownInOrderStatusToast = getNotificationPreferenceForType(
+    NotificationType.OrderStatus
+  );
+
+  if (placeOrderError && !isErrorShownInOrderStatusToast) {
     alertContent = placeOrderError;
   } else if (inputAlert) {
-    alertContent = inputAlert?.alertString;
-    alertType = inputAlert?.type;
+    alertContent = inputAlert.alertString;
+    alertType = inputAlert.type;
   }
 
   const shouldPromptUserToPlaceLimitOrder = ['MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE'].some(
