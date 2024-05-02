@@ -78,7 +78,6 @@ export const ClosePositionForm = ({
   const isFirstRender = useIsFirstRender();
 
   const [closePositionError, setClosePositionError] = useState<string | undefined>(undefined);
-  const [isClosingPosition, setIsClosingPosition] = useState(false);
 
   const { closePosition } = useSubaccount();
 
@@ -142,8 +141,6 @@ export const ClosePositionForm = ({
       if (currentStep === MobilePlaceOrderSteps.PlacingOrder) {
         setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
       }
-
-      setIsClosingPosition(false);
     }
   }, [currentStep, isFirstRender]);
 
@@ -180,6 +177,7 @@ export const ClosePositionForm = ({
         break;
       }
       case MobilePlaceOrderSteps.PlacingOrder:
+      case MobilePlaceOrderSteps.PlaceOrderFailed:
       case MobilePlaceOrderSteps.Confirmation: {
         dispatch(closeDialog());
         break;
@@ -195,14 +193,13 @@ export const ClosePositionForm = ({
 
   const onClosePosition = () => {
     setClosePositionError(undefined);
-    setIsClosingPosition(true);
 
     closePosition({
       onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
         setClosePositionError(
           stringGetter({ key: errorParams?.errorStringKey || STRING_KEYS.SOMETHING_WENT_WRONG })
         );
-        setIsClosingPosition(false);
+        setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
       },
       onSuccess: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => {
         setUnIndexedClientId(placeOrderPayload?.clientId);
@@ -290,7 +287,6 @@ export const ClosePositionForm = ({
         )}
 
         <PlaceOrderButtonAndReceipt
-          isLoading={isClosingPosition}
           hasValidationErrors={hasInputErrors}
           actionStringKey={inputAlert?.actionStringKey}
           validationErrorString={alertContent}

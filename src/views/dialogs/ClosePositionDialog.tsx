@@ -13,6 +13,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
+import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { Ring } from '@/components/Ring';
 import { VerticalSeparator } from '@/components/Separator';
@@ -63,7 +64,11 @@ export const ClosePositionDialog = ({ setIsOpen }: ElementProps) => {
       description: stringGetter({ key: STRING_KEYS.PLACING_ORDER_DESCRIPTION }),
       slotIcon: <Styled.Ring withAnimation value={0.25} />,
     },
-    // TODO(@aforaleka): add error state if trade didn't actually go through
+    [MobilePlaceOrderSteps.PlaceOrderFailed]: {
+      title: stringGetter({ key: STRING_KEYS.PLACE_ORDER_FAILED }),
+      description: stringGetter({ key: STRING_KEYS.PLACE_ORDER_FAILED_DESCRIPTION }),
+      slotIcon: <Styled.WarningIcon iconName={IconName.Warning} />,
+    },
     [MobilePlaceOrderSteps.Confirmation]: {
       title: stringGetter({ key: STRING_KEYS.CONFIRMED_TITLE }),
       description: stringGetter({ key: STRING_KEYS.CONFIRMED_DESCRIPTION }),
@@ -170,4 +175,9 @@ Styled.VerticalSeparator = styled(VerticalSeparator)`
 Styled.PreviewTitle = styled.div`
   ${layoutMixins.inlineRow}
   height: var(--dialog-icon-size);
+`;
+
+Styled.WarningIcon = styled(Icon)`
+  color: var(--color-warning);
+  font-size: 1.5rem;
 `;

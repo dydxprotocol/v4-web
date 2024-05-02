@@ -98,7 +98,6 @@ export const TradeForm = ({
   onConfirm,
   className,
 }: ElementProps & StyleProps) => {
-  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [placeOrderError, setPlaceOrderError] = useState<string>();
   const [showOrderbook, setShowOrderbook] = useState(false);
 
@@ -215,6 +214,7 @@ export const TradeForm = ({
         break;
       }
       case MobilePlaceOrderSteps.PlacingOrder:
+      case MobilePlaceOrderSteps.PlaceOrderFailed:
       case MobilePlaceOrderSteps.Confirmation: {
         onConfirm?.();
         break;
@@ -229,8 +229,7 @@ export const TradeForm = ({
   };
 
   const onLastOrderIndexed = useCallback(() => {
-    if (!currentStep || currentStep === MobilePlaceOrderSteps.PlacingOrder) {
-      setIsPlacingOrder(false);
+    if (currentStep === MobilePlaceOrderSteps.PlacingOrder) {
       setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
     }
   }, [currentStep]);
@@ -241,14 +240,13 @@ export const TradeForm = ({
 
   const onPlaceOrder = () => {
     setPlaceOrderError(undefined);
-    setIsPlacingOrder(true);
 
     placeOrder({
       onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
-        setIsPlacingOrder(false);
         setPlaceOrderError(
           stringGetter({ key: errorParams?.errorStringKey || STRING_KEYS.SOMETHING_WENT_WRONG })
         );
+        setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
       },
       onSuccess: (placeOrderPayload?: Nullable<HumanReadablePlaceOrderPayload>) => {
         setUnIndexedClientId(placeOrderPayload?.clientId);
@@ -445,7 +443,6 @@ export const TradeForm = ({
           </Styled.ButtonRow>
         )}
         <PlaceOrderButtonAndReceipt
-          isLoading={currentStep !== undefined && isPlacingOrder}
           hasValidationErrors={hasInputErrors}
           actionStringKey={inputAlert?.actionStringKey}
           validationErrorString={alertContent}

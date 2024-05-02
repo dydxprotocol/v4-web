@@ -149,6 +149,7 @@ export enum MobilePlaceOrderSteps {
   PreviewOrder = 'PreviewOrder',
   PlacingOrder = 'PlacingOrder',
   Confirmation = 'Confirmation',
+  PlaceOrderFailed = 'PlaceOrderFailed',
 }
 
 export const CLEARED_TRADE_INPUTS = {
