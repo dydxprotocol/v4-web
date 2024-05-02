@@ -436,6 +436,15 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
           onSuccess?.(data);
         } else {
           onError?.(data, { errorStringKey: parsingError?.stringKey });
+
+          const { placeOrderPayloads } = data || {};
+          placeOrderPayloads &&
+            placeOrderPayloads.toString() != '[]' &&
+            placeOrderPayloads.toArray().forEach((payload: HumanReadablePlaceOrderPayload) => {
+              if (payload.clientId !== undefined) {
+                dispatch(removeUncommittedOrderClientId(payload.clientId));
+              }
+            });
         }
       };
       return abacusStateManager.triggerOrders(callback);
