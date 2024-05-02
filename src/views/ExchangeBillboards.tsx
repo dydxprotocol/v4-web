@@ -2,8 +2,9 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { TokenRoute } from '@/constants/routes';
 
-import { usePerpetualMarketsStats, useStringGetter } from '@/hooks';
+import { usePerpetualMarketsStats, useStringGetter, useTokenConfigs } from '@/hooks';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -19,6 +20,7 @@ type ExchangeBillboardsProps = {
 
 export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ className }) => {
   const stringGetter = useStringGetter();
+  const { chainTokenLabel } = useTokenConfigs();
 
   const {
     stats: { volume24HUSDC, openInterestUSDC, feeEarned },
@@ -52,7 +54,7 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
           type: OutputType.CompactFiat,
           chartData: feeEarnedChart,
           linkLabelKey: STRING_KEYS.LEARN_MORE_ARROW,
-          link: import.meta.env.VITE_MARKETS_EARNED_BY_STAKERS_LEARN_MORE_URL,
+          link: `${chainTokenLabel}/${TokenRoute.StakingRewards}`,
         },
       ].map(
         ({ key, labelKey, tagKey, value, fractionDigits, type, chartData, link, linkLabelKey }) => (

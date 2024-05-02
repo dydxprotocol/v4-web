@@ -18,7 +18,7 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
-import { type ColumnDef, AssetTableCell, Table, TableCell } from '@/components/Table';
+import { AssetTableCell, Table, TableCell, type ColumnDef } from '@/components/Table';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -56,11 +56,11 @@ export const MarketsCompactTable = (props: PropsWithChildren<MarketsCompactTable
           }) => (
             <TableCell stacked>
               <Styled.TabletOutput
+                withBaseFont
+                withSubscript
                 type={OutputType.Fiat}
                 value={oraclePrice}
                 fractionDigits={tickSizeDecimals}
-                compressZeros
-                withBaseFont
               />
               <Styled.TabletPriceChange>
                 {!priceChange24H ? (

@@ -1,17 +1,16 @@
-interface GetChainRevenueRequest {
+type GetChainRevenueRequest = {
   startDate: Date;
   endDate: Date;
-}
+};
 
-interface ChainRevenue {
+type ChainRevenue = {
   labels: string;
   tx_fees: number;
   trading_fees: number;
   total: number;
-}
+};
 
-export const getChainRevenue = async (props: GetChainRevenueRequest) => {
-  const { startDate, endDate } = props;
+export const getChainRevenue = async ({ startDate, endDate }: GetChainRevenueRequest) => {
   const url = new URL(`${import.meta.env.VITE_NUMIA_BASE_URL}/dydx/tokenomics/chain_revenue`);
 
   url.searchParams.set('start_date', startDate.toISOString().split('T')[0]);
