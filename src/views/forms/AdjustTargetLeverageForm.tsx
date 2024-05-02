@@ -2,7 +2,7 @@ import { FormEvent, useState } from 'react';
 
 import { NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
 import { ButtonAction, ButtonShape, ButtonType } from '@/constants/buttons';
@@ -129,60 +129,54 @@ export const AdjustTargetLeverageForm = ({
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
+const Styled = {
+  Form: styled.form`
+    ${formMixins.transfersForm}
+  `,
+  InputContainer: styled.div`
+    ${formMixins.inputContainer}
+    --input-height: 3.5rem;
 
-Styled.Form = styled.form`
-  ${formMixins.transfersForm}
-`;
+    padding: var(--form-input-paddingY) var(--form-input-paddingX);
 
-Styled.InputContainer = styled.div`
-  ${formMixins.inputContainer}
-  --input-height: 3.5rem;
+    @media ${breakpoints.tablet} {
+      --input-height: 4rem;
+    }
+  `,
+  WithLabel: styled(WithLabel)`
+    ${formMixins.inputLabel}
+  `,
+  LeverageSlider: styled(Slider)`
+    margin-top: 0.25rem;
 
-  padding: var(--form-input-paddingY) var(--form-input-paddingX);
+    --slider-track-background: linear-gradient(
+      90deg,
+      var(--color-layer-7) 0%,
+      var(--color-text-2) 100%
+    );
+  `,
+  InnerInputContainer: styled.div`
+    ${formMixins.inputContainer}
+    --input-backgroundColor: var(--color-layer-5);
+    --input-borderColor: var(--color-layer-7);
+    --input-height: 2.25rem;
+    --input-width: 5rem;
 
-  @media ${breakpoints.tablet} {
-    --input-height: 4rem;
-  }
-`;
+    margin-left: 0.25rem;
 
-Styled.WithLabel = styled(WithLabel)`
-  ${formMixins.inputLabel}
-`;
+    input {
+      text-align: end;
+      padding: 0 var(--form-input-paddingX);
+    }
 
-Styled.LeverageSlider = styled(Slider)`
-  margin-top: 0.25rem;
-
-  --slider-track-background: linear-gradient(
-    90deg,
-    var(--color-layer-7) 0%,
-    var(--color-text-2) 100%
-  );
-`;
-
-Styled.InnerInputContainer = styled.div`
-  ${formMixins.inputContainer}
-  --input-backgroundColor: var(--color-layer-5);
-  --input-borderColor: var(--color-layer-7);
-  --input-height: 2.25rem;
-  --input-width: 5rem;
-
-  margin-left: 0.25rem;
-
-  input {
-    text-align: end;
-    padding: 0 var(--form-input-paddingX);
-  }
-
-  @media ${breakpoints.tablet} {
-    --input-height: 2.5rem;
-  }
-`;
-
-Styled.LeverageSide = styled.div`
-  cursor: pointer;
-`;
-
-Styled.ToggleGroup = styled(ToggleGroup)`
-  ${formMixins.inputToggleGroup}
-`;
+    @media ${breakpoints.tablet} {
+      --input-height: 2.5rem;
+    }
+  `,
+  LeverageSide: styled.div`
+    cursor: pointer;
+  `,
+  ToggleGroup: styled(ToggleGroup)`
+    ${formMixins.inputToggleGroup}
+  `,
+};
