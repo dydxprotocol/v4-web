@@ -164,17 +164,28 @@ export const CLEARED_SIZE_INPUTS = {
   leverageInput: '',
 };
 
-export enum OrderSubmissionStatuses {
+export enum PlaceOrderStatuses {
   Submitted,
   Placed,
   Filled,
 }
 
-export type LocalOrderData = {
+export enum CancelOrderStatuses {
+  Submitted,
+  Canceled,
+}
+
+export type LocalPlaceOrderData = {
   marketId: string;
   clientId: number;
   orderId?: string;
   orderType: TradeTypes;
-  submissionStatus: OrderSubmissionStatuses;
+  submissionStatus: PlaceOrderStatuses;
+  errorStringKey?: string;
+};
+
+export type LocalCancelOrderData = {
+  orderId: string;
+  submissionStatus: CancelOrderStatuses;
   errorStringKey?: string;
 };

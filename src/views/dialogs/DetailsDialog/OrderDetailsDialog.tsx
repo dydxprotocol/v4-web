@@ -1,11 +1,10 @@
-import { useState } from 'react';
-
-import { useDispatch, useSelector } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { AbacusOrderStatus, AbacusOrderTypes, type Nullable } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS, type StringKey } from '@/constants/localization';
+import { CancelOrderStatuses } from '@/constants/trade';
 
 import { useStringGetter, useSubaccount } from '@/hooks';
 
@@ -22,7 +21,7 @@ import { type OrderTableRow } from '@/views/tables/OrdersTable';
 
 import { clearOrder } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-import { getOrderDetails } from '@/state/accountSelectors';
+import { getLocalCancelOrders, getOrderDetails } from '@/state/accountSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -38,8 +37,12 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
   const dispatch = useDispatch();
   const selectedLocale = useSelector(getSelectedLocale);
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
-
+  const localCancelOrders = useSelector(getLocalCancelOrders, shallowEqual);
   const { cancelOrder } = useSubaccount();
+
+  const localCancelOrder = localCancelOrders.find((order) => order.orderId === orderId);
+  const isOrderCanceling =
+    localCancelOrder && localCancelOrder.submissionStatus < CancelOrderStatuses.Canceled;
 
   const {
     asset,
@@ -61,7 +64,6 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     triggerPrice,
     type,
   } = (useSelector(getOrderDetails(orderId)) as OrderTableRow) || {};
-  const [isPlacingCancel, setIsPlacingCancel] = useState(false);
 
   const renderOrderPrice = ({
     type,
@@ -168,9 +170,8 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     },
   ].filter((item) => Boolean(item.value)) as DetailsItem[];
 
-  const onCancelClick = async () => {
-    setIsPlacingCancel(true);
-    await cancelOrder({ orderId, onError: () => setIsPlacingCancel(false) });
+  const onCancelClick = () => {
+    cancelOrder({ orderId });
   };
 
   const onClearClick = () => {
@@ -189,8 +190,8 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
           <Button
             action={ButtonAction.Destroy}
             state={{
-              isDisabled: isPlacingCancel || status === AbacusOrderStatus.canceling,
-              isLoading: isPlacingCancel,
+              isDisabled: isOrderCanceling || status === AbacusOrderStatus.canceling,
+              isLoading: isOrderCanceling,
             }}
             onClick={onCancelClick}
           >

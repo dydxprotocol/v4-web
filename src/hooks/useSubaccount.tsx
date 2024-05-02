@@ -27,10 +27,13 @@ import { TradeTypes } from '@/constants/trade';
 import { DydxAddress } from '@/constants/wallets';
 
 import {
+  cancelOrderConfirmed,
+  cancelOrderFailed,
+  cancelOrderSubmitted,
+  placeOrderFailed,
+  placeOrderSubmitted,
   setHistoricalPnl,
   setSubaccount,
-  submittedOrder,
-  submittedOrderFailed,
 } from '@/state/account';
 import { getBalances } from '@/state/accountSelectors';
 
@@ -371,7 +374,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
           if (data?.clientId !== undefined) {
             dispatch(
-              submittedOrderFailed({
+              placeOrderFailed({
                 clientId: data.clientId,
                 errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
               })
@@ -390,7 +393,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
       if (placeOrderParams?.clientId) {
         dispatch(
-          submittedOrder({
+          placeOrderSubmitted({
             marketId: placeOrderParams.marketId,
             clientId: placeOrderParams.clientId,
             orderType: placeOrderParams.type as TradeTypes,
@@ -415,7 +418,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   );
 
   const cancelOrder = useCallback(
-    async ({
+    ({
       orderId,
       onError,
       onSuccess,
@@ -426,12 +429,20 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     }) => {
       const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
         if (success) {
+          dispatch(cancelOrderConfirmed(orderId));
           onSuccess?.();
         } else {
+          dispatch(
+            cancelOrderFailed({
+              orderId,
+              errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
+            })
+          );
           onError?.({ errorStringKey: parsingError?.stringKey });
         }
       };
 
+      dispatch(cancelOrderSubmitted(orderId));
       abacusStateManager.cancelOrder(orderId, callback);
     },
     [subaccountClient]

@@ -36,7 +36,7 @@ import { DydxChainId, isTestnet } from '@/constants/networks';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 
 import { RootStore } from '@/state/_store';
-import { submittedOrderTimeout } from '@/state/account';
+import { placeOrderTimeout } from '@/state/account';
 import { setInitializationError } from '@/state/app';
 
 import { signComplianceSignature } from '../compliance';
@@ -212,7 +212,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       } = params || {};
 
       setTimeout(() => {
-        this.store?.dispatch(submittedOrderTimeout(clientId));
+        this.store?.dispatch(placeOrderTimeout(clientId));
       }, UNCOMMITTED_ORDER_TIMEOUT_MS);
 
       // Place order
@@ -267,8 +267,15 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       throw new Error('Missing compositeClient or localWallet');
     }
 
-    const { subaccountNumber, clientId, orderFlags, clobPairId, goodTilBlock, goodTilBlockTime } =
-      params ?? {};
+    const {
+      orderId,
+      subaccountNumber,
+      clientId,
+      orderFlags,
+      clobPairId,
+      goodTilBlock,
+      goodTilBlockTime,
+    } = params ?? {};
 
     try {
       const tx = await this.compositeClient?.cancelRawOrder(
