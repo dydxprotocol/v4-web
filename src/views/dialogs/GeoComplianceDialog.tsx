@@ -12,8 +12,10 @@ import { useBreakpoints, useStringGetter } from '@/hooks';
 import { formMixins } from '@/styles/formMixins';
 
 import { Button } from '@/components/Button';
+import { Checkbox } from '@/components/Checkbox';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
+import { WithReceipt } from '@/components/WithReceipt';
 
 import abacusStateManager from '@/lib/abacus';
 import { isBlockedGeo } from '@/lib/compliance';
@@ -63,7 +65,7 @@ export const GeoComplianceDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
 
   const [residence, setResidence] = useState('');
-  const [tradingLoaction, settradingLoaction] = useState('');
+  const [hasAcknowledged, setHasAcknowledged] = useState(false);
 
   const [showForm, setShowForm] = useState(false);
   const { isMobile } = useBreakpoints();
@@ -98,14 +100,28 @@ export const GeoComplianceDialog = ({ setIsOpen }: ElementProps) => {
             selectedCountry={residence}
             onSelect={setResidence}
           />
-          <CountrySelector
-            label={stringGetter({ key: STRING_KEYS.TRADING_LOCATION })}
-            selectedCountry={tradingLoaction}
-            onSelect={settradingLoaction}
-          />
-          <Button action={ButtonAction.Primary} onClick={() => submit()}>
-            {stringGetter({ key: STRING_KEYS.SUBMIT })}
-          </Button>
+          <Styled.WithReceipt
+            slotReceipt={
+              <Styled.CheckboxContainer>
+                <Checkbox
+                  checked={hasAcknowledged}
+                  onCheckedChange={setHasAcknowledged}
+                  id="acknowledge-secret-phase-risk"
+                  label={stringGetter({
+                    key: STRING_KEYS.COMPLIANCE_ACKNOWLEDGEMENT,
+                  })}
+                />
+              </Styled.CheckboxContainer>
+            }
+          >
+            <Button
+              action={ButtonAction.Primary}
+              onClick={() => submit()}
+              state={{ isDisabled: !hasAcknowledged }}
+            >
+              {stringGetter({ key: STRING_KEYS.SUBMIT })}
+            </Button>
+          </Styled.WithReceipt>
         </Styled.Form>
       ) : (
         <Styled.Form>
@@ -128,4 +144,13 @@ Styled.Form = styled.form`
 
 Styled.SelectedCountry = styled.div`
   text-align: start;
+`;
+
+Styled.CheckboxContainer = styled.div`
+  padding: 1rem;
+  color: var(--color-text-0);
+`;
+
+Styled.WithReceipt = styled(WithReceipt)`
+  --withReceipt-backgroundColor: var(--color-layer-2);
 `;
