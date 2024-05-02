@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { NotificationType } from '@/constants/notifications';
+import { NotificationCategoryPreferences } from '@/constants/notifications';
 
 import { useEnvFeatures, useStringGetter } from '@/hooks';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -29,7 +29,7 @@ export const usePreferenceMenu = () => {
   const currentDisplayAllMarketDefault = useSelector(getDefaultToAllMarketsInPositionsOrdersFills);
   const [defaultToAllMarkets, setDefaultToAllMarkets] = useState(currentDisplayAllMarketDefault);
 
-  const toggleNotifPreference = (type: NotificationType) =>
+  const toggleNotifPreference = (type: NotificationCategoryPreferences) =>
     setEnabledNotifs((prev) => ({ ...prev, [type]: !prev[type] }));
 
   useEffect(() => {
@@ -40,60 +40,42 @@ export const usePreferenceMenu = () => {
     setDefaultToAllMarkets(currentDisplayAllMarketDefault);
   }, [currentDisplayAllMarketDefault]);
 
+  const getItem = (
+    notificationCategory: NotificationCategoryPreferences,
+    labelStringKey: string
+  ) => ({
+    value: notificationCategory,
+    label: stringGetter({ key: labelStringKey }),
+    slotAfter: (
+      <Switch
+        name={notificationCategory}
+        checked={enabledNotifs[notificationCategory]}
+        onCheckedChange={(enabled: boolean) => null}
+      />
+    ),
+    onSelect: () => toggleNotifPreference(notificationCategory),
+  });
+
   const notificationSection = useMemo(
     () => ({
       group: 'Notifications',
       groupLabel: stringGetter({ key: STRING_KEYS.NOTIFICATIONS }),
       items: [
         {
-          value: NotificationType.AbacusGenerated,
-          label: stringGetter({ key: STRING_KEYS.TRADING }),
-          slotAfter: (
-            <Switch
-              name={NotificationType.AbacusGenerated}
-              checked={enabledNotifs[NotificationType.AbacusGenerated]}
-              onCheckedChange={(enabled: boolean) => null}
-            />
-          ),
-          onSelect: () => toggleNotifPreference(NotificationType.AbacusGenerated),
+          value: NotificationCategoryPreferences.General,
+          labelStringKey: STRING_KEYS.GENERAL,
         },
         {
-          value: NotificationType.SquidTransfer,
-          label: stringGetter({ key: STRING_KEYS.TRANSFERS }),
-          slotAfter: (
-            <Switch
-              name={NotificationType.SquidTransfer}
-              checked={enabledNotifs[NotificationType.SquidTransfer]}
-              onCheckedChange={(enabled: boolean) => null}
-            />
-          ),
-          onSelect: () => toggleNotifPreference(NotificationType.SquidTransfer),
-        },
-        isSlTpEnabled && {
-          value: NotificationType.TriggerOrder,
-          label: stringGetter({ key: STRING_KEYS.TAKE_PROFIT_STOP_LOSS }),
-          slotAfter: (
-            <Switch
-              name={NotificationType.TriggerOrder}
-              checked={enabledNotifs[NotificationType.TriggerOrder]}
-              onCheckedChange={(enabled: boolean) => null}
-            />
-          ),
-          onSelect: () => toggleNotifPreference(NotificationType.TriggerOrder),
+          value: NotificationCategoryPreferences.Transfers,
+          labelStringKey: STRING_KEYS.TRANSFERS,
         },
         {
-          value: NotificationType.ReleaseUpdates,
-          label: stringGetter({ key: STRING_KEYS.RELEASE_UPDATES }),
-          slotAfter: (
-            <Switch
-              name={NotificationType.ReleaseUpdates}
-              checked={enabledNotifs[NotificationType.ReleaseUpdates]}
-              onCheckedChange={(enabled: boolean) => null}
-            />
-          ),
-          onSelect: () => toggleNotifPreference(NotificationType.ReleaseUpdates),
+          value: NotificationCategoryPreferences.Trading,
+          labelStringKey: STRING_KEYS.TRADING,
         },
-      ].filter(isTruthy),
+      ]
+        .filter(isTruthy)
+        .map(({ value, labelStringKey }) => getItem(value, labelStringKey)),
     }),
     [stringGetter, enabledNotifs]
   );
@@ -110,7 +92,7 @@ export const usePreferenceMenu = () => {
             <Switch
               name={OtherPreference.DisplayAllMarketsDefault}
               checked={defaultToAllMarkets}
-              onCheckedChange={(enabled: boolean) => null}
+              onCheckedChange={() => null}
             />
           ),
           onSelect: () => {
