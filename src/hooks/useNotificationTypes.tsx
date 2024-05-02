@@ -531,11 +531,12 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       useEffect(() => {
         for (const localCancel of localCancelOrders) {
+          // ensure order exists
+          const existingOrder = allOrders?.find((order) => order.id === localCancel.orderId);
+          if (!existingOrder) return;
+
           // share same notification with existing local order if exists
-          const key = (
-            allOrders?.find((order) => order.id === localCancel.orderId)?.clientId ??
-            localCancel.orderId
-          ).toString();
+          const key = (existingOrder.clientId ?? localCancel.orderId).toString();
 
           trigger(
             key,

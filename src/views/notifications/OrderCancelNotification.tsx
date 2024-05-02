@@ -2,10 +2,8 @@ import { shallowEqual, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { AbacusOrderStatus, KotlinIrEnumValues, ORDER_STATUS_STRINGS } from '@/constants/abacus';
-import { CancelOrderData } from '@/constants/account';
 import { STRING_KEYS } from '@/constants/localization';
-import { OrderCancelStatuses } from '@/constants/notifications';
-import { ORDER_TYPE_STRINGS } from '@/constants/trade';
+import { CancelOrderStatuses, LocalCancelOrderData, ORDER_TYPE_STRINGS } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks';
 
@@ -24,7 +22,7 @@ import { getTradeType } from '@/lib/orders';
 import { OrderStatusIcon } from '../OrderStatusIcon';
 
 type ElementProps = {
-  localCancel: CancelOrderData;
+  localCancel: LocalCancelOrderData;
 };
 
 export const OrderCancelNotification = ({
@@ -45,7 +43,7 @@ export const OrderCancelNotification = ({
   let orderStatusIcon = <Styled.LoadingSpinner />;
   let customContent = null;
 
-  if (cancelStatus === OrderCancelStatuses.Canceled) {
+  if (cancelStatus === CancelOrderStatuses.Canceled) {
     orderStatusStringKey =
       ORDER_STATUS_STRINGS[
         indexedOrderStatus as unknown as KotlinIrEnumValues<typeof AbacusOrderStatus>

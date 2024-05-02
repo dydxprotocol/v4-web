@@ -36,7 +36,7 @@ import { DydxChainId, isTestnet } from '@/constants/networks';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 
 import { RootStore } from '@/state/_store';
-import { submittedPlaceOrderTimeout } from '@/state/account';
+import { placeOrderTimeout } from '@/state/account';
 import { setInitializationError } from '@/state/app';
 
 import { signComplianceSignature } from '../compliance';
@@ -212,7 +212,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       } = params || {};
 
       setTimeout(() => {
-        this.store?.dispatch(submittedPlaceOrderTimeout(clientId));
+        this.store?.dispatch(placeOrderTimeout(clientId));
       }, UNCOMMITTED_ORDER_TIMEOUT_MS);
 
       // Place order

@@ -4,7 +4,7 @@ import styled, { AnyStyledComponent } from 'styled-components';
 import { AbacusOrderStatus, AbacusOrderTypes, type Nullable } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS, type StringKey } from '@/constants/localization';
-import { OrderCancelStatuses } from '@/constants/notifications';
+import { CancelOrderStatuses } from '@/constants/trade';
 
 import { useStringGetter, useSubaccount } from '@/hooks';
 
@@ -21,7 +21,7 @@ import { type OrderTableRow } from '@/views/tables/OrdersTable';
 
 import { clearOrder } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-import { getCanceledOrders, getOrderDetails } from '@/state/accountSelectors';
+import { getLocalCancelOrders, getOrderDetails } from '@/state/accountSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -37,12 +37,12 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
   const dispatch = useDispatch();
   const selectedLocale = useSelector(getSelectedLocale);
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
-
+  const localCancelOrders = useSelector(getLocalCancelOrders, shallowEqual);
   const { cancelOrder } = useSubaccount();
-  const canceledOrders = useSelector(getCanceledOrders, shallowEqual);
-  const canceledOrder = canceledOrders.find((order) => order.orderId === orderId);
+
+  const localCancelOrder = localCancelOrders.find((order) => order.orderId === orderId);
   const isOrderCanceling =
-    canceledOrder && canceledOrder.submissionStatus < OrderCancelStatuses.Canceled;
+    localCancelOrder && localCancelOrder.submissionStatus < CancelOrderStatuses.Canceled;
 
   const {
     asset,
