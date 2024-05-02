@@ -162,3 +162,18 @@ export const CLEARED_SIZE_INPUTS = {
   usdAmountInput: '',
   leverageInput: '',
 };
+
+export enum OrderSubmissionStatuses {
+  Submitted,
+  Placed,
+  Filled,
+}
+
+export type LocalOrderData = {
+  marketId: string;
+  clientId: number;
+  orderId?: string;
+  orderType: TradeTypes;
+  submissionStatus: OrderSubmissionStatuses;
+  errorStringKey?: string;
+};

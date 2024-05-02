@@ -169,7 +169,7 @@ export const ClosePositionForm = ({
     });
   };
 
-  const onSubmit = async (e: FormEvent) => {
+  const onSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     switch (currentStep) {
@@ -191,11 +191,11 @@ export const ClosePositionForm = ({
     }
   };
 
-  const onClosePosition = async () => {
+  const onClosePosition = () => {
     setClosePositionError(undefined);
     setIsClosingPosition(true);
 
-    await closePosition({
+    closePosition({
       onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
         setClosePositionError(
           stringGetter({ key: errorParams?.errorStringKey || STRING_KEYS.SOMETHING_WENT_WRONG })

@@ -224,7 +224,6 @@ export const TradeForm = ({
   const onLastOrderIndexed = useCallback(() => {
     if (!currentStep || currentStep === MobilePlaceOrderSteps.PlacingOrder) {
       setIsPlacingOrder(false);
-      abacusStateManager.clearTradeInputValues({ shouldResetSize: true });
       setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
     }
   }, [currentStep]);
@@ -233,22 +232,23 @@ export const TradeForm = ({
     callback: onLastOrderIndexed,
   });
 
-  const onPlaceOrder = async () => {
+  const onPlaceOrder = () => {
     setPlaceOrderError(undefined);
     setIsPlacingOrder(true);
 
-    await placeOrder({
+    placeOrder({
       onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
+        setIsPlacingOrder(false);
         setPlaceOrderError(
           stringGetter({ key: errorParams?.errorStringKey || STRING_KEYS.SOMETHING_WENT_WRONG })
         );
-
-        setIsPlacingOrder(false);
       },
       onSuccess: (placeOrderPayload?: Nullable<HumanReadablePlaceOrderPayload>) => {
         setUnIndexedClientId(placeOrderPayload?.clientId);
       },
     });
+
+    abacusStateManager.clearTradeInputValues({ shouldResetSize: true });
   };
 
   if (needsTriggerPrice) {
@@ -438,7 +438,7 @@ export const TradeForm = ({
           </Styled.ButtonRow>
         )}
         <PlaceOrderButtonAndReceipt
-          isLoading={isPlacingOrder}
+          isLoading={currentStep !== undefined && isPlacingOrder}
           hasValidationErrors={hasInputErrors}
           actionStringKey={inputAlert?.actionStringKey}
           validationErrorString={alertContent}

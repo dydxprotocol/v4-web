@@ -10,12 +10,14 @@ export enum NotificationType {
   ReleaseUpdates = 'ReleaseUpdates',
   ApiError = 'ApiError',
   ComplianceAlert = 'ComplianceAlert',
+  OrderStatus = 'OrderStatus',
 }
 
 export const SingleSessionNotificationTypes = [
   NotificationType.AbacusGenerated,
   NotificationType.ApiError,
   NotificationType.ComplianceAlert,
+  NotificationType.OrderStatus,
 ];
 
 export enum NotificationComponentType {}
