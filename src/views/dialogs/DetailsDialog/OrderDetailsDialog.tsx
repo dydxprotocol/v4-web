@@ -15,9 +15,9 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { type DetailsItem } from '@/components/Details';
 import { DetailsDialog } from '@/components/DetailsDialog';
-import { Icon } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
+import { OrderStatusIcon } from '@/views/OrderStatusIcon';
 import { type OrderTableRow } from '@/views/tables/OrdersTable';
 
 import { clearOrder } from '@/state/account';
@@ -26,12 +26,7 @@ import { getOrderDetails } from '@/state/accountSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
-import {
-  getStatusIconInfo,
-  isMarketOrderType,
-  isOrderStatusClearable,
-  relativeTimeString,
-} from '@/lib/orders';
+import { isMarketOrderType, isOrderStatusClearable, relativeTimeString } from '@/lib/orders';
 
 type ElementProps = {
   orderId: string;
@@ -68,11 +63,6 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
   } = (useSelector(getOrderDetails(orderId)) as OrderTableRow) || {};
   const [isPlacingCancel, setIsPlacingCancel] = useState(false);
 
-  const { statusIcon, statusIconColor, statusStringKey } = getStatusIconInfo({
-    status,
-    totalFilled,
-  });
-
   const renderOrderPrice = ({
     type,
     price,
@@ -107,13 +97,9 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
       label: stringGetter({ key: STRING_KEYS.STATUS }),
       value: (
         <Styled.Row>
-          <Styled.StatusIcon iconName={statusIcon} color={statusIconColor} />
+          <OrderStatusIcon status={status.rawValue} />
           <Styled.Status>
-            {statusStringKey
-              ? stringGetter({ key: statusStringKey })
-              : resources.statusStringKey
-              ? stringGetter({ key: resources.statusStringKey })
-              : undefined}
+            {resources.statusStringKey && stringGetter({ key: resources.statusStringKey })}
           </Styled.Status>
         </Styled.Row>
       ),
@@ -222,10 +208,6 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Row = styled.div`
   ${layoutMixins.inlineRow}
-`;
-
-Styled.StatusIcon = styled(Icon)<{ color: string }>`
-  color: ${({ color }) => color};
 `;
 
 Styled.Status = styled.span`

@@ -2,19 +2,18 @@ import styled, { AnyStyledComponent } from 'styled-components';
 
 import { formatZeroNumbers } from '@/lib/formatZeroNumbers';
 
-export type CompressedOutputProps = {
+export type NumberValueProps = {
   value: string;
-  compressZeros?: boolean;
+  withSubscript?: boolean;
   className?: string;
 };
 
-export const CompressedNumberOutput = (props: CompressedOutputProps) => {
-  const { value, compressZeros, ...otherProps } = props;
+export const NumberValue = ({ className, value, withSubscript }: NumberValueProps) => {
   const { significantDigits, decimalDigits, zeros, punctuationSymbol } = formatZeroNumbers(value);
 
-  if (compressZeros) {
+  if (withSubscript) {
     return (
-      <div {...otherProps}>
+      <span className={className}>
         {significantDigits}
         {punctuationSymbol}
         {Boolean(zeros) && (
@@ -23,7 +22,7 @@ export const CompressedNumberOutput = (props: CompressedOutputProps) => {
           </>
         )}
         {decimalDigits}
-      </div>
+      </span>
     );
   }
 

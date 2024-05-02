@@ -153,6 +153,7 @@ const $Description = styled.div`
   margin-top: 0.5rem;
   color: var(--color-text-0);
   font: var(--font-small-book);
+  white-space: break-spaces;
 `;
 
 const $Action = styled.div`

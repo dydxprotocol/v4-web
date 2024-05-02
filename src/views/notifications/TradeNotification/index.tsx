@@ -61,7 +61,7 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
       slotTitleRight={
         <Styled.OrderStatus>
           {stringGetter({ key: ORDER_STATUS_STRINGS[orderStatus] })}
-          <Styled.OrderStatusIcon status={orderStatus} totalFilled={parseFloat(FILLED_AMOUNT)} />
+          <Styled.OrderStatusIcon status={orderStatus} />
         </Styled.OrderStatus>
       }
       slotCustomContent={
