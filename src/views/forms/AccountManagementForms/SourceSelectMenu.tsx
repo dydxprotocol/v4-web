@@ -102,6 +102,7 @@ export const SourceSelectMenu = ({
 
   const selectedChainOption = chains.find((item) => item.type === selectedChain);
   const selectedExchangeOption = exchanges.find((item) => item.type === selectedExchange);
+  const isNotPrivyDeposit = type === TransferType.withdrawal || walletType !== WalletType.Privy;
 
   return (
     <SearchSelectMenu
@@ -111,7 +112,8 @@ export const SourceSelectMenu = ({
           groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
           items: exchangeItems,
         },
-        walletType !== WalletType.Privy &&
+        // only block privy wallets for deposits
+        isNotPrivyDeposit &&
           chainItems.length > 0 && {
             group: 'chains',
             groupLabel: stringGetter({ key: STRING_KEYS.CHAINS }),
