@@ -41,10 +41,10 @@ import { TransferStatusNotification } from '@/views/notifications/TransferStatus
 import { TriggerOrderNotification } from '@/views/notifications/TriggerOrderNotification';
 
 import {
-  getCanceledOrders,
+  getLocalCancelOrders,
+  getLocalPlaceOrders,
   getSubaccountFills,
   getSubaccountOrders,
-  getSubmittedOrders,
 } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { openDialog } from '@/state/dialogs';
@@ -79,7 +79,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const abacusNotifications = useSelector(getAbacusNotifications, isEqual);
       const orders = useSelector(getSubaccountOrders, shallowEqual) || [];
       const ordersById = groupBy(orders, 'id');
-      const localOrdersData = useSelector(getSubmittedOrders, shallowEqual);
+      const localPlaceOrders = useSelector(getLocalPlaceOrders, shallowEqual);
 
       useEffect(() => {
         for (const abacusNotif of abacusNotifications) {
@@ -97,7 +97,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               const order = ordersById[id]?.[0];
               const clientId: number | undefined = order?.clientId ?? undefined;
               const localOrderExists =
-                clientId && localOrdersData.some((order) => order.clientId === clientId);
+                clientId && localPlaceOrders.some((order) => order.clientId === clientId);
 
               if (localOrderExists) return; // already handled by OrderStatusNotification
 
@@ -499,14 +499,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
   {
     type: NotificationType.OrderStatus,
     useTrigger: ({ trigger }) => {
-      const localOrdersData = useSelector(getSubmittedOrders, shallowEqual);
-      const localCanceledOrders = useSelector(getCanceledOrders, shallowEqual);
+      const localPlaceOrders = useSelector(getLocalPlaceOrders, shallowEqual);
+      const localCancelOrders = useSelector(getLocalCancelOrders, shallowEqual);
       const allOrders = useSelector(getSubaccountOrders, shallowEqual);
       const stringGetter = useStringGetter();
 
       useEffect(() => {
-        for (const localOrder of localOrdersData) {
-          const key = localOrder.clientId.toString();
+        for (const localPlace of localPlaceOrders) {
+          const key = localPlace.clientId.toString();
           trigger(
             key,
             {
@@ -518,19 +518,19 @@ export const notificationTypes: NotificationTypeConfig[] = [
               renderCustomBody: ({ isToast, notification }) => (
                 <OrderStatusNotification
                   isToast={isToast}
-                  localOrder={localOrder}
+                  localOrder={localPlace}
                   notification={notification}
                 />
               ),
             },
-            [localOrder.submissionStatus],
+            [localPlace.submissionStatus],
             true
           );
         }
-      }, [localOrdersData]);
+      }, [localPlaceOrders]);
 
       useEffect(() => {
-        for (const localCancel of localCanceledOrders) {
+        for (const localCancel of localCancelOrders) {
           // share same notification with existing local order if exists
           const key = (
             allOrders?.find((order) => order.id === localCancel.orderId)?.clientId ??
@@ -557,7 +557,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             true
           );
         }
-      }, [localCanceledOrders]);
+      }, [localCancelOrders]);
     },
     useNotificationAction: () => {
       const dispatch = useDispatch();

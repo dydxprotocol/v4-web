@@ -27,13 +27,13 @@ import { TradeTypes } from '@/constants/trade';
 import { DydxAddress } from '@/constants/wallets';
 
 import {
+  cancelOrderConfirmed,
   cancelOrderFailed,
-  orderCanceledConfirmed,
+  cancelOrderSubmitted,
+  placeOrderFailed,
+  placeOrderSubmitted,
   setHistoricalPnl,
   setSubaccount,
-  submittedCancelOrder,
-  submittedOrder,
-  submittedOrderFailed,
 } from '@/state/account';
 import { getBalances } from '@/state/accountSelectors';
 
@@ -374,7 +374,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
           if (data?.clientId !== undefined) {
             dispatch(
-              submittedOrderFailed({
+              placeOrderFailed({
                 clientId: data.clientId,
                 errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
               })
@@ -393,7 +393,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
       if (placeOrderParams?.clientId) {
         dispatch(
-          submittedOrder({
+          placeOrderSubmitted({
             marketId: placeOrderParams.marketId,
             clientId: placeOrderParams.clientId,
             orderType: placeOrderParams.type as TradeTypes,
@@ -429,7 +429,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     }) => {
       const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
         if (success) {
-          dispatch(orderCanceledConfirmed(orderId));
+          dispatch(cancelOrderConfirmed(orderId));
           onSuccess?.();
         } else {
           dispatch(
@@ -442,7 +442,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         }
       };
 
-      dispatch(submittedCancelOrder(orderId));
+      dispatch(cancelOrderSubmitted(orderId));
       abacusStateManager.cancelOrder(orderId, callback);
     },
     [subaccountClient]

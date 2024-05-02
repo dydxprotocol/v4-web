@@ -283,11 +283,14 @@ export const getUncommittedOrderClientIds = (state: RootState) =>
   state.account.uncommittedOrderClientIds;
 
 /**
- * @returns a list of locally submitted orders for the current FE session
+ * @returns a list of locally placed orders for the current FE session
  */
-export const getSubmittedOrders = (state: RootState) => state.account.submittedOrders;
+export const getLocalPlaceOrders = (state: RootState) => state.account.localPlaceOrders;
 
-export const getCanceledOrders = (state: RootState) => state.account.canceledOrders;
+/**
+ * @returns a list of locally canceled orders for the current FE session
+ */
+export const getLocalCancelOrders = (state: RootState) => state.account.localCancelOrders;
 
 /**
  * @param orderId
