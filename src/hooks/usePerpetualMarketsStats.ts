@@ -38,7 +38,11 @@ export const usePerpetualMarketsStats = () => {
     refetchOnWindowFocus: false,
   });
 
-  const feeEarned = useMemo(() => data?.[0].total, [data]);
+  const feesEarned = useMemo(() => {
+    if (!data) return null;
+
+    return data.reduce((acc, { total }) => acc + total, 0);
+  }, [data]);
 
   const stats = useMemo(() => {
     let volume24HUSDC = 0;
@@ -53,11 +57,11 @@ export const usePerpetualMarketsStats = () => {
     return {
       volume24HUSDC,
       openInterestUSDC,
-      feeEarned,
+      feesEarned,
     };
-  }, [markets, feeEarned]);
+  }, [markets, feesEarned]);
 
-  const feeEarnedChart = useMemo(
+  const feesEarnedChart = useMemo(
     () =>
       data?.map((point, x) => ({
         x: x + 1,
@@ -68,6 +72,6 @@ export const usePerpetualMarketsStats = () => {
 
   return {
     stats,
-    feeEarnedChart,
+    feesEarnedChart,
   };
 };

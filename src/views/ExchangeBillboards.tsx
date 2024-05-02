@@ -23,8 +23,8 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
   const { chainTokenLabel } = useTokenConfigs();
 
   const {
-    stats: { volume24HUSDC, openInterestUSDC, feeEarned },
-    feeEarnedChart,
+    stats: { volume24HUSDC, openInterestUSDC, feesEarned },
+    feesEarnedChart,
   } = usePerpetualMarketsStats();
 
   return (
@@ -50,14 +50,26 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
           key: 'fee-earned-stakers',
           labelKey: STRING_KEYS.EARNED_BY_STAKERS,
           tagKey: STRING_KEYS._24H,
-          value: feeEarned,
+          value: feesEarned,
           type: OutputType.CompactFiat,
-          chartData: feeEarnedChart,
+          chartData: feesEarnedChart,
           linkLabelKey: STRING_KEYS.LEARN_MORE_ARROW,
           link: `${chainTokenLabel}/${TokenRoute.StakingRewards}`,
+          slotLeft: '~',
         },
       ].map(
-        ({ key, labelKey, tagKey, value, fractionDigits, type, chartData, link, linkLabelKey }) => (
+        ({
+          key,
+          labelKey,
+          tagKey,
+          value,
+          fractionDigits,
+          type,
+          chartData,
+          link,
+          linkLabelKey,
+          slotLeft,
+        }) => (
           <Styled.BillboardContainer key={key}>
             <Styled.BillboardStat>
               <Styled.BillboardTitle>
@@ -66,10 +78,11 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
               </Styled.BillboardTitle>
               <Styled.Output
                 useGrouping
+                withBaseFont
                 fractionDigits={fractionDigits}
                 type={type}
                 value={value}
-                withBaseFont
+                slotLeft={slotLeft}
               />
               {link && linkLabelKey ? (
                 <Styled.BillboardLink

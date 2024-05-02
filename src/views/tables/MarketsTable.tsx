@@ -20,7 +20,7 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
-import { type ColumnDef, AssetTableCell, Table, TableCell } from '@/components/Table';
+import { AssetTableCell, Table, TableCell, type ColumnDef } from '@/components/Table';
 import { Toolbar } from '@/components/Toolbar';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { SparklineChart } from '@/components/visx/SparklineChart';
@@ -111,12 +111,12 @@ export const MarketsTable = ({ className }: { className?: string }) => {
             },
             {
               columnKey: 'priceChange24HChart',
-              getCellValue: (row) => row.oneDaySparkline,
+              getCellValue: (row) => row.priceChange24HPercent,
               label: stringGetter({ key: STRING_KEYS.LAST_24H }),
-              renderCell: ({ oneDaySparkline, priceChange24HPercent }) => (
+              renderCell: ({ line, priceChange24HPercent }) => (
                 <div style={{ width: 50, height: 50 }}>
                   <SparklineChart
-                    data={(oneDaySparkline ?? []).map((datum, index) => ({
+                    data={(line?.toArray() ?? []).map((datum, index) => ({
                       x: index + 1,
                       y: parseFloat(datum.toString()),
                     }))}

@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
-import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, MarketSorting } from '@/constants/markets';
 
@@ -12,7 +11,6 @@ import { useStringGetter } from '@/hooks';
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Button } from '@/components/Button';
 import { Tag } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
@@ -40,16 +38,10 @@ export const MarketsStats = (props: MarketsStatsProps) => {
       <Styled.ExchangeBillboards />
       <Styled.Section>
         <Styled.SectionHeader>
-          <h4>{stringGetter({ key: STRING_KEYS.RECENTLY_LISTED })}</h4>
-          <Styled.NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</Styled.NewTag>
-
-          <Styled.ViewAll
-            type={ButtonType.Link}
-            action={ButtonAction.Navigation}
-            onClick={setNewFilter}
-          >
-            {stringGetter({ key: STRING_KEYS.VIEW })} →
-          </Styled.ViewAll>
+          <Styled.RecentlyListed>
+            {stringGetter({ key: STRING_KEYS.RECENTLY_LISTED })}
+            <Styled.NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</Styled.NewTag>
+          </Styled.RecentlyListed>
         </Styled.SectionHeader>
         <MarketsCompactTable filters={MarketFilters.NEW} />
       </Styled.Section>
@@ -100,9 +92,10 @@ const Styled = {
     background: var(--color-layer-3);
     border-radius: 0.625rem;
   `,
-  ViewAll: styled(Button)`
-    --button-textColor: var(--color-accent);
-    margin-left: auto;
+  RecentlyListed: styled.h4`
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
   `,
   NewTag: styled(Tag)`
     background-color: var(--color-accent-faded);
@@ -128,6 +121,7 @@ const Styled = {
     justify-content: space-between;
     padding: 1.125rem 1.5rem;
     gap: 0.375rem;
+    height: 4rem;
 
     & h4 {
       font: var(--font-base-medium);
