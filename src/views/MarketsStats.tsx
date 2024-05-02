@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { useDispatch } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -81,66 +81,60 @@ export const MarketsStats = (props: MarketsStatsProps) => {
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
+const Styled = {
+  MarketsStats: styled.section`
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
 
-Styled.MarketsStats = styled.section`
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
+    @media ${breakpoints.desktopSmall} {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
 
-  @media ${breakpoints.desktopSmall} {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
+    @media ${breakpoints.tablet} {
+      ${layoutMixins.column}
+    }
+  `,
+  Section: styled.div`
+    background: var(--color-layer-3);
+    border-radius: 0.625rem;
+  `,
+  ViewAll: styled(Button)`
+    --button-textColor: var(--color-accent);
+    margin-left: auto;
+  `,
+  NewTag: styled(Tag)`
+    background-color: var(--color-accent-faded);
+    color: var(--color-accent);
+    text-transform: uppercase;
+  `,
+  ToggleGroupContainer: styled.div`
+    ${layoutMixins.row}
+    margin-left: auto;
 
-  @media ${breakpoints.tablet} {
-    ${layoutMixins.column}
-  }
-`;
+    & button {
+      --button-toggle-off-backgroundColor: var(--color-layer-3);
+      --button-toggle-off-textColor: var(--color-text-1);
+      --border-color: var(--color-layer-6);
+      --button-height: 1.75rem;
+      --button-padding: 0 0.75rem;
+      --button-font: var(--font-mini-book);
+    }
+  `,
+  SectionHeader: styled.div`
+    ${layoutMixins.row}
 
-Styled.Section = styled.div`
-  background: var(--color-layer-3);
-  border-radius: 0.625rem;
-`;
+    justify-content: space-between;
+    padding: 1.125rem 1.5rem;
+    gap: 0.375rem;
 
-Styled.ViewAll = styled(Button)`
-  --button-textColor: var(--color-accent);
-  margin-left: auto;
-`;
-
-Styled.NewTag = styled(Tag)`
-  background-color: var(--color-accent-faded);
-  color: var(--color-accent);
-  text-transform: uppercase;
-`;
-
-Styled.ToggleGroupContainer = styled.div`
-  ${layoutMixins.row}
-  margin-left: auto;
-
-  & button {
-    --button-toggle-off-backgroundColor: var(--color-layer-3);
-    --button-toggle-off-textColor: var(--color-text-1);
-    --border-color: var(--color-layer-6);
-    --button-height: 1.75rem;
-    --button-padding: 0 0.75rem;
-    --button-font: var(--font-mini-book);
-  }
-`;
-
-Styled.SectionHeader = styled.div`
-  ${layoutMixins.row}
-
-  justify-content: space-between;
-  padding: 1.125rem 1.5rem;
-  gap: 0.375rem;
-
-  & h4 {
-    font: var(--font-base-medium);
-    color: var(--color-text-2);
-  }
-`;
-
-Styled.ExchangeBillboards = styled(ExchangeBillboards)`
-  ${layoutMixins.contentSectionDetachedScrollable}
-`;
+    & h4 {
+      font: var(--font-base-medium);
+      color: var(--color-text-2);
+    }
+  `,
+  ExchangeBillboards: styled(ExchangeBillboards)`
+    ${layoutMixins.contentSectionDetachedScrollable}
+  `,
+};
