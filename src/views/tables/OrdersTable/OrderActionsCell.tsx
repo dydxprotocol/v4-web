@@ -30,7 +30,7 @@ export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) 
 
   const onCancel = useCallback(async () => {
     setIsCanceling(true);
-    await cancelOrder({ orderId, onError: () => setIsCanceling(false) });
+    cancelOrder({ orderId, onError: () => setIsCanceling(false) });
   }, []);
 
   return (

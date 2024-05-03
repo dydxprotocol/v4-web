@@ -15,6 +15,7 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import type {
   AccountBalance,
+  HumanReadableCancelOrderPayload,
   HumanReadablePlaceOrderPayload,
   HumanReadableTriggerOrdersPayload,
   ParsingError,
@@ -454,54 +455,71 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       onError,
       onSuccess,
     }: {
-      onError: (
-        triggerOrdersPayload: Nullable<HumanReadableTriggerOrdersPayload>,
-        onErrorParams?: { errorStringKey?: Nullable<string> }
-      ) => void;
-      onSuccess?: (triggerOrdersPayload: Nullable<HumanReadableTriggerOrdersPayload>) => void;
+      onError: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
+      onSuccess?: () => void;
     }) => {
+      const payloadToArray = (
+        payloads?: any // this is a Kotlin EmptyList or ArrayList
+      ) => {
+        return payloads && payloads.toString() != '[]' ? payloads.toArray() : [];
+      };
+
       const callback = (
         success: boolean,
         parsingError?: Nullable<ParsingError>,
         data?: Nullable<HumanReadableTriggerOrdersPayload>
       ) => {
-        if (success) {
-          onSuccess?.(data);
-        } else {
-          onError?.(data, { errorStringKey: parsingError?.stringKey });
+        const { placeOrderPayloads, cancelOrderPayloads } = data || {};
 
-          const { placeOrderPayloads } = data || {};
-          placeOrderPayloads &&
-            placeOrderPayloads.toString() != '[]' &&
-            placeOrderPayloads.toArray().forEach((payload: HumanReadablePlaceOrderPayload) => {
-              if (payload.clientId !== undefined) {
-                dispatch(
-                  submittedOrderFailed({
-                    clientId: payload.clientId,
-                    errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
-                  })
-                );
-              }
-            });
+        if (success) {
+          onSuccess?.();
+
+          payloadToArray(cancelOrderPayloads).forEach(
+            (payload: HumanReadableCancelOrderPayload) => {
+              dispatch(cancelOrderConfirmed(payload.orderId));
+            }
+          );
+        } else {
+          onError?.({ errorStringKey: parsingError?.stringKey });
+
+          payloadToArray(placeOrderPayloads).forEach((payload: HumanReadablePlaceOrderPayload) => {
+            dispatch(
+              placeOrderFailed({
+                clientId: payload.clientId,
+                errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
+              })
+            );
+          });
+
+          payloadToArray(cancelOrderPayloads).forEach(
+            (payload: HumanReadableCancelOrderPayload) => {
+              dispatch(
+                cancelOrderFailed({
+                  orderId: payload.orderId,
+                  errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
+                })
+              );
+            }
+          );
         }
       };
 
       const triggerOrderParams = abacusStateManager.triggerOrders(callback);
-      const { placeOrderPayloads } = triggerOrderParams || {};
+      const { placeOrderPayloads, cancelOrderPayloads } = triggerOrderParams || {};
 
-      placeOrderPayloads &&
-        placeOrderPayloads.toString() != '[]' &&
-        placeOrderPayloads.toArray().forEach((payload: HumanReadablePlaceOrderPayload) => {
-          if (payload.clientId) {
-            dispatch(
-              submittedOrder({
-                marketId: payload.marketId,
-                clientId: payload.clientId,
-                orderType: payload.type as TradeTypes,
-              })
-            );
-          }
-        });
+      payloadToArray(placeOrderPayloads).forEach((payload: HumanReadablePlaceOrderPayload) => {
+        dispatch(
+          placeOrderSubmitted({
+            marketId: payload.marketId,
+            clientId: payload.clientId,
+            orderType: payload.type as TradeTypes,
+          })
+        );
+      });
+
+      payloadToArray(cancelOrderPayloads).forEach((payload: HumanReadableCancelOrderPayload) => {
+        dispatch(cancelOrderSubmitted(payload.orderId));
+      });
 
       return triggerOrderParams;
     },
