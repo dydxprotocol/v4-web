@@ -7,16 +7,12 @@ jobs:
     runs-on: ubuntu-latest
     if: >
       github.event_name == 'deployment_status' &&
-      github.event.deployment_status.state == 'success' &&
-      github.event.deployment.sha == github.event.pull_request.head.sha
+      github.event.deployment_status.state == 'success'
     steps:
-      - name: sha from context
-        run: echo ${{ github.event.pull_request.head.sha }}
-
       - name: Check environment URL
         id: check_env
         run: |
-          if [[ "${{ github.event.deployment_status.environment_url }}" == *"v4-testnet"* ]]; then
+          if [[ "${{ github.event.deployment_status.environment_url }}" == *"v4-staging"* ]]; then
             echo "::set-output name=should_run_tests::true"
           else
             echo "::set-output name=should_run_tests::false"
