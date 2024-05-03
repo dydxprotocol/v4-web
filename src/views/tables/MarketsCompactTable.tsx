@@ -1,12 +1,11 @@
 import { PropsWithChildren, useMemo } from 'react';
 
 import { useNavigate } from 'react-router-dom';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled, { AnyStyledComponent } from 'styled-components';
 
-import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, MarketSorting, type MarketData } from '@/constants/markets';
-import { AppRoute, MarketsRoute } from '@/constants/routes';
+import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
 import { useMarketsData } from '@/hooks/useMarketsData';
@@ -15,8 +14,8 @@ import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
-import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
+import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 import { AssetTableCell, Table, TableCell, type ColumnDef } from '@/components/Table';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
@@ -29,8 +28,11 @@ interface MarketsCompactTableProps {
   sorting?: MarketSorting;
 }
 
-export const MarketsCompactTable = (props: PropsWithChildren<MarketsCompactTableProps>) => {
-  const { className, filters, sorting } = props;
+export const MarketsCompactTable = ({
+  className,
+  filters,
+  sorting,
+}: PropsWithChildren<MarketsCompactTableProps>) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
@@ -43,11 +45,15 @@ export const MarketsCompactTable = (props: PropsWithChildren<MarketsCompactTable
         {
           columnKey: 'market',
           getCellValue: (row) => row.market,
+          allowsSorting: false,
+          label: stringGetter({ key: STRING_KEYS.MARKET }),
           renderCell: ({ asset }) => <AssetTableCell stacked asset={asset} />,
         },
         {
-          columnKey: 'price',
+          columnKey: 'oraclePrice',
           getCellValue: (row) => row.oraclePrice,
+          allowsSorting: false,
+          label: stringGetter({ key: STRING_KEYS.ORACLE_PRICE }),
           renderCell: ({
             oraclePrice,
             priceChange24H,
@@ -86,6 +92,7 @@ export const MarketsCompactTable = (props: PropsWithChildren<MarketsCompactTable
           ? {
               columnKey: 'listing',
               getCellValue: (row) => row.isNew,
+              allowsSorting: false,
               renderCell: ({ listingDate }) => (
                 <Styled.DetailsCell>
                   <Styled.RecentlyListed>
@@ -106,7 +113,9 @@ export const MarketsCompactTable = (props: PropsWithChildren<MarketsCompactTable
             }
           : {
               columnKey: 'openInterest',
-              getCellValue: (row) => row.isNew,
+              allowsSorting: false,
+              getCellValue: (row) => row.openInterestUSDC,
+              label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
               renderCell: ({ asset, openInterestUSDC, openInterest }) => (
                 <Styled.DetailsCell>
                   <Styled.RecentlyListed>
@@ -156,187 +165,169 @@ export const MarketsCompactTable = (props: PropsWithChildren<MarketsCompactTable
   return (
     <Styled.Table
       withInnerBorders
-      hideHeader
       data={sortedMarkets.slice(0, 5)}
       getRowKey={(row: MarketData) => row.market}
       label="Markets"
       onRowAction={(market: string) =>
         navigate(`${AppRoute.Trade}/${market}`, { state: { from: AppRoute.Markets } })
       }
-      defaultSortDescriptor={{
-        column: 'volume24H',
-        direction: 'descending',
-      }}
       columns={columns}
       className={className}
       slotEmpty={
         <Styled.MarketNotFound>
-          <p>{stringGetter({ key: STRING_KEYS.NO_RECENTLY_LISTED_MARKETS })}</p>
-          <Button
-            onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
-            size={ButtonSize.Small}
-            action={ButtonAction.Navigation}
-          >
-            {stringGetter({ key: STRING_KEYS.ADD_NEW_MARKET })}
-          </Button>
+          {filters === MarketFilters.NEW ? (
+            <p>{stringGetter({ key: STRING_KEYS.NO_RECENTLY_LISTED_MARKETS })}</p>
+          ) : (
+            <LoadingSpace id="compact-markets-table" />
+          )}
         </Styled.MarketNotFound>
       }
     />
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
+const Styled = {
+  Table: styled(Table)`
+    ${tradeViewMixins.horizontalTable}
+    --tableCell-padding: 0.625rem 1.5rem;
+    --tableRow-backgroundColor: var(--color-layer-3);
+    --tableHeader-backgroundColor: var(--color-layer-3);
+    border-bottom-right-radius: 0.625rem;
+    border-bottom-left-radius: 0.625rem;
 
-Styled.Table = styled(Table)`
-  ${tradeViewMixins.horizontalTable}
-  --tableCell-padding: 0.625rem 1.5rem;
-  --tableRow-backgroundColor: var(--color-layer-3);
-  --tableHeader-backgroundColor: var(--color-layer-3);
-  border-bottom-right-radius: 0.625rem;
-  border-bottom-left-radius: 0.625rem;
+    & table {
+      --stickyArea1-background: var(--color-layer-5);
+    }
 
-  & table {
-    --stickyArea1-background: var(--color-layer-5);
-  }
+    & tr:last-child {
+      box-shadow: none;
+    }
 
-  & tr > td:nth-child(1) {
-    --tableCell-padding: 0.625rem 0.625rem 0.625rem 1.5rem;
-  }
+    & tbody:after {
+      content: none;
+    }
 
-  & tr > td:nth-child(2) {
-    --tableCell-padding: 0.625rem 0;
-  }
+    & > div {
+      padding: 1rem;
+    }
 
-  & tr > td:nth-child(3) {
-    --tableCell-padding: 0.625rem 1.5rem 0.625rem 0.625rem;
-  }
-
-  & tr:last-child {
-    box-shadow: none;
-  }
-
-  & tbody:after {
-    content: none;
-  }
-
-  & > div {
-    padding: 1rem;
-  }
-
-  @media ${breakpoints.desktopSmall} {
-    --tableCell-padding: 0.5rem 0.5rem;
-
-    & tr > td:nth-child(1) {
+    @media ${breakpoints.desktopSmall} {
       --tableCell-padding: 0.5rem 0.5rem;
+
+      & tr > td:nth-child(1) {
+        --tableCell-padding: 0.5rem 0.5rem;
+      }
+
+      & tr > td:nth-child(2) {
+        --tableCell-padding: 0.5rem 0;
+      }
+
+      & tr > td:nth-child(3) {
+        --tableCell-padding: 0.5rem 0.5rem;
+      }
     }
 
-    & tr > td:nth-child(2) {
-      --tableCell-padding: 0.5rem 0;
+    @media ${breakpoints.tablet} {
+      table {
+        max-width: 100vw;
+      }
+
+      & tr > td:nth-child(1) {
+        --tableCell-padding: 0.5rem 0.625rem 0.5rem 1rem;
+      }
+
+      & tr > td:nth-child(2) {
+        --tableCell-padding: 0.5rem 0;
+      }
+
+      & tr > td:nth-child(3) {
+        --tableCell-padding: 0.5rem 1rem 0.5rem 0.625rem;
+      }
     }
+  ` as AnyStyledComponent, // TODO: Remove cast when Table component is refactored
 
-    & tr > td:nth-child(3) {
-      --tableCell-padding: 0.5rem 0.5rem;
+  TabletOutput: styled(Output)`
+    font: var(--font-small-medium);
+    color: var(--color-text-1);
+  `,
+
+  InlineRow: styled.div`
+    ${layoutMixins.inlineRow}
+  `,
+
+  TabletPriceChange: styled.div`
+    ${layoutMixins.inlineRow}
+
+    & output {
+      font: var(--font-mini-medium);
     }
-  }
+  `,
 
-  @media ${breakpoints.tablet} {
-    table {
-      max-width: 100vw;
-    }
-
-    & tr > td:nth-child(1) {
-      --tableCell-padding: 0.5rem 0.625rem 0.5rem 1rem;
-    }
-
-    & tr > td:nth-child(2) {
-      --tableCell-padding: 0.5rem 0;
-    }
-
-    & tr > td:nth-child(3) {
-      --tableCell-padding: 0.5rem 1rem 0.5rem 0.625rem;
-    }
-  }
-`;
-
-Styled.TabletOutput = styled(Output)`
-  font: var(--font-small-medium);
-  color: var(--color-text-1);
-`;
-
-Styled.InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
-`;
-
-Styled.TabletPriceChange = styled(Styled.InlineRow)`
-  & output {
-    font: var(--font-mini-medium);
-  }
-`;
-
-Styled.Output = styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`
-  color: ${({ isNegative, isPositive }) =>
-    isNegative
-      ? `var(--color-negative)`
-      : isPositive
-      ? `var(--color-positive)`
-      : `var(--color-text-1)`};
-  font: var(--font-base-medium);
-`;
-
-Styled.MarketNotFound = styled.div`
-  ${layoutMixins.column}
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 0;
-
-  & p {
-    color: var(--color-text-0);
+  Output: styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`
+    color: ${({ isNegative, isPositive }) =>
+      isNegative
+        ? `var(--color-negative)`
+        : isPositive
+        ? `var(--color-positive)`
+        : `var(--color-text-1)`};
     font: var(--font-base-medium);
-  }
+  `,
 
-  & button {
-    color: var(--color-accent);
-  }
-`;
+  MarketNotFound: styled.div`
+    ${layoutMixins.column}
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0;
 
-Styled.DetailsCell = styled(TableCell)`
-  ${layoutMixins.row}
-  gap: 0.75rem;
+    & p {
+      color: var(--color-text-0);
+      font: var(--font-base-medium);
+    }
 
-  & > svg {
-    opacity: 0.4;
-  }
-`;
+    & button {
+      color: var(--color-accent);
+    }
+  `,
 
-Styled.RecentlyListed = styled.div`
-  ${layoutMixins.column}
-  gap: 0.125rem;
+  DetailsCell: styled(TableCell)`
+    ${layoutMixins.row}
+    gap: 0.75rem;
 
-  & > span,
-  & > output {
-    text-align: right;
-    justify-content: flex-end;
-  }
+    & > svg {
+      opacity: 0.4;
+    }
+  `,
 
-  & > span:first-child {
+  RecentlyListed: styled.div`
+    ${layoutMixins.column}
+    gap: 0.125rem;
+
+    & > span,
+    & > output {
+      text-align: right;
+      justify-content: flex-end;
+    }
+
+    & > span:first-child {
+      color: var(--color-text-0);
+      font: var(--font-mini-medium);
+    }
+
+    & > span:last-child,
+    & > output:first-child {
+      color: var(--color-text-1);
+      font: var(--font-small-medium);
+    }
+  `,
+
+  InterestOutput: styled(Output)`
     color: var(--color-text-0);
     font: var(--font-mini-medium);
-  }
+  `,
 
-  & > span:last-child,
-  & > output:first-child {
+  RelativeTimeOutput: styled(Output)`
     color: var(--color-text-1);
     font: var(--font-small-medium);
-  }
-`;
-
-Styled.InterestOutput = styled(Output)`
-  color: var(--color-text-0);
-  font: var(--font-mini-medium);
-`;
-
-Styled.RelativeTimeOutput = styled(Output)`
-  color: var(--color-text-1);
-  font: var(--font-small-medium);
-`;
+  `,
+};
