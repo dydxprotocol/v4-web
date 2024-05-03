@@ -11,8 +11,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { USD_DECIMALS } from '@/constants/numbers';
 import {
   ORDER_TYPE_STRINGS,
-  OrderSubmissionStatuses,
-  type LocalOrderData,
+  PlaceOrderStatuses,
+  type LocalPlaceOrderData,
 } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks';
@@ -33,7 +33,7 @@ import { OrderStatusIcon } from '../OrderStatusIcon';
 import { FillDetails } from './TradeNotification/FillDetails';
 
 type ElementProps = {
-  localOrder: LocalOrderData;
+  localOrder: LocalPlaceOrderData;
 };
 
 export const OrderStatusNotification = ({
@@ -55,8 +55,8 @@ export const OrderStatusNotification = ({
   let customContent = null;
 
   switch (submissionStatus) {
-    case OrderSubmissionStatuses.Placed:
-    case OrderSubmissionStatuses.Filled:
+    case PlaceOrderStatuses.Placed:
+    case PlaceOrderStatuses.Filled:
       if (indexedOrderStatus) {
         // skip pending / best effort open state -> still show as submitted (loading)
         if (indexedOrderStatus === AbacusOrderStatus.pending.rawValue) break;

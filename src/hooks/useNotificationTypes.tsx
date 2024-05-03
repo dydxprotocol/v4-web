@@ -34,15 +34,17 @@ import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
+import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 import { TriggerOrderNotification } from '@/views/notifications/TriggerOrderNotification';
 
 import {
+  getLocalCancelOrders,
+  getLocalPlaceOrders,
   getSubaccountFills,
   getSubaccountOrders,
-  getSubmittedOrders,
 } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { openDialog } from '@/state/dialogs';
@@ -77,7 +79,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const abacusNotifications = useSelector(getAbacusNotifications, isEqual);
       const orders = useSelector(getSubaccountOrders, shallowEqual) || [];
       const ordersById = groupBy(orders, 'id');
-      const localOrdersData = useSelector(getSubmittedOrders, shallowEqual);
+      const localPlaceOrders = useSelector(getLocalPlaceOrders, shallowEqual);
 
       useEffect(() => {
         for (const abacusNotif of abacusNotifications) {
@@ -95,7 +97,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               const order = ordersById[id]?.[0];
               const clientId: number | undefined = order?.clientId ?? undefined;
               const localOrderExists =
-                clientId && localOrdersData.some((order) => order.clientId === clientId);
+                clientId && localPlaceOrders.some((order) => order.clientId === clientId);
 
               if (localOrderExists) return; // already handled by OrderStatusNotification
 
@@ -497,12 +499,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
   {
     type: NotificationType.OrderStatus,
     useTrigger: ({ trigger }) => {
-      const localOrdersData = useSelector(getSubmittedOrders, shallowEqual);
+      const localPlaceOrders = useSelector(getLocalPlaceOrders, shallowEqual);
+      const localCancelOrders = useSelector(getLocalCancelOrders, shallowEqual);
+      const allOrders = useSelector(getSubaccountOrders, shallowEqual);
       const stringGetter = useStringGetter();
 
       useEffect(() => {
-        for (const localOrder of localOrdersData) {
-          const key = localOrder.clientId.toString();
+        for (const localPlace of localPlaceOrders) {
+          const key = localPlace.clientId.toString();
           trigger(
             key,
             {
@@ -514,16 +518,47 @@ export const notificationTypes: NotificationTypeConfig[] = [
               renderCustomBody: ({ isToast, notification }) => (
                 <OrderStatusNotification
                   isToast={isToast}
-                  localOrder={localOrder}
+                  localOrder={localPlace}
                   notification={notification}
                 />
               ),
             },
-            [localOrder.submissionStatus],
+            [localPlace.submissionStatus],
             true
           );
         }
-      }, [localOrdersData]);
+      }, [localPlaceOrders]);
+
+      useEffect(() => {
+        for (const localCancel of localCancelOrders) {
+          // ensure order exists
+          const existingOrder = allOrders?.find((order) => order.id === localCancel.orderId);
+          if (!existingOrder) return;
+
+          // share same notification with existing local order if exists
+          const key = (existingOrder.clientId ?? localCancel.orderId).toString();
+
+          trigger(
+            key,
+            {
+              icon: null,
+              title: stringGetter({ key: STRING_KEYS.ORDER_STATUS }),
+              toastSensitivity: 'background',
+              groupKey: key,
+              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+              renderCustomBody: ({ isToast, notification }) => (
+                <OrderCancelNotification
+                  isToast={isToast}
+                  localCancel={localCancel}
+                  notification={notification}
+                />
+              ),
+            },
+            [localCancel.submissionStatus],
+            true
+          );
+        }
+      }, [localCancelOrders]);
     },
     useNotificationAction: () => {
       const dispatch = useDispatch();
