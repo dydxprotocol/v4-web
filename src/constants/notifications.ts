@@ -161,8 +161,6 @@ export type NotificationDisplayData = {
    */
   toastDuration?: number;
 
-  // xcxc consider close on trigger
-
   withClose?: boolean; // Show close button for Notification
 };
 
