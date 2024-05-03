@@ -15,12 +15,13 @@ import {
   CompositeClient,
   LocalWallet as LocalWalletType,
   Network,
-  ProposalStatus,
   TransactionOptions,
   VoteOption,
+  ProposalStatus,
 } from '@dydxprotocol/v4-client-js';
 import {
-  Perpetual, // PerpetualMarketType,
+  Perpetual,
+  PerpetualMarketType,
 } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
 import { MsgVote } from '@dydxprotocol/v4-proto/src/codegen/cosmos/gov/v1/tx';
 import { ClobPair } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/clob/clob_pair';
@@ -29,6 +30,7 @@ import Ajv from 'ajv';
 import axios from 'axios';
 import { readFileSync } from 'fs';
 import Long from 'long';
+import { PrometheusDriver } from 'prometheus-query';
 
 const LocalWalletModule = await import(
   '@dydxprotocol/v4-client-js/src/clients/modules/local-wallet'
@@ -48,6 +50,8 @@ const VOTE_FEE: StdFee = {
   ],
   gas: '1000000',
 };
+
+const PROMETHEUS_SERVER_URL = 'http://localhost:9091';
 
 const MNEMONICS = [
   // alice
@@ -112,10 +116,16 @@ enum ExchangeName {
   Okx = 'Okx',
 }
 
+interface PrometheusTimeSeries {
+  // value of the time serie
+  value: number;
+}
+
 interface ExchangeInfo {
   url: string;
   tickers: Map<string, any> | null;
   parseResp: (response: any) => Map<string, any>;
+  slinkyProviderName: string;
 }
 
 const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
@@ -128,6 +138,7 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
+    slinkyProviderName: 'binance_api',
   },
   [ExchangeName.BinanceUS]: {
     url: 'https://api.binance.us/api/v3/ticker/24hr',
@@ -138,6 +149,7 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
+    slinkyProviderName: 'binance_api',
   },
   [ExchangeName.Bitfinex]: {
     url: 'https://api-pub.bitfinex.com/v2/tickers?symbols=ALL',
@@ -148,6 +160,7 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
+    slinkyProviderName: 'bitfinex_ws',
   },
   [ExchangeName.Bitstamp]: {
     url: 'https://www.bitstamp.net/api/v2/ticker/',
@@ -158,6 +171,7 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
+    slinkyProviderName: 'bitstamp_ws',
   },
   [ExchangeName.Bybit]: {
     url: 'https://api.bybit.com/v5/market/tickers?category=spot',
@@ -168,6 +182,7 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
+    slinkyProviderName: 'bybit_ws',
   },
   [ExchangeName.CoinbasePro]: {
     url: 'https://api.exchange.coinbase.com/products',
@@ -178,6 +193,7 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
+    slinkyProviderName: 'coinbase_api',
   },
   [ExchangeName.CryptoCom]: {
     url: 'https://api.crypto.com/v2/public/get-ticker',
@@ -188,6 +204,7 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
+    slinkyProviderName: 'crypto_dot_com_ws',
   },
   [ExchangeName.Gate]: {
     url: 'https://api.gateio.ws/api/v4/spot/tickers',
@@ -198,6 +215,7 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
+    slinkyProviderName: 'gate_ws',
   },
   [ExchangeName.Huobi]: {
     url: 'https://api.huobi.pro/market/tickers',
@@ -208,6 +226,7 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
+    slinkyProviderName: 'huobi_ws',
   },
   [ExchangeName.Kraken]: {
     url: 'https://api.kraken.com/0/public/Ticker',
@@ -215,6 +234,7 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
     parseResp: (response: any) => {
       return new Map<string, any>(Object.entries(response.result));
     },
+    slinkyProviderName: 'kraken_api',
   },
   [ExchangeName.Kucoin]: {
     url: 'https://api.kucoin.com/api/v1/market/allTickers',
@@ -225,6 +245,7 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
+    slinkyProviderName: 'kucoin_ws',
   },
   [ExchangeName.Mexc]: {
     url: 'https://www.mexc.com/open/api/v2/market/ticker',
@@ -235,6 +256,7 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
+    slinkyProviderName: 'mexc_ws',
   },
   [ExchangeName.Okx]: {
     url: 'https://www.okx.com/api/v5/market/tickers?instType=SPOT',
@@ -245,6 +267,7 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
         return acc;
       }, new Map<string, any>());
     },
+    slinkyProviderName: 'okx_ws',
   },
 };
 
@@ -352,6 +375,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   const filteredProposals = proposals.filter(
     (proposal) => !allTickers.includes(proposal.params.ticker)
   );
+
   const numExistingMarkets = allPerps.perpetual.reduce(
     (max, perp) => (perp.params!.id > max ? perp.params!.id : max),
     0
@@ -389,10 +413,10 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
             stepBaseQuantums: Long.fromNumber(proposal.params.stepBaseQuantums),
             subticksPerTick: proposal.params.subticksPerTick,
             delayBlocks: proposal.params.delayBlocks,
-            // marketType:
-            //   proposal.params.marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
-            //     ? PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED
-            //     : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS,
+            marketType:
+              proposal.params.marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
+                ? PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED
+                : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS,
           },
           proposal.title,
           proposal.summary,
@@ -458,6 +482,99 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   }
 
   console.log(`\nValidated ${marketsProposed.size} proposals against localnet`);
+
+  // for all markets proposed, determine if the slinky metrics are ok
+  for (const proposal of marketsProposed.values()) {
+    for (const exchange of proposal.params.exchangeConfigJson) {
+      validateSlinkyMetricsPerTicker(
+        dydxTickerToSlinkyTicker(proposal.params.ticker),
+        exchange.ticker.toLowerCase(),
+        EXCHANGE_INFO[exchange.exchangeName].slinkyProviderName
+      );
+    }
+  }
+}
+
+// convert a ticker like BTC-USD -> btc/usd
+function dydxTickerToSlinkyTicker(ticker: string): string {
+  return ticker.toLowerCase().replace('-', '/');
+}
+
+function validateSlinkyMetricsPerTicker(
+  ticker: string,
+  exchangeSpecificTicker: string,
+  exchange: string
+): void {
+  const prometheus = new PrometheusDriver({
+    endpoint: PROMETHEUS_SERVER_URL,
+    baseURL: '/api/v1',
+  });
+
+  const exchangeAPIQuerySuccessRate = `(
+    sum(rate(side_car_provider_status_responses_per_id{status = "success", provider="${exchange}", id="${exchangeSpecificTicker}"}[1m])) by (provider, id)
+ ) / 
+ (
+    sum(rate(side_car_provider_status_responses_per_id{provider="${exchange}", id="${exchangeSpecificTicker}"}[1m])) by (provider, id)
+ )`;
+
+  const slinkyPriceAggregationQuery = `(
+    sum(rate(side_car_health_check_ticker_updates_total{id="${ticker}"}[1m])) by (instance, job)
+    /
+    sum(rate(side_car_health_check_system_updates_total[1m])) by (instance, job)
+)`;
+
+  const slinkyProviderPricesQuery = `sum(rate(side_car_health_check_provider_updates_total{provider="${exchange}", id="${ticker}", success='true'}[1m])) by (provider, id)
+  /
+  sum(rate(side_car_health_check_provider_updates_total{provider="${exchange}", id="${ticker}"}[1m])) by (provider, id)`;
+
+  const start = new Date().getTime() - 3 * 60 * 1000;
+  const end = new Date().getTime();
+  const step = 60;
+
+  // determine success-rate for slinky queries to each exchange
+  makePrometheusRateQuery(prometheus, exchangeAPIQuerySuccessRate, start, end, step, 0.7);
+
+  // determine success rate for slinky price aggregation per market
+  makePrometheusRateQuery(prometheus, slinkyPriceAggregationQuery, start, end, step, 0.7);
+
+  // determine success rate for slinky price provider per market
+  makePrometheusRateQuery(prometheus, slinkyProviderPricesQuery, start, end, step, 0.7);
+}
+
+function makePrometheusRateQuery(
+  prometheus: PrometheusDriver,
+  query: string,
+  start: number,
+  end: number,
+  step: number,
+  threshold: number
+): void {
+  prometheus
+    .rangeQuery(query, start, end, step)
+    .then((response) => {
+      const series = response.result;
+      series.forEach((s) => {
+        const values = s.values;
+        let totalSuccessRate = 0;
+        values.forEach((v: PrometheusTimeSeries) => {
+          // take the average of all success-rates over the interval
+          if (!Number.isNaN(v.value)) {
+            // we see NaN when there have been no successes from the provider
+            totalSuccessRate += v.value;
+          }
+        });
+        if (values.length === 0 || totalSuccessRate / values.length < threshold) {
+          throw new Error(
+            `slinky metrics for ${query} is below success rate threshold ${threshold}: ${
+              totalSuccessRate / values.length
+            }`
+          );
+        }
+      });
+    })
+    .catch((error) => {
+      throw error;
+    });
 }
 
 function validatePrice(price: MarketPrice, proposal: Proposal): void {
