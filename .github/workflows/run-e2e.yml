@@ -8,8 +8,11 @@ jobs:
     if: >
       github.event_name == 'deployment_status' &&
       github.event.deployment_status.state == 'success' &&
-      false
+      github.event.deployment.sha == github.event.pull_request.head.sha
     steps:
+      - name: sha from context
+        run: echo ${{ github.event.pull_request.head.sha }}
+
       - name: Check environment URL
         id: check_env
         run: |
