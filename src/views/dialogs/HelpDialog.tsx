@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import styled, { AnyStyledComponent } from 'styled-components';
 
@@ -17,14 +17,11 @@ type ElementProps = {
   setIsOpen: (open: boolean) => void;
 };
 
+const latestCommit = import.meta.env.VITE_LAST_ORIGINAL_COMMIT;
+
 export const HelpDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { help: helpCenter, community } = useURLConfigs();
-
-  useEffect(() => {
-    const latestCommit = import.meta.env.VITE_LAST_ORIGINAL_COMMIT;
-    console.log('latestCommit', latestCommit);
-  }, []);
 
   const HELP_ITEMS = useMemo(
     () => [
@@ -74,6 +71,13 @@ export const HelpDialog = ({ setIsOpen }: ElementProps) => {
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.HELP })}
       items={HELP_ITEMS}
+      slotFooter={
+        latestCommit ? (
+          <Styled.Footer>
+            Release - <span title={latestCommit}>{`${latestCommit.substring(0, 7)}`}</span>
+          </Styled.Footer>
+        ) : undefined
+      }
     />
   );
 };
@@ -88,4 +92,8 @@ Styled.ComboboxDialogMenu = styled(ComboboxDialogMenu)`
   @media ${breakpoints.notMobile} {
     --dialog-width: var(--dialog-small-width);
   }
+`;
+
+Styled.Footer = styled.div`
+  color: var(--color-text-0);
 `;
