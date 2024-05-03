@@ -96,4 +96,5 @@ Styled.ComboboxDialogMenu = styled(ComboboxDialogMenu)`
 
 Styled.Footer = styled.div`
   color: var(--color-text-0);
+  user-select: all;
 `;
