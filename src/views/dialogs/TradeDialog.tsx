@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import { DialogTypes } from '@/constants/dialogs';
@@ -14,11 +14,11 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Button } from '@/components/Button';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
+import { Icon, IconName } from '@/components/Icon';
 import { Ring } from '@/components/Ring';
 import { TradeForm } from '@/views/forms/TradeForm';
 
 import { openDialog } from '@/state/dialogs';
-import { getInputTradeData } from '@/state/inputsSelectors';
 
 import { testFlags } from '@/lib/testFlags';
 
@@ -34,7 +34,6 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
   const { isMobile } = useBreakpoints();
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
-  const currentTradeData = useSelector(getInputTradeData, shallowEqual);
 
   const [currentStep, setCurrentStep] = useState<MobilePlaceOrderSteps>(
     MobilePlaceOrderSteps.EditOrder
@@ -96,7 +95,11 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
           description: stringGetter({ key: STRING_KEYS.PLACING_ORDER_DESCRIPTION }),
           slotIcon: <Styled.Ring withAnimation value={0.25} />,
         },
-        // TODO(@aforaleka): add error state if trade didn't actually go through
+        [MobilePlaceOrderSteps.PlaceOrderFailed]: {
+          title: stringGetter({ key: STRING_KEYS.PLACE_ORDER_FAILED }),
+          description: stringGetter({ key: STRING_KEYS.PLACE_ORDER_FAILED_DESCRIPTION }),
+          slotIcon: <Styled.WarningIcon iconName={IconName.Warning} />,
+        },
         [MobilePlaceOrderSteps.Confirmation]: {
           title: stringGetter({ key: STRING_KEYS.CONFIRMED_TITLE }),
           description: stringGetter({ key: STRING_KEYS.CONFIRMED_DESCRIPTION }),
@@ -151,6 +154,11 @@ Styled.Ring = styled(Ring)`
 
 Styled.GreenCheckCircle = styled(GreenCheckCircle)`
   --icon-size: 2rem;
+`;
+
+Styled.WarningIcon = styled(Icon)`
+  color: var(--color-warning);
+  font-size: 1.5rem;
 `;
 
 Styled.PreviewTitle = styled.div`

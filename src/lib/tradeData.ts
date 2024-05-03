@@ -1,13 +1,13 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { type Location, matchPath } from 'react-router-dom';
+import { matchPath, type Location } from 'react-router-dom';
 
 import {
-  type Nullable,
   AbacusOrderSide,
-  type AbacusOrderSides,
   AbacusOrderTypes,
-  ValidationError,
   ErrorType,
+  ValidationError,
+  type AbacusOrderSides,
+  type Nullable,
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import type { StringGetterFunction } from '@/constants/localization';

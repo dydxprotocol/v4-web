@@ -4,66 +4,58 @@ import {
   AbacusOrderStatus,
   AbacusOrderType,
   AbacusOrderTypes,
+  KotlinIrEnumValues,
+  TRADE_TYPES,
   type Asset,
+  type OrderStatus,
+  type PerpetualMarket,
   type SubaccountFill,
   type SubaccountFundingPayment,
   type SubaccountOrder,
-  type Nullable,
-  type OrderStatus,
-  type PerpetualMarket,
 } from '@/constants/abacus';
-import { STRING_KEYS } from '@/constants/localization';
 
 import { IconName } from '@/components/Icon';
 
 import { convertAbacusOrderSide } from '@/lib/abacus/conversions';
-import { MustBigNumber } from '@/lib/numbers';
 
-export const getStatusIconInfo = ({
-  status,
-  totalFilled,
-}: {
-  status: OrderStatus;
-  totalFilled: Nullable<number>;
-}) => {
+export const getOrderStatusInfo = ({ status }: { status: string }) => {
   switch (status) {
-    case AbacusOrderStatus.open: {
-      return MustBigNumber(totalFilled).gt(0)
-        ? {
-            statusIcon: IconName.OrderPartiallyFilled,
-            statusIconColor: `var(--color-warning)`,
-            statusStringKey: STRING_KEYS.PARTIALLY_FILLED,
-          }
-        : {
-            statusIcon: IconName.OrderOpen,
-            statusIconColor: `var(--color-text-2)`,
-          };
+    case AbacusOrderStatus.open.rawValue: {
+      return {
+        statusIcon: IconName.OrderOpen,
+        statusIconColor: `var(--color-text-2)`,
+      };
     }
-    case AbacusOrderStatus.filled: {
+    case AbacusOrderStatus.partiallyFilled.rawValue:
+      return {
+        statusIcon: IconName.OrderPartiallyFilled,
+        statusIconColor: `var(--color-warning)`,
+      };
+    case AbacusOrderStatus.filled.rawValue: {
       return {
         statusIcon: IconName.OrderFilled,
         statusIconColor: `var(--color-success)`,
       };
     }
-    case AbacusOrderStatus.cancelled: {
+    case AbacusOrderStatus.cancelled.rawValue: {
       return {
         statusIcon: IconName.OrderCanceled,
         statusIconColor: `var(--color-error)`,
       };
     }
-    case AbacusOrderStatus.canceling: {
+    case AbacusOrderStatus.canceling.rawValue: {
       return {
         statusIcon: IconName.OrderPending,
         statusIconColor: `var(--color-error)`,
       };
     }
-    case AbacusOrderStatus.untriggered: {
+    case AbacusOrderStatus.untriggered.rawValue: {
       return {
         statusIcon: IconName.OrderUntriggered,
         statusIconColor: `var(--color-text-2)`,
       };
     }
-    case AbacusOrderStatus.pending:
+    case AbacusOrderStatus.pending.rawValue:
     default: {
       return {
         statusIcon: IconName.OrderPending,
@@ -131,3 +123,6 @@ export const getHydratedTradingData = ({
   tickSizeDecimals: perpetualMarkets?.[data.marketId]?.configs?.tickSizeDecimals,
   ...('side' in data && { orderSide: convertAbacusOrderSide(data.side) }),
 });
+
+export const getTradeType = (orderType: string) =>
+  TRADE_TYPES[orderType as KotlinIrEnumValues<typeof AbacusOrderType>];

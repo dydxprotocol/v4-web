@@ -1,4 +1,4 @@
-import { useState, type FormEvent, useEffect } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
@@ -18,6 +18,7 @@ import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 
+import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
 
 type DepositFormProps = {
@@ -42,6 +43,12 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
       getSubaccounts({ dydxAddress });
     }
   }, [subAccount]);
+
+  useEffect(() => {
+    return () => {
+      abacusStateManager.resetInputState();
+    };
+  }, []);
 
   return (
     <Styled.Form

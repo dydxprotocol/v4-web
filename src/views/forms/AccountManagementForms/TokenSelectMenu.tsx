@@ -9,7 +9,7 @@ import { useEnvFeatures, useStringGetter } from '@/hooks';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DiffArrow } from '@/components/DiffArrow';
-import { Icon, IconName } from '@/components/Icon';
+import { Icon } from '@/components/Icon';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 import { Tag } from '@/components/Tag';
 
@@ -40,6 +40,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
 
   const tokens =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() || [];
+
   const tokenItems = Object.values(tokens)
     .map((token) => ({
       value: token.type,
@@ -68,7 +69,8 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
     .filter(
       (token) =>
         type === TransferType.deposit || !!cctpTokensByAddress[token.value] || !CCTPWithdrawalOnly
-    );
+    )
+    .sort((token) => (!!cctpTokensByAddress[token.value] ? -1 : 1));
 
   return (
     <SearchSelectMenu

@@ -149,6 +149,7 @@ export enum MobilePlaceOrderSteps {
   PreviewOrder = 'PreviewOrder',
   PlacingOrder = 'PlacingOrder',
   Confirmation = 'Confirmation',
+  PlaceOrderFailed = 'PlaceOrderFailed',
 }
 
 export const CLEARED_TRADE_INPUTS = {
@@ -161,4 +162,30 @@ export const CLEARED_SIZE_INPUTS = {
   amountInput: '',
   usdAmountInput: '',
   leverageInput: '',
+};
+
+export enum PlaceOrderStatuses {
+  Submitted,
+  Placed,
+  Filled,
+}
+
+export enum CancelOrderStatuses {
+  Submitted,
+  Canceled,
+}
+
+export type LocalPlaceOrderData = {
+  marketId: string;
+  clientId: number;
+  orderId?: string;
+  orderType: TradeTypes;
+  submissionStatus: PlaceOrderStatuses;
+  errorStringKey?: string;
+};
+
+export type LocalCancelOrderData = {
+  orderId: string;
+  submissionStatus: CancelOrderStatuses;
+  errorStringKey?: string;
 };

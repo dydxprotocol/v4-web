@@ -1,8 +1,7 @@
 import { createSelector } from 'reselect';
 
 import { OnboardingState, OnboardingSteps } from '@/constants/account';
-import { type DydxNetwork } from '@/constants/networks';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { ENVIRONMENT_CONFIG_MAP, type DydxNetwork } from '@/constants/networks';
 
 import {
   getOnboardingGuards,

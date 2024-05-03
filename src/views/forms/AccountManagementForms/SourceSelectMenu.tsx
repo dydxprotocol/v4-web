@@ -41,7 +41,7 @@ export const SourceSelectMenu = ({
   const { CCTPWithdrawalOnly } = useEnvFeatures();
 
   const stringGetter = useStringGetter();
-  const { type, depositOptions, withdrawalOptions, resources } =
+  const { type, depositOptions, withdrawalOptions } =
     useSelector(getTransferInputs, shallowEqual) || {};
   const chains =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.chains?.toArray() || [];
@@ -50,13 +50,17 @@ export const SourceSelectMenu = ({
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.exchanges?.toArray() ||
     [];
 
-  const cctpTokenssByChainId = cctpTokens.reduce((acc, token) => {
+  const cctpTokensByChainId = cctpTokens.reduce((acc, token) => {
     if (!acc[token.chainId]) {
       acc[token.chainId] = [];
     }
     acc[token.chainId].push(token);
     return acc;
   }, {} as Record<string, TokenInfo[]>);
+
+  // withdrawals SourceSelectMenu is half width size so we must throw the decorator text
+  // in the description prop (renders below the item label) instead of in the slotAfter
+  const lowestFeesDecoratorProp = type === TransferType.deposit ? 'slotAfter' : 'description';
 
   const chainItems = Object.values(chains)
     .map((chain) => ({
@@ -66,11 +70,26 @@ export const SourceSelectMenu = ({
         onSelect(chain.type, 'chain');
       },
       slotBefore: <Styled.Img src={chain.iconUrl} alt="" />,
+      [lowestFeesDecoratorProp]: !!cctpTokensByChainId[chain.type] && (
+        <Styled.Text>
+          {stringGetter({
+            key: STRING_KEYS.LOWEST_FEES_WITH_USDC,
+            params: {
+              LOWEST_FEES_HIGHLIGHT_TEXT: (
+                <Styled.GreenHighlight>
+                  {stringGetter({ key: STRING_KEYS.LOWEST_FEES_HIGHLIGHT_TEXT })}
+                </Styled.GreenHighlight>
+              ),
+            },
+          })}
+        </Styled.Text>
+      ),
     }))
     .filter(
       (chain) =>
-        type === TransferType.deposit || !!cctpTokenssByChainId[chain.value] || !CCTPWithdrawalOnly
-    );
+        type === TransferType.deposit || !!cctpTokensByChainId[chain.value] || !CCTPWithdrawalOnly
+    )
+    .sort((chain) => (!!cctpTokensByChainId[chain.value] ? -1 : 1));
 
   const exchangeItems = Object.values(exchanges).map((exchange) => ({
     value: exchange.type,
@@ -83,6 +102,7 @@ export const SourceSelectMenu = ({
 
   const selectedChainOption = chains.find((item) => item.type === selectedChain);
   const selectedExchangeOption = exchanges.find((item) => item.type === selectedExchange);
+  const isNotPrivyDeposit = type === TransferType.withdrawal || walletType !== WalletType.Privy;
 
   return (
     <SearchSelectMenu
@@ -92,7 +112,8 @@ export const SourceSelectMenu = ({
           groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
           items: exchangeItems,
         },
-        walletType !== WalletType.Privy &&
+        // only block privy wallets for deposits
+        isNotPrivyDeposit &&
           chainItems.length > 0 && {
             group: 'chains',
             groupLabel: stringGetter({ key: STRING_KEYS.CHAINS }),
@@ -136,4 +157,13 @@ Styled.ChainRow = styled.div`
   gap: 0.5rem;
   color: var(--color-text-2);
   font: var(--font-base-book);
+`;
+
+Styled.Text = styled.div`
+  font: var(--font-small-regular);
+  color: var(--color-text-0);
+`;
+
+Styled.GreenHighlight = styled.span`
+  color: var(--color-green);
 `;

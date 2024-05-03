@@ -1,4 +1,4 @@
-import { Root, Indicator } from '@radix-ui/react-checkbox';
+import { Indicator, Root } from '@radix-ui/react-checkbox';
 import { CheckIcon } from '@radix-ui/react-icons';
 import styled, { css, type AnyStyledComponent } from 'styled-components';
 

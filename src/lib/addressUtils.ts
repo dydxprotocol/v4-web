@@ -1,4 +1,4 @@
-import { fromBech32, toBech32, fromHex, toHex } from '@cosmjs/encoding';
+import { fromBech32, fromHex, toBech32, toHex } from '@cosmjs/encoding';
 
 // ============ Byte Helpers ============
 export const stripHexPrefix = (input: string): string => {

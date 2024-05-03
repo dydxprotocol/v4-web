@@ -3,16 +3,16 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { createSelector } from 'reselect';
 
 import {
-  type AbacusOrderStatuses,
-  type SubaccountOrder,
-  type SubaccountFill,
-  type SubaccountFundingPayment,
+  AbacusOrderSide,
   AbacusOrderStatus,
   AbacusPositionSide,
-  ORDER_SIDES,
   HistoricalTradingReward,
   HistoricalTradingRewardsPeriod,
-  AbacusOrderSide,
+  ORDER_SIDES,
+  type AbacusOrderStatuses,
+  type SubaccountFill,
+  type SubaccountFundingPayment,
+  type SubaccountOrder,
 } from '@/constants/abacus';
 import { OnboardingState } from '@/constants/account';
 
@@ -160,6 +160,31 @@ export const getSubaccountOpenOrders = createSelector([getSubaccountOrders], (or
 
 /**
  * @param state
+ * @returns order with the specified id
+ */
+export const getOrderById = (orderId: string) =>
+  createSelector([getSubaccountOrders], (orders) => orders?.find((order) => order.id === orderId));
+
+/**
+ * @param state
+ * @returns order with the specified client id
+ */
+export const getOrderByClientId = (orderClientId: number) =>
+  createSelector([getSubaccountOrders], (orders) =>
+    orders?.find((order) => order.clientId === orderClientId)
+  );
+
+/**
+ * @param state
+ * @returns first matching fill with the specified order client id
+ */
+export const getFillByClientId = (orderClientId: number) =>
+  createSelector([getSubaccountFills, getOrderByClientId(orderClientId)], (fills, order) =>
+    fills?.find((fill) => fill.orderId === order?.id)
+  );
+
+/**
+ * @param state
  * @returns Record of SubaccountOrders that have not been filled or cancelled, indexed by marketId
  */
 export const getMarketSubaccountOpenOrders = (
@@ -256,6 +281,16 @@ export const getLatestOrderStatus = createSelector(
  */
 export const getUncommittedOrderClientIds = (state: RootState) =>
   state.account.uncommittedOrderClientIds;
+
+/**
+ * @returns a list of locally placed orders for the current FE session
+ */
+export const getLocalPlaceOrders = (state: RootState) => state.account.localPlaceOrders;
+
+/**
+ * @returns a list of locally canceled orders for the current FE session
+ */
+export const getLocalCancelOrders = (state: RootState) => state.account.localCancelOrders;
 
 /**
  * @param orderId
@@ -485,3 +520,13 @@ export const getUsageRestriction = (state: RootState) => state.account.restricti
  * @returns RestrictionType from the current session
  */
 export const getRestrictionType = (state: RootState) => state.account.restriction?.restriction;
+
+/**
+ * @returns compliance status of the current session
+ */
+export const getComplianceStatus = (state: RootState) => state.account.compliance?.status;
+
+/**
+ * @returns compliance geo of the current session
+ */
+export const getGeo = (state: RootState) => state.account.compliance?.geo;

@@ -4,10 +4,17 @@ import { STRING_KEYS } from '@/constants/localization';
 export type MarketData = {
   asset: Asset;
   tickSizeDecimals: number;
+  oneDaySparkline?: number[];
   isNew?: boolean;
+  listingDate?: Date;
 } & PerpetualMarket &
   PerpetualMarket['perpetual'] &
   PerpetualMarket['configs'];
+
+export enum MarketSorting {
+  GAINERS = 'gainers',
+  LOSERS = 'losers',
+}
 
 export enum MarketFilters {
   ALL = 'all',

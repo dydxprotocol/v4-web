@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import {
   AbacusPositionSide,

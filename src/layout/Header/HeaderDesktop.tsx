@@ -1,15 +1,18 @@
+import { isTruthy } from '@dydxprotocol/v4-client-js/build/src/network_optimizer';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { ButtonShape } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
-import { useTokenConfigs, useStringGetter, useURLConfigs } from '@/hooks';
+import { useStringGetter, useTokenConfigs, useURLConfigs } from '@/hooks';
+import { useComplianceState } from '@/hooks/useComplianceState';
 
-import { LogoShortIcon, BellStrokeIcon } from '@/icons';
+import { BellStrokeIcon, LogoShortIcon } from '@/icons';
 import breakpoints from '@/styles/breakpoints';
 import { headerMixins } from '@/styles/headerMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -31,6 +34,7 @@ export const HeaderDesktop = () => {
   const { documentation, community, mintscanBase, exchangeStats } = useURLConfigs();
   const dispatch = useDispatch();
   const { chainTokenLabel } = useTokenConfigs();
+  const { complianceState } = useComplianceState();
 
   const hasSeenLaunchIncentives = useSelector(getHasSeenLaunchIncentives);
 
@@ -53,7 +57,7 @@ export const HeaderDesktop = () => {
           label: stringGetter({ key: STRING_KEYS.MARKETS }),
           href: AppRoute.Markets,
         },
-        {
+        complianceState === ComplianceStates.FULL_ACCESS && {
           value: chainTokenLabel,
           label: chainTokenLabel,
           href: `/${chainTokenLabel}`,
@@ -110,7 +114,7 @@ export const HeaderDesktop = () => {
             },
           ],
         },
-      ],
+      ].filter(isTruthy),
     },
   ];
 

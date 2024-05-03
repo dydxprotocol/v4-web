@@ -2,7 +2,7 @@ import React, { PropsWithChildren, useContext, useState } from 'react';
 
 import { localPoint } from '@visx/event';
 import { Point } from '@visx/point';
-import { XYChart, DataContext, type EventHandlerParams } from '@visx/xychart';
+import { DataContext, XYChart, type EventHandlerParams } from '@visx/xychart';
 
 import { getScaleBandwidth } from '@/components/visx/getScaleBandwidth';
 

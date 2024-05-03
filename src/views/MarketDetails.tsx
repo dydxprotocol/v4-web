@@ -2,7 +2,7 @@ import { shallowEqual, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
-import { STRING_KEYS, type StringKey } from '@/constants/localization';
+import { STRING_KEYS } from '@/constants/localization';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
 

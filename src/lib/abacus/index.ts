@@ -2,35 +2,37 @@ import type { LocalWallet } from '@dydxprotocol/v4-client-js';
 
 import type {
   ClosePositionInputFields,
-  Nullable,
+  HistoricalPnlPeriods,
   HistoricalTradingRewardsPeriod,
   HistoricalTradingRewardsPeriods,
-  HumanReadablePlaceOrderPayload,
   HumanReadableCancelOrderPayload,
+  HumanReadablePlaceOrderPayload,
+  HumanReadableTriggerOrdersPayload,
+  Nullable,
+  ParsingError,
   TradeInputFields,
   TransferInputFields,
-  HistoricalPnlPeriods,
-  ParsingError,
-  HumanReadableTriggerOrdersPayload,
 } from '@/constants/abacus';
 import {
-  AsyncAbacusStateManager,
+  AbacusAppConfig,
   AbacusHelper,
+  ApiData,
+  AsyncAbacusStateManager,
   ClosePositionInputField,
+  ComplianceAction,
+  CoroutineTimer,
   HistoricalPnlPeriod,
+  IOImplementations,
   TradeInputField,
   TransferInputField,
-  IOImplementations,
-  UIImplementations,
-  CoroutineTimer,
   TransferType,
-  AbacusAppConfig,
-  ApiData,
-  type TriggerOrdersInputFields,
   TriggerOrdersInputField,
+  UIImplementations,
+  type TriggerOrdersInputFields,
 } from '@/constants/abacus';
+import { Hdkey } from '@/constants/account';
 import { DEFAULT_MARKETID } from '@/constants/markets';
-import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork, isMainnet } from '@/constants/networks';
+import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork } from '@/constants/networks';
 import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
 
 import type { RootStore } from '@/state/_store';
@@ -88,7 +90,7 @@ class AbacusStateManager {
     const appConfigs = new AbacusAppConfig(
       false, // subscribeToCandles
       true, // loadRemote
-      import.meta.env.MODE === 'development' // enableLogger
+      import.meta.env.MODE === 'development' && import.meta.env.VITE_ENABLE_ABACUS_LOGGING // enableLogger
     );
     appConfigs.squidVersion = AbacusAppConfig.SquidVersion.V2;
 
@@ -207,8 +209,8 @@ class AbacusStateManager {
       field: TransferInputField.type,
       value: null,
     });
-    this.clearTradeInputValues();
     this.clearTriggerOrdersInputValues();
+    this.clearTradeInputValues({ shouldResetSize: true });
   };
 
   // ------ Set Data ------ //
@@ -218,10 +220,11 @@ class AbacusStateManager {
     this.chainTransactions.setStore(store);
   };
 
-  setAccount = (localWallet?: LocalWallet) => {
+  setAccount = (localWallet?: LocalWallet, hdkey?: Hdkey) => {
     if (localWallet) {
       this.stateManager.accountAddress = localWallet.address;
       this.chainTransactions.setLocalWallet(localWallet);
+      if (hdkey) this.chainTransactions.setHdkey(hdkey);
     }
   };
 
@@ -325,6 +328,11 @@ class AbacusStateManager {
   cctpWithdraw = (
     callback: (success: boolean, parsingError: Nullable<ParsingError>, data: string) => void
   ): void => this.stateManager.commitCCTPWithdraw(callback);
+
+  triggerCompliance = (
+    action: typeof ComplianceAction.VALID_SURVEY | typeof ComplianceAction.INVALID_SURVEY,
+    callback: (success: boolean, parsingError: Nullable<ParsingError>, data: string) => void
+  ): void => this.stateManager.triggerCompliance(action, callback);
 
   // ------ Utils ------ //
   getHistoricalPnlPeriod = (): Nullable<HistoricalPnlPeriods> =>

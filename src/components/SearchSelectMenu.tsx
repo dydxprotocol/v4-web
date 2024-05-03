@@ -1,6 +1,6 @@
-import { type ReactNode, useState, useRef } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import { type MenuConfig } from '@/constants/menus';
 

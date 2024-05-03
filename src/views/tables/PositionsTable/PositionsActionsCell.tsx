@@ -4,10 +4,12 @@ import styled, { AnyStyledComponent } from 'styled-components';
 
 import { type SubaccountOrder } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { AppRoute } from '@/constants/routes';
 
 import { useEnvFeatures } from '@/hooks';
+import { useComplianceState } from '@/hooks/useComplianceState';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
@@ -40,6 +42,7 @@ export const PositionsActionsCell = ({
 }: ElementProps) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { complianceState } = useComplianceState();
   const { isSlTpEnabled } = useEnvFeatures();
 
   const currentMarketId = useSelector(getCurrentMarketId);
@@ -63,7 +66,7 @@ export const PositionsActionsCell = ({
 
   return (
     <ActionsTableCell>
-      {isSlTpEnabled && (
+      {isSlTpEnabled && complianceState === ComplianceStates.FULL_ACCESS && (
         <Styled.TriggersButton
           key="edittriggers"
           onClick={() =>

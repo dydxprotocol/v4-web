@@ -1,17 +1,20 @@
 import '@/polyfills';
+
 import { useEffect, useState } from 'react';
+
+import '@/index.css';
+import { GrazProvider } from 'graz';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import { Provider } from 'react-redux';
 import styled from 'styled-components';
 import { WagmiConfig } from 'wagmi';
-import { GrazProvider } from 'graz';
-import { QueryClient, QueryClientProvider } from 'react-query';
 
 import { SupportedLocales } from '@/constants/localization';
 
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
-import { DydxProvider } from '@/hooks/useDydxClient';
 import { DialogAreaProvider } from '@/hooks/useDialogArea';
+import { DydxProvider } from '@/hooks/useDydxClient';
 import { LocaleProvider } from '@/hooks/useLocaleSeparators';
 import { PotentialMarketsProvider } from '@/hooks/usePotentialMarkets';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
@@ -19,22 +22,20 @@ import { SubaccountProvider } from '@/hooks/useSubaccount';
 
 import { GlobalStyle } from '@/styles/globalStyle';
 
-import { SelectMenu, SelectItem } from '@/components/SelectMenu';
+import { SelectItem, SelectMenu } from '@/components/SelectMenu';
 
+import { store } from '@/state/_store';
 import {
+  AppColorMode,
   AppTheme,
   AppThemeSystemSetting,
-  AppColorMode,
-  setAppThemeSetting,
   setAppColorMode,
+  setAppThemeSetting,
 } from '@/state/configs';
-
 import { setLocaleLoaded, setSelectedLocale } from '@/state/localization';
-import { store } from '@/state/_store';
 
 import { config } from '@/lib/wagmi';
 
-import '@/index.css';
 import './ladle.css';
 
 const queryClient = new QueryClient();

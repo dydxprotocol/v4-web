@@ -1,4 +1,4 @@
-import { expect, browser, $ } from '@wdio/globals';
+import { $, browser, expect } from '@wdio/globals';
 
 describe('Smoke test', () => {
   it('should authenticate with vercel and load website', async () => {

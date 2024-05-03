@@ -1,22 +1,24 @@
-import { type FormEvent, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import {
   ClosePositionInputField,
+  ErrorType,
   ValidationError,
   type HumanReadablePlaceOrderPayload,
   type Nullable,
-  ErrorType,
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
+import { NotificationType } from '@/constants/notifications';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 
 import { useBreakpoints, useIsFirstRender, useStringGetter, useSubaccount } from '@/hooks';
+import { useNotifications } from '@/hooks/useNotifications';
 import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
 
 import { breakpoints } from '@/styles';
@@ -36,7 +38,6 @@ import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { closeDialog } from '@/state/dialogs';
 import { getClosePositionInputErrors, getInputClosePositionData } from '@/state/inputsSelectors';
-import { getCurrentInput } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -77,7 +78,6 @@ export const ClosePositionForm = ({
   const isFirstRender = useIsFirstRender();
 
   const [closePositionError, setClosePositionError] = useState<string | undefined>(undefined);
-  const [isClosingPosition, setIsClosingPosition] = useState(false);
 
   const { closePosition } = useSubaccount();
 
@@ -87,7 +87,6 @@ export const ClosePositionForm = ({
     useSelector(getCurrentMarketConfig, shallowEqual) || {};
   const { size: sizeData, summary } = useSelector(getInputClosePositionData, shallowEqual) || {};
   const { size, percent } = sizeData || {};
-  const currentInput = useSelector(getCurrentInput);
   const closePositionInputErrors = useSelector(getClosePositionInputErrors, shallowEqual);
   const currentPositionData = useSelector(getCurrentMarketPositionData, shallowEqual);
   const { size: currentPositionSize } = currentPositionData || {};
@@ -105,14 +104,19 @@ export const ClosePositionForm = ({
     tickSizeDecimals,
   });
 
+  const { getNotificationPreferenceForType } = useNotifications();
+  const isErrorShownInOrderStatusToast = getNotificationPreferenceForType(
+    NotificationType.OrderStatus
+  );
+
   let alertContent;
   let alertType = AlertType.Error;
 
-  if (closePositionError) {
+  if (closePositionError && !isErrorShownInOrderStatusToast) {
     alertContent = closePositionError;
   } else if (inputAlert) {
-    alertContent = inputAlert?.alertString;
-    alertType = inputAlert?.type;
+    alertContent = inputAlert.alertString;
+    alertType = inputAlert.type;
   }
 
   useEffect(() => {
@@ -137,8 +141,6 @@ export const ClosePositionForm = ({
       if (currentStep === MobilePlaceOrderSteps.PlacingOrder) {
         setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
       }
-
-      setIsClosingPosition(false);
     }
   }, [currentStep, isFirstRender]);
 
@@ -166,7 +168,7 @@ export const ClosePositionForm = ({
     });
   };
 
-  const onSubmit = async (e: FormEvent) => {
+  const onSubmit = (e: FormEvent) => {
     e.preventDefault();
 
     switch (currentStep) {
@@ -175,6 +177,7 @@ export const ClosePositionForm = ({
         break;
       }
       case MobilePlaceOrderSteps.PlacingOrder:
+      case MobilePlaceOrderSteps.PlaceOrderFailed:
       case MobilePlaceOrderSteps.Confirmation: {
         dispatch(closeDialog());
         break;
@@ -188,16 +191,15 @@ export const ClosePositionForm = ({
     }
   };
 
-  const onClosePosition = async () => {
+  const onClosePosition = () => {
     setClosePositionError(undefined);
-    setIsClosingPosition(true);
 
-    await closePosition({
+    closePosition({
       onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
         setClosePositionError(
           stringGetter({ key: errorParams?.errorStringKey || STRING_KEYS.SOMETHING_WENT_WRONG })
         );
-        setIsClosingPosition(false);
+        setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
       },
       onSuccess: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => {
         setUnIndexedClientId(placeOrderPayload?.clientId);
@@ -285,7 +287,6 @@ export const ClosePositionForm = ({
         )}
 
         <PlaceOrderButtonAndReceipt
-          isLoading={isClosingPosition}
           hasValidationErrors={hasInputErrors}
           actionStringKey={inputAlert?.actionStringKey}
           validationErrorString={alertContent}

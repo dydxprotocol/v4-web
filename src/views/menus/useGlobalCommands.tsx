@@ -1,4 +1,4 @@
-import { useDispatch, useSelector, shallowEqual } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { Asset, PerpetualMarket } from '@/constants/abacus';
@@ -10,11 +10,11 @@ import { AssetIcon } from '@/components/AssetIcon';
 
 import { getAssets } from '@/state/assetsSelectors';
 import {
+  AppColorMode,
   AppTheme,
   AppThemeSystemSetting,
-  AppColorMode,
-  setAppThemeSetting,
   setAppColorMode,
+  setAppThemeSetting,
 } from '@/state/configs';
 import { setSelectedTradeLayout } from '@/state/layout';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';

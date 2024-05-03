@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react';
 
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, type MarketData } from '@/constants/markets';
-import { FUNDING_DECIMALS, LARGE_TOKEN_DECIMALS } from '@/constants/numbers';
+import { FUNDING_DECIMALS } from '@/constants/numbers';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
@@ -19,17 +20,22 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
-import { type ColumnDef, MarketTableCell, Table, TableCell } from '@/components/Table';
+import { AssetTableCell, Table, TableCell, type ColumnDef } from '@/components/Table';
 import { Toolbar } from '@/components/Toolbar';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
+import { SparklineChart } from '@/components/visx/SparklineChart';
 import { MarketFilter } from '@/views/MarketFilter';
+
+import { setMarketFilter } from '@/state/perpetuals';
+import { getMarketFilter } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 
 export const MarketsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-  const [filter, setFilter] = useState(MarketFilters.ALL);
+  const dispatch = useDispatch();
+  const filter: MarketFilters = useSelector(getMarketFilter);
   const [searchFilter, setSearchFilter] = useState<string>();
   const navigate = useNavigate();
 
@@ -44,7 +50,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               columnKey: 'market',
               getCellValue: (row) => row.market,
               label: stringGetter({ key: STRING_KEYS.MARKET }),
-              renderCell: ({ asset, id }) => <Styled.MarketTableCell asset={asset} marketId={id} />,
+              renderCell: ({ asset }) => <AssetTableCell asset={asset} />,
             },
             {
               columnKey: 'price',
@@ -89,14 +95,14 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               columnKey: 'market',
               getCellValue: (row) => row.market,
               label: stringGetter({ key: STRING_KEYS.MARKET }),
-              renderCell: ({ asset, id }) => <Styled.MarketTableCell asset={asset} marketId={id} />,
+              renderCell: ({ asset }) => <AssetTableCell asset={asset} />,
             },
             {
               columnKey: 'oraclePrice',
               getCellValue: (row) => row.oraclePrice,
               label: stringGetter({ key: STRING_KEYS.ORACLE_PRICE }),
               renderCell: ({ oraclePrice, tickSizeDecimals }) => (
-                <Output
+                <Styled.TabletOutput
                   type={OutputType.Fiat}
                   value={oraclePrice}
                   fractionDigits={tickSizeDecimals}
@@ -104,10 +110,29 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               ),
             },
             {
+              columnKey: 'priceChange24HChart',
+              getCellValue: (row) => row.priceChange24HPercent,
+              label: stringGetter({ key: STRING_KEYS.LAST_24H }),
+              renderCell: ({ line, priceChange24HPercent }) => (
+                <div style={{ width: 50, height: 50 }}>
+                  <SparklineChart
+                    data={(line?.toArray() ?? []).map((datum, index) => ({
+                      x: index + 1,
+                      y: parseFloat(datum.toString()),
+                    }))}
+                    xAccessor={(datum) => datum.x}
+                    yAccessor={(datum) => datum.y}
+                    positive={MustBigNumber(priceChange24HPercent).gt(0)}
+                  />
+                </div>
+              ),
+              allowsSorting: false,
+            },
+            {
               columnKey: 'priceChange24HPercent',
               getCellValue: (row) => row.priceChange24HPercent,
               label: stringGetter({ key: STRING_KEYS.CHANGE_24H }),
-              renderCell: ({ priceChange24H, priceChange24HPercent, tickSizeDecimals }) => (
+              renderCell: ({ priceChange24HPercent }) => (
                 <TableCell stacked>
                   <Styled.InlineRow>
                     {!priceChange24HPercent ? (
@@ -121,12 +146,31 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                       />
                     )}
                   </Styled.InlineRow>
-                  <Output
-                    type={OutputType.Fiat}
-                    value={MustBigNumber(priceChange24H).abs()}
-                    fractionDigits={tickSizeDecimals}
-                  />
                 </TableCell>
+              ),
+            },
+            {
+              columnKey: 'volume24H',
+              getCellValue: (row) => row.volume24H,
+              label: stringGetter({ key: STRING_KEYS.VOLUME_24H }),
+              renderCell: (row) => (
+                <Styled.NumberOutput type={OutputType.CompactFiat} value={row.volume24H} />
+              ),
+            },
+            {
+              columnKey: 'trades24H',
+              getCellValue: (row) => row.trades24H,
+              label: stringGetter({ key: STRING_KEYS.TRADES }),
+              renderCell: (row) => (
+                <Styled.NumberOutput type={OutputType.CompactNumber} value={row.trades24H} />
+              ),
+            },
+            {
+              columnKey: 'openInterest',
+              getCellValue: (row) => row.openInterestUSDC,
+              label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
+              renderCell: (row) => (
+                <Styled.NumberOutput type={OutputType.CompactFiat} value={row.openInterestUSDC} />
               ),
             },
             {
@@ -143,44 +187,21 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                 />
               ),
             },
-            {
-              columnKey: 'openInterest',
-              getCellValue: (row) => row.openInterestUSDC,
-              label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
-              renderCell: (row) => (
-                <TableCell stacked>
-                  <Output type={OutputType.Fiat} value={row.openInterestUSDC} />
-
-                  <Output
-                    fractionDigits={LARGE_TOKEN_DECIMALS}
-                    type={OutputType.Number}
-                    value={row.openInterest}
-                    tag={row.asset?.id}
-                  />
-                </TableCell>
-              ),
-            },
-            {
-              columnKey: 'volume24H',
-              getCellValue: (row) => row.volume24H,
-              label: stringGetter({ key: STRING_KEYS.VOLUME_24H }),
-              renderCell: (row) => <Output type={OutputType.Fiat} value={row.volume24H} />,
-            },
-            {
-              columnKey: 'trades24H',
-              getCellValue: (row) => row.trades24H,
-              label: stringGetter({ key: STRING_KEYS.TRADES_24H }),
-              renderCell: (row) => <Output type={OutputType.Number} value={row.trades24H} />,
-            },
           ] as ColumnDef<MarketData>[]),
     [stringGetter, isTablet]
   );
+
+  const setFilter = (filter: MarketFilters) => {
+    dispatch(setMarketFilter(filter));
+  };
 
   return (
     <>
       <Styled.Toolbar>
         <MarketFilter
           hideNewMarketButton
+          compactLayout
+          searchPlaceholderKey={STRING_KEYS.SEARCH_MARKETS}
           selectedFilter={filter}
           filters={marketFilters as MarketFilters[]}
           onChangeFilter={setFilter}
@@ -190,7 +211,6 @@ export const MarketsTable = ({ className }: { className?: string }) => {
 
       <Styled.Table
         withInnerBorders
-        withOuterBorder={!isTablet}
         data={filteredMarkets}
         getRowKey={(row: MarketData) => row.market}
         label="Markets"
@@ -251,6 +271,18 @@ const Styled: Record<string, AnyStyledComponent> = {};
 Styled.Toolbar = styled(Toolbar)`
   max-width: 100vw;
   overflow: hidden;
+  margin-bottom: 0.625rem;
+  padding-left: 0.375rem;
+  padding-right: 0;
+
+  @media ${breakpoints.desktopSmall} {
+    padding-right: 0.375rem;
+  }
+
+  @media ${breakpoints.tablet} {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 `;
 
 Styled.Table = styled(Table)`
@@ -263,22 +295,9 @@ Styled.Table = styled(Table)`
   }
 `;
 
-Styled.MarketTableCell = styled(MarketTableCell)`
-  @media ${breakpoints.tablet} {
-    span:first-child {
-      font: var(--font-medium-book);
-    }
-    span:last-child {
-      font: var(--font-mini-regular);
-    }
-  }
-`;
-
 Styled.TabletOutput = styled(Output)`
-  @media ${breakpoints.tablet} {
-    font: var(--font-medium-book);
-    color: var(--color-text-2);
-  }
+  font: var(--font-medium-book);
+  color: var(--color-text-2);
 `;
 
 Styled.InlineRow = styled.div`
@@ -289,6 +308,11 @@ Styled.TabletPriceChange = styled(Styled.InlineRow)`
   font: var(--font-small-book);
 `;
 
+Styled.NumberOutput = styled(Output)`
+  font: var(--font-base-medium);
+  color: var(--color-text-2);
+`;
+
 Styled.Output = styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`
   color: ${({ isNegative, isPositive }) =>
     isNegative
@@ -296,6 +320,7 @@ Styled.Output = styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`
       : isPositive
       ? `var(--color-positive)`
       : `var(--color-text-1)`};
+  font: var(--font-base-medium);
 `;
 
 Styled.MarketNotFound = styled.div`

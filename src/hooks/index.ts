@@ -20,6 +20,7 @@ import { useNow } from './useNow';
 import { useOnClickOutside } from './useOnClickOutside';
 import { usePageTitlePriceUpdates } from './usePageTitlePriceUpdates';
 import { usePerpetualMarketSparklines } from './usePerpetualMarketSparklines';
+import { usePerpetualMarketsStats } from './usePerpetualMarketsStats';
 import { useRestrictions } from './useRestrictions';
 import { useSelectedNetwork } from './useSelectedNetwork';
 import { useShouldShowFooter } from './useShouldShowFooter';
@@ -32,9 +33,11 @@ import { useURLConfigs } from './useURLConfigs';
 import { useWithdrawalInfo } from './useWithdrawalInfo';
 
 export {
+  useAccountBalance,
+  useAccounts,
+  useAnalytics,
   useApiState,
   useBreakpoints,
-  useTokenConfigs,
   useCommandMenu,
   useCurrentMarketId,
   useDebounce,
@@ -42,26 +45,25 @@ export {
   useDydxClient,
   useEnvFeatures,
   useGovernanceVariables,
-  useAccountBalance,
-  useAccounts,
-  useAnalytics,
   useInitializePage,
   useInterval,
   useIsFirstRender,
-  useLocaleSeparators,
   useLocalStorage,
+  useLocaleSeparators,
   useNextClobPairId,
   useNow,
   useOnClickOutside,
   usePageTitlePriceUpdates,
   usePerpetualMarketSparklines,
   useRestrictions,
-  useShouldShowFooter,
   useSelectedNetwork,
+  useShouldShowFooter,
   useStringGetter,
   useSubaccount,
+  useTokenConfigs,
   useTradeFormInputs,
   useTriggerOrdersFormInputs,
   useURLConfigs,
   useWithdrawalInfo,
+  usePerpetualMarketsStats,
 };

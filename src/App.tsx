@@ -5,17 +5,17 @@ import { PrivyWagmiConnector } from '@privy-io/wagmi-connector';
 import { GrazProvider } from 'graz';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { WagmiConfig } from 'wagmi';
 
 import { AppRoute, DEFAULT_TRADE_ROUTE, MarketsRoute } from '@/constants/routes';
 
 import {
+  useAnalytics,
   useBreakpoints,
-  useTokenConfigs,
   useInitializePage,
   useShouldShowFooter,
-  useAnalytics,
+  useTokenConfigs,
 } from '@/hooks';
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
@@ -47,6 +47,9 @@ import { GlobalCommandDialog } from '@/views/dialogs/GlobalCommandDialog';
 import { parseLocationHash } from '@/lib/urlUtils';
 import { config, configureChainsConfig, privyConfig } from '@/lib/wagmi';
 
+import { ComplianceStates } from './constants/compliance';
+import { useComplianceState } from './hooks/useComplianceState';
+
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
 const PortfolioPage = lazy(() => import('@/pages/portfolio/Portfolio'));
@@ -61,8 +64,6 @@ const TokenPage = lazy(() => import('@/pages/token/Token'));
 const queryClient = new QueryClient();
 
 const Content = () => {
-  const { setDialogArea } = useDialogArea();
-
   useInitializePage();
   useAnalytics();
 
@@ -72,6 +73,8 @@ const Content = () => {
   const { chainTokenLabel } = useTokenConfigs();
   const location = useLocation();
 
+  const { complianceState } = useComplianceState();
+
   const pathFromHash = useMemo(() => {
     if (location.hash === '') {
       return '';
@@ -79,6 +82,7 @@ const Content = () => {
     return parseLocationHash(location.hash);
   }, [location.hash]);
 
+  const { dialogAreaRef } = useDialogArea() ?? {};
   return (
     <>
       <GlobalStyle />
@@ -97,7 +101,18 @@ const Content = () => {
                 <Route path={MarketsRoute.New} element={<NewMarket />} />
                 <Route path={AppRoute.Markets} element={<MarketsPage />} />
               </Route>
-              <Route path={`/${chainTokenLabel}/*`} element={<TokenPage />} />
+
+              <Route
+                path={`/${chainTokenLabel}/*`}
+                element={
+                  complianceState === ComplianceStates.FULL_ACCESS ? (
+                    <TokenPage />
+                  ) : (
+                    <Navigate to={DEFAULT_TRADE_ROUTE} />
+                  )
+                }
+              />
+
               {isTablet && (
                 <>
                   <Route path={AppRoute.Alerts} element={<AlertsPage />} />
@@ -124,7 +139,7 @@ const Content = () => {
 
         <Styled.NotificationsToastArea />
 
-        <Styled.DialogArea ref={setDialogArea}>
+        <Styled.DialogArea ref={dialogAreaRef}>
           <DialogManager />
         </Styled.DialogArea>
 
@@ -168,83 +183,83 @@ const App = () => {
   }, <Content />);
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
+const Styled = {
+  Content: styled.div<{ isShowingHeader: boolean; isShowingFooter: boolean }>`
+    /* Computed */
+    --page-currentHeaderHeight: 0px;
+    --page-currentFooterHeight: 0px;
 
-Styled.Content = styled.div<{ isShowingHeader: boolean; isShowingFooter: boolean }>`
-  /* Computed */
-  --page-currentHeaderHeight: 0px;
-  --page-currentFooterHeight: 0px;
+    ${({ isShowingHeader }) =>
+      isShowingHeader &&
+      css`
+        --page-currentHeaderHeight: var(--page-header-height);
 
-  ${({ isShowingHeader }) =>
-    isShowingHeader &&
-    css`
-      --page-currentHeaderHeight: var(--page-header-height);
+        @media ${breakpoints.tablet} {
+          --page-currentHeaderHeight: var(--page-header-height-mobile);
+        }
+      `}
 
-      @media ${breakpoints.tablet} {
-        --page-currentHeaderHeight: var(--page-header-height-mobile);
-      }
-    `}
+    ${({ isShowingFooter }) =>
+      isShowingFooter &&
+      css`
+        --page-currentFooterHeight: var(--page-footer-height);
 
-  ${({ isShowingFooter }) =>
-    isShowingFooter &&
-    css`
-      --page-currentFooterHeight: var(--page-footer-height);
+        @media ${breakpoints.tablet} {
+          --page-currentFooterHeight: var(--page-footer-height-mobile);
+        }
+      `}
+  
+    /* Rules */
+    ${layoutMixins.contentContainer}
+  
+    ${layoutMixins.scrollArea}
+    --scrollArea-height: 100vh;
 
-      @media ${breakpoints.tablet} {
-        --page-currentFooterHeight: var(--page-footer-height-mobile);
-      }
-    `}
+    @supports (-webkit-touch-callout: none) {
+      height: -webkit-fill-available;
+    }
 
-  /* Rules */
-  ${layoutMixins.contentContainer}
+    ${layoutMixins.stickyArea0}
+    --stickyArea0-topHeight: var(--page-currentHeaderHeight);
+    --stickyArea0-topGap: var(--border-width);
+    --stickyArea0-bottomGap: var(--border-width);
+    --stickyArea0-bottomHeight: var(--page-currentFooterHeight);
 
-  ${layoutMixins.scrollArea}
-  --scrollArea-height: 100vh;
+    ${layoutMixins.withOuterAndInnerBorders}
+    display: grid;
+    grid-template:
+      'Header' var(--page-currentHeaderHeight)
+      'Main' minmax(min-content, 1fr)
+      'Footer' var(--page-currentFooterHeight)
+      / 100%;
 
-  @supports (-webkit-touch-callout: none) {
-    height: -webkit-fill-available;
-  }
+    transition: 0.3s var(--ease-out-expo);
+  `,
 
-  ${layoutMixins.stickyArea0}
-  --stickyArea0-topHeight: var(--page-currentHeaderHeight);
-  --stickyArea0-topGap: var(--border-width);
-  --stickyArea0-bottomGap: var(--border-width);
-  --stickyArea0-bottomHeight: var(--page-currentFooterHeight);
+  Main: styled.main`
+    ${layoutMixins.contentSectionAttached}
+    box-shadow: none;
 
-  ${layoutMixins.withOuterAndInnerBorders}
-  display: grid;
-  grid-template:
-    'Header' var(--page-currentHeaderHeight)
-    'Main' minmax(min-content, 1fr)
-    'Footer' var(--page-currentFooterHeight)
-    / 100%;
+    grid-area: Main;
 
-  transition: 0.3s var(--ease-out-expo);
-`;
+    isolation: isolate;
 
-Styled.Main = styled.main`
-  ${layoutMixins.contentSectionAttached}
-  box-shadow: none;
+    position: relative;
+  `,
 
-  grid-area: Main;
+  NotificationsToastArea: styled(NotificationsToastArea)`
+    grid-area: Main;
+    z-index: 2;
+  `,
 
-  isolation: isolate;
-
-  position: relative;
-`;
-
-Styled.NotificationsToastArea = styled(NotificationsToastArea)`
-  grid-area: Main;
-  z-index: 2;
-`;
-
-Styled.DialogArea = styled.aside`
-  position: fixed;
-  height: 100%;
-  z-index: 1;
-  inset: 0;
-  overflow: clip;
-  ${layoutMixins.noPointerEvents}
-`;
+  DialogArea: styled.aside`
+    position: fixed;
+    height: 100%;
+    z-index: 1;
+    inset: 0;
+    overflow: clip;
+    ${layoutMixins.noPointerEvents}
+  `,
+};
 
 export default App;

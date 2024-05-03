@@ -1,11 +1,10 @@
-import { useState } from 'react';
-
-import { useDispatch, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { AbacusOrderStatus, AbacusOrderTypes, type Nullable } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS, type StringKey } from '@/constants/localization';
+import { CancelOrderStatuses } from '@/constants/trade';
 
 import { useStringGetter, useSubaccount } from '@/hooks';
 
@@ -15,23 +14,18 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { type DetailsItem } from '@/components/Details';
 import { DetailsDialog } from '@/components/DetailsDialog';
-import { Icon } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
+import { OrderStatusIcon } from '@/views/OrderStatusIcon';
 import { type OrderTableRow } from '@/views/tables/OrdersTable';
 
 import { clearOrder } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-import { getOrderDetails } from '@/state/accountSelectors';
+import { getLocalCancelOrders, getOrderDetails } from '@/state/accountSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
-import {
-  isOrderStatusClearable,
-  isMarketOrderType,
-  relativeTimeString,
-  getStatusIconInfo,
-} from '@/lib/orders';
+import { isMarketOrderType, isOrderStatusClearable, relativeTimeString } from '@/lib/orders';
 
 type ElementProps = {
   orderId: string;
@@ -43,8 +37,12 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
   const dispatch = useDispatch();
   const selectedLocale = useSelector(getSelectedLocale);
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
-
+  const localCancelOrders = useSelector(getLocalCancelOrders, shallowEqual);
   const { cancelOrder } = useSubaccount();
+
+  const localCancelOrder = localCancelOrders.find((order) => order.orderId === orderId);
+  const isOrderCanceling =
+    localCancelOrder && localCancelOrder.submissionStatus < CancelOrderStatuses.Canceled;
 
   const {
     asset,
@@ -66,12 +64,6 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     triggerPrice,
     type,
   } = (useSelector(getOrderDetails(orderId)) as OrderTableRow) || {};
-  const [isPlacingCancel, setIsPlacingCancel] = useState(false);
-
-  const { statusIcon, statusIconColor, statusStringKey } = getStatusIconInfo({
-    status,
-    totalFilled,
-  });
 
   const renderOrderPrice = ({
     type,
@@ -107,13 +99,9 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
       label: stringGetter({ key: STRING_KEYS.STATUS }),
       value: (
         <Styled.Row>
-          <Styled.StatusIcon iconName={statusIcon} color={statusIconColor} />
+          <OrderStatusIcon status={status.rawValue} />
           <Styled.Status>
-            {statusStringKey
-              ? stringGetter({ key: statusStringKey })
-              : resources.statusStringKey
-              ? stringGetter({ key: resources.statusStringKey })
-              : undefined}
+            {resources.statusStringKey && stringGetter({ key: resources.statusStringKey })}
           </Styled.Status>
         </Styled.Row>
       ),
@@ -182,9 +170,8 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     },
   ].filter((item) => Boolean(item.value)) as DetailsItem[];
 
-  const onCancelClick = async () => {
-    setIsPlacingCancel(true);
-    await cancelOrder({ orderId, onError: () => setIsPlacingCancel(false) });
+  const onCancelClick = () => {
+    cancelOrder({ orderId });
   };
 
   const onClearClick = () => {
@@ -203,8 +190,8 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
           <Button
             action={ButtonAction.Destroy}
             state={{
-              isDisabled: isPlacingCancel || status === AbacusOrderStatus.canceling,
-              isLoading: isPlacingCancel,
+              isDisabled: isOrderCanceling || status === AbacusOrderStatus.canceling,
+              isLoading: isOrderCanceling,
             }}
             onClick={onCancelClick}
           >
@@ -222,10 +209,6 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Row = styled.div`
   ${layoutMixins.inlineRow}
-`;
-
-Styled.StatusIcon = styled(Icon)<{ color: string }>`
-  color: ${({ color }) => color};
 `;
 
 Styled.Status = styled.span`

@@ -46,7 +46,7 @@ export const CollapsibleStoryWithSlotTrigger: Story<CollapsibleProps> = (args) =
     <StoryWrapper>
       <Collapsible
         {...args}
-        slotTrigger={<Checkbox checked={checked} onCheckedChange={setChecked}/>}
+        slotTrigger={<Checkbox checked={checked} onCheckedChange={setChecked} />}
         open={checked}
         onOpenChange={setChecked}
       >

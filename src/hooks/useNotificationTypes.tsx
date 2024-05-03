@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
 
-import { isEqual, groupBy } from 'lodash';
+import { groupBy, isEqual } from 'lodash';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { ComplianceStatus } from '@/constants/abacus';
+import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import {
   STRING_KEYS,
@@ -13,11 +15,12 @@ import {
   type StringKey,
 } from '@/constants/localization';
 import {
-  type NotificationTypeConfig,
-  NotificationType,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
-  TransferNotificationTypes,
+  NotificationDisplayData,
+  NotificationType,
   ReleaseUpdateNotificationIds,
+  TransferNotificationTypes,
+  type NotificationTypeConfig,
 } from '@/constants/notifications';
 import { AppRoute, TokenRoute } from '@/constants/routes';
 import { DydxChainAsset } from '@/constants/wallets';
@@ -31,11 +34,18 @@ import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
+import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
+import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
 import { TriggerOrderNotification } from '@/views/notifications/TriggerOrderNotification';
 
-import { getSubaccountFills, getSubaccountOrders } from '@/state/accountSelectors';
+import {
+  getLocalCancelOrders,
+  getLocalPlaceOrders,
+  getSubaccountFills,
+  getSubaccountOrders,
+} from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
@@ -44,6 +54,7 @@ import { getMarketIds } from '@/state/perpetualsSelectors';
 import { getTitleAndBodyForTriggerOrderNotification } from '@/lib/notifications';
 import { formatSeconds } from '@/lib/timeUtils';
 
+import { useComplianceState } from './useComplianceState';
 import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
 
 const parseStringParamsForNotification = ({
@@ -66,6 +77,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const abacusNotifications = useSelector(getAbacusNotifications, isEqual);
+      const orders = useSelector(getSubaccountOrders, shallowEqual) || [];
+      const ordersById = groupBy(orders, 'id');
+      const localPlaceOrders = useSelector(getLocalPlaceOrders, shallowEqual);
 
       useEffect(() => {
         for (const abacusNotif of abacusNotifications) {
@@ -80,6 +94,13 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
           switch (abacusNotificationType) {
             case 'order': {
+              const order = ordersById[id]?.[0];
+              const clientId: number | undefined = order?.clientId ?? undefined;
+              const localOrderExists =
+                clientId && localPlaceOrders.some((order) => order.clientId === clientId);
+
+              if (localOrderExists) return; // already handled by OrderStatusNotification
+
               trigger(
                 abacusNotif.id,
                 {
@@ -271,6 +292,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 icon: assetIcon,
                 title: title,
                 body: body,
+                toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
                 renderCustomBody: ({ isToast, notification }) => (
                   <TriggerOrderNotification
                     status={status}
@@ -300,11 +322,14 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const { chainTokenLabel } = useTokenConfigs();
       const stringGetter = useStringGetter();
-      const expirationDate = new Date('2024-05-09T23:59:59');
+
+      const incentivesExpirationDate = new Date('2024-05-09T23:59:59');
+      const conditionalOrdersExpirationDate = new Date('2024-06-01T23:59:59');
+
       const currentDate = new Date();
 
       useEffect(() => {
-        if (currentDate <= expirationDate) {
+        if (currentDate <= incentivesExpirationDate) {
           trigger(
             ReleaseUpdateNotificationIds.IncentivesS4,
             {
@@ -323,6 +348,31 @@ export const notificationTypes: NotificationTypeConfig[] = [
               }),
               toastSensitivity: 'foreground',
               groupKey: ReleaseUpdateNotificationIds.IncentivesS4,
+            },
+            []
+          );
+        }
+
+        if (currentDate <= conditionalOrdersExpirationDate) {
+          trigger(
+            ReleaseUpdateNotificationIds.RevampedConditionalOrders,
+            {
+              icon: <AssetIcon symbol={chainTokenLabel} />,
+              title: stringGetter({
+                key: 'NOTIFICATIONS.CONDITIONAL_ORDERS_REVAMP.TITLE',
+              }),
+              body: stringGetter({
+                key: 'NOTIFICATIONS.CONDITIONAL_ORDERS_REVAMP.BODY',
+                params: {
+                  TWITTER_LINK: (
+                    <$Link href="https://twitter.com/dYdX/status/1785339109268935042">
+                      {stringGetter({ key: STRING_KEYS.HERE })}
+                    </$Link>
+                  ),
+                },
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.RevampedConditionalOrders,
             },
             []
           );
@@ -395,6 +445,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               body: statusErrorMessage.body,
               toastSensitivity: 'foreground',
               groupKey: NotificationType.ApiError,
+              withClose: false,
               actionAltText: stringGetter({ key: STRING_KEYS.STATUS_PAGE }),
               renderActionSlot: () => (
                 <Link href={statusPage}>{stringGetter({ key: STRING_KEYS.STATUS_PAGE })} →</Link>
@@ -409,6 +460,123 @@ export const notificationTypes: NotificationTypeConfig[] = [
       return () => {};
     },
   },
+  {
+    type: NotificationType.ComplianceAlert,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+      const { complianceMessage, complianceState, complianceStatus } = useComplianceState();
+
+      useEffect(() => {
+        if (complianceState !== ComplianceStates.FULL_ACCESS) {
+          const displayData: NotificationDisplayData = {
+            icon: <$WarningIcon iconName={IconName.Warning} />,
+            title: stringGetter({ key: STRING_KEYS.COMPLIANCE_WARNING }),
+            body: complianceMessage,
+            toastSensitivity: 'foreground',
+            groupKey: NotificationType.ComplianceAlert,
+            withClose: false,
+          };
+
+          trigger(`${NotificationType.ComplianceAlert}-${complianceStatus}`, displayData, []);
+        }
+      }, [stringGetter, complianceMessage, complianceState, complianceStatus]);
+    },
+    useNotificationAction: () => {
+      const dispatch = useDispatch();
+      const { complianceStatus } = useComplianceState();
+
+      return () => {
+        if (complianceStatus === ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY) {
+          dispatch(
+            openDialog({
+              type: DialogTypes.GeoCompliance,
+            })
+          );
+        }
+      };
+    },
+  },
+  {
+    type: NotificationType.OrderStatus,
+    useTrigger: ({ trigger }) => {
+      const localPlaceOrders = useSelector(getLocalPlaceOrders, shallowEqual);
+      const localCancelOrders = useSelector(getLocalCancelOrders, shallowEqual);
+      const allOrders = useSelector(getSubaccountOrders, shallowEqual);
+      const stringGetter = useStringGetter();
+
+      useEffect(() => {
+        for (const localPlace of localPlaceOrders) {
+          const key = localPlace.clientId.toString();
+          trigger(
+            key,
+            {
+              icon: null,
+              title: stringGetter({ key: STRING_KEYS.ORDER_STATUS }),
+              toastSensitivity: 'background',
+              groupKey: key, // do not collapse
+              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+              renderCustomBody: ({ isToast, notification }) => (
+                <OrderStatusNotification
+                  isToast={isToast}
+                  localOrder={localPlace}
+                  notification={notification}
+                />
+              ),
+            },
+            [localPlace.submissionStatus],
+            true
+          );
+        }
+      }, [localPlaceOrders]);
+
+      useEffect(() => {
+        for (const localCancel of localCancelOrders) {
+          // ensure order exists
+          const existingOrder = allOrders?.find((order) => order.id === localCancel.orderId);
+          if (!existingOrder) return;
+
+          // share same notification with existing local order if exists
+          const key = (existingOrder.clientId ?? localCancel.orderId).toString();
+
+          trigger(
+            key,
+            {
+              icon: null,
+              title: stringGetter({ key: STRING_KEYS.ORDER_STATUS }),
+              toastSensitivity: 'background',
+              groupKey: key,
+              toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
+              renderCustomBody: ({ isToast, notification }) => (
+                <OrderCancelNotification
+                  isToast={isToast}
+                  localCancel={localCancel}
+                  notification={notification}
+                />
+              ),
+            },
+            [localCancel.submissionStatus],
+            true
+          );
+        }
+      }, [localCancelOrders]);
+    },
+    useNotificationAction: () => {
+      const dispatch = useDispatch();
+      const orders = useSelector(getSubaccountOrders, shallowEqual) || [];
+
+      return (orderClientId: string) => {
+        const order = orders.find((order) => order.clientId?.toString() === orderClientId);
+        if (order) {
+          dispatch(
+            openDialog({
+              type: DialogTypes.OrderDetails,
+              dialogProps: { orderId: order.id },
+            })
+          );
+        }
+      };
+    },
+  },
 ];
 
 const $Icon = styled.img`
@@ -421,5 +589,10 @@ const $WarningIcon = styled(Icon)`
 `;
 
 const $Output = styled(Output)`
+  display: inline-block;
+`;
+
+const $Link = styled(Link)`
+  --link-color: var(--color-accent);
   display: inline-block;
 `;

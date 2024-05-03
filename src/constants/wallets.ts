@@ -8,8 +8,9 @@ import {
   BitkeepIcon,
   BitpieIcon,
   CloverWalletIcon,
-  CoinbaseIcon,
   Coin98Icon,
+  CoinbaseIcon,
+  EmailIcon,
   GenericWalletIcon,
   HuobiIcon,
   ImTokenIcon,
@@ -21,7 +22,6 @@ import {
   TokenPocketIcon,
   TrustWalletIcon,
   WalletConnectIcon,
-  EmailIcon,
 } from '@/icons';
 
 import { isMetaMask } from '@/lib/wallet/providers';

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { useSelector, shallowEqual } from 'react-redux';
+import { shallowEqual, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 
 import { AnalyticsEvent, AnalyticsUserProperty } from '@/constants/analytics';
@@ -12,7 +12,7 @@ import { getActiveDialog } from '@/state/dialogsSelectors';
 import { getInputTradeData } from '@/state/inputsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
-import { track, identify } from '@/lib/analytics';
+import { identify, track } from '@/lib/analytics';
 import { getSelectedTradeType } from '@/lib/tradeData';
 
 import { useAccounts } from './useAccounts';

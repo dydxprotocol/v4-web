@@ -7,6 +7,11 @@ import { mapCandle } from '@/lib/tradingView/utils';
 import type { RootState } from './_store';
 
 /**
+ * @returns current market filter applied inside the markets page
+ */
+export const getMarketFilter = (state: RootState) => state.perpetuals.marketFilter;
+
+/**
  * @returns marketId of the market the user is currently viewing
  */
 export const getCurrentMarketId = (state: RootState) => state.perpetuals.currentMarketId;

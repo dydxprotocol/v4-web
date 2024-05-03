@@ -2,21 +2,30 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 import type {
   AccountBalance,
-  SubaccountFill,
+  Compliance,
+  HistoricalPnlPeriods,
   Nullable,
+  SubAccountHistoricalPNLs,
   Subaccount,
+  SubaccountFill,
   SubaccountFills,
   SubaccountFundingPayments,
-  Wallet,
   SubaccountOrder,
   SubaccountTransfers,
-  HistoricalPnlPeriods,
-  SubAccountHistoricalPNLs,
-  UsageRestriction,
   TradingRewards,
+  UsageRestriction,
+  Wallet,
 } from '@/constants/abacus';
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
 import { LocalStorageKey } from '@/constants/localStorage';
+import { STRING_KEYS } from '@/constants/localization';
+import {
+  CancelOrderStatuses,
+  PlaceOrderStatuses,
+  type LocalCancelOrderData,
+  type LocalPlaceOrderData,
+  type TradeTypes,
+} from '@/constants/trade';
 import { WalletType } from '@/constants/wallets';
 
 import { getLocalStorage } from '@/lib/localStorage';
@@ -43,8 +52,11 @@ export type AccountState = {
   latestOrder?: Nullable<SubaccountOrder>;
   historicalPnlPeriod?: HistoricalPnlPeriods;
   uncommittedOrderClientIds: number[];
+  localPlaceOrders: LocalPlaceOrderData[];
+  localCancelOrders: LocalCancelOrderData[];
 
   restriction?: Nullable<UsageRestriction>;
+  compliance?: Compliance;
 };
 
 const initialState: AccountState = {
@@ -81,9 +93,12 @@ const initialState: AccountState = {
   latestOrder: undefined,
   uncommittedOrderClientIds: [],
   historicalPnlPeriod: undefined,
+  localPlaceOrders: [],
+  localCancelOrders: [],
 
   // Restriction
   restriction: undefined,
+  compliance: undefined,
 };
 
 export const accountSlice = createSlice({
@@ -98,10 +113,27 @@ export const accountSlice = createSlice({
         state.fills != null &&
         (action.payload ?? []).some((fill: SubaccountFill) => !existingFillIds.includes(fill.id));
 
+      const filledOrderIds = (action.payload ?? []).map((fill: SubaccountFill) => fill.orderId);
+
       return {
         ...state,
         fills: action.payload,
         hasUnseenFillUpdates: state.hasUnseenFillUpdates || hasNewFillUpdates,
+        localPlaceOrders: hasNewFillUpdates
+          ? state.localPlaceOrders.map((order) =>
+              order.submissionStatus < PlaceOrderStatuses.Filled &&
+              order.orderId &&
+              filledOrderIds.includes(order.orderId)
+                ? {
+                    ...order,
+                    submissionStatus: PlaceOrderStatuses.Filled,
+                  }
+                : order
+            )
+          : state.localPlaceOrders,
+        submittedCanceledOrders: hasNewFillUpdates
+          ? state.localCancelOrders.filter((order) => !filledOrderIds.includes(order.orderId))
+          : state.localCancelOrders,
       };
     },
     setFundingPayments: (state, action: PayloadAction<any>) => {
@@ -111,12 +143,21 @@ export const accountSlice = createSlice({
       state.transfers = action.payload;
     },
     setLatestOrder: (state, action: PayloadAction<Nullable<SubaccountOrder>>) => {
-      const { clientId } = action.payload ?? {};
+      const { clientId, id } = action.payload ?? {};
       state.latestOrder = action.payload;
 
       if (clientId) {
         state.uncommittedOrderClientIds = state.uncommittedOrderClientIds.filter(
-          (id) => id !== clientId
+          (uncommittedClientId) => uncommittedClientId !== clientId
+        );
+        state.localPlaceOrders = state.localPlaceOrders.map((order) =>
+          order.clientId === clientId && order.submissionStatus < PlaceOrderStatuses.Placed
+            ? {
+                ...order,
+                orderId: id,
+                submissionStatus: PlaceOrderStatuses.Placed,
+              }
+            : order
         );
       }
     },
@@ -145,6 +186,9 @@ export const accountSlice = createSlice({
     },
     setRestrictionType: (state, action: PayloadAction<Nullable<UsageRestriction>>) => {
       state.restriction = action.payload;
+    },
+    setCompliance: (state, action: PayloadAction<Compliance>) => {
+      state.compliance = action.payload;
     },
     setSubaccount: (state, action: PayloadAction<Nullable<Subaccount>>) => {
       const existingOrderIds = state.subaccount?.orders
@@ -183,12 +227,61 @@ export const accountSlice = createSlice({
     setTradingRewards: (state, action: PayloadAction<TradingRewards>) => {
       state.tradingRewards = action.payload;
     },
-    addUncommittedOrderClientId: (state, action: PayloadAction<number>) => {
-      state.uncommittedOrderClientIds.push(action.payload);
+    placeOrderSubmitted: (
+      state,
+      action: PayloadAction<{ marketId: string; clientId: number; orderType: TradeTypes }>
+    ) => {
+      state.localPlaceOrders.push({
+        ...action.payload,
+        submissionStatus: PlaceOrderStatuses.Submitted,
+      });
+      state.uncommittedOrderClientIds.push(action.payload.clientId);
     },
-    removeUncommittedOrderClientId: (state, action: PayloadAction<number>) => {
+    placeOrderFailed: (
+      state,
+      action: PayloadAction<{ clientId: number; errorStringKey: string }>
+    ) => {
+      state.localPlaceOrders = state.localPlaceOrders.map((order) =>
+        order.clientId === action.payload.clientId
+          ? {
+              ...order,
+              errorStringKey: action.payload.errorStringKey,
+            }
+          : order
+      );
       state.uncommittedOrderClientIds = state.uncommittedOrderClientIds.filter(
-        (id) => id !== action.payload
+        (id) => id !== action.payload.clientId
+      );
+    },
+    placeOrderTimeout: (state, action: PayloadAction<number>) => {
+      if (state.uncommittedOrderClientIds.includes(action.payload)) {
+        placeOrderFailed({
+          clientId: action.payload,
+          errorStringKey: STRING_KEYS.SOMETHING_WENT_WRONG,
+        });
+      }
+    },
+    cancelOrderSubmitted: (state, action: PayloadAction<string>) => {
+      state.localCancelOrders.push({
+        orderId: action.payload,
+        submissionStatus: CancelOrderStatuses.Submitted,
+      });
+    },
+    cancelOrderConfirmed: (state, action: PayloadAction<string>) => {
+      state.localCancelOrders = state.localCancelOrders.map((order) =>
+        order.orderId === action.payload
+          ? { ...order, submissionStatus: CancelOrderStatuses.Canceled }
+          : order
+      );
+    },
+    cancelOrderFailed: (
+      state,
+      action: PayloadAction<{ orderId: string; errorStringKey: string }>
+    ) => {
+      state.localCancelOrders.map((order) =>
+        order.orderId === action.payload.orderId
+          ? { ...order, errorStringKey: action.payload.errorStringKey }
+          : order
       );
     },
   },
@@ -204,6 +297,7 @@ export const {
   setOnboardingState,
   setHistoricalPnl,
   setRestrictionType,
+  setCompliance,
   setSubaccount,
   setWallet,
   viewedFills,
@@ -211,6 +305,10 @@ export const {
   setBalances,
   setStakingBalances,
   setTradingRewards,
-  addUncommittedOrderClientId,
-  removeUncommittedOrderClientId,
+  placeOrderSubmitted,
+  placeOrderFailed,
+  placeOrderTimeout,
+  cancelOrderSubmitted,
+  cancelOrderConfirmed,
+  cancelOrderFailed,
 } = accountSlice.actions;

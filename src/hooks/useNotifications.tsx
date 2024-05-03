@@ -11,13 +11,15 @@ import {
 import { AnalyticsEvent } from '@/constants/analytics';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import {
+  NotificationCategoryPreferences,
+  NotificationStatus,
+  NotificationType,
+  NotificationTypeCategory,
+  SingleSessionNotificationTypes,
   type Notification,
   type NotificationDisplayData,
   type NotificationPreferences,
   type Notifications,
-  NotificationStatus,
-  NotificationType,
-  SingleSessionNotificationTypes,
 } from '@/constants/notifications';
 
 import { track } from '@/lib/analytics';
@@ -57,11 +59,10 @@ const useNotificationsContext = () => {
     useLocalStorage<NotificationPreferences>({
       key: LocalStorageKey.NotificationPreferences,
       defaultValue: {
-        [NotificationType.AbacusGenerated]: true,
-        [NotificationType.SquidTransfer]: true,
-        [NotificationType.TriggerOrder]: true,
-        [NotificationType.ReleaseUpdates]: true,
-        [NotificationType.ApiError]: true,
+        [NotificationCategoryPreferences.General]: true,
+        [NotificationCategoryPreferences.Transfers]: true,
+        [NotificationCategoryPreferences.Trading]: true,
+        [NotificationCategoryPreferences.MustSee]: true,
         version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
       },
     });
@@ -120,11 +121,10 @@ const useNotificationsContext = () => {
       LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences]
     ) {
       setNotificationPreferences({
-        [NotificationType.AbacusGenerated]: true,
-        [NotificationType.SquidTransfer]: true,
-        [NotificationType.ReleaseUpdates]: true,
-        [NotificationType.TriggerOrder]: true,
-        [NotificationType.ApiError]: true,
+        [NotificationCategoryPreferences.General]: true,
+        [NotificationCategoryPreferences.Transfers]: true,
+        [NotificationCategoryPreferences.Trading]: true,
+        [NotificationCategoryPreferences.MustSee]: true,
         version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.NotificationPreferences],
       });
     }
@@ -135,9 +135,12 @@ const useNotificationsContext = () => {
     (notification: Notification, status: NotificationStatus) => {
       notification.status = status;
       notification.timestamps[notification.status] = Date.now();
-      setNotifications({ ...notifications, [getKey(notification)]: notification });
+      setNotifications((notifications) => ({
+        ...notifications,
+        [getKey(notification)]: notification,
+      }));
     },
-    [notifications, getKey]
+    [getKey]
   );
 
   const { markUnseen, markSeen, markCleared } = useMemo(
@@ -168,7 +171,8 @@ const useNotificationsContext = () => {
   }, [notifications, markCleared]);
 
   // Trigger
-  for (const { type, useTrigger } of notificationTypes)
+  for (const { type, useTrigger } of notificationTypes) {
+    const notificationCategory = NotificationTypeCategory[type];
     useTrigger({
       trigger: useCallback(
         (id, displayData, updateKey, isNew = true) => {
@@ -177,7 +181,7 @@ const useNotificationsContext = () => {
           const notification = notifications[key];
 
           // Filter out notifications that are not enabled
-          if (notificationPreferences[type] !== false) {
+          if (notificationPreferences[notificationCategory] !== false) {
             // New unique key - create new notification
             if (!notification) {
               const notification = (notifications[key] = {
@@ -206,11 +210,12 @@ const useNotificationsContext = () => {
           notificationsDisplayData[key] = displayData;
           setNotificationsDisplayData({ ...notificationsDisplayData });
         },
-        [notifications, updateStatus, notificationPreferences[type]]
+        [notifications, updateStatus, notificationPreferences[notificationCategory]]
       ),
 
       lastUpdated: notificationsLastUpdated,
     });
+  }
 
   // Actions
   const actions = Object.fromEntries(
@@ -330,7 +335,7 @@ const useNotificationsContext = () => {
     notificationPreferences,
     setNotificationPreferences,
     getNotificationPreferenceForType: useCallback(
-      (type: NotificationType) => notificationPreferences[type],
+      (type: NotificationType) => notificationPreferences[NotificationTypeCategory[type]],
       [notificationPreferences]
     ),
   };

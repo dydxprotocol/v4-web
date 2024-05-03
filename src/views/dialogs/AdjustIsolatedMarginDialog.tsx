@@ -6,13 +6,10 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks';
 
-import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog } from '@/components/Dialog';
-import { GradientCard } from '@/components/GradientCard';
-import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { getOpenPositionFromId } from '@/state/accountSelectors';
 

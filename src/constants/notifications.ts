@@ -9,11 +9,34 @@ export enum NotificationType {
   TriggerOrder = 'TriggerOrder',
   ReleaseUpdates = 'ReleaseUpdates',
   ApiError = 'ApiError',
+  ComplianceAlert = 'ComplianceAlert',
+  OrderStatus = 'OrderStatus',
 }
+
+export enum NotificationCategoryPreferences {
+  General = 'General', // release updates
+  Transfers = 'Transfers', // transfers
+  Trading = 'Trading', // order status, positions / liquidations, trading rewards
+  MustSee = 'MustSee', // cannot be hidden: compliance, api errors
+}
+
+export const NotificationTypeCategory: {
+  [key in NotificationType]: NotificationCategoryPreferences;
+} = {
+  [NotificationType.ReleaseUpdates]: NotificationCategoryPreferences.General,
+  [NotificationType.SquidTransfer]: NotificationCategoryPreferences.Transfers,
+  [NotificationType.AbacusGenerated]: NotificationCategoryPreferences.Trading,
+  [NotificationType.TriggerOrder]: NotificationCategoryPreferences.Trading,
+  [NotificationType.OrderStatus]: NotificationCategoryPreferences.Trading,
+  [NotificationType.ApiError]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.ComplianceAlert]: NotificationCategoryPreferences.MustSee,
+};
 
 export const SingleSessionNotificationTypes = [
   NotificationType.AbacusGenerated,
   NotificationType.ApiError,
+  NotificationType.ComplianceAlert,
+  NotificationType.OrderStatus,
 ];
 
 export enum NotificationComponentType {}
@@ -139,6 +162,8 @@ export type NotificationDisplayData = {
      Push notification: requires interaction.
    */
   toastDuration?: number;
+
+  withClose?: boolean; // Show close button for Notification
 };
 
 export enum TransferNotificationTypes {
@@ -181,15 +206,16 @@ export type TriggerOrderNotification = {
 };
 
 export enum ReleaseUpdateNotificationIds {
+  RevampedConditionalOrders = 'revamped-conditional-orders',
   IncentivesS4 = 'incentives-s4',
   IncentivesDistributedS3 = 'incentives-distributed-s3',
 }
 
 /**
- * @description Struct to store whether a NotificationType should be triggered
+ * @description Struct to store whether a NotificationType belonging to each NotificationCategoryType should be triggered
  */
 export type NotificationPreferences = {
-  [key in NotificationType]: boolean;
+  [key in NotificationCategoryPreferences]: boolean;
 } & { version: string };
 
 export const DEFAULT_TOAST_AUTO_CLOSE_MS = 5000;

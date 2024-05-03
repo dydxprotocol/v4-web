@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import BigNumber from 'bignumber.js';
 import { DateTime } from 'luxon';
 import { useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent, css } from 'styled-components';
+import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import {
   LEVERAGE_DECIMALS,
@@ -25,10 +25,11 @@ import { Tag } from '@/components/Tag';
 
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
-import { type BigNumberish, MustBigNumber, isNumber } from '@/lib/numbers';
+import { MustBigNumber, isNumber, type BigNumberish } from '@/lib/numbers';
 import { getStringsForDateTimeDiff, getTimestamp } from '@/lib/timeUtils';
 
 import { LoadingOutput } from './Loading/LoadingOutput';
+import { NumberValue } from './NumberValue';
 
 export enum OutputType {
   Text = 'Text',
@@ -59,9 +60,11 @@ type ElementProps = {
   isLoading?: boolean;
   fractionDigits?: number | null;
   showSign?: ShowSign;
+  slotLeft?: React.ReactNode;
   slotRight?: React.ReactNode;
   useGrouping?: boolean;
   roundingMode?: BigNumber.RoundingMode;
+  withSubscript?: boolean;
   relativeTimeFormatOptions?: {
     format: 'long' | 'short' | 'narrow' | 'singleCharacter';
     resolution?: number;
@@ -88,8 +91,10 @@ export const Output = ({
   isLoading,
   fractionDigits,
   showSign = ShowSign.Negative,
+  slotLeft,
   slotRight,
   useGrouping = true,
+  withSubscript = false,
   roundingMode = BigNumber.ROUND_HALF_UP,
   relativeTimeFormatOptions = {
     format: 'singleCharacter',
@@ -119,6 +124,7 @@ export const Output = ({
           title={`${value ?? ''}${tag ? ` ${tag}` : ''}`}
           className={className}
         >
+          {slotLeft}
           {value?.toString() ?? null}
 
           {tag && <Tag>{tag}</Tag>}
@@ -248,6 +254,7 @@ export const Output = ({
           withParentheses={withParentheses}
           withBaseFont={withBaseFont}
         >
+          {slotLeft}
           {sign && <Styled.Sign>{sign}</Styled.Sign>}
           {hasValue &&
             {
@@ -256,62 +263,103 @@ export const Output = ({
                   throw new Error('value must be a number for compact number output');
                 }
 
-                return Intl.NumberFormat(locale, {
-                  style: 'decimal',
-                  notation: 'compact',
-                  maximumSignificantDigits: 3,
-                })
-                  .format(Math.abs(value))
-                  .toLowerCase();
+                return (
+                  <NumberValue
+                    value={Intl.NumberFormat(locale, {
+                      style: 'decimal',
+                      notation: 'compact',
+                      maximumSignificantDigits: 3,
+                    })
+                      .format(Math.abs(value))
+                      .toLowerCase()}
+                    withSubscript={withSubscript}
+                  />
+                );
               },
-              [OutputType.Number]: () =>
-                valueBN.toFormat(fractionDigits ?? 0, roundingMode, {
-                  ...format,
-                }),
-              [OutputType.Fiat]: () =>
-                valueBN.toFormat(fractionDigits ?? USD_DECIMALS, roundingMode, {
-                  ...format,
-                  prefix: '$',
-                }),
-              [OutputType.SmallFiat]: () =>
-                valueBN.toFormat(fractionDigits ?? SMALL_USD_DECIMALS, roundingMode, {
-                  ...format,
-                  prefix: '$',
-                }),
+              [OutputType.Number]: () => (
+                <NumberValue
+                  value={valueBN.toFormat(fractionDigits ?? 0, roundingMode, {
+                    ...format,
+                  })}
+                  withSubscript={withSubscript}
+                />
+              ),
+              [OutputType.Fiat]: () => (
+                <NumberValue
+                  value={valueBN.toFormat(fractionDigits ?? USD_DECIMALS, roundingMode, {
+                    ...format,
+                    prefix: '$',
+                  })}
+                  withSubscript={withSubscript}
+                />
+              ),
+              [OutputType.SmallFiat]: () => (
+                <NumberValue
+                  value={valueBN.toFormat(fractionDigits ?? SMALL_USD_DECIMALS, roundingMode, {
+                    ...format,
+                    prefix: '$',
+                  })}
+                  withSubscript={withSubscript}
+                />
+              ),
               [OutputType.CompactFiat]: () => {
                 if (!isNumber(value)) {
                   throw new Error('value must be a number for compact fiat output');
                 }
-                return Intl.NumberFormat(locale, {
-                  style: 'currency',
-                  currency: 'USD',
-                  notation: 'compact',
-                  maximumSignificantDigits: 3,
-                })
-                  .format(Math.abs(value))
-                  .toLowerCase();
+
+                return (
+                  <NumberValue
+                    value={Intl.NumberFormat(locale, {
+                      style: 'currency',
+                      currency: 'USD',
+                      notation: 'compact',
+                      maximumSignificantDigits: 3,
+                    })
+                      .format(Math.abs(value))
+                      .toLowerCase()}
+                    withSubscript={withSubscript}
+                  />
+                );
               },
-              [OutputType.Asset]: () =>
-                valueBN.toFormat(fractionDigits ?? TOKEN_DECIMALS, roundingMode, {
-                  ...format,
-                }),
-              [OutputType.Percent]: () =>
-                valueBN.times(100).toFormat(fractionDigits ?? PERCENT_DECIMALS, roundingMode, {
-                  ...format,
-                  suffix: '%',
-                }),
-              [OutputType.SmallPercent]: () =>
-                valueBN
-                  .times(100)
-                  .toFormat(fractionDigits ?? SMALL_PERCENT_DECIMALS, roundingMode, {
+              [OutputType.Asset]: () => (
+                <NumberValue
+                  value={valueBN.toFormat(fractionDigits ?? TOKEN_DECIMALS, roundingMode, {
                     ...format,
-                    suffix: '%',
-                  }),
-              [OutputType.Multiple]: () =>
-                valueBN.toFormat(fractionDigits ?? LEVERAGE_DECIMALS, roundingMode, {
-                  ...format,
-                  suffix: '×',
-                }),
+                  })}
+                  withSubscript={withSubscript}
+                />
+              ),
+              [OutputType.Percent]: () => (
+                <NumberValue
+                  value={valueBN
+                    .times(100)
+                    .toFormat(fractionDigits ?? PERCENT_DECIMALS, roundingMode, {
+                      ...format,
+                      suffix: '%',
+                    })}
+                  withSubscript={withSubscript}
+                />
+              ),
+              [OutputType.SmallPercent]: () => (
+                <NumberValue
+                  value={valueBN
+                    .times(100)
+                    .toFormat(fractionDigits ?? SMALL_PERCENT_DECIMALS, roundingMode, {
+                      ...format,
+                      suffix: '%',
+                    })}
+                  withSubscript={withSubscript}
+                />
+              ),
+              [OutputType.Multiple]: () => (
+                <NumberValue
+                  value={valueBN.toFormat(fractionDigits ?? LEVERAGE_DECIMALS, roundingMode, {
+                    ...format,
+                    suffix: '×',
+                  })}
+                  withSubscript={withSubscript}
+                />
+              ),
             }[type]()}
           {slotRight}
           {tag && <Styled.Tag>{tag}</Styled.Tag>}

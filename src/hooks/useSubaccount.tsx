@@ -5,13 +5,13 @@ import { type IndexedTx } from '@cosmjs/stargate';
 import { Method } from '@cosmjs/tendermint-rpc';
 import type { Nullable } from '@dydxprotocol/v4-abacus';
 import {
-  type LocalWallet,
   SubaccountClient,
-  type GovAddNewMarketParams,
   utils,
+  type GovAddNewMarketParams,
+  type LocalWallet,
 } from '@dydxprotocol/v4-client-js';
 import Long from 'long';
-import { shallowEqual, useSelector, useDispatch } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import type {
   AccountBalance,
@@ -21,10 +21,20 @@ import type {
   SubAccountHistoricalPNLs,
 } from '@/constants/abacus';
 import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
+import { STRING_KEYS } from '@/constants/localization';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
+import { TradeTypes } from '@/constants/trade';
 import { DydxAddress } from '@/constants/wallets';
 
-import { setSubaccount, setHistoricalPnl, removeUncommittedOrderClientId } from '@/state/account';
+import {
+  cancelOrderConfirmed,
+  cancelOrderFailed,
+  cancelOrderSubmitted,
+  placeOrderFailed,
+  placeOrderSubmitted,
+  setHistoricalPnl,
+  setSubaccount,
+} from '@/state/account';
 import { getBalances } from '@/state/accountSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -343,7 +353,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
   // ------ Trading Methods ------ //
   const placeOrder = useCallback(
-    async ({
+    ({
       isClosePosition = false,
       onError,
       onSuccess,
@@ -363,7 +373,12 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
           onError?.({ errorStringKey: parsingError?.stringKey });
 
           if (data?.clientId !== undefined) {
-            dispatch(removeUncommittedOrderClientId(data.clientId));
+            dispatch(
+              placeOrderFailed({
+                clientId: data.clientId,
+                errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
+              })
+            );
           }
         }
       };
@@ -376,24 +391,34 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         placeOrderParams = abacusStateManager.placeOrder(callback);
       }
 
+      if (placeOrderParams?.clientId) {
+        dispatch(
+          placeOrderSubmitted({
+            marketId: placeOrderParams.marketId,
+            clientId: placeOrderParams.clientId,
+            orderType: placeOrderParams.type as TradeTypes,
+          })
+        );
+      }
+
       return placeOrderParams;
     },
     [subaccountClient]
   );
 
   const closePosition = useCallback(
-    async ({
+    ({
       onError,
       onSuccess,
     }: {
       onError: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
       onSuccess?: (placeOrderPayload: Nullable<HumanReadablePlaceOrderPayload>) => void;
-    }) => await placeOrder({ isClosePosition: true, onError, onSuccess }),
+    }) => placeOrder({ isClosePosition: true, onError, onSuccess }),
     [placeOrder]
   );
 
   const cancelOrder = useCallback(
-    async ({
+    ({
       orderId,
       onError,
       onSuccess,
@@ -404,12 +429,20 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     }) => {
       const callback = (success: boolean, parsingError?: Nullable<ParsingError>) => {
         if (success) {
+          dispatch(cancelOrderConfirmed(orderId));
           onSuccess?.();
         } else {
+          dispatch(
+            cancelOrderFailed({
+              orderId,
+              errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
+            })
+          );
           onError?.({ errorStringKey: parsingError?.stringKey });
         }
       };
 
+      dispatch(cancelOrderSubmitted(orderId));
       abacusStateManager.cancelOrder(orderId, callback);
     },
     [subaccountClient]

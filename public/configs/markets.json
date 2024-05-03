@@ -238,6 +238,13 @@
     "displayStepSize": "0.001",
     "displayTickSize": "0.1"
   },
+  "ETHFI-USD": {
+    "name": "ether.fi",
+    "tags": [],
+    "websiteLink": "https://www.ether.fi/",
+    "whitepaperLink": "https://etherfi.gitbook.io/etherfi/ether.fi-whitepaper",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/ether-fi-ethfi/"
+  },
   "FET-USD": {
     "name": "Fetch.ai",
     "tags": ["AI"],
@@ -251,6 +258,13 @@
     "websiteLink": "https://filecoin.io/",
     "whitepaperLink": "https://filecoin.io/filecoin.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/filecoin/"
+  },
+  "FLR-USD": {
+    "name": "Flare",
+    "tags": ["Layer 1"],
+    "websiteLink": "https://flare.network/",
+    "whitepaperLink": "https://docs.flare.network/",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/flare/"
   },
   "FTM-USD": {
     "name": "Fantom",
@@ -538,6 +552,13 @@
     "whitepaperLink": "https://arxiv.org/pdf/1905.09274.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/celestia/"
   },
+  "TON-USD": {
+    "name": "Toncoin",
+    "tags": ["Layer 1"],
+    "websiteLink": "https://ton.org/",
+    "whitepaperLink": "https://ton.org/whitepaper.pdf",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/toncoin/"
+  },
   "TRX-USD": {
     "name": "TRON",
     "tags": ["Defi"],
@@ -559,13 +580,19 @@
     "whitepaperLink": "https://uniswap.org/whitepaper-v3.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/uniswap/"
   },
+  "WIF-USD": {
+    "name": "dogwifhat",
+    "tags": ["Meme"],
+    "websiteLink": "https://dogwifcoin.org/",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/dogwifhat/"
+  },
   "WLD-USD": {
     "name": "Worldcoin",
     "tags": [],
     "websiteLink": "https://worldcoin.org/",
     "whitepaperLink": "https://whitepaper.worldcoin.org/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/worldcoin-org/"
-  },
+  }, 
   "WOO-USD": {
     "name": "WOO Network",
     "tags": ["Defi"],

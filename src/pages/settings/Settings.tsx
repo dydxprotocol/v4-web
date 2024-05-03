@@ -3,14 +3,14 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
 import {
   STRING_KEYS,
-  SupportedLocales,
   SUPPORTED_LOCALE_STRING_LABELS,
+  SupportedLocales,
 } from '@/constants/localization';
 import type { MenuItem } from '@/constants/menus';
 import { DydxNetwork } from '@/constants/networks';
 import { AppRoute, MobileSettingsRoute } from '@/constants/routes';
 
-import { useStringGetter, useSelectedNetwork } from '@/hooks';
+import { useSelectedNetwork, useStringGetter } from '@/hooks';
 
 import { ComingSoonSpace } from '@/components/ComingSoon';
 import { PageMenu } from '@/components/PageMenu';
