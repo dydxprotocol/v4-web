@@ -14,12 +14,14 @@ import { BroadcastTxSyncResponse } from '@cosmjs/tendermint-rpc/build/tendermint
 import {
   CompositeClient,
   LocalWallet as LocalWalletType,
-  Network, TransactionOptions,
+  Network,
+  TransactionOptions,
   VoteOption,
-  ProposalStatus
+  ProposalStatus,
 } from '@dydxprotocol/v4-client-js';
 import {
-  Perpetual, PerpetualMarketType,
+  Perpetual,
+  PerpetualMarketType,
 } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
 import { MsgVote } from '@dydxprotocol/v4-proto/src/codegen/cosmos/gov/v1/tx';
 import { ClobPair } from '@dydxprotocol/v4-proto/src/codegen/dydxprotocol/clob/clob_pair';
@@ -116,14 +118,14 @@ enum ExchangeName {
 
 interface PrometheusTimeSeries {
   // value of the time serie
-  value : number;
+  value: number;
 }
 
 interface ExchangeInfo {
   url: string;
   tickers: Map<string, any> | null;
   parseResp: (response: any) => Map<string, any>;
-  slinkyProviderName: string
+  slinkyProviderName: string;
 }
 
 const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
@@ -374,7 +376,6 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
     (proposal) => !allTickers.includes(proposal.params.ticker)
   );
 
-
   const numExistingMarkets = allPerps.perpetual.reduce(
     (max, perp) => (perp.params!.id > max ? perp.params!.id : max),
     0
@@ -483,9 +484,13 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   console.log(`\nValidated ${marketsProposed.size} proposals against localnet`);
 
   // for all markets proposed, determine if the slinky metrics are ok
-  for (const [marketId, proposal] of marketsProposed.entries()) {
+  for (const proposal of marketsProposed.values()) {
     for (const exchange of proposal.params.exchangeConfigJson) {
-      validateSlinkyMetricsPerTicker(dydxTickerToSlinkyTicker(proposal.params.ticker), exchange.ticker.toLowerCase(), EXCHANGE_INFO[exchange.exchangeName].slinkyProviderName);
+      validateSlinkyMetricsPerTicker(
+        dydxTickerToSlinkyTicker(proposal.params.ticker),
+        exchange.ticker.toLowerCase(),
+        EXCHANGE_INFO[exchange.exchangeName].slinkyProviderName
+      );
     }
   }
 }
@@ -495,10 +500,14 @@ function dydxTickerToSlinkyTicker(ticker: string): string {
   return ticker.toLowerCase().replace('-', '/');
 }
 
-function validateSlinkyMetricsPerTicker(ticker: string, exchangeSpecificTicker: string, exchange: string): void {
+function validateSlinkyMetricsPerTicker(
+  ticker: string,
+  exchangeSpecificTicker: string,
+  exchange: string
+): void {
   const prometheus = new PrometheusDriver({
     endpoint: PROMETHEUS_SERVER_URL,
-    baseURL: "/api/v1"
+    baseURL: '/api/v1',
   });
 
   const exchangeAPIQuerySuccessRate = `(
@@ -509,14 +518,14 @@ function validateSlinkyMetricsPerTicker(ticker: string, exchangeSpecificTicker: 
  )`;
 
   const slinkyPriceAggregationQuery = `(
-    sum(rate(side_car_health_check_ticker_updates_total{id="${ticker }"}[1m])) by (instance, job)
+    sum(rate(side_car_health_check_ticker_updates_total{id="${ticker}"}[1m])) by (instance, job)
     /
     sum(rate(side_car_health_check_system_updates_total[1m])) by (instance, job)
 )`;
-  
+
   const slinkyProviderPricesQuery = `sum(rate(side_car_health_check_provider_updates_total{provider="${exchange}", id="${ticker}", success='true'}[1m])) by (provider, id)
   /
-  sum(rate(side_car_health_check_provider_updates_total{provider="${exchange}", id="${ticker}"}[1m])) by (provider, id)`
+  sum(rate(side_car_health_check_provider_updates_total{provider="${exchange}", id="${ticker}"}[1m])) by (provider, id)`;
 
   const start = new Date().getTime() - 3 * 60 * 1000;
   const end = new Date().getTime();
@@ -532,27 +541,40 @@ function validateSlinkyMetricsPerTicker(ticker: string, exchangeSpecificTicker: 
   makePrometheusRateQuery(prometheus, slinkyProviderPricesQuery, start, end, step, 0.7);
 }
 
-function makePrometheusRateQuery(prometheus: PrometheusDriver, query: string, start: number, end: number, step: number, threshold: number): void {
-  prometheus.rangeQuery(query, start, end, step).then(
-    (response) => {
+function makePrometheusRateQuery(
+  prometheus: PrometheusDriver,
+  query: string,
+  start: number,
+  end: number,
+  step: number,
+  threshold: number
+): void {
+  prometheus
+    .rangeQuery(query, start, end, step)
+    .then((response) => {
       const series = response.result;
       series.forEach((s) => {
         const values = s.values;
         let totalSuccessRate = 0;
-        values.forEach((v : PrometheusTimeSeries) => {
+        values.forEach((v: PrometheusTimeSeries) => {
           // take the average of all success-rates over the interval
-          if (!isNaN(v.value)) { // we see NaN when there have been no successes from the provider
+          if (!Number.isNaN(v.value)) {
+            // we see NaN when there have been no successes from the provider
             totalSuccessRate += v.value;
           }
         });
-        if (values.length == 0 || totalSuccessRate / values.length < threshold) {
-          throw new Error(`slinky metrics for ${query} is below success rate threshold ${threshold}: ${totalSuccessRate / values.length}`);
+        if (values.length === 0 || totalSuccessRate / values.length < threshold) {
+          throw new Error(
+            `slinky metrics for ${query} is below success rate threshold ${threshold}: ${
+              totalSuccessRate / values.length
+            }`
+          );
         }
       });
-    }
-  ).catch((error) => {
-    throw error;
-  });
+    })
+    .catch((error) => {
+      throw error;
+    });
 }
 
 function validatePrice(price: MarketPrice, proposal: Proposal): void {
