@@ -48,11 +48,16 @@ export const useChartMarketAndResolution = ({
    */
   useEffect(() => {
     if (chartResolution) {
-      if (chartResolution !== selectedResolution) {
-        dispatch(setTvChartResolution({ marketId: currentMarketId, resolution: chartResolution }));
-      }
-
-      setVisibleRangeForResolution({ resolution: chartResolution });
+      tvWidget?.onChartReady(() => {
+        tvWidget?.headerReady().then(() => {
+          if (chartResolution !== selectedResolution) {
+            dispatch(
+              setTvChartResolution({ marketId: currentMarketId, resolution: chartResolution })
+            );
+          }
+          setVisibleRangeForResolution({ resolution: chartResolution });
+        });
+      });
     }
   }, [currentMarketId, chartResolution, selectedResolution]);
 
