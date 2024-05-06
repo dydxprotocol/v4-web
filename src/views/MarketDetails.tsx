@@ -51,7 +51,7 @@ export const MarketDetails: React.FC = () => {
     whitepaperLink,
   } = resources || {};
 
-  const preferIEMF = Boolean(
+  const preferEIMF = Boolean(
     effectiveInitialMarginFraction && initialMarginFraction != effectiveInitialMarginFraction
   );
 
@@ -113,7 +113,7 @@ export const MarketDetails: React.FC = () => {
               ? BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction)
               : null
           }
-          withDiff={preferIEMF}
+          withDiff={preferEIMF}
           type={OutputType.Multiple}
         />
       ),
@@ -136,7 +136,7 @@ export const MarketDetails: React.FC = () => {
           newValue={
             effectiveInitialMarginFraction ? BigNumber(effectiveInitialMarginFraction) : null
           }
-          withDiff={preferIEMF}
+          withDiff={preferEIMF}
           type={OutputType.SmallPercent}
         />
       ),
