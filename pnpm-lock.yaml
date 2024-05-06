@@ -30,8 +30,8 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: 1.7.2
-    version: 1.7.2
+    specifier: 1.7.3
+    version: 1.7.3
   '@dydxprotocol/v4-client-js':
     specifier: ^1.1.8
     version: 1.1.8
@@ -1590,8 +1590,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.7.2:
-    resolution: {integrity: sha512-bDpp2xDxiYAgkOxN0hf5BwJW2DrgXnlNQz0/T+a/gzvHksva4P37FZCzRX3dfC5aaXaqLZds6sMSqAfm3ekq8A==}
+  /@dydxprotocol/v4-abacus@1.7.3:
+    resolution: {integrity: sha512-bXlvhgxsWXhe6j+l2rO0Yh9MWZB86BQ++RBCuiit92iXyXFpNR2Hr55MetTBpk6zONU2VG2whhF3TqL+oPxAeg==}
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
@@ -12301,6 +12301,7 @@ packages:
       is-hex-prefixed: 1.0.0
       strip-hex-prefix: 1.0.0
     dev: false
+    bundledDependencies: false
 
   /event-emitter@0.3.5:
     resolution: {integrity: sha512-D9rRn9y7kLPnJ+hMq7S/nhvoKwwvVJahBi2BPmx3bvbsEdK3W9ii8cBSGjP+72/LnM4n6fo3+dkCX5FeTQruXA==}

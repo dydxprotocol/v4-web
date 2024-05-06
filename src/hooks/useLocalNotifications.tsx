@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect } from 'react';
 import { useQuery } from 'react-query';
 
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
-import type { TransferNotifcation, TriggerOrderNotification } from '@/constants/notifications';
+import type { TransferNotifcation } from '@/constants/notifications';
 
 import { useAccounts } from '@/hooks/useAccounts';
 
@@ -37,16 +37,6 @@ const useLocalNotificationsContext = () => {
     },
   });
 
-  const [allTriggerOrderNotifications, setAllTriggerOrderNotifications] = useLocalStorage<{
-    [key: `dydx${string}`]: TriggerOrderNotification[];
-    version: string;
-  }>({
-    key: LocalStorageKey.TriggerOrderNotifications,
-    defaultValue: {
-      version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.TriggerOrderNotifications],
-    },
-  });
-
   // Ensure version matches, otherwise wipe
   useEffect(() => {
     if (
@@ -57,22 +47,11 @@ const useLocalNotificationsContext = () => {
         version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.TransferNotifications],
       });
     }
-    if (
-      allTriggerOrderNotifications?.version !==
-      LOCAL_STORAGE_VERSIONS[LocalStorageKey.TriggerOrderNotifications]
-    ) {
-      setAllTriggerOrderNotifications({
-        version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.TriggerOrderNotifications],
-      });
-    }
-  }, [allTransferNotifications, allTriggerOrderNotifications]);
+  }, [allTransferNotifications]);
 
   const { dydxAddress } = useAccounts();
 
   const transferNotifications = dydxAddress ? allTransferNotifications[dydxAddress] || [] : [];
-  const triggerOrderNotifications = dydxAddress
-    ? allTriggerOrderNotifications[dydxAddress] || []
-    : [];
 
   const setTransferNotifications = useCallback(
     (notifications: TransferNotifcation[]) => {
@@ -95,29 +74,6 @@ const useLocalNotificationsContext = () => {
     (notification: TransferNotifcation) =>
       setTransferNotifications([...transferNotifications, notification]),
     [transferNotifications]
-  );
-
-  const setTriggerOrderNotifications = useCallback(
-    (notifications: TriggerOrderNotification[]) => {
-      if (!dydxAddress) return;
-      setAllTriggerOrderNotifications((currentAllNotifications) => {
-        const updatedNotifications = { ...currentAllNotifications };
-
-        updatedNotifications[dydxAddress] = [
-          ...notifications,
-          ...(updatedNotifications[dydxAddress] || []).slice(notifications.length),
-        ];
-
-        return updatedNotifications;
-      });
-    },
-    [setAllTriggerOrderNotifications, dydxAddress, allTriggerOrderNotifications]
-  );
-
-  const addTriggerOrderNotification = useCallback(
-    (notification: TriggerOrderNotification) =>
-      setTriggerOrderNotifications([...triggerOrderNotifications, notification]),
-    [triggerOrderNotifications]
   );
 
   useQuery({
@@ -192,9 +148,5 @@ const useLocalNotificationsContext = () => {
     // Transfer notifications
     transferNotifications,
     addTransferNotification,
-
-    // Trigger notifications
-    triggerOrderNotifications,
-    addTriggerOrderNotification,
   };
 };

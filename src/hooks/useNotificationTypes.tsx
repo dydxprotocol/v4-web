@@ -31,14 +31,13 @@ import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
-import { Output, OutputType } from '@/components/Output';
+import { Output } from '@/components/Output';
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
 import { OrderStatusNotification } from '@/views/notifications/OrderStatusNotification';
 import { TradeNotification } from '@/views/notifications/TradeNotification';
 import { TransferStatusNotification } from '@/views/notifications/TransferStatusNotification';
-import { TriggerOrderNotification } from '@/views/notifications/TriggerOrderNotification';
 
 import {
   getLocalCancelOrders,
@@ -51,7 +50,6 @@ import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
-import { getTitleAndBodyForTriggerOrderNotification } from '@/lib/notifications';
 import { formatSeconds } from '@/lib/timeUtils';
 
 import { useComplianceState } from './useComplianceState';
@@ -258,60 +256,6 @@ export const notificationTypes: NotificationTypeConfig[] = [
           );
         }
       }, [transferNotifications, stringGetter]);
-    },
-    useNotificationAction: () => {
-      return () => {};
-    },
-  },
-  {
-    type: NotificationType.TriggerOrder,
-    useTrigger: ({ trigger }) => {
-      const stringGetter = useStringGetter();
-      const { triggerOrderNotifications } = useLocalNotifications();
-
-      useEffect(() => {
-        for (const triggerOrder of triggerOrderNotifications) {
-          const { assetId, clientId, orderType, price, status, tickSizeDecimals, type } =
-            triggerOrder;
-
-          const assetIcon = <AssetIcon symbol={assetId} />;
-          const formattedPrice = (
-            <$Output value={price} type={OutputType.Fiat} fractionDigits={tickSizeDecimals} />
-          );
-
-          const { title, body } = getTitleAndBodyForTriggerOrderNotification({
-            notification: triggerOrder,
-            formattedPrice: formattedPrice,
-            stringGetter,
-          });
-
-          if (title && body) {
-            trigger(
-              `${type}-${clientId.toString()}`,
-              {
-                icon: assetIcon,
-                title: title,
-                body: body,
-                toastDuration: DEFAULT_TOAST_AUTO_CLOSE_MS,
-                renderCustomBody: ({ isToast, notification }) => (
-                  <TriggerOrderNotification
-                    status={status}
-                    type={type}
-                    slotIcon={assetIcon}
-                    slotTitle={title}
-                    slotDescription={body}
-                    isToast={isToast}
-                    notification={notification}
-                  />
-                ),
-                toastSensitivity: 'foreground',
-                groupKey: NotificationType.TriggerOrder,
-              },
-              []
-            );
-          }
-        }
-      }, [triggerOrderNotifications, stringGetter]);
     },
     useNotificationAction: () => {
       return () => {};

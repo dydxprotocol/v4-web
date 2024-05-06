@@ -4,24 +4,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import {
-  AbacusOrderType,
   ErrorType,
-  HumanReadableCancelOrderPayload,
-  HumanReadablePlaceOrderPayload,
-  HumanReadableTriggerOrdersPayload,
-  KotlinIrEnumValues,
   Nullable,
-  TRADE_TYPES,
   ValidationError,
   type SubaccountOrder,
 } from '@/constants/abacus';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { TriggerOrderNotificationTypes, TriggerOrderStatus } from '@/constants/notifications';
-import { TradeTypes } from '@/constants/trade';
 
 import { useStringGetter, useSubaccount, useTriggerOrdersFormInputs } from '@/hooks';
-import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -58,7 +49,6 @@ export const TriggersForm = ({
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
   const { placeTriggerOrders } = useSubaccount();
-  const { addTriggerOrderNotification } = useLocalNotifications();
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
 
   const { asset, entryPrice, size, stepSizeDecimals, tickSizeDecimals, oraclePrice } =
@@ -117,74 +107,17 @@ export const TriggersForm = ({
     </Styled.PriceBox>
   );
 
-  const triggerNotificationForCancelOrderPayloads = (
-    triggerPayload: Nullable<HumanReadableTriggerOrdersPayload>,
-    isError?: boolean
-  ) => {
-    const { cancelOrderPayloads } = triggerPayload || {};
-
-    if (cancelOrderPayloads && cancelOrderPayloads.toString() != '[]') {
-      cancelOrderPayloads.toArray().map((payload: HumanReadableCancelOrderPayload) => {
-        const existingOrder =
-          payload.orderId === existingStopLossOrder?.id
-            ? existingStopLossOrder
-            : payload.orderId === existingTakeProfitOrder?.id
-            ? existingTakeProfitOrder
-            : null;
-
-        if (existingOrder) {
-          addTriggerOrderNotification({
-            assetId: symbol,
-            clientId: payload.clientId,
-            orderType: (existingOrder.type.rawValue as TradeTypes) || undefined,
-            price: existingOrder.triggerPrice || undefined,
-            status: isError ? TriggerOrderStatus.Error : TriggerOrderStatus.Success,
-            tickSizeDecimals,
-            type: TriggerOrderNotificationTypes.Cancelled,
-          });
-        }
-      });
-    }
-  };
-
-  const triggerNotificationForPlaceOrderPayloads = (
-    triggerPayload: Nullable<HumanReadableTriggerOrdersPayload>,
-    isError?: boolean
-  ) => {
-    const { placeOrderPayloads } = triggerPayload || {};
-
-    if (placeOrderPayloads && placeOrderPayloads.toString() != '[]') {
-      placeOrderPayloads.toArray().map((payload: HumanReadablePlaceOrderPayload) => {
-        addTriggerOrderNotification({
-          assetId: symbol,
-          clientId: payload.clientId,
-          orderType:
-            TRADE_TYPES[payload.type as KotlinIrEnumValues<typeof AbacusOrderType>] || undefined,
-          price: payload.triggerPrice || undefined,
-          status: isError ? TriggerOrderStatus.Error : TriggerOrderStatus.Success,
-          tickSizeDecimals,
-          type: TriggerOrderNotificationTypes.Created,
-        });
-      });
-    }
-  };
-
   const onSubmitOrders = async () => {
     setIsPlacingOrder(true);
 
-    await placeTriggerOrders({
+    placeTriggerOrders({
       onError: (
-        triggerOrdersPayload?: Nullable<HumanReadableTriggerOrdersPayload>,
         errorParams?: { errorStringKey?: Nullable<string> }
       ) => {
-        triggerNotificationForCancelOrderPayloads(triggerOrdersPayload, true);
-        triggerNotificationForPlaceOrderPayloads(triggerOrdersPayload, true);
         setIsPlacingOrder(false);
         dispatch(closeDialog());
       },
-      onSuccess: (triggerOrdersPayload: Nullable<HumanReadableTriggerOrdersPayload>) => {
-        triggerNotificationForCancelOrderPayloads(triggerOrdersPayload);
-        triggerNotificationForPlaceOrderPayloads(triggerOrdersPayload);
+      onSuccess: () => {
         setIsPlacingOrder(false);
         dispatch(closeDialog());
       },

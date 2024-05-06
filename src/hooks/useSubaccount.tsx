@@ -15,6 +15,7 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import type {
   AccountBalance,
+  HumanReadableCancelOrderPayload,
   HumanReadablePlaceOrderPayload,
   HumanReadableTriggerOrdersPayload,
   ParsingError,
@@ -454,24 +455,67 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       onError,
       onSuccess,
     }: {
-      onError: (
-        triggerOrdersPayload: Nullable<HumanReadableTriggerOrdersPayload>,
-        onErrorParams?: { errorStringKey?: Nullable<string> }
-      ) => void;
-      onSuccess?: (triggerOrdersPayload: Nullable<HumanReadableTriggerOrdersPayload>) => void;
+      onError: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
+      onSuccess?: () => void;
     }) => {
       const callback = (
         success: boolean,
         parsingError?: Nullable<ParsingError>,
         data?: Nullable<HumanReadableTriggerOrdersPayload>
       ) => {
+        const placeOrderPayloads = data?.placeOrderPayloads.toArray() || []
+        const cancelOrderPayloads = data?.cancelOrderPayloads.toArray() || []
+
         if (success) {
-          onSuccess?.(data);
+          onSuccess?.();
+
+          cancelOrderPayloads.forEach(
+            (payload: HumanReadableCancelOrderPayload) => {
+              dispatch(cancelOrderConfirmed(payload.orderId));
+            }
+          );
         } else {
-          onError?.(data, { errorStringKey: parsingError?.stringKey });
+          onError?.({ errorStringKey: parsingError?.stringKey });
+
+          placeOrderPayloads.forEach((payload: HumanReadablePlaceOrderPayload) => {
+            dispatch(
+              placeOrderFailed({
+                clientId: payload.clientId,
+                errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
+              })
+            );
+          });
+
+          cancelOrderPayloads.forEach(
+            (payload: HumanReadableCancelOrderPayload) => {
+              dispatch(
+                cancelOrderFailed({
+                  orderId: payload.orderId,
+                  errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
+                })
+              );
+            }
+          );
         }
       };
-      return abacusStateManager.triggerOrders(callback);
+
+      const triggerOrderParams = abacusStateManager.triggerOrders(callback);
+
+      triggerOrderParams?.placeOrderPayloads.toArray().forEach((payload: HumanReadablePlaceOrderPayload) => {
+        dispatch(
+          placeOrderSubmitted({
+            marketId: payload.marketId,
+            clientId: payload.clientId,
+            orderType: payload.type as TradeTypes,
+          })
+        );
+      });
+
+      triggerOrderParams?.cancelOrderPayloads.toArray().forEach((payload: HumanReadableCancelOrderPayload) => {
+        dispatch(cancelOrderSubmitted(payload.orderId));
+      });
+
+      return triggerOrderParams;
     },
     [subaccountClient]
   );

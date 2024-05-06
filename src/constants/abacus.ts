@@ -293,8 +293,8 @@ export const ORDER_STATUS_STRINGS: Record<KotlinIrEnumValues<typeof AbacusOrderS
   [AbacusOrderStatus.pending.name]: STRING_KEYS.PENDING,
   [AbacusOrderStatus.pending.rawValue]: STRING_KEYS.PENDING,
 
-  [AbacusOrderStatus.untriggered.name]: STRING_KEYS.UNTRIGGERED,
-  [AbacusOrderStatus.untriggered.rawValue]: STRING_KEYS.UNTRIGGERED,
+  [AbacusOrderStatus.untriggered.name]: STRING_KEYS.CREATED,
+  [AbacusOrderStatus.untriggered.rawValue]: STRING_KEYS.CREATED,
 };
 
 export const TRADE_TYPES: Record<

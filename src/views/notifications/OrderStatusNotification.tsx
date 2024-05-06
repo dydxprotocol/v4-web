@@ -46,8 +46,10 @@ export const OrderStatusNotification = ({
   const fill = useSelector(getFillByClientId(localOrder.clientId), shallowEqual);
   const marketData = useSelector(getMarketData(localOrder.marketId), shallowEqual);
   const { assetId } = marketData ?? {};
-  const titleKey = localOrder.orderType && ORDER_TYPE_STRINGS[localOrder.orderType]?.orderTypeKey;
-  const indexedOrderStatus = order?.status?.rawValue;
+  const titleKey = ORDER_TYPE_STRINGS[localOrder.orderType]?.orderTypeKey;
+  const indexedOrderStatus = order?.status?.rawValue as KotlinIrEnumValues<
+    typeof AbacusOrderStatus
+  >;
   const submissionStatus = localOrder.submissionStatus;
 
   let orderStatusStringKey = STRING_KEYS.SUBMITTING;
@@ -61,10 +63,7 @@ export const OrderStatusNotification = ({
         // skip pending / best effort open state -> still show as submitted (loading)
         if (indexedOrderStatus === AbacusOrderStatus.pending.rawValue) break;
 
-        orderStatusStringKey =
-          ORDER_STATUS_STRINGS[
-            indexedOrderStatus as unknown as KotlinIrEnumValues<typeof AbacusOrderStatus>
-          ];
+        orderStatusStringKey = ORDER_STATUS_STRINGS[indexedOrderStatus];
         orderStatusIcon = <Styled.OrderStatusIcon status={indexedOrderStatus} />;
       }
       if (order && fill) {
@@ -80,7 +79,7 @@ export const OrderStatusNotification = ({
         );
       }
       break;
-    default: // OrderSubmissionStatuses.Submitted
+    case PlaceOrderStatuses.Submitted:
       if (localOrder.errorStringKey) {
         orderStatusStringKey = STRING_KEYS.ERROR;
         orderStatusIcon = <Styled.WarningIcon iconName={IconName.Warning} />;

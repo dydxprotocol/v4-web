@@ -1,7 +1,5 @@
 import { StatusResponse } from '@0xsquid/sdk';
 
-import { TradeTypes } from './trade';
-
 /** implemented in useNotificationTypes */
 export enum NotificationType {
   AbacusGenerated = 'AbacusGenerated',
@@ -183,26 +181,6 @@ export type TransferNotifcation = {
   status?: StatusResponse;
   isExchange?: boolean;
   requestId?: string;
-};
-
-export enum TriggerOrderNotificationTypes {
-  Created = 'created',
-  Cancelled = 'cancelled',
-}
-
-export enum TriggerOrderStatus {
-  Success = 'success',
-  Error = 'error',
-}
-
-export type TriggerOrderNotification = {
-  assetId: string;
-  clientId: number;
-  orderType?: TradeTypes;
-  price?: number;
-  status: TriggerOrderStatus;
-  tickSizeDecimals?: number;
-  type: TriggerOrderNotificationTypes;
 };
 
 export enum ReleaseUpdateNotificationIds {
