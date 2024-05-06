@@ -30,11 +30,11 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: ^1.6.55
-    version: 1.6.55
+    specifier: 1.7.2
+    version: 1.7.2
   '@dydxprotocol/v4-client-js':
-    specifier: ^1.1.7
-    version: 1.1.7
+    specifier: ^1.1.8
+    version: 1.1.8
   '@dydxprotocol/v4-localization':
     specifier: ^1.1.81
     version: 1.1.81
@@ -218,6 +218,9 @@ dependencies:
   luxon:
     specifier: ^3.3.0
     version: 3.3.0
+  prometheus-query:
+    specifier: ^3.4.0
+    version: 3.4.0
   qr-code-styling:
     specifier: 1.6.0-rc.1
     version: 1.6.0-rc.1
@@ -1587,15 +1590,15 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.6.55:
-    resolution: {integrity: sha512-tiIK4uEnOaG+Ay4Q8Pen1rj3bm2Okz51bkFlY8HG6ZDng8OYvZbdQNMuiz2l7F1tpe8oKRG6lTxHe44kRNSrWg==}
+  /@dydxprotocol/v4-abacus@1.7.2:
+    resolution: {integrity: sha512-bDpp2xDxiYAgkOxN0hf5BwJW2DrgXnlNQz0/T+a/gzvHksva4P37FZCzRX3dfC5aaXaqLZds6sMSqAfm3ekq8A==}
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
     dev: false
 
-  /@dydxprotocol/v4-client-js@1.1.7:
-    resolution: {integrity: sha512-0x5nTscHz170lrbxU0x4AnFG8iArWtEprPnvhyxgDIk8BpdW8n8x5iP6XV8Vt//LQhNKP89VUldRgvVkktlNlg==}
+  /@dydxprotocol/v4-client-js@1.1.8:
+    resolution: {integrity: sha512-GOSWgjN7JQZncLIo4E+sQKTxCahOjFqnlqo7JD3cKaD4T03lRoeXR1Doz1Gp4BGv2mGAbn1P2la43wfK33y7Uw==}
     dependencies:
       '@cosmjs/amino': 0.32.2
       '@cosmjs/encoding': 0.32.2
@@ -16873,6 +16876,14 @@ packages:
     resolution: {integrity: sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==}
     engines: {node: '>=0.4.0'}
     dev: true
+
+  /prometheus-query@3.4.0:
+    resolution: {integrity: sha512-PGNwYVjXxenfj2PR4FKEUv5O4XO8ciHT92GX83J5ZJm5ki3YzLLiv+TfbmQSUxvHcXofLg9PYH6CBCSplcvr9g==}
+    dependencies:
+      axios: 1.6.7
+    transitivePeerDependencies:
+      - debug
+    dev: false
 
   /prop-types@15.8.1:
     resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}

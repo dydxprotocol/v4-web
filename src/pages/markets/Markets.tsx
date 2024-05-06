@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -57,71 +57,65 @@ const Markets = () => {
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Page = styled.div`
-  ${layoutMixins.contentContainerPage}
-`;
-
-Styled.ContentSectionHeader = styled(ContentSectionHeader)`
-  margin-top: 1rem;
-  margin-bottom: 0.25rem;
-
-  h3 {
-    font: var(--font-extra-medium);
-  }
-
-  @media ${breakpoints.tablet} {
-    margin-top: 0;
-    padding: 1.25rem 1.5rem 0;
+const Styled = {
+  Page: styled.div`
+    ${layoutMixins.contentContainerPage}
+  `,
+  ContentSectionHeader: styled(ContentSectionHeader)`
+    margin-top: 1rem;
+    margin-bottom: 0.25rem;
 
     h3 {
       font: var(--font-extra-medium);
     }
-  }
-`;
 
-Styled.HeaderSection = styled.section`
-  ${layoutMixins.contentSectionDetached}
+    @media ${breakpoints.tablet} {
+      margin-top: 0;
+      padding: 1.25rem 1.5rem 0;
 
-  margin-bottom: 2rem;
+      h3 {
+        font: var(--font-extra-medium);
+      }
+    }
+  `,
+  HeaderSection: styled.section`
+    ${layoutMixins.contentSectionDetached}
 
-  @media ${breakpoints.tablet} {
-    ${layoutMixins.flexColumn}
+    margin-bottom: 2rem;
+
+    @media ${breakpoints.tablet} {
+      ${layoutMixins.flexColumn}
+      gap: 1rem;
+
+      margin-bottom: 1rem;
+    }
+  `,
+  MarketsTable: styled(MarketsTable)`
+    ${layoutMixins.contentSectionAttached}
+  `,
+  MarketsStats: styled(MarketsStats)<{
+    showHighlights?: boolean;
+  }>`
+    ${({ showHighlights }) => !showHighlights && 'display: none;'}
+  `,
+  Highlights: styled.label`
+    align-items: center;
     gap: 1rem;
+    margin-bottom: 1.25rem;
+    display: none;
+    cursor: pointer;
 
-    margin-bottom: 1rem;
-  }
-`;
+    @media ${breakpoints.desktopSmall} {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
 
-Styled.MarketsTable = styled(MarketsTable)`
-  ${layoutMixins.contentSectionAttached}
-`;
-
-Styled.MarketsStats = styled(MarketsStats)<{
-  showHighlights?: boolean;
-}>`
-  ${({ showHighlights }) => !showHighlights && 'display: none;'}
-`;
-
-Styled.Highlights = styled.label`
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-  display: none;
-  cursor: pointer;
-
-  @media ${breakpoints.desktopSmall} {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  @media ${breakpoints.tablet} {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-    margin-bottom: 0;
-    display: flex;
-  }
-`;
-
+    @media ${breakpoints.tablet} {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+      margin-bottom: 0;
+      display: flex;
+    }
+  `,
+};
 export default Markets;

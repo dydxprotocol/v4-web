@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'public/configs/otherMarketData.json'
+      - 'scripts/validate-other-market-data.ts'
 
 jobs:
   validate:
@@ -36,9 +37,9 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: 'dydxprotocol/v4-chain'
-          ref: '7604f974a699efa8d15a8a70bfc85d8b5b2e2d58'
+          ref: 'd4e0f0d1ac28f128c787e40c5a0cdc7c481e6c42'
           path: 'v4-chain'
-      
+
       - name: Start v4 localnet
         run: |
           cd v4-chain/protocol

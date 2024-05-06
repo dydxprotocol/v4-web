@@ -1,4 +1,4 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -23,8 +23,8 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
   const { chainTokenLabel } = useTokenConfigs();
 
   const {
-    stats: { volume24HUSDC, openInterestUSDC, feeEarned },
-    feeEarnedChart,
+    stats: { volume24HUSDC, openInterestUSDC, feesEarned },
+    feesEarnedChart,
   } = usePerpetualMarketsStats();
 
   return (
@@ -50,14 +50,26 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
           key: 'fee-earned-stakers',
           labelKey: STRING_KEYS.EARNED_BY_STAKERS,
           tagKey: STRING_KEYS._24H,
-          value: feeEarned,
+          value: feesEarned,
           type: OutputType.CompactFiat,
-          chartData: feeEarnedChart,
+          chartData: feesEarnedChart,
           linkLabelKey: STRING_KEYS.LEARN_MORE_ARROW,
           link: `${chainTokenLabel}/${TokenRoute.StakingRewards}`,
+          slotLeft: '~',
         },
       ].map(
-        ({ key, labelKey, tagKey, value, fractionDigits, type, chartData, link, linkLabelKey }) => (
+        ({
+          key,
+          labelKey,
+          tagKey,
+          value,
+          fractionDigits,
+          type,
+          chartData,
+          link,
+          linkLabelKey,
+          slotLeft,
+        }) => (
           <Styled.BillboardContainer key={key}>
             <Styled.BillboardStat>
               <Styled.BillboardTitle>
@@ -66,10 +78,11 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
               </Styled.BillboardTitle>
               <Styled.Output
                 useGrouping
+                withBaseFont
                 fractionDigits={fractionDigits}
                 type={type}
                 value={value}
-                withBaseFont
+                slotLeft={slotLeft}
               />
               {link && linkLabelKey ? (
                 <Styled.BillboardLink
@@ -101,63 +114,57 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
+const Styled = {
+  MarketBillboardsWrapper: styled.div`
+    ${layoutMixins.column}
 
-Styled.MarketBillboardsWrapper = styled.div`
-  ${layoutMixins.column}
+    gap: 1rem;
+  `,
+  BillboardContainer: styled.div`
+    ${layoutMixins.row}
+    flex: 1;
+    justify-content: space-between;
 
-  gap: 1rem;
-`;
+    background-color: var(--color-layer-3);
+    padding: 1.5rem;
+    border-radius: 0.625rem;
+  `,
+  BillboardChart: styled.div`
+    width: 130px;
+    height: 40px;
+  `,
+  BillboardLink: styled(Button)`
+    --button-textColor: var(--color-accent);
+    --button-height: unset;
+    --button-padding: 0;
+    justify-content: flex-start;
+  `,
+  BillboardTitle: styled.div`
+    ${layoutMixins.row}
 
-Styled.BillboardContainer = styled.div`
-  ${layoutMixins.row}
-  flex: 1;
-  justify-content: space-between;
+    gap: 0.375rem;
+  `,
+  BillboardStat: styled.div`
+    ${layoutMixins.column}
 
-  background-color: var(--color-layer-3);
-  padding: 1.5rem;
-  border-radius: 0.625rem;
-`;
+    gap: 0.5rem;
 
-Styled.BillboardChart = styled.div`
-  width: 130px;
-  height: 40px;
-`;
+    label {
+      color: var(--color-text-0);
+      font: var(--font-base-medium);
+    }
 
-Styled.BillboardLink = styled(Button)`
-  --button-textColor: var(--color-accent);
-  --button-height: unset;
-  --button-padding: 0;
-  justify-content: flex-start;
-`;
+    output {
+      color: var(--color-text-1);
+      font: var(--font-large-medium);
+    }
+  `,
+  Output: styled(Output)`
+    font: var(--font-extra-book);
+    color: var(--color-text-2);
 
-Styled.BillboardTitle = styled.div`
-  ${layoutMixins.row}
-
-  gap: 0.375rem;
-`;
-
-Styled.BillboardStat = styled.div`
-  ${layoutMixins.column}
-
-  gap: 0.5rem;
-
-  label {
-    color: var(--color-text-0);
-    font: var(--font-base-medium);
-  }
-
-  output {
-    color: var(--color-text-1);
-    font: var(--font-large-medium);
-  }
-`;
-
-Styled.Output = styled(Output)`
-  font: var(--font-extra-book);
-  color: var(--color-text-2);
-
-  @media ${breakpoints.tablet} {
-    font: var(--font-base-book);
-  }
-`;
+    @media ${breakpoints.tablet} {
+      font: var(--font-base-book);
+    }
+  `,
+};
