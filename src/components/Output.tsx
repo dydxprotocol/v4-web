@@ -60,6 +60,7 @@ type ElementProps = {
   isLoading?: boolean;
   fractionDigits?: number | null;
   showSign?: ShowSign;
+  slotLeft?: React.ReactNode;
   slotRight?: React.ReactNode;
   useGrouping?: boolean;
   roundingMode?: BigNumber.RoundingMode;
@@ -90,6 +91,7 @@ export const Output = ({
   isLoading,
   fractionDigits,
   showSign = ShowSign.Negative,
+  slotLeft,
   slotRight,
   useGrouping = true,
   withSubscript = false,
@@ -122,6 +124,7 @@ export const Output = ({
           title={`${value ?? ''}${tag ? ` ${tag}` : ''}`}
           className={className}
         >
+          {slotLeft}
           {value?.toString() ?? null}
 
           {tag && <Tag>{tag}</Tag>}
@@ -251,6 +254,7 @@ export const Output = ({
           withParentheses={withParentheses}
           withBaseFont={withBaseFont}
         >
+          {slotLeft}
           {sign && <Styled.Sign>{sign}</Styled.Sign>}
           {hasValue &&
             {
