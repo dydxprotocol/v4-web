@@ -30,6 +30,7 @@ export interface LinksConfigs {
   tradingRewardsLearnMore?: string;
   walletLearnMore?: string;
   withdrawalGateLearnMore?: string;
+  exchangeStats?: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {
@@ -60,5 +61,6 @@ export const useURLConfigs = (): LinksConfigs => {
     tradingRewardsLearnMore: linksConfigs.tradingRewardsLearnMore || FALLBACK_URL,
     walletLearnMore: linksConfigs.walletLearnMore || FALLBACK_URL,
     withdrawalGateLearnMore: linksConfigs.withdrawalGateLearnMore || FALLBACK_URL,
+    exchangeStats: linksConfigs.exchangeStats || FALLBACK_URL,
   };
 };
