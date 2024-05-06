@@ -47,7 +47,7 @@ export const MarketLeverageInput = ({
   const { leverage, size: currentPositionSize } = currentPositionData || {};
   const { current: currentSize, postOrder: postOrderSize } = currentPositionSize || {};
   const { current: currentLeverage, postOrder: postOrderLeverage } = leverage || {};
-  const { initialMarginFraction } = currentMarketConfig || {};
+  const { initialMarginFraction, effectiveInitialMarginFraction } = currentMarketConfig || {};
   const { side } = inputTradeData || {};
   const orderSide = getSelectedOrderSide(side);
 
@@ -56,9 +56,9 @@ export const MarketLeverageInput = ({
     postOrderSize,
   });
 
-  const maxLeverage = initialMarginFraction
-    ? BIG_NUMBERS.ONE.div(initialMarginFraction)
-    : MustBigNumber(10);
+  const preferredIMF = effectiveInitialMarginFraction ?? initialMarginFraction;
+
+  const maxLeverage = preferredIMF ? BIG_NUMBERS.ONE.div(preferredIMF) : MustBigNumber(10);
 
   const leverageOptions = maxLeverage.lt(10) ? [1, 2, 3, 4, 5] : [1, 2, 3, 5, 10];
 

@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import BigNumber from 'bignumber.js';
 import { DateTime } from 'luxon';
 import { useSelector } from 'react-redux';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import {
   LEVERAGE_DECIMALS,
@@ -84,6 +84,39 @@ type StyleProps = {
 };
 
 export type OutputProps = ElementProps & StyleProps;
+
+type DynamicOutputProps = {
+  staticValue: BigNumber;
+  dynamicValue: BigNumber;
+  type: OutputType;
+};
+
+/***
+ * TODO: think about making this more abstract to support various types of dynamic outputs
+ *
+ * This component allows for a static and dynamic value.
+ * The optional output will render if a dynamic value exists and is not equal to the static value.
+ * If optional output is rendered, the static output will be a rendered w/ gray text instead of white.
+ */
+export const DynamicOutput = ({ staticValue, dynamicValue, type }: DynamicOutputProps) => {
+  const renderOptionalOutput = Boolean(dynamicValue && !dynamicValue.isEqualTo(staticValue));
+  return (
+    <Styled.Row>
+      <Styled.StaticOutput
+        useGrouping
+        value={staticValue}
+        type={type}
+        $renderOptionalOutput={renderOptionalOutput}
+      />
+      {renderOptionalOutput && (
+        <>
+          <Styled.Gap>&#8594;</Styled.Gap>
+          <Output useGrouping value={dynamicValue} type={type} />
+        </>
+      )}
+    </Styled.Row>
+  );
+};
 
 export const Output = ({
   type,
@@ -371,9 +404,7 @@ export const Output = ({
   }
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Output = styled.output<{ withParentheses?: boolean }>`
+const _OUTPUT_STYLES = styled.output<{ withParentheses?: boolean }>`
   --output-beforeString: '';
   --output-afterString: '';
   --output-sign-color: currentColor;
@@ -406,20 +437,33 @@ Styled.Output = styled.output<{ withParentheses?: boolean }>`
     `}
 `;
 
-Styled.Tag = styled(Tag)`
-  margin-left: 0.5ch;
-`;
+const Styled = {
+  StaticOutput: styled(Output)<{ $renderOptionalOutput?: boolean }>`
+    color: ${(props) =>
+      props.$renderOptionalOutput ? 'var(--color-text-0)' : 'var(--color-text-1)'};
+  `,
+  Gap: styled.div`
+    margin-left: 0.15rem;
+    margin-right: 0.15rem;
+  `,
+  Output: _OUTPUT_STYLES,
+  Row: styled.div`
+    display: flex;
+    flex-direction: row;
+  `,
+  Tag: styled(Tag)`
+    margin-left: 0.5ch;
+  `,
 
-Styled.Sign = styled.span`
-  color: var(--output-sign-color);
-`;
-
-Styled.Text = styled(Styled.Output)``;
-
-Styled.Number = styled(Styled.Output)<{ withBaseFont?: boolean }>`
-  ${({ withBaseFont }) =>
-    !withBaseFont &&
-    css`
-      font-feature-settings: var(--fontFeature-monoNumbers);
-    `}
-`;
+  Sign: styled.span`
+    color: var(--output-sign-color);
+  `,
+  Text: styled(_OUTPUT_STYLES)``,
+  Number: styled(_OUTPUT_STYLES)<{ withBaseFont?: boolean }>`
+    ${({ withBaseFont }) =>
+      !withBaseFont &&
+      css`
+        font-feature-settings: var(--fontFeature-monoNumbers);
+      `}
+  `,
+};
