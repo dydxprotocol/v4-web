@@ -40,8 +40,8 @@ export const AdjustTargetLeverageForm = ({
   /**
    * @todo: Replace with Abacus functionality
    */
-  const taregetLeverage = useSelector(getInputTradeTargetLeverage);
-  const [leverage, setLeverage] = useState(taregetLeverage?.toString() ?? '');
+  const targetLeverage = useSelector(getInputTradeTargetLeverage);
+  const [leverage, setLeverage] = useState(targetLeverage?.toString() ?? '');
   const leverageBN = MustBigNumber(leverage);
 
   return (

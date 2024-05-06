@@ -360,9 +360,10 @@ export const TradeForm = ({
                         }
                       }}
                     >
-                      {stringGetter({
-                        key: MARGIN_MODE_STRINGS[marginMode?.rawValue ?? ''],
-                      })}
+                      {marginMode &&
+                        stringGetter({
+                          key: MARGIN_MODE_STRINGS[marginMode.rawValue],
+                        })}
                     </Button>
 
                     <Button

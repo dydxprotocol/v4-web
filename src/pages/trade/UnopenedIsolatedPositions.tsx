@@ -17,15 +17,15 @@ export const UnopenedIsolatedPositions = ({
   className,
   onViewOrders,
 }: UnopenedIsolatedPositionsProps) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   return (
-    <Styled.UnopenedIsolatedPositions className={className}>
-      <Styled.Button isOpen={isVisible} onClick={() => setIsVisible(!isVisible)}>
+    <Styled.UnopenedIsolatedPositions className={className} isOpen={isOpen}>
+      <Styled.Button isOpen={isOpen} onClick={() => setIsOpen(!isOpen)}>
         Unopened Isolated Positions
         <Icon iconName={IconName.Caret} />
       </Styled.Button>
 
-      {isVisible && (
+      {isOpen && (
         <Styled.Cards>
           <PotentialPositionCard onViewOrders={onViewOrders} />
           <PotentialPositionCard onViewOrders={onViewOrders} />
@@ -43,9 +43,10 @@ export const UnopenedIsolatedPositions = ({
 };
 
 const Styled = {
-  UnopenedIsolatedPositions: styled.div`
+  UnopenedIsolatedPositions: styled.div<{ isOpen?: boolean }>`
     overflow: auto;
     border-top: var(--border);
+    ${({ isOpen }) => isOpen && 'height: 100%;'}
   `,
   Button: styled(Button)<{ isOpen?: boolean }>`
     position: sticky;
