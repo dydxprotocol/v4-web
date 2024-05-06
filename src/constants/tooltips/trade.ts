@@ -57,9 +57,10 @@ export const tradeTooltips: TooltipStrings = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.INDEX_PRICE_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.INDEX_PRICE_BODY }),
   }),
-  'initial-margin-fraction': ({ stringGetter }) => ({
+  'initial-margin-fraction': ({ stringGetter, urlConfigs }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.INITIAL_MARGIN_FRACTION_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.INITIAL_MARGIN_FRACTION_BODY }),
+    learnMoreLink: urlConfigs?.initialMarginFractionLearnMore,
   }),
   'initial-stop': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.INITIAL_STOP_TITLE }),
