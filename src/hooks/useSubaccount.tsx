@@ -458,23 +458,18 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       onError: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
       onSuccess?: () => void;
     }) => {
-      const payloadToArray = (
-        payloads?: any // this is a Kotlin EmptyList or ArrayList
-      ) => {
-        return payloads && payloads.toString() != '[]' ? payloads.toArray() : [];
-      };
-
       const callback = (
         success: boolean,
         parsingError?: Nullable<ParsingError>,
         data?: Nullable<HumanReadableTriggerOrdersPayload>
       ) => {
-        const { placeOrderPayloads, cancelOrderPayloads } = data || {};
+        const placeOrderPayloads = data?.placeOrderPayloads.toArray() || []
+        const cancelOrderPayloads = data?.cancelOrderPayloads.toArray() || []
 
         if (success) {
           onSuccess?.();
 
-          payloadToArray(cancelOrderPayloads).forEach(
+          cancelOrderPayloads.forEach(
             (payload: HumanReadableCancelOrderPayload) => {
               dispatch(cancelOrderConfirmed(payload.orderId));
             }
@@ -482,7 +477,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         } else {
           onError?.({ errorStringKey: parsingError?.stringKey });
 
-          payloadToArray(placeOrderPayloads).forEach((payload: HumanReadablePlaceOrderPayload) => {
+          placeOrderPayloads.forEach((payload: HumanReadablePlaceOrderPayload) => {
             dispatch(
               placeOrderFailed({
                 clientId: payload.clientId,
@@ -491,7 +486,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
             );
           });
 
-          payloadToArray(cancelOrderPayloads).forEach(
+          cancelOrderPayloads.forEach(
             (payload: HumanReadableCancelOrderPayload) => {
               dispatch(
                 cancelOrderFailed({
@@ -505,9 +500,8 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       };
 
       const triggerOrderParams = abacusStateManager.triggerOrders(callback);
-      const { placeOrderPayloads, cancelOrderPayloads } = triggerOrderParams || {};
 
-      payloadToArray(placeOrderPayloads).forEach((payload: HumanReadablePlaceOrderPayload) => {
+      triggerOrderParams?.placeOrderPayloads.toArray().forEach((payload: HumanReadablePlaceOrderPayload) => {
         dispatch(
           placeOrderSubmitted({
             marketId: payload.marketId,
@@ -517,7 +511,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         );
       });
 
-      payloadToArray(cancelOrderPayloads).forEach((payload: HumanReadableCancelOrderPayload) => {
+      triggerOrderParams?.cancelOrderPayloads.toArray().forEach((payload: HumanReadableCancelOrderPayload) => {
         dispatch(cancelOrderSubmitted(payload.orderId));
       });
 
