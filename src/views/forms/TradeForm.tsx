@@ -3,11 +3,12 @@ import { Ref, useCallback, useState, type FormEvent } from 'react';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { NumberFormatValues, SourceInfo } from 'react-number-format';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import {
   ComplianceStatus,
   ErrorType,
+  MARGIN_MODE_STRINGS,
   TradeInputErrorAction,
   TradeInputField,
   ValidationError,
@@ -44,6 +45,7 @@ import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { InputType } from '@/components/Input';
+import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
@@ -134,7 +136,7 @@ export const TradeForm = ({
 
   const currentTradeData = useSelector(getInputTradeData, shallowEqual);
 
-  const { side, type } = currentTradeData || {};
+  const { side, type, marginMode, targetLeverage } = currentTradeData || {};
 
   const selectedTradeType = getSelectedTradeType(type);
   const selectedOrderSide = getSelectedOrderSide(side);
@@ -329,7 +331,6 @@ export const TradeForm = ({
                     slotRight={<Icon iconName={IconName.Caret} />}
                     onPressedChange={setShowOrderbook}
                     isPressed={showOrderbook}
-                    hidePressedStyle
                   >
                     {!showOrderbook && stringGetter({ key: STRING_KEYS.ORDERBOOK })}
                   </Styled.OrderbookButton>
@@ -359,7 +360,10 @@ export const TradeForm = ({
                         }
                       }}
                     >
-                      {stringGetter({ key: STRING_KEYS.CROSS })}
+                      {marginMode &&
+                        stringGetter({
+                          key: MARGIN_MODE_STRINGS[marginMode.rawValue],
+                        })}
                     </Button>
 
                     <Button
@@ -367,7 +371,7 @@ export const TradeForm = ({
                         dispatch(openDialog({ type: DialogTypes.AdjustTargetLeverage }));
                       }}
                     >
-                      5x
+                      <Output type={OutputType.Multiple} value={targetLeverage} />
                     </Button>
                   </Styled.MarginAndLeverageButtons>
                 )}
@@ -377,9 +381,7 @@ export const TradeForm = ({
           </Styled.TopActionsRow>
 
           <Styled.OrderbookAndInputs showOrderbook={showOrderbook}>
-            {isTablet && showOrderbook && (
-              <Styled.Orderbook maxRowsPerSide={5} selectionBehavior="replace" />
-            )}
+            {isTablet && showOrderbook && <Styled.Orderbook maxRowsPerSide={5} />}
 
             <Styled.InputsColumn>
               {tradeFormInputs.map(
@@ -460,179 +462,167 @@ export const TradeForm = ({
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
+const Styled = {
+  TradeForm: styled.form`
+    /* Params */
+    --tradeBox-content-paddingTop: ;
+    --tradeBox-content-paddingRight: ;
+    --tradeBox-content-paddingBottom: ;
+    --tradeBox-content-paddingLeft: ;
 
-Styled.TradeForm = styled.form`
-  /* Params */
-  --tradeBox-content-paddingTop: ;
-  --tradeBox-content-paddingRight: ;
-  --tradeBox-content-paddingBottom: ;
-  --tradeBox-content-paddingLeft: ;
+    /* Rules */
+    --orderbox-column-width: 140px;
+    --orderbook-width: calc(var(--orderbox-column-width) + var(--tradeBox-content-paddingLeft));
 
-  /* Rules */
-  --orderbox-column-width: 140px;
-  --orderbook-width: calc(var(--orderbox-column-width) + var(--tradeBox-content-paddingLeft));
+    min-height: 100%;
+    isolation: isolate;
 
-  min-height: 100%;
-  isolation: isolate;
+    ${layoutMixins.flexColumn}
+    gap: 0.75rem;
 
-  ${layoutMixins.flexColumn}
-  gap: 0.75rem;
+    ${layoutMixins.stickyArea1}
+    --stickyArea1-background: var(--color-layer-2);
+    --stickyArea1-paddingBottom: var(--tradeBox-content-paddingBottom);
 
-  ${layoutMixins.stickyArea1}
-  --stickyArea1-background: var(--color-layer-2);
-  --stickyArea1-paddingBottom: var(--tradeBox-content-paddingBottom);
+    padding: var(--tradeBox-content-paddingTop) var(--tradeBox-content-paddingRight)
+      var(--tradeBox-content-paddingBottom) var(--tradeBox-content-paddingLeft);
 
-  padding: var(--tradeBox-content-paddingTop) var(--tradeBox-content-paddingRight)
-    var(--tradeBox-content-paddingBottom) var(--tradeBox-content-paddingLeft);
+    @media ${breakpoints.tablet} {
+      padding-left: 0;
+      padding-right: 0;
+      margin-left: var(--tradeBox-content-paddingLeft);
+      margin-right: var(--tradeBox-content-paddingRight);
 
-  @media ${breakpoints.tablet} {
-    padding-left: 0;
-    padding-right: 0;
-    margin-left: var(--tradeBox-content-paddingLeft);
-    margin-right: var(--tradeBox-content-paddingRight);
-
-    && * {
-      outline: none !important;
+      && * {
+        outline: none !important;
+      }
     }
-  }
-`;
+  `,
+  MarginAndLeverageButtons: styled.div`
+    ${layoutMixins.inlineRow}
+    gap: 0.5rem;
+    margin-right: 0.5rem;
 
-Styled.MarginAndLeverageButtons = styled.div`
-  ${layoutMixins.inlineRow}
-  gap: 0.5rem;
-  margin-right: 0.5rem;
-
-  button {
-    width: 100%;
-  }
-`;
-
-Styled.TopActionsRow = styled.div`
-  display: grid;
-  grid-auto-flow: column;
-
-  @media ${breakpoints.tablet} {
-    grid-auto-columns: var(--orderbox-column-width) 1fr;
-    gap: var(--form-input-gap);
-  }
-`;
-
-Styled.OrderbookButtons = styled.div`
-  ${layoutMixins.inlineRow}
-  justify-content: space-between;
-  gap: 0.25rem;
-
-  @media ${breakpoints.notTablet} {
-    display: none;
-  }
-`;
-
-Styled.OrderbookButton = styled(ToggleButton)`
-  --button-toggle-off-textColor: var(--color-text-1);
-  --button-toggle-off-backgroundColor: transparent;
-
-  > svg {
-    color: var(--color-text-0);
-    height: 0.875em;
-    width: 0.875em;
-
-    transition: 0.2s;
-  }
-
-  &[data-state='on'] {
-    svg {
-      rotate: 0.25turn;
+    button {
+      width: 100%;
     }
-  }
-
-  &[data-state='off'] {
-    svg {
-      rotate: -0.25turn;
-    }
-  }
-`;
-
-Styled.OrderbookAndInputs = styled.div<{ showOrderbook: boolean }>`
-  @media ${breakpoints.tablet} {
+  `,
+  TopActionsRow: styled.div`
     display: grid;
-    align-items: flex-start;
     grid-auto-flow: column;
 
-    ${({ showOrderbook }) =>
-      showOrderbook
-        ? css`
-            grid-auto-columns: var(--orderbook-width) 1fr;
-            gap: var(--form-input-gap);
-            margin-left: calc(-1 * var(--tradeBox-content-paddingLeft));
-          `
-        : css`
-            grid-auto-columns: 1fr;
-            gap: 0;
-          `}
-  }
-`;
+    @media ${breakpoints.tablet} {
+      grid-auto-columns: var(--orderbox-column-width) 1fr;
+      gap: var(--form-input-gap);
+    }
+  `,
+  OrderbookButtons: styled.div`
+    ${layoutMixins.inlineRow}
+    justify-content: space-between;
+    gap: 0.25rem;
 
-Styled.Orderbook = styled(Orderbook)`
-  width: 100%;
-
-  @media ${breakpoints.notTablet} {
-    display: none;
-  }
-
-  > table {
-    --tableCell-padding: 0.5em 1em;
-
-    scroll-snap-type: none;
-
-    thead {
+    @media ${breakpoints.notTablet} {
       display: none;
     }
-  }
-`;
+  `,
+  OrderbookButton: styled(ToggleButton)`
+    --button-toggle-off-textColor: var(--color-text-1);
+    --button-toggle-off-backgroundColor: transparent;
 
-Styled.ToggleGroup = styled(ToggleGroup)`
-  overflow-x: auto;
+    > svg {
+      color: var(--color-text-0);
+      height: 0.875em;
+      width: 0.875em;
 
-  button[data-state='off'] {
-    gap: 0;
-
-    img {
-      height: 0;
+      transition: 0.2s;
     }
-  }
-`;
 
-Styled.InputsColumn = styled.div`
-  ${formMixins.inputsColumn}
-`;
+    &[data-state='on'] {
+      svg {
+        rotate: 0.25turn;
+      }
+    }
 
-Styled.Message = styled.div`
-  ${layoutMixins.row}
-  gap: 0.75rem;
-`;
+    &[data-state='off'] {
+      svg {
+        rotate: -0.25turn;
+      }
+    }
+  `,
+  OrderbookAndInputs: styled.div<{ showOrderbook: boolean }>`
+    @media ${breakpoints.tablet} {
+      display: grid;
+      align-items: flex-start;
+      grid-auto-flow: column;
 
-Styled.IconButton = styled(IconButton)`
-  --button-backgroundColor: var(--color-white-faded);
-  flex-shrink: 0;
+      ${({ showOrderbook }) =>
+        showOrderbook
+          ? css`
+              grid-auto-columns: var(--orderbook-width) 1fr;
+              gap: var(--form-input-gap);
+              margin-left: calc(-1 * var(--tradeBox-content-paddingLeft));
+            `
+          : css`
+              grid-auto-columns: 1fr;
+              gap: 0;
+            `}
+    }
+  `,
+  Orderbook: styled(Orderbook)`
+    width: 100%;
 
-  svg {
-    width: 1.25em;
-    height: 1.25em;
-  }
-`;
+    @media ${breakpoints.notTablet} {
+      display: none;
+    }
 
-Styled.ButtonRow = styled.div`
-  ${layoutMixins.row}
-  justify-self: end;
-  padding: 0.5rem 0 0.5rem 0;
-`;
+    > table {
+      --tableCell-padding: 0.5em 1em;
 
-Styled.Footer = styled.footer`
-  ${formMixins.footer}
-  --stickyFooterBackdrop-outsetY: var(--tradeBox-content-paddingBottom);
-  backdrop-filter: none;
+      scroll-snap-type: none;
 
-  ${layoutMixins.column}
-  ${layoutMixins.noPointerEvents}
-`;
+      thead {
+        display: none;
+      }
+    }
+  `,
+  ToggleGroup: styled(ToggleGroup)`
+    overflow-x: auto;
+
+    button[data-state='off'] {
+      gap: 0;
+
+      img {
+        height: 0;
+      }
+    }
+  `,
+  InputsColumn: styled.div`
+    ${formMixins.inputsColumn}
+  `,
+  Message: styled.div`
+    ${layoutMixins.row}
+    gap: 0.75rem;
+  `,
+  IconButton: styled(IconButton)`
+    --button-backgroundColor: var(--color-white-faded);
+    flex-shrink: 0;
+
+    svg {
+      width: 1.25em;
+      height: 1.25em;
+    }
+  `,
+  ButtonRow: styled.div`
+    ${layoutMixins.row}
+    justify-self: end;
+    padding: 0.5rem 0 0.5rem 0;
+  `,
+  Footer: styled.footer`
+    ${formMixins.footer}
+    --stickyFooterBackdrop-outsetY: var(--tradeBox-content-paddingBottom);
+    backdrop-filter: none;
+
+    ${layoutMixins.column}
+    ${layoutMixins.noPointerEvents}
+  `,
+};

@@ -9,19 +9,23 @@ import { Icon, IconName } from '@/components/Icon';
 import { PotentialPositionCard } from '@/components/PotentialPositionCard';
 
 type UnopenedIsolatedPositionsProps = {
+  className?: string;
   onViewOrders: (marketId: string) => void;
 };
 
-export const UnopenedIsolatedPositions = ({ onViewOrders }: UnopenedIsolatedPositionsProps) => {
-  const [isVisible, setIsVisible] = useState(false);
+export const UnopenedIsolatedPositions = ({
+  className,
+  onViewOrders,
+}: UnopenedIsolatedPositionsProps) => {
+  const [isOpen, setIsOpen] = useState(false);
   return (
-    <Styled.UnopenedIsolatedPositions>
-      <Styled.Button isOpen={isVisible} onClick={() => setIsVisible(!isVisible)}>
+    <Styled.UnopenedIsolatedPositions className={className} isOpen={isOpen}>
+      <Styled.Button isOpen={isOpen} onClick={() => setIsOpen(!isOpen)}>
         Unopened Isolated Positions
         <Icon iconName={IconName.Caret} />
       </Styled.Button>
 
-      {isVisible && (
+      {isOpen && (
         <Styled.Cards>
           <PotentialPositionCard onViewOrders={onViewOrders} />
           <PotentialPositionCard onViewOrders={onViewOrders} />
@@ -39,9 +43,10 @@ export const UnopenedIsolatedPositions = ({ onViewOrders }: UnopenedIsolatedPosi
 };
 
 const Styled = {
-  UnopenedIsolatedPositions: styled.div`
+  UnopenedIsolatedPositions: styled.div<{ isOpen?: boolean }>`
     overflow: auto;
     border-top: var(--border);
+    ${({ isOpen }) => isOpen && 'height: 100%;'}
   `,
   Button: styled(Button)<{ isOpen?: boolean }>`
     position: sticky;

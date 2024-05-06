@@ -28,6 +28,17 @@ export const getTradeSide = (state: RootState) => state.inputs.tradeInputs?.side
 export const getInputTradeOptions = (state: RootState) => state.inputs.tradeInputs?.options;
 
 /**
+ * @returns The selected MarginMode in TradeInputs. 'CROSS' or 'ISOLATED'
+ */
+export const getInputTradeMarginMode = (state: RootState) => state.inputs.tradeInputs?.marginMode;
+
+/**
+ * @returns The specified targetLeverage for the next placed order
+ */
+export const getInputTradeTargetLeverage = (state: RootState) =>
+  state.inputs.tradeInputs?.targetLeverage;
+
+/**
  * @param state
  * @returns ValidationErrors of the current Input type (Trade or Transfer)
  */
