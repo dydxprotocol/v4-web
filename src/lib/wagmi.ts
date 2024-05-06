@@ -157,6 +157,8 @@ const getWalletconnect2ConnectorOptions = (
     qrModalOptions: {
       themeMode: 'dark' as const,
       themeVariables: {
+        // TODO: figure out why --wcm-accent-color isn't considered a known property
+        // @ts-ignore
         '--wcm-accent-color': '#5973fe',
         '--wcm-font-family': 'var(--fontFamily-base)',
       },

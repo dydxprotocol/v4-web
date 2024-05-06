@@ -12,7 +12,8 @@ import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';
-import { DynamicOutput, Output, OutputType } from '@/components/Output';
+import { DiffOutput } from '@/components/DiffOutput';
+import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { WithTooltip } from '@/components/WithTooltip';
@@ -173,9 +174,16 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
               }
               case MarketStats.MaxLeverage: {
                 return (
-                  <DynamicOutput
-                    staticValue={BIG_NUMBERS.ONE.div(initialMarginFraction || 0)}
-                    dynamicValue={BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction || 0)}
+                  <DiffOutput
+                    value={
+                      initialMarginFraction ? BIG_NUMBERS.ONE.div(initialMarginFraction) : null
+                    }
+                    newValue={
+                      effectiveInitialMarginFraction
+                        ? BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction)
+                        : null
+                    }
+                    withDiff={initialMarginFraction != effectiveInitialMarginFraction}
                     type={OutputType.Multiple}
                   />
                 );

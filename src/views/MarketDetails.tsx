@@ -13,8 +13,9 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
+import { DiffOutput } from '@/components/DiffOutput';
 import { Icon, IconName } from '@/components/Icon';
-import { DynamicOutput, Output, OutputType } from '@/components/Output';
+import { Output, OutputType } from '@/components/Output';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketData } from '@/state/perpetualsSelectors';
@@ -49,6 +50,10 @@ export const MarketDetails: React.FC = () => {
     websiteLink,
     whitepaperLink,
   } = resources || {};
+
+  const preferIEMF = Boolean(
+    effectiveInitialMarginFraction && initialMarginFraction != effectiveInitialMarginFraction
+  );
 
   const items = [
     {
@@ -101,11 +106,14 @@ export const MarketDetails: React.FC = () => {
       label: stringGetter({ key: STRING_KEYS.MAXIMUM_LEVERAGE }),
       tooltip: 'maximum-leverage',
       value: (
-        <DynamicOutput
-          // it's okay if we default to 0. it doesn't cause runtime errors
-          // and both values should always exist. their types aren't accurate yet.
-          staticValue={BIG_NUMBERS.ONE.div(initialMarginFraction || 0)}
-          dynamicValue={BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction || 0)}
+        <DiffOutput
+          value={initialMarginFraction ? BIG_NUMBERS.ONE.div(initialMarginFraction) : null}
+          newValue={
+            effectiveInitialMarginFraction
+              ? BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction)
+              : null
+          }
+          withDiff={preferIEMF}
           type={OutputType.Multiple}
         />
       ),
@@ -123,11 +131,12 @@ export const MarketDetails: React.FC = () => {
       label: stringGetter({ key: STRING_KEYS.INITIAL_MARGIN_FRACTION }),
       tooltip: 'initial-margin-fraction',
       value: (
-        // it's okay if we default to 0. it doesn't cause runtime errors
-        // and both values should always exist. their types aren't accurate yet.
-        <DynamicOutput
-          staticValue={BigNumber(initialMarginFraction || 0)}
-          dynamicValue={BigNumber(effectiveInitialMarginFraction || 0)}
+        <DiffOutput
+          value={initialMarginFraction ? BigNumber(initialMarginFraction) : null}
+          newValue={
+            effectiveInitialMarginFraction ? BigNumber(effectiveInitialMarginFraction) : null
+          }
+          withDiff={preferIEMF}
           type={OutputType.SmallPercent}
         />
       ),
