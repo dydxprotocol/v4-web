@@ -165,6 +165,7 @@ export const MarketLeverageInput = ({
         items={leverageOptions.map((leverageAmount: number) => ({
           label: `${leverageAmount}×`,
           value: MustBigNumber(leverageAmount).toFixed(LEVERAGE_DECIMALS),
+          disabled: maxLeverage.lt(leverageAmount),
         }))}
         value={MustBigNumber(formattedLeverageValue).abs().toFixed(LEVERAGE_DECIMALS)} // sign agnostic
         onValueChange={updateLeverage}
