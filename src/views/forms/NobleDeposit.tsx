@@ -36,6 +36,7 @@ export const NobleDeposit = () => {
               hasAcknowledged && hasTimedout
                 ? nobleAddress
                 : stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TO_REVEAL }),
+            allowUserSelection: true,
           },
         ]}
       >
