@@ -26,7 +26,7 @@ export const NobleDeposit = () => {
 
   return (
     <>
-      <WithDetailsReceipt
+      <Styled.WithDetailsReceipt
         side="bottom"
         detailItems={[
           {
@@ -45,7 +45,7 @@ export const NobleDeposit = () => {
           value={nobleAddress || ''}
           blurred={!hasAcknowledged || !hasTimedout}
         />
-      </WithDetailsReceipt>
+      </Styled.WithDetailsReceipt>
 
       <Styled.WithReceipt
         slotReceipt={
@@ -123,5 +123,11 @@ Styled.CautionIconContainer = styled.div`
     height: 2.5rem;
     background-color: ${({ theme }) =>
       generateFadedColorVariant(theme.warning, OpacityToken.Opacity16)};
+  }
+`;
+
+Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
+  dd {
+    user-select: all;
   }
 `;
