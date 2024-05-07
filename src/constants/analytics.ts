@@ -133,10 +133,12 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
     ? {
         state: OnboardingState;
         step?: OnboardingSteps;
+        referrer?: string | undefined;
       }
     : T extends AnalyticsEvent.OnboardingAccountDerived
     ? {
         hasPreviousTransactions: boolean;
+        referrer?: string | undefined;
       }
     : // Transfers
     T extends AnalyticsEvent.TransferFaucet
@@ -204,6 +206,10 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
     ? {
         type: string;
         id: string;
+      }
+    : T extends AnalyticsEvent.OnboardingWalletIsNonDeterministic
+    ? {
+        referrer: string | undefined;
       }
     : never;
 

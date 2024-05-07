@@ -31,6 +31,7 @@ import { getSelectedNetwork } from '@/state/appSelectors';
 import { track } from '@/lib/analytics';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
+import { testFlags } from '@/lib/testFlags';
 import { parseWalletError } from '@/lib/wallet';
 
 type ElementProps = {
@@ -141,7 +142,9 @@ export const GenerateKeys = ({
         const { message } = parseWalletError({ error, stringGetter });
 
         if (message) {
-          track(AnalyticsEvent.OnboardingWalletIsNonDeterministic);
+          track(AnalyticsEvent.OnboardingWalletIsNonDeterministic, {
+            referrer: testFlags.referrer,
+          });
           setError(message);
         }
         return;

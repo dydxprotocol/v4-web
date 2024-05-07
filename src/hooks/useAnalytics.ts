@@ -175,14 +175,15 @@ export const useAnalytics = () => {
       track(AnalyticsEvent.OnboardingStepChanged, {
         state: onboardingState,
         step: currentOnboardingStep,
+        referrer: testFlags.referrer,
       });
     } else {
       setHasOnboardingStateChanged(true);
     }
   }, [onboardingState, currentOnboardingStep]);
 
-  // AnalyticsEvent.OnboardingConnectWallet
-  // AnalyticsEvent.OnboardingDisconnectWallet
+  // AnalyticsEvent.ConnectWallet
+  // AnalyticsEvent.DisconnectWallet
   const [previousSelectedWalletType, setPreviousSelectedWalletType] =
     useState<typeof selectedWalletType>();
 
