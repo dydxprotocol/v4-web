@@ -95,6 +95,11 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     showCurrentMarket ? numOpenOrders : numTotalOpenOrders
   );
 
+  const viewMoreConfig: ViewMoreConfig = {
+    initialNumRowsToShow: 10,
+    numRowsPerPage: 10,
+  };
+
   const onViewOrders = useCallback((market: string) => {
     navigate(`${AppRoute.Trade}/${market}`, {
       state: {
@@ -143,6 +148,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                   ].filter(isTruthy)
             }
             showClosePositionAction={showClosePositionAction}
+            viewMoreConfig={viewMoreConfig}
             onNavigate={() => setView(PanelView.CurrentMarket)}
             navigateToOrders={onViewOrders}
           />
@@ -180,6 +186,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     !isAccountViewOnly && OrdersTableColumnKey.Actions,
                   ].filter(isTruthy)
             }
+            viewMoreConfig={viewMoreConfig}
           />
         ),
       },
@@ -218,6 +225,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
             columnWidths={{
               [FillsTableColumnKey.TypeAmount]: '100%',
             }}
+            viewMoreConfig={viewMoreConfig}
           />
         ),
       },

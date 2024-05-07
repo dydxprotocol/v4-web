@@ -42,10 +42,15 @@ import { Icon, IconName } from './Icon';
 import { Tag } from './Tag';
 
 export { ActionsTableCell } from './Table/ActionsTableCell';
-export { MarketTableCell } from './Table/MarketTableCell';
 export { AssetTableCell } from './Table/AssetTableCell';
+export { MarketTableCell } from './Table/MarketTableCell';
 export { TableCell } from './Table/TableCell';
 export { TableColumnHeader } from './Table/TableColumnHeader';
+
+export type ViewMoreConfig = {
+  initialNumRowsToShow: number;
+  numRowsPerPage?: number;
+};
 
 export type CustomRowConfig = {
   key: string;
@@ -90,10 +95,7 @@ export type ElementProps<TableRowData extends object | CustomRowConfig, TableRow
   selectionBehavior?: 'replace' | 'toggle';
   onRowAction?: (key: TableRowKey, row: TableRowData) => void;
   slotEmpty?: React.ReactNode;
-  viewMoreConfig?: {
-    initialNumRowsToShow: number;
-    numRowsPerPage?: number;
-  };
+  viewMoreConfig?: ViewMoreConfig;
   // collection: TableCollection<string>;
   // children: React.ReactNode;
 };
@@ -123,7 +125,10 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   selectionMode = 'single',
   selectionBehavior = 'toggle',
   slotEmpty,
-  viewMoreConfig,
+  viewMoreConfig = {
+    initialNumRowsToShow: 25,
+    numRowsPerPage: 10,
+  },
   // shouldRowRender,
 
   // collection,
