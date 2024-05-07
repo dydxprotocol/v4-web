@@ -101,7 +101,11 @@ export const PositionsTriggersCell = ({
     }: {
       liquidationWarningSide?: Nullable<AbacusPositionSides>;
     } = {}) => {
-      const styledLabel = <Styled.Label warning={liquidationWarningSide}>{label}</Styled.Label>;
+      const styledLabel = (
+        <Styled.Label warning={liquidationWarningSide} hasOrders={orders.length > 0}>
+          {label}
+        </Styled.Label>
+      );
       return liquidationWarningSide ? (
         <WithHovercard
           align="start"
@@ -192,7 +196,7 @@ export const PositionsTriggersCell = ({
   };
 
   return (
-    <Styled.TableCell
+    <TableCell
       stacked
       slotRight={
         !isDisabled &&
@@ -209,17 +213,11 @@ export const PositionsTriggersCell = ({
     >
       <Styled.Row>{renderOutput({ label: 'TP', orders: takeProfitOrders })}</Styled.Row>
       <Styled.Row>{renderOutput({ label: 'SL', orders: stopLossOrders })}</Styled.Row>
-    </Styled.TableCell>
+    </TableCell>
   );
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TableCell = styled(TableCell)`
-  > * {
-    color: var(--color-text-0);
-  }
-`;
 
 Styled.Row = styled.span`
   ${layoutMixins.inlineRow}
@@ -227,7 +225,7 @@ Styled.Row = styled.span`
   --item-height: 1.25rem;
 `;
 
-Styled.Label = styled.div<{ warning?: boolean }>`
+Styled.Label = styled.div<{ warning?: boolean; hasOrders: boolean }>`
   align-items: center;
   border: solid var(--border-width) var(--color-border);
   border-radius: 0.5em;
@@ -242,10 +240,28 @@ Styled.Label = styled.div<{ warning?: boolean }>`
       background-color: var(--color-warning);
       color: var(--color-black);
     `}
+
+  ${({ hasOrders }) =>
+    hasOrders
+      ? css`
+          color: var(--color-text-1);
+          background-color: var(--color-layer-4);
+        `
+      : css`
+          color: var(--color-text-0);
+        `}
 `;
 
-Styled.Output = styled(Output)`
+Styled.Output = styled(Output)<{ value?: number }>`
   font: var(--font-mini-medium);
+  ${({ value }) =>
+    value
+      ? css`
+          color: var(--color-text-1);
+        `
+      : css`
+          color: var(--color-text-0);
+        `}
 `;
 
 Styled.Button = styled(Button)`
