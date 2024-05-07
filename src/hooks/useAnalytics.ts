@@ -13,6 +13,7 @@ import { getInputTradeData } from '@/state/inputsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { identify, track } from '@/lib/analytics';
+import { testFlags } from '@/lib/testFlags';
 import { getSelectedTradeType } from '@/lib/tradeData';
 
 import { useAccounts } from './useAccounts';
@@ -91,7 +92,9 @@ export const useAnalytics = () => {
 
   // AnalyticsEvent.AppStart
   useEffect(() => {
-    track(AnalyticsEvent.AppStart);
+    track(AnalyticsEvent.AppStart, {
+      referrer: testFlags.referrer,
+    });
   }, []);
 
   // AnalyticsEvent.NetworkStatus

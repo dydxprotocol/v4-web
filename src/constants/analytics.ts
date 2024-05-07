@@ -89,7 +89,9 @@ export enum AnalyticsEvent {
 export type AnalyticsEventData<T extends AnalyticsEvent> =
   // App
   T extends AnalyticsEvent.AppStart
-    ? {}
+    ? {
+        referrer?: string;
+      }
     : T extends AnalyticsEvent.NetworkStatus
     ? {
         status: (typeof AbacusApiStatus)['name'];

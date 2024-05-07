@@ -43,6 +43,10 @@ class TestFlags {
   get enableComplianceApi() {
     return !!this.queryParams.complianceapi;
   }
+
+  get referrer() {
+    return this.queryParams.r;
+  }
 }
 
 export const testFlags = new TestFlags();
