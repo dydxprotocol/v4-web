@@ -7,7 +7,6 @@ import { STRING_KEYS } from '@/constants/localization';
 import { useEnvFeatures, useStringGetter } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
-import { CURVE_DAO_TOKEN_ADDRESS } from '@/styles/tokens';
 
 import { DiffArrow } from '@/components/DiffArrow';
 import { Icon } from '@/components/Icon';
@@ -24,6 +23,8 @@ type ElementProps = {
   onSelectToken: (token: TransferInputTokenResource) => void;
   isExchange?: boolean;
 };
+
+const CURVE_DAO_TOKEN_ADDRESS = '0xD533a949740bb3306d119CC777fa900bA034cd52';
 
 const cctpTokensByAddress = cctpTokens.reduce((acc, token) => {
   if (!acc[token.tokenAddress]) {
