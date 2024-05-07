@@ -45,7 +45,7 @@ class TestFlags {
   }
 
   get referrer() {
-    return this.queryParams.r;
+    return this.queryParams.utm_source;
   }
 }
 
