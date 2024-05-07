@@ -66,11 +66,14 @@ export const MarketLeverageInput = ({
 
   const getSignedLeverage = (newLeverage: string | number) => {
     const newLeverageBN = MustBigNumber(newLeverage);
+    const newLeverageBNCapped = newLeverageBN.isGreaterThan(maxLeverage)
+      ? maxLeverage
+      : newLeverageBN;
     const newLeverageSignedBN =
       leveragePosition === PositionSide.Short ||
       (leveragePosition === PositionSide.None && orderSide === OrderSide.SELL)
-        ? newLeverageBN.abs().negated()
-        : newLeverageBN.abs();
+        ? newLeverageBNCapped.abs().negated()
+        : newLeverageBNCapped.abs();
 
     return newLeverageSignedBN.toFixed(LEVERAGE_DECIMALS);
   };
