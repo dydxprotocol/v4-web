@@ -7,6 +7,8 @@ import styled, {
   type FlattenInterpolation,
 } from 'styled-components';
 
+import { Nullable } from '@/constants/abacus';
+
 import { LoadingContext } from '@/contexts/LoadingContext';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -19,7 +21,7 @@ export type DetailsItem = {
   tooltip?: string;
   tooltipParams?: Record<string, string>;
   label: string | JSX.Element;
-  value?: string | JSX.Element | undefined;
+  value?: Nullable<string> | JSX.Element | undefined;
   subitems?: DetailsItem[];
   withTooltipIcon?: boolean;
   allowUserSelection?: boolean;

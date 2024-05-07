@@ -47,7 +47,7 @@ export const MarketLeverageInput = ({
   const { leverage, size: currentPositionSize } = currentPositionData || {};
   const { current: currentSize, postOrder: postOrderSize } = currentPositionSize || {};
   const { current: currentLeverage, postOrder: postOrderLeverage } = leverage || {};
-  const { initialMarginFraction } = currentMarketConfig || {};
+  const { initialMarginFraction, effectiveInitialMarginFraction } = currentMarketConfig || {};
   const { side } = inputTradeData || {};
   const orderSide = getSelectedOrderSide(side);
 
@@ -56,9 +56,9 @@ export const MarketLeverageInput = ({
     postOrderSize,
   });
 
-  const maxLeverage = initialMarginFraction
-    ? BIG_NUMBERS.ONE.div(initialMarginFraction)
-    : MustBigNumber(10);
+  const preferredIMF = effectiveInitialMarginFraction ?? initialMarginFraction;
+
+  const maxLeverage = preferredIMF ? BIG_NUMBERS.ONE.div(preferredIMF) : MustBigNumber(10);
 
   const leverageOptions = maxLeverage.lt(10) ? [1, 2, 3, 4, 5] : [1, 2, 3, 5, 10];
 
@@ -66,11 +66,14 @@ export const MarketLeverageInput = ({
 
   const getSignedLeverage = (newLeverage: string | number) => {
     const newLeverageBN = MustBigNumber(newLeverage);
+    const newLeverageBNCapped = newLeverageBN.isGreaterThan(maxLeverage)
+      ? maxLeverage
+      : newLeverageBN;
     const newLeverageSignedBN =
       leveragePosition === PositionSide.Short ||
       (leveragePosition === PositionSide.None && orderSide === OrderSide.SELL)
-        ? newLeverageBN.abs().negated()
-        : newLeverageBN.abs();
+        ? newLeverageBNCapped.abs().negated()
+        : newLeverageBNCapped.abs();
 
     return newLeverageSignedBN.toFixed(LEVERAGE_DECIMALS);
   };
@@ -162,6 +165,7 @@ export const MarketLeverageInput = ({
         items={leverageOptions.map((leverageAmount: number) => ({
           label: `${leverageAmount}×`,
           value: MustBigNumber(leverageAmount).toFixed(LEVERAGE_DECIMALS),
+          disabled: maxLeverage.lt(leverageAmount),
         }))}
         value={MustBigNumber(formattedLeverageValue).abs().toFixed(LEVERAGE_DECIMALS)} // sign agnostic
         onValueChange={updateLeverage}

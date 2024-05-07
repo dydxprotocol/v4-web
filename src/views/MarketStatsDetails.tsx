@@ -12,9 +12,11 @@ import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';
+import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
 import { VerticalSeparator } from '@/components/Separator';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
+import { WithTooltip } from '@/components/WithTooltip';
 import { NextFundingTimer } from '@/views/NextFundingTimer';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
@@ -24,7 +26,7 @@ import {
   getCurrentMarketMidMarketPrice,
 } from '@/state/perpetualsSelectors';
 
-import { MustBigNumber } from '@/lib/numbers';
+import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
 
 import { MidMarketPrice } from './MidMarketPrice';
 
@@ -40,6 +42,7 @@ enum MarketStats {
   Volume24H = 'Volume24H',
   Trades24H = 'Trades24H',
   NextFunding = 'NextFunding',
+  MaxLeverage = 'MaxLeverage',
 }
 
 const defaultMarketStatistics = Object.values(MarketStats);
@@ -48,7 +51,8 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
   const { id = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
-  const { tickSizeDecimals } = useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const { tickSizeDecimals, initialMarginFraction, effectiveInitialMarginFraction } =
+    useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
   const midMarketPrice = useSelector(getCurrentMarketMidMarketPrice);
   const lastMidMarketPrice = useRef(midMarketPrice);
   const currentMarketData = useSelector(getCurrentMarketData, shallowEqual);
@@ -70,6 +74,7 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
     [MarketStats.PriceChange24H]: priceChange24H,
     [MarketStats.Trades24H]: trades24H,
     [MarketStats.Volume24H]: volume24H,
+    [MarketStats.MaxLeverage]: undefined, // needs more complex logic
   };
 
   const labelMap = {
@@ -80,6 +85,11 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
     [MarketStats.PriceChange24H]: stringGetter({ key: STRING_KEYS.CHANGE_24H }),
     [MarketStats.Trades24H]: stringGetter({ key: STRING_KEYS.TRADES_24H }),
     [MarketStats.Volume24H]: stringGetter({ key: STRING_KEYS.VOLUME_24H }),
+    [MarketStats.MaxLeverage]: (
+      <WithTooltip tooltip="maximum-leverage">
+        {stringGetter({ key: STRING_KEYS.MAXIMUM_LEVERAGE })}
+      </WithTooltip>
+    ),
   };
 
   return (
@@ -161,6 +171,22 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
               case MarketStats.Volume24H: {
                 // $ with no decimals
                 return <Styled.Output type={OutputType.Fiat} value={value} fractionDigits={0} />;
+              }
+              case MarketStats.MaxLeverage: {
+                return (
+                  <DiffOutput
+                    value={
+                      initialMarginFraction ? BIG_NUMBERS.ONE.div(initialMarginFraction) : null
+                    }
+                    newValue={
+                      effectiveInitialMarginFraction
+                        ? BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction)
+                        : null
+                    }
+                    withDiff={initialMarginFraction != effectiveInitialMarginFraction}
+                    type={OutputType.Multiple}
+                  />
+                );
               }
               default: {
                 // Default renderer
