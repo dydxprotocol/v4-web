@@ -30,6 +30,7 @@
     "ladle-p": "ladle preview",
     "lint": "eslint --ext .ts,.tsx src/",
     "fix-lint": "eslint --fix --ext .ts,.tsx src/",
+    "tag": "node scripts/generate-tag.cjs",
     "test": "vitest run",
     "tsc": "tsc",
     "postinstall": "tar -xzC public -f tradingview/tradingview.tgz",
