@@ -46,7 +46,7 @@ export const tableMixins: Record<
 
     span:nth-child(2) {
       :before {
-        content: ' / ';
+        content: ' | ';
       }
     }
   `,

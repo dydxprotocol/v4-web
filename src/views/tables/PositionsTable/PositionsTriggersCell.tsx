@@ -7,22 +7,27 @@ import {
   type AbacusPositionSides,
   type SubaccountOrder,
 } from '@/constants/abacus';
-import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useEnvFeatures, useStringGetter } from '@/hooks';
+import { useComplianceState } from '@/hooks/useComplianceState';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
+import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
+import { TableCell } from '@/components/Table';
 import { WithHovercard } from '@/components/WithHovercard';
 
 import { openDialog } from '@/state/dialogs';
 
 import { isStopLossOrder } from '@/lib/orders';
+import { testFlags } from '@/lib/testFlags';
 
 type ElementProps = {
   marketId: string;
@@ -52,6 +57,7 @@ export const PositionsTriggersCell = ({
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
+  const { complianceState } = useComplianceState();
 
   const onViewOrders = isDisabled ? null : () => onViewOrdersClick(marketId);
 
@@ -94,7 +100,7 @@ export const PositionsTriggersCell = ({
       liquidationWarningSide,
     }: {
       liquidationWarningSide?: Nullable<AbacusPositionSides>;
-    }) => {
+    } = {}) => {
       const styledLabel = <Styled.Label warning={liquidationWarningSide}>{label}</Styled.Label>;
       return liquidationWarningSide ? (
         <WithHovercard
@@ -124,7 +130,7 @@ export const PositionsTriggersCell = ({
     if (orders.length === 0) {
       return (
         <>
-          {triggerLabel({})} <Styled.Output type={OutputType.Fiat} value={null} />
+          {triggerLabel()} <Styled.Output type={OutputType.Fiat} value={null} />
         </>
       );
     }
@@ -179,27 +185,40 @@ export const PositionsTriggersCell = ({
 
     return (
       <>
-        {triggerLabel({})}
+        {triggerLabel()}
         {viewOrdersButton}
       </>
     );
   };
 
   return (
-    <Styled.Cell>
+    <Styled.TableCell
+      stacked
+      slotRight={
+        !isDisabled &&
+        testFlags.isolatedMargin &&
+        complianceState === ComplianceStates.FULL_ACCESS && (
+          <Styled.EditButton
+            key="edit-margin"
+            iconName={IconName.Pencil}
+            shape={ButtonShape.Square}
+            onClick={openTriggersDialog}
+          />
+        )
+      }
+    >
       <Styled.Row>{renderOutput({ label: 'TP', orders: takeProfitOrders })}</Styled.Row>
       <Styled.Row>{renderOutput({ label: 'SL', orders: stopLossOrders })}</Styled.Row>
-    </Styled.Cell>
+    </Styled.TableCell>
   );
 };
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
-Styled.Cell = styled.div`
-  ${layoutMixins.column}
-  gap: 0.25em;
-
-  color: var(--color-text-1);
+Styled.TableCell = styled(TableCell)`
+  > * {
+    color: var(--color-text-0);
+  }
 `;
 
 Styled.Row = styled.span`
@@ -246,4 +265,13 @@ Styled.PartialFillIcon = styled.span`
     width: 0.875em;
     height: 0.875em;
   }
+`;
+
+Styled.EditButton = styled(IconButton)`
+  --button-icon-size: 1.5em;
+  --button-padding: 0;
+  --button-textColor: var(--color-text-0);
+  --button-hover-textColor: var(--color-text-1);
+
+  margin-left: 0.5rem;
 `;

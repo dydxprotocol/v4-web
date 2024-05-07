@@ -85,13 +85,13 @@ Styled.TradeBox = styled.section`
 Styled.Dialog = styled(Dialog)`
   --dialog-backgroundColor: var(--color-layer-2);
 
-  --dialog-paddingX: 1.5rem;
+  --dialog-paddingX: 1.25rem;
 
   --dialog-header-paddingTop: 1.25rem;
   --dialog-header-paddingBottom: 0.25rem;
 
   --dialog-content-paddingTop: 1rem;
-  --dialog-content-paddingRight: 1.5rem;
-  --dialog-content-paddingBottom: 1.25rem;
-  --dialog-content-paddingLeft: 1.5rem;
+  --dialog-content-paddingRight: 1rem;
+  --dialog-content-paddingBottom: 1rem;
+  --dialog-content-paddingLeft: 1rem;
 `;

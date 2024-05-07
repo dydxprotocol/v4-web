@@ -70,8 +70,10 @@ export const PositionsMarginCell = ({
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.EditButton = styled(IconButton)`
-  svg {
-    width: 1.5em;
-    height: 1.5em;
-  }
+  --button-icon-size: 1.5em;
+  --button-padding: 0;
+  --button-textColor: var(--color-text-0);
+  --button-hover-textColor: var(--color-text-1);
+
+  margin-left: 0.5rem;
 `;
