@@ -90,7 +90,7 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
   // App
   T extends AnalyticsEvent.AppStart
     ? {
-        referrer?: string;
+        referrer?: string | undefined;
       }
     : T extends AnalyticsEvent.NetworkStatus
     ? {
