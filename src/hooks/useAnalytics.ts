@@ -13,7 +13,6 @@ import { getInputTradeData } from '@/state/inputsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { identify, track } from '@/lib/analytics';
-import { testFlags } from '@/lib/testFlags';
 import { getSelectedTradeType } from '@/lib/tradeData';
 
 import { useAccounts } from './useAccounts';
@@ -92,9 +91,7 @@ export const useAnalytics = () => {
 
   // AnalyticsEvent.AppStart
   useEffect(() => {
-    track(AnalyticsEvent.AppStart, {
-      referrer: testFlags.referrer,
-    });
+    track(AnalyticsEvent.AppStart);
   }, []);
 
   // AnalyticsEvent.NetworkStatus
@@ -175,7 +172,6 @@ export const useAnalytics = () => {
       track(AnalyticsEvent.OnboardingStepChanged, {
         state: onboardingState,
         step: currentOnboardingStep,
-        referrer: testFlags.referrer,
       });
     } else {
       setHasOnboardingStateChanged(true);
