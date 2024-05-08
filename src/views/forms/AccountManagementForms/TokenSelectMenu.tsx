@@ -24,6 +24,8 @@ type ElementProps = {
   isExchange?: boolean;
 };
 
+const CURVE_DAO_TOKEN_ADDRESS = '0xD533a949740bb3306d119CC777fa900bA034cd52';
+
 const cctpTokensByAddress = cctpTokens.reduce((acc, token) => {
   if (!acc[token.tokenAddress]) {
     acc[token.tokenAddress] = [];
@@ -49,7 +51,10 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
         const selectedToken = resources?.tokenResources?.get(token.type);
         selectedToken && onSelectToken(selectedToken);
       },
-      slotBefore: <Styled.Img src={token.iconUrl} alt="" />,
+      slotBefore: (
+        // the curve dao token svg causes the web app to lag when rendered
+        <Styled.Img src={token.type !== CURVE_DAO_TOKEN_ADDRESS ? token.iconUrl : null} alt="" />
+      ),
       slotAfter: !!cctpTokensByAddress[token.type] && (
         <Styled.Text>
           {stringGetter({
