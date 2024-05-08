@@ -15,16 +15,19 @@ export const MarketTableCell = ({
   marketId,
   leverage,
   showFavorite,
+  isHighlighted,
   className,
 }: {
   asset?: Asset;
   marketId: string;
   leverage?: number;
   showFavorite?: boolean;
+  isHighlighted?: boolean;
   className?: string;
 }) => (
   <TableCell
     className={className}
+    isHighlighted={isHighlighted}
     stacked
     slotLeft={
       <>

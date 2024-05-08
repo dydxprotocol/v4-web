@@ -164,10 +164,11 @@ const getPositionsTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.MARKET }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         renderCell: ({ id, asset, leverage }) => (
-          <Styled.MarketTableCell
+          <MarketTableCell
             asset={asset}
             marketId={id}
             leverage={leverage?.current ?? undefined}
+            isHighlighted
           />
         ),
       },
@@ -546,14 +547,4 @@ Styled.PositionSide = styled.span`
 
 Styled.Icon = styled(Icon)`
   font-size: 3em;
-`;
-
-Styled.MarketTableCell = styled(MarketTableCell)`
-  > * {
-    color: var(--color-text-2);
-
-    > :nth-child(2) {
-      color: var(--color-text-1);
-    }
-  }
 `;

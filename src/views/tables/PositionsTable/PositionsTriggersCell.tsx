@@ -196,8 +196,9 @@ export const PositionsTriggersCell = ({
   };
 
   return (
-    <TableCell
+    <Styled.TableCell
       stacked
+      stackedWithSecondaryStyling={false}
       slotRight={
         !isDisabled &&
         testFlags.isolatedMargin &&
@@ -213,7 +214,7 @@ export const PositionsTriggersCell = ({
     >
       <Styled.Row>{renderOutput({ label: 'TP', orders: takeProfitOrders })}</Styled.Row>
       <Styled.Row>{renderOutput({ label: 'SL', orders: stopLossOrders })}</Styled.Row>
-    </TableCell>
+    </Styled.TableCell>
   );
 };
 
@@ -290,4 +291,8 @@ Styled.EditButton = styled(IconButton)`
   --button-hover-textColor: var(--color-text-1);
 
   margin-left: 0.5rem;
+`;
+
+Styled.TableCell = styled(TableCell)`
+  justify-content: space-between;
 `;
