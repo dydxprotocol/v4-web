@@ -13,7 +13,7 @@ VITE_LAST_ORIGINAL_COMMIT=$(git merge-base HEAD upstream/main)
 
 # Check if the command succeeded and VITE_LAST_ORIGINAL_COMMIT is not empty
 if [ -z "$VITE_LAST_ORIGINAL_COMMIT" ]; then
-  echo "Error: Unable to determine the last original commit."
+  echo "Unable to determine the last original commit."
   exit 0
 fi
 
