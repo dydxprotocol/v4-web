@@ -6,7 +6,7 @@ if ! git remote | grep -q upstream; then
 fi
 
 # Fetch latest changes from the original repository
-git fetch upstream
+git fetch --unshallow upstream
 
 # Find the last common commit
 VITE_LAST_ORIGINAL_COMMIT=$(git merge-base HEAD upstream/main)
@@ -14,7 +14,7 @@ VITE_LAST_ORIGINAL_COMMIT=$(git merge-base HEAD upstream/main)
 # Check if the command succeeded and VITE_LAST_ORIGINAL_COMMIT is not empty
 if [ -z "$VITE_LAST_ORIGINAL_COMMIT" ]; then
   echo "Error: Unable to determine the last original commit."
-  exit 1
+  exit 0
 fi
 
 # Update or add VITE_LAST_ORIGINAL_COMMIT in .env
