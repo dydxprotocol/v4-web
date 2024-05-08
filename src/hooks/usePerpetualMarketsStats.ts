@@ -36,6 +36,8 @@ export const usePerpetualMarketsStats = () => {
       }
     },
     refetchOnWindowFocus: false,
+    cacheTime: 1_000 * 60 * 5, // 5 minutes
+    staleTime: 1_000 * 60 * 10, // 10 minutes
   });
 
   const feesEarned = useMemo(() => {
