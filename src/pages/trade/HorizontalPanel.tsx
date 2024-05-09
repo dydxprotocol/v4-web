@@ -135,15 +135,13 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                   ]
                 : [
                     PositionsTableColumnKey.Market,
-                    PositionsTableColumnKey.Side,
                     PositionsTableColumnKey.Size,
-                    PositionsTableColumnKey.Leverage,
-                    PositionsTableColumnKey.LiquidationAndOraclePrice,
                     testFlags.isolatedMargin && PositionsTableColumnKey.Margin,
                     PositionsTableColumnKey.UnrealizedPnl,
-                    PositionsTableColumnKey.RealizedPnl,
-                    PositionsTableColumnKey.AverageOpenAndClose,
+                    !testFlags.isolatedMargin && PositionsTableColumnKey.RealizedPnl,
                     PositionsTableColumnKey.NetFunding,
+                    PositionsTableColumnKey.AverageOpenAndClose,
+                    PositionsTableColumnKey.LiquidationAndOraclePrice,
                     shouldRenderTriggers && PositionsTableColumnKey.Triggers,
                     shouldRenderActions && PositionsTableColumnKey.Actions,
                   ].filter(isTruthy)

@@ -8,19 +8,26 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { TableCell } from '@/components/Table';
 
+import { Output, OutputType, ShowSign } from '../Output';
+
 export const MarketTableCell = ({
   asset,
   marketId,
+  leverage,
   showFavorite,
+  isHighlighted,
   className,
 }: {
   asset?: Asset;
   marketId: string;
+  leverage?: number;
   showFavorite?: boolean;
+  isHighlighted?: boolean;
   className?: string;
 }) => (
   <TableCell
     className={className}
+    isHighlighted={isHighlighted}
     stacked
     slotLeft={
       <>
@@ -29,8 +36,17 @@ export const MarketTableCell = ({
       </>
     }
   >
-    <Styled.Asset>{asset?.name}</Styled.Asset>
-    <span>{marketId}</span>
+    {leverage ? (
+      <>
+        <span>{marketId}</span>
+        <Output type={OutputType.Multiple} value={leverage} showSign={ShowSign.None} />
+      </>
+    ) : (
+      <>
+        <Styled.Asset>{asset?.name}</Styled.Asset>
+        <span>{marketId}</span>
+      </>
+    )}
   </TableCell>
 );
 
