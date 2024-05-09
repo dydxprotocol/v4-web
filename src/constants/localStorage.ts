@@ -7,6 +7,9 @@ export enum LocalStorageKey {
   OnboardingHasAcknowledgedTerms = 'dydx.OnboardingHasAcknowledgedTerms',
   EvmDerivedAddresses = 'dydx.EvmDerivedAddresses',
 
+  // Gas
+  SelectedGasDenom = 'dydx.SelectedGasDenom',
+
   // Notifications
   Notifications = 'dydx.Notifications',
   NotificationsLastUpdated = 'dydx.NotificationsLastUpdated',

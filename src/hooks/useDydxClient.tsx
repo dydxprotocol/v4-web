@@ -8,6 +8,7 @@ import {
   IndexerConfig,
   LocalWallet,
   Network,
+  SelectedGasDenom,
   ValidatorConfig,
   onboarding,
   type ProposalStatus,
@@ -18,12 +19,14 @@ import { useSelector } from 'react-redux';
 import type { ConnectNetworkEvent, NetworkConfig } from '@/constants/abacus';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { RESOLUTION_MAP, type Candle } from '@/constants/candles';
+import { LocalStorageKey } from '@/constants/localStorage';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { log } from '@/lib/telemetry';
 
 import { useEndpointsConfig } from './useEndpointsConfig';
+import { useLocalStorage } from './useLocalStorage';
 import { useRestrictions } from './useRestrictions';
 import { useTokenConfigs } from './useTokenConfigs';
 
@@ -111,6 +114,23 @@ const useDydxClientContext = () => {
       }
     })();
   }, [networkConfig]);
+
+  // ------ Gas Denom ------ //
+
+  const [gasDenom, setGasDenom] = useLocalStorage<SelectedGasDenom>({
+    key: LocalStorageKey.SelectedGasDenom,
+    defaultValue: SelectedGasDenom.USDC,
+  });
+
+  const setSelectedGasDenom = useCallback(
+    (selectedGasDenom: SelectedGasDenom) => {
+      if (compositeClient) {
+        compositeClient.validatorClient.setSelectedGasDenom(selectedGasDenom);
+        setGasDenom(selectedGasDenom);
+      }
+    },
+    [compositeClient]
+  );
 
   // ------ Wallet Methods ------ //
   const getWalletFromEvmSignature = async ({ signature }: { signature: string }) => {
@@ -273,6 +293,10 @@ const useDydxClientContext = () => {
     [compositeClient]
   );
 
+  const getAllValidators = useCallback(async () => {
+    return await compositeClient?.validatorClient.get.getAllValidators();
+  }, [compositeClient]);
+
   return {
     // Client initialization
     connect: setNetworkConfig,
@@ -281,6 +305,10 @@ const useDydxClientContext = () => {
     faucetClient,
     indexerClient,
     isCompositeClientConnected: !!compositeClient,
+
+    // Gas Denom
+    setSelectedGasDenom,
+    selectedGasDenom: gasDenom,
 
     // Wallet Methods
     getWalletFromEvmSignature,

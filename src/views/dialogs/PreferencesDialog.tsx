@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 import { useDispatch, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationCategoryPreferences } from '@/constants/notifications';
 
-import { useEnvFeatures, useStringGetter } from '@/hooks';
+import { useDydxClient, useEnvFeatures, useStringGetter } from '@/hooks';
 import { useNotifications } from '@/hooks/useNotifications';
 
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
@@ -80,6 +81,8 @@ export const usePreferenceMenu = () => {
     [stringGetter, enabledNotifs]
   );
 
+  const { setSelectedGasDenom, selectedGasDenom } = useDydxClient();
+
   const otherSection = useMemo(
     () => ({
       group: 'Other',
@@ -99,9 +102,27 @@ export const usePreferenceMenu = () => {
             dispatch(setDefaultToAllMarketsInPositionsOrdersFills(!defaultToAllMarkets));
           },
         },
+        {
+          value: OtherPreference.GasToken,
+          label: 'Pay gas with USDC',
+          slotAfter: (
+            <Switch
+              name={OtherPreference.GasToken}
+              checked={selectedGasDenom === SelectedGasDenom.USDC}
+              onCheckedChange={() => null}
+            />
+          ),
+          onSelect: () => {
+            setSelectedGasDenom(
+              selectedGasDenom === SelectedGasDenom.USDC
+                ? SelectedGasDenom.NATIVE
+                : SelectedGasDenom.USDC
+            );
+          },
+        },
       ],
     }),
-    [stringGetter, defaultToAllMarkets]
+    [stringGetter, defaultToAllMarkets, selectedGasDenom, setSelectedGasDenom]
   );
 
   return [notificationSection, otherSection];
