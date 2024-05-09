@@ -79,6 +79,7 @@ const Content = () => {
     if (location.hash === '') {
       return '';
     }
+
     return parseLocationHash(location.hash);
   }, [location.hash]);
 
