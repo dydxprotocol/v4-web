@@ -43,6 +43,7 @@ import { openDialog } from '@/state/dialogs';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
+import { testFlags } from '@/lib/testFlags';
 
 type NewMarketPreviewStepProps = {
   assetData: NewMarketProposal;

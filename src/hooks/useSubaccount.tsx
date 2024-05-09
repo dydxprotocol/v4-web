@@ -537,8 +537,6 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         throw new Error('governance variables not initialized');
       }
 
-      console.log(params);
-
       const response = await compositeClient.submitGovAddNewMarketProposal(
         localDydxWallet,
         params,
