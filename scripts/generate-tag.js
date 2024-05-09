@@ -1,15 +1,34 @@
+/* eslint-disable consistent-return */
+import chalk from 'chalk';
+import * as childProcess from 'child_process';
+import * as readLineSync from 'readline-sync';
+
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable func-names */
 /* eslint-disable no-console */
-const childProcess = require('child_process');
-const rl = require('readline-sync');
+// const childProcess = require('child_process');
+// const rl = require('readline-sync');
 
 const releaseTypes = ['Major', 'Minor', 'Patch'];
+
+const colors = {
+  INFO: chalk.cyan,
+  ERR: chalk.red,
+};
+
+const info = (msg) => console.log(colors.INFO(msg));
+const error = (msg) => console.log(chalk.bgRed('Error') + colors.ERR(msg));
+
+const rl = {
+  keyInSelect: (opts, msg) => readLineSync.keyInSelect(opts, colors.INFO(msg)),
+  keyInYN: (msg) => readLineSync.keyInYN(colors.INFO(msg)),
+};
 
 const execSync = (cmd) => {
   try {
     return childProcess.execSync(cmd, {
       encoding: 'utf-8',
+      stdio: 'pipe',
     });
   } catch (err) {
     process.exit(1);
@@ -29,10 +48,10 @@ const getNewSemVerNumber = (semVerNumber, releaseType) => {
 const bumpSemVer = (releaseTypeIndex) => {
   const currentVersion = execSync('git describe --tags $(git rev-list --tags --max-count=1)');
 
-  console.log('Current version is', currentVersion);
+  info('Current version is', currentVersion);
   const semVerNumber = currentVersion.split('v')[1];
   const newSemVerNumber = getNewSemVerNumber(semVerNumber, releaseTypeIndex);
-  console.log(
+  info(
     `Updated semantic version number [type: ${releaseTypes[releaseTypeIndex]}]`,
     newSemVerNumber
   );
@@ -42,14 +61,14 @@ const bumpSemVer = (releaseTypeIndex) => {
 const cutTagForSemVer = (newSemVerNumber) => {
   const shouldCutTag = rl.keyInYN(`Next version to release is ${newSemVerNumber}, okay?`);
   if (!shouldCutTag) {
-    console.log('Got it! Not cutting a new tag, exiting now.');
+    info('Got it! Not cutting a new tag, exiting now.');
     process.exit(0);
   }
-  console.log('Cutting new tag...');
+  info('Cutting new tag...');
 
   execSync(`git tag -a release/v${newSemVerNumber} -m "v4-web release v${newSemVerNumber}"`);
   execSync(`git push origin release/v${newSemVerNumber}`);
-  console.log('New tag successfully published!');
+  info('New tag successfully published!');
   process.exit(0);
 };
 
@@ -59,15 +78,15 @@ const ask = async () => {
     console.error('Error, please select 1, 2, or 3!');
     process.exit(1);
   }
-  console.log('\nRelease type:', releaseTypes[releaseTypeIndex]);
-  console.log('Checking git status cleanliness...');
+  info('\nRelease type:', releaseTypes[releaseTypeIndex]);
+  info('Checking git status cleanliness...');
   const uncommittedChanges = execSync('git status --porcelain');
-  console.log(uncommittedChanges);
+  info(uncommittedChanges);
   if (uncommittedChanges) {
-    console.log('You have uncommitted changes, please clean up your git status first\n');
+    error('You have uncommitted changes, please clean up your git status first\n');
     process.exit(1);
   }
-  console.log('Checking out main and pulling latest changes...');
+  info('Checking out main and pulling latest changes...');
   execSync('git checkout main && git pull origin main && git fetch --all');
   const newSemVerNumber = bumpSemVer(releaseTypeIndex);
   cutTagForSemVer(newSemVerNumber);

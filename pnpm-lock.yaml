@@ -358,6 +358,9 @@ devDependencies:
   browserify-zlib:
     specifier: ^0.2.0
     version: 0.2.0
+  chalk:
+    specifier: ^5.3.0
+    version: 5.3.0
   eslint:
     specifier: ^8.57.0
     version: 8.57.0
