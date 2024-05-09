@@ -33,8 +33,8 @@ dependencies:
     specifier: 1.7.6
     version: 1.7.6
   '@dydxprotocol/v4-client-js':
-    specifier: ^1.1.8
-    version: 1.1.8
+    specifier: file:/Users/jaredvu/Documents/v4-clients/v4-client-js/dydxprotocol-v4-client-js-1.1.10.tgz
+    version: file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-1.1.10.tgz
   '@dydxprotocol/v4-localization':
     specifier: ^1.1.82
     version: 1.1.82
@@ -1595,35 +1595,6 @@ packages:
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
-    dev: false
-
-  /@dydxprotocol/v4-client-js@1.1.8:
-    resolution: {integrity: sha512-GOSWgjN7JQZncLIo4E+sQKTxCahOjFqnlqo7JD3cKaD4T03lRoeXR1Doz1Gp4BGv2mGAbn1P2la43wfK33y7Uw==}
-    dependencies:
-      '@cosmjs/amino': 0.32.2
-      '@cosmjs/encoding': 0.32.2
-      '@cosmjs/math': 0.32.2
-      '@cosmjs/proto-signing': 0.32.2
-      '@cosmjs/stargate': 0.32.2
-      '@cosmjs/tendermint-rpc': 0.32.2
-      '@cosmjs/utils': 0.32.2
-      '@dydxprotocol/v4-proto': 5.0.0-dev.0
-      '@osmonauts/lcd': 0.6.0
-      '@scure/bip32': 1.3.2
-      '@scure/bip39': 1.2.1
-      axios: 1.1.3
-      bech32: 1.1.4
-      bignumber.js: 9.1.1
-      cosmjs-types: 0.9.0
-      ethereum-cryptography: 2.1.2
-      ethers: 6.6.1
-      long: 4.0.0
-      protobufjs: 6.11.4
-      ws: 8.15.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - utf-8-validate
     dev: false
 
   /@dydxprotocol/v4-localization@1.1.82:
@@ -20562,3 +20533,34 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
+
+  file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-1.1.10.tgz:
+    resolution: {integrity: sha512-OA1VXAqo0LHO/3NwZi/xlwMaYz/PB0+HEWsnfg9JGN1WP4QjoKyWNwvEIzjb/Z0dOrv1c+jqKBYKcnPNPOG1Zw==, tarball: file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-1.1.10.tgz}
+    name: '@dydxprotocol/v4-client-js'
+    version: 1.1.10
+    dependencies:
+      '@cosmjs/amino': 0.32.2
+      '@cosmjs/encoding': 0.32.2
+      '@cosmjs/math': 0.32.2
+      '@cosmjs/proto-signing': 0.32.2
+      '@cosmjs/stargate': 0.32.2
+      '@cosmjs/tendermint-rpc': 0.32.2
+      '@cosmjs/utils': 0.32.2
+      '@dydxprotocol/v4-proto': 5.0.0-dev.0
+      '@osmonauts/lcd': 0.6.0
+      '@scure/bip32': 1.3.2
+      '@scure/bip39': 1.2.1
+      axios: 1.1.3
+      bech32: 1.1.4
+      bignumber.js: 9.1.1
+      cosmjs-types: 0.9.0
+      ethereum-cryptography: 2.1.2
+      ethers: 6.6.1
+      long: 4.0.0
+      protobufjs: 6.11.4
+      ws: 8.15.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - utf-8-validate
+    dev: false
