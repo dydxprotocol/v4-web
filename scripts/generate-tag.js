@@ -58,7 +58,7 @@ const bumpSemVer = (releaseTypeIndex) => {
 };
 
 const cutTagForSemVer = (newSemVerNumber) => {
-  const shouldCutTag = rl.keyInYN(`Next version to release is ${newSemVerNumber}, okay?`);
+  const shouldCutTag = rl.keyInYN(`\nNext version to release is ${newSemVerNumber}, okay?`);
   if (!shouldCutTag) {
     info('Got it! Not cutting a new tag, exiting now.');
     process.exit(0);
@@ -72,7 +72,7 @@ const cutTagForSemVer = (newSemVerNumber) => {
 };
 
 const ask = async () => {
-  const releaseTypeIndex = rl.keyInSelect(releaseTypes, 'What kind of release is this?');
+  const releaseTypeIndex = rl.keyInSelect(releaseTypes, '\nWhat kind of release is this?');
   if (!releaseTypes[releaseTypeIndex]) {
     console.error('Error, please select 1, 2, or 3!');
     process.exit(1);
