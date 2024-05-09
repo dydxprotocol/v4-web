@@ -92,14 +92,14 @@ export const config: Options.Testrunner = {
       browserName: 'safari',
       'bstack:options': {
         os: 'OS X',
-        osVersion: 'Big Sur',
+        osVersion: 'Monterey',
       },
     },
     {
       browserName: 'chrome',
       'bstack:options': {
         os: 'OS X',
-        osVersion: 'Big Sur',
+        osVersion: 'Monterey',
       },
     },
     {
