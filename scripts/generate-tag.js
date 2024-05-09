@@ -1,13 +1,9 @@
 /* eslint-disable consistent-return */
+
+/* eslint-disable no-console */
 import chalk from 'chalk';
 import * as childProcess from 'child_process';
 import * as readLineSync from 'readline-sync';
-
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable func-names */
-/* eslint-disable no-console */
-// const childProcess = require('child_process');
-// const rl = require('readline-sync');
 
 const releaseTypes = ['Major', 'Minor', 'Patch'];
 
