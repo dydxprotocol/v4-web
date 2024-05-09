@@ -176,6 +176,7 @@
     "node-fetch": "^3.3.1",
     "pnpm": "^8.6.6",
     "prettier": "^3.2.5",
+    "readline-sync": "^1.4.10",
     "rollup-plugin-sourcemaps": "^0.6.3",
     "stream-browserify": "^3.0.0",
     "ts-node": "^10.9.2",
