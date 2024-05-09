@@ -32,6 +32,8 @@ export const usePerpetualMarketSparklines = (props: UsePerpetualMarketSparklines
     },
     refetchInterval,
     refetchOnWindowFocus: false,
+    cacheTime: 1_000 * 60 * 5, // 5 minutes
+    staleTime: 1_000 * 60 * 10, // 10 minutes
   });
 
   return data;

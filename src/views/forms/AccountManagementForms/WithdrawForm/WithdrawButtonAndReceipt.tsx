@@ -110,7 +110,7 @@ export const WithdrawButtonAndReceipt = ({
       label: (
         <WithTooltip tooltip="gas-fees">{stringGetter({ key: STRING_KEYS.GAS_FEE })}</WithTooltip>
       ),
-      value: <Output type={OutputType.Fiat} value={10} />,
+      value: <Output type={OutputType.Fiat} value={summary?.gasFee} />,
     },
     typeof summary?.bridgeFee === 'number' && {
       key: 'bridge-fees',

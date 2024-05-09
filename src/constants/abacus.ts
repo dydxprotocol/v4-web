@@ -196,6 +196,8 @@ export const AbacusOrderTimeInForce = Abacus.exchange.dydx.abacus.output.input.O
 export const AbacusPositionSide = Abacus.exchange.dydx.abacus.output.PositionSide;
 export type AbacusPositionSides = Abacus.exchange.dydx.abacus.output.PositionSide;
 
+export const AbacusMarginMode = Abacus.exchange.dydx.abacus.output.input.MarginMode;
+
 export type HumanReadablePlaceOrderPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadablePlaceOrderPayload;
 export type HumanReadableCancelOrderPayload =
@@ -336,6 +338,13 @@ export const TRADE_TYPES: Record<
 
   [AbacusOrderType.finalSettlement.name]: null,
   [AbacusOrderType.finalSettlement.rawValue]: null,
+};
+
+export const MARGIN_MODE_STRINGS: Record<string, string> = {
+  [AbacusMarginMode.cross.name]: STRING_KEYS.CROSS,
+  [AbacusMarginMode.cross.rawValue]: STRING_KEYS.CROSS,
+  [AbacusMarginMode.isolated.name]: STRING_KEYS.ISOLATED,
+  [AbacusMarginMode.isolated.rawValue]: STRING_KEYS.ISOLATED,
 };
 
 // Custom types involving Abacus

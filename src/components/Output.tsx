@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import BigNumber from 'bignumber.js';
 import { DateTime } from 'luxon';
 import { useSelector } from 'react-redux';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import {
   LEVERAGE_DECIMALS,
@@ -371,9 +371,7 @@ export const Output = ({
   }
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Output = styled.output<{ withParentheses?: boolean }>`
+const _OUTPUT_STYLES = styled.output<{ withParentheses?: boolean }>`
   --output-beforeString: '';
   --output-afterString: '';
   --output-sign-color: currentColor;
@@ -406,20 +404,21 @@ Styled.Output = styled.output<{ withParentheses?: boolean }>`
     `}
 `;
 
-Styled.Tag = styled(Tag)`
-  margin-left: 0.5ch;
-`;
+const Styled = {
+  Output: _OUTPUT_STYLES,
+  Tag: styled(Tag)`
+    margin-left: 0.5ch;
+  `,
 
-Styled.Sign = styled.span`
-  color: var(--output-sign-color);
-`;
-
-Styled.Text = styled(Styled.Output)``;
-
-Styled.Number = styled(Styled.Output)<{ withBaseFont?: boolean }>`
-  ${({ withBaseFont }) =>
-    !withBaseFont &&
-    css`
-      font-feature-settings: var(--fontFeature-monoNumbers);
-    `}
-`;
+  Sign: styled.span`
+    color: var(--output-sign-color);
+  `,
+  Text: styled(_OUTPUT_STYLES)``,
+  Number: styled(_OUTPUT_STYLES)<{ withBaseFont?: boolean }>`
+    ${({ withBaseFont }) =>
+      !withBaseFont &&
+      css`
+        font-feature-settings: var(--fontFeature-monoNumbers);
+      `}
+  `,
+};
