@@ -21,9 +21,8 @@ import { useBreakpoints } from './useBreakpoints';
 import { useDydxClient } from './useDydxClient';
 import { useSelectedNetwork } from './useSelectedNetwork';
 
-const latestTag = import.meta.env.VITE_LAST_TAG;
-
 export const useAnalytics = () => {
+  const latestTag = import.meta.env.VITE_LAST_TAG;
   const { walletType, walletConnectionType, evmAddress, dydxAddress, selectedWalletType } =
     useAccounts();
   const { indexerClient } = useDydxClient();
@@ -46,7 +45,6 @@ export const useAnalytics = () => {
     : 'UNSUPPORTED';
 
   useEffect(() => {
-    console.log('xcxc', breakpoint);
     identify(AnalyticsUserProperty.Breakpoint, breakpoint);
   }, [breakpoint]);
 
@@ -57,11 +55,9 @@ export const useAnalytics = () => {
     identify(AnalyticsUserProperty.Locale, selectedLocale);
   }, [selectedLocale]);
 
-  // AnalyticsUserProperty.CommitHash
+  // AnalyticsUserProperty.Version
   useEffect(() => {
-    const version = latestTag.split(`release/v`)[1];
-    console.log('xcxc', version);
-    identify(AnalyticsUserProperty.CommitHash, latestTag);
+    identify(AnalyticsUserProperty.Version, latestTag.split(`release/v`)[1]);
   }, [latestTag]);
 
   // AnalyticsUserProperty.Network
