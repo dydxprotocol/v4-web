@@ -11,17 +11,20 @@ import * as readLineSync from 'readline-sync';
 
 const releaseTypes = ['Major', 'Minor', 'Patch'];
 
-const colors = {
+const COLORS = {
   INFO: chalk.cyan,
   ERR: chalk.red,
 };
 
-const info = (msg) => console.log(colors.INFO(msg));
-const error = (msg) => console.log(chalk.bgRed('Error') + colors.ERR(msg));
+const INFO_HEADER = `${chalk.black(chalk.bgCyan('INFO:'))} `;
+const ERROR_HEADER = `${chalk.bgRed('Error:')} `;
+
+const info = (msg) => console.log(INFO_HEADER + COLORS.INFO(msg));
+const error = (msg) => console.log(ERROR_HEADER + COLORS.ERR(msg));
 
 const rl = {
-  keyInSelect: (opts, msg) => readLineSync.keyInSelect(opts, colors.INFO(msg)),
-  keyInYN: (msg) => readLineSync.keyInYN(colors.INFO(msg)),
+  keyInSelect: (opts, msg) => readLineSync.keyInSelect(opts, COLORS.INFO(msg)),
+  keyInYN: (msg) => readLineSync.keyInYN(COLORS.INFO(msg)),
 };
 
 const execSync = (cmd) => {
@@ -78,7 +81,7 @@ const ask = async () => {
     console.error('Error, please select 1, 2, or 3!');
     process.exit(1);
   }
-  info('\nRelease type:', releaseTypes[releaseTypeIndex]);
+  info('Release type:', releaseTypes[releaseTypeIndex]);
   info('Checking git status cleanliness...');
   const uncommittedChanges = execSync('git status --porcelain');
   info(uncommittedChanges);
