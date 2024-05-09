@@ -8,7 +8,7 @@ const releaseTypes = ['Major', 'Minor', 'Patch'];
 
 const execSync = (cmd) => {
   try {
-    childProcess.execSync(cmd, {
+    return childProcess.execSync(cmd, {
       encoding: 'utf-8',
     });
   } catch (err) {
@@ -60,7 +60,14 @@ const ask = async () => {
     process.exit(1);
   }
   console.log('\nRelease type:', releaseTypes[releaseTypeIndex]);
-  console.log('Checking out main branch');
+  console.log('Checking git status cleanliness...');
+  const uncommittedChanges = execSync('git status --porcelain');
+  console.log(uncommittedChanges);
+  if (uncommittedChanges) {
+    console.log('You have uncommitted changes, please clean up your git status first\n');
+    process.exit(1);
+  }
+  console.log('Checking out main and pulling latest changes...');
   execSync('git checkout main && git pull origin main && git fetch --all');
   const newSemVerNumber = bumpSemVer(releaseTypeIndex);
   cutTagForSemVer(newSemVerNumber);
