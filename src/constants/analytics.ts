@@ -11,6 +11,7 @@ export enum AnalyticsUserProperty {
   // Environment
   Locale = 'selectedLocale',
   Breakpoint = 'breakpoint',
+  Version = 'version',
 
   // Network
   Network = 'network',
@@ -31,6 +32,8 @@ export type AnalyticsUserPropertyValue<T extends AnalyticsUserProperty> =
     ? 'MOBILE' | 'TABLET' | 'DESKTOP_SMALL' | 'DESKTOP_MEDIUM' | 'DESKTOP_LARGE' | 'UNSUPPORTED'
     : T extends AnalyticsUserProperty.Locale
     ? SupportedLocales
+    : T extends AnalyticsUserProperty.Version
+    ? string | undefined
     : // Network
     T extends AnalyticsUserProperty.Network
     ? DydxNetwork
