@@ -22,6 +22,7 @@ import { useDydxClient } from './useDydxClient';
 import { useSelectedNetwork } from './useSelectedNetwork';
 
 export const useAnalytics = () => {
+  const latestTag = import.meta.env.VITE_LAST_TAG;
   const { walletType, walletConnectionType, evmAddress, dydxAddress, selectedWalletType } =
     useAccounts();
   const { indexerClient } = useDydxClient();
@@ -53,6 +54,13 @@ export const useAnalytics = () => {
   useEffect(() => {
     identify(AnalyticsUserProperty.Locale, selectedLocale);
   }, [selectedLocale]);
+
+  // AnalyticsUserProperty.Version
+  useEffect(() => {
+    if (latestTag !== undefined) {
+      identify(AnalyticsUserProperty.Version, latestTag.split(`release/v`).at(-1));
+    }
+  }, [latestTag]);
 
   // AnalyticsUserProperty.Network
   const { selectedNetwork } = useSelectedNetwork();
