@@ -117,7 +117,7 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
 const Styled = {
   MarketBillboardsWrapper: styled.div`
     ${layoutMixins.column}
-
+    height: unset!important;
     gap: 1rem;
   `,
   BillboardContainer: styled.div`
