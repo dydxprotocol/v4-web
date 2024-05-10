@@ -347,7 +347,7 @@ Styled.Toolbar = styled(Toolbar)`
 
 Styled.ScrollArea = styled.div`
   ${layoutMixins.scrollArea}
-  height: calc(100% - var(--popover-item-height));
+  height: calc(100% - var(--stickyArea-topHeight));
 `;
 
 Styled.Table = styled(Table)`
