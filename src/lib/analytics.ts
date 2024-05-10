@@ -7,7 +7,7 @@ import type {
 
 import { testFlags } from './testFlags';
 
-const DEBUG_ANALYTICS = true;
+const DEBUG_ANALYTICS = false;
 
 export const identify = <T extends AnalyticsUserProperty>(
   property: T,
