@@ -345,11 +345,13 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
   // ------ Faucet Methods ------ //
   const requestFaucetFunds = useCallback(async () => {
-    if (!dydxAddress) return;
-
     try {
-      await getFaucetFunds({ dydxAddress, subaccountNumber });
-      await getNativeTokens({ dydxAddress });
+      if (!dydxAddress) throw new Error('dydxAddress is not connected');
+
+      await Promise.all([
+        getFaucetFunds({ dydxAddress, subaccountNumber }),
+        getNativeTokens({ dydxAddress }),
+      ]);
     } catch (error) {
       log('useSubaccount/getFaucetFunds', error);
       throw error;
@@ -534,7 +536,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       } else if (!localDydxWallet) {
         throw new Error('wallet not initialized');
       } else if (!newMarketProposal) {
-        throw new Error('governance variables not initialized');
+        throw new Error(' governance variables not initialized');
       }
 
       const response = await compositeClient.submitGovAddNewMarketProposal(

@@ -293,10 +293,6 @@ const useDydxClientContext = () => {
     [compositeClient]
   );
 
-  const getAllValidators = useCallback(async () => {
-    return await compositeClient?.validatorClient.get.getAllValidators();
-  }, [compositeClient]);
-
   return {
     // Client initialization
     connect: setNetworkConfig,
