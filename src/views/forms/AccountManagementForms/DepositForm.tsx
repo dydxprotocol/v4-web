@@ -360,15 +360,14 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     },
   ];
 
+  // TODO: abstract as much as possible to a util/hook and share between WithdrawForm
   const errorMessage = useMemo(() => {
     if (isCctp) {
       if (
         !debouncedAmountBN.isZero() &&
         MustBigNumber(debouncedAmountBN).lte(MIN_CCTP_TRANSFER_AMOUNT)
       ) {
-        return {
-          errorMessage: 'Amount must be greater than 10 USDC',
-        };
+        return 'Amount must be greater than 10 USDC';
       }
       if (MustBigNumber(debouncedAmountBN).gte(MAX_CCTP_TRANSFER_AMOUNT)) {
         return stringGetter({
