@@ -337,7 +337,7 @@ const AssetActions = memo(
               shape={ButtonShape.Square}
               iconName={iconName}
               onClick={() => {
-                track(AnalyticsEvent.NavigateClickTransferAccountMenu);
+                track(AnalyticsEvent.NavigateClickTransferAccountMenu, { type: dialogType });
                 dispatch(openDialog({ type: dialogType, dialogProps }));
               }}
             />

@@ -76,7 +76,7 @@ export const AccountInfoConnectedState = () => {
   const showHeader = !hasDiff && !isTablet;
   const onClick = (type: DialogTypes) => {
     dispatch(openDialog({ type }));
-    track(AnalyticsEvent.NavigateClickDepositButton);
+    track(AnalyticsEvent.NavigateClickTransferTradePanel, { type });
   };
   return (
     <Styled.ConnectedAccountInfoContainer $showHeader={showHeader}>

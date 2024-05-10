@@ -231,6 +231,14 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
         type: DialogTypes;
         errorMessage: string | undefined;
       }
+    : T extends AnalyticsEvent.NavigateClickTransferAccountMenu
+    ? {
+        type: string;
+      }
+    : T extends AnalyticsEvent.NavigateClickTransferTradePanel
+    ? {
+        type: string;
+      }
     : never;
 
 export const DEFAULT_TRANSACTION_MEMO = 'dYdX Frontend (web)';
