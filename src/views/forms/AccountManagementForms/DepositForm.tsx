@@ -418,6 +418,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     sourceToken,
     stringGetter,
     summary,
+    debouncedAmount,
   ]);
 
   const isDisabled =
