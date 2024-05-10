@@ -62,6 +62,8 @@ export enum AnalyticsEvent {
   NavigateDialog = 'NavigateDialog',
   NavigateDialogClose = 'NavigateDialogClose',
   NavigateExternal = 'NavigateExternal',
+  NavigateClickTransferTradePanel = 'NavigateClickTransferTradePanel',
+  NavigateClickTransferAccountMenu = 'NavigateClickTransferAccountMenu',
 
   // Wallet
   ConnectWallet = 'ConnectWallet',

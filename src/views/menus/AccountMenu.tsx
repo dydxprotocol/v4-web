@@ -6,6 +6,7 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
+import { AnalyticsEvent } from '@/constants/analytics';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
@@ -45,6 +46,7 @@ import { AppTheme } from '@/state/configs';
 import { getAppTheme } from '@/state/configsSelectors';
 import { openDialog } from '@/state/dialogs';
 
+import { track } from '@/lib/analytics';
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { truncateAddress } from '@/lib/wallet';
@@ -334,7 +336,10 @@ const AssetActions = memo(
               action={ButtonAction.Base}
               shape={ButtonShape.Square}
               iconName={iconName}
-              onClick={() => dispatch(openDialog({ type: dialogType, dialogProps }))}
+              onClick={() => {
+                track(AnalyticsEvent.NavigateClickTransferAccountMenu);
+                dispatch(openDialog({ type: dialogType, dialogProps }));
+              }}
             />
           </Styled.WithTooltip>
         ))}

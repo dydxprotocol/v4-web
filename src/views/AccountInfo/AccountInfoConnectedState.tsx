@@ -2,6 +2,7 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { css, type AnyStyledComponent } from 'styled-components';
 
 import type { Nullable, TradeState } from '@/constants/abacus';
+import { AnalyticsEvent } from '@/constants/analytics';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
@@ -29,6 +30,7 @@ import { openDialog } from '@/state/dialogs';
 import { getInputErrors } from '@/state/inputsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
+import { track } from '@/lib/analytics';
 import { isNumber, MustBigNumber } from '@/lib/numbers';
 
 import { AccountInfoDiffOutput } from './AccountInfoDiffOutput';
@@ -72,7 +74,10 @@ export const AccountInfoConnectedState = () => {
       !MustBigNumber(buyingPower?.postOrder).eq(MustBigNumber(buyingPower?.current)));
 
   const showHeader = !hasDiff && !isTablet;
-
+  const onClick = (type: DialogTypes) => {
+    dispatch(openDialog({ type }));
+    track(AnalyticsEvent.NavigateClickDepositButton);
+  };
   return (
     <Styled.ConnectedAccountInfoContainer $showHeader={showHeader}>
       {!showHeader ? null : (
@@ -81,7 +86,7 @@ export const AccountInfoConnectedState = () => {
           <Styled.TransferButtons>
             <Styled.Button
               state={{ isDisabled: !dydxAccounts }}
-              onClick={() => dispatch(openDialog({ type: DialogTypes.Withdraw }))}
+              onClick={() => onClick(DialogTypes.Withdraw)}
               shape={ButtonShape.Rectangle}
               size={ButtonSize.XSmall}
             >
@@ -91,7 +96,7 @@ export const AccountInfoConnectedState = () => {
               <>
                 <Styled.Button
                   state={{ isDisabled: !dydxAccounts }}
-                  onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
+                  onClick={() => onClick(DialogTypes.Deposit)}
                   shape={ButtonShape.Rectangle}
                   size={ButtonSize.XSmall}
                 >
