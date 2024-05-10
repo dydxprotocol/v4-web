@@ -7,7 +7,6 @@ import { AES, enc } from 'crypto-js';
 import { useDispatch } from 'react-redux';
 
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
-import { DialogTypes } from '@/constants/dialogs';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import {
   DydxAddress,
@@ -19,7 +18,6 @@ import {
 } from '@/constants/wallets';
 
 import { setOnboardingGuard, setOnboardingState } from '@/state/account';
-import { forceOpenDialog } from '@/state/dialogs';
 
 import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
@@ -27,7 +25,6 @@ import { testFlags } from '@/lib/testFlags';
 
 import { useDydxClient } from './useDydxClient';
 import { useLocalStorage } from './useLocalStorage';
-import { useRestrictions } from './useRestrictions';
 import useSignForWalletDerivation from './useSignForWalletDerivation';
 import { useWalletConnection } from './useWalletConnection';
 
