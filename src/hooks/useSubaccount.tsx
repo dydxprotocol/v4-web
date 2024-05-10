@@ -536,7 +536,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       } else if (!localDydxWallet) {
         throw new Error('wallet not initialized');
       } else if (!newMarketProposal) {
-        throw new Error(' governance variables not initialized');
+        throw new Error('governance variables not initialized');
       }
 
       const response = await compositeClient.submitGovAddNewMarketProposal(
