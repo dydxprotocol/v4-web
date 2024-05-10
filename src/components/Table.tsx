@@ -26,19 +26,19 @@ import {
 import { useAsyncList } from 'react-stately';
 import styled, { css, type AnyStyledComponent } from 'styled-components';
 
+import { ButtonShape } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useBreakpoints, useStringGetter } from '@/hooks';
 import { MediaQueryKeys } from '@/hooks/useBreakpoints';
 
-import { CaretIcon } from '@/icons';
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { MustBigNumber } from '@/lib/numbers';
 
-import { Button } from './Button';
 import { Icon, IconName } from './Icon';
+import { IconButton } from './IconButton';
 import { Tag } from './Tag';
 
 export { ActionsTableCell } from './Table/ActionsTableCell';
@@ -216,59 +216,69 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
       withOuterBorder={withOuterBorder}
     >
       {!isEmpty ? (
-        <TableRoot
-          aria-label={label}
-          sortDescriptor={list.sortDescriptor}
-          onSortChange={list.sort}
-          selectedKeys={selectedKeys}
-          setSelectedKeys={setSelectedKeys}
-          selectionMode={selectionMode}
-          selectionBehavior={selectionBehavior}
-          getRowAttributes={getRowAttributes}
-          onRowAction={
-            onRowAction &&
-            ((key: TableRowKey) => onRowAction(key, data.find((row) => getRowKey(row) === key)!))
-          }
-          numColumns={shownColumns.length}
-          onViewMoreClick={
-            enableViewMore && numRowsToShow! < data.length ? onViewMoreClick : undefined
-          }
-          // shouldRowRender={shouldRowRender}
-          hideHeader={hideHeader}
-          withGradientCardRows={withGradientCardRows}
-          withFocusStickyRows={withFocusStickyRows}
-          withOuterBorder={withOuterBorder}
-          withInnerBorders={withInnerBorders}
-          withScrollSnapColumns={withScrollSnapColumns}
-          withScrollSnapRows={withScrollSnapRows}
-        >
-          <TableHeader columns={shownColumns}>
-            {(column) => (
-              <Column
-                key={column.columnKey}
-                childColumns={column.childColumns}
-                allowsSorting={column.allowsSorting ?? true}
-                allowsResizing={column.allowsResizing}
-                width={column.width}
-              >
-                {column.label}
-                {column.tag && <Tag>{column.tag}</Tag>}
-              </Column>
-            )}
-          </TableHeader>
+        <Styled.TableWrapper2>
+          <TableRoot
+            aria-label={label}
+            sortDescriptor={list.sortDescriptor}
+            onSortChange={list.sort}
+            selectedKeys={selectedKeys}
+            setSelectedKeys={setSelectedKeys}
+            selectionMode={selectionMode}
+            selectionBehavior={selectionBehavior}
+            getRowAttributes={getRowAttributes}
+            onRowAction={
+              onRowAction &&
+              ((key: TableRowKey) => onRowAction(key, data.find((row) => getRowKey(row) === key)!))
+            }
+            // numColumns={shownColumns.length}
+            // onViewMoreClick={
+            //   enableViewMore && numRowsToShow! < data.length ? onViewMoreClick : undefined
+            // }
+            // shouldRowRender={shouldRowRender}
+            hideHeader={hideHeader}
+            withGradientCardRows={withGradientCardRows}
+            withFocusStickyRows={withFocusStickyRows}
+            withOuterBorder={withOuterBorder}
+            withInnerBorders={withInnerBorders}
+            withScrollSnapColumns={withScrollSnapColumns}
+            withScrollSnapRows={withScrollSnapRows}
+          >
+            <TableHeader columns={shownColumns}>
+              {(column) => (
+                <Column
+                  key={column.columnKey}
+                  childColumns={column.childColumns}
+                  allowsSorting={column.allowsSorting ?? true}
+                  allowsResizing={column.allowsResizing}
+                  width={column.width}
+                >
+                  {column.label}
+                  {column.tag && <Tag>{column.tag}</Tag>}
+                </Column>
+              )}
+            </TableHeader>
 
-          <TableBody items={enableViewMore ? list.items.slice(0, numRowsToShow) : list.items}>
-            {(item) => (
-              <Row key={getRowKey(item)}>
-                {(columnKey) => (
-                  <Cell key={`${getRowKey(item)}-${columnKey}`}>
-                    {columns.find((column) => column.columnKey === columnKey)?.renderCell?.(item)}
-                  </Cell>
-                )}
-              </Row>
-            )}
-          </TableBody>
-        </TableRoot>
+            <TableBody items={enableViewMore ? list.items.slice(0, numRowsToShow) : list.items}>
+              {(item) => (
+                <Row key={getRowKey(item)}>
+                  {(columnKey) => (
+                    <Cell key={`${getRowKey(item)}-${columnKey}`}>
+                      {columns.find((column) => column.columnKey === columnKey)?.renderCell?.(item)}
+                    </Cell>
+                  )}
+                </Row>
+              )}
+            </TableBody>
+          </TableRoot>
+          {enableViewMore && numRowsToShow! < data.length ? (
+            <ViewMoreRow
+              colSpan={shownColumns.length}
+              total={data.length}
+              numRowsPerPage={viewMoreConfig.numRowsPerPage || 10}
+              onClick={onViewMoreClick}
+            />
+          ) : undefined}
+        </Styled.TableWrapper2>
       ) : (
         <Styled.Empty withOuterBorder={withOuterBorder}>{slotEmpty}</Styled.Empty>
       )}
@@ -291,8 +301,6 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
   onRowAction?: (key: TableRowKey) => void;
   // shouldRowRender?: (prevRowData: object, currentRowData: object) => boolean;
   children: CollectionChildren<TableRowData>;
-  numColumns: number;
-  onViewMoreClick?: () => void;
 
   hideHeader?: boolean;
   withGradientCardRows?: boolean;
@@ -302,7 +310,7 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
   withScrollSnapColumns?: boolean;
   withScrollSnapRows?: boolean;
 }) => {
-  const { selectionMode, selectionBehavior, numColumns, onViewMoreClick } = props;
+  const { selectionMode, selectionBehavior } = props;
 
   const state = useTableState<TableRowData>({
     ...props,
@@ -410,9 +418,6 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
             </TableRow>
           )
         )}
-        {onViewMoreClick ? (
-          <ViewMoreRow colSpan={numColumns} onClick={onViewMoreClick} />
-        ) : undefined}
       </TableBodyRowGroup>
     </Styled.Table>
   );
@@ -522,20 +527,43 @@ const TableColumnHeader = <TableRowData extends object>({
   );
 };
 
-export const ViewMoreRow = ({ colSpan, onClick }: { colSpan: number; onClick: () => void }) => {
+export const ViewMoreRow = ({
+  colSpan,
+  total,
+  numRowsPerPage,
+  onClick,
+}: {
+  colSpan: number;
+  total: number;
+  numRowsPerPage: number;
+  onClick: () => void;
+}) => {
   const stringGetter = useStringGetter();
+  const numPages = Math.ceil(total / numRowsPerPage);
   return (
-    <Styled.ViewMoreTr key="viewmore">
-      <Styled.Td
-        colSpan={colSpan}
-        onMouseDown={(e: MouseEvent) => e.preventDefault()}
-        onPointerDown={(e: MouseEvent) => e.preventDefault()}
-      >
-        <Styled.ViewMoreButton slotRight={<CaretIcon />} onClick={onClick}>
-          {stringGetter({ key: STRING_KEYS.VIEW_MORE })}
-        </Styled.ViewMoreButton>
-      </Styled.Td>
-    </Styled.ViewMoreTr>
+    // <Styled.ViewMoreTr key="viewmore">
+    //   <Styled.Td
+    //     colSpan={colSpan}
+    //     onMouseDown={(e: MouseEvent) => e.preventDefault()}
+    //     onPointerDown={(e: MouseEvent) => e.preventDefault()}
+    //   >
+    <Styled.ViewMoreButton onClick={onClick}>
+      <Styled.PaginationButton iconName={IconName.ChevronLeft} shape={ButtonShape.Square} />
+      {stringGetter({
+        key: STRING_KEYS.SHOWING_NUM_OUT_OF_TOTAL,
+        params: {
+          START: 1,
+          END: numRowsPerPage,
+          TOTAL: total,
+        },
+      })}
+      {stringGetter({
+        key: STRING_KEYS.SHOW,
+      })}
+      <Styled.PaginationButton iconName={IconName.ChevronRight} shape={ButtonShape.Square} />
+    </Styled.ViewMoreButton>
+    //   </Styled.Td>
+    // </Styled.ViewMoreTr>
   );
 };
 
@@ -708,6 +736,10 @@ Styled.TableWrapper = styled.div<{
     `}
 `;
 
+Styled.TableWrapper2 = styled.div`
+  ${layoutMixins.stickyArea}
+`;
+
 Styled.Empty = styled.div<{ withOuterBorder: boolean }>`
   ${layoutMixins.column}
   height: 100%;
@@ -728,8 +760,6 @@ Styled.Table = styled.table<{
   withInnerBorders: boolean;
   withSolidHeader: boolean;
 }>`
-  align-self: start;
-
   ${layoutMixins.stickyArea1}
   --stickyArea1-background: var(--color-layer-2);
   --stickyArea1-topHeight: var(--table-header-height);
@@ -739,8 +769,10 @@ Styled.Table = styled.table<{
       --stickyArea1-topHeight: 0px;
     `}
 
+  align-self: start;
   border-collapse: separate;
   border-spacing: 0;
+  width: 100%;
 
   /* [data-selected] {} */
 
@@ -989,17 +1021,15 @@ Styled.Row = styled.div`
   padding: var(--tableCell-padding);
 `;
 
-Styled.ViewMoreButton = styled(Button)`
-  --button-backgroundColor: var(--color-layer-2);
-  --button-textColor: var(--color-text-1);
+Styled.ViewMoreButton = styled.div`
+  ${layoutMixins.stickyFooter}
+
+  height: 3rem;
 
   width: 100%;
-
-  svg {
-    width: 0.675rem;
-    margin-left: 0.5ch;
-  }
 `;
+
+Styled.PaginationButton = styled(IconButton)``;
 
 Styled.ViewMoreTr = styled(Styled.Tr)`
   --border-color: var(--tableViewMore-borderColor);
