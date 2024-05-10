@@ -75,7 +75,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     errors: routeErrors,
     errorMessage: routeErrorMessage,
     isCctp,
-    depositOptions,
   } = useSelector(getTransferInputs, shallowEqual) || {};
   const chainId = chainIdStr ? parseInt(chainIdStr) : undefined;
 
@@ -130,27 +129,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       abacusStateManager.resetInputState();
     };
   }, []);
-
-  // Temporary default to Axelar USDC tokens while CCTP is down.
-  // Revert this change once CCTP is back up.
-  useEffect(() => {
-    const USDCTokenAddresses = new Set([
-      '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-      '0x07865c6E87B9F70255377e024ace6630C1Eaa37F',
-      '0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E',
-      '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85',
-      '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
-    ]);
-
-    Object.values(depositOptions?.assets?.toArray() || []).forEach((asset) => {
-      if (USDCTokenAddresses.has(asset.type)) {
-        abacusStateManager.setTransferValue({
-          field: TransferInputField.token,
-          value: asset.type,
-        });
-      }
-    });
-  }, [depositOptions]);
 
   useEffect(() => {
     if (error) onError?.();
