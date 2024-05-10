@@ -21,6 +21,7 @@ import { getSelectedDydxChainId } from '@/state/appSelectors';
 type ElementProps = {
   status?: StatusResponse;
   type: TransferNotificationTypes;
+  toAmount: number;
 };
 
 type StyleProps = {
@@ -34,7 +35,25 @@ enum TransferStatusStep {
   Complete,
 }
 
-export const TransferStatusSteps = ({ className, status, type }: ElementProps & StyleProps) => {
+const shouldTrackTxLinkExistence = (
+  currentStep: TransferStatusStep,
+  type: TransferNotificationTypes
+) => {
+  if (type === TransferNotificationTypes.Deposit) {
+    return currentStep === TransferStatusStep.FromChain;
+  }
+  if (type === TransferNotificationTypes.Withdrawal) {
+    return currentStep === TransferStatusStep.ToChain;
+  }
+  return false;
+};
+
+export const TransferStatusSteps = ({
+  className,
+  status,
+  type,
+  toAmount,
+}: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
   const selectedDydxChainId = useSelector(getSelectedDydxChainId);
   const { mintscan: mintscanTxUrl } = useURLConfigs();
@@ -106,7 +125,13 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
     if (status?.squidTransactionStatus === 'success') {
       currentStep = TransferStatusStep.Complete;
     }
-
+    track(AnalyticsEvent.TransferStep, {
+      step: TransferStatusStep[currentStep],
+      type,
+      link: steps.find(({ step }) => step === currentStep)?.link,
+      amount: toAmount,
+      time: status?.timeSpent,
+    });
     return {
       currentStep,
       steps,

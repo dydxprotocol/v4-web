@@ -117,7 +117,7 @@ export const TransferStatusNotification = ({
           <Styled.BridgingStatus>
             {content}
             {!isToast && !isComplete && !hasError && (
-              <Styled.TransferStatusSteps status={status} type={type} />
+              <Styled.TransferStatusSteps status={status} type={type} toAmount={toAmount} />
             )}
           </Styled.BridgingStatus>
         )
@@ -150,7 +150,7 @@ export const TransferStatusNotification = ({
       slotReceipt={
         <Collapsible open={open} onOpenChange={setOpen} label="" withTrigger={false}>
           <Styled.Receipt>
-            <TransferStatusSteps status={status} type={type} />
+            <TransferStatusSteps status={status} type={type} toAmount={toAmount} />
           </Styled.Receipt>
         </Collapsible>
       }

@@ -220,6 +220,7 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
     ? {
         step: string;
         type: string;
+        link: string | undefined;
       }
     : T extends AnalyticsEvent.SquidRouteError
     ? {
