@@ -304,6 +304,8 @@ Styled.Popover = styled(Popover)`
   --popover-backgroundColor: var(--color-layer-2);
   --stickyArea-topHeight: 6.125rem;
 
+  --toolbar-height: var(--stickyArea-topHeight);
+
   height: calc(
     100vh - var(--page-header-height) - var(--market-info-row-height) - var(--page-footer-height)
   );
@@ -340,14 +342,14 @@ Styled.Popover = styled(Popover)`
 
 Styled.Toolbar = styled(Toolbar)`
   ${layoutMixins.stickyHeader}
-  height: var(--stickyArea-topHeight);
+  height: var(--toolbar-height);
   gap: 0.5rem;
   border-bottom: solid var(--border-width) var(--color-border);
 `;
 
 Styled.ScrollArea = styled.div`
   ${layoutMixins.scrollArea}
-  height: calc(100% - var(--stickyArea-topHeight));
+  height: calc(100% - var(--toolbar-height));
 `;
 
 Styled.Table = styled(Table)`
