@@ -24,7 +24,7 @@ import { track } from '@/lib/analytics';
 type ElementProps = {
   status?: StatusResponse;
   type: TransferNotificationTypes;
-  toAmount: number;
+  toAmount: number | undefined;
 };
 
 type StyleProps = {

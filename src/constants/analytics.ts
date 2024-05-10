@@ -222,7 +222,7 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
         type: string;
         link: string | undefined;
         time: Record<string, number> | undefined;
-        amount: number;
+        amount: number | undefined;
       }
     : T extends AnalyticsEvent.SquidRouteError
     ? {
