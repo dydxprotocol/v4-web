@@ -77,6 +77,7 @@ export enum AnalyticsEvent {
   TransferFaucetConfirmed = 'TransferFaucetConfirmed',
   TransferDeposit = 'TransferDeposit',
   TransferWithdraw = 'TransferWithdraw',
+  TransferStep = 'TransferStep',
 
   // Trading
   TradeOrderTypeSelected = 'TradeOrderTypeSelected',
@@ -87,6 +88,9 @@ export enum AnalyticsEvent {
 
   // Notification
   NotificationAction = 'NotificationAction',
+
+  // SquidStatus
+  TransferNotification = 'TransferNotification',
 }
 
 export type AnalyticsEventData<T extends AnalyticsEvent> =
@@ -205,6 +209,16 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
     ? {
         type: string;
         id: string;
+      }
+    : T extends AnalyticsEvent.TransferNotification
+    ? {
+        type: string;
+        complete: boolean;
+      }
+    : T extends AnalyticsEvent.TransferStep
+    ? {
+        step: string;
+        type: string;
       }
     : never;
 

@@ -5,7 +5,8 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { ComplianceStatus } from '@/constants/abacus';
+import { ComplianceStatus, TransferType } from '@/constants/abacus';
+import { AnalyticsEvent } from '@/constants/analytics';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import {
@@ -50,6 +51,7 @@ import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
+import { track } from '@/lib/analytics';
 import { formatSeconds } from '@/lib/timeUtils';
 
 import { useComplianceState } from './useComplianceState';
@@ -230,6 +232,11 @@ export const notificationTypes: NotificationTypeConfig[] = [
               AMOUNT_USD: `${toAmount} ${DydxChainAsset.USDC.toUpperCase()}`,
               ESTIMATED_DURATION: estimatedDuration,
             },
+          });
+
+          track(AnalyticsEvent.TransferNotification, {
+            type: TransferType.deposit.name,
+            complete: Boolean(isFinished),
           });
 
           trigger(

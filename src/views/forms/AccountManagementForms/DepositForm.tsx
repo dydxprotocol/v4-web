@@ -105,6 +105,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const debouncedAmountBN = MustBigNumber(debouncedAmount);
   const balanceBN = MustBigNumber(balance);
 
+  useEffect(() => {
+    if (routeErrors) {
+      log('DepositForm/routeErrors', new Error(routeErrors));
+    }
+  }, [routeErrors]);
+
   useEffect(() => setSlippage(isCctp ? 0 : 0.01), [isCctp]);
 
   useEffect(() => {

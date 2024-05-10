@@ -59,6 +59,7 @@ import { validateCosmosAddress } from '@/lib/addressUtils';
 import { track } from '@/lib/analytics';
 import { MustBigNumber } from '@/lib/numbers';
 import { getNobleChainId } from '@/lib/squid';
+import { log } from '@/lib/telemetry';
 
 import { TokenSelectMenu } from './TokenSelectMenu';
 import { WithdrawButtonAndReceipt } from './WithdrawForm/WithdrawButtonAndReceipt';
@@ -107,6 +108,12 @@ export const WithdrawForm = () => {
     () => MustBigNumber(freeCollateral?.current),
     [freeCollateral?.current]
   );
+
+  useEffect(() => {
+    if (routeErrors) {
+      log('WithdrawForm/routeErrors', new Error(routeErrors));
+    }
+  }, [routeErrors]);
 
   useEffect(() => setSlippage(isCctp ? 0 : 0.01), [isCctp]);
 

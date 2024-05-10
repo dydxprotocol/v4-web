@@ -4,6 +4,7 @@ import { StatusResponse } from '@0xsquid/sdk';
 import { useSelector } from 'react-redux';
 import styled, { css, type AnyStyledComponent } from 'styled-components';
 
+import { AnalyticsEvent } from '@/constants/analytics';
 import { STRING_KEYS } from '@/constants/localization';
 import { TransferNotificationTypes } from '@/constants/notifications';
 
@@ -17,6 +18,8 @@ import { LoadingDots } from '@/components/Loading/LoadingDots';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
+
+import { track } from '@/lib/analytics';
 
 type ElementProps = {
   status?: StatusResponse;
@@ -106,7 +109,10 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
     if (status?.squidTransactionStatus === 'success') {
       currentStep = TransferStatusStep.Complete;
     }
-
+    track(AnalyticsEvent.TransferStep, {
+      step: TransferStatusStep[currentStep],
+      type,
+    });
     return {
       currentStep,
       steps,
