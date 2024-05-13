@@ -13,7 +13,12 @@ import { AnalyticsEvent, AnalyticsEventData } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
-import { MAX_CCTP_TRANSFER_AMOUNT, MAX_PRICE_IMPACT, NumberSign } from '@/constants/numbers';
+import {
+  MAX_CCTP_TRANSFER_AMOUNT,
+  MAX_PRICE_IMPACT,
+  MIN_CCTP_TRANSFER_AMOUNT,
+  NumberSign,
+} from '@/constants/numbers';
 import { WalletType, type EvmAddress } from '@/constants/wallets';
 
 import { useAccounts, useDebounce, useStringGetter } from '@/hooks';
@@ -75,7 +80,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     errors: routeErrors,
     errorMessage: routeErrorMessage,
     isCctp,
-    depositOptions,
   } = useSelector(getTransferInputs, shallowEqual) || {};
   const chainId = chainIdStr ? parseInt(chainIdStr) : undefined;
 
@@ -130,27 +134,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       abacusStateManager.resetInputState();
     };
   }, []);
-
-  // Temporary default to Axelar USDC tokens while CCTP is down.
-  // Revert this change once CCTP is back up.
-  useEffect(() => {
-    const USDCTokenAddresses = new Set([
-      '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-      '0x07865c6E87B9F70255377e024ace6630C1Eaa37F',
-      '0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E',
-      '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85',
-      '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
-    ]);
-
-    Object.values(depositOptions?.assets?.toArray() || []).forEach((asset) => {
-      if (USDCTokenAddresses.has(asset.type)) {
-        abacusStateManager.setTransferValue({
-          field: TransferInputField.token,
-          value: asset.type,
-        });
-      }
-    });
-  }, [depositOptions]);
 
   useEffect(() => {
     if (error) onError?.();
@@ -355,7 +338,24 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     },
   ];
 
+  // TODO: abstract as much as possible to a util/hook and share between WithdrawForm
   const errorMessage = useMemo(() => {
+    if (isCctp) {
+      if (
+        !debouncedAmountBN.isZero() &&
+        MustBigNumber(debouncedAmountBN).lte(MIN_CCTP_TRANSFER_AMOUNT)
+      ) {
+        return 'Amount must be greater than 10 USDC';
+      }
+      if (MustBigNumber(debouncedAmountBN).gte(MAX_CCTP_TRANSFER_AMOUNT)) {
+        return stringGetter({
+          key: STRING_KEYS.MAX_CCTP_TRANSFER_LIMIT_EXCEEDED,
+          params: {
+            MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
+          },
+        });
+      }
+    }
     if (error) {
       return parseWalletError({ error, stringGetter }).message;
     }
@@ -381,17 +381,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       return stringGetter({ key: STRING_KEYS.DEPOSIT_MORE_THAN_BALANCE });
     }
 
-    if (isCctp) {
-      if (MustBigNumber(debouncedAmountBN).gte(MAX_CCTP_TRANSFER_AMOUNT)) {
-        return stringGetter({
-          key: STRING_KEYS.MAX_CCTP_TRANSFER_LIMIT_EXCEEDED,
-          params: {
-            MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
-          },
-        });
-      }
-    }
-
     if (isMainnet && MustBigNumber(summary?.aggregatePriceImpact).gte(MAX_PRICE_IMPACT)) {
       return stringGetter({ key: STRING_KEYS.PRICE_IMPACT_TOO_HIGH });
     }
@@ -407,6 +396,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     sourceToken,
     stringGetter,
     summary,
+    debouncedAmountBN,
   ]);
 
   const isDisabled =

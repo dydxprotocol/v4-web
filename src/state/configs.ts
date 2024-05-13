@@ -25,6 +25,7 @@ export enum AppColorMode {
 
 export enum OtherPreference {
   DisplayAllMarketsDefault = 'DisplayAllMarketsDefault',
+  GasToken = 'GasToken',
 }
 
 export interface ConfigsState {

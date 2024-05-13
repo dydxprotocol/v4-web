@@ -30,11 +30,11 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: 1.7.6
-    version: 1.7.6
+    specifier: 1.7.9
+    version: 1.7.9
   '@dydxprotocol/v4-client-js':
-    specifier: ^1.1.8
-    version: 1.1.8
+    specifier: ^1.1.10
+    version: 1.1.10
   '@dydxprotocol/v4-localization':
     specifier: ^1.1.84
     version: 1.1.84
@@ -1590,15 +1590,16 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.7.6:
-    resolution: {integrity: sha512-/d9fTWBLB9IvsaVF+PPGrdWud1Ek+YP0ZqWevL+gFXWkUSV8h5TQ1znCPQpBUohQ1ml+mDd1POUoQkCcG2fGWA==}
+
+  /@dydxprotocol/v4-abacus@1.7.9:
+    resolution: {integrity: sha512-aXNm0B0cSx1PZgGEpLmH4KBbY6iNAfxsjvLVYSRl70/AwuRd31drjGrDgQkoxBIfbrTmYhJCgig59fZeoQeRfg==}
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
     dev: false
 
-  /@dydxprotocol/v4-client-js@1.1.8:
-    resolution: {integrity: sha512-GOSWgjN7JQZncLIo4E+sQKTxCahOjFqnlqo7JD3cKaD4T03lRoeXR1Doz1Gp4BGv2mGAbn1P2la43wfK33y7Uw==}
+  /@dydxprotocol/v4-client-js@1.1.10:
+    resolution: {integrity: sha512-XesAXsDJXVJ3qg7Ffexh9u//4DjglNA1y9ziIvgTg7bGj9m6BsK1rS9tWBejUNt8vdAVaaMo2zjRYI14iaUoeg==}
     dependencies:
       '@cosmjs/amino': 0.32.2
       '@cosmjs/encoding': 0.32.2

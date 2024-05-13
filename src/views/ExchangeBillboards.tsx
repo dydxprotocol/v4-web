@@ -18,7 +18,7 @@ type ExchangeBillboardsProps = {
   className?: string;
 };
 
-export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ className }) => {
+export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
 
@@ -26,9 +26,8 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
     stats: { volume24HUSDC, openInterestUSDC, feesEarned },
     feesEarnedChart,
   } = usePerpetualMarketsStats();
-
   return (
-    <Styled.MarketBillboardsWrapper className={className}>
+    <Styled.MarketBillboardsWrapper>
       {[
         {
           key: 'volume',
@@ -117,7 +116,6 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
 const Styled = {
   MarketBillboardsWrapper: styled.div`
     ${layoutMixins.column}
-
     gap: 1rem;
   `,
   BillboardContainer: styled.div`
