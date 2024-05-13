@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
@@ -19,7 +19,13 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
-import { Table, TableCell, TableColumnHeader, type ColumnDef } from '@/components/Table';
+import {
+  Table,
+  TableCell,
+  TableColumnHeader,
+  ViewMoreConfig,
+  type ColumnDef,
+} from '@/components/Table';
 import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { TagSize } from '@/components/Tag';
 
@@ -289,6 +295,7 @@ type ElementProps = {
   columnKeys: FillsTableColumnKey[];
   columnWidths?: Partial<Record<FillsTableColumnKey, ColumnSize>>;
   currentMarket?: string;
+  viewMoreConfig?: ViewMoreConfig;
 };
 
 type StyleProps = {
@@ -301,6 +308,7 @@ export const FillsTable = ({
   columnKeys,
   columnWidths,
   currentMarket,
+  viewMoreConfig,
   withGradientCardRows,
   withOuterBorder,
   withInnerBorders = true,
@@ -324,13 +332,17 @@ export const FillsTable = ({
 
   const symbol = currentMarket ? allAssets[allPerpetualMarkets[currentMarket]?.assetId]?.id : null;
 
-  const fillsData = fills.map((fill: SubaccountFill) =>
-    getHydratedTradingData({
-      data: fill,
-      assets: allAssets,
-      perpetualMarkets: allPerpetualMarkets,
-    })
-  ) as FillTableRow[];
+  const fillsData = useMemo(
+    () =>
+      fills.map((fill: SubaccountFill) =>
+        getHydratedTradingData({
+          data: fill,
+          assets: allAssets,
+          perpetualMarkets: allPerpetualMarkets,
+        })
+      ) as FillTableRow[],
+    [fills, allPerpetualMarkets, allAssets]
+  );
 
   return (
     <Styled.Table
@@ -363,6 +375,7 @@ export const FillsTable = ({
           <h4>{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</h4>
         </>
       }
+      viewMoreConfig={viewMoreConfig}
       withOuterBorder={withOuterBorder}
       withInnerBorders={withInnerBorders}
       withScrollSnapColumns

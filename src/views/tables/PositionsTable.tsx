@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import styled, { type AnyStyledComponent } from 'styled-components';
 
 import {
-  POSITION_SIDES,
   type Asset,
   type Nullable,
   type SubaccountOrder,
@@ -26,11 +25,9 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
-import { PositionSideTag } from '@/components/PositionSideTag';
-import { Table, TableColumnHeader, type ColumnDef } from '@/components/Table';
+import { Table, TableColumnHeader, ViewMoreConfig, type ColumnDef } from '@/components/Table';
 import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
-import { TagSize } from '@/components/Tag';
 
 import {
   calculateIsAccountViewOnly,
@@ -41,6 +38,7 @@ import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
+import { testFlags } from '@/lib/testFlags';
 
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
@@ -52,9 +50,7 @@ export enum PositionsTableColumnKey {
   PnL = 'PnL',
 
   Market = 'Market',
-  Side = 'Side',
   Size = 'Size',
-  Leverage = 'Leverage',
   LiquidationAndOraclePrice = 'LiquidationAndOraclePrice',
   Margin = 'Margin',
   UnrealizedPnl = 'UnrealizedPnl',
@@ -69,6 +65,7 @@ type PositionTableRow = {
   asset: Asset;
   oraclePrice: Nullable<number>;
   tickSizeDecimals: number;
+  fundingRate: number;
   stopLossOrders: SubaccountOrder[];
   takeProfitOrders: SubaccountOrder[];
 } & SubaccountPosition;
@@ -166,19 +163,14 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.id,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ id, asset }) => <MarketTableCell asset={asset} marketId={id} />,
-      },
-      [PositionsTableColumnKey.Side]: {
-        columnKey: 'market-side',
-        getCellValue: (row) => row.side?.current && POSITION_SIDES[row.side.current.name],
-        label: stringGetter({ key: STRING_KEYS.SIDE }),
-        renderCell: ({ side }) =>
-          side?.current && (
-            <PositionSideTag
-              positionSide={POSITION_SIDES[side.current.name]}
-              size={TagSize.Medium}
-            />
-          ),
+        renderCell: ({ id, asset, leverage }) => (
+          <MarketTableCell
+            asset={asset}
+            marketId={id}
+            leverage={leverage?.current ?? undefined}
+            isHighlighted
+          />
+        ),
       },
       [PositionsTableColumnKey.Size]: {
         columnKey: 'size',
@@ -187,11 +179,12 @@ const getPositionsTableColumnDef = ({
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         renderCell: ({ assetId, size, notionalTotal, tickSizeDecimals }) => (
           <TableCell stacked>
-            <Output
+            <Styled.OutputSigned
               type={OutputType.Asset}
               value={size?.current}
               tag={assetId}
-              showSign={ShowSign.None}
+              showSign={ShowSign.Negative}
+              sign={getNumberSign(size?.current)}
             />
             <Output
               type={OutputType.Fiat}
@@ -199,15 +192,6 @@ const getPositionsTableColumnDef = ({
               fractionDigits={tickSizeDecimals}
             />
           </TableCell>
-        ),
-      },
-      [PositionsTableColumnKey.Leverage]: {
-        columnKey: 'leverage',
-        getCellValue: (row) => row.leverage?.current,
-        label: stringGetter({ key: STRING_KEYS.LEVERAGE }),
-        hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ leverage }) => (
-          <Output type={OutputType.Multiple} value={leverage?.current} showSign={ShowSign.None} />
         ),
       },
       [PositionsTableColumnKey.Margin]: {
@@ -218,6 +202,27 @@ const getPositionsTableColumnDef = ({
         isActionable: true,
         renderCell: ({ id, adjustedMmf, notionalTotal }) => (
           <PositionsMarginCell id={id} notionalTotal={notionalTotal} adjustedMmf={adjustedMmf} />
+        ),
+      },
+      [PositionsTableColumnKey.NetFunding]: {
+        columnKey: 'netFunding',
+        getCellValue: (row) => row.netFunding,
+        label: (
+          <TableColumnHeader>
+            <span>{stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_SHORT })}</span>
+            <span>{stringGetter({ key: STRING_KEYS.RATE })}</span>
+          </TableColumnHeader>
+        ),
+        hideOnBreakpoint: MediaQueryKeys.isTablet,
+        renderCell: ({ netFunding, fundingRate }) => (
+          <TableCell stacked>
+            <Styled.OutputSigned
+              sign={getNumberSign(netFunding)}
+              type={OutputType.Fiat}
+              value={netFunding}
+            />
+            <Output showSign={ShowSign.Negative} type={OutputType.Percent} value={fundingRate} />
+          </TableCell>
         ),
       },
       [PositionsTableColumnKey.LiquidationAndOraclePrice]: {
@@ -276,7 +281,12 @@ const getPositionsTableColumnDef = ({
       [PositionsTableColumnKey.AverageOpenAndClose]: {
         columnKey: 'entryExitPrice',
         getCellValue: (row) => row.entryPrice?.current,
-        label: stringGetter({ key: STRING_KEYS.AVERAGE_OPEN_CLOSE }),
+        label: (
+          <TableColumnHeader>
+            <span>{stringGetter({ key: STRING_KEYS.AVERAGE_OPEN_SHORT })}</span>
+            <span>{stringGetter({ key: STRING_KEYS.AVERAGE_CLOSE_SHORT })}</span>
+          </TableColumnHeader>
+        ),
         hideOnBreakpoint: MediaQueryKeys.isTablet,
         renderCell: ({ entryPrice, exitPrice, tickSizeDecimals }) => (
           <TableCell stacked>
@@ -286,21 +296,6 @@ const getPositionsTableColumnDef = ({
               fractionDigits={tickSizeDecimals}
             />
             <Output type={OutputType.Fiat} value={exitPrice} fractionDigits={tickSizeDecimals} />
-          </TableCell>
-        ),
-      },
-      [PositionsTableColumnKey.NetFunding]: {
-        columnKey: 'netFunding',
-        getCellValue: (row) => row.netFunding,
-        label: stringGetter({ key: STRING_KEYS.NET_FUNDING }),
-        hideOnBreakpoint: MediaQueryKeys.isTablet,
-        renderCell: ({ netFunding }) => (
-          <TableCell>
-            <Styled.OutputSigned
-              sign={getNumberSign(netFunding)}
-              type={OutputType.Fiat}
-              value={netFunding}
-            />
           </TableCell>
         ),
       },
@@ -338,9 +333,9 @@ const getPositionsTableColumnDef = ({
         columnKey: 'actions',
         label: stringGetter({
           key:
-            shouldRenderTriggers && showClosePositionAction
+            shouldRenderTriggers && showClosePositionAction && !testFlags.isolatedMargin
               ? STRING_KEYS.ACTIONS
-              : STRING_KEYS.ACTION,
+              : STRING_KEYS.CLOSE,
         }),
         isActionable: true,
         allowsSorting: false,
@@ -367,6 +362,7 @@ type ElementProps = {
   currentRoute?: string;
   currentMarket?: string;
   showClosePositionAction: boolean;
+  viewMoreConfig?: ViewMoreConfig;
   onNavigate?: () => void;
   navigateToOrders: (market: string) => void;
 };
@@ -382,6 +378,7 @@ export const PositionsTable = ({
   currentRoute,
   currentMarket,
   showClosePositionAction,
+  viewMoreConfig,
   onNavigate,
   navigateToOrders,
   withGradientCardRows,
@@ -420,6 +417,7 @@ export const PositionsTable = ({
             perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
           asset: assets?.[position.assetId],
           oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
+          fundingRate: perpetualMarkets?.[position.id]?.perpetual?.nextFundingRate,
           stopLossOrders: allStopLossOrders.filter(
             (order: SubaccountOrder) => order.marketId === position.id
           ),
@@ -472,6 +470,7 @@ export const PositionsTable = ({
           <h4>{stringGetter({ key: STRING_KEYS.POSITIONS_EMPTY_STATE })}</h4>
         </>
       }
+      viewMoreConfig={viewMoreConfig}
       withGradientCardRows={withGradientCardRows}
       withOuterBorder={withOuterBorder}
       withInnerBorders

@@ -18,7 +18,7 @@ type ExchangeBillboardsProps = {
   className?: string;
 };
 
-export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ className }) => {
+export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
 
@@ -26,9 +26,8 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
     stats: { volume24HUSDC, openInterestUSDC, feesEarned },
     feesEarnedChart,
   } = usePerpetualMarketsStats();
-
   return (
-    <Styled.MarketBillboardsWrapper className={className}>
+    <Styled.MarketBillboardsWrapper>
       {[
         {
           key: 'volume',
@@ -36,7 +35,7 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
           tagKey: STRING_KEYS._24H,
           value: volume24HUSDC || undefined,
           fractionDigits: 0,
-          type: OutputType.CompactFiat,
+          type: OutputType.Fiat,
         },
         {
           key: 'open-interest',
@@ -44,14 +43,14 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
           tagKey: STRING_KEYS.CURRENT,
           value: openInterestUSDC || undefined,
           fractionDigits: 0,
-          type: OutputType.CompactFiat,
+          type: OutputType.Fiat,
         },
         {
           key: 'fee-earned-stakers',
           labelKey: STRING_KEYS.EARNED_BY_STAKERS,
           tagKey: STRING_KEYS._24H,
           value: feesEarned,
-          type: OutputType.CompactFiat,
+          type: OutputType.Fiat,
           chartData: feesEarnedChart,
           linkLabelKey: STRING_KEYS.LEARN_MORE_ARROW,
           link: `${chainTokenLabel}/${TokenRoute.StakingRewards}`,
@@ -117,7 +116,6 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = ({ classNam
 const Styled = {
   MarketBillboardsWrapper: styled.div`
     ${layoutMixins.column}
-
     gap: 1rem;
   `,
   BillboardContainer: styled.div`

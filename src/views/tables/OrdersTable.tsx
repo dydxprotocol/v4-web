@@ -27,6 +27,7 @@ import {
   Table,
   TableCell,
   TableColumnHeader,
+  ViewMoreConfig,
   type ColumnDef,
 } from '@/components/Table';
 import { TagSize } from '@/components/Tag';
@@ -293,6 +294,7 @@ type ElementProps = {
   columnKeys: OrdersTableColumnKey[];
   columnWidths?: Partial<Record<OrdersTableColumnKey, ColumnSize>>;
   currentMarket?: string;
+  viewMoreConfig?: ViewMoreConfig;
 };
 
 type StyleProps = {
@@ -303,6 +305,7 @@ export const OrdersTable = ({
   columnKeys = [],
   columnWidths,
   currentMarket,
+  viewMoreConfig,
   withOuterBorder,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
@@ -371,6 +374,7 @@ export const OrdersTable = ({
           <h4>{stringGetter({ key: STRING_KEYS.ORDERS_EMPTY_STATE })}</h4>
         </>
       }
+      viewMoreConfig={viewMoreConfig}
       withOuterBorder={withOuterBorder}
       withInnerBorders
       withScrollSnapColumns

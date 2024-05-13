@@ -63,6 +63,7 @@ export const ToggleGroup = forwardRef(
             <ToggleButton
               size={size ? size : isTablet ? ButtonSize.Small : ButtonSize.XSmall}
               shape={shape}
+              disabled={item.disabled}
               {...buttonProps}
             >
               {item.slotBefore}

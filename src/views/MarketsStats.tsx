@@ -35,7 +35,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
 
   return (
     <Styled.MarketsStats className={className}>
-      <Styled.ExchangeBillboards />
+      <ExchangeBillboards />
       <Styled.Section>
         <Styled.SectionHeader>
           <Styled.RecentlyListed>
@@ -127,8 +127,5 @@ const Styled = {
       font: var(--font-base-medium);
       color: var(--color-text-2);
     }
-  `,
-  ExchangeBillboards: styled(ExchangeBillboards)`
-    ${layoutMixins.contentSectionDetachedScrollable}
   `,
 };

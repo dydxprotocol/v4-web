@@ -66,7 +66,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   const { usdcDenom, usdcDecimals } = useTokenConfigs();
   const { compositeClient, faucetClient } = useDydxClient();
 
-  const { getFaucetFunds } = useMemo(
+  const { getFaucetFunds, getNativeTokens } = useMemo(
     () => ({
       getFaucetFunds: async ({
         dydxAddress,
@@ -75,6 +75,9 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         dydxAddress: DydxAddress;
         subaccountNumber: number;
       }) => await faucetClient?.fill(dydxAddress, subaccountNumber, 100),
+
+      getNativeTokens: async ({ dydxAddress }: { dydxAddress: DydxAddress }) =>
+        await faucetClient?.fillNative(dydxAddress),
     }),
     [faucetClient]
   );
@@ -342,15 +345,18 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
   // ------ Faucet Methods ------ //
   const requestFaucetFunds = useCallback(async () => {
-    if (!dydxAddress) return;
-
     try {
-      await getFaucetFunds({ dydxAddress, subaccountNumber });
+      if (!dydxAddress) throw new Error('dydxAddress is not connected');
+
+      await Promise.all([
+        getFaucetFunds({ dydxAddress, subaccountNumber }),
+        getNativeTokens({ dydxAddress }),
+      ]);
     } catch (error) {
       log('useSubaccount/getFaucetFunds', error);
       throw error;
     }
-  }, [dydxAddress, getFaucetFunds, subaccountNumber]);
+  }, [dydxAddress, getFaucetFunds, getNativeTokens, subaccountNumber]);
 
   // ------ Trading Methods ------ //
   const placeOrder = useCallback(
@@ -463,17 +469,15 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         parsingError?: Nullable<ParsingError>,
         data?: Nullable<HumanReadableTriggerOrdersPayload>
       ) => {
-        const placeOrderPayloads = data?.placeOrderPayloads.toArray() || []
-        const cancelOrderPayloads = data?.cancelOrderPayloads.toArray() || []
+        const placeOrderPayloads = data?.placeOrderPayloads.toArray() || [];
+        const cancelOrderPayloads = data?.cancelOrderPayloads.toArray() || [];
 
         if (success) {
           onSuccess?.();
 
-          cancelOrderPayloads.forEach(
-            (payload: HumanReadableCancelOrderPayload) => {
-              dispatch(cancelOrderConfirmed(payload.orderId));
-            }
-          );
+          cancelOrderPayloads.forEach((payload: HumanReadableCancelOrderPayload) => {
+            dispatch(cancelOrderConfirmed(payload.orderId));
+          });
         } else {
           onError?.({ errorStringKey: parsingError?.stringKey });
 
@@ -486,34 +490,36 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
             );
           });
 
-          cancelOrderPayloads.forEach(
-            (payload: HumanReadableCancelOrderPayload) => {
-              dispatch(
-                cancelOrderFailed({
-                  orderId: payload.orderId,
-                  errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
-                })
-              );
-            }
-          );
+          cancelOrderPayloads.forEach((payload: HumanReadableCancelOrderPayload) => {
+            dispatch(
+              cancelOrderFailed({
+                orderId: payload.orderId,
+                errorStringKey: parsingError?.stringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG,
+              })
+            );
+          });
         }
       };
 
       const triggerOrderParams = abacusStateManager.triggerOrders(callback);
 
-      triggerOrderParams?.placeOrderPayloads.toArray().forEach((payload: HumanReadablePlaceOrderPayload) => {
-        dispatch(
-          placeOrderSubmitted({
-            marketId: payload.marketId,
-            clientId: payload.clientId,
-            orderType: payload.type as TradeTypes,
-          })
-        );
-      });
+      triggerOrderParams?.placeOrderPayloads
+        .toArray()
+        .forEach((payload: HumanReadablePlaceOrderPayload) => {
+          dispatch(
+            placeOrderSubmitted({
+              marketId: payload.marketId,
+              clientId: payload.clientId,
+              orderType: payload.type as TradeTypes,
+            })
+          );
+        });
 
-      triggerOrderParams?.cancelOrderPayloads.toArray().forEach((payload: HumanReadableCancelOrderPayload) => {
-        dispatch(cancelOrderSubmitted(payload.orderId));
-      });
+      triggerOrderParams?.cancelOrderPayloads
+        .toArray()
+        .forEach((payload: HumanReadableCancelOrderPayload) => {
+          dispatch(cancelOrderSubmitted(payload.orderId));
+        });
 
       return triggerOrderParams;
     },

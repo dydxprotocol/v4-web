@@ -13,7 +13,12 @@ import { AnalyticsEvent, AnalyticsEventData } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
-import { MAX_CCTP_TRANSFER_AMOUNT, MAX_PRICE_IMPACT, NumberSign } from '@/constants/numbers';
+import {
+  MAX_CCTP_TRANSFER_AMOUNT,
+  MAX_PRICE_IMPACT,
+  MIN_CCTP_TRANSFER_AMOUNT,
+  NumberSign,
+} from '@/constants/numbers';
 import { WalletType, type EvmAddress } from '@/constants/wallets';
 
 import { useAccounts, useDebounce, useStringGetter } from '@/hooks';
@@ -333,7 +338,24 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     },
   ];
 
+  // TODO: abstract as much as possible to a util/hook and share between WithdrawForm
   const errorMessage = useMemo(() => {
+    if (isCctp) {
+      if (
+        !debouncedAmountBN.isZero() &&
+        MustBigNumber(debouncedAmountBN).lte(MIN_CCTP_TRANSFER_AMOUNT)
+      ) {
+        return 'Amount must be greater than 10 USDC';
+      }
+      if (MustBigNumber(debouncedAmountBN).gte(MAX_CCTP_TRANSFER_AMOUNT)) {
+        return stringGetter({
+          key: STRING_KEYS.MAX_CCTP_TRANSFER_LIMIT_EXCEEDED,
+          params: {
+            MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
+          },
+        });
+      }
+    }
     if (error) {
       return parseWalletError({ error, stringGetter }).message;
     }
@@ -359,17 +381,6 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       return stringGetter({ key: STRING_KEYS.DEPOSIT_MORE_THAN_BALANCE });
     }
 
-    if (isCctp) {
-      if (MustBigNumber(debouncedAmountBN).gte(MAX_CCTP_TRANSFER_AMOUNT)) {
-        return stringGetter({
-          key: STRING_KEYS.MAX_CCTP_TRANSFER_LIMIT_EXCEEDED,
-          params: {
-            MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
-          },
-        });
-      }
-    }
-
     if (isMainnet && MustBigNumber(summary?.aggregatePriceImpact).gte(MAX_PRICE_IMPACT)) {
       return stringGetter({ key: STRING_KEYS.PRICE_IMPACT_TOO_HIGH });
     }
@@ -385,6 +396,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     sourceToken,
     stringGetter,
     summary,
+    debouncedAmountBN,
   ]);
 
   const isDisabled =

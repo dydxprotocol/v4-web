@@ -20,6 +20,7 @@ import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { testFlags } from '@/lib/testFlags';
 
 type ElementProps = {
   marketId: string;
@@ -66,28 +67,30 @@ export const PositionsActionsCell = ({
 
   return (
     <ActionsTableCell>
-      {isSlTpEnabled && complianceState === ComplianceStates.FULL_ACCESS && (
-        <Styled.TriggersButton
-          key="edittriggers"
-          onClick={() =>
-            dispatch(
-              openDialog({
-                type: DialogTypes.Triggers,
-                dialogProps: {
-                  marketId,
-                  assetId,
-                  stopLossOrders,
-                  takeProfitOrders,
-                  navigateToMarketOrders,
-                },
-              })
-            )
-          }
-          iconName={IconName.Pencil}
-          shape={ButtonShape.Square}
-          isDisabled={isDisabled}
-        />
-      )}
+      {isSlTpEnabled &&
+        !testFlags.isolatedMargin &&
+        complianceState === ComplianceStates.FULL_ACCESS && (
+          <Styled.TriggersButton
+            key="edittriggers"
+            onClick={() =>
+              dispatch(
+                openDialog({
+                  type: DialogTypes.Triggers,
+                  dialogProps: {
+                    marketId,
+                    assetId,
+                    stopLossOrders,
+                    takeProfitOrders,
+                    navigateToMarketOrders,
+                  },
+                })
+              )
+            }
+            iconName={IconName.Pencil}
+            shape={ButtonShape.Square}
+            isDisabled={isDisabled}
+          />
+        )}
       {showClosePositionAction && (
         <Styled.CloseButtonToggle
           key="closepositions"
@@ -108,18 +111,13 @@ export const PositionsActionsCell = ({
 const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.TriggersButton = styled(IconButton)`
-  svg {
-    width: 1.5em;
-    height: 1.5em;
-  }
+  --button-icon-size: 1.33em;
+  --button-textColor: var(--color-text-0);
+  --button-hover-textColor: var(--color-text-1);
 `;
 
 Styled.CloseButtonToggle = styled(IconButton)`
+  --button-icon-size: 1em;
   --button-hover-textColor: var(--color-red);
   --button-toggle-on-textColor: var(--color-red);
-
-  svg {
-    width: 0.875em;
-    height: 0.875em;
-  }
 `;

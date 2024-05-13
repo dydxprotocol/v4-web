@@ -12,6 +12,7 @@ import { useBreakpoints, useStringGetter } from '@/hooks';
 import { AssetIcon } from '@/components/AssetIcon';
 import { CollapsibleTabs } from '@/components/CollapsibleTabs';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
+import { ViewMoreConfig } from '@/components/Table';
 import { MobileTabs } from '@/components/Tabs';
 import { Tag, TagType } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
@@ -95,6 +96,11 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     showCurrentMarket ? numOpenOrders : numTotalOpenOrders
   );
 
+  const viewMoreConfig: ViewMoreConfig = {
+    initialNumRowsToShow: 10,
+    numRowsPerPage: 10,
+  };
+
   const onViewOrders = useCallback((market: string) => {
     navigate(`${AppRoute.Trade}/${market}`, {
       state: {
@@ -129,20 +135,19 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                   ]
                 : [
                     PositionsTableColumnKey.Market,
-                    PositionsTableColumnKey.Side,
                     PositionsTableColumnKey.Size,
-                    PositionsTableColumnKey.Leverage,
-                    PositionsTableColumnKey.LiquidationAndOraclePrice,
                     testFlags.isolatedMargin && PositionsTableColumnKey.Margin,
                     PositionsTableColumnKey.UnrealizedPnl,
-                    PositionsTableColumnKey.RealizedPnl,
-                    PositionsTableColumnKey.AverageOpenAndClose,
+                    !testFlags.isolatedMargin && PositionsTableColumnKey.RealizedPnl,
                     PositionsTableColumnKey.NetFunding,
+                    PositionsTableColumnKey.AverageOpenAndClose,
+                    PositionsTableColumnKey.LiquidationAndOraclePrice,
                     shouldRenderTriggers && PositionsTableColumnKey.Triggers,
                     shouldRenderActions && PositionsTableColumnKey.Actions,
                   ].filter(isTruthy)
             }
             showClosePositionAction={showClosePositionAction}
+            viewMoreConfig={viewMoreConfig}
             onNavigate={() => setView(PanelView.CurrentMarket)}
             navigateToOrders={onViewOrders}
           />
@@ -180,6 +185,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     !isAccountViewOnly && OrdersTableColumnKey.Actions,
                   ].filter(isTruthy)
             }
+            viewMoreConfig={viewMoreConfig}
           />
         ),
       },
@@ -218,6 +224,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
             columnWidths={{
               [FillsTableColumnKey.TypeAmount]: '100%',
             }}
+            viewMoreConfig={viewMoreConfig}
           />
         ),
       },
@@ -250,7 +257,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
 
   const slotBottom = {
     [InfoSection.Position]: testFlags.isolatedMargin && (
-      <UnopenedIsolatedPositions onViewOrders={onViewOrders} />
+      <Styled.UnopenedIsolatedPositions onViewOrders={onViewOrders} />
     ),
     [InfoSection.Orders]: null,
     [InfoSection.Fills]: null,
@@ -293,7 +300,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
         }
         tabItems={tabItems}
       />
-      {slotBottom}
+      {isOpen && slotBottom}
     </>
   );
 };
@@ -311,5 +318,8 @@ const Styled = {
   ` as typeof CollapsibleTabs<InfoSection>,
   LoadingSpinner: styled(LoadingSpinner)`
     --spinner-width: 1rem;
+  `,
+  UnopenedIsolatedPositions: styled(UnopenedIsolatedPositions)`
+    margin-top: auto;
   `,
 };

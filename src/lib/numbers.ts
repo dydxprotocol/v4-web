@@ -10,7 +10,8 @@ export const BIG_NUMBERS = {
   ONE: new BigNumber(1),
 };
 
-export const MustBigNumber = (amount?: BigNumberish | null) => new BigNumber(amount || 0);
+export const MustBigNumber = (amount?: BigNumberish | null): BigNumber =>
+  new BigNumber(amount || 0);
 
 /**
  * @description Rounds the input to the nearest multiple of `factor`, which must be non-zero.

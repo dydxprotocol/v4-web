@@ -17,6 +17,7 @@ import {
 } from '@/state/accountCalculators';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { testFlags } from '@/lib/testFlags';
 
 import { AccountDetailsAndHistory } from './AccountDetailsAndHistory';
 
@@ -51,13 +52,11 @@ export const Overview = () => {
                 ]
               : [
                   PositionsTableColumnKey.Market,
-                  PositionsTableColumnKey.Side,
                   PositionsTableColumnKey.Size,
-                  PositionsTableColumnKey.Leverage,
-                  PositionsTableColumnKey.LiquidationAndOraclePrice,
                   PositionsTableColumnKey.UnrealizedPnl,
-                  PositionsTableColumnKey.RealizedPnl,
+                  !testFlags.isolatedMargin && PositionsTableColumnKey.RealizedPnl,
                   PositionsTableColumnKey.AverageOpenAndClose,
+                  PositionsTableColumnKey.LiquidationAndOraclePrice,
                   shouldRenderTriggers && PositionsTableColumnKey.Triggers,
                   shouldRenderActions && PositionsTableColumnKey.Actions,
                 ].filter(isTruthy)

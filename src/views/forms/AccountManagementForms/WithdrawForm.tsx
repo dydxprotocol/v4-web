@@ -347,6 +347,26 @@ export const WithdrawForm = () => {
   const { sanctionedAddresses } = useRestrictions();
 
   const { alertType, errorMessage } = useMemo(() => {
+    if (isCctp) {
+      if (debouncedAmountBN.gte(MAX_CCTP_TRANSFER_AMOUNT)) {
+        return {
+          errorMessage: stringGetter({
+            key: STRING_KEYS.MAX_CCTP_TRANSFER_LIMIT_EXCEEDED,
+            params: {
+              MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
+            },
+          }),
+        };
+      }
+      if (
+        !debouncedAmountBN.isZero() &&
+        MustBigNumber(debouncedAmountBN).lte(MIN_CCTP_TRANSFER_AMOUNT)
+      ) {
+        return {
+          errorMessage: 'Amount must be greater than 10 USDC',
+        };
+      }
+    }
     if (error) {
       return {
         errorMessage: error,
@@ -394,27 +414,6 @@ export const WithdrawForm = () => {
       return {
         errorMessage: stringGetter({ key: STRING_KEYS.WITHDRAW_MORE_THAN_FREE }),
       };
-    }
-
-    if (isCctp) {
-      if (debouncedAmountBN.gte(MAX_CCTP_TRANSFER_AMOUNT)) {
-        return {
-          errorMessage: stringGetter({
-            key: STRING_KEYS.MAX_CCTP_TRANSFER_LIMIT_EXCEEDED,
-            params: {
-              MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
-            },
-          }),
-        };
-      }
-      if (
-        !debouncedAmountBN.isZero() &&
-        MustBigNumber(debouncedAmountBN).lte(MIN_CCTP_TRANSFER_AMOUNT)
-      ) {
-        return {
-          errorMessage: 'Amount must be greater than 10 USDC',
-        };
-      }
     }
 
     if (isMainnet && MustBigNumber(summary?.aggregatePriceImpact).gte(MAX_PRICE_IMPACT)) {

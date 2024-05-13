@@ -203,7 +203,7 @@ Styled.ContentWrapper = styled.div`
 `;
 
 Styled.AdditionalConditions = styled.div`
-  ${tableMixins.cellContentColumn}
+  ${tableMixins.stackedWithSecondaryStyling}
   justify-content: end;
 
   color: var(--color-text-0);

@@ -1,7 +1,7 @@
 import { FormEvent, useMemo, useState } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import type { SubaccountPosition } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
@@ -247,29 +247,25 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Form = styled.form`
-  ${formMixins.transfersForm}
-`;
-
-Styled.ToggleGroup = styled(ToggleGroup)`
-  ${formMixins.inputToggleGroup}
-`;
-
-Styled.GradientCard = styled(GradientCard)`
-  ${layoutMixins.spacedRow}
-  height: 4rem;
-  border-radius: 0.5rem;
-  padding: 0.75rem 1rem;
-  align-items: center;
-`;
-
-Styled.Column = styled.div`
-  ${layoutMixins.column}
-  font: var(--font-small-medium);
-`;
-
-Styled.TertiarySpan = styled.span`
-  color: var(--color-text-0);
-`;
+const Styled = {
+  Form: styled.form`
+    ${formMixins.transfersForm}
+  `,
+  ToggleGroup: styled(ToggleGroup)`
+    ${formMixins.inputToggleGroup}
+  `,
+  GradientCard: styled(GradientCard)`
+    ${layoutMixins.spacedRow}
+    height: 4rem;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    align-items: center;
+  `,
+  Column: styled.div`
+    ${layoutMixins.column}
+    font: var(--font-small-medium);
+  `,
+  TertiarySpan: styled.span`
+    color: var(--color-text-0);
+  `,
+};
