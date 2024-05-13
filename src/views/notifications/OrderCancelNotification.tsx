@@ -1,7 +1,7 @@
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
-import { AbacusOrderStatus, KotlinIrEnumValues, ORDER_STATUS_STRINGS } from '@/constants/abacus';
+import { AbacusOrderStatus } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { CancelOrderStatuses, LocalCancelOrderData, ORDER_TYPE_STRINGS } from '@/constants/trade';
 
@@ -43,16 +43,15 @@ export const OrderCancelNotification = ({
   let orderStatusIcon = <Styled.LoadingSpinner />;
   let customContent = null;
 
-  if (cancelStatus === CancelOrderStatuses.Canceled) {
-    orderStatusStringKey =
-      ORDER_STATUS_STRINGS[
-        indexedOrderStatus as unknown as KotlinIrEnumValues<typeof AbacusOrderStatus>
-      ];
-    orderStatusIcon = <Styled.OrderStatusIcon status={indexedOrderStatus} />;
+  // whichever canceled confirmation happens first (node / indexer)
+  const canceledStatusValue = AbacusOrderStatus.cancelled.rawValue;
+  if (cancelStatus === CancelOrderStatuses.Canceled || indexedOrderStatus === canceledStatusValue) {
+    orderStatusStringKey = STRING_KEYS.CANCELED;
+    orderStatusIcon = <Styled.OrderStatusIcon status={canceledStatusValue} />;
   }
 
   if (localCancel.errorStringKey) {
-    orderStatusStringKey = STRING_KEYS.FAILED;
+    orderStatusStringKey = STRING_KEYS.ERROR;
     orderStatusIcon = <Styled.WarningIcon iconName={IconName.Warning} />;
     customContent = <span>{stringGetter({ key: localCancel.errorStringKey })}</span>;
   }
