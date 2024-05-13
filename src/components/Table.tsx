@@ -26,10 +26,7 @@ import {
 import { useAsyncList } from 'react-stately';
 import styled, { css, type AnyStyledComponent } from 'styled-components';
 
-import { ButtonShape } from '@/constants/buttons';
-import { STRING_KEYS } from '@/constants/localization';
-
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints, useTablePagination } from '@/hooks';
 import { MediaQueryKeys } from '@/hooks/useBreakpoints';
 
 import { breakpoints } from '@/styles';
@@ -38,7 +35,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { Icon, IconName } from './Icon';
-import { IconButton } from './IconButton';
+import { PageSize, TablePaginationRow } from './Table/TablePaginationRow';
 import { Tag } from './Tag';
 
 export { ActionsTableCell } from './Table/ActionsTableCell';
@@ -46,11 +43,6 @@ export { AssetTableCell } from './Table/AssetTableCell';
 export { MarketTableCell } from './Table/MarketTableCell';
 export { TableCell } from './Table/TableCell';
 export { TableColumnHeader } from './Table/TableColumnHeader';
-
-export type ViewMoreConfig = {
-  initialNumRowsToShow: number;
-  numRowsPerPage?: number;
-};
 
 export type CustomRowConfig = {
   key: string;
@@ -89,15 +81,12 @@ export type ElementProps<TableRowData extends object | CustomRowConfig, TableRow
   data: TableRowData[];
   getRowKey: (rowData: TableRowData, rowIndex?: number) => TableRowKey;
   getRowAttributes?: (rowData: TableRowData, rowIndex?: number) => Record<string, any>;
-  // shouldRowRender?: (prevRowData: object, currentRowData: object) => boolean;
   defaultSortDescriptor?: SortDescriptor;
   selectionMode?: 'multiple' | 'single';
   selectionBehavior?: 'replace' | 'toggle';
   onRowAction?: (key: TableRowKey, row: TableRowData) => void;
   slotEmpty?: React.ReactNode;
-  viewMoreConfig?: ViewMoreConfig;
-  // collection: TableCollection<string>;
-  // children: React.ReactNode;
+  initialPageSize?: PageSize;
 };
 
 type StyleProps = {
@@ -125,14 +114,7 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   selectionMode = 'single',
   selectionBehavior = 'toggle',
   slotEmpty,
-  viewMoreConfig = {
-    initialNumRowsToShow: 25,
-    numRowsPerPage: 10,
-  },
-  // shouldRowRender,
-
-  // collection,
-  // children,
+  initialPageSize = 10,
   hideHeader = false,
   withGradientCardRows = false,
   withFocusStickyRows = false,
@@ -144,18 +126,11 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   style,
 }: ElementProps<TableRowData, TableRowKey> & StyleProps) => {
   const [selectedKeys, setSelectedKeys] = useState(new Set<TableRowKey>());
-  const [numRowsToShow, setNumRowsToShow] = useState(viewMoreConfig?.initialNumRowsToShow);
-  const enableViewMore = viewMoreConfig !== undefined;
 
-  const onViewMoreClick = () => {
-    if (!viewMoreConfig) return;
-    const { numRowsPerPage } = viewMoreConfig;
-    if (numRowsPerPage) {
-      setNumRowsToShow((prev) => (prev ?? 0) + numRowsPerPage);
-    } else {
-      setNumRowsToShow(data.length);
-    }
-  };
+  const { currentPage, pageSize, pages, setCurrentPage, setPageSize } = useTablePagination({
+    initialPageSize: initialPageSize,
+    totalRows: data.length,
+  });
 
   const currentBreakpoints = useBreakpoints();
   const shownColumns = columns.filter(
@@ -230,11 +205,6 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
               onRowAction &&
               ((key: TableRowKey) => onRowAction(key, data.find((row) => getRowKey(row) === key)!))
             }
-            // numColumns={shownColumns.length}
-            // onViewMoreClick={
-            //   enableViewMore && numRowsToShow! < data.length ? onViewMoreClick : undefined
-            // }
-            // shouldRowRender={shouldRowRender}
             hideHeader={hideHeader}
             withGradientCardRows={withGradientCardRows}
             withFocusStickyRows={withFocusStickyRows}
@@ -242,6 +212,17 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
             withInnerBorders={withInnerBorders}
             withScrollSnapColumns={withScrollSnapColumns}
             withScrollSnapRows={withScrollSnapRows}
+            numColumns={shownColumns.length}
+            paginationRow={
+              <TablePaginationRow
+                currentPage={currentPage}
+                pageSize={pageSize}
+                pages={pages}
+                totalRows={data.length}
+                setCurrentPage={setCurrentPage}
+                setPageSize={setPageSize}
+              />
+            }
           >
             <TableHeader columns={shownColumns}>
               {(column) => (
@@ -258,7 +239,13 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
               )}
             </TableHeader>
 
-            <TableBody items={enableViewMore ? list.items.slice(0, numRowsToShow) : list.items}>
+            <TableBody
+              items={
+                list.items.length > pageSize
+                  ? list.items.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+                  : list.items
+              }
+            >
               {(item) => (
                 <Row key={getRowKey(item)}>
                   {(columnKey) => (
@@ -270,14 +257,6 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
               )}
             </TableBody>
           </TableRoot>
-          {enableViewMore && numRowsToShow! < data.length ? (
-            <ViewMoreRow
-              colSpan={shownColumns.length}
-              total={data.length}
-              numRowsPerPage={viewMoreConfig.numRowsPerPage || 10}
-              onClick={onViewMoreClick}
-            />
-          ) : undefined}
         </Styled.TableWrapper2>
       ) : (
         <Styled.Empty withOuterBorder={withOuterBorder}>{slotEmpty}</Styled.Empty>
@@ -299,8 +278,10 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
     rowIndex?: number
   ) => Record<string, string | number | Record<string, string | number>>;
   onRowAction?: (key: TableRowKey) => void;
-  // shouldRowRender?: (prevRowData: object, currentRowData: object) => boolean;
   children: CollectionChildren<TableRowData>;
+
+  numColumns: number;
+  paginationRow: React.ReactNode;
 
   hideHeader?: boolean;
   withGradientCardRows?: boolean;
@@ -310,7 +291,7 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
   withScrollSnapColumns?: boolean;
   withScrollSnapRows?: boolean;
 }) => {
-  const { selectionMode, selectionBehavior } = props;
+  const { selectionMode, selectionBehavior, paginationRow, numColumns } = props;
 
   const state = useTableState<TableRowData>({
     ...props,
@@ -349,12 +330,8 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
             state={state}
             withScrollSnapRows={props.withScrollSnapRows}
           >
-            {/* {Array.from(collection.getChildren!(headerRow.key), (column) => */}
             {[...headerRow.childNodes].map(
               (column) => (
-                // column.props.isSelectionCell ? (
-                //   <TableSelectAllCell key={column.key} column={column} state={state} />
-                // ) : (
                 <TableColumnHeader
                   key={column.key}
                   column={column}
@@ -373,7 +350,6 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
         withInnerBorders={props.withInnerBorders}
         withOuterBorder={props.withOuterBorder}
       >
-        {/* {Array.from(collection.getChildren!(collection.body.key), (row) => */}
         {[...collection.body.childNodes].map((row) =>
           (row.value as CustomRowConfig)?.slotCustomRow ? (
             (row.value as CustomRowConfig).slotCustomRow({
@@ -391,18 +367,13 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
               item={row}
               state={state}
               hasRowAction={!!props.onRowAction}
-              // shouldRowRender={props.shouldRowRender}
               {...props.getRowAttributes?.(row.value!)}
               withGradientCardRows={props.withGradientCardRows}
               withFocusStickyRows={props.withFocusStickyRows}
               withScrollSnapRows={props.withScrollSnapRows}
             >
-              {/* {Array.from(collection.getChildren!(row.key), (cell) => */}
               {[...row.childNodes].map(
                 (cell) => (
-                  // cell.props.isSelectionCell ? (
-                  //   <TableCheckboxCell key={cell.key} cell={cell} state={state} />
-                  // ) : (
                   <TableCell
                     key={cell.key}
                     cell={cell}
@@ -419,6 +390,17 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
           )
         )}
       </TableBodyRowGroup>
+      <Styled.Tfoot>
+        <Styled.Tr key="pagination">
+          <td
+            colSpan={numColumns}
+            onMouseDown={(e: MouseEvent) => e.preventDefault()}
+            onPointerDown={(e: MouseEvent) => e.preventDefault()}
+          >
+            {paginationRow}
+          </td>
+        </Styled.Tr>
+      </Styled.Tfoot>
     </Styled.Table>
   );
 };
@@ -527,51 +509,10 @@ const TableColumnHeader = <TableRowData extends object>({
   );
 };
 
-export const ViewMoreRow = ({
-  colSpan,
-  total,
-  numRowsPerPage,
-  onClick,
-}: {
-  colSpan: number;
-  total: number;
-  numRowsPerPage: number;
-  onClick: () => void;
-}) => {
-  const stringGetter = useStringGetter();
-  const numPages = Math.ceil(total / numRowsPerPage);
-  return (
-    // <Styled.ViewMoreTr key="viewmore">
-    //   <Styled.Td
-    //     colSpan={colSpan}
-    //     onMouseDown={(e: MouseEvent) => e.preventDefault()}
-    //     onPointerDown={(e: MouseEvent) => e.preventDefault()}
-    //   >
-    <Styled.ViewMoreButton onClick={onClick}>
-      <Styled.PaginationButton iconName={IconName.ChevronLeft} shape={ButtonShape.Square} />
-      {stringGetter({
-        key: STRING_KEYS.SHOWING_NUM_OUT_OF_TOTAL,
-        params: {
-          START: 1,
-          END: numRowsPerPage,
-          TOTAL: total,
-        },
-      })}
-      {stringGetter({
-        key: STRING_KEYS.SHOW,
-      })}
-      <Styled.PaginationButton iconName={IconName.ChevronRight} shape={ButtonShape.Square} />
-    </Styled.ViewMoreButton>
-    //   </Styled.Td>
-    // </Styled.ViewMoreTr>
-  );
-};
-
 export const TableRow = <TableRowData extends object>({
   item,
   children,
   state,
-  // shouldRowRender,
   hasRowAction,
   withGradientCardRows,
   withFocusStickyRows,
@@ -581,7 +522,6 @@ export const TableRow = <TableRowData extends object>({
   item: TableCollection<TableRowData>['rows'][number];
   children: React.ReactNode;
   state: TableState<TableRowData>;
-  // shouldRowRender?: (prevRowData: TableRowData, currentRowData: TableRowData) => boolean;
   hasRowAction?: boolean;
   withGradientCardRows?: boolean;
   withFocusStickyRows?: boolean;
@@ -620,11 +560,6 @@ export const TableRow = <TableRowData extends object>({
   );
 };
 
-// const TableRowMemo = React.memo(
-//   TableRow,
-//   (a, b) => !!b.shouldRowRender?.(a.item.value, b.item.value)
-// );
-
 const TableCell = <TableRowData extends object>({
   cell,
   state,
@@ -659,41 +594,6 @@ const TableCell = <TableRowData extends object>({
     </Styled.Td>
   );
 };
-
-// const TableSelectAllCell = ({ column, state }) => {
-//   const ref = React.useRef<HTMLTableHeaderCellElement>(null);
-//   const isSingleSelectionMode = state.selectionManager.selectionMode === 'single';
-//   const { columnHeaderProps } = useTableColumnHeader({ node: column }, state, ref);
-//   const { checkboxProps } = useTableSelectAllCheckbox(state);
-
-//   return (
-//     <Styled.Th
-//       {...columnHeaderProps}
-//       ref={ref}
-//     >
-//       {state.selectionManager.selectionMode === 'single' ? (
-//         <VisuallyHidden>{inputProps['aria-label']}</VisuallyHidden>
-//       ) : (
-//         <Checkbox {...checkboxProps} />
-//       )}
-//     </Styled.Th>
-//   );
-// };
-
-// const TableCheckboxCell = ({ cell, state }: { cell; state }) => {
-//   const ref = React.useRef<HTMLTableCellElement>(null);
-//   const { gridCellProps } = useTableCell({ node: cell }, state, ref);
-//   const { checkboxProps } = useTableSelectionCheckbox({ key: cell.parentKey }, state);
-
-//   return (
-//     <Styled.Td
-//       {...gridCellProps}
-//       ref={ref}
-//     >
-//       <Checkbox {...checkboxProps} />
-//     </Styled.Td>
-//   );
-// };
 
 const Styled: Record<string, AnyStyledComponent> = {};
 
@@ -763,6 +663,8 @@ Styled.Table = styled.table<{
   ${layoutMixins.stickyArea1}
   --stickyArea1-background: var(--color-layer-2);
   --stickyArea1-topHeight: var(--table-header-height);
+  --stickyArea1-bottomHeight: var(--table-header-height);
+
   ${({ hideHeader }) =>
     hideHeader &&
     css`
@@ -932,6 +834,13 @@ Styled.Thead = styled.thead<StyleProps>`
     `}
 `;
 
+Styled.Tfoot = styled.tfoot<StyleProps>`
+  ${layoutMixins.stickyFooter}
+  > * {
+    height: var(--stickyArea-bottomHeight);
+  }
+`;
+
 Styled.Tbody = styled.tbody<StyleProps>`
   ${layoutMixins.stickyArea2}
   font: var(--font-small-book);
@@ -1019,18 +928,4 @@ Styled.Tbody = styled.tbody<StyleProps>`
 Styled.Row = styled.div`
   ${layoutMixins.inlineRow}
   padding: var(--tableCell-padding);
-`;
-
-Styled.ViewMoreButton = styled.div`
-  ${layoutMixins.stickyFooter}
-
-  height: 3rem;
-
-  width: 100%;
-`;
-
-Styled.PaginationButton = styled(IconButton)``;
-
-Styled.ViewMoreTr = styled(Styled.Tr)`
-  --border-color: var(--tableViewMore-borderColor);
 `;

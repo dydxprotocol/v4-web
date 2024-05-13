@@ -137,6 +137,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
           }}
           label={stringGetter({ key: STRING_KEYS.MARKETS })}
           columns={columns}
+          initialPageSize={15}
           slotEmpty={
             <Styled.MarketNotFound>
               {filter === MarketFilters.NEW && !searchFilter ? (

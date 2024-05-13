@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { HistoricalTradingReward, HistoricalTradingRewardsPeriods } from '@/constants/abacus';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
@@ -124,44 +124,41 @@ export const TradingRewardHistoryTable = ({
       selectionBehavior="replace"
       withOuterBorder={withOuterBorder}
       withInnerBorders={withInnerBorders}
-      viewMoreConfig={{ initialNumRowsToShow: 5, numRowsPerPage: 10 }}
+      initialPageSize={5}
       withScrollSnapColumns
       withScrollSnapRows
     />
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
+const Styled = {
+  Table: styled(Table)`
+    --tableCell-padding: 0.5rem 0;
+    --tableHeader-backgroundColor: var(--color-layer-3);
+    --tableRow-backgroundColor: var(--color-layer-3);
+    --tableViewMore-borderColor: var(--color-layer-3);
 
-Styled.Table = styled(Table)`
-  --tableCell-padding: 0.5rem 0;
-  --tableHeader-backgroundColor: var(--color-layer-3);
-  --tableRow-backgroundColor: var(--color-layer-3);
-  --tableViewMore-borderColor: var(--color-layer-3);
+    tbody {
+      font: var(--font-medium-book);
+    }
+  `,
+  Rewarded: styled.span`
+    color: var(--color-text-2);
+  `,
+  TimePeriod: styled.div`
+    ${layoutMixins.inlineRow}
 
-  tbody {
-    font: var(--font-medium-book);
-  }
-`;
+    && {
+      color: var(--color-text-0);
+      font: var(--font-base-book);
+    }
 
-Styled.Rewarded = styled.span`
-  color: var(--color-text-2);
-`;
-
-Styled.TimePeriod = styled.div`
-  ${layoutMixins.inlineRow}
-
-  && {
-    color: var(--color-text-0);
-    font: var(--font-base-book);
-  }
-
-  output {
-    color: var(--color-text-1);
-    font: var(--font-base-book);
-  }
-`;
-
-Styled.AssetIcon = styled(AssetIcon)`
-  margin-left: 0.5ch;
-`;
+    output {
+      color: var(--color-text-1);
+      font: var(--font-base-book);
+    }
+  `,
+  AssetIcon: styled(AssetIcon)`
+    margin-left: 0.5ch;
+  `,
+};

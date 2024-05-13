@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import type { ColumnSize } from '@react-types/table';
 import { shallowEqual, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import {
   type Asset,
@@ -25,7 +25,7 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
-import { Table, TableColumnHeader, ViewMoreConfig, type ColumnDef } from '@/components/Table';
+import { Table, TableColumnHeader, type ColumnDef } from '@/components/Table';
 import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 
@@ -43,6 +43,7 @@ import { testFlags } from '@/lib/testFlags';
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
 import { PositionsTriggersCell } from './PositionsTable/PositionsTriggersCell';
+import { PageSize } from '@/components/Table/TablePaginationRow';
 
 export enum PositionsTableColumnKey {
   Details = 'Details',
@@ -362,7 +363,7 @@ type ElementProps = {
   currentRoute?: string;
   currentMarket?: string;
   showClosePositionAction: boolean;
-  viewMoreConfig?: ViewMoreConfig;
+  initialPageSize?: PageSize;
   onNavigate?: () => void;
   navigateToOrders: (market: string) => void;
 };
@@ -378,7 +379,7 @@ export const PositionsTable = ({
   currentRoute,
   currentMarket,
   showClosePositionAction,
-  viewMoreConfig,
+  initialPageSize,
   onNavigate,
   navigateToOrders,
   withGradientCardRows,
@@ -470,7 +471,7 @@ export const PositionsTable = ({
           <h4>{stringGetter({ key: STRING_KEYS.POSITIONS_EMPTY_STATE })}</h4>
         </>
       }
-      viewMoreConfig={viewMoreConfig}
+      initialPageSize={initialPageSize}
       withGradientCardRows={withGradientCardRows}
       withOuterBorder={withOuterBorder}
       withInnerBorders
@@ -481,73 +482,66 @@ export const PositionsTable = ({
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
+const Styled = {
+  Table: styled(Table)`
+    ${tradeViewMixins.horizontalTable}
 
-Styled.Table = styled(Table)`
-  ${tradeViewMixins.horizontalTable}
-
-  tr {
-    &:after {
-      content: '';
-    }
-  }
-
-  tbody tr {
-    overflow: hidden;
-    position: relative;
-
-    &[data-side='${PositionSide.Long}'] {
-      --side-color: var(--color-positive);
-      --table-row-gradient-to-color: var(--color-gradient-positive);
+    tr {
+      &:after {
+        content: '';
+      }
     }
 
-    &[data-side='${PositionSide.Short}'] {
-      --side-color: var(--color-negative);
-      --table-row-gradient-to-color: var(--color-gradient-negative);
+    tbody tr {
+      overflow: hidden;
+      position: relative;
+
+      &[data-side='${PositionSide.Long}'] {
+        --side-color: var(--color-positive);
+        --table-row-gradient-to-color: var(--color-gradient-positive);
+      }
+
+      &[data-side='${PositionSide.Short}'] {
+        --side-color: var(--color-negative);
+        --table-row-gradient-to-color: var(--color-gradient-negative);
+      }
     }
-  }
-`;
-
-Styled.InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
-`;
-
-Styled.AssetIcon = styled(AssetIcon)`
-  ${layoutMixins.inlineRow}
-  min-width: unset;
-  font-size: 2.25rem;
-`;
-
-Styled.SecondaryColor = styled.span`
-  color: var(--color-text-0);
-`;
-
-Styled.OutputSigned = styled(Output)<{ sign: NumberSign }>`
-  color: ${({ sign }) =>
-    ({
-      [NumberSign.Positive]: `var(--color-positive)`,
-      [NumberSign.Negative]: `var(--color-negative)`,
-      [NumberSign.Neutral]: `var(--color-text-2)`,
-    }[sign])};
-`;
-
-Styled.HighlightOutput = styled(Output)<{ isNegative?: boolean }>`
-  color: var(--color-text-1);
-  --secondary-item-color: currentColor;
-  --output-sign-color: ${({ isNegative }) =>
-    isNegative !== undefined
-      ? isNegative
-        ? `var(--color-negative)`
-        : `var(--color-positive)`
-      : `currentColor`};
-`;
-
-Styled.PositionSide = styled.span`
-  && {
-    color: var(--side-color);
-  }
-`;
-
-Styled.Icon = styled(Icon)`
-  font-size: 3em;
-`;
+  `,
+  InlineRow: styled.div`
+    ${layoutMixins.inlineRow}
+  `,
+  AssetIcon: styled(AssetIcon)`
+    ${layoutMixins.inlineRow}
+    min-width: unset;
+    font-size: 2.25rem;
+  `,
+  SecondaryColor: styled.span`
+    color: var(--color-text-0);
+  `,
+  OutputSigned: styled(Output)<{ sign: NumberSign }>`
+    color: ${({ sign }) =>
+      ({
+        [NumberSign.Positive]: `var(--color-positive)`,
+        [NumberSign.Negative]: `var(--color-negative)`,
+        [NumberSign.Neutral]: `var(--color-text-2)`,
+      }[sign])};
+  `,
+  HighlightOutput: styled(Output)<{ isNegative?: boolean }>`
+    color: var(--color-text-1);
+    --secondary-item-color: currentColor;
+    --output-sign-color: ${({ isNegative }) =>
+      isNegative !== undefined
+        ? isNegative
+          ? `var(--color-negative)`
+          : `var(--color-positive)`
+        : `currentColor`};
+  `,
+  PositionSide: styled.span`
+    && {
+      color: var(--side-color);
+    }
+  `,
+  Icon: styled(Icon)`
+    font-size: 3em;
+  `,
+};

@@ -129,34 +129,46 @@ const buttonActionVariants = {
   `,
 };
 
-const buttonStateVariants: Record<
-  ButtonState,
-  FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>
-> = {
+const getDisabledStateForButtonAction = (action?: ButtonAction) => {
+  switch (action) {
+    case ButtonAction.Navigation:
+      return css`
+        --button-textColor: var(--color-text-0);
+        --button-hover-filter: none;
+        --button-cursor: not-allowed;
+      `;
+    default:
+      return css`
+        --button-textColor: var(--color-text-0);
+        --button-backgroundColor: var(--color-layer-2);
+        --button-border: solid var(--border-width) var(--color-layer-6);
+        --button-hover-filter: none;
+        --button-cursor: not-allowed;
+      `;
+  }
+};
+
+const buttonStateVariants = (
+  action?: ButtonAction
+): Record<ButtonState, FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>> => ({
   [ButtonState.Default]: css``,
 
-  [ButtonState.Disabled]: css`
-    --button-textColor: var(--color-text-0);
-    --button-backgroundColor: var(--color-layer-2);
-    --button-border: solid var(--border-width) var(--color-layer-6);
-    --button-hover-filter: none;
-    --button-cursor: not-allowed;
-  `,
+  [ButtonState.Disabled]: getDisabledStateForButtonAction(action),
 
   [ButtonState.Loading]: css`
-    ${() => buttonStateVariants[ButtonState.Disabled]}
+    ${() => buttonStateVariants(action)[ButtonState.Disabled]}
     min-width: 4em;
   `,
-};
+});
 
 const StyledBaseButton = styled(BaseButton)<StyleProps>`
   ${({ action }) => action && buttonActionVariants[action]}
 
-  ${({ state }) =>
+  ${({ action, state }) =>
     state &&
     css`
       // Ordered from lowest to highest priority (ie. Disabled should overwrite Active and Loading states)
-      ${state[ButtonState.Loading] && buttonStateVariants[ButtonState.Loading]}
-      ${state[ButtonState.Disabled] && buttonStateVariants[ButtonState.Disabled]}
+      ${state[ButtonState.Loading] && buttonStateVariants(action)[ButtonState.Loading]}
+      ${state[ButtonState.Disabled] && buttonStateVariants(action)[ButtonState.Disabled]}
     `}
 `;
