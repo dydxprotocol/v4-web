@@ -76,6 +76,7 @@ export enum AnalyticsEvent {
   TransferFaucet = 'TransferFaucet',
   TransferFaucetConfirmed = 'TransferFaucetConfirmed',
   TransferDeposit = 'TransferDeposit',
+  TransferNotification = 'TransferNotification',
   TransferWithdraw = 'TransferWithdraw',
   TransferStep = 'TransferStep',
 
@@ -90,7 +91,7 @@ export enum AnalyticsEvent {
   NotificationAction = 'NotificationAction',
 
   // SquidStatus
-  TransferNotification = 'TransferNotification',
+  SquidRouteError = 'SquidRouteError',
 }
 
 export type AnalyticsEventData<T extends AnalyticsEvent> =
@@ -219,6 +220,11 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
     ? {
         step: string;
         type: string;
+      }
+    : T extends AnalyticsEvent.SquidRouteError
+    ? {
+        type: DialogTypes;
+        errorMessage: string | undefined;
       }
     : never;
 

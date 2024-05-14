@@ -10,6 +10,7 @@ import { TransferInputField, TransferInputTokenResource, TransferType } from '@/
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvent } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { TransferNotificationTypes } from '@/constants/notifications';
@@ -112,6 +113,10 @@ export const WithdrawForm = () => {
   useEffect(() => {
     if (routeErrors) {
       log('WithdrawForm/routeErrors', new Error(routeErrors));
+      track(AnalyticsEvent.SquidRouteError, {
+        type: DialogTypes.Withdraw,
+        errorMessage,
+      });
     }
   }, [routeErrors]);
 

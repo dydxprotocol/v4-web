@@ -11,6 +11,7 @@ import { TransferInputField, TransferInputTokenResource, TransferType } from '@/
 import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvent, AnalyticsEventData } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { MAX_CCTP_TRANSFER_AMOUNT, MAX_PRICE_IMPACT, NumberSign } from '@/constants/numbers';
@@ -39,6 +40,7 @@ import { getSelectedDydxChainId } from '@/state/appSelectors';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { track } from '@/lib/analytics';
 import { MustBigNumber } from '@/lib/numbers';
 import { getNobleChainId, NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
@@ -108,6 +110,10 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   useEffect(() => {
     if (routeErrors) {
       log('DepositForm/routeErrors', new Error(routeErrors));
+      track(AnalyticsEvent.SquidRouteError, {
+        type: DialogTypes.Deposit,
+        errorMessage,
+      });
     }
   }, [routeErrors]);
 
