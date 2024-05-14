@@ -72,7 +72,7 @@ export const useTablePagination = ({
         pageNumberToMenuItem(lastPage),
       ]);
     }
-  }, [pageSize, currentPage]);
+  }, [pageSize, currentPage, totalRows]);
 
   return { currentPage, pageSize, pages, setPageSize, setCurrentPage };
 };

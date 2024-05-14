@@ -26,6 +26,7 @@ import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
 
 type ElementProps = {
   currentMarket?: string;
+  initialPageSize: PageSize;
 };
 
 type StyleProps = {
@@ -40,6 +41,7 @@ export type FundingPaymentTableRow = {
 
 export const FundingPaymentsTable = ({
   currentMarket,
+  initialPageSize,
   withOuterBorder,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
@@ -144,6 +146,7 @@ export const FundingPaymentsTable = ({
           <h4>{stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_EMPTY_STATE })}</h4>
         </>
       }
+      initialPageSize={initialPageSize}
       withOuterBorder={withOuterBorder}
       withInnerBorders
       withScrollSnapColumns

@@ -124,7 +124,7 @@ export const TradingRewardHistoryTable = ({
       selectionBehavior="replace"
       withOuterBorder={withOuterBorder}
       withInnerBorders={withInnerBorders}
-      initialPageSize={5}
+      initialPageSize={15}
       withScrollSnapColumns
       withScrollSnapRows
     />
