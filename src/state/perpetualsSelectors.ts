@@ -20,7 +20,7 @@ export const getCurrentMarketId = (state: RootState) => state.perpetuals.current
  * @returns assetId of the currentMarket
  */
 export const getCurrentMarketAssetId = (state: RootState) => {
-  const currentMarketId = getCurrentMarketId(state) || '';
+  const currentMarketId = getCurrentMarketId(state) ?? '';
   return state.perpetuals?.markets?.[currentMarketId]?.assetId;
 };
 
@@ -86,7 +86,7 @@ export const getOrderbooks = (state: RootState) => state.perpetuals.orderbooks;
 export const getCurrentMarketOrderbook = (state: RootState) => {
   const orderbookData = getOrderbooks(state);
   const currentMarketId = getCurrentMarketId(state);
-  return orderbookData?.[currentMarketId || ''];
+  return orderbookData?.[currentMarketId ?? ''];
 };
 
 /**
@@ -95,7 +95,7 @@ export const getCurrentMarketOrderbook = (state: RootState) => {
 export const getCurrentMarketOrderbookMap = (state: RootState) => {
   const orderbookMap = state.perpetuals.orderbooksMap;
   const currentMarketId = getCurrentMarketId(state);
-  return orderbookMap?.[currentMarketId || ''];
+  return orderbookMap?.[currentMarketId ?? ''];
 };
 
 /**

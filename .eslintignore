@@ -8,7 +8,6 @@ commitlint.config.ts
 /src/forms
 /src/hooks
 /src/lib
-/src/main.tsx
 /src/menus
 /src/pages
 /src/views
