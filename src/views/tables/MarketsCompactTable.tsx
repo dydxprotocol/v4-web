@@ -182,6 +182,7 @@ export const MarketsCompactTable = ({
           )}
         </Styled.MarketNotFound>
       }
+      initialPageSize={5}
     />
   );
 };
