@@ -10,7 +10,7 @@ import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { ComboboxMenu, ComboboxMenuProps } from '@/components/ComboboxMenu';
+import { ComboboxMenu } from '@/components/ComboboxMenu';
 import { type DetailsItem } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 import { Popover, TriggerType } from '@/components/Popover';
@@ -152,7 +152,8 @@ const $ComboboxMenu = styled(ComboboxMenu)<ComboboxMenuStyleProps>`
   max-height: 30vh;
   overflow: auto;
 ` as <MenuItemValue extends string | number, MenuGroupValue extends string | number>(
-  props: ComboboxMenuProps<MenuItemValue, MenuGroupValue> & ComboboxMenuStyleProps
+  props: React.ComponentProps<typeof ComboboxMenu<MenuItemValue, MenuGroupValue>> &
+    ComboboxMenuStyleProps
 ) => JSX.Element;
 
 const $TriggerIcon = styled(Icon)<{ open?: boolean }>`

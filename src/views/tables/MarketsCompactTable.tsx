@@ -1,7 +1,7 @@
-import { PropsWithChildren, useMemo } from 'react';
+import { Key, PropsWithChildren, useMemo } from 'react';
 
 import { useNavigate } from 'react-router-dom';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, MarketSorting, type MarketData } from '@/constants/markets';
@@ -166,9 +166,9 @@ export const MarketsCompactTable = ({
     <$Table
       withInnerBorders
       data={sortedMarkets.slice(0, 5)}
-      getRowKey={(row: MarketData) => row.market}
+      getRowKey={(row) => row.market ?? ''}
       label="Markets"
-      onRowAction={(market: string) =>
+      onRowAction={(market: Key) =>
         navigate(`${AppRoute.Trade}/${market}`, { state: { from: AppRoute.Markets } })
       }
       columns={columns}
@@ -243,7 +243,7 @@ const $Table = styled(Table)`
       --tableCell-padding: 0.5rem 1rem 0.5rem 0.625rem;
     }
   }
-` as AnyStyledComponent; // TODO: Remove cast when Table component is refactored
+` as typeof Table;
 
 const $TabletOutput = styled(Output)`
   font: var(--font-small-medium);

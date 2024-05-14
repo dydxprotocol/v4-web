@@ -13,7 +13,7 @@ import { breakpoints } from '@/styles';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
-import { AllTableProps, BaseTableRowData, CustomRowConfig } from '@/components/Table';
+import { BaseTableRowData, CustomRowConfig, Table } from '@/components/Table';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketLiveTrades } from '@/state/perpetualsSelectors';
@@ -230,5 +230,7 @@ const $LiveTradesTable = styled(OrderbookTradesTable)<StyleProps>`
     font-size: 0.875em;
   }
 ` as <TableRowData extends BaseTableRowData | CustomRowConfig>(
-  props: AllTableProps<TableRowData> & StyleProps
+  props: React.ComponentProps<typeof Table<TableRowData>> & {
+    histogramSide?: 'left' | 'right';
+  } & StyleProps
 ) => React.ReactNode;

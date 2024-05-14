@@ -17,9 +17,9 @@ import { Details } from '@/components/Details';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 import {
-  AllTableProps,
   BaseTableRowData,
   ColumnDef,
+  Table,
   TableRow,
   type CustomRowConfig,
 } from '@/components/Table';
@@ -560,7 +560,9 @@ const $OrderbookTable = styled(OrderbookTradesTable)<StyleProps>`
     --tableCell-padding: 0.25rem 1rem;
   }
 ` as <TableRowData extends BaseTableRowData | CustomRowConfig>(
-  props: AllTableProps<TableRowData> & StyleProps
+  props: React.ComponentProps<typeof Table<TableRowData>> & {
+    histogramSide?: 'left' | 'right';
+  } & StyleProps
 ) => React.ReactNode;
 
 const $SpreadTableRow = styled(TableRow)`
