@@ -220,7 +220,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         this.store?.dispatch(placeOrderTimeout(clientId));
       }, UNCOMMITTED_ORDER_TIMEOUT_MS);
 
-      const subaccountClient = new SubaccountClient(this.localWallet, 128);
+      const subaccountClient = new SubaccountClient(this.localWallet, subaccountNumber);
       console.log('params', params, subaccountClient, subaccountNumber === 128);
 
       // Place order

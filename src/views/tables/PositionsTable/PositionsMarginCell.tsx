@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+
 import { useDispatch } from 'react-redux';
 import styled, { AnyStyledComponent } from 'styled-components';
 
@@ -15,50 +17,51 @@ import { TableCell } from '@/components/Table/TableCell';
 
 import { openDialog } from '@/state/dialogs';
 
-import { calculatePositionMargin } from '@/lib/tradeData';
+import { getPositionMargin } from '@/lib/tradeData';
 
-type PositionsMarginCellProps = {
-  id: SubaccountPosition['id'];
-  notionalTotal: SubaccountPosition['notionalTotal'];
-  adjustedMmf: SubaccountPosition['adjustedMmf'];
-};
+type PositionsMarginCellProps = { position: SubaccountPosition };
 
-export const PositionsMarginCell = ({
-  id,
-  adjustedMmf,
-  notionalTotal,
-}: PositionsMarginCellProps) => {
+export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
-  const margin = calculatePositionMargin({
-    notionalTotal: notionalTotal?.current,
-    adjustedMmf: adjustedMmf?.current,
-  });
-  const perpetualMarketType = 'CROSS'; // Todo: Replace with perpetualMarketType when available
 
-  const marginModeLabel =
-    perpetualMarketType === 'CROSS'
-      ? stringGetter({ key: STRING_KEYS.CROSS })
-      : stringGetter({ key: STRING_KEYS.ISOLATED });
+  const { marginMode, marginModeLabel, margin } = useMemo(() => {
+    const { childSubaccountNumber } = position;
+    const marginMode = childSubaccountNumber && childSubaccountNumber >= 128 ? 'ISOLATED' : 'CROSS';
+
+    const marginModeLabel =
+      marginMode === 'CROSS'
+        ? stringGetter({ key: STRING_KEYS.CROSS })
+        : stringGetter({ key: STRING_KEYS.ISOLATED });
+
+    const margin = getPositionMargin({ position });
+
+    return {
+      marginMode,
+      marginModeLabel,
+      margin,
+    };
+  }, [position]);
 
   return (
     <TableCell
       stacked
       slotRight={
-        // perpetualMarketType === 'CROSS' &&
-        <Styled.EditButton
-          key="edit-margin"
-          iconName={IconName.Pencil}
-          shape={ButtonShape.Square}
-          onClick={() =>
-            dispatch(
-              openDialog({
-                type: DialogTypes.AdjustIsolatedMargin,
-                dialogProps: { positionId: id },
-              })
-            )
-          }
-        />
+        marginMode === 'ISOLATED' && (
+          <Styled.EditButton
+            key="edit-margin"
+            iconName={IconName.Pencil}
+            shape={ButtonShape.Square}
+            onClick={() =>
+              dispatch(
+                openDialog({
+                  type: DialogTypes.AdjustIsolatedMargin,
+                  dialogProps: { positionId: position.id },
+                })
+              )
+            }
+          />
+        )
       }
     >
       <Output type={OutputType.Fiat} value={margin} showSign={ShowSign.None} />

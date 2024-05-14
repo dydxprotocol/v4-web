@@ -39,6 +39,7 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
+import { getPositionMargin } from '@/lib/tradeData';
 
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
@@ -196,13 +197,11 @@ const getPositionsTableColumnDef = ({
       },
       [PositionsTableColumnKey.Margin]: {
         columnKey: 'margin',
-        getCellValue: (row) => row.leverage?.current,
+        getCellValue: (row) => getPositionMargin({ position: row }),
         label: stringGetter({ key: STRING_KEYS.MARGIN }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         isActionable: true,
-        renderCell: ({ id, adjustedMmf, notionalTotal }) => (
-          <PositionsMarginCell id={id} notionalTotal={notionalTotal} adjustedMmf={adjustedMmf} />
-        ),
+        renderCell: (row) => <PositionsMarginCell position={row} />,
       },
       [PositionsTableColumnKey.NetFunding]: {
         columnKey: 'netFunding',

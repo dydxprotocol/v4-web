@@ -27,7 +27,7 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { getOpenPositionFromId, getSubaccount } from '@/state/accountSelectors';
 import { getMarketConfig } from '@/state/perpetualsSelectors';
 
-import { calculatePositionMargin } from '@/lib/tradeData';
+import { calculateCrossPositionMargin } from '@/lib/tradeData';
 
 type ElementProps = {
   marketId: SubaccountPosition['id'];
@@ -62,11 +62,11 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
   const onSubmit = () => {};
 
   const positionMargin = {
-    current: calculatePositionMargin({
+    current: calculateCrossPositionMargin({
       adjustedMmf: adjustedMmf?.current,
       notionalTotal: notionalTotal?.current,
     }).toFixed(tickSizeDecimals ?? USD_DECIMALS),
-    postOrder: calculatePositionMargin({
+    postOrder: calculateCrossPositionMargin({
       adjustedMmf: adjustedMmf?.postOrder,
       notionalTotal: notionalTotal?.postOrder,
     }).toFixed(tickSizeDecimals ?? USD_DECIMALS),

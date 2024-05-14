@@ -8,6 +8,7 @@ import {
   ValidationError,
   type AbacusOrderSides,
   type Nullable,
+  type SubaccountPosition,
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import type { StringGetterFunction } from '@/constants/localization';
@@ -133,7 +134,7 @@ export const getTradeInputAlert = ({
   return inputAlerts?.[0];
 };
 
-export const calculatePositionMargin = ({
+export const calculateCrossPositionMargin = ({
   notionalTotal,
   adjustedMmf,
 }: {
@@ -143,4 +144,18 @@ export const calculatePositionMargin = ({
   const notionalTotalBN = MustBigNumber(notionalTotal);
   const adjustedMmfBN = MustBigNumber(adjustedMmf);
   return notionalTotalBN.times(adjustedMmfBN);
+};
+
+export const getPositionMargin = ({ position }: { position: SubaccountPosition }) => {
+  const { childSubaccountNumber, notionalTotal, quoteBalance } = position;
+  const marginMode = childSubaccountNumber && childSubaccountNumber > 127 ? 'ISOLATED' : 'CROSS';
+  const margin =
+    marginMode === 'CROSS'
+      ? calculateCrossPositionMargin({
+          notionalTotal: notionalTotal?.current,
+          adjustedMmf: quoteBalance?.current,
+        })
+      : quoteBalance?.current;
+
+  return margin;
 };
