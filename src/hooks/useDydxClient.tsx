@@ -23,6 +23,7 @@ import { LocalStorageKey } from '@/constants/localStorage';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
 
+import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
 
 import { useEndpointsConfig } from './useEndpointsConfig';
@@ -122,10 +123,17 @@ const useDydxClientContext = () => {
     defaultValue: SelectedGasDenom.USDC,
   });
 
+  useEffect(() => {
+    if (compositeClient) {
+      setSelectedGasDenom(gasDenom);
+    }
+  }, [compositeClient]);
+
   const setSelectedGasDenom = useCallback(
     (selectedGasDenom: SelectedGasDenom) => {
       if (compositeClient) {
         compositeClient.validatorClient.setSelectedGasDenom(selectedGasDenom);
+        abacusStateManager.setSelectedGasDenom(selectedGasDenom);
         setGasDenom(selectedGasDenom);
       }
     },

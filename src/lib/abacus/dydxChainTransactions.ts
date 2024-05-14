@@ -12,6 +12,7 @@ import {
   OrderSide,
   OrderTimeInForce,
   OrderType,
+  SelectedGasDenom,
   SubaccountClient,
   ValidatorConfig,
   encodeJson,
@@ -155,6 +156,10 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     }
   }
 
+  setSelectedGasDenom(denom: SelectedGasDenom) {
+    this.compositeClient?.setSelectedGasDenom(denom);
+  }
+
   parseToPrimitives<T>(x: T): T {
     if (typeof x === 'number' || typeof x === 'string' || typeof x === 'boolean' || x === null) {
       return x;
@@ -215,9 +220,12 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         this.store?.dispatch(placeOrderTimeout(clientId));
       }, UNCOMMITTED_ORDER_TIMEOUT_MS);
 
+      const subaccountClient = new SubaccountClient(this.localWallet, 128);
+      console.log('params', params, subaccountClient, subaccountNumber === 128);
+
       // Place order
       const tx = await this.compositeClient?.placeOrder(
-        new SubaccountClient(this.localWallet, subaccountNumber),
+        subaccountClient,
         marketId,
         type as OrderType,
         side as OrderSide,
@@ -234,6 +242,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         undefined,
         goodTilBlock ?? undefined
       );
+
+      console.log('tx', tx, params);
 
       // Handle stateful orders
       if ((tx as IndexedTx)?.code !== 0) {
@@ -537,6 +547,38 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     }
   }
 
+  async subaccountTransfer(params: {
+    subaccountNumber: number;
+    amount: string;
+    destinationAddress: string;
+    destinationSubaccountNumber: number;
+  }): Promise<string> {
+    if (!this.compositeClient || !this.localWallet) {
+      throw new Error('Missing compositeClient or localWallet');
+    }
+
+    try {
+      console.log(this.compositeClient.selectedGasDenom);
+
+      const tx = await this.compositeClient.transferToSubaccount(
+        new SubaccountClient(this.localWallet, params.subaccountNumber),
+        params.destinationAddress,
+        params.destinationSubaccountNumber,
+        parseFloat(params.amount).toFixed(6)
+      );
+
+      const parsedTx = this.parseToPrimitives(tx);
+
+      return JSON.stringify(parsedTx);
+    } catch (error) {
+      log('DydxChainTransactions/subaccountTransfer', error);
+
+      return JSON.stringify({
+        error,
+      });
+    }
+  }
+
   async transaction(
     type: TransactionTypes,
     paramsInJson: Abacus.Nullable<string>,
@@ -548,6 +590,12 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       switch (type) {
         case TransactionType.PlaceOrder: {
           const result = await this.placeOrderTransaction(params);
+          callback(result);
+          break;
+        }
+        case TransactionType.SubaccountTransfer: {
+          console.log({ subaccountTransferParams: params });
+          const result = await this.subaccountTransfer(params);
           callback(result);
           break;
         }
