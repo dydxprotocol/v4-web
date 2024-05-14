@@ -11,3 +11,5 @@ export enum ComplianceStates {
   READ_ONLY = 'READ_ONLY',
   CLOSE_ONLY = 'CLOSE_ONLY',
 }
+
+export const CLOSE_ONLY_GRACE_PERIOD = 7;

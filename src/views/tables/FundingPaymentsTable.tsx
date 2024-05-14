@@ -27,7 +27,7 @@ import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
 
 type ElementProps = {
   currentMarket?: string;
-  initialPageSize: PageSize;
+  initialPageSize?: PageSize;
 };
 
 type StyleProps = {

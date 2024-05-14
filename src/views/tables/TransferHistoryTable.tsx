@@ -117,7 +117,7 @@ const getTransferHistoryTableColumnDef = ({
 type ElementProps = {
   columnKeys?: TransferHistoryTableColumnKey[];
   columnWidths?: Partial<Record<TransferHistoryTableColumnKey, ColumnSize>>;
-  initialPageSize: PageSize;
+  initialPageSize?: PageSize;
 };
 
 type StyleProps = {
