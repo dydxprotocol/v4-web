@@ -12,6 +12,7 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 import { Output, OutputType } from '@/components/Output';
 import { Table, TableCell, type ColumnDef } from '@/components/Table';
 import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import { PageSize } from '@/components/Table/TablePaginationRow';
 
 import {
   getCurrentMarketFundingPayments,

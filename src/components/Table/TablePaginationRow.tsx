@@ -46,14 +46,14 @@ export const TablePaginationRow = ({
     };
 
     return (
-      <Styled.InlineRow>
+      <$InlineRow>
         <IconButton
           {...buttonProps}
           iconName={IconName.ChevronLeft}
           onClick={() => setCurrentPage(currentPage - 1)}
           state={{ isDisabled: currentPage === 0 }}
         />
-        <Styled.ToggleGroup
+        <$ToggleGroup
           {...buttonProps}
           value={pageNumberToDisplay(currentPage)}
           items={pages}
@@ -67,12 +67,12 @@ export const TablePaginationRow = ({
             isDisabled: pageNumberToDisplay(currentPage) === pages[pages.length - 1]?.value,
           }}
         />
-      </Styled.InlineRow>
+      </$InlineRow>
     );
   };
 
   const pageSizeSelector = () => (
-    <Styled.InlineRow>
+    <$InlineRow>
       {stringGetter({
         key: STRING_KEYS.SHOW,
         params: {
@@ -88,11 +88,11 @@ export const TablePaginationRow = ({
           ),
         },
       })}
-    </Styled.InlineRow>
+    </$InlineRow>
   );
 
   return (
-    <Styled.PaginationRow>
+    <$PaginationRow>
       {stringGetter({
         key: STRING_KEYS.SHOWING_NUM_OUT_OF_TOTAL,
         params: {
@@ -103,24 +103,22 @@ export const TablePaginationRow = ({
       })}
       {pageToggles()}
       {pageSizeSelector()}
-    </Styled.PaginationRow>
+    </$PaginationRow>
   );
 };
 
-const Styled = {
-  InlineRow: styled.div`
-    ${layoutMixins.inlineRow}
-  `,
-  PaginationRow: styled.div`
-    ${layoutMixins.spacedRow}
-    padding: 0.33rem 0.25rem 0.33rem 1rem;
-    font: var(--font-mini-medium);
-    color: var(--tableHeader-textColor);
-  `,
-  ToggleGroup: styled(ToggleGroup)`
-    [data-disabled] {
-      border: none;
-      background-color: transparent;
-    }
-  `,
-};
+const $InlineRow = styled.div`
+  ${layoutMixins.inlineRow}
+`;
+
+const $PaginationRow = styled.div`
+  ${layoutMixins.spacedRow}
+  padding: var(--tableCell-padding)
+`;
+
+const $ToggleGroup = styled(ToggleGroup)`
+  [data-disabled] {
+    border: none;
+    background-color: transparent;
+  }
+`;

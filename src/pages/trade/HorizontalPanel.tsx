@@ -306,7 +306,7 @@ const Styled = {
     font-size: 1.5em;
   `,
   CollapsibleTabs: styled(CollapsibleTabs)`
-    --tableHeader-backgroundColor: var(--color-layer-3);
+    --tableStickyRow-backgroundColor: var(--color-layer-3);
 
     header {
       background-color: var(--color-layer-2);

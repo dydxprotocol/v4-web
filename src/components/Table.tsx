@@ -601,8 +601,8 @@ Styled.TableWrapper = styled.div<{
   withOuterBorder: boolean;
 }>`
   // Params
-  --tableHeader-textColor: var(--color-text-0, inherit);
-  --tableHeader-backgroundColor: inherit;
+  --tableStickyRow-textColor: var(--color-text-0, inherit);
+  --tableStickyRow-backgroundColor: inherit;
   --table-header-height: 2rem;
 
   --tableRow-hover-backgroundColor: var(--color-layer-3);
@@ -815,8 +815,8 @@ Styled.Thead = styled.thead<StyleProps>`
     height: var(--stickyArea-topHeight);
   }
 
-  color: var(--tableHeader-textColor);
-  background-color: var(--tableHeader-backgroundColor);
+  color: var(--tableStickyRow-textColor);
+  background-color: var(--tableStickyRow-backgroundColor);
 
   ${({ withInnerBorders, withGradientCardRows }) =>
     withInnerBorders &&
@@ -828,9 +828,15 @@ Styled.Thead = styled.thead<StyleProps>`
 
 Styled.Tfoot = styled.tfoot<StyleProps>`
   ${layoutMixins.stickyFooter}
+  scroll-snap-align: none;
+  font: var(--font-mini-book);
+
   > * {
     height: var(--stickyArea-bottomHeight);
   }
+
+  color: var(--tableStickyRow-textColor);
+  background-color: var(--tableStickyRow-backgroundColor);
 `;
 
 Styled.Tbody = styled.tbody<StyleProps>`

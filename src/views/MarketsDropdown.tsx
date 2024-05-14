@@ -354,6 +354,8 @@ Styled.ScrollArea = styled.div`
 `;
 
 Styled.Table = styled(Table)`
+  --tableCell-padding: 0.5rem 1rem;
+
   thead {
     --stickyArea-totalInsetTop: 0px;
     --stickyArea-totalInsetBottom: 0px;

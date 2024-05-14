@@ -135,7 +135,7 @@ const Styled: Record<string, AnyStyledComponent> = {};
 
 Styled.Table = styled(Table)`
   --tableCell-padding: 0.5rem 0;
-  --tableHeader-backgroundColor: var(--color-layer-3);
+  --tableStickyRow-backgroundColor: var(--color-layer-3);
   --tableRow-backgroundColor: var(--color-layer-3);
   --tableViewMore-borderColor: var(--color-layer-3);
 

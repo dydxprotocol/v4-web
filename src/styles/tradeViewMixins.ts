@@ -11,7 +11,7 @@ export const tradeViewMixins: Record<
 > = {
   horizontalTable: css`
     --tableCell-padding: 0.5rem 0.25rem;
-    --tableHeader-backgroundColor: var(--color-layer-2);
+    --tableStickyRow-backgroundColor: var(--color-layer-2);
     --tableRow-backgroundColor: var(--color-layer-2);
     font: var(--font-mini-book);
 
@@ -23,6 +23,13 @@ export const tradeViewMixins: Record<
       td:last-of-type,
       th:last-of-type {
         --tableCell-padding: 0.5rem 1rem 0.5rem 0.25rem;
+      }
+    }
+
+    tr:last-of-type {
+      td {
+        // Padding for the last row, which is the pagination row (a single cell)
+        --tableCell-padding: 0.5rem 1rem 0.5rem 1rem;
       }
     }
 

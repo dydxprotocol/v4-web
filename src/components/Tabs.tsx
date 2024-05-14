@@ -317,7 +317,7 @@ Styled.DropdownSelectMenu = styled(DropdownSelectMenu)<{ $isActive?: boolean }>`
 export const MobileTabs = styled(Tabs)`
   --trigger-backgroundColor: transparent;
   --trigger-active-backgroundColor: transparent;
-  --tableHeader-backgroundColor: var(--color-layer-2);
+  --tableStickyRow-backgroundColor: var(--color-layer-2);
   --trigger-font: var(--font-extra-book);
 
   padding-bottom: 1rem;

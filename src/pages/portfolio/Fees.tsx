@@ -306,7 +306,7 @@ Styled.FeeTable = styled(Table)`
   }
 
   @media ${breakpoints.notTablet} {
-    --tableHeader-backgroundColor: var(--color-layer-1);
+    --tableStickyRow-backgroundColor: var(--color-layer-1);
   }
 `;
 
