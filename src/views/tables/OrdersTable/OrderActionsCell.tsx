@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 
-import { useDispatch } from 'react-redux';
+import { OrderFlags } from '@dydxprotocol/v4-client-js';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { AbacusOrderStatus, type OrderStatus } from '@/constants/abacus';
@@ -13,6 +14,7 @@ import { IconButton } from '@/components/IconButton';
 import { ActionsTableCell } from '@/components/Table';
 
 import { clearOrder } from '@/state/account';
+import { getOrderById } from '@/state/accountSelectors';
 
 import { isOrderStatusClearable } from '@/lib/orders';
 
@@ -24,6 +26,8 @@ type ElementProps = {
 
 export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) => {
   const dispatch = useDispatch();
+  const order = useSelector(getOrderById(orderId), shallowEqual);
+
   const [isCanceling, setIsCanceling] = useState(false);
 
   const { cancelOrder } = useSubaccount();
@@ -32,6 +36,13 @@ export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) 
     setIsCanceling(true);
     cancelOrder({ orderId, onError: () => setIsCanceling(false) });
   }, []);
+
+  // CT831: if order is stateful and is initially best effort canceled, it's a stuck order that
+  // traders should be able to submit another cancel
+  const isShortTermOrder = order?.orderFlags === OrderFlags.SHORT_TERM;
+  const isBestEffortCanceled = status === AbacusOrderStatus.canceling;
+  const isCancelDisabled =
+    isCanceling || !!isDisabled || !order || (isShortTermOrder && isBestEffortCanceled);
 
   return (
     <ActionsTableCell>
@@ -44,8 +55,8 @@ export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) 
           : {
               onClick: onCancel,
               state: {
-                isLoading: isCanceling || status === AbacusOrderStatus.canceling,
-                isDisabled: isCanceling || !!isDisabled || status === AbacusOrderStatus.canceling,
+                isLoading: isCanceling,
+                isDisabled: isCancelDisabled,
               },
             })}
       />
