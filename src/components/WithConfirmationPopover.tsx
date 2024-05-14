@@ -2,13 +2,12 @@ import {
   forwardRef,
   type FormEvent,
   type FormEventHandler,
-  type MouseEventHandler,
   type ReactElement,
   type Ref,
 } from 'react';
 
 import { Anchor, Content, Portal, Root, Trigger } from '@radix-ui/react-popover';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonType } from '@/constants/buttons';
 
@@ -20,7 +19,7 @@ import { IconButton } from '@/components/IconButton';
 type ElementProps = {
   children?: ReactElement;
   asChild?: boolean;
-  onCancel?: MouseEventHandler<HTMLAnchorElement> | MouseEventHandler<HTMLButtonElement>;
+  onCancel?: () => void;
   onConfirm?: FormEventHandler;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -63,7 +62,7 @@ export const WithConfirmationPopover = forwardRef(
           className={className}
           sideOffset={sideOffset}
           align={align}
-          onOpenAutoFocus={(e: FocusEvent) => e.preventDefault()}
+          onOpenAutoFocus={(e: Event) => e.preventDefault()}
         >
           <$Form
             onSubmit={(e: FormEvent) => {

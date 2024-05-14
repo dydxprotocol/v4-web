@@ -1,5 +1,5 @@
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import type { Nullable, TradeState } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
@@ -314,10 +314,6 @@ const $ConnectedAccountInfoContainer = styled.div<{ $showHeader?: boolean }>`
 
   @media ${breakpoints.notTablet} {
     ${layoutMixins.withOuterAndInnerBorders}
-  }
-
-  @media ${breakpoints.tablet} {
-    ${layoutMixins.withInnerBorder}
   }
 
   ${({ $showHeader }) =>

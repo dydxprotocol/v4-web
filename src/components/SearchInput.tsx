@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -22,7 +22,7 @@ export const SearchInput = ({ placeholder, onTextChange }: SearchInputProps) => 
     <$Search>
       <$Icon iconName={IconName.Search} />
       <$Input
-        autoFocus
+        autoFocus={true}
         ref={inputRef}
         value={value}
         type={InputType.Search}

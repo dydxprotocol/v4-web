@@ -1,5 +1,5 @@
 import type { Story } from '@ladle/react';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -156,7 +156,7 @@ export const ScrollAreasStory: Story<{}> = (args) => (
     </$ScrollArea>
   </StoryWrapper>
 );
-const $ScrollArea = styled.section<{ width: string; height: string }>`
+const $ScrollArea = styled.section<{ width?: string; height: string }>`
   ${layoutMixins.container}
   ${layoutMixins.scrollArea}
 

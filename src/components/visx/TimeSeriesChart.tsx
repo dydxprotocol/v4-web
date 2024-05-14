@@ -207,7 +207,7 @@ export const TimeSeriesChart = <Datum extends {}>({
   }, [visibleData]);
 
   // Events
-  const onWheel = ({ deltaX, deltaY }: WheelEvent) => {
+  const onWheel = ({ deltaX, deltaY }: React.WheelEvent) => {
     if (!zoomDomain) return;
 
     setZoomDomain(

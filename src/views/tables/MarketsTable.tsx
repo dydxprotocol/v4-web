@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { Key, useMemo, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -214,7 +214,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
         data={filteredMarkets}
         getRowKey={(row: MarketData) => row.market ?? ''}
         label="Markets"
-        onRowAction={(market: string) =>
+        onRowAction={(market: Key) =>
           navigate(`${AppRoute.Trade}/${market}`, { state: { from: AppRoute.Markets } })
         }
         defaultSortDescriptor={{

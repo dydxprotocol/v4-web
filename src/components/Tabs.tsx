@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 
 import { Content, List, Root, Trigger } from '@radix-ui/react-tabs';
-import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 import { type MenuItem } from '@/constants/menus';
 
@@ -32,7 +32,7 @@ type ElementProps<TabItemsValue> = {
   slotToolbar?: ReactNode;
   sharedContent?: ReactNode;
   onValueChange?: (value: TabItemsValue) => void;
-  onWheel?: (event: WheelEvent) => void;
+  onWheel?: (event: React.WheelEvent) => void;
 };
 
 type StyleProps = {
@@ -81,7 +81,7 @@ export const Tabs = <TabItemsValue extends string>({
               onValueChange={onValueChange}
               align="end"
               $isActive={item.subitems.some((subitem) => subitem.value === value)}
-              slotTrigger={<$DropdownTabTrigger />}
+              slotTrigger={<$DropdownTabTrigger value={value ?? ''} />}
             >
               {item.label}
             </$DropdownSelectMenu>
@@ -100,7 +100,9 @@ export const Tabs = <TabItemsValue extends string>({
       className={className}
       defaultValue={defaultValue}
       value={value}
-      onValueChange={onValueChange}
+      onValueChange={
+        onValueChange != null ? (val) => onValueChange(val as TabItemsValue) : undefined
+      }
       onWheel={onWheel}
       $side={side}
       $withInnerBorder={withBorders}
@@ -116,7 +118,7 @@ export const Tabs = <TabItemsValue extends string>({
               key={value}
               asChild={asChild}
               value={value}
-              forceMount={forceMount}
+              forceMount={!!forceMount ? forceMount : undefined}
               $hide={forceMount && currentItem?.value !== value}
               $withTransitions={withTransitions}
             >
@@ -309,7 +311,9 @@ const $DropdownSelectMenu = styled(DropdownSelectMenu)<{ $isActive?: boolean }>`
       --trigger-textColor: var(--trigger-active-textColor);
       --trigger-backgroundColor: var(--trigger-active-backgroundColor);
     `}
-`;
+` as <MenuItemValue extends string>(
+  props: { $isActive?: boolean } & React.ComponentProps<typeof DropdownSelectMenu<MenuItemValue>>
+) => ReactNode;
 
 export const MobileTabs = styled(Tabs)`
   --trigger-backgroundColor: transparent;

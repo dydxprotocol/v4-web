@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Nullable, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -43,7 +43,7 @@ export const CanvasOrderbook = forwardRef(
       histogramSide = 'right',
       maxRowsPerSide = ORDERBOOK_MAX_ROWS_PER_SIDE,
     }: ElementProps & StyleProps,
-    ref
+    ref: React.ForwardedRef<HTMLDivElement>
   ) => {
     const { asks, bids, hasOrderbook, histogramRange, spread, spreadPercent } =
       useCalculateOrderbookData({

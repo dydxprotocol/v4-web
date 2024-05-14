@@ -1,6 +1,6 @@
 import { useRef, useState, type ReactNode } from 'react';
 
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { type MenuConfig } from '@/constants/menus';
 
@@ -10,7 +10,7 @@ import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { ComboboxMenu } from '@/components/ComboboxMenu';
+import { ComboboxMenu, ComboboxMenuProps } from '@/components/ComboboxMenu';
 import { type DetailsItem } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 import { Popover, TriggerType } from '@/components/Popover';
@@ -126,7 +126,9 @@ const $Popover = styled(Popover)`
   box-shadow: none;
 `;
 
-const $ComboboxMenu = styled(ComboboxMenu)<{ $withSearch?: boolean }>`
+type ComboboxMenuStyleProps = { $withSearch?: boolean };
+
+const $ComboboxMenu = styled(ComboboxMenu)<ComboboxMenuStyleProps>`
   ${layoutMixins.withInnerHorizontalBorders}
 
   --comboboxMenu-backgroundColor: var(--color-layer-4);
@@ -149,7 +151,9 @@ const $ComboboxMenu = styled(ComboboxMenu)<{ $withSearch?: boolean }>`
   border-radius: 0.5rem;
   max-height: 30vh;
   overflow: auto;
-`;
+` as <MenuItemValue extends string | number, MenuGroupValue extends string | number>(
+  props: ComboboxMenuProps<MenuItemValue, MenuGroupValue> & ComboboxMenuStyleProps
+) => JSX.Element;
 
 const $TriggerIcon = styled(Icon)<{ open?: boolean }>`
   width: 0.625rem;

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { Content, Portal, Root, Trigger } from '@radix-ui/react-popover';
 import { useRect } from '@radix-ui/react-use-rect';
-import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 import { popoverMixins } from '@/styles/popoverMixins';
 
@@ -46,7 +46,7 @@ export const Popover = ({
   className,
   children,
 }: PopoverProps) => {
-  const [trigger, setTrigger] = useState(null);
+  const [trigger, setTrigger] = useState<HTMLButtonElement | null>(null);
   const rect = useRect(trigger);
   const width = useMemo(() => fullWidth && rect?.width, undefined);
 
@@ -55,7 +55,7 @@ export const Popover = ({
       onOpenAutoFocus={(e: Event) => {
         e.preventDefault();
       }}
-      style={{ width }}
+      style={{ width: width != null && !!width ? width : undefined }}
       $noBlur={noBlur}
       className={className}
       sideOffset={sideOffset}

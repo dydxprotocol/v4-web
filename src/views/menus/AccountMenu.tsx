@@ -449,12 +449,12 @@ const $ConnectToChain = styled($Column)`
   }
 `;
 
-const $IconButton = styled(IconButton)<{ iconName: IconName }>`
+const $IconButton = styled(IconButton)`
   --button-padding: 0 0.25rem;
   --button-border: solid var(--border-width) var(--color-layer-6);
 
   ${({ iconName }) =>
-    [IconName.Withdraw, IconName.Deposit].includes(iconName) &&
+    iconName != null && [IconName.Withdraw, IconName.Deposit].includes(iconName) &&
     css`
       --button-icon-size: 1.375em;
     `}

@@ -16,7 +16,7 @@ import {
   type EventHandlerParams,
 } from '@visx/xychart';
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent, keyframes } from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 import {
   DepthChartDatum,
@@ -167,7 +167,7 @@ export const DepthChart = ({
   const onDepthChartZoom = ({
     deltaY,
     wheelDelta = deltaY,
-  }: WheelEvent & { wheelDelta?: number }) => {
+  }: React.WheelEvent & { wheelDelta?: number }) => {
     setZoomDomain(
       clamp(
         Math.max(

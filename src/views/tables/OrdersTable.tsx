@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { Key, useEffect, useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { ColumnSize } from '@react-types/table';
@@ -349,7 +349,7 @@ export const OrdersTable = ({
       getRowAttributes={(row: OrderTableRow) => ({
         'data-clearable': isOrderStatusClearable(row.status),
       })}
-      onRowAction={(key: string) =>
+      onRowAction={(key: Key) =>
         dispatch(
           openDialog({
             type: DialogTypes.OrderDetails,

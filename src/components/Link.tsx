@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -13,7 +13,7 @@ type ElementProps = {
   };
   children: React.ReactNode;
   href?: string;
-  onClick?: (e: MouseEvent) => void;
+  onClick?: (e: React.MouseEvent) => void;
   withIcon?: boolean;
 };
 
@@ -38,7 +38,7 @@ export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
       ref={ref}
       className={className}
       href={href}
-      onClick={(e: MouseEvent) => {
+      onClick={(e: React.MouseEvent) => {
         if (analyticsConfig) {
           console.log(analyticsConfig);
         }

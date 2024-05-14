@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 import { MarketTrade } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -13,6 +13,7 @@ import { breakpoints } from '@/styles';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
+import { AllTableProps, BaseTableRowData, CustomRowConfig } from '@/components/Table';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketLiveTrades } from '@/state/perpetualsSelectors';
@@ -228,4 +229,6 @@ const $LiveTradesTable = styled(OrderbookTradesTable)<StyleProps>`
 
     font-size: 0.875em;
   }
-`;
+` as <TableRowData extends BaseTableRowData | CustomRowConfig>(
+  props: AllTableProps<TableRowData> & StyleProps
+) => React.ReactNode;

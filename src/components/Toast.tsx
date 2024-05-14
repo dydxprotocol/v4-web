@@ -81,7 +81,7 @@ export const Toast = ({
           iconName={IconName.Close}
           shape={ButtonShape.Circle}
           size={ButtonSize.XSmall}
-          onClick={(e: MouseEvent) => e.stopPropagation()}
+          onClick={(e: React.MouseEvent) => e.stopPropagation()}
         />
       </Close>
 

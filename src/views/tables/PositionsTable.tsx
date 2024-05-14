@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { Key, useMemo } from 'react';
 
 import type { ColumnSize } from '@react-types/table';
 import { shallowEqual, useSelector } from 'react-redux';
@@ -459,7 +459,7 @@ export const PositionsTable = ({
       onRowAction={
         currentMarket
           ? undefined
-          : (market: string) => {
+          : (market: Key) => {
               navigate(`${AppRoute.Trade}/${market}`, {
                 state: { from: currentRoute },
               });

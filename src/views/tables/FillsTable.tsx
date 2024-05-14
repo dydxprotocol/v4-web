@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { Key, useEffect, useMemo } from 'react';
 
 import { Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
@@ -352,7 +352,7 @@ export const FillsTable = ({
         isMobile && withGradientCardRows ? fillsData.slice(0, MOBILE_FILLS_PER_PAGE) : fillsData
       }
       getRowKey={(row: FillTableRow) => row.id}
-      onRowAction={(key: string) =>
+      onRowAction={(key: Key) =>
         dispatch(
           openDialog({
             type: DialogTypes.FillDetails,

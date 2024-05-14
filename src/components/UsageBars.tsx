@@ -1,4 +1,4 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { type RiskLevels } from '@/constants/abacus';
 
@@ -37,7 +37,7 @@ const $UsageBars = styled.div<{ riskLevel: RiskLevels }>`
   justify-content: space-between;
 `;
 
-const $Bar = styled.div<{ active: boolean }>`
+const $Bar = styled.div<{ active: boolean; style?: { [custom: string]: string | number } }>`
   --active-delay: calc(0.2s * calc(var(--i) + 1));
 
   max-width: 3px;

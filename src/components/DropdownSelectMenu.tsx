@@ -10,7 +10,7 @@ import {
   Trigger,
 } from '@radix-ui/react-dropdown-menu';
 import { CheckIcon } from '@radix-ui/react-icons';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { type MenuItem } from '@/constants/menus';
 
@@ -23,8 +23,8 @@ import { Tag } from '@/components/Tag';
 type ElementProps<MenuItemValue extends string> = {
   disabled?: boolean;
   items: MenuItem<MenuItemValue>[];
-  value: MenuItemValue;
-  onValueChange: (value: MenuItemValue) => void;
+  value?: MenuItemValue;
+  onValueChange?: (value: MenuItemValue) => void;
   children?: React.ReactNode;
   slotTrigger?: JSX.Element;
 };
@@ -67,14 +67,16 @@ export const DropdownSelectMenu = <MenuItemValue extends string>({
 
   return (
     <Root>
-      <$Trigger disabled={disabled} className={className} asChild={slotTrigger}>
+      <$Trigger disabled={disabled} className={className} asChild={!!slotTrigger}>
         {slotTrigger ? cloneElement(slotTrigger, { children: triggerContent }) : triggerContent}
       </$Trigger>
       <Portal>
         <$Content align={align} sideOffset={sideOffset} className={className}>
           <RadioGroup
             value={value}
-            onValueChange={(value) => onValueChange(value as MenuItemValue)}
+            onValueChange={
+              onValueChange != null ? (value) => onValueChange(value as MenuItemValue) : undefined
+            }
           >
             {items.map(({ value, label, slotBefore, slotAfter, tag, disabled }) => (
               <$RadioItem key={value} value={value} disabled={disabled}>

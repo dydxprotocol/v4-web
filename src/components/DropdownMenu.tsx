@@ -1,7 +1,7 @@
 import { Fragment, forwardRef, type Ref } from 'react';
 
 import { Content, Item, Portal, Root, Separator, Trigger } from '@radix-ui/react-dropdown-menu';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { popoverMixins } from '@/styles/popoverMixins';
 
@@ -42,7 +42,7 @@ export const DropdownMenu = forwardRef(
       side = 'bottom',
       sideOffset = 8,
     }: DropdownMenuProps<T>,
-    ref: Ref<T>
+    ref: Ref<HTMLButtonElement>
   ) => {
     return (
       <Root>
@@ -79,21 +79,23 @@ const $Separator = styled(Separator)`
   margin: 0.25rem 1rem;
 `;
 
-const $Item = styled(Item)<{ $highlightColor: 'accent' | 'create' | 'destroy' }>`
+const $Item = styled(Item)<{ $highlightColor?: 'accent' | 'create' | 'destroy' }>`
   ${popoverMixins.item}
   --item-font-size: var(--dropdownMenu-item-font-size);
   ${({ $highlightColor }) =>
-    ({
-      ['accent']: `
+    $highlightColor != null
+      ? {
+          ['accent']: `
         --item-highlighted-textColor: var(--color-accent);
       `,
-      ['create']: `
+          ['create']: `
         --item-highlighted-textColor: var(--color-green);
       `,
-      ['destroy']: `
+          ['destroy']: `
         --item-highlighted-textColor: var(--color-red);
       `,
-    }[$highlightColor])}
+        }[$highlightColor]
+      : undefined}
 
   justify-content: start;
   color: var(--color-text-0);

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { HistoricalTradingReward, HistoricalTradingRewardsPeriods } from '@/constants/abacus';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
@@ -139,7 +139,7 @@ const $Table = styled(Table)`
   tbody {
     font: var(--font-medium-book);
   }
-`;
+` as typeof Table;
 
 const $Rewarded = styled.span`
   color: var(--color-text-2);

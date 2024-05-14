@@ -4,13 +4,14 @@ import {
   Close,
   Content,
   Description,
+  DialogCloseProps,
   Overlay,
   Portal,
   Root,
   Title,
   Trigger,
 } from '@radix-ui/react-dialog';
-import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 import { useDialogArea } from '@/hooks/useDialogArea';
 
@@ -92,7 +93,7 @@ export const Dialog = ({
   children,
   className,
 }: DialogProps) => {
-  const closeButtonRef = useRef<HTMLButtonElement>();
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   const showOverlay = ![DialogPlacement.Inline, DialogPlacement.FullScreen].includes(placement);
 
@@ -495,7 +496,9 @@ const $Close = styled(Close)<{ $absolute?: boolean }>`
     height: 1rem;
     outline: none;
   }
-`;
+` as React.ForwardRefExoticComponent<
+  { $absolute?: boolean } & DialogCloseProps & React.RefAttributes<HTMLButtonElement>
+>;
 
 const $BackButton = styled(BackButton)`
   position: absolute;

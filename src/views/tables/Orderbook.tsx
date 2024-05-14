@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { Key, useCallback, useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
@@ -16,7 +16,13 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Details } from '@/components/Details';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
-import { AllTableProps, ColumnDef, TableRow, type CustomRowConfig } from '@/components/Table';
+import {
+  AllTableProps,
+  BaseTableRowData,
+  ColumnDef,
+  TableRow,
+  type CustomRowConfig,
+} from '@/components/Table';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
@@ -162,7 +168,7 @@ const OrderbookTable = ({
   stepSizeDecimals: number | undefined | null;
   tickSizeDecimals: number | undefined | null;
   histogramRange: number;
-  onRowAction: (key: string, row: RowData) => void;
+  onRowAction: (key: Key, row: RowData) => void;
   className?: string;
   hideHeader?: boolean;
 }) => {
@@ -300,7 +306,7 @@ export const Orderbook = ({
   );
 
   const onRowAction = useCallback(
-    (key: string, row: RowData) => {
+    (key: Key, row: RowData) => {
       if (currentInput === 'trade' && key !== 'spread' && row?.price) {
         dispatch(setTradeFormInputs({ limitPriceInput: row?.price?.toString() }));
       }
@@ -553,8 +559,8 @@ const $OrderbookTable = styled(OrderbookTradesTable)<StyleProps>`
   ${$HorizontalLayout} & {
     --tableCell-padding: 0.25rem 1rem;
   }
-` as <TableRowData extends object | CustomRowConfig, TableRowKey extends React.Key>(
-  props: AllTableProps<TableRowData, TableRowKey> & StyleProps
+` as <TableRowData extends BaseTableRowData | CustomRowConfig>(
+  props: AllTableProps<TableRowData> & StyleProps
 ) => React.ReactNode;
 
 const $SpreadTableRow = styled(TableRow)`

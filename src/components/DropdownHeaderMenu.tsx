@@ -1,5 +1,5 @@
 import { Content, Item, Portal, Root, Trigger } from '@radix-ui/react-dropdown-menu';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { type MenuItem } from '@/constants/menus';
 
@@ -50,7 +50,7 @@ export const DropdownHeaderMenu = <MenuItemValue extends string>({
           {items.map(({ value, label, description, onSelect, disabled }) => (
             <$Item
               key={value}
-              value={value}
+              textValue={value}
               onSelect={() => (onSelect ?? onValueChange)?.(value)}
               disabled={disabled}
             >

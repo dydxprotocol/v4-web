@@ -1,6 +1,7 @@
 import { forwardRef } from 'react';
 
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import { BigNumber } from 'bignumber.js';
+import styled, { css } from 'styled-components';
 
 import type { Nullable } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -17,7 +18,7 @@ type StyleProps = {
 };
 
 type ElementProps = {
-  spread?: Nullable<number>;
+  spread?: Nullable<BigNumber | number>;
   spreadPercent?: Nullable<number>;
   tickSizeDecimals?: Nullable<number>;
 };

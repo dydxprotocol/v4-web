@@ -1,4 +1,4 @@
-import { memo, useMemo, useState } from 'react';
+import { Key, memo, useMemo, useState } from 'react';
 
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +31,7 @@ import { MustBigNumber } from '@/lib/numbers';
 
 import { MarketFilter } from './MarketFilter';
 
-const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string) => void }) => {
+const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) => void }) => {
   const [filter, setFilter] = useState(MarketFilters.ALL);
   const stringGetter = useStringGetter();
   const selectedLocale = useSelector(getSelectedLocale);
@@ -205,7 +205,7 @@ export const MarketsDropdown: React.FC<{ currentMarketId?: string; symbol: strin
         triggerType={TriggerType.MarketDropdown}
       >
         <MarketsDropdownContent
-          onRowAction={(market: string) => {
+          onRowAction={(market: Key) => {
             navigate(`${AppRoute.Trade}/${market}`);
             setIsOpen(false);
           }}

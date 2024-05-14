@@ -2,9 +2,9 @@ import { forwardRef, type ElementType } from 'react';
 
 import styled, { css } from 'styled-components';
 
-import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonSize, ButtonState } from '@/constants/buttons';
 
-import { Button, type ButtonProps } from '@/components/Button';
+import { Button, ButtonStateConfig } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { ToggleButton, type ToggleButtonProps } from '@/components/ToggleButton';
 
@@ -12,11 +12,11 @@ type ElementProps = {
   isToggle?: boolean;
   iconName?: IconName;
   iconComponent?: ElementType;
+  action?: ButtonAction;
+  state?: ButtonState | ButtonStateConfig;
 };
 
-export type IconButtonProps = ElementProps &
-  Omit<ButtonProps, 'onClick'> &
-  ToggleButtonProps & { onClick?(): void };
+export type IconButtonProps = ElementProps & ToggleButtonProps;
 
 export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, IconButtonProps>(
   (
@@ -44,7 +44,7 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
         size={size}
         shape={shape}
         href={href}
-        onPressedChange={onPressedChange ?? onClick}
+        onPressedChange={onPressedChange}
         {...otherProps}
       >
         <Icon iconName={iconName} iconComponent={iconComponent} />

@@ -88,7 +88,7 @@ export type TableItem<TableRowData> = {
   onSelect?: (key: TableRowData) => void;
 };
 
-type BaseTableRowData = {};
+export type BaseTableRowData = {};
 
 export type ColumnDef<TableRowData extends BaseTableRowData | CustomRowConfig> = {
   columnKey: string;
@@ -136,7 +136,7 @@ export type TableStyleProps = {
 
 export type TableConfig<TableRowData> = TableItem<TableRowData>[];
 
-export type AllTableProps<TableRowData extends object | CustomRowConfig> =
+export type AllTableProps<TableRowData extends BaseTableRowData | CustomRowConfig> =
   TableElementProps<TableRowData> & TableStyleProps & { style?: { [customProp: string]: number } };
 
 export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
@@ -213,9 +213,12 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
     );
   };
 
-  const internalGetRowKey = useCallback((row: TableRowData | CustomRowConfig) => {
-    return isCustomRow(row) ? row.key : getRowKey(row);
-  }, []);
+  const internalGetRowKey = useCallback(
+    (row: TableRowData | CustomRowConfig) => {
+      return isCustomRow(row) ? row.key : getRowKey(row);
+    },
+    [getRowKey]
+  );
 
   const list = useAsyncList<TableRowData | CustomRowConfig>({
     getKey: internalGetRowKey,

@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -12,7 +12,6 @@ import { BellIcon, MarketsIcon, PortfolioIcon, ProfileIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from '@/components/Icon';
-import { IconButton } from '@/components/IconButton';
 import { NavigationMenu } from '@/components/NavigationMenu';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
@@ -61,25 +60,25 @@ export const FooterMobile = () => {
               {
                 value: 'portfolio',
                 label: stringGetter({ key: STRING_KEYS.PORTFOLIO }),
-                slotBefore: <$Icon iconComponent={PortfolioIcon} />,
+                slotBefore: <$Icon iconComponent={PortfolioIcon as any} />,
                 href: AppRoute.Portfolio,
               },
               {
                 value: 'markets',
                 label: stringGetter({ key: STRING_KEYS.MARKETS }),
-                slotBefore: <$Icon iconComponent={MarketsIcon} />,
+                slotBefore: <$Icon iconComponent={MarketsIcon as any} />,
                 href: AppRoute.Markets,
               },
               {
                 value: 'alerts',
                 label: stringGetter({ key: STRING_KEYS.ALERTS }),
-                slotBefore: <$Icon iconComponent={BellIcon} />,
+                slotBefore: <$Icon iconComponent={BellIcon as any} />,
                 href: AppRoute.Alerts,
               },
               {
                 value: 'profile',
                 label: stringGetter({ key: STRING_KEYS.PROFILE }),
-                slotBefore: <$Icon iconComponent={ProfileIcon} />,
+                slotBefore: <$Icon iconComponent={ProfileIcon as any} />,
                 href: AppRoute.Profile,
               },
             ],
@@ -152,10 +151,6 @@ const $NavigationMenu = styled(NavigationMenu)`
       }
     }
   }
-`;
-
-const $IconButton = styled(IconButton)`
-  margin-top: -0.25rem;
 `;
 
 const $Icon = styled(Icon)`

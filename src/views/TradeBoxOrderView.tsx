@@ -12,7 +12,7 @@ import { useStringGetter } from '@/hooks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Tabs } from '@/components/Tabs';
+import { TabItem, Tabs } from '@/components/Tabs';
 
 import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';
 
@@ -21,7 +21,10 @@ import { isTruthy } from '@/lib/isTruthy';
 
 import { TradeForm } from './forms/TradeForm';
 
-const useTradeTypeOptions = () => {
+const useTradeTypeOptions = (): {
+  tradeTypeItems: TabItem<string>[];
+  selectedTradeType: TradeTypes;
+} => {
   const stringGetter = useStringGetter();
   const selectedTradeType = useSelector(
     createSelector(
@@ -51,8 +54,8 @@ const useTradeTypeOptions = () => {
             subitems: allTradeTypeItems
               ?.map(
                 ({ value, label }) =>
-                  value && {
-                    value: value as TradeTypes,
+                  value != null && {
+                    value: value,
                     label,
                   }
               )
@@ -64,7 +67,7 @@ const useTradeTypeOptions = () => {
 };
 
 export const TradeBoxOrderView = () => {
-  const onTradeTypeChange = useCallback((tradeType?: TradeTypes) => {
+  const onTradeTypeChange = useCallback((tradeType?: string) => {
     if (tradeType) {
       abacusStateManager.clearTradeInputValues();
       abacusStateManager.setTradeValue({ value: tradeType, field: TradeInputField.type });
