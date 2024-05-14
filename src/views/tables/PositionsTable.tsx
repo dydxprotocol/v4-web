@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import type { ColumnSize } from '@react-types/table';
 import { shallowEqual, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import {
   type Asset,
@@ -28,6 +28,7 @@ import { Output, OutputType, ShowSign } from '@/components/Output';
 import { Table, TableColumnHeader, type ColumnDef } from '@/components/Table';
 import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
+import { PageSize } from '@/components/Table/TablePaginationRow';
 
 import {
   calculateIsAccountViewOnly,
@@ -43,7 +44,6 @@ import { testFlags } from '@/lib/testFlags';
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
 import { PositionsTriggersCell } from './PositionsTable/PositionsTriggersCell';
-import { PageSize } from '@/components/Table/TablePaginationRow';
 
 export enum PositionsTableColumnKey {
   Details = 'Details',
@@ -96,26 +96,26 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.id,
         label: stringGetter({ key: STRING_KEYS.DETAILS }),
         renderCell: ({ asset, leverage, resources, size }) => (
-          <TableCell stacked slotLeft={<Styled.AssetIcon symbol={asset?.id} />}>
-            <Styled.HighlightOutput
+          <TableCell stacked slotLeft={<$AssetIcon symbol={asset?.id} />}>
+            <$HighlightOutput
               type={OutputType.Asset}
               value={size?.current}
               fractionDigits={TOKEN_DECIMALS}
               showSign={ShowSign.None}
               tag={asset?.id}
             />
-            <Styled.InlineRow>
-              <Styled.PositionSide>
+            <$InlineRow>
+              <$PositionSide>
                 {resources.sideStringKey?.current &&
                   stringGetter({ key: resources.sideStringKey?.current })}
-              </Styled.PositionSide>
-              <Styled.SecondaryColor>@</Styled.SecondaryColor>
-              <Styled.HighlightOutput
+              </$PositionSide>
+              <$SecondaryColor>@</$SecondaryColor>
+              <$HighlightOutput
                 type={OutputType.Multiple}
                 value={leverage?.current}
                 showSign={ShowSign.None}
               />
-            </Styled.InlineRow>
+            </$InlineRow>
           </TableCell>
         ),
       },
@@ -144,13 +144,13 @@ const getPositionsTableColumnDef = ({
         hideOnBreakpoint: MediaQueryKeys.isNotTablet,
         renderCell: ({ unrealizedPnl, unrealizedPnlPercent }) => (
           <TableCell stacked>
-            <Styled.OutputSigned
+            <$OutputSigned
               sign={getNumberSign(unrealizedPnlPercent?.current)}
               type={OutputType.Percent}
               value={unrealizedPnlPercent?.current}
               showSign={ShowSign.None}
             />
-            <Styled.HighlightOutput
+            <$HighlightOutput
               isNegative={MustBigNumber(unrealizedPnl?.current).isNegative()}
               type={OutputType.Fiat}
               value={unrealizedPnl?.current}
@@ -180,7 +180,7 @@ const getPositionsTableColumnDef = ({
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         renderCell: ({ assetId, size, notionalTotal, tickSizeDecimals }) => (
           <TableCell stacked>
-            <Styled.OutputSigned
+            <$OutputSigned
               type={OutputType.Asset}
               value={size?.current}
               tag={assetId}
@@ -217,7 +217,7 @@ const getPositionsTableColumnDef = ({
         hideOnBreakpoint: MediaQueryKeys.isTablet,
         renderCell: ({ netFunding, fundingRate }) => (
           <TableCell stacked>
-            <Styled.OutputSigned
+            <$OutputSigned
               sign={getNumberSign(netFunding)}
               type={OutputType.Fiat}
               value={netFunding}
@@ -253,7 +253,7 @@ const getPositionsTableColumnDef = ({
         hideOnBreakpoint: MediaQueryKeys.isTablet,
         renderCell: ({ unrealizedPnl, unrealizedPnlPercent }) => (
           <TableCell stacked>
-            <Styled.OutputSigned
+            <$OutputSigned
               sign={getNumberSign(unrealizedPnl?.current)}
               type={OutputType.Fiat}
               value={unrealizedPnl?.current}
@@ -269,7 +269,7 @@ const getPositionsTableColumnDef = ({
         hideOnBreakpoint: MediaQueryKeys.isTablet,
         renderCell: ({ realizedPnl, realizedPnlPercent }) => (
           <TableCell stacked>
-            <Styled.OutputSigned
+            <$OutputSigned
               sign={getNumberSign(realizedPnl?.current)}
               type={OutputType.Fiat}
               value={realizedPnl?.current}
@@ -467,7 +467,7 @@ export const PositionsTable = ({
       })}
       slotEmpty={
         <>
-          <Styled.Icon iconName={IconName.Positions} />
+          <$Icon iconName={IconName.Positions} />
           <h4>{stringGetter({ key: STRING_KEYS.POSITIONS_EMPTY_STATE })}</h4>
         </>
       }
@@ -482,66 +482,67 @@ export const PositionsTable = ({
   );
 };
 
-const Styled = {
-  Table: styled(Table)`
-    ${tradeViewMixins.horizontalTable}
+const Styled: Record<string, AnyStyledComponent> = {};
 
-    tr {
-      &:after {
-        content: '';
-      }
+Styled.Table = styled(Table)`
+  ${tradeViewMixins.horizontalTable}
+
+  tr {
+    &:after {
+      content: '';
+    }
+  }
+
+  tbody tr {
+    overflow: hidden;
+    position: relative;
+
+    &[data-side='${PositionSide.Long}'] {
+      --side-color: var(--color-positive);
+      --table-row-gradient-to-color: var(--color-gradient-positive);
     }
 
-    tbody tr {
-      overflow: hidden;
-      position: relative;
-
-      &[data-side='${PositionSide.Long}'] {
-        --side-color: var(--color-positive);
-        --table-row-gradient-to-color: var(--color-gradient-positive);
-      }
-
-      &[data-side='${PositionSide.Short}'] {
-        --side-color: var(--color-negative);
-        --table-row-gradient-to-color: var(--color-gradient-negative);
-      }
+    &[data-side='${PositionSide.Short}'] {
+      --side-color: var(--color-negative);
+      --table-row-gradient-to-color: var(--color-gradient-negative);
     }
-  `,
-  InlineRow: styled.div`
-    ${layoutMixins.inlineRow}
-  `,
-  AssetIcon: styled(AssetIcon)`
-    ${layoutMixins.inlineRow}
-    min-width: unset;
-    font-size: 2.25rem;
-  `,
-  SecondaryColor: styled.span`
-    color: var(--color-text-0);
-  `,
-  OutputSigned: styled(Output)<{ sign: NumberSign }>`
-    color: ${({ sign }) =>
-      ({
-        [NumberSign.Positive]: `var(--color-positive)`,
-        [NumberSign.Negative]: `var(--color-negative)`,
-        [NumberSign.Neutral]: `var(--color-text-2)`,
-      }[sign])};
-  `,
-  HighlightOutput: styled(Output)<{ isNegative?: boolean }>`
-    color: var(--color-text-1);
-    --secondary-item-color: currentColor;
-    --output-sign-color: ${({ isNegative }) =>
-      isNegative !== undefined
-        ? isNegative
-          ? `var(--color-negative)`
-          : `var(--color-positive)`
-        : `currentColor`};
-  `,
-  PositionSide: styled.span`
-    && {
-      color: var(--side-color);
-    }
-  `,
-  Icon: styled(Icon)`
-    font-size: 3em;
-  `,
-};
+  }
+`;
+
+const $InlineRow = styled.div`
+  ${layoutMixins.inlineRow}
+`;
+const $AssetIcon = styled(AssetIcon)`
+  ${layoutMixins.inlineRow}
+  min-width: unset;
+  font-size: 2.25rem;
+`;
+const $SecondaryColor = styled.span`
+  color: var(--color-text-0);
+`;
+const $OutputSigned = styled(Output)<{ sign: NumberSign }>`
+  color: ${({ sign }) =>
+    ({
+      [NumberSign.Positive]: `var(--color-positive)`,
+      [NumberSign.Negative]: `var(--color-negative)`,
+      [NumberSign.Neutral]: `var(--color-text-2)`,
+    }[sign])};
+`;
+const $HighlightOutput = styled(Output)<{ isNegative?: boolean }>`
+  color: var(--color-text-1);
+  --secondary-item-color: currentColor;
+  --output-sign-color: ${({ isNegative }) =>
+    isNegative !== undefined
+      ? isNegative
+        ? `var(--color-negative)`
+        : `var(--color-positive)`
+      : `currentColor`};
+`;
+const $PositionSide = styled.span`
+  && {
+    color: var(--side-color);
+  }
+`;
+const $Icon = styled(Icon)`
+  font-size: 3em;
+`;

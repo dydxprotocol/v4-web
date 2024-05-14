@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
-import styled from 'styled-components';
+import styled, { AnyStyledComponent } from 'styled-components';
 
 import { HistoricalTradingReward, HistoricalTradingRewardsPeriods } from '@/constants/abacus';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
@@ -38,8 +38,8 @@ const getTradingRewardHistoryTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.EVENT }),
         renderCell: ({ startedAtInMilliseconds, endedAtInMilliseconds }) => (
           <TableCell stacked>
-            <Styled.Rewarded>{stringGetter({ key: STRING_KEYS.REWARDED })}</Styled.Rewarded>
-            <Styled.TimePeriod>
+            <$Rewarded>{stringGetter({ key: STRING_KEYS.REWARDED })}</$Rewarded>
+            <$TimePeriod>
               {stringGetter({
                 key: STRING_KEYS.FOR_TRADING,
                 params: {
@@ -60,7 +60,7 @@ const getTradingRewardHistoryTableColumnDef = ({
                   ),
                 },
               })}
-            </Styled.TimePeriod>
+            </$TimePeriod>
           </TableCell>
         ),
       },
@@ -72,7 +72,7 @@ const getTradingRewardHistoryTableColumnDef = ({
           <Output
             type={OutputType.Asset}
             value={amount}
-            slotRight={<Styled.AssetIcon symbol={chainTokenLabel} />}
+            slotRight={<$AssetIcon symbol={chainTokenLabel} />}
           />
         ),
       },
@@ -131,34 +131,36 @@ export const TradingRewardHistoryTable = ({
   );
 };
 
-const Styled = {
-  Table: styled(Table)`
-    --tableCell-padding: 0.5rem 0;
-    --tableHeader-backgroundColor: var(--color-layer-3);
-    --tableRow-backgroundColor: var(--color-layer-3);
-    --tableViewMore-borderColor: var(--color-layer-3);
+const Styled: Record<string, AnyStyledComponent> = {};
 
-    tbody {
-      font: var(--font-medium-book);
-    }
-  `,
-  Rewarded: styled.span`
-    color: var(--color-text-2);
-  `,
-  TimePeriod: styled.div`
-    ${layoutMixins.inlineRow}
+Styled.Table = styled(Table)`
+  --tableCell-padding: 0.5rem 0;
+  --tableHeader-backgroundColor: var(--color-layer-3);
+  --tableRow-backgroundColor: var(--color-layer-3);
+  --tableViewMore-borderColor: var(--color-layer-3);
 
-    && {
-      color: var(--color-text-0);
-      font: var(--font-base-book);
-    }
+  tbody {
+    font: var(--font-medium-book);
+  }
+`;
 
-    output {
-      color: var(--color-text-1);
-      font: var(--font-base-book);
-    }
-  `,
-  AssetIcon: styled(AssetIcon)`
-    margin-left: 0.5ch;
-  `,
-};
+const $Rewarded = styled.span`
+  color: var(--color-text-2);
+`;
+
+const $TimePeriod = styled.div`
+  ${layoutMixins.inlineRow}
+
+  && {
+    color: var(--color-text-0);
+    font: var(--font-base-book);
+  }
+
+  output {
+    color: var(--color-text-1);
+    font: var(--font-base-book);
+  }
+`;
+const $AssetIcon = styled(AssetIcon)`
+  margin-left: 0.5ch;
+`;
