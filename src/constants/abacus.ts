@@ -46,6 +46,10 @@ export type AbacusTrackingProtocol = Omit<
   Abacus.exchange.dydx.abacus.protocols.TrackingProtocol,
   '__doNotUseOrImplementIt'
 >;
+export type AbacusLoggingProtocol = Omit<
+  Abacus.exchange.dydx.abacus.protocols.LoggingProtocol,
+  '__doNotUseOrImplementIt'
+>;
 
 export type FileLocation = Abacus.exchange.dydx.abacus.protocols.FileLocation;
 export type ThreadingType = Abacus.exchange.dydx.abacus.protocols.ThreadingType;

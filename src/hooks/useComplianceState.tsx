@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { ComplianceStatus } from '@/constants/abacus';
 import { CLOSE_ONLY_GRACE_PERIOD, ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
-import { isMainnet } from '@/constants/networks';
 
 import { LinkOutIcon } from '@/icons';
 
@@ -37,10 +36,7 @@ export const useComplianceState = () => {
     complianceStatus === ComplianceStatus.CLOSE_ONLY
   ) {
     complianceState = ComplianceStates.CLOSE_ONLY;
-  } else if (
-    complianceStatus === ComplianceStatus.BLOCKED ||
-    (geo && isBlockedGeo(geo) && isMainnet)
-  ) {
+  } else if (complianceStatus === ComplianceStatus.BLOCKED || (geo && isBlockedGeo(geo))) {
     complianceState = ComplianceStates.READ_ONLY;
   }
 
@@ -58,12 +54,12 @@ export const useComplianceState = () => {
           : undefined,
         EMAIL: complianceSupportEmail,
       },
-    });
+    }) as string;
   } else if (complianceStatus === ComplianceStatus.BLOCKED) {
     complianceMessage = stringGetter({
       key: STRING_KEYS.PERMANENTLY_BLOCKED_MESSAGE,
       params: { EMAIL: complianceSupportEmail },
-    });
+    }) as string;
   } else if (geo && isBlockedGeo(geo)) {
     complianceMessage = stringGetter({
       key: STRING_KEYS.BLOCKED_MESSAGE,
@@ -74,7 +70,7 @@ export const useComplianceState = () => {
           </Link>
         ),
       },
-    });
+    }) as string;
   }
 
   return {
