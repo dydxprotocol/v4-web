@@ -93,15 +93,10 @@ function NavItemWithRef<MenuItemValue extends string>(
   );
 }
 
-const NavItemForwarded = forwardRef(NavItemWithRef);
+const NavItem = forwardRef(NavItemWithRef);
 
 type AllNavItemProps<MenuItemValue extends string> = MenuItem<MenuItemValue, string | number> &
   React.RefAttributes<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement>;
-
-function NavItem<MenuItemValue extends string>(props: AllNavItemProps<MenuItemValue>) {
-  // we know these should line up, making up for lack of higher kinded types
-  return <NavItemForwarded {...(props as any)} />;
-}
 
 export const NavigationMenu = <MenuItemValue extends string, MenuGroupValue extends string>({
   onSelectItem,
