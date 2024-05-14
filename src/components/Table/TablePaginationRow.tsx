@@ -46,8 +46,8 @@ export const TablePaginationRow = ({
     };
 
     return (
-      <Styled.Row>
-        <Styled.PaginationButton
+      <Styled.InlineRow>
+        <IconButton
           {...buttonProps}
           iconName={IconName.ChevronLeft}
           onClick={() => setCurrentPage(currentPage - 1)}
@@ -59,7 +59,7 @@ export const TablePaginationRow = ({
           items={pages}
           onValueChange={(pageNumber: string) => setCurrentPage(Number(pageNumber) - 1)}
         />
-        <Styled.PaginationButton
+        <IconButton
           {...buttonProps}
           iconName={IconName.ChevronRight}
           onClick={() => setCurrentPage(currentPage + 1)}
@@ -67,12 +67,12 @@ export const TablePaginationRow = ({
             isDisabled: pageNumberToDisplay(currentPage) === pages[pages.length - 1]?.value,
           }}
         />
-      </Styled.Row>
+      </Styled.InlineRow>
     );
   };
 
   const pageSizeSelector = () => (
-    <Styled.Row>
+    <Styled.InlineRow>
       {stringGetter({
         key: STRING_KEYS.SHOW,
         params: {
@@ -88,7 +88,7 @@ export const TablePaginationRow = ({
           ),
         },
       })}
-    </Styled.Row>
+    </Styled.InlineRow>
   );
 
   return (
@@ -108,14 +108,12 @@ export const TablePaginationRow = ({
 };
 
 const Styled = {
-  Row: styled.div`
+  InlineRow: styled.div`
     ${layoutMixins.inlineRow}
   `,
-  PaginationButton: styled(IconButton)``,
   PaginationRow: styled.div`
-    // ${layoutMixins.stickyFooter}
     ${layoutMixins.spacedRow}
-    padding: 0.5rem 0.25rem 0.5rem 1rem;
+    padding: 0.33rem 0.25rem 0.33rem 1rem;
     font: var(--font-mini-medium);
     color: var(--tableHeader-textColor);
   `,

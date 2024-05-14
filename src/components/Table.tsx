@@ -191,73 +191,71 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
       withOuterBorder={withOuterBorder}
     >
       {!isEmpty ? (
-        <Styled.TableWrapper2>
-          <TableRoot
-            aria-label={label}
-            sortDescriptor={list.sortDescriptor}
-            onSortChange={list.sort}
-            selectedKeys={selectedKeys}
-            setSelectedKeys={setSelectedKeys}
-            selectionMode={selectionMode}
-            selectionBehavior={selectionBehavior}
-            getRowAttributes={getRowAttributes}
-            onRowAction={
-              onRowAction &&
-              ((key: TableRowKey) => onRowAction(key, data.find((row) => getRowKey(row) === key)!))
-            }
-            hideHeader={hideHeader}
-            withGradientCardRows={withGradientCardRows}
-            withFocusStickyRows={withFocusStickyRows}
-            withOuterBorder={withOuterBorder}
-            withInnerBorders={withInnerBorders}
-            withScrollSnapColumns={withScrollSnapColumns}
-            withScrollSnapRows={withScrollSnapRows}
-            numColumns={shownColumns.length}
-            paginationRow={
-              <TablePaginationRow
-                currentPage={currentPage}
-                pageSize={pageSize}
-                pages={pages}
-                totalRows={data.length}
-                setCurrentPage={setCurrentPage}
-                setPageSize={setPageSize}
-              />
+        <TableRoot
+          aria-label={label}
+          sortDescriptor={list.sortDescriptor}
+          onSortChange={list.sort}
+          selectedKeys={selectedKeys}
+          setSelectedKeys={setSelectedKeys}
+          selectionMode={selectionMode}
+          selectionBehavior={selectionBehavior}
+          getRowAttributes={getRowAttributes}
+          onRowAction={
+            onRowAction &&
+            ((key: TableRowKey) => onRowAction(key, data.find((row) => getRowKey(row) === key)!))
+          }
+          hideHeader={hideHeader}
+          withGradientCardRows={withGradientCardRows}
+          withFocusStickyRows={withFocusStickyRows}
+          withOuterBorder={withOuterBorder}
+          withInnerBorders={withInnerBorders}
+          withScrollSnapColumns={withScrollSnapColumns}
+          withScrollSnapRows={withScrollSnapRows}
+          numColumns={shownColumns.length}
+          paginationRow={
+            <TablePaginationRow
+              currentPage={currentPage}
+              pageSize={pageSize}
+              pages={pages}
+              totalRows={data.length}
+              setCurrentPage={setCurrentPage}
+              setPageSize={setPageSize}
+            />
+          }
+        >
+          <TableHeader columns={shownColumns}>
+            {(column) => (
+              <Column
+                key={column.columnKey}
+                childColumns={column.childColumns}
+                allowsSorting={column.allowsSorting ?? true}
+                allowsResizing={column.allowsResizing}
+                width={column.width}
+              >
+                {column.label}
+                {column.tag && <Tag>{column.tag}</Tag>}
+              </Column>
+            )}
+          </TableHeader>
+
+          <TableBody
+            items={
+              list.items.length > pageSize
+                ? list.items.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
+                : list.items
             }
           >
-            <TableHeader columns={shownColumns}>
-              {(column) => (
-                <Column
-                  key={column.columnKey}
-                  childColumns={column.childColumns}
-                  allowsSorting={column.allowsSorting ?? true}
-                  allowsResizing={column.allowsResizing}
-                  width={column.width}
-                >
-                  {column.label}
-                  {column.tag && <Tag>{column.tag}</Tag>}
-                </Column>
-              )}
-            </TableHeader>
-
-            <TableBody
-              items={
-                list.items.length > pageSize
-                  ? list.items.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
-                  : list.items
-              }
-            >
-              {(item) => (
-                <Row key={getRowKey(item)}>
-                  {(columnKey) => (
-                    <Cell key={`${getRowKey(item)}-${columnKey}`}>
-                      {columns.find((column) => column.columnKey === columnKey)?.renderCell?.(item)}
-                    </Cell>
-                  )}
-                </Row>
-              )}
-            </TableBody>
-          </TableRoot>
-        </Styled.TableWrapper2>
+            {(item) => (
+              <Row key={getRowKey(item)}>
+                {(columnKey) => (
+                  <Cell key={`${getRowKey(item)}-${columnKey}`}>
+                    {columns.find((column) => column.columnKey === columnKey)?.renderCell?.(item)}
+                  </Cell>
+                )}
+              </Row>
+            )}
+          </TableBody>
+        </TableRoot>
       ) : (
         <Styled.Empty withOuterBorder={withOuterBorder}>{slotEmpty}</Styled.Empty>
       )}
@@ -391,15 +389,15 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
         )}
       </TableBodyRowGroup>
       <Styled.Tfoot>
-        <Styled.Tr key="pagination">
+        <Styled.PaginationTr key="pagination">
           <td
             colSpan={numColumns}
-            onMouseDown={(e: MouseEvent) => e.preventDefault()}
-            onPointerDown={(e: MouseEvent) => e.preventDefault()}
+            onMouseDown={(e) => e.preventDefault()}
+            onPointerDown={(e) => e.preventDefault()}
           >
             {paginationRow}
           </td>
-        </Styled.Tr>
+        </Styled.PaginationTr>
       </Styled.Tfoot>
     </Styled.Table>
   );
@@ -636,10 +634,6 @@ Styled.TableWrapper = styled.div<{
     `}
 `;
 
-Styled.TableWrapper2 = styled.div`
-  ${layoutMixins.stickyArea}
-`;
-
 Styled.Empty = styled.div<{ withOuterBorder: boolean }>`
   ${layoutMixins.column}
   height: 100%;
@@ -671,10 +665,8 @@ Styled.Table = styled.table<{
       --stickyArea1-topHeight: 0px;
     `}
 
-  align-self: start;
   border-collapse: separate;
   border-spacing: 0;
-  width: 100%;
 
   /* [data-selected] {} */
 
@@ -846,8 +838,7 @@ Styled.Tbody = styled.tbody<StyleProps>`
   font: var(--font-small-book);
 
   // If <table> height is fixed with not enough rows to overflow, vertically center the rows
-  &:before,
-  &:after {
+  &:before {
     content: '';
     display: table-row;
   }
@@ -928,4 +919,8 @@ Styled.Tbody = styled.tbody<StyleProps>`
 Styled.Row = styled.div`
   ${layoutMixins.inlineRow}
   padding: var(--tableCell-padding);
+`;
+
+Styled.PaginationTr = styled.tr`
+  box-shadow: 0 calc(-1 * var(--border-width)) 0 0 var(--border-color);
 `;

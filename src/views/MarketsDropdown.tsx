@@ -362,6 +362,14 @@ Styled.Table = styled(Table)`
     }
   }
 
+  tfoot {
+    --stickyArea-totalInsetTop: 0px;
+    --stickyArea-totalInsetBottom: 3px; //xcxc
+    tr {
+      height: var(--stickyArea-bottomHeight);
+    }
+  }
+
   tr {
     height: var(--popover-item-height);
   }
