@@ -42,6 +42,11 @@ import { Icon, IconName } from './Icon';
 import { Tag } from './Tag';
 
 export { ActionsTableCell } from './Table/ActionsTableCell';
+
+// TODO: fix circular dependencies
+// eslint-disable-next-line import/no-cycle
+export { AssetTableCell } from './Table/AssetTableCell';
+
 // TODO: remove barrel files: https://www.npmjs.com/package/eslint-plugin-no-barrel-files
 // Reasoning why: https://dev.to/tassiofront/barrel-files-and-why-you-should-stop-using-them-now-bc4
 // eslint-disable-next-line import/no-cycle

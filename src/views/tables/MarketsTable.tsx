@@ -20,7 +20,7 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
-import { ActionsTableCell, Table, TableCell, type ColumnDef } from '@/components/Table';
+import { AssetTableCell, Table, TableCell, type ColumnDef } from '@/components/Table';
 import { Toolbar } from '@/components/Toolbar';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { SparklineChart } from '@/components/visx/SparklineChart';
@@ -50,7 +50,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               columnKey: 'market',
               getCellValue: (row) => row.market,
               label: stringGetter({ key: STRING_KEYS.MARKET }),
-              renderCell: ({ asset }) => <ActionsTableCell asset={asset} />,
+              renderCell: ({ asset }) => <AssetTableCell asset={asset} />,
             },
             {
               columnKey: 'price',
@@ -95,7 +95,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               columnKey: 'market',
               getCellValue: (row) => row.market,
               label: stringGetter({ key: STRING_KEYS.MARKET }),
-              renderCell: ({ asset }) => <ActionsTableCell asset={asset} />,
+              renderCell: ({ asset }) => <AssetTableCell asset={asset} />,
             },
             {
               columnKey: 'oraclePrice',
