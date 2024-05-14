@@ -51,7 +51,7 @@ export const Popover = ({
   const width = useMemo(() => fullWidth && rect?.width, undefined);
 
   const content = (
-    <Styled.Content
+    <$Content
       onOpenAutoFocus={(e: Event) => {
         e.preventDefault();
       }}
@@ -61,23 +61,20 @@ export const Popover = ({
       sideOffset={sideOffset}
     >
       {children}
-    </Styled.Content>
+    </$Content>
   );
 
   return (
     <Root modal={modal} open={open} onOpenChange={onOpenChange}>
-      <Styled.Trigger ref={setTrigger} $noBlur={noBlur} $triggerType={triggerType}>
+      <$Trigger ref={setTrigger} $noBlur={noBlur} $triggerType={triggerType}>
         {slotTrigger}
-      </Styled.Trigger>
+      </$Trigger>
       {slotAnchor}
       {withPortal ? <Portal>{content}</Portal> : content}
     </Root>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Trigger = styled(Trigger)<{ $noBlur?: boolean; $triggerType: TriggerType }>`
+const $Trigger = styled(Trigger)<{ $noBlur?: boolean; $triggerType: TriggerType }>`
   ${popoverMixins.backdropOverlay}
   ${popoverMixins.trigger}
 
@@ -101,7 +98,7 @@ Styled.Trigger = styled(Trigger)<{ $noBlur?: boolean; $triggerType: TriggerType 
   --trigger-padding: 0;
 `;
 
-Styled.Content = styled(Content)<{ $noBlur?: boolean }>`
+const $Content = styled(Content)<{ $noBlur?: boolean }>`
   ${({ $noBlur }) =>
     !$noBlur &&
     css`

@@ -31,8 +31,8 @@ export const FooterMobile = () => {
   if (!useShouldShowFooter()) return null;
 
   return (
-    <Styled.MobileNav>
-      <Styled.NavigationMenu
+    <$MobileNav>
+      <$NavigationMenu
         items={[
           {
             group: 'navigation',
@@ -42,9 +42,9 @@ export const FooterMobile = () => {
                     value: 'trade',
                     label: stringGetter({ key: STRING_KEYS.TRADE }),
                     slotBefore: (
-                      <Styled.StartIcon>
+                      <$StartIcon>
                         <Icon iconName={IconName.Trade} />
-                      </Styled.StartIcon>
+                      </$StartIcon>
                     ),
                     href: `${AppRoute.Trade}/${marketId ?? DEFAULT_MARKETID}`,
                   }
@@ -52,34 +52,34 @@ export const FooterMobile = () => {
                     value: 'onboarding',
                     label: stringGetter({ key: STRING_KEYS.ONBOARDING }),
                     slotBefore: (
-                      <Styled.StartIcon>
+                      <$StartIcon>
                         <Icon iconName={IconName.Play} />
-                      </Styled.StartIcon>
+                      </$StartIcon>
                     ),
                     onClick: () => dispatch(openDialog({ type: DialogTypes.Onboarding })),
                   },
               {
                 value: 'portfolio',
                 label: stringGetter({ key: STRING_KEYS.PORTFOLIO }),
-                slotBefore: <Styled.Icon iconComponent={PortfolioIcon} />,
+                slotBefore: <$Icon iconComponent={PortfolioIcon} />,
                 href: AppRoute.Portfolio,
               },
               {
                 value: 'markets',
                 label: stringGetter({ key: STRING_KEYS.MARKETS }),
-                slotBefore: <Styled.Icon iconComponent={MarketsIcon} />,
+                slotBefore: <$Icon iconComponent={MarketsIcon} />,
                 href: AppRoute.Markets,
               },
               {
                 value: 'alerts',
                 label: stringGetter({ key: STRING_KEYS.ALERTS }),
-                slotBefore: <Styled.Icon iconComponent={BellIcon} />,
+                slotBefore: <$Icon iconComponent={BellIcon} />,
                 href: AppRoute.Alerts,
               },
               {
                 value: 'profile',
                 label: stringGetter({ key: STRING_KEYS.PROFILE }),
-                slotBefore: <Styled.Icon iconComponent={ProfileIcon} />,
+                slotBefore: <$Icon iconComponent={ProfileIcon} />,
                 href: AppRoute.Profile,
               },
             ],
@@ -88,19 +88,16 @@ export const FooterMobile = () => {
         orientation="horizontal"
         itemOrientation="vertical"
       />
-    </Styled.MobileNav>
+    </$MobileNav>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.MobileNav = styled.footer`
+const $MobileNav = styled.footer`
   grid-area: Footer;
 
   ${layoutMixins.stickyFooter}
 `;
 
-Styled.NavigationMenu = styled(NavigationMenu)`
+const $NavigationMenu = styled(NavigationMenu)`
   --navigationMenu-height: var(--page-currentFooterHeight);
   --navigationMenu-item-height: var(--page-currentFooterHeight);
   --navigationMenu-item-radius: 0;
@@ -157,15 +154,15 @@ Styled.NavigationMenu = styled(NavigationMenu)`
   }
 `;
 
-Styled.IconButton = styled(IconButton)`
+const $IconButton = styled(IconButton)`
   margin-top: -0.25rem;
 `;
 
-Styled.Icon = styled(Icon)`
+const $Icon = styled(Icon)`
   font-size: 1.5rem;
 `;
 
-Styled.StartIcon = styled.div`
+const $StartIcon = styled.div`
   display: inline-flex;
   flex-direction: row;
   justify-content: center;

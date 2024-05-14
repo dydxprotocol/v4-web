@@ -62,7 +62,7 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
   };
 
   return (
-    <Styled.Dialog
+    <$Dialog
       isOpen={Boolean(currentOnboardingStep)}
       setIsOpen={setIsOpenFromDialog}
       {...(currentOnboardingStep &&
@@ -71,9 +71,9 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
             title: stringGetter({ key: STRING_KEYS.CONNECT_YOUR_WALLET }),
             description: 'Select your wallet from these supported options.',
             children: (
-              <Styled.Content>
+              <$Content>
                 <ChooseWallet onChooseWallet={onChooseWallet} />
-              </Styled.Content>
+              </$Content>
             ),
           },
           [OnboardingSteps.KeyDerivation]: {
@@ -81,27 +81,25 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
               [EvmDerivedAccountStatus.NotDerived]: walletType && (
                 <Icon iconComponent={wallets[walletType]?.icon as ElementType} />
               ),
-              [EvmDerivedAccountStatus.Deriving]: <Styled.Ring withAnimation value={0.25} />,
-              [EvmDerivedAccountStatus.EnsuringDeterminism]: (
-                <Styled.Ring withAnimation value={0.25} />
-              ),
+              [EvmDerivedAccountStatus.Deriving]: <$Ring withAnimation value={0.25} />,
+              [EvmDerivedAccountStatus.EnsuringDeterminism]: <$Ring withAnimation value={0.25} />,
               [EvmDerivedAccountStatus.Derived]: <GreenCheckCircle />,
             }[derivationStatus],
             title: stringGetter({ key: STRING_KEYS.SIGN_MESSAGE }),
             description: stringGetter({ key: STRING_KEYS.SIGNATURE_CREATES_COSMOS_WALLET }),
             children: (
-              <Styled.Content>
+              <$Content>
                 <GenerateKeys status={derivationStatus} setStatus={setDerivationStatus} />
-              </Styled.Content>
+              </$Content>
             ),
             width: '23rem',
           },
           [OnboardingSteps.AcknowledgeTerms]: {
             title: stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TERMS }),
             children: (
-              <Styled.Content>
+              <$Content>
                 <AcknowledgeTerms onClose={() => setIsOpenFromDialog?.(false)} />
-              </Styled.Content>
+              </$Content>
             ),
             width: '30rem',
           },
@@ -109,7 +107,7 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
             title: stringGetter({ key: STRING_KEYS.DEPOSIT }),
             description: !isMainnet && 'Test funds will be sent directly to your dYdX account.',
             children: (
-              <Styled.Content>
+              <$Content>
                 {isMainnet ? (
                   <DepositForm
                     onDeposit={(event) => {
@@ -123,7 +121,7 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
                     }}
                   />
                 )}
-              </Styled.Content>
+              </$Content>
             ),
           },
         }[currentOnboardingStep])}
@@ -131,15 +129,12 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1rem;
 `;
 
-Styled.Dialog = styled(Dialog)<{ width?: string }>`
+const $Dialog = styled(Dialog)<{ width?: string }>`
   @media ${breakpoints.notMobile} {
     ${({ width }) =>
       width &&
@@ -151,7 +146,7 @@ Styled.Dialog = styled(Dialog)<{ width?: string }>`
   --dialog-icon-size: 1.25rem;
 `;
 
-Styled.Ring = styled(Ring)`
+const $Ring = styled(Ring)`
   width: 1.25rem;
   height: 1.25rem;
   --ring-color: var(--color-accent);

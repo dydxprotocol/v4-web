@@ -224,7 +224,7 @@ export const TimeSeriesChart = <Datum extends {}>({
   };
 
   return (
-    <Styled.Container onWheel={onWheel} className={className}>
+    <$Container onWheel={onWheel} className={className}>
       {data.length && zoomDomain ? (
         <DataProvider
           xScale={{
@@ -249,7 +249,7 @@ export const TimeSeriesChart = <Datum extends {}>({
           }}
         >
           <EventEmitterProvider>
-            <Styled.ParentSize>
+            <$ParentSize>
               {({ width, height }: { width: number; height: number }) => {
                 const numTicksX =
                   (width - (margin?.left ?? 0) - (margin?.right ?? 0)) / tickSpacingX;
@@ -345,7 +345,7 @@ export const TimeSeriesChart = <Datum extends {}>({
                     {!isMobile && (
                       <>
                         {margin?.left && margin.left > 0 && (
-                          <Styled.YAxisBackground x="0" y="0" width={margin.left} height="100%" />
+                          <$YAxisBackground x="0" y="0" width={margin.left} height="100%" />
                         )}
 
                         <Axis
@@ -407,7 +407,7 @@ export const TimeSeriesChart = <Datum extends {}>({
                   </XYChart>
                 );
               }}
-            </Styled.ParentSize>
+            </$ParentSize>
           </EventEmitterProvider>
         </DataProvider>
       ) : (
@@ -415,13 +415,10 @@ export const TimeSeriesChart = <Datum extends {}>({
       )}
 
       {children}
-    </Styled.Container>
+    </$Container>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.div`
+const $Container = styled.div`
   ${layoutMixins.stack}
   width: 0;
   min-width: 100%;
@@ -460,7 +457,7 @@ Styled.Container = styled.div`
   }
 `;
 
-Styled.ParentSize = styled(ParentSize)`
+const $ParentSize = styled(ParentSize)`
   min-height: 0;
   display: grid;
 
@@ -468,7 +465,7 @@ Styled.ParentSize = styled(ParentSize)`
   overscroll-behavior: contain;
 `;
 
-Styled.YAxisBackground = styled.foreignObject`
+const $YAxisBackground = styled.foreignObject`
   background: var(--stickyArea-background);
 
   /* Safari */

@@ -100,8 +100,8 @@ export const Dialog = ({
     <Root modal={showOverlay} open={isOpen} onOpenChange={setIsOpen}>
       {slotTrigger && <Trigger asChild>{slotTrigger}</Trigger>}
       <DialogPortal withPortal={placement !== DialogPlacement.Inline} container={portalContainer}>
-        {showOverlay && <Styled.Overlay />}
-        <Styled.Container
+        {showOverlay && <$Overlay />}
+        <$Container
           placement={placement}
           className={className}
           onEscapeKeyDown={() => {
@@ -116,57 +116,54 @@ export const Dialog = ({
           $withAnimation={withAnimation}
         >
           {stacked ? (
-            <Styled.StackedHeaderTopRow $withBorder={hasHeaderBorder}>
-              {onBack && <Styled.BackButton onClick={onBack} />}
+            <$StackedHeaderTopRow $withBorder={hasHeaderBorder}>
+              {onBack && <$BackButton onClick={onBack} />}
 
               {slotIcon}
 
               {!preventClose && withClose && (
-                <Styled.Close ref={closeButtonRef} $absolute={stacked}>
+                <$Close ref={closeButtonRef} $absolute={stacked}>
                   <Icon iconName={IconName.Close} />
-                </Styled.Close>
+                </$Close>
               )}
 
-              {title && <Styled.Title>{title}</Styled.Title>}
+              {title && <$Title>{title}</$Title>}
 
-              {description && <Styled.Description>{description}</Styled.Description>}
+              {description && <$Description>{description}</$Description>}
 
               {slotHeaderInner}
-            </Styled.StackedHeaderTopRow>
+            </$StackedHeaderTopRow>
           ) : (
-            <Styled.Header $withBorder={hasHeaderBorder}>
-              <Styled.HeaderTopRow>
+            <$Header $withBorder={hasHeaderBorder}>
+              <$HeaderTopRow>
                 {onBack && <BackButton onClick={onBack} />}
 
-                {slotIcon && <Styled.Icon>{slotIcon}</Styled.Icon>}
+                {slotIcon && <$Icon>{slotIcon}</$Icon>}
 
-                {title && <Styled.Title>{title}</Styled.Title>}
+                {title && <$Title>{title}</$Title>}
 
                 {!preventClose && withClose && (
-                  <Styled.Close ref={closeButtonRef}>
+                  <$Close ref={closeButtonRef}>
                     <Icon iconName={IconName.Close} />
-                  </Styled.Close>
+                  </$Close>
                 )}
-              </Styled.HeaderTopRow>
+              </$HeaderTopRow>
 
-              {description && <Styled.Description>{description}</Styled.Description>}
+              {description && <$Description>{description}</$Description>}
 
               {slotHeaderInner}
-            </Styled.Header>
+            </$Header>
           )}
 
-          <Styled.Content>{children}</Styled.Content>
+          <$Content>{children}</$Content>
 
-          {slotFooter && <Styled.Footer>{slotFooter}</Styled.Footer>}
-        </Styled.Container>
+          {slotFooter && <$Footer>{slotFooter}</$Footer>}
+        </$Container>
       </DialogPortal>
     </Root>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Overlay = styled(Overlay)`
+const $Overlay = styled(Overlay)`
   z-index: 1;
 
   position: fixed;
@@ -197,7 +194,7 @@ Styled.Overlay = styled(Overlay)`
   }
 `;
 
-Styled.Container = styled(Content)<{
+const $Container = styled(Content)<{
   placement: DialogPlacement;
   $stacked?: boolean;
   $withAnimation?: boolean;
@@ -390,7 +387,7 @@ Styled.Container = styled(Content)<{
     `}
 `;
 
-Styled.Header = styled.header<{ $withBorder: boolean }>`
+const $Header = styled.header<{ $withBorder: boolean }>`
   ${layoutMixins.stickyHeader}
 
   z-index: var(--dialog-header-z);
@@ -409,12 +406,12 @@ Styled.Header = styled.header<{ $withBorder: boolean }>`
     `};
 `;
 
-Styled.HeaderTopRow = styled.div`
+const $HeaderTopRow = styled.div`
   ${layoutMixins.row}
   gap: var(--dialog-title-gap);
 `;
 
-Styled.StackedHeaderTopRow = styled.div<{ $withBorder: boolean }>`
+const $StackedHeaderTopRow = styled.div<{ $withBorder: boolean }>`
   ${layoutMixins.flexColumn}
   align-items: center;
   justify-content: center;
@@ -431,7 +428,7 @@ Styled.StackedHeaderTopRow = styled.div<{ $withBorder: boolean }>`
     `};
 `;
 
-Styled.Content = styled.div`
+const $Content = styled.div`
   flex: 1;
 
   ${layoutMixins.column}
@@ -449,7 +446,7 @@ Styled.Content = styled.div`
   isolation: isolate;
 `;
 
-Styled.Icon = styled.div`
+const $Icon = styled.div`
   ${layoutMixins.row}
 
   width: 1em;
@@ -459,7 +456,7 @@ Styled.Icon = styled.div`
   line-height: 1;
 `;
 
-Styled.Close = styled(Close)<{ $absolute?: boolean }>`
+const $Close = styled(Close)<{ $absolute?: boolean }>`
   width: 0.7813rem;
   height: 0.7813rem;
 
@@ -500,13 +497,13 @@ Styled.Close = styled(Close)<{ $absolute?: boolean }>`
   }
 `;
 
-Styled.BackButton = styled(BackButton)`
+const $BackButton = styled(BackButton)`
   position: absolute;
   left: var(--dialog-header-paddingLeft);
   top: var(--dialog-header-paddingTop);
 `;
 
-Styled.Title = styled(Title)`
+const $Title = styled(Title)`
   flex: 1;
 
   font: var(--font-large-medium);
@@ -516,13 +513,13 @@ Styled.Title = styled(Title)`
   text-overflow: ellipsis;
 `;
 
-Styled.Description = styled(Description)`
+const $Description = styled(Description)`
   margin-top: 0.5rem;
   color: var(--color-text-0);
   font: var(--font-base-book);
 `;
 
-Styled.Footer = styled.footer`
+const $Footer = styled.footer`
   display: grid;
   ${layoutMixins.stickyFooter}
   ${layoutMixins.withStickyFooterBackdrop}

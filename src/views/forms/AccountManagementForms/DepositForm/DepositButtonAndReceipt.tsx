@@ -1,8 +1,8 @@
-import { useState, type Dispatch, type ReactNode, type SetStateAction } from 'react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
 
 import type { RouteData } from '@0xsquid/sdk';
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { TransferInputTokenResource } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -41,7 +41,6 @@ type ElementProps = {
   setError?: Dispatch<SetStateAction<Error | null>>;
   setRequireUserActionInWallet: (val: boolean) => void;
   slippage: number;
-  slotError?: ReactNode;
   setSlippage: (slippage: number) => void;
   sourceToken?: TransferInputTokenResource;
   squidRoute?: RouteData;
@@ -55,7 +54,6 @@ export const DepositButtonAndReceipt = ({
   sourceToken,
   isDisabled,
   isLoading,
-  slotError,
   setRequireUserActionInWallet,
 }: ElementProps) => {
   const [isEditingSlippage, setIsEditingSlipapge] = useState(false);
@@ -135,7 +133,7 @@ export const DepositButtonAndReceipt = ({
       label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
       value:
         typeof summary?.exchangeRate === 'number' ? (
-          <Styled.ExchangeRate>
+          <$ExchangeRate>
             <Output
               type={OutputType.Asset}
               value={1}
@@ -144,7 +142,7 @@ export const DepositButtonAndReceipt = ({
             />
             =
             <Output type={OutputType.Asset} value={summary?.exchangeRate} tag={usdcLabel} />
-          </Styled.ExchangeRate>
+          </$ExchangeRate>
         ) : (
           <Output type={OutputType.Asset} />
         ),
@@ -241,10 +239,7 @@ export const DepositButtonAndReceipt = ({
     !isDisabled && !isEditingSlippage && connectionError !== ConnectionErrorType.CHAIN_DISRUPTION;
 
   return (
-    <Styled.WithReceipt
-      slotReceipt={<Styled.Details items={submitButtonReceipt} />}
-      slotError={slotError}
-    >
+    <$WithReceipt slotReceipt={<$Details items={submitButtonReceipt} />}>
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
       ) : !isConnectedWagmi ? (
@@ -271,22 +266,19 @@ export const DepositButtonAndReceipt = ({
           {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
         </Button>
       )}
-    </Styled.WithReceipt>
+    </$WithReceipt>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ExchangeRate = styled.span`
+const $ExchangeRate = styled.span`
   ${layoutMixins.row}
   gap: 0.5ch;
 `;
 
-Styled.WithReceipt = styled(WithReceipt)`
+const $WithReceipt = styled(WithReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
-Styled.Details = styled(Details)`
+const $Details = styled(Details)`
   padding: var(--form-input-paddingY) var(--form-input-paddingX);
   font-size: 0.8125em;
 `;

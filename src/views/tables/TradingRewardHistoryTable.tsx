@@ -38,8 +38,8 @@ const getTradingRewardHistoryTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.EVENT }),
         renderCell: ({ startedAtInMilliseconds, endedAtInMilliseconds }) => (
           <TableCell stacked>
-            <Styled.Rewarded>{stringGetter({ key: STRING_KEYS.REWARDED })}</Styled.Rewarded>
-            <Styled.TimePeriod>
+            <$Rewarded>{stringGetter({ key: STRING_KEYS.REWARDED })}</$Rewarded>
+            <$TimePeriod>
               {stringGetter({
                 key: STRING_KEYS.FOR_TRADING,
                 params: {
@@ -60,7 +60,7 @@ const getTradingRewardHistoryTableColumnDef = ({
                   ),
                 },
               })}
-            </Styled.TimePeriod>
+            </$TimePeriod>
           </TableCell>
         ),
       },
@@ -72,7 +72,7 @@ const getTradingRewardHistoryTableColumnDef = ({
           <Output
             type={OutputType.Asset}
             value={amount}
-            slotRight={<Styled.AssetIcon symbol={chainTokenLabel} />}
+            slotRight={<$AssetIcon symbol={chainTokenLabel} />}
           />
         ),
       },
@@ -107,7 +107,7 @@ export const TradingRewardHistoryTable = ({
   const rewardsData = useMemo(() => periodTradingRewards?.toArray() ?? [], [periodTradingRewards]);
 
   return (
-    <Styled.Table
+    <$Table
       label={stringGetter({ key: STRING_KEYS.REWARD_HISTORY })}
       data={rewardsData}
       getRowKey={(row: any) => row.startedAtInMilliseconds}
@@ -130,10 +130,7 @@ export const TradingRewardHistoryTable = ({
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Table = styled(Table)`
+const $Table = styled(Table)`
   --tableCell-padding: 0.5rem 0;
   --tableHeader-backgroundColor: var(--color-layer-3);
   --tableRow-backgroundColor: var(--color-layer-3);
@@ -144,11 +141,11 @@ Styled.Table = styled(Table)`
   }
 `;
 
-Styled.Rewarded = styled.span`
+const $Rewarded = styled.span`
   color: var(--color-text-2);
 `;
 
-Styled.TimePeriod = styled.div`
+const $TimePeriod = styled.div`
   ${layoutMixins.inlineRow}
 
   && {
@@ -162,6 +159,6 @@ Styled.TimePeriod = styled.div`
   }
 `;
 
-Styled.AssetIcon = styled(AssetIcon)`
+const $AssetIcon = styled(AssetIcon)`
   margin-left: 0.5ch;
 `;

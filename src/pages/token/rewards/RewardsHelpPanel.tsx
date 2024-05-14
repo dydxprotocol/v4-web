@@ -16,16 +16,16 @@ export const RewardsHelpPanel = () => {
   const { tradingRewardsLearnMore } = useURLConfigs();
 
   return (
-    <Styled.HelpCard
+    <$HelpCard
       slotHeader={
-        <Styled.Header>
+        <$Header>
           <h3>{stringGetter({ key: STRING_KEYS.HELP })}</h3>
           {tradingRewardsLearnMore && (
             <Link withIcon href={tradingRewardsLearnMore}>
               {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
             </Link>
           )}
-        </Styled.Header>
+        </$Header>
       }
     >
       <Accordion
@@ -44,13 +44,10 @@ export const RewardsHelpPanel = () => {
           },
         ]}
       />
-    </Styled.HelpCard>
+    </$HelpCard>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.HelpCard = styled(Panel)`
+const $HelpCard = styled(Panel)`
   --panel-content-paddingX: 0;
   --panel-content-paddingY: 0;
   width: 100%;
@@ -61,7 +58,7 @@ Styled.HelpCard = styled(Panel)`
   text-align: start;
 `;
 
-Styled.Header = styled.div`
+const $Header = styled.div`
   ${layoutMixins.spacedRow}
   gap: 1ch;
 
@@ -80,6 +77,6 @@ Styled.Header = styled.div`
   }
 `;
 
-Styled.Link = styled(Link)`
+const $Link = styled(Link)`
   display: inline-flex;
 `;

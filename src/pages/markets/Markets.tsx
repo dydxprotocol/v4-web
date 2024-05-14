@@ -28,9 +28,9 @@ const Markets = () => {
   useDocumentTitle(stringGetter({ key: STRING_KEYS.MARKETS }));
 
   return (
-    <Styled.Page>
-      <Styled.HeaderSection>
-        <Styled.ContentSectionHeader
+    <$Page>
+      <$HeaderSection>
+        <$ContentSectionHeader
           title={stringGetter({ key: STRING_KEYS.MARKETS })}
           slotRight={
             hasPotentialMarketsData && (
@@ -43,79 +43,77 @@ const Markets = () => {
             )
           }
         />
-        <Styled.Highlights htmlFor="highlights">
+        <$Highlights htmlFor="highlights">
           {stringGetter({ key: STRING_KEYS.HIDE })}
 
           <Switch name="highlights" checked={showHighlights} onCheckedChange={setShowHighlights} />
-        </Styled.Highlights>
+        </$Highlights>
 
-        <Styled.MarketsStats showHighlights={showHighlights} />
-      </Styled.HeaderSection>
+        <$MarketsStats showHighlights={showHighlights} />
+      </$HeaderSection>
 
-      <Styled.MarketsTable />
-    </Styled.Page>
+      <$MarketsTable />
+    </$Page>
   );
 };
 
-const Styled = {
-  Page: styled.div`
-    ${layoutMixins.contentContainerPage}
-  `,
-  ContentSectionHeader: styled(ContentSectionHeader)`
-    margin-top: 1rem;
-    margin-bottom: 0.25rem;
+const $Page = styled.div`
+  ${layoutMixins.contentContainerPage}
+`;
+const $ContentSectionHeader = styled(ContentSectionHeader)`
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+
+  h3 {
+    font: var(--font-extra-medium);
+  }
+
+  @media ${breakpoints.tablet} {
+    margin-top: 0;
+    padding: 1.25rem 1.5rem 0;
 
     h3 {
       font: var(--font-extra-medium);
     }
+  }
+`;
+const $HeaderSection = styled.section`
+  ${layoutMixins.contentSectionDetached}
 
-    @media ${breakpoints.tablet} {
-      margin-top: 0;
-      padding: 1.25rem 1.5rem 0;
+  margin-bottom: 2rem;
 
-      h3 {
-        font: var(--font-extra-medium);
-      }
-    }
-  `,
-  HeaderSection: styled.section`
-    ${layoutMixins.contentSectionDetached}
-
-    margin-bottom: 2rem;
-
-    @media ${breakpoints.tablet} {
-      ${layoutMixins.flexColumn}
-      gap: 1rem;
-
-      margin-bottom: 1rem;
-    }
-  `,
-  MarketsTable: styled(MarketsTable)`
-    ${layoutMixins.contentSectionAttached}
-  `,
-  MarketsStats: styled(MarketsStats)<{
-    showHighlights?: boolean;
-  }>`
-    ${({ showHighlights }) => !showHighlights && 'display: none;'}
-  `,
-  Highlights: styled.label`
-    align-items: center;
+  @media ${breakpoints.tablet} {
+    ${layoutMixins.flexColumn}
     gap: 1rem;
-    margin-bottom: 1.25rem;
-    display: none;
-    cursor: pointer;
 
-    @media ${breakpoints.desktopSmall} {
-      padding-left: 1rem;
-      padding-right: 1rem;
-    }
+    margin-bottom: 1rem;
+  }
+`;
+const $MarketsTable = styled(MarketsTable)`
+  ${layoutMixins.contentSectionAttached}
+`;
+const $MarketsStats = styled(MarketsStats)<{
+  showHighlights?: boolean;
+}>`
+  ${({ showHighlights }) => !showHighlights && 'display: none;'}
+`;
+const $Highlights = styled.label`
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  display: none;
+  cursor: pointer;
 
-    @media ${breakpoints.tablet} {
-      padding-left: 1.5rem;
-      padding-right: 1.5rem;
-      margin-bottom: 0;
-      display: flex;
-    }
-  `,
-};
+  @media ${breakpoints.desktopSmall} {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  @media ${breakpoints.tablet} {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    margin-bottom: 0;
+    display: flex;
+  }
+`;
 export default Markets;

@@ -42,14 +42,14 @@ export const MigratePanel = ({ className }: { className?: string }) => {
   });
 
   return isNotTablet ? (
-    <Styled.MigratePanel
+    <$MigratePanel
       className={className}
-      slotHeader={<Styled.Title>{stringGetter({ key: STRING_KEYS.MIGRATE })}</Styled.Title>}
+      slotHeader={<$Title>{stringGetter({ key: STRING_KEYS.MIGRATE })}</$Title>}
       slotRight={
-        <Styled.MigrateAction>
+        <$MigrateAction>
           <div>
             <div>{stringGetter({ key: STRING_KEYS.AVAILABLE_TO_MIGRATE })}</div>
-            <Styled.Token type={OutputType.Asset} value={tokenBalance} />
+            <$Token type={OutputType.Asset} value={tokenBalance} />
           </div>
           {import.meta.env.VITE_TOKEN_MIGRATION_URI && (
             <Button
@@ -61,47 +61,47 @@ export const MigratePanel = ({ className }: { className?: string }) => {
               {stringGetter({ key: STRING_KEYS.MIGRATE_NOW })}
             </Button>
           )}
-        </Styled.MigrateAction>
+        </$MigrateAction>
       }
     >
-      <Styled.Description>
+      <$Description>
         {stringGetter({ key: STRING_KEYS.MIGRATE_DESCRIPTION })}
         <Link href={TOKEN_MIGRATION_LEARN_MORE_LINK}>
           {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
         </Link>
-      </Styled.Description>
-    </Styled.MigratePanel>
+      </$Description>
+    </$MigratePanel>
   ) : (
-    <Styled.MigratePanel
+    <$MigratePanel
       className={className}
       slotHeader={
-        <Styled.MobileMigrateHeader>
+        <$MobileMigrateHeader>
           <h3>
             <Icon iconName={IconName.Migrate} />
             {stringGetter({ key: STRING_KEYS.MIGRATE })}
           </h3>
-          <Styled.VerticalSeparator />
+          <$VerticalSeparator />
           <span>
             {stringGetter({
               key: STRING_KEYS.FROM_TO,
               params: { FROM: <b>Ethereum</b>, TO: <b>dYdX Chain</b> },
             })}
           </span>
-        </Styled.MobileMigrateHeader>
+        </$MobileMigrateHeader>
       }
     >
-      <Styled.Column>
-        <Styled.WithReceipt
+      <$Column>
+        <$WithReceipt
           slotReceipt={
-            <Styled.Details
+            <$Details
               items={[
                 {
                   key: 'available-to-migrate',
                   label: (
-                    <Styled.InlineRow>
+                    <$InlineRow>
                       {stringGetter({ key: STRING_KEYS.AVAILABLE_TO_MIGRATE })}
                       <Tag>DYDX</Tag>
-                    </Styled.InlineRow>
+                    </$InlineRow>
                   ),
                   value: <Output type={OutputType.Asset} value={tokenBalance} />,
                 },
@@ -119,21 +119,18 @@ export const MigratePanel = ({ className }: { className?: string }) => {
               {stringGetter({ key: STRING_KEYS.MIGRATE_NOW })}
             </Button>
           )}
-        </Styled.WithReceipt>
-        <Styled.InlineRow>
+        </$WithReceipt>
+        <$InlineRow>
           {stringGetter({ key: STRING_KEYS.WANT_TO_LEARN })}
           <Link href={TOKEN_MIGRATION_LEARN_MORE_LINK} withIcon>
             {stringGetter({ key: STRING_KEYS.CLICK_HERE })}
           </Link>
-        </Styled.InlineRow>
-      </Styled.Column>
-    </Styled.MigratePanel>
+        </$InlineRow>
+      </$Column>
+    </$MigratePanel>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.MigratePanel = styled(Panel)`
+const $MigratePanel = styled(Panel)`
   width: 100%;
 
   background-image: url('/dots-background.svg');
@@ -141,7 +138,7 @@ Styled.MigratePanel = styled(Panel)`
   background-repeat: no-repeat;
 `;
 
-Styled.Title = styled.h3`
+const $Title = styled.h3`
   font: var(--font-medium-book);
   color: var(--color-text-2);
 
@@ -149,7 +146,7 @@ Styled.Title = styled.h3`
   margin-bottom: -0.5rem;
 `;
 
-Styled.MigrateAction = styled.div`
+const $MigrateAction = styled.div`
   ${layoutMixins.flexEqualColumns}
   align-items: center;
   gap: 1rem;
@@ -162,12 +159,12 @@ Styled.MigrateAction = styled.div`
   border-radius: 0.75rem;
 `;
 
-Styled.Token = styled(Output)`
+const $Token = styled(Output)`
   font: var(--font-large-book);
   color: var(--color-text-2);
 `;
 
-Styled.Description = styled.div`
+const $Description = styled.div`
   color: var(--color-text-0);
   --link-color: var(--color-text-1);
 
@@ -179,13 +176,13 @@ Styled.Description = styled.div`
   }
 `;
 
-Styled.Column = styled.div`
+const $Column = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1rem;
   align-items: center;
 `;
 
-Styled.MobileMigrateHeader = styled.div`
+const $MobileMigrateHeader = styled.div`
   ${layoutMixins.inlineRow}
   gap: 1ch;
 
@@ -214,7 +211,7 @@ Styled.MobileMigrateHeader = styled.div`
   }
 `;
 
-Styled.VerticalSeparator = styled(VerticalSeparator)`
+const $VerticalSeparator = styled(VerticalSeparator)`
   z-index: 1;
 
   && {
@@ -222,15 +219,15 @@ Styled.VerticalSeparator = styled(VerticalSeparator)`
   }
 `;
 
-Styled.Details = styled(Details)`
+const $Details = styled(Details)`
   padding: 0.5rem 1rem;
 `;
 
-Styled.WithReceipt = styled(WithReceipt)`
+const $WithReceipt = styled(WithReceipt)`
   width: 100%;
 `;
 
-Styled.InlineRow = styled.div`
+const $InlineRow = styled.div`
   ${layoutMixins.inlineRow}
   color: var(--color-text-0);
   --link-color: var(--color-text-1);

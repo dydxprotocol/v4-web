@@ -39,20 +39,17 @@ export const ExternalLinkDialog = ({
         linkDescription ?? stringGetter({ key: STRING_KEYS.LEAVING_WEBSITE_DESCRIPTION })
       }
     >
-      <Styled.Content>
+      <$Content>
         {slotContent}
         <p>{stringGetter({ key: STRING_KEYS.LEAVING_WEBSITE_DISCLAIMER })}.</p>
         <Button type={ButtonType.Link} action={ButtonAction.Primary} href={link}>
           {buttonText ?? stringGetter({ key: STRING_KEYS.CONTINUE })}
         </Button>
-      </Styled.Content>
+      </$Content>
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1rem;
 

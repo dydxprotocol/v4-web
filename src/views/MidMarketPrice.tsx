@@ -48,7 +48,7 @@ export const MidMarketPrice = () => {
   }, [midMarketPrice]);
 
   return midMarketPrice !== undefined ? (
-    <Styled.Output
+    <$Output
       type={OutputType.Fiat}
       value={midMarketPrice}
       color={midMarketColor}
@@ -58,10 +58,7 @@ export const MidMarketPrice = () => {
     <LoadingDots size={5} />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Output = styled(Output)<{ color?: string }>`
+const $Output = styled(Output)<{ color?: string }>`
   ${layoutMixins.row}
 
   ${({ color }) =>

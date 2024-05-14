@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { StatusResponse } from '@0xsquid/sdk';
 import { useSelector } from 'react-redux';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { TransferNotificationTypes } from '@/constants/notifications';
@@ -117,57 +117,54 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
   if (!status) return <LoadingDots size={3} />;
 
   return (
-    <Styled.BridgingStatus className={className}>
+    <$BridgingStatus className={className}>
       {steps.map((step) => (
-        <Styled.Step key={step.step}>
-          <Styled.row>
+        <$Step key={step.step}>
+          <$row>
             {step.step === currentStep ? (
-              <Styled.Icon>
-                <Styled.Spinner />
-              </Styled.Icon>
+              <$Icon>
+                <$Spinner />
+              </$Icon>
             ) : step.step < currentStep ? (
-              <Styled.Icon state="complete">
+              <$Icon state="complete">
                 <Icon iconName={IconName.Check} />
-              </Styled.Icon>
+              </$Icon>
             ) : (
-              <Styled.Icon state="default">{step.step + 1}</Styled.Icon>
+              <$Icon state="default">{step.step + 1}</$Icon>
             )}
             {step.link && currentStep >= step.step ? (
               <Link href={step.link}>
-                <Styled.Label highlighted={currentStep >= step.step}>
+                <$Label highlighted={currentStep >= step.step}>
                   {step.label}
                   <Icon iconName={IconName.LinkOut} />
-                </Styled.Label>
+                </$Label>
               </Link>
             ) : (
-              <Styled.Label highlighted={currentStep >= step.step}>{step.label}</Styled.Label>
+              <$Label highlighted={currentStep >= step.step}>{step.label}</$Label>
             )}
-          </Styled.row>
-        </Styled.Step>
+          </$row>
+        </$Step>
       ))}
-    </Styled.BridgingStatus>
+    </$BridgingStatus>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.BridgingStatus = styled.div`
+const $BridgingStatus = styled.div`
   ${layoutMixins.flexColumn};
 
   gap: 1rem;
   padding: 1rem 0;
 `;
 
-Styled.Step = styled.div`
+const $Step = styled.div`
   ${layoutMixins.spacedRow};
 `;
 
-Styled.row = styled.div`
+const $row = styled.div`
   ${layoutMixins.inlineRow};
   gap: 0.5rem;
 `;
 
-Styled.Icon = styled.div<{ state: 'complete' | 'default' }>`
+const $Icon = styled.div<{ state?: 'complete' | 'default' }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -180,23 +177,25 @@ Styled.Icon = styled.div<{ state: 'complete' | 'default' }>`
   background-color: var(--color-layer-3);
 
   ${({ state }) =>
-    ({
-      ['complete']: css`
-        color: var(--color-success);
-      `,
-      ['default']: css`
-        color: var(--color-text-0);
-      `,
-    }[state])}
+    state == null
+      ? undefined
+      : {
+          ['complete']: css`
+            color: var(--color-success);
+          `,
+          ['default']: css`
+            color: var(--color-text-0);
+          `,
+        }[state]}
 `;
 
-Styled.Spinner = styled(LoadingSpinner)`
+const $Spinner = styled(LoadingSpinner)`
   --spinner-width: 1.25rem;
 
   color: var(--color-accent);
 `;
 
-Styled.Label = styled(Styled.row)<{ highlighted?: boolean }>`
+const $Label = styled($row)<{ highlighted?: boolean }>`
   ${({ highlighted }) =>
     highlighted
       ? css`

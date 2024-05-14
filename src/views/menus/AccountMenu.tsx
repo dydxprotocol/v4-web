@@ -3,7 +3,7 @@ import { ElementType, memo } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
 import type { Dispatch } from '@reduxjs/toolkit';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -78,7 +78,7 @@ export const AccountMenu = () => {
 
   let walletIcon;
   if (onboardingState === OnboardingState.WalletConnected) {
-    walletIcon = <Styled.WarningIcon iconName={IconName.Warning} />;
+    walletIcon = <$WarningIcon iconName={IconName.Warning} />;
   } else if (
     onboardingState === OnboardingState.AccountConnected &&
     walletType === WalletType.Privy
@@ -99,13 +99,13 @@ export const AccountMenu = () => {
   return onboardingState === OnboardingState.Disconnected ? (
     <OnboardingTriggerButton size={ButtonSize.XSmall} />
   ) : (
-    <Styled.DropdownMenu
+    <$DropdownMenu
       slotTopContent={
         onboardingState === OnboardingState.AccountConnected && (
-          <Styled.AccountInfo>
-            <Styled.AddressRow>
-              <Styled.AssetIcon symbol="DYDX" />
-              <Styled.Column>
+          <$AccountInfo>
+            <$AddressRow>
+              <$AssetIcon symbol="DYDX" />
+              <$Column>
                 <WithTooltip
                   slotTooltip={
                     <dl>
@@ -121,15 +121,13 @@ export const AccountMenu = () => {
                     </dl>
                   }
                 >
-                  <Styled.label>
-                    {stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}
-                  </Styled.label>
+                  <$label>{stringGetter({ key: STRING_KEYS.DYDX_CHAIN_ADDRESS })}</$label>
                 </WithTooltip>
-                <Styled.Address>{truncateAddress(dydxAddress)}</Styled.Address>
-              </Styled.Column>
-              <Styled.CopyButton buttonType="icon" value={dydxAddress} shape={ButtonShape.Square} />
+                <$Address>{truncateAddress(dydxAddress)}</$Address>
+              </$Column>
+              <$CopyButton buttonType="icon" value={dydxAddress} shape={ButtonShape.Square} />
               <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.MINTSCAN })}>
-                <Styled.IconButton
+                <$IconButton
                   action={ButtonAction.Base}
                   href={`${mintscanBase}/account/${dydxAddress}`}
                   iconName={IconName.LinkOut}
@@ -137,30 +135,30 @@ export const AccountMenu = () => {
                   type={ButtonType.Link}
                 />
               </WithTooltip>
-            </Styled.AddressRow>
+            </$AddressRow>
             {walletType && walletType !== WalletType.Privy && (
-              <Styled.AddressRow>
-                <Styled.SourceIcon>
-                  <Styled.ConnectorIcon iconName={IconName.AddressConnector} />
+              <$AddressRow>
+                <$SourceIcon>
+                  <$ConnectorIcon iconName={IconName.AddressConnector} />
                   <Icon iconComponent={wallets[walletType].icon as ElementType} />
-                </Styled.SourceIcon>
-                <Styled.Column>
-                  <Styled.label>{stringGetter({ key: STRING_KEYS.SOURCE_ADDRESS })}</Styled.label>
-                  <Styled.Address>{truncateAddress(evmAddress, '0x')}</Styled.Address>
-                </Styled.Column>
-              </Styled.AddressRow>
+                </$SourceIcon>
+                <$Column>
+                  <$label>{stringGetter({ key: STRING_KEYS.SOURCE_ADDRESS })}</$label>
+                  <$Address>{truncateAddress(evmAddress, '0x')}</$Address>
+                </$Column>
+              </$AddressRow>
             )}
-            <Styled.Balances>
+            <$Balances>
               <div>
                 <div>
-                  <Styled.label>
+                  <$label>
                     {stringGetter({
                       key: STRING_KEYS.ASSET_BALANCE,
                       params: { ASSET: chainTokenLabel },
                     })}
                     <AssetIcon symbol={chainTokenLabel} />
-                  </Styled.label>
-                  <Styled.BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
+                  </$label>
+                  <$BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
                 </div>
                 <AssetActions
                   asset={DydxChainAsset.CHAINTOKEN}
@@ -172,18 +170,14 @@ export const AccountMenu = () => {
               </div>
               <div>
                 <div>
-                  <Styled.label>
+                  <$label>
                     {stringGetter({
                       key: STRING_KEYS.ASSET_BALANCE,
                       params: { ASSET: usdcLabel },
                     })}
                     <AssetIcon symbol="USDC" />
-                  </Styled.label>
-                  <Styled.BalanceOutput
-                    type={OutputType.Asset}
-                    value={usdcBalance}
-                    fractionDigits={2}
-                  />
+                  </$label>
+                  <$BalanceOutput type={OutputType.Asset} value={usdcBalance} fractionDigits={2} />
                 </div>
                 <AssetActions
                   asset={DydxChainAsset.USDC}
@@ -194,18 +188,18 @@ export const AccountMenu = () => {
                   withOnboarding
                 />
               </div>
-            </Styled.Balances>
-          </Styled.AccountInfo>
+            </$Balances>
+          </$AccountInfo>
         )
       }
       items={[
         onboardingState === OnboardingState.WalletConnected && {
           value: 'ConnectToChain',
           label: (
-            <Styled.ConnectToChain>
+            <$ConnectToChain>
               <p>{stringGetter({ key: STRING_KEYS.MISSING_KEYS_DESCRIPTION })}</p>
               <OnboardingTriggerButton />
-            </Styled.ConnectToChain>
+            </$ConnectToChain>
           ),
           onSelect: onRecoverKeys,
           separator: true,
@@ -263,7 +257,7 @@ export const AccountMenu = () => {
                 value: 'MnemonicExport',
                 icon: <Icon iconName={IconName.ExportKeys} />,
                 label: <span>{stringGetter({ key: STRING_KEYS.EXPORT_SECRET_PHRASE })}</span>,
-                highlightColor: 'destroy',
+                highlightColor: 'destroy' as const,
                 onSelect: () => dispatch(openDialog({ type: DialogTypes.MnemonicExport })),
               },
             ]
@@ -272,7 +266,7 @@ export const AccountMenu = () => {
           value: 'Disconnect',
           icon: <Icon iconName={IconName.BoxClose} />,
           label: stringGetter({ key: STRING_KEYS.DISCONNECT }),
-          highlightColor: 'destroy',
+          highlightColor: 'destroy' as const,
           onSelect: () => dispatch(openDialog({ type: DialogTypes.DisconnectWallet })),
         },
       ].filter(isTruthy)}
@@ -280,8 +274,8 @@ export const AccountMenu = () => {
       sideOffset={16}
     >
       {walletIcon}
-      {!isTablet && <Styled.Address>{truncateAddress(dydxAddress)}</Styled.Address>}
-    </Styled.DropdownMenu>
+      {!isTablet && <$Address>{truncateAddress(dydxAddress)}</$Address>}
+    </$DropdownMenu>
   );
 };
 
@@ -301,7 +295,7 @@ const AssetActions = memo(
     hasBalance?: boolean;
     stringGetter: StringGetterFunction;
   }) => (
-    <Styled.InlineRow>
+    <$InlineRow>
       {[
         withOnboarding &&
           complianceState === ComplianceStates.FULL_ACCESS && {
@@ -325,57 +319,54 @@ const AssetActions = memo(
       ]
         .filter(isTruthy)
         .map(({ iconName, tooltipStringKey, dialogType, dialogProps }) => (
-          <Styled.WithTooltip
+          <$WithTooltip
             key={tooltipStringKey}
             tooltipString={stringGetter({ key: tooltipStringKey })}
           >
-            <Styled.IconButton
+            <$IconButton
               key={dialogType}
               action={ButtonAction.Base}
               shape={ButtonShape.Square}
               iconName={iconName}
               onClick={() => dispatch(openDialog({ type: dialogType, dialogProps }))}
             />
-          </Styled.WithTooltip>
+          </$WithTooltip>
         ))}
-    </Styled.InlineRow>
+    </$InlineRow>
   )
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.AccountInfo = styled.div`
+const $AccountInfo = styled.div`
   ${layoutMixins.flexColumn}
 
   gap: 1rem;
   padding: 1rem 1rem 0.5rem 1rem;
 `;
 
-Styled.Column = styled.div`
+const $Column = styled.div`
   ${layoutMixins.column}
 `;
 
-Styled.InlineRow = styled.div`
+const $InlineRow = styled.div`
   ${layoutMixins.inlineRow}
 `;
 
-Styled.AddressRow = styled.div`
+const $AddressRow = styled.div`
   ${layoutMixins.row}
 
   gap: 0.5rem;
 
-  ${Styled.Column} {
+  ${$Column} {
     margin-right: 0.5rem;
   }
 `;
 
-Styled.AssetIcon = styled(AssetIcon)`
+const $AssetIcon = styled(AssetIcon)`
   z-index: 2;
 
   font-size: 1.75rem;
 `;
 
-Styled.SourceIcon = styled.div`
+const $SourceIcon = styled.div`
   padding: 0.375rem;
   position: relative;
   z-index: 1;
@@ -387,13 +378,13 @@ Styled.SourceIcon = styled.div`
   background-color: #303045;
 `;
 
-Styled.ConnectorIcon = styled(Icon)`
+const $ConnectorIcon = styled(Icon)`
   position: absolute;
   top: -1.625rem;
   height: 1.75rem;
 `;
 
-Styled.label = styled.div`
+const $label = styled.div`
   ${layoutMixins.row}
 
   gap: 0.25rem;
@@ -405,7 +396,7 @@ Styled.label = styled.div`
   }
 `;
 
-Styled.Balances = styled.div`
+const $Balances = styled.div`
   ${layoutMixins.flexColumn}
 
   > div {
@@ -426,28 +417,28 @@ Styled.Balances = styled.div`
   }
 `;
 
-Styled.BalanceOutput = styled(Output)`
+const $BalanceOutput = styled(Output)`
   font-size: var(--fontSize-medium);
 `;
 
-Styled.DropdownMenu = styled(DropdownMenu)`
+const $DropdownMenu = styled(DropdownMenu)`
   ${headerMixins.dropdownTrigger}
 
   --dropdownMenu-item-font-size: 0.875rem;
   --popover-padding: 0 0 0.5rem 0;
-`;
+` as typeof DropdownMenu;
 
-Styled.WarningIcon = styled(Icon)`
+const $WarningIcon = styled(Icon)`
   font-size: 1.25rem;
   color: var(--color-warning);
 `;
 
-Styled.Address = styled.span`
+const $Address = styled.span`
   font: var(--font-base-book);
   font-feature-settings: var(--fontFeature-monoNumbers);
 `;
 
-Styled.ConnectToChain = styled(Styled.Column)`
+const $ConnectToChain = styled($Column)`
   max-width: 12em;
   gap: 0.5rem;
   text-align: center;
@@ -458,7 +449,7 @@ Styled.ConnectToChain = styled(Styled.Column)`
   }
 `;
 
-Styled.IconButton = styled(IconButton)<{ iconName: IconName }>`
+const $IconButton = styled(IconButton)<{ iconName: IconName }>`
   --button-padding: 0 0.25rem;
   --button-border: solid var(--border-width) var(--color-layer-6);
 
@@ -469,11 +460,11 @@ Styled.IconButton = styled(IconButton)<{ iconName: IconName }>`
     `}
 `;
 
-Styled.CopyButton = styled(CopyButton)`
+const $CopyButton = styled(CopyButton)`
   --button-padding: 0 0.25rem;
   --button-border: solid var(--border-width) var(--color-layer-6);
 `;
 
-Styled.WithTooltip = styled(WithTooltip)`
+const $WithTooltip = styled(WithTooltip)`
   --tooltip-backgroundColor: var(--color-layer-5);
 `;

@@ -1,4 +1,4 @@
-import React, { Key, useEffect, useState } from 'react';
+import React, { Key, useCallback, useEffect, useState } from 'react';
 
 import {
   Cell, // CollectionBuilderContext,
@@ -12,6 +12,7 @@ import {
 import { type GridNode } from '@react-types/grid';
 import type { CollectionChildren, Node, SortDescriptor, SortDirection } from '@react-types/shared';
 import { type ColumnSize, type TableCollection } from '@react-types/table';
+import { isFunction } from 'lodash';
 import {
   mergeProps,
   useCollator,
@@ -24,7 +25,7 @@ import {
   useTableRowGroup,
 } from 'react-aria';
 import { useAsyncList } from 'react-stately';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -57,6 +58,18 @@ export type CustomRowConfig = {
   slotCustomRow: (..._: Parameters<typeof TableRow>) => React.ReactNode;
 };
 
+function isCustomRow<TableRowData extends object>(
+  v: TableRowData | CustomRowConfig
+): v is CustomRowConfig {
+  return (v as any).slotCustomRow != null && isFunction((v as any).slotCustomRow);
+}
+
+function isTableRowData<TableRowData extends object>(
+  v: TableRowData | CustomRowConfig
+): v is TableRowData {
+  return !isCustomRow(v);
+}
+
 export type TableItem<TableRowData> = {
   value: TableRowData;
 
@@ -68,7 +81,7 @@ export type TableItem<TableRowData> = {
   onSelect?: (key: TableRowData) => void;
 };
 
-export type ColumnDef<TableRowData extends object> = {
+export type ColumnDef<TableRowData extends object | CustomRowConfig> = {
   columnKey: string;
   label: React.ReactNode;
   tag?: React.ReactNode;
@@ -83,10 +96,13 @@ export type ColumnDef<TableRowData extends object> = {
   width?: ColumnSize;
 };
 
-export type ElementProps<TableRowData extends object | CustomRowConfig, TableRowKey extends Key> = {
+export type TableElementProps<
+  TableRowData extends object | CustomRowConfig,
+  TableRowKey extends Key
+> = {
   label?: string;
   columns: ColumnDef<TableRowData>[];
-  data: TableRowData[];
+  data: Array<TableRowData | CustomRowConfig>;
   getRowKey: (rowData: TableRowData, rowIndex?: number) => TableRowKey;
   getRowAttributes?: (rowData: TableRowData, rowIndex?: number) => Record<string, any>;
   // shouldRowRender?: (prevRowData: object, currentRowData: object) => boolean;
@@ -100,7 +116,7 @@ export type ElementProps<TableRowData extends object | CustomRowConfig, TableRow
   // children: React.ReactNode;
 };
 
-type StyleProps = {
+export type TableStyleProps = {
   hideHeader?: boolean;
   withGradientCardRows?: boolean; // TODO: CT-662
   withFocusStickyRows?: boolean;
@@ -114,7 +130,13 @@ type StyleProps = {
 
 export type TableConfig<TableRowData> = TableItem<TableRowData>[];
 
-export const Table = <TableRowData extends object, TableRowKey extends Key>({
+export type AllTableProps<
+  TableRowData extends object | CustomRowConfig,
+  TableRowKey extends Key
+> = TableElementProps<TableRowData, TableRowKey> &
+  TableStyleProps & { style?: { [customProp: string]: number } };
+
+export const Table = <TableRowData extends object | CustomRowConfig, TableRowKey extends Key>({
   label = '',
   columns,
   data = [],
@@ -142,7 +164,7 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   withScrollSnapRows = false,
   className,
   style,
-}: ElementProps<TableRowData, TableRowKey> & StyleProps) => {
+}: AllTableProps<TableRowData, TableRowKey>) => {
   const [selectedKeys, setSelectedKeys] = useState(new Set<TableRowKey>());
   const [numRowsToShow, setNumRowsToShow] = useState(viewMoreConfig?.initialNumRowsToShow);
   const enableViewMore = viewMoreConfig !== undefined;
@@ -165,16 +187,16 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   const collator = useCollator();
 
   const sortFn = (
-    a: TableRowData,
-    b: TableRowData,
+    a: TableRowData | CustomRowConfig,
+    b: TableRowData | CustomRowConfig,
     sortColumn?: Key,
     sortDirection?: SortDirection
   ) => {
     if (!sortColumn) return 0;
 
     const column = columns.find((column) => column.columnKey === sortColumn);
-    const first = column?.getCellValue(a);
-    const second = column?.getCellValue(b);
+    const first = isCustomRow(a) ? 0 : column?.getCellValue(a);
+    const second = isCustomRow(b) ? 0 : column?.getCellValue(b);
 
     return (
       // Compare the items by the sorted column
@@ -188,8 +210,12 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
     );
   };
 
-  const list = useAsyncList<TableRowData>({
-    getKey: getRowKey,
+  const internalGetRowKey = useCallback((row: TableRowData | CustomRowConfig) => {
+    return isCustomRow(row) ? row.key : getRowKey(row);
+  }, []);
+
+  const list = useAsyncList<TableRowData | CustomRowConfig>({
+    getKey: internalGetRowKey,
     load: async ({ sortDescriptor }) => ({
       items: sortDescriptor?.column
         ? data.sort((a, b) => sortFn(a, b, sortDescriptor?.column, sortDescriptor?.direction))
@@ -208,7 +234,7 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   const isEmpty = data.length === 0;
 
   return (
-    <Styled.TableWrapper
+    <$TableWrapper
       className={className}
       style={style}
       isEmpty={isEmpty}
@@ -227,7 +253,11 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
           getRowAttributes={getRowAttributes}
           onRowAction={
             onRowAction &&
-            ((key: TableRowKey) => onRowAction(key, data.find((row) => getRowKey(row) === key)!))
+            ((key: TableRowKey) =>
+              onRowAction(
+                key,
+                data.filter(isTableRowData).find((row) => internalGetRowKey(row) === key)!
+              ))
           }
           numColumns={shownColumns.length}
           onViewMoreClick={
@@ -259,10 +289,11 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
 
           <TableBody items={enableViewMore ? list.items.slice(0, numRowsToShow) : list.items}>
             {(item) => (
-              <Row key={getRowKey(item)}>
+              <Row key={internalGetRowKey(item)}>
                 {(columnKey) => (
-                  <Cell key={`${getRowKey(item)}-${columnKey}`}>
-                    {columns.find((column) => column.columnKey === columnKey)?.renderCell?.(item)}
+                  <Cell key={`${internalGetRowKey(item)}-${columnKey}`}>
+                    {isTableRowData(item) &&
+                      columns.find((column) => column.columnKey === columnKey)?.renderCell?.(item)}
                   </Cell>
                 )}
               </Row>
@@ -270,9 +301,9 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
           </TableBody>
         </TableRoot>
       ) : (
-        <Styled.Empty withOuterBorder={withOuterBorder}>{slotEmpty}</Styled.Empty>
+        <$Empty withOuterBorder={withOuterBorder}>{slotEmpty}</$Empty>
       )}
-    </Styled.TableWrapper>
+    </$TableWrapper>
   );
 };
 
@@ -321,7 +352,7 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
   );
 
   return (
-    <Styled.Table
+    <$Table
       ref={ref}
       {...gridProps}
       hideHeader={props.hideHeader}
@@ -414,7 +445,7 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
           <ViewMoreRow colSpan={numColumns} onClick={onViewMoreClick} />
         ) : undefined}
       </TableBodyRowGroup>
-    </Styled.Table>
+    </$Table>
   );
 };
 
@@ -431,14 +462,14 @@ const TableHeadRowGroup = ({
   const { rowGroupProps } = useTableRowGroup();
 
   return (
-    <Styled.Thead
+    <$Thead
       {...rowGroupProps}
       hidden={hidden}
       withGradientCardRows={withGradientCardRows}
       withInnerBorders={withInnerBorders}
     >
       {children}
-    </Styled.Thead>
+    </$Thead>
   );
 };
 
@@ -447,18 +478,18 @@ const TableBodyRowGroup = ({
   withGradientCardRows,
   withInnerBorders,
   withOuterBorder,
-}: { children: React.ReactNode } & StyleProps) => {
+}: { children: React.ReactNode } & TableStyleProps) => {
   const { rowGroupProps } = useTableRowGroup();
 
   return (
-    <Styled.Tbody
+    <$Tbody
       {...rowGroupProps}
       withGradientCardRows={withGradientCardRows}
       withInnerBorders={withInnerBorders}
       withOuterBorder={withOuterBorder}
     >
       {children}
-    </Styled.Tbody>
+    </$Tbody>
   );
 };
 
@@ -477,9 +508,9 @@ const TableHeaderRow = <TableRowData extends object>({
   const { rowProps } = useTableHeaderRow({ node: item }, state, ref);
 
   return (
-    <Styled.Tr ref={ref} {...rowProps} withScrollSnapRows={withScrollSnapRows}>
+    <$Tr ref={ref} {...rowProps} withScrollSnapRows={withScrollSnapRows}>
       {children}
-    </Styled.Tr>
+    </$Tr>
   );
 };
 
@@ -497,7 +528,7 @@ const TableColumnHeader = <TableRowData extends object>({
   const { isFocusVisible, focusProps } = useFocusRing();
 
   return (
-    <Styled.Th
+    <$Th
       {...mergeProps(columnHeaderProps, focusProps)}
       colSpan={column.props.colspan}
       // data-focused={isFocusVisible || undefined}
@@ -505,37 +536,39 @@ const TableColumnHeader = <TableRowData extends object>({
       ref={ref}
       withScrollSnapColumns={withScrollSnapColumns}
     >
-      <Styled.Row>
+      <$Row>
         {column.rendered}
         {column.props.allowsSorting && (
-          <Styled.SortArrow
+          <$SortArrow
             aria-hidden="true"
             sortDirection={
-              state.sortDescriptor?.column === column.key && state.sortDescriptor?.direction
+              state.sortDescriptor?.column === column.key
+                ? state.sortDescriptor?.direction
+                : undefined
             }
           >
             <Icon iconName={IconName.Triangle} aria-hidden="true" />
-          </Styled.SortArrow>
+          </$SortArrow>
         )}
-      </Styled.Row>
-    </Styled.Th>
+      </$Row>
+    </$Th>
   );
 };
 
 export const ViewMoreRow = ({ colSpan, onClick }: { colSpan: number; onClick: () => void }) => {
   const stringGetter = useStringGetter();
   return (
-    <Styled.ViewMoreTr key="viewmore">
-      <Styled.Td
+    <$ViewMoreTr key="viewmore">
+      <$Td
         colSpan={colSpan}
-        onMouseDown={(e: MouseEvent) => e.preventDefault()}
-        onPointerDown={(e: MouseEvent) => e.preventDefault()}
+        onMouseDown={(e: React.MouseEvent<HTMLTableCellElement>) => e.preventDefault()}
+        onPointerDown={(e: React.MouseEvent<HTMLTableCellElement>) => e.preventDefault()}
       >
-        <Styled.ViewMoreButton slotRight={<CaretIcon />} onClick={onClick}>
+        <$ViewMoreButton slotRight={<CaretIcon />} onClick={onClick}>
           {stringGetter({ key: STRING_KEYS.VIEW_MORE })}
-        </Styled.ViewMoreButton>
-      </Styled.Td>
-    </Styled.ViewMoreTr>
+        </$ViewMoreButton>
+      </$Td>
+    </$ViewMoreTr>
   );
 };
 
@@ -575,20 +608,19 @@ export const TableRow = <TableRowData extends object>({
   const { isFocusVisible, focusProps } = useFocusRing();
 
   return (
-    <Styled.Tr
+    <$Tr
       ref={ref}
       data-selected={isSelected}
       // data-focused={isFocusVisible || undefined}
       $data-isPressed={isPressed}
       {...mergeProps(rowProps, focusProps)}
       {...attrs}
-      withGradientCardRows={withGradientCardRows}
       withFocusStickyRows={withFocusStickyRows}
       withScrollSnapRows={withScrollSnapRows}
       isClickable={isClickable}
     >
       {children}
-    </Styled.Tr>
+    </$Tr>
   );
 };
 
@@ -611,7 +643,7 @@ const TableCell = <TableRowData extends object>({
   const { isFocusVisible, focusProps } = useFocusRing();
 
   return (
-    <Styled.Td
+    <$Td
       {...mergeProps(
         isActionable
           ? {
@@ -628,7 +660,7 @@ const TableCell = <TableRowData extends object>({
       {/* <Styled.Row> */}
       {cell.rendered}
       {/* </Styled.Row> */}
-    </Styled.Td>
+    </$Td>
   );
 };
 
@@ -666,10 +698,7 @@ const TableCell = <TableRowData extends object>({
 //     </Styled.Td>
 //   );
 // };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TableWrapper = styled.div<{
+const $TableWrapper = styled.div<{
   isEmpty: boolean;
   withGradientCardRows?: boolean;
   withOuterBorder: boolean;
@@ -708,7 +737,7 @@ Styled.TableWrapper = styled.div<{
     `}
 `;
 
-Styled.Empty = styled.div<{ withOuterBorder: boolean }>`
+const $Empty = styled.div<{ withOuterBorder: boolean }>`
   ${layoutMixins.column}
   height: 100%;
 
@@ -721,13 +750,15 @@ Styled.Empty = styled.div<{ withOuterBorder: boolean }>`
   font: var(--font-base-book);
 `;
 
-Styled.Table = styled.table<{
+type StyledTableStyleProps = {
   hideHeader?: boolean;
-  withGradientCardRows: boolean;
-  withOuterBorder: boolean;
-  withInnerBorders: boolean;
-  withSolidHeader: boolean;
-}>`
+  withGradientCardRows?: boolean;
+  withOuterBorder?: boolean;
+  withInnerBorders?: boolean;
+  withSolidHeader?: boolean;
+};
+
+const $Table = styled.table<StyledTableStyleProps>`
   align-self: start;
 
   ${layoutMixins.stickyArea1}
@@ -778,10 +809,10 @@ Styled.Table = styled.table<{
   }
 `;
 
-Styled.Tr = styled.tr<{
+const $Tr = styled.tr<{
   isClickable?: boolean;
   withFocusStickyRows?: boolean;
-  withScrollSnapRows: boolean;
+  withScrollSnapRows?: boolean;
 }>`
   /* Computed */
   --tableRow-currentBackgroundColor: var(--tableRow-backgroundColor);
@@ -819,7 +850,7 @@ Styled.Tr = styled.tr<{
     `}
 `;
 
-Styled.Th = styled.th<{ withScrollSnapColumns: boolean }>`
+const $Th = styled.th<{ withScrollSnapColumns?: boolean }>`
   // Computed
   --table-cell-currentAlign: var(--table-cell-align);
 
@@ -841,7 +872,7 @@ Styled.Th = styled.th<{ withScrollSnapColumns: boolean }>`
   text-align: var(--table-cell-currentAlign);
 `;
 
-Styled.Td = styled.td`
+const $Td = styled.td`
   // Computed
   --table-cell-currentAlign: var(--table-cell-align);
 
@@ -862,7 +893,7 @@ Styled.Td = styled.td`
   }
 `;
 
-Styled.SortArrow = styled.span<{ sortDirection: 'ascending' | 'descending' }>`
+const $SortArrow = styled.span<{ sortDirection?: 'ascending' | 'descending' }>`
   float: right;
   margin-left: auto;
 
@@ -871,16 +902,16 @@ Styled.SortArrow = styled.span<{ sortDirection: 'ascending' | 'descending' }>`
 
   font-size: 0.375em;
 
-  ${Styled.Th}[aria-sort="none"] & {
+  ${$Th}[aria-sort="none"] & {
     visibility: hidden;
   }
 
-  ${Styled.Th}[aria-sort="ascending"] & {
+  ${$Th}[aria-sort="ascending"] & {
     transform: scaleY(-1);
   }
 `;
 
-Styled.Thead = styled.thead<StyleProps>`
+const $Thead = styled.thead<TableStyleProps>`
   ${layoutMixins.stickyHeader}
   scroll-snap-align: none;
   font: var(--font-mini-book);
@@ -900,7 +931,7 @@ Styled.Thead = styled.thead<StyleProps>`
     `}
 `;
 
-Styled.Tbody = styled.tbody<StyleProps>`
+const $Tbody = styled.tbody<TableStyleProps>`
   ${layoutMixins.stickyArea2}
   font: var(--font-small-book);
 
@@ -984,12 +1015,12 @@ Styled.Tbody = styled.tbody<StyleProps>`
     `}
 `;
 
-Styled.Row = styled.div`
+const $Row = styled.div`
   ${layoutMixins.inlineRow}
   padding: var(--tableCell-padding);
 `;
 
-Styled.ViewMoreButton = styled(Button)`
+const $ViewMoreButton = styled(Button)`
   --button-backgroundColor: var(--color-layer-2);
   --button-textColor: var(--color-text-1);
 
@@ -1001,6 +1032,6 @@ Styled.ViewMoreButton = styled(Button)`
   }
 `;
 
-Styled.ViewMoreTr = styled(Styled.Tr)`
+const $ViewMoreTr = styled($Tr)`
   --border-color: var(--tableViewMore-borderColor);
 `;

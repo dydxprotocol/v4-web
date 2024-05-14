@@ -34,7 +34,7 @@ export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
     }: ElementProps & StyleProps,
     ref
   ) => (
-    <Styled.A
+    <$A
       ref={ref}
       className={className}
       href={href}
@@ -51,13 +51,10 @@ export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
     >
       {children}
       {withIcon && <Icon iconName={IconName.LinkOut} />}
-    </Styled.A>
+    </$A>
   )
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.A = styled.a<StyleProps>`
+const $A = styled.a<StyleProps>`
   --link-color: inherit;
   color: var(--link-color);
 

@@ -2,7 +2,7 @@ import { memo, useMemo, useState } from 'react';
 
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -48,13 +48,13 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
           getCellValue: (row) => row.market,
           label: stringGetter({ key: STRING_KEYS.MARKET }),
           renderCell: ({ assetId, id, isNew }) => (
-            <Styled.MarketName isFavorited={false}>
+            <$MarketName isFavorited={false}>
               {/* TRCL-1693 <Icon iconName={IconName.Star} /> */}
               <AssetIcon symbol={assetId} />
               <h2>{id}</h2>
               <Tag>{assetId}</Tag>
               {isNew && <Tag isHighlighted>{stringGetter({ key: STRING_KEYS.NEW })}</Tag>}
-            </Styled.MarketName>
+            </$MarketName>
           ),
         },
         {
@@ -62,11 +62,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
           getCellValue: (row) => row.oraclePrice,
           label: stringGetter({ key: STRING_KEYS.PRICE }),
           renderCell: ({ oraclePrice, tickSizeDecimals }) => (
-            <Styled.Output
-              type={OutputType.Fiat}
-              value={oraclePrice}
-              fractionDigits={tickSizeDecimals}
-            />
+            <$Output type={OutputType.Fiat} value={oraclePrice} fractionDigits={tickSizeDecimals} />
           ),
         },
         {
@@ -74,17 +70,17 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
           getCellValue: (row) => row.priceChange24HPercent,
           label: stringGetter({ key: STRING_KEYS._24H }),
           renderCell: ({ priceChange24HPercent }) => (
-            <Styled.InlineRow>
+            <$InlineRow>
               {!priceChange24HPercent ? (
-                <Styled.Output type={OutputType.Text} value={null} />
+                <$Output type={OutputType.Text} value={null} />
               ) : (
-                <Styled.PriceChangeOutput
+                <$PriceChangeOutput
                   type={OutputType.Percent}
                   value={priceChange24HPercent}
                   isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
                 />
               )}
-            </Styled.InlineRow>
+            </$InlineRow>
           ),
         },
         {
@@ -92,11 +88,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
           getCellValue: (row) => row.volume24H,
           label: stringGetter({ key: STRING_KEYS.VOLUME }),
           renderCell: ({ volume24H }) => (
-            <Styled.Output
-              type={OutputType.CompactFiat}
-              value={volume24H}
-              locale={selectedLocale}
-            />
+            <$Output type={OutputType.CompactFiat} value={volume24H} locale={selectedLocale} />
           ),
         },
         {
@@ -104,7 +96,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
           getCellValue: (row) => row.openInterestUSDC,
           label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
           renderCell: (row) => (
-            <Styled.Output
+            <$Output
               type={OutputType.CompactFiat}
               value={row.openInterestUSDC}
               locale={selectedLocale}
@@ -117,16 +109,16 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
 
   return (
     <>
-      <Styled.Toolbar>
+      <$Toolbar>
         <MarketFilter
           selectedFilter={filter}
           filters={marketFilters as MarketFilters[]}
           onChangeFilter={setFilter}
           onSearchTextChange={setSearchFilter}
         />
-      </Styled.Toolbar>
-      <Styled.ScrollArea>
-        <Styled.Table
+      </$Toolbar>
+      <$ScrollArea>
+        <$Table
           withInnerBorders
           data={filteredMarkets}
           getRowKey={(row: MarketData) => row.id}
@@ -138,7 +130,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
           label={stringGetter({ key: STRING_KEYS.MARKETS })}
           columns={columns}
           slotEmpty={
-            <Styled.MarketNotFound>
+            <$MarketNotFound>
               {filter === MarketFilters.NEW && !searchFilter ? (
                 <>
                   <h2>
@@ -173,10 +165,10 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: string
                   </Button>
                 </div>
               )}
-            </Styled.MarketNotFound>
+            </$MarketNotFound>
           }
         />
-      </Styled.ScrollArea>
+      </$ScrollArea>
     </>
   );
 };
@@ -188,12 +180,12 @@ export const MarketsDropdown: React.FC<{ currentMarketId?: string; symbol: strin
     const navigate = useNavigate();
 
     return (
-      <Styled.Popover
+      <$Popover
         open={isOpen}
         onOpenChange={setIsOpen}
         sideOffset={1}
         slotTrigger={
-          <Styled.TriggerContainer $isOpen={isOpen}>
+          <$TriggerContainer $isOpen={isOpen}>
             {isOpen ? (
               <h2>{stringGetter({ key: STRING_KEYS.SELECT_MARKET })}</h2>
             ) : (
@@ -204,11 +196,11 @@ export const MarketsDropdown: React.FC<{ currentMarketId?: string; symbol: strin
             )}
             <p>
               {stringGetter({ key: isOpen ? STRING_KEYS.TAP_TO_CLOSE : STRING_KEYS.ALL_MARKETS })}
-              <Styled.DropdownIcon aria-hidden="true">
+              <$DropdownIcon aria-hidden="true">
                 <Icon iconName={IconName.Triangle} aria-hidden="true" />
-              </Styled.DropdownIcon>
+              </$DropdownIcon>
             </p>
-          </Styled.TriggerContainer>
+          </$TriggerContainer>
         }
         triggerType={TriggerType.MarketDropdown}
       >
@@ -218,14 +210,11 @@ export const MarketsDropdown: React.FC<{ currentMarketId?: string; symbol: strin
             setIsOpen(false);
           }}
         />
-      </Styled.Popover>
+      </$Popover>
     );
   }
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.MarketName = styled.div<{ isFavorited: boolean }>`
+const $MarketName = styled.div<{ isFavorited: boolean }>`
   ${layoutMixins.row}
   gap: 0.5rem;
 
@@ -246,7 +235,7 @@ Styled.MarketName = styled.div<{ isFavorited: boolean }>`
     `}
 `;
 
-Styled.TriggerContainer = styled.div<{ $isOpen: boolean }>`
+const $TriggerContainer = styled.div<{ $isOpen: boolean }>`
   --marketsDropdown-width: var(--sidebar-width);
   width: var(--sidebar-width);
 
@@ -285,20 +274,16 @@ Styled.TriggerContainer = styled.div<{ $isOpen: boolean }>`
   }
 `;
 
-Styled.DropdownIcon = styled.span`
+const $DropdownIcon = styled.span`
   margin-left: auto;
 
   display: inline-flex;
   transition: transform 0.3s var(--ease-out-expo);
 
   font-size: 0.375rem;
-
-  ${Styled.Trigger}[data-state='open'] & {
-    transform: scaleY(-1);
-  }
 `;
 
-Styled.Popover = styled(Popover)`
+const $Popover = styled(Popover)`
   ${popoverMixins.popover}
   --popover-item-height: 3.375rem;
   --popover-backgroundColor: var(--color-layer-2);
@@ -340,19 +325,19 @@ Styled.Popover = styled(Popover)`
   }
 `;
 
-Styled.Toolbar = styled(Toolbar)`
+const $Toolbar = styled(Toolbar)`
   ${layoutMixins.stickyHeader}
   height: var(--toolbar-height);
   gap: 0.5rem;
   border-bottom: solid var(--border-width) var(--color-border);
 `;
 
-Styled.ScrollArea = styled.div`
+const $ScrollArea = styled.div`
   ${layoutMixins.scrollArea}
   height: calc(100% - var(--toolbar-height));
 `;
 
-Styled.Table = styled(Table)`
+const $Table = styled(Table)`
   thead {
     --stickyArea-totalInsetTop: 0px;
     --stickyArea-totalInsetBottom: 0px;
@@ -364,22 +349,22 @@ Styled.Table = styled(Table)`
   tr {
     height: var(--popover-item-height);
   }
-`;
+` as typeof Table;
 
-Styled.InlineRow = styled.div`
+const $InlineRow = styled.div`
   ${layoutMixins.inlineRow}
 `;
 
-Styled.Output = styled(Output)<{ isNegative?: boolean }>`
+const $Output = styled(Output)<{ isNegative?: boolean }>`
   color: ${({ isNegative }) => (isNegative ? `var(--color-negative)` : `var(--color-positive)`)};
   color: var(--color-text-2);
 `;
 
-Styled.PriceChangeOutput = styled(Output)<{ isNegative?: boolean }>`
+const $PriceChangeOutput = styled(Output)<{ isNegative?: boolean }>`
   color: ${({ isNegative }) => (isNegative ? `var(--color-negative)` : `var(--color-positive)`)};
 `;
 
-Styled.MarketNotFound = styled.div`
+const $MarketNotFound = styled.div`
   ${layoutMixins.column}
   justify-content: center;
   align-items: center;

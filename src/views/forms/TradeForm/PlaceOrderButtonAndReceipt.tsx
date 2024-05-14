@@ -184,13 +184,11 @@ export const PlaceOrderButtonAndReceipt = ({
     hasValidationErrors && (!currentStep || buttonStatesPerStep[currentStep].showValidatorError);
 
   const submitButton = (
-    <Styled.Button
+    <$Button
       state={buttonState}
       type={ButtonType.Submit}
       action={buttonAction}
-      slotLeft={
-        showValidatorErrors ? <Styled.WarningIcon iconName={IconName.Warning} /> : undefined
-      }
+      slotLeft={showValidatorErrors ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
     >
       {stringGetter({
         key: buttonTextStringKey,
@@ -200,7 +198,7 @@ export const PlaceOrderButtonAndReceipt = ({
           }),
         },
       })}
-    </Styled.Button>
+    </$Button>
   );
 
   return (
@@ -217,13 +215,10 @@ export const PlaceOrderButtonAndReceipt = ({
     </WithDetailsReceipt>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Button = styled(Button)`
+const $Button = styled(Button)`
   width: 100%;
 `;
 
-Styled.WarningIcon = styled(Icon)`
+const $WarningIcon = styled(Icon)`
   color: var(--color-warning);
 `;

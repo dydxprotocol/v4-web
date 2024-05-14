@@ -6,10 +6,207 @@ import {
   type ThemeProps,
 } from 'styled-components';
 
-export const layoutMixins: Record<
-  string,
-  FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>
-> = {
+const withOuterBorder = css`
+  box-shadow: 0 0 0 var(--border-width) var(--border-color);
+`;
+
+// A standalone column (shrinks to fit container)
+const flexColumn = css`
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+`;
+
+// A content container column
+const contentContainer = css`
+  /* Params */
+  --content-container-width: 100%;
+  --content-max-width: 100%;
+
+  /* Overrides */
+  --bordered-content-outer-container-width: var(--content-container-width);
+  --bordered-content-max-width: var(--content-max-width);
+
+  /* Rules */
+  ${() => flexColumn}
+  isolation: isolate;
+  /* $ {() => layoutMixins.scrollArea} */
+`;
+
+// Use as a descendant of layoutMixins.scrollArea
+const scrollSnapItem = css`
+  scroll-snap-align: start;
+
+  scroll-margin-top: var(--stickyArea-totalInsetTop);
+  scroll-margin-bottom: var(--stickyArea-totalInsetBottom);
+  scroll-margin-left: var(--stickyArea-totalInsetLeft);
+  scroll-margin-right: var(--stickyArea-totalInsetRight);
+`;
+
+// Creates a scrollable container that can contain sticky and/or scroll-snapped descendants.
+const scrollArea = css`
+  /* Params */
+  --scrollArea-height: 100%;
+  --scrollArea-width: 100%;
+
+  /* Rules */
+
+  isolation: isolate;
+
+  height: var(--scrollArea-height);
+
+  position: relative;
+  overflow: auto;
+
+  /* scroll-snap-type: both proximity; */
+
+  @media (prefers-reduced-motion: no-preference) {
+    scroll-behavior: smooth;
+  }
+`;
+
+// Use within contentContainer or contentContainerPage
+const contentSection = css`
+  ${() => scrollSnapItem}
+`;
+
+// Section that defines its own horizontal scrollArea and does not scroll with the outer scrollArea
+// Use within contentContainer or contentContainerPage
+const contentSectionDetached = css`
+  ${() => contentSection}
+  ${() => stickyLeft}
+
+    max-width: min(var(--content-container-width), var(--content-max-width));
+  transition: max-width 0.3s var(--ease-out-expo);
+`;
+
+// An item within a horizontally scrollable container that is unaffected by the horizontal scroll position.
+// Use when a sibling is horizontally overflowing (e.g. a table with many columns).
+const stickyLeft = css`
+  z-index: 1;
+
+  position: sticky;
+  left: var(--stickyArea-totalInsetLeft, 0px);
+
+  transition: left 0.3s var(--ease-out-expo);
+`;
+
+const sticky = css`
+  /* Params */
+  --stickyArea-totalInsetTop: ;
+  --stickyArea-totalInsetBottom: ;
+  --stickyArea-totalInsetLeft: ;
+  --stickyArea-totalInsetRight: ;
+
+  z-index: 1;
+
+  position: sticky;
+  inset: 0;
+  top: var(--stickyArea-totalInsetTop, 0px);
+  bottom: var(--stickyArea-totalInsetBottom, 0px);
+  left: var(--stickyArea-totalInsetLeft, 0px);
+  right: var(--stickyArea-totalInsetRight, 0px);
+
+  backdrop-filter: blur(10px);
+`;
+
+/**
+ * A container for positioning sticky items using simulated padding, width, height and gap properties.
+ * Use on layoutMixins.scrollArea or as a descendant of layoutMixins.scrollArea
+ */
+const stickyArea = css`
+  /* Params */
+  --stickyArea-paddingTop: ;
+  --stickyArea-height: var(--scrollArea-height, 100%);
+  --stickyArea-topHeight: ;
+  --stickyArea-topGap: ;
+  --stickyArea-bottomGap: ;
+  --stickyArea-paddingBottom: ;
+  --stickyArea-bottomHeight: ;
+  --stickyArea-paddingLeft: ;
+
+  --stickyArea-width: var(--scrollArea-width, 100%);
+  --stickyArea-leftWidth: ;
+  --stickyArea-leftGap: ;
+  --stickyArea-paddingRight: ;
+  --stickyArea-rightGap: ;
+  --stickyArea-rightWidth: ;
+
+  --stickyArea-background: ;
+
+  /* Computed */
+  --stickyArea-totalInsetTop: var(--stickyArea-paddingTop);
+  --stickyArea-totalInsetBottom: var(--stickyArea-paddingBottom);
+  --stickyArea-innerHeight: calc(
+    var(--stickyArea-height, 100%) -
+      (
+        var(--stickyArea-paddingTop, 0px) + var(--stickyArea-topHeight, 0px) +
+          var(--stickyArea-topGap, 0px)
+      ) -
+      (
+        var(--stickyArea-paddingBottom, 0px) + var(--stickyArea-bottomHeight, 0px) +
+          var(--stickyArea-bottomGap, 0px)
+      )
+  );
+
+  --stickyArea-totalInsetLeft: var(--stickyArea-paddingLeft);
+  --stickyArea-totalInsetRight: var(--stickyArea-paddingRight);
+  --stickyArea-innerWidth: calc(
+    var(--stickyArea-width, 100%) -
+      (
+        var(--stickyArea-paddingLeft, 0px) + var(--stickyArea-leftWidth, 0px) +
+          var(--stickyArea-leftGap, 0px)
+      ) -
+      (
+        var(--stickyArea-paddingRight, 0px) + var(--stickyArea-rightWidth, 0px) +
+          var(--stickyArea-rightGap, 0px)
+      )
+  );
+
+  /* Rules */
+  /* scroll-padding-top: var(--stickyArea-topHeight);
+scroll-padding-bottom: var(--stickyArea-bottomHeight); */
+  /* scroll-padding-top: var(--stickyArea-totalInsetTop);
+scroll-padding-bottom: var(--stickyArea-totalInsetBottom); */
+  /* scroll-padding-block-end: 4rem; */
+
+  /* Firefox: opaque background required for backdrop-filter to work */
+  background: var(--stickyArea-background, var(--color-layer-2));
+`;
+
+// Use as a descendant of layoutMixins.stickyArea
+const stickyFooter = css`
+  ${() => sticky}
+  min-height: var(--stickyArea-bottomHeight);
+  flex-shrink: 0;
+
+  ${() => scrollSnapItem}
+`;
+
+// Use with layoutMixins.stickyFooter
+const withStickyFooterBackdrop = css`
+  /* Params */
+  --stickyFooterBackdrop-outsetY: ;
+  --stickyFooterBackdrop-outsetX: ;
+
+  /* Rules */
+  backdrop-filter: none;
+
+  &:before {
+    content: '';
+
+    z-index: -1;
+    position: absolute;
+    inset: calc(-1 * var(--stickyFooterBackdrop-outsetY, 0px))
+      calc(-1 * var(--stickyFooterBackdrop-outsetX, 0px));
+
+    background: linear-gradient(transparent, var(--stickyArea-background));
+
+    pointer-events: none;
+  }
+`;
+
+export const layoutMixins = {
   // A standalone row
   row: css`
     display: flex;
@@ -39,12 +236,7 @@ export const layoutMixins: Record<
     grid-template-columns: minmax(0, 1fr);
   `,
 
-  // A standalone column (shrinks to fit container)
-  flexColumn: css`
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-  `,
+  flexColumn,
 
   // A column as a child of a row
   rowColumn: css`
@@ -173,7 +365,7 @@ export const layoutMixins: Record<
       inset: 0;
 
       background: inherit;
-      ${() => layoutMixins.withOuterBorder}
+      ${() => withOuterBorder}
       pointer-events: none;
     }
 
@@ -214,26 +406,12 @@ export const layoutMixins: Record<
     } */
   `,
 
-  // A content container column
-  contentContainer: css`
-    /* Params */
-    --content-container-width: 100%;
-    --content-max-width: 100%;
-
-    /* Overrides */
-    --bordered-content-outer-container-width: var(--content-container-width);
-    --bordered-content-max-width: var(--content-max-width);
-
-    /* Rules */
-    ${() => layoutMixins.flexColumn}
-    isolation: isolate;
-    /* $ {() => layoutMixins.scrollArea} */
-  `,
+  contentContainer,
 
   // A content container with dynamic padding and children with a max width of --content-max-width
   contentContainerPage: css`
     /* Overrides */
-    ${() => layoutMixins.contentContainer}
+    ${() => contentContainer}
     --content-container-width: 100vw;
     --content-max-width: var(--default-page-content-max-width);
 
@@ -246,8 +424,7 @@ export const layoutMixins: Record<
     );
 
     /* Rules */
-    ${() => layoutMixins.stickyHeaderArea}
-    ${() => layoutMixins.scrollSnapItem}
+    ${() => scrollSnapItem}
 
     min-height: 100%;
     /* height: max-content; */
@@ -263,65 +440,28 @@ export const layoutMixins: Record<
   `,
 
   // Section
-  // Use within contentContainer or contentContainerPage
-  contentSection: css`
-    ${() => layoutMixins.scrollSnapItem}
-  `,
+  contentSection,
 
   // Section containing horizontally-overflowing content that scrolls with the outer scrollArea
   // Use within contentContainer or contentContainerPage
   contentSectionAttached: css`
-    ${() => layoutMixins.contentSection}
+    ${() => contentSection}
     min-width: max-content;
     /* max-width: none; */
   `,
 
-  // Section that defines its own horizontal scrollArea and does not scroll with the outer scrollArea
-  // Use within contentContainer or contentContainerPage
-  contentSectionDetached: css`
-    ${() => layoutMixins.contentSection}
-    ${() => layoutMixins.stickyLeft}
-
-    max-width: min(var(--content-container-width), var(--content-max-width));
-    transition: max-width 0.3s var(--ease-out-expo);
-  `,
+  contentSectionDetached,
 
   // Section that defines its own horizontal scrollArea and does not scroll with the outer scrollArea
   // Use within contentContainer or contentContainerPage
   contentSectionDetachedScrollable: css`
-    ${() => layoutMixins.contentSectionDetached}
-    ${() => layoutMixins.scrollArea}
+    ${() => contentSectionDetached}
+    ${() => scrollArea}
   `,
 
-  sticky: css`
-    /* Params */
-    --stickyArea-totalInsetTop: ;
-    --stickyArea-totalInsetBottom: ;
-    --stickyArea-totalInsetLeft: ;
-    --stickyArea-totalInsetRight: ;
+  sticky,
 
-    z-index: 1;
-
-    position: sticky;
-    inset: 0;
-    top: var(--stickyArea-totalInsetTop, 0px);
-    bottom: var(--stickyArea-totalInsetBottom, 0px);
-    left: var(--stickyArea-totalInsetLeft, 0px);
-    right: var(--stickyArea-totalInsetRight, 0px);
-
-    backdrop-filter: blur(10px);
-  `,
-
-  // An item within a horizontally scrollable container that is unaffected by the horizontal scroll position.
-  // Use when a sibling is horizontally overflowing (e.g. a table with many columns).
-  stickyLeft: css`
-    z-index: 1;
-
-    position: sticky;
-    left: var(--stickyArea-totalInsetLeft, 0px);
-
-    transition: left 0.3s var(--ease-out-expo);
-  `,
+  stickyLeft,
 
   stickyRight: css`
     z-index: 1;
@@ -332,91 +472,9 @@ export const layoutMixins: Record<
     transition: right 0.3s var(--ease-out-expo);
   `,
 
-  // Creates a scrollable container that can contain sticky and/or scroll-snapped descendants.
-  scrollArea: css`
-    /* Params */
-    --scrollArea-height: 100%;
-    --scrollArea-width: 100%;
+  scrollArea,
 
-    /* Rules */
-
-    isolation: isolate;
-
-    height: var(--scrollArea-height);
-
-    position: relative;
-    overflow: auto;
-
-    /* scroll-snap-type: both proximity; */
-
-    @media (prefers-reduced-motion: no-preference) {
-      scroll-behavior: smooth;
-    }
-  `,
-
-  /**
-   * A container for positioning sticky items using simulated padding, width, height and gap properties.
-   * Use on layoutMixins.scrollArea or as a descendant of layoutMixins.scrollArea
-   */
-  stickyArea: css`
-    /* Params */
-    --stickyArea-paddingTop: ;
-    --stickyArea-height: var(--scrollArea-height, 100%);
-    --stickyArea-topHeight: ;
-    --stickyArea-topGap: ;
-    --stickyArea-bottomGap: ;
-    --stickyArea-paddingBottom: ;
-    --stickyArea-bottomHeight: ;
-    --stickyArea-paddingLeft: ;
-
-    --stickyArea-width: var(--scrollArea-width, 100%);
-    --stickyArea-leftWidth: ;
-    --stickyArea-leftGap: ;
-    --stickyArea-paddingRight: ;
-    --stickyArea-rightGap: ;
-    --stickyArea-rightWidth: ;
-
-    --stickyArea-background: ;
-
-    /* Computed */
-    --stickyArea-totalInsetTop: var(--stickyArea-paddingTop);
-    --stickyArea-totalInsetBottom: var(--stickyArea-paddingBottom);
-    --stickyArea-innerHeight: calc(
-      var(--stickyArea-height, 100%) -
-        (
-          var(--stickyArea-paddingTop, 0px) + var(--stickyArea-topHeight, 0px) +
-            var(--stickyArea-topGap, 0px)
-        ) -
-        (
-          var(--stickyArea-paddingBottom, 0px) + var(--stickyArea-bottomHeight, 0px) +
-            var(--stickyArea-bottomGap, 0px)
-        )
-    );
-
-    --stickyArea-totalInsetLeft: var(--stickyArea-paddingLeft);
-    --stickyArea-totalInsetRight: var(--stickyArea-paddingRight);
-    --stickyArea-innerWidth: calc(
-      var(--stickyArea-width, 100%) -
-        (
-          var(--stickyArea-paddingLeft, 0px) + var(--stickyArea-leftWidth, 0px) +
-            var(--stickyArea-leftGap, 0px)
-        ) -
-        (
-          var(--stickyArea-paddingRight, 0px) + var(--stickyArea-rightWidth, 0px) +
-            var(--stickyArea-rightGap, 0px)
-        )
-    );
-
-    /* Rules */
-    /* scroll-padding-top: var(--stickyArea-topHeight);
-    scroll-padding-bottom: var(--stickyArea-bottomHeight); */
-    /* scroll-padding-top: var(--stickyArea-totalInsetTop);
-    scroll-padding-bottom: var(--stickyArea-totalInsetBottom); */
-    /* scroll-padding-block-end: 4rem; */
-
-    /* Firefox: opaque background required for backdrop-filter to work */
-    background: var(--stickyArea-background, var(--color-layer-2));
-  `,
+  stickyArea,
 
   /**
    * A sticky area that may contain nested sticky areas.
@@ -450,7 +508,7 @@ export const layoutMixins: Record<
     --stickyArea0-totalInsetRight: var(--stickyArea0-paddingRight);
 
     /* Rules */
-    ${() => layoutMixins.stickyArea}
+    ${() => stickyArea}
 
     --stickyArea-height: var(--stickyArea0-height);
     --stickyArea-totalInsetTop: var(--stickyArea0-totalInsetTop);
@@ -536,7 +594,7 @@ export const layoutMixins: Record<
     );
 
     /* Rules */
-    ${() => layoutMixins.stickyArea}
+    ${() => stickyArea}
 
     --stickyArea-height: var(--stickyArea1-height);
     --stickyArea-totalInsetTop: var(--stickyArea1-totalInsetTop);
@@ -621,7 +679,7 @@ export const layoutMixins: Record<
     );
 
     /* Rules */
-    ${() => layoutMixins.stickyArea}
+    ${() => stickyArea}
 
     --stickyArea-height: var(--stickyArea2-height);
     --stickyArea-totalInsetTop: var(--stickyArea2-totalInsetTop);
@@ -706,7 +764,7 @@ export const layoutMixins: Record<
     );
 
     /* Rules */
-    ${() => layoutMixins.stickyArea}
+    ${() => stickyArea}
 
     --stickyArea-height: var(--stickyArea3-height);
     --stickyArea-totalInsetTop: var(--stickyArea3-totalInsetTop);
@@ -735,58 +793,20 @@ export const layoutMixins: Record<
 
   // Use as a descendant of layoutMixins.stickyArea
   stickyHeader: css`
-    ${() => layoutMixins.sticky}
+    ${() => sticky}
     min-height: var(--stickyArea-topHeight);
     flex-shrink: 0;
 
-    ${() => layoutMixins.scrollSnapItem}
+    ${() => scrollSnapItem}
   `,
 
-  // Use as a descendant of layoutMixins.stickyArea
-  stickyFooter: css`
-    ${() => layoutMixins.sticky}
-    min-height: var(--stickyArea-bottomHeight);
-    flex-shrink: 0;
+  stickyFooter,
 
-    ${() => layoutMixins.scrollSnapItem}
-  `,
+  scrollSnapItem,
 
-  // Use as a descendant of layoutMixins.scrollArea
-  scrollSnapItem: css`
-    scroll-snap-align: start;
+  withStickyFooterBackdrop,
 
-    scroll-margin-top: var(--stickyArea-totalInsetTop);
-    scroll-margin-bottom: var(--stickyArea-totalInsetBottom);
-    scroll-margin-left: var(--stickyArea-totalInsetLeft);
-    scroll-margin-right: var(--stickyArea-totalInsetRight);
-  `,
-
-  // Use with layoutMixins.stickyFooter
-  withStickyFooterBackdrop: css`
-    /* Params */
-    --stickyFooterBackdrop-outsetY: ;
-    --stickyFooterBackdrop-outsetX: ;
-
-    /* Rules */
-    backdrop-filter: none;
-
-    &:before {
-      content: '';
-
-      z-index: -1;
-      position: absolute;
-      inset: calc(-1 * var(--stickyFooterBackdrop-outsetY, 0px))
-        calc(-1 * var(--stickyFooterBackdrop-outsetX, 0px));
-
-      background: linear-gradient(transparent, var(--stickyArea-background));
-
-      pointer-events: none;
-    }
-  `,
-
-  withOuterBorder: css`
-    box-shadow: 0 0 0 var(--border-width) var(--border-color);
-  `,
+  withOuterBorder,
 
   // Show "borders" between and around grid/flex items using gap + box-shadow
   // Apply to element with display: grid or display: flex
@@ -797,7 +817,7 @@ export const layoutMixins: Record<
     gap: var(--border-width);
 
     > * {
-      ${() => layoutMixins.withOuterBorder}
+      ${() => withOuterBorder}
     }
   `,
 
@@ -850,7 +870,7 @@ export const layoutMixins: Record<
       inset: 0;
 
       border-radius: var(--computed-radius);
-      ${() => layoutMixins.withOuterBorder}
+      ${() => withOuterBorder}
 
       pointer-events: none;
     }
@@ -902,8 +922,8 @@ export const layoutMixins: Record<
     align-items: start;
 
     > :last-child {
-      ${() => layoutMixins.stickyFooter}
-      ${() => layoutMixins.withStickyFooterBackdrop}
+      ${() => stickyFooter}
+      ${() => withStickyFooterBackdrop}
     }
   `,
 
@@ -921,4 +941,4 @@ export const layoutMixins: Record<
     min-height: 100%;
     place-items: center;
   `,
-};
+} satisfies Record<string, FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>>;

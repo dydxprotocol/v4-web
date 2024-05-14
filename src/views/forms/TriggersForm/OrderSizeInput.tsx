@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { TriggerOrdersInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -100,12 +100,12 @@ export const OrderSizeInput = ({
       }
       open={shouldShowCustomAmount}
     >
-      <Styled.SizeInputRow>
-        <Styled.OrderSizeSlider
+      <$SizeInputRow>
+        <$OrderSizeSlider
           setAbacusSize={setAbacusSize}
           setOrderSizeInput={setOrderSize}
           size={orderSize}
-          positionSize={positionSize}
+          positionSize={positionSize ?? undefined}
           className={className}
         />
         <FormInput
@@ -114,18 +114,15 @@ export const OrderSizeInput = ({
           slotRight={<Tag>{symbol}</Tag>}
           onInput={onSizeInput}
         />
-      </Styled.SizeInputRow>
+      </$SizeInputRow>
     </Collapsible>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.OrderSizeSlider = styled(OrderSizeSlider)`
+const $OrderSizeSlider = styled(OrderSizeSlider)`
   width: 100%;
 `;
 
-Styled.SizeInputRow = styled.div`
+const $SizeInputRow = styled.div`
   display: flex;
   align-items: center;
   gap: 0.25rem;

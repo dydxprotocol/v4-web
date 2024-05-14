@@ -1,6 +1,6 @@
 import { forwardRef, type ElementType } from 'react';
 
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 
@@ -14,7 +14,9 @@ type ElementProps = {
   iconComponent?: ElementType;
 };
 
-export type IconButtonProps = ElementProps & ButtonProps & ToggleButtonProps;
+export type IconButtonProps = ElementProps &
+  Omit<ButtonProps, 'onClick'> &
+  ToggleButtonProps & { onClick?(): void };
 
 export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, IconButtonProps>(
   (
@@ -36,7 +38,7 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
     ref
   ) => {
     return isToggle ? (
-      <Styled.IconToggleButton
+      <$IconToggleButton
         ref={ref}
         className={className}
         size={size}
@@ -46,9 +48,9 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
         {...otherProps}
       >
         <Icon iconName={iconName} iconComponent={iconComponent} />
-      </Styled.IconToggleButton>
+      </$IconToggleButton>
     ) : (
-      <Styled.IconButton
+      <$IconButton
         ref={ref}
         className={className}
         size={size}
@@ -58,13 +60,10 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
         {...otherProps}
       >
         <Icon iconName={iconName} iconComponent={iconComponent} />
-      </Styled.IconButton>
+      </$IconButton>
     );
   }
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
 const buttonMixin = css`
   // Params
   --button-icon-size: 1.125em;
@@ -76,10 +75,10 @@ const buttonMixin = css`
   }
 `;
 
-Styled.IconButton = styled(Button)`
+const $IconButton = styled(Button)`
   ${buttonMixin}
 `;
 
-Styled.IconToggleButton = styled(ToggleButton)`
+const $IconToggleButton = styled(ToggleButton)`
   ${buttonMixin}
 `;

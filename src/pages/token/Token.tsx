@@ -38,8 +38,8 @@ export default () => {
     <WithSidebar
       sidebar={
         isTablet ? null : (
-          <Styled.SideBar>
-            <Styled.NavigationMenu
+          <$SideBar>
+            <$NavigationMenu
               items={[
                 {
                   group: 'views',
@@ -48,9 +48,9 @@ export default () => {
                     {
                       value: TokenRoute.TradingRewards,
                       slotBefore: (
-                        <Styled.IconContainer>
+                        <$IconContainer>
                           <Icon iconName={IconName.Token} />
-                        </Styled.IconContainer>
+                        </$IconContainer>
                       ),
                       label: stringGetter({ key: STRING_KEYS.TRADING_REWARDS }),
                       href: TokenRoute.TradingRewards,
@@ -58,9 +58,9 @@ export default () => {
                     {
                       value: TokenRoute.StakingRewards,
                       slotBefore: (
-                        <Styled.IconContainer>
+                        <$IconContainer>
                           <Icon iconName={IconName.CurrencySign} />
-                        </Styled.IconContainer>
+                        </$IconContainer>
                       ),
                       label: stringGetter({ key: STRING_KEYS.STAKING_REWARDS }),
                       href: TokenRoute.StakingRewards,
@@ -69,9 +69,9 @@ export default () => {
                     {
                       value: TokenRoute.Governance,
                       slotBefore: (
-                        <Styled.IconContainer>
+                        <$IconContainer>
                           <Icon iconName={IconName.Governance} />
-                        </Styled.IconContainer>
+                        </$IconContainer>
                       ),
                       label: stringGetter({ key: STRING_KEYS.GOVERNANCE }),
                       href: TokenRoute.Governance,
@@ -80,7 +80,7 @@ export default () => {
                 },
               ]}
             />
-          </Styled.SideBar>
+          </$SideBar>
         )
       }
     >
@@ -88,17 +88,14 @@ export default () => {
     </WithSidebar>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.SideBar = styled.div`
+const $SideBar = styled.div`
   ${layoutMixins.flexColumn}
   justify-content: space-between;
 
   height: 100%;
 `;
 
-Styled.Footer = styled.div`
+const $Footer = styled.div`
   ${layoutMixins.row}
   flex-wrap: wrap;
 
@@ -111,12 +108,12 @@ Styled.Footer = styled.div`
   }
 `;
 
-Styled.NavigationMenu = styled(NavigationMenu)`
+const $NavigationMenu = styled(NavigationMenu)`
   padding: 0.5rem;
   padding-top: 0;
 `;
 
-Styled.IconContainer = styled.div`
+const $IconContainer = styled.div`
   width: 1.5rem;
   height: 1.5rem;
   font-size: 0.75rem;

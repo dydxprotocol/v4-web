@@ -86,10 +86,10 @@ const Content = () => {
   return (
     <>
       <GlobalStyle />
-      <Styled.Content isShowingHeader={isShowingHeader} isShowingFooter={isShowingFooter}>
+      <$Content isShowingHeader={isShowingHeader} isShowingFooter={isShowingFooter}>
         {isNotTablet && <HeaderDesktop />}
 
-        <Styled.Main>
+        <$Main>
           <Suspense fallback={<LoadingSpace id="main" />}>
             <Routes>
               <Route path={AppRoute.Trade}>
@@ -133,18 +133,18 @@ const Content = () => {
               />
             </Routes>
           </Suspense>
-        </Styled.Main>
+        </$Main>
 
         {isTablet ? <FooterMobile /> : <FooterDesktop />}
 
-        <Styled.NotificationsToastArea />
+        <$NotificationsToastArea />
 
-        <Styled.DialogArea ref={dialogAreaRef}>
+        <$DialogArea ref={dialogAreaRef}>
           <DialogManager />
-        </Styled.DialogArea>
+        </$DialogArea>
 
         <GlobalCommandDialog />
-      </Styled.Content>
+      </$Content>
     </>
   );
 };
@@ -183,31 +183,30 @@ const App = () => {
   }, <Content />);
 };
 
-const Styled = {
-  Content: styled.div<{ isShowingHeader: boolean; isShowingFooter: boolean }>`
-    /* Computed */
-    --page-currentHeaderHeight: 0px;
-    --page-currentFooterHeight: 0px;
+const $Content = styled.div<{ isShowingHeader: boolean; isShowingFooter: boolean }>`
+  /* Computed */
+  --page-currentHeaderHeight: 0px;
+  --page-currentFooterHeight: 0px;
 
-    ${({ isShowingHeader }) =>
-      isShowingHeader &&
-      css`
-        --page-currentHeaderHeight: var(--page-header-height);
+  ${({ isShowingHeader }) =>
+    isShowingHeader &&
+    css`
+      --page-currentHeaderHeight: var(--page-header-height);
 
-        @media ${breakpoints.tablet} {
-          --page-currentHeaderHeight: var(--page-header-height-mobile);
-        }
-      `}
+      @media ${breakpoints.tablet} {
+        --page-currentHeaderHeight: var(--page-header-height-mobile);
+      }
+    `}
 
-    ${({ isShowingFooter }) =>
-      isShowingFooter &&
-      css`
-        --page-currentFooterHeight: var(--page-footer-height);
+  ${({ isShowingFooter }) =>
+    isShowingFooter &&
+    css`
+      --page-currentFooterHeight: var(--page-footer-height);
 
-        @media ${breakpoints.tablet} {
-          --page-currentFooterHeight: var(--page-footer-height-mobile);
-        }
-      `}
+      @media ${breakpoints.tablet} {
+        --page-currentFooterHeight: var(--page-footer-height-mobile);
+      }
+    `}
   
     /* Rules */
     ${layoutMixins.contentContainer}
@@ -215,51 +214,50 @@ const Styled = {
     ${layoutMixins.scrollArea}
     --scrollArea-height: 100vh;
 
-    @supports (-webkit-touch-callout: none) {
-      height: -webkit-fill-available;
-    }
+  @supports (-webkit-touch-callout: none) {
+    height: -webkit-fill-available;
+  }
 
-    ${layoutMixins.stickyArea0}
-    --stickyArea0-topHeight: var(--page-currentHeaderHeight);
-    --stickyArea0-topGap: var(--border-width);
-    --stickyArea0-bottomGap: var(--border-width);
-    --stickyArea0-bottomHeight: var(--page-currentFooterHeight);
+  ${layoutMixins.stickyArea0}
+  --stickyArea0-topHeight: var(--page-currentHeaderHeight);
+  --stickyArea0-topGap: var(--border-width);
+  --stickyArea0-bottomGap: var(--border-width);
+  --stickyArea0-bottomHeight: var(--page-currentFooterHeight);
 
-    ${layoutMixins.withOuterAndInnerBorders}
-    display: grid;
-    grid-template:
-      'Header' var(--page-currentHeaderHeight)
-      'Main' minmax(min-content, 1fr)
-      'Footer' var(--page-currentFooterHeight)
-      / 100%;
+  ${layoutMixins.withOuterAndInnerBorders}
+  display: grid;
+  grid-template:
+    'Header' var(--page-currentHeaderHeight)
+    'Main' minmax(min-content, 1fr)
+    'Footer' var(--page-currentFooterHeight)
+    / 100%;
 
-    transition: 0.3s var(--ease-out-expo);
-  `,
+  transition: 0.3s var(--ease-out-expo);
+`;
 
-  Main: styled.main`
-    ${layoutMixins.contentSectionAttached}
-    box-shadow: none;
+const $Main = styled.main`
+  ${layoutMixins.contentSectionAttached}
+  box-shadow: none;
 
-    grid-area: Main;
+  grid-area: Main;
 
-    isolation: isolate;
+  isolation: isolate;
 
-    position: relative;
-  `,
+  position: relative;
+`;
 
-  NotificationsToastArea: styled(NotificationsToastArea)`
-    grid-area: Main;
-    z-index: 2;
-  `,
+const $NotificationsToastArea = styled(NotificationsToastArea)`
+  grid-area: Main;
+  z-index: 2;
+`;
 
-  DialogArea: styled.aside`
-    position: fixed;
-    height: 100%;
-    z-index: 1;
-    inset: 0;
-    overflow: clip;
-    ${layoutMixins.noPointerEvents}
-  `,
-};
+const $DialogArea = styled.aside`
+  position: fixed;
+  height: 100%;
+  z-index: 1;
+  inset: 0;
+  overflow: clip;
+  ${layoutMixins.noPointerEvents}
+`;
 
 export default App;

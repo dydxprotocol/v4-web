@@ -93,15 +93,15 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
   };
 
   return (
-    <Styled.MarketDetailsItems>
+    <$MarketDetailsItems>
       {showMidMarketPrice && (
-        <Styled.MidMarketPrice>
+        <$MidMarketPrice>
           <MidMarketPrice />
           <VerticalSeparator />
-        </Styled.MidMarketPrice>
+        </$MidMarketPrice>
       )}
 
-      <Styled.Details
+      <$Details
         items={defaultMarketStatistics.map((stat) => ({
           key: stat,
           label: labelMap[stat],
@@ -116,16 +116,12 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
             switch (stat) {
               case MarketStats.OraclePrice: {
                 return (
-                  <Styled.Output
-                    type={OutputType.Fiat}
-                    value={value}
-                    fractionDigits={tickSizeDecimals}
-                  />
+                  <$Output type={OutputType.Fiat} value={value} fractionDigits={tickSizeDecimals} />
                 );
               }
               case MarketStats.OpenInterest: {
                 return (
-                  <Styled.Output
+                  <$Output
                     type={OutputType.Number}
                     value={value}
                     tag={id}
@@ -135,7 +131,7 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
               }
               case MarketStats.Funding1H: {
                 return (
-                  <Styled.Output
+                  <$Output
                     type={OutputType.Percent}
                     value={value}
                     color={color}
@@ -148,29 +144,29 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
               }
               case MarketStats.PriceChange24H: {
                 return (
-                  <Styled.RowSpan color={!isLoading ? color : undefined}>
+                  <$RowSpan color={!isLoading ? color : undefined}>
                     {!isLoading && <TriangleIndicator value={valueBN} />}
-                    <Styled.Output
+                    <$Output
                       type={OutputType.Fiat}
                       value={valueBN.abs()}
                       fractionDigits={tickSizeDecimals}
                     />
                     {!isLoading && (
-                      <Styled.Output
+                      <$Output
                         type={OutputType.Percent}
                         value={MustBigNumber(priceChange24HPercent).abs()}
                         withParentheses
                       />
                     )}
-                  </Styled.RowSpan>
+                  </$RowSpan>
                 );
               }
               case MarketStats.Trades24H: {
-                return <Styled.Output type={OutputType.Number} value={value} fractionDigits={0} />;
+                return <$Output type={OutputType.Number} value={value} fractionDigits={0} />;
               }
               case MarketStats.Volume24H: {
                 // $ with no decimals
-                return <Styled.Output type={OutputType.Fiat} value={value} fractionDigits={0} />;
+                return <$Output type={OutputType.Fiat} value={value} fractionDigits={0} />;
               }
               case MarketStats.MaxLeverage: {
                 return (
@@ -190,7 +186,7 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
               }
               default: {
                 // Default renderer
-                return <Styled.Output type={OutputType.Text} value={value} />;
+                return <$Output type={OutputType.Text} value={value} />;
               }
             }
           })(),
@@ -199,13 +195,10 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
         layout={isTablet ? 'grid' : 'rowColumns'}
         withSeparators={!isTablet}
       />
-    </Styled.MarketDetailsItems>
+    </$MarketDetailsItems>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.MarketDetailsItems = styled.div`
+const $MarketDetailsItems = styled.div`
   @media ${breakpoints.notTablet} {
     ${layoutMixins.scrollArea}
     ${layoutMixins.row}
@@ -220,7 +213,7 @@ Styled.MarketDetailsItems = styled.div`
   }
 `;
 
-Styled.Details = styled(Details)`
+const $Details = styled(Details)`
   font: var(--font-mini-book);
 
   @media ${breakpoints.tablet} {
@@ -234,7 +227,7 @@ Styled.Details = styled(Details)`
   }
 `;
 
-Styled.MidMarketPrice = styled.div`
+const $MidMarketPrice = styled.div`
   ${layoutMixins.sticky}
   ${layoutMixins.row}
   font: var(--font-medium-medium);
@@ -245,7 +238,7 @@ Styled.MidMarketPrice = styled.div`
   gap: 1rem;
 `;
 
-Styled.Output = styled(Output)<{ color?: string }>`
+const $Output = styled(Output)<{ color?: string }>`
   ${layoutMixins.row}
 
   ${({ color }) =>
@@ -255,7 +248,7 @@ Styled.Output = styled(Output)<{ color?: string }>`
     `}
 `;
 
-Styled.RowSpan = styled.span<{ color?: string }>`
+const $RowSpan = styled.span<{ color?: string }>`
   ${layoutMixins.row}
 
   ${({ color }) =>

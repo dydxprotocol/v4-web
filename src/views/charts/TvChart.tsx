@@ -36,17 +36,14 @@ export const TvChart = () => {
   useTradingViewTheme({ tvWidget, isWidgetReady, chartLines });
 
   return (
-    <Styled.PriceChart isChartReady={isChartReady}>
+    <$PriceChart isChartReady={isChartReady}>
       {!isChartReady && <LoadingSpace id="tv-chart-loading" />}
 
       <div id="tv-price-chart" />
-    </Styled.PriceChart>
+    </$PriceChart>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.PriceChart = styled.div<{ isChartReady?: boolean }>`
+const $PriceChart = styled.div<{ isChartReady?: boolean }>`
   ${layoutMixins.stack}
 
   height: 100%;

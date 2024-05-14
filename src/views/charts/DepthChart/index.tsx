@@ -181,7 +181,7 @@ export const DepthChart = ({
   };
 
   return (
-    <Styled.Container onWheel={onDepthChartZoom}>
+    <$Container onWheel={onDepthChartZoom}>
       <DataProvider
         theme={theme}
         xScale={{
@@ -315,7 +315,7 @@ export const DepthChart = ({
               verticalCrosshairStyle={{ strokeWidth: 1, strokeDasharray: '5 5', opacity: 0.7 }}
               snapCrosshairToDatumX={!isEditingOrder}
               renderXAxisLabel={({ tooltipData }) => (
-                <Styled.XAxisLabelOutput
+                <$XAxisLabelOutput
                   type={OutputType.Fiat}
                   value={
                     isEditingOrder && chartPointAtPointer
@@ -341,7 +341,7 @@ export const DepthChart = ({
               snapCrosshairToDatumY={!isEditingOrder}
               renderYAxisLabel={({ tooltipData }) =>
                 (isEditingOrder || tooltipData!.nearestDatum?.datum.depth) && (
-                  <Styled.YAxisLabelOutput
+                  <$YAxisLabelOutput
                     type={OutputType.Asset}
                     value={
                       isEditingOrder && chartPointAtPointer
@@ -385,13 +385,10 @@ export const DepthChart = ({
           </XYChartWithPointerEvents>
         </EventEmitterProvider>
       </DataProvider>
-    </Styled.Container>
+    </$Container>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.div`
+const $Container = styled.div`
   width: 0;
   min-width: 100%;
   height: 0;
@@ -430,11 +427,11 @@ Styled.Container = styled.div`
   }
 `;
 
-Styled.XAxisLabelOutput = styled(AxisLabelOutput)`
+const $XAxisLabelOutput = styled(AxisLabelOutput)`
   box-shadow: 0 0 0.5rem var(--color-layer-2);
 `;
 
-Styled.YAxisLabelOutput = styled(AxisLabelOutput)`
+const $YAxisLabelOutput = styled(AxisLabelOutput)`
   --axisLabel-offset: 0.5rem;
 
   [data-side='left'] & {

@@ -29,23 +29,19 @@ export const BlockRewardNotification = ({
   const { BLOCK_REWARD_AMOUNT, TOKEN_NAME } = data;
 
   return (
-    <Styled.Notification
+    <$Notification
       isToast={isToast}
       notification={notification}
       slotIcon={<Icon iconName={IconName.RewardStar} />}
       slotTitle={stringGetter({ key: STRING_KEYS.TRADING_REWARD_RECEIVED })}
       slotCustomContent={
-        <Styled.Details
+        <$Details
           items={[
             {
               key: 'block_reward',
               label: stringGetter({ key: STRING_KEYS.BLOCK_REWARD }),
               value: (
-                <Styled.Output
-                  type={OutputType.Asset}
-                  value={BLOCK_REWARD_AMOUNT}
-                  tag={TOKEN_NAME}
-                />
+                <$Output type={OutputType.Asset} value={BLOCK_REWARD_AMOUNT} tag={TOKEN_NAME} />
               ),
             },
           ]}
@@ -54,10 +50,7 @@ export const BlockRewardNotification = ({
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Details = styled(Details)`
+const $Details = styled(Details)`
   --details-item-height: 1.5rem;
 
   dd {
@@ -65,12 +58,12 @@ Styled.Details = styled(Details)`
   }
 `;
 
-Styled.Notification = styled(Notification)`
+const $Notification = styled(Notification)`
   background-image: url('/dots-background-2.svg');
   background-size: cover;
 `;
 
-Styled.Output = styled(Output)`
+const $Output = styled(Output)`
   &:before {
     content: '+';
     color: var(--color-success);

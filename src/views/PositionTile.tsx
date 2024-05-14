@@ -1,4 +1,4 @@
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 import { PositionSide } from '@/constants/trade';
@@ -50,15 +50,15 @@ export const PositionTile = ({
     currentPositionSide === PositionSide.None && newPositionSide === PositionSide.None;
 
   return (
-    <Styled.PositionTile
+    <$PositionTile
       newPositionSide={newPositionSide}
       positionSide={currentPositionSide}
       positionSideHasChanged={positionSideHasChanged}
       showNarrowVariation={showNarrowVariation}
     >
       <div>
-        {showNarrowVariation && <Styled.AssetIcon symbol={symbol} />}
-        <Styled.PositionTags>
+        {showNarrowVariation && <$AssetIcon symbol={symbol} />}
+        <$PositionTags>
           <PositionSideTag positionSide={currentPositionSide} size={TagSize.Medium} />
           {hasSizeDiff && newPositionSide && currentPositionSide !== newPositionSide && (
             <>
@@ -66,12 +66,12 @@ export const PositionTile = ({
               <PositionSideTag positionSide={newPositionSide} size={TagSize.Medium} />
             </>
           )}
-        </Styled.PositionTags>
+        </$PositionTags>
       </div>
 
       {!hasNoCurrentOrPostOrderPosition && (
-        <Styled.PositionSizes showNarrowVariation={showNarrowVariation}>
-          <Styled.Output
+        <$PositionSizes showNarrowVariation={showNarrowVariation}>
+          <$Output
             type={OutputType.Number}
             tag={!hasSizeDiff && symbol}
             value={currentSize}
@@ -81,7 +81,7 @@ export const PositionTile = ({
             withBaseFont
           />
           {hasSizeDiff ? (
-            <Styled.PostOrderSizeRow>
+            <$PostOrderSizeRow>
               <DiffArrow
                 sign={
                   MustBigNumber(postOrderSize).gt(currentSize ?? 0)
@@ -89,7 +89,7 @@ export const PositionTile = ({
                     : NumberSign.Negative
                 }
               />
-              <Styled.Output
+              <$Output
                 type={OutputType.Number}
                 value={postOrderSize}
                 fractionDigits={stepSizeDecimals || TOKEN_DECIMALS}
@@ -97,9 +97,9 @@ export const PositionTile = ({
                 tag={symbol}
                 withBaseFont
               />
-            </Styled.PostOrderSizeRow>
+            </$PostOrderSizeRow>
           ) : (
-            <Styled.Output
+            <$Output
               type={OutputType.Fiat}
               value={notionalTotal}
               fractionDigits={tickSizeDecimals}
@@ -107,20 +107,17 @@ export const PositionTile = ({
               withBaseFont
             />
           )}
-        </Styled.PositionSizes>
+        </$PositionSizes>
       )}
-      {isLoading && <Styled.LoadingSpinner />}
-    </Styled.PositionTile>
+      {isLoading && <$LoadingSpinner />}
+    </$PositionTile>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.PositionTags = styled.div`
+const $PositionTags = styled.div`
   ${layoutMixins.inlineRow}
 `;
 
-Styled.PositionSizes = styled.div<{ showNarrowVariation?: boolean }>`
+const $PositionSizes = styled.div<{ showNarrowVariation?: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: end;
@@ -144,14 +141,7 @@ Styled.PositionSizes = styled.div<{ showNarrowVariation?: boolean }>`
     `}
 `;
 
-Styled.Output = styled(Output)<{ sign: NumberSign; smallText?: boolean; margin?: string }>`
-  color: ${({ sign }) =>
-    ({
-      [NumberSign.Positive]: `var(--color-positive)`,
-      [NumberSign.Negative]: `var(--color-negative)`,
-      [NumberSign.Neutral]: `var(--color-text-2)`,
-    }[sign])};
-
+const $Output = styled(Output)<{ smallText?: boolean; margin?: string }>`
   ${({ smallText }) =>
     smallText &&
     css`
@@ -162,7 +152,7 @@ Styled.Output = styled(Output)<{ sign: NumberSign; smallText?: boolean; margin?:
   ${({ margin }) => margin && `margin: ${margin};`}
 `;
 
-Styled.PositionTile = styled.div<{
+const $PositionTile = styled.div<{
   newPositionSide?: PositionSide;
   positionSide?: PositionSide;
   positionSideHasChanged?: Boolean;
@@ -236,14 +226,14 @@ Styled.PositionTile = styled.div<{
     `};
 `;
 
-Styled.PostOrderSizeRow = styled.div`
+const $PostOrderSizeRow = styled.div`
   ${layoutMixins.inlineRow}
 `;
 
-Styled.AssetIcon = styled(AssetIcon)`
+const $AssetIcon = styled(AssetIcon)`
   font-size: 2.25rem;
 `;
 
-Styled.LoadingSpinner = styled(LoadingSpinner)`
+const $LoadingSpinner = styled(LoadingSpinner)`
   color: var(--color-text-0);
 `;

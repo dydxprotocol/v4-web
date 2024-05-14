@@ -122,9 +122,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         : '';
 
     return (
-      <Styled.InputContainer className={className}>
+      <$InputContainer className={className}>
         {type === InputType.Text || type === InputType.Search ? (
-          <Styled.Input
+          <$Input
             // React
             ref={ref as React.Ref<HTMLInputElement>}
             id={id}
@@ -142,7 +142,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {...otherProps}
           />
         ) : (
-          <Styled.NumericFormat
+          <$NumericFormat
             // React
             ref={ref as React.Ref<typeof NumericFormat<unknown>>}
             id={id}
@@ -183,14 +183,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {...otherProps}
           />
         )}
-      </Styled.InputContainer>
+      </$InputContainer>
     );
   }
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.InputContainer = styled.div`
+const $InputContainer = styled.div`
   width: 100%;
   min-height: 100%;
   height: 100%;
@@ -230,11 +227,11 @@ const InputStyle = css`
   }
 `;
 
-Styled.NumericFormat = styled(NumericFormat)`
+const $NumericFormat = styled(NumericFormat)`
   ${InputStyle}
   font-feature-settings: var(--fontFeature-monoNumbers);
 `;
 
-Styled.Input = styled.input`
+const $Input = styled.input`
   ${InputStyle}
 `;

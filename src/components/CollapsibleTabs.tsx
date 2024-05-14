@@ -11,7 +11,7 @@ import {
   Root as TabsRoot,
   Trigger as TabsTrigger,
 } from '@radix-ui/react-tabs';
-import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -54,52 +54,49 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
   const currentTab = tabItems.find((tabItem) => tabItem.value === tab);
 
   return (
-    <Styled.TabsRoot
+    <$TabsRoot
       className={className}
       defaultValue={defaultTab}
       value={tab}
-      onValueChange={setTab}
+      onValueChange={(v) => setTab?.(v as TabItemsValue)}
       asChild
     >
-      <Styled.CollapsibleRoot
+      <$CollapsibleRoot
         defaultOpen={defaultOpen}
         open={defaultOpen}
         onOpenChange={(isOpen: boolean) => onOpenChange?.(isOpen)}
       >
-        <Styled.Header>
-          <Styled.TabsList $fullWidthTabs={fullWidthTabs}>
+        <$Header>
+          <$TabsList $fullWidthTabs={fullWidthTabs}>
             {tabItems.map(({ value, label, tag, slotRight }) => (
-              <Styled.TabsTrigger key={value} value={value} onClick={() => onOpenChange?.(true)}>
+              <$TabsTrigger key={value} value={value} onClick={() => onOpenChange?.(true)}>
                 {label}
                 {tag && <Tag>{tag}</Tag>}
                 {slotRight}
-              </Styled.TabsTrigger>
+              </$TabsTrigger>
             ))}
-          </Styled.TabsList>
+          </$TabsList>
 
-          <Styled.Toolbar>
+          <$Toolbar>
             {currentTab?.slotToolbar || slotToolbar}
             <CollapsibleTrigger asChild>
-              <Styled.IconButton iconName={IconName.Caret} isToggle />
+              <$IconButton iconName={IconName.Caret} isToggle />
             </CollapsibleTrigger>
-          </Styled.Toolbar>
-        </Styled.Header>
+          </$Toolbar>
+        </$Header>
 
-        <Styled.CollapsibleContent>
+        <$CollapsibleContent>
           {tabItems.map(({ asChild, value, content }) => (
-            <Styled.TabsContent key={value} asChild={asChild} value={value}>
+            <$TabsContent key={value} asChild={asChild} value={value}>
               {content}
-            </Styled.TabsContent>
+            </$TabsContent>
           ))}
-        </Styled.CollapsibleContent>
-      </Styled.CollapsibleRoot>
-    </Styled.TabsRoot>
+        </$CollapsibleContent>
+      </$CollapsibleRoot>
+    </$TabsRoot>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TabsRoot = styled(TabsRoot)`
+const $TabsRoot = styled(TabsRoot)`
   /* Overrides */
   --trigger-backgroundColor: var(--color-layer-2);
   --trigger-textColor: var(--color-text-0);
@@ -122,7 +119,7 @@ Styled.TabsRoot = styled(TabsRoot)`
   ${layoutMixins.withInnerHorizontalBorders}
 `;
 
-Styled.TabsList = styled(TabsList)<{ $fullWidthTabs?: boolean }>`
+const $TabsList = styled(TabsList)<{ $fullWidthTabs?: boolean }>`
   ${layoutMixins.withOuterAndInnerBorders}
 
   align-self: stretch;
@@ -142,7 +139,7 @@ Styled.TabsList = styled(TabsList)<{ $fullWidthTabs?: boolean }>`
   padding: 0 var(--border-width);
 `;
 
-Styled.TabsTrigger = styled(TabsTrigger)`
+const $TabsTrigger = styled(TabsTrigger)`
   ${layoutMixins.withOuterBorder}
 
   ${layoutMixins.row}
@@ -161,11 +158,11 @@ Styled.TabsTrigger = styled(TabsTrigger)`
   }
 `;
 
-Styled.Toolbar = styled(Toolbar)`
+const $Toolbar = styled(Toolbar)`
   ${layoutMixins.inlineRow}
 `;
 
-Styled.TabsContent = styled(TabsContent)`
+const $TabsContent = styled(TabsContent)`
   ${layoutMixins.flexColumn}
 
   outline: none;
@@ -200,9 +197,9 @@ Styled.TabsContent = styled(TabsContent)`
   }
 `;
 
-Styled.CollapsibleRoot = styled(CollapsibleRoot)``;
+const $CollapsibleRoot = styled(CollapsibleRoot)``;
 
-Styled.Header = styled.header`
+const $Header = styled.header`
   ${layoutMixins.sticky}
   height: var(--stickyArea-topHeight);
 
@@ -212,20 +209,20 @@ Styled.Header = styled.header`
   ${layoutMixins.row}
   justify-content: space-between;
 
-  ${Styled.CollapsibleRoot}[data-state='closed'] & {
+  ${$CollapsibleRoot}[data-state='closed'] & {
     box-shadow: none;
   }
 `;
 
-Styled.CollapsibleContent = styled(CollapsibleContent)`
+const $CollapsibleContent = styled(CollapsibleContent)`
   ${layoutMixins.stack}
 
   box-shadow: none;
 `;
 
-Styled.IconButton = styled(IconButton)`
+const $IconButton = styled(IconButton)`
   --button-icon-size: 1em;
-  ${Styled.CollapsibleRoot}[data-state='closed'] & {
+  ${$CollapsibleRoot}[data-state='closed'] & {
     rotate: -0.5turn;
   }
 `;

@@ -99,8 +99,8 @@ export const LeverageSlider = ({
   };
 
   return (
-    <Styled.SliderContainer className={className}>
-      <Styled.Slider
+    <$SliderContainer className={className}>
+      <$Slider
         label="MarketLeverage"
         min={min}
         max={max}
@@ -111,13 +111,10 @@ export const LeverageSlider = ({
         midpoint={midpoint}
         orderSide={orderSide}
       />
-    </Styled.SliderContainer>
+    </$SliderContainer>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Slider = styled(Slider)<{ midpoint?: number; orderSide: OrderSide }>`
+const $Slider = styled(Slider)<{ midpoint?: number; orderSide: OrderSide }>`
   --slider-track-backgroundColor: var(--color-layer-4);
 
   ${({ midpoint, orderSide }) => css`
@@ -137,6 +134,6 @@ Styled.Slider = styled(Slider)<{ midpoint?: number; orderSide: OrderSide }>`
   `}
 `;
 
-Styled.SliderContainer = styled.div`
+const $SliderContainer = styled.div`
   height: 1.375rem;
 `;

@@ -96,8 +96,8 @@ export const NewMarketMessageDetailsDialog = ({
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.MESSAGE_DETAILS })}
     >
-      <Styled.ProposedMessageDetails>
-        <Styled.Tabs
+      <$ProposedMessageDetails>
+        <$Tabs
           items={toggleGroupItems}
           value={codeToggleGroup}
           onValueChange={setCodeToggleGroup}
@@ -105,8 +105,8 @@ export const NewMarketMessageDetailsDialog = ({
         {
           {
             [CodeToggleGroup.CREATE_ORACLE]: (
-              <Styled.Code>
-                <Styled.Details
+              <$Code>
+                <$Details
                   layout="column"
                   items={[
                     {
@@ -131,37 +131,35 @@ export const NewMarketMessageDetailsDialog = ({
                     },
                   ]}
                 />
-                <Styled.ExchangeConfigs>
-                  <Styled.Text0>
+                <$ExchangeConfigs>
+                  <$Text0>
                     exchange_config_json
-                    {exchangeConfig && (
-                      <Styled.Tag type={TagType.Number}>{exchangeConfig.length}</Styled.Tag>
-                    )}
-                  </Styled.Text0>
+                    {exchangeConfig && <$Tag type={TagType.Number}>{exchangeConfig.length}</$Tag>}
+                  </$Text0>
                   {'['}
                   {exchangeConfig?.map((exchange) => {
                     return (
-                      <Styled.ExchangeObject
+                      <$ExchangeObject
                         key={exchange.exchangeName}
                         style={{ padding: 0, margin: 0, paddingLeft: '0.5rem' }}
                       >
                         {'{'}
                         {Object.keys(exchange).map((key) => (
-                          <Styled.Line key={key}>
+                          <$Line key={key}>
                             {key}: <span>{exchange[key as keyof typeof exchange]}</span>
-                          </Styled.Line>
+                          </$Line>
                         ))}
                         {'},'}
-                      </Styled.ExchangeObject>
+                      </$ExchangeObject>
                     );
                   })}
                   {']'}
-                </Styled.ExchangeConfigs>
-              </Styled.Code>
+                </$ExchangeConfigs>
+              </$Code>
             ),
             [CodeToggleGroup.MSG_CREATE_PERPETUAL]: (
-              <Styled.Code>
-                <Styled.Details
+              <$Code>
+                <$Details
                   layout="column"
                   items={[
                     {
@@ -201,11 +199,11 @@ export const NewMarketMessageDetailsDialog = ({
                     },
                   ]}
                 />
-              </Styled.Code>
+              </$Code>
             ),
             [CodeToggleGroup.MSG_CREATE_CLOB_PAIR]: (
-              <Styled.Code>
-                <Styled.Details
+              <$Code>
+                <$Details
                   layout="column"
                   items={[
                     {
@@ -240,11 +238,11 @@ export const NewMarketMessageDetailsDialog = ({
                     },
                   ]}
                 />
-              </Styled.Code>
+              </$Code>
             ),
             [CodeToggleGroup.MSG_DELAY_MESSAGE]: (
-              <Styled.Code>
-                <Styled.Details
+              <$Code>
+                <$Details
                   layout="column"
                   items={[
                     {
@@ -261,7 +259,7 @@ export const NewMarketMessageDetailsDialog = ({
                   ]}
                 />
                 <div style={{ margin: '0.5rem 0' }}>MSG_UPDATE_CLOB_PAIR</div>
-                <Styled.Details
+                <$Details
                   layout="column"
                   items={[
                     {
@@ -296,11 +294,11 @@ export const NewMarketMessageDetailsDialog = ({
                     },
                   ]}
                 />
-              </Styled.Code>
+              </$Code>
             ),
             [CodeToggleGroup.MSG_SUBMIT_PROPOSAL]: (
-              <Styled.Code>
-                <Styled.Details
+              <$Code>
+                <$Details
                   items={[
                     {
                       key: 'title',
@@ -325,30 +323,27 @@ export const NewMarketMessageDetailsDialog = ({
                       key: 'summary',
                       label: 'summary',
                       value: (
-                        <Styled.Summary>
+                        <$Summary>
                           {utils.getGovAddNewMarketSummary(ticker, newMarketProposal.delayBlocks)}
-                        </Styled.Summary>
+                        </$Summary>
                       ),
                     },
                   ]}
                 />
-              </Styled.Code>
+              </$Code>
             ),
           }[codeToggleGroup]
         }
-      </Styled.ProposedMessageDetails>
+      </$ProposedMessageDetails>
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.column}
   gap: 0;
 `;
 
-Styled.ProposedMessageDetails = styled.div`
+const $ProposedMessageDetails = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -358,27 +353,27 @@ Styled.ProposedMessageDetails = styled.div`
   border-radius: 10px;
 `;
 
-Styled.Tabs = styled(ToggleGroup)`
+const $Tabs = styled(ToggleGroup)`
   overflow-x: auto;
 `;
 
-Styled.Details = styled(Details)`
+const $Details = styled(Details)`
   --details-item-height: 1.5rem;
 `;
 
-Styled.ExchangeConfigs = styled.div`
+const $ExchangeConfigs = styled.div`
   margin-top: 0.5rem;
 `;
 
-Styled.Text0 = styled.span`
+const $Text0 = styled.span`
   color: var(--color-text-0);
 `;
 
-Styled.Tag = styled(Tag)`
+const $Tag = styled(Tag)`
   margin: 0 0.5ch;
 `;
 
-Styled.Code = styled.div`
+const $Code = styled.div`
   height: 16.25rem;
   overflow: auto;
   display: block;
@@ -391,19 +386,19 @@ Styled.Code = styled.div`
   gap: 0rem;
 `;
 
-Styled.ExchangeObject = styled.div`
+const $ExchangeObject = styled.div`
   padding: 1rem;
 `;
 
-Styled.Line = styled.pre`
+const $Line = styled.pre`
   margin-left: 1rem;
 `;
 
-Styled.Description = styled.p`
+const $Description = styled.p`
   margin-bottom: 1rem;
 `;
 
-Styled.Summary = styled.p`
+const $Summary = styled.p`
   text-align: justify;
   margin-left: 0.5rem;
 `;

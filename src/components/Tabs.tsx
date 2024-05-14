@@ -63,31 +63,31 @@ export const Tabs = <TabItemsValue extends string>({
 
   const triggers = (
     <>
-      <Styled.List $fullWidthTabs={fullWidthTabs} $withBorders={withBorders}>
+      <$List $fullWidthTabs={fullWidthTabs} $withBorders={withBorders}>
         {items.map((item) =>
           !item.subitems ? (
             item.customTrigger ?? (
-              <Styled.Trigger key={item.value} value={item.value} $withBorders={withBorders}>
+              <$Trigger key={item.value} value={item.value} $withBorders={withBorders}>
                 {item.label}
                 {item.tag && <Tag>{item.tag}</Tag>}
                 {item.slotRight}
-              </Styled.Trigger>
+              </$Trigger>
             )
           ) : (
-            <Styled.DropdownSelectMenu
+            <$DropdownSelectMenu
               key={item.value ?? item.label}
               items={item.subitems as unknown as MenuItem<TabItemsValue>[]}
               value={value}
               onValueChange={onValueChange}
               align="end"
               $isActive={item.subitems.some((subitem) => subitem.value === value)}
-              slotTrigger={<Styled.DropdownTabTrigger />}
+              slotTrigger={<$DropdownTabTrigger />}
             >
               {item.label}
-            </Styled.DropdownSelectMenu>
+            </$DropdownSelectMenu>
           )
         )}
-      </Styled.List>
+      </$List>
 
       {(currentItem?.slotToolbar || slotToolbar) && (
         <Toolbar>{currentItem?.slotToolbar || slotToolbar}</Toolbar>
@@ -96,7 +96,7 @@ export const Tabs = <TabItemsValue extends string>({
   );
 
   return (
-    <Styled.Root
+    <$Root
       className={className}
       defaultValue={defaultValue}
       value={value}
@@ -105,14 +105,14 @@ export const Tabs = <TabItemsValue extends string>({
       $side={side}
       $withInnerBorder={withBorders}
     >
-      <Styled.Header $side={side}>{triggers}</Styled.Header>
+      <$Header $side={side}>{triggers}</$Header>
 
       {sharedContent ? (
         sharedContent
       ) : (
-        <Styled.Stack>
+        <$Stack>
           {items.map(({ asChild, value, content, forceMount }) => (
-            <Styled.Content
+            <$Content
               key={value}
               asChild={asChild}
               value={value}
@@ -121,16 +121,13 @@ export const Tabs = <TabItemsValue extends string>({
               $withTransitions={withTransitions}
             >
               {content}
-            </Styled.Content>
+            </$Content>
           ))}
-        </Styled.Stack>
+        </$Stack>
       )}
-    </Styled.Root>
+    </$Root>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
 const tabTriggerStyle = css`
   ${layoutMixins.row}
   justify-content: center;
@@ -149,7 +146,7 @@ const tabTriggerStyle = css`
   }
 `;
 
-Styled.Root = styled(Root)<{ $side: 'top' | 'bottom'; $withInnerBorder?: boolean }>`
+const $Root = styled(Root)<{ $side: 'top' | 'bottom'; $withInnerBorder?: boolean }>`
   /* Overrides */
   --trigger-backgroundColor: var(--color-layer-2);
   --trigger-textColor: var(--color-text-0);
@@ -197,7 +194,7 @@ Styled.Root = styled(Root)<{ $side: 'top' | 'bottom'; $withInnerBorder?: boolean
   }
 `;
 
-Styled.Header = styled.header<{ $side: 'top' | 'bottom' }>`
+const $Header = styled.header<{ $side: 'top' | 'bottom' }>`
   ${layoutMixins.contentSectionDetachedScrollable}
 
   ${({ $side }) =>
@@ -215,7 +212,7 @@ Styled.Header = styled.header<{ $side: 'top' | 'bottom' }>`
   justify-content: space-between;
 `;
 
-Styled.List = styled(List)<{ $fullWidthTabs?: boolean; $withBorders?: boolean }>`
+const $List = styled(List)<{ $fullWidthTabs?: boolean; $withBorders?: boolean }>`
   align-self: stretch;
 
   ${({ $withBorders }) =>
@@ -235,7 +232,7 @@ Styled.List = styled(List)<{ $fullWidthTabs?: boolean; $withBorders?: boolean }>
         `}
 `;
 
-Styled.Trigger = styled(Trigger)<{ $withBorders?: boolean }>`
+const $Trigger = styled(Trigger)<{ $withBorders?: boolean }>`
   ${({ $withBorders }) =>
     $withBorders &&
     css`
@@ -245,13 +242,13 @@ Styled.Trigger = styled(Trigger)<{ $withBorders?: boolean }>`
   ${tabTriggerStyle}
 `;
 
-Styled.Stack = styled.div`
+const $Stack = styled.div`
   ${layoutMixins.stack}
 
   box-shadow: none;
 `;
 
-Styled.Content = styled(Content)<{ $hide?: boolean; $withTransitions: boolean }>`
+const $Content = styled(Content)<{ $hide?: boolean; $withTransitions: boolean }>`
   ${layoutMixins.flexColumn}
   outline: none;
   box-shadow: none;
@@ -295,7 +292,7 @@ Styled.Content = styled(Content)<{ $hide?: boolean; $withTransitions: boolean }>
   }
 `;
 
-Styled.DropdownTabTrigger = styled(Trigger)`
+const $DropdownTabTrigger = styled(Trigger)`
   ${tabTriggerStyle}
   gap: 1ch;
 
@@ -303,7 +300,7 @@ Styled.DropdownTabTrigger = styled(Trigger)`
   width: 100%;
 `;
 
-Styled.DropdownSelectMenu = styled(DropdownSelectMenu)<{ $isActive?: boolean }>`
+const $DropdownSelectMenu = styled(DropdownSelectMenu)<{ $isActive?: boolean }>`
   --trigger-radius: 0;
 
   ${({ $isActive }) =>

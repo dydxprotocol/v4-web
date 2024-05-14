@@ -58,14 +58,14 @@ export const WithConfirmationPopover = forwardRef(
       </Trigger>
 
       <Portal>
-        <Styled.Content
+        <$Content
           ref={ref}
           className={className}
           sideOffset={sideOffset}
           align={align}
           onOpenAutoFocus={(e: FocusEvent) => e.preventDefault()}
         >
-          <Styled.Form
+          <$Form
             onSubmit={(e: FormEvent) => {
               e.preventDefault();
               e.stopPropagation();
@@ -74,22 +74,17 @@ export const WithConfirmationPopover = forwardRef(
             }}
           >
             {children}
-            <Styled.ConfirmationButtons>
-              {onCancel && <Styled.CancelButton iconName={IconName.Close} onClick={onCancel} />}
-              {onConfirm && (
-                <Styled.ConfirmButton iconName={IconName.Check} type={ButtonType.Submit} />
-              )}
-            </Styled.ConfirmationButtons>
-          </Styled.Form>
-        </Styled.Content>
+            <$ConfirmationButtons>
+              {onCancel && <$CancelButton iconName={IconName.Close} onClick={onCancel} />}
+              {onConfirm && <$ConfirmButton iconName={IconName.Check} type={ButtonType.Submit} />}
+            </$ConfirmationButtons>
+          </$Form>
+        </$Content>
       </Portal>
     </Root>
   )
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Content = styled(Content)`
+const $Content = styled(Content)`
   z-index: 1;
 
   &:focus-visible {
@@ -97,24 +92,24 @@ Styled.Content = styled(Content)`
   }
 `;
 
-Styled.Form = styled.form`
+const $Form = styled.form`
   ${layoutMixins.column}
   gap: 0.25rem;
 `;
 
-Styled.ConfirmationButtons = styled.div`
+const $ConfirmationButtons = styled.div`
   ${layoutMixins.row};
 
   justify-content: flex-end;
   gap: 0.25rem;
 `;
 
-Styled.IconButton = styled(IconButton)`
+const $IconButton = styled(IconButton)`
   --button-height: 1.25rem;
   --button-font: var(--font-tiny-book);
 `;
 
-Styled.ConfirmButton = styled(Styled.IconButton)`
+const $ConfirmButton = styled($IconButton)`
   --button-backgroundColor: hsla(203, 25%, 19%, 1);
 
   svg {
@@ -122,7 +117,7 @@ Styled.ConfirmButton = styled(Styled.IconButton)`
   }
 `;
 
-Styled.CancelButton = styled(Styled.IconButton)`
+const $CancelButton = styled($IconButton)`
   --button-backgroundColor: hsla(296, 16%, 18%, 1);
 
   svg {

@@ -16,20 +16,17 @@ export const LeverageSliderStory: Story<Parameters<typeof LeverageSlider>[0]> = 
 
   return (
     <StoryWrapper>
-      <Styled.PositionInfoContainer>
+      <$PositionInfoContainer>
         <LeverageSlider
           {...args}
           leverageInputValue={leverage}
           setLeverageInputValue={setLeverage}
         />
-      </Styled.PositionInfoContainer>
+      </$PositionInfoContainer>
     </StoryWrapper>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.PositionInfoContainer = styled.div`
+const $PositionInfoContainer = styled.div`
   height: 4.625rem;
   margin: auto;
   position: relative;

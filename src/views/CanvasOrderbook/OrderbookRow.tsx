@@ -43,7 +43,7 @@ export const SpreadRow = forwardRef<HTMLDivElement, StyleProps & ElementProps>(
     const stringGetter = useStringGetter();
 
     return (
-      <Styled.SpreadRow ref={ref} side={side}>
+      <$SpreadRow ref={ref} side={side}>
         <span>
           <WithTooltip tooltip="spread">
             {stringGetter({ key: STRING_KEYS.ORDERBOOK_SPREAD })}
@@ -55,14 +55,11 @@ export const SpreadRow = forwardRef<HTMLDivElement, StyleProps & ElementProps>(
         <span>
           <Output type={OutputType.Percent} value={spreadPercent} />
         </span>
-      </Styled.SpreadRow>
+      </$SpreadRow>
     );
   }
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.SpreadRow = styled(OrderbookRow)<{ side?: 'top' | 'bottom' }>`
+const $SpreadRow = styled(OrderbookRow)<{ side?: 'top' | 'bottom' }>`
   height: 2rem;
   border-top: var(--border);
   border-bottom: var(--border);

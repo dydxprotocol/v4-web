@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
 import { STRING_KEYS, StringKey } from '@/constants/localization';
@@ -47,6 +47,7 @@ const useTradeTypeOptions = () => {
           // All conditional orders labeled under "Stop Order"
           allTradeTypeItems?.length && {
             label: stringGetter({ key: STRING_KEYS.STOP_ORDER_SHORT }),
+            value: '',
             subitems: allTradeTypeItems
               ?.map(
                 ({ value, label }) =>
@@ -73,27 +74,25 @@ export const TradeBoxOrderView = () => {
   const { selectedTradeType, tradeTypeItems } = useTradeTypeOptions();
 
   return (
-    <Styled.Tabs
+    <$Tabs
       key={selectedTradeType}
       value={selectedTradeType}
       items={tradeTypeItems}
       onValueChange={onTradeTypeChange}
       sharedContent={
-        <Styled.Container>
+        <$Container>
           <TradeForm />
-        </Styled.Container>
+        </$Container>
       }
       fullWidthTabs
     />
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.div`
+const $Container = styled.div`
   ${layoutMixins.scrollArea}
 `;
 
-Styled.Tabs = styled(Tabs)`
+const $Tabs = styled(Tabs)`
   overflow: hidden;
-`;
+` as typeof Tabs;

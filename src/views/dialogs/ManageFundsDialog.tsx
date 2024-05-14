@@ -49,12 +49,12 @@ export const ManageFundsDialog = ({ setIsOpen, selectedTransferType }: ElementPr
   };
 
   return (
-    <Styled.Dialog
+    <$Dialog
       isOpen
       setIsOpen={setIsOpen}
       placement={DialogPlacement.FullScreen}
       title={
-        <Styled.ToggleGroup
+        <$ToggleGroup
           items={Object.values(transferTypeConfig)}
           value={currentType}
           size={ButtonSize.Medium}
@@ -69,16 +69,14 @@ export const ManageFundsDialog = ({ setIsOpen, selectedTransferType }: ElementPr
       hasHeaderBorder
     >
       {transferTypeConfig[currentType].component}
-    </Styled.Dialog>
+    </$Dialog>
   );
 };
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Dialog = styled(Dialog)`
+const $Dialog = styled(Dialog)`
   --dialog-content-paddingTop: 1.5rem;
 `;
 
-Styled.ToggleGroup = styled(ToggleGroup)`
+const $ToggleGroup = styled(ToggleGroup)`
   overflow-x: auto;
 
   button {

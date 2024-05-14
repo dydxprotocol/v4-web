@@ -65,7 +65,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
       getCellValue: (row: RowData) => row.createdAtMilliseconds,
       label: stringGetter({ key: STRING_KEYS.TIME }),
       renderCell: (row: RowData) => (
-        <Styled.TimeOutput type={OutputType.Time} value={row.createdAtMilliseconds} />
+        <$TimeOutput type={OutputType.Time} value={row.createdAtMilliseconds} />
       ),
     };
     return [
@@ -75,7 +75,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
         getCellValue: (row: RowData) => row.size,
         label: stringGetter({ key: STRING_KEYS.SIDE }),
         renderCell: (row: RowData) => (
-          <Styled.SideOutput
+          <$SideOutput
             type={OutputType.Text}
             value={stringGetter({
               key: row.side === OrderSide.BUY ? STRING_KEYS.BUY : STRING_KEYS.SELL,
@@ -89,7 +89,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
         label: stringGetter({ key: STRING_KEYS.SIZE }),
         tag: id,
         renderCell: (row: RowData) => (
-          <Styled.SizeOutput
+          <$SizeOutput
             type={OutputType.Asset}
             value={row.size}
             fractionDigits={stepSizeDecimals}
@@ -117,7 +117,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
   }, [stepSizeDecimals, tickSizeDecimals, id, histogramSide, stringGetter]);
 
   return (
-    <Styled.LiveTradesTable
+    <$LiveTradesTable
       className={className}
       key="live-trades"
       label="Recent Trades"
@@ -143,19 +143,16 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TimeOutput = styled(OrderbookTradesOutput)`
+const $TimeOutput = styled(OrderbookTradesOutput)`
   color: var(--color-text-0);
   font-feature-settings: var(--fontFeature-monoNumbers);
 `;
 
-Styled.SideOutput = styled(Output)`
+const $SideOutput = styled(Output)`
   color: var(--accent-color);
 `;
 
-Styled.SizeOutput = styled(Output)<StyleProps>`
+const $SizeOutput = styled(Output)<StyleProps>`
   color: var(--accent-color);
 
   @media ${breakpoints.tablet} {
@@ -163,7 +160,7 @@ Styled.SizeOutput = styled(Output)<StyleProps>`
   }
 `;
 
-Styled.LiveTradesTable = styled(OrderbookTradesTable)<StyleProps>`
+const $LiveTradesTable = styled(OrderbookTradesTable)<StyleProps>`
   tr {
     --histogram-bucket-size: 1;
     background-color: var(--color-layer-2);

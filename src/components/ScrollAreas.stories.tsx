@@ -7,159 +7,156 @@ import { StoryWrapper } from '.ladle/components';
 
 export const ScrollAreasStory: Story<{}> = (args) => (
   <StoryWrapper>
-    <Styled.ScrollArea width="500px" height="700px">
+    <$ScrollArea width="500px" height="700px">
       <p>
         Scroll area. (<code>layoutMixins.scrollArea</code>)
       </p>
 
-      <Styled.PlaceholderContent />
+      <$PlaceholderContent />
 
       <hr />
 
       <h2>Basic sticky area:</h2>
 
-      <Styled.StickyArea0 topHeight="4rem" bottomHeight="3rem">
-        <Styled.StickyHeader>Sticky header.</Styled.StickyHeader>
+      <$StickyArea0 topHeight="4rem" bottomHeight="3rem">
+        <$StickyHeader>Sticky header.</$StickyHeader>
 
         <p>
           Sticky area. (<code>layoutMixins.stickyArea0</code>)
         </p>
 
-        <Styled.PlaceholderContent />
+        <$PlaceholderContent />
 
-        <Styled.StickyFooter>Sticky footer.</Styled.StickyFooter>
-      </Styled.StickyArea0>
+        <$StickyFooter>Sticky footer.</$StickyFooter>
+      </$StickyArea0>
 
-      <Styled.PlaceholderContent />
+      <$PlaceholderContent />
 
       <hr />
 
       <h2>Nested sticky area:</h2>
 
-      <Styled.StickyArea0 topHeight="4rem" bottomHeight="3rem">
-        <Styled.StickyHeader>Sticky header.</Styled.StickyHeader>
+      <$StickyArea0 topHeight="4rem" bottomHeight="3rem">
+        <$StickyHeader>Sticky header.</$StickyHeader>
 
         <p>
           Sticky area. (<code>layoutMixins.stickyArea0</code>)
         </p>
 
-        <Styled.PlaceholderContent />
+        <$PlaceholderContent />
 
-        <Styled.StickyArea1 topHeight="3rem" bottomHeight="2rem">
-          <Styled.StickyHeader>Nested sticky header.</Styled.StickyHeader>
+        <$StickyArea1 topHeight="3rem" bottomHeight="2rem">
+          <$StickyHeader>Nested sticky header.</$StickyHeader>
 
           <p>
             Nested sticky area. (<code>layoutMixins.stickyArea1</code>)
           </p>
 
-          <Styled.PlaceholderContent />
+          <$PlaceholderContent />
 
-          <Styled.StickyFooter>Nested sticky footer.</Styled.StickyFooter>
-        </Styled.StickyArea1>
+          <$StickyFooter>Nested sticky footer.</$StickyFooter>
+        </$StickyArea1>
 
         <p>
           Sticky area. (<code>layoutMixins.stickyArea1</code>)
         </p>
 
-        <Styled.StickyFooter>Sticky footer.</Styled.StickyFooter>
-      </Styled.StickyArea0>
+        <$StickyFooter>Sticky footer.</$StickyFooter>
+      </$StickyArea0>
 
-      <Styled.PlaceholderContent />
+      <$PlaceholderContent />
 
       <hr />
 
       <h2>Super-nested sticky area:</h2>
 
-      <Styled.StickyArea0 topHeight="4rem" bottomHeight="3rem">
-        <Styled.StickyHeader>Sticky header.</Styled.StickyHeader>
+      <$StickyArea0 topHeight="4rem" bottomHeight="3rem">
+        <$StickyHeader>Sticky header.</$StickyHeader>
 
         <p>
           Sticky area. (<code>layoutMixins.stickyArea0</code>)
         </p>
 
-        <Styled.StickyArea1 topHeight="3rem" bottomHeight="2rem">
-          <Styled.StickyHeader>Nested sticky header.</Styled.StickyHeader>
+        <$StickyArea1 topHeight="3rem" bottomHeight="2rem">
+          <$StickyHeader>Nested sticky header.</$StickyHeader>
 
-          <Styled.StickyArea2 topHeight="3rem" bottomHeight="2rem">
-            <Styled.StickyHeader>Super-nested sticky header.</Styled.StickyHeader>
+          <$StickyArea2 topHeight="3rem" bottomHeight="2rem">
+            <$StickyHeader>Super-nested sticky header.</$StickyHeader>
 
             <p>
               Super-nested sticky area. (<code>layoutMixins.stickyArea2</code>)
             </p>
 
-            <Styled.PlaceholderContent />
+            <$PlaceholderContent />
 
-            <Styled.StickyFooter>Super-nested sticky footer.</Styled.StickyFooter>
-          </Styled.StickyArea2>
+            <$StickyFooter>Super-nested sticky footer.</$StickyFooter>
+          </$StickyArea2>
 
-          <Styled.StickyFooter>Nested sticky footer.</Styled.StickyFooter>
-        </Styled.StickyArea1>
+          <$StickyFooter>Nested sticky footer.</$StickyFooter>
+        </$StickyArea1>
 
         <p>
           Sticky area. (<code>layoutMixins.stickyArea1</code>)
         </p>
 
-        <Styled.StickyFooter>Sticky footer.</Styled.StickyFooter>
-      </Styled.StickyArea0>
+        <$StickyFooter>Sticky footer.</$StickyFooter>
+      </$StickyArea0>
 
       <hr />
 
       <h2>Nested scroll area:</h2>
 
-      <Styled.StickyArea0 topHeight="4rem" bottomHeight="3rem">
-        <Styled.StickyHeader>Sticky header.</Styled.StickyHeader>
+      <$StickyArea0 topHeight="4rem" bottomHeight="3rem">
+        <$StickyHeader>Sticky header.</$StickyHeader>
 
         <p>
           Sticky area. (<code>layoutMixins.stickyArea0</code>)
         </p>
 
-        <Styled.StickyArea1 topHeight="3rem" bottomHeight="2rem">
-          <Styled.StickyHeader>Nested sticky header.</Styled.StickyHeader>
+        <$StickyArea1 topHeight="3rem" bottomHeight="2rem">
+          <$StickyHeader>Nested sticky header.</$StickyHeader>
 
-          <Styled.StickyArea2 topHeight="3rem" bottomHeight="2rem">
-            <Styled.StickyHeader>Super-nested sticky header.</Styled.StickyHeader>
+          <$StickyArea2 topHeight="3rem" bottomHeight="2rem">
+            <$StickyHeader>Super-nested sticky header.</$StickyHeader>
 
             <p>
               Super-nested sticky area. (<code>layoutMixins.stickyArea2</code>)
             </p>
 
-            <Styled.ScrollArea height="300px">
+            <$ScrollArea height="300px">
               <p>
                 Nested scroll area. (<code>layoutMixins.scrollArea</code>)
               </p>
 
-              <Styled.StickyArea0 topHeight="4rem" bottomHeight="3rem">
-                <Styled.StickyHeader>Sticky header.</Styled.StickyHeader>
+              <$StickyArea0 topHeight="4rem" bottomHeight="3rem">
+                <$StickyHeader>Sticky header.</$StickyHeader>
 
                 <p>
                   Sticky area. (<code>layoutMixins.stickyArea0</code>)
                 </p>
 
-                <Styled.PlaceholderContent />
+                <$PlaceholderContent />
 
-                <Styled.StickyFooter>Sticky footer.</Styled.StickyFooter>
-              </Styled.StickyArea0>
-            </Styled.ScrollArea>
+                <$StickyFooter>Sticky footer.</$StickyFooter>
+              </$StickyArea0>
+            </$ScrollArea>
 
-            <Styled.StickyFooter>Super-nested sticky footer.</Styled.StickyFooter>
-          </Styled.StickyArea2>
+            <$StickyFooter>Super-nested sticky footer.</$StickyFooter>
+          </$StickyArea2>
 
-          <Styled.StickyFooter>Nested sticky footer.</Styled.StickyFooter>
-        </Styled.StickyArea1>
+          <$StickyFooter>Nested sticky footer.</$StickyFooter>
+        </$StickyArea1>
 
         <p>
           Sticky area. (<code>layoutMixins.stickyArea1</code>)
         </p>
 
-        <Styled.StickyFooter>Sticky footer.</Styled.StickyFooter>
-      </Styled.StickyArea0>
-    </Styled.ScrollArea>
+        <$StickyFooter>Sticky footer.</$StickyFooter>
+      </$StickyArea0>
+    </$ScrollArea>
   </StoryWrapper>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ScrollArea = styled.section<{ width: string; height: string }>`
+const $ScrollArea = styled.section<{ width: string; height: string }>`
   ${layoutMixins.container}
   ${layoutMixins.scrollArea}
 
@@ -180,7 +177,7 @@ Styled.ScrollArea = styled.section<{ width: string; height: string }>`
   }
 `;
 
-Styled.StickyHeader = styled.header<{}>`
+const $StickyHeader = styled.header<{}>`
   ${layoutMixins.stickyHeader}
 
   ${layoutMixins.row}
@@ -194,7 +191,7 @@ Styled.StickyHeader = styled.header<{}>`
   border-radius: 0.5rem;
 `;
 
-Styled.StickyFooter = styled.footer<{}>`
+const $StickyFooter = styled.footer<{}>`
   ${layoutMixins.stickyFooter}
 
   ${layoutMixins.row}
@@ -206,7 +203,7 @@ Styled.StickyFooter = styled.footer<{}>`
   border-radius: 0.5rem;
 `;
 
-Styled.StickyArea0 = styled.section<{ topHeight: string; bottomHeight: string }>`
+const $StickyArea0 = styled.section<{ topHeight: string; bottomHeight: string }>`
   ${layoutMixins.stickyArea0}
   --stickyArea0-topHeight: ${({ topHeight }) => topHeight};
   --stickyArea0-bottomHeight: ${({ bottomHeight }) => bottomHeight};
@@ -221,7 +218,7 @@ Styled.StickyArea0 = styled.section<{ topHeight: string; bottomHeight: string }>
   border-radius: 1rem;
 `;
 
-Styled.StickyArea1 = styled.section<{ topHeight: string; bottomHeight: string }>`
+const $StickyArea1 = styled.section<{ topHeight: string; bottomHeight: string }>`
   ${layoutMixins.stickyArea1}
   --stickyArea1-topHeight: ${({ topHeight }) => topHeight};
   --stickyArea1-bottomHeight: ${({ bottomHeight }) => bottomHeight};
@@ -236,7 +233,7 @@ Styled.StickyArea1 = styled.section<{ topHeight: string; bottomHeight: string }>
   border-radius: 0.5rem;
 `;
 
-Styled.StickyArea2 = styled.section<{ topHeight: string; bottomHeight: string }>`
+const $StickyArea2 = styled.section<{ topHeight: string; bottomHeight: string }>`
   ${layoutMixins.stickyArea2}
   --stickyArea2-topHeight: ${({ topHeight }) => topHeight};
   --stickyArea2-bottomHeight: ${({ bottomHeight }) => bottomHeight};
@@ -251,7 +248,7 @@ Styled.StickyArea2 = styled.section<{ topHeight: string; bottomHeight: string }>
   border-radius: 0.5rem;
 `;
 
-Styled.PlaceholderContent = styled.p`
+const $PlaceholderContent = styled.p`
   opacity: 0.3;
 
   &:before {
