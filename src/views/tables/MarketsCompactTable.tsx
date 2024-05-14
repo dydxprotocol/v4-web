@@ -17,7 +17,7 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
-import { AssetTableCell, Table, TableCell, type ColumnDef } from '@/components/Table';
+import { ActionsTableCell, Table, TableCell, type ColumnDef } from '@/components/Table';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -47,7 +47,7 @@ export const MarketsCompactTable = ({
           getCellValue: (row) => row.market,
           allowsSorting: false,
           label: stringGetter({ key: STRING_KEYS.MARKET }),
-          renderCell: ({ asset }) => <AssetTableCell stacked asset={asset} />,
+          renderCell: ({ asset }) => <ActionsTableCell stacked asset={asset} />,
         },
         {
           columnKey: 'oraclePrice',
