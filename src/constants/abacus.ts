@@ -8,6 +8,7 @@ export type Nullable<T> = T | null | undefined;
 
 // ------ V4 Protocols ------ //
 export const AbacusAppConfig = Abacus.exchange.dydx.abacus.state.manager.AppConfigs;
+export const AbacusAppConfigV2 = Abacus.exchange.dydx.abacus.state.v2.supervisor.AppConfigsV2;
 export const IOImplementations = Abacus.exchange.dydx.abacus.utils.IOImplementations;
 export const UIImplementations = Abacus.exchange.dydx.abacus.utils.UIImplementations;
 export type AbacusDYDXChainTransactionsProtocol = Omit<
@@ -69,6 +70,8 @@ export const Changes = Abacus.exchange.dydx.abacus.state.changes.Changes;
 export type PerpetualStateChanges = Abacus.exchange.dydx.abacus.state.changes.StateChanges;
 export const AsyncAbacusStateManager =
   Abacus.exchange.dydx.abacus.state.manager.AsyncAbacusStateManager;
+export const AsyncAbacusStateManagerV2 =
+  Abacus.exchange.dydx.abacus.state.v2.manager.AsyncAbacusStateManagerV2;
 
 // ------ Parsing Errors ------ //
 export type ParsingError = Abacus.exchange.dydx.abacus.responses.ParsingError;

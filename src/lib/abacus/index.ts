@@ -1,4 +1,4 @@
-import type { LocalWallet } from '@dydxprotocol/v4-client-js';
+import type { LocalWallet, SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 
 import type {
   ClosePositionInputFields,
@@ -15,9 +15,10 @@ import type {
 } from '@/constants/abacus';
 import {
   AbacusAppConfig,
+  AbacusAppConfigV2,
   AbacusHelper,
   ApiData,
-  AsyncAbacusStateManager,
+  AsyncAbacusStateManagerV2,
   ClosePositionInputField,
   ComplianceAction,
   CoroutineTimer,
@@ -54,7 +55,7 @@ class AbacusStateManager {
   private store: RootStore | undefined;
   private currentMarket: string | undefined;
 
-  stateManager: InstanceType<typeof AsyncAbacusStateManager>;
+  stateManager: InstanceType<typeof AsyncAbacusStateManagerV2>;
   websocket: AbacusWebsocket;
   stateNotifier: AbacusStateNotifier;
   analytics: AbacusAnalytics;
@@ -87,6 +88,8 @@ class AbacusStateManager {
       this.abacusFormatter
     );
 
+    const appConfigs2 = AbacusAppConfigV2.Companion.forWebAppWithIsolatedMargins;
+
     const appConfigs = new AbacusAppConfig(
       false, // subscribeToCandles
       true, // loadRemote
@@ -94,10 +97,10 @@ class AbacusStateManager {
     );
     appConfigs.squidVersion = AbacusAppConfig.SquidVersion.V2;
 
-    this.stateManager = new AsyncAbacusStateManager(
+    this.stateManager = new AsyncAbacusStateManagerV2(
       '',
       CURRENT_ABACUS_DEPLOYMENT,
-      appConfigs,
+      appConfigs2,
       ioImplementations,
       uiImplementations,
       // @ts-ignore
@@ -245,6 +248,10 @@ class AbacusStateManager {
     this.currentMarket = marketId;
     this.clearTradeInputValues({ shouldResetSize: true });
     this.stateManager.market = marketId;
+  };
+
+  setSelectedGasDenom = (denom: SelectedGasDenom) => {
+    this.chainTransactions.setSelectedGasDenom(denom);
   };
 
   setTradeValue = ({ value, field }: { value: any; field: TradeInputFields }) => {
