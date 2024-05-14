@@ -1,6 +1,7 @@
 import type { LocalWallet, SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 
 import type {
+  AdjustIsolatedMarginInputFields,
   ClosePositionInputFields,
   HistoricalPnlPeriods,
   HistoricalTradingRewardsPeriod,
@@ -17,6 +18,7 @@ import {
   AbacusAppConfig,
   AbacusAppConfigV2,
   AbacusHelper,
+  AdjustIsolatedMarginInputField,
   ApiData,
   AsyncAbacusStateManagerV2,
   ClosePositionInputField,
@@ -206,6 +208,17 @@ class AbacusStateManager {
     this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.takeProfitOrderType });
   };
 
+  clearAdjustIsolatedMarginInputValues = () => {
+    this.setAdjustIsolatedMarginValue({
+      value: null,
+      field: AdjustIsolatedMarginInputField.Amount,
+    });
+    this.setAdjustIsolatedMarginValue({
+      value: null,
+      field: AdjustIsolatedMarginInputField.ChildSubaccountNumber,
+    });
+  };
+
   resetInputState = () => {
     this.clearTransferInputValues();
     this.setTransferValue({
@@ -213,6 +226,7 @@ class AbacusStateManager {
       value: null,
     });
     this.clearTriggerOrdersInputValues();
+    this.clearAdjustIsolatedMarginInputValues();
     this.clearTradeInputValues({ shouldResetSize: true });
   };
 
@@ -256,6 +270,16 @@ class AbacusStateManager {
 
   setTradeValue = ({ value, field }: { value: any; field: TradeInputFields }) => {
     this.stateManager.trade(value, field);
+  };
+
+  setAdjustIsolatedMarginValue = ({
+    value,
+    field,
+  }: {
+    value: any;
+    field: AdjustIsolatedMarginInputFields;
+  }) => {
+    this.stateManager.adjustIsolatedMargin(value, field);
   };
 
   setTransferValue = ({ value, field }: { value: any; field: TransferInputFields }) => {
