@@ -41,7 +41,8 @@ export const usePreferenceMenu = () => {
       items: complianceStatusOptions.map(({ status, label }) => ({
         value: status,
         label: label,
-        onSelect: () => dispatch(setCompliance({ geo, status } as Compliance)),
+        onSelect: () =>
+          dispatch(setCompliance({ geo, status, updatedAt: new Date().toString() } as Compliance)),
         slotAfter: (
           <Switch
             name="CompliaceStatus"

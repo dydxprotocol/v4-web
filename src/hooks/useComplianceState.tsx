@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { ComplianceStatus } from '@/constants/abacus';
 import { CLOSE_ONLY_GRACE_PERIOD, ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
+import { isMainnet } from '@/constants/networks';
 
 import { LinkOutIcon } from '@/icons';
 
@@ -36,7 +37,10 @@ export const useComplianceState = () => {
     complianceStatus === ComplianceStatus.CLOSE_ONLY
   ) {
     complianceState = ComplianceStates.CLOSE_ONLY;
-  } else if (complianceStatus === ComplianceStatus.BLOCKED || (geo && isBlockedGeo(geo))) {
+  } else if (
+    complianceStatus === ComplianceStatus.BLOCKED ||
+    (geo && isBlockedGeo(geo) && isMainnet)
+  ) {
     complianceState = ComplianceStates.READ_ONLY;
   }
 
