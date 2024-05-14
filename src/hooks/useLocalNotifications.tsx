@@ -78,6 +78,7 @@ const useLocalNotificationsContext = () => {
       setTransferNotifications([...transferNotifications, notification]);
       // track initialized new transfer notification
       track(AnalyticsEvent.TransferNotification, {
+        triggeredAt,
         timeSpent: triggeredAt ? Date.now() - triggeredAt : undefined,
         txHash,
         toAmount,
@@ -133,9 +134,10 @@ const useLocalNotificationsContext = () => {
                   transferNotification.status = status;
                   if (status.squidTransactionStatus === 'success') {
                     track(AnalyticsEvent.TransferNotification, {
+                      triggeredAt,
                       timeSpent: triggeredAt ? Date.now() - triggeredAt : undefined,
                       toAmount: transferNotification.toAmount,
-                      status: 'complete',
+                      status: 'success',
                       type: transferNotification.type,
                       txHash,
                     });
@@ -146,6 +148,7 @@ const useLocalNotificationsContext = () => {
                   if (errorCount && errorCount > ERROR_COUNT_THRESHOLD) {
                     transferNotification.status = error;
                     track(AnalyticsEvent.TransferNotification, {
+                      triggeredAt,
                       timeSpent: triggeredAt ? Date.now() - triggeredAt : undefined,
                       toAmount: transferNotification.toAmount,
                       status: 'error',
