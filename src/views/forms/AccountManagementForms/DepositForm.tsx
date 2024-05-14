@@ -13,6 +13,7 @@ import { AnalyticsEvent, AnalyticsEventData } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
+import { TransferNotificationTypes } from '@/constants/notifications';
 import {
   MAX_CCTP_TRANSFER_AMOUNT,
   MAX_PRICE_IMPACT,
@@ -285,6 +286,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
             triggeredAt: Date.now(),
             isCctp,
             requestId: requestPayload.requestId ?? undefined,
+            type: TransferNotificationTypes.Deposit,
           });
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');

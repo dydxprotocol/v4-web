@@ -2,11 +2,13 @@ import { createContext, useCallback, useContext, useEffect } from 'react';
 
 import { useQuery } from 'react-query';
 
+import { AnalyticsEvent } from '@/constants/analytics';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
 import type { TransferNotifcation } from '@/constants/notifications';
 
 import { useAccounts } from '@/hooks/useAccounts';
 
+import { track } from '@/lib/analytics';
 import { fetchSquidStatus, STATUS_ERROR_GRACE_PERIOD } from '@/lib/squid';
 
 import { useLocalStorage } from './useLocalStorage';
@@ -71,8 +73,18 @@ const useLocalNotificationsContext = () => {
   );
 
   const addTransferNotification = useCallback(
-    (notification: TransferNotifcation) =>
-      setTransferNotifications([...transferNotifications, notification]),
+    (notification: TransferNotifcation) => {
+      const { txHash, triggeredAt, toAmount, type } = notification;
+      setTransferNotifications([...transferNotifications, notification]);
+      // track initialized new transfer notification
+      track(AnalyticsEvent.TransferNotification, {
+        timeSpent: triggeredAt ? Date.now() - triggeredAt : undefined,
+        txHash,
+        toAmount,
+        type,
+        status: 'new',
+      });
+    },
     [transferNotifications]
   );
 
@@ -117,14 +129,29 @@ const useLocalNotificationsContext = () => {
                   undefined,
                   requestId
                 );
-
                 if (status) {
                   transferNotification.status = status;
+                  if (status.squidTransactionStatus === 'success') {
+                    track(AnalyticsEvent.TransferNotification, {
+                      timeSpent: triggeredAt ? Date.now() - triggeredAt : undefined,
+                      toAmount: transferNotification.toAmount,
+                      status: 'complete',
+                      type: transferNotification.type,
+                      txHash,
+                    });
+                  }
                 }
               } catch (error) {
                 if (!triggeredAt || Date.now() - triggeredAt > STATUS_ERROR_GRACE_PERIOD) {
                   if (errorCount && errorCount > ERROR_COUNT_THRESHOLD) {
                     transferNotification.status = error;
+                    track(AnalyticsEvent.TransferNotification, {
+                      timeSpent: triggeredAt ? Date.now() - triggeredAt : undefined,
+                      toAmount: transferNotification.toAmount,
+                      status: 'error',
+                      type: transferNotification.type,
+                      txHash: txHash,
+                    });
                   } else {
                     transferNotification.errorCount = errorCount ? errorCount + 1 : 1;
                   }
@@ -143,7 +170,6 @@ const useLocalNotificationsContext = () => {
     },
     refetchInterval: TRANSFER_STATUS_FETCH_INTERVAL,
   });
-
   return {
     // Transfer notifications
     transferNotifications,
