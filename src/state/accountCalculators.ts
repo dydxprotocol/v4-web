@@ -104,8 +104,10 @@ export const calculateShouldRenderTriggersInPositionsTable = createSelector(
 export const calculateShouldRenderActionsInPositionsTable = (isCloseActionShown: boolean) =>
   createSelector(
     [calculateIsAccountViewOnly, calculateShouldRenderTriggersInPositionsTable],
-    (isAccountViewOnly: boolean, areTriggersRendered: boolean) =>
-      !isAccountViewOnly &&
-      ((!testFlags.isolatedMargin && (areTriggersRendered || isCloseActionShown)) ||
-        (testFlags.isolatedMargin && isCloseActionShown))
+    (isAccountViewOnly: boolean, areTriggersRendered: boolean) => {
+      const hasActionsInColumn = testFlags.isolatedMargin
+        ? isCloseActionShown
+        : areTriggersRendered || isCloseActionShown;
+      return !isAccountViewOnly && hasActionsInColumn;
+    }
   );
