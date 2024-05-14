@@ -335,7 +335,9 @@ const getPositionsTableColumnDef = ({
           key:
             shouldRenderTriggers && showClosePositionAction && !testFlags.isolatedMargin
               ? STRING_KEYS.ACTIONS
-              : STRING_KEYS.CLOSE,
+              : showClosePositionAction
+              ? STRING_KEYS.CLOSE
+              : STRING_KEYS.ACTION,
         }),
         isActionable: true,
         allowsSorting: false,
