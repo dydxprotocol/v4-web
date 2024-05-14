@@ -60,6 +60,7 @@ export enum AnalyticsEvent {
   // Navigation
   NavigatePage = 'NavigatePage',
   NavigateDialog = 'NavigateDialog',
+  NavigateDialogLoaded = 'NavigateDialogLoaded',
   NavigateDialogClose = 'NavigateDialogClose',
   NavigateExternal = 'NavigateExternal',
   NavigateClickTransferTradePanel = 'NavigateClickTransferTradePanel',
@@ -117,6 +118,10 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
         path: string;
       }
     : T extends AnalyticsEvent.NavigateDialog
+    ? {
+        type: DialogTypes;
+      }
+    : T extends AnalyticsEvent.NavigateDialogLoaded
     ? {
         type: DialogTypes;
       }

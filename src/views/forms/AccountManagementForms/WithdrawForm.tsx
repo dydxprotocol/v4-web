@@ -481,6 +481,7 @@ export const WithdrawForm = () => {
     isLoading ||
     isInvalidNobleAddress;
 
+  track(AnalyticsEvent.NavigateDialogLoaded, { type: DialogTypes.Withdraw });
   return (
     <Styled.Form onSubmit={onSubmit}>
       <Styled.Subheader>

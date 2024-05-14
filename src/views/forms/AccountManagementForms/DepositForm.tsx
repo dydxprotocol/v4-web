@@ -409,6 +409,9 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   if (!resources) {
     return <LoadingSpace id="DepositForm" />;
   }
+  track(AnalyticsEvent.NavigateDialogLoaded, {
+    type: DialogTypes.Deposit,
+  });
   return (
     <Styled.Form onSubmit={onSubmit}>
       <Styled.Subheader>
