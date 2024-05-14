@@ -19,8 +19,8 @@ import { useStringGetter } from './useStringGetter';
 export const useComplianceState = () => {
   const stringGetter = useStringGetter();
   const complianceStatus = useSelector(getComplianceStatus, shallowEqual);
-  const complianceUpdatedAt = useSelector(getComplianceUpdatedAt, shallowEqual);
-  const geo = useSelector(getGeo, shallowEqual);
+  const complianceUpdatedAt = useSelector(getComplianceUpdatedAt);
+  const geo = useSelector(getGeo);
   const selectedLocale = useSelector(getSelectedLocale);
 
   const updatedAtDate = complianceUpdatedAt ? new Date(complianceUpdatedAt) : undefined;

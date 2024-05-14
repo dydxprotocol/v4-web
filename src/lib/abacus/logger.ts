@@ -2,10 +2,14 @@ import type { AbacusLoggingProtocol } from '@/constants/abacus';
 
 class AbacusLogger implements Omit<AbacusLoggingProtocol, '__doNotUseOrImplementIt'> {
   d(tag: string, message: string) {
-    console.log(`${tag}: ${message}`);
+    if (import.meta.env.VITE_ENABLE_ABACUS_LOGGING) {
+      console.log(`${tag}: ${message}`);
+    }
   }
   e(tag: string, message: string) {
-    console.error(`${tag}: ${message}`);
+    if (import.meta.env.VITE_ENABLE_ABACUS_LOGGING) {
+      console.error(`${tag}: ${message}`);
+    }
   }
 }
 
