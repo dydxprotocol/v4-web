@@ -131,7 +131,9 @@ export const TransferStatusSteps = ({
     track(AnalyticsEvent.TransferStep, {
       step: TransferStatusStep[currentStep],
       type,
-      link: steps.find(({ step }) => step === currentStep)?.link,
+      link: shouldTrackTxLinkExistence(currentStep, type)
+        ? steps.find(({ step }) => step === currentStep)?.link
+        : 'N/A',
       amount: toAmount,
       time: status?.timeSpent,
     });
