@@ -11,6 +11,8 @@ import {
 } from '@/state/accountSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 
+import { testFlags } from '@/lib/testFlags';
+
 export const calculateOnboardingStep = createSelector(
   [getOnboardingState, getOnboardingGuards],
   (onboardingState: OnboardingState, onboardingGuards: ReturnType<typeof getOnboardingGuards>) => {
@@ -102,6 +104,10 @@ export const calculateShouldRenderTriggersInPositionsTable = createSelector(
 export const calculateShouldRenderActionsInPositionsTable = (isCloseActionShown: boolean) =>
   createSelector(
     [calculateIsAccountViewOnly, calculateShouldRenderTriggersInPositionsTable],
-    (isAccountViewOnly: boolean, areTriggersRendered: boolean) =>
-      !isAccountViewOnly && (areTriggersRendered || isCloseActionShown)
+    (isAccountViewOnly: boolean, areTriggersRendered: boolean) => {
+      const hasActionsInColumn = testFlags.isolatedMargin
+        ? isCloseActionShown
+        : areTriggersRendered || isCloseActionShown;
+      return !isAccountViewOnly && hasActionsInColumn;
+    }
   );
