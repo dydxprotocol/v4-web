@@ -1,4 +1,4 @@
-import React, { Key, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   Cell, // CollectionBuilderContext,
@@ -42,7 +42,14 @@ import { Icon, IconName } from './Icon';
 import { Tag } from './Tag';
 
 export { ActionsTableCell } from './Table/ActionsTableCell';
+
+// TODO: fix circular dependencies
+// eslint-disable-next-line import/no-cycle
 export { AssetTableCell } from './Table/AssetTableCell';
+
+// TODO: remove barrel files: https://www.npmjs.com/package/eslint-plugin-no-barrel-files
+// Reasoning why: https://dev.to/tassiofront/barrel-files-and-why-you-should-stop-using-them-now-bc4
+// eslint-disable-next-line import/no-cycle
 export { MarketTableCell } from './Table/MarketTableCell';
 export { TableCell } from './Table/TableCell';
 export { TableColumnHeader } from './Table/TableColumnHeader';
@@ -68,7 +75,9 @@ export type TableItem<TableRowData> = {
   onSelect?: (key: TableRowData) => void;
 };
 
-export type ColumnDef<TableRowData extends object> = {
+type BaseTableRowData = {};
+
+export type ColumnDef<TableRowData extends BaseTableRowData> = {
   columnKey: string;
   label: React.ReactNode;
   tag?: React.ReactNode;
@@ -83,17 +92,19 @@ export type ColumnDef<TableRowData extends object> = {
   width?: ColumnSize;
 };
 
-export type ElementProps<TableRowData extends object | CustomRowConfig, TableRowKey extends Key> = {
+type Key = string | number;
+
+export type ElementProps<TableRowData extends BaseTableRowData | CustomRowConfig> = {
   label?: string;
   columns: ColumnDef<TableRowData>[];
   data: TableRowData[];
-  getRowKey: (rowData: TableRowData, rowIndex?: number) => TableRowKey;
+  getRowKey: (rowData: TableRowData, rowIndex?: number) => Key;
   getRowAttributes?: (rowData: TableRowData, rowIndex?: number) => Record<string, any>;
   // shouldRowRender?: (prevRowData: object, currentRowData: object) => boolean;
   defaultSortDescriptor?: SortDescriptor;
   selectionMode?: 'multiple' | 'single';
   selectionBehavior?: 'replace' | 'toggle';
-  onRowAction?: (key: TableRowKey, row: TableRowData) => void;
+  onRowAction?: (key: Key, row: TableRowData) => void;
   slotEmpty?: React.ReactNode;
   viewMoreConfig?: ViewMoreConfig;
   // collection: TableCollection<string>;
@@ -114,7 +125,7 @@ type StyleProps = {
 
 export type TableConfig<TableRowData> = TableItem<TableRowData>[];
 
-export const Table = <TableRowData extends object, TableRowKey extends Key>({
+export const Table = <TableRowData extends BaseTableRowData>({
   label = '',
   columns,
   data = [],
@@ -142,8 +153,8 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   withScrollSnapRows = false,
   className,
   style,
-}: ElementProps<TableRowData, TableRowKey> & StyleProps) => {
-  const [selectedKeys, setSelectedKeys] = useState(new Set<TableRowKey>());
+}: ElementProps<TableRowData> & StyleProps) => {
+  const [selectedKeys, setSelectedKeys] = useState(new Set<Key>());
   const [numRowsToShow, setNumRowsToShow] = useState(viewMoreConfig?.initialNumRowsToShow);
   const enableViewMore = viewMoreConfig !== undefined;
 
@@ -172,15 +183,15 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   ) => {
     if (!sortColumn) return 0;
 
-    const column = columns.find((column) => column.columnKey === sortColumn);
+    const column = columns.find(({ columnKey }) => columnKey === sortColumn);
     const first = column?.getCellValue(a);
     const second = column?.getCellValue(b);
 
     return (
       // Compare the items by the sorted column
-      (isNaN(first as number)
+      (Number.isNaN(Number(first))
         ? // String
-          collator.compare(first as string, second as string)
+          collator.compare(String(first), String(second))
         : // Number
           MustBigNumber(first).comparedTo(MustBigNumber(second))) *
       // Flip the direction if descending order is specified.
@@ -203,6 +214,8 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
     }),
   });
 
+  // FIX: refactor table so we don't have to manually reload
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => list.reload(), [data]);
 
   const isEmpty = data.length === 0;
@@ -227,7 +240,7 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
           getRowAttributes={getRowAttributes}
           onRowAction={
             onRowAction &&
-            ((key: TableRowKey) => onRowAction(key, data.find((row) => getRowKey(row) === key)!))
+            ((key: Key) => onRowAction(key, data.find((row) => getRowKey(row) === key)!))
           }
           numColumns={shownColumns.length}
           onViewMoreClick={
@@ -276,19 +289,20 @@ export const Table = <TableRowData extends object, TableRowKey extends Key>({
   );
 };
 
-const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey extends Key>(props: {
+// TODO: remove useless extends
+const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(props: {
   'aria-label'?: string;
   sortDescriptor?: SortDescriptor;
   onSortChange?: (descriptor: SortDescriptor) => void;
   selectionMode: 'multiple' | 'single';
   selectionBehavior: 'replace' | 'toggle';
-  selectedKeys: Set<TableRowKey>;
-  setSelectedKeys: (selectedKeys: Set<TableRowKey>) => void;
+  selectedKeys: Set<Key>;
+  setSelectedKeys: (selectedKeys: Set<Key>) => void;
   getRowAttributes?: (
     rowData: TableRowData,
     rowIndex?: number
   ) => Record<string, string | number | Record<string, string | number>>;
-  onRowAction?: (key: TableRowKey) => void;
+  onRowAction?: (key: Key) => void;
   // shouldRowRender?: (prevRowData: object, currentRowData: object) => boolean;
   children: CollectionChildren<TableRowData>;
   numColumns: number;
@@ -302,7 +316,22 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
   withScrollSnapColumns?: boolean;
   withScrollSnapRows?: boolean;
 }) => {
-  const { selectionMode, selectionBehavior, numColumns, onViewMoreClick } = props;
+  const {
+    'aria-label': ariaLabel,
+    selectionMode,
+    selectionBehavior,
+    getRowAttributes,
+    onRowAction,
+    numColumns,
+    onViewMoreClick,
+    hideHeader,
+    withGradientCardRows,
+    withFocusStickyRows,
+    withOuterBorder,
+    withInnerBorders,
+    withScrollSnapColumns,
+    withScrollSnapRows,
+  } = props;
 
   const state = useTableState<TableRowData>({
     ...props,
@@ -311,10 +340,11 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
 
   const ref = React.useRef<HTMLTableElement>(null);
   const { collection } = state;
+
   const { gridProps } = useTable(
     {
-      'aria-label': props['aria-label'],
-      onRowAction: props.onRowAction as (key: Key) => void,
+      'aria-label': ariaLabel,
+      onRowAction,
     },
     state,
     ref
@@ -324,34 +354,34 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
     <Styled.Table
       ref={ref}
       {...gridProps}
-      hideHeader={props.hideHeader}
-      withGradientCardRows={props.withGradientCardRows}
-      withOuterBorder={props.withOuterBorder}
-      withInnerBorders={props.withInnerBorders}
+      hideHeader={hideHeader}
+      withGradientCardRows={withGradientCardRows}
+      withOuterBorder={withOuterBorder}
+      withInnerBorders={withInnerBorders}
     >
       <TableHeadRowGroup
-        hidden={props.hideHeader}
-        withGradientCardRows={props.withGradientCardRows}
-        withInnerBorders={props.withInnerBorders}
+        hidden={hideHeader}
+        withGradientCardRows={withGradientCardRows}
+        withInnerBorders={withInnerBorders}
       >
         {collection.headerRows.map((headerRow) => (
           <TableHeaderRow
             key={headerRow.key}
             item={headerRow}
             state={state}
-            withScrollSnapRows={props.withScrollSnapRows}
+            withScrollSnapRows={withScrollSnapRows}
           >
             {/* {Array.from(collection.getChildren!(headerRow.key), (column) => */}
             {[...headerRow.childNodes].map(
               (column) => (
-                // column.props.isSelectionCell ? (
+                // column.isSelectionCell ? (
                 //   <TableSelectAllCell key={column.key} column={column} state={state} />
                 // ) : (
                 <TableColumnHeader
                   key={column.key}
                   column={column}
                   state={state}
-                  withScrollSnapColumns={props.withScrollSnapColumns}
+                  withScrollSnapColumns={withScrollSnapColumns}
                 />
               )
               // )
@@ -361,20 +391,19 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
       </TableHeadRowGroup>
 
       <TableBodyRowGroup
-        withGradientCardRows={props.withGradientCardRows}
-        withInnerBorders={props.withInnerBorders}
-        withOuterBorder={props.withOuterBorder}
+        withGradientCardRows={withGradientCardRows}
+        withInnerBorders={withInnerBorders}
+        withOuterBorder={withOuterBorder}
       >
-        {/* {Array.from(collection.getChildren!(collection.body.key), (row) => */}
         {[...collection.body.childNodes].map((row) =>
           (row.value as CustomRowConfig)?.slotCustomRow ? (
             (row.value as CustomRowConfig).slotCustomRow({
               item: row,
               state,
-              ...props.getRowAttributes?.(row.value!),
-              withGradientCardRows: props.withGradientCardRows,
-              withFocusStickyRows: props.withFocusStickyRows,
-              withScrollSnapRows: props.withScrollSnapRows,
+              ...getRowAttributes?.(row.value!),
+              withGradientCardRows,
+              withFocusStickyRows,
+              withScrollSnapRows,
               children: null,
             })
           ) : (
@@ -382,17 +411,17 @@ const TableRoot = <TableRowData extends object | CustomRowConfig, TableRowKey ex
               key={row.key}
               item={row}
               state={state}
-              hasRowAction={!!props.onRowAction}
-              // shouldRowRender={props.shouldRowRender}
-              {...props.getRowAttributes?.(row.value!)}
-              withGradientCardRows={props.withGradientCardRows}
-              withFocusStickyRows={props.withFocusStickyRows}
-              withScrollSnapRows={props.withScrollSnapRows}
+              hasRowAction={!!onRowAction}
+              // shouldRowRender={shouldRowRender}
+              {...getRowAttributes?.(row.value!)}
+              withGradientCardRows={withGradientCardRows}
+              withFocusStickyRows={withFocusStickyRows}
+              withScrollSnapRows={withScrollSnapRows}
             >
               {/* {Array.from(collection.getChildren!(row.key), (cell) => */}
               {[...row.childNodes].map(
                 (cell) => (
-                  // cell.props.isSelectionCell ? (
+                  // cell.isSelectionCell ? (
                   //   <TableCheckboxCell key={cell.key} cell={cell} state={state} />
                   // ) : (
                   <TableCell
@@ -462,7 +491,7 @@ const TableBodyRowGroup = ({
   );
 };
 
-const TableHeaderRow = <TableRowData extends object>({
+const TableHeaderRow = <TableRowData extends BaseTableRowData>({
   item,
   state,
   children,
@@ -483,7 +512,7 @@ const TableHeaderRow = <TableRowData extends object>({
   );
 };
 
-const TableColumnHeader = <TableRowData extends object>({
+const TableColumnHeader = <TableRowData extends BaseTableRowData>({
   column,
   state,
   withScrollSnapColumns,
@@ -494,12 +523,11 @@ const TableColumnHeader = <TableRowData extends object>({
 }) => {
   const ref = React.useRef<HTMLTableCellElement>(null);
   const { columnHeaderProps } = useTableColumnHeader({ node: column }, state, ref);
-  const { isFocusVisible, focusProps } = useFocusRing();
+  const { focusProps } = useFocusRing();
 
   return (
     <Styled.Th
       {...mergeProps(columnHeaderProps, focusProps)}
-      colSpan={column.props.colspan}
       // data-focused={isFocusVisible || undefined}
       style={{ width: column.props?.width }}
       ref={ref}
@@ -539,7 +567,7 @@ export const ViewMoreRow = ({ colSpan, onClick }: { colSpan: number; onClick: ()
   );
 };
 
-export const TableRow = <TableRowData extends object>({
+export const TableRow = <TableRowData extends BaseTableRowData>({
   item,
   children,
   state,
@@ -572,13 +600,12 @@ export const TableRow = <TableRowData extends object>({
     ref
   );
 
-  const { isFocusVisible, focusProps } = useFocusRing();
+  const { focusProps } = useFocusRing();
 
   return (
     <Styled.Tr
       ref={ref}
       data-selected={isSelected}
-      // data-focused={isFocusVisible || undefined}
       $data-isPressed={isPressed}
       {...mergeProps(rowProps, focusProps)}
       {...attrs}
@@ -592,12 +619,7 @@ export const TableRow = <TableRowData extends object>({
   );
 };
 
-// const TableRowMemo = React.memo(
-//   TableRow,
-//   (a, b) => !!b.shouldRowRender?.(a.item.value, b.item.value)
-// );
-
-const TableCell = <TableRowData extends object>({
+const TableCell = <TableRowData extends BaseTableRowData>({
   cell,
   state,
   isActionable,
@@ -608,7 +630,7 @@ const TableCell = <TableRowData extends object>({
 }) => {
   const ref = React.useRef<HTMLTableCellElement>(null);
   const { gridCellProps } = useTableCell({ node: cell }, state, ref);
-  const { isFocusVisible, focusProps } = useFocusRing();
+  const { focusProps } = useFocusRing();
 
   return (
     <Styled.Td
