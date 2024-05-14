@@ -44,7 +44,7 @@ export const IconButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, Icon
         size={size}
         shape={shape}
         href={href}
-        onPressedChange={onPressedChange}
+        onPressedChange={onPressedChange ?? (onClick as any)} // TODO fix types
         {...otherProps}
       >
         <Icon iconName={iconName} iconComponent={iconComponent} />
