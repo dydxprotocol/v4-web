@@ -64,9 +64,10 @@ export const OrderSizeInput = ({
   const setAbacusSize = (newSize: number | null) => {
     const newSizeString = MustBigNumber(
       newSize && positionSize ? Math.min(positionSize, newSize) : newSize
-    ).toString();
+    ).toFixed(stepSizeDecimals ?? TOKEN_DECIMALS);
+
     abacusStateManager.setTriggerOrdersValue({
-      value: newSize != null ? newSizeString.toString() : null,
+      value: newSize != null ? newSizeString : null,
       field: TriggerOrdersInputField.size,
     });
   };
