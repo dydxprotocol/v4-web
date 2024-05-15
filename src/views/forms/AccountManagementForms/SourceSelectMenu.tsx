@@ -31,6 +31,14 @@ export type TokenInfo = {
   name: string;
 };
 
+const cctpTokensByChainId = cctpTokens.reduce((acc, token) => {
+  if (!acc[token.chainId]) {
+    acc[token.chainId] = [];
+  }
+  acc[token.chainId].push(token);
+  return acc;
+}, {} as Record<string, TokenInfo[]>);
+
 export const SourceSelectMenu = ({
   label,
   selectedExchange,
@@ -38,7 +46,7 @@ export const SourceSelectMenu = ({
   onSelect,
 }: ElementProps) => {
   const { walletType } = useAccounts();
-  const { CCTPWithdrawalOnly } = useEnvFeatures();
+  const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
 
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions } =
@@ -49,14 +57,6 @@ export const SourceSelectMenu = ({
   const exchanges =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.exchanges?.toArray() ||
     [];
-
-  const cctpTokensByChainId = cctpTokens.reduce((acc, token) => {
-    if (!acc[token.chainId]) {
-      acc[token.chainId] = [];
-    }
-    acc[token.chainId].push(token);
-    return acc;
-  }, {} as Record<string, TokenInfo[]>);
 
   // withdrawals SourceSelectMenu is half width size so we must throw the decorator text
   // in the description prop (renders below the item label) instead of in the slotAfter
@@ -85,10 +85,17 @@ export const SourceSelectMenu = ({
         </Styled.Text>
       ),
     }))
-    .filter(
-      (chain) =>
-        type === TransferType.deposit || !!cctpTokensByChainId[chain.value] || !CCTPWithdrawalOnly
-    )
+    .filter((chain) => {
+      // if deposit and CCTPDepositOnly enabled, only return cctp tokens
+      if (type === TransferType.deposit && CCTPDepositOnly) {
+        return !!cctpTokensByChainId[chain.value];
+      }
+      // if withdrawal and CCTPWithdrawalOnly enabled, only return cctp tokens
+      if (type === TransferType.withdrawal && CCTPWithdrawalOnly) {
+        return !!cctpTokensByChainId[chain.value];
+      }
+      return true;
+    })
     .sort((chain) => (!!cctpTokensByChainId[chain.value] ? -1 : 1));
 
   const exchangeItems = Object.values(exchanges).map((exchange) => ({
