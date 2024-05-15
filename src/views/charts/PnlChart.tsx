@@ -2,8 +2,9 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 
 import { curveLinear } from '@visx/curve';
 import type { TooltipContextType } from '@visx/xychart';
+import _ from 'lodash';
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import {
   HISTORICAL_PNL_PERIODS,
@@ -90,8 +91,12 @@ export const PnlChart = ({
   const pnlData = useSelector(getSubaccountHistoricalPnl, shallowEqual);
   const subaccountId = useSelector(getSubaccountId, shallowEqual);
 
+  const [periodOptions, setPeriodOptions] = useState<HistoricalPnlPeriods[]>([
+    HistoricalPnlPeriod.Period1d,
+  ]);
+
   const [selectedPeriod, setSelectedPeriod] = useState<HistoricalPnlPeriods>(
-    HistoricalPnlPeriod.Period7d
+    HistoricalPnlPeriod.Period1d
   );
 
   /**
@@ -138,6 +143,36 @@ export const PnlChart = ({
         : [],
     [pnlData, equity?.current, now]
   );
+
+  const getPeriodOptions = (oldestPnlMs: number): HistoricalPnlPeriods[] => {
+    const availablePeriods: HistoricalPnlPeriods[] = [HistoricalPnlPeriod.Period1d];
+    const entries = Object.entries(MS_FOR_PERIOD);
+
+    entries.map(([, ms], i) => {
+      if (oldestPnlMs < now - ms) {
+        const nextPeriod = _.get(entries, [i + 1, 0]);
+        if (nextPeriod)
+          availablePeriods.push(
+            HISTORICAL_PNL_PERIODS[nextPeriod as keyof typeof HISTORICAL_PNL_PERIODS]
+          );
+      }
+    });
+
+    return availablePeriods;
+  };
+
+  const oldestPnlMs = pnlData?.[0]?.createdAtMilliseconds;
+
+  useEffect(() => {
+    if (oldestPnlMs) {
+      const options = getPeriodOptions(oldestPnlMs);
+      setPeriodOptions(getPeriodOptions(oldestPnlMs));
+
+      // default to show 7d period if there's enough data
+      if (options[options.length - 1] === HistoricalPnlPeriod.Period7d)
+        setSelectedPeriod(HistoricalPnlPeriod.Period7d);
+    }
+  }, [oldestPnlMs]);
 
   const chartBackground =
     appTheme === AppTheme.Light ? LIGHT_CHART_BACKGROUND_URL : DARK_CHART_BACKGROUND_URL;
@@ -191,14 +226,9 @@ export const PnlChart = ({
       >
         <$PeriodToggle>
           <ToggleGroup
-            items={[
-              HistoricalPnlPeriod.Period1d.name,
-              HistoricalPnlPeriod.Period7d.name,
-              HistoricalPnlPeriod.Period30d.name,
-              HistoricalPnlPeriod.Period90d.name,
-            ].map((period) => ({
-              value: period,
-              label: formatRelativeTime(MS_FOR_PERIOD[period], {
+            items={periodOptions.map((period) => ({
+              value: period.name,
+              label: formatRelativeTime(MS_FOR_PERIOD[period.name], {
                 locale: selectedLocale,
                 relativeToTimestamp: 0,
                 largestUnit: 'day',
