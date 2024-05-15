@@ -64,6 +64,7 @@
     "@typescript-eslint/no-use-before-define": "off",
     "@typescript-eslint/comma-dangle": "off",
     "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/prefer-nullish-coalescing": "error",
     "@typescript-eslint/member-delimiter-style": [
       "error",
       {

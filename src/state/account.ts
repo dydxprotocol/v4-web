@@ -163,7 +163,7 @@ export const accountSlice = createSlice({
     },
     clearOrder: (state, action: PayloadAction<string>) => ({
       ...state,
-      clearedOrderIds: [...(state.clearedOrderIds || []), action.payload],
+      clearedOrderIds: [...(state.clearedOrderIds ?? []), action.payload],
     }),
     setOnboardingGuard: (
       state,

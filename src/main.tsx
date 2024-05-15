@@ -18,7 +18,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <ErrorBoundary>
     <StrictMode>
       <Provider store={store}>
-        <Router children={<App />} />
+        <Router>
+          <App />
+        </Router>
       </Provider>
     </StrictMode>
   </ErrorBoundary>

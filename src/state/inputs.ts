@@ -41,7 +41,7 @@ export const inputsSlice = createSlice({
   reducers: {
     setInputs: (state, action: PayloadAction<Nullable<Inputs>>) => {
       const { current, errors, trade, closePosition, transfer, triggerOrders } =
-        action.payload || {};
+        action.payload ?? {};
 
       return {
         ...state,
