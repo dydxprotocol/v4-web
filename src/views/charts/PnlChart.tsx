@@ -175,7 +175,7 @@ export const PnlChart = ({
     appTheme === AppTheme.Light ? LIGHT_CHART_BACKGROUND_URL : DARK_CHART_BACKGROUND_URL;
 
   return (
-    <Styled.Container className={className} chartBackground={chartBackground}>
+    <$Container className={className} chartBackground={chartBackground}>
       <TimeSeriesChart
         id="pnl-chart"
         selectedLocale={selectedLocale}
@@ -222,7 +222,7 @@ export const PnlChart = ({
         tickSpacingX={210}
         tickSpacingY={75}
       >
-        <Styled.PeriodToggle>
+        <$PeriodToggle>
           <ToggleGroup
             items={[
               HistoricalPnlPeriod.Period1d.name,
@@ -240,27 +240,24 @@ export const PnlChart = ({
             value={selectedPeriod.name}
             onValueChange={onSelectPeriod}
           />
-        </Styled.PeriodToggle>
+        </$PeriodToggle>
       </TimeSeriesChart>
-    </Styled.Container>
+    </$Container>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.div<{ chartBackground: string }>`
+const $Container = styled.div<{ chartBackground: string }>`
   position: relative;
   background: url(${({ chartBackground }) => chartBackground}) no-repeat center center;
 `;
 
-Styled.PeriodToggle = styled.div`
+const $PeriodToggle = styled.div`
   place-self: start end;
   isolation: isolate;
 
   margin: 1rem;
 `;
 
-Styled.SignedOutput = styled(Output)<{ side: PnlSide }>`
+const $SignedOutput = styled(Output)<{ side: PnlSide }>`
   ${({ side }) =>
     ({
       [PnlSide.Loss]: css`
@@ -275,11 +272,11 @@ Styled.SignedOutput = styled(Output)<{ side: PnlSide }>`
     }[side])};
 `;
 
-Styled.XAxisLabelOutput = styled(AxisLabelOutput)`
+const $XAxisLabelOutput = styled(AxisLabelOutput)`
   box-shadow: 0 0 0.5rem var(--color-layer-2);
 `;
 
-Styled.YAxisLabelOutput = styled(AxisLabelOutput)`
+const $YAxisLabelOutput = styled(AxisLabelOutput)`
   --axisLabel-offset: 0.5rem;
 
   [data-side='left'] & {

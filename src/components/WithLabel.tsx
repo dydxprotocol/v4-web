@@ -13,22 +13,19 @@ type StyleProps = {
 };
 
 export const WithLabel = ({ label, inputID, children, className }: ElementProps & StyleProps) => (
-  <Styled.WithLabel className={className}>
-    <Styled.Label htmlFor={inputID}>{label}</Styled.Label>
+  <$WithLabel className={className}>
+    <$Label htmlFor={inputID}>{label}</$Label>
     {children}
-  </Styled.WithLabel>
+  </$WithLabel>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.WithLabel = styled.div`
+const $WithLabel = styled.div`
   --label-textColor: var(--color-text-1);
 
   display: grid;
   gap: 0.5rem;
 `;
 
-Styled.Label = styled.label`
+const $Label = styled.label`
   ${layoutMixins.inlineRow}
   font: var(--font-mini-book);
   color: var(--label-textColor);

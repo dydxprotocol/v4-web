@@ -45,7 +45,7 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
   };
 
   return (
-    <Styled.Dialog
+    <$Dialog
       isOpen={isOpen}
       setIsOpen={(open: boolean) => (open ? setIsOpen?.(true) : onCloseDialog())}
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
@@ -55,7 +55,7 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
       {...{
         [MobilePlaceOrderSteps.EditOrder]: {
           title: testFlags.isolatedMargin ? (
-            <Styled.EditTradeHeader>
+            <$EditTradeHeader>
               <Button
                 onClick={() => {
                   dispatch(
@@ -77,48 +77,43 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
               </Button>
 
               <TradeSideToggle />
-            </Styled.EditTradeHeader>
+            </$EditTradeHeader>
           ) : (
             <TradeSideToggle />
           ),
         },
         [MobilePlaceOrderSteps.PreviewOrder]: {
           title: (
-            <Styled.PreviewTitle>
-              {stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_TITLE })}
-            </Styled.PreviewTitle>
+            <$PreviewTitle>{stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_TITLE })}</$PreviewTitle>
           ),
           description: stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_DESCRIPTION }),
         },
         [MobilePlaceOrderSteps.PlacingOrder]: {
           title: stringGetter({ key: STRING_KEYS.PLACING_ORDER_TITLE }),
           description: stringGetter({ key: STRING_KEYS.PLACING_ORDER_DESCRIPTION }),
-          slotIcon: <Styled.Ring withAnimation value={0.25} />,
+          slotIcon: <$Ring withAnimation value={0.25} />,
         },
         [MobilePlaceOrderSteps.PlaceOrderFailed]: {
           title: stringGetter({ key: STRING_KEYS.PLACE_ORDER_FAILED }),
           description: stringGetter({ key: STRING_KEYS.PLACE_ORDER_FAILED_DESCRIPTION }),
-          slotIcon: <Styled.WarningIcon iconName={IconName.Warning} />,
+          slotIcon: <$WarningIcon iconName={IconName.Warning} />,
         },
         [MobilePlaceOrderSteps.Confirmation]: {
           title: stringGetter({ key: STRING_KEYS.CONFIRMED_TITLE }),
           description: stringGetter({ key: STRING_KEYS.CONFIRMED_DESCRIPTION }),
-          slotIcon: <Styled.GreenCheckCircle />,
+          slotIcon: <$GreenCheckCircle />,
         },
       }[currentStep]}
     >
-      <Styled.TradeForm
+      <$TradeForm
         currentStep={currentStep}
         setCurrentStep={setCurrentStep}
         onConfirm={onCloseDialog}
       />
-    </Styled.Dialog>
+    </$Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
+const $Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
   --dialog-backgroundColor: var(--color-layer-2);
   --dialog-header-height: 1rem;
   --dialog-content-paddingTop: 0;
@@ -135,33 +130,33 @@ Styled.Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
     `}
 `;
 
-Styled.EditTradeHeader = styled.div`
+const $EditTradeHeader = styled.div`
   display: grid;
   grid-template-columns: auto auto 1fr;
   gap: 0.5rem;
 `;
 
-Styled.TradeForm = styled(TradeForm)`
+const $TradeForm = styled(TradeForm)`
   --tradeBox-content-paddingTop: 1rem;
   --tradeBox-content-paddingRight: 1.5rem;
   --tradeBox-content-paddingBottom: 1.5rem;
   --tradeBox-content-paddingLeft: 1.5rem;
 `;
 
-Styled.Ring = styled(Ring)`
+const $Ring = styled(Ring)`
   --ring-color: var(--color-accent);
 `;
 
-Styled.GreenCheckCircle = styled(GreenCheckCircle)`
+const $GreenCheckCircle = styled(GreenCheckCircle)`
   --icon-size: 2rem;
 `;
 
-Styled.WarningIcon = styled(Icon)`
+const $WarningIcon = styled(Icon)`
   color: var(--color-warning);
   font-size: 1.5rem;
 `;
 
-Styled.PreviewTitle = styled.div`
+const $PreviewTitle = styled.div`
   ${layoutMixins.inlineRow}
   height: var(--dialog-icon-size);
 `;

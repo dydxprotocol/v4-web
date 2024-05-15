@@ -28,29 +28,22 @@ export const RadioButtonCards = <MenuItemValue extends string>({
   slotBottom,
 }: RadioButtonCardsProps<MenuItemValue>) => {
   return (
-    <Styled.Root value={value} onValueChange={onValueChange} className={className}>
+    <$Root value={value} onValueChange={onValueChange} className={className}>
       {slotTop}
       {radioItems.map((item) => (
-        <Styled.RadioButtonCard key={item.value} value={item.value} disabled={item.disabled}>
-          <Styled.CardHeader>
+        <$RadioButtonCard key={item.value} value={item.value} disabled={item.disabled}>
+          <$CardHeader>
             {item.label}
-            {value === item.value ? (
-              <Styled.CheckIcon iconName={IconName.Check} />
-            ) : (
-              <Styled.EmptyIcon />
-            )}
-          </Styled.CardHeader>
+            {value === item.value ? <$CheckIcon iconName={IconName.Check} /> : <$EmptyIcon />}
+          </$CardHeader>
           {item.body}
-        </Styled.RadioButtonCard>
+        </$RadioButtonCard>
       ))}
       {slotBottom}
-    </Styled.Root>
+    </$Root>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Root = styled(Root)`
+const $Root = styled(Root)`
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -63,7 +56,7 @@ Styled.Root = styled(Root)`
   --radio-button-cards-item-backgroundColor: ;
 `;
 
-Styled.RadioButtonCard = styled(Item)`
+const $RadioButtonCard = styled(Item)`
   display: flex;
   flex-direction: column;
   border-radius: 0.625rem;
@@ -84,7 +77,7 @@ Styled.RadioButtonCard = styled(Item)`
   }
 `;
 
-Styled.CardHeader = styled.div`
+const $CardHeader = styled.div`
   display: flex;
   flex: 1;
   align-self: stretch;
@@ -95,7 +88,7 @@ Styled.CardHeader = styled.div`
   gap: 1rem;
 `;
 
-Styled.CheckIcon = styled(Icon)`
+const $CheckIcon = styled(Icon)`
   width: 1rem;
   height: 1rem;
   padding: 0.25rem;
@@ -106,7 +99,7 @@ Styled.CheckIcon = styled(Icon)`
   background-color: var(--color-accent);
 `;
 
-Styled.EmptyIcon = styled.div`
+const $EmptyIcon = styled.div`
   width: 1rem;
   height: 1rem;
 

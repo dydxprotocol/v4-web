@@ -27,15 +27,12 @@ export const WithDetailsReceipt = ({
     className={className}
     hideReceipt={hideReceipt}
     side={side}
-    slotReceipt={detailItems && <Styled.Details items={detailItems} />}
+    slotReceipt={detailItems && <$Details items={detailItems} />}
   >
     {children}
   </WithReceipt>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Details = styled(Details)`
+const $Details = styled(Details)`
   --details-item-backgroundColor: var(--withReceipt-backgroundColor);
 
   padding: 0.375rem 0.75rem 0.25rem;

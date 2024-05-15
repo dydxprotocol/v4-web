@@ -10,8 +10,8 @@ export const LoadingSpinner: React.FC<{
   disabled?: boolean;
 }> = ({ id, className, disabled = false }) => {
   return (
-    <Styled.Spinner className={className}>
-      <Styled.LoadingSpinnerSvg
+    <$Spinner className={className}>
+      <$LoadingSpinnerSvg
         id={id}
         width="38"
         height="38"
@@ -35,31 +35,28 @@ export const LoadingSpinner: React.FC<{
             strokeLinecap="round"
           />
         )}
-      </Styled.LoadingSpinnerSvg>
-    </Styled.Spinner>
+      </$LoadingSpinnerSvg>
+    </$Spinner>
   );
 };
 
 export const LoadingSpace: React.FC<{ className?: string; id: string }> = ({ className, id }) => (
-  <Styled.LoadingSpaceContainer className={className}>
+  <$LoadingSpaceContainer className={className}>
     <LoadingSpinner id={id} />
-  </Styled.LoadingSpaceContainer>
+  </$LoadingSpaceContainer>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.LoadingSpaceContainer = styled.div`
+const $LoadingSpaceContainer = styled.div`
   ${layoutMixins.centered}
 `;
 
-Styled.Spinner = styled.div`
+const $Spinner = styled.div`
   --spinner-width: auto;
 
   line-height: 0;
   color: var(--color-text-0);
 `;
 
-Styled.LoadingSpinnerSvg = styled.svg`
+const $LoadingSpinnerSvg = styled.svg`
   width: var(--spinner-width);
   height: auto;
 

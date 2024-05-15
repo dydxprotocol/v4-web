@@ -16,9 +16,9 @@ export const TriangleIndicatorStory: Story<{ value: number }> = (args) => {
 
   return (
     <StoryWrapper>
-      <Styled.Container>
+      <$Container>
         <TriangleIndicator value={valueBN} />
-      </Styled.Container>
+      </$Container>
     </StoryWrapper>
   );
 };
@@ -26,10 +26,7 @@ export const TriangleIndicatorStory: Story<{ value: number }> = (args) => {
 TriangleIndicatorStory.args = {
   value: 0,
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.section`
+const $Container = styled.section`
   background: var(--color-layer-3);
 
   ${layoutMixins.container}

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -66,7 +66,7 @@ export const HelpDialog = ({ setIsOpen }: ElementProps) => {
   );
 
   return (
-    <Styled.ComboboxDialogMenu
+    <$ComboboxDialogMenu
       isOpen
       withSearch={false}
       setIsOpen={setIsOpen}
@@ -74,7 +74,7 @@ export const HelpDialog = ({ setIsOpen }: ElementProps) => {
       items={HELP_ITEMS}
       slotFooter={
         latestCommit || latestVersion ? (
-          <Styled.Footer>
+          <$Footer>
             {latestCommit && (
               <span>
                 Release - <span title={latestCommit}> {`${latestCommit.substring(0, 7)}`}</span>
@@ -86,16 +86,13 @@ export const HelpDialog = ({ setIsOpen }: ElementProps) => {
                 <span title={latestVersion}>{`${latestVersion.split(`release/v`).at(-1)}`}</span>
               </span>
             )}
-          </Styled.Footer>
+          </$Footer>
         ) : undefined
       }
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ComboboxDialogMenu = styled(ComboboxDialogMenu)`
+const $ComboboxDialogMenu = styled(ComboboxDialogMenu)`
   --dialog-content-paddingTop: 1rem;
   --dialog-content-paddingBottom: 1rem;
   --comboxDialogMenu-item-gap: 1rem;
@@ -105,7 +102,7 @@ Styled.ComboboxDialogMenu = styled(ComboboxDialogMenu)`
   }
 `;
 
-Styled.Footer = styled.div`
+const $Footer = styled.div`
   display: flex;
   flex-direction: column;
 

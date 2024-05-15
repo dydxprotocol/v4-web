@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Nullable, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -43,7 +43,7 @@ export const CanvasOrderbook = forwardRef(
       histogramSide = 'right',
       maxRowsPerSide = ORDERBOOK_MAX_ROWS_PER_SIDE,
     }: ElementProps & StyleProps,
-    ref
+    ref: React.ForwardedRef<HTMLDivElement>
   ) => {
     const { asks, bids, hasOrderbook, histogramRange, spread, spreadPercent } =
       useCalculateOrderbookData({
@@ -123,9 +123,9 @@ export const CanvasOrderbook = forwardRef(
     });
 
     return (
-      <Styled.OrderbookContainer ref={ref}>
-        <Styled.OrderbookContent $isLoading={!hasOrderbook}>
-          <Styled.Header>
+      <$OrderbookContainer ref={ref}>
+        <$OrderbookContent $isLoading={!hasOrderbook}>
+          <$Header>
             <span>
               {stringGetter({ key: STRING_KEYS.SIZE })} {id && <Tag>{id}</Tag>}
             </span>
@@ -133,10 +133,10 @@ export const CanvasOrderbook = forwardRef(
               {stringGetter({ key: STRING_KEYS.PRICE })} <Tag>USD</Tag>
             </span>
             <span>{stringGetter({ key: STRING_KEYS.MINE })}</span>
-          </Styled.Header>
+          </$Header>
 
           {displaySide === 'top' && (
-            <Styled.SpreadRow
+            <$SpreadRow
               side="top"
               spread={spread}
               spreadPercent={spreadPercent}
@@ -144,12 +144,12 @@ export const CanvasOrderbook = forwardRef(
             />
           )}
 
-          <Styled.OrderbookWrapper ref={orderbookRef}>
-            <Styled.OrderbookSideContainer $side="asks">
-              <Styled.HoverRows $bottom>
+          <$OrderbookWrapper ref={orderbookRef}>
+            <$OrderbookSideContainer $side="asks">
+              <$HoverRows $bottom>
                 {asksSlice.map((row: PerpetualMarketOrderbookLevel | undefined, idx) =>
                   row ? (
-                    <Styled.Row
+                    <$Row
                       key={idx}
                       title={`${row.price}`}
                       onClick={() => {
@@ -157,12 +157,12 @@ export const CanvasOrderbook = forwardRef(
                       }}
                     />
                   ) : (
-                    <Styled.Row key={idx} />
+                    <$Row key={idx} />
                   )
                 )}
-              </Styled.HoverRows>
-              <Styled.OrderbookCanvas ref={asksCanvasRef} width="100%" height="100%" />
-            </Styled.OrderbookSideContainer>
+              </$HoverRows>
+              <$OrderbookCanvas ref={asksCanvasRef} width="100%" height="100%" />
+            </$OrderbookSideContainer>
 
             <SpreadRow
               ref={spreadRowRef}
@@ -171,11 +171,11 @@ export const CanvasOrderbook = forwardRef(
               tickSizeDecimals={tickSizeDecimals}
             />
 
-            <Styled.OrderbookSideContainer $side="bids">
-              <Styled.HoverRows>
+            <$OrderbookSideContainer $side="bids">
+              <$HoverRows>
                 {bidsSlice.map((row: PerpetualMarketOrderbookLevel | undefined, idx) =>
                   row ? (
-                    <Styled.Row
+                    <$Row
                       key={idx}
                       title={`${row.price}`}
                       onClick={
@@ -187,38 +187,35 @@ export const CanvasOrderbook = forwardRef(
                       }
                     />
                   ) : (
-                    <Styled.Row key={idx} />
+                    <$Row key={idx} />
                   )
                 )}
-              </Styled.HoverRows>
-              <Styled.OrderbookCanvas ref={bidsCanvasRef} width="100%" height="100%" />
-            </Styled.OrderbookSideContainer>
-          </Styled.OrderbookWrapper>
+              </$HoverRows>
+              <$OrderbookCanvas ref={bidsCanvasRef} width="100%" height="100%" />
+            </$OrderbookSideContainer>
+          </$OrderbookWrapper>
           {displaySide === 'bottom' && (
-            <Styled.SpreadRow
+            <$SpreadRow
               side="bottom"
               spread={spread}
               spreadPercent={spreadPercent}
               tickSizeDecimals={tickSizeDecimals}
             />
           )}
-        </Styled.OrderbookContent>
+        </$OrderbookContent>
         {!hasOrderbook && <LoadingSpace id="canvas-orderbook" />}
-      </Styled.OrderbookContainer>
+      </$OrderbookContainer>
     );
   }
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.OrderbookContainer = styled.div`
+const $OrderbookContainer = styled.div`
   display: flex;
   flex: 1 1 0%;
   flex-direction: column;
   overflow: hidden;
 `;
 
-Styled.OrderbookContent = styled.div<{ $isLoading?: boolean }>`
+const $OrderbookContent = styled.div<{ $isLoading?: boolean }>`
   max-height: 100%;
   display: flex;
   flex-direction: column;
@@ -226,20 +223,20 @@ Styled.OrderbookContent = styled.div<{ $isLoading?: boolean }>`
   ${({ $isLoading }) => $isLoading && 'flex: 1;'}
 `;
 
-Styled.Header = styled(OrderbookRow)`
+const $Header = styled(OrderbookRow)`
   height: 2rem;
   border-bottom: var(--border);
   color: var(--color-text-0);
 `;
 
-Styled.OrderbookWrapper = styled.div`
+const $OrderbookWrapper = styled.div`
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   flex: 1 1 0%;
 `;
 
-Styled.OrderbookSideContainer = styled.div<{ $side: 'bids' | 'asks' }>`
+const $OrderbookSideContainer = styled.div<{ $side: 'bids' | 'asks' }>`
   min-height: ${ORDERBOOK_HEIGHT}px;
   ${({ $side }) => css`
     --accent-color: ${$side === 'bids' ? 'var(--color-positive)' : 'var(--color-negative)'};
@@ -247,7 +244,7 @@ Styled.OrderbookSideContainer = styled.div<{ $side: 'bids' | 'asks' }>`
   position: relative;
 `;
 
-Styled.OrderbookCanvas = styled(Canvas)`
+const $OrderbookCanvas = styled(Canvas)`
   width: 100%;
   height: 100%;
   position: absolute;
@@ -257,14 +254,14 @@ Styled.OrderbookCanvas = styled(Canvas)`
   font-feature-settings: var(--fontFeature-monoNumbers);
 `;
 
-Styled.HoverRows = styled.div<{ $bottom?: boolean }>`
+const $HoverRows = styled.div<{ $bottom?: boolean }>`
   position: absolute;
   width: 100%;
 
   ${({ $bottom }) => $bottom && 'bottom: 0;'}
 `;
 
-Styled.Row = styled(OrderbookRow)<{ onClick?: () => void }>`
+const $Row = styled(OrderbookRow)<{ onClick?: () => void }>`
   ${({ onClick }) =>
     onClick
       ? css`
@@ -280,6 +277,6 @@ Styled.Row = styled(OrderbookRow)<{ onClick?: () => void }>`
         `}
 `;
 
-Styled.SpreadRow = styled(SpreadRow)`
+const $SpreadRow = styled(SpreadRow)`
   position: absolute;
 `;

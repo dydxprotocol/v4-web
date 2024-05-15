@@ -30,9 +30,9 @@ export const DisconnectDialog = ({ setIsOpen }: ElementProps) => {
 
   return (
     <Dialog isOpen setIsOpen={setIsOpen} title={stringGetter({ key: STRING_KEYS.DISCONNECT })}>
-      <Styled.Content>
+      <$Content>
         <p>{stringGetter({ key: STRING_KEYS.DISCONNECT_CONFIRMATION })}</p>
-        <Styled.ButtonRow>
+        <$ButtonRow>
           <Close asChild>
             <Button action={ButtonAction.Destroy} onClick={disconnect}>
               {stringGetter({ key: STRING_KEYS.DISCONNECT })}
@@ -41,22 +41,19 @@ export const DisconnectDialog = ({ setIsOpen }: ElementProps) => {
           <Close asChild>
             <Button onClick={onCancel}>{stringGetter({ key: STRING_KEYS.CANCEL })}</Button>
           </Close>
-        </Styled.ButtonRow>
-      </Styled.Content>
+        </$ButtonRow>
+      </$Content>
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ButtonRow = styled.div`
+const $ButtonRow = styled.div`
   ${layoutMixins.row}
 
   gap: 0.5rem;
   justify-content: end;
 `;
 
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
 `;

@@ -109,16 +109,16 @@ export default () => {
   );
 
   return isTablet ? (
-    <Styled.PortfolioMobile>
+    <$PortfolioMobile>
       <PortfolioNavMobile />
       {routesComponent}
-    </Styled.PortfolioMobile>
+    </$PortfolioMobile>
   ) : (
     <WithSidebar
       sidebar={
         isTablet ? null : (
-          <Styled.SideBar>
-            <Styled.NavigationMenu
+          <$SideBar>
+            <$NavigationMenu
               items={[
                 {
                   group: 'views',
@@ -127,9 +127,9 @@ export default () => {
                     {
                       value: PortfolioRoute.Overview,
                       slotBefore: (
-                        <Styled.IconContainer>
+                        <$IconContainer>
                           <Icon iconName={IconName.Overview} />
-                        </Styled.IconContainer>
+                        </$IconContainer>
                       ),
                       label: stringGetter({ key: STRING_KEYS.OVERVIEW }),
                       href: PortfolioRoute.Overview,
@@ -137,9 +137,9 @@ export default () => {
                     {
                       value: PortfolioRoute.Positions,
                       slotBefore: (
-                        <Styled.IconContainer>
+                        <$IconContainer>
                           <Icon iconName={IconName.Positions} />
-                        </Styled.IconContainer>
+                        </$IconContainer>
                       ),
                       label: (
                         <>
@@ -155,9 +155,9 @@ export default () => {
                     {
                       value: PortfolioRoute.Orders,
                       slotBefore: (
-                        <Styled.IconContainer>
+                        <$IconContainer>
                           <Icon iconName={IconName.OrderPending} />
-                        </Styled.IconContainer>
+                        </$IconContainer>
                       ),
                       label: (
                         <>
@@ -172,9 +172,9 @@ export default () => {
                     {
                       value: PortfolioRoute.Fees,
                       slotBefore: (
-                        <Styled.IconContainer>
+                        <$IconContainer>
                           <Icon iconName={IconName.Calculator} />
-                        </Styled.IconContainer>
+                        </$IconContainer>
                       ),
                       label: stringGetter({ key: STRING_KEYS.FEES }),
                       href: PortfolioRoute.Fees,
@@ -182,9 +182,9 @@ export default () => {
                     {
                       value: PortfolioRoute.History,
                       slotBefore: (
-                        <Styled.IconContainer>
+                        <$IconContainer>
                           <Icon iconName={IconName.History} />
-                        </Styled.IconContainer>
+                        </$IconContainer>
                       ),
                       label: stringGetter({ key: STRING_KEYS.HISTORY }),
                       href: PortfolioRoute.History,
@@ -194,7 +194,7 @@ export default () => {
               ]}
             />
             {onboardingState === OnboardingState.AccountConnected && (
-              <Styled.Footer>
+              <$Footer>
                 {complianceState === ComplianceStates.FULL_ACCESS && (
                   <Button
                     action={ButtonAction.Primary}
@@ -220,9 +220,9 @@ export default () => {
                       {stringGetter({ key: STRING_KEYS.TRANSFER })}
                     </Button>
                   )}
-              </Styled.Footer>
+              </$Footer>
             )}
-          </Styled.SideBar>
+          </$SideBar>
         )
       }
     >
@@ -230,22 +230,19 @@ export default () => {
     </WithSidebar>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.PortfolioMobile = styled.div`
+const $PortfolioMobile = styled.div`
   min-height: 100%;
   ${layoutMixins.expandingColumnWithHeader}
 `;
 
-Styled.SideBar = styled.div`
+const $SideBar = styled.div`
   ${layoutMixins.flexColumn}
   justify-content: space-between;
 
   height: 100%;
 `;
 
-Styled.Footer = styled.div`
+const $Footer = styled.div`
   ${layoutMixins.row}
   flex-wrap: wrap;
 
@@ -258,12 +255,12 @@ Styled.Footer = styled.div`
   }
 `;
 
-Styled.NavigationMenu = styled(NavigationMenu)`
+const $NavigationMenu = styled(NavigationMenu)`
   padding: 0.5rem;
   padding-top: 0;
 `;
 
-Styled.IconContainer = styled.div`
+const $IconContainer = styled.div`
   width: 1.5rem;
   height: 1.5rem;
   font-size: 0.75rem;

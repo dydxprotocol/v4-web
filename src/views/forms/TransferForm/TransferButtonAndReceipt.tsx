@@ -103,7 +103,7 @@ export const TransferButtonAndReceipt = ({
   ].filter(isTruthy);
 
   return (
-    <Styled.WithDetailsReceipt detailItems={transferDetailItems}>
+    <$WithDetailsReceipt detailItems={transferDetailItems}>
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
       ) : (
@@ -115,13 +115,10 @@ export const TransferButtonAndReceipt = ({
           {stringGetter({ key: STRING_KEYS.CONFIRM_TRANSFER })}
         </Button>
       )}
-    </Styled.WithDetailsReceipt>
+    </$WithDetailsReceipt>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
+const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 
   dl {

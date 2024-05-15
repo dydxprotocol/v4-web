@@ -1,6 +1,6 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';
@@ -106,7 +106,7 @@ export const MarketLeverageInput = ({
     });
   };
 
-  const onLeverageSideToggle = (e: Event) => {
+  const onLeverageSideToggle = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
 
     if (leveragePosition === PositionSide.None) return;
@@ -127,8 +127,8 @@ export const MarketLeverageInput = ({
 
   return (
     <>
-      <Styled.InputContainer>
-        <Styled.WithLabel
+      <$InputContainer>
+        <$WithLabel
           key="leverage"
           label={
             <>
@@ -136,13 +136,13 @@ export const MarketLeverageInput = ({
                 {stringGetter({ key: STRING_KEYS.LEVERAGE })}
               </WithTooltip>
 
-              <Styled.LeverageSide onClick={onLeverageSideToggle}>
+              <$LeverageSide onClick={onLeverageSideToggle}>
                 <PositionSideTag positionSide={leveragePosition} />
-              </Styled.LeverageSide>
+              </$LeverageSide>
             </>
           }
         >
-          <Styled.LeverageSlider
+          <$LeverageSlider
             leverage={currentLeverage}
             leverageInputValue={getSignedLeverage(leverageInputValue)}
             maxLeverage={maxLeverage}
@@ -150,18 +150,18 @@ export const MarketLeverageInput = ({
             positionSide={currentPositionSide}
             setLeverageInputValue={setLeverageInputValue}
           />
-        </Styled.WithLabel>
-        <Styled.InnerInputContainer>
+        </$WithLabel>
+        <$InnerInputContainer>
           <Input
             onInput={onLeverageInput}
             placeholder={`${MustBigNumber(currentLeverage).abs().toFixed(LEVERAGE_DECIMALS)}×`}
             type={InputType.Leverage}
             value={leverageInputValue ?? ''}
           />
-        </Styled.InnerInputContainer>
-      </Styled.InputContainer>
+        </$InnerInputContainer>
+      </$InputContainer>
 
-      <Styled.ToggleGroup
+      <$ToggleGroup
         items={leverageOptions.map((leverageAmount: number) => ({
           label: `${leverageAmount}×`,
           value: MustBigNumber(leverageAmount).toFixed(LEVERAGE_DECIMALS),
@@ -174,10 +174,7 @@ export const MarketLeverageInput = ({
     </>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.InputContainer = styled.div`
+const $InputContainer = styled.div`
   ${formMixins.inputContainer}
   --input-height: 3.5rem;
 
@@ -188,15 +185,15 @@ Styled.InputContainer = styled.div`
   }
 `;
 
-Styled.WithLabel = styled(WithLabel)`
+const $WithLabel = styled(WithLabel)`
   ${formMixins.inputLabel}
 `;
 
-Styled.LeverageSlider = styled(LeverageSlider)`
+const $LeverageSlider = styled(LeverageSlider)`
   margin-top: 0.25rem;
 `;
 
-Styled.InnerInputContainer = styled.div`
+const $InnerInputContainer = styled.div`
   ${formMixins.inputContainer}
   --input-backgroundColor: var(--color-layer-5);
   --input-borderColor: var(--color-layer-7);
@@ -215,10 +212,10 @@ Styled.InnerInputContainer = styled.div`
   }
 `;
 
-Styled.LeverageSide = styled.div`
+const $LeverageSide = styled.div`
   cursor: pointer;
 `;
 
-Styled.ToggleGroup = styled(ToggleGroup)`
+const $ToggleGroup = styled(ToggleGroup)`
   ${formMixins.inputToggleGroup}
 `;

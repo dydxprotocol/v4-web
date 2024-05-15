@@ -77,20 +77,20 @@ export const TransferStatusNotification = ({
 
   const content = (
     <>
-      <Styled.Status>
+      <$Status>
         {stringGetter({
           key: statusString,
           params: {
-            AMOUNT_USD: <Styled.InlineOutput type={OutputType.Fiat} value={toAmount} />,
+            AMOUNT_USD: <$InlineOutput type={OutputType.Fiat} value={toAmount} />,
             ESTIMATED_DURATION: (
-              <Styled.InlineOutput
+              <$InlineOutput
                 type={OutputType.Text}
                 value={formatSeconds(Math.max(secondsLeft || 0, 0))}
               />
             ),
           },
         })}
-      </Styled.Status>
+      </$Status>
       {hasError && (
         <AlertMessage type={AlertType.Error}>
           {stringGetter({
@@ -114,18 +114,18 @@ export const TransferStatusNotification = ({
         !status && !isExchange ? (
           <LoadingDots size={3} />
         ) : (
-          <Styled.BridgingStatus>
+          <$BridgingStatus>
             {content}
             {!isToast && !isComplete && !hasError && (
-              <Styled.TransferStatusSteps status={status} type={type} />
+              <$TransferStatusSteps status={status} type={type} />
             )}
-          </Styled.BridgingStatus>
+          </$BridgingStatus>
         )
       }
       slotAction={
         isToast &&
         status && (
-          <Styled.Trigger
+          <$Trigger
             isOpen={open}
             onClick={(e: MouseEvent) => {
               e.stopPropagation();
@@ -136,7 +136,7 @@ export const TransferStatusNotification = ({
             {stringGetter({
               key: open ? STRING_KEYS.HIDE_DETAILS : STRING_KEYS.VIEW_DETAILS,
             })}
-          </Styled.Trigger>
+          </$Trigger>
         )
       }
       withClose={false}
@@ -149,9 +149,9 @@ export const TransferStatusNotification = ({
       side="bottom"
       slotReceipt={
         <Collapsible open={open} onOpenChange={setOpen} label="" withTrigger={false}>
-          <Styled.Receipt>
+          <$Receipt>
             <TransferStatusSteps status={status} type={type} />
-          </Styled.Receipt>
+          </$Receipt>
         </Collapsible>
       }
     >
@@ -161,15 +161,12 @@ export const TransferStatusNotification = ({
     transferNotif
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.BridgingStatus = styled.div`
+const $BridgingStatus = styled.div`
   ${layoutMixins.flexColumn};
   gap: 0.5rem;
 `;
 
-Styled.Status = styled.div<{ withMarginBottom?: boolean }>`
+const $Status = styled.div<{ withMarginBottom?: boolean }>`
   color: var(--color-text-0);
   font-size: 0.875rem;
 
@@ -180,23 +177,23 @@ Styled.Status = styled.div<{ withMarginBottom?: boolean }>`
     `}
 `;
 
-Styled.InlineOutput = styled(Output)`
+const $InlineOutput = styled(Output)`
   display: inline-block;
 
   color: var(--color-text-1);
 `;
 
-Styled.Step = styled.div`
+const $Step = styled.div`
   ${layoutMixins.row};
 
   gap: 0.5rem;
 `;
 
-Styled.TransferStatusSteps = styled(TransferStatusSteps)`
+const $TransferStatusSteps = styled(TransferStatusSteps)`
   padding: 0.5rem 0 0;
 `;
 
-Styled.Trigger = styled.button<{ isOpen?: boolean }>`
+const $Trigger = styled.button<{ isOpen?: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5em;
@@ -223,6 +220,6 @@ Styled.Trigger = styled.button<{ isOpen?: boolean }>`
     `}
 `;
 
-Styled.Receipt = styled.div`
+const $Receipt = styled.div`
   padding: 0 1rem;
 `;

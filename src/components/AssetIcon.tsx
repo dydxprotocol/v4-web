@@ -1,4 +1,4 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { Nullable } from '@/constants/abacus';
 
@@ -115,16 +115,13 @@ export const AssetIcon = ({
   symbol?: Nullable<string>;
   className?: string;
 }) => (
-  <Styled.Img
+  <$Img
     src={isAssetSymbol(symbol) ? assetIcons[symbol] : '/currencies/unavailable.png'}
     className={className}
-    alt={symbol}
+    alt={symbol ?? undefined}
   />
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Img = styled.img`
+const $Img = styled.img`
   width: auto;
   height: 1em;
 `;

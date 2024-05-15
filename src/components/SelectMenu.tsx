@@ -12,7 +12,7 @@ import {
   Value,
   Viewport,
 } from '@radix-ui/react-select';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { formMixins } from '@/styles/formMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
@@ -38,24 +38,24 @@ export const SelectMenu = <T extends string>({
 }) => {
   return (
     <Root value={value} onValueChange={onValueChange}>
-      <Styled.Trigger className={className} $withBlur={withBlur}>
+      <$Trigger className={className} $withBlur={withBlur}>
         {label ? (
-          <Styled.WithLabel label={label}>
+          <$WithLabel label={label}>
             <Value />
-          </Styled.WithLabel>
+          </$WithLabel>
         ) : (
           <Value />
         )}
         {React.Children.toArray(children).length > 1 && (
-          <Styled.TriggerIcon iconName={IconName.Triangle} />
+          <$TriggerIcon iconName={IconName.Triangle} />
         )}
-      </Styled.Trigger>
+      </$Trigger>
       <Portal>
-        <Styled.Content className={className}>
+        <$Content className={className}>
           {/* <ScrollUpButton /> */}
           <Viewport>{children}</Viewport>
           {/* <ScrollDownButton /> */}
-        </Styled.Content>
+        </$Content>
       </Portal>
     </Root>
   );
@@ -68,19 +68,16 @@ export const SelectItem = <T extends string>({
 }: {
   className?: string;
   value: T;
-  label: string;
+  label: React.ReactNode;
 }) => (
-  <Styled.Item className={className} value={value}>
+  <$Item className={className} value={value}>
     <ItemText>{label}</ItemText>
-    <Styled.ItemIndicator>
+    <$ItemIndicator>
       <CheckIcon />
-    </Styled.ItemIndicator>
-  </Styled.Item>
+    </$ItemIndicator>
+  </$Item>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Trigger = styled(Trigger)<{ $withBlur?: boolean }>`
+const $Trigger = styled(Trigger)<{ $withBlur?: boolean }>`
   --select-menu-trigger-maxWidth: ;
   max-width: var(--select-menu-trigger-maxWidth);
   ${popoverMixins.trigger}
@@ -94,7 +91,7 @@ Styled.Trigger = styled(Trigger)<{ $withBlur?: boolean }>`
   }
 `;
 
-Styled.Content = styled(Content)`
+const $Content = styled(Content)`
   --select-menu-content-maxWidth: ;
   max-width: var(--select-menu-content-maxWidth);
 
@@ -102,22 +99,22 @@ Styled.Content = styled(Content)`
   ${popoverMixins.popoverAnimation}
 `;
 
-Styled.Item = styled(Item)`
+const $Item = styled(Item)`
   ${popoverMixins.item}
 `;
 
-Styled.ItemIndicator = styled(ItemIndicator)`
+const $ItemIndicator = styled(ItemIndicator)`
   margin-left: auto;
   display: inline-flex;
   transition: transform 0.3s var(--ease-out-expo);
 `;
 
-Styled.WithLabel = styled(WithLabel)`
+const $WithLabel = styled(WithLabel)`
   ${formMixins.inputLabel}
   border-radius: 0;
 `;
 
-Styled.TriggerIcon = styled(Icon)`
+const $TriggerIcon = styled(Icon)`
   width: 0.625rem;
   height: 0.375rem;
   color: var(--color-text-0);

@@ -30,10 +30,10 @@ export const WithSidebar: React.FC<WithSidebarProps> = ({ children, sidebar }) =
   const stringGetter = useStringGetter();
 
   return (
-    <Styled.Container data-state={!sidebar ? 'none' : isSidebarOpen ? 'open' : 'closed'}>
+    <$Container data-state={!sidebar ? 'none' : isSidebarOpen ? 'open' : 'closed'}>
       {sidebar && (
-        <Styled.Side>
-          <Styled.TriggerButton
+        <$Side>
+          <$TriggerButton
             shape={ButtonShape.Pill}
             size={isSidebarOpen ? ButtonSize.XSmall : ButtonSize.Base}
             isPressed={!isSidebarOpen}
@@ -44,20 +44,17 @@ export const WithSidebar: React.FC<WithSidebarProps> = ({ children, sidebar }) =
             ) : (
               <Icon iconName={IconName.Menu} />
             )}
-          </Styled.TriggerButton>
+          </$TriggerButton>
 
-          <Styled.Sidebar data-state={isSidebarOpen ? 'open' : 'closed'}>{sidebar}</Styled.Sidebar>
-        </Styled.Side>
+          <$Sidebar data-state={isSidebarOpen ? 'open' : 'closed'}>{sidebar}</$Sidebar>
+        </$Side>
       )}
 
-      <Styled.Content>{children}</Styled.Content>
-    </Styled.Container>
+      <$Content>{children}</$Content>
+    </$Container>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.div`
+const $Container = styled.div`
   /* Params */
   --withSidebar-containerWidth: 100vw;
   --withSidebar-open-sidebarWidth: var(--sidebar-width);
@@ -112,7 +109,7 @@ Styled.Container = styled.div`
   grid-template: var(--withSidebar-gridTemplate);
 `;
 
-Styled.Side = styled.aside`
+const $Side = styled.aside`
   grid-area: Side;
 
   ${layoutMixins.container}
@@ -125,7 +122,7 @@ Styled.Side = styled.aside`
   ${layoutMixins.stack}
 `;
 
-Styled.Sidebar = styled.div`
+const $Sidebar = styled.div`
   --current-sidebar-width: var(--sidebar-width);
 
   ${layoutMixins.scrollArea}
@@ -149,7 +146,7 @@ Styled.Sidebar = styled.div`
   }
 `;
 
-Styled.TriggerButton = styled(ToggleButton)`
+const $TriggerButton = styled(ToggleButton)`
   --button-toggle-on-backgroundColor: transparent;
 
   place-self: start end;
@@ -193,7 +190,7 @@ Styled.TriggerButton = styled(ToggleButton)`
   }
 `;
 
-Styled.Content = styled.article`
+const $Content = styled.article`
   grid-area: Content;
 
   ${layoutMixins.contentContainerPage}

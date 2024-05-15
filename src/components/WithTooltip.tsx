@@ -67,38 +67,35 @@ export const WithTooltip = ({
     <Provider>
       <Root delayDuration={300}>
         <Trigger asChild>
-          <Styled.Abbr>
+          <$Abbr>
             {children}
-            {withIcon && <Styled.Icon iconName={IconName.HelpCircle} />}
-          </Styled.Abbr>
+            {withIcon && <$Icon iconName={IconName.HelpCircle} />}
+          </$Abbr>
         </Trigger>
 
         <Portal>
-          <Styled.Content sideOffset={8} side={side} align={align} className={className} asChild>
+          <$Content sideOffset={8} side={side} align={align} className={className} asChild>
             {slotTooltip ?? (
               <dl>
                 {tooltipTitle && <dt>{tooltipTitle}</dt>}
                 {tooltipBody && <dd>{tooltipBody}</dd>}
                 {tooltipLearnMore && (
                   <dd>
-                    <Styled.LearnMore href={tooltipLearnMore}>
+                    <$LearnMore href={tooltipLearnMore}>
                       {stringGetter({ key: STRING_KEYS.LEARN_MORE })} →
-                    </Styled.LearnMore>
+                    </$LearnMore>
                   </dd>
                 )}
-                <Styled.Arrow />
+                <$Arrow />
               </dl>
             )}
-          </Styled.Content>
+          </$Content>
         </Portal>
       </Root>
     </Provider>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Abbr = styled.abbr`
+const $Abbr = styled.abbr`
   ${layoutMixins.inlineRow}
 
   text-decoration: underline dashed 0px;
@@ -109,7 +106,7 @@ Styled.Abbr = styled.abbr`
   cursor: help;
 `;
 
-Styled.Content = styled(Content)`
+const $Content = styled(Content)`
   --tooltip-backgroundColor: var(--color-layer-4);
   --tooltip-backgroundColor: ${({ theme }) => theme.tooltipBackground};
 
@@ -139,7 +136,7 @@ Styled.Content = styled(Content)`
   }
 `;
 
-Styled.Arrow = styled(Arrow)`
+const $Arrow = styled(Arrow)`
   width: 0.75rem;
   height: 0.375rem;
 
@@ -148,10 +145,10 @@ Styled.Arrow = styled(Arrow)`
   }
 `;
 
-Styled.Icon = styled(Icon)`
+const $Icon = styled(Icon)`
   color: var(--color-text-0);
 `;
 
-Styled.LearnMore = styled(Link)`
+const $LearnMore = styled(Link)`
   --link-color: var(--color-accent);
 `;

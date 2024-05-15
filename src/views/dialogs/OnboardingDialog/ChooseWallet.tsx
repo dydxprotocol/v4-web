@@ -1,4 +1,6 @@
-import styled, { AnyStyledComponent } from 'styled-components';
+import { ElementType } from 'react';
+
+import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
@@ -31,7 +33,7 @@ export const ChooseWallet = ({
   return (
     <>
       {selectedWalletType && selectedWalletError && (
-        <Styled.AlertMessage type={AlertType.Error}>
+        <$AlertMessage type={AlertType.Error}>
           {
             <h4>
               {stringGetter({
@@ -45,41 +47,38 @@ export const ChooseWallet = ({
             </h4>
           }
           {selectedWalletError}
-        </Styled.AlertMessage>
+        </$AlertMessage>
       )}
 
-      <Styled.Wallets>
+      <$Wallets>
         {displayedWallets.map((walletType) => (
-          <Styled.WalletButton
+          <$WalletButton
             action={ButtonAction.Base}
             key={walletType}
             onClick={() => onChooseWallet(walletType)}
-            slotLeft={<Styled.Icon iconComponent={wallets[walletType].icon} />}
+            slotLeft={<$Icon iconComponent={wallets[walletType].icon as ElementType} />}
             size={ButtonSize.Small}
           >
             {stringGetter({ key: wallets[walletType].stringKey })}
-          </Styled.WalletButton>
+          </$WalletButton>
         ))}
-      </Styled.Wallets>
+      </$Wallets>
 
-      <Styled.Footer>
+      <$Footer>
         <Link href={walletLearnMore} withIcon>
           {stringGetter({ key: STRING_KEYS.ABOUT_WALLETS })}
         </Link>
-      </Styled.Footer>
+      </$Footer>
     </>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.AlertMessage = styled(AlertMessage)`
+const $AlertMessage = styled(AlertMessage)`
   h4 {
     font: var(--font-small-medium);
   }
 `;
 
-Styled.Wallets = styled.div`
+const $Wallets = styled.div`
   gap: 0.5rem;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
@@ -98,7 +97,7 @@ Styled.Wallets = styled.div`
   } */
 `;
 
-Styled.WalletButton = styled(Button)`
+const $WalletButton = styled(Button)`
   justify-content: start;
   gap: 0.5rem;
 
@@ -111,12 +110,12 @@ Styled.WalletButton = styled(Button)`
   }
 `;
 
-Styled.Icon = styled(Icon)`
+const $Icon = styled(Icon)`
   width: 1.5em;
   height: 1.5em;
 `;
 
-Styled.Footer = styled.footer`
+const $Footer = styled.footer`
   ${layoutMixins.spacedRow}
   justify-content: center;
   margin-top: auto;

@@ -2,7 +2,7 @@ import { FormEvent, useEffect, useMemo, useState } from 'react';
 
 import { Item, Root } from '@radix-ui/react-radio-group';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
@@ -82,7 +82,7 @@ export const NewMarketSelectionStep = ({
   const initialDepositAmountDecimals = isMainnet ? 0 : chainTokenDecimals;
   const initialDepositAmount = initialDepositAmountBN.toFixed(initialDepositAmountDecimals);
 
-  const [tempLiquidityTier, setTempLiquidityTier] = useState<number>();
+  const [tempLiquidityTier, setTempLiquidityTier] = useState<string>();
 
   const alertMessage = useMemo(() => {
     if (nativeTokenBalance.lt(initialDepositAmountBN)) {
@@ -103,7 +103,7 @@ export const NewMarketSelectionStep = ({
 
   useEffect(() => {
     if (assetToAdd) {
-      setTempLiquidityTier(assetToAdd.params.liquidityTier);
+      setTempLiquidityTier('' + assetToAdd.params.liquidityTier);
       setLiquidityTier(assetToAdd.params.liquidityTier);
     }
   }, [assetToAdd]);
@@ -130,7 +130,7 @@ export const NewMarketSelectionStep = ({
   }, [potentialMarkets, marketIds]);
 
   return (
-    <Styled.Form
+    <$Form
       onSubmit={(e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         onConfirmMarket();
@@ -138,15 +138,15 @@ export const NewMarketSelectionStep = ({
     >
       <h2>
         {stringGetter({ key: STRING_KEYS.ADD_A_MARKET })}
-        <Styled.Balance>
+        <$Balance>
           {stringGetter({ key: STRING_KEYS.BALANCE })}:{' '}
           <Output
             type={OutputType.Number}
             value={nativeTokenBalance}
             fractionDigits={TOKEN_DECIMALS}
-            slotRight={<Styled.Tag>{chainTokenLabel}</Styled.Tag>}
+            slotRight={<$Tag>{chainTokenLabel}</$Tag>}
           />
-        </Styled.Balance>
+        </$Balance>
       </h2>
       <SearchSelectMenu
         items={[
@@ -170,9 +170,9 @@ export const NewMarketSelectionStep = ({
         label={stringGetter({ key: STRING_KEYS.MARKETS })}
       >
         {assetToAdd ? (
-          <Styled.SelectedAsset>
+          <$SelectedAsset>
             {assetToAdd.meta.assetName} <Tag>{assetToAdd.params.ticker}</Tag>
-          </Styled.SelectedAsset>
+          </$SelectedAsset>
         ) : (
           `${stringGetter({ key: STRING_KEYS.EG })} "BTC-USD"`
         )}
@@ -181,28 +181,28 @@ export const NewMarketSelectionStep = ({
         <>
           <div>{stringGetter({ key: STRING_KEYS.POPULATED_DETAILS })}</div>
           <div>
-            <Styled.Root value={tempLiquidityTier} onValueChange={setTempLiquidityTier}>
-              <Styled.Header>{stringGetter({ key: STRING_KEYS.LIQUIDITY_TIER })}</Styled.Header>
+            <$Root value={tempLiquidityTier} onValueChange={setTempLiquidityTier}>
+              <$Header>{stringGetter({ key: STRING_KEYS.LIQUIDITY_TIER })}</$Header>
 
               {Object.keys(liquidityTiers).map((tier) => {
                 const { maintenanceMarginFraction, impactNotional, label, initialMarginFraction } =
                   liquidityTiers[tier as unknown as keyof typeof liquidityTiers];
                 return (
-                  <Styled.LiquidityTierRadioButton
+                  <$LiquidityTierRadioButton
                     disabled
                     key={tier}
-                    value={Number(tier)}
-                    selected={Number(tier) === tempLiquidityTier}
+                    value={tier}
+                    selected={Number(tier) === Number(tempLiquidityTier)}
                   >
-                    <Styled.Header style={{ marginLeft: '1rem' }}>
+                    <$Header style={{ marginLeft: '1rem' }}>
                       {label}
                       {Number(tier) === assetToAdd?.params.liquidityTier && (
                         <Tag style={{ marginLeft: '0.5ch' }}>
                           ✨ {stringGetter({ key: STRING_KEYS.RECOMMENDED })}
                         </Tag>
                       )}
-                    </Styled.Header>
-                    <Styled.Details
+                    </$Header>
+                    <$Details
                       layout={isMobile ? 'grid' : 'rowColumns'}
                       withSeparators={!isMobile}
                       items={[
@@ -239,10 +239,10 @@ export const NewMarketSelectionStep = ({
                         },
                       ]}
                     />
-                  </Styled.LiquidityTierRadioButton>
+                  </$LiquidityTierRadioButton>
                 );
               })}
-            </Styled.Root>
+            </$Root>
           </div>
         </>
       )}
@@ -251,7 +251,7 @@ export const NewMarketSelectionStep = ({
       )}
       <WithReceipt
         slotReceipt={
-          <Styled.ReceiptDetails
+          <$ReceiptDetails
             items={[
               assetToAdd && {
                 key: 'reference-price',
@@ -269,7 +269,7 @@ export const NewMarketSelectionStep = ({
                 key: 'message-details',
                 label: stringGetter({ key: STRING_KEYS.MESSAGE_DETAILS }),
                 value: (
-                  <Styled.Button
+                  <$Button
                     action={ButtonAction.Navigation}
                     size={ButtonSize.Small}
                     onClick={() =>
@@ -282,7 +282,7 @@ export const NewMarketSelectionStep = ({
                     }
                   >
                     {stringGetter({ key: STRING_KEYS.VIEW_DETAILS })} →
-                  </Styled.Button>
+                  </$Button>
                 ),
               },
               {
@@ -294,12 +294,12 @@ export const NewMarketSelectionStep = ({
                   </span>
                 ),
                 value: (
-                  <Styled.Disclaimer>
+                  <$Disclaimer>
                     {stringGetter({
                       key: STRING_KEYS.OR_MORE,
                       params: {
                         NUMBER: (
-                          <Styled.Output
+                          <$Output
                             useGrouping
                             type={OutputType.Number}
                             value={initialDepositAmountBN}
@@ -308,7 +308,7 @@ export const NewMarketSelectionStep = ({
                         ),
                       },
                     })}
-                  </Styled.Disclaimer>
+                  </$Disclaimer>
                 ),
               },
             ].filter(isTruthy)}
@@ -327,13 +327,10 @@ export const NewMarketSelectionStep = ({
           </Button>
         )}
       </WithReceipt>
-    </Styled.Form>
+    </$Form>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Form = styled.form`
+const $Form = styled.form`
   ${formMixins.transfersForm}
   ${layoutMixins.stickyArea0}
   --stickyArea0-background: transparent;
@@ -347,7 +344,7 @@ Styled.Form = styled.form`
   }
 `;
 
-Styled.Balance = styled.span`
+const $Balance = styled.span`
   ${layoutMixins.inlineRow}
   font: var(--font-small-book);
   margin-top: 0.125rem;
@@ -357,20 +354,20 @@ Styled.Balance = styled.span`
   }
 `;
 
-Styled.Tag = styled(Tag)`
+const $Tag = styled(Tag)`
   margin-left: 0.5ch;
 `;
 
-Styled.SelectedAsset = styled.span`
+const $SelectedAsset = styled.span`
   color: var(--color-text-2);
 `;
 
-Styled.Disclaimer = styled.div`
+const $Disclaimer = styled.div`
   color: var(--color-text-0);
   margin-left: 0.5ch;
 `;
 
-Styled.Header = styled.div`
+const $Header = styled.div`
   display: flex;
   flex: 1;
   align-items: center;
@@ -379,7 +376,7 @@ Styled.Header = styled.div`
   justify-content: space-between;
 `;
 
-Styled.Root = styled(Root)`
+const $Root = styled(Root)`
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -387,9 +384,9 @@ Styled.Root = styled(Root)`
   border-radius: 10px;
   border: 1px solid var(--color-layer-6);
   background-color: var(--color-layer-4);
-`;
+` as typeof Root;
 
-Styled.LiquidityTierRadioButton = styled(Item)<{ selected?: boolean }>`
+const $LiquidityTierRadioButton = styled(Item)<{ selected?: boolean }>`
   display: flex;
   flex-direction: column;
   border-radius: 0.625rem;
@@ -404,7 +401,7 @@ Styled.LiquidityTierRadioButton = styled(Item)<{ selected?: boolean }>`
   ${({ selected }) => selected && 'background-color: var(--color-layer-2)'}
 `;
 
-Styled.Details = styled(Details)`
+const $Details = styled(Details)`
   margin-top: 0.5rem;
   padding: 0;
 
@@ -421,15 +418,15 @@ Styled.Details = styled(Details)`
   }
 `;
 
-Styled.ReceiptDetails = styled(Details)`
+const $ReceiptDetails = styled(Details)`
   padding: 0.375rem 0.75rem 0.25rem;
 `;
 
-Styled.Output = styled(Output)`
+const $Output = styled(Output)`
   display: inline-block;
 `;
 
-Styled.Button = styled(Button)`
+const $Button = styled(Button)`
   --button-padding: 0;
   --button-height: auto;
 `;

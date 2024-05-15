@@ -47,16 +47,16 @@ export const MnemonicExportDialog = ({ setIsOpen }: ElementProps) => {
   const content = {
     [MnemonicExportStep.AcknowledgeRisk]: (
       <>
-        <Styled.WaitingSpan>
-          <Styled.CautionIconContainer>
+        <$WaitingSpan>
+          <$CautionIconContainer>
             <Icon iconName={IconName.CautionCircleStroked} />
-          </Styled.CautionIconContainer>
+          </$CautionIconContainer>
 
           <p>{stringGetter({ key: STRING_KEYS.SECRET_PHRASE_RISK })}</p>
-        </Styled.WaitingSpan>
-        <Styled.WithReceipt
+        </$WaitingSpan>
+        <$WithReceipt
           slotReceipt={
-            <Styled.CheckboxContainer>
+            <$CheckboxContainer>
               <Checkbox
                 checked={hasAcknowledged}
                 onCheckedChange={setHasAcknowledged}
@@ -65,7 +65,7 @@ export const MnemonicExportDialog = ({ setIsOpen }: ElementProps) => {
                   key: STRING_KEYS.SECRET_PHRASE_RISK_ACK,
                 })}
               />
-            </Styled.CheckboxContainer>
+            </$CheckboxContainer>
           }
         >
           <TimeoutButton
@@ -76,15 +76,15 @@ export const MnemonicExportDialog = ({ setIsOpen }: ElementProps) => {
           >
             {stringGetter({ key: STRING_KEYS.REVEAL_SECRET_PHRASE })}
           </TimeoutButton>
-        </Styled.WithReceipt>
+        </$WithReceipt>
       </>
     ),
     [MnemonicExportStep.DisplayMnemonic]: (
       <>
-        <Styled.AlertMessage type={AlertType.Error}>
+        <$AlertMessage type={AlertType.Error}>
           {stringGetter({ key: STRING_KEYS.NEVER_SHARE_PHRASE })}
-        </Styled.AlertMessage>
-        <Styled.RevealControls>
+        </$AlertMessage>
+        <$RevealControls>
           <span>
             {stringGetter({ key: isShowing ? STRING_KEYS.NOT_READY : STRING_KEYS.READY })}
           </span>
@@ -98,19 +98,19 @@ export const MnemonicExportDialog = ({ setIsOpen }: ElementProps) => {
               key: !isShowing ? STRING_KEYS.SHOW_PHRASE : STRING_KEYS.HIDE_PHRASE,
             })}
           </ToggleButton>
-        </Styled.RevealControls>
+        </$RevealControls>
         <WithReceipt
           slotReceipt={
-            <Styled.WordList isShowing={isShowing} onClick={() => setIsShowing(!isShowing)}>
-              <Styled.List>
+            <$WordList isShowing={isShowing} onClick={() => setIsShowing(!isShowing)}>
+              <$List>
                 {mnemonic?.split(' ').map((word: string, i: number) => (
-                  <Styled.Word key={i}>
+                  <$Word key={i}>
                     <span>{isShowing ? word : '*****'}</span>
-                  </Styled.Word>
+                  </$Word>
                 ))}
-              </Styled.List>
+              </$List>
               <span>{stringGetter({ key: STRING_KEYS.CLICK_TO_SHOW })}</span>
-            </Styled.WordList>
+            </$WordList>
           }
         >
           <CopyButton value={mnemonic} />
@@ -120,26 +120,23 @@ export const MnemonicExportDialog = ({ setIsOpen }: ElementProps) => {
   }[currentStep];
 
   return (
-    <Styled.Dialog
+    <$Dialog
       isOpen
       setIsOpen={setIsOpen}
       title={title}
       description={stringGetter({ key: STRING_KEYS.REVEAL_SECRET_PHRASE_DESCRIPTION })}
     >
-      <Styled.Content>{content}</Styled.Content>
-    </Styled.Dialog>
+      <$Content>{content}</$Content>
+    </$Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.WaitingSpan = styled.span`
+const $WaitingSpan = styled.span`
   ${layoutMixins.row}
   gap: 1rem;
   color: var(--color-text-1);
 `;
 
-Styled.CautionIconContainer = styled.div`
+const $CautionIconContainer = styled.div`
   ${layoutMixins.stack}
   min-width: 2.5rem;
   height: 2.5rem;
@@ -162,21 +159,21 @@ Styled.CautionIconContainer = styled.div`
   }
 `;
 
-Styled.WithReceipt = styled(WithReceipt)`
+const $WithReceipt = styled(WithReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
-Styled.CheckboxContainer = styled.div`
+const $CheckboxContainer = styled.div`
   padding: 1rem;
   color: var(--color-text-0);
 `;
 
-Styled.AlertMessage = styled(AlertMessage)`
+const $AlertMessage = styled(AlertMessage)`
   font: var(--font-base-book);
   margin: 0;
 `;
 
-Styled.RevealControls = styled.div`
+const $RevealControls = styled.div`
   ${layoutMixins.spacedRow}
 
   svg {
@@ -184,7 +181,7 @@ Styled.RevealControls = styled.div`
   }
 `;
 
-Styled.WordList = styled.div<{ isShowing?: boolean }>`
+const $WordList = styled.div<{ isShowing?: boolean }>`
   ${layoutMixins.stack}
   transition: 0.2s;
   cursor: pointer;
@@ -218,7 +215,7 @@ Styled.WordList = styled.div<{ isShowing?: boolean }>`
   }
 `;
 
-Styled.List = styled.ol`
+const $List = styled.ol`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 0.25rem;
@@ -226,7 +223,7 @@ Styled.List = styled.ol`
   counter-reset: word;
 `;
 
-Styled.Word = styled.li`
+const $Word = styled.li`
   font: var(--font-base-book);
   font-family: var(--fontFamily-monospace);
 
@@ -244,13 +241,13 @@ Styled.Word = styled.li`
   }
 `;
 
-Styled.Dialog = styled(Dialog)`
+const $Dialog = styled(Dialog)`
   @media ${breakpoints.notMobile} {
     --dialog-width: 30rem;
   }
 `;
 
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
 `;
