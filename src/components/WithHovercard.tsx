@@ -51,25 +51,16 @@ export const WithHovercard = ({
     <Root openDelay={300}>
       {slotTrigger && <Trigger asChild>{slotTrigger}</Trigger>}
       <Portal>
-        <Styled.Content
-          className={className}
-          align={align}
-          alignOffset={-16}
-          side={side}
-          sideOffset={8}
-        >
-          {hovercardTitle && <Styled.Title>{hovercardTitle}</Styled.Title>}
+        <$Content className={className} align={align} alignOffset={-16} side={side} sideOffset={8}>
+          {hovercardTitle && <$Title>{hovercardTitle}</$Title>}
           {hovercardBody && <p>{hovercardBody}</p>}
           {slotButton}
-        </Styled.Content>
+        </$Content>
       </Portal>
     </Root>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Content = styled(Content)`
+const $Content = styled(Content)`
   ${popoverMixins.popover}
   --popover-backgroundColor: var(--color-layer-6);
 
@@ -85,7 +76,7 @@ Styled.Content = styled(Content)`
   border-radius: 0.33rem;
 `;
 
-Styled.Title = styled.h3`
+const $Title = styled.h3`
   font: var(--font-small-bold);
   color: var(--color-text-2);
 `;

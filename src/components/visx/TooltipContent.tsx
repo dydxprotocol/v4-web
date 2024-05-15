@@ -11,12 +11,9 @@ type StyleProps = {
 };
 
 export const TooltipContent = ({ children, accentColor }: ElementProps & StyleProps) => (
-  <Styled.TooltipContent accentColor={accentColor}>{children}</Styled.TooltipContent>
+  <$TooltipContent accentColor={accentColor}>{children}</$TooltipContent>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TooltipContent = styled.aside<{ accentColor?: string }>`
+const $TooltipContent = styled.aside<{ accentColor?: string }>`
   --accent-color: currentColor;
 
   ${({ accentColor }) =>

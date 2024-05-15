@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { type SubaccountOrder } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';
@@ -70,7 +70,7 @@ export const PositionsActionsCell = ({
       {isSlTpEnabled &&
         !testFlags.isolatedMargin &&
         complianceState === ComplianceStates.FULL_ACCESS && (
-          <Styled.TriggersButton
+          <$TriggersButton
             key="edittriggers"
             onClick={() =>
               dispatch(
@@ -88,11 +88,11 @@ export const PositionsActionsCell = ({
             }
             iconName={IconName.Pencil}
             shape={ButtonShape.Square}
-            isDisabled={isDisabled}
+            disabled={isDisabled}
           />
         )}
       {showClosePositionAction && (
-        <Styled.CloseButtonToggle
+        <$CloseButtonToggle
           key="closepositions"
           isToggle={true}
           isPressed={
@@ -101,22 +101,19 @@ export const PositionsActionsCell = ({
           onPressedChange={onCloseButtonToggle}
           iconName={IconName.Close}
           shape={ButtonShape.Square}
-          isDisabled={isDisabled}
+          disabled={isDisabled}
         />
       )}
     </ActionsTableCell>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TriggersButton = styled(IconButton)`
+const $TriggersButton = styled(IconButton)`
   --button-icon-size: 1.33em;
   --button-textColor: var(--color-text-0);
   --button-hover-textColor: var(--color-text-1);
 `;
 
-Styled.CloseButtonToggle = styled(IconButton)`
+const $CloseButtonToggle = styled(IconButton)`
   --button-icon-size: 1em;
   --button-hover-textColor: var(--color-red);
   --button-toggle-on-textColor: var(--color-red);

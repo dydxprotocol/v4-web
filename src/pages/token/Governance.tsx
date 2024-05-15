@@ -18,26 +18,23 @@ export default () => {
 
   return (
     <DetachedSection>
-      <Styled.HeaderSection>
+      <$HeaderSection>
         <ContentSectionHeader
           title={stringGetter({ key: STRING_KEYS.GOVERNANCE })}
           subtitle={stringGetter({ key: STRING_KEYS.GOVERNANCE_PAGE_SUBTITLE })}
         />
-      </Styled.HeaderSection>
+      </$HeaderSection>
 
-      <Styled.ContentWrapper>
-        <Styled.Row>
+      <$ContentWrapper>
+        <$Row>
           <GovernancePanel />
           <NewMarketsPanel />
-        </Styled.Row>
-      </Styled.ContentWrapper>
+        </$Row>
+      </$ContentWrapper>
     </DetachedSection>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.HeaderSection = styled.section`
+const $HeaderSection = styled.section`
   ${layoutMixins.contentSectionDetached}
 
   @media ${breakpoints.tablet} {
@@ -48,14 +45,14 @@ Styled.HeaderSection = styled.section`
   }
 `;
 
-Styled.ContentWrapper = styled.div`
+const $ContentWrapper = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1.5rem;
   max-width: 80rem;
   padding: 0 1rem;
 `;
 
-Styled.Row = styled.div`
+const $Row = styled.div`
   gap: 1rem;
   display: grid;
   grid-template-columns: repeat(3, 1fr);

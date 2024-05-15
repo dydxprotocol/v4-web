@@ -13,21 +13,18 @@ export const OrderSizeSliderStory: Story<Parameters<typeof OrderSizeSlider>[0]> 
 
   return (
     <StoryWrapper>
-      <Styled.Container>
+      <$Container>
         <OrderSizeSlider
           setAbacusSize={() => null}
           setOrderSizeInput={setSize}
           size={size}
           positionSize={100}
         />
-      </Styled.Container>
+      </$Container>
     </StoryWrapper>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.div`
+const $Container = styled.div`
   height: 4.625rem;
   margin: auto;
   position: relative;

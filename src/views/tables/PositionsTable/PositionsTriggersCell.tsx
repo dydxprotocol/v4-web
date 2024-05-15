@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import {
   AbacusPositionSide,
@@ -89,10 +89,14 @@ export const PositionsTriggersCell = ({
   };
 
   const viewOrdersButton = (
-    <Styled.Button action={ButtonAction.Navigation} size={ButtonSize.XSmall} onClick={onViewOrders}>
+    <$Button
+      action={ButtonAction.Navigation}
+      size={ButtonSize.XSmall}
+      onClick={onViewOrders ?? undefined}
+    >
       {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
-      {<Styled.ArrowIcon iconName={IconName.Arrow} />}
-    </Styled.Button>
+      {<$ArrowIcon iconName={IconName.Arrow} />}
+    </$Button>
   );
 
   const renderOutput = ({ label, orders }: { label: string; orders: SubaccountOrder[] }) => {
@@ -102,9 +106,9 @@ export const PositionsTriggersCell = ({
       liquidationWarningSide?: Nullable<AbacusPositionSides>;
     } = {}) => {
       const styledLabel = (
-        <Styled.Label warning={liquidationWarningSide} hasOrders={orders.length > 0}>
+        <$Label warning={liquidationWarningSide != null} hasOrders={orders.length > 0}>
           {label}
-        </Styled.Label>
+        </$Label>
       );
       return liquidationWarningSide ? (
         <WithHovercard
@@ -134,7 +138,7 @@ export const PositionsTriggersCell = ({
     if (orders.length === 0) {
       return (
         <>
-          {triggerLabel()} <Styled.Output type={OutputType.Fiat} value={null} />
+          {triggerLabel()} <$Output type={OutputType.Fiat} value={null} />
         </>
       );
     }
@@ -149,9 +153,9 @@ export const PositionsTriggersCell = ({
       return (
         <>
           {triggerLabel({ liquidationWarningSide })}
-          <Styled.Output
+          <$Output
             type={OutputType.Fiat}
-            value={triggerPrice}
+            value={triggerPrice ?? null}
             fractionDigits={tickSizeDecimals}
           />
           {isPartialPosition && (
@@ -177,9 +181,9 @@ export const PositionsTriggersCell = ({
                 </Button>
               }
               slotTrigger={
-                <Styled.PartialFillIcon>
+                <$PartialFillIcon>
                   <Icon iconName={IconName.PositionPartial} />
-                </Styled.PartialFillIcon>
+                </$PartialFillIcon>
               }
             />
           )}
@@ -196,14 +200,14 @@ export const PositionsTriggersCell = ({
   };
 
   return (
-    <Styled.TableCell
+    <$TableCell
       stacked
       stackedWithSecondaryStyling={false}
       slotRight={
         !isDisabled &&
         testFlags.isolatedMargin &&
         complianceState === ComplianceStates.FULL_ACCESS && (
-          <Styled.EditButton
+          <$EditButton
             key="edit-margin"
             iconName={IconName.Pencil}
             shape={ButtonShape.Square}
@@ -212,21 +216,18 @@ export const PositionsTriggersCell = ({
         )
       }
     >
-      <Styled.Row>{renderOutput({ label: 'TP', orders: takeProfitOrders })}</Styled.Row>
-      <Styled.Row>{renderOutput({ label: 'SL', orders: stopLossOrders })}</Styled.Row>
-    </Styled.TableCell>
+      <$Row>{renderOutput({ label: 'TP', orders: takeProfitOrders })}</$Row>
+      <$Row>{renderOutput({ label: 'SL', orders: stopLossOrders })}</$Row>
+    </$TableCell>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Row = styled.span`
+const $Row = styled.span`
   ${layoutMixins.inlineRow}
 
   --item-height: 1.25rem;
 `;
 
-Styled.Label = styled.div<{ warning?: boolean; hasOrders: boolean }>`
+const $Label = styled.div<{ warning?: boolean; hasOrders: boolean }>`
   align-items: center;
   border: solid var(--border-width) var(--color-border);
   border-radius: 0.5em;
@@ -253,7 +254,7 @@ Styled.Label = styled.div<{ warning?: boolean; hasOrders: boolean }>`
         `}
 `;
 
-Styled.Output = styled(Output)<{ value?: number }>`
+const $Output = styled(Output)<{ value: number | null }>`
   font: var(--font-mini-medium);
   ${({ value }) =>
     value
@@ -265,17 +266,17 @@ Styled.Output = styled(Output)<{ value?: number }>`
         `}
 `;
 
-Styled.Button = styled(Button)`
+const $Button = styled(Button)`
   --button-height: var(--item-height);
   --button-padding: 0;
   --button-textColor: var(--color-text-1);
 `;
 
-Styled.ArrowIcon = styled(Icon)`
+const $ArrowIcon = styled(Icon)`
   stroke-width: 2;
 `;
 
-Styled.PartialFillIcon = styled.span`
+const $PartialFillIcon = styled.span`
   svg {
     display: block;
 
@@ -284,7 +285,7 @@ Styled.PartialFillIcon = styled.span`
   }
 `;
 
-Styled.EditButton = styled(IconButton)`
+const $EditButton = styled(IconButton)`
   --button-icon-size: 1.5em;
   --button-padding: 0;
   --button-textColor: var(--color-text-0);
@@ -293,6 +294,6 @@ Styled.EditButton = styled(IconButton)`
   margin-left: 0.5rem;
 `;
 
-Styled.TableCell = styled(TableCell)`
+const $TableCell = styled(TableCell)`
   justify-content: space-between;
 `;

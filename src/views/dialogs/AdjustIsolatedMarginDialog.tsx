@@ -31,16 +31,13 @@ export const AdjustIsolatedMarginDialog = ({ positionId, setIsOpen }: ElementPro
       slotIcon={subaccountPosition && <AssetIcon symbol={subaccountPosition.assetId} />}
       title={stringGetter({ key: STRING_KEYS.ADJUST_ISOLATED_MARGIN })}
     >
-      <Styled.Content>
+      <$Content>
         <AdjustIsolatedMarginForm marketId={positionId} />
-      </Styled.Content>
+      </$Content>
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
 `;

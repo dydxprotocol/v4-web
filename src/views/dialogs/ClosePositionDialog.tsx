@@ -53,31 +53,29 @@ export const ClosePositionDialog = ({ setIsOpen }: ElementProps) => {
     },
     [MobilePlaceOrderSteps.PreviewOrder]: {
       title: (
-        <Styled.PreviewTitle>
-          {stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_TITLE })}
-        </Styled.PreviewTitle>
+        <$PreviewTitle>{stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_TITLE })}</$PreviewTitle>
       ),
       description: stringGetter({ key: STRING_KEYS.PREVIEW_ORDER_DESCRIPTION }),
     },
     [MobilePlaceOrderSteps.PlacingOrder]: {
       title: stringGetter({ key: STRING_KEYS.PLACING_ORDER_TITLE }),
       description: stringGetter({ key: STRING_KEYS.PLACING_ORDER_DESCRIPTION }),
-      slotIcon: <Styled.Ring withAnimation value={0.25} />,
+      slotIcon: <$Ring withAnimation value={0.25} />,
     },
     [MobilePlaceOrderSteps.PlaceOrderFailed]: {
       title: stringGetter({ key: STRING_KEYS.PLACE_ORDER_FAILED }),
       description: stringGetter({ key: STRING_KEYS.PLACE_ORDER_FAILED_DESCRIPTION }),
-      slotIcon: <Styled.WarningIcon iconName={IconName.Warning} />,
+      slotIcon: <$WarningIcon iconName={IconName.Warning} />,
     },
     [MobilePlaceOrderSteps.Confirmation]: {
       title: stringGetter({ key: STRING_KEYS.CONFIRMED_TITLE }),
       description: stringGetter({ key: STRING_KEYS.CONFIRMED_DESCRIPTION }),
-      slotIcon: <Styled.GreenCheckCircle />,
+      slotIcon: <$GreenCheckCircle />,
     },
   };
 
   return (
-    <Styled.Dialog
+    <$Dialog
       isOpen={isTablet}
       setIsOpen={(isOpen: boolean) => {
         setIsOpen?.(isOpen);
@@ -92,7 +90,7 @@ export const ClosePositionDialog = ({ setIsOpen }: ElementProps) => {
       currentStep={currentStep}
     >
       <ClosePositionForm currentStep={currentStep} setCurrentStep={setCurrentStep} />
-    </Styled.Dialog>
+    </$Dialog>
   );
 };
 
@@ -102,26 +100,23 @@ const CloseOrderHeader = () => {
     useSelector(getCurrentMarketData, shallowEqual) ?? {};
 
   return (
-    <Styled.CloseOrderHeader>
+    <$CloseOrderHeader>
       <h2>{stringGetter({ key: STRING_KEYS.CLOSE })}</h2>
-      <Styled.Right>
-        <Styled.MarketDetails>
+      <$Right>
+        <$MarketDetails>
           <MidMarketPrice />
-          <Styled.PriceChange
+          <$PriceChange
             type={OutputType.Percent}
             value={MustBigNumber(priceChange24HPercent).abs()}
             isNegative={MustBigNumber(priceChange24H).isNegative()}
           />
-        </Styled.MarketDetails>
-        <Styled.VerticalSeparator />
-      </Styled.Right>
-    </Styled.CloseOrderHeader>
+        </$MarketDetails>
+        <$VerticalSeparator />
+      </$Right>
+    </$CloseOrderHeader>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
+const $Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
   --dialog-backgroundColor: var(--color-layer-2);
   --dialog-header-height: 1rem;
   --dialog-content-paddingTop: 1.5rem;
@@ -137,47 +132,47 @@ Styled.Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
     `}
 `;
 
-Styled.Ring = styled(Ring)`
+const $Ring = styled(Ring)`
   --ring-color: var(--color-accent);
 `;
 
-Styled.GreenCheckCircle = styled(GreenCheckCircle)`
+const $GreenCheckCircle = styled(GreenCheckCircle)`
   --icon-size: 2rem;
 `;
 
-Styled.CloseOrderHeader = styled.div`
+const $CloseOrderHeader = styled.div`
   ${layoutMixins.spacedRow}
 `;
 
-Styled.Right = styled.div`
+const $Right = styled.div`
   ${layoutMixins.inlineRow}
   gap: 1rem;
   margin-right: 0.5rem;
 `;
 
-Styled.MarketDetails = styled.div`
+const $MarketDetails = styled.div`
   ${layoutMixins.rowColumn}
   justify-items: flex-end;
   font: var(--font-medium-medium);
 `;
 
-Styled.PriceChange = styled(Output)<{ isNegative?: boolean }>`
+const $PriceChange = styled(Output)<{ isNegative?: boolean }>`
   font: var(--font-base-book);
   color: ${({ isNegative }) => (isNegative ? `var(--color-negative)` : `var(--color-positive)`)};
 `;
 
-Styled.VerticalSeparator = styled(VerticalSeparator)`
+const $VerticalSeparator = styled(VerticalSeparator)`
   && {
     height: 3rem;
   }
 `;
 
-Styled.PreviewTitle = styled.div`
+const $PreviewTitle = styled.div`
   ${layoutMixins.inlineRow}
   height: var(--dialog-icon-size);
 `;
 
-Styled.WarningIcon = styled(Icon)`
+const $WarningIcon = styled(Icon)`
   color: var(--color-warning);
   font-size: 1.5rem;
 `;

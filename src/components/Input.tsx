@@ -2,7 +2,7 @@ import { Dispatch, forwardRef, SetStateAction } from 'react';
 
 import { NumericFormat, type NumberFormatValues, type SourceInfo } from 'react-number-format';
 import type { SyntheticInputEvent } from 'react-number-format/types/types';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import {
   LEVERAGE_DECIMALS,
@@ -32,6 +32,7 @@ type ElementProps = {
   type?: InputType;
   value?: string | number | null;
   disabled?: boolean;
+  autoFocus?: boolean;
   id?: string;
   onBlur?: () => void;
   onFocus?: () => void;
@@ -122,29 +123,29 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         : '';
 
     return (
-      <Styled.InputContainer className={className}>
+      <$InputContainer className={className}>
         {type === InputType.Text || type === InputType.Search ? (
-          <Styled.Input
+          <$Input
             // React
-            ref={ref as React.Ref<HTMLInputElement>}
+            ref={ref}
             id={id}
             // Events
             onBlur={onBlur}
-            onChange={onChange}
+            onChange={onChange as any} // TODO fix types
             onFocus={onFocus}
-            onInput={onInput}
+            onInput={onInput as any} // TODO fix type
             // Native
             disabled={disabled}
             placeholder={placeholder}
-            value={value}
+            value={value ?? undefined}
             // Other
             data-1p-ignore // prevent 1Password fill
             {...otherProps}
           />
         ) : (
-          <Styled.NumericFormat
+          <$NumericFormat
             // React
-            ref={ref as React.Ref<typeof NumericFormat<unknown>>}
+            getInputRef={ref}
             id={id}
             // NumericFormat
             valueIsNumericString
@@ -158,7 +159,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             suffix={numberFormatConfig?.suffix}
             // Events
             onBlur={onBlur}
-            onValueChange={onChange}
+            onValueChange={onChange as any} // TODO fix types
             onFocus={onFocus}
             onInput={(e: SyntheticInputEvent) => {
               if (!onInput) return;
@@ -183,14 +184,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {...otherProps}
           />
         )}
-      </Styled.InputContainer>
+      </$InputContainer>
     );
   }
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.InputContainer = styled.div`
+const $InputContainer = styled.div`
   width: 100%;
   min-height: 100%;
   height: 100%;
@@ -230,11 +228,11 @@ const InputStyle = css`
   }
 `;
 
-Styled.NumericFormat = styled(NumericFormat)`
+const $NumericFormat = styled(NumericFormat)`
   ${InputStyle}
   font-feature-settings: var(--fontFeature-monoNumbers);
 `;
 
-Styled.Input = styled.input`
+const $Input = styled.input`
   ${InputStyle}
 `;

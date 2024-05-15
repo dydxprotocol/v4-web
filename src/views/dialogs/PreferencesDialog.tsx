@@ -137,7 +137,7 @@ export const PreferencesDialog = ({ setIsOpen }: ElementProps) => {
   const preferenceItems = usePreferenceMenu();
 
   return (
-    <Styled.ComboboxDialogMenu
+    <$ComboboxDialogMenu
       isOpen
       title={stringGetter({ key: STRING_KEYS.PREFERENCES })}
       items={preferenceItems}
@@ -145,9 +145,6 @@ export const PreferencesDialog = ({ setIsOpen }: ElementProps) => {
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ComboboxDialogMenu = styled(ComboboxDialogMenu)`
+const $ComboboxDialogMenu = styled(ComboboxDialogMenu)`
   --dialog-content-paddingBottom: 0.5rem;
 `;

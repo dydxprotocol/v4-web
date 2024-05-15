@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
@@ -66,17 +66,17 @@ export const AdvancedTradeOptions = () => {
   }, [complianceState]);
 
   return (
-    <Styled.Collapsible
+    <$Collapsible
       defaultOpen={!isTablet}
       label={stringGetter({ key: STRING_KEYS.ADVANCED })}
       triggerIconSide="right"
       fullWidth
     >
-      <Styled.AdvancedInputsContainer>
+      <$AdvancedInputsContainer>
         {(hasTimeInForce || needsGoodUntil) && (
-          <Styled.AdvancedInputsRow>
-            {hasTimeInForce && (
-              <Styled.SelectMenu
+          <$AdvancedInputsRow>
+            {hasTimeInForce && timeInForce != null && (
+              <$SelectMenu
                 value={timeInForce}
                 onValueChange={(selectedTimeInForceOption: string) =>
                   abacusStateManager.setTradeValue({
@@ -87,16 +87,16 @@ export const AdvancedTradeOptions = () => {
                 label={stringGetter({ key: STRING_KEYS.TIME_IN_FORCE })}
               >
                 {timeInForceOptions.toArray().map(({ type, stringKey }) => (
-                  <Styled.SelectItem
+                  <$SelectItem
                     key={type}
                     value={type}
                     label={stringGetter({ key: stringKey as StringKey })}
                   />
                 ))}
-              </Styled.SelectMenu>
+              </$SelectMenu>
             )}
             {needsGoodUntil && (
-              <Styled.FormInput
+              <$FormInput
                 id="trade-good-til-time"
                 type={InputType.Number}
                 decimals={INTEGER_DECIMALS}
@@ -111,34 +111,36 @@ export const AdvancedTradeOptions = () => {
                 }}
                 value={duration ?? ''}
                 slotRight={
-                  <Styled.InnerSelectMenu
-                    value={unit}
-                    onValueChange={(goodTilTimeTimescale: string) => {
-                      abacusStateManager.setTradeValue({
-                        value: goodTilTimeTimescale,
-                        field: TradeInputField.goodTilUnit,
-                      });
-                    }}
-                  >
-                    {Object.values(TimeUnitShort).map((goodTilTimeTimescale: TimeUnitShort) => (
-                      <Styled.InnerSelectItem
-                        key={goodTilTimeTimescale}
-                        value={goodTilTimeTimescale}
-                        label={stringGetter({
-                          key: GOOD_TIL_TIME_TIMESCALE_STRINGS[goodTilTimeTimescale],
-                        })}
-                      />
-                    ))}
-                  </Styled.InnerSelectMenu>
+                  unit != null && (
+                    <$InnerSelectMenu
+                      value={unit}
+                      onValueChange={(goodTilTimeTimescale: string) => {
+                        abacusStateManager.setTradeValue({
+                          value: goodTilTimeTimescale,
+                          field: TradeInputField.goodTilUnit,
+                        });
+                      }}
+                    >
+                      {Object.values(TimeUnitShort).map((goodTilTimeTimescale: TimeUnitShort) => (
+                        <$InnerSelectItem
+                          key={goodTilTimeTimescale}
+                          value={goodTilTimeTimescale}
+                          label={stringGetter({
+                            key: GOOD_TIL_TIME_TIMESCALE_STRINGS[goodTilTimeTimescale],
+                          })}
+                        />
+                      ))}
+                    </$InnerSelectMenu>
+                  )
                 }
               />
             )}
-          </Styled.AdvancedInputsRow>
+          </$AdvancedInputsRow>
         )}
         {needsExecution && (
           <>
-            {executionOptions && (
-              <Styled.SelectMenu
+            {executionOptions && execution != null && (
+              <$SelectMenu
                 value={execution}
                 label={stringGetter({ key: STRING_KEYS.EXECUTION })}
                 onValueChange={(selectedTimeInForceOption: string) =>
@@ -149,13 +151,13 @@ export const AdvancedTradeOptions = () => {
                 }
               >
                 {executionOptions.toArray().map(({ type, stringKey }) => (
-                  <Styled.SelectItem
+                  <$SelectItem
                     key={type}
                     value={type}
                     label={stringGetter({ key: stringKey as StringKey })}
                   />
                 ))}
-              </Styled.SelectMenu>
+              </$SelectMenu>
             )}
             {showReduceOnly && (
               <Checkbox
@@ -213,14 +215,11 @@ export const AdvancedTradeOptions = () => {
             )}
           </>
         )}
-      </Styled.AdvancedInputsContainer>
-    </Styled.Collapsible>
+      </$AdvancedInputsContainer>
+    </$Collapsible>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Collapsible = styled(Collapsible)`
+const $Collapsible = styled(Collapsible)`
   --trigger-backgroundColor: transparent;
   --trigger-open-backgroundColor: transparent;
   --trigger-textColor: var(--color-text-0);
@@ -233,34 +232,34 @@ Styled.Collapsible = styled(Collapsible)`
   margin: -0.5rem 0;
 `;
 
-Styled.AdvancedInputsContainer = styled.div`
+const $AdvancedInputsContainer = styled.div`
   display: grid;
   gap: var(--form-input-gap);
 `;
 
-Styled.SelectMenu = styled(SelectMenu)`
+const $SelectMenu = styled(SelectMenu)`
   ${formMixins.inputSelectMenu}
 `;
 
-Styled.InnerSelectMenu = styled(SelectMenu)`
+const $InnerSelectMenu = styled(SelectMenu)`
   ${formMixins.inputInnerSelectMenu}
   --select-menu-trigger-maxWidth: 4rem;
-`;
+` as typeof SelectMenu;
 
-Styled.SelectItem = styled(SelectItem)`
+const $SelectItem = styled(SelectItem)`
   ${formMixins.inputSelectMenuItem}
-`;
+` as typeof SelectItem;
 
-Styled.InnerSelectItem = styled(SelectItem)`
+const $InnerSelectItem = styled(SelectItem)`
   ${formMixins.inputInnerSelectMenuItem}
 `;
 
-Styled.AdvancedInputsRow = styled.div`
+const $AdvancedInputsRow = styled.div`
   ${layoutMixins.gridEqualColumns}
   gap: var(--form-input-gap);
 `;
 
-Styled.FormInput = styled(FormInput)`
+const $FormInput = styled(FormInput)`
   input {
     margin-right: 4rem;
   }

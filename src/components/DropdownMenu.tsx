@@ -1,7 +1,7 @@
 import { Fragment, forwardRef, type Ref } from 'react';
 
 import { Content, Item, Portal, Root, Separator, Trigger } from '@radix-ui/react-dropdown-menu';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { popoverMixins } from '@/styles/popoverMixins';
 
@@ -42,61 +42,60 @@ export const DropdownMenu = forwardRef(
       side = 'bottom',
       sideOffset = 8,
     }: DropdownMenuProps<T>,
-    ref: Ref<T>
+    ref: Ref<HTMLButtonElement>
   ) => {
     return (
       <Root>
-        <Styled.Trigger ref={ref} className={className}>
+        <$Trigger ref={ref} className={className}>
           {children}
-          <Styled.DropdownIcon aria-hidden="true">
+          <$DropdownIcon aria-hidden="true">
             <Icon iconName={IconName.Triangle} aria-hidden="true" />
-          </Styled.DropdownIcon>
-        </Styled.Trigger>
+          </$DropdownIcon>
+        </$Trigger>
         <Portal>
-          <Styled.Content className={className} align={align} side={side} sideOffset={sideOffset}>
+          <$Content className={className} align={align} side={side} sideOffset={sideOffset}>
             {slotTopContent}
             {items.map((item: DropdownMenuItem<T>) => (
               <Fragment key={item.value}>
-                <Styled.Item
+                <$Item
                   disabled={!item.onSelect}
                   $highlightColor={item.highlightColor}
                   onSelect={item?.onSelect}
                 >
                   {item.icon}
                   {item.label}
-                </Styled.Item>
-                {item.separator && <Styled.Separator />}
+                </$Item>
+                {item.separator && <$Separator />}
               </Fragment>
             ))}
-          </Styled.Content>
+          </$Content>
         </Portal>
       </Root>
     );
   }
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Separator = styled(Separator)`
+const $Separator = styled(Separator)`
   border-bottom: solid var(--border-width) var(--color-border);
   margin: 0.25rem 1rem;
 `;
 
-Styled.Item = styled(Item)<{ $highlightColor: 'accent' | 'create' | 'destroy' }>`
+const $Item = styled(Item)<{ $highlightColor?: 'accent' | 'create' | 'destroy' }>`
   ${popoverMixins.item}
   --item-font-size: var(--dropdownMenu-item-font-size);
   ${({ $highlightColor }) =>
-    ({
-      ['accent']: `
+    $highlightColor != null
+      ? {
+          ['accent']: `
         --item-highlighted-textColor: var(--color-accent);
       `,
-      ['create']: `
+          ['create']: `
         --item-highlighted-textColor: var(--color-green);
       `,
-      ['destroy']: `
+          ['destroy']: `
         --item-highlighted-textColor: var(--color-red);
       `,
-    }[$highlightColor])}
+        }[$highlightColor]
+      : undefined}
 
   justify-content: start;
   color: var(--color-text-0);
@@ -106,23 +105,23 @@ Styled.Item = styled(Item)<{ $highlightColor: 'accent' | 'create' | 'destroy' }>
   }
 `;
 
-Styled.Trigger = styled(Trigger)`
+const $Trigger = styled(Trigger)`
   ${popoverMixins.trigger}
   ${popoverMixins.backdropOverlay}
 `;
 
-Styled.DropdownIcon = styled.span`
+const $DropdownIcon = styled.span`
   display: inline-flex;
   font-size: 0.375em;
   transition: transform 0.3s var(--ease-out-expo);
   align-items: center;
 
-  ${Styled.Trigger}[data-state='open'] & {
+  ${$Trigger}[data-state='open'] & {
     transform: scaleY(-1);
   }
 `;
 
-Styled.Content = styled(Content)`
+const $Content = styled(Content)`
   --dropdownMenu-item-font-size: inherit;
 
   ${popoverMixins.popover}

@@ -10,15 +10,12 @@ import { StoryWrapper } from '.ladle/components';
 
 export const SearchInputStory: Story<Parameters<typeof SearchInput>[0]> = (args) => (
   <StoryWrapper>
-    <Styled.Container>
+    <$Container>
       <SearchInput placeholder="Search something..." type={InputType.Search} />
-    </Styled.Container>
+    </$Container>
   </StoryWrapper>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.section`
+const $Container = styled.section`
   background: var(--color-layer-3);
 
   ${layoutMixins.container}

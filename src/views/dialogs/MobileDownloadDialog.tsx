@@ -43,9 +43,9 @@ export const getMobileAppUrl = () => {
 
 const MobileQrCode = ({ url }: { url: string }) => {
   return (
-    <Styled.QrCodeContainer isShowing={true}>
+    <$QrCodeContainer isShowing={true}>
       <QrCode hasLogo size={432} value={url} />
-    </Styled.QrCodeContainer>
+    </$QrCodeContainer>
   );
 };
 
@@ -63,14 +63,11 @@ export const MobileDownloadDialog = ({ setIsOpen }: ElementProps) => {
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.DOWNLOAD_MOBILE_APP })}
     >
-      <Styled.Content>{content}</Styled.Content>
+      <$Content>{content}</$Content>
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
 
@@ -89,13 +86,13 @@ Styled.Content = styled.div`
   }
 `;
 
-Styled.WaitingSpan = styled.span`
+const $WaitingSpan = styled.span`
   strong {
     color: var(--color-warning);
   }
 `;
 
-Styled.QrCodeContainer = styled.figure<{ isShowing: boolean }>`
+const $QrCodeContainer = styled.figure<{ isShowing: boolean }>`
   ${layoutMixins.stack}
 
   overflow: hidden;

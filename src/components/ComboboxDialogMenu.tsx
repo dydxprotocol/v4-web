@@ -1,6 +1,6 @@
 import React from 'react';
 
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { type MenuConfig } from '@/constants/menus';
 
@@ -72,7 +72,7 @@ export const ComboboxDialogMenu = <
   PickDialogProps &
   StyleProps) => (
   // TODO: sub-menu state management
-  <Styled.Dialog
+  <$Dialog
     isOpen={isOpen}
     setIsOpen={setIsOpen}
     title={title}
@@ -84,7 +84,7 @@ export const ComboboxDialogMenu = <
     preventClose={preventClose}
     className={className}
   >
-    <Styled.ComboboxMenu
+    <$ComboboxMenu
       items={items}
       onItemSelected={onItemSelected}
       title={title}
@@ -95,12 +95,9 @@ export const ComboboxDialogMenu = <
       withStickyLayout={withStickyLayout}
     />
     {children}
-  </Styled.Dialog>
+  </$Dialog>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Dialog = styled(Dialog)`
+const $Dialog = styled(Dialog)`
   /* Params */
   --comboboxDialogMenu-backgroundColor: var(--color-layer-2);
   --comboboxDialogMenu-item-gap: 0.5rem;
@@ -127,8 +124,8 @@ Styled.Dialog = styled(Dialog)`
   }
 `;
 
-Styled.ComboboxMenu = styled(ComboboxMenu)`
+const $ComboboxMenu = styled(ComboboxMenu)`
   --comboboxMenu-backgroundColor: var(--comboboxDialogMenu-backgroundColor);
   --comboboxMenu-item-gap: var(--comboboxDialogMenu-item-gap);
   --comboboxMenu-item-padding: var(--comboboxDialogMenu-item-padding);
-`;
+` as typeof ComboboxMenu;

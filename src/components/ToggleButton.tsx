@@ -38,19 +38,16 @@ export const ToggleButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, To
   ) => {
     return (
       <Root pressed={isPressed} onPressedChange={onPressedChange} className={className} asChild>
-        <Styled.BaseButton ref={ref} disabled={disabled} {...buttonProps}>
+        <$BaseButton ref={ref} disabled={disabled} {...buttonProps}>
           {slotLeft}
           {children}
           {slotRight}
-        </Styled.BaseButton>
+        </$BaseButton>
       </Root>
     );
   }
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.BaseButton = styled(BaseButton)`
+const $BaseButton = styled(BaseButton)`
   --button-toggle-off-backgroundColor: var(--color-layer-3);
   --button-toggle-off-textColor: var(--color-text-0);
   --button-toggle-off-border: solid var(--border-width) var(--border-color);

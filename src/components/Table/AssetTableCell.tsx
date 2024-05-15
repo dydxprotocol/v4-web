@@ -18,28 +18,22 @@ export const AssetTableCell = (props: AssetTableCellProps) => {
   const { asset, stacked, className } = props;
 
   return (
-    <TableCell
-      className={className}
-      slotLeft={<Styled.AssetIcon stacked={stacked} symbol={asset?.id} />}
-    >
-      <Styled.TableCellContent stacked={stacked}>
-        <Styled.Asset stacked={stacked}>{asset?.name}</Styled.Asset>
-        {stacked ? <Styled.AssetID>{asset?.id}</Styled.AssetID> : <Tag>{asset?.id}</Tag>}
-      </Styled.TableCellContent>
+    <TableCell className={className} slotLeft={<$AssetIcon stacked={stacked} symbol={asset?.id} />}>
+      <$TableCellContent stacked={stacked}>
+        <$Asset stacked={stacked}>{asset?.name}</$Asset>
+        {stacked ? <$AssetID>{asset?.id}</$AssetID> : <Tag>{asset?.id}</Tag>}
+      </$TableCellContent>
     </TableCell>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TableCellContent = styled.div<{ stacked?: boolean }>`
+const $TableCellContent = styled.div<{ stacked?: boolean }>`
   gap: ${({ stacked }) => (stacked ? '0.125rem' : '0.75rem')};
   display: flex;
   flex-direction: ${({ stacked }) => (stacked ? 'column' : 'row')};
   align-items: ${({ stacked }) => (stacked ? 'flex-start' : 'center')};
 `;
 
-Styled.AssetIcon = styled(AssetIcon)<{ stacked?: boolean }>`
+const $AssetIcon = styled(AssetIcon)<{ stacked?: boolean }>`
   font-size: ${({ stacked }) => (stacked ? '1.5rem' : '2rem')};
 
   @media ${breakpoints.tablet} {
@@ -47,12 +41,12 @@ Styled.AssetIcon = styled(AssetIcon)<{ stacked?: boolean }>`
   }
 `;
 
-Styled.AssetID = styled.span`
+const $AssetID = styled.span`
   color: var(--color-text-0);
   font: var(--font-mini-medium);
 `;
 
-Styled.Asset = styled.span<{ stacked?: boolean }>`
+const $Asset = styled.span<{ stacked?: boolean }>`
   color: var(--color-text-1);
   font: ${({ stacked }) => (stacked ? 'var(--font-small-medium)' : 'var(--font-medium-medium)')};
 `;

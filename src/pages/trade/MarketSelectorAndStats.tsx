@@ -15,19 +15,16 @@ export const MarketSelectorAndStats = ({ className }: { className?: string }) =>
   const currentMarketId = useSelector(getCurrentMarketId);
 
   return (
-    <Styled.Container className={className}>
+    <$Container className={className}>
       <MarketsDropdown currentMarketId={currentMarketId} symbol={id} />
 
       <VerticalSeparator />
 
       <MarketStatsDetails />
-    </Styled.Container>
+    </$Container>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.div`
+const $Container = styled.div`
   ${layoutMixins.container}
 
   display: grid;

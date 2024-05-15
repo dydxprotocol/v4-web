@@ -45,7 +45,7 @@ export const ToggleGroup = forwardRef(
     const { isTablet } = useBreakpoints();
 
     return (
-      <Styled.Root
+      <$Root
         ref={ref}
         type="single"
         value={value}
@@ -71,14 +71,11 @@ export const ToggleGroup = forwardRef(
             </ToggleButton>
           </Item>
         ))}
-      </Styled.Root>
+      </$Root>
     );
   }
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Root = styled(Root)`
+const $Root = styled(Root)`
   ${layoutMixins.row}
   gap: 0.33em;
 `;

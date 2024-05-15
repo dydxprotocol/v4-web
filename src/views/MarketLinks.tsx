@@ -33,18 +33,15 @@ export const MarketLinks = () => {
   ].filter(({ href }) => href);
 
   return (
-    <Styled.MarketLinks>
+    <$MarketLinks>
       {linkItems.map(
         ({ key, href, icon }) =>
           href && <IconButton key={key} href={href} iconName={icon} type={ButtonType.Link} />
       )}
-    </Styled.MarketLinks>
+    </$MarketLinks>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.MarketLinks = styled.div`
+const $MarketLinks = styled.div`
   ${layoutMixins.row}
 
   margin-left: auto;

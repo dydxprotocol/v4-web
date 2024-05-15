@@ -38,12 +38,12 @@ export const MarketFilter = ({
   const { hasPotentialMarketsData } = usePotentialMarkets();
 
   return (
-    <Styled.MarketFilter $compactLayout={compactLayout}>
+    <$MarketFilter $compactLayout={compactLayout}>
       <SearchInput
         placeholder={stringGetter({ key: searchPlaceholderKey })}
         onTextChange={onSearchTextChange}
       />
-      <Styled.ToggleGroupContainer $compactLayout={compactLayout}>
+      <$ToggleGroupContainer $compactLayout={compactLayout}>
         <ToggleGroup
           items={Object.values(filters).map((value) => ({
             label: stringGetter({ key: MARKET_FILTER_LABELS[value] }),
@@ -60,14 +60,11 @@ export const MarketFilter = ({
             {stringGetter({ key: STRING_KEYS.PROPOSE_NEW_MARKET })}
           </Button>
         )}
-      </Styled.ToggleGroupContainer>
-    </Styled.MarketFilter>
+      </$ToggleGroupContainer>
+    </$MarketFilter>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.MarketFilter = styled.div<{ $compactLayout: boolean }>`
+const $MarketFilter = styled.div<{ $compactLayout: boolean }>`
   display: flex;
   flex-direction: ${({ $compactLayout }) => ($compactLayout ? 'row-reverse' : 'column')};
   justify-content: space-between;
@@ -84,7 +81,7 @@ Styled.MarketFilter = styled.div<{ $compactLayout: boolean }>`
     `}
 `;
 
-Styled.ToggleGroupContainer = styled.div<{ $compactLayout: boolean }>`
+const $ToggleGroupContainer = styled.div<{ $compactLayout: boolean }>`
   ${layoutMixins.row}
   justify-content: space-between;
   overflow-x: auto;

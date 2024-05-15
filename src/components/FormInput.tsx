@@ -29,34 +29,26 @@ export type FormInputProps = ElementProps & StyleProps & InputProps;
 
 export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
   ({ id, label, slotRight, className, validationConfig, ...otherProps }, ref) => (
-    <Styled.FormInputContainer
-      className={className}
-      isValidationAttached={validationConfig?.attached}
-    >
-      <Styled.InputContainer hasLabel={!!label} hasSlotRight={!!slotRight}>
+    <$FormInputContainer className={className} isValidationAttached={validationConfig?.attached}>
+      <$InputContainer hasLabel={!!label} hasSlotRight={!!slotRight}>
         {label ? (
-          <Styled.WithLabel label={label} inputID={id} disabled={otherProps?.disabled}>
+          <$WithLabel label={label} inputID={id} disabled={otherProps?.disabled}>
             <Input ref={ref} id={id} {...otherProps} />
-          </Styled.WithLabel>
+          </$WithLabel>
         ) : (
           <Input ref={ref} id={id} {...otherProps} />
         )}
         {slotRight}
-      </Styled.InputContainer>
+      </$InputContainer>
       {validationConfig && (
-        <Styled.AlertMessage type={validationConfig.type}>
-          {validationConfig.message}
-        </Styled.AlertMessage>
+        <$AlertMessage type={validationConfig.type}>{validationConfig.message}</$AlertMessage>
       )}
-    </Styled.FormInputContainer>
+    </$FormInputContainer>
   )
 );
+const $AlertMessage = styled(AlertMessage)``;
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.AlertMessage = styled(AlertMessage)``;
-
-Styled.FormInputContainer = styled.div<{ isValidationAttached?: boolean }>`
+const $FormInputContainer = styled.div<{ isValidationAttached?: boolean }>`
   ${layoutMixins.flexColumn}
   gap: 0.5rem;
 
@@ -65,7 +57,7 @@ Styled.FormInputContainer = styled.div<{ isValidationAttached?: boolean }>`
     css`
       --input-radius: 0.5em 0.5em 0 0;
 
-      ${Styled.AlertMessage} {
+      ${$AlertMessage} {
         border-left: none;
         margin: 0;
         border-radius: 0 0 0.5em 0.5em;
@@ -73,7 +65,7 @@ Styled.FormInputContainer = styled.div<{ isValidationAttached?: boolean }>`
     `}
 `;
 
-Styled.InputContainer = styled.div<{ hasLabel?: boolean; hasSlotRight?: boolean }>`
+const $InputContainer = styled.div<{ hasLabel?: boolean; hasSlotRight?: boolean }>`
   ${formMixins.inputContainer}
 
   input {
@@ -97,7 +89,7 @@ Styled.InputContainer = styled.div<{ hasLabel?: boolean; hasSlotRight?: boolean 
     `}
 `;
 
-Styled.WithLabel = styled(WithLabel)<{ disabled?: boolean }>`
+const $WithLabel = styled(WithLabel)<{ disabled?: boolean }>`
   ${formMixins.inputLabel}
 
   label {
