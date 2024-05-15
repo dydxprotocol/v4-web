@@ -309,7 +309,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
 const $AssetIcon = styled(AssetIcon)`
   font-size: 1.5em;
 `;
-const collapsibleTabsType = getSimpleStyledOutputType(CollapsibleTabs, {} as {});
+const collapsibleTabsType = getSimpleStyledOutputType(CollapsibleTabs);
 
 const $CollapsibleTabs = styled(CollapsibleTabs)`
   --tableHeader-backgroundColor: var(--color-layer-3);

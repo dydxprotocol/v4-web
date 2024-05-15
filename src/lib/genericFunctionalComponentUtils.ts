@@ -21,7 +21,7 @@ const $NavItem = styled(NavItem)<NavItemStyleProps>`
 */
 
 // Note the output is a total lie, never use it at runtime, just for type inference
-export const getSimpleStyledOutputType: <C, P = {}>(
+export const getSimpleStyledOutputType: <C = {}, P = {}>(
   render: (props: P) => React.ReactNode,
-  style: C
+  style?: C
 ) => (props: P & C) => React.ReactNode = () => undefined as any;
