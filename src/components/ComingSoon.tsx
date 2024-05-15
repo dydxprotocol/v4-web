@@ -12,14 +12,11 @@ export const ComingSoon = () => {
 };
 
 export const ComingSoonSpace = () => (
-  <Styled.FullPageContainer>
+  <$FullPageContainer>
     <ComingSoon />
-  </Styled.FullPageContainer>
+  </$FullPageContainer>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.FullPageContainer = styled.div`
+const $FullPageContainer = styled.div`
   ${layoutMixins.centered}
 
   h1 {

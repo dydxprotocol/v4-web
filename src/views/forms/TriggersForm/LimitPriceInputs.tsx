@@ -105,7 +105,7 @@ export const LimitPriceInputs = ({
         }
       >
         {
-          <Styled.InputsRow>
+          <$InputsRow>
             {!multipleTakeProfitOrders && (
               <FormInput
                 id="TP-limit"
@@ -134,16 +134,13 @@ export const LimitPriceInputs = ({
                 onInput={onLimitInput(TriggerOrdersInputField.stopLossLimitPrice)}
               />
             )}
-          </Styled.InputsRow>
+          </$InputsRow>
         }
       </Collapsible>
     </>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.InputsRow = styled.span`
+const $InputsRow = styled.span`
   ${layoutMixins.flexEqualColumns}
   gap: 1ch;
 `;

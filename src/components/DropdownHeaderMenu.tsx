@@ -1,5 +1,5 @@
 import { Content, Item, Portal, Root, Trigger } from '@radix-ui/react-dropdown-menu';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { type MenuItem } from '@/constants/menus';
 
@@ -34,39 +34,36 @@ export const DropdownHeaderMenu = <MenuItemValue extends string>({
 
   return (
     <Root>
-      <Styled.Trigger className={className} asChild>
+      <$Trigger className={className} asChild>
         <div>
           {children}
-          <Styled.DropdownIconButton iconName={IconName.Caret} isToggle />
+          <$DropdownIconButton iconName={IconName.Caret} isToggle />
         </div>
-      </Styled.Trigger>
+      </$Trigger>
       <Portal>
-        <Styled.Content
+        <$Content
           align={isMobile ? 'center' : 'start'}
           sideOffset={sideOffset}
           loop
           className={className}
         >
           {items.map(({ value, label, description, onSelect, disabled }) => (
-            <Styled.Item
+            <$Item
               key={value}
-              value={value}
+              textValue={value}
               onSelect={() => (onSelect ?? onValueChange)?.(value)}
               disabled={disabled}
             >
-              <Styled.ItemLabel>{label}</Styled.ItemLabel>
-              <Styled.Description>{description}</Styled.Description>
-            </Styled.Item>
+              <$ItemLabel>{label}</$ItemLabel>
+              <$Description>{description}</$Description>
+            </$Item>
           ))}
-        </Styled.Content>
+        </$Content>
       </Portal>
     </Root>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Trigger = styled(Trigger)`
+const $Trigger = styled(Trigger)`
   ${popoverMixins.trigger}
   ${popoverMixins.backdropOverlay}
 
@@ -92,15 +89,15 @@ Styled.Trigger = styled(Trigger)`
   }
 `;
 
-Styled.DropdownIconButton = styled(IconButton)`
+const $DropdownIconButton = styled(IconButton)`
   --button-textColor: var(--color-text-2);
 
-  ${Styled.Trigger}[data-state='open'] & {
+  ${$Trigger}[data-state='open'] & {
     rotate: -0.5turn;
   }
 `;
 
-Styled.Content = styled(Content)`
+const $Content = styled(Content)`
   ${layoutMixins.withOuterAndInnerBorders}
   ${popoverMixins.popover}
   ${popoverMixins.popoverAnimation}
@@ -117,7 +114,7 @@ Styled.Content = styled(Content)`
   }
 `;
 
-Styled.Item = styled(Item)`
+const $Item = styled(Item)`
   ${popoverMixins.item}
 
   --item-padding: 0.75rem 1rem;
@@ -126,12 +123,12 @@ Styled.Item = styled(Item)`
   gap: 0.5rem;
 `;
 
-Styled.ItemLabel = styled.span`
+const $ItemLabel = styled.span`
   color: var(--color-text-2);
   font: var(--font-medium-book);
 `;
 
-Styled.Description = styled.span`
+const $Description = styled.span`
   color: var(--color-text-0);
   font: var(--font-small-book);
 `;

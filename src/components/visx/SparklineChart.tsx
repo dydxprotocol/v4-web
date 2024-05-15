@@ -25,7 +25,7 @@ export const SparklineChart = <Datum extends {}>(props: SparklineChartProps<Datu
   const { data, positive, xAccessor, yAccessor } = props;
 
   return (
-    <Styled.ParentSize>
+    <$ParentSize>
       {({ height, width }: { width: number; height: number }) => (
         <XYChart
           width={width}
@@ -71,13 +71,10 @@ export const SparklineChart = <Datum extends {}>(props: SparklineChartProps<Datu
           />
         </XYChart>
       )}
-    </Styled.ParentSize>
+    </$ParentSize>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ParentSize = styled(ParentSize)`
+const $ParentSize = styled(ParentSize)`
   & > svg {
     overflow: visible;
   }

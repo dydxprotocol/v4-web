@@ -181,11 +181,11 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
   const CenterElement = false ? (
     <AlertMessage type={AlertType.Error}>Placeholder Error</AlertMessage>
   ) : (
-    <Styled.GradientCard fromColor="neutral" toColor="negative">
-      <Styled.Column>
-        <Styled.TertiarySpan>{stringGetter({ key: STRING_KEYS.ESTIMATED })}</Styled.TertiarySpan>
+    <$GradientCard fromColor="neutral" toColor="negative">
+      <$Column>
+        <$TertiarySpan>{stringGetter({ key: STRING_KEYS.ESTIMATED })}</$TertiarySpan>
         <span>{stringGetter({ key: STRING_KEYS.LIQUIDATION_PRICE })}</span>
-      </Styled.Column>
+      </$Column>
       <div>
         <DiffOutput
           withDiff={
@@ -200,11 +200,11 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
           fractionDigits={tickSizeDecimals}
         />
       </div>
-    </Styled.GradientCard>
+    </$GradientCard>
   );
 
   return (
-    <Styled.Form
+    <$Form
       onSubmit={(e: FormEvent) => {
         e.preventDefault();
         onSubmit();
@@ -219,7 +219,7 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
         ]}
       />
 
-      <Styled.ToggleGroup
+      <$ToggleGroup
         items={Object.entries(SIZE_PERCENT_OPTIONS).map(([key, value]) => ({
           label: key,
           value: value.toString(),
@@ -243,29 +243,27 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
       <WithDetailsReceipt detailItems={formConfig.receiptItems}>
         <Button action={ButtonAction.Primary}>{formConfig.buttonLabel}</Button>
       </WithDetailsReceipt>
-    </Styled.Form>
+    </$Form>
   );
 };
 
-const Styled = {
-  Form: styled.form`
-    ${formMixins.transfersForm}
-  `,
-  ToggleGroup: styled(ToggleGroup)`
-    ${formMixins.inputToggleGroup}
-  `,
-  GradientCard: styled(GradientCard)`
-    ${layoutMixins.spacedRow}
-    height: 4rem;
-    border-radius: 0.5rem;
-    padding: 0.75rem 1rem;
-    align-items: center;
-  `,
-  Column: styled.div`
-    ${layoutMixins.column}
-    font: var(--font-small-medium);
-  `,
-  TertiarySpan: styled.span`
-    color: var(--color-text-0);
-  `,
-};
+const $Form = styled.form`
+  ${formMixins.transfersForm}
+`;
+const $ToggleGroup = styled(ToggleGroup)`
+  ${formMixins.inputToggleGroup}
+`;
+const $GradientCard = styled(GradientCard)`
+  ${layoutMixins.spacedRow}
+  height: 4rem;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  align-items: center;
+`;
+const $Column = styled.div`
+  ${layoutMixins.column}
+  font: var(--font-small-medium);
+`;
+const $TertiarySpan = styled.span`
+  color: var(--color-text-0);
+`;

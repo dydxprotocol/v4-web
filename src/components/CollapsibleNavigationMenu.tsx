@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { Item, Link, List, Root, Sub } from '@radix-ui/react-navigation-menu';
 import { NavLink, matchPath, useLocation } from 'react-router-dom';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { type MenuItem } from '@/constants/menus';
 
@@ -59,10 +59,10 @@ export const CollapsibleNavigationMenu = <MenuItemValue extends string>({
 
   return (
     <Root orientation="vertical">
-      <Styled.List>
+      <$List>
         {items.map((item) =>
           !item.subitems ? (
-            <Styled.NavItem key={item.value} onSelect={onSelectItem} {...item} />
+            <$NavItem key={item.value} onSelect={onSelectItem} {...item} />
           ) : (
             <Collapsible
               key={item.value}
@@ -70,26 +70,21 @@ export const CollapsibleNavigationMenu = <MenuItemValue extends string>({
               onOpenChange={(open) => {
                 setExpandedKey(!open ? '' : item.value);
               }}
-              label={
-                <Styled.CollapsibleItem value={item.value}>{item.label}</Styled.CollapsibleItem>
-              }
+              label={<$CollapsibleItem value={item.value}>{item.label}</$CollapsibleItem>}
               transitionDuration={0.2}
             >
-              <Styled.Sub defaultValue={item.subitems?.[0]}>
+              <$Sub defaultValue={item.subitems?.[0]?.value}>
                 {item.subitems.map((subitem: MenuItem<MenuItemValue>) => (
-                  <Styled.NavItem key={subitem.value} onSelect={onSelectItem} {...subitem} />
+                  <$NavItem key={subitem.value} onSelect={onSelectItem} {...subitem} />
                 ))}
-              </Styled.Sub>
+              </$Sub>
             </Collapsible>
           )
         )}
-      </Styled.List>
+      </$List>
     </Root>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
 const navItemStyle = css`
   ${popoverMixins.item}
   --item-padding: 0.5em 0.75em;
@@ -98,16 +93,16 @@ const navItemStyle = css`
   --item-checked-textColor: var(--color-text-0);
 `;
 
-Styled.List = styled(List)`
+const $List = styled(List)`
   gap: 0.5rem;
 `;
 
-Styled.CollapsibleItem = styled(Item)`
+const $CollapsibleItem = styled(Item)`
   ${navItemStyle}
   --item-padding: 0;
 `;
 
-Styled.Sub = styled(Sub)`
+const $Sub = styled(Sub)`
   margin: -0.25rem 0.5rem 0;
   padding-left: 0.5em;
   border-left: solid var(--border-width) var(--color-border);
@@ -115,12 +110,12 @@ Styled.Sub = styled(Sub)`
   font-size: 0.92em;
 `;
 
-Styled.NavItem = styled(NavItem)`
+const $NavItem = styled(NavItem)`
   ${navItemStyle}
   margin: 0.25em 0;
   justify-content: flex-start;
 
-  ${Styled.Sub} & {
+  ${$Sub} & {
     --item-padding: 0.5em 0.7em;
   }
-`;
+` as typeof NavItem;

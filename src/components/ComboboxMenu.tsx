@@ -1,7 +1,7 @@
 import { Fragment, useState, type ReactNode } from 'react';
 
 import { Command } from 'cmdk';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { type MenuConfig } from '@/constants/menus';
 
@@ -14,7 +14,7 @@ type ElementProps<MenuItemValue extends string | number, MenuGroupValue extends 
   items: MenuConfig<MenuItemValue, MenuGroupValue>;
   onItemSelected?: () => void;
 
-  title?: string;
+  title?: ReactNode;
   inputPlaceholder?: string;
   slotEmpty?: ReactNode;
   withSearch?: boolean;
@@ -31,7 +31,10 @@ export type ComboboxMenuProps<
   MenuGroupValue extends string | number
 > = ElementProps<MenuItemValue, MenuGroupValue> & StyleProps;
 
-export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extends string>({
+export const ComboboxMenu = <
+  MenuItemValue extends string | number,
+  MenuGroupValue extends string | number
+>({
   items,
   onItemSelected,
 
@@ -48,8 +51,8 @@ export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extend
   const [searchValue, setSearchValue] = useState('');
 
   return (
-    <Styled.Command
-      label={title}
+    <$Command
+      label={typeof title === 'string' ? title : undefined}
       // value={highlightedCommand}
       // onValueChange={setHighlightedCommand}
       filter={(value: string, search: string) =>
@@ -61,24 +64,23 @@ export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extend
       $withStickyLayout={withStickyLayout}
     >
       {withSearch && (
-        <Styled.Header $withStickyLayout={withStickyLayout}>
-          <Styled.Input
+        <$Header $withStickyLayout={withStickyLayout}>
+          <$Input
             /**
              * Mobile Issue: Search Input will always trigger mobile keyboard drawer. There is no fix.
              * https://github.com/pacocoursey/cmdk/issues/127
              */
             autoFocus
-            type="search"
             value={searchValue}
             onValueChange={setSearchValue}
             placeholder={inputPlaceholder}
           />
-        </Styled.Header>
+        </$Header>
       )}
 
-      <Styled.List $withStickyLayout={withStickyLayout}>
+      <$List $withStickyLayout={withStickyLayout}>
         {items.map((group) => (
-          <Styled.Group
+          <$Group
             key={group.group}
             heading={group.groupLabel}
             $withItemBorders={withItemBorders}
@@ -86,7 +88,7 @@ export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extend
           >
             {group.items.map((item) => (
               <Fragment key={item.value}>
-                <Styled.Item
+                <$Item
                   // value={item.value} // search by both value and textContent
                   // value={[group.groupLabel, item.label, item.tag].filter(Boolean).join('|')} // exclude item.value from searchable terms (not guaranteed to be unique)
                   value={[group.groupLabel, item.value, item.description, item.label, item.tag]
@@ -107,7 +109,7 @@ export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extend
                     <>
                       {item.slotBefore}
                       {item.slotCustomContent ?? (
-                        <Styled.ItemLabel>
+                        <$ItemLabel>
                           <span>
                             {typeof item.label === 'string'
                               ? `${item.label}${item.subitems?.length ? '…' : ''}`
@@ -120,18 +122,18 @@ export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extend
                             )}
                           </span>
                           {item.description && <span>{item.description}</span>}
-                        </Styled.ItemLabel>
+                        </$ItemLabel>
                       )}
                       {item.slotAfter}
                       {item.subitems && '→'}
                     </>
                   }
-                </Styled.Item>
+                </$Item>
 
                 {searchValue &&
                   item.subitems?.map((subitem) => (
                     <Fragment key={subitem.value}>
-                      <Styled.Item
+                      <$Item
                         // value={subitem.value} // search by both value and textContent
                         // value={[group.groupLabel, item.label, subitem.label, subitem.tag].filter(Boolean).join('|')}
                         value={[
@@ -151,7 +153,7 @@ export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extend
                         $withItemBorders={withItemBorders}
                       >
                         {subitem.slotBefore}
-                        <Styled.ItemLabel>
+                        <$ItemLabel>
                           <span>
                             {subitem.label}
                             {subitem.tag && (
@@ -162,24 +164,21 @@ export const ComboboxMenu = <MenuItemValue extends string, MenuGroupValue extend
                             )}
                           </span>
                           {item.description && <span>{item.description}</span>}
-                        </Styled.ItemLabel>
+                        </$ItemLabel>
                         {subitem.slotAfter}
-                      </Styled.Item>
+                      </$Item>
                     </Fragment>
                   ))}
               </Fragment>
             ))}
-          </Styled.Group>
+          </$Group>
         ))}
-        {slotEmpty && searchValue.trim() !== '' && <Styled.Empty>{slotEmpty}</Styled.Empty>}
-      </Styled.List>
-    </Styled.Command>
+        {slotEmpty && searchValue.trim() !== '' && <$Empty>{slotEmpty}</$Empty>}
+      </$List>
+    </$Command>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Command = styled(Command)<{ $withStickyLayout?: boolean }>`
+const $Command = styled(Command)<{ $withStickyLayout?: boolean }>`
   --comboboxMenu-backgroundColor: var(--color-layer-2);
 
   --comboboxMenu-input-backgroundColor: var(--color-layer-3);
@@ -211,13 +210,13 @@ Styled.Command = styled(Command)<{ $withStickyLayout?: boolean }>`
           --stickyArea1-topHeight: 4rem;
         `
       : css`
-          ${() => Styled.List} {
+          ${() => $List} {
             overflow-y: auto;
           }
         `}
 `;
 
-Styled.Header = styled.header<{ $withStickyLayout?: boolean }>`
+const $Header = styled.header<{ $withStickyLayout?: boolean }>`
   display: grid;
   align-items: center;
   padding-left: 0.75rem;
@@ -232,7 +231,7 @@ Styled.Header = styled.header<{ $withStickyLayout?: boolean }>`
     `}
 `;
 
-Styled.Input = styled(Command.Input)`
+const $Input = styled(Command.Input)`
   height: var(--comboboxMenu-input-height);
   padding: 0.5rem;
   background-color: var(--comboboxMenu-input-backgroundColor);
@@ -240,7 +239,7 @@ Styled.Input = styled(Command.Input)`
   gap: 0.5rem;
 `;
 
-Styled.Group = styled(Command.Group)<{ $withItemBorders?: boolean; $withStickyLayout?: boolean }>`
+const $Group = styled(Command.Group)<{ $withItemBorders?: boolean; $withStickyLayout?: boolean }>`
   color: var(--color-text-0);
 
   > [cmdk-group-heading] {
@@ -274,7 +273,7 @@ Styled.Group = styled(Command.Group)<{ $withItemBorders?: boolean; $withStickyLa
     `}
 `;
 
-Styled.List = styled(Command.List)<{ $withStickyLayout?: boolean }>`
+const $List = styled(Command.List)<{ $withStickyLayout?: boolean }>`
   isolation: isolate;
   background-color: var(--comboboxMenu-backgroundColor, inherit);
 
@@ -298,7 +297,7 @@ Styled.List = styled(Command.List)<{ $withStickyLayout?: boolean }>`
     `}
 `;
 
-Styled.Item = styled(Command.Item)<{ $withItemBorders?: boolean }>`
+const $Item = styled(Command.Item)<{ $withItemBorders?: boolean }>`
   ${layoutMixins.scrollSnapItem}
   ${popoverMixins.item}
   --item-checked-backgroundColor: var(--comboboxMenu-item-checked-backgroundColor);
@@ -324,7 +323,7 @@ Styled.Item = styled(Command.Item)<{ $withItemBorders?: boolean }>`
     `}
 `;
 
-Styled.ItemLabel = styled.div`
+const $ItemLabel = styled.div`
   flex: 1;
 
   ${layoutMixins.rowColumn}
@@ -344,7 +343,7 @@ Styled.ItemLabel = styled.div`
   min-width: 0;
 `;
 
-Styled.Empty = styled(Command.Empty)`
+const $Empty = styled(Command.Empty)`
   color: var(--color-text-0);
   padding: 1rem;
   height: 100%;

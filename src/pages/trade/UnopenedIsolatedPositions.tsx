@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -19,14 +19,14 @@ export const UnopenedIsolatedPositions = ({
 }: UnopenedIsolatedPositionsProps) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <Styled.UnopenedIsolatedPositions className={className} isOpen={isOpen}>
-      <Styled.Button isOpen={isOpen} onClick={() => setIsOpen(!isOpen)}>
+    <$UnopenedIsolatedPositions className={className} isOpen={isOpen}>
+      <$Button isOpen={isOpen} onClick={() => setIsOpen(!isOpen)}>
         Unopened Isolated Positions
         <Icon iconName={IconName.Caret} />
-      </Styled.Button>
+      </$Button>
 
       {isOpen && (
-        <Styled.Cards>
+        <$Cards>
           <PotentialPositionCard onViewOrders={onViewOrders} />
           <PotentialPositionCard onViewOrders={onViewOrders} />
           <PotentialPositionCard onViewOrders={onViewOrders} />
@@ -36,39 +36,37 @@ export const UnopenedIsolatedPositions = ({
           <PotentialPositionCard onViewOrders={onViewOrders} />
           <PotentialPositionCard onViewOrders={onViewOrders} />
           <PotentialPositionCard onViewOrders={onViewOrders} />
-        </Styled.Cards>
+        </$Cards>
       )}
-    </Styled.UnopenedIsolatedPositions>
+    </$UnopenedIsolatedPositions>
   );
 };
 
-const Styled = {
-  UnopenedIsolatedPositions: styled.div<{ isOpen?: boolean }>`
-    overflow: auto;
-    border-top: var(--border);
-    ${({ isOpen }) => isOpen && 'height: 100%;'}
-  `,
-  Button: styled(Button)<{ isOpen?: boolean }>`
-    position: sticky;
-    top: 0;
-    gap: 1rem;
-    backdrop-filter: blur(4px) contrast(1.01);
-    background-color: transparent;
-    border: none;
-    margin: 0 1rem;
+const $UnopenedIsolatedPositions = styled.div<{ isOpen?: boolean }>`
+  overflow: auto;
+  border-top: var(--border);
+  ${({ isOpen }) => isOpen && 'height: 100%;'}
+`;
+const $Button = styled(Button)<{ isOpen?: boolean }>`
+  position: sticky;
+  top: 0;
+  gap: 1rem;
+  backdrop-filter: blur(4px) contrast(1.01);
+  background-color: transparent;
+  border: none;
+  margin: 0 1rem;
 
-    ${({ isOpen }) =>
-      isOpen &&
-      `
+  ${({ isOpen }) =>
+    isOpen &&
+    `
       svg {
         transform: rotate(180deg);
       }
     `}
-  `,
-  Cards: styled.div`
-    ${layoutMixins.flexWrap}
-    gap: 1rem;
-    scroll-snap-align: none;
-    padding: 0 1rem 1rem;
-  `,
-} satisfies Record<string, AnyStyledComponent>;
+`;
+const $Cards = styled.div`
+  ${layoutMixins.flexWrap}
+  gap: 1rem;
+  scroll-snap-align: none;
+  padding: 0 1rem 1rem;
+`;

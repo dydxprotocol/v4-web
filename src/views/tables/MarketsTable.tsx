@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { Key, useMemo, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -63,13 +63,13 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                 tickSizeDecimals,
               }) => (
                 <TableCell stacked>
-                  <Styled.TabletOutput
+                  <$TabletOutput
                     type={OutputType.Fiat}
                     value={oraclePrice}
                     fractionDigits={tickSizeDecimals}
                     withBaseFont
                   />
-                  <Styled.TabletPriceChange>
+                  <$TabletPriceChange>
                     {!priceChange24H ? (
                       <Output type={OutputType.Fiat} value={null} />
                     ) : (
@@ -77,7 +77,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                         {priceChange24H > 0 && (
                           <TriangleIndicator value={MustBigNumber(priceChange24H)} />
                         )}
-                        <Styled.Output
+                        <$Output
                           type={OutputType.Percent}
                           value={MustBigNumber(priceChange24HPercent).abs()}
                           isPositive={MustBigNumber(priceChange24HPercent).gt(0)}
@@ -85,7 +85,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                         />
                       </>
                     )}
-                  </Styled.TabletPriceChange>
+                  </$TabletPriceChange>
                 </TableCell>
               ),
             },
@@ -102,7 +102,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               getCellValue: (row) => row.oraclePrice,
               label: stringGetter({ key: STRING_KEYS.ORACLE_PRICE }),
               renderCell: ({ oraclePrice, tickSizeDecimals }) => (
-                <Styled.TabletOutput
+                <$TabletOutput
                   type={OutputType.Fiat}
                   value={oraclePrice}
                   fractionDigits={tickSizeDecimals}
@@ -134,18 +134,18 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               label: stringGetter({ key: STRING_KEYS.CHANGE_24H }),
               renderCell: ({ priceChange24HPercent }) => (
                 <TableCell stacked>
-                  <Styled.InlineRow>
+                  <$InlineRow>
                     {!priceChange24HPercent ? (
                       <Output type={OutputType.Text} value={null} />
                     ) : (
-                      <Styled.Output
+                      <$Output
                         type={OutputType.Percent}
                         value={MustBigNumber(priceChange24HPercent).abs()}
                         isPositive={MustBigNumber(priceChange24HPercent).gt(0)}
                         isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
                       />
                     )}
-                  </Styled.InlineRow>
+                  </$InlineRow>
                 </TableCell>
               ),
             },
@@ -154,7 +154,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               getCellValue: (row) => row.volume24H,
               label: stringGetter({ key: STRING_KEYS.VOLUME_24H }),
               renderCell: (row) => (
-                <Styled.NumberOutput type={OutputType.CompactFiat} value={row.volume24H} />
+                <$NumberOutput type={OutputType.CompactFiat} value={row.volume24H} />
               ),
             },
             {
@@ -162,7 +162,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               getCellValue: (row) => row.trades24H,
               label: stringGetter({ key: STRING_KEYS.TRADES }),
               renderCell: (row) => (
-                <Styled.NumberOutput type={OutputType.CompactNumber} value={row.trades24H} />
+                <$NumberOutput type={OutputType.CompactNumber} value={row.trades24H} />
               ),
             },
             {
@@ -170,7 +170,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               getCellValue: (row) => row.openInterestUSDC,
               label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
               renderCell: (row) => (
-                <Styled.NumberOutput type={OutputType.CompactFiat} value={row.openInterestUSDC} />
+                <$NumberOutput type={OutputType.CompactFiat} value={row.openInterestUSDC} />
               ),
             },
             {
@@ -178,7 +178,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
               getCellValue: (row) => row.nextFundingRate,
               label: stringGetter({ key: STRING_KEYS.FUNDING_RATE_1H_SHORT }),
               renderCell: (row) => (
-                <Styled.Output
+                <$Output
                   type={OutputType.Percent}
                   fractionDigits={FUNDING_DECIMALS}
                   value={row.nextFundingRate}
@@ -197,7 +197,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
 
   return (
     <>
-      <Styled.Toolbar>
+      <$Toolbar>
         <MarketFilter
           hideNewMarketButton
           compactLayout
@@ -207,14 +207,14 @@ export const MarketsTable = ({ className }: { className?: string }) => {
           onChangeFilter={setFilter}
           onSearchTextChange={setSearchFilter}
         />
-      </Styled.Toolbar>
+      </$Toolbar>
 
-      <Styled.Table
+      <$Table
         withInnerBorders
         data={filteredMarkets}
-        getRowKey={(row: MarketData) => row.market}
+        getRowKey={(row: MarketData) => row.market ?? ''}
         label="Markets"
-        onRowAction={(market: string) =>
+        onRowAction={(market: Key) =>
           navigate(`${AppRoute.Trade}/${market}`, { state: { from: AppRoute.Markets } })
         }
         defaultSortDescriptor={{
@@ -224,7 +224,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
         columns={columns}
         className={className}
         slotEmpty={
-          <Styled.MarketNotFound>
+          <$MarketNotFound>
             {filter === MarketFilters.NEW && !searchFilter ? (
               <>
                 <h2>
@@ -259,16 +259,13 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                 </Button>
               </div>
             )}
-          </Styled.MarketNotFound>
+          </$MarketNotFound>
         }
       />
     </>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Toolbar = styled(Toolbar)`
+const $Toolbar = styled(Toolbar)`
   max-width: 100vw;
   overflow: hidden;
   margin-bottom: 0.625rem;
@@ -285,7 +282,7 @@ Styled.Toolbar = styled(Toolbar)`
   }
 `;
 
-Styled.Table = styled(Table)`
+const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
 
   @media ${breakpoints.tablet} {
@@ -293,27 +290,27 @@ Styled.Table = styled(Table)`
       max-width: 100vw;
     }
   }
-`;
+` as typeof Table;
 
-Styled.TabletOutput = styled(Output)`
+const $TabletOutput = styled(Output)`
   font: var(--font-medium-book);
   color: var(--color-text-2);
 `;
 
-Styled.InlineRow = styled.div`
+const $InlineRow = styled.div`
   ${layoutMixins.inlineRow}
 `;
 
-Styled.TabletPriceChange = styled(Styled.InlineRow)`
+const $TabletPriceChange = styled($InlineRow)`
   font: var(--font-small-book);
 `;
 
-Styled.NumberOutput = styled(Output)`
+const $NumberOutput = styled(Output)`
   font: var(--font-base-medium);
   color: var(--color-text-2);
 `;
 
-Styled.Output = styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`
+const $Output = styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`
   color: ${({ isNegative, isPositive }) =>
     isNegative
       ? `var(--color-negative)`
@@ -323,7 +320,7 @@ Styled.Output = styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`
   font: var(--font-base-medium);
 `;
 
-Styled.MarketNotFound = styled.div`
+const $MarketNotFound = styled.div`
   ${layoutMixins.column}
   justify-content: center;
   align-items: center;

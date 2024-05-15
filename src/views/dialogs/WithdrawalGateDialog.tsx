@@ -38,12 +38,12 @@ export const WithdrawalGateDialog = ({
         }[transferType]
       }
       slotIcon={
-        <Styled.IconContainer>
-          <Styled.Icon iconName={IconName.Warning} />
-        </Styled.IconContainer>
+        <$IconContainer>
+          <$Icon iconName={IconName.Warning} />
+        </$IconContainer>
       }
       slotFooter={
-        <Styled.ButtonRow>
+        <$ButtonRow>
           <Button
             type={ButtonType.Link}
             action={ButtonAction.Secondary}
@@ -55,24 +55,21 @@ export const WithdrawalGateDialog = ({
           <Button action={ButtonAction.Primary} onClick={() => setIsOpen(false)}>
             {stringGetter({ key: STRING_KEYS.CLOSE })}
           </Button>
-        </Styled.ButtonRow>
+        </$ButtonRow>
       }
     >
-      <Styled.Content>
+      <$Content>
         {stringGetter({
           key: STRING_KEYS.WITHDRAWALS_PAUSED_DESC,
           params: {
             ESTIMATED_DURATION: estimatedUnblockTime,
           },
         })}
-      </Styled.Content>
+      </$Content>
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.IconContainer = styled.div`
+const $IconContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -85,18 +82,18 @@ Styled.IconContainer = styled.div`
   background-color: var(--color-gradient-warning);
 `;
 
-Styled.Icon = styled(Icon)`
+const $Icon = styled(Icon)`
   color: var(--color-warning);
   font-size: 2.5rem;
   margin-bottom: 0.125rem;
 `;
 
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
 `;
 
-Styled.ButtonRow = styled.div`
+const $ButtonRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;

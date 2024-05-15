@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import { validation } from '@dydxprotocol/v4-client-js';
+import { noop } from 'lodash';
 import { type NumberFormatValues } from 'react-number-format';
 import type { SyntheticInputEvent } from 'react-number-format/types/types';
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
+import { Nullable } from 'vitest';
 
 import { TransferInputField, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
@@ -99,7 +101,7 @@ export const TransferForm = ({
   const amountBN = MustBigNumber(amount);
   const balanceBN = MustBigNumber(balance);
 
-  const onChangeAsset = (asset: DydxChainAsset) => {
+  const onChangeAsset = (asset: Nullable<string>) => {
     setError(undefined);
     setCurrentFee(undefined);
 
@@ -223,18 +225,18 @@ export const TransferForm = ({
     {
       value: DydxChainAsset.USDC,
       label: (
-        <Styled.InlineRow>
+        <$InlineRow>
           <AssetIcon symbol="USDC" /> {usdcLabel}
-        </Styled.InlineRow>
+        </$InlineRow>
       ),
     },
     {
       value: DydxChainAsset.CHAINTOKEN,
       label: (
-        <Styled.InlineRow>
+        <$InlineRow>
           <AssetIcon symbol={chainTokenLabel} />
           {chainTokenLabel}
-        </Styled.InlineRow>
+        </$InlineRow>
       ),
     },
   ];
@@ -243,9 +245,9 @@ export const TransferForm = ({
     {
       chainId: selectedDydxChainId,
       label: (
-        <Styled.InlineRow>
+        <$InlineRow>
           <AssetIcon symbol="DYDX" /> {stringGetter({ key: STRING_KEYS.DYDX_CHAIN })}
-        </Styled.InlineRow>
+        </$InlineRow>
       ),
     },
   ];
@@ -282,7 +284,7 @@ export const TransferForm = ({
     onClear: () => void;
     onClick: () => void;
   }) => (
-    <Styled.FormInputToggleButton
+    <$FormInputToggleButton
       size={ButtonSize.XSmall}
       isPressed={!isInputEmpty}
       onPressedChange={(isPressed: boolean) => (isPressed ? onClick : onClear)()}
@@ -290,26 +292,26 @@ export const TransferForm = ({
       shape={isInputEmpty ? ButtonShape.Rectangle : ButtonShape.Circle}
     >
       {isInputEmpty ? label : <Icon iconName={IconName.Close} />}
-    </Styled.FormInputToggleButton>
+    </$FormInputToggleButton>
   );
 
   return (
-    <Styled.Form
+    <$Form
       className={className}
       onSubmit={(e: FormEvent) => {
         e.preventDefault();
         onTransfer();
       }}
     >
-      <Styled.Row>
+      <$Row>
         <FormInput
           id="destination"
           onInput={(e: SyntheticInputEvent) => onChangeAddress(e.target?.value)}
           label={
-            <Styled.DestinationInputLabel>
+            <$DestinationInputLabel>
               {stringGetter({ key: STRING_KEYS.DESTINATION })}
-              {isAddressValid && <Styled.CheckIcon iconName={IconName.Check} />}
-            </Styled.DestinationInputLabel>
+              {isAddressValid && <$CheckIcon iconName={IconName.Check} />}
+            </$DestinationInputLabel>
           }
           type={InputType.Text}
           value={recipientAddress ?? ''}
@@ -322,40 +324,39 @@ export const TransferForm = ({
           })}
           disabled={isLoading}
         />
-        <Styled.NetworkSelectMenu
+        <$NetworkSelectMenu
           label={stringGetter({ key: STRING_KEYS.NETWORK })}
           value={selectedDydxChainId}
-          slotTriggerAfter={null}
+          onValueChange={noop}
         >
           {networkOptions.map(({ chainId, label }) => (
-            <Styled.SelectItem key={chainId} value={chainId} label={label} />
+            <$SelectItem key={chainId} value={chainId} label={label} />
           ))}
-        </Styled.NetworkSelectMenu>
-      </Styled.Row>
+        </$NetworkSelectMenu>
+      </$Row>
 
       {recipientAddress && !isAddressValid && (
-        <Styled.AddressValidationAlertMessage type={AlertType.Error}>
+        <$AddressValidationAlertMessage type={AlertType.Error}>
           {stringGetter({
             key:
               dydxAddress === recipientAddress
                 ? STRING_KEYS.TRANSFER_TO_YOURSELF
                 : STRING_KEYS.TRANSFER_INVALID_DYDX_ADDRESS,
           })}
-        </Styled.AddressValidationAlertMessage>
+        </$AddressValidationAlertMessage>
       )}
 
-      <Styled.SelectMenu
+      <$SelectMenu
         label={stringGetter({ key: STRING_KEYS.ASSET })}
-        value={token}
+        value={token ?? ''}
         onValueChange={onChangeAsset}
-        disabled={isLoading}
       >
         {assetOptions.map(({ value, label }) => (
-          <Styled.SelectItem key={value} value={value} label={label} />
+          <$SelectItem key={value} value={value} label={label} />
         ))}
-      </Styled.SelectMenu>
+      </$SelectMenu>
 
-      <Styled.WithDetailsReceipt side="bottom" detailItems={amountDetailItems}>
+      <$WithDetailsReceipt side="bottom" detailItems={amountDetailItems}>
         <FormInput
           label={stringGetter({ key: STRING_KEYS.AMOUNT })}
           type={InputType.Number}
@@ -373,7 +374,7 @@ export const TransferForm = ({
           }
           disabled={isLoading}
         />
-      </Styled.WithDetailsReceipt>
+      </$WithDetailsReceipt>
 
       {showNotEnoughGasWarning && (
         <AlertMessage type={AlertType.Warning}>
@@ -386,51 +387,48 @@ export const TransferForm = ({
 
       {error && <AlertMessage type={AlertType.Error}>{error}</AlertMessage>}
 
-      <Styled.Footer>
+      <$Footer>
         <TransferButtonAndReceipt
           selectedAsset={asset}
           fee={currentFee || undefined}
           isDisabled={!isAmountValid || !isAddressValid || !currentFee || isLoading}
           isLoading={isLoading || Boolean(isAmountValid && isAddressValid && !currentFee)}
         />
-      </Styled.Footer>
-    </Styled.Form>
+      </$Footer>
+    </$Form>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Form = styled.form`
+const $Form = styled.form`
   ${formMixins.transfersForm}
 `;
 
-Styled.Footer = styled.footer`
+const $Footer = styled.footer`
   ${formMixins.footer}
   --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
 `;
 
-Styled.Row = styled.div`
+const $Row = styled.div`
   ${layoutMixins.gridEqualColumns}
   gap: var(--form-input-gap);
 `;
 
-Styled.SelectMenu = styled(SelectMenu)`
+const $SelectMenu = styled(SelectMenu)`
   ${formMixins.inputSelectMenu}
-`;
+` as typeof SelectMenu;
 
-Styled.SelectItem = styled(SelectItem)`
+const $SelectItem = styled(SelectItem)`
   ${formMixins.inputSelectMenuItem}
-`;
+` as typeof SelectItem;
 
-Styled.NetworkSelectMenu = styled(Styled.SelectMenu)`
+const $NetworkSelectMenu = styled($SelectMenu)`
   pointer-events: none;
-`;
+` as typeof SelectMenu;
 
-Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
+const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
-Styled.InlineRow = styled.span`
+const $InlineRow = styled.span`
   ${layoutMixins.inlineRow}
   height: 100%;
 
@@ -439,19 +437,19 @@ Styled.InlineRow = styled.span`
   }
 `;
 
-Styled.DestinationInputLabel = styled.span`
+const $DestinationInputLabel = styled.span`
   ${layoutMixins.inlineRow}
 `;
 
-Styled.CheckIcon = styled(Icon)`
+const $CheckIcon = styled(Icon)`
   color: var(--color-success);
 `;
 
-Styled.AddressValidationAlertMessage = styled(AlertMessage)`
+const $AddressValidationAlertMessage = styled(AlertMessage)`
   margin-top: -0.75rem;
 `;
 
-Styled.FormInputToggleButton = styled(ToggleButton)`
+const $FormInputToggleButton = styled(ToggleButton)`
   ${formMixins.inputInnerToggleButton}
 
   svg {

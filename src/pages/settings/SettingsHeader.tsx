@@ -40,16 +40,13 @@ export const SettingsHeader = ({
   const currentRoute = routeMap[pathname];
 
   return (
-    <Styled.SettingsHeader>
+    <$SettingsHeader>
       <BackButton />
-      <Styled.Label>{currentRoute?.label}</Styled.Label>
-    </Styled.SettingsHeader>
+      <$Label>{currentRoute?.label}</$Label>
+    </$SettingsHeader>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.SettingsHeader = styled.header`
+const $SettingsHeader = styled.header`
   --stickyArea-topHeight: var(--page-header-height-mobile);
 
   ${layoutMixins.stickyHeader}
@@ -60,7 +57,7 @@ Styled.SettingsHeader = styled.header`
   background-color: var(--color-layer-2);
 `;
 
-Styled.Label = styled.h1`
+const $Label = styled.h1`
   padding: 0.5rem;
   font: var(--font-extra-medium);
 `;

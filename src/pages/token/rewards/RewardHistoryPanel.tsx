@@ -48,8 +48,8 @@ export const RewardHistoryPanel = () => {
   return (
     <Panel
       slotHeader={
-        <Styled.Header>
-          <Styled.Title>
+        <$Header>
+          <$Title>
             <WithTooltip tooltip="reward-history">
               <h3>{stringGetter({ key: STRING_KEYS.REWARD_HISTORY })}</h3>
             </WithTooltip>
@@ -58,7 +58,7 @@ export const RewardHistoryPanel = () => {
                 key: STRING_KEYS.REWARD_HISTORY_DESCRIPTION,
                 params: {
                   REWARDS_HISTORY_START_DATE: (
-                    <Styled.Output
+                    <$Output
                       type={OutputType.Date}
                       value={REWARDS_HISTORY_START_DATE_MS}
                       timeOptions={{ useUTC: true }}
@@ -67,7 +67,7 @@ export const RewardHistoryPanel = () => {
                 },
               })}
             </span>
-          </Styled.Title>
+          </$Title>
           <ToggleGroup
             items={[
               {
@@ -86,17 +86,14 @@ export const RewardHistoryPanel = () => {
             value={selectedPeriod.name}
             onValueChange={onSelectPeriod}
           />
-        </Styled.Header>
+        </$Header>
       }
     >
       <TradingRewardHistoryTable period={selectedPeriod} />
     </Panel>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Header = styled.div`
+const $Header = styled.div`
   ${layoutMixins.spacedRow}
 
   padding: 1rem 1rem 0;
@@ -107,7 +104,7 @@ Styled.Header = styled.div`
   }
 `;
 
-Styled.Title = styled.div`
+const $Title = styled.div`
   ${layoutMixins.column}
   color: var(--color-text-0);
   font: var(--font-small-book);
@@ -118,11 +115,11 @@ Styled.Title = styled.div`
   }
 `;
 
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.flexColumn}
   gap: 0.75rem;
 `;
 
-Styled.Output = styled(Output)`
+const $Output = styled(Output)`
   display: inline;
 `;

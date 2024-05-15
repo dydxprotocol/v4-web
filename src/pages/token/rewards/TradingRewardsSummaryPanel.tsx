@@ -32,29 +32,27 @@ export const TradingRewardsSummaryPanel = () => {
 
   return !currentWeekTradingReward ? null : (
     <Panel
-      slotHeader={
-        <Styled.Header>{stringGetter({ key: STRING_KEYS.TRADING_REWARDS_SUMMARY })}</Styled.Header>
-      }
+      slotHeader={<$Header>{stringGetter({ key: STRING_KEYS.TRADING_REWARDS_SUMMARY })}</$Header>}
     >
-      <Styled.Content>
-        <Styled.TradingRewardsDetails
+      <$Content>
+        <$TradingRewardsDetails
           layout="grid"
           items={[
             {
               key: 'week',
               label: (
-                <Styled.Label>
+                <$Label>
                   <h4>{stringGetter({ key: STRING_KEYS.THIS_WEEK })}</h4>
-                </Styled.Label>
+                </$Label>
               ),
               value: (
-                <Styled.Column>
+                <$Column>
                   <Output
-                    slotRight={<Styled.AssetIcon symbol={chainTokenLabel} />}
+                    slotRight={<$AssetIcon symbol={chainTokenLabel} />}
                     type={OutputType.Asset}
                     value={currentWeekTradingReward.amount}
                   />
-                  <Styled.TimePeriod>
+                  <$TimePeriod>
                     <Output
                       type={OutputType.Date}
                       value={currentWeekTradingReward.startedAtInMilliseconds}
@@ -66,32 +64,29 @@ export const TradingRewardsSummaryPanel = () => {
                       value={currentWeekTradingReward.endedAtInMilliseconds}
                       timeOptions={{ useUTC: true }}
                     />
-                  </Styled.TimePeriod>
-                </Styled.Column>
+                  </$TimePeriod>
+                </$Column>
               ),
             },
             // TODO(@aforaleka): add all-time when supported
           ]}
         />
-      </Styled.Content>
+      </$Content>
     </Panel>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Header = styled.div`
+const $Header = styled.div`
   padding: var(--panel-paddingY) var(--panel-paddingX) 0;
   font: var(--font-medium-book);
   color: var(--color-text-2);
 `;
 
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.flexColumn}
   gap: 0.75rem;
 `;
 
-Styled.TradingRewardsDetails = styled(Details)`
+const $TradingRewardsDetails = styled(Details)`
   --details-item-backgroundColor: var(--color-layer-6);
 
   grid-template-columns: 1fr; // TODO(@aforaleka): change to 1fr 1fr when all-time is supported
@@ -114,14 +109,14 @@ Styled.TradingRewardsDetails = styled(Details)`
   }
 `;
 
-Styled.Label = styled.div`
+const $Label = styled.div`
   ${layoutMixins.spacedRow}
 
   font: var(--font-base-book);
   color: var(--color-text-1);
 `;
 
-Styled.TimePeriod = styled.div`
+const $TimePeriod = styled.div`
   ${layoutMixins.inlineRow}
 
   &, output {
@@ -130,11 +125,11 @@ Styled.TimePeriod = styled.div`
   }
 `;
 
-Styled.Column = styled.div`
+const $Column = styled.div`
   ${layoutMixins.flexColumn}
   gap: 0.33rem;
 `;
 
-Styled.AssetIcon = styled(AssetIcon)`
+const $AssetIcon = styled(AssetIcon)`
   margin-left: 0.5ch;
 `;
