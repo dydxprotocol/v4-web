@@ -38,7 +38,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions, resources } =
     useSelector(getTransferInputs, shallowEqual) || {};
-  const { CCTPWithdrawalOnly } = useEnvFeatures();
+  const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
 
   const tokens =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() || [];
@@ -71,10 +71,14 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
       ),
       tag: resources?.tokenResources?.get(token.type)?.symbol,
     }))
-    .filter(
-      (token) =>
-        type === TransferType.deposit || !!cctpTokensByAddress[token.value] || !CCTPWithdrawalOnly
-    )
+    .filter((token) => {
+      if (type === TransferType.deposit) {
+        // if deposit, return only CCTP tokens UNLESS CCTPDepositOnly is not enabled
+        return !!cctpTokensByAddress[token.value] || !CCTPDepositOnly;
+      }
+      // if withdrawal, return only CCTP tokens UNLESS CCTPWithdrawalOnly is not enabled
+      return !!cctpTokensByAddress[token.value] || !CCTPWithdrawalOnly;
+    })
     .sort((token) => (!!cctpTokensByAddress[token.value] ? -1 : 1));
 
   return (
