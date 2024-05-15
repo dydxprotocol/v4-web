@@ -64,7 +64,11 @@ This will automatically open your default browser at `http://localhost:61000`.
 
 ## Part 3: Configuring environment
 
-Add or modify the relevant endpoints, links and options in `/public/configs/env.json`.
+Add or modify the relevant endpoints, links and options in `/public/configs/v1/env.json`.
+
+NOTE: There exists a deprecated file `/public/configs/env.json`. If you have users running older mobile versions you may
+need to keep feature flags between the two files in sync but may otherwise ignore it.
+
 You'll need to provide a Wallet Connect project id to enable onboarding and wallet connection:
 
 - Create a project on https://cloud.walletconnect.com/app
@@ -141,6 +145,7 @@ To run the tests run: `pnpm run wdio`
 ## Directory structure
 
 Our tooling assumes that the [v4-abacus repo](https://github.com/dydxprotocol/v4-abacus) is checked out alongside v4-web:
+
 ```
 --- parent folder
  |___ v4-web
@@ -150,18 +155,22 @@ Our tooling assumes that the [v4-abacus repo](https://github.com/dydxprotocol/v4
 ## Using your local v4-abacus repo
 
 Whenever you have changes in v4-abacus that you'd like to test in your local v4-web branch, use the following command:
+
 ```
 pnpm run install-local-abacus --clean
 ```
+
 The `--clean` option will do some extra cleaning, **it is not needed on subsequent runs.**
 
 ## Reverting to remote abacus
 
 Revert any changes to @dydxprotocol/v4-abacus in package.json and pnpm-lock.yaml. If you haven't made any other package changes, you can use:
+
 ```
 git restore main package.json
 git restore main pnpm-lock.yaml
 ```
+
 Then run `pnpm install`
 
 **Remember to revert to remote abacus before making a PR.**
