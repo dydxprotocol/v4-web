@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 
 import { curveLinear } from '@visx/curve';
 import type { TooltipContextType } from '@visx/xychart';
-import debounce from 'lodash/debounce';
+import { debounce } from 'lodash';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
@@ -94,7 +94,7 @@ export const PnlChart = ({
   const [minimumRequestedZoomDomain, setMinimumRequestedZoomDomain] = useState(-Infinity);
 
   const [selectedPeriod, setSelectedPeriod] = useState<HistoricalPnlPeriods>(
-    abacusStateManager.getHistoricalPnlPeriod() || HistoricalPnlPeriod.Period1d
+    HistoricalPnlPeriod.Period7d
   );
 
   /**
@@ -102,7 +102,7 @@ export const PnlChart = ({
    */
   useEffect(() => {
     abacusStateManager.setHistoricalPnlPeriod(HistoricalPnlPeriod.Period90d);
-  }, [pnlData]);
+  }, []);
 
   const onSelectPeriod = useCallback(
     (periodName: string) => {
@@ -168,7 +168,7 @@ export const PnlChart = ({
                 } as PnlDatum)
             )
         : [],
-    [pnlData, equity, selectedPeriod, now]
+    [pnlData, equity?.current, now]
   );
 
   const chartBackground =

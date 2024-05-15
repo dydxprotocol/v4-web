@@ -158,11 +158,17 @@ export const TimeSeriesChart = <Datum extends {}>({
   useAnimationFrame(
     (elapsedMilliseconds) => {
       if (zoomDomainAnimateTo) {
-        setZoomDomain(
-          (zoomDomain) =>
-            zoomDomain &&
-            zoomDomain * (zoomDomainAnimateTo / zoomDomain) ** (elapsedMilliseconds * 0.0166)
-        );
+        setZoomDomain((zoomDomain) => {
+          if (!zoomDomain) return zoomDomain;
+
+          const newZoomDomain =
+            zoomDomain * (zoomDomainAnimateTo / zoomDomain) ** (elapsedMilliseconds * 0.0166);
+
+          // clamp according to direction
+          return zoomDomainAnimateTo > zoomDomain
+            ? Math.min(newZoomDomain, zoomDomainAnimateTo)
+            : Math.max(newZoomDomain, zoomDomainAnimateTo);
+        });
       }
     },
     [zoomDomainAnimateTo]
@@ -190,7 +196,6 @@ export const TimeSeriesChart = <Datum extends {}>({
     );
 
     const range = visibleData
-      .filter((datum) => xAccessor(datum) >= domain[0] && xAccessor(datum) <= domain[1])
       .map((datum) => yAccessor(datum))
       .reduce((range, y) => [Math.min(range[0], y), Math.max(range[1], y)] as const, [
         Infinity,
