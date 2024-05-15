@@ -8,7 +8,7 @@ export const TableCell = ({
   slotLeft,
   slotRight,
   stacked,
-  stackedWithSecondaryStyling = true,
+  stackedWithSecondaryStyling = stacked,
   isHighlighted,
 }: {
   className?: string;
