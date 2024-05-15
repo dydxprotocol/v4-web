@@ -8,6 +8,7 @@ import type {
   HistoricalTradingRewardsPeriods,
   HumanReadableCancelOrderPayload,
   HumanReadablePlaceOrderPayload,
+  HumanReadableSubaccountTransferPayload,
   HumanReadableTriggerOrdersPayload,
   Nullable,
   ParsingError,
@@ -81,7 +82,8 @@ class AbacusStateManager {
       this.analytics,
       new AbacusThreading(),
       new CoroutineTimer(),
-      new AbacusFileSystem()
+      new AbacusFileSystem(),
+      null
     );
 
     const uiImplementations = new UIImplementations(
@@ -279,6 +281,7 @@ class AbacusStateManager {
     value: any;
     field: AdjustIsolatedMarginInputFields;
   }) => {
+    console.log(`${field.name}: ${value}`);
     this.stateManager.adjustIsolatedMargin(value, field);
   };
 
@@ -347,6 +350,11 @@ class AbacusStateManager {
       data: Nullable<HumanReadableCancelOrderPayload>
     ) => void
   ) => this.stateManager.cancelOrder(orderId, callback);
+
+  adjustIsolatedMarginOfPosition = (
+    callback: (success: boolean, parsingError: Nullable<ParsingError>, data: string) => void
+  ): Nullable<HumanReadableSubaccountTransferPayload> =>
+    this.stateManager.commitAdjustIsolatedMargin(callback);
 
   triggerOrders = (
     callback: (

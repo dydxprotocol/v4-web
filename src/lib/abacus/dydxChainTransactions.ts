@@ -604,12 +604,12 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
           callback(result);
           break;
         }
-        case TransactionType.simulateWithdraw: {
+        case TransactionType.SimulateWithdraw: {
           const result = await this.simulateWithdrawTransaction(params);
           callback(result);
           break;
         }
-        case TransactionType.simulateTransferNativeToken: {
+        case TransactionType.SimulateTransferNativeToken: {
           const result = await this.simulateTransferNativeTokenTransaction(params);
           callback(result);
           break;

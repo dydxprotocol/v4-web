@@ -1,15 +1,22 @@
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo } from 'react';
 
+import { NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import type { SubaccountPosition } from '@/constants/abacus';
+import {
+  AdjustIsolatedMarginInputField,
+  HumanReadableSubaccountTransferPayload,
+  IsolatedMarginAdjustmentType,
+  Nullable,
+  type SubaccountPosition,
+} from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
-import { ButtonAction, ButtonShape } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { NumberSign, USD_DECIMALS } from '@/constants/numbers';
+import { NumberSign } from '@/constants/numbers';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter, useSubaccount } from '@/hooks';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -25,9 +32,10 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
 import { getOpenPositionFromId, getSubaccount } from '@/state/accountSelectors';
+import { getAdjustIsolatedMarginInputs } from '@/state/inputsSelectors';
 import { getMarketConfig } from '@/state/perpetualsSelectors';
 
-import { calculateCrossPositionMargin } from '@/lib/tradeData';
+import abacusStateManager from '@/lib/abacus';
 
 type ElementProps = {
   marketId: SubaccountPosition['id'];
@@ -48,28 +56,60 @@ const SIZE_PERCENT_OPTIONS = {
 
 export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const [marginAction, setMarginAction] = useState(MarginAction.ADD);
   const subaccountPosition = useSelector(getOpenPositionFromId(marketId));
-  const { adjustedMmf, leverage, liquidationPrice, notionalTotal } = subaccountPosition ?? {};
+  const { childSubaccountNumber, leverage, liquidationPrice, quoteBalance } =
+    subaccountPosition ?? {};
   const marketConfig = useSelector(getMarketConfig(marketId));
+  const adjustIsolatedMarginInputs = useSelector(getAdjustIsolatedMarginInputs, shallowEqual);
+  const { type, amount, amountPercent } = adjustIsolatedMarginInputs ?? {};
   const { tickSizeDecimals } = marketConfig ?? {};
 
-  /**
-   * @todo: Replace with Abacus functionality
-   */
-  const [percent, setPercent] = useState('');
-  const [amount, setAmount] = useState('');
-  const onSubmit = () => {};
+  useEffect(() => {
+    console.log('childSubaccountNumber', childSubaccountNumber);
+    abacusStateManager.setAdjustIsolatedMarginValue({
+      value: childSubaccountNumber,
+      field: AdjustIsolatedMarginInputField.ChildSubaccountNumber,
+    });
+  }, []);
 
-  const positionMargin = {
-    current: calculateCrossPositionMargin({
-      adjustedMmf: adjustedMmf?.current,
-      notionalTotal: notionalTotal?.current,
-    }).toFixed(tickSizeDecimals ?? USD_DECIMALS),
-    postOrder: calculateCrossPositionMargin({
-      adjustedMmf: adjustedMmf?.postOrder,
-      notionalTotal: notionalTotal?.postOrder,
-    }).toFixed(tickSizeDecimals ?? USD_DECIMALS),
+  const setAmount = ({ floatValue }: NumberFormatValues) => {
+    abacusStateManager.setAdjustIsolatedMarginValue({
+      value: floatValue,
+      field: AdjustIsolatedMarginInputField.Amount,
+    });
+  };
+
+  const setPercent = (value: string) => {
+    abacusStateManager.setAdjustIsolatedMarginValue({
+      value,
+      field: AdjustIsolatedMarginInputField.AmountPercent,
+    });
+  };
+
+  const setMarginAction = (type: string) => {
+    abacusStateManager.setAdjustIsolatedMarginValue({
+      value: type,
+      field: AdjustIsolatedMarginInputField.Type,
+    });
+  };
+
+  const { adjustIsolatedMarginOfPosition } = useSubaccount();
+
+  const onSubmit = () => {
+    try {
+      adjustIsolatedMarginOfPosition({
+        onError: (errorParams) => {
+          console.log({ errorParams });
+        },
+        onSuccess: (
+          subaccountTransferPayload?: Nullable<HumanReadableSubaccountTransferPayload>
+        ) => {
+          console.log({ subaccountTransferPayload });
+        },
+      });
+    } catch (error) {
+      console.log('error', error);
+    }
   };
 
   const { freeCollateral, marginUsage } = useSelector(getSubaccount, shallowEqual) ?? {};
@@ -92,35 +132,35 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
     () => ({
       freeCollateralDiffOutput: renderDiffOutput({
         withDiff:
-          !!freeCollateral?.postOrder && freeCollateral?.current !== freeCollateral?.postOrder,
+          !!freeCollateral?.postOrder && freeCollateral.current !== freeCollateral?.postOrder,
         value: freeCollateral?.current,
         newValue: freeCollateral?.postOrder,
-        type: OutputType.Number,
+        type: OutputType.Fiat,
       }),
       marginUsageDiffOutput: renderDiffOutput({
-        withDiff: !!marginUsage?.postOrder && marginUsage?.current !== marginUsage?.postOrder,
+        withDiff: !!marginUsage?.postOrder && marginUsage.current !== marginUsage?.postOrder,
         value: marginUsage?.current,
         newValue: marginUsage?.postOrder,
         type: OutputType.Percent,
       }),
       positionMarginDiffOutput: renderDiffOutput({
-        withDiff: !!positionMargin.postOrder && positionMargin.current !== positionMargin.postOrder,
-        value: positionMargin.current,
-        newValue: positionMargin.postOrder,
+        withDiff: !!quoteBalance?.postOrder && quoteBalance.current !== quoteBalance.postOrder,
+        value: quoteBalance?.current,
+        newValue: quoteBalance?.postOrder,
         type: OutputType.Fiat,
       }),
       leverageDiffOutput: renderDiffOutput({
-        withDiff: !!leverage?.postOrder && leverage?.current !== leverage?.postOrder,
+        withDiff: !!leverage?.postOrder && leverage.current !== leverage?.postOrder,
         value: leverage?.current,
         newValue: leverage?.postOrder,
         type: OutputType.Multiple,
       }),
     }),
-    [freeCollateral, marginUsage, positionMargin, leverage]
+    [freeCollateral, marginUsage, quoteBalance, leverage]
   );
 
   const formConfig =
-    marginAction === MarginAction.ADD
+    type === IsolatedMarginAdjustmentType.Add
       ? {
           formLabel: stringGetter({ key: STRING_KEYS.ADDING }),
           buttonLabel: stringGetter({ key: STRING_KEYS.ADD_MARGIN }),
@@ -211,11 +251,17 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
       }}
     >
       <ToggleGroup
-        value={marginAction}
+        value={type?.name ?? IsolatedMarginAdjustmentType.Add.name}
         onValueChange={setMarginAction}
         items={[
-          { value: MarginAction.ADD, label: stringGetter({ key: STRING_KEYS.ADD_MARGIN }) },
-          { value: MarginAction.REMOVE, label: stringGetter({ key: STRING_KEYS.REMOVE_MARGIN }) },
+          {
+            value: IsolatedMarginAdjustmentType.Add.name,
+            label: stringGetter({ key: STRING_KEYS.ADD_MARGIN }),
+          },
+          {
+            value: IsolatedMarginAdjustmentType.Remove.name,
+            label: stringGetter({ key: STRING_KEYS.REMOVE_MARGIN }),
+          },
         ]}
       />
 
@@ -224,7 +270,7 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
           label: key,
           value: value.toString(),
         }))}
-        value={percent}
+        value={amountPercent ?? ''}
         onValueChange={setPercent}
         shape={ButtonShape.Rectangle}
       />
@@ -241,7 +287,9 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
       {CenterElement}
 
       <WithDetailsReceipt detailItems={formConfig.receiptItems}>
-        <Button action={ButtonAction.Primary}>{formConfig.buttonLabel}</Button>
+        <Button type={ButtonType.Submit} action={ButtonAction.Primary}>
+          {formConfig.buttonLabel}
+        </Button>
       </WithDetailsReceipt>
     </Styled.Form>
   );

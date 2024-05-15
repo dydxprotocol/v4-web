@@ -151,7 +151,7 @@ export type SubaccountTransfers = Abacus.exchange.dydx.abacus.output.SubaccountT
 // ------ Historical PnL ------ //
 export type SubAccountHistoricalPNL = Abacus.exchange.dydx.abacus.output.SubaccountHistoricalPNL;
 export type SubAccountHistoricalPNLs = Abacus.exchange.dydx.abacus.output.SubaccountHistoricalPNL[];
-export const HistoricalPnlPeriod = Abacus.exchange.dydx.abacus.protocols.HistoricalPnlPeriod;
+export const HistoricalPnlPeriod = Abacus.exchange.dydx.abacus.state.manager.HistoricalPnlPeriod;
 const historicalPnlPeriod = [...HistoricalPnlPeriod.values()] as const;
 export type HistoricalPnlPeriods = (typeof historicalPnlPeriod)[number];
 
@@ -168,6 +168,8 @@ export const AdjustIsolatedMarginInputField =
   Abacus.exchange.dydx.abacus.state.model.AdjustIsolatedMarginInputField;
 const adjustIsolatedMarginInputFields = [...AdjustIsolatedMarginInputField.values()] as const;
 export type AdjustIsolatedMarginInputFields = (typeof adjustIsolatedMarginInputFields)[number];
+export const IsolatedMarginAdjustmentType =
+  Abacus.exchange.dydx.abacus.output.input.IsolatedMarginAdjustmentType;
 
 // ------ Trade Items ------ //
 export const TradeInputField = Abacus.exchange.dydx.abacus.state.model.TradeInputField;
@@ -218,6 +220,8 @@ export type HumanReadableWithdrawPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableWithdrawPayload;
 export type HumanReadableTransferPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableTransferPayload;
+export type HumanReadableSubaccountTransferPayload =
+  Abacus.exchange.dydx.abacus.state.manager.HumanReadableSubaccountTransferPayload;
 
 // ------ Helpers ------ //
 export const AbacusHelper = Abacus.exchange.dydx.abacus.utils.AbacusHelper;
