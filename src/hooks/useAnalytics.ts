@@ -12,6 +12,7 @@ import { getActiveDialog } from '@/state/dialogsSelectors';
 import { getInputTradeData } from '@/state/inputsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
+import { lastSuccessfulWebsocketRequestByOrigin } from '@/lib/abacus/lastSuccessfulRequestGlobals';
 import { identify, track } from '@/lib/analytics';
 import { getSelectedTradeType } from '@/lib/tradeData';
 
@@ -219,6 +220,3 @@ export const useAnalytics = () => {
     }
   }, [selectedOrderType]);
 };
-
-export const lastSuccessfulRestRequestByOrigin: Record<URL['origin'], number> = {};
-export const lastSuccessfulWebsocketRequestByOrigin: Record<URL['origin'], number> = {};

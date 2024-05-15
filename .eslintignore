@@ -6,7 +6,6 @@ commitlint.config.ts
 
 # Temporarily ignore, we will slowly remove each directory as we fix files to follow ESLint rules
 /src/hooks
-/src/lib
 /src/views
 
 # components dir is being worked on

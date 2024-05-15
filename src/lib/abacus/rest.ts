@@ -2,7 +2,7 @@ import type { Nullable, kollections } from '@dydxprotocol/v4-abacus';
 
 import type { AbacusRestProtocol } from '@/constants/abacus';
 
-import { lastSuccessfulRestRequestByOrigin } from '@/hooks/useAnalytics';
+import { lastSuccessfulRestRequestByOrigin } from './lastSuccessfulRequestGlobals';
 
 type Headers = Nullable<kollections.Map<string, string>>;
 type FetchResponseCallback = (p0: Nullable<string>, p1: number, p2: Nullable<string>) => void;
@@ -56,7 +56,8 @@ class AbacusRest implements AbacusRestProtocol {
       .then(async (response) => {
         const data = await response.text();
         const headersObj: Record<string, string> = {};
-        for (let [key, value] of response.headers) {
+        // eslint-disable-next-line no-restricted-syntax
+        for (const [key, value] of response.headers) {
           headersObj[key] = value;
         }
         // Stringify the headers object
@@ -66,7 +67,9 @@ class AbacusRest implements AbacusRestProtocol {
 
         try {
           lastSuccessfulRestRequestByOrigin[new URL(url).origin] = Date.now();
-        } catch {}
+        } catch {
+          /* empty */
+        }
       })
       .catch(() => callback(null, 0, null)); // Network error or request couldn't be made
   }

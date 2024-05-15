@@ -28,5 +28,5 @@ const toDataUrl = (bytes: string, type = 'image/svg+xml') =>
 
 export const renderSvgToDataUrl = async (node: React.ReactElement<any, 'svg'>) => {
   const { renderToString } = await import('react-dom/server');
-  return await toDataUrl(applyComputedStyles(renderToString(node))!);
+  return toDataUrl(applyComputedStyles(renderToString(node))!);
 };

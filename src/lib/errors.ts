@@ -3,6 +3,7 @@
  */
 export class StatefulOrderError extends Error {
   response: any;
+
   code: number;
 
   constructor(message: any, response: any) {
