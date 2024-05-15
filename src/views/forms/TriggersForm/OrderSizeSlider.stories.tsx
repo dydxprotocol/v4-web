@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import type { Story } from '@ladle/react';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { breakpoints } from '@/styles';
 

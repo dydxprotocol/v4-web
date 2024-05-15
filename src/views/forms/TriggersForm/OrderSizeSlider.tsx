@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 import _ from 'lodash';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { Slider } from '@/components/Slider';
 

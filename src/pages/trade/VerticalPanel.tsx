@@ -28,8 +28,8 @@ export const VerticalPanel = ({ tradeLayout }: { tradeLayout: TradeLayouts }) =>
     <Tabs
       fullWidthTabs
       value={value}
-      onValueChange={(value: Tab) => {
-        setValue(value);
+      onValueChange={(v: Tab) => {
+        setValue(v);
       }}
       items={[
         {

@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 
 import { useDispatch } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { AbacusOrderStatus, type OrderStatus } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';

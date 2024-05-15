@@ -1,5 +1,5 @@
 import { Root } from '@radix-ui/react-toolbar';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import type { MenuItem } from '@/constants/menus';
 

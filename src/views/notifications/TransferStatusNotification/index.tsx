@@ -1,6 +1,6 @@
 import { MouseEvent, useCallback, useState } from 'react';
 
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 import { STRING_KEYS } from '@/constants/localization';

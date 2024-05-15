@@ -1,4 +1,5 @@
-import styled, { AnyStyledComponent } from 'styled-components';
+/* eslint-disable no-irregular-whitespace */
+import styled from 'styled-components';
 
 import { articleMixins } from '@/styles/articleMixins';
 
@@ -6,7 +7,7 @@ const TermsOfUsePage = () => (
   <$Article>
     <header>
       <h1>Sample Terms of Use</h1>
-      <span></span>
+      <span />
     </header>
     <div>
       <p>

@@ -1,7 +1,7 @@
 import { forwardRef, type Ref } from 'react';
 
 import { Item, Root } from '@radix-ui/react-toggle-group';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { type MenuItem } from '@/constants/menus';

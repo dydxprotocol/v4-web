@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { AbacusApiStatus } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';

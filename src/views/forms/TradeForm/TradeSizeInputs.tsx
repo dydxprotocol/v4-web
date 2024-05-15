@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
