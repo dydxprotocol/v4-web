@@ -55,11 +55,11 @@ export const MarketsStats = (props: MarketsStatsProps) => {
               items={[
                 {
                   label: stringGetter({ key: STRING_KEYS.GAINERS }),
-                  value: 'gainers',
+                  value: MarketSorting.GAINERS,
                 },
                 {
                   label: stringGetter({ key: STRING_KEYS.LOSERS }),
-                  value: 'losers',
+                  value: MarketSorting.LOSERS,
                 },
               ]}
               value={sorting}

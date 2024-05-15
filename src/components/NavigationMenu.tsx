@@ -1,4 +1,4 @@
-import { forwardRef, Ref } from 'react';
+import { Ref } from 'react';
 
 import {
   Content,
@@ -10,7 +10,7 @@ import {
   Trigger,
   Viewport,
 } from '@radix-ui/react-navigation-menu';
-import { matchPath, NavLink, useLocation } from 'react-router-dom';
+import { NavLink, matchPath, useLocation } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
 
 import { MenuConfig, MenuItem } from '@/constants/menus';
@@ -18,6 +18,7 @@ import { MenuConfig, MenuItem } from '@/constants/menus';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
 
+import { forwardRefFn, getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { isExternalLink } from '@/lib/isExternalLink';
 
 import { Icon, IconName } from './Icon';
@@ -46,8 +47,9 @@ function NavItemWithRef<MenuItemValue extends string>(
     slotAfter = isExternalLink(href) ? <Icon iconName={IconName.LinkOut} /> : undefined,
     onSelect,
     subitems,
+    type,
     ...props
-  }: MenuItem<MenuItemValue>,
+  }: MenuItem<MenuItemValue, string | number>,
   ref: Ref<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement>
 ) {
   const location = useLocation();
@@ -76,7 +78,7 @@ function NavItemWithRef<MenuItemValue extends string>(
       asChild
       target={isExternalLink(href) ? '_blank' : undefined}
     >
-      <NavLink to={href} ref={ref as Ref<HTMLAnchorElement>} {...props}>
+      <NavLink to={href} ref={ref as Ref<HTMLAnchorElement>} type={'' + type} {...props}>
         {children}
       </NavLink>
     </Link>
@@ -93,10 +95,7 @@ function NavItemWithRef<MenuItemValue extends string>(
   );
 }
 
-const NavItem = forwardRef(NavItemWithRef);
-
-type AllNavItemProps<MenuItemValue extends string> = MenuItem<MenuItemValue, string | number> &
-  React.RefAttributes<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement>;
+const NavItem = forwardRefFn(NavItemWithRef);
 
 export const NavigationMenu = <MenuItemValue extends string, MenuGroupValue extends string>({
   onSelectItem,
@@ -390,8 +389,10 @@ const $SubMenuTrigger = styled(Trigger)`
   }
 `;
 
-type NavItemStyleProps = { orientation: 'horizontal' | 'vertical' };
-const $NavItem = styled(NavItem)<NavItemStyleProps>`
+type navItemStyleProps = { orientation: 'horizontal' | 'vertical' };
+const NavItemTypeTemp = getSimpleStyledOutputType(NavItem, {} as navItemStyleProps);
+
+const $NavItem = styled(NavItem)<navItemStyleProps>`
   ${({ subitems }) =>
     subitems?.length
       ? css`
@@ -463,9 +464,7 @@ const $NavItem = styled(NavItem)<NavItemStyleProps>`
   ${$List}[data-orientation="menu"] ${$List}[data-orientation="menu"] > ${$ListItem}:first-child > & {
     border-top-left-radius: 0;
   }
-` as <MenuItemValue extends string>(
-  props: AllNavItemProps<MenuItemValue> & NavItemStyleProps
-) => React.ReactNode;
+` as typeof NavItemTypeTemp;
 
 const $Icon = styled(Icon)`
   font-size: 0.375em;

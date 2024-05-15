@@ -17,6 +17,8 @@ import { Popover, TriggerType } from '@/components/Popover';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithLabel } from '@/components/WithLabel';
 
+import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
+
 type ElementProps = {
   asChild?: boolean;
   children: ReactNode;
@@ -126,9 +128,10 @@ const $Popover = styled(Popover)`
   box-shadow: none;
 `;
 
-type ComboboxMenuStyleProps = { $withSearch?: boolean };
+type comboboxMenuStyleProps = { $withSearch?: boolean };
+const ComboboxMenuStyleType = getSimpleStyledOutputType(ComboboxMenu, {} as comboboxMenuStyleProps);
 
-const $ComboboxMenu = styled(ComboboxMenu)<ComboboxMenuStyleProps>`
+const $ComboboxMenu = styled(ComboboxMenu)<comboboxMenuStyleProps>`
   ${layoutMixins.withInnerHorizontalBorders}
 
   --comboboxMenu-backgroundColor: var(--color-layer-4);
@@ -151,10 +154,7 @@ const $ComboboxMenu = styled(ComboboxMenu)<ComboboxMenuStyleProps>`
   border-radius: 0.5rem;
   max-height: 30vh;
   overflow: auto;
-` as <MenuItemValue extends string | number, MenuGroupValue extends string | number>(
-  props: React.ComponentProps<typeof ComboboxMenu<MenuItemValue, MenuGroupValue>> &
-    ComboboxMenuStyleProps
-) => JSX.Element;
+` as typeof ComboboxMenuStyleType;
 
 const $TriggerIcon = styled(Icon)<{ open?: boolean }>`
   width: 0.625rem;

@@ -144,7 +144,7 @@ export const TradeForm = ({
   const { typeOptions } = useSelector(getInputTradeOptions, shallowEqual) ?? {};
 
   const allTradeTypeItems = (typeOptions?.toArray() ?? []).map(({ type, stringKey }) => ({
-    value: type,
+    value: type as TradeTypes,
     label: stringGetter({
       key: stringKey as StringKey,
     }),
@@ -594,7 +594,7 @@ const $ToggleGroup = styled(ToggleGroup)`
       height: 0;
     }
   }
-`;
+` as typeof ToggleGroup;
 const $InputsColumn = styled.div`
   ${formMixins.inputsColumn}
 `;
