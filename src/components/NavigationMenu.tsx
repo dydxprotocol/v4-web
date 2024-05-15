@@ -467,8 +467,6 @@ const $NavItem = styled(NavItem)<NavItemStyleProps>`
   props: AllNavItemProps<MenuItemValue> & NavItemStyleProps
 ) => React.ReactNode;
 
-type r = React.ComponentProps<typeof NavItem>;
-
 const $Icon = styled(Icon)`
   font-size: 0.375em;
   transition: rotate 0.3s var(--ease-out-expo);
