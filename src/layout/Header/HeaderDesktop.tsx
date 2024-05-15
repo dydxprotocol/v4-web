@@ -12,7 +12,7 @@ import { AppRoute } from '@/constants/routes';
 import { useStringGetter, useTokenConfigs, useURLConfigs } from '@/hooks';
 import { useComplianceState } from '@/hooks/useComplianceState';
 
-import { LogoShortIcon } from '@/icons';
+import { BellStrokeIcon, LogoShortIcon } from '@/icons';
 import breakpoints from '@/styles/breakpoints';
 import { headerMixins } from '@/styles/headerMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -146,7 +146,14 @@ export const HeaderDesktop = () => {
 
         <VerticalSeparator />
 
-        <NotificationsMenu slotTrigger={<$IconButton shape={ButtonShape.Rectangle} />} />
+        <NotificationsMenu
+          slotTrigger={
+            <$IconButton
+              shape={ButtonShape.Rectangle}
+              iconComponent={BellStrokeIcon as React.ElementType}
+            />
+          }
+        />
 
         <VerticalSeparator />
 
