@@ -54,6 +54,7 @@ export const formatRelativeTime = (
 
   const unitParts = [];
 
+  // eslint-disable-next-line no-restricted-syntax
   for (const [unit, amount] of Object.entries(timeUnits).slice(
     Object.keys(timeUnits).findIndex((u) => u === largestUnit)
   ))

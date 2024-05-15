@@ -57,6 +57,7 @@ export const subscribeOnStream = ({
 
 export const unsubscribeFromStream = (subscriberUID: string) => {
   // find a subscription with id === subscriberUID
+  // eslint-disable-next-line no-restricted-syntax
   for (const channelId of subscriptionsByChannelId.keys()) {
     const subscriptionItem = subscriptionsByChannelId.get(channelId);
     const { handlers } = subscriptionItem ?? {};

@@ -26,9 +26,11 @@ export const getWalletConnection = ({
 }): WalletConnection | undefined => {
   const walletConfig = wallets[walletType];
 
+  // eslint-disable-next-line no-restricted-syntax
   for (const connectionType of walletConfig.connectionTypes) {
     switch (connectionType) {
       case WalletConnectionType.InjectedEip1193: {
+        // eslint-disable-next-line no-restricted-syntax
         for (const provider of detectInjectedEip1193Providers()) {
           if (walletConfig.matchesInjectedEip1193?.(provider)) {
             /* @ts-ignore */
