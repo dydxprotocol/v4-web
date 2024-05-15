@@ -15,6 +15,7 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { getTradeSide } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { getSelectedOrderSide } from '@/lib/tradeData';
 
 export const TradeSideToggle = memo(() => {
@@ -23,7 +24,7 @@ export const TradeSideToggle = memo(() => {
   const selectedOrderSide = getSelectedOrderSide(side);
 
   return (
-    <ToggleContainer
+    <$ToggleContainer
       items={[
         { value: OrderSide.BUY, label: stringGetter({ key: STRING_KEYS.BUY }) },
         { value: OrderSide.SELL, label: stringGetter({ key: STRING_KEYS.SELL }) },
@@ -42,7 +43,9 @@ export const TradeSideToggle = memo(() => {
   );
 });
 
-const ToggleContainer = styled(ToggleGroup)<{ value: OrderSide }>`
+type ToggleContainerStyleProps = { value: OrderSide };
+const toggleContainerType = getSimpleStyledOutputType(ToggleGroup, {} as ToggleContainerStyleProps);
+const $ToggleContainer = styled(ToggleGroup)<ToggleContainerStyleProps>`
   --toggle-radius: 0.5em;
   --toggle-color: var(--color-negative);
   --toggle-background: ${({ theme }) => theme.toggleBackground};
@@ -87,4 +90,4 @@ const ToggleContainer = styled(ToggleGroup)<{ value: OrderSide }>`
         transform: translateX(100%);
       `}
   }
-`;
+` as typeof toggleContainerType;

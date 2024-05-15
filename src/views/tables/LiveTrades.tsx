@@ -13,11 +13,11 @@ import { breakpoints } from '@/styles';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
-import { BaseTableRowData, CustomRowConfig, Table } from '@/components/Table';
 
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketLiveTrades } from '@/state/perpetualsSelectors';
 
+import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { getSelectedOrderSide } from '@/lib/tradeData';
 
@@ -161,6 +161,7 @@ const $SizeOutput = styled(Output)<StyleProps>`
   }
 `;
 
+const liveTradesTableType = getSimpleStyledOutputType(OrderbookTradesTable, {} as StyleProps);
 const $LiveTradesTable = styled(OrderbookTradesTable)<StyleProps>`
   tr {
     --histogram-bucket-size: 1;
@@ -229,8 +230,4 @@ const $LiveTradesTable = styled(OrderbookTradesTable)<StyleProps>`
 
     font-size: 0.875em;
   }
-` as <TableRowData extends BaseTableRowData | CustomRowConfig>(
-  props: React.ComponentProps<typeof Table<TableRowData>> & {
-    histogramSide?: 'left' | 'right';
-  } & StyleProps
-) => React.ReactNode;
+` as typeof liveTradesTableType;

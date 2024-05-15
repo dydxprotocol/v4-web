@@ -1,4 +1,4 @@
-import { Fragment, forwardRef, type Ref } from 'react';
+import { Fragment, type Ref } from 'react';
 
 import { Content, Item, Portal, Root, Separator, Trigger } from '@radix-ui/react-dropdown-menu';
 import styled from 'styled-components';
@@ -6,6 +6,8 @@ import styled from 'styled-components';
 import { popoverMixins } from '@/styles/popoverMixins';
 
 import { Icon, IconName } from '@/components/Icon';
+
+import { forwardRefFn } from '@/lib/genericFunctionalComponentUtils';
 
 export type DropdownMenuItem<T> = {
   value: T;
@@ -31,7 +33,7 @@ type ElementProps<T> = {
 
 type DropdownMenuProps<T> = StyleProps & ElementProps<T>;
 
-export const DropdownMenu = forwardRef(
+export const DropdownMenu = forwardRefFn(
   <T extends string>(
     {
       align = 'center',
