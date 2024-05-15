@@ -1,5 +1,5 @@
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -38,7 +38,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions, resources } =
     useSelector(getTransferInputs, shallowEqual) || {};
-  const { CCTPWithdrawalOnly } = useEnvFeatures();
+  const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
 
   const tokens =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() || [];
@@ -53,28 +53,38 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
       },
       slotBefore: (
         // the curve dao token svg causes the web app to lag when rendered
-        <Styled.Img src={token.type !== CURVE_DAO_TOKEN_ADDRESS ? token.iconUrl : null} alt="" />
+        <$Img
+          src={token.type !== CURVE_DAO_TOKEN_ADDRESS ? token.iconUrl ?? undefined : undefined}
+          alt=""
+        />
       ),
       slotAfter: !!cctpTokensByAddress[token.type] && (
-        <Styled.Text>
+        <$Text>
           {stringGetter({
             key: STRING_KEYS.LOWEST_FEES_WITH_USDC,
             params: {
               LOWEST_FEES_HIGHLIGHT_TEXT: (
-                <Styled.GreenHighlight>
+                <$GreenHighlight>
                   {stringGetter({ key: STRING_KEYS.LOWEST_FEES_HIGHLIGHT_TEXT })}
-                </Styled.GreenHighlight>
+                </$GreenHighlight>
               ),
             },
           })}
-        </Styled.Text>
+        </$Text>
       ),
       tag: resources?.tokenResources?.get(token.type)?.symbol,
     }))
-    .filter(
-      (token) =>
-        type === TransferType.deposit || !!cctpTokensByAddress[token.value] || !CCTPWithdrawalOnly
-    )
+    .filter((token) => {
+      // if deposit and CCTPDepositOnly enabled, only return cctp tokens
+      if (type === TransferType.deposit && CCTPDepositOnly) {
+        return !!cctpTokensByAddress[token.value];
+      }
+      // if withdrawal and CCTPWithdrawalOnly enabled, only return cctp tokens
+      if (type === TransferType.withdrawal && CCTPWithdrawalOnly) {
+        return !!cctpTokensByAddress[token.value];
+      }
+      return true;
+    })
     .sort((token) => (!!cctpTokensByAddress[token.value] ? -1 : 1));
 
   return (
@@ -106,44 +116,41 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
           : undefined
       }
     >
-      <Styled.AssetRow>
+      <$AssetRow>
         {selectedToken ? (
           <>
-            <Styled.Img src={selectedToken?.iconUrl} alt="" /> {selectedToken?.name}{' '}
+            <$Img src={selectedToken?.iconUrl ?? undefined} alt="" /> {selectedToken?.name}{' '}
             <Tag>{selectedToken?.symbol}</Tag>
           </>
         ) : (
           stringGetter({ key: STRING_KEYS.SELECT_ASSET })
         )}
-      </Styled.AssetRow>
+      </$AssetRow>
     </SearchSelectMenu>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Text = styled.div`
+const $Text = styled.div`
   font: var(--font-small-regular);
   color: var(--color-text-0);
 `;
 
-Styled.GreenHighlight = styled.span`
+const $GreenHighlight = styled.span`
   color: var(--color-green);
 `;
 
-Styled.AssetRow = styled.div`
+const $AssetRow = styled.div`
   ${layoutMixins.row}
   gap: 0.5rem;
   color: var(--color-text-2);
   font: var(--font-base-book);
 `;
 
-Styled.Img = styled.img`
+const $Img = styled.img`
   width: 1.25rem;
   height: 1.25rem;
   border-radius: 50%;
 `;
 
-Styled.Icon = styled(Icon)`
+const $Icon = styled(Icon)`
   height: 0.5rem;
 `;

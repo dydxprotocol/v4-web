@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { useDispatch } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { type SubaccountPosition } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';
@@ -48,7 +48,7 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
       stacked
       slotRight={
         marginMode === 'ISOLATED' && (
-          <Styled.EditButton
+          <$EditButton
             key="edit-margin"
             iconName={IconName.Pencil}
             shape={ButtonShape.Square}
@@ -69,10 +69,7 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
     </TableCell>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.EditButton = styled(IconButton)`
+const $EditButton = styled(IconButton)`
   --button-icon-size: 1.5em;
   --button-padding: 0;
   --button-textColor: var(--color-text-0);

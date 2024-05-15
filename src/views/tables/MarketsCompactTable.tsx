@@ -1,7 +1,7 @@
-import { PropsWithChildren, useMemo } from 'react';
+import { Key, PropsWithChildren, useMemo } from 'react';
 
 import { useNavigate } from 'react-router-dom';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, MarketSorting, type MarketData } from '@/constants/markets';
@@ -61,14 +61,14 @@ export const MarketsCompactTable = ({
             tickSizeDecimals,
           }) => (
             <TableCell stacked>
-              <Styled.TabletOutput
+              <$TabletOutput
                 withBaseFont
                 withSubscript
                 type={OutputType.Fiat}
                 value={oraclePrice}
                 fractionDigits={tickSizeDecimals}
               />
-              <Styled.TabletPriceChange>
+              <$TabletPriceChange>
                 {!priceChange24H ? (
                   <Output type={OutputType.Fiat} value={null} />
                 ) : (
@@ -76,7 +76,7 @@ export const MarketsCompactTable = ({
                     {priceChange24H > 0 && (
                       <TriangleIndicator value={MustBigNumber(priceChange24H)} />
                     )}
-                    <Styled.Output
+                    <$Output
                       type={OutputType.Percent}
                       value={MustBigNumber(priceChange24HPercent).abs()}
                       isPositive={MustBigNumber(priceChange24HPercent).gt(0)}
@@ -84,7 +84,7 @@ export const MarketsCompactTable = ({
                     />
                   </>
                 )}
-              </Styled.TabletPriceChange>
+              </$TabletPriceChange>
             </TableCell>
           ),
         },
@@ -94,11 +94,11 @@ export const MarketsCompactTable = ({
               getCellValue: (row) => row.isNew,
               allowsSorting: false,
               renderCell: ({ listingDate }) => (
-                <Styled.DetailsCell>
-                  <Styled.RecentlyListed>
+                <$DetailsCell>
+                  <$RecentlyListed>
                     <span>Listed</span>
                     {listingDate && (
-                      <Styled.RelativeTimeOutput
+                      <$RelativeTimeOutput
                         type={OutputType.RelativeTime}
                         relativeTimeFormatOptions={{
                           format: 'singleCharacter',
@@ -106,9 +106,9 @@ export const MarketsCompactTable = ({
                         value={listingDate.getTime()}
                       />
                     )}
-                  </Styled.RecentlyListed>
+                  </$RecentlyListed>
                   <Icon iconName={IconName.ChevronRight} />
-                </Styled.DetailsCell>
+                </$DetailsCell>
               ),
             }
           : {
@@ -117,17 +117,17 @@ export const MarketsCompactTable = ({
               getCellValue: (row) => row.openInterestUSDC,
               label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
               renderCell: ({ asset, openInterestUSDC, openInterest }) => (
-                <Styled.DetailsCell>
-                  <Styled.RecentlyListed>
+                <$DetailsCell>
+                  <$RecentlyListed>
                     <Output type={OutputType.CompactFiat} value={openInterestUSDC} />
-                    <Styled.InterestOutput
+                    <$InterestOutput
                       type={OutputType.CompactNumber}
                       value={openInterest}
                       slotRight={` ${asset.id}`}
                     />
-                  </Styled.RecentlyListed>
+                  </$RecentlyListed>
                   <Icon iconName={IconName.ChevronRight} />
-                </Styled.DetailsCell>
+                </$DetailsCell>
               ),
             },
       ] as ColumnDef<MarketData>[],
@@ -163,171 +163,169 @@ export const MarketsCompactTable = ({
   }, [sorting, filteredMarkets]);
 
   return (
-    <Styled.Table
+    <$Table
       withInnerBorders
       data={sortedMarkets.slice(0, 5)}
-      getRowKey={(row: MarketData) => row.market}
+      getRowKey={(row) => row.market ?? ''}
       label="Markets"
-      onRowAction={(market: string) =>
+      onRowAction={(market: Key) =>
         navigate(`${AppRoute.Trade}/${market}`, { state: { from: AppRoute.Markets } })
       }
       columns={columns}
       className={className}
       slotEmpty={
-        <Styled.MarketNotFound>
+        <$MarketNotFound>
           {filters === MarketFilters.NEW ? (
             <p>{stringGetter({ key: STRING_KEYS.NO_RECENTLY_LISTED_MARKETS })}</p>
           ) : (
             <LoadingSpace id="compact-markets-table" />
           )}
-        </Styled.MarketNotFound>
+        </$MarketNotFound>
       }
     />
   );
 };
 
-const Styled = {
-  Table: styled(Table)`
-    ${tradeViewMixins.horizontalTable}
-    --tableCell-padding: 0.625rem 1.5rem;
-    --tableRow-backgroundColor: var(--color-layer-3);
-    --tableHeader-backgroundColor: var(--color-layer-3);
-    border-bottom-right-radius: 0.625rem;
-    border-bottom-left-radius: 0.625rem;
+const $Table = styled(Table)`
+  ${tradeViewMixins.horizontalTable}
+  --tableCell-padding: 0.625rem 1.5rem;
+  --tableRow-backgroundColor: var(--color-layer-3);
+  --tableHeader-backgroundColor: var(--color-layer-3);
+  border-bottom-right-radius: 0.625rem;
+  border-bottom-left-radius: 0.625rem;
 
-    & table {
-      --stickyArea1-background: var(--color-layer-5);
-    }
+  & table {
+    --stickyArea1-background: var(--color-layer-5);
+  }
 
-    & tr:last-child {
-      box-shadow: none;
-    }
+  & tr:last-child {
+    box-shadow: none;
+  }
 
-    & tbody:after {
-      content: none;
-    }
+  & tbody:after {
+    content: none;
+  }
 
-    & > div {
-      padding: 1rem;
-    }
+  & > div {
+    padding: 1rem;
+  }
 
-    @media ${breakpoints.desktopSmall} {
+  @media ${breakpoints.desktopSmall} {
+    --tableCell-padding: 0.5rem 0.5rem;
+
+    & tr > td:nth-child(1) {
       --tableCell-padding: 0.5rem 0.5rem;
-
-      & tr > td:nth-child(1) {
-        --tableCell-padding: 0.5rem 0.5rem;
-      }
-
-      & tr > td:nth-child(2) {
-        --tableCell-padding: 0.5rem 0;
-      }
-
-      & tr > td:nth-child(3) {
-        --tableCell-padding: 0.5rem 0.5rem;
-      }
     }
 
-    @media ${breakpoints.tablet} {
-      table {
-        max-width: 100vw;
-      }
-
-      & tr > td:nth-child(1) {
-        --tableCell-padding: 0.5rem 0.625rem 0.5rem 1rem;
-      }
-
-      & tr > td:nth-child(2) {
-        --tableCell-padding: 0.5rem 0;
-      }
-
-      & tr > td:nth-child(3) {
-        --tableCell-padding: 0.5rem 1rem 0.5rem 0.625rem;
-      }
+    & tr > td:nth-child(2) {
+      --tableCell-padding: 0.5rem 0;
     }
-  ` as AnyStyledComponent, // TODO: Remove cast when Table component is refactored
 
-  TabletOutput: styled(Output)`
-    font: var(--font-small-medium);
-    color: var(--color-text-1);
-  `,
-
-  InlineRow: styled.div`
-    ${layoutMixins.inlineRow}
-  `,
-
-  TabletPriceChange: styled.div`
-    ${layoutMixins.inlineRow}
-
-    & output {
-      font: var(--font-mini-medium);
+    & tr > td:nth-child(3) {
+      --tableCell-padding: 0.5rem 0.5rem;
     }
-  `,
+  }
 
-  Output: styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`
-    color: ${({ isNegative, isPositive }) =>
-      isNegative
-        ? `var(--color-negative)`
-        : isPositive
-        ? `var(--color-positive)`
-        : `var(--color-text-1)`};
+  @media ${breakpoints.tablet} {
+    table {
+      max-width: 100vw;
+    }
+
+    & tr > td:nth-child(1) {
+      --tableCell-padding: 0.5rem 0.625rem 0.5rem 1rem;
+    }
+
+    & tr > td:nth-child(2) {
+      --tableCell-padding: 0.5rem 0;
+    }
+
+    & tr > td:nth-child(3) {
+      --tableCell-padding: 0.5rem 1rem 0.5rem 0.625rem;
+    }
+  }
+` as typeof Table;
+
+const $TabletOutput = styled(Output)`
+  font: var(--font-small-medium);
+  color: var(--color-text-1);
+`;
+
+const $InlineRow = styled.div`
+  ${layoutMixins.inlineRow}
+`;
+
+const $TabletPriceChange = styled.div`
+  ${layoutMixins.inlineRow}
+
+  & output {
+    font: var(--font-mini-medium);
+  }
+`;
+
+const $Output = styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`
+  color: ${({ isNegative, isPositive }) =>
+    isNegative
+      ? `var(--color-negative)`
+      : isPositive
+      ? `var(--color-positive)`
+      : `var(--color-text-1)`};
+  font: var(--font-base-medium);
+`;
+
+const $MarketNotFound = styled.div`
+  ${layoutMixins.column}
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 0;
+
+  & p {
+    color: var(--color-text-0);
     font: var(--font-base-medium);
-  `,
+  }
 
-  MarketNotFound: styled.div`
-    ${layoutMixins.column}
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 0;
+  & button {
+    color: var(--color-accent);
+  }
+`;
 
-    & p {
-      color: var(--color-text-0);
-      font: var(--font-base-medium);
-    }
+const $DetailsCell = styled(TableCell)`
+  ${layoutMixins.row}
+  gap: 0.75rem;
 
-    & button {
-      color: var(--color-accent);
-    }
-  `,
+  & > svg {
+    opacity: 0.4;
+  }
+`;
 
-  DetailsCell: styled(TableCell)`
-    ${layoutMixins.row}
-    gap: 0.75rem;
+const $RecentlyListed = styled.div`
+  ${layoutMixins.column}
+  gap: 0.125rem;
 
-    & > svg {
-      opacity: 0.4;
-    }
-  `,
+  & > span,
+  & > output {
+    text-align: right;
+    justify-content: flex-end;
+  }
 
-  RecentlyListed: styled.div`
-    ${layoutMixins.column}
-    gap: 0.125rem;
-
-    & > span,
-    & > output {
-      text-align: right;
-      justify-content: flex-end;
-    }
-
-    & > span:first-child {
-      color: var(--color-text-0);
-      font: var(--font-mini-medium);
-    }
-
-    & > span:last-child,
-    & > output:first-child {
-      color: var(--color-text-1);
-      font: var(--font-small-medium);
-    }
-  `,
-
-  InterestOutput: styled(Output)`
+  & > span:first-child {
     color: var(--color-text-0);
     font: var(--font-mini-medium);
-  `,
+  }
 
-  RelativeTimeOutput: styled(Output)`
+  & > span:last-child,
+  & > output:first-child {
     color: var(--color-text-1);
     font: var(--font-small-medium);
-  `,
-};
+  }
+`;
+
+const $InterestOutput = styled(Output)`
+  color: var(--color-text-0);
+  font: var(--font-mini-medium);
+`;
+
+const $RelativeTimeOutput = styled(Output)`
+  color: var(--color-text-1);
+  font: var(--font-small-medium);
+`;

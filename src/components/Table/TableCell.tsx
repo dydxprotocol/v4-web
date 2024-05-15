@@ -8,7 +8,7 @@ export const TableCell = ({
   slotLeft,
   slotRight,
   stacked,
-  stackedWithSecondaryStyling = true,
+  stackedWithSecondaryStyling = stacked,
   isHighlighted,
 }: {
   className?: string;
@@ -19,22 +19,17 @@ export const TableCell = ({
   isHighlighted?: boolean;
   stackedWithSecondaryStyling?: boolean;
 }) => (
-  <Styled.CellContent isHighlighted={isHighlighted} className={className}>
+  <$CellContent isHighlighted={isHighlighted} className={className}>
     {slotLeft}
     {stacked || stackedWithSecondaryStyling ? (
-      <Styled.Column stackedWithSecondaryStyling={stackedWithSecondaryStyling}>
-        {children}
-      </Styled.Column>
+      <$Column stackedWithSecondaryStyling={stackedWithSecondaryStyling}>{children}</$Column>
     ) : (
       children
     )}
     {slotRight}
-  </Styled.CellContent>
+  </$CellContent>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.CellContent = styled.div<{ isHighlighted?: boolean }>`
+const $CellContent = styled.div<{ isHighlighted?: boolean }>`
   ${tableMixins.cellContent}
 
   ${({ isHighlighted }) =>
@@ -45,7 +40,7 @@ Styled.CellContent = styled.div<{ isHighlighted?: boolean }>`
     `}
 `;
 
-Styled.Column = styled.div<{ stackedWithSecondaryStyling?: boolean }>`
+const $Column = styled.div<{ stackedWithSecondaryStyling?: boolean }>`
   ${({ stackedWithSecondaryStyling }) =>
     stackedWithSecondaryStyling
       ? tableMixins.cellContentColumnSecondary

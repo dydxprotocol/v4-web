@@ -1,11 +1,6 @@
 import { Fragment } from 'react';
 
-import styled, {
-  ThemeProps,
-  css,
-  type AnyStyledComponent,
-  type FlattenInterpolation,
-} from 'styled-components';
+import styled, { ThemeProps, css, type FlattenInterpolation } from 'styled-components';
 
 import { Nullable } from '@/constants/abacus';
 
@@ -68,7 +63,7 @@ const DetailItem = ({
   withOverflow,
   allowUserSelection,
 }: DetailsItem & StyleProps) => (
-  <Styled.Item justifyItems={justifyItems} layout={layout} withOverflow={withOverflow}>
+  <$Item justifyItems={justifyItems} layout={layout} withOverflow={withOverflow}>
     <dt>
       <WithTooltip
         tooltip={tooltip}
@@ -79,10 +74,8 @@ const DetailItem = ({
         {label}
       </WithTooltip>
     </dt>
-    <Styled.DetailsItemValue allowUserSelection={allowUserSelection}>
-      {value ?? ''}
-    </Styled.DetailsItemValue>
-  </Styled.Item>
+    <$DetailsItemValue allowUserSelection={allowUserSelection}>{value ?? ''}</$DetailsItemValue>
+  </$Item>
 );
 
 export const Details = ({
@@ -96,7 +89,7 @@ export const Details = ({
   withSeparators = false,
 }: ElementProps & StyleProps) => (
   <LoadingContext.Provider value={isLoading}>
-    <Styled.Details layout={layout} withSeparators={withSeparators} className={className}>
+    <$Details layout={layout} withSeparators={withSeparators} className={className}>
       <WithSeparators withSeparators={withSeparators} layout={DETAIL_LAYOUTS[layout]}>
         {items.map(
           ({
@@ -125,7 +118,7 @@ export const Details = ({
                 }}
               />
               {subitems && showSubitems && layout === 'column' && (
-                <Styled.SubDetails
+                <$SubDetails
                   items={subitems}
                   layout={DETAIL_LAYOUTS[layout]}
                   withSeparators={withSeparators}
@@ -135,7 +128,7 @@ export const Details = ({
           )
         )}
       </WithSeparators>
-    </Styled.Details>
+    </$Details>
   </LoadingContext.Provider>
 );
 
@@ -227,10 +220,7 @@ const itemLayoutVariants: Record<string, FlattenInterpolation<ThemeProps<any>>> 
     gap: 0.375rem;
   `,
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Details = styled.dl<{
+const $Details = styled.dl<{
   layout: 'column' | 'row' | 'rowColumns' | 'grid' | 'stackColumn';
   withSeparators: boolean;
 }>`
@@ -242,10 +232,10 @@ Styled.Details = styled.dl<{
   ${({ layout }) => layout && detailsLayoutVariants[layout]}
 `;
 
-Styled.Item = styled.div<{
+const $Item = styled.div<{
   layout: 'column' | 'row' | 'rowColumns' | 'grid' | 'stackColumn';
   justifyItems?: 'start' | 'end';
-  withOverflow: boolean;
+  withOverflow?: boolean;
 }>`
   ${({ layout }) => layout && itemLayoutVariants[layout]}
 
@@ -308,7 +298,7 @@ Styled.Item = styled.div<{
   }
 `;
 
-Styled.SubDetails = styled(Details)`
+const $SubDetails = styled(Details)`
   padding-left: 1rem;
   position: relative;
 
@@ -324,7 +314,7 @@ Styled.SubDetails = styled(Details)`
   }
 `;
 
-Styled.DetailsItemValue = styled.dd<{
+const $DetailsItemValue = styled.dd<{
   allowUserSelection?: boolean;
 }>`
   ${({ allowUserSelection }) =>

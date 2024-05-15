@@ -1,12 +1,13 @@
 import { useMemo } from 'react';
 
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import type { Compliance } from '@/constants/abacus';
 import { ComplianceStatus } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
 import { BLOCKED_COUNTRIES, CountryCodes, OFAC_SANCTIONED_COUNTRIES } from '@/constants/geo';
+import { MenuGroup } from '@/constants/menus';
 
 import { useAccounts, useDydxClient } from '@/hooks';
 
@@ -35,13 +36,14 @@ export const usePreferenceMenu = () => {
   );
 
   const notificationSection = useMemo(
-    () => ({
+    (): MenuGroup<string, string> => ({
       group: 'status',
       groupLabel: 'Simulate Compliance Status',
       items: complianceStatusOptions.map(({ status, label }) => ({
-        value: status,
+        value: status.name,
         label: label,
-        onSelect: () => dispatch(setCompliance({ geo, status } as Compliance)),
+        onSelect: () =>
+          dispatch(setCompliance({ geo, status, updatedAt: new Date().toString() } as Compliance)),
         slotAfter: (
           <Switch
             name="CompliaceStatus"
@@ -55,7 +57,7 @@ export const usePreferenceMenu = () => {
   );
 
   const otherSection = useMemo(
-    () => ({
+    (): MenuGroup<string, string> => ({
       group: 'Geo',
       items: [
         {
@@ -105,7 +107,7 @@ export const ComplianceConfigDialog = ({ setIsOpen }: ElementProps) => {
   };
 
   return (
-    <Styled.ComboboxDialogMenu
+    <$ComboboxDialogMenu
       isOpen
       title="Compliance Settings (Dev Only)"
       items={preferenceItems}
@@ -114,12 +116,9 @@ export const ComplianceConfigDialog = ({ setIsOpen }: ElementProps) => {
       <Button action={ButtonAction.Primary} onClick={() => submit()}>
         Submit
       </Button>
-    </Styled.ComboboxDialogMenu>
+    </$ComboboxDialogMenu>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ComboboxDialogMenu = styled(ComboboxDialogMenu)`
+const $ComboboxDialogMenu = styled(ComboboxDialogMenu)`
   --dialog-content-paddingBottom: 0.5rem;
-`;
+` as typeof ComboboxDialogMenu;

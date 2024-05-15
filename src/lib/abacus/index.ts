@@ -49,6 +49,7 @@ import AbacusChainTransaction from './dydxChainTransactions';
 import AbacusFileSystem from './filesystem';
 import AbacusFormatter from './formatter';
 import AbacusLocalizer from './localizer';
+import AbacusLogger from './logger';
 import AbacusRest from './rest';
 import AbacusStateNotifier from './stateNotification';
 import AbacusThreading from './threading';
@@ -83,7 +84,7 @@ class AbacusStateManager {
       new AbacusThreading(),
       new CoroutineTimer(),
       new AbacusFileSystem(),
-      null
+      new AbacusLogger()
     );
 
     const uiImplementations = new UIImplementations(

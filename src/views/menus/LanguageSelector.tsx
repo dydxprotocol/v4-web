@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { SUPPORTED_LOCALE_STRING_LABELS, SupportedLocales } from '@/constants/localization';
 
@@ -25,7 +25,7 @@ export const LanguageSelector = ({ align, sideOffset }: StyleProps) => {
   const selectedLocale = useSelector(getSelectedLocale);
 
   return (
-    <Styled.DropdownSelectMenu
+    <$DropdownSelectMenu
       items={localizationItems}
       value={selectedLocale}
       onValueChange={(locale: SupportedLocales) => dispatch(setSelectedLocale({ locale }))}
@@ -34,9 +34,6 @@ export const LanguageSelector = ({ align, sideOffset }: StyleProps) => {
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.DropdownSelectMenu = styled(DropdownSelectMenu)`
+const $DropdownSelectMenu = styled(DropdownSelectMenu)`
   ${headerMixins.dropdownTrigger}
-`;
+` as typeof DropdownSelectMenu;

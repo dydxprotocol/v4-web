@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -18,6 +18,7 @@ type ElementProps = {
 };
 
 const latestCommit = import.meta.env.VITE_LAST_ORIGINAL_COMMIT;
+const latestVersion = import.meta.env.VITE_LAST_TAG;
 
 export const HelpDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
@@ -65,26 +66,33 @@ export const HelpDialog = ({ setIsOpen }: ElementProps) => {
   );
 
   return (
-    <Styled.ComboboxDialogMenu
+    <$ComboboxDialogMenu
       isOpen
       withSearch={false}
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.HELP })}
       items={HELP_ITEMS}
       slotFooter={
-        latestCommit ? (
-          <Styled.Footer>
-            Release - <span title={latestCommit}>{`${latestCommit.substring(0, 7)}`}</span>
-          </Styled.Footer>
+        latestCommit || latestVersion ? (
+          <$Footer>
+            {latestCommit && (
+              <span>
+                Release - <span title={latestCommit}> {`${latestCommit.substring(0, 7)}`}</span>
+              </span>
+            )}
+            {latestVersion && (
+              <span>
+                Version -{' '}
+                <span title={latestVersion}>{`${latestVersion.split(`release/v`).at(-1)}`}</span>
+              </span>
+            )}
+          </$Footer>
         ) : undefined
       }
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ComboboxDialogMenu = styled(ComboboxDialogMenu)`
+const $ComboboxDialogMenu = styled(ComboboxDialogMenu)`
   --dialog-content-paddingTop: 1rem;
   --dialog-content-paddingBottom: 1rem;
   --comboxDialogMenu-item-gap: 1rem;
@@ -94,7 +102,11 @@ Styled.ComboboxDialogMenu = styled(ComboboxDialogMenu)`
   }
 `;
 
-Styled.Footer = styled.div`
+const $Footer = styled.div`
+  display: flex;
+  flex-direction: column;
+
   color: var(--color-text-0);
-  user-select: all;
+  cursor: default;
+  user-select: text;
 `;

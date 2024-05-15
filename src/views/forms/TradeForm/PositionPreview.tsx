@@ -28,8 +28,8 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
   const { stepSizeDecimals, tickSizeDecimals } = configs || {};
 
   return (
-    <Styled.PositionPreviewContainer>
-      <Styled.YourPosition>
+    <$PositionPreviewContainer>
+      <$YourPosition>
         {!showNarrowVariation && <AssetIcon symbol={id} />}
         <span>
           {stringGetter({
@@ -39,7 +39,7 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
             },
           })}
         </span>
-      </Styled.YourPosition>
+      </$YourPosition>
       <PositionTile
         currentSize={positionSize?.current}
         notionalTotal={notionalTotal?.current}
@@ -49,13 +49,10 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
         tickSizeDecimals={tickSizeDecimals}
         showNarrowVariation={showNarrowVariation}
       />
-    </Styled.PositionPreviewContainer>
+    </$PositionPreviewContainer>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.PositionPreviewContainer = styled.div`
+const $PositionPreviewContainer = styled.div`
   ${layoutMixins.column}
   align-items: flex-start;
   width: 100%;
@@ -66,7 +63,7 @@ Styled.PositionPreviewContainer = styled.div`
   }
 `;
 
-Styled.YourPosition = styled.div`
+const $YourPosition = styled.div`
   ${layoutMixins.inlineRow}
   color: var(--color-text-0);
 

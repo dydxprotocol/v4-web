@@ -21,19 +21,16 @@ export const ContentSectionHeader = ({
   slotRight,
   className,
 }: ElementProps & StyleProps) => (
-  <Styled.ContentSectionHeader className={className}>
+  <$ContentSectionHeader className={className}>
     {slotLeft}
-    <Styled.Header>
+    <$Header>
       {title && <h3>{title}</h3>}
       {subtitle && <p>{subtitle}</p>}
-    </Styled.Header>
+    </$Header>
     {slotRight}
-  </Styled.ContentSectionHeader>
+  </$ContentSectionHeader>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ContentSectionHeader = styled.header<StyleProps>`
+const $ContentSectionHeader = styled.header<StyleProps>`
   ${layoutMixins.contentSectionDetached}
 
   ${layoutMixins.row}
@@ -49,7 +46,7 @@ Styled.ContentSectionHeader = styled.header<StyleProps>`
   }
 `;
 
-Styled.Header = styled.div`
+const $Header = styled.div`
   ${layoutMixins.column}
   flex: 1;
 

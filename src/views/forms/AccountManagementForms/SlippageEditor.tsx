@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 
 import type { NumberFormatValues } from 'react-number-format';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -94,26 +94,26 @@ export const SlippageEditor = ({
   }
 
   return (
-    <Styled.WithConfirmationPopover
+    <$WithConfirmationPopover
       open={editorState !== EditorState.Viewing}
       onOpenChange={onOpenChange}
       align="end"
       sideOffset={-22}
       asChild
       onCancel={onCancel}
-      onConfirm={editorState === EditorState.Editing && onConfirmSlippage}
+      onConfirm={editorState === EditorState.Editing ? onConfirmSlippage : undefined}
       slotTrigger={
-        <Styled.SlippageOutput onClick={() => setEditorState(EditorState.Selecting)}>
+        <$SlippageOutput onClick={() => setEditorState(EditorState.Selecting)}>
           <Output type={OutputType.Percent} value={slippage} />
           <Icon iconName={IconName.Pencil} />
-        </Styled.SlippageOutput>
+        </$SlippageOutput>
       }
     >
       {
         {
-          [EditorState.Viewing]: null,
+          [EditorState.Viewing]: undefined,
           [EditorState.Selecting]: (
-            <Styled.SlippageInput>
+            <$SlippageInput>
               <ToggleGroup
                 ref={toggleGroupRef}
                 items={[
@@ -126,38 +126,34 @@ export const SlippageEditor = ({
                 shape={ButtonShape.Rectangle}
                 size={ButtonSize.XSmall}
               />
-            </Styled.SlippageInput>
+            </$SlippageInput>
           ),
           [EditorState.Editing]: (
-            <Styled.FormInput
+            <$FormInput
               type={InputType.Percent}
               value={slippageInputValue}
-              tabIndex={0}
-              getInputRef={inputRef}
+              ref={inputRef}
               onChange={onChangeSlippage}
               max={100}
             />
           ),
         }[editorState]
       }
-    </Styled.WithConfirmationPopover>
+    </$WithConfirmationPopover>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.SlippageOutput = styled.button`
+const $SlippageOutput = styled.button`
   ${layoutMixins.row}
   text-decoration: underline;
   gap: 0.5ch;
 `;
 
-Styled.WithConfirmationPopover = styled(WithConfirmationPopover)`
+const $WithConfirmationPopover = styled(WithConfirmationPopover)`
   font-size: 0.625rem;
   width: 10rem;
 `;
 
-Styled.SlippageInput = styled.div`
+const $SlippageInput = styled.div`
   ${layoutMixins.inlineRow}
 
   justify-content: center;
@@ -165,7 +161,7 @@ Styled.SlippageInput = styled.div`
   border-radius: 0.5em;
 `;
 
-Styled.FormInput = styled(FormInput)`
+const $FormInput = styled(FormInput)`
   --form-input-height: 1.5rem;
 
   input {

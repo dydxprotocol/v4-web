@@ -20557,7 +20557,7 @@ packages:
     dev: true
 
   file:../../documents/v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.17.tgz:
-    resolution: {integrity: sha512-pnyCeMM/uZtJm4TmtO7xwyGoRVN7HvnV494y1iLWRvZz1Le+o4ZDI0NdY3XZtzmBXszBm1bFd0CntOfvGtx/1w==, tarball: file:../../documents/v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.17.tgz}
+    resolution: {integrity: sha512-CTImRP7uvgyZYr49bknhzubttB8d/SvgF50Pfu8CP30Lw1De4pqlmUfWC/89O7x0zBkZVQ7ziBZ6+ZvAxa48CA==, tarball: file:../../documents/v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.17.tgz}
     name: '@dydxprotocol/v4-abacus'
     version: 1.7.17
     dependencies:

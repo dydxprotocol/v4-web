@@ -36,6 +36,7 @@ import {
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
 import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
+import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
@@ -159,7 +160,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
         label: stringGetter({ key: STRING_KEYS.ORDERS }),
 
         slotRight: isWaitingForOrderToIndex ? (
-          <Styled.LoadingSpinner />
+          <$LoadingSpinner />
         ) : (
           ordersTagNumber && (
             <Tag type={TagType.Number} isHighlighted={hasUnseenOrderUpdates}>
@@ -257,7 +258,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
 
   const slotBottom = {
     [InfoSection.Position]: testFlags.isolatedMargin && (
-      <Styled.UnopenedIsolatedPositions onViewOrders={onViewOrders} />
+      <$UnopenedIsolatedPositions onViewOrders={onViewOrders} />
     ),
     [InfoSection.Orders]: null,
     [InfoSection.Fills]: null,
@@ -268,7 +269,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     <MobileTabs defaultValue={InfoSection.Position} items={tabItems} withBorders={false} />
   ) : (
     <>
-      <Styled.CollapsibleTabs
+      <$CollapsibleTabs
         defaultTab={InfoSection.Position}
         tab={tab}
         setTab={setTab}
@@ -285,7 +286,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                 value: PanelView.CurrentMarket,
                 ...(currentMarketAssetId
                   ? {
-                      slotBefore: <Styled.AssetIcon symbol={currentMarketAssetId} />,
+                      slotBefore: <$AssetIcon symbol={currentMarketAssetId} />,
                       label: currentMarketAssetId,
                     }
                   : { label: stringGetter({ key: STRING_KEYS.MARKET }) }),
@@ -305,21 +306,22 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   );
 };
 
-const Styled = {
-  AssetIcon: styled(AssetIcon)`
-    font-size: 1.5em;
-  `,
-  CollapsibleTabs: styled(CollapsibleTabs)`
-    --tableHeader-backgroundColor: var(--color-layer-3);
+const $AssetIcon = styled(AssetIcon)`
+  font-size: 1.5em;
+`;
+const collapsibleTabsType = getSimpleStyledOutputType(CollapsibleTabs);
 
-    header {
-      background-color: var(--color-layer-2);
-    }
-  ` as typeof CollapsibleTabs<InfoSection>,
-  LoadingSpinner: styled(LoadingSpinner)`
-    --spinner-width: 1rem;
-  `,
-  UnopenedIsolatedPositions: styled(UnopenedIsolatedPositions)`
-    margin-top: auto;
-  `,
-};
+const $CollapsibleTabs = styled(CollapsibleTabs)`
+  --tableHeader-backgroundColor: var(--color-layer-3);
+
+  header {
+    background-color: var(--color-layer-2);
+  }
+` as typeof collapsibleTabsType;
+
+const $LoadingSpinner = styled(LoadingSpinner)`
+  --spinner-width: 1rem;
+`;
+const $UnopenedIsolatedPositions = styled(UnopenedIsolatedPositions)`
+  margin-top: auto;
+`;

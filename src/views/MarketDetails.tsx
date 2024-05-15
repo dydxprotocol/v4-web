@@ -144,25 +144,25 @@ export const MarketDetails: React.FC = () => {
   ];
 
   return (
-    <Styled.MarketDetails>
-      <Styled.Header>
-        <Styled.WrapRow>
-          <Styled.MarketTitle>
+    <$MarketDetails>
+      <$Header>
+        <$WrapRow>
+          <$MarketTitle>
             <AssetIcon symbol={id} />
             {name}
-          </Styled.MarketTitle>
-          {isTablet && <Styled.MarketLinks />}
-        </Styled.WrapRow>
+          </$MarketTitle>
+          {isTablet && <$MarketLinks />}
+        </$WrapRow>
 
-        <Styled.MarketDescription>
+        <$MarketDescription>
           {primaryDescriptionKey && <p>{stringGetter({ key: `APP.${primaryDescriptionKey}` })}</p>}
           {secondaryDescriptionKey && (
             <p>{stringGetter({ key: `APP.${secondaryDescriptionKey}` })}</p>
           )}
-        </Styled.MarketDescription>
+        </$MarketDescription>
 
         {!isTablet && (
-          <Styled.Buttons>
+          <$Buttons>
             {whitepaperLink && (
               <Button
                 type={ButtonType.Link}
@@ -196,79 +196,77 @@ export const MarketDetails: React.FC = () => {
                 CoinmarketCap
               </Button>
             )}
-          </Styled.Buttons>
+          </$Buttons>
         )}
-      </Styled.Header>
+      </$Header>
 
-      <Styled.Details items={items} withSeparators />
-    </Styled.MarketDetails>
+      <$Details items={items} withSeparators />
+    </$MarketDetails>
   );
 };
 
-const Styled = {
-  MarketDetails: styled.div`
-    margin: auto;
-    width: 100%;
+const $MarketDetails = styled.div`
+  margin: auto;
+  width: 100%;
 
-    ${layoutMixins.gridConstrainedColumns}
-    --grid-max-columns: 2;
-    --column-gap: 2.25em;
-    --column-min-width: 18rem;
-    --column-max-width: 22rem;
-    --single-column-max-width: 25rem;
+  ${layoutMixins.gridConstrainedColumns}
+  --grid-max-columns: 2;
+  --column-gap: 2.25em;
+  --column-min-width: 18rem;
+  --column-max-width: 22rem;
+  --single-column-max-width: 25rem;
 
-    justify-content: center;
-    align-items: center;
-    padding: clamp(0.5rem, 7.5%, 2.5rem);
-    row-gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  padding: clamp(0.5rem, 7.5%, 2.5rem);
+  row-gap: 1rem;
 
-    @media ${breakpoints.tablet} {
-      padding: 0 clamp(0.5rem, 7.5%, 2.5rem);
+  @media ${breakpoints.tablet} {
+    padding: 0 clamp(0.5rem, 7.5%, 2.5rem);
+  }
+`;
+const $Header = styled.header`
+  ${layoutMixins.column}
+  gap: 1.25rem;
+`;
+const $WrapRow = styled.div`
+  ${layoutMixins.row}
+  gap: 0.5rem;
+
+  flex-wrap: wrap;
+`;
+const $MarketTitle = styled.h3`
+  ${layoutMixins.row}
+  font: var(--font-large-medium);
+  gap: 0.5rem;
+
+  img {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+`;
+const $MarketLinks = styled(MarketLinks)`
+  place-self: start end;
+`;
+const $MarketDescription = styled.div`
+  ${layoutMixins.column}
+  gap: 0.5em;
+
+  p {
+    font: var(--font-small-book);
+
+    &:last-of-type {
+      color: var(--color-text-0);
     }
-  `,
-  Header: styled.header`
-    ${layoutMixins.column}
-    gap: 1.25rem;
-  `,
-  WrapRow: styled.div`
-    ${layoutMixins.row}
-    gap: 0.5rem;
+  }
+`;
+const $Buttons = styled.div`
+  ${layoutMixins.row}
+  flex-wrap: wrap;
+  gap: 0.5rem;
 
-    flex-wrap: wrap;
-  `,
-  MarketTitle: styled.h3`
-    ${layoutMixins.row}
-    font: var(--font-large-medium);
-    gap: 0.5rem;
-
-    img {
-      width: 2.25rem;
-      height: 2.25rem;
-    }
-  `,
-  MarketLinks: styled(MarketLinks)`
-    place-self: start end;
-  `,
-  MarketDescription: styled.div`
-    ${layoutMixins.column}
-    gap: 0.5em;
-
-    p {
-      font: var(--font-small-book);
-
-      &:last-of-type {
-        color: var(--color-text-0);
-      }
-    }
-  `,
-  Buttons: styled.div`
-    ${layoutMixins.row}
-    flex-wrap: wrap;
-    gap: 0.5rem;
-
-    overflow-x: auto;
-  `,
-  Details: styled(Details)`
-    font: var(--font-mini-book);
-  `,
-};
+  overflow-x: auto;
+`;
+const $Details = styled(Details)`
+  font: var(--font-mini-book);
+`;

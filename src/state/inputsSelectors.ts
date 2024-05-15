@@ -118,7 +118,7 @@ export const useTradeFormData = () => {
     createSelector(
       [getInputTradeData, getInputTradeOptions, getTradeInputErrors],
       (tradeData, tradeOptions, tradeErrors) => {
-        const { price, size, summary } = tradeData || {};
+        const { price, size, summary } = tradeData ?? {};
 
         const {
           needsLimitPrice,
@@ -132,7 +132,7 @@ export const useTradeFormData = () => {
           postOnlyTooltip,
           reduceOnlyTooltip,
           timeInForceOptions,
-        } = tradeOptions || {};
+        } = tradeOptions ?? {};
 
         return {
           price,

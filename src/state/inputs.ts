@@ -50,7 +50,7 @@ export const inputsSlice = createSlice({
         transfer,
         triggerOrders,
         adjustIsolatedMargin,
-      } = action.payload || {};
+      } = action.payload ?? {};
 
       return {
         ...state,

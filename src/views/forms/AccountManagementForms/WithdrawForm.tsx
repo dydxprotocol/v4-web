@@ -330,7 +330,7 @@ export const WithdrawForm = () => {
         </span>
       ),
       value: (
-        <Styled.DiffOutput
+        <$DiffOutput
           type={OutputType.Fiat}
           value={freeCollateral?.current}
           newValue={freeCollateral?.postOrder}
@@ -430,7 +430,7 @@ export const WithdrawForm = () => {
             USDC_LIMIT: (
               <span>
                 {usdcWithdrawalCapacity.toFormat(TOKEN_DECIMALS)}
-                <Styled.Tag>{usdcLabel}</Styled.Tag>
+                <$Tag>{usdcLabel}</$Tag>
               </span>
             ),
           },
@@ -470,8 +470,8 @@ export const WithdrawForm = () => {
     isInvalidNobleAddress;
 
   return (
-    <Styled.Form onSubmit={onSubmit}>
-      <Styled.Subheader>
+    <$Form onSubmit={onSubmit}>
+      <$Subheader>
         {stringGetter({
           key: STRING_KEYS.LOWEST_FEE_WITHDRAWALS,
           params: {
@@ -484,8 +484,8 @@ export const WithdrawForm = () => {
             ),
           },
         })}
-      </Styled.Subheader>
-      <Styled.DestinationRow>
+      </$Subheader>
+      <$DestinationRow>
         <FormInput
           type={InputType.Text}
           placeholder={stringGetter({ key: STRING_KEYS.ADDRESS })}
@@ -494,7 +494,7 @@ export const WithdrawForm = () => {
           label={
             <span>
               {stringGetter({ key: STRING_KEYS.DESTINATION })}{' '}
-              {isValidAddress ? <Styled.CheckIcon iconName={IconName.Check} /> : null}
+              {isValidAddress ? <$CheckIcon iconName={IconName.Check} /> : null}
             </span>
           }
         />
@@ -503,7 +503,7 @@ export const WithdrawForm = () => {
           selectedChain={chainIdStr || undefined}
           onSelect={onSelectNetwork}
         />
-      </Styled.DestinationRow>
+      </$DestinationRow>
       {isInvalidNobleAddress && (
         <AlertMessage type={AlertType.Error}>
           {stringGetter({ key: STRING_KEYS.NOBLE_ADDRESS_VALIDATION })}
@@ -514,25 +514,23 @@ export const WithdrawForm = () => {
         onSelectToken={onSelectToken}
         isExchange={Boolean(exchange)}
       />
-      <Styled.WithDetailsReceipt side="bottom" detailItems={amountInputReceipt}>
+      <$WithDetailsReceipt side="bottom" detailItems={amountInputReceipt}>
         <FormInput
           type={InputType.Number}
           onChange={onChangeAmount}
           value={withdrawAmount}
           label={stringGetter({ key: STRING_KEYS.AMOUNT })}
           slotRight={
-            <Styled.FormInputButton size={ButtonSize.XSmall} onClick={onClickMax}>
+            <$FormInputButton size={ButtonSize.XSmall} onClick={onClickMax}>
               {stringGetter({ key: STRING_KEYS.MAX })}
-            </Styled.FormInputButton>
+            </$FormInputButton>
           }
         />
-      </Styled.WithDetailsReceipt>
+      </$WithDetailsReceipt>
       {errorMessage && (
-        <Styled.AlertMessage type={alertType ?? AlertType.Error}>
-          {errorMessage}
-        </Styled.AlertMessage>
+        <$AlertMessage type={alertType ?? AlertType.Error}>{errorMessage}</$AlertMessage>
       )}
-      <Styled.Footer>
+      <$Footer>
         <WithdrawButtonAndReceipt
           isDisabled={isDisabled}
           isLoading={isLoading}
@@ -541,49 +539,46 @@ export const WithdrawForm = () => {
           withdrawChain={chainIdStr || undefined}
           withdrawToken={toToken || undefined}
         />
-      </Styled.Footer>
-    </Styled.Form>
+      </$Footer>
+    </$Form>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Subheader = styled.div`
+const $Subheader = styled.div`
   color: var(--color-text-0);
 `;
 
-Styled.Tag = styled(Tag)`
+const $Tag = styled(Tag)`
   margin-left: 0.5ch;
 `;
 
-Styled.DiffOutput = styled(DiffOutput)`
+const $DiffOutput = styled(DiffOutput)`
   --diffOutput-valueWithDiff-fontSize: 1em;
 `;
 
-Styled.Form = styled.form`
+const $Form = styled.form`
   ${formMixins.transfersForm}
 `;
 
-Styled.Footer = styled.footer`
+const $Footer = styled.footer`
   ${formMixins.footer}
   --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
 `;
 
-Styled.DestinationRow = styled.div`
+const $DestinationRow = styled.div`
   ${layoutMixins.spacedRow}
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
 `;
 
-Styled.AlertMessage = styled(AlertMessage)`
+const $AlertMessage = styled(AlertMessage)`
   display: inline;
 `;
 
-Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
+const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
-Styled.Link = styled(Link)`
+const $Link = styled(Link)`
   color: var(--color-accent);
 
   &:visited {
@@ -591,15 +586,15 @@ Styled.Link = styled(Link)`
   }
 `;
 
-Styled.TransactionInfo = styled.span`
+const $TransactionInfo = styled.span`
   ${layoutMixins.row}
 `;
 
-Styled.FormInputButton = styled(Button)`
+const $FormInputButton = styled(Button)`
   ${formMixins.inputInnerButton}
 `;
 
-Styled.CheckIcon = styled(Icon)`
+const $CheckIcon = styled(Icon)`
   margin: 0 1ch;
 
   color: var(--color-success);

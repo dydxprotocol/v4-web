@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Content, Root, Trigger } from '@radix-ui/react-collapsible';
-import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 import { popoverMixins } from '@/styles/popoverMixins';
 
@@ -45,15 +45,15 @@ export const Collapsible = ({
   withTrigger = true,
 }: CollapsibleProps) => {
   const trigger = slotTrigger ? (
-    <Styled.TriggerSlot>
+    <$TriggerSlot>
       {triggerIconSide === 'right' && label}
       <Trigger className={className} disabled={disabled} asChild>
         {slotTrigger}
       </Trigger>
       {triggerIconSide === 'left' && label}
-    </Styled.TriggerSlot>
+    </$TriggerSlot>
   ) : (
-    <Styled.Trigger className={className} disabled={disabled}>
+    <$Trigger className={className} disabled={disabled}>
       {triggerIconSide === 'right' && (
         <>
           {label}
@@ -61,9 +61,9 @@ export const Collapsible = ({
         </>
       )}
       {
-        <Styled.TriggerIcon>
+        <$TriggerIcon>
           <Icon iconName={triggerIcon} />
-        </Styled.TriggerIcon>
+        </$TriggerIcon>
       }
       {triggerIconSide === 'left' && (
         <>
@@ -71,20 +71,17 @@ export const Collapsible = ({
           {label}
         </>
       )}
-    </Styled.Trigger>
+    </$Trigger>
   );
 
   return (
-    <Styled.Root defaultOpen={defaultOpen} open={open} onOpenChange={onOpenChange}>
+    <$Root defaultOpen={defaultOpen} open={open} onOpenChange={onOpenChange}>
       {withTrigger && trigger}
-      <Styled.Content $transitionDuration={transitionDuration}>{children}</Styled.Content>
-    </Styled.Root>
+      <$Content $transitionDuration={transitionDuration}>{children}</$Content>
+    </$Root>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Root = styled(Root)`
+const $Root = styled(Root)`
   display: grid;
 
   &[data-state='open'] {
@@ -92,32 +89,32 @@ Styled.Root = styled(Root)`
   }
 `;
 
-Styled.Trigger = styled(Trigger)`
+const $Trigger = styled(Trigger)`
   ${popoverMixins.trigger}
   --trigger-textColor: inherit;
   --trigger-icon-width: 0.75em;
   --trigger-icon-color: inherit;
 `;
 
-Styled.TriggerSlot = styled.div`
+const $TriggerSlot = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5em;
 `;
 
-Styled.TriggerIcon = styled.span`
+const $TriggerIcon = styled.span`
   width: var(--trigger-icon-width);
 
   display: inline-flex;
   transition: rotate 0.3s var(--ease-out-expo);
   color: var(--trigger-icon-color);
 
-  ${Styled.Trigger}[data-state='open'] & {
+  ${$Trigger}[data-state='open'] & {
     rotate: -0.5turn;
   }
 `;
 
-Styled.Content = styled(Content)<{ $transitionDuration: number }>`
+const $Content = styled(Content)<{ $transitionDuration?: number }>`
   display: grid;
   --transition-duration: 0.25s;
 
