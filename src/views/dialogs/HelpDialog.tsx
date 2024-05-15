@@ -73,15 +73,19 @@ export const HelpDialog = ({ setIsOpen }: ElementProps) => {
       title={stringGetter({ key: STRING_KEYS.HELP })}
       items={HELP_ITEMS}
       slotFooter={
-        latestCommit ? (
+        latestCommit || latestVersion ? (
           <Styled.Footer>
-            <span>
-              Release - <span title={latestCommit}> {`${latestCommit.substring(0, 7)}`}</span>
-            </span>
-            <span>
-              Version -{' '}
-              <span title={latestVersion}>{`${latestVersion.split(`release/v`).at(-1)}`}</span>
-            </span>
+            {latestCommit && (
+              <span>
+                Release - <span title={latestCommit}> {`${latestCommit.substring(0, 7)}`}</span>
+              </span>
+            )}
+            {latestVersion && (
+              <span>
+                Version -{' '}
+                <span title={latestVersion}>{`${latestVersion.split(`release/v`).at(-1)}`}</span>
+              </span>
+            )}
           </Styled.Footer>
         ) : undefined
       }
