@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import { Slider } from '@/components/Slider';
 
-import { MustBigNumber, roundToTick } from '@/lib/numbers';
+import { MustBigNumber } from '@/lib/numbers';
 
 type ElementProps = {
   setAbacusSize: (value: string) => void;

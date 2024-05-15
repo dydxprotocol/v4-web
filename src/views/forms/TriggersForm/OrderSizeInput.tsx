@@ -67,7 +67,7 @@ export const OrderSizeInput = ({
     ).toString();
 
     abacusStateManager.setTriggerOrdersValue({
-      value: newSize != null ? newSizeString : null,
+      value: newSize !== null ? newSizeString : null,
       field: TriggerOrdersInputField.size,
     });
   };
