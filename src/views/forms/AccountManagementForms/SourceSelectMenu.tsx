@@ -86,12 +86,15 @@ export const SourceSelectMenu = ({
       ),
     }))
     .filter((chain) => {
-      if (type === TransferType.deposit) {
-        // if deposit, return only CCTP tokens UNLESS CCTPDepositOnly is not enabled
-        return !!cctpTokensByChainId[chain.value] || !CCTPDepositOnly;
+      // if deposit and CCTPDepositOnly enabled, only return cctp tokens
+      if (type === TransferType.deposit && CCTPDepositOnly) {
+        return !!cctpTokensByChainId[chain.value];
       }
-      // if withdrawal, return only CCTP tokens UNLESS CCTPWithdrawalOnly is not enabled
-      return !!cctpTokensByChainId[chain.value] || !CCTPWithdrawalOnly;
+      // if withdrawal and CCTPWithdrawalOnly enabled, only return cctp tokens
+      if (type === TransferType.withdrawal && CCTPWithdrawalOnly) {
+        return !!cctpTokensByChainId[chain.value];
+      }
+      return true;
     })
     .sort((chain) => (!!cctpTokensByChainId[chain.value] ? -1 : 1));
 

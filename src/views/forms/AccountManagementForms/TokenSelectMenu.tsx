@@ -72,12 +72,15 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
       tag: resources?.tokenResources?.get(token.type)?.symbol,
     }))
     .filter((token) => {
-      if (type === TransferType.deposit) {
-        // if deposit, return only CCTP tokens UNLESS CCTPDepositOnly is not enabled
-        return !!cctpTokensByAddress[token.value] || !CCTPDepositOnly;
+      // if deposit and CCTPDepositOnly enabled, only return cctp tokens
+      if (type === TransferType.deposit && CCTPDepositOnly) {
+        return !!cctpTokensByAddress[token.value];
       }
-      // if withdrawal, return only CCTP tokens UNLESS CCTPWithdrawalOnly is not enabled
-      return !!cctpTokensByAddress[token.value] || !CCTPWithdrawalOnly;
+      // if withdrawal and CCTPWithdrawalOnly enabled, only return cctp tokens
+      if (type === TransferType.withdrawal && CCTPWithdrawalOnly) {
+        return !!cctpTokensByAddress[token.value];
+      }
+      return true;
     })
     .sort((token) => (!!cctpTokensByAddress[token.value] ? -1 : 1));
 
