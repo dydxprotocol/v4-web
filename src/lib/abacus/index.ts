@@ -217,7 +217,7 @@ class AbacusStateManager {
     });
     this.setAdjustIsolatedMarginValue({
       value: null,
-      field: AdjustIsolatedMarginInputField.ChildSubaccountNumber,
+      field: AdjustIsolatedMarginInputField.AmountPercent,
     });
   };
 
@@ -352,7 +352,11 @@ class AbacusStateManager {
   ) => this.stateManager.cancelOrder(orderId, callback);
 
   adjustIsolatedMarginOfPosition = (
-    callback: (success: boolean, parsingError: Nullable<ParsingError>, data: string) => void
+    callback: (
+      success: boolean,
+      parsingError: Nullable<ParsingError>,
+      data: Nullable<HumanReadableSubaccountTransferPayload>
+    ) => void
   ): Nullable<HumanReadableSubaccountTransferPayload> =>
     this.stateManager.commitAdjustIsolatedMargin(callback);
 

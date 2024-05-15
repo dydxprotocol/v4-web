@@ -31,7 +31,7 @@ import { OutputType } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
-import { getOpenPositionFromId, getSubaccount } from '@/state/accountSelectors';
+import { getOpenPositionFromId } from '@/state/accountSelectors';
 import { getAdjustIsolatedMarginInputs } from '@/state/inputsSelectors';
 import { getMarketConfig } from '@/state/perpetualsSelectors';
 
@@ -57,19 +57,24 @@ const SIZE_PERCENT_OPTIONS = {
 export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
   const stringGetter = useStringGetter();
   const subaccountPosition = useSelector(getOpenPositionFromId(marketId));
-  const { childSubaccountNumber, leverage, liquidationPrice, quoteBalance } =
-    subaccountPosition ?? {};
+  const { childSubaccountNumber } = subaccountPosition ?? {};
   const marketConfig = useSelector(getMarketConfig(marketId));
   const adjustIsolatedMarginInputs = useSelector(getAdjustIsolatedMarginInputs, shallowEqual);
-  const { type, amount, amountPercent } = adjustIsolatedMarginInputs ?? {};
+  const { type, amount, amountPercent, summary } = adjustIsolatedMarginInputs ?? {};
   const { tickSizeDecimals } = marketConfig ?? {};
 
   useEffect(() => {
-    console.log('childSubaccountNumber', childSubaccountNumber);
     abacusStateManager.setAdjustIsolatedMarginValue({
       value: childSubaccountNumber,
       field: AdjustIsolatedMarginInputField.ChildSubaccountNumber,
     });
+
+    return () => {
+      abacusStateManager.setAdjustIsolatedMarginValue({
+        value: null,
+        field: AdjustIsolatedMarginInputField.ChildSubaccountNumber,
+      });
+    };
   }, []);
 
   const setAmount = ({ floatValue }: NumberFormatValues) => {
@@ -96,23 +101,16 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
   const { adjustIsolatedMarginOfPosition } = useSubaccount();
 
   const onSubmit = () => {
-    try {
-      adjustIsolatedMarginOfPosition({
-        onError: (errorParams) => {
-          console.log({ errorParams });
-        },
-        onSuccess: (
-          subaccountTransferPayload?: Nullable<HumanReadableSubaccountTransferPayload>
-        ) => {
-          console.log({ subaccountTransferPayload });
-        },
-      });
-    } catch (error) {
-      console.log('error', error);
-    }
+    adjustIsolatedMarginOfPosition({
+      onError: (errorParams) => {
+        console.log({ errorParams });
+      },
+      onSuccess: (subaccountTransferPayload?: Nullable<HumanReadableSubaccountTransferPayload>) => {
+        console.log({ subaccountTransferPayload });
+        abacusStateManager.clearAdjustIsolatedMarginInputValues();
+      },
+    });
   };
-
-  const { freeCollateral, marginUsage } = useSelector(getSubaccount, shallowEqual) ?? {};
 
   const renderDiffOutput = ({
     type,
@@ -124,6 +122,19 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
   );
 
   const {
+    crossFreeCollateral,
+    crossFreeCollateralUpdated,
+    crossMarginUsage,
+    crossMarginUsageUpdated,
+    positionMargin,
+    positionMarginUpdated,
+    positionLeverage,
+    positionLeverageUpdated,
+    liquidationPrice,
+    liquidationPriceUpdated,
+  } = summary ?? {};
+
+  const {
     freeCollateralDiffOutput,
     marginUsageDiffOutput,
     positionMarginDiffOutput,
@@ -132,31 +143,40 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
     () => ({
       freeCollateralDiffOutput: renderDiffOutput({
         withDiff:
-          !!freeCollateral?.postOrder && freeCollateral.current !== freeCollateral?.postOrder,
-        value: freeCollateral?.current,
-        newValue: freeCollateral?.postOrder,
+          !!crossFreeCollateralUpdated && crossFreeCollateral !== crossFreeCollateralUpdated,
+        value: crossFreeCollateral,
+        newValue: crossFreeCollateralUpdated,
         type: OutputType.Fiat,
       }),
       marginUsageDiffOutput: renderDiffOutput({
-        withDiff: !!marginUsage?.postOrder && marginUsage.current !== marginUsage?.postOrder,
-        value: marginUsage?.current,
-        newValue: marginUsage?.postOrder,
+        withDiff: !!crossMarginUsageUpdated && crossMarginUsage !== crossMarginUsageUpdated,
+        value: crossMarginUsage,
+        newValue: crossMarginUsageUpdated,
         type: OutputType.Percent,
       }),
       positionMarginDiffOutput: renderDiffOutput({
-        withDiff: !!quoteBalance?.postOrder && quoteBalance.current !== quoteBalance.postOrder,
-        value: quoteBalance?.current,
-        newValue: quoteBalance?.postOrder,
+        withDiff: !!positionMarginUpdated && positionMargin !== positionMarginUpdated,
+        value: positionMargin,
+        newValue: positionMarginUpdated,
         type: OutputType.Fiat,
       }),
       leverageDiffOutput: renderDiffOutput({
-        withDiff: !!leverage?.postOrder && leverage.current !== leverage?.postOrder,
-        value: leverage?.current,
-        newValue: leverage?.postOrder,
+        withDiff: !!positionLeverageUpdated && positionLeverage !== positionLeverageUpdated,
+        value: positionLeverage,
+        newValue: positionLeverageUpdated,
         type: OutputType.Multiple,
       }),
     }),
-    [freeCollateral, marginUsage, quoteBalance, leverage]
+    [
+      crossFreeCollateral,
+      crossFreeCollateralUpdated,
+      crossMarginUsage,
+      crossMarginUsageUpdated,
+      positionMargin,
+      positionMarginUpdated,
+      positionLeverage,
+      positionLeverageUpdated,
+    ]
   );
 
   const formConfig =
@@ -228,14 +248,11 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
       </Styled.Column>
       <div>
         <DiffOutput
-          withDiff={
-            !!liquidationPrice?.postOrder &&
-            liquidationPrice?.current !== liquidationPrice?.postOrder
-          }
+          withDiff={!!liquidationPriceUpdated && liquidationPrice !== liquidationPriceUpdated}
           sign={NumberSign.Negative}
           layout="column"
-          value={liquidationPrice?.current}
-          newValue={liquidationPrice?.postOrder}
+          value={liquidationPrice}
+          newValue={liquidationPriceUpdated}
           type={OutputType.Fiat}
           fractionDigits={tickSizeDecimals}
         />

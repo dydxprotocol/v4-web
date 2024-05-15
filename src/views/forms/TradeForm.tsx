@@ -114,6 +114,7 @@ export const TradeForm = ({
     size,
     summary,
     needsLimitPrice,
+    needsTargetLeverage,
     needsTrailingPercent,
     needsTriggerPrice,
     executionOptions,
@@ -366,13 +367,15 @@ export const TradeForm = ({
                         })}
                     </Button>
 
-                    <Button
-                      onClick={() => {
-                        dispatch(openDialog({ type: DialogTypes.AdjustTargetLeverage }));
-                      }}
-                    >
-                      <Output type={OutputType.Multiple} value={targetLeverage} />
-                    </Button>
+                    {needsTargetLeverage && (
+                      <Button
+                        onClick={() => {
+                          dispatch(openDialog({ type: DialogTypes.AdjustTargetLeverage }));
+                        }}
+                      >
+                        <Output type={OutputType.Multiple} value={targetLeverage} />
+                      </Button>
+                    )}
                   </Styled.MarginAndLeverageButtons>
                 )}
                 <TradeSideToggle />

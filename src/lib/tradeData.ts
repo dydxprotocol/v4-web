@@ -2,6 +2,7 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { matchPath, type Location } from 'react-router-dom';
 
 import {
+  AbacusMarginMode,
   AbacusOrderSide,
   AbacusOrderTypes,
   ErrorType,
@@ -147,15 +148,18 @@ export const calculateCrossPositionMargin = ({
 };
 
 export const getPositionMargin = ({ position }: { position: SubaccountPosition }) => {
-  const { childSubaccountNumber, notionalTotal, quoteBalance } = position;
-  const marginMode = childSubaccountNumber && childSubaccountNumber > 127 ? 'ISOLATED' : 'CROSS';
+  const { childSubaccountNumber, freeCollateral, notionalTotal, quoteBalance } = position;
+  const marginMode =
+    childSubaccountNumber && childSubaccountNumber > 127
+      ? AbacusMarginMode.isolated.rawValue
+      : AbacusMarginMode.cross.rawValue;
   const margin =
-    marginMode === 'CROSS'
+    marginMode === AbacusMarginMode.cross.rawValue
       ? calculateCrossPositionMargin({
           notionalTotal: notionalTotal?.current,
           adjustedMmf: quoteBalance?.current,
         })
-      : quoteBalance?.current;
+      : freeCollateral?.current;
 
   return margin;
 };
