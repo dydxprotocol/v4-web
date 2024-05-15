@@ -62,13 +62,9 @@ export const getDydxDatafeed = (
     onResultReadyCallback([]);
   },
 
-  resolveSymbol: async (
-    symbolName: string,
-    onSymbolResolvedCallback: ResolveCallback,
-    onResolveErrorCallback: ErrorCallback
-  ) => {
+  resolveSymbol: async (symbolName: string, onSymbolResolvedCallback: ResolveCallback) => {
     const symbolItem = getSymbol(symbolName || DEFAULT_MARKETID);
-    const { tickSizeDecimals } = getMarketConfig(symbolItem.symbol)(store.getState()) || {};
+    const { tickSizeDecimals } = getMarketConfig(symbolItem.symbol)(store.getState()) ?? {};
 
     const pricescale = tickSizeDecimals ? 10 ** tickSizeDecimals : initialPriceScale ?? 100;
 
@@ -152,7 +148,7 @@ export const getDydxDatafeed = (
         );
       }
 
-      const bars = [...cachedBars, ...(fetchedCandles?.map(mapCandle) || [])].reverse();
+      const bars = [...cachedBars, ...(fetchedCandles?.map(mapCandle) ?? [])].reverse();
 
       if (bars.length === 0) {
         onHistoryCallback([], {

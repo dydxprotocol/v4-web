@@ -55,7 +55,7 @@ export const formatRelativeTime = (
   const unitParts = [];
 
   for (const [unit, amount] of Object.entries(timeUnits).slice(
-    Object.keys(timeUnits).findIndex((unit) => unit === largestUnit)
+    Object.keys(timeUnits).findIndex((u) => u === largestUnit)
   ))
     if (Math.abs(elapsed) >= amount) {
       unitParts.push(
@@ -72,6 +72,7 @@ export const formatRelativeTime = (
         }).formatToParts(sign * Math.floor(elapsed / amount), unit as keyof typeof timeUnits)
       );
 
+      // eslint-disable-next-line no-plusplus, no-param-reassign
       if (--resolution === 0) break;
 
       elapsed %= amount;

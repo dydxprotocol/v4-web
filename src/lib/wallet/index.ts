@@ -40,41 +40,39 @@ export const getWalletConnection = ({
             };
           }
         }
-
         break;
       }
-
       case WalletConnectionType.WalletConnect2: {
         return {
           type: WalletConnectionType.WalletConnect2,
         };
       }
-
       case WalletConnectionType.CoinbaseWalletSdk: {
         return {
           type: WalletConnectionType.CoinbaseWalletSdk,
         };
       }
-
       case WalletConnectionType.CosmosSigner: {
         return {
           type: WalletConnectionType.CosmosSigner,
         };
       }
-
       case WalletConnectionType.TestWallet: {
         return {
           type: WalletConnectionType.TestWallet,
         };
       }
-
       case WalletConnectionType.Privy: {
         return {
           type: WalletConnectionType.Privy,
         };
       }
+      default: {
+        continue;
+      }
     }
   }
+  return undefined;
 };
 
 export const getWalletErrorType = ({ error }: { error: Error }) => {

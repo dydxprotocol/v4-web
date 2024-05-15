@@ -14,6 +14,7 @@ export const identify = <T extends AnalyticsUserProperty>(
   propertyValue: AnalyticsUserPropertyValue<T>
 ) => {
   if (DEBUG_ANALYTICS) {
+    // eslint-disable-next-line no-console
     console.log(`[Analytics:Identify] ${property}`, propertyValue);
   }
   const customEvent = new CustomEvent('dydx:identify', {
@@ -27,8 +28,9 @@ export const track = <T extends AnalyticsEvent>(
   eventType: T,
   eventData?: AnalyticsEventData<T>
 ) => {
-  const eventDataWithReferrer = { ...(eventData || {}), refferer: testFlags.referrer };
+  const eventDataWithReferrer = { ...(eventData ?? {}), refferer: testFlags.referrer };
   if (DEBUG_ANALYTICS) {
+    // eslint-disable-next-line no-console
     console.log(`[Analytics] ${eventType}`, eventDataWithReferrer);
   }
   const customEvent = new CustomEvent('dydx:track', {

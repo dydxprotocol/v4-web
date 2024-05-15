@@ -12,10 +12,11 @@ const applyComputedStyles = (html: string) => {
         computedStyle.getPropertyPriority(key)
       )
     );
-    const html = node.outerHTML;
+    const newHtml = node.outerHTML;
     document.body.removeChild(node);
-    return html;
+    return newHtml;
   }
+  return undefined;
 };
 
 const toDataUrl = (bytes: string, type = 'image/svg+xml') =>

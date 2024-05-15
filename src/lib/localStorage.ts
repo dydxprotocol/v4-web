@@ -8,6 +8,7 @@ export const setLocalStorage = <Value>({ key, value }: { key: LocalStorageKey; v
   const serializedValue = JSON.stringify(value);
 
   globalThis.localStorage?.setItem(key, serializedValue);
+  return undefined;
 };
 
 export const getLocalStorage = <Value>({
