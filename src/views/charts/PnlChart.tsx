@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 
 import { curveLinear } from '@visx/curve';
 import type { TooltipContextType } from '@visx/xychart';
-import { debounce } from 'lodash';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled, { AnyStyledComponent, css } from 'styled-components';
 
@@ -91,8 +90,6 @@ export const PnlChart = ({
   const pnlData = useSelector(getSubaccountHistoricalPnl, shallowEqual);
   const subaccountId = useSelector(getSubaccountId, shallowEqual);
 
-  const [minimumRequestedZoomDomain, setMinimumRequestedZoomDomain] = useState(-Infinity);
-
   const [selectedPeriod, setSelectedPeriod] = useState<HistoricalPnlPeriods>(
     HistoricalPnlPeriod.Period7d
   );
@@ -104,37 +101,8 @@ export const PnlChart = ({
     abacusStateManager.setHistoricalPnlPeriod(HistoricalPnlPeriod.Period90d);
   }, []);
 
-  const onSelectPeriod = useCallback(
-    (periodName: string) => {
-      setSelectedPeriod(
-        HISTORICAL_PNL_PERIODS[
-          (periodName as keyof typeof HISTORICAL_PNL_PERIODS) || selectedPeriod.name
-        ]
-      );
-    },
-    [setSelectedPeriod, selectedPeriod]
-  );
-
-  const onZoomSnap = useCallback(
-    debounce(
-      ({ zoomDomain }: { zoomDomain?: number }) =>
-        zoomDomain && setMinimumRequestedZoomDomain(zoomDomain),
-      500
-    ),
-    [setMinimumRequestedZoomDomain]
-  );
-
-  useEffect(() => {
-    const smallestRequestedPeriod = Object.entries(MS_FOR_PERIOD).find(
-      ([, milliseconds]) => milliseconds >= minimumRequestedZoomDomain
-    )?.[0];
-
-    if (smallestRequestedPeriod && smallestRequestedPeriod !== selectedPeriod.name) {
-      setSelectedPeriod(
-        HISTORICAL_PNL_PERIODS[smallestRequestedPeriod as keyof typeof MS_FOR_PERIOD]
-      );
-    }
-  }, [minimumRequestedZoomDomain]);
+  const onSelectPeriod = (periodName: string) =>
+    setSelectedPeriod(HISTORICAL_PNL_PERIODS[periodName as keyof typeof HISTORICAL_PNL_PERIODS]);
 
   const lastPnlTick = pnlData?.[pnlData.length - 1];
 
@@ -214,7 +182,6 @@ export const PnlChart = ({
         renderTooltip={() => <div />}
         onTooltipContext={onTooltipContext}
         onVisibleDataChange={onVisibleDataChange}
-        onZoom={onZoomSnap}
         slotEmpty={slotEmpty}
         defaultZoomDomain={MS_FOR_PERIOD[selectedPeriod.name]}
         minZoomDomain={PNL_TIME_RESOLUTION * 2}

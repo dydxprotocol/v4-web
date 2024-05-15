@@ -162,7 +162,7 @@ export const TimeSeriesChart = <Datum extends {}>({
           if (!zoomDomain) return zoomDomain;
 
           const newZoomDomain =
-            zoomDomain * (zoomDomainAnimateTo / zoomDomain) ** (elapsedMilliseconds * 0.0166);
+            zoomDomain * (zoomDomainAnimateTo / zoomDomain) ** (elapsedMilliseconds * 0.01);
 
           // clamp according to direction
           return zoomDomainAnimateTo > zoomDomain
