@@ -139,6 +139,8 @@ export type HistoricalTradingRewardsPeriods = (typeof historicalTradingRewardsPe
 
 export type Subaccount = Abacus.exchange.dydx.abacus.output.Subaccount;
 export type SubaccountPosition = Abacus.exchange.dydx.abacus.output.SubaccountPosition;
+export type SubaccountPendingPosition =
+  Abacus.exchange.dydx.abacus.output.SubaccountPendingPosition;
 export type SubaccountOrder = Abacus.exchange.dydx.abacus.output.SubaccountOrder;
 export type OrderStatus = Abacus.exchange.dydx.abacus.output.input.OrderStatus;
 export const AbacusOrderStatus = Abacus.exchange.dydx.abacus.output.input.OrderStatus;

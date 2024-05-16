@@ -60,6 +60,7 @@ const $A = styled.a<StyleProps>`
 
   ${layoutMixins.spacedRow}
   gap: 0.25em;
+  cursor: pointer;
 
   &:hover {
     text-decoration: underline;

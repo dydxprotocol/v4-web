@@ -51,3 +51,5 @@ export type Hdkey = {
 };
 
 export const AMOUNT_RESERVED_FOR_GAS_USDC = 0.1;
+
+export const NUM_PARENT_SUBACCOUNTS = 128;

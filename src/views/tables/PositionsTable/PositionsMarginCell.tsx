@@ -3,7 +3,8 @@ import { useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
-import { type SubaccountPosition } from '@/constants/abacus';
+import { AbacusMarginMode, type SubaccountPosition } from '@/constants/abacus';
+import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import { ButtonShape } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -27,10 +28,13 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
 
   const { marginMode, marginModeLabel, margin } = useMemo(() => {
     const { childSubaccountNumber } = position;
-    const marginMode = childSubaccountNumber && childSubaccountNumber >= 128 ? 'ISOLATED' : 'CROSS';
+    const marginMode =
+      childSubaccountNumber && childSubaccountNumber >= NUM_PARENT_SUBACCOUNTS
+        ? AbacusMarginMode.isolated
+        : AbacusMarginMode.cross;
 
     const marginModeLabel =
-      marginMode === 'CROSS'
+      marginMode === AbacusMarginMode.cross
         ? stringGetter({ key: STRING_KEYS.CROSS })
         : stringGetter({ key: STRING_KEYS.ISOLATED });
 
@@ -47,7 +51,7 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
     <TableCell
       stacked
       slotRight={
-        marginMode === 'ISOLATED' && (
+        marginMode === AbacusMarginMode.isolated && (
           <$EditButton
             key="edit-margin"
             iconName={IconName.Pencil}

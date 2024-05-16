@@ -14,7 +14,7 @@ import {
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { NumberSign } from '@/constants/numbers';
+import { NumberSign, PERCENT_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter, useSubaccount } from '@/hooks';
 
@@ -36,6 +36,7 @@ import { getAdjustIsolatedMarginInputs } from '@/state/inputsSelectors';
 import { getMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
+import { MustBigNumber } from '@/lib/numbers';
 
 type ElementProps = {
   marketId: SubaccountPosition['id'];
@@ -287,7 +288,7 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
           label: key,
           value: value.toString(),
         }))}
-        value={amountPercent ?? ''}
+        value={MustBigNumber(amountPercent).toFixed(PERCENT_DECIMALS)}
         onValueChange={setPercent}
         shape={ButtonShape.Rectangle}
       />

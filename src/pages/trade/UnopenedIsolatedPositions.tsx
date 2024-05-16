@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { shallowEqual, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -7,6 +8,9 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { PotentialPositionCard } from '@/components/PotentialPositionCard';
+
+import { getPendingPositions } from '@/state/accountSelectors';
+import { getAssets } from '@/state/assetsSelectors';
 
 type UnopenedIsolatedPositionsProps = {
   className?: string;
@@ -18,6 +22,12 @@ export const UnopenedIsolatedPositions = ({
   onViewOrders,
 }: UnopenedIsolatedPositionsProps) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const pendingPositions = useSelector(getPendingPositions, shallowEqual);
+  const assetsData = useSelector(getAssets, shallowEqual);
+
+  if (!pendingPositions?.length) return null;
+
   return (
     <$UnopenedIsolatedPositions className={className} isOpen={isOpen}>
       <$Button isOpen={isOpen} onClick={() => setIsOpen(!isOpen)}>
@@ -27,15 +37,14 @@ export const UnopenedIsolatedPositions = ({
 
       {isOpen && (
         <$Cards>
-          <PotentialPositionCard onViewOrders={onViewOrders} />
-          <PotentialPositionCard onViewOrders={onViewOrders} />
-          <PotentialPositionCard onViewOrders={onViewOrders} />
-          <PotentialPositionCard onViewOrders={onViewOrders} />
-          <PotentialPositionCard onViewOrders={onViewOrders} />
-          <PotentialPositionCard onViewOrders={onViewOrders} />
-          <PotentialPositionCard onViewOrders={onViewOrders} />
-          <PotentialPositionCard onViewOrders={onViewOrders} />
-          <PotentialPositionCard onViewOrders={onViewOrders} />
+          {pendingPositions.map((pendingPosition) => (
+            <PotentialPositionCard
+              key={pendingPosition.assetId}
+              marketName={assetsData?.[pendingPosition.assetId].name ?? ''}
+              pendingPosition={pendingPosition}
+              onViewOrders={onViewOrders}
+            />
+          ))}
         </$Cards>
       )}
     </$UnopenedIsolatedPositions>

@@ -1,7 +1,13 @@
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
-import { AbacusOrderStatus, AbacusOrderTypes, type Nullable } from '@/constants/abacus';
+import {
+  AbacusMarginMode,
+  AbacusOrderStatus,
+  AbacusOrderTypes,
+  type Nullable,
+} from '@/constants/abacus';
+import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS, type StringKey } from '@/constants/localization';
 import { CancelOrderStatuses } from '@/constants/trade';
@@ -59,11 +65,22 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     size,
     status,
     stepSizeDecimals,
+    subaccountNumber,
     tickSizeDecimals,
     trailingPercent,
     triggerPrice,
     type,
   } = (useSelector(getOrderDetails(orderId)) as OrderTableRow) || {};
+
+  const marginMode =
+    !!subaccountNumber && subaccountNumber >= NUM_PARENT_SUBACCOUNTS
+      ? AbacusMarginMode.isolated
+      : AbacusMarginMode.cross;
+
+  const marginModeLabel =
+    marginMode === AbacusMarginMode.cross
+      ? stringGetter({ key: STRING_KEYS.CROSS })
+      : stringGetter({ key: STRING_KEYS.ISOLATED });
 
   const renderOrderPrice = ({
     type,
@@ -88,6 +105,11 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
       key: 'market',
       label: stringGetter({ key: STRING_KEYS.MARKET }),
       value: marketId,
+    },
+    {
+      key: 'margin-mode',
+      label: stringGetter({ key: STRING_KEYS.MARGIN_MODE }),
+      value: marginModeLabel,
     },
     {
       key: 'side',
