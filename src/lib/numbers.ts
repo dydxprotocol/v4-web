@@ -11,7 +11,8 @@ export const BIG_NUMBERS = {
 };
 
 export const MustBigNumber = (amount?: BigNumberish | null): BigNumber =>
-  new BigNumber(amount ?? 0);
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+  new BigNumber(amount || 0);
 
 /**
  * @description Rounds the input to the nearest multiple of `factor`, which must be non-zero.

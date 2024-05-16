@@ -291,8 +291,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         clientId,
         orderFlags,
         clobPairId,
-        goodTilBlock ?? undefined,
-        goodTilBlockTime ?? undefined
+        goodTilBlock === 0 ? undefined : goodTilBlock ?? undefined,
+        goodTilBlockTime === 0 ? undefined : goodTilBlockTime ?? undefined
       );
 
       const encodedTx = encodeJson(tx);

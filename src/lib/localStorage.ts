@@ -3,12 +3,14 @@ import { LocalStorageKey } from '@/constants/localStorage';
 import { log } from './telemetry';
 
 export const setLocalStorage = <Value>({ key, value }: { key: LocalStorageKey; value: Value }) => {
-  if (value === undefined) return removeLocalStorage({ key });
+  if (value === undefined) {
+    removeLocalStorage({ key });
+    return;
+  }
 
   const serializedValue = JSON.stringify(value);
 
   globalThis.localStorage?.setItem(key, serializedValue);
-  return undefined;
 };
 
 export const getLocalStorage = <Value>({
