@@ -109,16 +109,14 @@ export const Tabs = <TabItemsValue extends string>({
     >
       <$Header $side={side}>{triggers}</$Header>
 
-      {sharedContent ? (
-        sharedContent
-      ) : (
+      {sharedContent || (
         <$Stack>
           {items.map(({ asChild, value, content, forceMount }) => (
             <$Content
               key={value}
               asChild={asChild}
               value={value}
-              forceMount={!!forceMount ? forceMount : undefined}
+              forceMount={forceMount || undefined}
               $hide={forceMount && currentItem?.value !== value}
               $withTransitions={withTransitions}
             >

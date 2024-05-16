@@ -38,23 +38,20 @@ export const Panel = ({
     <$Left>
       {href ? (
         <Link to={href}>
-          {slotHeader ? (
-            slotHeader
-          ) : (
+          {slotHeader || (
             <$Header role="button" onClick={onHeaderClick} hasSeparator={hasSeparator}>
               {slotHeaderContent}
               <$Icon iconName={IconName.ChevronRight} />
             </$Header>
           )}
         </Link>
-      ) : slotHeader ? (
-        slotHeader
       ) : (
-        slotHeaderContent && (
+        slotHeader ||
+        (slotHeaderContent && (
           <$Header role="button" onClick={onHeaderClick} hasSeparator={hasSeparator}>
             {slotHeaderContent}
           </$Header>
-        )
+        ))
       )}
       <$Content>{children}</$Content>
     </$Left>

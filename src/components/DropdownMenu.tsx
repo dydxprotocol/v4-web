@@ -87,13 +87,13 @@ const $Item = styled(Item)<{ $highlightColor?: 'accent' | 'create' | 'destroy' }
   ${({ $highlightColor }) =>
     $highlightColor != null
       ? {
-          ['accent']: `
+          accent: `
         --item-highlighted-textColor: var(--color-accent);
       `,
-          ['create']: `
+          create: `
         --item-highlighted-textColor: var(--color-green);
       `,
-          ['destroy']: `
+          destroy: `
         --item-highlighted-textColor: var(--color-red);
       `,
         }[$highlightColor]

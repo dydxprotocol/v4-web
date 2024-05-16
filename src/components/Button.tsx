@@ -64,19 +64,17 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
         disabled={state[ButtonState.Disabled] || state[ButtonState.Loading]}
         {...{ ref, action, size, shape, state, ...otherProps }}
       >
-        {
-          <>
-            {state[ButtonState.Loading] ? (
-              <LoadingDots size={3} />
-            ) : (
-              <>
-                {slotLeft}
-                {children}
-                {slotRight}
-              </>
-            )}
-          </>
-        }
+        <>
+          {state[ButtonState.Loading] ? (
+            <LoadingDots size={3} />
+          ) : (
+            <>
+              {slotLeft}
+              {children}
+              {slotRight}
+            </>
+          )}
+        </>
       </StyledBaseButton>
     );
   }

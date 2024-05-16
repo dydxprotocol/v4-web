@@ -22,7 +22,7 @@ export const SearchInput = ({ placeholder, onTextChange }: SearchInputProps) => 
     <$Search>
       <$Icon iconName={IconName.Search} />
       <$Input
-        autoFocus={true}
+        autoFocus
         ref={inputRef}
         value={value}
         type={InputType.Search}
