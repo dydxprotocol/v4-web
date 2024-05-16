@@ -1,8 +1,7 @@
 import type { Nullable, kollections } from '@dydxprotocol/v4-abacus';
 
 import type { AbacusRestProtocol } from '@/constants/abacus';
-
-import { lastSuccessfulRestRequestByOrigin } from '@/hooks/useAnalytics';
+import { lastSuccessfulRestRequestByOrigin } from '@/constants/analytics';
 
 type Headers = Nullable<kollections.Map<string, string>>;
 type FetchResponseCallback = (p0: Nullable<string>, p1: number, p2: Nullable<string>) => void;
