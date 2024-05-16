@@ -18,6 +18,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
+// eslint-disable-next-line import/no-cycle
 import { Notification, NotificationProps } from '@/components/Notification';
 import { OrderStatusIcon } from '@/views/OrderStatusIcon';
 

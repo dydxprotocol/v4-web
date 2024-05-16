@@ -8,7 +8,6 @@ commitlint.config.ts
 /src/views/dialogs
 /src/views/forms
 /src/views/menus
-/src/views/notifications
 /src/views/tables
 
 # components dir is being worked on
