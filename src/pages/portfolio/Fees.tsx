@@ -178,6 +178,7 @@ export const Fees = () => {
             ] as ColumnDef<FeeTier>[]
           ).filter(isTruthy)}
           selectionBehavior="replace"
+          paginationBehavior="showAll"
           withOuterBorder={isNotTablet}
           withInnerBorders
         />

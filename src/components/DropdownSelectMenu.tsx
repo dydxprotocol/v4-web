@@ -125,12 +125,15 @@ const $DropdownIcon = styled.span`
 `;
 
 const $Content = styled(Content)`
+  --dropdownSelectMenu-item-font-size: inherit;
+
   ${popoverMixins.popover}
   ${popoverMixins.popoverAnimation}
 `;
 
 const $RadioItem = styled(RadioItem)`
   ${popoverMixins.item}
+  --item-font-size: var(--dropdownSelectMenu-item-font-size);
 `;
 
 const $ItemLabel = styled.span`

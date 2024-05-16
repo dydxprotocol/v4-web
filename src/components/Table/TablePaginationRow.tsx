@@ -15,7 +15,7 @@ import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
-const PAGE_SIZES = [5, 10, 15, 20] as const;
+export const PAGE_SIZES = [5, 10, 15, 20] as const;
 export type PageSize = (typeof PAGE_SIZES)[number];
 
 type ElementProps = {
@@ -77,7 +77,7 @@ export const TablePaginationRow = ({
         key: STRING_KEYS.SHOW,
         params: {
           NUMBER: (
-            <DropdownSelectMenu
+            <$DropdownSelectMenu
               value={String(pageSize)}
               items={PAGE_SIZES.map((size) => ({
                 label: String(size),
@@ -121,4 +121,8 @@ const $ToggleGroup = styled(ToggleGroup)`
     border: none;
     background-color: transparent;
   }
+`;
+
+const $DropdownSelectMenu = styled(DropdownSelectMenu)`
+  --dropdownSelectMenu-item-font-size: var(--fontSize-mini);
 `;

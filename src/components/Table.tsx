@@ -36,7 +36,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { Icon, IconName } from './Icon';
-import { PageSize, TablePaginationRow } from './Table/TablePaginationRow';
+import { PAGE_SIZES, PageSize, TablePaginationRow } from './Table/TablePaginationRow';
 import { Tag } from './Tag';
 
 export { ActionsTableCell } from './Table/ActionsTableCell';
@@ -109,6 +109,7 @@ export type TableElementProps<TableRowData extends BaseTableRowData | CustomRowC
   onRowAction?: (key: Key, row: TableRowData) => void;
   slotEmpty?: React.ReactNode;
   initialPageSize?: PageSize;
+  paginationBehavior?: 'paginate' | 'showAll';
 };
 
 export type TableStyleProps = {
@@ -140,6 +141,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
   selectionBehavior = 'toggle',
   slotEmpty,
   initialPageSize = 10,
+  paginationBehavior = 'paginate',
   hideHeader = false,
   withGradientCardRows = false,
   withFocusStickyRows = false,
@@ -215,6 +217,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
   useEffect(() => list.reload(), [data]);
 
   const isEmpty = data.length === 0;
+  const shouldPaginate = paginationBehavior === 'paginate' && data.length > Math.min(...PAGE_SIZES);
 
   return (
     <$TableWrapper
@@ -251,14 +254,16 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
           withScrollSnapRows={withScrollSnapRows}
           numColumns={shownColumns.length}
           paginationRow={
-            <TablePaginationRow
-              currentPage={currentPage}
-              pageSize={pageSize}
-              pages={pages}
-              totalRows={data.length}
-              setCurrentPage={setCurrentPage}
-              setPageSize={setPageSize}
-            />
+            shouldPaginate ? (
+              <TablePaginationRow
+                currentPage={currentPage}
+                pageSize={pageSize}
+                pages={pages}
+                totalRows={data.length}
+                setCurrentPage={setCurrentPage}
+                setPageSize={setPageSize}
+              />
+            ) : undefined
           }
         >
           <TableHeader columns={shownColumns}>
@@ -278,7 +283,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
 
           <TableBody
             items={
-              list.items.length > pageSize
+              shouldPaginate && list.items.length > pageSize
                 ? list.items.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
                 : list.items
             }
@@ -319,7 +324,7 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
   children: CollectionChildren<TableRowData>;
 
   numColumns: number;
-  paginationRow: React.ReactNode;
+  paginationRow?: React.ReactNode;
 
   hideHeader?: boolean;
   withGradientCardRows?: boolean;
@@ -444,17 +449,19 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
           )
         )}
       </TableBodyRowGroup>
-      <$Tfoot>
-        <$PaginationTr key="pagination">
-          <td
-            colSpan={numColumns}
-            onMouseDown={(e) => e.preventDefault()}
-            onPointerDown={(e) => e.preventDefault()}
-          >
-            {paginationRow}
-          </td>
-        </$PaginationTr>
-      </$Tfoot>
+      {paginationRow && (
+        <$Tfoot>
+          <$PaginationTr key="pagination">
+            <td
+              colSpan={numColumns}
+              onMouseDown={(e) => e.preventDefault()}
+              onPointerDown={(e) => e.preventDefault()}
+            >
+              {paginationRow}
+            </td>
+          </$PaginationTr>
+        </$Tfoot>
+      )}
     </$Table>
   );
 };
