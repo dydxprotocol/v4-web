@@ -1,30 +1,30 @@
 import type { LocalWallet } from '@dydxprotocol/v4-client-js';
 
-import type {
+import {
+  AbacusAppConfig,
+  AbacusAppConfigV2,
+  AbacusHelper,
+  ApiData,
+  AsyncAbacusStateManager,
+  AsyncAbacusStateManagerV2,
+  ClosePositionInputField,
   ClosePositionInputFields,
+  ComplianceAction,
+  CoroutineTimer,
+  HistoricalPnlPeriod,
   HistoricalPnlPeriods,
   HistoricalTradingRewardsPeriod,
   HistoricalTradingRewardsPeriods,
   HumanReadableCancelOrderPayload,
   HumanReadablePlaceOrderPayload,
   HumanReadableTriggerOrdersPayload,
+  IOImplementations,
   Nullable,
   ParsingError,
-  TradeInputFields,
-  TransferInputFields,
-} from '@/constants/abacus';
-import {
-  AbacusAppConfig,
-  AbacusHelper,
-  ApiData,
-  AsyncAbacusStateManager,
-  ClosePositionInputField,
-  ComplianceAction,
-  CoroutineTimer,
-  HistoricalPnlPeriod,
-  IOImplementations,
   TradeInputField,
+  TradeInputFields,
   TransferInputField,
+  TransferInputFields,
   TransferType,
   TriggerOrdersInputField,
   UIImplementations,
@@ -55,7 +55,7 @@ class AbacusStateManager {
   private store: RootStore | undefined;
   private currentMarket: string | undefined;
 
-  stateManager: InstanceType<typeof AsyncAbacusStateManager>;
+  stateManager: InstanceType<typeof AsyncAbacusStateManager> | InstanceType<typeof AsyncAbacusStateManagerV2>;
   websocket: AbacusWebsocket;
   stateNotifier: AbacusStateNotifier;
   analytics: AbacusAnalytics;
@@ -89,22 +89,38 @@ class AbacusStateManager {
       this.abacusFormatter
     );
 
-    const appConfigs = new AbacusAppConfig(
-      false, // subscribeToCandles
-      true, // loadRemote
-      import.meta.env.MODE === 'development' && import.meta.env.VITE_ENABLE_ABACUS_LOGGING // enableLogger
-    );
-    appConfigs.squidVersion = AbacusAppConfig.SquidVersion.V2;
-
-    this.stateManager = new AsyncAbacusStateManager(
-      '',
-      CURRENT_ABACUS_DEPLOYMENT,
-      appConfigs,
-      ioImplementations,
-      uiImplementations,
-      // @ts-ignore
-      this.stateNotifier
-    );
+    if (import.meta.env.MODE === 'development') {
+      const appConfigs = AbacusAppConfigV2.Companion.forAppWithIsolatedMargins;
+      appConfigs.enableLogger = import.meta.env.MODE === 'development' && import.meta.env.VITE_ENABLE_ABACUS_LOGGING;
+  
+      this.stateManager = new AsyncAbacusStateManagerV2(
+        '',
+        CURRENT_ABACUS_DEPLOYMENT,
+        appConfigs,
+        ioImplementations,
+        uiImplementations,
+        // @ts-ignore
+        this.stateNotifier
+      );
+    } else {
+      const appConfigs = new AbacusAppConfig(
+        false, // subscribeToCandles
+        true, // loadRemote
+        import.meta.env.MODE === 'development' && import.meta.env.VITE_ENABLE_ABACUS_LOGGING // enableLogger
+      );
+      appConfigs.squidVersion = AbacusAppConfig.SquidVersion.V2;
+  
+      this.stateManager = new AsyncAbacusStateManager(
+        '',
+        CURRENT_ABACUS_DEPLOYMENT,
+        appConfigs,
+        ioImplementations,
+        uiImplementations,
+        // @ts-ignore
+        this.stateNotifier
+      );
+    }
+    
   }
 
   start = ({ network }: { network?: DydxNetwork } = {}) => {
