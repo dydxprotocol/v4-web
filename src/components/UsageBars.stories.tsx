@@ -9,19 +9,16 @@ import { StoryWrapper } from '.ladle/components';
 
 export const UsageBarsStory: Story<{ value: number }> = (args) => (
   <StoryWrapper>
-    <Styled.Container>
+    <$Container>
       <UsageBars {...args} />
-    </Styled.Container>
+    </$Container>
   </StoryWrapper>
 );
 
 UsageBarsStory.args = {
   value: 0,
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.section`
+const $Container = styled.section`
   ${layoutMixins.container}
   background: var(--color-layer-3);
 

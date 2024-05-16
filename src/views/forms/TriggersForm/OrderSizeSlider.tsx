@@ -1,15 +1,18 @@
 import { useCallback } from 'react';
 
 import _ from 'lodash';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { Slider } from '@/components/Slider';
 
+import { MustBigNumber } from '@/lib/numbers';
+
 type ElementProps = {
-  setAbacusSize: (value: number | null) => void;
-  setOrderSizeInput: (value: number) => void;
+  setAbacusSize: (value: string) => void;
+  setOrderSizeInput: (value: string) => void;
   size: number | null;
   positionSize?: number;
+  stepSizeDecimals: number;
 };
 
 type StyleProps = {
@@ -21,6 +24,7 @@ export const OrderSizeSlider = ({
   setAbacusSize,
   size,
   positionSize,
+  stepSizeDecimals,
   className,
 }: ElementProps & StyleProps) => {
   const step = positionSize ? Math.pow(10, Math.floor(Math.log10(positionSize) - 1)) : 0.1;
@@ -29,27 +33,29 @@ export const OrderSizeSlider = ({
 
   // Debounced slightly to avoid excessive updates to Abacus while still providing a smooth slide
   const debouncedSetAbacusSize = useCallback(
-    _.debounce((newSize: number) => {
+    _.debounce((newSize: string) => {
       setAbacusSize(newSize);
     }, 50),
     []
   );
 
   const onSliderDrag = ([newSize]: number[]) => {
-    setOrderSizeInput(newSize);
-    debouncedSetAbacusSize(newSize);
+    const roundedSize = MustBigNumber(newSize).toFixed(stepSizeDecimals);
+    setOrderSizeInput(roundedSize);
+    debouncedSetAbacusSize(roundedSize);
   };
 
   const onValueCommit = ([newSize]: number[]) => {
-    setOrderSizeInput(newSize);
+    const roundedSize = MustBigNumber(newSize).toFixed(stepSizeDecimals);
+    setOrderSizeInput(roundedSize);
     // Ensure Abacus is updated with the latest, committed value
     debouncedSetAbacusSize.cancel();
-    setAbacusSize(newSize);
+    setAbacusSize(roundedSize);
   };
 
   return (
-    <Styled.SliderContainer className={className}>
-      <Styled.Slider
+    <$SliderContainer className={className}>
+      <$Slider
         label="PositionSize"
         min={0}
         max={maxSize}
@@ -58,16 +64,13 @@ export const OrderSizeSlider = ({
         onValueCommit={onValueCommit}
         value={Math.min(currSize, maxSize)}
       />
-    </Styled.SliderContainer>
+    </$SliderContainer>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.SliderContainer = styled.div`
+const $SliderContainer = styled.div`
   height: 1.375rem;
 `;
-Styled.Slider = styled(Slider)`
+const $Slider = styled(Slider)`
   --slider-track-backgroundColor: var(--color-layer-4);
   --slider-track-background: linear-gradient(
     90deg,

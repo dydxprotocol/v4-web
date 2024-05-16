@@ -210,8 +210,8 @@ export const ClosePositionForm = ({
   const alertMessage = alertContent && <AlertMessage type={alertType}>{alertContent}</AlertMessage>;
 
   const inputs = (
-    <Styled.InputsColumn>
-      <Styled.FormInput
+    <$InputsColumn>
+      <$FormInput
         id="close-position-amount"
         label={
           <>
@@ -226,7 +226,7 @@ export const ClosePositionForm = ({
         max={currentSize !== null ? currentSizeBN.toNumber() : undefined}
       />
 
-      <Styled.ToggleGroup
+      <$ToggleGroup
         items={Object.entries(SIZE_PERCENT_OPTIONS).map(([key, value]) => ({
           label: key === MAX_KEY ? stringGetter({ key: STRING_KEYS.FULL_CLOSE }) : key,
           value: value.toString(),
@@ -237,34 +237,34 @@ export const ClosePositionForm = ({
       />
 
       {alertMessage}
-    </Styled.InputsColumn>
+    </$InputsColumn>
   );
 
   return (
-    <Styled.ClosePositionForm onSubmit={onSubmit} className={className}>
+    <$ClosePositionForm onSubmit={onSubmit} className={className}>
       {!isTablet ? (
         inputs
       ) : currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder ? (
-        <Styled.PreviewAndConfirmContent>
+        <$PreviewAndConfirmContent>
           <PositionPreview />
           {alertMessage}
-        </Styled.PreviewAndConfirmContent>
+        </$PreviewAndConfirmContent>
       ) : (
-        <Styled.MobileLayout>
-          <Styled.OrderbookScrollArea scrollBehavior="snapToCenterUnlessHovered">
-            <Styled.Orderbook hideHeader />
-          </Styled.OrderbookScrollArea>
+        <$MobileLayout>
+          <$OrderbookScrollArea scrollBehavior="snapToCenterUnlessHovered">
+            <$Orderbook hideHeader />
+          </$OrderbookScrollArea>
 
-          <Styled.Right>
+          <$Right>
             <PositionPreview showNarrowVariation />
             {inputs}
-          </Styled.Right>
-        </Styled.MobileLayout>
+          </$Right>
+        </$MobileLayout>
       )}
 
-      <Styled.Footer>
+      <$Footer>
         {size != null && (
-          <Styled.ButtonRow>
+          <$ButtonRow>
             <Button
               type={ButtonType.Reset}
               action={ButtonAction.Reset}
@@ -283,7 +283,7 @@ export const ClosePositionForm = ({
             >
               {stringGetter({ key: STRING_KEYS.CLEAR })}
             </Button>
-          </Styled.ButtonRow>
+          </$ButtonRow>
         )}
 
         <PlaceOrderButtonAndReceipt
@@ -298,14 +298,11 @@ export const ClosePositionForm = ({
             buttonAction: ButtonAction.Destroy,
           }}
         />
-      </Styled.Footer>
-    </Styled.ClosePositionForm>
+      </$Footer>
+    </$ClosePositionForm>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ClosePositionForm = styled.form`
+const $ClosePositionForm = styled.form`
   --form-rowGap: 1.25rem;
 
   ${layoutMixins.expandingColumnWithFooter}
@@ -328,12 +325,12 @@ Styled.ClosePositionForm = styled.form`
   }
 `;
 
-Styled.PreviewAndConfirmContent = styled.div`
+const $PreviewAndConfirmContent = styled.div`
   ${layoutMixins.flexColumn}
   gap: var(--form-input-gap);
 `;
 
-Styled.MobileLayout = styled.div`
+const $MobileLayout = styled.div`
   height: 0;
   // Apply dialog's top/left/right padding to inner scroll areas
   min-height: calc(100% + var(--dialog-content-paddingTop) + var(--dialog-content-paddingBottom));
@@ -345,7 +342,7 @@ Styled.MobileLayout = styled.div`
   gap: var(--form-input-gap);
 `;
 
-Styled.OrderbookScrollArea = styled.div<{
+const $OrderbookScrollArea = styled.div<{
   scrollBehavior: OrderbookScrollBehavior;
 }>`
   ${layoutMixins.stickyLeft}
@@ -370,12 +367,12 @@ Styled.OrderbookScrollArea = styled.div<{
   padding-bottom: var(--form-rowGap);
 `;
 
-Styled.Orderbook = styled(Orderbook)`
+const $Orderbook = styled(Orderbook)`
   min-height: 100%;
   --tableCell-padding: 0.5em 1em;
 `;
 
-Styled.Right = styled.div`
+const $Right = styled.div`
   height: 0;
   min-height: 100%;
   ${layoutMixins.scrollArea}
@@ -388,11 +385,11 @@ Styled.Right = styled.div`
   gap: 1rem;
 `;
 
-Styled.FormInput = styled(FormInput)`
+const $FormInput = styled(FormInput)`
   width: 100%;
 `;
 
-Styled.ToggleGroup = styled(ToggleGroup)`
+const $ToggleGroup = styled(ToggleGroup)`
   ${formMixins.inputToggleGroup}
 
   @media ${breakpoints.mobile} {
@@ -402,7 +399,7 @@ Styled.ToggleGroup = styled(ToggleGroup)`
   }
 `;
 
-Styled.Footer = styled.footer`
+const $Footer = styled.footer`
   ${layoutMixins.stickyFooter}
   backdrop-filter: none;
 
@@ -411,12 +408,12 @@ Styled.Footer = styled.footer`
   margin-top: auto;
 `;
 
-Styled.ButtonRow = styled.div`
+const $ButtonRow = styled.div`
   ${layoutMixins.row}
   justify-self: end;
   padding: 0.5rem 0 0.5rem 0;
 `;
 
-Styled.InputsColumn = styled.div`
+const $InputsColumn = styled.div`
   ${formMixins.inputsColumn}
 `;

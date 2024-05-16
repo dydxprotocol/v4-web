@@ -35,7 +35,7 @@ export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) 
 
   return (
     <ActionsTableCell>
-      <Styled.CancelButton
+      <$CancelButton
         key="cancelorder"
         iconName={IconName.Close}
         shape={ButtonShape.Square}
@@ -52,10 +52,7 @@ export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) 
     </ActionsTableCell>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.CancelButton = styled(IconButton)`
+const $CancelButton = styled(IconButton)`
   --button-hover-textColor: var(--color-red);
 
   svg {

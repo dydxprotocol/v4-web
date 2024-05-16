@@ -29,15 +29,15 @@ export const FillDetails = ({
 }) => {
   const stringGetter = useStringGetter();
   return (
-    <Styled.Details
+    <$Details
       items={[
         {
           key: 'size',
           label: (
-            <Styled.Label>
+            <$Label>
               {stringGetter({ key: STRING_KEYS.SIZE })}
               <OrderSideTag orderSide={orderSide} />
-            </Styled.Label>
+            </$Label>
           ),
           value: <Output type={OutputType.Asset} value={filledAmount} tag={assetId} />,
         },
@@ -59,15 +59,12 @@ export const FillDetails = ({
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Label = styled.span`
+const $Label = styled.span`
   ${layoutMixins.row}
   gap: 0.5ch;
 `;
 
-Styled.Details = styled(Details)`
+const $Details = styled(Details)`
   --details-item-height: 1rem;
 
   dd {

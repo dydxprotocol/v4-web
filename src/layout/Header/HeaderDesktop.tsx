@@ -1,7 +1,7 @@
 import { isTruthy } from '@dydxprotocol/v4-client-js/build/src/network_optimizer';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonShape } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
@@ -61,7 +61,7 @@ export const HeaderDesktop = () => {
           value: chainTokenLabel,
           label: chainTokenLabel,
           href: `/${chainTokenLabel}`,
-          slotAfter: !hasSeenLaunchIncentives && <Styled.UnreadIndicator />,
+          slotAfter: !hasSeenLaunchIncentives && <$UnreadIndicator />,
         },
         {
           value: 'MORE',
@@ -101,8 +101,7 @@ export const HeaderDesktop = () => {
               value: 'HELP',
               slotBefore: <Icon iconName={IconName.HelpCircle} />,
               label: stringGetter({ key: STRING_KEYS.HELP }),
-              onClick: (e: MouseEvent) => {
-                e.preventDefault();
+              onClick: () => {
                 dispatch(openDialog({ type: DialogTypes.Help }));
               },
             },
@@ -119,27 +118,27 @@ export const HeaderDesktop = () => {
   ];
 
   return (
-    <Styled.Header>
-      <Styled.LogoLink to="/">
+    <$Header>
+      <$LogoLink to="/">
         <LogoShortIcon />
-      </Styled.LogoLink>
+      </$LogoLink>
 
       <VerticalSeparator />
 
-      <Styled.NavBefore>
+      <$NavBefore>
         <NetworkSelectMenu sideOffset={16} />
         <VerticalSeparator />
         <LanguageSelector sideOffset={16} />
-      </Styled.NavBefore>
+      </$NavBefore>
 
       <VerticalSeparator />
 
-      <Styled.NavigationMenu items={navItems} orientation="horizontal" />
+      <$NavigationMenu items={navItems} orientation="horizontal" />
 
       <div role="separator" />
 
-      <Styled.NavAfter>
-        <Styled.IconButton
+      <$NavAfter>
+        <$IconButton
           shape={ButtonShape.Rectangle}
           iconName={IconName.HelpCircle}
           onClick={() => dispatch(openDialog({ type: DialogTypes.Help }))}
@@ -149,21 +148,21 @@ export const HeaderDesktop = () => {
 
         <NotificationsMenu
           slotTrigger={
-            <Styled.IconButton shape={ButtonShape.Rectangle} iconComponent={BellStrokeIcon} />
+            <$IconButton
+              shape={ButtonShape.Rectangle}
+              iconComponent={BellStrokeIcon as React.ElementType}
+            />
           }
         />
 
         <VerticalSeparator />
 
         <AccountMenu />
-      </Styled.NavAfter>
-    </Styled.Header>
+      </$NavAfter>
+    </$Header>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Header = styled.header`
+const $Header = styled.header`
   --header-horizontal-padding-mobile: 0.5rem;
   --trigger-height: 2.25rem;
   --logo-width: 3.5rem;
@@ -202,7 +201,7 @@ Styled.Header = styled.header`
   }
 `;
 
-Styled.NavigationMenu = styled(NavigationMenu)`
+const $NavigationMenu = styled(NavigationMenu)`
   & {
     --navigationMenu-height: var(--stickyArea-topHeight);
     --navigationMenu-item-height: var(--trigger-height);
@@ -211,9 +210,9 @@ Styled.NavigationMenu = styled(NavigationMenu)`
   ${layoutMixins.scrollArea}
   padding: 0 0.5rem;
   scroll-padding: 0 0.5rem;
-`;
+` as typeof NavigationMenu;
 
-Styled.NavBefore = styled.div`
+const $NavBefore = styled.div`
   ${layoutMixins.flexEqualColumns}
 
   > * {
@@ -222,7 +221,7 @@ Styled.NavBefore = styled.div`
   }
 `;
 
-Styled.LogoLink = styled(Link)`
+const $LogoLink = styled(Link)`
   display: flex;
   align-self: stretch;
 
@@ -233,7 +232,7 @@ Styled.LogoLink = styled(Link)`
   }
 `;
 
-Styled.NavAfter = styled.div`
+const $NavAfter = styled.div`
   ${layoutMixins.row}
   justify-self: end;
   padding-right: 0.75rem;
@@ -245,14 +244,14 @@ Styled.NavAfter = styled.div`
   }
 `;
 
-Styled.IconButton = styled(IconButton)<{ size?: string }>`
+const $IconButton = styled(IconButton)<{ size?: string }>`
   ${headerMixins.button}
   --button-border: none;
   --button-icon-size: 1rem;
   --button-padding: 0 0.5em;
 `;
 
-Styled.UnreadIndicator = styled.div`
+const $UnreadIndicator = styled.div`
   width: 0.4375rem;
   height: 0.4375rem;
   border-radius: 50%;

@@ -176,7 +176,7 @@ export const GenerateKeys = ({
 
   return (
     <>
-      <Styled.StatusCardsContainer>
+      <$StatusCardsContainer>
         {[
           {
             status: EvmDerivedAccountStatus.Deriving,
@@ -191,24 +191,24 @@ export const GenerateKeys = ({
         ]
           .filter(isTruthy)
           .map((step) => (
-            <Styled.StatusCard key={step.status} active={status === step.status}>
+            <$StatusCard key={step.status} active={status === step.status}>
               {status < step.status ? (
                 <LoadingSpinner disabled />
               ) : status === step.status ? (
                 <LoadingSpinner />
               ) : (
-                <Styled.GreenCheckCircle />
+                <$GreenCheckCircle />
               )}
               <div>
                 <h3>{step.title}</h3>
                 <p>{step.description}</p>
               </div>
-            </Styled.StatusCard>
+            </$StatusCard>
           ))}
-      </Styled.StatusCardsContainer>
+      </$StatusCardsContainer>
 
-      <Styled.Footer>
-        <Styled.RememberMe htmlFor="remember-me">
+      <$Footer>
+        <$RememberMe htmlFor="remember-me">
           <WithTooltip withIcon tooltip="remember-me">
             {stringGetter({ key: STRING_KEYS.REMEMBER_ME })}
           </WithTooltip>
@@ -219,24 +219,24 @@ export const GenerateKeys = ({
             checked={shouldRememberMe}
             onCheckedChange={setShouldRememberMe}
           />
-        </Styled.RememberMe>
+        </$RememberMe>
         {error && <AlertMessage type={AlertType.Error}>{error}</AlertMessage>}
-        <Styled.WithReceipt
+        <$WithReceipt
           slotReceipt={
-            <Styled.ReceiptArea>
+            <$ReceiptArea>
               <span>
                 {stringGetter({
                   key: STRING_KEYS.FREE_SIGNING,
                   params: {
                     FREE: (
-                      <Styled.Green>
+                      <$Green>
                         {stringGetter({ key: STRING_KEYS.FREE_TRADING_TITLE_ASTERISK_FREE })}
-                      </Styled.Green>
+                      </$Green>
                     ),
                   },
                 })}
               </span>
-            </Styled.ReceiptArea>
+            </$ReceiptArea>
           }
         >
           {!isMatchingNetwork ? (
@@ -265,23 +265,18 @@ export const GenerateKeys = ({
                   })}
             </Button>
           )}
-        </Styled.WithReceipt>
-        <Styled.Disclaimer>
-          {stringGetter({ key: STRING_KEYS.CHECK_WALLET_FOR_REQUEST })}
-        </Styled.Disclaimer>
-      </Styled.Footer>
+        </$WithReceipt>
+        <$Disclaimer>{stringGetter({ key: STRING_KEYS.CHECK_WALLET_FOR_REQUEST })}</$Disclaimer>
+      </$Footer>
     </>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.StatusCardsContainer = styled.div`
+const $StatusCardsContainer = styled.div`
   display: grid;
   gap: 1rem;
 `;
 
-Styled.StatusCard = styled.div<{ active?: boolean }>`
+const $StatusCard = styled.div<{ active?: boolean }>`
   ${layoutMixins.row}
   gap: 1rem;
   background-color: var(--color-layer-4);
@@ -310,7 +305,7 @@ Styled.StatusCard = styled.div<{ active?: boolean }>`
   }
 `;
 
-Styled.Footer = styled.footer`
+const $Footer = styled.footer`
   ${layoutMixins.stickyFooter}
   margin-top: auto;
 
@@ -318,30 +313,30 @@ Styled.Footer = styled.footer`
   gap: 1rem;
 `;
 
-Styled.RememberMe = styled.label`
+const $RememberMe = styled.label`
   ${layoutMixins.spacedRow}
   font: var(--font-base-book);
 `;
 
-Styled.WithReceipt = styled(WithReceipt)`
+const $WithReceipt = styled(WithReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
-Styled.ReceiptArea = styled.div`
+const $ReceiptArea = styled.div`
   padding: 1rem;
   font: var(--font-small-book);
   color: var(--color-text-0);
 `;
 
-Styled.Green = styled.span`
+const $Green = styled.span`
   color: var(--color-green);
 `;
 
-Styled.GreenCheckCircle = styled(GreenCheckCircle)`
+const $GreenCheckCircle = styled(GreenCheckCircle)`
   --icon-size: 2.375rem;
 `;
 
-Styled.Disclaimer = styled.span`
+const $Disclaimer = styled.span`
   text-align: center;
   color: var(--color-text-0);
   font: var(--font-base-book);

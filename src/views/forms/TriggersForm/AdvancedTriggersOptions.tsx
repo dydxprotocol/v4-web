@@ -43,12 +43,12 @@ export const AdvancedTriggersOptions = ({
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
 
   return (
-    <Styled.Container>
-      <Styled.Header>
+    <$Container>
+      <$Header>
         {stringGetter({ key: STRING_KEYS.ADVANCED })}
         <HorizontalSeparatorFiller />
-      </Styled.Header>
-      <Styled.Content>
+      </$Header>
+      <$Content>
         <OrderSizeInput
           className={className}
           differingOrderSizes={differingOrderSizes}
@@ -66,18 +66,15 @@ export const AdvancedTriggersOptions = ({
             tickSizeDecimals={tickSizeDecimals}
           />
         )}
-      </Styled.Content>
-    </Styled.Container>
+      </$Content>
+    </$Container>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.div`
+const $Container = styled.div`
   ${layoutMixins.column}
 `;
 
-Styled.Header = styled.h3`
+const $Header = styled.h3`
   ${layoutMixins.inlineRow}
   font: var(--font-small-medium);
   color: var(--color-text-0);
@@ -85,7 +82,7 @@ Styled.Header = styled.h3`
   margin-bottom: 0.5rem;
 `;
 
-Styled.Content = styled.div`
+const $Content = styled.div`
   display: grid;
   gap: 0.5em;
 `;

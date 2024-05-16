@@ -39,35 +39,27 @@ export const TradeDialogTrigger = () => {
       isOpen={isOpen}
       setIsOpen={setIsOpen}
       slotTrigger={
-        <Styled.TradeDialogTrigger hasSummary={hasSummary}>
+        <$TradeDialogTrigger hasSummary={hasSummary}>
           {hasSummary ? (
-            <Styled.TradeSummary>
-              <Styled.TradeType>
+            <$TradeSummary>
+              <$TradeType>
                 <span>
                   {stringGetter({ key: ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey })}
                 </span>
                 <OrderSideTag size={TagSize.Medium} orderSide={selectedOrderSide} />
-              </Styled.TradeType>
-              <Styled.Output
-                type={OutputType.Fiat}
-                value={total}
-                showSign={ShowSign.None}
-                useGrouping
-              />
-            </Styled.TradeSummary>
+              </$TradeType>
+              <$Output type={OutputType.Fiat} value={total} showSign={ShowSign.None} useGrouping />
+            </$TradeSummary>
           ) : (
             stringGetter({ key: STRING_KEYS.TAP_TO_TRADE })
           )}
-          <Styled.Icon iconName={IconName.Caret} />
-        </Styled.TradeDialogTrigger>
+          <$Icon iconName={IconName.Caret} />
+        </$TradeDialogTrigger>
       }
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TradeDialogTrigger = styled.div<{ hasSummary?: boolean }>`
+const $TradeDialogTrigger = styled.div<{ hasSummary?: boolean }>`
   ${layoutMixins.stickyFooter}
 
   ${layoutMixins.spacedRow}
@@ -82,21 +74,21 @@ Styled.TradeDialogTrigger = styled.div<{ hasSummary?: boolean }>`
   cursor: pointer;
 `;
 
-Styled.TradeSummary = styled.div`
+const $TradeSummary = styled.div`
   ${layoutMixins.rowColumn}
   font: var(--font-medium-book);
 `;
 
-Styled.TradeType = styled.div`
+const $TradeType = styled.div`
   ${layoutMixins.inlineRow}
 `;
 
-Styled.Output = styled(Output)`
+const $Output = styled(Output)`
   color: var(--color-text-2);
   font: var(--font-large-book);
 `;
 
-Styled.Icon = styled(Icon)`
+const $Icon = styled(Icon)`
   rotate: 0.5turn;
   width: 1.5rem;
   height: 1.5rem;

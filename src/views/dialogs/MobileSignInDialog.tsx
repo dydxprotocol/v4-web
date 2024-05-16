@@ -59,10 +59,10 @@ const MobileQrCode = ({
   const encryptedData = AES.encrypt(JSON.stringify(data), encryptionKey).toString();
 
   return (
-    <Styled.QrCodeContainer isShowing={isShowing} onClick={onClick}>
+    <$QrCodeContainer isShowing={isShowing} onClick={onClick}>
       <QrCode hasLogo size={432} value={encryptedData} />
       <span>{stringGetter({ key: STRING_KEYS.CLICK_TO_SHOW })}</span>
-    </Styled.QrCodeContainer>
+    </$QrCodeContainer>
   );
 };
 
@@ -84,12 +84,12 @@ export const MobileSignInDialog = ({ setIsOpen }: ElementProps) => {
   const content = {
     [MobileSignInState.Waiting]: (
       <>
-        <Styled.WaitingSpan>
+        <$WaitingSpan>
           <p>{stringGetter({ key: STRING_KEYS.DESCRIPTION_ABOUT_TO_TRANSFER })}</p>
           <p>
             <strong>{stringGetter({ key: STRING_KEYS.DESCRIPTION_NEVER_SHARE })} </strong>
           </p>
-        </Styled.WaitingSpan>
+        </$WaitingSpan>
         <TimeoutButton
           onClick={() => setCurrentState(MobileSignInState.Scanning)}
           timeoutInSeconds={8}
@@ -144,14 +144,11 @@ export const MobileSignInDialog = ({ setIsOpen }: ElementProps) => {
 
   return (
     <Dialog isOpen setIsOpen={setIsOpen} title={title}>
-      <Styled.Content>{content}</Styled.Content>
+      <$Content>{content}</$Content>
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
 
@@ -170,13 +167,13 @@ Styled.Content = styled.div`
   }
 `;
 
-Styled.WaitingSpan = styled.span`
+const $WaitingSpan = styled.span`
   strong {
     color: var(--color-warning);
   }
 `;
 
-Styled.QrCodeContainer = styled.figure<{ isShowing: boolean }>`
+const $QrCodeContainer = styled.figure<{ isShowing: boolean }>`
   ${layoutMixins.stack}
 
   overflow: hidden;

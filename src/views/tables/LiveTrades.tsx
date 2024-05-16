@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 import { MarketTrade } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -17,6 +17,7 @@ import { Output, OutputType } from '@/components/Output';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketLiveTrades } from '@/state/perpetualsSelectors';
 
+import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { getSelectedOrderSide } from '@/lib/tradeData';
 
@@ -65,7 +66,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
       getCellValue: (row: RowData) => row.createdAtMilliseconds,
       label: stringGetter({ key: STRING_KEYS.TIME }),
       renderCell: (row: RowData) => (
-        <Styled.TimeOutput type={OutputType.Time} value={row.createdAtMilliseconds} />
+        <$TimeOutput type={OutputType.Time} value={row.createdAtMilliseconds} />
       ),
     };
     return [
@@ -75,7 +76,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
         getCellValue: (row: RowData) => row.size,
         label: stringGetter({ key: STRING_KEYS.SIDE }),
         renderCell: (row: RowData) => (
-          <Styled.SideOutput
+          <$SideOutput
             type={OutputType.Text}
             value={stringGetter({
               key: row.side === OrderSide.BUY ? STRING_KEYS.BUY : STRING_KEYS.SELL,
@@ -89,7 +90,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
         label: stringGetter({ key: STRING_KEYS.SIZE }),
         tag: id,
         renderCell: (row: RowData) => (
-          <Styled.SizeOutput
+          <$SizeOutput
             type={OutputType.Asset}
             value={row.size}
             fractionDigits={stepSizeDecimals}
@@ -117,7 +118,7 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
   }, [stepSizeDecimals, tickSizeDecimals, id, histogramSide, stringGetter]);
 
   return (
-    <Styled.LiveTradesTable
+    <$LiveTradesTable
       className={className}
       key="live-trades"
       label="Recent Trades"
@@ -143,19 +144,16 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TimeOutput = styled(OrderbookTradesOutput)`
+const $TimeOutput = styled(OrderbookTradesOutput)`
   color: var(--color-text-0);
   font-feature-settings: var(--fontFeature-monoNumbers);
 `;
 
-Styled.SideOutput = styled(Output)`
+const $SideOutput = styled(Output)`
   color: var(--accent-color);
 `;
 
-Styled.SizeOutput = styled(Output)<StyleProps>`
+const $SizeOutput = styled(Output)<StyleProps>`
   color: var(--accent-color);
 
   @media ${breakpoints.tablet} {
@@ -163,7 +161,8 @@ Styled.SizeOutput = styled(Output)<StyleProps>`
   }
 `;
 
-Styled.LiveTradesTable = styled(OrderbookTradesTable)<StyleProps>`
+const liveTradesTableType = getSimpleStyledOutputType(OrderbookTradesTable, {} as StyleProps);
+const $LiveTradesTable = styled(OrderbookTradesTable)<StyleProps>`
   tr {
     --histogram-bucket-size: 1;
     background-color: var(--color-layer-2);
@@ -231,4 +230,4 @@ Styled.LiveTradesTable = styled(OrderbookTradesTable)<StyleProps>`
 
     font-size: 0.875em;
   }
-`;
+` as typeof liveTradesTableType;

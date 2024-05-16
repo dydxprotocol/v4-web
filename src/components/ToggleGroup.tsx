@@ -1,7 +1,7 @@
-import { forwardRef, type Ref } from 'react';
+import { type Ref } from 'react';
 
 import { Item, Root } from '@radix-ui/react-toggle-group';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { type MenuItem } from '@/constants/menus';
@@ -13,10 +13,12 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { type BaseButtonProps } from '@/components/BaseButton';
 import { ToggleButton } from '@/components/ToggleButton';
 
+import { forwardRefFn } from '@/lib/genericFunctionalComponentUtils';
+
 type ElementProps<MenuItemValue extends string> = {
   items: MenuItem<MenuItemValue>[];
   value: MenuItemValue;
-  onValueChange: (value: any) => void;
+  onValueChange: (value: MenuItemValue) => void;
   onInteraction?: () => void;
   ensureSelected?: boolean;
 };
@@ -25,7 +27,7 @@ type StyleProps = {
   className?: string;
 };
 
-export const ToggleGroup = forwardRef(
+export const ToggleGroup = forwardRefFn(
   <MenuItemValue extends string>(
     {
       items,
@@ -45,7 +47,7 @@ export const ToggleGroup = forwardRef(
     const { isTablet } = useBreakpoints();
 
     return (
-      <Styled.Root
+      <$Root
         ref={ref}
         type="single"
         value={value}
@@ -71,14 +73,11 @@ export const ToggleGroup = forwardRef(
             </ToggleButton>
           </Item>
         ))}
-      </Styled.Root>
+      </$Root>
     );
   }
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Root = styled(Root)`
+const $Root = styled(Root)`
   ${layoutMixins.row}
   gap: 0.33em;
 `;

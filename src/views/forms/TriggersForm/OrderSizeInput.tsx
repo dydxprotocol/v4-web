@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { TriggerOrdersInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -65,8 +65,9 @@ export const OrderSizeInput = ({
     const newSizeString = MustBigNumber(
       newSize && positionSize ? Math.min(positionSize, newSize) : newSize
     ).toString();
+
     abacusStateManager.setTriggerOrdersValue({
-      value: newSize != null ? newSizeString.toString() : null,
+      value: newSize !== null ? newSizeString : null,
       field: TriggerOrdersInputField.size,
     });
   };
@@ -100,32 +101,30 @@ export const OrderSizeInput = ({
       }
       open={shouldShowCustomAmount}
     >
-      <Styled.SizeInputRow>
-        <Styled.OrderSizeSlider
-          setAbacusSize={setAbacusSize}
-          setOrderSizeInput={setOrderSize}
+      <$SizeInputRow>
+        <$OrderSizeSlider
+          setAbacusSize={(sizeString: string) => setAbacusSize(parseFloat(sizeString))}
+          setOrderSizeInput={(sizeString: string) => setOrderSize(parseFloat(sizeString))}
           size={orderSize}
-          positionSize={positionSize}
+          positionSize={positionSize ?? undefined}
+          stepSizeDecimals={stepSizeDecimals ?? TOKEN_DECIMALS}
           className={className}
         />
         <FormInput
           type={InputType.Number}
-          value={orderSize?.toFixed(stepSizeDecimals ?? TOKEN_DECIMALS)}
+          value={orderSize?.toString()}
           slotRight={<Tag>{symbol}</Tag>}
           onInput={onSizeInput}
         />
-      </Styled.SizeInputRow>
+      </$SizeInputRow>
     </Collapsible>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.OrderSizeSlider = styled(OrderSizeSlider)`
+const $OrderSizeSlider = styled(OrderSizeSlider)`
   width: 100%;
 `;
 
-Styled.SizeInputRow = styled.div`
+const $SizeInputRow = styled.div`
   display: flex;
   align-items: center;
   gap: 0.25rem;

@@ -1,9 +1,9 @@
-import { useMemo } from 'react';
+import { Key, useMemo } from 'react';
 
 import type { ColumnSize } from '@react-types/table';
 import { shallowEqual, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import {
   type Asset,
@@ -66,7 +66,7 @@ type PositionTableRow = {
   asset: Asset;
   oraclePrice: Nullable<number>;
   tickSizeDecimals: number;
-  fundingRate: number;
+  fundingRate: Nullable<number>;
   stopLossOrders: SubaccountOrder[];
   takeProfitOrders: SubaccountOrder[];
 } & SubaccountPosition;
@@ -414,27 +414,30 @@ export const PositionsTable = ({
 
   const positionsData = useMemo(
     () =>
-      positions.map((position: SubaccountPosition) => {
-        return {
-          tickSizeDecimals:
-            perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
-          asset: assets?.[position.assetId],
-          oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
-          fundingRate: perpetualMarkets?.[position.id]?.perpetual?.nextFundingRate,
-          stopLossOrders: allStopLossOrders.filter(
-            (order: SubaccountOrder) => order.marketId === position.id
-          ),
-          takeProfitOrders: allTakeProfitOrders.filter(
-            (order: SubaccountOrder) => order.marketId === position.id
-          ),
-          ...position,
-        };
+      positions.map((position: SubaccountPosition): PositionTableRow => {
+        // object splat ... doesn't copy getter defined properties
+        return Object.assign(
+          {
+            tickSizeDecimals:
+              perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
+            asset: assets?.[position.assetId],
+            oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
+            fundingRate: perpetualMarkets?.[position.id]?.perpetual?.nextFundingRate,
+            stopLossOrders: allStopLossOrders.filter(
+              (order: SubaccountOrder) => order.marketId === position.id
+            ),
+            takeProfitOrders: allTakeProfitOrders.filter(
+              (order: SubaccountOrder) => order.marketId === position.id
+            ),
+          },
+          position
+        );
       }),
     [positions, perpetualMarkets, assets, allStopLossOrders, allTakeProfitOrders]
   );
 
   return (
-    <Styled.Table
+    <$Table
       key={currentMarket ?? 'positions'}
       label="Positions"
       defaultSortDescriptor={{
@@ -456,8 +459,8 @@ export const PositionsTable = ({
       getRowKey={(row: PositionTableRow) => row.id}
       onRowAction={
         currentMarket
-          ? null
-          : (market: string) => {
+          ? undefined
+          : (market: Key) => {
               navigate(`${AppRoute.Trade}/${market}`, {
                 state: { from: currentRoute },
               });
@@ -483,10 +486,7 @@ export const PositionsTable = ({
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Table = styled(Table)`
+const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
 
   tr {
@@ -509,19 +509,22 @@ Styled.Table = styled(Table)`
       --table-row-gradient-to-color: var(--color-gradient-negative);
     }
   }
-`;
+` as typeof Table;
 
 const $InlineRow = styled.div`
   ${layoutMixins.inlineRow}
 `;
+
 const $AssetIcon = styled(AssetIcon)`
   ${layoutMixins.inlineRow}
   min-width: unset;
   font-size: 2.25rem;
 `;
+
 const $SecondaryColor = styled.span`
   color: var(--color-text-0);
 `;
+
 const $OutputSigned = styled(Output)<{ sign: NumberSign }>`
   color: ${({ sign }) =>
     ({
@@ -530,6 +533,7 @@ const $OutputSigned = styled(Output)<{ sign: NumberSign }>`
       [NumberSign.Neutral]: `var(--color-text-2)`,
     }[sign])};
 `;
+
 const $HighlightOutput = styled(Output)<{ isNegative?: boolean }>`
   color: var(--color-text-1);
   --secondary-item-color: currentColor;
@@ -540,11 +544,13 @@ const $HighlightOutput = styled(Output)<{ isNegative?: boolean }>`
         : `var(--color-positive)`
       : `currentColor`};
 `;
+
 const $PositionSide = styled.span`
   && {
     color: var(--side-color);
   }
 `;
+
 const $Icon = styled(Icon)`
   font-size: 3em;
 `;

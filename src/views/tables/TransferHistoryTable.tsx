@@ -1,6 +1,6 @@
 import type { ColumnSize } from '@react-types/table';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { type SubaccountTransfer } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
@@ -54,7 +54,7 @@ const getTransferHistoryTableColumnDef = ({
         getCellValue: (row) => row.updatedAtMilliseconds,
         label: stringGetter({ key: STRING_KEYS.TIME }),
         renderCell: ({ updatedAtMilliseconds }) => (
-          <Styled.TimeOutput
+          <$TimeOutput
             type={OutputType.RelativeTime}
             relativeTimeFormatOptions={{ format: 'singleCharacter' }}
             value={updatedAtMilliseconds}
@@ -100,12 +100,9 @@ const getTransferHistoryTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.TRANSACTION }),
         renderCell: ({ transactionHash }) =>
           transactionHash ? (
-            <Styled.TxHash
-              withIcon
-              href={`${mintscanTxUrl?.replace('{tx_hash}', transactionHash)}`}
-            >
+            <$TxHash withIcon href={`${mintscanTxUrl?.replace('{tx_hash}', transactionHash)}`}>
               {truncateAddress(transactionHash, '')}
-            </Styled.TxHash>
+            </$TxHash>
           ) : (
             '-'
           ),
@@ -141,7 +138,7 @@ export const TransferHistoryTable = ({
   const transfers = useSelector(getSubaccountTransfers, shallowEqual) ?? [];
 
   return (
-    <Styled.Table
+    <$Table
       label="Transfers"
       data={transfers}
       getRowKey={(row: SubaccountTransfer) => row.id}
@@ -177,25 +174,22 @@ export const TransferHistoryTable = ({
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Table = styled(Table)`
+const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
-`;
+` as typeof Table;
 
-Styled.InlineRow = styled.div`
+const $InlineRow = styled.div`
   ${layoutMixins.inlineRow}
 `;
 
-Styled.Icon = styled(Icon)`
+const $Icon = styled(Icon)`
   font-size: 3em;
 `;
 
-Styled.TimeOutput = styled(Output)`
+const $TimeOutput = styled(Output)`
   color: var(--color-text-0);
 `;
 
-Styled.TxHash = styled(Link)`
+const $TxHash = styled(Link)`
   justify-content: flex-end;
 `;

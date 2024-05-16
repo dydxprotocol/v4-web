@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { HistoricalTradingReward, HistoricalTradingRewardsPeriods } from '@/constants/abacus';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
@@ -107,7 +107,7 @@ export const TradingRewardHistoryTable = ({
   const rewardsData = useMemo(() => periodTradingRewards?.toArray() ?? [], [periodTradingRewards]);
 
   return (
-    <Styled.Table
+    <$Table
       label={stringGetter({ key: STRING_KEYS.REWARD_HISTORY })}
       data={rewardsData}
       getRowKey={(row: any) => row.startedAtInMilliseconds}
@@ -131,9 +131,7 @@ export const TradingRewardHistoryTable = ({
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Table = styled(Table)`
+const $Table = styled(Table)`
   --tableCell-padding: 0.5rem 0;
   --tableStickyRow-backgroundColor: var(--color-layer-3);
   --tableRow-backgroundColor: var(--color-layer-3);
@@ -141,7 +139,7 @@ Styled.Table = styled(Table)`
   tbody {
     font: var(--font-medium-book);
   }
-`;
+` as typeof Table;
 
 const $Rewarded = styled.span`
   color: var(--color-text-2);
@@ -160,6 +158,7 @@ const $TimePeriod = styled.div`
     font: var(--font-base-book);
   }
 `;
+
 const $AssetIcon = styled(AssetIcon)`
   margin-left: 0.5ch;
 `;

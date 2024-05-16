@@ -1,11 +1,11 @@
-import { useEffect, useMemo } from 'react';
+import { Key, useEffect, useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { ColumnSize } from '@react-types/table';
 import type { Dispatch } from '@reduxjs/toolkit';
 import { DateTime } from 'luxon';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Asset, Nullable, SubaccountOrder } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
@@ -111,7 +111,7 @@ const getOrdersTableColumnDef = ({
         renderCell: ({ status, resources }) => {
           return (
             <TableCell>
-              <Styled.WithTooltip
+              <$WithTooltip
                 tooltipString={
                   resources.statusStringKey
                     ? stringGetter({ key: resources.statusStringKey })
@@ -120,7 +120,7 @@ const getOrdersTableColumnDef = ({
                 side="right"
               >
                 <OrderStatusIcon status={status.rawValue} />
-              </Styled.WithTooltip>
+              </$WithTooltip>
               {resources.typeStringKey && stringGetter({ key: resources.typeStringKey })}
             </TableCell>
           );
@@ -229,22 +229,22 @@ const getOrdersTableColumnDef = ({
               stacked
               slotLeft={
                 <>
-                  <Styled.TimeOutput
+                  <$TimeOutput
                     type={OutputType.RelativeTime}
                     relativeTimeFormatOptions={{ format: 'singleCharacter' }}
                     value={createdAtMilliseconds}
                   />
-                  <Styled.AssetIconWithStatus>
-                    <Styled.AssetIcon symbol={asset?.id} />
-                    <Styled.StatusDot color={statusIconColor} />
-                  </Styled.AssetIconWithStatus>
+                  <$AssetIconWithStatus>
+                    <$AssetIcon symbol={asset?.id} />
+                    <$StatusDot color={statusIconColor} />
+                  </$AssetIconWithStatus>
                 </>
               }
             >
               <span>
                 {resources.statusStringKey && stringGetter({ key: resources.statusStringKey })}
               </span>
-              <Styled.InlineRow>
+              <$InlineRow>
                 <Output
                   type={OutputType.Asset}
                   value={totalFilled}
@@ -257,7 +257,7 @@ const getOrdersTableColumnDef = ({
                   fractionDigits={TOKEN_DECIMALS}
                   tag={asset?.id}
                 />
-              </Styled.InlineRow>
+              </$InlineRow>
             </TableCell>
           );
         },
@@ -273,13 +273,13 @@ const getOrdersTableColumnDef = ({
         getCellValue: (row) => row.price,
         renderCell: ({ price, orderSide, tickSizeDecimals, resources }) => (
           <TableCell stacked>
-            <Styled.InlineRow>
-              <Styled.Side side={orderSide}>
+            <$InlineRow>
+              <$Side side={orderSide}>
                 {resources.sideStringKey ? stringGetter({ key: resources.sideStringKey }) : null}
-              </Styled.Side>
-              <Styled.SecondaryColor>@</Styled.SecondaryColor>
+              </$Side>
+              <$SecondaryColor>@</$SecondaryColor>
               <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
-            </Styled.InlineRow>
+            </$InlineRow>
             <span>
               {resources.typeStringKey ? stringGetter({ key: resources.typeStringKey }) : null}
             </span>
@@ -341,7 +341,7 @@ export const OrdersTable = ({
   );
 
   return (
-    <Styled.Table
+    <$Table
       key={currentMarket ?? 'all-orders'}
       label="Orders"
       data={ordersData}
@@ -349,7 +349,7 @@ export const OrdersTable = ({
       getRowAttributes={(row: OrderTableRow) => ({
         'data-clearable': isOrderStatusClearable(row.status),
       })}
-      onRowAction={(key: string) =>
+      onRowAction={(key: Key) =>
         dispatch(
           openDialog({
             type: DialogTypes.OrderDetails,
@@ -370,7 +370,7 @@ export const OrdersTable = ({
       )}
       slotEmpty={
         <>
-          <Styled.EmptyIcon iconName={IconName.OrderPending} />
+          <$EmptyIcon iconName={IconName.OrderPending} />
           <h4>{stringGetter({ key: STRING_KEYS.ORDERS_EMPTY_STATE })}</h4>
         </>
       }
@@ -383,10 +383,7 @@ export const OrdersTable = ({
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Table = styled(Table)`
+const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
 
   tbody tr {
@@ -394,13 +391,13 @@ Styled.Table = styled(Table)`
       opacity: 0.5;
     }
   }
-`;
+` as typeof Table;
 
-Styled.InlineRow = styled.div`
+const $InlineRow = styled.div`
   ${layoutMixins.inlineRow}
 `;
 
-Styled.AssetIcon = styled(AssetIcon)`
+const $AssetIcon = styled(AssetIcon)`
   font-size: 2rem;
 
   @media ${breakpoints.tablet} {
@@ -408,15 +405,15 @@ Styled.AssetIcon = styled(AssetIcon)`
   }
 `;
 
-Styled.TimeOutput = styled(Output)`
+const $TimeOutput = styled(Output)`
   color: var(--color-text-0);
 `;
 
-Styled.SecondaryColor = styled.span`
+const $SecondaryColor = styled.span`
   color: var(--color-text-0);
 `;
 
-Styled.Side = styled.span<{ side: OrderSide }>`
+const $Side = styled.span<{ side: OrderSide }>`
   ${({ side }) =>
     ({
       [OrderSide.BUY]: css`
@@ -428,19 +425,19 @@ Styled.Side = styled.span<{ side: OrderSide }>`
     }[side])};
 `;
 
-Styled.EmptyIcon = styled(Icon)`
+const $EmptyIcon = styled(Icon)`
   font-size: 3em;
 `;
 
-Styled.AssetIconWithStatus = styled.div`
+const $AssetIconWithStatus = styled.div`
   ${layoutMixins.stack}
 
-  ${Styled.AssetIcon} {
+  ${$AssetIcon} {
     margin: 0.125rem;
   }
 `;
 
-Styled.StatusDot = styled.div<{ color: string }>`
+const $StatusDot = styled.div<{ color: string }>`
   place-self: start end;
   width: 0.875rem;
   height: 0.875rem;
@@ -450,6 +447,6 @@ Styled.StatusDot = styled.div<{ color: string }>`
   background-color: ${({ color }) => color};
 `;
 
-Styled.WithTooltip = styled(WithTooltip)`
+const $WithTooltip = styled(WithTooltip)`
   --tooltip-backgroundColor: var(--color-layer-5);
 `;

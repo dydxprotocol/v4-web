@@ -61,7 +61,7 @@ export const PortfolioNavMobile = () => {
   const currentRoute = routeMap[pathname];
 
   return (
-    <Styled.MobilePortfolioHeader>
+    <$MobilePortfolioHeader>
       <DropdownHeaderMenu
         key="portfolioRoute"
         items={portfolioRouteItems.filter(({ value }) => value !== currentRoute?.value)}
@@ -69,13 +69,10 @@ export const PortfolioNavMobile = () => {
       >
         {currentRoute?.label}
       </DropdownHeaderMenu>
-    </Styled.MobilePortfolioHeader>
+    </$MobilePortfolioHeader>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.MobilePortfolioHeader = styled.div`
+const $MobilePortfolioHeader = styled.div`
   ${layoutMixins.stickyHeader}
   ${layoutMixins.withOuterBorder}
   ${layoutMixins.row}
