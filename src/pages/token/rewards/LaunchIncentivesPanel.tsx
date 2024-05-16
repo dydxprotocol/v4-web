@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { useQuery } from 'react-query';
 import { useDispatch } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
@@ -33,7 +33,7 @@ export const LaunchIncentivesPanel = ({ className }: { className?: string }) => 
 
   useEffect(() => {
     dispatch(markLaunchIncentivesSeen());
-  }, []);
+  }, [dispatch]);
 
   return isNotTablet ? (
     <$Panel
@@ -273,10 +273,6 @@ const $EstimatedRewardsCardContent = styled.div`
       color: var(--color-text-2);
     }
   }
-`;
-
-const $BackgroundDots = styled.img`
-  position: absolute;
 `;
 
 const $Season = styled.span`

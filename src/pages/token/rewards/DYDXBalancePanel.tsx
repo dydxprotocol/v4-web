@@ -1,7 +1,7 @@
 import type { ElementType } from 'react';
 
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
@@ -71,7 +71,7 @@ export const DYDXBalancePanel = ({ className }: { className?: string }) => {
                   <$IconContainer>
                     <Icon
                       iconComponent={
-                        wallets[walletType || WalletType.OtherWallet].icon as ElementType
+                        wallets[walletType ?? WalletType.OtherWallet].icon as ElementType
                       }
                     />
                   </$IconContainer>
@@ -135,12 +135,6 @@ const $ActionButtons = styled(Toolbar)`
   --stickyArea-topHeight: max-content;
   gap: 0.5rem;
   padding: 0;
-`;
-
-const $ReceiveButton = styled(Button)`
-  --button-textColor: var(--color-text-2);
-  --button-backgroundColor: var(--color-layer-5);
-  --button-border: solid var(--border-width) var(--color-layer-6);
 `;
 
 const $Content = styled.div`

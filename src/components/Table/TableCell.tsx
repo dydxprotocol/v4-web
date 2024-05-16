@@ -1,4 +1,4 @@
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { tableMixins } from '@/styles/tableMixins';
 

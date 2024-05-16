@@ -137,8 +137,15 @@ const useDydxClientContext = () => {
         setGasDenom(selectedGasDenom);
       }
     },
-    [compositeClient]
+    [compositeClient, setGasDenom]
   );
+
+  useEffect(() => {
+    if (compositeClient) {
+      setSelectedGasDenom(gasDenom);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [compositeClient, setSelectedGasDenom]);
 
   // ------ Wallet Methods ------ //
   const getWalletFromEvmSignature = async ({ signature }: { signature: string }) => {

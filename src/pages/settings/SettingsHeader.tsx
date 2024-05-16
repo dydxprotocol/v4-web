@@ -1,4 +1,4 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { AppRoute, MobileSettingsRoute } from '@/constants/routes';

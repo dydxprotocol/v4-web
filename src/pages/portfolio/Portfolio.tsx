@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react';
 
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction } from '@/constants/buttons';
@@ -41,22 +41,22 @@ const Orders = lazy(() => import('./Orders').then((module) => ({ default: module
 const Fees = lazy(() => import('./Fees').then((module) => ({ default: module.Fees })));
 const History = lazy(() => import('./History').then((module) => ({ default: module.History })));
 
-export default () => {
+const PortfolioPage = () => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
 
   const onboardingState = useSelector(getOnboardingState);
-  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
+  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) ?? {};
   const { nativeTokenBalance } = useAccountBalance();
 
   const { numTotalPositions, numTotalOpenOrders } =
-    useSelector(getTradeInfoNumbers, shallowEqual) || {};
+    useSelector(getTradeInfoNumbers, shallowEqual) ?? {};
   const numPositions = shortenNumberForDisplay(numTotalPositions);
   const numOrders = shortenNumberForDisplay(numTotalOpenOrders);
 
-  const usdcBalance = freeCollateral?.current || 0;
+  const usdcBalance = freeCollateral?.current ?? 0;
 
   useDocumentTitle(stringGetter({ key: STRING_KEYS.PORTFOLIO }));
 
@@ -230,6 +230,9 @@ export default () => {
     </WithSidebar>
   );
 };
+
+export default PortfolioPage;
+
 const $PortfolioMobile = styled.div`
   min-height: 100%;
   ${layoutMixins.expandingColumnWithHeader}

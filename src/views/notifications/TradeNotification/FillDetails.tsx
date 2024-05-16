@@ -1,5 +1,5 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { TradeTypes } from '@/constants/trade';

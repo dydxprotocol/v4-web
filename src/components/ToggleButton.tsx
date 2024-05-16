@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 
 import { Root } from '@radix-ui/react-toggle';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { BaseButton, type BaseButtonProps } from '@/components/BaseButton';
 

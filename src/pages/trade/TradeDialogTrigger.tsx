@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { ORDER_TYPE_STRINGS } from '@/constants/trade';
@@ -27,8 +27,8 @@ export const TradeDialogTrigger = () => {
 
   const currentTradeData = useSelector(getInputTradeData, shallowEqual);
 
-  const { side, type, summary } = currentTradeData || {};
-  const { total } = summary || {};
+  const { side, type, summary } = currentTradeData ?? {};
+  const { total } = summary ?? {};
   const selectedTradeType = getSelectedTradeType(type);
   const selectedOrderSide = getSelectedOrderSide(side);
 

@@ -17,6 +17,7 @@ import {
   ValidatorConfig,
   encodeJson,
   type LocalWallet,
+  type SelectedGasDenom,
 } from '@dydxprotocol/v4-client-js';
 import Long from 'long';
 

@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 type ElementProps = {
   slotReceipt?: ReactNode;

@@ -1,4 +1,4 @@
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -13,7 +13,7 @@ import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { GovernancePanel } from './rewards/GovernancePanel';
 import { NewMarketsPanel } from './rewards/NewMarketsPanel';
 
-export default () => {
+const Governance = () => {
   const stringGetter = useStringGetter();
 
   return (
@@ -34,6 +34,8 @@ export default () => {
     </DetachedSection>
   );
 };
+export default Governance;
+
 const $HeaderSection = styled.section`
   ${layoutMixins.contentSectionDetached}
 

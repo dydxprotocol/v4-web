@@ -1,4 +1,4 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';

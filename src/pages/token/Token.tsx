@@ -1,7 +1,7 @@
 import { Suspense, lazy } from 'react';
 
 import { Navigate, Route, Routes } from 'react-router-dom';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { TokenRoute } from '@/constants/routes';
@@ -19,7 +19,7 @@ const RewardsPage = lazy(() => import('./rewards/RewardsPage'));
 const StakingPage = lazy(() => import('./staking/StakingPage'));
 const GovernancePage = lazy(() => import('./Governance'));
 
-export default () => {
+const Token = () => {
   const { isTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
 
@@ -88,24 +88,13 @@ export default () => {
     </WithSidebar>
   );
 };
+export default Token;
+
 const $SideBar = styled.div`
   ${layoutMixins.flexColumn}
   justify-content: space-between;
 
   height: 100%;
-`;
-
-const $Footer = styled.div`
-  ${layoutMixins.row}
-  flex-wrap: wrap;
-
-  padding: 1rem;
-
-  gap: 0.5rem;
-
-  > button {
-    flex-grow: 1;
-  }
 `;
 
 const $NavigationMenu = styled(NavigationMenu)`

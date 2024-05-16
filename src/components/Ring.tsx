@@ -1,4 +1,4 @@
-import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 type ElementProps = {
   value: number;

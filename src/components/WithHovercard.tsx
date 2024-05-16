@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { Content, Portal, Root, Trigger } from '@radix-ui/react-hover-card';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { tooltipStrings } from '@/constants/tooltips';
 

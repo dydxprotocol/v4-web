@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Nullable } from '@/constants/abacus';
 
