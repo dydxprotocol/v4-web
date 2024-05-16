@@ -85,7 +85,7 @@ export const PnlChart = ({
 }: PnlChartProps) => {
   const { isTablet } = useBreakpoints();
   const appTheme = useSelector(getAppTheme);
-  const { equity } = useSelector(getSubaccount, shallowEqual) || {};
+  const { equity } = useSelector(getSubaccount, shallowEqual) ?? {};
   const now = useNow({ intervalMs: timeUnits.minute });
 
   // Chart data
@@ -141,15 +141,15 @@ export const PnlChart = ({
               (datum) =>
                 ({
                   id: datum.createdAtMilliseconds,
-                  subaccountId: subaccountId,
+                  subaccountId,
                   equity: Number(datum.equity),
                   totalPnl: Number(datum.totalPnl),
                   netTransfers: Number(datum.netTransfers),
                   createdAt: new Date(datum.createdAtMilliseconds).valueOf(),
                   side: {
                     [-1]: PnlSide.Loss,
-                    [0]: PnlSide.Flat,
-                    [1]: PnlSide.Profit,
+                    0: PnlSide.Flat,
+                    1: PnlSide.Profit,
                   }[Math.sign(datum.equity)],
                 } as PnlDatum)
             )

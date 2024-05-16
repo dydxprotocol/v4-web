@@ -39,7 +39,7 @@ export const DepthChartTooltipContent = ({
   tickSizeDecimals,
   tooltipData,
 }: DepthChartTooltipProps) => {
-  const { nearestDatum } = tooltipData || {};
+  const { nearestDatum } = tooltipData ?? {};
   const stringGetter = useStringGetter();
   const { spread, spreadPercent, midMarketPrice } = useOrderbookValuesForDepthChart();
   const { id = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
@@ -202,8 +202,8 @@ export const DepthChartTooltipContent = ({
                       useGrouping
                       type={OutputType.Fiat}
                       value={
-                        nearestDatum
-                          ? nearestDatum?.datum.price * nearestDatum?.datum.depth
+                        nearestDatum != null
+                          ? nearestDatum.datum.price * nearestDatum.datum.depth
                           : undefined
                       }
                     />
