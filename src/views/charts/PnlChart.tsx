@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 import { curveLinear } from '@visx/curve';
 import type { TooltipContextType } from '@visx/xychart';
-import _ from 'lodash';
+import _, { debounce } from 'lodash';
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import {
   HISTORICAL_PNL_PERIODS,
@@ -15,11 +15,7 @@ import { timeUnits } from '@/constants/time';
 
 import { useBreakpoints, useNow } from '@/hooks';
 
-import { breakpoints } from '@/styles';
-
-import { Output } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
-import { AxisLabelOutput } from '@/components/visx/AxisLabelOutput';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
 import {
@@ -58,6 +54,10 @@ const MS_FOR_PERIOD = {
   [HistoricalPnlPeriod.Period30d.name]: 30 * timeUnits.day,
   [HistoricalPnlPeriod.Period90d.name]: 90 * timeUnits.day,
 };
+
+const zoomDomainDefaultValues = new Set(Object.values(MS_FOR_PERIOD));
+const getPeriodFromName = (periodName: string) =>
+  HISTORICAL_PNL_PERIODS[periodName as keyof typeof HISTORICAL_PNL_PERIODS];
 
 const DARK_CHART_BACKGROUND_URL = '/chart-dots-background-dark.svg';
 const LIGHT_CHART_BACKGROUND_URL = '/chart-dots-background-light.svg';
@@ -99,15 +99,27 @@ export const PnlChart = ({
     HistoricalPnlPeriod.Period1d
   );
 
-  /**
-   * Default period in Abacus to 90d so that we can work with a larger dataset
-   */
+  const [isZooming, setIsZooming] = useState(false);
+
+  // Fetch 90d data once in Abacus for the chart
   useEffect(() => {
     abacusStateManager.setHistoricalPnlPeriod(HistoricalPnlPeriod.Period90d);
   }, []);
 
-  const onSelectPeriod = (periodName: string) =>
-    setSelectedPeriod(HISTORICAL_PNL_PERIODS[periodName as keyof typeof HISTORICAL_PNL_PERIODS]);
+  const onSelectPeriod = (periodName: string) => setSelectedPeriod(getPeriodFromName(periodName));
+
+  // Unselect selected period in toggle if user zooms in/out
+  const onZoomSnap = useCallback(
+    debounce(({ zoomDomain }: { zoomDomain?: number }) => {
+      if (zoomDomain) {
+        setIsZooming(!zoomDomainDefaultValues.has(zoomDomain));
+      }
+    }, 200),
+    []
+  );
+
+  // Snap back to default zoom domain according to selected period
+  const onToggleInteract = () => setIsZooming(false);
 
   const lastPnlTick = pnlData?.[pnlData.length - 1];
 
@@ -144,35 +156,34 @@ export const PnlChart = ({
     [pnlData, equity?.current, now]
   );
 
-  const getPeriodOptions = (oldestPnlMs: number): HistoricalPnlPeriods[] => {
-    const availablePeriods: HistoricalPnlPeriods[] = [HistoricalPnlPeriod.Period1d];
-    const entries = Object.entries(MS_FOR_PERIOD);
+  // Include period option if oldest pnl is older than the previous option
+  // e.g. oldest pnl is 31 days old -> show 90d option
+  const getPeriodOptions = (oldestPnlMs: number): HistoricalPnlPeriods[] =>
+    Object.entries(MS_FOR_PERIOD).reduce(
+      (acc: HistoricalPnlPeriods[], [, ms], i, arr) => {
+        if (oldestPnlMs < now - ms) {
+          const nextPeriod = _.get(arr, [i + 1, 0]);
+          if (nextPeriod) {
+            acc.push(getPeriodFromName(nextPeriod));
+          }
+        }
+        return acc;
+      },
+      [HistoricalPnlPeriod.Period1d]
+    );
 
-    entries.map(([, ms], i) => {
-      if (oldestPnlMs < now - ms) {
-        const nextPeriod = _.get(entries, [i + 1, 0]);
-        if (nextPeriod)
-          availablePeriods.push(
-            HISTORICAL_PNL_PERIODS[nextPeriod as keyof typeof HISTORICAL_PNL_PERIODS]
-          );
-      }
-    });
-
-    return availablePeriods;
-  };
-
-  const oldestPnlMs = pnlData?.[0]?.createdAtMilliseconds;
+  const oldestPnlCreatedAt = pnlData?.[0]?.createdAtMilliseconds;
 
   useEffect(() => {
-    if (oldestPnlMs) {
-      const options = getPeriodOptions(oldestPnlMs);
-      setPeriodOptions(getPeriodOptions(oldestPnlMs));
+    if (oldestPnlCreatedAt) {
+      const options = getPeriodOptions(oldestPnlCreatedAt);
+      setPeriodOptions(options);
 
       // default to show 7d period if there's enough data
       if (options[options.length - 1] === HistoricalPnlPeriod.Period7d)
         setSelectedPeriod(HistoricalPnlPeriod.Period7d);
     }
-  }, [oldestPnlMs]);
+  }, [oldestPnlCreatedAt]);
 
   const chartBackground =
     appTheme === AppTheme.Light ? LIGHT_CHART_BACKGROUND_URL : DARK_CHART_BACKGROUND_URL;
@@ -217,8 +228,9 @@ export const PnlChart = ({
         renderTooltip={() => <div />}
         onTooltipContext={onTooltipContext}
         onVisibleDataChange={onVisibleDataChange}
+        onZoom={onZoomSnap}
         slotEmpty={slotEmpty}
-        defaultZoomDomain={MS_FOR_PERIOD[selectedPeriod.name]}
+        defaultZoomDomain={isZooming ? undefined : MS_FOR_PERIOD[selectedPeriod.name]}
         minZoomDomain={PNL_TIME_RESOLUTION * 2}
         numGridLines={0}
         tickSpacingX={210}
@@ -234,14 +246,16 @@ export const PnlChart = ({
                 largestUnit: 'day',
               }),
             }))}
-            value={selectedPeriod.name}
+            value={isZooming ? '' : selectedPeriod.name}
             onValueChange={onSelectPeriod}
+            onInteraction={onToggleInteract}
           />
         </$PeriodToggle>
       </TimeSeriesChart>
     </$Container>
   );
 };
+
 const $Container = styled.div<{ chartBackground: string }>`
   position: relative;
   background: url(${({ chartBackground }) => chartBackground}) no-repeat center center;
@@ -252,39 +266,4 @@ const $PeriodToggle = styled.div`
   isolation: isolate;
 
   margin: 1rem;
-`;
-
-const $SignedOutput = styled(Output)<{ side: PnlSide }>`
-  ${({ side }) =>
-    ({
-      [PnlSide.Loss]: css`
-        /* --output-sign-color: var(--color-negative); */
-        color: var(--color-negative);
-      `,
-      [PnlSide.Profit]: css`
-        /* --output-sign-color: var(--color-positive); */
-        color: var(--color-positive);
-      `,
-      [PnlSide.Flat]: css``,
-    }[side])};
-`;
-
-const $XAxisLabelOutput = styled(AxisLabelOutput)`
-  box-shadow: 0 0 0.5rem var(--color-layer-2);
-`;
-
-const $YAxisLabelOutput = styled(AxisLabelOutput)`
-  --axisLabel-offset: 0.5rem;
-
-  [data-side='left'] & {
-    translate: calc(-50% - var(--axisLabel-offset)) 0;
-
-    @media ${breakpoints.mobile} {
-      translate: calc(50% + var(--axisLabel-offset)) 0;
-    }
-  }
-
-  [data-side='right'] & {
-    translate: calc(-50% - var(--axisLabel-offset)) 0;
-  }
 `;

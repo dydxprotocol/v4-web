@@ -16,7 +16,7 @@ import {
   type TooltipContextType,
 } from '@visx/xychart';
 import { RenderTooltipParams } from '@visx/xychart/lib/components/Tooltip';
-import styled, { AnyStyledComponent, keyframes } from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 import { allTimeUnits } from '@/constants/time';
 
@@ -423,6 +423,7 @@ export const TimeSeriesChart = <Datum extends {}>({
     </$Container>
   );
 };
+
 const $Container = styled.div`
   ${layoutMixins.stack}
   width: 0;
