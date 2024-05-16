@@ -36,18 +36,16 @@ export const ChooseWallet = ({
     <>
       {selectedWalletType && selectedWalletError && (
         <$AlertMessage type={AlertType.Error}>
-          {
-            <h4>
-              {stringGetter({
-                key: STRING_KEYS.COULD_NOT_CONNECT,
-                params: {
-                  WALLET: stringGetter({
-                    key: wallets[selectedWalletType].stringKey,
-                  }),
-                },
-              })}
-            </h4>
-          }
+          <h4>
+            {stringGetter({
+              key: STRING_KEYS.COULD_NOT_CONNECT,
+              params: {
+                WALLET: stringGetter({
+                  key: wallets[selectedWalletType].stringKey,
+                }),
+              },
+            })}
+          </h4>
           {selectedWalletError}
         </$AlertMessage>
       )}

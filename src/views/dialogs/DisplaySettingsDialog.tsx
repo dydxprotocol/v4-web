@@ -1,6 +1,6 @@
 import { Indicator, Item, Root } from '@radix-ui/react-radio-group';
 import { useDispatch, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -270,20 +270,20 @@ const $ArrowIconContainer = styled.div`
 const $ArrowIcon = styled(Icon)<{ direction: 'up' | 'down'; color: 'green' | 'red' }>`
   ${({ direction }) =>
     ({
-      ['up']: css`
+      up: css`
         transform: rotate(-90deg);
       `,
-      ['down']: css`
+      down: css`
         transform: rotate(90deg);
       `,
     }[direction])}
 
   ${({ color }) =>
     ({
-      ['green']: css`
+      green: css`
         color: var(--color-green);
       `,
-      ['red']: css`
+      red: css`
         color: var(--color-red);
       `,
     }[color])}

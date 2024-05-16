@@ -14,7 +14,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog } from '@/components/Dialog';
-import { Link } from '@/components/Link';
 import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
@@ -56,9 +55,4 @@ export const ExchangeOfflineDialog = ({ preventClose, setIsOpen }: ElementProps)
 const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
-`;
-
-const $Link = styled(Link)`
-  display: contents;
-  --link-color: var(--color-accent);
 `;

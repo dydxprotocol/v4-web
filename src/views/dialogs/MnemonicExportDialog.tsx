@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
@@ -105,6 +105,7 @@ export const MnemonicExportDialog = ({ setIsOpen }: ElementProps) => {
             <$WordList isShowing={isShowing} onClick={() => setIsShowing(!isShowing)}>
               <$List>
                 {mnemonic?.split(' ').map((word: string, i: number) => (
+                  // eslint-disable-next-line react/no-array-index-key
                   <$Word key={i}>
                     <span>{isShowing ? word : '*****'}</span>
                   </$Word>

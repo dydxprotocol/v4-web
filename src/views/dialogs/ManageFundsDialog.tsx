@@ -25,7 +25,7 @@ type ElementProps = {
 
 export const ManageFundsDialog = ({ setIsOpen, selectedTransferType }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const { type } = useSelector(getTransferInputs, shallowEqual) || {};
+  const { type } = useSelector(getTransferInputs, shallowEqual) ?? {};
   const currentType = type?.rawValue ?? selectedTransferType ?? TransferType.deposit.rawValue;
 
   const closeDialog = () => setIsOpen?.(false);

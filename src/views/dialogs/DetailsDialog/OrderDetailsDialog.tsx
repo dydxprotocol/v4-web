@@ -64,21 +64,21 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     trailingPercent,
     triggerPrice,
     type,
-  } = (useSelector(getOrderDetails(orderId)) as OrderTableRow) || {};
+  } = (useSelector(getOrderDetails(orderId)) as OrderTableRow) ?? {};
 
   const renderOrderPrice = ({
-    type,
-    price,
-    tickSizeDecimals,
+    type: innerType,
+    price: innerPrice,
+    tickSizeDecimals: innerTickSizeDecimals,
   }: {
     type?: AbacusOrderTypes;
     price?: Nullable<number>;
     tickSizeDecimals: number;
   }) =>
-    isMarketOrderType(type) ? (
+    isMarketOrderType(innerType) ? (
       stringGetter({ key: STRING_KEYS.MARKET_PRICE_SHORT })
     ) : (
-      <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
+      <Output type={OutputType.Fiat} value={innerPrice} fractionDigits={innerTickSizeDecimals} />
     );
 
   const renderOrderTime = ({ timeInMs }: { timeInMs: Nullable<number> }) =>
@@ -191,7 +191,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
           <Button
             action={ButtonAction.Destroy}
             state={{
-              isDisabled: isOrderCanceling || status === AbacusOrderStatus.canceling,
+              isDisabled: !!isOrderCanceling || status === AbacusOrderStatus.canceling,
               isLoading: isOrderCanceling,
             }}
             onClick={onCancelClick}
