@@ -292,12 +292,12 @@ const useDydxClientContext = () => {
   }) => indexerClient.markets.getPerpetualMarketSparklines(period);
 
   const getWithdrawalAndTransferGatingStatus = useCallback(async () => {
-    return await compositeClient?.validatorClient.get.getWithdrawalAndTransferGatingStatus();
+    return compositeClient?.validatorClient.get.getWithdrawalAndTransferGatingStatus();
   }, [compositeClient]);
 
   const getWithdrawalCapacityByDenom = useCallback(
     async ({ denom }: { denom: string }) => {
-      return await compositeClient?.validatorClient.get.getWithdrawalCapacityByDenom(denom);
+      return compositeClient?.validatorClient.get.getWithdrawalCapacityByDenom(denom);
     },
     [compositeClient]
   );

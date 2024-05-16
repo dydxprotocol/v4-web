@@ -74,10 +74,10 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       }: {
         dydxAddress: DydxAddress;
         subaccountNumber: number;
-      }) => await faucetClient?.fill(dydxAddress, subaccountNumber, 100),
+      }) => faucetClient?.fill(dydxAddress, subaccountNumber, 100),
 
       getNativeTokens: async ({ dydxAddress }: { dydxAddress: DydxAddress }) =>
-        await faucetClient?.fillNative(dydxAddress),
+        faucetClient?.fillNative(dydxAddress),
     }),
     [faucetClient]
   );
@@ -286,7 +286,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         return;
       }
 
-      return await depositToSubaccount({ subaccountClient, amount });
+      return depositToSubaccount({ subaccountClient, amount });
     },
     [subaccountClient, depositToSubaccount]
   );
@@ -297,7 +297,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         return;
       }
 
-      return await withdrawFromSubaccount({ subaccountClient, amount });
+      return withdrawFromSubaccount({ subaccountClient, amount });
     },
     [subaccountClient, withdrawFromSubaccount]
   );
@@ -331,7 +331,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         );
       };
       if (isCctp) {
-        return await cctpWithdraw();
+        return cctpWithdraw();
       }
 
       if (!subaccountClient) {

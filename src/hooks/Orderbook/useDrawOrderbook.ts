@@ -60,7 +60,7 @@ export const useDrawOrderbook = ({
    * Scale canvas using device pixel ratio to unblur drawn text
    * @url https://stackoverflow.com/questions/15661339/how-do-i-fix-blurry-text-in-my-html5-canvas/65124939#65124939
    * @returns adjusted canvas width/height/rowHeight used in coordinates for drawing
-   **/
+   * */
   const { canvasWidth, canvasHeight, rowHeight } = useMemo(() => {
     const ratio = window.devicePixelRatio || 1;
 

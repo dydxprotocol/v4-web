@@ -81,7 +81,7 @@ export const useTradingViewTheme = ({
         // Necessary to update existing chart lines
         Object.values(chartLines).forEach(({ chartLineType, line }) => {
           const { maybeQuantityColor, borderColor, backgroundColor, textColor, textButtonColor } =
-            getChartLineColors({ chartLineType: chartLineType, appTheme, appColorMode });
+            getChartLineColors({ chartLineType, appTheme, appColorMode });
 
           if (maybeQuantityColor) {
             line.setLineColor(maybeQuantityColor).setQuantityBackgroundColor(maybeQuantityColor);
