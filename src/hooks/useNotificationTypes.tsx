@@ -69,7 +69,7 @@ const parseStringParamsForNotification = ({
   return value as string;
 };
 
-export const notificationTypes = [
+export const notificationTypes: NotificationTypeConfig[] = [
   {
     type: NotificationType.AbacusGenerated,
     useTrigger: ({ trigger }) => {
@@ -526,7 +526,7 @@ export const notificationTypes = [
       };
     },
   },
-] as const satisfies NotificationTypeConfig[];
+];
 
 const $Icon = styled.img`
   height: 1.5rem;

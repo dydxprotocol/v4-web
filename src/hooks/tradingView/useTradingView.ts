@@ -79,12 +79,13 @@ export const useTradingView = ({
         ...widgetOptions,
         ...widgetOverrides,
         datafeed: getDydxDatafeed(store, getCandlesForDatafeed, initialPriceScale),
-        interval: (savedResolution || DEFAULT_RESOLUTION) as ResolutionString,
+        interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
         locale: SUPPORTED_LOCALE_BASE_TAGS[selectedLocale] as LanguageCode,
         symbol: marketId,
         saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
       };
 
+      // eslint-disable-next-line new-cap
       const tvChartWidget = new widget(options);
       tvWidgetRef.current = tvChartWidget;
 
