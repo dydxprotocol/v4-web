@@ -209,3 +209,5 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
     : never;
 
 export const DEFAULT_TRANSACTION_MEMO = 'dYdX Frontend (web)';
+export const lastSuccessfulRestRequestByOrigin: Record<URL['origin'], number> = {};
+export const lastSuccessfulWebsocketRequestByOrigin: Record<URL['origin'], number> = {};
