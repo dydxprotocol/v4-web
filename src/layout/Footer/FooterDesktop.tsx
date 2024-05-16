@@ -15,6 +15,8 @@ import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { isPresent } from '@/lib/typeUtils';
+
 enum FooterItems {
   ChainHeight,
   IndexerHeight,
@@ -46,10 +48,6 @@ export const FooterDesktop = () => {
         exchangeStatus: ExchangeStatus.Degraded,
         label: stringGetter({ key: STRING_KEYS.DEGRADED }),
       };
-
-  function isPresent<T>(value: T | undefined | null): value is T {
-    return value != null;
-  }
 
   return (
     <$Footer>

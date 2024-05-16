@@ -26,6 +26,7 @@ import { track } from '@/lib/analytics';
 import { renderSvgToDataUrl } from '@/lib/renderSvgToDataUrl';
 
 import { useLocalStorage } from './useLocalStorage';
+// eslint-disable-next-line import/no-cycle
 import { notificationTypes } from './useNotificationTypes';
 
 type NotificationsContextType = ReturnType<typeof useNotificationsContext>;
@@ -69,7 +70,7 @@ const useNotificationsContext = () => {
 
   useEffect(() => {
     setNotificationsLastUpdated(Date.now());
-  }, [notifications]);
+  }, [notifications, setNotificationsLastUpdated]);
 
   useEffect(() => {
     // save notifications to localstorage, but filter out single session notifications
@@ -80,23 +81,7 @@ const useNotificationsContext = () => {
 
     const newNotifications = Object.fromEntries(filteredEntries);
     setLocalStorageNotifications(newNotifications);
-  }, [notifications]);
-
-  const clearAbacusGeneratedNotifications = useCallback(
-    (notifications: Notifications) => {
-      const originalEntries = Object.entries(notifications);
-      const filteredEntries = originalEntries.filter(
-        ([, value]) => value.type !== NotificationType.AbacusGenerated
-      );
-
-      // Only update if the number of notifications has changed
-      if (filteredEntries.length !== originalEntries.length) {
-        const newNotifications = Object.fromEntries(filteredEntries);
-        setNotifications(newNotifications);
-      }
-    },
-    [notifications]
-  );
+  }, [notifications, setLocalStorageNotifications]);
 
   const getKey = useCallback(
     <T extends string | number>(notification: Pick<Notification<T>, 'type' | 'id'>) =>
@@ -111,7 +96,7 @@ const useNotificationsContext = () => {
 
   const getDisplayData = useCallback(
     (notification: Notification) => notificationsDisplayData[getKey(notification)],
-    [notificationsDisplayData]
+    [getKey, notificationsDisplayData]
   );
 
   // Check for version changes
@@ -135,8 +120,8 @@ const useNotificationsContext = () => {
     (notification: Notification, status: NotificationStatus) => {
       notification.status = status;
       notification.timestamps[notification.status] = Date.now();
-      setNotifications((notifications) => ({
-        ...notifications,
+      setNotifications((ns) => ({
+        ...ns,
         [getKey(notification)]: notification,
       }));
     },
@@ -165,15 +150,16 @@ const useNotificationsContext = () => {
   );
 
   const markAllCleared = useCallback(() => {
-    for (const notification of Object.values(notifications)) {
-      markCleared(notification);
-    }
+    Object.values(notifications).forEach((n) => markCleared(n));
   }, [notifications, markCleared]);
 
   // Trigger
+  // eslint-disable-next-line no-restricted-syntax
   for (const { type, useTrigger } of notificationTypes) {
     const notificationCategory = NotificationTypeCategory[type];
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     useTrigger({
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       trigger: useCallback(
         (id, displayData, updateKey, isNew = true) => {
           const key = getKey({ type, id });
@@ -184,23 +170,23 @@ const useNotificationsContext = () => {
           if (notificationPreferences[notificationCategory] !== false) {
             // New unique key - create new notification
             if (!notification) {
-              const notification = (notifications[key] = {
+              const thisNotification = (notifications[key] = {
                 id,
                 type,
                 timestamps: {},
                 updateKey,
               } as Notification);
               updateStatus(
-                notification,
+                thisNotification,
                 isNew ? NotificationStatus.Triggered : NotificationStatus.Cleared
               );
             } else if (JSON.stringify(updateKey) !== JSON.stringify(notification.updateKey)) {
               // updateKey changed - update existing notification
 
-              const notification = notifications[key];
+              const thisNotification = notifications[key];
 
-              notification.updateKey = updateKey;
-              updateStatus(notification, NotificationStatus.Updated);
+              thisNotification.updateKey = updateKey;
+              updateStatus(thisNotification, NotificationStatus.Updated);
             }
           } else {
             // Notification is disabled - remove it
@@ -220,13 +206,14 @@ const useNotificationsContext = () => {
   // Actions
   const actions = Object.fromEntries(
     notificationTypes.map(
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       ({ type, useNotificationAction }) => [type, useNotificationAction?.()] as const
     )
   );
 
-  const onNotificationAction = async (notification: Notification) => {
+  const onNotificationAction = (notification: Notification) => {
     track(AnalyticsEvent.NotificationAction, { type: notification.type, id: notification.id });
-    return await actions[notification.type]?.(notification.id);
+    return actions[notification.type]?.(notification.id);
   };
 
   // Push notifications
@@ -259,6 +246,7 @@ const useNotificationsContext = () => {
     (async () => {
       if (!hasEnabledPush) return;
 
+      // eslint-disable-next-line no-restricted-syntax
       for (const notification of Object.values(notifications))
         if (
           notification.status < NotificationStatus.Seen &&
@@ -269,6 +257,7 @@ const useNotificationsContext = () => {
 
           const iconUrl =
             displayData.icon &&
+            // eslint-disable-next-line no-await-in-loop
             (await renderSvgToDataUrl(displayData.icon as ReactElement<any, 'svg'>).catch(
               () => undefined
             ));
@@ -283,13 +272,7 @@ const useNotificationsContext = () => {
             image: iconUrl?.toString() ?? '/favicon.svg',
             vibrate: displayData.toastSensitivity === 'foreground' ? 200 : undefined,
             requireInteraction: displayData.toastDuration === Infinity,
-            // actions: [
-            //   {
-            //     action: displayData.actionDescription,
-            //     title: displayData.actionDescription,
-            //   }
-            // ].slice(0, globalThis.Notification.maxActions),
-          });
+          } as any);
 
           pushNotification.addEventListener('click', () => {
             onNotificationAction(notification);

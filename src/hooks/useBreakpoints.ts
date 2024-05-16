@@ -20,7 +20,7 @@ export const mediaQueryLists = {
   [MediaQueryKeys.isDesktopSmall]: globalThis.matchMedia(breakpoints.desktopSmall),
   [MediaQueryKeys.isDesktopMedium]: globalThis.matchMedia(breakpoints.desktopMedium),
   [MediaQueryKeys.isDesktopLarge]: globalThis.matchMedia(breakpoints.desktopLarge),
-};
+} as const;
 
 export const uniqueMediaQueryLists = { ...mediaQueryLists };
 
@@ -29,6 +29,8 @@ export const useBreakpoints = () => {
   const state = Object.fromEntries(
     Object.entries(mediaQueryLists).map(([key, mediaQueryList]) => [
       key,
+      // this is technically okay since the loop is fully deterministic and the object won't change
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       useState(mediaQueryList.matches),
     ])
   );

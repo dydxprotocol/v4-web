@@ -13,6 +13,7 @@ import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 const filterFunctions = {
   [MarketFilters.ALL]: () => true,
@@ -50,8 +51,8 @@ export const useMarketsData = (
   filteredMarkets: MarketData[];
   marketFilters: string[];
 } => {
-  const allPerpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
-  const allAssets = useSelector(getAssets, shallowEqual) || {};
+  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
   const sevenDaysSparklineData = usePerpetualMarketSparklines();
 
   const markets = useMemo(() => {
@@ -95,6 +96,7 @@ export const useMarketsData = (
     if (searchFilter) {
       return filtered.filter(
         ({ asset, id }) =>
+          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
           asset?.name?.toLocaleLowerCase().includes(searchFilter.toLowerCase()) ||
           asset?.id?.toLocaleLowerCase().includes(searchFilter.toLowerCase()) ||
           id?.toLocaleLowerCase().includes(searchFilter.toLowerCase())

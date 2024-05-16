@@ -23,6 +23,7 @@ import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
 import { useBreakpoints } from './useBreakpoints';
 import { useDydxClient } from './useDydxClient';
+// eslint-disable-next-line import/no-cycle
 import { useSelectedNetwork } from './useSelectedNetwork';
 
 export const useAnalytics = () => {
@@ -85,7 +86,7 @@ export const useAnalytics = () => {
 
   // AnalyticsUserProperty.WalletAddress
   useEffect(() => {
-    identify(AnalyticsUserProperty.WalletAddress, evmAddress || dydxAddress);
+    identify(AnalyticsUserProperty.WalletAddress, evmAddress ?? dydxAddress);
   }, [evmAddress, dydxAddress]);
 
   // AnalyticsUserProperty.DydxAddress

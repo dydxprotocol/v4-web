@@ -126,7 +126,7 @@ export const useWalletConnection = () => {
 
   const connectWallet = useCallback(
     async ({
-      walletType,
+      walletType: wType,
       forceConnect,
       isAccountConnected,
     }: {
@@ -134,9 +134,9 @@ export const useWalletConnection = () => {
       forceConnect?: boolean;
       isAccountConnected?: boolean;
     }) => {
-      if (!walletType) return { walletType, walletConnectionType };
+      if (!wType) return { walletType: wType, walletConnectionType };
 
-      const walletConnection = getWalletConnection({ walletType });
+      const walletConnection = getWalletConnection({ walletType: wType });
 
       try {
         if (!walletConnection) {
@@ -148,12 +148,10 @@ export const useWalletConnection = () => {
         } else if (walletConnection.type === WalletConnectionType.CosmosSigner) {
           const cosmosWalletType = {
             [WalletType.Keplr as string]: CosmosWalletType.KEPLR,
-          }[walletType];
+          }[wType];
 
           if (!cosmosWalletType) {
-            throw new Error(
-              `${stringGetter({ key: wallets[walletType].stringKey })} was not found.`
-            );
+            throw new Error(`${stringGetter({ key: wallets[wType].stringKey })} was not found.`);
           }
 
           if (!isConnectedGraz) {
@@ -169,7 +167,7 @@ export const useWalletConnection = () => {
           if (!isConnectedWagmi && (forceConnect || !isAccountConnected)) {
             await connectWagmi({
               connector: resolveWagmiConnector({
-                walletType,
+                walletType: wType,
                 walletConnection,
                 walletConnectConfig,
               }),
@@ -189,7 +187,7 @@ export const useWalletConnection = () => {
       }
 
       return {
-        walletType,
+        walletType: wType,
         walletConnectionType: walletConnection?.type,
       };
     },
@@ -224,15 +222,15 @@ export const useWalletConnection = () => {
 
       if (selectedWalletType) {
         try {
-          const { walletType, walletConnectionType } = await connectWallet({
+          const { walletType: wType, walletConnectionType: wConnectionType } = await connectWallet({
             walletType: selectedWalletType,
             isAccountConnected: Boolean(
               evmAddress && evmDerivedAddresses[evmAddress]?.encryptedSignature
             ),
           });
 
-          setWalletType(walletType);
-          setWalletConnectionType(walletConnectionType);
+          setWalletType(wType);
+          setWalletConnectionType(wConnectionType);
         } catch (error) {
           const { walletErrorType, message } = parseWalletError({
             error,
@@ -250,13 +248,13 @@ export const useWalletConnection = () => {
     })();
   }, [selectedWalletType, signerWagmi, signerGraz, evmDerivedAddresses, evmAddress]);
 
-  const selectWalletType = async (walletType: WalletType | undefined) => {
+  const selectWalletType = async (wType: WalletType | undefined) => {
     if (selectedWalletType) {
       setSelectedWalletType(undefined);
       await new Promise(requestAnimationFrame);
     }
 
-    setSelectedWalletType(walletType);
+    setSelectedWalletType(wType);
   };
 
   // On page load, if testFlag.address is set, connect to the test wallet.
