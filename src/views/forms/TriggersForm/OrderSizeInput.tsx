@@ -65,8 +65,9 @@ export const OrderSizeInput = ({
     const newSizeString = MustBigNumber(
       newSize && positionSize ? Math.min(positionSize, newSize) : newSize
     ).toString();
+
     abacusStateManager.setTriggerOrdersValue({
-      value: newSize != null ? newSizeString.toString() : null,
+      value: newSize !== null ? newSizeString : null,
       field: TriggerOrdersInputField.size,
     });
   };
@@ -102,15 +103,16 @@ export const OrderSizeInput = ({
     >
       <$SizeInputRow>
         <$OrderSizeSlider
-          setAbacusSize={setAbacusSize}
-          setOrderSizeInput={setOrderSize}
+          setAbacusSize={(sizeString: string) => setAbacusSize(parseFloat(sizeString))}
+          setOrderSizeInput={(sizeString: string) => setOrderSize(parseFloat(sizeString))}
           size={orderSize}
           positionSize={positionSize ?? undefined}
+          stepSizeDecimals={stepSizeDecimals ?? TOKEN_DECIMALS}
           className={className}
         />
         <FormInput
           type={InputType.Number}
-          value={orderSize?.toFixed(stepSizeDecimals ?? TOKEN_DECIMALS)}
+          value={orderSize?.toString()}
           slotRight={<Tag>{symbol}</Tag>}
           onInput={onSizeInput}
         />

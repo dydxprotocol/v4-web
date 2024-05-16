@@ -16,13 +16,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Details } from '@/components/Details';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
-import {
-  BaseTableRowData,
-  ColumnDef,
-  Table,
-  TableRow,
-  type CustomRowConfig,
-} from '@/components/Table';
+import { ColumnDef, TableRow, type CustomRowConfig } from '@/components/Table';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
@@ -32,6 +26,7 @@ import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketOrderbook } from '@/state/perpetualsSelectors';
 
+import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { OrderbookTradesOutput, OrderbookTradesTable } from './OrderbookTradesTable';
@@ -513,6 +508,7 @@ const $HistogramOutput = styled(OrderbookTradesOutput)<StyleProps>`
       : ''}
 `;
 
+const orderbookTableType = getSimpleStyledOutputType(OrderbookTradesTable, {} as StyleProps);
 const $OrderbookTable = styled(OrderbookTradesTable)<StyleProps>`
   /* Params */
   --orderbook-spreadRowHeight: 2rem;
@@ -559,11 +555,7 @@ const $OrderbookTable = styled(OrderbookTradesTable)<StyleProps>`
   ${$HorizontalLayout} & {
     --tableCell-padding: 0.25rem 1rem;
   }
-` as <TableRowData extends BaseTableRowData | CustomRowConfig>(
-  props: React.ComponentProps<typeof Table<TableRowData>> & {
-    histogramSide?: 'left' | 'right';
-  } & StyleProps
-) => React.ReactNode;
+` as typeof orderbookTableType;
 
 const $SpreadTableRow = styled(TableRow)`
   ${layoutMixins.sticky}

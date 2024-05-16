@@ -36,6 +36,7 @@ import {
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
 import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
+import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
@@ -313,13 +314,16 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
 const $AssetIcon = styled(AssetIcon)`
   font-size: 1.5em;
 `;
+const collapsibleTabsType = getSimpleStyledOutputType(CollapsibleTabs);
+
 const $CollapsibleTabs = styled(CollapsibleTabs)`
   --tableHeader-backgroundColor: var(--color-layer-3);
 
   header {
     background-color: var(--color-layer-2);
   }
-` as typeof CollapsibleTabs<InfoSection>;
+` as typeof collapsibleTabsType;
+
 const $LoadingSpinner = styled(LoadingSpinner)`
   --spinner-width: 1rem;
 `;

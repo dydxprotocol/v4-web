@@ -4,6 +4,7 @@ import { utils } from '@dydxprotocol/v4-client-js';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { MenuItem } from '@/constants/menus';
 import { isMainnet } from '@/constants/networks';
 import { NewMarketProposal } from '@/constants/potentialMarkets';
 
@@ -64,7 +65,7 @@ export const NewMarketMessageDetailsDialog = ({
     return baseAsset ? exchangeConfigJson : undefined;
   }, [baseAsset]);
 
-  const toggleGroupItems: Parameters<typeof ToggleGroup>[0]['items'] = useMemo(() => {
+  const toggleGroupItems: MenuItem<CodeToggleGroup>[] = useMemo(() => {
     return [
       {
         value: CodeToggleGroup.CREATE_ORACLE,
@@ -355,7 +356,7 @@ const $ProposedMessageDetails = styled.div`
 
 const $Tabs = styled(ToggleGroup)`
   overflow-x: auto;
-`;
+` as typeof ToggleGroup;
 
 const $Details = styled(Details)`
   --details-item-height: 1.5rem;

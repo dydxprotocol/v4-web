@@ -3,6 +3,8 @@ import { useState } from 'react';
 import type { Story } from '@ladle/react';
 import styled from 'styled-components';
 
+import { TOKEN_DECIMALS } from '@/constants/numbers';
+
 import { breakpoints } from '@/styles';
 
 import { OrderSizeSlider } from './OrderSizeSlider';
@@ -16,8 +18,9 @@ export const OrderSizeSliderStory: Story<Parameters<typeof OrderSizeSlider>[0]> 
       <$Container>
         <OrderSizeSlider
           setAbacusSize={() => null}
-          setOrderSizeInput={setSize}
+          setOrderSizeInput={(sizeString: string) => setSize(parseFloat(sizeString))}
           size={size}
+          stepSizeDecimals={TOKEN_DECIMALS}
           positionSize={100}
         />
       </$Container>
