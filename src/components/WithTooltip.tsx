@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { Arrow, Content, Portal, Provider, Root, Trigger } from '@radix-ui/react-tooltip';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { tooltipStrings } from '@/constants/tooltips';

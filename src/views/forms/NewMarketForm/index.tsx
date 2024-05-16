@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { type NewMarketProposal } from '@/constants/potentialMarkets';

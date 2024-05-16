@@ -1,4 +1,4 @@
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -75,8 +75,4 @@ const $Header = styled.div`
     font: var(--font-medium-book);
     color: var(--color-text-2);
   }
-`;
-
-const $Link = styled(Link)`
-  display: inline-flex;
 `;

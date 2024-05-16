@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { type SubaccountPosition } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';

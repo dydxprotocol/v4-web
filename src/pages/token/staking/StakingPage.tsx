@@ -1,4 +1,4 @@
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -14,7 +14,7 @@ import { DYDXBalancePanel } from '../rewards/DYDXBalancePanel';
 import { StakingPanel } from './StakingPanel';
 import { StrideStakingPanel } from './StrideStakingPanel';
 
-export default () => {
+const StakingPage = () => {
   const stringGetter = useStringGetter();
   return (
     <DetachedSection>
@@ -37,6 +37,8 @@ export default () => {
     </DetachedSection>
   );
 };
+export default StakingPage;
+
 const $HeaderSection = styled.section`
   ${layoutMixins.contentSectionDetached}
 

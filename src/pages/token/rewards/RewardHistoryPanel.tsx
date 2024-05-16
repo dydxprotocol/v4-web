@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import {
   HISTORICAL_TRADING_REWARDS_PERIODS,
@@ -33,17 +33,14 @@ export const RewardHistoryPanel = () => {
     abacusStateManager.getHistoricalTradingRewardPeriod() || HistoricalTradingRewardsPeriod.WEEKLY
   );
 
-  const onSelectPeriod = useCallback(
-    (periodName: string) => {
-      const selectedPeriod =
-        HISTORICAL_TRADING_REWARDS_PERIODS[
-          periodName as keyof typeof HISTORICAL_TRADING_REWARDS_PERIODS
-        ];
-      setSelectedPeriod(selectedPeriod);
-      abacusStateManager.setHistoricalTradingRewardPeriod(selectedPeriod);
-    },
-    [setSelectedPeriod, selectedPeriod]
-  );
+  const onSelectPeriod = useCallback((periodName: string) => {
+    const thisSelectedPeriod =
+      HISTORICAL_TRADING_REWARDS_PERIODS[
+        periodName as keyof typeof HISTORICAL_TRADING_REWARDS_PERIODS
+      ];
+    setSelectedPeriod(thisSelectedPeriod);
+    abacusStateManager.setHistoricalTradingRewardPeriod(thisSelectedPeriod);
+  }, []);
 
   return (
     <Panel
@@ -113,11 +110,6 @@ const $Title = styled.div`
     font: var(--font-medium-book);
     color: var(--color-text-2);
   }
-`;
-
-const $Content = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 0.75rem;
 `;
 
 const $Output = styled(Output)`
