@@ -21,7 +21,7 @@ import { calculateIsAccountLoading } from '@/state/accountCalculators';
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { closeDialogInTradeBox, openDialog, openDialogInTradeBox } from '@/state/dialogs';
-import { getActiveDialog, getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
+import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -61,15 +61,13 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
 
   const currentMarketAssetData = useSelector(getCurrentMarketAssetData, shallowEqual);
   const currentMarketConfigs = useSelector(getCurrentMarketConfig, shallowEqual);
-  const activeDialog = useSelector(getActiveDialog, shallowEqual);
   const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog);
   const currentMarketPosition = useSelector(getCurrentMarketPositionData, shallowEqual);
   const isLoading = useSelector(calculateIsAccountLoading);
 
-  const { stepSizeDecimals, tickSizeDecimals } = currentMarketConfigs || {};
-  const { id } = currentMarketAssetData || {};
-  const { type: dialogType } = activeDialog || {};
-  const { type: tradeBoxDialogType } = activeTradeBoxDialog || {};
+  const { stepSizeDecimals, tickSizeDecimals } = currentMarketConfigs ?? {};
+  const { id } = currentMarketAssetData ?? {};
+  const { type: tradeBoxDialogType } = activeTradeBoxDialog ?? {};
 
   const {
     adjustedImf,
@@ -116,7 +114,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
     },
   ];
 
-  const { current: currentSize, postOrder: postOrderSize } = size || {};
+  const { current: currentSize, postOrder: postOrderSize } = size ?? {};
   const leverageBN = MustBigNumber(leverage?.current);
   const newLeverageBN = MustBigNumber(leverage?.postOrder);
   const maxLeverage = BIG_NUMBERS.ONE.div(MustBigNumber(adjustedImf?.postOrder));
@@ -187,7 +185,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       label: STRING_KEYS.LIQUIDATION_PRICE,
       tooltip: 'liquidation-price',
       tooltipParams: {
-        SYMBOL: id || '',
+        SYMBOL: id ?? '',
       },
       fractionDigits: tickSizeDecimals,
       hasInvalidNewValue: Boolean(newLeverageIsInvalid),
@@ -221,7 +219,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
         : MustBigNumber(realizedPnl?.current).lt(0)
         ? NumberSign.Negative
         : NumberSign.Neutral,
-      value: realizedPnl?.current || undefined,
+      value: realizedPnl?.current ?? undefined,
       withBaseFont: true,
     },
   ];
@@ -246,45 +244,41 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
     label: stringGetter({ key: label }),
     tooltip,
     tooltipParams,
-    value: (
-      <>
-        {useDiffOutput ? (
-          <$DiffOutput
-            type={type}
-            value={value}
-            newValue={newValue}
-            fractionDigits={fractionDigits}
-            hasInvalidNewValue={hasInvalidNewValue}
-            layout={isTablet ? 'row' : 'column'}
-            sign={sign}
-            showSign={showSign}
-            withBaseFont={withBaseFont}
-            withDiff={isNumber(newValue) && value !== newValue}
-          />
-        ) : (
-          <$Output
-            type={type}
-            value={value}
-            fractionDigits={fractionDigits}
-            showSign={showSign}
-            sign={sign}
-            slotRight={
-              percentValue && (
-                <$Output
-                  type={OutputType.Percent}
-                  value={percentValue}
-                  sign={sign}
-                  showSign={showSign}
-                  withParentheses
-                  withBaseFont={withBaseFont}
-                  margin="0 0 0 0.5ch"
-                />
-              )
-            }
-            withBaseFont={withBaseFont}
-          />
-        )}
-      </>
+    value: useDiffOutput ? (
+      <$DiffOutput
+        type={type}
+        value={value}
+        newValue={newValue}
+        fractionDigits={fractionDigits}
+        hasInvalidNewValue={hasInvalidNewValue}
+        layout={isTablet ? 'row' : 'column'}
+        sign={sign}
+        showSign={showSign}
+        withBaseFont={withBaseFont}
+        withDiff={isNumber(newValue) && value !== newValue}
+      />
+    ) : (
+      <$Output
+        type={type}
+        value={value}
+        fractionDigits={fractionDigits}
+        showSign={showSign}
+        sign={sign}
+        slotRight={
+          percentValue && (
+            <$Output
+              type={OutputType.Percent}
+              value={percentValue}
+              sign={sign}
+              showSign={showSign}
+              withParentheses
+              withBaseFont={withBaseFont}
+              margin="0 0 0 0.5ch"
+            />
+          )
+        }
+        withBaseFont={withBaseFont}
+      />
     ),
   });
 
@@ -325,7 +319,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
             notionalTotal={notionalTotal?.current}
             postOrderSize={size?.postOrder}
             stepSizeDecimals={stepSizeDecimals}
-            symbol={id || undefined}
+            symbol={id ?? undefined}
             tickSizeDecimals={tickSizeDecimals}
             showNarrowVariation={showNarrowVariation}
             isLoading={isLoading}
@@ -369,7 +363,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
           notionalTotal={notionalTotal?.current}
           postOrderSize={size?.postOrder}
           stepSizeDecimals={stepSizeDecimals}
-          symbol={id || undefined}
+          symbol={id ?? undefined}
           tickSizeDecimals={tickSizeDecimals}
           isLoading={isLoading}
         />

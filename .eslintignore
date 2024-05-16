@@ -5,7 +5,14 @@ vite.config.ts
 commitlint.config.ts
 
 # Temporarily ignore, we will slowly remove each directory as we fix files to follow ESLint rules
-/src/views
+/src/views/AccountInfo
+/src/views/CanvasOrderbook
+/src/views/charts
+/src/views/dialogs
+/src/views/forms
+/src/views/menus
+/src/views/notifications
+/src/views/tables
 
 # components dir is being worked on
 /src/components/*

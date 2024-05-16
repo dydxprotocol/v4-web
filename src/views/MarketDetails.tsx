@@ -27,8 +27,8 @@ import { MarketLinks } from './MarketLinks';
 export const MarketDetails: React.FC = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-  const { configs, market } = useSelector(getCurrentMarketData, shallowEqual) || {};
-  const { id, name, resources } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
+  const { configs, market } = useSelector(getCurrentMarketData, shallowEqual) ?? {};
+  const { id, name, resources } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
 
   if (!configs) return null;
 
@@ -49,10 +49,10 @@ export const MarketDetails: React.FC = () => {
     secondaryDescriptionKey,
     websiteLink,
     whitepaperLink,
-  } = resources || {};
+  } = resources ?? {};
 
   const preferEIMF = Boolean(
-    effectiveInitialMarginFraction && initialMarginFraction != effectiveInitialMarginFraction
+    effectiveInitialMarginFraction && initialMarginFraction !== effectiveInitialMarginFraction
   );
 
   const items = [
