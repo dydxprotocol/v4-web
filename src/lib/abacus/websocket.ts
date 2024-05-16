@@ -1,4 +1,5 @@
 import type { AbacusWebsocketProtocol } from '@/constants/abacus';
+import { lastSuccessfulWebsocketRequestByOrigin } from '@/constants/analytics';
 import type { TradingViewBar } from '@/constants/candles';
 import { isDev } from '@/constants/networks';
 
@@ -7,7 +8,6 @@ import { subscriptionsByChannelId } from '@/lib/tradingView/dydxfeed/cache';
 import { mapCandle } from '@/lib/tradingView/utils';
 
 import { log } from '../telemetry';
-import { lastSuccessfulWebsocketRequestByOrigin } from './lastSuccessfulRequestGlobals';
 
 const RECONNECT_INTERVAL_MS = 10_000;
 

@@ -3,7 +3,11 @@ import { useEffect, useState } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 
-import { AnalyticsEvent, AnalyticsUserProperty } from '@/constants/analytics';
+import {
+  AnalyticsEvent,
+  AnalyticsUserProperty,
+  lastSuccessfulWebsocketRequestByOrigin,
+} from '@/constants/analytics';
 import type { DialogTypes } from '@/constants/dialogs';
 
 import { calculateOnboardingStep } from '@/state/accountCalculators';
@@ -12,7 +16,6 @@ import { getActiveDialog } from '@/state/dialogsSelectors';
 import { getInputTradeData } from '@/state/inputsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
-import { lastSuccessfulWebsocketRequestByOrigin } from '@/lib/abacus/lastSuccessfulRequestGlobals';
 import { identify, track } from '@/lib/analytics';
 import { getSelectedTradeType } from '@/lib/tradeData';
 

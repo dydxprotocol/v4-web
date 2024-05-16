@@ -28,13 +28,13 @@ export const track = <T extends AnalyticsEvent>(
   eventType: T,
   eventData?: AnalyticsEventData<T>
 ) => {
-  const eventDataWithReferrer = { ...(eventData ?? {}), refferer: testFlags.referrer };
+  const eventDataWithReferrer = { ...(eventData ?? {}), referrer: testFlags.referrer };
   if (DEBUG_ANALYTICS) {
     // eslint-disable-next-line no-console
     console.log(`[Analytics] ${eventType}`, eventDataWithReferrer);
   }
   const customEvent = new CustomEvent('dydx:track', {
-    detail: { eventType, eventDataWithReferrer },
+    detail: { eventType, eventData: eventDataWithReferrer },
   });
 
   globalThis.dispatchEvent(customEvent);

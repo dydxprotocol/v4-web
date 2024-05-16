@@ -1,4 +1,4 @@
-import type { LocalWallet } from '@dydxprotocol/v4-client-js';
+import type { LocalWallet, SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 
 import type {
   ClosePositionInputFields,
@@ -255,6 +255,10 @@ class AbacusStateManager {
     this.currentMarket = marketId;
     this.clearTradeInputValues({ shouldResetSize: true });
     this.stateManager.market = marketId;
+  };
+
+  setSelectedGasDenom = (denom: SelectedGasDenom) => {
+    this.chainTransactions.setSelectedGasDenom(denom);
   };
 
   setTradeValue = ({ value, field }: { value: any; field: TradeInputFields }) => {
