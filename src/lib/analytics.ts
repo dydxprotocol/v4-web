@@ -27,7 +27,7 @@ export const track = <T extends AnalyticsEvent>(
   eventType: T,
   eventData?: AnalyticsEventData<T>
 ) => {
-  const eventDataWithReferrer = { ...(eventData || {}), refferer: testFlags.referrer };
+  const eventDataWithReferrer = { ...(eventData || {}), referrer: testFlags.referrer };
   if (DEBUG_ANALYTICS) {
     console.log(`[Analytics] ${eventType}`, eventDataWithReferrer);
   }
