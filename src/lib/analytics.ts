@@ -32,7 +32,7 @@ export const track = <T extends AnalyticsEvent>(
     console.log(`[Analytics] ${eventType}`, eventDataWithReferrer);
   }
   const customEvent = new CustomEvent('dydx:track', {
-    detail: { eventType, eventDataWithReferrer },
+    detail: { eventType, eventData: eventDataWithReferrer },
   });
 
   globalThis.dispatchEvent(customEvent);
