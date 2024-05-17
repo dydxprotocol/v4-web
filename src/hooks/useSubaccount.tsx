@@ -462,9 +462,9 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       onError,
       onSuccess,
     }: {
-      onError: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
+      onError?: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
       onSuccess?: () => void;
-    }) => {
+    } = {}) => {
       const callback = (
         success: boolean,
         parsingError?: Nullable<ParsingError>,
