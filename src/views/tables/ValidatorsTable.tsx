@@ -30,7 +30,15 @@ export const ValidatorsTable = () => {
           columnKey: 'votingPower',
           label: 'Voting Power',
           getCellValue: (row) => row.tokens,
-          renderCell: (row) => <TableCell>{parseFloat(row.tokens) / 1e18} DYDX</TableCell>,
+          renderCell: (row) => (
+            <TableCell>
+              {Intl.NumberFormat('en-US', {
+                notation: 'compact',
+                maximumSignificantDigits: 2,
+              }).format(parseFloat(row.tokens) / 1e18)}{' '}
+              DYDX
+            </TableCell>
+          ),
         },
         {
           columnKey: 'commission',
