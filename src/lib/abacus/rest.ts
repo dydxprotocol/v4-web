@@ -57,7 +57,7 @@ class AbacusRest implements AbacusRestProtocol {
       .then(async (response) => {
         const data = await response.text();
         const headersObj: Record<string, string> = {};
-        response.headers.forEach(([key, value]) => {
+        response.headers.forEach((value, key) => {
           headersObj[key] = value;
         });
         // Stringify the headers object
