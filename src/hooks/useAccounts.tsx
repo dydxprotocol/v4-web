@@ -151,9 +151,8 @@ const useAccountsContext = () => {
       // 403 is expected if the user account is blocked
       if (error.status === 404 || error.status === 403) {
         return [];
-      } else {
-        throw error;
       }
+      throw error;
     }
   };
 

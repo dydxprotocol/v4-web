@@ -70,7 +70,7 @@ export const useMarketsData = (
          * For this it is possible to estimate the listing date as follows:
          * `Hours elapsed since listing = (Total sparklines entries * 6)`
          */
-        let listingDate: Date | undefined = undefined;
+        let listingDate: Date | undefined;
 
         if (isNew) {
           listingDate = new Date();
