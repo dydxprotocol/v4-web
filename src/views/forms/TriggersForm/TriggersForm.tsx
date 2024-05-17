@@ -1,9 +1,9 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { ErrorType, Nullable, ValidationError, type SubaccountOrder } from '@/constants/abacus';
+import { ErrorType, ValidationError, type SubaccountOrder } from '@/constants/abacus';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -40,8 +40,6 @@ export const TriggersForm = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
-
-  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
   const { placeTriggerOrders } = useSubaccount();
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
@@ -99,18 +97,8 @@ export const TriggersForm = ({
   );
 
   const onSubmitOrders = async () => {
-    setIsPlacingOrder(true);
-
-    placeTriggerOrders({
-      onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
-        setIsPlacingOrder(false);
-        dispatch(closeDialog());
-      },
-      onSuccess: () => {
-        setIsPlacingOrder(false);
-        dispatch(closeDialog());
-      },
-    });
+    placeTriggerOrders();
+    dispatch(closeDialog());
   };
 
   const onSubmit = async (e: FormEvent) => {
@@ -145,7 +133,7 @@ export const TriggersForm = ({
             <$Button
               action={ButtonAction.Primary}
               type={ButtonType.Submit}
-              state={{ isDisabled: hasInputErrors || isAccountViewOnly, isLoading: isPlacingOrder }}
+              state={{ isDisabled: hasInputErrors || isAccountViewOnly }}
               slotLeft={hasInputErrors ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
             >
               {hasInputErrors
