@@ -21,9 +21,12 @@ export const ValidatorsTable = () => {
         label: 'Validator',
         getCellValue: (row) => row.description.moniker,
         renderCell: (row) => (
-          <TableCell>
-            <img src={`${row.description.website}/favicon.ico`} alt="" /> {row.description.moniker}
-          </TableCell>
+          <Styled.ValidatorCell
+            stacked
+            slotLeft={<img height="24rem" src={`${row.description.website}/favicon.ico`} alt="" />}
+          >
+            {row.description.moniker}
+          </Styled.ValidatorCell>
         ),
       },
       {
@@ -104,6 +107,11 @@ Styled.InlineRow = styled.div`
 
 Styled.SubText = styled.p``;
 Styled.NumberOutput = styled(Output)`
+  font: var(--font-base-medium);
+  color: var(--color-text-2);
+`;
+
+Styled.ValidatorCell = styled(TableCell)`
   font: var(--font-base-medium);
   color: var(--color-text-2);
 `;
