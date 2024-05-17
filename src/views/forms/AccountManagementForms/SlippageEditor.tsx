@@ -56,6 +56,7 @@ export const SlippageEditor = ({
     } else if (editorState === EditorState.Editing) {
       inputRef?.current?.focus();
     } else if (editorState === EditorState.Viewing) {
+      /* empty */
     }
   }, [editorState]);
 

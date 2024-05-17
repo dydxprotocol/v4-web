@@ -172,9 +172,6 @@ const $InnerInputContainer = styled.div`
     --input-height: 2.5rem;
   }
 `;
-const $LeverageSide = styled.div`
-  cursor: pointer;
-`;
 const $ToggleGroup = styled(ToggleGroup)`
   ${formMixins.inputToggleGroup}
 `;

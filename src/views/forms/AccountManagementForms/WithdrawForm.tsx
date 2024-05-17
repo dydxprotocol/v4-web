@@ -41,7 +41,6 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
-import { Link } from '@/components/Link';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
@@ -309,11 +308,11 @@ export const WithdrawForm = () => {
     }
   }, []);
 
-  const onSelectToken = useCallback((token: TransferInputTokenResource) => {
-    if (token) {
+  const onSelectToken = useCallback((selectedToken: TransferInputTokenResource) => {
+    if (selectedToken) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.token,
-        value: token.address,
+        value: selectedToken.address,
       });
       setWithdrawAmount('');
     }
@@ -535,7 +534,6 @@ export const WithdrawForm = () => {
           isLoading={isLoading}
           setSlippage={onSetSlippage}
           slippage={slippage}
-          withdrawChain={chainIdStr || undefined}
           withdrawToken={toToken || undefined}
         />
       </$Footer>
@@ -575,18 +573,6 @@ const $AlertMessage = styled(AlertMessage)`
 
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
-`;
-
-const $Link = styled(Link)`
-  color: var(--color-accent);
-
-  &:visited {
-    color: var(--color-accent);
-  }
-`;
-
-const $TransactionInfo = styled.span`
-  ${layoutMixins.row}
 `;
 
 const $FormInputButton = styled(Button)`

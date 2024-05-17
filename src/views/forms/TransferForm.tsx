@@ -6,7 +6,8 @@ import { type NumberFormatValues } from 'react-number-format';
 import type { SyntheticInputEvent } from 'react-number-format/types/types';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { Nullable } from 'vitest';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { type Nullable } from 'vitest';
 
 import { TransferInputField, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
@@ -60,7 +61,7 @@ export const TransferForm = ({
   className,
 }: TransferFormProps) => {
   const stringGetter = useStringGetter();
-  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
+  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) ?? {};
   const { dydxAddress } = useAccounts();
   const { transfer } = useSubaccount();
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
@@ -73,7 +74,7 @@ export const TransferForm = ({
     size,
     fee,
     token,
-  } = useSelector(getTransferInputs, shallowEqual) || {};
+  } = useSelector(getTransferInputs, shallowEqual) ?? {};
 
   // Form states
   const [error, setError] = useState<string>();
@@ -99,13 +100,13 @@ export const TransferForm = ({
   const amountBN = MustBigNumber(amount);
   const balanceBN = MustBigNumber(balance);
 
-  const onChangeAsset = (asset: Nullable<string>) => {
+  const onChangeAsset = (newAsset: Nullable<string>) => {
     setError(undefined);
     setCurrentFee(undefined);
 
-    if (asset) {
+    if (newAsset) {
       abacusStateManager.setTransferValue({
-        value: asset,
+        value: newAsset,
         field: TransferInputField.token,
       });
     }
@@ -169,28 +170,29 @@ export const TransferForm = ({
         );
 
         if (txResponse?.code === 0) {
+          // eslint-disable-next-line no-console
           console.log('TransferForm > txReceipt > ', txResponse?.hash);
           onDone?.();
         } else {
           throw new Error(txResponse?.rawLog ?? 'Transaction did not commit.');
         }
       }
-    } catch (error) {
-      if (error?.code === 429) {
+    } catch (err) {
+      if (err?.code === 429) {
         setError(stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_MESSAGE }));
       } else {
         setError(
-          error.message
+          err.message
             ? stringGetter({
                 key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
                 params: {
-                  ERROR_MESSAGE: error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
+                  ERROR_MESSAGE: err.message ?? stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
                 },
               })
             : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })
         );
       }
-      log('TransferForm/onTransfer', error);
+      log('TransferForm/onTransfer', err);
     } finally {
       setIsLoading(false);
     }
@@ -214,7 +216,7 @@ export const TransferForm = ({
     try {
       const value = await navigator.clipboard.readText();
       onChangeAddress(value);
-    } catch (error) {
+    } catch (err) {
       // expected error if user rejects clipboard access
     }
   };
@@ -316,7 +318,7 @@ export const TransferForm = ({
           placeholder={stringGetter({ key: STRING_KEYS.ADDRESS })}
           slotRight={renderFormInputButton({
             label: stringGetter({ key: STRING_KEYS.PASTE }),
-            isInputEmpty: recipientAddress == null || recipientAddress == '',
+            isInputEmpty: recipientAddress == null || recipientAddress === '',
             onClear: () => onChangeAddress(''),
             onClick: onPasteAddress,
           })}
@@ -388,7 +390,7 @@ export const TransferForm = ({
       <$Footer>
         <TransferButtonAndReceipt
           selectedAsset={asset}
-          fee={currentFee || undefined}
+          fee={currentFee ?? undefined}
           isDisabled={!isAmountValid || !isAddressValid || !currentFee || isLoading}
           isLoading={isLoading || Boolean(isAmountValid && isAddressValid && !currentFee)}
         />

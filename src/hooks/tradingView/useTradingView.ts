@@ -123,7 +123,7 @@ export const useTradingView = ({
       tvWidgetRef.current = null;
       setIsChartReady(false);
     };
-  }, [selectedLocale, selectedNetwork, !!marketId, hasPriceScaleInfo]);
+  }, [selectedLocale, selectedNetwork, marketId, hasPriceScaleInfo]);
 
   return { savedResolution };
 };

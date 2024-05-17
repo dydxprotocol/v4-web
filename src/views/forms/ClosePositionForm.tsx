@@ -85,15 +85,15 @@ export const ClosePositionForm = ({
   const { closePosition } = useSubaccount();
 
   const market = useSelector(getCurrentMarketId);
-  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
+  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const { stepSizeDecimals, tickSizeDecimals } =
-    useSelector(getCurrentMarketConfig, shallowEqual) || {};
-  const { size: sizeData, summary } = useSelector(getInputClosePositionData, shallowEqual) || {};
-  const { size, percent } = sizeData || {};
+    useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const { size: sizeData, summary } = useSelector(getInputClosePositionData, shallowEqual) ?? {};
+  const { size, percent } = sizeData ?? {};
   const closePositionInputErrors = useSelector(getClosePositionInputErrors, shallowEqual);
   const currentPositionData = useSelector(getCurrentMarketPositionData, shallowEqual);
-  const { size: currentPositionSize } = currentPositionData || {};
-  const { current: currentSize } = currentPositionSize || {};
+  const { size: currentPositionSize } = currentPositionData ?? {};
+  const { current: currentSize } = currentPositionSize ?? {};
   const currentSizeBN = MustBigNumber(currentSize).abs();
 
   const hasInputErrors = closePositionInputErrors?.some(
@@ -156,7 +156,7 @@ export const ClosePositionForm = ({
 
     const closeAmount = MustBigNumber(floatValue)
       .abs()
-      .toFixed(stepSizeDecimals || TOKEN_DECIMALS);
+      .toFixed(stepSizeDecimals ?? TOKEN_DECIMALS);
 
     abacusStateManager.setClosePositionValue({
       value: floatValue ? closeAmount : null,
@@ -200,7 +200,7 @@ export const ClosePositionForm = ({
     closePosition({
       onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
         setClosePositionError(
-          stringGetter({ key: errorParams?.errorStringKey || STRING_KEYS.SOMETHING_WENT_WRONG })
+          stringGetter({ key: errorParams?.errorStringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG })
         );
         setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
       },
@@ -222,7 +222,7 @@ export const ClosePositionForm = ({
             {id && <Tag>{id}</Tag>}
           </>
         }
-        decimals={stepSizeDecimals || TOKEN_DECIMALS}
+        decimals={stepSizeDecimals ?? TOKEN_DECIMALS}
         onInput={onAmountInput}
         type={InputType.Number}
         value={size ?? ''}

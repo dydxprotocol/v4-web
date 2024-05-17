@@ -107,24 +107,22 @@ export const NewMarketSelectionStep = ({
   }, [assetToAdd]);
 
   const filteredPotentialMarkets = useMemo(() => {
-    return potentialMarkets?.filter(
-      ({ params: { ticker, exchangeConfigJson, marketType }, meta }) => {
-        if (marketIds.includes(ticker)) {
-          return false;
-        }
-
-        // Disable Isolated markets if the user is not on Staging or Local deployment
-        if (marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED') {
-          return isDev && exchangeConfigJson.length > 0;
-        }
-
-        if (exchangeConfigJson.length >= NUM_ORACLES_TO_QUALIFY_AS_SAFE) {
-          return true;
-        }
-
+    return potentialMarkets?.filter(({ params: { ticker, exchangeConfigJson, marketType } }) => {
+      if (marketIds.includes(ticker)) {
         return false;
       }
-    );
+
+      // Disable Isolated markets if the user is not on Staging or Local deployment
+      if (marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED') {
+        return isDev && exchangeConfigJson.length > 0;
+      }
+
+      if (exchangeConfigJson.length >= NUM_ORACLES_TO_QUALIFY_AS_SAFE) {
+        return true;
+      }
+
+      return false;
+    });
   }, [potentialMarkets, marketIds]);
 
   return (

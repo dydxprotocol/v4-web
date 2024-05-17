@@ -19,7 +19,6 @@ import { Details, DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
-import { ToggleButton } from '@/components/ToggleButton';
 import { WithReceipt } from '@/components/WithReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
@@ -36,7 +35,6 @@ type ElementProps = {
   setSlippage: (slippage: number) => void;
 
   slippage: number;
-  withdrawChain?: string;
   withdrawToken?: TransferInputTokenResource;
 
   isDisabled?: boolean;
@@ -55,8 +53,8 @@ export const WithdrawButtonAndReceipt = ({
   const [isEditingSlippage, setIsEditingSlipapge] = useState(false);
   const stringGetter = useStringGetter();
 
-  const { leverage } = useSelector(getSubaccount, shallowEqual) || {};
-  const { summary, requestPayload, exchange } = useSelector(getTransferInputs, shallowEqual) || {};
+  const { leverage } = useSelector(getSubaccount, shallowEqual) ?? {};
+  const { summary, requestPayload, exchange } = useSelector(getTransferInputs, shallowEqual) ?? {};
   const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
   const { usdcLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
@@ -140,16 +138,16 @@ export const WithdrawButtonAndReceipt = ({
       key: 'estimated-route-duration',
       label: <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_TIME })}</span>,
       value:
-        typeof summary?.estimatedRouteDuration === 'number' ? (
+        summary != null && typeof summary?.estimatedRouteDuration === 'number' ? (
           <Output
             type={OutputType.Text}
             value={stringGetter({
               key: STRING_KEYS.X_MINUTES_LOWERCASED,
               params: {
                 X:
-                  summary?.estimatedRouteDuration < 60
+                  summary.estimatedRouteDuration < 60
                     ? '< 1'
-                    : Math.round(summary?.estimatedRouteDuration / 60),
+                    : Math.round(summary.estimatedRouteDuration / 60),
               },
             })}
           />
@@ -208,25 +206,4 @@ const $WithReceipt = styled(WithReceipt)`
 const $Details = styled(Details)`
   padding: var(--form-input-paddingY) var(--form-input-paddingX);
   font-size: 0.8125em;
-`;
-
-const $DetailButtons = styled.div`
-  ${layoutMixins.spacedRow}
-`;
-
-const $ToggleButton = styled(ToggleButton)`
-  --button-toggle-off-backgroundColor: transparent;
-  --button-toggle-on-backgroundColor: transparent;
-  --button-toggle-on-textColor: var(--color-text-0);
-
-  svg {
-    width: 0.875em;
-    height: 0.875em;
-  }
-
-  &[data-state='on'] {
-    svg {
-      transform: rotate(180deg);
-    }
-  }
 `;

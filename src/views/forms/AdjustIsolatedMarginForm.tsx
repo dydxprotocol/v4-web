@@ -4,7 +4,6 @@ import { shallowEqual, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import type { SubaccountPosition } from '@/constants/abacus';
-import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, USD_DECIMALS } from '@/constants/numbers';
@@ -14,7 +13,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
@@ -61,16 +59,19 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
   const [amount, setAmount] = useState('');
   const onSubmit = () => {};
 
-  const positionMargin = {
-    current: calculatePositionMargin({
-      adjustedMmf: adjustedMmf?.current,
-      notionalTotal: notionalTotal?.current,
-    }).toFixed(tickSizeDecimals ?? USD_DECIMALS),
-    postOrder: calculatePositionMargin({
-      adjustedMmf: adjustedMmf?.postOrder,
-      notionalTotal: notionalTotal?.postOrder,
-    }).toFixed(tickSizeDecimals ?? USD_DECIMALS),
-  };
+  const positionMargin = useMemo(
+    () => ({
+      current: calculatePositionMargin({
+        adjustedMmf: adjustedMmf?.current,
+        notionalTotal: notionalTotal?.current,
+      }).toFixed(tickSizeDecimals ?? USD_DECIMALS),
+      postOrder: calculatePositionMargin({
+        adjustedMmf: adjustedMmf?.postOrder,
+        notionalTotal: notionalTotal?.postOrder,
+      }).toFixed(tickSizeDecimals ?? USD_DECIMALS),
+    }),
+    [adjustedMmf, notionalTotal, tickSizeDecimals]
+  );
 
   const { freeCollateral, marginUsage } = useSelector(getSubaccount, shallowEqual) ?? {};
 
@@ -178,9 +179,7 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
           ],
         };
 
-  const CenterElement = false ? (
-    <AlertMessage type={AlertType.Error}>Placeholder Error</AlertMessage>
-  ) : (
+  const CenterElement = (
     <$GradientCard fromColor="neutral" toColor="negative">
       <$Column>
         <$TertiarySpan>{stringGetter({ key: STRING_KEYS.ESTIMATED })}</$TertiarySpan>

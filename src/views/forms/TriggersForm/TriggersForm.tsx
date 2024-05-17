@@ -47,7 +47,7 @@ export const TriggersForm = ({
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
 
   const { asset, entryPrice, size, stepSizeDecimals, tickSizeDecimals, oraclePrice } =
-    useSelector(getPositionDetails(marketId)) || {};
+    useSelector(getPositionDetails(marketId)) ?? {};
 
   const {
     differingOrderSizes,
@@ -135,7 +135,7 @@ export const TriggersForm = ({
             <$Button
               action={ButtonAction.Primary}
               type={ButtonType.Submit}
-              state={{ isDisabled: hasInputErrors || isAccountViewOnly }}
+              state={{ isDisabled: !!hasInputErrors || !!isAccountViewOnly }}
               slotLeft={hasInputErrors ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
             >
               {hasInputErrors
@@ -143,8 +143,8 @@ export const TriggersForm = ({
                     key: inputAlert?.actionStringKey ?? STRING_KEYS.UNAVAILABLE,
                   })
                 : existingStopLossOrder || existingTakeProfitOrder
-                ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })
-                : stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
+                  ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })
+                  : stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
             </$Button>
           </WithTooltip>
         </>
