@@ -89,7 +89,6 @@ export const useTradingView = ({
         saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
       };
 
-      // eslint-disable-next-line new-cap
       const tvChartWidget = new Widget(options);
       tvWidgetRef.current = tvChartWidget;
 
