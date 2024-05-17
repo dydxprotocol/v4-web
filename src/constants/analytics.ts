@@ -23,12 +23,16 @@ export type AnalyticsEventIdentifyMeta<T extends AnalyticsUserProperty> = {
   };
 };
 
+// Do not update. this is used specifically to type how we create custom identify events.
+// If you want to update how identify events work, go to src/lib/analytics.ts
 export const customIdentifyEvent = <T extends AnalyticsUserProperty>(
   meta: AnalyticsEventIdentifyMeta<T>
 ) => {
   return new CustomEvent('dydx:identify', meta);
 };
 
+// Do not update. this is used specifically to type how we create custom track events.
+// If you want to update how track events work, go to src/lib/analytics.ts
 export const customTrackEvent = <T extends AnalyticsEvent>(meta: AnalyticsEventTrackMeta<T>) => {
   return new CustomEvent('dydx:track', meta);
 };
