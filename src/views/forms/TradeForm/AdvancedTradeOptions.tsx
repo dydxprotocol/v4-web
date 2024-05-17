@@ -51,10 +51,10 @@ export const AdvancedTradeOptions = () => {
 
   const { duration, unit } = goodTil ?? {};
 
-  const showPostOnly = needsPostOnly || postOnlyTooltip;
-  const showReduceOnly = needsReduceOnly || reduceOnlyTooltip;
+  const showPostOnly = !!needsPostOnly || !!postOnlyTooltip;
+  const showReduceOnly = !!needsReduceOnly || !!reduceOnlyTooltip;
 
-  const needsExecution = executionOptions || showPostOnly || showReduceOnly;
+  const needsExecution = !!executionOptions || !!showPostOnly || !!showReduceOnly;
   const hasTimeInForce = timeInForceOptions?.toArray()?.length;
 
   useEffect(() => {

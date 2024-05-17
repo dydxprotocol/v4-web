@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import type { ChangeEvent, FormEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -67,7 +68,7 @@ export const WithdrawForm = () => {
   const selectedDydxChainId = useSelector(getSelectedDydxChainId);
 
   const { sendSquidWithdraw } = useSubaccount();
-  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
+  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) ?? {};
 
   const {
     requestPayload,
@@ -80,7 +81,7 @@ export const WithdrawForm = () => {
     errorMessage: routeErrorMessage,
     isCctp,
     summary,
-  } = useSelector(getTransferInputs, shallowEqual) || {};
+  } = useSelector(getTransferInputs, shallowEqual) ?? {};
 
   // User input
   const [withdrawAmount, setWithdrawAmount] = useState('');
@@ -135,8 +136,8 @@ export const WithdrawForm = () => {
           });
           setError(undefined);
         }
-      } catch (error) {
-        setError(error.message);
+      } catch (err) {
+        setError(err.message);
       } finally {
         setIsLoading(false);
       }
@@ -217,17 +218,16 @@ export const WithdrawForm = () => {
             });
           }
         }
-      } catch (error) {
-        if (error?.code === 429) {
+      } catch (err) {
+        if (err?.code === 429) {
           setError(stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_MESSAGE }));
         } else {
           setError(
-            error.message
+            err.message
               ? stringGetter({
                   key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
                   params: {
-                    ERROR_MESSAGE:
-                      error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
+                    ERROR_MESSAGE: err.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
                   },
                 })
               : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })

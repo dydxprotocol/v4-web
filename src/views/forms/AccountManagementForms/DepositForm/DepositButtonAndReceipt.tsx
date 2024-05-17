@@ -97,7 +97,7 @@ export const DepositButtonAndReceipt = ({
   const { usdcLabel } = useTokenConfigs();
 
   const sourceChainName =
-    depositOptions?.chains?.toArray().find((chain) => chain.type === chainIdStr)?.stringKey || '';
+    depositOptions?.chains?.toArray().find((chain) => chain.type === chainIdStr)?.stringKey ?? '';
 
   const submitButtonReceipt = [
     {

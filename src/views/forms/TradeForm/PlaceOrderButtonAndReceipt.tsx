@@ -74,7 +74,7 @@ export const PlaceOrderButtonAndReceipt = ({
     currentInput !== 'transfer' &&
     !tradingUnavailable;
 
-  const { fee, price: expectedPrice, total, reward } = summary || {};
+  const { fee, price: expectedPrice, total, reward } = summary ?? {};
 
   const items = [
     {
@@ -131,7 +131,7 @@ export const PlaceOrderButtonAndReceipt = ({
     [MobilePlaceOrderSteps.EditOrder]: {
       buttonTextStringKey: shouldEnableTrade
         ? STRING_KEYS.PREVIEW_ORDER
-        : actionStringKey || STRING_KEYS.UNAVAILABLE,
+        : actionStringKey ?? STRING_KEYS.UNAVAILABLE,
       buttonAction: ButtonAction.Primary,
       buttonState: { isDisabled: !shouldEnableTrade, isLoading: hasMissingData },
       showValidatorError: true,
