@@ -86,7 +86,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
       }
       return true;
     })
-    .sort((token) => (!!cctpTokensByAddress[token.value] ? -1 : 1));
+    .sort((token) => (cctpTokensByAddress[token.value] ? -1 : 1));
 
   return (
     <SearchSelectMenu

@@ -104,7 +104,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   // Async Data
   const { balance, queryStatus, isQueryFetching } = useAccountBalance({
     addressOrDenom: sourceToken?.address || CHAIN_DEFAULT_TOKEN_ADDRESS,
-    chainId: chainId,
+    chainId,
     decimals: sourceToken?.decimals || undefined,
     isCosmosChain: false,
   });
@@ -271,7 +271,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
         await validateTokenApproval();
 
-        let tx = {
+        const tx = {
           to: requestPayload.targetAddress as EvmAddress,
           data: requestPayload.data as EvmAddress,
           gasLimit: BigInt(requestPayload.gasLimit),
@@ -281,7 +281,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
         if (txHash) {
           addTransferNotification({
-            txHash: txHash,
+            txHash,
             toChainId: !isCctp ? selectedDydxChainId : getNobleChainId(),
             fromChainId: chainIdStr || undefined,
             toAmount: summary?.usdcSize || undefined,
@@ -355,7 +355,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         return stringGetter({
           key: STRING_KEYS.MAX_CCTP_TRANSFER_LIMIT_EXCEEDED,
           params: {
-            MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
+            MAX_CCTP_TRANSFER_AMOUNT,
           },
         });
       }
@@ -376,7 +376,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     if (fromAmount) {
       if (!chainId) {
         return stringGetter({ key: STRING_KEYS.MUST_SPECIFY_CHAIN });
-      } else if (!sourceToken) {
+      }
+      if (!sourceToken) {
         return stringGetter({ key: STRING_KEYS.MUST_SPECIFY_ASSET });
       }
     }

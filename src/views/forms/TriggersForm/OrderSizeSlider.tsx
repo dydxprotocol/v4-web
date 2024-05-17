@@ -27,7 +27,7 @@ export const OrderSizeSlider = ({
   stepSizeDecimals,
   className,
 }: ElementProps & StyleProps) => {
-  const step = positionSize ? Math.pow(10, Math.floor(Math.log10(positionSize) - 1)) : 0.1;
+  const step = positionSize ? 10 ** Math.floor(Math.log10(positionSize) - 1) : 0.1;
   const maxSize = positionSize ?? 0;
   const currSize = size ?? 0;
 

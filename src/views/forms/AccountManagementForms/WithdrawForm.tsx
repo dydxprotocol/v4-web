@@ -188,10 +188,10 @@ export const WithdrawForm = () => {
             isCctp
           );
           const nobleChainId = getNobleChainId();
-          const toChainId = Boolean(exchange) ? nobleChainId : chainIdStr || undefined;
+          const toChainId = exchange ? nobleChainId : chainIdStr || undefined;
           if (txHash && toChainId) {
             addTransferNotification({
-              txHash: txHash,
+              txHash,
               type: TransferNotificationTypes.Withdrawal,
               fromChainId: !isCctp ? selectedDydxChainId : nobleChainId,
               toChainId,
@@ -351,7 +351,7 @@ export const WithdrawForm = () => {
           errorMessage: stringGetter({
             key: STRING_KEYS.MAX_CCTP_TRANSFER_LIMIT_EXCEEDED,
             params: {
-              MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
+              MAX_CCTP_TRANSFER_AMOUNT,
             },
           }),
         };
@@ -401,7 +401,8 @@ export const WithdrawForm = () => {
         return {
           errorMessage: stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_CHAIN }),
         };
-      } else if (!toToken) {
+      }
+      if (!toToken) {
         return {
           errorMessage: stringGetter({ key: STRING_KEYS.WITHDRAW_MUST_SPECIFY_ASSET }),
         };

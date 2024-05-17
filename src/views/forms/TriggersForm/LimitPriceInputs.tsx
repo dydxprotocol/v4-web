@@ -87,57 +87,49 @@ export const LimitPriceInputs = ({
     };
 
   return (
-    <>
-      <Collapsible
-        className={className}
-        slotTrigger={
-          <Checkbox
-            id="sltp-limit"
-            checked={shouldShowLimitPrice}
-            onCheckedChange={onToggleLimit}
+    <Collapsible
+      className={className}
+      slotTrigger={
+        <Checkbox id="sltp-limit" checked={shouldShowLimitPrice} onCheckedChange={onToggleLimit} />
+      }
+      open={shouldShowLimitPrice}
+      label={
+        <WithTooltip tooltip="limit-price">
+          {stringGetter({ key: STRING_KEYS.LIMIT_PRICE })}
+        </WithTooltip>
+      }
+    >
+      <$InputsRow>
+        {!multipleTakeProfitOrders && (
+          <FormInput
+            id="TP-limit"
+            decimals={decimals}
+            value={takeProfitOrder?.price?.limitPrice}
+            label={
+              <>
+                {stringGetter({ key: STRING_KEYS.TP_LIMIT })}
+                <Tag>USD</Tag>
+              </>
+            }
+            onInput={onLimitInput(TriggerOrdersInputField.takeProfitLimitPrice)}
           />
-        }
-        open={shouldShowLimitPrice}
-        label={
-          <WithTooltip tooltip="limit-price">
-            {stringGetter({ key: STRING_KEYS.LIMIT_PRICE })}
-          </WithTooltip>
-        }
-      >
-        {
-          <$InputsRow>
-            {!multipleTakeProfitOrders && (
-              <FormInput
-                id="TP-limit"
-                decimals={decimals}
-                value={takeProfitOrder?.price?.limitPrice}
-                label={
-                  <>
-                    {stringGetter({ key: STRING_KEYS.TP_LIMIT })}
-                    <Tag>USD</Tag>
-                  </>
-                }
-                onInput={onLimitInput(TriggerOrdersInputField.takeProfitLimitPrice)}
-              />
-            )}
-            {!multipleStopLossOrders && (
-              <FormInput
-                id="SL-limit"
-                decimals={decimals}
-                value={stopLossOrder?.price?.limitPrice}
-                label={
-                  <>
-                    {stringGetter({ key: STRING_KEYS.SL_LIMIT })}
-                    <Tag>USD</Tag>
-                  </>
-                }
-                onInput={onLimitInput(TriggerOrdersInputField.stopLossLimitPrice)}
-              />
-            )}
-          </$InputsRow>
-        }
-      </Collapsible>
-    </>
+        )}
+        {!multipleStopLossOrders && (
+          <FormInput
+            id="SL-limit"
+            decimals={decimals}
+            value={stopLossOrder?.price?.limitPrice}
+            label={
+              <>
+                {stringGetter({ key: STRING_KEYS.SL_LIMIT })}
+                <Tag>USD</Tag>
+              </>
+            }
+            onInput={onLimitInput(TriggerOrdersInputField.stopLossLimitPrice)}
+          />
+        )}
+      </$InputsRow>
+    </Collapsible>
   );
 };
 const $InputsRow = styled.span`

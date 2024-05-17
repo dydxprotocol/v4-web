@@ -122,13 +122,7 @@ const $Slider = styled(Slider)<{ midpoint?: number; orderSide: OrderSide }>`
       90deg,
       var(--color-negative) 0%,
       var(--color-layer-7)
-        ${midpoint
-          ? midpoint
-          : orderSide === OrderSide.BUY
-          ? 0
-          : orderSide === OrderSide.SELL
-          ? 100
-          : 50}%,
+        ${midpoint || (orderSide === OrderSide.BUY ? 0 : orderSide === OrderSide.SELL ? 100 : 50)}%,
       var(--color-positive) 100%
     );
   `}

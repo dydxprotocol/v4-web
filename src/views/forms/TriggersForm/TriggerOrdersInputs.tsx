@@ -62,7 +62,7 @@ export const TriggerOrdersInputs = ({
           usdcDiffField: TriggerOrdersInputField.stopLossUsdcDiff,
         }}
         isMultiple={multipleStopLossOrders}
-        isNegativeDiff={true}
+        isNegativeDiff
         price={stopLossOrder?.price}
         tickSizeDecimals={tickSizeDecimals}
         onViewOrdersClick={onViewOrdersClick}
