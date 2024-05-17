@@ -68,7 +68,7 @@ class AbacusRest implements AbacusRestProtocol {
         try {
           lastSuccessfulRestRequestByOrigin[new URL(url).origin] = Date.now();
         } catch (error) {
-          log('AbacusRest/request', error);
+          log('AbacusRest/request', error, { url });
         }
       })
       .catch(() => callback(null, 0, null)); // Network error or request couldn't be made
