@@ -4,8 +4,10 @@ import styled, { type AnyStyledComponent } from 'styled-components';
 
 import { useValidatorsData } from '@/hooks/useValidatorsData';
 
+import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
+import { Output, OutputType } from '@/components/Output';
 import { Table, TableCell } from '@/components/Table';
 import { Toolbar } from '@/components/Toolbar';
 
@@ -13,42 +15,50 @@ export const ValidatorsTable = () => {
   const { validatorsData } = useValidatorsData();
 
   const columns = useMemo(
-    () =>
-      console.log(validatorsData?.validators) || [
-        {
-          columnKey: 'validator',
-          label: 'Validator',
-          getCellValue: (row) => row.description.moniker,
-          renderCell: (row) => (
-            <TableCell>
-              <img src={`${row.description.website}/favicon.ico`} alt="" />{' '}
-              {row.description.moniker}
-            </TableCell>
-          ),
-        },
-        {
-          columnKey: 'votingPower',
-          label: 'Voting Power',
-          getCellValue: (row) => row.tokens,
-          renderCell: (row) => (
-            <TableCell>
-              {Intl.NumberFormat('en-US', {
-                notation: 'compact',
-                maximumSignificantDigits: 2,
-              }).format(parseFloat(row.tokens) / 1e18)}{' '}
-              DYDX
-            </TableCell>
-          ),
-        },
-        {
-          columnKey: 'commission',
-          label: 'Commission',
-          getCellValue: (row) => row.commission.commissionRates.rate,
-          renderCell: (row) => (
-            <TableCell>{parseFloat(row.commission.commissionRates.rate) / 1e16}%</TableCell>
-          ),
-        },
-      ],
+    () => [
+      {
+        columnKey: 'validator',
+        label: 'Validator',
+        getCellValue: (row) => row.description.moniker,
+        renderCell: (row) => (
+          <TableCell>
+            <img src={`${row.description.website}/favicon.ico`} alt="" /> {row.description.moniker}
+          </TableCell>
+        ),
+      },
+      {
+        columnKey: 'votingPower',
+        label: 'Voting Power',
+        getCellValue: (row) => row.tokens,
+        renderCell: (row) => (
+          <Styled.NumberOutput
+            type={OutputType.CompactNumber}
+            value={parseFloat(row.tokens) / 1e18}
+            slotRight=" DYDX"
+          />
+          /*
+          <TableCell>
+            {Intl.NumberFormat('en-US', {
+              notation: 'compact',
+              maximumSignificantDigits: 2,
+            }).format(parseFloat(row.tokens) / 1e18)}{' '}
+            DYDX
+          </TableCell>
+          */
+        ),
+      },
+      {
+        columnKey: 'commission',
+        label: 'Commission',
+        getCellValue: (row) => row.commission.commissionRates.rate,
+        renderCell: (row) => (
+          <Styled.NumberOutput
+            type={OutputType.Percent}
+            value={parseFloat(row.commission.commissionRates.rate) / 1e18}
+          />
+        ),
+      },
+    ],
     [validatorsData?.validators]
   );
 
@@ -86,4 +96,14 @@ Styled.Table = styled(Table)`
 
 Styled.ValidatorCell = styled(TableCell)`
   flex-direction: 'column';
+`;
+
+Styled.InlineRow = styled.div`
+  ${layoutMixins.inlineRow}
+`;
+
+Styled.SubText = styled.p``;
+Styled.NumberOutput = styled(Output)`
+  font: var(--font-base-medium);
+  color: var(--color-text-2);
 `;

@@ -11,5 +11,7 @@
 
 - Write tests
 - Download the icons for every validator into `/public`
-- There looks to be a gap style in the . I wrapped the table into a styled `<div />`, but perhaps there are other tools
+- There looks to be a gap style in the content wrapper. I wrapped the table into a styled `<div />`, but perhaps there are other components
 - To align the table borders with the top toolbar, I had to make some peculiar adjustments. I would have liked to study the css in the codebase more to see if there could be a better solution
+- I used the operator address as the row key
+- Figure out the CORS situation
