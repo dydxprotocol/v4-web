@@ -26,6 +26,7 @@ import { useSelectedNetwork } from './useSelectedNetwork';
 import { useShouldShowFooter } from './useShouldShowFooter';
 import { useStringGetter } from './useStringGetter';
 import { useSubaccount } from './useSubaccount';
+import { useTablePagination } from './useTablePagination';
 import { useTokenConfigs } from './useTokenConfigs';
 import { useTradeFormInputs } from './useTradeFormInputs';
 import { useTriggerOrdersFormInputs } from './useTriggerOrdersFormInputs';
@@ -55,15 +56,16 @@ export {
   useOnClickOutside,
   usePageTitlePriceUpdates,
   usePerpetualMarketSparklines,
+  usePerpetualMarketsStats,
   useRestrictions,
   useSelectedNetwork,
   useShouldShowFooter,
   useStringGetter,
   useSubaccount,
+  useTablePagination,
   useTokenConfigs,
   useTradeFormInputs,
   useTriggerOrdersFormInputs,
   useURLConfigs,
   useWithdrawalInfo,
-  usePerpetualMarketsStats,
 };

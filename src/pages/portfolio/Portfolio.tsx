@@ -47,6 +47,8 @@ const PortfolioPage = () => {
   const { isTablet, isNotTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
 
+  const initialPageSize = 20;
+
   const onboardingState = useSelector(getOnboardingState);
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) ?? {};
   const { nativeTokenBalance } = useAccountBalance();
@@ -73,6 +75,7 @@ const PortfolioPage = () => {
             path={HistoryRoute.Trades}
             element={
               <FillsTable
+                initialPageSize={initialPageSize}
                 columnKeys={
                   isTablet
                     ? [
@@ -96,11 +99,21 @@ const PortfolioPage = () => {
           />
           <Route
             path={HistoryRoute.Transfers}
-            element={<TransferHistoryTable withOuterBorder={isNotTablet} />}
+            element={
+              <TransferHistoryTable
+                initialPageSize={initialPageSize}
+                withOuterBorder={isNotTablet}
+              />
+            }
           />
           <Route
             path={HistoryRoute.Payments}
-            element={<FundingPaymentsTable withOuterBorder={isNotTablet} />}
+            element={
+              <FundingPaymentsTable
+                initialPageSize={initialPageSize}
+                withOuterBorder={isNotTablet}
+              />
+            }
           />
         </Route>
         <Route path="*" element={<Navigate to={PortfolioRoute.Overview} replace />} />

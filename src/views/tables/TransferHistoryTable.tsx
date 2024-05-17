@@ -25,8 +25,7 @@ import { getSubaccountTransfers } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { truncateAddress } from '@/lib/wallet';
-
-const MOBILE_TRANSFERS_PER_PAGE = 50;
+import { PageSize } from '@/components/Table/TablePaginationRow';
 
 export enum TransferHistoryTableColumnKey {
   Time = 'Time',
@@ -43,7 +42,6 @@ const getTransferHistoryTableColumnDef = ({
   mintscanTxUrl,
 }: {
   key: TransferHistoryTableColumnKey;
-  isTablet?: boolean;
   stringGetter: StringGetterFunction;
   width?: ColumnSize;
   mintscanTxUrl?: string;
@@ -116,6 +114,7 @@ const getTransferHistoryTableColumnDef = ({
 type ElementProps = {
   columnKeys?: TransferHistoryTableColumnKey[];
   columnWidths?: Partial<Record<TransferHistoryTableColumnKey, ColumnSize>>;
+  initialPageSize?: PageSize;
 };
 
 type StyleProps = {
@@ -126,12 +125,12 @@ type StyleProps = {
 export const TransferHistoryTable = ({
   columnKeys = Object.values(TransferHistoryTableColumnKey),
   columnWidths,
+  initialPageSize,
   withOuterBorder,
   withInnerBorders = true,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
-  const { isMobile, isTablet } = useBreakpoints();
   const { mintscan: mintscanTxUrl } = useURLConfigs();
 
   const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
@@ -141,12 +140,11 @@ export const TransferHistoryTable = ({
   return (
     <$Table
       label="Transfers"
-      data={isMobile ? transfers.slice(0, MOBILE_TRANSFERS_PER_PAGE) : transfers}
+      data={transfers}
       getRowKey={(row: SubaccountTransfer) => row.id}
       columns={columnKeys.map((key: TransferHistoryTableColumnKey) =>
         getTransferHistoryTableColumnDef({
           key,
-          isTablet,
           stringGetter,
           width: columnWidths?.[key],
           mintscanTxUrl,
@@ -167,6 +165,7 @@ export const TransferHistoryTable = ({
           )}
         </>
       }
+      initialPageSize={initialPageSize}
       selectionBehavior="replace"
       withOuterBorder={withOuterBorder}
       withInnerBorders={withInnerBorders}

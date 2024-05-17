@@ -177,6 +177,7 @@ export const Fees = () => {
             ] as ColumnDef<FeeTier>[]
           ).filter(isTruthy)}
           selectionBehavior="replace"
+          paginationBehavior="showAll"
           withOuterBorder={isNotTablet}
           withInnerBorders
         />
@@ -294,7 +295,7 @@ const $FeeTable = styled(Table)`
   }
 
   @media ${breakpoints.notTablet} {
-    --tableHeader-backgroundColor: var(--color-layer-1);
+    --tableStickyRow-backgroundColor: var(--color-layer-1);
   }
 ` as typeof Table;
 

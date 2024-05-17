@@ -23,7 +23,6 @@ import {
   Table,
   TableCell,
   TableColumnHeader,
-  ViewMoreConfig,
   type ColumnDef,
 } from '@/components/Table';
 import { MarketTableCell } from '@/components/Table/MarketTableCell';
@@ -41,6 +40,7 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { getHydratedTradingData } from '@/lib/orders';
+import { PageSize } from '@/components/Table/TablePaginationRow';
 
 const MOBILE_FILLS_PER_PAGE = 50;
 
@@ -295,7 +295,7 @@ type ElementProps = {
   columnKeys: FillsTableColumnKey[];
   columnWidths?: Partial<Record<FillsTableColumnKey, ColumnSize>>;
   currentMarket?: string;
-  viewMoreConfig?: ViewMoreConfig;
+  initialPageSize?: PageSize;
 };
 
 type StyleProps = {
@@ -308,7 +308,7 @@ export const FillsTable = ({
   columnKeys,
   columnWidths,
   currentMarket,
-  viewMoreConfig,
+  initialPageSize,
   withGradientCardRows,
   withOuterBorder,
   withInnerBorders = true,
@@ -375,7 +375,7 @@ export const FillsTable = ({
           <h4>{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</h4>
         </>
       }
-      viewMoreConfig={viewMoreConfig}
+      initialPageSize={initialPageSize}
       withOuterBorder={withOuterBorder}
       withInnerBorders={withInnerBorders}
       withScrollSnapColumns

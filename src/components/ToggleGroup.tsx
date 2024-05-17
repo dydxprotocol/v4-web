@@ -61,7 +61,7 @@ export const ToggleGroup = forwardRefFn(
         loop
       >
         {items.map((item) => (
-          <Item key={item.value} value={item.value} asChild>
+          <Item key={item.value} value={item.value} disabled={item.disabled} asChild>
             <ToggleButton
               size={size ? size : isTablet ? ButtonSize.Small : ButtonSize.XSmall}
               shape={shape}

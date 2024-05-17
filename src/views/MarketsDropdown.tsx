@@ -129,6 +129,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
           }}
           label={stringGetter({ key: STRING_KEYS.MARKETS })}
           columns={columns}
+          initialPageSize={15}
           slotEmpty={
             <$MarketNotFound>
               {filter === MarketFilters.NEW && !searchFilter ? (
@@ -338,11 +339,22 @@ const $ScrollArea = styled.div`
 `;
 
 const $Table = styled(Table)`
+  --tableCell-padding: 0.5rem 1rem;
+  
   thead {
     --stickyArea-totalInsetTop: 0px;
     --stickyArea-totalInsetBottom: 0px;
     tr {
       height: var(--stickyArea-topHeight);
+    }
+  }
+
+  tfoot {
+    --stickyArea-totalInsetTop: 0px;
+    --stickyArea-totalInsetBottom: 3px; 
+    
+    tr {
+      height: var(--stickyArea-bottomHeight);
     }
   }
 
