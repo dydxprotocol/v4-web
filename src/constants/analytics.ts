@@ -7,6 +7,32 @@ import { TransferNotificationTypes } from './notifications';
 import type { TradeTypes } from './trade';
 import type { DydxAddress, EvmAddress, WalletConnectionType, WalletType } from './wallets';
 
+type AnalyticsEventDataWithReferrer<T extends AnalyticsEvent> = AnalyticsEventData<T> & {
+  referrer: string;
+};
+export type AnalyticsEventTrackMeta<T extends AnalyticsEvent> = {
+  detail: {
+    eventType: AnalyticsEvent;
+    eventData?: AnalyticsEventDataWithReferrer<T>;
+  };
+};
+export type AnalyticsEventIdentifyMeta<T extends AnalyticsUserProperty> = {
+  detail: {
+    property: AnalyticsUserProperty;
+    propertyValue: AnalyticsUserPropertyValue<T>;
+  };
+};
+
+export const customIdentifyEvent = <T extends AnalyticsUserProperty>(
+  meta: AnalyticsEventIdentifyMeta<T>
+) => {
+  return new CustomEvent('dydx:identify', meta);
+};
+
+export const customTrackEvent = <T extends AnalyticsEvent>(meta: AnalyticsEventTrackMeta<T>) => {
+  return new CustomEvent('dydx:track', meta);
+};
+
 // User properties
 export enum AnalyticsUserProperty {
   // Environment
