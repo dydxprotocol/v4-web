@@ -11,6 +11,7 @@ export const BIG_NUMBERS = {
 };
 
 export const MustBigNumber = (amount?: BigNumberish | null): BigNumber =>
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
   new BigNumber(amount || 0);
 
 /**
@@ -78,6 +79,7 @@ export function bytesToBigInt(u: Uint8Array): bigint {
   if (u.length <= 1) {
     return BigInt(0);
   }
+  // eslint-disable-next-line no-bitwise
   const negated: boolean = (u[0] & 1) === 1;
   const hex: string = Buffer.from(u.slice(1)).toString('hex');
   const abs: bigint = BigInt(`0x${hex}`);

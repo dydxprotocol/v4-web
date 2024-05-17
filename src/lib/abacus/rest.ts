@@ -3,6 +3,8 @@ import type { Nullable, kollections } from '@dydxprotocol/v4-abacus';
 import type { AbacusRestProtocol } from '@/constants/abacus';
 import { lastSuccessfulRestRequestByOrigin } from '@/constants/analytics';
 
+import { log } from '../telemetry';
+
 type Headers = Nullable<kollections.Map<string, string>>;
 type FetchResponseCallback = (p0: Nullable<string>, p1: number, p2: Nullable<string>) => void;
 
@@ -55,9 +57,9 @@ class AbacusRest implements AbacusRestProtocol {
       .then(async (response) => {
         const data = await response.text();
         const headersObj: Record<string, string> = {};
-        for (let [key, value] of response.headers) {
+        response.headers.forEach(([key, value]) => {
           headersObj[key] = value;
-        }
+        });
         // Stringify the headers object
         const headersJson = JSON.stringify(headersObj);
 
@@ -65,7 +67,9 @@ class AbacusRest implements AbacusRestProtocol {
 
         try {
           lastSuccessfulRestRequestByOrigin[new URL(url).origin] = Date.now();
-        } catch {}
+        } catch (error) {
+          log('AbacusRest/request', error);
+        }
       })
       .catch(() => callback(null, 0, null)); // Network error or request couldn't be made
   }
