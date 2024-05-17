@@ -21,7 +21,7 @@ export const PageMenuRadioGroupItem = <
       {subitems.map(({ disabled, value, label, slotBefore }) => (
         <$MenuItem key={value} value={value} disabled={disabled}>
           <div>
-            <>{slotBefore}</>
+            {slotBefore}
             <span>{label}</span>
           </div>
           {value === curentValue ? <$CheckIcon iconName={IconName.Check} /> : <$EmptyIcon />}

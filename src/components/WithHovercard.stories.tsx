@@ -14,7 +14,7 @@ export const Hovercard: Story<Parameters<typeof WithHovercard>[0]> = (args) => {
         {...args}
         slotTrigger={<div>Trigger</div>}
         slotButton={<Button>Button</Button>}
-      ></WithHovercard>
+      />
     </StoryWrapper>
   );
 };
