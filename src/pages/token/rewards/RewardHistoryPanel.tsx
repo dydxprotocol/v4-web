@@ -35,11 +35,9 @@ export const RewardHistoryPanel = () => {
 
   const onSelectPeriod = useCallback((periodName: string) => {
     const thisSelectedPeriod =
-      HISTORICAL_TRADING_REWARDS_PERIODS[
-        periodName as keyof typeof HISTORICAL_TRADING_REWARDS_PERIODS
-      ];
+      HISTORICAL_TRADING_REWARDS_PERIODS[HistoricalTradingRewardsPeriod.DAILY.name];
     setSelectedPeriod(thisSelectedPeriod);
-    abacusStateManager.setHistoricalTradingRewardPeriod(thisSelectedPeriod);
+    abacusStateManager.setHistoricalTradingRewardPeriod(thisSelectedPeriod); // xcxc swtich to always be 90d
   }, []);
 
   return (

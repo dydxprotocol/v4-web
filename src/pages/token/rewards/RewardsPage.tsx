@@ -18,6 +18,7 @@ import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { MigratePanel } from './MigratePanel';
 import { RewardHistoryPanel } from './RewardHistoryPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
+import { TradingRewardsChartPanel } from './TradingRewardsChartPanel';
 import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
 
 const RewardsPage = () => {
@@ -38,9 +39,11 @@ const RewardsPage = () => {
           {import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && <$MigratePanel />}
 
           {isTablet ? (
+            // xcxc figure out chart here
             <$LaunchIncentivesPanel />
           ) : (
             <>
+              <$TradingRewardsChartPanel />
               <$LaunchIncentivesPanel />
               <$DYDXBalancePanel />
             </>
@@ -76,17 +79,20 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean }>`
     gap: var(--gap);
   }
 
+  // xccx figure out migrate
   ${({ showMigratePanel }) =>
     showMigratePanel
       ? css`
           grid-template-areas:
             'migrate migrate'
+            'chart chart'
             'incentives incentives'
             'balance balance'
             'rewards other';
         `
       : css`
           grid-template-areas:
+            'chart chart'
             'incentives balance'
             'rewards other';
         `}
@@ -109,6 +115,10 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean }>`
 
 const $MigratePanel = styled(MigratePanel)`
   grid-area: migrate;
+`;
+
+const $TradingRewardsChartPanel = styled(TradingRewardsChartPanel)`
+  grid-area: chart;
 `;
 
 const $LaunchIncentivesPanel = styled(LaunchIncentivesPanel)`
