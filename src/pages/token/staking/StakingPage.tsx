@@ -9,6 +9,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
+import { ValidatorsTable } from '@/views/tables/ValidatorsTable';
 
 import { DYDXBalancePanel } from '../rewards/DYDXBalancePanel';
 import { StakingPanel } from './StakingPanel';
@@ -33,6 +34,7 @@ export default () => {
           </Styled.InnerRow>
           <DYDXBalancePanel />
         </Styled.Row>
+        <ValidatorsTable />
       </Styled.ContentWrapper>
     </DetachedSection>
   );
