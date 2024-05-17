@@ -1,4 +1,4 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import type { Nullable, TradeState } from '@/constants/abacus';
 import { NumberSign } from '@/constants/numbers';

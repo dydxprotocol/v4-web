@@ -1,5 +1,5 @@
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { TransferInputField, TransferType } from '@/constants/abacus';
 import { ButtonSize } from '@/constants/buttons';

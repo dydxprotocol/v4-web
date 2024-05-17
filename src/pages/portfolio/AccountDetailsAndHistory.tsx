@@ -49,7 +49,7 @@ export const usePortfolioValues = ({
             timeStyle: 'short',
           })
         : stringGetter({ key: STRING_KEYS.PORTFOLIO_VALUE }),
-    [activeDatum, stringGetter]
+    [activeDatum, selectedLocale, stringGetter]
   );
 
   const accountEquity = useMemo(
@@ -58,7 +58,7 @@ export const usePortfolioValues = ({
   );
 
   const earliestVisibleDatum = visibleData?.[0];
-  const latestVisibleDatum = visibleData?.[visibleData?.length - 1];
+  const latestVisibleDatum = visibleData?.[(visibleData?.length ?? 1) - 1];
 
   const pnl = useMemo(() => {
     let pnlDiff;
@@ -80,6 +80,7 @@ export const usePortfolioValues = ({
         sign: fullTimeframeDiff.gte(0) ? NumberSign.Positive : NumberSign.Negative,
       };
     }
+    return undefined;
   }, [activeDatum, earliestVisibleDatum, latestVisibleDatum]);
 
   return {
@@ -87,7 +88,7 @@ export const usePortfolioValues = ({
     accountEquity,
     pnlDiff: pnl?.pnlDiff,
     pnlDiffPercent: pnl?.pnlDiffPercent,
-    pnlDiffSign: pnl?.sign || NumberSign.Neutral,
+    pnlDiffSign: pnl?.sign ?? NumberSign.Neutral,
   };
 };
 
@@ -99,7 +100,7 @@ export const AccountDetailsAndHistory = () => {
   const onboardingState = useSelector(getOnboardingState);
 
   const { buyingPower, equity, freeCollateral, leverage, marginUsage } =
-    useSelector(getSubaccount, shallowEqual) || {};
+    useSelector(getSubaccount, shallowEqual) ?? {};
 
   const [tooltipContext, setTooltipContext] = useState<TooltipContextType<PnlDatum>>();
 

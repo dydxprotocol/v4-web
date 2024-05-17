@@ -98,15 +98,18 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
 
   const initialPageSize = 10;
 
-  const onViewOrders = useCallback((market: string) => {
-    navigate(`${AppRoute.Trade}/${market}`, {
-      state: {
-        from: AppRoute.Trade,
-      },
-    });
-    setView(PanelView.CurrentMarket);
-    setTab(InfoSection.Orders);
-  }, []);
+  const onViewOrders = useCallback(
+    (market: string) => {
+      navigate(`${AppRoute.Trade}/${market}`, {
+        state: {
+          from: AppRoute.Trade,
+        },
+      });
+      setView(PanelView.CurrentMarket);
+      setTab(InfoSection.Orders);
+    },
+    [navigate]
+  );
 
   const tabItems = useMemo(
     () => [
@@ -238,6 +241,8 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
       //   ),
       // },
     ],
+    // TODO - not sure if it's necessary but lots of the actual deps are missing from the deps list
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       stringGetter,
       currentMarketId,

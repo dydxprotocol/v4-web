@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { Story } from '@ladle/react';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { PositionSide } from '@/constants/trade';
 

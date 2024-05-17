@@ -1,10 +1,8 @@
-import { useMemo } from 'react';
-
 import { curveNatural } from '@visx/curve';
 import { LinearGradient } from '@visx/gradient';
 import { ParentSize } from '@visx/responsive';
 import { Axis, LineSeries, XYChart, buildChartTheme, darkTheme } from '@visx/xychart';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 interface SparklineChartProps<Datum extends {}> {
   data: Datum[];

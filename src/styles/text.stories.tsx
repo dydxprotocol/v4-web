@@ -1,5 +1,5 @@
 import type { Story } from '@ladle/react';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

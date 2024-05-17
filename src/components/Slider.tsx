@@ -1,5 +1,5 @@
 import { Root, Thumb, Track } from '@radix-ui/react-slider';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 type ElementProps = {
   value: number;

@@ -16,6 +16,7 @@ import {
   ValidatorConfig,
   encodeJson,
   type LocalWallet,
+  type SelectedGasDenom,
 } from '@dydxprotocol/v4-client-js';
 import Long from 'long';
 
@@ -153,6 +154,10 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       this.store?.dispatch(setInitializationError(error?.message ?? 'Unknown error'));
       log('DydxChainTransactions/connectNetwork', error);
     }
+  }
+
+  setSelectedGasDenom(denom: SelectedGasDenom) {
+    this.compositeClient?.setSelectedGasDenom(denom);
   }
 
   parseToPrimitives<T>(x: T): T {

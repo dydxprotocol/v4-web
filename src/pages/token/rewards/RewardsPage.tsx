@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
@@ -64,16 +64,6 @@ const RewardsPage = () => {
 };
 
 export default RewardsPage;
-const $MobileHeader = styled.header`
-  ${layoutMixins.contentSectionDetachedScrollable}
-  ${layoutMixins.stickyHeader}
-  z-index: 2;
-  padding: 1.25rem 0;
-
-  font: var(--font-large-medium);
-  color: var(--color-text-2);
-  background-color: var(--color-layer-2);
-`;
 
 const $GridLayout = styled.div<{ showMigratePanel?: boolean }>`
   --gap: 1.5rem;

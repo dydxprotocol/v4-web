@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useEnsName } from 'wagmi';
 
 import { TransferType } from '@/constants/abacus';
@@ -139,7 +139,7 @@ const Profile = () => {
       <$Header>
         <$ProfileIcon />
         <div>
-          <$Address>{isConnected ? ensName || truncateAddress(dydxAddress) : '-'}</$Address>
+          <$Address>{isConnected ? ensName ?? truncateAddress(dydxAddress) : '-'}</$Address>
           {isConnected && walletType ? (
             <$SubHeader>
               <$ConnectedIcon />
@@ -164,6 +164,7 @@ const Profile = () => {
               {action}
             </Link>
           ) : (
+            // eslint-disable-next-line jsx-a11y/label-has-associated-control
             <label key={key}>{action}</label>
           );
         })}

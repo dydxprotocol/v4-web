@@ -1,4 +1,4 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { Details, type DetailsItem } from '@/components/Details';
 import { WithReceipt } from '@/components/WithReceipt';

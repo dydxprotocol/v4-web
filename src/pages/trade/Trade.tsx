@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 
 import { useSelector } from 'react-redux';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { TradeLayouts } from '@/constants/layout';
 

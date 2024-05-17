@@ -1,5 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
+// TODO - fix cycle
+// eslint-disable-next-line import/no-cycle
 import abacusStateManager from '@/lib/abacus';
 
 import { accountSlice } from './account';

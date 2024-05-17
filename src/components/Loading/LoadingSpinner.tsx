@@ -1,4 +1,4 @@
-import styled, { keyframes, type AnyStyledComponent } from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

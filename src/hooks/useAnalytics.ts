@@ -3,7 +3,11 @@ import { useEffect, useState } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 
-import { AnalyticsEvent, AnalyticsUserProperty } from '@/constants/analytics';
+import {
+  AnalyticsEvent,
+  AnalyticsUserProperty,
+  lastSuccessfulWebsocketRequestByOrigin,
+} from '@/constants/analytics';
 import type { DialogTypes } from '@/constants/dialogs';
 
 import { calculateOnboardingStep } from '@/state/accountCalculators';
@@ -219,6 +223,3 @@ export const useAnalytics = () => {
     }
   }, [selectedOrderType]);
 };
-
-export const lastSuccessfulRestRequestByOrigin: Record<URL['origin'], number> = {};
-export const lastSuccessfulWebsocketRequestByOrigin: Record<URL['origin'], number> = {};

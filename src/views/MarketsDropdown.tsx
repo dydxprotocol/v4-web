@@ -351,7 +351,8 @@ const $Table = styled(Table)`
 
   tfoot {
     --stickyArea-totalInsetTop: 0px;
-    --stickyArea-totalInsetBottom: 3px; //xcxc
+    --stickyArea-totalInsetBottom: 3px; 
+    
     tr {
       height: var(--stickyArea-bottomHeight);
     }

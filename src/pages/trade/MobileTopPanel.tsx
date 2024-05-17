@@ -28,6 +28,7 @@ enum Tab {
   Depth = 'Depth',
   Funding = 'Funding',
   OrderBook = 'OrderBook',
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   LiveTrades = 'LiveTrades',
 }
 

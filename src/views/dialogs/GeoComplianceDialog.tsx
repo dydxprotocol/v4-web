@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ComplianceAction, Nullable, ParsingError } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';

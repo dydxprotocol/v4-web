@@ -46,35 +46,34 @@ export const Fees = () => {
   }, [userStats]);
 
   const AdditionalConditions = useCallback(
-    ({
-      totalShare,
-      makerShare,
-      isAdditional,
-    }: {
+    (conditions: {
       totalShare: Nullable<number>;
       makerShare: Nullable<number>;
       isAdditional?: boolean;
-    }) => (
-      <$AdditionalConditions>
-        {!isAdditional && !totalShare && !makerShare && <Output type={OutputType.Text} />}
-        {!!totalShare && (
-          <$AdditionalConditionsText>
-            {isAdditional && stringGetter({ key: STRING_KEYS.AND })}{' '}
-            {stringGetter({ key: STRING_KEYS.EXCHANGE_MARKET_SHARE })}{' '}
-            <$Highlighted>{'>'}</$Highlighted>{' '}
-            <$HighlightOutput type={OutputType.Percent} value={totalShare} fractionDigits={0} />
-          </$AdditionalConditionsText>
-        )}
-        {!!makerShare && (
-          <$AdditionalConditionsText>
-            {isAdditional && stringGetter({ key: STRING_KEYS.AND })}{' '}
-            {stringGetter({ key: STRING_KEYS.MAKER_MARKET_SHARE })}{' '}
-            <$Highlighted>{'>'}</$Highlighted>{' '}
-            <$HighlightOutput type={OutputType.Percent} value={makerShare} fractionDigits={0} />
-          </$AdditionalConditionsText>
-        )}
-      </$AdditionalConditions>
-    ),
+    }) => {
+      const { totalShare, makerShare, isAdditional } = conditions;
+      return (
+        <$AdditionalConditions>
+          {!isAdditional && !totalShare && !makerShare && <Output type={OutputType.Text} />}
+          {!!totalShare && (
+            <$AdditionalConditionsText>
+              {isAdditional && stringGetter({ key: STRING_KEYS.AND })}{' '}
+              {stringGetter({ key: STRING_KEYS.EXCHANGE_MARKET_SHARE })}{' '}
+              <$Highlighted>{'>'}</$Highlighted>{' '}
+              <$HighlightOutput type={OutputType.Percent} value={totalShare} fractionDigits={0} />
+            </$AdditionalConditionsText>
+          )}
+          {!!makerShare && (
+            <$AdditionalConditionsText>
+              {isAdditional && stringGetter({ key: STRING_KEYS.AND })}{' '}
+              {stringGetter({ key: STRING_KEYS.MAKER_MARKET_SHARE })}{' '}
+              <$Highlighted>{'>'}</$Highlighted>{' '}
+              <$HighlightOutput type={OutputType.Percent} value={makerShare} fractionDigits={0} />
+            </$AdditionalConditionsText>
+          )}
+        </$AdditionalConditions>
+      );
+    },
     [stringGetter]
   );
 
@@ -100,7 +99,7 @@ export const Fees = () => {
 
         <$FeeTable
           label="Fee Tiers"
-          data={feeTiers || []}
+          data={feeTiers ?? []}
           getRowKey={(row: FeeTier) => row.tier}
           getRowAttributes={(row: FeeTier) => ({
             'data-yours': row.tier === userFeeTier,
@@ -128,14 +127,14 @@ export const Fees = () => {
                 getCellValue: (row) => row.volume,
                 label: stringGetter({ key: STRING_KEYS.VOLUME_30D }),
                 allowsSorting: false,
-                renderCell: ({ symbol, volume, makerShare, totalShare }) => (
+                renderCell: ({ symbol, volume: vol, makerShare, totalShare }) => (
                   <>
                     <span>{`${
                       symbol in EQUALITY_SYMBOL_MAP
                         ? EQUALITY_SYMBOL_MAP[symbol as keyof typeof EQUALITY_SYMBOL_MAP]
                         : symbol
                     } `}</span>
-                    <$HighlightOutput type={OutputType.CompactFiat} value={volume} />
+                    <$HighlightOutput type={OutputType.CompactFiat} value={vol} />
                     {isTablet &&
                       AdditionalConditions({ totalShare, makerShare, isAdditional: true })}
                   </>
