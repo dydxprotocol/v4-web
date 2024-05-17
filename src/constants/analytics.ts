@@ -214,7 +214,7 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
         toAmount: number | undefined;
         timeSpent: Record<string, number> | number | undefined;
         txHash: string;
-        status: string;
+        status: 'new' | 'success' | 'error';
         triggeredAt: number | undefined;
       }
     : never;
