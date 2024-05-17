@@ -31,7 +31,7 @@ export const useWithdrawalInfo = ({
   const { getWithdrawalAndTransferGatingStatus, getWithdrawalCapacityByDenom } = useDydxClient();
   const { usdcDenom, usdcDecimals } = useTokenConfigs();
   const apiState = useSelector(getApiState, shallowEqual);
-  const { height } = apiState || {};
+  const { height } = apiState ?? {};
   const selectedLocale = useSelector(getSelectedLocale);
   const dispatch = useDispatch();
   const { withdrawalSafetyEnabled } = useEnvFeatures();
@@ -45,6 +45,7 @@ export const useWithdrawalInfo = ({
         return JSON.parse(encodeJson(response, ByteArrayEncoding.BIGINT));
       } catch (error) {
         log('useWithdrawalInfo/getWithdrawalCapacityByDenom', error);
+        return undefined;
       }
     },
     refetchInterval: 60_000,
@@ -59,6 +60,7 @@ export const useWithdrawalInfo = ({
         return await getWithdrawalAndTransferGatingStatus();
       } catch (error) {
         log('useWithdrawalInfo/getWithdrawalAndTransferGatingStatus', error);
+        return undefined;
       }
     },
     refetchInterval: 60_000,

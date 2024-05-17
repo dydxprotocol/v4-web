@@ -8,6 +8,8 @@ import { Themes } from '@/styles/themes';
 import { AppColorMode, AppTheme, AppThemeSetting, AppThemeSystemSetting } from '@/state/configs';
 import { getAppColorMode, getAppThemeSetting } from '@/state/configsSelectors';
 
+import { assertNever } from '@/lib/assertNever';
+
 export const AppThemeAndColorModeProvider = ({ ...props }) => {
   return <ThemeProvider theme={useAppThemeAndColorModeContext()} {...props} />;
 };
@@ -42,6 +44,9 @@ export const useAppThemeAndColorModeContext = () => {
       case AppTheme.Dark:
       case AppTheme.Light:
         return themeSetting;
+      default:
+        assertNever(themeSetting, true);
+        return systemPreference;
     }
   };
 

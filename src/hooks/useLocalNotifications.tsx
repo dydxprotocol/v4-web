@@ -92,9 +92,11 @@ const useLocalNotificationsContext = () => {
   useQuery({
     queryKey: 'getTransactionStatus',
     queryFn: async () => {
-      const processTransferNotifications = async (transferNotifications: TransferNotifcation[]) => {
+      const processTransferNotifications = async (
+        transferNotificationsInner: TransferNotifcation[]
+      ) => {
         const newTransferNotifications = await Promise.all(
-          transferNotifications.map(async (transferNotification) => {
+          transferNotificationsInner.map(async (transferNotification) => {
             const {
               txHash,
               toChainId,

@@ -250,8 +250,9 @@ export const useChartLines = ({
       .setBodyTextColor(textColor)
       .setQuantityTextColor(textButtonColor);
 
-    maybeQuantityColor &&
+    if (maybeQuantityColor != null) {
       line.setLineColor(maybeQuantityColor).setQuantityBackgroundColor(maybeQuantityColor);
+    }
   };
 
   return { chartLines: chartLinesRef.current };
