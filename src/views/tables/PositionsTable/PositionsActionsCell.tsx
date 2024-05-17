@@ -48,7 +48,7 @@ export const PositionsActionsCell = ({
 
   const currentMarketId = useSelector(getCurrentMarketId);
   const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog);
-  const { type: tradeBoxDialogType } = activeTradeBoxDialog || {};
+  const { type: tradeBoxDialogType } = activeTradeBoxDialog ?? {};
 
   const onCloseButtonToggle = (isPressed: boolean) => {
     navigate(`${AppRoute.Trade}/${marketId}`);

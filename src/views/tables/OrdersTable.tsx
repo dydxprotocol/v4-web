@@ -11,6 +11,7 @@ import { Asset, Nullable, SubaccountOrder } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
+import { EMPTY_ARR } from '@/constants/objects';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -53,6 +54,7 @@ import {
   isOrderStatusClearable,
 } from '@/lib/orders';
 import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { OrderStatusIcon } from '../OrderStatusIcon';
 import { OrderActionsCell } from './OrdersTable/OrderActionsCell';
@@ -313,12 +315,12 @@ export const OrdersTable = ({
   const { isTablet } = useBreakpoints();
 
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
-  const marketOrders = useSelector(getCurrentMarketOrders, shallowEqual) || [];
-  const allOrders = useSelector(getSubaccountUnclearedOrders, shallowEqual) || [];
+  const marketOrders = useSelector(getCurrentMarketOrders, shallowEqual) ?? EMPTY_ARR;
+  const allOrders = useSelector(getSubaccountUnclearedOrders, shallowEqual) ?? EMPTY_ARR;
   const orders = currentMarket ? marketOrders : allOrders;
 
-  const allPerpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
-  const allAssets = useSelector(getAssets, shallowEqual) || {};
+  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
 
   const hasUnseenOrderUpdates = useSelector(getHasUnseenOrderUpdates);
 
