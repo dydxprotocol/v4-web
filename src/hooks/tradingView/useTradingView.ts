@@ -2,7 +2,11 @@ import React, { useEffect, useState } from 'react';
 
 import BigNumber from 'bignumber.js';
 import isEmpty from 'lodash/isEmpty';
-import { LanguageCode, ResolutionString, widget } from 'public/tradingview/charting_library';
+import {
+  LanguageCode,
+  ResolutionString,
+  widget as Widget,
+} from 'public/tradingview/charting_library';
 import { shallowEqual, useSelector } from 'react-redux';
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
@@ -86,7 +90,7 @@ export const useTradingView = ({
       };
 
       // eslint-disable-next-line new-cap
-      const tvChartWidget = new widget(options);
+      const tvChartWidget = new Widget(options);
       tvWidgetRef.current = tvChartWidget;
 
       tvWidgetRef.current.onChartReady(() => {
