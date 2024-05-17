@@ -417,22 +417,20 @@ export const PositionsTable = ({
     () =>
       positions.map((position: SubaccountPosition): PositionTableRow => {
         // object splat ... doesn't copy getter defined properties
-        return Object.assign(
-          {
-            tickSizeDecimals:
-              perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
-            asset: assets?.[position.assetId],
-            oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
-            fundingRate: perpetualMarkets?.[position.id]?.perpetual?.nextFundingRate,
-            stopLossOrders: allStopLossOrders.filter(
-              (order: SubaccountOrder) => order.marketId === position.id
-            ),
-            takeProfitOrders: allTakeProfitOrders.filter(
-              (order: SubaccountOrder) => order.marketId === position.id
-            ),
-          },
-          position
-        );
+        return {
+          tickSizeDecimals:
+            perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
+          asset: assets?.[position.assetId],
+          oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
+          fundingRate: perpetualMarkets?.[position.id]?.perpetual?.nextFundingRate,
+          stopLossOrders: allStopLossOrders.filter(
+            (order: SubaccountOrder) => order.marketId === position.id
+          ),
+          takeProfitOrders: allTakeProfitOrders.filter(
+            (order: SubaccountOrder) => order.marketId === position.id
+          ),
+          ...position,
+        };
       }),
     [positions, perpetualMarkets, assets, allStopLossOrders, allTakeProfitOrders]
   );

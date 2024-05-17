@@ -94,7 +94,7 @@ export const PositionsActionsCell = ({
       {showClosePositionAction && (
         <$CloseButtonToggle
           key="closepositions"
-          isToggle={true}
+          isToggle
           isPressed={
             tradeBoxDialogType === TradeBoxDialogTypes.ClosePosition && currentMarketId === marketId
           }
