@@ -34,7 +34,9 @@ export default () => {
           </Styled.InnerRow>
           <DYDXBalancePanel />
         </Styled.Row>
-        <ValidatorsTable />
+        <Styled.TableWrapper>
+          <ValidatorsTable />
+        </Styled.TableWrapper>
       </Styled.ContentWrapper>
     </DetachedSection>
   );
@@ -72,3 +74,5 @@ Styled.InnerRow = styled.div`
   grid-template-columns: 1fr 1fr;
   height: fit-content;
 `;
+
+Styled.TableWrapper = styled.div``;

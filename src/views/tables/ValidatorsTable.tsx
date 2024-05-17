@@ -57,6 +57,7 @@ export const ValidatorsTable = () => {
       <Styled.Toolbar>All Validators</Styled.Toolbar>
       <Styled.Table
         withInnerBorders
+        withOuterBorder
         getRowKey={(row) => row.operatorAddress}
         columns={columns}
         data={validatorsData?.validators ?? []}
@@ -78,6 +79,9 @@ Styled.Toolbar = styled(Toolbar)`
 
 Styled.Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
+  --bordered-content-border-radius: 0rem;
+  width: calc(100% - 2px);
+  margin-left: 1px;
 `;
 
 Styled.ValidatorCell = styled(TableCell)`
