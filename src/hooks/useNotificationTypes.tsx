@@ -514,7 +514,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const orders = useSelector(getSubaccountOrders, shallowEqual) ?? [];
 
       return (orderClientId: string) => {
-        const order = orders.find((ordr) => ordr.clientId?.toString() === orderClientId);
+        const order = orders.find((o) => o.clientId?.toString() === orderClientId);
         if (order) {
           dispatch(
             openDialog({
