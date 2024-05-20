@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_APP_ENVIRONMENT, type DydxNetwork } from '@/constants/networks';
 
+// eslint-disable-next-line import/no-cycle
 import { useLocalStorage } from '@/hooks';
 
 import { initializeLocalization } from '@/state/app';

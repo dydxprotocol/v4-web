@@ -52,7 +52,7 @@ export const useDrawOrderbook = ({
   const canvas = canvasRef.current;
   const currentOrderbookMap = useSelector(getCurrentMarketOrderbookMap, shallowEqual);
   const { stepSizeDecimals = TOKEN_DECIMALS, tickSizeDecimals = SMALL_USD_DECIMALS } =
-    useSelector(getCurrentMarketConfig, shallowEqual) || {};
+    useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
   const prevData = useRef<typeof data>(data);
   const theme = useAppThemeAndColorModeContext();
 
@@ -60,7 +60,7 @@ export const useDrawOrderbook = ({
    * Scale canvas using device pixel ratio to unblur drawn text
    * @url https://stackoverflow.com/questions/15661339/how-do-i-fix-blurry-text-in-my-html5-canvas/65124939#65124939
    * @returns adjusted canvas width/height/rowHeight used in coordinates for drawing
-   **/
+   * */
   const { canvasWidth, canvasHeight, rowHeight } = useMemo(() => {
     const ratio = window.devicePixelRatio || 1;
 
@@ -97,7 +97,7 @@ export const useDrawOrderbook = ({
     depthOrSizeValue,
     gradientMultiplier,
     histogramAccentColor,
-    histogramSide,
+    histogramSide: inHistogramSide,
     rekt,
   }: {
     barType: 'depth' | 'size';
@@ -120,7 +120,7 @@ export const useDrawOrderbook = ({
       barWidth,
       canvasWidth,
       gradientMultiplier,
-      histogramSide,
+      histogramSide: inHistogramSide,
     });
 
     // Gradient
@@ -146,7 +146,7 @@ export const useDrawOrderbook = ({
         y,
         bar.x2,
         rowHeight - 2,
-        histogramSide === 'right' ? [2, 0, 0, 2] : [0, 2, 2, 0]
+        inHistogramSide === 'right' ? [2, 0, 0, 2] : [0, 2, 2, 0]
       );
     } else {
       ctx.rect(bar.x1, y, bar.x2, rowHeight - 2);

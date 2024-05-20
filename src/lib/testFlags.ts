@@ -12,13 +12,13 @@ class TestFlags {
       const queryParamsString = hash.substring(queryIndex + 1);
       const params = new URLSearchParams(queryParamsString);
 
-      params.forEach(([key, value]) => {
+      params.forEach((value, key) => {
         this.queryParams[key.toLowerCase()] = value;
       });
     } else {
       const params = new URLSearchParams(window.location.search);
 
-      params.forEach(([key, value]) => {
+      params.forEach((value, key) => {
         this.queryParams[key.toLowerCase()] = value;
       });
     }

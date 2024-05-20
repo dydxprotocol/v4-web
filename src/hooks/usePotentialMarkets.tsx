@@ -57,11 +57,11 @@ export const usePotentialMarketsContext = () => {
       fetch(POTENTIAL_MARKETS_FILE_PATH)
         .then((response) => response.json())
         .then((data: Record<string, Omit<NewMarketProposal, 'baseAsset'>>) => {
-          const potentialMarkets = Object.entries(data).map(([key, value]) => ({
+          const newPotentialMarkets = Object.entries(data).map(([key, value]) => ({
             ...value,
             baseAsset: key,
           }));
-          setPotentialMarkets(potentialMarkets);
+          setPotentialMarkets(newPotentialMarkets);
         });
     } catch (error) {
       log('usePotentialMarkets/potentialMarkets', error);

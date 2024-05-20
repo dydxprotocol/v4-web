@@ -25,10 +25,10 @@ export const useChartMarketAndResolution = ({
 }) => {
   const dispatch = useDispatch();
 
-  const currentMarketId: string = useSelector(getCurrentMarketId) || DEFAULT_MARKETID;
+  const currentMarketId: string = useSelector(getCurrentMarketId) ?? DEFAULT_MARKETID;
 
   const selectedResolution: string =
-    useSelector(getSelectedResolutionForMarket(currentMarketId)) || DEFAULT_RESOLUTION;
+    useSelector(getSelectedResolutionForMarket(currentMarketId)) ?? DEFAULT_RESOLUTION;
 
   const chart = isWidgetReady ? tvWidget?.chart() : undefined;
   const chartResolution = chart?.resolution?.();
@@ -38,7 +38,7 @@ export const useChartMarketAndResolution = ({
    */
   useEffect(() => {
     if (isWidgetReady && currentMarketId !== tvWidget?.activeChart().symbol()) {
-      const resolution = savedResolution || selectedResolution;
+      const resolution = savedResolution ?? selectedResolution;
       tvWidget?.setSymbol(currentMarketId, resolution as ResolutionString, () => {});
     }
   }, [currentMarketId, isWidgetReady]);
