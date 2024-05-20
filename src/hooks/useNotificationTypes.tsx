@@ -214,9 +214,10 @@ export const notificationTypes: NotificationTypeConfig[] = [
           const icon = <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />;
 
           const transferType =
-            type ?? fromChainId === selectedDydxChainId
+            type ??
+            (fromChainId === selectedDydxChainId
               ? TransferNotificationTypes.Withdrawal
-              : TransferNotificationTypes.Deposit;
+              : TransferNotificationTypes.Deposit);
 
           const title = stringGetter({
             key: {
