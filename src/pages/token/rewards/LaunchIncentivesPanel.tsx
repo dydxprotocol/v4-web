@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
@@ -25,7 +25,7 @@ import { Tag, TagSize } from '@/components/Tag';
 import { markLaunchIncentivesSeen } from '@/state/configs';
 import { openDialog } from '@/state/dialogs';
 
-import { log } from '@/lib/telemetry';
+import { wrapAndLogError } from '@/lib/asyncUtils';
 
 export const LaunchIncentivesPanel = ({ className }: { className?: string }) => {
   const { isNotTablet } = useBreakpoints();
@@ -74,8 +74,8 @@ const EstimatedRewards = () => {
   const { dydxAddress } = useAccounts();
 
   const { data: seasonNumber } = useQuery({
-    queryKey: 'chaos_labs_season_number',
-    queryFn: async () => {
+    queryKey: ['chaos_labs_season_number'],
+    queryFn: wrapAndLogError(async () => {
       const resp = await fetch('https://cloud.chaoslabs.co/query/ccar-perpetuals', {
         method: 'POST',
         headers: {
@@ -95,8 +95,7 @@ const EstimatedRewards = () => {
       });
       const seasons = (await resp.json())?.data?.tradingSeasons;
       return seasons && seasons.length > 0 ? seasons[seasons.length - 1].label : undefined;
-    },
-    onError: (error: Error) => log('LaunchIncentives/fetchSeasonNumber', error),
+    }, 'LaunchIncentives/fetchSeasonNumber'),
   });
 
   const { data, isLoading } = useQueryChaosLabsIncentives({ dydxAddress, season: seasonNumber });

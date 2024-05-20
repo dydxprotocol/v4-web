@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import type { PerpetualMarketSparklineResponse } from '@/constants/indexer';
 import { timeUnits } from '@/constants/time';
@@ -33,7 +33,7 @@ export const usePerpetualMarketSparklines = (props: UsePerpetualMarketSparklines
     },
     refetchInterval,
     refetchOnWindowFocus: false,
-    cacheTime: 1_000 * 60 * 5, // 5 minutes
+    gcTime: 1_000 * 60 * 5, // 5 minutes
     staleTime: 1_000 * 60 * 10, // 10 minutes
   });
 

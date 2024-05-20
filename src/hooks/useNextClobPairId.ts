@@ -12,7 +12,7 @@ import {
   TYPE_URL_MSG_DELAY_MESSAGE,
   TYPE_URL_MSG_UPDATE_CLOB_PAIR,
 } from '@dydxprotocol/v4-client-js';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import type { PerpetualMarketResponse } from '@/constants/indexer';
 
@@ -71,7 +71,7 @@ export const useNextClobPairId = () => {
     useDydxClient();
 
   const { data: perpetualMarkets, status: perpetualMarketsStatus } = useQuery({
-    queryKey: 'requestAllPerpetualMarkets',
+    queryKey: ['requestAllPerpetualMarkets'],
     queryFn: requestAllPerpetualMarkets,
     refetchInterval: 60_000,
     staleTime: 60_000,
@@ -79,7 +79,7 @@ export const useNextClobPairId = () => {
 
   const { data: allGovProposals, status: allGovProposalsStatus } = useQuery({
     enabled: isCompositeClientConnected,
-    queryKey: 'requestAllActiveGovernanceProposals',
+    queryKey: ['requestAllActiveGovernanceProposals'],
     queryFn: () => requestAllGovernanceProposals(),
     refetchInterval: 10_000,
     staleTime: 10_000,

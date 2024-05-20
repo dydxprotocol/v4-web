@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { getChainRevenue } from '@/services';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { shallowEqual, useSelector } from 'react-redux';
 
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
@@ -35,7 +35,7 @@ export const usePerpetualMarketsStats = () => {
       }
     },
     refetchOnWindowFocus: false,
-    cacheTime: 1_000 * 60 * 5, // 5 minutes
+    gcTime: 1_000 * 60 * 5, // 5 minutes
     staleTime: 1_000 * 60 * 10, // 10 minutes
   });
 

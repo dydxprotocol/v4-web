@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect } from 'react';
 
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { AnalyticsEvent } from '@/constants/analytics';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
@@ -90,7 +90,7 @@ const useLocalNotificationsContext = () => {
   );
 
   useQuery({
-    queryKey: 'getTransactionStatus',
+    queryKey: ['getTransactionStatus'],
     queryFn: async () => {
       const processTransferNotifications = async (
         transferNotificationsInner: TransferNotifcation[]
@@ -155,7 +155,7 @@ const useLocalNotificationsContext = () => {
                       toAmount: transferNotification.toAmount,
                       status: 'error',
                       type: transferNotification.type,
-                      txHash: txHash,
+                      txHash,
                     });
                   } else {
                     transferNotification.errorCount = errorCount ? errorCount + 1 : 1;
@@ -172,6 +172,7 @@ const useLocalNotificationsContext = () => {
       };
       const newTransferNotifications = await processTransferNotifications(transferNotifications);
       setTransferNotifications(newTransferNotifications);
+      return newTransferNotifications;
     },
     refetchInterval: TRANSFER_STATUS_FETCH_INTERVAL,
   });

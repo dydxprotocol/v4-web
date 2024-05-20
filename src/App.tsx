@@ -2,8 +2,8 @@ import { lazy, Suspense, useMemo } from 'react';
 
 import { PrivyProvider } from '@privy-io/react-auth';
 import { PrivyWagmiConnector } from '@privy-io/wagmi-connector';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
-import { QueryClient, QueryClientProvider } from 'react-query';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { WagmiConfig } from 'wagmi';

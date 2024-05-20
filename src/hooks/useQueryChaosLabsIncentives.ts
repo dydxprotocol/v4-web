@@ -1,8 +1,8 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import type { DydxAddress } from '@/constants/wallets';
 
-import { log } from '@/lib/telemetry';
+import { wrapAndLogError } from '@/lib/asyncUtils';
 
 type ChaosLabsIncentivesResponse = {
   dydxRewards: number;
@@ -20,13 +20,12 @@ export const useQueryChaosLabsIncentives = ({
   return useQuery<ChaosLabsIncentivesResponse | undefined, Error>({
     enabled: !!dydxAddress,
     queryKey: ['launch_incentives_rewards', dydxAddress, season],
-    queryFn: async () => {
+    queryFn: wrapAndLogError(async () => {
       if (!dydxAddress) return undefined;
       const resp = await fetch(
         `https://cloud.chaoslabs.co/query/api/dydx/points/${dydxAddress}?n=${season}`
       );
       return resp.json();
-    },
-    onError: (error: Error) => log('LaunchIncentives/fetchPoints', error),
+    }, 'LaunchIncentives/fetchPoints'),
   });
 };

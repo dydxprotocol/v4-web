@@ -2,8 +2,8 @@ import { useEffect, useMemo } from 'react';
 
 import { encodeJson } from '@dydxprotocol/v4-client-js';
 import { ByteArrayEncoding } from '@dydxprotocol/v4-client-js/build/src/lib/helpers';
+import { useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
-import { useQuery } from 'react-query';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import { DialogTypes } from '@/constants/dialogs';
@@ -38,7 +38,7 @@ export const useWithdrawalInfo = ({
 
   const { data: usdcWithdrawalCapacity } = useQuery({
     enabled: withdrawalSafetyEnabled,
-    queryKey: 'usdcWithdrawalCapacity',
+    queryKey: ['usdcWithdrawalCapacity'],
     queryFn: async () => {
       try {
         const response = await getWithdrawalCapacityByDenom({ denom: usdcDenom });
@@ -54,7 +54,7 @@ export const useWithdrawalInfo = ({
 
   const { data: withdrawalAndTransferGatingStatus } = useQuery({
     enabled: withdrawalSafetyEnabled,
-    queryKey: 'withdrawalTransferGateStatus',
+    queryKey: ['withdrawalTransferGateStatus'],
     queryFn: async () => {
       try {
         return await getWithdrawalAndTransferGatingStatus();
