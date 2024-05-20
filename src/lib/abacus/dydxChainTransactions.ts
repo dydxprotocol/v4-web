@@ -12,7 +12,6 @@ import {
   OrderSide,
   OrderTimeInForce,
   OrderType,
-  SelectedGasDenom,
   SubaccountClient,
   ValidatorConfig,
   encodeJson,
@@ -222,7 +221,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       }, UNCOMMITTED_ORDER_TIMEOUT_MS);
 
       const subaccountClient = new SubaccountClient(this.localWallet, subaccountNumber);
-      console.log('params', params, subaccountClient, subaccountNumber === 128);
+      console.log('params', params, subaccountClient);
 
       // Place order
       const tx = await this.compositeClient?.placeOrder(
@@ -559,8 +558,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
     }
 
     try {
-      console.log(this.compositeClient.selectedGasDenom);
-
       const tx = await this.compositeClient.transferToSubaccount(
         new SubaccountClient(this.localWallet, params.subaccountNumber),
         params.destinationAddress,
@@ -605,12 +602,12 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
           callback(result);
           break;
         }
-        case TransactionType.SimulateWithdraw: {
+        case TransactionType.simulateWithdraw: {
           const result = await this.simulateWithdrawTransaction(params);
           callback(result);
           break;
         }
-        case TransactionType.SimulateTransferNativeToken: {
+        case TransactionType.simulateTransferNativeToken: {
           const result = await this.simulateTransferNativeTokenTransaction(params);
           callback(result);
           break;

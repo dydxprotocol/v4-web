@@ -32,6 +32,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { isMarketOrderType, isOrderStatusClearable, relativeTimeString } from '@/lib/orders';
+import { testFlags } from '@/lib/testFlags';
 
 type ElementProps = {
   orderId: string;
@@ -190,7 +191,12 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
       label: stringGetter({ key: STRING_KEYS.CREATED_AT }),
       value: renderOrderTime({ timeInMs: createdAtMilliseconds }),
     },
-  ].filter((item) => Boolean(item.value)) as DetailsItem[];
+    testFlags.isolatedMargin && {
+      key: 'subaccount',
+      label: 'Subaccount # (Debug Only)',
+      value: subaccountNumber,
+    },
+  ].filter((item) => !!item && Boolean(item.value)) as DetailsItem[];
 
   const onCancelClick = () => {
     cancelOrder({ orderId });

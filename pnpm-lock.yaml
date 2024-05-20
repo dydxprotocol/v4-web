@@ -30,11 +30,11 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: file:/Users/jaredvu/documents/v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.20.tgz
-    version: file:../../documents/v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.20.tgz
+    specifier: file:/Users/jaredvu/documents/v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.23.tgz
+    version: file:../../documents/v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.23.tgz
   '@dydxprotocol/v4-client-js':
-    specifier: file:/Users/jaredvu/Documents/v4-clients/v4-client-js/dydxprotocol-v4-client-js-1.1.11.tgz
-    version: file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-1.1.11.tgz
+    specifier: ^1.1.13
+    version: 1.1.13
   '@dydxprotocol/v4-localization':
     specifier: ^1.1.82
     version: 1.1.82
@@ -1589,6 +1589,35 @@ packages:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
+
+  /@dydxprotocol/v4-client-js@1.1.13:
+    resolution: {integrity: sha512-pANwM4uPficmLuVWkLNIhlWmrtjQQMPfLWh8b12yBC+DpDA3BWhE/BzBD8VUN9J96/HZekRXI1L9+sVSYS3mOw==}
+    dependencies:
+      '@cosmjs/amino': 0.32.2
+      '@cosmjs/encoding': 0.32.2
+      '@cosmjs/math': 0.32.2
+      '@cosmjs/proto-signing': 0.32.2
+      '@cosmjs/stargate': 0.32.2
+      '@cosmjs/tendermint-rpc': 0.32.2
+      '@cosmjs/utils': 0.32.2
+      '@dydxprotocol/v4-proto': 5.0.0-dev.0
+      '@osmonauts/lcd': 0.6.0
+      '@scure/bip32': 1.3.2
+      '@scure/bip39': 1.2.1
+      axios: 1.1.3
+      bech32: 1.1.4
+      bignumber.js: 9.1.1
+      cosmjs-types: 0.9.0
+      ethereum-cryptography: 2.1.2
+      ethers: 6.6.1
+      long: 4.0.0
+      protobufjs: 6.11.4
+      ws: 8.15.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - utf-8-validate
+    dev: false
 
   /@dydxprotocol/v4-localization@1.1.82:
     resolution: {integrity: sha512-gtxAf4BBixeQx/3C6Sir9x+L3sKfwQl5IGWbxvLGfc+AH3RJjLT+GsrPLLIBUpAoKZgDCXkDZnv0z6TfZSvNWA==}
@@ -20527,42 +20556,11 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
 
-  file:../../documents/v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.20.tgz:
-    resolution: {integrity: sha512-AcvBhzqBIlFtafxF6/hmuYTiKkHZ/1eCl+vcjx2kkInW+Iv3oIGhOGymDVeERDZ7wxx/9dTqB/0FDtERpyEhCw==, tarball: file:../../documents/v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.20.tgz}
+  file:../../documents/v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.23.tgz:
+    resolution: {integrity: sha512-sdbI2iyft6glNwDXC1Kukx1APWA6WtJ9y1uKOa5zBpIP9TT8hJ/7XJ64wpD1gavIgvLMHee56G2HR7HwUHG3PA==, tarball: file:../../documents/v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.23.tgz}
     name: '@dydxprotocol/v4-abacus'
-    version: 1.7.20
+    version: 1.7.23
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
-    dev: false
-
-  file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-1.1.11.tgz:
-    resolution: {integrity: sha512-fDv9hhTqsPV61XH538vfE3OhNLHjArsQvCKNi+Cde0APys2jUv0SxBdOFqpC6+HATgxZaz2z5warah5YbGmjKQ==, tarball: file:../v4-clients/v4-client-js/dydxprotocol-v4-client-js-1.1.11.tgz}
-    name: '@dydxprotocol/v4-client-js'
-    version: 1.1.11
-    dependencies:
-      '@cosmjs/amino': 0.32.2
-      '@cosmjs/encoding': 0.32.2
-      '@cosmjs/math': 0.32.2
-      '@cosmjs/proto-signing': 0.32.2
-      '@cosmjs/stargate': 0.32.2
-      '@cosmjs/tendermint-rpc': 0.32.2
-      '@cosmjs/utils': 0.32.2
-      '@dydxprotocol/v4-proto': 5.0.0-dev.0
-      '@osmonauts/lcd': 0.6.0
-      '@scure/bip32': 1.3.2
-      '@scure/bip39': 1.2.1
-      axios: 1.1.3
-      bech32: 1.1.4
-      bignumber.js: 9.1.1
-      cosmjs-types: 0.9.0
-      ethereum-cryptography: 2.1.2
-      ethers: 6.6.1
-      long: 4.0.0
-      protobufjs: 6.11.4
-      ws: 8.15.1(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-    transitivePeerDependencies:
-      - bufferutil
-      - debug
-      - utf-8-validate
     dev: false
