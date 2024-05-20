@@ -5,8 +5,9 @@ import type { Asset } from '@/constants/abacus';
 import { breakpoints } from '@/styles';
 
 import { AssetIcon } from '@/components/AssetIcon';
-import { TableCell } from '@/components/Table';
 import { Tag } from '@/components/Tag';
+
+import { TableCell } from './TableCell';
 
 interface AssetTableCellProps {
   asset?: Asset;

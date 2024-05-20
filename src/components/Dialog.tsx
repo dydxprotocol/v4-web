@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { PropsWithChildren, useRef } from 'react';
 
 import {
   Close,
@@ -58,19 +58,14 @@ const DialogPortal = ({
   withPortal,
   container,
   children,
-}: {
+}: PropsWithChildren<{
   withPortal: boolean;
   container?: HTMLElement;
-  children: React.ReactNode;
-}) => {
+}>) => {
   const {
     dialogAreaRef: { current },
   } = useDialogArea() ?? { dialogAreaRef: {} };
-  return withPortal ? (
-    <Portal container={container ?? current}>{children}</Portal>
-  ) : (
-    <>{children}</>
-  );
+  return withPortal ? <Portal container={container ?? current}>{children}</Portal> : children;
 };
 
 export const Dialog = ({

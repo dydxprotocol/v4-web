@@ -11,8 +11,8 @@ import { MustBigNumber } from '@/lib/numbers';
 
 import { StoryWrapper } from '.ladle/components';
 
-export const TriangleIndicatorStory: Story<{ value: number }> = (args) => {
-  const [valueBN] = useState(MustBigNumber(args.value));
+export const TriangleIndicatorStory: Story<{ value: number }> = ({ value }: { value: number }) => {
+  const [valueBN] = useState(MustBigNumber(value));
 
   return (
     <StoryWrapper>

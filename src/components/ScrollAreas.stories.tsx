@@ -5,7 +5,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { StoryWrapper } from '.ladle/components';
 
-export const ScrollAreasStory: Story<{}> = (args) => (
+export const ScrollAreasStory: Story<{}> = () => (
   <StoryWrapper>
     <$ScrollArea width="500px" height="700px">
       <p>

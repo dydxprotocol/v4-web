@@ -21,8 +21,13 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
-import { Table, TableCell, TableColumnHeader, type ColumnDef } from '@/components/Table';
-import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import {
+  ColumnDef,
+  MarketTableCell,
+  Table,
+  TableCell,
+  TableColumnHeader,
+} from '@/components/Table';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 

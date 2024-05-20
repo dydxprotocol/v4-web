@@ -25,11 +25,11 @@ import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import {
+  ColumnDef,
   MarketTableCell,
   Table,
   TableCell,
   TableColumnHeader,
-  type ColumnDef,
 } from '@/components/Table';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';

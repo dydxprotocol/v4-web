@@ -10,13 +10,11 @@ export const NavigationMenuStory: Story<
 > = (args) => {
   return (
     <StoryWrapper>
-      <HashRouter
-        children={
-          <NavigationMenu {...args}>
-            <span>Menu</span>
-          </NavigationMenu>
-        }
-      />
+      <HashRouter>
+        <NavigationMenu {...args}>
+          <span>Menu</span>
+        </NavigationMenu>
+      </HashRouter>
     </StoryWrapper>
   );
 };

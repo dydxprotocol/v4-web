@@ -193,7 +193,6 @@ export const PnlChart = ({
   return (
     <$Container className={className} chartBackground={chartBackground}>
       <TimeSeriesChart
-        id="pnl-chart"
         selectedLocale={selectedLocale}
         data={data}
         margin={{
