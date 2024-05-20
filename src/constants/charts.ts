@@ -39,3 +39,9 @@ export type FundingChartDatum = {
   fundingRate: number;
   direction: FundingDirection;
 };
+
+// ------ Trading Rewards Chart ------ //
+export type TradingRewardsDatum = {
+  date: number;
+  amount: number;
+};

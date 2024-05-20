@@ -30,7 +30,7 @@ export const RewardHistoryPanel = () => {
   const stringGetter = useStringGetter();
 
   const [selectedPeriod, setSelectedPeriod] = useState<HistoricalTradingRewardsPeriods>(
-    abacusStateManager.getHistoricalTradingRewardPeriod() || HistoricalTradingRewardsPeriod.WEEKLY
+    abacusStateManager.getHistoricalTradingRewardPeriod() || HistoricalTradingRewardsPeriod.DAILY
   );
 
   const onSelectPeriod = useCallback((periodName: string) => {

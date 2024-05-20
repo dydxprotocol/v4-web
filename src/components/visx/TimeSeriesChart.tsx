@@ -46,6 +46,7 @@ type ThresholdProps<Datum extends {} = {}> = Parameters<typeof Threshold<Datum>>
 type ElementProps<Datum extends {}> = {
   id: string;
   selectedLocale: string;
+  yAxisOrientation?: 'right' | 'left';
   yAxisScaleType?: ScaleConfig['type'];
   data: Datum[];
   series: (Pick<
@@ -97,6 +98,7 @@ type StyleProps = {
 export const TimeSeriesChart = <Datum extends {}>({
   id,
   selectedLocale,
+  yAxisOrientation = 'left',
   yAxisScaleType = 'linear',
   data,
   series,
@@ -354,15 +356,20 @@ export const TimeSeriesChart = <Datum extends {}>({
                         )}
 
                         <Axis
-                          orientation="left"
+                          orientation={yAxisOrientation}
                           numTicks={numTicksY}
                           // hideAxisLine
                           stroke="var(--color-border)"
                           // hideTicks
                           tickStroke="var(--color-border)"
-                          tickFormat={(y) =>
-                            tickFormatY(y, { zoom, zoomDomain, numTicks: numTicksY })
-                          }
+                          tickFormat={(y) => {
+                            console.log(
+                              'xcxc',
+                              y,
+                              tickFormatY(y, { zoom, zoomDomain, numTicks: numTicksY })
+                            );
+                            return tickFormatY(y, { zoom, zoomDomain, numTicks: numTicksY });
+                          }}
                         />
                       </>
                     )}

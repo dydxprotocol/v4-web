@@ -18,41 +18,44 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 export const TradingRewardsChartPanel = () => {
   const stringGetter = useStringGetter();
   const selectedLocale = useSelector(getSelectedLocale);
-  const onboardingState = useSelector(getOnboardingState);
+  const onboardingState = useSelector(getOnboardingState); 
+
+  // xcxc make sure reconnecting wallet refreshes chart data
+
   return (
-    <Panel
-      slotRight={
-        <$TradingRewardsChart
-          selectedLocale={selectedLocale}
-          slotEmpty={
-            <$EmptyChart>
-              <$EmptyCard>
-                {onboardingState !== OnboardingState.AccountConnected ? (
-                  <>
-                    <p>
-                      {stringGetter({
-                        key: {
-                          [OnboardingState.Disconnected]: STRING_KEYS.CONNECT_YOUR_WALLET_EXTENDED,
-                          [OnboardingState.WalletConnected]: STRING_KEYS.MISSING_KEYS_DESCRIPTION,
-                        }[onboardingState],
-                      })}
-                    </p>
-                    <OnboardingTriggerButton />
-                  </>
-                ) : (
-                  'No trading rewards'
-                )}
-              </$EmptyCard>
-            </$EmptyChart>
-          }
-        />
-      }
-    />
+    <Panel>
+      <$TradingRewardsChart
+        selectedLocale={selectedLocale}
+        slotEmpty={
+          <$EmptyChart>
+            <$EmptyCard>
+              {onboardingState !== OnboardingState.AccountConnected ? (
+                <>
+                  <p>
+                    {stringGetter({
+                      key: {
+                        [OnboardingState.Disconnected]: STRING_KEYS.CONNECT_YOUR_WALLET_EXTENDED,
+                        [OnboardingState.WalletConnected]: STRING_KEYS.MISSING_KEYS_DESCRIPTION,
+                      }[onboardingState],
+                    })}
+                  </p>
+                  <OnboardingTriggerButton />
+                </>
+              ) : (
+                'No trading rewards'
+              )}
+            </$EmptyCard>
+          </$EmptyChart>
+        }
+      />
+    </Panel>
   );
 };
 
 const $TradingRewardsChart = styled(TradingRewardsChart)`
   --trading-rewards-line-color: var(--color-positive);
+  position: relative;
+  height: 20rem;
 `;
 
 const $EmptyChart = styled.div`
