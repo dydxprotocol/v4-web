@@ -95,7 +95,8 @@ export const TradeSizeInputs = () => {
     formattedValue: string;
   }) => {
     dispatch(setTradeFormInputs({ usdAmountInput: formattedValue }));
-    const newUsdcAmount = MustBigNumber(floatValue).toFixed(tickSizeDecimals ?? USD_DECIMALS);
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+    const newUsdcAmount = MustBigNumber(floatValue).toFixed(tickSizeDecimals || USD_DECIMALS);
 
     abacusStateManager.setTradeValue({
       value: formattedValue === '' || newUsdcAmount === 'NaN' ? null : newUsdcAmount,
