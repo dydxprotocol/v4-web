@@ -363,11 +363,6 @@ export const TimeSeriesChart = <Datum extends {}>({
                           // hideTicks
                           tickStroke="var(--color-border)"
                           tickFormat={(y) => {
-                            console.log(
-                              'xcxc',
-                              y,
-                              tickFormatY(y, { zoom, zoomDomain, numTicks: numTicksY })
-                            );
                             return tickFormatY(y, { zoom, zoomDomain, numTicks: numTicksY });
                           }}
                         />

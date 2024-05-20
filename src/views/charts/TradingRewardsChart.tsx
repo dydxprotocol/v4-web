@@ -58,17 +58,19 @@ export const TradingRewardsChart = ({
     shallowEqual
   );
 
+  console.log('Xcxc', periodTradingRewards);
+
   const rewardsData = useMemo(
     () =>
       periodTradingRewards
         ? periodTradingRewards
             .toArray()
-            .slice(0, DAY_RANGE)
+            // .slice(0, DAY_RANGE)
             .reverse()
             .map(
               (datum) =>
                 ({
-                  amount: datum.amount, // xcxc format
+                  cumulativeAmount: datum.cumulativeAmount, // xcxc format
                   date: new Date(datum.endedAtInMilliseconds).valueOf(),
                 } as TradingRewardsDatum)
             ) // xcxc constant
@@ -106,7 +108,7 @@ export const TradingRewardsChart = ({
         {
           dataKey: 'trading-rewards',
           xAccessor: (datum) => datum?.date,
-          yAccessor: (datum) => datum?.amount,
+          yAccessor: (datum) => datum?.cumulativeAmount,
           colorAccessor: () => 'var(--trading-rewards-line-color)',
           getCurve: () => curveLinear,
         },
@@ -138,7 +140,9 @@ export const TradingRewardsChart = ({
             </$Subtitle>
             <$Value>
               {
-                formatDyDxToken(tooltipContext?.tooltipData?.nearestDatum?.datum?.amount ?? 1000) //xcxc
+                formatDyDxToken(
+                  tooltipContext?.tooltipData?.nearestDatum?.datum?.cumulativeAmount ?? 1000
+                ) //xcxc
               }
               <AssetIcon symbol={chainTokenLabel}></AssetIcon>
             </$Value>

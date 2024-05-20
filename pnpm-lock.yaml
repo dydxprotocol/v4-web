@@ -30,8 +30,8 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: 1.7.18
-    version: 1.7.18
+    specifier: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.23.tgz
+    version: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.23.tgz
   '@dydxprotocol/v4-client-js':
     specifier: ^1.1.10
     version: 1.1.10
@@ -1589,13 +1589,6 @@ packages:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
-
-  /@dydxprotocol/v4-abacus@1.7.18:
-    resolution: {integrity: sha512-nskKgvkxzd6Snxt2oWYvRGKCmOVU6WCV8oc4SdY7ajqR0KZvUxW+Dv3YH+8rKr+uOTyPz09qJbSd0rhuYjg06A==}
-    dependencies:
-      '@js-joda/core': 3.2.0
-      format-util: 1.0.5
-    dev: false
 
   /@dydxprotocol/v4-client-js@1.1.10:
     resolution: {integrity: sha512-XesAXsDJXVJ3qg7Ffexh9u//4DjglNA1y9ziIvgTg7bGj9m6BsK1rS9tWBejUNt8vdAVaaMo2zjRYI14iaUoeg==}
@@ -12301,7 +12294,6 @@ packages:
       is-hex-prefixed: 1.0.0
       strip-hex-prefix: 1.0.0
     dev: false
-    bundledDependencies: false
 
   /event-emitter@0.3.5:
     resolution: {integrity: sha512-D9rRn9y7kLPnJ+hMq7S/nhvoKwwvVJahBi2BPmx3bvbsEdK3W9ii8cBSGjP+72/LnM4n6fo3+dkCX5FeTQruXA==}
@@ -20563,3 +20555,12 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
+
+  file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.23.tgz:
+    resolution: {integrity: sha512-8DARQWFdETM0oKb13DCjFUU0pWSokPXFpZXIpJViI7s/t7oYvSkjczIMufTJYf0toEArZ7NQC/d1nZ7CfRT+YA==, tarball: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.23.tgz}
+    name: '@dydxprotocol/v4-abacus'
+    version: 1.7.23
+    dependencies:
+      '@js-joda/core': 3.2.0
+      format-util: 1.0.5
+    dev: false

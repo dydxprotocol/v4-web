@@ -43,5 +43,5 @@ export type FundingChartDatum = {
 // ------ Trading Rewards Chart ------ //
 export type TradingRewardsDatum = {
   date: number;
-  amount: number;
+  cumulativeAmount: number;
 };
