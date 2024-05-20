@@ -94,25 +94,25 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
       },
     ];
 
-    let thisStep = TransferStatusStep.Bridge;
+    let newCurrentStep = TransferStatusStep.Bridge;
 
     if (!routeStatus?.length) {
-      thisStep = TransferStatusStep.FromChain;
+      newCurrentStep = TransferStatusStep.FromChain;
     } else if (currentStatus.chainId === toChain) {
-      thisStep =
+      newCurrentStep =
         currentStatus.status !== 'success'
           ? TransferStatusStep.ToChain
           : TransferStatusStep.Complete;
     } else if (currentStatus.chainId === fromChain && currentStatus.status !== 'success') {
-      thisStep = TransferStatusStep.FromChain;
+      newCurrentStep = TransferStatusStep.FromChain;
     }
 
     if (status?.squidTransactionStatus === 'success') {
-      thisStep = TransferStatusStep.Complete;
+      newCurrentStep = TransferStatusStep.Complete;
     }
 
     return {
-      currentStep: thisStep,
+      currentStep: newCurrentStep,
       steps: newSteps,
       type,
     };
