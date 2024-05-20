@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { TransferInputField, TransferType } from '@/constants/abacus';
 import { AnalyticsEvent } from '@/constants/analytics';
@@ -36,7 +36,7 @@ export const DepositDialogContent = ({ onDeposit }: ElementProps) => {
   }, []);
 
   return (
-    <Styled.Content>
+    <$Content>
       {isMainnet || !showFaucet ? (
         <DepositForm
           onDeposit={(event) => {
@@ -53,17 +53,14 @@ export const DepositDialogContent = ({ onDeposit }: ElementProps) => {
         />
       )}
       {!isMainnet && (
-        <Styled.TextToggle onClick={() => setShowFaucet(!showFaucet)}>
+        <$TextToggle onClick={() => setShowFaucet(!showFaucet)}>
           {showFaucet ? 'Show deposit form' : 'Show test faucet'}
-        </Styled.TextToggle>
+        </$TextToggle>
       )}
-    </Styled.Content>
+    </$Content>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1rem;
 
@@ -72,7 +69,7 @@ Styled.Content = styled.div`
   }
 `;
 
-Styled.TextToggle = styled.div`
+const $TextToggle = styled.div`
   ${layoutMixins.stickyFooter}
   --stickyArea-bottomHeight: 0;
 

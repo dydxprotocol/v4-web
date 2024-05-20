@@ -75,6 +75,7 @@ export const useAccountBalance = ({
 
       return formatUnits(BigInt(balanceAsCoin.amount), decimals);
     }
+    return undefined;
   }, [addressOrDenom, chainId, rpc]);
 
   const cosmosQuery = useQuery({
@@ -88,7 +89,7 @@ export const useAccountBalance = ({
     staleTime: 10_000,
   });
 
-  const { formatted: evmBalance } = evmQuery.data || {};
+  const { formatted: evmBalance } = evmQuery.data ?? {};
   const balance = isCosmosChain ? cosmosQuery.data : evmBalance;
 
   const nativeTokenCoinBalance = balances?.[chainTokenDenom];

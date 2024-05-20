@@ -1,5 +1,5 @@
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { AbacusOrderStatus, AbacusOrderTypes, type Nullable } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
@@ -98,12 +98,12 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
       key: 'status',
       label: stringGetter({ key: STRING_KEYS.STATUS }),
       value: (
-        <Styled.Row>
+        <$Row>
           <OrderStatusIcon status={status.rawValue} />
-          <Styled.Status>
+          <$Status>
             {resources.statusStringKey && stringGetter({ key: resources.statusStringKey })}
-          </Styled.Status>
-        </Styled.Row>
+          </$Status>
+        </$Row>
       ),
     },
     {
@@ -181,7 +181,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
 
   return (
     <DetailsDialog
-      slotIcon={<Styled.AssetIcon symbol={asset?.id} />}
+      slotIcon={<$AssetIcon symbol={asset?.id} />}
       title={!resources.typeStringKey ? '' : stringGetter({ key: resources.typeStringKey })}
       slotFooter={
         isAccountViewOnly ? null : isOrderStatusClearable(status) ? (
@@ -204,17 +204,14 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Row = styled.div`
+const $Row = styled.div`
   ${layoutMixins.inlineRow}
 `;
 
-Styled.Status = styled.span`
+const $Status = styled.span`
   font: var(--font-small-medium);
 `;
 
-Styled.AssetIcon = styled(AssetIcon)`
+const $AssetIcon = styled(AssetIcon)`
   font-size: 1em;
 `;

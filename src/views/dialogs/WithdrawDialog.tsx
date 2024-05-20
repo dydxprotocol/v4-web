@@ -1,4 +1,4 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -24,16 +24,13 @@ export const WithdrawDialog = ({ setIsOpen }: ElementProps) => {
       title={stringGetter({ key: STRING_KEYS.WITHDRAW })}
       placement={isTablet ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
-      <Styled.Content>
+      <$Content>
         <WithdrawForm />
-      </Styled.Content>
+      </$Content>
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TextToggle = styled.div`
+const $TextToggle = styled.div`
   ${layoutMixins.stickyFooter}
   color: var(--color-accent);
   cursor: pointer;
@@ -45,7 +42,7 @@ Styled.TextToggle = styled.div`
   }
 `;
 
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.stickyArea0}
   --stickyArea0-bottomHeight: 2rem;
   --stickyArea0-bottomGap: 1rem;

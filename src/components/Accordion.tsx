@@ -1,5 +1,5 @@
 import { Content, Header, Item, Root, Trigger } from '@radix-ui/react-accordion';
-import styled, { keyframes, type AnyStyledComponent } from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 import { PlusIcon } from '@/icons';
 import { breakpoints } from '@/styles';
@@ -16,26 +16,23 @@ export type AccordionProps = {
 };
 
 export const Accordion = ({ items, className }: AccordionProps) => (
-  <Styled.Root className={className} type="single" collapsible>
+  <$Root className={className} type="single" collapsible>
     {items.map(({ header, content }, idx) => (
-      <Styled.Item key={idx} value={idx.toString()}>
+      <$Item key={idx} value={idx.toString()}>
         <Header>
-          <Styled.Trigger>
+          <$Trigger>
             {header}
-            <Styled.Icon>
+            <$Icon>
               <PlusIcon />
-            </Styled.Icon>
-          </Styled.Trigger>
+            </$Icon>
+          </$Trigger>
         </Header>
-        <Styled.Content>{content}</Styled.Content>
-      </Styled.Item>
+        <$Content>{content}</$Content>
+      </$Item>
     ))}
-  </Styled.Root>
+  </$Root>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Root = styled(Root)`
+const $Root = styled(Root)`
   --accordion-paddingY: 1rem;
   --accordion-paddingX: 1rem;
 
@@ -48,9 +45,9 @@ Styled.Root = styled(Root)`
   }
 `;
 
-Styled.Item = styled(Item)``;
+const $Item = styled(Item)``;
 
-Styled.Icon = styled.div`
+const $Icon = styled.div`
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -71,7 +68,7 @@ Styled.Icon = styled.div`
   }
 `;
 
-Styled.Trigger = styled(Trigger)`
+const $Trigger = styled(Trigger)`
   ${layoutMixins.spacedRow}
   width: 100%;
   padding: var(--accordion-paddingY) var(--accordion-paddingX);
@@ -81,7 +78,7 @@ Styled.Trigger = styled(Trigger)`
   text-align: start;
 
   &:hover {
-    ${Styled.Icon} {
+    ${$Icon} {
       color: var(--color-text-2);
       filter: brightness(var(--hover-filter-base));
     }
@@ -97,7 +94,7 @@ Styled.Trigger = styled(Trigger)`
   }
 `;
 
-Styled.Content = styled(Content)`
+const $Content = styled(Content)`
   overflow: hidden;
   margin: 0 var(--accordion-paddingX) var(--accordion-paddingY);
 

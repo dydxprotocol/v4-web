@@ -1,4 +1,4 @@
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -13,31 +13,30 @@ import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { GovernancePanel } from './rewards/GovernancePanel';
 import { NewMarketsPanel } from './rewards/NewMarketsPanel';
 
-export default () => {
+const Governance = () => {
   const stringGetter = useStringGetter();
 
   return (
     <DetachedSection>
-      <Styled.HeaderSection>
+      <$HeaderSection>
         <ContentSectionHeader
           title={stringGetter({ key: STRING_KEYS.GOVERNANCE })}
           subtitle={stringGetter({ key: STRING_KEYS.GOVERNANCE_PAGE_SUBTITLE })}
         />
-      </Styled.HeaderSection>
+      </$HeaderSection>
 
-      <Styled.ContentWrapper>
-        <Styled.Row>
+      <$ContentWrapper>
+        <$Row>
           <GovernancePanel />
           <NewMarketsPanel />
-        </Styled.Row>
-      </Styled.ContentWrapper>
+        </$Row>
+      </$ContentWrapper>
     </DetachedSection>
   );
 };
+export default Governance;
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.HeaderSection = styled.section`
+const $HeaderSection = styled.section`
   ${layoutMixins.contentSectionDetached}
 
   @media ${breakpoints.tablet} {
@@ -48,14 +47,14 @@ Styled.HeaderSection = styled.section`
   }
 `;
 
-Styled.ContentWrapper = styled.div`
+const $ContentWrapper = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1.5rem;
   max-width: 80rem;
   padding: 0 1rem;
 `;
 
-Styled.Row = styled.div`
+const $Row = styled.div`
   gap: 1rem;
   display: grid;
   grid-template-columns: repeat(3, 1fr);

@@ -1,4 +1,4 @@
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import type { MenuGroup } from '@/constants/menus';
 
@@ -9,16 +9,13 @@ import { PageMenuItem, type PageMenuItemType } from './PageMenu/PageMenuItem';
 export const PageMenu = <MenuItemValue extends string, MenuGroupValue extends string>({
   items,
 }: MenuGroup<MenuItemValue, MenuGroupValue, PageMenuItemType>) => (
-  <Styled.PageMenu>
+  <$PageMenu>
     {items.map((item) => (
       <PageMenuItem key={item.value} {...item} />
     ))}
-  </Styled.PageMenu>
+  </$PageMenu>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.PageMenu = styled.menu`
+const $PageMenu = styled.menu`
   ${layoutMixins.flexColumn}
   ${layoutMixins.withInnerHorizontalBorders}
 

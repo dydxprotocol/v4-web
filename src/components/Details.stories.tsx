@@ -1,5 +1,5 @@
 import type { Story } from '@ladle/react';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -9,9 +9,9 @@ import { StoryWrapper } from '.ladle/components';
 
 export const DetailsStory: Story<Parameters<typeof Details>[0]> = (args) => (
   <StoryWrapper>
-    <Styled.Resizable>
+    <$Resizable>
       <Details {...args} />
-    </Styled.Resizable>
+    </$Resizable>
   </StoryWrapper>
 );
 
@@ -50,10 +50,7 @@ DetailsStory.argTypes = {
     defaultValue: 'column',
   },
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Resizable = styled.section`
+const $Resizable = styled.section`
   ${layoutMixins.container}
   resize: horizontal;
   overflow: hidden;

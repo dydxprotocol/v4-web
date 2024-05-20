@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 import { useDispatch, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationCategoryPreferences } from '@/constants/notifications';
@@ -137,7 +137,7 @@ export const PreferencesDialog = ({ setIsOpen }: ElementProps) => {
   const preferenceItems = usePreferenceMenu();
 
   return (
-    <Styled.ComboboxDialogMenu
+    <$ComboboxDialogMenu
       isOpen
       title={stringGetter({ key: STRING_KEYS.PREFERENCES })}
       items={preferenceItems}
@@ -145,9 +145,6 @@ export const PreferencesDialog = ({ setIsOpen }: ElementProps) => {
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ComboboxDialogMenu = styled(ComboboxDialogMenu)`
+const $ComboboxDialogMenu = styled(ComboboxDialogMenu)`
   --dialog-content-paddingBottom: 0.5rem;
 `;

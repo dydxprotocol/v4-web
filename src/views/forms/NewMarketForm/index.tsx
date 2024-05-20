@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { type NewMarketProposal } from '@/constants/potentialMarkets';
@@ -37,7 +37,7 @@ export const NewMarketForm = () => {
   }, [assetToAdd]);
 
   if (!hasPotentialMarketsData || !nextAvailableClobPairId) {
-    return <Styled.LoadingSpace id="new-market-form" />;
+    return <$LoadingSpace id="new-market-form" />;
   }
 
   if (NewMarketFormStep.SUCCESS === step && proposalTxHash) {
@@ -75,9 +75,6 @@ export const NewMarketForm = () => {
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.LoadingSpace = styled(LoadingSpace)`
+const $LoadingSpace = styled(LoadingSpace)`
   min-height: 18.75rem;
 `;

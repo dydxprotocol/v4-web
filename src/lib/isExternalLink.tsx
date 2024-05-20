@@ -1,7 +1,10 @@
 export const isExternalLink = (href: string | undefined) => {
-  if (href)
+  if (href) {
     try {
       return new URL(href).hostname !== globalThis.location.hostname;
-    } catch {}
+    } catch (error) {
+      return false;
+    }
+  }
   return false;
 };

@@ -28,6 +28,7 @@ export const usePerpetualMarketSparklines = (props: UsePerpetualMarketSparklines
         return getPerpetualMarketSparklines({ period });
       } catch (error) {
         log('usePerpetualMarketSparklines', error);
+        return undefined;
       }
     },
     refetchInterval,

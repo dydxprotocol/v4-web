@@ -154,7 +154,7 @@ export const useChartLines = ({
 
       if (positionLine) {
         const chartLine: ChartLine = { line: positionLine, chartLineType };
-        setLineColors({ chartLine: chartLine });
+        setLineColors({ chartLine });
         chartLinesRef.current[key] = chartLine;
       }
     }
@@ -196,7 +196,6 @@ export const useChartLines = ({
           if (maybeOrderLine) {
             maybeOrderLine.remove();
             delete chartLinesRef.current[key];
-            return;
           }
         } else {
           if (maybeOrderLine) {
@@ -219,7 +218,7 @@ export const useChartLines = ({
                 line: orderLine,
                 chartLineType: ORDER_SIDES[side.name],
               };
-              setLineColors({ chartLine: chartLine });
+              setLineColors({ chartLine });
               chartLinesRef.current[key] = chartLine;
             }
           }
@@ -251,8 +250,9 @@ export const useChartLines = ({
       .setBodyTextColor(textColor)
       .setQuantityTextColor(textButtonColor);
 
-    maybeQuantityColor &&
+    if (maybeQuantityColor != null) {
       line.setLineColor(maybeQuantityColor).setQuantityBackgroundColor(maybeQuantityColor);
+    }
   };
 
   return { chartLines: chartLinesRef.current };

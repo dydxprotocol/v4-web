@@ -527,6 +527,11 @@ export const getRestrictionType = (state: RootState) => state.account.restrictio
 export const getComplianceStatus = (state: RootState) => state.account.compliance?.status;
 
 /**
+ * @returns compliance status of the current session
+ */
+export const getComplianceUpdatedAt = (state: RootState) => state.account.compliance?.updatedAt;
+
+/**
  * @returns compliance geo of the current session
  */
 export const getGeo = (state: RootState) => state.account.compliance?.geo;

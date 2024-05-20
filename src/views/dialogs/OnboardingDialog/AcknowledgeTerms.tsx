@@ -1,4 +1,4 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -34,19 +34,19 @@ export const AcknowledgeTerms = ({ onClose, onContinue }: ElementProps) => {
           key: STRING_KEYS.TOS_TITLE,
           params: {
             TERMS_LINK: (
-              <Styled.Link href={`${BASE_ROUTE}${AppRoute.Terms}`}>
+              <$Link href={`${BASE_ROUTE}${AppRoute.Terms}`}>
                 {stringGetter({ key: STRING_KEYS.TERMS_OF_USE })}
-              </Styled.Link>
+              </$Link>
             ),
             PRIVACY_POLICY_LINK: (
-              <Styled.Link href={`${BASE_ROUTE}${AppRoute.Privacy}`}>
+              <$Link href={`${BASE_ROUTE}${AppRoute.Privacy}`}>
                 {stringGetter({ key: STRING_KEYS.PRIVACY_POLICY })}
-              </Styled.Link>
+              </$Link>
             ),
           },
         })}
       </p>
-      <Styled.TOS>
+      <$TOS>
         <ul>
           <li>{stringGetter({ key: STRING_KEYS.TOS_LINE1 })}</li>
           <li>{stringGetter({ key: STRING_KEYS.TOS_LINE2 })}</li>
@@ -54,22 +54,19 @@ export const AcknowledgeTerms = ({ onClose, onContinue }: ElementProps) => {
           <li>{stringGetter({ key: STRING_KEYS.TOS_LINE4 })}</li>
           <li>{stringGetter({ key: STRING_KEYS.TOS_LINE5 })}</li>
         </ul>
-      </Styled.TOS>
-      <Styled.Footer>
-        <Styled.Button onClick={onClose} action={ButtonAction.Base}>
+      </$TOS>
+      <$Footer>
+        <$Button onClick={onClose} action={ButtonAction.Base}>
           {stringGetter({ key: STRING_KEYS.CLOSE })}
-        </Styled.Button>
-        <Styled.Button onClick={onAcknowledgement} action={ButtonAction.Primary}>
+        </$Button>
+        <$Button onClick={onAcknowledgement} action={ButtonAction.Primary}>
           {stringGetter({ key: STRING_KEYS.I_AGREE })}
-        </Styled.Button>
-      </Styled.Footer>
+        </$Button>
+      </$Footer>
     </>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Link = styled(Link)`
+const $Link = styled(Link)`
   display: inline-block;
   color: var(--color-accent);
 
@@ -78,7 +75,7 @@ Styled.Link = styled(Link)`
   }
 `;
 
-Styled.TOS = styled.section`
+const $TOS = styled.section`
   background-color: var(--color-layer-4);
   padding: 1rem 1rem 1rem 2rem;
   border-radius: 0.875rem;
@@ -88,13 +85,13 @@ Styled.TOS = styled.section`
   }
 `;
 
-Styled.Footer = styled.div`
+const $Footer = styled.div`
   ${formMixins.footer};
   ${layoutMixins.row}
 
   gap: 1rem;
 `;
 
-Styled.Button = styled(Button)`
+const $Button = styled(Button)`
   flex-grow: 1;
 `;

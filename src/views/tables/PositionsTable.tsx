@@ -1,9 +1,9 @@
-import { useMemo } from 'react';
+import { Key, useMemo } from 'react';
 
 import type { ColumnSize } from '@react-types/table';
 import { shallowEqual, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import {
   type Asset,
@@ -25,9 +25,10 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
-import { Table, TableColumnHeader, ViewMoreConfig, type ColumnDef } from '@/components/Table';
+import { Table, TableColumnHeader, type ColumnDef } from '@/components/Table';
 import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
+import { PageSize } from '@/components/Table/TablePaginationRow';
 
 import {
   calculateIsAccountViewOnly,
@@ -65,7 +66,7 @@ type PositionTableRow = {
   asset: Asset;
   oraclePrice: Nullable<number>;
   tickSizeDecimals: number;
-  fundingRate: number;
+  fundingRate: Nullable<number>;
   stopLossOrders: SubaccountOrder[];
   takeProfitOrders: SubaccountOrder[];
 } & SubaccountPosition;
@@ -95,26 +96,26 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.id,
         label: stringGetter({ key: STRING_KEYS.DETAILS }),
         renderCell: ({ asset, leverage, resources, size }) => (
-          <TableCell stacked slotLeft={<Styled.AssetIcon symbol={asset?.id} />}>
-            <Styled.HighlightOutput
+          <TableCell stacked slotLeft={<$AssetIcon symbol={asset?.id} />}>
+            <$HighlightOutput
               type={OutputType.Asset}
               value={size?.current}
               fractionDigits={TOKEN_DECIMALS}
               showSign={ShowSign.None}
               tag={asset?.id}
             />
-            <Styled.InlineRow>
-              <Styled.PositionSide>
+            <$InlineRow>
+              <$PositionSide>
                 {resources.sideStringKey?.current &&
                   stringGetter({ key: resources.sideStringKey?.current })}
-              </Styled.PositionSide>
-              <Styled.SecondaryColor>@</Styled.SecondaryColor>
-              <Styled.HighlightOutput
+              </$PositionSide>
+              <$SecondaryColor>@</$SecondaryColor>
+              <$HighlightOutput
                 type={OutputType.Multiple}
                 value={leverage?.current}
                 showSign={ShowSign.None}
               />
-            </Styled.InlineRow>
+            </$InlineRow>
           </TableCell>
         ),
       },
@@ -143,13 +144,13 @@ const getPositionsTableColumnDef = ({
         hideOnBreakpoint: MediaQueryKeys.isNotTablet,
         renderCell: ({ unrealizedPnl, unrealizedPnlPercent }) => (
           <TableCell stacked>
-            <Styled.OutputSigned
+            <$OutputSigned
               sign={getNumberSign(unrealizedPnlPercent?.current)}
               type={OutputType.Percent}
               value={unrealizedPnlPercent?.current}
               showSign={ShowSign.None}
             />
-            <Styled.HighlightOutput
+            <$HighlightOutput
               isNegative={MustBigNumber(unrealizedPnl?.current).isNegative()}
               type={OutputType.Fiat}
               value={unrealizedPnl?.current}
@@ -179,7 +180,7 @@ const getPositionsTableColumnDef = ({
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         renderCell: ({ assetId, size, notionalTotal, tickSizeDecimals }) => (
           <TableCell stacked>
-            <Styled.OutputSigned
+            <$OutputSigned
               type={OutputType.Asset}
               value={size?.current}
               tag={assetId}
@@ -216,7 +217,7 @@ const getPositionsTableColumnDef = ({
         hideOnBreakpoint: MediaQueryKeys.isTablet,
         renderCell: ({ netFunding, fundingRate }) => (
           <TableCell stacked>
-            <Styled.OutputSigned
+            <$OutputSigned
               sign={getNumberSign(netFunding)}
               type={OutputType.Fiat}
               value={netFunding}
@@ -252,7 +253,7 @@ const getPositionsTableColumnDef = ({
         hideOnBreakpoint: MediaQueryKeys.isTablet,
         renderCell: ({ unrealizedPnl, unrealizedPnlPercent }) => (
           <TableCell stacked>
-            <Styled.OutputSigned
+            <$OutputSigned
               sign={getNumberSign(unrealizedPnl?.current)}
               type={OutputType.Fiat}
               value={unrealizedPnl?.current}
@@ -268,7 +269,7 @@ const getPositionsTableColumnDef = ({
         hideOnBreakpoint: MediaQueryKeys.isTablet,
         renderCell: ({ realizedPnl, realizedPnlPercent }) => (
           <TableCell stacked>
-            <Styled.OutputSigned
+            <$OutputSigned
               sign={getNumberSign(realizedPnl?.current)}
               type={OutputType.Fiat}
               value={realizedPnl?.current}
@@ -335,7 +336,9 @@ const getPositionsTableColumnDef = ({
           key:
             shouldRenderTriggers && showClosePositionAction && !testFlags.isolatedMargin
               ? STRING_KEYS.ACTIONS
-              : STRING_KEYS.CLOSE,
+              : showClosePositionAction
+              ? STRING_KEYS.CLOSE
+              : STRING_KEYS.ACTION,
         }),
         isActionable: true,
         allowsSorting: false,
@@ -362,7 +365,7 @@ type ElementProps = {
   currentRoute?: string;
   currentMarket?: string;
   showClosePositionAction: boolean;
-  viewMoreConfig?: ViewMoreConfig;
+  initialPageSize?: PageSize;
   onNavigate?: () => void;
   navigateToOrders: (market: string) => void;
 };
@@ -378,7 +381,7 @@ export const PositionsTable = ({
   currentRoute,
   currentMarket,
   showClosePositionAction,
-  viewMoreConfig,
+  initialPageSize,
   onNavigate,
   navigateToOrders,
   withGradientCardRows,
@@ -411,27 +414,30 @@ export const PositionsTable = ({
 
   const positionsData = useMemo(
     () =>
-      positions.map((position: SubaccountPosition) => {
-        return {
-          tickSizeDecimals:
-            perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
-          asset: assets?.[position.assetId],
-          oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
-          fundingRate: perpetualMarkets?.[position.id]?.perpetual?.nextFundingRate,
-          stopLossOrders: allStopLossOrders.filter(
-            (order: SubaccountOrder) => order.marketId === position.id
-          ),
-          takeProfitOrders: allTakeProfitOrders.filter(
-            (order: SubaccountOrder) => order.marketId === position.id
-          ),
-          ...position,
-        };
+      positions.map((position: SubaccountPosition): PositionTableRow => {
+        // object splat ... doesn't copy getter defined properties
+        return Object.assign(
+          {
+            tickSizeDecimals:
+              perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
+            asset: assets?.[position.assetId],
+            oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
+            fundingRate: perpetualMarkets?.[position.id]?.perpetual?.nextFundingRate,
+            stopLossOrders: allStopLossOrders.filter(
+              (order: SubaccountOrder) => order.marketId === position.id
+            ),
+            takeProfitOrders: allTakeProfitOrders.filter(
+              (order: SubaccountOrder) => order.marketId === position.id
+            ),
+          },
+          position
+        );
       }),
     [positions, perpetualMarkets, assets, allStopLossOrders, allTakeProfitOrders]
   );
 
   return (
-    <Styled.Table
+    <$Table
       key={currentMarket ?? 'positions'}
       label="Positions"
       defaultSortDescriptor={{
@@ -453,8 +459,8 @@ export const PositionsTable = ({
       getRowKey={(row: PositionTableRow) => row.id}
       onRowAction={
         currentMarket
-          ? null
-          : (market: string) => {
+          ? undefined
+          : (market: Key) => {
               navigate(`${AppRoute.Trade}/${market}`, {
                 state: { from: currentRoute },
               });
@@ -466,11 +472,11 @@ export const PositionsTable = ({
       })}
       slotEmpty={
         <>
-          <Styled.Icon iconName={IconName.Positions} />
+          <$Icon iconName={IconName.Positions} />
           <h4>{stringGetter({ key: STRING_KEYS.POSITIONS_EMPTY_STATE })}</h4>
         </>
       }
-      viewMoreConfig={viewMoreConfig}
+      initialPageSize={initialPageSize}
       withGradientCardRows={withGradientCardRows}
       withOuterBorder={withOuterBorder}
       withInnerBorders
@@ -480,10 +486,7 @@ export const PositionsTable = ({
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Table = styled(Table)`
+const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
 
   tr {
@@ -506,23 +509,23 @@ Styled.Table = styled(Table)`
       --table-row-gradient-to-color: var(--color-gradient-negative);
     }
   }
-`;
+` as typeof Table;
 
-Styled.InlineRow = styled.div`
+const $InlineRow = styled.div`
   ${layoutMixins.inlineRow}
 `;
 
-Styled.AssetIcon = styled(AssetIcon)`
+const $AssetIcon = styled(AssetIcon)`
   ${layoutMixins.inlineRow}
   min-width: unset;
   font-size: 2.25rem;
 `;
 
-Styled.SecondaryColor = styled.span`
+const $SecondaryColor = styled.span`
   color: var(--color-text-0);
 `;
 
-Styled.OutputSigned = styled(Output)<{ sign: NumberSign }>`
+const $OutputSigned = styled(Output)<{ sign: NumberSign }>`
   color: ${({ sign }) =>
     ({
       [NumberSign.Positive]: `var(--color-positive)`,
@@ -531,7 +534,7 @@ Styled.OutputSigned = styled(Output)<{ sign: NumberSign }>`
     }[sign])};
 `;
 
-Styled.HighlightOutput = styled(Output)<{ isNegative?: boolean }>`
+const $HighlightOutput = styled(Output)<{ isNegative?: boolean }>`
   color: var(--color-text-1);
   --secondary-item-color: currentColor;
   --output-sign-color: ${({ isNegative }) =>
@@ -542,12 +545,12 @@ Styled.HighlightOutput = styled(Output)<{ isNegative?: boolean }>`
       : `currentColor`};
 `;
 
-Styled.PositionSide = styled.span`
+const $PositionSide = styled.span`
   && {
     color: var(--side-color);
   }
 `;
 
-Styled.Icon = styled(Icon)`
+const $Icon = styled(Icon)`
   font-size: 3em;
 `;

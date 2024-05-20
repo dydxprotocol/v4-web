@@ -1,5 +1,5 @@
 import { Root, Thumb, Track } from '@radix-ui/react-slider';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 type ElementProps = {
   value: number;
@@ -23,7 +23,7 @@ export const Slider = ({
   max,
   step = 0.1,
 }: ElementProps & StyleProps) => (
-  <Styled.Root
+  <$Root
     aria-label={label}
     className={className}
     min={min}
@@ -33,14 +33,11 @@ export const Slider = ({
     onValueChange={onSliderDrag}
     onValueCommit={onValueCommit}
   >
-    <Styled.Track />
-    <Styled.Thumb />
-  </Styled.Root>
+    <$Track />
+    <$Thumb />
+  </$Root>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Root = styled(Root)`
+const $Root = styled(Root)`
   // make thumb covers the start of the track
   --radix-slider-thumb-transform: translateX(-65%) !important;
   --slider-track-background: ;
@@ -56,7 +53,7 @@ Styled.Root = styled(Root)`
   height: 100%;
 `;
 
-Styled.Track = styled(Track)`
+const $Track = styled(Track)`
   position: relative;
 
   display: flex;
@@ -88,7 +85,7 @@ Styled.Track = styled(Track)`
   }
 `;
 
-Styled.Thumb = styled(Thumb)`
+const $Thumb = styled(Thumb)`
   height: 1.375rem;
   width: 1.375rem;
 

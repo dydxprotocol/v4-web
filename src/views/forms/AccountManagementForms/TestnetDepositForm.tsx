@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -51,7 +51,7 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
   }, []);
 
   return (
-    <Styled.Form
+    <$Form
       onSubmit={async (e: FormEvent) => {
         e.preventDefault();
 
@@ -84,7 +84,7 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
           },
         })}
       </p>
-      <Styled.Footer>
+      <$Footer>
         {!canAccountTrade ? (
           <OnboardingTriggerButton size={ButtonSize.Base} />
         ) : (
@@ -92,18 +92,15 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
             {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
           </Button>
         )}
-      </Styled.Footer>
-    </Styled.Form>
+      </$Footer>
+    </$Form>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Form = styled.form`
+const $Form = styled.form`
   ${formMixins.transfersForm}
 `;
 
-Styled.Footer = styled.footer`
+const $Footer = styled.footer`
   ${formMixins.footer}
   --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
 

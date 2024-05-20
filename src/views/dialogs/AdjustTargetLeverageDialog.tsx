@@ -1,4 +1,4 @@
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -23,16 +23,13 @@ export const AdjustTargetLeverageDialog = ({ setIsOpen }: ElementProps) => {
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.ADJUST_TARGET_LEVERAGE })}
     >
-      <Styled.Content>
+      <$Content>
         <AdjustTargetLeverageForm onSetTargetLeverage={() => setIsOpen?.(false)} />
-      </Styled.Content>
+      </$Content>
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
 `;

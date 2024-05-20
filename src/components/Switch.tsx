@@ -1,5 +1,5 @@
 import { Root, Thumb } from '@radix-ui/react-switch';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 type ElementProps = {
   checked: boolean;
@@ -23,7 +23,7 @@ export const Switch = ({
   required,
   value,
 }: ElementProps & StyleProps) => (
-  <Styled.Root
+  <$Root
     checked={checked}
     className={className}
     disabled={disabled}
@@ -33,13 +33,10 @@ export const Switch = ({
     required={required}
     value={value}
   >
-    <Styled.Thumb />
-  </Styled.Root>
+    <$Thumb />
+  </$Root>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Root = styled(Root)`
+const $Root = styled(Root)`
   --switch-width: 2.625em;
   --switch-height: 1.5em;
   --switch-backgroundColor: var(--color-layer-0);
@@ -66,7 +63,7 @@ Styled.Root = styled(Root)`
   }
 `;
 
-Styled.Thumb = styled(Thumb)`
+const $Thumb = styled(Thumb)`
   width: calc(var(--switch-width) / 2);
   height: calc(var(--switch-height) - 0.1875em);
 

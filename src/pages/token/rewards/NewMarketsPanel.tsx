@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -37,28 +37,28 @@ export const NewMarketsPanel = ({ className }: { className?: string }) => {
     <Panel
       className={className}
       slotHeaderContent={
-        <Styled.Title>
+        <$Title>
           {stringGetter({ key: STRING_KEYS.ADD_A_MARKET })}
-          <Styled.NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</Styled.NewTag>
-        </Styled.Title>
+          <$NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</$NewTag>
+        </$Title>
       }
       slotRight={
-        <Styled.Arrow>
-          <Styled.IconButton
+        <$Arrow>
+          <$IconButton
             action={ButtonAction.Base}
             iconName={IconName.Arrow}
             size={ButtonSize.Small}
           />
-        </Styled.Arrow>
+        </$Arrow>
       }
       onClick={() => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`)}
     >
-      <Styled.Description>
+      <$Description>
         {stringGetter({
           key: STRING_KEYS.NEW_MARKET_REWARDS_ENTRY_DESCRIPTION,
           params: {
             REQUIRED_NUM_TOKENS: (
-              <Styled.Output
+              <$Output
                 useGrouping
                 type={OutputType.Number}
                 value={initialDepositAmountBN}
@@ -68,38 +68,35 @@ export const NewMarketsPanel = ({ className }: { className?: string }) => {
             NATIVE_TOKEN_DENOM: chainTokenLabel,
           },
         })}
-      </Styled.Description>
+      </$Description>
     </Panel>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Description = styled.div`
+const $Description = styled.div`
   color: var(--color-text-0);
 `;
 
-Styled.IconButton = styled(IconButton)`
+const $IconButton = styled(IconButton)`
   color: var(--color-text-0);
   --color-border: var(--color-layer-6);
 `;
 
-Styled.Arrow = styled.div`
+const $Arrow = styled.div`
   padding-right: 1.5rem;
 `;
 
-Styled.Title = styled.h3`
+const $Title = styled.h3`
   font: var(--font-medium-book);
   color: var(--color-text-2);
   margin-bottom: -1rem;
   ${layoutMixins.inlineRow}
 `;
 
-Styled.Output = styled(Output)`
+const $Output = styled(Output)`
   display: inline-block;
 `;
 
-Styled.NewTag = styled(Tag)`
+const $NewTag = styled(Tag)`
   color: var(--color-accent);
   background-color: var(--color-accent-faded);
 `;

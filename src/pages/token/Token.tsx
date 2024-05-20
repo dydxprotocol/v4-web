@@ -1,7 +1,7 @@
 import { Suspense, lazy } from 'react';
 
 import { Navigate, Route, Routes } from 'react-router-dom';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { TokenRoute } from '@/constants/routes';
@@ -19,7 +19,7 @@ const RewardsPage = lazy(() => import('./rewards/RewardsPage'));
 const StakingPage = lazy(() => import('./staking/StakingPage'));
 const GovernancePage = lazy(() => import('./Governance'));
 
-export default () => {
+const Token = () => {
   const { isTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
 
@@ -38,8 +38,8 @@ export default () => {
     <WithSidebar
       sidebar={
         isTablet ? null : (
-          <Styled.SideBar>
-            <Styled.NavigationMenu
+          <$SideBar>
+            <$NavigationMenu
               items={[
                 {
                   group: 'views',
@@ -48,9 +48,9 @@ export default () => {
                     {
                       value: TokenRoute.TradingRewards,
                       slotBefore: (
-                        <Styled.IconContainer>
+                        <$IconContainer>
                           <Icon iconName={IconName.Token} />
-                        </Styled.IconContainer>
+                        </$IconContainer>
                       ),
                       label: stringGetter({ key: STRING_KEYS.TRADING_REWARDS }),
                       href: TokenRoute.TradingRewards,
@@ -58,9 +58,9 @@ export default () => {
                     {
                       value: TokenRoute.StakingRewards,
                       slotBefore: (
-                        <Styled.IconContainer>
+                        <$IconContainer>
                           <Icon iconName={IconName.CurrencySign} />
-                        </Styled.IconContainer>
+                        </$IconContainer>
                       ),
                       label: stringGetter({ key: STRING_KEYS.STAKING_REWARDS }),
                       href: TokenRoute.StakingRewards,
@@ -69,9 +69,9 @@ export default () => {
                     {
                       value: TokenRoute.Governance,
                       slotBefore: (
-                        <Styled.IconContainer>
+                        <$IconContainer>
                           <Icon iconName={IconName.Governance} />
-                        </Styled.IconContainer>
+                        </$IconContainer>
                       ),
                       label: stringGetter({ key: STRING_KEYS.GOVERNANCE }),
                       href: TokenRoute.Governance,
@@ -80,7 +80,7 @@ export default () => {
                 },
               ]}
             />
-          </Styled.SideBar>
+          </$SideBar>
         )
       }
     >
@@ -88,35 +88,21 @@ export default () => {
     </WithSidebar>
   );
 };
+export default Token;
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.SideBar = styled.div`
+const $SideBar = styled.div`
   ${layoutMixins.flexColumn}
   justify-content: space-between;
 
   height: 100%;
 `;
 
-Styled.Footer = styled.div`
-  ${layoutMixins.row}
-  flex-wrap: wrap;
-
-  padding: 1rem;
-
-  gap: 0.5rem;
-
-  > button {
-    flex-grow: 1;
-  }
-`;
-
-Styled.NavigationMenu = styled(NavigationMenu)`
+const $NavigationMenu = styled(NavigationMenu)`
   padding: 0.5rem;
   padding-top: 0;
 `;
 
-Styled.IconContainer = styled.div`
+const $IconContainer = styled.div`
   width: 1.5rem;
   height: 1.5rem;
   font-size: 0.75rem;

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { TransferInputTokenResource } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -14,7 +14,7 @@ import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
-import { Details } from '@/components/Details';
+import { Details, DetailsItem } from '@/components/Details';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
@@ -60,14 +60,15 @@ export const WithdrawButtonAndReceipt = ({
   const { usdcLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
 
-  const submitButtonReceipt = [
+  const submitButtonReceipt: DetailsItem[] = [
     {
       key: 'expected-amount-received',
+
       label: (
-        <Styled.RowWithGap>
+        <$RowWithGap>
           {stringGetter({ key: STRING_KEYS.EXPECTED_AMOUNT_RECEIVED })}
           {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
-        </Styled.RowWithGap>
+        </$RowWithGap>
       ),
       value: (
         <Output type={OutputType.Asset} value={summary?.toAmount} fractionDigits={TOKEN_DECIMALS} />
@@ -76,10 +77,10 @@ export const WithdrawButtonAndReceipt = ({
     {
       key: 'minimum-amount-received',
       label: (
-        <Styled.RowWithGap>
+        <$RowWithGap>
           {stringGetter({ key: STRING_KEYS.MINIMUM_AMOUNT_RECEIVED })}
           {withdrawToken && <Tag>{withdrawToken?.symbol}</Tag>}
-        </Styled.RowWithGap>
+        </$RowWithGap>
       ),
       value: (
         <Output
@@ -93,17 +94,18 @@ export const WithdrawButtonAndReceipt = ({
     !exchange && {
       key: 'exchange-rate',
       label: <span>{stringGetter({ key: STRING_KEYS.EXCHANGE_RATE })}</span>,
-      value: withdrawToken && typeof summary?.exchangeRate === 'number' && (
-        <Styled.RowWithGap>
-          <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={usdcLabel} />
-          =
-          <Output
-            type={OutputType.Asset}
-            value={summary?.exchangeRate}
-            tag={withdrawToken?.symbol}
-          />
-        </Styled.RowWithGap>
-      ),
+      value:
+        withdrawToken && typeof summary?.exchangeRate === 'number' ? (
+          <$RowWithGap>
+            <Output type={OutputType.Asset} value={1} fractionDigits={0} tag={usdcLabel} />
+            =
+            <Output
+              type={OutputType.Asset}
+              value={summary?.exchangeRate}
+              tag={withdrawToken?.symbol}
+            />
+          </$RowWithGap>
+        ) : undefined,
     },
     typeof summary?.gasFee === 'number' && {
       key: 'gas-fees',
@@ -136,26 +138,27 @@ export const WithdrawButtonAndReceipt = ({
     {
       key: 'estimated-route-duration',
       label: <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_TIME })}</span>,
-      value: typeof summary?.estimatedRouteDuration === 'number' && (
-        <Output
-          type={OutputType.Text}
-          value={stringGetter({
-            key: STRING_KEYS.X_MINUTES_LOWERCASED,
-            params: {
-              X:
-                summary?.estimatedRouteDuration < 60
-                  ? '< 1'
-                  : Math.round(summary?.estimatedRouteDuration / 60),
-            },
-          })}
-        />
-      ),
+      value:
+        typeof summary?.estimatedRouteDuration === 'number' ? (
+          <Output
+            type={OutputType.Text}
+            value={stringGetter({
+              key: STRING_KEYS.X_MINUTES_LOWERCASED,
+              params: {
+                X:
+                  summary?.estimatedRouteDuration < 60
+                    ? '< 1'
+                    : Math.round(summary?.estimatedRouteDuration / 60),
+              },
+            })}
+          />
+        ) : undefined,
     },
     {
       key: 'leverage',
       label: <span>{stringGetter({ key: STRING_KEYS.ACCOUNT_LEVERAGE })}</span>,
       value: (
-        <Styled.DiffOutput
+        <$DiffOutput
           type={OutputType.Multiple}
           value={leverage?.current}
           newValue={leverage?.postOrder}
@@ -170,7 +173,7 @@ export const WithdrawButtonAndReceipt = ({
     !isDisabled && !isEditingSlippage && connectionError !== ConnectionErrorType.CHAIN_DISRUPTION;
 
   return (
-    <Styled.WithReceipt slotReceipt={<Styled.Details items={submitButtonReceipt} />}>
+    <$WithReceipt slotReceipt={<$Details items={submitButtonReceipt} />}>
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
       ) : (
@@ -185,35 +188,32 @@ export const WithdrawButtonAndReceipt = ({
           {stringGetter({ key: STRING_KEYS.WITHDRAW })}
         </Button>
       )}
-    </Styled.WithReceipt>
+    </$WithReceipt>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.DiffOutput = styled(DiffOutput)`
+const $DiffOutput = styled(DiffOutput)`
   --diffOutput-valueWithDiff-fontSize: 1em;
 `;
 
-Styled.RowWithGap = styled.span`
+const $RowWithGap = styled.span`
   ${layoutMixins.row}
   gap: 0.5ch;
 `;
 
-Styled.WithReceipt = styled(WithReceipt)`
+const $WithReceipt = styled(WithReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
-Styled.Details = styled(Details)`
+const $Details = styled(Details)`
   padding: var(--form-input-paddingY) var(--form-input-paddingX);
   font-size: 0.8125em;
 `;
 
-Styled.DetailButtons = styled.div`
+const $DetailButtons = styled.div`
   ${layoutMixins.spacedRow}
 `;
 
-Styled.ToggleButton = styled(ToggleButton)`
+const $ToggleButton = styled(ToggleButton)`
   --button-toggle-off-backgroundColor: transparent;
   --button-toggle-on-backgroundColor: transparent;
   --button-toggle-on-textColor: var(--color-text-0);

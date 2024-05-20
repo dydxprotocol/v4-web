@@ -1,6 +1,6 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import {
   AbacusOrderStatus,
@@ -59,10 +59,10 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
       slotIcon={<AssetIcon symbol={assetId} />}
       slotTitle={titleKey && stringGetter({ key: titleKey })}
       slotTitleRight={
-        <Styled.OrderStatus>
+        <$OrderStatus>
           {stringGetter({ key: ORDER_STATUS_STRINGS[orderStatus] })}
-          <Styled.OrderStatusIcon status={orderStatus} />
-        </Styled.OrderStatus>
+          <$OrderStatusIcon status={orderStatus} />
+        </$OrderStatus>
       }
       slotCustomContent={
         <FillDetails
@@ -77,20 +77,17 @@ export const TradeNotification = ({ isToast, data, notification }: TradeNotifica
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Label = styled.span`
+const $Label = styled.span`
   ${layoutMixins.row}
   gap: 0.5ch;
 `;
 
-Styled.OrderStatus = styled(Styled.Label)`
+const $OrderStatus = styled($Label)`
   color: var(--color-text-0);
   font: var(--font-small-book);
 `;
 
-Styled.OrderStatusIcon = styled(OrderStatusIcon)`
+const $OrderStatusIcon = styled(OrderStatusIcon)`
   width: 0.9375rem;
   height: 0.9375rem;
 `;

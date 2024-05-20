@@ -27,7 +27,7 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
     feesEarnedChart,
   } = usePerpetualMarketsStats();
   return (
-    <Styled.MarketBillboardsWrapper>
+    <$MarketBillboardsWrapper>
       {[
         {
           key: 'volume',
@@ -69,13 +69,13 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
           linkLabelKey,
           slotLeft,
         }) => (
-          <Styled.BillboardContainer key={key}>
-            <Styled.BillboardStat>
-              <Styled.BillboardTitle>
+          <$BillboardContainer key={key}>
+            <$BillboardStat>
+              <$BillboardTitle>
                 <label>{stringGetter({ key: labelKey })}</label>
                 <Tag>{stringGetter({ key: tagKey })}</Tag>
-              </Styled.BillboardTitle>
-              <Styled.Output
+              </$BillboardTitle>
+              <$Output
                 useGrouping
                 withBaseFont
                 fractionDigits={fractionDigits}
@@ -84,85 +84,83 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
                 slotLeft={slotLeft}
               />
               {link && linkLabelKey ? (
-                <Styled.BillboardLink
+                <$BillboardLink
                   href={link}
                   size={ButtonSize.Small}
                   type={ButtonType.Link}
                   action={ButtonAction.Navigation}
                 >
                   {stringGetter({ key: linkLabelKey })}
-                </Styled.BillboardLink>
+                </$BillboardLink>
               ) : null}
-            </Styled.BillboardStat>
+            </$BillboardStat>
             {chartData ? (
-              <Styled.BillboardChart>
+              <$BillboardChart>
                 <SparklineChart
                   data={chartData}
                   xAccessor={(datum) => datum.x}
                   yAccessor={(datum) => datum.y}
                   positive={true}
                 />
-              </Styled.BillboardChart>
+              </$BillboardChart>
             ) : (
               false
             )}
-          </Styled.BillboardContainer>
+          </$BillboardContainer>
         )
       )}
-    </Styled.MarketBillboardsWrapper>
+    </$MarketBillboardsWrapper>
   );
 };
 
-const Styled = {
-  MarketBillboardsWrapper: styled.div`
-    ${layoutMixins.column}
-    gap: 1rem;
-  `,
-  BillboardContainer: styled.div`
-    ${layoutMixins.row}
-    flex: 1;
-    justify-content: space-between;
+const $MarketBillboardsWrapper = styled.div`
+  ${layoutMixins.column}
+  gap: 1rem;
+`;
+const $BillboardContainer = styled.div`
+  ${layoutMixins.row}
+  flex: 1;
+  justify-content: space-between;
 
-    background-color: var(--color-layer-3);
-    padding: 1.5rem;
-    border-radius: 0.625rem;
-  `,
-  BillboardChart: styled.div`
-    width: 130px;
-    height: 40px;
-  `,
-  BillboardLink: styled(Button)`
-    --button-textColor: var(--color-accent);
-    --button-height: unset;
-    --button-padding: 0;
-    justify-content: flex-start;
-  `,
-  BillboardTitle: styled.div`
-    ${layoutMixins.row}
+  background-color: var(--color-layer-3);
+  padding: 1.5rem;
+  border-radius: 0.625rem;
+`;
+const $BillboardChart = styled.div`
+  width: 130px;
+  height: 40px;
+`;
+const $BillboardLink = styled(Button)`
+  --button-textColor: var(--color-accent);
+  --button-height: unset;
+  --button-padding: 0;
+  justify-content: flex-start;
+`;
+const $BillboardTitle = styled.div`
+  ${layoutMixins.row}
 
-    gap: 0.375rem;
-  `,
-  BillboardStat: styled.div`
-    ${layoutMixins.column}
+  gap: 0.375rem;
+`;
+const $BillboardStat = styled.div`
+  ${layoutMixins.column}
 
-    gap: 0.5rem;
+  gap: 0.5rem;
 
-    label {
-      color: var(--color-text-0);
-      font: var(--font-base-medium);
-    }
+  label {
+    color: var(--color-text-0);
+    font: var(--font-base-medium);
+  }
 
-    output {
-      color: var(--color-text-1);
-      font: var(--font-large-medium);
-    }
-  `,
-  Output: styled(Output)`
-    font: var(--font-extra-book);
-    color: var(--color-text-2);
+  output {
+    color: var(--color-text-1);
+    font: var(--font-large-medium);
+  }
+`;
+const $Output = styled(Output)`
+  font: var(--font-extra-book);
+  color: var(--color-text-2);
 
-    @media ${breakpoints.tablet} {
-      font: var(--font-base-book);
-    }
-  `,
-};
+  @media ${breakpoints.tablet} {
+    font: var(--font-base-book);
+  }
+`;

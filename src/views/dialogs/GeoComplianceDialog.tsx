@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ComplianceAction, Nullable, ParsingError } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
@@ -54,9 +54,9 @@ const CountrySelector = ({
       label={label}
       withSearch
     >
-      <Styled.SelectedCountry>
+      <$SelectedCountry>
         {selectedCountry || stringGetter({ key: STRING_KEYS.SELECT_A_COUNTRY })}
-      </Styled.SelectedCountry>
+      </$SelectedCountry>
     </SearchSelectMenu>
   );
 };
@@ -94,15 +94,15 @@ export const GeoComplianceDialog = ({ setIsOpen }: ElementProps) => {
       placement={isMobile ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
       {showForm ? (
-        <Styled.Form>
+        <$Form>
           <CountrySelector
             label={stringGetter({ key: STRING_KEYS.COUNTRY_OF_RESIDENCE })}
             selectedCountry={residence}
             onSelect={setResidence}
           />
-          <Styled.WithReceipt
+          <$WithReceipt
             slotReceipt={
-              <Styled.CheckboxContainer>
+              <$CheckboxContainer>
                 <Checkbox
                   checked={hasAcknowledged}
                   onCheckedChange={setHasAcknowledged}
@@ -111,7 +111,7 @@ export const GeoComplianceDialog = ({ setIsOpen }: ElementProps) => {
                     key: STRING_KEYS.COMPLIANCE_ACKNOWLEDGEMENT,
                   })}
                 />
-              </Styled.CheckboxContainer>
+              </$CheckboxContainer>
             }
           >
             <Button
@@ -121,36 +121,33 @@ export const GeoComplianceDialog = ({ setIsOpen }: ElementProps) => {
             >
               {stringGetter({ key: STRING_KEYS.SUBMIT })}
             </Button>
-          </Styled.WithReceipt>
-        </Styled.Form>
+          </$WithReceipt>
+        </$Form>
       ) : (
-        <Styled.Form>
+        <$Form>
           <p>{stringGetter({ key: STRING_KEYS.COMPLIANCE_BODY_FIRST_OFFENSE_1 })}</p>
           <p>{stringGetter({ key: STRING_KEYS.COMPLIANCE_BODY_FIRST_OFFENSE_2 })}</p>
           <Button action={ButtonAction.Primary} onClick={() => setShowForm(true)}>
             {stringGetter({ key: STRING_KEYS.CONTINUE })}
           </Button>
-        </Styled.Form>
+        </$Form>
       )}
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Form = styled.form`
+const $Form = styled.form`
   ${formMixins.transfersForm}
 `;
 
-Styled.SelectedCountry = styled.div`
+const $SelectedCountry = styled.div`
   text-align: start;
 `;
 
-Styled.CheckboxContainer = styled.div`
+const $CheckboxContainer = styled.div`
   padding: 1rem;
   color: var(--color-text-0);
 `;
 
-Styled.WithReceipt = styled(WithReceipt)`
+const $WithReceipt = styled(WithReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;

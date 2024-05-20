@@ -16,7 +16,7 @@ import {
   type TooltipContextType,
 } from '@visx/xychart';
 import { RenderTooltipParams } from '@visx/xychart/lib/components/Tooltip';
-import styled, { AnyStyledComponent, keyframes } from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 import { allTimeUnits } from '@/constants/time';
 
@@ -158,11 +158,17 @@ export const TimeSeriesChart = <Datum extends {}>({
   useAnimationFrame(
     (elapsedMilliseconds) => {
       if (zoomDomainAnimateTo) {
-        setZoomDomain(
-          (zoomDomain) =>
-            zoomDomain &&
-            zoomDomain * (zoomDomainAnimateTo / zoomDomain) ** (elapsedMilliseconds * 0.0166)
-        );
+        setZoomDomain((zoomDomain) => {
+          if (!zoomDomain) return zoomDomain;
+
+          const newZoomDomain =
+            zoomDomain * (zoomDomainAnimateTo / zoomDomain) ** (elapsedMilliseconds * 0.01);
+
+          // clamp according to direction
+          return zoomDomainAnimateTo > zoomDomain
+            ? Math.min(newZoomDomain, zoomDomainAnimateTo)
+            : Math.max(newZoomDomain, zoomDomainAnimateTo);
+        });
       }
     },
     [zoomDomainAnimateTo]
@@ -190,7 +196,6 @@ export const TimeSeriesChart = <Datum extends {}>({
     );
 
     const range = visibleData
-      .filter((datum) => xAccessor(datum) >= domain[0] && xAccessor(datum) <= domain[1])
       .map((datum) => yAccessor(datum))
       .reduce((range, y) => [Math.min(range[0], y), Math.max(range[1], y)] as const, [
         Infinity,
@@ -207,7 +212,7 @@ export const TimeSeriesChart = <Datum extends {}>({
   }, [visibleData]);
 
   // Events
-  const onWheel = ({ deltaX, deltaY }: WheelEvent) => {
+  const onWheel = ({ deltaX, deltaY }: React.WheelEvent) => {
     if (!zoomDomain) return;
 
     setZoomDomain(
@@ -224,7 +229,7 @@ export const TimeSeriesChart = <Datum extends {}>({
   };
 
   return (
-    <Styled.Container onWheel={onWheel} className={className}>
+    <$Container onWheel={onWheel} className={className}>
       {data.length && zoomDomain ? (
         <DataProvider
           xScale={{
@@ -249,7 +254,7 @@ export const TimeSeriesChart = <Datum extends {}>({
           }}
         >
           <EventEmitterProvider>
-            <Styled.ParentSize>
+            <$ParentSize>
               {({ width, height }: { width: number; height: number }) => {
                 const numTicksX =
                   (width - (margin?.left ?? 0) - (margin?.right ?? 0)) / tickSpacingX;
@@ -345,7 +350,7 @@ export const TimeSeriesChart = <Datum extends {}>({
                     {!isMobile && (
                       <>
                         {margin?.left && margin.left > 0 && (
-                          <Styled.YAxisBackground x="0" y="0" width={margin.left} height="100%" />
+                          <$YAxisBackground x="0" y="0" width={margin.left} height="100%" />
                         )}
 
                         <Axis
@@ -407,7 +412,7 @@ export const TimeSeriesChart = <Datum extends {}>({
                   </XYChart>
                 );
               }}
-            </Styled.ParentSize>
+            </$ParentSize>
           </EventEmitterProvider>
         </DataProvider>
       ) : (
@@ -415,13 +420,11 @@ export const TimeSeriesChart = <Datum extends {}>({
       )}
 
       {children}
-    </Styled.Container>
+    </$Container>
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.div`
+const $Container = styled.div`
   ${layoutMixins.stack}
   width: 0;
   min-width: 100%;
@@ -460,7 +463,7 @@ Styled.Container = styled.div`
   }
 `;
 
-Styled.ParentSize = styled(ParentSize)`
+const $ParentSize = styled(ParentSize)`
   min-height: 0;
   display: grid;
 
@@ -468,7 +471,7 @@ Styled.ParentSize = styled(ParentSize)`
   overscroll-behavior: contain;
 `;
 
-Styled.YAxisBackground = styled.foreignObject`
+const $YAxisBackground = styled.foreignObject`
   background: var(--stickyArea-background);
 
   /* Safari */

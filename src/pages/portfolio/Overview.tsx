@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, PortfolioRoute } from '@/constants/routes';
@@ -39,7 +39,7 @@ export const Overview = () => {
         <AccountDetailsAndHistory />
       </DetachedSection>
 
-      <Styled.AttachedExpandingSection>
+      <$AttachedExpandingSection>
         <ContentSectionHeader title={stringGetter({ key: STRING_KEYS.OPEN_POSITIONS })} />
 
         <PositionsTable
@@ -70,13 +70,10 @@ export const Overview = () => {
           showClosePositionAction={showClosePositionAction}
           withOuterBorder
         />
-      </Styled.AttachedExpandingSection>
+      </$AttachedExpandingSection>
     </div>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.AttachedExpandingSection = styled(AttachedExpandingSection)`
+const $AttachedExpandingSection = styled(AttachedExpandingSection)`
   margin-top: 1rem;
 `;

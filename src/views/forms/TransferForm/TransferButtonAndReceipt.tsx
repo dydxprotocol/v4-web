@@ -1,5 +1,5 @@
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -103,7 +103,7 @@ export const TransferButtonAndReceipt = ({
   ].filter(isTruthy);
 
   return (
-    <Styled.WithDetailsReceipt detailItems={transferDetailItems}>
+    <$WithDetailsReceipt detailItems={transferDetailItems}>
       {!canAccountTrade ? (
         <OnboardingTriggerButton size={ButtonSize.Base} />
       ) : (
@@ -115,13 +115,10 @@ export const TransferButtonAndReceipt = ({
           {stringGetter({ key: STRING_KEYS.CONFIRM_TRANSFER })}
         </Button>
       )}
-    </Styled.WithDetailsReceipt>
+    </$WithDetailsReceipt>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
+const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 
   dl {

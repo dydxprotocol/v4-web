@@ -1,6 +1,6 @@
 import React from 'react';
 
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Toolbar } from '@/components/Toolbar';
 
@@ -9,21 +9,16 @@ type ElementProps = {
 };
 
 export const ActionsTableCell = ({ children }: ElementProps) => (
-  <Styled.ActionsCell>
-    <Styled.Toolbar $numChildren={React.Children.toArray(children).length}>
-      {children}
-    </Styled.Toolbar>
-  </Styled.ActionsCell>
+  <$ActionsCell>
+    <$Toolbar $numChildren={React.Children.toArray(children).length}>{children}</$Toolbar>
+  </$ActionsCell>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ActionsCell = styled.div`
+const $ActionsCell = styled.div`
   display: flex;
   justify-content: flex-end;
 `;
 
-Styled.Toolbar = styled(Toolbar)<{ $numChildren: number }>`
+const $Toolbar = styled(Toolbar)<{ $numChildren: number }>`
   ${({ $numChildren }) =>
     $numChildren &&
     css`

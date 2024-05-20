@@ -1,4 +1,4 @@
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 type GradientCardProps = React.PropsWithChildren<{
   className?: string;
@@ -8,15 +8,12 @@ type GradientCardProps = React.PropsWithChildren<{
 
 export const GradientCard = ({ children, className, fromColor, toColor }: GradientCardProps) => {
   return (
-    <Styled.GradientCard className={className} fromColor={fromColor} toColor={toColor}>
+    <$GradientCard className={className} fromColor={fromColor} toColor={toColor}>
       {children}
-    </Styled.GradientCard>
+    </$GradientCard>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.GradientCard = styled.div<{
+const $GradientCard = styled.div<{
   fromColor?: GradientCardProps['fromColor'];
   toColor?: GradientCardProps['toColor'];
 }>`

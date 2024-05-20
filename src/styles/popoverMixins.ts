@@ -1,4 +1,10 @@
-import { css, keyframes } from 'styled-components';
+import {
+  FlattenInterpolation,
+  FlattenSimpleInterpolation,
+  ThemeProps,
+  css,
+  keyframes,
+} from 'styled-components';
 
 import { layoutMixins } from './layoutMixins';
 
@@ -236,4 +242,4 @@ export const popoverMixins = {
       color: var(--item-checked-textColor, var(--trigger-textColor, inherit));
     }
   `,
-};
+} satisfies Record<string, FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>>;

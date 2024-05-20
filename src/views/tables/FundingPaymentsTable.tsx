@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import type { Asset, SubaccountFundingPayment } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -12,6 +12,7 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 import { Output, OutputType } from '@/components/Output';
 import { Table, TableCell, type ColumnDef } from '@/components/Table';
 import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import { PageSize } from '@/components/Table/TablePaginationRow';
 
 import {
   getCurrentMarketFundingPayments,
@@ -26,6 +27,7 @@ import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
 
 type ElementProps = {
   currentMarket?: string;
+  initialPageSize?: PageSize;
 };
 
 type StyleProps = {
@@ -40,6 +42,7 @@ export type FundingPaymentTableRow = {
 
 export const FundingPaymentsTable = ({
   currentMarket,
+  initialPageSize,
   withOuterBorder,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
@@ -60,7 +63,7 @@ export const FundingPaymentsTable = ({
   ) as FundingPaymentTableRow[];
 
   return (
-    <Styled.Table
+    <$Table
       key={currentMarket ?? 'all-fundingPayments'}
       label="FundingPayments"
       data={fundingPaymentsData}
@@ -98,7 +101,7 @@ export const FundingPaymentsTable = ({
             getCellValue: (row) => row.rate,
             label: stringGetter({ key: STRING_KEYS.FUNDING_RATE }),
             renderCell: (row) => (
-              <Styled.Output
+              <$Output
                 type={OutputType.SmallPercent}
                 value={row.rate}
                 isNegative={MustBigNumber(row.rate).isNegative()}
@@ -117,7 +120,7 @@ export const FundingPaymentsTable = ({
                   fractionDigits={stepSizeDecimals}
                   tag={asset.id}
                 />
-                <Styled.Output
+                <$Output
                   type={OutputType.Text}
                   value={
                     MustBigNumber(positionSize).isNegative()
@@ -144,6 +147,7 @@ export const FundingPaymentsTable = ({
           <h4>{stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_EMPTY_STATE })}</h4>
         </>
       }
+      initialPageSize={initialPageSize}
       withOuterBorder={withOuterBorder}
       withInnerBorders
       withScrollSnapColumns
@@ -152,14 +156,11 @@ export const FundingPaymentsTable = ({
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Table = styled(Table)`
+const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
-`;
+` as typeof Table;
 
-Styled.Output = styled(Output)<{ isNegative?: boolean }>`
+const $Output = styled(Output)<{ isNegative?: boolean }>`
   color: ${({ isNegative }) =>
     isNegative ? `var(--color-negative)` : `var(--color-positive)`} !important;
 `;

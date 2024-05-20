@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import {
   Nullable,
@@ -153,7 +153,7 @@ export const TriggerOrderInputs = ({
   const signedOutput = () => {
     const { outputType, outputValue } = getOutputDiffData();
     return (
-      <Styled.SignedOutput
+      <$SignedOutput
         sign={getNumberSign(outputValue)}
         showSign={ShowSign.Both}
         type={outputType}
@@ -186,13 +186,13 @@ export const TriggerOrderInputs = ({
   );
 
   const multipleOrdersButton = () => (
-    <Styled.MultipleOrdersContainer>
+    <$MultipleOrdersContainer>
       {stringGetter({ key: STRING_KEYS.MULTIPLE_ORDERS_FOUND })}
-      <Styled.ViewAllButton action={ButtonAction.Navigation} onClick={onViewOrdersClick}>
+      <$ViewAllButton action={ButtonAction.Navigation} onClick={onViewOrdersClick}>
         {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
-        {<Styled.ArrowIcon iconName={IconName.Arrow} />}
-      </Styled.ViewAllButton>
-    </Styled.MultipleOrdersContainer>
+        {<$ArrowIcon iconName={IconName.Arrow} />}
+      </$ViewAllButton>
+    </$MultipleOrdersContainer>
   );
 
   const headerTooltip = () => (
@@ -200,29 +200,29 @@ export const TriggerOrderInputs = ({
   );
 
   return isMultiple ? (
-    <Styled.TriggerRow key={tooltipId}>
-      <Styled.Heading>{headerTooltip()}</Styled.Heading>
-      <Styled.InlineRow>{multipleOrdersButton()}</Styled.InlineRow>
-    </Styled.TriggerRow>
+    <$TriggerRow key={tooltipId}>
+      <$Heading>{headerTooltip()}</$Heading>
+      <$InlineRow>{multipleOrdersButton()}</$InlineRow>
+    </$TriggerRow>
   ) : (
-    <Styled.TriggerRow key={tooltipId}>
-      <Styled.Heading>
+    <$TriggerRow key={tooltipId}>
+      <$Heading>
         {headerTooltip()}
-        <Styled.HeadingInfo>
+        <$HeadingInfo>
           {stringGetter({ key: stringKeys.headerDiff })}
           {signedOutput()}
-          <Styled.VerticalSeparator />
-          <Styled.ClearButton
+          <$VerticalSeparator />
+          <$ClearButton
             action={ButtonAction.Destroy}
             size={ButtonSize.Base}
             type={ButtonType.Button}
             onClick={clearPriceInputFields}
           >
             {stringGetter({ key: STRING_KEYS.CLEAR })}
-          </Styled.ClearButton>
-        </Styled.HeadingInfo>
-      </Styled.Heading>
-      <Styled.InlineRow>
+          </$ClearButton>
+        </$HeadingInfo>
+      </$Heading>
+      <$InlineRow>
         <FormInput
           id={`${tooltipId}-price`}
           label={
@@ -255,25 +255,22 @@ export const TriggerOrderInputs = ({
           onInput={inputType === InputType.Percent ? onPercentageDiffInput : onUsdcDiffInput}
           allowNegative={true}
         />
-      </Styled.InlineRow>
-    </Styled.TriggerRow>
+      </$InlineRow>
+    </$TriggerRow>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Heading = styled.div`
+const $Heading = styled.div`
   ${layoutMixins.spacedRow}
 `;
 
-Styled.HeadingInfo = styled.div`
+const $HeadingInfo = styled.div`
   ${layoutMixins.row}
   font: var(--font-base-book);
   gap: 0.5em;
   color: var(--color-text-0);
 `;
 
-Styled.SignedOutput = styled(Output)<{ sign: NumberSign }>`
+const $SignedOutput = styled(Output)<{ sign: NumberSign }>`
   color: ${({ sign }) =>
     ({
       [NumberSign.Positive]: `var(--color-positive)`,
@@ -282,13 +279,13 @@ Styled.SignedOutput = styled(Output)<{ sign: NumberSign }>`
     }[sign])};
 `;
 
-Styled.VerticalSeparator = styled(VerticalSeparator)`
+const $VerticalSeparator = styled(VerticalSeparator)`
   && {
     height: 1.5rem;
   }
 `;
 
-Styled.ClearButton = styled(Button)`
+const $ClearButton = styled(Button)`
   --button-backgroundColor: transparent;
   --button-border: none;
   --button-height: 1.5rem;
@@ -296,17 +293,17 @@ Styled.ClearButton = styled(Button)`
   --button-padding: 0;
 `;
 
-Styled.TriggerRow = styled.div`
+const $TriggerRow = styled.div`
   ${layoutMixins.column}
   gap: 1ch;
 `;
 
-Styled.InlineRow = styled.span`
+const $InlineRow = styled.span`
   ${layoutMixins.flexEqualColumns}
   gap: 1ch;
 `;
 
-Styled.MultipleOrdersContainer = styled.div`
+const $MultipleOrdersContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -318,10 +315,10 @@ Styled.MultipleOrdersContainer = styled.div`
   color: var(--color-text-2);
 `;
 
-Styled.ViewAllButton = styled(Button)`
+const $ViewAllButton = styled(Button)`
   color: var(--color-accent);
 `;
 
-Styled.ArrowIcon = styled(Icon)`
+const $ArrowIcon = styled(Icon)`
   stroke-width: 2;
 `;

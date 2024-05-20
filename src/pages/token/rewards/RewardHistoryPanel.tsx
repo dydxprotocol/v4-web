@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import {
   HISTORICAL_TRADING_REWARDS_PERIODS,
@@ -33,23 +33,20 @@ export const RewardHistoryPanel = () => {
     abacusStateManager.getHistoricalTradingRewardPeriod() || HistoricalTradingRewardsPeriod.WEEKLY
   );
 
-  const onSelectPeriod = useCallback(
-    (periodName: string) => {
-      const selectedPeriod =
-        HISTORICAL_TRADING_REWARDS_PERIODS[
-          periodName as keyof typeof HISTORICAL_TRADING_REWARDS_PERIODS
-        ];
-      setSelectedPeriod(selectedPeriod);
-      abacusStateManager.setHistoricalTradingRewardPeriod(selectedPeriod);
-    },
-    [setSelectedPeriod, selectedPeriod]
-  );
+  const onSelectPeriod = useCallback((periodName: string) => {
+    const thisSelectedPeriod =
+      HISTORICAL_TRADING_REWARDS_PERIODS[
+        periodName as keyof typeof HISTORICAL_TRADING_REWARDS_PERIODS
+      ];
+    setSelectedPeriod(thisSelectedPeriod);
+    abacusStateManager.setHistoricalTradingRewardPeriod(thisSelectedPeriod);
+  }, []);
 
   return (
     <Panel
       slotHeader={
-        <Styled.Header>
-          <Styled.Title>
+        <$Header>
+          <$Title>
             <WithTooltip tooltip="reward-history">
               <h3>{stringGetter({ key: STRING_KEYS.REWARD_HISTORY })}</h3>
             </WithTooltip>
@@ -58,7 +55,7 @@ export const RewardHistoryPanel = () => {
                 key: STRING_KEYS.REWARD_HISTORY_DESCRIPTION,
                 params: {
                   REWARDS_HISTORY_START_DATE: (
-                    <Styled.Output
+                    <$Output
                       type={OutputType.Date}
                       value={REWARDS_HISTORY_START_DATE_MS}
                       timeOptions={{ useUTC: true }}
@@ -67,7 +64,7 @@ export const RewardHistoryPanel = () => {
                 },
               })}
             </span>
-          </Styled.Title>
+          </$Title>
           <ToggleGroup
             items={[
               {
@@ -86,17 +83,14 @@ export const RewardHistoryPanel = () => {
             value={selectedPeriod.name}
             onValueChange={onSelectPeriod}
           />
-        </Styled.Header>
+        </$Header>
       }
     >
       <TradingRewardHistoryTable period={selectedPeriod} />
     </Panel>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Header = styled.div`
+const $Header = styled.div`
   ${layoutMixins.spacedRow}
 
   padding: 1rem 1rem 0;
@@ -107,7 +101,7 @@ Styled.Header = styled.div`
   }
 `;
 
-Styled.Title = styled.div`
+const $Title = styled.div`
   ${layoutMixins.column}
   color: var(--color-text-0);
   font: var(--font-small-book);
@@ -118,11 +112,6 @@ Styled.Title = styled.div`
   }
 `;
 
-Styled.Content = styled.div`
-  ${layoutMixins.flexColumn}
-  gap: 0.75rem;
-`;
-
-Styled.Output = styled(Output)`
+const $Output = styled(Output)`
   display: inline;
 `;

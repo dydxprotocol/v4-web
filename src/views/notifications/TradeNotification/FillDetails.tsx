@@ -1,5 +1,5 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { TradeTypes } from '@/constants/trade';
@@ -29,15 +29,15 @@ export const FillDetails = ({
 }) => {
   const stringGetter = useStringGetter();
   return (
-    <Styled.Details
+    <$Details
       items={[
         {
           key: 'size',
           label: (
-            <Styled.Label>
+            <$Label>
               {stringGetter({ key: STRING_KEYS.SIZE })}
               <OrderSideTag orderSide={orderSide} />
-            </Styled.Label>
+            </$Label>
           ),
           value: <Output type={OutputType.Asset} value={filledAmount} tag={assetId} />,
         },
@@ -59,15 +59,12 @@ export const FillDetails = ({
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Label = styled.span`
+const $Label = styled.span`
   ${layoutMixins.row}
   gap: 0.5ch;
 `;
 
-Styled.Details = styled(Details)`
+const $Details = styled(Details)`
   --details-item-height: 1rem;
 
   dd {

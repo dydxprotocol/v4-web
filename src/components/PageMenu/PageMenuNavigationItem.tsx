@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import type { MenuItem } from '@/constants/menus';
 
@@ -17,19 +17,16 @@ export const PageMenuNavigationItem = <
   labelRight,
 }: MenuItem<MenuItemValue, PageMenuItemType>) => (
   <Link to={href || ''}>
-    <Styled.MenuItem>
+    <$MenuItem>
       <div>{label}</div>
-      <Styled.RightRow>
+      <$RightRow>
         {labelRight && <span>{labelRight}</span>}
-        <Styled.Icon iconName={IconName.ChevronRight} />
-      </Styled.RightRow>
-    </Styled.MenuItem>
+        <$Icon iconName={IconName.ChevronRight} />
+      </$RightRow>
+    </$MenuItem>
   </Link>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.MenuItem = styled.ul`
+const $MenuItem = styled.ul`
   ${popoverMixins.item}
 
   --item-padding: 1.25rem 1.625rem;
@@ -38,7 +35,7 @@ Styled.MenuItem = styled.ul`
   ${layoutMixins.spacedRow}
 `;
 
-Styled.RightRow = styled.div`
+const $RightRow = styled.div`
   ${layoutMixins.row}
   gap: 1rem;
 
@@ -46,6 +43,6 @@ Styled.RightRow = styled.div`
   color: var(--color-text-0);
 `;
 
-Styled.Icon = styled(Icon)`
+const $Icon = styled(Icon)`
   color: var(--color-text-0);
 `;

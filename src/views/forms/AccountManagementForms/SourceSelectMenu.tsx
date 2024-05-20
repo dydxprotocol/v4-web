@@ -1,5 +1,5 @@
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -31,6 +31,14 @@ export type TokenInfo = {
   name: string;
 };
 
+const cctpTokensByChainId = cctpTokens.reduce((acc, token) => {
+  if (!acc[token.chainId]) {
+    acc[token.chainId] = [];
+  }
+  acc[token.chainId].push(token);
+  return acc;
+}, {} as Record<string, TokenInfo[]>);
+
 export const SourceSelectMenu = ({
   label,
   selectedExchange,
@@ -38,7 +46,7 @@ export const SourceSelectMenu = ({
   onSelect,
 }: ElementProps) => {
   const { walletType } = useAccounts();
-  const { CCTPWithdrawalOnly } = useEnvFeatures();
+  const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
 
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions } =
@@ -49,14 +57,6 @@ export const SourceSelectMenu = ({
   const exchanges =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.exchanges?.toArray() ||
     [];
-
-  const cctpTokensByChainId = cctpTokens.reduce((acc, token) => {
-    if (!acc[token.chainId]) {
-      acc[token.chainId] = [];
-    }
-    acc[token.chainId].push(token);
-    return acc;
-  }, {} as Record<string, TokenInfo[]>);
 
   // withdrawals SourceSelectMenu is half width size so we must throw the decorator text
   // in the description prop (renders below the item label) instead of in the slotAfter
@@ -69,26 +69,33 @@ export const SourceSelectMenu = ({
       onSelect: () => {
         onSelect(chain.type, 'chain');
       },
-      slotBefore: <Styled.Img src={chain.iconUrl} alt="" />,
+      slotBefore: <$Img src={chain.iconUrl ?? undefined} alt="" />,
       [lowestFeesDecoratorProp]: !!cctpTokensByChainId[chain.type] && (
-        <Styled.Text>
+        <$Text>
           {stringGetter({
             key: STRING_KEYS.LOWEST_FEES_WITH_USDC,
             params: {
               LOWEST_FEES_HIGHLIGHT_TEXT: (
-                <Styled.GreenHighlight>
+                <$GreenHighlight>
                   {stringGetter({ key: STRING_KEYS.LOWEST_FEES_HIGHLIGHT_TEXT })}
-                </Styled.GreenHighlight>
+                </$GreenHighlight>
               ),
             },
           })}
-        </Styled.Text>
+        </$Text>
       ),
     }))
-    .filter(
-      (chain) =>
-        type === TransferType.deposit || !!cctpTokensByChainId[chain.value] || !CCTPWithdrawalOnly
-    )
+    .filter((chain) => {
+      // if deposit and CCTPDepositOnly enabled, only return cctp tokens
+      if (type === TransferType.deposit && CCTPDepositOnly) {
+        return !!cctpTokensByChainId[chain.value];
+      }
+      // if withdrawal and CCTPWithdrawalOnly enabled, only return cctp tokens
+      if (type === TransferType.withdrawal && CCTPWithdrawalOnly) {
+        return !!cctpTokensByChainId[chain.value];
+      }
+      return true;
+    })
     .sort((chain) => (!!cctpTokensByChainId[chain.value] ? -1 : 1));
 
   const exchangeItems = Object.values(exchanges).map((exchange) => ({
@@ -97,7 +104,7 @@ export const SourceSelectMenu = ({
     onSelect: () => {
       onSelect(exchange.type, 'exchange');
     },
-    slotBefore: <Styled.Img src={exchange.iconUrl} alt="" />,
+    slotBefore: <$Img src={exchange.iconUrl ?? undefined} alt="" />,
   }));
 
   const selectedChainOption = chains.find((item) => item.type === selectedChain);
@@ -122,48 +129,46 @@ export const SourceSelectMenu = ({
       ].filter(isTruthy)}
       label={label || (type === TransferType.deposit ? 'Source' : 'Destination')}
     >
-      <Styled.ChainRow>
+      <$ChainRow>
         {selectedChainOption ? (
           <>
-            <Styled.Img src={selectedChainOption.iconUrl} alt="" /> {selectedChainOption.stringKey}
+            <$Img src={selectedChainOption.iconUrl ?? undefined} alt="" />{' '}
+            {selectedChainOption.stringKey}
           </>
         ) : selectedExchangeOption ? (
           <>
-            <Styled.Img src={selectedExchangeOption.iconUrl} alt="" />{' '}
+            <$Img src={selectedExchangeOption.iconUrl ?? undefined} alt="" />{' '}
             {selectedExchangeOption.string}
           </>
         ) : (
           stringGetter({ key: STRING_KEYS.SELECT_CHAIN })
         )}
-      </Styled.ChainRow>
+      </$ChainRow>
     </SearchSelectMenu>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.DropdownContainer = styled.div`
+const $DropdownContainer = styled.div`
   ${popoverMixins.item}
 `;
 
-Styled.Img = styled.img`
+const $Img = styled.img`
   width: 1.25rem;
   height: 1.25rem;
   border-radius: 50%;
 `;
 
-Styled.ChainRow = styled.div`
+const $ChainRow = styled.div`
   ${layoutMixins.row}
   gap: 0.5rem;
   color: var(--color-text-2);
   font: var(--font-base-book);
 `;
 
-Styled.Text = styled.div`
+const $Text = styled.div`
   font: var(--font-small-regular);
   color: var(--color-text-0);
 `;
 
-Styled.GreenHighlight = styled.span`
+const $GreenHighlight = styled.span`
   color: var(--color-green);
 `;

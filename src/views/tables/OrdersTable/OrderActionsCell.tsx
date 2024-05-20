@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 
 import { useDispatch } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { AbacusOrderStatus, type OrderStatus } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';
@@ -35,7 +35,7 @@ export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) 
 
   return (
     <ActionsTableCell>
-      <Styled.CancelButton
+      <$CancelButton
         key="cancelorder"
         iconName={IconName.Close}
         shape={ButtonShape.Square}
@@ -52,10 +52,7 @@ export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) 
     </ActionsTableCell>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.CancelButton = styled(IconButton)`
+const $CancelButton = styled(IconButton)`
   --button-hover-textColor: var(--color-red);
 
   svg {

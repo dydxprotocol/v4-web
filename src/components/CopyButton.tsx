@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -38,15 +38,15 @@ export const CopyButton = ({
   };
 
   return buttonType === 'text' ? (
-    <Styled.InlineRow onClick={onCopy} copied={copied}>
+    <$InlineRow onClick={onCopy} copied={copied}>
       {children}
-      <Styled.Icon copied={copied} iconName={copied ? IconName.Check : IconName.Copy} />
-    </Styled.InlineRow>
+      <$Icon copied={copied} iconName={copied ? IconName.Check : IconName.Copy} />
+    </$InlineRow>
   ) : buttonType === 'icon' ? (
     <WithTooltip
       tooltipString={stringGetter({ key: copied ? STRING_KEYS.COPIED : STRING_KEYS.COPY })}
     >
-      <Styled.IconButton
+      <$IconButton
         {...buttonProps}
         copied={copied}
         action={ButtonAction.Base}
@@ -65,10 +65,7 @@ export const CopyButton = ({
     </Button>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.InlineRow = styled.div<{ copied: boolean }>`
+const $InlineRow = styled.div<{ copied: boolean }>`
   ${layoutMixins.inlineRow}
   cursor: pointer;
 
@@ -85,7 +82,7 @@ Styled.InlineRow = styled.div<{ copied: boolean }>`
         `}
 `;
 
-Styled.Icon = styled(Icon)<{ copied: boolean }>`
+const $Icon = styled(Icon)<{ copied: boolean }>`
   ${({ copied }) =>
     copied &&
     css`
@@ -93,7 +90,7 @@ Styled.Icon = styled(Icon)<{ copied: boolean }>`
     `}
 `;
 
-Styled.IconButton = styled(IconButton)<{ copied: boolean }>`
+const $IconButton = styled(IconButton)<{ copied: boolean }>`
   ${({ copied }) =>
     copied &&
     css`

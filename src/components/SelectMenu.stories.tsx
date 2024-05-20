@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import type { Story } from '@ladle/react';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -34,7 +34,7 @@ export const SelectMenuStory: Story<Parameters<typeof SelectMenu>[0]> = (args) =
 
   return (
     <StoryWrapper>
-      <Styled.Container>
+      <$Container>
         <SelectMenu value={value} onValueChange={setValue}>
           {exampleItems.map(({ value, label }) => (
             <SelectItem key={value} value={value} label={label} />
@@ -46,14 +46,11 @@ export const SelectMenuStory: Story<Parameters<typeof SelectMenu>[0]> = (args) =
             <SelectItem key={value} value={value} label={label} />
           ))}
         </SelectMenu>
-      </Styled.Container>
+      </$Container>
     </StoryWrapper>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.section`
+const $Container = styled.section`
   background: var(--color-layer-3);
 
   ${layoutMixins.container}

@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { TradeBoxDialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -46,10 +46,10 @@ export const TradeBox = () => {
     }[activeDialog.type];
 
   return (
-    <Styled.TradeBox>
+    <$TradeBox>
       <TradeBoxOrderView />
 
-      <Styled.Dialog
+      <$Dialog
         isOpen={!!activeDialog}
         title={activeDialogConfig?.title}
         setIsOpen={(isOpen: boolean) => {
@@ -63,14 +63,11 @@ export const TradeBox = () => {
         {...activeDialog?.dialogProps}
       >
         {activeDialogConfig?.content}
-      </Styled.Dialog>
-    </Styled.TradeBox>
+      </$Dialog>
+    </$TradeBox>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TradeBox = styled.section`
+const $TradeBox = styled.section`
   --tradeBox-content-paddingTop: 1rem;
   --tradeBox-content-paddingRight: 1rem;
   --tradeBox-content-paddingBottom: 1rem;
@@ -82,7 +79,7 @@ Styled.TradeBox = styled.section`
   ${layoutMixins.stack}
 `;
 
-Styled.Dialog = styled(Dialog)`
+const $Dialog = styled(Dialog)`
   --dialog-backgroundColor: var(--color-layer-2);
 
   --dialog-paddingX: 1.25rem;

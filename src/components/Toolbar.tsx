@@ -1,5 +1,5 @@
 import { Root } from '@radix-ui/react-toolbar';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -21,7 +21,7 @@ export const Toolbar = ({
   withSeparators = false,
   className,
 }: ElementProps & StyleProps) => (
-  <Styled.Root className={className} layout={layout}>
+  <$Root className={className} layout={layout}>
     <WithSeparators layout={layout} withSeparators={withSeparators}>
       {children}
 
@@ -35,12 +35,9 @@ export const Toolbar = ({
         </Button>
       ))} */}
     </WithSeparators>
-  </Styled.Root>
+  </$Root>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Root = styled(Root)<{ layout?: 'column' | 'row' }>`
+const $Root = styled(Root)<{ layout?: 'column' | 'row' }>`
   ${({ layout }) =>
     layout &&
     {

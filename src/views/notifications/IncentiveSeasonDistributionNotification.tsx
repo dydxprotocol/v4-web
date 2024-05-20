@@ -1,4 +1,4 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
@@ -22,18 +22,18 @@ export const IncentiveSeasonDistributionNotification = ({
   const { chainTokenLabel, points } = data;
 
   return (
-    <Styled.Notification
+    <$Notification
       isToast={isToast}
       notification={notification}
       slotIcon={<Icon iconName={IconName.RewardStar} />}
       slotTitle="Season 3 launch rewards have been distributed!"
       slotCustomContent={
-        <Styled.Details
+        <$Details
           items={[
             {
               key: 'season_distribution',
               label: 'Season 3 rewards',
-              value: <Styled.Output type={OutputType.Asset} value={points} tag={chainTokenLabel} />,
+              value: <$Output type={OutputType.Asset} value={points} tag={chainTokenLabel} />,
             },
           ]}
         />
@@ -41,10 +41,7 @@ export const IncentiveSeasonDistributionNotification = ({
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Details = styled(Details)`
+const $Details = styled(Details)`
   --details-item-height: 1.5rem;
 
   dd {
@@ -52,12 +49,12 @@ Styled.Details = styled(Details)`
   }
 `;
 
-Styled.Notification = styled(Notification)`
+const $Notification = styled(Notification)`
   background-image: url('/dots-background-2.svg');
   background-size: cover;
 `;
 
-Styled.Output = styled(Output)`
+const $Output = styled(Output)`
   &:before {
     content: '+';
     color: var(--color-success);

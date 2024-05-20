@@ -1,4 +1,4 @@
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { formatZeroNumbers } from '@/lib/formatZeroNumbers';
 
@@ -18,7 +18,7 @@ export const NumberValue = ({ className, value, withSubscript }: NumberValueProp
         {punctuationSymbol}
         {Boolean(zeros) && (
           <>
-            0<Styled.Sub title={value}>{zeros}</Styled.Sub>
+            0<$Sub title={value}>{zeros}</$Sub>
           </>
         )}
         {decimalDigits}
@@ -28,9 +28,6 @@ export const NumberValue = ({ className, value, withSubscript }: NumberValueProp
 
   return value;
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Sub = styled.sub`
+const $Sub = styled.sub`
   font-size: 0.85em;
 `;

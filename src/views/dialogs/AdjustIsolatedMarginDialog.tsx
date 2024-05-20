@@ -1,5 +1,5 @@
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import type { SubaccountPosition } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -31,16 +31,13 @@ export const AdjustIsolatedMarginDialog = ({ positionId, setIsOpen }: ElementPro
       slotIcon={subaccountPosition && <AssetIcon symbol={subaccountPosition.assetId} />}
       title={stringGetter({ key: STRING_KEYS.ADJUST_ISOLATED_MARGIN })}
     >
-      <Styled.Content>
+      <$Content>
         <AdjustIsolatedMarginForm marketId={positionId} />
-      </Styled.Content>
+      </$Content>
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
 `;

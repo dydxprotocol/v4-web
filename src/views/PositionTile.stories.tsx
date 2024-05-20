@@ -1,5 +1,5 @@
 import type { Story } from '@ladle/react';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { breakpoints } from '@/styles';
 
@@ -8,15 +8,12 @@ import { StoryWrapper } from '.ladle/components';
 
 export const PositionTileStory: Story<Parameters<typeof PositionTile>[0]> = (args) => (
   <StoryWrapper>
-    <Styled.PositionInfoContainer>
+    <$PositionInfoContainer>
       <PositionTile {...args} />
-    </Styled.PositionInfoContainer>
+    </$PositionInfoContainer>
   </StoryWrapper>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.PositionInfoContainer = styled.div`
+const $PositionInfoContainer = styled.div`
   display: grid;
   height: 4.625rem;
   margin: auto;

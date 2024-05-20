@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { OpacityToken } from '@/constants/styles/base';
@@ -40,7 +40,7 @@ export const NobleDeposit = () => {
           },
         ]}
       >
-        <Styled.QrCode
+        <$QrCode
           hasLogo
           size={432}
           value={nobleAddress || ''}
@@ -48,9 +48,9 @@ export const NobleDeposit = () => {
         />
       </WithDetailsReceipt>
 
-      <Styled.WithReceipt
+      <$WithReceipt
         slotReceipt={
-          <Styled.CheckboxContainer>
+          <$CheckboxContainer>
             <Checkbox
               checked={hasAcknowledged}
               onCheckedChange={setHasAcknowledged}
@@ -59,7 +59,7 @@ export const NobleDeposit = () => {
                 key: STRING_KEYS.NOBLE_ACKNOWLEDGEMENT,
               })}
             />
-          </Styled.CheckboxContainer>
+          </$CheckboxContainer>
         }
       >
         <TimeoutButton
@@ -71,24 +71,21 @@ export const NobleDeposit = () => {
             </CopyButton>
           }
         />
-      </Styled.WithReceipt>
+      </$WithReceipt>
     </>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.WaitingSpan = styled.span`
+const $WaitingSpan = styled.span`
   ${layoutMixins.row}
   gap: 1rem;
   color: var(--color-text-1);
 `;
 
-Styled.WithReceipt = styled(WithReceipt)`
+const $WithReceipt = styled(WithReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
-Styled.QrCode = styled(QrCode)<{ blurred: boolean }>`
+const $QrCode = styled(QrCode)<{ blurred: boolean }>`
   border-radius: 0.5em;
 
   ${({ blurred }) =>
@@ -98,12 +95,12 @@ Styled.QrCode = styled(QrCode)<{ blurred: boolean }>`
     `}
 `;
 
-Styled.CheckboxContainer = styled.div`
+const $CheckboxContainer = styled.div`
   padding: 1rem;
   color: var(--color-text-0);
 `;
 
-Styled.CautionIconContainer = styled.div`
+const $CautionIconContainer = styled.div`
   ${layoutMixins.stack}
   min-width: 2.5rem;
   height: 2.5rem;

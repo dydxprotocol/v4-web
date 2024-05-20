@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -19,9 +19,9 @@ export const SearchInput = ({ placeholder, onTextChange }: SearchInputProps) => 
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   return (
-    <Styled.Search>
-      <Styled.Icon iconName={IconName.Search} />
-      <Styled.Input
+    <$Search>
+      <$Icon iconName={IconName.Search} />
+      <$Input
         autoFocus
         ref={inputRef}
         value={value}
@@ -33,20 +33,17 @@ export const SearchInput = ({ placeholder, onTextChange }: SearchInputProps) => 
         placeholder={placeholder}
       />
       {value.length > 0 && (
-        <Styled.IconButton
+        <$IconButton
           iconName={IconName.Close}
           onClick={() => {
             setValue('');
           }}
         />
       )}
-    </Styled.Search>
+    </$Search>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Search = styled.div`
+const $Search = styled.div`
   ${layoutMixins.row}
   width: auto;
   height: 2rem;
@@ -59,12 +56,12 @@ Styled.Search = styled.div`
   justify-content: end;
 `;
 
-Styled.Input = styled(Input)`
+const $Input = styled(Input)`
   max-width: 100%;
   border-radius: 0;
 `;
 
-Styled.IconButton = styled(IconButton)`
+const $IconButton = styled(IconButton)`
   --button-icon-size: 0.5rem;
   --button-border: none;
   --button-backgroundColor: transparent;
@@ -73,6 +70,6 @@ Styled.IconButton = styled(IconButton)`
   height: 1.5rem;
 `;
 
-Styled.Icon = styled(Icon)`
+const $Icon = styled(Icon)`
   color: ${({ theme }) => theme.textSecondary};
 `;

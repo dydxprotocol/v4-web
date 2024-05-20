@@ -1,8 +1,8 @@
-import { useCallback, useMemo } from 'react';
+import { Key, useCallback, useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { css, keyframes, type AnyStyledComponent } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 import { type OrderbookLine } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -16,7 +16,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Details } from '@/components/Details';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
-import { TableRow, type CustomRowConfig } from '@/components/Table';
+import { ColumnDef, TableRow, type CustomRowConfig } from '@/components/Table';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
@@ -26,6 +26,7 @@ import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketOrderbook } from '@/state/perpetualsSelectors';
 
+import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { OrderbookTradesOutput, OrderbookTradesTable } from './OrderbookTradesTable';
@@ -162,13 +163,13 @@ const OrderbookTable = ({
   stepSizeDecimals: number | undefined | null;
   tickSizeDecimals: number | undefined | null;
   histogramRange: number;
-  onRowAction: (key: string, row: RowData) => void;
+  onRowAction: (key: Key, row: RowData) => void;
   className?: string;
   hideHeader?: boolean;
 }) => {
   const stringGetter = useStringGetter();
 
-  const columns = useMemo(() => {
+  const columns = useMemo((): ColumnDef<RowData>[] => {
     return [
       {
         columnKey: 'size',
@@ -177,12 +178,12 @@ const OrderbookTable = ({
         tag: symbol,
         renderCell: (row: RowData) =>
           row.size > 0 && (
-            <Styled.HistogramOutput
+            <$HistogramOutput
               highlightText
               type={OutputType.Asset}
               value={row.size}
               fractionDigits={stepSizeDecimals}
-              histogramSide={histogramSide === 'left' && 'left'}
+              histogramSide={histogramSide === 'left' ? 'left' : undefined}
               useGrouping={false}
             />
           ),
@@ -205,16 +206,16 @@ const OrderbookTable = ({
       },
       {
         columnKey: 'subaccount-orders',
-        getCellValue: (row: RowData) => row.mine,
+        getCellValue: (row: RowData) => row.mine ?? '',
         label: showMineColumn && stringGetter({ key: STRING_KEYS.ORDERBOOK_MY_ORDER_SIZE }),
         renderCell: (row: RowData) => (
           <span>
-            <Styled.HistogramOutput
+            <$HistogramOutput
               highlightText
               type={row.mine ? OutputType.Asset : OutputType.Text}
               value={row.mine}
               fractionDigits={stepSizeDecimals}
-              histogramSide={histogramSide === 'right' && 'right'}
+              histogramSide={histogramSide === 'right' ? 'right' : undefined}
               useGrouping={false}
             />
           </span>
@@ -224,7 +225,7 @@ const OrderbookTable = ({
   }, [showMineColumn, symbol, stepSizeDecimals, tickSizeDecimals, histogramSide, stringGetter]);
 
   return (
-    <Styled.OrderbookTable
+    <$OrderbookTable
       key={`orderbook-${histogramSide}`}
       label="Orderbook"
       data={data}
@@ -281,7 +282,7 @@ export const Orderbook = ({
         {
           key: 'spread',
           slotCustomRow: (props) => (
-            <Styled.SpreadTableRow key="spread" {...props}>
+            <$SpreadTableRow key="spread" {...props}>
               <td>
                 <WithTooltip tooltip="spread">
                   {stringGetter({ key: STRING_KEYS.ORDERBOOK_SPREAD })}
@@ -291,7 +292,7 @@ export const Orderbook = ({
                 <Output type={OutputType.Number} value={spread} fractionDigits={tickSizeDecimals} />
               </td>
               <td>{!isTablet && <Output type={OutputType.Percent} value={spreadPercent} />}</td>
-            </Styled.SpreadTableRow>
+            </$SpreadTableRow>
           ),
         } as CustomRowConfig,
         ...asks,
@@ -300,7 +301,7 @@ export const Orderbook = ({
   );
 
   const onRowAction = useCallback(
-    (key: string, row: RowData) => {
+    (key: Key, row: RowData) => {
       if (currentInput === 'trade' && key !== 'spread' && row?.price) {
         dispatch(setTradeFormInputs({ limitPriceInput: row?.price?.toString() }));
       }
@@ -326,9 +327,9 @@ export const Orderbook = ({
   return layout === 'vertical' ? (
     <OrderbookTable data={data} histogramSide={histogramSide} {...orderbookTableProps} />
   ) : (
-    <Styled.HorizontalLayout className={className}>
-      <Styled.Header>
-        <Styled.SpreadDetails
+    <$HorizontalLayout className={className}>
+      <$Header>
+        <$SpreadDetails
           items={[
             {
               key: 'spread',
@@ -349,12 +350,12 @@ export const Orderbook = ({
           layout="row"
         />
         {/* TODO: TRCL-1411 implement zoom here */}
-      </Styled.Header>
-      <Styled.SplitOrderbook>
+      </$Header>
+      <$SplitOrderbook>
         <OrderbookTable data={asks} histogramSide="right" {...orderbookTableProps} />
         <OrderbookTable data={bids.reverse()} histogramSide="left" {...orderbookTableProps} />
-      </Styled.SplitOrderbook>
-    </Styled.HorizontalLayout>
+      </$SplitOrderbook>
+    </$HorizontalLayout>
   );
 };
 
@@ -419,16 +420,13 @@ export const orderbookMixins = {
     scroll-snap-stop: always;
   `,
 } as const;
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
 const fadeAnimation = keyframes`
 20% {
   opacity: 0.6;
 }
 `;
 
-Styled.HorizontalLayout = styled.div`
+const $HorizontalLayout = styled.div`
   ${layoutMixins.expandingColumnWithHeader}
   ${layoutMixins.withInnerHorizontalBorders}
 
@@ -444,7 +442,7 @@ Styled.HorizontalLayout = styled.div`
   }
 `;
 
-Styled.HistogramOutput = styled(OrderbookTradesOutput)<StyleProps>`
+const $HistogramOutput = styled(OrderbookTradesOutput)<StyleProps>`
   ${({ histogramSide }) =>
     histogramSide
       ? css`
@@ -510,7 +508,8 @@ Styled.HistogramOutput = styled(OrderbookTradesOutput)<StyleProps>`
       : ''}
 `;
 
-Styled.OrderbookTable = styled(OrderbookTradesTable)<StyleProps>`
+const orderbookTableType = getSimpleStyledOutputType(OrderbookTradesTable, {} as StyleProps);
+const $OrderbookTable = styled(OrderbookTradesTable)<StyleProps>`
   /* Params */
   --orderbook-spreadRowHeight: 2rem;
 
@@ -553,12 +552,12 @@ Styled.OrderbookTable = styled(OrderbookTradesTable)<StyleProps>`
       `}
   }
 
-  ${Styled.HorizontalLayout} & {
+  ${$HorizontalLayout} & {
     --tableCell-padding: 0.25rem 1rem;
   }
-`;
+` as typeof orderbookTableType;
 
-Styled.SpreadTableRow = styled(TableRow)`
+const $SpreadTableRow = styled(TableRow)`
   ${layoutMixins.sticky}
   position: sticky !important;
 
@@ -574,7 +573,8 @@ Styled.SpreadTableRow = styled(TableRow)`
     bottom: 50%;
   }
 
-  ${Styled.OrderbookTable}:not(:focus-within) & {
+  // have to override since we destroyed the string typings with the inline cast above
+  ${$OrderbookTable as any}:not(:focus-within) & {
     ${orderbookMixins.scrollSnapItem}
   }
 
@@ -593,7 +593,7 @@ Styled.SpreadTableRow = styled(TableRow)`
   }
 `;
 
-Styled.SpreadDetails = styled(Details)<{ asTableCells?: boolean }>`
+const $SpreadDetails = styled(Details)<{ asTableCells?: boolean }>`
   /* Overrides */
   --details-item-backgroundColor: var(--color-layer-2);
   --details-value-font: var(--font-mini-book);
@@ -605,12 +605,12 @@ Styled.SpreadDetails = styled(Details)<{ asTableCells?: boolean }>`
   }
 `;
 
-Styled.SplitOrderbook = styled.div`
+const $SplitOrderbook = styled.div`
   ${layoutMixins.gridEqualColumns}
   gap: var(--border-width);
 `;
 
-Styled.Header = styled.header`
+const $Header = styled.header`
   ${layoutMixins.stickyHeader}
   ${layoutMixins.spacedRow}
 `;

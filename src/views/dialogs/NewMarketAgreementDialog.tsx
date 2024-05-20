@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -27,25 +27,25 @@ export const NewMarketAgreementDialog = ({ acceptTerms, setIsOpen }: ElementProp
   const stringGetter = useStringGetter();
 
   return (
-    <Styled.Dialog
+    <$Dialog
       isOpen
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.ACKNOWLEDGEMENT })}
     >
-      <Styled.Content>
+      <$Content>
         <p>
           {stringGetter({
             key: STRING_KEYS.NEW_MARKET_PROPOSAL_AGREEMENT,
             params: {
               DOCUMENTATION_LINK: (
-                <Styled.Link href="https://docs.dydx.community/dydx-governance/voting-and-governance/governance-process">
+                <$Link href="https://docs.dydx.community/dydx-governance/voting-and-governance/governance-process">
                   {stringGetter({ key: STRING_KEYS.WEBSITE }).toLowerCase()}
-                </Styled.Link>
+                </$Link>
               ),
               TERMS_OF_USE: (
-                <Styled.Link href={`${BASE_ROUTE}${AppRoute.Terms}`}>
+                <$Link href={`${BASE_ROUTE}${AppRoute.Terms}`}>
                   {stringGetter({ key: STRING_KEYS.TERMS_OF_USE })}
-                </Styled.Link>
+                </$Link>
               ),
             },
           })}
@@ -57,7 +57,7 @@ export const NewMarketAgreementDialog = ({ acceptTerms, setIsOpen }: ElementProp
           id="acknowledgement-checkbox"
           label={stringGetter({ key: STRING_KEYS.I_HAVE_READ_AND_AGREE })}
         />
-        <Styled.ButtonRow>
+        <$ButtonRow>
           <Button action={ButtonAction.Base} onClick={() => setIsOpen(false)}>
             {stringGetter({ key: STRING_KEYS.CANCEL })}
           </Button>
@@ -71,21 +71,18 @@ export const NewMarketAgreementDialog = ({ acceptTerms, setIsOpen }: ElementProp
           >
             {stringGetter({ key: STRING_KEYS.CONTINUE })}
           </Button>
-        </Styled.ButtonRow>
-      </Styled.Content>
-    </Styled.Dialog>
+        </$ButtonRow>
+      </$Content>
+    </$Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Dialog = styled(Dialog)`
+const $Dialog = styled(Dialog)`
   @media ${breakpoints.notMobile} {
     --dialog-width: 30rem;
   }
 `;
 
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
 
@@ -96,12 +93,12 @@ Styled.Content = styled.div`
   }
 `;
 
-Styled.Link = styled(Link)`
+const $Link = styled(Link)`
   --link-color: var(--color-accent);
   display: inline-block;
 `;
 
-Styled.ButtonRow = styled.div`
+const $ButtonRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 1rem;

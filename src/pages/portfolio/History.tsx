@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { HistoryRoute } from '@/constants/routes';
@@ -18,7 +18,7 @@ export const History = () => {
   return (
     <AttachedExpandingSection>
       {isNotTablet && (
-        <Styled.NavigationMenu
+        <$NavigationMenu
           orientation="horizontal"
           items={[
             {
@@ -51,10 +51,7 @@ export const History = () => {
     </AttachedExpandingSection>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.NavigationMenu = styled(NavigationMenu)`
+const $NavigationMenu = styled(NavigationMenu)`
   --header-horizontal-padding: 1rem;
 
   ${layoutMixins.contentSectionDetached}

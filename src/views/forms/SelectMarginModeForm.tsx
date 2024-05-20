@@ -34,8 +34,8 @@ export const SelectMarginModeForm = ({
   };
 
   return (
-    <Styled.Form>
-      <Styled.RadioButtonCards
+    <$Form>
+      <$RadioButtonCards
         value={marginModeValue}
         onValueChange={setMarginMode}
         radioItems={[
@@ -43,39 +43,37 @@ export const SelectMarginModeForm = ({
             value: AbacusMarginMode.cross.rawValue,
             label: stringGetter({ key: MARGIN_MODE_STRINGS[AbacusMarginMode.cross.rawValue] }),
             body: (
-              <Styled.TertiarySpan>
+              <$TertiarySpan>
                 {stringGetter({ key: STRING_KEYS.CROSS_MARGIN_DESCRIPTION })}
-              </Styled.TertiarySpan>
+              </$TertiarySpan>
             ),
           },
           {
             value: AbacusMarginMode.isolated.rawValue,
             label: stringGetter({ key: MARGIN_MODE_STRINGS[AbacusMarginMode.isolated.rawValue] }),
             body: (
-              <Styled.TertiarySpan>
+              <$TertiarySpan>
                 {stringGetter({ key: STRING_KEYS.ISOLATED_MARGIN_DESCRIPTION })}
-              </Styled.TertiarySpan>
+              </$TertiarySpan>
             ),
           },
         ]}
       />
-    </Styled.Form>
+    </$Form>
   );
 };
 
-const Styled = {
-  Form: styled.form`
-    ${formMixins.transfersForm}
-  `,
-  RadioButtonCards: styled(RadioButtonCards)`
-    padding: 0;
+const $Form = styled.form`
+  ${formMixins.transfersForm}
+`;
+const $RadioButtonCards = styled(RadioButtonCards)`
+  padding: 0;
 
-    --radio-button-cards-item-checked-backgroundColor: var(--color-layer-1);
-  `,
-  TertiarySpan: styled.span`
-    color: var(--color-text-0);
-  `,
-  Button: styled(Button)`
-    width: 100%;
-  `,
-};
+  --radio-button-cards-item-checked-backgroundColor: var(--color-layer-1);
+`;
+const $TertiarySpan = styled.span`
+  color: var(--color-text-0);
+`;
+const $Button = styled(Button)`
+  width: 100%;
+`;

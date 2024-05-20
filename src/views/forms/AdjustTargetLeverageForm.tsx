@@ -45,7 +45,7 @@ export const AdjustTargetLeverageForm = ({
   const leverageBN = MustBigNumber(leverage);
 
   return (
-    <Styled.Form
+    <$Form
       onSubmit={(e: FormEvent) => {
         e.preventDefault();
 
@@ -57,17 +57,17 @@ export const AdjustTargetLeverageForm = ({
         onSetTargetLeverage?.(leverage);
       }}
     >
-      <Styled.InputContainer>
-        <Styled.WithLabel label={stringGetter({ key: STRING_KEYS.TARGET_LEVERAGE })}>
-          <Styled.LeverageSlider
+      <$InputContainer>
+        <$WithLabel label={stringGetter({ key: STRING_KEYS.TARGET_LEVERAGE })}>
+          <$LeverageSlider
             min={1}
             max={10}
             value={MustBigNumber(leverage).abs().toNumber()}
             onSliderDrag={([value]: number[]) => setLeverage(value.toString())}
             onValueCommit={([value]: number[]) => setLeverage(value.toString())}
           />
-        </Styled.WithLabel>
-        <Styled.InnerInputContainer>
+        </$WithLabel>
+        <$InnerInputContainer>
           <Input
             placeholder={`${MustBigNumber(leverage).abs().toFixed(LEVERAGE_DECIMALS)}×`}
             type={InputType.Leverage}
@@ -76,10 +76,10 @@ export const AdjustTargetLeverageForm = ({
               setLeverage(floatValue?.toString() ?? '')
             }
           />
-        </Styled.InnerInputContainer>
-      </Styled.InputContainer>
+        </$InnerInputContainer>
+      </$InputContainer>
 
-      <Styled.ToggleGroup
+      <$ToggleGroup
         items={[1, 2, 3, 5, 10].map((leverageAmount: number) => ({
           label: `${leverageAmount}×`,
           value: MustBigNumber(leverageAmount).toFixed(LEVERAGE_DECIMALS),
@@ -125,58 +125,56 @@ export const AdjustTargetLeverageForm = ({
           {stringGetter({ key: STRING_KEYS.CONFIRM_LEVERAGE })}
         </Button>
       </WithDetailsReceipt>
-    </Styled.Form>
+    </$Form>
   );
 };
 
-const Styled = {
-  Form: styled.form`
-    ${formMixins.transfersForm}
-  `,
-  InputContainer: styled.div`
-    ${formMixins.inputContainer}
-    --input-height: 3.5rem;
+const $Form = styled.form`
+  ${formMixins.transfersForm}
+`;
+const $InputContainer = styled.div`
+  ${formMixins.inputContainer}
+  --input-height: 3.5rem;
 
-    padding: var(--form-input-paddingY) var(--form-input-paddingX);
+  padding: var(--form-input-paddingY) var(--form-input-paddingX);
 
-    @media ${breakpoints.tablet} {
-      --input-height: 4rem;
-    }
-  `,
-  WithLabel: styled(WithLabel)`
-    ${formMixins.inputLabel}
-  `,
-  LeverageSlider: styled(Slider)`
-    margin-top: 0.25rem;
+  @media ${breakpoints.tablet} {
+    --input-height: 4rem;
+  }
+`;
+const $WithLabel = styled(WithLabel)`
+  ${formMixins.inputLabel}
+`;
+const $LeverageSlider = styled(Slider)`
+  margin-top: 0.25rem;
 
-    --slider-track-background: linear-gradient(
-      90deg,
-      var(--color-layer-7) 0%,
-      var(--color-text-2) 100%
-    );
-  `,
-  InnerInputContainer: styled.div`
-    ${formMixins.inputContainer}
-    --input-backgroundColor: var(--color-layer-5);
-    --input-borderColor: var(--color-layer-7);
-    --input-height: 2.25rem;
-    --input-width: 5rem;
+  --slider-track-background: linear-gradient(
+    90deg,
+    var(--color-layer-7) 0%,
+    var(--color-text-2) 100%
+  );
+`;
+const $InnerInputContainer = styled.div`
+  ${formMixins.inputContainer}
+  --input-backgroundColor: var(--color-layer-5);
+  --input-borderColor: var(--color-layer-7);
+  --input-height: 2.25rem;
+  --input-width: 5rem;
 
-    margin-left: 0.25rem;
+  margin-left: 0.25rem;
 
-    input {
-      text-align: end;
-      padding: 0 var(--form-input-paddingX);
-    }
+  input {
+    text-align: end;
+    padding: 0 var(--form-input-paddingX);
+  }
 
-    @media ${breakpoints.tablet} {
-      --input-height: 2.5rem;
-    }
-  `,
-  LeverageSide: styled.div`
-    cursor: pointer;
-  `,
-  ToggleGroup: styled(ToggleGroup)`
-    ${formMixins.inputToggleGroup}
-  `,
-};
+  @media ${breakpoints.tablet} {
+    --input-height: 2.5rem;
+  }
+`;
+const $LeverageSide = styled.div`
+  cursor: pointer;
+`;
+const $ToggleGroup = styled(ToggleGroup)`
+  ${formMixins.inputToggleGroup}
+`;

@@ -1,5 +1,5 @@
 import { Item, Root } from '@radix-ui/react-radio-group';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import type { MenuItem } from '@/constants/menus';
 
@@ -17,33 +17,26 @@ export const PageMenuRadioGroupItem = <
   subitems,
 }: MenuItem<MenuItemValue, PageMenuItemType>) =>
   subitems?.length ? (
-    <Styled.Root value={curentValue} onValueChange={onSelect}>
+    <$Root value={curentValue} onValueChange={onSelect}>
       {subitems.map(({ disabled, value, label, slotBefore }) => (
-        <Styled.MenuItem key={value} value={value} disabled={disabled}>
+        <$MenuItem key={value} value={value} disabled={disabled}>
           <div>
-            <>{slotBefore}</>
+            {slotBefore}
             <span>{label}</span>
           </div>
-          {value === curentValue ? (
-            <Styled.CheckIcon iconName={IconName.Check} />
-          ) : (
-            <Styled.EmptyIcon />
-          )}
-        </Styled.MenuItem>
+          {value === curentValue ? <$CheckIcon iconName={IconName.Check} /> : <$EmptyIcon />}
+        </$MenuItem>
       ))}
-    </Styled.Root>
+    </$Root>
   ) : null;
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Root = styled(Root)`
+const $Root = styled(Root)`
   ${layoutMixins.flexColumn}
   ${layoutMixins.withInnerHorizontalBorders}
 
   gap: var(--border-width);
 `;
 
-Styled.MenuItem = styled(Item)<{ $selected: boolean }>`
+const $MenuItem = styled(Item)`
   ${layoutMixins.spacedRow}
   ${popoverMixins.item}
 
@@ -51,7 +44,7 @@ Styled.MenuItem = styled(Item)<{ $selected: boolean }>`
   --item-checked-backgroundColor: var(--color-layer-0);
 `;
 
-Styled.CheckIcon = styled(Icon)`
+const $CheckIcon = styled(Icon)`
   padding: 4px;
 
   border-radius: 50%;
@@ -60,7 +53,7 @@ Styled.CheckIcon = styled(Icon)`
   background-color: var(--color-accent);
 `;
 
-Styled.EmptyIcon = styled.div`
+const $EmptyIcon = styled.div`
   width: 0.9em;
   height: 0.9em;
 

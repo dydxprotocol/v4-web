@@ -1,14 +1,9 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
-import {
-  ErrorType,
-  Nullable,
-  ValidationError,
-  type SubaccountOrder,
-} from '@/constants/abacus';
+import { ErrorType, ValidationError, type SubaccountOrder } from '@/constants/abacus';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -45,8 +40,6 @@ export const TriggersForm = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
-
-  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
   const { placeTriggerOrders } = useSubaccount();
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
@@ -87,41 +80,25 @@ export const TriggersForm = ({
   const existsEditableOrCreatableOrders = !(multipleTakeProfitOrders && multipleStopLossOrders);
 
   const priceInfo = (
-    <Styled.PriceBox>
-      <Styled.PriceRow>
-        <Styled.PriceLabel>{stringGetter({ key: STRING_KEYS.AVG_ENTRY_PRICE })}</Styled.PriceLabel>
-        <Styled.Price
+    <$PriceBox>
+      <$PriceRow>
+        <$PriceLabel>{stringGetter({ key: STRING_KEYS.AVG_ENTRY_PRICE })}</$PriceLabel>
+        <$Price
           type={OutputType.Fiat}
           value={entryPrice?.current}
           fractionDigits={tickSizeDecimals}
         />
-      </Styled.PriceRow>
-      <Styled.PriceRow>
-        <Styled.PriceLabel>{stringGetter({ key: STRING_KEYS.ORACLE_PRICE })}</Styled.PriceLabel>
-        <Styled.Price
-          type={OutputType.Fiat}
-          value={oraclePrice}
-          fractionDigits={tickSizeDecimals}
-        />
-      </Styled.PriceRow>
-    </Styled.PriceBox>
+      </$PriceRow>
+      <$PriceRow>
+        <$PriceLabel>{stringGetter({ key: STRING_KEYS.ORACLE_PRICE })}</$PriceLabel>
+        <$Price type={OutputType.Fiat} value={oraclePrice} fractionDigits={tickSizeDecimals} />
+      </$PriceRow>
+    </$PriceBox>
   );
 
   const onSubmitOrders = async () => {
-    setIsPlacingOrder(true);
-
-    placeTriggerOrders({
-      onError: (
-        errorParams?: { errorStringKey?: Nullable<string> }
-      ) => {
-        setIsPlacingOrder(false);
-        dispatch(closeDialog());
-      },
-      onSuccess: () => {
-        setIsPlacingOrder(false);
-        dispatch(closeDialog());
-      },
-    });
+    placeTriggerOrders();
+    dispatch(closeDialog());
   };
 
   const onSubmit = async (e: FormEvent) => {
@@ -130,7 +107,7 @@ export const TriggersForm = ({
   };
 
   return (
-    <Styled.Form onSubmit={onSubmit}>
+    <$Form onSubmit={onSubmit}>
       {priceInfo}
       <TriggerOrdersInputs
         symbol={symbol}
@@ -153,13 +130,11 @@ export const TriggersForm = ({
             tickSizeDecimals={tickSizeDecimals}
           />
           <WithTooltip tooltipString={hasInputErrors ? inputAlert?.alertString : undefined}>
-            <Styled.Button
+            <$Button
               action={ButtonAction.Primary}
               type={ButtonType.Submit}
-              state={{ isDisabled: hasInputErrors || isAccountViewOnly, isLoading: isPlacingOrder }}
-              slotLeft={
-                hasInputErrors ? <Styled.WarningIcon iconName={IconName.Warning} /> : undefined
-              }
+              state={{ isDisabled: hasInputErrors || isAccountViewOnly }}
+              slotLeft={hasInputErrors ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
             >
               {hasInputErrors
                 ? stringGetter({
@@ -168,22 +143,19 @@ export const TriggersForm = ({
                 : !!(existingStopLossOrder || existingTakeProfitOrder)
                 ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })
                 : stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
-            </Styled.Button>
+            </$Button>
           </WithTooltip>
         </>
       )}
-    </Styled.Form>
+    </$Form>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Form = styled.form`
+const $Form = styled.form`
   ${layoutMixins.column}
   gap: 1.25ch;
 `;
 
-Styled.PriceBox = styled.div`
+const $PriceBox = styled.div`
   background-color: var(--color-layer-2);
   border-radius: 0.5em;
   font: var(--font-base-medium);
@@ -193,22 +165,22 @@ Styled.PriceBox = styled.div`
   padding: 0.625em 0.75em;
 `;
 
-Styled.PriceRow = styled.div`
+const $PriceRow = styled.div`
   ${layoutMixins.spacedRow};
 `;
 
-Styled.PriceLabel = styled.h3`
+const $PriceLabel = styled.h3`
   color: var(--color-text-0);
 `;
 
-Styled.Price = styled(Output)`
+const $Price = styled(Output)`
   color: var(--color-text-2);
 `;
 
-Styled.Button = styled(Button)`
+const $Button = styled(Button)`
   width: 100%;
 `;
 
-Styled.WarningIcon = styled(Icon)`
+const $WarningIcon = styled(Icon)`
   color: var(--color-warning);
 `;

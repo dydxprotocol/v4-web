@@ -52,7 +52,7 @@ export const tableMixins: Record<
     ${() => tableMixins.cellContent}
     gap: 0.25em;
 
-    color: var(--tableHeader-textColor, var(--color-text-0));
+    color: var(--tableStickyRow-textColor, var(--color-text-0));
 
     span:nth-child(2) {
       :before {

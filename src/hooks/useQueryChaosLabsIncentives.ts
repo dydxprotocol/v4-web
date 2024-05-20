@@ -25,7 +25,7 @@ export const useQueryChaosLabsIncentives = ({
       const resp = await fetch(
         `https://cloud.chaoslabs.co/query/api/dydx/points/${dydxAddress}?n=${season}`
       );
-      return await resp.json();
+      return resp.json();
     },
     onError: (error: Error) => log('LaunchIncentives/fetchPoints', error),
   });

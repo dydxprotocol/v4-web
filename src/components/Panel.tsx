@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -34,37 +34,31 @@ export const Panel = ({
   hasSeparator,
   className,
 }: PanelProps) => (
-  <Styled.Panel onClick={onClick} className={className}>
-    <Styled.Left>
+  <$Panel onClick={onClick} className={className}>
+    <$Left>
       {href ? (
         <Link to={href}>
-          {slotHeader ? (
-            slotHeader
-          ) : (
-            <Styled.Header role="button" onClick={onHeaderClick} hasSeparator={hasSeparator}>
+          {slotHeader ?? (
+            <$Header role="button" onClick={onHeaderClick} hasSeparator={hasSeparator}>
               {slotHeaderContent}
-              <Styled.Icon iconName={IconName.ChevronRight} />
-            </Styled.Header>
+              <$Icon iconName={IconName.ChevronRight} />
+            </$Header>
           )}
         </Link>
-      ) : slotHeader ? (
-        slotHeader
       ) : (
-        slotHeaderContent && (
-          <Styled.Header role="button" onClick={onHeaderClick} hasSeparator={hasSeparator}>
+        slotHeader ??
+        (slotHeaderContent && (
+          <$Header role="button" onClick={onHeaderClick} hasSeparator={hasSeparator}>
             {slotHeaderContent}
-          </Styled.Header>
-        )
+          </$Header>
+        ))
       )}
-      <Styled.Content>{children}</Styled.Content>
-    </Styled.Left>
+      <$Content>{children}</$Content>
+    </$Left>
     {slotRight}
-  </Styled.Panel>
+  </$Panel>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Panel = styled.section<{ onClick?: () => void }>`
+const $Panel = styled.section<{ onClick?: () => void }>`
   --panel-paddingY: 1rem;
   --panel-paddingX: 1rem;
   --panel-content-paddingY: var(--panel-paddingY);
@@ -95,12 +89,12 @@ Styled.Panel = styled.section<{ onClick?: () => void }>`
     `}
 `;
 
-Styled.Left = styled.div`
+const $Left = styled.div`
   ${layoutMixins.flexColumn}
   width: 100%;
 `;
 
-Styled.Header = styled.header<{ hasSeparator?: boolean }>`
+const $Header = styled.header<{ hasSeparator?: boolean }>`
   ${layoutMixins.spacedRow}
   padding: var(--panel-paddingY) var(--panel-paddingX);
 
@@ -112,12 +106,12 @@ Styled.Header = styled.header<{ hasSeparator?: boolean }>`
     `}
 `;
 
-Styled.Icon = styled(Icon)`
+const $Icon = styled(Icon)`
   color: var(--color-text-0);
   font-size: 0.625rem;
 `;
 
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.scrollArea}
   ${layoutMixins.stickyArea0}
   --stickyArea0-background: transparent;

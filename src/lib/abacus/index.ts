@@ -1,4 +1,4 @@
-import type { LocalWallet } from '@dydxprotocol/v4-client-js';
+import type { LocalWallet, SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 
 import type {
   ClosePositionInputFields,
@@ -12,6 +12,7 @@ import type {
   ParsingError,
   TradeInputFields,
   TransferInputFields,
+  TriggerOrdersInputFields,
 } from '@/constants/abacus';
 import {
   AbacusAppConfig,
@@ -28,7 +29,6 @@ import {
   TransferType,
   TriggerOrdersInputField,
   UIImplementations,
-  type TriggerOrdersInputFields,
 } from '@/constants/abacus';
 import { Hdkey } from '@/constants/account';
 import { DEFAULT_MARKETID } from '@/constants/markets';
@@ -41,24 +41,33 @@ import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors
 
 import { LocaleSeparators } from '../numbers';
 import AbacusAnalytics from './analytics';
+// eslint-disable-next-line import/no-cycle
 import AbacusChainTransaction from './dydxChainTransactions';
 import AbacusFileSystem from './filesystem';
 import AbacusFormatter from './formatter';
 import AbacusLocalizer from './localizer';
+import AbacusLogger from './logger';
 import AbacusRest from './rest';
 import AbacusStateNotifier from './stateNotification';
 import AbacusThreading from './threading';
+// eslint-disable-next-line import/no-cycle
 import AbacusWebsocket from './websocket';
 
 class AbacusStateManager {
   private store: RootStore | undefined;
+
   private currentMarket: string | undefined;
 
   stateManager: InstanceType<typeof AsyncAbacusStateManager>;
+
   websocket: AbacusWebsocket;
+
   stateNotifier: AbacusStateNotifier;
+
   analytics: AbacusAnalytics;
+
   abacusFormatter: AbacusFormatter;
+
   chainTransactions: AbacusChainTransaction;
 
   constructor() {
@@ -78,7 +87,8 @@ class AbacusStateManager {
       this.analytics,
       new AbacusThreading(),
       new CoroutineTimer(),
-      new AbacusFileSystem()
+      new AbacusFileSystem(),
+      new AbacusLogger()
     );
 
     const uiImplementations = new UIImplementations(
@@ -245,6 +255,10 @@ class AbacusStateManager {
     this.currentMarket = marketId;
     this.clearTradeInputValues({ shouldResetSize: true });
     this.stateManager.market = marketId;
+  };
+
+  setSelectedGasDenom = (denom: SelectedGasDenom) => {
+    this.chainTransactions.setSelectedGasDenom(denom);
   };
 
   setTradeValue = ({ value, field }: { value: any; field: TradeInputFields }) => {

@@ -74,7 +74,7 @@ export const Notification = ({
                 iconName={IconName.Close}
                 shape={ButtonShape.Square}
                 size={ButtonSize.XSmall}
-                onClick={(e: MouseEvent) => {
+                onClick={(e: React.MouseEvent) => {
                   e.stopPropagation();
 
                   if (notification.status < NotificationStatus.Seen) {

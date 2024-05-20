@@ -1,5 +1,5 @@
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonType } from '@/constants/buttons';
 
@@ -33,18 +33,15 @@ export const MarketLinks = () => {
   ].filter(({ href }) => href);
 
   return (
-    <Styled.MarketLinks>
+    <$MarketLinks>
       {linkItems.map(
         ({ key, href, icon }) =>
           href && <IconButton key={key} href={href} iconName={icon} type={ButtonType.Link} />
       )}
-    </Styled.MarketLinks>
+    </$MarketLinks>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.MarketLinks = styled.div`
+const $MarketLinks = styled.div`
   ${layoutMixins.row}
 
   margin-left: auto;

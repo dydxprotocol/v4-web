@@ -20,8 +20,8 @@ export const getHydratedPositionData = ({
   return {
     ...data,
     asset: assets?.[data.assetId],
-    stepSizeDecimals: perpetualMarkets?.[data.id]?.configs?.stepSizeDecimals || TOKEN_DECIMALS,
-    tickSizeDecimals: perpetualMarkets?.[data.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
+    stepSizeDecimals: perpetualMarkets?.[data.id]?.configs?.stepSizeDecimals ?? TOKEN_DECIMALS,
+    tickSizeDecimals: perpetualMarkets?.[data.id]?.configs?.tickSizeDecimals ?? USD_DECIMALS,
     oraclePrice: perpetualMarkets?.[data.id]?.oraclePrice,
   } as HydratedPositionData;
 };

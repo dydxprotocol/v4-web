@@ -1,4 +1,4 @@
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -14,23 +14,16 @@ type StyleProps = {
 export type StepIndicatorProps = ElementProps & StyleProps;
 
 export const StepIndicator = ({ className, currentStepIndex, totalSteps }: StepIndicatorProps) => (
-  <Styled.StepIndicator
+  <$StepIndicator
     className={className}
     progress={((currentStepIndex - 1) / (totalSteps - 1)) * 100}
   >
     {[...Array(totalSteps)].map((_, i) => (
-      <Styled.Step
-        key={i}
-        isActive={i === currentStepIndex - 1}
-        isFilled={i <= currentStepIndex - 1}
-      />
+      <$Step key={i} isActive={i === currentStepIndex - 1} isFilled={i <= currentStepIndex - 1} />
     ))}
-  </Styled.StepIndicator>
+  </$StepIndicator>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.StepIndicator = styled.div<{ progress: number }>`
+const $StepIndicator = styled.div<{ progress: number }>`
   --stepIndicator-line-backgroundColor: var(--color-layer-4);
   --stepIndicator-step-backgroundColor: var(--color-layer-4);
   --stepIndicator-active-step-boxShadowColor: hsla(240, 32%, 21%, 1);
@@ -65,7 +58,7 @@ Styled.StepIndicator = styled.div<{ progress: number }>`
   }
 `;
 
-Styled.Step = styled.div<{ isActive?: boolean; isFilled?: boolean }>`
+const $Step = styled.div<{ isActive?: boolean; isFilled?: boolean }>`
   width: 0.5em;
   height: 0.5em;
   border-radius: 50%;

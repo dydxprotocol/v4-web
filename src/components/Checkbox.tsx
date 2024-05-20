@@ -1,6 +1,6 @@
 import { Indicator, Root } from '@radix-ui/react-checkbox';
 import { CheckIcon } from '@radix-ui/react-icons';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -26,35 +26,32 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   label,
   disabled,
 }) => (
-  <Styled.Container>
-    <Styled.Root
+  <$Container>
+    <$Root
       className={className}
       checked={checked}
       disabled={disabled}
       onCheckedChange={onCheckedChange}
       id={id}
     >
-      <Styled.Indicator>
+      <$Indicator>
         <CheckIcon />
-      </Styled.Indicator>
-    </Styled.Root>
+      </$Indicator>
+    </$Root>
     {label && (
-      <Styled.Label disabled={disabled} htmlFor={id}>
+      <$Label disabled={disabled} htmlFor={id}>
         {label}
-      </Styled.Label>
+      </$Label>
     )}
-  </Styled.Container>
+  </$Container>
 );
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.div`
+const $Container = styled.div`
   ${layoutMixins.row}
   gap: 1ch;
   font: var(--font-small-book);
 `;
 
-Styled.Root = styled(Root)`
+const $Root = styled(Root)`
   --checkbox-backgroundColor: var(--color-layer-0);
   --checkbox-borderColor: var(--color-border);
 
@@ -75,7 +72,7 @@ Styled.Root = styled(Root)`
   }
 `;
 
-Styled.Indicator = styled(Indicator)`
+const $Indicator = styled(Indicator)`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -83,7 +80,7 @@ Styled.Indicator = styled(Indicator)`
   color: var(--color-text-button);
 `;
 
-Styled.Label = styled.label<{ disabled?: boolean }>`
+const $Label = styled.label<{ disabled?: boolean }>`
   cursor: pointer;
   color: var(--color-text-2);
 

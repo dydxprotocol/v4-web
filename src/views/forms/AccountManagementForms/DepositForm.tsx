@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react
 
 import { type NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 import { Abi, parseUnits } from 'viem';
 
 import erc20 from '@/abi/erc20.json';
@@ -13,6 +13,7 @@ import { AnalyticsEvent, AnalyticsEventData } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
+import { TransferNotificationTypes } from '@/constants/notifications';
 import {
   MAX_CCTP_TRANSFER_AMOUNT,
   MAX_PRICE_IMPACT,
@@ -285,6 +286,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
             triggeredAt: Date.now(),
             isCctp,
             requestId: requestPayload.requestId ?? undefined,
+            type: TransferNotificationTypes.Deposit,
           });
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');
@@ -410,8 +412,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     return <LoadingSpace id="DepositForm" />;
   }
   return (
-    <Styled.Form onSubmit={onSubmit}>
-      <Styled.Subheader>
+    <$Form onSubmit={onSubmit}>
+      <$Subheader>
         {stringGetter({
           key: STRING_KEYS.LOWEST_FEE_DEPOSITS,
           params: {
@@ -424,7 +426,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
             ),
           },
         })}
-      </Styled.Subheader>
+      </$Subheader>
       <SourceSelectMenu
         selectedChain={chainIdStr || undefined}
         selectedExchange={exchange || undefined}
@@ -435,26 +437,26 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       ) : (
         <>
           <TokenSelectMenu selectedToken={sourceToken || undefined} onSelectToken={onSelectToken} />
-          <Styled.WithDetailsReceipt side="bottom" detailItems={amountInputReceipt}>
+          <$WithDetailsReceipt side="bottom" detailItems={amountInputReceipt}>
             <FormInput
               type={InputType.Number}
               onChange={onChangeAmount}
               label={stringGetter({ key: STRING_KEYS.AMOUNT })}
               value={fromAmount}
               slotRight={
-                <Styled.FormInputButton size={ButtonSize.XSmall} onClick={onClickMax}>
+                <$FormInputButton size={ButtonSize.XSmall} onClick={onClickMax}>
                   {stringGetter({ key: STRING_KEYS.MAX })}
-                </Styled.FormInputButton>
+                </$FormInputButton>
               }
             />
-          </Styled.WithDetailsReceipt>
+          </$WithDetailsReceipt>
           {errorMessage && <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>}
           {requireUserActionInWallet && (
             <AlertMessage type={AlertType.Warning}>
               {stringGetter({ key: STRING_KEYS.CHECK_WALLET_FOR_REQUEST })}
             </AlertMessage>
           )}
-          <Styled.Footer>
+          <$Footer>
             <DepositButtonAndReceipt
               isDisabled={isDisabled}
               isLoading={isLoading}
@@ -465,33 +467,30 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
               setRequireUserActionInWallet={setRequireUserActionInWallet}
               setError={setError}
             />
-          </Styled.Footer>
+          </$Footer>
         </>
       )}
-    </Styled.Form>
+    </$Form>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Form = styled.form`
+const $Form = styled.form`
   ${formMixins.transfersForm}
 `;
 
-Styled.Subheader = styled.div`
+const $Subheader = styled.div`
   color: var(--color-text-0);
 `;
 
-Styled.Footer = styled.footer`
+const $Footer = styled.footer`
   ${formMixins.footer}
   --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
 `;
 
-Styled.WithDetailsReceipt = styled(WithDetailsReceipt)`
+const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
-Styled.Link = styled(Link)`
+const $Link = styled(Link)`
   color: var(--color-accent);
 
   &:visited {
@@ -499,10 +498,10 @@ Styled.Link = styled(Link)`
   }
 `;
 
-Styled.TransactionInfo = styled.span`
+const $TransactionInfo = styled.span`
   ${layoutMixins.row}
 `;
 
-Styled.FormInputButton = styled(Button)`
+const $FormInputButton = styled(Button)`
   ${formMixins.inputInnerButton}
 `;

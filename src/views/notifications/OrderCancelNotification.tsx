@@ -1,5 +1,5 @@
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { AbacusOrderStatus } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -40,19 +40,19 @@ export const OrderCancelNotification = ({
   const cancelStatus = localCancel.submissionStatus;
 
   let orderStatusStringKey = STRING_KEYS.CANCELING;
-  let orderStatusIcon = <Styled.LoadingSpinner />;
+  let orderStatusIcon = <$LoadingSpinner />;
   let customContent = null;
 
   // whichever canceled confirmation happens first (node / indexer)
   const canceledStatusValue = AbacusOrderStatus.cancelled.rawValue;
   if (cancelStatus === CancelOrderStatuses.Canceled || indexedOrderStatus === canceledStatusValue) {
     orderStatusStringKey = STRING_KEYS.CANCELED;
-    orderStatusIcon = <Styled.OrderStatusIcon status={canceledStatusValue} />;
+    orderStatusIcon = <$OrderStatusIcon status={canceledStatusValue} />;
   }
 
   if (localCancel.errorStringKey) {
     orderStatusStringKey = STRING_KEYS.ERROR;
-    orderStatusIcon = <Styled.WarningIcon iconName={IconName.Warning} />;
+    orderStatusIcon = <$WarningIcon iconName={IconName.Warning} />;
     customContent = <span>{stringGetter({ key: localCancel.errorStringKey })}</span>;
   }
 
@@ -63,38 +63,35 @@ export const OrderCancelNotification = ({
       slotIcon={<AssetIcon symbol={assetId} />}
       slotTitle={orderTypeKey && stringGetter({ key: orderTypeKey })}
       slotTitleRight={
-        <Styled.OrderStatus>
+        <$OrderStatus>
           {stringGetter({ key: orderStatusStringKey })}
           {orderStatusIcon}
-        </Styled.OrderStatus>
+        </$OrderStatus>
       }
       slotCustomContent={customContent}
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Label = styled.span`
+const $Label = styled.span`
   ${layoutMixins.row}
   gap: 0.5ch;
 `;
 
-Styled.OrderStatus = styled(Styled.Label)`
+const $OrderStatus = styled($Label)`
   color: var(--color-text-0);
   font: var(--font-small-book);
 `;
 
-Styled.LoadingSpinner = styled(LoadingSpinner)`
+const $LoadingSpinner = styled(LoadingSpinner)`
   --spinner-width: 0.9375rem;
   color: var(--color-accent);
 `;
 
-Styled.WarningIcon = styled(Icon)`
+const $WarningIcon = styled(Icon)`
   color: var(--color-warning);
 `;
 
-Styled.OrderStatusIcon = styled(OrderStatusIcon)`
+const $OrderStatusIcon = styled(OrderStatusIcon)`
   width: 0.9375rem;
   height: 0.9375rem;
 `;

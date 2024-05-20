@@ -1,4 +1,4 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { tableMixins } from '@/styles/tableMixins';
 
@@ -8,10 +8,7 @@ export const TableColumnHeader = ({
 }: {
   className?: string;
   children?: React.ReactNode;
-}) => <Styled.HeaderCellContent className={className}>{children}</Styled.HeaderCellContent>;
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.HeaderCellContent = styled.div`
+}) => <$HeaderCellContent className={className}>{children}</$HeaderCellContent>;
+const $HeaderCellContent = styled.div`
   ${tableMixins.headerCellContent}
 `;

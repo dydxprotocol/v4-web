@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { AbacusApiStatus } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
@@ -45,22 +45,19 @@ export const ExchangeOfflineDialog = ({ preventClose, setIsOpen }: ElementProps)
       setIsOpen={setIsOpen}
       title={stringGetter({ key: STRING_KEYS.UNAVAILABLE })}
     >
-      <Styled.Content>
+      <$Content>
         <p>{statusErrorMessage?.body}</p>
         {isDev && <NetworkSelectMenu />}
-      </Styled.Content>
+      </$Content>
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;
 `;
 
-Styled.Link = styled(Link)`
+const $Link = styled(Link)`
   display: contents;
   --link-color: var(--color-accent);
 `;

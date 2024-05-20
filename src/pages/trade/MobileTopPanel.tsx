@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { Trigger } from '@radix-ui/react-tabs';
 import { useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -28,15 +28,16 @@ enum Tab {
   Depth = 'Depth',
   Funding = 'Funding',
   OrderBook = 'OrderBook',
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   LiveTrades = 'LiveTrades',
 }
 
 const TabButton = ({ value, label, icon }: { value: Tab; label: string; icon: IconName }) => (
   <Trigger asChild value={value}>
-    <Styled.TabButton>
+    <$TabButton>
       <Icon iconName={icon} />
       <span>{label}</span>
-    </Styled.TabButton>
+    </$TabButton>
   </Trigger>
 );
 
@@ -48,7 +49,7 @@ export const MobileTopPanel = () => {
 
   const items = [
     {
-      content: <Styled.AccountInfo />,
+      content: <$AccountInfo />,
       label: stringGetter({ key: STRING_KEYS.WALLET }),
       value: Tab.Account,
       icon: IconName.Coins,
@@ -74,9 +75,9 @@ export const MobileTopPanel = () => {
     },
     {
       content: (
-        <Styled.ScrollableTableContainer>
+        <$ScrollableTableContainer>
           <Orderbook histogramSide="right" layout="horizontal" hideHeader />
-        </Styled.ScrollableTableContainer>
+        </$ScrollableTableContainer>
       ),
       label: stringGetter({ key: STRING_KEYS.ORDERBOOK_SHORT }),
       value: Tab.OrderBook,
@@ -84,9 +85,9 @@ export const MobileTopPanel = () => {
     },
     {
       content: (
-        <Styled.ScrollableTableContainer>
+        <$ScrollableTableContainer>
           <LiveTrades histogramSide="left" />
-        </Styled.ScrollableTableContainer>
+        </$ScrollableTableContainer>
       ),
       label: stringGetter({ key: STRING_KEYS.RECENT }),
       value: Tab.LiveTrades,
@@ -95,7 +96,7 @@ export const MobileTopPanel = () => {
   ];
 
   return (
-    <Styled.Tabs
+    <$Tabs
       value={value}
       onValueChange={setValue}
       items={items.map((item) => ({
@@ -109,10 +110,7 @@ export const MobileTopPanel = () => {
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Tabs = styled(Tabs)`
+const $Tabs = styled(Tabs)`
   --scrollArea-height: 20rem;
   --stickyArea0-background: var(--color-layer-2);
   --tabContent-height: calc(20rem - 2rem - var(--tabs-currentHeight));
@@ -130,9 +128,9 @@ Styled.Tabs = styled(Tabs)`
       gap: 0.5rem;
     }
   }
-`;
+` as typeof Tabs;
 
-Styled.TabButton = styled(ToggleButton)`
+const $TabButton = styled(ToggleButton)`
   padding: 0 0.5rem;
 
   span {
@@ -156,11 +154,11 @@ Styled.TabButton = styled(ToggleButton)`
   }
 `;
 
-Styled.AccountInfo = styled(AccountInfo)`
+const $AccountInfo = styled(AccountInfo)`
   --account-info-section-height: var(--tabContent-height);
 `;
 
-Styled.ScrollableTableContainer = styled.div`
+const $ScrollableTableContainer = styled.div`
   ${layoutMixins.scrollArea}
   --scrollArea-height: var(--tabContent-height);
   --stickyArea0-topGap: 0px;

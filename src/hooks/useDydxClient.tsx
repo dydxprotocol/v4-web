@@ -23,6 +23,7 @@ import { LocalStorageKey } from '@/constants/localStorage';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
 
+import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
 
 import { useEndpointsConfig } from './useEndpointsConfig';
@@ -126,11 +127,19 @@ const useDydxClientContext = () => {
     (selectedGasDenom: SelectedGasDenom) => {
       if (compositeClient) {
         compositeClient.validatorClient.setSelectedGasDenom(selectedGasDenom);
+        abacusStateManager.setSelectedGasDenom(selectedGasDenom);
         setGasDenom(selectedGasDenom);
       }
     },
-    [compositeClient]
+    [compositeClient, setGasDenom]
   );
+
+  useEffect(() => {
+    if (compositeClient) {
+      setSelectedGasDenom(gasDenom);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [compositeClient, setSelectedGasDenom]);
 
   // ------ Wallet Methods ------ //
   const getWalletFromEvmSignature = async ({ signature }: { signature: string }) => {
@@ -148,7 +157,7 @@ const useDydxClientContext = () => {
   // ------ Public Methods ------ //
   const requestAllPerpetualMarkets = async () => {
     try {
-      const { markets } = (await indexerClient.markets.getPerpetualMarkets()) || {};
+      const { markets } = (await indexerClient.markets.getPerpetualMarkets()) ?? {};
       return markets || [];
     } catch (error) {
       log('useDydxClient/getPerpetualMarkets', error);
@@ -158,10 +167,11 @@ const useDydxClientContext = () => {
 
   const getMarketTickSize = async (marketId: string) => {
     try {
-      const { markets } = (await indexerClient.markets.getPerpetualMarkets(marketId)) || {};
+      const { markets } = (await indexerClient.markets.getPerpetualMarkets(marketId)) ?? {};
       return markets?.[marketId]?.tickSize;
     } catch (error) {
       log('useDydxClient/getMarketTickSize', error);
+      return undefined;
     }
   };
 
@@ -186,14 +196,12 @@ const useDydxClientContext = () => {
 
   const requestCandles = async ({
     marketId,
-    marketType = 'perpetualMarkets',
     resolution,
     fromIso,
     toIso,
     limit,
   }: {
     marketId: string;
-    marketType?: string;
     resolution: ResolutionString;
     fromIso?: string;
     toIso?: string;
@@ -231,6 +239,7 @@ const useDydxClientContext = () => {
     const candlesInRange: Candle[] = [];
 
     while (true) {
+      // eslint-disable-next-line no-await-in-loop
       const candles = await requestCandles({
         marketId,
         resolution,
@@ -283,12 +292,12 @@ const useDydxClientContext = () => {
   }) => indexerClient.markets.getPerpetualMarketSparklines(period);
 
   const getWithdrawalAndTransferGatingStatus = useCallback(async () => {
-    return await compositeClient?.validatorClient.get.getWithdrawalAndTransferGatingStatus();
+    return compositeClient?.validatorClient.get.getWithdrawalAndTransferGatingStatus();
   }, [compositeClient]);
 
   const getWithdrawalCapacityByDenom = useCallback(
     async ({ denom }: { denom: string }) => {
-      return await compositeClient?.validatorClient.get.getWithdrawalCapacityByDenom(denom);
+      return compositeClient?.validatorClient.get.getWithdrawalCapacityByDenom(denom);
     },
     [compositeClient]
   );

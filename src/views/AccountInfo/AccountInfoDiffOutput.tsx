@@ -1,4 +1,4 @@
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import type { Nullable, TradeState } from '@/constants/abacus';
 import { NumberSign } from '@/constants/numbers';
@@ -21,7 +21,7 @@ export const AccountInfoDiffOutput = ({ hasError, isPositive, type, value }: Ele
   const hasDiffPostOrder = isNumber(postOrderValue) && currentValue !== postOrderValue;
 
   return (
-    <Styled.DiffOutput
+    <$DiffOutput
       hasInvalidNewValue={!!hasError}
       sign={isPositive ? NumberSign.Positive : NumberSign.Negative}
       type={type}
@@ -33,10 +33,7 @@ export const AccountInfoDiffOutput = ({ hasError, isPositive, type, value }: Ele
     />
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.DiffOutput = styled(DiffOutput)<{ withDiff?: boolean }>`
+const $DiffOutput = styled(DiffOutput)<{ withDiff?: boolean }>`
   --diffOutput-valueWithDiff-font: var(--font-small-book);
   --diffOutput-gap: 0.125rem;
   font: var(--font-base-book);

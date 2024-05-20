@@ -1,8 +1,7 @@
 import type { AbacusWebsocketProtocol } from '@/constants/abacus';
+import { lastSuccessfulWebsocketRequestByOrigin } from '@/constants/analytics';
 import type { TradingViewBar } from '@/constants/candles';
 import { isDev } from '@/constants/networks';
-
-import { lastSuccessfulWebsocketRequestByOrigin } from '@/hooks/useAnalytics';
 
 import { testFlags } from '@/lib/testFlags';
 import { subscriptionsByChannelId } from '@/lib/tradingView/dydxfeed/cache';
@@ -14,12 +13,17 @@ const RECONNECT_INTERVAL_MS = 10_000;
 
 class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImplementIt'> {
   private socket: WebSocket | null = null;
+
   private url: string | null = null;
+
   private connectedCallback: ((p0: boolean) => void) | null = null;
+
   private receivedCallback: ((p0: string) => void) | null = null;
 
   private disconnectTimer?: NodeJS.Timer;
+
   private reconnectTimer?: NodeJS.Timer;
+
   private currentCandleId: string | undefined;
 
   private isConnecting: boolean = false;
@@ -172,6 +176,7 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
       this.isConnecting = false;
       this.connectedCallback?.(false);
       if (!isDev) return;
+      // eslint-disable-next-line no-console
       console.warn('AbacusStateManager > WS > close > ', e);
     };
 
@@ -179,6 +184,7 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
       this.isConnecting = false;
       this.connectedCallback?.(false);
       if (!isDev) return;
+      // eslint-disable-next-line no-console
       console.error('AbacusStateManager > WS > error > ', e);
     };
   };

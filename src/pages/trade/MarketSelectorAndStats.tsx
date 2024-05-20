@@ -1,5 +1,5 @@
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -15,19 +15,16 @@ export const MarketSelectorAndStats = ({ className }: { className?: string }) =>
   const currentMarketId = useSelector(getCurrentMarketId);
 
   return (
-    <Styled.Container className={className}>
+    <$Container className={className}>
       <MarketsDropdown currentMarketId={currentMarketId} symbol={id} />
 
       <VerticalSeparator />
 
       <MarketStatsDetails />
-    </Styled.Container>
+    </$Container>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Container = styled.div`
+const $Container = styled.div`
   ${layoutMixins.container}
 
   display: grid;

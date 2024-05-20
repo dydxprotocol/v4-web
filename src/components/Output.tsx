@@ -119,7 +119,7 @@ export const Output = ({
   switch (type) {
     case OutputType.Text: {
       return (
-        <Styled.Text
+        <$Text
           key={value?.toString()}
           title={`${value ?? ''}${tag ? ` ${tag}` : ''}`}
           className={className}
@@ -129,7 +129,7 @@ export const Output = ({
 
           {tag && <Tag>{tag}</Tag>}
           {slotRight}
-        </Styled.Text>
+        </$Text>
       );
     }
     case OutputType.RelativeTime: {
@@ -142,7 +142,7 @@ export const Output = ({
         );
 
         return (
-          <Styled.Text
+          <$Text
             key={value?.toString()}
             title={`${value ?? ''}${tag ? ` ${tag}` : ''}`}
             className={className}
@@ -156,12 +156,12 @@ export const Output = ({
             </time>
 
             {tag && <Tag>{tag}</Tag>}
-          </Styled.Text>
+          </$Text>
         );
       }
 
       return (
-        <Styled.Text
+        <$Text
           key={value?.toString()}
           title={`${value ?? ''}${tag ? ` ${tag}` : ''}`}
           className={className}
@@ -169,7 +169,7 @@ export const Output = ({
           <RelativeTime timestamp={timestamp} {...relativeTimeFormatOptions} />
 
           {tag && <Tag>{tag}</Tag>}
-        </Styled.Text>
+        </$Text>
       );
     }
     case OutputType.Date:
@@ -197,13 +197,9 @@ export const Output = ({
       }[type];
 
       return (
-        <Styled.Text
-          key={value}
-          title={`${value ?? ''}${tag ? ` ${tag}` : ''}`}
-          className={className}
-        >
+        <$Text key={value} title={`${value ?? ''}${tag ? ` ${tag}` : ''}`} className={className}>
           {dateString}
-        </Styled.Text>
+        </$Text>
       );
     }
     case OutputType.CompactNumber:
@@ -240,7 +236,7 @@ export const Output = ({
       };
 
       return (
-        <Styled.Number
+        <$Number
           key={value?.toString()}
           title={`${value ?? ''}${
             (
@@ -255,7 +251,7 @@ export const Output = ({
           withBaseFont={withBaseFont}
         >
           {slotLeft}
-          {sign && <Styled.Sign>{sign}</Styled.Sign>}
+          {sign && <$Sign>{sign}</$Sign>}
           {hasValue &&
             {
               [OutputType.CompactNumber]: () => {
@@ -362,8 +358,8 @@ export const Output = ({
               ),
             }[type]()}
           {slotRight}
-          {tag && <Styled.Tag>{tag}</Styled.Tag>}
-        </Styled.Number>
+          {tag && <$Tag>{tag}</$Tag>}
+        </$Number>
       );
     }
     default:
@@ -404,21 +400,22 @@ const _OUTPUT_STYLES = styled.output<{ withParentheses?: boolean }>`
     `}
 `;
 
-const Styled = {
-  Output: _OUTPUT_STYLES,
-  Tag: styled(Tag)`
-    margin-left: 0.5ch;
-  `,
+const $Output = _OUTPUT_STYLES;
 
-  Sign: styled.span`
-    color: var(--output-sign-color);
-  `,
-  Text: styled(_OUTPUT_STYLES)``,
-  Number: styled(_OUTPUT_STYLES)<{ withBaseFont?: boolean }>`
-    ${({ withBaseFont }) =>
-      !withBaseFont &&
-      css`
-        font-feature-settings: var(--fontFeature-monoNumbers);
-      `}
-  `,
-};
+const $Tag = styled(Tag)`
+  margin-left: 0.5ch;
+`;
+
+const $Sign = styled.span`
+  color: var(--output-sign-color);
+`;
+
+const $Text = styled(_OUTPUT_STYLES)``;
+
+const $Number = styled(_OUTPUT_STYLES)<{ withBaseFont?: boolean }>`
+  ${({ withBaseFont }) =>
+    !withBaseFont &&
+    css`
+      font-feature-settings: var(--fontFeature-monoNumbers);
+    `}
+`;

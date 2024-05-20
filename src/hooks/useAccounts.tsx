@@ -91,17 +91,17 @@ const useAccountsContext = () => {
   }, []);
 
   const saveEvmDerivedAccount = ({
-    evmAddress,
+    evmAddressInner,
     dydxAddress,
   }: {
-    evmAddress: EvmAddress;
+    evmAddressInner: EvmAddress;
     dydxAddress?: DydxAddress;
   }) => {
     saveEvmDerivedAddresses({
       ...evmDerivedAddresses,
       version: LOCAL_STORAGE_VERSIONS[LocalStorageKey.EvmDerivedAddresses],
-      [evmAddress]: {
-        ...evmDerivedAddresses[evmAddress],
+      [evmAddressInner]: {
+        ...evmDerivedAddresses[evmAddressInner],
         dydxAddress,
       },
     });
@@ -151,9 +151,8 @@ const useAccountsContext = () => {
       // 403 is expected if the user account is blocked
       if (error.status === 404 || error.status === 403) {
         return [];
-      } else {
-        throw error;
       }
+      throw error;
     }
   };
 
@@ -181,7 +180,7 @@ const useAccountsContext = () => {
 
   useEffect(() => {
     if (evmAddress) {
-      saveEvmDerivedAccount({ evmAddress, dydxAddress });
+      saveEvmDerivedAccount({ evmAddressInner: evmAddress, dydxAddress });
     }
   }, [evmAddress, dydxAddress]);
 
@@ -201,7 +200,7 @@ const useAccountsContext = () => {
 
         // Set variables.
         saveEvmDerivedAccount({
-          evmAddress: TEST_WALLET_EVM_ADDRESS,
+          evmAddressInner: TEST_WALLET_EVM_ADDRESS,
           dydxAddress: addressOverride,
         });
         const wallet = new LocalWallet();
@@ -293,7 +292,7 @@ const useAccountsContext = () => {
         value: hasAcknowledgedTerms,
       })
     );
-  }, [hasAcknowledgedTerms]);
+  }, [dispatch, hasAcknowledgedTerms]);
 
   useEffect(() => {
     const hasPreviousTransactions = Boolean(dydxSubaccounts?.length);
@@ -304,7 +303,7 @@ const useAccountsContext = () => {
         value: hasPreviousTransactions,
       })
     );
-  }, [dydxSubaccounts]);
+  }, [dispatch, dydxSubaccounts]);
 
   // Disconnect wallet / accounts
   const disconnectLocalDydxWallet = () => {

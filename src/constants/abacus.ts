@@ -46,6 +46,10 @@ export type AbacusTrackingProtocol = Omit<
   Abacus.exchange.dydx.abacus.protocols.TrackingProtocol,
   '__doNotUseOrImplementIt'
 >;
+export type AbacusLoggingProtocol = Omit<
+  Abacus.exchange.dydx.abacus.protocols.LoggingProtocol,
+  '__doNotUseOrImplementIt'
+>;
 
 export type FileLocation = Abacus.exchange.dydx.abacus.protocols.FileLocation;
 export type ThreadingType = Abacus.exchange.dydx.abacus.protocols.ThreadingType;
@@ -146,7 +150,7 @@ export type SubaccountTransfers = Abacus.exchange.dydx.abacus.output.SubaccountT
 // ------ Historical PnL ------ //
 export type SubAccountHistoricalPNL = Abacus.exchange.dydx.abacus.output.SubaccountHistoricalPNL;
 export type SubAccountHistoricalPNLs = Abacus.exchange.dydx.abacus.output.SubaccountHistoricalPNL[];
-export const HistoricalPnlPeriod = Abacus.exchange.dydx.abacus.protocols.HistoricalPnlPeriod;
+export const HistoricalPnlPeriod = Abacus.exchange.dydx.abacus.state.manager.HistoricalPnlPeriod;
 const historicalPnlPeriod = [...HistoricalPnlPeriod.values()] as const;
 export type HistoricalPnlPeriods = (typeof historicalPnlPeriod)[number];
 

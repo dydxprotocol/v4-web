@@ -3,7 +3,11 @@ import { useEffect, useState } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 
-import { AnalyticsEvent, AnalyticsUserProperty } from '@/constants/analytics';
+import {
+  AnalyticsEvent,
+  AnalyticsUserProperty,
+  lastSuccessfulWebsocketRequestByOrigin,
+} from '@/constants/analytics';
 import type { DialogTypes } from '@/constants/dialogs';
 
 import { calculateOnboardingStep } from '@/state/accountCalculators';
@@ -19,6 +23,7 @@ import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
 import { useBreakpoints } from './useBreakpoints';
 import { useDydxClient } from './useDydxClient';
+// eslint-disable-next-line import/no-cycle
 import { useSelectedNetwork } from './useSelectedNetwork';
 
 export const useAnalytics = () => {
@@ -81,7 +86,7 @@ export const useAnalytics = () => {
 
   // AnalyticsUserProperty.WalletAddress
   useEffect(() => {
-    identify(AnalyticsUserProperty.WalletAddress, evmAddress || dydxAddress);
+    identify(AnalyticsUserProperty.WalletAddress, evmAddress ?? dydxAddress);
   }, [evmAddress, dydxAddress]);
 
   // AnalyticsUserProperty.DydxAddress
@@ -219,6 +224,3 @@ export const useAnalytics = () => {
     }
   }, [selectedOrderType]);
 };
-
-export const lastSuccessfulRestRequestByOrigin: Record<URL['origin'], number> = {};
-export const lastSuccessfulWebsocketRequestByOrigin: Record<URL['origin'], number> = {};

@@ -1,10 +1,8 @@
-import { useMemo } from 'react';
-
 import { curveNatural } from '@visx/curve';
 import { LinearGradient } from '@visx/gradient';
 import { ParentSize } from '@visx/responsive';
 import { Axis, LineSeries, XYChart, buildChartTheme, darkTheme } from '@visx/xychart';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 interface SparklineChartProps<Datum extends {}> {
   data: Datum[];
@@ -25,7 +23,7 @@ export const SparklineChart = <Datum extends {}>(props: SparklineChartProps<Datu
   const { data, positive, xAccessor, yAccessor } = props;
 
   return (
-    <Styled.ParentSize>
+    <$ParentSize>
       {({ height, width }: { width: number; height: number }) => (
         <XYChart
           width={width}
@@ -71,13 +69,10 @@ export const SparklineChart = <Datum extends {}>(props: SparklineChartProps<Datu
           />
         </XYChart>
       )}
-    </Styled.ParentSize>
+    </$ParentSize>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.ParentSize = styled(ParentSize)`
+const $ParentSize = styled(ParentSize)`
   & > svg {
     overflow: visible;
   }

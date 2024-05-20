@@ -1,5 +1,5 @@
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import styled, { css, type AnyStyledComponent } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import type { Nullable, TradeState } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
@@ -74,31 +74,31 @@ export const AccountInfoConnectedState = () => {
   const showHeader = !hasDiff && !isTablet;
 
   return (
-    <Styled.ConnectedAccountInfoContainer $showHeader={showHeader}>
+    <$ConnectedAccountInfoContainer $showHeader={showHeader}>
       {!showHeader ? null : (
-        <Styled.Header>
+        <$Header>
           <span>{stringGetter({ key: STRING_KEYS.ACCOUNT })}</span>
-          <Styled.TransferButtons>
-            <Styled.Button
+          <$TransferButtons>
+            <$Button
               state={{ isDisabled: !dydxAccounts }}
               onClick={() => dispatch(openDialog({ type: DialogTypes.Withdraw }))}
               shape={ButtonShape.Rectangle}
               size={ButtonSize.XSmall}
             >
               {stringGetter({ key: STRING_KEYS.WITHDRAW })}
-            </Styled.Button>
+            </$Button>
             {complianceState === ComplianceStates.FULL_ACCESS && (
               <>
-                <Styled.Button
+                <$Button
                   state={{ isDisabled: !dydxAccounts }}
                   onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
                   shape={ButtonShape.Rectangle}
                   size={ButtonSize.XSmall}
                 >
                   {stringGetter({ key: STRING_KEYS.DEPOSIT })}
-                </Styled.Button>
+                </$Button>
                 <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.TRANSFER })}>
-                  <Styled.IconButton
+                  <$IconButton
                     shape={ButtonShape.Square}
                     iconName={IconName.Send}
                     onClick={() =>
@@ -113,21 +113,21 @@ export const AccountInfoConnectedState = () => {
                 </WithTooltip>
               </>
             )}
-          </Styled.TransferButtons>
-        </Styled.Header>
+          </$TransferButtons>
+        </$Header>
       )}
-      <Styled.Stack>
+      <$Stack>
         {!showHeader && !isTablet && complianceState === ComplianceStates.FULL_ACCESS && (
-          <Styled.CornerButton
+          <$CornerButton
             state={{ isDisabled: !dydxAccounts }}
             onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
           >
-            <Styled.CircleContainer>
+            <$CircleContainer>
               <Icon iconName={IconName.Transfer} />
-            </Styled.CircleContainer>
-          </Styled.CornerButton>
+            </$CircleContainer>
+          </$CornerButton>
         )}
-        <Styled.Details
+        <$Details
           items={[
             {
               key: AccountInfoItem.Leverage,
@@ -139,7 +139,7 @@ export const AccountInfoConnectedState = () => {
               label: stringGetter({ key: STRING_KEYS.LEVERAGE }),
               type: OutputType.Multiple,
               value: leverage,
-              slotRight: <Styled.UsageBars value={getUsageValue(leverage)} />,
+              slotRight: <$UsageBars value={getUsageValue(leverage)} />,
             },
             {
               key: AccountInfoItem.Equity,
@@ -193,18 +193,14 @@ export const AccountInfoConnectedState = () => {
               key,
               label: (
                 <WithTooltip tooltip={tooltip} stringParams={stringParams}>
-                  <Styled.WithUsage>
+                  <$WithUsage>
                     {label}
-                    {hasError ? (
-                      <Styled.CautionIcon iconName={IconName.CautionCircle} />
-                    ) : (
-                      slotRight
-                    )}
-                  </Styled.WithUsage>
+                    {hasError ? <$CautionIcon iconName={IconName.CautionCircle} /> : slotRight}
+                  </$WithUsage>
                 </WithTooltip>
               ),
               value: [AccountInfoItem.Leverage, AccountInfoItem.Equity].includes(key) ? (
-                <Styled.Output type={type} value={value?.current} />
+                <$Output type={type} value={value?.current} />
               ) : (
                 <AccountInfoDiffOutput
                   hasError={hasError}
@@ -220,18 +216,15 @@ export const AccountInfoConnectedState = () => {
           showHeader={showHeader}
           isLoading={isLoading}
         />
-      </Styled.Stack>
-    </Styled.ConnectedAccountInfoContainer>
+      </$Stack>
+    </$ConnectedAccountInfoContainer>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Stack = styled.div`
+const $Stack = styled.div`
   ${layoutMixins.stack}
 `;
 
-Styled.CornerButton = styled(Button)`
+const $CornerButton = styled(Button)`
   ${layoutMixins.withOuterBorder}
   z-index: 1;
   place-self: start end;
@@ -247,7 +240,7 @@ Styled.CornerButton = styled(Button)`
   }
 `;
 
-Styled.CircleContainer = styled.div`
+const $CircleContainer = styled.div`
   display: inline-flex;
   align-items: center;
 
@@ -256,11 +249,11 @@ Styled.CircleContainer = styled.div`
   border-radius: 50%;
 `;
 
-Styled.CautionIcon = styled(Icon)`
+const $CautionIcon = styled(Icon)`
   color: var(--color-error);
 `;
 
-Styled.WithUsage = styled.div`
+const $WithUsage = styled.div`
   ${layoutMixins.row}
 
   & > :last-child {
@@ -272,7 +265,7 @@ Styled.WithUsage = styled.div`
   }
 `;
 
-Styled.Details = styled(Details)<{ showHeader?: boolean }>`
+const $Details = styled(Details)<{ showHeader?: boolean }>`
   ${layoutMixins.withOuterAndInnerBorders}
   clip-path: inset(0.5rem 1px);
 
@@ -296,35 +289,31 @@ Styled.Details = styled(Details)<{ showHeader?: boolean }>`
   }
 `;
 
-Styled.UsageBars = styled(UsageBars)`
+const $UsageBars = styled(UsageBars)`
   margin-top: -0.125rem;
 `;
 
-Styled.Output = styled(Output)<{ isNegative?: boolean }>`
+const $Output = styled(Output)<{ isNegative?: boolean }>`
   color: var(--color-text-1);
   font: var(--font-base-book);
 `;
 
-Styled.Header = styled.header`
+const $Header = styled.header`
   ${layoutMixins.spacedRow}
   font: var(--font-small-book);
   padding: 0 1.25rem;
 `;
 
-Styled.TransferButtons = styled.div`
+const $TransferButtons = styled.div`
   ${layoutMixins.inlineRow}
   gap: 1rem;
 `;
 
-Styled.ConnectedAccountInfoContainer = styled.div<{ $showHeader?: boolean }>`
+const $ConnectedAccountInfoContainer = styled.div<{ $showHeader?: boolean }>`
   ${layoutMixins.column}
 
   @media ${breakpoints.notTablet} {
     ${layoutMixins.withOuterAndInnerBorders}
-  }
-
-  @media ${breakpoints.tablet} {
-    ${layoutMixins.withInnerBorder}
   }
 
   ${({ $showHeader }) =>
@@ -334,7 +323,7 @@ Styled.ConnectedAccountInfoContainer = styled.div<{ $showHeader?: boolean }>`
     `}
 `;
 
-Styled.Button = styled(Button)`
+const $Button = styled(Button)`
   margin-right: -0.3rem;
 
   svg {
@@ -343,7 +332,7 @@ Styled.Button = styled(Button)`
   }
 `;
 
-Styled.IconButton = styled(IconButton)`
+const $IconButton = styled(IconButton)`
   --button-padding: 0 0.25rem;
   --button-border: solid var(--border-width) var(--color-layer-6);
 `;

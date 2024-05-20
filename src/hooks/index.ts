@@ -1,5 +1,6 @@
 import { useAccountBalance } from './useAccountBalance';
 import { useAccounts } from './useAccounts';
+// eslint-disable-next-line import/no-cycle
 import { useAnalytics } from './useAnalytics';
 import { useApiState } from './useApiState';
 import { useBreakpoints } from './useBreakpoints';
@@ -10,6 +11,7 @@ import { useDocumentTitle } from './useDocumentTitle';
 import { useDydxClient } from './useDydxClient';
 import { useEnvFeatures } from './useEnvFeatures';
 import { useGovernanceVariables } from './useGovernanceVariables';
+// eslint-disable-next-line import/no-cycle
 import { useInitializePage } from './useInitializePage';
 import { useInterval } from './useInterval';
 import { useIsFirstRender } from './useIsFirstRender';
@@ -26,6 +28,7 @@ import { useSelectedNetwork } from './useSelectedNetwork';
 import { useShouldShowFooter } from './useShouldShowFooter';
 import { useStringGetter } from './useStringGetter';
 import { useSubaccount } from './useSubaccount';
+import { useTablePagination } from './useTablePagination';
 import { useTokenConfigs } from './useTokenConfigs';
 import { useTradeFormInputs } from './useTradeFormInputs';
 import { useTriggerOrdersFormInputs } from './useTriggerOrdersFormInputs';
@@ -55,15 +58,16 @@ export {
   useOnClickOutside,
   usePageTitlePriceUpdates,
   usePerpetualMarketSparklines,
+  usePerpetualMarketsStats,
   useRestrictions,
   useSelectedNetwork,
   useShouldShowFooter,
   useStringGetter,
   useSubaccount,
+  useTablePagination,
   useTokenConfigs,
   useTradeFormInputs,
   useTriggerOrdersFormInputs,
   useURLConfigs,
   useWithdrawalInfo,
-  usePerpetualMarketsStats,
 };

@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 import { useDispatch } from 'react-redux';
-import styled, { type AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
@@ -35,10 +35,10 @@ export const ExternalNavStrideDialog = ({ setIsOpen }: ElementProps) => {
         type: DialogTypes.ExternalLink,
         dialogProps: {
           buttonText: (
-            <Styled.Span>
+            <$Span>
               {stringGetter({ key: STRING_KEYS.LIQUID_STAKE_ON_STRIDE })}
               <Icon iconName={IconName.LinkOut} />
-            </Styled.Span>
+            </$Span>
           ),
           link: strideZoneApp,
           title: stringGetter({ key: STRING_KEYS.LIQUID_STAKING_AND_LEAVING }),
@@ -60,12 +60,8 @@ export const ExternalNavStrideDialog = ({ setIsOpen }: ElementProps) => {
       title={stringGetter({ key: STRING_KEYS.HAVE_YOU_EXPORTED })}
       placement={isTablet ? DialogPlacement.FullScreen : DialogPlacement.Default}
     >
-      <Styled.Content>
-        <Styled.Button
-          type={ButtonType.Button}
-          size={ButtonSize.XLarge}
-          onClick={openExternalNavDialog}
-        >
+      <$Content>
+        <$Button type={ButtonType.Button} size={ButtonSize.XLarge} onClick={openExternalNavDialog}>
           <span>
             {stringGetter({
               key: STRING_KEYS.NAVIGATE_TO_STRIDE,
@@ -75,18 +71,14 @@ export const ExternalNavStrideDialog = ({ setIsOpen }: ElementProps) => {
             })}
           </span>
 
-          <Styled.IconButton
+          <$IconButton
             action={ButtonAction.Base}
             iconName={IconName.Arrow}
             size={ButtonSize.XSmall}
           />
-        </Styled.Button>
+        </$Button>
 
-        <Styled.Button
-          type={ButtonType.Link}
-          size={ButtonSize.XLarge}
-          href={accountExportLearnMore}
-        >
+        <$Button type={ButtonType.Link} size={ButtonSize.XLarge} href={accountExportLearnMore}>
           <span>
             {stringGetter({
               key: STRING_KEYS.LEARN_TO_EXPORT,
@@ -96,20 +88,17 @@ export const ExternalNavStrideDialog = ({ setIsOpen }: ElementProps) => {
             })}
           </span>
 
-          <Styled.IconButton
+          <$IconButton
             action={ButtonAction.Base}
             iconName={IconName.Arrow}
             size={ButtonSize.XSmall}
           />
-        </Styled.Button>
-      </Styled.Content>
+        </$Button>
+      </$Content>
     </Dialog>
   );
 };
-
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.TextToggle = styled.div`
+const $TextToggle = styled.div`
   ${layoutMixins.stickyFooter}
   color: var(--color-accent);
   cursor: pointer;
@@ -121,7 +110,7 @@ Styled.TextToggle = styled.div`
   }
 `;
 
-Styled.Content = styled.div`
+const $Content = styled.div`
   ${layoutMixins.stickyArea0}
   --stickyArea0-bottomHeight: 2rem;
   --stickyArea0-bottomGap: 1rem;
@@ -131,7 +120,7 @@ Styled.Content = styled.div`
   gap: 1rem;
 `;
 
-Styled.Button = styled(Button)`
+const $Button = styled(Button)`
   --button-font: var(--font-base-book);
   --button-padding: 0 1.5rem;
 
@@ -140,12 +129,12 @@ Styled.Button = styled(Button)`
   justify-content: space-between;
 `;
 
-Styled.IconButton = styled(IconButton)`
+const $IconButton = styled(IconButton)`
   color: var(--color-text-0);
   --color-border: var(--color-layer-6);
 `;
 
-Styled.Span = styled.span`
+const $Span = styled.span`
   display: flex;
   align-items: center;
   gap: 0.5ch;

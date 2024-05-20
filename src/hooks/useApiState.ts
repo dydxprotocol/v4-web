@@ -31,7 +31,7 @@ const getConnectionError = ({
   apiState: Nullable<AbacusApiState>;
   initializationError?: string;
 }) => {
-  const { status } = apiState || {};
+  const { status } = apiState ?? {};
 
   if (initializationError) {
     return ConnectionErrorType.CHAIN_DISRUPTION;
@@ -72,7 +72,7 @@ const getStatusErrorMessage = ({
 };
 
 export const getIndexerHeight = (apiState: Nullable<AbacusApiState>) => {
-  const { haltedBlock, trailingBlocks, status, height } = apiState || {};
+  const { haltedBlock, trailingBlocks, status, height } = apiState ?? {};
 
   switch (status) {
     case AbacusApiStatus.INDEXER_HALTED: {

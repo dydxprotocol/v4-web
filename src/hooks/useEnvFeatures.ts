@@ -8,6 +8,7 @@ export interface EnvironmentFeatures {
   reduceOnlySupported: boolean;
   withdrawalSafetyEnabled: boolean;
   CCTPWithdrawalOnly: boolean;
+  CCTPDepositOnly: boolean;
   isSlTpEnabled: boolean;
   isSlTpLimitOrdersEnabled: boolean;
 }

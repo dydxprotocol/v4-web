@@ -5,12 +5,6 @@ vite.config.ts
 commitlint.config.ts
 
 # Temporarily ignore, we will slowly remove each directory as we fix files to follow ESLint rules
-/src/forms
-/src/hooks
-/src/lib
-/src/main.tsx
-/src/menus
-/src/pages
 /src/views
 
 # components dir is being worked on

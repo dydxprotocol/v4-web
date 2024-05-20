@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
@@ -34,30 +34,30 @@ const RewardsPage = () => {
         />
       )}
       <DetachedSection>
-        <Styled.GridLayout showMigratePanel={import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet}>
-          {import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && <Styled.MigratePanel />}
+        <$GridLayout showMigratePanel={import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet}>
+          {import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && <$MigratePanel />}
 
           {isTablet ? (
-            <Styled.LaunchIncentivesPanel />
+            <$LaunchIncentivesPanel />
           ) : (
             <>
-              <Styled.LaunchIncentivesPanel />
-              <Styled.DYDXBalancePanel />
+              <$LaunchIncentivesPanel />
+              <$DYDXBalancePanel />
             </>
           )}
 
-          <Styled.TradingRewardsColumn>
+          <$TradingRewardsColumn>
             <TradingRewardsSummaryPanel />
             {isTablet && <RewardsHelpPanel />}
             <RewardHistoryPanel />
-          </Styled.TradingRewardsColumn>
+          </$TradingRewardsColumn>
 
           {isNotTablet && (
-            <Styled.OtherColumn>
+            <$OtherColumn>
               <RewardsHelpPanel />
-            </Styled.OtherColumn>
+            </$OtherColumn>
           )}
-        </Styled.GridLayout>
+        </$GridLayout>
       </DetachedSection>
     </div>
   );
@@ -65,20 +65,7 @@ const RewardsPage = () => {
 
 export default RewardsPage;
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.MobileHeader = styled.header`
-  ${layoutMixins.contentSectionDetachedScrollable}
-  ${layoutMixins.stickyHeader}
-  z-index: 2;
-  padding: 1.25rem 0;
-
-  font: var(--font-large-medium);
-  color: var(--color-text-2);
-  background-color: var(--color-layer-2);
-`;
-
-Styled.GridLayout = styled.div<{ showMigratePanel?: boolean }>`
+const $GridLayout = styled.div<{ showMigratePanel?: boolean }>`
   --gap: 1.5rem;
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -120,24 +107,24 @@ Styled.GridLayout = styled.div<{ showMigratePanel?: boolean }>`
   }
 `;
 
-Styled.MigratePanel = styled(MigratePanel)`
+const $MigratePanel = styled(MigratePanel)`
   grid-area: migrate;
 `;
 
-Styled.LaunchIncentivesPanel = styled(LaunchIncentivesPanel)`
+const $LaunchIncentivesPanel = styled(LaunchIncentivesPanel)`
   grid-area: incentives;
 `;
 
-Styled.DYDXBalancePanel = styled(DYDXBalancePanel)`
+const $DYDXBalancePanel = styled(DYDXBalancePanel)`
   grid-area: balance;
 `;
 
-Styled.TradingRewardsColumn = styled.div`
+const $TradingRewardsColumn = styled.div`
   grid-area: rewards;
   ${layoutMixins.flexColumn}
 `;
 
-Styled.OtherColumn = styled.div`
+const $OtherColumn = styled.div`
   grid-area: other;
   ${layoutMixins.flexColumn}
 `;
