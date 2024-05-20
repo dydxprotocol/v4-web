@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 
 import { type MenuConfig } from '@/constants/menus';
 
-import { useOnClickOutside } from '@/hooks';
+import { useOnClickOutside } from '@/hooks/useOnClickOutside';
 
 import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';

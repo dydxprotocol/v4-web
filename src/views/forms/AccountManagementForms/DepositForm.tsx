@@ -22,9 +22,11 @@ import {
 } from '@/constants/numbers';
 import { WalletType, type EvmAddress } from '@/constants/wallets';
 
-import { useAccounts, useDebounce, useStringGetter } from '@/hooks';
 import { CHAIN_DEFAULT_TOKEN_ADDRESS, useAccountBalance } from '@/hooks/useAccountBalance';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useDebounce } from '@/hooks/useDebounce';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';

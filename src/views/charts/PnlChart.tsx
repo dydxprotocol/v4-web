@@ -13,7 +13,8 @@ import {
 } from '@/constants/abacus';
 import { timeUnits } from '@/constants/time';
 
-import { useBreakpoints, useNow } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useNow } from '@/hooks/useNow';
 
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';

@@ -6,7 +6,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
 
-import { useShouldShowFooter, useStringGetter } from '@/hooks';
+import { useShouldShowFooter } from '@/hooks/useShouldShowFooter';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { BellIcon, MarketsIcon, PortfolioIcon, ProfileIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';

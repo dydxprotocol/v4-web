@@ -16,14 +16,12 @@ import {
   type NewMarketProposal,
 } from '@/constants/potentialMarkets';
 
-import {
-  useAccountBalance,
-  useBreakpoints,
-  useGovernanceVariables,
-  useStringGetter,
-  useTokenConfigs,
-} from '@/hooks';
+import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useGovernanceVariables } from '@/hooks/useGovernanceVariables';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { breakpoints } from '@/styles';
 import { formMixins } from '@/styles/formMixins';

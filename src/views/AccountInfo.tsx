@@ -4,7 +4,7 @@ import styled, { AnyStyledComponent, css } from 'styled-components';
 import { OnboardingState } from '@/constants/account';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

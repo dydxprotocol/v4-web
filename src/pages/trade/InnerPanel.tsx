@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { TradeInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Tabs } from '@/components/Tabs';
 import { MarketDetails } from '@/views/MarketDetails';

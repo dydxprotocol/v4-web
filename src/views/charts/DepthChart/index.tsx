@@ -26,8 +26,8 @@ import {
 } from '@/constants/charts';
 import { StringGetterFunction } from '@/constants/localization';
 
-import { useBreakpoints } from '@/hooks';
 import { useOrderbookValuesForDepthChart } from '@/hooks/Orderbook/useOrderbookValues';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { OutputType } from '@/components/Output';

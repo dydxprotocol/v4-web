@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import type { SubaccountPosition } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

@@ -9,8 +9,10 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
-import { useStringGetter, useTokenConfigs, useURLConfigs } from '@/hooks';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { BellStrokeIcon, LogoShortIcon } from '@/icons';
 import breakpoints from '@/styles/breakpoints';

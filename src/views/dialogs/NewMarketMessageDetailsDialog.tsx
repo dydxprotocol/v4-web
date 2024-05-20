@@ -8,7 +8,9 @@ import { MenuItem } from '@/constants/menus';
 import { isMainnet } from '@/constants/networks';
 import { NewMarketProposal } from '@/constants/potentialMarkets';
 
-import { useGovernanceVariables, useStringGetter, useTokenConfigs } from '@/hooks';
+import { useGovernanceVariables } from '@/hooks/useGovernanceVariables';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

@@ -10,13 +10,6 @@ import { WagmiConfig } from 'wagmi';
 
 import { AppRoute, DEFAULT_TRADE_ROUTE, MarketsRoute } from '@/constants/routes';
 
-import {
-  useAnalytics,
-  useBreakpoints,
-  useInitializePage,
-  useShouldShowFooter,
-  useTokenConfigs,
-} from '@/hooks';
 import { AccountsProvider } from '@/hooks/useAccounts';
 import { AppThemeAndColorModeProvider } from '@/hooks/useAppThemeAndColorMode';
 import { DialogAreaProvider, useDialogArea } from '@/hooks/useDialogArea';
@@ -48,7 +41,12 @@ import { parseLocationHash } from '@/lib/urlUtils';
 import { config, configureChainsConfig, privyConfig } from '@/lib/wagmi';
 
 import { ComplianceStates } from './constants/compliance';
+import { useAnalytics } from './hooks/useAnalytics';
+import { useBreakpoints } from './hooks/useBreakpoints';
 import { useComplianceState } from './hooks/useComplianceState';
+import { useInitializePage } from './hooks/useInitializePage';
+import { useShouldShowFooter } from './hooks/useShouldShowFooter';
+import { useTokenConfigs } from './hooks/useTokenConfigs';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));

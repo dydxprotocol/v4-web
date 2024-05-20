@@ -15,16 +15,14 @@ import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 import { DydxChainAsset } from '@/constants/wallets';
 
-import {
-  useAccountBalance,
-  useAccounts,
-  useDydxClient,
-  useRestrictions,
-  useStringGetter,
-  useSubaccount,
-  useTokenConfigs,
-  useWithdrawalInfo,
-} from '@/hooks';
+import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useDydxClient } from '@/hooks/useDydxClient';
+import { useRestrictions } from '@/hooks/useRestrictions';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+import { useWithdrawalInfo } from '@/hooks/useWithdrawalInfo';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';

@@ -29,10 +29,12 @@ import {
   TradeTypes,
 } from '@/constants/trade';
 
-import { useBreakpoints, useStringGetter, useSubaccount } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { breakpoints } from '@/styles';
 import { formMixins } from '@/styles/formMixins';

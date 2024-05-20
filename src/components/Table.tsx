@@ -27,8 +27,8 @@ import {
 import { useAsyncList } from 'react-stately';
 import styled, { css } from 'styled-components';
 
-import { useBreakpoints, useTablePagination } from '@/hooks';
-import { MediaQueryKeys } from '@/hooks/useBreakpoints';
+import { MediaQueryKeys, useBreakpoints } from '@/hooks/useBreakpoints';
+import { useTablePagination } from '@/hooks/useTablePagination';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';

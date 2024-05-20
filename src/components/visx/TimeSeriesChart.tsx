@@ -20,8 +20,8 @@ import styled, { keyframes } from 'styled-components';
 
 import { allTimeUnits } from '@/constants/time';
 
-import { useBreakpoints } from '@/hooks';
 import { useAnimationFrame } from '@/hooks/useAnimationFrame';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

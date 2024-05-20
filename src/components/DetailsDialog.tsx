@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { useBreakpoints } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

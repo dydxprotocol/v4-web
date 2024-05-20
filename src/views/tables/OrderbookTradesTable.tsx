@@ -13,9 +13,9 @@ const orderbookTradesTableType = getSimpleStyledOutputType(
   {} as OrderbookTradesTableStyleProps
 );
 
-export const OrderbookTradesTable = <TableRowData extends BaseTableRowData>(props: AllTableProps<TableRowData>) => (
-  <$OrderbookTradesTable {...props} paginationBehavior="showAll" />
-);
+export const OrderbookTradesTable = <TableRowData extends BaseTableRowData>(
+  props: AllTableProps<TableRowData>
+) => <$OrderbookTradesTable {...props} paginationBehavior="showAll" />;
 
 const $OrderbookTradesTable = styled(Table)<OrderbookTradesTableStyleProps>`
   // Params
