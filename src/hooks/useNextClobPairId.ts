@@ -72,7 +72,7 @@ export const useNextClobPairId = () => {
 
   const { data: perpetualMarkets, status: perpetualMarketsStatus } = useQuery({
     queryKey: ['requestAllPerpetualMarkets'],
-    queryFn: requestAllPerpetualMarkets,
+    queryFn: () => requestAllPerpetualMarkets(),
     refetchInterval: 60_000,
     staleTime: 60_000,
   });

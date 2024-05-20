@@ -13,9 +13,9 @@ import { getApiState } from '@/state/appSelectors';
 import { closeDialog, openDialog } from '@/state/dialogs';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
+import { wrapAndLogError } from '@/lib/asyncUtils';
 import { formatRelativeTime } from '@/lib/dateTime';
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
-import { log } from '@/lib/telemetry';
 
 import { useDydxClient } from './useDydxClient';
 import { useEnvFeatures } from './useEnvFeatures';
@@ -39,15 +39,10 @@ export const useWithdrawalInfo = ({
   const { data: usdcWithdrawalCapacity } = useQuery({
     enabled: withdrawalSafetyEnabled,
     queryKey: ['usdcWithdrawalCapacity'],
-    queryFn: async () => {
-      try {
-        const response = await getWithdrawalCapacityByDenom({ denom: usdcDenom });
-        return JSON.parse(encodeJson(response, ByteArrayEncoding.BIGINT));
-      } catch (error) {
-        log('useWithdrawalInfo/getWithdrawalCapacityByDenom', error);
-        return undefined;
-      }
-    },
+    queryFn: wrapAndLogError(async () => {
+      const response = await getWithdrawalCapacityByDenom({ denom: usdcDenom });
+      return JSON.parse(encodeJson(response, ByteArrayEncoding.BIGINT));
+    }, 'useWithdrawalInfo/getWithdrawalCapacityByDenom'),
     refetchInterval: 60_000,
     staleTime: 60_000,
   });
@@ -55,14 +50,10 @@ export const useWithdrawalInfo = ({
   const { data: withdrawalAndTransferGatingStatus } = useQuery({
     enabled: withdrawalSafetyEnabled,
     queryKey: ['withdrawalTransferGateStatus'],
-    queryFn: async () => {
-      try {
-        return await getWithdrawalAndTransferGatingStatus();
-      } catch (error) {
-        log('useWithdrawalInfo/getWithdrawalAndTransferGatingStatus', error);
-        return undefined;
-      }
-    },
+    queryFn: wrapAndLogError(
+      () => getWithdrawalAndTransferGatingStatus(),
+      'useWithdrawalInfo/getWithdrawalAndTransferGatingStatus'
+    ),
     refetchInterval: 60_000,
     staleTime: 60_000,
   });
