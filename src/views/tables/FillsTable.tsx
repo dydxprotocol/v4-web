@@ -87,9 +87,12 @@ const getFillsTableColumnDef = ({
       [FillsTableColumnKey.TypeAmount]: {
         columnKey: 'typeAmount',
         getCellValue: (row) => row.size,
-        label: `${stringGetter({ key: STRING_KEYS.TYPE })} / ${stringGetter({
-          key: STRING_KEYS.AMOUNT,
-        })}`,
+        label: (
+          <TableColumnHeader>
+            <span>{stringGetter({ key: STRING_KEYS.TYPE })}</span>
+            <span>{stringGetter({ key: STRING_KEYS.AMOUNT })}</span>
+          </TableColumnHeader>
+        ),
         renderCell: ({ resources, size, stepSizeDecimals, asset: { id } }) => (
           <TableCell stacked slotLeft={<$AssetIcon symbol={id} />}>
             <span>
@@ -107,9 +110,12 @@ const getFillsTableColumnDef = ({
       [FillsTableColumnKey.PriceFee]: {
         columnKey: 'priceFee',
         getCellValue: (row) => row.price,
-        label: `${stringGetter({ key: STRING_KEYS.PRICE })} / ${stringGetter({
-          key: STRING_KEYS.FEE,
-        })}`,
+        label: (
+          <TableColumnHeader>
+            <span>{stringGetter({ key: STRING_KEYS.PRICE })}</span>
+            <span>{stringGetter({ key: STRING_KEYS.FEE })}</span>
+          </TableColumnHeader>
+        ),
         renderCell: ({ fee, orderSide, price, resources, tickSizeDecimals }) => (
           <TableCell stacked>
             <$InlineRow>
@@ -176,15 +182,11 @@ const getFillsTableColumnDef = ({
       [FillsTableColumnKey.TotalFee]: {
         columnKey: 'totalFee',
         getCellValue: (row) => MustBigNumber(row.price).times(row.size).toNumber(),
-        label: isTablet ? (
+        label: (
           <TableColumnHeader>
             <span>{stringGetter({ key: STRING_KEYS.TOTAL })}</span>
             <span>{stringGetter({ key: STRING_KEYS.FEE })}</span>
           </TableColumnHeader>
-        ) : (
-          `${stringGetter({ key: STRING_KEYS.TOTAL })} / ${stringGetter({
-            key: STRING_KEYS.FEE,
-          })}`
         ),
         renderCell: ({ size, fee, price }) => (
           <TableCell stacked>
@@ -242,15 +244,11 @@ const getFillsTableColumnDef = ({
       [FillsTableColumnKey.AmountPrice]: {
         columnKey: 'sizePrice',
         getCellValue: (row) => row.size,
-        label: isTablet ? (
+        label: (
           <TableColumnHeader>
             <span>{stringGetter({ key: STRING_KEYS.AMOUNT })}</span>
             <span>{stringGetter({ key: STRING_KEYS.PRICE })}</span>
           </TableColumnHeader>
-        ) : (
-          `${stringGetter({ key: STRING_KEYS.AMOUNT })} / ${stringGetter({
-            key: STRING_KEYS.PRICE,
-          })}`
         ),
         renderCell: ({ size, stepSizeDecimals, price, tickSizeDecimals }) => (
           <TableCell stacked>
@@ -262,15 +260,11 @@ const getFillsTableColumnDef = ({
       [FillsTableColumnKey.TypeLiquidity]: {
         columnKey: 'typeLiquidity',
         getCellValue: (row) => row.type.rawValue,
-        label: isTablet ? (
+        label: (
           <TableColumnHeader>
             <span>{stringGetter({ key: STRING_KEYS.TYPE })}</span>
             <span>{stringGetter({ key: STRING_KEYS.LIQUIDITY })}</span>
           </TableColumnHeader>
-        ) : (
-          `${stringGetter({ key: STRING_KEYS.TYPE })} / ${stringGetter({
-            key: STRING_KEYS.LIQUIDITY,
-          })}`
         ),
         renderCell: ({ resources }) => (
           <TableCell stacked>

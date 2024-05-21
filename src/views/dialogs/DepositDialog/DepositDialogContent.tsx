@@ -70,13 +70,10 @@ const $Content = styled.div`
 `;
 
 const $TextToggle = styled.div`
-  ${layoutMixins.stickyFooter}
   --stickyArea-bottomHeight: 0;
 
   color: var(--color-accent);
   cursor: pointer;
-
-  margin-top: auto;
 
   &:hover {
     text-decoration: underline;
