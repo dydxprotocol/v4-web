@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 
 import { NumberFormatValues } from 'react-number-format';
 import { shallowEqual, useSelector } from 'react-redux';
@@ -13,7 +13,7 @@ import {
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonType } from '@/constants/buttons';
-import { STRING_KEYS } from '@/constants/localization';
+import { STRING_KEYS, StringKey } from '@/constants/localization';
 import { NumberSign, PERCENT_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -102,13 +102,20 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
 
   const { adjustIsolatedMarginOfPosition } = useSubaccount();
 
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const onSubmit = () => {
+    setErrorMessage(null);
+
     adjustIsolatedMarginOfPosition({
       onError: (errorParams) => {
-        console.log({ errorParams });
+        if (errorParams) {
+          setErrorMessage(stringGetter({ key: errorParams.errorStringKey as StringKey }));
+        }
       },
-      onSuccess: (subaccountTransferPayload?: Nullable<HumanReadableSubaccountTransferPayload>) => {
-        console.log({ subaccountTransferPayload });
+      onSuccess: (
+        _subaccountTransferPayload?: Nullable<HumanReadableSubaccountTransferPayload>
+      ) => {
         abacusStateManager.clearAdjustIsolatedMarginInputValues();
       },
     });
@@ -240,8 +247,8 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
           ],
         };
 
-  const CenterElement = false ? (
-    <AlertMessage type={AlertType.Error}>Placeholder Error</AlertMessage>
+  const CenterElement = errorMessage ? (
+    <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>
   ) : (
     <$GradientCard fromColor="neutral" toColor="negative">
       <$Column>
