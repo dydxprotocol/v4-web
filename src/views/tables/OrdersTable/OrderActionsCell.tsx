@@ -1,7 +1,8 @@
 import { useCallback, useState } from 'react';
 
+import { type Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderFlags } from '@dydxprotocol/v4-client-js';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { AbacusOrderStatus, type OrderStatus } from '@/constants/abacus';
@@ -14,19 +15,18 @@ import { IconButton } from '@/components/IconButton';
 import { ActionsTableCell } from '@/components/Table';
 
 import { clearOrder } from '@/state/account';
-import { getOrderById } from '@/state/accountSelectors';
 
 import { isOrderStatusClearable } from '@/lib/orders';
 
 type ElementProps = {
   orderId: string;
+  orderFlags: Nullable<number>;
   status: OrderStatus;
   isDisabled?: boolean;
 };
 
-export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) => {
+export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: ElementProps) => {
   const dispatch = useDispatch();
-  const order = useSelector(getOrderById(orderId), shallowEqual);
 
   const [isCanceling, setIsCanceling] = useState(false);
 
@@ -39,10 +39,10 @@ export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) 
 
   // CT831: if order is stateful and is initially best effort canceled, it's a stuck order that
   // traders should be able to submit another cancel
-  const isShortTermOrder = order?.orderFlags === OrderFlags.SHORT_TERM;
+  const isShortTermOrder = orderFlags === OrderFlags.SHORT_TERM;
   const isBestEffortCanceled = status === AbacusOrderStatus.canceling;
   const isCancelDisabled =
-    isCanceling || !!isDisabled || !order || (isShortTermOrder && isBestEffortCanceled);
+    isCanceling || !!isDisabled || (isShortTermOrder && isBestEffortCanceled);
 
   return (
     <ActionsTableCell>

@@ -23,7 +23,7 @@ import { type OrderTableRow } from '@/views/tables/OrdersTable';
 
 import { clearOrder } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-import { getLocalCancelOrders, getOrderById, getOrderDetails } from '@/state/accountSelectors';
+import { getLocalCancelOrders, getOrderDetails } from '@/state/accountSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -40,7 +40,6 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
   const selectedLocale = useSelector(getSelectedLocale);
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
   const localCancelOrders = useSelector(getLocalCancelOrders, shallowEqual);
-  const existingOrder = useSelector(getOrderById(orderId), shallowEqual);
 
   const { cancelOrder } = useSubaccount();
 
@@ -67,6 +66,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     trailingPercent,
     triggerPrice,
     type,
+    orderFlags,
   } = (useSelector(getOrderDetails(orderId)) as OrderTableRow) ?? {};
 
   const renderOrderPrice = ({
@@ -183,10 +183,9 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     setIsOpen?.(false);
   };
 
-  const isShortTermOrder = existingOrder?.orderFlags === OrderFlags.SHORT_TERM;
+  const isShortTermOrder = orderFlags === OrderFlags.SHORT_TERM;
   const isBestEffortCanceled = status === AbacusOrderStatus.canceling;
-  const isCancelDisabled =
-    !!isOrderCanceling || !existingOrder || (isShortTermOrder && isBestEffortCanceled);
+  const isCancelDisabled = !!isOrderCanceling || (isShortTermOrder && isBestEffortCanceled);
 
   return (
     <DetailsDialog

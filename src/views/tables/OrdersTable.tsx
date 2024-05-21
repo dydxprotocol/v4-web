@@ -213,8 +213,13 @@ const getOrdersTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.ACTION }),
         isActionable: true,
         allowsSorting: false,
-        renderCell: ({ id, status }) => (
-          <OrderActionsCell orderId={id} status={status} isDisabled={isAccountViewOnly} />
+        renderCell: ({ id, status, orderFlags }) => (
+          <OrderActionsCell
+            orderId={id}
+            status={status}
+            orderFlags={orderFlags}
+            isDisabled={isAccountViewOnly}
+          />
         ),
       },
       [OrdersTableColumnKey.StatusFill]: {
