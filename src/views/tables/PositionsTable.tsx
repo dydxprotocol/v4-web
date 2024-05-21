@@ -40,7 +40,6 @@ import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 import { getPositionMargin } from '@/lib/tradeData';
 
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
@@ -334,7 +333,7 @@ const getPositionsTableColumnDef = ({
         columnKey: 'actions',
         label: stringGetter({
           key:
-            shouldRenderTriggers && showClosePositionAction && !testFlags.isolatedMargin
+            shouldRenderTriggers && showClosePositionAction
               ? STRING_KEYS.ACTIONS
               : showClosePositionAction
               ? STRING_KEYS.CLOSE

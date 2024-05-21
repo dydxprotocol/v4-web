@@ -43,11 +43,6 @@ type ElementProps = {
   marketId: SubaccountPosition['id'];
 };
 
-enum MarginAction {
-  ADD = 'ADD',
-  REMOVE = 'REMOVE',
-}
-
 const SIZE_PERCENT_OPTIONS = {
   '5%': '0.05',
   '10%': '0.1',

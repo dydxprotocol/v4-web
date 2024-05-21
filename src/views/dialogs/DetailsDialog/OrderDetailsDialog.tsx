@@ -9,6 +9,7 @@ import {
 } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS, type StringKey } from '@/constants/localization';
+import { isMainnet } from '@/constants/networks';
 import { CancelOrderStatuses } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -32,7 +33,6 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { isMarketOrderType, isOrderStatusClearable, relativeTimeString } from '@/lib/orders';
-import { testFlags } from '@/lib/testFlags';
 import { getMarginModeFromSubaccountNumber } from '@/lib/tradeData';
 
 type ElementProps = {
@@ -189,7 +189,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
       label: stringGetter({ key: STRING_KEYS.CREATED_AT }),
       value: renderOrderTime({ timeInMs: createdAtMilliseconds }),
     },
-    testFlags.isolatedMargin && {
+    !isMainnet && {
       key: 'subaccount',
       label: 'Subaccount # (Debug Only)',
       value: subaccountNumber,

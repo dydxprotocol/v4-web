@@ -28,7 +28,6 @@ import { WithHovercard } from '@/components/WithHovercard';
 import { openDialog } from '@/state/dialogs';
 
 import { isStopLossOrder } from '@/lib/orders';
-import { testFlags } from '@/lib/testFlags';
 
 type ElementProps = {
   marketId: string;
@@ -206,7 +205,6 @@ export const PositionsTriggersCell = ({
       stackedWithSecondaryStyling={false}
       slotRight={
         !isDisabled &&
-        testFlags.isolatedMargin &&
         complianceState === ComplianceStates.FULL_ACCESS && (
           <$EditButton
             key="edit-margin"

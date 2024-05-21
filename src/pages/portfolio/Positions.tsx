@@ -17,7 +17,6 @@ import {
 } from '@/state/accountCalculators';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { testFlags } from '@/lib/testFlags';
 
 export const Positions = () => {
   const stringGetter = useStringGetter();
@@ -46,9 +45,9 @@ export const Positions = () => {
             : [
                 PositionsTableColumnKey.Market,
                 PositionsTableColumnKey.Size,
-                testFlags.isolatedMargin && PositionsTableColumnKey.Margin,
+                PositionsTableColumnKey.Margin,
                 PositionsTableColumnKey.UnrealizedPnl,
-                !testFlags.isolatedMargin && PositionsTableColumnKey.RealizedPnl,
+                PositionsTableColumnKey.RealizedPnl,
                 PositionsTableColumnKey.NetFunding,
                 PositionsTableColumnKey.AverageOpenAndClose,
                 PositionsTableColumnKey.LiquidationAndOraclePrice,

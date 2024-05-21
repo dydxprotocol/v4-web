@@ -39,7 +39,6 @@ import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsS
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
 
 import { UnopenedIsolatedPositions } from './UnopenedIsolatedPositions';
 
@@ -137,9 +136,9 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                 : [
                     PositionsTableColumnKey.Market,
                     PositionsTableColumnKey.Size,
-                    testFlags.isolatedMargin && PositionsTableColumnKey.Margin,
+                    PositionsTableColumnKey.Margin,
                     PositionsTableColumnKey.UnrealizedPnl,
-                    !testFlags.isolatedMargin && PositionsTableColumnKey.RealizedPnl,
+                    PositionsTableColumnKey.RealizedPnl,
                     PositionsTableColumnKey.NetFunding,
                     PositionsTableColumnKey.AverageOpenAndClose,
                     PositionsTableColumnKey.LiquidationAndOraclePrice,
@@ -259,9 +258,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   );
 
   const slotBottom = {
-    [InfoSection.Position]: testFlags.isolatedMargin && (
-      <$UnopenedIsolatedPositions onViewOrders={onViewOrders} />
-    ),
+    [InfoSection.Position]: <$UnopenedIsolatedPositions onViewOrders={onViewOrders} />,
     [InfoSection.Orders]: null,
     [InfoSection.Fills]: null,
     [InfoSection.Payments]: null,

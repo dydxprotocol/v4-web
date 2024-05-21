@@ -21,8 +21,6 @@ import { TradeForm } from '@/views/forms/TradeForm';
 
 import { openDialog } from '@/state/dialogs';
 
-import { testFlags } from '@/lib/testFlags';
-
 import { TradeSideToggle } from '../forms/TradeForm/TradeSideToggle';
 
 type ElementProps = {
@@ -55,7 +53,7 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
       hasHeaderBorder
       {...{
         [MobilePlaceOrderSteps.EditOrder]: {
-          title: testFlags.isolatedMargin ? (
+          title: (
             <$EditTradeHeader>
               <Button
                 onClick={() => {
@@ -79,8 +77,6 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
 
               <TradeSideToggle />
             </$EditTradeHeader>
-          ) : (
-            <TradeSideToggle />
           ),
         },
         [MobilePlaceOrderSteps.PreviewOrder]: {

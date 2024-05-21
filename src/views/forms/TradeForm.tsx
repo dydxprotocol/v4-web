@@ -66,7 +66,6 @@ import {
 import { getCurrentMarketAssetId, getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { testFlags } from '@/lib/testFlags';
 import { getSelectedOrderSide, getSelectedTradeType, getTradeInputAlert } from '@/lib/tradeData';
 
 import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
@@ -350,36 +349,35 @@ export const TradeForm = ({
 
             {!isTablet && (
               <>
-                {testFlags.isolatedMargin && (
-                  <$MarginAndLeverageButtons>
+                <$MarginAndLeverageButtons>
+                  <Button
+                    onClick={() => {
+                      if (isTablet) {
+                        dispatch(openDialog({ type: DialogTypes.SelectMarginMode }));
+                      } else {
+                        dispatch(
+                          openDialogInTradeBox({ type: TradeBoxDialogTypes.SelectMarginMode })
+                        );
+                      }
+                    }}
+                  >
+                    {marginMode &&
+                      stringGetter({
+                        key: MARGIN_MODE_STRINGS[marginMode.rawValue],
+                      })}
+                  </Button>
+
+                  {needsTargetLeverage && (
                     <Button
                       onClick={() => {
-                        if (isTablet) {
-                          dispatch(openDialog({ type: DialogTypes.SelectMarginMode }));
-                        } else {
-                          dispatch(
-                            openDialogInTradeBox({ type: TradeBoxDialogTypes.SelectMarginMode })
-                          );
-                        }
+                        dispatch(openDialog({ type: DialogTypes.AdjustTargetLeverage }));
                       }}
                     >
-                      {marginMode &&
-                        stringGetter({
-                          key: MARGIN_MODE_STRINGS[marginMode.rawValue],
-                        })}
+                      <Output type={OutputType.Multiple} value={targetLeverage} />
                     </Button>
+                  )}
+                </$MarginAndLeverageButtons>
 
-                    {needsTargetLeverage && (
-                      <Button
-                        onClick={() => {
-                          dispatch(openDialog({ type: DialogTypes.AdjustTargetLeverage }));
-                        }}
-                      >
-                        <Output type={OutputType.Multiple} value={targetLeverage} />
-                      </Button>
-                    )}
-                  </$MarginAndLeverageButtons>
-                )}
                 <TradeSideToggle />
               </>
             )}

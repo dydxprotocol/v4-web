@@ -20,7 +20,6 @@ import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { testFlags } from '@/lib/testFlags';
 
 type ElementProps = {
   marketId: string;
@@ -67,30 +66,28 @@ export const PositionsActionsCell = ({
 
   return (
     <ActionsTableCell>
-      {isSlTpEnabled &&
-        !testFlags.isolatedMargin &&
-        complianceState === ComplianceStates.FULL_ACCESS && (
-          <$TriggersButton
-            key="edittriggers"
-            onClick={() =>
-              dispatch(
-                openDialog({
-                  type: DialogTypes.Triggers,
-                  dialogProps: {
-                    marketId,
-                    assetId,
-                    stopLossOrders,
-                    takeProfitOrders,
-                    navigateToMarketOrders,
-                  },
-                })
-              )
-            }
-            iconName={IconName.Pencil}
-            shape={ButtonShape.Square}
-            disabled={isDisabled}
-          />
-        )}
+      {isSlTpEnabled && complianceState === ComplianceStates.FULL_ACCESS && (
+        <$TriggersButton
+          key="edittriggers"
+          onClick={() =>
+            dispatch(
+              openDialog({
+                type: DialogTypes.Triggers,
+                dialogProps: {
+                  marketId,
+                  assetId,
+                  stopLossOrders,
+                  takeProfitOrders,
+                  navigateToMarketOrders,
+                },
+              })
+            )
+          }
+          iconName={IconName.Pencil}
+          shape={ButtonShape.Square}
+          disabled={isDisabled}
+        />
+      )}
       {showClosePositionAction && (
         <$CloseButtonToggle
           key="closepositions"

@@ -18,7 +18,6 @@ import {
 } from '@/state/accountCalculators';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { testFlags } from '@/lib/testFlags';
 
 import { AccountDetailsAndHistory } from './AccountDetailsAndHistory';
 
@@ -55,7 +54,7 @@ export const Overview = () => {
                   PositionsTableColumnKey.Market,
                   PositionsTableColumnKey.Size,
                   PositionsTableColumnKey.UnrealizedPnl,
-                  !testFlags.isolatedMargin && PositionsTableColumnKey.RealizedPnl,
+                  PositionsTableColumnKey.RealizedPnl,
                   PositionsTableColumnKey.AverageOpenAndClose,
                   PositionsTableColumnKey.LiquidationAndOraclePrice,
                   shouldRenderTriggers && PositionsTableColumnKey.Triggers,
