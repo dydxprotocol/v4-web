@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import {
@@ -8,7 +9,7 @@ import {
   HistoricalTradingRewardsPeriods,
 } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
-import { isMainnet } from '@/constants/networks';
+import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -21,13 +22,13 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithTooltip } from '@/components/WithTooltip';
 import { TradingRewardHistoryTable } from '@/views/tables/TradingRewardHistoryTable';
 
-import abacusStateManager from '@/lib/abacus';
+import { getSelectedNetwork } from '@/state/appSelectors';
 
-// TODO: set in env featureFlag config
-const REWARDS_HISTORY_START_DATE_MS = isMainnet ? 1706486400000 : 1704844800000;
+import abacusStateManager from '@/lib/abacus';
 
 export const RewardHistoryPanel = () => {
   const stringGetter = useStringGetter();
+  const selectedNetwork = useSelector(getSelectedNetwork);
 
   const [selectedPeriod, setSelectedPeriod] = useState<HistoricalTradingRewardsPeriods>(
     abacusStateManager.getHistoricalTradingRewardPeriod() || HistoricalTradingRewardsPeriod.WEEKLY
@@ -57,7 +58,9 @@ export const RewardHistoryPanel = () => {
                   REWARDS_HISTORY_START_DATE: (
                     <$Output
                       type={OutputType.Date}
-                      value={REWARDS_HISTORY_START_DATE_MS}
+                      value={parseInt(
+                        ENVIRONMENT_CONFIG_MAP[selectedNetwork].rewardsHistoryStartDateMs
+                      )}
                       timeOptions={{ useUTC: true }}
                     />
                   ),
