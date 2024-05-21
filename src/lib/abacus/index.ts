@@ -282,7 +282,6 @@ class AbacusStateManager {
     value: any;
     field: AdjustIsolatedMarginInputFields;
   }) => {
-    console.log(`${field.name}: ${value}`);
     this.stateManager.adjustIsolatedMargin(value, field);
   };
 

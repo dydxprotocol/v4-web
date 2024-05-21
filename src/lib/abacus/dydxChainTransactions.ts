@@ -221,7 +221,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       }, UNCOMMITTED_ORDER_TIMEOUT_MS);
 
       const subaccountClient = new SubaccountClient(this.localWallet, subaccountNumber);
-      console.log('params', params, subaccountClient);
 
       // Place order
       const tx = await this.compositeClient?.placeOrder(
@@ -242,8 +241,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         undefined,
         goodTilBlock ?? undefined
       );
-
-      console.log('tx', tx, params);
 
       // Handle stateful orders
       if ((tx as IndexedTx)?.code !== 0) {
@@ -592,7 +589,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
           break;
         }
         case TransactionType.SubaccountTransfer: {
-          console.log({ subaccountTransferParams: params });
           const result = await this.subaccountTransfer(params);
           callback(result);
           break;

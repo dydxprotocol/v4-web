@@ -123,12 +123,6 @@ const useDydxClientContext = () => {
     defaultValue: SelectedGasDenom.USDC,
   });
 
-  useEffect(() => {
-    if (compositeClient) {
-      setSelectedGasDenom(gasDenom);
-    }
-  }, [compositeClient]);
-
   const setSelectedGasDenom = useCallback(
     (selectedGasDenom: SelectedGasDenom) => {
       if (compositeClient) {

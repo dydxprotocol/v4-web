@@ -11,6 +11,7 @@ import {
   type Nullable,
   type SubaccountPosition,
 } from '@/constants/abacus';
+import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
 import type { StringGetterFunction } from '@/constants/localization';
 import { PERCENT_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
@@ -147,14 +148,25 @@ export const calculateCrossPositionMargin = ({
   return notionalTotalBN.times(adjustedMmfBN);
 };
 
+/**
+ * @param subaccountNumber
+ * @returns marginMode from subaccountNumber, defaulting to cross margin if subaccountNumber is undefined or null.
+ * @note v4-web is assuming that subaccountNumber >= 128 is used as childSubaccounts. API Traders may utilize these subaccounts differently.
+ */
+export const getMarginModeFromSubaccountNumber = (subaccountNumber: Nullable<number>) => {
+  if (!subaccountNumber) return AbacusMarginMode.cross;
+
+  return subaccountNumber >= NUM_PARENT_SUBACCOUNTS
+    ? AbacusMarginMode.isolated
+    : AbacusMarginMode.cross;
+};
+
 export const getPositionMargin = ({ position }: { position: SubaccountPosition }) => {
   const { childSubaccountNumber, freeCollateral, notionalTotal, quoteBalance } = position;
-  const marginMode =
-    childSubaccountNumber && childSubaccountNumber > 127
-      ? AbacusMarginMode.isolated.rawValue
-      : AbacusMarginMode.cross.rawValue;
+  const marginMode = getMarginModeFromSubaccountNumber(childSubaccountNumber);
+
   const margin =
-    marginMode === AbacusMarginMode.cross.rawValue
+    marginMode === AbacusMarginMode.cross
       ? calculateCrossPositionMargin({
           notionalTotal: notionalTotal?.current,
           adjustedMmf: quoteBalance?.current,

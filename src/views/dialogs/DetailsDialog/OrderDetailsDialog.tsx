@@ -7,7 +7,6 @@ import {
   AbacusOrderTypes,
   type Nullable,
 } from '@/constants/abacus';
-import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS, type StringKey } from '@/constants/localization';
 import { CancelOrderStatuses } from '@/constants/trade';
@@ -33,6 +32,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { MustBigNumber } from '@/lib/numbers';
 import { isMarketOrderType, isOrderStatusClearable, relativeTimeString } from '@/lib/orders';
 import { testFlags } from '@/lib/testFlags';
+import { getMarginModeFromSubaccountNumber } from '@/lib/tradeData';
 
 type ElementProps = {
   orderId: string;
@@ -73,10 +73,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     type,
   } = (useSelector(getOrderDetails(orderId)) as OrderTableRow) || {};
 
-  const marginMode =
-    !!subaccountNumber && subaccountNumber >= NUM_PARENT_SUBACCOUNTS
-      ? AbacusMarginMode.isolated
-      : AbacusMarginMode.cross;
+  const marginMode = getMarginModeFromSubaccountNumber(subaccountNumber);
 
   const marginModeLabel =
     marginMode === AbacusMarginMode.cross
