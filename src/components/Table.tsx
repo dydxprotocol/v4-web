@@ -322,7 +322,6 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
     rowIndex?: number
   ) => Record<string, string | number | Record<string, string | number>>;
   onRowAction?: (key: Key) => void;
-  // shouldRowRender?: (prevRowData: object, currentRowData: object) => boolean;
   children: TableStateProps<TableRowData>['children'];
   numColumns: number;
   paginationRow?: React.ReactNode;
