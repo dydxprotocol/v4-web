@@ -1,6 +1,6 @@
 import { POSITION_SIDE_STRINGS, PositionSide } from '@/constants/trade';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Tag, TagSign, TagSize, TagType } from '@/components/Tag';
 

@@ -13,8 +13,8 @@ import {
 } from '@/constants/charts';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
 import { useOrderbookValuesForDepthChart } from '@/hooks/Orderbook/useOrderbookValues';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';

@@ -4,7 +4,7 @@ import { FundingRateResolution, type FundingChartDatum } from '@/constants/chart
 import { STRING_KEYS } from '@/constants/localization';
 import { FundingDirection } from '@/constants/markets';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Details, DetailsItem } from '@/components/Details';
 import { Output, OutputType, ShowSign } from '@/components/Output';

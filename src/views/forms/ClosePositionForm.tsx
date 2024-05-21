@@ -17,9 +17,12 @@ import { NotificationType } from '@/constants/notifications';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 
-import { useBreakpoints, useIsFirstRender, useStringGetter, useSubaccount } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useIsFirstRender } from '@/hooks/useIsFirstRender';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { breakpoints } from '@/styles';
 import { formMixins } from '@/styles/formMixins';

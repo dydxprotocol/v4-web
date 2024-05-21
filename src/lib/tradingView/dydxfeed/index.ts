@@ -14,7 +14,7 @@ import type {
 import { Candle, RESOLUTION_MAP } from '@/constants/candles';
 import { DEFAULT_MARKETID } from '@/constants/markets';
 
-import { useDydxClient } from '@/hooks';
+import { useDydxClient } from '@/hooks/useDydxClient';
 
 import { RootStore } from '@/state/_store';
 import { setCandles } from '@/state/perpetuals';

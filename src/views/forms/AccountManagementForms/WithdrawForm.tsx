@@ -22,17 +22,15 @@ import {
 } from '@/constants/numbers';
 import { WalletType } from '@/constants/wallets';
 
-import {
-  useAccounts,
-  useDebounce,
-  useDydxClient,
-  useRestrictions,
-  useStringGetter,
-  useSubaccount,
-  useTokenConfigs,
-  useWithdrawalInfo,
-} from '@/hooks';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useDydxClient } from '@/hooks/useDydxClient';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
+import { useRestrictions } from '@/hooks/useRestrictions';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+import { useWithdrawalInfo } from '@/hooks/useWithdrawalInfo';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';

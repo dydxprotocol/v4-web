@@ -7,8 +7,10 @@ import styled from 'styled-components';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationCategoryPreferences } from '@/constants/notifications';
 
-import { useDydxClient, useEnvFeatures, useStringGetter } from '@/hooks';
+import { useDydxClient } from '@/hooks/useDydxClient';
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { Switch } from '@/components/Switch';

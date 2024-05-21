@@ -6,7 +6,8 @@ import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS, type StringKey } from '@/constants/localization';
 import { CancelOrderStatuses } from '@/constants/trade';
 
-import { useStringGetter, useSubaccount } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

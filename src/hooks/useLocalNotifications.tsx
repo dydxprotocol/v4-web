@@ -155,7 +155,7 @@ const useLocalNotificationsContext = () => {
                       toAmount: transferNotification.toAmount,
                       status: 'error',
                       type: transferNotification.type,
-                      txHash: txHash,
+                      txHash,
                     });
                   } else {
                     transferNotification.errorCount = errorCount ? errorCount + 1 : 1;

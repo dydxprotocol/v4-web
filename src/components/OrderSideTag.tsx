@@ -2,7 +2,7 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Tag, TagSign, TagSize, TagType } from './Tag';
 

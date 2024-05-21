@@ -6,7 +6,8 @@ import styled from 'styled-components';
 import { STRING_KEYS } from '@/constants/localization';
 import { tooltipStrings } from '@/constants/tooltips';
 
-import { useStringGetter, useURLConfigs } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';

@@ -1,4 +1,4 @@
-import { useCommandMenu } from '@/hooks';
+import { useCommandMenu } from '@/hooks/useCommandMenu';
 
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { useGlobalCommands } from '@/views/menus/useGlobalCommands';

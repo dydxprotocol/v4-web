@@ -9,9 +9,9 @@ import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, type MarketData } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
-import { useStringGetter } from '@/hooks';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
@@ -340,7 +340,7 @@ const $ScrollArea = styled.div`
 
 const $Table = styled(Table)`
   --tableCell-padding: 0.5rem 1rem;
-  
+
   thead {
     --stickyArea-totalInsetTop: 0px;
     --stickyArea-totalInsetBottom: 0px;
@@ -351,8 +351,8 @@ const $Table = styled(Table)`
 
   tfoot {
     --stickyArea-totalInsetTop: 0px;
-    --stickyArea-totalInsetBottom: 3px; 
-    
+    --stickyArea-totalInsetBottom: 3px;
+
     tr {
       height: var(--stickyArea-bottomHeight);
     }
