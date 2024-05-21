@@ -8,13 +8,13 @@ import { AnalyticsEvent } from '@/constants/analytics';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useLocaleSeparators, useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
 import { Checkbox } from '@/components/Checkbox';
 import { DropdownMenu } from '@/components/DropdownMenu';
 import { Icon, IconName } from '@/components/Icon';
-import { OutputType, formatNumber, formatTimestamp } from '@/components/Output';
+import { OutputType, formatNumber } from '@/components/Output';
 
 import { getSubaccountFills, getSubaccountTransfers } from '@/state/accountSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
@@ -23,12 +23,15 @@ import { track } from '@/lib/analytics';
 import { exportCSV } from '@/lib/csv';
 import { MustBigNumber } from '@/lib/numbers';
 
-export const ExportHistoryDropdown = () => {
+interface ExportHistoryDropdownProps {
+  className?: string;
+}
+
+export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
   const selectedLocale = useSelector(getSelectedLocale);
   const stringGetter = useStringGetter();
   const allTransfers = useSelector(getSubaccountTransfers, shallowEqual) ?? [];
   const allFills = useSelector(getSubaccountFills, shallowEqual) ?? [];
-  const { decimal: localeDecimalSeparator, group: localeGroupSeparator } = useLocaleSeparators();
   const [checkedTrades, setCheckedTrades] = useState(true);
   const [checkedTransfers, setCheckedTransfers] = useState(true);
 
@@ -38,21 +41,11 @@ export const ExportHistoryDropdown = () => {
         const { sign: feeSign, formattedString: feeString } = formatNumber({
           type: OutputType.Fiat,
           value: fill.fee,
-          localeDecimalSeparator,
-          localeGroupSeparator,
         });
 
         const { sign: totalSign, formattedString: totalString } = formatNumber({
           type: OutputType.Fiat,
           value: MustBigNumber(fill.price).times(fill.size),
-          localeDecimalSeparator,
-          localeGroupSeparator,
-        });
-
-        const { displayString } = formatTimestamp({
-          type: OutputType.DateTime,
-          value: fill.createdAtMilliseconds,
-          locale: selectedLocale,
         });
 
         const sideKey = {
@@ -65,7 +58,10 @@ export const ExportHistoryDropdown = () => {
           liquidity:
             fill.resources.liquidityStringKey &&
             stringGetter({ key: fill.resources.liquidityStringKey }),
-          time: displayString,
+          time: new Date(fill.createdAtMilliseconds).toLocaleString(selectedLocale, {
+            dateStyle: 'short',
+            timeStyle: 'short',
+          }),
           amount: fill.size,
           fee: feeSign ? `${feeSign}${feeString}` : feeString,
           total: totalSign ? `${totalSign}${totalString}` : totalString,
@@ -77,7 +73,7 @@ export const ExportHistoryDropdown = () => {
             : '',
         };
       }),
-    [allFills, stringGetter, localeDecimalSeparator, localeGroupSeparator]
+    [allFills, selectedLocale, stringGetter]
   );
 
   const transfers = useMemo(
@@ -86,18 +82,13 @@ export const ExportHistoryDropdown = () => {
         const { sign, formattedString } = formatNumber({
           type: OutputType.Fiat,
           value: transfer.amount,
-          localeDecimalSeparator,
-          localeGroupSeparator,
-        });
-
-        const { displayString } = formatTimestamp({
-          type: OutputType.DateTime,
-          value: transfer.updatedAtMilliseconds,
-          locale: selectedLocale,
         });
 
         return {
-          time: displayString,
+          time: new Date(transfer.updatedAtMilliseconds).toLocaleString(selectedLocale, {
+            dateStyle: 'short',
+            timeStyle: 'short',
+          }),
           action:
             transfer.resources.typeStringKey &&
             stringGetter({ key: transfer.resources.typeStringKey }),
@@ -107,7 +98,7 @@ export const ExportHistoryDropdown = () => {
           transaction: transfer.transactionHash,
         };
       }),
-    [allTransfers, stringGetter, localeDecimalSeparator, localeGroupSeparator]
+    [allTransfers, selectedLocale, stringGetter]
   );
 
   const exportTrades = useCallback(() => {
@@ -255,6 +246,7 @@ export const ExportHistoryDropdown = () => {
           onSelect: exportData,
         },
       ]}
+      {...props}
     >
       <Icon iconName={IconName.Download} />
       {stringGetter({ key: STRING_KEYS.EXPORT })}

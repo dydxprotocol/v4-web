@@ -96,11 +96,6 @@ type StyleProps = {
   withBaseFont?: boolean;
 };
 
-export type OutputProps = ElementProps &
-  StyleProps &
-  Exclude<FormatNumberParams, 'localeDecimalSeparator' | 'localeGroupSeparator'> &
-  FormatTimestampParams;
-
 export const formatTimestamp = (
   params: FormatTimestampParams
 ): {
@@ -298,6 +293,11 @@ export const formatNumber = (params: FormatNumberParams) => {
     formattedString,
   };
 };
+
+export type OutputProps = ElementProps &
+  StyleProps &
+  Exclude<FormatNumberParams, 'localeDecimalSeparator' | 'localeGroupSeparator'> &
+  FormatTimestampParams;
 
 export const Output = (props: OutputProps) => {
   const {
