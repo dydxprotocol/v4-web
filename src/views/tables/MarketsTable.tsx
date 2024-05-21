@@ -192,8 +192,8 @@ export const MarketsTable = ({ className }: { className?: string }) => {
     [stringGetter, isTablet]
   );
 
-  const setFilter = (filter: MarketFilters) => {
-    dispatch(setMarketFilter(filter));
+  const setFilter = (newFilter: MarketFilters) => {
+    dispatch(setMarketFilter(newFilter));
   };
 
   return (

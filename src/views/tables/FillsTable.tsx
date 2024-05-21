@@ -9,6 +9,7 @@ import styled, { css } from 'styled-components';
 import { type Asset, type SubaccountFill } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
+import { EMPTY_ARR } from '@/constants/objects';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -37,6 +38,7 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { getHydratedTradingData } from '@/lib/orders';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 const MOBILE_FILLS_PER_PAGE = 50;
 
@@ -313,12 +315,12 @@ export const FillsTable = ({
   const dispatch = useDispatch();
   const { isMobile, isTablet } = useBreakpoints();
 
-  const marketFills = useSelector(getCurrentMarketFills, shallowEqual) || [];
-  const allFills = useSelector(getSubaccountFills, shallowEqual) || [];
+  const marketFills = useSelector(getCurrentMarketFills, shallowEqual) ?? EMPTY_ARR;
+  const allFills = useSelector(getSubaccountFills, shallowEqual) ?? EMPTY_ARR;
   const fills = currentMarket ? marketFills : allFills;
 
-  const allPerpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
-  const allAssets = useSelector(getAssets, shallowEqual) || {};
+  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
 
   const hasUnseenFillUpdates = useSelector(getHasUnseenFillUpdates);
 
@@ -356,7 +358,7 @@ export const FillsTable = ({
           })
         )
       }
-      columns={columnKeys.map((key: FillsTableColumnKey, index: number) =>
+      columns={columnKeys.map((key: FillsTableColumnKey) =>
         getFillsTableColumnDef({
           key,
           isTablet,
