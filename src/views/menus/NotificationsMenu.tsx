@@ -69,14 +69,14 @@ export const NotificationsMenu = ({
     () =>
       (Object.entries(notificationsByStatus) as unknown as [NotificationStatus, Notification[]][])
         .filter(([status]) => status < NotificationStatus.Cleared)
-        .map(([status, notifications]) => ({
+        .map(([status, innerNotifications]) => ({
           group: status,
           groupLabel: {
             [NotificationStatus.Triggered]: stringGetter({ key: STRING_KEYS.NEW }),
             [NotificationStatus.Seen]: 'Seen',
           }[status as number],
 
-          items: notifications
+          items: innerNotifications
             .sort(
               (n1, n2) =>
                 n2.timestamps[NotificationStatus.Triggered]! -
@@ -108,7 +108,7 @@ export const NotificationsMenu = ({
               },
             })),
         }))
-        .filter(({ items }) => items.length),
+        .filter(({ items: allItems }) => allItems.length),
     [notificationsByStatus, getDisplayData, onNotificationAction, markSeen, stringGetter]
   );
 

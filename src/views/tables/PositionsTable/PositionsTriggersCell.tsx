@@ -96,7 +96,7 @@ export const PositionsTriggersCell = ({
       onClick={onViewOrders ?? undefined}
     >
       {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
-      {<$ArrowIcon iconName={IconName.Arrow} />}
+      <$ArrowIcon iconName={IconName.Arrow} />
     </$Button>
   );
 

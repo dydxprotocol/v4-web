@@ -13,6 +13,7 @@ import {
 } from '@/constants/abacus';
 import { STRING_KEYS, StringGetterFunction } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { EMPTY_ARR } from '@/constants/objects';
 import { AppRoute } from '@/constants/routes';
 import { PositionSide } from '@/constants/trade';
 
@@ -41,6 +42,7 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
 import { PositionsMarginCell } from './PositionsTable/PositionsMarginCell';
@@ -393,13 +395,15 @@ export const PositionsTable = ({
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
 
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
-  const perpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
-  const assets = useSelector(getAssets, shallowEqual) || {};
+  const perpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
+  const assets = orEmptyObj(useSelector(getAssets, shallowEqual));
   const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
 
-  const openPositions = useSelector(getExistingOpenPositions, shallowEqual) || [];
-  const marketPosition = openPositions.find((position) => position.id == currentMarket);
-  const positions = currentMarket ? (marketPosition ? [marketPosition] : []) : openPositions;
+  const openPositions = useSelector(getExistingOpenPositions, shallowEqual) ?? EMPTY_ARR;
+  const positions = useMemo(() => {
+    const marketPosition = openPositions.find((position) => position.id === currentMarket);
+    return currentMarket ? (marketPosition ? [marketPosition] : []) : openPositions;
+  }, [currentMarket, openPositions]);
 
   const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } = useSelector(
     getSubaccountConditionalOrders(isSlTpLimitOrdersEnabled),
@@ -417,10 +421,12 @@ export const PositionsTable = ({
     () =>
       positions.map((position: SubaccountPosition): PositionTableRow => {
         // object splat ... doesn't copy getter defined properties
+        // eslint-disable-next-line prefer-object-spread
         return Object.assign(
+          {},
           {
             tickSizeDecimals:
-              perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals || USD_DECIMALS,
+              perpetualMarkets?.[position.id]?.configs?.tickSizeDecimals ?? USD_DECIMALS,
             asset: assets?.[position.assetId],
             oraclePrice: perpetualMarkets?.[position.id]?.oraclePrice,
             fundingRate: perpetualMarkets?.[position.id]?.perpetual?.nextFundingRate,

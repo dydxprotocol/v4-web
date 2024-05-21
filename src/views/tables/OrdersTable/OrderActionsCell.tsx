@@ -45,7 +45,7 @@ export const OrderActionsCell = ({ orderId, status, isDisabled }: ElementProps) 
               onClick: onCancel,
               state: {
                 isLoading: isCanceling || status === AbacusOrderStatus.canceling,
-                isDisabled: isCanceling || isDisabled || status === AbacusOrderStatus.canceling,
+                isDisabled: isCanceling || !!isDisabled || status === AbacusOrderStatus.canceling,
               },
             })}
       />
