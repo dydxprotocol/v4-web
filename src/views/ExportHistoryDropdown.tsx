@@ -1,25 +1,29 @@
-import { Button } from '@/components/Button';
-import { Icon, IconName } from '@/components/Icon';
+import { useCallback, useMemo, useState } from 'react';
+
+import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { shallowEqual, useSelector } from 'react-redux';
+import styled, { AnyStyledComponent } from 'styled-components';
+
+import { AnalyticsEvent } from '@/constants/analytics';
+import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { shallowEqual, useSelector } from 'react-redux';
-import { getSubaccountFills, getSubaccountTransfers } from '@/state/accountSelectors';
-import { useCallback, useMemo, useState } from 'react';
-import { OutputType, formatNumber, formatTimestamp } from '@/components/Output';
-import { MustBigNumber } from '@/lib/numbers';
-import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { getSelectedLocale } from '@/state/localizationSelectors';
-import { exportCSV } from '@/lib/csv';
 import { useLocaleSeparators, useStringGetter } from '@/hooks';
-import { ButtonAction, ButtonSize } from '@/constants/buttons';
-import { DropdownMenu, DropdownMenuProps } from '@/components/DropdownMenu';
-import { Checkbox } from '@/components/Checkbox';
-import styled, { AnyStyledComponent } from 'styled-components';
-import { track } from '@/lib/analytics';
-import { AnalyticsEvent } from '@/constants/analytics';
 
-export const ExportHistoryDropdown = (props: DropdownMenuProps<string>) => {
-  const { items = [], ...rest } = props;
+import { Button } from '@/components/Button';
+import { Checkbox } from '@/components/Checkbox';
+import { DropdownMenu } from '@/components/DropdownMenu';
+import { Icon, IconName } from '@/components/Icon';
+import { OutputType, formatNumber, formatTimestamp } from '@/components/Output';
+
+import { getSubaccountFills, getSubaccountTransfers } from '@/state/accountSelectors';
+import { getSelectedLocale } from '@/state/localizationSelectors';
+
+import { track } from '@/lib/analytics';
+import { exportCSV } from '@/lib/csv';
+import { MustBigNumber } from '@/lib/numbers';
+
+export const ExportHistoryDropdown = () => {
   const selectedLocale = useSelector(getSelectedLocale);
   const stringGetter = useStringGetter();
   const allTransfers = useSelector(getSubaccountTransfers, shallowEqual) ?? [];
@@ -187,19 +191,20 @@ export const ExportHistoryDropdown = (props: DropdownMenuProps<string>) => {
       exportTransfers();
     }
 
-    track(AnalyticsEvent.ExportDownloadClick, { trades: checkedTrades, transfers: checkedTransfers })
+    track(AnalyticsEvent.ExportDownloadClick, {
+      trades: checkedTrades,
+      transfers: checkedTransfers,
+    });
   }, [checkedTrades, checkedTransfers, exportTrades, exportTransfers]);
 
   return (
     <DropdownMenu
-      {...rest}
       onOpenChange={(open) => {
         if (open) {
           track(AnalyticsEvent.ExportButtonClick);
         }
       }}
       items={[
-        ...items,
         {
           label: (
             <Checkbox

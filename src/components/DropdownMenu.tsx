@@ -85,6 +85,7 @@ export const DropdownMenu = forwardRefFn(
     );
   }
 );
+
 const $Separator = styled(Separator)`
   border-bottom: solid var(--border-width) var(--color-border);
   margin: 0.25rem 1rem;
