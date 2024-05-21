@@ -2153,11 +2153,6 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Huobi",
-          "ticker": "wifusdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
           "exchangeName": "Kraken",
           "ticker": "WIFUSD"
         },
@@ -36848,46 +36843,11 @@
       "cmcId": 27508.0
     }
   },
-  "HAMMY": {
-    "title": "Add HAMMY-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a HAMMY-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 760,
-      "ticker": "HAMMY-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11.0,
-      "minPriceChange": 4000,
-      "minExchanges": 1,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "Raydium",
-          "ticker": "HAMMY-SOL-324NgHgEDyU9d7TE9dkAkB2GNtqxdEU4PsYRTDL68qoR-6-4kPJL1LmempALPjjwMWSo6JRBjmKQY7HX3edozqmJBPe-9",
-          "adjustByMarket": "SOL-USD"
-        }
-      ],
-      "liquidityTier": 2,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "SAD HAMSTER",
-      "referencePrice": 0.054015,
-      "cmcId": 31284.0
-    }
-  },
   "FOXY": {
     "title": "Add FOXY-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a FOXY-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 761,
+      "id": 760,
       "ticker": "FOXY-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
@@ -36926,6 +36886,41 @@
       "assetName": "Foxy",
       "referencePrice": 0.015104136704851862,
       "cmcId": 30591.0
+    }
+  },
+  "HAMMY": {
+    "title": "Add HAMMY-USD perpetual market",
+    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a HAMMY-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "params": {
+      "id": 761,
+      "ticker": "HAMMY-USD",
+      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
+      "priceExponent": -11.0,
+      "minPriceChange": 4000,
+      "minExchanges": 1,
+      "exchangeConfigJson": [
+        {
+          "exchangeName": "Raydium",
+          "ticker": "HAMMY-SOL-324NgHgEDyU9d7TE9dkAkB2GNtqxdEU4PsYRTDL68qoR-6-4kPJL1LmempALPjjwMWSo6JRBjmKQY7HX3edozqmJBPe-9",
+          "adjustByMarket": "SOL-USD"
+        }
+      ],
+      "liquidityTier": 2,
+      "atomicResolution": -4.0,
+      "quantumConversionExponent": -9,
+      "defaultFundingPpm": 0,
+      "stepBaseQuantums": 1000000,
+      "subticksPerTick": 1000000,
+      "delayBlocks": 3600
+    },
+    "initialDeposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "meta": {
+      "assetName": "SAD HAMSTER",
+      "referencePrice": 0.054015,
+      "cmcId": 31284.0
     }
   },
   "LAI": {
@@ -40734,7 +40729,7 @@
     "meta": {
       "assetName": "RETARDIO",
       "referencePrice": 0.022996,
-      "cmcId": NaN
+      "cmcId": -1.0
     }
   }
 }
