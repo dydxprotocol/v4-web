@@ -55,7 +55,7 @@ const useTradeTypeOptions = (): {
               ?.map(
                 ({ value, label }) =>
                   value != null && {
-                    value: value,
+                    value,
                     label,
                   }
               )

@@ -174,8 +174,8 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
   );
 };
 
-export const MarketsDropdown: React.FC<{ currentMarketId?: string; symbol: string | null }> = memo(
-  ({ currentMarketId, symbol = '' }) => {
+export const MarketsDropdown = memo(
+  ({ currentMarketId, symbol = '' }: { currentMarketId?: string; symbol: string | null }) => {
     const [isOpen, setIsOpen] = useState(false);
     const stringGetter = useStringGetter();
     const navigate = useNavigate();
@@ -215,6 +215,7 @@ export const MarketsDropdown: React.FC<{ currentMarketId?: string; symbol: strin
     );
   }
 );
+
 const $MarketName = styled.div<{ isFavorited: boolean }>`
   ${layoutMixins.row}
   gap: 0.5rem;

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -14,8 +13,6 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Tag } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
 
-import { setMarketFilter } from '@/state/perpetuals';
-
 import { ExchangeBillboards } from './ExchangeBillboards';
 import { MarketsCompactTable } from './tables/MarketsCompactTable';
 
@@ -26,12 +23,7 @@ interface MarketsStatsProps {
 export const MarketsStats = (props: MarketsStatsProps) => {
   const { className } = props;
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
   const [sorting, setSorting] = useState(MarketSorting.GAINERS);
-
-  const setNewFilter = () => {
-    dispatch(setMarketFilter(MarketFilters.NEW));
-  };
 
   return (
     <$MarketsStats className={className}>
