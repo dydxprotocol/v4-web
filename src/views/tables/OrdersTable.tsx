@@ -81,7 +81,6 @@ export type OrderTableRow = {
 
 const getOrdersTableColumnDef = ({
   key,
-  dispatch,
   stringGetter,
   symbol = '',
   isAccountViewOnly,
@@ -173,7 +172,7 @@ const getOrdersTableColumnDef = ({
         columnKey: 'triggerPrice',
         getCellValue: (row) => row.triggerPrice ?? -1,
         label: stringGetter({ key: STRING_KEYS.TRIGGER_PRICE_SHORT }),
-        renderCell: ({ type, triggerPrice, trailingPercent, tickSizeDecimals }) => (
+        renderCell: ({ triggerPrice, trailingPercent, tickSizeDecimals }) => (
           <TableCell stacked>
             <Output type={OutputType.Fiat} value={triggerPrice} fractionDigits={tickSizeDecimals} />
             {trailingPercent && (
@@ -358,7 +357,7 @@ export const OrdersTable = ({
           })
         )
       }
-      columns={columnKeys.map((key: OrdersTableColumnKey, index: number) =>
+      columns={columnKeys.map((key: OrdersTableColumnKey) =>
         getOrdersTableColumnDef({
           key,
           dispatch,

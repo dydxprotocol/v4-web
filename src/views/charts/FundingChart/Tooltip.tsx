@@ -20,7 +20,7 @@ export const FundingChartTooltipContent = ({
   latestDatum,
   tooltipData,
 }: FundingChartTooltipProps) => {
-  const { nearestDatum } = tooltipData || {};
+  const { nearestDatum } = tooltipData ?? {};
   const stringGetter = useStringGetter();
 
   const tooltipDatum = nearestDatum?.datum ?? latestDatum;

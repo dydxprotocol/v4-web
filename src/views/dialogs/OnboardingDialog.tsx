@@ -1,7 +1,7 @@
 import { useEffect, useState, type ElementType } from 'react';
 
 import { useSelector } from 'react-redux';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { EvmDerivedAccountStatus, OnboardingSteps } from '@/constants/account';
 import { AnalyticsEvent } from '@/constants/analytics';
@@ -56,11 +56,11 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
     setIsOpen?.(open);
   };
 
-  const onChooseWallet = (walletType: WalletType) => {
-    if (walletType === WalletType.Privy) {
+  const onChooseWallet = (wType: WalletType) => {
+    if (wType === WalletType.Privy) {
       setIsOpenFromDialog(false);
     }
-    selectWalletType(walletType);
+    selectWalletType(wType);
   };
 
   return (

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { AES } from 'crypto-js';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonSize } from '@/constants/buttons';

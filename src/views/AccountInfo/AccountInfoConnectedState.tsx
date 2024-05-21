@@ -65,7 +65,7 @@ export const AccountInfoConnectedState = () => {
 
   const listOfErrors = inputErrors?.map(({ code }: { code: string }) => code);
 
-  const { buyingPower, equity, marginUsage, leverage } = subAccount || {};
+  const { buyingPower, equity, marginUsage, leverage } = subAccount ?? {};
 
   const hasDiff =
     (marginUsage?.postOrder !== null &&

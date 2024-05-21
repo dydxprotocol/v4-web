@@ -120,7 +120,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
           latestDatum={latestDatum}
         />
       )}
-      onTooltipContext={(tooltipContext) => setTooltipContext(tooltipContext)}
+      onTooltipContext={(ttContext) => setTooltipContext(ttContext)}
       minZoomDomain={FUNDING_RATE_TIME_RESOLUTION * 4}
       numGridLines={1}
       slotEmpty={<LoadingSpace id="funding-chart-loading" />}
@@ -140,7 +140,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
                 [FundingRateResolution.Annualized]: stringGetter({
                   key: STRING_KEYS.ANNUALIZED,
                 }),
-              }[rate] || '',
+              }[rate] ?? '',
           }))}
           value={fundingRateView}
           onValueChange={setFundingRateView}
