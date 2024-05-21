@@ -55,8 +55,6 @@ export const SlippageEditor = ({
       setTimeout(() => toggleGroupRef?.current?.focus(), 0);
     } else if (editorState === EditorState.Editing) {
       inputRef?.current?.focus();
-    } else if (editorState === EditorState.Viewing) {
-      /* empty */
     }
   }, [editorState]);
 
