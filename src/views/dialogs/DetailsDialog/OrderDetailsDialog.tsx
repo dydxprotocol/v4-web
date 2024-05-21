@@ -1,3 +1,4 @@
+import { OrderFlags } from '@dydxprotocol/v4-client-js';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
@@ -22,7 +23,7 @@ import { type OrderTableRow } from '@/views/tables/OrdersTable';
 
 import { clearOrder } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
-import { getLocalCancelOrders, getOrderDetails } from '@/state/accountSelectors';
+import { getLocalCancelOrders, getOrderById, getOrderDetails } from '@/state/accountSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -39,6 +40,8 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
   const selectedLocale = useSelector(getSelectedLocale);
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
   const localCancelOrders = useSelector(getLocalCancelOrders, shallowEqual);
+  const existingOrder = useSelector(getOrderById(orderId), shallowEqual);
+
   const { cancelOrder } = useSubaccount();
 
   const localCancelOrder = localCancelOrders.find((order) => order.orderId === orderId);
@@ -180,6 +183,11 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     setIsOpen?.(false);
   };
 
+  const isShortTermOrder = existingOrder?.orderFlags === OrderFlags.SHORT_TERM;
+  const isBestEffortCanceled = status === AbacusOrderStatus.canceling;
+  const isCancelDisabled =
+    !!isOrderCanceling || !existingOrder || (isShortTermOrder && isBestEffortCanceled);
+
   return (
     <DetailsDialog
       slotIcon={<$AssetIcon symbol={asset?.id} />}
@@ -191,7 +199,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
           <Button
             action={ButtonAction.Destroy}
             state={{
-              isDisabled: !!isOrderCanceling || status === AbacusOrderStatus.canceling,
+              isDisabled: isCancelDisabled,
               isLoading: isOrderCanceling,
             }}
             onClick={onCancelClick}
