@@ -208,6 +208,19 @@ export const ClosePositionForm = ({
         setUnIndexedClientId(placeOrderPayload?.clientId);
       },
     });
+
+    onClearInputs();
+  };
+
+  const onClearInputs = () => {
+    abacusStateManager.setClosePositionValue({
+      value: null,
+      field: ClosePositionInputField.percent,
+    });
+    abacusStateManager.setClosePositionValue({
+      value: null,
+      field: ClosePositionInputField.size,
+    });
   };
 
   const alertMessage = alertContent && <AlertMessage type={alertType}>{alertContent}</AlertMessage>;
@@ -273,16 +286,7 @@ export const ClosePositionForm = ({
               action={ButtonAction.Reset}
               shape={ButtonShape.Pill}
               size={ButtonSize.XSmall}
-              onClick={() => {
-                abacusStateManager.setClosePositionValue({
-                  value: null,
-                  field: ClosePositionInputField.percent,
-                });
-                abacusStateManager.setClosePositionValue({
-                  value: null,
-                  field: ClosePositionInputField.size,
-                });
-              }}
+              onClick={onClearInputs}
             >
               {stringGetter({ key: STRING_KEYS.CLEAR })}
             </Button>
