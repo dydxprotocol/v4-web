@@ -196,7 +196,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
       label: 'Subaccount # (Debug Only)',
       value: subaccountNumber,
     },
-  ].filter((item) => !!item && Boolean(item.value)) as DetailsItem[];
+  ].filter((item) => Boolean(item)) as DetailsItem[];
 
   const onCancelClick = () => {
     cancelOrder({ orderId });
