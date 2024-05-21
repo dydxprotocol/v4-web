@@ -2,7 +2,7 @@ import { Content, Header, Item, Root, Trigger } from '@radix-ui/react-accordion'
 import styled, { keyframes } from 'styled-components';
 
 import { PlusIcon } from '@/icons';
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 export type AccordionItem = {

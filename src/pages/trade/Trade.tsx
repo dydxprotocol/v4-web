@@ -10,7 +10,7 @@ import { useCurrentMarketId } from '@/hooks/useCurrentMarketId';
 import { usePageTitlePriceUpdates } from '@/hooks/usePageTitlePriceUpdates';
 import { useTradeFormInputs } from '@/hooks/useTradeFormInputs';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DetachedSection } from '@/components/ContentSection';

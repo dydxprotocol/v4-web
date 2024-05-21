@@ -7,8 +7,6 @@ import { Output, OutputType, type OutputProps } from '@/components/Output';
 
 import { BigNumberish } from '@/lib/numbers';
 
-export { OutputType as DiffOutputType };
-
 type ElementProps = {
   hasInvalidNewValue?: boolean;
   newValue?: BigNumberish | null;

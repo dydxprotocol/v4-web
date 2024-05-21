@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 import type { Asset } from '@/constants/abacus';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Tag } from '@/components/Tag';
