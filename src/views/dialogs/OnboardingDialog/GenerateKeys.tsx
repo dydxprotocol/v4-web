@@ -41,11 +41,7 @@ type ElementProps = {
   onKeysDerived?: () => void;
 };
 
-export const GenerateKeys = ({
-  status: status,
-  setStatus,
-  onKeysDerived = () => {},
-}: ElementProps) => {
+export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: ElementProps) => {
   const stringGetter = useStringGetter();
 
   const [shouldRememberMe, setShouldRememberMe] = useState(false);
@@ -69,14 +65,14 @@ export const GenerateKeys = ({
     try {
       await matchNetwork?.();
       return true;
-    } catch (error) {
+    } catch (err) {
       const { message, walletErrorType, isErrorExpected } = parseWalletError({
-        error,
+        error: err,
         stringGetter,
       });
 
       if (!isErrorExpected) {
-        log('GenerateKeys/switchNetwork', error, { walletErrorType });
+        log('GenerateKeys/switchNetwork', err, { walletErrorType });
       }
 
       if (message) {
@@ -138,9 +134,9 @@ export const GenerateKeys = ({
             );
           }
         }
-      } catch (error) {
+      } catch (err) {
         setStatus(EvmDerivedAccountStatus.NotDerived);
-        const { message } = parseWalletError({ error, stringGetter });
+        const { message } = parseWalletError({ error: err, stringGetter });
 
         if (message) {
           track(AnalyticsEvent.OnboardingWalletIsNonDeterministic);
@@ -160,17 +156,17 @@ export const GenerateKeys = ({
 
       // 4. Done
       setStatus(EvmDerivedAccountStatus.Derived);
-    } catch (error) {
+    } catch (err) {
       setStatus(EvmDerivedAccountStatus.NotDerived);
       const { message, walletErrorType, isErrorExpected } = parseWalletError({
-        error,
+        error: err,
         stringGetter,
       });
 
       if (message) {
         setError(message);
         if (!isErrorExpected) {
-          log('GenerateKeys/deriveKeys', error, { walletErrorType });
+          log('GenerateKeys/deriveKeys', err, { walletErrorType });
         }
       }
     }

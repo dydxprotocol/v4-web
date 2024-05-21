@@ -22,11 +22,13 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
+// eslint-disable-next-line import/no-cycle
 import { Notification, NotificationProps } from '@/components/Notification';
 
 import { getFillByClientId, getOrderByClientId } from '@/state/accountSelectors';
 import { getMarketData } from '@/state/perpetualsSelectors';
 
+import { assertNever } from '@/lib/assertNever';
 import { getTradeType } from '@/lib/orders';
 
 import { OrderStatusIcon } from '../OrderStatusIcon';
@@ -85,6 +87,9 @@ export const OrderStatusNotification = ({
         orderStatusIcon = <$WarningIcon iconName={IconName.Warning} />;
         customContent = <span>{stringGetter({ key: localOrder.errorStringKey })}</span>;
       }
+      break;
+    default:
+      assertNever(submissionStatus);
       break;
   }
 

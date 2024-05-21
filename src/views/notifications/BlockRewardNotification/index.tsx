@@ -6,6 +6,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
+// eslint-disable-next-line import/no-cycle
 import { Notification, NotificationProps } from '@/components/Notification';
 import { Output, OutputType } from '@/components/Output';
 

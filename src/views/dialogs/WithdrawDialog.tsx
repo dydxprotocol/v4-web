@@ -31,17 +31,6 @@ export const WithdrawDialog = ({ setIsOpen }: ElementProps) => {
     </Dialog>
   );
 };
-const $TextToggle = styled.div`
-  ${layoutMixins.stickyFooter}
-  color: var(--color-accent);
-  cursor: pointer;
-
-  margin-top: auto;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
 
 const $Content = styled.div`
   ${layoutMixins.stickyArea0}
