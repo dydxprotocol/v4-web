@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_APP_ENVIRONMENT, DydxNetwork, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
-// eslint-disable-next-line import/no-cycle
 import { setSelectedNetwork } from '@/state/app';
 import { getSelectedNetwork } from '@/state/appSelectors';
 
