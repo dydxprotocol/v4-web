@@ -2153,6 +2153,11 @@
           "adjustByMarket": "USDT-USD"
         },
         {
+          "exchangeName": "Huobi",
+          "ticker": "wifusdt",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
           "exchangeName": "Kraken",
           "ticker": "WIFUSD"
         },
@@ -2408,7 +2413,7 @@
         },
         {
           "exchangeName": "Kraken",
-          "ticker": "XMRUSD"
+          "ticker": "XMRUSDT"
         },
         {
           "exchangeName": "Kucoin",
