@@ -220,9 +220,16 @@ const getOrdersTableColumnDef = ({
       [OrdersTableColumnKey.StatusFill]: {
         columnKey: 'statusFill',
         getCellValue: (row) => row.status.name,
-        label: `${stringGetter({ key: STRING_KEYS.STATUS })} / ${stringGetter({
-          key: STRING_KEYS.FILL,
-        })}`,
+        label: (
+          <TableColumnHeader>
+            <span>{stringGetter({ key: STRING_KEYS.STATUS })}</span>
+            <span>
+              {stringGetter({
+                key: STRING_KEYS.FILL,
+              })}
+            </span>
+          </TableColumnHeader>
+        ),
         renderCell: ({ asset, createdAtMilliseconds, size, status, totalFilled, resources }) => {
           const { statusIconColor } = getOrderStatusInfo({ status: status.rawValue });
 

@@ -29,14 +29,12 @@ import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { InputType } from '@/components/Input';
-import { Link } from '@/components/Link';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
@@ -490,18 +488,6 @@ const $Footer = styled.footer`
 
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
-`;
-
-const $Link = styled(Link)`
-  color: var(--color-accent);
-
-  &:visited {
-    color: var(--color-accent);
-  }
-`;
-
-const $TransactionInfo = styled.span`
-  ${layoutMixins.row}
 `;
 
 const $FormInputButton = styled(Button)`

@@ -136,11 +136,17 @@ export const formMixins: Record<
     }
   `,
 
-  footer: css`
-    ${layoutMixins.stickyFooter}
-    ${layoutMixins.withStickyFooterBackdrop}
+  withStickyFooter: css`
+    footer {
+      ${layoutMixins.stickyFooter}
+      ${layoutMixins.withStickyFooterBackdrop}
+    }
+  `,
 
+  footer: css`
     margin-top: auto;
+    backdrop-filter: none;
+    ${layoutMixins.noPointerEvents}
   `,
 
   transfersForm: css`
