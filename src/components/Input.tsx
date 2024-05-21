@@ -11,7 +11,7 @@ import {
   USD_DECIMALS,
 } from '@/constants/numbers';
 
-import { useLocaleSeparators } from '@/hooks';
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 
 import { BIG_NUMBERS } from '@/lib/numbers';
 

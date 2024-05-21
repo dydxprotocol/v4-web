@@ -7,13 +7,11 @@ import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { AppRoute } from '@/constants/routes';
 
-import {
-  useBreakpoints,
-  useDocumentTitle,
-  useGovernanceVariables,
-  useStringGetter,
-  useTokenConfigs,
-} from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useGovernanceVariables } from '@/hooks/useGovernanceVariables';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';

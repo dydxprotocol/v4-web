@@ -17,15 +17,13 @@ import {
 import { isDev } from '@/constants/networks';
 import { DydxChainAsset, WalletType, wallets } from '@/constants/wallets';
 
-import {
-  useAccountBalance,
-  useAccounts,
-  useBreakpoints,
-  useStringGetter,
-  useTokenConfigs,
-  useURLConfigs,
-} from '@/hooks';
+import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { DiscordIcon, GoogleIcon, TwitterIcon } from '@/icons';
 import { headerMixins } from '@/styles/headerMixins';
@@ -454,7 +452,8 @@ const $IconButton = styled(IconButton)`
   --button-border: solid var(--border-width) var(--color-layer-6);
 
   ${({ iconName }) =>
-    iconName != null && [IconName.Withdraw, IconName.Deposit].includes(iconName) &&
+    iconName != null &&
+    [IconName.Withdraw, IconName.Deposit].includes(iconName) &&
     css`
       --button-icon-size: 1.375em;
     `}

@@ -7,7 +7,9 @@ import { ErrorType, ValidationError, type SubaccountOrder } from '@/constants/ab
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter, useSubaccount, useTriggerOrdersFormInputs } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
+import { useTriggerOrdersFormInputs } from '@/hooks/useTriggerOrdersFormInputs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

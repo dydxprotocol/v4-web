@@ -5,7 +5,7 @@ import { AbacusOrderStatus } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { CancelOrderStatuses, LocalCancelOrderData, ORDER_TYPE_STRINGS } from '@/constants/trade';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

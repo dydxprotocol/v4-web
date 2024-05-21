@@ -6,7 +6,8 @@ import { AlertType } from '@/constants/alerts';
 import { STRING_KEYS } from '@/constants/localization';
 import { TransferNotifcation, TransferNotificationTypes } from '@/constants/notifications';
 
-import { useInterval, useStringGetter } from '@/hooks';
+import { useInterval } from '@/hooks/useInterval';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

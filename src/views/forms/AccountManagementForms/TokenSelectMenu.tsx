@@ -4,7 +4,8 @@ import styled from 'styled-components';
 import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useEnvFeatures, useStringGetter } from '@/hooks';
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

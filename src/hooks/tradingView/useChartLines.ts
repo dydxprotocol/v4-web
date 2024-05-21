@@ -7,8 +7,6 @@ import { STRING_KEYS } from '@/constants/localization';
 import { ORDER_TYPE_STRINGS, type OrderType } from '@/constants/trade';
 import type { ChartLine, PositionLineType, TvWidget } from '@/constants/tvchart';
 
-import { useStringGetter } from '@/hooks';
-
 import {
   getCurrentMarketOrders,
   getCurrentMarketPositionData,
@@ -19,6 +17,8 @@ import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { getChartLineColors } from '@/lib/tradingView/utils';
+
+import { useStringGetter } from '../useStringGetter';
 
 /**
  * @description Hook to handle drawing chart lines

@@ -9,7 +9,8 @@ import { ButtonAction } from '@/constants/buttons';
 import { BLOCKED_COUNTRIES, CountryCodes, OFAC_SANCTIONED_COUNTRIES } from '@/constants/geo';
 import { MenuGroup } from '@/constants/menus';
 
-import { useAccounts, useDydxClient } from '@/hooks';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useDydxClient } from '@/hooks/useDydxClient';
 
 import { Button } from '@/components/Button';
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';

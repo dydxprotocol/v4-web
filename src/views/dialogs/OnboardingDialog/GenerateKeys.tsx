@@ -12,9 +12,11 @@ import { STRING_KEYS } from '@/constants/localization';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { DydxAddress } from '@/constants/wallets';
 
-import { useAccounts, useDydxClient, useStringGetter } from '@/hooks';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useDydxClient } from '@/hooks/useDydxClient';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
 import useSignForWalletDerivation from '@/hooks/useSignForWalletDerivation';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

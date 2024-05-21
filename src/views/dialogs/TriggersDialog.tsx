@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { type SubaccountOrder } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog } from '@/components/Dialog';

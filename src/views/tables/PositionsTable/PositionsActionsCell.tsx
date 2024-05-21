@@ -8,8 +8,8 @@ import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { AppRoute } from '@/constants/routes';
 
-import { useEnvFeatures } from '@/hooks';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';

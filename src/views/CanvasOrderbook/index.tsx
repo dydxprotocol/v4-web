@@ -7,13 +7,13 @@ import { Nullable, type PerpetualMarketOrderbookLevel } from '@/constants/abacus
 import { STRING_KEYS } from '@/constants/localization';
 import { ORDERBOOK_HEIGHT, ORDERBOOK_MAX_ROWS_PER_SIDE } from '@/constants/orderbook';
 
-import { useStringGetter } from '@/hooks';
 import {
   useCalculateOrderbookData,
   useCenterOrderbook,
   useDrawOrderbook,
   useSpreadRowScrollListener,
 } from '@/hooks/Orderbook';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Canvas } from '@/components/Canvas';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';

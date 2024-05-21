@@ -5,12 +5,10 @@ import styled, { css } from 'styled-components';
 
 import { TradeLayouts } from '@/constants/layout';
 
-import {
-  useBreakpoints,
-  useCurrentMarketId,
-  usePageTitlePriceUpdates,
-  useTradeFormInputs,
-} from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useCurrentMarketId } from '@/hooks/useCurrentMarketId';
+import { usePageTitlePriceUpdates } from '@/hooks/usePageTitlePriceUpdates';
+import { useTradeFormInputs } from '@/hooks/useTradeFormInputs';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';

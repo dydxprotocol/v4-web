@@ -5,7 +5,7 @@ import { TransferInputField, TransferType } from '@/constants/abacus';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { ToggleGroup } from '@/components/ToggleGroup';

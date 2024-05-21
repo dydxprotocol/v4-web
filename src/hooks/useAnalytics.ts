@@ -23,7 +23,6 @@ import { useAccounts } from './useAccounts';
 import { useApiState } from './useApiState';
 import { useBreakpoints } from './useBreakpoints';
 import { useDydxClient } from './useDydxClient';
-// eslint-disable-next-line import/no-cycle
 import { useSelectedNetwork } from './useSelectedNetwork';
 
 export const useAnalytics = () => {

@@ -9,7 +9,7 @@ import { ButtonAction, ButtonShape, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { LEVERAGE_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { breakpoints } from '@/styles';
 import { formMixins } from '@/styles/formMixins';

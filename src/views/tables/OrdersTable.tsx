@@ -12,7 +12,8 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -29,6 +30,7 @@ import {
   TableColumnHeader,
   type ColumnDef,
 } from '@/components/Table';
+import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
@@ -54,7 +56,6 @@ import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
 
 import { OrderStatusIcon } from '../OrderStatusIcon';
 import { OrderActionsCell } from './OrdersTable/OrderActionsCell';
-import { PageSize } from '@/components/Table/TablePaginationRow';
 
 export enum OrdersTableColumnKey {
   Market = 'Market',

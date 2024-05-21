@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { STRING_KEYS } from '@/constants/localization';
 import { DydxChainAsset } from '@/constants/wallets';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Dialog } from '@/components/Dialog';
 import { TransferForm } from '@/views/forms/TransferForm';

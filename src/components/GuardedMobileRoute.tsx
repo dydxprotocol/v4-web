@@ -5,7 +5,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 
 import { DialogTypes } from '@/constants/dialogs';
 
-import { useBreakpoints } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { openDialog } from '@/state/dialogs';

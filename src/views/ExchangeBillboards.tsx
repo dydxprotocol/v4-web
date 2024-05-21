@@ -4,7 +4,9 @@ import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { TokenRoute } from '@/constants/routes';
 
-import { usePerpetualMarketsStats, useStringGetter, useTokenConfigs } from '@/hooks';
+import { usePerpetualMarketsStats } from '@/hooks/usePerpetualMarketsStats';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';

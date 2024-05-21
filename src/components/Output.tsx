@@ -16,7 +16,8 @@ import {
 import { UNICODE } from '@/constants/unicode';
 
 import { LoadingContext } from '@/contexts/LoadingContext';
-import { useLocaleSeparators, useStringGetter } from '@/hooks';
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
