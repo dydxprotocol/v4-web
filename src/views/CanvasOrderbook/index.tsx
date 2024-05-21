@@ -7,13 +7,13 @@ import { Nullable, type PerpetualMarketOrderbookLevel } from '@/constants/abacus
 import { STRING_KEYS } from '@/constants/localization';
 import { ORDERBOOK_HEIGHT, ORDERBOOK_MAX_ROWS_PER_SIDE } from '@/constants/orderbook';
 
-import { useStringGetter } from '@/hooks';
 import {
   useCalculateOrderbookData,
   useCenterOrderbook,
   useDrawOrderbook,
   useSpreadRowScrollListener,
 } from '@/hooks/Orderbook';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Canvas } from '@/components/Canvas';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
@@ -28,13 +28,10 @@ import { OrderbookRow, SpreadRow } from './OrderbookRow';
 
 type ElementProps = {
   maxRowsPerSide?: number;
-  layout?: 'vertical' | 'horizontal';
 };
 
 type StyleProps = {
-  hideHeader?: boolean;
   histogramSide?: 'left' | 'right';
-  className?: string;
 };
 
 export const CanvasOrderbook = forwardRef(
@@ -61,23 +58,23 @@ export const CanvasOrderbook = forwardRef(
      * Slice asks and bids to maxRowsPerSide using empty rows
      */
     const { asksSlice, bidsSlice } = useMemo(() => {
-      let asksSlice: Array<PerpetualMarketOrderbookLevel | undefined> = [];
+      let newAsksSlice: Array<PerpetualMarketOrderbookLevel | undefined> = [];
       const emptyAskRows =
         asks.length < maxRowsPerSide
           ? new Array<undefined>(maxRowsPerSide - asks.length).fill(undefined)
           : [];
-      asksSlice = [...emptyAskRows, ...asks.reverse()];
+      newAsksSlice = [...emptyAskRows, ...asks.reverse()];
 
-      let bidsSlice: Array<PerpetualMarketOrderbookLevel | undefined> = [];
+      let newBidsSlice: Array<PerpetualMarketOrderbookLevel | undefined> = [];
       const emptyBidRows =
         bids.length < maxRowsPerSide
           ? new Array<undefined>(maxRowsPerSide - bids.length).fill(undefined)
           : [];
-      bidsSlice = [...bids, ...emptyBidRows];
+      newBidsSlice = [...bids, ...emptyBidRows];
 
       return {
-        asksSlice,
-        bidsSlice,
+        asksSlice: newAsksSlice,
+        bidsSlice: newBidsSlice,
       };
     }, [asks, bids]);
 
@@ -150,6 +147,7 @@ export const CanvasOrderbook = forwardRef(
                 {asksSlice.map((row: PerpetualMarketOrderbookLevel | undefined, idx) =>
                   row ? (
                     <$Row
+                      // eslint-disable-next-line react/no-array-index-key
                       key={idx}
                       title={`${row.price}`}
                       onClick={() => {
@@ -157,6 +155,7 @@ export const CanvasOrderbook = forwardRef(
                       }}
                     />
                   ) : (
+                    // eslint-disable-next-line react/no-array-index-key
                     <$Row key={idx} />
                   )
                 )}
@@ -176,6 +175,7 @@ export const CanvasOrderbook = forwardRef(
                 {bidsSlice.map((row: PerpetualMarketOrderbookLevel | undefined, idx) =>
                   row ? (
                     <$Row
+                      // eslint-disable-next-line react/no-array-index-key
                       key={idx}
                       title={`${row.price}`}
                       onClick={
@@ -187,6 +187,7 @@ export const CanvasOrderbook = forwardRef(
                       }
                     />
                   ) : (
+                    // eslint-disable-next-line react/no-array-index-key
                     <$Row key={idx} />
                   )
                 )}

@@ -16,7 +16,7 @@ const formatString = <T extends StringGetterParams>(
     .map((textPart, index) => {
       if (textPart.match(PLACEHOLDER_REGEX)) {
         const matchedKey = textPart.slice(1, -1);
-        let valueForPlaceholder = params?.[matchedKey];
+        const valueForPlaceholder = params?.[matchedKey];
 
         if (React.isValidElement(valueForPlaceholder)) {
           hasObject = true;

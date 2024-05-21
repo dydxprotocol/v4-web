@@ -75,10 +75,10 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       }: {
         dydxAddress: DydxAddress;
         subaccountNumber: number;
-      }) => await faucetClient?.fill(dydxAddress, subaccountNumber, 100),
+      }) => faucetClient?.fill(dydxAddress, subaccountNumber, 100),
 
       getNativeTokens: async ({ dydxAddress }: { dydxAddress: DydxAddress }) =>
-        await faucetClient?.fillNative(dydxAddress),
+        faucetClient?.fillNative(dydxAddress),
     }),
     [faucetClient]
   );
@@ -239,7 +239,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     [compositeClient]
   );
 
-  const [subaccountNumber, setSubaccountNumber] = useState(0);
+  const [subaccountNumber] = useState(0);
 
   useEffect(() => {
     abacusStateManager.setSubaccountNumber(subaccountNumber);
@@ -265,8 +265,8 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       const amount = parseFloat(balance.amount) - AMOUNT_RESERVED_FOR_GAS_USDC;
 
       if (amount > 0) {
-        const subaccountClient = new SubaccountClient(localDydxWallet, 0);
-        await depositToSubaccount({ amount, subaccountClient });
+        const newSubaccountClient = new SubaccountClient(localDydxWallet, 0);
+        await depositToSubaccount({ amount, subaccountClient: newSubaccountClient });
       }
     },
     [localDydxWallet, depositToSubaccount]
@@ -284,10 +284,10 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   const deposit = useCallback(
     async (amount: number) => {
       if (!subaccountClient) {
-        return;
+        return undefined;
       }
 
-      return await depositToSubaccount({ subaccountClient, amount });
+      return depositToSubaccount({ subaccountClient, amount });
     },
     [subaccountClient, depositToSubaccount]
   );
@@ -295,10 +295,10 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   const withdraw = useCallback(
     async (amount: number) => {
       if (!subaccountClient) {
-        return;
+        return undefined;
       }
 
-      return await withdrawFromSubaccount({ subaccountClient, amount });
+      return withdrawFromSubaccount({ subaccountClient, amount });
     },
     [subaccountClient, withdrawFromSubaccount]
   );
@@ -308,7 +308,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   const transfer = useCallback(
     async (amount: number, recipient: string, coinDenom: string) => {
       if (!subaccountClient) {
-        return;
+        return undefined;
       }
       return (await (coinDenom === usdcDenom
         ? transferFromSubaccountToAddress
@@ -320,23 +320,24 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   const sendSquidWithdraw = useCallback(
     async (amount: number, payload: string, isCctp?: boolean) => {
       const cctpWithdraw = () => {
-        return new Promise<string>((resolve, reject) =>
+        return new Promise<string>((resolve, reject) => {
           abacusStateManager.cctpWithdraw((success, error, data) => {
             const parsedData = JSON.parse(data);
+            // eslint-disable-next-line eqeqeq
             if (success && parsedData?.code == 0) {
               resolve(parsedData?.transactionHash);
             } else {
               reject(error);
             }
-          })
-        );
+          });
+        });
       };
       if (isCctp) {
-        return await cctpWithdraw();
+        return cctpWithdraw();
       }
 
       if (!subaccountClient) {
-        return;
+        return undefined;
       }
       const tx = await sendSquidWithdrawFromSubaccount({ subaccountClient, amount, payload });
       return hashFromTx(tx?.hash);
@@ -490,16 +491,16 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       onError,
       onSuccess,
     }: {
-      onError: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
+      onError?: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
       onSuccess?: () => void;
-    }) => {
+    } = {}) => {
       const callback = (
         success: boolean,
         parsingError?: Nullable<ParsingError>,
         data?: Nullable<HumanReadableTriggerOrdersPayload>
       ) => {
-        const placeOrderPayloads = data?.placeOrderPayloads.toArray() || [];
-        const cancelOrderPayloads = data?.cancelOrderPayloads.toArray() || [];
+        const placeOrderPayloads = data?.placeOrderPayloads.toArray() ?? [];
+        const cancelOrderPayloads = data?.cancelOrderPayloads.toArray() ?? [];
 
         if (success) {
           onSuccess?.();

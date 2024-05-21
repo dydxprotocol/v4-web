@@ -37,7 +37,7 @@ type StyleProps = {
   className?: string;
 };
 
-function NavItemWithRef<MenuItemValue extends string>(
+const NavItemWithRef = <MenuItemValue extends string>(
   {
     value,
     slotBefore,
@@ -51,7 +51,7 @@ function NavItemWithRef<MenuItemValue extends string>(
     ...props
   }: MenuItem<MenuItemValue, string | number>,
   ref: Ref<HTMLAnchorElement | HTMLButtonElement | HTMLDivElement>
-) {
+) => {
   const location = useLocation();
 
   const children = (
@@ -78,7 +78,7 @@ function NavItemWithRef<MenuItemValue extends string>(
       asChild
       target={isExternalLink(href) ? '_blank' : undefined}
     >
-      <NavLink to={href} ref={ref as Ref<HTMLAnchorElement>} type={'' + type} {...props}>
+      <NavLink to={href} ref={ref as Ref<HTMLAnchorElement>} type={`${type}`} {...props}>
         {children}
       </NavLink>
     </Link>
@@ -93,7 +93,7 @@ function NavItemWithRef<MenuItemValue extends string>(
       {children}
     </div>
   );
-}
+};
 
 const NavItem = forwardRefFn(NavItemWithRef);
 

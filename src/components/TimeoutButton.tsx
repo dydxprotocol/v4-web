@@ -3,7 +3,8 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { ButtonAction, ButtonState } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useNow, useStringGetter } from '@/hooks';
+import { useNow } from '@/hooks/useNow';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button, type ButtonProps, type ButtonStateConfig } from '@/components/Button';
 

@@ -64,7 +64,7 @@ export type TooltipProps<Datum extends object> = {
     onTooltipContext?: (tooltipContext: TooltipContextType<Datum>) => void;
   };
 
-function DefaultGlyph<Datum extends object>(props: RenderTooltipGlyphProps<Datum>) {
+const DefaultGlyph = <Datum extends object>(props: RenderTooltipGlyphProps<Datum>) => {
   const { theme } = useContext(DataContext) || {};
 
   return (
@@ -79,13 +79,13 @@ function DefaultGlyph<Datum extends object>(props: RenderTooltipGlyphProps<Datum
       {...props.glyphStyle}
     />
   );
-}
+};
 
 function defaultRenderGlyph<Datum extends object>(props: RenderTooltipGlyphProps<Datum>) {
   return <DefaultGlyph {...props} />;
 }
 
-function TooltipInner<Datum extends object>({
+const TooltipInner = <Datum extends object>({
   horizontalCrosshairStyle,
   glyphStyle,
   onTooltipContext,
@@ -103,7 +103,7 @@ function TooltipInner<Datum extends object>({
   snapCrosshairToDatumY = true,
   verticalCrosshairStyle,
   ...tooltipProps
-}: TooltipProps<Datum>) {
+}: TooltipProps<Datum>) => {
   const {
     colorScale,
     theme,
@@ -291,7 +291,7 @@ function TooltipInner<Datum extends object>({
       </foreignObject>
     </g>
   ) : null;
-}
+};
 
 /**
  * This is a wrapper component which bails early if tooltip is not visible.

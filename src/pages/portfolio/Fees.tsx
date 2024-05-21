@@ -8,7 +8,8 @@ import { FeeTier } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { FEE_DECIMALS } from '@/constants/numbers';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -177,6 +178,7 @@ export const Fees = () => {
             ] as ColumnDef<FeeTier>[]
           ).filter(isTruthy)}
           selectionBehavior="replace"
+          paginationBehavior="showAll"
           withOuterBorder={isNotTablet}
           withInnerBorders
         />
@@ -294,7 +296,7 @@ const $FeeTable = styled(Table)`
   }
 
   @media ${breakpoints.notTablet} {
-    --tableHeader-backgroundColor: var(--color-layer-1);
+    --tableStickyRow-backgroundColor: var(--color-layer-1);
   }
 ` as typeof Table;
 

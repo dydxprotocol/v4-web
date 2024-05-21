@@ -2,15 +2,17 @@ import React, { useEffect, useState } from 'react';
 
 import BigNumber from 'bignumber.js';
 import isEmpty from 'lodash/isEmpty';
-import { LanguageCode, ResolutionString, widget } from 'public/tradingview/charting_library';
+import {
+  LanguageCode,
+  ResolutionString,
+  widget as Widget,
+} from 'public/tradingview/charting_library';
 import { shallowEqual, useSelector } from 'react-redux';
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS, SUPPORTED_LOCALE_BASE_TAGS } from '@/constants/localization';
 import type { TvWidget } from '@/constants/tvchart';
-
-import { useDydxClient, useLocalStorage, useStringGetter } from '@/hooks';
 
 import { store } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
@@ -20,6 +22,10 @@ import { getCurrentMarketId, getMarketIds } from '@/state/perpetualsSelectors';
 
 import { getDydxDatafeed } from '@/lib/tradingView/dydxfeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
+
+import { useDydxClient } from '../useDydxClient';
+import { useLocalStorage } from '../useLocalStorage';
+import { useStringGetter } from '../useStringGetter';
 
 /**
  * @description Hook to initialize TradingView Chart
@@ -79,13 +85,13 @@ export const useTradingView = ({
         ...widgetOptions,
         ...widgetOverrides,
         datafeed: getDydxDatafeed(store, getCandlesForDatafeed, initialPriceScale),
-        interval: (savedResolution || DEFAULT_RESOLUTION) as ResolutionString,
+        interval: (savedResolution ?? DEFAULT_RESOLUTION) as ResolutionString,
         locale: SUPPORTED_LOCALE_BASE_TAGS[selectedLocale] as LanguageCode,
         symbol: marketId,
         saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
       };
 
-      const tvChartWidget = new widget(options);
+      const tvChartWidget = new Widget(options);
       tvWidgetRef.current = tvChartWidget;
 
       tvWidgetRef.current.onChartReady(() => {

@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import { tooltipStrings } from '@/constants/tooltips';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { popoverMixins } from '@/styles/popoverMixins';
 

@@ -60,11 +60,9 @@ export const Collapsible = ({
           {fullWidth && <HorizontalSeparatorFiller />}
         </>
       )}
-      {
-        <$TriggerIcon>
-          <Icon iconName={triggerIcon} />
-        </$TriggerIcon>
-      }
+      <$TriggerIcon>
+        <Icon iconName={triggerIcon} />
+      </$TriggerIcon>
       {triggerIconSide === 'left' && (
         <>
           {fullWidth && <HorizontalSeparatorFiller />}

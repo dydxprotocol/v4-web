@@ -105,29 +105,27 @@ export const ComboboxMenu = <
                   disabled={item.disabled}
                   $withItemBorders={withItemBorders}
                 >
-                  {
-                    <>
-                      {item.slotBefore}
-                      {item.slotCustomContent ?? (
-                        <$ItemLabel>
-                          <span>
-                            {typeof item.label === 'string'
-                              ? `${item.label}${item.subitems?.length ? '…' : ''}`
-                              : item.label}
-                            {item.tag && (
-                              <>
-                                {' '}
-                                <Tag>{item.tag}</Tag>
-                              </>
-                            )}
-                          </span>
-                          {item.description && <span>{item.description}</span>}
-                        </$ItemLabel>
-                      )}
-                      {item.slotAfter}
-                      {item.subitems && '→'}
-                    </>
-                  }
+                  <>
+                    {item.slotBefore}
+                    {item.slotCustomContent ?? (
+                      <$ItemLabel>
+                        <span>
+                          {typeof item.label === 'string'
+                            ? `${item.label}${item.subitems?.length ? '…' : ''}`
+                            : item.label}
+                          {item.tag && (
+                            <>
+                              {' '}
+                              <Tag>{item.tag}</Tag>
+                            </>
+                          )}
+                        </span>
+                        {item.description && <span>{item.description}</span>}
+                      </$ItemLabel>
+                    )}
+                    {item.slotAfter}
+                    {item.subitems && '→'}
+                  </>
                 </$Item>
 
                 {searchValue &&

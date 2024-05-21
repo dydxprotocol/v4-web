@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { type MenuItem } from '@/constants/menus';
 
-import { useBreakpoints } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -61,9 +61,9 @@ export const ToggleGroup = forwardRefFn(
         loop
       >
         {items.map((item) => (
-          <Item key={item.value} value={item.value} asChild>
+          <Item key={item.value} value={item.value} disabled={item.disabled} asChild>
             <ToggleButton
-              size={size ? size : isTablet ? ButtonSize.Small : ButtonSize.XSmall}
+              size={size ?? (isTablet ? ButtonSize.Small : ButtonSize.XSmall)}
               shape={shape}
               disabled={item.disabled}
               {...buttonProps}

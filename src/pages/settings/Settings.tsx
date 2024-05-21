@@ -10,7 +10,8 @@ import type { MenuItem } from '@/constants/menus';
 import { DydxNetwork } from '@/constants/networks';
 import { AppRoute, MobileSettingsRoute } from '@/constants/routes';
 
-import { useSelectedNetwork, useStringGetter } from '@/hooks';
+import { useSelectedNetwork } from '@/hooks/useSelectedNetwork';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { ComingSoonSpace } from '@/components/ComingSoon';
 import { PageMenu } from '@/components/PageMenu';

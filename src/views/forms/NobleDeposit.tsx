@@ -5,7 +5,8 @@ import styled, { css } from 'styled-components';
 import { STRING_KEYS } from '@/constants/localization';
 import { OpacityToken } from '@/constants/styles/base';
 
-import { useAccounts, useStringGetter } from '@/hooks';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

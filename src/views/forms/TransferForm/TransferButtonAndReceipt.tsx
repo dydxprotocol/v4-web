@@ -6,7 +6,9 @@ import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 import { DydxChainAsset } from '@/constants/wallets';
 
-import { useAccountBalance, useStringGetter, useTokenConfigs } from '@/hooks';
+import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';

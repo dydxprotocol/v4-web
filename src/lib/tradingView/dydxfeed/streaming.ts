@@ -16,7 +16,6 @@ export const subscribeOnStream = ({
   resolution,
   onRealtimeCallback,
   subscribeUID,
-  onResetCacheNeededCallback,
   lastBar,
 }: {
   symbolInfo: LibrarySymbolInfo;
@@ -58,14 +57,14 @@ export const subscribeOnStream = ({
 
 export const unsubscribeFromStream = (subscriberUID: string) => {
   // find a subscription with id === subscriberUID
+  // eslint-disable-next-line no-restricted-syntax
   for (const channelId of subscriptionsByChannelId.keys()) {
     const subscriptionItem = subscriptionsByChannelId.get(channelId);
-    const { handlers } = subscriptionItem || {};
+    const { handlers } = subscriptionItem ?? {};
 
     if (subscriptionItem && handlers?.[subscriberUID]) {
       // remove from handlers
       delete subscriptionItem.handlers[subscriberUID];
-      const id = channelId;
 
       if (Object.keys(subscriptionItem.handlers).length === 0) {
         // unsubscribe from the channel, if it was the last handler

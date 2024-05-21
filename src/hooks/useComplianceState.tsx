@@ -13,8 +13,8 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { isBlockedGeo } from '@/lib/compliance';
 
-import { useURLConfigs } from '.';
 import { useStringGetter } from './useStringGetter';
+import { useURLConfigs } from './useURLConfigs';
 
 export const useComplianceState = () => {
   const stringGetter = useStringGetter();

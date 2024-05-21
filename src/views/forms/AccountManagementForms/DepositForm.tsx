@@ -13,6 +13,7 @@ import { AnalyticsEvent, AnalyticsEventData } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
+import { TransferNotificationTypes } from '@/constants/notifications';
 import {
   MAX_CCTP_TRANSFER_AMOUNT,
   MAX_PRICE_IMPACT,
@@ -21,9 +22,11 @@ import {
 } from '@/constants/numbers';
 import { WalletType, type EvmAddress } from '@/constants/wallets';
 
-import { useAccounts, useDebounce, useStringGetter } from '@/hooks';
 import { CHAIN_DEFAULT_TOKEN_ADDRESS, useAccountBalance } from '@/hooks/useAccountBalance';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useDebounce } from '@/hooks/useDebounce';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -285,6 +288,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
             triggeredAt: Date.now(),
             isCctp,
             requestId: requestPayload.requestId ?? undefined,
+            type: TransferNotificationTypes.Deposit,
           });
           abacusStateManager.clearTransferInputValues();
           setFromAmount('');

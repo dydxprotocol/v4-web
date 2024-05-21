@@ -26,8 +26,8 @@ import {
 } from '@/constants/charts';
 import { StringGetterFunction } from '@/constants/localization';
 
-import { useBreakpoints } from '@/hooks';
 import { useOrderbookValuesForDepthChart } from '@/hooks/Orderbook/useOrderbookValues';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { OutputType } from '@/components/Output';
@@ -119,25 +119,26 @@ export const DepthChart = ({
     if (!(zoomDomain && midMarketPrice && asks.length && bids.length))
       return { domain: [0, 0] as const, range: [0, 0] as const };
 
-    const domain = [
+    const newDomain = [
       clamp(midMarketPrice - zoomDomain, 0, highestBid.price),
       clamp(midMarketPrice + zoomDomain, lowestAsk.price, highestAsk.price),
     ] as const;
 
-    const range = [
+    const newRange = [
       0,
       [...bids, ...asks]
-        .filter((datum) => datum.price >= domain[0] && datum.price <= domain[1])
+        .filter((datum) => datum.price >= newDomain[0] && datum.price <= newDomain[1])
         .map((datum) => datum.depth)
         .reduce((a, b) => Math.max(a, b), 0),
     ] as const;
 
-    return { domain, range };
+    return { domain: newDomain, range: newRange };
   }, [orderbook, zoomDomain]);
 
   const getChartPoint = useCallback(
     (point: Point | EventHandlerParams<object>) => {
-      let price, size;
+      let price;
+      let size;
       if (point instanceof Point) {
         const { x, y } = point as Point;
         price = x;
@@ -211,7 +212,7 @@ export const DepthChart = ({
             }}
             onPointerUp={(point) => point && onChartClick?.(getChartPoint(point))}
             onPointerMove={(point) => point && setChartPointAtPointer(getChartPoint(point))}
-            onPointerPressedChange={(isPointerPressed) => setIsPointerPressed(isPointerPressed)}
+            onPointerPressedChange={(pointerPressed) => setIsPointerPressed(pointerPressed)}
           >
             <Axis
               orientation="bottom"

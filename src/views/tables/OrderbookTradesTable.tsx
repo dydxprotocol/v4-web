@@ -3,7 +3,7 @@ import styled, { css, keyframes } from 'styled-components';
 import { breakpoints } from '@/styles';
 
 import { Output } from '@/components/Output';
-import { Table } from '@/components/Table';
+import { AllTableProps, BaseTableRowData, Table } from '@/components/Table';
 
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 
@@ -13,7 +13,11 @@ const orderbookTradesTableType = getSimpleStyledOutputType(
   {} as OrderbookTradesTableStyleProps
 );
 
-export const OrderbookTradesTable = styled(Table)<OrderbookTradesTableStyleProps>`
+export const OrderbookTradesTable = <TableRowData extends BaseTableRowData>(
+  props: AllTableProps<TableRowData>
+) => <$OrderbookTradesTable {...props} paginationBehavior="showAll" />;
+
+const $OrderbookTradesTable = styled(Table)<OrderbookTradesTableStyleProps>`
   // Params
   --histogram-width: 100%;
 

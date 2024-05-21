@@ -75,7 +75,7 @@ export const PositionTile = ({
             type={OutputType.Number}
             tag={!hasSizeDiff && symbol}
             value={currentSize}
-            fractionDigits={stepSizeDecimals || TOKEN_DECIMALS}
+            fractionDigits={stepSizeDecimals ?? TOKEN_DECIMALS}
             showSign={ShowSign.None}
             smallText={hasSizeDiff}
             withBaseFont
@@ -92,7 +92,7 @@ export const PositionTile = ({
               <$Output
                 type={OutputType.Number}
                 value={postOrderSize}
-                fractionDigits={stepSizeDecimals || TOKEN_DECIMALS}
+                fractionDigits={stepSizeDecimals ?? TOKEN_DECIMALS}
                 showSign={ShowSign.None}
                 tag={symbol}
                 withBaseFont

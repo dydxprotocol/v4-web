@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { useSelectedNetwork } from '@/hooks';
+import { useSelectedNetwork } from '@/hooks/useSelectedNetwork';
 
 import { headerMixins } from '@/styles/headerMixins';
 import { layoutMixins } from '@/styles/layoutMixins';

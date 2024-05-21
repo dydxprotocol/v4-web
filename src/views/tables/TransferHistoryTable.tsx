@@ -7,7 +7,8 @@ import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 
-import { useBreakpoints, useStringGetter, useURLConfigs } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
@@ -18,6 +19,7 @@ import { Icon } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { Table, TableCell, TableColumnHeader, type ColumnDef } from '@/components/Table';
+import { PageSize } from '@/components/Table/TablePaginationRow';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
@@ -25,8 +27,6 @@ import { getSubaccountTransfers } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { truncateAddress } from '@/lib/wallet';
-
-const MOBILE_TRANSFERS_PER_PAGE = 50;
 
 export enum TransferHistoryTableColumnKey {
   Time = 'Time',
@@ -43,7 +43,6 @@ const getTransferHistoryTableColumnDef = ({
   mintscanTxUrl,
 }: {
   key: TransferHistoryTableColumnKey;
-  isTablet?: boolean;
   stringGetter: StringGetterFunction;
   width?: ColumnSize;
   mintscanTxUrl?: string;
@@ -116,6 +115,7 @@ const getTransferHistoryTableColumnDef = ({
 type ElementProps = {
   columnKeys?: TransferHistoryTableColumnKey[];
   columnWidths?: Partial<Record<TransferHistoryTableColumnKey, ColumnSize>>;
+  initialPageSize?: PageSize;
 };
 
 type StyleProps = {
@@ -126,12 +126,12 @@ type StyleProps = {
 export const TransferHistoryTable = ({
   columnKeys = Object.values(TransferHistoryTableColumnKey),
   columnWidths,
+  initialPageSize,
   withOuterBorder,
   withInnerBorders = true,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
-  const { isMobile, isTablet } = useBreakpoints();
   const { mintscan: mintscanTxUrl } = useURLConfigs();
 
   const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
@@ -141,12 +141,11 @@ export const TransferHistoryTable = ({
   return (
     <$Table
       label="Transfers"
-      data={isMobile ? transfers.slice(0, MOBILE_TRANSFERS_PER_PAGE) : transfers}
+      data={transfers}
       getRowKey={(row: SubaccountTransfer) => row.id}
       columns={columnKeys.map((key: TransferHistoryTableColumnKey) =>
         getTransferHistoryTableColumnDef({
           key,
-          isTablet,
           stringGetter,
           width: columnWidths?.[key],
           mintscanTxUrl,
@@ -167,6 +166,7 @@ export const TransferHistoryTable = ({
           )}
         </>
       }
+      initialPageSize={initialPageSize}
       selectionBehavior="replace"
       withOuterBorder={withOuterBorder}
       withInnerBorders={withInnerBorders}

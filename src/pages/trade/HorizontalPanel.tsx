@@ -7,12 +7,12 @@ import styled from 'styled-components';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { CollapsibleTabs } from '@/components/CollapsibleTabs';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
-import { ViewMoreConfig } from '@/components/Table';
 import { MobileTabs } from '@/components/Tabs';
 import { Tag, TagType } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
@@ -97,10 +97,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     showCurrentMarket ? numOpenOrders : numTotalOpenOrders
   );
 
-  const viewMoreConfig: ViewMoreConfig = {
-    initialNumRowsToShow: 10,
-    numRowsPerPage: 10,
-  };
+  const initialPageSize = 10;
 
   const onViewOrders = useCallback(
     (market: string) => {
@@ -151,7 +148,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                   ].filter(isTruthy)
             }
             showClosePositionAction={showClosePositionAction}
-            viewMoreConfig={viewMoreConfig}
+            initialPageSize={initialPageSize}
             onNavigate={() => setView(PanelView.CurrentMarket)}
             navigateToOrders={onViewOrders}
           />
@@ -189,7 +186,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     !isAccountViewOnly && OrdersTableColumnKey.Actions,
                   ].filter(isTruthy)
             }
-            viewMoreConfig={viewMoreConfig}
+            initialPageSize={initialPageSize}
           />
         ),
       },
@@ -228,7 +225,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
             columnWidths={{
               [FillsTableColumnKey.TypeAmount]: '100%',
             }}
-            viewMoreConfig={viewMoreConfig}
+            initialPageSize={initialPageSize}
           />
         ),
       },

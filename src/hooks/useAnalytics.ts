@@ -85,7 +85,7 @@ export const useAnalytics = () => {
 
   // AnalyticsUserProperty.WalletAddress
   useEffect(() => {
-    identify(AnalyticsUserProperty.WalletAddress, evmAddress || dydxAddress);
+    identify(AnalyticsUserProperty.WalletAddress, evmAddress ?? dydxAddress);
   }, [evmAddress, dydxAddress]);
 
   // AnalyticsUserProperty.DydxAddress

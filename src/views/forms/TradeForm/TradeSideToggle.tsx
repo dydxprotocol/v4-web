@@ -8,7 +8,7 @@ import { AbacusOrderSide, TradeInputField } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { ToggleGroup } from '@/components/ToggleGroup';
 

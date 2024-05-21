@@ -24,6 +24,6 @@ export const useEndpointsConfig = () => {
     validators: endpointsConfig.validators,
     '0xsquid': endpointsConfig['0xsquid'],
     nobleValidator: endpointsConfig.nobleValidator,
-    faucet: endpointsConfig['faucet'],
+    faucet: endpointsConfig.faucet,
   };
 };

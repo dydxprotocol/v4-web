@@ -36,6 +36,8 @@ import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { DydxChainId, isTestnet } from '@/constants/networks';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 
+// TODO Fix cycle
+// eslint-disable-next-line import/no-cycle
 import { RootStore } from '@/state/_store';
 import { placeOrderTimeout } from '@/state/account';
 import { setInitializationError } from '@/state/app';
@@ -46,16 +48,21 @@ import { bytesToBigInt } from '../numbers';
 import { log } from '../telemetry';
 import { getMintscanTxLink, hashFromTx } from '../txUtils';
 
-(BigInt.prototype as any).toJSON = function () {
+(BigInt.prototype as any).toJSON = function toJSON() {
   return this.toString();
 };
 
 class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
   private compositeClient: CompositeClient | undefined;
+
   private nobleClient: NobleClient | undefined;
+
   private store: RootStore | undefined;
+
   private hdkey: Hdkey | undefined;
+
   private localWallet: LocalWallet | undefined;
+
   private nobleWallet: LocalWallet | undefined;
 
   constructor() {
@@ -179,6 +186,7 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
     if (typeof x === 'object') {
       const parsedObj: { [key: string]: any } = {};
+      // eslint-disable-next-line no-restricted-syntax
       for (const key in x) {
         if (Object.prototype.hasOwnProperty.call(x, key)) {
           parsedObj[key] = this.parseToPrimitives((x as any)[key]);
@@ -252,9 +260,11 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       const hash = parsedTx.hash.toUpperCase();
 
       if (isTestnet) {
+        // eslint-disable-next-line no-console
         console.log(
           getMintscanTxLink(this.compositeClient.network.getString() as DydxChainId, hash)
         );
+        // eslint-disable-next-line no-console
       } else console.log(`txHash: ${hash}`);
 
       return encodedTx;
@@ -274,15 +284,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       throw new Error('Missing compositeClient or localWallet');
     }
 
-    const {
-      orderId,
-      subaccountNumber,
-      clientId,
-      orderFlags,
-      clobPairId,
-      goodTilBlock,
-      goodTilBlockTime,
-    } = params ?? {};
+    const { subaccountNumber, clientId, orderFlags, clobPairId, goodTilBlock, goodTilBlockTime } =
+      params ?? {};
 
     try {
       const tx = await this.compositeClient?.cancelRawOrder(
@@ -290,14 +293,15 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
         clientId,
         orderFlags,
         clobPairId,
-        goodTilBlock || undefined,
-        goodTilBlockTime || undefined
+        goodTilBlock === 0 ? undefined : goodTilBlock ?? undefined,
+        goodTilBlockTime === 0 ? undefined : goodTilBlockTime ?? undefined
       );
 
       const encodedTx = encodeJson(tx);
 
       if (import.meta.env.MODE === 'development') {
         const parsedTx = JSON.parse(encodedTx);
+        // eslint-disable-next-line no-console
         console.log(parsedTx, parsedTx.hash.toUpperCase());
       }
 
@@ -350,9 +354,8 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       throw new Error('Missing compositeClient or localWallet');
     }
 
-    const { subaccountNumber, amount, recipient } = params ?? {};
+    const { amount, recipient } = params ?? {};
     const compositeClient = this.compositeClient;
-    const subaccountClient = new SubaccountClient(this.localWallet, subaccountNumber);
 
     try {
       const tx = await compositeClient.simulate(
@@ -653,11 +656,12 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       const params = paramsInJson ? JSON.parse(paramsInJson) : undefined;
 
       switch (type) {
-        case QueryType.Height:
+        case QueryType.Height: {
           const block = await this.compositeClient?.validatorClient.get.latestBlock();
           callback(JSON.stringify(block));
           break;
-        case QueryType.OptimalNode:
+        }
+        case QueryType.OptimalNode: {
           const networkOptimizer = new NetworkOptimizer();
           const optimalNode = await networkOptimizer.findOptimalNode(
             params.endpointUrls,
@@ -665,32 +669,37 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
           );
           callback(JSON.stringify({ url: optimalNode }));
           break;
-        case QueryType.EquityTiers:
+        }
+        case QueryType.EquityTiers: {
           const equityTiers =
             await this.compositeClient?.validatorClient.get.getEquityTierLimitConfiguration();
           const parsedEquityTiers = this.parseToPrimitives(equityTiers);
           callback(JSON.stringify(parsedEquityTiers));
           break;
-        case QueryType.FeeTiers:
+        }
+        case QueryType.FeeTiers: {
           const feeTiers = await this.compositeClient?.validatorClient.get.getFeeTiers();
           const parsedFeeTiers = this.parseToPrimitives(feeTiers);
           callback(JSON.stringify(parsedFeeTiers));
           break;
-        case QueryType.UserFeeTier:
+        }
+        case QueryType.UserFeeTier: {
           const userFeeTier = await this.compositeClient?.validatorClient.get.getUserFeeTier(
             params.address
           );
           const parsedUserFeeTier = this.parseToPrimitives(userFeeTier);
           callback(JSON.stringify(parsedUserFeeTier));
           break;
-        case QueryType.UserStats:
+        }
+        case QueryType.UserStats: {
           const userStats = await this.compositeClient?.validatorClient.get.getUserStats(
             params.address
           );
           const parsedUserStats = this.parseToPrimitives(userStats);
           callback(JSON.stringify(parsedUserStats));
           break;
-        case QueryType.GetAccountBalances:
+        }
+        case QueryType.GetAccountBalances: {
           if (!this.localWallet?.address) throw new Error('Missing localWallet');
           const accountBalances =
             await this.compositeClient?.validatorClient.get.getAccountBalances(
@@ -699,31 +708,37 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
           const parsedAccountBalances = this.parseToPrimitives(accountBalances);
           callback(JSON.stringify(parsedAccountBalances));
           break;
-        case QueryType.RewardsParams:
+        }
+        case QueryType.RewardsParams: {
           const rewardsParams = await this.compositeClient?.validatorClient.get.getRewardsParams();
           const parsedRewardsParams = this.parseToPrimitives(rewardsParams);
           callback(JSON.stringify(parsedRewardsParams));
           break;
-        case QueryType.GetMarketPrice:
+        }
+        case QueryType.GetMarketPrice: {
           const price = await this.compositeClient?.validatorClient.get.getPrice(params.marketId);
           const parsedPrice = this.parseToPrimitives(price);
           callback(JSON.stringify(parsedPrice));
           break;
-        case QueryType.GetDelegations:
+        }
+        case QueryType.GetDelegations: {
           const delegations =
             await this.compositeClient?.validatorClient.get.getDelegatorDelegations(params.address);
           const parseDelegations = this.parseToPrimitives(delegations);
           callback(JSON.stringify(parseDelegations));
           break;
-        case QueryType.GetNobleBalance:
+        }
+        case QueryType.GetNobleBalance: {
           if (this.nobleClient?.isConnected) {
             const nobleBalance = await this.nobleClient.getAccountBalance('uusdc');
             const parsedNobleBalance = this.parseToPrimitives(nobleBalance);
             callback(JSON.stringify(parsedNobleBalance));
           }
           break;
-        default:
+        }
+        default: {
           break;
+        }
       }
     } catch (error) {
       log('DydxChainTransactions/get', error);

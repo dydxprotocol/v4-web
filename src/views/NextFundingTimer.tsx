@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-import { useInterval } from '@/hooks';
+import { useInterval } from '@/hooks/useInterval';
 
 import { Output, OutputType } from '@/components/Output';
 

@@ -7,8 +7,9 @@ import { STRING_KEYS } from '@/constants/localization';
 import { MarketFilters, MarketSorting, type MarketData } from '@/constants/markets';
 import { AppRoute } from '@/constants/routes';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useMarketsData } from '@/hooks/useMarketsData';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -182,6 +183,7 @@ export const MarketsCompactTable = ({
           )}
         </$MarketNotFound>
       }
+      initialPageSize={5}
     />
   );
 };
@@ -248,10 +250,6 @@ const $Table = styled(Table)`
 const $TabletOutput = styled(Output)`
   font: var(--font-small-medium);
   color: var(--color-text-1);
-`;
-
-const $InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
 `;
 
 const $TabletPriceChange = styled.div`

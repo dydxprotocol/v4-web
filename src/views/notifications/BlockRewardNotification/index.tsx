@@ -2,10 +2,11 @@ import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
+// eslint-disable-next-line import/no-cycle
 import { Notification, NotificationProps } from '@/components/Notification';
 import { Output, OutputType } from '@/components/Output';
 

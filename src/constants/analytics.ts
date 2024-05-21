@@ -3,6 +3,7 @@ import type { OnboardingState, OnboardingSteps } from './account';
 import type { DialogTypes } from './dialogs';
 import type { SupportedLocales } from './localization';
 import type { DydxNetwork } from './networks';
+import { TransferNotificationTypes } from './notifications';
 import type { TradeTypes } from './trade';
 import type { DydxAddress, EvmAddress, WalletConnectionType, WalletType } from './wallets';
 
@@ -77,6 +78,7 @@ export enum AnalyticsEvent {
   TransferFaucetConfirmed = 'TransferFaucetConfirmed',
   TransferDeposit = 'TransferDeposit',
   TransferWithdraw = 'TransferWithdraw',
+  TransferNotification = 'TransferNotification',
 
   // Trading
   TradeOrderTypeSelected = 'TradeOrderTypeSelected',
@@ -205,6 +207,15 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
     ? {
         type: string;
         id: string;
+      }
+    : T extends AnalyticsEvent.TransferNotification
+    ? {
+        type: TransferNotificationTypes | undefined;
+        toAmount: number | undefined;
+        timeSpent: Record<string, number> | number | undefined;
+        txHash: string;
+        status: 'new' | 'success' | 'error';
+        triggeredAt: number | undefined;
       }
     : never;
 

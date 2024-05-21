@@ -55,9 +55,9 @@ class AbacusRest implements AbacusRestProtocol {
       .then(async (response) => {
         const data = await response.text();
         const headersObj: Record<string, string> = {};
-        for (let [key, value] of response.headers) {
+        response.headers.forEach((value, key) => {
           headersObj[key] = value;
-        }
+        });
         // Stringify the headers object
         const headersJson = JSON.stringify(headersObj);
 
@@ -65,7 +65,9 @@ class AbacusRest implements AbacusRestProtocol {
 
         try {
           lastSuccessfulRestRequestByOrigin[new URL(url).origin] = Date.now();
-        } catch {}
+        } catch (error) {
+          // expected error when bad url
+        }
       })
       .catch(() => callback(null, 0, null)); // Network error or request couldn't be made
   }

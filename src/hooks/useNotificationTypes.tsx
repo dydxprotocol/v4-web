@@ -25,13 +25,12 @@ import {
 import { AppRoute, TokenRoute } from '@/constants/routes';
 import { DydxChainAsset } from '@/constants/wallets';
 
-import { useAccounts, useApiState, useStringGetter, useTokenConfigs, useURLConfigs } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
-import { Output } from '@/components/Output';
+// eslint-disable-next-line import/no-cycle
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
 import { OrderCancelNotification } from '@/views/notifications/OrderCancelNotification';
@@ -52,8 +51,13 @@ import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import { formatSeconds } from '@/lib/timeUtils';
 
+import { useAccounts } from './useAccounts';
+import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
 import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
+import { useStringGetter } from './useStringGetter';
+import { useTokenConfigs } from './useTokenConfigs';
+import { useURLConfigs } from './useURLConfigs';
 
 const parseStringParamsForNotification = ({
   stringGetter,
@@ -75,11 +79,12 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const abacusNotifications = useSelector(getAbacusNotifications, isEqual);
-      const orders = useSelector(getSubaccountOrders, shallowEqual) || [];
+      const orders = useSelector(getSubaccountOrders, shallowEqual) ?? [];
       const ordersById = groupBy(orders, 'id');
       const localPlaceOrders = useSelector(getLocalPlaceOrders, shallowEqual);
 
       useEffect(() => {
+        // eslint-disable-next-line no-restricted-syntax
         for (const abacusNotif of abacusNotifications) {
           const [abacusNotificationType = '', id = ''] = abacusNotif.id.split(':');
           const parsedData = abacusNotif.data ? JSON.parse(abacusNotif.data) : {};
@@ -95,7 +100,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
               const order = ordersById[id]?.[0];
               const clientId: number | undefined = order?.clientId ?? undefined;
               const localOrderExists =
-                clientId && localPlaceOrders.some((order) => order.clientId === clientId);
+                clientId && localPlaceOrders.some((ordr) => ordr.clientId === clientId);
 
               if (localOrderExists) return; // already handled by OrderStatusNotification
 
@@ -164,15 +169,16 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
     useNotificationAction: () => {
       const dispatch = useDispatch();
-      const orders = useSelector(getSubaccountOrders, shallowEqual) || [];
+      const orders = useSelector(getSubaccountOrders, shallowEqual) ?? [];
       const ordersById = groupBy(orders, 'id');
-      const fills = useSelector(getSubaccountFills, shallowEqual) || [];
+      const fills = useSelector(getSubaccountFills, shallowEqual) ?? [];
       const fillsById = groupBy(fills, 'id');
       const marketIds = useSelector(getMarketIds, shallowEqual);
       const navigate = useNavigate();
 
       return (notificationId: string) => {
-        const [abacusNotificationType = '', id = ''] = notificationId.split(':');
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const [abacusNotificationType, id = ''] = notificationId.split(':');
 
         if (ordersById[id]) {
           dispatch(
@@ -204,6 +210,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const selectedDydxChainId = useSelector(getSelectedDydxChainId);
 
       useEffect(() => {
+        // eslint-disable-next-line no-restricted-syntax
         for (const transfer of transferNotifications) {
           const { fromChainId, status, txHash, toAmount, type, isExchange } = transfer;
           const isFinished =
@@ -211,9 +218,10 @@ export const notificationTypes: NotificationTypeConfig[] = [
           const icon = <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />;
 
           const transferType =
-            type ?? fromChainId === selectedDydxChainId
+            type ??
+            (fromChainId === selectedDydxChainId
               ? TransferNotificationTypes.Withdrawal
-              : TransferNotificationTypes.Deposit;
+              : TransferNotificationTypes.Deposit);
 
           const title = stringGetter({
             key: {
@@ -222,7 +230,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             }[transferType],
           });
 
-          const toChainEta = status?.toChain?.chainData?.estimatedRouteDuration || 0;
+          const toChainEta = status?.toChain?.chainData?.estimatedRouteDuration ?? 0;
           const estimatedDuration = formatSeconds(Math.max(toChainEta, 0));
           const body = stringGetter({
             key: STRING_KEYS.DEPOSIT_STATUS,
@@ -449,6 +457,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const stringGetter = useStringGetter();
 
       useEffect(() => {
+        // eslint-disable-next-line no-restricted-syntax
         for (const localPlace of localPlaceOrders) {
           const key = localPlace.clientId.toString();
           trigger(
@@ -474,6 +483,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       }, [localPlaceOrders]);
 
       useEffect(() => {
+        // eslint-disable-next-line no-restricted-syntax
         for (const localCancel of localCancelOrders) {
           // ensure order exists
           const existingOrder = allOrders?.find((order) => order.id === localCancel.orderId);
@@ -506,10 +516,10 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
     useNotificationAction: () => {
       const dispatch = useDispatch();
-      const orders = useSelector(getSubaccountOrders, shallowEqual) || [];
+      const orders = useSelector(getSubaccountOrders, shallowEqual) ?? [];
 
       return (orderClientId: string) => {
-        const order = orders.find((order) => order.clientId?.toString() === orderClientId);
+        const order = orders.find((o) => o.clientId?.toString() === orderClientId);
         if (order) {
           dispatch(
             openDialog({
@@ -530,10 +540,6 @@ const $Icon = styled.img`
 
 const $WarningIcon = styled(Icon)`
   color: var(--color-warning);
-`;
-
-const $Output = styled(Output)`
-  display: inline-block;
 `;
 
 const $Link = styled(Link)`

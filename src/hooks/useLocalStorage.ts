@@ -28,6 +28,7 @@ export const useLocalStorage = <Value>({
           return false;
         }
       }
+      return undefined;
     };
 
     globalThis.window.addEventListener('storage', onStorage);

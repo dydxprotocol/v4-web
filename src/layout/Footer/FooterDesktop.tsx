@@ -5,7 +5,9 @@ import { ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 
-import { useApiState, useStringGetter, useURLConfigs } from '@/hooks';
+import { useApiState } from '@/hooks/useApiState';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { ChatIcon, LinkOutIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -14,6 +16,8 @@ import { Button } from '@/components/Button';
 import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
+
+import { isPresent } from '@/lib/typeUtils';
 
 enum FooterItems {
   ChainHeight,
@@ -46,10 +50,6 @@ export const FooterDesktop = () => {
         exchangeStatus: ExchangeStatus.Degraded,
         label: stringGetter({ key: STRING_KEYS.DEGRADED }),
       };
-
-  function isPresent<T>(value: T | undefined | null): value is T {
-    return value != null;
-  }
 
   return (
     <$Footer>

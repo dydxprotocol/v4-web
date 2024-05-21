@@ -8,9 +8,9 @@ import { MenuItem } from '@/constants/menus';
 import { isMainnet } from '@/constants/networks';
 import { NewMarketProposal } from '@/constants/potentialMarkets';
 
-import { useGovernanceVariables, useStringGetter, useTokenConfigs } from '@/hooks';
-
-import { layoutMixins } from '@/styles/layoutMixins';
+import { useGovernanceVariables } from '@/hooks/useGovernanceVariables';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { Details } from '@/components/Details';
 import { Dialog } from '@/components/Dialog';
@@ -137,7 +137,7 @@ export const NewMarketMessageDetailsDialog = ({
                     exchange_config_json
                     {exchangeConfig && <$Tag type={TagType.Number}>{exchangeConfig.length}</$Tag>}
                   </$Text0>
-                  {'['}
+                  [
                   {exchangeConfig?.map((exchange) => {
                     return (
                       <$ExchangeObject
@@ -154,7 +154,7 @@ export const NewMarketMessageDetailsDialog = ({
                       </$ExchangeObject>
                     );
                   })}
-                  {']'}
+                  ]
                 </$ExchangeConfigs>
               </$Code>
             ),
@@ -339,10 +339,6 @@ export const NewMarketMessageDetailsDialog = ({
     </Dialog>
   );
 };
-const $Content = styled.div`
-  ${layoutMixins.column}
-  gap: 0;
-`;
 
 const $ProposedMessageDetails = styled.div`
   display: flex;
@@ -393,10 +389,6 @@ const $ExchangeObject = styled.div`
 
 const $Line = styled.pre`
   margin-left: 1rem;
-`;
-
-const $Description = styled.p`
-  margin-bottom: 1rem;
 `;
 
 const $Summary = styled.p`

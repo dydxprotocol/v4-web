@@ -5,7 +5,9 @@ import { TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { WalletType } from '@/constants/wallets';
 
-import { useAccounts, useEnvFeatures, useStringGetter } from '@/hooks';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';

@@ -16,8 +16,9 @@ import { NumberSign, TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { AppRoute } from '@/constants/routes';
 import { PositionSide } from '@/constants/trade';
 
-import { useEnvFeatures, useStringGetter } from '@/hooks';
 import { MediaQueryKeys } from '@/hooks/useBreakpoints';
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
@@ -25,9 +26,10 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
-import { Table, TableColumnHeader, ViewMoreConfig, type ColumnDef } from '@/components/Table';
+import { Table, TableColumnHeader, type ColumnDef } from '@/components/Table';
 import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
+import { PageSize } from '@/components/Table/TablePaginationRow';
 
 import {
   calculateIsAccountViewOnly,
@@ -363,7 +365,7 @@ type ElementProps = {
   currentRoute?: string;
   currentMarket?: string;
   showClosePositionAction: boolean;
-  viewMoreConfig?: ViewMoreConfig;
+  initialPageSize?: PageSize;
   onNavigate?: () => void;
   navigateToOrders: (market: string) => void;
 };
@@ -379,7 +381,7 @@ export const PositionsTable = ({
   currentRoute,
   currentMarket,
   showClosePositionAction,
-  viewMoreConfig,
+  initialPageSize,
   onNavigate,
   navigateToOrders,
   withGradientCardRows,
@@ -474,7 +476,7 @@ export const PositionsTable = ({
           <h4>{stringGetter({ key: STRING_KEYS.POSITIONS_EMPTY_STATE })}</h4>
         </>
       }
-      viewMoreConfig={viewMoreConfig}
+      initialPageSize={initialPageSize}
       withGradientCardRows={withGradientCardRows}
       withOuterBorder={withOuterBorder}
       withInnerBorders

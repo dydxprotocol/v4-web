@@ -7,7 +7,8 @@ import styled, { css } from 'styled-components';
 import { STRING_KEYS } from '@/constants/localization';
 import { TransferNotificationTypes } from '@/constants/notifications';
 
-import { useStringGetter, useURLConfigs } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -44,9 +45,12 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
     const fromChain = status?.fromChain?.chainData?.chainId;
     const toChain = status?.toChain?.chainData?.chainId;
 
-    const currentStatus = routeStatus?.[routeStatus?.length - 1];
+    const currentStatus =
+      routeStatus != null && routeStatus.length != null
+        ? routeStatus[routeStatus.length - 1]
+        : undefined;
 
-    const steps = [
+    const newSteps = [
       {
         label: stringGetter({
           key:
@@ -90,26 +94,26 @@ export const TransferStatusSteps = ({ className, status, type }: ElementProps & 
       },
     ];
 
-    let currentStep = TransferStatusStep.Bridge;
+    let newCurrentStep = TransferStatusStep.Bridge;
 
     if (!routeStatus?.length) {
-      currentStep = TransferStatusStep.FromChain;
+      newCurrentStep = TransferStatusStep.FromChain;
     } else if (currentStatus.chainId === toChain) {
-      currentStep =
+      newCurrentStep =
         currentStatus.status !== 'success'
           ? TransferStatusStep.ToChain
           : TransferStatusStep.Complete;
     } else if (currentStatus.chainId === fromChain && currentStatus.status !== 'success') {
-      currentStep = TransferStatusStep.FromChain;
+      newCurrentStep = TransferStatusStep.FromChain;
     }
 
     if (status?.squidTransactionStatus === 'success') {
-      currentStep = TransferStatusStep.Complete;
+      newCurrentStep = TransferStatusStep.Complete;
     }
 
     return {
-      currentStep,
-      steps,
+      currentStep: newCurrentStep,
+      steps: newSteps,
       type,
     };
   }, [status, stringGetter]);
@@ -180,10 +184,10 @@ const $Icon = styled.div<{ state?: 'complete' | 'default' }>`
     state == null
       ? undefined
       : {
-          ['complete']: css`
+          complete: css`
             color: var(--color-success);
           `,
-          ['default']: css`
+          default: css`
             color: var(--color-text-0);
           `,
         }[state]}

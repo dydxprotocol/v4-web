@@ -2,7 +2,9 @@ const ZERO = '0';
 
 const countZeros = (decimalDigits: string): number => {
   let zeroCount = 0;
+  // eslint-disable-next-line no-plusplus
   for (let i = 0; i < decimalDigits.length && decimalDigits[i] === ZERO; i++) {
+    // eslint-disable-next-line no-plusplus
     zeroCount++;
   }
   return zeroCount;

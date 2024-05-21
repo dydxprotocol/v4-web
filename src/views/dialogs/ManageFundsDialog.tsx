@@ -5,7 +5,7 @@ import { TransferInputField, TransferType } from '@/constants/abacus';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { ToggleGroup } from '@/components/ToggleGroup';
@@ -25,7 +25,7 @@ type ElementProps = {
 
 export const ManageFundsDialog = ({ setIsOpen, selectedTransferType }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const { type } = useSelector(getTransferInputs, shallowEqual) || {};
+  const { type } = useSelector(getTransferInputs, shallowEqual) ?? {};
   const currentType = type?.rawValue ?? selectedTransferType ?? TransferType.deposit.rawValue;
 
   const closeDialog = () => setIsOpen?.(false);

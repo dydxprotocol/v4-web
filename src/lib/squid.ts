@@ -33,8 +33,8 @@ export const fetchSquidStatus = async (
 
   const response = await fetch(url, {
     headers: {
-      'x-integrator-id': integratorId || 'dYdX-api',
-      'x-request-id': requestId || '',
+      'x-integrator-id': integratorId ?? 'dYdX-api',
+      'x-request-id': requestId ?? '',
     },
   });
 

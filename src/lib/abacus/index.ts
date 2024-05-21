@@ -14,6 +14,7 @@ import type {
   ParsingError,
   TradeInputFields,
   TransferInputFields,
+  TriggerOrdersInputFields,
 } from '@/constants/abacus';
 import {
   AbacusAppConfig,
@@ -32,7 +33,6 @@ import {
   TransferType,
   TriggerOrdersInputField,
   UIImplementations,
-  type TriggerOrdersInputFields,
 } from '@/constants/abacus';
 import { Hdkey } from '@/constants/account';
 import { DEFAULT_MARKETID } from '@/constants/markets';
@@ -45,6 +45,7 @@ import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors
 
 import { LocaleSeparators } from '../numbers';
 import AbacusAnalytics from './analytics';
+// eslint-disable-next-line import/no-cycle
 import AbacusChainTransaction from './dydxChainTransactions';
 import AbacusFileSystem from './filesystem';
 import AbacusFormatter from './formatter';
@@ -57,13 +58,19 @@ import AbacusWebsocket from './websocket';
 
 class AbacusStateManager {
   private store: RootStore | undefined;
+
   private currentMarket: string | undefined;
 
   stateManager: InstanceType<typeof AsyncAbacusStateManagerV2>;
+
   websocket: AbacusWebsocket;
+
   stateNotifier: AbacusStateNotifier;
+
   analytics: AbacusAnalytics;
+
   abacusFormatter: AbacusFormatter;
+
   chainTransactions: AbacusChainTransaction;
 
   constructor() {

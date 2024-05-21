@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { AbacusOrderStatus, type OrderStatus } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';
 
-import { useSubaccount } from '@/hooks';
+import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';

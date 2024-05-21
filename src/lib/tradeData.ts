@@ -88,7 +88,7 @@ const formatErrorParam = ({
       return `$${dollarBN.toFixed(tickSizeDecimals ?? USD_DECIMALS)}`;
     }
     default: {
-      return value || '';
+      return value ?? '';
     }
   }
 };
@@ -109,8 +109,8 @@ export const getTradeInputAlert = ({
 }) => {
   const inputAlerts = abacusInputErrors.map(({ action: errorAction, resources, type, code }) => {
     const { action, text } = resources || {};
-    const { stringKey: actionStringKey } = action || {};
-    const { stringKey: alertStringKey, params: stringParams } = text || {};
+    const { stringKey: actionStringKey } = action ?? {};
+    const { stringKey: alertStringKey, params: stringParams } = text ?? {};
 
     const params =
       stringParams?.toArray() &&

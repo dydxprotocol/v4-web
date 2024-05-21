@@ -12,9 +12,11 @@ import { STRING_KEYS } from '@/constants/localization';
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { DydxAddress } from '@/constants/wallets';
 
-import { useAccounts, useDydxClient, useStringGetter } from '@/hooks';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useDydxClient } from '@/hooks/useDydxClient';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
 import useSignForWalletDerivation from '@/hooks/useSignForWalletDerivation';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -39,11 +41,7 @@ type ElementProps = {
   onKeysDerived?: () => void;
 };
 
-export const GenerateKeys = ({
-  status: status,
-  setStatus,
-  onKeysDerived = () => {},
-}: ElementProps) => {
+export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: ElementProps) => {
   const stringGetter = useStringGetter();
 
   const [shouldRememberMe, setShouldRememberMe] = useState(false);
@@ -67,14 +65,14 @@ export const GenerateKeys = ({
     try {
       await matchNetwork?.();
       return true;
-    } catch (error) {
+    } catch (err) {
       const { message, walletErrorType, isErrorExpected } = parseWalletError({
-        error,
+        error: err,
         stringGetter,
       });
 
       if (!isErrorExpected) {
-        log('GenerateKeys/switchNetwork', error, { walletErrorType });
+        log('GenerateKeys/switchNetwork', err, { walletErrorType });
       }
 
       if (message) {
@@ -136,9 +134,9 @@ export const GenerateKeys = ({
             );
           }
         }
-      } catch (error) {
+      } catch (err) {
         setStatus(EvmDerivedAccountStatus.NotDerived);
-        const { message } = parseWalletError({ error, stringGetter });
+        const { message } = parseWalletError({ error: err, stringGetter });
 
         if (message) {
           track(AnalyticsEvent.OnboardingWalletIsNonDeterministic);
@@ -158,17 +156,17 @@ export const GenerateKeys = ({
 
       // 4. Done
       setStatus(EvmDerivedAccountStatus.Derived);
-    } catch (error) {
+    } catch (err) {
       setStatus(EvmDerivedAccountStatus.NotDerived);
       const { message, walletErrorType, isErrorExpected } = parseWalletError({
-        error,
+        error: err,
         stringGetter,
       });
 
       if (message) {
         setError(message);
         if (!isErrorExpected) {
-          log('GenerateKeys/deriveKeys', error, { walletErrorType });
+          log('GenerateKeys/deriveKeys', err, { walletErrorType });
         }
       }
     }

@@ -10,7 +10,8 @@ import { type Asset, type SubaccountFill } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
@@ -19,14 +20,9 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
-import {
-  Table,
-  TableCell,
-  TableColumnHeader,
-  ViewMoreConfig,
-  type ColumnDef,
-} from '@/components/Table';
+import { Table, TableCell, TableColumnHeader, type ColumnDef } from '@/components/Table';
 import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 
 import { viewedFills } from '@/state/account';
@@ -295,7 +291,7 @@ type ElementProps = {
   columnKeys: FillsTableColumnKey[];
   columnWidths?: Partial<Record<FillsTableColumnKey, ColumnSize>>;
   currentMarket?: string;
-  viewMoreConfig?: ViewMoreConfig;
+  initialPageSize?: PageSize;
 };
 
 type StyleProps = {
@@ -308,7 +304,7 @@ export const FillsTable = ({
   columnKeys,
   columnWidths,
   currentMarket,
-  viewMoreConfig,
+  initialPageSize,
   withGradientCardRows,
   withOuterBorder,
   withInnerBorders = true,
@@ -375,7 +371,7 @@ export const FillsTable = ({
           <h4>{stringGetter({ key: STRING_KEYS.TRADES_EMPTY_STATE })}</h4>
         </>
       }
-      viewMoreConfig={viewMoreConfig}
+      initialPageSize={initialPageSize}
       withOuterBorder={withOuterBorder}
       withInnerBorders={withInnerBorders}
       withScrollSnapColumns

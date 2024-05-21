@@ -12,7 +12,8 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -27,9 +28,9 @@ import {
   Table,
   TableCell,
   TableColumnHeader,
-  ViewMoreConfig,
   type ColumnDef,
 } from '@/components/Table';
+import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
@@ -80,7 +81,6 @@ export type OrderTableRow = {
 
 const getOrdersTableColumnDef = ({
   key,
-  dispatch,
   stringGetter,
   symbol = '',
   isAccountViewOnly,
@@ -172,7 +172,7 @@ const getOrdersTableColumnDef = ({
         columnKey: 'triggerPrice',
         getCellValue: (row) => row.triggerPrice ?? -1,
         label: stringGetter({ key: STRING_KEYS.TRIGGER_PRICE_SHORT }),
-        renderCell: ({ type, triggerPrice, trailingPercent, tickSizeDecimals }) => (
+        renderCell: ({ triggerPrice, trailingPercent, tickSizeDecimals }) => (
           <TableCell stacked>
             <Output type={OutputType.Fiat} value={triggerPrice} fractionDigits={tickSizeDecimals} />
             {trailingPercent && (
@@ -294,7 +294,7 @@ type ElementProps = {
   columnKeys: OrdersTableColumnKey[];
   columnWidths?: Partial<Record<OrdersTableColumnKey, ColumnSize>>;
   currentMarket?: string;
-  viewMoreConfig?: ViewMoreConfig;
+  initialPageSize?: PageSize;
 };
 
 type StyleProps = {
@@ -305,7 +305,7 @@ export const OrdersTable = ({
   columnKeys = [],
   columnWidths,
   currentMarket,
-  viewMoreConfig,
+  initialPageSize,
   withOuterBorder,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
@@ -357,7 +357,7 @@ export const OrdersTable = ({
           })
         )
       }
-      columns={columnKeys.map((key: OrdersTableColumnKey, index: number) =>
+      columns={columnKeys.map((key: OrdersTableColumnKey) =>
         getOrdersTableColumnDef({
           key,
           dispatch,
@@ -374,7 +374,7 @@ export const OrdersTable = ({
           <h4>{stringGetter({ key: STRING_KEYS.ORDERS_EMPTY_STATE })}</h4>
         </>
       }
-      viewMoreConfig={viewMoreConfig}
+      initialPageSize={initialPageSize}
       withOuterBorder={withOuterBorder}
       withInnerBorders
       withScrollSnapColumns

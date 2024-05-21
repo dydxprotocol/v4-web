@@ -60,14 +60,20 @@ export const getStringsForTimeInterval = (timeInterval: Duration) => {
 export const getTimeTillNextUnit = (unit: 'minute' | 'hour' | 'day') => {
   const now = new Date();
   switch (unit) {
-    case 'minute':
+    case 'minute': {
       return 60 - now.getSeconds();
-    case 'hour':
+    }
+    case 'hour': {
       return 3600 - (now.getMinutes() * 60 + now.getSeconds());
-    case 'day':
+    }
+    case 'day': {
       const secondsTillNextHour = 3600 - (now.getMinutes() * 60 + now.getSeconds());
       const hoursTillNextDay = 24 - (now.getHours() + 1);
       return secondsTillNextHour + hoursTillNextDay * 3600;
+    }
+    default: {
+      return undefined;
+    }
   }
 };
 
