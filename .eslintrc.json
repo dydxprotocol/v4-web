@@ -44,6 +44,7 @@
     "no-use-before-define": "off",
     "prefer-destructuring": "off",
     "prettier/prettier": "error",
+    "react/display-name": "off",
     "react/forbid-prop-types": "off",
     "react/function-component-definition": [
       "error",

@@ -26,7 +26,8 @@ const getMidMarketPriceColor = ({
 }) => {
   if (MustBigNumber(midMarketPrice).lt(MustBigNumber(lastMidMarketPrice))) {
     return 'var(--color-negative)';
-  } else if (MustBigNumber(midMarketPrice).gt(MustBigNumber(lastMidMarketPrice))) {
+  }
+  if (MustBigNumber(midMarketPrice).gt(MustBigNumber(lastMidMarketPrice))) {
     return 'var(--color-positive)';
   }
 

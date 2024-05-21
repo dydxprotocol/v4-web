@@ -74,6 +74,7 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
           <$BillboardContainer key={key}>
             <$BillboardStat>
               <$BillboardTitle>
+                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                 <label>{stringGetter({ key: labelKey })}</label>
                 <Tag>{stringGetter({ key: tagKey })}</Tag>
               </$BillboardTitle>
@@ -102,7 +103,7 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
                   data={chartData}
                   xAccessor={(datum) => datum.x}
                   yAccessor={(datum) => datum.y}
-                  positive={true}
+                  positive
                 />
               </$BillboardChart>
             ) : (
