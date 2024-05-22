@@ -45,7 +45,7 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
         notionalTotal={notionalTotal?.current}
         postOrderSize={positionSize?.postOrder}
         stepSizeDecimals={stepSizeDecimals}
-        symbol={id ?? undefined}
+        symbol={id}
         tickSizeDecimals={tickSizeDecimals}
         showNarrowVariation={showNarrowVariation}
       />

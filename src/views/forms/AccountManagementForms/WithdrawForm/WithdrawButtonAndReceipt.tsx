@@ -138,7 +138,7 @@ export const WithdrawButtonAndReceipt = ({
       key: 'estimated-route-duration',
       label: <span>{stringGetter({ key: STRING_KEYS.ESTIMATED_TIME })}</span>,
       value:
-        summary != null && typeof summary?.estimatedRouteDuration === 'number' ? (
+        summary != null && typeof summary.estimatedRouteDuration === 'number' ? (
           <Output
             type={OutputType.Text}
             value={stringGetter({
