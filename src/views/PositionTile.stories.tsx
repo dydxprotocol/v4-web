@@ -1,7 +1,7 @@
 import type { Story } from '@ladle/react';
 import styled from 'styled-components';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 
 import { PositionTile } from './PositionTile';
 import { StoryWrapper } from '.ladle/components';

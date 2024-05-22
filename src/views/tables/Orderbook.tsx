@@ -11,13 +11,13 @@ import { ORDERBOOK_MAX_ROWS_PER_SIDE } from '@/constants/orderbook';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
-import { ColumnDef, TableRow, type CustomRowConfig } from '@/components/Table';
+import { CustomRowConfig, ColumnDef, TableRow } from '@/components/Table';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';

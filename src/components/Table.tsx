@@ -30,7 +30,7 @@ import styled, { css } from 'styled-components';
 import { MediaQueryKeys, useBreakpoints } from '@/hooks/useBreakpoints';
 import { useTablePagination } from '@/hooks/useTablePagination';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { MustBigNumber } from '@/lib/numbers';

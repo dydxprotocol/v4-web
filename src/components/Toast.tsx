@@ -5,7 +5,7 @@ import styled, { keyframes } from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { popoverMixins } from '@/styles/popoverMixins';
 
 import { Notification, type NotificationProps } from '@/components/Notification';
