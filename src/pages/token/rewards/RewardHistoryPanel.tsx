@@ -8,8 +8,8 @@ import {
   HistoricalTradingRewardsPeriods,
 } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
-import { isMainnet } from '@/constants/networks';
 
+import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -23,11 +23,9 @@ import { TradingRewardHistoryTable } from '@/views/tables/TradingRewardHistoryTa
 
 import abacusStateManager from '@/lib/abacus';
 
-// TODO: set in env featureFlag config
-const REWARDS_HISTORY_START_DATE_MS = isMainnet ? 1706486400000 : 1704844800000;
-
 export const RewardHistoryPanel = () => {
   const stringGetter = useStringGetter();
+  const rewardsHistoryStartDate = useEnvConfig('rewardsHistoryStartDateMs');
 
   const [selectedPeriod, setSelectedPeriod] = useState<HistoricalTradingRewardsPeriods>(
     abacusStateManager.getHistoricalTradingRewardPeriod() || HistoricalTradingRewardsPeriod.WEEKLY
@@ -57,7 +55,7 @@ export const RewardHistoryPanel = () => {
                   REWARDS_HISTORY_START_DATE: (
                     <$Output
                       type={OutputType.Date}
-                      value={REWARDS_HISTORY_START_DATE_MS}
+                      value={Number(rewardsHistoryStartDate)}
                       timeOptions={{ useUTC: true }}
                     />
                   ),
