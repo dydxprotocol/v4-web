@@ -2,7 +2,7 @@ import Abacus, { kollections } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { STRING_KEYS } from './localization';
-import { PositionSide, TradeTypes } from './trade';
+import { TradeTypes } from './trade';
 
 export type Nullable<T> = T | null | undefined;
 
@@ -51,7 +51,6 @@ export type AbacusLoggingProtocol = Omit<
   '__doNotUseOrImplementIt'
 >;
 
-export type FileLocation = Abacus.exchange.dydx.abacus.protocols.FileLocation;
 export type ThreadingType = Abacus.exchange.dydx.abacus.protocols.ThreadingType;
 export const CoroutineTimer = Abacus.exchange.dydx.abacus.utils.CoroutineTimer;
 
@@ -67,8 +66,6 @@ export type TransactionTypes = (typeof transactionTypes)[number];
 // ------ State ------
 export type AbacusApiState = Abacus.exchange.dydx.abacus.state.manager.ApiState;
 export const AbacusApiStatus = Abacus.exchange.dydx.abacus.state.manager.ApiStatus;
-const abacusApiStatuses = [...AbacusApiStatus.values()];
-export type AbacusApiStatuses = (typeof abacusApiStatuses)[number];
 export const Changes = Abacus.exchange.dydx.abacus.state.changes.Changes;
 export type PerpetualStateChanges = Abacus.exchange.dydx.abacus.state.changes.StateChanges;
 export const AsyncAbacusStateManager =
@@ -77,19 +74,11 @@ export const AsyncAbacusStateManager =
 // ------ Parsing Errors ------ //
 export type ParsingError = Abacus.exchange.dydx.abacus.responses.ParsingError;
 export type ParsingErrors = kollections.List<ParsingError>;
-export const ParsingErrorType = Abacus.exchange.dydx.abacus.responses.ParsingErrorType;
-const parsingErrorTypes = [...ParsingErrorType.values()] as const;
-export type ParsingErrorTypes = (typeof parsingErrorTypes)[number];
 
 // ------ Perpetuals/Markets ------ //
 export type PerpetualState = Abacus.exchange.dydx.abacus.output.PerpetualState;
-export type MarketCandles = Abacus.exchange.dydx.abacus.output.MarketCandles;
 export type MarketOrderbook = Abacus.exchange.dydx.abacus.output.MarketOrderbook;
-export type MarketPerpetual = Abacus.exchange.dydx.abacus.output.MarketPerpetual;
-export type MarketStatus = Abacus.exchange.dydx.abacus.output.MarketStatus;
 export type MarketTrade = Abacus.exchange.dydx.abacus.output.MarketTrade;
-export type MarketTrades = kollections.List<Abacus.exchange.dydx.abacus.output.MarketTrade>;
-export type MarketsSummary = Partial<Abacus.exchange.dydx.abacus.output.PerpetualMarketSummary>;
 export type OrderbookLine = Abacus.exchange.dydx.abacus.output.OrderbookLine;
 export type PerpetualMarket = Abacus.exchange.dydx.abacus.output.PerpetualMarket;
 export type MarketHistoricalFunding = Abacus.exchange.dydx.abacus.output.MarketHistoricalFunding;
@@ -97,14 +86,11 @@ export type MarketHistoricalFunding = Abacus.exchange.dydx.abacus.output.MarketH
 // ------ Configs ------ //
 export type Configs = Abacus.exchange.dydx.abacus.output.Configs;
 export type FeeDiscount = Abacus.exchange.dydx.abacus.output.FeeDiscount;
-export type FeeDiscountResources = Abacus.exchange.dydx.abacus.output.FeeDiscountResources;
 export type FeeTier = Abacus.exchange.dydx.abacus.output.FeeTier;
-export type FeeTierResources = Abacus.exchange.dydx.abacus.output.FeeTierResources;
 export type NetworkConfigs = Abacus.exchange.dydx.abacus.output.NetworkConfigs;
 
 // ------ Assets ------ //
 export type Asset = Abacus.exchange.dydx.abacus.output.Asset;
-export type AssetResources = Abacus.exchange.dydx.abacus.output.AssetResources;
 
 // ------ Inputs ------ //
 export type Inputs = Abacus.exchange.dydx.abacus.output.input.Input;
@@ -116,11 +102,7 @@ export type TriggerOrdersInputs = Abacus.exchange.dydx.abacus.output.input.Trigg
 export type InputError = Abacus.exchange.dydx.abacus.output.input.ValidationError;
 export type TransferInputTokenResource =
   Abacus.exchange.dydx.abacus.output.input.TransferInputTokenResource;
-export type TransferInputChainResource =
-  Abacus.exchange.dydx.abacus.output.input.TransferInputChainResource;
-export type SelectionOption = Abacus.exchange.dydx.abacus.output.input.SelectionOption;
 export const ErrorType = Abacus.exchange.dydx.abacus.output.input.ErrorType;
-export const InputSelectionOption = Abacus.exchange.dydx.abacus.output.input.SelectionOption;
 
 // ------ Wallet ------ //
 export type Wallet = Abacus.exchange.dydx.abacus.output.Wallet;
@@ -148,7 +130,6 @@ export type SubaccountTransfer = Abacus.exchange.dydx.abacus.output.SubaccountTr
 export type SubaccountTransfers = Abacus.exchange.dydx.abacus.output.SubaccountTransfer[];
 
 // ------ Historical PnL ------ //
-export type SubAccountHistoricalPNL = Abacus.exchange.dydx.abacus.output.SubaccountHistoricalPNL;
 export type SubAccountHistoricalPNLs = Abacus.exchange.dydx.abacus.output.SubaccountHistoricalPNL[];
 export const HistoricalPnlPeriod = Abacus.exchange.dydx.abacus.state.manager.HistoricalPnlPeriod;
 const historicalPnlPeriod = [...HistoricalPnlPeriod.values()] as const;
@@ -160,8 +141,6 @@ const transferInputFields = [...TransferInputField.values()] as const;
 export type TransferInputFields = (typeof transferInputFields)[number];
 
 export const TransferType = Abacus.exchange.dydx.abacus.output.input.TransferType;
-const transferTypes = [...TransferType.values()] as const;
-export type TransferTypes = (typeof transferTypes)[number];
 
 // ------ Trade Items ------ //
 export const TradeInputField = Abacus.exchange.dydx.abacus.state.model.TradeInputField;
@@ -186,16 +165,13 @@ export const TriggerOrdersInputField =
 const triggerOrdersInputFields = [...TriggerOrdersInputField.values()] as const;
 export type TriggerOrdersInputFields = (typeof triggerOrdersInputFields)[number];
 export type TriggerOrdersInputPrice = Abacus.exchange.dydx.abacus.output.input.TriggerPrice;
-export type TriggerOrdersTriggerOrder = Abacus.exchange.dydx.abacus.output.input.TriggerOrder;
 
 export type ValidationError = Abacus.exchange.dydx.abacus.output.input.ValidationError;
 export const TradeInputErrorAction = Abacus.exchange.dydx.abacus.output.input.ErrorAction;
 export type AbacusOrderTypes = Abacus.exchange.dydx.abacus.output.input.OrderType;
 export type AbacusOrderSides = Abacus.exchange.dydx.abacus.output.input.OrderSide;
-export type AbacusOrderTimeInForces = Abacus.exchange.dydx.abacus.output.input.OrderTimeInForce;
 export const AbacusOrderType = Abacus.exchange.dydx.abacus.output.input.OrderType;
 export const AbacusOrderSide = Abacus.exchange.dydx.abacus.output.input.OrderSide;
-export const AbacusOrderTimeInForce = Abacus.exchange.dydx.abacus.output.input.OrderTimeInForce;
 
 export const AbacusPositionSide = Abacus.exchange.dydx.abacus.output.PositionSide;
 export type AbacusPositionSides = Abacus.exchange.dydx.abacus.output.PositionSide;
@@ -216,7 +192,7 @@ export type HumanReadableTransferPayload =
 // ------ Helpers ------ //
 export const AbacusHelper = Abacus.exchange.dydx.abacus.utils.AbacusHelper;
 
-export const RiskLevel = Abacus.exchange.dydx.abacus.utils.RiskLevel;
+const RiskLevel = Abacus.exchange.dydx.abacus.utils.RiskLevel;
 const riskLevels = [...RiskLevel.values()] as const;
 export type RiskLevels = (typeof riskLevels)[number];
 
@@ -226,8 +202,6 @@ export type AbacusNotification = Abacus.exchange.dydx.abacus.output.Notification
 // ------ Restrictions ------ //
 export type UsageRestriction = Abacus.exchange.dydx.abacus.output.UsageRestriction;
 export const RestrictionType = Abacus.exchange.dydx.abacus.output.Restriction;
-const restrictionTypes = [...RestrictionType.values()] as const;
-export type RestrictionTypes = (typeof restrictionTypes)[number];
 
 // ------ Compliance ------ //
 export const ComplianceStatus = Abacus.exchange.dydx.abacus.output.ComplianceStatus;
@@ -253,12 +227,6 @@ export const ORDER_SIDES: Record<KotlinIrEnumValues<typeof AbacusOrderSide>, Ord
   [AbacusOrderSide.sell.name]: OrderSide.SELL,
   [AbacusOrderSide.buy.rawValue]: OrderSide.BUY,
   [AbacusOrderSide.sell.rawValue]: OrderSide.SELL,
-};
-
-export const POSITION_SIDES: Record<KotlinIrEnumValues<typeof AbacusPositionSide>, PositionSide> = {
-  [AbacusPositionSide.LONG.name]: PositionSide.Long,
-  [AbacusPositionSide.SHORT.name]: PositionSide.Short,
-  [AbacusPositionSide.NONE.name]: PositionSide.None,
 };
 
 export const HISTORICAL_PNL_PERIODS: Record<

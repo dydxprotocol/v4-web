@@ -27,7 +27,7 @@ const complianceStatusOptions = [
   { status: ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY, label: 'First Strike Close Only' },
 ];
 
-export const usePreferenceMenu = () => {
+const usePreferenceMenu = () => {
   const dispatch = useDispatch();
 
   const complianceStatus = useSelector(getComplianceStatus, shallowEqual);

@@ -71,7 +71,7 @@ const getStatusErrorMessage = ({
   return null;
 };
 
-export const getIndexerHeight = (apiState: Nullable<AbacusApiState>) => {
+const getIndexerHeight = (apiState: Nullable<AbacusApiState>) => {
   const { haltedBlock, trailingBlocks, status, height } = apiState ?? {};
 
   switch (status) {

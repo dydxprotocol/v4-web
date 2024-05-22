@@ -37,8 +37,6 @@ export const SingleSessionNotificationTypes = [
   NotificationType.OrderStatus,
 ];
 
-export enum NotificationComponentType {}
-
 export type NotificationId = string | number;
 
 export type NotificationTypeConfig<

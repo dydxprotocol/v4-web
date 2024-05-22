@@ -6,7 +6,6 @@ export enum TagSize {
 }
 
 export enum TagType {
-  Asset = 'Asset',
   Side = 'Side',
   Number = 'Number',
 }
