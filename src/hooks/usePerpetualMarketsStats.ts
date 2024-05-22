@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { getChainRevenue } from '@/services';
+import { getChainRevenue } from '@/services/numia';
 import { useQuery } from 'react-query';
 import { shallowEqual, useSelector } from 'react-redux';
 

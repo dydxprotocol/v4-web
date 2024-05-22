@@ -22,7 +22,7 @@ import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
-import { TableCell } from '@/components/Table';
+import { TableCell } from '@/components/Table/TableCell';
 import { WithHovercard } from '@/components/WithHovercard';
 
 import { openDialog } from '@/state/dialogs';

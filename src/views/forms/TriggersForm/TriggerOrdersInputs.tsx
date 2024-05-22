@@ -23,7 +23,7 @@ export const TriggerOrdersInputs = ({
   onViewOrdersClick,
 }: ElementProps) => {
   const { stopLossOrder, takeProfitOrder } =
-    useSelector(getTriggerOrdersInputs, shallowEqual) || {};
+    useSelector(getTriggerOrdersInputs, shallowEqual) ?? {};
 
   return (
     <>

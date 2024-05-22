@@ -1,3 +1,4 @@
+import { OrderFlags } from '@dydxprotocol/v4-client-js';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
@@ -39,6 +40,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
   const selectedLocale = useSelector(getSelectedLocale);
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
   const localCancelOrders = useSelector(getLocalCancelOrders, shallowEqual);
+
   const { cancelOrder } = useSubaccount();
 
   const localCancelOrder = localCancelOrders.find((order) => order.orderId === orderId);
@@ -64,6 +66,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     trailingPercent,
     triggerPrice,
     type,
+    orderFlags,
   } = (useSelector(getOrderDetails(orderId)) as OrderTableRow) ?? {};
 
   const renderOrderPrice = ({
@@ -180,6 +183,10 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     setIsOpen?.(false);
   };
 
+  const isShortTermOrder = orderFlags === OrderFlags.SHORT_TERM;
+  const isBestEffortCanceled = status === AbacusOrderStatus.canceling;
+  const isCancelDisabled = !!isOrderCanceling || (isShortTermOrder && isBestEffortCanceled);
+
   return (
     <DetailsDialog
       slotIcon={<$AssetIcon symbol={asset?.id} />}
@@ -191,7 +198,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
           <Button
             action={ButtonAction.Destroy}
             state={{
-              isDisabled: !!isOrderCanceling || status === AbacusOrderStatus.canceling,
+              isDisabled: isCancelDisabled,
               isLoading: isOrderCanceling,
             }}
             onClick={onCancelClick}

@@ -238,6 +238,7 @@ const useDydxClientContext = () => {
     let toIso = new Date(toMs).toISOString();
     const candlesInRange: Candle[] = [];
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       // eslint-disable-next-line no-await-in-loop
       const candles = await requestCandles({

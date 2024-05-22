@@ -53,7 +53,7 @@ export const Tag = styled.span<StyleProps>`
 
         font: var(--font-mini-book);
       `,
-    }[size || TagSize.Small])}
+    }[size ?? TagSize.Small])}
 
   ${({ sign }) =>
     sign !== undefined &&

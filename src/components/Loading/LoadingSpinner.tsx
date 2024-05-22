@@ -2,13 +2,18 @@ import styled, { keyframes } from 'styled-components';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-// In some strange cases, hiding a spinner on one part of the page causes the linearGradient to
-// be hidden on all other instances of the page. An id can be passed in to prevent this.
-export const LoadingSpinner: React.FC<{
+type LoadingSpinnerProps = {
   id?: string;
   className?: string;
   disabled?: boolean;
-}> = ({ id, className, disabled = false }) => {
+};
+// In some strange cases, hiding a spinner on one part of the page causes the linearGradient to
+// be hidden on all other instances of the page. An id can be passed in to prevent this.
+export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
+  id,
+  className,
+  disabled = false,
+}: LoadingSpinnerProps) => {
   return (
     <$Spinner className={className}>
       <$LoadingSpinnerSvg
@@ -40,7 +45,8 @@ export const LoadingSpinner: React.FC<{
   );
 };
 
-export const LoadingSpace: React.FC<{ className?: string; id: string }> = ({ className, id }) => (
+type LoadingSpaceProps = { className?: string; id: string };
+export const LoadingSpace: React.FC<LoadingSpaceProps> = ({ className, id }: LoadingSpaceProps) => (
   <$LoadingSpaceContainer className={className}>
     <LoadingSpinner id={id} />
   </$LoadingSpaceContainer>

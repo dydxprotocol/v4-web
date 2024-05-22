@@ -16,7 +16,7 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
@@ -24,13 +24,10 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
-import {
-  MarketTableCell,
-  Table,
-  TableCell,
-  TableColumnHeader,
-  type ColumnDef,
-} from '@/components/Table';
+import { ColumnDef, Table } from '@/components/Table';
+import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import { TableCell } from '@/components/Table/TableCell';
+import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
@@ -213,8 +210,13 @@ const getOrdersTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.ACTION }),
         isActionable: true,
         allowsSorting: false,
-        renderCell: ({ id, status }) => (
-          <OrderActionsCell orderId={id} status={status} isDisabled={isAccountViewOnly} />
+        renderCell: ({ id, status, orderFlags }) => (
+          <OrderActionsCell
+            orderId={id}
+            status={status}
+            orderFlags={orderFlags}
+            isDisabled={isAccountViewOnly}
+          />
         ),
       },
       [OrdersTableColumnKey.StatusFill]: {

@@ -47,7 +47,7 @@ export const TriggersForm = ({
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
 
   const { asset, entryPrice, size, stepSizeDecimals, tickSizeDecimals, oraclePrice } =
-    useSelector(getPositionDetails(marketId)) || {};
+    useSelector(getPositionDetails(marketId)) ?? {};
 
   const {
     differingOrderSizes,
@@ -135,7 +135,7 @@ export const TriggersForm = ({
             <$Button
               action={ButtonAction.Primary}
               type={ButtonType.Submit}
-              state={{ isDisabled: hasInputErrors || isAccountViewOnly }}
+              state={{ isDisabled: !!hasInputErrors || !!isAccountViewOnly }}
               slotLeft={hasInputErrors ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
             >
               {hasInputErrors

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { PropsWithChildren, useRef } from 'react';
 
 import {
   Close,
@@ -15,7 +15,7 @@ import styled, { css, keyframes } from 'styled-components';
 
 import { useDialogArea } from '@/hooks/useDialogArea';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { BackButton } from '@/components/BackButton';
@@ -58,19 +58,14 @@ const DialogPortal = ({
   withPortal,
   container,
   children,
-}: {
+}: PropsWithChildren<{
   withPortal: boolean;
   container?: HTMLElement;
-  children: React.ReactNode;
-}) => {
+}>) => {
   const {
     dialogAreaRef: { current },
   } = useDialogArea() ?? { dialogAreaRef: {} };
-  return withPortal ? (
-    <Portal container={container ?? current}>{children}</Portal>
-  ) : (
-    <>{children}</>
-  );
+  return withPortal ? <Portal container={container ?? current}>{children}</Portal> : children;
 };
 
 export const Dialog = ({

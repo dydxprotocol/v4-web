@@ -40,30 +40,28 @@ export const WithSeparators = ({
   layout: 'column' | 'row';
   children: React.ReactNode;
   withSeparators?: boolean;
-}) => (
-  <>
-    {withSeparators
-      ? [children].flat().map((child, i, { length }) => (
-          <Fragment key={i}>
-            {child}
-            {i < length - 1 && (
-              <StyledSeparator
-                orientation={
-                  (
-                    {
-                      column: 'horizontal',
-                      row: 'vertical',
-                    } as const
-                  )[layout]
-                }
-                decorative
-              />
-            )}
-          </Fragment>
-        ))
-      : children}
-  </>
-);
+}) =>
+  withSeparators
+    ? [children].flat().map((child, i, { length }) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <Fragment key={i}>
+          {child}
+          {i < length - 1 && (
+            <StyledSeparator
+              orientation={
+                (
+                  {
+                    column: 'horizontal',
+                    row: 'vertical',
+                  } as const
+                )[layout]
+              }
+              decorative
+            />
+          )}
+        </Fragment>
+      ))
+    : children;
 
 const StyledHorizontalSeparatorFiller = styled(Separator)`
   flex: 1;
