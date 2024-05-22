@@ -16,7 +16,9 @@ import { Button } from '@/components/Button';
 import { CopyButton } from '@/components/CopyButton';
 import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
-import { ColumnDef, Table, TableCell, TableColumnHeader } from '@/components/Table';
+import { ColumnDef, Table } from '@/components/Table';
+import { TableCell } from '@/components/Table/TableCell';
+import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 

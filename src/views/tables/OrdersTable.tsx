@@ -24,13 +24,10 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
-import {
-  ColumnDef,
-  MarketTableCell,
-  Table,
-  TableCell,
-  TableColumnHeader,
-} from '@/components/Table';
+import { ColumnDef, Table } from '@/components/Table';
+import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import { TableCell } from '@/components/Table/TableCell';
+import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
