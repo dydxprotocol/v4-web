@@ -6,11 +6,12 @@ import {
   Row,
   TableBody,
   TableHeader,
+  TableStateProps,
   useTableState,
   type TableState,
 } from '@react-stately/table';
 import { type GridNode } from '@react-types/grid';
-import type { CollectionChildren, Node, SortDescriptor, SortDirection } from '@react-types/shared';
+import type { Node, SortDescriptor, SortDirection } from '@react-types/shared';
 import { type ColumnSize, type TableCollection } from '@react-types/table';
 import { isFunction } from 'lodash';
 import {
@@ -308,8 +309,7 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
     rowIndex?: number
   ) => Record<string, string | number | Record<string, string | number>>;
   onRowAction?: (key: Key) => void;
-  children: CollectionChildren<TableRowData>;
-
+  children: TableStateProps<TableRowData>['children'];
   numColumns: number;
   paginationRow?: React.ReactNode;
 
