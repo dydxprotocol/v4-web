@@ -24,6 +24,7 @@ import {
   CoroutineTimer,
   HistoricalPnlPeriod,
   IOImplementations,
+  OnboardingConfig,
   TradeInputField,
   TransferInputField,
   TransferType,
@@ -96,12 +97,8 @@ class AbacusStateManager {
       this.abacusFormatter
     );
 
-    const appConfigs = new AbacusAppConfig(
-      false, // subscribeToCandles
-      true, // loadRemote
-      import.meta.env.MODE === 'development' && import.meta.env.VITE_ENABLE_ABACUS_LOGGING // enableLogger
-    );
-    appConfigs.squidVersion = AbacusAppConfig.SquidVersion.V2;
+    const appConfigs = AbacusAppConfig.Companion.forWeb;
+    appConfigs.onboardingConfigs.squidVersion = OnboardingConfig.SquidVersion.V2;
 
     this.stateManager = new AsyncAbacusStateManager(
       '',
