@@ -2,20 +2,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { type SubaccountOrder } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';
-import { ComplianceStates } from '@/constants/compliance';
-import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
+import { TradeBoxDialogTypes } from '@/constants/dialogs';
 import { AppRoute } from '@/constants/routes';
-
-import { useComplianceState } from '@/hooks/useComplianceState';
-import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { ActionsTableCell } from '@/components/Table';
 
-import { closeDialogInTradeBox, openDialog, openDialogInTradeBox } from '@/state/dialogs';
+import { closeDialogInTradeBox, openDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
@@ -23,27 +18,17 @@ import abacusStateManager from '@/lib/abacus';
 
 type ElementProps = {
   marketId: string;
-  assetId: string;
-  stopLossOrders: SubaccountOrder[];
-  takeProfitOrders: SubaccountOrder[];
   isDisabled?: boolean;
   showClosePositionAction: boolean;
-  navigateToMarketOrders: (market: string) => void;
 };
 
 export const PositionsActionsCell = ({
   marketId,
-  assetId,
-  stopLossOrders,
-  takeProfitOrders,
   isDisabled,
   showClosePositionAction,
-  navigateToMarketOrders,
 }: ElementProps) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { complianceState } = useComplianceState();
-  const { isSlTpEnabled } = useEnvFeatures();
 
   const currentMarketId = useSelector(getCurrentMarketId);
   const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog);
@@ -66,28 +51,6 @@ export const PositionsActionsCell = ({
 
   return (
     <ActionsTableCell>
-      {isSlTpEnabled && complianceState === ComplianceStates.FULL_ACCESS && (
-        <$TriggersButton
-          key="edittriggers"
-          onClick={() =>
-            dispatch(
-              openDialog({
-                type: DialogTypes.Triggers,
-                dialogProps: {
-                  marketId,
-                  assetId,
-                  stopLossOrders,
-                  takeProfitOrders,
-                  navigateToMarketOrders,
-                },
-              })
-            )
-          }
-          iconName={IconName.Pencil}
-          shape={ButtonShape.Square}
-          disabled={isDisabled}
-        />
-      )}
       {showClosePositionAction && (
         <$CloseButtonToggle
           key="closepositions"
@@ -104,11 +67,6 @@ export const PositionsActionsCell = ({
     </ActionsTableCell>
   );
 };
-const $TriggersButton = styled(IconButton)`
-  --button-icon-size: 1.33em;
-  --button-textColor: var(--color-text-0);
-  --button-hover-textColor: var(--color-text-1);
-`;
 
 const $CloseButtonToggle = styled(IconButton)`
   --button-icon-size: 1em;

@@ -332,25 +332,16 @@ const getPositionsTableColumnDef = ({
       [PositionsTableColumnKey.Actions]: {
         columnKey: 'actions',
         label: stringGetter({
-          key:
-            shouldRenderTriggers && showClosePositionAction
-              ? STRING_KEYS.ACTIONS
-              : showClosePositionAction
-              ? STRING_KEYS.CLOSE
-              : STRING_KEYS.ACTION,
+          key: showClosePositionAction ? STRING_KEYS.CLOSE : STRING_KEYS.ACTION,
         }),
         isActionable: true,
         allowsSorting: false,
         hideOnBreakpoint: MediaQueryKeys.isTablet,
-        renderCell: ({ id, assetId, stopLossOrders, takeProfitOrders }) => (
+        renderCell: ({ id }) => (
           <PositionsActionsCell
             marketId={id}
-            assetId={assetId}
             isDisabled={isAccountViewOnly}
             showClosePositionAction={showClosePositionAction}
-            stopLossOrders={stopLossOrders}
-            takeProfitOrders={takeProfitOrders}
-            navigateToMarketOrders={navigateToOrders}
           />
         ),
       },
