@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DiffArrow, type DiffArrowProps } from '@/components/DiffArrow';
-import { Output, OutputType, type OutputProps } from '@/components/Output';
+import { Output, type OutputProps } from '@/components/Output';
 
 import { BigNumberish } from '@/lib/numbers';
 
