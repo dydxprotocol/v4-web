@@ -18,6 +18,7 @@ export type AccordionProps = {
 export const Accordion = ({ items, className }: AccordionProps) => (
   <$Root className={className} type="single" collapsible>
     {items.map(({ header, content }, idx) => (
+      // eslint-disable-next-line react/no-array-index-key
       <$Item key={idx} value={idx.toString()}>
         <Header>
           <$Trigger>

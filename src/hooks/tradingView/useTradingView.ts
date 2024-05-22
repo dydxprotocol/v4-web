@@ -14,8 +14,6 @@ import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS, SUPPORTED_LOCALE_BASE_TAGS } from '@/constants/localization';
 import type { TvWidget } from '@/constants/tvchart';
 
-import { useDydxClient, useLocalStorage, useStringGetter } from '@/hooks';
-
 import { store } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
 import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
@@ -24,6 +22,10 @@ import { getCurrentMarketId, getMarketIds } from '@/state/perpetualsSelectors';
 
 import { getDydxDatafeed } from '@/lib/tradingView/dydxfeed';
 import { getSavedResolution, getWidgetOptions, getWidgetOverrides } from '@/lib/tradingView/utils';
+
+import { useDydxClient } from '../useDydxClient';
+import { useLocalStorage } from '../useLocalStorage';
+import { useStringGetter } from '../useStringGetter';
 
 /**
  * @description Hook to initialize TradingView Chart

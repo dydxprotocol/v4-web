@@ -6,7 +6,8 @@ import { AlertType } from '@/constants/alerts';
 import { STRING_KEYS } from '@/constants/localization';
 import { TransferNotifcation, TransferNotificationTypes } from '@/constants/notifications';
 
-import { useInterval, useStringGetter } from '@/hooks';
+import { useInterval } from '@/hooks/useInterval';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -14,6 +15,7 @@ import { AlertMessage } from '@/components/AlertMessage';
 import { Collapsible } from '@/components/Collapsible';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingDots } from '@/components/Loading/LoadingDots';
+// eslint-disable-next-line import/no-cycle
 import { Notification, NotificationProps } from '@/components/Notification';
 import { Output, OutputType } from '@/components/Output';
 import { WithReceipt } from '@/components/WithReceipt';
@@ -33,7 +35,6 @@ export const TransferStatusNotification = ({
   notification,
   slotIcon,
   slotTitle,
-  slotDescription,
   transfer,
   type,
   triggeredAt = Date.now(),
@@ -41,15 +42,15 @@ export const TransferStatusNotification = ({
   const stringGetter = useStringGetter();
   const [open, setOpen] = useState<boolean>(false);
   const [secondsLeft, setSecondsLeft] = useState<number>(0);
-  const { fromChainId, status, txHash, toAmount, isExchange } = transfer;
+  const { status, toAmount, isExchange } = transfer;
 
   // @ts-ignore status.errors is not in the type definition but can be returned
   const error = status?.errors?.length ? status?.errors[0] : status?.error;
   const hasError = error && Object.keys(error).length !== 0;
 
   const updateSecondsLeft = useCallback(() => {
-    const fromChainEta = (status?.fromChain?.chainData?.estimatedRouteDuration || 0) * 1000;
-    const toChainEta = (status?.toChain?.chainData?.estimatedRouteDuration || 0) * 1000;
+    const fromChainEta = (status?.fromChain?.chainData?.estimatedRouteDuration ?? 0) * 1000;
+    const toChainEta = (status?.toChain?.chainData?.estimatedRouteDuration ?? 0) * 1000;
     setSecondsLeft(Math.floor((triggeredAt + fromChainEta + toChainEta - Date.now()) / 1000));
   }, [status]);
 
@@ -181,12 +182,6 @@ const $InlineOutput = styled(Output)`
   display: inline-block;
 
   color: var(--color-text-1);
-`;
-
-const $Step = styled.div`
-  ${layoutMixins.row};
-
-  gap: 0.5rem;
 `;
 
 const $TransferStatusSteps = styled(TransferStatusSteps)`

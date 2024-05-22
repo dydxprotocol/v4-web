@@ -20,8 +20,8 @@ import styled, { keyframes } from 'styled-components';
 
 import { allTimeUnits } from '@/constants/time';
 
-import { useBreakpoints } from '@/hooks';
 import { useAnimationFrame } from '@/hooks/useAnimationFrame';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -44,7 +44,6 @@ type GlyphSeriesProps<Datum extends {} = {}> = Parameters<
 type ThresholdProps<Datum extends {} = {}> = Parameters<typeof Threshold<Datum>>[0];
 
 type ElementProps<Datum extends {}> = {
-  id: string;
   selectedLocale: string;
   yAxisOrientation?: 'right' | 'left';
   yAxisScaleType?: ScaleConfig['type'];
@@ -96,13 +95,12 @@ type StyleProps = {
 };
 
 export const TimeSeriesChart = <Datum extends {}>({
-  id,
   selectedLocale,
   yAxisOrientation = 'left',
   yAxisScaleType = 'linear',
   data,
   series,
-  tickFormatX = (timestamp, { zoomDomain, numTicks }) =>
+  tickFormatX = (timestamp, { zoomDomain }) =>
     formatAbsoluteTime(timestamp, {
       resolutionUnit:
         objectEntries(allTimeUnits)
@@ -160,14 +158,14 @@ export const TimeSeriesChart = <Datum extends {}>({
   useAnimationFrame(
     (elapsedMilliseconds) => {
       if (zoomDomainAnimateTo) {
-        setZoomDomain((zoomDomain) => {
-          if (!zoomDomain) return zoomDomain;
+        setZoomDomain((oldZoomDomain) => {
+          if (!oldZoomDomain) return oldZoomDomain;
 
           const newZoomDomain =
-            zoomDomain * (zoomDomainAnimateTo / zoomDomain) ** (elapsedMilliseconds * 0.01);
+            oldZoomDomain * (zoomDomainAnimateTo / oldZoomDomain) ** (elapsedMilliseconds * 0.01);
 
           // clamp according to direction
-          return zoomDomainAnimateTo > zoomDomain
+          return zoomDomainAnimateTo > oldZoomDomain
             ? Math.min(newZoomDomain, zoomDomainAnimateTo)
             : Math.max(newZoomDomain, zoomDomainAnimateTo);
         });
@@ -177,7 +175,7 @@ export const TimeSeriesChart = <Datum extends {}>({
   );
 
   // Computations
-  const { zoom, domain, range, visibleData } = useMemo(() => {
+  const calculatedValues = useMemo(() => {
     if (!zoomDomain)
       return {
         zoom: 1,
@@ -199,13 +197,15 @@ export const TimeSeriesChart = <Datum extends {}>({
 
     const range = visibleData
       .map((datum) => yAccessor(datum))
-      .reduce((range, y) => [Math.min(range[0], y), Math.max(range[1], y)] as const, [
+      .reduce((calcRange, y) => [Math.min(calcRange[0], y), Math.max(calcRange[1], y)] as const, [
         Infinity,
         -Infinity,
       ] as const);
 
     return { zoom, domain, range, visibleData };
   }, [data, zoomDomain, minZoomDomain]);
+
+  const { domain, range, visibleData, zoom } = calculatedValues;
 
   useEffect(() => {
     if (visibleData) {
@@ -214,7 +214,7 @@ export const TimeSeriesChart = <Datum extends {}>({
   }, [visibleData]);
 
   // Events
-  const onWheel = ({ deltaX, deltaY }: React.WheelEvent) => {
+  const onWheel = ({ deltaY }: React.WheelEvent) => {
     if (!zoomDomain) return;
 
     setZoomDomain(
@@ -257,6 +257,7 @@ export const TimeSeriesChart = <Datum extends {}>({
         >
           <EventEmitterProvider>
             <$ParentSize>
+              {/* eslint-disable-next-line react/no-unused-prop-types */}
               {({ width, height }: { width: number; height: number }) => {
                 const numTicksX =
                   (width - (margin?.left ?? 0) - (margin?.right ?? 0)) / tickSpacingX;
@@ -276,72 +277,74 @@ export const TimeSeriesChart = <Datum extends {}>({
                       }}
                     />
 
-                    {series.map((series) => (
-                      <React.Fragment key={series.dataKey}>
-                        {series.threshold && (
+                    {series.map((childSeries) => (
+                      <React.Fragment key={childSeries.dataKey}>
+                        {childSeries.threshold && (
                           <>
                             <XYChartThreshold<Datum>
                               id={`${Math.random()}`}
                               data={data}
-                              x={series.xAccessor}
-                              y0={series.yAccessor}
-                              y1={series.threshold.yAccessor}
+                              x={childSeries.xAccessor}
+                              y0={childSeries.yAccessor}
+                              y1={childSeries.threshold.yAccessor}
                               clipAboveTo={margin?.top ?? 0}
                               clipBelowTo={height - (margin?.bottom ?? 0)}
-                              curve={series.getCurve?.({ zoom, zoomDomain }) ?? series.curve}
+                              curve={
+                                childSeries.getCurve?.({ zoom, zoomDomain }) ?? childSeries.curve
+                              }
                               aboveAreaProps={{
                                 fill: 'url(#XYChartThresholdAbove)',
-                                fillOpacity: series.threshold.aboveAreaProps?.fillOpacity,
-                                strokeWidth: series.threshold.aboveAreaProps?.strokeWidth,
-                                stroke: series.threshold.aboveAreaProps?.stroke,
+                                fillOpacity: childSeries.threshold.aboveAreaProps?.fillOpacity,
+                                strokeWidth: childSeries.threshold.aboveAreaProps?.strokeWidth,
+                                stroke: childSeries.threshold.aboveAreaProps?.stroke,
                               }}
                               belowAreaProps={{
                                 fill: 'url(#XYChartThresholdBelow)',
-                                fillOpacity: series.threshold.belowAreaProps?.fillOpacity,
-                                strokeWidth: series.threshold.belowAreaProps?.strokeWidth,
-                                stroke: series.threshold.belowAreaProps?.stroke,
+                                fillOpacity: childSeries.threshold.belowAreaProps?.fillOpacity,
+                                strokeWidth: childSeries.threshold.belowAreaProps?.strokeWidth,
+                                stroke: childSeries.threshold.belowAreaProps?.stroke,
                               }}
                             />
                             <LinearGradient
                               id="XYChartThresholdAbove"
-                              from={series.threshold.aboveAreaProps?.fill}
-                              to={series.threshold.aboveAreaProps?.fill}
-                              toOpacity={series.threshold.aboveAreaProps?.fillOpacity}
+                              from={childSeries.threshold.aboveAreaProps?.fill}
+                              to={childSeries.threshold.aboveAreaProps?.fill}
+                              toOpacity={childSeries.threshold.aboveAreaProps?.fillOpacity}
                               toOffset={`${map(0, range[0], range[1], 100, 0)}%`}
                             />
                             <LinearGradient
                               id="XYChartThresholdBelow"
-                              from={series.threshold.belowAreaProps?.fill}
-                              fromOpacity={series.threshold.aboveAreaProps?.fillOpacity}
-                              to={series.threshold.belowAreaProps?.fill}
+                              from={childSeries.threshold.belowAreaProps?.fill}
+                              fromOpacity={childSeries.threshold.aboveAreaProps?.fillOpacity}
+                              to={childSeries.threshold.belowAreaProps?.fill}
                               fromOffset={`${map(0, range[0], range[1], 100, 0)}%`}
                             />
                           </>
                         )}
                         <LineSeries
-                          dataKey={`LineSeries-${series.dataKey}`}
+                          dataKey={`LineSeries-${childSeries.dataKey}`}
                           data={data}
-                          xAccessor={series.xAccessor}
-                          yAccessor={series.yAccessor}
-                          curve={series.getCurve?.({ zoom, zoomDomain }) ?? series.curve}
+                          xAccessor={childSeries.xAccessor}
+                          yAccessor={childSeries.yAccessor}
+                          curve={childSeries.getCurve?.({ zoom, zoomDomain }) ?? childSeries.curve}
                           colorAccessor={
-                            series.threshold ? () => 'transparent' : series.colorAccessor
+                            childSeries.threshold ? () => 'transparent' : childSeries.colorAccessor
                           }
-                          onPointerMove={series?.onPointerMove}
-                          onPointerOut={series?.onPointerOut}
+                          onPointerMove={childSeries?.onPointerMove}
+                          onPointerOut={childSeries?.onPointerOut}
                         />
 
-                        {(series.glyphSize || series.getGlyphSize) && (
+                        {(childSeries.glyphSize || childSeries.getGlyphSize) && (
                           <GlyphSeries
-                            dataKey={`GlyphSeries-${series.dataKey}`}
+                            dataKey={`GlyphSeries-${childSeries.dataKey}`}
                             data={data}
-                            xAccessor={series.xAccessor}
-                            yAccessor={series.yAccessor}
-                            colorAccessor={series.colorAccessor}
+                            xAccessor={childSeries.xAccessor}
+                            yAccessor={childSeries.yAccessor}
+                            colorAccessor={childSeries.colorAccessor}
                             size={
-                              series.getGlyphSize
-                                ? (datum) => series.getGlyphSize?.({ datum, zoom }) || 0
-                                : series.glyphSize || 0
+                              childSeries.getGlyphSize
+                                ? (datum) => childSeries.getGlyphSize?.({ datum, zoom }) ?? 0
+                                : childSeries.glyphSize ?? 0
                             }
                           />
                         )}

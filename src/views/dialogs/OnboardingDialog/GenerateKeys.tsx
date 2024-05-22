@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import { AES } from 'crypto-js';
-import { useSelector } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { EvmDerivedAccountStatus } from '@/constants/account';
@@ -9,12 +8,14 @@ import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvent } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { DydxAddress } from '@/constants/wallets';
 
-import { useAccounts, useDydxClient, useStringGetter } from '@/hooks';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useDydxClient } from '@/hooks/useDydxClient';
+import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
 import useSignForWalletDerivation from '@/hooks/useSignForWalletDerivation';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -25,8 +26,6 @@ import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Switch } from '@/components/Switch';
 import { WithReceipt } from '@/components/WithReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
-
-import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { track } from '@/lib/analytics';
 import { isTruthy } from '@/lib/isTruthy';
@@ -39,13 +38,8 @@ type ElementProps = {
   onKeysDerived?: () => void;
 };
 
-export const GenerateKeys = ({
-  status: status,
-  setStatus,
-  onKeysDerived = () => {},
-}: ElementProps) => {
+export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: ElementProps) => {
   const stringGetter = useStringGetter();
-
   const [shouldRememberMe, setShouldRememberMe] = useState(false);
 
   const { setWalletFromEvmSignature, saveEvmSignature } = useAccounts();
@@ -53,9 +47,8 @@ export const GenerateKeys = ({
   const [error, setError] = useState<string>();
 
   // 1. Switch network
-  const selectedNetwork = useSelector(getSelectedNetwork);
-
-  const chainId = Number(ENVIRONMENT_CONFIG_MAP[selectedNetwork].ethereumChainId);
+  const ethereumChainId = useEnvConfig('ethereumChainId');
+  const chainId = Number(ethereumChainId);
 
   const { isMatchingNetwork, matchNetwork, isSwitchingNetwork } = useMatchingEvmNetwork({
     chainId,
@@ -67,14 +60,14 @@ export const GenerateKeys = ({
     try {
       await matchNetwork?.();
       return true;
-    } catch (error) {
+    } catch (err) {
       const { message, walletErrorType, isErrorExpected } = parseWalletError({
-        error,
+        error: err,
         stringGetter,
       });
 
       if (!isErrorExpected) {
-        log('GenerateKeys/switchNetwork', error, { walletErrorType });
+        log('GenerateKeys/switchNetwork', err, { walletErrorType });
       }
 
       if (message) {
@@ -136,9 +129,9 @@ export const GenerateKeys = ({
             );
           }
         }
-      } catch (error) {
+      } catch (err) {
         setStatus(EvmDerivedAccountStatus.NotDerived);
-        const { message } = parseWalletError({ error, stringGetter });
+        const { message } = parseWalletError({ error: err, stringGetter });
 
         if (message) {
           track(AnalyticsEvent.OnboardingWalletIsNonDeterministic);
@@ -158,17 +151,17 @@ export const GenerateKeys = ({
 
       // 4. Done
       setStatus(EvmDerivedAccountStatus.Derived);
-    } catch (error) {
+    } catch (err) {
       setStatus(EvmDerivedAccountStatus.NotDerived);
       const { message, walletErrorType, isErrorExpected } = parseWalletError({
-        error,
+        error: err,
         stringGetter,
       });
 
       if (message) {
         setError(message);
         if (!isErrorExpected) {
-          log('GenerateKeys/deriveKeys', error, { walletErrorType });
+          log('GenerateKeys/deriveKeys', err, { walletErrorType });
         }
       }
     }

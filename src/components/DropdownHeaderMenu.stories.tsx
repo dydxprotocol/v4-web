@@ -9,7 +9,7 @@ import { DropdownHeaderMenu } from '@/components/DropdownHeaderMenu';
 
 import { StoryWrapper } from '.ladle/components';
 
-export const DropdownHeaderMenuStory: Story<Parameters<typeof DropdownHeaderMenu>> = (args) => {
+export const DropdownHeaderMenuStory: Story<Parameters<typeof DropdownHeaderMenu>> = () => {
   const [view, setView] = useState<string | undefined>();
 
   const exampleItems = [

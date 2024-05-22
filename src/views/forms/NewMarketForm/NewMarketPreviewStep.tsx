@@ -15,15 +15,13 @@ import { isMainnet } from '@/constants/networks';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 import type { NewMarketProposal } from '@/constants/potentialMarkets';
 
-import {
-  useAccountBalance,
-  useGovernanceVariables,
-  useStringGetter,
-  useSubaccount,
-  useTokenConfigs,
-  useURLConfigs,
-} from '@/hooks';
+import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useGovernanceVariables } from '@/hooks/useGovernanceVariables';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -402,13 +400,6 @@ const $Icon = styled(Icon)<{ $hasError?: boolean }>`
 
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --details-item-fontSize: 1rem;
-`;
-
-const $CheckboxContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  padding: 1rem;
-  align-items: center;
 `;
 
 const $DisclaimerContainer = styled.div`

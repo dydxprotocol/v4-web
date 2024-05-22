@@ -7,8 +7,9 @@ import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
-import { useDocumentTitle, useStringGetter } from '@/hooks';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';

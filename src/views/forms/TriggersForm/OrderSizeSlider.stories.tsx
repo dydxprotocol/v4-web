@@ -10,7 +10,7 @@ import { breakpoints } from '@/styles';
 import { OrderSizeSlider } from './OrderSizeSlider';
 import { StoryWrapper } from '.ladle/components';
 
-export const OrderSizeSliderStory: Story<Parameters<typeof OrderSizeSlider>[0]> = (args) => {
+export const OrderSizeSliderStory: Story<Parameters<typeof OrderSizeSlider>[0]> = () => {
   const [size, setSize] = useState(20);
 
   return (

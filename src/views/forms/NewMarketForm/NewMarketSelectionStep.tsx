@@ -16,14 +16,12 @@ import {
   type NewMarketProposal,
 } from '@/constants/potentialMarkets';
 
-import {
-  useAccountBalance,
-  useBreakpoints,
-  useGovernanceVariables,
-  useStringGetter,
-  useTokenConfigs,
-} from '@/hooks';
+import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useGovernanceVariables } from '@/hooks/useGovernanceVariables';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { breakpoints } from '@/styles';
 import { formMixins } from '@/styles/formMixins';
@@ -103,30 +101,28 @@ export const NewMarketSelectionStep = ({
 
   useEffect(() => {
     if (assetToAdd) {
-      setTempLiquidityTier('' + assetToAdd.params.liquidityTier);
+      setTempLiquidityTier(`${assetToAdd.params.liquidityTier}`);
       setLiquidityTier(assetToAdd.params.liquidityTier);
     }
   }, [assetToAdd]);
 
   const filteredPotentialMarkets = useMemo(() => {
-    return potentialMarkets?.filter(
-      ({ params: { ticker, exchangeConfigJson, marketType }, meta }) => {
-        if (marketIds.includes(ticker)) {
-          return false;
-        }
-
-        // Disable Isolated markets if the user is not on Staging or Local deployment
-        if (marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED') {
-          return isDev && exchangeConfigJson.length > 0;
-        }
-
-        if (exchangeConfigJson.length >= NUM_ORACLES_TO_QUALIFY_AS_SAFE) {
-          return true;
-        }
-
+    return potentialMarkets?.filter(({ params: { ticker, exchangeConfigJson, marketType } }) => {
+      if (marketIds.includes(ticker)) {
         return false;
       }
-    );
+
+      // Disable Isolated markets if the user is not on Staging or Local deployment
+      if (marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED') {
+        return isDev && exchangeConfigJson.length > 0;
+      }
+
+      if (exchangeConfigJson.length >= NUM_ORACLES_TO_QUALIFY_AS_SAFE) {
+        return true;
+      }
+
+      return false;
+    });
   }, [potentialMarkets, marketIds]);
 
   return (

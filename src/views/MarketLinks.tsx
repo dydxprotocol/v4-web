@@ -11,8 +11,8 @@ import { IconButton } from '@/components/IconButton';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 
 export const MarketLinks = () => {
-  const { resources } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
-  const { coinMarketCapsLink, websiteLink, whitepaperLink } = resources || {};
+  const { resources } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { coinMarketCapsLink, websiteLink, whitepaperLink } = resources ?? {};
 
   const linkItems = [
     {

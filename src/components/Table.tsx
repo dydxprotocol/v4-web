@@ -27,8 +27,8 @@ import {
 import { useAsyncList } from 'react-stately';
 import styled, { css } from 'styled-components';
 
-import { useBreakpoints, useTablePagination } from '@/hooks';
-import { MediaQueryKeys } from '@/hooks/useBreakpoints';
+import { MediaQueryKeys, useBreakpoints } from '@/hooks/useBreakpoints';
+import { useTablePagination } from '@/hooks/useTablePagination';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -38,19 +38,6 @@ import { MustBigNumber } from '@/lib/numbers';
 import { Icon, IconName } from './Icon';
 import { PAGE_SIZES, PageSize, TablePaginationRow } from './Table/TablePaginationRow';
 import { Tag } from './Tag';
-
-export { ActionsTableCell } from './Table/ActionsTableCell';
-
-// TODO: fix circular dependencies
-// eslint-disable-next-line import/no-cycle
-export { AssetTableCell } from './Table/AssetTableCell';
-
-// TODO: remove barrel files: https://www.npmjs.com/package/eslint-plugin-no-barrel-files
-// Reasoning why: https://dev.to/tassiofront/barrel-files-and-why-you-should-stop-using-them-now-bc4
-// eslint-disable-next-line import/no-cycle
-export { MarketTableCell } from './Table/MarketTableCell';
-export { TableCell } from './Table/TableCell';
-export { TableColumnHeader } from './Table/TableColumnHeader';
 
 export type CustomRowConfig = {
   key: string;

@@ -8,7 +8,8 @@ import { type OrderbookLine } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { ORDERBOOK_MAX_ROWS_PER_SIDE } from '@/constants/orderbook';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -107,8 +108,8 @@ const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number 
     const spreadPercent = orderbook?.spreadPercent;
 
     const histogramRange = Math.max(
-      isNaN(Number(bids[bids.length - 1]?.depth)) ? 0 : Number(bids[bids.length - 1]?.depth),
-      isNaN(Number(asks[asks.length - 1]?.depth)) ? 0 : Number(asks[asks.length - 1]?.depth)
+      Number.isNaN(Number(bids[bids.length - 1]?.depth)) ? 0 : Number(bids[bids.length - 1]?.depth),
+      Number.isNaN(Number(asks[asks.length - 1]?.depth)) ? 0 : Number(asks[asks.length - 1]?.depth)
     );
 
     // Ensure asks and bids are of length maxRowsPerSide by adding empty rows.
@@ -281,6 +282,8 @@ export const Orderbook = ({
         ...bids.reverse(),
         {
           key: 'spread',
+          // TODO - should probably refactor this to not break the lint rule
+          // eslint-disable-next-line react/no-unstable-nested-components
           slotCustomRow: (props) => (
             <$SpreadTableRow key="spread" {...props}>
               <td>

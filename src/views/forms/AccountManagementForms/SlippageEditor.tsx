@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -55,7 +55,6 @@ export const SlippageEditor = ({
       setTimeout(() => toggleGroupRef?.current?.focus(), 0);
     } else if (editorState === EditorState.Editing) {
       inputRef?.current?.focus();
-    } else if (editorState === EditorState.Viewing) {
     }
   }, [editorState]);
 

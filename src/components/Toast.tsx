@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type MouseEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Action, Close, Root } from '@radix-ui/react-toast';
 import styled, { keyframes } from 'styled-components';

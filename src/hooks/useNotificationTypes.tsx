@@ -25,7 +25,6 @@ import {
 import { AppRoute, TokenRoute } from '@/constants/routes';
 import { DydxChainAsset } from '@/constants/wallets';
 
-import { useAccounts, useApiState, useStringGetter, useTokenConfigs, useURLConfigs } from '@/hooks';
 import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -52,8 +51,13 @@ import { getMarketIds } from '@/state/perpetualsSelectors';
 
 import { formatSeconds } from '@/lib/timeUtils';
 
+import { useAccounts } from './useAccounts';
+import { useApiState } from './useApiState';
 import { useComplianceState } from './useComplianceState';
 import { useQueryChaosLabsIncentives } from './useQueryChaosLabsIncentives';
+import { useStringGetter } from './useStringGetter';
+import { useTokenConfigs } from './useTokenConfigs';
+import { useURLConfigs } from './useURLConfigs';
 
 const parseStringParamsForNotification = ({
   stringGetter,
@@ -214,9 +218,10 @@ export const notificationTypes: NotificationTypeConfig[] = [
           const icon = <Icon iconName={isFinished ? IconName.Transfer : IconName.Clock} />;
 
           const transferType =
-            type ?? fromChainId === selectedDydxChainId
+            type ??
+            (fromChainId === selectedDydxChainId
               ? TransferNotificationTypes.Withdrawal
-              : TransferNotificationTypes.Deposit;
+              : TransferNotificationTypes.Deposit);
 
           const title = stringGetter({
             key: {

@@ -6,9 +6,9 @@ import { breakpoints } from '@/styles';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
-import { TableCell } from '@/components/Table';
 
 import { Output, OutputType, ShowSign } from '../Output';
+import { TableCell } from './TableCell';
 
 export const MarketTableCell = ({
   asset,

@@ -6,10 +6,14 @@ import { PositionSideTag } from '@/components/PositionSideTag';
 
 import { StoryWrapper } from '.ladle/components';
 
-export const LongTagStory: Story<{ positionSide: PositionSide }> = (args) => {
+export const LongTagStory: Story<{ positionSide: PositionSide }> = ({
+  positionSide,
+}: {
+  positionSide: PositionSide;
+}) => {
   return (
     <StoryWrapper>
-      <PositionSideTag positionSide={args.positionSide} />
+      <PositionSideTag positionSide={positionSide} />
     </StoryWrapper>
   );
 };
@@ -18,10 +22,14 @@ LongTagStory.args = {
   positionSide: PositionSide.Long,
 };
 
-export const ShortTagStory: Story<{ positionSide: PositionSide }> = (args) => {
+export const ShortTagStory: Story<{ positionSide: PositionSide }> = ({
+  positionSide,
+}: {
+  positionSide: PositionSide;
+}) => {
   return (
     <StoryWrapper>
-      <PositionSideTag positionSide={args.positionSide} />
+      <PositionSideTag positionSide={positionSide} />
     </StoryWrapper>
   );
 };
@@ -30,10 +38,14 @@ ShortTagStory.args = {
   positionSide: PositionSide.Short,
 };
 
-export const NoneTagStory: Story<{ positionSide: PositionSide }> = (args) => {
+export const NoneTagStory: Story<{ positionSide: PositionSide }> = ({
+  positionSide,
+}: {
+  positionSide: PositionSide;
+}) => {
   return (
     <StoryWrapper>
-      <PositionSideTag positionSide={args.positionSide} />
+      <PositionSideTag positionSide={positionSide} />
     </StoryWrapper>
   );
 };

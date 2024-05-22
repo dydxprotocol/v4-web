@@ -11,8 +11,11 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { HistoryRoute, PortfolioRoute } from '@/constants/routes';
 
-import { useAccountBalance, useBreakpoints, useDocumentTitle, useStringGetter } from '@/hooks';
+import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

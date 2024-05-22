@@ -8,7 +8,7 @@ import { AbacusOrderSide, TradeInputField } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { ToggleGroup } from '@/components/ToggleGroup';
 
@@ -30,10 +30,12 @@ export const TradeSideToggle = memo(() => {
         { value: OrderSide.SELL, label: stringGetter({ key: STRING_KEYS.SELL }) },
       ]}
       value={selectedOrderSide}
-      onValueChange={(side: OrderSide) => {
+      onValueChange={(newSide: OrderSide) => {
         abacusStateManager.setTradeValue({
           value:
-            side === OrderSide.BUY ? AbacusOrderSide.buy.rawValue : AbacusOrderSide.sell.rawValue,
+            newSide === OrderSide.BUY
+              ? AbacusOrderSide.buy.rawValue
+              : AbacusOrderSide.sell.rawValue,
           field: TradeInputField.side,
         });
       }}

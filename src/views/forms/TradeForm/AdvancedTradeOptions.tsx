@@ -11,8 +11,9 @@ import { INTEGER_DECIMALS } from '@/constants/numbers';
 import { TimeUnitShort } from '@/constants/time';
 import { GOOD_TIL_TIME_TIMESCALE_STRINGS } from '@/constants/trade';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -36,7 +37,7 @@ export const AdvancedTradeOptions = () => {
   const currentTradeFormConfig = useSelector(getInputTradeOptions, shallowEqual);
   const inputTradeData = useSelector(getInputTradeData, shallowEqual);
 
-  const { execution, goodTil, postOnly, reduceOnly, timeInForce, type } = inputTradeData || {};
+  const { execution, goodTil, postOnly, reduceOnly, timeInForce } = inputTradeData ?? {};
 
   const {
     executionOptions,
@@ -46,14 +47,14 @@ export const AdvancedTradeOptions = () => {
     postOnlyTooltip,
     reduceOnlyTooltip,
     timeInForceOptions,
-  } = currentTradeFormConfig || {};
+  } = currentTradeFormConfig ?? {};
 
-  const { duration, unit } = goodTil || {};
+  const { duration, unit } = goodTil ?? {};
 
-  const showPostOnly = needsPostOnly || postOnlyTooltip;
-  const showReduceOnly = needsReduceOnly || reduceOnlyTooltip;
+  const showPostOnly = !!needsPostOnly || !!postOnlyTooltip;
+  const showReduceOnly = !!needsReduceOnly || !!reduceOnlyTooltip;
 
-  const needsExecution = executionOptions || showPostOnly || showReduceOnly;
+  const needsExecution = !!executionOptions || !!showPostOnly || !!showReduceOnly;
   const hasTimeInForce = timeInForceOptions?.toArray()?.length;
 
   useEffect(() => {

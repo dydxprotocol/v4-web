@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import { type MenuItem } from '@/constants/menus';
 
-import { useBreakpoints } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';

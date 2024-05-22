@@ -11,8 +11,10 @@ import { Asset, Nullable, SubaccountOrder } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
+import { EMPTY_ARR } from '@/constants/objects';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -22,13 +24,11 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
-import {
-  MarketTableCell,
-  Table,
-  TableCell,
-  TableColumnHeader,
-  type ColumnDef,
-} from '@/components/Table';
+import { ColumnDef, Table } from '@/components/Table';
+import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import { TableCell } from '@/components/Table/TableCell';
+import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
+import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
@@ -51,10 +51,10 @@ import {
   isOrderStatusClearable,
 } from '@/lib/orders';
 import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { OrderStatusIcon } from '../OrderStatusIcon';
 import { OrderActionsCell } from './OrdersTable/OrderActionsCell';
-import { PageSize } from '@/components/Table/TablePaginationRow';
 
 export enum OrdersTableColumnKey {
   Market = 'Market',
@@ -80,7 +80,6 @@ export type OrderTableRow = {
 
 const getOrdersTableColumnDef = ({
   key,
-  dispatch,
   stringGetter,
   symbol = '',
   isAccountViewOnly,
@@ -172,7 +171,7 @@ const getOrdersTableColumnDef = ({
         columnKey: 'triggerPrice',
         getCellValue: (row) => row.triggerPrice ?? -1,
         label: stringGetter({ key: STRING_KEYS.TRIGGER_PRICE_SHORT }),
-        renderCell: ({ type, triggerPrice, trailingPercent, tickSizeDecimals }) => (
+        renderCell: ({ triggerPrice, trailingPercent, tickSizeDecimals }) => (
           <TableCell stacked>
             <Output type={OutputType.Fiat} value={triggerPrice} fractionDigits={tickSizeDecimals} />
             {trailingPercent && (
@@ -211,16 +210,28 @@ const getOrdersTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.ACTION }),
         isActionable: true,
         allowsSorting: false,
-        renderCell: ({ id, status }) => (
-          <OrderActionsCell orderId={id} status={status} isDisabled={isAccountViewOnly} />
+        renderCell: ({ id, status, orderFlags }) => (
+          <OrderActionsCell
+            orderId={id}
+            status={status}
+            orderFlags={orderFlags}
+            isDisabled={isAccountViewOnly}
+          />
         ),
       },
       [OrdersTableColumnKey.StatusFill]: {
         columnKey: 'statusFill',
         getCellValue: (row) => row.status.name,
-        label: `${stringGetter({ key: STRING_KEYS.STATUS })} / ${stringGetter({
-          key: STRING_KEYS.FILL,
-        })}`,
+        label: (
+          <TableColumnHeader>
+            <span>{stringGetter({ key: STRING_KEYS.STATUS })}</span>
+            <span>
+              {stringGetter({
+                key: STRING_KEYS.FILL,
+              })}
+            </span>
+          </TableColumnHeader>
+        ),
         renderCell: ({ asset, createdAtMilliseconds, size, status, totalFilled, resources }) => {
           const { statusIconColor } = getOrderStatusInfo({ status: status.rawValue });
 
@@ -313,12 +324,12 @@ export const OrdersTable = ({
   const { isTablet } = useBreakpoints();
 
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
-  const marketOrders = useSelector(getCurrentMarketOrders, shallowEqual) || [];
-  const allOrders = useSelector(getSubaccountUnclearedOrders, shallowEqual) || [];
+  const marketOrders = useSelector(getCurrentMarketOrders, shallowEqual) ?? EMPTY_ARR;
+  const allOrders = useSelector(getSubaccountUnclearedOrders, shallowEqual) ?? EMPTY_ARR;
   const orders = currentMarket ? marketOrders : allOrders;
 
-  const allPerpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
-  const allAssets = useSelector(getAssets, shallowEqual) || {};
+  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
 
   const hasUnseenOrderUpdates = useSelector(getHasUnseenOrderUpdates);
 
@@ -357,7 +368,7 @@ export const OrdersTable = ({
           })
         )
       }
-      columns={columnKeys.map((key: OrdersTableColumnKey, index: number) =>
+      columns={columnKeys.map((key: OrdersTableColumnKey) =>
         getOrdersTableColumnDef({
           key,
           dispatch,

@@ -50,7 +50,6 @@ import AbacusLogger from './logger';
 import AbacusRest from './rest';
 import AbacusStateNotifier from './stateNotification';
 import AbacusThreading from './threading';
-// eslint-disable-next-line import/no-cycle
 import AbacusWebsocket from './websocket';
 
 class AbacusStateManager {

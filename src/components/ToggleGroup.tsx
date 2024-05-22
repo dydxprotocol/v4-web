@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { type MenuItem } from '@/constants/menus';
 
-import { useBreakpoints } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

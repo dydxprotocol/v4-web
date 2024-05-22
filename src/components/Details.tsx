@@ -12,11 +12,13 @@ import { WithSeparators } from '@/components/Separator';
 import { WithTooltip } from '@/components/WithTooltip';
 
 export type DetailsItem = {
+  // eslint-disable-next-line react/no-unused-prop-types
   key: string;
   tooltip?: string;
   tooltipParams?: Record<string, string>;
   label: string | JSX.Element;
   value?: Nullable<string> | JSX.Element | undefined;
+  // eslint-disable-next-line react/no-unused-prop-types
   subitems?: DetailsItem[];
   withTooltipIcon?: boolean;
   allowUserSelection?: boolean;
@@ -47,8 +49,11 @@ type ElementProps = {
 type StyleProps = {
   layout?: 'column' | 'row' | 'rowColumns' | 'grid' | 'stackColumn';
   justifyItems?: 'start' | 'end';
+  // I don't know why we're getting false positives for these props
+  // eslint-disable-next-line react/no-unused-prop-types
   withSeparators?: boolean;
   withOverflow?: boolean;
+  // eslint-disable-next-line react/no-unused-prop-types
   className?: string;
 };
 

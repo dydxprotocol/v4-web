@@ -7,7 +7,9 @@ import { ErrorType, ValidationError, type SubaccountOrder } from '@/constants/ab
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter, useSubaccount, useTriggerOrdersFormInputs } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
+import { useTriggerOrdersFormInputs } from '@/hooks/useTriggerOrdersFormInputs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -45,7 +47,7 @@ export const TriggersForm = ({
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
 
   const { asset, entryPrice, size, stepSizeDecimals, tickSizeDecimals, oraclePrice } =
-    useSelector(getPositionDetails(marketId)) || {};
+    useSelector(getPositionDetails(marketId)) ?? {};
 
   const {
     differingOrderSizes,
@@ -133,14 +135,14 @@ export const TriggersForm = ({
             <$Button
               action={ButtonAction.Primary}
               type={ButtonType.Submit}
-              state={{ isDisabled: hasInputErrors || isAccountViewOnly }}
+              state={{ isDisabled: !!hasInputErrors || !!isAccountViewOnly }}
               slotLeft={hasInputErrors ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
             >
               {hasInputErrors
                 ? stringGetter({
                     key: inputAlert?.actionStringKey ?? STRING_KEYS.UNAVAILABLE,
                   })
-                : !!(existingStopLossOrder || existingTakeProfitOrder)
+                : existingStopLossOrder || existingTakeProfitOrder
                 ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })
                 : stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
             </$Button>

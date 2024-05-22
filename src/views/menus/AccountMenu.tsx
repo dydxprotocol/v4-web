@@ -17,15 +17,13 @@ import {
 import { isDev } from '@/constants/networks';
 import { DydxChainAsset, WalletType, wallets } from '@/constants/wallets';
 
-import {
-  useAccountBalance,
-  useAccounts,
-  useBreakpoints,
-  useStringGetter,
-  useTokenConfigs,
-  useURLConfigs,
-} from '@/hooks';
+import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { DiscordIcon, GoogleIcon, TwitterIcon } from '@/icons';
 import { headerMixins } from '@/styles/headerMixins';
@@ -59,7 +57,7 @@ export const AccountMenu = () => {
 
   const dispatch = useDispatch();
   const onboardingState = useSelector(getOnboardingState);
-  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
+  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) ?? {};
 
   const { nativeTokenBalance } = useAccountBalance();
   const { usdcLabel, chainTokenLabel } = useTokenConfigs();
@@ -70,7 +68,7 @@ export const AccountMenu = () => {
   const privy = usePrivy();
   const { google, discord, twitter } = privy?.user ?? {};
 
-  const usdcBalance = freeCollateral?.current || 0;
+  const usdcBalance = freeCollateral?.current ?? 0;
 
   const onRecoverKeys = () => {
     dispatch(openDialog({ type: DialogTypes.Onboarding }));
@@ -454,7 +452,8 @@ const $IconButton = styled(IconButton)`
   --button-border: solid var(--border-width) var(--color-layer-6);
 
   ${({ iconName }) =>
-    iconName != null && [IconName.Withdraw, IconName.Deposit].includes(iconName) &&
+    iconName != null &&
+    [IconName.Withdraw, IconName.Deposit].includes(iconName) &&
     css`
       --button-icon-size: 1.375em;
     `}

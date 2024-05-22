@@ -6,7 +6,7 @@ import { TriggerOrdersInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Checkbox } from '@/components/Checkbox';
 import { Collapsible } from '@/components/Collapsible';

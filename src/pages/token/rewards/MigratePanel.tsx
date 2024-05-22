@@ -1,11 +1,12 @@
-import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
-import { useAccountBalance, useBreakpoints, useStringGetter } from '@/hooks';
+import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useEnvConfig } from '@/hooks/useEnvConfig';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -19,8 +20,6 @@ import { VerticalSeparator } from '@/components/Separator';
 import { Tag } from '@/components/Tag';
 import { WithReceipt } from '@/components/WithReceipt';
 
-import { getSelectedNetwork } from '@/state/appSelectors';
-
 import { MustBigNumber } from '@/lib/numbers';
 
 const TOKEN_MIGRATION_LEARN_MORE_LINK =
@@ -30,9 +29,9 @@ export const MigratePanel = ({ className }: { className?: string }) => {
   const { isNotTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
 
-  const selectedNetwork = useSelector(getSelectedNetwork);
+  const ethereumChainId = useEnvConfig('ethereumChainId');
 
-  const chainId = Number(ENVIRONMENT_CONFIG_MAP[selectedNetwork].ethereumChainId);
+  const chainId = Number(ethereumChainId);
 
   // v3 token is only on mainnet
   const { balance: tokenBalance } = useAccountBalance({

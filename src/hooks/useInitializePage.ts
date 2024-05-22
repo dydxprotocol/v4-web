@@ -5,13 +5,12 @@ import { useDispatch } from 'react-redux';
 import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_APP_ENVIRONMENT, type DydxNetwork } from '@/constants/networks';
 
-// eslint-disable-next-line import/no-cycle
-import { useLocalStorage } from '@/hooks';
-
 import { initializeLocalization } from '@/state/app';
 
 import abacusStateManager from '@/lib/abacus';
 import { validateAgainstAvailableEnvironments } from '@/lib/network';
+
+import { useLocalStorage } from './useLocalStorage';
 
 export const useInitializePage = () => {
   const dispatch = useDispatch();

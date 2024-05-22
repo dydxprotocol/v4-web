@@ -7,17 +7,19 @@ import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 
-import { useBreakpoints, useStringGetter, useURLConfigs } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
-import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { Button } from '@/components/Button';
 import { CopyButton } from '@/components/CopyButton';
-import { Icon } from '@/components/Icon';
 import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
-import { Table, TableCell, TableColumnHeader, type ColumnDef } from '@/components/Table';
+import { ColumnDef, Table } from '@/components/Table';
+import { TableCell } from '@/components/Table/TableCell';
+import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
+import { PageSize } from '@/components/Table/TablePaginationRow';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
@@ -25,7 +27,6 @@ import { getSubaccountTransfers } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { truncateAddress } from '@/lib/wallet';
-import { PageSize } from '@/components/Table/TablePaginationRow';
 
 export enum TransferHistoryTableColumnKey {
   Time = 'Time',
@@ -177,14 +178,6 @@ export const TransferHistoryTable = ({
 const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
 ` as typeof Table;
-
-const $InlineRow = styled.div`
-  ${layoutMixins.inlineRow}
-`;
-
-const $Icon = styled(Icon)`
-  font-size: 3em;
-`;
 
 const $TimeOutput = styled(Output)`
   color: var(--color-text-0);

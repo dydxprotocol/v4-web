@@ -6,6 +6,7 @@ import { StoryWrapper } from '.ladle/components';
 export const TimeoutButtonStory: Story<TimeoutButtonProps> = (args) => {
   return (
     <StoryWrapper>
+      {/* eslint-disable-next-line no-alert */}
       <TimeoutButton {...args} onClick={() => alert('Timeout button clicked!')}>
         Continue
       </TimeoutButton>

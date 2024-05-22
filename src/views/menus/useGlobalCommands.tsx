@@ -19,16 +19,12 @@ import {
 import { setSelectedTradeLayout } from '@/state/layout';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
+import { orEmptyObj } from '@/lib/typeUtils';
+
 enum LayoutItems {
   setDefaultLayout = 'SetDefaultLayout',
   setReverseLayout = 'SetReverseLayout',
   setAlternativeLayout = 'SetAlternativeLayout',
-}
-
-enum TradeItems {
-  PlaceMarketOrder = 'PlaceMarketOrder',
-  PlaceLimitOrder = 'PlaceLimitOrder',
-  PlaceStopLimitOrder = 'PlaceStopLimitOrder',
 }
 
 enum NavItems {
@@ -39,12 +35,12 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const allPerpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
-  const allAssets = useSelector(getAssets, shallowEqual) || {};
+  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
 
   const joinedPerpetualMarketsAndAssets = Object.values(allPerpetualMarkets).map((market) => ({
     ...market,
-    ...allAssets[market?.assetId],
+    ...(market != null ? allAssets[market.assetId] : {}),
   })) as Array<PerpetualMarket & Asset>;
 
   return [

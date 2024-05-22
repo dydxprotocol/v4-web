@@ -31,11 +31,17 @@ const exampleItems = [
   },
 ];
 
-export const RadioButtonCardsStory: Story<{
+type RadioButtonCardStoryProps = {
   bgColor?: string;
   withSlotTop?: boolean;
   withSlotBottom?: boolean;
-}> = ({ bgColor, withSlotTop, withSlotBottom }) => {
+};
+
+export const RadioButtonCardsStory: Story<RadioButtonCardStoryProps> = ({
+  bgColor,
+  withSlotTop,
+  withSlotBottom,
+}: RadioButtonCardStoryProps) => {
   const [item, setItem] = useState(exampleItems[0].value);
   return (
     <StoryWrapper>

@@ -6,7 +6,8 @@ import styled, { css } from 'styled-components';
 import { STRING_KEYS } from '@/constants/localization';
 import { LARGE_TOKEN_DECIMALS, TINY_PERCENT_DECIMALS } from '@/constants/numbers';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { breakpoints } from '@/styles';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -106,90 +107,18 @@ export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) 
           key: stat,
           label: labelMap[stat],
           tooltip: stat,
-          // value: <output>{valueMap[stat]?.toString()}</output>,
-          value: (() => {
-            const value = valueMap[stat];
-            const valueBN = MustBigNumber(value);
-
-            const color = valueBN.isNegative() ? 'var(--color-negative)' : 'var(--color-positive)';
-
-            switch (stat) {
-              case MarketStats.OraclePrice: {
-                return (
-                  <$Output type={OutputType.Fiat} value={value} fractionDigits={tickSizeDecimals} />
-                );
-              }
-              case MarketStats.OpenInterest: {
-                return (
-                  <$Output
-                    type={OutputType.Number}
-                    value={value}
-                    tag={id}
-                    fractionDigits={LARGE_TOKEN_DECIMALS}
-                  />
-                );
-              }
-              case MarketStats.Funding1H: {
-                return (
-                  <$Output
-                    type={OutputType.Percent}
-                    value={value}
-                    color={color}
-                    fractionDigits={TINY_PERCENT_DECIMALS}
-                  />
-                );
-              }
-              case MarketStats.NextFunding: {
-                return <NextFundingTimer />;
-              }
-              case MarketStats.PriceChange24H: {
-                return (
-                  <$RowSpan color={!isLoading ? color : undefined}>
-                    {!isLoading && <TriangleIndicator value={valueBN} />}
-                    <$Output
-                      type={OutputType.Fiat}
-                      value={valueBN.abs()}
-                      fractionDigits={tickSizeDecimals}
-                    />
-                    {!isLoading && (
-                      <$Output
-                        type={OutputType.Percent}
-                        value={MustBigNumber(priceChange24HPercent).abs()}
-                        withParentheses
-                      />
-                    )}
-                  </$RowSpan>
-                );
-              }
-              case MarketStats.Trades24H: {
-                return <$Output type={OutputType.Number} value={value} fractionDigits={0} />;
-              }
-              case MarketStats.Volume24H: {
-                // $ with no decimals
-                return <$Output type={OutputType.Fiat} value={value} fractionDigits={0} />;
-              }
-              case MarketStats.MaxLeverage: {
-                return (
-                  <DiffOutput
-                    value={
-                      initialMarginFraction ? BIG_NUMBERS.ONE.div(initialMarginFraction) : null
-                    }
-                    newValue={
-                      effectiveInitialMarginFraction
-                        ? BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction)
-                        : null
-                    }
-                    withDiff={initialMarginFraction != effectiveInitialMarginFraction}
-                    type={OutputType.Multiple}
-                  />
-                );
-              }
-              default: {
-                // Default renderer
-                return <$Output type={OutputType.Text} value={value} />;
-              }
-            }
-          })(),
+          value: (
+            <DetailsItem
+              value={valueMap[stat]}
+              stat={stat}
+              tickSizeDecimals={tickSizeDecimals}
+              id={id}
+              isLoading={isLoading}
+              priceChange24HPercent={priceChange24HPercent}
+              initialMarginFraction={initialMarginFraction}
+              effectiveInitialMarginFraction={effectiveInitialMarginFraction}
+            />
+          ),
         }))}
         isLoading={isLoading}
         layout={isTablet ? 'grid' : 'rowColumns'}
@@ -263,3 +192,96 @@ const $RowSpan = styled.span<{ color?: string }>`
 
   gap: 0.25rem;
 `;
+
+const DetailsItem = ({
+  value,
+  stat,
+  tickSizeDecimals,
+  id,
+  isLoading,
+  priceChange24HPercent,
+  initialMarginFraction,
+  effectiveInitialMarginFraction,
+}: {
+  value: number | null | undefined;
+  stat: MarketStats;
+  tickSizeDecimals: number | null | undefined;
+  id: string;
+  isLoading: boolean;
+  priceChange24HPercent: number | null | undefined;
+  initialMarginFraction: number | null | undefined;
+  effectiveInitialMarginFraction: number | null | undefined;
+}) => {
+  const valueBN = MustBigNumber(value);
+
+  const color = valueBN.isNegative() ? 'var(--color-negative)' : 'var(--color-positive)';
+
+  switch (stat) {
+    case MarketStats.OraclePrice: {
+      return <$Output type={OutputType.Fiat} value={value} fractionDigits={tickSizeDecimals} />;
+    }
+    case MarketStats.OpenInterest: {
+      return (
+        <$Output
+          type={OutputType.Number}
+          value={value}
+          tag={id}
+          fractionDigits={LARGE_TOKEN_DECIMALS}
+        />
+      );
+    }
+    case MarketStats.Funding1H: {
+      return (
+        <$Output
+          type={OutputType.Percent}
+          value={value}
+          color={color}
+          fractionDigits={TINY_PERCENT_DECIMALS}
+        />
+      );
+    }
+    case MarketStats.NextFunding: {
+      return <NextFundingTimer />;
+    }
+    case MarketStats.PriceChange24H: {
+      return (
+        <$RowSpan color={!isLoading ? color : undefined}>
+          {!isLoading && <TriangleIndicator value={valueBN} />}
+          <$Output type={OutputType.Fiat} value={valueBN.abs()} fractionDigits={tickSizeDecimals} />
+          {!isLoading && (
+            <$Output
+              type={OutputType.Percent}
+              value={MustBigNumber(priceChange24HPercent).abs()}
+              withParentheses
+            />
+          )}
+        </$RowSpan>
+      );
+    }
+    case MarketStats.Trades24H: {
+      return <$Output type={OutputType.Number} value={value} fractionDigits={0} />;
+    }
+    case MarketStats.Volume24H: {
+      // $ with no decimals
+      return <$Output type={OutputType.Fiat} value={value} fractionDigits={0} />;
+    }
+    case MarketStats.MaxLeverage: {
+      return (
+        <DiffOutput
+          value={initialMarginFraction ? BIG_NUMBERS.ONE.div(initialMarginFraction) : null}
+          newValue={
+            effectiveInitialMarginFraction
+              ? BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction)
+              : null
+          }
+          withDiff={initialMarginFraction !== effectiveInitialMarginFraction}
+          type={OutputType.Multiple}
+        />
+      );
+    }
+    default: {
+      // Default renderer
+      return <$Output type={OutputType.Text} value={value} />;
+    }
+  }
+};

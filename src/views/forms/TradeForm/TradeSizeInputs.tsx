@@ -9,7 +9,8 @@ import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { TradeSizeInput } from '@/constants/trade';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -41,14 +42,14 @@ export const TradeSizeInputs = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
 
-  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
+  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const inputTradeSizeData = useSelector(getInputTradeSizeData, shallowEqual);
   const currentTradeInputOptions = useSelector(getInputTradeOptions, shallowEqual);
 
   const { stepSizeDecimals, tickSizeDecimals } =
-    useSelector(getCurrentMarketConfig, shallowEqual) || {};
-  const { size, usdcSize, leverage, input: lastEditedInput } = inputTradeSizeData || {};
-  const { needsLeverage } = currentTradeInputOptions || {};
+    useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const { size, usdcSize, leverage, input: lastEditedInput } = inputTradeSizeData ?? {};
+  const { needsLeverage } = currentTradeInputOptions ?? {};
   const decimals = stepSizeDecimals ?? TOKEN_DECIMALS;
 
   const { amountInput, usdAmountInput, leverageInput } = useSelector(
@@ -94,6 +95,7 @@ export const TradeSizeInputs = () => {
     formattedValue: string;
   }) => {
     dispatch(setTradeFormInputs({ usdAmountInput: formattedValue }));
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const newUsdcAmount = MustBigNumber(floatValue).toFixed(tickSizeDecimals || USD_DECIMALS);
 
     abacusStateManager.setTradeValue({

@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 
 import { curveLinear } from '@visx/curve';
 import type { TooltipContextType } from '@visx/xychart';
-import _, { debounce } from 'lodash';
+import { debounce, get } from 'lodash';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
@@ -13,7 +13,8 @@ import {
 } from '@/constants/abacus';
 import { timeUnits } from '@/constants/time';
 
-import { useBreakpoints, useNow } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useNow } from '@/hooks/useNow';
 
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
@@ -84,7 +85,7 @@ export const PnlChart = ({
 }: PnlChartProps) => {
   const { isTablet } = useBreakpoints();
   const appTheme = useSelector(getAppTheme);
-  const { equity } = useSelector(getSubaccount, shallowEqual) || {};
+  const { equity } = useSelector(getSubaccount, shallowEqual) ?? {};
   const now = useNow({ intervalMs: timeUnits.minute });
 
   // Chart data
@@ -109,12 +110,13 @@ export const PnlChart = ({
   const onSelectPeriod = (periodName: string) => setSelectedPeriod(getPeriodFromName(periodName));
 
   // Unselect selected period in toggle if user zooms in/out
-  const onZoomSnap = useCallback(
-    debounce(({ zoomDomain }: { zoomDomain?: number }) => {
-      if (zoomDomain) {
-        setIsZooming(!zoomDomainDefaultValues.has(zoomDomain));
-      }
-    }, 200),
+  const onZoomSnap = useMemo(
+    () =>
+      debounce(({ zoomDomain }: { zoomDomain?: number }) => {
+        if (zoomDomain) {
+          setIsZooming(!zoomDomainDefaultValues.has(zoomDomain));
+        }
+      }, 200),
     []
   );
 
@@ -140,15 +142,15 @@ export const PnlChart = ({
               (datum) =>
                 ({
                   id: datum.createdAtMilliseconds,
-                  subaccountId: subaccountId,
+                  subaccountId,
                   equity: Number(datum.equity),
                   totalPnl: Number(datum.totalPnl),
                   netTransfers: Number(datum.netTransfers),
                   createdAt: new Date(datum.createdAtMilliseconds).valueOf(),
                   side: {
                     [-1]: PnlSide.Loss,
-                    [0]: PnlSide.Flat,
-                    [1]: PnlSide.Profit,
+                    0: PnlSide.Flat,
+                    1: PnlSide.Profit,
                   }[Math.sign(datum.equity)],
                 } as PnlDatum)
             )
@@ -162,7 +164,7 @@ export const PnlChart = ({
     Object.entries(MS_FOR_PERIOD).reduce(
       (acc: HistoricalPnlPeriods[], [, ms], i, arr) => {
         if (oldestPnlMs < now - ms) {
-          const nextPeriod = _.get(arr, [i + 1, 0]);
+          const nextPeriod = get(arr, [i + 1, 0]);
           if (nextPeriod) {
             acc.push(getPeriodFromName(nextPeriod));
           }
@@ -191,7 +193,6 @@ export const PnlChart = ({
   return (
     <$Container className={className} chartBackground={chartBackground}>
       <TimeSeriesChart
-        id="pnl-chart"
         selectedLocale={selectedLocale}
         data={data}
         margin={{
