@@ -6,10 +6,8 @@ import { type NumberFormatValues } from 'react-number-format';
 import type { SyntheticInputEvent } from 'react-number-format/types/types';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled from 'styled-components';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { type Nullable } from 'vitest';
 
-import { TransferInputField, TransferType } from '@/constants/abacus';
+import { Nullable, TransferInputField, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import _ from 'lodash';
+import { debounce } from 'lodash';
 import styled from 'styled-components';
 
 import { Slider } from '@/components/Slider';
@@ -33,10 +33,7 @@ export const OrderSizeSlider = ({
 
   // Debounced slightly to avoid excessive updates to Abacus while still providing a smooth slide
   const debouncedSetAbacusSize = useMemo(
-    () =>
-      _.debounce((newSize: string) => {
-        setAbacusSize(newSize);
-      }, 50),
+    () => debounce((newSize: string) => setAbacusSize(newSize), 50),
     []
   );
 

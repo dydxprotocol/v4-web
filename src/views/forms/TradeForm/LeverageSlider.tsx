@@ -1,7 +1,7 @@
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import _ from 'lodash';
+import { debounce } from 'lodash';
 import styled, { css } from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
@@ -73,13 +73,16 @@ export const LeverageSlider = ({
   const { min, max, midpoint } = sliderConfig[positionSide] || {};
 
   // Debounced slightly to avoid excessive updates to Abacus while still providing a smooth slide
-  const debouncedSetAbacusLeverage = useCallback(
-    _.debounce((newLeverage: number) => {
-      abacusStateManager.setTradeValue({
-        value: newLeverage,
-        field: TradeInputField.leverage,
-      });
-    }, 50),
+  const debouncedSetAbacusLeverage = useMemo(
+    () =>
+      debounce(
+        (newLeverage: number) =>
+          abacusStateManager.setTradeValue({
+            value: newLeverage,
+            field: TradeInputField.leverage,
+          }),
+        50
+      ),
     []
   );
 
