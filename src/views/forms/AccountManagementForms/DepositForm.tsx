@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import { type NumberFormatValues } from 'react-number-format';
@@ -81,7 +82,9 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     errors: routeErrors,
     errorMessage: routeErrorMessage,
     isCctp,
-  } = useSelector(getTransferInputs, shallowEqual) || {};
+  } = useSelector(getTransferInputs, shallowEqual) ?? {};
+  // todo are these guaranteed to be base 10?
+  // eslint-disable-next-line radix
   const chainId = chainIdStr ? parseInt(chainIdStr) : undefined;
 
   // User inputs
@@ -100,7 +103,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const debouncedAmount = useDebounce<string>(fromAmount, 500);
 
   // Async Data
-  const { balance, queryStatus, isQueryFetching } = useAccountBalance({
+  const { balance } = useAccountBalance({
     addressOrDenom: sourceToken?.address || CHAIN_DEFAULT_TOKEN_ADDRESS,
     chainId,
     decimals: sourceToken?.decimals || undefined,
@@ -169,12 +172,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     }
   }, []);
 
-  const onSelectToken = useCallback((token: TransferInputTokenResource) => {
-    if (token) {
+  const onSelectToken = useCallback((selectedToken: TransferInputTokenResource) => {
+    if (selectedToken) {
       abacusStateManager.clearTransferInputValues();
       abacusStateManager.setTransferValue({
         field: TransferInputField.token,
-        value: token.address,
+        value: selectedToken.address,
       });
       setFromAmount('');
     }
@@ -304,9 +307,9 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
             toAmountMin: summary?.toAmountMin || undefined,
           });
         }
-      } catch (error) {
-        log('DepositForm/onSubmit', error);
-        setError(error);
+      } catch (err) {
+        log('DepositForm/onSubmit', err);
+        setError(err);
       } finally {
         setIsLoading(false);
       }

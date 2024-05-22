@@ -4,9 +4,6 @@ polyfills.ts
 vite.config.ts
 commitlint.config.ts
 
-# Temporarily ignore, we will slowly remove each directory as we fix files to follow ESLint rules
-/src/views/forms
-
 # components dir is being worked on
 /src/components/*
 

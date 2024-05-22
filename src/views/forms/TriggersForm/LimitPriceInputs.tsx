@@ -47,7 +47,7 @@ export const LimitPriceInputs = ({
   const stringGetter = useStringGetter();
 
   const { stopLossOrder, takeProfitOrder } =
-    useSelector(getTriggerOrdersInputs, shallowEqual) || {};
+    useSelector(getTriggerOrdersInputs, shallowEqual) ?? {};
 
   const [shouldShowLimitPrice, setShouldShowLimitPrice] = useState(existsLimitOrder);
 

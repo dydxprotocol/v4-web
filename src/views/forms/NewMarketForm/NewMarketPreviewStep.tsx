@@ -402,13 +402,6 @@ const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --details-item-fontSize: 1rem;
 `;
 
-const $CheckboxContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  padding: 1rem;
-  align-items: center;
-`;
-
 const $DisclaimerContainer = styled.div`
   min-width: 100%;
   width: min-content;

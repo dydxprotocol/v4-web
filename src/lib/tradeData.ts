@@ -105,7 +105,7 @@ export const getTradeInputAlert = ({
   tickSizeDecimals: Nullable<number>;
 }) => {
   const inputAlerts = abacusInputErrors.map(({ action: errorAction, resources, type, code }) => {
-    const { action, text } = resources || {};
+    const { action, text } = resources ?? {};
     const { stringKey: actionStringKey } = action ?? {};
     const { stringKey: alertStringKey, params: stringParams } = text ?? {};
 

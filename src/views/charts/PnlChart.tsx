@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 
 import { curveLinear } from '@visx/curve';
 import type { TooltipContextType } from '@visx/xychart';
-import _, { debounce } from 'lodash';
+import { debounce, get } from 'lodash';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
@@ -110,12 +110,13 @@ export const PnlChart = ({
   const onSelectPeriod = (periodName: string) => setSelectedPeriod(getPeriodFromName(periodName));
 
   // Unselect selected period in toggle if user zooms in/out
-  const onZoomSnap = useCallback(
-    debounce(({ zoomDomain }: { zoomDomain?: number }) => {
-      if (zoomDomain) {
-        setIsZooming(!zoomDomainDefaultValues.has(zoomDomain));
-      }
-    }, 200),
+  const onZoomSnap = useMemo(
+    () =>
+      debounce(({ zoomDomain }: { zoomDomain?: number }) => {
+        if (zoomDomain) {
+          setIsZooming(!zoomDomainDefaultValues.has(zoomDomain));
+        }
+      }, 200),
     []
   );
 
@@ -163,7 +164,7 @@ export const PnlChart = ({
     Object.entries(MS_FOR_PERIOD).reduce(
       (acc: HistoricalPnlPeriods[], [, ms], i, arr) => {
         if (oldestPnlMs < now - ms) {
-          const nextPeriod = _.get(arr, [i + 1, 0]);
+          const nextPeriod = get(arr, [i + 1, 0]);
           if (nextPeriod) {
             acc.push(getPeriodFromName(nextPeriod));
           }

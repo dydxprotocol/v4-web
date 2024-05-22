@@ -44,11 +44,11 @@ export const MarketLeverageInput = ({
   const currentPositionData = useSelector(getCurrentMarketPositionData, shallowEqual);
   const inputTradeData = useSelector(getInputTradeData, shallowEqual);
 
-  const { leverage, size: currentPositionSize } = currentPositionData || {};
-  const { current: currentSize, postOrder: postOrderSize } = currentPositionSize || {};
-  const { current: currentLeverage, postOrder: postOrderLeverage } = leverage || {};
-  const { initialMarginFraction, effectiveInitialMarginFraction } = currentMarketConfig || {};
-  const { side } = inputTradeData || {};
+  const { leverage, size: currentPositionSize } = currentPositionData ?? {};
+  const { current: currentSize, postOrder: postOrderSize } = currentPositionSize ?? {};
+  const { current: currentLeverage, postOrder: postOrderLeverage } = leverage ?? {};
+  const { initialMarginFraction, effectiveInitialMarginFraction } = currentMarketConfig ?? {};
+  const { side } = inputTradeData ?? {};
   const orderSide = getSelectedOrderSide(side);
 
   const { currentPositionSide, newPositionSide } = hasPositionSideChanged({
