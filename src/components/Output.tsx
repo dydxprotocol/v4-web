@@ -369,7 +369,7 @@ export const Output = ({
   }
 };
 
-const OUTPUT_STYLES = styled.output<{ withParentheses?: boolean }>`
+const $Text = styled.output<{ withParentheses?: boolean }>`
   --output-beforeString: '';
   --output-afterString: '';
   --output-sign-color: currentColor;
@@ -410,9 +410,7 @@ const $Sign = styled.span`
   color: var(--output-sign-color);
 `;
 
-const $Text = styled(OUTPUT_STYLES)``;
-
-const $Number = styled(OUTPUT_STYLES)<{ withBaseFont?: boolean }>`
+const $Number = styled($Text)<{ withBaseFont?: boolean }>`
   ${({ withBaseFont }) =>
     !withBaseFont &&
     css`

@@ -1,6 +1,6 @@
 // Forked from original XYChart Tooltip to use TooltipWithBounds instead of TooltipInPortal:
 // https://github.com/airbnb/visx/blob/master/packages/visx-xychart/src/components/Tooltip.tsx
-import React, { Fragment, useCallback, useContext, useEffect } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 
 import { Group } from '@visx/group';
 import { PickD3Scale } from '@visx/scale';
@@ -286,10 +286,7 @@ const TooltipInner = <Datum extends object>({
         </Group>
       )}
 
-      {glyphProps.map(({ x, y, ...props }, i) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <Fragment key={i}>{renderGlyph({ x, y, ...props })}</Fragment>
-      ))}
+      {glyphProps.map(({ x, y, ...props }) => renderGlyph({ x, y, ...props }))}
 
       <foreignObject style={{ width: '100%', height: `calc(100% - ${margin.bottom}px)` }}>
         <TooltipWithBounds left={computedTooltipLeft} top={computedTooltipTop} {...tooltipProps}>

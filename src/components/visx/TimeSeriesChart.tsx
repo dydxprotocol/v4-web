@@ -156,14 +156,14 @@ export const TimeSeriesChart = <Datum extends {}>({
   useAnimationFrame(
     (elapsedMilliseconds) => {
       if (zoomDomainAnimateTo) {
-        setZoomDomain((oldZd) => {
-          if (!oldZd) return oldZd;
+        setZoomDomain((oldZoomDomain) => {
+          if (!oldZoomDomain) return oldZoomDomain;
 
           const newZoomDomain =
-            oldZd * (zoomDomainAnimateTo / oldZd) ** (elapsedMilliseconds * 0.01);
+            oldZoomDomain * (zoomDomainAnimateTo / oldZoomDomain) ** (elapsedMilliseconds * 0.01);
 
           // clamp according to direction
-          return zoomDomainAnimateTo > oldZd
+          return zoomDomainAnimateTo > oldZoomDomain
             ? Math.min(newZoomDomain, zoomDomainAnimateTo)
             : Math.max(newZoomDomain, zoomDomainAnimateTo);
         });
