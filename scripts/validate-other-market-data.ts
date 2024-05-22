@@ -270,6 +270,17 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
     },
     slinkyProviderName: 'okx_ws',
   },
+  [ExchangeName.Raydium]: {
+    url: '',
+    tickers: null,
+    parseResp: (response: any) => {
+      return Array.from(response.data).reduce((acc: Map<string, any>, item: any) => {
+        acc.set(item.instId, {});
+        return acc;
+      }, new Map<string, any>());
+    },
+    slinkyProviderName: 'Raydium',
+  },
 };
 
 async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promise<void> {
