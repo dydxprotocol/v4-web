@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react';
 
-import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import {
@@ -9,8 +8,8 @@ import {
   HistoricalTradingRewardsPeriods,
 } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
+import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -22,13 +21,11 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithTooltip } from '@/components/WithTooltip';
 import { TradingRewardHistoryTable } from '@/views/tables/TradingRewardHistoryTable';
 
-import { getSelectedNetwork } from '@/state/appSelectors';
-
 import abacusStateManager from '@/lib/abacus';
 
 export const RewardHistoryPanel = () => {
   const stringGetter = useStringGetter();
-  const selectedNetwork = useSelector(getSelectedNetwork);
+  const rewardsHistoryStartDate = useEnvConfig('rewardsHistoryStartDateMs');
 
   const [selectedPeriod, setSelectedPeriod] = useState<HistoricalTradingRewardsPeriods>(
     abacusStateManager.getHistoricalTradingRewardPeriod() || HistoricalTradingRewardsPeriod.WEEKLY
@@ -58,9 +55,7 @@ export const RewardHistoryPanel = () => {
                   REWARDS_HISTORY_START_DATE: (
                     <$Output
                       type={OutputType.Date}
-                      value={parseInt(
-                        ENVIRONMENT_CONFIG_MAP[selectedNetwork].rewardsHistoryStartDateMs
-                      )}
+                      value={Number(rewardsHistoryStartDate)}
                       timeOptions={{ useUTC: true }}
                     />
                   ),

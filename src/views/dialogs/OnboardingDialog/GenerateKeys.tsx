@@ -14,6 +14,7 @@ import { DydxAddress } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDydxClient } from '@/hooks/useDydxClient';
+import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
 import useSignForWalletDerivation from '@/hooks/useSignForWalletDerivation';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -43,7 +44,6 @@ type ElementProps = {
 
 export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: ElementProps) => {
   const stringGetter = useStringGetter();
-
   const [shouldRememberMe, setShouldRememberMe] = useState(false);
 
   const { setWalletFromEvmSignature, saveEvmSignature } = useAccounts();
@@ -51,9 +51,8 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
   const [error, setError] = useState<string>();
 
   // 1. Switch network
-  const selectedNetwork = useSelector(getSelectedNetwork);
-
-  const chainId = Number(ENVIRONMENT_CONFIG_MAP[selectedNetwork].ethereumChainId);
+  const ethereumChainId = useEnvConfig('ethereumChainId');
+  const chainId = Number(ethereumChainId);
 
   const { isMatchingNetwork, matchNetwork, isSwitchingNetwork } = useMatchingEvmNetwork({
     chainId,
