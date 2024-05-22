@@ -1,6 +1,6 @@
 // Forked from original XYChart Tooltip to use TooltipWithBounds instead of TooltipInPortal:
 // https://github.com/airbnb/visx/blob/master/packages/visx-xychart/src/components/Tooltip.tsx
-import React, { Fragment, useCallback, useContext, useEffect } from 'react';
+import React, { useCallback, useContext, useEffect } from 'react';
 
 import { Group } from '@visx/group';
 import { PickD3Scale } from '@visx/scale';
@@ -64,19 +64,25 @@ export type TooltipProps<Datum extends object> = {
     onTooltipContext?: (tooltipContext: TooltipContextType<Datum>) => void;
   };
 
-const DefaultGlyph = <Datum extends object>(props: RenderTooltipGlyphProps<Datum>) => {
+const DefaultGlyph = <Datum extends object>({
+  x,
+  y,
+  size,
+  color,
+  glyphStyle,
+}: RenderTooltipGlyphProps<Datum>) => {
   const { theme } = useContext(DataContext) || {};
 
   return (
     <circle
-      cx={props.x}
-      cy={props.y}
-      r={props.size}
-      fill={props.color}
+      cx={x}
+      cy={y}
+      r={size}
+      fill={color}
       stroke={theme?.backgroundColor}
       strokeWidth={1.5}
       paintOrder="fill"
-      {...props.glyphStyle}
+      {...glyphStyle}
     />
   );
 };
@@ -132,8 +138,8 @@ const TooltipInner = <Datum extends object>({
 
   const showTooltip = tooltipContext?.tooltipOpen && tooltipContent != null;
 
-  let computedTooltipLeft = tooltipContext?.tooltipLeft || 0;
-  let computedTooltipTop = tooltipContext?.tooltipTop || 0;
+  let computedTooltipLeft = tooltipContext?.tooltipLeft ?? 0;
+  let computedTooltipTop = tooltipContext?.tooltipTop ?? 0;
   let crosshairLeft = computedTooltipLeft;
   let crosshairTop = computedTooltipTop;
 
@@ -280,9 +286,7 @@ const TooltipInner = <Datum extends object>({
         </Group>
       )}
 
-      {glyphProps.map(({ x, y, ...props }, i) => (
-        <Fragment key={i}>{renderGlyph({ x, y, ...props })}</Fragment>
-      ))}
+      {glyphProps.map(({ x, y, ...props }) => renderGlyph({ x, y, ...props }))}
 
       <foreignObject style={{ width: '100%', height: `calc(100% - ${margin.bottom}px)` }}>
         <TooltipWithBounds left={computedTooltipLeft} top={computedTooltipTop} {...tooltipProps}>
@@ -293,11 +297,13 @@ const TooltipInner = <Datum extends object>({
   ) : null;
 };
 
+const Tooltip = <Datum extends object>(props: TooltipProps<Datum>) => {
+  return <TooltipInner {...props} />;
+};
+
 /**
  * This is a wrapper component which bails early if tooltip is not visible.
  * If many charts with Tooltips are rendered on a page,
  * this avoids creating many resize observers / hitting browser limits.
  */
-export default function Tooltip<Datum extends object>(props: TooltipProps<Datum>) {
-  return <TooltipInner {...props} />;
-}
+export default Tooltip;

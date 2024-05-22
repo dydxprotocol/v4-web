@@ -9,7 +9,6 @@ import { PositionSide } from '@/constants/trade';
 import { breakpoints } from '@/styles';
 
 import { LeverageSlider } from './LeverageSlider';
-// eslint-disable-next-line import/order
 import { StoryWrapper } from '.ladle/components';
 
 export const LeverageSliderStory: Story<Parameters<typeof LeverageSlider>[0]> = (args) => {

@@ -12,7 +12,7 @@ import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
-import { ActionsTableCell } from '@/components/Table';
+import { ActionsTableCell } from '@/components/Table/ActionsTableCell';
 
 import { clearOrder } from '@/state/account';
 

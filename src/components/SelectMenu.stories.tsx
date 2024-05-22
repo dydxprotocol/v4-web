@@ -28,7 +28,7 @@ const exampleItems: { value: string; label: string }[] = [
   },
 ];
 
-export const SelectMenuStory: Story<Parameters<typeof SelectMenu>[0]> = (args) => {
+export const SelectMenuStory: Story<Parameters<typeof SelectMenu>[0]> = () => {
   const [value, setValue] = useState(exampleItems[0].value);
   const [value2, setValue2] = useState(exampleItems[2].value);
 
@@ -36,14 +36,14 @@ export const SelectMenuStory: Story<Parameters<typeof SelectMenu>[0]> = (args) =
     <StoryWrapper>
       <$Container>
         <SelectMenu value={value} onValueChange={setValue}>
-          {exampleItems.map(({ value, label }) => (
-            <SelectItem key={value} value={value} label={label} />
+          {exampleItems.map(({ value: innerValue, label }) => (
+            <SelectItem key={innerValue} value={innerValue} label={label} />
           ))}
         </SelectMenu>
 
         <SelectMenu value={value2} onValueChange={setValue2}>
-          {exampleItems.map(({ value, label }) => (
-            <SelectItem key={value} value={value} label={label} />
+          {exampleItems.map(({ value: innerValue, label }) => (
+            <SelectItem key={innerValue} value={innerValue} label={label} />
           ))}
         </SelectMenu>
       </$Container>

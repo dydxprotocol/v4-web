@@ -9,7 +9,6 @@ import { useBalance } from 'wagmi';
 import { EvmAddress } from '@/constants/wallets';
 
 import { getBalances, getStakingBalances } from '@/state/accountSelectors';
-import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { convertBech32Address } from '@/lib/addressUtils';
 import { MustBigNumber } from '@/lib/numbers';

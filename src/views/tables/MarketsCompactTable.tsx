@@ -18,7 +18,9 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
-import { AssetTableCell, Table, TableCell, type ColumnDef } from '@/components/Table';
+import { Table, type ColumnDef } from '@/components/Table';
+import { AssetTableCell } from '@/components/Table/AssetTableCell';
+import { TableCell } from '@/components/Table/TableCell';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 
 import { MustBigNumber } from '@/lib/numbers';

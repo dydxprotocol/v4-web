@@ -27,9 +27,10 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
-import { Table, TableColumnHeader, type ColumnDef } from '@/components/Table';
+import { ColumnDef, Table } from '@/components/Table';
 import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
+import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 
 import {

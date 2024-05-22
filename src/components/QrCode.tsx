@@ -61,7 +61,7 @@ export const QrCode = ({ className, value, hasLogo, size = 300 }: ElementProps &
   );
 
   useEffect(() => {
-    qrCode.append(ref.current || undefined);
+    qrCode.append(ref.current ?? undefined);
   }, []);
 
   useEffect(() => {

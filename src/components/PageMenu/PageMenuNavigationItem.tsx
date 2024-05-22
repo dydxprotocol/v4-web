@@ -16,7 +16,7 @@ export const PageMenuNavigationItem = <
   label,
   labelRight,
 }: MenuItem<MenuItemValue, PageMenuItemType>) => (
-  <Link to={href || ''}>
+  <Link to={href ?? ''}>
     <$MenuItem>
       <div>{label}</div>
       <$RightRow>

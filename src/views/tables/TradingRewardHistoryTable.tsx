@@ -13,7 +13,8 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Output, OutputType } from '@/components/Output';
-import { Table, TableCell, type ColumnDef } from '@/components/Table';
+import { Table, type ColumnDef } from '@/components/Table';
+import { TableCell } from '@/components/Table/TableCell';
 
 import { getHistoricalTradingRewardsForPeriod } from '@/state/accountSelectors';
 

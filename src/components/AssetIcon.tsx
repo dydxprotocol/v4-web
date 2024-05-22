@@ -106,7 +106,7 @@ const assetIcons = {
 } as const;
 
 const isAssetSymbol = (symbol: Nullable<string>): symbol is AssetSymbol =>
-  symbol != null && assetIcons.hasOwnProperty(symbol);
+  symbol != null && Object.hasOwn(assetIcons, symbol);
 
 export const AssetIcon = ({
   symbol,

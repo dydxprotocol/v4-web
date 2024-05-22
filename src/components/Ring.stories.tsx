@@ -4,10 +4,10 @@ import { Ring } from '@/components/Ring';
 
 import { StoryWrapper } from '.ladle/components';
 
-export const RingStory: Story<{ value: number }> = (args) => {
+export const RingStory: Story<{ value: number }> = ({ value }: { value: number }) => {
   return (
     <StoryWrapper>
-      <Ring value={args.value / 100} />
+      <Ring value={value / 100} />
     </StoryWrapper>
   );
 };

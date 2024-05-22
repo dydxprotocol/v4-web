@@ -3,9 +3,3 @@ vite-env.d.ts
 polyfills.ts
 vite.config.ts
 commitlint.config.ts
-
-# components dir is being worked on
-/src/components/*
-
-# unignored components
-!/src/components/Table.tsx

@@ -63,7 +63,6 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
 
   return (
     <TimeSeriesChart
-      id="funding-chart"
       selectedLocale={selectedLocale}
       data={data}
       yAxisScaleType="symlog"

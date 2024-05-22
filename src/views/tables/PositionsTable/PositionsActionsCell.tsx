@@ -13,7 +13,7 @@ import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
-import { ActionsTableCell } from '@/components/Table';
+import { ActionsTableCell } from '@/components/Table/ActionsTableCell';
 
 import { closeDialogInTradeBox, openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';

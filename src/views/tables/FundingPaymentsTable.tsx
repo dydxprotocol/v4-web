@@ -11,8 +11,9 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { Output, OutputType } from '@/components/Output';
-import { Table, TableCell, type ColumnDef } from '@/components/Table';
+import { Table, type ColumnDef } from '@/components/Table';
 import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import { TableCell } from '@/components/Table/TableCell';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 
 import {
