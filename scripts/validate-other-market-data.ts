@@ -114,6 +114,7 @@ enum ExchangeName {
   Kucoin = 'Kucoin',
   Mexc = 'Mexc',
   Okx = 'Okx',
+  Raydium = 'Raydium',
 }
 
 interface PrometheusTimeSeries {
@@ -296,6 +297,11 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
 
     // TODO: Skip Bybit exchange until we can query from non-US IP.
     if (exchange.exchangeName === ExchangeName.Bybit) {
+      return; // exit the current iteration of the loop.
+    }
+
+    // TODO: Skip Raydium since ticker is idiosyncratic
+    if (exchange.exchangeName === ExchangeName.Raydium) {
       return; // exit the current iteration of the loop.
     }
 
