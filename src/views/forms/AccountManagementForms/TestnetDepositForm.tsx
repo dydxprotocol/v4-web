@@ -33,7 +33,7 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
   const { requestFaucetFunds } = useSubaccount();
   const subAccount = useSelector(getSubaccount, shallowEqual);
   const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
-  const ethereumChainId = useEnvConfig('ethereumChainId');
+  const dydxChainId = useEnvConfig('dydxChainId');
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -78,7 +78,7 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
         {stringGetter({
           key: STRING_KEYS.CREDITED_WITH,
           params: {
-            AMOUNT_USD: ethereumChainId === 'dydxprotocol-testnet' ? 1000 : 100,
+            AMOUNT_USD: dydxChainId === 'dydxprotocol-testnet' ? 1000 : 100,
           },
         })}
       </p>
