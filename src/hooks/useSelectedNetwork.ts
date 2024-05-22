@@ -7,13 +7,13 @@ import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_APP_ENVIRONMENT, DydxNetwork } from '@/constants/networks';
 
 import { setSelectedNetwork } from '@/state/app';
+import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { validateAgainstAvailableEnvironments } from '@/lib/network';
 
 import { useAccounts } from './useAccounts';
 import { useEnvConfig } from './useEnvConfig';
 import { useLocalStorage } from './useLocalStorage';
-import { getSelectedNetwork } from '@/state/appSelectors';
 
 export const useSelectedNetwork = (): {
   switchNetwork: (network: DydxNetwork) => void;

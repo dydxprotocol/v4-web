@@ -72,13 +72,11 @@ export type FillTableRow = {
 
 const getFillsTableColumnDef = ({
   key,
-  isTablet = false,
   stringGetter,
   symbol = '',
   width,
 }: {
   key: FillsTableColumnKey;
-  isTablet?: boolean;
   stringGetter: StringGetterFunction;
   symbol?: Nullable<string>;
   width?: ColumnSize;
@@ -309,7 +307,7 @@ export const FillsTable = ({
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
-  const { isMobile, isTablet } = useBreakpoints();
+  const { isMobile } = useBreakpoints();
 
   const marketFills = useSelector(getCurrentMarketFills, shallowEqual) ?? EMPTY_ARR;
   const allFills = useSelector(getSubaccountFills, shallowEqual) ?? EMPTY_ARR;
@@ -357,7 +355,6 @@ export const FillsTable = ({
       columns={columnKeys.map((key: FillsTableColumnKey) =>
         getFillsTableColumnDef({
           key,
-          isTablet,
           stringGetter,
           symbol,
           width: columnWidths?.[key],
