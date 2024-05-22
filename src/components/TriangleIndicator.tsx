@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { NumberSign } from '@/constants/numbers';
 
@@ -53,5 +53,5 @@ const $TriangleIndicator = styled.div<{ sign: NumberSign }>`
           transform: rotate(180deg);
         }
       `,
-    }[sign])}
+    })[sign]}
 `;

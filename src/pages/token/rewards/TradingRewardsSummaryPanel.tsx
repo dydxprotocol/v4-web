@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
+import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -15,23 +16,27 @@ import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 
+import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getHistoricalTradingRewardsForCurrentWeek } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 
 export const TradingRewardsSummaryPanel = () => {
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
-  const currentWeekTradingReward = useSelector(
+  const canViewAccount = useAppSelector(calculateCanViewAccount);
+  const currentWeekTradingReward = useAppSelector(
     getHistoricalTradingRewardsForCurrentWeek,
     shallowEqual
   );
 
   useEffect(() => {
-    abacusStateManager.refreshHistoricalTradingRewards();
-  }, []);
+    // Initialize weekly data for currentWeekTradingReward
+    abacusStateManager.setHistoricalTradingRewardPeriod(HistoricalTradingRewardsPeriod.WEEKLY);
+  }, [canViewAccount]);
 
-  return !currentWeekTradingReward ? null : (
+  return !canViewAccount || !currentWeekTradingReward ? null : (
     <Panel
       slotHeader={<$Header>{stringGetter({ key: STRING_KEYS.TRADING_REWARDS_SUMMARY })}</$Header>}
     >

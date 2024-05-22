@@ -26,6 +26,7 @@ import { Tag } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import abacusStateManager from '@/lib/abacus';
+import { assertNever } from '@/lib/assertNever';
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
 
 type InputChangeType = InputType.Currency | InputType.Percent;
@@ -127,12 +128,15 @@ export const TriggerOrderInputs = ({
     });
   };
 
-  const getDecimalsForInputType = (inputType: InputChangeType) => {
-    switch (inputType) {
+  const getDecimalsForInputType = (inType: InputChangeType) => {
+    switch (inType) {
       case InputType.Currency:
         return USD_DECIMALS;
       case InputType.Percent:
         return PERCENT_DECIMALS;
+      default:
+        assertNever(inType);
+        return USD_DECIMALS;
     }
   };
 
@@ -190,7 +194,7 @@ export const TriggerOrderInputs = ({
       {stringGetter({ key: STRING_KEYS.MULTIPLE_ORDERS_FOUND })}
       <$ViewAllButton action={ButtonAction.Navigation} onClick={onViewOrdersClick}>
         {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
-        {<$ArrowIcon iconName={IconName.Arrow} />}
+        <$ArrowIcon iconName={IconName.Arrow} />
       </$ViewAllButton>
     </$MultipleOrdersContainer>
   );
@@ -234,7 +238,7 @@ export const TriggerOrderInputs = ({
           decimals={tickSizeDecimals}
           value={triggerPrice}
           onInput={onTriggerPriceInput}
-          allowNegative={true}
+          allowNegative
         />
         <FormInput
           id={`${tooltipId}-priceDiff`}
@@ -253,7 +257,7 @@ export const TriggerOrderInputs = ({
               : usdcDiff
           }
           onInput={inputType === InputType.Percent ? onPercentageDiffInput : onUsdcDiffInput}
-          allowNegative={true}
+          allowNegative
         />
       </$InlineRow>
     </$TriggerRow>
@@ -276,7 +280,7 @@ const $SignedOutput = styled(Output)<{ sign: NumberSign }>`
       [NumberSign.Positive]: `var(--color-positive)`,
       [NumberSign.Negative]: `var(--color-negative)`,
       [NumberSign.Neutral]: `var(--color-text-2)`,
-    }[sign])};
+    })[sign]};
 `;
 
 const $VerticalSeparator = styled(VerticalSeparator)`

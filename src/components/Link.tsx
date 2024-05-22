@@ -40,6 +40,7 @@ export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
       href={href}
       onClick={(e: React.MouseEvent) => {
         if (analyticsConfig) {
+          // eslint-disable-next-line no-console
           console.log(analyticsConfig);
         }
 
@@ -60,6 +61,7 @@ const $A = styled.a<StyleProps>`
 
   ${layoutMixins.spacedRow}
   gap: 0.25em;
+  cursor: pointer;
 
   &:hover {
     text-decoration: underline;

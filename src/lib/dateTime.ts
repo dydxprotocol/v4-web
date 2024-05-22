@@ -1,5 +1,7 @@
 import { allTimeUnits, timeUnits } from '@/constants/time';
 
+import { objectEntries } from './objectHelpers';
+
 // Given a literal from Intl.RelativeTimeFormat formatToParts,
 // strip out words/symbols unrelated to time unit
 const isolateTimeUnit = (literal: string) =>
@@ -55,7 +57,7 @@ export const formatRelativeTime = (
   const unitParts = [];
 
   // eslint-disable-next-line no-restricted-syntax
-  for (const [unit, amount] of Object.entries(timeUnits).slice(
+  for (const [unit, amount] of objectEntries(timeUnits).slice(
     Object.keys(timeUnits).findIndex((u) => u === largestUnit)
   ))
     if (Math.abs(elapsed) >= amount) {
@@ -88,8 +90,8 @@ export const formatRelativeTime = (
               ? format === 'singleCharacter'
                 ? toSingleCharacterTimeUnit(stripRelativeWords ? isolateTimeUnit(value) : value)
                 : stripRelativeWords
-                ? isolateTimeUnit(value)
-                : value
+                  ? isolateTimeUnit(value)
+                  : value
               : /* : type === 'integer' ?
                 // fr/ru: remove "past" negative signs
                 Math.abs(Number(value)) */

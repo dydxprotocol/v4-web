@@ -1,7 +1,7 @@
 import { memo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { AbacusOrderSide, TradeInputField } from '@/constants/abacus';
@@ -12,28 +12,32 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { ToggleGroup } from '@/components/ToggleGroup';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getTradeSide } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { getSelectedOrderSide } from '@/lib/tradeData';
 
-export const TradeSideToggle = memo(() => {
+export const TradeSideToggle = memo(({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
-  const side = useSelector(getTradeSide, shallowEqual);
+  const side = useAppSelector(getTradeSide, shallowEqual);
   const selectedOrderSide = getSelectedOrderSide(side);
 
   return (
     <$ToggleContainer
+      className={className}
       items={[
         { value: OrderSide.BUY, label: stringGetter({ key: STRING_KEYS.BUY }) },
         { value: OrderSide.SELL, label: stringGetter({ key: STRING_KEYS.SELL }) },
       ]}
       value={selectedOrderSide}
-      onValueChange={(side: OrderSide) => {
+      onValueChange={(newSide: OrderSide) => {
         abacusStateManager.setTradeValue({
           value:
-            side === OrderSide.BUY ? AbacusOrderSide.buy.rawValue : AbacusOrderSide.sell.rawValue,
+            newSide === OrderSide.BUY
+              ? AbacusOrderSide.buy.rawValue
+              : AbacusOrderSide.sell.rawValue,
           field: TradeInputField.side,
         });
       }}

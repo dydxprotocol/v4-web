@@ -1,8 +1,9 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 
 import { TriggerOrdersInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getTriggerOrdersInputs } from '@/state/inputsSelectors';
 
 import { TriggerOrderInputs } from './TriggerOrderInputs';
@@ -23,7 +24,7 @@ export const TriggerOrdersInputs = ({
   onViewOrdersClick,
 }: ElementProps) => {
   const { stopLossOrder, takeProfitOrder } =
-    useSelector(getTriggerOrdersInputs, shallowEqual) || {};
+    useAppSelector(getTriggerOrdersInputs, shallowEqual) ?? {};
 
   return (
     <>
@@ -62,7 +63,7 @@ export const TriggerOrdersInputs = ({
           usdcDiffField: TriggerOrdersInputField.stopLossUsdcDiff,
         }}
         isMultiple={multipleStopLossOrders}
-        isNegativeDiff={true}
+        isNegativeDiff
         price={stopLossOrder?.price}
         tickSizeDecimals={tickSizeDecimals}
         onViewOrdersClick={onViewOrdersClick}

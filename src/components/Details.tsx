@@ -12,14 +12,15 @@ import { WithSeparators } from '@/components/Separator';
 import { WithTooltip } from '@/components/WithTooltip';
 
 export type DetailsItem = {
+  // eslint-disable-next-line react/no-unused-prop-types
   key: string;
   tooltip?: string;
   tooltipParams?: Record<string, string>;
   label: string | JSX.Element;
   value?: Nullable<string> | JSX.Element | undefined;
+  // eslint-disable-next-line react/no-unused-prop-types
   subitems?: DetailsItem[];
   withTooltipIcon?: boolean;
-  allowUserSelection?: boolean;
 };
 
 const DETAIL_LAYOUTS = {
@@ -47,8 +48,11 @@ type ElementProps = {
 type StyleProps = {
   layout?: 'column' | 'row' | 'rowColumns' | 'grid' | 'stackColumn';
   justifyItems?: 'start' | 'end';
+  // I don't know why we're getting false positives for these props
+  // eslint-disable-next-line react/no-unused-prop-types
   withSeparators?: boolean;
   withOverflow?: boolean;
+  // eslint-disable-next-line react/no-unused-prop-types
   className?: string;
 };
 
@@ -61,7 +65,6 @@ const DetailItem = ({
   justifyItems,
   layout = 'column',
   withOverflow,
-  allowUserSelection,
 }: DetailsItem & StyleProps) => (
   <$Item justifyItems={justifyItems} layout={layout} withOverflow={withOverflow}>
     <dt>
@@ -74,7 +77,7 @@ const DetailItem = ({
         {label}
       </WithTooltip>
     </dt>
-    <$DetailsItemValue allowUserSelection={allowUserSelection}>{value ?? ''}</$DetailsItemValue>
+    <dd>{value ?? ''}</dd>
   </$Item>
 );
 
@@ -91,42 +94,30 @@ export const Details = ({
   <LoadingContext.Provider value={isLoading}>
     <$Details layout={layout} withSeparators={withSeparators} className={className}>
       <WithSeparators withSeparators={withSeparators} layout={DETAIL_LAYOUTS[layout]}>
-        {items.map(
-          ({
-            key,
-            tooltip,
-            tooltipParams,
-            label,
-            subitems,
-            value,
-            withTooltipIcon,
-            allowUserSelection,
-          }) => (
-            <Fragment key={key}>
-              <DetailItem
-                {...{
-                  key,
-                  tooltip,
-                  tooltipParams,
-                  label,
-                  value,
-                  withTooltipIcon,
-                  justifyItems,
-                  layout,
-                  withOverflow,
-                  allowUserSelection,
-                }}
+        {items.map(({ key, tooltip, tooltipParams, label, subitems, value, withTooltipIcon }) => (
+          <Fragment key={key}>
+            <DetailItem
+              {...{
+                key,
+                tooltip,
+                tooltipParams,
+                label,
+                value,
+                withTooltipIcon,
+                justifyItems,
+                layout,
+                withOverflow,
+              }}
+            />
+            {subitems && showSubitems && layout === 'column' && (
+              <$SubDetails
+                items={subitems}
+                layout={DETAIL_LAYOUTS[layout]}
+                withSeparators={withSeparators}
               />
-              {subitems && showSubitems && layout === 'column' && (
-                <$SubDetails
-                  items={subitems}
-                  layout={DETAIL_LAYOUTS[layout]}
-                  withSeparators={withSeparators}
-                />
-              )}
-            </Fragment>
-          )
-        )}
+            )}
+          </Fragment>
+        ))}
       </WithSeparators>
     </$Details>
   </LoadingContext.Provider>
@@ -160,7 +151,7 @@ const detailsLayoutVariants = {
   `,
 };
 
-const itemLayoutVariants: Record<string, FlattenInterpolation<ThemeProps<any>>> = {
+const itemLayoutVariants = {
   column: css`
     isolation: isolate;
 
@@ -171,8 +162,8 @@ const itemLayoutVariants: Record<string, FlattenInterpolation<ThemeProps<any>>> 
 
     ${layoutMixins.spacedRow}
     gap: 0.5rem;
-    align-items: start;
-    padding: 0.5rem 0;
+    align-items: center;
+    padding: var(--details-item-vertical-padding, 0.5rem) 0;
 
     min-height: var(--details-item-height);
 
@@ -191,7 +182,7 @@ const itemLayoutVariants: Record<string, FlattenInterpolation<ThemeProps<any>>> 
 
   stackColumn: css`
     ${layoutMixins.column}
-    padding: 0.75rem 0;
+    padding: var(--details-item-vertical-padding, 0.75rem) 0;
     > :first-child {
       margin-bottom: 0.5rem;
     }
@@ -219,15 +210,16 @@ const itemLayoutVariants: Record<string, FlattenInterpolation<ThemeProps<any>>> 
     justify-items: start;
     gap: 0.375rem;
   `,
-};
+} satisfies Record<string, FlattenInterpolation<ThemeProps<any>>>;
 const $Details = styled.dl<{
   layout: 'column' | 'row' | 'rowColumns' | 'grid' | 'stackColumn';
   withSeparators: boolean;
 }>`
-  --details-item-height: 2rem;
+  --details-item-height: 1rem;
   --details-item-backgroundColor: transparent;
   --details-subitem-borderWidth: 2px;
   --details-grid-numColumns: 2;
+  --details-item-vertical-padding: ;
 
   ${({ layout }) => layout && detailsLayoutVariants[layout]}
 `;
@@ -312,14 +304,4 @@ const $SubDetails = styled(Details)`
     width: var(--details-subitem-borderWidth);
     border-radius: 0.25rem;
   }
-`;
-
-const $DetailsItemValue = styled.dd<{
-  allowUserSelection?: boolean;
-}>`
-  ${({ allowUserSelection }) =>
-    allowUserSelection &&
-    css`
-      user-select: all;
-    `}
 `;

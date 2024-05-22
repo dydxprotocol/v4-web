@@ -25,7 +25,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   id,
   label,
   disabled,
-}) => (
+}: CheckboxProps) => (
   <$Container>
     <$Root
       className={className}

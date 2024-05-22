@@ -1,4 +1,3 @@
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { DialogTypes } from '@/constants/dialogs';
@@ -12,11 +11,12 @@ import { Link } from '@/components/Link';
 import { Panel } from '@/components/Panel';
 import { Tag } from '@/components/Tag';
 
+import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 export const StrideStakingPanel = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { stakingLearnMore } = useURLConfigs();
   const { chainTokenLabel } = useTokenConfigs();
 

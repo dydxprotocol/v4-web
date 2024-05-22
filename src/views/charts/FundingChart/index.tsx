@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { curveMonotoneX, curveStepAfter } from '@visx/curve';
 import type { TooltipContextType } from '@visx/xychart';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
@@ -14,7 +14,7 @@ import { SMALL_PERCENT_DECIMALS, TINY_PERCENT_DECIMALS } from '@/constants/numbe
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
@@ -22,6 +22,7 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { AxisLabelOutput } from '@/components/visx/AxisLabelOutput';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
+import { useAppSelector } from '@/state/appTypes';
 import { calculateFundingRateHistory } from '@/state/perpetualsCalculators';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -48,7 +49,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
   const stringGetter = useStringGetter();
 
   // Chart data
-  const data = useSelector(calculateFundingRateHistory, shallowEqual) as FundingChartDatum[];
+  const data = useAppSelector(calculateFundingRateHistory, shallowEqual);
 
   const latestDatum = data?.[data.length - 1];
 
@@ -63,7 +64,6 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
 
   return (
     <TimeSeriesChart
-      id="funding-chart"
       selectedLocale={selectedLocale}
       data={data}
       yAxisScaleType="symlog"
@@ -127,7 +127,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
     >
       <$FundingRateToggle>
         <ToggleGroup
-          items={Object.keys(FundingRateResolution).map((rate: string) => ({
+          items={Object.keys(FundingRateResolution).map((rate) => ({
             value: rate as FundingRateResolution,
             label:
               {

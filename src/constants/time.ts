@@ -1,10 +1,3 @@
-export enum TimeUnit {
-  Day = 'Day',
-  Hour = 'Hour',
-  Minute = 'Minute',
-  Second = 'Second',
-}
-
 // Good Til Time Timescales
 export enum TimeUnitShort {
   Minutes = 'M',
@@ -23,13 +16,13 @@ export const timeUnits = {
   second: 1000,
 } satisfies Partial<Record<Intl.RelativeTimeFormatUnit, number>>;
 
-export const smallTimeUnits = {
+const smallTimeUnits = {
   decisecond: 100,
   centisecond: 10,
   millisecond: 1,
 } satisfies Partial<Record<string, number>>;
 
-export const otherTimeUnits = {
+const otherTimeUnits = {
   threeDays: 3 * timeUnits.day,
 } satisfies Partial<Record<string, number>>;
 

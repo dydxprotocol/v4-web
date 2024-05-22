@@ -1,3 +1,4 @@
+import { Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { FundingDirection } from './markets';
@@ -12,7 +13,7 @@ export enum DepthChartSeries {
 export type DepthChartDatum = {
   size: number;
   price: number;
-  depth: number;
+  depth: Nullable<number>;
   seriesKey: DepthChartSeries;
 };
 
@@ -39,3 +40,19 @@ export type FundingChartDatum = {
   fundingRate: number;
   direction: FundingDirection;
 };
+
+// ------ Trading Rewards Chart ------ //
+export type TradingRewardsDatum = {
+  date: number;
+  cumulativeAmount: number;
+};
+
+export enum TradingRewardsPeriod {
+  Period1d = 'Period1d',
+  Period7d = 'Period7d',
+  Period30d = 'Period30d',
+  Period90d = 'Period90d',
+  PeriodAllTime = 'PeriodAllTime',
+}
+
+export const tradingRewardsPeriods = Object.keys(TradingRewardsPeriod) as TradingRewardsPeriod[];

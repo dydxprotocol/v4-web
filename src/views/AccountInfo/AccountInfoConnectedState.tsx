@@ -1,4 +1,4 @@
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import type { Nullable, TradeState } from '@/constants/abacus';
@@ -13,7 +13,7 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
@@ -21,25 +21,24 @@ import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { MarginUsageRing } from '@/components/MarginUsageRing';
-import { Output, OutputType } from '@/components/Output';
-import { UsageBars } from '@/components/UsageBars';
+import { OutputType } from '@/components/Output';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateIsAccountLoading } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
+import { getIsClosingIsolatedMarginPosition } from '@/state/inputsCalculator';
 import { getInputErrors } from '@/state/inputsSelectors';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { isNumber, MustBigNumber } from '@/lib/numbers';
+import { getTradeStateWithDoubleValuesHasDiff } from '@/lib/tradeData';
 
 import { AccountInfoDiffOutput } from './AccountInfoDiffOutput';
 
 enum AccountInfoItem {
   BuyingPower = 'buying-power',
-  Equity = 'equity',
   MarginUsage = 'margin-usage',
-  Leverage = 'leverage',
 }
 
 const getUsageValue = (value: Nullable<TradeState<number>>) => {
@@ -52,26 +51,28 @@ const getUsageValue = (value: Nullable<TradeState<number>>) => {
 export const AccountInfoConnectedState = () => {
   const stringGetter = useStringGetter();
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { isTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
 
   const { dydxAccounts } = useAccounts();
 
-  const inputErrors = useSelector(getInputErrors, shallowEqual);
-  const currentMarketId = useSelector(getCurrentMarketId);
-  const subAccount = useSelector(getSubaccount, shallowEqual);
-  const isLoading = useSelector(calculateIsAccountLoading);
+  const inputErrors = useAppSelector(getInputErrors, shallowEqual);
+  const subAccount = useAppSelector(getSubaccount, shallowEqual);
+  const isLoading = useAppSelector(calculateIsAccountLoading);
+  const isClosingIsolatedPosition = useAppSelector(getIsClosingIsolatedMarginPosition);
 
   const listOfErrors = inputErrors?.map(({ code }: { code: string }) => code);
 
-  const { buyingPower, equity, marginUsage, leverage } = subAccount ?? {};
+  const { freeCollateral, marginUsage } = subAccount ?? {};
 
+  /**
+   * TODO: isClosingIsolatedPosition controls whether diff state is shown. Remove when diff state is fixed in Abacus.
+   */
   const hasDiff =
-    (marginUsage?.postOrder !== null &&
-      !MustBigNumber(marginUsage?.postOrder).eq(MustBigNumber(marginUsage?.current))) ||
-    (buyingPower?.postOrder !== null &&
-      !MustBigNumber(buyingPower?.postOrder).eq(MustBigNumber(buyingPower?.current)));
+    !isClosingIsolatedPosition &&
+    ((!!marginUsage?.postOrder && getTradeStateWithDoubleValuesHasDiff(marginUsage)) ||
+      (!!freeCollateral?.postOrder && getTradeStateWithDoubleValuesHasDiff(freeCollateral)));
 
   const showHeader = !hasDiff && !isTablet;
 
@@ -132,34 +133,13 @@ export const AccountInfoConnectedState = () => {
         <$Details
           items={[
             {
-              key: AccountInfoItem.Leverage,
-              // hasError:
-              //   listOfErrors?.includes('INVALID_LARGE_POSITION_LEVERAGE') ||
-              //   listOfErrors?.includes('INVALID_NEW_POSITION_LEVERAGE'),
-              tooltip: 'leverage',
-              isPositive: !MustBigNumber(leverage?.postOrder).gt(MustBigNumber(leverage?.current)),
-              label: stringGetter({ key: STRING_KEYS.LEVERAGE }),
-              type: OutputType.Multiple,
-              value: leverage,
-              slotRight: <$UsageBars value={getUsageValue(leverage)} />,
-            },
-            {
-              key: AccountInfoItem.Equity,
-              // hasError: isNumber(equity?.postOrder) && MustBigNumber(equity?.postOrder).lt(0),
-              tooltip: 'equity',
-              isPositive: MustBigNumber(equity?.postOrder).gt(MustBigNumber(equity?.current)),
-              label: stringGetter({ key: STRING_KEYS.EQUITY }),
-              type: OutputType.Fiat,
-              value: equity,
-            },
-            {
               key: AccountInfoItem.MarginUsage,
               hasError: listOfErrors?.includes('INVALID_NEW_ACCOUNT_MARGIN_USAGE'),
-              tooltip: 'margin-usage',
+              tooltip: 'cross-margin-usage',
               isPositive: !MustBigNumber(marginUsage?.postOrder).gt(
                 MustBigNumber(marginUsage?.current)
               ),
-              label: stringGetter({ key: STRING_KEYS.MARGIN_USAGE }),
+              label: stringGetter({ key: STRING_KEYS.CROSS_MARGIN_USAGE }),
               type: OutputType.Percent,
               value: marginUsage,
               slotRight: <MarginUsageRing value={getUsageValue(marginUsage)} />,
@@ -167,25 +147,24 @@ export const AccountInfoConnectedState = () => {
             {
               key: AccountInfoItem.BuyingPower,
               hasError:
-                isNumber(buyingPower?.postOrder) && MustBigNumber(buyingPower?.postOrder).lt(0),
-              tooltip: 'buying-power',
-              stringParams: { MARKET: currentMarketId },
-              isPositive: MustBigNumber(buyingPower?.postOrder).gt(
-                MustBigNumber(buyingPower?.current)
+                isNumber(freeCollateral?.postOrder) &&
+                MustBigNumber(freeCollateral?.postOrder).lt(0),
+              tooltip: 'cross-free-collateral',
+              isPositive: MustBigNumber(freeCollateral?.postOrder).gt(
+                MustBigNumber(freeCollateral?.current)
               ),
-              label: stringGetter({ key: STRING_KEYS.BUYING_POWER }),
+              label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
               type: OutputType.Fiat,
               value:
-                MustBigNumber(buyingPower?.current).lt(0) && buyingPower?.postOrder === null
+                MustBigNumber(freeCollateral?.current).lt(0) && freeCollateral?.postOrder === null
                   ? undefined
-                  : buyingPower,
+                  : freeCollateral,
             },
           ].map(
             ({
               key,
               hasError,
               tooltip = undefined,
-              stringParams,
               isPositive,
               label,
               type,
@@ -194,21 +173,20 @@ export const AccountInfoConnectedState = () => {
             }) => ({
               key,
               label: (
-                <WithTooltip tooltip={tooltip} stringParams={stringParams}>
+                <WithTooltip tooltip={tooltip}>
                   <$WithUsage>
                     {label}
                     {hasError ? <$CautionIcon iconName={IconName.CautionCircle} /> : slotRight}
                   </$WithUsage>
                 </WithTooltip>
               ),
-              value: [AccountInfoItem.Leverage, AccountInfoItem.Equity].includes(key) ? (
-                <$Output type={type} value={value?.current} />
-              ) : (
+              value: (
                 <AccountInfoDiffOutput
                   hasError={hasError}
                   isPositive={isPositive}
                   type={type}
                   value={value}
+                  hideDiff={isClosingIsolatedPosition}
                 />
               ),
             })
@@ -276,8 +254,8 @@ const $Details = styled(Details)<{ showHeader?: boolean }>`
   > * {
     height: ${({ showHeader }) =>
       !showHeader
-        ? `calc(var(--account-info-section-height) / 2)`
-        : `calc((var(--account-info-section-height) - var(--tabs-height)) / 2)`};
+        ? `calc(var(--account-info-section-height))`
+        : `calc((var(--account-info-section-height) - var(--tabs-height)))`};
 
     padding: 0.625rem 1rem;
   }
@@ -289,15 +267,6 @@ const $Details = styled(Details)<{ showHeader?: boolean }>`
       padding: 1.25rem 1.875rem;
     }
   }
-`;
-
-const $UsageBars = styled(UsageBars)`
-  margin-top: -0.125rem;
-`;
-
-const $Output = styled(Output)<{ isNegative?: boolean }>`
-  color: var(--color-text-1);
-  font: var(--font-base-book);
 `;
 
 const $Header = styled.header`
@@ -316,6 +285,9 @@ const $ConnectedAccountInfoContainer = styled.div<{ $showHeader?: boolean }>`
 
   @media ${breakpoints.notTablet} {
     ${layoutMixins.withOuterAndInnerBorders}
+    > *:last-child {
+      box-shadow: none;
+    }
   }
 
   ${({ $showHeader }) =>

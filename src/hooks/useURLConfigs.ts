@@ -1,8 +1,7 @@
-import { useSelector } from 'react-redux';
-
 import { LINKS_CONFIG_MAP } from '@/constants/networks';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 const FALLBACK_URL = 'https://help.dydx.exchange/';
 
@@ -11,16 +10,19 @@ export interface LinksConfigs {
   blogs?: string;
   community?: string;
   documentation?: string;
+  equityTiersLearnMore?: string;
   feedback?: string;
   foundation?: string;
   governanceLearnMore?: string;
   help?: string;
   initialMarginFractionLearnMore?: string;
+  isolatedMarginLearnMore?: string;
   keplrDashboard?: string;
   launchIncentive?: string;
   mintscan: string;
   mintscanBase: string;
   newMarketProposalLearnMore: string;
+  adjustTargetLeverageLearnMore: string;
   privacy: string;
   reduceOnlyLearnMore?: string;
   statusPage: string;
@@ -32,10 +34,12 @@ export interface LinksConfigs {
   withdrawalGateLearnMore?: string;
   exchangeStats?: string;
   complianceSupportEmail?: string;
+  fetAgixMarketWindDownProposal?: string;
+  contractLossMechanismLearnMore?: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {
-  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const linksConfigs = LINKS_CONFIG_MAP[selectedDydxChainId] as LinksConfigs;
 
   return {
@@ -43,11 +47,13 @@ export const useURLConfigs = (): LinksConfigs => {
     blogs: linksConfigs.blogs ?? FALLBACK_URL,
     community: linksConfigs.community ?? FALLBACK_URL,
     documentation: linksConfigs.documentation ?? FALLBACK_URL,
+    equityTiersLearnMore: linksConfigs.equityTiersLearnMore,
     feedback: linksConfigs.feedback ?? FALLBACK_URL,
     foundation: linksConfigs.foundation ?? FALLBACK_URL,
     governanceLearnMore: linksConfigs.governanceLearnMore ?? FALLBACK_URL,
     help: linksConfigs.help ?? FALLBACK_URL,
     initialMarginFractionLearnMore: linksConfigs.initialMarginFractionLearnMore ?? FALLBACK_URL,
+    isolatedMarginLearnMore: linksConfigs.isolatedMarginLearnMore ?? FALLBACK_URL,
     keplrDashboard: linksConfigs.keplrDashboard ?? FALLBACK_URL,
     launchIncentive: linksConfigs.launchIncentive ?? FALLBACK_URL,
     mintscan: linksConfigs.mintscan,
@@ -64,5 +70,8 @@ export const useURLConfigs = (): LinksConfigs => {
     withdrawalGateLearnMore: linksConfigs.withdrawalGateLearnMore ?? FALLBACK_URL,
     exchangeStats: linksConfigs.exchangeStats ?? FALLBACK_URL,
     complianceSupportEmail: linksConfigs.complianceSupportEmail ?? FALLBACK_URL,
+    adjustTargetLeverageLearnMore: linksConfigs.adjustTargetLeverageLearnMore ?? FALLBACK_URL,
+    fetAgixMarketWindDownProposal: linksConfigs.fetAgixMarketWindDownProposal,
+    contractLossMechanismLearnMore: linksConfigs.contractLossMechanismLearnMore,
   };
 };

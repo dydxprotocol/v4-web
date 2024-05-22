@@ -6,7 +6,6 @@ import type {
   AbacusNotification,
   AbacusStateNotificationProtocol,
   AccountBalance,
-  Asset,
   Nullable,
   ParsingErrors,
   PerpetualMarket,
@@ -15,10 +14,12 @@ import type {
   SubaccountOrder,
 } from '@/constants/abacus';
 import { Changes } from '@/constants/abacus';
+import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 
-import type { RootStore } from '@/state/_store';
+import { type RootStore } from '@/state/_store';
 import {
   setBalances,
+  setChildSubaccount,
   setCompliance,
   setFills,
   setFundingPayments,
@@ -26,9 +27,12 @@ import {
   setLatestOrder,
   setRestrictionType,
   setStakingBalances,
+  setStakingDelegations,
+  setStakingRewards,
   setSubaccount,
   setTradingRewards,
   setTransfers,
+  setUnbondingDelegations,
   setWallet,
 } from '@/state/account';
 import { setApiState } from '@/state/app';
@@ -39,7 +43,6 @@ import { updateNotifications } from '@/state/notifications';
 import { setHistoricalFundings, setLiveTrades, setMarkets, setOrderbook } from '@/state/perpetuals';
 
 import { isTruthy } from '../isTruthy';
-import { testFlags } from '../testFlags';
 
 class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   private store: RootStore | undefined;
@@ -69,11 +72,16 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         dispatch(
           setAssets(
             Object.fromEntries(
-              (updatedState?.assetIds()?.toArray() ?? []).map((assetId: string) => {
-                const assetData = updatedState?.asset(assetId);
-                return [assetId, assetData];
-              })
-            ) as Record<string, Asset>
+              (updatedState?.assetIds()?.toArray() ?? [])
+                .map((assetId: string) => {
+                  const assetData = updatedState?.asset(assetId);
+                  if (assetData == null) {
+                    return undefined;
+                  }
+                  return [assetId, assetData];
+                })
+                .filter(isTruthy)
+            )
           )
         );
       }
@@ -90,6 +98,15 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
             updatedState.account.stakingBalances.toArray().map(({ k, v }) => [k, v])
           );
           dispatch(setStakingBalances(stakingBalances));
+        }
+        if (updatedState.account?.stakingDelegations) {
+          dispatch(setStakingDelegations(updatedState.account.stakingDelegations.toArray()));
+        }
+        if (updatedState.account?.unbondingDelegation) {
+          dispatch(setUnbondingDelegations(updatedState.account.unbondingDelegation.toArray()));
+        }
+        if (updatedState.account?.stakingRewards) {
+          dispatch(setStakingRewards(updatedState.account.stakingRewards));
         }
       }
 
@@ -116,12 +133,15 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
           setMarkets({
             markets: Object.fromEntries(
               (marketIds ?? updatedState.marketIds()?.toArray() ?? [])
-                .map((marketId: string) => {
+                .map((marketId: string): undefined | [string, PerpetualMarket] => {
                   const marketData = updatedState.market(marketId);
+                  if (marketData == null) {
+                    return undefined;
+                  }
                   return [marketId, marketData];
                 })
                 .filter(isTruthy)
-            ) as Record<string, PerpetualMarket>,
+            ),
             update: !!marketIds,
           })
         );
@@ -131,41 +151,74 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         dispatch(setRestrictionType(updatedState.restriction));
       }
 
-      if (
-        changes.has(Changes.compliance) &&
-        updatedState.compliance &&
-        testFlags.enableComplianceApi
-      ) {
+      if (changes.has(Changes.compliance) && updatedState.compliance) {
         dispatch(setCompliance(updatedState.compliance));
       }
 
       subaccountNumbers?.forEach((subaccountId: number) => {
-        if (subaccountId !== null) {
-          if (changes.has(Changes.subaccount)) {
-            dispatch(setSubaccount(updatedState.subaccount(subaccountId)));
-          }
+        const isChildSubaccount = subaccountId >= NUM_PARENT_SUBACCOUNTS;
+        const childSubaccountUpdate: Parameters<typeof setChildSubaccount>[0] = {};
 
-          if (changes.has(Changes.fills)) {
-            const fills = updatedState.subaccountFills(subaccountId)?.toArray() ?? [];
+        if (changes.has(Changes.subaccount)) {
+          const subaccountData = updatedState.subaccount(subaccountId);
+          if (isChildSubaccount) {
+            childSubaccountUpdate[subaccountId] = subaccountData;
+          } else {
+            dispatch(setSubaccount(subaccountData));
+          }
+        }
+
+        if (changes.has(Changes.fills)) {
+          const fills = updatedState.subaccountFills(subaccountId)?.toArray() ?? [];
+          if (isChildSubaccount) {
+            childSubaccountUpdate[subaccountId] = { ...childSubaccountUpdate[subaccountId], fills };
+          } else {
             dispatch(setFills(fills));
           }
+        }
 
-          if (changes.has(Changes.fundingPayments)) {
-            const fundingPayments =
-              updatedState.subaccountFundingPayments(subaccountId)?.toArray() ?? [];
+        if (changes.has(Changes.fundingPayments)) {
+          const fundingPayments =
+            updatedState.subaccountFundingPayments(subaccountId)?.toArray() ?? [];
+
+          if (isChildSubaccount) {
+            childSubaccountUpdate[subaccountId] = {
+              ...childSubaccountUpdate[subaccountId],
+              fundingPayments,
+            };
+          } else {
             dispatch(setFundingPayments(fundingPayments));
           }
+        }
 
-          if (changes.has(Changes.transfers)) {
-            const transfers = updatedState.subaccountTransfers(subaccountId)?.toArray() ?? [];
+        if (changes.has(Changes.transfers)) {
+          const transfers = updatedState.subaccountTransfers(subaccountId)?.toArray() ?? [];
+
+          if (isChildSubaccount) {
+            childSubaccountUpdate[subaccountId] = {
+              ...childSubaccountUpdate[subaccountId],
+              transfers,
+            };
+          } else {
             dispatch(setTransfers(transfers));
           }
+        }
 
-          if (changes.has(Changes.historicalPnl)) {
-            const historicalPnl =
-              updatedState.subaccountHistoricalPnl(subaccountId)?.toArray() ?? [];
+        if (changes.has(Changes.historicalPnl)) {
+          const historicalPnl = updatedState.subaccountHistoricalPnl(subaccountId)?.toArray() ?? [];
+
+          if (isChildSubaccount) {
+            childSubaccountUpdate[subaccountId] = {
+              ...childSubaccountUpdate[subaccountId],
+              historicalPnl,
+            };
+          } else {
             dispatch(setHistoricalPnl(historicalPnl));
           }
+        }
+
+        if (isChildSubaccount) {
+          dispatch(setChildSubaccount(childSubaccountUpdate));
         }
       });
 

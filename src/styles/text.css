@@ -52,6 +52,7 @@
   --font-extra-regular: var(--fontWeight-regular) var(--fontSize-extra) var(--fontFamily-base);
   --font-extra-book: var(--fontWeight-book) var(--fontSize-extra) var(--fontFamily-base);
   --font-extra-medium: var(--fontWeight-medium) var(--fontSize-extra) var(--fontFamily-base);
+  --font-extra-bold: var(--fontWeight-bold) var(--fontSize-extra) var(--fontFamily-base);
 
   --fontFeature-monoNumbers: 'tnum' on, 'lnum' on, 'zero' 1;
 }

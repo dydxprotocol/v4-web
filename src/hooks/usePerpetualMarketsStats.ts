@@ -1,49 +1,21 @@
 import { useMemo } from 'react';
 
-import { getChainRevenue } from '@/services';
-import { useQuery } from 'react-query';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
-import { log } from '@/lib/telemetry';
 import { isPresent, orEmptyObj } from '@/lib/typeUtils';
 
-const endDate = new Date();
-const startDate = new Date();
-startDate.setDate(startDate.getDate() - 1);
+const FEE_ESTIMATION_MULTIPLIER = 0.0002; // 2bps
 
 export const usePerpetualMarketsStats = () => {
-  const perpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
+  const perpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
 
   const markets = useMemo(
     () => Object.values(perpetualMarkets).filter(isPresent),
     [perpetualMarkets]
   );
-
-  const { data } = useQuery({
-    queryKey: ['chain-revenue', startDate.toISOString(), endDate.toISOString()],
-    queryFn: () => {
-      try {
-        return getChainRevenue({
-          startDate,
-          endDate,
-        });
-      } catch (error) {
-        log('usePerpetualMarketsStats getChainRevenue', error);
-        return undefined;
-      }
-    },
-    refetchOnWindowFocus: false,
-    cacheTime: 1_000 * 60 * 5, // 5 minutes
-    staleTime: 1_000 * 60 * 10, // 10 minutes
-  });
-
-  const feesEarned = useMemo(() => {
-    if (!data) return null;
-
-    return data.reduce((acc, { total }) => acc + total, 0);
-  }, [data]);
 
   const stats = useMemo(() => {
     let volume24HUSDC = 0;
@@ -59,21 +31,11 @@ export const usePerpetualMarketsStats = () => {
     return {
       volume24HUSDC,
       openInterestUSDC,
-      feesEarned,
+      feesEarned: volume24HUSDC * FEE_ESTIMATION_MULTIPLIER,
     };
-  }, [markets, feesEarned]);
-
-  const feesEarnedChart = useMemo(
-    () =>
-      data?.map((point, x) => ({
-        x: x + 1,
-        y: point.total,
-      })) ?? [],
-    [data]
-  );
+  }, [markets]);
 
   return {
     stats,
-    feesEarnedChart,
   };
 };

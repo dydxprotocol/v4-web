@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { Nullable } from '@/constants/abacus';
@@ -10,6 +10,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { LoadingDots } from '@/components/Loading/LoadingDots';
 import { Output, OutputType } from '@/components/Output';
 
+import { useAppSelector } from '@/state/appTypes';
 import {
   getCurrentMarketConfig,
   getCurrentMarketMidMarketPrice,
@@ -35,8 +36,8 @@ const getMidMarketPriceColor = ({
 };
 
 export const MidMarketPrice = () => {
-  const { tickSizeDecimals } = useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
-  const midMarketPrice = useSelector(getCurrentMarketMidMarketPrice);
+  const { tickSizeDecimals } = useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice);
   const lastMidMarketPrice = useRef(midMarketPrice);
 
   const midMarketColor = getMidMarketPriceColor({

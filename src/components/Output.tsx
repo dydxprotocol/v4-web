@@ -1,8 +1,8 @@
+/* eslint-disable react/no-unstable-nested-components */
 import { useContext } from 'react';
 
 import BigNumber from 'bignumber.js';
 import { DateTime } from 'luxon';
-import { useSelector } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import {
@@ -24,6 +24,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { RelativeTime } from '@/components/RelativeTime';
 import { Tag } from '@/components/Tag';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber, isNumber, type BigNumberish } from '@/lib/numbers';
@@ -43,7 +44,9 @@ export enum OutputType {
   Percent = 'Percent',
   SmallPercent = 'SmallPercent',
   Multiple = 'Multiple',
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   RelativeTime = 'RelativeTime',
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   DateTime = 'DateTime',
   Date = 'Date',
   Time = 'Time',
@@ -304,25 +307,30 @@ export const Output = (props: OutputProps) => {
     type,
     value,
     isLoading,
+    fractionDigits,
+    showSign = ShowSign.Negative,
     slotLeft,
     slotRight,
-    withSubscript,
+    useGrouping = true,
+    withSubscript = false,
+    roundingMode = BigNumber.ROUND_HALF_UP,
     relativeTimeFormatOptions = {
       format: 'singleCharacter',
     },
+    timeOptions,
     tag,
     withParentheses,
     locale = navigator.language || 'en-US',
     className,
     withBaseFont,
   } = props;
-  const selectedLocale = useSelector(getSelectedLocale);
+  const selectedLocale = useAppSelector(getSelectedLocale);
   const stringGetter = useStringGetter();
   const isDetailsLoading = useContext(LoadingContext);
   const { decimal: LOCALE_DECIMAL_SEPARATOR, group: LOCALE_GROUP_SEPARATOR } =
     useLocaleSeparators();
 
-  if (isLoading || isDetailsLoading) {
+  if (!!isLoading || !!isDetailsLoading) {
     return <LoadingOutput />;
   }
 
@@ -407,6 +415,43 @@ export const Output = (props: OutputProps) => {
         localeGroupSeparator: LOCALE_GROUP_SEPARATOR,
       });
 
+      const numberRenderers = {
+        [OutputType.CompactNumber]: () => {
+          if (!isNumber(value)) {
+            throw new Error('value must be a number for compact number output');
+          }
+
+          return <NumberValue value={formattedString} withSubscript={withSubscript} />;
+        },
+        [OutputType.Number]: () => (
+          <NumberValue value={formattedString} withSubscript={withSubscript} />
+        ),
+        [OutputType.Fiat]: () => (
+          <NumberValue value={formattedString} withSubscript={withSubscript} />
+        ),
+        [OutputType.SmallFiat]: () => (
+          <NumberValue value={formattedString} withSubscript={withSubscript} />
+        ),
+        [OutputType.CompactFiat]: () => {
+          if (!isNumber(value)) {
+            throw new Error('value must be a number for compact fiat output');
+          }
+
+          return <NumberValue value={formattedString} withSubscript={withSubscript} />;
+        },
+        [OutputType.Asset]: () => (
+          <NumberValue value={formattedString} withSubscript={withSubscript} />
+        ),
+        [OutputType.Percent]: () => (
+          <NumberValue value={formattedString} withSubscript={withSubscript} />
+        ),
+        [OutputType.SmallPercent]: () => (
+          <NumberValue value={formattedString} withSubscript={withSubscript} />
+        ),
+        [OutputType.Multiple]: () => (
+          <NumberValue value={formattedString} withSubscript={withSubscript} />
+        ),
+      };
       return (
         <$Number
           key={value?.toString()}
@@ -424,44 +469,7 @@ export const Output = (props: OutputProps) => {
         >
           {slotLeft}
           {sign && <$Sign>{sign}</$Sign>}
-          {hasValue &&
-            {
-              [OutputType.CompactNumber]: () => {
-                if (!isNumber(value)) {
-                  throw new Error('value must be a number for compact number output');
-                }
-
-                return <NumberValue value={formattedString} withSubscript={withSubscript} />;
-              },
-              [OutputType.Number]: () => (
-                <NumberValue value={formattedString} withSubscript={withSubscript} />
-              ),
-              [OutputType.Fiat]: () => (
-                <NumberValue value={formattedString} withSubscript={withSubscript} />
-              ),
-              [OutputType.SmallFiat]: () => (
-                <NumberValue value={formattedString} withSubscript={withSubscript} />
-              ),
-              [OutputType.CompactFiat]: () => {
-                if (!isNumber(value)) {
-                  throw new Error('value must be a number for compact fiat output');
-                }
-
-                return <NumberValue value={formattedString} withSubscript={withSubscript} />;
-              },
-              [OutputType.Asset]: () => (
-                <NumberValue value={formattedString} withSubscript={withSubscript} />
-              ),
-              [OutputType.Percent]: () => (
-                <NumberValue value={formattedString} withSubscript={withSubscript} />
-              ),
-              [OutputType.SmallPercent]: () => (
-                <NumberValue value={formattedString} withSubscript={withSubscript} />
-              ),
-              [OutputType.Multiple]: () => (
-                <NumberValue value={formattedString} withSubscript={withSubscript} />
-              ),
-            }[type]()}
+          {hasValue && numberRenderers[type]()}
           {slotRight}
           {tag && <$Tag>{tag}</$Tag>}
         </$Number>
@@ -472,7 +480,7 @@ export const Output = (props: OutputProps) => {
   }
 };
 
-const _OUTPUT_STYLES = styled.output<{ withParentheses?: boolean }>`
+const $Text = styled.output<{ withParentheses?: boolean }>`
   --output-beforeString: '';
   --output-afterString: '';
   --output-sign-color: currentColor;
@@ -505,8 +513,6 @@ const _OUTPUT_STYLES = styled.output<{ withParentheses?: boolean }>`
     `}
 `;
 
-const $Output = _OUTPUT_STYLES;
-
 const $Tag = styled(Tag)`
   margin-left: 0.5ch;
 `;
@@ -515,9 +521,7 @@ const $Sign = styled.span`
   color: var(--output-sign-color);
 `;
 
-const $Text = styled(_OUTPUT_STYLES)``;
-
-const $Number = styled(_OUTPUT_STYLES)<{ withBaseFont?: boolean }>`
+const $Number = styled($Text)<{ withBaseFont?: boolean }>`
   ${({ withBaseFont }) =>
     !withBaseFont &&
     css`

@@ -48,7 +48,7 @@ export const usePotentialMarkets = () => useContext(PotentialMarketsContext);
 
 const POTENTIAL_MARKETS_FILE_PATH = '/configs/otherMarketData.json';
 
-export const usePotentialMarketsContext = () => {
+const usePotentialMarketsContext = () => {
   const stringGetter = useStringGetter();
   const [potentialMarkets, setPotentialMarkets] = useState<NewMarketProposal[]>();
 

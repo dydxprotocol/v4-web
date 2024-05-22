@@ -1,4 +1,5 @@
 import type { RootState } from './_store';
+import { createAppSelector } from './appTypes';
 import { AppTheme, AppThemeSetting, AppThemeSystemSetting } from './configs';
 
 export const getAppThemeSetting = (state: RootState): AppThemeSetting =>
@@ -15,11 +16,24 @@ export const getAppTheme = (state: RootState): AppTheme => {
   }
 };
 
+const DARK_CHART_BACKGROUND_URL = '/chart-dots-background-dark.svg';
+const LIGHT_CHART_BACKGROUND_URL = '/chart-dots-background-light.svg';
+
+export const getChartDotBackground = (state: RootState): string => {
+  const appTheme = getAppTheme(state);
+  return appTheme === AppTheme.Light ? LIGHT_CHART_BACKGROUND_URL : DARK_CHART_BACKGROUND_URL;
+};
+
 export const getAppColorMode = (state: RootState) => state.configs.appColorMode;
 
-export const getFeeTiers = (state: RootState) => state.configs.feeTiers?.toArray();
+export const getFeeTiers = createAppSelector([(state: RootState) => state.configs.feeTiers], (t) =>
+  t?.toArray()
+);
 
-export const getFeeDiscounts = (state: RootState) => state.configs.feeDiscounts;
+export const getStatefulOrderEquityTiers = createAppSelector(
+  [(state: RootState) => state.configs.equityTiers?.statefulOrderEquityTiers],
+  (t) => t?.toArray()
+);
 
 export const getHasSeenLaunchIncentives = (state: RootState) =>
   state.configs.hasSeenLaunchIncentives;

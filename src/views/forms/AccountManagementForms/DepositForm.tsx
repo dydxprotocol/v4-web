@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import { type NumberFormatValues } from 'react-number-format';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 import { Abi, parseUnits } from 'viem';
 
@@ -29,14 +30,12 @@ import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { InputType } from '@/components/Input';
-import { Link } from '@/components/Link';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
@@ -44,6 +43,7 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -67,9 +67,9 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [requireUserActionInWallet, setRequireUserActionInWallet] = useState(false);
-  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
-  const { evmAddress, signerWagmi, publicClientWagmi, nobleAddress } = useAccounts();
+  const { dydxAddress, evmAddress, signerWagmi, publicClientWagmi, nobleAddress } = useAccounts();
 
   const { addTransferNotification } = useLocalNotifications();
 
@@ -83,7 +83,9 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     errors: routeErrors,
     errorMessage: routeErrorMessage,
     isCctp,
-  } = useSelector(getTransferInputs, shallowEqual) || {};
+  } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
+  // todo are these guaranteed to be base 10?
+  // eslint-disable-next-line radix
   const chainId = chainIdStr ? parseInt(chainIdStr) : undefined;
 
   // User inputs
@@ -102,9 +104,9 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const debouncedAmount = useDebounce<string>(fromAmount, 500);
 
   // Async Data
-  const { balance, queryStatus, isQueryFetching } = useAccountBalance({
+  const { balance } = useAccountBalance({
     addressOrDenom: sourceToken?.address || CHAIN_DEFAULT_TOKEN_ADDRESS,
-    chainId: chainId,
+    chainId,
     decimals: sourceToken?.decimals || undefined,
     isCosmosChain: false,
   });
@@ -128,15 +130,19 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   }, [debouncedAmountBN.toNumber()]);
 
   useEffect(() => {
-    abacusStateManager.setTransferValue({
-      field: TransferInputField.type,
-      value: TransferType.deposit.rawValue,
-    });
-
+    if (dydxAddress && evmAddress) {
+      // TODO: this is for fixing a race condition where the sourceAddress is not set in time.
+      // worth investigating a better fix on abacus
+      abacusStateManager.setTransfersSourceAddress(evmAddress);
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.type,
+        value: TransferType.deposit.rawValue,
+      });
+    }
     return () => {
       abacusStateManager.resetInputState();
     };
-  }, []);
+  }, [dydxAddress]);
 
   useEffect(() => {
     if (error) onError?.();
@@ -171,12 +177,12 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     }
   }, []);
 
-  const onSelectToken = useCallback((token: TransferInputTokenResource) => {
-    if (token) {
+  const onSelectToken = useCallback((selectedToken: TransferInputTokenResource) => {
+    if (selectedToken) {
       abacusStateManager.clearTransferInputValues();
       abacusStateManager.setTransferValue({
         field: TransferInputField.token,
-        value: token.address,
+        value: selectedToken.address,
       });
       setFromAmount('');
     }
@@ -271,7 +277,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
         await validateTokenApproval();
 
-        let tx = {
+        const tx = {
           to: requestPayload.targetAddress as EvmAddress,
           data: requestPayload.data as EvmAddress,
           gasLimit: BigInt(requestPayload.gasLimit),
@@ -281,7 +287,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
         if (txHash) {
           addTransferNotification({
-            txHash: txHash,
+            txHash,
             toChainId: !isCctp ? selectedDydxChainId : getNobleChainId(),
             fromChainId: chainIdStr || undefined,
             toAmount: summary?.usdcSize || undefined,
@@ -306,9 +312,9 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
             toAmountMin: summary?.toAmountMin || undefined,
           });
         }
-      } catch (error) {
-        log('DepositForm/onSubmit', error);
-        setError(error);
+      } catch (err) {
+        log('DepositForm/onSubmit', err);
+        setError(err);
       } finally {
         setIsLoading(false);
       }
@@ -355,7 +361,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         return stringGetter({
           key: STRING_KEYS.MAX_CCTP_TRANSFER_LIMIT_EXCEEDED,
           params: {
-            MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
+            MAX_CCTP_TRANSFER_AMOUNT,
           },
         });
       }
@@ -376,7 +382,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     if (fromAmount) {
       if (!chainId) {
         return stringGetter({ key: STRING_KEYS.MUST_SPECIFY_CHAIN });
-      } else if (!sourceToken) {
+      }
+      if (!sourceToken) {
         return stringGetter({ key: STRING_KEYS.MUST_SPECIFY_ASSET });
       }
     }
@@ -490,18 +497,6 @@ const $Footer = styled.footer`
 
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
-`;
-
-const $Link = styled(Link)`
-  color: var(--color-accent);
-
-  &:visited {
-    color: var(--color-accent);
-  }
-`;
-
-const $TransactionInfo = styled.span`
-  ${layoutMixins.row}
 `;
 
 const $FormInputButton = styled(Button)`

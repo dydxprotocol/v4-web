@@ -70,7 +70,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     {
       className,
       allowNegative = false,
-      decimals,
+      decimals: inDecimals,
       disabled,
       id,
       max,
@@ -107,20 +107,20 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       [InputType.Search]: null,
     }[type];
 
-    decimals = decimals !== undefined ? decimals : numberFormatConfig?.defaultDecimals;
+    const decimals = inDecimals ?? numberFormatConfig?.defaultDecimals;
 
     const defaultNumberPlaceholder = `${numberFormatConfig?.prefix ?? ''}${BIG_NUMBERS.ZERO.toFixed(
-      decimals !== undefined ? decimals : USD_DECIMALS
+      decimals ?? USD_DECIMALS
     )}${numberFormatConfig?.suffix ?? ''}`;
 
     const formattedValue =
       typeof value === 'string'
         ? value
         : value != null
-        ? Intl.NumberFormat(navigator.language || 'en-US', {
-            maximumFractionDigits: decimals,
-          }).format(value)
-        : '';
+          ? Intl.NumberFormat(navigator.language || 'en-US', {
+              maximumFractionDigits: decimals,
+            }).format(value)
+          : '';
 
     return (
       <$InputContainer className={className}>
@@ -153,7 +153,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             decimalScale={decimals}
             decimalSeparator={LOCALE_DECIMAL_SEPARATOR}
             isAllowed={({ floatValue }: NumberFormatValues) =>
-              floatValue ? floatValue <= (max || Number.MAX_VALUE) : true
+              floatValue ? floatValue <= (max ?? Number.MAX_VALUE) : true
             }
             prefix={numberFormatConfig?.prefix}
             suffix={numberFormatConfig?.suffix}
@@ -163,20 +163,22 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             onFocus={onFocus}
             onInput={(e: SyntheticInputEvent) => {
               if (!onInput) return;
-              const value = e.target.value;
-              const { prefix = '', suffix = '' } = numberFormatConfig || {};
+              const newValue = e.target.value;
+              const { prefix = '', suffix = '' } = numberFormatConfig ?? {};
               // Remove prefix and suffix, replace commas with periods
-              const formattedValue = value.replace(prefix, '').replace(suffix, '');
+              const newFormattedValue = newValue.replace(prefix, '').replace(suffix, '');
 
-              const floatValue: number | undefined = isNaN(Number(formattedValue.replace(',', '.')))
+              const floatValue: number | undefined = Number.isNaN(
+                Number(newFormattedValue.replace(',', '.'))
+              )
                 ? undefined
-                : Number(formattedValue.replace(',', '.'));
+                : Number(newFormattedValue.replace(',', '.'));
 
-              onInput?.({ value, floatValue, formattedValue, ...e });
+              onInput?.({ value: newValue, floatValue, formattedValue: newFormattedValue, ...e });
             }}
             // Native
             disabled={disabled}
-            placeholder={placeholder || defaultNumberPlaceholder}
+            placeholder={placeholder ?? defaultNumberPlaceholder}
             value={formattedValue}
             autoComplete="off"
             autoCorrect="off"
@@ -220,7 +222,9 @@ const InputStyle = css`
   // Input autofill Styles
   &:-webkit-autofill,
   &:-webkit-autofill:focus {
-    transition: background-color 600000s 0s, color 600000s 0s;
+    transition:
+      background-color 600000s 0s,
+      color 600000s 0s;
   }
 
   &[data-autocompleted] {

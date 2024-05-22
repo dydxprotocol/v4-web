@@ -1,10 +1,12 @@
-import { createSelector } from 'reselect';
-
 import { Candle, TradingViewBar } from '@/constants/candles';
+import { EMPTY_ARR, EMPTY_OBJ } from '@/constants/objects';
 
+import { BIG_NUMBERS } from '@/lib/numbers';
 import { mapCandle } from '@/lib/tradingView/utils';
+import { orEmptyObj } from '@/lib/typeUtils';
 
-import type { RootState } from './_store';
+import { type RootState } from './_store';
+import { createAppSelector } from './appTypes';
 
 /**
  * @returns current market filter applied inside the markets page
@@ -33,13 +35,14 @@ export const getPerpetualMarkets = (state: RootState) => state.perpetuals.market
  * @param marketId
  * @returns PerpetualMarket data of the specified marketId
  */
-export const getMarketData = (marketId: string) => (state: RootState) =>
+export const getMarketData = (state: RootState, marketId: string) =>
   getPerpetualMarkets(state)?.[marketId];
 
 /**
  * @returns marketIds of all markets
  */
-export const getMarketIds = (state: RootState) => Object.keys(getPerpetualMarkets(state) ?? []);
+export const getMarketIds = (state: RootState) =>
+  Object.keys(getPerpetualMarkets(state) ?? EMPTY_OBJ);
 
 /**
  * @returns PerpetualMarket data of the market the user is currently viewing
@@ -58,8 +61,8 @@ export const getCurrentMarketConfig = (state: RootState) => getCurrentMarketData
  * @param marketId
  * @returns config for specified market
  */
-export const getMarketConfig = (marketId: string) => (state: RootState) =>
-  getMarketData(marketId)(state)?.configs;
+export const getMarketConfig = (state: RootState, marketId: string) =>
+  getMarketData(state, marketId)?.configs;
 
 /**
  * @returns Record of list of MarketTrades indexed by marketId
@@ -72,7 +75,7 @@ export const getLiveTrades = (state: RootState) => state.perpetuals.liveTrades;
 export const getCurrentMarketLiveTrades = (state: RootState) => {
   const liveTrades = getLiveTrades(state);
   const currentMarketId = getCurrentMarketId(state);
-  return currentMarketId ? liveTrades?.[currentMarketId] ?? [] : [];
+  return currentMarketId ? liveTrades?.[currentMarketId] ?? EMPTY_ARR : EMPTY_ARR;
 };
 
 /**
@@ -106,10 +109,10 @@ export const getHistoricalFundings = (state: RootState) => state.perpetuals.hist
 /**
  * @returns Historical funding data for the market the user is currently viewing
  */
-export const getCurrentMarketHistoricalFundings = createSelector(
+export const getCurrentMarketHistoricalFundings = createAppSelector(
   [getHistoricalFundings, getCurrentMarketId],
   (historicalFundings, currentMarketId) =>
-    currentMarketId ? historicalFundings?.[currentMarketId] ?? [] : []
+    currentMarketId ? historicalFundings?.[currentMarketId] ?? EMPTY_ARR : EMPTY_ARR
 );
 
 /**
@@ -132,10 +135,11 @@ export const getCurrentMarketMidMarketPrice = (state: RootState) => {
  * @param resolution
  * @returns candle data for specified marketId and resolution
  */
-export const getPerpetualCandlesForMarket =
-  (marketId: string, resolution: string) =>
-  (state: RootState): Candle[] =>
-    state.perpetuals.candles?.[marketId]?.data?.[resolution] ?? [];
+export const getPerpetualCandlesForMarket = (
+  state: RootState,
+  marketId: string,
+  resolution: string
+): Candle[] => state.perpetuals.candles?.[marketId]?.data?.[resolution] ?? EMPTY_ARR;
 
 /**
  *
@@ -143,9 +147,12 @@ export const getPerpetualCandlesForMarket =
  * @param resolution
  * @returns TradingViewBar data for specified marketId and resolution
  */
-export const getPerpetualBarsForPriceChart = (marketId: string, resolution: string) =>
-  createSelector(
-    [getPerpetualCandlesForMarket(marketId, resolution)],
+export const getPerpetualBarsForPriceChart = () =>
+  createAppSelector(
+    [
+      (state: RootState, marketId: string, resolution: string) =>
+        getPerpetualCandlesForMarket(state, marketId, resolution),
+    ],
     (candles): TradingViewBar[] => candles.map(mapCandle)
   );
 
@@ -154,20 +161,33 @@ export const getPerpetualBarsForPriceChart = (marketId: string, resolution: stri
  * @param marketId
  * @returns TvChart resolution for specified marketId
  */
-export const getSelectedResolutionForMarket = (marketId: string) => (state: RootState) =>
+export const getSelectedResolutionForMarket = (state: RootState, marketId: string) =>
   state.perpetuals.candles?.[marketId]?.selectedResolution;
 
 /**
  * @returns Current market's next funding rate
  */
-export const getCurrentMarketNextFundingRate = createSelector(
+export const getCurrentMarketNextFundingRate = createAppSelector(
   [getCurrentMarketData],
   (marketData) => marketData?.perpetual?.nextFundingRate
 );
 
 /**
- * @param marketId
- * @returns sparkline data for specified marketId
+ * @returns Specified market's max leverage
  */
-export const getPerpetualMarketSparklineData = (marketId: string) => (state: RootState) =>
-  getPerpetualMarkets(state)?.[marketId]?.perpetual?.line?.toArray() ?? [];
+export const getMarketMaxLeverage = createAppSelector(
+  [(state: RootState, marketId: string) => getMarketConfig(state, marketId)],
+  (marketConfig) => {
+    const { effectiveInitialMarginFraction, initialMarginFraction } = orEmptyObj(marketConfig);
+
+    if (effectiveInitialMarginFraction) {
+      return BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction).toNumber();
+    }
+
+    if (initialMarginFraction) {
+      return BIG_NUMBERS.ONE.div(initialMarginFraction).toNumber();
+    }
+
+    return 10; // safe default
+  }
+);

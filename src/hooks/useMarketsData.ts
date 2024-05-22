@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 
 import { MARKET_FILTER_LABELS, MarketFilters, type MarketData } from '@/constants/markets';
 
@@ -9,10 +9,12 @@ import {
   usePerpetualMarketSparklines,
 } from '@/hooks/usePerpetualMarketSparklines';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
+import { objectKeys, safeAssign } from '@/lib/objectHelpers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 const filterFunctions = {
@@ -49,16 +51,16 @@ export const useMarketsData = (
 ): {
   markets: MarketData[];
   filteredMarkets: MarketData[];
-  marketFilters: string[];
+  marketFilters: MarketFilters[];
 } => {
-  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
-  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
+  const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
   const sevenDaysSparklineData = usePerpetualMarketSparklines();
 
   const markets = useMemo(() => {
     return Object.values(allPerpetualMarkets)
       .filter(isTruthy)
-      .map((marketData) => {
+      .map((marketData): MarketData => {
         const sevenDaySparklineEntries = sevenDaysSparklineData?.[marketData.id]?.length ?? 0;
         const isNew = Boolean(
           sevenDaysSparklineData && sevenDaySparklineEntries < SEVEN_DAY_SPARKLINE_ENTRIES
@@ -78,16 +80,19 @@ export const useMarketsData = (
           listingDate.setHours(listingDate.getHours() - sevenDaySparklineEntries * 4);
         }
 
-        return {
-          asset: allAssets[marketData.assetId] ?? {},
-          tickSizeDecimals: marketData.configs?.tickSizeDecimals,
-          isNew,
-          listingDate,
-          ...marketData,
-          ...marketData.perpetual,
-          ...marketData.configs,
-        };
-      }) as MarketData[];
+        return safeAssign(
+          {},
+          {
+            asset: allAssets[marketData.assetId] ?? {},
+            tickSizeDecimals: marketData.configs?.tickSizeDecimals,
+            isNew,
+            listingDate,
+          },
+          marketData,
+          marketData.perpetual,
+          marketData.configs
+        );
+      });
   }, [allPerpetualMarkets, allAssets, sevenDaysSparklineData]);
 
   const filteredMarkets = useMemo(() => {
@@ -108,7 +113,7 @@ export const useMarketsData = (
     () => [
       MarketFilters.ALL,
       MarketFilters.NEW,
-      ...Object.keys(MARKET_FILTER_LABELS).filter((marketFilter) =>
+      ...objectKeys(MARKET_FILTER_LABELS).filter((marketFilter) =>
         markets.some((market) => market.asset?.tags?.toArray().some((tag) => tag === marketFilter))
       ),
     ],

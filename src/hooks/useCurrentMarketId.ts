@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import { useMatch, useNavigate } from 'react-router-dom';
 
 import { SubaccountPosition } from '@/constants/abacus';
@@ -13,6 +13,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 import { getOpenPositions } from '@/state/accountSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { setCurrentMarketId } from '@/state/perpetuals';
@@ -24,12 +25,12 @@ export const useCurrentMarketId = () => {
   const navigate = useNavigate();
   const match = useMatch(`/${AppRoute.Trade}/:marketId`);
   const { marketId } = match?.params ?? {};
-  const dispatch = useDispatch();
-  const selectedNetwork = useSelector(getSelectedNetwork);
-  const openPositions = useSelector(getOpenPositions, shallowEqual);
-  const marketIds = useSelector(getMarketIds, shallowEqual);
+  const dispatch = useAppDispatch();
+  const selectedNetwork = useAppSelector(getSelectedNetwork);
+  const openPositions = useAppSelector(getOpenPositions, shallowEqual);
+  const marketIds = useAppSelector(getMarketIds, shallowEqual);
   const hasMarketIds = marketIds.length > 0;
-  const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog);
+  const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
 
   const [lastViewedMarket, setLastViewedMarket] = useLocalStorage({
     key: LocalStorageKey.LastViewedMarket,
@@ -81,8 +82,9 @@ export const useCurrentMarketId = () => {
 
   useEffect(() => {
     // Check for marketIds otherwise Abacus will silently fail its isMarketValid check
-    if (marketIds) {
+    if (hasMarketIds) {
       abacusStateManager.setMarket(marketId ?? DEFAULT_MARKETID);
+      abacusStateManager.setTradeValue({ value: null, field: null });
     }
   }, [selectedNetwork, hasMarketIds, marketId]);
 };

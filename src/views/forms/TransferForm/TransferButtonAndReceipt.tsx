@@ -1,4 +1,4 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -19,6 +19,7 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -38,17 +39,17 @@ export const TransferButtonAndReceipt = ({
   isLoading,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
-  const { size } = useSelector(getTransferInputs, shallowEqual) || {};
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
+  const { size } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
   const { tokensConfigs } = useTokenConfigs();
 
   const { equity: equityInfo, leverage: leverageInfo } =
-    useSelector(getSubaccount, shallowEqual) || {};
+    useAppSelector(getSubaccount, shallowEqual) ?? {};
 
   const { nativeTokenBalance } = useAccountBalance();
 
-  const { current: equity, postOrder: newEquity } = equityInfo || {};
-  const { current: leverage, postOrder: newLeverage } = leverageInfo || {};
+  const { current: equity, postOrder: newEquity } = equityInfo ?? {};
+  const { current: leverage, postOrder: newLeverage } = leverageInfo ?? {};
 
   const isUSDCSelected = selectedAsset === DydxChainAsset.USDC;
 

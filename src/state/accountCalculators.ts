@@ -1,7 +1,4 @@
-import { createSelector } from 'reselect';
-
 import { OnboardingState, OnboardingSteps } from '@/constants/account';
-import { ENVIRONMENT_CONFIG_MAP, type DydxNetwork } from '@/constants/networks';
 
 import {
   getOnboardingGuards,
@@ -9,11 +6,10 @@ import {
   getSubaccountId,
   getUncommittedOrderClientIds,
 } from '@/state/accountSelectors';
-import { getSelectedNetwork } from '@/state/appSelectors';
 
-import { testFlags } from '@/lib/testFlags';
+import { createAppSelector } from './appTypes';
 
-export const calculateOnboardingStep = createSelector(
+export const calculateOnboardingStep = createAppSelector(
   [getOnboardingState, getOnboardingGuards],
   (onboardingState: OnboardingState, onboardingGuards: ReturnType<typeof getOnboardingGuards>) => {
     const { hasAcknowledgedTerms, hasPreviousTransactions } = onboardingGuards;
@@ -24,8 +20,8 @@ export const calculateOnboardingStep = createSelector(
       [OnboardingState.AccountConnected]: !hasAcknowledgedTerms
         ? OnboardingSteps.AcknowledgeTerms
         : !hasPreviousTransactions
-        ? OnboardingSteps.DepositFunds
-        : undefined,
+          ? OnboardingSteps.DepositFunds
+          : undefined,
     }[onboardingState];
   }
 );
@@ -33,7 +29,7 @@ export const calculateOnboardingStep = createSelector(
 /**
  * @description calculate whether an account is in a state where they can trade
  */
-export const calculateCanAccountTrade = createSelector(
+export const calculateCanAccountTrade = createAppSelector(
   [getOnboardingState],
   (onboardingState: OnboardingState) => {
     return onboardingState === OnboardingState.AccountConnected;
@@ -44,7 +40,7 @@ export const calculateCanAccountTrade = createSelector(
  * @description calculate whether the client has enough information to display account info.
  * User does not have to have AccountConnected. The dYdX account can be viewed if the client knows the dYdX address.
  */
-export const calculateCanViewAccount = createSelector(
+export const calculateCanViewAccount = createAppSelector(
   [getOnboardingState, getSubaccountId],
   (onboardingState: OnboardingState, subaccountId?: number) =>
     onboardingState === OnboardingState.AccountConnected ||
@@ -55,7 +51,7 @@ export const calculateCanViewAccount = createSelector(
  * @description calculate whether the client is in view only mode
  * (Onboarding State is WalletConnected and Abacus has a connected subaccount)
  */
-export const calculateIsAccountViewOnly = createSelector(
+export const calculateIsAccountViewOnly = createAppSelector(
   [getOnboardingState, calculateCanViewAccount],
   (onboardingState: OnboardingState, canViewAccountInfo: boolean) =>
     onboardingState !== OnboardingState.AccountConnected && canViewAccountInfo
@@ -64,7 +60,7 @@ export const calculateIsAccountViewOnly = createSelector(
 /**
  * @description calculate whether the subaccount has uncommitted positions
  */
-export const calculateHasUncommittedOrders = createSelector(
+export const calculateHasUncommittedOrders = createAppSelector(
   [getUncommittedOrderClientIds],
   (uncommittedOrderClientIds: number[]) => uncommittedOrderClientIds.length > 0
 );
@@ -73,7 +69,7 @@ export const calculateHasUncommittedOrders = createSelector(
  * @description calculate whether the client is loading info.
  * (account is connected but subaccountId is till missing)
  */
-export const calculateIsAccountLoading = createSelector(
+export const calculateIsAccountLoading = createAppSelector(
   [getOnboardingState, getOnboardingGuards, getSubaccountId],
   (
     onboardingState: ReturnType<typeof getOnboardingState>,
@@ -92,22 +88,19 @@ export const calculateIsAccountLoading = createSelector(
 /**
  * @description calculate whether positions table should render triggers column
  */
-export const calculateShouldRenderTriggersInPositionsTable = createSelector(
-  [calculateIsAccountViewOnly, getSelectedNetwork],
-  (isAccountViewOnly: boolean, selectedNetwork: DydxNetwork) =>
-    !isAccountViewOnly && ENVIRONMENT_CONFIG_MAP[selectedNetwork].featureFlags.isSlTpEnabled
+export const calculateShouldRenderTriggersInPositionsTable = createAppSelector(
+  [calculateIsAccountViewOnly],
+  (isAccountViewOnly: boolean) => !isAccountViewOnly
 );
 
 /**
  * @description calculate whether positions table should render actions column
  */
-export const calculateShouldRenderActionsInPositionsTable = (isCloseActionShown: boolean) =>
-  createSelector(
-    [calculateIsAccountViewOnly, calculateShouldRenderTriggersInPositionsTable],
-    (isAccountViewOnly: boolean, areTriggersRendered: boolean) => {
-      const hasActionsInColumn = testFlags.isolatedMargin
-        ? isCloseActionShown
-        : areTriggersRendered || isCloseActionShown;
+export const calculateShouldRenderActionsInPositionsTable = () =>
+  createAppSelector(
+    [calculateIsAccountViewOnly, (s, isCloseActionShown: boolean = true) => isCloseActionShown],
+    (isAccountViewOnly: boolean, isCloseActionShown) => {
+      const hasActionsInColumn = isCloseActionShown;
       return !isAccountViewOnly && hasActionsInColumn;
     }
   );

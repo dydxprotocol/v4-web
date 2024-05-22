@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
+
+import { objectEntries } from '@/lib/objectHelpers';
 
 export enum MediaQueryKeys {
   isMobile = 'isMobile',
@@ -12,7 +14,7 @@ export enum MediaQueryKeys {
   isDesktopLarge = 'isDesktopLarge',
 }
 
-export const mediaQueryLists = {
+const mediaQueryLists = {
   [MediaQueryKeys.isMobile]: globalThis.matchMedia(breakpoints.mobile),
   [MediaQueryKeys.isNotMobile]: globalThis.matchMedia(breakpoints.notMobile),
   [MediaQueryKeys.isTablet]: globalThis.matchMedia(breakpoints.tablet),
@@ -22,12 +24,10 @@ export const mediaQueryLists = {
   [MediaQueryKeys.isDesktopLarge]: globalThis.matchMedia(breakpoints.desktopLarge),
 } as const;
 
-export const uniqueMediaQueryLists = { ...mediaQueryLists };
-
 export const useBreakpoints = () => {
   // { [typeof breakpoints['string']]: [boolean, () => void] }
   const state = Object.fromEntries(
-    Object.entries(mediaQueryLists).map(([key, mediaQueryList]) => [
+    objectEntries(mediaQueryLists).map(([key, mediaQueryList]) => [
       key,
       // this is technically okay since the loop is fully deterministic and the object won't change
       // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -39,7 +39,7 @@ export const useBreakpoints = () => {
     // { [typeof breakpoints['string']]: () => void }
     const callbacks: { [key: string]: (e: MediaQueryListEvent) => void } = {};
 
-    Object.entries(mediaQueryLists).forEach(([key, mediaQueryList]) => {
+    objectEntries(mediaQueryLists).forEach(([key, mediaQueryList]) => {
       const [, setMatches] = state[key];
 
       callbacks[key] = (e) => {
@@ -52,7 +52,7 @@ export const useBreakpoints = () => {
     });
 
     return () => {
-      Object.entries(mediaQueryLists).forEach(([key, mediaQueryList]) => {
+      objectEntries(mediaQueryLists).forEach(([key, mediaQueryList]) => {
         if (mediaQueryList.removeEventListener) {
           mediaQueryList.removeEventListener('change', callbacks[key]);
         }
@@ -62,8 +62,8 @@ export const useBreakpoints = () => {
 
   // { [typeof breakpoints['string']]: boolean }
   const breakpointMatches = Object.fromEntries(
-    Object.entries(state).map(([key, [matches]]) => [key, matches])
+    objectEntries(state).map(([key, [matches]]) => [key, matches])
   );
 
-  return breakpointMatches;
+  return breakpointMatches as { [key in MediaQueryKeys]: boolean };
 };

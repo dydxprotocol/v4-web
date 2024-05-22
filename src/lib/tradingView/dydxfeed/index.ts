@@ -16,9 +16,11 @@ import { DEFAULT_MARKETID } from '@/constants/markets';
 
 import { useDydxClient } from '@/hooks/useDydxClient';
 
-import { RootStore } from '@/state/_store';
+import { type RootStore } from '@/state/_store';
 import { setCandles } from '@/state/perpetuals';
 import { getMarketConfig, getPerpetualBarsForPriceChart } from '@/state/perpetualsSelectors';
+
+import { objectKeys } from '@/lib/objectHelpers';
 
 import { log } from '../../telemetry';
 import { getHistorySlice, getSymbol, mapCandle } from '../utils';
@@ -28,7 +30,7 @@ import { subscribeOnStream, unsubscribeFromStream } from './streaming';
 const timezone = DateTime.local().get('zoneName') as unknown as Timezone;
 
 const configurationData: DatafeedConfiguration = {
-  supported_resolutions: Object.keys(RESOLUTION_MAP) as ResolutionString[],
+  supported_resolutions: objectKeys(RESOLUTION_MAP),
   exchanges: [
     {
       value: 'dYdX', // `exchange` argument for the `searchSymbols` method, if a user selects this exchange
@@ -64,7 +66,7 @@ export const getDydxDatafeed = (
 
   resolveSymbol: async (symbolName: string, onSymbolResolvedCallback: ResolveCallback) => {
     const symbolItem = getSymbol(symbolName || DEFAULT_MARKETID);
-    const { tickSizeDecimals } = getMarketConfig(symbolItem.symbol)(store.getState()) ?? {};
+    const { tickSizeDecimals } = getMarketConfig(store.getState(), symbolItem.symbol) ?? {};
 
     const pricescale = tickSizeDecimals ? 10 ** tickSizeDecimals : initialPriceScale ?? 100;
 
@@ -84,7 +86,7 @@ export const getDydxDatafeed = (
 
       session: '24x7',
       intraday_multipliers: ['1', '5', '15', '30', '60', '240'],
-      supported_resolutions: configurationData.supported_resolutions as ResolutionString[],
+      supported_resolutions: configurationData.supported_resolutions!,
       data_status: 'streaming',
       timezone,
       format: 'price',
@@ -117,10 +119,11 @@ export const getDydxDatafeed = (
     }
 
     try {
-      const currentMarketBars = getPerpetualBarsForPriceChart(
+      const currentMarketBars = getPerpetualBarsForPriceChart()(
+        store.getState(),
         symbolInfo.name,
         resolution
-      )(store.getState());
+      );
 
       // Retrieve candles in the store that are between fromMs and toMs
       const cachedBars = getHistorySlice({

@@ -1,15 +1,27 @@
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { NumberFormatValues } from 'react-number-format';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import type { SubaccountPosition } from '@/constants/abacus';
+import {
+  AdjustIsolatedMarginInputField,
+  IsolatedMarginAdjustmentType,
+  type SubaccountPosition,
+} from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
-import { ButtonAction, ButtonShape } from '@/constants/buttons';
+import {
+  ButtonAction,
+  ButtonShape,
+  ButtonSize,
+  ButtonState,
+  ButtonType,
+} from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { NumberSign, USD_DECIMALS } from '@/constants/numbers';
+import { NumberSign, PERCENT_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -20,23 +32,23 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { GradientCard } from '@/components/GradientCard';
 import { InputType } from '@/components/Input';
-import { OutputType } from '@/components/Output';
+import { OutputType, ShowSign } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
-import { getOpenPositionFromId, getSubaccount } from '@/state/accountSelectors';
-import { getMarketConfig } from '@/state/perpetualsSelectors';
+import { getOpenPositionFromId } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
+import { getAdjustIsolatedMarginInputs } from '@/state/inputsSelectors';
+import { getMarketConfig, getMarketMaxLeverage } from '@/state/perpetualsSelectors';
 
-import { calculatePositionMargin } from '@/lib/tradeData';
+import abacusStateManager from '@/lib/abacus';
+import { MustBigNumber } from '@/lib/numbers';
+import { objectEntries } from '@/lib/objectHelpers';
 
 type ElementProps = {
   marketId: SubaccountPosition['id'];
+  onIsolatedMarginAdjustment?(): void;
 };
-
-enum MarginAction {
-  ADD = 'ADD',
-  REMOVE = 'REMOVE',
-}
 
 const SIZE_PERCENT_OPTIONS = {
   '5%': '0.05',
@@ -46,42 +58,156 @@ const SIZE_PERCENT_OPTIONS = {
   '75%': '0.75',
 };
 
-export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
+export const AdjustIsolatedMarginForm = ({
+  marketId,
+  onIsolatedMarginAdjustment,
+}: ElementProps) => {
   const stringGetter = useStringGetter();
-  const [marginAction, setMarginAction] = useState(MarginAction.ADD);
-  const subaccountPosition = useSelector(getOpenPositionFromId(marketId));
-  const { adjustedMmf, leverage, liquidationPrice, notionalTotal } = subaccountPosition ?? {};
-  const marketConfig = useSelector(getMarketConfig(marketId));
+  const subaccountPosition = useAppSelector(getOpenPositionFromId(marketId));
+  const { childSubaccountNumber, marginUsage } = subaccountPosition ?? {};
+  const marketConfig = useAppSelector((s) => getMarketConfig(s, marketId));
+  const adjustIsolatedMarginInputs = useAppSelector(getAdjustIsolatedMarginInputs, shallowEqual);
+
+  const {
+    type: isolatedMarginAdjustmentType,
+    amount,
+    amountPercent,
+    summary,
+  } = adjustIsolatedMarginInputs ?? {};
+
   const { tickSizeDecimals } = marketConfig ?? {};
 
-  /**
-   * @todo: Replace with Abacus functionality
-   */
-  const [percent, setPercent] = useState('');
-  const [amount, setAmount] = useState('');
-  const onSubmit = () => {};
+  useEffect(() => {
+    abacusStateManager.setAdjustIsolatedMarginValue({
+      value: childSubaccountNumber,
+      field: AdjustIsolatedMarginInputField.ChildSubaccountNumber,
+    });
 
-  const positionMargin = {
-    current: calculatePositionMargin({
-      adjustedMmf: adjustedMmf?.current,
-      notionalTotal: notionalTotal?.current,
-    }).toFixed(tickSizeDecimals ?? USD_DECIMALS),
-    postOrder: calculatePositionMargin({
-      adjustedMmf: adjustedMmf?.postOrder,
-      notionalTotal: notionalTotal?.postOrder,
-    }).toFixed(tickSizeDecimals ?? USD_DECIMALS),
+    return () => {
+      abacusStateManager.setAdjustIsolatedMarginValue({
+        value: null,
+        field: AdjustIsolatedMarginInputField.ChildSubaccountNumber,
+      });
+      abacusStateManager.clearAdjustIsolatedMarginInputValues();
+      abacusStateManager.clearTradeInputValues({ shouldResetSize: true });
+    };
+  }, [childSubaccountNumber]);
+
+  const setAmount = ({ floatValue }: NumberFormatValues) => {
+    abacusStateManager.setAdjustIsolatedMarginValue({
+      value: floatValue,
+      field: AdjustIsolatedMarginInputField.Amount,
+    });
   };
 
-  const { freeCollateral, marginUsage } = useSelector(getSubaccount, shallowEqual) ?? {};
+  const setPercent = (value: string) => {
+    abacusStateManager.setAdjustIsolatedMarginValue({
+      value,
+      field: AdjustIsolatedMarginInputField.AmountPercent,
+    });
+  };
+
+  const setMarginAction = (marginAction: string) => {
+    abacusStateManager.setAdjustIsolatedMarginValue({
+      value: marginAction,
+      field: AdjustIsolatedMarginInputField.Type,
+    });
+  };
+
+  const { adjustIsolatedMarginOfPosition } = useSubaccount();
+
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  const onSubmit = () => {
+    setErrorMessage(null);
+    setIsSubmitting(true);
+
+    adjustIsolatedMarginOfPosition({
+      onError: (errorParams) => {
+        setIsSubmitting(false);
+        if (errorParams?.errorStringKey) {
+          setErrorMessage(stringGetter({ key: errorParams.errorStringKey }));
+        }
+      },
+      onSuccess: () => {
+        setIsSubmitting(false);
+        abacusStateManager.clearAdjustIsolatedMarginInputValues();
+        onIsolatedMarginAdjustment?.();
+      },
+    });
+  };
 
   const renderDiffOutput = ({
     type,
     value,
     newValue,
+    showSign,
     withDiff,
-  }: Pick<Parameters<typeof DiffOutput>[0], 'type' | 'value' | 'newValue' | 'withDiff'>) => (
-    <DiffOutput type={type} value={value} newValue={newValue} withDiff={withDiff} />
+  }: Pick<
+    Parameters<typeof DiffOutput>[0],
+    'type' | 'value' | 'newValue' | 'withDiff' | 'showSign'
+  >) => (
+    <DiffOutput
+      type={type}
+      value={value}
+      newValue={newValue}
+      showSign={showSign}
+      withDiff={withDiff}
+    />
   );
+
+  const {
+    crossFreeCollateral,
+    crossFreeCollateralUpdated,
+    crossMarginUsage,
+    crossMarginUsageUpdated,
+    positionMargin,
+    positionMarginUpdated,
+    positionLeverage,
+    positionLeverageUpdated,
+    liquidationPrice,
+    liquidationPriceUpdated,
+  } = summary ?? {};
+
+  /**
+   * TODO: Handle by adding AdjustIsolatedMarginValidator within Abacus
+   */
+  const marketMaxLeverage = useAppSelector((s) => getMarketMaxLeverage(s, marketId));
+
+  const alertMessage = useMemo(() => {
+    if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Add) {
+      if (crossMarginUsageUpdated && MustBigNumber(crossMarginUsageUpdated).gte(1)) {
+        return {
+          message: stringGetter({ key: STRING_KEYS.INVALID_NEW_ACCOUNT_MARGIN_USAGE }),
+          type: AlertType.Error,
+        };
+      }
+    } else if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Remove) {
+      if (marginUsage?.postOrder && MustBigNumber(marginUsage?.postOrder).gte(1)) {
+        return {
+          message: stringGetter({ key: STRING_KEYS.INVALID_NEW_ACCOUNT_MARGIN_USAGE }),
+          type: AlertType.Error,
+        };
+      }
+
+      if (positionLeverageUpdated && MustBigNumber(positionLeverageUpdated).gt(marketMaxLeverage)) {
+        return {
+          message: stringGetter({ key: STRING_KEYS.INVALID_NEW_POSITION_LEVERAGE }),
+          type: AlertType.Error,
+        };
+      }
+    }
+
+    return null;
+  }, [
+    crossMarginUsageUpdated,
+    isolatedMarginAdjustmentType,
+    marginUsage,
+    marketMaxLeverage,
+    positionLeverageUpdated,
+    stringGetter,
+  ]);
 
   const {
     freeCollateralDiffOutput,
@@ -92,37 +218,47 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
     () => ({
       freeCollateralDiffOutput: renderDiffOutput({
         withDiff:
-          !!freeCollateral?.postOrder && freeCollateral?.current !== freeCollateral?.postOrder,
-        value: freeCollateral?.current,
-        newValue: freeCollateral?.postOrder,
-        type: OutputType.Number,
+          !!crossFreeCollateralUpdated && crossFreeCollateral !== crossFreeCollateralUpdated,
+        value: crossFreeCollateral,
+        newValue: crossFreeCollateralUpdated,
+        type: OutputType.Fiat,
       }),
       marginUsageDiffOutput: renderDiffOutput({
-        withDiff: !!marginUsage?.postOrder && marginUsage?.current !== marginUsage?.postOrder,
-        value: marginUsage?.current,
-        newValue: marginUsage?.postOrder,
+        withDiff: !!crossMarginUsageUpdated && crossMarginUsage !== crossMarginUsageUpdated,
+        value: crossMarginUsage,
+        newValue: crossMarginUsageUpdated,
         type: OutputType.Percent,
       }),
       positionMarginDiffOutput: renderDiffOutput({
-        withDiff: !!positionMargin.postOrder && positionMargin.current !== positionMargin.postOrder,
-        value: positionMargin.current,
-        newValue: positionMargin.postOrder,
+        withDiff: !!positionMarginUpdated && positionMargin !== positionMarginUpdated,
+        value: positionMargin,
+        newValue: positionMarginUpdated,
         type: OutputType.Fiat,
       }),
       leverageDiffOutput: renderDiffOutput({
-        withDiff: !!leverage?.postOrder && leverage?.current !== leverage?.postOrder,
-        value: leverage?.current,
-        newValue: leverage?.postOrder,
+        withDiff: !!positionLeverageUpdated && positionLeverage !== positionLeverageUpdated,
+        value: positionLeverage,
+        newValue: positionLeverageUpdated,
         type: OutputType.Multiple,
+        showSign: ShowSign.None,
       }),
     }),
-    [freeCollateral, marginUsage, positionMargin, leverage]
+    [
+      crossFreeCollateral,
+      crossFreeCollateralUpdated,
+      crossMarginUsage,
+      crossMarginUsageUpdated,
+      positionMargin,
+      positionMarginUpdated,
+      positionLeverage,
+      positionLeverageUpdated,
+    ]
   );
 
   const formConfig =
-    marginAction === MarginAction.ADD
+    isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Add
       ? {
-          formLabel: stringGetter({ key: STRING_KEYS.ADDING }),
+          formLabel: stringGetter({ key: STRING_KEYS.AMOUNT_TO_ADD }),
           buttonLabel: stringGetter({ key: STRING_KEYS.ADD_MARGIN }),
           inputReceiptItems: [
             {
@@ -150,7 +286,7 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
           ],
         }
       : {
-          formLabel: stringGetter({ key: STRING_KEYS.REMOVING }),
+          formLabel: stringGetter({ key: STRING_KEYS.AMOUNT_TO_REMOVE }),
           buttonLabel: stringGetter({ key: STRING_KEYS.REMOVE_MARGIN }),
           inputReceiptItems: [
             {
@@ -178,10 +314,28 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
           ],
         };
 
-  const CenterElement = false ? (
-    <AlertMessage type={AlertType.Error}>Placeholder Error</AlertMessage>
+  const gradientToColor = useMemo(() => {
+    if (MustBigNumber(amount).isZero()) {
+      return 'neutral';
+    }
+
+    if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Add) {
+      return 'positive';
+    }
+
+    if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Remove) {
+      return 'negative';
+    }
+
+    return 'neutral';
+  }, [amount, isolatedMarginAdjustmentType]);
+
+  const CenterElement = alertMessage ? (
+    <AlertMessage type={alertMessage.type}>{alertMessage.message}</AlertMessage>
+  ) : errorMessage ? (
+    <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>
   ) : (
-    <$GradientCard fromColor="neutral" toColor="negative">
+    <$GradientCard fromColor="neutral" toColor={gradientToColor}>
       <$Column>
         <$TertiarySpan>{stringGetter({ key: STRING_KEYS.ESTIMATED })}</$TertiarySpan>
         <span>{stringGetter({ key: STRING_KEYS.LIQUIDATION_PRICE })}</span>
@@ -189,13 +343,14 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
       <div>
         <DiffOutput
           withDiff={
-            !!liquidationPrice?.postOrder &&
-            liquidationPrice?.current !== liquidationPrice?.postOrder
+            !!liquidationPriceUpdated &&
+            liquidationPrice !== liquidationPriceUpdated &&
+            MustBigNumber(amount).gt(0)
           }
           sign={NumberSign.Negative}
           layout="column"
-          value={liquidationPrice?.current}
-          newValue={liquidationPrice?.postOrder}
+          value={liquidationPrice}
+          newValue={liquidationPriceUpdated}
           type={OutputType.Fiat}
           fractionDigits={tickSizeDecimals}
         />
@@ -211,37 +366,53 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
       }}
     >
       <ToggleGroup
-        value={marginAction}
+        size={ButtonSize.Small}
+        value={isolatedMarginAdjustmentType?.name ?? IsolatedMarginAdjustmentType.Add.name}
         onValueChange={setMarginAction}
         items={[
-          { value: MarginAction.ADD, label: stringGetter({ key: STRING_KEYS.ADD_MARGIN }) },
-          { value: MarginAction.REMOVE, label: stringGetter({ key: STRING_KEYS.REMOVE_MARGIN }) },
+          {
+            value: IsolatedMarginAdjustmentType.Add.name,
+            label: stringGetter({ key: STRING_KEYS.ADD_MARGIN }),
+          },
+          {
+            value: IsolatedMarginAdjustmentType.Remove.name,
+            label: stringGetter({ key: STRING_KEYS.REMOVE_MARGIN }),
+          },
         ]}
       />
 
-      <$ToggleGroup
-        items={Object.entries(SIZE_PERCENT_OPTIONS).map(([key, value]) => ({
-          label: key,
-          value: value.toString(),
-        }))}
-        value={percent}
-        onValueChange={setPercent}
-        shape={ButtonShape.Rectangle}
-      />
-
-      <WithDetailsReceipt side="bottom" detailItems={formConfig.inputReceiptItems}>
-        <FormInput
-          type={InputType.Currency}
-          label={formConfig.formLabel}
-          value={amount}
-          onChange={setAmount}
+      <$RelatedInputsGroup>
+        <$ToggleGroup
+          items={objectEntries(SIZE_PERCENT_OPTIONS).map(([key, value]) => ({
+            label: key,
+            value: value.toString(),
+          }))}
+          value={MustBigNumber(amountPercent).toFixed(PERCENT_DECIMALS)}
+          onValueChange={setPercent}
+          shape={ButtonShape.Rectangle}
         />
-      </WithDetailsReceipt>
+
+        <WithDetailsReceipt side="bottom" detailItems={formConfig.inputReceiptItems}>
+          <FormInput
+            type={InputType.Currency}
+            label={formConfig.formLabel}
+            value={amount}
+            onChange={setAmount}
+          />
+        </WithDetailsReceipt>
+      </$RelatedInputsGroup>
 
       {CenterElement}
 
       <WithDetailsReceipt detailItems={formConfig.receiptItems}>
-        <Button action={ButtonAction.Primary}>{formConfig.buttonLabel}</Button>
+        <Button
+          type={ButtonType.Submit}
+          action={ButtonAction.Primary}
+          disabled={isSubmitting}
+          state={isSubmitting ? ButtonState.Loading : ButtonState.Default}
+        >
+          {formConfig.buttonLabel}
+        </Button>
       </WithDetailsReceipt>
     </$Form>
   );
@@ -249,6 +420,11 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
 
 const $Form = styled.form`
   ${formMixins.transfersForm}
+`;
+
+const $RelatedInputsGroup = styled.div`
+  ${layoutMixins.flexColumn}
+  gap: 0.56rem;
 `;
 const $ToggleGroup = styled(ToggleGroup)`
   ${formMixins.inputToggleGroup}

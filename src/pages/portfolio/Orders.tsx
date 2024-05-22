@@ -1,5 +1,3 @@
-import { useSelector } from 'react-redux';
-
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -10,13 +8,14 @@ import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { OrdersTable, OrdersTableColumnKey } from '@/views/tables/OrdersTable';
 
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
+import { useAppSelector } from '@/state/appTypes';
 
 import { isTruthy } from '@/lib/isTruthy';
 
 export const Orders = () => {
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
-  const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
+  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 
   return (
     <AttachedExpandingSection>
@@ -33,6 +32,7 @@ export const Orders = () => {
                 OrdersTableColumnKey.AmountFill,
                 OrdersTableColumnKey.Price,
                 OrdersTableColumnKey.Trigger,
+                OrdersTableColumnKey.MarginType,
                 OrdersTableColumnKey.GoodTil,
                 !isAccountViewOnly && OrdersTableColumnKey.Actions,
               ].filter(isTruthy)

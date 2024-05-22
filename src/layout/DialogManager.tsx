@@ -1,9 +1,8 @@
-import { useDispatch, useSelector } from 'react-redux';
-
 import { DialogTypes } from '@/constants/dialogs';
 
 import { AdjustIsolatedMarginDialog } from '@/views/dialogs/AdjustIsolatedMarginDialog';
 import { AdjustTargetLeverageDialog } from '@/views/dialogs/AdjustTargetLeverageDialog';
+import { CancelAllOrdersDialog } from '@/views/dialogs/CancelAllOrdersDialog';
 import { ClosePositionDialog } from '@/views/dialogs/ClosePositionDialog';
 import { ComplianceConfigDialog } from '@/views/dialogs/ComplianceConfigDialog';
 import { DepositDialog } from '@/views/dialogs/DepositDialog';
@@ -29,18 +28,22 @@ import { RateLimitDialog } from '@/views/dialogs/RateLimitDialog';
 import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
 import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
 import { SelectMarginModeDialog } from '@/views/dialogs/SelectMarginModeDialog';
+import { StakeDialog } from '@/views/dialogs/StakeDialog';
+import { StakingRewardDialog } from '@/views/dialogs/StakingRewardDialog';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
 import { TriggersDialog } from '@/views/dialogs/TriggersDialog';
+import { UnstakeDialog } from '@/views/dialogs/UnstakeDialog';
 import { WithdrawDialog } from '@/views/dialogs/WithdrawDialog';
 import { WithdrawalGateDialog } from '@/views/dialogs/WithdrawalGateDialog';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialog, openDialog } from '@/state/dialogs';
 import { getActiveDialog } from '@/state/dialogsSelectors';
 
 export const DialogManager = () => {
-  const dispatch = useDispatch();
-  const activeDialog = useSelector(getActiveDialog);
+  const dispatch = useAppDispatch();
+  const activeDialog = useAppSelector(getActiveDialog);
 
   if (!activeDialog) return null;
   const { dialogProps, type } = activeDialog;
@@ -60,6 +63,7 @@ export const DialogManager = () => {
     [DialogTypes.AdjustIsolatedMargin]: <AdjustIsolatedMarginDialog {...modalProps} />,
     [DialogTypes.AdjustTargetLeverage]: <AdjustTargetLeverageDialog {...modalProps} />,
     [DialogTypes.ClosePosition]: <ClosePositionDialog {...modalProps} />,
+    [DialogTypes.CancelPendingOrders]: <CancelAllOrdersDialog {...modalProps} />,
     [DialogTypes.ComplianceConfig]: <ComplianceConfigDialog {...modalProps} />,
     [DialogTypes.Deposit]: <DepositDialog {...modalProps} />,
     [DialogTypes.DisplaySettings]: <DisplaySettingsDialog {...modalProps} />,
@@ -84,9 +88,12 @@ export const DialogManager = () => {
     [DialogTypes.RestrictedGeo]: <RestrictedGeoDialog {...modalProps} />,
     [DialogTypes.RestrictedWallet]: <RestrictedWalletDialog {...modalProps} />,
     [DialogTypes.SelectMarginMode]: <SelectMarginModeDialog {...modalProps} />,
+    [DialogTypes.Stake]: <StakeDialog {...modalProps} />,
+    [DialogTypes.StakingReward]: <StakingRewardDialog {...modalProps} />,
     [DialogTypes.Trade]: <TradeDialog {...modalProps} />,
     [DialogTypes.Transfer]: <TransferDialog {...modalProps} />,
     [DialogTypes.Triggers]: <TriggersDialog {...modalProps} />,
+    [DialogTypes.Unstake]: <UnstakeDialog {...modalProps} />,
     [DialogTypes.Withdraw]: <WithdrawDialog {...modalProps} />,
     [DialogTypes.WithdrawalGated]: <WithdrawalGateDialog {...modalProps} />,
   }[type];

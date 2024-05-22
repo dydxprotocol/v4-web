@@ -1,28 +1,30 @@
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { Nullable, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { USD_DECIMALS } from '@/constants/numbers';
 import { ORDERBOOK_HEIGHT, ORDERBOOK_MAX_ROWS_PER_SIDE } from '@/constants/orderbook';
 
-import {
-  useCalculateOrderbookData,
-  useCenterOrderbook,
-  useDrawOrderbook,
-  useSpreadRowScrollListener,
-} from '@/hooks/Orderbook';
+import { useCenterOrderbook } from '@/hooks/Orderbook/useCenterOrderbook';
+import { useDrawOrderbook } from '@/hooks/Orderbook/useDrawOrderbook';
+import { useCalculateOrderbookData } from '@/hooks/Orderbook/useOrderbookValues';
+import { useSpreadRowScrollListener } from '@/hooks/Orderbook/useSpreadRowScrollListener';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Canvas } from '@/components/Canvas';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Tag } from '@/components/Tag';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
+
+import { MustBigNumber } from '@/lib/numbers';
 
 import { OrderbookRow, SpreadRow } from './OrderbookRow';
 
@@ -48,11 +50,11 @@ export const CanvasOrderbook = forwardRef(
       });
 
     const stringGetter = useStringGetter();
-    const currentMarket = useSelector(getCurrentMarketId) ?? '';
-    const currentMarketConfig = useSelector(getCurrentMarketConfig, shallowEqual);
-    const { id = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+    const currentMarket = useAppSelector(getCurrentMarketId) ?? '';
+    const currentMarketConfig = useAppSelector(getCurrentMarketConfig, shallowEqual);
+    const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
 
-    const { tickSizeDecimals = 2 } = currentMarketConfig ?? {};
+    const { tickSizeDecimals = USD_DECIMALS } = currentMarketConfig ?? {};
 
     /**
      * Slice asks and bids to maxRowsPerSide using empty rows
@@ -94,12 +96,17 @@ export const CanvasOrderbook = forwardRef(
     /**
      * Row action
      */
-    const currentInput = useSelector(getCurrentInput);
-    const dispatch = useDispatch();
+    const currentInput = useAppSelector(getCurrentInput);
+    const dispatch = useAppDispatch();
     const onRowAction = useCallback(
       (price: Nullable<number>) => {
         if (currentInput === 'trade' && price) {
-          dispatch(setTradeFormInputs({ limitPriceInput: price?.toString() }));
+          // avoid scientific notation for when converting small number to string
+          dispatch(
+            setTradeFormInputs({
+              limitPriceInput: MustBigNumber(price).toFixed(tickSizeDecimals ?? USD_DECIMALS),
+            })
+          );
         }
       },
       [currentInput]

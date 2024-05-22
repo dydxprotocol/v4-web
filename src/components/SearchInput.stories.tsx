@@ -8,7 +8,7 @@ import { SearchInput } from '@/components/SearchInput';
 import { InputType } from './Input';
 import { StoryWrapper } from '.ladle/components';
 
-export const SearchInputStory: Story<Parameters<typeof SearchInput>[0]> = (args) => (
+export const SearchInputStory: Story<Parameters<typeof SearchInput>[0]> = () => (
   <StoryWrapper>
     <$Container>
       <SearchInput placeholder="Search something..." type={InputType.Search} />

@@ -1,27 +1,29 @@
 import { Key, useCallback, useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css, keyframes } from 'styled-components';
 
 import { type OrderbookLine } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { USD_DECIMALS } from '@/constants/numbers';
 import { ORDERBOOK_MAX_ROWS_PER_SIDE } from '@/constants/orderbook';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Details } from '@/components/Details';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
-import { ColumnDef, TableRow, type CustomRowConfig } from '@/components/Table';
+import { ColumnDef, CustomRowConfig, TableRow } from '@/components/Table';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getSubaccountOrderSizeBySideAndPrice } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
@@ -29,6 +31,7 @@ import { getCurrentMarketConfig, getCurrentMarketOrderbook } from '@/state/perpe
 
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { MustBigNumber } from '@/lib/numbers';
+import { safeAssign } from '@/lib/objectHelpers';
 
 import { OrderbookTradesOutput, OrderbookTradesTable } from './OrderbookTradesTable';
 
@@ -50,32 +53,31 @@ type RowData = Pick<OrderbookLine, 'depth' | 'offset' | 'price' | 'size'> & {
 };
 
 const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number }) => {
-  const orderbook = useSelector(getCurrentMarketOrderbook, shallowEqual);
+  const orderbook = useAppSelector(getCurrentMarketOrderbook, shallowEqual);
 
   const subaccountOrderSizeBySideAndPrice =
-    useSelector(getSubaccountOrderSizeBySideAndPrice, shallowEqual) || {};
+    useAppSelector(getSubaccountOrderSizeBySideAndPrice, shallowEqual) || {};
 
   return useMemo(() => {
     const asks = (orderbook?.asks?.toArray() ?? [])
       .map(
-        (row: OrderbookLine, idx: number) =>
-          ({
+        (row: OrderbookLine, idx: number): RowData =>
+          safeAssign({}, row, {
             key: `ask-${idx}`,
-            side: 'ask',
+            side: 'ask' as const,
             mine: subaccountOrderSizeBySideAndPrice[OrderSide.SELL]?.[row.price],
-          } as RowData)
+          })
       )
       .slice(0, maxRowsPerSide);
 
     const bids = (orderbook?.bids?.toArray() ?? [])
       .map(
-        (row: OrderbookLine, idx: number) =>
-          ({
+        (row: OrderbookLine, idx: number): RowData =>
+          safeAssign({}, row, {
             key: `bid-${idx}`,
-            side: 'bid',
+            side: 'bid' as const,
             mine: subaccountOrderSizeBySideAndPrice[OrderSide.BUY]?.[row.price],
-            ...row,
-          } as RowData)
+          })
       )
       .slice(0, maxRowsPerSide);
 
@@ -260,53 +262,53 @@ export const Orderbook = ({
   maxRowsPerSide = ORDERBOOK_MAX_ROWS_PER_SIDE,
   hideHeader = false,
 }: ElementProps & StyleProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
 
-  const currentInput = useSelector(getCurrentInput);
-  const { id = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const currentInput = useAppSelector(getCurrentInput);
+  const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const { stepSizeDecimals, tickSizeDecimals } =
-    useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+    useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
 
-  const showMineColumn = useSelector(calculateCanViewAccount) && !isTablet;
+  const showMineColumn = useAppSelector(calculateCanViewAccount) && !isTablet;
 
   const { asks, bids, spread, spreadPercent, histogramRange, hasOrderbook } =
     useCalculateOrderbookData({
       maxRowsPerSide,
     });
 
-  const data = useMemo(
-    () =>
-      [
-        ...bids.reverse(),
-        {
-          key: 'spread',
-          // TODO - should probably refactor this to not break the lint rule
-          // eslint-disable-next-line react/no-unstable-nested-components
-          slotCustomRow: (props) => (
-            <$SpreadTableRow key="spread" {...props}>
-              <td>
-                <WithTooltip tooltip="spread">
-                  {stringGetter({ key: STRING_KEYS.ORDERBOOK_SPREAD })}
-                </WithTooltip>
-              </td>
-              <td>
-                <Output type={OutputType.Number} value={spread} fractionDigits={tickSizeDecimals} />
-              </td>
-              <td>{!isTablet && <Output type={OutputType.Percent} value={spreadPercent} />}</td>
-            </$SpreadTableRow>
-          ),
-        } as CustomRowConfig,
-        ...asks,
-      ].reverse(),
-    [asks, bids, spread, spreadPercent, isTablet]
-  );
+  const data = useMemo(() => {
+    const customRow: CustomRowConfig = {
+      key: 'spread',
+      // TODO - should probably refactor this to not break the lint rule
+      // eslint-disable-next-line react/no-unstable-nested-components
+      slotCustomRow: (props) => (
+        <$SpreadTableRow key="spread" {...props}>
+          <td>
+            <WithTooltip tooltip="spread">
+              {stringGetter({ key: STRING_KEYS.ORDERBOOK_SPREAD })}
+            </WithTooltip>
+          </td>
+          {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+          <td>
+            <Output type={OutputType.Number} value={spread} fractionDigits={tickSizeDecimals} />
+          </td>
+          <td>{!isTablet && <Output type={OutputType.Percent} value={spreadPercent} />}</td>
+        </$SpreadTableRow>
+      ),
+    };
+    return [...bids.reverse(), customRow, ...asks].reverse();
+  }, [asks, bids, spread, spreadPercent, isTablet, stringGetter, tickSizeDecimals]);
 
   const onRowAction = useCallback(
     (key: Key, row: RowData) => {
       if (currentInput === 'trade' && key !== 'spread' && row?.price) {
-        dispatch(setTradeFormInputs({ limitPriceInput: row?.price?.toString() }));
+        dispatch(
+          setTradeFormInputs({
+            limitPriceInput: MustBigNumber(row.price).toFixed(tickSizeDecimals ?? USD_DECIMALS),
+          })
+        );
       }
     },
     [currentInput]
@@ -590,7 +592,8 @@ const $SpreadTableRow = styled(TableRow)`
 
     // Safari: apply box-shadow to inner table-cells
     @supports (background: -webkit-named-image(i)) {
-      box-shadow: 0 calc(-1 * var(--border-width)) var(--color-border) inset,
+      box-shadow:
+        0 calc(-1 * var(--border-width)) var(--color-border) inset,
         0 var(--border-width) var(--color-border) inset;
     }
   }

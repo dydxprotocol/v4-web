@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react';
 
-import { useSelector } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { TradeLayouts } from '@/constants/layout';
@@ -10,7 +9,7 @@ import { useCurrentMarketId } from '@/hooks/useCurrentMarketId';
 import { usePageTitlePriceUpdates } from '@/hooks/usePageTitlePriceUpdates';
 import { useTradeFormInputs } from '@/hooks/useTradeFormInputs';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DetachedSection } from '@/components/ContentSection';
@@ -18,6 +17,7 @@ import { AccountInfo } from '@/views/AccountInfo';
 import { TradeBox } from '@/views/TradeBox';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
+import { useAppSelector } from '@/state/appTypes';
 import { getSelectedTradeLayout } from '@/state/layoutSelectors';
 
 import { HorizontalPanel } from './HorizontalPanel';
@@ -34,8 +34,8 @@ const TradePage = () => {
 
   useCurrentMarketId();
   const { isTablet } = useBreakpoints();
-  const tradeLayout = useSelector(getSelectedTradeLayout);
-  const canAccountTrade = useSelector(calculateCanAccountTrade);
+  const tradeLayout = useAppSelector(getSelectedTradeLayout);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
   const [isHorizontalPanelOpen, setIsHorizontalPanelOpen] = useState(true);
 
@@ -111,7 +111,7 @@ const $TradeLayout = styled.article<{
   --layout-default-desktopMedium:
     'Top Top Top' auto
     'Side Vertical Inner' minmax(0, 1fr)
-    'Side Vertical Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
+    'Side Horizontal Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
     / var(--sidebar-width) minmax(0, var(--orderbook-trades-width)) 1fr;
 
   /* prettier-ignore */
@@ -132,7 +132,7 @@ const $TradeLayout = styled.article<{
   --layout-alternative-desktopMedium:
     'Top Top Top' auto
     'Vertical Inner Side' minmax(0, 1fr)
-    'Vertical Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
+    'Horizontal Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
     / minmax(0, var(--orderbook-trades-width)) 1fr var(--sidebar-width);
 
   /* prettier-ignore */
@@ -177,7 +177,7 @@ const $TradeLayout = styled.article<{
           direction: initial;
         }
       `,
-    }[tradeLayout])}
+    })[tradeLayout]}
 
   ${({ isHorizontalPanelOpen }) =>
     !isHorizontalPanelOpen &&

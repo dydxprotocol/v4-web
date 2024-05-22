@@ -1,6 +1,5 @@
 import { useEffect, useState, type ElementType } from 'react';
 
-import { useSelector } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { EvmDerivedAccountStatus, OnboardingSteps } from '@/constants/account';
@@ -13,7 +12,7 @@ import { useAccounts } from '@/hooks/useAccounts';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
@@ -23,6 +22,7 @@ import { Ring } from '@/components/Ring';
 import { TestnetDepositForm } from '@/views/forms/AccountManagementForms/TestnetDepositForm';
 
 import { calculateOnboardingStep } from '@/state/accountCalculators';
+import { useAppSelector } from '@/state/appTypes';
 
 import { track } from '@/lib/analytics';
 
@@ -43,7 +43,7 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
 
   const { selectWalletType, disconnect, walletType } = useAccounts();
 
-  const currentOnboardingStep = useSelector(calculateOnboardingStep);
+  const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
 
   useEffect(() => {
     if (!currentOnboardingStep) setIsOpen?.(false);

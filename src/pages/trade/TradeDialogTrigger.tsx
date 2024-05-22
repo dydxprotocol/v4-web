@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -16,6 +16,7 @@ import { Output, OutputType, ShowSign } from '@/components/Output';
 import { TagSize } from '@/components/Tag';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getInputTradeData } from '@/state/inputsSelectors';
 
 import { getSelectedOrderSide, getSelectedTradeType } from '@/lib/tradeData';
@@ -25,7 +26,7 @@ export const TradeDialogTrigger = () => {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const currentTradeData = useSelector(getInputTradeData, shallowEqual);
+  const currentTradeData = useAppSelector(getInputTradeData, shallowEqual);
 
   const { side, type, summary } = currentTradeData ?? {};
   const { total } = summary ?? {};

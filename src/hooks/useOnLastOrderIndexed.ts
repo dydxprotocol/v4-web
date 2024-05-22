@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { useSelector } from 'react-redux';
-
 import { getLatestOrderClientId } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 /**
  * @description This hook will fire a callback when the latest order has been updated to a non-pending state from the Indexer.
@@ -10,7 +9,7 @@ import { getLatestOrderClientId } from '@/state/accountSelectors';
  */
 export const useOnLastOrderIndexed = ({ callback }: { callback: () => void }) => {
   const [unIndexedClientId, setUnIndexedClientId] = useState<number | undefined>();
-  const latestOrderClientId = useSelector(getLatestOrderClientId);
+  const latestOrderClientId = useAppSelector(getLatestOrderClientId);
 
   useEffect(() => {
     if (unIndexedClientId) {

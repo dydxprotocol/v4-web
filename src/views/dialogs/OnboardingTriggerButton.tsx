@@ -1,5 +1,3 @@
-import { useDispatch, useSelector } from 'react-redux';
-
 import { OnboardingState } from '@/constants/account';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
@@ -10,6 +8,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { Button } from '@/components/Button';
 
 import { getOnboardingState } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { forceOpenDialog } from '@/state/dialogs';
 
 type StyleProps = {
@@ -18,9 +17,9 @@ type StyleProps = {
 
 export const OnboardingTriggerButton = ({ size = ButtonSize.Small }: StyleProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
-  const onboardingState = useSelector(getOnboardingState);
+  const onboardingState = useAppSelector(getOnboardingState);
 
   return (
     <Button

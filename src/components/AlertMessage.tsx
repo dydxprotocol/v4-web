@@ -15,7 +15,11 @@ type ElementProps = {
 
 export type AlertMessageProps = ElementProps & StyleProps;
 
-export const AlertMessage: React.FC<AlertMessageProps> = ({ className, children, type }) => {
+export const AlertMessage: React.FC<AlertMessageProps> = ({
+  className,
+  children,
+  type,
+}: AlertMessageProps) => {
   return (
     <AlertContainer type={type} className={className}>
       {children}

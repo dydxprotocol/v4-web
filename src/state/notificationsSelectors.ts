@@ -1,3 +1,3 @@
-import { RootState } from './_store';
+import { type RootState } from './_store';
 
 export const getAbacusNotifications = (state: RootState) => state.notifications.abacusNotifications;

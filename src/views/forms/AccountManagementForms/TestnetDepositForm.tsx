@@ -1,13 +1,13 @@
 import { useEffect, useState, type FormEvent } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
 import { useAccounts } from '@/hooks/useAccounts';
+import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 
@@ -18,7 +18,7 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
-import { getSelectedNetwork } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
@@ -32,9 +32,9 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
   const stringGetter = useStringGetter();
   const { dydxAddress, getSubaccounts } = useAccounts();
   const { requestFaucetFunds } = useSubaccount();
-  const subAccount = useSelector(getSubaccount, shallowEqual);
-  const selectedNetwork = useSelector(getSelectedNetwork);
-  const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
+  const subAccount = useAppSelector(getSubaccount, shallowEqual);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
+  const dydxChainId = useEnvConfig('dydxChainId');
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -79,10 +79,7 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
         {stringGetter({
           key: STRING_KEYS.CREDITED_WITH,
           params: {
-            AMOUNT_USD:
-              ENVIRONMENT_CONFIG_MAP[selectedNetwork].ethereumChainId === 'dydxprotocol-testnet'
-                ? 1000
-                : 100,
+            AMOUNT_USD: dydxChainId === 'dydxprotocol-testnet' ? 1000 : 100,
           },
         })}
       </p>

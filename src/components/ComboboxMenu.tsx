@@ -28,12 +28,12 @@ type StyleProps = {
 
 export type ComboboxMenuProps<
   MenuItemValue extends string | number,
-  MenuGroupValue extends string | number
+  MenuGroupValue extends string | number,
 > = ElementProps<MenuItemValue, MenuGroupValue> & StyleProps;
 
 export const ComboboxMenu = <
   MenuItemValue extends string | number,
-  MenuGroupValue extends string | number
+  MenuGroupValue extends string | number,
 >({
   items,
   onItemSelected,
@@ -47,7 +47,6 @@ export const ComboboxMenu = <
   withItemBorders,
   withStickyLayout,
 }: ComboboxMenuProps<MenuItemValue, MenuGroupValue>) => {
-  const [highlightedCommand, setHighlightedCommand] = useState<MenuItemValue>();
   const [searchValue, setSearchValue] = useState('');
 
   return (

@@ -1,13 +1,13 @@
-import { Key, useEffect, useMemo } from 'react';
+import { Key, ReactNode, useEffect, useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { ColumnSize } from '@react-types/table';
 import type { Dispatch } from '@reduxjs/toolkit';
 import { DateTime } from 'luxon';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import { Asset, Nullable, SubaccountOrder } from '@/constants/abacus';
+import { AbacusMarginMode, Asset, Nullable, SubaccountOrder } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
@@ -16,7 +16,7 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
@@ -24,16 +24,14 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
-import {
-  MarketTableCell,
-  Table,
-  TableCell,
-  TableColumnHeader,
-  type ColumnDef,
-} from '@/components/Table';
+import { ColumnDef, Table } from '@/components/Table';
+import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import { TableCell } from '@/components/Table/TableCell';
+import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
+import { MarketTypeFilter, marketTypeMatchesFilter } from '@/pages/trade/types';
 
 import { viewedOrders } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
@@ -42,6 +40,7 @@ import {
   getHasUnseenOrderUpdates,
   getSubaccountUnclearedOrders,
 } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
@@ -54,6 +53,7 @@ import {
   isOrderStatusClearable,
 } from '@/lib/orders';
 import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
+import { getMarginModeFromSubaccountNumber } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { OrderStatusIcon } from '../OrderStatusIcon';
@@ -68,6 +68,7 @@ export enum OrdersTableColumnKey {
   Trigger = 'Trigger',
   GoodTil = 'Good-Til',
   Actions = 'Actions',
+  MarginType = 'Margin-Type',
 
   // Tablet Only
   StatusFill = 'Status-Fill',
@@ -75,10 +76,10 @@ export enum OrdersTableColumnKey {
 }
 
 export type OrderTableRow = {
-  asset: Asset;
-  stepSizeDecimals: number;
-  tickSizeDecimals: number;
-  orderSide: OrderSide;
+  asset: Nullable<Asset>;
+  stepSizeDecimals: Nullable<number>;
+  tickSizeDecimals: Nullable<number>;
+  orderSide?: Nullable<OrderSide>;
 } & SubaccountOrder;
 
 const getOrdersTableColumnDef = ({
@@ -104,7 +105,9 @@ const getOrdersTableColumnDef = ({
         columnKey: 'marketId',
         getCellValue: (row) => row.marketId,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
-        renderCell: ({ asset, marketId }) => <MarketTableCell asset={asset} marketId={marketId} />,
+        renderCell: ({ asset, marketId }) => (
+          <MarketTableCell asset={asset ?? undefined} marketId={marketId} />
+        ),
       },
       [OrdersTableColumnKey.Status]: {
         columnKey: 'status',
@@ -132,7 +135,9 @@ const getOrdersTableColumnDef = ({
         columnKey: 'side',
         getCellValue: (row) => row.orderSide,
         label: stringGetter({ key: STRING_KEYS.SIDE }),
-        renderCell: ({ orderSide }) => <OrderSideTag orderSide={orderSide} size={TagSize.Medium} />,
+        renderCell: ({ orderSide }) => (
+          <OrderSideTag orderSide={orderSide ?? OrderSide.BUY} size={TagSize.Medium} />
+        ),
       },
       [OrdersTableColumnKey.AmountFill]: {
         columnKey: 'size',
@@ -149,12 +154,16 @@ const getOrdersTableColumnDef = ({
             <Output
               type={OutputType.Asset}
               value={size}
-              fractionDigits={stepSizeDecimals < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals}
+              fractionDigits={
+                (stepSizeDecimals ?? 0) < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals
+              }
             />
             <Output
               type={OutputType.Asset}
               value={totalFilled}
-              fractionDigits={stepSizeDecimals < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals}
+              fractionDigits={
+                (stepSizeDecimals ?? 0) < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals
+              }
             />
           </TableCell>
         ),
@@ -213,16 +222,28 @@ const getOrdersTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.ACTION }),
         isActionable: true,
         allowsSorting: false,
-        renderCell: ({ id, status }) => (
-          <OrderActionsCell orderId={id} status={status} isDisabled={isAccountViewOnly} />
+        renderCell: ({ id, status, orderFlags }) => (
+          <OrderActionsCell
+            orderId={id}
+            status={status}
+            orderFlags={orderFlags}
+            isDisabled={isAccountViewOnly}
+          />
         ),
       },
       [OrdersTableColumnKey.StatusFill]: {
         columnKey: 'statusFill',
         getCellValue: (row) => row.status.name,
-        label: `${stringGetter({ key: STRING_KEYS.STATUS })} / ${stringGetter({
-          key: STRING_KEYS.FILL,
-        })}`,
+        label: (
+          <TableColumnHeader>
+            <span>{stringGetter({ key: STRING_KEYS.STATUS })}</span>
+            <span>
+              {stringGetter({
+                key: STRING_KEYS.FILL,
+              })}
+            </span>
+          </TableColumnHeader>
+        ),
         renderCell: ({ asset, createdAtMilliseconds, size, status, totalFilled, resources }) => {
           const { statusIconColor } = getOrderStatusInfo({ status: status.rawValue });
 
@@ -288,7 +309,21 @@ const getOrdersTableColumnDef = ({
           </TableCell>
         ),
       },
-    } as Record<OrdersTableColumnKey, ColumnDef<OrderTableRow>>
+      [OrdersTableColumnKey.MarginType]: {
+        columnKey: 'marginType',
+        label: stringGetter({ key: STRING_KEYS.MARGIN_MODE }),
+        getCellValue: (row) => getMarginModeFromSubaccountNumber(row.subaccountNumber).name,
+        renderCell(row: OrderTableRow): ReactNode {
+          const marginMode = getMarginModeFromSubaccountNumber(row.subaccountNumber);
+
+          const marginModeLabel =
+            marginMode === AbacusMarginMode.cross
+              ? stringGetter({ key: STRING_KEYS.CROSS })
+              : stringGetter({ key: STRING_KEYS.ISOLATED });
+          return <Output type={OutputType.Text} value={marginModeLabel} />;
+        },
+      },
+    } satisfies Record<OrdersTableColumnKey, ColumnDef<OrderTableRow>>
   )[key],
 });
 
@@ -296,6 +331,7 @@ type ElementProps = {
   columnKeys: OrdersTableColumnKey[];
   columnWidths?: Partial<Record<OrdersTableColumnKey, ColumnSize>>;
   currentMarket?: string;
+  marketTypeFilter?: MarketTypeFilter;
   initialPageSize?: PageSize;
 };
 
@@ -307,22 +343,31 @@ export const OrdersTable = ({
   columnKeys = [],
   columnWidths,
   currentMarket,
+  marketTypeFilter,
   initialPageSize,
   withOuterBorder,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { isTablet } = useBreakpoints();
 
-  const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
-  const marketOrders = useSelector(getCurrentMarketOrders, shallowEqual) ?? EMPTY_ARR;
-  const allOrders = useSelector(getSubaccountUnclearedOrders, shallowEqual) ?? EMPTY_ARR;
-  const orders = currentMarket ? marketOrders : allOrders;
+  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
+  const marketOrders = useAppSelector(getCurrentMarketOrders, shallowEqual) ?? EMPTY_ARR;
+  const allOrders = useAppSelector(getSubaccountUnclearedOrders, shallowEqual) ?? EMPTY_ARR;
 
-  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
-  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
+  const orders = useMemo(
+    () =>
+      (currentMarket ? marketOrders : allOrders).filter((order) => {
+        const orderType = getMarginModeFromSubaccountNumber(order.subaccountNumber).name;
+        return marketTypeMatchesFilter(orderType, marketTypeFilter);
+      }),
+    [allOrders, currentMarket, marketOrders, marketTypeFilter]
+  );
 
-  const hasUnseenOrderUpdates = useSelector(getHasUnseenOrderUpdates);
+  const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
+
+  const hasUnseenOrderUpdates = useAppSelector(getHasUnseenOrderUpdates);
 
   useEffect(() => {
     if (hasUnseenOrderUpdates) dispatch(viewedOrders());
@@ -332,13 +377,14 @@ export const OrdersTable = ({
 
   const ordersData = useMemo(
     () =>
-      orders.map((order: SubaccountOrder) =>
-        getHydratedTradingData({
-          data: order,
-          assets: allAssets,
-          perpetualMarkets: allPerpetualMarkets,
-        })
-      ) as OrderTableRow[],
+      orders.map(
+        (order: SubaccountOrder): OrderTableRow =>
+          getHydratedTradingData({
+            data: order,
+            assets: allAssets,
+            perpetualMarkets: allPerpetualMarkets,
+          })
+      ),
     [orders, allPerpetualMarkets, allAssets]
   );
 
@@ -415,16 +461,17 @@ const $SecondaryColor = styled.span`
   color: var(--color-text-0);
 `;
 
-const $Side = styled.span<{ side: OrderSide }>`
+const $Side = styled.span<{ side?: OrderSide | null }>`
   ${({ side }) =>
-    ({
+    side &&
+    {
       [OrderSide.BUY]: css`
         color: var(--color-positive);
       `,
       [OrderSide.SELL]: css`
         color: var(--color-negative);
       `,
-    }[side])};
+    }[side]};
 `;
 
 const $EmptyIcon = styled(Icon)`

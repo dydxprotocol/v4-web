@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual, useSelector } from 'react-redux';
-import styled, { AnyStyledComponent } from 'styled-components';
+import styled from 'styled-components';
 
 import { AnalyticsEvent } from '@/constants/analytics';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
@@ -230,7 +230,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
         },
         {
           label: (
-            <Styled.Button
+            <$Button
               state={{
                 isDisabled:
                   (!checkedTrades && !checkedTransfers) ||
@@ -240,7 +240,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
               size={ButtonSize.XSmall}
             >
               {stringGetter({ key: STRING_KEYS.DOWNLOAD })}
-            </Styled.Button>
+            </$Button>
           ),
           value: 'download',
           onSelect: exportData,
@@ -254,8 +254,6 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
   );
 };
 
-const Styled: Record<string, AnyStyledComponent> = {};
-
-Styled.Button = styled(Button)`
+const $Button = styled(Button)`
   width: 100%;
 `;

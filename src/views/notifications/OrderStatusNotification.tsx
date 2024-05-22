@@ -1,4 +1,4 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import {
@@ -15,17 +15,21 @@ import {
   type LocalPlaceOrderData,
 } from '@/constants/trade';
 
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 // eslint-disable-next-line import/no-cycle
 import { Notification, NotificationProps } from '@/components/Notification';
 
 import { getFillByClientId, getOrderByClientId } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getMarketData } from '@/state/perpetualsSelectors';
 
 import { assertNever } from '@/lib/assertNever';
@@ -44,10 +48,12 @@ export const OrderStatusNotification = ({
   notification,
 }: NotificationProps & ElementProps) => {
   const stringGetter = useStringGetter();
-  const order = useSelector(getOrderByClientId(localOrder.clientId), shallowEqual);
-  const fill = useSelector(getFillByClientId(localOrder.clientId), shallowEqual);
-  const marketData = useSelector(getMarketData(localOrder.marketId), shallowEqual);
+  const order = useParameterizedSelector(getOrderByClientId, localOrder.clientId);
+  const fill = useParameterizedSelector(getFillByClientId, localOrder.clientId);
+  const marketData = useAppSelector((s) => getMarketData(s, localOrder.marketId), shallowEqual);
+
   const { assetId } = marketData ?? {};
+  const { equityTiersLearnMore } = useURLConfigs();
   const titleKey = ORDER_TYPE_STRINGS[localOrder.orderType]?.orderTypeKey;
   const indexedOrderStatus = order?.status?.rawValue as KotlinIrEnumValues<
     typeof AbacusOrderStatus
@@ -85,12 +91,24 @@ export const OrderStatusNotification = ({
       if (localOrder.errorStringKey) {
         orderStatusStringKey = STRING_KEYS.ERROR;
         orderStatusIcon = <$WarningIcon iconName={IconName.Warning} />;
-        customContent = <span>{stringGetter({ key: localOrder.errorStringKey })}</span>;
+        customContent = (
+          <span>
+            {stringGetter({
+              key: localOrder.errorStringKey,
+              params: {
+                EQUITY_TIER_LEARN_MORE: (
+                  <$Link href={equityTiersLearnMore} onClick={(e) => e.stopPropagation()}>
+                    {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
+                  </$Link>
+                ),
+              },
+            })}
+          </span>
+        );
       }
       break;
     default:
       assertNever(submissionStatus);
-      break;
   }
 
   return (
@@ -131,4 +149,9 @@ const $WarningIcon = styled(Icon)`
 const $OrderStatusIcon = styled(OrderStatusIcon)`
   width: 0.9375rem;
   height: 0.9375rem;
+`;
+
+const $Link = styled(Link)`
+  --link-color: var(--color-text-1);
+  display: inline-grid;
 `;

@@ -1,7 +1,11 @@
-import { shallowEqual, useSelector } from 'react-redux';
-import { createSelector } from 'reselect';
+import { useMemo } from 'react';
 
-import type { RootState } from './_store';
+import { shallowEqual } from 'react-redux';
+
+import { EMPTY_ARR } from '@/constants/objects';
+
+import { type RootState } from './_store';
+import { createAppSelector, useAppSelector } from './appTypes';
 
 /**
  * @param state
@@ -40,7 +44,7 @@ export const getInputTradeTargetLeverage = (state: RootState) =>
 
 /**
  * @param state
- * @returns ValidationErrors of the current Input type (Trade or Transfer)
+ * @returns ValidationErrors of the current Input type
  */
 export const getInputErrors = (state: RootState) => state.inputs.inputErrors;
 
@@ -56,7 +60,7 @@ export const getCurrentInput = (state: RootState) => state.inputs.current;
  */
 export const getTradeInputErrors = (state: RootState) => {
   const currentInput = state.inputs.current;
-  return currentInput === 'trade' ? getInputErrors(state) : [];
+  return currentInput === 'trade' ? getInputErrors(state) : EMPTY_ARR;
 };
 
 /**
@@ -65,7 +69,7 @@ export const getTradeInputErrors = (state: RootState) => {
  */
 export const getClosePositionInputErrors = (state: RootState) => {
   const currentInput = state.inputs.current;
-  return currentInput === 'closePosition' ? getInputErrors(state) : [];
+  return currentInput === 'closePosition' ? getInputErrors(state) : EMPTY_ARR;
 };
 
 /**
@@ -73,15 +77,6 @@ export const getClosePositionInputErrors = (state: RootState) => {
  * @returns ClosePositionInputs
  */
 export const getInputClosePositionData = (state: RootState) => state.inputs.closePositionInputs;
-
-/**
- * @param state
- * @returns input errors for Transfer
- */
-export const getTransferInputErrors = (state: RootState) => {
-  const currentInput = state.inputs.current;
-  return currentInput === 'transfer' ? getInputErrors(state) : [];
-};
 
 /**
  * @param state
@@ -95,7 +90,7 @@ export const getTransferInputs = (state: RootState) => state.inputs.transferInpu
  */
 export const getTriggerOrdersInputErrors = (state: RootState) => {
   const currentInput = state.inputs.current;
-  return currentInput === 'triggerOrders' ? getInputErrors(state) : [];
+  return currentInput === 'triggerOrders' ? getInputErrors(state) : EMPTY_ARR;
 };
 
 /**
@@ -105,50 +100,66 @@ export const getTriggerOrdersInputErrors = (state: RootState) => {
 export const getTriggerOrdersInputs = (state: RootState) => state.inputs.triggerOrdersInputs;
 
 /**
+ * @returns AdjustIsolatedMarginInputs
+ */
+export const getAdjustIsolatedMarginInputs = (state: RootState) =>
+  state.inputs.adjustIsolatedMarginInputs;
+
+/**
  * @returns Data needed for the TradeForm (price, size, summary, input render options, and errors/input validation)
  */
 export const useTradeFormData = () => {
-  return useSelector(
-    createSelector(
-      [getInputTradeData, getInputTradeOptions, getTradeInputErrors],
-      (tradeData, tradeOptions, tradeErrors) => {
-        const { price, size, summary } = tradeData ?? {};
+  const selector = useMemo(
+    () =>
+      createAppSelector(
+        [getInputTradeData, getInputTradeOptions, getTradeInputErrors],
+        (tradeData, tradeOptions, tradeErrors) => {
+          const { price, size, summary } = tradeData ?? {};
 
-        const {
-          needsLimitPrice,
-          needsTrailingPercent,
-          needsTriggerPrice,
-          executionOptions,
-          needsGoodUntil,
-          needsPostOnly,
-          needsReduceOnly,
-          postOnlyTooltip,
-          reduceOnlyTooltip,
-          timeInForceOptions,
-        } = tradeOptions ?? {};
+          const {
+            needsLimitPrice,
+            needsMarginMode,
+            needsTargetLeverage,
+            needsTrailingPercent,
+            needsTriggerPrice,
+            needsGoodUntil,
+            needsPostOnly,
+            needsReduceOnly,
+            postOnlyTooltip,
+            reduceOnlyTooltip,
 
-        return {
-          price,
-          size,
-          summary,
+            executionOptions,
+            marginModeOptions,
+            timeInForceOptions,
+          } = tradeOptions ?? {};
 
-          needsLimitPrice,
-          needsTrailingPercent,
-          needsTriggerPrice,
-          executionOptions,
-          needsGoodUntil,
-          needsPostOnly,
-          needsReduceOnly,
-          postOnlyTooltip,
-          reduceOnlyTooltip,
-          timeInForceOptions,
+          return {
+            price,
+            size,
+            summary,
 
-          tradeErrors,
-        };
-      }
-    ),
-    shallowEqual
+            needsLimitPrice,
+            needsMarginMode,
+            needsTargetLeverage,
+            needsTrailingPercent,
+            needsTriggerPrice,
+            needsGoodUntil,
+            needsPostOnly,
+            needsReduceOnly,
+            postOnlyTooltip,
+            reduceOnlyTooltip,
+
+            executionOptions,
+            marginModeOptions,
+            timeInForceOptions,
+
+            tradeErrors,
+          };
+        }
+      ),
+    []
   );
+  return useAppSelector(selector, shallowEqual);
 };
 
 /**

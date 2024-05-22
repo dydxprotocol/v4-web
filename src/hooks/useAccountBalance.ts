@@ -1,21 +1,21 @@
 import { useCallback } from 'react';
 
 import { StargateClient } from '@cosmjs/stargate';
-import { useQuery } from 'react-query';
-import { shallowEqual, useSelector } from 'react-redux';
+import { useQuery } from '@tanstack/react-query';
+import { shallowEqual } from 'react-redux';
 import { formatUnits } from 'viem';
 import { useBalance } from 'wagmi';
 
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { EvmAddress } from '@/constants/wallets';
 
 import { getBalances, getStakingBalances } from '@/state/accountSelectors';
-import { getSelectedNetwork } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import { convertBech32Address } from '@/lib/addressUtils';
 import { MustBigNumber } from '@/lib/numbers';
 
 import { useAccounts } from './useAccounts';
+import { useEnvConfig } from './useEnvConfig';
 import { useTokenConfigs } from './useTokenConfigs';
 
 type UseAccountBalanceProps = {
@@ -47,11 +47,10 @@ export const useAccountBalance = ({
 }: UseAccountBalanceProps = {}) => {
   const { evmAddress, dydxAddress } = useAccounts();
 
-  const selectedNetwork = useSelector(getSelectedNetwork);
-  const balances = useSelector(getBalances, shallowEqual);
+  const balances = useAppSelector(getBalances, shallowEqual);
   const { chainTokenDenom, usdcDenom } = useTokenConfigs();
-  const evmChainId = Number(ENVIRONMENT_CONFIG_MAP[selectedNetwork].ethereumChainId);
-  const stakingBalances = useSelector(getStakingBalances, shallowEqual);
+  const evmChainId = Number(useEnvConfig('ethereumChainId'));
+  const stakingBalances = useAppSelector(getStakingBalances, shallowEqual);
 
   const evmQuery = useBalance({
     enabled: Boolean(!isCosmosChain && addressOrDenom?.startsWith('0x')),
@@ -80,7 +79,7 @@ export const useAccountBalance = ({
 
   const cosmosQuery = useQuery({
     enabled: Boolean(isCosmosChain && dydxAddress && bech32AddrPrefix && rpc && addressOrDenom),
-    queryKey: `accountBalances_${chainId}_${addressOrDenom}`,
+    queryKey: ['accountBalances', chainId, addressOrDenom],
     queryFn: cosmosQueryFn,
     refetchOnWindowFocus: false,
     refetchOnMount: false,

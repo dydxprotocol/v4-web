@@ -1,4 +1,4 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { AbacusMarginMode, MARGIN_MODE_STRINGS, TradeInputField } from '@/constants/abacus';
@@ -8,9 +8,9 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
 
-import { Button } from '@/components/Button';
 import { RadioButtonCards } from '@/components/RadioButtonCards';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getInputTradeMarginMode } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -20,7 +20,7 @@ export const SelectMarginModeForm = ({
 }: {
   onChangeMarginMode?: () => void;
 }) => {
-  const marginMode = useSelector(getInputTradeMarginMode, shallowEqual);
+  const marginMode = useAppSelector(getInputTradeMarginMode, shallowEqual);
   const marginModeValue = marginMode?.rawValue;
 
   const stringGetter = useStringGetter();
@@ -70,10 +70,9 @@ const $RadioButtonCards = styled(RadioButtonCards)`
   padding: 0;
 
   --radio-button-cards-item-checked-backgroundColor: var(--color-layer-1);
+  --radio-button-cards-item-header-font: var(--font-medium-medium);
 `;
 const $TertiarySpan = styled.span`
   color: var(--color-text-0);
-`;
-const $Button = styled(Button)`
-  width: 100%;
+  font: var(--font-base-medium);
 `;

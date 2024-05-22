@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import type { PerpetualMarketSparklineResponse } from '@/constants/indexer';
 import { timeUnits } from '@/constants/time';
@@ -9,7 +9,6 @@ import { useDydxClient } from './useDydxClient';
 
 const POLLING_MS = timeUnits.hour;
 export const SEVEN_DAY_SPARKLINE_ENTRIES = 42;
-export const ONE_DAY_SPARKLINE_ENTRIES = 24;
 
 type UsePerpetualMarketSparklinesProps = {
   period?: 'ONE_DAY' | 'SEVEN_DAYS';
@@ -33,7 +32,7 @@ export const usePerpetualMarketSparklines = (props: UsePerpetualMarketSparklines
     },
     refetchInterval,
     refetchOnWindowFocus: false,
-    cacheTime: 1_000 * 60 * 5, // 5 minutes
+    gcTime: 1_000 * 60 * 5, // 5 minutes
     staleTime: 1_000 * 60 * 10, // 10 minutes
   });
 

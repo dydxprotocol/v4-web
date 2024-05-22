@@ -1,4 +1,4 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import { ComplianceStatus } from '@/constants/abacus';
@@ -9,6 +9,7 @@ import { isMainnet } from '@/constants/networks';
 import { LinkOutIcon } from '@/icons';
 
 import { getComplianceStatus, getComplianceUpdatedAt, getGeo } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { isBlockedGeo } from '@/lib/compliance';
@@ -18,10 +19,10 @@ import { useURLConfigs } from './useURLConfigs';
 
 export const useComplianceState = () => {
   const stringGetter = useStringGetter();
-  const complianceStatus = useSelector(getComplianceStatus, shallowEqual);
-  const complianceUpdatedAt = useSelector(getComplianceUpdatedAt);
-  const geo = useSelector(getGeo);
-  const selectedLocale = useSelector(getSelectedLocale);
+  const complianceStatus = useAppSelector(getComplianceStatus, shallowEqual);
+  const complianceUpdatedAt = useAppSelector(getComplianceUpdatedAt);
+  const geo = useAppSelector(getGeo);
+  const selectedLocale = useAppSelector(getSelectedLocale);
 
   const updatedAtDate = complianceUpdatedAt ? new Date(complianceUpdatedAt) : undefined;
   updatedAtDate?.setDate(updatedAtDate.getDate() + CLOSE_ONLY_GRACE_PERIOD);
@@ -58,12 +59,12 @@ export const useComplianceState = () => {
           : undefined,
         EMAIL: complianceSupportEmail,
       },
-    }) as string;
+    });
   } else if (complianceStatus === ComplianceStatus.BLOCKED) {
     complianceMessage = stringGetter({
       key: STRING_KEYS.PERMANENTLY_BLOCKED_MESSAGE,
       params: { EMAIL: complianceSupportEmail },
-    }) as string;
+    });
   } else if (geo && isBlockedGeo(geo)) {
     complianceMessage = stringGetter({
       key: STRING_KEYS.BLOCKED_MESSAGE,
@@ -74,7 +75,7 @@ export const useComplianceState = () => {
           </Link>
         ),
       },
-    }) as string;
+    });
   }
 
   return {

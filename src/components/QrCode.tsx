@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
 
 import QRCodeStyling from 'qr-code-styling';
-import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
+import { useAppSelector } from '@/state/appTypes';
 import { AppTheme } from '@/state/configs';
 import { getAppTheme } from '@/state/configsSelectors';
 
@@ -22,7 +22,7 @@ const LIGHT_LOGO_MARK_URL = '/logos/logo-mark-light.svg';
 
 export const QrCode = ({ className, value, hasLogo, size = 300 }: ElementProps & StyleProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  const appTheme: AppTheme = useSelector(getAppTheme);
+  const appTheme: AppTheme = useAppSelector(getAppTheme);
 
   const { current: qrCode } = useRef(
     new QRCodeStyling({
@@ -61,7 +61,7 @@ export const QrCode = ({ className, value, hasLogo, size = 300 }: ElementProps &
   );
 
   useEffect(() => {
-    qrCode.append(ref.current || undefined);
+    qrCode.append(ref.current ?? undefined);
   }, []);
 
   useEffect(() => {

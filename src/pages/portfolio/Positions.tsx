@@ -1,10 +1,13 @@
-import { useSelector } from 'react-redux';
+import { useCallback } from 'react';
+
 import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, PortfolioRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AttachedExpandingSection } from '@/components/ContentSection';
@@ -15,24 +18,30 @@ import {
   calculateShouldRenderActionsInPositionsTable,
   calculateShouldRenderTriggersInPositionsTable,
 } from '@/state/accountCalculators';
+import { useAppSelector } from '@/state/appTypes';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { testFlags } from '@/lib/testFlags';
+
+import { MaybeUnopenedIsolatedPositionsPanel } from '../trade/UnopenedIsolatedPositions';
 
 export const Positions = () => {
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  const showClosePositionAction = false;
-
-  const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
-  const shouldRenderActions = useSelector(
-    calculateShouldRenderActionsInPositionsTable(showClosePositionAction)
+  const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
+  const shouldRenderActions = useParameterizedSelector(
+    calculateShouldRenderActionsInPositionsTable
   );
 
+  const handleViewUnopenedIsolatedOrders = useCallback(() => {
+    navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
+      state: { from: AppRoute.Portfolio },
+    });
+  }, [navigate]);
+
   return (
-    <AttachedExpandingSection>
+    <$AttachedExpandingSection>
       {isNotTablet && <ContentSectionHeader title={stringGetter({ key: STRING_KEYS.POSITIONS })} />}
 
       <PositionsTable
@@ -46,9 +55,9 @@ export const Positions = () => {
             : [
                 PositionsTableColumnKey.Market,
                 PositionsTableColumnKey.Size,
-                testFlags.isolatedMargin && PositionsTableColumnKey.Margin,
+                PositionsTableColumnKey.Margin,
                 PositionsTableColumnKey.UnrealizedPnl,
-                !testFlags.isolatedMargin && PositionsTableColumnKey.RealizedPnl,
+                PositionsTableColumnKey.RealizedPnl,
                 PositionsTableColumnKey.NetFunding,
                 PositionsTableColumnKey.AverageOpenAndClose,
                 PositionsTableColumnKey.LiquidationAndOraclePrice,
@@ -58,13 +67,35 @@ export const Positions = () => {
         }
         currentRoute={`${AppRoute.Portfolio}/${PortfolioRoute.Positions}`}
         withOuterBorder={isNotTablet}
-        showClosePositionAction={showClosePositionAction}
+        showClosePositionAction={shouldRenderActions}
         navigateToOrders={() =>
           navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
             state: { from: AppRoute.Portfolio },
           })
         }
       />
-    </AttachedExpandingSection>
+
+      <$MaybeUnopenedIsolatedPositionsPanel
+        header={
+          <ContentSectionHeader
+            title={stringGetter({ key: STRING_KEYS.UNOPENED_ISOLATED_POSITIONS })}
+          />
+        }
+        onViewOrders={handleViewUnopenedIsolatedOrders}
+      />
+    </$AttachedExpandingSection>
   );
 };
+
+const $AttachedExpandingSection = styled(AttachedExpandingSection)`
+  margin-bottom: 1rem;
+`;
+
+const $MaybeUnopenedIsolatedPositionsPanel = styled(MaybeUnopenedIsolatedPositionsPanel)`
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+
+  > div {
+    padding-left: 1rem;
+  }
+`;

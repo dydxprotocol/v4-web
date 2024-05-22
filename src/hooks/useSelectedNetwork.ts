@@ -1,26 +1,28 @@
 import { useCallback } from 'react';
 
 import { useWallets } from '@privy-io/react-auth';
-import { useDispatch, useSelector } from 'react-redux';
 
 import { LocalStorageKey } from '@/constants/localStorage';
-import { DEFAULT_APP_ENVIRONMENT, DydxNetwork, ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
+import { DEFAULT_APP_ENVIRONMENT, DydxNetwork } from '@/constants/networks';
 
 import { setSelectedNetwork } from '@/state/app';
 import { getSelectedNetwork } from '@/state/appSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
 import { validateAgainstAvailableEnvironments } from '@/lib/network';
 
 import { useAccounts } from './useAccounts';
+import { useEnvConfig } from './useEnvConfig';
 import { useLocalStorage } from './useLocalStorage';
 
 export const useSelectedNetwork = (): {
   switchNetwork: (network: DydxNetwork) => void;
   selectedNetwork: DydxNetwork;
 } => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { disconnect } = useAccounts();
-  const selectedNetwork = useSelector(getSelectedNetwork);
+  const selectedNetwork = useAppSelector(getSelectedNetwork);
+  const chainId = useEnvConfig('ethereumChainId');
 
   const { wallets } = useWallets();
   const privyWallet = wallets.find((wallet) => wallet.walletClientType === 'privy');
@@ -37,10 +39,9 @@ export const useSelectedNetwork = (): {
 
       setLocalStorageNetwork(network);
       dispatch(setSelectedNetwork(network));
-      const chainId = Number(ENVIRONMENT_CONFIG_MAP[selectedNetwork].ethereumChainId);
-      privyWallet?.switchChain(chainId);
+      privyWallet?.switchChain(Number(chainId));
     },
-    [dispatch, disconnect, setLocalStorageNetwork]
+    [dispatch, disconnect, setLocalStorageNetwork, chainId]
   );
 
   return { switchNetwork, selectedNetwork };

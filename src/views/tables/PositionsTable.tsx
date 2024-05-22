@@ -1,7 +1,7 @@
 import { Key, useMemo } from 'react';
 
 import type { ColumnSize } from '@react-types/table';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -27,21 +27,25 @@ import { tradeViewMixins } from '@/styles/tradeViewMixins';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
-import { Table, TableColumnHeader, type ColumnDef } from '@/components/Table';
+import { ColumnDef, Table } from '@/components/Table';
 import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
+import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
+import { MarketTypeFilter, marketTypeMatchesFilter } from '@/pages/trade/types';
 
 import {
   calculateIsAccountViewOnly,
   calculateShouldRenderTriggersInPositionsTable,
 } from '@/state/accountCalculators';
 import { getExistingOpenPositions, getSubaccountConditionalOrders } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
-import { testFlags } from '@/lib/testFlags';
+import { safeAssign } from '@/lib/objectHelpers';
+import { getMarginModeFromSubaccountNumber, getPositionMargin } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
@@ -125,9 +129,16 @@ const getPositionsTableColumnDef = ({
       [PositionsTableColumnKey.IndexEntry]: {
         columnKey: 'oracleEntry',
         getCellValue: (row) => row.entryPrice?.current,
-        label: `${stringGetter({ key: STRING_KEYS.ORACLE_PRICE_ABBREVIATED })} / ${stringGetter({
-          key: STRING_KEYS.ENTRY_PRICE_SHORT,
-        })}`,
+        label: (
+          <TableColumnHeader>
+            <span>{stringGetter({ key: STRING_KEYS.ORACLE_PRICE_ABBREVIATED })}</span>
+            <span>
+              {stringGetter({
+                key: STRING_KEYS.ENTRY_PRICE_SHORT,
+              })}
+            </span>
+          </TableColumnHeader>
+        ),
         hideOnBreakpoint: MediaQueryKeys.isNotTablet,
         renderCell: ({ entryPrice, oraclePrice, tickSizeDecimals }) => (
           <TableCell stacked>
@@ -200,13 +211,11 @@ const getPositionsTableColumnDef = ({
       },
       [PositionsTableColumnKey.Margin]: {
         columnKey: 'margin',
-        getCellValue: (row) => row.leverage?.current,
+        getCellValue: (row) => getPositionMargin({ position: row }),
         label: stringGetter({ key: STRING_KEYS.MARGIN }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         isActionable: true,
-        renderCell: ({ id, adjustedMmf, notionalTotal }) => (
-          <PositionsMarginCell id={id} notionalTotal={notionalTotal} adjustedMmf={adjustedMmf} />
-        ),
+        renderCell: (row) => <PositionsMarginCell position={row} />,
       },
       [PositionsTableColumnKey.NetFunding]: {
         columnKey: 'netFunding',
@@ -337,11 +346,11 @@ const getPositionsTableColumnDef = ({
         columnKey: 'actions',
         label: stringGetter({
           key:
-            shouldRenderTriggers && showClosePositionAction && !testFlags.isolatedMargin
+            showClosePositionAction && shouldRenderTriggers
               ? STRING_KEYS.ACTIONS
               : showClosePositionAction
-              ? STRING_KEYS.CLOSE
-              : STRING_KEYS.ACTION,
+                ? STRING_KEYS.CLOSE
+                : STRING_KEYS.ACTION,
         }),
         isActionable: true,
         allowsSorting: false,
@@ -358,7 +367,7 @@ const getPositionsTableColumnDef = ({
           />
         ),
       },
-    } as Record<PositionsTableColumnKey, ColumnDef<PositionTableRow>>
+    } satisfies Record<PositionsTableColumnKey, ColumnDef<PositionTableRow>>
   )[key],
 });
 
@@ -367,6 +376,7 @@ type ElementProps = {
   columnWidths?: Partial<Record<PositionsTableColumnKey, ColumnSize>>;
   currentRoute?: string;
   currentMarket?: string;
+  marketTypeFilter?: MarketTypeFilter;
   showClosePositionAction: boolean;
   initialPageSize?: PageSize;
   onNavigate?: () => void;
@@ -383,6 +393,7 @@ export const PositionsTable = ({
   columnWidths,
   currentRoute,
   currentMarket,
+  marketTypeFilter,
   showClosePositionAction,
   initialPageSize,
   onNavigate,
@@ -394,35 +405,37 @@ export const PositionsTable = ({
   const navigate = useNavigate();
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
 
-  const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
-  const perpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
-  const assets = orEmptyObj(useSelector(getAssets, shallowEqual));
-  const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
+  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
+  const perpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const assets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
+  const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
 
-  const openPositions = useSelector(getExistingOpenPositions, shallowEqual) ?? EMPTY_ARR;
+  const openPositions = useAppSelector(getExistingOpenPositions, shallowEqual) ?? EMPTY_ARR;
   const positions = useMemo(() => {
-    const marketPosition = openPositions.find((position) => position.id === currentMarket);
-    return currentMarket ? (marketPosition ? [marketPosition] : []) : openPositions;
-  }, [currentMarket, openPositions]);
+    return openPositions.filter((position) => {
+      const matchesMarket = currentMarket == null || position.id === currentMarket;
+      const subaccountNumber = position.childSubaccountNumber;
+      const marginType = getMarginModeFromSubaccountNumber(subaccountNumber).name;
+      const matchesType = marketTypeMatchesFilter(marginType, marketTypeFilter);
+      return matchesMarket && matchesType;
+    });
+  }, [currentMarket, marketTypeFilter, openPositions]);
 
-  const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } = useSelector(
-    getSubaccountConditionalOrders(isSlTpLimitOrdersEnabled),
-    {
+  const conditionalOrderSelector = useMemo(getSubaccountConditionalOrders, []);
+  const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } =
+    useAppSelector((s) => conditionalOrderSelector(s, isSlTpLimitOrdersEnabled), {
       equalityFn: (oldVal, newVal) => {
         return (
           shallowEqual(oldVal.stopLossOrders, newVal.stopLossOrders) &&
           shallowEqual(oldVal.takeProfitOrders, newVal.takeProfitOrders)
         );
       },
-    }
-  );
+    });
 
   const positionsData = useMemo(
     () =>
       positions.map((position: SubaccountPosition): PositionTableRow => {
-        // object splat ... doesn't copy getter defined properties
-        // eslint-disable-next-line prefer-object-spread
-        return Object.assign(
+        return safeAssign(
           {},
           {
             tickSizeDecimals:
@@ -538,7 +551,7 @@ const $OutputSigned = styled(Output)<{ sign: NumberSign }>`
       [NumberSign.Positive]: `var(--color-positive)`,
       [NumberSign.Negative]: `var(--color-negative)`,
       [NumberSign.Neutral]: `var(--color-text-2)`,
-    }[sign])};
+    })[sign]};
 `;
 
 const $HighlightOutput = styled(Output)<{ isNegative?: boolean }>`

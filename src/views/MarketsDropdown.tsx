@@ -1,6 +1,5 @@
 import { Key, memo, useMemo, useState } from 'react';
 
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled, { css, keyframes } from 'styled-components';
 
@@ -25,6 +24,7 @@ import { ColumnDef, Table } from '@/components/Table';
 import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -34,7 +34,7 @@ import { MarketFilter } from './MarketFilter';
 const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) => void }) => {
   const [filter, setFilter] = useState(MarketFilters.ALL);
   const stringGetter = useStringGetter();
-  const selectedLocale = useSelector(getSelectedLocale);
+  const selectedLocale = useAppSelector(getSelectedLocale);
   const [searchFilter, setSearchFilter] = useState<string>();
   const { filteredMarkets, marketFilters } = useMarketsData(filter, searchFilter);
   const navigate = useNavigate();
@@ -103,7 +103,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
             />
           ),
         },
-      ] as ColumnDef<MarketData>[],
+      ] satisfies ColumnDef<MarketData>[],
     [stringGetter, selectedLocale]
   );
 
@@ -112,7 +112,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
       <$Toolbar>
         <MarketFilter
           selectedFilter={filter}
-          filters={marketFilters as MarketFilters[]}
+          filters={marketFilters}
           onChangeFilter={setFilter}
           onSearchTextChange={setSearchFilter}
         />
@@ -130,6 +130,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
           label={stringGetter({ key: STRING_KEYS.MARKETS })}
           columns={columns}
           initialPageSize={15}
+          paginationBehavior="showAll"
           slotEmpty={
             <$MarketNotFound>
               {filter === MarketFilters.NEW && !searchFilter ? (

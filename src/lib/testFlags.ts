@@ -32,16 +32,12 @@ class TestFlags {
     return this.queryParams.address;
   }
 
-  get isolatedMargin() {
-    return !!this.queryParams.isolatedmargin;
-  }
-
   get withNewMarketType() {
     return !!this.queryParams.withnewmarkettype;
   }
 
-  get enableComplianceApi() {
-    return !!this.queryParams.complianceapi;
+  get enableStaking() {
+    return !!this.queryParams.staking;
   }
 
   get referrer() {

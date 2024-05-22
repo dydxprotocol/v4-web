@@ -4,12 +4,12 @@ import { timeUnits } from './time';
 
 export const mockHistoricalFundingData = Array.from(
   { length: 100 },
-  (_, i) =>
+  (_, i): MarketHistoricalFunding =>
     ({
       effectiveAtMilliseconds:
         timeUnits.hour * Math.floor(Date.now() / timeUnits.hour) - (100 - i - 1) * timeUnits.hour,
       rate: (Math.random() - 0.5) * 0.0001,
-    } as MarketHistoricalFunding)
+    }) as MarketHistoricalFunding
 );
 
 export const mockSubaccountPnlData = Array.from({ length: 3000 }, (_, i) => {

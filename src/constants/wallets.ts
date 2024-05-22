@@ -312,9 +312,6 @@ export type WalletConnection = {
   provider?: ExternalProvider;
 };
 
-// dYdX Chain wallets
-export const COSMOS_DERIVATION_PATH = "m/44'/118'/0'/0/0";
-
 /**
  * @description typed data to sign for dYdX Chain onboarding
  */
@@ -330,7 +327,7 @@ export const getSignTypedData = (selectedDydxChainId: DydxChainId) =>
     message: {
       action: WALLETS_CONFIG_MAP[selectedDydxChainId].signTypedDataAction,
     },
-  } as const);
+  }) as const;
 
 export type PrivateInformation = ReturnType<typeof onboarding.deriveHDKeyFromEthereumSignature>;
 

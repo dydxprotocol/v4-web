@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { LinearGradient } from '@visx/gradient';
 import { ParentSize } from '@visx/responsive';
@@ -29,7 +29,7 @@ import Tooltip from '@/components/visx/XYChartTooltipWithBounds';
 
 import { formatAbsoluteTime } from '@/lib/dateTime';
 import { clamp, lerp, map } from '@/lib/math';
-import { objectEntries } from '@/lib/objectEntries';
+import { objectEntries } from '@/lib/objectHelpers';
 
 import { XYChartThreshold, type Threshold } from './XYChartThreshold';
 
@@ -44,8 +44,8 @@ type GlyphSeriesProps<Datum extends {} = {}> = Parameters<
 type ThresholdProps<Datum extends {} = {}> = Parameters<typeof Threshold<Datum>>[0];
 
 type ElementProps<Datum extends {}> = {
-  id: string;
   selectedLocale: string;
+  yAxisOrientation?: 'right' | 'left';
   yAxisScaleType?: ScaleConfig['type'];
   data: Datum[];
   series: (Pick<
@@ -95,12 +95,12 @@ type StyleProps = {
 };
 
 export const TimeSeriesChart = <Datum extends {}>({
-  id,
   selectedLocale,
+  yAxisOrientation = 'left',
   yAxisScaleType = 'linear',
   data,
   series,
-  tickFormatX = (timestamp, { zoomDomain, numTicks }) =>
+  tickFormatX = (timestamp, { zoomDomain }) =>
     formatAbsoluteTime(timestamp, {
       resolutionUnit:
         objectEntries(allTimeUnits)
@@ -132,6 +132,8 @@ export const TimeSeriesChart = <Datum extends {}>({
   // Context
   const { isMobile } = useBreakpoints();
 
+  const chartRef = useRef<HTMLDivElement>(null);
+
   // Chart data
   const { xAccessor, yAccessor } = series[0];
 
@@ -139,33 +141,48 @@ export const TimeSeriesChart = <Datum extends {}>({
   const latestDatum = data?.[data.length - 1];
 
   // Chart state
+  const getClampedZoomDomain = useCallback(
+    (unclamped: number) => {
+      return clamp(
+        Math.max(1e-320, Math.min(Number.MAX_SAFE_INTEGER, unclamped)),
+        minZoomDomain,
+        xAccessor(latestDatum) - xAccessor(earliestDatum)
+      );
+    },
+    [earliestDatum, latestDatum, minZoomDomain, xAccessor]
+  );
+
   const [zoomDomain, setZoomDomain] = useState<number | undefined>(
-    defaultZoomDomain ?? xAccessor(latestDatum) - xAccessor(earliestDatum)
+    defaultZoomDomain
+      ? getClampedZoomDomain(defaultZoomDomain)
+      : xAccessor(latestDatum) - xAccessor(earliestDatum)
   );
 
   const [zoomDomainAnimateTo, setZoomDomainAnimateTo] = useState<number | undefined>();
 
   useEffect(() => {
-    if (defaultZoomDomain && defaultZoomDomain !== zoomDomain) {
-      setZoomDomainAnimateTo(defaultZoomDomain);
+    if (defaultZoomDomain) {
+      const clampedZoomDomain = getClampedZoomDomain(defaultZoomDomain);
+      setZoomDomain(clampedZoomDomain);
+      setZoomDomainAnimateTo(clampedZoomDomain);
     }
-  }, [defaultZoomDomain]);
+  }, [defaultZoomDomain, getClampedZoomDomain]);
 
   useEffect(() => {
     onZoom?.({ zoomDomain });
-  }, [zoomDomain]);
+  }, [zoomDomain, onZoom]);
 
   useAnimationFrame(
     (elapsedMilliseconds) => {
       if (zoomDomainAnimateTo) {
-        setZoomDomain((zoomDomain) => {
-          if (!zoomDomain) return zoomDomain;
+        setZoomDomain((oldZoomDomain) => {
+          if (!oldZoomDomain) return oldZoomDomain;
 
           const newZoomDomain =
-            zoomDomain * (zoomDomainAnimateTo / zoomDomain) ** (elapsedMilliseconds * 0.01);
+            oldZoomDomain * (zoomDomainAnimateTo / oldZoomDomain) ** (elapsedMilliseconds * 0.01);
 
           // clamp according to direction
-          return zoomDomainAnimateTo > zoomDomain
+          return zoomDomainAnimateTo > oldZoomDomain
             ? Math.min(newZoomDomain, zoomDomainAnimateTo)
             : Math.max(newZoomDomain, zoomDomainAnimateTo);
         });
@@ -175,12 +192,12 @@ export const TimeSeriesChart = <Datum extends {}>({
   );
 
   // Computations
-  const { zoom, domain, range, visibleData } = useMemo(() => {
+  const calculatedValues = useMemo(() => {
     if (!zoomDomain)
       return {
         zoom: 1,
-        domain: [0, 1] as [number, number],
-        range: [0, 1] as [number, number],
+        domain: [0, 1] as const,
+        range: [0, 1] as const,
         visibleData: data,
       };
 
@@ -197,13 +214,15 @@ export const TimeSeriesChart = <Datum extends {}>({
 
     const range = visibleData
       .map((datum) => yAccessor(datum))
-      .reduce((range, y) => [Math.min(range[0], y), Math.max(range[1], y)] as const, [
+      .reduce((calcRange, y) => [Math.min(calcRange[0], y), Math.max(calcRange[1], y)] as const, [
         Infinity,
         -Infinity,
       ] as const);
 
     return { zoom, domain, range, visibleData };
   }, [data, zoomDomain, minZoomDomain]);
+
+  const { domain, range, visibleData, zoom } = calculatedValues;
 
   useEffect(() => {
     if (visibleData) {
@@ -212,24 +231,26 @@ export const TimeSeriesChart = <Datum extends {}>({
   }, [visibleData]);
 
   // Events
-  const onWheel = ({ deltaX, deltaY }: React.WheelEvent) => {
+  const onWheel = ({ deltaY }: React.WheelEvent) => {
     if (!zoomDomain) return;
 
-    setZoomDomain(
-      clamp(
-        Math.max(1e-320, Math.min(Number.MAX_SAFE_INTEGER, zoomDomain * Math.exp(deltaY / 1000))),
-        minZoomDomain,
-        xAccessor(latestDatum) - xAccessor(earliestDatum)
-      )
-    );
-
+    setZoomDomain(getClampedZoomDomain(zoomDomain * Math.exp(deltaY / 1000)));
     setZoomDomainAnimateTo(undefined);
 
     // TODO: scroll horizontally to pan
   };
 
+  useEffect(() => {
+    const currentChart = chartRef.current;
+    const handler = (e: WheelEvent) => e.preventDefault();
+    // Prevents scrolling of the page when user is hovered over chart (scrolling should adjust zoom of the chart instead)
+    currentChart?.addEventListener('wheel', handler);
+
+    return () => currentChart?.removeEventListener('wheel', handler);
+  }, [chartRef]);
+
   return (
-    <$Container onWheel={onWheel} className={className}>
+    <$Container onWheel={onWheel} className={className} ref={chartRef}>
       {data.length && zoomDomain ? (
         <DataProvider
           xScale={{
@@ -255,6 +276,7 @@ export const TimeSeriesChart = <Datum extends {}>({
         >
           <EventEmitterProvider>
             <$ParentSize>
+              {/* eslint-disable-next-line react/no-unused-prop-types */}
               {({ width, height }: { width: number; height: number }) => {
                 const numTicksX =
                   (width - (margin?.left ?? 0) - (margin?.right ?? 0)) / tickSpacingX;
@@ -264,7 +286,7 @@ export const TimeSeriesChart = <Datum extends {}>({
                 return (
                   <XYChart margin={margin} width={width} height={height}>
                     <Grid
-                      numTicks={numGridLines !== undefined ? numGridLines : numTicksY}
+                      numTicks={numGridLines ?? numTicksY}
                       rows={withGridRows}
                       columns={withGridColumns}
                       lineStyle={{
@@ -274,72 +296,74 @@ export const TimeSeriesChart = <Datum extends {}>({
                       }}
                     />
 
-                    {series.map((series) => (
-                      <React.Fragment key={series.dataKey}>
-                        {series.threshold && (
+                    {series.map((childSeries) => (
+                      <React.Fragment key={childSeries.dataKey}>
+                        {childSeries.threshold && (
                           <>
                             <XYChartThreshold<Datum>
                               id={`${Math.random()}`}
                               data={data}
-                              x={series.xAccessor}
-                              y0={series.yAccessor}
-                              y1={series.threshold.yAccessor}
+                              x={childSeries.xAccessor}
+                              y0={childSeries.yAccessor}
+                              y1={childSeries.threshold.yAccessor}
                               clipAboveTo={margin?.top ?? 0}
                               clipBelowTo={height - (margin?.bottom ?? 0)}
-                              curve={series.getCurve?.({ zoom, zoomDomain }) ?? series.curve}
+                              curve={
+                                childSeries.getCurve?.({ zoom, zoomDomain }) ?? childSeries.curve
+                              }
                               aboveAreaProps={{
                                 fill: 'url(#XYChartThresholdAbove)',
-                                fillOpacity: series.threshold.aboveAreaProps?.fillOpacity,
-                                strokeWidth: series.threshold.aboveAreaProps?.strokeWidth,
-                                stroke: series.threshold.aboveAreaProps?.stroke,
+                                fillOpacity: childSeries.threshold.aboveAreaProps?.fillOpacity,
+                                strokeWidth: childSeries.threshold.aboveAreaProps?.strokeWidth,
+                                stroke: childSeries.threshold.aboveAreaProps?.stroke,
                               }}
                               belowAreaProps={{
                                 fill: 'url(#XYChartThresholdBelow)',
-                                fillOpacity: series.threshold.belowAreaProps?.fillOpacity,
-                                strokeWidth: series.threshold.belowAreaProps?.strokeWidth,
-                                stroke: series.threshold.belowAreaProps?.stroke,
+                                fillOpacity: childSeries.threshold.belowAreaProps?.fillOpacity,
+                                strokeWidth: childSeries.threshold.belowAreaProps?.strokeWidth,
+                                stroke: childSeries.threshold.belowAreaProps?.stroke,
                               }}
                             />
                             <LinearGradient
                               id="XYChartThresholdAbove"
-                              from={series.threshold.aboveAreaProps?.fill}
-                              to={series.threshold.aboveAreaProps?.fill}
-                              toOpacity={series.threshold.aboveAreaProps?.fillOpacity}
+                              from={childSeries.threshold.aboveAreaProps?.fill}
+                              to={childSeries.threshold.aboveAreaProps?.fill}
+                              toOpacity={childSeries.threshold.aboveAreaProps?.fillOpacity}
                               toOffset={`${map(0, range[0], range[1], 100, 0)}%`}
                             />
                             <LinearGradient
                               id="XYChartThresholdBelow"
-                              from={series.threshold.belowAreaProps?.fill}
-                              fromOpacity={series.threshold.aboveAreaProps?.fillOpacity}
-                              to={series.threshold.belowAreaProps?.fill}
+                              from={childSeries.threshold.belowAreaProps?.fill}
+                              fromOpacity={childSeries.threshold.aboveAreaProps?.fillOpacity}
+                              to={childSeries.threshold.belowAreaProps?.fill}
                               fromOffset={`${map(0, range[0], range[1], 100, 0)}%`}
                             />
                           </>
                         )}
                         <LineSeries
-                          dataKey={`LineSeries-${series.dataKey}`}
+                          dataKey={`LineSeries-${childSeries.dataKey}`}
                           data={data}
-                          xAccessor={series.xAccessor}
-                          yAccessor={series.yAccessor}
-                          curve={series.getCurve?.({ zoom, zoomDomain }) ?? series.curve}
+                          xAccessor={childSeries.xAccessor}
+                          yAccessor={childSeries.yAccessor}
+                          curve={childSeries.getCurve?.({ zoom, zoomDomain }) ?? childSeries.curve}
                           colorAccessor={
-                            series.threshold ? () => 'transparent' : series.colorAccessor
+                            childSeries.threshold ? () => 'transparent' : childSeries.colorAccessor
                           }
-                          onPointerMove={series?.onPointerMove}
-                          onPointerOut={series?.onPointerOut}
+                          onPointerMove={childSeries?.onPointerMove}
+                          onPointerOut={childSeries?.onPointerOut}
                         />
 
-                        {(series.glyphSize || series.getGlyphSize) && (
+                        {(childSeries.glyphSize ?? childSeries.getGlyphSize) && (
                           <GlyphSeries
-                            dataKey={`GlyphSeries-${series.dataKey}`}
+                            dataKey={`GlyphSeries-${childSeries.dataKey}`}
                             data={data}
-                            xAccessor={series.xAccessor}
-                            yAccessor={series.yAccessor}
-                            colorAccessor={series.colorAccessor}
+                            xAccessor={childSeries.xAccessor}
+                            yAccessor={childSeries.yAccessor}
+                            colorAccessor={childSeries.colorAccessor}
                             size={
-                              series.getGlyphSize
-                                ? (datum) => series.getGlyphSize?.({ datum, zoom }) || 0
-                                : series.glyphSize || 0
+                              childSeries.getGlyphSize
+                                ? (datum) => childSeries.getGlyphSize?.({ datum, zoom }) ?? 0
+                                : childSeries.glyphSize ?? 0
                             }
                           />
                         )}
@@ -354,7 +378,7 @@ export const TimeSeriesChart = <Datum extends {}>({
                         )}
 
                         <Axis
-                          orientation="left"
+                          orientation={yAxisOrientation}
                           numTicks={numTicksY}
                           // hideAxisLine
                           stroke="var(--color-border)"

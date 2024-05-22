@@ -6,7 +6,6 @@ export enum TagSize {
 }
 
 export enum TagType {
-  Asset = 'Asset',
   Side = 'Side',
   Number = 'Number',
 }
@@ -36,8 +35,6 @@ export const Tag = styled.span<StyleProps>`
   letter-spacing: 0.04em;
   line-height: 1.3;
 
-  user-select: none;
-
   ${({ type, size }) =>
     ({
       [TagSize.Small]: css`
@@ -54,7 +51,7 @@ export const Tag = styled.span<StyleProps>`
 
         font: var(--font-mini-book);
       `,
-    }[size || TagSize.Small])}
+    })[size ?? TagSize.Small]}
 
   ${({ sign }) =>
     sign !== undefined &&

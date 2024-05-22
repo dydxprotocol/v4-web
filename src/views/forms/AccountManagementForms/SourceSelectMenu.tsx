@@ -1,8 +1,9 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { EMPTY_ARR } from '@/constants/objects';
 import { WalletType } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -10,10 +11,10 @@ import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
-import { popoverMixins } from '@/styles/popoverMixins';
 
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -33,13 +34,16 @@ export type TokenInfo = {
   name: string;
 };
 
-const cctpTokensByChainId = cctpTokens.reduce((acc, token) => {
-  if (!acc[token.chainId]) {
-    acc[token.chainId] = [];
-  }
-  acc[token.chainId].push(token);
-  return acc;
-}, {} as Record<string, TokenInfo[]>);
+const cctpTokensByChainId = cctpTokens.reduce(
+  (acc, token) => {
+    if (!acc[token.chainId]) {
+      acc[token.chainId] = [];
+    }
+    acc[token.chainId].push(token);
+    return acc;
+  },
+  {} as Record<string, TokenInfo[]>
+);
 
 export const SourceSelectMenu = ({
   label,
@@ -52,13 +56,14 @@ export const SourceSelectMenu = ({
 
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions } =
-    useSelector(getTransferInputs, shallowEqual) || {};
+    useAppSelector(getTransferInputs, shallowEqual) ?? {};
   const chains =
-    (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.chains?.toArray() || [];
+    (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.chains?.toArray() ??
+    EMPTY_ARR;
 
   const exchanges =
-    (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.exchanges?.toArray() ||
-    [];
+    (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.exchanges?.toArray() ??
+    EMPTY_ARR;
 
   // withdrawals SourceSelectMenu is half width size so we must throw the decorator text
   // in the description prop (renders below the item label) instead of in the slotAfter
@@ -98,7 +103,7 @@ export const SourceSelectMenu = ({
       }
       return true;
     })
-    .sort((chain) => (!!cctpTokensByChainId[chain.value] ? -1 : 1));
+    .sort((chain) => (cctpTokensByChainId[chain.value] ? -1 : 1));
 
   const exchangeItems = Object.values(exchanges).map((exchange) => ({
     value: exchange.type,
@@ -129,7 +134,7 @@ export const SourceSelectMenu = ({
             items: chainItems,
           },
       ].filter(isTruthy)}
-      label={label || (type === TransferType.deposit ? 'Source' : 'Destination')}
+      label={label ?? (type === TransferType.deposit ? 'Source' : 'Destination')}
     >
       <$ChainRow>
         {selectedChainOption ? (
@@ -149,9 +154,6 @@ export const SourceSelectMenu = ({
     </SearchSelectMenu>
   );
 };
-const $DropdownContainer = styled.div`
-  ${popoverMixins.item}
-`;
 
 const $Img = styled.img`
   width: 1.25rem;

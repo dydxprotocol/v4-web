@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { useSelector } from 'react-redux';
-
+import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { formatRelativeTime } from '@/lib/dateTime';
@@ -15,8 +14,9 @@ export const RelativeTime = ({
   format: 'long' | 'short' | 'narrow' | 'singleCharacter';
   resolution?: number;
 }) => {
-  const locale = useSelector(getSelectedLocale);
+  const locale = useAppSelector(getSelectedLocale);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {

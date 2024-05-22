@@ -85,6 +85,8 @@ type StatusColors = {
 type DirectionalColors = {
   positive: string;
   negative: string;
+  positiveDark: string;
+  negativeDark: string;
   positiveFaded: string;
   negativeFaded: string;
 };

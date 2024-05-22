@@ -11,17 +11,18 @@ import {
   type LocalWallet,
 } from '@dydxprotocol/v4-client-js';
 import Long from 'long';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
+import { parseUnits } from 'viem';
 
 import type {
   AccountBalance,
   HumanReadableCancelOrderPayload,
   HumanReadablePlaceOrderPayload,
+  HumanReadableSubaccountTransferPayload,
   HumanReadableTriggerOrdersPayload,
   ParsingError,
-  SubAccountHistoricalPNLs,
 } from '@/constants/abacus';
-import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
+import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
 import { STRING_KEYS } from '@/constants/localization';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { TradeTypes } from '@/constants/trade';
@@ -37,8 +38,10 @@ import {
   setSubaccount,
 } from '@/state/account';
 import { getBalances } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
+import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
 import { hashFromTx } from '@/lib/txUtils';
 
@@ -61,9 +64,9 @@ export const SubaccountProvider = ({ ...props }) => {
 
 export const useSubaccount = () => useContext(SubaccountContext);
 
-export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWallet }) => {
-  const dispatch = useDispatch();
-  const { usdcDenom, usdcDecimals } = useTokenConfigs();
+const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWallet }) => {
+  const dispatch = useAppDispatch();
+  const { usdcDenom, usdcDecimals, chainTokenDecimals } = useTokenConfigs();
   const { compositeClient, faucetClient } = useDydxClient();
 
   const { getFaucetFunds, getNativeTokens } = useMemo(
@@ -167,10 +170,12 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         subaccountClient,
         amount,
         recipient,
+        memo,
       }: {
         subaccountClient: SubaccountClient;
         amount: number;
         recipient: string;
+        memo?: string;
       }) => {
         try {
           return await compositeClient?.validatorClient.post.send(
@@ -187,7 +192,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
               }),
             false,
             compositeClient?.validatorClient?.post.defaultDydxGasPrice,
-            undefined,
+            memo,
             Method.BroadcastTxCommit
           );
         } catch (error) {
@@ -235,7 +240,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         }
       },
     }),
-    [compositeClient]
+    [compositeClient, usdcDecimals]
   );
 
   const [subaccountNumber] = useState(0);
@@ -253,32 +258,40 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
   useEffect(() => {
     dispatch(setSubaccount(undefined));
-    dispatch(setHistoricalPnl([] as unknown as SubAccountHistoricalPNLs));
-  }, [dydxAddress]);
+    dispatch(setHistoricalPnl([]));
+  }, [dispatch, dydxAddress]);
 
   // ------ Deposit/Withdraw Methods ------ //
-  const depositFunds = useCallback(
+  const rebalanceWalletFunds = useCallback(
     async (balance: AccountBalance) => {
-      if (!localDydxWallet) return;
+      if (!subaccountClient) return;
+      const balanceAmount = parseFloat(balance.amount);
+      const shouldDeposit = balanceAmount - AMOUNT_RESERVED_FOR_GAS_USDC > 0;
+      const shouldWithdraw = balanceAmount - AMOUNT_USDC_BEFORE_REBALANCE <= 0;
 
-      const amount = parseFloat(balance.amount) - AMOUNT_RESERVED_FOR_GAS_USDC;
-
-      if (amount > 0) {
-        const newSubaccountClient = new SubaccountClient(localDydxWallet, 0);
-        await depositToSubaccount({ amount, subaccountClient: newSubaccountClient });
+      if (shouldDeposit) {
+        await depositToSubaccount({
+          amount: balanceAmount - AMOUNT_RESERVED_FOR_GAS_USDC,
+          subaccountClient,
+        });
+      } else if (shouldWithdraw) {
+        await withdrawFromSubaccount({
+          amount: AMOUNT_RESERVED_FOR_GAS_USDC - balanceAmount,
+          subaccountClient,
+        });
       }
     },
-    [localDydxWallet, depositToSubaccount]
+    [subaccountClient, depositToSubaccount, withdrawFromSubaccount]
   );
 
-  const balances = useSelector(getBalances, shallowEqual);
+  const balances = useAppSelector(getBalances, shallowEqual);
   const usdcCoinBalance = balances?.[usdcDenom];
 
   useEffect(() => {
     if (usdcCoinBalance) {
-      depositFunds(usdcCoinBalance);
+      rebalanceWalletFunds(usdcCoinBalance);
     }
-  }, [usdcCoinBalance]);
+  }, [usdcCoinBalance, rebalanceWalletFunds]);
 
   const deposit = useCallback(
     async (amount: number) => {
@@ -305,15 +318,15 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   // ------ Transfer Methods ------ //
 
   const transfer = useCallback(
-    async (amount: number, recipient: string, coinDenom: string) => {
+    async (amount: number, recipient: string, coinDenom: string, memo?: string) => {
       if (!subaccountClient) {
         return undefined;
       }
       return (await (coinDenom === usdcDenom
-        ? transferFromSubaccountToAddress
-        : transferNativeToken)({ subaccountClient, amount, recipient })) as IndexedTx;
+        ? transferFromSubaccountToAddress({ subaccountClient, amount, recipient })
+        : transferNativeToken({ subaccountClient, amount, recipient, memo }))) as IndexedTx;
     },
-    [subaccountClient, transferFromSubaccountToAddress, transferNativeToken]
+    [subaccountClient, transferFromSubaccountToAddress, transferNativeToken, usdcDenom]
   );
 
   const sendSquidWithdraw = useCallback(
@@ -342,6 +355,34 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       return hashFromTx(tx?.hash);
     },
     [subaccountClient, sendSquidWithdrawFromSubaccount]
+  );
+
+  const adjustIsolatedMarginOfPosition = useCallback(
+    ({
+      onError,
+      onSuccess,
+    }: {
+      onError?: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
+      onSuccess?: (
+        subaccountTransferPayload?: Nullable<HumanReadableSubaccountTransferPayload>
+      ) => void;
+    }) => {
+      const callback = (
+        success: boolean,
+        parsingError?: Nullable<ParsingError>,
+        data?: Nullable<HumanReadableSubaccountTransferPayload>
+      ) => {
+        if (success) {
+          onSuccess?.(data);
+        } else {
+          onError?.({ errorStringKey: parsingError?.stringKey });
+        }
+      };
+
+      const subaccountTransferPayload = abacusStateManager.adjustIsolatedMarginOfPosition(callback);
+      return subaccountTransferPayload;
+    },
+    []
   );
 
   // ------ Faucet Methods ------ //
@@ -411,7 +452,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
       return placeOrderParams;
     },
-    [subaccountClient]
+    [dispatch]
   );
 
   const closePosition = useCallback(
@@ -453,7 +494,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
       dispatch(cancelOrderSubmitted(orderId));
       abacusStateManager.cancelOrder(orderId, callback);
     },
-    [subaccountClient]
+    [dispatch]
   );
 
   // ------ Trigger Orders Methods ------ //
@@ -524,7 +565,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
       return triggerOrderParams;
     },
-    [subaccountClient]
+    [dispatch]
   );
 
   const { newMarketProposal } = useGovernanceVariables();
@@ -550,7 +591,125 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
       return response;
     },
-    [compositeClient, localDydxWallet]
+    [compositeClient, localDydxWallet, newMarketProposal]
+  );
+
+  // ------ Staking Methods ------ //
+  const delegate = useCallback(
+    async (validator: string, amount: number) => {
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      }
+      if (!subaccountClient?.wallet?.address) {
+        throw new Error('wallet not initialized');
+      }
+
+      const response = await compositeClient?.validatorClient.post.delegate(
+        subaccountClient,
+        subaccountClient.wallet?.address,
+        validator,
+        parseUnits(amount.toString(), chainTokenDecimals).toString()
+      );
+
+      return response;
+    },
+    [subaccountClient, compositeClient, chainTokenDecimals]
+  );
+
+  const getDelegateFee = useCallback(
+    async (validator: string, amount: number) => {
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      }
+      if (!localDydxWallet?.address) {
+        throw new Error('wallet not initialized');
+      }
+
+      const tx = await compositeClient.simulate(
+        localDydxWallet,
+        () =>
+          Promise.resolve([
+            compositeClient.validatorClient.post.delegateMsg(
+              localDydxWallet.address ?? '',
+              validator,
+              parseUnits(amount.toString(), chainTokenDecimals).toString()
+            ),
+          ]),
+        compositeClient.validatorClient.post.defaultDydxGasPrice
+      );
+
+      return tx;
+    },
+    [localDydxWallet, compositeClient, chainTokenDecimals]
+  );
+
+  const undelegate = useCallback(
+    async (amounts: Record<string, number | undefined>) => {
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      }
+      if (!localDydxWallet) {
+        throw new Error('wallet not initialized');
+      }
+
+      const msgs = Object.keys(amounts)
+        .map((validator) => {
+          const amount = amounts[validator];
+          if (!amount) {
+            return undefined;
+          }
+          return compositeClient.validatorClient.post.undelegateMsg(
+            localDydxWallet.address ?? '',
+            validator,
+            parseUnits(amount.toString(), chainTokenDecimals).toString()
+          );
+        })
+        .filter(isTruthy);
+
+      const tx = await compositeClient.send(
+        localDydxWallet,
+        () => Promise.resolve(msgs),
+        false,
+        compositeClient.validatorClient.post.defaultDydxGasPrice
+      );
+
+      return tx;
+    },
+    [localDydxWallet, compositeClient, chainTokenDecimals]
+  );
+
+  const getUndelegateFee = useCallback(
+    async (amounts: Record<string, number | undefined>) => {
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      }
+      if (!localDydxWallet) {
+        throw new Error('wallet not initialized');
+      }
+
+      const msgs = Object.keys(amounts)
+        .map((validator) => {
+          const amount = amounts[validator];
+          if (!amount) {
+            return undefined;
+          }
+          return compositeClient.validatorClient.post.undelegateMsg(
+            localDydxWallet.address ?? '',
+            validator,
+            parseUnits(amount.toString(), chainTokenDecimals).toString()
+          );
+        })
+        .filter(isTruthy);
+
+      const tx = await compositeClient.simulate(
+        localDydxWallet,
+        () => Promise.resolve(msgs),
+        compositeClient.validatorClient.post.defaultDydxGasPrice
+      );
+
+      return tx;
+    },
+    [localDydxWallet, compositeClient, chainTokenDecimals]
   );
 
   return {
@@ -562,6 +721,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     // Transfer Methods
     transfer,
     sendSquidWithdraw,
+    adjustIsolatedMarginOfPosition,
 
     // Trading Methods
     placeOrder,
@@ -571,5 +731,11 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
     // Governance Methods
     submitNewMarketProposal,
+
+    // staking methods
+    delegate,
+    getDelegateFee,
+    undelegate,
+    getUndelegateFee,
   };
 };

@@ -16,6 +16,8 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { NavigationMenu } from '@/components/NavigationMenu';
 import { WithSidebar } from '@/components/WithSidebar';
 
+import { testFlags } from '@/lib/testFlags';
+
 const RewardsPage = lazy(() => import('./rewards/RewardsPage'));
 const StakingPage = lazy(() => import('./staking/StakingPage'));
 const GovernancePage = lazy(() => import('./Governance'));
@@ -38,7 +40,7 @@ const Token = () => {
   return (
     <WithSidebar
       sidebar={
-        isTablet ? null : (
+        isTablet || testFlags.enableStaking ? null : (
           <$SideBar>
             <$NavigationMenu
               items={[

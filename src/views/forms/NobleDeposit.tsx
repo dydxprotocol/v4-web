@@ -3,12 +3,9 @@ import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { OpacityToken } from '@/constants/styles/base';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useStringGetter } from '@/hooks/useStringGetter';
-
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Checkbox } from '@/components/Checkbox';
 import { CopyButton } from '@/components/CopyButton';
@@ -16,8 +13,6 @@ import { QrCode } from '@/components/QrCode';
 import { TimeoutButton } from '@/components/TimeoutButton';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithReceipt } from '@/components/WithReceipt';
-
-import { generateFadedColorVariant } from '@/lib/styles';
 
 export const NobleDeposit = () => {
   const [hasAcknowledged, setHasAcknowledged] = useState(false);
@@ -37,14 +32,13 @@ export const NobleDeposit = () => {
               hasAcknowledged && hasTimedout
                 ? nobleAddress
                 : stringGetter({ key: STRING_KEYS.ACKNOWLEDGE_TO_REVEAL }),
-            allowUserSelection: true,
           },
         ]}
       >
         <$QrCode
           hasLogo
           size={432}
-          value={nobleAddress || ''}
+          value={nobleAddress ?? ''}
           blurred={!hasAcknowledged || !hasTimedout}
         />
       </WithDetailsReceipt>
@@ -76,11 +70,6 @@ export const NobleDeposit = () => {
     </>
   );
 };
-const $WaitingSpan = styled.span`
-  ${layoutMixins.row}
-  gap: 1rem;
-  color: var(--color-text-1);
-`;
 
 const $WithReceipt = styled(WithReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
@@ -99,28 +88,4 @@ const $QrCode = styled(QrCode)<{ blurred: boolean }>`
 const $CheckboxContainer = styled.div`
   padding: 1rem;
   color: var(--color-text-0);
-`;
-
-const $CautionIconContainer = styled.div`
-  ${layoutMixins.stack}
-  min-width: 2.5rem;
-  height: 2.5rem;
-  align-items: center;
-  border-radius: 50%;
-  overflow: hidden;
-  color: var(--color-warning);
-
-  svg {
-    width: 1.125em;
-    height: 1.125em;
-    justify-self: center;
-  }
-
-  &:before {
-    content: '';
-    width: 2.5rem;
-    height: 2.5rem;
-    background-color: ${({ theme }) =>
-      generateFadedColorVariant(theme.warning, OpacityToken.Opacity16)};
-  }
 `;

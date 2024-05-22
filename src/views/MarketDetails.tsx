@@ -1,14 +1,15 @@
 import BigNumber from 'bignumber.js';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
+import { PerpetualMarketType } from '@/constants/abacus';
 import { ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -18,6 +19,7 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketData } from '@/state/perpetualsSelectors';
 
@@ -28,8 +30,8 @@ import { MarketLinks } from './MarketLinks';
 export const MarketDetails: React.FC = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-  const { configs, market } = useSelector(getCurrentMarketData, shallowEqual) ?? {};
-  const { id, name, resources } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { configs, market } = useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
+  const { id, name, resources } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
 
   if (!configs) return null;
 
@@ -40,6 +42,7 @@ export const MarketDetails: React.FC = () => {
     effectiveInitialMarginFraction,
     maintenanceMarginFraction,
     minOrderSize,
+    perpetualMarketType,
     stepSizeDecimals,
     tickSizeDecimals,
   } = configs;
@@ -61,6 +64,14 @@ export const MarketDetails: React.FC = () => {
       key: 'market-name',
       label: stringGetter({ key: STRING_KEYS.MARKET_NAME }),
       value: market,
+    },
+    {
+      key: 'market-type',
+      label: stringGetter({ key: STRING_KEYS.TYPE }),
+      value:
+        perpetualMarketType === PerpetualMarketType.CROSS
+          ? stringGetter({ key: STRING_KEYS.CROSS })
+          : stringGetter({ key: STRING_KEYS.ISOLATED }),
     },
     {
       key: 'tick-size',

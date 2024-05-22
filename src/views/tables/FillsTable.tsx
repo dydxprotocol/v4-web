@@ -3,7 +3,7 @@ import { Key, useEffect, useMemo } from 'react';
 import { Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { ColumnSize } from '@react-types/table';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { type Asset, type SubaccountFill } from '@/constants/abacus';
@@ -21,17 +21,16 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
-import { Table, TableCell, TableColumnHeader, type ColumnDef } from '@/components/Table';
+import { ColumnDef, Table } from '@/components/Table';
 import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import { TableCell } from '@/components/Table/TableCell';
+import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 
 import { viewedFills } from '@/state/account';
-import {
-  getCurrentMarketFills,
-  getHasUnseenFillUpdates,
-  getSubaccountFills,
-} from '@/state/accountSelectors';
+import { getCurrentMarketFills, getSubaccountFills } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
@@ -62,21 +61,19 @@ export enum FillsTableColumnKey {
 }
 
 export type FillTableRow = {
-  asset: Asset;
-  stepSizeDecimals: number;
-  tickSizeDecimals: number;
-  orderSide: OrderSide;
+  asset: Nullable<Asset>;
+  stepSizeDecimals: Nullable<number>;
+  tickSizeDecimals: Nullable<number>;
+  orderSide?: Nullable<OrderSide>;
 } & SubaccountFill;
 
 const getFillsTableColumnDef = ({
   key,
-  isTablet = false,
   stringGetter,
   symbol = '',
   width,
 }: {
   key: FillsTableColumnKey;
-  isTablet?: boolean;
   stringGetter: StringGetterFunction;
   symbol?: Nullable<string>;
   width?: ColumnSize;
@@ -87,11 +84,14 @@ const getFillsTableColumnDef = ({
       [FillsTableColumnKey.TypeAmount]: {
         columnKey: 'typeAmount',
         getCellValue: (row) => row.size,
-        label: `${stringGetter({ key: STRING_KEYS.TYPE })} / ${stringGetter({
-          key: STRING_KEYS.AMOUNT,
-        })}`,
-        renderCell: ({ resources, size, stepSizeDecimals, asset: { id } }) => (
-          <TableCell stacked slotLeft={<$AssetIcon symbol={id} />}>
+        label: (
+          <TableColumnHeader>
+            <span>{stringGetter({ key: STRING_KEYS.TYPE })}</span>
+            <span>{stringGetter({ key: STRING_KEYS.AMOUNT })}</span>
+          </TableColumnHeader>
+        ),
+        renderCell: ({ resources, size, stepSizeDecimals, asset }) => (
+          <TableCell stacked slotLeft={<$AssetIcon symbol={asset?.id} />}>
             <span>
               {resources.typeStringKey ? stringGetter({ key: resources.typeStringKey }) : null}
             </span>
@@ -107,9 +107,12 @@ const getFillsTableColumnDef = ({
       [FillsTableColumnKey.PriceFee]: {
         columnKey: 'priceFee',
         getCellValue: (row) => row.price,
-        label: `${stringGetter({ key: STRING_KEYS.PRICE })} / ${stringGetter({
-          key: STRING_KEYS.FEE,
-        })}`,
+        label: (
+          <TableColumnHeader>
+            <span>{stringGetter({ key: STRING_KEYS.PRICE })}</span>
+            <span>{stringGetter({ key: STRING_KEYS.FEE })}</span>
+          </TableColumnHeader>
+        ),
         renderCell: ({ fee, orderSide, price, resources, tickSizeDecimals }) => (
           <TableCell stacked>
             <$InlineRow>
@@ -146,7 +149,9 @@ const getFillsTableColumnDef = ({
         columnKey: 'market',
         getCellValue: (row) => row.marketId,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
-        renderCell: ({ asset, marketId }) => <MarketTableCell asset={asset} marketId={marketId} />,
+        renderCell: ({ asset, marketId }) => (
+          <MarketTableCell asset={asset ?? undefined} marketId={marketId} />
+        ),
       },
       [FillsTableColumnKey.Action]: {
         columnKey: 'market-simple',
@@ -154,14 +159,16 @@ const getFillsTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.ACTION }),
         renderCell: ({ asset, orderSide }) => (
           <$TableCell>
-            <$Side side={orderSide}>
-              {stringGetter({
-                key: {
-                  [OrderSide.BUY]: STRING_KEYS.BUY,
-                  [OrderSide.SELL]: STRING_KEYS.SELL,
-                }[orderSide],
-              })}
-            </$Side>
+            {orderSide && (
+              <$Side side={orderSide}>
+                {stringGetter({
+                  key: {
+                    [OrderSide.BUY]: STRING_KEYS.BUY,
+                    [OrderSide.SELL]: STRING_KEYS.SELL,
+                  }[orderSide],
+                })}
+              </$Side>
+            )}
             <Output type={OutputType.Text} value={asset?.id} />
           </$TableCell>
         ),
@@ -176,15 +183,11 @@ const getFillsTableColumnDef = ({
       [FillsTableColumnKey.TotalFee]: {
         columnKey: 'totalFee',
         getCellValue: (row) => MustBigNumber(row.price).times(row.size).toNumber(),
-        label: isTablet ? (
+        label: (
           <TableColumnHeader>
             <span>{stringGetter({ key: STRING_KEYS.TOTAL })}</span>
             <span>{stringGetter({ key: STRING_KEYS.FEE })}</span>
           </TableColumnHeader>
-        ) : (
-          `${stringGetter({ key: STRING_KEYS.TOTAL })} / ${stringGetter({
-            key: STRING_KEYS.FEE,
-          })}`
         ),
         renderCell: ({ size, fee, price }) => (
           <TableCell stacked>
@@ -221,7 +224,8 @@ const getFillsTableColumnDef = ({
         columnKey: 'side',
         getCellValue: (row) => row.orderSide,
         label: stringGetter({ key: STRING_KEYS.SIDE }),
-        renderCell: ({ orderSide }) => <OrderSideTag orderSide={orderSide} size={TagSize.Medium} />,
+        renderCell: ({ orderSide }) =>
+          orderSide && <OrderSideTag orderSide={orderSide} size={TagSize.Medium} />,
       },
       [FillsTableColumnKey.SideLongShort]: {
         columnKey: 'side',
@@ -234,7 +238,7 @@ const getFillsTableColumnDef = ({
               key: {
                 [OrderSide.BUY]: STRING_KEYS.LONG_POSITION_SHORT,
                 [OrderSide.SELL]: STRING_KEYS.SHORT_POSITION_SHORT,
-              }[orderSide],
+              }[orderSide ?? OrderSide.BUY],
             })}
           />
         ),
@@ -242,15 +246,11 @@ const getFillsTableColumnDef = ({
       [FillsTableColumnKey.AmountPrice]: {
         columnKey: 'sizePrice',
         getCellValue: (row) => row.size,
-        label: isTablet ? (
+        label: (
           <TableColumnHeader>
             <span>{stringGetter({ key: STRING_KEYS.AMOUNT })}</span>
             <span>{stringGetter({ key: STRING_KEYS.PRICE })}</span>
           </TableColumnHeader>
-        ) : (
-          `${stringGetter({ key: STRING_KEYS.AMOUNT })} / ${stringGetter({
-            key: STRING_KEYS.PRICE,
-          })}`
         ),
         renderCell: ({ size, stepSizeDecimals, price, tickSizeDecimals }) => (
           <TableCell stacked>
@@ -262,15 +262,11 @@ const getFillsTableColumnDef = ({
       [FillsTableColumnKey.TypeLiquidity]: {
         columnKey: 'typeLiquidity',
         getCellValue: (row) => row.type.rawValue,
-        label: isTablet ? (
+        label: (
           <TableColumnHeader>
             <span>{stringGetter({ key: STRING_KEYS.TYPE })}</span>
             <span>{stringGetter({ key: STRING_KEYS.LIQUIDITY })}</span>
           </TableColumnHeader>
-        ) : (
-          `${stringGetter({ key: STRING_KEYS.TYPE })} / ${stringGetter({
-            key: STRING_KEYS.LIQUIDITY,
-          })}`
         ),
         renderCell: ({ resources }) => (
           <TableCell stacked>
@@ -285,7 +281,7 @@ const getFillsTableColumnDef = ({
           </TableCell>
         ),
       },
-    } as Record<FillsTableColumnKey, ColumnDef<FillTableRow>>
+    } satisfies Record<FillsTableColumnKey, ColumnDef<FillTableRow>>
   )[key],
 });
 
@@ -312,33 +308,36 @@ export const FillsTable = ({
   withInnerBorders = true,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
-  const { isMobile, isTablet } = useBreakpoints();
+  const dispatch = useAppDispatch();
+  const { isMobile } = useBreakpoints();
 
-  const marketFills = useSelector(getCurrentMarketFills, shallowEqual) ?? EMPTY_ARR;
-  const allFills = useSelector(getSubaccountFills, shallowEqual) ?? EMPTY_ARR;
+  const marketFills = useAppSelector(getCurrentMarketFills, shallowEqual) ?? EMPTY_ARR;
+  const allFills = useAppSelector(getSubaccountFills, shallowEqual) ?? EMPTY_ARR;
   const fills = currentMarket ? marketFills : allFills;
 
-  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
-  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
-
-  const hasUnseenFillUpdates = useSelector(getHasUnseenFillUpdates);
+  const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
 
   useEffect(() => {
-    if (hasUnseenFillUpdates) dispatch(viewedFills());
-  }, [hasUnseenFillUpdates]);
+    // marked fills as seen both on mount and dismount (i.e. new fill came in while fills table is being shown)
+    dispatch(viewedFills(currentMarket));
+    return () => {
+      dispatch(viewedFills(currentMarket));
+    };
+  }, [currentMarket]);
 
   const symbol = currentMarket ? allAssets[allPerpetualMarkets[currentMarket]?.assetId]?.id : null;
 
   const fillsData = useMemo(
     () =>
-      fills.map((fill: SubaccountFill) =>
-        getHydratedTradingData({
-          data: fill,
-          assets: allAssets,
-          perpetualMarkets: allPerpetualMarkets,
-        })
-      ) as FillTableRow[],
+      fills.map(
+        (fill: SubaccountFill): FillTableRow =>
+          getHydratedTradingData({
+            data: fill,
+            assets: allAssets,
+            perpetualMarkets: allPerpetualMarkets,
+          })
+      ),
     [fills, allPerpetualMarkets, allAssets]
   );
 
@@ -361,7 +360,6 @@ export const FillsTable = ({
       columns={columnKeys.map((key: FillsTableColumnKey) =>
         getFillsTableColumnDef({
           key,
-          isTablet,
           stringGetter,
           symbol,
           width: columnWidths?.[key],
@@ -414,14 +412,15 @@ const $TimeOutput = styled(Output)`
   color: var(--color-text-0);
 `;
 
-const $Side = styled.span<{ side: OrderSide }>`
+const $Side = styled.span<{ side: Nullable<OrderSide> }>`
   ${({ side }) =>
-    ({
+    side &&
+    {
       [OrderSide.BUY]: css`
         color: var(--color-positive);
       `,
       [OrderSide.SELL]: css`
         color: var(--color-negative);
       `,
-    }[side])};
+    }[side]};
 `;

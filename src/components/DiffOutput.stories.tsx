@@ -2,8 +2,9 @@ import type { Story } from '@ladle/react';
 
 import { NumberSign } from '@/constants/numbers';
 
-import { DiffOutput, DiffOutputType, type DiffOutputProps } from '@/components/DiffOutput';
+import { DiffOutput, type DiffOutputProps } from '@/components/DiffOutput';
 
+import { OutputType } from './Output';
 import { StoryWrapper } from '.ladle/components';
 
 export const DiffOutputStory: Story<DiffOutputProps> = (args) => (
@@ -38,8 +39,8 @@ DiffOutputStory.argTypes = {
     defaultValue: NumberSign.Neutral,
   },
   type: {
-    options: Object.values(DiffOutputType),
+    options: Object.values(OutputType),
     control: { type: 'select' },
-    defaultValue: DiffOutputType.Number,
+    defaultValue: OutputType.Number,
   },
 };
