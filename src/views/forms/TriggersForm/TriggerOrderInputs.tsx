@@ -190,7 +190,7 @@ export const TriggerOrderInputs = ({
       {stringGetter({ key: STRING_KEYS.MULTIPLE_ORDERS_FOUND })}
       <$ViewAllButton action={ButtonAction.Navigation} onClick={onViewOrdersClick}>
         {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
-        {<$ArrowIcon iconName={IconName.Arrow} />}
+        <$ArrowIcon iconName={IconName.Arrow} />
       </$ViewAllButton>
     </$MultipleOrdersContainer>
   );
@@ -234,7 +234,7 @@ export const TriggerOrderInputs = ({
           decimals={tickSizeDecimals}
           value={triggerPrice}
           onInput={onTriggerPriceInput}
-          allowNegative={true}
+          allowNegative
         />
         <FormInput
           id={`${tooltipId}-priceDiff`}
@@ -253,7 +253,7 @@ export const TriggerOrderInputs = ({
               : usdcDiff
           }
           onInput={inputType === InputType.Percent ? onPercentageDiffInput : onUsdcDiffInput}
-          allowNegative={true}
+          allowNegative
         />
       </$InlineRow>
     </$TriggerRow>

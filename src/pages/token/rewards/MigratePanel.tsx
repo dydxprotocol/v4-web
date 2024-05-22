@@ -3,7 +3,6 @@ import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -32,9 +31,9 @@ export const MigratePanel = ({ className }: { className?: string }) => {
   const { isNotTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
 
-  const selectedNetwork = useSelector(getSelectedNetwork);
+  const ethereumChainId = useEnvConfig('ethereumChainId');
 
-  const chainId = Number(ENVIRONMENT_CONFIG_MAP[selectedNetwork].ethereumChainId);
+  const chainId = Number(ethereumChainId);
 
   // v3 token is only on mainnet
   const { balance: tokenBalance } = useAccountBalance({

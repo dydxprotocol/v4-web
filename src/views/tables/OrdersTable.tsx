@@ -213,16 +213,28 @@ const getOrdersTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.ACTION }),
         isActionable: true,
         allowsSorting: false,
-        renderCell: ({ id, status }) => (
-          <OrderActionsCell orderId={id} status={status} isDisabled={isAccountViewOnly} />
+        renderCell: ({ id, status, orderFlags }) => (
+          <OrderActionsCell
+            orderId={id}
+            status={status}
+            orderFlags={orderFlags}
+            isDisabled={isAccountViewOnly}
+          />
         ),
       },
       [OrdersTableColumnKey.StatusFill]: {
         columnKey: 'statusFill',
         getCellValue: (row) => row.status.name,
-        label: `${stringGetter({ key: STRING_KEYS.STATUS })} / ${stringGetter({
-          key: STRING_KEYS.FILL,
-        })}`,
+        label: (
+          <TableColumnHeader>
+            <span>{stringGetter({ key: STRING_KEYS.STATUS })}</span>
+            <span>
+              {stringGetter({
+                key: STRING_KEYS.FILL,
+              })}
+            </span>
+          </TableColumnHeader>
+        ),
         renderCell: ({ asset, createdAtMilliseconds, size, status, totalFilled, resources }) => {
           const { statusIconColor } = getOrderStatusInfo({ status: status.rawValue });
 

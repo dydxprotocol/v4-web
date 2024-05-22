@@ -98,7 +98,7 @@ export const SourceSelectMenu = ({
       }
       return true;
     })
-    .sort((chain) => (!!cctpTokensByChainId[chain.value] ? -1 : 1));
+    .sort((chain) => (cctpTokensByChainId[chain.value] ? -1 : 1));
 
   const exchangeItems = Object.values(exchanges).map((exchange) => ({
     value: exchange.type,

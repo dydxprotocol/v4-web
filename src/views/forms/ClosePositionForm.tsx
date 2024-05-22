@@ -208,6 +208,19 @@ export const ClosePositionForm = ({
         setUnIndexedClientId(placeOrderPayload?.clientId);
       },
     });
+
+    onClearInputs();
+  };
+
+  const onClearInputs = () => {
+    abacusStateManager.setClosePositionValue({
+      value: null,
+      field: ClosePositionInputField.percent,
+    });
+    abacusStateManager.setClosePositionValue({
+      value: null,
+      field: ClosePositionInputField.size,
+    });
   };
 
   const alertMessage = alertContent && <AlertMessage type={alertType}>{alertContent}</AlertMessage>;
@@ -273,16 +286,7 @@ export const ClosePositionForm = ({
               action={ButtonAction.Reset}
               shape={ButtonShape.Pill}
               size={ButtonSize.XSmall}
-              onClick={() => {
-                abacusStateManager.setClosePositionValue({
-                  value: null,
-                  field: ClosePositionInputField.percent,
-                });
-                abacusStateManager.setClosePositionValue({
-                  value: null,
-                  field: ClosePositionInputField.size,
-                });
-              }}
+              onClick={onClearInputs}
             >
               {stringGetter({ key: STRING_KEYS.CLEAR })}
             </Button>
@@ -308,22 +312,30 @@ export const ClosePositionForm = ({
 const $ClosePositionForm = styled.form`
   --form-rowGap: 1.25rem;
 
-  ${layoutMixins.expandingColumnWithFooter}
+  min-height: 100%;
+  isolation: isolate;
+
+  ${layoutMixins.flexColumn}
   gap: var(--form-rowGap);
-  align-items: start;
 
   ${layoutMixins.stickyArea1}
   --stickyArea1-background: var(--color-layer-2);
   --stickyArea1-paddingBottom: var(--dialog-content-paddingBottom);
 
-  @media ${breakpoints.tablet} {
-    ${layoutMixins.expandingColumnWithFooter}
+  @media (min-height: 48rem) {
+    ${formMixins.withStickyFooter}
+  }
 
+  @media ${breakpoints.tablet} {
     --orderbox-column-width: 140px;
     --orderbook-width: calc(var(--orderbox-column-width) + var(--dialog-content-paddingLeft));
 
     && * {
       outline: none !important;
+    }
+
+    @media (min-height: 35rem) {
+      ${formMixins.withStickyFooter}
     }
   }
 `;
@@ -403,12 +415,11 @@ const $ToggleGroup = styled(ToggleGroup)`
 `;
 
 const $Footer = styled.footer`
-  ${layoutMixins.stickyFooter}
-  backdrop-filter: none;
+  ${formMixins.footer}
+  padding-bottom: var(--dialog-content-paddingBottom);
+  --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
 
   ${layoutMixins.column}
-  ${layoutMixins.noPointerEvents}
-  margin-top: auto;
 `;
 
 const $ButtonRow = styled.div`

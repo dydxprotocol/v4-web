@@ -488,6 +488,10 @@ const $TradeForm = styled.form`
   padding: var(--tradeBox-content-paddingTop) var(--tradeBox-content-paddingRight)
     var(--tradeBox-content-paddingBottom) var(--tradeBox-content-paddingLeft);
 
+  @media (min-height: 48rem) {
+    ${formMixins.withStickyFooter}
+  }
+
   @media ${breakpoints.tablet} {
     padding-left: 0;
     padding-right: 0;
@@ -496,6 +500,9 @@ const $TradeForm = styled.form`
 
     && * {
       outline: none !important;
+    }
+    @media (min-height: 35rem) {
+      ${formMixins.withStickyFooter}
     }
   }
 `;
@@ -621,8 +628,6 @@ const $ButtonRow = styled.div`
 const $Footer = styled.footer`
   ${formMixins.footer}
   --stickyFooterBackdrop-outsetY: var(--tradeBox-content-paddingBottom);
-  backdrop-filter: none;
 
   ${layoutMixins.column}
-  ${layoutMixins.noPointerEvents}
 `;

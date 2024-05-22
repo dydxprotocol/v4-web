@@ -125,9 +125,16 @@ const getPositionsTableColumnDef = ({
       [PositionsTableColumnKey.IndexEntry]: {
         columnKey: 'oracleEntry',
         getCellValue: (row) => row.entryPrice?.current,
-        label: `${stringGetter({ key: STRING_KEYS.ORACLE_PRICE_ABBREVIATED })} / ${stringGetter({
-          key: STRING_KEYS.ENTRY_PRICE_SHORT,
-        })}`,
+        label: (
+          <TableColumnHeader>
+            <span>{stringGetter({ key: STRING_KEYS.ORACLE_PRICE_ABBREVIATED })}</span>
+            <span>
+              {stringGetter({
+                key: STRING_KEYS.ENTRY_PRICE_SHORT,
+              })}
+            </span>
+          </TableColumnHeader>
+        ),
         hideOnBreakpoint: MediaQueryKeys.isNotTablet,
         renderCell: ({ entryPrice, oraclePrice, tickSizeDecimals }) => (
           <TableCell stacked>

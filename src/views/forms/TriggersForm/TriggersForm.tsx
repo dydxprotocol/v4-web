@@ -142,7 +142,7 @@ export const TriggersForm = ({
                 ? stringGetter({
                     key: inputAlert?.actionStringKey ?? STRING_KEYS.UNAVAILABLE,
                   })
-                : !!(existingStopLossOrder || existingTakeProfitOrder)
+                : existingStopLossOrder || existingTakeProfitOrder
                 ? stringGetter({ key: STRING_KEYS.ENTER_TRIGGERS })
                 : stringGetter({ key: STRING_KEYS.ADD_TRIGGERS })}
             </$Button>

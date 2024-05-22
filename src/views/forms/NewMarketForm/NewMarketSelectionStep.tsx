@@ -101,7 +101,7 @@ export const NewMarketSelectionStep = ({
 
   useEffect(() => {
     if (assetToAdd) {
-      setTempLiquidityTier('' + assetToAdd.params.liquidityTier);
+      setTempLiquidityTier(`${assetToAdd.params.liquidityTier}`);
       setLiquidityTier(assetToAdd.params.liquidityTier);
     }
   }, [assetToAdd]);

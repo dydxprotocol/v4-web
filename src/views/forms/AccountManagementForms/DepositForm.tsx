@@ -29,14 +29,12 @@ import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
-import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { InputType } from '@/components/Input';
-import { Link } from '@/components/Link';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
@@ -104,7 +102,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   // Async Data
   const { balance, queryStatus, isQueryFetching } = useAccountBalance({
     addressOrDenom: sourceToken?.address || CHAIN_DEFAULT_TOKEN_ADDRESS,
-    chainId: chainId,
+    chainId,
     decimals: sourceToken?.decimals || undefined,
     isCosmosChain: false,
   });
@@ -271,7 +269,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
         await validateTokenApproval();
 
-        let tx = {
+        const tx = {
           to: requestPayload.targetAddress as EvmAddress,
           data: requestPayload.data as EvmAddress,
           gasLimit: BigInt(requestPayload.gasLimit),
@@ -281,7 +279,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
 
         if (txHash) {
           addTransferNotification({
-            txHash: txHash,
+            txHash,
             toChainId: !isCctp ? selectedDydxChainId : getNobleChainId(),
             fromChainId: chainIdStr || undefined,
             toAmount: summary?.usdcSize || undefined,
@@ -355,7 +353,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         return stringGetter({
           key: STRING_KEYS.MAX_CCTP_TRANSFER_LIMIT_EXCEEDED,
           params: {
-            MAX_CCTP_TRANSFER_AMOUNT: MAX_CCTP_TRANSFER_AMOUNT,
+            MAX_CCTP_TRANSFER_AMOUNT,
           },
         });
       }
@@ -376,7 +374,8 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     if (fromAmount) {
       if (!chainId) {
         return stringGetter({ key: STRING_KEYS.MUST_SPECIFY_CHAIN });
-      } else if (!sourceToken) {
+      }
+      if (!sourceToken) {
         return stringGetter({ key: STRING_KEYS.MUST_SPECIFY_ASSET });
       }
     }
@@ -490,18 +489,6 @@ const $Footer = styled.footer`
 
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
-`;
-
-const $Link = styled(Link)`
-  color: var(--color-accent);
-
-  &:visited {
-    color: var(--color-accent);
-  }
-`;
-
-const $TransactionInfo = styled.span`
-  ${layoutMixins.row}
 `;
 
 const $FormInputButton = styled(Button)`
