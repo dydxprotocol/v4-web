@@ -5,7 +5,7 @@ import styled, { css, keyframes } from 'styled-components';
 
 import { type MenuItem } from '@/constants/menus';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DropdownSelectMenu } from '@/components/DropdownSelectMenu';

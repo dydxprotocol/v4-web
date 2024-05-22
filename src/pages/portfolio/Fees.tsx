@@ -11,7 +11,7 @@ import { FEE_DECIMALS } from '@/constants/numbers';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tableMixins } from '@/styles/tableMixins';
 

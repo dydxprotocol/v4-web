@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 
 export enum MediaQueryKeys {
   isMobile = 'isMobile',
