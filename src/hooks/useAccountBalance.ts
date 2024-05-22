@@ -80,7 +80,7 @@ export const useAccountBalance = ({
 
   const cosmosQuery = useQuery({
     enabled: Boolean(isCosmosChain && dydxAddress && bech32AddrPrefix && rpc && addressOrDenom),
-    queryKey: [`accountBalances`, chainId, addressOrDenom],
+    queryKey: ['accountBalances', chainId, addressOrDenom],
     queryFn: cosmosQueryFn,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
