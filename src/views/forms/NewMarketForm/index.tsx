@@ -5,8 +5,9 @@ import styled from 'styled-components';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { type NewMarketProposal } from '@/constants/potentialMarkets';
 
-import { useNextClobPairId, useURLConfigs } from '@/hooks';
+import { useNextClobPairId } from '@/hooks/useNextClobPairId';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 

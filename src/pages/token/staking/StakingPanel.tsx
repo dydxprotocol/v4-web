@@ -4,7 +4,8 @@ import styled from 'styled-components';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter, useURLConfigs } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { Link } from '@/components/Link';
 import { Panel } from '@/components/Panel';

@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { get } from 'lodash';
 import { createSelector } from 'reselect';
 
 import {
@@ -46,7 +46,7 @@ export const getStringGetterForLocaleData = (
     if (isLocaleLoaded) {
       const formattedString: string =
         localeData || EN_LOCALE_DATA
-          ? _.get(localeData, props.key) || _.get(EN_LOCALE_DATA, props.key)
+          ? get(localeData, props.key) || get(EN_LOCALE_DATA, props.key)
           : '';
 
       return formatString(formattedString, props?.params);

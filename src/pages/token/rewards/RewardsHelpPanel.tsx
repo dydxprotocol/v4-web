@@ -2,9 +2,10 @@ import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter, useURLConfigs } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Accordion } from '@/components/Accordion';

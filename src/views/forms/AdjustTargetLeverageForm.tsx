@@ -9,9 +9,9 @@ import { ButtonAction, ButtonShape, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { LEVERAGE_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
 
 import { Button } from '@/components/Button';
@@ -171,9 +171,6 @@ const $InnerInputContainer = styled.div`
   @media ${breakpoints.tablet} {
     --input-height: 2.5rem;
   }
-`;
-const $LeverageSide = styled.div`
-  cursor: pointer;
 `;
 const $ToggleGroup = styled(ToggleGroup)`
   ${formMixins.inputToggleGroup}

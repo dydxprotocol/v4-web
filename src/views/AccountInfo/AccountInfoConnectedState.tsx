@@ -8,10 +8,12 @@ import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { DydxChainAsset } from '@/constants/wallets';
 
-import { useAccounts, useBreakpoints, useStringGetter } from '@/hooks';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
@@ -63,7 +65,7 @@ export const AccountInfoConnectedState = () => {
 
   const listOfErrors = inputErrors?.map(({ code }: { code: string }) => code);
 
-  const { buyingPower, equity, marginUsage, leverage } = subAccount || {};
+  const { buyingPower, equity, marginUsage, leverage } = subAccount ?? {};
 
   const hasDiff =
     (marginUsage?.postOrder !== null &&

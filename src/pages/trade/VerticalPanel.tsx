@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { TradeLayouts } from '@/constants/layout';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Tabs } from '@/components/Tabs';
 import { CanvasOrderbook } from '@/views/CanvasOrderbook';

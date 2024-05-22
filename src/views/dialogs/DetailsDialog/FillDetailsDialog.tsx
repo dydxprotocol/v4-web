@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { type DetailsItem } from '@/components/Details';

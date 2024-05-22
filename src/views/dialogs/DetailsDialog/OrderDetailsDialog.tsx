@@ -1,3 +1,4 @@
+import { OrderFlags } from '@dydxprotocol/v4-client-js';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
@@ -6,7 +7,8 @@ import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS, type StringKey } from '@/constants/localization';
 import { CancelOrderStatuses } from '@/constants/trade';
 
-import { useStringGetter, useSubaccount } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -38,6 +40,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
   const selectedLocale = useSelector(getSelectedLocale);
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
   const localCancelOrders = useSelector(getLocalCancelOrders, shallowEqual);
+
   const { cancelOrder } = useSubaccount();
 
   const localCancelOrder = localCancelOrders.find((order) => order.orderId === orderId);
@@ -63,21 +66,22 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     trailingPercent,
     triggerPrice,
     type,
-  } = (useSelector(getOrderDetails(orderId)) as OrderTableRow) || {};
+    orderFlags,
+  } = (useSelector(getOrderDetails(orderId)) as OrderTableRow) ?? {};
 
   const renderOrderPrice = ({
-    type,
-    price,
-    tickSizeDecimals,
+    type: innerType,
+    price: innerPrice,
+    tickSizeDecimals: innerTickSizeDecimals,
   }: {
     type?: AbacusOrderTypes;
     price?: Nullable<number>;
     tickSizeDecimals: number;
   }) =>
-    isMarketOrderType(type) ? (
+    isMarketOrderType(innerType) ? (
       stringGetter({ key: STRING_KEYS.MARKET_PRICE_SHORT })
     ) : (
-      <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
+      <Output type={OutputType.Fiat} value={innerPrice} fractionDigits={innerTickSizeDecimals} />
     );
 
   const renderOrderTime = ({ timeInMs }: { timeInMs: Nullable<number> }) =>
@@ -179,6 +183,10 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     setIsOpen?.(false);
   };
 
+  const isShortTermOrder = orderFlags === OrderFlags.SHORT_TERM;
+  const isBestEffortCanceled = status === AbacusOrderStatus.canceling;
+  const isCancelDisabled = !!isOrderCanceling || (isShortTermOrder && isBestEffortCanceled);
+
   return (
     <DetailsDialog
       slotIcon={<$AssetIcon symbol={asset?.id} />}
@@ -190,7 +198,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
           <Button
             action={ButtonAction.Destroy}
             state={{
-              isDisabled: isOrderCanceling || status === AbacusOrderStatus.canceling,
+              isDisabled: isCancelDisabled,
               isLoading: isOrderCanceling,
             }}
             onClick={onCancelClick}

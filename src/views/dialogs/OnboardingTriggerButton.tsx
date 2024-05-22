@@ -5,7 +5,7 @@ import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
 

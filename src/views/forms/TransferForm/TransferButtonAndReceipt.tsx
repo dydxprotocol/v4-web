@@ -6,7 +6,9 @@ import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 import { DydxChainAsset } from '@/constants/wallets';
 
-import { useAccountBalance, useStringGetter, useTokenConfigs } from '@/hooks';
+import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
@@ -37,16 +39,16 @@ export const TransferButtonAndReceipt = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
-  const { size } = useSelector(getTransferInputs, shallowEqual) || {};
+  const { size } = useSelector(getTransferInputs, shallowEqual) ?? {};
   const { tokensConfigs } = useTokenConfigs();
 
   const { equity: equityInfo, leverage: leverageInfo } =
-    useSelector(getSubaccount, shallowEqual) || {};
+    useSelector(getSubaccount, shallowEqual) ?? {};
 
   const { nativeTokenBalance } = useAccountBalance();
 
-  const { current: equity, postOrder: newEquity } = equityInfo || {};
-  const { current: leverage, postOrder: newLeverage } = leverageInfo || {};
+  const { current: equity, postOrder: newEquity } = equityInfo ?? {};
+  const { current: leverage, postOrder: newLeverage } = leverageInfo ?? {};
 
   const isUSDCSelected = selectedAsset === DydxChainAsset.USDC;
 

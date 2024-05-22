@@ -6,9 +6,10 @@ import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
-import { useStringGetter, useTokenConfigs } from '@/hooks';
 import { useGovernanceVariables } from '@/hooks/useGovernanceVariables';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

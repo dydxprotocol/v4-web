@@ -1,6 +1,5 @@
 import { useState, type Dispatch, type SetStateAction } from 'react';
 
-import type { RouteData } from '@0xsquid/sdk';
 import { shallowEqual, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
@@ -9,9 +8,10 @@ import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 
-import { useApiState, useStringGetter, useTokenConfigs } from '@/hooks';
-import { ConnectionErrorType } from '@/hooks/useApiState';
+import { ConnectionErrorType, useApiState } from '@/hooks/useApiState';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { useWalletConnection } from '@/hooks/useWalletConnection';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -43,7 +43,6 @@ type ElementProps = {
   slippage: number;
   setSlippage: (slippage: number) => void;
   sourceToken?: TransferInputTokenResource;
-  squidRoute?: RouteData;
 };
 
 export const DepositButtonAndReceipt = ({
@@ -84,21 +83,21 @@ export const DepositButtonAndReceipt = ({
   });
 
   const { current: equity, postOrder: newEquity } =
-    useSelector(getSubaccountEquity, shallowEqual) || {};
+    useSelector(getSubaccountEquity, shallowEqual) ?? {};
 
   const { current: buyingPower, postOrder: newBuyingPower } =
-    useSelector(getSubaccountBuyingPower, shallowEqual) || {};
+    useSelector(getSubaccountBuyingPower, shallowEqual) ?? {};
 
   const {
     summary,
     requestPayload,
     depositOptions,
     chain: chainIdStr,
-  } = useSelector(getTransferInputs, shallowEqual) || {};
+  } = useSelector(getTransferInputs, shallowEqual) ?? {};
   const { usdcLabel } = useTokenConfigs();
 
   const sourceChainName =
-    depositOptions?.chains?.toArray().find((chain) => chain.type === chainIdStr)?.stringKey || '';
+    depositOptions?.chains?.toArray().find((chain) => chain.type === chainIdStr)?.stringKey ?? '';
 
   const submitButtonReceipt = [
     {
@@ -218,14 +217,14 @@ export const DepositButtonAndReceipt = ({
         <Output
           type={OutputType.Text}
           value={
-            typeof summary?.estimatedRouteDuration === 'number'
+            summary != null && typeof summary.estimatedRouteDuration === 'number'
               ? stringGetter({
                   key: STRING_KEYS.X_MINUTES_LOWERCASED,
                   params: {
                     X:
-                      summary?.estimatedRouteDuration < 60
+                      summary.estimatedRouteDuration < 60
                         ? '< 1'
-                        : Math.round(summary?.estimatedRouteDuration / 60),
+                        : Math.round(summary.estimatedRouteDuration / 60),
                   },
                 })
               : null

@@ -19,6 +19,7 @@ export const StepIndicator = ({ className, currentStepIndex, totalSteps }: StepI
     progress={((currentStepIndex - 1) / (totalSteps - 1)) * 100}
   >
     {[...Array(totalSteps)].map((_, i) => (
+      // eslint-disable-next-line react/no-array-index-key
       <$Step key={i} isActive={i === currentStepIndex - 1} isFilled={i <= currentStepIndex - 1} />
     ))}
   </$StepIndicator>

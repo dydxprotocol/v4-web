@@ -5,7 +5,7 @@ import styled, { css, keyframes } from 'styled-components';
 
 import { type MenuItem } from '@/constants/menus';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DropdownSelectMenu } from '@/components/DropdownSelectMenu';
@@ -111,13 +111,13 @@ export const Tabs = <TabItemsValue extends string>({
 
       {sharedContent ?? (
         <$Stack>
-          {items.map(({ asChild, value, content, forceMount }) => (
+          {items.map(({ asChild, value: childValue, content, forceMount }) => (
             <$Content
-              key={value}
+              key={childValue}
               asChild={asChild}
-              value={value}
-              forceMount={!!forceMount ? true : undefined}
-              $hide={forceMount && currentItem?.value !== value}
+              value={childValue}
+              forceMount={forceMount ? true : undefined}
+              $hide={forceMount && currentItem?.value !== childValue}
               $withTransitions={withTransitions}
             >
               {content}

@@ -4,9 +4,11 @@ import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { TokenRoute } from '@/constants/routes';
 
-import { usePerpetualMarketsStats, useStringGetter, useTokenConfigs } from '@/hooks';
+import { usePerpetualMarketsStats } from '@/hooks/usePerpetualMarketsStats';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
@@ -72,6 +74,7 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
           <$BillboardContainer key={key}>
             <$BillboardStat>
               <$BillboardTitle>
+                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                 <label>{stringGetter({ key: labelKey })}</label>
                 <Tag>{stringGetter({ key: tagKey })}</Tag>
               </$BillboardTitle>
@@ -100,7 +103,7 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
                   data={chartData}
                   xAccessor={(datum) => datum.x}
                   yAccessor={(datum) => datum.y}
-                  positive={true}
+                  positive
                 />
               </$BillboardChart>
             ) : (

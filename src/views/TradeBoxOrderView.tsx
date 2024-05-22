@@ -8,7 +8,7 @@ import { TradeInputField } from '@/constants/abacus';
 import { STRING_KEYS, StringKey } from '@/constants/localization';
 import { TradeTypes } from '@/constants/trade';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -55,7 +55,7 @@ const useTradeTypeOptions = (): {
               ?.map(
                 ({ value, label }) =>
                   value != null && {
-                    value: value,
+                    value,
                     label,
                   }
               )

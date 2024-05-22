@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -21,11 +21,11 @@ type ElementProps = {
 export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
   const stringGetter = useStringGetter();
 
-  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
-  const { configs, oraclePrice } = useSelector(getCurrentMarketData, shallowEqual) || {};
+  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { configs } = useSelector(getCurrentMarketData, shallowEqual) ?? {};
   const { size: positionSize, notionalTotal } =
-    useSelector(getCurrentMarketPositionData, shallowEqual) || {};
-  const { stepSizeDecimals, tickSizeDecimals } = configs || {};
+    useSelector(getCurrentMarketPositionData, shallowEqual) ?? {};
+  const { stepSizeDecimals, tickSizeDecimals } = configs ?? {};
 
   return (
     <$PositionPreviewContainer>
@@ -45,7 +45,7 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
         notionalTotal={notionalTotal?.current}
         postOrderSize={positionSize?.postOrder}
         stepSizeDecimals={stepSizeDecimals}
-        symbol={id || undefined}
+        symbol={id}
         tickSizeDecimals={tickSizeDecimals}
         showNarrowVariation={showNarrowVariation}
       />

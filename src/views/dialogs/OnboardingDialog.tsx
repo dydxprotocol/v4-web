@@ -1,7 +1,7 @@
 import { useEffect, useState, type ElementType } from 'react';
 
 import { useSelector } from 'react-redux';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { EvmDerivedAccountStatus, OnboardingSteps } from '@/constants/account';
 import { AnalyticsEvent } from '@/constants/analytics';
@@ -9,9 +9,11 @@ import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
 import { WalletType, wallets } from '@/constants/wallets';
 
-import { useAccounts, useBreakpoints, useStringGetter } from '@/hooks';
+import { useAccounts } from '@/hooks/useAccounts';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog, DialogPlacement } from '@/components/Dialog';
@@ -54,11 +56,11 @@ export const OnboardingDialog = ({ setIsOpen }: ElementProps) => {
     setIsOpen?.(open);
   };
 
-  const onChooseWallet = (walletType: WalletType) => {
-    if (walletType === WalletType.Privy) {
+  const onChooseWallet = (wType: WalletType) => {
+    if (wType === WalletType.Privy) {
       setIsOpenFromDialog(false);
     }
-    selectWalletType(walletType);
+    selectWalletType(wType);
   };
 
   return (

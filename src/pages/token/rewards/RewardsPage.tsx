@@ -4,9 +4,10 @@ import styled, { css } from 'styled-components';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { BackButton } from '@/components/BackButton';

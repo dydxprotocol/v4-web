@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { STRING_KEYS } from '@/constants/localization';
 import { TradeTypes } from '@/constants/trade';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

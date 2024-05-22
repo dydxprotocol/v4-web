@@ -12,8 +12,9 @@ import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useEnvFeatures, useStringGetter } from '@/hooks';
 import { useComplianceState } from '@/hooks/useComplianceState';
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -21,7 +22,7 @@ import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
-import { TableCell } from '@/components/Table';
+import { TableCell } from '@/components/Table/TableCell';
 import { WithHovercard } from '@/components/WithHovercard';
 
 import { openDialog } from '@/state/dialogs';
@@ -95,7 +96,7 @@ export const PositionsTriggersCell = ({
       onClick={onViewOrders ?? undefined}
     >
       {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
-      {<$ArrowIcon iconName={IconName.Arrow} />}
+      <$ArrowIcon iconName={IconName.Arrow} />
     </$Button>
   );
 

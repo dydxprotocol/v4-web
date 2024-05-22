@@ -18,7 +18,7 @@ import {
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
-import { STRING_KEYS, StringKey } from '@/constants/localization';
+import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
 import { USD_DECIMALS } from '@/constants/numbers';
 import {
@@ -29,12 +29,14 @@ import {
   TradeTypes,
 } from '@/constants/trade';
 
-import { useBreakpoints, useStringGetter, useSubaccount } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -129,27 +131,29 @@ export const TradeForm = ({
   const currentInput = useSelector(getCurrentInput);
   const currentAssetId = useSelector(getCurrentMarketAssetId);
   const { tickSizeDecimals, stepSizeDecimals } =
-    useSelector(getCurrentMarketConfig, shallowEqual) || {};
+    useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
 
   const tradeFormInputValues = useSelector(getTradeFormInputs, shallowEqual);
   const { limitPriceInput, triggerPriceInput, trailingPercentInput } = tradeFormInputValues;
 
   const currentTradeData = useSelector(getInputTradeData, shallowEqual);
 
-  const { side, type, marginMode, targetLeverage } = currentTradeData || {};
+  const { side, type, marginMode, targetLeverage } = currentTradeData ?? {};
 
   const selectedTradeType = getSelectedTradeType(type);
   const selectedOrderSide = getSelectedOrderSide(side);
 
   const { typeOptions } = useSelector(getInputTradeOptions, shallowEqual) ?? {};
 
-  const allTradeTypeItems = (typeOptions?.toArray() ?? []).map(({ type, stringKey }) => ({
-    value: type as TradeTypes,
-    label: stringGetter({
-      key: stringKey as StringKey,
-    }),
-    slotBefore: <AssetIcon symbol={currentAssetId} />,
-  }));
+  const allTradeTypeItems = (typeOptions?.toArray() ?? []).map(
+    ({ type: tradeTypeOptionType, stringKey }) => ({
+      value: tradeTypeOptionType as TradeTypes,
+      label: stringGetter({
+        key: stringKey ?? '',
+      }),
+      slotBefore: <AssetIcon symbol={currentAssetId} />,
+    })
+  );
 
   const onTradeTypeChange = (tradeType: TradeTypes) => {
     abacusStateManager.clearTradeInputValues();
@@ -157,23 +161,23 @@ export const TradeForm = ({
   };
 
   const needsAdvancedOptions =
-    needsGoodUntil ||
-    timeInForceOptions ||
-    executionOptions ||
-    needsPostOnly ||
-    postOnlyTooltip ||
-    needsReduceOnly ||
-    reduceOnlyTooltip;
+    !!needsGoodUntil ||
+    !!timeInForceOptions ||
+    !!executionOptions ||
+    !!needsPostOnly ||
+    !!postOnlyTooltip ||
+    !!needsReduceOnly ||
+    !!reduceOnlyTooltip;
 
   const tradeFormInputs: TradeBoxInputConfig[] = [];
 
   const isInputFilled =
     Object.values(tradeFormInputValues).some((val) => val !== '') ||
-    Object.values(price || {}).some((val) => !!val) ||
+    Object.values(price ?? {}).some((val) => !!val) ||
     [size?.size, size?.usdcSize, size?.leverage].some((val) => val != null);
 
   const hasInputErrors =
-    tradeErrors?.some((error: ValidationError) => error.type !== ErrorType.warning) ||
+    !!tradeErrors?.some((error: ValidationError) => error.type !== ErrorType.warning) ||
     currentInput !== 'trade';
 
   let alertContent;
@@ -246,7 +250,7 @@ export const TradeForm = ({
     placeOrder({
       onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
         setPlaceOrderError(
-          stringGetter({ key: errorParams?.errorStringKey || STRING_KEYS.SOMETHING_WENT_WRONG })
+          stringGetter({ key: errorParams?.errorStringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG })
         );
         setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
       },
@@ -486,6 +490,10 @@ const $TradeForm = styled.form`
   padding: var(--tradeBox-content-paddingTop) var(--tradeBox-content-paddingRight)
     var(--tradeBox-content-paddingBottom) var(--tradeBox-content-paddingLeft);
 
+  @media (min-height: 48rem) {
+    ${formMixins.withStickyFooter}
+  }
+
   @media ${breakpoints.tablet} {
     padding-left: 0;
     padding-right: 0;
@@ -494,6 +502,9 @@ const $TradeForm = styled.form`
 
     && * {
       outline: none !important;
+    }
+    @media (min-height: 35rem) {
+      ${formMixins.withStickyFooter}
     }
   }
 `;
@@ -619,8 +630,6 @@ const $ButtonRow = styled.div`
 const $Footer = styled.footer`
   ${formMixins.footer}
   --stickyFooterBackdrop-outsetY: var(--tradeBox-content-paddingBottom);
-  backdrop-filter: none;
 
   ${layoutMixins.column}
-  ${layoutMixins.noPointerEvents}
 `;

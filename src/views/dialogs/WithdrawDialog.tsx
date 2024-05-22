@@ -2,7 +2,8 @@ import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -30,17 +31,6 @@ export const WithdrawDialog = ({ setIsOpen }: ElementProps) => {
     </Dialog>
   );
 };
-const $TextToggle = styled.div`
-  ${layoutMixins.stickyFooter}
-  color: var(--color-accent);
-  cursor: pointer;
-
-  margin-top: auto;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
 
 const $Content = styled.div`
   ${layoutMixins.stickyArea0}

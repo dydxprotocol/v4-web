@@ -6,10 +6,10 @@ import { STRING_KEYS } from '@/constants/localization';
 import { MARKET_FILTER_LABELS, MarketFilters } from '@/constants/markets';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
-import { useStringGetter } from '@/hooks';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';

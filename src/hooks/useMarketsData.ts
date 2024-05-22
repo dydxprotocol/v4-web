@@ -96,10 +96,9 @@ export const useMarketsData = (
     if (searchFilter) {
       return filtered.filter(
         ({ asset, id }) =>
-          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-          asset?.name?.toLocaleLowerCase().includes(searchFilter.toLowerCase()) ||
-          asset?.id?.toLocaleLowerCase().includes(searchFilter.toLowerCase()) ||
-          id?.toLocaleLowerCase().includes(searchFilter.toLowerCase())
+          !!asset?.name?.toLocaleLowerCase().includes(searchFilter.toLowerCase()) ||
+          !!asset?.id?.toLocaleLowerCase().includes(searchFilter.toLowerCase()) ||
+          !!id?.toLocaleLowerCase().includes(searchFilter.toLowerCase())
       );
     }
     return filtered;

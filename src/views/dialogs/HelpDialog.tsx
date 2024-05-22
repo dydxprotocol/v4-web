@@ -3,10 +3,12 @@ import { useMemo } from 'react';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { MenuConfig } from '@/constants/menus';
 
-import { useStringGetter, useURLConfigs } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { Icon, IconName } from '@/components/Icon';
@@ -25,7 +27,7 @@ export const HelpDialog = ({ setIsOpen }: ElementProps) => {
   const { help: helpCenter, community } = useURLConfigs();
 
   const HELP_ITEMS = useMemo(
-    () => [
+    (): MenuConfig<string | number, string | number> => [
       {
         group: 'help-items',
         items: [
@@ -34,7 +36,9 @@ export const HelpDialog = ({ setIsOpen }: ElementProps) => {
             label: stringGetter({ key: STRING_KEYS.HELP_CENTER }),
             description: stringGetter({ key: STRING_KEYS.HELP_CENTER_DESCRIPTION }),
             onSelect: () => {
-              helpCenter && globalThis.open(helpCenter, '_blank');
+              if (helpCenter) {
+                globalThis.open(helpCenter, '_blank');
+              }
               setIsOpen(false);
             },
             slotBefore: <Icon iconName={IconName.File} />,
@@ -54,7 +58,9 @@ export const HelpDialog = ({ setIsOpen }: ElementProps) => {
             label: stringGetter({ key: STRING_KEYS.COMMUNITY }),
             description: stringGetter({ key: STRING_KEYS.COMMUNITY_DESCRIPTION }),
             onSelect: () => {
-              community && globalThis.open(community, '_blank');
+              if (community) {
+                globalThis.open(community, '_blank');
+              }
               setIsOpen(false);
             },
             slotBefore: <Icon iconName={IconName.Discord} />,

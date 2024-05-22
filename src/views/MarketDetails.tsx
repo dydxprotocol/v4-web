@@ -5,9 +5,10 @@ import styled from 'styled-components';
 import { ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -27,8 +28,8 @@ import { MarketLinks } from './MarketLinks';
 export const MarketDetails: React.FC = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-  const { configs, market } = useSelector(getCurrentMarketData, shallowEqual) || {};
-  const { id, name, resources } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
+  const { configs, market } = useSelector(getCurrentMarketData, shallowEqual) ?? {};
+  const { id, name, resources } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
 
   if (!configs) return null;
 
@@ -49,10 +50,10 @@ export const MarketDetails: React.FC = () => {
     secondaryDescriptionKey,
     websiteLink,
     whitepaperLink,
-  } = resources || {};
+  } = resources ?? {};
 
   const preferEIMF = Boolean(
-    effectiveInitialMarginFraction && initialMarginFraction != effectiveInitialMarginFraction
+    effectiveInitialMarginFraction && initialMarginFraction !== effectiveInitialMarginFraction
   );
 
   const items = [

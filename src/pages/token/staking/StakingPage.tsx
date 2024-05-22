@@ -2,9 +2,9 @@ import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DetachedSection } from '@/components/ContentSection';

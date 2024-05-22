@@ -5,7 +5,9 @@ import { ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
 
-import { useApiState, useStringGetter, useURLConfigs } from '@/hooks';
+import { useApiState } from '@/hooks/useApiState';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { ChatIcon, LinkOutIcon } from '@/icons';
 import { layoutMixins } from '@/styles/layoutMixins';

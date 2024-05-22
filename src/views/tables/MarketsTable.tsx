@@ -10,17 +10,20 @@ import { MarketFilters, type MarketData } from '@/constants/markets';
 import { FUNDING_DECIMALS } from '@/constants/numbers';
 import { AppRoute, MarketsRoute } from '@/constants/routes';
 
-import { useBreakpoints, useStringGetter } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
-import { AssetTableCell, Table, TableCell, type ColumnDef } from '@/components/Table';
+import { Table, type ColumnDef } from '@/components/Table';
+import { AssetTableCell } from '@/components/Table/AssetTableCell';
+import { TableCell } from '@/components/Table/TableCell';
 import { Toolbar } from '@/components/Toolbar';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { SparklineChart } from '@/components/visx/SparklineChart';
@@ -191,8 +194,8 @@ export const MarketsTable = ({ className }: { className?: string }) => {
     [stringGetter, isTablet]
   );
 
-  const setFilter = (filter: MarketFilters) => {
-    dispatch(setMarketFilter(filter));
+  const setFilter = (newFilter: MarketFilters) => {
+    dispatch(setMarketFilter(newFilter));
   };
 
   return (
@@ -222,6 +225,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
           direction: 'descending',
         }}
         columns={columns}
+        paginationBehavior="showAll"
         className={className}
         slotEmpty={
           <$MarketNotFound>

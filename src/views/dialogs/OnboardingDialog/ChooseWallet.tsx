@@ -7,10 +7,12 @@ import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { WalletType, wallets } from '@/constants/wallets';
 
-import { useAccounts, useStringGetter, useURLConfigs } from '@/hooks';
+import { useAccounts } from '@/hooks/useAccounts';
 import { useDisplayedWallets } from '@/hooks/useDisplayedWallets';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
@@ -34,18 +36,16 @@ export const ChooseWallet = ({
     <>
       {selectedWalletType && selectedWalletError && (
         <$AlertMessage type={AlertType.Error}>
-          {
-            <h4>
-              {stringGetter({
-                key: STRING_KEYS.COULD_NOT_CONNECT,
-                params: {
-                  WALLET: stringGetter({
-                    key: wallets[selectedWalletType].stringKey,
-                  }),
-                },
-              })}
-            </h4>
-          }
+          <h4>
+            {stringGetter({
+              key: STRING_KEYS.COULD_NOT_CONNECT,
+              params: {
+                WALLET: stringGetter({
+                  key: wallets[selectedWalletType].stringKey,
+                }),
+              },
+            })}
+          </h4>
           {selectedWalletError}
         </$AlertMessage>
       )}

@@ -1,8 +1,8 @@
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -26,7 +26,7 @@ type ElementProps = {
 // for testing only
 // export const mobileAppUrl = "http://example.com";
 
-let mobileAppUrl: string | undefined | null = undefined;
+let mobileAppUrl: string | undefined | null;
 
 export const getMobileAppUrl = () => {
   if (!mobileAppUrl) {
@@ -43,7 +43,7 @@ export const getMobileAppUrl = () => {
 
 const MobileQrCode = ({ url }: { url: string }) => {
   return (
-    <$QrCodeContainer isShowing={true}>
+    <$QrCodeContainer isShowing>
       <QrCode hasLogo size={432} value={url} />
     </$QrCodeContainer>
   );
@@ -83,12 +83,6 @@ const $Content = styled.div`
     svg {
       width: auto;
     }
-  }
-`;
-
-const $WaitingSpan = styled.span`
-  strong {
-    color: var(--color-warning);
   }
 `;
 

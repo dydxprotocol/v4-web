@@ -8,9 +8,9 @@ import { STRING_KEYS } from '@/constants/localization';
 import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 import { PositionSide } from '@/constants/trade';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
 
 import { Input, InputType } from '@/components/Input';
@@ -44,11 +44,11 @@ export const MarketLeverageInput = ({
   const currentPositionData = useSelector(getCurrentMarketPositionData, shallowEqual);
   const inputTradeData = useSelector(getInputTradeData, shallowEqual);
 
-  const { leverage, size: currentPositionSize } = currentPositionData || {};
-  const { current: currentSize, postOrder: postOrderSize } = currentPositionSize || {};
-  const { current: currentLeverage, postOrder: postOrderLeverage } = leverage || {};
-  const { initialMarginFraction, effectiveInitialMarginFraction } = currentMarketConfig || {};
-  const { side } = inputTradeData || {};
+  const { leverage, size: currentPositionSize } = currentPositionData ?? {};
+  const { current: currentSize, postOrder: postOrderSize } = currentPositionSize ?? {};
+  const { current: currentLeverage, postOrder: postOrderLeverage } = leverage ?? {};
+  const { initialMarginFraction, effectiveInitialMarginFraction } = currentMarketConfig ?? {};
+  const { side } = inputTradeData ?? {};
   const orderSide = getSelectedOrderSide(side);
 
   const { currentPositionSide, newPositionSide } = hasPositionSideChanged({
