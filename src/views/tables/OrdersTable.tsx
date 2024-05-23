@@ -96,210 +96,227 @@ const getOrdersTableColumnDef = ({
   isAccountViewOnly: boolean;
   width?: ColumnSize;
 }): ColumnDef<OrderTableRow> => {
-  const columnMap: Record<OrdersTableColumnKey, ColumnDef<OrderTableRow>> = {
-    [OrdersTableColumnKey.Market]: {
-      columnKey: 'marketId',
-      getCellValue: (row) => row.marketId,
-      label: stringGetter({ key: STRING_KEYS.MARKET }),
-      renderCell: ({ asset, marketId }) => <MarketTableCell asset={asset} marketId={marketId} />,
-    },
-    [OrdersTableColumnKey.Status]: {
-      columnKey: 'status',
-      getCellValue: (row) => row.status.name,
-      label: stringGetter({ key: STRING_KEYS.STATUS }),
-      renderCell: ({ status, resources }) => {
-        return (
-          <TableCell>
-            <$WithTooltip
-              tooltipString={
-                resources.statusStringKey
-                  ? stringGetter({ key: resources.statusStringKey })
-                  : undefined
-              }
-              side="right"
-            >
-              <OrderStatusIcon status={status.rawValue} />
-            </$WithTooltip>
-            {resources.typeStringKey && stringGetter({ key: resources.typeStringKey })}
-          </TableCell>
-        );
-      },
-    },
-    [OrdersTableColumnKey.Side]: {
-      columnKey: 'side',
-      getCellValue: (row) => row.orderSide,
-      label: stringGetter({ key: STRING_KEYS.SIDE }),
-      renderCell: ({ orderSide }) => <OrderSideTag orderSide={orderSide} size={TagSize.Medium} />,
-    },
-    [OrdersTableColumnKey.AmountFill]: {
-      columnKey: 'size',
-      getCellValue: (row) => row.size,
-      label: (
-        <TableColumnHeader>
-          <span>{stringGetter({ key: STRING_KEYS.AMOUNT })}</span>
-          <span>{stringGetter({ key: STRING_KEYS.AMOUNT_FILLED })}</span>
-        </TableColumnHeader>
-      ),
-      tag: symbol,
-      renderCell: ({ size, totalFilled, stepSizeDecimals }) => (
-        <TableCell stacked>
-          <Output
-            type={OutputType.Asset}
-            value={size}
-            fractionDigits={stepSizeDecimals < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals}
-          />
-          <Output
-            type={OutputType.Asset}
-            value={totalFilled}
-            fractionDigits={stepSizeDecimals < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals}
-          />
-        </TableCell>
-      ),
-    },
-    [OrdersTableColumnKey.Price]: {
-      columnKey: 'price',
-      getCellValue: (row) => row.price,
-      label: stringGetter({ key: STRING_KEYS.PRICE }),
-      renderCell: ({ type, price, tickSizeDecimals }) =>
-        isMarketOrderType(type) ? (
-          stringGetter({ key: STRING_KEYS.MARKET_PRICE_SHORT })
-        ) : (
-          <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
-        ),
-    },
-    [OrdersTableColumnKey.Trigger]: {
-      columnKey: 'triggerPrice',
-      getCellValue: (row) => row.triggerPrice ?? -1,
-      label: stringGetter({ key: STRING_KEYS.TRIGGER_PRICE_SHORT }),
-      renderCell: ({ triggerPrice, trailingPercent, tickSizeDecimals }) => (
-        <TableCell stacked>
-          <Output type={OutputType.Fiat} value={triggerPrice} fractionDigits={tickSizeDecimals} />
-          {trailingPercent && (
-            <span>
-              <Output
-                type={OutputType.Percent}
-                value={MustBigNumber(trailingPercent).abs().div(100)}
-              />{' '}
-              {stringGetter({ key: STRING_KEYS.TRAIL })}
-            </span>
-          )}
-        </TableCell>
-      ),
-    },
-    [OrdersTableColumnKey.GoodTil]: {
-      columnKey: 'expiresAtMilliseconds',
-      getCellValue: (row) => row.expiresAtMilliseconds ?? Infinity,
-      label: stringGetter({ key: STRING_KEYS.GOOD_TIL }),
-      renderCell: ({ expiresAtMilliseconds }) => {
-        if (!expiresAtMilliseconds) return <Output type={OutputType.Text} />;
-        // TODO: use OutputType.RelativeTime when ready
-        const { timeString, unitStringKey } = getStringsForDateTimeDiff(
-          DateTime.fromMillis(expiresAtMilliseconds)
-        );
-
-        return (
-          <Output
-            type={OutputType.Text}
-            value={`${timeString}${stringGetter({ key: unitStringKey })}`}
-          />
-        );
-      },
-    },
-    [OrdersTableColumnKey.Actions]: {
-      columnKey: 'cancelOrClear',
-      label: stringGetter({ key: STRING_KEYS.ACTION }),
-      isActionable: true,
-      allowsSorting: false,
-      getCellValue: () => '',
-      renderCell: ({ id, status }) => (
-        <OrderActionsCell orderId={id} status={status} isDisabled={isAccountViewOnly} />
-      ),
-    },
-    [OrdersTableColumnKey.StatusFill]: {
-      columnKey: 'statusFill',
-      getCellValue: (row) => row.status.name,
-      label: `${stringGetter({ key: STRING_KEYS.STATUS })} / ${stringGetter({
-        key: STRING_KEYS.FILL,
-      })}`,
-      renderCell: ({ asset, createdAtMilliseconds, size, status, totalFilled, resources }) => {
-        const { statusIconColor } = getOrderStatusInfo({ status: status.rawValue });
-
-        return (
-          <TableCell
-            stacked
-            slotLeft={
-              <>
-                <$TimeOutput
-                  type={OutputType.RelativeTime}
-                  relativeTimeFormatOptions={{ format: 'singleCharacter' }}
-                  value={createdAtMilliseconds}
-                />
-                <$AssetIconWithStatus>
-                  <$AssetIcon symbol={asset?.id} />
-                  <$StatusDot color={statusIconColor} />
-                </$AssetIconWithStatus>
-              </>
-            }
-          >
-            <span>
-              {resources.statusStringKey && stringGetter({ key: resources.statusStringKey })}
-            </span>
-            <$InlineRow>
-              <Output type={OutputType.Asset} value={totalFilled} fractionDigits={TOKEN_DECIMALS} />
-              /
+  return {
+    width,
+    ...(
+      {
+        [OrdersTableColumnKey.Market]: {
+          columnKey: 'marketId',
+          getCellValue: (row) => row.marketId,
+          label: stringGetter({ key: STRING_KEYS.MARKET }),
+          renderCell: ({ asset, marketId }) => (
+            <MarketTableCell asset={asset} marketId={marketId} />
+          ),
+        },
+        [OrdersTableColumnKey.Status]: {
+          columnKey: 'status',
+          getCellValue: (row) => row.status.name,
+          label: stringGetter({ key: STRING_KEYS.STATUS }),
+          renderCell: ({ status, resources }) => {
+            return (
+              <TableCell>
+                <$WithTooltip
+                  tooltipString={
+                    resources.statusStringKey
+                      ? stringGetter({ key: resources.statusStringKey })
+                      : undefined
+                  }
+                  side="right"
+                >
+                  <OrderStatusIcon status={status.rawValue} />
+                </$WithTooltip>
+                {resources.typeStringKey && stringGetter({ key: resources.typeStringKey })}
+              </TableCell>
+            );
+          },
+        },
+        [OrdersTableColumnKey.Side]: {
+          columnKey: 'side',
+          getCellValue: (row) => row.orderSide,
+          label: stringGetter({ key: STRING_KEYS.SIDE }),
+          renderCell: ({ orderSide }) => (
+            <OrderSideTag orderSide={orderSide} size={TagSize.Medium} />
+          ),
+        },
+        [OrdersTableColumnKey.AmountFill]: {
+          columnKey: 'size',
+          getCellValue: (row) => row.size,
+          label: (
+            <TableColumnHeader>
+              <span>{stringGetter({ key: STRING_KEYS.AMOUNT })}</span>
+              <span>{stringGetter({ key: STRING_KEYS.AMOUNT_FILLED })}</span>
+            </TableColumnHeader>
+          ),
+          tag: symbol,
+          renderCell: ({ size, totalFilled, stepSizeDecimals }) => (
+            <TableCell stacked>
               <Output
                 type={OutputType.Asset}
                 value={size}
-                fractionDigits={TOKEN_DECIMALS}
-                tag={asset?.id}
+                fractionDigits={
+                  stepSizeDecimals < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals
+                }
               />
-            </$InlineRow>
-          </TableCell>
-        );
-      },
-    },
-    [OrdersTableColumnKey.PriceType]: {
-      columnKey: 'priceType',
-      label: (
-        <TableColumnHeader>
-          <span>{stringGetter({ key: STRING_KEYS.PRICE })}</span>
-          <span>{stringGetter({ key: STRING_KEYS.TYPE })}</span>
-        </TableColumnHeader>
-      ),
-      getCellValue: (row) => row.price,
-      renderCell: ({ price, orderSide, tickSizeDecimals, resources }) => (
-        <TableCell stacked>
-          <$InlineRow>
-            <$Side side={orderSide}>
-              {resources.sideStringKey ? stringGetter({ key: resources.sideStringKey }) : null}
-            </$Side>
-            <$SecondaryColor>@</$SecondaryColor>
-            <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
-          </$InlineRow>
-          <span>
-            {resources.typeStringKey ? stringGetter({ key: resources.typeStringKey }) : null}
-          </span>
-        </TableCell>
-      ),
-    },
-    [OrdersTableColumnKey.MarginType]: {
-      columnKey: 'marginType',
-      label: stringGetter({ key: STRING_KEYS.MARGIN_MODE }),
-      getCellValue: (row) => getMarginModeFromSubaccountNumber(row.subaccountNumber).name,
-      renderCell: function (row: OrderTableRow): ReactNode {
-        const marginMode = getMarginModeFromSubaccountNumber(row.subaccountNumber);
+              <Output
+                type={OutputType.Asset}
+                value={totalFilled}
+                fractionDigits={
+                  stepSizeDecimals < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals
+                }
+              />
+            </TableCell>
+          ),
+        },
+        [OrdersTableColumnKey.Price]: {
+          columnKey: 'price',
+          getCellValue: (row) => row.price,
+          label: stringGetter({ key: STRING_KEYS.PRICE }),
+          renderCell: ({ type, price, tickSizeDecimals }) =>
+            isMarketOrderType(type) ? (
+              stringGetter({ key: STRING_KEYS.MARKET_PRICE_SHORT })
+            ) : (
+              <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
+            ),
+        },
+        [OrdersTableColumnKey.Trigger]: {
+          columnKey: 'triggerPrice',
+          getCellValue: (row) => row.triggerPrice ?? -1,
+          label: stringGetter({ key: STRING_KEYS.TRIGGER_PRICE_SHORT }),
+          renderCell: ({ triggerPrice, trailingPercent, tickSizeDecimals }) => (
+            <TableCell stacked>
+              <Output
+                type={OutputType.Fiat}
+                value={triggerPrice}
+                fractionDigits={tickSizeDecimals}
+              />
+              {trailingPercent && (
+                <span>
+                  <Output
+                    type={OutputType.Percent}
+                    value={MustBigNumber(trailingPercent).abs().div(100)}
+                  />{' '}
+                  {stringGetter({ key: STRING_KEYS.TRAIL })}
+                </span>
+              )}
+            </TableCell>
+          ),
+        },
+        [OrdersTableColumnKey.GoodTil]: {
+          columnKey: 'expiresAtMilliseconds',
+          getCellValue: (row) => row.expiresAtMilliseconds ?? Infinity,
+          label: stringGetter({ key: STRING_KEYS.GOOD_TIL }),
+          renderCell: ({ expiresAtMilliseconds }) => {
+            if (!expiresAtMilliseconds) return <Output type={OutputType.Text} />;
+            // TODO: use OutputType.RelativeTime when ready
+            const { timeString, unitStringKey } = getStringsForDateTimeDiff(
+              DateTime.fromMillis(expiresAtMilliseconds)
+            );
 
-        const marginModeLabel =
-          marginMode === AbacusMarginMode.cross
-            ? stringGetter({ key: STRING_KEYS.CROSS })
-            : stringGetter({ key: STRING_KEYS.ISOLATED });
-        return <Output type={OutputType.Text} value={marginModeLabel} />;
-      },
-    },
-  };
-  return {
-    width,
-    ...columnMap[key],
+            return (
+              <Output
+                type={OutputType.Text}
+                value={`${timeString}${stringGetter({ key: unitStringKey })}`}
+              />
+            );
+          },
+        },
+        [OrdersTableColumnKey.Actions]: {
+          columnKey: 'cancelOrClear',
+          label: stringGetter({ key: STRING_KEYS.ACTION }),
+          isActionable: true,
+          allowsSorting: false,
+          getCellValue: () => '',
+          renderCell: ({ id, status }) => (
+            <OrderActionsCell orderId={id} status={status} isDisabled={isAccountViewOnly} />
+          ),
+        },
+        [OrdersTableColumnKey.StatusFill]: {
+          columnKey: 'statusFill',
+          getCellValue: (row) => row.status.name,
+          label: `${stringGetter({ key: STRING_KEYS.STATUS })} / ${stringGetter({
+            key: STRING_KEYS.FILL,
+          })}`,
+          renderCell: ({ asset, createdAtMilliseconds, size, status, totalFilled, resources }) => {
+            const { statusIconColor } = getOrderStatusInfo({ status: status.rawValue });
+
+            return (
+              <TableCell
+                stacked
+                slotLeft={
+                  <>
+                    <$TimeOutput
+                      type={OutputType.RelativeTime}
+                      relativeTimeFormatOptions={{ format: 'singleCharacter' }}
+                      value={createdAtMilliseconds}
+                    />
+                    <$AssetIconWithStatus>
+                      <$AssetIcon symbol={asset?.id} />
+                      <$StatusDot color={statusIconColor} />
+                    </$AssetIconWithStatus>
+                  </>
+                }
+              >
+                <span>
+                  {resources.statusStringKey && stringGetter({ key: resources.statusStringKey })}
+                </span>
+                <$InlineRow>
+                  <Output
+                    type={OutputType.Asset}
+                    value={totalFilled}
+                    fractionDigits={TOKEN_DECIMALS}
+                  />
+                  /
+                  <Output
+                    type={OutputType.Asset}
+                    value={size}
+                    fractionDigits={TOKEN_DECIMALS}
+                    tag={asset?.id}
+                  />
+                </$InlineRow>
+              </TableCell>
+            );
+          },
+        },
+        [OrdersTableColumnKey.PriceType]: {
+          columnKey: 'priceType',
+          label: (
+            <TableColumnHeader>
+              <span>{stringGetter({ key: STRING_KEYS.PRICE })}</span>
+              <span>{stringGetter({ key: STRING_KEYS.TYPE })}</span>
+            </TableColumnHeader>
+          ),
+          getCellValue: (row) => row.price,
+          renderCell: ({ price, orderSide, tickSizeDecimals, resources }) => (
+            <TableCell stacked>
+              <$InlineRow>
+                <$Side side={orderSide}>
+                  {resources.sideStringKey ? stringGetter({ key: resources.sideStringKey }) : null}
+                </$Side>
+                <$SecondaryColor>@</$SecondaryColor>
+                <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
+              </$InlineRow>
+              <span>
+                {resources.typeStringKey ? stringGetter({ key: resources.typeStringKey }) : null}
+              </span>
+            </TableCell>
+          ),
+        },
+        [OrdersTableColumnKey.MarginType]: {
+          columnKey: 'marginType',
+          label: stringGetter({ key: STRING_KEYS.MARGIN_MODE }),
+          getCellValue: (row) => getMarginModeFromSubaccountNumber(row.subaccountNumber).name,
+          renderCell: function (row: OrderTableRow): ReactNode {
+            const marginMode = getMarginModeFromSubaccountNumber(row.subaccountNumber);
+
+            const marginModeLabel =
+              marginMode === AbacusMarginMode.cross
+                ? stringGetter({ key: STRING_KEYS.CROSS })
+                : stringGetter({ key: STRING_KEYS.ISOLATED });
+            return <Output type={OutputType.Text} value={marginModeLabel} />;
+          },
+        },
+      } satisfies Record<OrdersTableColumnKey, ColumnDef<OrderTableRow>>
+    )[key],
   };
 };
 
