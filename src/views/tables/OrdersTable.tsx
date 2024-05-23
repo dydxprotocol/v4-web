@@ -1,4 +1,4 @@
-import { Key, useEffect, useMemo } from 'react';
+import { Key, ReactNode, useEffect, useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { ColumnSize } from '@react-types/table';
@@ -7,7 +7,7 @@ import { DateTime } from 'luxon';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import { Asset, Nullable, SubaccountOrder } from '@/constants/abacus';
+import { AbacusMarginMode, Asset, Nullable, SubaccountOrder } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
@@ -53,6 +53,7 @@ import {
   isOrderStatusClearable,
 } from '@/lib/orders';
 import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
+import { getMarginModeFromSubaccountNumber } from '@/lib/tradeData';
 
 import { OrderStatusIcon } from '../OrderStatusIcon';
 import { OrderActionsCell } from './OrdersTable/OrderActionsCell';
@@ -66,6 +67,7 @@ export enum OrdersTableColumnKey {
   Trigger = 'Trigger',
   GoodTil = 'Good-Til',
   Actions = 'Actions',
+  MarginType = 'Margin-Type',
 
   // Tablet Only
   StatusFill = 'Status-Fill',
@@ -211,6 +213,7 @@ const getOrdersTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.ACTION }),
         isActionable: true,
         allowsSorting: false,
+        getCellValue: () => '',
         renderCell: ({ id, status }) => (
           <OrderActionsCell orderId={id} status={status} isDisabled={isAccountViewOnly} />
         ),
@@ -286,7 +289,21 @@ const getOrdersTableColumnDef = ({
           </TableCell>
         ),
       },
-    } as Record<OrdersTableColumnKey, ColumnDef<OrderTableRow>>
+      [OrdersTableColumnKey.MarginType]: {
+        columnKey: 'marginType',
+        label: stringGetter({ key: STRING_KEYS.MARGIN_MODE }),
+        getCellValue: (row) => getMarginModeFromSubaccountNumber(row.subaccountNumber).name,
+        renderCell: function (row: OrderTableRow): ReactNode {
+          const marginMode = getMarginModeFromSubaccountNumber(row.subaccountNumber);
+
+          const marginModeLabel =
+            marginMode === AbacusMarginMode.cross
+              ? stringGetter({ key: STRING_KEYS.CROSS })
+              : stringGetter({ key: STRING_KEYS.ISOLATED });
+          return <Output type={OutputType.Text} value={marginModeLabel} />;
+        },
+      },
+    } satisfies Record<OrdersTableColumnKey, ColumnDef<OrderTableRow>>
   )[key],
 });
 
