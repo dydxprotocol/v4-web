@@ -26,12 +26,8 @@ export const Overview = () => {
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  const showClosePositionAction = false;
-
   const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
-  const shouldRenderActions = useSelector(
-    calculateShouldRenderActionsInPositionsTable(showClosePositionAction)
-  );
+  const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable(true));
 
   return (
     <div>
@@ -53,6 +49,7 @@ export const Overview = () => {
               : [
                   PositionsTableColumnKey.Market,
                   PositionsTableColumnKey.Size,
+                  PositionsTableColumnKey.Margin,
                   PositionsTableColumnKey.UnrealizedPnl,
                   PositionsTableColumnKey.RealizedPnl,
                   PositionsTableColumnKey.AverageOpenAndClose,
@@ -67,7 +64,7 @@ export const Overview = () => {
               state: { from: AppRoute.Portfolio },
             })
           }
-          showClosePositionAction={showClosePositionAction}
+          showClosePositionAction
           withOuterBorder
         />
       </$AttachedExpandingSection>

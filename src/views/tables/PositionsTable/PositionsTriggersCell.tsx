@@ -200,7 +200,7 @@ export const PositionsTriggersCell = ({
   };
 
   return (
-    <$TableCell
+    <TableCell
       stacked
       stackedWithSecondaryStyling={false}
       slotRight={
@@ -217,7 +217,7 @@ export const PositionsTriggersCell = ({
     >
       <$Row>{renderOutput({ label: 'TP', orders: takeProfitOrders })}</$Row>
       <$Row>{renderOutput({ label: 'SL', orders: stopLossOrders })}</$Row>
-    </$TableCell>
+    </TableCell>
   );
 };
 const $Row = styled.span`
@@ -291,8 +291,4 @@ const $EditButton = styled(IconButton)`
   --button-hover-textColor: var(--color-text-1);
 
   margin-left: 0.5rem;
-`;
-
-const $TableCell = styled(TableCell)`
-  justify-content: space-between;
 `;
