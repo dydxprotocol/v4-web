@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import {
+  Subaccount,
   type Asset,
   type Nullable,
   type SubaccountOrder,
@@ -35,7 +36,11 @@ import {
   calculateIsAccountViewOnly,
   calculateShouldRenderTriggersInPositionsTable,
 } from '@/state/accountCalculators';
-import { getExistingOpenPositions, getSubaccountConditionalOrders } from '@/state/accountSelectors';
+import {
+  getExistingOpenPositions,
+  getSubaccount,
+  getSubaccountConditionalOrders,
+} from '@/state/accountSelectors';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
@@ -80,8 +85,10 @@ const getPositionsTableColumnDef = ({
   showClosePositionAction,
   shouldRenderTriggers,
   navigateToOrders,
+  subaccount,
 }: {
   key: PositionsTableColumnKey;
+  subaccount: Subaccount | undefined;
   stringGetter: StringGetterFunction;
   width?: ColumnSize;
   isAccountViewOnly: boolean;
@@ -198,11 +205,11 @@ const getPositionsTableColumnDef = ({
       },
       [PositionsTableColumnKey.Margin]: {
         columnKey: 'margin',
-        getCellValue: (row) => getPositionMargin({ position: row }),
+        getCellValue: (row) => getPositionMargin({ position: row, subaccount }),
         label: stringGetter({ key: STRING_KEYS.MARGIN }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         isActionable: true,
-        renderCell: (row) => <PositionsMarginCell position={row} />,
+        renderCell: (row) => <PositionsMarginCell position={row} subaccount={subaccount} />,
       },
       [PositionsTableColumnKey.NetFunding]: {
         columnKey: 'netFunding',
@@ -383,6 +390,7 @@ export const PositionsTable = ({
 
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
   const perpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
+  const subaccount = useSelector(getSubaccount, shallowEqual) ?? undefined;
   const assets = useSelector(getAssets, shallowEqual) || {};
   const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
 
@@ -443,6 +451,7 @@ export const PositionsTable = ({
           isAccountViewOnly,
           showClosePositionAction,
           shouldRenderTriggers,
+          subaccount: subaccount,
           navigateToOrders,
         })
       )}
