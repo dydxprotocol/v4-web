@@ -11,18 +11,25 @@ import { STRING_KEYS } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
 import { timeUnits } from '@/constants/time';
 
-import { useBreakpoints, useStringGetter, useTokenConfigs } from '@/hooks';
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
-import { getHistoricalTradingRewardsForPeriod } from '@/state/accountSelectors';
+import {
+  getHistoricalTradingRewardsForPeriod,
+  getTotalTradingRewards,
+} from '@/state/accountSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { formatRelativeTime } from '@/lib/dateTime';
 import { MustBigNumber } from '@/lib/numbers';
+
+import { Nullable } from '../../constants/abacus';
 
 type ElementProps = {
   selectedLocale: string;
@@ -48,28 +55,22 @@ export const TradingRewardsChart = ({
 
   const [tooltipContext, setTooltipContext] = useState<TooltipContextType<TradingRewardsDatum>>();
 
-  // Fetch 90d data once in Abacus for the chart
-  useEffect(() => {
-    abacusStateManager.setHistoricalPnlPeriod(HistoricalPnlPeriod.Period90d);
-  }, []);
-
+  const totalTradingRewards = useSelector(getTotalTradingRewards);
   const periodTradingRewards = useSelector(
     getHistoricalTradingRewardsForPeriod(SELECTED_PERIOD.name),
     shallowEqual
   );
-
-  console.log('Xcxc', periodTradingRewards);
 
   const rewardsData = useMemo(
     () =>
       periodTradingRewards
         ? periodTradingRewards
             .toArray()
-            // .slice(0, DAY_RANGE)
             .reverse()
             .map(
               (datum) =>
                 ({
+                  amount: datum.amount,
                   cumulativeAmount: datum.cumulativeAmount, // xcxc format
                   date: new Date(datum.endedAtInMilliseconds).valueOf(),
                 } as TradingRewardsDatum)
@@ -79,11 +80,14 @@ export const TradingRewardsChart = ({
   );
 
   const formatDyDxToken = useCallback(
-    (value: number) => MustBigNumber(value).toFixed(TOKEN_DECIMALS),
+    (value: Nullable<number>) => MustBigNumber(value ?? 0).toFixed(TOKEN_DECIMALS),
     []
   );
 
-  console.log('Xcxc', rewardsData);
+  console.log(
+    'Xcxc',
+    rewardsData.map((a) => a.amount).reduce((sum, current) => sum + current, 0)
+  );
 
   return (
     <TimeSeriesChart
@@ -119,7 +123,7 @@ export const TradingRewardsChart = ({
       //   onVisibleDataChange={onVisibleDataChange}
       //   onZoom={onZoomSnap}
       slotEmpty={slotEmpty}
-      defaultZoomDomain={DAY_RANGE * timeUnits.day}
+      // defaultZoomDomain={DAY_RANGE * timeUnits.day}
       minZoomDomain={TRADING_REWARDS_TIME_RESOLUTION * 2} // xcxc
       numGridLines={0}
     >
@@ -139,12 +143,11 @@ export const TradingRewardsChart = ({
               })}
             </$Subtitle>
             <$Value>
-              {
-                formatDyDxToken(
-                  tooltipContext?.tooltipData?.nearestDatum?.datum?.cumulativeAmount ?? 1000
-                ) //xcxc
-              }
-              <AssetIcon symbol={chainTokenLabel}></AssetIcon>
+              {formatDyDxToken(
+                tooltipContext?.tooltipData?.nearestDatum?.datum?.cumulativeAmount ??
+                  totalTradingRewards
+              )}
+              <AssetIcon symbol={chainTokenLabel} />
             </$Value>
           </$TitleContainer>
         </$Title>

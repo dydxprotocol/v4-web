@@ -99,8 +99,7 @@ class AbacusStateManager {
     const appConfigs = new AbacusAppConfig(
       false, // subscribeToCandles
       true, // loadRemote
-      true
-      // import.meta.env.MODE === 'development' && import.meta.env.VITE_ENABLE_ABACUS_LOGGING // enableLogger
+      import.meta.env.MODE === 'development' && import.meta.env.VITE_ENABLE_ABACUS_LOGGING // enableLogger
     );
     appConfigs.squidVersion = AbacusAppConfig.SquidVersion.V2;
 

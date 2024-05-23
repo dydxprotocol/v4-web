@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { OnboardingState } from '@/constants/account';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useStringGetter } from '@/hooks';
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -42,7 +42,7 @@ export const TradingRewardsChartPanel = () => {
                   <OnboardingTriggerButton />
                 </>
               ) : (
-                'No trading rewards'
+                'No trading rewards' // xcx dont render totile
               )}
             </$EmptyCard>
           </$EmptyChart>

@@ -44,4 +44,5 @@ export type FundingChartDatum = {
 export type TradingRewardsDatum = {
   date: number;
   cumulativeAmount: number;
+  amount: number;
 };

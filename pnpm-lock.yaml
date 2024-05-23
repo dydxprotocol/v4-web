@@ -30,8 +30,8 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.23.tgz
-    version: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.23.tgz
+    specifier: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.29.tgz
+    version: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.29.tgz
   '@dydxprotocol/v4-client-js':
     specifier: ^1.1.10
     version: 1.1.10
@@ -20556,10 +20556,10 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
 
-  file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.23.tgz:
-    resolution: {integrity: sha512-8DARQWFdETM0oKb13DCjFUU0pWSokPXFpZXIpJViI7s/t7oYvSkjczIMufTJYf0toEArZ7NQC/d1nZ7CfRT+YA==, tarball: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.23.tgz}
+  file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.29.tgz:
+    resolution: {integrity: sha512-0Ek8xqK6o2VGOZ817f3yRWToc4ZYEx5hVCchb7iGww8Ar9gLPiaEndRhDQEEa1P7ZycQdJ1qERP4QSw1OgH2WQ==, tarball: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.29.tgz}
     name: '@dydxprotocol/v4-abacus'
-    version: 1.7.23
+    version: 1.7.29
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
