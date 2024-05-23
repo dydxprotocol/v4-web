@@ -19,7 +19,7 @@ import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSel
 
 import { isTruthy } from '@/lib/isTruthy';
 
-export const usePreferenceMenu = () => {
+const usePreferenceMenu = () => {
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
 

@@ -1,13 +1,6 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
-import {
-  AbacusOrderSide,
-  AbacusPositionSide,
-  AbacusPositionSides,
-  type AbacusOrderSides,
-  type Nullable,
-} from '@/constants/abacus';
-import { PositionSide } from '@/constants/trade';
+import { AbacusOrderSide, type AbacusOrderSides, type Nullable } from '@/constants/abacus';
 
 /** @deprecated use ORDER_SIDES from constants/abacus */
 export const convertAbacusOrderSide = (abacusOrderSide: Nullable<AbacusOrderSides>) => {
@@ -16,20 +9,6 @@ export const convertAbacusOrderSide = (abacusOrderSide: Nullable<AbacusOrderSide
       return OrderSide.BUY;
     case AbacusOrderSide.sell:
       return OrderSide.SELL;
-    default:
-      return null;
-  }
-};
-
-/** @deprecated use POSITION_SIDES from constants/abacus */
-export const convertAbacusPositionSide = (abacusPositionSide: Nullable<AbacusPositionSides>) => {
-  switch (abacusPositionSide) {
-    case AbacusPositionSide.LONG:
-      return PositionSide.Long;
-    case AbacusPositionSide.SHORT:
-      return PositionSide.Short;
-    case AbacusPositionSide.NONE:
-      return PositionSide.None;
     default:
       return null;
   }

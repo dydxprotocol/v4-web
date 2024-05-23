@@ -12,7 +12,7 @@ type StyleProps = {
   size?: TagSize;
 };
 
-export const positionSideTagSign: Record<PositionSide, TagSign> = {
+const positionSideTagSign: Record<PositionSide, TagSign> = {
   [PositionSide.Long]: TagSign.Positive,
   [PositionSide.Short]: TagSign.Negative,
   [PositionSide.None]: TagSign.Neutral,

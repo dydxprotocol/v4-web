@@ -77,7 +77,7 @@ export const getWalletConnection = ({
   return undefined;
 };
 
-export const getWalletErrorType = ({ error }: { error: Error }) => {
+const getWalletErrorType = ({ error }: { error: Error }) => {
   const { message } = error;
   const messageLower = message.toLowerCase();
 
