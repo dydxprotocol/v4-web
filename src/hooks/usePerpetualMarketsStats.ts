@@ -29,7 +29,8 @@ export const usePerpetualMarketsStats = () => {
           startDate,
           endDate,
         }),
-      'usePerpetualMarketsStats getChainRevenue'
+      'usePerpetualMarketsStats getChainRevenue',
+      true
     ),
     refetchOnWindowFocus: false,
     gcTime: 1_000 * 60 * 5, // 5 minutes

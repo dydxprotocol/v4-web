@@ -20,12 +20,16 @@ export const useQueryChaosLabsIncentives = ({
   return useQuery<ChaosLabsIncentivesResponse | undefined, Error>({
     enabled: !!dydxAddress,
     queryKey: ['launch_incentives_rewards', dydxAddress, season],
-    queryFn: wrapAndLogError(async () => {
-      if (!dydxAddress) return undefined;
-      const resp = await fetch(
-        `https://cloud.chaoslabs.co/query/api/dydx/points/${dydxAddress}?n=${season}`
-      );
-      return resp.json();
-    }, 'LaunchIncentives/fetchPoints'),
+    queryFn: wrapAndLogError(
+      async () => {
+        if (!dydxAddress) return undefined;
+        const resp = await fetch(
+          `https://cloud.chaoslabs.co/query/api/dydx/points/${dydxAddress}?n=${season}`
+        );
+        return resp.json();
+      },
+      'LaunchIncentives/fetchPoints',
+      true
+    ),
   });
 };

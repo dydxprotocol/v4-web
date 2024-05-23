@@ -77,27 +77,31 @@ const EstimatedRewards = () => {
 
   const { data: seasonNumber } = useQuery({
     queryKey: ['chaos_labs_season_number'],
-    queryFn: wrapAndLogError(async () => {
-      const resp = await fetch('https://cloud.chaoslabs.co/query/ccar-perpetuals', {
-        method: 'POST',
-        headers: {
-          'apollographql-client-name': 'dydx-v4',
-          'content-type': 'application/json',
-          protocol: 'dydx-v4',
-        },
-        body: JSON.stringify({
-          operationName: 'TradingSeasons',
-          variables: {},
-          query: `query TradingSeasons {
+    queryFn: wrapAndLogError(
+      async () => {
+        const resp = await fetch('https://cloud.chaoslabs.co/query/ccar-perpetuals', {
+          method: 'POST',
+          headers: {
+            'apollographql-client-name': 'dydx-v4',
+            'content-type': 'application/json',
+            protocol: 'dydx-v4',
+          },
+          body: JSON.stringify({
+            operationName: 'TradingSeasons',
+            variables: {},
+            query: `query TradingSeasons {
         tradingSeasons {
           label
         }
       }`,
-        }),
-      });
-      const seasons = (await resp.json())?.data?.tradingSeasons;
-      return seasons && seasons.length > 0 ? seasons[seasons.length - 1].label : undefined;
-    }, 'LaunchIncentives/fetchSeasonNumber'),
+          }),
+        });
+        const seasons = (await resp.json())?.data?.tradingSeasons;
+        return seasons && seasons.length > 0 ? seasons[seasons.length - 1].label : undefined;
+      },
+      'LaunchIncentives/fetchSeasonNumber',
+      true
+    ),
   });
 
   const { data, isLoading } = useQueryChaosLabsIncentives({ dydxAddress, season: seasonNumber });

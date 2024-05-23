@@ -39,10 +39,14 @@ export const useWithdrawalInfo = ({
   const { data: usdcWithdrawalCapacity } = useQuery({
     enabled: withdrawalSafetyEnabled,
     queryKey: ['usdcWithdrawalCapacity'],
-    queryFn: wrapAndLogError(async () => {
-      const response = await getWithdrawalCapacityByDenom({ denom: usdcDenom });
-      return JSON.parse(encodeJson(response, ByteArrayEncoding.BIGINT));
-    }, 'useWithdrawalInfo/getWithdrawalCapacityByDenom'),
+    queryFn: wrapAndLogError(
+      async () => {
+        const response = await getWithdrawalCapacityByDenom({ denom: usdcDenom });
+        return JSON.parse(encodeJson(response, ByteArrayEncoding.BIGINT));
+      },
+      'useWithdrawalInfo/getWithdrawalCapacityByDenom',
+      true
+    ),
     refetchInterval: 60_000,
     staleTime: 60_000,
   });
@@ -52,7 +56,8 @@ export const useWithdrawalInfo = ({
     queryKey: ['withdrawalTransferGateStatus'],
     queryFn: wrapAndLogError(
       () => getWithdrawalAndTransferGatingStatus(),
-      'useWithdrawalInfo/getWithdrawalAndTransferGatingStatus'
+      'useWithdrawalInfo/getWithdrawalAndTransferGatingStatus',
+      true
     ),
     refetchInterval: 60_000,
     staleTime: 60_000,
