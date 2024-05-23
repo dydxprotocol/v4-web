@@ -60,7 +60,7 @@ export const AdjustTargetLeverageForm = ({
       <$InputContainer>
         <$WithLabel label={stringGetter({ key: STRING_KEYS.TARGET_LEVERAGE })}>
           <$LeverageSlider
-            min={1}
+            min={  1}
             max={10}
             value={MustBigNumber(leverage).abs().toNumber()}
             onSliderDrag={([value]: number[]) => setLeverage(value.toString())}
