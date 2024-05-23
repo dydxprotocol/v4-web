@@ -97,6 +97,7 @@ const getOrdersTableColumnDef = ({
   width?: ColumnSize;
 }): ColumnDef<OrderTableRow> => ({
   width,
+
   ...(
     {
       [OrdersTableColumnKey.Market]: {
