@@ -7,9 +7,10 @@ import styled from 'styled-components';
 import { TradeInputField } from '@/constants/abacus';
 import { ButtonAction, ButtonShape, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { LEVERAGE_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useURLConfigs } from '@/hooks/useURLConfigs';
 
 import { breakpoints } from '@/styles';
 import { formMixins } from '@/styles/formMixins';
@@ -17,6 +18,7 @@ import { formMixins } from '@/styles/formMixins';
 import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Input, InputType } from '@/components/Input';
+import { Link } from '@/components/Link';
 import { OutputType } from '@/components/Output';
 import { Slider } from '@/components/Slider';
 import { ToggleGroup } from '@/components/ToggleGroup';
@@ -35,6 +37,7 @@ export const AdjustTargetLeverageForm = ({
   onSetTargetLeverage: (value: string) => void;
 }) => {
   const stringGetter = useStringGetter();
+  const { governanceLearnMore } = useURLConfigs();
   const { buyingPower } = useSelector(getSubaccount, shallowEqual) ?? {};
 
   /**
@@ -57,6 +60,13 @@ export const AdjustTargetLeverageForm = ({
         onSetTargetLeverage?.(leverage);
       }}
     >
+      <$Description>
+        {stringGetter({ key: STRING_KEYS.ADJUST_TARGET_LEVERAGE_DESCRIPTION })}
+        <Link withIcon href={''}>
+          {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
+        </Link>
+      </$Description>
+
       <$InputContainer>
         <$WithLabel label={stringGetter({ key: STRING_KEYS.TARGET_LEVERAGE })}>
           <$LeverageSlider
@@ -104,21 +114,6 @@ export const AdjustTargetLeverageForm = ({
               />
             ),
           },
-          {
-            key: 'buying-power',
-            label: stringGetter({ key: STRING_KEYS.BUYING_POWER }),
-            value: (
-              <DiffOutput
-                type={OutputType.Fiat}
-                withDiff={
-                  !!buyingPower?.postOrder && buyingPower?.current !== buyingPower?.postOrder
-                }
-                value={buyingPower?.current}
-                newValue={buyingPower?.postOrder}
-                fractionDigits={USD_DECIMALS}
-              />
-            ),
-          },
         ]}
       >
         <Button type={ButtonType.Submit} action={ButtonAction.Primary}>
@@ -128,6 +123,18 @@ export const AdjustTargetLeverageForm = ({
     </$Form>
   );
 };
+
+const $Description = styled.div`
+  color: var(--color-text-0);
+  --link-color: var(--color-text-1);
+
+  a {
+    display: inline-grid;
+    ::before {
+      content: ' ';
+    }
+  }
+`;
 
 const $Form = styled.form`
   ${formMixins.transfersForm}
