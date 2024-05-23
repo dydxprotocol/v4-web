@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
-import { AbacusMarginMode, type SubaccountPosition } from '@/constants/abacus';
+import { AbacusMarginMode, Subaccount, type SubaccountPosition } from '@/constants/abacus';
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import { ButtonShape } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
@@ -20,9 +20,12 @@ import { openDialog } from '@/state/dialogs';
 
 import { getPositionMargin } from '@/lib/tradeData';
 
-type PositionsMarginCellProps = { position: SubaccountPosition };
+type PositionsMarginCellProps = {
+  position: SubaccountPosition;
+  subaccount: Subaccount | undefined;
+};
 
-export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
+export const PositionsMarginCell = ({ position, subaccount }: PositionsMarginCellProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
 
@@ -38,7 +41,7 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
         ? stringGetter({ key: STRING_KEYS.CROSS })
         : stringGetter({ key: STRING_KEYS.ISOLATED });
 
-    const margin = getPositionMargin({ position });
+    const margin = getPositionMargin({ position, subaccount });
 
     return {
       marginMode,
