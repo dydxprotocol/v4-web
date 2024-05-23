@@ -12,7 +12,7 @@ import {
   type SubaccountPosition,
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
-import { ButtonAction, ButtonShape, ButtonType } from '@/constants/buttons';
+import { ButtonAction, ButtonShape, ButtonState, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS, StringKey } from '@/constants/localization';
 import { NumberSign, PERCENT_DECIMALS } from '@/constants/numbers';
 
@@ -41,6 +41,7 @@ import { MustBigNumber } from '@/lib/numbers';
 
 type ElementProps = {
   marketId: SubaccountPosition['id'];
+  closeForm?(): void;
 };
 
 const SIZE_PERCENT_OPTIONS = {
@@ -51,7 +52,7 @@ const SIZE_PERCENT_OPTIONS = {
   '75%': '0.75',
 };
 
-export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
+export const AdjustIsolatedMarginForm = ({ marketId, closeForm }: ElementProps) => {
   const stringGetter = useStringGetter();
   const subaccountPosition = useSelector(getOpenPositionFromId(marketId));
   const { childSubaccountNumber } = subaccountPosition ?? {};
@@ -98,12 +99,15 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
   const { adjustIsolatedMarginOfPosition } = useSubaccount();
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const onSubmit = () => {
     setErrorMessage(null);
+    setIsSubmitting(true);
 
     adjustIsolatedMarginOfPosition({
       onError: (errorParams) => {
+        setIsSubmitting(false);
         if (errorParams) {
           setErrorMessage(stringGetter({ key: errorParams.errorStringKey as StringKey }));
         }
@@ -111,7 +115,9 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
       onSuccess: (
         _subaccountTransferPayload?: Nullable<HumanReadableSubaccountTransferPayload>
       ) => {
+        setIsSubmitting(false);
         abacusStateManager.clearAdjustIsolatedMarginInputValues();
+        closeForm?.();
       },
     });
   };
@@ -308,7 +314,12 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
       {CenterElement}
 
       <WithDetailsReceipt detailItems={formConfig.receiptItems}>
-        <Button type={ButtonType.Submit} action={ButtonAction.Primary}>
+        <Button
+          type={ButtonType.Submit}
+          action={ButtonAction.Primary}
+          disabled={isSubmitting}
+          state={isSubmitting ? ButtonState.Loading : ButtonState.Default}
+        >
           {formConfig.buttonLabel}
         </Button>
       </WithDetailsReceipt>
