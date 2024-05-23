@@ -28,3 +28,7 @@ jobs:
           echo "${PR_TITLE}" | pnpx commitlint --config commitlint.config.ts
         env:
           PR_TITLE: '${{ github.event.pull_request.title }}'
+
+      - name: ESLint
+        run: |
+          pnpm lint
