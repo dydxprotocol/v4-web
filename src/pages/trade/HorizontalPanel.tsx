@@ -181,6 +181,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     OrdersTableColumnKey.AmountFill,
                     OrdersTableColumnKey.Price,
                     OrdersTableColumnKey.Trigger,
+                    OrdersTableColumnKey.MarginType,
                     OrdersTableColumnKey.GoodTil,
                     !isAccountViewOnly && OrdersTableColumnKey.Actions,
                   ].filter(isTruthy)

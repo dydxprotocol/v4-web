@@ -33,6 +33,7 @@ export const Orders = () => {
                 OrdersTableColumnKey.AmountFill,
                 OrdersTableColumnKey.Price,
                 OrdersTableColumnKey.Trigger,
+                OrdersTableColumnKey.MarginType,
                 OrdersTableColumnKey.GoodTil,
                 !isAccountViewOnly && OrdersTableColumnKey.Actions,
               ].filter(isTruthy)
