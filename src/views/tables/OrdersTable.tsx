@@ -210,6 +210,7 @@ const getOrdersTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.ACTION }),
         isActionable: true,
         allowsSorting: false,
+        getCellValue: undefined,
         renderCell: ({ id, status, orderFlags }) => (
           <OrderActionsCell
             orderId={id}
@@ -297,7 +298,7 @@ const getOrdersTableColumnDef = ({
           </TableCell>
         ),
       },
-    } as Record<OrdersTableColumnKey, ColumnDef<OrderTableRow>>
+    } satisfies Record<OrdersTableColumnKey, ColumnDef<OrderTableRow>>
   )[key],
 });
 
