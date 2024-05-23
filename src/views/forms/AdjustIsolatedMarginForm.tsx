@@ -41,7 +41,7 @@ import { MustBigNumber } from '@/lib/numbers';
 
 type ElementProps = {
   marketId: SubaccountPosition['id'];
-  closeForm?(): void;
+  onIsolatedMarginAdjustment?(): void;
 };
 
 const SIZE_PERCENT_OPTIONS = {
@@ -52,7 +52,10 @@ const SIZE_PERCENT_OPTIONS = {
   '75%': '0.75',
 };
 
-export const AdjustIsolatedMarginForm = ({ marketId, closeForm }: ElementProps) => {
+export const AdjustIsolatedMarginForm = ({
+  marketId,
+  onIsolatedMarginAdjustment,
+}: ElementProps) => {
   const stringGetter = useStringGetter();
   const subaccountPosition = useSelector(getOpenPositionFromId(marketId));
   const { childSubaccountNumber } = subaccountPosition ?? {};
@@ -117,7 +120,7 @@ export const AdjustIsolatedMarginForm = ({ marketId, closeForm }: ElementProps) 
       ) => {
         setIsSubmitting(false);
         abacusStateManager.clearAdjustIsolatedMarginInputValues();
-        closeForm?.();
+        onIsolatedMarginAdjustment?.();
       },
     });
   };

@@ -26,7 +26,7 @@ export const AdjustIsolatedMarginDialog = ({ positionId, setIsOpen }: ElementPro
   const stringGetter = useStringGetter();
   const subaccountPosition = useSelector(getOpenPositionFromId(positionId), shallowEqual);
 
-  const closeForm = useCallback(() => setIsOpen?.(false), [setIsOpen]);
+  const onIsolatedMarginAdjustment = useCallback(() => setIsOpen?.(false), [setIsOpen]);
 
   return (
     <Dialog
@@ -36,7 +36,10 @@ export const AdjustIsolatedMarginDialog = ({ positionId, setIsOpen }: ElementPro
       title={stringGetter({ key: STRING_KEYS.ADJUST_ISOLATED_MARGIN })}
     >
       <$Content>
-        <AdjustIsolatedMarginForm marketId={positionId} closeForm={closeForm} />
+        <AdjustIsolatedMarginForm
+          marketId={positionId}
+          onIsolatedMarginAdjustment={onIsolatedMarginAdjustment}
+        />
       </$Content>
     </Dialog>
   );
