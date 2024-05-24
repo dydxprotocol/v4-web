@@ -127,10 +127,8 @@ const $Description = styled.div`
   --link-color: var(--color-text-1);
 
   a {
-    display: inline-grid;
-    ::before {
-      content: ' ';
-    }
+    display: inline;
+    margin-left: 3px;
   }
 `;
 
