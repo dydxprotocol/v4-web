@@ -158,7 +158,7 @@ export const NewMarketPreviewStep = ({
                 : undefined,
               stepBaseQuantums: Long.fromNumber(stepBaseQuantums),
               subticksPerTick,
-              delayBlocks: newMarketProposal.delayBlocks,
+              delayBlocks: 30, // newMarketProposal.delayBlocks,
             });
 
             if ((tx as IndexedTx)?.code === 0) {

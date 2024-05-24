@@ -111,6 +111,12 @@
     "whitepaperLink": "https://bitcoincash.org/",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/bitcoin-cash/"
   },
+  "BODEN-USD": {
+    "name": "Jeo Boden",
+    "tags": ["Meme"],
+    "websiteLink": "https://jeoboden.com/",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/jeo-boden/"
+  },
   "BOME-USD": {
     "name": "BOOK OF MEME",
     "tags": ["Meme"],
