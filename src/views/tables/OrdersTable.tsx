@@ -210,7 +210,6 @@ const getOrdersTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.ACTION }),
         isActionable: true,
         allowsSorting: false,
-        getCellValue: undefined,
         renderCell: ({ id, status, orderFlags }) => (
           <OrderActionsCell
             orderId={id}

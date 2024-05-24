@@ -317,7 +317,6 @@ const getPositionsTableColumnDef = ({
         isActionable: true,
         allowsSorting: false,
         hideOnBreakpoint: MediaQueryKeys.isTablet,
-        getCellValue: undefined,
         renderCell: ({
           id,
           assetId,
@@ -354,7 +353,6 @@ const getPositionsTableColumnDef = ({
         }),
         isActionable: true,
         allowsSorting: false,
-        getCellValue: undefined,
         hideOnBreakpoint: MediaQueryKeys.isTablet,
         renderCell: ({ id, assetId, stopLossOrders, takeProfitOrders }) => (
           <PositionsActionsCell
