@@ -9,7 +9,6 @@ import { useDydxClient } from './useDydxClient';
 
 const POLLING_MS = timeUnits.hour;
 export const SEVEN_DAY_SPARKLINE_ENTRIES = 42;
-export const ONE_DAY_SPARKLINE_ENTRIES = 24;
 
 type UsePerpetualMarketSparklinesProps = {
   period?: 'ONE_DAY' | 'SEVEN_DAYS';

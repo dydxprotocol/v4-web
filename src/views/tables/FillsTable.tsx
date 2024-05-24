@@ -279,7 +279,7 @@ const getFillsTableColumnDef = ({
           </TableCell>
         ),
       },
-    } as Record<FillsTableColumnKey, ColumnDef<FillTableRow>>
+    } satisfies Record<FillsTableColumnKey, ColumnDef<FillTableRow>>
   )[key],
 });
 

@@ -30,7 +30,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 
-export const usePortfolioValues = ({
+const usePortfolioValues = ({
   equity,
   visibleData,
   activeDatum,

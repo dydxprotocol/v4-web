@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 
 import { Separator } from '@radix-ui/react-separator';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 const StyledSeparator = styled(Separator)`
   flex: 0 !important;
@@ -23,14 +23,6 @@ const StyledSeparator = styled(Separator)`
     border-right: solid var(--border-width) var(--color-border);
   }
 `;
-
-export const HorizontalSeparator = ({
-  className,
-  decorative = false,
-}: {
-  className?: string;
-  decorative?: boolean;
-}) => <StyledSeparator className={className} orientation="horizontal" decorative={decorative} />;
 
 export const VerticalSeparator = ({
   className,
@@ -70,28 +62,6 @@ export const WithSeparators = ({
         </Fragment>
       ))
     : children;
-
-export const HorizontalSeparatorWithText = styled(HorizontalSeparator)<{ contents?: string }>`
-  --contents: '';
-
-  ${({ contents }) =>
-    contents &&
-    css`
-      --contents: '${contents}';
-    `}
-
-  position: relative;
-
-  &:before {
-    content: var(--contents);
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: inherit;
-    padding: 0 0.5em;
-  }
-`;
 
 const StyledHorizontalSeparatorFiller = styled(Separator)`
   flex: 1;

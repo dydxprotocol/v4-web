@@ -297,7 +297,7 @@ const getOrdersTableColumnDef = ({
           </TableCell>
         ),
       },
-    } as Record<OrdersTableColumnKey, ColumnDef<OrderTableRow>>
+    } satisfies Record<OrdersTableColumnKey, ColumnDef<OrderTableRow>>
   )[key],
 });
 

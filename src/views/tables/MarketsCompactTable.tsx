@@ -47,14 +47,12 @@ export const MarketsCompactTable = ({
       [
         {
           columnKey: 'market',
-          getCellValue: (row) => row.market,
           allowsSorting: false,
           label: stringGetter({ key: STRING_KEYS.MARKET }),
           renderCell: ({ asset }) => <AssetTableCell stacked asset={asset} />,
         },
         {
           columnKey: 'oraclePrice',
-          getCellValue: (row) => row.oraclePrice,
           allowsSorting: false,
           label: stringGetter({ key: STRING_KEYS.ORACLE_PRICE }),
           renderCell: ({
@@ -94,7 +92,6 @@ export const MarketsCompactTable = ({
         filters === MarketFilters.NEW
           ? {
               columnKey: 'listing',
-              getCellValue: (row) => row.isNew,
               allowsSorting: false,
               renderCell: ({ listingDate }) => (
                 <$DetailsCell>
@@ -117,7 +114,6 @@ export const MarketsCompactTable = ({
           : {
               columnKey: 'openInterest',
               allowsSorting: false,
-              getCellValue: (row) => row.openInterestUSDC,
               label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
               renderCell: ({ asset, openInterestUSDC, openInterest }) => (
                 <$DetailsCell>

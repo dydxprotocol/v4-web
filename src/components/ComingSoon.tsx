@@ -6,7 +6,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-export const ComingSoon = () => {
+const ComingSoon = () => {
   const stringGetter = useStringGetter();
   return <h1>{stringGetter({ key: STRING_KEYS.COMING_SOON })}</h1>;
 };

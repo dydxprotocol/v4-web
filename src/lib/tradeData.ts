@@ -1,5 +1,4 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { matchPath, type Location } from 'react-router-dom';
 
 import {
   AbacusOrderSide,
@@ -12,16 +11,9 @@ import {
 import { AlertType } from '@/constants/alerts';
 import type { StringGetterFunction } from '@/constants/localization';
 import { PERCENT_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
-import { TRADE_ROUTE } from '@/constants/routes';
 import { PositionSide, TradeTypes } from '@/constants/trade';
 
 import { MustBigNumber } from '@/lib/numbers';
-
-export const getMarketIdFromLocation = (location: Location) => {
-  const { pathname } = location;
-  const tradeMatch = matchPath(TRADE_ROUTE, pathname);
-  return tradeMatch?.params.market;
-};
 
 export const getSelectedTradeType = (type: Nullable<AbacusOrderTypes>) => {
   return type ? (type.rawValue as TradeTypes) : TradeTypes.LIMIT;

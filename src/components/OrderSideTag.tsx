@@ -14,7 +14,7 @@ type StyleProps = {
   size?: TagSize;
 };
 
-export const orderSideTagSign: Record<OrderSide, TagSign> = {
+const orderSideTagSign: Record<OrderSide, TagSign> = {
   [OrderSide.BUY]: TagSign.Positive,
   [OrderSide.SELL]: TagSign.Negative,
 };

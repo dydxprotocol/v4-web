@@ -39,6 +39,6 @@ export const getLocalStorage = <Value>({
   return defaultValue!;
 };
 
-export const removeLocalStorage = ({ key }: { key: LocalStorageKey }) => {
+const removeLocalStorage = ({ key }: { key: LocalStorageKey }) => {
   globalThis.localStorage?.removeItem(key);
 };

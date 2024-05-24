@@ -5,9 +5,3 @@ export const BREAKPOINT_REM = {
   desktopMedium: '90rem',
   desktopLarge: '120rem',
 };
-
-export const PAGE_REM = {
-  maxContentWidth: '80rem',
-  collapsedSidebarWidth: '3.5rem',
-  sidebarWidth: '20.25rem',
-};
