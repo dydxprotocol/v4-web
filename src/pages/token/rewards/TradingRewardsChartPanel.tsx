@@ -18,9 +18,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 export const TradingRewardsChartPanel = () => {
   const stringGetter = useStringGetter();
   const selectedLocale = useSelector(getSelectedLocale);
-  const onboardingState = useSelector(getOnboardingState); 
-
-  // xcxc make sure reconnecting wallet refreshes chart data
+  const onboardingState = useSelector(getOnboardingState);
 
   return (
     <Panel>
@@ -56,6 +54,8 @@ const $TradingRewardsChart = styled(TradingRewardsChart)`
   --trading-rewards-line-color: var(--color-positive);
   position: relative;
   height: 20rem;
+  overscroll-behavior: contain;
+  touch-action: none;
 `;
 
 const $EmptyChart = styled.div`

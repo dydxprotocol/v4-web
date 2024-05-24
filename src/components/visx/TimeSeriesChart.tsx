@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { LinearGradient } from '@visx/gradient';
 import { ParentSize } from '@visx/responsive';
@@ -132,6 +132,8 @@ export const TimeSeriesChart = <Datum extends {}>({
   // Context
   const { isMobile } = useBreakpoints();
 
+  const chartRef = useRef<HTMLDivElement>(null);
+
   // Chart data
   const { xAccessor, yAccessor } = series[0];
 
@@ -230,8 +232,12 @@ export const TimeSeriesChart = <Datum extends {}>({
     // TODO: scroll horizontally to pan
   };
 
+  useEffect(() => {
+    chartRef.current?.addEventListener('wheel', (e) => e.preventDefault());
+  }, [chartRef]);
+
   return (
-    <$Container onWheel={onWheel} className={className}>
+    <$Container onWheel={onWheel} className={className} ref={chartRef}>
       {data.length && zoomDomain ? (
         <DataProvider
           xScale={{

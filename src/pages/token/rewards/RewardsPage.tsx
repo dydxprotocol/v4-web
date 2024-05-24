@@ -14,6 +14,8 @@ import { BackButton } from '@/components/BackButton';
 import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 
+import { testFlags } from '@/lib/testFlags';
+
 import { DYDXBalancePanel } from './DYDXBalancePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { MigratePanel } from './MigratePanel';
@@ -40,11 +42,10 @@ const RewardsPage = () => {
           {import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && <$MigratePanel />}
 
           {isTablet ? (
-            // xcxc figure out chart here
             <$LaunchIncentivesPanel />
           ) : (
             <>
-              <$TradingRewardsChartPanel />
+              {testFlags.tradingRewardsRehaul && <$TradingRewardsChartPanel />}
               <$LaunchIncentivesPanel />
               <$DYDXBalancePanel />
             </>
@@ -52,6 +53,7 @@ const RewardsPage = () => {
 
           <$TradingRewardsColumn>
             <TradingRewardsSummaryPanel />
+            {isTablet && testFlags.tradingRewardsRehaul && <TradingRewardsChartPanel />}
             {isTablet && <RewardsHelpPanel />}
             <RewardHistoryPanel />
           </$TradingRewardsColumn>

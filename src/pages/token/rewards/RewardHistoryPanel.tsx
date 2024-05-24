@@ -37,7 +37,7 @@ export const RewardHistoryPanel = () => {
         periodName as keyof typeof HISTORICAL_TRADING_REWARDS_PERIODS
       ];
     setSelectedPeriod(thisSelectedPeriod);
-    abacusStateManager.setHistoricalTradingRewardPeriod(thisSelectedPeriod); // xcxc swtich to always be 90d
+    abacusStateManager.setHistoricalTradingRewardPeriod(thisSelectedPeriod);
   }, []);
 
   return (

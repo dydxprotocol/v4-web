@@ -35,6 +35,13 @@ export const useTablePagination = ({
   };
 
   useEffect(() => {
+    const lastPage = Math.max(1, Math.ceil(totalRows / pageSize)) - 1;
+    if (currentPage > lastPage) {
+      setCurrentPage(lastPage);
+    }
+  }, [pageSize]);
+
+  useEffect(() => {
     const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
     const lastPage = totalPages - 1;
 
@@ -65,11 +72,7 @@ export const useTablePagination = ({
         pageNumberToMenuItem(lastPage),
       ]);
     }
-
-    if (currentPage > lastPage) {
-      setCurrentPage(lastPage);
-    }
-  }, [pageSize, currentPage, totalRows, pageNumberToMenuItem]);
+  }, [pageSize, currentPage, totalRows]);
 
   return { currentPage, pageSize, pages, setPageSize, setCurrentPage };
 };

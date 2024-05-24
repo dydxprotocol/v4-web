@@ -16,6 +16,7 @@ import { Output, OutputType } from '@/components/Output';
 import { Table, type ColumnDef } from '@/components/Table';
 import { TableCell } from '@/components/Table/TableCell';
 
+import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getHistoricalTradingRewardsForPeriod } from '@/state/accountSelectors';
 
 export enum TradingRewardHistoryTableColumnKey {
@@ -99,6 +100,7 @@ export const TradingRewardHistoryTable = ({
   withInnerBorders = true,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
+  const canViewAccount = useSelector(calculateCanViewAccount);
   const { chainTokenLabel } = useTokenConfigs();
 
   const periodTradingRewards = useSelector(
@@ -106,7 +108,10 @@ export const TradingRewardHistoryTable = ({
     shallowEqual
   );
 
-  const rewardsData = useMemo(() => periodTradingRewards?.toArray() ?? [], [periodTradingRewards]);
+  const rewardsData = useMemo(
+    () => (periodTradingRewards && canViewAccount ? periodTradingRewards.toArray() : []),
+    [periodTradingRewards, canViewAccount]
+  );
 
   return (
     <$Table
