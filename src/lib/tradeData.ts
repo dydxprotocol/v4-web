@@ -6,7 +6,6 @@ import {
   AbacusOrderSide,
   AbacusOrderTypes,
   ErrorType,
-  Subaccount,
   ValidationError,
   type AbacusOrderSides,
   type Nullable,
@@ -162,23 +161,17 @@ export const getMarginModeFromSubaccountNumber = (subaccountNumber: Nullable<num
     : AbacusMarginMode.cross;
 };
 
-export const getPositionMargin = ({
-  position,
-  subaccount,
-}: {
-  position: SubaccountPosition;
-  subaccount: Subaccount | undefined;
-}) => {
-  const { childSubaccountNumber, freeCollateral, notionalTotal } = position;
+export const getPositionMargin = ({ position }: { position: SubaccountPosition }) => {
+  const { childSubaccountNumber, equity, notionalTotal, adjustedMmf } = position;
   const marginMode = getMarginModeFromSubaccountNumber(childSubaccountNumber);
 
   const margin =
     marginMode === AbacusMarginMode.cross
       ? calculateCrossPositionMargin({
           notionalTotal: notionalTotal?.current,
-          adjustedMmf: subaccount?.quoteBalance?.current,
+          adjustedMmf: adjustedMmf.current,
         })
-      : freeCollateral?.current;
+      : equity?.current;
 
   return margin;
 };

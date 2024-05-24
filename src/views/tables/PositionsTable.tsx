@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import {
-  Subaccount,
   type Asset,
   type Nullable,
   type SubaccountOrder,
@@ -32,15 +31,8 @@ import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 
-import {
-  calculateIsAccountViewOnly,
-  calculateShouldRenderTriggersInPositionsTable,
-} from '@/state/accountCalculators';
-import {
-  getExistingOpenPositions,
-  getSubaccount,
-  getSubaccountConditionalOrders,
-} from '@/state/accountSelectors';
+import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
+import { getExistingOpenPositions, getSubaccountConditionalOrders } from '@/state/accountSelectors';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
@@ -83,17 +75,13 @@ const getPositionsTableColumnDef = ({
   width,
   isAccountViewOnly,
   showClosePositionAction,
-  shouldRenderTriggers,
   navigateToOrders,
-  subaccount,
 }: {
   key: PositionsTableColumnKey;
-  subaccount: Subaccount | undefined;
   stringGetter: StringGetterFunction;
   width?: ColumnSize;
   isAccountViewOnly: boolean;
   showClosePositionAction: boolean;
-  shouldRenderTriggers: boolean;
   navigateToOrders: (market: string) => void;
 }) => ({
   width,
@@ -205,11 +193,11 @@ const getPositionsTableColumnDef = ({
       },
       [PositionsTableColumnKey.Margin]: {
         columnKey: 'margin',
-        getCellValue: (row) => getPositionMargin({ position: row, subaccount }),
+        getCellValue: (row) => getPositionMargin({ position: row }),
         label: stringGetter({ key: STRING_KEYS.MARGIN }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         isActionable: true,
-        renderCell: (row) => <PositionsMarginCell position={row} subaccount={subaccount} />,
+        renderCell: (row) => <PositionsMarginCell position={row} />,
       },
       [PositionsTableColumnKey.NetFunding]: {
         columnKey: 'netFunding',
@@ -390,9 +378,7 @@ export const PositionsTable = ({
 
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
   const perpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
-  const subaccount = useSelector(getSubaccount, shallowEqual) ?? undefined;
   const assets = useSelector(getAssets, shallowEqual) || {};
-  const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
 
   const openPositions = useSelector(getExistingOpenPositions, shallowEqual) || [];
   const marketPosition = openPositions.find((position) => position.id == currentMarket);
@@ -450,8 +436,6 @@ export const PositionsTable = ({
           width: columnWidths?.[key],
           isAccountViewOnly,
           showClosePositionAction,
-          shouldRenderTriggers,
-          subaccount: subaccount,
           navigateToOrders,
         })
       )}
