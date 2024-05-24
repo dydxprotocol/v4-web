@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 
 import { PositionSide } from '@/constants/trade';
 
-import { BIG_NUMBERS, MustBigNumber } from '../numbers';
 import { calculateCrossPositionMargin, hasPositionSideChanged } from '../tradeData';
 
 describe('hasPositionSideChanged', () => {
@@ -81,38 +80,30 @@ describe('hasPositionSideChanged', () => {
 
 describe('calculateCrossPositionMargin', () => {
   it('should calculate the position margin', () => {
-    expect(calculateCrossPositionMargin({ notionalTotal: 100, adjustedMmf: 0.1 })).toEqual(
-      MustBigNumber(10)
-    );
+    expect(calculateCrossPositionMargin({ notionalTotal: 100, adjustedMmf: 0.1 })).toEqual('10.00');
   });
 
   it('should calculate the position margin with a notionalTotal of 0', () => {
-    expect(calculateCrossPositionMargin({ notionalTotal: 0, adjustedMmf: 0.1 })).toEqual(
-      BIG_NUMBERS.ZERO
-    );
+    expect(calculateCrossPositionMargin({ notionalTotal: 0, adjustedMmf: 0.1 })).toEqual('0.00');
   });
 
   it('should calculate the position margin with a adjustedMmf of 0', () => {
-    expect(calculateCrossPositionMargin({ notionalTotal: 100, adjustedMmf: 0 })).toEqual(
-      BIG_NUMBERS.ZERO
-    );
+    expect(calculateCrossPositionMargin({ notionalTotal: 100, adjustedMmf: 0 })).toEqual('0.00');
   });
 
   it('should calculate the position margin with a notionalTotal of 0 and a adjustedMmf of 0', () => {
-    expect(calculateCrossPositionMargin({ notionalTotal: 0, adjustedMmf: 0 })).toEqual(
-      BIG_NUMBERS.ZERO
-    );
+    expect(calculateCrossPositionMargin({ notionalTotal: 0, adjustedMmf: 0 })).toEqual('0.00');
   });
 
   it('should calculate the position margin with a negative notionalTotal', () => {
     expect(calculateCrossPositionMargin({ notionalTotal: -100, adjustedMmf: 0.1 })).toEqual(
-      MustBigNumber(-10)
+      '-10.00'
     );
   });
 
   it('should handle undefined notionalTotal', () => {
     expect(calculateCrossPositionMargin({ notionalTotal: undefined, adjustedMmf: 0.1 })).toEqual(
-      BIG_NUMBERS.ZERO
+      '0.00'
     );
   });
 });
