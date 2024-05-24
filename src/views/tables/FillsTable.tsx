@@ -9,6 +9,7 @@ import styled, { css } from 'styled-components';
 import { type Asset, type SubaccountFill } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
+import { EMPTY_ARR } from '@/constants/objects';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -20,8 +21,10 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
-import { Table, TableCell, TableColumnHeader, type ColumnDef } from '@/components/Table';
+import { ColumnDef, Table } from '@/components/Table';
 import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import { TableCell } from '@/components/Table/TableCell';
+import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 
@@ -37,6 +40,7 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { getHydratedTradingData } from '@/lib/orders';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 const MOBILE_FILLS_PER_PAGE = 50;
 
@@ -68,13 +72,11 @@ export type FillTableRow = {
 
 const getFillsTableColumnDef = ({
   key,
-  isTablet = false,
   stringGetter,
   symbol = '',
   width,
 }: {
   key: FillsTableColumnKey;
-  isTablet?: boolean;
   stringGetter: StringGetterFunction;
   symbol?: Nullable<string>;
   width?: ColumnSize;
@@ -85,9 +87,12 @@ const getFillsTableColumnDef = ({
       [FillsTableColumnKey.TypeAmount]: {
         columnKey: 'typeAmount',
         getCellValue: (row) => row.size,
-        label: `${stringGetter({ key: STRING_KEYS.TYPE })} / ${stringGetter({
-          key: STRING_KEYS.AMOUNT,
-        })}`,
+        label: (
+          <TableColumnHeader>
+            <span>{stringGetter({ key: STRING_KEYS.TYPE })}</span>
+            <span>{stringGetter({ key: STRING_KEYS.AMOUNT })}</span>
+          </TableColumnHeader>
+        ),
         renderCell: ({ resources, size, stepSizeDecimals, asset: { id } }) => (
           <TableCell stacked slotLeft={<$AssetIcon symbol={id} />}>
             <span>
@@ -105,9 +110,12 @@ const getFillsTableColumnDef = ({
       [FillsTableColumnKey.PriceFee]: {
         columnKey: 'priceFee',
         getCellValue: (row) => row.price,
-        label: `${stringGetter({ key: STRING_KEYS.PRICE })} / ${stringGetter({
-          key: STRING_KEYS.FEE,
-        })}`,
+        label: (
+          <TableColumnHeader>
+            <span>{stringGetter({ key: STRING_KEYS.PRICE })}</span>
+            <span>{stringGetter({ key: STRING_KEYS.FEE })}</span>
+          </TableColumnHeader>
+        ),
         renderCell: ({ fee, orderSide, price, resources, tickSizeDecimals }) => (
           <TableCell stacked>
             <$InlineRow>
@@ -174,15 +182,11 @@ const getFillsTableColumnDef = ({
       [FillsTableColumnKey.TotalFee]: {
         columnKey: 'totalFee',
         getCellValue: (row) => MustBigNumber(row.price).times(row.size).toNumber(),
-        label: isTablet ? (
+        label: (
           <TableColumnHeader>
             <span>{stringGetter({ key: STRING_KEYS.TOTAL })}</span>
             <span>{stringGetter({ key: STRING_KEYS.FEE })}</span>
           </TableColumnHeader>
-        ) : (
-          `${stringGetter({ key: STRING_KEYS.TOTAL })} / ${stringGetter({
-            key: STRING_KEYS.FEE,
-          })}`
         ),
         renderCell: ({ size, fee, price }) => (
           <TableCell stacked>
@@ -240,15 +244,11 @@ const getFillsTableColumnDef = ({
       [FillsTableColumnKey.AmountPrice]: {
         columnKey: 'sizePrice',
         getCellValue: (row) => row.size,
-        label: isTablet ? (
+        label: (
           <TableColumnHeader>
             <span>{stringGetter({ key: STRING_KEYS.AMOUNT })}</span>
             <span>{stringGetter({ key: STRING_KEYS.PRICE })}</span>
           </TableColumnHeader>
-        ) : (
-          `${stringGetter({ key: STRING_KEYS.AMOUNT })} / ${stringGetter({
-            key: STRING_KEYS.PRICE,
-          })}`
         ),
         renderCell: ({ size, stepSizeDecimals, price, tickSizeDecimals }) => (
           <TableCell stacked>
@@ -260,15 +260,11 @@ const getFillsTableColumnDef = ({
       [FillsTableColumnKey.TypeLiquidity]: {
         columnKey: 'typeLiquidity',
         getCellValue: (row) => row.type.rawValue,
-        label: isTablet ? (
+        label: (
           <TableColumnHeader>
             <span>{stringGetter({ key: STRING_KEYS.TYPE })}</span>
             <span>{stringGetter({ key: STRING_KEYS.LIQUIDITY })}</span>
           </TableColumnHeader>
-        ) : (
-          `${stringGetter({ key: STRING_KEYS.TYPE })} / ${stringGetter({
-            key: STRING_KEYS.LIQUIDITY,
-          })}`
         ),
         renderCell: ({ resources }) => (
           <TableCell stacked>
@@ -311,14 +307,14 @@ export const FillsTable = ({
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useDispatch();
-  const { isMobile, isTablet } = useBreakpoints();
+  const { isMobile } = useBreakpoints();
 
-  const marketFills = useSelector(getCurrentMarketFills, shallowEqual) || [];
-  const allFills = useSelector(getSubaccountFills, shallowEqual) || [];
+  const marketFills = useSelector(getCurrentMarketFills, shallowEqual) ?? EMPTY_ARR;
+  const allFills = useSelector(getSubaccountFills, shallowEqual) ?? EMPTY_ARR;
   const fills = currentMarket ? marketFills : allFills;
 
-  const allPerpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
-  const allAssets = useSelector(getAssets, shallowEqual) || {};
+  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
 
   const hasUnseenFillUpdates = useSelector(getHasUnseenFillUpdates);
 
@@ -356,10 +352,9 @@ export const FillsTable = ({
           })
         )
       }
-      columns={columnKeys.map((key: FillsTableColumnKey, index: number) =>
+      columns={columnKeys.map((key: FillsTableColumnKey) =>
         getFillsTableColumnDef({
           key,
-          isTablet,
           stringGetter,
           symbol,
           width: columnWidths?.[key],

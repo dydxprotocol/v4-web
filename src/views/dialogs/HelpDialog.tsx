@@ -8,7 +8,7 @@ import { MenuConfig } from '@/constants/menus';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { Icon, IconName } from '@/components/Icon';

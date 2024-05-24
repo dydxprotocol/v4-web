@@ -37,7 +37,7 @@ export const AdvancedTradeOptions = () => {
   const currentTradeFormConfig = useSelector(getInputTradeOptions, shallowEqual);
   const inputTradeData = useSelector(getInputTradeData, shallowEqual);
 
-  const { execution, goodTil, postOnly, reduceOnly, timeInForce, type } = inputTradeData || {};
+  const { execution, goodTil, postOnly, reduceOnly, timeInForce } = inputTradeData ?? {};
 
   const {
     executionOptions,
@@ -47,14 +47,14 @@ export const AdvancedTradeOptions = () => {
     postOnlyTooltip,
     reduceOnlyTooltip,
     timeInForceOptions,
-  } = currentTradeFormConfig || {};
+  } = currentTradeFormConfig ?? {};
 
-  const { duration, unit } = goodTil || {};
+  const { duration, unit } = goodTil ?? {};
 
-  const showPostOnly = needsPostOnly || postOnlyTooltip;
-  const showReduceOnly = needsReduceOnly || reduceOnlyTooltip;
+  const showPostOnly = !!needsPostOnly || !!postOnlyTooltip;
+  const showReduceOnly = !!needsReduceOnly || !!reduceOnlyTooltip;
 
-  const needsExecution = executionOptions || showPostOnly || showReduceOnly;
+  const needsExecution = !!executionOptions || !!showPostOnly || !!showReduceOnly;
   const hasTimeInForce = timeInForceOptions?.toArray()?.length;
 
   useEffect(() => {

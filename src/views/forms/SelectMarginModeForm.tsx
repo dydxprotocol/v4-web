@@ -8,7 +8,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { formMixins } from '@/styles/formMixins';
 
-import { Button } from '@/components/Button';
 import { RadioButtonCards } from '@/components/RadioButtonCards';
 
 import { getInputTradeMarginMode } from '@/state/inputsSelectors';
@@ -73,7 +72,4 @@ const $RadioButtonCards = styled(RadioButtonCards)`
 `;
 const $TertiarySpan = styled.span`
   color: var(--color-text-0);
-`;
-const $Button = styled(Button)`
-  width: 100%;
 `;

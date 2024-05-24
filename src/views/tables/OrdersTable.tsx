@@ -11,11 +11,12 @@ import { AbacusMarginMode, Asset, Nullable, SubaccountOrder } from '@/constants/
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
+import { EMPTY_ARR } from '@/constants/objects';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
@@ -23,13 +24,10 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
-import {
-  MarketTableCell,
-  Table,
-  TableCell,
-  TableColumnHeader,
-  type ColumnDef,
-} from '@/components/Table';
+import { ColumnDef, Table } from '@/components/Table';
+import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import { TableCell } from '@/components/Table/TableCell';
+import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
@@ -54,6 +52,7 @@ import {
 } from '@/lib/orders';
 import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
 import { getMarginModeFromSubaccountNumber } from '@/lib/tradeData';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { OrderStatusIcon } from '../OrderStatusIcon';
 import { OrderActionsCell } from './OrdersTable/OrderActionsCell';
@@ -214,16 +213,28 @@ const getOrdersTableColumnDef = ({
         isActionable: true,
         allowsSorting: false,
         getCellValue: () => '',
-        renderCell: ({ id, status }) => (
-          <OrderActionsCell orderId={id} status={status} isDisabled={isAccountViewOnly} />
+        renderCell: ({ id, status, orderFlags }) => (
+          <OrderActionsCell
+            orderId={id}
+            status={status}
+            orderFlags={orderFlags}
+            isDisabled={isAccountViewOnly}
+          />
         ),
       },
       [OrdersTableColumnKey.StatusFill]: {
         columnKey: 'statusFill',
         getCellValue: (row) => row.status.name,
-        label: `${stringGetter({ key: STRING_KEYS.STATUS })} / ${stringGetter({
-          key: STRING_KEYS.FILL,
-        })}`,
+        label: (
+          <TableColumnHeader>
+            <span>{stringGetter({ key: STRING_KEYS.STATUS })}</span>
+            <span>
+              {stringGetter({
+                key: STRING_KEYS.FILL,
+              })}
+            </span>
+          </TableColumnHeader>
+        ),
         renderCell: ({ asset, createdAtMilliseconds, size, status, totalFilled, resources }) => {
           const { statusIconColor } = getOrderStatusInfo({ status: status.rawValue });
 
@@ -293,7 +304,7 @@ const getOrdersTableColumnDef = ({
         columnKey: 'marginType',
         label: stringGetter({ key: STRING_KEYS.MARGIN_MODE }),
         getCellValue: (row) => getMarginModeFromSubaccountNumber(row.subaccountNumber).name,
-        renderCell: function (row: OrderTableRow): ReactNode {
+        renderCell(row: OrderTableRow): ReactNode {
           const marginMode = getMarginModeFromSubaccountNumber(row.subaccountNumber);
 
           const marginModeLabel =
@@ -330,12 +341,12 @@ export const OrdersTable = ({
   const { isTablet } = useBreakpoints();
 
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
-  const marketOrders = useSelector(getCurrentMarketOrders, shallowEqual) || [];
-  const allOrders = useSelector(getSubaccountUnclearedOrders, shallowEqual) || [];
+  const marketOrders = useSelector(getCurrentMarketOrders, shallowEqual) ?? EMPTY_ARR;
+  const allOrders = useSelector(getSubaccountUnclearedOrders, shallowEqual) ?? EMPTY_ARR;
   const orders = currentMarket ? marketOrders : allOrders;
 
-  const allPerpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
-  const allAssets = useSelector(getAssets, shallowEqual) || {};
+  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
 
   const hasUnseenOrderUpdates = useSelector(getHasUnseenOrderUpdates);
 

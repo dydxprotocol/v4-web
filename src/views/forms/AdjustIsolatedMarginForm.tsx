@@ -6,9 +6,7 @@ import styled from 'styled-components';
 
 import {
   AdjustIsolatedMarginInputField,
-  HumanReadableSubaccountTransferPayload,
   IsolatedMarginAdjustmentType,
-  Nullable,
   type SubaccountPosition,
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
@@ -61,7 +59,12 @@ export const AdjustIsolatedMarginForm = ({
   const { childSubaccountNumber } = subaccountPosition ?? {};
   const marketConfig = useSelector(getMarketConfig(marketId));
   const adjustIsolatedMarginInputs = useSelector(getAdjustIsolatedMarginInputs, shallowEqual);
-  const { type, amount, amountPercent, summary } = adjustIsolatedMarginInputs ?? {};
+  const {
+    type: isolatedMarginAdjustmentType,
+    amount,
+    amountPercent,
+    summary,
+  } = adjustIsolatedMarginInputs ?? {};
   const { tickSizeDecimals } = marketConfig ?? {};
 
   useEffect(() => {
@@ -92,9 +95,9 @@ export const AdjustIsolatedMarginForm = ({
     });
   };
 
-  const setMarginAction = (type: string) => {
+  const setMarginAction = (marginAction: string) => {
     abacusStateManager.setAdjustIsolatedMarginValue({
-      value: type,
+      value: marginAction,
       field: AdjustIsolatedMarginInputField.Type,
     });
   };
@@ -115,9 +118,7 @@ export const AdjustIsolatedMarginForm = ({
           setErrorMessage(stringGetter({ key: errorParams.errorStringKey as StringKey }));
         }
       },
-      onSuccess: (
-        _subaccountTransferPayload?: Nullable<HumanReadableSubaccountTransferPayload>
-      ) => {
+      onSuccess: () => {
         setIsSubmitting(false);
         abacusStateManager.clearAdjustIsolatedMarginInputValues();
         onIsolatedMarginAdjustment?.();
@@ -193,7 +194,7 @@ export const AdjustIsolatedMarginForm = ({
   );
 
   const formConfig =
-    type === IsolatedMarginAdjustmentType.Add
+    isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Add
       ? {
           formLabel: stringGetter({ key: STRING_KEYS.ADDING }),
           buttonLabel: stringGetter({ key: STRING_KEYS.ADD_MARGIN }),
@@ -281,7 +282,7 @@ export const AdjustIsolatedMarginForm = ({
       }}
     >
       <ToggleGroup
-        value={type?.name ?? IsolatedMarginAdjustmentType.Add.name}
+        value={isolatedMarginAdjustmentType?.name ?? IsolatedMarginAdjustmentType.Add.name}
         onValueChange={setMarginAction}
         items={[
           {

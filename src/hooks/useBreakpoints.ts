@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 
 export enum MediaQueryKeys {
   isMobile = 'isMobile',
@@ -12,7 +12,7 @@ export enum MediaQueryKeys {
   isDesktopLarge = 'isDesktopLarge',
 }
 
-export const mediaQueryLists = {
+const mediaQueryLists = {
   [MediaQueryKeys.isMobile]: globalThis.matchMedia(breakpoints.mobile),
   [MediaQueryKeys.isNotMobile]: globalThis.matchMedia(breakpoints.notMobile),
   [MediaQueryKeys.isTablet]: globalThis.matchMedia(breakpoints.tablet),
@@ -21,8 +21,6 @@ export const mediaQueryLists = {
   [MediaQueryKeys.isDesktopMedium]: globalThis.matchMedia(breakpoints.desktopMedium),
   [MediaQueryKeys.isDesktopLarge]: globalThis.matchMedia(breakpoints.desktopLarge),
 } as const;
-
-export const uniqueMediaQueryLists = { ...mediaQueryLists };
 
 export const useBreakpoints = () => {
   // { [typeof breakpoints['string']]: [boolean, () => void] }

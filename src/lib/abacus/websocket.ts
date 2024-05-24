@@ -20,9 +20,9 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
 
   private receivedCallback: ((p0: string) => void) | null = null;
 
-  private disconnectTimer?: NodeJS.Timer;
+  private disconnectTimer?: NodeJS.Timeout;
 
-  private reconnectTimer?: NodeJS.Timer;
+  private reconnectTimer?: NodeJS.Timeout;
 
   private currentCandleId: string | undefined;
 

@@ -6,11 +6,12 @@ import {
   Row,
   TableBody,
   TableHeader,
+  TableStateProps,
   useTableState,
   type TableState,
 } from '@react-stately/table';
 import { type GridNode } from '@react-types/grid';
-import type { CollectionChildren, Node, SortDescriptor, SortDirection } from '@react-types/shared';
+import type { Node, SortDescriptor, SortDirection } from '@react-types/shared';
 import { type ColumnSize, type TableCollection } from '@react-types/table';
 import { isFunction } from 'lodash';
 import {
@@ -30,7 +31,7 @@ import styled, { css } from 'styled-components';
 import { MediaQueryKeys, useBreakpoints } from '@/hooks/useBreakpoints';
 import { useTablePagination } from '@/hooks/useTablePagination';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -38,19 +39,6 @@ import { MustBigNumber } from '@/lib/numbers';
 import { Icon, IconName } from './Icon';
 import { PAGE_SIZES, PageSize, TablePaginationRow } from './Table/TablePaginationRow';
 import { Tag } from './Tag';
-
-export { ActionsTableCell } from './Table/ActionsTableCell';
-
-// TODO: fix circular dependencies
-// eslint-disable-next-line import/no-cycle
-export { AssetTableCell } from './Table/AssetTableCell';
-
-// TODO: remove barrel files: https://www.npmjs.com/package/eslint-plugin-no-barrel-files
-// Reasoning why: https://dev.to/tassiofront/barrel-files-and-why-you-should-stop-using-them-now-bc4
-// eslint-disable-next-line import/no-cycle
-export { MarketTableCell } from './Table/MarketTableCell';
-export { TableCell } from './Table/TableCell';
-export { TableColumnHeader } from './Table/TableColumnHeader';
 
 export type CustomRowConfig = {
   key: string;
@@ -321,8 +309,7 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
     rowIndex?: number
   ) => Record<string, string | number | Record<string, string | number>>;
   onRowAction?: (key: Key) => void;
-  children: CollectionChildren<TableRowData>;
-
+  children: TableStateProps<TableRowData>['children'];
   numColumns: number;
   paginationRow?: React.ReactNode;
 

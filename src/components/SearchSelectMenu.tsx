@@ -22,10 +22,8 @@ import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils
 type ElementProps = {
   asChild?: boolean;
   children: ReactNode;
-  disabled?: boolean;
   label?: string;
   items: MenuConfig<string, string>;
-  slotEmpty?: ReactNode;
   withSearch?: boolean;
   withReceiptItems?: DetailsItem[];
 };
@@ -49,7 +47,7 @@ export const SearchSelectMenu = ({
   const searchSelectMenuRef = useRef<HTMLDivElement & HTMLButtonElement>(null);
 
   useOnClickOutside({
-    onClickOutside(e: MouseEvent) {
+    onClickOutside() {
       setOpen(false);
     },
     ref: searchSelectMenuRef,
@@ -128,10 +126,10 @@ const $Popover = styled(Popover)`
   box-shadow: none;
 `;
 
-type comboboxMenuStyleProps = { $withSearch?: boolean };
-const ComboboxMenuStyleType = getSimpleStyledOutputType(ComboboxMenu, {} as comboboxMenuStyleProps);
+type ComboboxMenuStyleProps = { $withSearch?: boolean };
+const ComboboxMenuStyleType = getSimpleStyledOutputType(ComboboxMenu, {} as ComboboxMenuStyleProps);
 
-const $ComboboxMenu = styled(ComboboxMenu)<comboboxMenuStyleProps>`
+const $ComboboxMenu = styled(ComboboxMenu)<ComboboxMenuStyleProps>`
   ${layoutMixins.withInnerHorizontalBorders}
 
   --comboboxMenu-backgroundColor: var(--color-layer-4);

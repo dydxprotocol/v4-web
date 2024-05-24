@@ -15,7 +15,7 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Output, OutputType, ShowSign } from '@/components/Output';
@@ -30,7 +30,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 
-export const usePortfolioValues = ({
+const usePortfolioValues = ({
   equity,
   visibleData,
   activeDatum,

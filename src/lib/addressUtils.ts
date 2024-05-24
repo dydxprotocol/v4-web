@@ -1,13 +1,5 @@
 import { fromBech32, fromHex, toBech32, toHex } from '@cosmjs/encoding';
 
-// ============ Byte Helpers ============
-export const stripHexPrefix = (input: string): string => {
-  if (input.indexOf('0x') === 0) {
-    return input.substring(2);
-  }
-  return input;
-};
-
 /**
  *
  * @params {

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import { AES } from 'crypto-js';
-import { useSelector } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { EvmDerivedAccountStatus } from '@/constants/account';
@@ -9,11 +8,11 @@ import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvent } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { DydxAddress } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDydxClient } from '@/hooks/useDydxClient';
+import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useMatchingEvmNetwork } from '@/hooks/useMatchingEvmNetwork';
 import useSignForWalletDerivation from '@/hooks/useSignForWalletDerivation';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -28,8 +27,6 @@ import { Switch } from '@/components/Switch';
 import { WithReceipt } from '@/components/WithReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 
-import { getSelectedNetwork } from '@/state/appSelectors';
-
 import { track } from '@/lib/analytics';
 import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
@@ -43,7 +40,6 @@ type ElementProps = {
 
 export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: ElementProps) => {
   const stringGetter = useStringGetter();
-
   const [shouldRememberMe, setShouldRememberMe] = useState(false);
 
   const { setWalletFromEvmSignature, saveEvmSignature } = useAccounts();
@@ -51,9 +47,8 @@ export const GenerateKeys = ({ status, setStatus, onKeysDerived = () => {} }: El
   const [error, setError] = useState<string>();
 
   // 1. Switch network
-  const selectedNetwork = useSelector(getSelectedNetwork);
-
-  const chainId = Number(ENVIRONMENT_CONFIG_MAP[selectedNetwork].ethereumChainId);
+  const ethereumChainId = useEnvConfig('ethereumChainId');
+  const chainId = Number(ethereumChainId);
 
   const { isMatchingNetwork, matchNetwork, isSwitchingNetwork } = useMatchingEvmNetwork({
     chainId,

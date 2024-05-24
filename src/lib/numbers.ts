@@ -35,17 +35,6 @@ export const getFractionDigits = (unit?: BigNumber | number | string | null) =>
   // n?.toString().match(/[.](\d*)/)?.[1].length ?? 0
   unit ? Math.max(Math.ceil(-Math.log10(Math.abs(+unit))), 0) : 0;
 
-/**
- * @description Rounds the input to the nearest multiple of `tick`, which must be non-zero.
- */
-export const roundToTick = ({ num, tick }: { num: number; tick: number }): number => {
-  if (tick === 0) {
-    throw Error('Invalid dividend');
-  }
-  const absTick: number = Math.abs(tick);
-  return Math.round(num / absTick) * absTick;
-};
-
 export const isNumber = (value: any): value is number =>
   typeof value === 'number' && !Number.isNaN(value);
 

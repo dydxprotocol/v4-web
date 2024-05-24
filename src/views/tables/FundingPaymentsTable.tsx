@@ -4,14 +4,16 @@ import styled from 'styled-components';
 
 import type { Asset, SubaccountFundingPayment } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { EMPTY_ARR } from '@/constants/objects';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { Output, OutputType } from '@/components/Output';
-import { Table, TableCell, type ColumnDef } from '@/components/Table';
+import { Table, type ColumnDef } from '@/components/Table';
 import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import { TableCell } from '@/components/Table/TableCell';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 
 import {
@@ -24,6 +26,7 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 import { MustBigNumber } from '@/lib/numbers';
 import { getHydratedTradingData } from '@/lib/orders';
 import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 type ElementProps = {
   currentMarket?: string;
@@ -47,12 +50,13 @@ export const FundingPaymentsTable = ({
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
 
-  const marketFundingPayments = useSelector(getCurrentMarketFundingPayments, shallowEqual) || [];
-  const allFundingPayments = useSelector(getSubaccountFundingPayments, shallowEqual) || [];
+  const marketFundingPayments =
+    useSelector(getCurrentMarketFundingPayments, shallowEqual) ?? EMPTY_ARR;
+  const allFundingPayments = useSelector(getSubaccountFundingPayments, shallowEqual) ?? EMPTY_ARR;
   const fundingPayments = currentMarket ? marketFundingPayments : allFundingPayments;
 
-  const allPerpetualMarkets = useSelector(getPerpetualMarkets, shallowEqual) || {};
-  const allAssets = useSelector(getAssets, shallowEqual) || {};
+  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
 
   const fundingPaymentsData = fundingPayments.map((fundingPayment: SubaccountFundingPayment) =>
     getHydratedTradingData({
@@ -142,11 +146,7 @@ export const FundingPaymentsTable = ({
           },
         ] as ColumnDef<FundingPaymentTableRow>[]
       ).filter(Boolean)}
-      slotEmpty={
-        <>
-          <h4>{stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_EMPTY_STATE })}</h4>
-        </>
-      }
+      slotEmpty={<h4>{stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_EMPTY_STATE })}</h4>}
       initialPageSize={initialPageSize}
       withOuterBorder={withOuterBorder}
       withInnerBorders
