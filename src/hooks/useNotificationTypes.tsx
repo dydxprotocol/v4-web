@@ -275,7 +275,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const { chainTokenLabel } = useTokenConfigs();
       const stringGetter = useStringGetter();
 
-      const incentivesExpirationDate = new Date('2024-05-09T23:59:59');
+      const incentivesExpirationDate = new Date('2024-06-01T23:59:59');
       const conditionalOrdersExpirationDate = new Date('2024-06-01T23:59:59');
 
       const currentDate = new Date();
@@ -283,23 +283,23 @@ export const notificationTypes: NotificationTypeConfig[] = [
       useEffect(() => {
         if (currentDate <= incentivesExpirationDate) {
           trigger(
-            ReleaseUpdateNotificationIds.IncentivesS4,
+            ReleaseUpdateNotificationIds.IncentivesS5,
             {
               icon: <AssetIcon symbol={chainTokenLabel} />,
               title: stringGetter({
                 key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.TITLE',
-                params: { SEASON_NUMBER: '4' },
+                params: { SEASON_NUMBER: '5' },
               }),
               body: stringGetter({
                 key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.BODY',
                 params: {
-                  PREV_SEASON_NUMBER: '2',
-                  DYDX_AMOUNT: '16',
-                  USDC_AMOUNT: '50',
+                  PREV_SEASON_NUMBER: '3',
+                  DYDX_AMOUNT: '52',
+                  USDC_AMOUNT: '100',
                 },
               }),
               toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.IncentivesS4,
+              groupKey: ReleaseUpdateNotificationIds.IncentivesS5,
             },
             []
           );
@@ -372,7 +372,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const navigate = useNavigate();
 
       return (notificationId: string) => {
-        if (notificationId === ReleaseUpdateNotificationIds.IncentivesS4) {
+        if (notificationId === ReleaseUpdateNotificationIds.IncentivesS5) {
           navigate(`${chainTokenLabel}/${TokenRoute.TradingRewards}`);
         } else if (notificationId === ReleaseUpdateNotificationIds.IncentivesDistributedS3) {
           navigate(`${chainTokenLabel}/${TokenRoute.StakingRewards}`);
