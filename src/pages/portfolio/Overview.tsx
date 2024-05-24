@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -19,6 +21,7 @@ import {
 
 import { isTruthy } from '@/lib/isTruthy';
 
+import { MaybeUnopenedIsolatedPositionsPanel } from '../trade/UnopenedIsolatedPositions';
 import { AccountDetailsAndHistory } from './AccountDetailsAndHistory';
 
 export const Overview = () => {
@@ -28,6 +31,15 @@ export const Overview = () => {
 
   const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
   const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable(true));
+
+  const handleViewUnopenedIsolatedOrders = useCallback(
+    (market: string) => {
+      navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
+        state: { from: AppRoute.Portfolio },
+      });
+    },
+    [navigate]
+  );
 
   return (
     <div>
@@ -67,10 +79,24 @@ export const Overview = () => {
           showClosePositionAction
           withOuterBorder
         />
+        <$MaybeUnopenedIsolatedPositionsPanel
+          header={
+            <ContentSectionHeader
+              title={stringGetter({ key: STRING_KEYS.UNOPENED_ISOLATED_POSITIONS })}
+            />
+          }
+          onViewOrders={handleViewUnopenedIsolatedOrders}
+        />
       </$AttachedExpandingSection>
     </div>
   );
 };
+
 const $AttachedExpandingSection = styled(AttachedExpandingSection)`
   margin-top: 1rem;
+`;
+
+const $MaybeUnopenedIsolatedPositionsPanel = styled(MaybeUnopenedIsolatedPositionsPanel)`
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 `;
