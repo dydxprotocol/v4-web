@@ -15,9 +15,9 @@ import {
   CompositeClient,
   LocalWallet as LocalWalletType,
   Network,
+  ProposalStatus,
   TransactionOptions,
   VoteOption,
-  ProposalStatus,
 } from '@dydxprotocol/v4-client-js';
 import {
   Perpetual,
@@ -297,8 +297,9 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
 
     // `adjustByMarket` should be set if ticker doesn't end in usd or USD.
     if (
-      (exchange.exchangeName !== ExchangeName.Raydium) &&
-      (!/usd$|usdc$/i.test(exchange.ticker) && exchange.adjustByMarket === undefined) ||
+      (exchange.exchangeName !== ExchangeName.Raydium &&
+        !/usd$|usdc$/i.test(exchange.ticker) &&
+        exchange.adjustByMarket === undefined) ||
       exchange.adjustByMarket === ''
     ) {
       throw new Error(
@@ -309,12 +310,12 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
 
     // TODO: Skip Bybit exchange until we can query from non-US IP.
     if (exchange.exchangeName === ExchangeName.Bybit) {
-      return; // exit the current iteration of the loop.
+      continue; // exit the current iteration of the loop.
     }
 
     // TODO: Skip Raydium since ticker is idiosyncratic
     if (exchange.exchangeName === ExchangeName.Raydium) {
-      return; // exit the current iteration of the loop.
+      continue; // exit the current iteration of the loop.
     }
 
     // Query exchange tickers if not yet.
