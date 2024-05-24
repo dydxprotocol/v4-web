@@ -70,20 +70,27 @@ export type TableItem<TableRowData> = {
 
 export type BaseTableRowData = {};
 
+type SortableColumnDef<TableRowData extends BaseTableRowData | CustomRowConfig> = {
+  allowsSorting?: true;
+  getCellValue: (row: TableRowData) => string | number | undefined | null;
+};
+
+type NonSortableColumnDef = {
+  allowsSorting: false;
+};
+
 export type ColumnDef<TableRowData extends BaseTableRowData | CustomRowConfig> = {
   columnKey: string;
   label: React.ReactNode;
   tag?: React.ReactNode;
   colspan?: number;
   childColumns?: ColumnDef<TableRowData>[];
-  getCellValue: (row: TableRowData) => string | number;
-  allowsSorting?: boolean; // Default true
   allowsResizing?: boolean;
   renderCell: (row: TableRowData) => React.ReactNode;
   isActionable?: boolean;
   hideOnBreakpoint?: MediaQueryKeys;
   width?: ColumnSize;
-};
+} & (SortableColumnDef<TableRowData> | NonSortableColumnDef);
 
 export type TableElementProps<TableRowData extends BaseTableRowData | CustomRowConfig> = {
   label?: string;
@@ -163,8 +170,21 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
     if (!sortColumn) return 0;
 
     const column = columns.find((c) => c.columnKey === sortColumn);
-    const first = isCustomRow(a) ? 0 : column?.getCellValue(a);
-    const second = isCustomRow(b) ? 0 : column?.getCellValue(b);
+    if (column == null || column.allowsSorting === false) {
+      return 0;
+    }
+    const first = (isCustomRow(a) ? 0 : column.getCellValue(a)) ?? undefined;
+    const second = (isCustomRow(b) ? 0 : column.getCellValue(b)) ?? undefined;
+
+    if (first == null || second == null) {
+      if (first === second) {
+        return 0;
+      }
+      if (first != null) {
+        return 1;
+      }
+      return -1;
+    }
 
     return (
       // Compare the items by the sorted column
@@ -541,7 +561,7 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
     >
       <$Row>
         {column.rendered}
-        {column.props.allowsSorting && (
+        {(column.props.allowsSorting ?? true) && (
           <$SortArrow
             aria-hidden="true"
             sortDirection={

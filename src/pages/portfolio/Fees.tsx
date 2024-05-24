@@ -109,7 +109,6 @@ export const Fees = () => {
             [
               {
                 columnKey: 'tier',
-                getCellValue: (row) => row.tier,
                 label: stringGetter({ key: STRING_KEYS.TIER }),
                 allowsSorting: false,
                 renderCell: ({ tier }) => (
@@ -125,7 +124,6 @@ export const Fees = () => {
               },
               {
                 columnKey: 'volume',
-                getCellValue: (row) => row.volume,
                 label: stringGetter({ key: STRING_KEYS.VOLUME_30D }),
                 allowsSorting: false,
                 renderCell: ({ symbol, volume: vol, makerShare, totalShare }) => (
@@ -143,7 +141,6 @@ export const Fees = () => {
               },
               isNotTablet && {
                 columnKey: 'condition',
-                getCellValue: (row) => row.volume,
                 label: stringGetter({ key: STRING_KEYS.ADDITIONAL_CONDITION }),
                 allowsSorting: false,
                 renderCell: ({ totalShare, makerShare }) =>
@@ -151,7 +148,6 @@ export const Fees = () => {
               },
               {
                 columnKey: 'maker',
-                getCellValue: (row) => row.maker,
                 label: stringGetter({ key: STRING_KEYS.MAKER }),
                 allowsSorting: false,
                 renderCell: ({ maker }) => (
@@ -164,7 +160,6 @@ export const Fees = () => {
               },
               {
                 columnKey: 'taker',
-                getCellValue: (row) => row.taker,
                 label: stringGetter({ key: STRING_KEYS.TAKER }),
                 allowsSorting: false,
                 renderCell: ({ taker }) => (

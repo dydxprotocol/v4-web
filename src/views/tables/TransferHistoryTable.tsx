@@ -108,7 +108,7 @@ const getTransferHistoryTableColumnDef = ({
             '-'
           ),
       },
-    } as Record<TransferHistoryTableColumnKey, ColumnDef<SubaccountTransfer>>
+    } satisfies Record<TransferHistoryTableColumnKey, ColumnDef<SubaccountTransfer>>
   )[key],
 });
 

@@ -350,7 +350,7 @@ const getPositionsTableColumnDef = ({
           />
         ),
       },
-    } as Record<PositionsTableColumnKey, ColumnDef<PositionTableRow>>
+    } satisfies Record<PositionsTableColumnKey, ColumnDef<PositionTableRow>>
   )[key],
 });
 
