@@ -78,7 +78,7 @@ const getTradingRewardHistoryTableColumnDef = ({
           />
         ),
       },
-    } as Record<TradingRewardHistoryTableColumnKey, ColumnDef<HistoricalTradingReward>>
+    } satisfies Record<TradingRewardHistoryTableColumnKey, ColumnDef<HistoricalTradingReward>>
   )[key],
 });
 

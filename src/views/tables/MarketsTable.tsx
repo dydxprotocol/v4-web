@@ -114,7 +114,6 @@ export const MarketsTable = ({ className }: { className?: string }) => {
             },
             {
               columnKey: 'priceChange24HChart',
-              getCellValue: (row) => row.priceChange24HPercent,
               label: stringGetter({ key: STRING_KEYS.LAST_24H }),
               renderCell: ({ line, priceChange24HPercent }) => (
                 <div style={{ width: 50, height: 50 }}>
