@@ -1,7 +1,7 @@
 import { FormEvent, useState } from 'react';
 
 import { NumberFormatValues } from 'react-number-format';
-import { shallowEqual, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
@@ -25,7 +25,6 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithLabel } from '@/components/WithLabel';
 
-import { getSubaccount } from '@/state/accountSelectors';
 import { getInputTradeTargetLeverage } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -37,8 +36,7 @@ export const AdjustTargetLeverageForm = ({
   onSetTargetLeverage: (value: string) => void;
 }) => {
   const stringGetter = useStringGetter();
-  const { governanceLearnMore } = useURLConfigs();
-  const { buyingPower } = useSelector(getSubaccount, shallowEqual) ?? {};
+  const { adjustTargetLeverageLearnMore } = useURLConfigs();
 
   /**
    * @todo: Replace with Abacus functionality
@@ -62,7 +60,7 @@ export const AdjustTargetLeverageForm = ({
     >
       <$Description>
         {stringGetter({ key: STRING_KEYS.ADJUST_TARGET_LEVERAGE_DESCRIPTION })}
-        <Link withIcon href={''}>
+        <Link withIcon href={adjustTargetLeverageLearnMore}>
           {stringGetter({ key: STRING_KEYS.LEARN_MORE })}
         </Link>
       </$Description>
@@ -178,9 +176,6 @@ const $InnerInputContainer = styled.div`
   @media ${breakpoints.tablet} {
     --input-height: 2.5rem;
   }
-`;
-const $LeverageSide = styled.div`
-  cursor: pointer;
 `;
 const $ToggleGroup = styled(ToggleGroup)`
   ${formMixins.inputToggleGroup}
