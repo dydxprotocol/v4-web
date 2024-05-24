@@ -9,7 +9,7 @@ class AbacusLogger implements Omit<AbacusLoggingProtocol, '__doNotUseOrImplement
   }
 
   e(tag: string, message: string) {
-    if (true) {
+    if (import.meta.env.VITE_ENABLE_ABACUS_LOGGING) {
       console.error(`${tag}: ${message}`);
     }
   }

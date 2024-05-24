@@ -6,8 +6,7 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { layoutMixins } from '@/styles/layoutMixins';
-
+import { Icon, IconName } from '@/components/Icon';
 import { Panel } from '@/components/Panel';
 import { TradingRewardsChart } from '@/views/charts/TradingRewardsChart';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
@@ -40,7 +39,12 @@ export const TradingRewardsChartPanel = () => {
                   <OnboardingTriggerButton />
                 </>
               ) : (
-                'No trading rewards' // xcx dont render totile
+                <>
+                  <$EmptyIcon iconName={IconName.OrderPending} />
+                  {stringGetter({
+                    key: STRING_KEYS.TRADING_REWARD_CHART_EMPTY_STATE,
+                  })}
+                </>
               )}
             </$EmptyCard>
           </$EmptyChart>
@@ -52,10 +56,7 @@ export const TradingRewardsChartPanel = () => {
 
 const $TradingRewardsChart = styled(TradingRewardsChart)`
   --trading-rewards-line-color: var(--color-positive);
-  position: relative;
   height: 20rem;
-  overscroll-behavior: contain;
-  touch-action: none;
 `;
 
 const $EmptyChart = styled.div`
@@ -65,10 +66,18 @@ const $EmptyChart = styled.div`
 
 const $EmptyCard = styled.div`
   width: 16.75rem;
-  ${layoutMixins.column};
-  font: var(--font-base-book);
-  gap: 1rem;
-  margin: auto;
-  padding: 2rem 1rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
+  margin: auto;
+  gap: 1rem;
+
+  font: var(--font-base-book);
+  color: var(--color-text-0);
+`;
+
+const $EmptyIcon = styled(Icon)`
+  font-size: 3em;
 `;

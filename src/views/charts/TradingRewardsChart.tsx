@@ -200,7 +200,7 @@ export const TradingRewardsChart = ({
         tickSpacingX={210}
         tickSpacingY={50}
       >
-        {canViewAccount && (
+        {rewardsData.length > 0 && (
           <$Value>
             {MustBigNumber(
               tooltipContext?.tooltipData?.nearestDatum?.datum?.cumulativeAmount ??

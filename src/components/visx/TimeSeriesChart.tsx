@@ -371,9 +371,9 @@ export const TimeSeriesChart = <Datum extends {}>({
                           stroke="var(--color-border)"
                           // hideTicks
                           tickStroke="var(--color-border)"
-                          tickFormat={(y) => {
-                            return tickFormatY(y, { zoom, zoomDomain, numTicks: numTicksY });
-                          }}
+                          tickFormat={(y) =>
+                            tickFormatY(y, { zoom, zoomDomain, numTicks: numTicksY })
+                          }
                         />
                       </>
                     )}
