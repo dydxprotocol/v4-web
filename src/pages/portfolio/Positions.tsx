@@ -35,14 +35,11 @@ export const Positions = () => {
     calculateShouldRenderActionsInPositionsTable(showClosePositionAction)
   );
 
-  const handleViewUnopenedIsolatedOrders = useCallback(
-    (market: string) => {
-      navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
-        state: { from: AppRoute.Portfolio },
-      });
-    },
-    [navigate]
-  );
+  const handleViewUnopenedIsolatedOrders = useCallback(() => {
+    navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
+      state: { from: AppRoute.Portfolio },
+    });
+  }, [navigate]);
 
   return (
     <$AttachedExpandingSection>

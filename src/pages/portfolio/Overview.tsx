@@ -32,14 +32,11 @@ export const Overview = () => {
   const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
   const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable(true));
 
-  const handleViewUnopenedIsolatedOrders = useCallback(
-    (market: string) => {
-      navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
-        state: { from: AppRoute.Portfolio },
-      });
-    },
-    [navigate]
-  );
+  const handleViewUnopenedIsolatedOrders = useCallback(() => {
+    navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
+      state: { from: AppRoute.Portfolio },
+    });
+  }, [navigate]);
 
   return (
     <div>
