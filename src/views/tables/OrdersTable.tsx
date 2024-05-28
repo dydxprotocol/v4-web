@@ -31,7 +31,7 @@ import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
-import { IsolatedPanelFilter, marketTypeMatchesFilter } from '@/pages/trade/types';
+import { MarketTypeFilter, marketTypeMatchesFilter } from '@/pages/trade/types';
 
 import { viewedOrders } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
@@ -322,7 +322,7 @@ type ElementProps = {
   columnKeys: OrdersTableColumnKey[];
   columnWidths?: Partial<Record<OrdersTableColumnKey, ColumnSize>>;
   currentMarket?: string;
-  marketTypeFilter?: IsolatedPanelFilter;
+  marketTypeFilter?: MarketTypeFilter;
   initialPageSize?: PageSize;
 };
 

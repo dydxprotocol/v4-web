@@ -45,7 +45,7 @@ import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
 
 import { UnopenedIsolatedPositions } from './UnopenedIsolatedPositions';
-import { IsolatedPanelFilter } from './types';
+import { MarketTypeFilter } from './types';
 
 enum InfoSection {
   Position = 'Position',
@@ -73,9 +73,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const [view, setView] = useState<PanelView>(
     allMarkets ? PanelView.AllMarkets : PanelView.CurrentMarket
   );
-  const [viewIsolated, setViewIsolated] = useState<IsolatedPanelFilter>(
-    IsolatedPanelFilter.AllMarkets
-  );
+  const [viewIsolated, setViewIsolated] = useState<MarketTypeFilter>(MarketTypeFilter.AllMarkets);
   const [tab, setTab] = useState<InfoSection>(InfoSection.Position);
 
   const currentMarketId = useSelector(getCurrentMarketId);
@@ -314,22 +312,22 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
             <$SelectMenu
               value={viewIsolated}
               onValueChange={(newViewIsolated: string) => {
-                setViewIsolated(newViewIsolated as IsolatedPanelFilter);
+                setViewIsolated(newViewIsolated as MarketTypeFilter);
               }}
             >
               <$SelectItem
-                key={IsolatedPanelFilter.AllMarkets}
-                value={IsolatedPanelFilter.AllMarkets}
+                key={MarketTypeFilter.AllMarkets}
+                value={MarketTypeFilter.AllMarkets}
                 label="All"
               />
               <$SelectItem
-                key={IsolatedPanelFilter.Isolated}
-                value={IsolatedPanelFilter.Isolated}
+                key={MarketTypeFilter.Isolated}
+                value={MarketTypeFilter.Isolated}
                 label="Isolated"
               />
               <$SelectItem
-                key={IsolatedPanelFilter.Cross}
-                value={IsolatedPanelFilter.Cross}
+                key={MarketTypeFilter.Cross}
+                value={MarketTypeFilter.Cross}
                 label="Cross"
               />
             </$SelectMenu>
