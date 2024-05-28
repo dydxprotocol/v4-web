@@ -275,7 +275,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const { chainTokenLabel } = useTokenConfigs();
       const stringGetter = useStringGetter();
 
-      const incentivesExpirationDate = new Date('2024-06-01T23:59:59');
+      const incentivesExpirationDate = new Date('2024-07-17T23:59:59');
       const conditionalOrdersExpirationDate = new Date('2024-06-01T23:59:59');
 
       const currentDate = new Date();
