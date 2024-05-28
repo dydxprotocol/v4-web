@@ -5313,60 +5313,6 @@
       "cmcId": 13855.0
     }
   },
-  "NEXO": {
-    "title": "Add NEXO-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a NEXO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 94,
-      "ticker": "NEXO-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -9.0,
-      "minPriceChange": 4000,
-      "minExchanges": 1,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "Binance",
-          "ticker": "NEXOUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "Bitstamp",
-          "ticker": "NEXO/USD"
-        },
-        {
-          "exchangeName": "Bybit",
-          "ticker": "NEXOUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "Huobi",
-          "ticker": "nexousdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "Mexc",
-          "ticker": "NEXO_USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 2,
-      "atomicResolution": -6.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Nexo",
-      "referencePrice": 1.4385909655334577,
-      "cmcId": 2694.0
-    }
-  },
   "APE": {
     "title": "Add APE-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a APE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
