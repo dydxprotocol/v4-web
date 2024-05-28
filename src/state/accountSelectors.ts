@@ -104,6 +104,9 @@ export const getCurrentMarketPositionData = (state: RootState) => {
   )[currentMarketId as string];
 };
 
+/**
+ * @returns the current leverage of the isolated position. Selector will return null if position is not isolated or does not exist.
+ */
 export const getCurrentMarketIsolatedPositionLeverage = createSelector(
   [getCurrentMarketPositionData],
   ({ leverage, marginMode }) => {
