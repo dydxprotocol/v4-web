@@ -5,10 +5,7 @@ import {
   type ThemeProps,
 } from 'styled-components';
 
-export const tradeViewMixins: Record<
-  string,
-  FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>
-> = {
+export const tradeViewMixins = {
   horizontalTable: css`
     --tableCell-padding: 0.5rem 0.25rem;
     --tableStickyRow-backgroundColor: var(--color-layer-2);
@@ -37,4 +34,4 @@ export const tradeViewMixins: Record<
       --tableCell-padding: 0.5rem 1rem 0.5rem 1rem;
     }
   `,
-};
+} satisfies Record<string, FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>>;
