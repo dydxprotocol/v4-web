@@ -27,6 +27,9 @@ export const getStatefulOrderEquityTiers = createAppSelector(
   (t) => t?.toArray()
 );
 
+export const getStatefulOrderEquityTiers = (state: RootState) =>
+  state.configs.equityTiers?.statefulOrderEquityTiers?.toArray();
+
 export const getHasSeenLaunchIncentives = (state: RootState) =>
   state.configs.hasSeenLaunchIncentives;
 
