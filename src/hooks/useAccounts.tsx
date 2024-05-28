@@ -260,7 +260,7 @@ const useAccountsContext = () => {
     if (dydxAddress) {
       abacusStateManager.setAccount(localDydxWallet, hdKey);
     } else abacusStateManager.attemptDisconnectAccount();
-  }, [localDydxWallet, hdKey, dydxAddress]);
+  }, [localDydxWallet, hdKey]);
 
   useEffect(() => {
     const setNobleWallet = async () => {
