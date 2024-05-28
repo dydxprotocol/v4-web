@@ -28,7 +28,6 @@ import { calculateIsAccountLoading } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getInputErrors } from '@/state/inputsSelectors';
-import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { isNumber, MustBigNumber } from '@/lib/numbers';
 
@@ -56,7 +55,6 @@ export const AccountInfoConnectedState = () => {
   const { dydxAccounts } = useAccounts();
 
   const inputErrors = useSelector(getInputErrors, shallowEqual);
-  const currentMarketId = useSelector(getCurrentMarketId);
   const subAccount = useSelector(getSubaccount, shallowEqual);
   const isLoading = useSelector(calculateIsAccountLoading);
 
@@ -131,7 +129,7 @@ export const AccountInfoConnectedState = () => {
             {
               key: AccountInfoItem.MarginUsage,
               hasError: listOfErrors?.includes('INVALID_NEW_ACCOUNT_MARGIN_USAGE'),
-              tooltip: 'margin-usage',
+              tooltip: 'cross-margin-usage',
               isPositive: !MustBigNumber(marginUsage?.postOrder).gt(
                 MustBigNumber(marginUsage?.current)
               ),
@@ -144,8 +142,7 @@ export const AccountInfoConnectedState = () => {
               key: AccountInfoItem.BuyingPower,
               hasError:
                 isNumber(buyingPower?.postOrder) && MustBigNumber(buyingPower?.postOrder).lt(0),
-              tooltip: 'buying-power',
-              stringParams: { MARKET: currentMarketId },
+              tooltip: 'cross-free-collateral',
               isPositive: MustBigNumber(buyingPower?.postOrder).gt(
                 MustBigNumber(buyingPower?.current)
               ),
@@ -161,7 +158,6 @@ export const AccountInfoConnectedState = () => {
               key,
               hasError,
               tooltip = undefined,
-              stringParams,
               isPositive,
               label,
               type,
@@ -170,7 +166,7 @@ export const AccountInfoConnectedState = () => {
             }) => ({
               key,
               label: (
-                <WithTooltip tooltip={tooltip} stringParams={stringParams}>
+                <WithTooltip tooltip={tooltip}>
                   <$WithUsage>
                     {label}
                     {hasError ? <$CautionIcon iconName={IconName.CautionCircle} /> : slotRight}
