@@ -30,8 +30,8 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: 1.7.29
-    version: 1.7.29
+    specifier: 1.7.33
+    version: 1.7.33
   '@dydxprotocol/v4-client-js':
     specifier: ^1.1.13
     version: 1.1.13
@@ -1375,8 +1375,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.7.29:
-    resolution: {integrity: sha512-WQ7acWOBVKg/JDPTlsUOT3SAyNifp5J+XT87RuhvCSqZP9rSVPvUF71n1onqRXZSazuwFgfun/lKX98YXxKThg==}
+  /@dydxprotocol/v4-abacus@1.7.33:
+    resolution: {integrity: sha512-x5MarvUw5H70XszO8XujTZca0Jkm1Yqa85Sj1IF/ewdiEV4FxHQy2fkiSxCj6r4nQleQJUYdOoOA3iFYOecmbQ==}
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
@@ -3044,6 +3044,7 @@ packages:
     dependencies:
       is-glob: 4.0.3
       micromatch: 4.0.5
+      napi-wasm: 1.1.0
     dev: false
     bundledDependencies:
       - napi-wasm
@@ -15404,6 +15405,10 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
     dev: true
+
+  /napi-wasm@1.1.0:
+    resolution: {integrity: sha512-lHwIAJbmLSjF9VDRm9GoVOy9AGp3aIvkjv+Kvz9h16QR3uSVYH78PNQUnT2U4X53mhlnV2M7wrhibQ3GHicDmg==}
+    dev: false
 
   /native-abort-controller@1.0.4(abort-controller@3.0.0):
     resolution: {integrity: sha512-zp8yev7nxczDJMoP6pDxyD20IU0T22eX8VwN2ztDccKvSZhRaV33yP1BGwKSZfXuqWUzsXopVFjBdau9OOAwMQ==}
