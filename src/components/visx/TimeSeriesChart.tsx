@@ -233,6 +233,7 @@ export const TimeSeriesChart = <Datum extends {}>({
   };
 
   useEffect(() => {
+    // Prevents scrolling of the page when user is hovered over chart (scrolling should adjust zoom of the chart instead)
     chartRef.current?.addEventListener('wheel', (e) => e.preventDefault());
   }, [chartRef]);
 
