@@ -36,13 +36,8 @@ dependencies:
     specifier: ^1.1.13
     version: 1.1.13
   '@dydxprotocol/v4-localization':
-<<<<<<< tu/adjust-target-leverage-designs
-    specifier: ^1.1.87
-    version: 1.1.87
-=======
     specifier: ^1.1.92
     version: 1.1.92
->>>>>>> isolated-market-trading
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -1416,13 +1411,8 @@ packages:
       - utf-8-validate
     dev: false
 
-<<<<<<< tu/adjust-target-leverage-designs
-  /@dydxprotocol/v4-localization@1.1.87:
-    resolution: {integrity: sha512-KmCTUPdHQ57GvYgHyAAlkoQc8b//A8RrVHIOwnoJk1SmAsB8iU70tx2RQ4CLs1MWwrIpCimPGM+wD+mL8oeg1A==}
-=======
   /@dydxprotocol/v4-localization@1.1.92:
     resolution: {integrity: sha512-h5BiqPzzUsBAOEyrr5Jxa0q6VdGsjrMCH6IVtTbQlX9DqDPDRNbwzLDSrJvadyZE0iuQFnlmoQqDhZH/WXUjdA==}
->>>>>>> isolated-market-trading
     dev: false
 
   /@dydxprotocol/v4-proto@5.0.0-dev.0:
@@ -11779,6 +11769,7 @@ packages:
       is-hex-prefixed: 1.0.0
       strip-hex-prefix: 1.0.0
     dev: false
+    bundledDependencies: false
 
   /event-emitter@0.3.5:
     resolution: {integrity: sha512-D9rRn9y7kLPnJ+hMq7S/nhvoKwwvVJahBi2BPmx3bvbsEdK3W9ii8cBSGjP+72/LnM4n6fo3+dkCX5FeTQruXA==}
