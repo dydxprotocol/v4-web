@@ -5381,66 +5381,6 @@
       "cmcId": 18876.0
     }
   },
-  "AEVO": {
-    "title": "Add AEVO-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a AEVO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 97,
-      "ticker": "AEVO-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
-      "priceExponent": -10.0,
-      "minPriceChange": 4000,
-      "minExchanges": 3,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "Binance",
-          "ticker": "AEVOUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "Bybit",
-          "ticker": "AEVOUSDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "Gate",
-          "ticker": "AEVO_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "Kucoin",
-          "ticker": "AEVO-USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "Mexc",
-          "ticker": "AEVO_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "Okx",
-          "ticker": "AEVO-USDT",
-          "adjustByMarket": "USDT-USD"
-        }
-      ],
-      "liquidityTier": 2,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Aevo",
-      "referencePrice": 0.914545093606788,
-      "cmcId": 29676.0
-    }
-  },
   "CKB": {
     "title": "Add CKB-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a CKB-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
