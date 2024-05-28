@@ -127,7 +127,7 @@ const $Description = styled.div`
   --link-color: var(--color-text-1);
 
   a {
-    display: inline;
+    display: inline-grid;
     margin-left: 0.5ch;
   }
 `;
