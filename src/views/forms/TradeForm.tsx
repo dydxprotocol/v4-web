@@ -250,7 +250,9 @@ export const TradeForm = ({
         field: TradeInputField.targetLeverage,
       });
     }
-  }, [currentLeverageForIsolatedPosition]);
+    // We only want to set the target leverage once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [Boolean(currentLeverageForIsolatedPosition)]);
 
   const { setUnIndexedClientId } = useOnLastOrderIndexed({
     callback: onLastOrderIndexed,
