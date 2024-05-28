@@ -10,10 +10,11 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
-import { Output, OutputType } from '@/components/Output';
+import { Output, OutputType, ShowSign } from '@/components/Output';
 import { Table, type ColumnDef } from '@/components/Table';
 import { TableCell } from '@/components/Table/TableCell';
 
@@ -73,10 +74,11 @@ const getTradingRewardHistoryTableColumnDef = ({
         getCellValue: (row) => row.amount,
         label: stringGetter({ key: STRING_KEYS.EARNED }),
         renderCell: ({ amount }) => (
-          <Output
+          <$Output
             type={OutputType.Asset}
             value={amount}
-            slotRight={<$AssetIcon symbol={chainTokenLabel} />}
+            showSign={ShowSign.Both}
+            slotRight={<AssetIcon symbol={chainTokenLabel} />}
           />
         ),
       },
@@ -109,14 +111,13 @@ export const TradingRewardHistoryTable = ({
     shallowEqual
   );
 
-  const rewardsData = useMemo(
-    () => (periodTradingRewards && canViewAccount ? periodTradingRewards.toArray() : []),
-    [periodTradingRewards, canViewAccount]
-  );
+  const rewardsData = useMemo(() => {
+    return periodTradingRewards && canViewAccount ? periodTradingRewards.toArray() : [];
+  }, [periodTradingRewards, canViewAccount]);
 
   return (
     <$Table
-      label={stringGetter({ key: STRING_KEYS.REWARD_HISTORY })}
+      label={stringGetter({ key: STRING_KEYS.TRADING_REWARD_HISTORY })}
       data={rewardsData}
       getRowKey={(row: any) => row.startedAtInMilliseconds}
       columns={columnKeys.map((key: TradingRewardHistoryTableColumnKey) =>
@@ -143,12 +144,16 @@ export const TradingRewardHistoryTable = ({
 };
 
 const $Table = styled(Table)`
-  --tableCell-padding: 0.5rem 0;
-  --tableStickyRow-backgroundColor: var(--color-layer-3);
-  --tableRow-backgroundColor: var(--color-layer-3);
+  ${tradeViewMixins.horizontalTable}
+
+  tr {
+    &:after {
+      content: '';
+    }
+  }
 
   tbody {
-    font: var(--font-medium-book);
+    font: var(--font-small-book);
   }
 ` as typeof Table;
 
@@ -170,10 +175,6 @@ const $TimePeriod = styled.div`
   }
 `;
 
-const $AssetIcon = styled(AssetIcon)`
-  margin-left: 0.5ch;
-`;
-
 const $Column = styled.div`
   display: flex;
   flex-direction: column;
@@ -183,4 +184,9 @@ const $Column = styled.div`
 
 const $EmptyIcon = styled(Icon)`
   font-size: 3em;
+`;
+
+const $Output = styled(Output)`
+  --output-sign-color: var(--color-positive);
+  gap: 0.5ch;
 `;

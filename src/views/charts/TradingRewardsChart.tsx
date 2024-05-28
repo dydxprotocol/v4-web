@@ -75,6 +75,7 @@ export const TradingRewardsChart = ({
   const [selectedPeriod, setSelectedPeriod] = useState<TradingRewardsPeriod>(
     TradingRewardsPeriod.PeriodAllTime
   );
+  const [defaultZoomDomain, setDefaultZoomDomain] = useState<number | undefined>(undefined);
 
   const canViewAccount = useSelector(calculateCanViewAccount);
   const totalTradingRewards = useSelector(getTotalTradingRewards);
@@ -87,38 +88,6 @@ export const TradingRewardsChart = ({
     // Initialize daily data for rewards chart
     abacusStateManager.setHistoricalTradingRewardPeriod(HistoricalTradingRewardsPeriod.DAILY);
   }, [canViewAccount]);
-
-  const msForPeriod = useCallback(
-    (period: TradingRewardsPeriod) => {
-      switch (period) {
-        case TradingRewardsPeriod.Period1d:
-          return 1 * timeUnits.day;
-        case TradingRewardsPeriod.Period7d:
-          return 7 * timeUnits.day;
-        case TradingRewardsPeriod.Period30d:
-          return 30 * timeUnits.day;
-        case TradingRewardsPeriod.Period90d:
-          return 90 * timeUnits.day;
-        case TradingRewardsPeriod.PeriodAllTime:
-        default:
-          return (now - Number(rewardsHistoryStartDate) + 1) * timeUnits.day;
-      }
-    },
-    [now, rewardsHistoryStartDate]
-  );
-
-  // Unselect selected period in toggle if user zooms in/out
-  const onZoomSnap = useMemo(
-    () =>
-      debounce(({ zoomDomain }: { zoomDomain?: number }) => {
-        if (zoomDomain) {
-          setIsZooming(!tradingRewardsPeriods.map(msForPeriod).includes(zoomDomain));
-        }
-      }, 200),
-    [msForPeriod]
-  );
-
-  const onToggleInteract = () => setIsZooming(false);
 
   const rewardsData = useMemo(
     () =>
@@ -136,6 +105,58 @@ export const TradingRewardsChart = ({
         : [],
     [periodTradingRewards, canViewAccount]
   );
+
+  const msForPeriod = useCallback(
+    (period: TradingRewardsPeriod) => {
+      const earliestDatum = rewardsData[0]?.date ?? Number(rewardsHistoryStartDate);
+      const latestDatum = rewardsData[rewardsData.length - 1]?.date ?? now;
+      switch (period) {
+        case TradingRewardsPeriod.Period1d:
+          return 1 * timeUnits.day;
+        case TradingRewardsPeriod.Period7d:
+          return 7 * timeUnits.day;
+        case TradingRewardsPeriod.Period30d:
+          return 30 * timeUnits.day;
+        case TradingRewardsPeriod.Period90d:
+          return 90 * timeUnits.day;
+        case TradingRewardsPeriod.PeriodAllTime:
+        default:
+          return latestDatum - earliestDatum;
+      }
+    },
+    [now, rewardsHistoryStartDate, rewardsData]
+  );
+
+  // Update selected period in toggle if user zooms in/out
+  const onZoomSnap = useMemo(
+    () =>
+      debounce(({ zoomDomain }: { zoomDomain?: number }) => {
+        if (zoomDomain) {
+          const predefinedPeriodIx = tradingRewardsPeriods.findIndex(
+            (period) => msForPeriod(period) === zoomDomain
+          );
+          if (predefinedPeriodIx < 0) {
+            // Unselect period
+            setIsZooming(true);
+          } else {
+            // Update period to new selected period
+            setIsZooming(false);
+            setSelectedPeriod(tradingRewardsPeriods[predefinedPeriodIx]);
+          }
+        }
+      }, 200),
+    [msForPeriod]
+  );
+
+  useEffect(() => {
+    if (isZooming) {
+      setDefaultZoomDomain(undefined);
+    } else {
+      setDefaultZoomDomain(msForPeriod(selectedPeriod));
+    }
+  }, [isZooming, msForPeriod, selectedPeriod]);
+
+  const onToggleInteract = () => setIsZooming(false);
 
   const series = useMemo(
     () => [
@@ -165,7 +186,6 @@ export const TradingRewardsChart = ({
   );
 
   const renderTooltip = useCallback(() => <div />, []);
-  const defaultZoomDomain = isZooming ? undefined : msForPeriod(selectedPeriod);
 
   const toggleGroupItems = useMemo(() => {
     return tradingRewardsPeriods.map((period: TradingRewardsPeriod) => ({
@@ -181,10 +201,9 @@ export const TradingRewardsChart = ({
     }));
   }, [stringGetter, msForPeriod, selectedLocale]);
 
-  const setTradingRewardsPeriod = useCallback(
-    (value: string) => setSelectedPeriod(value as TradingRewardsPeriod),
-    []
-  );
+  const setTradingRewardsPeriod = useCallback((value: string) => {
+    setSelectedPeriod(value as TradingRewardsPeriod);
+  }, []);
 
   return (
     <>
