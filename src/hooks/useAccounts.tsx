@@ -257,9 +257,8 @@ const useAccountsContext = () => {
 
   // abacus
   useEffect(() => {
-    if (dydxAddress) {
-      abacusStateManager.setAccount(localDydxWallet, hdKey);
-    } else abacusStateManager.attemptDisconnectAccount();
+    if (dydxAddress) abacusStateManager.setAccount(localDydxWallet, hdKey);
+    else abacusStateManager.attemptDisconnectAccount();
   }, [localDydxWallet, hdKey]);
 
   useEffect(() => {
