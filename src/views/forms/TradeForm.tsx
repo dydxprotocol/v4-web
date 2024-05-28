@@ -1,4 +1,4 @@
-import { Ref, useCallback, useState, type FormEvent } from 'react';
+import { Ref, useCallback, useEffect, useState, type FormEvent } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { NumberFormatValues, SourceInfo } from 'react-number-format';
@@ -54,6 +54,7 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithTooltip } from '@/components/WithTooltip';
 import { Orderbook } from '@/views/tables/Orderbook';
 
+import { getCurrentMarketIsolatedPositionLeverage } from '@/state/accountSelectors';
 import { openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { setTradeFormInputs } from '@/state/inputs';
 import {
@@ -238,7 +239,18 @@ export const TradeForm = ({
     if (currentStep === MobilePlaceOrderSteps.PlacingOrder) {
       setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
     }
-  }, [currentStep]);
+  }, [currentStep, setCurrentStep]);
+
+  const currentLeverageForIsolatedPosition = useSelector(getCurrentMarketIsolatedPositionLeverage);
+
+  useEffect(() => {
+    if (currentLeverageForIsolatedPosition) {
+      abacusStateManager.setTradeValue({
+        value: currentLeverageForIsolatedPosition,
+        field: TradeInputField.targetLeverage,
+      });
+    }
+  }, [currentLeverageForIsolatedPosition]);
 
   const { setUnIndexedClientId } = useOnLastOrderIndexed({
     callback: onLastOrderIndexed,

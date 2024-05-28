@@ -3,6 +3,7 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { createSelector } from 'reselect';
 
 import {
+  AbacusMarginMode,
   AbacusOrderSide,
   AbacusOrderStatus,
   AbacusPositionSide,
@@ -102,6 +103,17 @@ export const getCurrentMarketPositionData = (state: RootState) => {
     (getOpenPositions(state) ?? []).map((positionData) => [positionData.id, positionData])
   )[currentMarketId as string];
 };
+
+export const getCurrentMarketIsolatedPositionLeverage = createSelector(
+  [getCurrentMarketPositionData],
+  ({ leverage, marginMode }) => {
+    if (marginMode === AbacusMarginMode.isolated) {
+      return leverage.current;
+    }
+
+    return null;
+  }
+);
 
 /**
  * @param state
