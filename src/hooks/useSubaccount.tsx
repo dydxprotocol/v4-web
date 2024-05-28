@@ -62,7 +62,7 @@ export const SubaccountProvider = ({ ...props }) => {
 
 export const useSubaccount = () => useContext(SubaccountContext);
 
-export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWallet }) => {
+const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWallet }) => {
   const dispatch = useDispatch();
   const { usdcDenom, usdcDecimals } = useTokenConfigs();
   const { compositeClient, faucetClient } = useDydxClient();

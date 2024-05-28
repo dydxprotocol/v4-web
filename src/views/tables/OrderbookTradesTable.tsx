@@ -1,9 +1,9 @@
 import styled, { css, keyframes } from 'styled-components';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 
 import { Output } from '@/components/Output';
-import { AllTableProps, BaseTableRowData, Table } from '@/components/Table';
+import { Table, BaseTableRowData, AllTableProps } from '@/components/Table';
 
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 

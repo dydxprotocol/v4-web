@@ -14,7 +14,7 @@ import { SMALL_PERCENT_DECIMALS, TINY_PERCENT_DECIMALS } from '@/constants/numbe
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
@@ -63,7 +63,6 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
 
   return (
     <TimeSeriesChart
-      id="funding-chart"
       selectedLocale={selectedLocale}
       data={data}
       yAxisScaleType="symlog"

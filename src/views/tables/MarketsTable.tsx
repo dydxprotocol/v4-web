@@ -15,13 +15,15 @@ import { useMarketsData } from '@/hooks/useMarketsData';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
-import { AssetTableCell, Table, TableCell, type ColumnDef } from '@/components/Table';
+import { Table, type ColumnDef } from '@/components/Table';
+import { AssetTableCell } from '@/components/Table/AssetTableCell';
+import { TableCell } from '@/components/Table/TableCell';
 import { Toolbar } from '@/components/Toolbar';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { SparklineChart } from '@/components/visx/SparklineChart';
@@ -112,7 +114,6 @@ export const MarketsTable = ({ className }: { className?: string }) => {
             },
             {
               columnKey: 'priceChange24HChart',
-              getCellValue: (row) => row.priceChange24HPercent,
               label: stringGetter({ key: STRING_KEYS.LAST_24H }),
               renderCell: ({ line, priceChange24HPercent }) => (
                 <div style={{ width: 50, height: 50 }}>
@@ -192,8 +193,8 @@ export const MarketsTable = ({ className }: { className?: string }) => {
     [stringGetter, isTablet]
   );
 
-  const setFilter = (filter: MarketFilters) => {
-    dispatch(setMarketFilter(filter));
+  const setFilter = (newFilter: MarketFilters) => {
+    dispatch(setMarketFilter(newFilter));
   };
 
   return (
@@ -223,6 +224,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
           direction: 'descending',
         }}
         columns={columns}
+        paginationBehavior="showAll"
         className={className}
         slotEmpty={
           <$MarketNotFound>

@@ -57,7 +57,7 @@ export const AccountMenu = () => {
 
   const dispatch = useDispatch();
   const onboardingState = useSelector(getOnboardingState);
-  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
+  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) ?? {};
 
   const { nativeTokenBalance } = useAccountBalance();
   const { usdcLabel, chainTokenLabel } = useTokenConfigs();
@@ -68,7 +68,7 @@ export const AccountMenu = () => {
   const privy = usePrivy();
   const { google, discord, twitter } = privy?.user ?? {};
 
-  const usdcBalance = freeCollateral?.current || 0;
+  const usdcBalance = freeCollateral?.current ?? 0;
 
   const onRecoverKeys = () => {
     dispatch(openDialog({ type: DialogTypes.Onboarding }));

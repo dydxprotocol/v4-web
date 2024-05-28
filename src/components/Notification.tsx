@@ -1,4 +1,4 @@
-import React, { type MouseEvent } from 'react';
+import React from 'react';
 
 import styled, { css } from 'styled-components';
 
@@ -8,6 +8,7 @@ import {
   type Notification as NotificationDataType,
 } from '@/constants/notifications';
 
+// eslint-disable-next-line import/no-cycle
 import { useNotifications } from '@/hooks/useNotifications';
 
 import { layoutMixins } from '@/styles/layoutMixins';

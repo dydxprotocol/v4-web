@@ -75,30 +75,41 @@ export const DropdownSelectMenu = <MenuItemValue extends string>({
           <RadioGroup
             value={value}
             onValueChange={
-              onValueChange != null ? (value) => onValueChange(value as MenuItemValue) : undefined
+              onValueChange != null
+                ? (innerValue) => onValueChange(innerValue as MenuItemValue)
+                : undefined
             }
           >
-            {items.map(({ value, label, slotBefore, slotAfter, tag, disabled }) => (
-              <$RadioItem key={value} value={value} disabled={disabled}>
-                {slotBefore}
+            {items.map(
+              ({
+                value: innerValue,
+                label,
+                slotBefore,
+                slotAfter,
+                tag,
+                disabled: innerDisabled,
+              }) => (
+                <$RadioItem key={innerValue} value={innerValue} disabled={innerDisabled}>
+                  {slotBefore}
 
-                <$ItemLabel>
-                  {label}
-                  {tag && (
-                    <>
-                      {' '}
-                      <Tag>{tag}</Tag>
-                    </>
-                  )}
-                </$ItemLabel>
+                  <$ItemLabel>
+                    {label}
+                    {tag && (
+                      <>
+                        {' '}
+                        <Tag>{tag}</Tag>
+                      </>
+                    )}
+                  </$ItemLabel>
 
-                {slotAfter}
+                  {slotAfter}
 
-                <$ItemIndicator>
-                  <CheckIcon />
-                </$ItemIndicator>
-              </$RadioItem>
-            ))}
+                  <$ItemIndicator>
+                    <CheckIcon />
+                  </$ItemIndicator>
+                </$RadioItem>
+              )
+            )}
           </RadioGroup>
         </$Content>
       </Portal>

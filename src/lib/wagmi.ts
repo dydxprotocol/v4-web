@@ -57,7 +57,7 @@ import { validateAgainstAvailableEnvironments } from './network';
 
 // Config
 
-export const WAGMI_SUPPORTED_CHAINS: Chain[] = [
+const WAGMI_SUPPORTED_CHAINS: Chain[] = [
   mainnet,
   goerli,
   sepolia,

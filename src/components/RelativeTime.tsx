@@ -17,6 +17,7 @@ export const RelativeTime = ({
 }) => {
   const locale = useSelector(getSelectedLocale);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {

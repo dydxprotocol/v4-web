@@ -11,14 +11,16 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useMarketsData } from '@/hooks/useMarketsData';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { Icon, IconName } from '@/components/Icon';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
-import { AssetTableCell, Table, TableCell, type ColumnDef } from '@/components/Table';
+import { Table, type ColumnDef } from '@/components/Table';
+import { AssetTableCell } from '@/components/Table/AssetTableCell';
+import { TableCell } from '@/components/Table/TableCell';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -45,14 +47,12 @@ export const MarketsCompactTable = ({
       [
         {
           columnKey: 'market',
-          getCellValue: (row) => row.market,
           allowsSorting: false,
           label: stringGetter({ key: STRING_KEYS.MARKET }),
           renderCell: ({ asset }) => <AssetTableCell stacked asset={asset} />,
         },
         {
           columnKey: 'oraclePrice',
-          getCellValue: (row) => row.oraclePrice,
           allowsSorting: false,
           label: stringGetter({ key: STRING_KEYS.ORACLE_PRICE }),
           renderCell: ({
@@ -92,7 +92,6 @@ export const MarketsCompactTable = ({
         filters === MarketFilters.NEW
           ? {
               columnKey: 'listing',
-              getCellValue: (row) => row.isNew,
               allowsSorting: false,
               renderCell: ({ listingDate }) => (
                 <$DetailsCell>
@@ -115,7 +114,6 @@ export const MarketsCompactTable = ({
           : {
               columnKey: 'openInterest',
               allowsSorting: false,
-              getCellValue: (row) => row.openInterestUSDC,
               label: stringGetter({ key: STRING_KEYS.OPEN_INTEREST }),
               renderCell: ({ asset, openInterestUSDC, openInterest }) => (
                 <$DetailsCell>

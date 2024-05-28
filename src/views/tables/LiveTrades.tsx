@@ -6,11 +6,12 @@ import styled, { css, keyframes } from 'styled-components';
 
 import { MarketTrade } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { EMPTY_ARR } from '@/constants/objects';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
@@ -46,10 +47,11 @@ export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) =>
   const { isTablet } = useBreakpoints();
   const currentMarketAssetData = useSelector(getCurrentMarketAssetData, shallowEqual);
   const currentMarketConfig = useSelector(getCurrentMarketConfig, shallowEqual);
-  const currentMarketLiveTrades = useSelector(getCurrentMarketLiveTrades, shallowEqual) || [];
+  const currentMarketLiveTrades =
+    useSelector(getCurrentMarketLiveTrades, shallowEqual) ?? EMPTY_ARR;
 
   const { id = '' } = currentMarketAssetData ?? {};
-  const { stepSizeDecimals, tickSizeDecimals } = currentMarketConfig || {};
+  const { stepSizeDecimals, tickSizeDecimals } = currentMarketConfig ?? {};
 
   const rows = currentMarketLiveTrades.map(
     ({ createdAtMilliseconds, price, size, side }: MarketTrade, idx) => ({

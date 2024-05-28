@@ -47,7 +47,6 @@ export const ComboboxMenu = <
   withItemBorders,
   withStickyLayout,
 }: ComboboxMenuProps<MenuItemValue, MenuGroupValue>) => {
-  const [highlightedCommand, setHighlightedCommand] = useState<MenuItemValue>();
   const [searchValue, setSearchValue] = useState('');
 
   return (

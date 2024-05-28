@@ -1,5 +1,3 @@
-import { OrderSide } from '@dydxprotocol/v4-client-js';
-
 import { AlertType } from '@/constants/alerts';
 import { STRING_KEYS } from '@/constants/localization';
 import { TimeUnitShort } from '@/constants/time';
@@ -24,12 +22,6 @@ enum ClosingTradeTypes {
 
 export type OrderType = TradeTypes | ClosingTradeTypes;
 
-export enum TimeInForceOptions {
-  GTT = 'GTT',
-  FOK = 'FOK',
-  IOC = 'IOC',
-}
-
 export enum PositionSide {
   None = 'NONE',
   Long = 'LONG',
@@ -37,11 +29,6 @@ export enum PositionSide {
 }
 
 export const UNCOMMITTED_ORDER_TIMEOUT_MS = 10_000;
-
-export const ORDER_SIDE_STRINGS = {
-  [OrderSide.BUY]: STRING_KEYS.BUY,
-  [OrderSide.SELL]: STRING_KEYS.SELL,
-};
 
 export const POSITION_SIDE_STRINGS: Record<PositionSide, string> = {
   [PositionSide.None]: STRING_KEYS.NONE,

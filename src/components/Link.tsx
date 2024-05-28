@@ -40,6 +40,7 @@ export const Link = forwardRef<HTMLAnchorElement, ElementProps & StyleProps>(
       href={href}
       onClick={(e: React.MouseEvent) => {
         if (analyticsConfig) {
+          // eslint-disable-next-line no-console
           console.log(analyticsConfig);
         }
 

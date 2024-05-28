@@ -21,7 +21,7 @@ export const WithReceipt = ({
   children,
 }: ElementProps & StyleProps) => {
   if (!slotReceipt) {
-    return <>{children}</>;
+    return children;
   }
 
   const receipt = <$SlotReceipt>{slotReceipt}</$SlotReceipt>;

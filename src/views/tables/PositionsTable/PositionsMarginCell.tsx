@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { AbacusMarginMode, type SubaccountPosition } from '@/constants/abacus';
-import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import { ButtonShape } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -18,9 +17,11 @@ import { TableCell } from '@/components/Table/TableCell';
 
 import { openDialog } from '@/state/dialogs';
 
-import { getPositionMargin } from '@/lib/tradeData';
+import { getMarginModeFromSubaccountNumber, getPositionMargin } from '@/lib/tradeData';
 
-type PositionsMarginCellProps = { position: SubaccountPosition };
+type PositionsMarginCellProps = {
+  position: SubaccountPosition;
+};
 
 export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
   const stringGetter = useStringGetter();
@@ -28,24 +29,17 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
 
   const { marginMode, marginModeLabel, margin } = useMemo(() => {
     const { childSubaccountNumber } = position;
-    const marginMode =
-      childSubaccountNumber && childSubaccountNumber >= NUM_PARENT_SUBACCOUNTS
-        ? AbacusMarginMode.isolated
-        : AbacusMarginMode.cross;
-
-    const marginModeLabel =
-      marginMode === AbacusMarginMode.cross
-        ? stringGetter({ key: STRING_KEYS.CROSS })
-        : stringGetter({ key: STRING_KEYS.ISOLATED });
-
-    const margin = getPositionMargin({ position });
+    const derivedMarginMode = getMarginModeFromSubaccountNumber(childSubaccountNumber);
 
     return {
-      marginMode,
-      marginModeLabel,
-      margin,
+      marginMode: derivedMarginMode,
+      marginModeLabel:
+        derivedMarginMode === AbacusMarginMode.cross
+          ? stringGetter({ key: STRING_KEYS.CROSS })
+          : stringGetter({ key: STRING_KEYS.ISOLATED }),
+      margin: getPositionMargin({ position }),
     };
-  }, [position]);
+  }, [position, stringGetter]);
 
   return (
     <TableCell

@@ -12,7 +12,7 @@ import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
 
 import { Button } from '@/components/Button';

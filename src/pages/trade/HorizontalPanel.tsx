@@ -40,7 +40,7 @@ import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils
 import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
 
-import { UnopenedIsolatedPositions } from './UnopenedIsolatedPositions';
+import { MaybeUnopenedIsolatedPositionsDrawer } from './UnopenedIsolatedPositions';
 
 enum InfoSection {
   Position = 'Position',
@@ -181,6 +181,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     OrdersTableColumnKey.AmountFill,
                     OrdersTableColumnKey.Price,
                     OrdersTableColumnKey.Trigger,
+                    OrdersTableColumnKey.MarginType,
                     OrdersTableColumnKey.GoodTil,
                     !isAccountViewOnly && OrdersTableColumnKey.Actions,
                   ].filter(isTruthy)
@@ -321,6 +322,6 @@ const $CollapsibleTabs = styled(CollapsibleTabs)`
 const $LoadingSpinner = styled(LoadingSpinner)`
   --spinner-width: 1rem;
 `;
-const $UnopenedIsolatedPositions = styled(UnopenedIsolatedPositions)`
+const $UnopenedIsolatedPositions = styled(MaybeUnopenedIsolatedPositionsDrawer)`
   margin-top: auto;
 `;

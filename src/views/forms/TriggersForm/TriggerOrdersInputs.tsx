@@ -23,7 +23,7 @@ export const TriggerOrdersInputs = ({
   onViewOrdersClick,
 }: ElementProps) => {
   const { stopLossOrder, takeProfitOrder } =
-    useSelector(getTriggerOrdersInputs, shallowEqual) || {};
+    useSelector(getTriggerOrdersInputs, shallowEqual) ?? {};
 
   return (
     <>
@@ -62,7 +62,7 @@ export const TriggerOrdersInputs = ({
           usdcDiffField: TriggerOrdersInputField.stopLossUsdcDiff,
         }}
         isMultiple={multipleStopLossOrders}
-        isNegativeDiff={true}
+        isNegativeDiff
         price={stopLossOrder?.price}
         tickSizeDecimals={tickSizeDecimals}
         onViewOrdersClick={onViewOrdersClick}

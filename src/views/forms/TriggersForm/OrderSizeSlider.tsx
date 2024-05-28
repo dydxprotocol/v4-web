@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
+import { useMemo } from 'react';
 
-import _ from 'lodash';
+import { debounce } from 'lodash';
 import styled from 'styled-components';
 
 import { Slider } from '@/components/Slider';
@@ -27,15 +27,13 @@ export const OrderSizeSlider = ({
   stepSizeDecimals,
   className,
 }: ElementProps & StyleProps) => {
-  const step = positionSize ? Math.pow(10, Math.floor(Math.log10(positionSize) - 1)) : 0.1;
+  const step = positionSize ? 10 ** Math.floor(Math.log10(positionSize) - 1) : 0.1;
   const maxSize = positionSize ?? 0;
   const currSize = size ?? 0;
 
   // Debounced slightly to avoid excessive updates to Abacus while still providing a smooth slide
-  const debouncedSetAbacusSize = useCallback(
-    _.debounce((newSize: string) => {
-      setAbacusSize(newSize);
-    }, 50),
+  const debouncedSetAbacusSize = useMemo(
+    () => debounce((newSize: string) => setAbacusSize(newSize), 50),
     []
   );
 

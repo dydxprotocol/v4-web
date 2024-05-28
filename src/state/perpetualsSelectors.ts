@@ -164,10 +164,3 @@ export const getCurrentMarketNextFundingRate = createSelector(
   [getCurrentMarketData],
   (marketData) => marketData?.perpetual?.nextFundingRate
 );
-
-/**
- * @param marketId
- * @returns sparkline data for specified marketId
- */
-export const getPerpetualMarketSparklineData = (marketId: string) => (state: RootState) =>
-  getPerpetualMarkets(state)?.[marketId]?.perpetual?.line?.toArray() ?? [];

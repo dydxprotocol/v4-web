@@ -8,7 +8,7 @@ import { AppRoute } from '@/constants/routes';
 
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
-import { ActionsTableCell } from '@/components/Table';
+import { ActionsTableCell } from '@/components/Table/ActionsTableCell';
 
 import { closeDialogInTradeBox, openDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
@@ -32,7 +32,7 @@ export const PositionsActionsCell = ({
 
   const currentMarketId = useSelector(getCurrentMarketId);
   const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog);
-  const { type: tradeBoxDialogType } = activeTradeBoxDialog || {};
+  const { type: tradeBoxDialogType } = activeTradeBoxDialog ?? {};
 
   const onCloseButtonToggle = (isPressed: boolean) => {
     navigate(`${AppRoute.Trade}/${marketId}`);
@@ -54,7 +54,7 @@ export const PositionsActionsCell = ({
       {showClosePositionAction && (
         <$CloseButtonToggle
           key="closepositions"
-          isToggle={true}
+          isToggle
           isPressed={
             tradeBoxDialogType === TradeBoxDialogTypes.ClosePosition && currentMarketId === marketId
           }

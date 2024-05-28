@@ -17,8 +17,6 @@ import localizationMiddleware from './localizationMiddleware';
 import { notificationsSlice } from './notifications';
 import { perpetualsSlice } from './perpetuals';
 
-export const commandMenuSlices = [layoutSlice, localizationSlice];
-
 export const store = configureStore({
   reducer: {
     account: accountSlice.reducer,
@@ -49,4 +47,3 @@ abacusStateManager.setStore(store);
 
 export type RootStore = typeof store;
 export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;

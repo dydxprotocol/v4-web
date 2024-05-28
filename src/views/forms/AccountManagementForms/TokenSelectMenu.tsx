@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { EMPTY_ARR } from '@/constants/objects';
 
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -10,7 +11,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DiffArrow } from '@/components/DiffArrow';
-import { Icon } from '@/components/Icon';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 import { Tag } from '@/components/Tag';
 
@@ -38,19 +38,22 @@ const cctpTokensByAddress = cctpTokens.reduce((acc, token) => {
 export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions, resources } =
-    useSelector(getTransferInputs, shallowEqual) || {};
+    useSelector(getTransferInputs, shallowEqual) ?? {};
   const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
 
   const tokens =
-    (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() || [];
+    (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.assets?.toArray() ??
+    EMPTY_ARR;
 
   const tokenItems = Object.values(tokens)
     .map((token) => ({
       value: token.type,
       label: token.stringKey,
       onSelect: () => {
-        const selectedToken = resources?.tokenResources?.get(token.type);
-        selectedToken && onSelectToken(selectedToken);
+        const newSelectedToken = resources?.tokenResources?.get(token.type);
+        if (newSelectedToken) {
+          onSelectToken(newSelectedToken);
+        }
       },
       slotBefore: (
         // the curve dao token svg causes the web app to lag when rendered
@@ -86,7 +89,7 @@ export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: El
       }
       return true;
     })
-    .sort((token) => (!!cctpTokensByAddress[token.value] ? -1 : 1));
+    .sort((token) => (cctpTokensByAddress[token.value] ? -1 : 1));
 
   return (
     <SearchSelectMenu
@@ -150,8 +153,4 @@ const $Img = styled.img`
   width: 1.25rem;
   height: 1.25rem;
   border-radius: 50%;
-`;
-
-const $Icon = styled(Icon)`
-  height: 0.5rem;
 `;

@@ -76,15 +76,6 @@ export const getInputClosePositionData = (state: RootState) => state.inputs.clos
 
 /**
  * @param state
- * @returns input errors for Transfer
- */
-export const getTransferInputErrors = (state: RootState) => {
-  const currentInput = state.inputs.current;
-  return currentInput === 'transfer' ? getInputErrors(state) : [];
-};
-
-/**
- * @param state
  * @returns TransferInputs
  */
 export const getTransferInputs = (state: RootState) => state.inputs.transferInputs;

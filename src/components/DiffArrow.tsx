@@ -1,4 +1,4 @@
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { NumberSign } from '@/constants/numbers';
 
@@ -60,5 +60,5 @@ const $DiffArrowContainer = styled.span<DiffArrowProps>`
       down: css`
         transform: rotate(90deg);
       `,
-    }[direction || 'right'])}
+    }[direction ?? 'right'])}
 `;
