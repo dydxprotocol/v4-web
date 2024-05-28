@@ -151,7 +151,7 @@ export const TimeSeriesChart = <Datum extends {}>({
     if (defaultZoomDomain && defaultZoomDomain !== zoomDomain) {
       setZoomDomainAnimateTo(defaultZoomDomain);
     }
-  }, [defaultZoomDomain, zoomDomain]);
+  }, [defaultZoomDomain]);
 
   useEffect(() => {
     onZoom?.({ zoomDomain });

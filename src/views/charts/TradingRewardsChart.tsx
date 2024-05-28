@@ -168,7 +168,7 @@ export const TradingRewardsChart = ({
   const defaultZoomDomain = isZooming ? undefined : msForPeriod(selectedPeriod);
 
   const toggleGroupItems = useMemo(() => {
-    return tradingRewardsPeriods.map((period) => ({
+    return tradingRewardsPeriods.map((period: TradingRewardsPeriod) => ({
       value: period,
       label:
         period === TradingRewardsPeriod.PeriodAllTime
