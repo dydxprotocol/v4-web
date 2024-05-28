@@ -96,4 +96,8 @@ const $AttachedExpandingSection = styled(AttachedExpandingSection)`
 const $MaybeUnopenedIsolatedPositionsPanel = styled(MaybeUnopenedIsolatedPositionsPanel)`
   margin-top: 1rem;
   margin-bottom: 1rem;
+
+  > div {
+    padding-left: 1rem;
+  }
 `;
