@@ -3,7 +3,6 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { createSelector } from 'reselect';
 
 import {
-  AbacusMarginMode,
   AbacusOrderSide,
   AbacusOrderStatus,
   AbacusPositionSide,
@@ -15,7 +14,7 @@ import {
   type SubaccountFundingPayment,
   type SubaccountOrder,
 } from '@/constants/abacus';
-import { OnboardingState } from '@/constants/account';
+import { NUM_PARENT_SUBACCOUNTS, OnboardingState } from '@/constants/account';
 
 import { getHydratedTradingData, isStopLossOrder, isTakeProfitOrder } from '@/lib/orders';
 import { getHydratedPositionData } from '@/lib/positions';
@@ -109,9 +108,13 @@ export const getCurrentMarketPositionData = (state: RootState) => {
  */
 export const getCurrentMarketIsolatedPositionLeverage = createSelector(
   [getCurrentMarketPositionData],
-  ({ leverage, marginMode }) => {
-    if (marginMode === AbacusMarginMode.isolated) {
-      return leverage.current;
+  (position) => {
+    if (
+      position?.childSubaccountNumber &&
+      position.childSubaccountNumber >=
+        NUM_PARENT_SUBACCOUNTS /* marginMode === AbacusMarginMode.isolated */
+    ) {
+      return position.leverage?.current;
     }
 
     return null;
