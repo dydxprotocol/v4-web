@@ -128,7 +128,7 @@ const $Description = styled.div`
 
   a {
     display: inline;
-    margin-left: 3px;
+    margin-left: 0.5ch;
   }
 `;
 
