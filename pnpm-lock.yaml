@@ -1411,13 +1411,8 @@ packages:
       - utf-8-validate
     dev: false
 
-<<<<<<< HEAD
-  /@dydxprotocol/v4-localization@1.1.89:
-    resolution: {integrity: sha512-zvh8hQ6lwZdntM6QJ7cf4TV4SXNd7eA1Ne7Q0Qur+5XKX3JIUZeJxsxEF7JdjdgjBI38/knkIRJaC4203eqg3Q==}
-=======
   /@dydxprotocol/v4-localization@1.1.90:
     resolution: {integrity: sha512-Nd7bwD5463F1NjX7YrCsVlYcsICHh1KdF8K1l/FFN+JiXQrFk7wa/TYpm4ea1yZLqLXjJLYUeNdCaSt41H6oZw==}
->>>>>>> 31b29b06ba887ce22835bb33d93a7f4c53d18182
     dev: false
 
   /@dydxprotocol/v4-proto@5.0.0-dev.0:
@@ -3049,7 +3044,6 @@ packages:
     dependencies:
       is-glob: 4.0.3
       micromatch: 4.0.5
-      napi-wasm: 1.1.0
     dev: false
     bundledDependencies:
       - napi-wasm
@@ -15411,10 +15405,6 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
     dev: true
-
-  /napi-wasm@1.1.0:
-    resolution: {integrity: sha512-lHwIAJbmLSjF9VDRm9GoVOy9AGp3aIvkjv+Kvz9h16QR3uSVYH78PNQUnT2U4X53mhlnV2M7wrhibQ3GHicDmg==}
-    dev: false
 
   /native-abort-controller@1.0.4(abort-controller@3.0.0):
     resolution: {integrity: sha512-zp8yev7nxczDJMoP6pDxyD20IU0T22eX8VwN2ztDccKvSZhRaV33yP1BGwKSZfXuqWUzsXopVFjBdau9OOAwMQ==}
