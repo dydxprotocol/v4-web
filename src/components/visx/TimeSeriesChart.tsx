@@ -151,11 +151,11 @@ export const TimeSeriesChart = <Datum extends {}>({
     if (defaultZoomDomain && defaultZoomDomain !== zoomDomain) {
       setZoomDomainAnimateTo(defaultZoomDomain);
     }
-  }, [defaultZoomDomain]);
+  }, [defaultZoomDomain, zoomDomain]);
 
   useEffect(() => {
     onZoom?.({ zoomDomain });
-  }, [zoomDomain]);
+  }, [zoomDomain, onZoom]);
 
   useAnimationFrame(
     (elapsedMilliseconds) => {
@@ -233,8 +233,12 @@ export const TimeSeriesChart = <Datum extends {}>({
   };
 
   useEffect(() => {
+    const currentChart = chartRef.current;
+    const handler = (e: WheelEvent) => e.preventDefault();
     // Prevents scrolling of the page when user is hovered over chart (scrolling should adjust zoom of the chart instead)
-    chartRef.current?.addEventListener('wheel', (e) => e.preventDefault());
+    currentChart?.addEventListener('wheel', handler);
+
+    return () => currentChart?.removeEventListener('wheel', handler);
   }, [chartRef]);
 
   return (

@@ -49,6 +49,16 @@ type StyleProps = {
 const TRADING_REWARDS_TIME_RESOLUTION = 1 * timeUnits.hour;
 const SELECTED_PERIOD = HistoricalTradingRewardsPeriod.DAILY;
 
+const CHART_STYLES = {
+  margin: { left: 32, right: 48, top: 12, bottom: 32 },
+  padding: {
+    left: 0.01,
+    right: 0.01,
+    top: 0.5,
+    bottom: 0.01,
+  },
+};
+
 export const TradingRewardsChart = ({
   selectedLocale,
   slotEmpty,
@@ -58,7 +68,7 @@ export const TradingRewardsChart = ({
   const { chainTokenLabel } = useTokenConfigs();
 
   const rewardsHistoryStartDate = useEnvConfig('rewardsHistoryStartDateMs');
-  const now = useNow({ intervalMs: timeUnits.day });
+  const now = useNow({ intervalMs: timeUnits.minute });
 
   const [tooltipContext, setTooltipContext] = useState<TooltipContextType<TradingRewardsDatum>>();
   const [isZooming, setIsZooming] = useState(false);
@@ -127,6 +137,55 @@ export const TradingRewardsChart = ({
     [periodTradingRewards, canViewAccount]
   );
 
+  const series = useMemo(
+    () => [
+      {
+        dataKey: 'trading-rewards',
+        xAccessor: (datum: TradingRewardsDatum) => datum?.date,
+        yAccessor: (datum: TradingRewardsDatum) => datum?.cumulativeAmount,
+        colorAccessor: () => 'var(--trading-rewards-line-color)',
+        getCurve: () => curveLinear,
+      },
+    ],
+    []
+  );
+
+  const language = navigator.language || 'en-US';
+
+  const tickFormatY = useCallback(
+    (value: number) =>
+      Intl.NumberFormat(language, {
+        style: 'decimal',
+        notation: 'compact',
+        maximumSignificantDigits: 3,
+      })
+        .format(value)
+        .toLowerCase(),
+    [language]
+  );
+
+  const renderTooltip = useCallback(() => <div />, []);
+  const defaultZoomDomain = isZooming ? undefined : msForPeriod(selectedPeriod);
+
+  const toggleGroupItems = useMemo(() => {
+    return tradingRewardsPeriods.map((period) => ({
+      value: period,
+      label:
+        period === TradingRewardsPeriod.PeriodAllTime
+          ? stringGetter({ key: STRING_KEYS.ALL })
+          : formatRelativeTime(msForPeriod(period), {
+              locale: selectedLocale,
+              relativeToTimestamp: 0,
+              largestUnit: 'day',
+            }),
+    }));
+  }, [stringGetter, msForPeriod, selectedLocale]);
+
+  const setTradingRewardsPeriod = useCallback(
+    (value: string) => setSelectedPeriod(value as TradingRewardsPeriod),
+    []
+  );
+
   return (
     <>
       {rewardsData.length === 0 ? undefined : (
@@ -138,19 +197,9 @@ export const TradingRewardsChart = ({
           </$Title>
 
           <ToggleGroup
-            items={tradingRewardsPeriods.map((period) => ({
-              value: period,
-              label:
-                period === TradingRewardsPeriod.PeriodAllTime
-                  ? stringGetter({ key: STRING_KEYS.ALL })
-                  : formatRelativeTime(msForPeriod(period), {
-                      locale: selectedLocale,
-                      relativeToTimestamp: 0,
-                      largestUnit: 'day',
-                    }),
-            }))}
+            items={toggleGroupItems}
             value={isZooming ? '' : selectedPeriod}
-            onValueChange={(value) => setSelectedPeriod(value as TradingRewardsPeriod)}
+            onValueChange={setTradingRewardsPeriod}
             onInteraction={onToggleInteract}
           />
         </$TitleContainer>
@@ -160,41 +209,15 @@ export const TradingRewardsChart = ({
         selectedLocale={selectedLocale}
         data={rewardsData}
         yAxisOrientation="right"
-        margin={{
-          left: 32,
-          right: 48,
-          top: 12,
-          bottom: 32,
-        }}
-        padding={{
-          left: 0.01,
-          right: 0.01,
-          top: 0.5,
-          bottom: 0.01,
-        }}
-        series={[
-          {
-            dataKey: 'trading-rewards',
-            xAccessor: (datum) => datum?.date,
-            yAccessor: (datum) => datum?.cumulativeAmount,
-            colorAccessor: () => 'var(--trading-rewards-line-color)',
-            getCurve: () => curveLinear,
-          },
-        ]}
-        tickFormatY={(value) =>
-          Intl.NumberFormat(navigator.language || 'en-US', {
-            style: 'decimal',
-            notation: 'compact',
-            maximumSignificantDigits: 3,
-          })
-            .format(value)
-            .toLowerCase()
-        }
-        renderTooltip={() => <div />}
+        margin={CHART_STYLES.margin}
+        padding={CHART_STYLES.padding}
+        series={series}
+        tickFormatY={tickFormatY}
+        renderTooltip={renderTooltip}
         onTooltipContext={setTooltipContext}
         onZoom={onZoomSnap}
         slotEmpty={slotEmpty}
-        defaultZoomDomain={isZooming ? undefined : msForPeriod(selectedPeriod)}
+        defaultZoomDomain={defaultZoomDomain}
         minZoomDomain={TRADING_REWARDS_TIME_RESOLUTION * 2}
         numGridLines={0}
         tickSpacingX={210}
