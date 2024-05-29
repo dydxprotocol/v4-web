@@ -13,7 +13,6 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
-import { tableMixins } from '@/styles/tableMixins';
 
 import { AttachedExpandingSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
@@ -189,8 +188,6 @@ const $ContentWrapper = styled.div`
 `;
 
 const $AdditionalConditions = styled.div`
-  ${tableMixins.stackedWithSecondaryStyling}
-
   color: var(--color-text-0);
   font: var(--font-small-book);
 
