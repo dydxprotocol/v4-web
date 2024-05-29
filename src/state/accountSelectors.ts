@@ -507,14 +507,14 @@ export const getHistoricalTradingRewardsForPeriod = () =>
     (historicalTradingRewards, period) => historicalTradingRewards?.get(period)
   );
 
+const historicalRewardsForCurrentWeekSelector = getHistoricalTradingRewardsForPeriod();
 /**
  * @returns account historical trading rewards for the current week
  */
-export const getHistoricalTradingRewardsForCurrentWeek = () =>
-  createAppSelector(
-    [(s) => getHistoricalTradingRewardsForPeriod()(s, HistoricalTradingRewardsPeriod.WEEKLY.name)],
-    (historicalTradingRewards) => historicalTradingRewards?.firstOrNull()
-  );
+export const getHistoricalTradingRewardsForCurrentWeek = createAppSelector(
+  [(s) => historicalRewardsForCurrentWeekSelector(s, HistoricalTradingRewardsPeriod.WEEKLY.name)],
+  (historicalTradingRewards) => historicalTradingRewards?.firstOrNull()
+);
 
 /**
  * @returns UsageRestriction of the current session

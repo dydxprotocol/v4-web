@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import { Link, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useEnsName } from 'wagmi';
@@ -71,8 +69,7 @@ const Profile = () => {
     chainId: ENS_CHAIN_ID,
   });
 
-  const tradingRewardSelector = useMemo(getHistoricalTradingRewardsForCurrentWeek, []);
-  const currentWeekTradingReward = useAppSelector(tradingRewardSelector);
+  const currentWeekTradingReward = useAppSelector(getHistoricalTradingRewardsForCurrentWeek);
 
   const actions: Action[] = [
     {

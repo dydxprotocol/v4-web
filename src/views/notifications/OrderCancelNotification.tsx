@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
@@ -7,6 +5,7 @@ import { AbacusOrderStatus } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { CancelOrderStatuses, LocalCancelOrderData, ORDER_TYPE_STRINGS } from '@/constants/trade';
 
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -35,9 +34,8 @@ export const OrderCancelNotification = ({
   notification,
 }: NotificationProps & ElementProps) => {
   const stringGetter = useStringGetter();
-  const selectOrderById = useMemo(getOrderById, []);
-  const order = useAppSelector((s) => selectOrderById(s, localCancel.orderId), shallowEqual)!!;
-  const marketData = useAppSelector(getMarketData(order.marketId), shallowEqual);
+  const order = useParameterizedSelector(getOrderById, localCancel.orderId)!;
+  const marketData = useAppSelector((s) => getMarketData(s, order.marketId), shallowEqual);
   const { assetId } = marketData ?? {};
   const tradeType = getTradeType(order.type.rawValue) ?? undefined;
   const orderTypeKey = tradeType && ORDER_TYPE_STRINGS[tradeType]?.orderTypeKey;

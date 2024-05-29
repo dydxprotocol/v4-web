@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import { OrderFlags, OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
@@ -9,6 +7,7 @@ import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS, type StringKey } from '@/constants/localization';
 import { CancelOrderStatuses } from '@/constants/trade';
 
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 
@@ -49,7 +48,6 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
   const isOrderCanceling =
     localCancelOrder && localCancelOrder.submissionStatus < CancelOrderStatuses.Canceled;
 
-  const orderDetailsSelector = useMemo(getOrderDetails, []);
   const {
     asset,
     cancelReason,
@@ -70,7 +68,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     triggerPrice,
     type,
     orderFlags,
-  } = useAppSelector((s) => orderDetailsSelector(s, orderId)!) ?? {};
+  } = useParameterizedSelector(getOrderDetails, orderId)! ?? {};
 
   const renderOrderPrice = ({
     type: innerType,

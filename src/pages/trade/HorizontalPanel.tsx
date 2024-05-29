@@ -8,6 +8,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -21,7 +22,6 @@ import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { OrdersTable, OrdersTableColumnKey } from '@/views/tables/OrdersTable';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
-import { type RootState } from '@/state/_store';
 import {
   calculateHasUncommittedOrders,
   calculateIsAccountViewOnly,
@@ -88,9 +88,9 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const hasUnseenFillUpdates = useAppSelector(getHasUnseenFillUpdates);
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
   const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
-  const selectShouldRenderActions = useMemo(calculateShouldRenderActionsInPositionsTable, []);
-  const shouldRenderActions = useAppSelector((state: RootState) =>
-    selectShouldRenderActions(state, showClosePositionAction)
+  const shouldRenderActions = useParameterizedSelector(
+    calculateShouldRenderActionsInPositionsTable,
+    showClosePositionAction
   );
   const isWaitingForOrderToIndex = useAppSelector(calculateHasUncommittedOrders);
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;

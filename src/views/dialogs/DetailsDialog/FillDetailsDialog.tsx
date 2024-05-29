@@ -1,10 +1,9 @@
-import { useMemo } from 'react';
-
 import { DateTime } from 'luxon';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -28,7 +27,6 @@ export const FillDetailsDialog = ({ fillId, setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
 
-  const fillSelector = useMemo(getFillDetails, []);
   const {
     asset,
     createdAtMilliseconds,
@@ -40,7 +38,7 @@ export const FillDetailsDialog = ({ fillId, setIsOpen }: ElementProps) => {
     size,
     stepSizeDecimals,
     tickSizeDecimals,
-  } = useAppSelector((s) => fillSelector(s, fillId)!) ?? {};
+  } = useParameterizedSelector(getFillDetails, fillId)! ?? {};
 
   const detailItems = [
     {

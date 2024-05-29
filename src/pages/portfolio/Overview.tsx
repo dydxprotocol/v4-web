@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -7,13 +5,13 @@ import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, PortfolioRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AttachedExpandingSection, DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
-import { type RootState } from '@/state/_store';
 import {
   calculateShouldRenderActionsInPositionsTable,
   calculateShouldRenderTriggersInPositionsTable,
@@ -33,9 +31,9 @@ export const Overview = () => {
   const showClosePositionAction = false;
 
   const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
-  const shouldRenderActionsSelector = useMemo(calculateShouldRenderActionsInPositionsTable, []);
-  const shouldRenderActions = useAppSelector((state: RootState) =>
-    shouldRenderActionsSelector(state, showClosePositionAction)
+  const shouldRenderActions = useParameterizedSelector(
+    calculateShouldRenderActionsInPositionsTable,
+    showClosePositionAction
   );
 
   return (

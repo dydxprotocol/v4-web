@@ -1,4 +1,4 @@
-import { FormEvent, useMemo } from 'react';
+import { FormEvent } from 'react';
 
 import styled from 'styled-components';
 
@@ -6,6 +6,7 @@ import { ErrorType, ValidationError, type SubaccountOrder } from '@/constants/ab
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTriggerOrdersFormInputs } from '@/hooks/useTriggerOrdersFormInputs';
@@ -46,9 +47,8 @@ export const TriggersForm = ({
   const { placeTriggerOrders } = useSubaccount();
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 
-  const selectPositionDetails = useMemo(getPositionDetails, []);
   const { asset, entryPrice, size, stepSizeDecimals, tickSizeDecimals, oraclePrice } =
-    useAppSelector((s) => selectPositionDetails(s, marketId)) ?? {};
+    useParameterizedSelector(getPositionDetails, marketId) ?? {};
 
   const {
     differingOrderSizes,

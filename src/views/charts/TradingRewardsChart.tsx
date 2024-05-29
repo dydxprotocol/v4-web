@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { curveLinear } from '@visx/curve';
 import { TooltipContextType } from '@visx/xychart';
 import { debounce } from 'lodash';
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
@@ -18,6 +17,7 @@ import { timeUnits } from '@/constants/time';
 
 import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useNow } from '@/hooks/useNow';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -79,10 +79,9 @@ export const TradingRewardsChart = ({
 
   const canViewAccount = useAppSelector(calculateCanViewAccount);
   const totalTradingRewards = useAppSelector(getTotalTradingRewards);
-  const tradingRewardsSelector = useMemo(getHistoricalTradingRewardsForPeriod, []);
-  const periodTradingRewards = useAppSelector(
-    (s) => tradingRewardsSelector(s, SELECTED_PERIOD.name),
-    shallowEqual
+  const periodTradingRewards = useParameterizedSelector(
+    getHistoricalTradingRewardsForPeriod,
+    SELECTED_PERIOD.name
   );
 
   useEffect(() => {

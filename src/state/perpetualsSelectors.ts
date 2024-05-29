@@ -33,7 +33,7 @@ export const getPerpetualMarkets = (state: RootState) => state.perpetuals.market
  * @param marketId
  * @returns PerpetualMarket data of the specified marketId
  */
-export const getMarketData = (marketId: string) => (state: RootState) =>
+export const getMarketData = (state: RootState, marketId: string) =>
   getPerpetualMarkets(state)?.[marketId];
 
 /**
@@ -58,8 +58,8 @@ export const getCurrentMarketConfig = (state: RootState) => getCurrentMarketData
  * @param marketId
  * @returns config for specified market
  */
-export const getMarketConfig = (marketId: string) => (state: RootState) =>
-  getMarketData(marketId)(state)?.configs;
+export const getMarketConfig = (state: RootState, marketId: string) =>
+  getMarketData(state, marketId)?.configs;
 
 /**
  * @returns Record of list of MarketTrades indexed by marketId
