@@ -1,4 +1,6 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { useMemo } from 'react';
+
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { AbacusOrderStatus } from '@/constants/abacus';
@@ -16,6 +18,7 @@ import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Notification, NotificationProps } from '@/components/Notification';
 
 import { getOrderById } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getMarketData } from '@/state/perpetualsSelectors';
 
 import { getTradeType } from '@/lib/orders';
@@ -32,8 +35,9 @@ export const OrderCancelNotification = ({
   notification,
 }: NotificationProps & ElementProps) => {
   const stringGetter = useStringGetter();
-  const order = useSelector(getOrderById(localCancel.orderId), shallowEqual)!!;
-  const marketData = useSelector(getMarketData(order.marketId), shallowEqual);
+  const selectOrderById = useMemo(getOrderById, []);
+  const order = useAppSelector((s) => selectOrderById(s, localCancel.orderId), shallowEqual)!!;
+  const marketData = useAppSelector(getMarketData(order.marketId), shallowEqual);
   const { assetId } = marketData ?? {};
   const tradeType = getTradeType(order.type.rawValue) ?? undefined;
   const orderTypeKey = tradeType && ORDER_TYPE_STRINGS[tradeType]?.orderTypeKey;

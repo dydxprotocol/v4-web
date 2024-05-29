@@ -7,7 +7,7 @@ import {
   ResolutionString,
   widget as Widget,
 } from 'public/tradingview/charting_library';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 
 import { DEFAULT_RESOLUTION } from '@/constants/candles';
 import { LocalStorageKey } from '@/constants/localStorage';
@@ -16,6 +16,7 @@ import type { TvWidget } from '@/constants/tvchart';
 
 import { store } from '@/state/_store';
 import { getSelectedNetwork } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import { getCurrentMarketId, getMarketIds } from '@/state/perpetualsSelectors';
@@ -41,13 +42,13 @@ export const useTradingView = ({
 }) => {
   const stringGetter = useStringGetter();
 
-  const appTheme = useSelector(getAppTheme);
-  const appColorMode = useSelector(getAppColorMode);
+  const appTheme = useAppSelector(getAppTheme);
+  const appColorMode = useAppSelector(getAppColorMode);
 
-  const marketId = useSelector(getCurrentMarketId);
-  const marketIds = useSelector(getMarketIds, shallowEqual);
-  const selectedLocale = useSelector(getSelectedLocale);
-  const selectedNetwork = useSelector(getSelectedNetwork);
+  const marketId = useAppSelector(getCurrentMarketId);
+  const marketIds = useAppSelector(getMarketIds, shallowEqual);
+  const selectedLocale = useAppSelector(getSelectedLocale);
+  const selectedNetwork = useAppSelector(getSelectedNetwork);
 
   const { getCandlesForDatafeed, getMarketTickSize } = useDydxClient();
 

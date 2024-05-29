@@ -23,8 +23,6 @@ import { SubaccountProvider } from '@/hooks/useSubaccount';
 import { GlobalStyle } from '@/styles/globalStyle';
 
 import { SelectItem, SelectMenu } from '@/components/SelectMenu';
-
-import { store } from '@/state/_store';
 import {
   AppColorMode,
   AppTheme,
@@ -37,6 +35,7 @@ import { setLocaleLoaded, setSelectedLocale } from '@/state/localization';
 import { config } from '@/lib/wagmi';
 
 import './ladle.css';
+import { store } from "@/state/_store";
 
 const queryClient = new QueryClient();
 

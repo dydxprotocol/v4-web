@@ -3,7 +3,7 @@ import type { ChangeEvent, FormEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { NumberFormatValues } from 'react-number-format';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 import { isAddress } from 'viem';
 
@@ -50,6 +50,7 @@ import { SourceSelectMenu } from '@/views/forms/AccountManagementForms/SourceSel
 
 import { getSubaccount } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -65,10 +66,10 @@ export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
   const [error, setError] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
-  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   const { sendSquidWithdraw } = useSubaccount();
-  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) ?? {};
+  const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
   const {
     requestPayload,
@@ -81,7 +82,7 @@ export const WithdrawForm = () => {
     errorMessage: routeErrorMessage,
     isCctp,
     summary,
-  } = useSelector(getTransferInputs, shallowEqual) ?? {};
+  } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
 
   // User input
   const [withdrawAmount, setWithdrawAmount] = useState('');

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { TooltipContextType } from '@visx/xychart';
 import BigNumber from 'bignumber.js';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import type { Nullable } from '@/constants/abacus';
@@ -25,6 +25,7 @@ import { PnlChart, type PnlDatum } from '@/views/charts/PnlChart';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -40,7 +41,7 @@ const usePortfolioValues = ({
   activeDatum?: PnlDatum;
 }) => {
   const stringGetter = useStringGetter();
-  const selectedLocale = useSelector(getSelectedLocale);
+  const selectedLocale = useAppSelector(getSelectedLocale);
 
   const accountValueLabel = useMemo(
     () =>
@@ -97,11 +98,11 @@ export const AccountDetailsAndHistory = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
-  const selectedLocale = useSelector(getSelectedLocale);
-  const onboardingState = useSelector(getOnboardingState);
+  const selectedLocale = useAppSelector(getSelectedLocale);
+  const onboardingState = useAppSelector(getOnboardingState);
 
   const { buyingPower, equity, freeCollateral, leverage, marginUsage } =
-    useSelector(getSubaccount, shallowEqual) ?? {};
+    useAppSelector(getSubaccount, shallowEqual) ?? {};
 
   const [tooltipContext, setTooltipContext] = useState<TooltipContextType<PnlDatum>>();
 

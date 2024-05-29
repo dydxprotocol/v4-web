@@ -1,21 +1,22 @@
 import { useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 
 import { OrderbookLine, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { DepthChartDatum, DepthChartSeries } from '@/constants/charts';
 
 import { getSubaccountOrderSizeBySideAndPrice } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketOrderbook } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 
 export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number }) => {
-  const orderbook = useSelector(getCurrentMarketOrderbook, shallowEqual);
+  const orderbook = useAppSelector(getCurrentMarketOrderbook, shallowEqual);
 
   const subaccountOrderSizeBySideAndPrice =
-    useSelector(getSubaccountOrderSizeBySideAndPrice, shallowEqual) || {};
+    useAppSelector(getSubaccountOrderSizeBySideAndPrice, shallowEqual) || {};
 
   return useMemo(() => {
     const asks: Array<PerpetualMarketOrderbookLevel | undefined> = (
@@ -91,7 +92,7 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
 };
 
 export const useOrderbookValuesForDepthChart = () => {
-  const orderbook = useSelector(getCurrentMarketOrderbook, shallowEqual);
+  const orderbook = useAppSelector(getCurrentMarketOrderbook, shallowEqual);
 
   return useMemo(() => {
     const bids = (orderbook?.bids?.toArray() ?? [])

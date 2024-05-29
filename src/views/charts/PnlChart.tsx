@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { curveLinear } from '@visx/curve';
 import type { TooltipContextType } from '@visx/xychart';
 import { debounce, get } from 'lodash';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import {
@@ -24,6 +24,7 @@ import {
   getSubaccountHistoricalPnl,
   getSubaccountId,
 } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { AppTheme } from '@/state/configs';
 import { getAppTheme } from '@/state/configsSelectors';
 
@@ -84,13 +85,13 @@ export const PnlChart = ({
   slotEmpty,
 }: PnlChartProps) => {
   const { isTablet } = useBreakpoints();
-  const appTheme = useSelector(getAppTheme);
-  const { equity } = useSelector(getSubaccount, shallowEqual) ?? {};
+  const appTheme = useAppSelector(getAppTheme);
+  const { equity } = useAppSelector(getSubaccount, shallowEqual) ?? {};
   const now = useNow({ intervalMs: timeUnits.minute });
 
   // Chart data
-  const pnlData = useSelector(getSubaccountHistoricalPnl, shallowEqual);
-  const subaccountId = useSelector(getSubaccountId, shallowEqual);
+  const pnlData = useAppSelector(getSubaccountHistoricalPnl, shallowEqual);
+  const subaccountId = useAppSelector(getSubaccountId, shallowEqual);
 
   const [periodOptions, setPeriodOptions] = useState<HistoricalPnlPeriods[]>([
     HistoricalPnlPeriod.Period1d,

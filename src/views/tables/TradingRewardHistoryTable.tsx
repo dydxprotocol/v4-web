@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { HistoricalTradingReward, HistoricalTradingRewardsPeriods } from '@/constants/abacus';
@@ -19,6 +19,7 @@ import { TableCell } from '@/components/Table/TableCell';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getHistoricalTradingRewardsForPeriod } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 export enum TradingRewardHistoryTableColumnKey {
   Event = 'Event',
@@ -101,11 +102,12 @@ export const TradingRewardHistoryTable = ({
   withInnerBorders = true,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const canViewAccount = useSelector(calculateCanViewAccount);
+  const canViewAccount = useAppSelector(calculateCanViewAccount);
   const { chainTokenLabel } = useTokenConfigs();
 
-  const periodTradingRewards = useSelector(
-    getHistoricalTradingRewardsForPeriod(period.name),
+  const selectTradingRewardsForPeriod = useMemo(getHistoricalTradingRewardsForPeriod, []);
+  const periodTradingRewards = useAppSelector(
+    (s) => selectTradingRewardsForPeriod(s, period.name),
     shallowEqual
   );
 

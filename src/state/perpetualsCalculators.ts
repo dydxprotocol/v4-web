@@ -1,5 +1,3 @@
-import { createSelector } from 'reselect';
-
 import type { MarketHistoricalFunding } from '@/constants/abacus';
 import { FundingDirection } from '@/constants/markets';
 
@@ -8,7 +6,9 @@ import {
   getCurrentMarketNextFundingRate,
 } from '@/state/perpetualsSelectors';
 
-export const calculateFundingRateHistory = createSelector(
+import { createAppSelector } from './appTypes';
+
+export const calculateFundingRateHistory = createAppSelector(
   [getCurrentMarketHistoricalFundings, getCurrentMarketNextFundingRate],
   (historicalFundings, nextFundingRate) => {
     const data: Pick<MarketHistoricalFunding, 'effectiveAtMilliseconds' | 'rate'>[] = [

@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { RenderTooltipParams } from '@visx/xychart/lib/components/Tooltip';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 
 import type { Nullable } from '@/constants/abacus';
 import {
@@ -20,6 +20,7 @@ import { Details } from '@/components/Details';
 import { Output, OutputType } from '@/components/Output';
 import { TooltipContent } from '@/components/visx/TooltipContent';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -42,7 +43,7 @@ export const DepthChartTooltipContent = ({
   const { nearestDatum } = tooltipData ?? {};
   const stringGetter = useStringGetter();
   const { spread, spreadPercent, midMarketPrice } = useOrderbookValuesForDepthChart();
-  const { id = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
 
   const priceImpact = useMemo(() => {
     if (nearestDatum && midMarketPrice) {

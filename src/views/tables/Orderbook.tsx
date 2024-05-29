@@ -1,7 +1,7 @@
 import { Key, useCallback, useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css, keyframes } from 'styled-components';
 
 import { type OrderbookLine } from '@/constants/abacus';
@@ -17,11 +17,12 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Details } from '@/components/Details';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
-import { CustomRowConfig, ColumnDef, TableRow } from '@/components/Table';
+import { ColumnDef, CustomRowConfig, TableRow } from '@/components/Table';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getSubaccountOrderSizeBySideAndPrice } from '@/state/accountSelectors';
+import { useAppSelector, useAppDispatch } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
@@ -50,10 +51,10 @@ type RowData = Pick<OrderbookLine, 'depth' | 'offset' | 'price' | 'size'> & {
 };
 
 const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number }) => {
-  const orderbook = useSelector(getCurrentMarketOrderbook, shallowEqual);
+  const orderbook = useAppSelector(getCurrentMarketOrderbook, shallowEqual);
 
   const subaccountOrderSizeBySideAndPrice =
-    useSelector(getSubaccountOrderSizeBySideAndPrice, shallowEqual) || {};
+    useAppSelector(getSubaccountOrderSizeBySideAndPrice, shallowEqual) || {};
 
   return useMemo(() => {
     const asks = (orderbook?.asks?.toArray() ?? [])
@@ -260,16 +261,16 @@ export const Orderbook = ({
   maxRowsPerSide = ORDERBOOK_MAX_ROWS_PER_SIDE,
   hideHeader = false,
 }: ElementProps & StyleProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
 
-  const currentInput = useSelector(getCurrentInput);
-  const { id = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const currentInput = useAppSelector(getCurrentInput);
+  const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const { stepSizeDecimals, tickSizeDecimals } =
-    useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+    useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
 
-  const showMineColumn = useSelector(calculateCanViewAccount) && !isTablet;
+  const showMineColumn = useAppSelector(calculateCanViewAccount) && !isTablet;
 
   const { asks, bids, spread, spreadPercent, histogramRange, hasOrderbook } =
     useCalculateOrderbookData({

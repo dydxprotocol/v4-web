@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 
 import {
@@ -12,6 +12,7 @@ import type { DialogTypes } from '@/constants/dialogs';
 
 import { calculateOnboardingStep } from '@/state/accountCalculators';
 import { getOnboardingState, getSubaccountId } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getActiveDialog } from '@/state/dialogsSelectors';
 import { getInputTradeData } from '@/state/inputsSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
@@ -53,7 +54,7 @@ export const useAnalytics = () => {
   }, [breakpoint]);
 
   // AnalyticsUserProperty.Locale
-  const selectedLocale = useSelector(getSelectedLocale);
+  const selectedLocale = useAppSelector(getSelectedLocale);
 
   useEffect(() => {
     identify(AnalyticsUserProperty.Locale, selectedLocale);
@@ -94,7 +95,7 @@ export const useAnalytics = () => {
   }, [dydxAddress]);
 
   // AnalyticsUserProperty.SubaccountNumber
-  const subaccountNumber = useSelector(getSubaccountId);
+  const subaccountNumber = useAppSelector(getSubaccountId);
   useEffect(() => {
     identify(AnalyticsUserProperty.SubaccountNumber, subaccountNumber);
   }, [subaccountNumber]);
@@ -140,7 +141,7 @@ export const useAnalytics = () => {
 
   // AnalyticsEvent.NavigateDialog
   // AnalyticsEvent.NavigateDialogClose
-  const activeDialog = useSelector(getActiveDialog);
+  const activeDialog = useAppSelector(getActiveDialog);
   const [previousActiveDialogType, setPreviousActiveDialogType] = useState<
     DialogTypes | undefined
   >();
@@ -175,8 +176,8 @@ export const useAnalytics = () => {
   }, []);
 
   // AnalyticsEvent.OnboardingStepChanged
-  const currentOnboardingStep = useSelector(calculateOnboardingStep);
-  const onboardingState = useSelector(getOnboardingState);
+  const currentOnboardingStep = useAppSelector(calculateOnboardingStep);
+  const onboardingState = useAppSelector(getOnboardingState);
   const [hasOnboardingStateChanged, setHasOnboardingStateChanged] = useState(false);
 
   useEffect(() => {
@@ -209,7 +210,7 @@ export const useAnalytics = () => {
   }, [selectedWalletType, walletConnectionType]);
 
   // AnalyticsEvent.TradeOrderTypeSelected
-  const { type: selectedOrderType } = useSelector(getInputTradeData, shallowEqual) ?? {};
+  const { type: selectedOrderType } = useAppSelector(getInputTradeData, shallowEqual) ?? {};
   const [hasSelectedOrderTypeChanged, setHasSelectedOrderTypeChanged] = useState(false);
 
   useEffect(() => {

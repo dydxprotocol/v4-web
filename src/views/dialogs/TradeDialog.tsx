@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import { useDispatch } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { DialogTypes } from '@/constants/dialogs';
@@ -19,6 +18,7 @@ import { Icon, IconName } from '@/components/Icon';
 import { Ring } from '@/components/Ring';
 import { TradeForm } from '@/views/forms/TradeForm';
 
+import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { testFlags } from '@/lib/testFlags';
@@ -33,7 +33,7 @@ type ElementProps = {
 
 export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) => {
   const { isMobile } = useBreakpoints();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
   const [currentStep, setCurrentStep] = useState<MobilePlaceOrderSteps>(

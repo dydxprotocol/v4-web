@@ -1,7 +1,9 @@
-import { shallowEqual, useSelector } from 'react-redux';
-import { createSelector } from 'reselect';
+import { useMemo } from 'react';
 
-import type { RootState } from './_store';
+import { shallowEqual } from 'react-redux';
+
+import { type RootState } from './_store';
+import { createAppSelector, useAppSelector } from './appTypes';
 
 /**
  * @param state
@@ -99,47 +101,49 @@ export const getTriggerOrdersInputs = (state: RootState) => state.inputs.trigger
  * @returns Data needed for the TradeForm (price, size, summary, input render options, and errors/input validation)
  */
 export const useTradeFormData = () => {
-  return useSelector(
-    createSelector(
-      [getInputTradeData, getInputTradeOptions, getTradeInputErrors],
-      (tradeData, tradeOptions, tradeErrors) => {
-        const { price, size, summary } = tradeData ?? {};
+  const selector = useMemo(
+    () =>
+      createAppSelector(
+        [getInputTradeData, getInputTradeOptions, getTradeInputErrors],
+        (tradeData, tradeOptions, tradeErrors) => {
+          const { price, size, summary } = tradeData ?? {};
 
-        const {
-          needsLimitPrice,
-          needsTrailingPercent,
-          needsTriggerPrice,
-          executionOptions,
-          needsGoodUntil,
-          needsPostOnly,
-          needsReduceOnly,
-          postOnlyTooltip,
-          reduceOnlyTooltip,
-          timeInForceOptions,
-        } = tradeOptions ?? {};
+          const {
+            needsLimitPrice,
+            needsTrailingPercent,
+            needsTriggerPrice,
+            executionOptions,
+            needsGoodUntil,
+            needsPostOnly,
+            needsReduceOnly,
+            postOnlyTooltip,
+            reduceOnlyTooltip,
+            timeInForceOptions,
+          } = tradeOptions ?? {};
 
-        return {
-          price,
-          size,
-          summary,
+          return {
+            price,
+            size,
+            summary,
 
-          needsLimitPrice,
-          needsTrailingPercent,
-          needsTriggerPrice,
-          executionOptions,
-          needsGoodUntil,
-          needsPostOnly,
-          needsReduceOnly,
-          postOnlyTooltip,
-          reduceOnlyTooltip,
-          timeInForceOptions,
+            needsLimitPrice,
+            needsTrailingPercent,
+            needsTriggerPrice,
+            executionOptions,
+            needsGoodUntil,
+            needsPostOnly,
+            needsReduceOnly,
+            postOnlyTooltip,
+            reduceOnlyTooltip,
+            timeInForceOptions,
 
-          tradeErrors,
-        };
-      }
-    ),
-    shallowEqual
+            tradeErrors,
+          };
+        }
+      ),
+    []
   );
+  return useAppSelector(selector, shallowEqual);
 };
 
 /**

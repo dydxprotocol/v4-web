@@ -1,5 +1,7 @@
-import { OrderFlags } from '@dydxprotocol/v4-client-js';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { useMemo } from 'react';
+
+import { OrderFlags, OrderSide } from '@dydxprotocol/v4-client-js';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { AbacusOrderStatus, AbacusOrderTypes, type Nullable } from '@/constants/abacus';
@@ -19,11 +21,11 @@ import { DetailsDialog } from '@/components/DetailsDialog';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
 import { OrderStatusIcon } from '@/views/OrderStatusIcon';
-import { type OrderTableRow } from '@/views/tables/OrdersTable';
 
 import { clearOrder } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getLocalCancelOrders, getOrderDetails } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -36,10 +38,10 @@ type ElementProps = {
 
 export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
-  const selectedLocale = useSelector(getSelectedLocale);
-  const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
-  const localCancelOrders = useSelector(getLocalCancelOrders, shallowEqual);
+  const dispatch = useAppDispatch();
+  const selectedLocale = useAppSelector(getSelectedLocale);
+  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
+  const localCancelOrders = useAppSelector(getLocalCancelOrders, shallowEqual);
 
   const { cancelOrder } = useSubaccount();
 
@@ -47,6 +49,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
   const isOrderCanceling =
     localCancelOrder && localCancelOrder.submissionStatus < CancelOrderStatuses.Canceled;
 
+  const orderDetailsSelector = useMemo(getOrderDetails, []);
   const {
     asset,
     cancelReason,
@@ -67,7 +70,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     triggerPrice,
     type,
     orderFlags,
-  } = (useSelector(getOrderDetails(orderId)) as OrderTableRow) ?? {};
+  } = useAppSelector((s) => orderDetailsSelector(s, orderId)!) ?? {};
 
   const renderOrderPrice = ({
     type: innerType,
@@ -96,7 +99,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     {
       key: 'side',
       label: stringGetter({ key: STRING_KEYS.SIDE }),
-      value: <OrderSideTag orderSide={orderSide} />,
+      value: <OrderSideTag orderSide={orderSide ?? OrderSide.BUY} />,
     },
     {
       key: 'status',
@@ -132,12 +135,14 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     {
       key: 'price',
       label: stringGetter({ key: STRING_KEYS.PRICE }),
-      value: renderOrderPrice({ type, price, tickSizeDecimals }),
+      value: renderOrderPrice({ type, price, tickSizeDecimals: tickSizeDecimals ?? 0 }),
     },
     {
       key: 'trigger-price',
       label: stringGetter({ key: STRING_KEYS.TRIGGER_PRICE_SHORT }),
-      value: triggerPrice ? renderOrderPrice({ price: triggerPrice, tickSizeDecimals }) : undefined,
+      value: triggerPrice
+        ? renderOrderPrice({ price: triggerPrice, tickSizeDecimals: tickSizeDecimals ?? 0 })
+        : undefined,
     },
     {
       key: 'trailing-percent',

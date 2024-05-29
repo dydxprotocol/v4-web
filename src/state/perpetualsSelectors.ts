@@ -1,10 +1,9 @@
-import { createSelector } from 'reselect';
-
 import { Candle, TradingViewBar } from '@/constants/candles';
 
 import { mapCandle } from '@/lib/tradingView/utils';
 
-import type { RootState } from './_store';
+import { type RootState } from './_store';
+import { createAppSelector } from './appTypes';
 
 /**
  * @returns current market filter applied inside the markets page
@@ -106,7 +105,7 @@ export const getHistoricalFundings = (state: RootState) => state.perpetuals.hist
 /**
  * @returns Historical funding data for the market the user is currently viewing
  */
-export const getCurrentMarketHistoricalFundings = createSelector(
+export const getCurrentMarketHistoricalFundings = createAppSelector(
   [getHistoricalFundings, getCurrentMarketId],
   (historicalFundings, currentMarketId) =>
     currentMarketId ? historicalFundings?.[currentMarketId] ?? [] : []
@@ -132,10 +131,11 @@ export const getCurrentMarketMidMarketPrice = (state: RootState) => {
  * @param resolution
  * @returns candle data for specified marketId and resolution
  */
-export const getPerpetualCandlesForMarket =
-  (marketId: string, resolution: string) =>
-  (state: RootState): Candle[] =>
-    state.perpetuals.candles?.[marketId]?.data?.[resolution] ?? [];
+export const getPerpetualCandlesForMarket = (
+  state: RootState,
+  marketId: string,
+  resolution: string
+): Candle[] => state.perpetuals.candles?.[marketId]?.data?.[resolution] ?? [];
 
 /**
  *
@@ -143,9 +143,12 @@ export const getPerpetualCandlesForMarket =
  * @param resolution
  * @returns TradingViewBar data for specified marketId and resolution
  */
-export const getPerpetualBarsForPriceChart = (marketId: string, resolution: string) =>
-  createSelector(
-    [getPerpetualCandlesForMarket(marketId, resolution)],
+export const getPerpetualBarsForPriceChart = () =>
+  createAppSelector(
+    [
+      (state: RootState, marketId: string, resolution: string) =>
+        getPerpetualCandlesForMarket(state, marketId, resolution),
+    ],
     (candles): TradingViewBar[] => candles.map(mapCandle)
   );
 
@@ -154,13 +157,13 @@ export const getPerpetualBarsForPriceChart = (marketId: string, resolution: stri
  * @param marketId
  * @returns TvChart resolution for specified marketId
  */
-export const getSelectedResolutionForMarket = (marketId: string) => (state: RootState) =>
+export const getSelectedResolutionForMarket = (state: RootState, marketId: string) =>
   state.perpetuals.candles?.[marketId]?.selectedResolution;
 
 /**
  * @returns Current market's next funding rate
  */
-export const getCurrentMarketNextFundingRate = createSelector(
+export const getCurrentMarketNextFundingRate = createAppSelector(
   [getCurrentMarketData],
   (marketData) => marketData?.perpetual?.nextFundingRate
 );

@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -21,6 +21,7 @@ import { FillsTable, FillsTableColumnKey } from '@/views/tables/FillsTable';
 import { OrdersTable, OrdersTableColumnKey } from '@/views/tables/OrdersTable';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
+import { type RootState } from '@/state/_store';
 import {
   calculateHasUncommittedOrders,
   calculateIsAccountViewOnly,
@@ -33,6 +34,7 @@ import {
   getHasUnseenOrderUpdates,
   getTradeInfoNumbers,
 } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
 import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
@@ -65,31 +67,32 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const navigate = useNavigate();
   const { isTablet } = useBreakpoints();
 
-  const allMarkets = useSelector(getDefaultToAllMarketsInPositionsOrdersFills);
+  const allMarkets = useAppSelector(getDefaultToAllMarketsInPositionsOrdersFills);
   const [view, setView] = useState<PanelView>(
     allMarkets ? PanelView.AllMarkets : PanelView.CurrentMarket
   );
   const [tab, setTab] = useState<InfoSection>(InfoSection.Position);
 
-  const currentMarketId = useSelector(getCurrentMarketId);
-  const currentMarketAssetId = useSelector(getCurrentMarketAssetId);
+  const currentMarketId = useAppSelector(getCurrentMarketId);
+  const currentMarketAssetId = useAppSelector(getCurrentMarketAssetId);
 
   const { numTotalPositions, numTotalOpenOrders, numTotalFills } =
-    useSelector(getTradeInfoNumbers, shallowEqual) || {};
+    useAppSelector(getTradeInfoNumbers, shallowEqual) || {};
 
   const { numOpenOrders, numFills } =
-    useSelector(getCurrentMarketTradeInfoNumbers, shallowEqual) || {};
+    useAppSelector(getCurrentMarketTradeInfoNumbers, shallowEqual) || {};
 
   const showClosePositionAction = true;
 
-  const hasUnseenOrderUpdates = useSelector(getHasUnseenOrderUpdates);
-  const hasUnseenFillUpdates = useSelector(getHasUnseenFillUpdates);
-  const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
-  const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
-  const shouldRenderActions = useSelector(
-    calculateShouldRenderActionsInPositionsTable(showClosePositionAction)
+  const hasUnseenOrderUpdates = useAppSelector(getHasUnseenOrderUpdates);
+  const hasUnseenFillUpdates = useAppSelector(getHasUnseenFillUpdates);
+  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
+  const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
+  const selectShouldRenderActions = useMemo(calculateShouldRenderActionsInPositionsTable, []);
+  const shouldRenderActions = useAppSelector((state: RootState) =>
+    selectShouldRenderActions(state, showClosePositionAction)
   );
-  const isWaitingForOrderToIndex = useSelector(calculateHasUncommittedOrders);
+  const isWaitingForOrderToIndex = useAppSelector(calculateHasUncommittedOrders);
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
 
   const fillsTagNumber = shortenNumberForDisplay(showCurrentMarket ? numFills : numTotalFills);

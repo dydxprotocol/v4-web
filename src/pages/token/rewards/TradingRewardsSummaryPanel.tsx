@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
@@ -18,17 +18,16 @@ import { Panel } from '@/components/Panel';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getHistoricalTradingRewardsForCurrentWeek } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 
 export const TradingRewardsSummaryPanel = () => {
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
-  const canViewAccount = useSelector(calculateCanViewAccount);
-  const currentWeekTradingReward = useSelector(
-    getHistoricalTradingRewardsForCurrentWeek,
-    shallowEqual
-  );
+  const canViewAccount = useAppSelector(calculateCanViewAccount);
+  const currentWeekTradingRewardsSelector = useMemo(getHistoricalTradingRewardsForCurrentWeek, []);
+  const currentWeekTradingReward = useAppSelector(currentWeekTradingRewardsSelector, shallowEqual);
 
   useEffect(() => {
     // Initialize weekly data for currentWeekTradingReward

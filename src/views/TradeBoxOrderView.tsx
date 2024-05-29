@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
-import { createSelector } from 'reselect';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
@@ -14,6 +13,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { TabItem, Tabs } from '@/components/Tabs';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -26,13 +26,11 @@ const useTradeTypeOptions = (): {
   selectedTradeType: TradeTypes;
 } => {
   const stringGetter = useStringGetter();
-  const selectedTradeType = useSelector(
-    createSelector(
-      [getInputTradeData],
-      (currentTradeData) => (currentTradeData?.type?.rawValue as TradeTypes) ?? TradeTypes.LIMIT
-    )
-  );
-  const { typeOptions } = useSelector(getInputTradeOptions, shallowEqual) ?? {};
+
+  const currentTradeData = useAppSelector(getInputTradeData, shallowEqual);
+  const selectedTradeType = (currentTradeData?.type?.rawValue as TradeTypes) ?? TradeTypes.LIMIT;
+
+  const { typeOptions } = useAppSelector(getInputTradeOptions, shallowEqual) ?? {};
   const allTradeTypeItems = typeOptions?.toArray()?.map(({ type, stringKey }) => ({
     value: type,
     label: stringGetter({

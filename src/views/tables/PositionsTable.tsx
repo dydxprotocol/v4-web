@@ -1,7 +1,7 @@
 import { Key, useMemo } from 'react';
 
 import type { ColumnSize } from '@react-types/table';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -38,6 +38,7 @@ import {
   calculateShouldRenderTriggersInPositionsTable,
 } from '@/state/accountCalculators';
 import { getExistingOpenPositions, getSubaccountConditionalOrders } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
@@ -402,28 +403,26 @@ export const PositionsTable = ({
   const navigate = useNavigate();
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
 
-  const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
-  const perpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
-  const assets = orEmptyObj(useSelector(getAssets, shallowEqual));
-  const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
+  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
+  const perpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const assets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
+  const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
 
-  const openPositions = useSelector(getExistingOpenPositions, shallowEqual) ?? EMPTY_ARR;
+  const openPositions = useAppSelector(getExistingOpenPositions, shallowEqual) ?? EMPTY_ARR;
   const positions = useMemo(() => {
     const marketPosition = openPositions.find((position) => position.id === currentMarket);
     return currentMarket ? (marketPosition ? [marketPosition] : []) : openPositions;
   }, [currentMarket, openPositions]);
 
-  const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } = useSelector(
-    getSubaccountConditionalOrders(isSlTpLimitOrdersEnabled),
-    {
+  const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } =
+    useAppSelector(getSubaccountConditionalOrders(isSlTpLimitOrdersEnabled), {
       equalityFn: (oldVal, newVal) => {
         return (
           shallowEqual(oldVal.stopLossOrders, newVal.stopLossOrders) &&
           shallowEqual(oldVal.takeProfitOrders, newVal.takeProfitOrders)
         );
       },
-    }
-  );
+    });
 
   const positionsData = useMemo(
     () =>

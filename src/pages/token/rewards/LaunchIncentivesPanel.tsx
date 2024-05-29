@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 
 import { useQuery } from 'react-query';
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
@@ -24,6 +23,7 @@ import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 import { Tag, TagSize } from '@/components/Tag';
 
+import { useAppDispatch } from '@/state/appTypes';
 import { markLaunchIncentivesSeen } from '@/state/configs';
 import { openDialog } from '@/state/dialogs';
 
@@ -31,7 +31,7 @@ import { log } from '@/lib/telemetry';
 
 export const LaunchIncentivesPanel = ({ className }: { className?: string }) => {
   const { isNotTablet } = useBreakpoints();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(markLaunchIncentivesSeen());
@@ -137,7 +137,7 @@ const EstimatedRewards = () => {
 
 const LaunchIncentivesContent = () => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   return (
     <$Column>

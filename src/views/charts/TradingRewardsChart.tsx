@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { curveLinear } from '@visx/curve';
 import { TooltipContextType } from '@visx/xychart';
 import { debounce } from 'lodash';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
@@ -32,6 +32,7 @@ import {
   getHistoricalTradingRewardsForPeriod,
   getTotalTradingRewards,
 } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 import { formatRelativeTime } from '@/lib/dateTime';
@@ -76,10 +77,11 @@ export const TradingRewardsChart = ({
     TradingRewardsPeriod.PeriodAllTime
   );
 
-  const canViewAccount = useSelector(calculateCanViewAccount);
-  const totalTradingRewards = useSelector(getTotalTradingRewards);
-  const periodTradingRewards = useSelector(
-    getHistoricalTradingRewardsForPeriod(SELECTED_PERIOD.name),
+  const canViewAccount = useAppSelector(calculateCanViewAccount);
+  const totalTradingRewards = useAppSelector(getTotalTradingRewards);
+  const tradingRewardsSelector = useMemo(getHistoricalTradingRewardsForPeriod, []);
+  const periodTradingRewards = useAppSelector(
+    (s) => tradingRewardsSelector(s, SELECTED_PERIOD.name),
     shallowEqual
   );
 

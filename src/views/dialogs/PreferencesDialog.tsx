@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { SelectedGasDenom } from '@dydxprotocol/v4-client-js';
-import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -14,20 +13,23 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { ComboboxDialogMenu } from '@/components/ComboboxDialogMenu';
 import { Switch } from '@/components/Switch';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { OtherPreference, setDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configs';
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 
 const usePreferenceMenu = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
   // Notifications
   const { notificationPreferences, setNotificationPreferences } = useNotifications();
   const [enabledNotifs, setEnabledNotifs] = useState(notificationPreferences);
 
-  const currentDisplayAllMarketDefault = useSelector(getDefaultToAllMarketsInPositionsOrdersFills);
+  const currentDisplayAllMarketDefault = useAppSelector(
+    getDefaultToAllMarketsInPositionsOrdersFills
+  );
   const [defaultToAllMarkets, setDefaultToAllMarkets] = useState(currentDisplayAllMarketDefault);
 
   const toggleNotifPreference = (type: NotificationCategoryPreferences) =>

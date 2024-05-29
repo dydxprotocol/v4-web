@@ -1,4 +1,5 @@
-import { useSelector } from 'react-redux';
+import { useMemo } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -12,10 +13,12 @@ import { AttachedExpandingSection, DetachedSection } from '@/components/ContentS
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { PositionsTable, PositionsTableColumnKey } from '@/views/tables/PositionsTable';
 
+import { type RootState } from '@/state/_store';
 import {
   calculateShouldRenderActionsInPositionsTable,
   calculateShouldRenderTriggersInPositionsTable,
 } from '@/state/accountCalculators';
+import { useAppSelector } from '@/state/appTypes';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { testFlags } from '@/lib/testFlags';
@@ -29,9 +32,10 @@ export const Overview = () => {
 
   const showClosePositionAction = false;
 
-  const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
-  const shouldRenderActions = useSelector(
-    calculateShouldRenderActionsInPositionsTable(showClosePositionAction)
+  const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
+  const shouldRenderActionsSelector = useMemo(calculateShouldRenderActionsInPositionsTable, []);
+  const shouldRenderActions = useAppSelector((state: RootState) =>
+    shouldRenderActionsSelector(state, showClosePositionAction)
   );
 
   return (

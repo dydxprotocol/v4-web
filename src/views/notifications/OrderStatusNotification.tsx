@@ -1,4 +1,6 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { useMemo } from 'react';
+
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import {
@@ -25,7 +27,8 @@ import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 // eslint-disable-next-line import/no-cycle
 import { Notification, NotificationProps } from '@/components/Notification';
 
-import { getFillByClientId, getOrderByClientId } from '@/state/accountSelectors';
+import { getOrderByClientId } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getMarketData } from '@/state/perpetualsSelectors';
 
 import { assertNever } from '@/lib/assertNever';
@@ -44,9 +47,11 @@ export const OrderStatusNotification = ({
   notification,
 }: NotificationProps & ElementProps) => {
   const stringGetter = useStringGetter();
-  const order = useSelector(getOrderByClientId(localOrder.clientId), shallowEqual);
-  const fill = useSelector(getFillByClientId(localOrder.clientId), shallowEqual);
-  const marketData = useSelector(getMarketData(localOrder.marketId), shallowEqual);
+  const selectOrderById = useMemo(getOrderByClientId, []);
+  const selectFillByClientId = useMemo(getOrderByClientId, []);
+  const order = useAppSelector((s) => selectOrderById(s, localOrder.clientId), shallowEqual);
+  const fill = useAppSelector((s) => selectFillByClientId(s, localOrder.clientId), shallowEqual);
+  const marketData = useAppSelector(getMarketData(localOrder.marketId), shallowEqual);
   const { assetId } = marketData ?? {};
   const titleKey = ORDER_TYPE_STRINGS[localOrder.orderType]?.orderTypeKey;
   const indexedOrderStatus = order?.status?.rawValue as KotlinIrEnumValues<
