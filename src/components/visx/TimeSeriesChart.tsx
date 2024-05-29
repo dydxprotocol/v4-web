@@ -162,7 +162,9 @@ export const TimeSeriesChart = <Datum extends {}>({
 
   useEffect(() => {
     if (defaultZoomDomain) {
-      setZoomDomainAnimateTo(getClampedZoomDomain(defaultZoomDomain));
+      const clampedZoomDomain = getClampedZoomDomain(defaultZoomDomain);
+      setZoomDomain(clampedZoomDomain);
+      setZoomDomainAnimateTo(clampedZoomDomain);
     }
   }, [defaultZoomDomain, getClampedZoomDomain]);
 
