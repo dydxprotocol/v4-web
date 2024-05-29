@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 import { StargateClient } from '@cosmjs/stargate';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { shallowEqual } from 'react-redux';
 import { formatUnits } from 'viem';
 import { useBalance } from 'wagmi';
@@ -79,7 +79,7 @@ export const useAccountBalance = ({
 
   const cosmosQuery = useQuery({
     enabled: Boolean(isCosmosChain && dydxAddress && bech32AddrPrefix && rpc && addressOrDenom),
-    queryKey: `accountBalances_${chainId}_${addressOrDenom}`,
+    queryKey: ['accountBalances', chainId, addressOrDenom],
     queryFn: cosmosQueryFn,
     refetchOnWindowFocus: false,
     refetchOnMount: false,

@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 
 import { getChainRevenue } from '@/services/numia';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { shallowEqual } from 'react-redux';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
-import { log } from '@/lib/telemetry';
+import { wrapAndLogError } from '@/lib/asyncUtils';
 import { isPresent, orEmptyObj } from '@/lib/typeUtils';
 
 const endDate = new Date();
@@ -24,19 +24,17 @@ export const usePerpetualMarketsStats = () => {
 
   const { data } = useQuery({
     queryKey: ['chain-revenue', startDate.toISOString(), endDate.toISOString()],
-    queryFn: () => {
-      try {
-        return getChainRevenue({
+    queryFn: wrapAndLogError(
+      () =>
+        getChainRevenue({
           startDate,
           endDate,
-        });
-      } catch (error) {
-        log('usePerpetualMarketsStats getChainRevenue', error);
-        return undefined;
-      }
-    },
+        }),
+      'usePerpetualMarketsStats getChainRevenue',
+      true
+    ),
     refetchOnWindowFocus: false,
-    cacheTime: 1_000 * 60 * 5, // 5 minutes
+    gcTime: 1_000 * 60 * 5, // 5 minutes
     staleTime: 1_000 * 60 * 10, // 10 minutes
   });
 
