@@ -2,8 +2,8 @@ import { useEffect, useMemo } from 'react';
 
 import { encodeJson } from '@dydxprotocol/v4-client-js';
 import { ByteArrayEncoding } from '@dydxprotocol/v4-client-js/build/src/lib/helpers';
+import { useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
-import { useQuery } from 'react-query';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 import { DialogTypes } from '@/constants/dialogs';
@@ -13,9 +13,9 @@ import { getApiState } from '@/state/appSelectors';
 import { closeDialog, openDialog } from '@/state/dialogs';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
+import { wrapAndLogError } from '@/lib/asyncUtils';
 import { formatRelativeTime } from '@/lib/dateTime';
 import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
-import { log } from '@/lib/telemetry';
 
 import { useDydxClient } from './useDydxClient';
 import { useEnvFeatures } from './useEnvFeatures';
@@ -38,31 +38,27 @@ export const useWithdrawalInfo = ({
 
   const { data: usdcWithdrawalCapacity } = useQuery({
     enabled: withdrawalSafetyEnabled,
-    queryKey: 'usdcWithdrawalCapacity',
-    queryFn: async () => {
-      try {
+    queryKey: ['usdcWithdrawalCapacity'],
+    queryFn: wrapAndLogError(
+      async () => {
         const response = await getWithdrawalCapacityByDenom({ denom: usdcDenom });
         return JSON.parse(encodeJson(response, ByteArrayEncoding.BIGINT));
-      } catch (error) {
-        log('useWithdrawalInfo/getWithdrawalCapacityByDenom', error);
-        return undefined;
-      }
-    },
+      },
+      'useWithdrawalInfo/getWithdrawalCapacityByDenom',
+      true
+    ),
     refetchInterval: 60_000,
     staleTime: 60_000,
   });
 
   const { data: withdrawalAndTransferGatingStatus } = useQuery({
     enabled: withdrawalSafetyEnabled,
-    queryKey: 'withdrawalTransferGateStatus',
-    queryFn: async () => {
-      try {
-        return await getWithdrawalAndTransferGatingStatus();
-      } catch (error) {
-        log('useWithdrawalInfo/getWithdrawalAndTransferGatingStatus', error);
-        return undefined;
-      }
-    },
+    queryKey: ['withdrawalTransferGateStatus'],
+    queryFn: wrapAndLogError(
+      () => getWithdrawalAndTransferGatingStatus(),
+      'useWithdrawalInfo/getWithdrawalAndTransferGatingStatus',
+      true
+    ),
     refetchInterval: 60_000,
     staleTime: 60_000,
   });
