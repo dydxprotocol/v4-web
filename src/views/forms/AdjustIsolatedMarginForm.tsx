@@ -5,7 +5,6 @@ import { shallowEqual, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import {
-  AbacusPositionSide,
   AdjustIsolatedMarginInputField,
   IsolatedMarginAdjustmentType,
   type SubaccountPosition,
@@ -63,7 +62,7 @@ export const AdjustIsolatedMarginForm = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const subaccountPosition = useSelector(getOpenPositionFromId(marketId));
-  const { childSubaccountNumber, side } = subaccountPosition ?? {};
+  const { childSubaccountNumber } = subaccountPosition ?? {};
   const marketConfig = useSelector(getMarketConfig(marketId));
   const adjustIsolatedMarginInputs = useSelector(getAdjustIsolatedMarginInputs, shallowEqual);
 
@@ -272,22 +271,16 @@ export const AdjustIsolatedMarginForm = ({
         };
 
   const gradientToColor = useMemo(() => {
-    if (liquidationPriceUpdated && liquidationPrice) {
-      const increasedLiquidationPrice = liquidationPriceUpdated > liquidationPrice;
-      if (side?.current === AbacusPositionSide.LONG) {
-        return increasedLiquidationPrice ? 'negative' : 'positive';
-      }
-
-      return increasedLiquidationPrice ? 'positive' : 'negative';
+    if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Add) {
+      return 'positive';
     }
 
-    // Position did not have a liq. price prior to the adjustment
-    if (liquidationPriceUpdated) {
+    if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Remove) {
       return 'negative';
     }
 
     return 'neutral';
-  }, [liquidationPrice, liquidationPriceUpdated, side]);
+  }, [isolatedMarginAdjustmentType]);
 
   const CenterElement = errorMessage ? (
     <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>

@@ -14,7 +14,8 @@ import {
   type SubaccountFundingPayment,
   type SubaccountOrder,
 } from '@/constants/abacus';
-import { OnboardingState } from '@/constants/account';
+import { NUM_PARENT_SUBACCOUNTS, OnboardingState } from '@/constants/account';
+import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 
 import { getHydratedTradingData, isStopLossOrder, isTakeProfitOrder } from '@/lib/orders';
 import { getHydratedPositionData } from '@/lib/positions';
@@ -110,6 +111,24 @@ export const getCurrentMarketPositionData = (state: RootState) => {
     (getOpenPositions(state) ?? []).map((positionData) => [positionData.id, positionData])
   )[currentMarketId as string];
 };
+
+/**
+ * @returns the current leverage of the isolated position. Selector will return null if position is not isolated or does not exist.
+ */
+export const getCurrentMarketIsolatedPositionLeverage = createSelector(
+  [getCurrentMarketPositionData],
+  (position) => {
+    if (
+      position?.childSubaccountNumber &&
+      position.childSubaccountNumber >= NUM_PARENT_SUBACCOUNTS &&
+      position.leverage?.current
+    ) {
+      return Number(position.leverage.current.toFixed(LEVERAGE_DECIMALS));
+    }
+
+    return 0;
+  }
+);
 
 /**
  * @param state
