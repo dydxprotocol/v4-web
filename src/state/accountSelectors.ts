@@ -65,8 +65,10 @@ export const getOpenPositions = (state: RootState) =>
  *
  * @returns All SubaccountOrders that have a margin mode of Isolated and no existing position for the market.
  */
-export const getPendingPositions = (state: RootState) =>
-  state.account.subaccount?.pendingPositions?.toArray();
+export const getNonZeroPendingPositions = createSelector(
+  [(state: RootState) => state.account.subaccount?.pendingPositions],
+  (pending) => pending?.toArray().filter((p) => (p.freeCollateral?.current ?? 0) > 0)
+);
 
 /**
  * @param marketId
