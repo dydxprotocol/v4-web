@@ -359,12 +359,7 @@ export const TradeForm = ({
         </$WarningTooltipContent>
       }
     >
-      <Button
-        disabled
-        onClick={() => {
-          dispatch(openDialogInTradeBox({ type: TradeBoxDialogTypes.SelectMarginMode }));
-        }}
-      >
+      <Button disabled>
         {marginMode &&
           stringGetter({
             key: MARGIN_MODE_STRINGS[marginMode.rawValue],
