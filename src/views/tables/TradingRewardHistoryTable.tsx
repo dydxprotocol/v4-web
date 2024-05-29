@@ -75,7 +75,7 @@ const getTradingRewardHistoryTableColumnDef = ({
         getCellValue: (row) => row.amount,
         label: stringGetter({ key: STRING_KEYS.EARNED }),
         renderCell: ({ amount }) => (
-          <$Output
+          <$PositiveOutput
             type={OutputType.Asset}
             value={amount}
             showSign={ShowSign.Both}
@@ -185,7 +185,7 @@ const $EmptyIcon = styled(Icon)`
   font-size: 3em;
 `;
 
-const $Output = styled(Output)`
+const $PositiveOutput = styled(Output)`
   --output-sign-color: var(--color-positive);
   gap: 0.5ch;
 `;
