@@ -5,10 +5,7 @@ import {
   type ThemeProps,
 } from 'styled-components';
 
-export const articleMixins: Record<
-  string,
-  FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>
-> = {
+export const articleMixins = {
   article: css`
     padding: 2rem;
     overflow-wrap: break-word;
@@ -50,4 +47,4 @@ export const articleMixins: Record<
       padding: 0.5rem 1rem;
     }
   `,
-};
+} satisfies Record<string, FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>>;
