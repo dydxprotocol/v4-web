@@ -339,7 +339,7 @@ devDependencies:
     version: 8.32.4
   '@wdio/types':
     specifier: ^8.32.4
-    version: 8.36.1
+    version: 8.37.0
   ajv:
     specifier: ^8.12.0
     version: 8.12.0
@@ -6559,7 +6559,7 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       superjson: 1.13.3
-      use-sync-external-store: 1.2.0(react@18.2.0)
+      use-sync-external-store: 1.2.2(react@18.2.0)
     dev: false
 
   /@tanstack/react-query-persist-client@4.32.6(@tanstack/react-query@4.36.1):
@@ -6586,7 +6586,7 @@ packages:
       '@tanstack/query-core': 4.36.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
-      use-sync-external-store: 1.2.0(react@18.2.0)
+      use-sync-external-store: 1.2.2(react@18.2.0)
     dev: false
 
   /@tanstack/react-query@5.37.1(react@18.2.0):
@@ -8348,7 +8348,7 @@ packages:
       '@wdio/utils': 8.33.1
       decamelize: 6.0.0
       deepmerge-ts: 5.1.0
-      glob: 10.3.16
+      glob: 10.4.1
       import-meta-resolve: 4.1.0
     transitivePeerDependencies:
       - supports-color
@@ -8357,6 +8357,7 @@ packages:
   /@wdio/config@8.38.0:
     resolution: {integrity: sha512-9eMmHYkXw/0htj8Nok2vBa8Q+IS/wj7HXbLczKb5rEmDb57SW5iPMpZutFywGki1D/GIDLvejWaZvlxmS/yfBA==}
     engines: {node: ^16.13 || >=18}
+    requiresBuild: true
     dependencies:
       '@wdio/logger': 8.38.0
       '@wdio/types': 8.37.0
@@ -8445,6 +8446,7 @@ packages:
 
   /@wdio/protocols@8.38.0:
     resolution: {integrity: sha512-7BPi7aXwUtnXZPeWJRmnCNFjyDvGrXlBmN9D4Pi58nILkyjVRQKEY9/qv/pcdyB0cvmIvw++Kl/1Lg+RxG++UA==}
+    requiresBuild: true
     dev: true
 
   /@wdio/repl@8.24.12:
@@ -8507,13 +8509,6 @@ packages:
       '@types/node': 20.12.12
     dev: true
 
-  /@wdio/types@8.36.1:
-    resolution: {integrity: sha512-kKtyJbypasKo/VQuJ6dTQQwFtHE9qoygjoCZjrQCLGraRSjOEiqZHPR0497wbeCvcgHIYyImbmcylqZNGUE0CQ==}
-    engines: {node: ^16.13 || >=18}
-    dependencies:
-      '@types/node': 20.12.12
-    dev: true
-
   /@wdio/types@8.37.0:
     resolution: {integrity: sha512-36kmSlZcVhsMlbhaSCQUfL51iG81FlbzW4Dfkz4903cDkxmh64bgxydZbRB5aPLnJzzR7tI3chIME8zSVZFR8w==}
     engines: {node: ^16.13 || >=18}
@@ -8531,7 +8526,7 @@ packages:
       decamelize: 6.0.0
       deepmerge-ts: 5.1.0
       edgedriver: 5.5.0
-      geckodriver: 4.4.0
+      geckodriver: 4.4.1
       get-port: 7.1.0
       import-meta-resolve: 4.1.0
       locate-app: 2.4.15
@@ -8545,6 +8540,7 @@ packages:
   /@wdio/utils@8.38.0:
     resolution: {integrity: sha512-ios7MpyJk4kGW9ZOYxbPpdwVZBI7SzccIgiirqSf8rvJi62VpDA2nfa7i7BY1rs9p7lnenF8phwnuVFGMCoL0w==}
     engines: {node: ^16.13 || >=18}
+    requiresBuild: true
     dependencies:
       '@puppeteer/browsers': 1.9.1
       '@wdio/logger': 8.38.0
@@ -9013,7 +9009,7 @@ packages:
     engines: {node: '>= 14'}
     requiresBuild: true
     dependencies:
-      glob: 10.3.16
+      glob: 10.4.1
       graceful-fs: 4.2.11
       is-stream: 2.0.1
       lazystream: 1.0.1
@@ -10683,6 +10679,7 @@ packages:
 
   /devtools-protocol@0.0.1302984:
     resolution: {integrity: sha512-Rgh2Sk5fUSCtEx4QGH9iwTyECdFPySG2nlz5J8guGh2Wlha6uzSOCq/DCEC8faHlLaMPZJMuZ4ovgcX4LvOkKA==}
+    requiresBuild: true
     dev: true
 
   /diff-sequences@29.6.3:
@@ -10806,7 +10803,7 @@ packages:
     hasBin: true
     requiresBuild: true
     dependencies:
-      '@wdio/logger': 8.28.0
+      '@wdio/logger': 8.38.0
       decamelize: 6.0.0
       edge-paths: 3.0.5
       node-fetch: 3.3.2
@@ -11857,8 +11854,8 @@ packages:
       lodash.isequal: 4.5.0
     optionalDependencies:
       '@wdio/globals': 8.33.1(typescript@5.1.3)
-      '@wdio/logger': 8.28.0
-      webdriverio: 8.33.1(typescript@5.1.3)
+      '@wdio/logger': 8.38.0
+      webdriverio: 8.38.0(typescript@5.1.3)
     transitivePeerDependencies:
       - bufferutil
       - devtools
@@ -12235,24 +12232,6 @@ packages:
       globule: 1.3.4
     dev: true
 
-  /geckodriver@4.4.0:
-    resolution: {integrity: sha512-Y/Np2VkAhBkJoFAIY3pKH3rICUcR5rH9VD6EHwh0CqUIh6Opzr/NFwfcQenYfbRT/659R15/35LpA1s6h9wPPg==}
-    engines: {node: ^16.13 || >=18 || >=20}
-    hasBin: true
-    requiresBuild: true
-    dependencies:
-      '@wdio/logger': 8.28.0
-      decamelize: 6.0.0
-      http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.4
-      node-fetch: 3.3.2
-      tar-fs: 3.0.6
-      unzipper: 0.11.6
-      which: 4.0.0
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
-
   /geckodriver@4.4.1:
     resolution: {integrity: sha512-nnAdIrwLkMcDu4BitWXF23pEMeZZ0Cj7HaWWFdSpeedBP9z6ft150JYiGO2mwzw6UiR823Znk1JeIf07RyzloA==}
     engines: {node: ^16.13 || >=18 || >=20}
@@ -12393,18 +12372,6 @@ packages:
     resolution: {integrity: sha512-lkX1HJXwyMcprw/5YUZc2s7DrpAiHB21/V+E1rHUrVNokkvB6bqMzT0VfV6/86ZNabt1k14YOIaT7nDvOX3Iiw==}
     dev: true
 
-  /glob@10.3.16:
-    resolution: {integrity: sha512-JDKXl1DiuuHJ6fVS2FXjownaavciiHNUU4mOvV/B793RLh05vZL1rcPnCSaOgv1hDT6RDlY7AB7ZUvFYAtPgAw==}
-    engines: {node: '>=16 || 14 >=14.18'}
-    hasBin: true
-    dependencies:
-      foreground-child: 3.1.1
-      jackspeak: 3.1.2
-      minimatch: 9.0.4
-      minipass: 7.1.1
-      path-scurry: 1.11.1
-    dev: true
-
   /glob@10.4.1:
     resolution: {integrity: sha512-2jelhlq3E4ho74ZyVLN03oKdAZVUa6UDZzFLVH1H7dnoax+y9qyaq8zBkfDIggjniU19z0wU18y16jMB2eyVIw==}
     engines: {node: '>=16 || 14 >=14.18'}
@@ -12419,6 +12386,7 @@ packages:
 
   /glob@7.1.7:
     resolution: {integrity: sha512-OvD9ENzPLbegENnYP5UUfJIirTg4+XwMWGaQfQTY0JenxNvvIKP3U3/tAQSPIu/lHxXYSZmpXlUHeqAIdKzBLQ==}
+    deprecated: Glob versions prior to v9 are no longer supported
     dependencies:
       fs.realpath: 1.0.0
       inflight: 1.0.6
@@ -12430,6 +12398,7 @@ packages:
 
   /glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
+    deprecated: Glob versions prior to v9 are no longer supported
     dependencies:
       fs.realpath: 1.0.0
       inflight: 1.0.6
@@ -12442,6 +12411,7 @@ packages:
   /glob@8.1.0:
     resolution: {integrity: sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ==}
     engines: {node: '>=12'}
+    deprecated: Glob versions prior to v9 are no longer supported
     dependencies:
       fs.realpath: 1.0.0
       inflight: 1.0.6
@@ -13027,6 +12997,7 @@ packages:
 
   /immediate@3.0.6:
     resolution: {integrity: sha512-XXOFtyqDjNDAQxVfYxuF7g9Il/IbWmmlQg2MYKOH8ExIT1qg6xc4zyS3HaEEATgs1btfzxq15ciUiY7gjSXRGQ==}
+    requiresBuild: true
     dev: true
 
   /immer@10.1.1:
@@ -13057,6 +13028,7 @@ packages:
 
   /inflight@1.0.6:
     resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==}
+    deprecated: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
     dependencies:
       once: 1.4.0
       wrappy: 1.0.2
@@ -14041,6 +14013,7 @@ packages:
 
   /jszip@3.10.1:
     resolution: {integrity: sha512-xXDvecyTpGLrqFrvkrUSoxxfJI5AH7U8zxxtVclpsUtMCq4JQ290LY8AW5c7Ggnr/Y/oK+bQMbqK2qmtk3pN4g==}
+    requiresBuild: true
     dependencies:
       lie: 3.3.0
       pako: 1.0.11
@@ -14199,6 +14172,7 @@ packages:
 
   /lie@3.3.0:
     resolution: {integrity: sha512-UaiMJzeWRlEujzAuw5LokY1L5ecNQYZKfmyZ9L7wDHb/p5etKaxXhohBcrw0EYby+G/NA52vRSN4N39dxHAIwQ==}
+    requiresBuild: true
     dependencies:
       immediate: 3.0.6
     dev: true
@@ -15236,11 +15210,6 @@ packages:
   /minimist@1.2.8:
     resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
 
-  /minipass@7.1.1:
-    resolution: {integrity: sha512-UZ7eQ+h8ywIRAW1hIEl2AqdwzJucU/Kp59+8kkZeSvafXhZjul247BvIJjEVFVeON6d7lM46XX1HXCduKAS8VA==}
-    engines: {node: '>=16 || 14 >=14.17'}
-    dev: true
-
   /minipass@7.1.2:
     resolution: {integrity: sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==}
     engines: {node: '>=16 || 14 >=14.17'}
@@ -16001,7 +15970,7 @@ packages:
     engines: {node: '>=16 || 14 >=14.18'}
     dependencies:
       lru-cache: 10.2.2
-      minipass: 7.1.1
+      minipass: 7.1.2
     dev: true
 
   /path-to-regexp@6.2.1:
@@ -17126,6 +17095,7 @@ packages:
 
   /rimraf@2.5.4:
     resolution: {integrity: sha512-Lw7SHMjssciQb/rRz7JyPIy9+bbUshEucPoLRvWqy09vC5zQixl8Uet+Zl+SROBB/JMWHJRdCk1qdxNWHNMvlQ==}
+    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
     dependencies:
       glob: 7.2.3
@@ -17133,6 +17103,7 @@ packages:
 
   /rimraf@2.7.1:
     resolution: {integrity: sha512-uWjbaKIK3T1OSVptzX7Nl6PvQ3qAGtKEtVRjRuazjfL3Bx5eI409VZSqgND+4UNnmzLVdPj9FqFJNPqBZFve4w==}
+    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
     dependencies:
       glob: 7.2.3
@@ -17140,6 +17111,7 @@ packages:
 
   /rimraf@3.0.2:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
+    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
     dependencies:
       glob: 7.2.3
@@ -17386,6 +17358,7 @@ packages:
 
   /setimmediate@1.0.5:
     resolution: {integrity: sha512-MATJdZp8sLqDl/68LfQmbP8zKPLQNV6BIZoIgrscFDQ+RsvK/BxeDQOgyxKKoh0y/8h3BqVFnCqQ/gd+reiIXA==}
+    requiresBuild: true
     dev: true
 
   /setprototypeof@1.2.0:
@@ -19058,7 +19031,7 @@ packages:
       abitype: 0.8.7(typescript@5.1.3)
       react: 18.2.0
       typescript: 5.1.3
-      use-sync-external-store: 1.2.0(react@18.2.0)
+      use-sync-external-store: 1.2.2(react@18.2.0)
       viem: 1.20.0(typescript@5.1.3)
     transitivePeerDependencies:
       - '@azure/app-configuration'
@@ -19334,6 +19307,7 @@ packages:
   /webdriver@8.38.0:
     resolution: {integrity: sha512-BT3sd667AqcZ1lzaOd7lphjnc7MNG3WgduAq4vUUDYlJAbs6SyjYd0EZPIPv9KUUYr0BoSJTDa0Xuyl/6PPW0Q==}
     engines: {node: ^16.13 || >=18}
+    requiresBuild: true
     dependencies:
       '@types/node': 20.12.12
       '@types/ws': 8.5.10
