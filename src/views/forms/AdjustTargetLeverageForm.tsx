@@ -1,7 +1,7 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useMemo, useState } from 'react';
 
 import { NumberFormatValues } from 'react-number-format';
-import { useSelector } from 'react-redux';
+import { shallowEqual, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
@@ -26,9 +26,11 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithLabel } from '@/components/WithLabel';
 
 import { getInputTradeTargetLeverage } from '@/state/inputsSelectors';
+import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { MustBigNumber } from '@/lib/numbers';
+import { BIG_NUMBERS, MustBigNumber } from '@/lib/numbers';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 export const AdjustTargetLeverageForm = ({
   onSetTargetLeverage,
@@ -38,12 +40,25 @@ export const AdjustTargetLeverageForm = ({
   const stringGetter = useStringGetter();
   const { adjustTargetLeverageLearnMore } = useURLConfigs();
 
-  /**
-   * @todo: Replace with Abacus functionality
-   */
+  const { initialMarginFraction, effectiveInitialMarginFraction } = orEmptyObj(
+    useSelector(getCurrentMarketConfig, shallowEqual)
+  );
+
   const targetLeverage = useSelector(getInputTradeTargetLeverage);
   const [leverage, setLeverage] = useState(targetLeverage?.toString() ?? '');
   const leverageBN = MustBigNumber(leverage);
+
+  const maxLeverage = useMemo(() => {
+    if (effectiveInitialMarginFraction) {
+      return BIG_NUMBERS.ONE.div(effectiveInitialMarginFraction).toNumber();
+    }
+
+    if (initialMarginFraction) {
+      return BIG_NUMBERS.ONE.div(initialMarginFraction).toNumber();
+    }
+
+    return 10; // default
+  }, [initialMarginFraction, effectiveInitialMarginFraction]);
 
   return (
     <$Form
@@ -69,7 +84,7 @@ export const AdjustTargetLeverageForm = ({
         <$WithLabel label={stringGetter({ key: STRING_KEYS.TARGET_LEVERAGE })}>
           <$LeverageSlider
             min={1}
-            max={10}
+            max={maxLeverage}
             value={MustBigNumber(leverage).abs().toNumber()}
             onSliderDrag={([value]: number[]) => setLeverage(value.toString())}
             onValueCommit={([value]: number[]) => setLeverage(value.toString())}
@@ -80,6 +95,7 @@ export const AdjustTargetLeverageForm = ({
             placeholder={`${MustBigNumber(leverage).abs().toFixed(LEVERAGE_DECIMALS)}×`}
             type={InputType.Leverage}
             value={leverage}
+            max={maxLeverage}
             onChange={({ floatValue }: NumberFormatValues) =>
               setLeverage(floatValue?.toString() ?? '')
             }
@@ -122,19 +138,19 @@ export const AdjustTargetLeverageForm = ({
   );
 };
 
+const $Form = styled.form`
+  ${formMixins.transfersForm}
+`;
+
 const $Description = styled.div`
   color: var(--color-text-0);
   --link-color: var(--color-text-1);
-
   a {
     display: inline-grid;
     margin-left: 0.5ch;
   }
 `;
 
-const $Form = styled.form`
-  ${formMixins.transfersForm}
-`;
 const $InputContainer = styled.div`
   ${formMixins.inputContainer}
   --input-height: 3.5rem;
@@ -145,9 +161,11 @@ const $InputContainer = styled.div`
     --input-height: 4rem;
   }
 `;
+
 const $WithLabel = styled(WithLabel)`
   ${formMixins.inputLabel}
 `;
+
 const $LeverageSlider = styled(Slider)`
   margin-top: 0.25rem;
 
