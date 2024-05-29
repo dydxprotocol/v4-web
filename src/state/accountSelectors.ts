@@ -1,5 +1,6 @@
 import type { Nullable, kollections } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import _ from 'lodash';
 import { createSelector } from 'reselect';
 
 import {
@@ -398,28 +399,64 @@ const isOpenOrderStatus = (status: AbacusOrderStatuses) => {
 
 /**
  * @param state
- * @returns Total numbers of the subaccount's open positions, open orders and fills
+ * @returns Whether there are unseen fill updates
+ */
+export const getHasUnseenFillUpdates = (state: RootState) =>
+  Object.keys(state.account.unseenFillsCountPerMarket).length > 0;
+
+/**
+ * @param state
+ * @returns get unseen fills count per market
+ */
+const getUnseenFillsCountPerMarket = (state: RootState) => state.account.unseenFillsCountPerMarket;
+
+/**
+ * @param state
+ * @returns get unseen fills count for current market
+ */
+const getUnseenFillsCountForMarket = createSelector(
+  [getUnseenFillsCountPerMarket, getCurrentMarketId],
+  (unseenFillsCountPerMarket, marketId) => (marketId ? unseenFillsCountPerMarket[marketId] ?? 0 : 0)
+);
+
+/**
+ * @param state
+ * @returns get unseen fills count for current market
+ */
+const getAllUnseenFillsCount = createSelector(
+  [getUnseenFillsCountPerMarket],
+  (unseenFillsCountPerMarket) => _.sum(Object.values(unseenFillsCountPerMarket))
+);
+
+/**
+ * @param state
+ * @returns Total numbers of the subaccount's open positions, open orders and unseen fills
  */
 export const getTradeInfoNumbers = createSelector(
-  [getExistingOpenPositions, getSubaccountOrders, getSubaccountFills, getSubaccountFundingPayments],
-  (positions, orders, fills, fundingPayments) => ({
+  [
+    getExistingOpenPositions,
+    getSubaccountOrders,
+    getAllUnseenFillsCount,
+    getSubaccountFundingPayments,
+  ],
+  (positions, orders, unseenFillsCount, fundingPayments) => ({
     numTotalPositions: positions?.length,
     numTotalOpenOrders: orders?.filter((order) => isOpenOrderStatus(order.status)).length,
-    numTotalFills: fills?.length,
+    numTotalUnseenFills: unseenFillsCount,
     numTotalFundingPayments: fundingPayments?.length,
   })
 );
 
 /**
  * @param state
- * @returns Numbers of the subaccount's open orders and fills of the current market
+ * @returns Numbers of the subaccount's open orders and unseen fills of the current market
  */
 export const getCurrentMarketTradeInfoNumbers = createSelector(
-  [getCurrentMarketOrders, getCurrentMarketFills, getCurrentMarketFundingPayments],
-  (marketOrders, marketFills, marketFundingPayments) => {
+  [getCurrentMarketOrders, getUnseenFillsCountForMarket, getCurrentMarketFundingPayments],
+  (marketOrders, marketUnseenFillsCount, marketFundingPayments) => {
     return {
       numOpenOrders: marketOrders?.filter((order) => isOpenOrderStatus(order.status)).length,
-      numFills: marketFills?.length,
+      numUnseenFills: marketUnseenFillsCount,
       numFundingPayments: marketFundingPayments?.length,
     };
   }
@@ -443,12 +480,6 @@ export const getIsAccountConnected = (state: RootState) =>
  * @returns OnboardingGuards (Record of boolean items) to aid in determining what Onboarding Step the user is on.
  */
 export const getOnboardingGuards = (state: RootState) => state.account.onboardingGuards;
-
-/**
- * @param state
- * @returns Whether there are unseen fill updates
- */
-export const getHasUnseenFillUpdates = (state: RootState) => state.account.hasUnseenFillUpdates;
 
 /**
  * @param state
