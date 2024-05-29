@@ -18,7 +18,6 @@ import type {
 } from '@/constants/abacus';
 import {
   AbacusAppConfig,
-  AbacusAppConfigV2,
   AbacusHelper,
   AdjustIsolatedMarginInputField,
   ApiData,
@@ -28,6 +27,7 @@ import {
   CoroutineTimer,
   HistoricalPnlPeriod,
   IOImplementations,
+  OnboardingConfig,
   TradeInputField,
   TransferInputField,
   TransferType,
@@ -100,19 +100,13 @@ class AbacusStateManager {
       this.abacusFormatter
     );
 
-    const appConfigs2 = AbacusAppConfigV2.Companion.forWebAppWithIsolatedMargins;
-
-    const appConfigs = new AbacusAppConfig(
-      false, // subscribeToCandles
-      true, // loadRemote
-      import.meta.env.MODE === 'development' && import.meta.env.VITE_ENABLE_ABACUS_LOGGING // enableLogger
-    );
-    appConfigs.squidVersion = AbacusAppConfig.SquidVersion.V2;
+    const appConfigs = AbacusAppConfig.Companion.forWebAppWithIsolatedMargins;
+    appConfigs.onboardingConfigs.squidVersion = OnboardingConfig.SquidVersion.V2;
 
     this.stateManager = new AsyncAbacusStateManagerV2(
       '',
       CURRENT_ABACUS_DEPLOYMENT,
-      appConfigs2,
+      appConfigs,
       ioImplementations,
       uiImplementations,
       // @ts-ignore
