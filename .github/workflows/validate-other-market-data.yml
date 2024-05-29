@@ -43,6 +43,7 @@ jobs:
       - name: Start v4 localnet
         run: |
           cd v4-chain/protocol
+          sed -i '/\.consensus\.timeout_commit.*-v '\''5s'\''/s/5s/1s/' testing/testnet-local/local.sh
           echo "Building v4-chain/protocol..."
           make build
           echo "Starting localnet..."
