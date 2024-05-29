@@ -11,7 +11,13 @@ import {
   type SubaccountPosition,
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
-import { ButtonAction, ButtonShape, ButtonState, ButtonType } from '@/constants/buttons';
+import {
+  ButtonAction,
+  ButtonShape,
+  ButtonSize,
+  ButtonState,
+  ButtonType,
+} from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, PERCENT_DECIMALS } from '@/constants/numbers';
 
@@ -27,7 +33,7 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { GradientCard } from '@/components/GradientCard';
 import { InputType } from '@/components/Input';
-import { OutputType } from '@/components/Output';
+import { OutputType, ShowSign } from '@/components/Output';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
@@ -132,9 +138,19 @@ export const AdjustIsolatedMarginForm = ({
     type,
     value,
     newValue,
+    showSign,
     withDiff,
-  }: Pick<Parameters<typeof DiffOutput>[0], 'type' | 'value' | 'newValue' | 'withDiff'>) => (
-    <DiffOutput type={type} value={value} newValue={newValue} withDiff={withDiff} />
+  }: Pick<
+    Parameters<typeof DiffOutput>[0],
+    'type' | 'value' | 'newValue' | 'withDiff' | 'showSign'
+  >) => (
+    <DiffOutput
+      type={type}
+      value={value}
+      newValue={newValue}
+      showSign={showSign}
+      withDiff={withDiff}
+    />
   );
 
   const {
@@ -181,6 +197,7 @@ export const AdjustIsolatedMarginForm = ({
         value: positionLeverage,
         newValue: positionLeverageUpdated,
         type: OutputType.Multiple,
+        showSign: ShowSign.None,
       }),
     }),
     [
@@ -302,6 +319,7 @@ export const AdjustIsolatedMarginForm = ({
       }}
     >
       <ToggleGroup
+        size={ButtonSize.Small}
         value={isolatedMarginAdjustmentType?.name ?? IsolatedMarginAdjustmentType.Add.name}
         onValueChange={setMarginAction}
         items={[
