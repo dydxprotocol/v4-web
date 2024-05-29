@@ -113,6 +113,7 @@ export const useTradeFormData = () => {
 
         const {
           needsLimitPrice,
+          needsMarginMode,
           needsTargetLeverage,
           needsTrailingPercent,
           needsTriggerPrice,
@@ -133,6 +134,7 @@ export const useTradeFormData = () => {
           summary,
 
           needsLimitPrice,
+          needsMarginMode,
           needsTargetLeverage,
           needsTrailingPercent,
           needsTriggerPrice,
