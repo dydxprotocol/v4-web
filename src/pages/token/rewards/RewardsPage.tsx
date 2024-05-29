@@ -13,7 +13,6 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { BackButton } from '@/components/BackButton';
 import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
-import { Output } from '@/components/Output';
 
 import { testFlags } from '@/lib/testFlags';
 
@@ -34,12 +33,11 @@ const RewardsPage = () => {
 
   const tradingRewardsRehaulEnabled = testFlags.tradingRewardsRehaul;
 
-  const legalDisclaimer = tradingRewardsRehaulEnabled && (
+  const legalDisclaimer = (
     <$LegalDisclaimer>
       {stringGetter({ key: STRING_KEYS.TRADING_REWARDS_LEGAL_DISCLAIMER })}
     </$LegalDisclaimer>
   );
-
   return isTablet ? (
     <div>
       <ContentSectionHeader
@@ -61,7 +59,7 @@ const RewardsPage = () => {
             {tradingRewardsRehaulEnabled && <GovernancePanel />}
             <RewardHistoryPanel />
             <RewardsHelpPanel />
-            {legalDisclaimer}
+            {tradingRewardsRehaulEnabled && legalDisclaimer}
           </$TradingRewardsColumn>
         </$GridLayout>
       </DetachedSection>
@@ -86,7 +84,7 @@ const RewardsPage = () => {
           {tradingRewardsRehaulEnabled && <NewMarketsPanel />}
           {tradingRewardsRehaulEnabled && <GovernancePanel />}
           <RewardsHelpPanel />
-          {legalDisclaimer}
+          {tradingRewardsRehaulEnabled && legalDisclaimer}
         </$OtherColumn>
       </$GridLayout>
     </DetachedSection>
