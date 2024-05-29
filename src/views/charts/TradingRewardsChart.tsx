@@ -132,7 +132,7 @@ export const TradingRewardsChart = ({
                 ({
                   date: new Date(datum.endedAtInMilliseconds).valueOf(),
                   cumulativeAmount: datum.cumulativeAmount,
-                } as TradingRewardsDatum)
+                }) as TradingRewardsDatum
             )
         : [],
     [periodTradingRewards, canViewAccount]

@@ -53,5 +53,5 @@ const $TriangleIndicator = styled.div<{ sign: NumberSign }>`
           transform: rotate(180deg);
         }
       `,
-    }[sign])}
+    })[sign]}
 `;

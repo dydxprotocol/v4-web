@@ -140,9 +140,8 @@ export const useTriggerOrdersFormInputs = ({
     // Default input size to be shown on custom amount slider, null if different order sizes
     inputSize,
     // Boolean to signify whether the limit box should be checked on initial render of the triggers order form
-    existsLimitOrder: !!(
-      (stopLossOrder && isLimitOrderType(stopLossOrder.type)) ||
-      (takeProfitOrder && isLimitOrderType(takeProfitOrder.type))
-    ),
+    existsLimitOrder:
+      !!(stopLossOrder && isLimitOrderType(stopLossOrder.type)) ||
+      !!(takeProfitOrder && isLimitOrderType(takeProfitOrder.type)),
   };
 };

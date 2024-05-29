@@ -28,13 +28,16 @@ type ElementProps = {
 
 const CURVE_DAO_TOKEN_ADDRESS = '0xD533a949740bb3306d119CC777fa900bA034cd52';
 
-const cctpTokensByAddress = cctpTokens.reduce((acc, token) => {
-  if (!acc[token.tokenAddress]) {
-    acc[token.tokenAddress] = [];
-  }
-  acc[token.tokenAddress].push(token);
-  return acc;
-}, {} as Record<string, TokenInfo[]>);
+const cctpTokensByAddress = cctpTokens.reduce(
+  (acc, token) => {
+    if (!acc[token.tokenAddress]) {
+      acc[token.tokenAddress] = [];
+    }
+    acc[token.tokenAddress].push(token);
+    return acc;
+  },
+  {} as Record<string, TokenInfo[]>
+);
 
 export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: ElementProps) => {
   const stringGetter = useStringGetter();

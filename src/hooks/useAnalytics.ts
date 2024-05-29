@@ -40,14 +40,14 @@ export const useAnalytics = () => {
   const breakpoint = breakpointMatches.isMobile
     ? 'MOBILE'
     : breakpointMatches.isTablet
-    ? 'TABLET'
-    : breakpointMatches.isDesktopSmall
-    ? 'DESKTOP_SMALL'
-    : breakpointMatches.isDesktopMedium
-    ? 'DESKTOP_MEDIUM'
-    : breakpointMatches.isDesktopLarge
-    ? 'DESKTOP_LARGE'
-    : 'UNSUPPORTED';
+      ? 'TABLET'
+      : breakpointMatches.isDesktopSmall
+        ? 'DESKTOP_SMALL'
+        : breakpointMatches.isDesktopMedium
+          ? 'DESKTOP_MEDIUM'
+          : breakpointMatches.isDesktopLarge
+            ? 'DESKTOP_LARGE'
+            : 'UNSUPPORTED';
 
   useEffect(() => {
     identify(AnalyticsUserProperty.Breakpoint, breakpoint);

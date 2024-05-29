@@ -181,9 +181,8 @@ const useDydxClientContext = () => {
   const requestAllGovernanceProposals = useCallback(
     async (proposalStatus?: ProposalStatus) => {
       try {
-        const allGovProposals = await compositeClient?.validatorClient.get.getAllGovProposals(
-          proposalStatus
-        );
+        const allGovProposals =
+          await compositeClient?.validatorClient.get.getAllGovProposals(proposalStatus);
 
         return allGovProposals;
       } catch (error) {

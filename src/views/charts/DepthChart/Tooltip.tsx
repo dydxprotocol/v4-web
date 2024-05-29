@@ -135,87 +135,87 @@ export const DepthChartTooltipContent = ({
                 },
               ]
             : nearestDatum?.key === DepthChartSeries.MidMarket
-            ? [
-                {
-                  key: 'midMarketPrice',
-                  label: stringGetter({ key: STRING_KEYS.PRICE }),
-                  value: (
-                    <Output type={OutputType.Fiat} value={midMarketPrice} useGrouping={false} />
-                  ),
-                },
-                {
-                  key: 'spread',
-                  label: stringGetter({ key: STRING_KEYS.ORDERBOOK_SPREAD }),
-                  value: (
-                    <>
+              ? [
+                  {
+                    key: 'midMarketPrice',
+                    label: stringGetter({ key: STRING_KEYS.PRICE }),
+                    value: (
+                      <Output type={OutputType.Fiat} value={midMarketPrice} useGrouping={false} />
+                    ),
+                  },
+                  {
+                    key: 'spread',
+                    label: stringGetter({ key: STRING_KEYS.ORDERBOOK_SPREAD }),
+                    value: (
+                      <>
+                        <Output
+                          type={OutputType.Fiat}
+                          value={spread}
+                          fractionDigits={tickSizeDecimals}
+                          useGrouping={false}
+                        />
+                        <Output
+                          type={OutputType.SmallPercent}
+                          value={spreadPercent}
+                          withParentheses
+                        />
+                      </>
+                    ),
+                  },
+                ]
+              : [
+                  {
+                    key: 'price',
+                    label: stringGetter({ key: STRING_KEYS.PRICE }),
+                    value: (
+                      <>
+                        {nearestDatum &&
+                          {
+                            [DepthChartSeries.Bids]: '≥',
+                            [DepthChartSeries.Asks]: '≤',
+                          }[nearestDatum.key]}
+                        <Output
+                          type={OutputType.Fiat}
+                          value={nearestDatum?.datum.price}
+                          useGrouping={false}
+                        />
+                      </>
+                    ),
+                  },
+                  {
+                    key: 'depth',
+                    label: stringGetter({ key: STRING_KEYS.TOTAL_SIZE }),
+                    value: (
                       <Output
-                        type={OutputType.Fiat}
-                        value={spread}
-                        fractionDigits={tickSizeDecimals}
+                        type={OutputType.Asset}
+                        value={nearestDatum?.datum.depth}
+                        fractionDigits={stepSizeDecimals}
+                        tag={id}
                         useGrouping={false}
                       />
+                    ),
+                  },
+                  {
+                    key: 'cost',
+                    label: stringGetter({ key: STRING_KEYS.TOTAL_COST }),
+                    value: (
                       <Output
-                        type={OutputType.SmallPercent}
-                        value={spreadPercent}
-                        withParentheses
-                      />
-                    </>
-                  ),
-                },
-              ]
-            : [
-                {
-                  key: 'price',
-                  label: stringGetter({ key: STRING_KEYS.PRICE }),
-                  value: (
-                    <>
-                      {nearestDatum &&
-                        {
-                          [DepthChartSeries.Bids]: '≥',
-                          [DepthChartSeries.Asks]: '≤',
-                        }[nearestDatum.key]}
-                      <Output
+                        useGrouping
                         type={OutputType.Fiat}
-                        value={nearestDatum?.datum.price}
-                        useGrouping={false}
+                        value={
+                          nearestDatum != null
+                            ? nearestDatum.datum.price * nearestDatum.datum.depth
+                            : undefined
+                        }
                       />
-                    </>
-                  ),
-                },
-                {
-                  key: 'depth',
-                  label: stringGetter({ key: STRING_KEYS.TOTAL_SIZE }),
-                  value: (
-                    <Output
-                      type={OutputType.Asset}
-                      value={nearestDatum?.datum.depth}
-                      fractionDigits={stepSizeDecimals}
-                      tag={id}
-                      useGrouping={false}
-                    />
-                  ),
-                },
-                {
-                  key: 'cost',
-                  label: stringGetter({ key: STRING_KEYS.TOTAL_COST }),
-                  value: (
-                    <Output
-                      useGrouping
-                      type={OutputType.Fiat}
-                      value={
-                        nearestDatum != null
-                          ? nearestDatum.datum.price * nearestDatum.datum.depth
-                          : undefined
-                      }
-                    />
-                  ),
-                },
-                {
-                  key: 'priceImpact',
-                  label: stringGetter({ key: STRING_KEYS.PRICE_IMPACT }),
-                  value: <Output useGrouping type={OutputType.Percent} value={priceImpact} />,
-                },
-              ]
+                    ),
+                  },
+                  {
+                    key: 'priceImpact',
+                    label: stringGetter({ key: STRING_KEYS.PRICE_IMPACT }),
+                    value: <Output useGrouping type={OutputType.Percent} value={priceImpact} />,
+                  },
+                ]
         }
       />
     </TooltipContent>

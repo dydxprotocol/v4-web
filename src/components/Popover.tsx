@@ -85,7 +85,7 @@ const $Trigger = styled(Trigger)<{ $noBlur?: boolean; $triggerType: TriggerType 
       `,
       [TriggerType.SearchSelect]: popoverMixins.searchSelectTrigger,
       [TriggerType.MarketDropdown]: popoverMixins.marketDropdownTrigger,
-    }[$triggerType])}
+    })[$triggerType]}
 
   ${({ $noBlur }) =>
     $noBlur &&

@@ -177,7 +177,7 @@ const $TradeLayout = styled.article<{
           direction: initial;
         }
       `,
-    }[tradeLayout])}
+    })[tradeLayout]}
 
   ${({ isHorizontalPanelOpen }) =>
     !isHorizontalPanelOpen &&

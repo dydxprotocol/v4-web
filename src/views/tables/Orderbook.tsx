@@ -22,7 +22,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getSubaccountOrderSizeBySideAndPrice } from '@/state/accountSelectors';
-import { useAppSelector, useAppDispatch } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
@@ -64,7 +64,7 @@ const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number 
             key: `ask-${idx}`,
             side: 'ask',
             mine: subaccountOrderSizeBySideAndPrice[OrderSide.SELL]?.[row.price],
-          } as RowData)
+          }) as RowData
       )
       .slice(0, maxRowsPerSide);
 
@@ -76,7 +76,7 @@ const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number 
             side: 'bid',
             mine: subaccountOrderSizeBySideAndPrice[OrderSide.BUY]?.[row.price],
             ...row,
-          } as RowData)
+          }) as RowData
       )
       .slice(0, maxRowsPerSide);
 
@@ -292,6 +292,7 @@ export const Orderbook = ({
                   {stringGetter({ key: STRING_KEYS.ORDERBOOK_SPREAD })}
                 </WithTooltip>
               </td>
+              {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
               <td>
                 <Output type={OutputType.Number} value={spread} fractionDigits={tickSizeDecimals} />
               </td>
@@ -591,7 +592,8 @@ const $SpreadTableRow = styled(TableRow)`
 
     // Safari: apply box-shadow to inner table-cells
     @supports (background: -webkit-named-image(i)) {
-      box-shadow: 0 calc(-1 * var(--border-width)) var(--color-border) inset,
+      box-shadow:
+        0 calc(-1 * var(--border-width)) var(--color-border) inset,
         0 var(--border-width) var(--color-border) inset;
     }
   }

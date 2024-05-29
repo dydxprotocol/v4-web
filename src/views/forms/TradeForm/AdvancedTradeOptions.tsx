@@ -75,7 +75,7 @@ export const AdvancedTradeOptions = () => {
       fullWidth
     >
       <$AdvancedInputsContainer>
-        {(hasTimeInForce || needsGoodUntil) && (
+        {(!!hasTimeInForce || !!needsGoodUntil) && (
           <$AdvancedInputsRow>
             {hasTimeInForce && timeInForce != null && (
               <$SelectMenu
@@ -164,7 +164,7 @@ export const AdvancedTradeOptions = () => {
             {showReduceOnly && (
               <Checkbox
                 checked={
-                  (reduceOnly && !reduceOnlyTooltip) ||
+                  (!!reduceOnly && !reduceOnlyTooltip) ||
                   complianceState === ComplianceStates.CLOSE_ONLY ||
                   false
                 }
@@ -182,10 +182,10 @@ export const AdvancedTradeOptions = () => {
                       needsReduceOnly
                         ? 'reduce-only'
                         : reduceOnlyTooltip?.titleStringKey.includes(
-                            'REDUCE_ONLY_EXECUTION_IOC_FOK'
-                          )
-                        ? 'reduce-only-execution-ioc-fok'
-                        : 'reduce-only-timeinforce-ioc-fok'
+                              'REDUCE_ONLY_EXECUTION_IOC_FOK'
+                            )
+                          ? 'reduce-only-execution-ioc-fok'
+                          : 'reduce-only-timeinforce-ioc-fok'
                     }
                     side="right"
                   >
@@ -196,7 +196,7 @@ export const AdvancedTradeOptions = () => {
             )}
             {showPostOnly && (
               <Checkbox
-                checked={(postOnly && !postOnlyTooltip) || false}
+                checked={!!postOnly && !postOnlyTooltip}
                 disabled={!!postOnlyTooltip}
                 onCheckedChange={(checked) =>
                   abacusStateManager.setTradeValue({

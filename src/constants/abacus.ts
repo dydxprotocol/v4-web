@@ -212,9 +212,8 @@ export type Compliance = Abacus.exchange.dydx.abacus.output.Compliance;
 export const ApiData = Abacus.exchange.dydx.abacus.state.manager.ApiData;
 
 // ------ Enum Conversions ------ //
-type IfEquals<X, Y, A, B> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2
-  ? A
-  : B;
+type IfEquals<X, Y, A, B> =
+  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? A : B;
 
 type ReadonlyKeysOf<T> = {
   [K in keyof T]: IfEquals<{ [_ in K]: T[K] }, { readonly [_ in K]: T[K] }, K, never>;

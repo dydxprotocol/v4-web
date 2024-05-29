@@ -285,7 +285,7 @@ const $PnlChart = styled(PnlChart)<{ pnlDiffSign: NumberSign }>`
       [NumberSign.Positive]: 'var(--color-positive)',
       [NumberSign.Negative]: 'var(--color-negative)',
       [NumberSign.Neutral]: 'var(--color-text-1)',
-    }[pnlDiffSign])};
+    })[pnlDiffSign]};
 `;
 
 const $EmptyChart = styled.div`

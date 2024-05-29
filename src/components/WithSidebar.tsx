@@ -65,8 +65,9 @@ const $Container = styled.div`
 
   --withSidebar-current-sidebarWidth: 0px;
   --withSidebar-current-contentAreaWidth: calc(
-    var(--withSidebar-containerWidth) - var(--withSidebar-gap) -
-      var(--withSidebar-current-sideAreaWidth)
+    var(--withSidebar-containerWidth) - var(--withSidebar-gap) - var(
+        --withSidebar-current-sideAreaWidth
+      )
   );
 
   &[data-state='none'] {

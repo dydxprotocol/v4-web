@@ -134,11 +134,14 @@ export const getSubaccountUnclearedOrders = createAppSelector(
  */
 export const getMarketOrders = (state: RootState): { [marketId: string]: SubaccountOrder[] } => {
   const orders = getSubaccountUnclearedOrders(state);
-  return (orders ?? []).reduce((marketOrders, order) => {
-    marketOrders[order.marketId] ??= [];
-    marketOrders[order.marketId].push(order);
-    return marketOrders;
-  }, {} as { [marketId: string]: SubaccountOrder[] });
+  return (orders ?? []).reduce(
+    (marketOrders, order) => {
+      marketOrders[order.marketId] ??= [];
+      marketOrders[order.marketId].push(order);
+      return marketOrders;
+    },
+    {} as { [marketId: string]: SubaccountOrder[] }
+  );
 };
 
 /**
@@ -200,11 +203,14 @@ export const getMarketSubaccountOpenOrders = (
   [marketId: string]: SubaccountOrder[];
 } => {
   const orders = getSubaccountOpenOrders(state);
-  return (orders ?? []).reduce((marketOrders, order) => {
-    marketOrders[order.marketId] ??= [];
-    marketOrders[order.marketId].push(order);
-    return marketOrders;
-  }, {} as { [marketId: string]: SubaccountOrder[] });
+  return (orders ?? []).reduce(
+    (marketOrders, order) => {
+      marketOrders[order.marketId] ??= [];
+      marketOrders[order.marketId].push(order);
+      return marketOrders;
+    },
+    {} as { [marketId: string]: SubaccountOrder[] }
+  );
 };
 
 /**
@@ -329,11 +335,14 @@ export const getSubaccountFills = (state: RootState) => state.account?.fills;
  */
 export const getMarketFills = (state: RootState): { [marketId: string]: SubaccountFill[] } => {
   const fills = getSubaccountFills(state);
-  return (fills ?? []).reduce((marketFills, fill) => {
-    marketFills[fill.marketId] ??= [];
-    marketFills[fill.marketId].push(fill);
-    return marketFills;
-  }, {} as { [marketId: string]: SubaccountFill[] });
+  return (fills ?? []).reduce(
+    (marketFills, fill) => {
+      marketFills[fill.marketId] ??= [];
+      marketFills[fill.marketId].push(fill);
+      return marketFills;
+    },
+    {} as { [marketId: string]: SubaccountFill[] }
+  );
 };
 
 /**
@@ -381,11 +390,14 @@ export const getMarketFundingPayments = (
   state: RootState
 ): { [marketId: string]: SubaccountFundingPayment[] } => {
   const fundingPayments = getSubaccountFundingPayments(state);
-  return (fundingPayments ?? []).reduce((marketFundingPayments, fundingPayment) => {
-    marketFundingPayments[fundingPayment.marketId] ??= [];
-    marketFundingPayments[fundingPayment.marketId].push(fundingPayment);
-    return marketFundingPayments;
-  }, {} as { [marketId: string]: SubaccountFundingPayment[] });
+  return (fundingPayments ?? []).reduce(
+    (marketFundingPayments, fundingPayment) => {
+      marketFundingPayments[fundingPayment.marketId] ??= [];
+      marketFundingPayments[fundingPayment.marketId].push(fundingPayment);
+      return marketFundingPayments;
+    },
+    {} as { [marketId: string]: SubaccountFundingPayment[] }
+  );
 };
 
 /**
