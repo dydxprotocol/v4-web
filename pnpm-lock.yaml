@@ -19794,16 +19794,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
-
-  file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.34.tgz:
-    resolution:
-      {
-        integrity: sha512-QvV5DoRQrhKf2Rkj7tZsprTtS2Gfjr9UpCeyJIPsRhFBvpCHctEwIJ1EPys2bpf0eVgvgk333kMPgYt89zEWPw==,
-        tarball: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.34.tgz,
-      }
-    name: '@dydxprotocol/v4-abacus'
-    version: 1.7.34
-    dependencies:
-      '@js-joda/core': 3.2.0
-      format-util: 1.0.5
-    dev: false
