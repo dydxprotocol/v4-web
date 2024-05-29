@@ -165,7 +165,7 @@ const detailsLayoutVariants = {
   `,
 };
 
-const itemLayoutVariants: Record<string, FlattenInterpolation<ThemeProps<any>>> = {
+const itemLayoutVariants = {
   column: css`
     isolation: isolate;
 
@@ -224,7 +224,7 @@ const itemLayoutVariants: Record<string, FlattenInterpolation<ThemeProps<any>>> 
     justify-items: start;
     gap: 0.375rem;
   `,
-};
+} satisfies Record<string, FlattenInterpolation<ThemeProps<any>>>;
 const $Details = styled.dl<{
   layout: 'column' | 'row' | 'rowColumns' | 'grid' | 'stackColumn';
   withSeparators: boolean;

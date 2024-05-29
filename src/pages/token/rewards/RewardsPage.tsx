@@ -14,11 +14,14 @@ import { BackButton } from '@/components/BackButton';
 import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 
+import { testFlags } from '@/lib/testFlags';
+
 import { DYDXBalancePanel } from './DYDXBalancePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { MigratePanel } from './MigratePanel';
 import { RewardHistoryPanel } from './RewardHistoryPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
+import { TradingRewardsChartPanel } from './TradingRewardsChartPanel';
 import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
 
 const RewardsPage = () => {
@@ -42,6 +45,7 @@ const RewardsPage = () => {
             <$LaunchIncentivesPanel />
           ) : (
             <>
+              {testFlags.tradingRewardsRehaul && <$TradingRewardsChartPanel />}
               <$LaunchIncentivesPanel />
               <$DYDXBalancePanel />
             </>
@@ -49,6 +53,7 @@ const RewardsPage = () => {
 
           <$TradingRewardsColumn>
             <TradingRewardsSummaryPanel />
+            {isTablet && testFlags.tradingRewardsRehaul && <TradingRewardsChartPanel />}
             {isTablet && <RewardsHelpPanel />}
             <RewardHistoryPanel />
           </$TradingRewardsColumn>
@@ -77,17 +82,20 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean }>`
     gap: var(--gap);
   }
 
+  // xccx figure out migrate
   ${({ showMigratePanel }) =>
     showMigratePanel
       ? css`
           grid-template-areas:
             'migrate migrate'
+            'chart chart'
             'incentives incentives'
             'balance balance'
             'rewards other';
         `
       : css`
           grid-template-areas:
+            'chart chart'
             'incentives balance'
             'rewards other';
         `}
@@ -110,6 +118,10 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean }>`
 
 const $MigratePanel = styled(MigratePanel)`
   grid-area: migrate;
+`;
+
+const $TradingRewardsChartPanel = styled(TradingRewardsChartPanel)`
+  grid-area: chart;
 `;
 
 const $LaunchIncentivesPanel = styled(LaunchIncentivesPanel)`

@@ -368,13 +368,9 @@ export const TradeForm = ({
                 <$MarginAndLeverageButtons>
                   <Button
                     onClick={() => {
-                      if (isTablet) {
-                        dispatch(openDialog({ type: DialogTypes.SelectMarginMode }));
-                      } else {
-                        dispatch(
-                          openDialogInTradeBox({ type: TradeBoxDialogTypes.SelectMarginMode })
-                        );
-                      }
+                      dispatch(
+                        openDialogInTradeBox({ type: TradeBoxDialogTypes.SelectMarginMode })
+                      );
                     }}
                   >
                     {marginMode &&

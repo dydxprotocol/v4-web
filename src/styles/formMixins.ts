@@ -8,14 +8,19 @@ import {
 import breakpoints from './breakpoints';
 import { layoutMixins } from './layoutMixins';
 
-export const formMixins: Record<
-  string,
-  FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>
-> = {
-  inputsColumn: css`
-    ${layoutMixins.flexColumn}
-    gap: var(--form-input-gap);
-  `,
+const inputInnerButton = css`
+  --button-textColor: var(--color-text-1);
+  --button-backgroundColor: var(--color-layer-5);
+  --button-border: var(--border-width) solid var(--color-layer-6);
+`;
+
+const inputsColumn = css`
+  ${layoutMixins.flexColumn}
+  gap: var(--form-input-gap);
+`;
+
+export const formMixins = {
+  inputsColumn,
 
   inputContainer: css`
     --input-radius: 0.5em;
@@ -46,14 +51,10 @@ export const formMixins: Record<
     }
   `,
 
-  inputInnerButton: css`
-    --button-textColor: var(--color-text-1);
-    --button-backgroundColor: var(--color-layer-5);
-    --button-border: var(--border-width) solid var(--color-layer-6);
-  `,
+  inputInnerButton,
 
   inputInnerToggleButton: css`
-    ${() => formMixins.inputInnerButton}
+    ${() => inputInnerButton}
 
     --button-toggle-off-backgroundColor: var(--color-layer-5);
     --button-toggle-off-textColor: var(--color-text-1);
@@ -150,7 +151,7 @@ export const formMixins: Record<
   `,
 
   transfersForm: css`
-    ${() => formMixins.inputsColumn}
+    ${() => inputsColumn}
     --form-input-gap: 1.25rem;
     --form-input-height: 3.5rem;
     --form-input-height-mobile: 4rem;
@@ -167,4 +168,4 @@ export const formMixins: Record<
       --form-input-gap: 1rem;
     }
   `,
-};
+} satisfies Record<string, FlattenSimpleInterpolation | FlattenInterpolation<ThemeProps<any>>>;

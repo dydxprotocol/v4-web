@@ -81,8 +81,9 @@ export const useCurrentMarketId = () => {
 
   useEffect(() => {
     // Check for marketIds otherwise Abacus will silently fail its isMarketValid check
-    if (marketIds) {
+    if (hasMarketIds) {
       abacusStateManager.setMarket(marketId ?? DEFAULT_MARKETID);
+      abacusStateManager.setTradeValue({ value: null, field: null });
     }
   }, [selectedNetwork, hasMarketIds, marketId]);
 };

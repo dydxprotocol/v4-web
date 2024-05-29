@@ -12,10 +12,12 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
+import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { Table, type ColumnDef } from '@/components/Table';
 import { TableCell } from '@/components/Table/TableCell';
 
+import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getHistoricalTradingRewardsForPeriod } from '@/state/accountSelectors';
 
 export enum TradingRewardHistoryTableColumnKey {
@@ -99,6 +101,7 @@ export const TradingRewardHistoryTable = ({
   withInnerBorders = true,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
+  const canViewAccount = useSelector(calculateCanViewAccount);
   const { chainTokenLabel } = useTokenConfigs();
 
   const periodTradingRewards = useSelector(
@@ -106,7 +109,10 @@ export const TradingRewardHistoryTable = ({
     shallowEqual
   );
 
-  const rewardsData = useMemo(() => periodTradingRewards?.toArray() ?? [], [periodTradingRewards]);
+  const rewardsData = useMemo(
+    () => (periodTradingRewards && canViewAccount ? periodTradingRewards.toArray() : []),
+    [periodTradingRewards, canViewAccount]
+  );
 
   return (
     <$Table
@@ -121,7 +127,10 @@ export const TradingRewardHistoryTable = ({
         })
       )}
       slotEmpty={
-        <div>{stringGetter({ key: STRING_KEYS.EMPTY_HISTORICAL_REWARDS_DESCRIPTION })}</div>
+        <$Column>
+          <$EmptyIcon iconName={IconName.OrderPending} />
+          {stringGetter({ key: STRING_KEYS.TRADING_REWARD_TABLE_EMPTY_STATE })}
+        </$Column>
       }
       selectionBehavior="replace"
       withOuterBorder={withOuterBorder}
@@ -163,4 +172,15 @@ const $TimePeriod = styled.div`
 
 const $AssetIcon = styled(AssetIcon)`
   margin-left: 0.5ch;
+`;
+
+const $Column = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const $EmptyIcon = styled(Icon)`
+  font-size: 3em;
 `;

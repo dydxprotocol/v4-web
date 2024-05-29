@@ -7,8 +7,8 @@ import { TradeTypes } from './trade';
 export type Nullable<T> = T | null | undefined;
 
 // ------ V4 Protocols ------ //
-export const AbacusAppConfig = Abacus.exchange.dydx.abacus.state.manager.AppConfigs;
-export const AbacusAppConfigV2 = Abacus.exchange.dydx.abacus.state.v2.supervisor.AppConfigsV2;
+export const AbacusAppConfig = Abacus.exchange.dydx.abacus.state.v2.supervisor.AppConfigsV2;
+export const OnboardingConfig = Abacus.exchange.dydx.abacus.state.v2.supervisor.OnboardingConfigs;
 export const IOImplementations = Abacus.exchange.dydx.abacus.utils.IOImplementations;
 export const UIImplementations = Abacus.exchange.dydx.abacus.utils.UIImplementations;
 export type AbacusDYDXChainTransactionsProtocol = Omit<

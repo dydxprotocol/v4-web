@@ -1,8 +1,9 @@
 import { useState } from 'react';
 
-import { useDispatch } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled, { css } from 'styled-components';
 
+import { MARGIN_MODE_STRINGS } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
@@ -16,10 +17,14 @@ import { Button } from '@/components/Button';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { Icon, IconName } from '@/components/Icon';
+import { Output, OutputType } from '@/components/Output';
 import { Ring } from '@/components/Ring';
 import { TradeForm } from '@/views/forms/TradeForm';
 
 import { openDialog } from '@/state/dialogs';
+import { getInputTradeData, useTradeFormData } from '@/state/inputsSelectors';
+
+import { orEmptyObj } from '@/lib/typeUtils';
 
 import { TradeSideToggle } from '../forms/TradeForm/TradeSideToggle';
 
@@ -33,7 +38,10 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
   const { isMobile } = useBreakpoints();
   const dispatch = useDispatch();
   const stringGetter = useStringGetter();
+  const currentTradeData = orEmptyObj(useSelector(getInputTradeData, shallowEqual));
+  const { marginMode, targetLeverage } = currentTradeData;
 
+  const { needsTargetLeverage } = useTradeFormData();
   const [currentStep, setCurrentStep] = useState<MobilePlaceOrderSteps>(
     MobilePlaceOrderSteps.EditOrder
   );
@@ -64,16 +72,21 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
                   );
                 }}
               >
-                {stringGetter({ key: STRING_KEYS.CROSS })}
+                {marginMode &&
+                  stringGetter({
+                    key: MARGIN_MODE_STRINGS[marginMode.rawValue],
+                  })}
               </Button>
 
-              <Button
-                onClick={() => {
-                  dispatch(openDialog({ type: DialogTypes.AdjustTargetLeverage }));
-                }}
-              >
-                1x
-              </Button>
+              {needsTargetLeverage && (
+                <Button
+                  onClick={() => {
+                    dispatch(openDialog({ type: DialogTypes.AdjustTargetLeverage }));
+                  }}
+                >
+                  <Output type={OutputType.Multiple} value={targetLeverage} />
+                </Button>
+              )}
 
               <TradeSideToggle />
             </$EditTradeHeader>
