@@ -130,6 +130,10 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean; showChartPanel?: bo
     grid-template-areas:
       'incentives'
       'rewards';
+
+    > :last-child {
+      margin-bottom: var(--gap);
+    }
   }
 `;
 

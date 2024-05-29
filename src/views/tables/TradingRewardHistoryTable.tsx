@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 import styled from 'styled-components';
@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { HistoricalTradingReward, HistoricalTradingRewardsPeriods } from '@/constants/abacus';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 
+import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -92,18 +93,17 @@ type ElementProps = {
 };
 
 type StyleProps = {
-  withOuterBorder?: boolean;
-  withInnerBorders?: boolean;
+  className?: string;
 };
 
 export const TradingRewardHistoryTable = ({
   period,
   columnKeys = Object.values(TradingRewardHistoryTableColumnKey),
-  withOuterBorder,
-  withInnerBorders = true,
+  className,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
   const canViewAccount = useSelector(calculateCanViewAccount);
+  const { isNotTablet } = useBreakpoints();
   const { chainTokenLabel } = useTokenConfigs();
 
   const periodTradingRewards = useSelector(
@@ -115,18 +115,23 @@ export const TradingRewardHistoryTable = ({
     return periodTradingRewards && canViewAccount ? periodTradingRewards.toArray() : [];
   }, [periodTradingRewards, canViewAccount]);
 
+  const columns = columnKeys.map((key: TradingRewardHistoryTableColumnKey) =>
+    getTradingRewardHistoryTableColumnDef({
+      key,
+      chainTokenLabel,
+      stringGetter,
+    })
+  );
+
+  const getRowKey = useCallback((row: any) => row.startedAtInMilliseconds, []);
+
   return (
     <$Table
+      className={className}
       label={stringGetter({ key: STRING_KEYS.TRADING_REWARD_HISTORY })}
       data={rewardsData}
-      getRowKey={(row: any) => row.startedAtInMilliseconds}
-      columns={columnKeys.map((key: TradingRewardHistoryTableColumnKey) =>
-        getTradingRewardHistoryTableColumnDef({
-          key,
-          chainTokenLabel,
-          stringGetter,
-        })
-      )}
+      getRowKey={getRowKey}
+      columns={columns}
       slotEmpty={
         <$Column>
           <$EmptyIcon iconName={IconName.OrderPending} />
@@ -134,8 +139,8 @@ export const TradingRewardHistoryTable = ({
         </$Column>
       }
       selectionBehavior="replace"
-      withOuterBorder={withOuterBorder}
-      withInnerBorders={withInnerBorders}
+      withOuterBorder={isNotTablet || rewardsData.length === 0}
+      withInnerBorders
       initialPageSize={15}
       withScrollSnapColumns
       withScrollSnapRows
@@ -145,12 +150,6 @@ export const TradingRewardHistoryTable = ({
 
 const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
-
-  tr {
-    &:after {
-      content: '';
-    }
-  }
 
   tbody {
     font: var(--font-small-book);

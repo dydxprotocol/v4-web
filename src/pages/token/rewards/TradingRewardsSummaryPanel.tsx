@@ -25,16 +25,15 @@ export const TradingRewardsSummaryPanel = () => {
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
   const canViewAccount = useSelector(calculateCanViewAccount);
+  const currentWeekTradingReward = useSelector(
+    getHistoricalTradingRewardsForCurrentWeek,
+    shallowEqual
+  );
 
   useEffect(() => {
     // Initialize weekly data for currentWeekTradingReward
     abacusStateManager.setHistoricalTradingRewardPeriod(HistoricalTradingRewardsPeriod.WEEKLY);
   }, [canViewAccount]);
-
-  const currentWeekTradingReward = useSelector(
-    getHistoricalTradingRewardsForCurrentWeek,
-    shallowEqual
-  );
 
   return !canViewAccount || !currentWeekTradingReward ? null : (
     <Panel
