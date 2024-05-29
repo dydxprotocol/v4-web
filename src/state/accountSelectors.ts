@@ -15,6 +15,7 @@ import {
   type SubaccountOrder,
 } from '@/constants/abacus';
 import { NUM_PARENT_SUBACCOUNTS, OnboardingState } from '@/constants/account';
+import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 
 import { getHydratedTradingData, isStopLossOrder, isTakeProfitOrder } from '@/lib/orders';
 import { getHydratedPositionData } from '@/lib/positions';
@@ -119,13 +120,13 @@ export const getCurrentMarketIsolatedPositionLeverage = createSelector(
   (position) => {
     if (
       position?.childSubaccountNumber &&
-      position.childSubaccountNumber >=
-        NUM_PARENT_SUBACCOUNTS /* marginMode === AbacusMarginMode.isolated */
+      position.childSubaccountNumber >= NUM_PARENT_SUBACCOUNTS &&
+      position.leverage?.current
     ) {
-      return position.leverage?.current;
+      return Number(position.leverage.current.toFixed(LEVERAGE_DECIMALS));
     }
 
-    return null;
+    return 0;
   }
 );
 
