@@ -64,7 +64,7 @@ export const getDydxDatafeed = (
 
   resolveSymbol: async (symbolName: string, onSymbolResolvedCallback: ResolveCallback) => {
     const symbolItem = getSymbol(symbolName || DEFAULT_MARKETID);
-    const { tickSizeDecimals } = getMarketConfig(symbolItem.symbol)(store.getState()) ?? {};
+    const { tickSizeDecimals } = getMarketConfig(store.getState(), symbolItem.symbol) ?? {};
 
     const pricescale = tickSizeDecimals ? 10 ** tickSizeDecimals : initialPriceScale ?? 100;
 

@@ -50,7 +50,7 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
   const [marginAction, setMarginAction] = useState(MarginAction.ADD);
   const subaccountPosition = useAppSelector(getOpenPositionFromId(marketId));
   const { adjustedMmf, leverage, liquidationPrice, notionalTotal } = subaccountPosition ?? {};
-  const marketConfig = useAppSelector(getMarketConfig(marketId));
+  const marketConfig = useAppSelector((s) => getMarketConfig(s, marketId));
   const { tickSizeDecimals } = marketConfig ?? {};
 
   /**

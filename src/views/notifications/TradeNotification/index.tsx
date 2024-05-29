@@ -47,7 +47,7 @@ export type TradeNotificationProps = NotificationProps & ElementProps;
 export const TradeNotification = ({ isToast, data, notification }: TradeNotificationProps) => {
   const stringGetter = useStringGetter();
   const { AVERAGE_PRICE, FILLED_AMOUNT, MARKET, ORDER_TYPE, ORDER_STATUS, SIDE } = data;
-  const marketData = useAppSelector(getMarketData(MARKET), shallowEqual);
+  const marketData = useAppSelector((s) => getMarketData(s, MARKET), shallowEqual);
   const { assetId } = marketData ?? {};
   const orderType = ORDER_TYPE as KotlinIrEnumValues<typeof AbacusOrderType>;
   const tradeType = TRADE_TYPES[orderType] ?? undefined;
