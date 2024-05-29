@@ -13,12 +13,15 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { BackButton } from '@/components/BackButton';
 import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
+import { Output } from '@/components/Output';
 
 import { testFlags } from '@/lib/testFlags';
 
 import { DYDXBalancePanel } from './DYDXBalancePanel';
+import { GovernancePanel } from './GovernancePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { MigratePanel } from './MigratePanel';
+import { NewMarketsPanel } from './NewMarketsPanel';
 import { RewardHistoryPanel } from './RewardHistoryPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { TradingRewardsChartPanel } from './TradingRewardsChartPanel';
@@ -29,48 +32,64 @@ const RewardsPage = () => {
   const { isTablet, isNotTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  const showChartPanel = testFlags.tradingRewardsRehaul;
+  const tradingRewardsRehaulEnabled = testFlags.tradingRewardsRehaul;
 
-  return (
+  const legalDisclaimer = tradingRewardsRehaulEnabled && (
+    <$LegalDisclaimer>
+      {stringGetter({ key: STRING_KEYS.TRADING_REWARDS_LEGAL_DISCLAIMER })}
+    </$LegalDisclaimer>
+  );
+
+  return isTablet ? (
     <div>
-      {isTablet && (
-        <ContentSectionHeader
-          title={stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
-          slotLeft={<BackButton onClick={() => navigate(AppRoute.Profile)} />}
-        />
-      )}
+      <ContentSectionHeader
+        title={stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
+        slotLeft={<BackButton onClick={() => navigate(AppRoute.Profile)} />}
+      />
       <DetachedSection>
         <$GridLayout
           showMigratePanel={import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet}
-          showChartPanel={showChartPanel}
+          showChartPanel={tradingRewardsRehaulEnabled}
         >
-          {import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && <$MigratePanel />}
-
-          {isTablet ? (
-            <$LaunchIncentivesPanel />
-          ) : (
-            <>
-              {showChartPanel && <$TradingRewardsChartPanel />}
-              <$LaunchIncentivesPanel />
-              <$DYDXBalancePanel />
-            </>
-          )}
-
+          {/* Available staking rewards panel */}
+          {/* List of unstaking panels */}
+          {tradingRewardsRehaulEnabled && <TradingRewardsChartPanel />}
+          <$LaunchIncentivesPanel />
           <$TradingRewardsColumn>
             <TradingRewardsSummaryPanel />
-            {isTablet && showChartPanel && <TradingRewardsChartPanel />}
-            {isTablet && <RewardsHelpPanel />}
+            {tradingRewardsRehaulEnabled && <NewMarketsPanel />}
+            {tradingRewardsRehaulEnabled && <GovernancePanel />}
             <RewardHistoryPanel />
+            <RewardsHelpPanel />
+            {legalDisclaimer}
           </$TradingRewardsColumn>
-
-          {isNotTablet && (
-            <$OtherColumn>
-              <RewardsHelpPanel />
-            </$OtherColumn>
-          )}
         </$GridLayout>
       </DetachedSection>
     </div>
+  ) : (
+    <DetachedSection>
+      <$GridLayout
+        showMigratePanel={import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet}
+        showChartPanel={tradingRewardsRehaulEnabled}
+      >
+        {import.meta.env.VITE_V3_TOKEN_ADDRESS && <$MigratePanel />}
+        {tradingRewardsRehaulEnabled && <$TradingRewardsChartPanel />}
+        <$LaunchIncentivesPanel />
+        <$DYDXBalancePanel />
+        <$TradingRewardsColumn>
+          <TradingRewardsSummaryPanel />
+          <RewardHistoryPanel />
+        </$TradingRewardsColumn>
+        <$OtherColumn>
+          {/* Available staking rewards panel */}
+          {/* List of unstaking panels */}
+          {tradingRewardsRehaulEnabled && <NewMarketsPanel />}
+          {tradingRewardsRehaulEnabled && <GovernancePanel />}
+          <RewardsHelpPanel />
+          {legalDisclaimer}
+        </$OtherColumn>
+      </$GridLayout>
+    </DetachedSection>
   );
 };
 
@@ -161,4 +180,9 @@ const $TradingRewardsColumn = styled.div`
 const $OtherColumn = styled.div`
   grid-area: other;
   ${layoutMixins.flexColumn}
+`;
+
+const $LegalDisclaimer = styled.div`
+  font: var(--font-mini-book);
+  color: var(--color-text-0);
 `;

@@ -70,4 +70,9 @@ const $Description = styled.span`
 
   padding: 0 8rem;
   text-align: center;
+
+  @media ${breakpoints.tablet} {
+    text-align: start;
+    padding: 0;
+  }
 `;
