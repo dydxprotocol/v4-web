@@ -26,7 +26,7 @@ import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/co
 import { ErrorParams } from '@/constants/errors';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { TradeTypes } from '@/constants/trade';
-import { DydxAddress } from '@/constants/wallets';
+import { DydxAddress, WalletType } from '@/constants/wallets';
 
 import {
   cancelOrderConfirmed,
@@ -68,6 +68,7 @@ export const useSubaccount = () => useContext(SubaccountContext);
 const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWallet }) => {
   const dispatch = useAppDispatch();
   const { usdcDenom, usdcDecimals, chainTokenDecimals } = useTokenConfigs();
+  const { walletType } = useAccounts();
   const { compositeClient, faucetClient } = useDydxClient();
 
   const { getFaucetFunds, getNativeTokens } = useMemo(
@@ -289,10 +290,11 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   const usdcCoinBalance = balances?.[usdcDenom];
 
   useEffect(() => {
-    if (usdcCoinBalance) {
+    const isKeplr = walletType === WalletType.Keplr;
+    if (usdcCoinBalance && !isKeplr) {
       rebalanceWalletFunds(usdcCoinBalance);
     }
-  }, [usdcCoinBalance, rebalanceWalletFunds]);
+  }, [usdcCoinBalance, rebalanceWalletFunds, walletType]);
 
   const deposit = useCallback(
     async (amount: number) => {
