@@ -54,7 +54,7 @@ const RewardsPage = () => {
           {tradingRewardsRehaulEnabled && <TradingRewardsChartPanel />}
           <$LaunchIncentivesPanel />
           <$TradingRewardsColumn>
-            <TradingRewardsSummaryPanel />
+            {!tradingRewardsRehaulEnabled && <TradingRewardsSummaryPanel />}
             {tradingRewardsRehaulEnabled && <NewMarketsPanel />}
             {tradingRewardsRehaulEnabled && <GovernancePanel />}
             <RewardHistoryPanel />
@@ -75,7 +75,7 @@ const RewardsPage = () => {
         <$LaunchIncentivesPanel />
         <$DYDXBalancePanel />
         <$TradingRewardsColumn>
-          <TradingRewardsSummaryPanel />
+          {!tradingRewardsRehaulEnabled && <TradingRewardsSummaryPanel />}
           <RewardHistoryPanel />
         </$TradingRewardsColumn>
         <$OtherColumn>
@@ -94,9 +94,8 @@ const RewardsPage = () => {
 export default RewardsPage;
 
 const $GridLayout = styled.div<{ showMigratePanel?: boolean; showChartPanel?: boolean }>`
-  --gap: 1.5rem;
+  --gap: ;
   display: grid;
-  grid-template-columns: 2fr 1fr;
   gap: var(--gap);
   max-width: 80rem;
 
@@ -104,38 +103,40 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean; showChartPanel?: bo
     gap: var(--gap);
   }
 
-  ${({ showMigratePanel, showChartPanel }) =>
-    showMigratePanel && showChartPanel
-      ? css`
-          grid-template-areas:
-            'migrate migrate'
-            'chart chart'
-            'incentives incentives'
-            'balance balance'
-            'rewards other';
-        `
-      : showMigratePanel
-      ? css`
-          grid-template-areas:
-            'migrate migrate'
-            'incentives balance'
-            'rewards other';
-        `
-      : showChartPanel
-      ? css`
-          grid-template-areas:
-            'chart chart'
-            'incentives balance'
-            'rewards other';
-        `
-      : css`
-          grid-template-areas:
-            'incentives balance'
-            'rewards other';
-        `}
-
   @media ${breakpoints.notTablet} {
+    --gap: 1.5rem;
+    grid-template-columns: 2fr 1fr;
     padding: 1rem;
+
+    ${({ showMigratePanel, showChartPanel }) =>
+      showMigratePanel && showChartPanel
+        ? css`
+            grid-template-areas:
+              'migrate migrate'
+              'chart chart'
+              'incentives incentives'
+              'balance balance'
+              'rewards other';
+          `
+        : showMigratePanel
+        ? css`
+            grid-template-areas:
+              'migrate migrate'
+              'incentives balance'
+              'rewards other';
+          `
+        : showChartPanel
+        ? css`
+            grid-template-areas:
+              'chart chart'
+              'incentives balance'
+              'rewards other';
+          `
+        : css`
+            grid-template-areas:
+              'incentives balance'
+              'rewards other';
+          `}
   }
 
   @media ${breakpoints.tablet} {
@@ -143,14 +144,23 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean; showChartPanel?: bo
     grid-template-columns: 1fr;
     width: calc(100vw - 2rem);
     margin: 0 auto;
-
-    grid-template-areas:
-      'incentives'
-      'rewards';
-
     > :last-child {
       margin-bottom: var(--gap);
     }
+
+    ${({ showChartPanel }) =>
+      showChartPanel
+        ? css`
+            grid-template-areas:
+              'chart'
+              'incentives'
+              'rewards';
+          `
+        : css`
+            grid-template-areas:
+              'incentives'
+              'rewards';
+          `}
   }
 `;
 

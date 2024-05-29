@@ -5,6 +5,8 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { layoutMixins } from '@/styles/layoutMixins';
+
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Link } from '@/components/Link';
@@ -70,6 +72,7 @@ export const RewardsNavPanel = ({
 };
 
 const $Title = styled.h3<{ tradingRewardsRehaulEnabled: boolean }>`
+  ${layoutMixins.inlineRow}
   font: var(--font-medium-book);
 
   ${({ tradingRewardsRehaulEnabled }) =>
@@ -104,9 +107,6 @@ const $Description = styled.div`
 `;
 
 const $Link = styled(Link)`
-  ::before {
-    content: ' ';
-    white-space: pre;
-  }
   display: inline-block;
+  margin-left: 0.5ch;
 `;
