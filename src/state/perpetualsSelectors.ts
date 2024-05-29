@@ -1,4 +1,5 @@
 import { Candle, TradingViewBar } from '@/constants/candles';
+import { EMPTY_ARR } from '@/constants/objects';
 
 import { mapCandle } from '@/lib/tradingView/utils';
 
@@ -71,7 +72,7 @@ export const getLiveTrades = (state: RootState) => state.perpetuals.liveTrades;
 export const getCurrentMarketLiveTrades = (state: RootState) => {
   const liveTrades = getLiveTrades(state);
   const currentMarketId = getCurrentMarketId(state);
-  return currentMarketId ? liveTrades?.[currentMarketId] ?? [] : [];
+  return currentMarketId ? liveTrades?.[currentMarketId] ?? EMPTY_ARR : EMPTY_ARR;
 };
 
 /**
@@ -135,7 +136,7 @@ export const getPerpetualCandlesForMarket = (
   state: RootState,
   marketId: string,
   resolution: string
-): Candle[] => state.perpetuals.candles?.[marketId]?.data?.[resolution] ?? [];
+): Candle[] => state.perpetuals.candles?.[marketId]?.data?.[resolution] ?? EMPTY_ARR;
 
 /**
  *

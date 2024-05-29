@@ -50,8 +50,10 @@ export const getSubaccountHistoricalPnl = (state: RootState) => state.account?.h
  * @param state
  * @returns list of a subaccount's open positions. Each item in the list is an open position in a different market.
  */
-export const getOpenPositions = (state: RootState) =>
-  state.account.subaccount?.openPositions?.toArray();
+export const getOpenPositions = createAppSelector(
+  [(state: RootState) => state.account.subaccount?.openPositions],
+  (t) => t?.toArray()
+);
 
 /**
  * @param state
@@ -98,8 +100,10 @@ export const getCurrentMarketPositionData = (state: RootState) => {
  * @param state
  * @returns list of orders for the currently connected subaccount
  */
-export const getSubaccountOrders = (state: RootState) =>
-  state.account.subaccount?.orders?.toArray();
+export const getSubaccountOrders = createAppSelector(
+  [(state: RootState) => state.account.subaccount?.orders],
+  (t) => t?.toArray()
+);
 
 /**
  * @param state
