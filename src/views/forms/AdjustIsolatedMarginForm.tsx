@@ -5,13 +5,14 @@ import { shallowEqual, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import {
+  AbacusPositionSide,
   AdjustIsolatedMarginInputField,
   IsolatedMarginAdjustmentType,
   type SubaccountPosition,
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonState, ButtonType } from '@/constants/buttons';
-import { STRING_KEYS, StringKey } from '@/constants/localization';
+import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, PERCENT_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -56,9 +57,10 @@ export const AdjustIsolatedMarginForm = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const subaccountPosition = useSelector(getOpenPositionFromId(marketId));
-  const { childSubaccountNumber } = subaccountPosition ?? {};
+  const { childSubaccountNumber, side } = subaccountPosition ?? {};
   const marketConfig = useSelector(getMarketConfig(marketId));
   const adjustIsolatedMarginInputs = useSelector(getAdjustIsolatedMarginInputs, shallowEqual);
+
   const {
     type: isolatedMarginAdjustmentType,
     amount,
@@ -114,8 +116,8 @@ export const AdjustIsolatedMarginForm = ({
     adjustIsolatedMarginOfPosition({
       onError: (errorParams) => {
         setIsSubmitting(false);
-        if (errorParams) {
-          setErrorMessage(stringGetter({ key: errorParams.errorStringKey as StringKey }));
+        if (errorParams?.errorStringKey) {
+          setErrorMessage(stringGetter({ key: errorParams.errorStringKey }));
         }
       },
       onSuccess: () => {
@@ -252,10 +254,28 @@ export const AdjustIsolatedMarginForm = ({
           ],
         };
 
+  const gradientToColor = useMemo(() => {
+    if (liquidationPriceUpdated && liquidationPrice) {
+      const increasedLiquidationPrice = liquidationPriceUpdated > liquidationPrice;
+      if (side?.current === AbacusPositionSide.LONG) {
+        return increasedLiquidationPrice ? 'negative' : 'positive';
+      }
+
+      return increasedLiquidationPrice ? 'positive' : 'negative';
+    }
+
+    // Position did not have a liq. price prior to the adjustment
+    if (liquidationPriceUpdated) {
+      return 'negative';
+    }
+
+    return 'neutral';
+  }, [liquidationPrice, liquidationPriceUpdated, side]);
+
   const CenterElement = errorMessage ? (
     <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>
   ) : (
-    <$GradientCard fromColor="neutral" toColor="negative">
+    <$GradientCard fromColor="neutral" toColor={gradientToColor}>
       <$Column>
         <$TertiarySpan>{stringGetter({ key: STRING_KEYS.ESTIMATED })}</$TertiarySpan>
         <span>{stringGetter({ key: STRING_KEYS.LIQUIDATION_PRICE })}</span>

@@ -80,6 +80,7 @@ export const AdjustTargetLeverageForm = ({
             placeholder={`${MustBigNumber(leverage).abs().toFixed(LEVERAGE_DECIMALS)}×`}
             type={InputType.Leverage}
             value={leverage}
+            max={10}
             onChange={({ floatValue }: NumberFormatValues) =>
               setLeverage(floatValue?.toString() ?? '')
             }

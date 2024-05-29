@@ -116,12 +116,14 @@ export const useTradeFormData = () => {
           needsTargetLeverage,
           needsTrailingPercent,
           needsTriggerPrice,
-          executionOptions,
           needsGoodUntil,
           needsPostOnly,
           needsReduceOnly,
           postOnlyTooltip,
           reduceOnlyTooltip,
+
+          executionOptions,
+          marginModeOptions,
           timeInForceOptions,
         } = tradeOptions ?? {};
 
@@ -134,12 +136,14 @@ export const useTradeFormData = () => {
           needsTargetLeverage,
           needsTrailingPercent,
           needsTriggerPrice,
-          executionOptions,
           needsGoodUntil,
           needsPostOnly,
           needsReduceOnly,
           postOnlyTooltip,
           reduceOnlyTooltip,
+
+          executionOptions,
+          marginModeOptions,
           timeInForceOptions,
 
           tradeErrors,
