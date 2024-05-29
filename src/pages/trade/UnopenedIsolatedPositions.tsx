@@ -14,7 +14,7 @@ import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
 import { PotentialPositionCard } from '@/components/PotentialPositionCard';
 
-import { getPendingPositions } from '@/state/accountSelectors';
+import { getNonZeroPendingPositions } from '@/state/accountSelectors';
 import { getAssets } from '@/state/assetsSelectors';
 
 type UnopenedIsolatedPositionsProps = {
@@ -28,7 +28,7 @@ export const MaybeUnopenedIsolatedPositionsDrawer = ({
 }: UnopenedIsolatedPositionsProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const pendingPositions = useSelector(getPendingPositions, shallowEqual);
+  const pendingPositions = useSelector(getNonZeroPendingPositions, shallowEqual);
   const stringGetter = useStringGetter();
 
   if (!pendingPositions?.length) return null;
@@ -62,7 +62,7 @@ export const MaybeUnopenedIsolatedPositionsPanel = ({
   header,
   className,
 }: UnopenedIsolatedPositionsPanelProps) => {
-  const pendingPositions = useSelector(getPendingPositions, shallowEqual);
+  const pendingPositions = useSelector(getNonZeroPendingPositions, shallowEqual);
   if (!pendingPositions?.length) return null;
 
   return (
