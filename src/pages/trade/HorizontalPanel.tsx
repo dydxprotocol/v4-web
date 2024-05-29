@@ -318,17 +318,19 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
               <$SelectItem
                 key={MarketTypeFilter.AllMarkets}
                 value={MarketTypeFilter.AllMarkets}
-                label="All"
+                label={`${stringGetter({ key: STRING_KEYS.CROSS })} / ${stringGetter({
+                  key: STRING_KEYS.ISOLATED,
+                })}`}
               />
               <$SelectItem
                 key={MarketTypeFilter.Isolated}
                 value={MarketTypeFilter.Isolated}
-                label="Isolated"
+                label={stringGetter({ key: STRING_KEYS.ISOLATED })}
               />
               <$SelectItem
                 key={MarketTypeFilter.Cross}
                 value={MarketTypeFilter.Cross}
-                label="Cross"
+                label={stringGetter({ key: STRING_KEYS.CROSS })}
               />
             </$SelectMenu>
             <$VerticalSeparator />
@@ -342,7 +344,9 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
 };
 
 const $VerticalSeparator = styled(VerticalSeparator)`
-  height: 1em !important;
+  && {
+    height: 1em;
+  }
 `;
 
 const $AssetIcon = styled(AssetIcon)`
