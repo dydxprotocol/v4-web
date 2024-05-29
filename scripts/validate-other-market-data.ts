@@ -401,17 +401,14 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   );
   const marketsProposed = new Map<number, Proposal>(); // marketId -> Proposal
 
-  for (let i = 0; i < filteredProposals.length + 1; i += 4) {
+  for (let i = 0; i < filteredProposals.length; i += 4) {
     // Send out proposals in groups of 4 or fewer.
     const proposalsToSend = filteredProposals.slice(i, i + 4);
     const proposalIds: number[] = [];
     for (let j = 0; j < proposalsToSend.length; j++) {
       // Use wallets[j] to send out proposalsToSend[j]
       const proposal = proposalsToSend[j];
-      let proposalId: number = i + j + 1; // skip proposalid number 98
-      if (proposalId == 98){
-        proposalId++;
-      }
+      const proposalId: number = i + j + 1; 
       const marketId: number = numExistingMarkets + proposalId;
 
       // Send proposal.
