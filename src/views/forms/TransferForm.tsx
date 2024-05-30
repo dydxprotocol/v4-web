@@ -47,6 +47,7 @@ import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
 import { testFlags } from '@/lib/testFlags';
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 
 type TransferFormProps = {
   selectedAsset?: DydxChainAsset;
@@ -60,6 +61,8 @@ export const TransferForm = ({
   className,
 }: TransferFormProps) => {
   const stringGetter = useStringGetter();
+  const { showMemoTransferField } = useEnvFeatures();
+
   const { freeCollateral } = useSelector(getSubaccount, shallowEqual) ?? {};
   const { dydxAddress } = useAccounts();
   const { transfer } = useSubaccount();
@@ -91,7 +94,7 @@ export const TransferForm = ({
   const isUSDCSelected = asset === DydxChainAsset.USDC;
   const amount = isUSDCSelected ? size?.usdcSize : size?.size;
   const showNotEnoughGasWarning = fee && isUSDCSelected && usdcBalance < fee;
-  const showMemoField = testFlags.memoTransferField && isChainTokenSelected;
+  const showMemoField = showMemoTransferField && isChainTokenSelected;
   const showMemoEmptyWarning = showMemoField && (!memo || memo === '');
 
   const balance = isUSDCSelected ? freeCollateral?.current : nativeTokenBalance;

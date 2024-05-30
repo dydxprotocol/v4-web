@@ -48,10 +48,6 @@ class TestFlags {
     return !!this.queryParams.tradingrewardsrehaul;
   }
 
-  get memoTransferField() {
-    return !!this.queryParams.memotransferfield;
-  }
-
   get referrer() {
     return this.queryParams.utm_source;
   }
