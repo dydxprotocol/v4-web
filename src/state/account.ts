@@ -43,7 +43,7 @@ export type AccountState = {
   transfers?: SubaccountTransfers;
   historicalPnl?: SubAccountHistoricalPNLs;
 
-  childSubaccounts?: {
+  childSubaccounts: {
     [subaccountNumber: number]: Nullable<
       Partial<
         Subaccount & {
@@ -229,11 +229,9 @@ export const accountSlice = createSlice({
         subaccountNumber: number;
       }>
     ) => {
-      state.childSubaccounts = {
-        ...state.childSubaccounts,
-        [action.payload.subaccountNumber]: {
-          ...action.payload.data,
-        },
+      state.childSubaccounts[action.payload.subaccountNumber] = {
+        ...state.childSubaccounts[action.payload.subaccountNumber],
+        ...action.payload.data,
       };
     },
     setWallet: (state, action: PayloadAction<Nullable<Wallet>>) => ({
