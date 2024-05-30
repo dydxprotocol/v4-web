@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 
+import { groupBy } from 'lodash';
 import { useQuery } from 'react-query';
 import { shallowEqual, useSelector } from 'react-redux';
 
@@ -61,10 +62,7 @@ export const useStakingValidator = () => {
 
     return {
       selectedValidator: validatorWithFewestTokens,
-      stakingValidators: Object.groupBy(
-        stakingValidators,
-        ({ operatorAddress }) => operatorAddress
-      ),
+      stakingValidators: groupBy(stakingValidators, ({ operatorAddress }) => operatorAddress),
       currentDelegations,
     };
   }, [validatorWhitelist, getValidators, currentDelegations]);

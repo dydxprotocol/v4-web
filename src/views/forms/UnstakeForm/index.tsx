@@ -71,7 +71,7 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
   }, [amounts, currentDelegations]);
 
   const totalAmount = useMemo(() => {
-    return Object.values(amounts).reduce((acc, value) => acc + (value ?? 0), 0);
+    return Object.values(amounts).reduce((acc: number, value) => acc + (value ?? 0), 0);
   }, [amounts]);
 
   const isTotalAmountValid = totalAmount && totalAmount > 0;
