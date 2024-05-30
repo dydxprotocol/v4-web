@@ -10,9 +10,13 @@ import { AppRoute } from '@/constants/routes';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { formMixins } from '@/styles/formMixins';
+
 import { AssetIcon } from '@/components/AssetIcon';
 import { CollapsibleTabs } from '@/components/CollapsibleTabs';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
+import { SelectItem, SelectMenu } from '@/components/SelectMenu';
+import { VerticalSeparator } from '@/components/Separator';
 import { MobileTabs } from '@/components/Tabs';
 import { Tag, TagType } from '@/components/Tag';
 import { ToggleGroup } from '@/components/ToggleGroup';
@@ -41,6 +45,7 @@ import { isTruthy } from '@/lib/isTruthy';
 import { shortenNumberForDisplay } from '@/lib/numbers';
 
 import { MaybeUnopenedIsolatedPositionsDrawer } from './UnopenedIsolatedPositions';
+import { MarketTypeFilter } from './types';
 
 enum InfoSection {
   Position = 'Position',
@@ -68,6 +73,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const [view, setView] = useState<PanelView>(
     allMarkets ? PanelView.AllMarkets : PanelView.CurrentMarket
   );
+  const [viewIsolated, setViewIsolated] = useState<MarketTypeFilter>(MarketTypeFilter.AllMarkets);
   const [tab, setTab] = useState<InfoSection>(InfoSection.Position);
 
   const currentMarketId = useSelector(getCurrentMarketId);
@@ -126,6 +132,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
         ) : (
           <PositionsTable
             currentMarket={showCurrentMarket ? currentMarketId : undefined}
+            marketTypeFilter={viewIsolated}
             columnKeys={
               isTablet
                 ? [
@@ -171,6 +178,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
         content: (
           <OrdersTable
             currentMarket={showCurrentMarket ? currentMarketId : undefined}
+            marketTypeFilter={viewIsolated}
             columnKeys={
               isTablet
                 ? [OrdersTableColumnKey.StatusFill, OrdersTableColumnKey.PriceType]
@@ -247,6 +255,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     [
       stringGetter,
       currentMarketId,
+      viewIsolated,
       showCurrentMarket,
       isTablet,
       isWaitingForOrderToIndex,
@@ -276,28 +285,56 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
         defaultOpen={isOpen}
         onOpenChange={setIsOpen}
         slotToolbar={
-          <ToggleGroup
-            items={[
-              {
-                value: PanelView.AllMarkets,
-                label: stringGetter({ key: STRING_KEYS.ALL }),
-              },
-              {
-                value: PanelView.CurrentMarket,
-                ...(currentMarketAssetId
-                  ? {
-                      slotBefore: <$AssetIcon symbol={currentMarketAssetId} />,
-                      label: currentMarketAssetId,
-                    }
-                  : { label: stringGetter({ key: STRING_KEYS.MARKET }) }),
-              },
-            ]}
-            value={view}
-            onValueChange={setView}
-            onInteraction={() => {
-              setIsOpen?.(true);
-            }}
-          />
+          <>
+            <ToggleGroup
+              items={[
+                {
+                  value: PanelView.AllMarkets,
+                  label: stringGetter({ key: STRING_KEYS.ALL }),
+                },
+                {
+                  value: PanelView.CurrentMarket,
+                  ...(currentMarketAssetId
+                    ? {
+                        slotBefore: <$AssetIcon symbol={currentMarketAssetId} />,
+                        label: currentMarketAssetId,
+                      }
+                    : { label: stringGetter({ key: STRING_KEYS.MARKET }) }),
+                },
+              ]}
+              value={view}
+              onValueChange={setView}
+              onInteraction={() => {
+                setIsOpen?.(true);
+              }}
+            />
+            <$VerticalSeparator />
+            <$SelectMenu
+              value={viewIsolated}
+              onValueChange={(newViewIsolated: string) => {
+                setViewIsolated(newViewIsolated as MarketTypeFilter);
+              }}
+            >
+              <$SelectItem
+                key={MarketTypeFilter.AllMarkets}
+                value={MarketTypeFilter.AllMarkets}
+                label={`${stringGetter({ key: STRING_KEYS.CROSS })} / ${stringGetter({
+                  key: STRING_KEYS.ISOLATED,
+                })}`}
+              />
+              <$SelectItem
+                key={MarketTypeFilter.Isolated}
+                value={MarketTypeFilter.Isolated}
+                label={stringGetter({ key: STRING_KEYS.ISOLATED })}
+              />
+              <$SelectItem
+                key={MarketTypeFilter.Cross}
+                value={MarketTypeFilter.Cross}
+                label={stringGetter({ key: STRING_KEYS.CROSS })}
+              />
+            </$SelectMenu>
+            <$VerticalSeparator />
+          </>
         }
         tabItems={tabItems}
       />
@@ -305,6 +342,12 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     </>
   );
 };
+
+const $VerticalSeparator = styled(VerticalSeparator)`
+  && {
+    height: 1em;
+  }
+`;
 
 const $AssetIcon = styled(AssetIcon)`
   font-size: 1.5em;
@@ -325,3 +368,14 @@ const $LoadingSpinner = styled(LoadingSpinner)`
 const $UnopenedIsolatedPositions = styled(MaybeUnopenedIsolatedPositionsDrawer)`
   margin-top: auto;
 `;
+
+const $SelectMenu = styled(SelectMenu)`
+  ${formMixins.inputInnerSelectMenu}
+  --trigger-height: 1.75rem;
+  --trigger-radius: 2rem;
+  --trigger-backgroundColor: var(--color-layer-1);
+`;
+
+const $SelectItem = styled(SelectItem)`
+  ${formMixins.inputInnerSelectMenuItem}
+` as typeof SelectItem;

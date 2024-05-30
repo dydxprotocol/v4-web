@@ -31,6 +31,7 @@ import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
+import { MarketTypeFilter, marketTypeMatchesFilter } from '@/pages/trade/types';
 
 import { viewedOrders } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
@@ -321,6 +322,7 @@ type ElementProps = {
   columnKeys: OrdersTableColumnKey[];
   columnWidths?: Partial<Record<OrdersTableColumnKey, ColumnSize>>;
   currentMarket?: string;
+  marketTypeFilter?: MarketTypeFilter;
   initialPageSize?: PageSize;
 };
 
@@ -332,6 +334,7 @@ export const OrdersTable = ({
   columnKeys = [],
   columnWidths,
   currentMarket,
+  marketTypeFilter,
   initialPageSize,
   withOuterBorder,
 }: ElementProps & StyleProps) => {
@@ -342,7 +345,14 @@ export const OrdersTable = ({
   const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
   const marketOrders = useSelector(getCurrentMarketOrders, shallowEqual) ?? EMPTY_ARR;
   const allOrders = useSelector(getSubaccountUnclearedOrders, shallowEqual) ?? EMPTY_ARR;
-  const orders = currentMarket ? marketOrders : allOrders;
+  const orders = useMemo(
+    () =>
+      (currentMarket ? marketOrders : allOrders).filter((order) => {
+        const orderType = getMarginModeFromSubaccountNumber(order.subaccountNumber).name;
+        return marketTypeMatchesFilter(orderType, marketTypeFilter);
+      }),
+    [allOrders, currentMarket, marketOrders, marketTypeFilter]
+  );
 
   const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
   const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
