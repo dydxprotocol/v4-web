@@ -7,6 +7,36 @@ import { TransferNotificationTypes } from './notifications';
 import type { TradeTypes } from './trade';
 import type { DydxAddress, EvmAddress, WalletConnectionType, WalletType } from './wallets';
 
+type AnalyticsEventDataWithReferrer<T extends AnalyticsEvent> = AnalyticsEventData<T> & {
+  referrer: string;
+};
+export type AnalyticsEventTrackMeta<T extends AnalyticsEvent> = {
+  detail: {
+    eventType: AnalyticsEvent;
+    eventData: AnalyticsEventDataWithReferrer<T>;
+  };
+};
+export type AnalyticsEventIdentifyMeta<T extends AnalyticsUserProperty> = {
+  detail: {
+    property: AnalyticsUserProperty;
+    propertyValue: AnalyticsUserPropertyValue<T>;
+  };
+};
+
+// Do not update. this is used specifically to type how we create custom identify events.
+// If you want to update how identify events work, go to src/lib/analytics.ts
+export const customIdentifyEvent = <T extends AnalyticsUserProperty>(
+  meta: AnalyticsEventIdentifyMeta<T>
+) => {
+  return new CustomEvent('dydx:identify', meta);
+};
+
+// Do not update. this is used specifically to type how we create custom track events.
+// If you want to update how track events work, go to src/lib/analytics.ts
+export const customTrackEvent = <T extends AnalyticsEvent>(meta: AnalyticsEventTrackMeta<T>) => {
+  return new CustomEvent('dydx:track', meta);
+};
+
 // User properties
 export enum AnalyticsUserProperty {
   // Environment

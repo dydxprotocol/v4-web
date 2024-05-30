@@ -580,6 +580,16 @@
     "whitepaperLink": "https://uniswap.org/whitepaper-v3.pdf",
     "coinMarketCapsLink": "https://coinmarketcap.com/currencies/uniswap/"
   },
+  "W-USD": {
+    "name": "Wormhole",
+    "tags": [
+        "NFT",
+        "Defi"
+    ],
+    "websiteLink": "https://wormhole.com",
+    "whitepaperLink": "https://docs.wormhole.com/wormhole",
+    "coinMarketCapsLink": "https://coinmarketcap.com/currencies/wormhole/"
+},
   "WIF-USD": {
     "name": "dogwifhat",
     "tags": ["Meme"],
