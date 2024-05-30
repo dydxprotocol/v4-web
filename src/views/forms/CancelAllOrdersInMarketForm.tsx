@@ -1,0 +1,154 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { zipObject } from 'lodash';
+import { shallowEqual, useSelector } from 'react-redux';
+import styled from 'styled-components';
+
+import { ButtonAction } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
+import { NumberSign } from '@/constants/numbers';
+import { EMPTY_ARR } from '@/constants/objects';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
+
+import { Button } from '@/components/Button';
+import { DiffOutput } from '@/components/DiffOutput';
+import { OutputType } from '@/components/Output';
+import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
+
+import { getNonZeroPendingPositions, getPendingIsolatedOrders } from '@/state/accountSelectors';
+import { getAssets } from '@/state/assetsSelectors';
+
+type CancelAllOrdersInMarketFormProps = {
+  marketId: string;
+  onCancelComplete(): void;
+};
+
+type OrderCancelStatus =
+  | { type: 'pending' }
+  | { type: 'success' }
+  | { type: 'error'; errorKey?: string };
+
+export const CancelAllOrdersInMarketForm = ({
+  marketId,
+  onCancelComplete,
+}: CancelAllOrdersInMarketFormProps) => {
+  const stringGetter = useStringGetter();
+  const pendingPositions = useSelector(getNonZeroPendingPositions, shallowEqual);
+  const thisPendingPosition = useMemo(
+    () => pendingPositions?.find((f) => f.marketId === marketId),
+    [marketId, pendingPositions]
+  );
+  const allPending = useSelector(getPendingIsolatedOrders, shallowEqual);
+  const pendingPositionOrders = allPending[marketId] ?? EMPTY_ARR;
+  const assetsData = useSelector(getAssets, shallowEqual);
+
+  const [cancellingStatus, setCancellingStatus] = useState<Record<string, OrderCancelStatus>>({});
+  const isCancelling = useMemo(
+    () => Object.values(cancellingStatus).some((s) => s.type === 'pending'),
+    [cancellingStatus]
+  );
+  const { cancelOrder } = useSubaccount();
+
+  const onCancel = useCallback(() => {
+    if (isCancelling) {
+      return;
+    }
+    setCancellingStatus(
+      zipObject(
+        pendingPositionOrders.map((p) => p.id),
+        pendingPositionOrders.map(() => ({ type: 'pending' }))
+      )
+    );
+    pendingPositionOrders.forEach((p) =>
+      cancelOrder({
+        orderId: p.id,
+        onSuccess: () => {
+          setCancellingStatus((old) => ({ ...old, [p.id]: { type: 'success' } }));
+        },
+        onError: (errorInfo) => {
+          setCancellingStatus((old) => ({
+            ...old,
+            [p.id]: { type: 'error', errorKey: errorInfo?.errorStringKey ?? undefined },
+          }));
+        },
+      })
+    );
+  }, [cancelOrder, isCancelling, pendingPositionOrders]);
+
+  useEffect(() => {
+    const allResults = Object.values(cancellingStatus);
+    if (allResults.length === 0) {
+      return;
+    }
+    // if there are errors, user should be able to see the error notifications so we won't display inline.
+    if (allResults.every((r) => r.type === 'success' || r.type === 'error')) {
+      onCancelComplete();
+    }
+  }, [cancellingStatus, onCancelComplete]);
+
+  const detailItems = useMemo(() => {
+    return [
+      {
+        key: 'open-orders',
+        label: <span>{stringGetter({ key: STRING_KEYS.OPEN_POSITIONS })}</span>,
+        value: (
+          <$DiffOutput
+            type={OutputType.Number}
+            value={pendingPositionOrders.length}
+            newValue={0}
+            sign={NumberSign.Negative}
+            withDiff
+          />
+        ),
+      },
+      {
+        key: 'position-margin',
+        label: <span>{stringGetter({ key: STRING_KEYS.POSITION_MARGIN })}</span>,
+        value: (
+          <$DiffOutput
+            type={OutputType.Fiat}
+            value={thisPendingPosition?.freeCollateral?.current ?? 0}
+            newValue={0}
+            sign={NumberSign.Negative}
+            withDiff
+          />
+        ),
+      },
+      // TODO: show effect on cross margin, communicate that the money is being transferred back
+    ];
+  }, [pendingPositionOrders.length, stringGetter, thisPendingPosition?.freeCollateral]);
+
+  const submitButtonWithReceipt = (
+    <WithDetailsReceipt detailItems={detailItems}>
+      <$Button
+        action={ButtonAction.Destroy}
+        onClick={onCancel}
+        state={{ isDisabled: isCancelling, isLoading: isCancelling }}
+      >
+        {stringGetter({
+          key: STRING_KEYS.CANCEL_ORDER,
+        })}
+      </$Button>
+    </WithDetailsReceipt>
+  );
+  return (
+    <div>
+      <$ConfirmationText>
+        Are you sure you want to cancel {pendingPositionOrders.length} open orders in{' '}
+        {assetsData?.[pendingPositionOrders[0]?.assetId ?? '']?.name ?? marketId} ({marketId})?
+      </$ConfirmationText>
+      {submitButtonWithReceipt}
+    </div>
+  );
+};
+
+const $ConfirmationText = styled.div`
+  margin-bottom: 1rem;
+`;
+const $Button = styled(Button)`
+  width: 100%;
+`;
+
+const $DiffOutput = styled(DiffOutput)``;
