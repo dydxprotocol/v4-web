@@ -1,9 +1,10 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
@@ -34,6 +35,7 @@ import {
   getTradeInfoNumbers,
 } from '@/state/accountSelectors';
 import { getDefaultToAllMarketsInPositionsOrdersFills } from '@/state/configsSelectors';
+import { openDialog } from '@/state/dialogs';
 import { getCurrentMarketAssetId, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
@@ -258,8 +260,17 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
     ]
   );
 
+  const dispatch = useDispatch();
+  const onCancelOrders = useCallback(
+    (marketId: string) => {
+      dispatch(openDialog({ type: DialogTypes.CancelPendingOrders, dialogProps: { marketId } }));
+    },
+    [dispatch]
+  );
   const slotBottom = {
-    [InfoSection.Position]: <$UnopenedIsolatedPositions onViewOrders={onViewOrders} />,
+    [InfoSection.Position]: (
+      <$UnopenedIsolatedPositions onViewOrders={onViewOrders} onCancelOrders={onCancelOrders} />
+    ),
     [InfoSection.Orders]: null,
     [InfoSection.Fills]: null,
     [InfoSection.Payments]: null,

@@ -1,8 +1,10 @@
 import type { Nullable, kollections } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { groupBy } from 'lodash';
 import { createSelector } from 'reselect';
 
 import {
+  AbacusMarginMode,
   AbacusOrderSide,
   AbacusOrderStatus,
   AbacusPositionSide,
@@ -190,6 +192,25 @@ export const getSubaccountOpenOrders = createSelector([getSubaccountOrders], (or
     (order) =>
       order.status !== AbacusOrderStatus.filled && order.status !== AbacusOrderStatus.cancelled
   )
+);
+
+export const getPendingIsolatedOrders = createSelector(
+  [getSubaccountOrders, getExistingOpenPositions, getPerpetualMarkets],
+  (allOrders, allOpenPositions, allMarkets) => {
+    const allValidOrders = (allOrders ?? [])
+      .filter(
+        (o) =>
+          (o.status === AbacusOrderStatus.open || o.status === AbacusOrderStatus.pending) &&
+          o.marginMode === AbacusMarginMode.isolated
+      )
+      // eslint-disable-next-line prefer-object-spread
+      .map((o) => Object.assign({}, o, { assetId: allMarkets?.[o.marketId]?.assetId }));
+    const allOpenPositionAssetIds = new Set(allOpenPositions?.map((p) => p.assetId) ?? []);
+    return groupBy(
+      allValidOrders.filter((o) => !allOpenPositionAssetIds.has(o.assetId ?? '')),
+      (o) => o.marketId
+    );
+  }
 );
 
 /**

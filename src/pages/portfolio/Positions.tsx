@@ -1,9 +1,10 @@
 import { useCallback } from 'react';
 
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, PortfolioRoute } from '@/constants/routes';
 
@@ -18,6 +19,7 @@ import {
   calculateShouldRenderActionsInPositionsTable,
   calculateShouldRenderTriggersInPositionsTable,
 } from '@/state/accountCalculators';
+import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
 
@@ -40,6 +42,14 @@ export const Positions = () => {
       state: { from: AppRoute.Portfolio },
     });
   }, [navigate]);
+
+  const dispatch = useDispatch();
+  const onCancelOrders = useCallback(
+    (marketId: string) => {
+      dispatch(openDialog({ type: DialogTypes.CancelPendingOrders, dialogProps: { marketId } }));
+    },
+    [dispatch]
+  );
 
   return (
     <$AttachedExpandingSection>
@@ -83,6 +93,7 @@ export const Positions = () => {
           />
         }
         onViewOrders={handleViewUnopenedIsolatedOrders}
+        onCancelOrders={onCancelOrders}
       />
     </$AttachedExpandingSection>
   );

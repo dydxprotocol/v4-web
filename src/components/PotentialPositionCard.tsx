@@ -15,12 +15,14 @@ import { Output, OutputType } from './Output';
 type PotentialPositionCardProps = {
   marketName: string;
   onViewOrders: (marketId: string) => void;
+  onCancelOrders: (marketId: string) => void;
   pendingPosition: SubaccountPendingPosition;
 };
 
 export const PotentialPositionCard = ({
   marketName,
   onViewOrders,
+  onCancelOrders,
   pendingPosition,
 }: PotentialPositionCardProps) => {
   const stringGetter = useStringGetter();
@@ -41,6 +43,9 @@ export const PotentialPositionCard = ({
           {stringGetter({ key: orderCount > 1 ? STRING_KEYS.VIEW_ORDERS : STRING_KEYS.VIEW })}{' '}
           <Icon iconName={IconName.Arrow} />
         </$Link>
+        <$CancelLink onClick={() => onCancelOrders(marketId)}>
+          {stringGetter({ key: orderCount > 1 ? STRING_KEYS.CANCEL_ALL : STRING_KEYS.CANCEL })}{' '}
+        </$CancelLink>
       </$ActionRow>
     </$PotentialPositionCard>
   );
@@ -93,5 +98,10 @@ const $ActionRow = styled.div`
 
 const $Link = styled(Link)`
   --link-color: var(--color-accent);
+  font: var(--font-small-book);
+`;
+
+const $CancelLink = styled(Link)`
+  --link-color: var(--color-risk-high);
   font: var(--font-small-book);
 `;
