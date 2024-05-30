@@ -5,6 +5,7 @@ import type {
   Compliance,
   HistoricalPnlPeriods,
   Nullable,
+  StakingDelegation,
   SubAccountHistoricalPNLs,
   Subaccount,
   SubaccountFill,
@@ -33,6 +34,7 @@ import { getLocalStorage } from '@/lib/localStorage';
 export type AccountState = {
   balances?: Record<string, AccountBalance>;
   stakingBalances?: Record<string, AccountBalance>;
+  stakingDelegations?: StakingDelegation[];
   tradingRewards?: TradingRewards;
   wallet?: Nullable<Wallet>;
   walletType?: WalletType;
@@ -224,6 +226,9 @@ export const accountSlice = createSlice({
     setStakingBalances: (state, action: PayloadAction<Record<string, AccountBalance>>) => {
       state.stakingBalances = action.payload;
     },
+    setStakingDelegations: (state, action: PayloadAction<StakingDelegation[]>) => {
+      state.stakingDelegations = action.payload;
+    },
     setTradingRewards: (state, action: PayloadAction<TradingRewards>) => {
       state.tradingRewards = action.payload;
     },
@@ -304,6 +309,7 @@ export const {
   viewedOrders,
   setBalances,
   setStakingBalances,
+  setStakingDelegations,
   setTradingRewards,
   placeOrderSubmitted,
   placeOrderFailed,

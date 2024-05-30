@@ -14,11 +14,14 @@ import { BackButton } from '@/components/BackButton';
 import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 
+import { testFlags } from '@/lib/testFlags';
+
 import { DYDXBalancePanel } from './DYDXBalancePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { MigratePanel } from './MigratePanel';
 import { RewardHistoryPanel } from './RewardHistoryPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
+import { StakingPanel } from './StakingPanel';
 import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
 
 const RewardsPage = () => {
@@ -43,7 +46,7 @@ const RewardsPage = () => {
           ) : (
             <>
               <$LaunchIncentivesPanel />
-              <$DYDXBalancePanel />
+              {testFlags.enableStaking ? <$StakingPanel /> : <$DYDXBalancePanel />}
             </>
           )}
 
@@ -117,6 +120,10 @@ const $LaunchIncentivesPanel = styled(LaunchIncentivesPanel)`
 `;
 
 const $DYDXBalancePanel = styled(DYDXBalancePanel)`
+  grid-area: balance;
+`;
+
+const $StakingPanel = styled(StakingPanel)`
   grid-area: balance;
 `;
 

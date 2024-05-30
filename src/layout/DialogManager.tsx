@@ -29,9 +29,11 @@ import { RateLimitDialog } from '@/views/dialogs/RateLimitDialog';
 import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
 import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
 import { SelectMarginModeDialog } from '@/views/dialogs/SelectMarginModeDialog';
+import { StakeDialog } from '@/views/dialogs/StakeDialog';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
 import { TriggersDialog } from '@/views/dialogs/TriggersDialog';
+import { UnstakeDialog } from '@/views/dialogs/UnstakeDialog';
 import { WithdrawDialog } from '@/views/dialogs/WithdrawDialog';
 import { WithdrawalGateDialog } from '@/views/dialogs/WithdrawalGateDialog';
 
@@ -84,9 +86,11 @@ export const DialogManager = () => {
     [DialogTypes.RestrictedGeo]: <RestrictedGeoDialog {...modalProps} />,
     [DialogTypes.RestrictedWallet]: <RestrictedWalletDialog {...modalProps} />,
     [DialogTypes.SelectMarginMode]: <SelectMarginModeDialog {...modalProps} />,
+    [DialogTypes.Stake]: <StakeDialog {...modalProps} />,
     [DialogTypes.Trade]: <TradeDialog {...modalProps} />,
     [DialogTypes.Transfer]: <TransferDialog {...modalProps} />,
     [DialogTypes.Triggers]: <TriggersDialog {...modalProps} />,
+    [DialogTypes.Unstake]: <UnstakeDialog {...modalProps} />,
     [DialogTypes.Withdraw]: <WithdrawDialog {...modalProps} />,
     [DialogTypes.WithdrawalGated]: <WithdrawalGateDialog {...modalProps} />,
   }[type];
