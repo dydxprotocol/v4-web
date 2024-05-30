@@ -17,6 +17,7 @@ import { DydxChainAsset } from '@/constants/wallets';
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDydxClient } from '@/hooks/useDydxClient';
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useRestrictions } from '@/hooks/useRestrictions';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
@@ -46,8 +47,6 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
-import { testFlags } from '@/lib/testFlags';
-import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 
 type TransferFormProps = {
   selectedAsset?: DydxChainAsset;
