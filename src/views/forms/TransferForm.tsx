@@ -94,7 +94,6 @@ export const TransferForm = ({
   const amount = isUSDCSelected ? size?.usdcSize : size?.size;
   const showNotEnoughGasWarning = fee && isUSDCSelected && usdcBalance < fee;
   const showMemoField = showMemoTransferField && isChainTokenSelected;
-  const showMemoEmptyWarning = showMemoField && !memo;
 
   const balance = isUSDCSelected ? freeCollateral?.current : nativeTokenBalance;
 
@@ -143,6 +142,7 @@ export const TransferForm = ({
   );
 
   const isAmountValid = balance && amount && amountBN.gt(0) && newBalanceBN.gte(0);
+  const showMemoEmptyWarning = showMemoField && !memo && isAddressValid && isAmountValid; // only show warning if user has begin inputting mandatory fields
 
   const { screenAddresses } = useDydxClient();
 
