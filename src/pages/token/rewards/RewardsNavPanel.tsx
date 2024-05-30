@@ -107,6 +107,9 @@ const $Description = styled.div`
 `;
 
 const $Link = styled(Link)`
-  display: inline-block;
-  margin-left: 0.5ch;
+  display: inline;
+
+  ::before {
+    content: ' ';
+  }
 `;
