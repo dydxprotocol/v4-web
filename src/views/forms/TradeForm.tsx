@@ -20,7 +20,7 @@ import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/b
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
-import { USD_DECIMALS } from '@/constants/numbers';
+import { LEVERAGE_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import {
   InputErrorData,
   MobilePlaceOrderSteps,
@@ -116,6 +116,7 @@ export const TradeForm = ({
     size,
     summary,
     needsLimitPrice,
+    needsMarginMode,
     needsTargetLeverage,
     needsTrailingPercent,
     needsTriggerPrice,
@@ -332,6 +333,41 @@ export const TradeForm = ({
     });
   }
 
+  const marginModeSelector = needsMarginMode ? (
+    <Button
+      onClick={() => {
+        dispatch(openDialogInTradeBox({ type: TradeBoxDialogTypes.SelectMarginMode }));
+      }}
+    >
+      {marginMode &&
+        stringGetter({
+          key: MARGIN_MODE_STRINGS[marginMode.rawValue],
+        })}
+      <$TriangleIcon iconName={IconName.Triangle} />
+    </Button>
+  ) : (
+    <$WarningTooltip
+      slotTooltip={
+        <$WarningTooltipContent>
+          <$CautionIcon iconName={IconName.Warning} />
+          {stringGetter({
+            key: STRING_KEYS.UNABLE_TO_CHANGE_MARGIN_MODE,
+            params: {
+              MARKET: currentAssetId,
+            },
+          })}
+        </$WarningTooltipContent>
+      }
+    >
+      <Button disabled>
+        {marginMode &&
+          stringGetter({
+            key: MARGIN_MODE_STRINGS[marginMode.rawValue],
+          })}
+      </Button>
+    </$WarningTooltip>
+  );
+
   return (
     <$TradeForm onSubmit={onSubmit} className={className}>
       {currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder ? (
@@ -366,27 +402,21 @@ export const TradeForm = ({
             {!isTablet && (
               <>
                 <$MarginAndLeverageButtons>
-                  <Button
-                    onClick={() => {
-                      dispatch(
-                        openDialogInTradeBox({ type: TradeBoxDialogTypes.SelectMarginMode })
-                      );
-                    }}
-                  >
-                    {marginMode &&
-                      stringGetter({
-                        key: MARGIN_MODE_STRINGS[marginMode.rawValue],
-                      })}
-                  </Button>
+                  {marginModeSelector}
 
                   {needsTargetLeverage && (
-                    <Button
-                      onClick={() => {
-                        dispatch(openDialog({ type: DialogTypes.AdjustTargetLeverage }));
-                      }}
+                    <WithTooltip
+                      tooltip="target-leverage"
+                      stringParams={{ TARGET_LEVERAGE: targetLeverage?.toFixed(LEVERAGE_DECIMALS) }}
                     >
-                      <Output type={OutputType.Multiple} value={targetLeverage} />
-                    </Button>
+                      <Button
+                        onClick={() => {
+                          dispatch(openDialog({ type: DialogTypes.AdjustTargetLeverage }));
+                        }}
+                      >
+                        <Output type={OutputType.Multiple} value={targetLeverage} />
+                      </Button>
+                    </WithTooltip>
                   )}
                 </$MarginAndLeverageButtons>
 
@@ -524,10 +554,34 @@ const $MarginAndLeverageButtons = styled.div`
   gap: 0.5rem;
   margin-right: 0.5rem;
 
+  abbr,
   button {
     width: 100%;
   }
 `;
+
+const $TriangleIcon = styled(Icon)`
+  font-size: 0.4375rem;
+  transform: rotate(0.75turn);
+  margin-left: 0.5ch;
+`;
+
+const $WarningTooltip = styled(WithTooltip)`
+  --tooltip-backgroundColor: var(--color-gradient-warning);
+  border: 1px solid ${({ theme }) => theme.warning}30;
+`;
+
+const $WarningTooltipContent = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+`;
+
+const $CautionIcon = styled(Icon)`
+  font-size: 1.5rem;
+  color: var(--color-warning);
+`;
+
 const $TopActionsRow = styled.div`
   display: grid;
   grid-auto-flow: column;
@@ -617,13 +671,16 @@ const $ToggleGroup = styled(ToggleGroup)`
     }
   }
 ` as typeof ToggleGroup;
+
 const $InputsColumn = styled.div`
   ${formMixins.inputsColumn}
 `;
+
 const $Message = styled.div`
   ${layoutMixins.row}
   gap: 0.75rem;
 `;
+
 const $IconButton = styled(IconButton)`
   --button-backgroundColor: var(--color-white-faded);
   flex-shrink: 0;
@@ -633,11 +690,13 @@ const $IconButton = styled(IconButton)`
     height: 1.25em;
   }
 `;
+
 const $ButtonRow = styled.div`
   ${layoutMixins.row}
   justify-self: end;
   padding: 0.5rem 0 0.5rem 0;
 `;
+
 const $Footer = styled.footer`
   ${formMixins.footer}
   --stickyFooterBackdrop-outsetY: var(--tradeBox-content-paddingBottom);
