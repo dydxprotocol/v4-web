@@ -55,7 +55,7 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
     setAmounts({ ...amounts, [validator]: value });
   };
 
-  const isAmountValid = useMemo(() => {
+  const isEachAmountValid = useMemo(() => {
     return (
       Object.keys(amounts).length > 0 &&
       Object.keys(amounts).every((validator) => {
@@ -64,6 +64,7 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
             '0'
         );
         const validatorAmount = amounts[validator];
+        if (!validatorAmount) return true;
         return validatorAmount && validatorAmount > 0 && balance && validatorAmount <= balance;
       })
     );
@@ -72,6 +73,10 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
   const totalAmount = useMemo(() => {
     return Object.values(amounts).reduce((acc, value) => acc + (value ?? 0), 0);
   }, [amounts]);
+
+  const isTotalAmountValid = totalAmount && totalAmount > 0;
+
+  const isAmountValid = isEachAmountValid && isTotalAmountValid;
 
   useEffect(() => {
     if (isAmountValid) {
