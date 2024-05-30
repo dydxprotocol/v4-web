@@ -76,11 +76,11 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const currentMarketId = useAppSelector(getCurrentMarketId);
   const currentMarketAssetId = useAppSelector(getCurrentMarketAssetId);
 
-  const { numTotalPositions, numTotalOpenOrders, numTotalFills } =
-    useAppSelector(getTradeInfoNumbers, shallowEqual) || {};
+  const { numTotalPositions, numTotalOpenOrders, numTotalUnseenFills } =
+    useAppSelector(getTradeInfoNumbers, shallowEqual) ?? {};
 
-  const { numOpenOrders, numFills } =
-    useAppSelector(getCurrentMarketTradeInfoNumbers, shallowEqual) || {};
+  const { numOpenOrders, numUnseenFills } =
+    useAppSelector(getCurrentMarketTradeInfoNumbers, shallowEqual) ?? {};
 
   const showClosePositionAction = true;
 
@@ -95,7 +95,9 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const isWaitingForOrderToIndex = useAppSelector(calculateHasUncommittedOrders);
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
 
-  const fillsTagNumber = shortenNumberForDisplay(showCurrentMarket ? numFills : numTotalFills);
+  const fillsTagNumber = shortenNumberForDisplay(
+    showCurrentMarket ? numUnseenFills : numTotalUnseenFills
+  );
   const ordersTagNumber = shortenNumberForDisplay(
     showCurrentMarket ? numOpenOrders : numTotalOpenOrders
   );

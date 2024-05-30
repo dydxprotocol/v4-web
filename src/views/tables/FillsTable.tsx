@@ -29,11 +29,7 @@ import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 
 import { viewedFills } from '@/state/account';
-import {
-  getCurrentMarketFills,
-  getHasUnseenFillUpdates,
-  getSubaccountFills,
-} from '@/state/accountSelectors';
+import { getCurrentMarketFills, getSubaccountFills } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 import { openDialog } from '@/state/dialogs';
@@ -317,11 +313,13 @@ export const FillsTable = ({
   const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
   const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
 
-  const hasUnseenFillUpdates = useAppSelector(getHasUnseenFillUpdates);
-
   useEffect(() => {
-    if (hasUnseenFillUpdates) dispatch(viewedFills());
-  }, [hasUnseenFillUpdates]);
+    // marked fills as seen both on mount and dismount (i.e. new fill came in while fills table is being shown)
+    dispatch(viewedFills(currentMarket));
+    return () => {
+      dispatch(viewedFills(currentMarket));
+    };
+  }, [currentMarket]);
 
   const symbol = currentMarket ? allAssets[allPerpetualMarkets[currentMarket]?.assetId]?.id : null;
 
