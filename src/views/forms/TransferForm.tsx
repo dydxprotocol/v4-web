@@ -94,7 +94,7 @@ export const TransferForm = ({
   const amount = isUSDCSelected ? size?.usdcSize : size?.size;
   const showNotEnoughGasWarning = fee && isUSDCSelected && usdcBalance < fee;
   const showMemoField = showMemoTransferField && isChainTokenSelected;
-  const showMemoEmptyWarning = showMemoField && (!memo || memo === '');
+  const showMemoEmptyWarning = showMemoField && !memo;
 
   const balance = isUSDCSelected ? freeCollateral?.current : nativeTokenBalance;
 
@@ -408,7 +408,7 @@ export const TransferForm = ({
           value={memo ?? undefined}
           slotRight={renderFormInputButton({
             label: stringGetter({ key: STRING_KEYS.PASTE }),
-            isInputEmpty: memo == null || memo === '',
+            isInputEmpty: !memo,
             onClear: () => onChangeMemo(''),
             onClick: onPasteMemo,
           })}
