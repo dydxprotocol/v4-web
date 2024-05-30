@@ -3,8 +3,8 @@ import '@/polyfills';
 import { useEffect, useState } from 'react';
 
 import '@/index.css';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
-import { QueryClient, QueryClientProvider } from 'react-query';
 import { Provider } from 'react-redux';
 import styled from 'styled-components';
 import { WagmiConfig } from 'wagmi';
