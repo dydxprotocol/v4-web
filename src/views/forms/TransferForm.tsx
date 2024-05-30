@@ -142,7 +142,7 @@ export const TransferForm = ({
   );
 
   const isAmountValid = balance && amount && amountBN.gt(0) && newBalanceBN.gte(0);
-  const showMemoEmptyWarning = showMemoField && !memo && isAddressValid && isAmountValid; // only show warning if user has begin inputting mandatory fields
+  const showMemoEmptyWarning = showMemoField && !memo && isAddressValid && isAmountValid; // only show warning if user has inputted mandatory fields
 
   const { screenAddresses } = useDydxClient();
 
