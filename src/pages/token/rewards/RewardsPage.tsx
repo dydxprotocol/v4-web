@@ -5,6 +5,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import breakpoints from '@/styles/breakpoints';
@@ -17,6 +18,7 @@ import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { testFlags } from '@/lib/testFlags';
 
 import { DYDXBalancePanel } from './DYDXBalancePanel';
+import { GeoblockedPanel } from './GeoblockedPanel';
 import { GovernancePanel } from './GovernancePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { MigratePanel } from './MigratePanel';
@@ -28,16 +30,21 @@ import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
 
 const RewardsPage = () => {
   const stringGetter = useStringGetter();
-  const { isTablet, isNotTablet } = useBreakpoints();
   const navigate = useNavigate();
 
+  const { complianceState } = useComplianceState();
+  const { isTablet, isNotTablet } = useBreakpoints();
+
   const tradingRewardsRehaulEnabled = testFlags.tradingRewardsRehaul;
+  const showGeoblockedPanel = tradingRewardsRehaulEnabled && true;
+  // const showGeoblockedPanel = tradingRewardsRehaulEnabled && complianceState !== ComplianceStates.FULL_ACCESS;
 
   const legalDisclaimer = (
     <$LegalDisclaimer>
       {stringGetter({ key: STRING_KEYS.TRADING_REWARDS_LEGAL_DISCLAIMER })}
     </$LegalDisclaimer>
   );
+
   return isTablet ? (
     <div>
       <ContentSectionHeader
@@ -73,12 +80,13 @@ const RewardsPage = () => {
         {import.meta.env.VITE_V3_TOKEN_ADDRESS && <$MigratePanel />}
         {tradingRewardsRehaulEnabled && <$TradingRewardsChartPanel />}
         <$LaunchIncentivesPanel />
-        <$DYDXBalancePanel />
         <$TradingRewardsColumn>
           {!tradingRewardsRehaulEnabled && <TradingRewardsSummaryPanel />}
           <RewardHistoryPanel />
         </$TradingRewardsColumn>
         <$OtherColumn>
+          {showGeoblockedPanel && <GeoblockedPanel />}
+          <$DYDXBalancePanel />
           {/* Available staking rewards panel */}
           {/* List of unstaking panels */}
           {tradingRewardsRehaulEnabled && <NewMarketsPanel />}
@@ -93,7 +101,10 @@ const RewardsPage = () => {
 
 export default RewardsPage;
 
-const $GridLayout = styled.div<{ showMigratePanel?: boolean; showChartPanel?: boolean }>`
+const $GridLayout = styled.div<{
+  showMigratePanel?: boolean;
+  showChartPanel?: boolean;
+}>`
   --gap: ;
   display: grid;
   gap: var(--gap);
@@ -128,9 +139,9 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean; showChartPanel?: bo
         : showChartPanel
         ? css`
             grid-template-areas:
-              'chart chart'
+              'chart other'
               'incentives balance'
-              'rewards other';
+              'rewards balance';
           `
         : css`
             grid-template-areas:
