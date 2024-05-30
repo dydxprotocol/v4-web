@@ -46,6 +46,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
+import { testFlags } from '@/lib/testFlags';
 
 type TransferFormProps = {
   selectedAsset?: DydxChainAsset;
@@ -72,6 +73,7 @@ export const TransferForm = ({
     size,
     fee,
     token,
+    memo,
   } = useSelector(getTransferInputs, shallowEqual) ?? {};
 
   // Form states
@@ -85,9 +87,13 @@ export const TransferForm = ({
   }, [fee]);
 
   const asset = (token ?? selectedAsset) as DydxChainAsset;
+  const isChainTokenSelected = asset === DydxChainAsset.CHAINTOKEN;
   const isUSDCSelected = asset === DydxChainAsset.USDC;
   const amount = isUSDCSelected ? size?.usdcSize : size?.size;
   const showNotEnoughGasWarning = fee && isUSDCSelected && usdcBalance < fee;
+  const showMemoField = testFlags.memoTransferField && isChainTokenSelected;
+  const showMemoEmptyWarning = showMemoField && (!memo || memo === '');
+
   const balance = isUSDCSelected ? freeCollateral?.current : nativeTokenBalance;
 
   // BN
@@ -164,7 +170,8 @@ export const TransferForm = ({
         const txResponse = await transfer(
           amountBN.toNumber(),
           recipientAddress as string,
-          tokensConfigs[asset]?.denom
+          tokensConfigs[asset]?.denom,
+          memo ?? undefined
         );
 
         if (txResponse?.code === 0) {
@@ -210,10 +217,26 @@ export const TransferForm = ({
     });
   };
 
+  const onChangeMemo = (value: string) => {
+    abacusStateManager.setTransferValue({
+      value,
+      field: TransferInputField.MEMO,
+    });
+  };
+
   const onPasteAddress = async () => {
     try {
       const value = await navigator.clipboard.readText();
       onChangeAddress(value);
+    } catch (err) {
+      // expected error if user rejects clipboard access
+    }
+  };
+
+  const onPasteMemo = async () => {
+    try {
+      const value = await navigator.clipboard.readText();
+      onChangeMemo(value);
     } catch (err) {
       // expected error if user rejects clipboard access
     }
@@ -373,6 +396,31 @@ export const TransferForm = ({
           disabled={isLoading}
         />
       </$WithDetailsReceipt>
+
+      {showMemoField && (
+        <FormInput
+          label={stringGetter({ key: STRING_KEYS.MEMO })}
+          placeholder={stringGetter({ key: STRING_KEYS.REQUIRED_FOR_TRANSFERS_TO_CEX })}
+          type={InputType.Text}
+          onInput={(e: SyntheticInputEvent) => onChangeMemo(e.target?.value || '')}
+          value={memo ?? undefined}
+          slotRight={renderFormInputButton({
+            label: stringGetter({ key: STRING_KEYS.PASTE }),
+            isInputEmpty: memo == null || memo === '',
+            onClear: () => onChangeMemo(''),
+            onClick: onPasteMemo,
+          })}
+          disabled={isLoading}
+        />
+      )}
+
+      {showMemoEmptyWarning && (
+        <AlertMessage type={AlertType.Warning}>
+          {stringGetter({
+            key: STRING_KEYS.TRANSFER_WITHOUT_MEMO,
+          })}
+        </AlertMessage>
+      )}
 
       {showNotEnoughGasWarning && (
         <AlertMessage type={AlertType.Warning}>
