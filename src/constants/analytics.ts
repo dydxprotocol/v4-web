@@ -13,7 +13,7 @@ type AnalyticsEventDataWithReferrer<T extends AnalyticsEvent> = AnalyticsEventDa
 export type AnalyticsEventTrackMeta<T extends AnalyticsEvent> = {
   detail: {
     eventType: AnalyticsEvent;
-    eventData?: AnalyticsEventDataWithReferrer<T>;
+    eventData: AnalyticsEventDataWithReferrer<T>;
   };
 };
 export type AnalyticsEventIdentifyMeta<T extends AnalyticsUserProperty> = {
