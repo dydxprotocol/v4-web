@@ -1,5 +1,5 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import _ from 'lodash';
+import { sum } from 'lodash';
 import { createSelector } from 'reselect';
 
 import {
@@ -434,7 +434,7 @@ const getUnseenFillsCountForMarket = createSelector(
  */
 const getAllUnseenFillsCount = createSelector(
   [getUnseenFillsCountPerMarket],
-  (unseenFillsCountPerMarket) => _.sum(Object.values(unseenFillsCountPerMarket))
+  (unseenFillsCountPerMarket) => sum(Object.values(unseenFillsCountPerMarket))
 );
 
 /**
