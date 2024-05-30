@@ -85,6 +85,7 @@ export type MarketTrade = Abacus.exchange.dydx.abacus.output.MarketTrade;
 export type OrderbookLine = Abacus.exchange.dydx.abacus.output.OrderbookLine;
 export type PerpetualMarket = Abacus.exchange.dydx.abacus.output.PerpetualMarket;
 export type MarketHistoricalFunding = Abacus.exchange.dydx.abacus.output.MarketHistoricalFunding;
+export const PerpetualMarketType = Abacus.exchange.dydx.abacus.output.PerpetualMarketType;
 
 // ------ Configs ------ //
 export type Configs = Abacus.exchange.dydx.abacus.output.Configs;
