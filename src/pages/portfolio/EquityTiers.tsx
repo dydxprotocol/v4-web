@@ -19,8 +19,6 @@ import { ColumnDef, Table } from '@/components/Table';
 
 import { getStatefulOrderEquityTiers } from '@/state/configsSelectors';
 
-import { isTruthy } from '@/lib/isTruthy';
-
 export const EquityTiers = () => {
   const stringGetter = useStringGetter();
   const equityTiers = useSelector(getStatefulOrderEquityTiers, shallowEqual);
@@ -49,7 +47,7 @@ export const EquityTiers = () => {
           label={stringGetter({ key: STRING_KEYS.EQUITY_TIERS })}
           data={equityTiers ?? []}
           getRowKey={(row: EquityTier) => row.requiredTotalNetCollateralUSD}
-          columns={(
+          columns={
             [
               {
                 columnKey: 'net_collateral',
@@ -95,8 +93,8 @@ export const EquityTiers = () => {
                   <$HighlightOutput type={OutputType.Number} value={maxOrders} />
                 ),
               },
-            ] as ColumnDef<EquityTier>[]
-          ).filter(isTruthy)}
+            ] satisfies ColumnDef<EquityTier>[]
+          }
           selectionBehavior="replace"
           paginationBehavior="showAll"
           withOuterBorder={isNotTablet}
