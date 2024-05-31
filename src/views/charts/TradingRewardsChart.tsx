@@ -96,11 +96,10 @@ export const TradingRewardsChart = ({
             .toArray()
             .reverse()
             .map(
-              (datum) =>
-                ({
-                  date: new Date(datum.endedAtInMilliseconds).valueOf(),
-                  cumulativeAmount: datum.cumulativeAmount,
-                } as TradingRewardsDatum)
+              (datum): TradingRewardsDatum => ({
+                date: new Date(datum.endedAtInMilliseconds).valueOf(),
+                cumulativeAmount: datum.cumulativeAmount,
+              })
             )
         : [],
     [periodTradingRewards, canViewAccount]
