@@ -90,6 +90,7 @@ const assetIcons = {
   UNI: '/currencies/uni.png',
   USDC: '/currencies/usdc.png',
   USDT: '/currencies/usdt.png',
+  W: '/currencies/w.png',
   WBTC: '/currencies/wbtc.png',
   WETH: '/currencies/weth.png',
   WIF: '/currencies/wif.png',

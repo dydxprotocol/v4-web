@@ -1,8 +1,10 @@
-import type {
-  AnalyticsEvent,
-  AnalyticsEventData,
-  AnalyticsUserProperty,
-  AnalyticsUserPropertyValue,
+import {
+  customIdentifyEvent,
+  customTrackEvent,
+  type AnalyticsEvent,
+  type AnalyticsEventData,
+  type AnalyticsUserProperty,
+  type AnalyticsUserPropertyValue,
 } from '@/constants/analytics';
 
 import { testFlags } from './testFlags';
@@ -17,7 +19,8 @@ export const identify = <T extends AnalyticsUserProperty>(
     // eslint-disable-next-line no-console
     console.log(`[Analytics:Identify] ${property}`, propertyValue);
   }
-  const customEvent = new CustomEvent('dydx:identify', {
+
+  const customEvent = customIdentifyEvent({
     detail: { property, propertyValue },
   });
 
@@ -33,7 +36,7 @@ export const track = <T extends AnalyticsEvent>(
     // eslint-disable-next-line no-console
     console.log(`[Analytics] ${eventType}`, eventDataWithReferrer);
   }
-  const customEvent = new CustomEvent('dydx:track', {
+  const customEvent = customTrackEvent({
     detail: { eventType, eventData: eventDataWithReferrer },
   });
 

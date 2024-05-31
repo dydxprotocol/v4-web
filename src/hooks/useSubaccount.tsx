@@ -167,10 +167,12 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         subaccountClient,
         amount,
         recipient,
+        memo,
       }: {
         subaccountClient: SubaccountClient;
         amount: number;
         recipient: string;
+        memo?: string;
       }) => {
         try {
           return await compositeClient?.validatorClient.post.send(
@@ -187,7 +189,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
               }),
             false,
             compositeClient?.validatorClient?.post.defaultDydxGasPrice,
-            undefined,
+            memo,
             Method.BroadcastTxCommit
           );
         } catch (error) {
@@ -305,13 +307,13 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   // ------ Transfer Methods ------ //
 
   const transfer = useCallback(
-    async (amount: number, recipient: string, coinDenom: string) => {
+    async (amount: number, recipient: string, coinDenom: string, memo?: string) => {
       if (!subaccountClient) {
         return undefined;
       }
       return (await (coinDenom === usdcDenom
-        ? transferFromSubaccountToAddress
-        : transferNativeToken)({ subaccountClient, amount, recipient })) as IndexedTx;
+        ? transferFromSubaccountToAddress({ subaccountClient, amount, recipient })
+        : transferNativeToken({ subaccountClient, amount, recipient, memo }))) as IndexedTx;
     },
     [subaccountClient, transferFromSubaccountToAddress, transferNativeToken]
   );
