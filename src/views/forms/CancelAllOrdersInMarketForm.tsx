@@ -17,8 +17,14 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { OutputType } from '@/components/Output';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
-import { getNonZeroPendingPositions, getPendingIsolatedOrders } from '@/state/accountSelectors';
+import {
+  getNonZeroPendingPositions,
+  getPendingIsolatedOrders,
+  getSubaccount,
+} from '@/state/accountSelectors';
 import { getAssets } from '@/state/assetsSelectors';
+
+import { MustBigNumber } from '@/lib/numbers';
 
 type CancelAllOrdersInMarketFormProps = {
   marketId: string;
@@ -50,6 +56,7 @@ export const CancelAllOrdersInMarketForm = ({
     [cancellingStatus]
   );
   const { cancelOrder } = useSubaccount();
+  const { freeCollateral: crossFreeCollateral } = useSelector(getSubaccount, shallowEqual) ?? {};
 
   const onCancel = useCallback(() => {
     if (isCancelling) {
@@ -116,9 +123,29 @@ export const CancelAllOrdersInMarketForm = ({
           />
         ),
       },
+      {
+        key: 'cross-free-collateral',
+        label: <span>{stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL })}</span>,
+        value: (
+          <$DiffOutput
+            type={OutputType.Fiat}
+            value={crossFreeCollateral?.current}
+            newValue={MustBigNumber(crossFreeCollateral?.current).plus(
+              MustBigNumber(thisPendingPosition?.freeCollateral?.current ?? 0)
+            )}
+            sign={NumberSign.Positive}
+            withDiff
+          />
+        ),
+      },
       // TODO: show effect on cross margin, communicate that the money is being transferred back
     ];
-  }, [pendingPositionOrders.length, stringGetter, thisPendingPosition?.freeCollateral]);
+  }, [
+    crossFreeCollateral,
+    pendingPositionOrders.length,
+    stringGetter,
+    thisPendingPosition?.freeCollateral,
+  ]);
 
   const submitButtonWithReceipt = (
     <WithDetailsReceipt detailItems={detailItems}>
