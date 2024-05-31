@@ -1,7 +1,7 @@
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { AbacusMarginMode, type TradeInputSummary } from '@/constants/abacus';
+import { type TradeInputSummary } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
@@ -17,7 +17,7 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Icon, IconName } from '@/components/Icon';
-import { Output, OutputType, ShowSign } from '@/components/Output';
+import { Output, OutputType } from '@/components/Output';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
@@ -25,7 +25,7 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getCurrentMarketPositionData, getSubaccountId } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
-import { getCurrentInput, getInputTradeMarginMode } from '@/state/inputsSelectors';
+import { getCurrentInput } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { nullIfZero } from '@/lib/numbers';
@@ -66,7 +66,6 @@ export const PlaceOrderButtonAndReceipt = ({
   const canAccountTrade = useSelector(calculateCanAccountTrade);
   const subaccountNumber = useSelector(getSubaccountId);
   const currentInput = useSelector(getCurrentInput);
-  const marginMode = useSelector(getInputTradeMarginMode, shallowEqual);
   const { liquidationPrice, equity, leverage } = orEmptyObj(
     useSelector(getCurrentMarketPositionData, shallowEqual)
   );
@@ -84,9 +83,18 @@ export const PlaceOrderButtonAndReceipt = ({
     currentInput !== 'transfer' &&
     !tradingUnavailable;
 
-  const { fee, price: expectedPrice, total, reward } = summary ?? {};
+  const { fee, price: expectedPrice, reward } = summary ?? {};
 
-  const isolatedMarginItems = [
+  const items = [
+    {
+      key: 'expected-price',
+      label: (
+        <WithTooltip tooltip="expected-price" side="right">
+          {stringGetter({ key: STRING_KEYS.EXPECTED_PRICE })}
+        </WithTooltip>
+      ),
+      value: <Output type={OutputType.Fiat} value={expectedPrice} useGrouping />,
+    },
     {
       key: 'liquidation-price',
       label: stringGetter({ key: STRING_KEYS.LIQUIDATION_PRICE }),
@@ -126,19 +134,6 @@ export const PlaceOrderButtonAndReceipt = ({
         />
       ),
     },
-  ];
-
-  const items = [
-    {
-      key: 'expected-price',
-      label: (
-        <WithTooltip tooltip="expected-price" side="right">
-          {stringGetter({ key: STRING_KEYS.EXPECTED_PRICE })}
-        </WithTooltip>
-      ),
-      value: <Output type={OutputType.Fiat} value={expectedPrice} useGrouping />,
-    },
-    ...(marginMode === AbacusMarginMode.isolated ? isolatedMarginItems : []),
     {
       key: 'fee',
       label: (
@@ -165,11 +160,6 @@ export const PlaceOrderButtonAndReceipt = ({
         />
       ),
       tooltip: 'max-reward',
-    },
-    marginMode === AbacusMarginMode.cross && {
-      key: 'total',
-      label: stringGetter({ key: STRING_KEYS.TOTAL }),
-      value: <Output type={OutputType.Fiat} value={total} showSign={ShowSign.None} useGrouping />,
     },
   ].filter(isTruthy);
 
