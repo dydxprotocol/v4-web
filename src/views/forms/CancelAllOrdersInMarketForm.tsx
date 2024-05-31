@@ -92,7 +92,7 @@ export const CancelAllOrdersInMarketForm = ({
     return [
       {
         key: 'open-orders',
-        label: <span>{stringGetter({ key: STRING_KEYS.OPEN_POSITIONS })}</span>,
+        label: <span>{stringGetter({ key: STRING_KEYS.OPEN_ORDERS })}</span>,
         value: (
           <$DiffOutput
             type={OutputType.Number}
@@ -127,17 +127,34 @@ export const CancelAllOrdersInMarketForm = ({
         onClick={onCancel}
         state={{ isDisabled: isCancelling, isLoading: isCancelling }}
       >
-        {stringGetter({
-          key: STRING_KEYS.CANCEL_ORDER,
-        })}
+        {pendingPositionOrders.length !== 1
+          ? stringGetter({
+              key: STRING_KEYS.CANCEL_ORDERS_COUNT,
+              params: { COUNT: pendingPositionOrders.length },
+            })
+          : stringGetter({
+              key: STRING_KEYS.CANCEL_ORDER,
+            })}
       </$Button>
     </WithDetailsReceipt>
   );
   return (
     <div>
       <$ConfirmationText>
-        Are you sure you want to cancel {pendingPositionOrders.length} open orders in{' '}
-        {assetsData?.[pendingPositionOrders[0]?.assetId ?? '']?.name ?? marketId} ({marketId})?
+        {stringGetter({
+          key: STRING_KEYS.CANCEL_ORDERS_CONFIRMATION,
+          params: {
+            OPEN_ORDERS_TEXT:
+              pendingPositionOrders.length === 1
+                ? stringGetter({ key: STRING_KEYS.ONE_OPEN_ORDER })
+                : stringGetter({
+                    key: STRING_KEYS.N_OPEN_ORDERS,
+                    params: { COUNT: pendingPositionOrders.length },
+                  }),
+            ASSET: assetsData?.[pendingPositionOrders[0]?.assetId ?? '']?.name ?? marketId,
+            MARKET: marketId,
+          },
+        })}
       </$ConfirmationText>
       {submitButtonWithReceipt}
     </div>

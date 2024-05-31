@@ -33,7 +33,12 @@ export const CancelAllOrdersDialog = ({ setIsOpen, marketId }: CancelAllOrdersDi
       isOpen
       setIsOpen={setIsOpen}
       slotIcon={pendingPosition && <AssetIcon symbol={pendingPosition.assetId} />}
-      title={stringGetter({ key: STRING_KEYS.CANCEL_ORDER })}
+      title={stringGetter({
+        key:
+          (pendingPosition?.orderCount ?? 0) !== 1
+            ? STRING_KEYS.CANCEL_ORDERS
+            : STRING_KEYS.CANCEL_ORDER,
+      })}
     >
       <CancelAllOrdersInMarketForm marketId={marketId} onCancelComplete={onSuccessfulCancel} />
     </Dialog>

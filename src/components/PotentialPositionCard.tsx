@@ -44,7 +44,7 @@ export const PotentialPositionCard = ({
           <Icon iconName={IconName.Arrow} />
         </$Link>
         <$CancelLink onClick={() => onCancelOrders(marketId)}>
-          {stringGetter({ key: orderCount > 1 ? STRING_KEYS.CANCEL_ALL : STRING_KEYS.CANCEL })}{' '}
+          {stringGetter({ key: orderCount > 1 ? STRING_KEYS.CANCEL_ORDERS : STRING_KEYS.CANCEL })}{' '}
         </$CancelLink>
       </$ActionRow>
     </$PotentialPositionCard>
