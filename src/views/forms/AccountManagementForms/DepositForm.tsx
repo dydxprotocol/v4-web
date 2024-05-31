@@ -60,7 +60,7 @@ import { getNobleChainId, NATIVE_TOKEN_ADDRESS } from '@/lib/squid';
 import { log } from '@/lib/telemetry';
 import { parseWalletError } from '@/lib/wallet';
 
-import { NobleDeposit } from '../NobleDeposit';
+import { CoinbaseDeposit } from '../CoinbaseDeposit';
 import { DepositButtonAndReceipt } from './DepositForm/DepositButtonAndReceipt';
 import { SourceSelectMenu } from './SourceSelectMenu';
 import { TokenSelectMenu } from './TokenSelectMenu';
@@ -495,7 +495,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
         onSelect={onSelectNetwork}
       />
       {exchange && nobleAddress ? (
-        <NobleDeposit />
+        <CoinbaseDeposit />
       ) : (
         <>
           <TokenSelectMenu selectedToken={sourceToken || undefined} onSelectToken={onSelectToken} />
