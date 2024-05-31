@@ -48,7 +48,7 @@ export const Popover = ({
 }: PopoverProps) => {
   const [trigger, setTrigger] = useState<HTMLButtonElement | null>(null);
   const rect = useRect(trigger);
-  const width = useMemo(() => fullWidth && rect?.width, undefined);
+  const width = useMemo(() => fullWidth && rect?.width, [fullWidth, rect?.width]);
 
   const content = (
     <$Content

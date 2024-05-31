@@ -1,5 +1,3 @@
-import { useDispatch, useSelector } from 'react-redux';
-
 import { DialogTypes } from '@/constants/dialogs';
 
 import { AdjustIsolatedMarginDialog } from '@/views/dialogs/AdjustIsolatedMarginDialog';
@@ -35,12 +33,13 @@ import { TriggersDialog } from '@/views/dialogs/TriggersDialog';
 import { WithdrawDialog } from '@/views/dialogs/WithdrawDialog';
 import { WithdrawalGateDialog } from '@/views/dialogs/WithdrawalGateDialog';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialog, openDialog } from '@/state/dialogs';
 import { getActiveDialog } from '@/state/dialogsSelectors';
 
 export const DialogManager = () => {
-  const dispatch = useDispatch();
-  const activeDialog = useSelector(getActiveDialog);
+  const dispatch = useAppDispatch();
+  const activeDialog = useAppSelector(getActiveDialog);
 
   if (!activeDialog) return null;
   const { dialogProps, type } = activeDialog;

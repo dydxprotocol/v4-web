@@ -16,7 +16,7 @@ import type {
 } from '@/constants/abacus';
 import { Changes } from '@/constants/abacus';
 
-import type { RootStore } from '@/state/_store';
+import { type RootStore } from '@/state/_store';
 import {
   setBalances,
   setCompliance,

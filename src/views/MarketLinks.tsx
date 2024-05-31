@@ -1,4 +1,4 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonType } from '@/constants/buttons';
@@ -8,10 +8,11 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 
 export const MarketLinks = () => {
-  const { resources } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { resources } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const { coinMarketCapsLink, websiteLink, whitepaperLink } = resources ?? {};
 
   const linkItems = [

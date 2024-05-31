@@ -1,4 +1,5 @@
 import type { RootState } from './_store';
+import { createAppSelector } from './appTypes';
 import { AppTheme, AppThemeSetting, AppThemeSystemSetting } from './configs';
 
 export const getAppThemeSetting = (state: RootState): AppThemeSetting =>
@@ -17,7 +18,9 @@ export const getAppTheme = (state: RootState): AppTheme => {
 
 export const getAppColorMode = (state: RootState) => state.configs.appColorMode;
 
-export const getFeeTiers = (state: RootState) => state.configs.feeTiers?.toArray();
+export const getFeeTiers = createAppSelector([(state: RootState) => state.configs.feeTiers], (t) =>
+  t?.toArray()
+);
 
 export const getHasSeenLaunchIncentives = (state: RootState) =>
   state.configs.hasSeenLaunchIncentives;

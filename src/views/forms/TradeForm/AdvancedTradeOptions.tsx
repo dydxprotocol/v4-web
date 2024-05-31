@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { type NumberFormatValues } from 'react-number-format';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
@@ -25,6 +25,7 @@ import { InputType } from '@/components/Input';
 import { SelectItem, SelectMenu } from '@/components/SelectMenu';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -34,8 +35,8 @@ export const AdvancedTradeOptions = () => {
   const { isTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
 
-  const currentTradeFormConfig = useSelector(getInputTradeOptions, shallowEqual);
-  const inputTradeData = useSelector(getInputTradeData, shallowEqual);
+  const currentTradeFormConfig = useAppSelector(getInputTradeOptions, shallowEqual);
+  const inputTradeData = useAppSelector(getInputTradeData, shallowEqual);
 
   const { execution, goodTil, postOnly, reduceOnly, timeInForce } = inputTradeData ?? {};
 

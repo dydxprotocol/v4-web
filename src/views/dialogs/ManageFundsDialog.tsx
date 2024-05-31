@@ -1,4 +1,4 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TransferInputField, TransferType } from '@/constants/abacus';
@@ -12,6 +12,7 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithdrawForm } from '@/views/forms/AccountManagementForms/WithdrawForm';
 import { TransferForm } from '@/views/forms/TransferForm';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -25,7 +26,7 @@ type ElementProps = {
 
 export const ManageFundsDialog = ({ setIsOpen, selectedTransferType }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const { type } = useSelector(getTransferInputs, shallowEqual) ?? {};
+  const { type } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
   const currentType = type?.rawValue ?? selectedTransferType ?? TransferType.deposit.rawValue;
 
   const closeDialog = () => setIsOpen?.(false);

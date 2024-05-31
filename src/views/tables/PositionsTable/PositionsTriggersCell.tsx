@@ -1,4 +1,3 @@
-import { useDispatch } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import {
@@ -25,6 +24,7 @@ import { Output, OutputType } from '@/components/Output';
 import { TableCell } from '@/components/Table/TableCell';
 import { WithHovercard } from '@/components/WithHovercard';
 
+import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { isStopLossOrder } from '@/lib/orders';
@@ -56,7 +56,7 @@ export const PositionsTriggersCell = ({
   isDisabled,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
   const { complianceState } = useComplianceState();
 

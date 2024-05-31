@@ -1,4 +1,3 @@
-import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
@@ -12,12 +11,13 @@ import { TradingRewardsChart } from '@/views/charts/TradingRewardsChart';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { getOnboardingState } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 export const TradingRewardsChartPanel = () => {
   const stringGetter = useStringGetter();
-  const selectedLocale = useSelector(getSelectedLocale);
-  const onboardingState = useSelector(getOnboardingState);
+  const selectedLocale = useAppSelector(getSelectedLocale);
+  const onboardingState = useAppSelector(getOnboardingState);
 
   return (
     <Panel>

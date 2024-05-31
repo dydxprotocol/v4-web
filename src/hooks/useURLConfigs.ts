@@ -1,8 +1,7 @@
-import { useSelector } from 'react-redux';
-
 import { LINKS_CONFIG_MAP } from '@/constants/networks';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 const FALLBACK_URL = 'https://help.dydx.exchange/';
 
@@ -35,7 +34,7 @@ export interface LinksConfigs {
 }
 
 export const useURLConfigs = (): LinksConfigs => {
-  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const linksConfigs = LINKS_CONFIG_MAP[selectedDydxChainId] as LinksConfigs;
 
   return {

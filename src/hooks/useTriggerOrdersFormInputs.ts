@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 
 import { AbacusOrderType, SubaccountOrder, TriggerOrdersInputField } from '@/constants/abacus';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getTriggerOrdersInputErrors } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -22,7 +23,7 @@ export const useTriggerOrdersFormInputs = ({
   stopLossOrder?: SubaccountOrder;
   takeProfitOrder?: SubaccountOrder;
 }) => {
-  const inputErrors = useSelector(getTriggerOrdersInputErrors, shallowEqual);
+  const inputErrors = useAppSelector(getTriggerOrdersInputErrors, shallowEqual);
 
   const [differingOrderSizes, setDifferingOrderSizes] = useState(false);
   const [inputSize, setInputSize] = useState<number | null>(null);

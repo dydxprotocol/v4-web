@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -18,6 +17,7 @@ import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 
+import { useAppDispatch } from '@/state/appTypes';
 import { closeDialog, openDialog } from '@/state/dialogs';
 
 type ElementProps = {
@@ -27,7 +27,7 @@ type ElementProps = {
 export const ExternalNavStrideDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { strideZoneApp, accountExportLearnMore } = useURLConfigs();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { isTablet } = useBreakpoints();
 
   const openExternalNavDialog = useCallback(() => {

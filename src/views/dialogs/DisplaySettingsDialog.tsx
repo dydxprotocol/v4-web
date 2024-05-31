@@ -1,5 +1,4 @@
 import { Indicator, Item, Root } from '@radix-ui/react-radio-group';
-import { useDispatch, useSelector } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -13,6 +12,7 @@ import { Dialog } from '@/components/Dialog';
 import { Icon, IconName } from '@/components/Icon';
 import { HorizontalSeparatorFiller } from '@/components/Separator';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import {
   AppColorMode,
   AppTheme,
@@ -28,11 +28,11 @@ type ElementProps = {
 };
 
 export const DisplaySettingsDialog = ({ setIsOpen }: ElementProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
-  const currentThemeSetting: AppThemeSetting = useSelector(getAppThemeSetting);
-  const currentColorMode: AppColorMode = useSelector(getAppColorMode);
+  const currentThemeSetting: AppThemeSetting = useAppSelector(getAppThemeSetting);
+  const currentColorMode: AppColorMode = useAppSelector(getAppColorMode);
 
   const sectionHeader = (heading: string) => {
     return (

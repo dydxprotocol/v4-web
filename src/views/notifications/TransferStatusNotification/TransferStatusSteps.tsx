@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 
 import { StatusResponse } from '@0xsquid/sdk';
-import { useSelector } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -18,6 +17,7 @@ import { LoadingDots } from '@/components/Loading/LoadingDots';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 type ElementProps = {
   status?: StatusResponse;
@@ -37,7 +37,7 @@ enum TransferStatusStep {
 
 export const TransferStatusSteps = ({ className, status, type }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { mintscan: mintscanTxUrl } = useURLConfigs();
 
   const { currentStep, steps } = useMemo(() => {

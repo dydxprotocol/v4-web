@@ -1,5 +1,5 @@
 import type { ColumnSize } from '@react-types/table';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { type SubaccountTransfer } from '@/constants/abacus';
@@ -24,6 +24,7 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccountTransfers } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { truncateAddress } from '@/lib/wallet';
@@ -131,12 +132,12 @@ export const TransferHistoryTable = ({
   withInnerBorders = true,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { mintscan: mintscanTxUrl } = useURLConfigs();
 
-  const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
 
-  const transfers = useSelector(getSubaccountTransfers, shallowEqual) ?? [];
+  const transfers = useAppSelector(getSubaccountTransfers, shallowEqual) ?? [];
 
   return (
     <$Table

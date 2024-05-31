@@ -1,12 +1,12 @@
 import { FormEvent } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { ErrorType, ValidationError, type SubaccountOrder } from '@/constants/abacus';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTriggerOrdersFormInputs } from '@/hooks/useTriggerOrdersFormInputs';
@@ -20,6 +20,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getPositionDetails } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialog } from '@/state/dialogs';
 
 import { getTradeInputAlert } from '@/lib/tradeData';
@@ -41,13 +42,13 @@ export const TriggersForm = ({
   onViewOrdersClick,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const { placeTriggerOrders } = useSubaccount();
-  const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
+  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
 
   const { asset, entryPrice, size, stepSizeDecimals, tickSizeDecimals, oraclePrice } =
-    useSelector(getPositionDetails(marketId)) ?? {};
+    useParameterizedSelector(getPositionDetails, marketId) ?? {};
 
   const {
     differingOrderSizes,

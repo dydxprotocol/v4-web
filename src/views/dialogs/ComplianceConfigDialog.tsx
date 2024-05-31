@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import type { Compliance } from '@/constants/abacus';
@@ -18,6 +18,7 @@ import { Switch } from '@/components/Switch';
 
 import { setCompliance } from '@/state/account';
 import { getComplianceStatus, getGeo } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
 const complianceStatusOptions = [
   { status: ComplianceStatus.COMPLIANT, label: 'Compliant' },
@@ -28,10 +29,10 @@ const complianceStatusOptions = [
 ];
 
 const usePreferenceMenu = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
-  const complianceStatus = useSelector(getComplianceStatus, shallowEqual);
-  const geo = useSelector(getGeo, shallowEqual);
+  const complianceStatus = useAppSelector(getComplianceStatus, shallowEqual);
+  const geo = useAppSelector(getGeo, shallowEqual);
   const geoRestricted = Boolean(
     geo && [...BLOCKED_COUNTRIES, ...OFAC_SANCTIONED_COUNTRIES].includes(geo as CountryCodes)
   );
@@ -89,7 +90,7 @@ type ElementProps = {
 
 export const ComplianceConfigDialog = ({ setIsOpen }: ElementProps) => {
   const preferenceItems = usePreferenceMenu();
-  const complianceStatus = useSelector(getComplianceStatus, shallowEqual);
+  const complianceStatus = useAppSelector(getComplianceStatus, shallowEqual);
 
   const { dydxAddress } = useAccounts();
   const { compositeClient } = useDydxClient();

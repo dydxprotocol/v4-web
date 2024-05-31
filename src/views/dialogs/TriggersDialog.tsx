@@ -1,5 +1,3 @@
-import { useDispatch } from 'react-redux';
-
 import { type SubaccountOrder } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -9,6 +7,7 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog } from '@/components/Dialog';
 import { TriggersForm } from '@/views/forms/TriggersForm/TriggersForm';
 
+import { useAppDispatch } from '@/state/appTypes';
 import { closeDialog } from '@/state/dialogs';
 
 type ElementProps = {
@@ -29,7 +28,7 @@ export const TriggersDialog = ({
   setIsOpen,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   return (
     <Dialog

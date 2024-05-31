@@ -1,7 +1,5 @@
 import { useState } from 'react';
 
-import { useSelector } from 'react-redux';
-
 import { TradeInputField } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -14,6 +12,7 @@ import { DepthChart } from '@/views/charts/DepthChart';
 import { FundingChart } from '@/views/charts/FundingChart';
 import { TvChart } from '@/views/charts/TvChart';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -27,7 +26,7 @@ enum Tab {
 
 export const InnerPanel = () => {
   const stringGetter = useStringGetter();
-  const selectedLocale = useSelector(getSelectedLocale);
+  const selectedLocale = useAppSelector(getSelectedLocale);
 
   const [value, setValue] = useState(Tab.Price);
 

@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
 import { Nullable } from '@dydxprotocol/v4-abacus';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { FeeTier } from '@/constants/abacus';
@@ -22,6 +22,7 @@ import { ColumnDef, Table } from '@/components/Table';
 import { Tag, TagSize } from '@/components/Tag';
 
 import { getUserFeeTier, getUserStats } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getFeeTiers } from '@/state/configsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -34,9 +35,9 @@ const EQUALITY_SYMBOL_MAP = {
 export const Fees = () => {
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
-  const userFeeTier = useSelector(getUserFeeTier, shallowEqual);
-  const userStats = useSelector(getUserStats, shallowEqual);
-  const feeTiers = useSelector(getFeeTiers, shallowEqual);
+  const userFeeTier = useAppSelector(getUserFeeTier, shallowEqual);
+  const userStats = useAppSelector(getUserStats, shallowEqual);
+  const feeTiers = useAppSelector(getFeeTiers, shallowEqual);
 
   const volume = useMemo(() => {
     if (userStats.makerVolume30D !== undefined && userStats.takerVolume30D !== undefined) {

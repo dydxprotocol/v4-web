@@ -1,4 +1,3 @@
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { type SubaccountPosition } from '@/constants/abacus';
@@ -13,6 +12,7 @@ import { IconButton } from '@/components/IconButton';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { TableCell } from '@/components/Table/TableCell';
 
+import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { calculatePositionMargin } from '@/lib/tradeData';
@@ -29,7 +29,7 @@ export const PositionsMarginCell = ({
   notionalTotal,
 }: PositionsMarginCellProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const margin = calculatePositionMargin({
     notionalTotal: notionalTotal?.current,
     adjustedMmf: adjustedMmf?.current,

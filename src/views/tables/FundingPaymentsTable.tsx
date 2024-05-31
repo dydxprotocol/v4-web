@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import type { Asset, SubaccountFundingPayment } from '@/constants/abacus';
@@ -20,6 +20,7 @@ import {
   getCurrentMarketFundingPayments,
   getSubaccountFundingPayments,
 } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
@@ -51,12 +52,13 @@ export const FundingPaymentsTable = ({
   const stringGetter = useStringGetter();
 
   const marketFundingPayments =
-    useSelector(getCurrentMarketFundingPayments, shallowEqual) ?? EMPTY_ARR;
-  const allFundingPayments = useSelector(getSubaccountFundingPayments, shallowEqual) ?? EMPTY_ARR;
+    useAppSelector(getCurrentMarketFundingPayments, shallowEqual) ?? EMPTY_ARR;
+  const allFundingPayments =
+    useAppSelector(getSubaccountFundingPayments, shallowEqual) ?? EMPTY_ARR;
   const fundingPayments = currentMarket ? marketFundingPayments : allFundingPayments;
 
-  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
-  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
+  const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
 
   const fundingPaymentsData = fundingPayments.map((fundingPayment: SubaccountFundingPayment) =>
     getHydratedTradingData({

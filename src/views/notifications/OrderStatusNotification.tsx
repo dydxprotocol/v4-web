@@ -1,4 +1,4 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import {
@@ -15,6 +15,7 @@ import {
   type LocalPlaceOrderData,
 } from '@/constants/trade';
 
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -26,6 +27,7 @@ import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Notification, NotificationProps } from '@/components/Notification';
 
 import { getFillByClientId, getOrderByClientId } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getMarketData } from '@/state/perpetualsSelectors';
 
 import { assertNever } from '@/lib/assertNever';
@@ -44,9 +46,10 @@ export const OrderStatusNotification = ({
   notification,
 }: NotificationProps & ElementProps) => {
   const stringGetter = useStringGetter();
-  const order = useSelector(getOrderByClientId(localOrder.clientId), shallowEqual);
-  const fill = useSelector(getFillByClientId(localOrder.clientId), shallowEqual);
-  const marketData = useSelector(getMarketData(localOrder.marketId), shallowEqual);
+  const order = useParameterizedSelector(getOrderByClientId, localOrder.clientId);
+  const fill = useParameterizedSelector(getFillByClientId, localOrder.clientId);
+  const marketData = useAppSelector((s) => getMarketData(s, localOrder.marketId), shallowEqual);
+
   const { assetId } = marketData ?? {};
   const titleKey = ORDER_TYPE_STRINGS[localOrder.orderType]?.orderTypeKey;
   const indexedOrderStatus = order?.status?.rawValue as KotlinIrEnumValues<
