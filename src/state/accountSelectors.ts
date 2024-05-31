@@ -132,17 +132,19 @@ export const getSubaccountUnclearedOrders = createAppSelector(
  * @param state
  * @returns Record of SubaccountOrders indexed by marketId
  */
-export const getMarketOrders = (state: RootState): { [marketId: string]: SubaccountOrder[] } => {
-  const orders = getSubaccountUnclearedOrders(state);
-  return (orders ?? []).reduce(
-    (marketOrders, order) => {
-      marketOrders[order.marketId] ??= [];
-      marketOrders[order.marketId].push(order);
-      return marketOrders;
-    },
-    {} as { [marketId: string]: SubaccountOrder[] }
-  );
-};
+export const getMarketOrders = createAppSelector(
+  [getSubaccountUnclearedOrders],
+  (orders): { [marketId: string]: SubaccountOrder[] } => {
+    return (orders ?? []).reduce(
+      (marketOrders, order) => {
+        marketOrders[order.marketId] ??= [];
+        marketOrders[order.marketId].push(order);
+        return marketOrders;
+      },
+      {} as { [marketId: string]: SubaccountOrder[] }
+    );
+  }
+);
 
 /**
  * @param state
@@ -197,30 +199,36 @@ export const getFillByClientId = () =>
  * @param state
  * @returns Record of SubaccountOrders that have not been filled or cancelled, indexed by marketId
  */
-export const getMarketSubaccountOpenOrders = (
-  state: RootState
-): {
-  [marketId: string]: SubaccountOrder[];
-} => {
-  const orders = getSubaccountOpenOrders(state);
-  return (orders ?? []).reduce(
-    (marketOrders, order) => {
-      marketOrders[order.marketId] ??= [];
-      marketOrders[order.marketId].push(order);
-      return marketOrders;
-    },
-    {} as { [marketId: string]: SubaccountOrder[] }
-  );
-};
+export const getMarketSubaccountOpenOrders = createAppSelector(
+  [getSubaccountOpenOrders],
+  (
+    orders
+  ): {
+    [marketId: string]: SubaccountOrder[];
+  } => {
+    return (orders ?? []).reduce(
+      (marketOrders, order) => {
+        marketOrders[order.marketId] ??= [];
+        marketOrders[order.marketId].push(order);
+        return marketOrders;
+      },
+      {} as { [marketId: string]: SubaccountOrder[] }
+    );
+  }
+);
 
 /**
  * @param state
  * @returns list of conditional orders that have not been filled or cancelled for all subaccount positions
  */
-export const getSubaccountConditionalOrders = (isSlTpLimitOrdersEnabled: boolean) =>
+export const getSubaccountConditionalOrders = () =>
   createAppSelector(
-    [getMarketSubaccountOpenOrders, getOpenPositions],
-    (openOrdersByMarketId, positions) => {
+    [
+      getMarketSubaccountOpenOrders,
+      getOpenPositions,
+      (s, isSlTpLimitOrdersEnabled: boolean) => isSlTpLimitOrdersEnabled,
+    ],
+    (openOrdersByMarketId, positions, isSlTpLimitOrdersEnabled) => {
       const stopLossOrders: SubaccountOrder[] = [];
       const takeProfitOrders: SubaccountOrder[] = [];
 
@@ -333,17 +341,19 @@ export const getSubaccountFills = (state: RootState) => state.account?.fills;
  * @param state
  * @returns Record of SubaccountFills indexed by marketId
  */
-export const getMarketFills = (state: RootState): { [marketId: string]: SubaccountFill[] } => {
-  const fills = getSubaccountFills(state);
-  return (fills ?? []).reduce(
-    (marketFills, fill) => {
-      marketFills[fill.marketId] ??= [];
-      marketFills[fill.marketId].push(fill);
-      return marketFills;
-    },
-    {} as { [marketId: string]: SubaccountFill[] }
-  );
-};
+export const getMarketFills = createAppSelector(
+  [getSubaccountFills],
+  (fills): { [marketId: string]: SubaccountFill[] } => {
+    return (fills ?? []).reduce(
+      (marketFills, fill) => {
+        marketFills[fill.marketId] ??= [];
+        marketFills[fill.marketId].push(fill);
+        return marketFills;
+      },
+      {} as { [marketId: string]: SubaccountFill[] }
+    );
+  }
+);
 
 /**
  * @param state
@@ -386,19 +396,19 @@ export const getSubaccountFundingPayments = (state: RootState) => state.account?
  * @param state
  * @returns Record of SubaccountFundingPayments indexed by marketId
  */
-export const getMarketFundingPayments = (
-  state: RootState
-): { [marketId: string]: SubaccountFundingPayment[] } => {
-  const fundingPayments = getSubaccountFundingPayments(state);
-  return (fundingPayments ?? []).reduce(
-    (marketFundingPayments, fundingPayment) => {
-      marketFundingPayments[fundingPayment.marketId] ??= [];
-      marketFundingPayments[fundingPayment.marketId].push(fundingPayment);
-      return marketFundingPayments;
-    },
-    {} as { [marketId: string]: SubaccountFundingPayment[] }
-  );
-};
+export const getMarketFundingPayments = createAppSelector(
+  [getSubaccountFundingPayments],
+  (fundingPayments): { [marketId: string]: SubaccountFundingPayment[] } => {
+    return (fundingPayments ?? []).reduce(
+      (marketFundingPayments, fundingPayment) => {
+        marketFundingPayments[fundingPayment.marketId] ??= [];
+        marketFundingPayments[fundingPayment.marketId].push(fundingPayment);
+        return marketFundingPayments;
+      },
+      {} as { [marketId: string]: SubaccountFundingPayment[] }
+    );
+  }
+);
 
 /**
  * @param state
