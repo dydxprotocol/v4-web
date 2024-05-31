@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { shallowEqual, useSelector } from 'react-redux';
 
@@ -56,39 +56,35 @@ export const useDrawOrderbook = ({
   const prevData = useRef<typeof data>(data);
   const theme = useAppThemeAndColorModeContext();
 
-  /**
-   * Scale canvas using device pixel ratio to unblur drawn text
-   * @url https://stackoverflow.com/questions/15661339/how-do-i-fix-blurry-text-in-my-html5-canvas/65124939#65124939
-   * @returns adjusted canvas width/height/rowHeight used in coordinates for drawing
-   * */
-  const { canvasWidth, canvasHeight, rowHeight } = useMemo(() => {
-    const ratio = window.devicePixelRatio || 1;
+  const rowHeight = ORDERBOOK_ROW_HEIGHT;
+  const ratio = window.devicePixelRatio;
+  const [canvasWidth, setCanvasWidth] = useState(ORDERBOOK_WIDTH / ratio);
+  const [canvasHeight, setCanvasHeight] = useState(ORDERBOOK_HEIGHT / ratio);
 
-    if (!canvas) {
-      return {
-        canvasWidth: ORDERBOOK_WIDTH / devicePixelRatio,
-        canvasHeight: ORDERBOOK_HEIGHT / devicePixelRatio,
-        rowHeight: ORDERBOOK_ROW_HEIGHT / devicePixelRatio,
-      };
-    }
+  useEffect(() => {
+    const scaleCanvas = () => {
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const currentRatio = window.devicePixelRatio;
+      canvas.width = canvas.offsetWidth * currentRatio;
+      canvas.height = canvas.offsetHeight * currentRatio;
 
-    const ctx = canvas.getContext('2d');
-    canvas.width = canvas.offsetWidth * ratio;
-    canvas.height = canvas.offsetHeight * ratio;
+      if (ctx) {
+        ctx.scale(currentRatio, currentRatio);
+        ctx.font = '12px Satoshi';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.imageSmoothingQuality = 'high';
+      }
 
-    if (ctx) {
-      ctx.scale(ratio, ratio);
-      ctx.font = '12px Satoshi';
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'middle';
-      ctx.imageSmoothingQuality = 'high';
-    }
-
-    return {
-      canvasWidth: canvas.width / ratio,
-      canvasHeight: canvas.height / ratio,
-      rowHeight: ORDERBOOK_ROW_HEIGHT,
+      setCanvasWidth(canvas.width / currentRatio);
+      setCanvasHeight(canvas.height / currentRatio);
     };
+
+    scaleCanvas();
+    window.addEventListener('resize', scaleCanvas);
+
+    return () => window.removeEventListener('resize', scaleCanvas);
   }, [canvas]);
 
   const drawBars = ({
@@ -290,7 +286,7 @@ export const useDrawOrderbook = ({
     if (!canvas || !ctx) return;
 
     // Clear canvas before redraw
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
     // Animate row removal and update
     const mapOfOrderbookPriceLevels =
@@ -311,7 +307,7 @@ export const useDrawOrderbook = ({
     });
 
     setTimeout(() => {
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
       data.forEach((row, idx) => drawOrderbookRow({ ctx, idx, rowToRender: row }));
     }, ORDERBOOK_ANIMATION_DURATION);
 
@@ -319,7 +315,6 @@ export const useDrawOrderbook = ({
   }, [
     canvasHeight,
     canvasWidth,
-    rowHeight,
     data,
     histogramRange,
     stepSizeDecimals,

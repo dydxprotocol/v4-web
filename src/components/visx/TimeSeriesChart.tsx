@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { LinearGradient } from '@visx/gradient';
 import { ParentSize } from '@visx/responsive';
@@ -45,6 +45,7 @@ type ThresholdProps<Datum extends {} = {}> = Parameters<typeof Threshold<Datum>>
 
 type ElementProps<Datum extends {}> = {
   selectedLocale: string;
+  yAxisOrientation?: 'right' | 'left';
   yAxisScaleType?: ScaleConfig['type'];
   data: Datum[];
   series: (Pick<
@@ -95,6 +96,7 @@ type StyleProps = {
 
 export const TimeSeriesChart = <Datum extends {}>({
   selectedLocale,
+  yAxisOrientation = 'left',
   yAxisScaleType = 'linear',
   data,
   series,
@@ -130,6 +132,8 @@ export const TimeSeriesChart = <Datum extends {}>({
   // Context
   const { isMobile } = useBreakpoints();
 
+  const chartRef = useRef<HTMLDivElement>(null);
+
   // Chart data
   const { xAccessor, yAccessor } = series[0];
 
@@ -144,14 +148,14 @@ export const TimeSeriesChart = <Datum extends {}>({
   const [zoomDomainAnimateTo, setZoomDomainAnimateTo] = useState<number | undefined>();
 
   useEffect(() => {
-    if (defaultZoomDomain && defaultZoomDomain !== zoomDomain) {
+    if (defaultZoomDomain) {
       setZoomDomainAnimateTo(defaultZoomDomain);
     }
   }, [defaultZoomDomain]);
 
   useEffect(() => {
     onZoom?.({ zoomDomain });
-  }, [zoomDomain]);
+  }, [zoomDomain, onZoom]);
 
   useAnimationFrame(
     (elapsedMilliseconds) => {
@@ -228,8 +232,17 @@ export const TimeSeriesChart = <Datum extends {}>({
     // TODO: scroll horizontally to pan
   };
 
+  useEffect(() => {
+    const currentChart = chartRef.current;
+    const handler = (e: WheelEvent) => e.preventDefault();
+    // Prevents scrolling of the page when user is hovered over chart (scrolling should adjust zoom of the chart instead)
+    currentChart?.addEventListener('wheel', handler);
+
+    return () => currentChart?.removeEventListener('wheel', handler);
+  }, [chartRef]);
+
   return (
-    <$Container onWheel={onWheel} className={className}>
+    <$Container onWheel={onWheel} className={className} ref={chartRef}>
       {data.length && zoomDomain ? (
         <DataProvider
           xScale={{
@@ -357,7 +370,7 @@ export const TimeSeriesChart = <Datum extends {}>({
                         )}
 
                         <Axis
-                          orientation="left"
+                          orientation={yAxisOrientation}
                           numTicks={numTicksY}
                           // hideAxisLine
                           stroke="var(--color-border)"

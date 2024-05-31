@@ -22,6 +22,7 @@ import { MigratePanel } from './MigratePanel';
 import { RewardHistoryPanel } from './RewardHistoryPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { StakingPanel } from './StakingPanel';
+import { TradingRewardsChartPanel } from './TradingRewardsChartPanel';
 import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
 
 const RewardsPage = () => {
@@ -45,6 +46,7 @@ const RewardsPage = () => {
             <$LaunchIncentivesPanel />
           ) : (
             <>
+              {testFlags.tradingRewardsRehaul && <$TradingRewardsChartPanel />}
               <$LaunchIncentivesPanel />
               {testFlags.enableStaking ? <$StakingPanel /> : <$DYDXBalancePanel />}
             </>
@@ -52,6 +54,7 @@ const RewardsPage = () => {
 
           <$TradingRewardsColumn>
             <TradingRewardsSummaryPanel />
+            {isTablet && testFlags.tradingRewardsRehaul && <TradingRewardsChartPanel />}
             {isTablet && <RewardsHelpPanel />}
             <RewardHistoryPanel />
           </$TradingRewardsColumn>
@@ -80,17 +83,20 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean }>`
     gap: var(--gap);
   }
 
+  // xccx figure out migrate
   ${({ showMigratePanel }) =>
     showMigratePanel
       ? css`
           grid-template-areas:
             'migrate migrate'
+            'chart chart'
             'incentives incentives'
             'balance balance'
             'rewards other';
         `
       : css`
           grid-template-areas:
+            'chart chart'
             'incentives balance'
             'rewards other';
         `}
@@ -113,6 +119,10 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean }>`
 
 const $MigratePanel = styled(MigratePanel)`
   grid-area: migrate;
+`;
+
+const $TradingRewardsChartPanel = styled(TradingRewardsChartPanel)`
+  grid-area: chart;
 `;
 
 const $LaunchIncentivesPanel = styled(LaunchIncentivesPanel)`

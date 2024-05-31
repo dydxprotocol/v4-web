@@ -186,6 +186,7 @@ class AbacusStateManager {
     this.setTransferValue({ value: null, field: TransferInputField.address });
     this.setTransferValue({ value: null, field: TransferInputField.size });
     this.setTransferValue({ value: null, field: TransferInputField.usdcSize });
+    this.setTransferValue({ value: null, field: TransferInputField.MEMO });
   };
 
   clearTriggerOrdersInputValues = () => {
