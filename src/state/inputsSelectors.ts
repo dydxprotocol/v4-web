@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 
 import { shallowEqual } from 'react-redux';
 
+import { EMPTY_ARR } from '@/constants/objects';
+
 import { type RootState } from './_store';
 import { createAppSelector, useAppSelector } from './appTypes';
 
@@ -58,7 +60,7 @@ export const getCurrentInput = (state: RootState) => state.inputs.current;
  */
 export const getTradeInputErrors = (state: RootState) => {
   const currentInput = state.inputs.current;
-  return currentInput === 'trade' ? getInputErrors(state) : [];
+  return currentInput === 'trade' ? getInputErrors(state) : EMPTY_ARR;
 };
 
 /**
@@ -67,7 +69,7 @@ export const getTradeInputErrors = (state: RootState) => {
  */
 export const getClosePositionInputErrors = (state: RootState) => {
   const currentInput = state.inputs.current;
-  return currentInput === 'closePosition' ? getInputErrors(state) : [];
+  return currentInput === 'closePosition' ? getInputErrors(state) : EMPTY_ARR;
 };
 
 /**
@@ -88,7 +90,7 @@ export const getTransferInputs = (state: RootState) => state.inputs.transferInpu
  */
 export const getTriggerOrdersInputErrors = (state: RootState) => {
   const currentInput = state.inputs.current;
-  return currentInput === 'triggerOrders' ? getInputErrors(state) : [];
+  return currentInput === 'triggerOrders' ? getInputErrors(state) : EMPTY_ARR;
 };
 
 /**
