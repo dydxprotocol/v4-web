@@ -1,4 +1,4 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { EquityTier } from '@/constants/abacus';
@@ -17,11 +17,12 @@ import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, Table } from '@/components/Table';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getStatefulOrderEquityTiers } from '@/state/configsSelectors';
 
 export const EquityTiers = () => {
   const stringGetter = useStringGetter();
-  const equityTiers = useSelector(getStatefulOrderEquityTiers, shallowEqual);
+  const equityTiers = useAppSelector(getStatefulOrderEquityTiers, shallowEqual);
   const { isNotTablet } = useBreakpoints();
   const { equityTiersLearnMore } = useURLConfigs();
 
