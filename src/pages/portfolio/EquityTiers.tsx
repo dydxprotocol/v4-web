@@ -156,6 +156,6 @@ const $Description = styled.div`
   }
 
   a {
-    display: inline;
+    display: inline-grid;
   }
 `;
