@@ -12583,6 +12583,7 @@ packages:
 
   /grapheme-splitter@1.0.4:
     resolution: {integrity: sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==}
+    requiresBuild: true
     dev: true
 
   /graphemer@1.4.0:
@@ -19083,7 +19084,7 @@ packages:
       tinypool: 0.5.0
       vite: 4.3.9(@types/node@20.12.13)
       vite-node: 0.32.2(@types/node@20.12.13)
-      webdriverio: 8.38.0(typescript@5.1.3)
+      webdriverio: 8.36.1(typescript@5.1.3)
       why-is-node-running: 2.2.2
     transitivePeerDependencies:
       - less
@@ -19471,9 +19472,9 @@ packages:
         optional: true
     dependencies:
       '@types/node': 20.12.13
-      '@wdio/config': 8.38.0
-      '@wdio/logger': 8.38.0
-      '@wdio/protocols': 8.38.0
+      '@wdio/config': 8.36.1
+      '@wdio/logger': 8.28.0
+      '@wdio/protocols': 8.32.0
       '@wdio/repl': 8.24.12
       '@wdio/types': 8.36.1
       '@wdio/utils': 8.36.1
