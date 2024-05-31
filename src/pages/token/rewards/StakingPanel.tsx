@@ -67,6 +67,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
               {stringGetter({
                 key: STRING_KEYS.UNSTAKED,
               })}
+              {/* Hardcoded for now until I get the APY endpoint working */}
               <Tag sign={TagSign.Positive}>Est. 16.94 APR</Tag>
             </$label>
             <$BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
@@ -88,6 +89,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
               {stringGetter({
                 key: STRING_KEYS.STAKED,
               })}
+              {/* Hardcoded for now until I get the APY endpoint working */}
               <Tag>Est. 16.94 APR</Tag>
             </$label>
             <$BalanceOutput type={OutputType.Asset} value={nativeStakingBalance} />

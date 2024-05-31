@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
+import { useQuery } from '@tanstack/react-query';
 import { groupBy } from 'lodash';
-import { useQuery } from 'react-query';
 import { shallowEqual, useSelector } from 'react-redux';
 
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
@@ -67,7 +67,9 @@ export const useStakingValidator = () => {
     };
   }, [validatorWhitelist, getValidators, currentDelegations]);
 
-  const { data } = useQuery('stakingValidators', queryFn, {
+  const { data } = useQuery({
+    queryKey: ['stakingValidator', selectedNetwork],
+    queryFn,
     enabled: Boolean(isCompositeClientConnected && validatorWhitelist?.length > 0),
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

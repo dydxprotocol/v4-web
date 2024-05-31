@@ -161,7 +161,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
             balance.gt(0) &&
             renderFormInputButton({
               label: stringGetter({ key: STRING_KEYS.MAX }),
-              isInputEmpty: !amount,
+              isInputEmpty: !amountBN,
               onClear: () => onChangeAmount(undefined),
               onClick: () => onChangeAmount(balance.toNumber()),
             })

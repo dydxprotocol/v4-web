@@ -18,7 +18,6 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 
-import { isTruthy } from '@/lib/isTruthy';
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 
 type ElementProps = {
@@ -74,7 +73,7 @@ export const UnstakeButtonAndReceipt = ({ fee, amount, isDisabled, isLoading }: 
       ),
       value: <Output type={OutputType.Asset} value={fee} />,
     },
-  ].filter(isTruthy);
+  ];
 
   return (
     <$WithDetailsReceipt detailItems={transferDetailItems}>

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 // TODO: This api doesn't work due to cors, need to contact protocolstaking.info
 export const useStakingAPY = () => {
@@ -16,7 +16,9 @@ export const useStakingAPY = () => {
     return data;
   }, []);
 
-  const { data } = useQuery('stakingAPY', queryFn, {
+  const { data } = useQuery({
+    queryKey: ['stakingAPY'],
+    queryFn,
     enabled: true,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
