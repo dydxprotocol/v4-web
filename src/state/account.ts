@@ -5,11 +5,11 @@ import type {
   Compliance,
   HistoricalPnlPeriods,
   Nullable,
-  SubAccountHistoricalPNLs,
   Subaccount,
   SubaccountFill,
   SubaccountFills,
   SubaccountFundingPayments,
+  SubAccountHistoricalPNLs,
   SubaccountOrder,
   SubaccountTransfers,
   TradingRewards,
@@ -43,6 +43,19 @@ export type AccountState = {
   transfers?: SubaccountTransfers;
   historicalPnl?: SubAccountHistoricalPNLs;
 
+  childSubaccounts: {
+    [subaccountNumber: number]: Nullable<
+      Partial<
+        Subaccount & {
+          fills: SubaccountFills;
+          fundingPayments: SubaccountFundingPayments;
+          transfers: SubaccountTransfers;
+          historicalPnl: SubAccountHistoricalPNLs;
+        }
+      >
+    >;
+  };
+
   onboardingGuards: Record<OnboardingGuard, boolean | undefined>;
   onboardingState: OnboardingState;
 
@@ -69,6 +82,7 @@ const initialState: AccountState = {
 
   // Subaccount
   subaccount: undefined,
+  childSubaccounts: {},
   fills: undefined,
   fundingPayments: undefined,
   transfers: undefined,
@@ -218,6 +232,18 @@ export const accountSlice = createSlice({
 
       state.subaccount = action.payload;
     },
+    setChildSubaccount: (
+      state,
+      action: PayloadAction<{
+        data: Partial<AccountState['childSubaccounts']>;
+        subaccountNumber: number;
+      }>
+    ) => {
+      state.childSubaccounts[action.payload.subaccountNumber] = {
+        ...state.childSubaccounts[action.payload.subaccountNumber],
+        ...action.payload.data,
+      };
+    },
     setWallet: (state, action: PayloadAction<Nullable<Wallet>>) => ({
       ...state,
       wallet: action.payload,
@@ -315,6 +341,7 @@ export const {
   setRestrictionType,
   setCompliance,
   setSubaccount,
+  setChildSubaccount,
   setWallet,
   viewedFills,
   viewedOrders,
