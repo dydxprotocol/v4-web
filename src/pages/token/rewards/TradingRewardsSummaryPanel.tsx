@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
@@ -25,7 +26,10 @@ export const TradingRewardsSummaryPanel = () => {
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
   const canViewAccount = useAppSelector(calculateCanViewAccount);
-  const currentWeekTradingReward = useAppSelector(getHistoricalTradingRewardsForCurrentWeek);
+  const currentWeekTradingReward = useAppSelector(
+    getHistoricalTradingRewardsForCurrentWeek,
+    shallowEqual
+  );
 
   useEffect(() => {
     // Initialize weekly data for currentWeekTradingReward

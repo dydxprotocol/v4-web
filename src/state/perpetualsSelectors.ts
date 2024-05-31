@@ -39,7 +39,8 @@ export const getMarketData = (state: RootState, marketId: string) =>
 /**
  * @returns marketIds of all markets
  */
-export const getMarketIds = (state: RootState) => Object.keys(getPerpetualMarkets(state) ?? []);
+export const getMarketIds = (state: RootState) =>
+  Object.keys(getPerpetualMarkets(state) ?? EMPTY_ARR);
 
 /**
  * @returns PerpetualMarket data of the market the user is currently viewing
@@ -109,7 +110,7 @@ export const getHistoricalFundings = (state: RootState) => state.perpetuals.hist
 export const getCurrentMarketHistoricalFundings = createAppSelector(
   [getHistoricalFundings, getCurrentMarketId],
   (historicalFundings, currentMarketId) =>
-    currentMarketId ? historicalFundings?.[currentMarketId] ?? [] : []
+    currentMarketId ? historicalFundings?.[currentMarketId] ?? EMPTY_ARR : EMPTY_ARR
 );
 
 /**
