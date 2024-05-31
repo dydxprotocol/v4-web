@@ -16,6 +16,7 @@ export enum MarketsRoute {
 }
 
 export enum PortfolioRoute {
+  EquityTiers = 'equity-tiers',
   Fees = 'fees',
   History = 'history',
   Orders = 'orders',

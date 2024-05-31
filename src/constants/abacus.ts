@@ -87,6 +87,8 @@ export type MarketHistoricalFunding = Abacus.exchange.dydx.abacus.output.MarketH
 export type Configs = Abacus.exchange.dydx.abacus.output.Configs;
 export type FeeDiscount = Abacus.exchange.dydx.abacus.output.FeeDiscount;
 export type FeeTier = Abacus.exchange.dydx.abacus.output.FeeTier;
+export type EquityTiers = Abacus.exchange.dydx.abacus.output.EquityTiers;
+export type EquityTier = Abacus.exchange.dydx.abacus.output.EquityTier;
 export type NetworkConfigs = Abacus.exchange.dydx.abacus.output.NetworkConfigs;
 
 // ------ Assets ------ //
