@@ -99,7 +99,7 @@ export const Fees = () => {
         />
 
         <$FeeTable
-          label="Fee Tiers"
+          label={stringGetter({ key: STRING_KEYS.FEE_TIERS })}
           data={feeTiers ?? []}
           getRowKey={(row: FeeTier) => row.tier}
           getRowAttributes={(row: FeeTier) => ({
@@ -188,8 +188,6 @@ const $ContentWrapper = styled.div`
 `;
 
 const $AdditionalConditions = styled.div`
-  justify-content: end;
-
   color: var(--color-text-0);
   font: var(--font-small-book);
 
@@ -201,6 +199,7 @@ const $AdditionalConditions = styled.div`
 const $AdditionalConditionsText = styled.span`
   display: flex;
   gap: 0.5ch;
+  justify-content: end;
 
   @media ${breakpoints.mobile} {
     display: inline;

@@ -10,6 +10,7 @@ export interface LinksConfigs {
   blogs?: string;
   community?: string;
   documentation?: string;
+  equityTiersLearnMore?: string;
   feedback?: string;
   foundation?: string;
   governanceLearnMore?: string;
@@ -42,6 +43,7 @@ export const useURLConfigs = (): LinksConfigs => {
     blogs: linksConfigs.blogs ?? FALLBACK_URL,
     community: linksConfigs.community ?? FALLBACK_URL,
     documentation: linksConfigs.documentation ?? FALLBACK_URL,
+    equityTiersLearnMore: linksConfigs.equityTiersLearnMore,
     feedback: linksConfigs.feedback ?? FALLBACK_URL,
     foundation: linksConfigs.foundation ?? FALLBACK_URL,
     governanceLearnMore: linksConfigs.governanceLearnMore ?? FALLBACK_URL,
