@@ -9,6 +9,7 @@ import {
   type AbacusOrderSides,
   type Nullable,
   type SubaccountPosition,
+  type TradeState,
 } from '@/constants/abacus';
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
@@ -166,4 +167,8 @@ export const getPositionMargin = ({ position }: { position: SubaccountPosition }
       : equity?.current;
 
   return margin;
+};
+
+export const getTradeStateWithDoubleValuesDiff = (tradeState: Nullable<TradeState<number>>) => {
+  return !!tradeState?.postOrder && tradeState.current !== tradeState.postOrder;
 };

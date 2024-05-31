@@ -81,10 +81,7 @@ export const AdjustIsolatedMarginForm = ({
     });
 
     return () => {
-      abacusStateManager.setAdjustIsolatedMarginValue({
-        value: null,
-        field: AdjustIsolatedMarginInputField.ChildSubaccountNumber,
-      });
+      abacusStateManager.clearAdjustIsolatedMarginInputValues();
     };
   }, []);
 

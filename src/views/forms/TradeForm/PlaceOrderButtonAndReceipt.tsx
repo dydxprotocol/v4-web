@@ -1,7 +1,7 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import type { TradeInputSummary } from '@/constants/abacus';
+import { AbacusMarginMode, type TradeInputSummary } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
@@ -15,6 +15,7 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
+import { DiffOutput } from '@/components/DiffOutput';
 import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
@@ -22,9 +23,14 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
-import { getSubaccountId } from '@/state/accountSelectors';
+import { getCurrentMarketPositionData, getSubaccountId } from '@/state/accountSelectors';
 import { openDialog } from '@/state/dialogs';
-import { getCurrentInput } from '@/state/inputsSelectors';
+import { getCurrentInput, getInputTradeMarginMode } from '@/state/inputsSelectors';
+
+import { isTruthy } from '@/lib/isTruthy';
+import { nullIfZero } from '@/lib/numbers';
+import { getTradeStateWithDoubleValuesDiff } from '@/lib/tradeData';
+import { orEmptyObj } from '@/lib/typeUtils';
 
 type ConfirmButtonConfig = {
   stringKey: string;
@@ -60,6 +66,10 @@ export const PlaceOrderButtonAndReceipt = ({
   const canAccountTrade = useSelector(calculateCanAccountTrade);
   const subaccountNumber = useSelector(getSubaccountId);
   const currentInput = useSelector(getCurrentInput);
+  const marginMode = useSelector(getInputTradeMarginMode, shallowEqual);
+  const { liquidationPrice, equity, leverage } = orEmptyObj(
+    useSelector(getCurrentMarketPositionData, shallowEqual)
+  );
 
   const hasMissingData = subaccountNumber === undefined;
 
@@ -76,6 +86,48 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const { fee, price: expectedPrice, total, reward } = summary ?? {};
 
+  const isolatedMarginItems = [
+    {
+      key: 'liquidation-price',
+      label: stringGetter({ key: STRING_KEYS.LIQUIDATION_PRICE }),
+      value: (
+        <DiffOutput
+          useGrouping
+          type={OutputType.Fiat}
+          value={liquidationPrice?.current}
+          newValue={liquidationPrice?.postOrder}
+          withDiff={getTradeStateWithDoubleValuesDiff(liquidationPrice)}
+        />
+      ),
+    },
+    {
+      key: 'position-margin',
+      label: stringGetter({ key: STRING_KEYS.POSITION_MARGIN }),
+      value: (
+        <DiffOutput
+          useGrouping
+          type={OutputType.Fiat}
+          value={equity?.current}
+          newValue={equity?.postOrder}
+          withDiff={getTradeStateWithDoubleValuesDiff(equity)}
+        />
+      ),
+    },
+    {
+      key: 'position-leverage',
+      label: stringGetter({ key: STRING_KEYS.POSITION_LEVERAGE }),
+      value: (
+        <DiffOutput
+          useGrouping
+          type={OutputType.Multiple}
+          value={nullIfZero(leverage?.current)}
+          newValue={leverage?.postOrder}
+          withDiff={getTradeStateWithDoubleValuesDiff(leverage)}
+        />
+      ),
+    },
+  ];
+
   const items = [
     {
       key: 'expected-price',
@@ -86,6 +138,7 @@ export const PlaceOrderButtonAndReceipt = ({
       ),
       value: <Output type={OutputType.Fiat} value={expectedPrice} useGrouping />,
     },
+    ...(marginMode === AbacusMarginMode.isolated ? isolatedMarginItems : []),
     {
       key: 'fee',
       label: (
@@ -113,12 +166,12 @@ export const PlaceOrderButtonAndReceipt = ({
       ),
       tooltip: 'max-reward',
     },
-    {
+    marginMode === AbacusMarginMode.cross && {
       key: 'total',
       label: stringGetter({ key: STRING_KEYS.TOTAL }),
       value: <Output type={OutputType.Fiat} value={total} showSign={ShowSign.None} useGrouping />,
     },
-  ];
+  ].filter(isTruthy);
 
   const returnToMarketState = () => ({
     buttonTextStringKey: STRING_KEYS.RETURN_TO_MARKET,
