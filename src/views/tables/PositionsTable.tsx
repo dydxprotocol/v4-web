@@ -414,8 +414,9 @@ export const PositionsTable = ({
     return currentMarket ? (marketPosition ? [marketPosition] : []) : openPositions;
   }, [currentMarket, openPositions]);
 
+  const conditionalOrderSelector = useMemo(getSubaccountConditionalOrders, []);
   const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } =
-    useAppSelector(getSubaccountConditionalOrders(isSlTpLimitOrdersEnabled), {
+    useAppSelector((s) => conditionalOrderSelector(s, isSlTpLimitOrdersEnabled), {
       equalityFn: (oldVal, newVal) => {
         return (
           shallowEqual(oldVal.stopLossOrders, newVal.stopLossOrders) &&
