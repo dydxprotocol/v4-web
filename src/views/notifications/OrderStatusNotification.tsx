@@ -21,6 +21,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
 import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 // eslint-disable-next-line import/no-cycle
 import { Notification, NotificationProps } from '@/components/Notification';
@@ -85,7 +86,20 @@ export const OrderStatusNotification = ({
       if (localOrder.errorStringKey) {
         orderStatusStringKey = STRING_KEYS.ERROR;
         orderStatusIcon = <$WarningIcon iconName={IconName.Warning} />;
-        customContent = <span>{stringGetter({ key: localOrder.errorStringKey })}</span>;
+        customContent = (
+          <span>
+            {stringGetter({
+              key: localOrder.errorStringKey,
+              params: {
+                EQUITY_TIER_LEARN_MORE: (
+                  <$Link href="https://help.dydx.trade/en/articles/9335041-equity-tiers-and-rate-limits">
+                    {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
+                  </$Link>
+                ),
+              },
+            })}
+          </span>
+        );
       }
       break;
     default:
@@ -131,4 +145,9 @@ const $WarningIcon = styled(Icon)`
 const $OrderStatusIcon = styled(OrderStatusIcon)`
   width: 0.9375rem;
   height: 0.9375rem;
+`;
+
+const $Link = styled(Link)`
+  --link-color: var(--color-text-1);
+  display: inline-block;
 `;
