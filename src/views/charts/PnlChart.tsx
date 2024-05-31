@@ -94,6 +94,11 @@ export const PnlChart = ({
 
   const [isZooming, setIsZooming] = useState(false);
 
+  // Fetch 90d data once in Abacus for the chart
+  useEffect(() => {
+    abacusStateManager.setHistoricalPnlPeriod(HistoricalPnlPeriod.Period90d);
+  }, []);
+
   const lastPnlTick = pnlData?.[pnlData.length - 1];
 
   const data = useMemo(
@@ -151,11 +156,6 @@ export const PnlChart = ({
     },
     [data]
   );
-
-  // Fetch 90d data once in Abacus for the chart
-  useEffect(() => {
-    abacusStateManager.setHistoricalPnlPeriod(HistoricalPnlPeriod.Period90d);
-  }, []);
 
   const onSelectPeriod = (periodName: string) => setSelectedPeriod(getPeriodFromName(periodName));
 
