@@ -130,7 +130,7 @@ class AbacusStateManager {
 
   attemptDisconnectAccount = () => {
     const state = this.store?.getState();
-    const { type: transferType } = (state && getTransferInputs(state)) || {};
+    const { type: transferType } = (state && getTransferInputs(state)) ?? {};
     // we don't want to disconnect the account if we switch network during the deposit form
     if (transferType?.rawValue !== TransferType.deposit.rawValue) {
       this.disconnectAccount();
@@ -142,7 +142,7 @@ class AbacusStateManager {
     const state = this.store?.getState();
 
     const { needsTriggerPrice, needsTrailingPercent, needsLeverage, needsLimitPrice } =
-      (state && getInputTradeOptions(state)) || {};
+      (state && getInputTradeOptions(state)) ?? {};
 
     if (needsTrailingPercent) {
       this.setTradeValue({ value: null, field: TradeInputField.trailingPercent });

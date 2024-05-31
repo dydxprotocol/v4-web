@@ -29,8 +29,8 @@ export const calculateFundingRateHistory = createAppSelector(
         rate === 0
           ? FundingDirection.None
           : rate < 0
-          ? FundingDirection.ToLong
-          : FundingDirection.ToShort,
+            ? FundingDirection.ToLong
+            : FundingDirection.ToShort,
     }));
   }
 );

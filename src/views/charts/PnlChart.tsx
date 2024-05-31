@@ -153,7 +153,7 @@ export const PnlChart = ({
                     0: PnlSide.Flat,
                     1: PnlSide.Profit,
                   }[Math.sign(datum.equity)],
-                } as PnlDatum)
+                }) as PnlDatum
             )
         : [],
     [pnlData, equity?.current, now]

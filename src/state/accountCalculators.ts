@@ -24,8 +24,8 @@ export const calculateOnboardingStep = createAppSelector(
       [OnboardingState.AccountConnected]: !hasAcknowledgedTerms
         ? OnboardingSteps.AcknowledgeTerms
         : !hasPreviousTransactions
-        ? OnboardingSteps.DepositFunds
-        : undefined,
+          ? OnboardingSteps.DepositFunds
+          : undefined,
     }[onboardingState];
   }
 );

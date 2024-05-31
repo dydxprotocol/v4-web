@@ -34,13 +34,16 @@ export type TokenInfo = {
   name: string;
 };
 
-const cctpTokensByChainId = cctpTokens.reduce((acc, token) => {
-  if (!acc[token.chainId]) {
-    acc[token.chainId] = [];
-  }
-  acc[token.chainId].push(token);
-  return acc;
-}, {} as Record<string, TokenInfo[]>);
+const cctpTokensByChainId = cctpTokens.reduce(
+  (acc, token) => {
+    if (!acc[token.chainId]) {
+      acc[token.chainId] = [];
+    }
+    acc[token.chainId].push(token);
+    return acc;
+  },
+  {} as Record<string, TokenInfo[]>
+);
 
 export const SourceSelectMenu = ({
   label,

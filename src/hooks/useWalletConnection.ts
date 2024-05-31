@@ -164,7 +164,7 @@ export const useWalletConnection = () => {
           saveEvmAddress(STRING_KEYS.TEST_WALLET as EvmAddress);
         } else {
           // if account connected (via remember me), do not show wagmi popup until forceConnect
-          if (!isConnectedWagmi && (forceConnect || !isAccountConnected)) {
+          if (!isConnectedWagmi && (!!forceConnect || !isAccountConnected)) {
             await connectWagmi({
               connector: resolveWagmiConnector({
                 walletType: wType,

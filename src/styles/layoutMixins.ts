@@ -828,7 +828,8 @@ export const layoutMixins = {
     gap: var(--border-width);
 
     > * {
-      box-shadow: 0 var(--border-width) var(--border-color),
+      box-shadow:
+        0 var(--border-width) var(--border-color),
         0 calc(-1 * var(--border-width)) var(--border-color);
     }
   `,

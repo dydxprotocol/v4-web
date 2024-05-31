@@ -109,7 +109,7 @@ export const relativeTimeString = ({
   DateTime.fromMillis(timeInMs).setLocale(selectedLocale).toLocaleString(DateTime.DATETIME_SHORT);
 
 export const getHydratedTradingData = <
-  T extends SubaccountOrder | SubaccountFill | SubaccountFundingPayment
+  T extends SubaccountOrder | SubaccountFill | SubaccountFundingPayment,
 >({
   data,
   assets,

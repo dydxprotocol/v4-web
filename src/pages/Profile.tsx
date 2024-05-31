@@ -434,8 +434,7 @@ const $InlineRow = styled.div`
 `;
 
 const $PanelButton = styled(Panel)`
-  --panel-paddingY: 0
-  --panel-paddingX:0;
+  --panel-paddingY: 0 --panel-paddingX: 0;
 `;
 
 const $SettingsButton = styled($PanelButton)`

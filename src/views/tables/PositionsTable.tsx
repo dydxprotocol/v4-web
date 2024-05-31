@@ -349,8 +349,8 @@ const getPositionsTableColumnDef = ({
             shouldRenderTriggers && showClosePositionAction && !testFlags.isolatedMargin
               ? STRING_KEYS.ACTIONS
               : showClosePositionAction
-              ? STRING_KEYS.CLOSE
-              : STRING_KEYS.ACTION,
+                ? STRING_KEYS.CLOSE
+                : STRING_KEYS.ACTION,
         }),
         isActionable: true,
         allowsSorting: false,
@@ -545,7 +545,7 @@ const $OutputSigned = styled(Output)<{ sign: NumberSign }>`
       [NumberSign.Positive]: `var(--color-positive)`,
       [NumberSign.Negative]: `var(--color-negative)`,
       [NumberSign.Neutral]: `var(--color-text-2)`,
-    }[sign])};
+    })[sign]};
 `;
 
 const $HighlightOutput = styled(Output)<{ isNegative?: boolean }>`

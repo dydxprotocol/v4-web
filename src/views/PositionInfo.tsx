@@ -110,8 +110,8 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       sign: MustBigNumber(netFunding).gt(0)
         ? NumberSign.Positive
         : MustBigNumber(netFunding).lt(0)
-        ? NumberSign.Negative
-        : NumberSign.Neutral,
+          ? NumberSign.Negative
+          : NumberSign.Neutral,
       value: netFunding && netFundingBN.toFixed(USD_DECIMALS),
     },
   ];
@@ -124,7 +124,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
   const hasNoPositionInMarket = MustBigNumber(currentSize).isZero();
 
   const newLeverageIsInvalid =
-    leverage?.postOrder && (!newLeverageBN.isFinite() || newLeverageBN.gt(maxLeverage));
+    !!leverage?.postOrder && (!newLeverageBN.isFinite() || newLeverageBN.gt(maxLeverage));
 
   const newLeverageIsLarger =
     !leverage?.current || (leverage?.postOrder && newLeverageBN.gt(leverageBN));
@@ -173,8 +173,8 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
         !newLeverageIsInvalid && !newLeverageIsLarger
           ? NumberSign.Positive
           : newLeverageIsInvalid || newLeverageIsLarger
-          ? NumberSign.Negative
-          : NumberSign.Neutral,
+            ? NumberSign.Negative
+            : NumberSign.Neutral,
       useDiffOutput: true,
       showSign: ShowSign.None,
       value: leverage?.current,
@@ -205,8 +205,8 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       sign: MustBigNumber(unrealizedPnl?.current).gt(0)
         ? NumberSign.Positive
         : MustBigNumber(unrealizedPnl?.current).lt(0)
-        ? NumberSign.Negative
-        : NumberSign.Neutral,
+          ? NumberSign.Negative
+          : NumberSign.Neutral,
       value: unrealizedPnl?.current,
       percentValue: unrealizedPnlPercent?.current,
       withBaseFont: true,
@@ -219,8 +219,8 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       sign: MustBigNumber(realizedPnl?.current).gt(0)
         ? NumberSign.Positive
         : MustBigNumber(realizedPnl?.current).lt(0)
-        ? NumberSign.Negative
-        : NumberSign.Neutral,
+          ? NumberSign.Negative
+          : NumberSign.Neutral,
       value: realizedPnl?.current ?? undefined,
       withBaseFont: true,
     },

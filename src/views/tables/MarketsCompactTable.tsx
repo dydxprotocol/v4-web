@@ -263,8 +263,8 @@ const $Output = styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`
     isNegative
       ? `var(--color-negative)`
       : isPositive
-      ? `var(--color-positive)`
-      : `var(--color-text-1)`};
+        ? `var(--color-positive)`
+        : `var(--color-text-1)`};
   font: var(--font-base-medium);
 `;
 

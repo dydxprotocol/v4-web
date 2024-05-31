@@ -29,7 +29,7 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
             side: 'ask',
             mine: subaccountOrderSizeBySideAndPrice[OrderSide.SELL]?.[row.price],
             ...row,
-          } as PerpetualMarketOrderbookLevel)
+          }) as PerpetualMarketOrderbookLevel
       )
       .slice(0, maxRowsPerSide);
 
@@ -43,7 +43,7 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
             side: 'bid',
             mine: subaccountOrderSizeBySideAndPrice[OrderSide.BUY]?.[row.price],
             ...row,
-          } as PerpetualMarketOrderbookLevel)
+          }) as PerpetualMarketOrderbookLevel
       )
       .slice(0, maxRowsPerSide);
 
@@ -97,11 +97,11 @@ export const useOrderbookValuesForDepthChart = () => {
   return useMemo(() => {
     const bids = (orderbook?.bids?.toArray() ?? [])
       .filter(Boolean)
-      .map((datum) => ({ ...datum, seriesKey: DepthChartSeries.Bids } as DepthChartDatum));
+      .map((datum) => ({ ...datum, seriesKey: DepthChartSeries.Bids }) as DepthChartDatum);
 
     const asks = (orderbook?.asks?.toArray() ?? [])
       .filter(Boolean)
-      .map((datum) => ({ ...datum, seriesKey: DepthChartSeries.Asks } as DepthChartDatum));
+      .map((datum) => ({ ...datum, seriesKey: DepthChartSeries.Asks }) as DepthChartDatum);
 
     const lowestBid = bids[bids.length - 1];
     const highestBid = bids[0];

@@ -428,7 +428,7 @@ const $NavItem = styled(NavItem)<NavItemStyleProps>`
         justify-items: center;
         align-content: center;
       `,
-    }[orientation])}
+    })[orientation]}
   gap: 0.7rem 0.5rem;
 
   > span {

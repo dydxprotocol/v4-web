@@ -162,8 +162,8 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
       value: reduceOnly
         ? stringGetter({ key: STRING_KEYS.REDUCE_ONLY })
         : postOnly
-        ? stringGetter({ key: STRING_KEYS.POST_ONLY })
-        : '-',
+          ? stringGetter({ key: STRING_KEYS.POST_ONLY })
+          : '-',
     },
     {
       key: 'good-til',

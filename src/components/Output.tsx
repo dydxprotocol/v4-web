@@ -116,7 +116,7 @@ export const Output = ({
   const { decimal: LOCALE_DECIMAL_SEPARATOR, group: LOCALE_GROUP_SEPARATOR } =
     useLocaleSeparators();
 
-  if (isLoading || isDetailsLoading) {
+  if (!!isLoading || !!isDetailsLoading) {
     return <LoadingOutput />;
   }
 

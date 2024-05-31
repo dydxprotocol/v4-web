@@ -276,7 +276,7 @@ const $ArrowIcon = styled(Icon)<{ direction: 'up' | 'down'; color: 'green' | 're
       down: css`
         transform: rotate(90deg);
       `,
-    }[direction])}
+    })[direction]}
 
   ${({ color }) =>
     ({
@@ -286,7 +286,7 @@ const $ArrowIcon = styled(Icon)<{ direction: 'up' | 'down'; color: 'green' | 're
       red: css`
         color: var(--color-red);
       `,
-    }[color])}
+    })[color]}
 `;
 
 const indicatorStyle = css`
