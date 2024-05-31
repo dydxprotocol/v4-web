@@ -302,6 +302,10 @@ const useDydxClientContext = () => {
     [compositeClient]
   );
 
+  const getValidators = useCallback(async () => {
+    return compositeClient?.validatorClient.get.getAllValidators();
+  }, [compositeClient]);
+
   return {
     // Client initialization
     connect: setNetworkConfig,
@@ -328,5 +332,6 @@ const useDydxClientContext = () => {
     screenAddresses,
     getWithdrawalAndTransferGatingStatus,
     getWithdrawalCapacityByDenom,
+    getValidators,
   };
 };

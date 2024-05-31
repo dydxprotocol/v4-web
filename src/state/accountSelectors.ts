@@ -542,6 +542,11 @@ export const getBalances = (state: RootState) => state.account?.balances;
 export const getStakingBalances = (state: RootState) => state.account?.stakingBalances;
 
 /**
+ *  @returns user wallet staking delegations
+ * */
+export const getStakingDelegations = (state: RootState) => state.account?.stakingDelegations;
+
+/**
  * @returns account all time trading rewards
  */
 export const getTotalTradingRewards = (state: RootState) => state.account?.tradingRewards?.total;
