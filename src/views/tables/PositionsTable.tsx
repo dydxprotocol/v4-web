@@ -32,6 +32,7 @@ import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
+import { MarketTypeFilter, marketTypeMatchesFilter } from '@/pages/trade/types';
 
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getExistingOpenPositions, getSubaccountConditionalOrders } from '@/state/accountSelectors';
@@ -39,7 +40,7 @@ import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
-import { getPositionMargin } from '@/lib/tradeData';
+import { getMarginModeFromSubaccountNumber, getPositionMargin } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
@@ -359,6 +360,7 @@ type ElementProps = {
   columnWidths?: Partial<Record<PositionsTableColumnKey, ColumnSize>>;
   currentRoute?: string;
   currentMarket?: string;
+  marketTypeFilter?: MarketTypeFilter;
   showClosePositionAction: boolean;
   initialPageSize?: PageSize;
   onNavigate?: () => void;
@@ -375,6 +377,7 @@ export const PositionsTable = ({
   columnWidths,
   currentRoute,
   currentMarket,
+  marketTypeFilter,
   showClosePositionAction,
   initialPageSize,
   onNavigate,
@@ -392,9 +395,14 @@ export const PositionsTable = ({
 
   const openPositions = useSelector(getExistingOpenPositions, shallowEqual) ?? EMPTY_ARR;
   const positions = useMemo(() => {
-    const marketPosition = openPositions.find((position) => position.id === currentMarket);
-    return currentMarket ? (marketPosition ? [marketPosition] : []) : openPositions;
-  }, [currentMarket, openPositions]);
+    return openPositions.filter((position) => {
+      const matchesMarket = currentMarket == null || position.id === currentMarket;
+      const subaccountNumber = position.childSubaccountNumber;
+      const marginType = getMarginModeFromSubaccountNumber(subaccountNumber).name;
+      const matchesType = marketTypeMatchesFilter(marginType, marketTypeFilter);
+      return matchesMarket && matchesType;
+    });
+  }, [currentMarket, marketTypeFilter, openPositions]);
 
   const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } = useSelector(
     getSubaccountConditionalOrders(isSlTpLimitOrdersEnabled),
