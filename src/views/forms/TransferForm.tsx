@@ -4,7 +4,7 @@ import { validation } from '@dydxprotocol/v4-client-js';
 import { noop } from 'lodash';
 import { type NumberFormatValues } from 'react-number-format';
 import type { SyntheticInputEvent } from 'react-number-format/types/types';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { Nullable, TransferInputField, TransferType } from '@/constants/abacus';
@@ -42,6 +42,7 @@ import { TransferButtonAndReceipt } from '@/views/forms/TransferForm/TransferBut
 
 import { getSubaccount } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -62,11 +63,11 @@ export const TransferForm = ({
   const stringGetter = useStringGetter();
   const { showMemoTransferField } = useEnvFeatures();
 
-  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) ?? {};
+  const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
   const { dydxAddress } = useAccounts();
   const { transfer } = useSubaccount();
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
-  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { tokensConfigs, usdcLabel, chainTokenLabel } = useTokenConfigs();
   useWithdrawalInfo({ transferType: 'transfer' });
 
@@ -76,7 +77,7 @@ export const TransferForm = ({
     fee,
     token,
     memo,
-  } = useSelector(getTransferInputs, shallowEqual) ?? {};
+  } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
 
   // Form states
   const [error, setError] = useState<string>();

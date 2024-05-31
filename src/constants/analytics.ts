@@ -62,25 +62,25 @@ export type AnalyticsUserPropertyValue<T extends AnalyticsUserProperty> =
   T extends AnalyticsUserProperty.Breakpoint
     ? 'MOBILE' | 'TABLET' | 'DESKTOP_SMALL' | 'DESKTOP_MEDIUM' | 'DESKTOP_LARGE' | 'UNSUPPORTED'
     : T extends AnalyticsUserProperty.Locale
-    ? SupportedLocales
-    : T extends AnalyticsUserProperty.Version
-    ? string | undefined
-    : // Network
-    T extends AnalyticsUserProperty.Network
-    ? DydxNetwork
-    : // Wallet
-    T extends AnalyticsUserProperty.WalletType
-    ? WalletType | undefined
-    : T extends AnalyticsUserProperty.WalletConnectionType
-    ? WalletConnectionType | undefined
-    : T extends AnalyticsUserProperty.WalletAddress
-    ? EvmAddress | DydxAddress | undefined
-    : // Account
-    T extends AnalyticsUserProperty.DydxAddress
-    ? DydxAddress | undefined
-    : T extends AnalyticsUserProperty.SubaccountNumber
-    ? number | undefined
-    : undefined;
+      ? SupportedLocales
+      : T extends AnalyticsUserProperty.Version
+        ? string | undefined
+        : // Network
+          T extends AnalyticsUserProperty.Network
+          ? DydxNetwork
+          : // Wallet
+            T extends AnalyticsUserProperty.WalletType
+            ? WalletType | undefined
+            : T extends AnalyticsUserProperty.WalletConnectionType
+              ? WalletConnectionType | undefined
+              : T extends AnalyticsUserProperty.WalletAddress
+                ? EvmAddress | DydxAddress | undefined
+                : // Account
+                  T extends AnalyticsUserProperty.DydxAddress
+                  ? DydxAddress | undefined
+                  : T extends AnalyticsUserProperty.SubaccountNumber
+                    ? number | undefined
+                    : undefined;
 
 // Events
 export enum AnalyticsEvent {
@@ -126,128 +126,131 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
   T extends AnalyticsEvent.AppStart
     ? {}
     : T extends AnalyticsEvent.NetworkStatus
-    ? {
-        status: (typeof AbacusApiStatus)['name'];
-        /** Last time indexer node was queried successfully */
-        lastSuccessfulIndexerRpcQuery?: number;
-        /** Time elapsed since indexer node was queried successfully */
-        elapsedTime?: number;
-        blockHeight?: number;
-        indexerBlockHeight?: number;
-        trailingBlocks?: number;
-      }
-    : // Navigation
-    T extends AnalyticsEvent.NavigatePage
-    ? {
-        path: string;
-      }
-    : T extends AnalyticsEvent.NavigateDialog
-    ? {
-        type: DialogTypes;
-      }
-    : T extends AnalyticsEvent.NavigateDialogClose
-    ? {
-        type: DialogTypes;
-      }
-    : T extends AnalyticsEvent.NavigateExternal
-    ? {
-        link: string;
-      }
-    : // Wallet
-    T extends AnalyticsEvent.ConnectWallet
-    ? {
-        walletType: WalletType;
-        walletConnectionType: WalletConnectionType;
-      }
-    : T extends AnalyticsEvent.DisconnectWallet
-    ? {}
-    : // Onboarding
-    T extends AnalyticsEvent.OnboardingStepChanged
-    ? {
-        state: OnboardingState;
-        step?: OnboardingSteps;
-      }
-    : T extends AnalyticsEvent.OnboardingAccountDerived
-    ? {
-        hasPreviousTransactions: boolean;
-      }
-    : // Transfers
-    T extends AnalyticsEvent.TransferFaucet
-    ? {}
-    : T extends AnalyticsEvent.TransferFaucetConfirmed
-    ? {
-        /** roundtrip time between user placing an order and confirmation from indexer (client → validator → indexer → client) */
-        roundtripMs: number;
-        /** URL/IP of node the order was sent to */
-        validatorUrl: string;
-      }
-    : T extends AnalyticsEvent.TransferDeposit
-    ? {
-        chainId?: string;
-        tokenAddress?: string;
-        tokenSymbol?: string;
-        slippage?: number;
-        gasFee?: number;
-        bridgeFee?: number;
-        exchangeRate?: number;
-        estimatedRouteDuration?: number;
-        toAmount?: number;
-        toAmountMin?: number;
-      }
-    : T extends AnalyticsEvent.TransferWithdraw
-    ? {
-        chainId?: string;
-        tokenAddress?: string;
-        tokenSymbol?: string;
-        slippage?: number;
-        gasFee?: number;
-        bridgeFee?: number;
-        exchangeRate?: number;
-        estimatedRouteDuration?: number;
-        toAmount?: number;
-        toAmountMin?: number;
-      }
-    : // Trading
-    T extends AnalyticsEvent.TradeOrderTypeSelected
-    ? {
-        type: TradeTypes;
-      }
-    : T extends AnalyticsEvent.TradePlaceOrder
-    ? HumanReadablePlaceOrderPayload & {
-        isClosePosition: boolean;
-      }
-    : T extends AnalyticsEvent.TradePlaceOrderConfirmed
-    ? {
-        /** roundtrip time between user placing an order and confirmation from indexer (client → validator → indexer → client) */
-        roundtripMs: number;
-        /** URL/IP of node the order was sent to */
-        validatorUrl: string;
-      }
-    : T extends AnalyticsEvent.TradeCancelOrder
-    ? {}
-    : T extends AnalyticsEvent.TradeCancelOrderConfirmed
-    ? {
-        /** roundtrip time between user canceling an order and confirmation from indexer (client → validator → indexer → client) */
-        roundtripMs: number;
-        /** URL/IP of node the order was sent to */
-        validatorUrl: string;
-      }
-    : // Notifcation
-    T extends AnalyticsEvent.NotificationAction
-    ? {
-        type: string;
-        id: string;
-      }
-    : T extends AnalyticsEvent.TransferNotification
-    ? {
-        type: TransferNotificationTypes | undefined;
-        toAmount: number | undefined;
-        timeSpent: Record<string, number> | number | undefined;
-        txHash: string;
-        status: 'new' | 'success' | 'error';
-        triggeredAt: number | undefined;
-      }
-    : never;
+      ? {
+          status: (typeof AbacusApiStatus)['name'];
+          /** Last time indexer node was queried successfully */
+          lastSuccessfulIndexerRpcQuery?: number;
+          /** Time elapsed since indexer node was queried successfully */
+          elapsedTime?: number;
+          blockHeight?: number;
+          indexerBlockHeight?: number;
+          trailingBlocks?: number;
+        }
+      : // Navigation
+        T extends AnalyticsEvent.NavigatePage
+        ? {
+            path: string;
+          }
+        : T extends AnalyticsEvent.NavigateDialog
+          ? {
+              type: DialogTypes;
+            }
+          : T extends AnalyticsEvent.NavigateDialogClose
+            ? {
+                type: DialogTypes;
+              }
+            : T extends AnalyticsEvent.NavigateExternal
+              ? {
+                  link: string;
+                }
+              : // Wallet
+                T extends AnalyticsEvent.ConnectWallet
+                ? {
+                    walletType: WalletType;
+                    walletConnectionType: WalletConnectionType;
+                  }
+                : T extends AnalyticsEvent.DisconnectWallet
+                  ? {}
+                  : // Onboarding
+                    T extends AnalyticsEvent.OnboardingStepChanged
+                    ? {
+                        state: OnboardingState;
+                        step?: OnboardingSteps;
+                      }
+                    : T extends AnalyticsEvent.OnboardingAccountDerived
+                      ? {
+                          hasPreviousTransactions: boolean;
+                        }
+                      : // Transfers
+                        T extends AnalyticsEvent.TransferFaucet
+                        ? {}
+                        : T extends AnalyticsEvent.TransferFaucetConfirmed
+                          ? {
+                              /** roundtrip time between user placing an order and confirmation from indexer (client → validator → indexer → client) */
+                              roundtripMs: number;
+                              /** URL/IP of node the order was sent to */
+                              validatorUrl: string;
+                            }
+                          : T extends AnalyticsEvent.TransferDeposit
+                            ? {
+                                chainId?: string;
+                                tokenAddress?: string;
+                                tokenSymbol?: string;
+                                slippage?: number;
+                                gasFee?: number;
+                                bridgeFee?: number;
+                                exchangeRate?: number;
+                                estimatedRouteDuration?: number;
+                                toAmount?: number;
+                                toAmountMin?: number;
+                              }
+                            : T extends AnalyticsEvent.TransferWithdraw
+                              ? {
+                                  chainId?: string;
+                                  tokenAddress?: string;
+                                  tokenSymbol?: string;
+                                  slippage?: number;
+                                  gasFee?: number;
+                                  bridgeFee?: number;
+                                  exchangeRate?: number;
+                                  estimatedRouteDuration?: number;
+                                  toAmount?: number;
+                                  toAmountMin?: number;
+                                }
+                              : // Trading
+                                T extends AnalyticsEvent.TradeOrderTypeSelected
+                                ? {
+                                    type: TradeTypes;
+                                  }
+                                : T extends AnalyticsEvent.TradePlaceOrder
+                                  ? HumanReadablePlaceOrderPayload & {
+                                      isClosePosition: boolean;
+                                    }
+                                  : T extends AnalyticsEvent.TradePlaceOrderConfirmed
+                                    ? {
+                                        /** roundtrip time between user placing an order and confirmation from indexer (client → validator → indexer → client) */
+                                        roundtripMs: number;
+                                        /** URL/IP of node the order was sent to */
+                                        validatorUrl: string;
+                                      }
+                                    : T extends AnalyticsEvent.TradeCancelOrder
+                                      ? {}
+                                      : T extends AnalyticsEvent.TradeCancelOrderConfirmed
+                                        ? {
+                                            /** roundtrip time between user canceling an order and confirmation from indexer (client → validator → indexer → client) */
+                                            roundtripMs: number;
+                                            /** URL/IP of node the order was sent to */
+                                            validatorUrl: string;
+                                          }
+                                        : // Notifcation
+                                          T extends AnalyticsEvent.NotificationAction
+                                          ? {
+                                              type: string;
+                                              id: string;
+                                            }
+                                          : T extends AnalyticsEvent.TransferNotification
+                                            ? {
+                                                type: TransferNotificationTypes | undefined;
+                                                toAmount: number | undefined;
+                                                timeSpent:
+                                                  | Record<string, number>
+                                                  | number
+                                                  | undefined;
+                                                txHash: string;
+                                                status: 'new' | 'success' | 'error';
+                                                triggeredAt: number | undefined;
+                                              }
+                                            : never;
 
 export const DEFAULT_TRANSACTION_MEMO = 'dYdX Frontend (web)';
 export const lastSuccessfulRestRequestByOrigin: Record<URL['origin'], number> = {};

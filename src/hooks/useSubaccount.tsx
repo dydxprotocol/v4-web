@@ -11,7 +11,7 @@ import {
   type LocalWallet,
 } from '@dydxprotocol/v4-client-js';
 import Long from 'long';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import { parseUnits } from 'viem';
 
 import type {
@@ -38,6 +38,7 @@ import {
   setSubaccount,
 } from '@/state/account';
 import { getBalances } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 import { isTruthy } from '@/lib/isTruthy';
@@ -64,7 +65,7 @@ export const SubaccountProvider = ({ ...props }) => {
 export const useSubaccount = () => useContext(SubaccountContext);
 
 const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWallet }) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { usdcDenom, usdcDecimals, chainTokenDecimals } = useTokenConfigs();
   const { compositeClient, faucetClient } = useDydxClient();
 
@@ -275,7 +276,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [localDydxWallet, depositToSubaccount]
   );
 
-  const balances = useSelector(getBalances, shallowEqual);
+  const balances = useAppSelector(getBalances, shallowEqual);
   const usdcCoinBalance = balances?.[usdcDenom];
 
   useEffect(() => {

@@ -181,7 +181,7 @@ const $Root = styled(Root)<{ $side: 'top' | 'bottom'; $withInnerBorder?: boolean
         --stickyArea0-bottomHeight: var(--tabs-currentHeight);
         ${layoutMixins.expandingColumnWithFooter}
       `,
-    }[$side])}
+    })[$side]}
 
   ${({ $withInnerBorder }) =>
     $withInnerBorder &&
@@ -206,7 +206,7 @@ const $Header = styled.header<{ $side: 'top' | 'bottom' }>`
         ${layoutMixins.stickyFooter}
         grid-row: 2;
       `,
-    }[$side])}
+    })[$side]}
 
   ${layoutMixins.row}
   justify-content: space-between;

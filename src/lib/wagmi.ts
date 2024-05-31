@@ -234,8 +234,8 @@ export const resolveWagmiConnector = ({
   return walletConnection.type === WalletConnectionType.InjectedEip1193 && walletConnection.provider
     ? createInjectedConnectorWithProvider(walletConnection.provider)
     : walletConnection.type === WalletConnectionType.WalletConnect2 && walletConfig.walletconnect2Id
-    ? createWalletConnect2ConnectorWithId(walletConfig.walletconnect2Id, walletConnectConfig)
-    : getConnectors(walletConnectConfig).find(
-        ({ id }: { id: string }) => id === walletConnectionConfig.wagmiConnectorId
-      );
+      ? createWalletConnect2ConnectorWithId(walletConfig.walletconnect2Id, walletConnectConfig)
+      : getConnectors(walletConnectConfig).find(
+          ({ id }: { id: string }) => id === walletConnectionConfig.wagmiConnectorId
+        );
 };

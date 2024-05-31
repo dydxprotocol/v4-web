@@ -373,7 +373,7 @@ const $Container = styled(Content)<{
         top: 0;
         bottom: 0;
       `,
-    }[placement])}
+    })[placement]}
 
   ${({ $stacked }) =>
     $stacked &&

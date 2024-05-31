@@ -95,7 +95,7 @@ const $DiffOutput = styled.div<{ layout: 'row' | 'column'; withDiff?: boolean }>
       column: `
         ${layoutMixins.column}
       `,
-    }[layout])}
+    })[layout]}
 
   ${({ withDiff }) =>
     withDiff &&

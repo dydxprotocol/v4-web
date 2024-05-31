@@ -1,8 +1,7 @@
-import { useSelector } from 'react-redux';
-
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 interface EnvironmentConfig {
   name: string;
@@ -17,6 +16,6 @@ interface EnvironmentConfig {
 export type EnvironmentConfigKey = keyof EnvironmentConfig;
 
 export const useEnvConfig = (configKey: EnvironmentConfigKey): string => {
-  const selectedNetwork = useSelector(getSelectedNetwork);
+  const selectedNetwork = useAppSelector(getSelectedNetwork);
   return ENVIRONMENT_CONFIG_MAP[selectedNetwork][configKey];
 };

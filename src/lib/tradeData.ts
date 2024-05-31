@@ -36,14 +36,14 @@ export const hasPositionSideChanged = ({
   const currentPositionSide = currentSizeBN.gt(0)
     ? PositionSide.Long
     : currentSizeBN.lt(0)
-    ? PositionSide.Short
-    : PositionSide.None;
+      ? PositionSide.Short
+      : PositionSide.None;
 
   const newPositionSide = postOrderSizeBN.gt(0)
     ? PositionSide.Long
     : postOrderSizeBN.lt(0)
-    ? PositionSide.Short
-    : PositionSide.None;
+      ? PositionSide.Short
+      : PositionSide.None;
 
   return {
     currentPositionSide,

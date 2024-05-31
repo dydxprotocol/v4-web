@@ -14,7 +14,6 @@ import {
   type ProposalStatus,
 } from '@dydxprotocol/v4-client-js';
 import type { ResolutionString } from 'public/tradingview/charting_library';
-import { useSelector } from 'react-redux';
 
 import type { ConnectNetworkEvent, NetworkConfig } from '@/constants/abacus';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
@@ -22,6 +21,7 @@ import { RESOLUTION_MAP, type Candle } from '@/constants/candles';
 import { LocalStorageKey } from '@/constants/localStorage';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
@@ -44,7 +44,7 @@ export const useDydxClient = () => useContext(DydxContext);
 const useDydxClientContext = () => {
   // ------ Network ------ //
 
-  const selectedNetwork = useSelector(getSelectedNetwork);
+  const selectedNetwork = useAppSelector(getSelectedNetwork);
   const { usdcDenom, usdcDecimals, usdcGasDenom, chainTokenDenom, chainTokenDecimals } =
     useTokenConfigs();
 
@@ -181,9 +181,8 @@ const useDydxClientContext = () => {
   const requestAllGovernanceProposals = useCallback(
     async (proposalStatus?: ProposalStatus) => {
       try {
-        const allGovProposals = await compositeClient?.validatorClient.get.getAllGovProposals(
-          proposalStatus
-        );
+        const allGovProposals =
+          await compositeClient?.validatorClient.get.getAllGovProposals(proposalStatus);
 
         return allGovProposals;
       } catch (error) {

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 
 import { MARKET_FILTER_LABELS, MarketFilters, type MarketData } from '@/constants/markets';
 
@@ -9,6 +9,7 @@ import {
   usePerpetualMarketSparklines,
 } from '@/hooks/usePerpetualMarketSparklines';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
@@ -51,8 +52,8 @@ export const useMarketsData = (
   filteredMarkets: MarketData[];
   marketFilters: string[];
 } => {
-  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
-  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
+  const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
   const sevenDaysSparklineData = usePerpetualMarketSparklines();
 
   const markets = useMemo(() => {

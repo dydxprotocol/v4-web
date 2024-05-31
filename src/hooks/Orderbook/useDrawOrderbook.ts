@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 
 import type { PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { SMALL_USD_DECIMALS, TOKEN_DECIMALS } from '@/constants/numbers';
@@ -14,6 +14,7 @@ import {
 
 import { useAppThemeAndColorModeContext } from '@/hooks/useAppThemeAndColorMode';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketConfig, getCurrentMarketOrderbookMap } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -50,9 +51,9 @@ export const useDrawOrderbook = ({
 }: ElementProps & StyleProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvas = canvasRef.current;
-  const currentOrderbookMap = useSelector(getCurrentMarketOrderbookMap, shallowEqual);
+  const currentOrderbookMap = useAppSelector(getCurrentMarketOrderbookMap, shallowEqual);
   const { stepSizeDecimals = TOKEN_DECIMALS, tickSizeDecimals = SMALL_USD_DECIMALS } =
-    useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+    useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
   const prevData = useRef<typeof data>(data);
   const theme = useAppThemeAndColorModeContext();
 

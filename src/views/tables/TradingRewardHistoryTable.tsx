@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { HistoricalTradingReward, HistoricalTradingRewardsPeriods } from '@/constants/abacus';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -19,6 +19,7 @@ import { TableCell } from '@/components/Table/TableCell';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getHistoricalTradingRewardsForPeriod } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 export enum TradingRewardHistoryTableColumnKey {
   Event = 'Event',
@@ -101,12 +102,12 @@ export const TradingRewardHistoryTable = ({
   withInnerBorders = true,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const canViewAccount = useSelector(calculateCanViewAccount);
+  const canViewAccount = useAppSelector(calculateCanViewAccount);
   const { chainTokenLabel } = useTokenConfigs();
 
-  const periodTradingRewards = useSelector(
-    getHistoricalTradingRewardsForPeriod(period.name),
-    shallowEqual
+  const periodTradingRewards = useParameterizedSelector(
+    getHistoricalTradingRewardsForPeriod,
+    period.name
   );
 
   const rewardsData = useMemo(

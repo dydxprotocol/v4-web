@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -30,6 +30,7 @@ import { FundingPaymentsTable } from '@/views/tables/FundingPaymentsTable';
 import { TransferHistoryTable } from '@/views/tables/TransferHistoryTable';
 
 import { getOnboardingState, getSubaccount, getTradeInfoNumbers } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { shortenNumberForDisplay } from '@/lib/numbers';
@@ -42,22 +43,26 @@ const Positions = lazy(() =>
 );
 const Orders = lazy(() => import('./Orders').then((module) => ({ default: module.Orders })));
 const Fees = lazy(() => import('./Fees').then((module) => ({ default: module.Fees })));
+const EquityTiers = lazy(() =>
+  import('./EquityTiers').then((module) => ({ default: module.EquityTiers }))
+);
+
 const History = lazy(() => import('./History').then((module) => ({ default: module.History })));
 
 const PortfolioPage = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
 
   const initialPageSize = 20;
 
-  const onboardingState = useSelector(getOnboardingState);
-  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) ?? {};
+  const onboardingState = useAppSelector(getOnboardingState);
+  const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
   const { nativeTokenBalance } = useAccountBalance();
 
   const { numTotalPositions, numTotalOpenOrders } =
-    useSelector(getTradeInfoNumbers, shallowEqual) ?? {};
+    useAppSelector(getTradeInfoNumbers, shallowEqual) ?? {};
   const numPositions = shortenNumberForDisplay(numTotalPositions);
   const numOrders = shortenNumberForDisplay(numTotalOpenOrders);
 
@@ -72,6 +77,7 @@ const PortfolioPage = () => {
         <Route path={PortfolioRoute.Positions} element={<Positions />} />
         <Route path={PortfolioRoute.Orders} element={<Orders />} />
         <Route path={PortfolioRoute.Fees} element={<Fees />} />
+        <Route path={PortfolioRoute.EquityTiers} element={<EquityTiers />} />
         <Route path={PortfolioRoute.History} element={<History />}>
           <Route index path="*" element={<Navigate to={HistoryRoute.Trades} />} />
           <Route
@@ -194,6 +200,16 @@ const PortfolioPage = () => {
                       ),
                       label: stringGetter({ key: STRING_KEYS.FEES }),
                       href: PortfolioRoute.Fees,
+                    },
+                    {
+                      value: PortfolioRoute.EquityTiers,
+                      slotBefore: (
+                        <$IconContainer>
+                          <Icon iconName={IconName.List} />
+                        </$IconContainer>
+                      ),
+                      label: stringGetter({ key: STRING_KEYS.EQUITY_TIERS }),
+                      href: PortfolioRoute.EquityTiers,
                     },
                     {
                       value: PortfolioRoute.History,

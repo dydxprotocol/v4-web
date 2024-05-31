@@ -1,4 +1,4 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TransferType } from '@/constants/abacus';
@@ -14,6 +14,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -33,13 +34,16 @@ export type TokenInfo = {
   name: string;
 };
 
-const cctpTokensByChainId = cctpTokens.reduce((acc, token) => {
-  if (!acc[token.chainId]) {
-    acc[token.chainId] = [];
-  }
-  acc[token.chainId].push(token);
-  return acc;
-}, {} as Record<string, TokenInfo[]>);
+const cctpTokensByChainId = cctpTokens.reduce(
+  (acc, token) => {
+    if (!acc[token.chainId]) {
+      acc[token.chainId] = [];
+    }
+    acc[token.chainId].push(token);
+    return acc;
+  },
+  {} as Record<string, TokenInfo[]>
+);
 
 export const SourceSelectMenu = ({
   label,
@@ -52,7 +56,7 @@ export const SourceSelectMenu = ({
 
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions } =
-    useSelector(getTransferInputs, shallowEqual) ?? {};
+    useAppSelector(getTransferInputs, shallowEqual) ?? {};
   const chains =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.chains?.toArray() ??
     EMPTY_ARR;

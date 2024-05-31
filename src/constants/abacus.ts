@@ -87,6 +87,8 @@ export type MarketHistoricalFunding = Abacus.exchange.dydx.abacus.output.MarketH
 export type Configs = Abacus.exchange.dydx.abacus.output.Configs;
 export type FeeDiscount = Abacus.exchange.dydx.abacus.output.FeeDiscount;
 export type FeeTier = Abacus.exchange.dydx.abacus.output.FeeTier;
+export type EquityTiers = Abacus.exchange.dydx.abacus.output.EquityTiers;
+export type EquityTier = Abacus.exchange.dydx.abacus.output.EquityTier;
 export type NetworkConfigs = Abacus.exchange.dydx.abacus.output.NetworkConfigs;
 
 // ------ Assets ------ //
@@ -213,9 +215,8 @@ export type Compliance = Abacus.exchange.dydx.abacus.output.Compliance;
 export const ApiData = Abacus.exchange.dydx.abacus.state.manager.ApiData;
 
 // ------ Enum Conversions ------ //
-type IfEquals<X, Y, A, B> = (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2
-  ? A
-  : B;
+type IfEquals<X, Y, A, B> =
+  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? A : B;
 
 type ReadonlyKeysOf<T> = {
   [K in keyof T]: IfEquals<{ [_ in K]: T[K] }, { readonly [_ in K]: T[K] }, K, never>;

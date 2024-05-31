@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { curveLinear } from '@visx/curve';
 import { TooltipContextType } from '@visx/xychart';
 import { debounce } from 'lodash';
-import { shallowEqual, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
@@ -18,6 +17,7 @@ import { timeUnits } from '@/constants/time';
 
 import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useNow } from '@/hooks/useNow';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -32,6 +32,7 @@ import {
   getHistoricalTradingRewardsForPeriod,
   getTotalTradingRewards,
 } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 import { formatRelativeTime } from '@/lib/dateTime';
@@ -76,11 +77,11 @@ export const TradingRewardsChart = ({
     TradingRewardsPeriod.PeriodAllTime
   );
 
-  const canViewAccount = useSelector(calculateCanViewAccount);
-  const totalTradingRewards = useSelector(getTotalTradingRewards);
-  const periodTradingRewards = useSelector(
-    getHistoricalTradingRewardsForPeriod(SELECTED_PERIOD.name),
-    shallowEqual
+  const canViewAccount = useAppSelector(calculateCanViewAccount);
+  const totalTradingRewards = useAppSelector(getTotalTradingRewards);
+  const periodTradingRewards = useParameterizedSelector(
+    getHistoricalTradingRewardsForPeriod,
+    SELECTED_PERIOD.name
   );
 
   useEffect(() => {
@@ -131,7 +132,7 @@ export const TradingRewardsChart = ({
                 ({
                   date: new Date(datum.endedAtInMilliseconds).valueOf(),
                   cumulativeAmount: datum.cumulativeAmount,
-                } as TradingRewardsDatum)
+                }) as TradingRewardsDatum
             )
         : [],
     [periodTradingRewards, canViewAccount]

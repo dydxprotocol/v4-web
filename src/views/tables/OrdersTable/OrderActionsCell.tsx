@@ -2,7 +2,6 @@ import { useCallback, useState } from 'react';
 
 import { type Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderFlags } from '@dydxprotocol/v4-client-js';
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { AbacusOrderStatus, type OrderStatus } from '@/constants/abacus';
@@ -15,6 +14,7 @@ import { IconButton } from '@/components/IconButton';
 import { ActionsTableCell } from '@/components/Table/ActionsTableCell';
 
 import { clearOrder } from '@/state/account';
+import { useAppDispatch } from '@/state/appTypes';
 
 import { isOrderStatusClearable } from '@/lib/orders';
 
@@ -26,7 +26,7 @@ type ElementProps = {
 };
 
 export const OrderActionsCell = ({ orderId, orderFlags, status, isDisabled }: ElementProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [isCanceling, setIsCanceling] = useState(false);
 
