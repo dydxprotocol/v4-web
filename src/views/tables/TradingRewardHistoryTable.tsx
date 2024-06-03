@@ -3,7 +3,11 @@ import { useCallback, useMemo } from 'react';
 import { kollections } from '@dydxprotocol/v4-abacus';
 import styled from 'styled-components';
 
-import { HistoricalTradingReward, HistoricalTradingRewardsPeriods } from '@/constants/abacus';
+import {
+  HistoricalTradingReward,
+  HistoricalTradingRewardsPeriods,
+  Nullable,
+} from '@/constants/abacus';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -108,10 +112,8 @@ export const TradingRewardHistoryTable = ({
   const { isNotTablet } = useBreakpoints();
   const { chainTokenLabel } = useTokenConfigs();
 
-  const periodTradingRewards: kollections.List<HistoricalTradingReward> = useParameterizedSelector(
-    getHistoricalTradingRewardsForPeriod,
-    period.name
-  );
+  const periodTradingRewards: Nullable<kollections.List<HistoricalTradingReward>> =
+    useParameterizedSelector(getHistoricalTradingRewardsForPeriod, period.name);
 
   const rewardsData = useMemo(() => {
     return periodTradingRewards && canViewAccount ? periodTradingRewards.toArray() : [];

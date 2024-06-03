@@ -6,7 +6,11 @@ import { TooltipContextType } from '@visx/xychart';
 import { debounce } from 'lodash';
 import styled from 'styled-components';
 
-import { HistoricalTradingReward, HistoricalTradingRewardsPeriod } from '@/constants/abacus';
+import {
+  HistoricalTradingReward,
+  HistoricalTradingRewardsPeriod,
+  Nullable,
+} from '@/constants/abacus';
 import {
   TradingRewardsPeriod,
   tradingRewardsPeriods,
@@ -84,10 +88,8 @@ export const TradingRewardsChart = ({
 
   const canViewAccount = useAppSelector(calculateCanViewAccount);
   const totalTradingRewards = useAppSelector(getTotalTradingRewards);
-  const periodTradingRewards: kollections.List<HistoricalTradingReward> = useParameterizedSelector(
-    getHistoricalTradingRewardsForPeriod,
-    SELECTED_PERIOD.name
-  );
+  const periodTradingRewards: Nullable<kollections.List<HistoricalTradingReward>> =
+    useParameterizedSelector(getHistoricalTradingRewardsForPeriod, SELECTED_PERIOD.name);
 
   useEffect(() => {
     // Initialize daily data for rewards chart
