@@ -88,7 +88,7 @@ export const AdjustIsolatedMarginForm = ({
         field: AdjustIsolatedMarginInputField.ChildSubaccountNumber,
       });
     };
-  }, []);
+  }, [childSubaccountNumber]);
 
   const setAmount = ({ floatValue }: NumberFormatValues) => {
     abacusStateManager.setAdjustIsolatedMarginValue({
@@ -216,7 +216,7 @@ export const AdjustIsolatedMarginForm = ({
   const formConfig =
     isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Add
       ? {
-          formLabel: stringGetter({ key: STRING_KEYS.ADDING }),
+          formLabel: stringGetter({ key: STRING_KEYS.AMOUNT_TO_ADD }),
           buttonLabel: stringGetter({ key: STRING_KEYS.ADD_MARGIN }),
           inputReceiptItems: [
             {
@@ -244,7 +244,7 @@ export const AdjustIsolatedMarginForm = ({
           ],
         }
       : {
-          formLabel: stringGetter({ key: STRING_KEYS.REMOVING }),
+          formLabel: stringGetter({ key: STRING_KEYS.AMOUNT_TO_REMOVE }),
           buttonLabel: stringGetter({ key: STRING_KEYS.REMOVE_MARGIN }),
           inputReceiptItems: [
             {
@@ -273,6 +273,10 @@ export const AdjustIsolatedMarginForm = ({
         };
 
   const gradientToColor = useMemo(() => {
+    if (MustBigNumber(amount).isZero()) {
+      return 'neutral';
+    }
+
     if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Add) {
       return 'positive';
     }
@@ -282,7 +286,7 @@ export const AdjustIsolatedMarginForm = ({
     }
 
     return 'neutral';
-  }, [isolatedMarginAdjustmentType]);
+  }, [amount, isolatedMarginAdjustmentType]);
 
   const CenterElement = errorMessage ? (
     <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>
@@ -329,24 +333,26 @@ export const AdjustIsolatedMarginForm = ({
         ]}
       />
 
-      <$ToggleGroup
-        items={Object.entries(SIZE_PERCENT_OPTIONS).map(([key, value]) => ({
-          label: key,
-          value: value.toString(),
-        }))}
-        value={MustBigNumber(amountPercent).toFixed(PERCENT_DECIMALS)}
-        onValueChange={setPercent}
-        shape={ButtonShape.Rectangle}
-      />
-
-      <WithDetailsReceipt side="bottom" detailItems={formConfig.inputReceiptItems}>
-        <FormInput
-          type={InputType.Currency}
-          label={formConfig.formLabel}
-          value={amount}
-          onChange={setAmount}
+      <$RelatedInputsGroup>
+        <$ToggleGroup
+          items={Object.entries(SIZE_PERCENT_OPTIONS).map(([key, value]) => ({
+            label: key,
+            value: value.toString(),
+          }))}
+          value={MustBigNumber(amountPercent).toFixed(PERCENT_DECIMALS)}
+          onValueChange={setPercent}
+          shape={ButtonShape.Rectangle}
         />
-      </WithDetailsReceipt>
+
+        <WithDetailsReceipt side="bottom" detailItems={formConfig.inputReceiptItems}>
+          <FormInput
+            type={InputType.Currency}
+            label={formConfig.formLabel}
+            value={amount}
+            onChange={setAmount}
+          />
+        </WithDetailsReceipt>
+      </$RelatedInputsGroup>
 
       {CenterElement}
 
@@ -366,6 +372,11 @@ export const AdjustIsolatedMarginForm = ({
 
 const $Form = styled.form`
   ${formMixins.transfersForm}
+`;
+
+const $RelatedInputsGroup = styled.div`
+  ${layoutMixins.flexColumn}
+  gap: 0.56rem;
 `;
 const $ToggleGroup = styled(ToggleGroup)`
   ${formMixins.inputToggleGroup}
