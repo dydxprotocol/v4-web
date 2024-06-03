@@ -57,10 +57,10 @@ const RewardsPage = () => {
       />
       <$DetachedSection>
         {showGeoblockedPanel && <GeoblockedPanel /> /* or claim rewards panel */}
+        {enableStaking ? <StakingPanel /> : <DYDXBalancePanel />}
         {/* List of unstaking panels */}
         {tradingRewardsRehaulEnabled && <TradingRewardsChartPanel />}
         <LaunchIncentivesPanel />
-        {enableStaking ? <StakingPanel /> : <DYDXBalancePanel />}
         {!tradingRewardsRehaulEnabled && <TradingRewardsSummaryPanel />}
         {tradingRewardsRehaulEnabled && <NewMarketsPanel />}
         {tradingRewardsRehaulEnabled && <GovernancePanel />}
