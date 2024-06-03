@@ -1,3 +1,5 @@
+import React from 'react';
+
 import styled, { css } from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
@@ -60,7 +62,7 @@ export const RewardsNavPanel = ({
       <$Description>
         {description}
         {learnMore && (
-          <$Link href={learnMore} onClick={(e: MouseEvent) => e.stopPropagation()}>
+          <$Link href={learnMore} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
             {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
           </$Link>
         )}
