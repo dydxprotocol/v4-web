@@ -1,6 +1,5 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { sum } from 'lodash';
-import { createSelector } from 'reselect';
 
 import {
   AbacusOrderSide,
@@ -445,7 +444,7 @@ const getUnseenFillsCountPerMarket = (state: RootState) => state.account.unseenF
  * @param state
  * @returns get unseen fills count for current market
  */
-const getUnseenFillsCountForMarket = createSelector(
+const getUnseenFillsCountForMarket = createAppSelector(
   [getUnseenFillsCountPerMarket, getCurrentMarketId],
   (unseenFillsCountPerMarket, marketId) => (marketId ? unseenFillsCountPerMarket[marketId] ?? 0 : 0)
 );
@@ -454,7 +453,7 @@ const getUnseenFillsCountForMarket = createSelector(
  * @param state
  * @returns get unseen fills count for current market
  */
-const getAllUnseenFillsCount = createSelector(
+const getAllUnseenFillsCount = createAppSelector(
   [getUnseenFillsCountPerMarket],
   (unseenFillsCountPerMarket) => sum(Object.values(unseenFillsCountPerMarket))
 );
