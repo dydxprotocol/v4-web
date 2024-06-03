@@ -46,9 +46,9 @@ const $RewardHistoryContainer = styled.div`
 `;
 
 const $Header = styled.div`
-  @media ${breakpoints.notTablet} {
-    margin-bottom: -0.5rem;
-  }
+  // @media ${breakpoints.notTablet} {
+  //   margin-bottom: -0.5rem;
+  // } xcxc
 `;
 
 const $Title = styled.div`
@@ -58,6 +58,7 @@ const $Title = styled.div`
 
 const $TradingRewardHistoryTable = styled(TradingRewardHistoryTable)`
   --computed-radius: 0.875rem;
+  margin: 1rem 0;
 `;
 
 const $Output = styled(Output)`
