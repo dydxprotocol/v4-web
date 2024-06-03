@@ -156,7 +156,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
 
   const currentBreakpoints = useBreakpoints();
   const shownColumns = columns.filter(
-    ({ hideOnBreakpoint }) => !hideOnBreakpoint || !currentBreakpoints[hideOnBreakpoint as string]
+    ({ hideOnBreakpoint }) => !hideOnBreakpoint || !currentBreakpoints[hideOnBreakpoint]
   );
 
   const collator = useCollator();

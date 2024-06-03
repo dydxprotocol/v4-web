@@ -24,6 +24,7 @@ import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
 import { TableCell } from '@/components/Table/TableCell';
 import { WithHovercard } from '@/components/WithHovercard';
+import { WithTooltip } from '@/components/WithTooltip';
 
 import { openDialog } from '@/state/dialogs';
 
@@ -206,12 +207,16 @@ export const PositionsTriggersCell = ({
       slotRight={
         !isDisabled &&
         complianceState === ComplianceStates.FULL_ACCESS && (
-          <$EditButton
-            key="edit-margin"
-            iconName={IconName.Pencil}
-            shape={ButtonShape.Square}
-            onClick={openTriggersDialog}
-          />
+          <WithTooltip
+            tooltipString={stringGetter({ key: STRING_KEYS.EDIT_TAKE_PROFIT_STOP_LOSS_TRIGGERS })}
+          >
+            <$EditButton
+              key="edit-margin"
+              iconName={IconName.Pencil}
+              shape={ButtonShape.Square}
+              onClick={openTriggersDialog}
+            />
+          </WithTooltip>
         )
       }
     >

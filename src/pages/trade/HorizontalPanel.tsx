@@ -67,7 +67,7 @@ type ElementProps = {
 export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
   const navigate = useNavigate();
-  const { isTablet } = useBreakpoints();
+  const { isTablet, isDesktopSmall } = useBreakpoints();
 
   const allMarkets = useSelector(getDefaultToAllMarketsInPositionsOrdersFills);
   const [view, setView] = useState<PanelView>(
@@ -147,7 +147,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     PositionsTableColumnKey.Size,
                     PositionsTableColumnKey.Margin,
                     PositionsTableColumnKey.UnrealizedPnl,
-                    PositionsTableColumnKey.RealizedPnl,
+                    !isDesktopSmall && PositionsTableColumnKey.RealizedPnl,
                     PositionsTableColumnKey.NetFunding,
                     PositionsTableColumnKey.AverageOpenAndClose,
                     PositionsTableColumnKey.LiquidationAndOraclePrice,
@@ -260,6 +260,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
       viewIsolated,
       showCurrentMarket,
       isTablet,
+      isDesktopSmall,
       isWaitingForOrderToIndex,
       isAccountViewOnly,
       ordersTagNumber,
