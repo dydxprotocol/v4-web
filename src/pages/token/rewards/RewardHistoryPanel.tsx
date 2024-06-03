@@ -17,9 +17,7 @@ export const RewardHistoryPanel = () => {
 
   return (
     <$RewardHistoryContainer>
-      <$Header>
-        <$Title>{stringGetter({ key: STRING_KEYS.TRADING_REWARD_HISTORY })}</$Title>
-      </$Header>
+      <$Title>{stringGetter({ key: STRING_KEYS.TRADING_REWARD_HISTORY })}</$Title>
       <$TradingRewardHistoryTable period={HistoricalTradingRewardsPeriod.DAILY} />
       <$Description>
         {stringGetter({
@@ -42,13 +40,7 @@ export const RewardHistoryPanel = () => {
 const $RewardHistoryContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: var(--gap);
-`;
-
-const $Header = styled.div`
-  // @media ${breakpoints.notTablet} {
-  //   margin-bottom: -0.5rem;
-  // } xcxc
+  gap: 1rem;
 `;
 
 const $Title = styled.div`
@@ -58,7 +50,6 @@ const $Title = styled.div`
 
 const $TradingRewardHistoryTable = styled(TradingRewardHistoryTable)`
   --computed-radius: 0.875rem;
-  margin: 1rem 0;
 `;
 
 const $Output = styled(Output)`
