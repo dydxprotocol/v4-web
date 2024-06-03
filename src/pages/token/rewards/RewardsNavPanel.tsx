@@ -58,14 +58,12 @@ export const RewardsNavPanel = ({
       onClick={onNav}
     >
       <$Description>
-        <>
           {description}
           {learnMore && (
-            <$Link href={learnMore} onClick={(e) => e.stopPropagation()}>
+            <$Link href={learnMore} onClick={(e: MouseEvent) => e.stopPropagation()}>
               {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
             </$Link>
           )}
-        </>
       </$Description>
     </Panel>
   );
@@ -111,5 +109,7 @@ const $Link = styled(Link)`
 
   ::before {
     content: ' ';
+    display: inline-block;
+    white-space: pre-wrap;
   }
 `;
