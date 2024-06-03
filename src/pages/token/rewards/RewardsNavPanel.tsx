@@ -58,12 +58,12 @@ export const RewardsNavPanel = ({
       onClick={onNav}
     >
       <$Description>
-          {description}
-          {learnMore && (
-            <$Link href={learnMore} onClick={(e: MouseEvent) => e.stopPropagation()}>
-              {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
-            </$Link>
-          )}
+        {description}
+        {learnMore && (
+          <$Link href={learnMore} onClick={(e: MouseEvent) => e.stopPropagation()}>
+            {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
+          </$Link>
+        )}
       </$Description>
     </Panel>
   );
