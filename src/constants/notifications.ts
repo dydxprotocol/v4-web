@@ -185,6 +185,7 @@ export enum ReleaseUpdateNotificationIds {
   RevampedConditionalOrders = 'revamped-conditional-orders',
   IncentivesS5 = 'incentives-s5',
   IncentivesDistributedS3 = 'incentives-distributed-s3',
+  FOKDeprecation = 'fok-deprecation',
 }
 
 /**

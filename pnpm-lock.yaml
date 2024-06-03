@@ -30,14 +30,14 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.45.tgz
-    version: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.45.tgz
+    specifier: 1.7.49
+    version: 1.7.49
   '@dydxprotocol/v4-client-js':
     specifier: ^1.1.15
     version: 1.1.15
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.105
-    version: 1.1.105
+    specifier: ^1.1.108
+    version: 1.1.108
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -1370,6 +1370,13 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
+  /@dydxprotocol/v4-abacus@1.7.49:
+    resolution: {integrity: sha512-p0BhFn0nwhMD+w2ufUW0zymqqvXRs5GnXwt/iUxShb19HEH0E20jDN9ZwppZDy/uu7Z0WP9bzFf9XrMdSyn0ag==}
+    dependencies:
+      '@js-joda/core': 3.2.0
+      format-util: 1.0.5
+    dev: false
+
   /@dydxprotocol/v4-client-js@1.1.15:
     resolution: {integrity: sha512-ipHr11du9eMl4BojfXZqRrlWaaRm+GsYa6ERoFRQScgu4L5UVogcyfFlvYWtKxqQsBzWyRmxKG3rIfBqN3LalQ==}
     dependencies:
@@ -1399,8 +1406,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.105:
-    resolution: {integrity: sha512-8HrdmgRMm4t386/lqoHlxPOn7vXo7UGbtjZQP94o0KXUOmdb3D2MDfrupIxqT7YsWZEyG9fmH3TNaq/wATOg5g==}
+  /@dydxprotocol/v4-localization@1.1.108:
+    resolution: {integrity: sha512-nqVBnuYtKFgLpC4CdyoVXFDKHzTdxRIDT0HRZ3dS6rPu/LdTk/dvHa2QOfyUL/lNscz5GLBfdjPbwITSNjrHww==}
     dev: false
 
   /@dydxprotocol/v4-proto@5.0.0-dev.0:
@@ -19963,12 +19970,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
-
-  file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.45.tgz:
-    resolution: {integrity: sha512-TDis8tiD32PXqr7uZ1epKy3uJT2J9KB46li0lEWyahAZJw60+m9vTQaD1YJCBTusZIHKNpTC9LoCXLmoQGJDWA==, tarball: file:../v4-abacus/build/packages/dydxprotocol-v4-abacus-1.7.45.tgz}
-    name: '@dydxprotocol/v4-abacus'
-    version: 1.7.45
-    dependencies:
-      '@js-joda/core': 3.2.0
-      format-util: 1.0.5
-    dev: false
