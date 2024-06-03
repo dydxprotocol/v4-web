@@ -9,6 +9,7 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { BackButton } from '@/components/BackButton';
@@ -100,6 +101,10 @@ const $DetachedSection = styled(DetachedSection)`
   gap: 1.5rem;
   padding: 1rem;
   max-width: 80rem;
+
+  @media ${breakpoints.tablet} {
+    width: 100vw;
+  }
 `;
 
 const $DoubleColumnView = styled.div`
