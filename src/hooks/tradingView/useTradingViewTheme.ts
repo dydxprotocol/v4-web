@@ -1,10 +1,9 @@
 import { useEffect } from 'react';
 
-import { useSelector } from 'react-redux';
-
 import { THEME_NAMES } from '@/constants/styles/colors';
 import type { ChartLine, TvWidget } from '@/constants/tvchart';
 
+import { useAppSelector } from '@/state/appTypes';
 import { AppColorMode, AppTheme } from '@/state/configs';
 import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 
@@ -33,8 +32,8 @@ export const useTradingViewTheme = ({
   tvWidget: TvWidget | null;
   isWidgetReady?: boolean;
 }) => {
-  const appTheme: AppTheme = useSelector(getAppTheme);
-  const appColorMode: AppColorMode = useSelector(getAppColorMode);
+  const appTheme: AppTheme = useAppSelector(getAppTheme);
+  const appColorMode: AppColorMode = useAppSelector(getAppColorMode);
 
   useEffect(() => {
     if (tvWidget && isWidgetReady) {

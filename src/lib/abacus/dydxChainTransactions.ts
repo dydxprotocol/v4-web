@@ -36,9 +36,9 @@ import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { DydxChainId, isTestnet } from '@/constants/networks';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 
+import { type RootStore } from '@/state/_store';
 // TODO Fix cycle
 // eslint-disable-next-line import/no-cycle
-import { RootStore } from '@/state/_store';
 import { placeOrderTimeout } from '@/state/account';
 import { setInitializationError } from '@/state/app';
 

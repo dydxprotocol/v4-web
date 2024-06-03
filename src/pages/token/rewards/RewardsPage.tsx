@@ -21,6 +21,7 @@ import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { MigratePanel } from './MigratePanel';
 import { RewardHistoryPanel } from './RewardHistoryPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
+import { StakingPanel } from './StakingPanel';
 import { TradingRewardsChartPanel } from './TradingRewardsChartPanel';
 import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
 
@@ -28,6 +29,8 @@ const RewardsPage = () => {
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
   const navigate = useNavigate();
+
+  const showChartPanel = testFlags.tradingRewardsRehaul;
 
   return (
     <div>
@@ -38,22 +41,25 @@ const RewardsPage = () => {
         />
       )}
       <DetachedSection>
-        <$GridLayout showMigratePanel={import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet}>
+        <$GridLayout
+          showMigratePanel={import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet}
+          showChartPanel={showChartPanel}
+        >
           {import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && <$MigratePanel />}
 
           {isTablet ? (
             <$LaunchIncentivesPanel />
           ) : (
             <>
-              {testFlags.tradingRewardsRehaul && <$TradingRewardsChartPanel />}
+              {showChartPanel && <$TradingRewardsChartPanel />}
               <$LaunchIncentivesPanel />
-              <$DYDXBalancePanel />
+              {testFlags.enableStaking ? <$StakingPanel /> : <$DYDXBalancePanel />}
             </>
           )}
 
           <$TradingRewardsColumn>
             <TradingRewardsSummaryPanel />
-            {isTablet && testFlags.tradingRewardsRehaul && <TradingRewardsChartPanel />}
+            {isTablet && showChartPanel && <TradingRewardsChartPanel />}
             {isTablet && <RewardsHelpPanel />}
             <RewardHistoryPanel />
           </$TradingRewardsColumn>
@@ -71,7 +77,7 @@ const RewardsPage = () => {
 
 export default RewardsPage;
 
-const $GridLayout = styled.div<{ showMigratePanel?: boolean }>`
+const $GridLayout = styled.div<{ showMigratePanel?: boolean; showChartPanel?: boolean }>`
   --gap: 1.5rem;
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -82,9 +88,8 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean }>`
     gap: var(--gap);
   }
 
-  // xccx figure out migrate
-  ${({ showMigratePanel }) =>
-    showMigratePanel
+  ${({ showMigratePanel, showChartPanel }) =>
+    showMigratePanel && showChartPanel
       ? css`
           grid-template-areas:
             'migrate migrate'
@@ -93,12 +98,25 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean }>`
             'balance balance'
             'rewards other';
         `
-      : css`
-          grid-template-areas:
-            'chart chart'
-            'incentives balance'
-            'rewards other';
-        `}
+      : showMigratePanel
+        ? css`
+            grid-template-areas:
+              'migrate migrate'
+              'incentives balance'
+              'rewards other';
+          `
+        : showChartPanel
+          ? css`
+              grid-template-areas:
+                'chart chart'
+                'incentives balance'
+                'rewards other';
+            `
+          : css`
+              grid-template-areas:
+                'incentives balance'
+                'rewards other';
+            `}
 
   @media ${breakpoints.notTablet} {
     padding: 1rem;
@@ -113,6 +131,10 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean }>`
     grid-template-areas:
       'incentives'
       'rewards';
+
+    > :last-child {
+      margin-bottom: var(--gap);
+    }
   }
 `;
 
@@ -129,6 +151,10 @@ const $LaunchIncentivesPanel = styled(LaunchIncentivesPanel)`
 `;
 
 const $DYDXBalancePanel = styled(DYDXBalancePanel)`
+  grid-area: balance;
+`;
+
+const $StakingPanel = styled(StakingPanel)`
   grid-area: balance;
 `;
 

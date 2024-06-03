@@ -17,7 +17,7 @@ import type {
 import { Changes } from '@/constants/abacus';
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 
-import type { RootStore } from '@/state/_store';
+import { type RootStore } from '@/state/_store';
 import {
   setBalances,
   setChildSubaccount,
@@ -28,6 +28,7 @@ import {
   setLatestOrder,
   setRestrictionType,
   setStakingBalances,
+  setStakingDelegations,
   setSubaccount,
   setTradingRewards,
   setTransfers,
@@ -92,6 +93,9 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
             updatedState.account.stakingBalances.toArray().map(({ k, v }) => [k, v])
           );
           dispatch(setStakingBalances(stakingBalances));
+        }
+        if (updatedState.account?.stakingDelegations) {
+          dispatch(setStakingDelegations(updatedState.account.stakingDelegations.toArray()));
         }
       }
 

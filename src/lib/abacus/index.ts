@@ -39,7 +39,7 @@ import { DEFAULT_MARKETID } from '@/constants/markets';
 import { CURRENT_ABACUS_DEPLOYMENT, type DydxNetwork } from '@/constants/networks';
 import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
 
-import type { RootStore } from '@/state/_store';
+import { type RootStore } from '@/state/_store';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getInputTradeOptions, getTransferInputs } from '@/state/inputsSelectors';
 
@@ -130,7 +130,7 @@ class AbacusStateManager {
 
   attemptDisconnectAccount = () => {
     const state = this.store?.getState();
-    const { type: transferType } = (state && getTransferInputs(state)) || {};
+    const { type: transferType } = (state && getTransferInputs(state)) ?? {};
     // we don't want to disconnect the account if we switch network during the deposit form
     if (transferType?.rawValue !== TransferType.deposit.rawValue) {
       this.disconnectAccount();
@@ -142,7 +142,7 @@ class AbacusStateManager {
     const state = this.store?.getState();
 
     const { needsTriggerPrice, needsTrailingPercent, needsLeverage, needsLimitPrice } =
-      (state && getInputTradeOptions(state)) || {};
+      (state && getInputTradeOptions(state)) ?? {};
 
     if (needsTrailingPercent) {
       this.setTradeValue({ value: null, field: TradeInputField.trailingPercent });
@@ -186,6 +186,7 @@ class AbacusStateManager {
     this.setTransferValue({ value: null, field: TransferInputField.address });
     this.setTransferValue({ value: null, field: TransferInputField.size });
     this.setTransferValue({ value: null, field: TransferInputField.usdcSize });
+    this.setTransferValue({ value: null, field: TransferInputField.MEMO });
   };
 
   clearTriggerOrdersInputValues = () => {

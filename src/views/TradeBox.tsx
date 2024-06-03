@@ -1,4 +1,3 @@
-import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { TradeBoxDialogTypes } from '@/constants/dialogs';
@@ -12,6 +11,7 @@ import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { ClosePositionForm } from '@/views/forms/ClosePositionForm';
 import { SelectMarginModeForm } from '@/views/forms/SelectMarginModeForm';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialogInTradeBox, openDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 
@@ -20,10 +20,10 @@ import abacusStateManager from '@/lib/abacus';
 import { TradeBoxOrderView } from './TradeBoxOrderView';
 
 export const TradeBox = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
-  const activeDialog = useSelector(getActiveTradeBoxDialog);
+  const activeDialog = useAppSelector(getActiveTradeBoxDialog);
 
   const activeDialogConfig =
     activeDialog &&
