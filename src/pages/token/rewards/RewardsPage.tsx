@@ -21,6 +21,7 @@ import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { MigratePanel } from './MigratePanel';
 import { RewardHistoryPanel } from './RewardHistoryPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
+import { StakingPanel } from './StakingPanel';
 import { TradingRewardsChartPanel } from './TradingRewardsChartPanel';
 import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
 
@@ -52,7 +53,7 @@ const RewardsPage = () => {
             <>
               {showChartPanel && <$TradingRewardsChartPanel />}
               <$LaunchIncentivesPanel />
-              <$DYDXBalancePanel />
+              {testFlags.enableStaking ? <$StakingPanel /> : <$DYDXBalancePanel />}
             </>
           )}
 
@@ -150,6 +151,10 @@ const $LaunchIncentivesPanel = styled(LaunchIncentivesPanel)`
 `;
 
 const $DYDXBalancePanel = styled(DYDXBalancePanel)`
+  grid-area: balance;
+`;
+
+const $StakingPanel = styled(StakingPanel)`
   grid-area: balance;
 `;
 

@@ -1,6 +1,6 @@
 import { FormEvent, useMemo, useState } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import type { SubaccountPosition } from '@/constants/abacus';
@@ -23,6 +23,7 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
 import { getOpenPositionFromId, getSubaccount } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getMarketConfig } from '@/state/perpetualsSelectors';
 
 import { calculatePositionMargin } from '@/lib/tradeData';
@@ -47,9 +48,9 @@ const SIZE_PERCENT_OPTIONS = {
 export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
   const stringGetter = useStringGetter();
   const [marginAction, setMarginAction] = useState(MarginAction.ADD);
-  const subaccountPosition = useSelector(getOpenPositionFromId(marketId));
+  const subaccountPosition = useAppSelector(getOpenPositionFromId(marketId));
   const { adjustedMmf, leverage, liquidationPrice, notionalTotal } = subaccountPosition ?? {};
-  const marketConfig = useSelector(getMarketConfig(marketId));
+  const marketConfig = useAppSelector((s) => getMarketConfig(s, marketId));
   const { tickSizeDecimals } = marketConfig ?? {};
 
   /**
@@ -73,7 +74,7 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
     [adjustedMmf, notionalTotal, tickSizeDecimals]
   );
 
-  const { freeCollateral, marginUsage } = useSelector(getSubaccount, shallowEqual) ?? {};
+  const { freeCollateral, marginUsage } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
   const renderDiffOutput = ({
     type,

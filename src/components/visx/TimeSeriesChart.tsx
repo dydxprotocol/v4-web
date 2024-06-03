@@ -286,7 +286,7 @@ export const TimeSeriesChart = <Datum extends {}>({
                 return (
                   <XYChart margin={margin} width={width} height={height}>
                     <Grid
-                      numTicks={numGridLines !== undefined ? numGridLines : numTicksY}
+                      numTicks={numGridLines ?? numTicksY}
                       rows={withGridRows}
                       columns={withGridColumns}
                       lineStyle={{
@@ -353,7 +353,7 @@ export const TimeSeriesChart = <Datum extends {}>({
                           onPointerOut={childSeries?.onPointerOut}
                         />
 
-                        {(childSeries.glyphSize || childSeries.getGlyphSize) && (
+                        {(childSeries.glyphSize ?? childSeries.getGlyphSize) && (
                           <GlyphSeries
                             dataKey={`GlyphSeries-${childSeries.dataKey}`}
                             data={data}

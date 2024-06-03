@@ -2,7 +2,7 @@ import { Ref, useCallback, useState, type FormEvent } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { NumberFormatValues, SourceInfo } from 'react-number-format';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import {
@@ -54,6 +54,7 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithTooltip } from '@/components/WithTooltip';
 import { Orderbook } from '@/views/tables/Orderbook';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { setTradeFormInputs } from '@/state/inputs';
 import {
@@ -105,7 +106,7 @@ export const TradeForm = ({
   const [placeOrderError, setPlaceOrderError] = useState<string>();
   const [showOrderbook, setShowOrderbook] = useState(false);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { placeOrder } = useSubaccount();
   const { isTablet } = useBreakpoints();
@@ -128,22 +129,22 @@ export const TradeForm = ({
     tradeErrors,
   } = useTradeFormData();
 
-  const currentInput = useSelector(getCurrentInput);
-  const currentAssetId = useSelector(getCurrentMarketAssetId);
+  const currentInput = useAppSelector(getCurrentInput);
+  const currentAssetId = useAppSelector(getCurrentMarketAssetId);
   const { tickSizeDecimals, stepSizeDecimals } =
-    useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+    useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
 
-  const tradeFormInputValues = useSelector(getTradeFormInputs, shallowEqual);
+  const tradeFormInputValues = useAppSelector(getTradeFormInputs, shallowEqual);
   const { limitPriceInput, triggerPriceInput, trailingPercentInput } = tradeFormInputValues;
 
-  const currentTradeData = useSelector(getInputTradeData, shallowEqual);
+  const currentTradeData = useAppSelector(getInputTradeData, shallowEqual);
 
   const { side, type, marginMode, targetLeverage } = currentTradeData ?? {};
 
   const selectedTradeType = getSelectedTradeType(type);
   const selectedOrderSide = getSelectedOrderSide(side);
 
-  const { typeOptions } = useSelector(getInputTradeOptions, shallowEqual) ?? {};
+  const { typeOptions } = useAppSelector(getInputTradeOptions, shallowEqual) ?? {};
 
   const allTradeTypeItems = (typeOptions?.toArray() ?? []).map(
     ({ type: tradeTypeOptionType, stringKey }) => ({

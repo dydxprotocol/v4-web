@@ -176,9 +176,12 @@ const providers = [
 ];
 
 const App = () => {
-  return [...providers].reverse().reduce((children, Provider) => {
-    return <Provider>{children}</Provider>;
-  }, <Content />);
+  return [...providers].reverse().reduce(
+    (children, Provider) => {
+      return <Provider>{children}</Provider>;
+    },
+    <Content />
+  );
 };
 
 const $Content = styled.div<{ isShowingHeader: boolean; isShowingFooter: boolean }>`

@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { kollections } from '@dydxprotocol/v4-abacus';
 import { curveLinear } from '@visx/curve';
 import { TooltipContextType } from '@visx/xychart';
 import { debounce } from 'lodash';
-import { shallowEqual, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
+import { HistoricalTradingReward, HistoricalTradingRewardsPeriod } from '@/constants/abacus';
 import {
   TradingRewardsPeriod,
   tradingRewardsPeriods,
@@ -18,6 +18,7 @@ import { timeUnits } from '@/constants/time';
 
 import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useNow } from '@/hooks/useNow';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -32,6 +33,7 @@ import {
   getHistoricalTradingRewardsForPeriod,
   getTotalTradingRewards,
 } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 import { formatRelativeTime } from '@/lib/dateTime';
@@ -80,11 +82,11 @@ export const TradingRewardsChart = ({
   );
   const [defaultZoomDomain, setDefaultZoomDomain] = useState<number | undefined>(undefined);
 
-  const canViewAccount = useSelector(calculateCanViewAccount);
-  const totalTradingRewards = useSelector(getTotalTradingRewards);
-  const periodTradingRewards = useSelector(
-    getHistoricalTradingRewardsForPeriod(SELECTED_PERIOD.name),
-    shallowEqual
+  const canViewAccount = useAppSelector(calculateCanViewAccount);
+  const totalTradingRewards = useAppSelector(getTotalTradingRewards);
+  const periodTradingRewards: kollections.List<HistoricalTradingReward> = useParameterizedSelector(
+    getHistoricalTradingRewardsForPeriod,
+    SELECTED_PERIOD.name
   );
 
   useEffect(() => {

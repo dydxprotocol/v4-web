@@ -1,9 +1,9 @@
 import { DateTime } from 'luxon';
-import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -11,9 +11,9 @@ import { type DetailsItem } from '@/components/Details';
 import { DetailsDialog } from '@/components/DetailsDialog';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
-import { type FillTableRow } from '@/views/tables/FillsTable';
 
 import { getFillDetails } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -25,7 +25,7 @@ type ElementProps = {
 
 export const FillDetailsDialog = ({ fillId, setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const selectedLocale = useSelector(getSelectedLocale);
+  const selectedLocale = useAppSelector(getSelectedLocale);
 
   const {
     asset,
@@ -38,7 +38,7 @@ export const FillDetailsDialog = ({ fillId, setIsOpen }: ElementProps) => {
     size,
     stepSizeDecimals,
     tickSizeDecimals,
-  } = (useSelector(getFillDetails(fillId)) as FillTableRow) || {};
+  } = useParameterizedSelector(getFillDetails, fillId)! ?? {};
 
   const detailItems = [
     {
@@ -49,7 +49,7 @@ export const FillDetailsDialog = ({ fillId, setIsOpen }: ElementProps) => {
     {
       key: 'side',
       label: stringGetter({ key: STRING_KEYS.SIDE }),
-      value: <OrderSideTag orderSide={orderSide} />,
+      value: <OrderSideTag orderSide={orderSide!} />,
     },
     {
       key: 'liquidity',

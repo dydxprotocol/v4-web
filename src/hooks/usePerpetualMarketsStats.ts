@@ -2,8 +2,9 @@ import { useMemo } from 'react';
 
 import { getChainRevenue } from '@/services/numia';
 import { useQuery } from '@tanstack/react-query';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { wrapAndLogError } from '@/lib/asyncUtils';
@@ -14,7 +15,7 @@ const startDate = new Date();
 startDate.setDate(startDate.getDate() - 1);
 
 export const usePerpetualMarketsStats = () => {
-  const perpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
+  const perpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
 
   const markets = useMemo(
     () => Object.values(perpetualMarkets).filter(isPresent),
