@@ -1,4 +1,4 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { AbacusMarginMode, MARGIN_MODE_STRINGS, TradeInputField } from '@/constants/abacus';
@@ -10,6 +10,7 @@ import { formMixins } from '@/styles/formMixins';
 
 import { RadioButtonCards } from '@/components/RadioButtonCards';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getInputTradeMarginMode } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -19,7 +20,7 @@ export const SelectMarginModeForm = ({
 }: {
   onChangeMarginMode?: () => void;
 }) => {
-  const marginMode = useSelector(getInputTradeMarginMode, shallowEqual);
+  const marginMode = useAppSelector(getInputTradeMarginMode, shallowEqual);
   const marginModeValue = marginMode?.rawValue;
 
   const stringGetter = useStringGetter();

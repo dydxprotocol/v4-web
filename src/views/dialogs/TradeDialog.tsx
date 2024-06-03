@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { MARGIN_MODE_STRINGS } from '@/constants/abacus';
@@ -23,6 +23,7 @@ import { Ring } from '@/components/Ring';
 import { WithTooltip } from '@/components/WithTooltip';
 import { TradeForm } from '@/views/forms/TradeForm';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { getInputTradeData, useTradeFormData } from '@/state/inputsSelectors';
 import { getCurrentMarketAssetId } from '@/state/perpetualsSelectors';
@@ -39,10 +40,10 @@ type ElementProps = {
 
 export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) => {
   const { isMobile } = useBreakpoints();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
-  const currentAssetId = useSelector(getCurrentMarketAssetId);
-  const currentTradeData = orEmptyObj(useSelector(getInputTradeData, shallowEqual));
+  const currentAssetId = useAppSelector(getCurrentMarketAssetId);
+  const currentTradeData = orEmptyObj(useAppSelector(getInputTradeData, shallowEqual));
   const { marginMode, targetLeverage } = currentTradeData;
 
   const { needsMarginMode, needsTargetLeverage } = useTradeFormData();

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 
 import { AbacusOrderStatus, ORDER_SIDES, SubaccountOrder } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
@@ -12,6 +12,7 @@ import {
   getCurrentMarketPositionData,
   getIsAccountConnected,
 } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getAppColorMode, getAppTheme } from '@/state/configsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
@@ -39,14 +40,17 @@ export const useChartLines = ({
 
   const chartLinesRef = useRef<Record<string, ChartLine>>({});
 
-  const appTheme = useSelector(getAppTheme);
-  const appColorMode = useSelector(getAppColorMode);
+  const appTheme = useAppSelector(getAppTheme);
+  const appColorMode = useAppSelector(getAppColorMode);
 
-  const isAccountConnected = useSelector(getIsAccountConnected);
+  const isAccountConnected = useAppSelector(getIsAccountConnected);
 
-  const currentMarketId = useSelector(getCurrentMarketId);
-  const currentMarketPositionData = useSelector(getCurrentMarketPositionData, shallowEqual);
-  const currentMarketOrders: SubaccountOrder[] = useSelector(getCurrentMarketOrders, shallowEqual);
+  const currentMarketId = useAppSelector(getCurrentMarketId);
+  const currentMarketPositionData = useAppSelector(getCurrentMarketPositionData, shallowEqual);
+  const currentMarketOrders: SubaccountOrder[] = useAppSelector(
+    getCurrentMarketOrders,
+    shallowEqual
+  );
 
   useEffect(() => {
     return () => deleteChartLines();

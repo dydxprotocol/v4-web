@@ -1,4 +1,4 @@
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import type { Nullable, TradeState } from '@/constants/abacus';
@@ -26,6 +26,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateIsAccountLoading } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { getInputErrors } from '@/state/inputsSelectors';
 
@@ -48,15 +49,15 @@ const getUsageValue = (value: Nullable<TradeState<number>>) => {
 export const AccountInfoConnectedState = () => {
   const stringGetter = useStringGetter();
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { isTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
 
   const { dydxAccounts } = useAccounts();
 
-  const inputErrors = useSelector(getInputErrors, shallowEqual);
-  const subAccount = useSelector(getSubaccount, shallowEqual);
-  const isLoading = useSelector(calculateIsAccountLoading);
+  const inputErrors = useAppSelector(getInputErrors, shallowEqual);
+  const subAccount = useAppSelector(getSubaccount, shallowEqual);
+  const isLoading = useAppSelector(calculateIsAccountLoading);
 
   const listOfErrors = inputErrors?.map(({ code }: { code: string }) => code);
 

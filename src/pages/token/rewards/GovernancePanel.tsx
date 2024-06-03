@@ -1,4 +1,3 @@
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
@@ -13,11 +12,12 @@ import { IconButton } from '@/components/IconButton';
 import { Link } from '@/components/Link';
 import { Panel } from '@/components/Panel';
 
+import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 export const GovernancePanel = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { governanceLearnMore } = useURLConfigs();
 
   return (

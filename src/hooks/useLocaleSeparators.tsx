@@ -1,9 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-import { useSelector } from 'react-redux';
-
 import { SUPPORTED_BASE_TAGS_LOCALE_MAPPING } from '@/constants/localization';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -18,7 +17,7 @@ export const LocaleProvider = ({ ...props }) => (
 );
 
 const useLocaleContext = () => {
-  const selectedLocale = useSelector(getSelectedLocale);
+  const selectedLocale = useAppSelector(getSelectedLocale);
   const [browserLanguage, setBrowserLanguage] = useState(navigator.language || 'en-US');
 
   useEffect(() => {

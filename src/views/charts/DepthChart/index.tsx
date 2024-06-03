@@ -15,7 +15,7 @@ import {
   darkTheme,
   type EventHandlerParams,
 } from '@visx/xychart';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { keyframes } from 'styled-components';
 
 import {
@@ -35,6 +35,7 @@ import { AxisLabelOutput } from '@/components/visx/AxisLabelOutput';
 import Tooltip from '@/components/visx/XYChartTooltipWithBounds';
 import { XYChartWithPointerEvents } from '@/components/visx/XYChartWithPointerEvents';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
@@ -79,9 +80,9 @@ export const DepthChart = ({
   const { isMobile } = useBreakpoints();
 
   // Chart data
-  const { id = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const { stepSizeDecimals, tickSizeDecimals } =
-    useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+    useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
 
   const { bids, asks, lowestBid, highestBid, lowestAsk, highestAsk, midMarketPrice, orderbook } =
     useOrderbookValuesForDepthChart();

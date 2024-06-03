@@ -1,24 +1,32 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { kollections } from '@dydxprotocol/v4-abacus';
 import styled from 'styled-components';
 
-import { HistoricalTradingReward, HistoricalTradingRewardsPeriods } from '@/constants/abacus';
+import {
+  HistoricalTradingReward,
+  HistoricalTradingRewardsPeriods,
+  Nullable,
+} from '@/constants/abacus';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 
+import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
-import { Output, OutputType } from '@/components/Output';
+import { Output, OutputType, ShowSign } from '@/components/Output';
 import { Table, type ColumnDef } from '@/components/Table';
 import { TableCell } from '@/components/Table/TableCell';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getHistoricalTradingRewardsForPeriod } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 export enum TradingRewardHistoryTableColumnKey {
   Event = 'Event',
@@ -73,10 +81,11 @@ const getTradingRewardHistoryTableColumnDef = ({
         getCellValue: (row) => row.amount,
         label: stringGetter({ key: STRING_KEYS.EARNED }),
         renderCell: ({ amount }) => (
-          <Output
+          <$PositiveOutput
             type={OutputType.Asset}
             value={amount}
-            slotRight={<$AssetIcon symbol={chainTokenLabel} />}
+            showSign={ShowSign.Both}
+            slotRight={<AssetIcon symbol={chainTokenLabel} />}
           />
         ),
       },
@@ -90,42 +99,43 @@ type ElementProps = {
 };
 
 type StyleProps = {
-  withOuterBorder?: boolean;
-  withInnerBorders?: boolean;
+  className?: string;
 };
 
 export const TradingRewardHistoryTable = ({
   period,
   columnKeys = Object.values(TradingRewardHistoryTableColumnKey),
-  withOuterBorder,
-  withInnerBorders = true,
+  className,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const canViewAccount = useSelector(calculateCanViewAccount);
+  const canViewAccount = useAppSelector(calculateCanViewAccount);
+  const { isNotTablet } = useBreakpoints();
   const { chainTokenLabel } = useTokenConfigs();
 
-  const periodTradingRewards = useSelector(
-    getHistoricalTradingRewardsForPeriod(period.name),
-    shallowEqual
+  const periodTradingRewards: Nullable<kollections.List<HistoricalTradingReward>> =
+    useParameterizedSelector(getHistoricalTradingRewardsForPeriod, period.name);
+
+  const rewardsData = useMemo(() => {
+    return periodTradingRewards && canViewAccount ? periodTradingRewards.toArray() : [];
+  }, [periodTradingRewards, canViewAccount]);
+
+  const columns = columnKeys.map((key: TradingRewardHistoryTableColumnKey) =>
+    getTradingRewardHistoryTableColumnDef({
+      key,
+      chainTokenLabel,
+      stringGetter,
+    })
   );
 
-  const rewardsData = useMemo(
-    () => (periodTradingRewards && canViewAccount ? periodTradingRewards.toArray() : []),
-    [periodTradingRewards, canViewAccount]
-  );
+  const getRowKey = useCallback((row: any) => row.startedAtInMilliseconds, []);
 
   return (
     <$Table
-      label={stringGetter({ key: STRING_KEYS.REWARD_HISTORY })}
+      className={className}
+      label={stringGetter({ key: STRING_KEYS.TRADING_REWARD_HISTORY })}
       data={rewardsData}
-      getRowKey={(row: any) => row.startedAtInMilliseconds}
-      columns={columnKeys.map((key: TradingRewardHistoryTableColumnKey) =>
-        getTradingRewardHistoryTableColumnDef({
-          key,
-          chainTokenLabel,
-          stringGetter,
-        })
-      )}
+      getRowKey={getRowKey}
+      columns={columns}
       slotEmpty={
         <$Column>
           <$EmptyIcon iconName={IconName.OrderPending} />
@@ -133,8 +143,8 @@ export const TradingRewardHistoryTable = ({
         </$Column>
       }
       selectionBehavior="replace"
-      withOuterBorder={withOuterBorder}
-      withInnerBorders={withInnerBorders}
+      withOuterBorder={isNotTablet || rewardsData.length === 0}
+      withInnerBorders
       initialPageSize={15}
       withScrollSnapColumns
       withScrollSnapRows
@@ -143,12 +153,10 @@ export const TradingRewardHistoryTable = ({
 };
 
 const $Table = styled(Table)`
-  --tableCell-padding: 0.5rem 0;
-  --tableStickyRow-backgroundColor: var(--color-layer-3);
-  --tableRow-backgroundColor: var(--color-layer-3);
+  ${tradeViewMixins.horizontalTable}
 
   tbody {
-    font: var(--font-medium-book);
+    font: var(--font-small-book);
   }
 ` as typeof Table;
 
@@ -170,10 +178,6 @@ const $TimePeriod = styled.div`
   }
 `;
 
-const $AssetIcon = styled(AssetIcon)`
-  margin-left: 0.5ch;
-`;
-
 const $Column = styled.div`
   display: flex;
   flex-direction: column;
@@ -183,4 +187,9 @@ const $Column = styled.div`
 
 const $EmptyIcon = styled(Icon)`
   font-size: 3em;
+`;
+
+const $PositiveOutput = styled(Output)`
+  --output-sign-color: var(--color-positive);
+  gap: 0.5ch;
 `;

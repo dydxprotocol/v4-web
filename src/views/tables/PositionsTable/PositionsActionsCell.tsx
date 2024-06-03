@@ -1,4 +1,3 @@
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -10,6 +9,7 @@ import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { ActionsTableCell } from '@/components/Table/ActionsTableCell';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialogInTradeBox, openDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
@@ -27,11 +27,11 @@ export const PositionsActionsCell = ({
   isDisabled,
   showClosePositionAction,
 }: ElementProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const currentMarketId = useSelector(getCurrentMarketId);
-  const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog);
+  const currentMarketId = useAppSelector(getCurrentMarketId);
+  const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
   const { type: tradeBoxDialogType } = activeTradeBoxDialog ?? {};
 
   const onCloseButtonToggle = (isPressed: boolean) => {

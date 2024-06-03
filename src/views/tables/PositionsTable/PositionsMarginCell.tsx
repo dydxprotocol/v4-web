@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { AbacusMarginMode, type SubaccountPosition } from '@/constants/abacus';
@@ -15,6 +14,7 @@ import { IconButton } from '@/components/IconButton';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { TableCell } from '@/components/Table/TableCell';
 
+import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { getMarginModeFromSubaccountNumber, getPositionMargin } from '@/lib/tradeData';
@@ -25,7 +25,7 @@ type PositionsMarginCellProps = {
 
 export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const { marginMode, marginModeLabel, margin } = useMemo(() => {
     const { childSubaccountNumber } = position;

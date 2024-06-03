@@ -1,7 +1,7 @@
 import { FormEvent, useMemo, useState } from 'react';
 
 import { NumberFormatValues } from 'react-number-format';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
@@ -25,6 +25,7 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithLabel } from '@/components/WithLabel';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getInputTradeTargetLeverage } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
@@ -41,10 +42,10 @@ export const AdjustTargetLeverageForm = ({
   const { adjustTargetLeverageLearnMore } = useURLConfigs();
 
   const { initialMarginFraction, effectiveInitialMarginFraction } = orEmptyObj(
-    useSelector(getCurrentMarketConfig, shallowEqual)
+    useAppSelector(getCurrentMarketConfig, shallowEqual)
   );
 
-  const targetLeverage = useSelector(getInputTradeTargetLeverage);
+  const targetLeverage = useAppSelector(getInputTradeTargetLeverage);
   const [leverage, setLeverage] = useState(targetLeverage?.toString() ?? '');
   const leverageBN = MustBigNumber(leverage);
 

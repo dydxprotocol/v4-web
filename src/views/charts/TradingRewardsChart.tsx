@@ -1,12 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { kollections } from '@dydxprotocol/v4-abacus';
 import { curveLinear } from '@visx/curve';
 import { TooltipContextType } from '@visx/xychart';
 import { debounce } from 'lodash';
-import { shallowEqual, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
+import {
+  HistoricalTradingReward,
+  HistoricalTradingRewardsPeriod,
+  Nullable,
+} from '@/constants/abacus';
 import {
   TradingRewardsPeriod,
   tradingRewardsPeriods,
@@ -18,6 +22,7 @@ import { timeUnits } from '@/constants/time';
 
 import { useEnvConfig } from '@/hooks/useEnvConfig';
 import { useNow } from '@/hooks/useNow';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -32,6 +37,7 @@ import {
   getHistoricalTradingRewardsForPeriod,
   getTotalTradingRewards,
 } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 import { formatRelativeTime } from '@/lib/dateTime';
@@ -70,55 +76,25 @@ export const TradingRewardsChart = ({
   const rewardsHistoryStartDate = useEnvConfig('rewardsHistoryStartDateMs');
   const now = useNow({ intervalMs: timeUnits.minute });
 
+  const [periodOptions, setPeriodOptions] = useState<TradingRewardsPeriod[]>([
+    TradingRewardsPeriod.Period1d,
+  ]);
   const [tooltipContext, setTooltipContext] = useState<TooltipContextType<TradingRewardsDatum>>();
   const [isZooming, setIsZooming] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState<TradingRewardsPeriod>(
     TradingRewardsPeriod.PeriodAllTime
   );
+  const [defaultZoomDomain, setDefaultZoomDomain] = useState<number | undefined>(undefined);
 
-  const canViewAccount = useSelector(calculateCanViewAccount);
-  const totalTradingRewards = useSelector(getTotalTradingRewards);
-  const periodTradingRewards = useSelector(
-    getHistoricalTradingRewardsForPeriod(SELECTED_PERIOD.name),
-    shallowEqual
-  );
+  const canViewAccount = useAppSelector(calculateCanViewAccount);
+  const totalTradingRewards = useAppSelector(getTotalTradingRewards);
+  const periodTradingRewards: Nullable<kollections.List<HistoricalTradingReward>> =
+    useParameterizedSelector(getHistoricalTradingRewardsForPeriod, SELECTED_PERIOD.name);
 
   useEffect(() => {
     // Initialize daily data for rewards chart
     abacusStateManager.setHistoricalTradingRewardPeriod(HistoricalTradingRewardsPeriod.DAILY);
   }, [canViewAccount]);
-
-  const msForPeriod = useCallback(
-    (period: TradingRewardsPeriod) => {
-      switch (period) {
-        case TradingRewardsPeriod.Period1d:
-          return 1 * timeUnits.day;
-        case TradingRewardsPeriod.Period7d:
-          return 7 * timeUnits.day;
-        case TradingRewardsPeriod.Period30d:
-          return 30 * timeUnits.day;
-        case TradingRewardsPeriod.Period90d:
-          return 90 * timeUnits.day;
-        case TradingRewardsPeriod.PeriodAllTime:
-        default:
-          return (now - Number(rewardsHistoryStartDate) + 1) * timeUnits.day;
-      }
-    },
-    [now, rewardsHistoryStartDate]
-  );
-
-  // Unselect selected period in toggle if user zooms in/out
-  const onZoomSnap = useMemo(
-    () =>
-      debounce(({ zoomDomain }: { zoomDomain?: number }) => {
-        if (zoomDomain) {
-          setIsZooming(!tradingRewardsPeriods.map(msForPeriod).includes(zoomDomain));
-        }
-      }, 200),
-    [msForPeriod]
-  );
-
-  const onToggleInteract = () => setIsZooming(false);
 
   const rewardsData = useMemo(
     () =>
@@ -127,27 +103,107 @@ export const TradingRewardsChart = ({
             .toArray()
             .reverse()
             .map(
-              (datum) =>
-                ({
-                  date: new Date(datum.endedAtInMilliseconds).valueOf(),
-                  cumulativeAmount: datum.cumulativeAmount,
-                } as TradingRewardsDatum)
+              (datum): TradingRewardsDatum => ({
+                date: new Date(datum.endedAtInMilliseconds).valueOf(),
+                cumulativeAmount: datum.cumulativeAmount,
+              })
             )
         : [],
     [periodTradingRewards, canViewAccount]
   );
 
+  const oldestDataPointDate = rewardsData?.[0]?.date;
+  const newestDataPointDate = rewardsData?.[rewardsData.length - 1]?.date;
+
+  const msForPeriod = useCallback(
+    (period: TradingRewardsPeriod, clampMax: Boolean = true) => {
+      const earliestDatum = oldestDataPointDate ?? Number(rewardsHistoryStartDate);
+      const latestDatum = newestDataPointDate ?? now;
+      const maxPeriod = latestDatum - earliestDatum;
+
+      switch (period) {
+        case TradingRewardsPeriod.Period1d:
+          return clampMax ? Math.min(maxPeriod, 1 * timeUnits.day) : 1 * timeUnits.day;
+        case TradingRewardsPeriod.Period7d:
+          return clampMax ? Math.min(maxPeriod, 7 * timeUnits.day) : 7 * timeUnits.day;
+        case TradingRewardsPeriod.Period30d:
+          return clampMax ? Math.min(maxPeriod, 30 * timeUnits.day) : 30 * timeUnits.day;
+        case TradingRewardsPeriod.Period90d:
+          return clampMax ? Math.min(maxPeriod, 90 * timeUnits.day) : 90 * timeUnits.day;
+        case TradingRewardsPeriod.PeriodAllTime:
+        default:
+          return maxPeriod;
+      }
+    },
+    [now, rewardsHistoryStartDate, newestDataPointDate, oldestDataPointDate]
+  );
+
+  // Include period option only if oldest date is older it
+  // e.g. oldest date is 31 days old -> show 30d option, but not 90d
+  const getPeriodOptions = useCallback(
+    (oldestMs: number): TradingRewardsPeriod[] =>
+      tradingRewardsPeriods.reduce((acc: TradingRewardsPeriod[], period) => {
+        if (oldestMs <= (newestDataPointDate ?? now) - msForPeriod(period, false)) {
+          acc.push(period);
+        }
+        return acc;
+      }, []),
+    [msForPeriod, newestDataPointDate, now]
+  );
+
+  useEffect(() => {
+    if (oldestDataPointDate) {
+      const options = getPeriodOptions(oldestDataPointDate);
+      setPeriodOptions(options);
+    }
+  }, [oldestDataPointDate, getPeriodOptions]);
+
+  // Update selected period in toggle if user zooms in/out
+  const onZoomSnap = useMemo(
+    () =>
+      debounce(({ zoomDomain }: { zoomDomain?: number }) => {
+        if (zoomDomain) {
+          const predefinedPeriodIx = periodOptions.findIndex(
+            // To account for slight variance from zoom animation
+            (period) => Math.abs(msForPeriod(period) - zoomDomain) <= 1
+          );
+          if (predefinedPeriodIx < 0) {
+            // Unselect period
+            setIsZooming(true);
+          } else {
+            // Update period to new selected period
+            setIsZooming(false);
+            setSelectedPeriod(periodOptions[predefinedPeriodIx]);
+          }
+        }
+      }, 200),
+    [periodOptions, msForPeriod]
+  );
+
+  useEffect(() => {
+    if (isZooming) {
+      setDefaultZoomDomain(undefined);
+    } else {
+      setDefaultZoomDomain(msForPeriod(selectedPeriod));
+    }
+  }, [isZooming, msForPeriod, selectedPeriod]);
+
+  const onToggleInteract = () => setIsZooming(false);
+
+  const xAccessorFunc = useCallback((datum: TradingRewardsDatum) => datum?.date, []);
+  const yAccessorFunc = useCallback((datum: TradingRewardsDatum) => datum?.cumulativeAmount, []);
+
   const series = useMemo(
     () => [
       {
         dataKey: 'trading-rewards',
-        xAccessor: (datum: TradingRewardsDatum) => datum?.date,
-        yAccessor: (datum: TradingRewardsDatum) => datum?.cumulativeAmount,
+        xAccessor: xAccessorFunc,
+        yAccessor: yAccessorFunc,
         colorAccessor: () => 'var(--trading-rewards-line-color)',
         getCurve: () => curveLinear,
       },
     ],
-    []
+    [xAccessorFunc, yAccessorFunc]
   );
 
   const language = navigator.language || 'en-US';
@@ -165,26 +221,24 @@ export const TradingRewardsChart = ({
   );
 
   const renderTooltip = useCallback(() => <div />, []);
-  const defaultZoomDomain = isZooming ? undefined : msForPeriod(selectedPeriod);
 
   const toggleGroupItems = useMemo(() => {
-    return tradingRewardsPeriods.map((period: TradingRewardsPeriod) => ({
+    return periodOptions.map((period: TradingRewardsPeriod) => ({
       value: period,
       label:
         period === TradingRewardsPeriod.PeriodAllTime
           ? stringGetter({ key: STRING_KEYS.ALL })
-          : formatRelativeTime(msForPeriod(period), {
+          : formatRelativeTime(msForPeriod(period, false), {
               locale: selectedLocale,
               relativeToTimestamp: 0,
               largestUnit: 'day',
             }),
     }));
-  }, [stringGetter, msForPeriod, selectedLocale]);
+  }, [stringGetter, msForPeriod, selectedLocale, periodOptions]);
 
-  const setTradingRewardsPeriod = useCallback(
-    (value: string) => setSelectedPeriod(value as TradingRewardsPeriod),
-    []
-  );
+  const setTradingRewardsPeriod = useCallback((value: string) => {
+    setSelectedPeriod(value as TradingRewardsPeriod);
+  }, []);
 
   return (
     <>

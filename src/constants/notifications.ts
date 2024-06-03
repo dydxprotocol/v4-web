@@ -41,7 +41,7 @@ export type NotificationId = string | number;
 
 export type NotificationTypeConfig<
   NotificationIdType extends NotificationId = string,
-  NotificationUpdateKey = any
+  NotificationUpdateKey = any,
 > = {
   type: NotificationType;
 
@@ -95,7 +95,7 @@ export enum NotificationStatus {
 /** Notification state. Serialized and cached into localStorage. */
 export type Notification<
   NotificationIdType extends NotificationId = string,
-  NotificationUpdateKey = any
+  NotificationUpdateKey = any,
 > = {
   id: NotificationIdType;
   type: NotificationType;

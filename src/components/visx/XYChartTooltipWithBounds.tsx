@@ -237,8 +237,8 @@ const TooltipInner = <Datum extends object>({
         ? 'right'
         : 'left'
       : crosshairLeft > innerWidth - 120
-      ? 'left'
-      : 'right';
+        ? 'left'
+        : 'right';
 
   return showTooltip ? (
     <g data-state={showTooltip ? 'open' : 'closed'}>

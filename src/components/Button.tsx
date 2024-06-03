@@ -20,7 +20,9 @@ export type ButtonStateConfig = {
 
 type ElementProps = {
   children?: React.ReactNode;
+  // eslint-disable-next-line react/no-unused-prop-types
   href?: string;
+  // eslint-disable-next-line react/no-unused-prop-types
   onClick?: React.MouseEventHandler<HTMLButtonElement> | React.MouseEventHandler<HTMLAnchorElement>;
   slotLeft?: React.ReactNode;
   slotRight?: React.ReactNode;

@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 
 import { Item, Root } from '@radix-ui/react-radio-group';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
@@ -37,6 +37,7 @@ import { WithReceipt } from '@/components/WithReceipt';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { getOnboardingState } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
@@ -64,12 +65,12 @@ export const NewMarketSelectionStep = ({
   tickSizeDecimals,
   tickersFromProposals,
 }: NewMarketSelectionStepProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { nativeTokenBalance } = useAccountBalance();
-  const onboardingState = useSelector(getOnboardingState);
+  const onboardingState = useAppSelector(getOnboardingState);
   const isDisconnected = onboardingState === OnboardingState.Disconnected;
   const { isMobile } = useBreakpoints();
-  const marketIds = useSelector(getMarketIds, shallowEqual);
+  const marketIds = useAppSelector(getMarketIds, shallowEqual);
   const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
   const { potentialMarkets, liquidityTiers } = usePotentialMarkets();
   const stringGetter = useStringGetter();

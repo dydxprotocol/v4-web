@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -18,6 +18,7 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
@@ -31,8 +32,8 @@ export const TestnetDepositForm = ({ onDeposit, onError }: DepositFormProps) => 
   const stringGetter = useStringGetter();
   const { dydxAddress, getSubaccounts } = useAccounts();
   const { requestFaucetFunds } = useSubaccount();
-  const subAccount = useSelector(getSubaccount, shallowEqual);
-  const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
+  const subAccount = useAppSelector(getSubaccount, shallowEqual);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
   const dydxChainId = useEnvConfig('dydxChainId');
 
   const [isLoading, setIsLoading] = useState(false);

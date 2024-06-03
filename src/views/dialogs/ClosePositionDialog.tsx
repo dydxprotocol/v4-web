@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -21,6 +21,7 @@ import { VerticalSeparator } from '@/components/Separator';
 import { MidMarketPrice } from '@/views/MidMarketPrice';
 import { ClosePositionForm } from '@/views/forms/ClosePositionForm';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketData } from '@/state/perpetualsSelectors';
 
@@ -32,7 +33,7 @@ type ElementProps = {
 };
 
 export const ClosePositionDialog = ({ setIsOpen }: ElementProps) => {
-  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const { isTablet } = useBreakpoints();
   const stringGetter = useStringGetter();
 
@@ -98,7 +99,7 @@ export const ClosePositionDialog = ({ setIsOpen }: ElementProps) => {
 const CloseOrderHeader = () => {
   const stringGetter = useStringGetter();
   const { priceChange24H, priceChange24HPercent } =
-    useSelector(getCurrentMarketData, shallowEqual) ?? {};
+    useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
 
   return (
     <$CloseOrderHeader>

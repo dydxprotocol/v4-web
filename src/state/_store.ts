@@ -1,4 +1,4 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { Middleware, configureStore } from '@reduxjs/toolkit';
 
 // TODO - fix cycle
 // eslint-disable-next-line import/no-cycle
@@ -31,13 +31,10 @@ export const store = configureStore({
     perpetuals: perpetualsSlice.reducer,
   },
 
-  middleware: (getDefaultMiddleware: any) => [
-    ...getDefaultMiddleware({
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
       serializableCheck: false,
-    }),
-    appMiddleware,
-    localizationMiddleware,
-  ],
+    }).concat(appMiddleware as Middleware, localizationMiddleware as Middleware),
 
   devTools: process.env.NODE_ENV !== 'production',
 });
@@ -47,3 +44,4 @@ abacusStateManager.setStore(store);
 
 export type RootStore = typeof store;
 export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = RootStore['dispatch'];

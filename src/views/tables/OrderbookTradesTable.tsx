@@ -70,7 +70,9 @@ const $OrderbookTradesTable = styled(Table)<OrderbookTradesTableStyleProps>`
       --accent-color: var(--color-negative);
     }
 
-    transition: outline var(--ease-out-expo) 0.2s, background-color 0.2s;
+    transition:
+      outline var(--ease-out-expo) 0.2s,
+      background-color 0.2s;
   }
 
   td {
@@ -118,7 +120,9 @@ export const OrderbookTradesOutput = styled(Output)<{ highlightText?: boolean }>
     highlightText &&
     css`
       @media (prefers-reduced-motion: no-preference) {
-        transition: outline 0.2s, color var(--ease-out-expo) 0.3s;
+        transition:
+          outline 0.2s,
+          color var(--ease-out-expo) 0.3s;
 
         animation: ${colorAnimation} 0.5s;
       }

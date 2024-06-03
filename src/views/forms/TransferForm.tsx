@@ -4,7 +4,7 @@ import { validation } from '@dydxprotocol/v4-client-js';
 import { noop } from 'lodash';
 import { type NumberFormatValues } from 'react-number-format';
 import type { SyntheticInputEvent } from 'react-number-format/types/types';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { Nullable, TransferInputField, TransferType } from '@/constants/abacus';
@@ -17,6 +17,7 @@ import { DydxChainAsset } from '@/constants/wallets';
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useDydxClient } from '@/hooks/useDydxClient';
+import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useRestrictions } from '@/hooks/useRestrictions';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
@@ -41,6 +42,7 @@ import { TransferButtonAndReceipt } from '@/views/forms/TransferForm/TransferBut
 
 import { getSubaccount } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -59,11 +61,13 @@ export const TransferForm = ({
   className,
 }: TransferFormProps) => {
   const stringGetter = useStringGetter();
-  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) ?? {};
+  const { showMemoTransferField } = useEnvFeatures();
+
+  const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
   const { dydxAddress } = useAccounts();
   const { transfer } = useSubaccount();
   const { nativeTokenBalance, usdcBalance } = useAccountBalance();
-  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const { tokensConfigs, usdcLabel, chainTokenLabel } = useTokenConfigs();
   useWithdrawalInfo({ transferType: 'transfer' });
 
@@ -72,7 +76,8 @@ export const TransferForm = ({
     size,
     fee,
     token,
-  } = useSelector(getTransferInputs, shallowEqual) ?? {};
+    memo,
+  } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
 
   // Form states
   const [error, setError] = useState<string>();
@@ -85,9 +90,12 @@ export const TransferForm = ({
   }, [fee]);
 
   const asset = (token ?? selectedAsset) as DydxChainAsset;
+  const isChainTokenSelected = asset === DydxChainAsset.CHAINTOKEN;
   const isUSDCSelected = asset === DydxChainAsset.USDC;
   const amount = isUSDCSelected ? size?.usdcSize : size?.size;
   const showNotEnoughGasWarning = fee && isUSDCSelected && usdcBalance < fee;
+  const showMemoField = showMemoTransferField && isChainTokenSelected;
+
   const balance = isUSDCSelected ? freeCollateral?.current : nativeTokenBalance;
 
   // BN
@@ -135,6 +143,7 @@ export const TransferForm = ({
   );
 
   const isAmountValid = balance && amount && amountBN.gt(0) && newBalanceBN.gte(0);
+  const showMemoEmptyWarning = showMemoField && !memo && isAddressValid && isAmountValid; // only show warning if user has inputted mandatory fields
 
   const { screenAddresses } = useDydxClient();
 
@@ -164,7 +173,8 @@ export const TransferForm = ({
         const txResponse = await transfer(
           amountBN.toNumber(),
           recipientAddress as string,
-          tokensConfigs[asset]?.denom
+          tokensConfigs[asset]?.denom,
+          memo ?? undefined
         );
 
         if (txResponse?.code === 0) {
@@ -210,10 +220,26 @@ export const TransferForm = ({
     });
   };
 
+  const onChangeMemo = (value: string) => {
+    abacusStateManager.setTransferValue({
+      value,
+      field: TransferInputField.MEMO,
+    });
+  };
+
   const onPasteAddress = async () => {
     try {
       const value = await navigator.clipboard.readText();
       onChangeAddress(value);
+    } catch (err) {
+      // expected error if user rejects clipboard access
+    }
+  };
+
+  const onPasteMemo = async () => {
+    try {
+      const value = await navigator.clipboard.readText();
+      onChangeMemo(value);
     } catch (err) {
       // expected error if user rejects clipboard access
     }
@@ -373,6 +399,31 @@ export const TransferForm = ({
           disabled={isLoading}
         />
       </$WithDetailsReceipt>
+
+      {showMemoField && (
+        <FormInput
+          label={stringGetter({ key: STRING_KEYS.MEMO })}
+          placeholder={stringGetter({ key: STRING_KEYS.REQUIRED_FOR_TRANSFERS_TO_CEX })}
+          type={InputType.Text}
+          onInput={(e: SyntheticInputEvent) => onChangeMemo(e.target?.value || '')}
+          value={memo ?? undefined}
+          slotRight={renderFormInputButton({
+            label: stringGetter({ key: STRING_KEYS.PASTE }),
+            isInputEmpty: !memo,
+            onClear: () => onChangeMemo(''),
+            onClick: onPasteMemo,
+          })}
+          disabled={isLoading}
+        />
+      )}
+
+      {showMemoEmptyWarning && (
+        <AlertMessage type={AlertType.Warning}>
+          {stringGetter({
+            key: STRING_KEYS.TRANSFER_WITHOUT_MEMO,
+          })}
+        </AlertMessage>
+      )}
 
       {showNotEnoughGasWarning && (
         <AlertMessage type={AlertType.Warning}>

@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -9,6 +8,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, PortfolioRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AttachedExpandingSection } from '@/components/ContentSection';
@@ -19,6 +19,7 @@ import {
   calculateShouldRenderActionsInPositionsTable,
   calculateShouldRenderTriggersInPositionsTable,
 } from '@/state/accountCalculators';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -32,9 +33,10 @@ export const Positions = () => {
 
   const showClosePositionAction = false;
 
-  const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
-  const shouldRenderActions = useSelector(
-    calculateShouldRenderActionsInPositionsTable(showClosePositionAction)
+  const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
+  const shouldRenderActions = useParameterizedSelector(
+    calculateShouldRenderActionsInPositionsTable,
+    showClosePositionAction
   );
 
   const handleViewUnopenedIsolatedOrders = useCallback(() => {
@@ -43,7 +45,7 @@ export const Positions = () => {
     });
   }, [navigate]);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const onCancelOrders = useCallback(
     (marketId: string) => {
       dispatch(openDialog({ type: DialogTypes.CancelPendingOrders, dialogProps: { marketId } }));

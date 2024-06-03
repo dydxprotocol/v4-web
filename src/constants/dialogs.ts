@@ -27,9 +27,11 @@ export enum DialogTypes {
   RestrictedGeo = 'RestrictedGeo',
   RestrictedWallet = 'RestrictedWallet',
   SelectMarginMode = 'SelectMarginMode',
+  Stake = 'Stake',
   Trade = 'Trade',
   Triggers = 'Triggers',
   Transfer = 'Transfer',
+  Unstake = 'Unstake',
   Withdraw = 'Withdraw',
   WithdrawalGated = 'WithdrawalGated',
 }

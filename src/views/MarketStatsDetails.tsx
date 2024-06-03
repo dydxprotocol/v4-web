@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -20,6 +20,7 @@ import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { WithTooltip } from '@/components/WithTooltip';
 import { NextFundingTimer } from '@/views/NextFundingTimer';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import {
   getCurrentMarketConfig,
@@ -51,12 +52,12 @@ const defaultMarketStatistics = Object.values(MarketStats);
 export const MarketStatsDetails = ({ showMidMarketPrice = true }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-  const { id = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const { tickSizeDecimals, initialMarginFraction, effectiveInitialMarginFraction } =
-    useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
-  const midMarketPrice = useSelector(getCurrentMarketMidMarketPrice);
+    useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const midMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice);
   const lastMidMarketPrice = useRef(midMarketPrice);
-  const currentMarketData = useSelector(getCurrentMarketData, shallowEqual);
+  const currentMarketData = useAppSelector(getCurrentMarketData, shallowEqual);
   const isLoading = currentMarketData === undefined;
 
   const { oraclePrice, perpetual, priceChange24H, priceChange24HPercent } = currentMarketData ?? {};
