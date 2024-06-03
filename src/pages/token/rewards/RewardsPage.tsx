@@ -99,24 +99,24 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean; showChartPanel?: bo
             'rewards other';
         `
       : showMigratePanel
-      ? css`
-          grid-template-areas:
-            'migrate migrate'
-            'incentives balance'
-            'rewards other';
-        `
-      : showChartPanel
-      ? css`
-          grid-template-areas:
-            'chart chart'
-            'incentives balance'
-            'rewards other';
-        `
-      : css`
-          grid-template-areas:
-            'incentives balance'
-            'rewards other';
-        `}
+        ? css`
+            grid-template-areas:
+              'migrate migrate'
+              'incentives balance'
+              'rewards other';
+          `
+        : showChartPanel
+          ? css`
+              grid-template-areas:
+                'chart chart'
+                'incentives balance'
+                'rewards other';
+            `
+          : css`
+              grid-template-areas:
+                'incentives balance'
+                'rewards other';
+            `}
 
   @media ${breakpoints.notTablet} {
     padding: 1rem;
