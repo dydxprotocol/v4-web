@@ -30,7 +30,7 @@ export const AdjustIsolatedMarginDialog = ({ positionId, setIsOpen }: ElementPro
   const onIsolatedMarginAdjustment = useCallback(() => setIsOpen?.(false), [setIsOpen]);
 
   return (
-    <Dialog
+    <$Dialog
       isOpen
       setIsOpen={setIsOpen}
       slotIcon={subaccountPosition && <AssetIcon symbol={subaccountPosition.assetId} />}
@@ -42,9 +42,13 @@ export const AdjustIsolatedMarginDialog = ({ positionId, setIsOpen }: ElementPro
           onIsolatedMarginAdjustment={onIsolatedMarginAdjustment}
         />
       </$Content>
-    </Dialog>
+    </$Dialog>
   );
 };
+
+const $Dialog = styled(Dialog)`
+  --dialog-width: 25rem;
+`;
 const $Content = styled.div`
   ${layoutMixins.column}
   gap: 1rem;

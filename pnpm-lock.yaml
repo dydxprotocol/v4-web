@@ -36,8 +36,8 @@ dependencies:
     specifier: ^1.1.15
     version: 1.1.15
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.106
-    version: 1.1.106
+    specifier: ^1.1.107
+    version: 1.1.107
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -1418,8 +1418,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.106:
-    resolution: {integrity: sha512-Edz5JBUJ7E79X40phpY8+CQ7NGgTw7Z7e31esaIvTgzetCpcBioVQRCSX2btJv1evsrOikS7ni9qHgj1MprgwQ==}
+  /@dydxprotocol/v4-localization@1.1.107:
+    resolution: {integrity: sha512-/rVLNh5gD3FID44gs5/1E5lUlRBipW7dM+fHaLLDpuF16oV61Z8zJjh6io+zOM/l/IIhO97mZRHbNmTy/hQQKw==}
     dev: false
 
   /@dydxprotocol/v4-proto@5.0.0-dev.0:
@@ -11964,7 +11964,6 @@ packages:
       is-hex-prefixed: 1.0.0
       strip-hex-prefix: 1.0.0
     dev: false
-    bundledDependencies: false
 
   /event-emitter@0.3.5:
     resolution: {integrity: sha512-D9rRn9y7kLPnJ+hMq7S/nhvoKwwvVJahBi2BPmx3bvbsEdK3W9ii8cBSGjP+72/LnM4n6fo3+dkCX5FeTQruXA==}
@@ -12771,6 +12770,7 @@ packages:
 
   /grapheme-splitter@1.0.4:
     resolution: {integrity: sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==}
+    requiresBuild: true
     dev: true
 
   /graphemer@1.4.0:
