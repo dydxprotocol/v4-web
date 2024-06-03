@@ -171,13 +171,13 @@ export const tradeTooltips: TooltipStrings = {
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_BODY }),
     learnMoreLink: urlConfigs?.reduceOnlyLearnMore,
   }),
-  'reduce-only-execution-ioc-fok': ({ stringGetter }) => ({
-    title: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_EXECUTION_IOC_FOK_TITLE }),
-    body: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_EXECUTION_IOC_FOK_BODY }),
+  'reduce-only-execution-ioc': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_EXECUTION_IOC_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_EXECUTION_IOC_BODY }),
   }),
-  'reduce-only-timeinforce-ioc-fok': ({ stringGetter }) => ({
-    title: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_TIMEINFORCE_IOC_FOK_TITLE }),
-    body: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_TIMEINFORCE_IOC_FOK_BODY }),
+  'reduce-only-timeinforce-ioc': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_TIMEINFORCE_IOC_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.REDUCE_ONLY_TIMEINFORCE_IOC_BODY }),
   }),
   'reference-price': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.REFERENCE_PRICE_TITLE }),
