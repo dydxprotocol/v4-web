@@ -29,7 +29,7 @@ export const GeoblockedPanel = () => {
 
 const $Link = styled(Link)`
   --link-color: var(--color-text-1);
-  
+
   display: inline-block;
   text-decoration: underline;
 `;
