@@ -1,4 +1,4 @@
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { type Nullable } from '@/constants/abacus';
@@ -20,6 +20,7 @@ import { ToggleButton } from '@/components/ToggleButton';
 
 import { calculateIsAccountLoading } from '@/state/accountCalculators';
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { closeDialogInTradeBox, openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { getActiveTradeBoxDialog } from '@/state/dialogsSelectors';
@@ -58,13 +59,13 @@ type PositionInfoItems = {
 export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: boolean }) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
-  const currentMarketAssetData = useSelector(getCurrentMarketAssetData, shallowEqual);
-  const currentMarketConfigs = useSelector(getCurrentMarketConfig, shallowEqual);
-  const activeTradeBoxDialog = useSelector(getActiveTradeBoxDialog);
-  const currentMarketPosition = useSelector(getCurrentMarketPositionData, shallowEqual);
-  const isLoading = useSelector(calculateIsAccountLoading);
+  const currentMarketAssetData = useAppSelector(getCurrentMarketAssetData, shallowEqual);
+  const currentMarketConfigs = useAppSelector(getCurrentMarketConfig, shallowEqual);
+  const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
+  const currentMarketPosition = useAppSelector(getCurrentMarketPositionData, shallowEqual);
+  const isLoading = useAppSelector(calculateIsAccountLoading);
 
   const { stepSizeDecimals, tickSizeDecimals } = currentMarketConfigs ?? {};
   const { id } = currentMarketAssetData ?? {};
@@ -109,8 +110,8 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       sign: MustBigNumber(netFunding).gt(0)
         ? NumberSign.Positive
         : MustBigNumber(netFunding).lt(0)
-        ? NumberSign.Negative
-        : NumberSign.Neutral,
+          ? NumberSign.Negative
+          : NumberSign.Neutral,
       value: netFunding && netFundingBN.toFixed(USD_DECIMALS),
     },
   ];
@@ -123,7 +124,7 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
   const hasNoPositionInMarket = MustBigNumber(currentSize).isZero();
 
   const newLeverageIsInvalid =
-    leverage?.postOrder && (!newLeverageBN.isFinite() || newLeverageBN.gt(maxLeverage));
+    !!leverage?.postOrder && (!newLeverageBN.isFinite() || newLeverageBN.gt(maxLeverage));
 
   const newLeverageIsLarger =
     !leverage?.current || (leverage?.postOrder && newLeverageBN.gt(leverageBN));
@@ -172,8 +173,8 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
         !newLeverageIsInvalid && !newLeverageIsLarger
           ? NumberSign.Positive
           : newLeverageIsInvalid || newLeverageIsLarger
-          ? NumberSign.Negative
-          : NumberSign.Neutral,
+            ? NumberSign.Negative
+            : NumberSign.Neutral,
       useDiffOutput: true,
       showSign: ShowSign.None,
       value: leverage?.current,
@@ -204,8 +205,8 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       sign: MustBigNumber(unrealizedPnl?.current).gt(0)
         ? NumberSign.Positive
         : MustBigNumber(unrealizedPnl?.current).lt(0)
-        ? NumberSign.Negative
-        : NumberSign.Neutral,
+          ? NumberSign.Negative
+          : NumberSign.Neutral,
       value: unrealizedPnl?.current,
       percentValue: unrealizedPnlPercent?.current,
       withBaseFont: true,
@@ -218,8 +219,8 @@ export const PositionInfo = ({ showNarrowVariation }: { showNarrowVariation?: bo
       sign: MustBigNumber(realizedPnl?.current).gt(0)
         ? NumberSign.Positive
         : MustBigNumber(realizedPnl?.current).lt(0)
-        ? NumberSign.Negative
-        : NumberSign.Neutral,
+          ? NumberSign.Negative
+          : NumberSign.Neutral,
       value: realizedPnl?.current ?? undefined,
       withBaseFont: true,
     },

@@ -1,12 +1,17 @@
 import { useCallback, useMemo } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { kollections } from '@dydxprotocol/v4-abacus';
 import styled from 'styled-components';
 
-import { HistoricalTradingReward, HistoricalTradingRewardsPeriods } from '@/constants/abacus';
+import {
+  HistoricalTradingReward,
+  HistoricalTradingRewardsPeriods,
+  Nullable,
+} from '@/constants/abacus';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -21,6 +26,7 @@ import { TableCell } from '@/components/Table/TableCell';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getHistoricalTradingRewardsForPeriod } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 export enum TradingRewardHistoryTableColumnKey {
   Event = 'Event',
@@ -102,14 +108,12 @@ export const TradingRewardHistoryTable = ({
   className,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const canViewAccount = useSelector(calculateCanViewAccount);
+  const canViewAccount = useAppSelector(calculateCanViewAccount);
   const { isNotTablet } = useBreakpoints();
   const { chainTokenLabel } = useTokenConfigs();
 
-  const periodTradingRewards = useSelector(
-    getHistoricalTradingRewardsForPeriod(period.name),
-    shallowEqual
-  );
+  const periodTradingRewards: Nullable<kollections.List<HistoricalTradingReward>> =
+    useParameterizedSelector(getHistoricalTradingRewardsForPeriod, period.name);
 
   const rewardsData = useMemo(() => {
     return periodTradingRewards && canViewAccount ? periodTradingRewards.toArray() : [];

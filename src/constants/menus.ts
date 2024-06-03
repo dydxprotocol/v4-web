@@ -3,13 +3,13 @@ import type React from 'react';
 export type MenuConfig<
   MenuItemValue extends string | number,
   MenuGroupValue extends string | number,
-  MenuItemTypes extends string | number = string | number
+  MenuItemTypes extends string | number = string | number,
 > = MenuGroup<MenuItemValue, MenuGroupValue, MenuItemTypes>[];
 
 export type MenuGroup<
   MenuItemValue extends string | number,
   MenuGroupValue extends string | number,
-  MenuItemTypes extends string | number = string | number
+  MenuItemTypes extends string | number = string | number,
 > = {
   group: MenuGroupValue;
   groupLabel?: string;

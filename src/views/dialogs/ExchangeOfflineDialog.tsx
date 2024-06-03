@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { AbacusApiStatus } from '@/constants/abacus';
@@ -17,6 +17,7 @@ import { Dialog } from '@/components/Dialog';
 import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialog } from '@/state/dialogs';
 import { getActiveDialog } from '@/state/dialogsSelectors';
 
@@ -26,11 +27,11 @@ type ElementProps = {
 };
 
 export const ExchangeOfflineDialog = ({ preventClose, setIsOpen }: ElementProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { status, statusErrorMessage } = useApiState();
-  const selectedNetwork = useSelector(getSelectedNetwork);
-  const activeDialog = useSelector(getActiveDialog, shallowEqual);
+  const selectedNetwork = useAppSelector(getSelectedNetwork);
+  const activeDialog = useAppSelector(getActiveDialog, shallowEqual);
 
   useEffect(() => {
     if (activeDialog?.type === DialogTypes.ExchangeOffline && status === AbacusApiStatus.NORMAL) {

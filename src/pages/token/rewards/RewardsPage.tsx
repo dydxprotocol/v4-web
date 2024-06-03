@@ -23,6 +23,7 @@ import { MigratePanel } from './MigratePanel';
 import { NewMarketsPanel } from './NewMarketsPanel';
 import { RewardHistoryPanel } from './RewardHistoryPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
+import { StakingPanel } from './StakingPanel';
 import { TradingRewardsChartPanel } from './TradingRewardsChartPanel';
 import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
 
@@ -177,6 +178,10 @@ const $LaunchIncentivesPanel = styled(LaunchIncentivesPanel)`
 `;
 
 const $DYDXBalancePanel = styled(DYDXBalancePanel)`
+  grid-area: balance;
+`;
+
+const $StakingPanel = styled(StakingPanel)`
   grid-area: balance;
 `;
 

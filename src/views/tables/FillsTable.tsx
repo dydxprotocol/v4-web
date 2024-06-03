@@ -3,7 +3,7 @@ import { Key, useEffect, useMemo } from 'react';
 import { Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { ColumnSize } from '@react-types/table';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { type Asset, type SubaccountFill } from '@/constants/abacus';
@@ -29,11 +29,8 @@ import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 
 import { viewedFills } from '@/state/account';
-import {
-  getCurrentMarketFills,
-  getHasUnseenFillUpdates,
-  getSubaccountFills,
-} from '@/state/accountSelectors';
+import { getCurrentMarketFills, getSubaccountFills } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
@@ -306,21 +303,23 @@ export const FillsTable = ({
   withInnerBorders = true,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { isMobile } = useBreakpoints();
 
-  const marketFills = useSelector(getCurrentMarketFills, shallowEqual) ?? EMPTY_ARR;
-  const allFills = useSelector(getSubaccountFills, shallowEqual) ?? EMPTY_ARR;
+  const marketFills = useAppSelector(getCurrentMarketFills, shallowEqual) ?? EMPTY_ARR;
+  const allFills = useAppSelector(getSubaccountFills, shallowEqual) ?? EMPTY_ARR;
   const fills = currentMarket ? marketFills : allFills;
 
-  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
-  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
-
-  const hasUnseenFillUpdates = useSelector(getHasUnseenFillUpdates);
+  const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
 
   useEffect(() => {
-    if (hasUnseenFillUpdates) dispatch(viewedFills());
-  }, [hasUnseenFillUpdates]);
+    // marked fills as seen both on mount and dismount (i.e. new fill came in while fills table is being shown)
+    dispatch(viewedFills(currentMarket));
+    return () => {
+      dispatch(viewedFills(currentMarket));
+    };
+  }, [currentMarket]);
 
   const symbol = currentMarket ? allAssets[allPerpetualMarkets[currentMarket]?.assetId]?.id : null;
 
@@ -416,5 +415,5 @@ const $Side = styled.span<{ side: OrderSide }>`
       [OrderSide.SELL]: css`
         color: var(--color-negative);
       `,
-    }[side])};
+    })[side]};
 `;

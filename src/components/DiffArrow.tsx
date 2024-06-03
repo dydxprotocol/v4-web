@@ -60,5 +60,5 @@ const $DiffArrowContainer = styled.span<DiffArrowProps>`
       down: css`
         transform: rotate(90deg);
       `,
-    }[direction ?? 'right'])}
+    })[direction ?? 'right']}
 `;

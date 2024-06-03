@@ -4,7 +4,6 @@ import { OfflineSigner } from '@cosmjs/proto-signing';
 import { LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
 import { AES, enc } from 'crypto-js';
-import { useDispatch } from 'react-redux';
 
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
@@ -18,6 +17,7 @@ import {
 } from '@/constants/wallets';
 
 import { setOnboardingGuard, setOnboardingState } from '@/state/account';
+import { useAppDispatch } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
@@ -39,7 +39,7 @@ export const AccountsProvider = ({ ...props }) => (
 export const useAccounts = () => useContext(AccountsContext)!;
 
 const useAccountsContext = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   // Wallet connection
   const {

@@ -1,4 +1,3 @@
-import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useEnsName } from 'wagmi';
@@ -31,6 +30,7 @@ import {
   getHistoricalTradingRewardsForCurrentWeek,
   getOnboardingState,
 } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -55,10 +55,10 @@ type Action = {
 
 const Profile = () => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const onboardingState = useSelector(getOnboardingState);
+  const onboardingState = useAppSelector(getOnboardingState);
   const isConnected = onboardingState !== OnboardingState.Disconnected;
 
   const { evmAddress, dydxAddress, walletType } = useAccounts();
@@ -69,7 +69,7 @@ const Profile = () => {
     chainId: ENS_CHAIN_ID,
   });
 
-  const currentWeekTradingReward = useSelector(getHistoricalTradingRewardsForCurrentWeek);
+  const currentWeekTradingReward = useAppSelector(getHistoricalTradingRewardsForCurrentWeek);
 
   const actions: Action[] = [
     {
@@ -434,8 +434,7 @@ const $InlineRow = styled.div`
 `;
 
 const $PanelButton = styled(Panel)`
-  --panel-paddingY: 0
-  --panel-paddingX:0;
+  --panel-paddingY: 0 --panel-paddingX: 0;
 `;
 
 const $SettingsButton = styled($PanelButton)`

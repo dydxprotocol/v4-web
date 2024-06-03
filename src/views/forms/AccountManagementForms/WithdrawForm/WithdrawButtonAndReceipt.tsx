@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TransferInputTokenResource } from '@/constants/abacus';
@@ -25,6 +25,7 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -53,9 +54,10 @@ export const WithdrawButtonAndReceipt = ({
   const [isEditingSlippage, setIsEditingSlipapge] = useState(false);
   const stringGetter = useStringGetter();
 
-  const { leverage } = useSelector(getSubaccount, shallowEqual) ?? {};
-  const { summary, requestPayload, exchange } = useSelector(getTransferInputs, shallowEqual) ?? {};
-  const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
+  const { leverage } = useAppSelector(getSubaccount, shallowEqual) ?? {};
+  const { summary, requestPayload, exchange } =
+    useAppSelector(getTransferInputs, shallowEqual) ?? {};
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
   const { usdcLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
 

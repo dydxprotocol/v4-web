@@ -1,4 +1,3 @@
-import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
 import {
@@ -18,6 +17,7 @@ import { PageMenu } from '@/components/PageMenu';
 import { PageMenuItemType } from '@/components/PageMenu/PageMenuItem';
 import { useNetworks } from '@/views/menus/useNetworks';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setSelectedLocale } from '@/state/localization';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
@@ -26,8 +26,8 @@ import { SettingsHeader } from './SettingsHeader';
 const SettingsPage = () => {
   const stringGetter = useStringGetter();
   const { pathname } = useLocation();
-  const dispatch = useDispatch();
-  const selectedLocale = useSelector(getSelectedLocale);
+  const dispatch = useAppDispatch();
+  const selectedLocale = useAppSelector(getSelectedLocale);
   const networks = useNetworks();
   const { switchNetwork, selectedNetwork } = useSelectedNetwork();
 

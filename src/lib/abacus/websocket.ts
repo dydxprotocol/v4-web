@@ -84,7 +84,7 @@ class AbacusWebsocket implements Omit<AbacusWebsocketProtocol, '__doNotUseOrImpl
 
   private _initializeSocket = (): void => {
     if (!this.url || !this.connectedCallback || !this.receivedCallback) return;
-    if ((this.socket && this.socket.readyState === WebSocket.OPEN) || this.isConnecting) {
+    if ((this.socket != null && this.socket.readyState === WebSocket.OPEN) || this.isConnecting) {
       return;
     }
 

@@ -1,5 +1,4 @@
 import { isTruthy } from '@dydxprotocol/v4-client-js/build/src/network_optimizer';
-import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -28,17 +27,18 @@ import { LanguageSelector } from '@/views/menus/LanguageSelector';
 import { NetworkSelectMenu } from '@/views/menus/NetworkSelectMenu';
 import { NotificationsMenu } from '@/views/menus/NotificationsMenu';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getHasSeenLaunchIncentives } from '@/state/configsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
   const { documentation, community, mintscanBase, exchangeStats } = useURLConfigs();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { chainTokenLabel } = useTokenConfigs();
   const { complianceState } = useComplianceState();
 
-  const hasSeenLaunchIncentives = useSelector(getHasSeenLaunchIncentives);
+  const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
 
   const navItems = [
     {

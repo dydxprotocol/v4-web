@@ -1,13 +1,14 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 
 import { RestrictionType } from '@/constants/abacus';
 
 import { getRestrictionType } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 const useRestrictionContext = () => {
-  const restrictionType = useSelector(getRestrictionType, shallowEqual);
+  const restrictionType = useAppSelector(getRestrictionType, shallowEqual);
   const [sanctionedAddresses, setSanctionedAddresses] = useState<string[]>([]);
 
   const updateSanctionedAddresses = useCallback(

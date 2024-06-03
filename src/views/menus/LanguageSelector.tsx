@@ -1,4 +1,3 @@
-import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { SUPPORTED_LOCALE_STRING_LABELS, SupportedLocales } from '@/constants/localization';
@@ -7,6 +6,7 @@ import { headerMixins } from '@/styles/headerMixins';
 
 import { DropdownSelectMenu } from '@/components/DropdownSelectMenu';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setSelectedLocale } from '@/state/localization';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
@@ -21,8 +21,8 @@ const localizationItems = Object.values(SupportedLocales).map((locale) => ({
 }));
 
 export const LanguageSelector = ({ align, sideOffset }: StyleProps) => {
-  const dispatch = useDispatch();
-  const selectedLocale = useSelector(getSelectedLocale);
+  const dispatch = useAppDispatch();
+  const selectedLocale = useAppSelector(getSelectedLocale);
 
   return (
     <$DropdownSelectMenu

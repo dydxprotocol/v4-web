@@ -1,7 +1,7 @@
 import { FormEvent, useState } from 'react';
 
 import { NumberFormatValues } from 'react-number-format';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
@@ -24,6 +24,7 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithLabel } from '@/components/WithLabel';
 
 import { getSubaccount } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getInputTradeTargetLeverage } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -35,12 +36,12 @@ export const AdjustTargetLeverageForm = ({
   onSetTargetLeverage: (value: string) => void;
 }) => {
   const stringGetter = useStringGetter();
-  const { buyingPower } = useSelector(getSubaccount, shallowEqual) ?? {};
+  const { buyingPower } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
   /**
    * @todo: Replace with Abacus functionality
    */
-  const targetLeverage = useSelector(getInputTradeTargetLeverage);
+  const targetLeverage = useAppSelector(getInputTradeTargetLeverage);
   const [leverage, setLeverage] = useState(targetLeverage?.toString() ?? '');
   const leverageBN = MustBigNumber(leverage);
 

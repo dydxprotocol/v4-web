@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css, keyframes } from 'styled-components';
 
 import { MarketTrade } from '@/constants/abacus';
@@ -16,6 +16,7 @@ import breakpoints from '@/styles/breakpoints';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketLiveTrades } from '@/state/perpetualsSelectors';
 
@@ -45,10 +46,10 @@ type RowData = {
 export const LiveTrades = ({ className, histogramSide = 'left' }: StyleProps) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-  const currentMarketAssetData = useSelector(getCurrentMarketAssetData, shallowEqual);
-  const currentMarketConfig = useSelector(getCurrentMarketConfig, shallowEqual);
+  const currentMarketAssetData = useAppSelector(getCurrentMarketAssetData, shallowEqual);
+  const currentMarketConfig = useAppSelector(getCurrentMarketConfig, shallowEqual);
   const currentMarketLiveTrades =
-    useSelector(getCurrentMarketLiveTrades, shallowEqual) ?? EMPTY_ARR;
+    useAppSelector(getCurrentMarketLiveTrades, shallowEqual) ?? EMPTY_ARR;
 
   const { id = '' } = currentMarketAssetData ?? {};
   const { stepSizeDecimals, tickSizeDecimals } = currentMarketConfig ?? {};
