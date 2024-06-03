@@ -1,15 +1,16 @@
 import { useEffect } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 
 import { TradeInputField } from '@/constants/abacus';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getTradeFormInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 
 export const useTradeFormInputs = () => {
-  const tradeFormInputValues = useSelector(getTradeFormInputs, shallowEqual);
+  const tradeFormInputValues = useAppSelector(getTradeFormInputs, shallowEqual);
   const { limitPriceInput, triggerPriceInput, trailingPercentInput } = tradeFormInputValues;
 
   useEffect(() => {

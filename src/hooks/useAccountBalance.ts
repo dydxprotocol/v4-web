@@ -1,14 +1,15 @@
 import { useCallback } from 'react';
 
 import { StargateClient } from '@cosmjs/stargate';
-import { useQuery } from 'react-query';
-import { shallowEqual, useSelector } from 'react-redux';
+import { useQuery } from '@tanstack/react-query';
+import { shallowEqual } from 'react-redux';
 import { formatUnits } from 'viem';
 import { useBalance } from 'wagmi';
 
 import { EvmAddress } from '@/constants/wallets';
 
 import { getBalances, getStakingBalances } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import { convertBech32Address } from '@/lib/addressUtils';
 import { MustBigNumber } from '@/lib/numbers';
@@ -46,10 +47,10 @@ export const useAccountBalance = ({
 }: UseAccountBalanceProps = {}) => {
   const { evmAddress, dydxAddress } = useAccounts();
 
-  const balances = useSelector(getBalances, shallowEqual);
+  const balances = useAppSelector(getBalances, shallowEqual);
   const { chainTokenDenom, usdcDenom } = useTokenConfigs();
   const evmChainId = Number(useEnvConfig('ethereumChainId'));
-  const stakingBalances = useSelector(getStakingBalances, shallowEqual);
+  const stakingBalances = useAppSelector(getStakingBalances, shallowEqual);
 
   const evmQuery = useBalance({
     enabled: Boolean(!isCosmosChain && addressOrDenom?.startsWith('0x')),
@@ -78,7 +79,7 @@ export const useAccountBalance = ({
 
   const cosmosQuery = useQuery({
     enabled: Boolean(isCosmosChain && dydxAddress && bech32AddrPrefix && rpc && addressOrDenom),
-    queryKey: `accountBalances_${chainId}_${addressOrDenom}`,
+    queryKey: ['accountBalances', chainId, addressOrDenom],
     queryFn: cosmosQueryFn,
     refetchOnWindowFocus: false,
     refetchOnMount: false,

@@ -1,10 +1,11 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 
 import type { StringGetterFunction } from '@/constants/localization';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getLocaleStringGetter } from '@/state/localizationSelectors';
 
 export const useStringGetter = (): StringGetterFunction => {
-  const stringGetterFunction = useSelector(getLocaleStringGetter, shallowEqual);
+  const stringGetterFunction = useAppSelector(getLocaleStringGetter, shallowEqual);
   return stringGetterFunction;
 };

@@ -1,4 +1,3 @@
-import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { DialogTypes } from '@/constants/dialogs';
@@ -16,17 +15,18 @@ import { Icon, IconName } from '@/components/Icon';
 import { NavigationMenu } from '@/components/NavigationMenu';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { getCurrentMarketId } from '@/state/perpetualsSelectors';
 
 export const FooterMobile = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const stringGetter = useStringGetter();
 
-  const canAccountTrade = useSelector(calculateCanAccountTrade);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
-  const marketId = useSelector(getCurrentMarketId);
+  const marketId = useAppSelector(getCurrentMarketId);
 
   if (!useShouldShowFooter()) return null;
 

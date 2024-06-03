@@ -25,6 +25,7 @@ import { MigratePanel } from './MigratePanel';
 import { NewMarketsPanel } from './NewMarketsPanel';
 import { RewardHistoryPanel } from './RewardHistoryPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
+import { StakingPanel } from './StakingPanel';
 import { TradingRewardsChartPanel } from './TradingRewardsChartPanel';
 import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
 
@@ -35,7 +36,7 @@ const RewardsPage = () => {
   const { complianceState } = useComplianceState();
   const { isTablet, isNotTablet } = useBreakpoints();
 
-  const tradingRewardsRehaulEnabled = testFlags.tradingRewardsRehaul;
+  const { enableStaking, tradingRewardsRehaul: tradingRewardsRehaulEnabled } = testFlags;
   const showGeoblockedPanel = tradingRewardsRehaulEnabled && true;
   // const showGeoblockedPanel = tradingRewardsRehaulEnabled && complianceState !== ComplianceStates.FULL_ACCESS;
 
@@ -60,6 +61,7 @@ const RewardsPage = () => {
           {/* List of unstaking panels */}
           {tradingRewardsRehaulEnabled && <TradingRewardsChartPanel />}
           <$LaunchIncentivesPanel />
+          {enableStaking ? <$StakingPanel /> : <$DYDXBalancePanel />}
           <$TradingRewardsColumn>
             {!tradingRewardsRehaulEnabled && <TradingRewardsSummaryPanel />}
             {tradingRewardsRehaulEnabled && <NewMarketsPanel />}
@@ -80,6 +82,7 @@ const RewardsPage = () => {
         {import.meta.env.VITE_V3_TOKEN_ADDRESS && <$MigratePanel />}
         {tradingRewardsRehaulEnabled && <$TradingRewardsChartPanel />}
         <$LaunchIncentivesPanel />
+        {enableStaking ? <$StakingPanel /> : <$DYDXBalancePanel />}
         <$TradingRewardsColumn>
           {!tradingRewardsRehaulEnabled && <TradingRewardsSummaryPanel />}
           <RewardHistoryPanel />
@@ -163,12 +166,14 @@ const $GridLayout = styled.div<{
       showChartPanel
         ? css`
             grid-template-areas:
+              'balance'
               'chart'
               'incentives'
               'rewards';
           `
         : css`
             grid-template-areas:
+              'balance'
               'incentives'
               'rewards';
           `}
@@ -188,6 +193,10 @@ const $LaunchIncentivesPanel = styled(LaunchIncentivesPanel)`
 `;
 
 const $DYDXBalancePanel = styled(DYDXBalancePanel)`
+  grid-area: balance;
+`;
+
+const $StakingPanel = styled(StakingPanel)`
   grid-area: balance;
 `;
 

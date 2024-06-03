@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { groupBy, isEqual } from 'lodash';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -45,6 +45,7 @@ import {
   getSubaccountOrders,
 } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { useAppSelector, useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
@@ -78,10 +79,10 @@ export const notificationTypes: NotificationTypeConfig[] = [
     type: NotificationType.AbacusGenerated,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
-      const abacusNotifications = useSelector(getAbacusNotifications, isEqual);
-      const orders = useSelector(getSubaccountOrders, shallowEqual) ?? [];
+      const abacusNotifications = useAppSelector(getAbacusNotifications, isEqual);
+      const orders = useAppSelector(getSubaccountOrders, shallowEqual) ?? [];
       const ordersById = groupBy(orders, 'id');
-      const localPlaceOrders = useSelector(getLocalPlaceOrders, shallowEqual);
+      const localPlaceOrders = useAppSelector(getLocalPlaceOrders, shallowEqual);
 
       useEffect(() => {
         // eslint-disable-next-line no-restricted-syntax
@@ -168,12 +169,12 @@ export const notificationTypes: NotificationTypeConfig[] = [
       }, [abacusNotifications, stringGetter]);
     },
     useNotificationAction: () => {
-      const dispatch = useDispatch();
-      const orders = useSelector(getSubaccountOrders, shallowEqual) ?? [];
+      const dispatch = useAppDispatch();
+      const orders = useAppSelector(getSubaccountOrders, shallowEqual) ?? [];
       const ordersById = groupBy(orders, 'id');
-      const fills = useSelector(getSubaccountFills, shallowEqual) ?? [];
+      const fills = useAppSelector(getSubaccountFills, shallowEqual) ?? [];
       const fillsById = groupBy(fills, 'id');
-      const marketIds = useSelector(getMarketIds, shallowEqual);
+      const marketIds = useAppSelector(getMarketIds, shallowEqual);
       const navigate = useNavigate();
 
       return (notificationId: string) => {
@@ -207,7 +208,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
       const { transferNotifications } = useLocalNotifications();
-      const selectedDydxChainId = useSelector(getSelectedDydxChainId);
+      const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
       useEffect(() => {
         // eslint-disable-next-line no-restricted-syntax
@@ -434,7 +435,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       }, [stringGetter, complianceMessage, complianceState, complianceStatus]);
     },
     useNotificationAction: () => {
-      const dispatch = useDispatch();
+      const dispatch = useAppDispatch();
       const { complianceStatus } = useComplianceState();
 
       return () => {
@@ -451,9 +452,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
   {
     type: NotificationType.OrderStatus,
     useTrigger: ({ trigger }) => {
-      const localPlaceOrders = useSelector(getLocalPlaceOrders, shallowEqual);
-      const localCancelOrders = useSelector(getLocalCancelOrders, shallowEqual);
-      const allOrders = useSelector(getSubaccountOrders, shallowEqual);
+      const localPlaceOrders = useAppSelector(getLocalPlaceOrders, shallowEqual);
+      const localCancelOrders = useAppSelector(getLocalCancelOrders, shallowEqual);
+      const allOrders = useAppSelector(getSubaccountOrders, shallowEqual);
       const stringGetter = useStringGetter();
 
       useEffect(() => {
@@ -515,8 +516,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
       }, [localCancelOrders]);
     },
     useNotificationAction: () => {
-      const dispatch = useDispatch();
-      const orders = useSelector(getSubaccountOrders, shallowEqual) ?? [];
+      const dispatch = useAppDispatch();
+      const orders = useAppSelector(getSubaccountOrders, shallowEqual) ?? [];
 
       return (orderClientId: string) => {
         const order = orders.find((o) => o.clientId?.toString() === orderClientId);

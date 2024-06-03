@@ -4,7 +4,7 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { ColumnSize } from '@react-types/table';
 import type { Dispatch } from '@reduxjs/toolkit';
 import { DateTime } from 'luxon';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { Asset, Nullable, SubaccountOrder } from '@/constants/abacus';
@@ -39,6 +39,7 @@ import {
   getHasUnseenOrderUpdates,
   getSubaccountUnclearedOrders,
 } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
@@ -320,18 +321,18 @@ export const OrdersTable = ({
   withOuterBorder,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { isTablet } = useBreakpoints();
 
-  const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
-  const marketOrders = useSelector(getCurrentMarketOrders, shallowEqual) ?? EMPTY_ARR;
-  const allOrders = useSelector(getSubaccountUnclearedOrders, shallowEqual) ?? EMPTY_ARR;
+  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
+  const marketOrders = useAppSelector(getCurrentMarketOrders, shallowEqual) ?? EMPTY_ARR;
+  const allOrders = useAppSelector(getSubaccountUnclearedOrders, shallowEqual) ?? EMPTY_ARR;
   const orders = currentMarket ? marketOrders : allOrders;
 
-  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
-  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
+  const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
 
-  const hasUnseenOrderUpdates = useSelector(getHasUnseenOrderUpdates);
+  const hasUnseenOrderUpdates = useAppSelector(getHasUnseenOrderUpdates);
 
   useEffect(() => {
     if (hasUnseenOrderUpdates) dispatch(viewedOrders());
@@ -433,7 +434,7 @@ const $Side = styled.span<{ side: OrderSide }>`
       [OrderSide.SELL]: css`
         color: var(--color-negative);
       `,
-    }[side])};
+    })[side]};
 `;
 
 const $EmptyIcon = styled(Icon)`

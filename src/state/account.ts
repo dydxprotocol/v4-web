@@ -5,6 +5,7 @@ import type {
   Compliance,
   HistoricalPnlPeriods,
   Nullable,
+  StakingDelegation,
   SubAccountHistoricalPNLs,
   Subaccount,
   SubaccountFill,
@@ -33,6 +34,7 @@ import { getLocalStorage } from '@/lib/localStorage';
 export type AccountState = {
   balances?: Record<string, AccountBalance>;
   stakingBalances?: Record<string, AccountBalance>;
+  stakingDelegations?: StakingDelegation[];
   tradingRewards?: TradingRewards;
   wallet?: Nullable<Wallet>;
   walletType?: WalletType;
@@ -47,7 +49,7 @@ export type AccountState = {
   onboardingState: OnboardingState;
 
   clearedOrderIds?: string[];
-  hasUnseenFillUpdates: boolean;
+  unseenFillsCountPerMarket: Record<string, number>;
   hasUnseenOrderUpdates: boolean;
   latestOrder?: Nullable<SubaccountOrder>;
   historicalPnlPeriod?: HistoricalPnlPeriods;
@@ -88,7 +90,7 @@ const initialState: AccountState = {
 
   // UI
   clearedOrderIds: undefined,
-  hasUnseenFillUpdates: false,
+  unseenFillsCountPerMarket: {},
   hasUnseenOrderUpdates: false,
   latestOrder: undefined,
   uncommittedOrderClientIds: [],
@@ -113,12 +115,22 @@ export const accountSlice = createSlice({
         state.fills != null &&
         (action.payload ?? []).some((fill: SubaccountFill) => !existingFillIds.includes(fill.id));
 
+      const newUnseenFillsCountPerMarket = { ...state.unseenFillsCountPerMarket };
+      if (hasNewFillUpdates) {
+        (action.payload ?? [])
+          .filter((fill: SubaccountFill) => !existingFillIds.includes(fill.id))
+          .forEach((fill: SubaccountFill) => {
+            newUnseenFillsCountPerMarket[fill.marketId] =
+              (newUnseenFillsCountPerMarket[fill.marketId] ?? 0) + 1;
+          });
+      }
+
       const filledOrderIds = (action.payload ?? []).map((fill: SubaccountFill) => fill.orderId);
 
       return {
         ...state,
         fills: action.payload,
-        hasUnseenFillUpdates: state.hasUnseenFillUpdates || hasNewFillUpdates,
+        unseenFillsCountPerMarket: newUnseenFillsCountPerMarket,
         localPlaceOrders: hasNewFillUpdates
           ? state.localPlaceOrders.map((order) =>
               order.submissionStatus < PlaceOrderStatuses.Filled &&
@@ -212,8 +224,14 @@ export const accountSlice = createSlice({
       ...state,
       wallet: action.payload,
     }),
-    viewedFills: (state) => {
-      state.hasUnseenFillUpdates = false;
+    viewedFills: (state, action: PayloadAction<string | undefined>) => {
+      if (!action.payload) {
+        // viewed fills for all markets
+        state.unseenFillsCountPerMarket = {};
+      } else {
+        const { [action.payload]: unseenCount, ...remaining } = state.unseenFillsCountPerMarket;
+        state.unseenFillsCountPerMarket = remaining;
+      }
     },
     viewedOrders: (state) => {
       state.hasUnseenOrderUpdates = false;
@@ -223,6 +241,9 @@ export const accountSlice = createSlice({
     },
     setStakingBalances: (state, action: PayloadAction<Record<string, AccountBalance>>) => {
       state.stakingBalances = action.payload;
+    },
+    setStakingDelegations: (state, action: PayloadAction<StakingDelegation[]>) => {
+      state.stakingDelegations = action.payload;
     },
     setTradingRewards: (state, action: PayloadAction<TradingRewards>) => {
       state.tradingRewards = action.payload;
@@ -304,6 +325,7 @@ export const {
   viewedOrders,
   setBalances,
   setStakingBalances,
+  setStakingDelegations,
   setTradingRewards,
   placeOrderSubmitted,
   placeOrderFailed,

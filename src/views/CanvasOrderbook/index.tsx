@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useMemo, useRef } from 'react';
 
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { Nullable, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
@@ -17,6 +17,7 @@ import { Canvas } from '@/components/Canvas';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Tag } from '@/components/Tag';
 
+import { useAppSelector, useAppDispatch } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
@@ -46,9 +47,9 @@ export const CanvasOrderbook = forwardRef(
       });
 
     const stringGetter = useStringGetter();
-    const currentMarket = useSelector(getCurrentMarketId) ?? '';
-    const currentMarketConfig = useSelector(getCurrentMarketConfig, shallowEqual);
-    const { id = '' } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+    const currentMarket = useAppSelector(getCurrentMarketId) ?? '';
+    const currentMarketConfig = useAppSelector(getCurrentMarketConfig, shallowEqual);
+    const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
 
     const { tickSizeDecimals = 2 } = currentMarketConfig ?? {};
 
@@ -92,8 +93,8 @@ export const CanvasOrderbook = forwardRef(
     /**
      * Row action
      */
-    const currentInput = useSelector(getCurrentInput);
-    const dispatch = useDispatch();
+    const currentInput = useAppSelector(getCurrentInput);
+    const dispatch = useAppDispatch();
     const onRowAction = useCallback(
       (price: Nullable<number>) => {
         if (currentInput === 'trade' && price) {

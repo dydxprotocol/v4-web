@@ -1,4 +1,3 @@
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { DialogTypes } from '@/constants/dialogs';
@@ -10,11 +9,12 @@ import { useURLConfigs } from '@/hooks/useURLConfigs';
 import { Link } from '@/components/Link';
 import { Panel } from '@/components/Panel';
 
+import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 export const StakingPanel = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { stakingLearnMore } = useURLConfigs();
 
   return (

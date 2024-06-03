@@ -88,8 +88,8 @@ export const formatRelativeTime = (
               ? format === 'singleCharacter'
                 ? toSingleCharacterTimeUnit(stripRelativeWords ? isolateTimeUnit(value) : value)
                 : stripRelativeWords
-                ? isolateTimeUnit(value)
-                : value
+                  ? isolateTimeUnit(value)
+                  : value
               : /* : type === 'integer' ?
                 // fr/ru: remove "past" negative signs
                 Math.abs(Number(value)) */

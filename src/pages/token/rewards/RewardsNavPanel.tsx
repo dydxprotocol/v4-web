@@ -1,3 +1,5 @@
+import React from 'react';
+
 import styled, { css } from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
@@ -58,14 +60,12 @@ export const RewardsNavPanel = ({
       onClick={onNav}
     >
       <$Description>
-        <>
-          {description}
-          {learnMore && (
-            <$Link href={learnMore} onClick={(e) => e.stopPropagation()}>
-              {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
-            </$Link>
-          )}
-        </>
+        {description}
+        {learnMore && (
+          <$Link href={learnMore} onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+            {stringGetter({ key: STRING_KEYS.LEARN_MORE_ARROW })}
+          </$Link>
+        )}
       </$Description>
     </Panel>
   );
@@ -111,5 +111,7 @@ const $Link = styled(Link)`
 
   ::before {
     content: ' ';
+    display: inline-block;
+    white-space: pre-wrap;
   }
 `;

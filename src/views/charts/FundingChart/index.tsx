@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { curveMonotoneX, curveStepAfter } from '@visx/curve';
 import type { TooltipContextType } from '@visx/xychart';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { ButtonSize } from '@/constants/buttons';
@@ -22,6 +22,7 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { AxisLabelOutput } from '@/components/visx/AxisLabelOutput';
 import { TimeSeriesChart } from '@/components/visx/TimeSeriesChart';
 
+import { useAppSelector } from '@/state/appTypes';
 import { calculateFundingRateHistory } from '@/state/perpetualsCalculators';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -48,7 +49,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
   const stringGetter = useStringGetter();
 
   // Chart data
-  const data = useSelector(calculateFundingRateHistory, shallowEqual) as FundingChartDatum[];
+  const data = useAppSelector(calculateFundingRateHistory, shallowEqual) as FundingChartDatum[];
 
   const latestDatum = data?.[data.length - 1];
 

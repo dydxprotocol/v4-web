@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import {
@@ -38,6 +38,7 @@ import { PositionPreview } from '@/views/forms/TradeForm/PositionPreview';
 import { Orderbook, orderbookMixins, type OrderbookScrollBehavior } from '@/views/tables/Orderbook';
 
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { closeDialog } from '@/state/dialogs';
 import { getClosePositionInputErrors, getInputClosePositionData } from '@/state/inputsSelectors';
@@ -76,7 +77,7 @@ export const ClosePositionForm = ({
   className,
 }: ElementProps & StyledProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { isTablet } = useBreakpoints();
   const isFirstRender = useIsFirstRender();
 
@@ -84,14 +85,14 @@ export const ClosePositionForm = ({
 
   const { closePosition } = useSubaccount();
 
-  const market = useSelector(getCurrentMarketId);
-  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const market = useAppSelector(getCurrentMarketId);
+  const { id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const { stepSizeDecimals, tickSizeDecimals } =
-    useSelector(getCurrentMarketConfig, shallowEqual) ?? {};
-  const { size: sizeData, summary } = useSelector(getInputClosePositionData, shallowEqual) ?? {};
+    useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const { size: sizeData, summary } = useAppSelector(getInputClosePositionData, shallowEqual) ?? {};
   const { size, percent } = sizeData ?? {};
-  const closePositionInputErrors = useSelector(getClosePositionInputErrors, shallowEqual);
-  const currentPositionData = useSelector(getCurrentMarketPositionData, shallowEqual);
+  const closePositionInputErrors = useAppSelector(getClosePositionInputErrors, shallowEqual);
+  const currentPositionData = useAppSelector(getCurrentMarketPositionData, shallowEqual);
   const { size: currentPositionSize } = currentPositionData ?? {};
   const { current: currentSize } = currentPositionSize ?? {};
   const currentSizeBN = MustBigNumber(currentSize).abs();
