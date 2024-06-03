@@ -1,4 +1,4 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -11,17 +11,18 @@ import { BackButton } from '@/components/BackButton';
 import { Output, OutputType } from '@/components/Output';
 import { MidMarketPrice } from '@/views/MidMarketPrice';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketData } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 
 export const TradeHeaderMobile = () => {
-  const { name, id } = useSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { name, id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
   const navigate = useNavigate();
 
   const { market, priceChange24H, priceChange24HPercent } =
-    useSelector(getCurrentMarketData, shallowEqual) ?? {};
+    useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
 
   return (
     <$Header>

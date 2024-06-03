@@ -79,5 +79,5 @@ export const getNumberSign = (n: any): NumberSign =>
   MustBigNumber(n).gt(0)
     ? NumberSign.Positive
     : MustBigNumber(n).lt(0)
-    ? NumberSign.Negative
-    : NumberSign.Neutral;
+      ? NumberSign.Negative
+      : NumberSign.Neutral;

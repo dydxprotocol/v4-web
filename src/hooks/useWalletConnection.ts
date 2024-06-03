@@ -8,7 +8,6 @@ import {
   useDisconnect as useDisconnectGraz,
   useOfflineSigners as useOfflineSignersGraz,
 } from 'graz';
-import { useSelector } from 'react-redux';
 import {
   useAccount as useAccountWagmi,
   useConnect as useConnectWagmi,
@@ -33,6 +32,7 @@ import {
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import { log } from '@/lib/telemetry';
 import { testFlags } from '@/lib/testFlags';
@@ -91,7 +91,7 @@ export const useWalletConnection = () => {
 
   // Wallet connection
 
-  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const walletConnectConfig = WALLETS_CONFIG_MAP[selectedDydxChainId].walletconnect;
   const wagmiConnector = useMemo(
     () =>
@@ -164,7 +164,7 @@ export const useWalletConnection = () => {
           saveEvmAddress(STRING_KEYS.TEST_WALLET as EvmAddress);
         } else {
           // if account connected (via remember me), do not show wagmi popup until forceConnect
-          if (!isConnectedWagmi && (forceConnect || !isAccountConnected)) {
+          if (!isConnectedWagmi && (!!forceConnect || !isAccountConnected)) {
             await connectWagmi({
               connector: resolveWagmiConnector({
                 walletType: wType,

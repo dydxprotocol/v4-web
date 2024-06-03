@@ -1,10 +1,11 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 
 import type { AbacusApiState, Nullable } from '@/constants/abacus';
 import { AbacusApiStatus } from '@/constants/abacus';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 
 import { getApiState, getInitializationError } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import { useStringGetter } from './useStringGetter';
 
@@ -89,8 +90,8 @@ const getIndexerHeight = (apiState: Nullable<AbacusApiState>) => {
 
 export const useApiState = () => {
   const stringGetter = useStringGetter();
-  const apiState = useSelector(getApiState, shallowEqual);
-  const initializationError = useSelector(getInitializationError);
+  const apiState = useAppSelector(getApiState, shallowEqual);
+  const initializationError = useAppSelector(getInitializationError);
   const { haltedBlock, height, status, trailingBlocks } = apiState ?? {};
   const connectionError = getConnectionError({
     apiState,

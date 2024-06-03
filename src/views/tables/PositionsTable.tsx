@@ -1,7 +1,7 @@
 import { Key, useMemo } from 'react';
 
 import type { ColumnSize } from '@react-types/table';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -36,6 +36,7 @@ import { MarketTypeFilter, marketTypeMatchesFilter } from '@/pages/trade/types';
 
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
 import { getExistingOpenPositions, getSubaccountConditionalOrders } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
@@ -389,11 +390,11 @@ export const PositionsTable = ({
   const navigate = useNavigate();
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
 
-  const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
-  const perpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
-  const assets = orEmptyObj(useSelector(getAssets, shallowEqual));
+  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
+  const perpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const assets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
 
-  const openPositions = useSelector(getExistingOpenPositions, shallowEqual) ?? EMPTY_ARR;
+  const openPositions = useAppSelector(getExistingOpenPositions, shallowEqual) ?? EMPTY_ARR;
   const positions = useMemo(() => {
     return openPositions.filter((position) => {
       const matchesMarket = currentMarket == null || position.id === currentMarket;
@@ -404,17 +405,16 @@ export const PositionsTable = ({
     });
   }, [currentMarket, marketTypeFilter, openPositions]);
 
-  const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } = useSelector(
-    getSubaccountConditionalOrders(isSlTpLimitOrdersEnabled),
-    {
+  const conditionalOrderSelector = useMemo(getSubaccountConditionalOrders, []);
+  const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } =
+    useAppSelector((s) => conditionalOrderSelector(s, isSlTpLimitOrdersEnabled), {
       equalityFn: (oldVal, newVal) => {
         return (
           shallowEqual(oldVal.stopLossOrders, newVal.stopLossOrders) &&
           shallowEqual(oldVal.takeProfitOrders, newVal.takeProfitOrders)
         );
       },
-    }
-  );
+    });
 
   const positionsData = useMemo(
     () =>

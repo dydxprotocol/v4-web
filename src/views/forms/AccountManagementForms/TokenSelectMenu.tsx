@@ -1,4 +1,4 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TransferInputTokenResource, TransferType } from '@/constants/abacus';
@@ -14,6 +14,7 @@ import { DiffArrow } from '@/components/DiffArrow';
 import { SearchSelectMenu } from '@/components/SearchSelectMenu';
 import { Tag } from '@/components/Tag';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import cctpTokens from '../../../../public/configs/cctp.json';
@@ -27,18 +28,21 @@ type ElementProps = {
 
 const CURVE_DAO_TOKEN_ADDRESS = '0xD533a949740bb3306d119CC777fa900bA034cd52';
 
-const cctpTokensByAddress = cctpTokens.reduce((acc, token) => {
-  if (!acc[token.tokenAddress]) {
-    acc[token.tokenAddress] = [];
-  }
-  acc[token.tokenAddress].push(token);
-  return acc;
-}, {} as Record<string, TokenInfo[]>);
+const cctpTokensByAddress = cctpTokens.reduce(
+  (acc, token) => {
+    if (!acc[token.tokenAddress]) {
+      acc[token.tokenAddress] = [];
+    }
+    acc[token.tokenAddress].push(token);
+    return acc;
+  },
+  {} as Record<string, TokenInfo[]>
+);
 
 export const TokenSelectMenu = ({ selectedToken, onSelectToken, isExchange }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions, resources } =
-    useSelector(getTransferInputs, shallowEqual) ?? {};
+    useAppSelector(getTransferInputs, shallowEqual) ?? {};
   const { CCTPWithdrawalOnly, CCTPDepositOnly } = useEnvFeatures();
 
   const tokens =

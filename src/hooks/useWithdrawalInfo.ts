@@ -4,12 +4,13 @@ import { encodeJson } from '@dydxprotocol/v4-client-js';
 import { ByteArrayEncoding } from '@dydxprotocol/v4-client-js/build/src/lib/helpers';
 import { useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 
 import { DialogTypes } from '@/constants/dialogs';
 import { isMainnet } from '@/constants/networks';
 
 import { getApiState } from '@/state/appSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { closeDialog, openDialog } from '@/state/dialogs';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
@@ -30,10 +31,10 @@ export const useWithdrawalInfo = ({
 }) => {
   const { getWithdrawalAndTransferGatingStatus, getWithdrawalCapacityByDenom } = useDydxClient();
   const { usdcDenom, usdcDecimals } = useTokenConfigs();
-  const apiState = useSelector(getApiState, shallowEqual);
+  const apiState = useAppSelector(getApiState, shallowEqual);
   const { height } = apiState ?? {};
-  const selectedLocale = useSelector(getSelectedLocale);
-  const dispatch = useDispatch();
+  const selectedLocale = useAppSelector(getSelectedLocale);
+  const dispatch = useAppDispatch();
   const { withdrawalSafetyEnabled } = useEnvFeatures();
 
   const { data: usdcWithdrawalCapacity } = useQuery({

@@ -1,8 +1,7 @@
-import { useSelector } from 'react-redux';
-
 import { LINKS_CONFIG_MAP } from '@/constants/networks';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 const FALLBACK_URL = 'https://help.dydx.exchange/';
 
@@ -11,6 +10,7 @@ export interface LinksConfigs {
   blogs?: string;
   community?: string;
   documentation?: string;
+  equityTiersLearnMore?: string;
   feedback?: string;
   foundation?: string;
   governanceLearnMore?: string;
@@ -36,7 +36,7 @@ export interface LinksConfigs {
 }
 
 export const useURLConfigs = (): LinksConfigs => {
-  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const linksConfigs = LINKS_CONFIG_MAP[selectedDydxChainId] as LinksConfigs;
 
   return {
@@ -44,6 +44,7 @@ export const useURLConfigs = (): LinksConfigs => {
     blogs: linksConfigs.blogs ?? FALLBACK_URL,
     community: linksConfigs.community ?? FALLBACK_URL,
     documentation: linksConfigs.documentation ?? FALLBACK_URL,
+    equityTiersLearnMore: linksConfigs.equityTiersLearnMore,
     feedback: linksConfigs.feedback ?? FALLBACK_URL,
     foundation: linksConfigs.foundation ?? FALLBACK_URL,
     governanceLearnMore: linksConfigs.governanceLearnMore ?? FALLBACK_URL,

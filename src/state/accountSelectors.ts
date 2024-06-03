@@ -1,13 +1,11 @@
-import type { Nullable, kollections } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import _ from 'lodash';
+import { sum } from 'lodash';
 import { createSelector } from 'reselect';
 
 import {
   AbacusOrderSide,
   AbacusOrderStatus,
   AbacusPositionSide,
-  HistoricalTradingReward,
   HistoricalTradingRewardsPeriod,
   ORDER_SIDES,
   type AbacusOrderStatuses,
@@ -21,7 +19,8 @@ import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 import { getHydratedTradingData, isStopLossOrder, isTakeProfitOrder } from '@/lib/orders';
 import { getHydratedPositionData } from '@/lib/positions';
 
-import type { RootState } from './_store';
+import { type RootState } from './_store';
+import { createAppSelector } from './appTypes';
 import { getAssets } from './assetsSelectors';
 import { getCurrentMarketId, getPerpetualMarkets } from './perpetualsSelectors';
 
@@ -60,8 +59,18 @@ export const getSubaccountHistoricalPnl = (state: RootState) => state.account?.h
  * @param state
  * @returns list of a subaccount's open positions. Each item in the list is an open position in a different market.
  */
-export const getOpenPositions = (state: RootState) =>
-  state.account.subaccount?.openPositions?.toArray();
+export const getOpenPositions = createAppSelector(
+  [(state: RootState) => state.account.subaccount?.openPositions],
+  (t) => t?.toArray()
+);
+
+/**
+ * @param state
+ * @returns list of a subaccount's open positions, excluding the ones in draft, i.e. with NONE position side.
+ */
+export const getExistingOpenPositions = createAppSelector([getOpenPositions], (allOpenPositions) =>
+  allOpenPositions?.filter((position) => position.side.current !== AbacusPositionSide.NONE)
+);
 
 /**
  *
@@ -77,10 +86,10 @@ export const getNonZeroPendingPositions = createSelector(
  * @returns user's position details with the given marketId
  */
 
-export const getPositionDetails = (marketId: string) =>
-  createSelector(
-    [getExistingOpenPositions, getAssets, getPerpetualMarkets],
-    (positions, assets, perpetualMarkets) => {
+export const getPositionDetails = () =>
+  createAppSelector(
+    [getExistingOpenPositions, getAssets, getPerpetualMarkets, (s, marketId: string) => marketId],
+    (positions, assets, perpetualMarkets, marketId) => {
       const matchingPosition = positions?.find((position) => position.id === marketId);
       return matchingPosition
         ? getHydratedPositionData({ data: matchingPosition, assets, perpetualMarkets })
@@ -88,16 +97,8 @@ export const getPositionDetails = (marketId: string) =>
     }
   );
 
-/**
- * @param state
- * @returns list of a subaccount's open positions, excluding the ones in draft, i.e. with NONE position side.
- */
-export const getExistingOpenPositions = createSelector([getOpenPositions], (allOpenPositions) =>
-  allOpenPositions?.filter((position) => position.side.current !== AbacusPositionSide.NONE)
-);
-
 export const getOpenPositionFromId = (marketId: string) =>
-  createSelector([getOpenPositions], (allOpenPositions) =>
+  createAppSelector([getOpenPositions], (allOpenPositions) =>
     allOpenPositions?.find(({ id }) => id === marketId)
   );
 
@@ -135,8 +136,10 @@ export const getCurrentMarketIsolatedPositionLeverage = createSelector(
  * @param state
  * @returns list of orders for the currently connected subaccount
  */
-export const getSubaccountOrders = (state: RootState) =>
-  state.account.subaccount?.orders?.toArray();
+export const getSubaccountOrders = createAppSelector(
+  [(state: RootState) => state.account.subaccount?.orders],
+  (t) => t?.toArray()
+);
 
 /**
  * @param state
@@ -154,7 +157,7 @@ export const getSubaccountClearedOrderIds = (state: RootState) => state.account.
  * @param state
  * @returns list of orders that user has not cleared and should be displayed
  */
-export const getSubaccountUnclearedOrders = createSelector(
+export const getSubaccountUnclearedOrders = createAppSelector(
   [getSubaccountOrders, getSubaccountClearedOrderIds],
   (orders, clearedOrderIds) => orders?.filter((order) => !clearedOrderIds?.includes(order.id))
 );
@@ -163,20 +166,25 @@ export const getSubaccountUnclearedOrders = createSelector(
  * @param state
  * @returns Record of SubaccountOrders indexed by marketId
  */
-export const getMarketOrders = (state: RootState): { [marketId: string]: SubaccountOrder[] } => {
-  const orders = getSubaccountUnclearedOrders(state);
-  return (orders ?? []).reduce((marketOrders, order) => {
-    marketOrders[order.marketId] ??= [];
-    marketOrders[order.marketId].push(order);
-    return marketOrders;
-  }, {} as { [marketId: string]: SubaccountOrder[] });
-};
+export const getMarketOrders = createAppSelector(
+  [getSubaccountUnclearedOrders],
+  (orders): { [marketId: string]: SubaccountOrder[] } => {
+    return (orders ?? []).reduce(
+      (marketOrders, order) => {
+        marketOrders[order.marketId] ??= [];
+        marketOrders[order.marketId].push(order);
+        return marketOrders;
+      },
+      {} as { [marketId: string]: SubaccountOrder[] }
+    );
+  }
+);
 
 /**
  * @param state
  * @returns SubaccountOrders of the current market
  */
-export const getCurrentMarketOrders = createSelector(
+export const getCurrentMarketOrders = createAppSelector(
   [getCurrentMarketId, getMarketOrders],
   (currentMarketId, marketOrders): SubaccountOrder[] =>
     !currentMarketId ? [] : marketOrders[currentMarketId]
@@ -186,7 +194,7 @@ export const getCurrentMarketOrders = createSelector(
  * @param state
  * @returns list of orders that have not been filled or cancelled
  */
-export const getSubaccountOpenOrders = createSelector([getSubaccountOrders], (orders) =>
+export const getSubaccountOpenOrders = createAppSelector([getSubaccountOrders], (orders) =>
   orders?.filter(
     (order) =>
       order.status !== AbacusOrderStatus.filled && order.status !== AbacusOrderStatus.cancelled
@@ -197,24 +205,27 @@ export const getSubaccountOpenOrders = createSelector([getSubaccountOrders], (or
  * @param state
  * @returns order with the specified id
  */
-export const getOrderById = (orderId: string) =>
-  createSelector([getSubaccountOrders], (orders) => orders?.find((order) => order.id === orderId));
+export const getOrderById = () =>
+  createAppSelector([getSubaccountOrders, (s, orderId: string) => orderId], (orders, orderId) =>
+    orders?.find((order) => order.id === orderId)
+  );
 
 /**
  * @param state
  * @returns order with the specified client id
  */
-export const getOrderByClientId = (orderClientId: number) =>
-  createSelector([getSubaccountOrders], (orders) =>
-    orders?.find((order) => order.clientId === orderClientId)
+export const getOrderByClientId = () =>
+  createAppSelector(
+    [getSubaccountOrders, (s, orderClientId: number) => orderClientId],
+    (orders, orderClientId) => orders?.find((order) => order.clientId === orderClientId)
   );
 
 /**
  * @param state
  * @returns first matching fill with the specified order client id
  */
-export const getFillByClientId = (orderClientId: number) =>
-  createSelector([getSubaccountFills, getOrderByClientId(orderClientId)], (fills, order) =>
+export const getFillByClientId = () =>
+  createAppSelector([getSubaccountFills, getOrderByClientId()], (fills, order) =>
     fills?.find((fill) => fill.orderId === order?.id)
   );
 
@@ -222,27 +233,36 @@ export const getFillByClientId = (orderClientId: number) =>
  * @param state
  * @returns Record of SubaccountOrders that have not been filled or cancelled, indexed by marketId
  */
-export const getMarketSubaccountOpenOrders = (
-  state: RootState
-): {
-  [marketId: string]: SubaccountOrder[];
-} => {
-  const orders = getSubaccountOpenOrders(state);
-  return (orders ?? []).reduce((marketOrders, order) => {
-    marketOrders[order.marketId] ??= [];
-    marketOrders[order.marketId].push(order);
-    return marketOrders;
-  }, {} as { [marketId: string]: SubaccountOrder[] });
-};
+export const getMarketSubaccountOpenOrders = createAppSelector(
+  [getSubaccountOpenOrders],
+  (
+    orders
+  ): {
+    [marketId: string]: SubaccountOrder[];
+  } => {
+    return (orders ?? []).reduce(
+      (marketOrders, order) => {
+        marketOrders[order.marketId] ??= [];
+        marketOrders[order.marketId].push(order);
+        return marketOrders;
+      },
+      {} as { [marketId: string]: SubaccountOrder[] }
+    );
+  }
+);
 
 /**
  * @param state
  * @returns list of conditional orders that have not been filled or cancelled for all subaccount positions
  */
-export const getSubaccountConditionalOrders = (isSlTpLimitOrdersEnabled: boolean) =>
-  createSelector(
-    [getMarketSubaccountOpenOrders, getOpenPositions],
-    (openOrdersByMarketId, positions) => {
+export const getSubaccountConditionalOrders = () =>
+  createAppSelector(
+    [
+      getMarketSubaccountOpenOrders,
+      getOpenPositions,
+      (s, isSlTpLimitOrdersEnabled: boolean) => isSlTpLimitOrdersEnabled,
+    ],
+    (openOrdersByMarketId, positions, isSlTpLimitOrdersEnabled) => {
       const stopLossOrders: SubaccountOrder[] = [];
       const takeProfitOrders: SubaccountOrder[] = [];
 
@@ -277,11 +297,11 @@ export const getSubaccountConditionalOrders = (isSlTpLimitOrdersEnabled: boolean
  * @param state
  * @returns list of orders that are in the open status
  */
-export const getSubaccountOpenStatusOrders = createSelector([getSubaccountOrders], (orders) =>
+export const getSubaccountOpenStatusOrders = createAppSelector([getSubaccountOrders], (orders) =>
   orders?.filter((order) => order.status === AbacusOrderStatus.open)
 );
 
-export const getSubaccountOrderSizeBySideAndPrice = createSelector(
+export const getSubaccountOrderSizeBySideAndPrice = createAppSelector(
   [getSubaccountOpenStatusOrders],
   (openOrders = []) => {
     const orderSizeBySideAndPrice: Partial<Record<OrderSide, Record<number, number>>> = {};
@@ -301,12 +321,15 @@ export const getSubaccountOrderSizeBySideAndPrice = createSelector(
 /**
  * @returns the clientId of the latest order
  */
-export const getLatestOrderClientId = createSelector([getLatestOrder], (order) => order?.clientId);
+export const getLatestOrderClientId = createAppSelector(
+  [getLatestOrder],
+  (order) => order?.clientId
+);
 
 /**
  * @returns the rawValue status of the latest order
  */
-export const getLatestOrderStatus = createSelector(
+export const getLatestOrderStatus = createAppSelector(
   [getLatestOrder],
   (order) => order?.status.rawValue
 );
@@ -331,10 +354,10 @@ export const getLocalCancelOrders = (state: RootState) => state.account.localCan
  * @param orderId
  * @returns order details with the given orderId
  */
-export const getOrderDetails = (orderId: string) =>
-  createSelector(
-    [getSubaccountOrders, getAssets, getPerpetualMarkets],
-    (orders, assets, perpetualMarkets) => {
+export const getOrderDetails = () =>
+  createAppSelector(
+    [getSubaccountOrders, getAssets, getPerpetualMarkets, (s, orderId: string) => orderId],
+    (orders, assets, perpetualMarkets, orderId) => {
       const matchingOrder = orders?.find((order) => order.id === orderId);
       return matchingOrder
         ? getHydratedTradingData({ data: matchingOrder, assets, perpetualMarkets })
@@ -352,23 +375,28 @@ export const getSubaccountFills = (state: RootState) => state.account?.fills;
  * @param state
  * @returns Record of SubaccountFills indexed by marketId
  */
-export const getMarketFills = (state: RootState): { [marketId: string]: SubaccountFill[] } => {
-  const fills = getSubaccountFills(state);
-  return (fills ?? []).reduce((marketFills, fill) => {
-    marketFills[fill.marketId] ??= [];
-    marketFills[fill.marketId].push(fill);
-    return marketFills;
-  }, {} as { [marketId: string]: SubaccountFill[] });
-};
+export const getMarketFills = createAppSelector(
+  [getSubaccountFills],
+  (fills): { [marketId: string]: SubaccountFill[] } => {
+    return (fills ?? []).reduce(
+      (marketFills, fill) => {
+        marketFills[fill.marketId] ??= [];
+        marketFills[fill.marketId].push(fill);
+        return marketFills;
+      },
+      {} as { [marketId: string]: SubaccountFill[] }
+    );
+  }
+);
 
 /**
  * @param state
  * @returns fill details with the given fillId
  */
-export const getFillDetails = (fillId: string) =>
-  createSelector(
-    [getSubaccountFills, getAssets, getPerpetualMarkets],
-    (fills, assets, perpetualMarkets) => {
+export const getFillDetails = () =>
+  createAppSelector(
+    [getSubaccountFills, getAssets, getPerpetualMarkets, (s, fillId: string) => fillId],
+    (fills, assets, perpetualMarkets, fillId) => {
       const matchingFill = fills?.find((fill) => fill.id === fillId);
       return matchingFill
         ? getHydratedTradingData({ data: matchingFill, assets, perpetualMarkets })
@@ -380,7 +408,7 @@ export const getFillDetails = (fillId: string) =>
  * @param state
  * @returns SubaccountFills of the current market
  */
-export const getCurrentMarketFills = createSelector(
+export const getCurrentMarketFills = createAppSelector(
   [getCurrentMarketId, getMarketFills],
   (currentMarketId, marketFills): SubaccountFill[] =>
     !currentMarketId ? [] : marketFills[currentMarketId]
@@ -402,22 +430,25 @@ export const getSubaccountFundingPayments = (state: RootState) => state.account?
  * @param state
  * @returns Record of SubaccountFundingPayments indexed by marketId
  */
-export const getMarketFundingPayments = (
-  state: RootState
-): { [marketId: string]: SubaccountFundingPayment[] } => {
-  const fundingPayments = getSubaccountFundingPayments(state);
-  return (fundingPayments ?? []).reduce((marketFundingPayments, fundingPayment) => {
-    marketFundingPayments[fundingPayment.marketId] ??= [];
-    marketFundingPayments[fundingPayment.marketId].push(fundingPayment);
-    return marketFundingPayments;
-  }, {} as { [marketId: string]: SubaccountFundingPayment[] });
-};
+export const getMarketFundingPayments = createAppSelector(
+  [getSubaccountFundingPayments],
+  (fundingPayments): { [marketId: string]: SubaccountFundingPayment[] } => {
+    return (fundingPayments ?? []).reduce(
+      (marketFundingPayments, fundingPayment) => {
+        marketFundingPayments[fundingPayment.marketId] ??= [];
+        marketFundingPayments[fundingPayment.marketId].push(fundingPayment);
+        return marketFundingPayments;
+      },
+      {} as { [marketId: string]: SubaccountFundingPayment[] }
+    );
+  }
+);
 
 /**
  * @param state
  * @returns SubaccountFundingPayments of the current market
  */
-export const getCurrentMarketFundingPayments = createSelector(
+export const getCurrentMarketFundingPayments = createAppSelector(
   [getCurrentMarketId, getMarketFundingPayments],
   (currentMarketId, marketFundingPayments): SubaccountFundingPayment[] =>
     !currentMarketId ? [] : marketFundingPayments[currentMarketId]
@@ -459,14 +490,14 @@ const getUnseenFillsCountForMarket = createSelector(
  */
 const getAllUnseenFillsCount = createSelector(
   [getUnseenFillsCountPerMarket],
-  (unseenFillsCountPerMarket) => _.sum(Object.values(unseenFillsCountPerMarket))
+  (unseenFillsCountPerMarket) => sum(Object.values(unseenFillsCountPerMarket))
 );
 
 /**
  * @param state
  * @returns Total numbers of the subaccount's open positions, open orders and unseen fills
  */
-export const getTradeInfoNumbers = createSelector(
+export const getTradeInfoNumbers = createAppSelector(
   [
     getExistingOpenPositions,
     getSubaccountOrders,
@@ -485,7 +516,7 @@ export const getTradeInfoNumbers = createSelector(
  * @param state
  * @returns Numbers of the subaccount's open orders and unseen fills of the current market
  */
-export const getCurrentMarketTradeInfoNumbers = createSelector(
+export const getCurrentMarketTradeInfoNumbers = createAppSelector(
   [getCurrentMarketOrders, getUnseenFillsCountForMarket, getCurrentMarketFundingPayments],
   (marketOrders, marketUnseenFillsCount, marketFundingPayments) => {
     return {
@@ -545,6 +576,11 @@ export const getBalances = (state: RootState) => state.account?.balances;
 export const getStakingBalances = (state: RootState) => state.account?.stakingBalances;
 
 /**
+ *  @returns user wallet staking delegations
+ * */
+export const getStakingDelegations = (state: RootState) => state.account?.stakingDelegations;
+
+/**
  * @returns account all time trading rewards
  */
 export const getTotalTradingRewards = (state: RootState) => state.account?.tradingRewards?.total;
@@ -558,21 +594,18 @@ export const getHistoricalTradingRewards = (state: RootState) =>
 /**
  * @returns account historical trading rewards for the specified perid
  */
-export const getHistoricalTradingRewardsForPeriod = (period: string) =>
-  createSelector(
-    [getHistoricalTradingRewards],
-    (
-      historicalTradingRewards: Nullable<
-        kollections.Map<string, kollections.List<HistoricalTradingReward>>
-      >
-    ) => historicalTradingRewards?.get(period)
+export const getHistoricalTradingRewardsForPeriod = () =>
+  createAppSelector(
+    [getHistoricalTradingRewards, (s, period: string) => period],
+    (historicalTradingRewards, period) => historicalTradingRewards?.get(period)
   );
 
+const historicalRewardsForCurrentWeekSelector = getHistoricalTradingRewardsForPeriod();
 /**
  * @returns account historical trading rewards for the current week
  */
-export const getHistoricalTradingRewardsForCurrentWeek = createSelector(
-  [getHistoricalTradingRewardsForPeriod(HistoricalTradingRewardsPeriod.WEEKLY.name)],
+export const getHistoricalTradingRewardsForCurrentWeek = createAppSelector(
+  [(s) => historicalRewardsForCurrentWeekSelector(s, HistoricalTradingRewardsPeriod.WEEKLY.name)],
   (historicalTradingRewards) => historicalTradingRewards?.firstOrNull()
 );
 

@@ -10,7 +10,7 @@ import { Icon, IconName } from '@/components/Icon';
 
 export const PageMenuRadioGroupItem = <
   MenuItemValue extends string,
-  PageMenuItemType extends string
+  PageMenuItemType extends string,
 >({
   value: curentValue,
   onSelect,

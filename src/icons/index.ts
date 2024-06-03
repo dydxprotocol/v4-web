@@ -1,21 +1,20 @@
 export { default as AddressConnectorIcon } from './address-connector.svg';
 export { default as ArrowIcon } from './arrow.svg';
 export { default as Bar3Icon } from './bar3.svg';
-export { default as BellIcon } from './bell.svg';
 export { default as BellStrokeIcon } from './bell-stroke.svg';
+export { default as BellIcon } from './bell.svg';
 export { default as BoxCloseIcon } from './box-close.svg';
 export { default as CalculatorIcon } from './calculator.svg';
 export { default as CaretIcon } from './caret-down.svg';
-export { default as CautionCircleIcon } from './caution-circle.svg';
 export { default as CautionCircleStrokeIcon } from './caution-circle-stroke.svg';
+export { default as CautionCircleIcon } from './caution-circle.svg';
 export { default as ChatIcon } from './chat-bubble.svg';
-export { default as CheckIcon } from './check.svg';
 export { default as CheckCircleIcon } from './check-circle.svg';
+export { default as CheckIcon } from './check.svg';
 export { default as ChevronLeftIcon } from './chevron-left.svg';
 export { default as ChevronRightIcon } from './chevron-right.svg';
 export { default as ClockIcon } from './clock.svg';
 export { default as CloseIcon } from './close.svg';
-export { default as CoinMarketCapIcon } from './logos/coinmarketcap.svg';
 export { default as CoinsIcon } from './coins.svg';
 export { default as CommentIcon } from './comment.svg';
 export { default as CopyIcon } from './copy.svg';
@@ -35,11 +34,13 @@ export { default as HideIcon } from './hide.svg';
 export { default as HistoryIcon } from './history.svg';
 export { default as LeaderboardIcon } from './leaderboard.svg';
 export { default as LinkOutIcon } from './link-out.svg';
+export { default as ListIcon } from './list.svg';
 export { default as LockIcon } from './lock.svg';
+export { default as CoinMarketCapIcon } from './logos/coinmarketcap.svg';
+export { default as MintscanIcon } from './logos/mintscan.svg';
 export { default as MarketsIcon } from './markets.svg';
 export { default as MenuIcon } from './menu.svg';
 export { default as MigrateIcon } from './migrate.svg';
-export { default as MintscanIcon } from './logos/mintscan.svg';
 export { default as MoonIcon } from './moon.svg';
 export { default as OrderbookIcon } from './orderbook.svg';
 export { default as OverviewIcon } from './overview.svg';
@@ -70,12 +71,16 @@ export { default as WarningIcon } from './warning.svg';
 export { default as WithdrawIcon } from './withdraw.svg';
 
 // Wallets
+export { default as AppleIcon } from './wallets/apple.svg';
 export { default as BitkeepIcon } from './wallets/bitkeep.svg';
 export { default as BitpieIcon } from './wallets/bitpie.svg';
 export { default as CloverWalletIcon } from './wallets/clover-wallet.svg';
 export { default as Coin98Icon } from './wallets/coin98.svg';
 export { default as CoinbaseIcon } from './wallets/coinbase-wallet.svg';
+export { default as Discord2Icon } from './wallets/discord.svg';
+export { default as EmailIcon } from './wallets/email.svg';
 export { default as GenericWalletIcon } from './wallets/generic-wallet.svg';
+export { default as GoogleIcon } from './wallets/google.svg';
 export { default as HuobiIcon } from './wallets/huobi-wallet.svg';
 export { default as ImTokenIcon } from './wallets/imtoken.svg';
 export { default as KeplrIcon } from './wallets/keplr.svg';
@@ -88,19 +93,15 @@ export { default as RainbowIcon } from './wallets/rainbow-wallet.svg';
 export { default as TestWalletIcon } from './wallets/test-wallet.svg';
 export { default as TokenPocketIcon } from './wallets/tokenpocket.svg';
 export { default as TrustWalletIcon } from './wallets/trust-wallet.svg';
+export { default as TwitterIcon } from './wallets/twitter.svg';
 export { default as WalletConnectIcon } from './wallets/walletconnect.svg';
 export { default as WebsiteIcon } from './website.svg';
 export { default as WhitepaperIcon } from './whitepaper.svg';
-export { default as Discord2Icon } from './wallets/discord.svg';
-export { default as TwitterIcon } from './wallets/twitter.svg';
-export { default as GoogleIcon } from './wallets/google.svg';
-export { default as AppleIcon } from './wallets/apple.svg';
-export { default as EmailIcon } from './wallets/email.svg';
 
 // Logos
 export { default as ChaosLabsIcon } from './chaos-labs';
-export { default as EtherscanIcon } from './logos/etherscan.svg';
 export { default as LogoShortIcon } from './logo-short';
+export { default as EtherscanIcon } from './logos/etherscan.svg';
 
 // Trade
 export { default as OrderCanceledIcon } from './trade/order-canceled.svg';

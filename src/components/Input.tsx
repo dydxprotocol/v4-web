@@ -110,17 +110,17 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const decimals = inDecimals ?? numberFormatConfig?.defaultDecimals;
 
     const defaultNumberPlaceholder = `${numberFormatConfig?.prefix ?? ''}${BIG_NUMBERS.ZERO.toFixed(
-      decimals !== undefined ? decimals : USD_DECIMALS
+      decimals ?? USD_DECIMALS
     )}${numberFormatConfig?.suffix ?? ''}`;
 
     const formattedValue =
       typeof value === 'string'
         ? value
         : value != null
-        ? Intl.NumberFormat(navigator.language || 'en-US', {
-            maximumFractionDigits: decimals,
-          }).format(value)
-        : '';
+          ? Intl.NumberFormat(navigator.language || 'en-US', {
+              maximumFractionDigits: decimals,
+            }).format(value)
+          : '';
 
     return (
       <$InputContainer className={className}>
@@ -222,7 +222,9 @@ const InputStyle = css`
   // Input autofill Styles
   &:-webkit-autofill,
   &:-webkit-autofill:focus {
-    transition: background-color 600000s 0s, color 600000s 0s;
+    transition:
+      background-color 600000s 0s,
+      color 600000s 0s;
   }
 
   &[data-autocompleted] {

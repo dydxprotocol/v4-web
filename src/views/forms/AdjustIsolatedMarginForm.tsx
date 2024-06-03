@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 
 import { NumberFormatValues } from 'react-number-format';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import {
@@ -37,6 +37,7 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
 import { getOpenPositionFromId } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getAdjustIsolatedMarginInputs } from '@/state/inputsSelectors';
 import { getMarketConfig } from '@/state/perpetualsSelectors';
 
@@ -61,10 +62,10 @@ export const AdjustIsolatedMarginForm = ({
   onIsolatedMarginAdjustment,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const subaccountPosition = useSelector(getOpenPositionFromId(marketId));
+  const subaccountPosition = useAppSelector(getOpenPositionFromId(marketId));
   const { childSubaccountNumber } = subaccountPosition ?? {};
-  const marketConfig = useSelector(getMarketConfig(marketId));
-  const adjustIsolatedMarginInputs = useSelector(getAdjustIsolatedMarginInputs, shallowEqual);
+  const marketConfig = useAppSelector((s) => getMarketConfig(s, marketId));
+  const adjustIsolatedMarginInputs = useAppSelector(getAdjustIsolatedMarginInputs, shallowEqual);
 
   const {
     type: isolatedMarginAdjustmentType,
@@ -72,6 +73,7 @@ export const AdjustIsolatedMarginForm = ({
     amountPercent,
     summary,
   } = adjustIsolatedMarginInputs ?? {};
+
   const { tickSizeDecimals } = marketConfig ?? {};
 
   useEffect(() => {
