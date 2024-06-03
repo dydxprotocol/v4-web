@@ -461,7 +461,7 @@ const $Side = styled.span<{ side: OrderSide }>`
       [OrderSide.SELL]: css`
         color: var(--color-negative);
       `,
-    }[side])};
+    })[side]};
 `;
 
 const $EmptyIcon = styled(Icon)`

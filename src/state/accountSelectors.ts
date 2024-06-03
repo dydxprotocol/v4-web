@@ -1,6 +1,5 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { sum } from 'lodash';
-import { createSelector } from 'reselect';
 
 import {
   AbacusOrderSide,
@@ -76,7 +75,7 @@ export const getExistingOpenPositions = createAppSelector([getOpenPositions], (a
  *
  * @returns All SubaccountOrders that have a margin mode of Isolated and no existing position for the market.
  */
-export const getNonZeroPendingPositions = createSelector(
+export const getNonZeroPendingPositions = createAppSelector(
   [(state: RootState) => state.account.subaccount?.pendingPositions],
   (pending) => pending?.toArray().filter((p) => (p.freeCollateral?.current ?? 0) > 0)
 );
@@ -117,7 +116,7 @@ export const getCurrentMarketPositionData = (state: RootState) => {
 /**
  * @returns the current leverage of the isolated position. Selector will return null if position is not isolated or does not exist.
  */
-export const getCurrentMarketIsolatedPositionLeverage = createSelector(
+export const getCurrentMarketIsolatedPositionLeverage = createAppSelector(
   [getCurrentMarketPositionData],
   (position) => {
     if (
@@ -479,7 +478,7 @@ const getUnseenFillsCountPerMarket = (state: RootState) => state.account.unseenF
  * @param state
  * @returns get unseen fills count for current market
  */
-const getUnseenFillsCountForMarket = createSelector(
+const getUnseenFillsCountForMarket = createAppSelector(
   [getUnseenFillsCountPerMarket, getCurrentMarketId],
   (unseenFillsCountPerMarket, marketId) => (marketId ? unseenFillsCountPerMarket[marketId] ?? 0 : 0)
 );
@@ -488,7 +487,7 @@ const getUnseenFillsCountForMarket = createSelector(
  * @param state
  * @returns get unseen fills count for current market
  */
-const getAllUnseenFillsCount = createSelector(
+const getAllUnseenFillsCount = createAppSelector(
   [getUnseenFillsCountPerMarket],
   (unseenFillsCountPerMarket) => sum(Object.values(unseenFillsCountPerMarket))
 );
