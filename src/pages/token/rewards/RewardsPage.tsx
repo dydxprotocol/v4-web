@@ -32,7 +32,7 @@ const RewardsPage = () => {
   const { isTablet, isNotTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  const tradingRewardsRehaulEnabled = testFlags.tradingRewardsRehaul;
+  const { enableStaking, tradingRewardsRehaul: tradingRewardsRehaulEnabled } = testFlags;
 
   const legalDisclaimer = (
     <$LegalDisclaimer>
@@ -54,6 +54,7 @@ const RewardsPage = () => {
           {/* List of unstaking panels */}
           {tradingRewardsRehaulEnabled && <TradingRewardsChartPanel />}
           <$LaunchIncentivesPanel />
+          {enableStaking ? <$StakingPanel /> : <$DYDXBalancePanel />}
           <$TradingRewardsColumn>
             {!tradingRewardsRehaulEnabled && <TradingRewardsSummaryPanel />}
             {tradingRewardsRehaulEnabled && <NewMarketsPanel />}
@@ -74,7 +75,7 @@ const RewardsPage = () => {
         {import.meta.env.VITE_V3_TOKEN_ADDRESS && <$MigratePanel />}
         {tradingRewardsRehaulEnabled && <$TradingRewardsChartPanel />}
         <$LaunchIncentivesPanel />
-        <$DYDXBalancePanel />
+        {enableStaking ? <$StakingPanel /> : <$DYDXBalancePanel />}
         <$TradingRewardsColumn>
           {!tradingRewardsRehaulEnabled && <TradingRewardsSummaryPanel />}
           <RewardHistoryPanel />
@@ -120,24 +121,24 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean; showChartPanel?: bo
               'rewards other';
           `
         : showMigratePanel
-        ? css`
-            grid-template-areas:
-              'migrate migrate'
-              'incentives balance'
-              'rewards other';
-          `
-        : showChartPanel
-        ? css`
-            grid-template-areas:
-              'chart chart'
-              'incentives balance'
-              'rewards other';
-          `
-        : css`
-            grid-template-areas:
-              'incentives balance'
-              'rewards other';
-          `}
+          ? css`
+              grid-template-areas:
+                'migrate migrate'
+                'incentives balance'
+                'rewards other';
+            `
+          : showChartPanel
+            ? css`
+                grid-template-areas:
+                  'chart chart'
+                  'incentives balance'
+                  'rewards other';
+              `
+            : css`
+                grid-template-areas:
+                  'incentives balance'
+                  'rewards other';
+              `}
   }
 
   @media ${breakpoints.tablet} {
@@ -153,12 +154,14 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean; showChartPanel?: bo
       showChartPanel
         ? css`
             grid-template-areas:
+              'balance'
               'chart'
               'incentives'
               'rewards';
           `
         : css`
             grid-template-areas:
+              'balance'
               'incentives'
               'rewards';
           `}
