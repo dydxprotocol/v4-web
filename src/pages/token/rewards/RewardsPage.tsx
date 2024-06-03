@@ -99,6 +99,7 @@ const $DetachedSection = styled(DetachedSection)`
   flex-direction: column;
   gap: 1.5rem;
   padding: 1rem;
+  max-width: 80rem;
 `;
 
 const $DoubleColumnView = styled.div`
