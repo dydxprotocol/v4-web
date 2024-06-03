@@ -184,8 +184,8 @@ export const AdvancedTradeOptions = () => {
                         : reduceOnlyTooltip?.titleStringKey.includes(
                               'REDUCE_ONLY_EXECUTION_IOC_FOK'
                             )
-                          ? 'reduce-only-execution-ioc-fok'
-                          : 'reduce-only-timeinforce-ioc-fok'
+                          ? 'reduce-only-execution-ioc'
+                          : 'reduce-only-timeinforce-ioc'
                     }
                     side="right"
                   >
