@@ -130,6 +130,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
           label={stringGetter({ key: STRING_KEYS.MARKETS })}
           columns={columns}
           initialPageSize={15}
+          paginationBehavior="showAll"
           slotEmpty={
             <$MarketNotFound>
               {filter === MarketFilters.NEW && !searchFilter ? (

@@ -1,4 +1,4 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -17,6 +17,7 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
+import { useAppSelector } from '@/state/appTypes';
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 
@@ -29,7 +30,7 @@ type ElementProps = {
 
 export const UnstakeButtonAndReceipt = ({ fee, amount, isDisabled, isLoading }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
   const { chainTokenLabel } = useTokenConfigs();
   const { nativeTokenBalance } = useAccountBalance();
 
