@@ -228,7 +228,7 @@ export const TradeForm = ({
     abacusStateManager.clearTradeInputValues({ shouldResetSize: true });
   };
 
-  const topActionsRow = isTablet && (
+  const tabletActionsRow = isTablet && (
     <$TopActionsRow>
       <$OrderbookButtons>
         <$OrderbookButton
@@ -323,7 +323,7 @@ export const TradeForm = ({
         </>
       ) : (
         <>
-          {topActionsRow}
+          {tabletActionsRow}
           {orderbookAndInputs}
         </>
       )}
