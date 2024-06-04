@@ -1,4 +1,4 @@
-import { Ref, useCallback, useEffect, useState, type FormEvent } from 'react';
+import { Ref, useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { NumberFormatValues, SourceInfo } from 'react-number-format';
@@ -8,7 +8,6 @@ import styled, { css } from 'styled-components';
 import {
   ComplianceStatus,
   ErrorType,
-  MARGIN_MODE_STRINGS,
   TradeInputErrorAction,
   TradeInputField,
   ValidationError,
@@ -17,10 +16,9 @@ import {
 } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
-import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
-import { LEVERAGE_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
+import { USD_DECIMALS } from '@/constants/numbers';
 import {
   InputErrorData,
   MobilePlaceOrderSteps,
@@ -41,13 +39,11 @@ import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
-import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { InputType } from '@/components/Input';
-import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
@@ -56,25 +52,23 @@ import { Orderbook } from '@/views/tables/Orderbook';
 
 import { getCurrentMarketIsolatedPositionLeverage } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { setTradeFormInputs } from '@/state/inputs';
 import {
   getCurrentInput,
   getInputTradeData,
-  getInputTradeOptions,
   getTradeFormInputs,
   useTradeFormData,
 } from '@/state/inputsSelectors';
-import { getCurrentMarketAssetId, getCurrentMarketConfig } from '@/state/perpetualsSelectors';
+import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
-import { getSelectedOrderSide, getSelectedTradeType, getTradeInputAlert } from '@/lib/tradeData';
+import { getSelectedOrderSide, getTradeInputAlert } from '@/lib/tradeData';
 
 import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 import { PositionPreview } from './TradeForm/PositionPreview';
-import { TradeSideToggle } from './TradeForm/TradeSideToggle';
 import { TradeSizeInputs } from './TradeForm/TradeSizeInputs';
+import { useTradeTypeOptions } from './TradeForm/useTradeTypeOptions';
 
 type TradeBoxInputConfig = {
   key: TradeBoxKeys;
@@ -106,73 +100,34 @@ export const TradeForm = ({
   const [placeOrderError, setPlaceOrderError] = useState<string>();
   const [showOrderbook, setShowOrderbook] = useState(false);
 
-  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { placeOrder } = useSubaccount();
   const { isTablet } = useBreakpoints();
   const { complianceMessage, complianceStatus } = useComplianceState();
 
-  const {
-    price,
-    size,
-    summary,
-    needsLimitPrice,
-    needsMarginMode,
-    needsTargetLeverage,
-    needsTrailingPercent,
-    needsTriggerPrice,
-    executionOptions,
-    needsGoodUntil,
-    needsPostOnly,
-    needsReduceOnly,
-    postOnlyTooltip,
-    reduceOnlyTooltip,
-    timeInForceOptions,
-    tradeErrors,
-  } = useTradeFormData();
+  const { price, size, summary, tradeErrors } = useTradeFormData();
 
   const currentInput = useAppSelector(getCurrentInput);
-  const currentAssetId = useAppSelector(getCurrentMarketAssetId);
   const { tickSizeDecimals, stepSizeDecimals } =
     useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
 
   const tradeFormInputValues = useAppSelector(getTradeFormInputs, shallowEqual);
-  const { limitPriceInput, triggerPriceInput, trailingPercentInput } = tradeFormInputValues;
 
   const currentTradeData = useAppSelector(getInputTradeData, shallowEqual);
 
-  const { side, type, marginMode, targetLeverage } = currentTradeData ?? {};
+  const { side } = currentTradeData ?? {};
 
-  const selectedTradeType = getSelectedTradeType(type);
   const selectedOrderSide = getSelectedOrderSide(side);
 
-  const { typeOptions } = useAppSelector(getInputTradeOptions, shallowEqual) ?? {};
-
-  const allTradeTypeItems = (typeOptions?.toArray() ?? []).map(
-    ({ type: tradeTypeOptionType, stringKey }) => ({
-      value: tradeTypeOptionType as TradeTypes,
-      label: stringGetter({
-        key: stringKey ?? '',
-      }),
-      slotBefore: <AssetIcon symbol={currentAssetId} />,
-    })
-  );
+  const { selectedTradeType, tradeTypeItems: allTradeTypeItems } = useTradeTypeOptions({
+    showAll: true,
+    showAssetIcon: true,
+  });
 
   const onTradeTypeChange = (tradeType: TradeTypes) => {
     abacusStateManager.clearTradeInputValues();
     abacusStateManager.setTradeValue({ value: tradeType, field: TradeInputField.type });
   };
-
-  const needsAdvancedOptions =
-    !!needsGoodUntil ||
-    !!timeInForceOptions ||
-    !!executionOptions ||
-    !!needsPostOnly ||
-    !!postOnlyTooltip ||
-    !!needsReduceOnly ||
-    !!reduceOnlyTooltip;
-
-  const tradeFormInputs: TradeBoxInputConfig[] = [];
 
   const isInputFilled =
     Object.values(tradeFormInputValues).some((val) => val !== '') ||
@@ -183,31 +138,47 @@ export const TradeForm = ({
     !!tradeErrors?.some((error: ValidationError) => error.type !== ErrorType.warning) ||
     currentInput !== 'trade';
 
-  let alertContent;
-  let alertType = AlertType.Error;
-
-  const inputAlert = getTradeInputAlert({
-    abacusInputErrors: tradeErrors ?? [],
-    stringGetter,
-    stepSizeDecimals,
-    tickSizeDecimals,
-  });
-
   const { getNotificationPreferenceForType } = useNotifications();
-  const isErrorShownInOrderStatusToast = getNotificationPreferenceForType(
-    NotificationType.OrderStatus
-  );
 
-  if (placeOrderError && !isErrorShownInOrderStatusToast) {
-    alertContent = placeOrderError;
-  } else if (inputAlert) {
-    alertContent = inputAlert.alertString;
-    alertType = inputAlert.type;
-  }
+  const { inputAlert, alertContent, alertType, shouldPromptUserToPlaceLimitOrder } = useMemo(() => {
+    let alertContentInner;
+    let alertTypeInner = AlertType.Error;
 
-  const shouldPromptUserToPlaceLimitOrder = ['MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE'].some(
-    (errorCode) => inputAlert?.code === errorCode
-  );
+    const inputAlertInner = getTradeInputAlert({
+      abacusInputErrors: tradeErrors ?? [],
+      stringGetter,
+      stepSizeDecimals,
+      tickSizeDecimals,
+    });
+
+    const isErrorShownInOrderStatusToast = getNotificationPreferenceForType(
+      NotificationType.OrderStatus
+    );
+
+    if (placeOrderError && !isErrorShownInOrderStatusToast) {
+      alertContentInner = placeOrderError;
+    } else if (inputAlertInner) {
+      alertContentInner = inputAlertInner.alertString;
+      alertTypeInner = inputAlertInner.type;
+    }
+
+    const shouldPromptUserToPlaceLimitOrderInner = ['MARKET_ORDER_ERROR_ORDERBOOK_SLIPPAGE'].some(
+      (errorCode) => inputAlertInner?.code === errorCode
+    );
+    return {
+      alertContent: alertContentInner,
+      alertType: alertTypeInner,
+      shouldPromptUserToPlaceLimitOrder: shouldPromptUserToPlaceLimitOrderInner,
+      inputAlert: inputAlertInner,
+    };
+  }, [
+    getNotificationPreferenceForType,
+    placeOrderError,
+    stepSizeDecimals,
+    stringGetter,
+    tickSizeDecimals,
+    tradeErrors,
+  ]);
 
   const orderSideAction = {
     [OrderSide.BUY]: ButtonAction.Create,
@@ -280,97 +251,97 @@ export const TradeForm = ({
     abacusStateManager.clearTradeInputValues({ shouldResetSize: true });
   };
 
-  if (needsTriggerPrice) {
-    tradeFormInputs.push({
-      key: TradeBoxKeys.TriggerPrice,
-      inputType: InputType.Currency,
-      label: (
-        <>
-          <WithTooltip tooltip="trigger-price" side="right">
-            {stringGetter({ key: STRING_KEYS.TRIGGER_PRICE })}
-          </WithTooltip>
-          <Tag>USD</Tag>
-        </>
-      ),
-      onChange: ({ value }: NumberFormatValues) => {
-        dispatch(setTradeFormInputs({ triggerPriceInput: value }));
-      },
-      value: triggerPriceInput ?? '',
-      decimals: tickSizeDecimals ?? USD_DECIMALS,
-    });
-  }
+  const topActionsRow = isTablet && (
+    <$TopActionsRow>
+      <$OrderbookButtons>
+        <$OrderbookButton
+          slotRight={<Icon iconName={IconName.Caret} />}
+          onPressedChange={setShowOrderbook}
+          isPressed={showOrderbook}
+        >
+          {!showOrderbook && stringGetter({ key: STRING_KEYS.ORDERBOOK })}
+        </$OrderbookButton>
+        {/* TODO[TRCL-1411]: add orderbook scale functionality */}
+      </$OrderbookButtons>
 
-  if (needsLimitPrice) {
-    tradeFormInputs.push({
-      key: TradeBoxKeys.LimitPrice,
-      inputType: InputType.Currency,
-      label: (
-        <>
-          <WithTooltip tooltip="limit-price" side="right">
-            {stringGetter({ key: STRING_KEYS.LIMIT_PRICE })}
-          </WithTooltip>
-          <Tag>USD</Tag>
-        </>
-      ),
-      onChange: ({ value }: NumberFormatValues) => {
-        dispatch(setTradeFormInputs({ limitPriceInput: value }));
-      },
-      value: limitPriceInput,
-      decimals: tickSizeDecimals ?? USD_DECIMALS,
-    });
-  }
+      <$ToggleGroup
+        items={allTradeTypeItems}
+        value={selectedTradeType}
+        onValueChange={onTradeTypeChange}
+      />
+    </$TopActionsRow>
+  );
+  const orderbookAndInputs = (
+    <$OrderbookAndInputs showOrderbook={showOrderbook}>
+      {isTablet && showOrderbook && <$Orderbook maxRowsPerSide={5} />}
+      <$InputsColumn>
+        <TradeSizeInputs />
+        <TradeFormInputs />
+        <AdvancedTradeOptions />
 
-  if (needsTrailingPercent) {
-    tradeFormInputs.push({
-      key: TradeBoxKeys.TrailingPercent,
-      inputType: InputType.Percent,
-      label: (
-        <WithTooltip tooltip="trailing-percent" side="right">
-          {stringGetter({ key: STRING_KEYS.TRAILING_PERCENT })}
-        </WithTooltip>
-      ),
-      onChange: ({ value }: NumberFormatValues) => {
-        dispatch(setTradeFormInputs({ trailingPercentInput: value }));
-      },
-      value: trailingPercentInput ?? '',
-    });
-  }
+        {complianceStatus === ComplianceStatus.CLOSE_ONLY && (
+          <AlertMessage type={AlertType.Error}>
+            <$Message>{complianceMessage}</$Message>
+          </AlertMessage>
+        )}
 
-  const marginModeSelector = needsMarginMode ? (
-    <Button
-      onClick={() => {
-        dispatch(openDialogInTradeBox({ type: TradeBoxDialogTypes.SelectMarginMode }));
-      }}
-    >
-      {marginMode &&
-        stringGetter({
-          key: MARGIN_MODE_STRINGS[marginMode.rawValue],
-        })}
-      <$TriangleIcon iconName={IconName.Triangle} />
-    </Button>
-  ) : (
-    <$WarningTooltip
-      slotTooltip={
-        <$WarningTooltipContent>
-          <$CautionIcon iconName={IconName.Warning} />
-          {stringGetter({
-            key: STRING_KEYS.UNABLE_TO_CHANGE_MARGIN_MODE,
-            params: {
-              MARKET: currentAssetId,
-            },
-          })}
-        </$WarningTooltipContent>
-      }
-    >
-      <Button disabled>
-        {marginMode &&
-          stringGetter({
-            key: MARGIN_MODE_STRINGS[marginMode.rawValue],
-          })}
-      </Button>
-    </$WarningTooltip>
+        {alertContent && (
+          <AlertMessage type={alertType}>
+            <$Message>
+              {alertContent}
+              {shouldPromptUserToPlaceLimitOrder && (
+                <$IconButton
+                  iconName={IconName.Arrow}
+                  shape={ButtonShape.Circle}
+                  action={ButtonAction.Navigation}
+                  size={ButtonSize.XSmall}
+                  onClick={() => onTradeTypeChange(TradeTypes.LIMIT)}
+                />
+              )}
+            </$Message>
+          </AlertMessage>
+        )}
+      </$InputsColumn>
+    </$OrderbookAndInputs>
   );
 
+  const tradeFooter = (
+    <$Footer>
+      {isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder) && (
+        <$ButtonRow>
+          <Button
+            type={ButtonType.Reset}
+            action={ButtonAction.Reset}
+            shape={ButtonShape.Pill}
+            size={ButtonSize.XSmall}
+            onClick={() => abacusStateManager.clearTradeInputValues({ shouldResetSize: true })}
+          >
+            {stringGetter({ key: STRING_KEYS.CLEAR })}
+          </Button>
+        </$ButtonRow>
+      )}
+      <PlaceOrderButtonAndReceipt
+        hasValidationErrors={hasInputErrors}
+        actionStringKey={inputAlert?.actionStringKey}
+        validationErrorString={alertContent}
+        summary={summary ?? undefined}
+        currentStep={currentStep}
+        showDeposit={inputAlert?.errorAction === TradeInputErrorAction.DEPOSIT}
+        confirmButtonConfig={{
+          stringKey: ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey,
+          buttonTextStringKey: STRING_KEYS.PLACE_ORDER,
+          buttonAction: orderSideAction,
+        }}
+      />
+    </$Footer>
+  );
+
+  const tradeConfiguration = (
+    <>
+      {topActionsRow}
+      {orderbookAndInputs}
+    </>
+  );
   return (
     <$TradeForm onSubmit={onSubmit} className={className}>
       {currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder ? (
@@ -379,133 +350,9 @@ export const TradeForm = ({
           {alertContent && <AlertMessage type={alertType}>{alertContent}</AlertMessage>}
         </>
       ) : (
-        <>
-          <$TopActionsRow>
-            {isTablet && (
-              <>
-                <$OrderbookButtons>
-                  <$OrderbookButton
-                    slotRight={<Icon iconName={IconName.Caret} />}
-                    onPressedChange={setShowOrderbook}
-                    isPressed={showOrderbook}
-                  >
-                    {!showOrderbook && stringGetter({ key: STRING_KEYS.ORDERBOOK })}
-                  </$OrderbookButton>
-                  {/* TODO[TRCL-1411]: add orderbook scale functionality */}
-                </$OrderbookButtons>
-
-                <$ToggleGroup
-                  items={allTradeTypeItems}
-                  value={selectedTradeType}
-                  onValueChange={onTradeTypeChange}
-                />
-              </>
-            )}
-
-            {!isTablet && (
-              <>
-                <$MarginAndLeverageButtons>
-                  {marginModeSelector}
-
-                  {needsTargetLeverage && (
-                    <WithTooltip
-                      tooltip="target-leverage"
-                      stringParams={{ TARGET_LEVERAGE: targetLeverage?.toFixed(LEVERAGE_DECIMALS) }}
-                    >
-                      <Button
-                        onClick={() => {
-                          dispatch(openDialog({ type: DialogTypes.AdjustTargetLeverage }));
-                        }}
-                      >
-                        <Output type={OutputType.Multiple} value={targetLeverage} />
-                      </Button>
-                    </WithTooltip>
-                  )}
-                </$MarginAndLeverageButtons>
-
-                <TradeSideToggle />
-              </>
-            )}
-          </$TopActionsRow>
-
-          <$OrderbookAndInputs showOrderbook={showOrderbook}>
-            {isTablet && showOrderbook && <$Orderbook maxRowsPerSide={5} />}
-
-            <$InputsColumn>
-              {tradeFormInputs.map(
-                ({ key, inputType, label, onChange, validationConfig, value, decimals }) => (
-                  <FormInput
-                    key={key}
-                    id={key}
-                    type={inputType}
-                    label={label}
-                    onChange={onChange}
-                    validationConfig={validationConfig}
-                    value={value}
-                    decimals={decimals}
-                  />
-                )
-              )}
-
-              <TradeSizeInputs />
-
-              {needsAdvancedOptions && <AdvancedTradeOptions />}
-
-              {complianceStatus === ComplianceStatus.CLOSE_ONLY && (
-                <AlertMessage type={AlertType.Error}>
-                  <$Message>{complianceMessage}</$Message>
-                </AlertMessage>
-              )}
-
-              {alertContent && (
-                <AlertMessage type={alertType}>
-                  <$Message>
-                    {alertContent}
-                    {shouldPromptUserToPlaceLimitOrder && (
-                      <$IconButton
-                        iconName={IconName.Arrow}
-                        shape={ButtonShape.Circle}
-                        action={ButtonAction.Navigation}
-                        size={ButtonSize.XSmall}
-                        onClick={() => onTradeTypeChange(TradeTypes.LIMIT)}
-                      />
-                    )}
-                  </$Message>
-                </AlertMessage>
-              )}
-            </$InputsColumn>
-          </$OrderbookAndInputs>
-        </>
+        tradeConfiguration
       )}
-
-      <$Footer>
-        {isInputFilled && (!currentStep || currentStep === MobilePlaceOrderSteps.EditOrder) && (
-          <$ButtonRow>
-            <Button
-              type={ButtonType.Reset}
-              action={ButtonAction.Reset}
-              shape={ButtonShape.Pill}
-              size={ButtonSize.XSmall}
-              onClick={() => abacusStateManager.clearTradeInputValues({ shouldResetSize: true })}
-            >
-              {stringGetter({ key: STRING_KEYS.CLEAR })}
-            </Button>
-          </$ButtonRow>
-        )}
-        <PlaceOrderButtonAndReceipt
-          hasValidationErrors={hasInputErrors}
-          actionStringKey={inputAlert?.actionStringKey}
-          validationErrorString={alertContent}
-          summary={summary ?? undefined}
-          currentStep={currentStep}
-          showDeposit={inputAlert?.errorAction === TradeInputErrorAction.DEPOSIT}
-          confirmButtonConfig={{
-            stringKey: ORDER_TYPE_STRINGS[selectedTradeType].orderTypeKey,
-            buttonTextStringKey: STRING_KEYS.PLACE_ORDER,
-            buttonAction: orderSideAction,
-          }}
-        />
-      </$Footer>
+      {tradeFooter}
     </$TradeForm>
   );
 };
@@ -551,38 +398,6 @@ const $TradeForm = styled.form`
       ${formMixins.withStickyFooter}
     }
   }
-`;
-const $MarginAndLeverageButtons = styled.div`
-  ${layoutMixins.inlineRow}
-  gap: 0.5rem;
-  margin-right: 0.5rem;
-
-  abbr,
-  button {
-    width: 100%;
-  }
-`;
-
-const $TriangleIcon = styled(Icon)`
-  font-size: 0.4375rem;
-  transform: rotate(0.75turn);
-  margin-left: 0.5ch;
-`;
-
-const $WarningTooltip = styled(WithTooltip)`
-  --tooltip-backgroundColor: var(--color-gradient-warning);
-  border: 1px solid ${({ theme }) => theme.warning}30;
-`;
-
-const $WarningTooltipContent = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: start;
-`;
-
-const $CautionIcon = styled(Icon)`
-  font-size: 1.5rem;
-  color: var(--color-warning);
 `;
 
 const $TopActionsRow = styled.div`
@@ -675,10 +490,6 @@ const $ToggleGroup = styled(ToggleGroup)`
   }
 ` as typeof ToggleGroup;
 
-const $InputsColumn = styled.div`
-  ${formMixins.inputsColumn}
-`;
-
 const $Message = styled.div`
   ${layoutMixins.row}
   gap: 0.75rem;
@@ -694,6 +505,10 @@ const $IconButton = styled(IconButton)`
   }
 `;
 
+const $InputsColumn = styled.div`
+  ${formMixins.inputsColumn}
+`;
+
 const $ButtonRow = styled.div`
   ${layoutMixins.row}
   justify-self: end;
@@ -706,3 +521,85 @@ const $Footer = styled.footer`
 
   ${layoutMixins.column}
 `;
+
+const TradeFormInputs = () => {
+  const dispatch = useAppDispatch();
+  const stringGetter = useStringGetter();
+
+  const { needsLimitPrice, needsTrailingPercent, needsTriggerPrice } = useTradeFormData();
+  const tradeFormInputValues = useAppSelector(getTradeFormInputs, shallowEqual);
+  const { limitPriceInput, triggerPriceInput, trailingPercentInput } = tradeFormInputValues;
+  const { tickSizeDecimals } = useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+
+  const tradeFormInputs: TradeBoxInputConfig[] = [];
+  if (needsTriggerPrice) {
+    tradeFormInputs.push({
+      key: TradeBoxKeys.TriggerPrice,
+      inputType: InputType.Currency,
+      label: (
+        <>
+          <WithTooltip tooltip="trigger-price" side="right">
+            {stringGetter({ key: STRING_KEYS.TRIGGER_PRICE })}
+          </WithTooltip>
+          <Tag>USD</Tag>
+        </>
+      ),
+      onChange: ({ value }: NumberFormatValues) => {
+        dispatch(setTradeFormInputs({ triggerPriceInput: value }));
+      },
+      value: triggerPriceInput ?? '',
+      decimals: tickSizeDecimals ?? USD_DECIMALS,
+    });
+  }
+
+  if (needsLimitPrice) {
+    tradeFormInputs.push({
+      key: TradeBoxKeys.LimitPrice,
+      inputType: InputType.Currency,
+      label: (
+        <>
+          <WithTooltip tooltip="limit-price" side="right">
+            {stringGetter({ key: STRING_KEYS.LIMIT_PRICE })}
+          </WithTooltip>
+          <Tag>USD</Tag>
+        </>
+      ),
+      onChange: ({ value }: NumberFormatValues) => {
+        dispatch(setTradeFormInputs({ limitPriceInput: value }));
+      },
+      value: limitPriceInput,
+      decimals: tickSizeDecimals ?? USD_DECIMALS,
+    });
+  }
+
+  if (needsTrailingPercent) {
+    tradeFormInputs.push({
+      key: TradeBoxKeys.TrailingPercent,
+      inputType: InputType.Percent,
+      label: (
+        <WithTooltip tooltip="trailing-percent" side="right">
+          {stringGetter({ key: STRING_KEYS.TRAILING_PERCENT })}
+        </WithTooltip>
+      ),
+      onChange: ({ value }: NumberFormatValues) => {
+        dispatch(setTradeFormInputs({ trailingPercentInput: value }));
+      },
+      value: trailingPercentInput ?? '',
+    });
+  }
+
+  return tradeFormInputs.map(
+    ({ key, inputType, label, onChange, validationConfig, value, decimals }) => (
+      <FormInput
+        key={key}
+        id={key}
+        type={inputType}
+        label={label}
+        onChange={onChange}
+        validationConfig={validationConfig}
+        value={value}
+        decimals={decimals}
+      />
+    )
+  );
+};

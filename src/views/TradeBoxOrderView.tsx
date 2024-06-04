@@ -1,71 +1,25 @@
 import { useCallback } from 'react';
 
-import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
-import { STRING_KEYS, StringKey } from '@/constants/localization';
 import { TradeTypes } from '@/constants/trade';
 
-import { useStringGetter } from '@/hooks/useStringGetter';
-
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { TabItem, Tabs } from '@/components/Tabs';
-
-import { useAppSelector } from '@/state/appTypes';
-import { getInputTradeData, getInputTradeOptions } from '@/state/inputsSelectors';
+import { Tabs } from '@/components/Tabs';
 
 import abacusStateManager from '@/lib/abacus';
-import { isTruthy } from '@/lib/isTruthy';
 
 import { TradeForm } from './forms/TradeForm';
-
-const useTradeTypeOptions = (): {
-  tradeTypeItems: TabItem<string>[];
-  selectedTradeType: TradeTypes;
-} => {
-  const stringGetter = useStringGetter();
-
-  const currentTradeData = useAppSelector(getInputTradeData, shallowEqual);
-  const selectedTradeType = (currentTradeData?.type?.rawValue as TradeTypes) ?? TradeTypes.LIMIT;
-
-  const { typeOptions } = useAppSelector(getInputTradeOptions, shallowEqual) ?? {};
-  const allTradeTypeItems = typeOptions?.toArray()?.map(({ type, stringKey }) => ({
-    value: type,
-    label: stringGetter({
-      key:
-        type === TradeTypes.TAKE_PROFIT ? STRING_KEYS.TAKE_PROFIT_LIMIT : (stringKey as StringKey),
-    }),
-  }));
-
-  return {
-    selectedTradeType,
-    tradeTypeItems: allTradeTypeItems
-      ? [
-          allTradeTypeItems?.shift(), // Limit order is always first
-          allTradeTypeItems?.shift(), // Market order is always second
-          // All conditional orders labeled under "Stop Order"
-          allTradeTypeItems?.length && {
-            label: stringGetter({ key: STRING_KEYS.STOP_ORDER_SHORT }),
-            value: '',
-            subitems: allTradeTypeItems
-              ?.map(
-                ({ value, label }) =>
-                  value != null && {
-                    value,
-                    label,
-                  }
-              )
-              .filter(isTruthy),
-          },
-        ].filter(isTruthy)
-      : [],
-  };
-};
+import { MarginModeSelector } from './forms/TradeForm/MarginModeSelector';
+import { TargetLeverageButton } from './forms/TradeForm/TargetLeverageButton';
+import { TradeSideToggle } from './forms/TradeForm/TradeSideToggle';
+import { useTradeTypeOptions } from './forms/TradeForm/useTradeTypeOptions';
 
 export const TradeBoxOrderView = () => {
-  const onTradeTypeChange = useCallback((tradeType?: string) => {
+  const onTradeTypeChange = useCallback((tradeType?: TradeTypes) => {
     if (tradeType) {
       abacusStateManager.clearTradeInputValues();
       abacusStateManager.setTradeValue({ value: tradeType, field: TradeInputField.type });
@@ -75,20 +29,38 @@ export const TradeBoxOrderView = () => {
   const { selectedTradeType, tradeTypeItems } = useTradeTypeOptions();
 
   return (
-    <$Tabs
-      key={selectedTradeType}
-      value={selectedTradeType}
-      items={tradeTypeItems}
-      onValueChange={onTradeTypeChange}
-      sharedContent={
-        <$Container>
-          <TradeForm />
-        </$Container>
-      }
-      fullWidthTabs
-    />
+    <$TradeBoxOrderViewContainer>
+      <$TopActionsRow>
+        <$MarginAndLeverageButtons>
+          <MarginModeSelector openInTradeBox />
+          <TargetLeverageButton />
+        </$MarginAndLeverageButtons>
+        <TradeSideToggle />
+      </$TopActionsRow>
+      <$Tabs
+        key={selectedTradeType}
+        value={selectedTradeType}
+        items={tradeTypeItems}
+        onValueChange={onTradeTypeChange}
+        withBorders={false}
+        // fullWidthTabs
+        sharedContent={
+          <$Container>
+            <TradeForm />
+          </$Container>
+        }
+      />
+    </$TradeBoxOrderViewContainer>
   );
 };
+
+const $TradeBoxOrderViewContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  min-height: 100%;
+`;
 
 const $Container = styled.div`
   ${layoutMixins.scrollArea}
@@ -96,4 +68,32 @@ const $Container = styled.div`
 
 const $Tabs = styled(Tabs)`
   overflow: hidden;
+  --trigger-active-backgroundColor: --trigger-backgroundColor;
+  --trigger-active-underline-size: 2px;
+  > header {
+    justify-content: space-around;
+  }
 ` as typeof Tabs;
+
+const $MarginAndLeverageButtons = styled.div`
+  ${layoutMixins.inlineRow}
+  gap: 0.5rem;
+  margin-right: 0.5rem;
+
+  abbr,
+  button {
+    width: 100%;
+  }
+`;
+
+const $TopActionsRow = styled.div`
+  display: grid;
+  grid-auto-flow: column;
+
+  padding-left: 1rem;
+  padding-right: 1rem;
+  @media ${breakpoints.tablet} {
+    grid-auto-columns: var(--orderbox-column-width) 1fr;
+    gap: var(--form-input-gap);
+  }
+`;
