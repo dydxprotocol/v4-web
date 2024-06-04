@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
@@ -242,7 +242,7 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
             }
             const balance = MustBigNumber(delegation.amount).toNumber();
             return (
-              <>
+              <React.Fragment key={delegation.validator}>
                 <ValidatorName validator={stakingValidators[delegation.validator]?.[0]} />
                 <FormInput
                   key={delegation.validator}
@@ -259,7 +259,7 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
                   })}
                   disabled={isLoading}
                 />
-              </>
+              </React.Fragment>
             );
           })}
         </$GridLayout>
