@@ -30,6 +30,12 @@ import { openDialog } from '@/state/dialogs';
 import { isStopLossOrder } from '@/lib/orders';
 import { testFlags } from '@/lib/testFlags';
 
+enum TriggerButtonState {
+  Warning = 'Warning',
+  HasOrders = 'HasOrders',
+  Default = 'Default',
+}
+
 type ElementProps = {
   marketId: string;
   assetId: string;
@@ -106,12 +112,19 @@ export const PositionsTriggersCell = ({
     }: {
       liquidationWarningSide?: Nullable<AbacusPositionSides>;
     } = {}) => {
-      const styledLabel = (
+      let triggerButtonState = TriggerButtonState.Default;
+
+      if (liquidationWarningSide != null) {
+        triggerButtonState = TriggerButtonState.Warning;
+      } else if (orders.length > 0) {
+        triggerButtonState = TriggerButtonState.HasOrders;
+      }
+
+      const triggerButton = (
         <$TriggerButton
           action={ButtonAction.Primary}
           onClick={openTriggersDialog}
-          warning={liquidationWarningSide != null}
-          hasOrders={orders.length > 0}
+          triggerButtonState={triggerButtonState}
         >
           {label}
         </$TriggerButton>
@@ -134,10 +147,10 @@ export const PositionsTriggersCell = ({
               {stringGetter({ key: STRING_KEYS.EDIT_STOP_LOSS })}
             </Button>
           }
-          slotTrigger={styledLabel}
+          slotTrigger={triggerButton}
         />
       ) : (
-        styledLabel
+        triggerButton
       );
     };
 
@@ -233,7 +246,27 @@ const $Row = styled.span`
   --item-height: 1.25rem;
 `;
 
-const $TriggerButton = styled(Button)<{ warning?: boolean; hasOrders: boolean }>`
+const getStylingForTriggerButtonState = (state: TriggerButtonState) => {
+  switch (state) {
+    case TriggerButtonState.HasOrders:
+      return css`
+        --button-textColor: var(--color-text-1);
+        --button-backgroundColor: var(--color-layer-4);
+      `;
+    case TriggerButtonState.Warning:
+      return css`
+        --button-textColor: var(--color-black);
+        --button-backgroundColor: var(--color-warning);
+      `;
+    case TriggerButtonState.Default:
+    default:
+      return css`
+        --button-hover-textColor: var(--color-text-1);
+      `;
+  }
+};
+
+const $TriggerButton = styled(Button)<{ triggerButtonState: TriggerButtonState }>`
   --button-backgroundColor: transparent;
   --button-border: solid var(--border-width) var(--color-border);
   --button-font: var(--font-tiny-book);
@@ -241,22 +274,7 @@ const $TriggerButton = styled(Button)<{ warning?: boolean; hasOrders: boolean }>
   --button-padding: 0 0.25rem;
   --button-textColor: var(--color-text-0);
 
-  ${({ warning }) =>
-    warning &&
-    css`
-      --button-textColor: var(--color-black);
-      --button-backgroundColor: var(--color-warning);
-    `}
-
-  ${({ hasOrders }) =>
-    hasOrders
-      ? css`
-          --button-textColor: var(--color-text-1);
-          --button-backgroundColor: var(--color-layer-4);
-        `
-      : css`
-          --button-hover-textColor: var(--color-text-1);
-        `}
+  ${({ triggerButtonState }) => getStylingForTriggerButtonState(triggerButtonState)}
 `;
 
 const $Output = styled(Output)<{ value: number | null }>`
