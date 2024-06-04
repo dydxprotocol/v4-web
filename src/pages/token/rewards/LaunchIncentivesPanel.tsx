@@ -256,7 +256,7 @@ const $EstimatedRewardsCard = styled.div`
   margin: 1.5rem;
 
   background-color: var(--color-layer-5);
-  bakgroucnd-image: url('/dots-background.svg');
+  background-image: url('/dots-background.svg');
   background-size: cover;
 
   border-radius: 0.75rem;

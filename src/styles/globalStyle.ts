@@ -8,7 +8,6 @@ export const GlobalStyle = createGlobalStyle`
     --color-red: ${({ theme }) => theme.red};
 
     --color-white-faded: ${({ theme }) => theme.whiteFaded};
-    --color-green-faded: ${({ theme }) => theme.greenFaded};
 
     --color-green-dark: ${({ theme }) => theme.greenDark};
 

@@ -16,7 +16,7 @@ import { Output, OutputType, ShowSign } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
-import { getSubaccount, getSubaccountEquity } from '@/state/accountSelectors';
+import { getSubaccountEquity } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 type ElementProps = {
@@ -25,11 +25,15 @@ type ElementProps = {
 
 export const StakingRewardDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const { usdcLabel, chainTokenLabel } = useTokenConfigs();
+  const { usdcLabel } = useTokenConfigs();
 
-  const { buyingPower } = useAppSelector(getSubaccount, shallowEqual) ?? {};
   const { current: equity, postOrder: newEquity } =
     useAppSelector(getSubaccountEquity, shallowEqual) ?? {};
+
+  const HARDCODED_XCXC = {
+    gasFee: 0.32,
+    gain: 2.55,
+  };
 
   const detailItems = [
     {
@@ -50,41 +54,26 @@ export const StakingRewardDialog = ({ setIsOpen }: ElementProps) => {
       ),
     },
     {
-      key: 'buying-power',
-      label: (
-        <>
-          {stringGetter({ key: STRING_KEYS.BUYING_POWER })} <Tag>{chainTokenLabel}</Tag>
-        </>
-      ),
-      value: (
-        <DiffOutput
-          type={OutputType.Fiat}
-          value={buyingPower?.current}
-          newValue={buyingPower?.postOrder}
-          sign={NumberSign.Positive}
-          withDiff={equity !== newEquity}
-        />
-      ),
-    },
-    {
       key: 'gas-fees',
       label: (
         <>
-          {stringGetter({ key: STRING_KEYS.EST_GAS })} <Tag>{chainTokenLabel}</Tag>
+          {stringGetter({ key: STRING_KEYS.EST_GAS })} <Tag>{usdcLabel}</Tag>
         </>
       ),
-      value: <Output type={OutputType.Fiat} value={0.32} />,
+      value: <Output type={OutputType.Fiat} value={HARDCODED_XCXC.gasFee} />,
     },
   ];
-
-  const gain = 2.55;
 
   return (
     <$Dialog isOpen setIsOpen={setIsOpen} hasHeaderBlur={false}>
       <$Container>
         <$AssetContainer>
           <$Pill>
-            <$PositiveOutput type={OutputType.Asset} value={gain} showSign={ShowSign.Both} />
+            <$PositiveOutput
+              type={OutputType.Asset}
+              value={HARDCODED_XCXC.gain}
+              showSign={ShowSign.Both}
+            />
             {usdcLabel}
           </$Pill>
           <$AssetIcon symbol="USDC" />
@@ -95,7 +84,7 @@ export const StakingRewardDialog = ({ setIsOpen }: ElementProps) => {
             {stringGetter({
               key: STRING_KEYS.CLAIM_USDC_AMOUNT,
               params: {
-                USDC_AMOUNT: '2.55',
+                USDC_AMOUNT: HARDCODED_XCXC.gain,
               },
             })}
           </Button>

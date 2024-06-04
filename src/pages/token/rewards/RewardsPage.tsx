@@ -43,8 +43,7 @@ const RewardsPage = () => {
   const showMigratePanel = import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet;
   const showGeoblockedPanel =
     tradingRewardsRehaulEnabled && complianceState !== ComplianceStates.FULL_ACCESS;
-
-  // xcxc if there are non 0 rewards && tradingRewardsRehaulEnabled
+  const showStakingRewardPanel = !showGeoblockedPanel && enableStaking && true; // xcxc when there are rewards to be claimed
 
   const legalDisclaimer = (
     <$LegalDisclaimer>
@@ -59,8 +58,8 @@ const RewardsPage = () => {
         slotLeft={<BackButton onClick={() => navigate(AppRoute.Profile)} />}
       />
       <$DetachedSection>
-        {showGeoblockedPanel && <GeoblockedPanel /> /* or claim rewards panel */}
-        {enableStaking && <StakingRewardPanel />}
+        {showGeoblockedPanel && <GeoblockedPanel />}
+        {showStakingRewardPanel && <StakingRewardPanel />}
         {enableStaking ? <StakingPanel /> : <DYDXBalancePanel />}
         {/* List of unstaking panels */}
         {tradingRewardsRehaulEnabled && <TradingRewardsChartPanel />}
@@ -84,8 +83,8 @@ const RewardsPage = () => {
           <RewardHistoryPanel />
         </$LeftColumn>
         <$RightColumn>
-          {showGeoblockedPanel && <GeoblockedPanel /> /* or claim rewards panel */}
-          {enableStaking && <StakingRewardPanel />}
+          {showGeoblockedPanel && <GeoblockedPanel />}
+          {showStakingRewardPanel && <StakingRewardPanel />}
           {enableStaking ? <StakingPanel /> : <DYDXBalancePanel />}
           {/* List of unstaking panels */}
           {tradingRewardsRehaulEnabled && <NewMarketsPanel />}
