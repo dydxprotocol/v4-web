@@ -61,13 +61,13 @@ export const AccountInfoConnectedState = () => {
 
   const listOfErrors = inputErrors?.map(({ code }: { code: string }) => code);
 
-  const { buyingPower, marginUsage } = subAccount ?? {};
+  const { freeCollateral, marginUsage } = subAccount ?? {};
 
   const hasDiff =
     (marginUsage?.postOrder !== null &&
       !MustBigNumber(marginUsage?.postOrder).eq(MustBigNumber(marginUsage?.current))) ||
-    (buyingPower?.postOrder !== null &&
-      !MustBigNumber(buyingPower?.postOrder).eq(MustBigNumber(buyingPower?.current)));
+    (freeCollateral?.postOrder !== null &&
+      !MustBigNumber(freeCollateral?.postOrder).eq(MustBigNumber(freeCollateral?.current)));
 
   const showHeader = !hasDiff && !isTablet;
 
@@ -142,17 +142,18 @@ export const AccountInfoConnectedState = () => {
             {
               key: AccountInfoItem.BuyingPower,
               hasError:
-                isNumber(buyingPower?.postOrder) && MustBigNumber(buyingPower?.postOrder).lt(0),
+                isNumber(freeCollateral?.postOrder) &&
+                MustBigNumber(freeCollateral?.postOrder).lt(0),
               tooltip: 'cross-free-collateral',
-              isPositive: MustBigNumber(buyingPower?.postOrder).gt(
-                MustBigNumber(buyingPower?.current)
+              isPositive: MustBigNumber(freeCollateral?.postOrder).gt(
+                MustBigNumber(freeCollateral?.current)
               ),
               label: stringGetter({ key: STRING_KEYS.CROSS_FREE_COLLATERAL }),
               type: OutputType.Fiat,
               value:
-                MustBigNumber(buyingPower?.current).lt(0) && buyingPower?.postOrder === null
+                MustBigNumber(freeCollateral?.current).lt(0) && freeCollateral?.postOrder === null
                   ? undefined
-                  : buyingPower,
+                  : freeCollateral,
             },
           ].map(
             ({

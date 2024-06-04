@@ -1,7 +1,8 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { sum } from 'lodash';
+import { groupBy, sum } from 'lodash';
 
 import {
+  AbacusMarginMode,
   AbacusOrderSide,
   AbacusOrderStatus,
   AbacusPositionSide,
@@ -198,6 +199,25 @@ export const getSubaccountOpenOrders = createAppSelector([getSubaccountOrders], 
     (order) =>
       order.status !== AbacusOrderStatus.filled && order.status !== AbacusOrderStatus.cancelled
   )
+);
+
+export const getPendingIsolatedOrders = createAppSelector(
+  [getSubaccountOrders, getExistingOpenPositions, getPerpetualMarkets],
+  (allOrders, allOpenPositions, allMarkets) => {
+    const allValidOrders = (allOrders ?? [])
+      .filter(
+        (o) =>
+          (o.status === AbacusOrderStatus.open || o.status === AbacusOrderStatus.pending) &&
+          o.marginMode === AbacusMarginMode.isolated
+      )
+      // eslint-disable-next-line prefer-object-spread
+      .map((o) => Object.assign({}, o, { assetId: allMarkets?.[o.marketId]?.assetId }));
+    const allOpenPositionAssetIds = new Set(allOpenPositions?.map((p) => p.assetId) ?? []);
+    return groupBy(
+      allValidOrders.filter((o) => !allOpenPositionAssetIds.has(o.assetId ?? '')),
+      (o) => o.marketId
+    );
+  }
 );
 
 /**
