@@ -27,6 +27,7 @@ import { NewMarketsPanel } from './NewMarketsPanel';
 import { RewardHistoryPanel } from './RewardHistoryPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { StakingPanel } from './StakingPanel';
+import { StakingRewardPanel } from './StakingRewardPanel';
 import { TradingRewardsChartPanel } from './TradingRewardsChartPanel';
 import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
 
@@ -43,6 +44,8 @@ const RewardsPage = () => {
   const showGeoblockedPanel =
     tradingRewardsRehaulEnabled && complianceState !== ComplianceStates.FULL_ACCESS;
 
+  // xcxc if there are non 0 rewards && tradingRewardsRehaulEnabled
+
   const legalDisclaimer = (
     <$LegalDisclaimer>
       {stringGetter({ key: STRING_KEYS.TRADING_REWARDS_LEGAL_DISCLAIMER })}
@@ -57,6 +60,7 @@ const RewardsPage = () => {
       />
       <$DetachedSection>
         {showGeoblockedPanel && <GeoblockedPanel /> /* or claim rewards panel */}
+        {enableStaking && <StakingRewardPanel />}
         {enableStaking ? <StakingPanel /> : <DYDXBalancePanel />}
         {/* List of unstaking panels */}
         {tradingRewardsRehaulEnabled && <TradingRewardsChartPanel />}
@@ -81,6 +85,7 @@ const RewardsPage = () => {
         </$LeftColumn>
         <$RightColumn>
           {showGeoblockedPanel && <GeoblockedPanel /> /* or claim rewards panel */}
+          {enableStaking && <StakingRewardPanel />}
           {enableStaking ? <StakingPanel /> : <DYDXBalancePanel />}
           {/* List of unstaking panels */}
           {tradingRewardsRehaulEnabled && <NewMarketsPanel />}

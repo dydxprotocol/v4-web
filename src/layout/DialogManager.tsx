@@ -28,6 +28,7 @@ import { RestrictedGeoDialog } from '@/views/dialogs/RestrictedGeoDialog';
 import { RestrictedWalletDialog } from '@/views/dialogs/RestrictedWalletDialog';
 import { SelectMarginModeDialog } from '@/views/dialogs/SelectMarginModeDialog';
 import { StakeDialog } from '@/views/dialogs/StakeDialog';
+import { StakingRewardDialog } from '@/views/dialogs/StakingRewardDialog';
 import { TradeDialog } from '@/views/dialogs/TradeDialog';
 import { TransferDialog } from '@/views/dialogs/TransferDialog';
 import { TriggersDialog } from '@/views/dialogs/TriggersDialog';
@@ -86,6 +87,7 @@ export const DialogManager = () => {
     [DialogTypes.RestrictedWallet]: <RestrictedWalletDialog {...modalProps} />,
     [DialogTypes.SelectMarginMode]: <SelectMarginModeDialog {...modalProps} />,
     [DialogTypes.Stake]: <StakeDialog {...modalProps} />,
+    [DialogTypes.StakingReward]: <StakingRewardDialog {...modalProps} />,
     [DialogTypes.Trade]: <TradeDialog {...modalProps} />,
     [DialogTypes.Transfer]: <TransferDialog {...modalProps} />,
     [DialogTypes.Triggers]: <TriggersDialog {...modalProps} />,
