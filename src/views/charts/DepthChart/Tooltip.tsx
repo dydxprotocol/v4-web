@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { RenderTooltipParams } from '@visx/xychart/lib/components/Tooltip';
 import { shallowEqual } from 'react-redux';
+import styled from 'styled-components';
 
 import type { Nullable } from '@/constants/abacus';
 import {
@@ -85,7 +86,7 @@ export const DepthChartTooltipContent = ({
             }[nearestDatum.key]}
       </h4>
 
-      <Details
+      <$Details
         layout="column"
         items={
           isEditingOrder
@@ -221,3 +222,7 @@ export const DepthChartTooltipContent = ({
     </TooltipContent>
   );
 };
+
+const $Details = styled(Details)`
+  --details-item-vertical-padding: 0.2rem;
+`;

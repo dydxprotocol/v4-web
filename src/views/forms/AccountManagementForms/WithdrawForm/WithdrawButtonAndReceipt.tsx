@@ -206,6 +206,7 @@ const $WithReceipt = styled(WithReceipt)`
 `;
 
 const $Details = styled(Details)`
+  --details-item-vertical-padding: 0.33rem;
   padding: var(--form-input-paddingY) var(--form-input-paddingX);
   font-size: 0.8125em;
 `;
