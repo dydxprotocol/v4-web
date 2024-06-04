@@ -236,15 +236,18 @@ export const accountSlice = createSlice({
     },
     setChildSubaccount: (
       state,
-      action: PayloadAction<{
-        data: Partial<AccountState['childSubaccounts']>;
-        subaccountNumber: number;
-      }>
+      action: PayloadAction<Partial<AccountState['childSubaccounts']>>
     ) => {
-      state.childSubaccounts[action.payload.subaccountNumber] = {
-        ...state.childSubaccounts[action.payload.subaccountNumber],
-        ...action.payload.data,
-      };
+      const childSubaccountsCopy = { ...state.childSubaccounts };
+
+      Object.keys(action.payload).forEach((subaccountNumber) => {
+        childSubaccountsCopy[Number(subaccountNumber)] = {
+          ...childSubaccountsCopy[Number(subaccountNumber)],
+          ...action.payload[Number(subaccountNumber)],
+        };
+      });
+
+      state.childSubaccounts = childSubaccountsCopy;
     },
     setWallet: (state, action: PayloadAction<Nullable<Wallet>>) => ({
       ...state,
