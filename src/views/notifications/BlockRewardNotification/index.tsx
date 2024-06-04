@@ -52,7 +52,7 @@ export const BlockRewardNotification = ({
   );
 };
 const $Details = styled(Details)`
-  --details-item-height: 1.5rem;
+  --details-item-vertical-padding: 0;
 
   dd {
     color: var(--color-text-2);

@@ -184,6 +184,10 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
       return bytesToBigInt(x).toString() as T;
     }
 
+    if (x instanceof Date) {
+      return x.toString() as T;
+    }
+
     if (typeof x === 'object') {
       const parsedObj: { [key: string]: any } = {};
       // eslint-disable-next-line no-restricted-syntax
@@ -697,6 +701,23 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
             const parsedNobleBalance = this.parseToPrimitives(nobleBalance);
             callback(JSON.stringify(parsedNobleBalance));
           }
+          break;
+        }
+        case QueryType.GetStakingRewards: {
+          const rewards = await this.compositeClient?.validatorClient.get.getDelegationTotalRewards(
+            params.address
+          );
+          const parsedRewards = this.parseToPrimitives(rewards);
+          callback(JSON.stringify(parsedRewards));
+          break;
+        }
+        case QueryType.GetCurrentUnstaking: {
+          const unbonding =
+            await this.compositeClient?.validatorClient.get.getDelegatorUnbondingDelegations(
+              params.address
+            );
+          const parseUnbonding = this.parseToPrimitives(unbonding);
+          callback(JSON.stringify(parseUnbonding));
           break;
         }
         default: {

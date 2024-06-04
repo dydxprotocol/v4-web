@@ -181,9 +181,7 @@ export const AdvancedTradeOptions = () => {
                     tooltip={
                       needsReduceOnly
                         ? 'reduce-only'
-                        : reduceOnlyTooltip?.titleStringKey.includes(
-                              'REDUCE_ONLY_EXECUTION_IOC_FOK'
-                            )
+                        : reduceOnlyTooltip?.titleStringKey.includes('REDUCE_ONLY_EXECUTION_IOC')
                           ? 'reduce-only-execution-ioc'
                           : 'reduce-only-timeinforce-ioc'
                     }
