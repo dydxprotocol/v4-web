@@ -90,14 +90,14 @@ export const PositionsTriggersCell = ({
   };
 
   const viewOrdersButton = (
-    <$Button
+    <$ViewOrdersButton
       action={ButtonAction.Navigation}
       size={ButtonSize.XSmall}
       onClick={onViewOrders ?? undefined}
     >
       {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
       <$ArrowIcon iconName={IconName.Arrow} />
-    </$Button>
+    </$ViewOrdersButton>
   );
 
   const renderOutput = ({ label, orders }: { label: string; orders: SubaccountOrder[] }) => {
@@ -107,9 +107,14 @@ export const PositionsTriggersCell = ({
       liquidationWarningSide?: Nullable<AbacusPositionSides>;
     } = {}) => {
       const styledLabel = (
-        <$Label warning={liquidationWarningSide != null} hasOrders={orders.length > 0}>
+        <$TriggerButton
+          action={ButtonAction.Primary}
+          onClick={openTriggersDialog}
+          warning={liquidationWarningSide != null}
+          hasOrders={orders.length > 0}
+        >
           {label}
-        </$Label>
+        </$TriggerButton>
       );
       return liquidationWarningSide ? (
         <WithHovercard
@@ -228,30 +233,29 @@ const $Row = styled.span`
   --item-height: 1.25rem;
 `;
 
-const $Label = styled.div<{ warning?: boolean; hasOrders: boolean }>`
-  align-items: center;
-  border: solid var(--border-width) var(--color-border);
-  border-radius: 0.5em;
-  display: flex;
-  font: var(--font-tiny-book);
-  height: var(--item-height);
-  padding: 0 0.25rem;
+const $TriggerButton = styled(Button)<{ warning?: boolean; hasOrders: boolean }>`
+  --button-backgroundColor: transparent;
+  --button-border: solid var(--border-width) var(--color-border);
+  --button-font: var(--font-tiny-book);
+  --button-height: var(--item-height);
+  --button-padding: 0 0.25rem;
+  --button-textColor: var(--color-text-0);
 
   ${({ warning }) =>
     warning &&
     css`
-      background-color: var(--color-warning);
-      color: var(--color-black);
+      --button-textColor: var(--color-black);
+      --button-backgroundColor: var(--color-warning);
     `}
 
   ${({ hasOrders }) =>
     hasOrders
       ? css`
-          color: var(--color-text-1);
-          background-color: var(--color-layer-4);
+          --button-textColor: var(--color-text-1);
+          --button-backgroundColor: var(--color-layer-4);
         `
       : css`
-          color: var(--color-text-0);
+          --button-hover-textColor: var(--color-text-1);
         `}
 `;
 
@@ -267,7 +271,7 @@ const $Output = styled(Output)<{ value: number | null }>`
         `}
 `;
 
-const $Button = styled(Button)`
+const $ViewOrdersButton = styled(Button)`
   --button-height: var(--item-height);
   --button-padding: 0;
   --button-textColor: var(--color-text-1);
