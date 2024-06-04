@@ -106,7 +106,7 @@ export const CancelAllOrdersInMarketForm = ({
             value={pendingPositionOrders.length}
             newValue={0}
             sign={NumberSign.Negative}
-            withDiff
+            withDiff={pendingPositionOrders.length > 0}
           />
         ),
       },
@@ -119,7 +119,7 @@ export const CancelAllOrdersInMarketForm = ({
             value={thisPendingPosition?.freeCollateral?.current ?? 0}
             newValue={0}
             sign={NumberSign.Negative}
-            withDiff
+            withDiff={(thisPendingPosition?.freeCollateral?.current ?? 0) > 0}
           />
         ),
       },
@@ -134,11 +134,10 @@ export const CancelAllOrdersInMarketForm = ({
               MustBigNumber(thisPendingPosition?.freeCollateral?.current ?? 0)
             )}
             sign={NumberSign.Positive}
-            withDiff
+            withDiff={(thisPendingPosition?.freeCollateral?.current ?? 0) > 0}
           />
         ),
       },
-      // TODO: show effect on cross margin, communicate that the money is being transferred back
     ];
   }, [
     crossFreeCollateral,

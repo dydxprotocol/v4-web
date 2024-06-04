@@ -3,7 +3,6 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, PortfolioRoute } from '@/constants/routes';
 
@@ -19,8 +18,7 @@ import {
   calculateShouldRenderActionsInPositionsTable,
   calculateShouldRenderTriggersInPositionsTable,
 } from '@/state/accountCalculators';
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { openDialog } from '@/state/dialogs';
+import { useAppSelector } from '@/state/appTypes';
 
 import { isTruthy } from '@/lib/isTruthy';
 
@@ -37,13 +35,6 @@ export const Overview = () => {
       state: { from: AppRoute.Portfolio },
     });
   }, [navigate]);
-  const dispatch = useAppDispatch();
-  const onCancelOrders = useCallback(
-    (marketId: string) => {
-      dispatch(openDialog({ type: DialogTypes.CancelPendingOrders, dialogProps: { marketId } }));
-    },
-    [dispatch]
-  );
 
   const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
   const shouldRenderActions = useParameterizedSelector(
@@ -96,7 +87,6 @@ export const Overview = () => {
             />
           }
           onViewOrders={handleViewUnopenedIsolatedOrders}
-          onCancelOrders={onCancelOrders}
         />
       </$AttachedExpandingSection>
     </div>

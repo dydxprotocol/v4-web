@@ -1,11 +1,17 @@
+import { useCallback } from 'react';
+
 import styled from 'styled-components';
 
 import { SubaccountPendingPosition } from '@/constants/abacus';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+
+import { useAppDispatch } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
 
 import { AssetIcon } from './AssetIcon';
 import { Icon, IconName } from './Icon';
@@ -15,16 +21,22 @@ import { Output, OutputType } from './Output';
 type PotentialPositionCardProps = {
   marketName: string;
   onViewOrders: (marketId: string) => void;
-  onCancelOrders: (marketId: string) => void;
   pendingPosition: SubaccountPendingPosition;
 };
 
 export const PotentialPositionCard = ({
   marketName,
   onViewOrders,
-  onCancelOrders,
   pendingPosition,
 }: PotentialPositionCardProps) => {
+  const dispatch = useAppDispatch();
+  const onCancelOrders = useCallback(
+    (marketId: string) => {
+      dispatch(openDialog({ type: DialogTypes.CancelPendingOrders, dialogProps: { marketId } }));
+    },
+    [dispatch]
+  );
+
   const stringGetter = useStringGetter();
   const { assetId, freeCollateral, marketId, orderCount } = pendingPosition;
 

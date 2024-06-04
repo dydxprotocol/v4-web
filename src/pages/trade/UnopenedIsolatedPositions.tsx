@@ -20,13 +20,11 @@ import { getAssets } from '@/state/assetsSelectors';
 type UnopenedIsolatedPositionsProps = {
   className?: string;
   onViewOrders: (marketId: string) => void;
-  onCancelOrders: (marketId: string) => void;
 };
 
 export const MaybeUnopenedIsolatedPositionsDrawer = ({
   className,
   onViewOrders,
-  onCancelOrders,
 }: UnopenedIsolatedPositionsProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -46,7 +44,6 @@ export const MaybeUnopenedIsolatedPositionsDrawer = ({
         <$CardsContainer>
           <UnopenedIsolatedPositionsCards
             onViewOrders={onViewOrders}
-            onCancelOrders={onCancelOrders}
             pendingPositions={pendingPositions}
           />
         </$CardsContainer>
@@ -57,13 +54,11 @@ export const MaybeUnopenedIsolatedPositionsDrawer = ({
 
 type UnopenedIsolatedPositionsPanelProps = {
   onViewOrders: (marketId: string) => void;
-  onCancelOrders: (marketId: string) => void;
   className?: string;
   header: ReactNode;
 };
 export const MaybeUnopenedIsolatedPositionsPanel = ({
   onViewOrders,
-  onCancelOrders,
   header,
   className,
 }: UnopenedIsolatedPositionsPanelProps) => {
@@ -75,7 +70,6 @@ export const MaybeUnopenedIsolatedPositionsPanel = ({
       {header}
       <UnopenedIsolatedPositionsCards
         onViewOrders={onViewOrders}
-        onCancelOrders={onCancelOrders}
         pendingPositions={pendingPositions}
       />
     </div>
@@ -84,13 +78,11 @@ export const MaybeUnopenedIsolatedPositionsPanel = ({
 
 type UnopenedIsolatedPositionsCardsProps = {
   onViewOrders: (marketId: string) => void;
-  onCancelOrders: (marketId: string) => void;
   pendingPositions: SubaccountPendingPosition[];
 };
 
 const UnopenedIsolatedPositionsCards = ({
   onViewOrders,
-  onCancelOrders,
   pendingPositions,
 }: UnopenedIsolatedPositionsCardsProps) => {
   const assetsData = useSelector(getAssets, shallowEqual);
@@ -102,7 +94,6 @@ const UnopenedIsolatedPositionsCards = ({
           marketName={assetsData?.[pendingPosition.assetId].name ?? ''}
           pendingPosition={pendingPosition}
           onViewOrders={onViewOrders}
-          onCancelOrders={onCancelOrders}
         />
       ))}
     </$Cards>
