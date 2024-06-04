@@ -54,7 +54,7 @@ export const BlockRewardNotification = ({
 const $Details = styled(Details)`
   --details-item-height: 1.5rem;
 
-  padding: 0 dd {
+  dd {
     color: var(--color-text-2);
   }
 `;
