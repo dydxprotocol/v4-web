@@ -176,8 +176,8 @@ const itemLayoutVariants = {
 
     ${layoutMixins.spacedRow}
     gap: 0.5rem;
-    align-items: start;
-    padding: 0.5rem 0;
+    align-items: center;
+    padding: var(--details-item-vertical-padding, 0.5rem) 0;
 
     min-height: var(--details-item-height);
 
@@ -196,7 +196,7 @@ const itemLayoutVariants = {
 
   stackColumn: css`
     ${layoutMixins.column}
-    padding: 0.75rem 0;
+    padding: var(--details-item-vertical-padding, 0.75rem) 0;
     > :first-child {
       margin-bottom: 0.5rem;
     }
@@ -229,10 +229,11 @@ const $Details = styled.dl<{
   layout: 'column' | 'row' | 'rowColumns' | 'grid' | 'stackColumn';
   withSeparators: boolean;
 }>`
-  --details-item-height: 2rem;
+  --details-item-height: 1rem;
   --details-item-backgroundColor: transparent;
   --details-subitem-borderWidth: 2px;
   --details-grid-numColumns: 2;
+  --details-item-vertical-padding: ;
 
   ${({ layout }) => layout && detailsLayoutVariants[layout]}
 `;
