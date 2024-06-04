@@ -45,7 +45,7 @@ import {
   getSubaccountOrders,
 } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
-import { useAppSelector, useAppDispatch } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { getAbacusNotifications } from '@/state/notificationsSelectors';
 import { getMarketIds } from '@/state/perpetualsSelectors';
@@ -278,6 +278,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       const incentivesExpirationDate = new Date('2024-07-17T23:59:59');
       const conditionalOrdersExpirationDate = new Date('2024-06-01T23:59:59');
+      const fokDeprecationExpirationDate = new Date('2024-07-01T23:59:59');
 
       const currentDate = new Date();
 
@@ -326,6 +327,24 @@ export const notificationTypes: NotificationTypeConfig[] = [
               }),
               toastSensitivity: 'foreground',
               groupKey: ReleaseUpdateNotificationIds.RevampedConditionalOrders,
+            },
+            []
+          );
+        }
+
+        if (currentDate <= fokDeprecationExpirationDate) {
+          trigger(
+            ReleaseUpdateNotificationIds.FOKDeprecation,
+            {
+              icon: <AssetIcon symbol={chainTokenLabel} />,
+              title: stringGetter({
+                key: 'NOTIFICATIONS.FOK_DEPRECATION.TITLE',
+              }),
+              body: stringGetter({
+                key: 'NOTIFICATIONS.FOK_DEPRECATION.BODY',
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.FOKDeprecation,
             },
             []
           );
