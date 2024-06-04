@@ -1,7 +1,6 @@
-import { Ref, useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import type { NumberFormatValues, SourceInfo } from 'react-number-format';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
@@ -18,14 +17,7 @@ import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
-import { USD_DECIMALS } from '@/constants/numbers';
-import {
-  InputErrorData,
-  MobilePlaceOrderSteps,
-  ORDER_TYPE_STRINGS,
-  TradeBoxKeys,
-  TradeTypes,
-} from '@/constants/trade';
+import { MobilePlaceOrderSteps, ORDER_TYPE_STRINGS, TradeTypes } from '@/constants/trade';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
@@ -40,19 +32,14 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { Button } from '@/components/Button';
-import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
-import { InputType } from '@/components/Input';
-import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
-import { WithTooltip } from '@/components/WithTooltip';
 import { Orderbook } from '@/views/tables/Orderbook';
 
 import { getCurrentMarketIsolatedPositionLeverage } from '@/state/accountSelectors';
-import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { setTradeFormInputs } from '@/state/inputs';
+import { useAppSelector } from '@/state/appTypes';
 import {
   getCurrentInput,
   getInputTradeData,
@@ -67,19 +54,9 @@ import { getSelectedOrderSide, getTradeInputAlert } from '@/lib/tradeData';
 import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 import { PositionPreview } from './TradeForm/PositionPreview';
+import { TradeFormInputs } from './TradeForm/TradeFormInputs';
 import { TradeSizeInputs } from './TradeForm/TradeSizeInputs';
 import { useTradeTypeOptions } from './TradeForm/useTradeTypeOptions';
-
-type TradeBoxInputConfig = {
-  key: TradeBoxKeys;
-  inputType: InputType;
-  label: React.ReactNode;
-  onChange: (values: NumberFormatValues, e: SourceInfo) => void;
-  ref?: Ref<HTMLInputElement>;
-  validationConfig?: InputErrorData;
-  value: string | number;
-  decimals?: number;
-};
 
 type ElementProps = {
   currentStep?: MobilePlaceOrderSteps;
@@ -521,85 +498,3 @@ const $Footer = styled.footer`
 
   ${layoutMixins.column}
 `;
-
-const TradeFormInputs = () => {
-  const dispatch = useAppDispatch();
-  const stringGetter = useStringGetter();
-
-  const { needsLimitPrice, needsTrailingPercent, needsTriggerPrice } = useTradeFormData();
-  const tradeFormInputValues = useAppSelector(getTradeFormInputs, shallowEqual);
-  const { limitPriceInput, triggerPriceInput, trailingPercentInput } = tradeFormInputValues;
-  const { tickSizeDecimals } = useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
-
-  const tradeFormInputs: TradeBoxInputConfig[] = [];
-  if (needsTriggerPrice) {
-    tradeFormInputs.push({
-      key: TradeBoxKeys.TriggerPrice,
-      inputType: InputType.Currency,
-      label: (
-        <>
-          <WithTooltip tooltip="trigger-price" side="right">
-            {stringGetter({ key: STRING_KEYS.TRIGGER_PRICE })}
-          </WithTooltip>
-          <Tag>USD</Tag>
-        </>
-      ),
-      onChange: ({ value }: NumberFormatValues) => {
-        dispatch(setTradeFormInputs({ triggerPriceInput: value }));
-      },
-      value: triggerPriceInput ?? '',
-      decimals: tickSizeDecimals ?? USD_DECIMALS,
-    });
-  }
-
-  if (needsLimitPrice) {
-    tradeFormInputs.push({
-      key: TradeBoxKeys.LimitPrice,
-      inputType: InputType.Currency,
-      label: (
-        <>
-          <WithTooltip tooltip="limit-price" side="right">
-            {stringGetter({ key: STRING_KEYS.LIMIT_PRICE })}
-          </WithTooltip>
-          <Tag>USD</Tag>
-        </>
-      ),
-      onChange: ({ value }: NumberFormatValues) => {
-        dispatch(setTradeFormInputs({ limitPriceInput: value }));
-      },
-      value: limitPriceInput,
-      decimals: tickSizeDecimals ?? USD_DECIMALS,
-    });
-  }
-
-  if (needsTrailingPercent) {
-    tradeFormInputs.push({
-      key: TradeBoxKeys.TrailingPercent,
-      inputType: InputType.Percent,
-      label: (
-        <WithTooltip tooltip="trailing-percent" side="right">
-          {stringGetter({ key: STRING_KEYS.TRAILING_PERCENT })}
-        </WithTooltip>
-      ),
-      onChange: ({ value }: NumberFormatValues) => {
-        dispatch(setTradeFormInputs({ trailingPercentInput: value }));
-      },
-      value: trailingPercentInput ?? '',
-    });
-  }
-
-  return tradeFormInputs.map(
-    ({ key, inputType, label, onChange, validationConfig, value, decimals }) => (
-      <FormInput
-        key={key}
-        id={key}
-        type={inputType}
-        label={label}
-        onChange={onChange}
-        validationConfig={validationConfig}
-        value={value}
-        decimals={decimals}
-      />
-    )
-  );
-};
