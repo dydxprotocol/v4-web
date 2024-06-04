@@ -17,8 +17,10 @@ import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 import { testFlags } from '@/lib/testFlags';
 
 import { DYDXBalancePanel } from './DYDXBalancePanel';
+import { GovernancePanel } from './GovernancePanel';
 import { LaunchIncentivesPanel } from './LaunchIncentivesPanel';
 import { MigratePanel } from './MigratePanel';
+import { NewMarketsPanel } from './NewMarketsPanel';
 import { RewardHistoryPanel } from './RewardHistoryPanel';
 import { RewardsHelpPanel } from './RewardsHelpPanel';
 import { StakingPanel } from './StakingPanel';
@@ -30,57 +32,72 @@ const RewardsPage = () => {
   const { isTablet, isNotTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  const showChartPanel = testFlags.tradingRewardsRehaul;
+  const { enableStaking, tradingRewardsRehaul: tradingRewardsRehaulEnabled } = testFlags;
 
-  return (
+  const legalDisclaimer = (
+    <$LegalDisclaimer>
+      {stringGetter({ key: STRING_KEYS.TRADING_REWARDS_LEGAL_DISCLAIMER })}
+    </$LegalDisclaimer>
+  );
+  return isTablet ? (
     <div>
-      {isTablet && (
-        <ContentSectionHeader
-          title={stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
-          slotLeft={<BackButton onClick={() => navigate(AppRoute.Profile)} />}
-        />
-      )}
+      <ContentSectionHeader
+        title={stringGetter({ key: STRING_KEYS.TRADING_REWARDS })}
+        slotLeft={<BackButton onClick={() => navigate(AppRoute.Profile)} />}
+      />
       <DetachedSection>
         <$GridLayout
           showMigratePanel={import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet}
-          showChartPanel={showChartPanel}
+          showChartPanel={tradingRewardsRehaulEnabled}
         >
-          {import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet && <$MigratePanel />}
-
-          {isTablet ? (
-            <$LaunchIncentivesPanel />
-          ) : (
-            <>
-              {showChartPanel && <$TradingRewardsChartPanel />}
-              <$LaunchIncentivesPanel />
-              {testFlags.enableStaking ? <$StakingPanel /> : <$DYDXBalancePanel />}
-            </>
-          )}
-
+          {/* Available staking rewards panel */}
+          {/* List of unstaking panels */}
+          {tradingRewardsRehaulEnabled && <TradingRewardsChartPanel />}
+          <$LaunchIncentivesPanel />
+          {enableStaking ? <$StakingPanel /> : <$DYDXBalancePanel />}
           <$TradingRewardsColumn>
-            <TradingRewardsSummaryPanel />
-            {isTablet && showChartPanel && <TradingRewardsChartPanel />}
-            {isTablet && <RewardsHelpPanel />}
+            {!tradingRewardsRehaulEnabled && <TradingRewardsSummaryPanel />}
+            {tradingRewardsRehaulEnabled && <NewMarketsPanel />}
+            {tradingRewardsRehaulEnabled && <GovernancePanel />}
             <RewardHistoryPanel />
+            <RewardsHelpPanel />
+            {tradingRewardsRehaulEnabled && legalDisclaimer}
           </$TradingRewardsColumn>
-
-          {isNotTablet && (
-            <$OtherColumn>
-              <RewardsHelpPanel />
-            </$OtherColumn>
-          )}
         </$GridLayout>
       </DetachedSection>
     </div>
+  ) : (
+    <DetachedSection>
+      <$GridLayout
+        showMigratePanel={import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet}
+        showChartPanel={tradingRewardsRehaulEnabled}
+      >
+        {import.meta.env.VITE_V3_TOKEN_ADDRESS && <$MigratePanel />}
+        {tradingRewardsRehaulEnabled && <$TradingRewardsChartPanel />}
+        <$LaunchIncentivesPanel />
+        {enableStaking ? <$StakingPanel /> : <$DYDXBalancePanel />}
+        <$TradingRewardsColumn>
+          {!tradingRewardsRehaulEnabled && <TradingRewardsSummaryPanel />}
+          <RewardHistoryPanel />
+        </$TradingRewardsColumn>
+        <$OtherColumn>
+          {/* Available staking rewards panel */}
+          {/* List of unstaking panels */}
+          {tradingRewardsRehaulEnabled && <NewMarketsPanel />}
+          {tradingRewardsRehaulEnabled && <GovernancePanel />}
+          <RewardsHelpPanel />
+          {tradingRewardsRehaulEnabled && legalDisclaimer}
+        </$OtherColumn>
+      </$GridLayout>
+    </DetachedSection>
   );
 };
 
 export default RewardsPage;
 
 const $GridLayout = styled.div<{ showMigratePanel?: boolean; showChartPanel?: boolean }>`
-  --gap: 1.5rem;
+  --gap: ;
   display: grid;
-  grid-template-columns: 2fr 1fr;
   gap: var(--gap);
   max-width: 80rem;
 
@@ -88,38 +105,40 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean; showChartPanel?: bo
     gap: var(--gap);
   }
 
-  ${({ showMigratePanel, showChartPanel }) =>
-    showMigratePanel && showChartPanel
-      ? css`
-          grid-template-areas:
-            'migrate migrate'
-            'chart chart'
-            'incentives incentives'
-            'balance balance'
-            'rewards other';
-        `
-      : showMigratePanel
+  @media ${breakpoints.notTablet} {
+    --gap: 1.5rem;
+    grid-template-columns: 2fr 1fr;
+    padding: 1rem;
+
+    ${({ showMigratePanel, showChartPanel }) =>
+      showMigratePanel && showChartPanel
         ? css`
             grid-template-areas:
               'migrate migrate'
-              'incentives balance'
+              'chart chart'
+              'incentives incentives'
+              'balance balance'
               'rewards other';
           `
-        : showChartPanel
+        : showMigratePanel
           ? css`
               grid-template-areas:
-                'chart chart'
+                'migrate migrate'
                 'incentives balance'
                 'rewards other';
             `
-          : css`
-              grid-template-areas:
-                'incentives balance'
-                'rewards other';
-            `}
-
-  @media ${breakpoints.notTablet} {
-    padding: 1rem;
+          : showChartPanel
+            ? css`
+                grid-template-areas:
+                  'chart chart'
+                  'incentives balance'
+                  'rewards other';
+              `
+            : css`
+                grid-template-areas:
+                  'incentives balance'
+                  'rewards other';
+              `}
   }
 
   @media ${breakpoints.tablet} {
@@ -127,14 +146,25 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean; showChartPanel?: bo
     grid-template-columns: 1fr;
     width: calc(100vw - 2rem);
     margin: 0 auto;
-
-    grid-template-areas:
-      'incentives'
-      'rewards';
-
     > :last-child {
       margin-bottom: var(--gap);
     }
+
+    ${({ showChartPanel }) =>
+      showChartPanel
+        ? css`
+            grid-template-areas:
+              'balance'
+              'chart'
+              'incentives'
+              'rewards';
+          `
+        : css`
+            grid-template-areas:
+              'balance'
+              'incentives'
+              'rewards';
+          `}
   }
 `;
 
@@ -166,4 +196,9 @@ const $TradingRewardsColumn = styled.div`
 const $OtherColumn = styled.div`
   grid-area: other;
   ${layoutMixins.flexColumn}
+`;
+
+const $LegalDisclaimer = styled.div`
+  font: var(--font-mini-book);
+  color: var(--color-text-0);
 `;

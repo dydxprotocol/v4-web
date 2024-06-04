@@ -154,6 +154,7 @@ export const TradingRewardHistoryTable = ({
 
 const $Table = styled(Table)`
   ${tradeViewMixins.horizontalTable}
+  min-width: 1px;
 
   tbody {
     font: var(--font-small-book);

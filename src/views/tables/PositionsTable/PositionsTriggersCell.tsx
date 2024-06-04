@@ -30,6 +30,12 @@ import { openDialog } from '@/state/dialogs';
 import { isStopLossOrder } from '@/lib/orders';
 import { testFlags } from '@/lib/testFlags';
 
+enum TriggerButtonState {
+  Warning = 'Warning',
+  HasOrders = 'HasOrders',
+  Default = 'Default',
+}
+
 type ElementProps = {
   marketId: string;
   assetId: string;
@@ -90,14 +96,14 @@ export const PositionsTriggersCell = ({
   };
 
   const viewOrdersButton = (
-    <$Button
+    <$ViewOrdersButton
       action={ButtonAction.Navigation}
       size={ButtonSize.XSmall}
       onClick={onViewOrders ?? undefined}
     >
       {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
       <$ArrowIcon iconName={IconName.Arrow} />
-    </$Button>
+    </$ViewOrdersButton>
   );
 
   const renderOutput = ({ label, orders }: { label: string; orders: SubaccountOrder[] }) => {
@@ -106,10 +112,22 @@ export const PositionsTriggersCell = ({
     }: {
       liquidationWarningSide?: Nullable<AbacusPositionSides>;
     } = {}) => {
-      const styledLabel = (
-        <$Label warning={liquidationWarningSide != null} hasOrders={orders.length > 0}>
+      let triggerButtonState = TriggerButtonState.Default;
+
+      if (liquidationWarningSide != null) {
+        triggerButtonState = TriggerButtonState.Warning;
+      } else if (orders.length > 0) {
+        triggerButtonState = TriggerButtonState.HasOrders;
+      }
+
+      const triggerButton = (
+        <$TriggerButton
+          action={ButtonAction.Primary}
+          onClick={openTriggersDialog}
+          triggerButtonState={triggerButtonState}
+        >
           {label}
-        </$Label>
+        </$TriggerButton>
       );
       return liquidationWarningSide ? (
         <WithHovercard
@@ -129,10 +147,10 @@ export const PositionsTriggersCell = ({
               {stringGetter({ key: STRING_KEYS.EDIT_STOP_LOSS })}
             </Button>
           }
-          slotTrigger={styledLabel}
+          slotTrigger={triggerButton}
         />
       ) : (
-        styledLabel
+        triggerButton
       );
     };
 
@@ -228,31 +246,35 @@ const $Row = styled.span`
   --item-height: 1.25rem;
 `;
 
-const $Label = styled.div<{ warning?: boolean; hasOrders: boolean }>`
-  align-items: center;
-  border: solid var(--border-width) var(--color-border);
-  border-radius: 0.5em;
-  display: flex;
-  font: var(--font-tiny-book);
-  height: var(--item-height);
-  padding: 0 0.25rem;
+const getStylingForTriggerButtonState = (state: TriggerButtonState) => {
+  switch (state) {
+    case TriggerButtonState.HasOrders:
+      return css`
+        --button-textColor: var(--color-text-1);
+        --button-backgroundColor: var(--color-layer-4);
+      `;
+    case TriggerButtonState.Warning:
+      return css`
+        --button-textColor: var(--color-black);
+        --button-backgroundColor: var(--color-warning);
+      `;
+    case TriggerButtonState.Default:
+    default:
+      return css`
+        --button-hover-textColor: var(--color-text-1);
+      `;
+  }
+};
 
-  ${({ warning }) =>
-    warning &&
-    css`
-      background-color: var(--color-warning);
-      color: var(--color-black);
-    `}
+const $TriggerButton = styled(Button)<{ triggerButtonState: TriggerButtonState }>`
+  --button-backgroundColor: transparent;
+  --button-border: solid var(--border-width) var(--color-border);
+  --button-font: var(--font-tiny-book);
+  --button-height: var(--item-height);
+  --button-padding: 0 0.25rem;
+  --button-textColor: var(--color-text-0);
 
-  ${({ hasOrders }) =>
-    hasOrders
-      ? css`
-          color: var(--color-text-1);
-          background-color: var(--color-layer-4);
-        `
-      : css`
-          color: var(--color-text-0);
-        `}
+  ${({ triggerButtonState }) => getStylingForTriggerButtonState(triggerButtonState)}
 `;
 
 const $Output = styled(Output)<{ value: number | null }>`
@@ -267,7 +289,7 @@ const $Output = styled(Output)<{ value: number | null }>`
         `}
 `;
 
-const $Button = styled(Button)`
+const $ViewOrdersButton = styled(Button)`
   --button-height: var(--item-height);
   --button-padding: 0;
   --button-textColor: var(--color-text-1);

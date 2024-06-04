@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { useLogin, useLogout, usePrivy } from '@privy-io/react-auth';
+import { useLogin, useLogout, useMfa, useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
 import {
   WalletType as CosmosWalletType,
   useAccount as useAccountGraz,
@@ -114,7 +114,16 @@ export const useWalletConnection = () => {
     defaultValue: {} as EvmDerivedAddresses,
   });
   const { ready, authenticated } = usePrivy();
+
+  const { mfaMethods } = useMfa();
+  const { showMfaEnrollmentModal } = useMfaEnrollment();
+
   const { login } = useLogin({
+    onComplete: (user, isNewUser, wasAlreadyAuthenticated) => {
+      if (!wasAlreadyAuthenticated && isNewUser && mfaMethods.length) {
+        showMfaEnrollmentModal();
+      }
+    },
     onError: (error) => {
       if (error !== 'exited_auth_flow') {
         log('useWalletConnection/privy/useLogin', new Error(`Privy: ${error}`));

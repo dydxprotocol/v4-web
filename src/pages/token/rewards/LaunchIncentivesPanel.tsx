@@ -165,7 +165,7 @@ const LaunchIncentivesContent = () => {
         >
           {stringGetter({ key: STRING_KEYS.ABOUT })}
         </$AboutButton>
-        <$Button
+        <$LeaderboardButton
           action={ButtonAction.Primary}
           onClick={() => {
             dispatch(
@@ -179,7 +179,7 @@ const LaunchIncentivesContent = () => {
           slotLeft={<Icon iconName={IconName.Leaderboard} />}
         >
           {stringGetter({ key: STRING_KEYS.LEADERBOARD })}
-        </$Button>
+        </$LeaderboardButton>
       </$ButtonRow>
     </$Column>
   );
@@ -236,6 +236,11 @@ const $AboutButton = styled($Button)`
   --button-textColor: var(--color-text-2);
   --button-backgroundColor: var(--color-layer-6);
   --button-border: solid var(--border-width) var(--color-layer-7);
+  flex-grow: 1;
+`;
+
+const $LeaderboardButton = styled($Button)`
+  flex-grow: 2;
 `;
 
 const $Column = styled.div`
