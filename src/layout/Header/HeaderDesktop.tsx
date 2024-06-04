@@ -31,6 +31,8 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getHasSeenLaunchIncentives } from '@/state/configsSelectors';
 import { openDialog } from '@/state/dialogs';
 
+import { testFlags } from '@/lib/testFlags';
+
 export const HeaderDesktop = () => {
   const stringGetter = useStringGetter();
   const { documentation, community, mintscanBase, exchangeStats } = useURLConfigs();
@@ -39,6 +41,9 @@ export const HeaderDesktop = () => {
   const { complianceState } = useComplianceState();
 
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
+  const showChainTokenPage =
+    complianceState === ComplianceStates.FULL_ACCESS ||
+    (testFlags.tradingRewardsRehaul && testFlags.enableStaking);
 
   const navItems = [
     {
@@ -59,7 +64,7 @@ export const HeaderDesktop = () => {
           label: stringGetter({ key: STRING_KEYS.MARKETS }),
           href: AppRoute.Markets,
         },
-        complianceState === ComplianceStates.FULL_ACCESS && {
+        showChainTokenPage && {
           value: chainTokenLabel,
           label: chainTokenLabel,
           href: `/${chainTokenLabel}`,
