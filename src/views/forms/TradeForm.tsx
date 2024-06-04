@@ -248,6 +248,7 @@ export const TradeForm = ({
       />
     </$TopActionsRow>
   );
+
   const orderbookAndInputs = (
     <$OrderbookAndInputs showOrderbook={showOrderbook}>
       {isTablet && showOrderbook && <$Orderbook maxRowsPerSide={5} />}
@@ -313,12 +314,6 @@ export const TradeForm = ({
     </$Footer>
   );
 
-  const tradeConfiguration = (
-    <>
-      {topActionsRow}
-      {orderbookAndInputs}
-    </>
-  );
   return (
     <$TradeForm onSubmit={onSubmit} className={className}>
       {currentStep && currentStep !== MobilePlaceOrderSteps.EditOrder ? (
@@ -327,7 +322,10 @@ export const TradeForm = ({
           {alertContent && <AlertMessage type={alertType}>{alertContent}</AlertMessage>}
         </>
       ) : (
-        tradeConfiguration
+        <>
+          {topActionsRow}
+          {orderbookAndInputs}
+        </>
       )}
       {tradeFooter}
     </$TradeForm>
