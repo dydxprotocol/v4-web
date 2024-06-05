@@ -16,6 +16,7 @@ import {
 } from '@/constants/localization';
 import {
   DEFAULT_TOAST_AUTO_CLOSE_MS,
+  MarketWindDownNotificationIds,
   NotificationDisplayData,
   NotificationType,
   ReleaseUpdateNotificationIds,
@@ -30,6 +31,7 @@ import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
+import { Output, OutputType } from '@/components/Output';
 // eslint-disable-next-line import/no-cycle
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
@@ -401,34 +403,86 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
   },
   {
-    type: NotificationType.MarketWinddown,
+    type: NotificationType.MarketWindDown,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
 
-      // const startDate - newData
-      const expirationDate = new Date('2024-07-17T23:59:59'); // xcxc
+      // xcxc fix
+      const marketWindDownProposalExpirationDate = '2024-07-17T23:59:59'; // should match marketWindDownDate
+      const marketWindDownDate = '2024-07-17T23:59:59';
+      const marketWindDownExpirationDate = '2024-07-17T23:59:59'; // 30 days after wind down
       const currentDate = new Date();
 
+      const blockNumber = '1111'; // xcxc fix
+      const blockDate = <$Output type={OutputType.DateTime} value={marketWindDownDate} />;
+
+      const firstMarket = 'FET-USD';
+      const secondMarket = 'AGIX-USD';
+
       useEffect(() => {
-        if (currentDate <= expirationDate) {
+        if (currentDate <= new Date(marketWindDownProposalExpirationDate)) {
+          trigger(MarketWindDownNotificationIds.MarketWindDownProposalFetAgix, {
+            title: stringGetter({
+              key: 'NOTIFICATIONS.TWO_MARKET_WIND_DOWN_PROPOSAL.TITLE',
+              params: {
+                MARKET_1: firstMarket,
+                MARKET_2: secondMarket,
+              },
+            }),
+            body: stringGetter({
+              key: 'NOTIFICATIONS.TWO_MARKET_WIND_DOWN_PROPOSAL.BODY',
+              params: {
+                MARKET_1: firstMarket,
+                MARKET_2: secondMarket,
+                BLOCK_NUMBER: blockNumber,
+                DATE: blockDate,
+                HERE_LINK: (
+                  <$Link href="https://help.dydx.trade/en/articles/166973-contract-loss-mechanisms-on-dydx-chain">
+                    {/* xcxc should link to mintscan */}
+                    {stringGetter({ key: STRING_KEYS.HERE })}
+                  </$Link>
+                ),
+              },
+            }),
+            toastSensitivity: 'foreground',
+            groupKey: MarketWindDownNotificationIds.MarketWindDownProposalFetAgix,
+          });
+        }
+      });
+
+      useEffect(() => {
+        if (currentDate <= new Date(marketWindDownExpirationDate)) {
           trigger(
-            NotificationType.MarketWinddown,
+            MarketWindDownNotificationIds.MarketWindDownFetAgix,
             {
-              //           icon: <$WarningIcon iconName={IconName.Warning} />,
-              title: 'Markets are being winded down', // xcxc
-              body: 'At block XYZ <some date/time>, the markets FET-USD and AGIX-USD went through final settlement. Existing positions have been closed and open orders have now been canceled. You can find more information regarding the final settlement here.',
-              //           toastSensitivity: 'foreground',
-              groupKey: NotificationType.MarketWinddown,
-              //           withClose: false,
-              //           actionAltText: stringGetter({ key: STRING_KEYS.STATUS_PAGE }),
-              //           renderActionSlot: () => (
-              //             <Link href={statusPage}>{stringGetter({ key: STRING_KEYS.STATUS_PAGE })} →</Link>
-              //           ),
+              title: stringGetter({
+                key: 'NOTIFICATIONS.TWO_MARKET_WIND_DOWN.TITLE',
+                params: {
+                  MARKET_1: firstMarket,
+                  MARKET_2: secondMarket,
+                },
+              }),
+              body: stringGetter({
+                key: 'NOTIFICATIONS.TWO_MARKET_WIND_DOWN.BODY',
+                params: {
+                  MARKET_1: firstMarket,
+                  MARKET_2: secondMarket,
+                  BLOCK_NUMBER: blockNumber,
+                  DATE: blockDate,
+                  HERE_LINK: (
+                    <$Link href="https://help.dydx.trade/en/articles/166973-contract-loss-mechanisms-on-dydx-chain">
+                      {stringGetter({ key: STRING_KEYS.HERE })}
+                    </$Link>
+                  ),
+                },
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: MarketWindDownNotificationIds.MarketWindDownFetAgix,
             },
             []
           );
         }
-      }, [stringGetter]);
+      }, [stringGetter, blockDate, currentDate]);
     },
     useNotificationAction: () => {
       return () => {};
@@ -598,5 +652,9 @@ const $WarningIcon = styled(Icon)`
 
 const $Link = styled(Link)`
   --link-color: var(--color-accent);
+  display: inline-block;
+`;
+
+const $Output = styled(Output)`
   display: inline-block;
 `;

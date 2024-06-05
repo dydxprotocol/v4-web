@@ -9,7 +9,7 @@ export enum NotificationType {
   ApiError = 'ApiError',
   ComplianceAlert = 'ComplianceAlert',
   OrderStatus = 'OrderStatus',
-  MarketWinddown = 'MarketWinddown',
+  MarketWindDown = 'MarketWindDown',
 }
 
 export enum NotificationCategoryPreferences {
@@ -29,7 +29,7 @@ export const NotificationTypeCategory: {
   [NotificationType.OrderStatus]: NotificationCategoryPreferences.Trading,
   [NotificationType.ApiError]: NotificationCategoryPreferences.MustSee,
   [NotificationType.ComplianceAlert]: NotificationCategoryPreferences.MustSee,
-  [NotificationType.MarketWinddown]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.MarketWindDown]: NotificationCategoryPreferences.MustSee,
 };
 
 export const SingleSessionNotificationTypes = [
@@ -188,6 +188,11 @@ export enum ReleaseUpdateNotificationIds {
   IncentivesS5 = 'incentives-s5',
   IncentivesDistributedS3 = 'incentives-distributed-s3',
   FOKDeprecation = 'fok-deprecation',
+}
+
+export enum MarketWindDownNotificationIds {
+  MarketWindDownFetAgix = 'market-wind-down-fet-agix',
+  MarketWindDownProposalFetAgix = 'market-wind-down-proposal-fet-agix',
 }
 
 /**
