@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
+import { SMALL_USD_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -18,20 +19,25 @@ import { Panel } from '@/components/Panel';
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
-export const StakingRewardPanel = () => {
+import { BigNumberish } from '@/lib/numbers';
+
+type ElementProps = {
+  usdcRewards: BigNumberish;
+};
+
+export const StakingRewardPanel = ({ usdcRewards }: ElementProps) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
-
-  const placeholderGains = '2.20';
 
   const openStakingRewardDialog = useCallback(
     () =>
       dispatch(
         openDialog({
           type: DialogTypes.StakingReward,
+          dialogProps: { usdcRewards },
         })
       ),
-    [dispatch]
+    [dispatch, usdcRewards]
   );
 
   return (
@@ -52,8 +58,9 @@ export const StakingRewardPanel = () => {
       <$InlineRow>
         <$PositiveOutput
           type={OutputType.Asset}
-          value={placeholderGains}
+          value={usdcRewards}
           showSign={ShowSign.Both}
+          fractionDigits={SMALL_USD_DECIMALS}
         />
         <AssetIcon symbol="USDC" />
       </$InlineRow>

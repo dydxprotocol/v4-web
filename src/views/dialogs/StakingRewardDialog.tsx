@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { NumberSign } from '@/constants/numbers';
+import { NumberSign, SMALL_USD_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -19,21 +19,21 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { getSubaccountEquity } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import { BigNumberish, MustBigNumber } from '@/lib/numbers';
+
 type ElementProps = {
+  usdcRewards: BigNumberish;
   setIsOpen?: (open: boolean) => void;
 };
 
-export const StakingRewardDialog = ({ setIsOpen }: ElementProps) => {
+export const StakingRewardDialog = ({ usdcRewards, setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
   const { usdcLabel } = useTokenConfigs();
 
-  const { current: equity, postOrder: newEquity } =
-    useAppSelector(getSubaccountEquity, shallowEqual) ?? {};
+  const { current: equity } = useAppSelector(getSubaccountEquity, shallowEqual) ?? {};
+  const newEquity = MustBigNumber(equity).plus(usdcRewards);
 
-  const HARDCODED_XCXC = {
-    gasFee: 0.32,
-    gain: 2.55,
-  };
+  const HARDCODED_GAS_FEE = 0.32; // TODO: OTE-392
 
   const detailItems = [
     {
@@ -49,7 +49,7 @@ export const StakingRewardDialog = ({ setIsOpen }: ElementProps) => {
           value={equity}
           newValue={newEquity}
           sign={NumberSign.Positive}
-          withDiff={equity !== newEquity}
+          withDiff={MustBigNumber(equity) !== newEquity}
         />
       ),
     },
@@ -60,31 +60,38 @@ export const StakingRewardDialog = ({ setIsOpen }: ElementProps) => {
           {stringGetter({ key: STRING_KEYS.EST_GAS })} <Tag>{usdcLabel}</Tag>
         </>
       ),
-      value: <Output type={OutputType.Fiat} value={HARDCODED_XCXC.gasFee} />,
+      value: <Output type={OutputType.Fiat} value={HARDCODED_GAS_FEE} />,
     },
   ];
+
+  const claimRewards = () => {
+    // TODO: OTE-393
+  };
 
   return (
     <$Dialog isOpen setIsOpen={setIsOpen} hasHeaderBlur={false}>
       <$Container>
         <$AssetContainer>
           <$Pill>
-            <$PositiveOutput
-              type={OutputType.Asset}
-              value={HARDCODED_XCXC.gain}
-              showSign={ShowSign.Both}
-            />
+            <$PositiveOutput type={OutputType.Asset} value={usdcRewards} showSign={ShowSign.Both} />
             {usdcLabel}
           </$Pill>
           <$AssetIcon symbol="USDC" />
         </$AssetContainer>
         <$Heading>{stringGetter({ key: STRING_KEYS.CLAIM_STAKING_REWARDS })}</$Heading>
         <$WithDetailsReceipt detailItems={detailItems}>
-          <Button action={ButtonAction.Primary}>
+          <Button action={ButtonAction.Primary} onClick={claimRewards}>
             {stringGetter({
               key: STRING_KEYS.CLAIM_USDC_AMOUNT,
               params: {
-                USDC_AMOUNT: HARDCODED_XCXC.gain,
+                USDC_AMOUNT: (
+                  <Output
+                    type={OutputType.Asset}
+                    value={usdcRewards}
+                    showSign={ShowSign.None}
+                    fractionDigits={SMALL_USD_DECIMALS}
+                  />
+                ),
               },
             })}
           </Button>

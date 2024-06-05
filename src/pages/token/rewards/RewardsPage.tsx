@@ -1,6 +1,8 @@
+import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { AccountBalance } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
@@ -8,6 +10,7 @@ import { AppRoute } from '@/constants/routes';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -16,6 +19,10 @@ import { BackButton } from '@/components/BackButton';
 import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 
+import { getStakingRewards } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
+
+import { MustBigNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
 
 import { DYDXBalancePanel } from './DYDXBalancePanel';
@@ -37,14 +44,30 @@ const RewardsPage = () => {
 
   const { complianceState } = useComplianceState();
   const { isTablet, isNotTablet } = useBreakpoints();
-
+  const { usdcDenom } = useTokenConfigs();
+  const usdcDecimals = 24; // hardcoded solution; fix in OTE-390
   const { enableStaking, tradingRewardsRehaul: tradingRewardsRehaulEnabled } = testFlags;
+
+  const stakingRewards: AccountBalance[] =
+    useAppSelector(getStakingRewards, shallowEqual)?.totalRewards?.toArray() ?? [];
+
+  const totalUsdcRewards = stakingRewards?.reduce((total: number, reward) => {
+    if (reward?.denom === usdcDenom && reward.amount) {
+      return total + parseFloat(reward.amount);
+    }
+    return total;
+  }, 0);
 
   const showMigratePanel = import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet;
   const showGeoblockedPanel =
     tradingRewardsRehaulEnabled && complianceState !== ComplianceStates.FULL_ACCESS;
-  const showStakingRewardPanel = !showGeoblockedPanel && enableStaking && true; // xcxc when there are rewards to be claimed
+  const showStakingRewardPanel = totalUsdcRewards > 0 && !showGeoblockedPanel && enableStaking;
 
+  const stakingRewardPanel = (
+    <StakingRewardPanel
+      usdcRewards={MustBigNumber(totalUsdcRewards).div(Number(`1e${usdcDecimals}`))}
+    />
+  );
   const legalDisclaimer = (
     <$LegalDisclaimer>
       {stringGetter({ key: STRING_KEYS.TRADING_REWARDS_LEGAL_DISCLAIMER })}
@@ -59,7 +82,7 @@ const RewardsPage = () => {
       />
       <$DetachedSection>
         {showGeoblockedPanel && <GeoblockedPanel />}
-        {showStakingRewardPanel && <StakingRewardPanel />}
+        {showStakingRewardPanel && stakingRewardPanel}
         {enableStaking ? <StakingPanel /> : <DYDXBalancePanel />}
         {/* List of unstaking panels */}
         {tradingRewardsRehaulEnabled && <TradingRewardsChartPanel />}
@@ -84,7 +107,7 @@ const RewardsPage = () => {
         </$LeftColumn>
         <$RightColumn>
           {showGeoblockedPanel && <GeoblockedPanel />}
-          {showStakingRewardPanel && <StakingRewardPanel />}
+          {showStakingRewardPanel && stakingRewardPanel}
           {enableStaking ? <StakingPanel /> : <DYDXBalancePanel />}
           {/* List of unstaking panels */}
           {tradingRewardsRehaulEnabled && <NewMarketsPanel />}
