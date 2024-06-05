@@ -1,7 +1,7 @@
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import { type TradeInputSummary } from '@/constants/abacus';
+import { AbacusMarginMode, type TradeInputSummary } from '@/constants/abacus';
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
@@ -26,11 +26,11 @@ import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getCurrentMarketPositionData, getSubaccountId } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { getCurrentInput } from '@/state/inputsSelectors';
+import { getCurrentInput, getInputTradeMarginMode } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { nullIfZero } from '@/lib/numbers';
-import { getTradeStateWithDoubleValuesDiff } from '@/lib/tradeData';
+import { calculateCrossPositionMargin, getTradeStateWithDoubleValuesDiff } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 type ConfirmButtonConfig = {
@@ -67,9 +67,10 @@ export const PlaceOrderButtonAndReceipt = ({
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const subaccountNumber = useAppSelector(getSubaccountId);
   const currentInput = useAppSelector(getCurrentInput);
-  const { liquidationPrice, equity, leverage } = orEmptyObj(
+  const { liquidationPrice, equity, leverage, notionalTotal, adjustedMmf } = orEmptyObj(
     useAppSelector(getCurrentMarketPositionData, shallowEqual)
   );
+  const marginMode = useAppSelector(getInputTradeMarginMode, shallowEqual);
 
   const hasMissingData = subaccountNumber === undefined;
 
@@ -85,6 +86,40 @@ export const PlaceOrderButtonAndReceipt = ({
     !tradingUnavailable;
 
   const { fee, price: expectedPrice, reward } = summary ?? {};
+
+  const renderMarginValue = () => {
+    if (marginMode === AbacusMarginMode.cross) {
+      const currentCrossMargin = calculateCrossPositionMargin({
+        notionalTotal: notionalTotal?.current,
+        adjustedMmf: adjustedMmf?.current,
+      })
+
+      const postOrderCrossMargin = calculateCrossPositionMargin({
+        notionalTotal: notionalTotal?.postOrder,
+        adjustedMmf: adjustedMmf?.postOrder,
+      })
+
+      return (
+        <DiffOutput
+          useGrouping
+          type={OutputType.Fiat}
+          value={nullIfZero(currentCrossMargin)}
+          newValue={nullIfZero(postOrderCrossMargin)}
+          withDiff={currentCrossMargin !== postOrderCrossMargin}
+        />
+      );
+    }
+    
+    return (
+      <DiffOutput
+        useGrouping
+        type={OutputType.Fiat}
+        value={equity?.current}
+        newValue={equity?.postOrder}
+        withDiff={getTradeStateWithDoubleValuesDiff(equity)}
+      />
+    );
+  };
 
   const items = [
     {
@@ -112,15 +147,7 @@ export const PlaceOrderButtonAndReceipt = ({
     {
       key: 'position-margin',
       label: stringGetter({ key: STRING_KEYS.POSITION_MARGIN }),
-      value: (
-        <DiffOutput
-          useGrouping
-          type={OutputType.Fiat}
-          value={equity?.current}
-          newValue={equity?.postOrder}
-          withDiff={getTradeStateWithDoubleValuesDiff(equity)}
-        />
-      ),
+      value: renderMarginValue(),
     },
     {
       key: 'position-leverage',
