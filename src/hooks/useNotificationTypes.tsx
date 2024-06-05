@@ -401,6 +401,40 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
   },
   {
+    type: NotificationType.MarketWinddown,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+
+      // const startDate - newData
+      const expirationDate = new Date('2024-07-17T23:59:59'); // xcxc
+      const currentDate = new Date();
+
+      useEffect(() => {
+        if (currentDate <= expirationDate) {
+          trigger(
+            NotificationType.MarketWinddown,
+            {
+              //           icon: <$WarningIcon iconName={IconName.Warning} />,
+              title: 'Markets are being winded down', // xcxc
+              body: 'At block XYZ <some date/time>, the markets FET-USD and AGIX-USD went through final settlement. Existing positions have been closed and open orders have now been canceled. You can find more information regarding the final settlement here.',
+              //           toastSensitivity: 'foreground',
+              groupKey: NotificationType.MarketWinddown,
+              //           withClose: false,
+              //           actionAltText: stringGetter({ key: STRING_KEYS.STATUS_PAGE }),
+              //           renderActionSlot: () => (
+              //             <Link href={statusPage}>{stringGetter({ key: STRING_KEYS.STATUS_PAGE })} →</Link>
+              //           ),
+            },
+            []
+          );
+        }
+      }, [stringGetter]);
+    },
+    useNotificationAction: () => {
+      return () => {};
+    },
+  },
+  {
     type: NotificationType.ApiError,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
