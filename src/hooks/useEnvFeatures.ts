@@ -1,8 +1,7 @@
-import { useSelector } from 'react-redux';
-
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 export interface EnvironmentFeatures {
   reduceOnlySupported: boolean;
@@ -11,9 +10,10 @@ export interface EnvironmentFeatures {
   CCTPDepositOnly: boolean;
   isSlTpEnabled: boolean;
   isSlTpLimitOrdersEnabled: boolean;
+  showMemoTransferField: boolean;
 }
 
 export const useEnvFeatures = (): EnvironmentFeatures => {
-  const selectedNetwork = useSelector(getSelectedNetwork);
+  const selectedNetwork = useAppSelector(getSelectedNetwork);
   return ENVIRONMENT_CONFIG_MAP[selectedNetwork].featureFlags;
 };

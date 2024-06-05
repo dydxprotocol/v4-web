@@ -5,12 +5,10 @@ import styled, { css } from 'styled-components';
 
 import type { TvWidget } from '@/constants/tvchart';
 
-import {
-  useChartLines,
-  useChartMarketAndResolution,
-  useTradingView,
-  useTradingViewTheme,
-} from '@/hooks/tradingView';
+import { useChartLines } from '@/hooks/tradingView/useChartLines';
+import { useChartMarketAndResolution } from '@/hooks/tradingView/useChartMarketAndResolution';
+import { useTradingView } from '@/hooks/tradingView/useTradingView';
+import { useTradingViewTheme } from '@/hooks/tradingView/useTradingViewTheme';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 

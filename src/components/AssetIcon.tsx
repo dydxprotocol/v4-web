@@ -90,6 +90,7 @@ const assetIcons = {
   UNI: '/currencies/uni.png',
   USDC: '/currencies/usdc.png',
   USDT: '/currencies/usdt.png',
+  W: '/currencies/w.png',
   WBTC: '/currencies/wbtc.png',
   WETH: '/currencies/weth.png',
   WIF: '/currencies/wif.png',
@@ -106,7 +107,7 @@ const assetIcons = {
 } as const;
 
 const isAssetSymbol = (symbol: Nullable<string>): symbol is AssetSymbol =>
-  symbol != null && assetIcons.hasOwnProperty(symbol);
+  symbol != null && Object.hasOwn(assetIcons, symbol);
 
 export const AssetIcon = ({
   symbol,

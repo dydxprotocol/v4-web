@@ -13,7 +13,7 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useNotifications } from '@/hooks/useNotifications';
 
 import { ChevronLeftIcon } from '@/icons';
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 
 import { Button } from '@/components/Button';
 import { Toast } from '@/components/Toast';

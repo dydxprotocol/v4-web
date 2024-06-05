@@ -4,7 +4,6 @@ import type { IndexedTx } from '@cosmjs/stargate';
 import { encodeJson } from '@dydxprotocol/v4-client-js';
 import { PerpetualMarketType } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/dydxprotocol/perpetuals/perpetual';
 import Long from 'long';
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
@@ -37,6 +36,7 @@ import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
+import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -60,7 +60,7 @@ export const NewMarketPreviewStep = ({
   tickSizeDecimals,
 }: NewMarketPreviewStepProps) => {
   const { nativeTokenBalance } = useAccountBalance();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
   const [errorMessage, setErrorMessage] = useState();
@@ -396,13 +396,6 @@ const $Icon = styled(Icon)<{ $hasError?: boolean }>`
 
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --details-item-fontSize: 1rem;
-`;
-
-const $CheckboxContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  padding: 1rem;
-  align-items: center;
 `;
 
 const $DisclaimerContainer = styled.div`

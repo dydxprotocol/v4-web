@@ -1,5 +1,5 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
@@ -10,7 +10,7 @@ import { PositionSide } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
 
 import { Input, InputType } from '@/components/Input';
@@ -20,6 +20,7 @@ import { WithLabel } from '@/components/WithLabel';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getInputTradeData } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
@@ -40,15 +41,15 @@ export const MarketLeverageInput = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
 
-  const currentMarketConfig = useSelector(getCurrentMarketConfig, shallowEqual);
-  const currentPositionData = useSelector(getCurrentMarketPositionData, shallowEqual);
-  const inputTradeData = useSelector(getInputTradeData, shallowEqual);
+  const currentMarketConfig = useAppSelector(getCurrentMarketConfig, shallowEqual);
+  const currentPositionData = useAppSelector(getCurrentMarketPositionData, shallowEqual);
+  const inputTradeData = useAppSelector(getInputTradeData, shallowEqual);
 
-  const { leverage, size: currentPositionSize } = currentPositionData || {};
-  const { current: currentSize, postOrder: postOrderSize } = currentPositionSize || {};
-  const { current: currentLeverage, postOrder: postOrderLeverage } = leverage || {};
-  const { initialMarginFraction, effectiveInitialMarginFraction } = currentMarketConfig || {};
-  const { side } = inputTradeData || {};
+  const { leverage, size: currentPositionSize } = currentPositionData ?? {};
+  const { current: currentSize, postOrder: postOrderSize } = currentPositionSize ?? {};
+  const { current: currentLeverage, postOrder: postOrderLeverage } = leverage ?? {};
+  const { initialMarginFraction, effectiveInitialMarginFraction } = currentMarketConfig ?? {};
+  const { side } = inputTradeData ?? {};
   const orderSide = getSelectedOrderSide(side);
 
   const { currentPositionSide, newPositionSide } = hasPositionSideChanged({

@@ -6,11 +6,12 @@ import {
   Row,
   TableBody,
   TableHeader,
+  TableStateProps,
   useTableState,
   type TableState,
 } from '@react-stately/table';
 import { type GridNode } from '@react-types/grid';
-import type { CollectionChildren, Node, SortDescriptor, SortDirection } from '@react-types/shared';
+import type { Node, SortDescriptor, SortDirection } from '@react-types/shared';
 import { type ColumnSize, type TableCollection } from '@react-types/table';
 import { isFunction } from 'lodash';
 import {
@@ -30,7 +31,7 @@ import styled, { css } from 'styled-components';
 import { MediaQueryKeys, useBreakpoints } from '@/hooks/useBreakpoints';
 import { useTablePagination } from '@/hooks/useTablePagination';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -38,19 +39,6 @@ import { MustBigNumber } from '@/lib/numbers';
 import { Icon, IconName } from './Icon';
 import { PAGE_SIZES, PageSize, TablePaginationRow } from './Table/TablePaginationRow';
 import { Tag } from './Tag';
-
-export { ActionsTableCell } from './Table/ActionsTableCell';
-
-// TODO: fix circular dependencies
-// eslint-disable-next-line import/no-cycle
-export { AssetTableCell } from './Table/AssetTableCell';
-
-// TODO: remove barrel files: https://www.npmjs.com/package/eslint-plugin-no-barrel-files
-// Reasoning why: https://dev.to/tassiofront/barrel-files-and-why-you-should-stop-using-them-now-bc4
-// eslint-disable-next-line import/no-cycle
-export { MarketTableCell } from './Table/MarketTableCell';
-export { TableCell } from './Table/TableCell';
-export { TableColumnHeader } from './Table/TableColumnHeader';
 
 export type CustomRowConfig = {
   key: string;
@@ -82,20 +70,27 @@ export type TableItem<TableRowData> = {
 
 export type BaseTableRowData = {};
 
+type SortableColumnDef<TableRowData extends BaseTableRowData | CustomRowConfig> = {
+  allowsSorting?: true;
+  getCellValue: (row: TableRowData) => string | number | undefined | null;
+};
+
+type NonSortableColumnDef = {
+  allowsSorting: false;
+};
+
 export type ColumnDef<TableRowData extends BaseTableRowData | CustomRowConfig> = {
   columnKey: string;
   label: React.ReactNode;
   tag?: React.ReactNode;
   colspan?: number;
   childColumns?: ColumnDef<TableRowData>[];
-  getCellValue: (row: TableRowData) => string | number;
-  allowsSorting?: boolean; // Default true
   allowsResizing?: boolean;
   renderCell: (row: TableRowData) => React.ReactNode;
   isActionable?: boolean;
   hideOnBreakpoint?: MediaQueryKeys;
   width?: ColumnSize;
-};
+} & (SortableColumnDef<TableRowData> | NonSortableColumnDef);
 
 export type TableElementProps<TableRowData extends BaseTableRowData | CustomRowConfig> = {
   label?: string;
@@ -175,8 +170,21 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
     if (!sortColumn) return 0;
 
     const column = columns.find((c) => c.columnKey === sortColumn);
-    const first = isCustomRow(a) ? 0 : column?.getCellValue(a);
-    const second = isCustomRow(b) ? 0 : column?.getCellValue(b);
+    if (column == null || column.allowsSorting === false) {
+      return 0;
+    }
+    const first = (isCustomRow(a) ? 0 : column.getCellValue(a)) ?? undefined;
+    const second = (isCustomRow(b) ? 0 : column.getCellValue(b)) ?? undefined;
+
+    if (first == null || second == null) {
+      if (first === second) {
+        return 0;
+      }
+      if (first != null) {
+        return 1;
+      }
+      return -1;
+    }
 
     return (
       // Compare the items by the sorted column
@@ -321,8 +329,7 @@ const TableRoot = <TableRowData extends BaseTableRowData | CustomRowConfig>(prop
     rowIndex?: number
   ) => Record<string, string | number | Record<string, string | number>>;
   onRowAction?: (key: Key) => void;
-  children: CollectionChildren<TableRowData>;
-
+  children: TableStateProps<TableRowData>['children'];
   numColumns: number;
   paginationRow?: React.ReactNode;
 
@@ -554,7 +561,7 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
     >
       <$Row>
         {column.rendered}
-        {column.props.allowsSorting && (
+        {(column.props.allowsSorting ?? true) && (
           <$SortArrow
             aria-hidden="true"
             sortDirection={
@@ -855,7 +862,9 @@ const $SortArrow = styled.span<{ sortDirection?: 'ascending' | 'descending' }>`
   margin-left: auto;
 
   display: inline-flex;
-  transition: transform 0.3s var(--ease-out-expo), font-size 0.3s var(--ease-out-expo);
+  transition:
+    transform 0.3s var(--ease-out-expo),
+    font-size 0.3s var(--ease-out-expo);
 
   font-size: 0.375em;
 

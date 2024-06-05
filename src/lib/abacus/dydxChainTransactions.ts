@@ -36,9 +36,9 @@ import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { DydxChainId, isTestnet } from '@/constants/networks';
 import { UNCOMMITTED_ORDER_TIMEOUT_MS } from '@/constants/trade';
 
+import { type RootStore } from '@/state/_store';
 // TODO Fix cycle
 // eslint-disable-next-line import/no-cycle
-import { RootStore } from '@/state/_store';
 import { placeOrderTimeout } from '@/state/account';
 import { setInitializationError } from '@/state/app';
 
@@ -182,6 +182,10 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
     if (x instanceof Uint8Array) {
       return bytesToBigInt(x).toString() as T;
+    }
+
+    if (x instanceof Date) {
+      return x.toString() as T;
     }
 
     if (typeof x === 'object') {
@@ -697,6 +701,23 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
             const parsedNobleBalance = this.parseToPrimitives(nobleBalance);
             callback(JSON.stringify(parsedNobleBalance));
           }
+          break;
+        }
+        case QueryType.GetStakingRewards: {
+          const rewards = await this.compositeClient?.validatorClient.get.getDelegationTotalRewards(
+            params.address
+          );
+          const parsedRewards = this.parseToPrimitives(rewards);
+          callback(JSON.stringify(parsedRewards));
+          break;
+        }
+        case QueryType.GetCurrentUnstaking: {
+          const unbonding =
+            await this.compositeClient?.validatorClient.get.getDelegatorUnbondingDelegations(
+              params.address
+            );
+          const parseUnbonding = this.parseToPrimitives(unbonding);
+          callback(JSON.stringify(parseUnbonding));
           break;
         }
         default: {

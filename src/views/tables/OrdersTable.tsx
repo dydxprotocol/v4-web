@@ -4,7 +4,7 @@ import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { ColumnSize } from '@react-types/table';
 import type { Dispatch } from '@reduxjs/toolkit';
 import { DateTime } from 'luxon';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { Asset, Nullable, SubaccountOrder } from '@/constants/abacus';
@@ -16,7 +16,7 @@ import { EMPTY_ARR } from '@/constants/objects';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
@@ -24,13 +24,10 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { OrderSideTag } from '@/components/OrderSideTag';
 import { Output, OutputType } from '@/components/Output';
-import {
-  MarketTableCell,
-  Table,
-  TableCell,
-  TableColumnHeader,
-  type ColumnDef,
-} from '@/components/Table';
+import { ColumnDef, Table } from '@/components/Table';
+import { MarketTableCell } from '@/components/Table/MarketTableCell';
+import { TableCell } from '@/components/Table/TableCell';
+import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
@@ -42,6 +39,7 @@ import {
   getHasUnseenOrderUpdates,
   getSubaccountUnclearedOrders,
 } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 import { openDialog } from '@/state/dialogs';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
@@ -300,7 +298,7 @@ const getOrdersTableColumnDef = ({
           </TableCell>
         ),
       },
-    } as Record<OrdersTableColumnKey, ColumnDef<OrderTableRow>>
+    } satisfies Record<OrdersTableColumnKey, ColumnDef<OrderTableRow>>
   )[key],
 });
 
@@ -323,18 +321,18 @@ export const OrdersTable = ({
   withOuterBorder,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { isTablet } = useBreakpoints();
 
-  const isAccountViewOnly = useSelector(calculateIsAccountViewOnly);
-  const marketOrders = useSelector(getCurrentMarketOrders, shallowEqual) ?? EMPTY_ARR;
-  const allOrders = useSelector(getSubaccountUnclearedOrders, shallowEqual) ?? EMPTY_ARR;
+  const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
+  const marketOrders = useAppSelector(getCurrentMarketOrders, shallowEqual) ?? EMPTY_ARR;
+  const allOrders = useAppSelector(getSubaccountUnclearedOrders, shallowEqual) ?? EMPTY_ARR;
   const orders = currentMarket ? marketOrders : allOrders;
 
-  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
-  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
+  const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
 
-  const hasUnseenOrderUpdates = useSelector(getHasUnseenOrderUpdates);
+  const hasUnseenOrderUpdates = useAppSelector(getHasUnseenOrderUpdates);
 
   useEffect(() => {
     if (hasUnseenOrderUpdates) dispatch(viewedOrders());
@@ -436,7 +434,7 @@ const $Side = styled.span<{ side: OrderSide }>`
       [OrderSide.SELL]: css`
         color: var(--color-negative);
       `,
-    }[side])};
+    })[side]};
 `;
 
 const $EmptyIcon = styled(Icon)`

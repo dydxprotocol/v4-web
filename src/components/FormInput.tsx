@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 

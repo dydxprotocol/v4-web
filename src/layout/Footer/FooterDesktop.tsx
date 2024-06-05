@@ -42,14 +42,14 @@ export const FooterDesktop = () => {
         label: stringGetter({ key: STRING_KEYS.CONNECTING }),
       }
     : status === AbacusApiStatus.NORMAL
-    ? {
-        exchangeStatus: ExchangeStatus.Operational,
-        label: stringGetter({ key: STRING_KEYS.OPERATIONAL }),
-      }
-    : {
-        exchangeStatus: ExchangeStatus.Degraded,
-        label: stringGetter({ key: STRING_KEYS.DEGRADED }),
-      };
+      ? {
+          exchangeStatus: ExchangeStatus.Operational,
+          label: stringGetter({ key: STRING_KEYS.OPERATIONAL }),
+        }
+      : {
+          exchangeStatus: ExchangeStatus.Degraded,
+          label: stringGetter({ key: STRING_KEYS.DEGRADED }),
+        };
 
   return (
     <$Footer>

@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 
 import { Item, Root } from '@radix-ui/react-radio-group';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
@@ -23,7 +23,7 @@ import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -37,6 +37,7 @@ import { WithReceipt } from '@/components/WithReceipt';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { getOnboardingState } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { getMarketIds } from '@/state/perpetualsSelectors';
 
@@ -64,12 +65,12 @@ export const NewMarketSelectionStep = ({
   tickSizeDecimals,
   tickersFromProposals,
 }: NewMarketSelectionStepProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { nativeTokenBalance } = useAccountBalance();
-  const onboardingState = useSelector(getOnboardingState);
+  const onboardingState = useAppSelector(getOnboardingState);
   const isDisconnected = onboardingState === OnboardingState.Disconnected;
   const { isMobile } = useBreakpoints();
-  const marketIds = useSelector(getMarketIds, shallowEqual);
+  const marketIds = useAppSelector(getMarketIds, shallowEqual);
   const { chainTokenDecimals, chainTokenLabel } = useTokenConfigs();
   const { potentialMarkets, liquidityTiers } = usePotentialMarkets();
   const stringGetter = useStringGetter();
@@ -107,24 +108,22 @@ export const NewMarketSelectionStep = ({
   }, [assetToAdd]);
 
   const filteredPotentialMarkets = useMemo(() => {
-    return potentialMarkets?.filter(
-      ({ params: { ticker, exchangeConfigJson, marketType }, meta }) => {
-        if (marketIds.includes(ticker)) {
-          return false;
-        }
-
-        // Disable Isolated markets if the user is not on Staging or Local deployment
-        if (marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED') {
-          return isDev && exchangeConfigJson.length > 0;
-        }
-
-        if (exchangeConfigJson.length >= NUM_ORACLES_TO_QUALIFY_AS_SAFE) {
-          return true;
-        }
-
+    return potentialMarkets?.filter(({ params: { ticker, exchangeConfigJson, marketType } }) => {
+      if (marketIds.includes(ticker)) {
         return false;
       }
-    );
+
+      // Disable Isolated markets if the user is not on Staging or Local deployment
+      if (marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED') {
+        return isDev && exchangeConfigJson.length > 0;
+      }
+
+      if (exchangeConfigJson.length >= NUM_ORACLES_TO_QUALIFY_AS_SAFE) {
+        return true;
+      }
+
+      return false;
+    });
   }, [potentialMarkets, marketIds]);
 
   return (

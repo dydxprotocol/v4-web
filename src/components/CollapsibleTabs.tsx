@@ -78,7 +78,7 @@ export const CollapsibleTabs = <TabItemsValue extends string>({
           </$TabsList>
 
           <$Toolbar>
-            {currentTab?.slotToolbar || slotToolbar}
+            {currentTab?.slotToolbar ?? slotToolbar}
             <CollapsibleTrigger asChild>
               <$IconButton iconName={IconName.Caret} isToggle />
             </CollapsibleTrigger>

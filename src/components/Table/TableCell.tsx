@@ -21,7 +21,7 @@ export const TableCell = ({
 }) => (
   <$CellContent isHighlighted={isHighlighted} className={className}>
     {slotLeft}
-    {stacked || stackedWithSecondaryStyling ? (
+    {!!stacked || stackedWithSecondaryStyling ? (
       <$Column stackedWithSecondaryStyling={stackedWithSecondaryStyling}>{children}</$Column>
     ) : (
       children

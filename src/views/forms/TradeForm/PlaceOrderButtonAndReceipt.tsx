@@ -1,4 +1,3 @@
-import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import type { TradeInputSummary } from '@/constants/abacus';
@@ -23,6 +22,7 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccountId } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { getCurrentInput } from '@/state/inputsSelectors';
 
@@ -52,14 +52,14 @@ export const PlaceOrderButtonAndReceipt = ({
   confirmButtonConfig,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { chainTokenLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
   const { complianceState } = useComplianceState();
 
-  const canAccountTrade = useSelector(calculateCanAccountTrade);
-  const subaccountNumber = useSelector(getSubaccountId);
-  const currentInput = useSelector(getCurrentInput);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
+  const subaccountNumber = useAppSelector(getSubaccountId);
+  const currentInput = useAppSelector(getCurrentInput);
 
   const hasMissingData = subaccountNumber === undefined;
 
@@ -74,7 +74,7 @@ export const PlaceOrderButtonAndReceipt = ({
     currentInput !== 'transfer' &&
     !tradingUnavailable;
 
-  const { fee, price: expectedPrice, total, reward } = summary || {};
+  const { fee, price: expectedPrice, total, reward } = summary ?? {};
 
   const items = [
     {
@@ -131,7 +131,7 @@ export const PlaceOrderButtonAndReceipt = ({
     [MobilePlaceOrderSteps.EditOrder]: {
       buttonTextStringKey: shouldEnableTrade
         ? STRING_KEYS.PREVIEW_ORDER
-        : actionStringKey || STRING_KEYS.UNAVAILABLE,
+        : actionStringKey ?? STRING_KEYS.UNAVAILABLE,
       buttonAction: ButtonAction.Primary,
       buttonState: { isDisabled: !shouldEnableTrade, isLoading: hasMissingData },
       showValidatorError: true,

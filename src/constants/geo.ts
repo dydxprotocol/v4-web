@@ -243,7 +243,7 @@ export enum CountryCodes {
   ZW = 'ZW',
 }
 
-export const RESTRICTED_COUNTRIES = {
+const RESTRICTED_COUNTRIES = {
   USA: CountryCodes.US,
   CANADA: CountryCodes.CA,
 
@@ -271,8 +271,6 @@ export const RESTRICTED_COUNTRIES = {
   VENEZUELA: CountryCodes.VE,
   ZIMBABWE: CountryCodes.ZW,
 };
-
-export const SOFT_BLOCKED_COUNTRIES = [];
 
 export const BLOCKED_COUNTRIES = [RESTRICTED_COUNTRIES.USA, RESTRICTED_COUNTRIES.CANADA];
 

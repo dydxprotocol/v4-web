@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import type { ChangeEvent, FormEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { NumberFormatValues } from 'react-number-format';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 import { isAddress } from 'viem';
 
@@ -41,7 +42,6 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
-import { Link } from '@/components/Link';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
@@ -50,6 +50,7 @@ import { SourceSelectMenu } from '@/views/forms/AccountManagementForms/SourceSel
 
 import { getSubaccount } from '@/state/accountSelectors';
 import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -65,10 +66,10 @@ export const WithdrawForm = () => {
   const stringGetter = useStringGetter();
   const [error, setError] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
-  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   const { sendSquidWithdraw } = useSubaccount();
-  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) || {};
+  const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
   const {
     requestPayload,
@@ -81,7 +82,7 @@ export const WithdrawForm = () => {
     errorMessage: routeErrorMessage,
     isCctp,
     summary,
-  } = useSelector(getTransferInputs, shallowEqual) || {};
+  } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
 
   // User input
   const [withdrawAmount, setWithdrawAmount] = useState('');
@@ -136,8 +137,8 @@ export const WithdrawForm = () => {
           });
           setError(undefined);
         }
-      } catch (error) {
-        setError(error.message);
+      } catch (err) {
+        setError(err.message);
       } finally {
         setIsLoading(false);
       }
@@ -218,17 +219,16 @@ export const WithdrawForm = () => {
             });
           }
         }
-      } catch (error) {
-        if (error?.code === 429) {
+      } catch (err) {
+        if (err?.code === 429) {
           setError(stringGetter({ key: STRING_KEYS.RATE_LIMIT_REACHED_ERROR_MESSAGE }));
         } else {
           setError(
-            error.message
+            err.message
               ? stringGetter({
                   key: STRING_KEYS.SOMETHING_WENT_WRONG_WITH_MESSAGE,
                   params: {
-                    ERROR_MESSAGE:
-                      error.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
+                    ERROR_MESSAGE: err.message || stringGetter({ key: STRING_KEYS.UNKNOWN_ERROR }),
                   },
                 })
               : stringGetter({ key: STRING_KEYS.SOMETHING_WENT_WRONG })
@@ -309,11 +309,11 @@ export const WithdrawForm = () => {
     }
   }, []);
 
-  const onSelectToken = useCallback((token: TransferInputTokenResource) => {
-    if (token) {
+  const onSelectToken = useCallback((selectedToken: TransferInputTokenResource) => {
+    if (selectedToken) {
       abacusStateManager.setTransferValue({
         field: TransferInputField.token,
-        value: token.address,
+        value: selectedToken.address,
       });
       setWithdrawAmount('');
     }
@@ -535,7 +535,6 @@ export const WithdrawForm = () => {
           isLoading={isLoading}
           setSlippage={onSetSlippage}
           slippage={slippage}
-          withdrawChain={chainIdStr || undefined}
           withdrawToken={toToken || undefined}
         />
       </$Footer>
@@ -575,18 +574,6 @@ const $AlertMessage = styled(AlertMessage)`
 
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
-`;
-
-const $Link = styled(Link)`
-  color: var(--color-accent);
-
-  &:visited {
-    color: var(--color-accent);
-  }
-`;
-
-const $TransactionInfo = styled.span`
-  ${layoutMixins.row}
 `;
 
 const $FormInputButton = styled(Button)`

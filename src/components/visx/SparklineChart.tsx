@@ -24,6 +24,7 @@ export const SparklineChart = <Datum extends {}>(props: SparklineChartProps<Datu
 
   return (
     <$ParentSize>
+      {/* eslint-disable-next-line react/no-unused-prop-types */}
       {({ height, width }: { width: number; height: number }) => (
         <XYChart
           width={width}

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { useSelector } from 'react-redux';
 import { ThemeProvider } from 'styled-components';
 
 import { Themes } from '@/styles/themes';
 
+import { useAppSelector } from '@/state/appTypes';
 import { AppColorMode, AppTheme, AppThemeSetting, AppThemeSystemSetting } from '@/state/configs';
 import { getAppColorMode, getAppThemeSetting } from '@/state/configsSelectors';
 
@@ -15,8 +15,8 @@ export const AppThemeAndColorModeProvider = ({ ...props }) => {
 };
 
 export const useAppThemeAndColorModeContext = () => {
-  const themeSetting: AppThemeSetting = useSelector(getAppThemeSetting);
-  const colorMode: AppColorMode = useSelector(getAppColorMode);
+  const themeSetting: AppThemeSetting = useAppSelector(getAppThemeSetting);
+  const colorMode: AppColorMode = useAppSelector(getAppColorMode);
 
   const darkModePref = globalThis.matchMedia('(prefers-color-scheme: dark)');
 

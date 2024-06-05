@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { TooltipContextType } from '@visx/xychart';
 import BigNumber from 'bignumber.js';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import type { Nullable } from '@/constants/abacus';
@@ -15,7 +15,7 @@ import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Output, OutputType, ShowSign } from '@/components/Output';
@@ -25,12 +25,13 @@ import { PnlChart, type PnlDatum } from '@/views/charts/PnlChart';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 
-export const usePortfolioValues = ({
+const usePortfolioValues = ({
   equity,
   visibleData,
   activeDatum,
@@ -40,7 +41,7 @@ export const usePortfolioValues = ({
   activeDatum?: PnlDatum;
 }) => {
   const stringGetter = useStringGetter();
-  const selectedLocale = useSelector(getSelectedLocale);
+  const selectedLocale = useAppSelector(getSelectedLocale);
 
   const accountValueLabel = useMemo(
     () =>
@@ -97,11 +98,11 @@ export const AccountDetailsAndHistory = () => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
-  const selectedLocale = useSelector(getSelectedLocale);
-  const onboardingState = useSelector(getOnboardingState);
+  const selectedLocale = useAppSelector(getSelectedLocale);
+  const onboardingState = useAppSelector(getOnboardingState);
 
   const { buyingPower, equity, freeCollateral, leverage, marginUsage } =
-    useSelector(getSubaccount, shallowEqual) ?? {};
+    useAppSelector(getSubaccount, shallowEqual) ?? {};
 
   const [tooltipContext, setTooltipContext] = useState<TooltipContextType<PnlDatum>>();
 
@@ -284,7 +285,7 @@ const $PnlChart = styled(PnlChart)<{ pnlDiffSign: NumberSign }>`
       [NumberSign.Positive]: 'var(--color-positive)',
       [NumberSign.Negative]: 'var(--color-negative)',
       [NumberSign.Neutral]: 'var(--color-text-1)',
-    }[pnlDiffSign])};
+    })[pnlDiffSign]};
 `;
 
 const $EmptyChart = styled.div`

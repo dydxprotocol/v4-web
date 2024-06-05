@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import type { Story } from '@ladle/react';
 
 import { DropdownMenu } from '@/components/DropdownMenu';

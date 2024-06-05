@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState, type MouseEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Action, Close, Root } from '@radix-ui/react-toast';
 import styled, { keyframes } from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { popoverMixins } from '@/styles/popoverMixins';
 
 import { Notification, type NotificationProps } from '@/components/Notification';
@@ -135,7 +135,8 @@ const $Root = styled(Root)`
       align-items: end;
       transform-origin: left bottom;
 
-      animation: ${keyframes`
+      animation:
+        ${keyframes`
           from {
             /* scale: 0; */
             grid-template-rows: 0fr; // height transition
@@ -228,7 +229,8 @@ const $Notification = styled(Notification)`
   ${popoverMixins.popover}
   overflow: visible;
   padding: 1rem;
-  box-shadow: 0 0 0 var(--border-width) var(--color-border),
+  box-shadow:
+    0 0 0 var(--border-width) var(--color-border),
     // border
     0 0 0.5rem 0.1rem var(--color-layer-2); // shadow
 

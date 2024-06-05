@@ -1,6 +1,5 @@
 import { Key, useMemo, useState } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -15,18 +14,21 @@ import { useMarketsData } from '@/hooks/useMarketsData';
 import { usePotentialMarkets } from '@/hooks/usePotentialMarkets';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { tradeViewMixins } from '@/styles/tradeViewMixins';
 
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
-import { AssetTableCell, Table, TableCell, type ColumnDef } from '@/components/Table';
+import { Table, type ColumnDef } from '@/components/Table';
+import { AssetTableCell } from '@/components/Table/AssetTableCell';
+import { TableCell } from '@/components/Table/TableCell';
 import { Toolbar } from '@/components/Toolbar';
 import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { SparklineChart } from '@/components/visx/SparklineChart';
 import { MarketFilter } from '@/views/MarketFilter';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setMarketFilter } from '@/state/perpetuals';
 import { getMarketFilter } from '@/state/perpetualsSelectors';
 
@@ -35,8 +37,8 @@ import { MustBigNumber } from '@/lib/numbers';
 export const MarketsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-  const dispatch = useDispatch();
-  const filter: MarketFilters = useSelector(getMarketFilter);
+  const dispatch = useAppDispatch();
+  const filter: MarketFilters = useAppSelector(getMarketFilter);
   const [searchFilter, setSearchFilter] = useState<string>();
   const navigate = useNavigate();
 
@@ -112,7 +114,6 @@ export const MarketsTable = ({ className }: { className?: string }) => {
             },
             {
               columnKey: 'priceChange24HChart',
-              getCellValue: (row) => row.priceChange24HPercent,
               label: stringGetter({ key: STRING_KEYS.LAST_24H }),
               renderCell: ({ line, priceChange24HPercent }) => (
                 <div style={{ width: 50, height: 50 }}>
@@ -317,8 +318,8 @@ const $Output = styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`
     isNegative
       ? `var(--color-negative)`
       : isPositive
-      ? `var(--color-positive)`
-      : `var(--color-text-1)`};
+        ? `var(--color-positive)`
+        : `var(--color-text-1)`};
   font: var(--font-base-medium);
 `;
 

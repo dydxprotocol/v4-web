@@ -2,8 +2,8 @@ import { lazy, Suspense, useMemo } from 'react';
 
 import { PrivyProvider } from '@privy-io/react-auth';
 import { PrivyWagmiConnector } from '@privy-io/wagmi-connector';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GrazProvider } from 'graz';
-import { QueryClient, QueryClientProvider } from 'react-query';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { WagmiConfig } from 'wagmi';
@@ -21,7 +21,6 @@ import { PotentialMarketsProvider } from '@/hooks/usePotentialMarkets';
 import { RestrictionProvider } from '@/hooks/useRestrictions';
 import { SubaccountProvider } from '@/hooks/useSubaccount';
 
-import { breakpoints } from '@/styles';
 import '@/styles/constants.css';
 import '@/styles/fonts.css';
 import { GlobalStyle } from '@/styles/globalStyle';
@@ -47,6 +46,8 @@ import { useComplianceState } from './hooks/useComplianceState';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
+import { testFlags } from './lib/testFlags';
+import breakpoints from './styles/breakpoints';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
 const MarketsPage = lazy(() => import('@/pages/markets/Markets'));
@@ -81,6 +82,11 @@ const Content = () => {
   }, [location.hash]);
 
   const { dialogAreaRef } = useDialogArea() ?? {};
+
+  const showChainTokenPage =
+    complianceState === ComplianceStates.FULL_ACCESS ||
+    (testFlags.tradingRewardsRehaul && testFlags.enableStaking);
+
   return (
     <>
       <GlobalStyle />
@@ -102,13 +108,7 @@ const Content = () => {
 
               <Route
                 path={`/${chainTokenLabel}/*`}
-                element={
-                  complianceState === ComplianceStates.FULL_ACCESS ? (
-                    <TokenPage />
-                  ) : (
-                    <Navigate to={DEFAULT_TRADE_ROUTE} />
-                  )
-                }
+                element={showChainTokenPage ? <TokenPage /> : <Navigate to={DEFAULT_TRADE_ROUTE} />}
               />
 
               {isTablet && (
@@ -176,9 +176,12 @@ const providers = [
 ];
 
 const App = () => {
-  return [...providers].reverse().reduce((children, Provider) => {
-    return <Provider>{children}</Provider>;
-  }, <Content />);
+  return [...providers].reverse().reduce(
+    (children, Provider) => {
+      return <Provider>{children}</Provider>;
+    },
+    <Content />
+  );
 };
 
 const $Content = styled.div<{ isShowingHeader: boolean; isShowingFooter: boolean }>`

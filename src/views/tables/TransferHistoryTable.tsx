@@ -1,5 +1,5 @@
 import type { ColumnSize } from '@react-types/table';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { type SubaccountTransfer } from '@/constants/abacus';
@@ -16,12 +16,15 @@ import { Button } from '@/components/Button';
 import { CopyButton } from '@/components/CopyButton';
 import { Link } from '@/components/Link';
 import { Output, OutputType } from '@/components/Output';
-import { Table, TableCell, TableColumnHeader, type ColumnDef } from '@/components/Table';
+import { ColumnDef, Table } from '@/components/Table';
+import { TableCell } from '@/components/Table/TableCell';
+import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccountTransfers } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { truncateAddress } from '@/lib/wallet';
@@ -106,7 +109,7 @@ const getTransferHistoryTableColumnDef = ({
             '-'
           ),
       },
-    } as Record<TransferHistoryTableColumnKey, ColumnDef<SubaccountTransfer>>
+    } satisfies Record<TransferHistoryTableColumnKey, ColumnDef<SubaccountTransfer>>
   )[key],
 });
 
@@ -129,12 +132,12 @@ export const TransferHistoryTable = ({
   withInnerBorders = true,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { mintscan: mintscanTxUrl } = useURLConfigs();
 
-  const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
 
-  const transfers = useSelector(getSubaccountTransfers, shallowEqual) ?? [];
+  const transfers = useAppSelector(getSubaccountTransfers, shallowEqual) ?? [];
 
   return (
     <$Table

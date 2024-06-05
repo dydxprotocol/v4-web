@@ -155,7 +155,7 @@ export const perpetualsSlice = createSlice({
         ...initialState,
         currentMarketId:
           getLocalStorage({ key: LocalStorageKey.LastViewedMarket }) ?? DEFAULT_MARKETID,
-      } as PerpetualsState),
+      }) as PerpetualsState,
   },
 });
 

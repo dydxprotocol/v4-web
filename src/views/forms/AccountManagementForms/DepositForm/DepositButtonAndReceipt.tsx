@@ -1,7 +1,6 @@
 import { useState, type Dispatch, type SetStateAction } from 'react';
 
-import type { RouteData } from '@0xsquid/sdk';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TransferInputTokenResource } from '@/constants/abacus';
@@ -28,6 +27,7 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccountBuyingPower, getSubaccountEquity } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -44,7 +44,6 @@ type ElementProps = {
   slippage: number;
   setSlippage: (slippage: number) => void;
   sourceToken?: TransferInputTokenResource;
-  squidRoute?: RouteData;
 };
 
 export const DepositButtonAndReceipt = ({
@@ -60,7 +59,7 @@ export const DepositButtonAndReceipt = ({
   const [isEditingSlippage, setIsEditingSlipapge] = useState(false);
   const stringGetter = useStringGetter();
 
-  const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
 
   const { connectWallet, isConnectedWagmi } = useWalletConnection();
   const { connectionError } = useApiState();
@@ -85,21 +84,21 @@ export const DepositButtonAndReceipt = ({
   });
 
   const { current: equity, postOrder: newEquity } =
-    useSelector(getSubaccountEquity, shallowEqual) || {};
+    useAppSelector(getSubaccountEquity, shallowEqual) ?? {};
 
   const { current: buyingPower, postOrder: newBuyingPower } =
-    useSelector(getSubaccountBuyingPower, shallowEqual) || {};
+    useAppSelector(getSubaccountBuyingPower, shallowEqual) ?? {};
 
   const {
     summary,
     requestPayload,
     depositOptions,
     chain: chainIdStr,
-  } = useSelector(getTransferInputs, shallowEqual) || {};
+  } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
   const { usdcLabel } = useTokenConfigs();
 
   const sourceChainName =
-    depositOptions?.chains?.toArray().find((chain) => chain.type === chainIdStr)?.stringKey || '';
+    depositOptions?.chains?.toArray().find((chain) => chain.type === chainIdStr)?.stringKey ?? '';
 
   const submitButtonReceipt = [
     {
@@ -219,14 +218,14 @@ export const DepositButtonAndReceipt = ({
         <Output
           type={OutputType.Text}
           value={
-            typeof summary?.estimatedRouteDuration === 'number'
+            summary != null && typeof summary.estimatedRouteDuration === 'number'
               ? stringGetter({
                   key: STRING_KEYS.X_MINUTES_LOWERCASED,
                   params: {
                     X:
-                      summary?.estimatedRouteDuration < 60
+                      summary.estimatedRouteDuration < 60
                         ? '< 1'
-                        : Math.round(summary?.estimatedRouteDuration / 60),
+                        : Math.round(summary.estimatedRouteDuration / 60),
                   },
                 })
               : null
@@ -280,6 +279,7 @@ const $WithReceipt = styled(WithReceipt)`
 `;
 
 const $Details = styled(Details)`
+  --details-item-vertical-padding: 0.33rem;
   padding: var(--form-input-paddingY) var(--form-input-paddingX);
   font-size: 0.8125em;
 `;

@@ -1,5 +1,4 @@
 import { Close } from '@radix-ui/react-dialog';
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
@@ -13,6 +12,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
 
+import { useAppDispatch } from '@/state/appTypes';
 import { closeDialog } from '@/state/dialogs';
 
 type ElementProps = {
@@ -21,7 +21,7 @@ type ElementProps = {
 
 export const DisconnectDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const { disconnect } = useAccounts();
 

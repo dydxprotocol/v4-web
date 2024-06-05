@@ -5,7 +5,7 @@ import styled, { css, keyframes } from 'styled-components';
 
 import { type MenuItem } from '@/constants/menus';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DropdownSelectMenu } from '@/components/DropdownSelectMenu';
@@ -111,13 +111,13 @@ export const Tabs = <TabItemsValue extends string>({
 
       {sharedContent ?? (
         <$Stack>
-          {items.map(({ asChild, value, content, forceMount }) => (
+          {items.map(({ asChild, value: childValue, content, forceMount }) => (
             <$Content
-              key={value}
+              key={childValue}
               asChild={asChild}
-              value={value}
-              forceMount={!!forceMount ? true : undefined}
-              $hide={forceMount && currentItem?.value !== value}
+              value={childValue}
+              forceMount={forceMount ? true : undefined}
+              $hide={forceMount && currentItem?.value !== childValue}
               $withTransitions={withTransitions}
             >
               {content}
@@ -181,7 +181,7 @@ const $Root = styled(Root)<{ $side: 'top' | 'bottom'; $withInnerBorder?: boolean
         --stickyArea0-bottomHeight: var(--tabs-currentHeight);
         ${layoutMixins.expandingColumnWithFooter}
       `,
-    }[$side])}
+    })[$side]}
 
   ${({ $withInnerBorder }) =>
     $withInnerBorder &&
@@ -206,7 +206,7 @@ const $Header = styled.header<{ $side: 'top' | 'bottom' }>`
         ${layoutMixins.stickyFooter}
         grid-row: 2;
       `,
-    }[$side])}
+    })[$side]}
 
   ${layoutMixins.row}
   justify-content: space-between;
@@ -302,6 +302,7 @@ const $DropdownTabTrigger = styled(Trigger)`
 
 const $DropdownSelectMenu = styled(DropdownSelectMenu)<{ $isActive?: boolean }>`
   --trigger-radius: 0;
+  --dropdownSelectMenu-item-font-size: var(--fontSize-base);
 
   ${({ $isActive }) =>
     $isActive &&

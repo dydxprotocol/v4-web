@@ -16,7 +16,7 @@ import type {
 } from '@/constants/abacus';
 import { Changes } from '@/constants/abacus';
 
-import type { RootStore } from '@/state/_store';
+import { type RootStore } from '@/state/_store';
 import {
   setBalances,
   setCompliance,
@@ -26,9 +26,12 @@ import {
   setLatestOrder,
   setRestrictionType,
   setStakingBalances,
+  setStakingDelegations,
+  setStakingRewards,
   setSubaccount,
   setTradingRewards,
   setTransfers,
+  setUnbondingDelegations,
   setWallet,
 } from '@/state/account';
 import { setApiState } from '@/state/app';
@@ -90,6 +93,15 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
             updatedState.account.stakingBalances.toArray().map(({ k, v }) => [k, v])
           );
           dispatch(setStakingBalances(stakingBalances));
+        }
+        if (updatedState.account?.stakingDelegations) {
+          dispatch(setStakingDelegations(updatedState.account.stakingDelegations.toArray()));
+        }
+        if (updatedState.account?.unbondingDelegation) {
+          dispatch(setUnbondingDelegations(updatedState.account.unbondingDelegation.toArray()));
+        }
+        if (updatedState.account?.stakingRewards) {
+          dispatch(setStakingRewards(updatedState.account.stakingRewards));
         }
       }
 
