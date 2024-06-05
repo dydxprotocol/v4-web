@@ -40,6 +40,12 @@ export const AccountsProvider = ({ ...props }) => (
 
 export const useAccounts = () => useContext(AccountsContext)!;
 
+async function sleep(ms = 1000) {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(null), ms);
+  });
+}
+
 const useAccountsContext = () => {
   const dispatch = useAppDispatch();
 
@@ -227,6 +233,8 @@ const useAccountsContext = () => {
 
           if (walletConnectionType === WalletConnectionType.Privy && authenticated && ready) {
             try {
+              // Give Privy a second to finish the auth flow before getting the signature
+              await sleep();
               const signature = await signTypedDataAsync();
 
               await setWalletFromEvmSignature(signature);

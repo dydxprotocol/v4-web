@@ -13,6 +13,7 @@ import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { TableCell } from '@/components/Table/TableCell';
+import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
@@ -46,19 +47,21 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
       stacked
       slotRight={
         marginMode === AbacusMarginMode.isolated && (
-          <$EditButton
-            key="edit-margin"
-            iconName={IconName.Pencil}
-            shape={ButtonShape.Square}
-            onClick={() =>
-              dispatch(
-                openDialog({
-                  type: DialogTypes.AdjustIsolatedMargin,
-                  dialogProps: { positionId: position.id },
-                })
-              )
-            }
-          />
+          <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.ADJUST_ISOLATED_MARGIN })}>
+            <$EditButton
+              key="edit-margin"
+              iconName={IconName.Pencil}
+              shape={ButtonShape.Square}
+              onClick={() =>
+                dispatch(
+                  openDialog({
+                    type: DialogTypes.AdjustIsolatedMargin,
+                    dialogProps: { positionId: position.id },
+                  })
+                )
+              }
+            />
+          </WithTooltip>
         )
       }
     >

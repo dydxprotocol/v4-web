@@ -2,6 +2,7 @@ export enum DialogTypes {
   AdjustIsolatedMargin = 'AdjustIsolatedMargin',
   AdjustTargetLeverage = 'AdjustTargetLeverage',
   ClosePosition = 'ClosePosition',
+  CancelPendingOrders = 'CancelPendingOrders',
   ComplianceConfig = 'ComplianceConfig',
   Deposit = 'Deposit',
   DisconnectWallet = 'DisconnectWallet',

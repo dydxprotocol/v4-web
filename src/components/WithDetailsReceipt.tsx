@@ -34,6 +34,7 @@ export const WithDetailsReceipt = ({
 );
 const $Details = styled(Details)`
   --details-item-backgroundColor: var(--withReceipt-backgroundColor);
+  --details-item-vertical-padding: 0.33rem;
 
   padding: 0.375rem 0.75rem 0.25rem;
 

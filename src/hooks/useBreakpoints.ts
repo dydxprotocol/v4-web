@@ -63,5 +63,5 @@ export const useBreakpoints = () => {
     Object.entries(state).map(([key, [matches]]) => [key, matches])
   );
 
-  return breakpointMatches;
+  return breakpointMatches as { [key in MediaQueryKeys]: boolean };
 };

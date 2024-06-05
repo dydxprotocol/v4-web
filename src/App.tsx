@@ -46,6 +46,7 @@ import { useComplianceState } from './hooks/useComplianceState';
 import { useInitializePage } from './hooks/useInitializePage';
 import { useShouldShowFooter } from './hooks/useShouldShowFooter';
 import { useTokenConfigs } from './hooks/useTokenConfigs';
+import { testFlags } from './lib/testFlags';
 import breakpoints from './styles/breakpoints';
 
 const NewMarket = lazy(() => import('@/pages/markets/NewMarket'));
@@ -81,6 +82,11 @@ const Content = () => {
   }, [location.hash]);
 
   const { dialogAreaRef } = useDialogArea() ?? {};
+
+  const showChainTokenPage =
+    complianceState === ComplianceStates.FULL_ACCESS ||
+    (testFlags.tradingRewardsRehaul && testFlags.enableStaking);
+
   return (
     <>
       <GlobalStyle />
@@ -102,13 +108,7 @@ const Content = () => {
 
               <Route
                 path={`/${chainTokenLabel}/*`}
-                element={
-                  complianceState === ComplianceStates.FULL_ACCESS ? (
-                    <TokenPage />
-                  ) : (
-                    <Navigate to={DEFAULT_TRADE_ROUTE} />
-                  )
-                }
+                element={showChainTokenPage ? <TokenPage /> : <Navigate to={DEFAULT_TRADE_ROUTE} />}
               />
 
               {isTablet && (
