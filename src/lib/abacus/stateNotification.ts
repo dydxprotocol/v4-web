@@ -6,7 +6,6 @@ import type {
   AbacusNotification,
   AbacusStateNotificationProtocol,
   AccountBalance,
-  Asset,
   Nullable,
   ParsingErrors,
   PerpetualMarket,
@@ -72,11 +71,16 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         dispatch(
           setAssets(
             Object.fromEntries(
-              (updatedState?.assetIds()?.toArray() ?? []).map((assetId: string) => {
-                const assetData = updatedState?.asset(assetId);
-                return [assetId, assetData];
-              })
-            ) as Record<string, Asset>
+              (updatedState?.assetIds()?.toArray() ?? [])
+                .map((assetId: string) => {
+                  const assetData = updatedState?.asset(assetId);
+                  if (assetData == null) {
+                    return undefined;
+                  }
+                  return [assetId, assetData];
+                })
+                .filter(isTruthy)
+            )
           )
         );
       }
@@ -128,12 +132,15 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
           setMarkets({
             markets: Object.fromEntries(
               (marketIds ?? updatedState.marketIds()?.toArray() ?? [])
-                .map((marketId: string) => {
+                .map((marketId: string): undefined | [string, PerpetualMarket] => {
                   const marketData = updatedState.market(marketId);
+                  if (marketData == null) {
+                    return undefined;
+                  }
                   return [marketId, marketData];
                 })
                 .filter(isTruthy)
-            ) as Record<string, PerpetualMarket>,
+            ),
             update: !!marketIds,
           })
         );

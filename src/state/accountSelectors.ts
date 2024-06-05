@@ -94,7 +94,7 @@ export const getCurrentMarketPositionData = (state: RootState) => {
 
   return Object.fromEntries(
     (getOpenPositions(state) ?? []).map((positionData) => [positionData.id, positionData])
-  )[currentMarketId as string];
+  )[currentMarketId!];
 };
 
 /**
@@ -325,7 +325,11 @@ export const getOrderDetails = () =>
     (orders, assets, perpetualMarkets, orderId) => {
       const matchingOrder = orders?.find((order) => order.id === orderId);
       return matchingOrder
-        ? getHydratedTradingData({ data: matchingOrder, assets, perpetualMarkets })
+        ? getHydratedTradingData({
+            data: matchingOrder,
+            assets: assets ?? {},
+            perpetualMarkets: perpetualMarkets ?? {},
+          })
         : undefined;
     }
   );
@@ -364,7 +368,11 @@ export const getFillDetails = () =>
     (fills, assets, perpetualMarkets, fillId) => {
       const matchingFill = fills?.find((fill) => fill.id === fillId);
       return matchingFill
-        ? getHydratedTradingData({ data: matchingFill, assets, perpetualMarkets })
+        ? getHydratedTradingData({
+            data: matchingFill,
+            assets: assets ?? {},
+            perpetualMarkets: perpetualMarkets ?? {},
+          })
         : undefined;
     }
   );

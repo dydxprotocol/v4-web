@@ -61,10 +61,10 @@ export enum FillsTableColumnKey {
 }
 
 export type FillTableRow = {
-  asset: Asset;
-  stepSizeDecimals: number;
-  tickSizeDecimals: number;
-  orderSide: OrderSide;
+  asset: Nullable<Asset>;
+  stepSizeDecimals: Nullable<number>;
+  tickSizeDecimals: Nullable<number>;
+  orderSide?: Nullable<OrderSide>;
 } & SubaccountFill;
 
 const getFillsTableColumnDef = ({
@@ -90,8 +90,8 @@ const getFillsTableColumnDef = ({
             <span>{stringGetter({ key: STRING_KEYS.AMOUNT })}</span>
           </TableColumnHeader>
         ),
-        renderCell: ({ resources, size, stepSizeDecimals, asset: { id } }) => (
-          <TableCell stacked slotLeft={<$AssetIcon symbol={id} />}>
+        renderCell: ({ resources, size, stepSizeDecimals, asset }) => (
+          <TableCell stacked slotLeft={<$AssetIcon symbol={asset?.id} />}>
             <span>
               {resources.typeStringKey ? stringGetter({ key: resources.typeStringKey }) : null}
             </span>
@@ -149,7 +149,9 @@ const getFillsTableColumnDef = ({
         columnKey: 'market',
         getCellValue: (row) => row.marketId,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
-        renderCell: ({ asset, marketId }) => <MarketTableCell asset={asset} marketId={marketId} />,
+        renderCell: ({ asset, marketId }) => (
+          <MarketTableCell asset={asset ?? undefined} marketId={marketId} />
+        ),
       },
       [FillsTableColumnKey.Action]: {
         columnKey: 'market-simple',
@@ -162,7 +164,7 @@ const getFillsTableColumnDef = ({
                 key: {
                   [OrderSide.BUY]: STRING_KEYS.BUY,
                   [OrderSide.SELL]: STRING_KEYS.SELL,
-                }[orderSide],
+                }[orderSide ?? OrderSide.BUY],
               })}
             </$Side>
             <Output type={OutputType.Text} value={asset?.id} />
@@ -220,7 +222,9 @@ const getFillsTableColumnDef = ({
         columnKey: 'side',
         getCellValue: (row) => row.orderSide,
         label: stringGetter({ key: STRING_KEYS.SIDE }),
-        renderCell: ({ orderSide }) => <OrderSideTag orderSide={orderSide} size={TagSize.Medium} />,
+        renderCell: ({ orderSide }) => (
+          <OrderSideTag orderSide={orderSide ?? OrderSide.BUY} size={TagSize.Medium} />
+        ),
       },
       [FillsTableColumnKey.SideLongShort]: {
         columnKey: 'side',
@@ -233,7 +237,7 @@ const getFillsTableColumnDef = ({
               key: {
                 [OrderSide.BUY]: STRING_KEYS.LONG_POSITION_SHORT,
                 [OrderSide.SELL]: STRING_KEYS.SHORT_POSITION_SHORT,
-              }[orderSide],
+              }[orderSide ?? OrderSide.BUY],
             })}
           />
         ),
@@ -325,13 +329,14 @@ export const FillsTable = ({
 
   const fillsData = useMemo(
     () =>
-      fills.map((fill: SubaccountFill) =>
-        getHydratedTradingData({
-          data: fill,
-          assets: allAssets,
-          perpetualMarkets: allPerpetualMarkets,
-        })
-      ) as FillTableRow[],
+      fills.map(
+        (fill: SubaccountFill): FillTableRow =>
+          getHydratedTradingData({
+            data: fill,
+            assets: allAssets,
+            perpetualMarkets: allPerpetualMarkets,
+          })
+      ),
     [fills, allPerpetualMarkets, allAssets]
   );
 
@@ -406,14 +411,15 @@ const $TimeOutput = styled(Output)`
   color: var(--color-text-0);
 `;
 
-const $Side = styled.span<{ side: OrderSide }>`
+const $Side = styled.span<{ side: Nullable<OrderSide> }>`
   ${({ side }) =>
-    ({
+    side &&
+    {
       [OrderSide.BUY]: css`
         color: var(--color-positive);
       `,
       [OrderSide.SELL]: css`
         color: var(--color-negative);
       `,
-    })[side]};
+    }[side]};
 `;

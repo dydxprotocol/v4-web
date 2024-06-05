@@ -428,8 +428,6 @@ export const PositionsTable = ({
   const positionsData = useMemo(
     () =>
       positions.map((position: SubaccountPosition): PositionTableRow => {
-        // object splat ... doesn't copy getter defined properties
-        // eslint-disable-next-line prefer-object-spread
         return Object.assign(
           {},
           {

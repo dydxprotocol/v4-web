@@ -39,10 +39,9 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
   const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
   const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
 
-  const joinedPerpetualMarketsAndAssets = Object.values(allPerpetualMarkets).map((market) => ({
-    ...market,
-    ...(market != null ? allAssets[market.assetId] : {}),
-  })) as Array<PerpetualMarket & Asset>;
+  const joinedPerpetualMarketsAndAssets = Object.values(allPerpetualMarkets).map(
+    (market): PerpetualMarket & Asset => Object.assign({}, market, allAssets[market?.assetId] ?? {})
+  );
 
   return [
     {

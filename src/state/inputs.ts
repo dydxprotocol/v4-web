@@ -49,10 +49,9 @@ export const inputsSlice = createSlice({
         inputErrors: errors?.toArray(),
         tradeInputs: trade,
         closePositionInputs: closePosition,
-        transferInputs: {
-          ...transfer,
+        transferInputs: Object.assign({}, transfer, {
           isCctp: !!transfer?.isCctp,
-        } as Nullable<TransferInputs>,
+        }),
         triggerOrdersInputs: triggerOrders,
       };
     },

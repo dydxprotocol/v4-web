@@ -23,13 +23,16 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
       orderbook?.asks?.toArray() ?? []
     )
       .map(
-        (row: OrderbookLine, idx: number) =>
-          ({
-            key: `ask-${idx}`,
-            side: 'ask',
-            mine: subaccountOrderSizeBySideAndPrice[OrderSide.SELL]?.[row.price],
-            ...row,
-          }) as PerpetualMarketOrderbookLevel
+        (row: OrderbookLine, idx: number): PerpetualMarketOrderbookLevel =>
+          Object.assign(
+            {},
+            {
+              key: `ask-${idx}`,
+              side: 'ask' as const,
+              mine: subaccountOrderSizeBySideAndPrice[OrderSide.SELL]?.[row.price],
+            },
+            row
+          )
       )
       .slice(0, maxRowsPerSide);
 
@@ -37,13 +40,16 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
       orderbook?.bids?.toArray() ?? []
     )
       .map(
-        (row: OrderbookLine, idx: number) =>
-          ({
-            key: `bid-${idx}`,
-            side: 'bid',
-            mine: subaccountOrderSizeBySideAndPrice[OrderSide.BUY]?.[row.price],
-            ...row,
-          }) as PerpetualMarketOrderbookLevel
+        (row: OrderbookLine, idx: number): PerpetualMarketOrderbookLevel =>
+          Object.assign(
+            {},
+            {
+              key: `bid-${idx}`,
+              side: 'bid' as const,
+              mine: subaccountOrderSizeBySideAndPrice[OrderSide.BUY]?.[row.price],
+            },
+            row
+          )
       )
       .slice(0, maxRowsPerSide);
 
@@ -97,11 +103,15 @@ export const useOrderbookValuesForDepthChart = () => {
   return useMemo(() => {
     const bids = (orderbook?.bids?.toArray() ?? [])
       .filter(Boolean)
-      .map((datum) => ({ ...datum, seriesKey: DepthChartSeries.Bids }) as DepthChartDatum);
+      .map(
+        (datum): DepthChartDatum => Object.assign({}, datum, { seriesKey: DepthChartSeries.Bids })
+      );
 
     const asks = (orderbook?.asks?.toArray() ?? [])
       .filter(Boolean)
-      .map((datum) => ({ ...datum, seriesKey: DepthChartSeries.Asks }) as DepthChartDatum);
+      .map(
+        (datum): DepthChartDatum => Object.assign({}, datum, { seriesKey: DepthChartSeries.Asks })
+      );
 
     const lowestBid = bids[bids.length - 1];
     const highestBid = bids[0];

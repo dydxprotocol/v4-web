@@ -16,12 +16,11 @@ export const getHydratedPositionData = ({
   data: SubaccountPosition;
   assets?: Record<string, Asset>;
   perpetualMarkets?: Record<string, PerpetualMarket>;
-}) => {
-  return {
-    ...data,
+}): HydratedPositionData => {
+  return Object.assign({}, data, {
     asset: assets?.[data.assetId],
     stepSizeDecimals: perpetualMarkets?.[data.id]?.configs?.stepSizeDecimals ?? TOKEN_DECIMALS,
     tickSizeDecimals: perpetualMarkets?.[data.id]?.configs?.tickSizeDecimals ?? USD_DECIMALS,
     oraclePrice: perpetualMarkets?.[data.id]?.oraclePrice,
-  } as HydratedPositionData;
+  });
 };
