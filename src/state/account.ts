@@ -20,8 +20,8 @@ import type {
   Wallet,
 } from '@/constants/abacus';
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
-import { STRING_KEYS } from '@/constants/localization';
 import { LocalStorageKey } from '@/constants/localStorage';
+import { STRING_KEYS } from '@/constants/localization';
 import {
   CancelOrderStatuses,
   PlaceOrderStatuses,
