@@ -149,7 +149,8 @@ export const NewMarketPreviewStep = ({
               atomicResolution,
               liquidityTier,
               quantumConversionExponent,
-              marketType: marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
+              marketType:
+                marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
                   ? PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED
                   : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS,
               stepBaseQuantums: Long.fromNumber(stepBaseQuantums),
