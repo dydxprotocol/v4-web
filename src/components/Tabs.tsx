@@ -302,6 +302,7 @@ const $DropdownTabTrigger = styled(Trigger)`
 
 const $DropdownSelectMenu = styled(DropdownSelectMenu)<{ $isActive?: boolean }>`
   --trigger-radius: 0;
+  --dropdownSelectMenu-item-font-size: var(--fontSize-base);
 
   ${({ $isActive }) =>
     $isActive &&

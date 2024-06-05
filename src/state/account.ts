@@ -6,6 +6,7 @@ import type {
   HistoricalPnlPeriods,
   Nullable,
   StakingDelegation,
+  StakingRewards,
   Subaccount,
   SubaccountFill,
   SubaccountFills,
@@ -14,12 +15,13 @@ import type {
   SubaccountOrder,
   SubaccountTransfers,
   TradingRewards,
+  UnbondingDelegation,
   UsageRestriction,
   Wallet,
 } from '@/constants/abacus';
 import { OnboardingGuard, OnboardingState } from '@/constants/account';
-import { LocalStorageKey } from '@/constants/localStorage';
 import { STRING_KEYS } from '@/constants/localization';
+import { LocalStorageKey } from '@/constants/localStorage';
 import {
   CancelOrderStatuses,
   PlaceOrderStatuses,
@@ -35,6 +37,8 @@ export type AccountState = {
   balances?: Record<string, AccountBalance>;
   stakingBalances?: Record<string, AccountBalance>;
   stakingDelegations?: StakingDelegation[];
+  unbondingDelegations?: UnbondingDelegation[];
+  stakingRewards?: StakingRewards;
   tradingRewards?: TradingRewards;
   wallet?: Nullable<Wallet>;
   walletType?: WalletType;
@@ -274,6 +278,12 @@ export const accountSlice = createSlice({
     setStakingDelegations: (state, action: PayloadAction<StakingDelegation[]>) => {
       state.stakingDelegations = action.payload;
     },
+    setUnbondingDelegations: (state, action: PayloadAction<UnbondingDelegation[]>) => {
+      state.unbondingDelegations = action.payload;
+    },
+    setStakingRewards: (state, action: PayloadAction<StakingRewards>) => {
+      state.stakingRewards = action.payload;
+    },
     setTradingRewards: (state, action: PayloadAction<TradingRewards>) => {
       state.tradingRewards = action.payload;
     },
@@ -357,6 +367,8 @@ export const {
   setStakingBalances,
   setStakingDelegations,
   setTradingRewards,
+  setUnbondingDelegations,
+  setStakingRewards,
   placeOrderSubmitted,
   placeOrderFailed,
   placeOrderTimeout,

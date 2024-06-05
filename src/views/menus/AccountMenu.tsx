@@ -1,6 +1,6 @@
 import { ElementType, memo } from 'react';
 
-import { usePrivy } from '@privy-io/react-auth';
+import { useMfaEnrollment, usePrivy } from '@privy-io/react-auth';
 import type { Dispatch } from '@reduxjs/toolkit';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
@@ -68,6 +68,8 @@ export const AccountMenu = () => {
 
   const privy = usePrivy();
   const { google, discord, twitter } = privy?.user ?? {};
+
+  const { showMfaEnrollmentModal } = useMfaEnrollment();
 
   const usdcBalance = freeCollateral?.current ?? 0;
 
@@ -258,6 +260,16 @@ export const AccountMenu = () => {
                 label: <span>{stringGetter({ key: STRING_KEYS.EXPORT_SECRET_PHRASE })}</span>,
                 highlightColor: 'destroy' as const,
                 onSelect: () => dispatch(openDialog({ type: DialogTypes.MnemonicExport })),
+              },
+            ]
+          : []),
+        ...(privy.ready && privy.authenticated
+          ? [
+              {
+                value: 'MFA',
+                icon: <Icon iconName={IconName.Lock} />,
+                label: stringGetter({ key: STRING_KEYS.MULTI_FACTOR_AUTH }),
+                onSelect: () => showMfaEnrollmentModal(),
               },
             ]
           : []),

@@ -2,10 +2,12 @@ import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
+import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
+import { useComplianceState } from '@/hooks/useComplianceState';
 import { useStakingValidator } from '@/hooks/useStakingValidator';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -31,6 +33,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
+  const { complianceState } = useComplianceState();
   const { nativeTokenBalance, nativeStakingBalance } = useAccountBalance();
   const { chainTokenLabel } = useTokenConfigs();
   const { selectedValidator } = useStakingValidator() ?? {};
@@ -44,20 +47,22 @@ export const StakingPanel = ({ className }: { className?: string }) => {
             <AssetIcon symbol={chainTokenLabel} />
             {chainTokenLabel}
           </$Title>
-          <$ActionButtons>
-            {!canAccountTrade ? (
-              <OnboardingTriggerButton size={ButtonSize.Small} />
-            ) : (
-              <Button
-                slotLeft={<Icon iconName={IconName.Send} />}
-                size={ButtonSize.Small}
-                action={ButtonAction.Primary}
-                onClick={() => dispatch(openDialog({ type: DialogTypes.Transfer }))}
-              >
-                {stringGetter({ key: STRING_KEYS.TRANSFER })}
-              </Button>
-            )}
-          </$ActionButtons>
+          {complianceState === ComplianceStates.FULL_ACCESS && (
+            <$ActionButtons>
+              {!canAccountTrade ? (
+                <OnboardingTriggerButton size={ButtonSize.Small} />
+              ) : (
+                <Button
+                  slotLeft={<Icon iconName={IconName.Send} />}
+                  size={ButtonSize.Small}
+                  action={ButtonAction.Primary}
+                  onClick={() => dispatch(openDialog({ type: DialogTypes.Transfer }))}
+                >
+                  {stringGetter({ key: STRING_KEYS.TRANSFER })}
+                </Button>
+              )}
+            </$ActionButtons>
+          )}
         </$Header>
       }
     >
