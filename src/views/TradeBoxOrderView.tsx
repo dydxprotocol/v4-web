@@ -64,6 +64,7 @@ const $TradeBoxOrderViewContainer = styled.div`
 
 const $Container = styled.div`
   ${layoutMixins.scrollArea}
+  border-top: var(--border-width) solid var(--border-color);
 `;
 
 const $Tabs = styled(Tabs)`
