@@ -3,7 +3,6 @@ import { useContext } from 'react';
 
 import BigNumber from 'bignumber.js';
 import { DateTime } from 'luxon';
-import { useSelector } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import {
@@ -25,6 +24,7 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { RelativeTime } from '@/components/RelativeTime';
 import { Tag } from '@/components/Tag';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber, isNumber, type BigNumberish } from '@/lib/numbers';
@@ -110,13 +110,13 @@ export const Output = ({
   className,
   withBaseFont,
 }: OutputProps) => {
-  const selectedLocale = useSelector(getSelectedLocale);
+  const selectedLocale = useAppSelector(getSelectedLocale);
   const stringGetter = useStringGetter();
   const isDetailsLoading = useContext(LoadingContext);
   const { decimal: LOCALE_DECIMAL_SEPARATOR, group: LOCALE_GROUP_SEPARATOR } =
     useLocaleSeparators();
 
-  if (isLoading || isDetailsLoading) {
+  if (!!isLoading || !!isDetailsLoading) {
     return <LoadingOutput />;
   }
 

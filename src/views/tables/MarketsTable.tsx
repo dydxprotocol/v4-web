@@ -1,6 +1,5 @@
 import { Key, useMemo, useState } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -29,6 +28,7 @@ import { TriangleIndicator } from '@/components/TriangleIndicator';
 import { SparklineChart } from '@/components/visx/SparklineChart';
 import { MarketFilter } from '@/views/MarketFilter';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setMarketFilter } from '@/state/perpetuals';
 import { getMarketFilter } from '@/state/perpetualsSelectors';
 
@@ -37,8 +37,8 @@ import { MustBigNumber } from '@/lib/numbers';
 export const MarketsTable = ({ className }: { className?: string }) => {
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
-  const dispatch = useDispatch();
-  const filter: MarketFilters = useSelector(getMarketFilter);
+  const dispatch = useAppDispatch();
+  const filter: MarketFilters = useAppSelector(getMarketFilter);
   const [searchFilter, setSearchFilter] = useState<string>();
   const navigate = useNavigate();
 
@@ -318,8 +318,8 @@ const $Output = styled(Output)<{ isNegative?: boolean; isPositive?: boolean }>`
     isNegative
       ? `var(--color-negative)`
       : isPositive
-      ? `var(--color-positive)`
-      : `var(--color-text-1)`};
+        ? `var(--color-positive)`
+        : `var(--color-text-1)`};
   font: var(--font-base-medium);
 `;
 

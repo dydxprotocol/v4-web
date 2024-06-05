@@ -1,9 +1,8 @@
 import { useEffect } from 'react';
 
-import { useSelector } from 'react-redux';
-
 import { DEFAULT_DOCUMENT_TITLE } from '@/constants/routes';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 import {
   getCurrentMarketId,
@@ -14,11 +13,11 @@ import {
 import { useBreakpoints } from './useBreakpoints';
 
 export const usePageTitlePriceUpdates = () => {
-  const selectedLocale = useSelector(getSelectedLocale);
+  const selectedLocale = useAppSelector(getSelectedLocale);
   const { isNotTablet } = useBreakpoints();
-  const id = useSelector(getCurrentMarketId);
-  const oraclePrice = useSelector(getCurrentMarketOraclePrice);
-  const orderbookMidMarketPrice = useSelector(getCurrentMarketMidMarketPrice);
+  const id = useAppSelector(getCurrentMarketId);
+  const oraclePrice = useAppSelector(getCurrentMarketOraclePrice);
+  const orderbookMidMarketPrice = useAppSelector(getCurrentMarketMidMarketPrice);
 
   const price = orderbookMidMarketPrice ?? oraclePrice;
 

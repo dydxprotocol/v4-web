@@ -327,7 +327,7 @@ export const getSignTypedData = (selectedDydxChainId: DydxChainId) =>
     message: {
       action: WALLETS_CONFIG_MAP[selectedDydxChainId].signTypedDataAction,
     },
-  } as const);
+  }) as const;
 
 export type PrivateInformation = ReturnType<typeof onboarding.deriveHDKeyFromEthereumSignature>;
 

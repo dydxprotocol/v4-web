@@ -156,7 +156,7 @@ export const Table = <TableRowData extends BaseTableRowData | CustomRowConfig>({
 
   const currentBreakpoints = useBreakpoints();
   const shownColumns = columns.filter(
-    ({ hideOnBreakpoint }) => !hideOnBreakpoint || !currentBreakpoints[hideOnBreakpoint as string]
+    ({ hideOnBreakpoint }) => !hideOnBreakpoint || !currentBreakpoints[hideOnBreakpoint]
   );
 
   const collator = useCollator();
@@ -862,7 +862,9 @@ const $SortArrow = styled.span<{ sortDirection?: 'ascending' | 'descending' }>`
   margin-left: auto;
 
   display: inline-flex;
-  transition: transform 0.3s var(--ease-out-expo), font-size 0.3s var(--ease-out-expo);
+  transition:
+    transform 0.3s var(--ease-out-expo),
+    font-size 0.3s var(--ease-out-expo);
 
   font-size: 0.375em;
 

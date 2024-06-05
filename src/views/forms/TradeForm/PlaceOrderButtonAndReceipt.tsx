@@ -1,4 +1,4 @@
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { type TradeInputSummary } from '@/constants/abacus';
@@ -24,6 +24,7 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getCurrentMarketPositionData, getSubaccountId } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { getCurrentInput } from '@/state/inputsSelectors';
 
@@ -58,16 +59,16 @@ export const PlaceOrderButtonAndReceipt = ({
   confirmButtonConfig,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { chainTokenLabel } = useTokenConfigs();
   const { connectionError } = useApiState();
   const { complianceState } = useComplianceState();
 
-  const canAccountTrade = useSelector(calculateCanAccountTrade);
-  const subaccountNumber = useSelector(getSubaccountId);
-  const currentInput = useSelector(getCurrentInput);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
+  const subaccountNumber = useAppSelector(getSubaccountId);
+  const currentInput = useAppSelector(getCurrentInput);
   const { liquidationPrice, equity, leverage } = orEmptyObj(
-    useSelector(getCurrentMarketPositionData, shallowEqual)
+    useAppSelector(getCurrentMarketPositionData, shallowEqual)
   );
 
   const hasMissingData = subaccountNumber === undefined;

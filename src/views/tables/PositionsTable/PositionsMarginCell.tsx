@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { AbacusMarginMode, type SubaccountPosition } from '@/constants/abacus';
@@ -14,7 +13,9 @@ import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { TableCell } from '@/components/Table/TableCell';
+import { WithTooltip } from '@/components/WithTooltip';
 
+import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { getMarginModeFromSubaccountNumber, getPositionMargin } from '@/lib/tradeData';
@@ -25,7 +26,7 @@ type PositionsMarginCellProps = {
 
 export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const { marginMode, marginModeLabel, margin } = useMemo(() => {
     const { childSubaccountNumber } = position;
@@ -46,19 +47,21 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
       stacked
       slotRight={
         marginMode === AbacusMarginMode.isolated && (
-          <$EditButton
-            key="edit-margin"
-            iconName={IconName.Pencil}
-            shape={ButtonShape.Square}
-            onClick={() =>
-              dispatch(
-                openDialog({
-                  type: DialogTypes.AdjustIsolatedMargin,
-                  dialogProps: { positionId: position.id },
-                })
-              )
-            }
-          />
+          <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.ADJUST_ISOLATED_MARGIN })}>
+            <$EditButton
+              key="edit-margin"
+              iconName={IconName.Pencil}
+              shape={ButtonShape.Square}
+              onClick={() =>
+                dispatch(
+                  openDialog({
+                    type: DialogTypes.AdjustIsolatedMargin,
+                    dialogProps: { positionId: position.id },
+                  })
+                )
+              }
+            />
+          </WithTooltip>
         )
       }
     >

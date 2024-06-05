@@ -10,7 +10,7 @@ import { Icon, IconName } from '@/components/Icon';
 
 export const PageMenuNavigationItem = <
   MenuItemValue extends string,
-  PageMenuItemType extends string
+  PageMenuItemType extends string,
 >({
   href,
   label,

@@ -5,6 +5,7 @@ import type {
   Compliance,
   HistoricalPnlPeriods,
   Nullable,
+  StakingDelegation,
   Subaccount,
   SubaccountFill,
   SubaccountFills,
@@ -33,6 +34,7 @@ import { getLocalStorage } from '@/lib/localStorage';
 export type AccountState = {
   balances?: Record<string, AccountBalance>;
   stakingBalances?: Record<string, AccountBalance>;
+  stakingDelegations?: StakingDelegation[];
   tradingRewards?: TradingRewards;
   wallet?: Nullable<Wallet>;
   walletType?: WalletType;
@@ -234,15 +236,18 @@ export const accountSlice = createSlice({
     },
     setChildSubaccount: (
       state,
-      action: PayloadAction<{
-        data: Partial<AccountState['childSubaccounts']>;
-        subaccountNumber: number;
-      }>
+      action: PayloadAction<Partial<AccountState['childSubaccounts']>>
     ) => {
-      state.childSubaccounts[action.payload.subaccountNumber] = {
-        ...state.childSubaccounts[action.payload.subaccountNumber],
-        ...action.payload.data,
-      };
+      const childSubaccountsCopy = { ...state.childSubaccounts };
+
+      Object.keys(action.payload).forEach((subaccountNumber) => {
+        childSubaccountsCopy[Number(subaccountNumber)] = {
+          ...childSubaccountsCopy[Number(subaccountNumber)],
+          ...action.payload[Number(subaccountNumber)],
+        };
+      });
+
+      state.childSubaccounts = childSubaccountsCopy;
     },
     setWallet: (state, action: PayloadAction<Nullable<Wallet>>) => ({
       ...state,
@@ -265,6 +270,9 @@ export const accountSlice = createSlice({
     },
     setStakingBalances: (state, action: PayloadAction<Record<string, AccountBalance>>) => {
       state.stakingBalances = action.payload;
+    },
+    setStakingDelegations: (state, action: PayloadAction<StakingDelegation[]>) => {
+      state.stakingDelegations = action.payload;
     },
     setTradingRewards: (state, action: PayloadAction<TradingRewards>) => {
       state.tradingRewards = action.payload;
@@ -347,6 +355,7 @@ export const {
   viewedOrders,
   setBalances,
   setStakingBalances,
+  setStakingDelegations,
   setTradingRewards,
   placeOrderSubmitted,
   placeOrderFailed,

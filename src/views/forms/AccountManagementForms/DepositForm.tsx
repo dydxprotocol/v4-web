@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import { type NumberFormatValues } from 'react-number-format';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 import { Abi, parseUnits } from 'viem';
 
@@ -43,6 +43,7 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -66,7 +67,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const [error, setError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [requireUserActionInWallet, setRequireUserActionInWallet] = useState(false);
-  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
   const { evmAddress, signerWagmi, publicClientWagmi, nobleAddress } = useAccounts();
 
@@ -82,7 +83,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
     errors: routeErrors,
     errorMessage: routeErrorMessage,
     isCctp,
-  } = useSelector(getTransferInputs, shallowEqual) ?? {};
+  } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
   // todo are these guaranteed to be base 10?
   // eslint-disable-next-line radix
   const chainId = chainIdStr ? parseInt(chainIdStr) : undefined;

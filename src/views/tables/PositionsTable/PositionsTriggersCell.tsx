@@ -1,4 +1,3 @@
-import { useDispatch } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import {
@@ -24,7 +23,9 @@ import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
 import { TableCell } from '@/components/Table/TableCell';
 import { WithHovercard } from '@/components/WithHovercard';
+import { WithTooltip } from '@/components/WithTooltip';
 
+import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { isStopLossOrder } from '@/lib/orders';
@@ -55,7 +56,7 @@ export const PositionsTriggersCell = ({
   isDisabled,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
   const { complianceState } = useComplianceState();
 
@@ -206,12 +207,16 @@ export const PositionsTriggersCell = ({
       slotRight={
         !isDisabled &&
         complianceState === ComplianceStates.FULL_ACCESS && (
-          <$EditButton
-            key="edit-margin"
-            iconName={IconName.Pencil}
-            shape={ButtonShape.Square}
-            onClick={openTriggersDialog}
-          />
+          <WithTooltip
+            tooltipString={stringGetter({ key: STRING_KEYS.EDIT_TAKE_PROFIT_STOP_LOSS_TRIGGERS })}
+          >
+            <$EditButton
+              key="edit-margin"
+              iconName={IconName.Pencil}
+              shape={ButtonShape.Square}
+              onClick={openTriggersDialog}
+            />
+          </WithTooltip>
         )
       }
     >

@@ -17,7 +17,7 @@ import type {
 import { Changes } from '@/constants/abacus';
 import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 
-import type { RootStore } from '@/state/_store';
+import { type RootStore } from '@/state/_store';
 import {
   setBalances,
   setChildSubaccount,
@@ -28,6 +28,7 @@ import {
   setLatestOrder,
   setRestrictionType,
   setStakingBalances,
+  setStakingDelegations,
   setSubaccount,
   setTradingRewards,
   setTransfers,
@@ -93,6 +94,9 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
           );
           dispatch(setStakingBalances(stakingBalances));
         }
+        if (updatedState.account?.stakingDelegations) {
+          dispatch(setStakingDelegations(updatedState.account.stakingDelegations.toArray()));
+        }
       }
 
       if (changes.has(Changes.tradingRewards)) {
@@ -143,11 +147,10 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
 
       subaccountNumbers?.forEach((subaccountId: number) => {
         const isChildSubaccount = subaccountId >= NUM_PARENT_SUBACCOUNTS;
-        const childSubaccountUpdate: Parameters<typeof setChildSubaccount>['0']['data'] = {};
+        const childSubaccountUpdate: Parameters<typeof setChildSubaccount>[0] = {};
 
         if (changes.has(Changes.subaccount)) {
           const subaccountData = updatedState.subaccount(subaccountId);
-
           if (isChildSubaccount) {
             childSubaccountUpdate[subaccountId] = subaccountData;
           } else {
@@ -205,9 +208,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         }
 
         if (isChildSubaccount) {
-          dispatch(
-            setChildSubaccount({ data: childSubaccountUpdate, subaccountNumber: subaccountId })
-          );
+          dispatch(setChildSubaccount(childSubaccountUpdate));
         }
       });
 

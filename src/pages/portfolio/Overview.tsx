@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 
-import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -8,6 +7,7 @@ import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute, PortfolioRoute } from '@/constants/routes';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
+import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { AttachedExpandingSection, DetachedSection } from '@/components/ContentSection';
@@ -18,6 +18,7 @@ import {
   calculateShouldRenderActionsInPositionsTable,
   calculateShouldRenderTriggersInPositionsTable,
 } from '@/state/accountCalculators';
+import { useAppSelector } from '@/state/appTypes';
 
 import { isTruthy } from '@/lib/isTruthy';
 
@@ -29,14 +30,17 @@ export const Overview = () => {
   const { isTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  const shouldRenderTriggers = useSelector(calculateShouldRenderTriggersInPositionsTable);
-  const shouldRenderActions = useSelector(calculateShouldRenderActionsInPositionsTable(true));
-
   const handleViewUnopenedIsolatedOrders = useCallback(() => {
     navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
       state: { from: AppRoute.Portfolio },
     });
   }, [navigate]);
+
+  const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
+  const shouldRenderActions = useParameterizedSelector(
+    calculateShouldRenderActionsInPositionsTable,
+    true
+  );
 
   return (
     <div>

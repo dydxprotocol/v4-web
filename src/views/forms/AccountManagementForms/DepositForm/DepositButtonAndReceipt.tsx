@@ -1,6 +1,6 @@
 import { useState, type Dispatch, type SetStateAction } from 'react';
 
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TransferInputTokenResource } from '@/constants/abacus';
@@ -27,6 +27,7 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { getSubaccountBuyingPower, getSubaccountEquity } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -58,7 +59,7 @@ export const DepositButtonAndReceipt = ({
   const [isEditingSlippage, setIsEditingSlipapge] = useState(false);
   const stringGetter = useStringGetter();
 
-  const canAccountTrade = useSelector(calculateCanAccountTrade, shallowEqual);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
 
   const { connectWallet, isConnectedWagmi } = useWalletConnection();
   const { connectionError } = useApiState();
@@ -83,17 +84,17 @@ export const DepositButtonAndReceipt = ({
   });
 
   const { current: equity, postOrder: newEquity } =
-    useSelector(getSubaccountEquity, shallowEqual) ?? {};
+    useAppSelector(getSubaccountEquity, shallowEqual) ?? {};
 
   const { current: buyingPower, postOrder: newBuyingPower } =
-    useSelector(getSubaccountBuyingPower, shallowEqual) ?? {};
+    useAppSelector(getSubaccountBuyingPower, shallowEqual) ?? {};
 
   const {
     summary,
     requestPayload,
     depositOptions,
     chain: chainIdStr,
-  } = useSelector(getTransferInputs, shallowEqual) ?? {};
+  } = useAppSelector(getTransferInputs, shallowEqual) ?? {};
   const { usdcLabel } = useTokenConfigs();
 
   const sourceChainName =

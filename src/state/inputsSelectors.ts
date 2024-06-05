@@ -1,7 +1,11 @@
-import { shallowEqual, useSelector } from 'react-redux';
-import { createSelector } from 'reselect';
+import { useMemo } from 'react';
 
-import type { RootState } from './_store';
+import { shallowEqual } from 'react-redux';
+
+import { EMPTY_ARR } from '@/constants/objects';
+
+import { type RootState } from './_store';
+import { createAppSelector, useAppSelector } from './appTypes';
 
 /**
  * @param state
@@ -56,7 +60,7 @@ export const getCurrentInput = (state: RootState) => state.inputs.current;
  */
 export const getTradeInputErrors = (state: RootState) => {
   const currentInput = state.inputs.current;
-  return currentInput === 'trade' ? getInputErrors(state) : [];
+  return currentInput === 'trade' ? getInputErrors(state) : EMPTY_ARR;
 };
 
 /**
@@ -65,7 +69,7 @@ export const getTradeInputErrors = (state: RootState) => {
  */
 export const getClosePositionInputErrors = (state: RootState) => {
   const currentInput = state.inputs.current;
-  return currentInput === 'closePosition' ? getInputErrors(state) : [];
+  return currentInput === 'closePosition' ? getInputErrors(state) : EMPTY_ARR;
 };
 
 /**
@@ -86,7 +90,7 @@ export const getTransferInputs = (state: RootState) => state.inputs.transferInpu
  */
 export const getTriggerOrdersInputErrors = (state: RootState) => {
   const currentInput = state.inputs.current;
-  return currentInput === 'triggerOrders' ? getInputErrors(state) : [];
+  return currentInput === 'triggerOrders' ? getInputErrors(state) : EMPTY_ARR;
 };
 
 /**
@@ -105,55 +109,57 @@ export const getAdjustIsolatedMarginInputs = (state: RootState) =>
  * @returns Data needed for the TradeForm (price, size, summary, input render options, and errors/input validation)
  */
 export const useTradeFormData = () => {
-  return useSelector(
-    createSelector(
-      [getInputTradeData, getInputTradeOptions, getTradeInputErrors],
-      (tradeData, tradeOptions, tradeErrors) => {
-        const { price, size, summary } = tradeData ?? {};
+  const selector = useMemo(
+    () =>
+      createAppSelector(
+        [getInputTradeData, getInputTradeOptions, getTradeInputErrors],
+        (tradeData, tradeOptions, tradeErrors) => {
+          const { price, size, summary } = tradeData ?? {};
 
-        const {
-          needsLimitPrice,
-          needsMarginMode,
-          needsTargetLeverage,
-          needsTrailingPercent,
-          needsTriggerPrice,
-          needsGoodUntil,
-          needsPostOnly,
-          needsReduceOnly,
-          postOnlyTooltip,
-          reduceOnlyTooltip,
+          const {
+            needsLimitPrice,
+            needsMarginMode,
+            needsTargetLeverage,
+            needsTrailingPercent,
+            needsTriggerPrice,
+            needsGoodUntil,
+            needsPostOnly,
+            needsReduceOnly,
+            postOnlyTooltip,
+            reduceOnlyTooltip,
 
-          executionOptions,
-          marginModeOptions,
-          timeInForceOptions,
-        } = tradeOptions ?? {};
+            executionOptions,
+            marginModeOptions,
+            timeInForceOptions,
+          } = tradeOptions ?? {};
 
-        return {
-          price,
-          size,
-          summary,
+          return {
+            price,
+            size,
+            summary,
 
-          needsLimitPrice,
-          needsMarginMode,
-          needsTargetLeverage,
-          needsTrailingPercent,
-          needsTriggerPrice,
-          needsGoodUntil,
-          needsPostOnly,
-          needsReduceOnly,
-          postOnlyTooltip,
-          reduceOnlyTooltip,
+            needsLimitPrice,
+            needsMarginMode,
+            needsTargetLeverage,
+            needsTrailingPercent,
+            needsTriggerPrice,
+            needsGoodUntil,
+            needsPostOnly,
+            needsReduceOnly,
+            postOnlyTooltip,
+            reduceOnlyTooltip,
 
-          executionOptions,
-          marginModeOptions,
-          timeInForceOptions,
+            executionOptions,
+            marginModeOptions,
+            timeInForceOptions,
 
-          tradeErrors,
-        };
-      }
-    ),
-    shallowEqual
+            tradeErrors,
+          };
+        }
+      ),
+    []
   );
+  return useAppSelector(selector, shallowEqual);
 };
 
 /**

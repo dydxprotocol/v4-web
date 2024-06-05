@@ -20,7 +20,7 @@ type StyleProps = {
 
 type PickComboxMenuProps<
   MenuItemValue extends string | number,
-  MenuGroupValue extends string | number
+  MenuGroupValue extends string | number,
 > = Pick<
   ComboboxMenuProps<MenuItemValue, MenuGroupValue>,
   | 'inputPlaceholder'
@@ -45,7 +45,7 @@ type PickDialogProps = Pick<
 
 export const ComboboxDialogMenu = <
   MenuItemValue extends string | number,
-  MenuGroupValue extends string | number
+  MenuGroupValue extends string | number,
 >({
   isOpen = false,
   setIsOpen,

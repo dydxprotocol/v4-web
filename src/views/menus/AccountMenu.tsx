@@ -2,7 +2,7 @@ import { ElementType, memo } from 'react';
 
 import { usePrivy } from '@privy-io/react-auth';
 import type { Dispatch } from '@reduxjs/toolkit';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
@@ -39,6 +39,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { getOnboardingState, getSubaccount } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { AppTheme } from '@/state/configs';
 import { getAppTheme } from '@/state/configsSelectors';
 import { openDialog } from '@/state/dialogs';
@@ -55,13 +56,13 @@ export const AccountMenu = () => {
   const { isTablet } = useBreakpoints();
   const { complianceState } = useComplianceState();
 
-  const dispatch = useDispatch();
-  const onboardingState = useSelector(getOnboardingState);
-  const { freeCollateral } = useSelector(getSubaccount, shallowEqual) ?? {};
+  const dispatch = useAppDispatch();
+  const onboardingState = useAppSelector(getOnboardingState);
+  const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
   const { nativeTokenBalance } = useAccountBalance();
   const { usdcLabel, chainTokenLabel } = useTokenConfigs();
-  const theme = useSelector(getAppTheme);
+  const theme = useAppSelector(getAppTheme);
 
   const { evmAddress, walletType, dydxAddress, hdKey } = useAccounts();
 

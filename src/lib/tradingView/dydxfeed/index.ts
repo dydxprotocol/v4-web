@@ -16,7 +16,7 @@ import { DEFAULT_MARKETID } from '@/constants/markets';
 
 import { useDydxClient } from '@/hooks/useDydxClient';
 
-import { RootStore } from '@/state/_store';
+import { type RootStore } from '@/state/_store';
 import { setCandles } from '@/state/perpetuals';
 import { getMarketConfig, getPerpetualBarsForPriceChart } from '@/state/perpetualsSelectors';
 
@@ -64,7 +64,7 @@ export const getDydxDatafeed = (
 
   resolveSymbol: async (symbolName: string, onSymbolResolvedCallback: ResolveCallback) => {
     const symbolItem = getSymbol(symbolName || DEFAULT_MARKETID);
-    const { tickSizeDecimals } = getMarketConfig(symbolItem.symbol)(store.getState()) ?? {};
+    const { tickSizeDecimals } = getMarketConfig(store.getState(), symbolItem.symbol) ?? {};
 
     const pricescale = tickSizeDecimals ? 10 ** tickSizeDecimals : initialPriceScale ?? 100;
 
@@ -117,10 +117,11 @@ export const getDydxDatafeed = (
     }
 
     try {
-      const currentMarketBars = getPerpetualBarsForPriceChart(
+      const currentMarketBars = getPerpetualBarsForPriceChart()(
+        store.getState(),
         symbolInfo.name,
         resolution
-      )(store.getState());
+      );
 
       // Retrieve candles in the store that are between fromMs and toMs
       const cachedBars = getHistorySlice({

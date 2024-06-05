@@ -108,7 +108,8 @@ const $Container = styled.div<{ isToast?: boolean }>`
     isToast
       ? css`
           padding: 1rem;
-          box-shadow: 0 0 0 var(--border-width) var(--color-border),
+          box-shadow:
+            0 0 0 var(--border-width) var(--color-border),
             // border
             0 0 0.5rem 0.1rem var(--color-layer-2); // shadow
         `

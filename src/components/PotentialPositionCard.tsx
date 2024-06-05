@@ -1,11 +1,17 @@
+import { useCallback } from 'react';
+
 import styled from 'styled-components';
 
 import { SubaccountPendingPosition } from '@/constants/abacus';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
+
+import { useAppDispatch } from '@/state/appTypes';
+import { openDialog } from '@/state/dialogs';
 
 import { AssetIcon } from './AssetIcon';
 import { Icon, IconName } from './Icon';
@@ -23,6 +29,14 @@ export const PotentialPositionCard = ({
   onViewOrders,
   pendingPosition,
 }: PotentialPositionCardProps) => {
+  const dispatch = useAppDispatch();
+  const onCancelOrders = useCallback(
+    (marketId: string) => {
+      dispatch(openDialog({ type: DialogTypes.CancelPendingOrders, dialogProps: { marketId } }));
+    },
+    [dispatch]
+  );
+
   const stringGetter = useStringGetter();
   const { assetId, freeCollateral, marketId, orderCount } = pendingPosition;
 
@@ -41,6 +55,9 @@ export const PotentialPositionCard = ({
           {stringGetter({ key: orderCount > 1 ? STRING_KEYS.VIEW_ORDERS : STRING_KEYS.VIEW })}{' '}
           <Icon iconName={IconName.Arrow} />
         </$Link>
+        <$CancelLink onClick={() => onCancelOrders(marketId)}>
+          {stringGetter({ key: orderCount > 1 ? STRING_KEYS.CANCEL_ORDERS : STRING_KEYS.CANCEL })}{' '}
+        </$CancelLink>
       </$ActionRow>
     </$PotentialPositionCard>
   );
@@ -93,5 +110,10 @@ const $ActionRow = styled.div`
 
 const $Link = styled(Link)`
   --link-color: var(--color-accent);
+  font: var(--font-small-book);
+`;
+
+const $CancelLink = styled(Link)`
+  --link-color: var(--color-risk-high);
   font: var(--font-small-book);
 `;

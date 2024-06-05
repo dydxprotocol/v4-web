@@ -1,8 +1,7 @@
-import { useSelector } from 'react-redux';
-
 import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 
 import { getSelectedNetwork } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 interface EndpointsConfig {
   indexers: {
@@ -16,7 +15,7 @@ interface EndpointsConfig {
 }
 
 export const useEndpointsConfig = () => {
-  const selectedNetwork = useSelector(getSelectedNetwork);
+  const selectedNetwork = useAppSelector(getSelectedNetwork);
   const endpointsConfig = ENVIRONMENT_CONFIG_MAP[selectedNetwork].endpoints as EndpointsConfig;
 
   return {
