@@ -92,12 +92,12 @@ export const PlaceOrderButtonAndReceipt = ({
       const currentCrossMargin = calculateCrossPositionMargin({
         notionalTotal: notionalTotal?.current,
         adjustedMmf: adjustedMmf?.current,
-      })
+      });
 
       const postOrderCrossMargin = calculateCrossPositionMargin({
         notionalTotal: notionalTotal?.postOrder,
         adjustedMmf: adjustedMmf?.postOrder,
-      })
+      });
 
       return (
         <DiffOutput
@@ -109,7 +109,7 @@ export const PlaceOrderButtonAndReceipt = ({
         />
       );
     }
-    
+
     return (
       <DiffOutput
         useGrouping
