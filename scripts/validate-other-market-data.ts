@@ -15,9 +15,9 @@ import {
   CompositeClient,
   LocalWallet as LocalWalletType,
   Network,
+  ProposalStatus,
   TransactionOptions,
   VoteOption,
-  ProposalStatus,
 } from '@dydxprotocol/v4-client-js';
 import {
   Perpetual,
@@ -95,6 +95,7 @@ interface Params {
 }
 
 interface Proposal {
+  id: Long;
   title: string;
   summary: string;
   params: Params;
@@ -271,6 +272,18 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
   },
 };
 
+enum ValidationError {
+  PROPOSAL_REJECTED = 'proposal rejected',
+  PROPOSAL_FAILED = 'proposal failed',
+  PRICE_EXPONENT_MISMATCH = 'price exponent mismatch',
+  PRICE_ZERO = 'price is 0',
+  CLOB_QCE_MISMATCH = 'Quantum conversion exponent mismatch',
+  CLOB_SBQ_MISMATCH = 'step base quantums mismatch',
+  CLOB_SPT_MISMATCH = 'subticks per tick mismatch',
+  PERP_AR_MISMATCH = 'Atomic resolution mismatch',
+  PERP_LT_MISMATCH = 'Liquidity tier mismatch',
+}
+
 async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promise<void> {
   const exchanges: Set<ExchangeName> = new Set();
   for (const exchange of exchangeConfigJson) {
@@ -433,31 +446,47 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
       proposalIds.push(proposalId);
     }
 
-    // Wait 10 seconds for proposals to be processed.
-    await sleep(10000);
+    // Wait 5 seconds for proposals to be processed.
+    await sleep(5000);
 
     // Vote YES on proposals from every wallet.
     for (const wallet of wallets) {
       retry(() => voteOnProposals(proposalIds, client, wallet));
     }
 
-    // Wait 10 seconds for votes to be processed.
-    await sleep(10000);
+    // Wait 5 seconds for votes to be processed.
+    await sleep(5000);
   }
 
   // Wait for voting period to end.
   console.log(`\nWaiting for ${VOTING_PERIOD_SECONDS} seconds for voting period to end...`);
   await sleep(VOTING_PERIOD_SECONDS * 1000);
 
-  // Check that no proposal failed.
-  console.log('\nChecking that no proposal failed...');
+  // Keep track of which error occurred for which markets.
+  const allErrors: Map<string, ValidationError> = new Map();
+  const failedOrRejectedProposals = new Set<Long>();
+
+  // Check which proposals were rejected.
+  console.log('\nChecking which proposals were rejected...');
+  const proposalsRejected = await client.validatorClient.get.getAllGovProposals(
+    ProposalStatus.PROPOSAL_STATUS_REJECTED
+  );
+  console.log(`${proposalsRejected.proposals.length} proposals rejected`);
+  proposalsRejected.proposals.map((proposal) => {
+    allErrors.set(`Proposal ${proposal.id} with title ${proposal.title}`, ValidationError.PROPOSAL_REJECTED);
+    failedOrRejectedProposals.add(proposal.id);
+  })
+
+  // Check which proposals failed.
+  console.log('\nChecking which proposals failed...');
   const proposalsFailed = await client.validatorClient.get.getAllGovProposals(
     ProposalStatus.PROPOSAL_STATUS_FAILED
   );
-  if (proposalsFailed.proposals.length > 0) {
-    const failedIds = proposalsFailed.proposals.map((proposal) => proposal.id);
-    throw new Error(`Proposals ${failedIds} failed: ${proposalsFailed.proposals}`);
-  }
+  console.log(`${proposalsFailed.proposals.length} proposals failed`);
+  proposalsFailed.proposals.map((proposal) => {
+    allErrors.set(`Proposal ${proposal.id} with title ${proposal.title}`, ValidationError.PROPOSAL_FAILED);
+    failedOrRejectedProposals.add(proposal.id);
+  })
 
   // Wait for prices to update.
   console.log('\nWaiting for 300 seconds for prices to update...');
@@ -467,21 +496,24 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
   console.log('\nChecking price, clob pair, and perpetual on chain for each market proposed...');
   for (const [marketId, proposal] of marketsProposed.entries()) {
     console.log(`\nChecking ${proposal?.params?.ticker}`);
+    if (failedOrRejectedProposals.has(proposal.id)) {
+      console.log(`Skipping proposal ${proposal.id} as it failed or was rejected.`);
+      continue;
+    }
+
     const isDydxUsd = proposal.params.ticker.toLowerCase() === 'dydx-usd';
     // Validate price.
     const price = await client.validatorClient.get.getPrice(isDydxUsd ? 1000001 : marketId);
-    validatePrice(price.marketPrice!, proposal);
+    validatePrice(price.marketPrice!, proposal, allErrors);
 
     // Validate clob pair.
     const clobPair = await client.validatorClient.get.getClobPair(marketId);
-    validateClobPair(clobPair.clobPair!, proposal);
+    validateClobPair(clobPair.clobPair!, proposal, allErrors);
 
     // Validate perpetual.
     const perpetual = await client.validatorClient.get.getPerpetual(marketId);
-    validatePerpetual(perpetual.perpetual!, proposal);
+    validatePerpetual(perpetual.perpetual!, proposal, allErrors);
   }
-
-  console.log(`\nValidated ${marketsProposed.size} proposals against localnet`);
 
   // for all markets proposed, determine if the slinky metrics are ok
   for (const proposal of marketsProposed.values()) {
@@ -493,6 +525,18 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
       );
     }
   }
+
+  // Print all errors.
+  console.log(`\nValidated ${marketsProposed.size} markets against localnet`);
+  if (allErrors.size === 0) {
+    console.log('All markets validated successfully');
+    return;
+  }
+  console.log(`\nPrinting out ${allErrors.size} errors:`);
+  allErrors.forEach((k, v) => {
+    console.log(`${k}: ${v}`);
+  });
+  throw new Error('Errors occurred while validating markets');
 }
 
 // convert a ticker like BTC-USD -> btc/usd
@@ -577,33 +621,36 @@ function makePrometheusRateQuery(
     });
 }
 
-function validatePrice(price: MarketPrice, proposal: Proposal): void {
+function validatePrice(price: MarketPrice, proposal: Proposal, allErrors: Map<String, ValidationError>): void {
+  const ticker = proposal?.params?.ticker;
   if (price.exponent !== proposal.params.priceExponent) {
-    throw new Error(`Price exponent mismatch for price ${price.id}`);
+    allErrors.set(`Price ${price.id.toString()} with ticker ${ticker}`, ValidationError.PRICE_EXPONENT_MISMATCH);
   }
   if (price.price.isZero()) {
-    throw new Error(`Price is 0 for price ${price.id}`);
+    allErrors.set(`Price ${price.id.toString()} with ticker ${ticker}`, ValidationError.PRICE_ZERO);
   }
 }
 
-function validateClobPair(clobPair: ClobPair, proposal: Proposal): void {
+function validateClobPair(clobPair: ClobPair, proposal: Proposal, allErrors: Map<String, ValidationError>): void {
+  const ticker = proposal?.params?.ticker;
   if (clobPair.quantumConversionExponent !== proposal.params.quantumConversionExponent) {
-    throw new Error(`Quantum conversion exponent mismatch for clob pair ${clobPair.id}`);
+    allErrors.set(`Clob pair ${clobPair.id.toString()} with ticker ${ticker}`, ValidationError.CLOB_QCE_MISMATCH);
   }
   if (!clobPair.stepBaseQuantums.equals(proposal.params.stepBaseQuantums)) {
-    throw new Error(`Step base quantums mismatch for clob pair ${clobPair.id}`);
+    allErrors.set(`Clob pair ${clobPair.id.toString()} with ticker ${ticker}`, ValidationError.CLOB_SBQ_MISMATCH);
   }
   if (clobPair.subticksPerTick !== proposal.params.subticksPerTick) {
-    throw new Error(`Subticks per tick mismatch for clob pair ${clobPair.id}`);
+    allErrors.set(`Clob pair ${clobPair.id.toString()} with ticker ${ticker}`, ValidationError.CLOB_SPT_MISMATCH);
   }
 }
 
-function validatePerpetual(perpetual: Perpetual, proposal: Proposal): void {
+function validatePerpetual(perpetual: Perpetual, proposal: Proposal, allErrors: Map<String, ValidationError>): void {
+  const ticker = proposal?.params?.ticker;
   if (perpetual.params!.atomicResolution !== proposal.params.atomicResolution) {
-    throw new Error(`Atomic resolution mismatch for perpetual ${perpetual.params!.id}`);
+    allErrors.set(`Perpetual ${perpetual.params!.id.toString()} with ticker ${ticker}`, ValidationError.PERP_AR_MISMATCH);
   }
   if (perpetual.params!.liquidityTier !== proposal.params.liquidityTier) {
-    throw new Error(`Liquidity tier mismatch for perpetual ${perpetual.params!.id}`);
+    allErrors.set(`Perpetual ${perpetual.params!.id.toString()} with ticker ${ticker}`, ValidationError.PERP_LT_MISMATCH);
   }
 }
 
