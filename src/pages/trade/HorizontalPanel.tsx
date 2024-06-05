@@ -160,7 +160,6 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
             }
             showClosePositionAction={showClosePositionAction}
             initialPageSize={initialPageSize}
-            onNavigate={() => setView(PanelView.CurrentMarket)}
             navigateToOrders={onViewOrders}
           />
         ),
