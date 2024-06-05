@@ -125,7 +125,7 @@ export const getCurrentMarketIsolatedPositionLeverage = createAppSelector(
       position.childSubaccountNumber >= NUM_PARENT_SUBACCOUNTS &&
       position.leverage?.current
     ) {
-      return Number(position.leverage.current.toFixed(LEVERAGE_DECIMALS));
+      return Math.abs(Number(position.leverage.current.toFixed(LEVERAGE_DECIMALS)));
     }
 
     return 0;
