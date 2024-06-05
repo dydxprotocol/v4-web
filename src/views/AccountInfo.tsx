@@ -50,7 +50,7 @@ const $DisconnectedAccountInfoContainer = styled.div`
   ${layoutMixins.column}
   justify-items: center;
   text-align: center;
-  gap: 1em;
+  gap: 0.5em;
 
   p {
     font: var(--font-small-book);

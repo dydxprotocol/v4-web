@@ -279,6 +279,9 @@ const $ConnectedAccountInfoContainer = styled.div<{ $showHeader?: boolean }>`
 
   @media ${breakpoints.notTablet} {
     ${layoutMixins.withOuterAndInnerBorders}
+    > *:last-child {
+      box-shadow: none;
+    }
   }
 
   ${({ $showHeader }) =>
