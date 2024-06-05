@@ -159,14 +159,16 @@ const getFillsTableColumnDef = ({
         label: stringGetter({ key: STRING_KEYS.ACTION }),
         renderCell: ({ asset, orderSide }) => (
           <$TableCell>
-            <$Side side={orderSide}>
-              {stringGetter({
-                key: {
-                  [OrderSide.BUY]: STRING_KEYS.BUY,
-                  [OrderSide.SELL]: STRING_KEYS.SELL,
-                }[orderSide ?? OrderSide.BUY],
-              })}
-            </$Side>
+            {orderSide && (
+              <$Side side={orderSide}>
+                {stringGetter({
+                  key: {
+                    [OrderSide.BUY]: STRING_KEYS.BUY,
+                    [OrderSide.SELL]: STRING_KEYS.SELL,
+                  }[orderSide],
+                })}
+              </$Side>
+            )}
             <Output type={OutputType.Text} value={asset?.id} />
           </$TableCell>
         ),
@@ -222,9 +224,8 @@ const getFillsTableColumnDef = ({
         columnKey: 'side',
         getCellValue: (row) => row.orderSide,
         label: stringGetter({ key: STRING_KEYS.SIDE }),
-        renderCell: ({ orderSide }) => (
-          <OrderSideTag orderSide={orderSide ?? OrderSide.BUY} size={TagSize.Medium} />
-        ),
+        renderCell: ({ orderSide }) =>
+          orderSide && <OrderSideTag orderSide={orderSide} size={TagSize.Medium} />,
       },
       [FillsTableColumnKey.SideLongShort]: {
         columnKey: 'side',

@@ -12,6 +12,8 @@ import type {
 } from '@/constants/abacus';
 import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
 
+import { safeAssign } from '@/lib/objectHelpers';
+
 type TradeFormInputs = typeof CLEARED_TRADE_INPUTS & typeof CLEARED_SIZE_INPUTS;
 
 export interface InputsState {
@@ -49,7 +51,7 @@ export const inputsSlice = createSlice({
         inputErrors: errors?.toArray(),
         tradeInputs: trade,
         closePositionInputs: closePosition,
-        transferInputs: Object.assign({}, transfer, {
+        transferInputs: safeAssign({}, transfer, {
           isCctp: !!transfer?.isCctp,
         }),
         triggerOrdersInputs: triggerOrders,

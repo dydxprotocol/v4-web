@@ -11,6 +11,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketOrderbook } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { safeAssign } from '@/lib/objectHelpers';
 
 export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number }) => {
   const orderbook = useAppSelector(getCurrentMarketOrderbook, shallowEqual);
@@ -24,7 +25,7 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
     )
       .map(
         (row: OrderbookLine, idx: number): PerpetualMarketOrderbookLevel =>
-          Object.assign(
+          safeAssign(
             {},
             {
               key: `ask-${idx}`,
@@ -41,7 +42,7 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
     )
       .map(
         (row: OrderbookLine, idx: number): PerpetualMarketOrderbookLevel =>
-          Object.assign(
+          safeAssign(
             {},
             {
               key: `bid-${idx}`,
@@ -103,15 +104,11 @@ export const useOrderbookValuesForDepthChart = () => {
   return useMemo(() => {
     const bids = (orderbook?.bids?.toArray() ?? [])
       .filter(Boolean)
-      .map(
-        (datum): DepthChartDatum => Object.assign({}, datum, { seriesKey: DepthChartSeries.Bids })
-      );
+      .map((datum): DepthChartDatum => safeAssign({}, datum, { seriesKey: DepthChartSeries.Bids }));
 
     const asks = (orderbook?.asks?.toArray() ?? [])
       .filter(Boolean)
-      .map(
-        (datum): DepthChartDatum => Object.assign({}, datum, { seriesKey: DepthChartSeries.Asks })
-      );
+      .map((datum): DepthChartDatum => safeAssign({}, datum, { seriesKey: DepthChartSeries.Asks }));
 
     const lowestBid = bids[bids.length - 1];
     const highestBid = bids[0];

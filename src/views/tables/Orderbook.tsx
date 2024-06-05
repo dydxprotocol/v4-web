@@ -30,6 +30,7 @@ import { getCurrentMarketConfig, getCurrentMarketOrderbook } from '@/state/perpe
 
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { MustBigNumber } from '@/lib/numbers';
+import { safeAssign } from '@/lib/objectHelpers';
 
 import { OrderbookTradesOutput, OrderbookTradesTable } from './OrderbookTradesTable';
 
@@ -60,7 +61,7 @@ const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number 
     const asks = (orderbook?.asks?.toArray() ?? [])
       .map(
         (row: OrderbookLine, idx: number): RowData =>
-          Object.assign({}, row, {
+          safeAssign({}, row, {
             key: `ask-${idx}`,
             side: 'ask' as const,
             mine: subaccountOrderSizeBySideAndPrice[OrderSide.SELL]?.[row.price],
@@ -71,7 +72,7 @@ const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number 
     const bids = (orderbook?.bids?.toArray() ?? [])
       .map(
         (row: OrderbookLine, idx: number): RowData =>
-          Object.assign({}, row, {
+          safeAssign({}, row, {
             key: `bid-${idx}`,
             side: 'bid' as const,
             mine: subaccountOrderSizeBySideAndPrice[OrderSide.BUY]?.[row.price],

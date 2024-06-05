@@ -20,6 +20,7 @@ import {
 import { setSelectedTradeLayout } from '@/state/layout';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
+import { safeAssign } from '@/lib/objectHelpers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 enum LayoutItems {
@@ -40,7 +41,7 @@ export const useGlobalCommands = (): MenuConfig<string, string> => {
   const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
 
   const joinedPerpetualMarketsAndAssets = Object.values(allPerpetualMarkets).map(
-    (market): PerpetualMarket & Asset => Object.assign({}, market, allAssets[market?.assetId] ?? {})
+    (market): PerpetualMarket & Asset => safeAssign({}, market, allAssets[market?.assetId] ?? {})
   );
 
   return [

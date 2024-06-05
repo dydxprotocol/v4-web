@@ -14,7 +14,7 @@ import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
-import { objectKeys } from '@/lib/objectHelpers';
+import { objectKeys, safeAssign } from '@/lib/objectHelpers';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 const filterFunctions = {
@@ -80,7 +80,7 @@ export const useMarketsData = (
           listingDate.setHours(listingDate.getHours() - sevenDaySparklineEntries * 4);
         }
 
-        return Object.assign(
+        return safeAssign(
           {},
           {
             asset: allAssets[marketData.assetId] ?? {},
