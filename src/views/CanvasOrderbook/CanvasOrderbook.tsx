@@ -17,7 +17,7 @@ import { Canvas } from '@/components/Canvas';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Tag } from '@/components/Tag';
 
-import { useAppSelector, useAppDispatch } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
@@ -123,12 +123,12 @@ export const CanvasOrderbook = forwardRef(
         <$OrderbookContent $isLoading={!hasOrderbook}>
           <$Header>
             <span>
-              {stringGetter({ key: STRING_KEYS.SIZE })} {id && <Tag>{id}</Tag>}
-            </span>
-            <span>
               {stringGetter({ key: STRING_KEYS.PRICE })} <Tag>USD</Tag>
             </span>
-            <span>{stringGetter({ key: STRING_KEYS.MINE })}</span>
+            <span>
+              {stringGetter({ key: STRING_KEYS.SIZE })} {id && <Tag>{id}</Tag>}
+            </span>
+            <span>{stringGetter({ key: STRING_KEYS.TOTAL })}</span>
           </$Header>
 
           {displaySide === 'top' && (

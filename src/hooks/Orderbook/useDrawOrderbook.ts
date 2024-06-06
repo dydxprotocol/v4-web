@@ -62,6 +62,7 @@ export const useDrawOrderbook = ({
   const [canvasWidth, setCanvasWidth] = useState(ORDERBOOK_WIDTH / ratio);
   const [canvasHeight, setCanvasHeight] = useState(ORDERBOOK_HEIGHT / ratio);
 
+  // Handle resize, sync to state
   useEffect(() => {
     const scaleCanvas = () => {
       if (!canvas) return;
@@ -192,21 +193,21 @@ export const useDrawOrderbook = ({
       }
     }
 
-    // Size text
-    if (size) {
-      ctx.fillStyle = updatedTextColor ?? textColor;
-      ctx.fillText(
-        MustBigNumber(size).toFixed(stepSizeDecimals ?? TOKEN_DECIMALS),
-        getXByColumn({ canvasWidth, colIdx: 0 }) - ORDERBOOK_ROW_PADDING_RIGHT,
-        y
-      );
-    }
-
     // Price text
     if (price) {
       ctx.fillStyle = textColor;
       ctx.fillText(
         MustBigNumber(price).toFixed(tickSizeDecimals ?? SMALL_USD_DECIMALS),
+        getXByColumn({ canvasWidth, colIdx: 0 }) - ORDERBOOK_ROW_PADDING_RIGHT,
+        y
+      );
+    }
+
+    // Size text
+    if (size) {
+      ctx.fillStyle = updatedTextColor ?? textColor;
+      ctx.fillText(
+        MustBigNumber(size).toFixed(stepSizeDecimals ?? TOKEN_DECIMALS),
         getXByColumn({ canvasWidth, colIdx: 1 }) - ORDERBOOK_ROW_PADDING_RIGHT,
         y
       );

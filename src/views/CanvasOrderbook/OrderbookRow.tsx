@@ -51,7 +51,7 @@ export const SpreadRow = forwardRef<HTMLDivElement, StyleProps & ElementProps>(
           </WithTooltip>
         </span>
         <span>
-          <Output type={OutputType.Number} value={spread} fractionDigits={tickSizeDecimals} />
+          <Output type={OutputType.Fiat} value={spread} fractionDigits={tickSizeDecimals} />
         </span>
         <span>
           <Output type={OutputType.Percent} value={spreadPercent} />

@@ -64,6 +64,7 @@ const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number 
             key: `ask-${idx}`,
             side: 'ask',
             mine: subaccountOrderSizeBySideAndPrice[OrderSide.SELL]?.[row.price],
+            ...row,
           }) as RowData
       )
       .slice(0, maxRowsPerSide);
@@ -294,7 +295,7 @@ export const Orderbook = ({
               </td>
               {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
               <td>
-                <Output type={OutputType.Number} value={spread} fractionDigits={tickSizeDecimals} />
+                <Output type={OutputType.Fiat} value={spread} fractionDigits={tickSizeDecimals} />
               </td>
               <td>{!isTablet && <Output type={OutputType.Percent} value={spreadPercent} />}</td>
             </$SpreadTableRow>
@@ -342,11 +343,7 @@ export const Orderbook = ({
               tooltip: 'spread',
               value: (
                 <>
-                  <Output
-                    type={OutputType.Number}
-                    value={spread}
-                    fractionDigits={tickSizeDecimals}
-                  />
+                  <Output type={OutputType.Number} value={spread} />
                   {!isTablet && <Output type={OutputType.Percent} value={spreadPercent} />}
                 </>
               ),
