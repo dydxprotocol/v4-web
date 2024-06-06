@@ -42,7 +42,6 @@ import { updateNotifications } from '@/state/notifications';
 import { setHistoricalFundings, setLiveTrades, setMarkets, setOrderbook } from '@/state/perpetuals';
 
 import { isTruthy } from '../isTruthy';
-import { testFlags } from '../testFlags';
 
 class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   private store: RootStore | undefined;
@@ -143,11 +142,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         dispatch(setRestrictionType(updatedState.restriction));
       }
 
-      if (
-        changes.has(Changes.compliance) &&
-        updatedState.compliance &&
-        testFlags.enableComplianceApi
-      ) {
+      if (changes.has(Changes.compliance) && updatedState.compliance) {
         dispatch(setCompliance(updatedState.compliance));
       }
 
