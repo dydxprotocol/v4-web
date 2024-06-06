@@ -6,12 +6,10 @@ import {
   type AbacusPositionSides,
   type SubaccountOrder,
 } from '@/constants/abacus';
-import { ButtonAction, ButtonShape, ButtonSize } from '@/constants/buttons';
-import { ComplianceStates } from '@/constants/compliance';
+import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
-import { useComplianceState } from '@/hooks/useComplianceState';
 import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -19,7 +17,6 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Button } from '@/components/Button';
 import { Icon, IconName } from '@/components/Icon';
-import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
 import { TableCell } from '@/components/Table/TableCell';
 import { WithHovercard } from '@/components/WithHovercard';
@@ -28,7 +25,6 @@ import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { isStopLossOrder } from '@/lib/orders';
-import { testFlags } from '@/lib/testFlags';
 
 enum TriggerButtonState {
   Warning = 'Warning',
@@ -64,9 +60,8 @@ export const PositionsTriggersCell = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
   const { isSlTpLimitOrdersEnabled } = useEnvFeatures();
-  const { complianceState } = useComplianceState();
 
-  const onViewOrders = isDisabled ? null : () => onViewOrdersClick(marketId);
+  const onViewOrders = () => onViewOrdersClick(marketId);
 
   const showLiquidationWarning = (order: SubaccountOrder) => {
     if (!isStopLossOrder(order, isSlTpLimitOrdersEnabled) || !liquidationPrice) {
@@ -96,14 +91,14 @@ export const PositionsTriggersCell = ({
   };
 
   const viewOrdersButton = (
-    <$ViewOrdersButton
+    <$ActionButton
       action={ButtonAction.Navigation}
       size={ButtonSize.XSmall}
       onClick={onViewOrders ?? undefined}
     >
       {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
       <$ArrowIcon iconName={IconName.Arrow} />
-    </$ViewOrdersButton>
+    </$ActionButton>
   );
 
   const renderOutput = ({ label, orders }: { label: string; orders: SubaccountOrder[] }) => {
@@ -157,7 +152,18 @@ export const PositionsTriggersCell = ({
     if (orders.length === 0) {
       return (
         <>
-          {triggerLabel()} <$Output type={OutputType.Fiat} value={null} />
+          {triggerLabel()}
+          {isDisabled ? (
+            <$Output type={OutputType.Fiat} value={null} />
+          ) : (
+            <$ActionButton
+              action={ButtonAction.Primary}
+              size={ButtonSize.XSmall}
+              onClick={openTriggersDialog}
+            >
+              {stringGetter({ key: STRING_KEYS.ADD })}
+            </$ActionButton>
+          )}
         </>
       );
     }
@@ -219,22 +225,7 @@ export const PositionsTriggersCell = ({
   };
 
   return (
-    <$TableCell
-      stacked
-      stackedWithSecondaryStyling={false}
-      slotRight={
-        !isDisabled &&
-        testFlags.isolatedMargin &&
-        complianceState === ComplianceStates.FULL_ACCESS && (
-          <$EditButton
-            key="edit-margin"
-            iconName={IconName.Pencil}
-            shape={ButtonShape.Square}
-            onClick={openTriggersDialog}
-          />
-        )
-      }
-    >
+    <$TableCell stacked stackedWithSecondaryStyling={false}>
       <$Row>{renderOutput({ label: 'TP', orders: takeProfitOrders })}</$Row>
       <$Row>{renderOutput({ label: 'SL', orders: stopLossOrders })}</$Row>
     </$TableCell>
@@ -289,10 +280,12 @@ const $Output = styled(Output)<{ value: number | null }>`
         `}
 `;
 
-const $ViewOrdersButton = styled(Button)`
+const $ActionButton = styled(Button)`
   --button-height: var(--item-height);
   --button-padding: 0;
-  --button-textColor: var(--color-text-1);
+  --button-textColor: var(--color-accent);
+  --button-backgroundColor: transparent;
+  --button-border: none;
 `;
 
 const $ArrowIcon = styled(Icon)`
@@ -306,15 +299,6 @@ const $PartialFillIcon = styled.span`
     width: 0.875em;
     height: 0.875em;
   }
-`;
-
-const $EditButton = styled(IconButton)`
-  --button-icon-size: 1.5em;
-  --button-padding: 0;
-  --button-textColor: var(--color-text-0);
-  --button-hover-textColor: var(--color-text-1);
-
-  margin-left: 0.5rem;
 `;
 
 const $TableCell = styled(TableCell)`
