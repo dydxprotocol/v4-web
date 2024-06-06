@@ -2,7 +2,7 @@ import { Ref, useCallback, useState, type FormEvent } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import type { NumberFormatValues, SourceInfo } from 'react-number-format';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import {
@@ -18,7 +18,7 @@ import {
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
-import { STRING_KEYS, StringKey } from '@/constants/localization';
+import { STRING_KEYS } from '@/constants/localization';
 import { NotificationType } from '@/constants/notifications';
 import { USD_DECIMALS } from '@/constants/numbers';
 import {
@@ -36,7 +36,7 @@ import { useOnLastOrderIndexed } from '@/hooks/useOnLastOrderIndexed';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
@@ -54,6 +54,7 @@ import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithTooltip } from '@/components/WithTooltip';
 import { Orderbook } from '@/views/tables/Orderbook';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog, openDialogInTradeBox } from '@/state/dialogs';
 import { setTradeFormInputs } from '@/state/inputs';
 import {
@@ -105,7 +106,7 @@ export const TradeForm = ({
   const [placeOrderError, setPlaceOrderError] = useState<string>();
   const [showOrderbook, setShowOrderbook] = useState(false);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { placeOrder } = useSubaccount();
   const { isTablet } = useBreakpoints();
@@ -128,30 +129,32 @@ export const TradeForm = ({
     tradeErrors,
   } = useTradeFormData();
 
-  const currentInput = useSelector(getCurrentInput);
-  const currentAssetId = useSelector(getCurrentMarketAssetId);
+  const currentInput = useAppSelector(getCurrentInput);
+  const currentAssetId = useAppSelector(getCurrentMarketAssetId);
   const { tickSizeDecimals, stepSizeDecimals } =
-    useSelector(getCurrentMarketConfig, shallowEqual) || {};
+    useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
 
-  const tradeFormInputValues = useSelector(getTradeFormInputs, shallowEqual);
+  const tradeFormInputValues = useAppSelector(getTradeFormInputs, shallowEqual);
   const { limitPriceInput, triggerPriceInput, trailingPercentInput } = tradeFormInputValues;
 
-  const currentTradeData = useSelector(getInputTradeData, shallowEqual);
+  const currentTradeData = useAppSelector(getInputTradeData, shallowEqual);
 
-  const { side, type, marginMode, targetLeverage } = currentTradeData || {};
+  const { side, type, marginMode, targetLeverage } = currentTradeData ?? {};
 
   const selectedTradeType = getSelectedTradeType(type);
   const selectedOrderSide = getSelectedOrderSide(side);
 
-  const { typeOptions } = useSelector(getInputTradeOptions, shallowEqual) ?? {};
+  const { typeOptions } = useAppSelector(getInputTradeOptions, shallowEqual) ?? {};
 
-  const allTradeTypeItems = (typeOptions?.toArray() ?? []).map(({ type, stringKey }) => ({
-    value: type as TradeTypes,
-    label: stringGetter({
-      key: stringKey as StringKey,
-    }),
-    slotBefore: <AssetIcon symbol={currentAssetId} />,
-  }));
+  const allTradeTypeItems = (typeOptions?.toArray() ?? []).map(
+    ({ type: tradeTypeOptionType, stringKey }) => ({
+      value: tradeTypeOptionType as TradeTypes,
+      label: stringGetter({
+        key: stringKey ?? '',
+      }),
+      slotBefore: <AssetIcon symbol={currentAssetId} />,
+    })
+  );
 
   const onTradeTypeChange = (tradeType: TradeTypes) => {
     abacusStateManager.clearTradeInputValues();
@@ -159,23 +162,23 @@ export const TradeForm = ({
   };
 
   const needsAdvancedOptions =
-    needsGoodUntil ||
-    timeInForceOptions ||
-    executionOptions ||
-    needsPostOnly ||
-    postOnlyTooltip ||
-    needsReduceOnly ||
-    reduceOnlyTooltip;
+    !!needsGoodUntil ||
+    !!timeInForceOptions ||
+    !!executionOptions ||
+    !!needsPostOnly ||
+    !!postOnlyTooltip ||
+    !!needsReduceOnly ||
+    !!reduceOnlyTooltip;
 
   const tradeFormInputs: TradeBoxInputConfig[] = [];
 
   const isInputFilled =
     Object.values(tradeFormInputValues).some((val) => val !== '') ||
-    Object.values(price || {}).some((val) => !!val) ||
+    Object.values(price ?? {}).some((val) => !!val) ||
     [size?.size, size?.usdcSize, size?.leverage].some((val) => val != null);
 
   const hasInputErrors =
-    tradeErrors?.some((error: ValidationError) => error.type !== ErrorType.warning) ||
+    !!tradeErrors?.some((error: ValidationError) => error.type !== ErrorType.warning) ||
     currentInput !== 'trade';
 
   let alertContent;
@@ -248,7 +251,7 @@ export const TradeForm = ({
     placeOrder({
       onError: (errorParams?: { errorStringKey?: Nullable<string> }) => {
         setPlaceOrderError(
-          stringGetter({ key: errorParams?.errorStringKey || STRING_KEYS.SOMETHING_WENT_WRONG })
+          stringGetter({ key: errorParams?.errorStringKey ?? STRING_KEYS.SOMETHING_WENT_WRONG })
         );
         setCurrentStep?.(MobilePlaceOrderSteps.PlaceOrderFailed);
       },

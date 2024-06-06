@@ -16,7 +16,7 @@ import type {
 } from '@/constants/abacus';
 import { Changes } from '@/constants/abacus';
 
-import type { RootStore } from '@/state/_store';
+import { type RootStore } from '@/state/_store';
 import {
   setBalances,
   setCompliance,
@@ -26,9 +26,12 @@ import {
   setLatestOrder,
   setRestrictionType,
   setStakingBalances,
+  setStakingDelegations,
+  setStakingRewards,
   setSubaccount,
   setTradingRewards,
   setTransfers,
+  setUnbondingDelegations,
   setWallet,
 } from '@/state/account';
 import { setApiState } from '@/state/app';
@@ -39,7 +42,6 @@ import { updateNotifications } from '@/state/notifications';
 import { setHistoricalFundings, setLiveTrades, setMarkets, setOrderbook } from '@/state/perpetuals';
 
 import { isTruthy } from '../isTruthy';
-import { testFlags } from '../testFlags';
 
 class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   private store: RootStore | undefined;
@@ -91,6 +93,15 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
           );
           dispatch(setStakingBalances(stakingBalances));
         }
+        if (updatedState.account?.stakingDelegations) {
+          dispatch(setStakingDelegations(updatedState.account.stakingDelegations.toArray()));
+        }
+        if (updatedState.account?.unbondingDelegation) {
+          dispatch(setUnbondingDelegations(updatedState.account.unbondingDelegation.toArray()));
+        }
+        if (updatedState.account?.stakingRewards) {
+          dispatch(setStakingRewards(updatedState.account.stakingRewards));
+        }
       }
 
       if (changes.has(Changes.tradingRewards)) {
@@ -131,11 +142,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         dispatch(setRestrictionType(updatedState.restriction));
       }
 
-      if (
-        changes.has(Changes.compliance) &&
-        updatedState.compliance &&
-        testFlags.enableComplianceApi
-      ) {
+      if (changes.has(Changes.compliance) && updatedState.compliance) {
         dispatch(setCompliance(updatedState.compliance));
       }
 

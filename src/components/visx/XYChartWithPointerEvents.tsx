@@ -22,14 +22,14 @@ export const XYChartWithPointerEvents = ({
   const pointerContainerPosition = lastPointerMoveEvent ? localPoint(lastPointerMoveEvent) : null;
 
   const pointerChartPosition =
-    xScale &&
-    yScale &&
-    pointerContainerPosition &&
+    xScale != null &&
+    yScale != null &&
+    pointerContainerPosition != null &&
     new Point({
       // @ts-expect-error invert supposedly doesn't exist on AxisScale
-      x: xScale.invert(pointerContainerPosition?.x - getScaleBandwidth(xScale) / 2),
+      x: xScale.invert(pointerContainerPosition.x - getScaleBandwidth(xScale) / 2),
       // @ts-expect-error invert supposedly doesn't exist on AxisScale
-      y: yScale.invert(pointerContainerPosition?.y - getScaleBandwidth(yScale) / 2),
+      y: yScale.invert(pointerContainerPosition.y - getScaleBandwidth(yScale) / 2),
     });
 
   return (

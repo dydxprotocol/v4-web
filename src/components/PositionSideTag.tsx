@@ -12,7 +12,7 @@ type StyleProps = {
   size?: TagSize;
 };
 
-export const positionSideTagSign: Record<PositionSide, TagSign> = {
+const positionSideTagSign: Record<PositionSide, TagSign> = {
   [PositionSide.Long]: TagSign.Positive,
   [PositionSide.Short]: TagSign.Negative,
   [PositionSide.None]: TagSign.Neutral,
@@ -25,9 +25,9 @@ export const PositionSideTag = ({ positionSide, size }: ElementProps & StyleProp
     <Tag
       size={size}
       type={TagType.Side}
-      sign={positionSideTagSign[positionSide || PositionSide.None]}
+      sign={positionSideTagSign[positionSide ?? PositionSide.None]}
     >
-      {stringGetter({ key: POSITION_SIDE_STRINGS[positionSide || PositionSide.None] })}
+      {stringGetter({ key: POSITION_SIDE_STRINGS[positionSide ?? PositionSide.None] })}
     </Tag>
   );
 };

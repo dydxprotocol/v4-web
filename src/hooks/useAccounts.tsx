@@ -4,7 +4,6 @@ import { OfflineSigner } from '@cosmjs/proto-signing';
 import { LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
 import { AES, enc } from 'crypto-js';
-import { useDispatch, useSelector } from 'react-redux';
 
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
@@ -19,6 +18,7 @@ import {
 
 import { setOnboardingGuard, setOnboardingState } from '@/state/account';
 import { getHasSubaccount } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
@@ -39,8 +39,14 @@ export const AccountsProvider = ({ ...props }) => (
 
 export const useAccounts = () => useContext(AccountsContext)!;
 
+async function sleep(ms = 1000) {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(null), ms);
+  });
+}
+
 const useAccountsContext = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   // Wallet connection
   const {
@@ -58,7 +64,7 @@ const useAccountsContext = () => {
 
   // EVM wallet connection
   const [previousEvmAddress, setPreviousEvmAddress] = useState(evmAddress);
-  const hasSubAccount = useSelector(getHasSubaccount);
+  const hasSubAccount = useAppSelector(getHasSubaccount);
 
   useEffect(() => {
     // Wallet accounts switched
@@ -226,6 +232,8 @@ const useAccountsContext = () => {
 
           if (walletConnectionType === WalletConnectionType.Privy && authenticated && ready) {
             try {
+              // Give Privy a second to finish the auth flow before getting the signature
+              await sleep();
               const signature = await signTypedDataAsync();
 
               await setWalletFromEvmSignature(signature);

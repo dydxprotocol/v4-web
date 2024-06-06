@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
 import styled, { keyframes } from 'styled-components';
 
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
@@ -8,12 +7,13 @@ import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Icon, IconName } from '@/components/Icon';
 import { ToggleButton } from '@/components/ToggleButton';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { setIsSidebarOpen } from '@/state/layout';
 import { getIsSidebarOpen } from '@/state/layoutSelectors';
 
@@ -25,8 +25,8 @@ type ElementProps = {
 export type WithSidebarProps = ElementProps;
 
 export const WithSidebar: React.FC<WithSidebarProps> = ({ children, sidebar }) => {
-  const dispatch = useDispatch();
-  const isSidebarOpen = useSelector(getIsSidebarOpen);
+  const dispatch = useAppDispatch();
+  const isSidebarOpen = useAppSelector(getIsSidebarOpen);
   const stringGetter = useStringGetter();
 
   return (
@@ -65,8 +65,9 @@ const $Container = styled.div`
 
   --withSidebar-current-sidebarWidth: 0px;
   --withSidebar-current-contentAreaWidth: calc(
-    var(--withSidebar-containerWidth) - var(--withSidebar-gap) -
-      var(--withSidebar-current-sideAreaWidth)
+    var(--withSidebar-containerWidth) - var(--withSidebar-gap) - var(
+        --withSidebar-current-sideAreaWidth
+      )
   );
 
   &[data-state='none'] {

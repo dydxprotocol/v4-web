@@ -7,11 +7,11 @@ import { MarginUsageRing } from '@/components/MarginUsageRing';
 
 import { StoryWrapper } from '.ladle/components';
 
-export const MarginUsageRingStory: Story<{ value: number }> = (args) => {
+export const MarginUsageRingStory: Story<{ value: number }> = ({ value }: { value: number }) => {
   return (
     <StoryWrapper>
       <$Container>
-        <MarginUsageRing value={args.value / 100} />
+        <MarginUsageRing value={value / 100} />
       </$Container>
     </StoryWrapper>
   );
@@ -21,11 +21,11 @@ MarginUsageRingStory.args = {
   value: 0,
 };
 
-export const MarginUsageRingStyled: Story<{ value: number }> = (args) => {
+export const MarginUsageRingStyled: Story<{ value: number }> = ({ value }: { value: number }) => {
   return (
     <StoryWrapper>
       <$Container>
-        <$MarginUsageRing value={args.value / 100} />
+        <$MarginUsageRing value={value / 100} />
       </$Container>
     </StoryWrapper>
   );

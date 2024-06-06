@@ -1,11 +1,9 @@
 import type { Story } from '@ladle/react';
 import styled from 'styled-components';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 
 import { PositionTile } from './PositionTile';
-// eslint and prettier seem to conflict on ordering or something
-// eslint-disable-next-line import/order
 import { StoryWrapper } from '.ladle/components';
 
 export const PositionTileStory: Story<Parameters<typeof PositionTile>[0]> = (args) => (

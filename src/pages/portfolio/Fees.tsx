@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
 import { Nullable } from '@dydxprotocol/v4-abacus';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { FeeTier } from '@/constants/abacus';
@@ -11,9 +11,8 @@ import { FEE_DECIMALS } from '@/constants/numbers';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
-import { tableMixins } from '@/styles/tableMixins';
 
 import { AttachedExpandingSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
@@ -23,6 +22,7 @@ import { ColumnDef, Table } from '@/components/Table';
 import { Tag, TagSize } from '@/components/Tag';
 
 import { getUserFeeTier, getUserStats } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getFeeTiers } from '@/state/configsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
@@ -35,9 +35,9 @@ const EQUALITY_SYMBOL_MAP = {
 export const Fees = () => {
   const stringGetter = useStringGetter();
   const { isTablet, isNotTablet } = useBreakpoints();
-  const userFeeTier = useSelector(getUserFeeTier, shallowEqual);
-  const userStats = useSelector(getUserStats, shallowEqual);
-  const feeTiers = useSelector(getFeeTiers, shallowEqual);
+  const userFeeTier = useAppSelector(getUserFeeTier, shallowEqual);
+  const userStats = useAppSelector(getUserStats, shallowEqual);
+  const feeTiers = useAppSelector(getFeeTiers, shallowEqual);
 
   const volume = useMemo(() => {
     if (userStats.makerVolume30D !== undefined && userStats.takerVolume30D !== undefined) {
@@ -99,7 +99,7 @@ export const Fees = () => {
         />
 
         <$FeeTable
-          label="Fee Tiers"
+          label={stringGetter({ key: STRING_KEYS.FEE_TIERS })}
           data={feeTiers ?? []}
           getRowKey={(row: FeeTier) => row.tier}
           getRowAttributes={(row: FeeTier) => ({
@@ -109,7 +109,6 @@ export const Fees = () => {
             [
               {
                 columnKey: 'tier',
-                getCellValue: (row) => row.tier,
                 label: stringGetter({ key: STRING_KEYS.TIER }),
                 allowsSorting: false,
                 renderCell: ({ tier }) => (
@@ -125,7 +124,6 @@ export const Fees = () => {
               },
               {
                 columnKey: 'volume',
-                getCellValue: (row) => row.volume,
                 label: stringGetter({ key: STRING_KEYS.VOLUME_30D }),
                 allowsSorting: false,
                 renderCell: ({ symbol, volume: vol, makerShare, totalShare }) => (
@@ -143,7 +141,6 @@ export const Fees = () => {
               },
               isNotTablet && {
                 columnKey: 'condition',
-                getCellValue: (row) => row.volume,
                 label: stringGetter({ key: STRING_KEYS.ADDITIONAL_CONDITION }),
                 allowsSorting: false,
                 renderCell: ({ totalShare, makerShare }) =>
@@ -151,7 +148,6 @@ export const Fees = () => {
               },
               {
                 columnKey: 'maker',
-                getCellValue: (row) => row.maker,
                 label: stringGetter({ key: STRING_KEYS.MAKER }),
                 allowsSorting: false,
                 renderCell: ({ maker }) => (
@@ -164,7 +160,6 @@ export const Fees = () => {
               },
               {
                 columnKey: 'taker',
-                getCellValue: (row) => row.taker,
                 label: stringGetter({ key: STRING_KEYS.TAKER }),
                 allowsSorting: false,
                 renderCell: ({ taker }) => (
@@ -193,9 +188,6 @@ const $ContentWrapper = styled.div`
 `;
 
 const $AdditionalConditions = styled.div`
-  ${tableMixins.stackedWithSecondaryStyling}
-  justify-content: end;
-
   color: var(--color-text-0);
   font: var(--font-small-book);
 
@@ -207,6 +199,7 @@ const $AdditionalConditions = styled.div`
 const $AdditionalConditionsText = styled.span`
   display: flex;
   gap: 0.5ch;
+  justify-content: end;
 
   @media ${breakpoints.mobile} {
     display: inline;

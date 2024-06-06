@@ -45,7 +45,7 @@ export const WithTooltip = ({
   const urlConfigs = useURLConfigs();
 
   const getTooltipStrings = tooltip && tooltipStrings[tooltip];
-  if (!getTooltipStrings && !tooltipString && !slotTooltip) return <>{children}</>;
+  if (!getTooltipStrings && !tooltipString && !slotTooltip) return children;
 
   let tooltipTitle;
   let tooltipBody;

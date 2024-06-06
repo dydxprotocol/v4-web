@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 
-import { useQuery } from 'react-query';
-import { useDispatch } from 'react-redux';
+import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
@@ -24,14 +23,15 @@ import { Output, OutputType } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 import { Tag, TagSize } from '@/components/Tag';
 
+import { useAppDispatch } from '@/state/appTypes';
 import { markLaunchIncentivesSeen } from '@/state/configs';
 import { openDialog } from '@/state/dialogs';
 
-import { log } from '@/lib/telemetry';
+import { wrapAndLogError } from '@/lib/asyncUtils';
 
 export const LaunchIncentivesPanel = ({ className }: { className?: string }) => {
   const { isNotTablet } = useBreakpoints();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(markLaunchIncentivesSeen());
@@ -76,29 +76,32 @@ const EstimatedRewards = () => {
   const { dydxAddress } = useAccounts();
 
   const { data: seasonNumber } = useQuery({
-    queryKey: 'chaos_labs_season_number',
-    queryFn: async () => {
-      const resp = await fetch('https://cloud.chaoslabs.co/query/ccar-perpetuals', {
-        method: 'POST',
-        headers: {
-          'apollographql-client-name': 'dydx-v4',
-          'content-type': 'application/json',
-          protocol: 'dydx-v4',
-        },
-        body: JSON.stringify({
-          operationName: 'TradingSeasons',
-          variables: {},
-          query: `query TradingSeasons {
+    queryKey: ['chaos_labs_season_number'],
+    queryFn: wrapAndLogError(
+      async () => {
+        const resp = await fetch('https://cloud.chaoslabs.co/query/ccar-perpetuals', {
+          method: 'POST',
+          headers: {
+            'apollographql-client-name': 'dydx-v4',
+            'content-type': 'application/json',
+            protocol: 'dydx-v4',
+          },
+          body: JSON.stringify({
+            operationName: 'TradingSeasons',
+            variables: {},
+            query: `query TradingSeasons {
         tradingSeasons {
           label
         }
       }`,
-        }),
-      });
-      const seasons = (await resp.json())?.data?.tradingSeasons;
-      return seasons && seasons.length > 0 ? seasons[seasons.length - 1].label : undefined;
-    },
-    onError: (error: Error) => log('LaunchIncentives/fetchSeasonNumber', error),
+          }),
+        });
+        const seasons = (await resp.json())?.data?.tradingSeasons;
+        return seasons && seasons.length > 0 ? seasons[seasons.length - 1].label : undefined;
+      },
+      'LaunchIncentives/fetchSeasonNumber',
+      true
+    ),
   });
 
   const { data, isLoading } = useQueryChaosLabsIncentives({ dydxAddress, season: seasonNumber });
@@ -137,7 +140,7 @@ const EstimatedRewards = () => {
 
 const LaunchIncentivesContent = () => {
   const stringGetter = useStringGetter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   return (
     <$Column>
@@ -162,7 +165,7 @@ const LaunchIncentivesContent = () => {
         >
           {stringGetter({ key: STRING_KEYS.ABOUT })}
         </$AboutButton>
-        <$Button
+        <$LeaderboardButton
           action={ButtonAction.Primary}
           onClick={() => {
             dispatch(
@@ -176,7 +179,7 @@ const LaunchIncentivesContent = () => {
           slotLeft={<Icon iconName={IconName.Leaderboard} />}
         >
           {stringGetter({ key: STRING_KEYS.LEADERBOARD })}
-        </$Button>
+        </$LeaderboardButton>
       </$ButtonRow>
     </$Column>
   );
@@ -233,6 +236,11 @@ const $AboutButton = styled($Button)`
   --button-textColor: var(--color-text-2);
   --button-backgroundColor: var(--color-layer-6);
   --button-border: solid var(--border-width) var(--color-layer-7);
+  flex-grow: 1;
+`;
+
+const $LeaderboardButton = styled($Button)`
+  flex-grow: 2;
 `;
 
 const $Column = styled.div`

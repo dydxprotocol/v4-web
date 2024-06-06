@@ -1,7 +1,7 @@
 import { FormEvent, useState } from 'react';
 
 import { NumberFormatValues } from 'react-number-format';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
@@ -11,7 +11,7 @@ import { LEVERAGE_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { formMixins } from '@/styles/formMixins';
 
 import { Button } from '@/components/Button';
@@ -24,6 +24,7 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithLabel } from '@/components/WithLabel';
 
 import { getSubaccount } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getInputTradeTargetLeverage } from '@/state/inputsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
@@ -35,12 +36,12 @@ export const AdjustTargetLeverageForm = ({
   onSetTargetLeverage: (value: string) => void;
 }) => {
   const stringGetter = useStringGetter();
-  const { buyingPower } = useSelector(getSubaccount, shallowEqual) ?? {};
+  const { buyingPower } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
   /**
    * @todo: Replace with Abacus functionality
    */
-  const targetLeverage = useSelector(getInputTradeTargetLeverage);
+  const targetLeverage = useAppSelector(getInputTradeTargetLeverage);
   const [leverage, setLeverage] = useState(targetLeverage?.toString() ?? '');
   const leverageBN = MustBigNumber(leverage);
 
@@ -171,9 +172,6 @@ const $InnerInputContainer = styled.div`
   @media ${breakpoints.tablet} {
     --input-height: 2.5rem;
   }
-`;
-const $LeverageSide = styled.div`
-  cursor: pointer;
 `;
 const $ToggleGroup = styled(ToggleGroup)`
   ${formMixins.inputToggleGroup}

@@ -20,7 +20,9 @@ export type ButtonStateConfig = {
 
 type ElementProps = {
   children?: React.ReactNode;
+  // eslint-disable-next-line react/no-unused-prop-types
   href?: string;
+  // eslint-disable-next-line react/no-unused-prop-types
   onClick?: React.MouseEventHandler<HTMLButtonElement> | React.MouseEventHandler<HTMLAnchorElement>;
   slotLeft?: React.ReactNode;
   slotRight?: React.ReactNode;
@@ -61,20 +63,18 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
 
     return (
       <StyledBaseButton
-        disabled={state[ButtonState.Disabled] || state[ButtonState.Loading]}
+        disabled={!!state[ButtonState.Disabled] || !!state[ButtonState.Loading]}
         {...{ ref, action, size, shape, state, ...otherProps }}
       >
-        <>
-          {state[ButtonState.Loading] ? (
-            <LoadingDots size={3} />
-          ) : (
-            <>
-              {slotLeft}
-              {children}
-              {slotRight}
-            </>
-          )}
-        </>
+        {state[ButtonState.Loading] ? (
+          <LoadingDots size={3} />
+        ) : (
+          <>
+            {slotLeft}
+            {children}
+            {slotRight}
+          </>
+        )}
       </StyledBaseButton>
     );
   }

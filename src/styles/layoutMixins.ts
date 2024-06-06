@@ -97,6 +97,7 @@ const sticky = css`
   --stickyArea-totalInsetBottom: ;
   --stickyArea-totalInsetLeft: ;
   --stickyArea-totalInsetRight: ;
+  --stickyArea-backdropFilter: blur(10px);
 
   z-index: 1;
 
@@ -107,7 +108,7 @@ const sticky = css`
   left: var(--stickyArea-totalInsetLeft, 0px);
   right: var(--stickyArea-totalInsetRight, 0px);
 
-  backdrop-filter: blur(10px);
+  backdrop-filter: var(--stickyArea-backdropFilter);
 `;
 
 /**
@@ -828,7 +829,8 @@ export const layoutMixins = {
     gap: var(--border-width);
 
     > * {
-      box-shadow: 0 var(--border-width) var(--border-color),
+      box-shadow:
+        0 var(--border-width) var(--border-color),
         0 calc(-1 * var(--border-width)) var(--border-color);
     }
   `,

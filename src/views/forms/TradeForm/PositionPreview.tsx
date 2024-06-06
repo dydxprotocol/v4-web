@@ -1,4 +1,4 @@
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -11,6 +11,7 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { PositionTile } from '@/views/PositionTile';
 
 import { getCurrentMarketPositionData } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { getCurrentMarketData } from '@/state/perpetualsSelectors';
 
@@ -21,11 +22,11 @@ type ElementProps = {
 export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
   const stringGetter = useStringGetter();
 
-  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
-  const { configs, oraclePrice } = useSelector(getCurrentMarketData, shallowEqual) || {};
+  const { id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const { configs } = useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
   const { size: positionSize, notionalTotal } =
-    useSelector(getCurrentMarketPositionData, shallowEqual) || {};
-  const { stepSizeDecimals, tickSizeDecimals } = configs || {};
+    useAppSelector(getCurrentMarketPositionData, shallowEqual) ?? {};
+  const { stepSizeDecimals, tickSizeDecimals } = configs ?? {};
 
   return (
     <$PositionPreviewContainer>
@@ -45,7 +46,7 @@ export const PositionPreview = ({ showNarrowVariation }: ElementProps) => {
         notionalTotal={notionalTotal?.current}
         postOrderSize={positionSize?.postOrder}
         stepSizeDecimals={stepSizeDecimals}
-        symbol={id || undefined}
+        symbol={id}
         tickSizeDecimals={tickSizeDecimals}
         showNarrowVariation={showNarrowVariation}
       />

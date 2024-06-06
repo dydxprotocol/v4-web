@@ -1,4 +1,4 @@
-import React, { type MouseEvent } from 'react';
+import React from 'react';
 
 import styled, { css } from 'styled-components';
 
@@ -8,6 +8,7 @@ import {
   type Notification as NotificationDataType,
 } from '@/constants/notifications';
 
+// eslint-disable-next-line import/no-cycle
 import { useNotifications } from '@/hooks/useNotifications';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -107,7 +108,8 @@ const $Container = styled.div<{ isToast?: boolean }>`
     isToast
       ? css`
           padding: 1rem;
-          box-shadow: 0 0 0 var(--border-width) var(--color-border),
+          box-shadow:
+            0 0 0 var(--border-width) var(--color-border),
             // border
             0 0 0.5rem 0.1rem var(--color-layer-2); // shadow
         `

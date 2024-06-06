@@ -5,16 +5,21 @@ import { STRING_KEYS } from '@/constants/localization';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useURLConfigs } from '@/hooks/useURLConfigs';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Accordion } from '@/components/Accordion';
 import { Link } from '@/components/Link';
 import { Panel } from '@/components/Panel';
 
+import { isTruthy } from '@/lib/isTruthy';
+import { testFlags } from '@/lib/testFlags';
+
 export const RewardsHelpPanel = () => {
   const stringGetter = useStringGetter();
   const { tradingRewardsLearnMore } = useURLConfigs();
+
+  const tradingRewardsRehaulEnabled = testFlags.tradingRewardsRehaul;
 
   return (
     <$HelpCard
@@ -37,13 +42,43 @@ export const RewardsHelpPanel = () => {
           },
           {
             header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_QUESTION }),
-            content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_ANSWER }),
-          },
+            content: stringGetter({
+              key: STRING_KEYS.FAQ_HOW_DO_TRADING_REWARDS_WORK_ANSWER,
+              params: {
+                HERE_LINK: (
+                  <$Link href={tradingRewardsLearnMore}>
+                    {stringGetter({ key: STRING_KEYS.HERE })}
+                  </$Link>
+                ),
+              },
+            }),
+          }, // xcxc edit
           {
             header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_QUESTION }),
             content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_ANSWER }),
           },
-        ]}
+          tradingRewardsRehaulEnabled && {
+            header: stringGetter({ key: STRING_KEYS.FAQ_WHAT_IS_STAKING_QUESTION }),
+            content: stringGetter({
+              key: STRING_KEYS.FAQ_WHAT_IS_STAKING_ANSWER,
+              params: {
+                HERE_LINK: (
+                  <$Link href="https://protocolstaking.info/">
+                    {stringGetter({ key: STRING_KEYS.HERE })}
+                  </$Link>
+                ),
+              },
+            }),
+          },
+          tradingRewardsRehaulEnabled && {
+            header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_QUESTION }),
+            content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_ANSWER }),
+          },
+          tradingRewardsRehaulEnabled && {
+            header: stringGetter({ key: STRING_KEYS.FAQ_WHAT_ARE_THE_RISKS_OF_STAKING_QUESTION }),
+            content: stringGetter({ key: STRING_KEYS.FAQ_WHAT_ARE_THE_RISKS_OF_STAKING_ANSWER }),
+          },
+        ].filter(isTruthy)}
       />
     </$HelpCard>
   );
@@ -76,4 +111,9 @@ const $Header = styled.div`
     font: var(--font-medium-book);
     color: var(--color-text-2);
   }
+`;
+
+const $Link = styled(Link)`
+  --link-color: var(--color-accent);
+  display: inline-block;
 `;

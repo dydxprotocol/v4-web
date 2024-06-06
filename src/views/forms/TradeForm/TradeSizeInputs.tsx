@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
@@ -22,6 +22,7 @@ import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 import { WithTooltip } from '@/components/WithTooltip';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import {
@@ -38,21 +39,21 @@ import { MarketLeverageInput } from './MarketLeverageInput';
 
 export const TradeSizeInputs = () => {
   const [showUSDCInputOnTablet, setShowUSDCInputOnTablet] = useState(false);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
   const { isTablet } = useBreakpoints();
 
-  const { id } = useSelector(getCurrentMarketAssetData, shallowEqual) || {};
-  const inputTradeSizeData = useSelector(getInputTradeSizeData, shallowEqual);
-  const currentTradeInputOptions = useSelector(getInputTradeOptions, shallowEqual);
+  const { id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+  const inputTradeSizeData = useAppSelector(getInputTradeSizeData, shallowEqual);
+  const currentTradeInputOptions = useAppSelector(getInputTradeOptions, shallowEqual);
 
   const { stepSizeDecimals, tickSizeDecimals } =
-    useSelector(getCurrentMarketConfig, shallowEqual) || {};
-  const { size, usdcSize, leverage, input: lastEditedInput } = inputTradeSizeData || {};
-  const { needsLeverage } = currentTradeInputOptions || {};
+    useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
+  const { size, usdcSize, leverage, input: lastEditedInput } = inputTradeSizeData ?? {};
+  const { needsLeverage } = currentTradeInputOptions ?? {};
   const decimals = stepSizeDecimals ?? TOKEN_DECIMALS;
 
-  const { amountInput, usdAmountInput, leverageInput } = useSelector(
+  const { amountInput, usdAmountInput, leverageInput } = useAppSelector(
     getTradeFormInputs,
     shallowEqual
   );
@@ -95,6 +96,7 @@ export const TradeSizeInputs = () => {
     formattedValue: string;
   }) => {
     dispatch(setTradeFormInputs({ usdAmountInput: formattedValue }));
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const newUsdcAmount = MustBigNumber(floatValue).toFixed(tickSizeDecimals || USD_DECIMALS);
 
     abacusStateManager.setTradeValue({

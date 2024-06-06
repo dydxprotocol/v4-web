@@ -1,8 +1,8 @@
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import _ from 'lodash';
-import styled, { AnyStyledComponent, css } from 'styled-components';
+import { debounce } from 'lodash';
+import styled, { css } from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
 import { PositionSide } from '@/constants/trade';
@@ -35,7 +35,9 @@ export const LeverageSlider = ({
   const leverageBN = MustBigNumber(leverage);
   const maxLeverageBN = MustBigNumber(maxLeverage);
   const leverageInputBN = MustBigNumber(leverageInputValue || leverage);
-  const leverageInputNumber = isNaN(leverageInputBN.toNumber()) ? 0 : leverageInputBN.toNumber();
+  const leverageInputNumber = Number.isNaN(leverageInputBN.toNumber())
+    ? 0
+    : leverageInputBN.toNumber();
 
   const sliderConfig = useMemo(
     () => ({
@@ -71,13 +73,16 @@ export const LeverageSlider = ({
   const { min, max, midpoint } = sliderConfig[positionSide] || {};
 
   // Debounced slightly to avoid excessive updates to Abacus while still providing a smooth slide
-  const debouncedSetAbacusLeverage = useCallback(
-    _.debounce((newLeverage: number) => {
-      abacusStateManager.setTradeValue({
-        value: newLeverage,
-        field: TradeInputField.leverage,
-      });
-    }, 50),
+  const debouncedSetAbacusLeverage = useMemo(
+    () =>
+      debounce(
+        (newLeverage: number) =>
+          abacusStateManager.setTradeValue({
+            value: newLeverage,
+            field: TradeInputField.leverage,
+          }),
+        50
+      ),
     []
   );
 
@@ -122,7 +127,7 @@ const $Slider = styled(Slider)<{ midpoint?: number; orderSide: OrderSide }>`
       90deg,
       var(--color-negative) 0%,
       var(--color-layer-7)
-        ${midpoint || (orderSide === OrderSide.BUY ? 0 : orderSide === OrderSide.SELL ? 100 : 50)}%,
+        ${midpoint ?? (orderSide === OrderSide.BUY ? 0 : orderSide === OrderSide.SELL ? 100 : 50)}%,
       var(--color-positive) 100%
     );
   `}

@@ -131,7 +131,7 @@ const ButtonStyle = css<StyleProps>`
 
   --button-width: auto;
   --button-height: 2.75rem;
-  --button-padding: 0 0.625em;
+  --button-padding: 0 0.625rem;
 
   --button-textColor: var(--color-text-0);
   --button-backgroundColor: transparent;

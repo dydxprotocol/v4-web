@@ -5,7 +5,7 @@ import { type MenuItem } from '@/constants/menus';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
 

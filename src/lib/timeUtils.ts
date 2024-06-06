@@ -9,8 +9,8 @@ export const getTimestamp = (value?: BigNumberish | null) =>
     ? typeof value === 'number'
       ? value
       : typeof value === 'string'
-      ? new Date(value).getTime()
-      : new Date(value.toString()).getTime()
+        ? new Date(value).getTime()
+        : new Date(value.toString()).getTime()
     : undefined;
 
 export const getStringsForDateTimeDiff = (dateTime: DateTime) => {

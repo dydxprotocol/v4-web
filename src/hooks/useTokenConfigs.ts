@@ -1,9 +1,8 @@
-import { useSelector } from 'react-redux';
-
 import { TOKEN_CONFIG_MAP } from '@/constants/networks';
 import { DydxChainAsset } from '@/constants/wallets';
 
 import { getSelectedDydxChainId } from '@/state/appSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 export const useTokenConfigs = (): {
   tokensConfigs: {
@@ -28,7 +27,7 @@ export const useTokenConfigs = (): {
   chainTokenDecimals: number;
   chainTokenLabel: string;
 } => {
-  const selectedDydxChainId = useSelector(getSelectedDydxChainId);
+  const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
   const tokensConfigs = TOKEN_CONFIG_MAP[selectedDydxChainId];
 
   return {

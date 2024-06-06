@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import { AES } from 'crypto-js';
-import { useSelector } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { EvmDerivedAccountStatus } from '@/constants/account';
@@ -9,7 +8,6 @@ import { AlertType } from '@/constants/alerts';
 import { AnalyticsEvent } from '@/constants/analytics';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { ENVIRONMENT_CONFIG_MAP } from '@/constants/networks';
 import { DydxAddress } from '@/constants/wallets';
 
 import { useAccounts } from '@/hooks/useAccounts';
@@ -28,8 +26,6 @@ import { LoadingSpinner } from '@/components/Loading/LoadingSpinner';
 import { Switch } from '@/components/Switch';
 import { WithReceipt } from '@/components/WithReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
-
-import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { track } from '@/lib/analytics';
 import { isTruthy } from '@/lib/isTruthy';

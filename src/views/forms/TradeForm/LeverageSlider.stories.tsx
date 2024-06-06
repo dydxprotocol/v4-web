@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 import { PositionSide } from '@/constants/trade';
 
-import { breakpoints } from '@/styles';
+import breakpoints from '@/styles/breakpoints';
 
 import { LeverageSlider } from './LeverageSlider';
 import { StoryWrapper } from '.ladle/components';

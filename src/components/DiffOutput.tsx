@@ -3,11 +3,9 @@ import styled, { css } from 'styled-components';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { DiffArrow, type DiffArrowProps } from '@/components/DiffArrow';
-import { Output, OutputType, type OutputProps } from '@/components/Output';
+import { Output, type OutputProps } from '@/components/Output';
 
 import { BigNumberish } from '@/lib/numbers';
-
-export { OutputType as DiffOutputType };
 
 type ElementProps = {
   hasInvalidNewValue?: boolean;
@@ -97,7 +95,7 @@ const $DiffOutput = styled.div<{ layout: 'row' | 'column'; withDiff?: boolean }>
       column: `
         ${layoutMixins.column}
       `,
-    }[layout])}
+    })[layout]}
 
   ${({ withDiff }) =>
     withDiff &&

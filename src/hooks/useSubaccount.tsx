@@ -11,7 +11,8 @@ import {
   type LocalWallet,
 } from '@dydxprotocol/v4-client-js';
 import Long from 'long';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
+import { parseUnits } from 'viem';
 
 import type {
   AccountBalance,
@@ -37,8 +38,10 @@ import {
   setSubaccount,
 } from '@/state/account';
 import { getBalances } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
+import { isTruthy } from '@/lib/isTruthy';
 import { log } from '@/lib/telemetry';
 import { hashFromTx } from '@/lib/txUtils';
 
@@ -61,9 +64,9 @@ export const SubaccountProvider = ({ ...props }) => {
 
 export const useSubaccount = () => useContext(SubaccountContext);
 
-export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWallet }) => {
-  const dispatch = useDispatch();
-  const { usdcDenom, usdcDecimals } = useTokenConfigs();
+const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWallet }) => {
+  const dispatch = useAppDispatch();
+  const { usdcDenom, usdcDecimals, chainTokenDecimals } = useTokenConfigs();
   const { compositeClient, faucetClient } = useDydxClient();
 
   const { getFaucetFunds, getNativeTokens } = useMemo(
@@ -167,10 +170,12 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
         subaccountClient,
         amount,
         recipient,
+        memo,
       }: {
         subaccountClient: SubaccountClient;
         amount: number;
         recipient: string;
+        memo?: string;
       }) => {
         try {
           return await compositeClient?.validatorClient.post.send(
@@ -187,7 +192,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
               }),
             false,
             compositeClient?.validatorClient?.post.defaultDydxGasPrice,
-            undefined,
+            memo,
             Method.BroadcastTxCommit
           );
         } catch (error) {
@@ -271,7 +276,7 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     [localDydxWallet, depositToSubaccount]
   );
 
-  const balances = useSelector(getBalances, shallowEqual);
+  const balances = useAppSelector(getBalances, shallowEqual);
   const usdcCoinBalance = balances?.[usdcDenom];
 
   useEffect(() => {
@@ -305,13 +310,13 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
   // ------ Transfer Methods ------ //
 
   const transfer = useCallback(
-    async (amount: number, recipient: string, coinDenom: string) => {
+    async (amount: number, recipient: string, coinDenom: string, memo?: string) => {
       if (!subaccountClient) {
         return undefined;
       }
       return (await (coinDenom === usdcDenom
-        ? transferFromSubaccountToAddress
-        : transferNativeToken)({ subaccountClient, amount, recipient })) as IndexedTx;
+        ? transferFromSubaccountToAddress({ subaccountClient, amount, recipient })
+        : transferNativeToken({ subaccountClient, amount, recipient, memo }))) as IndexedTx;
     },
     [subaccountClient, transferFromSubaccountToAddress, transferNativeToken]
   );
@@ -553,6 +558,124 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
     [compositeClient, localDydxWallet]
   );
 
+  // ------ Staking Methods ------ //
+  const delegate = useCallback(
+    async (validator: string, amount: number) => {
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      }
+      if (!subaccountClient?.wallet?.address) {
+        throw new Error('wallet not initialized');
+      }
+
+      const response = await compositeClient?.validatorClient.post.delegate(
+        subaccountClient,
+        subaccountClient.wallet?.address,
+        validator,
+        parseUnits(amount.toString(), chainTokenDecimals).toString()
+      );
+
+      return response;
+    },
+    [subaccountClient, compositeClient, chainTokenDecimals]
+  );
+
+  const getDelegateFee = useCallback(
+    async (validator: string, amount: number) => {
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      }
+      if (!localDydxWallet?.address) {
+        throw new Error('wallet not initialized');
+      }
+
+      const tx = await compositeClient.simulate(
+        localDydxWallet,
+        () =>
+          Promise.resolve([
+            compositeClient.validatorClient.post.delegateMsg(
+              localDydxWallet.address ?? '',
+              validator,
+              parseUnits(amount.toString(), chainTokenDecimals).toString()
+            ),
+          ]),
+        compositeClient.validatorClient.post.defaultDydxGasPrice
+      );
+
+      return tx;
+    },
+    [localDydxWallet, compositeClient, chainTokenDecimals]
+  );
+
+  const undelegate = useCallback(
+    async (amounts: Record<string, number | undefined>) => {
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      }
+      if (!localDydxWallet) {
+        throw new Error('wallet not initialized');
+      }
+
+      const msgs = Object.keys(amounts)
+        .map((validator) => {
+          const amount = amounts[validator];
+          if (!amount) {
+            return undefined;
+          }
+          return compositeClient.validatorClient.post.undelegateMsg(
+            localDydxWallet.address ?? '',
+            validator,
+            parseUnits(amount.toString(), chainTokenDecimals).toString()
+          );
+        })
+        .filter(isTruthy);
+
+      const tx = await compositeClient.send(
+        localDydxWallet,
+        () => Promise.resolve(msgs),
+        false,
+        compositeClient.validatorClient.post.defaultDydxGasPrice
+      );
+
+      return tx;
+    },
+    [localDydxWallet, compositeClient, chainTokenDecimals]
+  );
+
+  const getUndelegateFee = useCallback(
+    async (amounts: Record<string, number | undefined>) => {
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      }
+      if (!localDydxWallet) {
+        throw new Error('wallet not initialized');
+      }
+
+      const msgs = Object.keys(amounts)
+        .map((validator) => {
+          const amount = amounts[validator];
+          if (!amount) {
+            return undefined;
+          }
+          return compositeClient.validatorClient.post.undelegateMsg(
+            localDydxWallet.address ?? '',
+            validator,
+            parseUnits(amount.toString(), chainTokenDecimals).toString()
+          );
+        })
+        .filter(isTruthy);
+
+      const tx = await compositeClient.simulate(
+        localDydxWallet,
+        () => Promise.resolve(msgs),
+        compositeClient.validatorClient.post.defaultDydxGasPrice
+      );
+
+      return tx;
+    },
+    [localDydxWallet, compositeClient, chainTokenDecimals]
+  );
+
   return {
     // Deposit/Withdraw/Faucet Methods
     deposit,
@@ -571,5 +694,11 @@ export const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: Lo
 
     // Governance Methods
     submitNewMarketProposal,
+
+    // staking methods
+    delegate,
+    getDelegateFee,
+    undelegate,
+    getUndelegateFee,
   };
 };

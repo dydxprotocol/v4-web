@@ -1,4 +1,3 @@
-import { useSelector } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { OnboardingState } from '@/constants/account';
@@ -12,6 +11,7 @@ import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getOnboardingState } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import { AccountInfoConnectedState } from './AccountInfo/AccountInfoConnectedState';
 
@@ -21,8 +21,8 @@ type StyleProps = {
 
 export const AccountInfo: React.FC = ({ className }: StyleProps) => {
   const stringGetter = useStringGetter();
-  const onboardingState = useSelector(getOnboardingState);
-  const canViewAccountInfo = useSelector(calculateCanViewAccount);
+  const onboardingState = useAppSelector(getOnboardingState);
+  const canViewAccountInfo = useAppSelector(calculateCanViewAccount);
 
   return (
     <$AccountInfoSectionContainer className={className} showAccountInfo={canViewAccountInfo}>

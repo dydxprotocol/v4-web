@@ -10,13 +10,13 @@ import { Icon, IconName } from '@/components/Icon';
 
 export const PageMenuNavigationItem = <
   MenuItemValue extends string,
-  PageMenuItemType extends string
+  PageMenuItemType extends string,
 >({
   href,
   label,
   labelRight,
 }: MenuItem<MenuItemValue, PageMenuItemType>) => (
-  <Link to={href || ''}>
+  <Link to={href ?? ''}>
     <$MenuItem>
       <div>{label}</div>
       <$RightRow>

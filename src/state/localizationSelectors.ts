@@ -1,5 +1,4 @@
-import _ from 'lodash';
-import { createSelector } from 'reselect';
+import { get } from 'lodash';
 
 import {
   EN_LOCALE_DATA,
@@ -10,7 +9,8 @@ import {
 
 import formatString from '@/lib/formatString';
 
-import type { RootState } from './_store';
+import { type RootState } from './_store';
+import { createAppSelector } from './appTypes';
 
 /**
  * @param state
@@ -46,7 +46,7 @@ export const getStringGetterForLocaleData = (
     if (isLocaleLoaded) {
       const formattedString: string =
         localeData || EN_LOCALE_DATA
-          ? _.get(localeData, props.key) || _.get(EN_LOCALE_DATA, props.key)
+          ? get(localeData, props.key) || get(EN_LOCALE_DATA, props.key)
           : '';
 
       return formatString(formattedString, props?.params);
@@ -60,7 +60,7 @@ export const getStringGetterForLocaleData = (
  * @param state
  * @returns
  */
-export const getLocaleStringGetter = createSelector(
+export const getLocaleStringGetter = createAppSelector(
   [getSelectedLocaleData, getIsLocaleLoaded],
   getStringGetterForLocaleData
 );

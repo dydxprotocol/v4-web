@@ -389,10 +389,10 @@ const $SubMenuTrigger = styled(Trigger)`
   }
 `;
 
-type navItemStyleProps = { orientation: 'horizontal' | 'vertical' };
-const NavItemTypeTemp = getSimpleStyledOutputType(NavItem, {} as navItemStyleProps);
+type NavItemStyleProps = { orientation: 'horizontal' | 'vertical' };
+const NavItemTypeTemp = getSimpleStyledOutputType(NavItem, {} as NavItemStyleProps);
 
-const $NavItem = styled(NavItem)<navItemStyleProps>`
+const $NavItem = styled(NavItem)<NavItemStyleProps>`
   ${({ subitems }) =>
     subitems?.length
       ? css`
@@ -428,7 +428,7 @@ const $NavItem = styled(NavItem)<navItemStyleProps>`
         justify-items: center;
         align-content: center;
       `,
-    }[orientation])}
+    })[orientation]}
   gap: 0.7rem 0.5rem;
 
   > span {

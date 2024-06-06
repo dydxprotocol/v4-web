@@ -6,7 +6,7 @@ export type LoadingDotsProps = {
 };
 
 // Component
-export const LoadingDots: React.FC<LoadingDotsProps> = ({ size = 1 }) => (
+export const LoadingDots: React.FC<LoadingDotsProps> = ({ size = 1 }: LoadingDotsProps) => (
   <LoadingDotsContainer size={size}>
     <i />
     <i />

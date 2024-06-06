@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import { Trigger } from '@radix-ui/react-tabs';
-import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -20,6 +19,7 @@ import { TvChart } from '@/views/charts/TvChart';
 import { LiveTrades } from '@/views/tables/LiveTrades';
 import { Orderbook } from '@/views/tables/Orderbook';
 
+import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
 enum Tab {
@@ -43,7 +43,7 @@ const TabButton = ({ value, label, icon }: { value: Tab; label: string; icon: Ic
 
 export const MobileTopPanel = () => {
   const stringGetter = useStringGetter();
-  const selectedLocale = useSelector(getSelectedLocale);
+  const selectedLocale = useAppSelector(getSelectedLocale);
 
   const [value, setValue] = useState(Tab.Account);
 

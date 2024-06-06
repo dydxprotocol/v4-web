@@ -1,4 +1,4 @@
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { Asset, PerpetualMarket } from '@/constants/abacus';
@@ -8,6 +8,7 @@ import { AppRoute } from '@/constants/routes';
 
 import { AssetIcon } from '@/components/AssetIcon';
 
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 import {
   AppColorMode,
@@ -32,11 +33,11 @@ enum NavItems {
 }
 
 export const useGlobalCommands = (): MenuConfig<string, string> => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const allPerpetualMarkets = orEmptyObj(useSelector(getPerpetualMarkets, shallowEqual));
-  const allAssets = orEmptyObj(useSelector(getAssets, shallowEqual));
+  const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
+  const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
 
   const joinedPerpetualMarketsAndAssets = Object.values(allPerpetualMarkets).map((market) => ({
     ...market,

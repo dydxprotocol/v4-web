@@ -37,13 +37,11 @@ export const SingleSessionNotificationTypes = [
   NotificationType.OrderStatus,
 ];
 
-export enum NotificationComponentType {}
-
 export type NotificationId = string | number;
 
 export type NotificationTypeConfig<
   NotificationIdType extends NotificationId = string,
-  NotificationUpdateKey = any
+  NotificationUpdateKey = any,
 > = {
   type: NotificationType;
 
@@ -97,7 +95,7 @@ export enum NotificationStatus {
 /** Notification state. Serialized and cached into localStorage. */
 export type Notification<
   NotificationIdType extends NotificationId = string,
-  NotificationUpdateKey = any
+  NotificationUpdateKey = any,
 > = {
   id: NotificationIdType;
   type: NotificationType;
@@ -185,8 +183,9 @@ export type TransferNotifcation = {
 
 export enum ReleaseUpdateNotificationIds {
   RevampedConditionalOrders = 'revamped-conditional-orders',
-  IncentivesS4 = 'incentives-s4',
+  IncentivesS5 = 'incentives-s5',
   IncentivesDistributedS3 = 'incentives-distributed-s3',
+  FOKDeprecation = 'fok-deprecation',
 }
 
 /**

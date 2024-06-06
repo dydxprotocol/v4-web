@@ -9,13 +9,6 @@ export const getAssets = (state: RootState) => state.assets.assets;
 
 /**
  *
- * @param assetId
- * @returns Asset data of the specified AssetId
- */
-export const getAssetData = (assetId: string) => (state: RootState) => getAssets(state)?.[assetId];
-
-/**
- *
  * @param state
  * @returns Asset data of the current MarketId
  */

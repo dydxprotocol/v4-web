@@ -1,4 +1,3 @@
-import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
@@ -20,8 +19,6 @@ import { Panel } from '@/components/Panel';
 import { VerticalSeparator } from '@/components/Separator';
 import { Tag } from '@/components/Tag';
 import { WithReceipt } from '@/components/WithReceipt';
-
-import { getSelectedNetwork } from '@/state/appSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 
