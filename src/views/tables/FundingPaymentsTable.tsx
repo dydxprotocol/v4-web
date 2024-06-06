@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import type { Asset, SubaccountFundingPayment } from '@/constants/abacus';
+import type { Asset, Nullable, SubaccountFundingPayment } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 import { EMPTY_ARR } from '@/constants/objects';
 
@@ -24,6 +24,7 @@ import { useAppSelector } from '@/state/appTypes';
 import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
+import { isTruthy } from '@/lib/isTruthy';
 import { MustBigNumber } from '@/lib/numbers';
 import { getHydratedTradingData } from '@/lib/orders';
 import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
@@ -39,9 +40,9 @@ type StyleProps = {
 };
 
 export type FundingPaymentTableRow = {
-  asset: Asset;
-  stepSizeDecimals: number;
-  tickSizeDecimals: number;
+  asset: Nullable<Asset>;
+  stepSizeDecimals: Nullable<number>;
+  tickSizeDecimals: Nullable<number>;
 } & SubaccountFundingPayment;
 
 export const FundingPaymentsTable = ({
@@ -60,13 +61,14 @@ export const FundingPaymentsTable = ({
   const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
   const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
 
-  const fundingPaymentsData = fundingPayments.map((fundingPayment: SubaccountFundingPayment) =>
-    getHydratedTradingData({
-      data: fundingPayment,
-      assets: allAssets,
-      perpetualMarkets: allPerpetualMarkets,
-    })
-  ) as FundingPaymentTableRow[];
+  const fundingPaymentsData = fundingPayments.map(
+    (fundingPayment: SubaccountFundingPayment): FundingPaymentTableRow =>
+      getHydratedTradingData({
+        data: fundingPayment,
+        assets: allAssets,
+        perpetualMarkets: allPerpetualMarkets,
+      })
+  );
 
   return (
     <$Table
@@ -81,7 +83,7 @@ export const FundingPaymentsTable = ({
             getCellValue: (row) => row.marketId,
             label: stringGetter({ key: STRING_KEYS.MARKET }),
             renderCell: ({ asset, marketId }) => (
-              <MarketTableCell asset={asset} marketId={marketId} />
+              <MarketTableCell asset={asset ?? undefined} marketId={marketId} />
             ),
           },
           {
@@ -124,7 +126,7 @@ export const FundingPaymentsTable = ({
                   type={OutputType.Asset}
                   value={Math.abs(positionSize)}
                   fractionDigits={stepSizeDecimals}
-                  tag={asset.id}
+                  tag={asset?.id}
                 />
                 <$Output
                   type={OutputType.Text}
@@ -146,8 +148,8 @@ export const FundingPaymentsTable = ({
               <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />
             ),
           },
-        ] as ColumnDef<FundingPaymentTableRow>[]
-      ).filter(Boolean)}
+        ] satisfies Array<false | ColumnDef<FundingPaymentTableRow>>
+      ).filter(isTruthy)}
       slotEmpty={<h4>{stringGetter({ key: STRING_KEYS.FUNDING_PAYMENTS_EMPTY_STATE })}</h4>}
       initialPageSize={initialPageSize}
       withOuterBorder={withOuterBorder}

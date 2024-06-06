@@ -73,10 +73,10 @@ export enum OrdersTableColumnKey {
 }
 
 export type OrderTableRow = {
-  asset: Asset;
-  stepSizeDecimals: number;
-  tickSizeDecimals: number;
-  orderSide: OrderSide;
+  asset: Nullable<Asset>;
+  stepSizeDecimals: Nullable<number>;
+  tickSizeDecimals: Nullable<number>;
+  orderSide?: Nullable<OrderSide>;
 } & SubaccountOrder;
 
 const getOrdersTableColumnDef = ({
@@ -102,7 +102,9 @@ const getOrdersTableColumnDef = ({
         columnKey: 'marketId',
         getCellValue: (row) => row.marketId,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
-        renderCell: ({ asset, marketId }) => <MarketTableCell asset={asset} marketId={marketId} />,
+        renderCell: ({ asset, marketId }) => (
+          <MarketTableCell asset={asset ?? undefined} marketId={marketId} />
+        ),
       },
       [OrdersTableColumnKey.Status]: {
         columnKey: 'status',
@@ -130,7 +132,9 @@ const getOrdersTableColumnDef = ({
         columnKey: 'side',
         getCellValue: (row) => row.orderSide,
         label: stringGetter({ key: STRING_KEYS.SIDE }),
-        renderCell: ({ orderSide }) => <OrderSideTag orderSide={orderSide} size={TagSize.Medium} />,
+        renderCell: ({ orderSide }) => (
+          <OrderSideTag orderSide={orderSide ?? OrderSide.BUY} size={TagSize.Medium} />
+        ),
       },
       [OrdersTableColumnKey.AmountFill]: {
         columnKey: 'size',
@@ -147,12 +151,16 @@ const getOrdersTableColumnDef = ({
             <Output
               type={OutputType.Asset}
               value={size}
-              fractionDigits={stepSizeDecimals < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals}
+              fractionDigits={
+                (stepSizeDecimals ?? 0) < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals
+              }
             />
             <Output
               type={OutputType.Asset}
               value={totalFilled}
-              fractionDigits={stepSizeDecimals < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals}
+              fractionDigits={
+                (stepSizeDecimals ?? 0) < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals
+              }
             />
           </TableCell>
         ),
@@ -342,13 +350,14 @@ export const OrdersTable = ({
 
   const ordersData = useMemo(
     () =>
-      orders.map((order: SubaccountOrder) =>
-        getHydratedTradingData({
-          data: order,
-          assets: allAssets,
-          perpetualMarkets: allPerpetualMarkets,
-        })
-      ) as OrderTableRow[],
+      orders.map(
+        (order: SubaccountOrder): OrderTableRow =>
+          getHydratedTradingData({
+            data: order,
+            assets: allAssets,
+            perpetualMarkets: allPerpetualMarkets,
+          })
+      ),
     [orders, allPerpetualMarkets, allAssets]
   );
 
@@ -425,16 +434,17 @@ const $SecondaryColor = styled.span`
   color: var(--color-text-0);
 `;
 
-const $Side = styled.span<{ side: OrderSide }>`
+const $Side = styled.span<{ side?: OrderSide | null }>`
   ${({ side }) =>
-    ({
+    side &&
+    {
       [OrderSide.BUY]: css`
         color: var(--color-positive);
       `,
       [OrderSide.SELL]: css`
         color: var(--color-negative);
       `,
-    })[side]};
+    }[side]};
 `;
 
 const $EmptyIcon = styled(Icon)`
