@@ -4,7 +4,7 @@ import { timeUnits } from './time';
 
 export const mockHistoricalFundingData = Array.from(
   { length: 100 },
-  (_, i) =>
+  (_, i): MarketHistoricalFunding =>
     ({
       effectiveAtMilliseconds:
         timeUnits.hour * Math.floor(Date.now() / timeUnits.hour) - (100 - i - 1) * timeUnits.hour,

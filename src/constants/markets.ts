@@ -1,9 +1,9 @@
-import { Asset, PerpetualMarket } from '@/constants/abacus';
+import { Asset, Nullable, PerpetualMarket } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
 
 export type MarketData = {
   asset: Asset;
-  tickSizeDecimals: number;
+  tickSizeDecimals: Nullable<number>;
   oneDaySparkline?: number[];
   isNew?: boolean;
   listingDate?: Date;
