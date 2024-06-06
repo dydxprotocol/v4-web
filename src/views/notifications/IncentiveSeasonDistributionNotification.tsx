@@ -1,5 +1,9 @@
 import styled from 'styled-components';
 
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
+
 import { Details } from '@/components/Details';
 import { Icon, IconName } from '@/components/Icon';
 // eslint-disable-next-line import/no-cycle
@@ -20,6 +24,7 @@ export const IncentiveSeasonDistributionNotification = ({
   data,
   notification,
 }: IncentiveSeasonDistributionNotificationProps) => {
+  const stringGetter = useStringGetter();
   const { chainTokenLabel, points } = data;
 
   return (
@@ -27,13 +32,19 @@ export const IncentiveSeasonDistributionNotification = ({
       isToast={isToast}
       notification={notification}
       slotIcon={<Icon iconName={IconName.RewardStar} />}
-      slotTitle="Season 3 launch rewards have been distributed!"
+      slotTitle={stringGetter({
+        key: 'NOTIFICATIONS.REWARDS_DISTRIBUTED.TITLE',
+        params: { SEASON_NUMBER: 4 },
+      })}
       slotCustomContent={
         <$Details
           items={[
             {
               key: 'season_distribution',
-              label: 'Season 3 rewards',
+              label: stringGetter({
+                key: STRING_KEYS.LAUNCH_INCENTIVES_SEASON_REWARDS,
+                params: { SEASON_NUMBER: 4 },
+              }),
               value: <$Output type={OutputType.Asset} value={points} tag={chainTokenLabel} />,
             },
           ]}

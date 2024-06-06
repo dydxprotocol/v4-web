@@ -184,7 +184,7 @@ export type TransferNotifcation = {
 export enum ReleaseUpdateNotificationIds {
   RevampedConditionalOrders = 'revamped-conditional-orders',
   IncentivesS5 = 'incentives-s5',
-  IncentivesDistributedS3 = 'incentives-distributed-s3',
+  IncentivesDistributedS4 = 'incentives-distributed-s4',
   FOKDeprecation = 'fok-deprecation',
 }
 
