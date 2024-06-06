@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
 
 import type { PerpetualMarketOrderbookLevel } from '@/constants/abacus';
@@ -24,6 +25,8 @@ import {
   getXByColumn,
   getYForElements,
 } from '@/lib/orderbookHelpers';
+
+import { useLocaleSeparators } from '../useLocaleSeparators';
 
 type ElementProps = {
   data: Array<PerpetualMarketOrderbookLevel | undefined>;
@@ -54,6 +57,9 @@ export const useDrawOrderbook = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvas = canvasRef.current;
   const currentOrderbookMap = useAppSelector(getCurrentMarketOrderbookMap, shallowEqual);
+  const { decimal: LOCALE_DECIMAL_SEPARATOR, group: LOCALE_GROUP_SEPARATOR } =
+    useLocaleSeparators();
+
   const { stepSizeDecimals = TOKEN_DECIMALS, tickSizeDecimals = SMALL_USD_DECIMALS } =
     useAppSelector(getCurrentMarketConfig, shallowEqual) ?? {};
   const prevData = useRef<typeof data>(data);
@@ -210,11 +216,28 @@ export const useDrawOrderbook = ({
       }
     }
 
+    const format = {
+      decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
+      ...{
+        groupSeparator: LOCALE_GROUP_SEPARATOR,
+        groupSize: 3,
+        secondaryGroupSize: 0,
+        fractionGroupSeparator: ' ',
+        fractionGroupSize: 0,
+      },
+    };
+
     // Price text
     if (price) {
       ctx.fillStyle = textColor;
       ctx.fillText(
-        MustBigNumber(price).toFixed(tickSizeDecimals ?? SMALL_USD_DECIMALS),
+        MustBigNumber(price).toFormat(
+          tickSizeDecimals ?? SMALL_USD_DECIMALS,
+          BigNumber.ROUND_HALF_UP,
+          {
+            ...format,
+          }
+        ),
         getXByColumn({ canvasWidth, colIdx: 0 }) - ORDERBOOK_ROW_PADDING_RIGHT,
         y
       );
@@ -230,7 +253,9 @@ export const useDrawOrderbook = ({
     if (displaySize) {
       ctx.fillStyle = updatedTextColor ?? textColor;
       ctx.fillText(
-        MustBigNumber(displaySize).toFixed(decimalPlaces),
+        MustBigNumber(displaySize).toFormat(decimalPlaces, BigNumber.ROUND_HALF_UP, {
+          ...format,
+        }),
         getXByColumn({ canvasWidth, colIdx: 1 }) - ORDERBOOK_ROW_PADDING_RIGHT,
         y
       );
@@ -241,7 +266,9 @@ export const useDrawOrderbook = ({
     if (displayDepth) {
       ctx.fillStyle = textColor;
       ctx.fillText(
-        MustBigNumber(displayDepth).toFixed(decimalPlaces),
+        MustBigNumber(displayDepth).toFormat(decimalPlaces, BigNumber.ROUND_HALF_UP, {
+          ...format,
+        }),
         getXByColumn({ canvasWidth, colIdx: 2 }) - ORDERBOOK_ROW_PADDING_RIGHT,
         y
       );

@@ -20,7 +20,11 @@ import { getHydratedPositionData } from '@/lib/positions';
 import { type RootState } from './_store';
 import { createAppSelector } from './appTypes';
 import { getAssets } from './assetsSelectors';
-import { getCurrentMarketId, getPerpetualMarkets } from './perpetualsSelectors';
+import {
+  getCurrentMarketId,
+  getCurrentMarketOrderbook,
+  getPerpetualMarkets,
+} from './perpetualsSelectors';
 
 /**
  * @param state
@@ -267,16 +271,21 @@ export const getSubaccountOpenStatusOrders = createAppSelector([getSubaccountOrd
 );
 
 export const getSubaccountOrderSizeBySideAndPrice = createAppSelector(
-  [getSubaccountOpenStatusOrders],
-  (openOrders = []) => {
+  [getSubaccountOpenStatusOrders, getCurrentMarketOrderbook],
+  (openOrders = [], book = undefined) => {
+    const tickSize = book?.grouping?.tickSize;
     const orderSizeBySideAndPrice: Partial<Record<OrderSide, Record<number, number>>> = {};
     openOrders.forEach((order: SubaccountOrder) => {
       const side = ORDER_SIDES[order.side.name];
       const byPrice = (orderSizeBySideAndPrice[side] ??= {});
-      if (byPrice[order.price]) {
-        byPrice[order.price] += order.size;
+
+      const priceOrderbookTick = tickSize
+        ? Math.floor(order.price / tickSize) * tickSize
+        : order.price;
+      if (byPrice[priceOrderbookTick]) {
+        byPrice[priceOrderbookTick] += order.size;
       } else {
-        byPrice[order.price] = order.size;
+        byPrice[priceOrderbookTick] = order.size;
       }
     });
     return orderSizeBySideAndPrice;
