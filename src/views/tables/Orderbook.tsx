@@ -58,10 +58,7 @@ const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number 
     useAppSelector(getSubaccountOrderSizeBySideAndPrice, shallowEqual) || {};
 
   return useMemo(() => {
-    const allAsks = orderbook?.asks?.toArray() ?? [];
-    // const askSizes = allAsks.map((a) => a.size);
-    // const askSums = allAsks;
-    const asks = allAsks
+    const asks = (orderbook?.asks?.toArray() ?? [])
       .map(
         (row: OrderbookLine, idx: number): RowData =>
           safeAssign({}, row, {
@@ -340,7 +337,7 @@ export const Orderbook = ({
               tooltip: 'spread',
               value: (
                 <>
-                  <Output type={OutputType.Number} value={spread} />
+                  <Output type={OutputType.Fiat} value={spread} fractionDigits={tickSizeDecimals} />
                   {!isTablet && <Output type={OutputType.Percent} value={spreadPercent} />}
                 </>
               ),
