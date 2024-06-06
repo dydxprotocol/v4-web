@@ -1266,11 +1266,6 @@
           "adjustByMarket": "USDT-USD"
         },
         {
-          "exchangeName": "Huobi",
-          "ticker": "wifusdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
           "exchangeName": "Kraken",
           "ticker": "WIFUSD"
         },
@@ -4493,11 +4488,6 @@
           "exchangeName": "Kucoin",
           "ticker": "XEC-USDT",
           "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "Okx",
-          "ticker": "XEC-USDT",
-          "adjustByMarket": "USDT-USD"
         }
       ],
       "liquidityTier": 2,
@@ -4514,7 +4504,7 @@
     },
     "meta": {
       "assetName": "eCash",
-      "referencePrice": 4.710245696799576e-05,
+      "referencePrice": 4.710371660411801e-05,
       "cmcId": 10791.0
     }
   },
