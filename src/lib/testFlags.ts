@@ -36,10 +36,6 @@ class TestFlags {
     return !!this.queryParams.withnewmarkettype;
   }
 
-  get enableComplianceApi() {
-    return !!this.queryParams.complianceapi;
-  }
-
   get enableStaking() {
     return !!this.queryParams.staking;
   }

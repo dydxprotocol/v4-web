@@ -43,6 +43,8 @@ jobs:
       - name: Start v4 localnet
         run: |
           cd v4-chain/protocol
+          sed -i '/\.consensus\.timeout_commit.*-v '\''5s'\''/s/5s/1s/' testing/testnet-local/local.sh
+          sed -i '/  datadog-agent:/,/    ports:/d; /^      - "8125:8215"/d; /^      - "8126:8126"/d' docker-compose.yml
           echo "Building v4-chain/protocol..."
           make build
           echo "Starting localnet..."
