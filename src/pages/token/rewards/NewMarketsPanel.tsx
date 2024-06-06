@@ -70,9 +70,7 @@ export const NewMarketsPanel = ({ className }: { className?: string }) => {
   return (
     <RewardsNavPanel
       title={stringGetter({
-        key: stakingEnabled
-          ? STRING_KEYS.ADD_NEW_MARKET_CAPITALIZED
-          : STRING_KEYS.ADD_A_MARKET,
+        key: stakingEnabled ? STRING_KEYS.ADD_NEW_MARKET_CAPITALIZED : STRING_KEYS.ADD_A_MARKET,
       })}
       titleTag={stakingEnabled ? undefined : stringGetter({ key: STRING_KEYS.NEW })}
       description={description}
