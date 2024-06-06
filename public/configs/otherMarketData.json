@@ -17952,7 +17952,8 @@
         },
         {
           "exchangeName": "Kucoin",
-          "ticker": "KARRAT-USDT"
+          "ticker": "KARRAT-USDT",
+          "adjustByMarket": "USDT-USD"
         }
       ],
       "liquidityTier": 2,
