@@ -15,9 +15,11 @@ import {
   type StringKey,
 } from '@/constants/localization';
 import {
+  CURRENT_SEASON_NUMBER,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
   NotificationDisplayData,
   NotificationType,
+  REWARD_DISTRIBUTION_SEASON_NUMBER,
   ReleaseUpdateNotificationIds,
   TransferNotificationTypes,
   type NotificationTypeConfig,
@@ -290,12 +292,12 @@ export const notificationTypes: NotificationTypeConfig[] = [
               icon: <AssetIcon symbol={chainTokenLabel} />,
               title: stringGetter({
                 key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.TITLE',
-                params: { SEASON_NUMBER: '5' },
+                params: { SEASON_NUMBER: CURRENT_SEASON_NUMBER },
               }),
               body: stringGetter({
                 key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.BODY',
                 params: {
-                  PREV_SEASON_NUMBER: '3',
+                  PREV_SEASON_NUMBER: CURRENT_SEASON_NUMBER - 2, // we generally only have data for rewards from 2 seasons ago because the new season launches before the previous season's rewards are distributed
                   DYDX_AMOUNT: '52',
                   USDC_AMOUNT: '100',
                 },
@@ -367,12 +369,12 @@ export const notificationTypes: NotificationTypeConfig[] = [
               icon: <AssetIcon symbol={chainTokenLabel} />,
               title: stringGetter({
                 key: 'NOTIFICATIONS.REWARDS_DISTRIBUTED.TITLE',
-                params: { SEASON_NUMBER: 4 },
+                params: { SEASON_NUMBER: REWARD_DISTRIBUTION_SEASON_NUMBER },
               }),
               body: stringGetter({
                 key: 'NOTIFICATIONS.REWARDS_DISTRIBUTED.BODY',
                 params: {
-                  SEASON_NUMBER: 4,
+                  SEASON_NUMBER: REWARD_DISTRIBUTION_SEASON_NUMBER,
                   DYDX_AMOUNT: dydxRewards ?? 0,
                 },
               }),

@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { REWARD_DISTRIBUTION_SEASON_NUMBER } from '@/constants/notifications';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -34,7 +35,7 @@ export const IncentiveSeasonDistributionNotification = ({
       slotIcon={<Icon iconName={IconName.RewardStar} />}
       slotTitle={stringGetter({
         key: 'NOTIFICATIONS.REWARDS_DISTRIBUTED.TITLE',
-        params: { SEASON_NUMBER: 4 },
+        params: { SEASON_NUMBER: REWARD_DISTRIBUTION_SEASON_NUMBER },
       })}
       slotCustomContent={
         <$Details
@@ -43,7 +44,7 @@ export const IncentiveSeasonDistributionNotification = ({
               key: 'season_distribution',
               label: stringGetter({
                 key: STRING_KEYS.LAUNCH_INCENTIVES_SEASON_REWARDS,
-                params: { SEASON_NUMBER: 4 },
+                params: { SEASON_NUMBER: REWARD_DISTRIBUTION_SEASON_NUMBER },
               }),
               value: <$Output type={OutputType.Asset} value={points} tag={chainTokenLabel} />,
             },

@@ -188,6 +188,10 @@ export enum ReleaseUpdateNotificationIds {
   FOKDeprecation = 'fok-deprecation',
 }
 
+// Incentives Season
+export const CURRENT_SEASON_NUMBER = 5;
+export const REWARD_DISTRIBUTION_SEASON_NUMBER = 4;
+
 /**
  * @description Struct to store whether a NotificationType belonging to each NotificationCategoryType should be triggered
  */
