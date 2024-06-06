@@ -129,7 +129,7 @@ export const DepthChart = ({
       0,
       [...bids, ...asks]
         .filter((datum) => datum.price >= newDomain[0] && datum.price <= newDomain[1])
-        .map((datum) => datum.depth)
+        .map((datum) => datum.depth ?? 0)
         .reduce((a, b) => Math.max(a, b), 0),
     ] as const;
 
@@ -141,20 +141,20 @@ export const DepthChart = ({
       let price;
       let size;
       if (point instanceof Point) {
-        const { x, y } = point as Point;
+        const { x, y } = point;
         price = x;
         size = y;
       } else {
-        const { svgPoint: { x, y } = {} } = point as EventHandlerParams<object>;
-        price = x;
-        size = y;
+        const { svgPoint: { x, y } = {} } = point;
+        price = x ?? 0;
+        size = y ?? 0;
       }
 
       return {
         side: MustBigNumber(price).lt(midMarketPrice!) ? OrderSide.BUY : OrderSide.SELL,
         price,
         size,
-      } as DepthChartPoint;
+      } satisfies DepthChartPoint;
     },
     [midMarketPrice]
   );

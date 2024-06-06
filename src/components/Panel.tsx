@@ -63,6 +63,7 @@ const $Panel = styled.section<{ onClick?: () => void }>`
   --panel-paddingX: 1rem;
   --panel-content-paddingY: var(--panel-paddingY);
   --panel-content-paddingX: var(--panel-paddingX);
+  --panel-border-radius: 0.875rem;
 
   @media ${breakpoints.notTablet} {
     --panel-paddingX: 1.5rem;
@@ -73,7 +74,7 @@ const $Panel = styled.section<{ onClick?: () => void }>`
   ${layoutMixins.row}
 
   background-color: var(--color-layer-3);
-  border-radius: 0.875rem;
+  border-radius: var(--panel-border-radius);
 
   ${({ onClick }) =>
     onClick &&

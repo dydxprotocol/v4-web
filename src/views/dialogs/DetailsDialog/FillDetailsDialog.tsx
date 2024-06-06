@@ -40,58 +40,60 @@ export const FillDetailsDialog = ({ fillId, setIsOpen }: ElementProps) => {
     tickSizeDecimals,
   } = useParameterizedSelector(getFillDetails, fillId)! ?? {};
 
-  const detailItems = [
-    {
-      key: 'market',
-      label: stringGetter({ key: STRING_KEYS.MARKET }),
-      value: marketId,
-    },
-    {
-      key: 'side',
-      label: stringGetter({ key: STRING_KEYS.SIDE }),
-      value: <OrderSideTag orderSide={orderSide!} />,
-    },
-    {
-      key: 'liquidity',
-      label: stringGetter({ key: STRING_KEYS.LIQUIDITY }),
-      value: resources.liquidityStringKey
-        ? stringGetter({ key: resources.liquidityStringKey })
-        : null,
-    },
-    {
-      key: 'amount',
-      label: stringGetter({ key: STRING_KEYS.AMOUNT }),
-      value: <Output type={OutputType.Asset} value={size} fractionDigits={stepSizeDecimals} />,
-    },
-    {
-      key: 'price',
-      label: stringGetter({ key: STRING_KEYS.PRICE }),
-      value: <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />,
-    },
-    {
-      key: 'total',
-      label: stringGetter({ key: STRING_KEYS.TOTAL }),
-      value: <Output type={OutputType.Fiat} value={MustBigNumber(price).times(size)} />,
-    },
-    {
-      key: 'fee',
-      label: stringGetter({
-        key: STRING_KEYS.FEE,
-      }),
-      value: <Output type={OutputType.Fiat} value={MustBigNumber(fee)} />,
-    },
-    {
-      key: 'created-at',
-      label: stringGetter({ key: STRING_KEYS.CREATED_AT }),
-      value: (
-        <time>
-          {DateTime.fromMillis(createdAtMilliseconds)
-            .setLocale(selectedLocale as string)
-            .toLocaleString(DateTime.DATETIME_SHORT)}
-        </time>
-      ),
-    },
-  ].filter((item) => Boolean(item.value)) as DetailsItem[];
+  const detailItems = (
+    [
+      {
+        key: 'market',
+        label: stringGetter({ key: STRING_KEYS.MARKET }),
+        value: marketId,
+      },
+      {
+        key: 'side',
+        label: stringGetter({ key: STRING_KEYS.SIDE }),
+        value: <OrderSideTag orderSide={orderSide!} />,
+      },
+      {
+        key: 'liquidity',
+        label: stringGetter({ key: STRING_KEYS.LIQUIDITY }),
+        value: resources.liquidityStringKey
+          ? stringGetter({ key: resources.liquidityStringKey })
+          : null,
+      },
+      {
+        key: 'amount',
+        label: stringGetter({ key: STRING_KEYS.AMOUNT }),
+        value: <Output type={OutputType.Asset} value={size} fractionDigits={stepSizeDecimals} />,
+      },
+      {
+        key: 'price',
+        label: stringGetter({ key: STRING_KEYS.PRICE }),
+        value: <Output type={OutputType.Fiat} value={price} fractionDigits={tickSizeDecimals} />,
+      },
+      {
+        key: 'total',
+        label: stringGetter({ key: STRING_KEYS.TOTAL }),
+        value: <Output type={OutputType.Fiat} value={MustBigNumber(price).times(size)} />,
+      },
+      {
+        key: 'fee',
+        label: stringGetter({
+          key: STRING_KEYS.FEE,
+        }),
+        value: <Output type={OutputType.Fiat} value={MustBigNumber(fee)} />,
+      },
+      {
+        key: 'created-at',
+        label: stringGetter({ key: STRING_KEYS.CREATED_AT }),
+        value: (
+          <time>
+            {DateTime.fromMillis(createdAtMilliseconds)
+              .setLocale(selectedLocale)
+              .toLocaleString(DateTime.DATETIME_SHORT)}
+          </time>
+        ),
+      },
+    ] satisfies DetailsItem[]
+  ).filter((item) => Boolean(item.value));
 
   return (
     <DetailsDialog

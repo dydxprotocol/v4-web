@@ -46,6 +46,7 @@ type StyleProps = {
   placement?: DialogPlacement;
   portalContainer?: HTMLElement;
   hasHeaderBorder?: boolean;
+  hasHeaderBlur?: boolean;
   children?: React.ReactNode;
   className?: string;
   stacked?: boolean;
@@ -84,6 +85,7 @@ export const Dialog = ({
   placement = DialogPlacement.Default,
   portalContainer,
   hasHeaderBorder = false,
+  hasHeaderBlur = true,
   withAnimation = false,
   children,
   className,
@@ -112,7 +114,7 @@ export const Dialog = ({
           $withAnimation={withAnimation}
         >
           {stacked ? (
-            <$StackedHeaderTopRow $withBorder={hasHeaderBorder}>
+            <$StackedHeaderTopRow $withBorder={hasHeaderBorder} $withBlur={hasHeaderBlur}>
               {onBack && <$BackButton onClick={onBack} />}
 
               {slotIcon}
@@ -130,7 +132,7 @@ export const Dialog = ({
               {slotHeaderInner}
             </$StackedHeaderTopRow>
           ) : (
-            <$Header $withBorder={hasHeaderBorder}>
+            <$Header $withBorder={hasHeaderBorder} $withBlur={hasHeaderBlur}>
               <$HeaderTopRow>
                 {onBack && <BackButton onClick={onBack} />}
 
@@ -383,7 +385,7 @@ const $Container = styled(Content)<{
     `}
 `;
 
-const $Header = styled.header<{ $withBorder: boolean }>`
+const $Header = styled.header<{ $withBorder: boolean; $withBlur: boolean }>`
   ${layoutMixins.stickyHeader}
 
   z-index: var(--dialog-header-z);
@@ -400,6 +402,12 @@ const $Header = styled.header<{ $withBorder: boolean }>`
       ${layoutMixins.withOuterBorder};
       background: var(--dialog-backgroundColor);
     `};
+
+  ${({ $withBlur }) =>
+    !$withBlur &&
+    css`
+      --stickyArea-backdropFilter: none;
+    `};
 `;
 
 const $HeaderTopRow = styled.div`
@@ -407,7 +415,7 @@ const $HeaderTopRow = styled.div`
   gap: var(--dialog-title-gap);
 `;
 
-const $StackedHeaderTopRow = styled.div<{ $withBorder: boolean }>`
+const $StackedHeaderTopRow = styled.div<{ $withBorder: boolean; $withBlur: boolean }>`
   ${layoutMixins.flexColumn}
   align-items: center;
   justify-content: center;
@@ -421,6 +429,12 @@ const $StackedHeaderTopRow = styled.div<{ $withBorder: boolean }>`
     css`
       ${layoutMixins.withOuterBorder};
       background: var(--dialog-backgroundColor);
+    `};
+
+  ${({ $withBlur }) =>
+    !$withBlur &&
+    css`
+      --stickyArea-backdropFilter: none;
     `};
 `;
 

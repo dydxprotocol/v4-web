@@ -172,7 +172,7 @@ export const TransferForm = ({
       } else {
         const txResponse = await transfer(
           amountBN.toNumber(),
-          recipientAddress as string,
+          recipientAddress!,
           tokensConfigs[asset]?.denom,
           memo ?? undefined
         );

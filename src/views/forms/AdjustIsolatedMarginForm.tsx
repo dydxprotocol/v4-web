@@ -26,6 +26,7 @@ import { getOpenPositionFromId, getSubaccount } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getMarketConfig } from '@/state/perpetualsSelectors';
 
+import { objectEntries } from '@/lib/objectHelpers';
 import { calculatePositionMargin } from '@/lib/tradeData';
 
 type ElementProps = {
@@ -220,7 +221,7 @@ export const AdjustIsolatedMarginForm = ({ marketId }: ElementProps) => {
       />
 
       <$ToggleGroup
-        items={Object.entries(SIZE_PERCENT_OPTIONS).map(([key, value]) => ({
+        items={objectEntries(SIZE_PERCENT_OPTIONS).map(([key, value]) => ({
           label: key,
           value: value.toString(),
         }))}
