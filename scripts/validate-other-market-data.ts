@@ -95,7 +95,7 @@ interface Params {
 }
 
 interface Proposal {
-  id: Long;
+  id: Long.Long;
   title: string;
   summary: string;
   params: Params;
@@ -464,7 +464,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
 
   // Keep track of which error occurred for which markets.
   const allErrors: Map<string, ValidationError> = new Map();
-  const failedOrRejectedProposals = new Set<Long>();
+  const failedOrRejectedProposals = new Set<Long.Long>();
 
   // Check which proposals were rejected.
   console.log('\nChecking which proposals were rejected...');
