@@ -30,7 +30,7 @@ export const NewMarketsPanel = ({ className }: { className?: string }) => {
     Number(`1e${chainTokenDecimals}`)
   );
 
-  const tradingRewardsRehaulEnabled = testFlags.tradingRewardsRehaul;
+  const stakingEnabled = testFlags.enableStaking;
   const navToMarket = useCallback(
     () => navigate(`${AppRoute.Markets}/${MarketsRoute.New}`),
     [navigate]
@@ -39,10 +39,10 @@ export const NewMarketsPanel = ({ className }: { className?: string }) => {
   if (!hasPotentialMarketsData) return null;
 
   const description = stringGetter({
-    key: tradingRewardsRehaulEnabled
+    key: stakingEnabled
       ? STRING_KEYS.ADD_NEW_MARKET_DETAILS
       : STRING_KEYS.NEW_MARKET_REWARDS_ENTRY_DESCRIPTION,
-    params: tradingRewardsRehaulEnabled
+    params: stakingEnabled
       ? {
           AMOUNT: (
             <$Output
@@ -70,11 +70,11 @@ export const NewMarketsPanel = ({ className }: { className?: string }) => {
   return (
     <RewardsNavPanel
       title={stringGetter({
-        key: tradingRewardsRehaulEnabled
+        key: stakingEnabled
           ? STRING_KEYS.ADD_NEW_MARKET_CAPITALIZED
           : STRING_KEYS.ADD_A_MARKET,
       })}
-      titleTag={tradingRewardsRehaulEnabled ? undefined : stringGetter({ key: STRING_KEYS.NEW })}
+      titleTag={stakingEnabled ? undefined : stringGetter({ key: STRING_KEYS.NEW })}
       description={description}
       onNav={navToMarket}
       className={className}

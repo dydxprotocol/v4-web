@@ -48,10 +48,6 @@ class TestFlags {
     return !!this.queryParams.staking;
   }
 
-  get tradingRewardsRehaul() {
-    return !!this.queryParams.tradingrewardsrehaul;
-  }
-
   get referrer() {
     return this.queryParams.utm_source;
   }
