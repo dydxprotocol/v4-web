@@ -33,6 +33,7 @@ type ElementProps<TabItemsValue> = {
   items: TabItem<TabItemsValue>[];
   slotToolbar?: ReactNode;
   sharedContent?: ReactNode;
+  disabled?: boolean;
   onValueChange?: (value: TabItemsValue) => void;
   onWheel?: (event: React.WheelEvent) => void;
 };
@@ -59,6 +60,7 @@ export const Tabs = <TabItemsValue extends string>({
   side = 'top',
   withBorders = true,
   withTransitions = true,
+  disabled = false,
   className,
 }: ElementProps<TabItemsValue> & StyleProps) => {
   const currentItem = items.find((item) => item.value === value);
@@ -69,7 +71,12 @@ export const Tabs = <TabItemsValue extends string>({
         {items.map((item) =>
           !item.subitems ? (
             item.customTrigger ?? (
-              <$Trigger key={item.value} value={item.value} $withBorders={withBorders}>
+              <$Trigger
+                key={item.value}
+                value={item.value}
+                $withBorders={withBorders}
+                disabled={disabled}
+              >
                 {item.label}
                 {item.tag && <Tag>{item.tag}</Tag>}
                 {item.slotRight}
@@ -84,6 +91,7 @@ export const Tabs = <TabItemsValue extends string>({
               align="end"
               $isActive={item.subitems.some((subitem) => subitem.value === value)}
               slotTrigger={<$DropdownTabTrigger value={value ?? ''} />}
+              disabled={disabled}
             >
               {item.label}
             </$DropdownSelectMenu>

@@ -3,12 +3,16 @@ import { useCallback } from 'react';
 import styled from 'styled-components';
 
 import { TradeInputField } from '@/constants/abacus';
+import { OnboardingState } from '@/constants/account';
 import { TradeTypes } from '@/constants/trade';
 
 import breakpoints from '@/styles/breakpoints';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Tabs } from '@/components/Tabs';
+
+import { getOnboardingState } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 
@@ -28,6 +32,9 @@ export const TradeBoxOrderView = () => {
 
   const { selectedTradeType, tradeTypeItems } = useTradeTypeOptions();
 
+  const onboardingState = useAppSelector(getOnboardingState);
+  const allowChangingOrderType = onboardingState === OnboardingState.AccountConnected;
+
   return (
     <$TradeBoxOrderViewContainer>
       <$TopActionsRow>
@@ -43,7 +50,7 @@ export const TradeBoxOrderView = () => {
         items={tradeTypeItems}
         onValueChange={onTradeTypeChange}
         withBorders={false}
-        // fullWidthTabs
+        disabled={!allowChangingOrderType}
         sharedContent={
           <$Container>
             <TradeForm />
