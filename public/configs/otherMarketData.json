@@ -29902,44 +29902,6 @@
       "cmcId": 22574.0
     }
   },
-  "1GBP": {
-    "title": "Add 1GBP-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a 1GBP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 642,
-      "ticker": "1GBP-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -9.0,
-      "minPriceChange": 4000,
-      "minExchanges": 1,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "Bitstamp",
-          "ticker": "1GBP/USD"
-        },
-        {
-          "exchangeName": "Kraken",
-          "ticker": "1GBPUSD"
-        }
-      ],
-      "liquidityTier": 2,
-      "atomicResolution": -6.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "poundtoken",
-      "referencePrice": 1.2777353964309646,
-      "cmcId": 21145.0
-    }
-  },
   "USDE": {
     "title": "Add USDE-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a USDE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
