@@ -17,6 +17,8 @@ import {
 import {
   CURRENT_SEASON_NUMBER,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
+  INCENTIVES_DISTRIBUTED_NOTIFICATION_ID,
+  INCENTIVES_SEASON_NOTIFICATION_ID,
   NotificationDisplayData,
   NotificationType,
   REWARD_DISTRIBUTION_SEASON_NUMBER,
@@ -287,7 +289,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       useEffect(() => {
         if (currentDate <= incentivesExpirationDate) {
           trigger(
-            ReleaseUpdateNotificationIds.IncentivesS5,
+            INCENTIVES_SEASON_NOTIFICATION_ID,
             {
               icon: <AssetIcon symbol={chainTokenLabel} />,
               title: stringGetter({
@@ -303,7 +305,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 },
               }),
               toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.IncentivesS5,
+              groupKey: INCENTIVES_SEASON_NOTIFICATION_ID,
             },
             []
           );
@@ -364,7 +366,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       useEffect(() => {
         if (dydxAddress && status === 'success') {
           trigger(
-            ReleaseUpdateNotificationIds.IncentivesDistributedS4,
+            INCENTIVES_DISTRIBUTED_NOTIFICATION_ID,
             {
               icon: <AssetIcon symbol={chainTokenLabel} />,
               title: stringGetter({
@@ -391,7 +393,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 );
               },
               toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.IncentivesDistributedS4,
+              groupKey: INCENTIVES_DISTRIBUTED_NOTIFICATION_ID,
             },
             []
           );
@@ -403,9 +405,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const navigate = useNavigate();
 
       return (notificationId: string) => {
-        if (notificationId === ReleaseUpdateNotificationIds.IncentivesS5) {
+        if (notificationId === INCENTIVES_SEASON_NOTIFICATION_ID) {
           navigate(`${chainTokenLabel}/${TokenRoute.TradingRewards}`);
-        } else if (notificationId === ReleaseUpdateNotificationIds.IncentivesDistributedS4) {
+        } else if (notificationId === INCENTIVES_DISTRIBUTED_NOTIFICATION_ID) {
           navigate(`${chainTokenLabel}/${TokenRoute.StakingRewards}`);
         }
       };

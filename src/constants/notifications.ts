@@ -191,6 +191,9 @@ export enum ReleaseUpdateNotificationIds {
 // Incentives Season
 export const CURRENT_SEASON_NUMBER = 5;
 export const REWARD_DISTRIBUTION_SEASON_NUMBER = 4;
+export const INCENTIVES_SEASON_NOTIFICATION_ID = ReleaseUpdateNotificationIds.IncentivesS5;
+export const INCENTIVES_DISTRIBUTED_NOTIFICATION_ID =
+  ReleaseUpdateNotificationIds.IncentivesDistributedS4;
 
 /**
  * @description Struct to store whether a NotificationType belonging to each NotificationCategoryType should be triggered
