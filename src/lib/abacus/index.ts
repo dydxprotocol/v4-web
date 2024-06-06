@@ -9,6 +9,7 @@ import type {
   HumanReadablePlaceOrderPayload,
   HumanReadableTriggerOrdersPayload,
   Nullable,
+  OrderbookGroupings,
   ParsingError,
   TradeInputFields,
   TransferInputFields,
@@ -354,6 +355,10 @@ class AbacusStateManager {
 
   getHistoricalTradingRewardPeriod = (): HistoricalTradingRewardsPeriods =>
     this.stateManager.historicalTradingRewardPeriod;
+
+  modifyOrderbookLevel = (grouping: OrderbookGroupings) => {
+    this.stateManager.orderbookGrouping = grouping;
+  };
 
   handleCandlesSubscription = ({
     channelId,

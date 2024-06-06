@@ -1,9 +1,16 @@
-import { forwardRef, useCallback, useMemo, useRef } from 'react';
+import { forwardRef, useCallback, useMemo, useRef, useState } from 'react';
 
+import { clamp } from 'lodash';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import { Nullable, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
+import {
+  MarketOrderbookGrouping,
+  Nullable,
+  OrderbookGrouping,
+  type PerpetualMarketOrderbookLevel,
+} from '@/constants/abacus';
+import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { ORDERBOOK_HEIGHT, ORDERBOOK_MAX_ROWS_PER_SIDE } from '@/constants/orderbook';
 
@@ -13,15 +20,20 @@ import { useCalculateOrderbookData } from '@/hooks/Orderbook/useOrderbookValues'
 import { useSpreadRowScrollListener } from '@/hooks/Orderbook/useSpreadRowScrollListener';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
+import { Button } from '@/components/Button';
 import { Canvas } from '@/components/Canvas';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
+import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
+import { ToggleGroup } from '@/components/ToggleGroup';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
+
+import abacusStateManager from '@/lib/abacus';
 
 import { OrderbookRow, SpreadRow } from './OrderbookRow';
 
@@ -41,7 +53,7 @@ export const CanvasOrderbook = forwardRef(
     }: ElementProps & StyleProps,
     ref: React.ForwardedRef<HTMLDivElement>
   ) => {
-    const { asks, bids, hasOrderbook, histogramRange, spread, spreadPercent } =
+    const { asks, bids, hasOrderbook, histogramRange, spread, spreadPercent, currentGrouping } =
       useCalculateOrderbookData({
         maxRowsPerSide,
       });
@@ -49,7 +61,7 @@ export const CanvasOrderbook = forwardRef(
     const stringGetter = useStringGetter();
     const currentMarket = useAppSelector(getCurrentMarketId) ?? '';
     const currentMarketConfig = useAppSelector(getCurrentMarketConfig, shallowEqual);
-    const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+    const { id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
 
     const { tickSizeDecimals = 2 } = currentMarketConfig ?? {};
 
@@ -104,10 +116,12 @@ export const CanvasOrderbook = forwardRef(
       [currentInput]
     );
 
+    const [displayUnit, setDisplayUnit] = useState<'fiat' | 'asset'>('asset');
     const { canvasRef: asksCanvasRef } = useDrawOrderbook({
       data: [...asksSlice].reverse(),
       histogramRange,
       histogramSide,
+      displayUnit,
       side: 'ask',
     });
 
@@ -115,20 +129,32 @@ export const CanvasOrderbook = forwardRef(
       data: bidsSlice,
       histogramRange,
       histogramSide,
+      displayUnit,
       side: 'bid',
     });
 
+    const usdTag = <Tag>USD</Tag>;
+    const assetTag = id ? <Tag>{id}</Tag> : undefined;
     return (
       <$OrderbookContainer ref={ref}>
         <$OrderbookContent $isLoading={!hasOrderbook}>
+          <$OrderbookControls
+            assetName={id}
+            selectedUnit={displayUnit}
+            setSelectedUnit={setDisplayUnit}
+            grouping={currentGrouping}
+          />
           <$Header>
             <span>
-              {stringGetter({ key: STRING_KEYS.PRICE })} <Tag>USD</Tag>
+              {stringGetter({ key: STRING_KEYS.PRICE })} {usdTag}
             </span>
             <span>
-              {stringGetter({ key: STRING_KEYS.SIZE })} {id && <Tag>{id}</Tag>}
+              {stringGetter({ key: STRING_KEYS.SIZE })} {displayUnit === 'fiat' ? usdTag : assetTag}
             </span>
-            <span>{stringGetter({ key: STRING_KEYS.TOTAL })}</span>
+            <span>
+              {stringGetter({ key: STRING_KEYS.TOTAL })}{' '}
+              {displayUnit === 'fiat' ? usdTag : assetTag}
+            </span>
           </$Header>
 
           {displaySide === 'top' && (
@@ -208,6 +234,107 @@ export const CanvasOrderbook = forwardRef(
     );
   }
 );
+
+type OrderbookControlsProps = {
+  className?: string;
+  assetName?: string;
+  selectedUnit: 'fiat' | 'asset';
+  setSelectedUnit(val: 'fiat' | 'asset'): void;
+  grouping: Nullable<MarketOrderbookGrouping>;
+};
+const OrderbookControls = ({
+  className,
+  assetName,
+  selectedUnit,
+  setSelectedUnit,
+  grouping,
+}: OrderbookControlsProps) => {
+  // const stringGetter = useStringGetter();
+  const modifyScale = useCallback(
+    (direction: number) => {
+      const start = grouping?.multiplier.ordinal ?? 0;
+      const end = clamp(start + direction, 0, 3);
+      abacusStateManager.modifyOrderbookLevel(
+        OrderbookGrouping.values().find((v) => v.ordinal === end)!
+      );
+    },
+    [grouping?.multiplier.ordinal]
+  );
+  return (
+    <$OrderbookControlsContainer className={className}>
+      <$OrderbookUnitControl>
+        {/* TODO - localization */}
+        <$OrderbookLabel>Units</$OrderbookLabel>
+        <ToggleGroup
+          items={[
+            { label: assetName ?? '', value: 'asset' as const },
+            { label: 'USD', value: 'fiat' as const },
+          ]}
+          shape={ButtonShape.Rectangle}
+          value={selectedUnit}
+          onValueChange={setSelectedUnit}
+        />
+      </$OrderbookUnitControl>
+      <$OrderbookZoomControl>
+        <Output value={grouping?.tickSize} type={OutputType.Fiat} />
+        <$ButtonGroup>
+          <Button
+            size={ButtonSize.XSmall}
+            shape={ButtonShape.Square}
+            onClick={() => modifyScale(1)}
+          >
+            -
+          </Button>
+          <Button
+            size={ButtonSize.XSmall}
+            shape={ButtonShape.Square}
+            onClick={() => modifyScale(-1)}
+          >
+            +
+          </Button>
+        </$ButtonGroup>
+      </$OrderbookZoomControl>
+    </$OrderbookControlsContainer>
+  );
+};
+const $OrderbookControls = styled(OrderbookControls)`
+  border-bottom: var(--border);
+  color: var(--color-text-0);
+  font: var(--font-small-book);
+`;
+const $OrderbookLabel = styled.div`
+  display: inline-flex;
+  align-items: center;
+`;
+const $OrderbookControlsContainer = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: var(--border-width);
+  > * {
+    padding: 0.5rem;
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+  }
+`;
+const $ButtonGroup = styled.div`
+  display: flex;
+  gap: 0.25rem;
+  > button {
+    --button-font: var(--font-medium-book);
+  }
+`;
+const $OrderbookUnitControl = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`;
+const $OrderbookZoomControl = styled.div`
+  gap: 1rem;
+  display: flex;
+  justify-content: space-between;
+  box-shadow: 0 0 0 var(--border-width) var(--border-color);
+`;
+
 const $OrderbookContainer = styled.div`
   display: flex;
   flex: 1 1 0%;

@@ -58,7 +58,10 @@ const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number 
     useAppSelector(getSubaccountOrderSizeBySideAndPrice, shallowEqual) || {};
 
   return useMemo(() => {
-    const asks = (orderbook?.asks?.toArray() ?? [])
+    const allAsks = orderbook?.asks?.toArray() ?? [];
+    // const askSizes = allAsks.map((a) => a.size);
+    // const askSums = allAsks;
+    const asks = allAsks
       .map(
         (row: OrderbookLine, idx: number): RowData =>
           safeAssign({}, row, {

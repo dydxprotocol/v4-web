@@ -52,7 +52,6 @@ import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { WithTooltip } from '@/components/WithTooltip';
-import { Orderbook } from '@/views/tables/Orderbook';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog, openDialogInTradeBox } from '@/state/dialogs';
@@ -70,6 +69,7 @@ import abacusStateManager from '@/lib/abacus';
 import { testFlags } from '@/lib/testFlags';
 import { getSelectedOrderSide, getSelectedTradeType, getTradeInputAlert } from '@/lib/tradeData';
 
+import { Orderbook } from '../tables/Orderbook';
 import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 import { PositionPreview } from './TradeForm/PositionPreview';

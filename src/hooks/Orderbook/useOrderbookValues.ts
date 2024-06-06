@@ -31,6 +31,7 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
               key: `ask-${idx}`,
               side: 'ask' as const,
               mine: subaccountOrderSizeBySideAndPrice[OrderSide.SELL]?.[row.price],
+              sizeCost: row.size * row.price,
             },
             row
           )
@@ -47,6 +48,7 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
             {
               key: `bid-${idx}`,
               side: 'bid' as const,
+              sizeCost: row.size * row.price,
               mine: subaccountOrderSizeBySideAndPrice[OrderSide.BUY]?.[row.price],
             },
             row
@@ -94,6 +96,7 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
       spreadPercent,
       histogramRange,
       hasOrderbook: !!orderbook,
+      currentGrouping: orderbook?.grouping,
     };
   }, [orderbook, subaccountOrderSizeBySideAndPrice]);
 };
