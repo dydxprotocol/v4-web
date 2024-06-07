@@ -109,8 +109,6 @@ const $OrderbookControlsContainer = styled.div`
     padding: 0.5rem;
     padding-top: 0.3rem;
     padding-bottom: 0.3rem;
-
-    border-bottom: var(--border);
   }
 `;
 const $ZoomControls = styled.div`
@@ -130,6 +128,7 @@ const $OrderbookUnitControl = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 0.5rem;
+  border-bottom: var(--border);
 `;
 
 const $OrderbookZoomControl = styled.div`
