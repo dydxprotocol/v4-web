@@ -4,14 +4,17 @@ import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
+import { AlertType } from '@/constants/alerts';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, SMALL_USD_DECIMALS } from '@/constants/numbers';
 
+import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
+import { AlertMessage } from '@/components/AlertMessage';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
@@ -29,7 +32,7 @@ import { log } from '@/lib/telemetry';
 type ElementProps = {
   validators: string[];
   usdcRewards: BigNumberish;
-  setIsOpen?: (open: boolean) => void;
+  setIsOpen: (open: boolean) => void;
 };
 
 export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: ElementProps) => {
@@ -37,11 +40,15 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
   const { usdcLabel, usdcDecimals } = useTokenConfigs();
 
   const { getWithdrawRewardFee, withdrawReward } = useSubaccount();
+  const { usdcBalance } = useAccountBalance();
 
   const { current: equity } = useAppSelector(getSubaccountEquity, shallowEqual) ?? {};
 
+  const [error, setError] = useState<string>();
   const [fee, setFee] = useState<BigNumberish>();
   const [isLoading, setIsLoading] = useState(false);
+
+  const showNotEnoughGasWarning = MustBigNumber(usdcBalance).lt(fee ?? 0);
 
   useEffect(() => {
     getWithdrawRewardFee(validators)
@@ -95,8 +102,10 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
     try {
       setIsLoading(true);
       await withdrawReward(validators);
+      setIsOpen(false);
     } catch (err) {
       log('StakeRewardDialog/withdrawReward', err);
+      setError(err.message); // TODO: OTE-400
     } finally {
       setIsLoading(false);
     }
@@ -113,6 +122,15 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
           <$AssetIcon symbol="USDC" />
         </$AssetContainer>
         <$Heading>{stringGetter({ key: STRING_KEYS.CLAIM_STAKING_REWARDS })}</$Heading>
+        {showNotEnoughGasWarning && (
+          <AlertMessage type={AlertType.Warning}>
+            {stringGetter({
+              key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS, // TODO: OTE-400
+              params: { USDC_BALANCE: usdcBalance },
+            })}
+          </AlertMessage>
+        )}
+        {error && <AlertMessage type={AlertType.Error}> {error} </AlertMessage>}
         <$WithDetailsReceipt detailItems={detailItems}>
           <Button
             action={ButtonAction.Primary}

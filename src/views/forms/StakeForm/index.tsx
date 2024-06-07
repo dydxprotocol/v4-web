@@ -173,7 +173,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
       {showNotEnoughGasWarning && (
         <AlertMessage type={AlertType.Warning}>
           {stringGetter({
-            key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS,
+            key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS, // TODO: OTE-400 update, this should be DYDX (and support both gas types)
           })}
         </AlertMessage>
       )}
