@@ -1,3 +1,4 @@
+import { Nullable } from '@dydxprotocol/v4-abacus';
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import { FundingDirection } from './markets';
@@ -12,7 +13,7 @@ export enum DepthChartSeries {
 export type DepthChartDatum = {
   size: number;
   price: number;
-  depth: number;
+  depth: Nullable<number>;
   seriesKey: DepthChartSeries;
 };
 

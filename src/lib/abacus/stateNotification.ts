@@ -6,7 +6,6 @@ import type {
   AbacusNotification,
   AbacusStateNotificationProtocol,
   AccountBalance,
-  Asset,
   Nullable,
   ParsingErrors,
   PerpetualMarket,
@@ -42,7 +41,6 @@ import { updateNotifications } from '@/state/notifications';
 import { setHistoricalFundings, setLiveTrades, setMarkets, setOrderbook } from '@/state/perpetuals';
 
 import { isTruthy } from '../isTruthy';
-import { testFlags } from '../testFlags';
 
 class AbacusStateNotifier implements AbacusStateNotificationProtocol {
   private store: RootStore | undefined;
@@ -72,11 +70,16 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         dispatch(
           setAssets(
             Object.fromEntries(
-              (updatedState?.assetIds()?.toArray() ?? []).map((assetId: string) => {
-                const assetData = updatedState?.asset(assetId);
-                return [assetId, assetData];
-              })
-            ) as Record<string, Asset>
+              (updatedState?.assetIds()?.toArray() ?? [])
+                .map((assetId: string) => {
+                  const assetData = updatedState?.asset(assetId);
+                  if (assetData == null) {
+                    return undefined;
+                  }
+                  return [assetId, assetData];
+                })
+                .filter(isTruthy)
+            )
           )
         );
       }
@@ -128,12 +131,15 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
           setMarkets({
             markets: Object.fromEntries(
               (marketIds ?? updatedState.marketIds()?.toArray() ?? [])
-                .map((marketId: string) => {
+                .map((marketId: string): undefined | [string, PerpetualMarket] => {
                   const marketData = updatedState.market(marketId);
+                  if (marketData == null) {
+                    return undefined;
+                  }
                   return [marketId, marketData];
                 })
                 .filter(isTruthy)
-            ) as Record<string, PerpetualMarket>,
+            ),
             update: !!marketIds,
           })
         );
@@ -143,11 +149,7 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
         dispatch(setRestrictionType(updatedState.restriction));
       }
 
-      if (
-        changes.has(Changes.compliance) &&
-        updatedState.compliance &&
-        testFlags.enableComplianceApi
-      ) {
+      if (changes.has(Changes.compliance) && updatedState.compliance) {
         dispatch(setCompliance(updatedState.compliance));
       }
 

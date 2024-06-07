@@ -1,3 +1,4 @@
+import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { DateTime } from 'luxon';
 
 import {
@@ -5,6 +6,7 @@ import {
   AbacusOrderType,
   AbacusOrderTypes,
   KotlinIrEnumValues,
+  Nullable,
   TRADE_TYPES,
   type Asset,
   type OrderStatus,
@@ -108,6 +110,13 @@ export const relativeTimeString = ({
 }) =>
   DateTime.fromMillis(timeInMs).setLocale(selectedLocale).toLocaleString(DateTime.DATETIME_SHORT);
 
+type AddedProps = {
+  asset: Asset | undefined;
+  stepSizeDecimals: Nullable<number>;
+  tickSizeDecimals: Nullable<number>;
+  orderSide?: Nullable<OrderSide>;
+};
+
 export const getHydratedTradingData = <
   T extends SubaccountOrder | SubaccountFill | SubaccountFundingPayment,
 >({
@@ -116,13 +125,13 @@ export const getHydratedTradingData = <
   perpetualMarkets,
 }: {
   data: T;
-  assets?: Record<string, Asset>;
-  perpetualMarkets?: Record<string, PerpetualMarket>;
-}) => ({
+  assets: Record<string, Asset>;
+  perpetualMarkets: Record<string, PerpetualMarket>;
+}): T & AddedProps => ({
   ...data,
-  asset: assets && perpetualMarkets && assets[perpetualMarkets[data.marketId]?.assetId],
-  stepSizeDecimals: perpetualMarkets?.[data.marketId]?.configs?.stepSizeDecimals,
-  tickSizeDecimals: perpetualMarkets?.[data.marketId]?.configs?.tickSizeDecimals,
+  asset: assets[perpetualMarkets[data.marketId]?.assetId],
+  stepSizeDecimals: perpetualMarkets[data.marketId]?.configs?.stepSizeDecimals,
+  tickSizeDecimals: perpetualMarkets[data.marketId]?.configs?.tickSizeDecimals,
   ...('side' in data && { orderSide: convertAbacusOrderSide(data.side) }),
 });
 
