@@ -77,7 +77,7 @@ export const OrderbookControls = ({
               shape={ButtonShape.Square}
               onClick={() => modifyScale(-1)}
             >
-              -
+              <$MinusSymbolCenter>-</$MinusSymbolCenter>
             </Button>
             <Button
               size={ButtonSize.XSmall}
@@ -137,4 +137,8 @@ const $OrderbookZoomControl = styled.div`
   display: flex;
   justify-content: space-between;
   box-shadow: 0 0 0 var(--border-width) var(--border-color);
+`;
+
+const $MinusSymbolCenter = styled.span`
+  margin-top: -2px;
 `;
