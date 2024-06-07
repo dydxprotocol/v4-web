@@ -76,8 +76,10 @@ const $Title = styled.h3`
 `;
 
 const $Panel = styled(Panel)`
+  --gradient-start-color: var(--color-layer-5);
+
   background: url('/chart-dots-background-dark.svg'),
-    linear-gradient(to right, var(--color-layer-6) 65%, var(--color-green-dark));
+    linear-gradient(254deg, var(--color-green-dark), var(--gradient-start-color) 60%);
   position: relative;
 
   &::before {
@@ -89,8 +91,8 @@ const $Panel = styled(Panel)`
     right: 0;
 
     border-radius: var(--panel-border-radius);
-    background: var(--color-layer-6);
-    mask-image: linear-gradient(to right, var(--color-layer-6) 30%, transparent);
+    background: var(--gradient-start-color);
+    mask-image: linear-gradient(254deg, transparent, var(--gradient-start-color) 60%);
   }
 `;
 

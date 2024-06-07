@@ -143,7 +143,7 @@ const LightThemeBase: ThemeColorBase = {
 
   whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
 
-  greenDark: ColorToken.Green4,
+  greenDark: ColorToken.Green5,
 
   layer0: ColorToken.White,
   layer1: ColorToken.LightGray6,

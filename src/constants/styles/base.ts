@@ -53,6 +53,7 @@ export enum ColorToken {
   Green2 = '#2CCC98',
   Green3 = '#3EB68A',
   Green4 = '#2C5254',
+  Green5 = '#CEECE4',
 
   Yellow0 = '#FFCC48',
   Yellow1 = '#FFB647',
