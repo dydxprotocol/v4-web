@@ -79,6 +79,23 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
       }
     }
 
+    // if bids and asks touch each other, roll up bottom ask to one tick up
+    if (asks[0] && bids[0] && bids[0].price === asks[0].price) {
+      const lowest = asks.shift();
+      if (lowest != null) {
+        const nextHighestPrice = lowest.price + (orderbook?.grouping?.tickSize ?? 1);
+        if (asks[0]?.price === nextHighestPrice) {
+          asks[0] = safeAssign({}, asks[0], {
+            size: asks[0].size + lowest.size,
+            sizeCost: asks[0].sizeCost + lowest.sizeCost,
+            mine: lowest.mine ? (asks[0].mine ?? 0) + lowest.mine : asks[0].mine,
+          });
+        } else {
+          asks.unshift(safeAssign({}, lowest, { price: nextHighestPrice }));
+        }
+      }
+    }
+
     const spread =
       asks[0]?.price && bids[0]?.price ? MustBigNumber(asks[0].price).minus(bids[0].price) : null;
 
