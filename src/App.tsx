@@ -84,8 +84,7 @@ const Content = () => {
   const { dialogAreaRef } = useDialogArea() ?? {};
 
   const showChainTokenPage =
-    complianceState === ComplianceStates.FULL_ACCESS ||
-    (testFlags.tradingRewardsRehaul && testFlags.enableStaking);
+    complianceState === ComplianceStates.FULL_ACCESS || testFlags.enableStaking;
 
   return (
     <>
