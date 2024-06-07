@@ -31,6 +31,7 @@ import { getAppTheme } from '@/state/configsSelectors';
 import abacusStateManager from '@/lib/abacus';
 import { formatRelativeTime } from '@/lib/dateTime';
 import { isTruthy } from '@/lib/isTruthy';
+import { objectEntries } from '@/lib/objectHelpers';
 
 enum PnlSide {
   Profit = 'Profit',
@@ -116,20 +117,19 @@ export const PnlChart = ({
           ]
             .filter(isTruthy)
             .map(
-              (datum) =>
-                ({
-                  id: datum.createdAtMilliseconds,
-                  subaccountId,
-                  equity: Number(datum.equity),
-                  totalPnl: Number(datum.totalPnl),
-                  netTransfers: Number(datum.netTransfers),
-                  createdAt: new Date(datum.createdAtMilliseconds).valueOf(),
-                  side: {
-                    [-1]: PnlSide.Loss,
-                    0: PnlSide.Flat,
-                    1: PnlSide.Profit,
-                  }[Math.sign(datum.equity)],
-                }) as PnlDatum
+              (datum): PnlDatum => ({
+                id: datum.createdAtMilliseconds,
+                subaccountId: subaccountId ?? 0,
+                equity: Number(datum.equity),
+                totalPnl: Number(datum.totalPnl),
+                netTransfers: Number(datum.netTransfers),
+                createdAt: new Date(datum.createdAtMilliseconds).valueOf(),
+                side: {
+                  [-1]: PnlSide.Loss,
+                  0: PnlSide.Flat,
+                  1: PnlSide.Profit,
+                }[Math.sign(datum.equity)]!,
+              })
             )
         : [],
     [pnlData, equity?.current, now, lastPnlTick, subaccountId]
@@ -188,7 +188,7 @@ export const PnlChart = ({
   // e.g. oldest pnl is 31 days old -> show 90d option
   const getPeriodOptions = useCallback(
     (oldestPnlMs: number): HistoricalPnlPeriods[] =>
-      Object.entries(HISTORICAL_PNL_PERIODS).reduce(
+      objectEntries(HISTORICAL_PNL_PERIODS).reduce(
         (acc: HistoricalPnlPeriods[], [, period], i, arr) => {
           if (oldestPnlMs < now - msForPeriod(period, false)) {
             const nextPeriod = get(arr, [i + 1, 0]);

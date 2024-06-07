@@ -25,7 +25,7 @@ export type MenuItem<MenuItemValue, MenuItemTypes = string> = {
   labelRight?: React.ReactNode;
   tag?: React.ReactNode;
   slotAfter?: React.ReactNode;
-  description?: string;
+  description?: React.ReactNode;
   slotCustomContent?: React.ReactNode;
 
   href?: string;

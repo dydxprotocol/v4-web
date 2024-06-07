@@ -45,6 +45,7 @@
     "no-underscore-dangle": "off",
     "no-use-before-define": "off",
     "prefer-destructuring": "off",
+    "prefer-object-spread": "off",
     "prettier/prettier": "error",
     "react/display-name": "off",
     "react/forbid-prop-types": "off",

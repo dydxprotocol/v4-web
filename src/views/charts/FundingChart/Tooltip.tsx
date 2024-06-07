@@ -101,7 +101,7 @@ export const FundingChartTooltipContent = ({
                 : stringGetter({ key: STRING_KEYS.TIME }),
               value: <Output type={OutputType.DateTime} value={tooltipDatum.time} />,
             },
-          ].filter(Boolean) as Array<DetailsItem>
+          ] satisfies Array<DetailsItem>
         }
       />
     </TooltipContent>
