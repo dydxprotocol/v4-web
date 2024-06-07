@@ -47,7 +47,10 @@ export const SpreadRow = forwardRef<HTMLDivElement, StyleProps & ElementProps>(
       <$SpreadRow ref={ref} side={side}>
         <span>
           <WithTooltip tooltip="spread">
-            {stringGetter({ key: STRING_KEYS.ORDERBOOK_SPREAD })}
+            <Output
+              type={OutputType.Text}
+              value={stringGetter({ key: STRING_KEYS.ORDERBOOK_SPREAD })}
+            />
           </WithTooltip>
         </span>
         <span>
