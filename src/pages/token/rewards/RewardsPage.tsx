@@ -2,7 +2,6 @@ import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { AccountBalance } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
@@ -48,10 +47,9 @@ const RewardsPage = () => {
   const usdcDecimals = 24; // hardcoded solution; fix in OTE-390
   const { enableStaking, tradingRewardsRehaul: tradingRewardsRehaulEnabled } = testFlags;
 
-  const stakingRewards: AccountBalance[] =
-    useAppSelector(getStakingRewards, shallowEqual)?.totalRewards?.toArray() ?? [];
+  const { totalRewards, validators } = useAppSelector(getStakingRewards, shallowEqual) ?? {};
 
-  const totalUsdcRewards = stakingRewards?.reduce((total: number, reward) => {
+  const totalUsdcRewards = (totalRewards?.toArray() ?? [])?.reduce((total: number, reward) => {
     if (reward?.denom === usdcDenom && reward.amount) {
       return total + parseFloat(reward.amount);
     }
@@ -65,6 +63,7 @@ const RewardsPage = () => {
 
   const stakingRewardPanel = (
     <StakingRewardPanel
+      validators={validators?.toArray() ?? []}
       usdcRewards={MustBigNumber(totalUsdcRewards).div(Number(`1e${usdcDecimals}`))}
     />
   );

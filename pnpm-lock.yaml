@@ -33,8 +33,8 @@ dependencies:
     specifier: 1.7.51
     version: 1.7.51
   '@dydxprotocol/v4-client-js':
-    specifier: ^1.1.15
-    version: 1.1.15
+    specifier: ^1.1.20
+    version: 1.1.20
   '@dydxprotocol/v4-localization':
     specifier: ^1.1.109
     version: 1.1.109
@@ -1383,8 +1383,8 @@ packages:
       format-util: 1.0.5
     dev: false
 
-  /@dydxprotocol/v4-client-js@1.1.15:
-    resolution: {integrity: sha512-ipHr11du9eMl4BojfXZqRrlWaaRm+GsYa6ERoFRQScgu4L5UVogcyfFlvYWtKxqQsBzWyRmxKG3rIfBqN3LalQ==}
+  /@dydxprotocol/v4-client-js@1.1.20:
+    resolution: {integrity: sha512-mS0T27DTkhrJqAc/BjqZkFsAdEOuN1tkquwVuMNi5QXMEVTptT/OfK0vbnib5ficcbowMOgzQWF1EeHuzY3aUg==}
     dependencies:
       '@cosmjs/amino': 0.32.2
       '@cosmjs/encoding': 0.32.2
@@ -11824,6 +11824,7 @@ packages:
       is-hex-prefixed: 1.0.0
       strip-hex-prefix: 1.0.0
     dev: false
+    bundledDependencies: false
 
   /event-emitter@0.3.5:
     resolution: {integrity: sha512-D9rRn9y7kLPnJ+hMq7S/nhvoKwwvVJahBi2BPmx3bvbsEdK3W9ii8cBSGjP+72/LnM4n6fo3+dkCX5FeTQruXA==}

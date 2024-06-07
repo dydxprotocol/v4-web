@@ -1,11 +1,15 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
+import { formatUnits } from 'viem';
 
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, SMALL_USD_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
+import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -20,53 +24,83 @@ import { getSubaccountEquity } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
+import { log } from '@/lib/telemetry';
 
 type ElementProps = {
+  validators: string[];
   usdcRewards: BigNumberish;
   setIsOpen?: (open: boolean) => void;
 };
 
-export const StakingRewardDialog = ({ usdcRewards, setIsOpen }: ElementProps) => {
+export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const { usdcLabel } = useTokenConfigs();
+  const { usdcLabel, usdcDecimals } = useTokenConfigs();
+
+  const { getWithdrawRewardFee, withdrawReward } = useSubaccount();
 
   const { current: equity } = useAppSelector(getSubaccountEquity, shallowEqual) ?? {};
-  const newEquity = MustBigNumber(equity).plus(usdcRewards);
 
-  const HARDCODED_GAS_FEE = 0.32; // TODO: OTE-392
+  const [fee, setFee] = useState<BigNumberish>();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const detailItems = [
-    {
-      key: 'equity',
-      label: (
-        <>
-          {stringGetter({ key: STRING_KEYS.EQUITY })} <Tag>{usdcLabel}</Tag>
-        </>
-      ),
-      value: (
-        <DiffOutput
-          type={OutputType.Fiat}
-          value={equity}
-          newValue={newEquity}
-          sign={NumberSign.Positive}
-          withDiff={MustBigNumber(equity) !== newEquity}
-        />
-      ),
-    },
-    {
-      key: 'gas-fees',
-      label: (
-        <>
-          {stringGetter({ key: STRING_KEYS.EST_GAS })} <Tag>{usdcLabel}</Tag>
-        </>
-      ),
-      value: <Output type={OutputType.Fiat} value={HARDCODED_GAS_FEE} />,
-    },
-  ];
+  useEffect(() => {
+    getWithdrawRewardFee(validators)
+      .then((stdFee) => {
+        if (stdFee.amount.length > 0) {
+          const feeAmount = stdFee.amount[0].amount;
+          setFee(MustBigNumber(formatUnits(BigInt(feeAmount), usdcDecimals)));
+        } else {
+          setFee(undefined);
+        }
+      })
+      .catch((err) => {
+        log('StakeRewardDialog/getWithdrawRewardFee', err);
+        setFee(undefined);
+      });
+  }, [getWithdrawRewardFee, usdcDecimals, validators]);
 
-  const claimRewards = () => {
-    // TODO: OTE-393
-  };
+  const detailItems = useMemo(() => {
+    const newEquity = MustBigNumber(equity).plus(usdcRewards);
+    return [
+      {
+        key: 'equity',
+        label: (
+          <>
+            {stringGetter({ key: STRING_KEYS.EQUITY })} <Tag>{usdcLabel}</Tag>
+          </>
+        ),
+        value: (
+          <DiffOutput
+            type={OutputType.Fiat}
+            value={equity}
+            newValue={newEquity}
+            sign={NumberSign.Positive}
+            withDiff={MustBigNumber(equity) !== newEquity}
+          />
+        ),
+      },
+      {
+        key: 'gas-fees',
+        label: (
+          <>
+            {stringGetter({ key: STRING_KEYS.EST_GAS })} <Tag>{usdcLabel}</Tag>
+          </>
+        ),
+        value: <Output type={OutputType.Fiat} value={fee} />,
+      },
+    ];
+  }, [equity, usdcLabel, usdcRewards, fee, stringGetter]);
+
+  const claimRewards = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      await withdrawReward(validators);
+    } catch (err) {
+      log('StakeRewardDialog/withdrawReward', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [validators, withdrawReward]);
 
   return (
     <$Dialog isOpen setIsOpen={setIsOpen} hasHeaderBlur={false}>
@@ -80,7 +114,11 @@ export const StakingRewardDialog = ({ usdcRewards, setIsOpen }: ElementProps) =>
         </$AssetContainer>
         <$Heading>{stringGetter({ key: STRING_KEYS.CLAIM_STAKING_REWARDS })}</$Heading>
         <$WithDetailsReceipt detailItems={detailItems}>
-          <Button action={ButtonAction.Primary} onClick={claimRewards}>
+          <Button
+            action={ButtonAction.Primary}
+            onClick={claimRewards}
+            state={{ isLoading, isDisabled: fee === undefined }}
+          >
             {stringGetter({
               key: STRING_KEYS.CLAIM_USDC_AMOUNT,
               params: {

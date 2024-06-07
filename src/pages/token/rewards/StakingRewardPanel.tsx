@@ -22,10 +22,11 @@ import { openDialog } from '@/state/dialogs';
 import { BigNumberish } from '@/lib/numbers';
 
 type ElementProps = {
+  validators: string[];
   usdcRewards: BigNumberish;
 };
 
-export const StakingRewardPanel = ({ usdcRewards }: ElementProps) => {
+export const StakingRewardPanel = ({ validators, usdcRewards }: ElementProps) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
@@ -34,10 +35,10 @@ export const StakingRewardPanel = ({ usdcRewards }: ElementProps) => {
       dispatch(
         openDialog({
           type: DialogTypes.StakingReward,
-          dialogProps: { usdcRewards },
+          dialogProps: { validators, usdcRewards },
         })
       ),
-    [dispatch, usdcRewards]
+    [dispatch, validators, usdcRewards]
   );
 
   return (
