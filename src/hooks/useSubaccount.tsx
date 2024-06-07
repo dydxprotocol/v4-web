@@ -21,7 +21,6 @@ import type {
   HumanReadableSubaccountTransferPayload,
   HumanReadableTriggerOrdersPayload,
   ParsingError,
-  SubAccountHistoricalPNLs,
 } from '@/constants/abacus';
 import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
 import { STRING_KEYS } from '@/constants/localization';
@@ -259,7 +258,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
   useEffect(() => {
     dispatch(setSubaccount(undefined));
-    dispatch(setHistoricalPnl([] as unknown as SubAccountHistoricalPNLs));
+    dispatch(setHistoricalPnl([]));
   }, [dydxAddress]);
 
   // ------ Deposit/Withdraw Methods ------ //

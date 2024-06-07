@@ -110,7 +110,7 @@ export type Notifications = Record<NotificationId, Notification<any>>;
 export type NotificationDisplayData = {
   icon?: React.ReactNode;
   title: string; // Title for Toast, Notification, and Push Notification
-  body?: string; // Description body for Toast, Notification, and Push Notification
+  body?: string | React.ReactNode; // Description body for Toast, Notification, and Push Notification
 
   slotTitleLeft?: React.ReactNode;
   slotTitleRight?: React.ReactNode;

@@ -43,6 +43,7 @@ import { getMarketConfig } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
+import { objectEntries } from '@/lib/objectHelpers';
 
 type ElementProps = {
   marketId: SubaccountPosition['id'];
@@ -337,7 +338,7 @@ export const AdjustIsolatedMarginForm = ({
 
       <$RelatedInputsGroup>
         <$ToggleGroup
-          items={Object.entries(SIZE_PERCENT_OPTIONS).map(([key, value]) => ({
+          items={objectEntries(SIZE_PERCENT_OPTIONS).map(([key, value]) => ({
             label: key,
             value: value.toString(),
           }))}

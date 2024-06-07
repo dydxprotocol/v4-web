@@ -10,7 +10,15 @@ export type ValidatorNameProps = {
   validator?: Validator;
 };
 
-const FaviconIcon = ({ url, fallbackText }: { url?: string; fallbackText?: string }) => {
+export const ValidatorFaviconIcon = ({
+  className,
+  url,
+  fallbackText,
+}: {
+  className?: string;
+  url?: string;
+  fallbackText?: string;
+}) => {
   const [iconFail, setIconFail] = useState<boolean>(false);
 
   if (url && !iconFail) {
@@ -18,6 +26,7 @@ const FaviconIcon = ({ url, fallbackText }: { url?: string; fallbackText?: strin
     const baseUrl = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
     return (
       <$Img
+        className={className}
         src={`${baseUrl}/favicon.ico`}
         alt="validator favicon"
         onError={() => setIconFail(true)}
@@ -25,7 +34,7 @@ const FaviconIcon = ({ url, fallbackText }: { url?: string; fallbackText?: strin
     );
   }
   if (fallbackText) {
-    return <$IconContainer>{fallbackText.charAt(0)}</$IconContainer>;
+    return <$IconContainer className={className}>{fallbackText.charAt(0)}</$IconContainer>;
   }
 
   return null;
@@ -40,7 +49,7 @@ export const ValidatorName = ({ validator }: ValidatorNameProps) => {
       type={OutputType.Text}
       value={validator?.description?.moniker}
       slotLeft={
-        <FaviconIcon
+        <ValidatorFaviconIcon
           url={validator?.description?.website}
           fallbackText={validator?.description?.moniker}
         />
