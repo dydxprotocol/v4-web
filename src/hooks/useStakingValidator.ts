@@ -47,19 +47,14 @@ export const useStakingValidator = () => {
     const filteredValidators = response?.validators.filter((validator) =>
       validatorOptions.includes(validator.operatorAddress.toLowerCase())
     );
-
     const stakingValidators =
       response?.validators.filter((validator) =>
-        currentDelegations
-          ?.map((d) => d.validator)
-          .includes(validator.operatorAddress.toLowerCase())
+        currentDelegations?.some((d) => d.validator === validator.operatorAddress.toLowerCase())
       ) ?? [];
 
     const unbondingValidators =
       response?.validators.filter((validator) =>
-        unbondingDelegations
-          ?.map((d) => d.validator)
-          .includes(validator.operatorAddress.toLowerCase())
+        unbondingDelegations?.some((d) => d.validator === validator.operatorAddress.toLowerCase())
       ) ?? [];
 
     if (!filteredValidators || filteredValidators.length === 0) {

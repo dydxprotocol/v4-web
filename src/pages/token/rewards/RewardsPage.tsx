@@ -86,7 +86,6 @@ const RewardsPage = () => {
         {showStakingRewardPanel && stakingRewardPanel}
         {enableStaking ? <StakingPanel /> : <DYDXBalancePanel />}
         {enableStaking && <UnbondingPanels />}
-        {/* List of unstaking panels */}
         {tradingRewardsRehaulEnabled && <TradingRewardsChartPanel />}
         <LaunchIncentivesPanel />
         {!tradingRewardsRehaulEnabled && <TradingRewardsSummaryPanel />}
@@ -112,7 +111,6 @@ const RewardsPage = () => {
           {showStakingRewardPanel && stakingRewardPanel}
           {enableStaking ? <StakingPanel /> : <DYDXBalancePanel />}
           {enableStaking && <UnbondingPanels />}
-          {/* List of unstaking panels */}
           {tradingRewardsRehaulEnabled && <NewMarketsPanel />}
           {tradingRewardsRehaulEnabled && <GovernancePanel />}
           <RewardsHelpPanel />

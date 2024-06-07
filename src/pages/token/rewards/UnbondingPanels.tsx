@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
 import { STRING_KEYS } from '@/constants/localization';
+import { timeUnits } from '@/constants/time';
 
 import { useStakingValidator } from '@/hooks/useStakingValidator';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -35,7 +36,9 @@ export const UnbondingPanels = () => {
         const currentDate = new Date().getTime();
         const timeDifference = completionDate - currentDate;
 
-        const dayDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+        const dayDifference = Math.floor(timeDifference / timeUnits.day);
+
+        const unbondingValidator = unbondingValidators?.[delegation.validator]?.[0];
 
         return (
           <Panel
@@ -46,16 +49,13 @@ export const UnbondingPanels = () => {
                   {stringGetter({
                     key: STRING_KEYS.UNSTAKING_FROM,
                     params: {
-                      VALIDATOR:
-                        unbondingValidators?.[delegation.validator]?.[0]?.description?.moniker,
+                      VALIDATOR: unbondingValidator?.description?.moniker,
                     },
                   })}
                 </$Title>
                 <$ValidatorFaviconIcon
-                  url={unbondingValidators?.[delegation.validator]?.[0]?.description?.website}
-                  fallbackText={
-                    unbondingValidators?.[delegation.validator]?.[0]?.description?.moniker
-                  }
+                  url={unbondingValidator?.description?.website}
+                  fallbackText={unbondingValidator?.description?.moniker}
                 />
               </>
             }
