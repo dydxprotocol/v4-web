@@ -15,9 +15,13 @@ import {
   type StringKey,
 } from '@/constants/localization';
 import {
+  CURRENT_SEASON_NUMBER,
   DEFAULT_TOAST_AUTO_CLOSE_MS,
+  INCENTIVES_DISTRIBUTED_NOTIFICATION_ID,
+  INCENTIVES_SEASON_NOTIFICATION_ID,
   NotificationDisplayData,
   NotificationType,
+  REWARD_DISTRIBUTION_SEASON_NUMBER,
   ReleaseUpdateNotificationIds,
   TransferNotificationTypes,
   type NotificationTypeConfig,
@@ -285,23 +289,23 @@ export const notificationTypes: NotificationTypeConfig[] = [
       useEffect(() => {
         if (currentDate <= incentivesExpirationDate) {
           trigger(
-            ReleaseUpdateNotificationIds.IncentivesS5,
+            INCENTIVES_SEASON_NOTIFICATION_ID,
             {
               icon: <AssetIcon symbol={chainTokenLabel} />,
               title: stringGetter({
                 key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.TITLE',
-                params: { SEASON_NUMBER: '5' },
+                params: { SEASON_NUMBER: CURRENT_SEASON_NUMBER },
               }),
               body: stringGetter({
                 key: 'NOTIFICATIONS.INCENTIVES_SEASON_BEGUN.BODY',
                 params: {
-                  PREV_SEASON_NUMBER: '3',
+                  PREV_SEASON_NUMBER: CURRENT_SEASON_NUMBER - 2, // we generally only have data for rewards from 2 seasons ago because the new season launches before the previous season's rewards are distributed
                   DYDX_AMOUNT: '52',
                   USDC_AMOUNT: '100',
                 },
               }),
               toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.IncentivesS5,
+              groupKey: INCENTIVES_SEASON_NOTIFICATION_ID,
             },
             []
           );
@@ -362,11 +366,20 @@ export const notificationTypes: NotificationTypeConfig[] = [
       useEffect(() => {
         if (dydxAddress && status === 'success') {
           trigger(
-            ReleaseUpdateNotificationIds.IncentivesDistributedS3,
+            INCENTIVES_DISTRIBUTED_NOTIFICATION_ID,
             {
               icon: <AssetIcon symbol={chainTokenLabel} />,
-              title: 'Season 3 launch rewards have been distributed!',
-              body: `Season 3 rewards: +${dydxRewards ?? 0} ${chainTokenLabel}`,
+              title: stringGetter({
+                key: 'NOTIFICATIONS.REWARDS_DISTRIBUTED.TITLE',
+                params: { SEASON_NUMBER: REWARD_DISTRIBUTION_SEASON_NUMBER },
+              }),
+              body: stringGetter({
+                key: 'NOTIFICATIONS.REWARDS_DISTRIBUTED.BODY',
+                params: {
+                  SEASON_NUMBER: REWARD_DISTRIBUTION_SEASON_NUMBER,
+                  DYDX_AMOUNT: dydxRewards ?? 0,
+                },
+              }),
               renderCustomBody({ isToast, notification }) {
                 return (
                   <IncentiveSeasonDistributionNotification
@@ -380,21 +393,21 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 );
               },
               toastSensitivity: 'foreground',
-              groupKey: ReleaseUpdateNotificationIds.IncentivesDistributedS3,
+              groupKey: INCENTIVES_DISTRIBUTED_NOTIFICATION_ID,
             },
             []
           );
         }
-      }, [dydxAddress, status, dydxRewards]);
+      }, [stringGetter, dydxAddress, status, dydxRewards]);
     },
     useNotificationAction: () => {
       const { chainTokenLabel } = useTokenConfigs();
       const navigate = useNavigate();
 
       return (notificationId: string) => {
-        if (notificationId === ReleaseUpdateNotificationIds.IncentivesS5) {
+        if (notificationId === INCENTIVES_SEASON_NOTIFICATION_ID) {
           navigate(`${chainTokenLabel}/${TokenRoute.TradingRewards}`);
-        } else if (notificationId === ReleaseUpdateNotificationIds.IncentivesDistributedS3) {
+        } else if (notificationId === INCENTIVES_DISTRIBUTED_NOTIFICATION_ID) {
           navigate(`${chainTokenLabel}/${TokenRoute.StakingRewards}`);
         }
       };

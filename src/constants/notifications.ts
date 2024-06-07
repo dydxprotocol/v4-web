@@ -184,9 +184,16 @@ export type TransferNotifcation = {
 export enum ReleaseUpdateNotificationIds {
   RevampedConditionalOrders = 'revamped-conditional-orders',
   IncentivesS5 = 'incentives-s5',
-  IncentivesDistributedS3 = 'incentives-distributed-s3',
+  IncentivesDistributedS4 = 'incentives-distributed-s4',
   FOKDeprecation = 'fok-deprecation',
 }
+
+// Incentives Season
+export const CURRENT_SEASON_NUMBER = 5;
+export const REWARD_DISTRIBUTION_SEASON_NUMBER = 4;
+export const INCENTIVES_SEASON_NOTIFICATION_ID = ReleaseUpdateNotificationIds.IncentivesS5;
+export const INCENTIVES_DISTRIBUTED_NOTIFICATION_ID =
+  ReleaseUpdateNotificationIds.IncentivesDistributedS4;
 
 /**
  * @description Struct to store whether a NotificationType belonging to each NotificationCategoryType should be triggered
