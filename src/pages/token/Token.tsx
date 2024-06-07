@@ -40,7 +40,7 @@ const Token = () => {
   return (
     <WithSidebar
       sidebar={
-        isTablet || testFlags.tradingRewardsRehaul ? null : (
+        isTablet || testFlags.enableStaking ? null : (
           <$SideBar>
             <$NavigationMenu
               items={[
