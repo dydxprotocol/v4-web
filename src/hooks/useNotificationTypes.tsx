@@ -420,14 +420,12 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
 
-      // xcxc fix
-      const marketWindDownProposalExpirationDate = '2024-07-17T23:59:59'; // should match marketWindDownDate
-      const marketWindDownDate = '2024-07-17T23:59:59';
-      const marketWindDownExpirationDate = '2024-07-17T23:59:59'; // 30 days after wind down
+      const marketWindDownProposalExpirationDate = '2024-06-11T16:53:00';
+      const marketWindDownDate = marketWindDownProposalExpirationDate;
+      const marketWindDownExpirationDate = '2024-07-11T16:53:00'; // 30 days after wind down
       const currentDate = new Date();
 
-      const blockNumber = '1111'; // xcxc fix
-      const blockDate = <$Output type={OutputType.DateTime} value={marketWindDownDate} />;
+      const outputDate = <$Output type={OutputType.DateTime} value={marketWindDownDate} />;
 
       const firstMarket = 'FET-USD';
       const secondMarket = 'AGIX-USD';
@@ -447,11 +445,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
               params: {
                 MARKET_1: firstMarket,
                 MARKET_2: secondMarket,
-                BLOCK_NUMBER: blockNumber,
-                DATE: blockDate,
+                DATE: outputDate,
                 HERE_LINK: (
-                  <$Link href="https://help.dydx.trade/en/articles/166973-contract-loss-mechanisms-on-dydx-chain">
-                    {/* xcxc should link to mintscan */}
+                  <$Link href="https://www.mintscan.io/dydx/proposals/61">
                     {stringGetter({ key: STRING_KEYS.HERE })}
                   </$Link>
                 ),
@@ -464,7 +460,10 @@ export const notificationTypes: NotificationTypeConfig[] = [
       });
 
       useEffect(() => {
-        if (currentDate <= new Date(marketWindDownExpirationDate)) {
+        if (
+          currentDate >= new Date(marketWindDownDate) &&
+          currentDate <= new Date(marketWindDownExpirationDate)
+        ) {
           trigger(
             MarketWindDownNotificationIds.MarketWindDownFetAgix,
             {
@@ -480,8 +479,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 params: {
                   MARKET_1: firstMarket,
                   MARKET_2: secondMarket,
-                  BLOCK_NUMBER: blockNumber,
-                  DATE: blockDate,
+                  DATE: outputDate,
                   HERE_LINK: (
                     <$Link href="https://help.dydx.trade/en/articles/166973-contract-loss-mechanisms-on-dydx-chain">
                       {stringGetter({ key: STRING_KEYS.HERE })}
@@ -495,7 +493,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             []
           );
         }
-      }, [stringGetter, blockDate, currentDate]);
+      }, [stringGetter, outputDate, currentDate, marketWindDownDate]);
     },
     useNotificationAction: () => {
       return () => {};
