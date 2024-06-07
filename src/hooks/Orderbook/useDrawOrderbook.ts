@@ -243,10 +243,7 @@ export const useDrawOrderbook = ({
       );
     }
 
-    const decimalPlaces =
-      displayUnit === 'asset'
-        ? stepSizeDecimals ?? TOKEN_DECIMALS
-        : tickSizeDecimals ?? SMALL_USD_DECIMALS;
+    const decimalPlaces = displayUnit === 'asset' ? stepSizeDecimals ?? TOKEN_DECIMALS : 0;
 
     // Size text
     const displaySize = displayUnit === 'asset' ? size : sizeCost;

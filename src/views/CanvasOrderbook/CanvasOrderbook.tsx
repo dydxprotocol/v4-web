@@ -18,10 +18,13 @@ import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Tag } from '@/components/Tag';
 
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
-import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
-import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
+import {
+  getCurrentMarketConfig,
+  getCurrentMarketData,
+  getCurrentMarketId,
+} from '@/state/perpetualsSelectors';
 
 import { OrderbookControls } from './OrderbookControls';
 import { OrderbookRow, SpreadRow } from './OrderbookRow';
@@ -50,7 +53,7 @@ export const CanvasOrderbook = forwardRef(
     const stringGetter = useStringGetter();
     const currentMarket = useAppSelector(getCurrentMarketId) ?? '';
     const currentMarketConfig = useAppSelector(getCurrentMarketConfig, shallowEqual);
-    const { id } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
+    const { assetId: id } = useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
 
     const { tickSizeDecimals = 2 } = currentMarketConfig ?? {};
 
@@ -127,7 +130,7 @@ export const CanvasOrderbook = forwardRef(
     return (
       <$OrderbookContainer ref={ref}>
         <$OrderbookContent $isLoading={!hasOrderbook}>
-          <$OrderbookControls
+          <OrderbookControls
             assetName={id}
             selectedUnit={displayUnit}
             setSelectedUnit={setDisplayUnit}
@@ -229,10 +232,6 @@ const $OrderbookContainer = styled.div`
   flex: 1 1 0%;
   flex-direction: column;
   overflow: hidden;
-`;
-
-const $OrderbookControls = styled(OrderbookControls)`
-  border-bottom: var(--border);
 `;
 
 const $OrderbookContent = styled.div<{ $isLoading?: boolean }>`
