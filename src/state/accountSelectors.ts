@@ -270,7 +270,7 @@ export const getSubaccountOpenStatusOrders = createAppSelector([getSubaccountOrd
   orders?.filter((order) => order.status === AbacusOrderStatus.open)
 );
 
-export const getSubaccountOrderSizeBySideAndPrice = createAppSelector(
+export const getSubaccountOrderSizeBySideAndOrderbookLevel = createAppSelector(
   [getSubaccountOpenStatusOrders, getCurrentMarketOrderbook],
   (openOrders = [], book = undefined) => {
     const tickSize = book?.grouping?.tickSize;
@@ -279,13 +279,13 @@ export const getSubaccountOrderSizeBySideAndPrice = createAppSelector(
       const side = ORDER_SIDES[order.side.name];
       const byPrice = (orderSizeBySideAndPrice[side] ??= {});
 
-      const priceOrderbookTick = tickSize
+      const priceOrderbookLevel = tickSize
         ? Math.floor(order.price / tickSize) * tickSize
         : order.price;
-      if (byPrice[priceOrderbookTick]) {
-        byPrice[priceOrderbookTick] += order.size;
+      if (byPrice[priceOrderbookLevel]) {
+        byPrice[priceOrderbookLevel] += order.size;
       } else {
-        byPrice[priceOrderbookTick] = order.size;
+        byPrice[priceOrderbookLevel] = order.size;
       }
     });
     return orderSizeBySideAndPrice;

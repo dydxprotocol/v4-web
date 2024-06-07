@@ -21,7 +21,7 @@ import { ColumnDef, CustomRowConfig, TableRow } from '@/components/Table';
 import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
-import { getSubaccountOrderSizeBySideAndPrice } from '@/state/accountSelectors';
+import { getSubaccountOrderSizeBySideAndOrderbookLevel } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
@@ -55,7 +55,7 @@ const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: number 
   const orderbook = useAppSelector(getCurrentMarketOrderbook, shallowEqual);
 
   const subaccountOrderSizeBySideAndPrice =
-    useAppSelector(getSubaccountOrderSizeBySideAndPrice, shallowEqual) || {};
+    useAppSelector(getSubaccountOrderSizeBySideAndOrderbookLevel, shallowEqual) || {};
 
   return useMemo(() => {
     const asks = (orderbook?.asks?.toArray() ?? [])
