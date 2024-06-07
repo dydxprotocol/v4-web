@@ -42,7 +42,7 @@ export const UnbondingPanels = () => {
 
         return (
           <Panel
-            key={delegation.validator}
+            key={`${delegation.validator}-${timeDifference}`}
             slotHeaderContent={
               <>
                 <$Title>
