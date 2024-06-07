@@ -7,7 +7,7 @@
       "ticker": "BNB-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -7.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -651,7 +651,7 @@
       "ticker": "NEAR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -843,7 +843,7 @@
       "ticker": "PEPE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -14.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -965,7 +965,7 @@
       "ticker": "DAI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -1022,7 +1022,7 @@
       "ticker": "KAS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -1193,7 +1193,7 @@
       "ticker": "HBAR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -1311,7 +1311,7 @@
       "ticker": "IMX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -1621,7 +1621,7 @@
       "ticker": "MNT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -1666,7 +1666,7 @@
       "ticker": "CRO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -1710,7 +1710,7 @@
       "ticker": "FLOKI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -13.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -1765,7 +1765,7 @@
       "ticker": "XMR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -7.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -1815,7 +1815,7 @@
       "ticker": "OKB-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -1855,7 +1855,7 @@
       "ticker": "AR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -1978,7 +1978,7 @@
       "ticker": "TAO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -7.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -2149,7 +2149,7 @@
       "ticker": "VET-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -2203,7 +2203,7 @@
       "ticker": "MKR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -6.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -2261,7 +2261,7 @@
       "ticker": "INJ-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -2319,7 +2319,7 @@
       "ticker": "FTM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -2373,7 +2373,7 @@
       "ticker": "BONK-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -14.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -2431,7 +2431,7 @@
       "ticker": "THETA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -2491,7 +2491,7 @@
       "ticker": "NOT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -2600,7 +2600,7 @@
       "ticker": "LDO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -2653,7 +2653,7 @@
       "ticker": "TIA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -2711,7 +2711,7 @@
       "ticker": "ONDO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -2760,7 +2760,7 @@
       "ticker": "JASMY-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -2809,7 +2809,7 @@
       "ticker": "FET-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -2867,7 +2867,7 @@
       "ticker": "CORE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -2975,7 +2975,7 @@
       "ticker": "PYTH-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -3089,7 +3089,7 @@
       "ticker": "ALGO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -3147,7 +3147,7 @@
       "ticker": "SEI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -3200,7 +3200,7 @@
       "ticker": "AAVE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -7.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -3258,7 +3258,7 @@
       "ticker": "GALA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -3312,7 +3312,7 @@
       "ticker": "ENA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -3362,7 +3362,7 @@
       "ticker": "FLOW-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -3416,7 +3416,7 @@
       "ticker": "BEAM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -3461,7 +3461,7 @@
       "ticker": "CHZ-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -3518,7 +3518,7 @@
       "ticker": "AXS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -3585,7 +3585,7 @@
       "ticker": "BSV-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -3625,7 +3625,7 @@
       "ticker": "ORDI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -3685,7 +3685,7 @@
       "ticker": "AGIX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -3745,7 +3745,7 @@
       "ticker": "FLR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -3798,7 +3798,7 @@
       "ticker": "WLD-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -3858,7 +3858,7 @@
       "ticker": "W-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -3913,7 +3913,7 @@
       "ticker": "BTT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -15.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -3967,7 +3967,7 @@
       "ticker": "AKT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -4015,7 +4015,7 @@
       "ticker": "QNT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -4073,7 +4073,7 @@
       "ticker": "SAND-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -4132,7 +4132,7 @@
       "ticker": "EGLD-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -4200,7 +4200,7 @@
       "ticker": "NEO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -4250,7 +4250,7 @@
       "ticker": "MINA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -4318,7 +4318,7 @@
       "ticker": "KCS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -4358,7 +4358,7 @@
       "ticker": "PENDLE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -4408,7 +4408,7 @@
       "ticker": "XTZ-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -4466,7 +4466,7 @@
       "ticker": "XEC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -14.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -4516,7 +4516,7 @@
       "ticker": "SNX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -4569,7 +4569,7 @@
       "ticker": "BOME-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -4687,7 +4687,7 @@
       "ticker": "CFX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -4737,7 +4737,7 @@
       "ticker": "GNO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -7.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -4785,7 +4785,7 @@
       "ticker": "SAFE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -4839,7 +4839,7 @@
       "ticker": "CAKE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -4889,7 +4889,7 @@
       "ticker": "AEVO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -4944,7 +4944,7 @@
       "ticker": "AIOZ-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -4993,7 +4993,7 @@
       "ticker": "NEXO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -5105,7 +5105,7 @@
       "ticker": "KLAY-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -5160,7 +5160,7 @@
       "ticker": "DEXE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -5205,7 +5205,7 @@
       "ticker": "ROSE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -5259,7 +5259,7 @@
       "ticker": "CKB-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -5304,7 +5304,7 @@
       "ticker": "ENS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -5376,7 +5376,7 @@
       "ticker": "IOTA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -5426,7 +5426,7 @@
       "ticker": "KAVA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -5479,7 +5479,7 @@
       "ticker": "OM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -5524,7 +5524,7 @@
       "ticker": "USDD-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -5569,7 +5569,7 @@
       "ticker": "LPT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -5632,7 +5632,7 @@
       "ticker": "AXL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -5676,7 +5676,7 @@
       "ticker": "BLUR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -5734,7 +5734,7 @@
       "ticker": "HNT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -5782,7 +5782,7 @@
       "ticker": "PRIME-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -5826,7 +5826,7 @@
       "ticker": "TFUEL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -5866,7 +5866,7 @@
       "ticker": "WOO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -5916,7 +5916,7 @@
       "ticker": "MANTA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -5971,7 +5971,7 @@
       "ticker": "MEME-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -6021,7 +6021,7 @@
       "ticker": "TWT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -6066,7 +6066,7 @@
       "ticker": "IOTX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -6115,7 +6115,7 @@
       "ticker": "1INCH-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -6170,7 +6170,7 @@
       "ticker": "ARKM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -6219,7 +6219,7 @@
       "ticker": "OSMO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -6268,7 +6268,7 @@
       "ticker": "ASTR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -6327,7 +6327,7 @@
       "ticker": "XDC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -6372,7 +6372,7 @@
       "ticker": "PEOPLE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -6432,7 +6432,7 @@
       "ticker": "SUPER-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -6540,7 +6540,7 @@
       "ticker": "FTT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -6590,7 +6590,7 @@
       "ticker": "OCEAN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -6643,7 +6643,7 @@
       "ticker": "GLM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -6697,7 +6697,7 @@
       "ticker": "COMP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -6764,7 +6764,7 @@
       "ticker": "TUSD-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -6818,7 +6818,7 @@
       "ticker": "GMT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -6886,7 +6886,7 @@
       "ticker": "WEMIX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -6931,7 +6931,7 @@
       "ticker": "RAY-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -6985,7 +6985,7 @@
       "ticker": "DYM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -7035,7 +7035,7 @@
       "ticker": "ZRX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -7107,7 +7107,7 @@
       "ticker": "NFT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -16.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -7157,7 +7157,7 @@
       "ticker": "CELO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -7216,7 +7216,7 @@
       "ticker": "ENJ-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -7283,7 +7283,7 @@
       "ticker": "SSV-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -7338,7 +7338,7 @@
       "ticker": "HOT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -7378,7 +7378,7 @@
       "ticker": "METIS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -7437,7 +7437,7 @@
       "ticker": "ZIL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -7492,7 +7492,7 @@
       "ticker": "RSR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -7542,7 +7542,7 @@
       "ticker": "GAL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -7605,7 +7605,7 @@
       "ticker": "ANKR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -7668,7 +7668,7 @@
       "ticker": "PAXG-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -6.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -7717,7 +7717,7 @@
       "ticker": "ZEC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -7770,7 +7770,7 @@
       "ticker": "RPL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -7833,7 +7833,7 @@
       "ticker": "XRD-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -7873,7 +7873,7 @@
       "ticker": "ANT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -7917,7 +7917,7 @@
       "ticker": "MX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -7957,7 +7957,7 @@
       "ticker": "ID-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -8012,7 +8012,7 @@
       "ticker": "RVN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -8067,7 +8067,7 @@
       "ticker": "SKL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -8125,7 +8125,7 @@
       "ticker": "BICO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -8188,7 +8188,7 @@
       "ticker": "PYUSD-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -8241,7 +8241,7 @@
       "ticker": "BNX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -8281,7 +8281,7 @@
       "ticker": "ALT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -8326,7 +8326,7 @@
       "ticker": "ETHW-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -8380,7 +8380,7 @@
       "ticker": "ILV-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -8429,7 +8429,7 @@
       "ticker": "YGG-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -8488,7 +8488,7 @@
       "ticker": "PIXEL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -8533,7 +8533,7 @@
       "ticker": "MEW-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -8588,7 +8588,7 @@
       "ticker": "POLYX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -8633,7 +8633,7 @@
       "ticker": "FXS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -8692,7 +8692,7 @@
       "ticker": "GMX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -8751,7 +8751,7 @@
       "ticker": "SC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -8805,7 +8805,7 @@
       "ticker": "SFP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -8845,7 +8845,7 @@
       "ticker": "LRC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -8912,7 +8912,7 @@
       "ticker": "QTUM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -8971,7 +8971,7 @@
       "ticker": "ZETA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9030,7 +9030,7 @@
       "ticker": "BAT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9097,7 +9097,7 @@
       "ticker": "TRAC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9145,7 +9145,7 @@
       "ticker": "DASH-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9198,7 +9198,7 @@
       "ticker": "MASK-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -9257,7 +9257,7 @@
       "ticker": "ELF-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9307,7 +9307,7 @@
       "ticker": "T-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9375,7 +9375,7 @@
       "ticker": "FLUX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9420,7 +9420,7 @@
       "ticker": "CSPR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9479,7 +9479,7 @@
       "ticker": "DCR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9534,7 +9534,7 @@
       "ticker": "CFG-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9578,7 +9578,7 @@
       "ticker": "JITOSOL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -7.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9613,7 +9613,7 @@
       "ticker": "MSOL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -7.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9656,7 +9656,7 @@
       "ticker": "TRUMP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9691,7 +9691,7 @@
       "ticker": "MOG-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -15.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9731,7 +9731,7 @@
       "ticker": "POPCAT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9771,7 +9771,7 @@
       "ticker": "BETH-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -6.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9811,7 +9811,7 @@
       "ticker": "TURBO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9851,7 +9851,7 @@
       "ticker": "DEGEN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9896,7 +9896,7 @@
       "ticker": "GAS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9946,7 +9946,7 @@
       "ticker": "XCH-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -9991,7 +9991,7 @@
       "ticker": "ONE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -10046,7 +10046,7 @@
       "ticker": "HIGH-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -10090,7 +10090,7 @@
       "ticker": "VANRY-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -10135,7 +10135,7 @@
       "ticker": "SUSHI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -10202,7 +10202,7 @@
       "ticker": "JST-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -10257,7 +10257,7 @@
       "ticker": "RSS3-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -10302,7 +10302,7 @@
       "ticker": "AMP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -10355,7 +10355,7 @@
       "ticker": "API3-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -10418,7 +10418,7 @@
       "ticker": "TEL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -10458,7 +10458,7 @@
       "ticker": "CHR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -10507,7 +10507,7 @@
       "ticker": "GLMR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -10566,7 +10566,7 @@
       "ticker": "TRIBE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -10606,7 +10606,7 @@
       "ticker": "KSM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -10664,7 +10664,7 @@
       "ticker": "ONT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -10714,7 +10714,7 @@
       "ticker": "TRB-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -7.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -10768,7 +10768,7 @@
       "ticker": "UMA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -10835,7 +10835,7 @@
       "ticker": "CVX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -10892,7 +10892,7 @@
       "ticker": "SAGA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -10932,7 +10932,7 @@
       "ticker": "EDU-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -10972,7 +10972,7 @@
       "ticker": "MYRO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -11021,7 +11021,7 @@
       "ticker": "BAND-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -11083,7 +11083,7 @@
       "ticker": "XAI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -11133,7 +11133,7 @@
       "ticker": "ACH-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -11196,7 +11196,7 @@
       "ticker": "VTHO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -11240,7 +11240,7 @@
       "ticker": "RLC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -11293,7 +11293,7 @@
       "ticker": "AUDIO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -11350,7 +11350,7 @@
       "ticker": "AGI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -11390,7 +11390,7 @@
       "ticker": "KDA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -11440,7 +11440,7 @@
       "ticker": "MAGIC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -11504,7 +11504,7 @@
       "ticker": "YFI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -6.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -11571,7 +11571,7 @@
       "ticker": "CTC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -11621,7 +11621,7 @@
       "ticker": "BAL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -11679,7 +11679,7 @@
       "ticker": "WAXP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -11729,7 +11729,7 @@
       "ticker": "TRU-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -11782,7 +11782,7 @@
       "ticker": "NOS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -11816,7 +11816,7 @@
       "ticker": "NTRN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -11856,7 +11856,7 @@
       "ticker": "COTI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -11909,7 +11909,7 @@
       "ticker": "ICX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -11968,7 +11968,7 @@
       "ticker": "C98-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12026,7 +12026,7 @@
       "ticker": "POKT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12066,7 +12066,7 @@
       "ticker": "PROM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12111,7 +12111,7 @@
       "ticker": "SXP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12156,7 +12156,7 @@
       "ticker": "BIGTIME-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12200,7 +12200,7 @@
       "ticker": "AZERO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12240,7 +12240,7 @@
       "ticker": "PORTAL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12290,7 +12290,7 @@
       "ticker": "STORJ-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12357,7 +12357,7 @@
       "ticker": "XEM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12412,7 +12412,7 @@
       "ticker": "CYBER-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12462,7 +12462,7 @@
       "ticker": "LCX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12500,7 +12500,7 @@
       "ticker": "REZ-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12545,7 +12545,7 @@
       "ticker": "POND-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12598,7 +12598,7 @@
       "ticker": "CTSI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12655,7 +12655,7 @@
       "ticker": "SLERF-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12695,7 +12695,7 @@
       "ticker": "DGB-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12750,7 +12750,7 @@
       "ticker": "NMR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12803,7 +12803,7 @@
       "ticker": "LSK-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12853,7 +12853,7 @@
       "ticker": "MERL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12903,7 +12903,7 @@
       "ticker": "CELR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -12956,7 +12956,7 @@
       "ticker": "DUSK-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13001,7 +13001,7 @@
       "ticker": "SLP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13055,7 +13055,7 @@
       "ticker": "DESO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13099,7 +13099,7 @@
       "ticker": "COQ-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -15.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13144,7 +13144,7 @@
       "ticker": "IOST-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13194,7 +13194,7 @@
       "ticker": "LADYS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -16.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13239,7 +13239,7 @@
       "ticker": "RIF-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13279,7 +13279,7 @@
       "ticker": "PONKE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13314,7 +13314,7 @@
       "ticker": "H2O-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13354,7 +13354,7 @@
       "ticker": "VENOM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13399,7 +13399,7 @@
       "ticker": "JOE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13444,7 +13444,7 @@
       "ticker": "XNO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13498,7 +13498,7 @@
       "ticker": "ORAI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13538,7 +13538,7 @@
       "ticker": "WAVES-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13592,7 +13592,7 @@
       "ticker": "TNSR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 3,
       "exchangeConfigJson": [
         {
@@ -13646,7 +13646,7 @@
       "ticker": "IQ-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13686,7 +13686,7 @@
       "ticker": "USDJ-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13726,7 +13726,7 @@
       "ticker": "ONG-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13766,7 +13766,7 @@
       "ticker": "PYR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13815,7 +13815,7 @@
       "ticker": "CQT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13859,7 +13859,7 @@
       "ticker": "USTC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13918,7 +13918,7 @@
       "ticker": "RBN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13957,7 +13957,7 @@
       "ticker": "WMT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -13997,7 +13997,7 @@
       "ticker": "OAS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14047,7 +14047,7 @@
       "ticker": "SYS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14092,7 +14092,7 @@
       "ticker": "POWR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14135,7 +14135,7 @@
       "ticker": "$MICHI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14170,7 +14170,7 @@
       "ticker": "WEN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -13.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14215,7 +14215,7 @@
       "ticker": "HIVE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14255,7 +14255,7 @@
       "ticker": "WILD-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14295,7 +14295,7 @@
       "ticker": "SFUND-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14340,7 +14340,7 @@
       "ticker": "CVC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14388,7 +14388,7 @@
       "ticker": "FRONT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14438,7 +14438,7 @@
       "ticker": "BONE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14478,7 +14478,7 @@
       "ticker": "MOBILE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14522,7 +14522,7 @@
       "ticker": "HOOK-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14562,7 +14562,7 @@
       "ticker": "ALICE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14615,7 +14615,7 @@
       "ticker": "NAKA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14660,7 +14660,7 @@
       "ticker": "USDP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14709,7 +14709,7 @@
       "ticker": "CREAM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14749,7 +14749,7 @@
       "ticker": "NFP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14794,7 +14794,7 @@
       "ticker": "DENT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14838,7 +14838,7 @@
       "ticker": "REQ-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14891,7 +14891,7 @@
       "ticker": "ARK-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14931,7 +14931,7 @@
       "ticker": "ZEN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -14985,7 +14985,7 @@
       "ticker": "PUNDIX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15034,7 +15034,7 @@
       "ticker": "STRAX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15074,7 +15074,7 @@
       "ticker": "PHB-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15114,7 +15114,7 @@
       "ticker": "PHA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15168,7 +15168,7 @@
       "ticker": "AUCTION-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15222,7 +15222,7 @@
       "ticker": "SNT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15267,7 +15267,7 @@
       "ticker": "LMWR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15320,7 +15320,7 @@
       "ticker": "SYN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15373,7 +15373,7 @@
       "ticker": "DODO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15418,7 +15418,7 @@
       "ticker": "CPOOL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15458,7 +15458,7 @@
       "ticker": "SPELL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15516,7 +15516,7 @@
       "ticker": "NOIA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15556,7 +15556,7 @@
       "ticker": "ACE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15601,7 +15601,7 @@
       "ticker": "MOVR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15660,7 +15660,7 @@
       "ticker": "STG-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15714,7 +15714,7 @@
       "ticker": "NYM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15768,7 +15768,7 @@
       "ticker": "ORCA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15811,7 +15811,7 @@
       "ticker": "XYM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15851,7 +15851,7 @@
       "ticker": "KNC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15913,7 +15913,7 @@
       "ticker": "VELO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -15963,7 +15963,7 @@
       "ticker": "MVL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16003,7 +16003,7 @@
       "ticker": "HFT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16061,7 +16061,7 @@
       "ticker": "SUN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16116,7 +16116,7 @@
       "ticker": "DAG-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16156,7 +16156,7 @@
       "ticker": "STEEM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16196,7 +16196,7 @@
       "ticker": "AITECH-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16236,7 +16236,7 @@
       "ticker": "RDNT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16291,7 +16291,7 @@
       "ticker": "AGLD-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16354,7 +16354,7 @@
       "ticker": "ZCX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16394,7 +16394,7 @@
       "ticker": "MAVIA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16439,7 +16439,7 @@
       "ticker": "MYRIA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16484,7 +16484,7 @@
       "ticker": "MBOX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16529,7 +16529,7 @@
       "ticker": "WIN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -13.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16579,7 +16579,7 @@
       "ticker": "ALPHA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16632,7 +16632,7 @@
       "ticker": "CTK-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16672,7 +16672,7 @@
       "ticker": "LQTY-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16726,7 +16726,7 @@
       "ticker": "LEVER-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16766,7 +16766,7 @@
       "ticker": "GTC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16814,7 +16814,7 @@
       "ticker": "MAV-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16854,7 +16854,7 @@
       "ticker": "ARPA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16907,7 +16907,7 @@
       "ticker": "ELON-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -16.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16952,7 +16952,7 @@
       "ticker": "DAR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -16996,7 +16996,7 @@
       "ticker": "GNS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17046,7 +17046,7 @@
       "ticker": "ACA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17100,7 +17100,7 @@
       "ticker": "DAO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17145,7 +17145,7 @@
       "ticker": "MBX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17185,7 +17185,7 @@
       "ticker": "BNT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17243,7 +17243,7 @@
       "ticker": "DKA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17283,7 +17283,7 @@
       "ticker": "OXT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17341,7 +17341,7 @@
       "ticker": "PCI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17381,7 +17381,7 @@
       "ticker": "BLZ-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17434,7 +17434,7 @@
       "ticker": "MLK-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17479,7 +17479,7 @@
       "ticker": "SCRT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17533,7 +17533,7 @@
       "ticker": "FORT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17577,7 +17577,7 @@
       "ticker": "PNG-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17616,7 +17616,7 @@
       "ticker": "AURORA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17660,7 +17660,7 @@
       "ticker": "HIFI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17705,7 +17705,7 @@
       "ticker": "XYO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17749,7 +17749,7 @@
       "ticker": "EVER-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17794,7 +17794,7 @@
       "ticker": "RACA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -13.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17844,7 +17844,7 @@
       "ticker": "ORBS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17889,7 +17889,7 @@
       "ticker": "MTL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17938,7 +17938,7 @@
       "ticker": "KARRAT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -17977,7 +17977,7 @@
       "ticker": "BAKE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18017,7 +18017,7 @@
       "ticker": "LOOM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18057,7 +18057,7 @@
       "ticker": "CUDOS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18097,7 +18097,7 @@
       "ticker": "STPT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18137,7 +18137,7 @@
       "ticker": "XVG-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18177,7 +18177,7 @@
       "ticker": "CGPT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18222,7 +18222,7 @@
       "ticker": "QI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18266,7 +18266,7 @@
       "ticker": "LOOKS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18316,7 +18316,7 @@
       "ticker": "XPLA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18356,7 +18356,7 @@
       "ticker": "BADGER-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18409,7 +18409,7 @@
       "ticker": "RAD-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18457,7 +18457,7 @@
       "ticker": "NKN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18506,7 +18506,7 @@
       "ticker": "LYX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18546,7 +18546,7 @@
       "ticker": "OGN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18599,7 +18599,7 @@
       "ticker": "ATA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18639,7 +18639,7 @@
       "ticker": "AIDOGE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -19.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18679,7 +18679,7 @@
       "ticker": "ARDR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18719,7 +18719,7 @@
       "ticker": "EWT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18758,7 +18758,7 @@
       "ticker": "ERG-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18798,7 +18798,7 @@
       "ticker": "GHX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18838,7 +18838,7 @@
       "ticker": "GHST-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18891,7 +18891,7 @@
       "ticker": "RARE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18934,7 +18934,7 @@
       "ticker": "LTO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -18974,7 +18974,7 @@
       "ticker": "TLM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19023,7 +19023,7 @@
       "ticker": "ACS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19072,7 +19072,7 @@
       "ticker": "BFC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19112,7 +19112,7 @@
       "ticker": "GUSD-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19150,7 +19150,7 @@
       "ticker": "ERN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19204,7 +19204,7 @@
       "ticker": "WRX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19244,7 +19244,7 @@
       "ticker": "QKC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19284,7 +19284,7 @@
       "ticker": "DRIFT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19333,7 +19333,7 @@
       "ticker": "PERP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19396,7 +19396,7 @@
       "ticker": "GODS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19454,7 +19454,7 @@
       "ticker": "GME-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19489,7 +19489,7 @@
       "ticker": "REN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19548,7 +19548,7 @@
       "ticker": "ALEPH-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19587,7 +19587,7 @@
       "ticker": "DORA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19627,7 +19627,7 @@
       "ticker": "POLS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19685,7 +19685,7 @@
       "ticker": "MBL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19730,7 +19730,7 @@
       "ticker": "CTXC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19775,7 +19775,7 @@
       "ticker": "MPLX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19820,7 +19820,7 @@
       "ticker": "REI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19860,7 +19860,7 @@
       "ticker": "MPL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19898,7 +19898,7 @@
       "ticker": "LINA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19943,7 +19943,7 @@
       "ticker": "BRISE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -16.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -19983,7 +19983,7 @@
       "ticker": "LIT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20027,7 +20027,7 @@
       "ticker": "VR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20067,7 +20067,7 @@
       "ticker": "EUL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20111,7 +20111,7 @@
       "ticker": "ZK-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20156,7 +20156,7 @@
       "ticker": "DATA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20196,7 +20196,7 @@
       "ticker": "LAT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20236,7 +20236,7 @@
       "ticker": "FORTH-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20294,7 +20294,7 @@
       "ticker": "NULS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20339,7 +20339,7 @@
       "ticker": "BEL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20379,7 +20379,7 @@
       "ticker": "RARI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20417,7 +20417,7 @@
       "ticker": "MAPO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20457,7 +20457,7 @@
       "ticker": "OMG-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20516,7 +20516,7 @@
       "ticker": "SIDUS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20556,7 +20556,7 @@
       "ticker": "FX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20595,7 +20595,7 @@
       "ticker": "COMBO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20635,7 +20635,7 @@
       "ticker": "CBK-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20675,7 +20675,7 @@
       "ticker": "UOS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20715,7 +20715,7 @@
       "ticker": "ORN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20759,7 +20759,7 @@
       "ticker": "BOSON-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20799,7 +20799,7 @@
       "ticker": "FLM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20839,7 +20839,7 @@
       "ticker": "SWEAT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20889,7 +20889,7 @@
       "ticker": "KMD-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20934,7 +20934,7 @@
       "ticker": "DIA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -20988,7 +20988,7 @@
       "ticker": "MLN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21041,7 +21041,7 @@
       "ticker": "WXT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21081,7 +21081,7 @@
       "ticker": "ALCX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21129,7 +21129,7 @@
       "ticker": "ELA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21173,7 +21173,7 @@
       "ticker": "BOBA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21226,7 +21226,7 @@
       "ticker": "XCN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21274,7 +21274,7 @@
       "ticker": "FIS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21317,7 +21317,7 @@
       "ticker": "NUM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21357,7 +21357,7 @@
       "ticker": "PDA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21397,7 +21397,7 @@
       "ticker": "PRCL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21447,7 +21447,7 @@
       "ticker": "REEF-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21492,7 +21492,7 @@
       "ticker": "DEGO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21532,7 +21532,7 @@
       "ticker": "WAN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21572,7 +21572,7 @@
       "ticker": "VRA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21622,7 +21622,7 @@
       "ticker": "LOKA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21671,7 +21671,7 @@
       "ticker": "SAMO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21710,7 +21710,7 @@
       "ticker": "AERGO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21759,7 +21759,7 @@
       "ticker": "IDEX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21807,7 +21807,7 @@
       "ticker": "OPUL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21847,7 +21847,7 @@
       "ticker": "ROOT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21892,7 +21892,7 @@
       "ticker": "VIC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21937,7 +21937,7 @@
       "ticker": "SOLO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -21977,7 +21977,7 @@
       "ticker": "NEON-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22021,7 +22021,7 @@
       "ticker": "XPRT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22061,7 +22061,7 @@
       "ticker": "FARM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22104,7 +22104,7 @@
       "ticker": "BSW-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22144,7 +22144,7 @@
       "ticker": "TT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22184,7 +22184,7 @@
       "ticker": "DFI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22229,7 +22229,7 @@
       "ticker": "MON-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22269,7 +22269,7 @@
       "ticker": "TOMI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22314,7 +22314,7 @@
       "ticker": "MDT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22358,7 +22358,7 @@
       "ticker": "CEEK-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22403,7 +22403,7 @@
       "ticker": "VOXEL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22452,7 +22452,7 @@
       "ticker": "UTK-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22502,7 +22502,7 @@
       "ticker": "MXC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22551,7 +22551,7 @@
       "ticker": "ROUTE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22596,7 +22596,7 @@
       "ticker": "AVA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22641,7 +22641,7 @@
       "ticker": "XCAD-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22686,7 +22686,7 @@
       "ticker": "KEY-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22725,7 +22725,7 @@
       "ticker": "DEP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22765,7 +22765,7 @@
       "ticker": "UNFI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22814,7 +22814,7 @@
       "ticker": "EURC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22857,7 +22857,7 @@
       "ticker": "GST-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22905,7 +22905,7 @@
       "ticker": "VRTX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22950,7 +22950,7 @@
       "ticker": "DUKO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -22985,7 +22985,7 @@
       "ticker": "VLX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23025,7 +23025,7 @@
       "ticker": "CUSD-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23065,7 +23065,7 @@
       "ticker": "LIKE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23105,7 +23105,7 @@
       "ticker": "CERE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23145,7 +23145,7 @@
       "ticker": "XPR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23185,7 +23185,7 @@
       "ticker": "UFT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23225,7 +23225,7 @@
       "ticker": "SDAO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23265,7 +23265,7 @@
       "ticker": "ICE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23310,7 +23310,7 @@
       "ticker": "KP3R-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23354,7 +23354,7 @@
       "ticker": "AMB-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23394,7 +23394,7 @@
       "ticker": "KLV-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23434,7 +23434,7 @@
       "ticker": "TAVA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23474,7 +23474,7 @@
       "ticker": "ADX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23523,7 +23523,7 @@
       "ticker": "AKRO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23568,7 +23568,7 @@
       "ticker": "CETUS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23608,7 +23608,7 @@
       "ticker": "SILLY-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23648,7 +23648,7 @@
       "ticker": "VOLT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -16.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23688,7 +23688,7 @@
       "ticker": "AURY-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23733,7 +23733,7 @@
       "ticker": "PSG-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23778,7 +23778,7 @@
       "ticker": "VIDT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23818,7 +23818,7 @@
       "ticker": "ZKF-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23863,7 +23863,7 @@
       "ticker": "PRQ-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23912,7 +23912,7 @@
       "ticker": "AST-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23956,7 +23956,7 @@
       "ticker": "BAR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -23996,7 +23996,7 @@
       "ticker": "BOND-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24040,7 +24040,7 @@
       "ticker": "NYAN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24080,7 +24080,7 @@
       "ticker": "FIO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24120,7 +24120,7 @@
       "ticker": "SHRAP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24165,7 +24165,7 @@
       "ticker": "VEGA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24209,7 +24209,7 @@
       "ticker": "CTX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24248,7 +24248,7 @@
       "ticker": "FIRO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24288,7 +24288,7 @@
       "ticker": "HARD-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24328,7 +24328,7 @@
       "ticker": "BLOK-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24368,7 +24368,7 @@
       "ticker": "KRL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24412,7 +24412,7 @@
       "ticker": "ARG-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24452,7 +24452,7 @@
       "ticker": "GFT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24502,7 +24502,7 @@
       "ticker": "CITY-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24547,7 +24547,7 @@
       "ticker": "SOLAMA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24582,7 +24582,7 @@
       "ticker": "PAJAMAS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24617,7 +24617,7 @@
       "ticker": "DMAIL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24662,7 +24662,7 @@
       "ticker": "WIFI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24702,7 +24702,7 @@
       "ticker": "OG-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24742,7 +24742,7 @@
       "ticker": "LING-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24782,7 +24782,7 @@
       "ticker": "SWFTC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24831,7 +24831,7 @@
       "ticker": "ALPINE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24871,7 +24871,7 @@
       "ticker": "TIME-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -8.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24915,7 +24915,7 @@
       "ticker": "SD-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -24965,7 +24965,7 @@
       "ticker": "VINU-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -17.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25010,7 +25010,7 @@
       "ticker": "FITFI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25060,7 +25060,7 @@
       "ticker": "SUKU-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25104,7 +25104,7 @@
       "ticker": "SPA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25148,7 +25148,7 @@
       "ticker": "DF-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25188,7 +25188,7 @@
       "ticker": "SCA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25233,7 +25233,7 @@
       "ticker": "WSM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25273,7 +25273,7 @@
       "ticker": "BCUT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25313,7 +25313,7 @@
       "ticker": "SIS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25358,7 +25358,7 @@
       "ticker": "DCK-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25398,7 +25398,7 @@
       "ticker": "DC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -13.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25438,7 +25438,7 @@
       "ticker": "FOR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25478,7 +25478,7 @@
       "ticker": "JUV-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25523,7 +25523,7 @@
       "ticker": "ATM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25563,7 +25563,7 @@
       "ticker": "NODL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25602,7 +25602,7 @@
       "ticker": "FIRE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25642,7 +25642,7 @@
       "ticker": "TRVL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25682,7 +25682,7 @@
       "ticker": "GOAL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25722,7 +25722,7 @@
       "ticker": "ABBC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25762,7 +25762,7 @@
       "ticker": "ACM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25802,7 +25802,7 @@
       "ticker": "BNC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25841,7 +25841,7 @@
       "ticker": "RIO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25886,7 +25886,7 @@
       "ticker": "PIP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25926,7 +25926,7 @@
       "ticker": "CVP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -25966,7 +25966,7 @@
       "ticker": "EPIK-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26006,7 +26006,7 @@
       "ticker": "OGV-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26046,7 +26046,7 @@
       "ticker": "CULT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -15.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26086,7 +26086,7 @@
       "ticker": "PUSH-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26126,7 +26126,7 @@
       "ticker": "REVV-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26171,7 +26171,7 @@
       "ticker": "BRWL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26216,7 +26216,7 @@
       "ticker": "NAVX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26256,7 +26256,7 @@
       "ticker": "GARI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26305,7 +26305,7 @@
       "ticker": "LAMB-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26345,7 +26345,7 @@
       "ticker": "GTAI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26390,7 +26390,7 @@
       "ticker": "KAN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -13.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26430,7 +26430,7 @@
       "ticker": "SQR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26470,7 +26470,7 @@
       "ticker": "XTM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26510,7 +26510,7 @@
       "ticker": "SRM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26554,7 +26554,7 @@
       "ticker": "IZI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26594,7 +26594,7 @@
       "ticker": "LITH-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26639,7 +26639,7 @@
       "ticker": "ORB-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26679,7 +26679,7 @@
       "ticker": "PLU-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26723,7 +26723,7 @@
       "ticker": "MCRT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26763,7 +26763,7 @@
       "ticker": "VEXT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26802,7 +26802,7 @@
       "ticker": "XDEFI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26842,7 +26842,7 @@
       "ticker": "WHALE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26882,7 +26882,7 @@
       "ticker": "WWY-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26922,7 +26922,7 @@
       "ticker": "MV-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -26966,7 +26966,7 @@
       "ticker": "TAMA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27006,7 +27006,7 @@
       "ticker": "DYP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27046,7 +27046,7 @@
       "ticker": "CRPT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27086,7 +27086,7 @@
       "ticker": "SYLO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27126,7 +27126,7 @@
       "ticker": "PBR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27166,7 +27166,7 @@
       "ticker": "DOSE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27210,7 +27210,7 @@
       "ticker": "WLKN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27255,7 +27255,7 @@
       "ticker": "CWAR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27295,7 +27295,7 @@
       "ticker": "STRM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27335,7 +27335,7 @@
       "ticker": "UNB-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27375,7 +27375,7 @@
       "ticker": "XWG-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27415,7 +27415,7 @@
       "ticker": "POLC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27455,7 +27455,7 @@
       "ticker": "EGO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27495,7 +27495,7 @@
       "ticker": "ERTHA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27540,7 +27540,7 @@
       "ticker": "VSYS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -13.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27580,7 +27580,7 @@
       "ticker": "LBP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -13.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27620,7 +27620,7 @@
       "ticker": "HOTCROSS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27660,7 +27660,7 @@
       "ticker": "VEMP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27700,7 +27700,7 @@
       "ticker": "PUMLX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27740,7 +27740,7 @@
       "ticker": "IGU-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27785,7 +27785,7 @@
       "ticker": "SON-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -13.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27825,7 +27825,7 @@
       "ticker": "MOVEZ-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -13.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27865,7 +27865,7 @@
       "ticker": "AZY-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27905,7 +27905,7 @@
       "ticker": "XCUR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27945,7 +27945,7 @@
       "ticker": "SATS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -16.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -27995,7 +27995,7 @@
       "ticker": "TREMP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28030,7 +28030,7 @@
       "ticker": "FOXY-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28075,7 +28075,7 @@
       "ticker": "BODEN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28110,7 +28110,7 @@
       "ticker": "LFT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28150,7 +28150,7 @@
       "ticker": "ZEUS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28195,7 +28195,7 @@
       "ticker": "PUNDU-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28235,7 +28235,7 @@
       "ticker": "MSN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28280,7 +28280,7 @@
       "ticker": "MASA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28320,7 +28320,7 @@
       "ticker": "FURY-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28360,7 +28360,7 @@
       "ticker": "ZERO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -13.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28405,7 +28405,7 @@
       "ticker": "1CAT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28445,7 +28445,7 @@
       "ticker": "WYNN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28480,7 +28480,7 @@
       "ticker": "XETA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28525,7 +28525,7 @@
       "ticker": "LAI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28570,7 +28570,7 @@
       "ticker": "HAMMY-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28605,7 +28605,7 @@
       "ticker": "HARAMBE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28640,7 +28640,7 @@
       "ticker": "BORK-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -13.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28675,7 +28675,7 @@
       "ticker": "KMNO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28715,7 +28715,7 @@
       "ticker": "ESE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28755,7 +28755,7 @@
       "ticker": "WELL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28795,7 +28795,7 @@
       "ticker": "GRAIL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -6.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28835,7 +28835,7 @@
       "ticker": "NGL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28875,7 +28875,7 @@
       "ticker": "FLIP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28915,7 +28915,7 @@
       "ticker": "GUAC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -16.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28949,7 +28949,7 @@
       "ticker": "LHINU-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -15.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -28989,7 +28989,7 @@
       "ticker": "KHAI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29024,7 +29024,7 @@
       "ticker": "BORING-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29064,7 +29064,7 @@
       "ticker": "TENET-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29109,7 +29109,7 @@
       "ticker": "SQD-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29149,7 +29149,7 @@
       "ticker": "LBR-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29189,7 +29189,7 @@
       "ticker": "GIGA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29224,7 +29224,7 @@
       "ticker": "MNDE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29263,7 +29263,7 @@
       "ticker": "SEAM-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29302,7 +29302,7 @@
       "ticker": "ZEND-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29342,7 +29342,7 @@
       "ticker": "SGB-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29380,7 +29380,7 @@
       "ticker": "VELA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29420,7 +29420,7 @@
       "ticker": "KICKS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -13.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29460,7 +29460,7 @@
       "ticker": "HBB-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29500,7 +29500,7 @@
       "ticker": "TURBOS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29540,7 +29540,7 @@
       "ticker": "XAVA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29580,7 +29580,7 @@
       "ticker": "OMN-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29620,7 +29620,7 @@
       "ticker": "MELOS-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29660,7 +29660,7 @@
       "ticker": "KCAL-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29705,7 +29705,7 @@
       "ticker": "RANKER-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29745,7 +29745,7 @@
       "ticker": "VPAD-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29785,7 +29785,7 @@
       "ticker": "KARATE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29825,7 +29825,7 @@
       "ticker": "SUIA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29865,7 +29865,7 @@
       "ticker": "ECOX-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
@@ -29905,7 +29905,7 @@
       "ticker": "USDE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -9.0,
-      "minPriceChange": 4000,
+      "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
