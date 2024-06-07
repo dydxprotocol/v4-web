@@ -420,6 +420,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
 
+      const { fetAgixMarketWindDownProposal, contractLossMechanismLearnMore } = useURLConfigs();
+
       const marketWindDownProposalExpirationDate = '2024-06-11T16:53:00';
       const marketWindDownDate = marketWindDownProposalExpirationDate;
       const marketWindDownExpirationDate = '2024-07-11T16:53:00'; // 30 days after wind down
@@ -447,7 +449,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 MARKET_2: secondMarket,
                 DATE: outputDate,
                 HERE_LINK: (
-                  <$Link href="https://www.mintscan.io/dydx/proposals/61">
+                  <$Link href={fetAgixMarketWindDownProposal}>
                     {stringGetter({ key: STRING_KEYS.HERE })}
                   </$Link>
                 ),
@@ -457,7 +459,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             groupKey: MarketWindDownNotificationIds.MarketWindDownProposalFetAgix,
           });
         }
-      });
+      }, [stringGetter]);
 
       useEffect(() => {
         if (
@@ -481,7 +483,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                   MARKET_2: secondMarket,
                   DATE: outputDate,
                   HERE_LINK: (
-                    <$Link href="https://help.dydx.trade/en/articles/166973-contract-loss-mechanisms-on-dydx-chain">
+                    <$Link href={contractLossMechanismLearnMore}>
                       {stringGetter({ key: STRING_KEYS.HERE })}
                     </$Link>
                   ),
@@ -493,7 +495,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
             []
           );
         }
-      }, [stringGetter, outputDate, currentDate, marketWindDownDate]);
+      }, [stringGetter]);
     },
     useNotificationAction: () => {
       return () => {};
