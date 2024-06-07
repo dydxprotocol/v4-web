@@ -64,7 +64,7 @@ export const OrderbookControls = ({
         />
       </$OrderbookUnitControl>
       <$OrderbookZoomControl>
-        <$OrderbookLabel>Grouping</$OrderbookLabel>
+        <$OrderbookLabel>{stringGetter({ key: STRING_KEYS.ORDERBOOK_GROUPING })}</$OrderbookLabel>
         <$ZoomControls>
           <Output
             value={grouping?.tickSize}
