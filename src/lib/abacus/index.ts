@@ -118,9 +118,9 @@ class AbacusStateManager {
     if (network) {
       this.stateManager.environmentId = network;
     }
-    this.stateManager.trade(null, null);
     this.stateManager.readyToConnect = true;
     this.setMarket(this.currentMarket ?? DEFAULT_MARKETID);
+    this.stateManager.trade(null, null);
   };
 
   // ------ Breakdown ------ //

@@ -17,7 +17,7 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Icon, IconName } from '@/components/Icon';
-import { Output, OutputType } from '@/components/Output';
+import { Output, OutputType, ShowSign } from '@/components/Output';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
@@ -70,6 +70,7 @@ export const PlaceOrderButtonAndReceipt = ({
   const { liquidationPrice, equity, leverage, notionalTotal, adjustedMmf } = orEmptyObj(
     useAppSelector(getCurrentMarketPositionData, shallowEqual)
   );
+
   const marginMode = useAppSelector(getInputTradeMarginMode, shallowEqual);
 
   const hasMissingData = subaccountNumber === undefined;
@@ -89,23 +90,27 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const renderMarginValue = () => {
     if (marginMode === AbacusMarginMode.cross) {
-      const currentCrossMargin = calculateCrossPositionMargin({
-        notionalTotal: notionalTotal?.current,
-        adjustedMmf: adjustedMmf?.current,
-      });
+      const currentCrossMargin = nullIfZero(
+        calculateCrossPositionMargin({
+          notionalTotal: notionalTotal?.current,
+          adjustedMmf: adjustedMmf?.current,
+        })
+      );
 
-      const postOrderCrossMargin = calculateCrossPositionMargin({
-        notionalTotal: notionalTotal?.postOrder,
-        adjustedMmf: adjustedMmf?.postOrder,
-      });
+      const postOrderCrossMargin = nullIfZero(
+        calculateCrossPositionMargin({
+          notionalTotal: notionalTotal?.postOrder,
+          adjustedMmf: adjustedMmf?.postOrder,
+        })
+      );
 
       return (
         <DiffOutput
           useGrouping
           type={OutputType.Fiat}
-          value={nullIfZero(currentCrossMargin)}
-          newValue={nullIfZero(postOrderCrossMargin)}
-          withDiff={currentCrossMargin !== postOrderCrossMargin}
+          value={currentCrossMargin}
+          newValue={postOrderCrossMargin}
+          withDiff={!!notionalTotal?.postOrder && currentCrossMargin !== postOrderCrossMargin}
         />
       );
     }
@@ -157,8 +162,9 @@ export const PlaceOrderButtonAndReceipt = ({
           useGrouping
           type={OutputType.Multiple}
           value={nullIfZero(leverage?.current)}
-          newValue={leverage?.postOrder}
+          newValue={nullIfZero(leverage?.postOrder)}
           withDiff={getTradeStateWithDoubleValuesDiff(leverage)}
+          showSign={ShowSign.None}
         />
       ),
     },

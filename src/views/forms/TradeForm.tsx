@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useMemo, useState, type FormEvent } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual } from 'react-redux';
@@ -38,7 +38,6 @@ import { ToggleButton } from '@/components/ToggleButton';
 import { ToggleGroup } from '@/components/ToggleGroup';
 import { Orderbook } from '@/views/tables/Orderbook';
 
-import { getCurrentMarketIsolatedPositionLeverage } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import {
   getCurrentInput,
@@ -190,21 +189,6 @@ export const TradeForm = ({
       setCurrentStep?.(MobilePlaceOrderSteps.Confirmation);
     }
   }, [currentStep, setCurrentStep]);
-
-  const currentLeverageForIsolatedPosition = useAppSelector(
-    getCurrentMarketIsolatedPositionLeverage
-  );
-
-  useEffect(() => {
-    if (currentLeverageForIsolatedPosition) {
-      abacusStateManager.setTradeValue({
-        value: currentLeverageForIsolatedPosition,
-        field: TradeInputField.targetLeverage,
-      });
-    }
-    // We only want to set the target leverage once
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentLeverageForIsolatedPosition]);
 
   const { setUnIndexedClientId } = useOnLastOrderIndexed({
     callback: onLastOrderIndexed,

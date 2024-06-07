@@ -78,7 +78,7 @@ export const getExistingOpenPositions = createAppSelector([getOpenPositions], (a
  */
 export const getNonZeroPendingPositions = createAppSelector(
   [(state: RootState) => state.account.subaccount?.pendingPositions],
-  (pending) => pending?.toArray().filter((p) => (p.freeCollateral?.current ?? 0) > 0)
+  (pending) => pending?.toArray().filter((p) => (p.equity?.current ?? 0) > 0)
 );
 
 /**
@@ -207,7 +207,10 @@ export const getPendingIsolatedOrders = createAppSelector(
     const allValidOrders = (allOrders ?? [])
       .filter(
         (o) =>
-          (o.status === AbacusOrderStatus.open || o.status === AbacusOrderStatus.pending) &&
+          (o.status === AbacusOrderStatus.open ||
+            o.status === AbacusOrderStatus.pending ||
+            o.status === AbacusOrderStatus.partiallyFilled ||
+            o.status === AbacusOrderStatus.untriggered) &&
           o.marginMode === AbacusMarginMode.isolated
       )
       // eslint-disable-next-line prefer-object-spread
