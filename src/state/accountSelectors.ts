@@ -554,6 +554,11 @@ export const getStakingBalances = (state: RootState) => state.account?.stakingBa
 export const getStakingDelegations = (state: RootState) => state.account?.stakingDelegations;
 
 /**
+ *  @returns user unbonding delegations
+ * */
+export const getUnbondingDelegations = (state: RootState) => state.account?.unbondingDelegations;
+
+/**
  *  @returns user staking rewards
  * */
 export const getStakingRewards = (state: RootState) => state.account?.stakingRewards;
