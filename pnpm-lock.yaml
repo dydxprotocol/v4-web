@@ -30,8 +30,8 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: 1.7.51
-    version: 1.7.51
+    specifier: 1.7.56
+    version: 1.7.56
   '@dydxprotocol/v4-client-js':
     specifier: ^1.1.15
     version: 1.1.15
@@ -1578,8 +1578,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.7.51:
-    resolution: {integrity: sha512-kfS33PN5Iqd4dO4buNlH5uZjKjvzgjlE1/5WnMEZso7oI9keCW9aYc3vQdAvwSYr3AjHUIWVWzlc8VgW1fITww==}
+  /@dydxprotocol/v4-abacus@1.7.56:
+    resolution: {integrity: sha512-vZb7IKciHWnjL1urEOkkCRdEhbAfu293EkoKG/NczsjPyD+FZL8Y56ZliOrMqQEzuMUVbMeng37o3LWvTxxElw==}
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
@@ -13119,6 +13119,7 @@ packages:
 
   /grapheme-splitter@1.0.4:
     resolution: {integrity: sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==}
+    requiresBuild: true
     dev: true
 
   /graphemer@1.4.0:
