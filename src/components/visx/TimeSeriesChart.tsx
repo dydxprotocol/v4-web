@@ -29,7 +29,7 @@ import Tooltip from '@/components/visx/XYChartTooltipWithBounds';
 
 import { formatAbsoluteTime } from '@/lib/dateTime';
 import { clamp, lerp, map } from '@/lib/math';
-import { objectEntries } from '@/lib/objectEntries';
+import { objectEntries } from '@/lib/objectHelpers';
 
 import { XYChartThreshold, type Threshold } from './XYChartThreshold';
 
@@ -196,8 +196,8 @@ export const TimeSeriesChart = <Datum extends {}>({
     if (!zoomDomain)
       return {
         zoom: 1,
-        domain: [0, 1] as [number, number],
-        range: [0, 1] as [number, number],
+        domain: [0, 1] as const,
+        range: [0, 1] as const,
         visibleData: data,
       };
 

@@ -38,13 +38,13 @@ export const RewardsNavPanel = ({
   className,
 }: ElementProps & StyleProps) => {
   const stringGetter = useStringGetter();
-  const tradingRewardsRehaulEnabled = testFlags.tradingRewardsRehaul;
+  const stakingEnabled = testFlags.enableStaking;
 
   return (
     <Panel
       className={className}
       slotHeaderContent={
-        <$Title tradingRewardsRehaulEnabled={tradingRewardsRehaulEnabled}>
+        <$Title stakingEnabled={stakingEnabled}>
           {title} {titleTag && <$Tag>{titleTag}</$Tag>}
         </$Title>
       }
@@ -71,12 +71,12 @@ export const RewardsNavPanel = ({
   );
 };
 
-const $Title = styled.h3<{ tradingRewardsRehaulEnabled: boolean }>`
+const $Title = styled.h3<{ stakingEnabled: boolean }>`
   ${layoutMixins.inlineRow}
   font: var(--font-medium-book);
 
-  ${({ tradingRewardsRehaulEnabled }) =>
-    tradingRewardsRehaulEnabled
+  ${({ stakingEnabled }) =>
+    stakingEnabled
       ? css`
           margin-bottom: -1.5rem;
           color: var(--color-text-1);

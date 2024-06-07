@@ -49,7 +49,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
   const stringGetter = useStringGetter();
 
   // Chart data
-  const data = useAppSelector(calculateFundingRateHistory, shallowEqual) as FundingChartDatum[];
+  const data = useAppSelector(calculateFundingRateHistory, shallowEqual);
 
   const latestDatum = data?.[data.length - 1];
 
@@ -127,7 +127,7 @@ export const FundingChart = ({ selectedLocale }: ElementProps) => {
     >
       <$FundingRateToggle>
         <ToggleGroup
-          items={Object.keys(FundingRateResolution).map((rate: string) => ({
+          items={Object.keys(FundingRateResolution).map((rate) => ({
             value: rate as FundingRateResolution,
             label:
               {

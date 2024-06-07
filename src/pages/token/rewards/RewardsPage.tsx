@@ -1,6 +1,7 @@
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { formatUnits } from 'viem';
 
 import { AccountBalance } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
@@ -37,6 +38,7 @@ import { StakingPanel } from './StakingPanel';
 import { StakingRewardPanel } from './StakingRewardPanel';
 import { TradingRewardsChartPanel } from './TradingRewardsChartPanel';
 import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
+import { UnbondingPanels } from './UnbondingPanels';
 
 const RewardsPage = () => {
   const stringGetter = useStringGetter();
@@ -46,7 +48,7 @@ const RewardsPage = () => {
   const { isTablet, isNotTablet } = useBreakpoints();
   const { usdcDenom } = useTokenConfigs();
   const usdcDecimals = 24; // hardcoded solution; fix in OTE-390
-  const { enableStaking, tradingRewardsRehaul: tradingRewardsRehaulEnabled } = testFlags;
+  const stakingEnabled = testFlags.enableStaking;
 
   const stakingRewards: AccountBalance[] =
     useAppSelector(getStakingRewards, shallowEqual)?.totalRewards?.toArray() ?? [];
@@ -59,13 +61,12 @@ const RewardsPage = () => {
   }, 0);
 
   const showMigratePanel = import.meta.env.VITE_V3_TOKEN_ADDRESS && isNotTablet;
-  const showGeoblockedPanel =
-    tradingRewardsRehaulEnabled && complianceState !== ComplianceStates.FULL_ACCESS;
-  const showStakingRewardPanel = totalUsdcRewards > 0 && !showGeoblockedPanel && enableStaking;
+  const showGeoblockedPanel = stakingEnabled && complianceState !== ComplianceStates.FULL_ACCESS;
+  const showStakingRewardPanel = totalUsdcRewards > 0 && !showGeoblockedPanel && stakingEnabled;
 
   const stakingRewardPanel = (
     <StakingRewardPanel
-      usdcRewards={MustBigNumber(totalUsdcRewards).div(Number(`1e${usdcDecimals}`))}
+      usdcRewards={MustBigNumber(formatUnits(BigInt(totalUsdcRewards), usdcDecimals))}
     />
   );
   const legalDisclaimer = (
@@ -83,16 +84,16 @@ const RewardsPage = () => {
       <$DetachedSection>
         {showGeoblockedPanel && <GeoblockedPanel />}
         {showStakingRewardPanel && stakingRewardPanel}
-        {enableStaking ? <StakingPanel /> : <DYDXBalancePanel />}
-        {/* List of unstaking panels */}
-        {tradingRewardsRehaulEnabled && <TradingRewardsChartPanel />}
+        {stakingEnabled ? <StakingPanel /> : <DYDXBalancePanel />}
+        {stakingEnabled && <UnbondingPanels />}
+        {stakingEnabled && <TradingRewardsChartPanel />}
         <LaunchIncentivesPanel />
-        {!tradingRewardsRehaulEnabled && <TradingRewardsSummaryPanel />}
-        {tradingRewardsRehaulEnabled && <NewMarketsPanel />}
-        {tradingRewardsRehaulEnabled && <GovernancePanel />}
+        {!stakingEnabled && <TradingRewardsSummaryPanel />}
+        {stakingEnabled && <NewMarketsPanel />}
+        {stakingEnabled && <GovernancePanel />}
         <RewardHistoryPanel />
         <RewardsHelpPanel />
-        {tradingRewardsRehaulEnabled && legalDisclaimer}
+        {stakingEnabled && legalDisclaimer}
       </$DetachedSection>
     </div>
   ) : (
@@ -100,20 +101,20 @@ const RewardsPage = () => {
       {showMigratePanel && <MigratePanel />}
       <$DoubleColumnView>
         <$LeftColumn>
-          {tradingRewardsRehaulEnabled && <TradingRewardsChartPanel />}
+          {stakingEnabled && <TradingRewardsChartPanel />}
           <LaunchIncentivesPanel />
-          {!tradingRewardsRehaulEnabled && <TradingRewardsSummaryPanel />}
+          {!stakingEnabled && <TradingRewardsSummaryPanel />}
           <RewardHistoryPanel />
         </$LeftColumn>
         <$RightColumn>
           {showGeoblockedPanel && <GeoblockedPanel />}
           {showStakingRewardPanel && stakingRewardPanel}
-          {enableStaking ? <StakingPanel /> : <DYDXBalancePanel />}
-          {/* List of unstaking panels */}
-          {tradingRewardsRehaulEnabled && <NewMarketsPanel />}
-          {tradingRewardsRehaulEnabled && <GovernancePanel />}
+          {stakingEnabled ? <StakingPanel /> : <DYDXBalancePanel />}
+          {stakingEnabled && <UnbondingPanels />}
+          {stakingEnabled && <NewMarketsPanel />}
+          {stakingEnabled && <GovernancePanel />}
           <RewardsHelpPanel />
-          {tradingRewardsRehaulEnabled && legalDisclaimer}
+          {stakingEnabled && legalDisclaimer}
         </$RightColumn>
       </$DoubleColumnView>
     </$DetachedSection>

@@ -49,7 +49,7 @@ export const Toast = ({
   lastUpdated,
 }: ToastProps) => {
   // Timeout
-  const timeout = useRef<number>();
+  const timeout = useRef<NodeJS.Timeout>();
   const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
@@ -59,7 +59,7 @@ export const Toast = ({
     if (isOpen && !isPaused && duration !== Infinity)
       timeout.current = globalThis.setTimeout(() => {
         setIsOpen?.(false, true);
-      }, duration) as unknown as number;
+      }, duration);
   }, [isOpen, isPaused, duration, lastUpdated]);
 
   return (

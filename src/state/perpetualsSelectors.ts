@@ -1,5 +1,5 @@
 import { Candle, TradingViewBar } from '@/constants/candles';
-import { EMPTY_ARR } from '@/constants/objects';
+import { EMPTY_ARR, EMPTY_OBJ } from '@/constants/objects';
 
 import { mapCandle } from '@/lib/tradingView/utils';
 
@@ -40,7 +40,7 @@ export const getMarketData = (state: RootState, marketId: string) =>
  * @returns marketIds of all markets
  */
 export const getMarketIds = (state: RootState) =>
-  Object.keys(getPerpetualMarkets(state) ?? EMPTY_ARR);
+  Object.keys(getPerpetualMarkets(state) ?? EMPTY_OBJ);
 
 /**
  * @returns PerpetualMarket data of the market the user is currently viewing

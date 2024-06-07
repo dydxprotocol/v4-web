@@ -20,6 +20,8 @@ import { type RootStore } from '@/state/_store';
 import { setCandles } from '@/state/perpetuals';
 import { getMarketConfig, getPerpetualBarsForPriceChart } from '@/state/perpetualsSelectors';
 
+import { objectKeys } from '@/lib/objectHelpers';
+
 import { log } from '../../telemetry';
 import { getHistorySlice, getSymbol, mapCandle } from '../utils';
 import { lastBarsCache } from './cache';
@@ -28,7 +30,7 @@ import { subscribeOnStream, unsubscribeFromStream } from './streaming';
 const timezone = DateTime.local().get('zoneName') as unknown as Timezone;
 
 const configurationData: DatafeedConfiguration = {
-  supported_resolutions: Object.keys(RESOLUTION_MAP) as ResolutionString[],
+  supported_resolutions: objectKeys(RESOLUTION_MAP),
   exchanges: [
     {
       value: 'dYdX', // `exchange` argument for the `searchSymbols` method, if a user selects this exchange
@@ -84,7 +86,7 @@ export const getDydxDatafeed = (
 
       session: '24x7',
       intraday_multipliers: ['1', '5', '15', '30', '60', '240'],
-      supported_resolutions: configurationData.supported_resolutions as ResolutionString[],
+      supported_resolutions: configurationData.supported_resolutions!,
       data_status: 'streaming',
       timezone,
       format: 'price',
