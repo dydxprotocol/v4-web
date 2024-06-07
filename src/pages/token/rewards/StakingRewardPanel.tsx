@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { ButtonAction } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { SMALL_USD_DECIMALS } from '@/constants/numbers';
+import { USD_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -16,8 +16,9 @@ import { Button } from '@/components/Button';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 
-import { useAppDispatch } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { BigNumberish } from '@/lib/numbers';
 
@@ -29,6 +30,8 @@ type ElementProps = {
 export const StakingRewardPanel = ({ validators, usdcRewards }: ElementProps) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
+
+  const selectedLocale = useAppSelector(getSelectedLocale);
 
   const openStakingRewardDialog = useCallback(
     () =>
@@ -59,9 +62,10 @@ export const StakingRewardPanel = ({ validators, usdcRewards }: ElementProps) =>
       <$InlineRow>
         <$PositiveOutput
           type={OutputType.Asset}
-          value={usdcRewards}
+          value={usdcRewards.toLocaleString(selectedLocale, {
+            minimumFractionDigits: USD_DECIMALS,
+          })}
           showSign={ShowSign.Both}
-          fractionDigits={SMALL_USD_DECIMALS}
         />
         <AssetIcon symbol="USDC" />
       </$InlineRow>

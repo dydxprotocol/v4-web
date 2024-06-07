@@ -7,7 +7,7 @@ import { formatUnits } from 'viem';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { NumberSign, SMALL_USD_DECIMALS } from '@/constants/numbers';
+import { NumberSign, USD_DECIMALS } from '@/constants/numbers';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -25,6 +25,7 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
 import { getSubaccountEquity } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
+import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
@@ -43,6 +44,7 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
   const { usdcBalance } = useAccountBalance();
 
   const { current: equity } = useAppSelector(getSubaccountEquity, shallowEqual) ?? {};
+  const selectedLocale = useAppSelector(getSelectedLocale);
 
   const [error, setError] = useState<string>();
   const [fee, setFee] = useState<BigNumberish>();
@@ -109,7 +111,7 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
     } finally {
       setIsLoading(false);
     }
-  }, [validators, withdrawReward]);
+  }, [validators, withdrawReward, setIsOpen]);
 
   return (
     <$Dialog isOpen setIsOpen={setIsOpen} hasHeaderBlur={false}>
@@ -143,9 +145,10 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
                 USDC_AMOUNT: (
                   <Output
                     type={OutputType.Asset}
-                    value={usdcRewards}
+                    value={usdcRewards.toLocaleString(selectedLocale, {
+                      minimumFractionDigits: USD_DECIMALS,
+                    })}
                     showSign={ShowSign.None}
-                    fractionDigits={SMALL_USD_DECIMALS}
                   />
                 ),
               },
