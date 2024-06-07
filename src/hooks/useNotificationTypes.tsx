@@ -19,6 +19,7 @@ import {
   DEFAULT_TOAST_AUTO_CLOSE_MS,
   INCENTIVES_DISTRIBUTED_NOTIFICATION_ID,
   INCENTIVES_SEASON_NOTIFICATION_ID,
+  MarketWindDownNotificationIds,
   NotificationDisplayData,
   NotificationType,
   REWARD_DISTRIBUTION_SEASON_NUMBER,
@@ -34,6 +35,7 @@ import { useLocalNotifications } from '@/hooks/useLocalNotifications';
 import { AssetIcon } from '@/components/AssetIcon';
 import { Icon, IconName } from '@/components/Icon';
 import { Link } from '@/components/Link';
+import { Output, OutputType } from '@/components/Output';
 // eslint-disable-next-line import/no-cycle
 import { BlockRewardNotification } from '@/views/notifications/BlockRewardNotification';
 import { IncentiveSeasonDistributionNotification } from '@/views/notifications/IncentiveSeasonDistributionNotification';
@@ -414,6 +416,92 @@ export const notificationTypes: NotificationTypeConfig[] = [
     },
   },
   {
+    type: NotificationType.MarketWindDown,
+    useTrigger: ({ trigger }) => {
+      const stringGetter = useStringGetter();
+
+      const { fetAgixMarketWindDownProposal, contractLossMechanismLearnMore } = useURLConfigs();
+
+      const marketWindDownProposalExpirationDate = '2024-06-11T16:53:00';
+      const marketWindDownDate = marketWindDownProposalExpirationDate;
+      const marketWindDownExpirationDate = '2024-07-11T16:53:00'; // 30 days after wind down
+      const currentDate = new Date();
+
+      const outputDate = <$Output type={OutputType.DateTime} value={marketWindDownDate} />;
+
+      const firstMarket = 'FET-USD';
+      const secondMarket = 'AGIX-USD';
+
+      useEffect(() => {
+        if (currentDate <= new Date(marketWindDownProposalExpirationDate)) {
+          trigger(MarketWindDownNotificationIds.MarketWindDownProposalFetAgix, {
+            title: stringGetter({
+              key: 'NOTIFICATIONS.TWO_MARKET_WIND_DOWN_PROPOSAL.TITLE',
+              params: {
+                MARKET_1: firstMarket,
+                MARKET_2: secondMarket,
+              },
+            }),
+            body: stringGetter({
+              key: 'NOTIFICATIONS.TWO_MARKET_WIND_DOWN_PROPOSAL.BODY',
+              params: {
+                MARKET_1: firstMarket,
+                MARKET_2: secondMarket,
+                DATE: outputDate,
+                HERE_LINK: (
+                  <$Link href={fetAgixMarketWindDownProposal}>
+                    {stringGetter({ key: STRING_KEYS.HERE })}
+                  </$Link>
+                ),
+              },
+            }),
+            toastSensitivity: 'foreground',
+            groupKey: MarketWindDownNotificationIds.MarketWindDownProposalFetAgix,
+          });
+        }
+      }, [stringGetter]);
+
+      useEffect(() => {
+        if (
+          currentDate >= new Date(marketWindDownDate) &&
+          currentDate <= new Date(marketWindDownExpirationDate)
+        ) {
+          trigger(
+            MarketWindDownNotificationIds.MarketWindDownFetAgix,
+            {
+              title: stringGetter({
+                key: 'NOTIFICATIONS.TWO_MARKET_WIND_DOWN.TITLE',
+                params: {
+                  MARKET_1: firstMarket,
+                  MARKET_2: secondMarket,
+                },
+              }),
+              body: stringGetter({
+                key: 'NOTIFICATIONS.TWO_MARKET_WIND_DOWN.BODY',
+                params: {
+                  MARKET_1: firstMarket,
+                  MARKET_2: secondMarket,
+                  DATE: outputDate,
+                  HERE_LINK: (
+                    <$Link href={contractLossMechanismLearnMore}>
+                      {stringGetter({ key: STRING_KEYS.HERE })}
+                    </$Link>
+                  ),
+                },
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: MarketWindDownNotificationIds.MarketWindDownFetAgix,
+            },
+            []
+          );
+        }
+      }, [stringGetter]);
+    },
+    useNotificationAction: () => {
+      return () => {};
+    },
+  },
+  {
     type: NotificationType.ApiError,
     useTrigger: ({ trigger }) => {
       const stringGetter = useStringGetter();
@@ -577,5 +665,9 @@ const $WarningIcon = styled(Icon)`
 
 const $Link = styled(Link)`
   --link-color: var(--color-accent);
+  display: inline-block;
+`;
+
+const $Output = styled(Output)`
   display: inline-block;
 `;

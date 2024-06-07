@@ -9,6 +9,7 @@ export enum NotificationType {
   ApiError = 'ApiError',
   ComplianceAlert = 'ComplianceAlert',
   OrderStatus = 'OrderStatus',
+  MarketWindDown = 'MarketWindDown',
 }
 
 export enum NotificationCategoryPreferences {
@@ -28,6 +29,7 @@ export const NotificationTypeCategory: {
   [NotificationType.OrderStatus]: NotificationCategoryPreferences.Trading,
   [NotificationType.ApiError]: NotificationCategoryPreferences.MustSee,
   [NotificationType.ComplianceAlert]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.MarketWindDown]: NotificationCategoryPreferences.MustSee,
 };
 
 export const SingleSessionNotificationTypes = [
@@ -194,6 +196,11 @@ export const REWARD_DISTRIBUTION_SEASON_NUMBER = 4;
 export const INCENTIVES_SEASON_NOTIFICATION_ID = ReleaseUpdateNotificationIds.IncentivesS5;
 export const INCENTIVES_DISTRIBUTED_NOTIFICATION_ID =
   ReleaseUpdateNotificationIds.IncentivesDistributedS4;
+
+export enum MarketWindDownNotificationIds {
+  MarketWindDownFetAgix = 'market-wind-down-fet-agix',
+  MarketWindDownProposalFetAgix = 'market-wind-down-proposal-fet-agix',
+}
 
 /**
  * @description Struct to store whether a NotificationType belonging to each NotificationCategoryType should be triggered
