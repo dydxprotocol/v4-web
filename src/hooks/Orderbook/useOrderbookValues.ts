@@ -58,23 +58,23 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
 
     // Prevent the bid/ask sides from crossing by using the offsets.
     // While the books are crossing...
-    while (asks[0] && bids[0] && bids[0]!.price >= asks[0].price) {
+    while (asks[0] && bids[0] && bids[0].price > asks[0].price) {
       // Drop the order on the side with the lower offset.
       // The offset of the other side is higher and so supercedes.
-      if (bids[0]!.offset === asks[0].offset) {
+      if (bids[0].offset === asks[0].offset) {
         // If offsets are the same, give precedence to the larger size. In this case,
         // one of the sizes *should* be zero, but we simply check for the larger size.
-        if (bids[0]!.size > asks[0].size) {
+        if (bids[0].size > asks[0].size) {
           asks.shift();
         } else {
-          bids.pop();
+          bids.shift();
         }
       } else {
         // Offsets are not equal. Give precedence to the larger offset.
-        if (bids[0]!.offset > asks[0].offset) {
+        if (bids[0].offset > asks[0].offset) {
           asks.shift();
         } else {
-          bids.pop();
+          bids.shift();
         }
       }
     }

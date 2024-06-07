@@ -228,7 +228,7 @@ export const useDrawOrderbook = ({
     };
 
     // Price text
-    if (price) {
+    if (price != null) {
       ctx.fillStyle = textColor;
       ctx.fillText(
         MustBigNumber(price).toFormat(
@@ -247,7 +247,7 @@ export const useDrawOrderbook = ({
 
     // Size text
     const displaySize = displayUnit === 'asset' ? size : sizeCost;
-    if (displaySize) {
+    if (displaySize != null) {
       ctx.fillStyle = updatedTextColor ?? textColor;
       ctx.fillText(
         MustBigNumber(displaySize).toFormat(decimalPlaces, BigNumber.ROUND_HALF_UP, {
@@ -260,7 +260,7 @@ export const useDrawOrderbook = ({
 
     // Depth text
     const displayDepth = displayUnit === 'asset' ? depth : depthCost;
-    if (displayDepth) {
+    if (displayDepth != null) {
       ctx.fillStyle = textColor;
       ctx.fillText(
         MustBigNumber(displayDepth).toFormat(decimalPlaces, BigNumber.ROUND_HALF_UP, {
