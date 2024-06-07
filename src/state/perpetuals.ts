@@ -13,6 +13,7 @@ import { LocalStorageKey } from '@/constants/localStorage';
 import { DEFAULT_MARKETID, MarketFilters } from '@/constants/markets';
 
 import { getLocalStorage } from '@/lib/localStorage';
+import { objectKeys } from '@/lib/objectHelpers';
 import { processOrderbookToCreateMap } from '@/lib/orderbookHelpers';
 
 interface CandleDataByMarket {
@@ -137,7 +138,7 @@ export const perpetualsSlice = createSlice({
         ? { ...state.candles[marketId], selectedResolution: resolution }
         : {
             data: Object.fromEntries(
-              Object.keys(RESOLUTION_MAP).map((resolutionString: string) => [resolutionString, []])
+              objectKeys(RESOLUTION_MAP).map((resolutionString) => [resolutionString, []])
             ),
             selectedResolution: resolution,
           };
@@ -155,7 +156,7 @@ export const perpetualsSlice = createSlice({
         ...initialState,
         currentMarketId:
           getLocalStorage({ key: LocalStorageKey.LastViewedMarket }) ?? DEFAULT_MARKETID,
-      }) as PerpetualsState,
+      }) satisfies PerpetualsState,
   },
 });
 

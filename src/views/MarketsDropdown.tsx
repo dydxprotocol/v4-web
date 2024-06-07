@@ -103,7 +103,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
             />
           ),
         },
-      ] as ColumnDef<MarketData>[],
+      ] satisfies ColumnDef<MarketData>[],
     [stringGetter, selectedLocale]
   );
 
@@ -112,7 +112,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
       <$Toolbar>
         <MarketFilter
           selectedFilter={filter}
-          filters={marketFilters as MarketFilters[]}
+          filters={marketFilters}
           onChangeFilter={setFilter}
           onSearchTextChange={setSearchFilter}
         />

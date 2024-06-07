@@ -205,7 +205,7 @@ export const DepthChartTooltipContent = ({
                         type={OutputType.Fiat}
                         value={
                           nearestDatum != null
-                            ? nearestDatum.datum.price * nearestDatum.datum.depth
+                            ? nearestDatum.datum.price * (nearestDatum.datum.depth ?? 0)
                             : undefined
                         }
                       />
