@@ -5,6 +5,9 @@ import styled from 'styled-components';
 
 import { MarketOrderbookGrouping, Nullable, OrderbookGrouping } from '@/constants/abacus';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import { STRING_KEYS } from '@/constants/localization';
+
+import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
@@ -27,7 +30,7 @@ export const OrderbookControls = ({
   setSelectedUnit,
   grouping,
 }: OrderbookControlsProps) => {
-  // const stringGetter = useStringGetter();
+  const stringGetter = useStringGetter();
   const modifyScale = useCallback(
     (direction: number) => {
       const start = grouping?.multiplier.ordinal ?? 0;
@@ -41,8 +44,7 @@ export const OrderbookControls = ({
   return (
     <$OrderbookControlsContainer className={className}>
       <$OrderbookUnitControl>
-        {/* TODO - localization */}
-        <$OrderbookLabel>Units</$OrderbookLabel>
+        <$OrderbookLabel>{stringGetter({ key: STRING_KEYS.ORDERBOOK_UNITS })}</$OrderbookLabel>
         <ToggleGroup
           items={[
             { label: assetName ?? '', value: 'asset' as const },
