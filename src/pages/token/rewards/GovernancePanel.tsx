@@ -18,7 +18,7 @@ export const GovernancePanel = ({ className }: { className?: string }) => {
   const dispatch = useAppDispatch();
   const { governanceLearnMore } = useURLConfigs();
 
-  const tradingRewardsRehaulEnabled = testFlags.tradingRewardsRehaul;
+  const stakingEnabled = testFlags.enableStaking;
 
   const openKeplrDialog = useCallback(
     () => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr })),
@@ -29,9 +29,7 @@ export const GovernancePanel = ({ className }: { className?: string }) => {
     <RewardsNavPanel
       title={stringGetter({ key: STRING_KEYS.GOVERNANCE })}
       description={stringGetter({
-        key: tradingRewardsRehaulEnabled
-          ? STRING_KEYS.GOVERNANCE_DETAILS
-          : STRING_KEYS.GOVERNANCE_DESCRIPTION,
+        key: stakingEnabled ? STRING_KEYS.GOVERNANCE_DETAILS : STRING_KEYS.GOVERNANCE_DESCRIPTION,
       })}
       learnMore={governanceLearnMore}
       onNav={openKeplrDialog}

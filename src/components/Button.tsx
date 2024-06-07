@@ -55,7 +55,7 @@ export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPr
   ) => {
     const state: Record<string, boolean | undefined> =
       typeof stateConfig === 'string'
-        ? { [stateConfig as ButtonState]: true }
+        ? { [stateConfig]: true }
         : {
             [ButtonState.Loading]: stateConfig.isLoading,
             [ButtonState.Disabled]: stateConfig.isDisabled,
