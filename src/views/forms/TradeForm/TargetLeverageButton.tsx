@@ -13,7 +13,7 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { getInputTradeData, useTradeFormData } from '@/state/inputsSelectors';
 
-export const TargetLeverageButton = () => {
+export const TargetLeverageButton = ({ className }: { className?: string }) => {
   const { needsTargetLeverage } = useTradeFormData();
 
   const currentTradeData = useAppSelector(getInputTradeData, shallowEqual);
@@ -28,6 +28,7 @@ export const TargetLeverageButton = () => {
   return (
     needsTargetLeverage && (
       <WithTooltip
+        className={className}
         tooltip="target-leverage"
         stringParams={{ TARGET_LEVERAGE: targetLeverage?.toFixed(LEVERAGE_DECIMALS) }}
       >

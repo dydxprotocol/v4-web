@@ -20,7 +20,13 @@ import { getCurrentMarketAssetId } from '@/state/perpetualsSelectors';
 
 import { orEmptyObj } from '@/lib/typeUtils';
 
-export const MarginModeSelector = ({ openInTradeBox }: { openInTradeBox: boolean }) => {
+export const MarginModeSelector = ({
+  className,
+  openInTradeBox,
+}: {
+  className?: string;
+  openInTradeBox: boolean;
+}) => {
   const stringGetter = useStringGetter();
   const currentAssetId = useAppSelector(getCurrentMarketAssetId);
   const { marginMode } = orEmptyObj(useAppSelector(getInputTradeData, shallowEqual));
@@ -38,7 +44,7 @@ export const MarginModeSelector = ({ openInTradeBox }: { openInTradeBox: boolean
   }, [dispatch, openInTradeBox]);
 
   return needsMarginMode ? (
-    <Button onClick={handleClick}>
+    <Button onClick={handleClick} className={className}>
       {marginMode &&
         stringGetter({
           key: MARGIN_MODE_STRINGS[marginMode.rawValue],
@@ -47,6 +53,7 @@ export const MarginModeSelector = ({ openInTradeBox }: { openInTradeBox: boolean
     </Button>
   ) : (
     <$WarningTooltip
+      className={className}
       slotTooltip={
         <$WarningTooltipContent>
           <$CautionIcon iconName={IconName.Warning} />

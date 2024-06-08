@@ -64,8 +64,8 @@ export const TradeBoxOrderView = () => {
 const $TradeBoxOrderViewContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding-top: 1rem;
+  gap: 0.25rem;
+  padding-top: 0.875rem;
   min-height: 100%;
 `;
 
@@ -76,8 +76,10 @@ const $Container = styled.div`
 
 const $Tabs = styled(Tabs)`
   overflow: hidden;
+  --tabs-height: 2.125rem;
   --trigger-active-backgroundColor: --trigger-backgroundColor;
   --trigger-active-underline-size: 2px;
+
   > header {
     justify-content: space-around;
   }
@@ -91,6 +93,7 @@ const $MarginAndLeverageButtons = styled.div`
   abbr,
   button {
     width: 100%;
+    height: 2.5rem;
   }
 `;
 
@@ -100,6 +103,7 @@ const $TopActionsRow = styled.div`
 
   padding-left: 1rem;
   padding-right: 1rem;
+
   @media ${breakpoints.tablet} {
     grid-auto-columns: var(--orderbox-column-width) 1fr;
     gap: var(--form-input-gap);

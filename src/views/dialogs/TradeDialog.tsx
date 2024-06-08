@@ -50,8 +50,11 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
         [MobilePlaceOrderSteps.EditOrder]: {
           title: (
             <$EditTradeHeader>
-              <MarginModeSelector openInTradeBox={false} />
-              <TargetLeverageButton />
+              <$MarginControls>
+                <$MarginModeSelector openInTradeBox={false} />
+                <$TargetLeverageButton />
+              </$MarginControls>
+
               <TradeSideToggle />
             </$EditTradeHeader>
           ),
@@ -107,8 +110,25 @@ const $Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
 
 const $EditTradeHeader = styled.div`
   display: grid;
-  grid-template-columns: auto auto 1fr;
+  grid-template-columns: 1fr 2fr;
   gap: 0.5rem;
+`;
+
+const $MarginControls = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`;
+
+const $MarginModeSelector = styled(MarginModeSelector)`
+  flex: 1;
+`;
+
+const $TargetLeverageButton = styled(TargetLeverageButton)`
+  flex: 1;
+
+  button {
+    width: 100%;
+  }
 `;
 
 const $TradeForm = styled(TradeForm)`
