@@ -30,7 +30,10 @@ import { getCurrentInput, getInputTradeMarginMode } from '@/state/inputsSelector
 
 import { isTruthy } from '@/lib/isTruthy';
 import { nullIfZero } from '@/lib/numbers';
-import { calculateCrossPositionMargin, getTradeStateWithDoubleValuesDiff } from '@/lib/tradeData';
+import {
+  calculateCrossPositionMargin,
+  getTradeStateWithDoubleValuesHasDiff,
+} from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 type ConfirmButtonConfig = {
@@ -88,6 +91,9 @@ export const PlaceOrderButtonAndReceipt = ({
 
   const { fee, price: expectedPrice, reward } = summary ?? {};
 
+  // check if required fields are filled and summary has been calculated
+  const areInputsFilled = fee != null || reward != null;
+
   const renderMarginValue = () => {
     if (marginMode === AbacusMarginMode.cross) {
       const currentCrossMargin = nullIfZero(
@@ -110,7 +116,7 @@ export const PlaceOrderButtonAndReceipt = ({
           type={OutputType.Fiat}
           value={currentCrossMargin}
           newValue={postOrderCrossMargin}
-          withDiff={!!notionalTotal?.postOrder && currentCrossMargin !== postOrderCrossMargin}
+          withDiff={areInputsFilled && currentCrossMargin !== postOrderCrossMargin}
         />
       );
     }
@@ -121,7 +127,7 @@ export const PlaceOrderButtonAndReceipt = ({
         type={OutputType.Fiat}
         value={equity?.current}
         newValue={equity?.postOrder}
-        withDiff={getTradeStateWithDoubleValuesDiff(equity)}
+        withDiff={areInputsFilled && getTradeStateWithDoubleValuesHasDiff(equity)}
       />
     );
   };
@@ -145,7 +151,7 @@ export const PlaceOrderButtonAndReceipt = ({
           type={OutputType.Fiat}
           value={liquidationPrice?.current}
           newValue={liquidationPrice?.postOrder}
-          withDiff={getTradeStateWithDoubleValuesDiff(liquidationPrice)}
+          withDiff={areInputsFilled && getTradeStateWithDoubleValuesHasDiff(liquidationPrice)}
         />
       ),
     },
@@ -162,8 +168,8 @@ export const PlaceOrderButtonAndReceipt = ({
           useGrouping
           type={OutputType.Multiple}
           value={nullIfZero(leverage?.current)}
-          newValue={nullIfZero(leverage?.postOrder)}
-          withDiff={getTradeStateWithDoubleValuesDiff(leverage)}
+          newValue={leverage?.postOrder}
+          withDiff={areInputsFilled && getTradeStateWithDoubleValuesHasDiff(leverage)}
           showSign={ShowSign.None}
         />
       ),
