@@ -14,7 +14,6 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { Button } from '@/components/Button';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
-import { SparklineChart } from '@/components/visx/SparklineChart';
 
 type ExchangeBillboardsProps = {
   className?: string;
@@ -26,7 +25,6 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
 
   const {
     stats: { volume24HUSDC, openInterestUSDC, feesEarned },
-    feesEarnedChart,
   } = usePerpetualMarketsStats();
   return (
     <$MarketBillboardsWrapper>
@@ -53,24 +51,12 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
           tagKey: STRING_KEYS._24H,
           value: feesEarned,
           type: OutputType.CompactFiat,
-          chartData: feesEarnedChart,
           linkLabelKey: STRING_KEYS.LEARN_MORE_ARROW,
           link: `${chainTokenLabel}/${TokenRoute.StakingRewards}`,
           slotLeft: '~',
         },
       ].map(
-        ({
-          key,
-          labelKey,
-          tagKey,
-          value,
-          fractionDigits,
-          type,
-          chartData,
-          link,
-          linkLabelKey,
-          slotLeft,
-        }) => (
+        ({ key, labelKey, tagKey, value, fractionDigits, type, link, linkLabelKey, slotLeft }) => (
           <$BillboardContainer key={key}>
             <$BillboardStat>
               <$BillboardTitle>
@@ -97,18 +83,6 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
                 </$BillboardLink>
               ) : null}
             </$BillboardStat>
-            {chartData ? (
-              <$BillboardChart>
-                <SparklineChart
-                  data={chartData}
-                  xAccessor={(datum) => datum.x}
-                  yAccessor={(datum) => datum.y}
-                  positive
-                />
-              </$BillboardChart>
-            ) : (
-              false
-            )}
           </$BillboardContainer>
         )
       )}
@@ -128,10 +102,6 @@ const $BillboardContainer = styled.div`
   background-color: var(--color-layer-3);
   padding: 1.5rem;
   border-radius: 0.625rem;
-`;
-const $BillboardChart = styled.div`
-  width: 130px;
-  height: 40px;
 `;
 const $BillboardLink = styled(Button)`
   --button-textColor: var(--color-accent);

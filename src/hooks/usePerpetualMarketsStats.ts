@@ -1,18 +1,11 @@
 import { useMemo } from 'react';
 
-import { getChainRevenue } from '@/services/numia';
-import { useQuery } from '@tanstack/react-query';
 import { shallowEqual } from 'react-redux';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
-import { wrapAndLogError } from '@/lib/asyncUtils';
 import { isPresent, orEmptyObj } from '@/lib/typeUtils';
-
-const endDate = new Date();
-const startDate = new Date();
-startDate.setDate(startDate.getDate() - 1);
 
 export const usePerpetualMarketsStats = () => {
   const perpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
@@ -21,22 +14,6 @@ export const usePerpetualMarketsStats = () => {
     () => Object.values(perpetualMarkets).filter(isPresent),
     [perpetualMarkets]
   );
-
-  const { data } = useQuery({
-    queryKey: ['chain-revenue', startDate.toISOString(), endDate.toISOString()],
-    queryFn: wrapAndLogError(
-      () =>
-        getChainRevenue({
-          startDate,
-          endDate,
-        }),
-      'usePerpetualMarketsStats getChainRevenue',
-      true
-    ),
-    refetchOnWindowFocus: false,
-    gcTime: 1_000 * 60 * 5, // 5 minutes
-    staleTime: 1_000 * 60 * 10, // 10 minutes
-  });
 
   const stats = useMemo(() => {
     let volume24HUSDC = 0;
@@ -56,17 +33,7 @@ export const usePerpetualMarketsStats = () => {
     };
   }, [markets]);
 
-  const feesEarnedChart = useMemo(
-    () =>
-      data?.map((point, x) => ({
-        x: x + 1,
-        y: point.total,
-      })) ?? [],
-    [data]
-  );
-
   return {
     stats,
-    feesEarnedChart,
   };
 };
