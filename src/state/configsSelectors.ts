@@ -19,7 +19,7 @@ export const getAppTheme = (state: RootState): AppTheme => {
 const DARK_CHART_BACKGROUND_URL = '/chart-dots-background-dark.svg';
 const LIGHT_CHART_BACKGROUND_URL = '/chart-dots-background-light.svg';
 
-export const getChartDotBackground = (state: RootState): String => {
+export const getChartDotBackground = (state: RootState): string => {
   const appTheme = getAppTheme(state);
   return appTheme === AppTheme.Light ? LIGHT_CHART_BACKGROUND_URL : DARK_CHART_BACKGROUND_URL;
 };
