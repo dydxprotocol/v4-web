@@ -37,6 +37,7 @@ jobs:
         run: |
           pnpm run build
           pnpm run build:inject-amplitude
+          pnpm run build:inject-hotjar
           pnpm run build:inject-bugsnag
           pnpm run build:inject-statuspage
           pnpm run build:inject-smartbanner
