@@ -105,7 +105,7 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
       setIsOpen(false);
     } catch (err) {
       log('StakeRewardDialog/withdrawReward', err);
-      setError(err.message); // TODO: OTE-400
+      setError(err.message);
     } finally {
       setIsLoading(false);
     }
@@ -130,7 +130,7 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
         {showNotEnoughGasWarning && (
           <AlertMessage type={AlertType.Warning}>
             {stringGetter({
-              key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS, // TODO: OTE-400
+              key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS, // TODO: OTE-399
               params: { USDC_BALANCE: usdcBalance },
             })}
           </AlertMessage>
