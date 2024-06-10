@@ -38,12 +38,6 @@ export const usePerpetualMarketsStats = () => {
     staleTime: 1_000 * 60 * 10, // 10 minutes
   });
 
-  const feesEarned = useMemo(() => {
-    if (!data) return null;
-
-    return data.reduce((acc, { total }) => acc + total, 0);
-  }, [data]);
-
   const stats = useMemo(() => {
     let volume24HUSDC = 0;
     let openInterestUSDC = 0;
@@ -58,9 +52,9 @@ export const usePerpetualMarketsStats = () => {
     return {
       volume24HUSDC,
       openInterestUSDC,
-      feesEarned,
+      feesEarned: volume24HUSDC * 0.0002, // approximation derived from volume * 2bps
     };
-  }, [markets, feesEarned]);
+  }, [markets]);
 
   const feesEarnedChart = useMemo(
     () =>

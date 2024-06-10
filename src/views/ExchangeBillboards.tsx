@@ -52,7 +52,7 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
           labelKey: STRING_KEYS.EARNED_BY_STAKERS,
           tagKey: STRING_KEYS._24H,
           value: feesEarned,
-          type: OutputType.Fiat,
+          type: OutputType.CompactFiat,
           chartData: feesEarnedChart,
           linkLabelKey: STRING_KEYS.LEARN_MORE_ARROW,
           link: `${chainTokenLabel}/${TokenRoute.StakingRewards}`,
