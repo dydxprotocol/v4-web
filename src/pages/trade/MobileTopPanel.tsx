@@ -13,11 +13,11 @@ import { Icon, IconName } from '@/components/Icon';
 import { Tabs } from '@/components/Tabs';
 import { ToggleButton } from '@/components/ToggleButton';
 import { AccountInfo } from '@/views/AccountInfo';
+import { CanvasOrderbook } from '@/views/CanvasOrderbook/CanvasOrderbook';
 import { DepthChart } from '@/views/charts/DepthChart';
 import { FundingChart } from '@/views/charts/FundingChart';
 import { TvChart } from '@/views/charts/TvChart';
 import { LiveTrades } from '@/views/tables/LiveTrades';
-import { Orderbook } from '@/views/tables/Orderbook';
 
 import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
@@ -76,7 +76,7 @@ export const MobileTopPanel = () => {
     {
       content: (
         <$ScrollableTableContainer>
-          <Orderbook histogramSide="right" layout="horizontal" hideHeader />
+          <CanvasOrderbook histogramSide="right" layout="horizontal" hideHeader />
         </$ScrollableTableContainer>
       ),
       label: stringGetter({ key: STRING_KEYS.ORDERBOOK_SHORT }),

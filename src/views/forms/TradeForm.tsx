@@ -69,7 +69,7 @@ import abacusStateManager from '@/lib/abacus';
 import { testFlags } from '@/lib/testFlags';
 import { getSelectedOrderSide, getSelectedTradeType, getTradeInputAlert } from '@/lib/tradeData';
 
-import { Orderbook } from '../tables/Orderbook';
+import { CanvasOrderbook } from '../CanvasOrderbook/CanvasOrderbook';
 import { AdvancedTradeOptions } from './TradeForm/AdvancedTradeOptions';
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
 import { PositionPreview } from './TradeForm/PositionPreview';
@@ -386,7 +386,7 @@ export const TradeForm = ({
           </$TopActionsRow>
 
           <$OrderbookAndInputs showOrderbook={showOrderbook}>
-            {isTablet && showOrderbook && <$Orderbook maxRowsPerSide={5} />}
+            {isTablet && showOrderbook && <$Orderbook maxRowsPerSide={5} hideHeader />}
 
             <$InputsColumn>
               {tradeFormInputs.map(
@@ -475,7 +475,7 @@ const $TradeForm = styled.form`
   --tradeBox-content-paddingLeft: ;
 
   /* Rules */
-  --orderbox-column-width: 140px;
+  --orderbox-column-width: 180px;
   --orderbook-width: calc(var(--orderbox-column-width) + var(--tradeBox-content-paddingLeft));
 
   min-height: 100%;
@@ -579,21 +579,11 @@ const $OrderbookAndInputs = styled.div<{ showOrderbook: boolean }>`
           `}
   }
 `;
-const $Orderbook = styled(Orderbook)`
+const $Orderbook = styled(CanvasOrderbook)`
   width: 100%;
 
   @media ${breakpoints.notTablet} {
     display: none;
-  }
-
-  > table {
-    --tableCell-padding: 0.5em 1em;
-
-    scroll-snap-type: none;
-
-    thead {
-      display: none;
-    }
   }
 `;
 const $ToggleGroup = styled(ToggleGroup)`

@@ -15,6 +15,7 @@ import { WithTooltip } from '@/components/WithTooltip';
 
 type StyleProps = {
   side?: 'top' | 'bottom';
+  isHeader?: boolean;
 };
 
 type ElementProps = {
@@ -23,7 +24,7 @@ type ElementProps = {
   tickSizeDecimals?: Nullable<number>;
 };
 
-export const OrderbookRow = styled.div`
+export const OrderbookRow = styled.div<{ isHeader?: boolean }>`
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -37,14 +38,25 @@ export const OrderbookRow = styled.div`
     flex: 1 1 0%;
     text-align: right;
   }
+
+  ${({ isHeader }) =>
+    isHeader
+      ? `
+  padding-left: 2rem;
+  gap: 2rem;
+  > span {
+    flex: 0 0 0%;
+  }
+  `
+      : ``}
 `;
 
 export const SpreadRow = forwardRef<HTMLDivElement, StyleProps & ElementProps>(
-  ({ side, spread, spreadPercent, tickSizeDecimals = TOKEN_DECIMALS }, ref) => {
+  ({ side, spread, isHeader, spreadPercent, tickSizeDecimals = TOKEN_DECIMALS }, ref) => {
     const stringGetter = useStringGetter();
 
     return (
-      <$SpreadRow ref={ref} side={side}>
+      <$SpreadRow ref={ref} side={side} isHeader={isHeader}>
         <span>
           <WithTooltip tooltip="spread">
             <Output
