@@ -13,8 +13,6 @@ const ClassicThemeBase: ThemeColorBase = {
 
   whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
 
-  greenDark: ColorToken.Green4,
-
   layer0: ColorToken.GrayBlue7,
   layer1: ColorToken.GrayBlue6,
   layer2: ColorToken.GrayBlue5,
@@ -49,6 +47,8 @@ const ClassicThemeBase: ThemeColorBase = {
 
   positive: ColorToken.Green1,
   negative: ColorToken.Red2,
+  positiveDark: ColorToken.Green4,
+  negativeDark: ColorToken.Red4,
   positiveFaded: generateFadedColorVariant(ColorToken.Green1, OpacityToken.Opacity16),
   negativeFaded: generateFadedColorVariant(ColorToken.Red2, OpacityToken.Opacity16),
 
@@ -77,8 +77,6 @@ const DarkThemeBase: ThemeColorBase = {
   red: ColorToken.Red0,
 
   whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
-
-  greenDark: ColorToken.Green4,
 
   layer0: ColorToken.Black,
   layer1: ColorToken.DarkGray11,
@@ -114,6 +112,8 @@ const DarkThemeBase: ThemeColorBase = {
 
   positive: ColorToken.Green0,
   negative: ColorToken.Red0,
+  positiveDark: ColorToken.Green4,
+  negativeDark: ColorToken.Red3,
   positiveFaded: generateFadedColorVariant(ColorToken.Green0, OpacityToken.Opacity16),
   negativeFaded: generateFadedColorVariant(ColorToken.Red0, OpacityToken.Opacity16),
 
@@ -142,8 +142,6 @@ const LightThemeBase: ThemeColorBase = {
   red: ColorToken.Red1,
 
   whiteFaded: generateFadedColorVariant(ColorToken.White, OpacityToken.Opacity16),
-
-  greenDark: ColorToken.Green5,
 
   layer0: ColorToken.White,
   layer1: ColorToken.LightGray6,
@@ -179,6 +177,8 @@ const LightThemeBase: ThemeColorBase = {
 
   positive: ColorToken.Green2,
   negative: ColorToken.Red1,
+  positiveDark: ColorToken.Green5,
+  negativeDark: ColorToken.Red5,
   positiveFaded: generateFadedColorVariant(ColorToken.Green2, OpacityToken.Opacity16),
   negativeFaded: generateFadedColorVariant(ColorToken.Red1, OpacityToken.Opacity16),
 
@@ -208,6 +208,8 @@ const generateTheme = (themeBase: ThemeColorBase): Theme => {
       // #InvertDirectionalColors
       positive: themeBase.negative,
       negative: themeBase.positive,
+      positiveDark: themeBase.negativeDark,
+      negativeDark: themeBase.positiveDark,
       positiveFaded: themeBase.negativeFaded,
       negativeFaded: themeBase.positiveFaded,
     },

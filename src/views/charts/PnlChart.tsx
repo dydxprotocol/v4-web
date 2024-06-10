@@ -25,8 +25,7 @@ import {
   getSubaccountId,
 } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { AppTheme } from '@/state/configs';
-import { getAppTheme } from '@/state/configsSelectors';
+import { getChartDotBackground } from '@/state/configsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { formatRelativeTime } from '@/lib/dateTime';
@@ -54,9 +53,6 @@ const PNL_TIME_RESOLUTION = 1 * timeUnits.hour;
 const getPeriodFromName = (periodName: string) =>
   HISTORICAL_PNL_PERIODS[periodName as keyof typeof HISTORICAL_PNL_PERIODS];
 
-const DARK_CHART_BACKGROUND_URL = '/chart-dots-background-dark.svg';
-const LIGHT_CHART_BACKGROUND_URL = '/chart-dots-background-light.svg';
-
 type ElementProps = {
   onTooltipContext?: (tooltipContext: TooltipContextType<PnlDatum>) => void;
   onVisibleDataChange?: (data: Array<PnlDatum>) => void;
@@ -78,9 +74,10 @@ export const PnlChart = ({
   slotEmpty,
 }: PnlChartProps) => {
   const { isTablet } = useBreakpoints();
-  const appTheme = useAppSelector(getAppTheme);
   const { equity } = useAppSelector(getSubaccount, shallowEqual) ?? {};
   const now = useNow({ intervalMs: timeUnits.minute });
+
+  const chartDotsBackground = useAppSelector(getChartDotBackground);
 
   // Chart data
   const pnlData = useAppSelector(getSubaccountHistoricalPnl, shallowEqual);
@@ -219,8 +216,7 @@ export const PnlChart = ({
 
   const chartStyles = useMemo(
     () => ({
-      background:
-        appTheme === AppTheme.Light ? LIGHT_CHART_BACKGROUND_URL : DARK_CHART_BACKGROUND_URL,
+      background: chartDotsBackground,
       margin: {
         left: -0.5, // left: isMobile ? -0.5 : 70,
         right: -0.5,
@@ -234,7 +230,7 @@ export const PnlChart = ({
         bottom: 0.1,
       },
     }),
-    [appTheme, isTablet]
+    [chartDotsBackground, isTablet]
   );
 
   const xAccessorFunc = useCallback((datum: PnlDatum) => datum?.createdAt, []);

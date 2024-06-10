@@ -1,5 +1,5 @@
 import { shallowEqual } from 'react-redux';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -18,6 +18,7 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
 import { getSubaccountEquity } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
+import { getChartDotBackground } from '@/state/configsSelectors';
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 
@@ -30,6 +31,7 @@ export const StakingRewardDialog = ({ usdcRewards, setIsOpen }: ElementProps) =>
   const stringGetter = useStringGetter();
   const { usdcLabel } = useTokenConfigs();
 
+  const chartDotsBackground = useAppSelector(getChartDotBackground);
   const { current: equity } = useAppSelector(getSubaccountEquity, shallowEqual) ?? {};
   const newEquity = MustBigNumber(equity).plus(usdcRewards);
 
@@ -70,7 +72,7 @@ export const StakingRewardDialog = ({ usdcRewards, setIsOpen }: ElementProps) =>
 
   return (
     <$Dialog isOpen setIsOpen={setIsOpen} hasHeaderBlur={false}>
-      <$Container>
+      <$Container backgroundImagePath={chartDotsBackground}>
         <$AssetContainer>
           <$Pill>
             <$PositiveOutput type={OutputType.Asset} value={usdcRewards} showSign={ShowSign.Both} />
@@ -78,7 +80,7 @@ export const StakingRewardDialog = ({ usdcRewards, setIsOpen }: ElementProps) =>
           </$Pill>
           <$AssetIcon symbol="USDC" />
         </$AssetContainer>
-        <$Heading>{stringGetter({ key: STRING_KEYS.CLAIM_STAKING_REWARDS })}</$Heading>
+        <$Heading>{stringGetter({ key: STRING_KEYS.YOU_EARNED })}</$Heading>
         <$WithDetailsReceipt detailItems={detailItems}>
           <Button action={ButtonAction.Primary} onClick={claimRewards}>
             {stringGetter({
@@ -105,7 +107,7 @@ const $Dialog = styled(Dialog)`
   --dialog-header-paddingBottom: 0rem;
 `;
 
-const $Container = styled.div`
+const $Container = styled.div<{ backgroundImagePath: string }>`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -119,8 +121,10 @@ const $Container = styled.div`
     bottom: 0;
     right: 0;
 
-    background-image: url('/chart-dots-background-dark.svg'),
-      linear-gradient(to top, var(--color-layer-3) 60%, var(--color-green-dark) 130%);
+    ${({ backgroundImagePath }) => css`
+      background-image: url(${backgroundImagePath}),
+        linear-gradient(to top, var(--color-layer-3) 60%, var(--color-positive-dark));
+    `}
     mask-image: linear-gradient(to bottom, var(--color-layer-3) 20%, transparent);
   }
 `;
@@ -138,7 +142,7 @@ const $Pill = styled.div`
   padding: 0.25rem 0.5rem;
   gap: 0.5ch;
 
-  background: var(--color-green-dark);
+  background: var(--color-positive-dark);
   color: var(--color-text-2);
 
   margin-bottom: -0.5rem;
