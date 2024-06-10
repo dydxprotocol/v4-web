@@ -59,12 +59,12 @@ export const useComplianceState = () => {
           : undefined,
         EMAIL: complianceSupportEmail,
       },
-    }) as string;
+    });
   } else if (complianceStatus === ComplianceStatus.BLOCKED) {
     complianceMessage = stringGetter({
       key: STRING_KEYS.PERMANENTLY_BLOCKED_MESSAGE,
       params: { EMAIL: complianceSupportEmail },
-    }) as string;
+    });
   } else if (geo && isBlockedGeo(geo)) {
     complianceMessage = stringGetter({
       key: STRING_KEYS.BLOCKED_MESSAGE,
@@ -75,7 +75,7 @@ export const useComplianceState = () => {
           </Link>
         ),
       },
-    }) as string;
+    });
   }
 
   return {

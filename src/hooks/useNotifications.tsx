@@ -170,19 +170,17 @@ const useNotificationsContext = () => {
           if (notificationPreferences[notificationCategory] !== false) {
             // New unique key - create new notification
             if (!notification) {
-              const thisNotification = (notifications[key] = {
+              const newStatus = isNew ? NotificationStatus.Triggered : NotificationStatus.Cleared;
+              const thisNotification: Notification = (notifications[key] = {
                 id,
                 type,
                 timestamps: {},
+                status: newStatus,
                 updateKey,
-              } as Notification);
-              updateStatus(
-                thisNotification,
-                isNew ? NotificationStatus.Triggered : NotificationStatus.Cleared
-              );
+              });
+              updateStatus(thisNotification, newStatus);
             } else if (JSON.stringify(updateKey) !== JSON.stringify(notification.updateKey)) {
               // updateKey changed - update existing notification
-
               const thisNotification = notifications[key];
 
               thisNotification.updateKey = updateKey;

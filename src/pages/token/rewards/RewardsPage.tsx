@@ -38,6 +38,7 @@ import { StakingPanel } from './StakingPanel';
 import { StakingRewardPanel } from './StakingRewardPanel';
 import { TradingRewardsChartPanel } from './TradingRewardsChartPanel';
 import { TradingRewardsSummaryPanel } from './TradingRewardsSummaryPanel';
+import { UnbondingPanels } from './UnbondingPanels';
 
 const RewardsPage = () => {
   const stringGetter = useStringGetter();
@@ -84,7 +85,7 @@ const RewardsPage = () => {
         {showGeoblockedPanel && <GeoblockedPanel />}
         {showStakingRewardPanel && stakingRewardPanel}
         {stakingEnabled ? <StakingPanel /> : <DYDXBalancePanel />}
-        {/* List of unstaking panels */}
+        {stakingEnabled && <UnbondingPanels />}
         {stakingEnabled && <TradingRewardsChartPanel />}
         <LaunchIncentivesPanel />
         {!stakingEnabled && <TradingRewardsSummaryPanel />}
@@ -109,7 +110,7 @@ const RewardsPage = () => {
           {showGeoblockedPanel && <GeoblockedPanel />}
           {showStakingRewardPanel && stakingRewardPanel}
           {stakingEnabled ? <StakingPanel /> : <DYDXBalancePanel />}
-          {/* List of unstaking panels */}
+          {stakingEnabled && <UnbondingPanels />}
           {stakingEnabled && <NewMarketsPanel />}
           {stakingEnabled && <GovernancePanel />}
           <RewardsHelpPanel />
