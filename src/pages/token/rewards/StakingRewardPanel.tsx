@@ -2,10 +2,10 @@ import { useCallback } from 'react';
 
 import styled from 'styled-components';
 
-import { ButtonAction } from '@/constants/buttons';
+import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { USD_DECIMALS } from '@/constants/numbers';
+import { TOKEN_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -16,9 +16,9 @@ import { Button } from '@/components/Button';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 
+import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
-import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { BigNumberish } from '@/lib/numbers';
 
@@ -31,7 +31,7 @@ export const StakingRewardPanel = ({ validators, usdcRewards }: ElementProps) =>
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
-  const selectedLocale = useAppSelector(getSelectedLocale);
+  const canAccountTrade = useAppSelector(calculateCanAccountTrade);
 
   const openStakingRewardDialog = useCallback(
     () =>
@@ -54,18 +54,23 @@ export const StakingRewardPanel = ({ validators, usdcRewards }: ElementProps) =>
         </$Title>
       }
       slotRight={
-        <$Button action={ButtonAction.Primary} onClick={openStakingRewardDialog}>
-          {stringGetter({ key: STRING_KEYS.CLAIM })}
-        </$Button>
+        canAccountTrade && (
+          <$Button
+            action={ButtonAction.Primary}
+            size={ButtonSize.Base}
+            onClick={openStakingRewardDialog}
+          >
+            {stringGetter({ key: STRING_KEYS.CLAIM })}
+          </$Button>
+        )
       }
     >
       <$InlineRow>
         <$PositiveOutput
           type={OutputType.Asset}
-          value={usdcRewards.toLocaleString(selectedLocale, {
-            minimumFractionDigits: USD_DECIMALS,
-          })}
+          value={usdcRewards}
           showSign={ShowSign.Both}
+          minimumFractionDigits={TOKEN_DECIMALS}
         />
         <AssetIcon symbol="USDC" />
       </$InlineRow>
@@ -101,7 +106,6 @@ const $Panel = styled(Panel)`
 
 const $Button = styled(Button)`
   margin-right: var(--panel-paddingX);
-
   z-index: 1;
 `;
 

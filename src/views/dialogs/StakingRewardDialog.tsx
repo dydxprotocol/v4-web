@@ -7,7 +7,7 @@ import { formatUnits } from 'viem';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { NumberSign, USD_DECIMALS } from '@/constants/numbers';
+import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -25,7 +25,6 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
 import { getSubaccountEquity } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
-import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
@@ -44,7 +43,6 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
   const { usdcBalance } = useAccountBalance();
 
   const { current: equity } = useAppSelector(getSubaccountEquity, shallowEqual) ?? {};
-  const selectedLocale = useAppSelector(getSelectedLocale);
 
   const [error, setError] = useState<string>();
   const [fee, setFee] = useState<BigNumberish>();
@@ -118,7 +116,12 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
       <$Container>
         <$AssetContainer>
           <$Pill>
-            <$PositiveOutput type={OutputType.Asset} value={usdcRewards} showSign={ShowSign.Both} />
+            <$PositiveOutput
+              type={OutputType.Asset}
+              value={usdcRewards}
+              showSign={ShowSign.Both}
+              minimumFractionDigits={TOKEN_DECIMALS}
+            />
             {usdcLabel}
           </$Pill>
           <$AssetIcon symbol="USDC" />
@@ -145,10 +148,9 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
                 USDC_AMOUNT: (
                   <Output
                     type={OutputType.Asset}
-                    value={usdcRewards.toLocaleString(selectedLocale, {
-                      minimumFractionDigits: USD_DECIMALS,
-                    })}
+                    value={usdcRewards}
                     showSign={ShowSign.None}
+                    minimumFractionDigits={TOKEN_DECIMALS}
                   />
                 ),
               },
