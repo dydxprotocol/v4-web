@@ -116,7 +116,9 @@ export const TradingRewardHistoryTable = ({
     useParameterizedSelector(getHistoricalTradingRewardsForPeriod, period.name);
 
   const rewardsData = useMemo(() => {
-    return periodTradingRewards && canViewAccount ? periodTradingRewards.toArray() : [];
+    return periodTradingRewards && canViewAccount
+      ? periodTradingRewards.toArray().filter((f) => f.amount > 0)
+      : [];
   }, [periodTradingRewards, canViewAccount]);
 
   const columns = columnKeys.map((key: TradingRewardHistoryTableColumnKey) =>
