@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { TOKEN_DECIMALS } from '@/constants/numbers';
+import { SMALL_USD_DECIMALS } from '@/constants/numbers';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -70,7 +70,7 @@ export const StakingRewardPanel = ({ validators, usdcRewards }: ElementProps) =>
           type={OutputType.Asset}
           value={usdcRewards}
           showSign={ShowSign.Both}
-          minimumFractionDigits={TOKEN_DECIMALS}
+          minimumFractionDigits={SMALL_USD_DECIMALS}
         />
         <AssetIcon symbol="USDC" />
       </$InlineRow>

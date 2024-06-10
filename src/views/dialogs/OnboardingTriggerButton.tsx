@@ -12,11 +12,10 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { forceOpenDialog } from '@/state/dialogs';
 
 type StyleProps = {
-  className?: string;
   size?: ButtonSize;
 };
 
-export const OnboardingTriggerButton = ({ className, size = ButtonSize.Small }: StyleProps) => {
+export const OnboardingTriggerButton = ({ size = ButtonSize.Small }: StyleProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
 
@@ -24,7 +23,6 @@ export const OnboardingTriggerButton = ({ className, size = ButtonSize.Small }: 
 
   return (
     <Button
-      className={className}
       action={ButtonAction.Primary}
       size={size}
       onClick={() => dispatch(forceOpenDialog({ type: DialogTypes.Onboarding }))}

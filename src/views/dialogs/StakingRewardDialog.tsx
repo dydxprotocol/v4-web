@@ -7,7 +7,7 @@ import { formatUnits } from 'viem';
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
-import { NumberSign, TOKEN_DECIMALS } from '@/constants/numbers';
+import { NumberSign, SMALL_USD_DECIMALS } from '@/constants/numbers';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -120,7 +120,7 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
               type={OutputType.Asset}
               value={usdcRewards}
               showSign={ShowSign.Both}
-              minimumFractionDigits={TOKEN_DECIMALS}
+              minimumFractionDigits={SMALL_USD_DECIMALS}
             />
             {usdcLabel}
           </$Pill>
@@ -150,7 +150,7 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
                     type={OutputType.Asset}
                     value={usdcRewards}
                     showSign={ShowSign.None}
-                    minimumFractionDigits={TOKEN_DECIMALS}
+                    minimumFractionDigits={SMALL_USD_DECIMALS}
                   />
                 ),
               },
