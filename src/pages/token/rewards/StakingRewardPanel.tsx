@@ -84,7 +84,7 @@ const $Panel = styled(Panel)<{ backgroundImagePath: string }>`
 
   ${({ backgroundImagePath }) => css`
     background: url(${backgroundImagePath}),
-      linear-gradient(254deg, var(--color-positive-dark), var(--gradient-start-color) 60%);
+      linear-gradient(270deg, var(--color-positive-dark), var(--gradient-start-color) 60%);
   `}
   position: relative;
 
@@ -98,7 +98,7 @@ const $Panel = styled(Panel)<{ backgroundImagePath: string }>`
 
     border-radius: var(--panel-border-radius);
     background: var(--gradient-start-color);
-    mask-image: linear-gradient(254deg, transparent, var(--gradient-start-color) 60%);
+    mask-image: linear-gradient(270deg, transparent, var(--gradient-start-color) 60%);
   }
 `;
 
