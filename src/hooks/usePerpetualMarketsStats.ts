@@ -7,6 +7,8 @@ import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { isPresent, orEmptyObj } from '@/lib/typeUtils';
 
+const FEE_ESTIMATION_MULTIPLIER = 0.0002; // 2bps
+
 export const usePerpetualMarketsStats = () => {
   const perpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
 
@@ -29,7 +31,7 @@ export const usePerpetualMarketsStats = () => {
     return {
       volume24HUSDC,
       openInterestUSDC,
-      feesEarned: volume24HUSDC * 0.0002, // approximation derived from volume * 2bps
+      feesEarned: volume24HUSDC * FEE_ESTIMATION_MULTIPLIER,
     };
   }, [markets]);
 
