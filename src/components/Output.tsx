@@ -251,12 +251,11 @@ export const Output = ({
         fallbackDecimals: number,
         formattingOptions?: FormattingOptions
       ) => {
+        const numDigits = fractionDigits ?? fallbackDecimals;
         const precisionVal = minimumFractionDigits
-          ? MustBigNumber(val.toPrecision(minimumFractionDigits, roundingMode))
+          ? MustBigNumber(val.toPrecision(minimumFractionDigits, roundingMode)).abs()
           : valueBN;
-        const dp = minimumFractionDigits
-          ? precisionVal.decimalPlaces()
-          : fractionDigits ?? fallbackDecimals;
+        const dp = minimumFractionDigits ? precisionVal.decimalPlaces() ?? numDigits : numDigits;
         return precisionVal.toFormat(dp, roundingMode, { ...format, ...formattingOptions });
       };
 
