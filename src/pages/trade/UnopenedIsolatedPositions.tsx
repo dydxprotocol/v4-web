@@ -91,7 +91,7 @@ const UnopenedIsolatedPositionsCards = ({
       {pendingPositions.map((pendingPosition) => (
         <PotentialPositionCard
           key={pendingPosition.assetId}
-          marketName={assetsData?.[pendingPosition.assetId].name ?? ''}
+          marketName={assetsData?.[pendingPosition.assetId]?.name ?? pendingPosition.assetId ?? ''}
           pendingPosition={pendingPosition}
           onViewOrders={onViewOrders}
         />
