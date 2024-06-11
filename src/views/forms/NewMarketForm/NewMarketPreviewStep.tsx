@@ -41,7 +41,6 @@ import { openDialog } from '@/state/dialogs';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
-import { testFlags } from '@/lib/testFlags';
 
 type NewMarketPreviewStepProps = {
   assetData: NewMarketProposal;
@@ -151,11 +150,9 @@ export const NewMarketPreviewStep = ({
               liquidityTier,
               quantumConversionExponent,
               // @ts-ignore - marketType is not required until v5
-              marketType: testFlags.withNewMarketType
-                ? marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
+              marketType: marketType === 'PERPETUAL_MARKET_TYPE_ISOLATED'
                   ? PerpetualMarketType.PERPETUAL_MARKET_TYPE_ISOLATED
-                  : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS
-                : undefined,
+                  : PerpetualMarketType.PERPETUAL_MARKET_TYPE_CROSS,
               stepBaseQuantums: Long.fromNumber(stepBaseQuantums),
               subticksPerTick,
               delayBlocks: newMarketProposal.delayBlocks,
