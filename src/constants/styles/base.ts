@@ -53,6 +53,7 @@ export enum ColorToken {
   Green2 = '#2CCC98',
   Green3 = '#3EB68A',
   Green4 = '#2C5254',
+  Green5 = '#CEEDE3',
 
   Yellow0 = '#FFCC48',
   Yellow1 = '#FFB647',
@@ -60,6 +61,9 @@ export enum ColorToken {
   Red0 = '#FF5C5C',
   Red1 = '#E76565',
   Red2 = '#E45555',
+  Red3 = '#462C2E',
+  Red4 = '#412A38',
+  Red5 = '#F5E1E3',
 }
 
 /** Maps opacity to corresponding hex value */

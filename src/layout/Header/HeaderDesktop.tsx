@@ -42,8 +42,7 @@ export const HeaderDesktop = () => {
 
   const hasSeenLaunchIncentives = useAppSelector(getHasSeenLaunchIncentives);
   const showChainTokenPage =
-    complianceState === ComplianceStates.FULL_ACCESS ||
-    (testFlags.tradingRewardsRehaul && testFlags.enableStaking);
+    complianceState === ComplianceStates.FULL_ACCESS || testFlags.enableStaking;
 
   const navItems = [
     {
