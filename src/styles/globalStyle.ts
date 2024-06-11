@@ -9,8 +9,6 @@ export const GlobalStyle = createGlobalStyle`
 
     --color-white-faded: ${({ theme }) => theme.whiteFaded};
 
-    --color-green-dark: ${({ theme }) => theme.greenDark};
-
     --color-layer-0: ${({ theme }) => theme.layer0};
     --color-layer-1: ${({ theme }) => theme.layer1};
     --color-layer-2: ${({ theme }) => theme.layer2};
@@ -45,6 +43,8 @@ export const GlobalStyle = createGlobalStyle`
 
     --color-positive: ${({ theme }) => theme.positive};
     --color-negative: ${({ theme }) => theme.negative};
+    --color-positive-dark: ${({ theme }) => theme.positiveDark};
+    --color-negative-dark: ${({ theme }) => theme.negativeDark};
     --color-gradient-positive: ${({ theme }) => theme.positiveFaded};
     --color-gradient-negative: ${({ theme }) => theme.negativeFaded};
 
