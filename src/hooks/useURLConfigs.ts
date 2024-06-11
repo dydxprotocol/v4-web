@@ -32,6 +32,8 @@ export interface LinksConfigs {
   withdrawalGateLearnMore?: string;
   exchangeStats?: string;
   complianceSupportEmail?: string;
+  fetAgixMarketWindDownProposal?: string;
+  contractLossMechanismLearnMore?: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {
@@ -65,5 +67,7 @@ export const useURLConfigs = (): LinksConfigs => {
     withdrawalGateLearnMore: linksConfigs.withdrawalGateLearnMore ?? FALLBACK_URL,
     exchangeStats: linksConfigs.exchangeStats ?? FALLBACK_URL,
     complianceSupportEmail: linksConfigs.complianceSupportEmail ?? FALLBACK_URL,
+    fetAgixMarketWindDownProposal: linksConfigs.fetAgixMarketWindDownProposal,
+    contractLossMechanismLearnMore: linksConfigs.contractLossMechanismLearnMore,
   };
 };
