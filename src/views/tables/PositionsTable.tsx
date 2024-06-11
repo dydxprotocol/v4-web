@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import {
-  AbacusMarginMode,
   type Asset,
   type Nullable,
   type SubaccountOrder,
@@ -323,7 +322,6 @@ const getPositionsTableColumnDef = ({
           size,
           stopLossOrders,
           takeProfitOrders,
-          childSubaccountNumber,
         }) => (
           <PositionsTriggersCell
             marketId={id}
@@ -334,10 +332,7 @@ const getPositionsTableColumnDef = ({
             takeProfitOrders={takeProfitOrders}
             positionSide={side.current}
             positionSize={size?.current}
-            isDisabled={
-              isAccountViewOnly ||
-              getMarginModeFromSubaccountNumber(childSubaccountNumber) === AbacusMarginMode.isolated
-            }
+            isDisabled={isAccountViewOnly}
             onViewOrdersClick={navigateToOrders}
           />
         ),

@@ -30,8 +30,8 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: 1.7.66
-    version: 1.7.66
+    specifier: 1.7.67
+    version: 1.7.67
   '@dydxprotocol/v4-client-js':
     specifier: ^1.1.15
     version: 1.1.15
@@ -1578,8 +1578,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.7.66:
-    resolution: {integrity: sha512-6hKiPkooDP5GqwYCzR0eK3Rtqu8+MDcCpdJM8nLVhqC69ZpQYkfsUp5qH8S1qMJFoDlDaFSFARvGEav90DjSyA==}
+  /@dydxprotocol/v4-abacus@1.7.67:
+    resolution: {integrity: sha512-9F5gvB1Y8LimZbTD8Si1iyzMLd+hok1aXxX3AHpmy9bDYBFDYvC/5mo0v2T+uAQeizLKBRg/1QehJIfQHnoMbg==}
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
@@ -12358,7 +12358,6 @@ packages:
       is-hex-prefixed: 1.0.0
       strip-hex-prefix: 1.0.0
     dev: false
-    bundledDependencies: false
 
   /event-emitter@0.3.5:
     resolution: {integrity: sha512-D9rRn9y7kLPnJ+hMq7S/nhvoKwwvVJahBi2BPmx3bvbsEdK3W9ii8cBSGjP+72/LnM4n6fo3+dkCX5FeTQruXA==}
@@ -13120,6 +13119,7 @@ packages:
 
   /grapheme-splitter@1.0.4:
     resolution: {integrity: sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==}
+    requiresBuild: true
     dev: true
 
   /graphemer@1.4.0:
