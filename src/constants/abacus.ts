@@ -70,8 +70,6 @@ export const AbacusApiStatus = Abacus.exchange.dydx.abacus.state.manager.ApiStat
 export const Changes = Abacus.exchange.dydx.abacus.state.changes.Changes;
 export type PerpetualStateChanges = Abacus.exchange.dydx.abacus.state.changes.StateChanges;
 export const AsyncAbacusStateManager =
-  Abacus.exchange.dydx.abacus.state.manager.AsyncAbacusStateManager;
-export const AsyncAbacusStateManagerV2 =
   Abacus.exchange.dydx.abacus.state.v2.manager.AsyncAbacusStateManagerV2;
 
 // ------ Parsing Errors ------ //
