@@ -27,6 +27,7 @@ import { getCurrentMarketPositionData, getSubaccountId } from '@/state/accountSe
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { getCurrentInput, getInputTradeMarginMode } from '@/state/inputsSelectors';
+import { getCurrentMarketConfig } from '@/state/perpetualsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 import { nullIfZero } from '@/lib/numbers';
@@ -70,6 +71,7 @@ export const PlaceOrderButtonAndReceipt = ({
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const subaccountNumber = useAppSelector(getSubaccountId);
   const currentInput = useAppSelector(getCurrentInput);
+  const { tickSizeDecimals } = orEmptyObj(useAppSelector(getCurrentMarketConfig, shallowEqual));
   const { liquidationPrice, equity, leverage, notionalTotal, adjustedMmf } = orEmptyObj(
     useAppSelector(getCurrentMarketPositionData, shallowEqual)
   );
@@ -140,7 +142,14 @@ export const PlaceOrderButtonAndReceipt = ({
           {stringGetter({ key: STRING_KEYS.EXPECTED_PRICE })}
         </WithTooltip>
       ),
-      value: <Output type={OutputType.Fiat} value={expectedPrice} useGrouping />,
+      value: (
+        <Output
+          useGrouping
+          fractionDigits={tickSizeDecimals}
+          type={OutputType.Fiat}
+          value={expectedPrice}
+        />
+      ),
     },
     {
       key: 'liquidation-price',
