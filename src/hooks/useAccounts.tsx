@@ -4,7 +4,6 @@ import { OfflineSigner } from '@cosmjs/proto-signing';
 import { LocalWallet, NOBLE_BECH32_PREFIX, type Subaccount } from '@dydxprotocol/v4-client-js';
 import { usePrivy } from '@privy-io/react-auth';
 import { AES, enc } from 'crypto-js';
-import { shallowEqual } from 'react-redux';
 
 import { OnboardingGuard, OnboardingState, type EvmDerivedAddresses } from '@/constants/account';
 import { LOCAL_STORAGE_VERSIONS, LocalStorageKey } from '@/constants/localStorage';
@@ -65,7 +64,7 @@ const useAccountsContext = () => {
 
   // EVM wallet connection
   const [previousEvmAddress, setPreviousEvmAddress] = useState(evmAddress);
-  const hasSubAccount = useAppSelector(getHasSubaccount, shallowEqual);
+  const hasSubAccount = useAppSelector(getHasSubaccount);
 
   useEffect(() => {
     // Wallet accounts switched
