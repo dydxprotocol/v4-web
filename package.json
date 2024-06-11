@@ -49,7 +49,7 @@
     "@cosmjs/tendermint-rpc": "^0.32.1",
     "@dydxprotocol/v4-abacus": "1.7.51",
     "@dydxprotocol/v4-client-js": "^1.1.15",
-    "@dydxprotocol/v4-localization": "^1.1.118",
+    "@dydxprotocol/v4-localization": "^1.1.120",
     "@ethersproject/providers": "^5.7.2",
     "@js-joda/core": "^5.5.3",
     "@privy-io/react-auth": "^1.66.2",

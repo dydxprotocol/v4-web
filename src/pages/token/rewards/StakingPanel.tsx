@@ -38,6 +38,9 @@ export const StakingPanel = ({ className }: { className?: string }) => {
   const { chainTokenLabel } = useTokenConfigs();
   const { selectedValidator } = useStakingValidator() ?? {};
 
+  const unstakedApr = 16.94; /* OTE-406: Hardcoded for now until I get the APY endpoint working */
+  const stakedApr = 16.94; /* OTE-406: Hardcoded for now until I get the APY endpoint working */
+
   return (
     <Panel
       className={className}
@@ -73,8 +76,9 @@ export const StakingPanel = ({ className }: { className?: string }) => {
               {stringGetter({
                 key: STRING_KEYS.UNSTAKED,
               })}
-              {/* Hardcoded for now until I get the APY endpoint working */}
-              <Tag sign={TagSign.Positive}>Est. 16.94 APR</Tag>
+              <Tag sign={TagSign.Positive}>
+                {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: unstakedApr } })}
+              </Tag>
             </$label>
             <$BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
           </div>
@@ -95,8 +99,9 @@ export const StakingPanel = ({ className }: { className?: string }) => {
               {stringGetter({
                 key: STRING_KEYS.STAKED,
               })}
-              {/* Hardcoded for now until I get the APY endpoint working */}
-              <Tag>Est. 16.94 APR</Tag>
+              <Tag>
+                {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: stakedApr } })}
+              </Tag>
             </$label>
             <$BalanceOutput type={OutputType.Asset} value={nativeStakingBalance} />
           </div>

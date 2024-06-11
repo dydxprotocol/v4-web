@@ -16,6 +16,7 @@ import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { ValidatorName } from '@/components/ValidatorName';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
+import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
@@ -42,7 +43,11 @@ export const StakeButtonAndReceipt = ({ fee, amount, isDisabled, isLoading }: El
   const transferDetailItems = [
     {
       key: 'validator',
-      label: <span>{stringGetter({ key: STRING_KEYS.SELECTED_VALIDATOR })}</span>,
+      label: (
+        <WithTooltip tooltip="validator-selection">
+          {stringGetter({ key: STRING_KEYS.SELECTED_VALIDATOR })}
+        </WithTooltip>
+      ),
       value: <ValidatorName validator={selectedValidator} />,
     },
     {
