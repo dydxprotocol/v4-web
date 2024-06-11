@@ -33,8 +33,6 @@ type BaseColors = {
   red: string;
 
   whiteFaded: string;
-
-  greenDark: string;
 };
 
 type LayerColors = {
@@ -87,6 +85,8 @@ type StatusColors = {
 type DirectionalColors = {
   positive: string;
   negative: string;
+  positiveDark: string;
+  negativeDark: string;
   positiveFaded: string;
   negativeFaded: string;
 };

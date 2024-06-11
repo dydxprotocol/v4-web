@@ -13,6 +13,6 @@ export interface GovernanceVariables {
 
 export const useGovernanceVariables = (): GovernanceVariables => {
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
-  const governanceVars = GOVERNANCE_CONFIG_MAP[selectedDydxChainId] as GovernanceVariables;
+  const governanceVars = GOVERNANCE_CONFIG_MAP[selectedDydxChainId];
   return governanceVars;
 };

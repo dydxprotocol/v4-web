@@ -43,6 +43,7 @@ import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
+import { safeAssign } from '@/lib/objectHelpers';
 import { testFlags } from '@/lib/testFlags';
 import { orEmptyObj } from '@/lib/typeUtils';
 
@@ -428,9 +429,7 @@ export const PositionsTable = ({
   const positionsData = useMemo(
     () =>
       positions.map((position: SubaccountPosition): PositionTableRow => {
-        // object splat ... doesn't copy getter defined properties
-        // eslint-disable-next-line prefer-object-spread
-        return Object.assign(
+        return safeAssign(
           {},
           {
             tickSizeDecimals:

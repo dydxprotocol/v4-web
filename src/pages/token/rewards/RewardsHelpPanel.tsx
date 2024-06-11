@@ -19,7 +19,7 @@ export const RewardsHelpPanel = () => {
   const stringGetter = useStringGetter();
   const { tradingRewardsLearnMore } = useURLConfigs();
 
-  const tradingRewardsRehaulEnabled = testFlags.tradingRewardsRehaul;
+  const stakingEnabled = testFlags.enableStaking;
 
   return (
     <$HelpCard
@@ -57,7 +57,7 @@ export const RewardsHelpPanel = () => {
             header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_QUESTION }),
             content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_ANSWER }),
           },
-          tradingRewardsRehaulEnabled && {
+          stakingEnabled && {
             header: stringGetter({ key: STRING_KEYS.FAQ_WHAT_IS_STAKING_QUESTION }),
             content: stringGetter({
               key: STRING_KEYS.FAQ_WHAT_IS_STAKING_ANSWER,
@@ -70,11 +70,11 @@ export const RewardsHelpPanel = () => {
               },
             }),
           },
-          tradingRewardsRehaulEnabled && {
+          stakingEnabled && {
             header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_QUESTION }),
             content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_STAKE_AND_CLAIM_ANSWER }),
           },
-          tradingRewardsRehaulEnabled && {
+          stakingEnabled && {
             header: stringGetter({ key: STRING_KEYS.FAQ_WHAT_ARE_THE_RISKS_OF_STAKING_QUESTION }),
             content: stringGetter({ key: STRING_KEYS.FAQ_WHAT_ARE_THE_RISKS_OF_STAKING_ANSWER }),
           },

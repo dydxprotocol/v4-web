@@ -9,6 +9,7 @@ export enum NotificationType {
   ApiError = 'ApiError',
   ComplianceAlert = 'ComplianceAlert',
   OrderStatus = 'OrderStatus',
+  MarketWindDown = 'MarketWindDown',
 }
 
 export enum NotificationCategoryPreferences {
@@ -28,6 +29,7 @@ export const NotificationTypeCategory: {
   [NotificationType.OrderStatus]: NotificationCategoryPreferences.Trading,
   [NotificationType.ApiError]: NotificationCategoryPreferences.MustSee,
   [NotificationType.ComplianceAlert]: NotificationCategoryPreferences.MustSee,
+  [NotificationType.MarketWindDown]: NotificationCategoryPreferences.MustSee,
 };
 
 export const SingleSessionNotificationTypes = [
@@ -110,7 +112,7 @@ export type Notifications = Record<NotificationId, Notification<any>>;
 export type NotificationDisplayData = {
   icon?: React.ReactNode;
   title: string; // Title for Toast, Notification, and Push Notification
-  body?: string; // Description body for Toast, Notification, and Push Notification
+  body?: string | React.ReactNode; // Description body for Toast, Notification, and Push Notification
 
   slotTitleLeft?: React.ReactNode;
   slotTitleRight?: React.ReactNode;
@@ -184,8 +186,20 @@ export type TransferNotifcation = {
 export enum ReleaseUpdateNotificationIds {
   RevampedConditionalOrders = 'revamped-conditional-orders',
   IncentivesS5 = 'incentives-s5',
-  IncentivesDistributedS3 = 'incentives-distributed-s3',
+  IncentivesDistributedS4 = 'incentives-distributed-s4',
   FOKDeprecation = 'fok-deprecation',
+}
+
+// Incentives Season
+export const CURRENT_SEASON_NUMBER = 5;
+export const REWARD_DISTRIBUTION_SEASON_NUMBER = 4;
+export const INCENTIVES_SEASON_NOTIFICATION_ID = ReleaseUpdateNotificationIds.IncentivesS5;
+export const INCENTIVES_DISTRIBUTED_NOTIFICATION_ID =
+  ReleaseUpdateNotificationIds.IncentivesDistributedS4;
+
+export enum MarketWindDownNotificationIds {
+  MarketWindDownFetAgix = 'market-wind-down-fet-agix',
+  MarketWindDownProposalFetAgix = 'market-wind-down-proposal-fet-agix',
 }
 
 /**

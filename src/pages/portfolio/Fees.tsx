@@ -170,7 +170,7 @@ export const Fees = () => {
                   />
                 ),
               },
-            ] as ColumnDef<FeeTier>[]
+            ] satisfies Array<false | ColumnDef<FeeTier>>
           ).filter(isTruthy)}
           selectionBehavior="replace"
           paginationBehavior="showAll"
