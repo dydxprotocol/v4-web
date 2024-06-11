@@ -30,6 +30,12 @@ export const getSubaccount = (state: RootState) => state.account.subaccount;
 
 /**
  * @param state
+ * @returns Whether or not Abacus' subaccount object exists
+ */
+export const getHasSubaccount = (state: RootState) => Boolean(state.account.subaccount);
+
+/**
+ * @param state
  * @returns identifier of the current subaccount
  */
 export const getSubaccountId = (state: RootState) => state.account.subaccount?.subaccountNumber;

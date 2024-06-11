@@ -17,7 +17,8 @@ import {
 } from '@/constants/wallets';
 
 import { setOnboardingGuard, setOnboardingState } from '@/state/account';
-import { useAppDispatch } from '@/state/appTypes';
+import { getHasSubaccount } from '@/state/accountSelectors';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 
 import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
@@ -63,6 +64,7 @@ const useAccountsContext = () => {
 
   // EVM wallet connection
   const [previousEvmAddress, setPreviousEvmAddress] = useState(evmAddress);
+  const hasSubAccount = useAppSelector(getHasSubaccount);
 
   useEffect(() => {
     // Wallet accounts switched
@@ -79,7 +81,7 @@ const useAccountsContext = () => {
     }
 
     setPreviousEvmAddress(evmAddress);
-  }, [evmAddress]);
+  }, [evmAddress, hasSubAccount]);
 
   const { ready, authenticated } = usePrivy();
 
