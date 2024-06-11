@@ -21,7 +21,7 @@ import {
   AbacusHelper,
   AdjustIsolatedMarginInputField,
   ApiData,
-  AsyncAbacusStateManagerV2,
+  AsyncAbacusStateManager,
   ClosePositionInputField,
   ComplianceAction,
   CoroutineTimer,
@@ -61,7 +61,7 @@ class AbacusStateManager {
 
   private currentMarket: string | undefined;
 
-  stateManager: InstanceType<typeof AsyncAbacusStateManagerV2>;
+  stateManager: InstanceType<typeof AsyncAbacusStateManager>;
 
   websocket: AbacusWebsocket;
 
@@ -103,7 +103,7 @@ class AbacusStateManager {
     const appConfigs = AbacusAppConfig.Companion.forWebAppWithIsolatedMargins;
     appConfigs.onboardingConfigs.squidVersion = OnboardingConfig.SquidVersion.V2;
 
-    this.stateManager = new AsyncAbacusStateManagerV2(
+    this.stateManager = new AsyncAbacusStateManager(
       '',
       CURRENT_ABACUS_DEPLOYMENT,
       appConfigs,
