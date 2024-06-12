@@ -21,7 +21,7 @@ export const customIdentifyEvent = (meta: AnalyticsUserProperty) => {
 // If you want to update how track events work, go to src/lib/analytics.ts
 export const customTrackEvent = (meta: AnalyticsEvent, referrer: string) => {
   return new CustomEvent('dydx:track', {
-    detail: { eventType: meta.type, eventData: { ...meta.payload, referrer } },
+    detail: { eventType: meta.type, eventData: { ...(meta.payload ?? {}), referrer } },
   });
 };
 
