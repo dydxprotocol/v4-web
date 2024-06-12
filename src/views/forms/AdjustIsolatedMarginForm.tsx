@@ -39,7 +39,7 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { getOpenPositionFromId } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getAdjustIsolatedMarginInputs } from '@/state/inputsSelectors';
-import { getMarketConfig } from '@/state/perpetualsSelectors';
+import { getMarketConfig, getMarketMaxLeverage } from '@/state/perpetualsSelectors';
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
@@ -64,7 +64,7 @@ export const AdjustIsolatedMarginForm = ({
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const subaccountPosition = useAppSelector(getOpenPositionFromId(marketId));
-  const { childSubaccountNumber } = subaccountPosition ?? {};
+  const { childSubaccountNumber, marginUsage } = subaccountPosition ?? {};
   const marketConfig = useAppSelector((s) => getMarketConfig(s, marketId));
   const adjustIsolatedMarginInputs = useAppSelector(getAdjustIsolatedMarginInputs, shallowEqual);
 
@@ -169,6 +169,45 @@ export const AdjustIsolatedMarginForm = ({
     liquidationPrice,
     liquidationPriceUpdated,
   } = summary ?? {};
+
+  /**
+   * TODO: Handle by adding AdjustIsolatedMarginValidator within Abacus
+   */
+  const marketMaxLeverage = useAppSelector((s) => getMarketMaxLeverage(s, marketId));
+
+  const alertMessage = useMemo(() => {
+    if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Add) {
+      if (crossMarginUsageUpdated && MustBigNumber(crossMarginUsageUpdated).gte(1)) {
+        return {
+          message: stringGetter({ key: STRING_KEYS.INVALID_NEW_ACCOUNT_MARGIN_USAGE }),
+          type: AlertType.Error,
+        };
+      }
+    } else if (isolatedMarginAdjustmentType === IsolatedMarginAdjustmentType.Remove) {
+      if (marginUsage?.postOrder && MustBigNumber(marginUsage?.postOrder).gte(1)) {
+        return {
+          message: stringGetter({ key: STRING_KEYS.INVALID_NEW_ACCOUNT_MARGIN_USAGE }),
+          type: AlertType.Error,
+        };
+      }
+
+      if (positionLeverageUpdated && MustBigNumber(positionLeverageUpdated).gt(marketMaxLeverage)) {
+        return {
+          message: stringGetter({ key: STRING_KEYS.INVALID_NEW_POSITION_LEVERAGE }),
+          type: AlertType.Error,
+        };
+      }
+    }
+
+    return null;
+  }, [
+    crossMarginUsageUpdated,
+    isolatedMarginAdjustmentType,
+    marginUsage,
+    marketMaxLeverage,
+    positionLeverageUpdated,
+    stringGetter,
+  ]);
 
   const {
     freeCollateralDiffOutput,
@@ -291,7 +330,9 @@ export const AdjustIsolatedMarginForm = ({
     return 'neutral';
   }, [amount, isolatedMarginAdjustmentType]);
 
-  const CenterElement = errorMessage ? (
+  const CenterElement = alertMessage ? (
+    <AlertMessage type={alertMessage.type}>{alertMessage.message}</AlertMessage>
+  ) : errorMessage ? (
     <AlertMessage type={AlertType.Error}>{errorMessage}</AlertMessage>
   ) : (
     <$GradientCard fromColor="neutral" toColor={gradientToColor}>
@@ -301,7 +342,11 @@ export const AdjustIsolatedMarginForm = ({
       </$Column>
       <div>
         <DiffOutput
-          withDiff={!!liquidationPriceUpdated && liquidationPrice !== liquidationPriceUpdated}
+          withDiff={
+            !!liquidationPriceUpdated &&
+            liquidationPrice !== liquidationPriceUpdated &&
+            MustBigNumber(amount).gt(0)
+          }
           sign={NumberSign.Negative}
           layout="column"
           value={liquidationPrice}
