@@ -28,6 +28,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 
 import { isTruthy } from '@/lib/isTruthy';
 
+import otherChains from '../../../../public/configs/otherChains.json';
 import { HighestFeesDecoratorText } from './HighestFeesText';
 import { LowestFeesDecoratorText } from './LowestFeesText';
 
@@ -50,6 +51,10 @@ export const SourceSelectMenu = ({
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions } =
     useAppSelector(getTransferInputs, shallowEqual) ?? {};
+
+  const isNotPrivyDeposit = type === TransferType.withdrawal || walletType !== WalletType.Privy;
+  const isNotKeplrDeposit = type === TransferType.withdrawal || walletType !== WalletType.Keplr;
+
   const chains =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.chains?.toArray() ??
     EMPTY_ARR;
@@ -79,7 +84,9 @@ export const SourceSelectMenu = ({
     if (highestFeeTokensByChainId[chainId]) return <HighestFeesDecoratorText />;
     return null;
   };
-  const chainItems = Object.values(chains)
+  const supportedChains = isNotKeplrDeposit ? chains : otherChains;
+
+  const chainItems = Object.values(supportedChains)
     .map((chain) => ({
       value: chain.type,
       label: chain.stringKey,
@@ -90,6 +97,7 @@ export const SourceSelectMenu = ({
       [feesDecoratorProp]: getFeeDecoratorComponentForChainId(chain.type),
     }))
     .filter((chain) => {
+      if (!isNotKeplrDeposit) return true;
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
       if (type === TransferType.deposit && CCTPDepositOnly) {
         return !!cctpTokensByChainId[chain.value];
@@ -114,18 +122,19 @@ export const SourceSelectMenu = ({
     [feesDecoratorProp]: <LowestFeesDecoratorText />,
   }));
 
-  const selectedChainOption = chains.find((item) => item.type === selectedChain);
+  const selectedChainOption = supportedChains.find((item) => item.type === selectedChain);
+
   const selectedExchangeOption = exchanges.find((item) => item.type === selectedExchange);
-  const isNotPrivyDeposit = type === TransferType.withdrawal || walletType !== WalletType.Privy;
 
   return (
     <SearchSelectMenu
       items={[
-        exchangeItems.length > 0 && {
-          group: 'exchanges',
-          groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
-          items: exchangeItems,
-        },
+        isNotKeplrDeposit &&
+          exchangeItems.length > 0 && {
+            group: 'exchanges',
+            groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
+            items: exchangeItems,
+          },
         // only block privy wallets for deposits
         isNotPrivyDeposit &&
           chainItems.length > 0 && {
