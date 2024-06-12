@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
+import { PerpetualMarketType } from '@/constants/abacus';
 import { ButtonShape, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
@@ -41,6 +42,7 @@ export const MarketDetails: React.FC = () => {
     effectiveInitialMarginFraction,
     maintenanceMarginFraction,
     minOrderSize,
+    perpetualMarketType,
     stepSizeDecimals,
     tickSizeDecimals,
   } = configs;
@@ -62,6 +64,14 @@ export const MarketDetails: React.FC = () => {
       key: 'market-name',
       label: stringGetter({ key: STRING_KEYS.MARKET_NAME }),
       value: market,
+    },
+    {
+      key: 'market-type',
+      label: stringGetter({ key: STRING_KEYS.TYPE }),
+      value:
+        perpetualMarketType === PerpetualMarketType.CROSS
+          ? stringGetter({ key: STRING_KEYS.CROSS })
+          : stringGetter({ key: STRING_KEYS.ISOLATED }),
     },
     {
       key: 'tick-size',

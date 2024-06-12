@@ -69,7 +69,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   const [requireUserActionInWallet, setRequireUserActionInWallet] = useState(false);
   const selectedDydxChainId = useAppSelector(getSelectedDydxChainId);
 
-  const { evmAddress, signerWagmi, publicClientWagmi, nobleAddress } = useAccounts();
+  const { dydxAddress, evmAddress, signerWagmi, publicClientWagmi, nobleAddress } = useAccounts();
 
   const { addTransferNotification } = useLocalNotifications();
 
@@ -130,15 +130,19 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
   }, [debouncedAmountBN.toNumber()]);
 
   useEffect(() => {
-    abacusStateManager.setTransferValue({
-      field: TransferInputField.type,
-      value: TransferType.deposit.rawValue,
-    });
-
+    if (dydxAddress && evmAddress) {
+      // TODO: this is for fixing a race condition where the sourceAddress is not set in time.
+      // worth investigating a better fix on abacus
+      abacusStateManager.setTransfersSourceAddress(evmAddress);
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.type,
+        value: TransferType.deposit.rawValue,
+      });
+    }
     return () => {
       abacusStateManager.resetInputState();
     };
-  }, []);
+  }, [dydxAddress]);
 
   useEffect(() => {
     if (error) onError?.();

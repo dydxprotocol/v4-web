@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
@@ -18,6 +18,7 @@ import { Panel } from '@/components/Panel';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
+import { getChartDotBackground } from '@/state/configsSelectors';
 import { openDialog } from '@/state/dialogs';
 
 import { BigNumberish } from '@/lib/numbers';
@@ -32,6 +33,7 @@ export const StakingRewardPanel = ({ validators, usdcRewards }: ElementProps) =>
   const stringGetter = useStringGetter();
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
+  const chartDotsBackground = useAppSelector(getChartDotBackground);
 
   const openStakingRewardDialog = useCallback(
     () =>
@@ -46,6 +48,7 @@ export const StakingRewardPanel = ({ validators, usdcRewards }: ElementProps) =>
 
   return (
     <$Panel
+      backgroundImagePath={chartDotsBackground}
       slotHeader={
         <$Title>
           {stringGetter({
@@ -85,9 +88,13 @@ const $Title = styled.h3`
   z-index: 1;
 `;
 
-const $Panel = styled(Panel)`
-  background: url('/chart-dots-background-dark.svg'),
-    linear-gradient(to right, var(--color-layer-6) 65%, var(--color-green-dark));
+const $Panel = styled(Panel)<{ backgroundImagePath: string }>`
+  --gradient-start-color: var(--color-layer-5);
+
+  ${({ backgroundImagePath }) => css`
+    background: url(${backgroundImagePath}),
+      linear-gradient(270deg, var(--color-positive-dark), var(--gradient-start-color) 60%);
+  `}
   position: relative;
 
   &::before {
@@ -99,8 +106,8 @@ const $Panel = styled(Panel)`
     right: 0;
 
     border-radius: var(--panel-border-radius);
-    background: var(--color-layer-6);
-    mask-image: linear-gradient(to right, var(--color-layer-6) 30%, transparent);
+    background: var(--gradient-start-color);
+    mask-image: linear-gradient(270deg, transparent, var(--gradient-start-color) 60%);
   }
 `;
 

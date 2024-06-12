@@ -25,6 +25,7 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
 import { getSubaccountEquity } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
+import { getChartDotBackground } from '@/state/configsSelectors';
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
@@ -42,6 +43,7 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
   const { getWithdrawRewardFee, withdrawReward } = useSubaccount();
   const { usdcBalance } = useAccountBalance();
 
+  const chartDotsBackground = useAppSelector(getChartDotBackground);
   const { current: equity } = useAppSelector(getSubaccountEquity, shallowEqual) ?? {};
 
   const [error, setError] = useState<string>();
@@ -113,7 +115,7 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
 
   return (
     <$Dialog isOpen setIsOpen={setIsOpen} hasHeaderBlur={false}>
-      <$Container>
+      <$Container backgroundImagePath={chartDotsBackground}>
         <$AssetContainer>
           <$Pill>
             <$PositiveOutput
@@ -126,7 +128,7 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
           </$Pill>
           <$AssetIcon symbol="USDC" />
         </$AssetContainer>
-        <$Heading>{stringGetter({ key: STRING_KEYS.CLAIM_STAKING_REWARDS })}</$Heading>
+        <$Heading>{stringGetter({ key: STRING_KEYS.YOU_EARNED })}</$Heading>
         {showNotEnoughGasWarning && (
           <AlertMessage type={AlertType.Warning}>
             {stringGetter({
@@ -166,7 +168,7 @@ const $Dialog = styled(Dialog)`
   --dialog-header-paddingBottom: 0rem;
 `;
 
-const $Container = styled.div`
+const $Container = styled.div<{ backgroundImagePath: string }>`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -180,8 +182,10 @@ const $Container = styled.div`
     bottom: 0;
     right: 0;
 
-    background-image: url('/chart-dots-background-dark.svg'),
-      linear-gradient(to top, var(--color-layer-3) 60%, var(--color-green-dark) 130%);
+    ${({ backgroundImagePath }) => css`
+      background-image: url(${backgroundImagePath}),
+        linear-gradient(to top, var(--color-layer-3) 60%, var(--color-positive-dark));
+    `}
     mask-image: linear-gradient(to bottom, var(--color-layer-3) 20%, transparent);
   }
 `;
@@ -199,7 +203,7 @@ const $Pill = styled.div`
   padding: 0.25rem 0.5rem;
   gap: 0.5ch;
 
-  background: var(--color-green-dark);
+  background: var(--color-positive-dark);
   color: var(--color-text-2);
 
   margin-bottom: -0.5rem;

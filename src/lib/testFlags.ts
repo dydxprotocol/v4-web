@@ -32,10 +32,6 @@ class TestFlags {
     return this.queryParams.address;
   }
 
-  get isolatedMargin() {
-    return !!this.queryParams.isolatedmargin;
-  }
-
   get withNewMarketType() {
     return !!this.queryParams.withnewmarkettype;
   }

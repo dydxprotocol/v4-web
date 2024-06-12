@@ -18,6 +18,7 @@ import type {
   AccountBalance,
   HumanReadableCancelOrderPayload,
   HumanReadablePlaceOrderPayload,
+  HumanReadableSubaccountTransferPayload,
   HumanReadableTriggerOrdersPayload,
   ParsingError,
 } from '@/constants/abacus';
@@ -346,6 +347,34 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       return hashFromTx(tx?.hash);
     },
     [subaccountClient, sendSquidWithdrawFromSubaccount]
+  );
+
+  const adjustIsolatedMarginOfPosition = useCallback(
+    ({
+      onError,
+      onSuccess,
+    }: {
+      onError?: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
+      onSuccess?: (
+        subaccountTransferPayload?: Nullable<HumanReadableSubaccountTransferPayload>
+      ) => void;
+    }) => {
+      const callback = (
+        success: boolean,
+        parsingError?: Nullable<ParsingError>,
+        data?: Nullable<HumanReadableSubaccountTransferPayload>
+      ) => {
+        if (success) {
+          onSuccess?.(data);
+        } else {
+          onError?.({ errorStringKey: parsingError?.stringKey });
+        }
+      };
+
+      const subaccountTransferPayload = abacusStateManager.adjustIsolatedMarginOfPosition(callback);
+      return subaccountTransferPayload;
+    },
+    [subaccountClient]
   );
 
   // ------ Faucet Methods ------ //
@@ -743,6 +772,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     // Transfer Methods
     transfer,
     sendSquidWithdraw,
+    adjustIsolatedMarginOfPosition,
 
     // Trading Methods
     placeOrder,

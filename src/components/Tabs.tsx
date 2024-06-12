@@ -12,6 +12,8 @@ import { DropdownSelectMenu } from '@/components/DropdownSelectMenu';
 import { Tag } from '@/components/Tag';
 import { Toolbar } from '@/components/Toolbar';
 
+import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
+
 export type TabItem<TabItemsValue> = {
   value: TabItemsValue;
   label: React.ReactNode;
@@ -31,6 +33,7 @@ type ElementProps<TabItemsValue> = {
   items: TabItem<TabItemsValue>[];
   slotToolbar?: ReactNode;
   sharedContent?: ReactNode;
+  disabled?: boolean;
   onValueChange?: (value: TabItemsValue) => void;
   onWheel?: (event: React.WheelEvent) => void;
 };
@@ -57,6 +60,7 @@ export const Tabs = <TabItemsValue extends string>({
   side = 'top',
   withBorders = true,
   withTransitions = true,
+  disabled = false,
   className,
 }: ElementProps<TabItemsValue> & StyleProps) => {
   const currentItem = items.find((item) => item.value === value);
@@ -67,7 +71,12 @@ export const Tabs = <TabItemsValue extends string>({
         {items.map((item) =>
           !item.subitems ? (
             item.customTrigger ?? (
-              <$Trigger key={item.value} value={item.value} $withBorders={withBorders}>
+              <$Trigger
+                key={item.value}
+                value={item.value}
+                $withBorders={withBorders}
+                disabled={disabled}
+              >
                 {item.label}
                 {item.tag && <Tag>{item.tag}</Tag>}
                 {item.slotRight}
@@ -82,6 +91,7 @@ export const Tabs = <TabItemsValue extends string>({
               align="end"
               $isActive={item.subitems.some((subitem) => subitem.value === value)}
               slotTrigger={<$DropdownTabTrigger value={value ?? ''} />}
+              disabled={disabled}
             >
               {item.label}
             </$DropdownSelectMenu>
@@ -139,10 +149,13 @@ const tabTriggerStyle = css`
   font: var(--trigger-font, var(--font-base-book));
   color: var(--trigger-textColor);
   background-color: var(--trigger-backgroundColor);
+  box-shadow: inset 0 calc(var(--trigger-underline-size) * -1) 0 var(--trigger-active-textColor);
 
   &[data-state='active'] {
     color: var(--trigger-active-textColor);
     background-color: var(--trigger-active-backgroundColor);
+    box-shadow: inset 0 calc(var(--trigger-active-underline-size) * -1) 0
+      var(--trigger-active-textColor);
   }
 `;
 
@@ -153,6 +166,9 @@ const $Root = styled(Root)<{ $side: 'top' | 'bottom'; $withInnerBorder?: boolean
 
   --trigger-active-backgroundColor: var(--color-layer-1);
   --trigger-active-textColor: var(--color-text-2);
+
+  --trigger-active-underline-size: 0px;
+  --trigger-underline-size: 0px;
 
   /* Variants */
   --tabs-currentHeight: var(--tabs-height);
@@ -300,6 +316,10 @@ const $DropdownTabTrigger = styled(Trigger)`
   width: 100%;
 `;
 
+const dropdownSelectMenuType = getSimpleStyledOutputType(
+  DropdownSelectMenu,
+  {} as { $isActive?: boolean }
+);
 const $DropdownSelectMenu = styled(DropdownSelectMenu)<{ $isActive?: boolean }>`
   --trigger-radius: 0;
   --dropdownSelectMenu-item-font-size: var(--fontSize-base);
@@ -309,10 +329,9 @@ const $DropdownSelectMenu = styled(DropdownSelectMenu)<{ $isActive?: boolean }>`
     css`
       --trigger-textColor: var(--trigger-active-textColor);
       --trigger-backgroundColor: var(--trigger-active-backgroundColor);
+      --trigger-underline-size: var(--trigger-active-underline-size);
     `}
-` as <MenuItemValue extends string>(
-  props: { $isActive?: boolean } & React.ComponentProps<typeof DropdownSelectMenu<MenuItemValue>>
-) => ReactNode;
+` as typeof dropdownSelectMenuType;
 
 export const MobileTabs = styled(Tabs)`
   --trigger-backgroundColor: transparent;
