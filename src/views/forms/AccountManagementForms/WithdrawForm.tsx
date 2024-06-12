@@ -127,7 +127,7 @@ export const WithdrawForm = () => {
         const hasInvalidInput = debouncedAmountBN.isNaN() || debouncedAmountBN.lte(0);
         if (hasInvalidInput) {
           abacusStateManager.setTransferValue({
-            value: '0',
+            value: 0,
             field: TransferInputField.usdcSize,
           });
         } else {

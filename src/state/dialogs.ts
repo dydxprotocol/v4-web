@@ -19,7 +19,7 @@ export const dialogsSlice = createSlice({
   initialState,
   reducers: {
     openDialog: (state, action: PayloadAction<DialogType>) => {
-      if (state.activeDialog?.tag === action.payload.tag) return;
+      if (state.activeDialog?.type === action.payload.type) return;
 
       if (state.activeDialog) {
         state.dialogQueue.push(action.payload);

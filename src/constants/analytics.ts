@@ -1,8 +1,8 @@
-import { ofType, unionize } from 'unionize';
+import { RecordOf, UnionOf, ofType, unionize } from 'unionize';
 
 import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
 import type { OnboardingState, OnboardingSteps } from './account';
-import { DialogType } from './dialogs';
+import { DialogTypesTypes } from './dialogs';
 import type { SupportedLocales } from './localization';
 import type { DydxNetwork } from './networks';
 import { TransferNotificationTypes } from './notifications';
@@ -50,7 +50,7 @@ export const AnalyticsUserProperties = unionize(
   { tag: 'type' as const, value: 'payload' as const }
 );
 
-export type AnalyticsUserProperty = (typeof AnalyticsUserProperties)['_Union'];
+export type AnalyticsUserProperty = UnionOf<typeof AnalyticsUserProperties>;
 
 export const AnalyticsEvents = unionize(
   {
@@ -72,10 +72,10 @@ export const AnalyticsEvents = unionize(
       path: string;
     }>(),
     NavigateDialog: ofType<{
-      type: DialogType['tag'];
+      type: DialogTypesTypes;
     }>(),
     NavigateDialogClose: ofType<{
-      type: DialogType['tag'];
+      type: DialogTypesTypes;
     }>(),
     NavigateExternal: ofType<{
       link: string;
@@ -170,7 +170,9 @@ export const AnalyticsEvents = unionize(
   },
   { tag: 'type' as const, value: 'payload' as const }
 );
-export type AnalyticsEvent = (typeof AnalyticsEvents)['_Union'];
+// export type AnalyticsEvent = (typeof AnalyticsEvents)['_Union'];
+export type AnalyticsEvent = UnionOf<typeof AnalyticsEvents>;
+export type AnalyticsEventArgTypes = RecordOf<typeof AnalyticsEvents>;
 
 export const DEFAULT_TRANSACTION_MEMO = 'dYdX Frontend (web)';
 export const lastSuccessfulRestRequestByOrigin: Record<URL['origin'], number> = {};

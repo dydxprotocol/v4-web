@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import { UnionOf, ofType, unionize } from 'unionize';
+import { TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
 import { BigNumberish } from '@/lib/numbers';
 
@@ -73,51 +73,58 @@ export type WithdrawalGatedDialogProps = {
   estimatedUnblockTime?: string | null;
 };
 
-export const DialogTypes = unionize({
-  AdjustIsolatedMargin: ofType<AdjustIsolatedMarginDialogProps>(),
-  AdjustTargetLeverage: ofType<AdjustTargetLeverageDialogProps>(),
-  ClosePosition: ofType<ClosePositionDialogProps>(),
-  CancelPendingOrders: ofType<CancelPendingOrdersDialogProps>(),
-  ComplianceConfig: ofType<ComplianceConfigDialogProps>(),
-  Deposit: ofType<DepositDialogProps>(),
-  DisconnectWallet: ofType<DisconnectWalletDialogProps>(),
-  DisplaySettings: ofType<DisplaySettingsDialogProps>(),
-  ExchangeOffline: ofType<ExchangeOfflineDialogProps>(),
-  ExternalLink: ofType<ExternalLinkDialogProps>(),
-  ExternalNavStride: ofType<ExternalNavStrideDialogProps>(),
-  FillDetails: ofType<FillDetailsDialogProps>(),
-  GeoCompliance: ofType<GeoComplianceDialogProps>(),
-  Help: ofType<HelpDialogProps>(),
-  ExternalNavKeplr: ofType<ExternalNavKeplrDialogProps>(),
-  ManageFunds: ofType<ManageFundsDialogProps>(),
-  MnemonicExport: ofType<MnemonicExportDialogProps>(),
-  MobileDownload: ofType<MobileDownloadDialogProps>(),
-  MobileSignIn: ofType<MobileSignInDialogProps>(),
-  NewMarketAgreement: ofType<NewMarketAgreementDialogProps>(),
-  NewMarketMessageDetails: ofType<NewMarketMessageDetailsDialogProps>(),
-  Onboarding: ofType<OnboardingDialogProps>(),
-  OrderDetails: ofType<OrderDetailsDialogProps>(),
-  Preferences: ofType<PreferencesDialogProps>(),
-  RateLimit: ofType<RateLimitDialogProps>(),
-  RestrictedGeo: ofType<RestrictedGeoDialogProps>(),
-  RestrictedWallet: ofType<RestrictedWalletDialogProps>(),
-  SelectMarginMode: ofType<SelectMarginModeDialogProps>(),
-  Stake: ofType<StakeDialogProps>(),
-  StakingReward: ofType<StakingRewardDialogProps>(),
-  Trade: ofType<TradeDialogProps>(),
-  Triggers: ofType<TriggersDialogProps>(),
-  Transfer: ofType<TransferDialogProps>(),
-  Unstake: ofType<UnstakeDialogProps>(),
-  Withdraw: ofType<WithdrawDialogProps>(),
-  WithdrawalGated: ofType<WithdrawalGatedDialogProps>(),
-});
+export const DialogTypes = unionize(
+  {
+    AdjustIsolatedMargin: ofType<AdjustIsolatedMarginDialogProps>(),
+    AdjustTargetLeverage: ofType<AdjustTargetLeverageDialogProps>(),
+    ClosePosition: ofType<ClosePositionDialogProps>(),
+    CancelPendingOrders: ofType<CancelPendingOrdersDialogProps>(),
+    ComplianceConfig: ofType<ComplianceConfigDialogProps>(),
+    Deposit: ofType<DepositDialogProps>(),
+    DisconnectWallet: ofType<DisconnectWalletDialogProps>(),
+    DisplaySettings: ofType<DisplaySettingsDialogProps>(),
+    ExchangeOffline: ofType<ExchangeOfflineDialogProps>(),
+    ExternalLink: ofType<ExternalLinkDialogProps>(),
+    ExternalNavStride: ofType<ExternalNavStrideDialogProps>(),
+    FillDetails: ofType<FillDetailsDialogProps>(),
+    GeoCompliance: ofType<GeoComplianceDialogProps>(),
+    Help: ofType<HelpDialogProps>(),
+    ExternalNavKeplr: ofType<ExternalNavKeplrDialogProps>(),
+    ManageFunds: ofType<ManageFundsDialogProps>(),
+    MnemonicExport: ofType<MnemonicExportDialogProps>(),
+    MobileDownload: ofType<MobileDownloadDialogProps>(),
+    MobileSignIn: ofType<MobileSignInDialogProps>(),
+    NewMarketAgreement: ofType<NewMarketAgreementDialogProps>(),
+    NewMarketMessageDetails: ofType<NewMarketMessageDetailsDialogProps>(),
+    Onboarding: ofType<OnboardingDialogProps>(),
+    OrderDetails: ofType<OrderDetailsDialogProps>(),
+    Preferences: ofType<PreferencesDialogProps>(),
+    RateLimit: ofType<RateLimitDialogProps>(),
+    RestrictedGeo: ofType<RestrictedGeoDialogProps>(),
+    RestrictedWallet: ofType<RestrictedWalletDialogProps>(),
+    SelectMarginMode: ofType<SelectMarginModeDialogProps>(),
+    Stake: ofType<StakeDialogProps>(),
+    StakingReward: ofType<StakingRewardDialogProps>(),
+    Trade: ofType<TradeDialogProps>(),
+    Triggers: ofType<TriggersDialogProps>(),
+    Transfer: ofType<TransferDialogProps>(),
+    Unstake: ofType<UnstakeDialogProps>(),
+    Withdraw: ofType<WithdrawDialogProps>(),
+    WithdrawalGated: ofType<WithdrawalGatedDialogProps>(),
+  },
+  { tag: 'type' as const, value: 'props' as const }
+);
 export type DialogType = UnionOf<typeof DialogTypes>;
+export type DialogTypesTypes = TagsOf<typeof DialogTypes>;
 
 export type ClosePositionFormProps = {};
 export type SelectMarginModeFormProps = {};
 
-export const TradeBoxDialogTypes = unionize({
-  ClosePosition: ofType<ClosePositionFormProps>(),
-  SelectMarginMode: ofType<SelectMarginModeFormProps>(),
-});
+export const TradeBoxDialogTypes = unionize(
+  {
+    ClosePosition: ofType<ClosePositionFormProps>(),
+    SelectMarginMode: ofType<SelectMarginModeFormProps>(),
+  },
+  { tag: 'type' as const, value: 'props' as const }
+);
 export type TradeBoxDialogType = UnionOf<typeof TradeBoxDialogTypes>;

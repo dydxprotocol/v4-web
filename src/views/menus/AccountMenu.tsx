@@ -334,7 +334,7 @@ const AssetActions = memo(
             tooltipString={stringGetter({ key: tooltipStringKey })}
           >
             <$IconButton
-              key={dialog.tag}
+              key={dialog.type}
               action={ButtonAction.Base}
               shape={ButtonShape.Square}
               iconName={iconName}

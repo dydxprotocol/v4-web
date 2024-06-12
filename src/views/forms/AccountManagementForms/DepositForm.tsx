@@ -10,7 +10,7 @@ import erc20 from '@/abi/erc20.json';
 import erc20_usdt from '@/abi/erc20_usdt.json';
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
-import { AnalyticsEvents } from '@/constants/analytics';
+import { AnalyticsEventArgTypes } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
@@ -58,7 +58,7 @@ import { SourceSelectMenu } from './SourceSelectMenu';
 import { TokenSelectMenu } from './TokenSelectMenu';
 
 type DepositFormProps = {
-  onDeposit?: (event?: (typeof AnalyticsEvents)['_Record']['TransferDeposit']) => void;
+  onDeposit?: (event?: AnalyticsEventArgTypes['TransferDeposit']) => void;
   onError?: () => void;
 };
 
@@ -122,7 +122,7 @@ export const DepositForm = ({ onDeposit, onError }: DepositFormProps) => {
       debouncedAmountBN.isNaN() || debouncedAmountBN.lte(0) || debouncedAmountBN.gt(balanceBN);
 
     abacusStateManager.setTransferValue({
-      value: hasInvalidInput ? '0' : debouncedAmount,
+      value: hasInvalidInput ? 0 : debouncedAmount,
       field: TransferInputField.size,
     });
 

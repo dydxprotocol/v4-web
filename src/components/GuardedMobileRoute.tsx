@@ -18,7 +18,7 @@ export const GuardedMobileRoute = () => {
   const dispatch = useAppDispatch();
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
   const activeDialog = useAppSelector(getActiveDialog, shallowEqual);
-  const prevActiveDialog = useRef(activeDialog?.tag);
+  const prevActiveDialog = useRef(activeDialog);
 
   useEffect(() => {
     if (isTablet && !canAccountTrade) {
@@ -27,11 +27,14 @@ export const GuardedMobileRoute = () => {
   }, []);
 
   useEffect(() => {
-    const dialogClosed = !activeDialog && prevActiveDialog.current === 'Onboarding';
+    const dialogClosed =
+      !activeDialog &&
+      prevActiveDialog.current != null &&
+      DialogTypes.is.Onboarding(prevActiveDialog.current);
     if (isTablet && !canAccountTrade && dialogClosed) {
       navigate('/');
     }
-    prevActiveDialog.current = activeDialog?.tag;
+    prevActiveDialog.current = activeDialog;
   }, [activeDialog, canAccountTrade, isTablet]);
 
   return <Outlet />;

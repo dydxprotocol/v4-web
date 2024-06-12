@@ -8,7 +8,7 @@ import {
   AnalyticsUserProperties,
   lastSuccessfulWebsocketRequestByOrigin,
 } from '@/constants/analytics';
-import { DialogType } from '@/constants/dialogs';
+import { DialogTypesTypes } from '@/constants/dialogs';
 
 import { calculateOnboardingStep } from '@/state/accountCalculators';
 import { getOnboardingState, getSubaccountId } from '@/state/accountSelectors';
@@ -145,19 +145,19 @@ export const useAnalytics = () => {
   // AnalyticsEvent.NavigateDialogClose
   const activeDialog = useAppSelector(getActiveDialog);
   const [previousActiveDialogType, setPreviousActiveDialogType] = useState<
-    DialogType['tag'] | undefined
+    DialogTypesTypes | undefined
   >();
 
   useEffect(() => {
-    if (activeDialog?.tag) {
-      track(AnalyticsEvents.NavigateDialog({ type: activeDialog.tag }));
+    if (activeDialog?.type) {
+      track(AnalyticsEvents.NavigateDialog({ type: activeDialog.type }));
     }
 
     if (previousActiveDialogType) {
       track(AnalyticsEvents.NavigateDialogClose({ type: previousActiveDialogType }));
     }
 
-    setPreviousActiveDialogType(activeDialog?.tag);
+    setPreviousActiveDialogType(activeDialog?.type);
   }, [activeDialog]);
 
   // AnalyticsEvent.NavigateExternal
