@@ -414,6 +414,9 @@ class AbacusStateManager {
     callback: (success: boolean, parsingError: Nullable<ParsingError>, data: string) => void
   ): void => this.stateManager.triggerCompliance(action, callback);
 
+  sendNobleIBC = (params: { msgTypeUrl: string; msg: any }): Promise<string> =>
+    this.chainTransactions.sendNobleIBC(params);
+
   // ------ Utils ------ //
   getHistoricalPnlPeriod = (): Nullable<HistoricalPnlPeriods> =>
     this.stateManager.historicalPnlPeriod;
