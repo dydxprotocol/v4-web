@@ -6,7 +6,6 @@
   height: 100%;
   color: var(--color-text-1);
   background-color: var(--color-layer-2);
-  user-select: none;
   overflow: hidden;
   --border: var(--default-border-width) solid var(--color-border);
 }

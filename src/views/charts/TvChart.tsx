@@ -43,6 +43,7 @@ export const TvChart = () => {
 };
 const $PriceChart = styled.div<{ isChartReady?: boolean }>`
   ${layoutMixins.stack}
+  user-select: none;
 
   height: 100%;
 
