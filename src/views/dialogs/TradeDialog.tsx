@@ -2,7 +2,6 @@ import { useState } from 'react';
 
 import styled, { css } from 'styled-components';
 
-import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { MobilePlaceOrderSteps } from '@/constants/trade';
 
@@ -11,18 +10,14 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { Button } from '@/components/Button';
 import { Dialog, DialogPlacement } from '@/components/Dialog';
 import { GreenCheckCircle } from '@/components/GreenCheckCircle';
 import { Icon, IconName } from '@/components/Icon';
 import { Ring } from '@/components/Ring';
 import { TradeForm } from '@/views/forms/TradeForm';
 
-import { useAppDispatch } from '@/state/appTypes';
-import { openDialog } from '@/state/dialogs';
-
-import { testFlags } from '@/lib/testFlags';
-
+import { MarginModeSelector } from '../forms/TradeForm/MarginModeSelector';
+import { TargetLeverageButton } from '../forms/TradeForm/TargetLeverageButton';
 import { TradeSideToggle } from '../forms/TradeForm/TradeSideToggle';
 
 type ElementProps = {
@@ -33,9 +28,7 @@ type ElementProps = {
 
 export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) => {
   const { isMobile } = useBreakpoints();
-  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
-
   const [currentStep, setCurrentStep] = useState<MobilePlaceOrderSteps>(
     MobilePlaceOrderSteps.EditOrder
   );
@@ -55,32 +48,15 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
       hasHeaderBorder
       {...{
         [MobilePlaceOrderSteps.EditOrder]: {
-          title: testFlags.isolatedMargin ? (
+          title: (
             <$EditTradeHeader>
-              <Button
-                onClick={() => {
-                  dispatch(
-                    openDialog({
-                      type: DialogTypes.SelectMarginMode,
-                    })
-                  );
-                }}
-              >
-                {stringGetter({ key: STRING_KEYS.CROSS })}
-              </Button>
-
-              <Button
-                onClick={() => {
-                  dispatch(openDialog({ type: DialogTypes.AdjustTargetLeverage }));
-                }}
-              >
-                1x
-              </Button>
+              <$MarginControls>
+                <$MarginModeSelector openInTradeBox={false} />
+                <$TargetLeverageButton />
+              </$MarginControls>
 
               <TradeSideToggle />
             </$EditTradeHeader>
-          ) : (
-            <TradeSideToggle />
           ),
         },
         [MobilePlaceOrderSteps.PreviewOrder]: {
@@ -114,6 +90,7 @@ export const TradeDialog = ({ isOpen, setIsOpen, slotTrigger }: ElementProps) =>
     </$Dialog>
   );
 };
+
 const $Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
   --dialog-backgroundColor: var(--color-layer-2);
   --dialog-header-height: 1rem;
@@ -133,8 +110,25 @@ const $Dialog = styled(Dialog)<{ currentStep: MobilePlaceOrderSteps }>`
 
 const $EditTradeHeader = styled.div`
   display: grid;
-  grid-template-columns: auto auto 1fr;
+  grid-template-columns: 1fr 2fr;
   gap: 0.5rem;
+`;
+
+const $MarginControls = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`;
+
+const $MarginModeSelector = styled(MarginModeSelector)`
+  flex: 1;
+`;
+
+const $TargetLeverageButton = styled(TargetLeverageButton)`
+  flex: 1;
+
+  button {
+    width: 100%;
+  }
 `;
 
 const $TradeForm = styled(TradeForm)`
