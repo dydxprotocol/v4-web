@@ -232,10 +232,10 @@ export const PositionsTriggersCell = ({
   };
 
   return (
-    <$TableCell stacked stackedWithSecondaryStyling={false}>
+    <TableCell stacked stackedWithSecondaryStyling={false}>
       <$Row>{renderOutput({ label: 'TP', orders: takeProfitOrders })}</$Row>
       <$Row>{renderOutput({ label: 'SL', orders: stopLossOrders })}</$Row>
-    </$TableCell>
+    </TableCell>
   );
 };
 const $Row = styled.span`
@@ -306,8 +306,4 @@ const $PartialFillIcon = styled.span`
     width: 0.875em;
     height: 0.875em;
   }
-`;
-
-const $TableCell = styled(TableCell)`
-  justify-content: space-between;
 `;
