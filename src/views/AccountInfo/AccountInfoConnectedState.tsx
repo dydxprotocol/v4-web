@@ -28,9 +28,11 @@ import { calculateIsAccountLoading } from '@/state/accountCalculators';
 import { getSubaccount } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
+import { getIsClosingIsolatedMarginPosition } from '@/state/inputsCalculator';
 import { getInputErrors } from '@/state/inputsSelectors';
 
 import { isNumber, MustBigNumber } from '@/lib/numbers';
+import { getTradeStateWithDoubleValuesHasDiff } from '@/lib/tradeData';
 
 import { AccountInfoDiffOutput } from './AccountInfoDiffOutput';
 
@@ -58,16 +60,19 @@ export const AccountInfoConnectedState = () => {
   const inputErrors = useAppSelector(getInputErrors, shallowEqual);
   const subAccount = useAppSelector(getSubaccount, shallowEqual);
   const isLoading = useAppSelector(calculateIsAccountLoading);
+  const isClosingIsolatedPosition = useAppSelector(getIsClosingIsolatedMarginPosition);
 
   const listOfErrors = inputErrors?.map(({ code }: { code: string }) => code);
 
   const { freeCollateral, marginUsage } = subAccount ?? {};
 
+  /**
+   * TODO: isClosingIsolatedPosition controls whether diff state is shown. Remove when diff state is fixed in Abacus.
+   */
   const hasDiff =
-    (marginUsage?.postOrder !== null &&
-      !MustBigNumber(marginUsage?.postOrder).eq(MustBigNumber(marginUsage?.current))) ||
-    (freeCollateral?.postOrder !== null &&
-      !MustBigNumber(freeCollateral?.postOrder).eq(MustBigNumber(freeCollateral?.current)));
+    !isClosingIsolatedPosition &&
+    ((!!marginUsage?.postOrder && getTradeStateWithDoubleValuesHasDiff(marginUsage)) ||
+      (!!freeCollateral?.postOrder && getTradeStateWithDoubleValuesHasDiff(freeCollateral)));
 
   const showHeader = !hasDiff && !isTablet;
 
@@ -181,6 +186,7 @@ export const AccountInfoConnectedState = () => {
                   isPositive={isPositive}
                   type={type}
                   value={value}
+                  hideDiff={isClosingIsolatedPosition}
                 />
               ),
             })

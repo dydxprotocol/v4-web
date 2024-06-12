@@ -87,15 +87,12 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
   const { numOpenOrders, numUnseenFills } =
     useAppSelector(getCurrentMarketTradeInfoNumbers, shallowEqual) ?? {};
 
-  const showClosePositionAction = true;
-
   const hasUnseenOrderUpdates = useAppSelector(getHasUnseenOrderUpdates);
   const hasUnseenFillUpdates = useAppSelector(getHasUnseenFillUpdates);
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
   const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
   const shouldRenderActions = useParameterizedSelector(
-    calculateShouldRenderActionsInPositionsTable,
-    showClosePositionAction
+    calculateShouldRenderActionsInPositionsTable
   );
   const isWaitingForOrderToIndex = useAppSelector(calculateHasUncommittedOrders);
   const showCurrentMarket = isTablet || view === PanelView.CurrentMarket;
@@ -158,7 +155,7 @@ export const HorizontalPanel = ({ isOpen = true, setIsOpen }: ElementProps) => {
                     shouldRenderActions && PositionsTableColumnKey.Actions,
                   ].filter(isTruthy)
             }
-            showClosePositionAction={showClosePositionAction}
+            showClosePositionAction={shouldRenderActions}
             initialPageSize={initialPageSize}
             navigateToOrders={onViewOrders}
           />

@@ -101,13 +101,9 @@ export const calculateShouldRenderTriggersInPositionsTable = createAppSelector(
  */
 export const calculateShouldRenderActionsInPositionsTable = () =>
   createAppSelector(
-    [
-      calculateIsAccountViewOnly,
-      calculateShouldRenderTriggersInPositionsTable,
-      (s, isCloseActionShown: boolean) => isCloseActionShown,
-    ],
-    (isAccountViewOnly: boolean, areTriggersRendered: boolean, isCloseActionShown) => {
-      const hasActionsInColumn = areTriggersRendered || isCloseActionShown;
+    [calculateIsAccountViewOnly, (s, isCloseActionShown: boolean = true) => isCloseActionShown],
+    (isAccountViewOnly: boolean, isCloseActionShown) => {
+      const hasActionsInColumn = isCloseActionShown;
       return !isAccountViewOnly && hasActionsInColumn;
     }
   );
