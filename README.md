@@ -91,7 +91,7 @@ Set environment variables via `.env`.
 - `STATUS_PAGE_SCRIPT_URI` (optional): Used for enabling the status page; used with `pnpm run build:inject-statuspage`.
 - `SMARTBANNER_APP_NAME`, `SMARTBANNER_ORG_NAME`, `SMARTBANNER_ICON_URL`, `SMARTBANNER_APPSTORE_URL` (optional): Used for enabling the smart app banner; used with `pnpm run build:inject-smartbanner`.
 - `VITE_PRIVY_APP_ID` (optional): App ID used for enabling Privy authentication. For deployment of DYDX token holders use `clua5njf801bncvpa0woolzq4`.
-- `VITE_PRIVY_APP_CLIENT_ID` (optional): App Client ID used for enabling Privy authentication. For deployment on the `dydx.trade` domain, use `client-WY2jY1XhCXytbdxXXTwDuDToiPtTiyKCMGsX7oj25hUcF`. Otherwise leave unset.
+- `VITE_PRIVY_APP_CLIENT_ID` (optional): App Client ID used for enabling Privy authentication.
 
 ## Part 5: Configure entry points
 
