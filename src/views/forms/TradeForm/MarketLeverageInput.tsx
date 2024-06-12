@@ -31,7 +31,7 @@ import { getSelectedOrderSide, hasPositionSideChanged } from '@/lib/tradeData';
 import { LeverageSlider } from './LeverageSlider';
 
 type ElementProps = {
-  leverageInputValue: string;
+  leverageInputValue: string | number;
   setLeverageInputValue: (value: string) => void;
 };
 

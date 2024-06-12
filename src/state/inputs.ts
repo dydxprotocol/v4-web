@@ -15,15 +15,13 @@ import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
 
 import { safeAssign } from '@/lib/objectHelpers';
 
-type StringOrNumber = string | number;
-
 type TradeFormInputs = {
-  limitPriceInput: StringOrNumber;
-  triggerPriceInput: StringOrNumber;
-  trailingPercentInput: StringOrNumber;
-  amountInput: StringOrNumber;
-  usdAmountInput: StringOrNumber;
-  leverageInput: StringOrNumber;
+  limitPriceInput: string | number;
+  triggerPriceInput: string | number;
+  trailingPercentInput: string | number;
+  amountInput: string | number;
+  usdAmountInput: string | number;
+  leverageInput: string | number;
 };
 
 export interface InputsState {
