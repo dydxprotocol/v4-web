@@ -15,7 +15,16 @@ import { CLEARED_SIZE_INPUTS, CLEARED_TRADE_INPUTS } from '@/constants/trade';
 
 import { safeAssign } from '@/lib/objectHelpers';
 
-type TradeFormInputs = typeof CLEARED_TRADE_INPUTS & typeof CLEARED_SIZE_INPUTS;
+type StringOrNumber = string | number;
+
+type TradeFormInputs = {
+  limitPriceInput: StringOrNumber;
+  triggerPriceInput: StringOrNumber;
+  trailingPercentInput: StringOrNumber;
+  amountInput: StringOrNumber;
+  usdAmountInput: StringOrNumber;
+  leverageInput: StringOrNumber;
+};
 
 export interface InputsState {
   current?: Nullable<string>;

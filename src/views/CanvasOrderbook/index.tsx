@@ -17,7 +17,7 @@ import { Canvas } from '@/components/Canvas';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Tag } from '@/components/Tag';
 
-import { useAppSelector, useAppDispatch } from '@/state/appTypes';
+import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
@@ -51,7 +51,7 @@ export const CanvasOrderbook = forwardRef(
     const currentMarketConfig = useAppSelector(getCurrentMarketConfig, shallowEqual);
     const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
 
-    const { tickSizeDecimals = 2 } = currentMarketConfig ?? {};
+    const { tickSizeDecimals = 2, stepSizeDecimals } = currentMarketConfig ?? {};
 
     /**
      * Slice asks and bids to maxRowsPerSide using empty rows
@@ -98,7 +98,8 @@ export const CanvasOrderbook = forwardRef(
     const onRowAction = useCallback(
       (price: Nullable<number>) => {
         if (currentInput === 'trade' && price) {
-          dispatch(setTradeFormInputs({ limitPriceInput: price?.toString() }));
+          // keep price as number type instead of string to avoid scientific notation
+          dispatch(setTradeFormInputs({ limitPriceInput: price }));
         }
       },
       [currentInput]
