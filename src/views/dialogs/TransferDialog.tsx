@@ -1,19 +1,14 @@
 import styled from 'styled-components';
 
+import { DialogProps, TransferDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
-import { DydxChainAsset } from '@/constants/wallets';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Dialog } from '@/components/Dialog';
 import { TransferForm } from '@/views/forms/TransferForm';
 
-type ElementProps = {
-  selectedAsset?: DydxChainAsset;
-  setIsOpen?: (open: boolean) => void;
-};
-
-export const TransferDialog = ({ selectedAsset, setIsOpen }: ElementProps) => {
+export const TransferDialog = ({ selectedAsset, setIsOpen }: DialogProps<TransferDialogProps>) => {
   const stringGetter = useStringGetter();
 
   return (

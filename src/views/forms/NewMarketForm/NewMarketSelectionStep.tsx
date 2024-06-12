@@ -271,10 +271,13 @@ export const NewMarketSelectionStep = ({
                     size={ButtonSize.Small}
                     onClick={() =>
                       dispatch(
-                        openDialog({
-                          type: DialogTypes.NewMarketMessageDetails,
-                          dialogProps: { assetData: assetToAdd, clobPairId, liquidityTier },
-                        })
+                        openDialog(
+                          DialogTypes.NewMarketMessageDetails({
+                            assetData: assetToAdd,
+                            clobPairId,
+                            liquidityTier,
+                          })
+                        )
                       )
                     }
                   >

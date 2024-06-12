@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { TransferInputField, TransferType } from '@/constants/abacus';
-import { AnalyticsEvent } from '@/constants/analytics';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { isMainnet } from '@/constants/networks';
 
 import { layoutMixins } from '@/styles/layoutMixins';
@@ -40,14 +40,14 @@ export const DepositDialogContent = ({ onDeposit }: ElementProps) => {
       {isMainnet || !showFaucet ? (
         <DepositForm
           onDeposit={(event) => {
-            track(AnalyticsEvent.TransferDeposit, event);
+            track(AnalyticsEvents.TransferDeposit(event ?? {}));
             onDeposit?.();
           }}
         />
       ) : (
         <TestnetDepositForm
           onDeposit={() => {
-            track(AnalyticsEvent.TransferFaucet);
+            track(AnalyticsEvents.TransferFaucet());
             onDeposit?.();
           }}
         />

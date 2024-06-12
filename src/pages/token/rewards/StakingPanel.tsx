@@ -56,7 +56,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
                   slotLeft={<Icon iconName={IconName.Send} />}
                   size={ButtonSize.Small}
                   action={ButtonAction.Primary}
-                  onClick={() => dispatch(openDialog({ type: DialogTypes.Transfer }))}
+                  onClick={() => dispatch(openDialog(DialogTypes.Transfer({})))}
                 >
                   {stringGetter({ key: STRING_KEYS.TRANSFER })}
                 </Button>
@@ -82,7 +82,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
             <div>
               <Button
                 action={ButtonAction.Primary}
-                onClick={() => dispatch(openDialog({ type: DialogTypes.Stake }))}
+                onClick={() => dispatch(openDialog(DialogTypes.Stake()))}
               >
                 {stringGetter({ key: STRING_KEYS.STAKE })}
               </Button>
@@ -104,7 +104,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
             <div>
               <Button
                 action={ButtonAction.Base}
-                onClick={() => dispatch(openDialog({ type: DialogTypes.Unstake }))}
+                onClick={() => dispatch(openDialog(DialogTypes.Unstake()))}
               >
                 {stringGetter({ key: STRING_KEYS.UNSTAKE })}
               </Button>

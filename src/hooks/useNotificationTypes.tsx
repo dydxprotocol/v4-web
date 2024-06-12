@@ -188,19 +188,9 @@ export const notificationTypes: NotificationTypeConfig[] = [
         const [abacusNotificationType, id = ''] = notificationId.split(':');
 
         if (ordersById[id]) {
-          dispatch(
-            openDialog({
-              type: DialogTypes.OrderDetails,
-              dialogProps: { orderId: id },
-            })
-          );
+          dispatch(openDialog(DialogTypes.OrderDetails({ orderId: id })));
         } else if (fillsById[id]) {
-          dispatch(
-            openDialog({
-              type: DialogTypes.FillDetails,
-              dialogProps: { fillId: id },
-            })
-          );
+          dispatch(openDialog(DialogTypes.FillDetails({ fillId: id })));
         } else if (marketIds.includes(id)) {
           navigate(`${AppRoute.Trade}/${id}`, {
             replace: true,
@@ -587,11 +577,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
 
       return () => {
         if (complianceStatus === ComplianceStatus.FIRST_STRIKE_CLOSE_ONLY) {
-          dispatch(
-            openDialog({
-              type: DialogTypes.GeoCompliance,
-            })
-          );
+          dispatch(openDialog(DialogTypes.GeoCompliance()));
         }
       };
     },
@@ -669,12 +655,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
       return (orderClientId: string) => {
         const order = orders.find((o) => o.clientId?.toString() === orderClientId);
         if (order) {
-          dispatch(
-            openDialog({
-              type: DialogTypes.OrderDetails,
-              dialogProps: { orderId: order.id },
-            })
-          );
+          dispatch(openDialog(DialogTypes.OrderDetails({ orderId: order.id })));
         }
       };
     },

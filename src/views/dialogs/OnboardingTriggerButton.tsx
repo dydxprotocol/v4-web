@@ -25,7 +25,7 @@ export const OnboardingTriggerButton = ({ size = ButtonSize.Small }: StyleProps)
     <Button
       action={ButtonAction.Primary}
       size={size}
-      onClick={() => dispatch(forceOpenDialog({ type: DialogTypes.Onboarding }))}
+      onClick={() => dispatch(forceOpenDialog(DialogTypes.Onboarding()))}
     >
       {
         {

@@ -33,13 +33,7 @@ export const StakingRewardPanel = ({ usdcRewards }: ElementProps) => {
   const chartDotsBackground = useAppSelector(getChartDotBackground);
 
   const openStakingRewardDialog = useCallback(
-    () =>
-      dispatch(
-        openDialog({
-          type: DialogTypes.StakingReward,
-          dialogProps: { usdcRewards },
-        })
-      ),
+    () => dispatch(openDialog(DialogTypes.StakingReward({ usdcRewards }))),
     [dispatch, usdcRewards]
   );
 

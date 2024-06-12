@@ -123,6 +123,7 @@
     "react-stately": "^3.23.0",
     "reselect": "^5.1.0",
     "styled-components": "^5.3.11",
+    "unionize": "^3.1.0",
     "use-latest": "^1.2.1",
     "viem": "^1.20.0",
     "wagmi": "^1.4.12"

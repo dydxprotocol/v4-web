@@ -257,6 +257,9 @@ dependencies:
   styled-components:
     specifier: ^5.3.11
     version: 5.3.11(@babel/core@7.23.9)(react-dom@18.2.0)(react-is@18.3.1)(react@18.2.0)
+  unionize:
+    specifier: ^3.1.0
+    version: 3.1.0
   use-latest:
     specifier: ^1.2.1
     version: 1.2.1(@types/react@18.3.3)(react@18.2.0)
@@ -18375,6 +18378,10 @@ packages:
       trough: 2.1.0
       vfile: 6.0.1
     dev: true
+
+  /unionize@3.1.0:
+    resolution: {integrity: sha512-LQZvbanzvpzvK0QYgRvnaA9VVe+g4nTbRlyoGGWDKFrZn0HJnDN5LC2Ti0+BxpKKOCrL3BQcRBVFPy/t12Y24Q==}
+    dev: false
 
   /unist-util-is@6.0.0:
     resolution: {integrity: sha512-2qCTHimwdxLfz+YzdGfkqNlH0tLi9xjTnHddPmJwtIG9MGsdbutfTc4P+haPD7l7Cjxf/WZj+we5qfVPvvxfYw==}

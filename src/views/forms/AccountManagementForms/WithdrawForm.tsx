@@ -9,7 +9,7 @@ import { isAddress } from 'viem';
 
 import { TransferInputField, TransferInputTokenResource, TransferType } from '@/constants/abacus';
 import { AlertType } from '@/constants/alerts';
-import { AnalyticsEvent } from '@/constants/analytics';
+import { AnalyticsEvents } from '@/constants/analytics';
 import { ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { isMainnet } from '@/constants/networks';
@@ -127,7 +127,7 @@ export const WithdrawForm = () => {
         const hasInvalidInput = debouncedAmountBN.isNaN() || debouncedAmountBN.lte(0);
         if (hasInvalidInput) {
           abacusStateManager.setTransferValue({
-            value: 0,
+            value: '0',
             field: TransferInputField.usdcSize,
           });
         } else {
@@ -205,18 +205,20 @@ export const WithdrawForm = () => {
             abacusStateManager.clearTransferInputValues();
             setWithdrawAmount('');
 
-            track(AnalyticsEvent.TransferWithdraw, {
-              chainId: toChainId,
-              tokenAddress: toToken?.address || undefined,
-              tokenSymbol: toToken?.symbol || undefined,
-              slippage: slippage || undefined,
-              gasFee: summary?.gasFee || undefined,
-              bridgeFee: summary?.bridgeFee || undefined,
-              exchangeRate: summary?.exchangeRate || undefined,
-              estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
-              toAmount: summary?.toAmount || undefined,
-              toAmountMin: summary?.toAmountMin || undefined,
-            });
+            track(
+              AnalyticsEvents.TransferWithdraw({
+                chainId: toChainId,
+                tokenAddress: toToken?.address || undefined,
+                tokenSymbol: toToken?.symbol || undefined,
+                slippage: slippage || undefined,
+                gasFee: summary?.gasFee || undefined,
+                bridgeFee: summary?.bridgeFee || undefined,
+                exchangeRate: summary?.exchangeRate || undefined,
+                estimatedRouteDuration: summary?.estimatedRouteDuration || undefined,
+                toAmount: summary?.toAmount || undefined,
+                toAmountMin: summary?.toAmountMin || undefined,
+              })
+            );
           }
         }
       } catch (err) {

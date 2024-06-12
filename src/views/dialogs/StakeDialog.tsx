@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 
+import { DialogProps, StakeDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -7,11 +8,7 @@ import { useStringGetter } from '@/hooks/useStringGetter';
 import { Dialog } from '@/components/Dialog';
 import { StakeForm } from '@/views/forms/StakeForm';
 
-type ElementProps = {
-  setIsOpen?: (open: boolean) => void;
-};
-
-export const StakeDialog = ({ setIsOpen }: ElementProps) => {
+export const StakeDialog = ({ setIsOpen }: DialogProps<StakeDialogProps>) => {
   const stringGetter = useStringGetter();
 
   return (

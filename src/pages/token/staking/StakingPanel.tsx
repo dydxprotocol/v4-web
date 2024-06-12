@@ -26,7 +26,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
           <$Img src="/third-party/keplr.png" alt={stringGetter({ key: STRING_KEYS.KEPLR })} />
         </$Header>
       }
-      onClick={() => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr }))}
+      onClick={() => dispatch(openDialog(DialogTypes.ExternalNavKeplr()))}
     >
       <$Description>
         {stringGetter({ key: STRING_KEYS.STAKING_DESCRIPTION })}

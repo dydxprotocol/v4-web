@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 import styled from 'styled-components';
 
+import { DialogProps, FillDetailsDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
@@ -18,12 +19,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 
-type ElementProps = {
-  fillId: string;
-  setIsOpen: (open: boolean) => void;
-};
-
-export const FillDetailsDialog = ({ fillId, setIsOpen }: ElementProps) => {
+export const FillDetailsDialog = ({ fillId, setIsOpen }: DialogProps<FillDetailsDialogProps>) => {
   const stringGetter = useStringGetter();
   const selectedLocale = useAppSelector(getSelectedLocale);
 

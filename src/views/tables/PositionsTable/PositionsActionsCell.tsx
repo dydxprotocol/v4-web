@@ -50,15 +50,11 @@ export const PositionsActionsCell = ({
   const stringGetter = useStringGetter();
   const { complianceState } = useComplianceState();
 
-  const { type: tradeBoxDialogType } = activeTradeBoxDialog ?? {};
-
   const onCloseButtonToggle = (isPressed: boolean) => {
     navigate(`${AppRoute.Trade}/${marketId}`);
     dispatch(
       isPressed
-        ? openDialogInTradeBox({
-            type: TradeBoxDialogTypes.ClosePosition,
-          })
+        ? openDialogInTradeBox(TradeBoxDialogTypes.ClosePosition())
         : closeDialogInTradeBox()
     );
 
@@ -72,16 +68,15 @@ export const PositionsActionsCell = ({
       return;
     }
     dispatch(
-      openDialog({
-        type: DialogTypes.Triggers,
-        dialogProps: {
+      openDialog(
+        DialogTypes.Triggers({
           marketId,
           assetId,
           stopLossOrders,
           takeProfitOrders,
           navigateToMarketOrders,
-        },
-      })
+        })
+      )
     );
   };
 
@@ -106,7 +101,8 @@ export const PositionsActionsCell = ({
             key="closepositions"
             isToggle
             isPressed={
-              tradeBoxDialogType === TradeBoxDialogTypes.ClosePosition &&
+              activeTradeBoxDialog != null &&
+              TradeBoxDialogTypes.is.ClosePosition(activeTradeBoxDialog) &&
               currentMarketId === marketId
             }
             onPressedChange={onCloseButtonToggle}

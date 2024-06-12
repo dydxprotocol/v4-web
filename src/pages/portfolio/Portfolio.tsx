@@ -230,7 +230,7 @@ const PortfolioPage = () => {
                 {complianceState === ComplianceStates.FULL_ACCESS && (
                   <Button
                     action={ButtonAction.Primary}
-                    onClick={() => dispatch(openDialog({ type: DialogTypes.Deposit }))}
+                    onClick={() => dispatch(openDialog(DialogTypes.Deposit()))}
                   >
                     {stringGetter({ key: STRING_KEYS.DEPOSIT })}
                   </Button>
@@ -238,7 +238,7 @@ const PortfolioPage = () => {
                 {usdcBalance > 0 && (
                   <Button
                     action={ButtonAction.Base}
-                    onClick={() => dispatch(openDialog({ type: DialogTypes.Withdraw }))}
+                    onClick={() => dispatch(openDialog(DialogTypes.Withdraw()))}
                   >
                     {stringGetter({ key: STRING_KEYS.WITHDRAW })}
                   </Button>
@@ -247,7 +247,7 @@ const PortfolioPage = () => {
                   (usdcBalance > 0 || nativeTokenBalance.gt(0)) && (
                     <Button
                       action={ButtonAction.Base}
-                      onClick={() => dispatch(openDialog({ type: DialogTypes.Transfer }))}
+                      onClick={() => dispatch(openDialog(DialogTypes.Transfer({})))}
                     >
                       {stringGetter({ key: STRING_KEYS.TRANSFER })}
                     </Button>

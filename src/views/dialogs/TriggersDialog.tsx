@@ -1,4 +1,4 @@
-import { type SubaccountOrder } from '@/constants/abacus';
+import { DialogProps, TriggersDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -10,15 +10,6 @@ import { TriggersForm } from '@/views/forms/TriggersForm/TriggersForm';
 import { useAppDispatch } from '@/state/appTypes';
 import { closeDialog } from '@/state/dialogs';
 
-type ElementProps = {
-  marketId: string;
-  assetId: string;
-  stopLossOrders: SubaccountOrder[];
-  takeProfitOrders: SubaccountOrder[];
-  navigateToMarketOrders: (market: string) => void;
-  setIsOpen: (open: boolean) => void;
-};
-
 export const TriggersDialog = ({
   marketId,
   assetId,
@@ -26,7 +17,7 @@ export const TriggersDialog = ({
   takeProfitOrders,
   navigateToMarketOrders,
   setIsOpen,
-}: ElementProps) => {
+}: DialogProps<TriggersDialogProps>) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
 

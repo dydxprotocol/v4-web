@@ -53,12 +53,7 @@ export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
               iconName={IconName.Pencil}
               shape={ButtonShape.Square}
               onClick={() =>
-                dispatch(
-                  openDialog({
-                    type: DialogTypes.AdjustIsolatedMargin,
-                    dialogProps: { positionId: position.id },
-                  })
-                )
+                dispatch(openDialog(DialogTypes.AdjustIsolatedMargin({ positionId: position.id })))
               }
             />
           </WithTooltip>

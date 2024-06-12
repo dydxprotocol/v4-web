@@ -21,7 +21,7 @@ export const GovernancePanel = ({ className }: { className?: string }) => {
   const stakingEnabled = testFlags.enableStaking;
 
   const openKeplrDialog = useCallback(
-    () => dispatch(openDialog({ type: DialogTypes.ExternalNavKeplr })),
+    () => dispatch(openDialog(DialogTypes.ExternalNavKeplr())),
     [dispatch]
   );
 

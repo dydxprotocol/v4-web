@@ -2,6 +2,7 @@ import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { ButtonAction } from '@/constants/buttons';
+import { DialogProps, StakingRewardDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, SMALL_USD_DECIMALS } from '@/constants/numbers';
 
@@ -20,14 +21,12 @@ import { getSubaccountEquity } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 import { getChartDotBackground } from '@/state/configsSelectors';
 
-import { BigNumberish, MustBigNumber } from '@/lib/numbers';
+import { MustBigNumber } from '@/lib/numbers';
 
-type ElementProps = {
-  usdcRewards: BigNumberish;
-  setIsOpen?: (open: boolean) => void;
-};
-
-export const StakingRewardDialog = ({ usdcRewards, setIsOpen }: ElementProps) => {
+export const StakingRewardDialog = ({
+  usdcRewards,
+  setIsOpen,
+}: DialogProps<StakingRewardDialogProps>) => {
   const stringGetter = useStringGetter();
   const { usdcLabel } = useTokenConfigs();
 

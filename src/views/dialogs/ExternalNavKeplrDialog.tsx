@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import styled from 'styled-components';
 
 import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
-import { DialogTypes } from '@/constants/dialogs';
+import { DialogProps, DialogTypes, ExternalNavKeplrDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -20,11 +20,7 @@ import { IconButton } from '@/components/IconButton';
 import { useAppDispatch } from '@/state/appTypes';
 import { closeDialog, openDialog } from '@/state/dialogs';
 
-type ElementProps = {
-  setIsOpen: (open: boolean) => void;
-};
-
-export const ExternalNavKeplrDialog = ({ setIsOpen }: ElementProps) => {
+export const ExternalNavKeplrDialog = ({ setIsOpen }: DialogProps<ExternalNavKeplrDialogProps>) => {
   const stringGetter = useStringGetter();
   const { keplrDashboard, accountExportLearnMore } = useURLConfigs();
   const dispatch = useAppDispatch();
@@ -33,9 +29,8 @@ export const ExternalNavKeplrDialog = ({ setIsOpen }: ElementProps) => {
   const onExternalNavDialog = useCallback(() => {
     dispatch(closeDialog());
     dispatch(
-      openDialog({
-        type: DialogTypes.ExternalLink,
-        dialogProps: {
+      openDialog(
+        DialogTypes.ExternalLink({
           buttonText: stringGetter({ key: STRING_KEYS.CONTINUE }),
           link: keplrDashboard,
           title: stringGetter({ key: STRING_KEYS.LEAVING_WEBSITE_STAKING_GOVERNANCE }),
@@ -45,8 +40,8 @@ export const ExternalNavKeplrDialog = ({ setIsOpen }: ElementProps) => {
               CTA: stringGetter({ key: STRING_KEYS.CONTINUE }),
             },
           }),
-        },
-      })
+        })
+      )
     );
   }, [dispatch]);
 

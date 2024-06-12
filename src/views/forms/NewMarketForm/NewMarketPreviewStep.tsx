@@ -126,12 +126,11 @@ export const NewMarketPreviewStep = ({
 
         if (!hasAcceptedTerms) {
           dispatch(
-            openDialog({
-              type: DialogTypes.NewMarketAgreement,
-              dialogProps: {
+            openDialog(
+              DialogTypes.NewMarketAgreement({
                 acceptTerms: () => setHasAcceptedTerms(true),
-              },
-            })
+              })
+            )
           );
         } else {
           setIsLoading(true);
@@ -262,10 +261,9 @@ export const NewMarketPreviewStep = ({
                 size={ButtonSize.Small}
                 onClick={() =>
                   dispatch(
-                    openDialog({
-                      type: DialogTypes.NewMarketMessageDetails,
-                      dialogProps: { assetData, clobPairId, liquidityTier },
-                    })
+                    openDialog(
+                      DialogTypes.NewMarketMessageDetails({ assetData, clobPairId, liquidityTier })
+                    )
                   )
                 }
               >

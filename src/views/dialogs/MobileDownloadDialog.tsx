@@ -1,5 +1,6 @@
 import styled, { css } from 'styled-components';
 
+import { DialogProps, MobileDownloadDialogProps } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
@@ -8,10 +9,6 @@ import { layoutMixins } from '@/styles/layoutMixins';
 
 import { Dialog } from '@/components/Dialog';
 import { QrCode } from '@/components/QrCode';
-
-type ElementProps = {
-  setIsOpen: (open: boolean) => void;
-};
 
 /*
   When/if deployer deploys the web app with smartbanner, "smartbanner:button-url-apple" and/or 
@@ -53,7 +50,7 @@ const MobileQrCode = ({ url }: { url: string }) => {
 MobileDownloadDialog should only been shown on desktop when mobileAppUrl has value. That's controlled by AccountMenu.tsx.
 */
 
-export const MobileDownloadDialog = ({ setIsOpen }: ElementProps) => {
+export const MobileDownloadDialog = ({ setIsOpen }: DialogProps<MobileDownloadDialogProps>) => {
   const stringGetter = useStringGetter();
   const content = <MobileQrCode url={mobileAppUrl!} />;
 

@@ -4,11 +4,11 @@ import { shallowEqual } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 
 import {
-  AnalyticsEvent,
-  AnalyticsUserProperty,
+  AnalyticsEvents,
+  AnalyticsUserProperties,
   lastSuccessfulWebsocketRequestByOrigin,
 } from '@/constants/analytics';
-import type { DialogTypes } from '@/constants/dialogs';
+import { DialogType } from '@/constants/dialogs';
 
 import { calculateOnboardingStep } from '@/state/accountCalculators';
 import { getOnboardingState, getSubaccountId } from '@/state/accountSelectors';
@@ -50,20 +50,20 @@ export const useAnalytics = () => {
             : 'UNSUPPORTED';
 
   useEffect(() => {
-    identify(AnalyticsUserProperty.Breakpoint, breakpoint);
+    identify(AnalyticsUserProperties.Breakpoint(breakpoint));
   }, [breakpoint]);
 
   // AnalyticsUserProperty.Locale
   const selectedLocale = useAppSelector(getSelectedLocale);
 
   useEffect(() => {
-    identify(AnalyticsUserProperty.Locale, selectedLocale);
+    identify(AnalyticsUserProperties.Locale(selectedLocale));
   }, [selectedLocale]);
 
   // AnalyticsUserProperty.Version
   useEffect(() => {
     if (latestTag !== undefined) {
-      identify(AnalyticsUserProperty.Version, latestTag.split(`release/v`).at(-1));
+      identify(AnalyticsUserProperties.Version(latestTag.split(`release/v`).at(-1)));
     }
   }, [latestTag]);
 
@@ -71,40 +71,40 @@ export const useAnalytics = () => {
   const { selectedNetwork } = useSelectedNetwork();
 
   useEffect(() => {
-    identify(AnalyticsUserProperty.Network, selectedNetwork);
+    identify(AnalyticsUserProperties.Network(selectedNetwork));
   }, [selectedNetwork]);
 
   // AnalyticsUserProperty.WalletType
   useEffect(() => {
-    identify(AnalyticsUserProperty.WalletType, walletType);
+    identify(AnalyticsUserProperties.WalletType(walletType ?? null));
   }, [walletType]);
 
   // AnalyticsUserProperty.WalletConnectionType
   useEffect(() => {
-    identify(AnalyticsUserProperty.WalletConnectionType, walletConnectionType);
+    identify(AnalyticsUserProperties.WalletConnectionType(walletConnectionType ?? null));
   }, [walletConnectionType]);
 
   // AnalyticsUserProperty.WalletAddress
   useEffect(() => {
-    identify(AnalyticsUserProperty.WalletAddress, evmAddress ?? dydxAddress);
+    identify(AnalyticsUserProperties.WalletAddress(evmAddress ?? dydxAddress ?? null));
   }, [evmAddress, dydxAddress]);
 
   // AnalyticsUserProperty.DydxAddress
   useEffect(() => {
-    identify(AnalyticsUserProperty.DydxAddress, dydxAddress);
+    identify(AnalyticsUserProperties.DydxAddress(dydxAddress ?? null));
   }, [dydxAddress]);
 
   // AnalyticsUserProperty.SubaccountNumber
   const subaccountNumber = useAppSelector(getSubaccountId);
   useEffect(() => {
-    identify(AnalyticsUserProperty.SubaccountNumber, subaccountNumber);
+    identify(AnalyticsUserProperties.SubaccountNumber(subaccountNumber ?? null));
   }, [subaccountNumber]);
 
   /** Events */
 
   // AnalyticsEvent.AppStart
   useEffect(() => {
-    track(AnalyticsEvent.AppStart);
+    track(AnalyticsEvents.AppStart());
   }, []);
 
   // AnalyticsEvent.NetworkStatus
@@ -119,14 +119,16 @@ export const useAnalytics = () => {
           lastSuccessfulWebsocketRequestByOrigin[new URL(websocketEndpoint).origin]) ||
         undefined;
 
-      track(AnalyticsEvent.NetworkStatus, {
-        status: status.name,
-        lastSuccessfulIndexerRpcQuery,
-        elapsedTime: lastSuccessfulIndexerRpcQuery && Date.now() - lastSuccessfulIndexerRpcQuery,
-        blockHeight: height ?? undefined,
-        indexerBlockHeight: indexerHeight ?? undefined,
-        trailingBlocks: trailingBlocks ?? undefined,
-      });
+      track(
+        AnalyticsEvents.NetworkStatus({
+          status: status.name,
+          lastSuccessfulIndexerRpcQuery,
+          elapsedTime: lastSuccessfulIndexerRpcQuery && Date.now() - lastSuccessfulIndexerRpcQuery,
+          blockHeight: height ?? undefined,
+          indexerBlockHeight: indexerHeight ?? undefined,
+          trailingBlocks: trailingBlocks ?? undefined,
+        })
+      );
     }
   }, [status]);
 
@@ -136,26 +138,26 @@ export const useAnalytics = () => {
   useEffect(() => {
     // Ignore hashchange events from <iframe>s x_x
     if (location.pathname.startsWith('/'))
-      track(AnalyticsEvent.NavigatePage, { path: location.pathname });
+      track(AnalyticsEvents.NavigatePage({ path: location.pathname }));
   }, [location]);
 
   // AnalyticsEvent.NavigateDialog
   // AnalyticsEvent.NavigateDialogClose
   const activeDialog = useAppSelector(getActiveDialog);
   const [previousActiveDialogType, setPreviousActiveDialogType] = useState<
-    DialogTypes | undefined
+    DialogType['tag'] | undefined
   >();
 
   useEffect(() => {
-    if (activeDialog?.type) {
-      track(AnalyticsEvent.NavigateDialog, { type: activeDialog.type });
+    if (activeDialog?.tag) {
+      track(AnalyticsEvents.NavigateDialog({ type: activeDialog.tag }));
     }
 
     if (previousActiveDialogType) {
-      track(AnalyticsEvent.NavigateDialogClose, { type: previousActiveDialogType });
+      track(AnalyticsEvents.NavigateDialogClose({ type: previousActiveDialogType }));
     }
 
-    setPreviousActiveDialogType(activeDialog?.type);
+    setPreviousActiveDialogType(activeDialog?.tag);
   }, [activeDialog]);
 
   // AnalyticsEvent.NavigateExternal
@@ -168,7 +170,7 @@ export const useAnalytics = () => {
         anchorElement.href &&
         anchorElement.hostname !== globalThis.location.hostname
       )
-        track(AnalyticsEvent.NavigateExternal, { link: anchorElement.href });
+        track(AnalyticsEvents.NavigateExternal({ link: anchorElement.href }));
     };
     globalThis.addEventListener('click', onClick);
 
@@ -182,10 +184,12 @@ export const useAnalytics = () => {
 
   useEffect(() => {
     if (hasOnboardingStateChanged) {
-      track(AnalyticsEvent.OnboardingStepChanged, {
-        state: onboardingState,
-        step: currentOnboardingStep,
-      });
+      track(
+        AnalyticsEvents.OnboardingStepChanged({
+          state: onboardingState,
+          step: currentOnboardingStep,
+        })
+      );
     } else {
       setHasOnboardingStateChanged(true);
     }
@@ -198,12 +202,14 @@ export const useAnalytics = () => {
 
   useEffect(() => {
     if (selectedWalletType) {
-      track(AnalyticsEvent.ConnectWallet, {
-        walletType: selectedWalletType,
-        walletConnectionType: walletConnectionType!,
-      });
+      track(
+        AnalyticsEvents.ConnectWallet({
+          walletType: selectedWalletType,
+          walletConnectionType: walletConnectionType!,
+        })
+      );
     } else if (previousSelectedWalletType) {
-      track(AnalyticsEvent.DisconnectWallet);
+      track(AnalyticsEvents.DisconnectWallet());
     }
 
     setPreviousSelectedWalletType(selectedWalletType);
@@ -216,9 +222,11 @@ export const useAnalytics = () => {
   useEffect(() => {
     if (hasSelectedOrderTypeChanged) {
       if (selectedOrderType)
-        track(AnalyticsEvent.TradeOrderTypeSelected, {
-          type: getSelectedTradeType(selectedOrderType),
-        });
+        track(
+          AnalyticsEvents.TradeOrderTypeSelected({
+            type: getSelectedTradeType(selectedOrderType),
+          })
+        );
     } else {
       setHasSelectedOrderTypeChanged(true);
     }
