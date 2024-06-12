@@ -258,6 +258,8 @@ export const ClosePositionForm = ({
     </$InputsColumn>
   );
 
+  const isFullClose = percent === SIZE_PERCENT_OPTIONS[MAX_KEY] || currentSizeBN.eq(size ?? 0);
+
   return (
     <$ClosePositionForm onSubmit={onSubmit} className={className}>
       {!isTablet ? (
@@ -306,6 +308,7 @@ export const ClosePositionForm = ({
             buttonTextStringKey: STRING_KEYS.CLOSE_POSITION,
             buttonAction: ButtonAction.Destroy,
           }}
+          isFullClose={isFullClose}
         />
       </$Footer>
     </$ClosePositionForm>
