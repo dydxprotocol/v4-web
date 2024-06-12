@@ -66,6 +66,9 @@ export const AccountInfoConnectedState = () => {
 
   const { freeCollateral, marginUsage } = subAccount ?? {};
 
+  /**
+   * TODO: isClosingIsolatedPosition controls whether diff state is shown. Remove when diff state is fixed in Abacus.
+   */
   const hasDiff =
     !isClosingIsolatedPosition &&
     ((!!marginUsage?.postOrder && getTradeStateWithDoubleValuesHasDiff(marginUsage)) ||

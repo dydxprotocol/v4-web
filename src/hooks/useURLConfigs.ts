@@ -16,6 +16,7 @@ export interface LinksConfigs {
   governanceLearnMore?: string;
   help?: string;
   initialMarginFractionLearnMore?: string;
+  isolatedMarginLearnMore?: string;
   keplrDashboard?: string;
   launchIncentive?: string;
   mintscan: string;
@@ -52,6 +53,7 @@ export const useURLConfigs = (): LinksConfigs => {
     governanceLearnMore: linksConfigs.governanceLearnMore ?? FALLBACK_URL,
     help: linksConfigs.help ?? FALLBACK_URL,
     initialMarginFractionLearnMore: linksConfigs.initialMarginFractionLearnMore ?? FALLBACK_URL,
+    isolatedMarginLearnMore: linksConfigs.isolatedMarginLearnMore ?? FALLBACK_URL,
     keplrDashboard: linksConfigs.keplrDashboard ?? FALLBACK_URL,
     launchIncentive: linksConfigs.launchIncentive ?? FALLBACK_URL,
     mintscan: linksConfigs.mintscan,

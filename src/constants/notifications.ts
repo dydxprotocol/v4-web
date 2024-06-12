@@ -188,6 +188,7 @@ export enum ReleaseUpdateNotificationIds {
   IncentivesS5 = 'incentives-s5',
   IncentivesDistributedS4 = 'incentives-distributed-s4',
   FOKDeprecation = 'fok-deprecation',
+  IsolatedMarginLive = 'isolated-margin-live', // Added 06/12/2024
 }
 
 // Incentives Season
