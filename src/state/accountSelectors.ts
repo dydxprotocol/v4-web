@@ -1,7 +1,8 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
-import { sum } from 'lodash';
+import { groupBy, sum } from 'lodash';
 
 import {
+  AbacusMarginMode,
   AbacusOrderSide,
   AbacusOrderStatus,
   AbacusPositionSide,
@@ -12,7 +13,8 @@ import {
   type SubaccountFundingPayment,
   type SubaccountOrder,
 } from '@/constants/abacus';
-import { OnboardingState } from '@/constants/account';
+import { NUM_PARENT_SUBACCOUNTS, OnboardingState } from '@/constants/account';
+import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 
 import { getHydratedTradingData, isStopLossOrder, isTakeProfitOrder } from '@/lib/orders';
 import { getHydratedPositionData } from '@/lib/positions';
@@ -31,6 +33,12 @@ import {
  * @returns Abacus' subaccount object
  */
 export const getSubaccount = (state: RootState) => state.account.subaccount;
+
+/**
+ * @param state
+ * @returns Whether or not Abacus' subaccount object exists
+ */
+export const getHasSubaccount = (state: RootState) => Boolean(state.account.subaccount);
 
 /**
  * @param state
@@ -69,6 +77,15 @@ export const getExistingOpenPositions = createAppSelector([getOpenPositions], (a
 );
 
 /**
+ *
+ * @returns All SubaccountOrders that have a margin mode of Isolated and no existing position for the market.
+ */
+export const getNonZeroPendingPositions = createAppSelector(
+  [(state: RootState) => state.account.subaccount?.pendingPositions],
+  (pending) => pending?.toArray().filter((p) => (p.equity?.current ?? 0) > 0)
+);
+
+/**
  * @param marketId
  * @returns user's position details with the given marketId
  */
@@ -100,6 +117,24 @@ export const getCurrentMarketPositionData = (state: RootState) => {
     (getOpenPositions(state) ?? []).map((positionData) => [positionData.id, positionData])
   )[currentMarketId!];
 };
+
+/**
+ * @returns the current leverage of the isolated position. Selector will return null if position is not isolated or does not exist.
+ */
+export const getCurrentMarketIsolatedPositionLeverage = createAppSelector(
+  [getCurrentMarketPositionData],
+  (position) => {
+    if (
+      position?.childSubaccountNumber &&
+      position.childSubaccountNumber >= NUM_PARENT_SUBACCOUNTS &&
+      position.leverage?.current
+    ) {
+      return Math.abs(Number(position.leverage.current.toFixed(LEVERAGE_DECIMALS)));
+    }
+
+    return 0;
+  }
+);
 
 /**
  * @param state
@@ -168,6 +203,28 @@ export const getSubaccountOpenOrders = createAppSelector([getSubaccountOrders], 
     (order) =>
       order.status !== AbacusOrderStatus.filled && order.status !== AbacusOrderStatus.cancelled
   )
+);
+
+export const getPendingIsolatedOrders = createAppSelector(
+  [getSubaccountOrders, getExistingOpenPositions, getPerpetualMarkets],
+  (allOrders, allOpenPositions, allMarkets) => {
+    const allValidOrders = (allOrders ?? [])
+      .filter(
+        (o) =>
+          (o.status === AbacusOrderStatus.open ||
+            o.status === AbacusOrderStatus.pending ||
+            o.status === AbacusOrderStatus.partiallyFilled ||
+            o.status === AbacusOrderStatus.untriggered) &&
+          o.marginMode === AbacusMarginMode.isolated
+      )
+      // eslint-disable-next-line prefer-object-spread
+      .map((o) => Object.assign({}, o, { assetId: allMarkets?.[o.marketId]?.assetId }));
+    const allOpenPositionAssetIds = new Set(allOpenPositions?.map((p) => p.assetId) ?? []);
+    return groupBy(
+      allValidOrders.filter((o) => !allOpenPositionAssetIds.has(o.assetId ?? '')),
+      (o) => o.marketId
+    );
+  }
 );
 
 /**

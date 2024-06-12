@@ -2,6 +2,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import assign from 'lodash/assign';
 
 import type {
+  AdjustIsolatedMarginInputs,
   ClosePositionInputs,
   InputError,
   Inputs,
@@ -21,6 +22,7 @@ export interface InputsState {
   inputErrors?: Nullable<InputError[]>;
   tradeFormInputs: TradeFormInputs;
   tradeInputs?: Nullable<TradeInputs>;
+  adjustIsolatedMarginInputs?: Nullable<AdjustIsolatedMarginInputs>;
   closePositionInputs?: Nullable<ClosePositionInputs>;
   triggerOrdersInputs?: Nullable<TriggerOrdersInputs>;
   transferInputs?: Nullable<TransferInputs>;
@@ -42,8 +44,15 @@ export const inputsSlice = createSlice({
   initialState,
   reducers: {
     setInputs: (state, action: PayloadAction<Nullable<Inputs>>) => {
-      const { current, errors, trade, closePosition, transfer, triggerOrders } =
-        action.payload ?? {};
+      const {
+        current,
+        errors,
+        trade,
+        closePosition,
+        transfer,
+        triggerOrders,
+        adjustIsolatedMargin,
+      } = action.payload ?? {};
 
       return {
         ...state,
@@ -51,6 +60,7 @@ export const inputsSlice = createSlice({
         inputErrors: errors?.toArray(),
         tradeInputs: trade,
         closePositionInputs: closePosition,
+        adjustIsolatedMarginInputs: adjustIsolatedMargin,
         transferInputs: safeAssign({}, transfer, {
           isCctp: !!transfer?.isCctp,
         }),

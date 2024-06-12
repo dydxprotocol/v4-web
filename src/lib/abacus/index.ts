@@ -1,12 +1,14 @@
 import type { LocalWallet, SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 
 import type {
+  AdjustIsolatedMarginInputFields,
   ClosePositionInputFields,
   HistoricalPnlPeriods,
   HistoricalTradingRewardsPeriod,
   HistoricalTradingRewardsPeriods,
   HumanReadableCancelOrderPayload,
   HumanReadablePlaceOrderPayload,
+  HumanReadableSubaccountTransferPayload,
   HumanReadableTriggerOrdersPayload,
   Nullable,
   OrderbookGroupings,
@@ -18,6 +20,7 @@ import type {
 import {
   AbacusAppConfig,
   AbacusHelper,
+  AdjustIsolatedMarginInputField,
   ApiData,
   AsyncAbacusStateManager,
   ClosePositionInputField,
@@ -25,6 +28,7 @@ import {
   CoroutineTimer,
   HistoricalPnlPeriod,
   IOImplementations,
+  OnboardingConfig,
   TradeInputField,
   TransferInputField,
   TransferType,
@@ -97,12 +101,8 @@ class AbacusStateManager {
       this.abacusFormatter
     );
 
-    const appConfigs = new AbacusAppConfig(
-      false, // subscribeToCandles
-      true, // loadRemote
-      import.meta.env.MODE === 'development' && import.meta.env.VITE_ENABLE_ABACUS_LOGGING // enableLogger
-    );
-    appConfigs.squidVersion = AbacusAppConfig.SquidVersion.V2;
+    const appConfigs = AbacusAppConfig.Companion.forWebAppWithIsolatedMargins;
+    appConfigs.onboardingConfigs.squidVersion = OnboardingConfig.SquidVersion.V2;
 
     this.stateManager = new AsyncAbacusStateManager(
       '',
@@ -119,9 +119,9 @@ class AbacusStateManager {
     if (network) {
       this.stateManager.environmentId = network;
     }
-    this.stateManager.trade(null, null);
     this.stateManager.readyToConnect = true;
     this.setMarket(this.currentMarket ?? DEFAULT_MARKETID);
+    this.stateManager.trade(null, null);
   };
 
   // ------ Breakdown ------ //
@@ -214,6 +214,17 @@ class AbacusStateManager {
     this.setTriggerOrdersValue({ value: null, field: TriggerOrdersInputField.takeProfitOrderType });
   };
 
+  clearAdjustIsolatedMarginInputValues = () => {
+    this.setAdjustIsolatedMarginValue({
+      value: null,
+      field: AdjustIsolatedMarginInputField.Amount,
+    });
+    this.setAdjustIsolatedMarginValue({
+      value: null,
+      field: AdjustIsolatedMarginInputField.AmountPercent,
+    });
+  };
+
   resetInputState = () => {
     this.clearTransferInputValues();
     this.setTransferValue({
@@ -221,6 +232,7 @@ class AbacusStateManager {
       value: null,
     });
     this.clearTriggerOrdersInputValues();
+    this.clearAdjustIsolatedMarginInputValues();
     this.clearTradeInputValues({ shouldResetSize: true });
   };
 
@@ -262,8 +274,18 @@ class AbacusStateManager {
     this.chainTransactions.setSelectedGasDenom(denom);
   };
 
-  setTradeValue = ({ value, field }: { value: any; field: TradeInputFields }) => {
+  setTradeValue = ({ value, field }: { value: any; field: Nullable<TradeInputFields> }) => {
     this.stateManager.trade(value, field);
+  };
+
+  setAdjustIsolatedMarginValue = ({
+    value,
+    field,
+  }: {
+    value: any;
+    field: AdjustIsolatedMarginInputFields;
+  }) => {
+    this.stateManager.adjustIsolatedMargin(value, field);
   };
 
   setTransferValue = ({ value, field }: { value: any; field: TransferInputFields }) => {
@@ -331,6 +353,15 @@ class AbacusStateManager {
       data: Nullable<HumanReadableCancelOrderPayload>
     ) => void
   ) => this.stateManager.cancelOrder(orderId, callback);
+
+  adjustIsolatedMarginOfPosition = (
+    callback: (
+      success: boolean,
+      parsingError: Nullable<ParsingError>,
+      data: Nullable<HumanReadableSubaccountTransferPayload>
+    ) => void
+  ): Nullable<HumanReadableSubaccountTransferPayload> =>
+    this.stateManager.commitAdjustIsolatedMargin(callback);
 
   triggerOrders = (
     callback: (

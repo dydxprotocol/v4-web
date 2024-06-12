@@ -54,6 +54,8 @@ const $Root = styled(Root)`
   --radio-button-cards-item-checked-backgroundColor: ;
   --radio-button-cards-item-disabled-backgroundColor: ;
   --radio-button-cards-item-backgroundColor: ;
+  --radio-button-cards-item-header-font: ;
+  --radio-button-cards-item-body-font: ;
 `;
 
 const $RadioButtonCard = styled(Item)`
@@ -63,7 +65,7 @@ const $RadioButtonCard = styled(Item)`
   background-color: var(--radio-button-cards-item-backgroundColor, transparent);
   border: 1px solid var(--color-layer-6);
   padding: var(--radio-button-cards-item-padding, 1rem);
-  font: var(--font-mini-book);
+  font: var(--radio-buttons-cards-item-body-font, var(--font-mini-book));
   text-align: left;
   gap: var(--radio-button-cards-item-gap, 0.5rem);
 
@@ -83,7 +85,7 @@ const $CardHeader = styled.div`
   align-self: stretch;
   align-items: center;
   color: var(--color-text-2);
-  font: var(--font-base-medium);
+  font: var(--radio-button-cards-item-header-font, var(--font-base-medium));
   justify-content: space-between;
   gap: 1rem;
 `;
