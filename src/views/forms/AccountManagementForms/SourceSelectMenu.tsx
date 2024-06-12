@@ -20,6 +20,7 @@ import { getTransferInputs } from '@/state/inputsSelectors';
 import { isTruthy } from '@/lib/isTruthy';
 
 import cctpTokens from '../../../../public/configs/cctp.json';
+import otherChains from '../../../../public/configs/otherChains.json';
 
 type ElementProps = {
   label?: string;
@@ -34,16 +35,13 @@ export type TokenInfo = {
   name: string;
 };
 
-const cctpTokensByChainId = cctpTokens.reduce(
-  (acc, token) => {
-    if (!acc[token.chainId]) {
-      acc[token.chainId] = [];
-    }
-    acc[token.chainId].push(token);
-    return acc;
-  },
-  {} as Record<string, TokenInfo[]>
-);
+const cctpTokensByChainId = cctpTokens.reduce((acc, token) => {
+  if (!acc[token.chainId]) {
+    acc[token.chainId] = [];
+  }
+  acc[token.chainId].push(token);
+  return acc;
+}, {} as Record<string, TokenInfo[]>);
 
 export const SourceSelectMenu = ({
   label,
@@ -57,6 +55,10 @@ export const SourceSelectMenu = ({
   const stringGetter = useStringGetter();
   const { type, depositOptions, withdrawalOptions } =
     useAppSelector(getTransferInputs, shallowEqual) ?? {};
+
+  const isNotPrivyDeposit = type === TransferType.withdrawal || walletType !== WalletType.Privy;
+  const isNotKeplrDeposit = type === TransferType.withdrawal || walletType !== WalletType.Keplr;
+
   const chains =
     (type === TransferType.deposit ? depositOptions : withdrawalOptions)?.chains?.toArray() ??
     EMPTY_ARR;
@@ -69,7 +71,9 @@ export const SourceSelectMenu = ({
   // in the description prop (renders below the item label) instead of in the slotAfter
   const lowestFeesDecoratorProp = type === TransferType.deposit ? 'slotAfter' : 'description';
 
-  const chainItems = Object.values(chains)
+  const supportedChains = isNotKeplrDeposit ? chains : otherChains;
+
+  const chainItems = Object.values(supportedChains)
     .map((chain) => ({
       value: chain.type,
       label: chain.stringKey,
@@ -93,6 +97,7 @@ export const SourceSelectMenu = ({
       ),
     }))
     .filter((chain) => {
+      if (!isNotKeplrDeposit) return true;
       // if deposit and CCTPDepositOnly enabled, only return cctp tokens
       if (type === TransferType.deposit && CCTPDepositOnly) {
         return !!cctpTokensByChainId[chain.value];
@@ -114,18 +119,19 @@ export const SourceSelectMenu = ({
     slotBefore: <$Img src={exchange.iconUrl ?? undefined} alt="" />,
   }));
 
-  const selectedChainOption = chains.find((item) => item.type === selectedChain);
+  const selectedChainOption = supportedChains.find((item) => item.type === selectedChain);
+
   const selectedExchangeOption = exchanges.find((item) => item.type === selectedExchange);
-  const isNotPrivyDeposit = type === TransferType.withdrawal || walletType !== WalletType.Privy;
 
   return (
     <SearchSelectMenu
       items={[
-        exchangeItems.length > 0 && {
-          group: 'exchanges',
-          groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
-          items: exchangeItems,
-        },
+        isNotKeplrDeposit &&
+          exchangeItems.length > 0 && {
+            group: 'exchanges',
+            groupLabel: stringGetter({ key: STRING_KEYS.EXCHANGES }),
+            items: exchangeItems,
+          },
         // only block privy wallets for deposits
         isNotPrivyDeposit &&
           chainItems.length > 0 && {
