@@ -38,8 +38,7 @@ export const Overview = () => {
 
   const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
   const shouldRenderActions = useParameterizedSelector(
-    calculateShouldRenderActionsInPositionsTable,
-    true
+    calculateShouldRenderActionsInPositionsTable
   );
 
   return (
@@ -77,7 +76,7 @@ export const Overview = () => {
               state: { from: AppRoute.Portfolio },
             })
           }
-          showClosePositionAction
+          showClosePositionAction={shouldRenderActions}
           withOuterBorder
         />
         <$MaybeUnopenedIsolatedPositionsPanel

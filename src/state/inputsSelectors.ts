@@ -44,7 +44,7 @@ export const getInputTradeTargetLeverage = (state: RootState) =>
 
 /**
  * @param state
- * @returns ValidationErrors of the current Input type (Trade or Transfer)
+ * @returns ValidationErrors of the current Input type
  */
 export const getInputErrors = (state: RootState) => state.inputs.inputErrors;
 

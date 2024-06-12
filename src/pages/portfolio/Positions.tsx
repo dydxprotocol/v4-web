@@ -29,12 +29,9 @@ export const Positions = () => {
   const { isTablet, isNotTablet } = useBreakpoints();
   const navigate = useNavigate();
 
-  const showClosePositionAction = false;
-
   const shouldRenderTriggers = useAppSelector(calculateShouldRenderTriggersInPositionsTable);
   const shouldRenderActions = useParameterizedSelector(
-    calculateShouldRenderActionsInPositionsTable,
-    showClosePositionAction
+    calculateShouldRenderActionsInPositionsTable
   );
 
   const handleViewUnopenedIsolatedOrders = useCallback(() => {
@@ -70,7 +67,7 @@ export const Positions = () => {
         }
         currentRoute={`${AppRoute.Portfolio}/${PortfolioRoute.Positions}`}
         withOuterBorder={isNotTablet}
-        showClosePositionAction={showClosePositionAction}
+        showClosePositionAction={shouldRenderActions}
         navigateToOrders={() =>
           navigate(`${AppRoute.Portfolio}/${PortfolioRoute.Orders}`, {
             state: { from: AppRoute.Portfolio },

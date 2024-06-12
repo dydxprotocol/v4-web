@@ -273,7 +273,7 @@ class AbacusStateManager {
     this.chainTransactions.setSelectedGasDenom(denom);
   };
 
-  setTradeValue = ({ value, field }: { value: any; field: TradeInputFields | null }) => {
+  setTradeValue = ({ value, field }: { value: any; field: Nullable<TradeInputFields> }) => {
     this.stateManager.trade(value, field);
   };
 
