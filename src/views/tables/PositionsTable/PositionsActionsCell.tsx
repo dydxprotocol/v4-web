@@ -9,7 +9,6 @@ import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
 
 import { useComplianceState } from '@/hooks/useComplianceState';
-import { useEnvFeatures } from '@/hooks/useEnvFeatures';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { IconName } from '@/components/Icon';
@@ -49,7 +48,6 @@ export const PositionsActionsCell = ({
   const currentMarketId = useAppSelector(getCurrentMarketId);
   const activeTradeBoxDialog = useAppSelector(getActiveTradeBoxDialog);
   const stringGetter = useStringGetter();
-  const { isSlTpEnabled } = useEnvFeatures();
   const { complianceState } = useComplianceState();
 
   const { type: tradeBoxDialogType } = activeTradeBoxDialog ?? {};
@@ -89,7 +87,7 @@ export const PositionsActionsCell = ({
 
   return (
     <ActionsTableCell>
-      {!isDisabled && isSlTpEnabled && complianceState === ComplianceStates.FULL_ACCESS && (
+      {!isDisabled && complianceState === ComplianceStates.FULL_ACCESS && (
         <WithTooltip
           tooltipString={stringGetter({ key: STRING_KEYS.EDIT_TAKE_PROFIT_STOP_LOSS_TRIGGERS })}
         >
