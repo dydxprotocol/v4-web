@@ -19,6 +19,11 @@
           "exchangeName": "Raydium",
           "ticker": "MOTHER-SOL-8ZcrNqaDbqy1H4R2DtmGnuZnJ6TKGSsaGmyRGQQeELLv-6-8uQwXPi1sWwUTVbDBnjznmf4mV44CETiNAh3UENvHejV-9",
           "adjustByMarket": "SOL-USD"
+        },
+        {
+          "exchangeName": "Gate",
+          "ticker": "MOTHER_USDT",
+          "adjustByMarket": "USDT-USD"
         }
       ],
       "liquidityTier": 2,
