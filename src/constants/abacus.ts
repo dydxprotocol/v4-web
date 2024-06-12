@@ -83,6 +83,7 @@ export type MarketTrade = Abacus.exchange.dydx.abacus.output.MarketTrade;
 export type OrderbookLine = Abacus.exchange.dydx.abacus.output.OrderbookLine;
 export type PerpetualMarket = Abacus.exchange.dydx.abacus.output.PerpetualMarket;
 export type MarketHistoricalFunding = Abacus.exchange.dydx.abacus.output.MarketHistoricalFunding;
+export const PerpetualMarketType = Abacus.exchange.dydx.abacus.output.PerpetualMarketType;
 
 // ------ Configs ------ //
 export type Configs = Abacus.exchange.dydx.abacus.output.Configs;
@@ -102,6 +103,8 @@ export type ClosePositionInputs = Abacus.exchange.dydx.abacus.output.input.Close
 export type TradeInputSummary = Abacus.exchange.dydx.abacus.output.input.TradeInputSummary;
 export type TransferInputs = Abacus.exchange.dydx.abacus.output.input.TransferInput;
 export type TriggerOrdersInputs = Abacus.exchange.dydx.abacus.output.input.TriggerOrdersInput;
+export type AdjustIsolatedMarginInputs =
+  Abacus.exchange.dydx.abacus.output.input.AdjustIsolatedMarginInput;
 export type InputError = Abacus.exchange.dydx.abacus.output.input.ValidationError;
 export type TransferInputTokenResource =
   Abacus.exchange.dydx.abacus.output.input.TransferInputTokenResource;
@@ -122,6 +125,8 @@ export type HistoricalTradingRewardsPeriods = (typeof historicalTradingRewardsPe
 
 export type Subaccount = Abacus.exchange.dydx.abacus.output.Subaccount;
 export type SubaccountPosition = Abacus.exchange.dydx.abacus.output.SubaccountPosition;
+export type SubaccountPendingPosition =
+  Abacus.exchange.dydx.abacus.output.SubaccountPendingPosition;
 export type SubaccountOrder = Abacus.exchange.dydx.abacus.output.SubaccountOrder;
 export type OrderStatus = Abacus.exchange.dydx.abacus.output.input.OrderStatus;
 export const AbacusOrderStatus = Abacus.exchange.dydx.abacus.output.input.OrderStatus;
@@ -147,6 +152,13 @@ const transferInputFields = [...TransferInputField.values()] as const;
 export type TransferInputFields = (typeof transferInputFields)[number];
 
 export const TransferType = Abacus.exchange.dydx.abacus.output.input.TransferType;
+
+export const AdjustIsolatedMarginInputField =
+  Abacus.exchange.dydx.abacus.state.model.AdjustIsolatedMarginInputField;
+const adjustIsolatedMarginInputFields = [...AdjustIsolatedMarginInputField.values()] as const;
+export type AdjustIsolatedMarginInputFields = (typeof adjustIsolatedMarginInputFields)[number];
+export const IsolatedMarginAdjustmentType =
+  Abacus.exchange.dydx.abacus.output.input.IsolatedMarginAdjustmentType;
 
 // ------ Trade Items ------ //
 export const TradeInputField = Abacus.exchange.dydx.abacus.state.model.TradeInputField;
@@ -194,6 +206,8 @@ export type HumanReadableWithdrawPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableWithdrawPayload;
 export type HumanReadableTransferPayload =
   Abacus.exchange.dydx.abacus.state.manager.HumanReadableTransferPayload;
+export type HumanReadableSubaccountTransferPayload =
+  Abacus.exchange.dydx.abacus.state.manager.HumanReadableSubaccountTransferPayload;
 
 // ------ Helpers ------ //
 export const AbacusHelper = Abacus.exchange.dydx.abacus.utils.AbacusHelper;

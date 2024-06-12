@@ -81,3 +81,5 @@ export const getNumberSign = (n: any): NumberSign =>
     : MustBigNumber(n).lt(0)
       ? NumberSign.Negative
       : NumberSign.Neutral;
+
+export const nullIfZero = (n?: number | string | null) => (MustBigNumber(n).eq(0) ? null : n);

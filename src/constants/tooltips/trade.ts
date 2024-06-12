@@ -21,6 +21,14 @@ export const tradeTooltips: TooltipStrings = {
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.BUYING_POWER_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.BUYING_POWER_BODY, params: stringParams }),
   }),
+  'cross-margin-usage': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.CROSS_MARGIN_USAGE_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.CROSS_MARGIN_USAGE_BODY }),
+  }),
+  'cross-free-collateral': ({ stringGetter }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.CROSS_FREE_COLLATERAL_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.CROSS_FREE_COLLATERAL_BODY }),
+  }),
   'default-execution': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.DEFAULT_EXECUTION_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.DEFAULT_EXECUTION_BODY }),
@@ -194,6 +202,10 @@ export const tradeTooltips: TooltipStrings = {
   'taker-fee': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.TAKER_FEE_TITLE }),
     body: stringGetter({ key: TOOLTIP_STRING_KEYS.TAKER_FEE_BODY }),
+  }),
+  'target-leverage': ({ stringGetter, stringParams }) => ({
+    title: stringGetter({ key: TOOLTIP_STRING_KEYS.TARGET_LEVERAGE_TITLE }),
+    body: stringGetter({ key: TOOLTIP_STRING_KEYS.TARGET_LEVERAGE_BODY, params: stringParams }),
   }),
   'tick-size': ({ stringGetter }) => ({
     title: stringGetter({ key: TOOLTIP_STRING_KEYS.TICK_SIZE_TITLE }),

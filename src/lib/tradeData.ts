@@ -1,13 +1,17 @@
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 
 import {
+  AbacusMarginMode,
   AbacusOrderSide,
   AbacusOrderTypes,
   ErrorType,
   ValidationError,
   type AbacusOrderSides,
   type Nullable,
+  type SubaccountPosition,
+  type TradeState,
 } from '@/constants/abacus';
+import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
 import type { StringGetterFunction } from '@/constants/localization';
 import { PERCENT_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
@@ -125,7 +129,7 @@ export const getTradeInputAlert = ({
   return inputAlerts?.[0];
 };
 
-export const calculatePositionMargin = ({
+export const calculateCrossPositionMargin = ({
   notionalTotal,
   adjustedMmf,
 }: {
@@ -134,5 +138,37 @@ export const calculatePositionMargin = ({
 }) => {
   const notionalTotalBN = MustBigNumber(notionalTotal);
   const adjustedMmfBN = MustBigNumber(adjustedMmf);
-  return notionalTotalBN.times(adjustedMmfBN);
+  return notionalTotalBN.times(adjustedMmfBN).toFixed(USD_DECIMALS);
+};
+
+/**
+ * @param subaccountNumber
+ * @returns marginMode from subaccountNumber, defaulting to cross margin if subaccountNumber is undefined or null.
+ * @note v4-web is assuming that subaccountNumber >= 128 is used as childSubaccounts. API Traders may utilize these subaccounts differently.
+ */
+export const getMarginModeFromSubaccountNumber = (subaccountNumber: Nullable<number>) => {
+  if (!subaccountNumber) return AbacusMarginMode.cross;
+
+  return subaccountNumber >= NUM_PARENT_SUBACCOUNTS
+    ? AbacusMarginMode.isolated
+    : AbacusMarginMode.cross;
+};
+
+export const getPositionMargin = ({ position }: { position: SubaccountPosition }) => {
+  const { childSubaccountNumber, equity, notionalTotal, adjustedMmf } = position;
+  const marginMode = getMarginModeFromSubaccountNumber(childSubaccountNumber);
+
+  const margin =
+    marginMode === AbacusMarginMode.cross
+      ? calculateCrossPositionMargin({
+          notionalTotal: notionalTotal?.current,
+          adjustedMmf: adjustedMmf.current,
+        })
+      : equity?.current;
+
+  return margin;
+};
+
+export const getTradeStateWithDoubleValuesHasDiff = (tradeState: Nullable<TradeState<number>>) => {
+  return !!tradeState && tradeState.current !== tradeState.postOrder;
 };

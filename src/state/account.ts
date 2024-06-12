@@ -7,11 +7,11 @@ import type {
   Nullable,
   StakingDelegation,
   StakingRewards,
-  SubAccountHistoricalPNLs,
   Subaccount,
   SubaccountFill,
   SubaccountFills,
   SubaccountFundingPayments,
+  SubAccountHistoricalPNLs,
   SubaccountOrder,
   SubaccountTransfers,
   TradingRewards,
@@ -49,6 +49,19 @@ export type AccountState = {
   transfers?: SubaccountTransfers;
   historicalPnl?: SubAccountHistoricalPNLs;
 
+  childSubaccounts: {
+    [subaccountNumber: number]: Nullable<
+      Partial<
+        Subaccount & {
+          fills: SubaccountFills;
+          fundingPayments: SubaccountFundingPayments;
+          transfers: SubaccountTransfers;
+          historicalPnl: SubAccountHistoricalPNLs;
+        }
+      >
+    >;
+  };
+
   onboardingGuards: Record<OnboardingGuard, boolean | undefined>;
   onboardingState: OnboardingState;
 
@@ -75,6 +88,7 @@ const initialState: AccountState = {
 
   // Subaccount
   subaccount: undefined,
+  childSubaccounts: {},
   fills: undefined,
   fundingPayments: undefined,
   transfers: undefined,
@@ -224,6 +238,21 @@ export const accountSlice = createSlice({
 
       state.subaccount = action.payload;
     },
+    setChildSubaccount: (
+      state,
+      action: PayloadAction<Partial<AccountState['childSubaccounts']>>
+    ) => {
+      const childSubaccountsCopy = { ...state.childSubaccounts };
+
+      Object.keys(action.payload).forEach((subaccountNumber) => {
+        childSubaccountsCopy[Number(subaccountNumber)] = {
+          ...childSubaccountsCopy[Number(subaccountNumber)],
+          ...action.payload[Number(subaccountNumber)],
+        };
+      });
+
+      state.childSubaccounts = childSubaccountsCopy;
+    },
     setWallet: (state, action: PayloadAction<Nullable<Wallet>>) => ({
       ...state,
       wallet: action.payload,
@@ -330,6 +359,7 @@ export const {
   setRestrictionType,
   setCompliance,
   setSubaccount,
+  setChildSubaccount,
   setWallet,
   viewedFills,
   viewedOrders,

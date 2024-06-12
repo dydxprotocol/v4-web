@@ -23,12 +23,12 @@ import { IconButton } from '@/components/IconButton';
 import { Output, OutputType } from '@/components/Output';
 import { TableCell } from '@/components/Table/TableCell';
 import { WithHovercard } from '@/components/WithHovercard';
+import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
 import { isStopLossOrder } from '@/lib/orders';
-import { testFlags } from '@/lib/testFlags';
 
 enum TriggerButtonState {
   Warning = 'Warning',
@@ -81,6 +81,9 @@ export const PositionsTriggersCell = ({
   };
 
   const openTriggersDialog = () => {
+    if (isDisabled) {
+      return;
+    }
     dispatch(
       openDialog({
         type: DialogTypes.Triggers,
@@ -100,6 +103,7 @@ export const PositionsTriggersCell = ({
       action={ButtonAction.Navigation}
       size={ButtonSize.XSmall}
       onClick={onViewOrders ?? undefined}
+      disabled={isDisabled}
     >
       {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
       <$ArrowIcon iconName={IconName.Arrow} />
@@ -125,6 +129,7 @@ export const PositionsTriggersCell = ({
           action={ButtonAction.Primary}
           onClick={openTriggersDialog}
           triggerButtonState={triggerButtonState}
+          disabled={isDisabled}
         >
           {label}
         </$TriggerButton>
@@ -142,6 +147,7 @@ export const PositionsTriggersCell = ({
             <Button
               action={ButtonAction.Primary}
               size={ButtonSize.Small}
+              disabled={isDisabled}
               onClick={openTriggersDialog}
             >
               {stringGetter({ key: STRING_KEYS.EDIT_STOP_LOSS })}
@@ -191,6 +197,7 @@ export const PositionsTriggersCell = ({
                   action={ButtonAction.Primary}
                   size={ButtonSize.Small}
                   onClick={openTriggersDialog}
+                  disabled={isDisabled}
                 >
                   {stringGetter({
                     key: isStopLossOrder(order, isSlTpLimitOrdersEnabled)
@@ -219,25 +226,28 @@ export const PositionsTriggersCell = ({
   };
 
   return (
-    <$TableCell
+    <TableCell
       stacked
       stackedWithSecondaryStyling={false}
       slotRight={
         !isDisabled &&
-        testFlags.isolatedMargin &&
         complianceState === ComplianceStates.FULL_ACCESS && (
-          <$EditButton
-            key="edit-margin"
-            iconName={IconName.Pencil}
-            shape={ButtonShape.Square}
-            onClick={openTriggersDialog}
-          />
+          <WithTooltip
+            tooltipString={stringGetter({ key: STRING_KEYS.EDIT_TAKE_PROFIT_STOP_LOSS_TRIGGERS })}
+          >
+            <$EditButton
+              key="edit-margin"
+              iconName={IconName.Pencil}
+              shape={ButtonShape.Square}
+              onClick={openTriggersDialog}
+            />
+          </WithTooltip>
         )
       }
     >
       <$Row>{renderOutput({ label: 'TP', orders: takeProfitOrders })}</$Row>
       <$Row>{renderOutput({ label: 'SL', orders: stopLossOrders })}</$Row>
-    </$TableCell>
+    </TableCell>
   );
 };
 const $Row = styled.span`
@@ -315,8 +325,4 @@ const $EditButton = styled(IconButton)`
   --button-hover-textColor: var(--color-text-1);
 
   margin-left: 0.5rem;
-`;
-
-const $TableCell = styled(TableCell)`
-  justify-content: space-between;
 `;

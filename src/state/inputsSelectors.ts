@@ -44,7 +44,7 @@ export const getInputTradeTargetLeverage = (state: RootState) =>
 
 /**
  * @param state
- * @returns ValidationErrors of the current Input type (Trade or Transfer)
+ * @returns ValidationErrors of the current Input type
  */
 export const getInputErrors = (state: RootState) => state.inputs.inputErrors;
 
@@ -100,6 +100,12 @@ export const getTriggerOrdersInputErrors = (state: RootState) => {
 export const getTriggerOrdersInputs = (state: RootState) => state.inputs.triggerOrdersInputs;
 
 /**
+ * @returns AdjustIsolatedMarginInputs
+ */
+export const getAdjustIsolatedMarginInputs = (state: RootState) =>
+  state.inputs.adjustIsolatedMarginInputs;
+
+/**
  * @returns Data needed for the TradeForm (price, size, summary, input render options, and errors/input validation)
  */
 export const useTradeFormData = () => {
@@ -112,14 +118,18 @@ export const useTradeFormData = () => {
 
           const {
             needsLimitPrice,
+            needsMarginMode,
+            needsTargetLeverage,
             needsTrailingPercent,
             needsTriggerPrice,
-            executionOptions,
             needsGoodUntil,
             needsPostOnly,
             needsReduceOnly,
             postOnlyTooltip,
             reduceOnlyTooltip,
+
+            executionOptions,
+            marginModeOptions,
             timeInForceOptions,
           } = tradeOptions ?? {};
 
@@ -129,14 +139,18 @@ export const useTradeFormData = () => {
             summary,
 
             needsLimitPrice,
+            needsMarginMode,
+            needsTargetLeverage,
             needsTrailingPercent,
             needsTriggerPrice,
-            executionOptions,
             needsGoodUntil,
             needsPostOnly,
             needsReduceOnly,
             postOnlyTooltip,
             reduceOnlyTooltip,
+
+            executionOptions,
+            marginModeOptions,
             timeInForceOptions,
 
             tradeErrors,

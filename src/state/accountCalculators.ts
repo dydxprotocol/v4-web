@@ -9,8 +9,6 @@ import {
 } from '@/state/accountSelectors';
 import { getSelectedNetwork } from '@/state/appSelectors';
 
-import { testFlags } from '@/lib/testFlags';
-
 import { createAppSelector } from './appTypes';
 
 export const calculateOnboardingStep = createAppSelector(
@@ -103,15 +101,9 @@ export const calculateShouldRenderTriggersInPositionsTable = createAppSelector(
  */
 export const calculateShouldRenderActionsInPositionsTable = () =>
   createAppSelector(
-    [
-      calculateIsAccountViewOnly,
-      calculateShouldRenderTriggersInPositionsTable,
-      (s, isCloseActionShown: boolean) => isCloseActionShown,
-    ],
-    (isAccountViewOnly: boolean, areTriggersRendered: boolean, isCloseActionShown) => {
-      const hasActionsInColumn = testFlags.isolatedMargin
-        ? isCloseActionShown
-        : areTriggersRendered || isCloseActionShown;
+    [calculateIsAccountViewOnly, (s, isCloseActionShown: boolean = true) => isCloseActionShown],
+    (isAccountViewOnly: boolean, isCloseActionShown) => {
+      const hasActionsInColumn = isCloseActionShown;
       return !isAccountViewOnly && hasActionsInColumn;
     }
   );

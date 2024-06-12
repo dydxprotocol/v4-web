@@ -1,6 +1,8 @@
+import { useMemo } from 'react';
+
 import styled from 'styled-components';
 
-import { type SubaccountPosition } from '@/constants/abacus';
+import { AbacusMarginMode, type SubaccountPosition } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -11,54 +13,56 @@ import { IconName } from '@/components/Icon';
 import { IconButton } from '@/components/IconButton';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import { TableCell } from '@/components/Table/TableCell';
+import { WithTooltip } from '@/components/WithTooltip';
 
 import { useAppDispatch } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 
-import { calculatePositionMargin } from '@/lib/tradeData';
+import { getMarginModeFromSubaccountNumber, getPositionMargin } from '@/lib/tradeData';
 
 type PositionsMarginCellProps = {
-  id: SubaccountPosition['id'];
-  notionalTotal: SubaccountPosition['notionalTotal'];
-  adjustedMmf: SubaccountPosition['adjustedMmf'];
+  position: SubaccountPosition;
 };
 
-export const PositionsMarginCell = ({
-  id,
-  adjustedMmf,
-  notionalTotal,
-}: PositionsMarginCellProps) => {
+export const PositionsMarginCell = ({ position }: PositionsMarginCellProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
-  const margin = calculatePositionMargin({
-    notionalTotal: notionalTotal?.current,
-    adjustedMmf: adjustedMmf?.current,
-  });
-  const perpetualMarketType = 'CROSS'; // Todo: Replace with perpetualMarketType when available
 
-  const marginModeLabel =
-    perpetualMarketType === 'CROSS'
-      ? stringGetter({ key: STRING_KEYS.CROSS })
-      : stringGetter({ key: STRING_KEYS.ISOLATED });
+  const { marginMode, marginModeLabel, margin } = useMemo(() => {
+    const { childSubaccountNumber } = position;
+    const derivedMarginMode = getMarginModeFromSubaccountNumber(childSubaccountNumber);
+
+    return {
+      marginMode: derivedMarginMode,
+      marginModeLabel:
+        derivedMarginMode === AbacusMarginMode.cross
+          ? stringGetter({ key: STRING_KEYS.CROSS })
+          : stringGetter({ key: STRING_KEYS.ISOLATED }),
+      margin: getPositionMargin({ position }),
+    };
+  }, [position, stringGetter]);
 
   return (
     <TableCell
       stacked
       slotRight={
-        // perpetualMarketType === 'CROSS' &&
-        <$EditButton
-          key="edit-margin"
-          iconName={IconName.Pencil}
-          shape={ButtonShape.Square}
-          onClick={() =>
-            dispatch(
-              openDialog({
-                type: DialogTypes.AdjustIsolatedMargin,
-                dialogProps: { positionId: id },
-              })
-            )
-          }
-        />
+        marginMode === AbacusMarginMode.isolated && (
+          <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.ADJUST_ISOLATED_MARGIN })}>
+            <$EditButton
+              key="edit-margin"
+              iconName={IconName.Pencil}
+              shape={ButtonShape.Square}
+              onClick={() =>
+                dispatch(
+                  openDialog({
+                    type: DialogTypes.AdjustIsolatedMargin,
+                    dialogProps: { positionId: position.id },
+                  })
+                )
+              }
+            />
+          </WithTooltip>
+        )
       }
     >
       <Output type={OutputType.Fiat} value={margin} showSign={ShowSign.None} />

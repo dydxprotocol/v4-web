@@ -14,10 +14,12 @@ import type {
   SubaccountOrder,
 } from '@/constants/abacus';
 import { Changes } from '@/constants/abacus';
+import { NUM_PARENT_SUBACCOUNTS } from '@/constants/account';
 
 import { type RootStore } from '@/state/_store';
 import {
   setBalances,
+  setChildSubaccount,
   setCompliance,
   setFills,
   setFundingPayments,
@@ -154,32 +156,69 @@ class AbacusStateNotifier implements AbacusStateNotificationProtocol {
       }
 
       subaccountNumbers?.forEach((subaccountId: number) => {
-        if (subaccountId !== null) {
-          if (changes.has(Changes.subaccount)) {
-            dispatch(setSubaccount(updatedState.subaccount(subaccountId)));
-          }
+        const isChildSubaccount = subaccountId >= NUM_PARENT_SUBACCOUNTS;
+        const childSubaccountUpdate: Parameters<typeof setChildSubaccount>[0] = {};
 
-          if (changes.has(Changes.fills)) {
-            const fills = updatedState.subaccountFills(subaccountId)?.toArray() ?? [];
+        if (changes.has(Changes.subaccount)) {
+          const subaccountData = updatedState.subaccount(subaccountId);
+          if (isChildSubaccount) {
+            childSubaccountUpdate[subaccountId] = subaccountData;
+          } else {
+            dispatch(setSubaccount(subaccountData));
+          }
+        }
+
+        if (changes.has(Changes.fills)) {
+          const fills = updatedState.subaccountFills(subaccountId)?.toArray() ?? [];
+          if (isChildSubaccount) {
+            childSubaccountUpdate[subaccountId] = { ...childSubaccountUpdate[subaccountId], fills };
+          } else {
             dispatch(setFills(fills));
           }
+        }
 
-          if (changes.has(Changes.fundingPayments)) {
-            const fundingPayments =
-              updatedState.subaccountFundingPayments(subaccountId)?.toArray() ?? [];
+        if (changes.has(Changes.fundingPayments)) {
+          const fundingPayments =
+            updatedState.subaccountFundingPayments(subaccountId)?.toArray() ?? [];
+
+          if (isChildSubaccount) {
+            childSubaccountUpdate[subaccountId] = {
+              ...childSubaccountUpdate[subaccountId],
+              fundingPayments,
+            };
+          } else {
             dispatch(setFundingPayments(fundingPayments));
           }
+        }
 
-          if (changes.has(Changes.transfers)) {
-            const transfers = updatedState.subaccountTransfers(subaccountId)?.toArray() ?? [];
+        if (changes.has(Changes.transfers)) {
+          const transfers = updatedState.subaccountTransfers(subaccountId)?.toArray() ?? [];
+
+          if (isChildSubaccount) {
+            childSubaccountUpdate[subaccountId] = {
+              ...childSubaccountUpdate[subaccountId],
+              transfers,
+            };
+          } else {
             dispatch(setTransfers(transfers));
           }
+        }
 
-          if (changes.has(Changes.historicalPnl)) {
-            const historicalPnl =
-              updatedState.subaccountHistoricalPnl(subaccountId)?.toArray() ?? [];
+        if (changes.has(Changes.historicalPnl)) {
+          const historicalPnl = updatedState.subaccountHistoricalPnl(subaccountId)?.toArray() ?? [];
+
+          if (isChildSubaccount) {
+            childSubaccountUpdate[subaccountId] = {
+              ...childSubaccountUpdate[subaccountId],
+              historicalPnl,
+            };
+          } else {
             dispatch(setHistoricalPnl(historicalPnl));
           }
+        }
+
+        if (isChildSubaccount) {
+          dispatch(setChildSubaccount(childSubaccountUpdate));
         }
       });
 

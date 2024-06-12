@@ -21,6 +21,7 @@ export interface LinksConfigs {
   mintscan: string;
   mintscanBase: string;
   newMarketProposalLearnMore: string;
+  adjustTargetLeverageLearnMore: string;
   privacy: string;
   reduceOnlyLearnMore?: string;
   statusPage: string;
@@ -67,6 +68,7 @@ export const useURLConfigs = (): LinksConfigs => {
     withdrawalGateLearnMore: linksConfigs.withdrawalGateLearnMore ?? FALLBACK_URL,
     exchangeStats: linksConfigs.exchangeStats ?? FALLBACK_URL,
     complianceSupportEmail: linksConfigs.complianceSupportEmail ?? FALLBACK_URL,
+    adjustTargetLeverageLearnMore: linksConfigs.adjustTargetLeverageLearnMore ?? FALLBACK_URL,
     fetAgixMarketWindDownProposal: linksConfigs.fetAgixMarketWindDownProposal,
     contractLossMechanismLearnMore: linksConfigs.contractLossMechanismLearnMore,
   };
