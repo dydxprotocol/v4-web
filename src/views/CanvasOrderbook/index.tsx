@@ -23,6 +23,8 @@ import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
 import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSelectors';
 
+import { MustBigNumber } from '@/lib/numbers';
+
 import { OrderbookRow, SpreadRow } from './OrderbookRow';
 
 type ElementProps = {
@@ -51,7 +53,7 @@ export const CanvasOrderbook = forwardRef(
     const currentMarketConfig = useAppSelector(getCurrentMarketConfig, shallowEqual);
     const { id = '' } = useAppSelector(getCurrentMarketAssetData, shallowEqual) ?? {};
 
-    const { tickSizeDecimals = 2, stepSizeDecimals } = currentMarketConfig ?? {};
+    const { tickSizeDecimals = 2 } = currentMarketConfig ?? {};
 
     /**
      * Slice asks and bids to maxRowsPerSide using empty rows
@@ -98,8 +100,12 @@ export const CanvasOrderbook = forwardRef(
     const onRowAction = useCallback(
       (price: Nullable<number>) => {
         if (currentInput === 'trade' && price) {
-          // keep price as number type instead of string to avoid scientific notation
-          dispatch(setTradeFormInputs({ limitPriceInput: price }));
+          // avoid scientific notation for when converting small number to string
+          dispatch(
+            setTradeFormInputs({
+              limitPriceInput: MustBigNumber(price).toFixed(tickSizeDecimals ?? 2),
+            })
+          );
         }
       },
       [currentInput]

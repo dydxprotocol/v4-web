@@ -303,7 +303,11 @@ export const Orderbook = ({
   const onRowAction = useCallback(
     (key: Key, row: RowData) => {
       if (currentInput === 'trade' && key !== 'spread' && row?.price) {
-        dispatch(setTradeFormInputs({ limitPriceInput: row.price }));
+        dispatch(
+          setTradeFormInputs({
+            limitPriceInput: MustBigNumber(row.price).toFixed(tickSizeDecimals ?? 2),
+          })
+        );
       }
     },
     [currentInput]
