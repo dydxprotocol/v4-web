@@ -46,6 +46,7 @@ import { getCurrentMarketConfig, getCurrentMarketId } from '@/state/perpetualsSe
 
 import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
+import { objectEntries } from '@/lib/objectHelpers';
 import { getTradeInputAlert } from '@/lib/tradeData';
 
 import { PlaceOrderButtonAndReceipt } from './TradeForm/PlaceOrderButtonAndReceipt';
@@ -244,7 +245,7 @@ export const ClosePositionForm = ({
       />
 
       <$ToggleGroup
-        items={Object.entries(SIZE_PERCENT_OPTIONS).map(([key, value]) => ({
+        items={objectEntries(SIZE_PERCENT_OPTIONS).map(([key, value]) => ({
           label: key === MAX_KEY ? stringGetter({ key: STRING_KEYS.FULL_CLOSE }) : key,
           value: value.toString(),
         }))}

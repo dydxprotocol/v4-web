@@ -18,9 +18,9 @@ import type {
   AccountBalance,
   HumanReadableCancelOrderPayload,
   HumanReadablePlaceOrderPayload,
+  HumanReadableSubaccountTransferPayload,
   HumanReadableTriggerOrdersPayload,
   ParsingError,
-  SubAccountHistoricalPNLs,
 } from '@/constants/abacus';
 import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
 import { STRING_KEYS } from '@/constants/localization';
@@ -258,7 +258,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
   useEffect(() => {
     dispatch(setSubaccount(undefined));
-    dispatch(setHistoricalPnl([] as unknown as SubAccountHistoricalPNLs));
+    dispatch(setHistoricalPnl([]));
   }, [dydxAddress]);
 
   // ------ Deposit/Withdraw Methods ------ //
@@ -347,6 +347,34 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       return hashFromTx(tx?.hash);
     },
     [subaccountClient, sendSquidWithdrawFromSubaccount]
+  );
+
+  const adjustIsolatedMarginOfPosition = useCallback(
+    ({
+      onError,
+      onSuccess,
+    }: {
+      onError?: (onErrorParams?: { errorStringKey?: Nullable<string> }) => void;
+      onSuccess?: (
+        subaccountTransferPayload?: Nullable<HumanReadableSubaccountTransferPayload>
+      ) => void;
+    }) => {
+      const callback = (
+        success: boolean,
+        parsingError?: Nullable<ParsingError>,
+        data?: Nullable<HumanReadableSubaccountTransferPayload>
+      ) => {
+        if (success) {
+          onSuccess?.(data);
+        } else {
+          onError?.({ errorStringKey: parsingError?.stringKey });
+        }
+      };
+
+      const subaccountTransferPayload = abacusStateManager.adjustIsolatedMarginOfPosition(callback);
+      return subaccountTransferPayload;
+    },
+    [subaccountClient]
   );
 
   // ------ Faucet Methods ------ //
@@ -685,6 +713,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     // Transfer Methods
     transfer,
     sendSquidWithdraw,
+    adjustIsolatedMarginOfPosition,
 
     // Trading Methods
     placeOrder,

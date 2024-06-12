@@ -76,6 +76,9 @@ export const PositionsTriggersCell = ({
   };
 
   const openTriggersDialog = () => {
+    if (isDisabled) {
+      return;
+    }
     dispatch(
       openDialog({
         type: DialogTypes.Triggers,
@@ -95,6 +98,7 @@ export const PositionsTriggersCell = ({
       action={ButtonAction.Navigation}
       size={ButtonSize.XSmall}
       onClick={onViewOrders ?? undefined}
+      disabled={isDisabled}
     >
       {stringGetter({ key: STRING_KEYS.VIEW_ORDERS })}
       <$ArrowIcon iconName={IconName.Arrow} />
@@ -120,6 +124,7 @@ export const PositionsTriggersCell = ({
           action={ButtonAction.Primary}
           onClick={openTriggersDialog}
           triggerButtonState={triggerButtonState}
+          disabled={isDisabled}
         >
           {label}
         </$TriggerButton>
@@ -137,6 +142,7 @@ export const PositionsTriggersCell = ({
             <Button
               action={ButtonAction.Primary}
               size={ButtonSize.Small}
+              disabled={isDisabled}
               onClick={openTriggersDialog}
             >
               {stringGetter({ key: STRING_KEYS.EDIT_STOP_LOSS })}
@@ -197,6 +203,7 @@ export const PositionsTriggersCell = ({
                   action={ButtonAction.Primary}
                   size={ButtonSize.Small}
                   onClick={openTriggersDialog}
+                  disabled={isDisabled}
                 >
                   {stringGetter({
                     key: isStopLossOrder(order, isSlTpLimitOrdersEnabled)

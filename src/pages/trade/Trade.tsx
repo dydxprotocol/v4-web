@@ -111,7 +111,7 @@ const $TradeLayout = styled.article<{
   --layout-default-desktopMedium:
     'Top Top Top' auto
     'Side Vertical Inner' minmax(0, 1fr)
-    'Side Vertical Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
+    'Side Horizontal Horizontal' minmax(var(--tabs-height), var(--horizontalPanel-height))
     / var(--sidebar-width) minmax(0, var(--orderbook-trades-width)) 1fr;
 
   /* prettier-ignore */
@@ -132,7 +132,7 @@ const $TradeLayout = styled.article<{
   --layout-alternative-desktopMedium:
     'Top Top Top' auto
     'Vertical Inner Side' minmax(0, 1fr)
-    'Vertical Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
+    'Horizontal Horizontal Side' minmax(var(--tabs-height), var(--horizontalPanel-height))
     / minmax(0, var(--orderbook-trades-width)) 1fr var(--sidebar-width);
 
   /* prettier-ignore */

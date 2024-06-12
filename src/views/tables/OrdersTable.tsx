@@ -1,4 +1,4 @@
-import { Key, useEffect, useMemo } from 'react';
+import { Key, ReactNode, useEffect, useMemo } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
 import { ColumnSize } from '@react-types/table';
@@ -7,7 +7,7 @@ import { DateTime } from 'luxon';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
-import { Asset, Nullable, SubaccountOrder } from '@/constants/abacus';
+import { AbacusMarginMode, Asset, Nullable, SubaccountOrder } from '@/constants/abacus';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS, type StringGetterFunction } from '@/constants/localization';
 import { TOKEN_DECIMALS } from '@/constants/numbers';
@@ -31,6 +31,7 @@ import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
 import { TagSize } from '@/components/Tag';
 import { WithTooltip } from '@/components/WithTooltip';
+import { MarketTypeFilter, marketTypeMatchesFilter } from '@/pages/trade/types';
 
 import { viewedOrders } from '@/state/account';
 import { calculateIsAccountViewOnly } from '@/state/accountCalculators';
@@ -52,6 +53,7 @@ import {
   isOrderStatusClearable,
 } from '@/lib/orders';
 import { getStringsForDateTimeDiff } from '@/lib/timeUtils';
+import { getMarginModeFromSubaccountNumber } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { OrderStatusIcon } from '../OrderStatusIcon';
@@ -66,6 +68,7 @@ export enum OrdersTableColumnKey {
   Trigger = 'Trigger',
   GoodTil = 'Good-Til',
   Actions = 'Actions',
+  MarginType = 'Margin-Type',
 
   // Tablet Only
   StatusFill = 'Status-Fill',
@@ -73,10 +76,10 @@ export enum OrdersTableColumnKey {
 }
 
 export type OrderTableRow = {
-  asset: Asset;
-  stepSizeDecimals: number;
-  tickSizeDecimals: number;
-  orderSide: OrderSide;
+  asset: Nullable<Asset>;
+  stepSizeDecimals: Nullable<number>;
+  tickSizeDecimals: Nullable<number>;
+  orderSide?: Nullable<OrderSide>;
 } & SubaccountOrder;
 
 const getOrdersTableColumnDef = ({
@@ -102,7 +105,9 @@ const getOrdersTableColumnDef = ({
         columnKey: 'marketId',
         getCellValue: (row) => row.marketId,
         label: stringGetter({ key: STRING_KEYS.MARKET }),
-        renderCell: ({ asset, marketId }) => <MarketTableCell asset={asset} marketId={marketId} />,
+        renderCell: ({ asset, marketId }) => (
+          <MarketTableCell asset={asset ?? undefined} marketId={marketId} />
+        ),
       },
       [OrdersTableColumnKey.Status]: {
         columnKey: 'status',
@@ -130,7 +135,9 @@ const getOrdersTableColumnDef = ({
         columnKey: 'side',
         getCellValue: (row) => row.orderSide,
         label: stringGetter({ key: STRING_KEYS.SIDE }),
-        renderCell: ({ orderSide }) => <OrderSideTag orderSide={orderSide} size={TagSize.Medium} />,
+        renderCell: ({ orderSide }) => (
+          <OrderSideTag orderSide={orderSide ?? OrderSide.BUY} size={TagSize.Medium} />
+        ),
       },
       [OrdersTableColumnKey.AmountFill]: {
         columnKey: 'size',
@@ -147,12 +154,16 @@ const getOrdersTableColumnDef = ({
             <Output
               type={OutputType.Asset}
               value={size}
-              fractionDigits={stepSizeDecimals < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals}
+              fractionDigits={
+                (stepSizeDecimals ?? 0) < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals
+              }
             />
             <Output
               type={OutputType.Asset}
               value={totalFilled}
-              fractionDigits={stepSizeDecimals < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals}
+              fractionDigits={
+                (stepSizeDecimals ?? 0) < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals
+              }
             />
           </TableCell>
         ),
@@ -298,6 +309,20 @@ const getOrdersTableColumnDef = ({
           </TableCell>
         ),
       },
+      [OrdersTableColumnKey.MarginType]: {
+        columnKey: 'marginType',
+        label: stringGetter({ key: STRING_KEYS.MARGIN_MODE }),
+        getCellValue: (row) => getMarginModeFromSubaccountNumber(row.subaccountNumber).name,
+        renderCell(row: OrderTableRow): ReactNode {
+          const marginMode = getMarginModeFromSubaccountNumber(row.subaccountNumber);
+
+          const marginModeLabel =
+            marginMode === AbacusMarginMode.cross
+              ? stringGetter({ key: STRING_KEYS.CROSS })
+              : stringGetter({ key: STRING_KEYS.ISOLATED });
+          return <Output type={OutputType.Text} value={marginModeLabel} />;
+        },
+      },
     } satisfies Record<OrdersTableColumnKey, ColumnDef<OrderTableRow>>
   )[key],
 });
@@ -306,6 +331,7 @@ type ElementProps = {
   columnKeys: OrdersTableColumnKey[];
   columnWidths?: Partial<Record<OrdersTableColumnKey, ColumnSize>>;
   currentMarket?: string;
+  marketTypeFilter?: MarketTypeFilter;
   initialPageSize?: PageSize;
 };
 
@@ -317,6 +343,7 @@ export const OrdersTable = ({
   columnKeys = [],
   columnWidths,
   currentMarket,
+  marketTypeFilter,
   initialPageSize,
   withOuterBorder,
 }: ElementProps & StyleProps) => {
@@ -327,7 +354,15 @@ export const OrdersTable = ({
   const isAccountViewOnly = useAppSelector(calculateIsAccountViewOnly);
   const marketOrders = useAppSelector(getCurrentMarketOrders, shallowEqual) ?? EMPTY_ARR;
   const allOrders = useAppSelector(getSubaccountUnclearedOrders, shallowEqual) ?? EMPTY_ARR;
-  const orders = currentMarket ? marketOrders : allOrders;
+
+  const orders = useMemo(
+    () =>
+      (currentMarket ? marketOrders : allOrders).filter((order) => {
+        const orderType = getMarginModeFromSubaccountNumber(order.subaccountNumber).name;
+        return marketTypeMatchesFilter(orderType, marketTypeFilter);
+      }),
+    [allOrders, currentMarket, marketOrders, marketTypeFilter]
+  );
 
   const allPerpetualMarkets = orEmptyObj(useAppSelector(getPerpetualMarkets, shallowEqual));
   const allAssets = orEmptyObj(useAppSelector(getAssets, shallowEqual));
@@ -342,13 +377,14 @@ export const OrdersTable = ({
 
   const ordersData = useMemo(
     () =>
-      orders.map((order: SubaccountOrder) =>
-        getHydratedTradingData({
-          data: order,
-          assets: allAssets,
-          perpetualMarkets: allPerpetualMarkets,
-        })
-      ) as OrderTableRow[],
+      orders.map(
+        (order: SubaccountOrder): OrderTableRow =>
+          getHydratedTradingData({
+            data: order,
+            assets: allAssets,
+            perpetualMarkets: allPerpetualMarkets,
+          })
+      ),
     [orders, allPerpetualMarkets, allAssets]
   );
 
@@ -425,16 +461,17 @@ const $SecondaryColor = styled.span`
   color: var(--color-text-0);
 `;
 
-const $Side = styled.span<{ side: OrderSide }>`
+const $Side = styled.span<{ side?: OrderSide | null }>`
   ${({ side }) =>
-    ({
+    side &&
+    {
       [OrderSide.BUY]: css`
         color: var(--color-positive);
       `,
       [OrderSide.SELL]: css`
         color: var(--color-negative);
       `,
-    })[side]};
+    }[side]};
 `;
 
 const $EmptyIcon = styled(Icon)`

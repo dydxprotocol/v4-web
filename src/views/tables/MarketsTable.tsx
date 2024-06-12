@@ -92,7 +92,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                 </TableCell>
               ),
             },
-          ] as ColumnDef<MarketData>[])
+          ] satisfies ColumnDef<MarketData>[])
         : ([
             {
               columnKey: 'market',
@@ -189,7 +189,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
                 />
               ),
             },
-          ] as ColumnDef<MarketData>[]),
+          ] satisfies ColumnDef<MarketData>[]),
     [stringGetter, isTablet]
   );
 
@@ -205,7 +205,7 @@ export const MarketsTable = ({ className }: { className?: string }) => {
           compactLayout
           searchPlaceholderKey={STRING_KEYS.SEARCH_MARKETS}
           selectedFilter={filter}
-          filters={marketFilters as MarketFilters[]}
+          filters={marketFilters}
           onChangeFilter={setFilter}
           onSearchTextChange={setSearchFilter}
         />

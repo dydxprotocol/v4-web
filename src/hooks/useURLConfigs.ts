@@ -16,11 +16,13 @@ export interface LinksConfigs {
   governanceLearnMore?: string;
   help?: string;
   initialMarginFractionLearnMore?: string;
+  isolatedMarginLearnMore?: string;
   keplrDashboard?: string;
   launchIncentive?: string;
   mintscan: string;
   mintscanBase: string;
   newMarketProposalLearnMore: string;
+  adjustTargetLeverageLearnMore: string;
   privacy: string;
   reduceOnlyLearnMore?: string;
   statusPage: string;
@@ -32,6 +34,8 @@ export interface LinksConfigs {
   withdrawalGateLearnMore?: string;
   exchangeStats?: string;
   complianceSupportEmail?: string;
+  fetAgixMarketWindDownProposal?: string;
+  contractLossMechanismLearnMore?: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {
@@ -49,6 +53,7 @@ export const useURLConfigs = (): LinksConfigs => {
     governanceLearnMore: linksConfigs.governanceLearnMore ?? FALLBACK_URL,
     help: linksConfigs.help ?? FALLBACK_URL,
     initialMarginFractionLearnMore: linksConfigs.initialMarginFractionLearnMore ?? FALLBACK_URL,
+    isolatedMarginLearnMore: linksConfigs.isolatedMarginLearnMore ?? FALLBACK_URL,
     keplrDashboard: linksConfigs.keplrDashboard ?? FALLBACK_URL,
     launchIncentive: linksConfigs.launchIncentive ?? FALLBACK_URL,
     mintscan: linksConfigs.mintscan,
@@ -65,5 +70,8 @@ export const useURLConfigs = (): LinksConfigs => {
     withdrawalGateLearnMore: linksConfigs.withdrawalGateLearnMore ?? FALLBACK_URL,
     exchangeStats: linksConfigs.exchangeStats ?? FALLBACK_URL,
     complianceSupportEmail: linksConfigs.complianceSupportEmail ?? FALLBACK_URL,
+    adjustTargetLeverageLearnMore: linksConfigs.adjustTargetLeverageLearnMore ?? FALLBACK_URL,
+    fetAgixMarketWindDownProposal: linksConfigs.fetAgixMarketWindDownProposal,
+    contractLossMechanismLearnMore: linksConfigs.contractLossMechanismLearnMore,
   };
 };

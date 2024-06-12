@@ -32,6 +32,7 @@ import { MarketTableCell } from '@/components/Table/MarketTableCell';
 import { TableCell } from '@/components/Table/TableCell';
 import { TableColumnHeader } from '@/components/Table/TableColumnHeader';
 import { PageSize } from '@/components/Table/TablePaginationRow';
+import { MarketTypeFilter, marketTypeMatchesFilter } from '@/pages/trade/types';
 
 import {
   calculateIsAccountViewOnly,
@@ -43,6 +44,8 @@ import { getAssets } from '@/state/assetsSelectors';
 import { getPerpetualMarkets } from '@/state/perpetualsSelectors';
 
 import { MustBigNumber, getNumberSign } from '@/lib/numbers';
+import { safeAssign } from '@/lib/objectHelpers';
+import { getMarginModeFromSubaccountNumber, getPositionMargin } from '@/lib/tradeData';
 import { orEmptyObj } from '@/lib/typeUtils';
 
 import { PositionsActionsCell } from './PositionsTable/PositionsActionsCell';
@@ -208,13 +211,11 @@ const getPositionsTableColumnDef = ({
       },
       [PositionsTableColumnKey.Margin]: {
         columnKey: 'margin',
-        getCellValue: (row) => row.leverage?.current,
+        getCellValue: (row) => getPositionMargin({ position: row }),
         label: stringGetter({ key: STRING_KEYS.MARGIN }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
         isActionable: true,
-        renderCell: ({ id, adjustedMmf, notionalTotal }) => (
-          <PositionsMarginCell id={id} notionalTotal={notionalTotal} adjustedMmf={adjustedMmf} />
-        ),
+        renderCell: (row) => <PositionsMarginCell position={row} />,
       },
       [PositionsTableColumnKey.NetFunding]: {
         columnKey: 'netFunding',
@@ -345,9 +346,9 @@ const getPositionsTableColumnDef = ({
         columnKey: 'actions',
         label: stringGetter({
           key:
-            shouldRenderTriggers && showClosePositionAction
+            showClosePositionAction && shouldRenderTriggers
               ? STRING_KEYS.ACTIONS
-              : STRING_KEYS.ACTION,
+              : STRING_KEYS.CLOSE,
         }),
         isActionable: true,
         allowsSorting: false,
@@ -373,6 +374,7 @@ type ElementProps = {
   columnWidths?: Partial<Record<PositionsTableColumnKey, ColumnSize>>;
   currentRoute?: string;
   currentMarket?: string;
+  marketTypeFilter?: MarketTypeFilter;
   showClosePositionAction: boolean;
   initialPageSize?: PageSize;
   onNavigate?: () => void;
@@ -389,6 +391,7 @@ export const PositionsTable = ({
   columnWidths,
   currentRoute,
   currentMarket,
+  marketTypeFilter,
   showClosePositionAction,
   initialPageSize,
   onNavigate,
@@ -407,9 +410,14 @@ export const PositionsTable = ({
 
   const openPositions = useAppSelector(getExistingOpenPositions, shallowEqual) ?? EMPTY_ARR;
   const positions = useMemo(() => {
-    const marketPosition = openPositions.find((position) => position.id === currentMarket);
-    return currentMarket ? (marketPosition ? [marketPosition] : []) : openPositions;
-  }, [currentMarket, openPositions]);
+    return openPositions.filter((position) => {
+      const matchesMarket = currentMarket == null || position.id === currentMarket;
+      const subaccountNumber = position.childSubaccountNumber;
+      const marginType = getMarginModeFromSubaccountNumber(subaccountNumber).name;
+      const matchesType = marketTypeMatchesFilter(marginType, marketTypeFilter);
+      return matchesMarket && matchesType;
+    });
+  }, [currentMarket, marketTypeFilter, openPositions]);
 
   const conditionalOrderSelector = useMemo(getSubaccountConditionalOrders, []);
   const { stopLossOrders: allStopLossOrders, takeProfitOrders: allTakeProfitOrders } =
@@ -425,9 +433,7 @@ export const PositionsTable = ({
   const positionsData = useMemo(
     () =>
       positions.map((position: SubaccountPosition): PositionTableRow => {
-        // object splat ... doesn't copy getter defined properties
-        // eslint-disable-next-line prefer-object-spread
-        return Object.assign(
+        return safeAssign(
           {},
           {
             tickSizeDecimals:
