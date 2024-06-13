@@ -22,12 +22,11 @@ import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { WithTooltip } from '@/components/WithTooltip';
 import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
 
-import { calculateCanAccountTrade } from '@/state/accountCalculators';
 import {
-  getCurrentMarketHasOpenIsolatedOrders,
-  getCurrentMarketPositionData,
-  getSubaccountId,
-} from '@/state/accountSelectors';
+  calculateCanAccountTrade,
+  calculateShouldShowIsolatedMarketPostOrderPositionMarginAsZero,
+} from '@/state/accountCalculators';
+import { getCurrentMarketPositionData, getSubaccountId } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { openDialog } from '@/state/dialogs';
 import { getCurrentInput, getInputTradeMarginMode } from '@/state/inputsSelectors';
@@ -55,7 +54,6 @@ type ElementProps = {
   currentStep?: MobilePlaceOrderSteps;
   showDeposit?: boolean;
   confirmButtonConfig: ConfirmButtonConfig;
-  isFullClose?: boolean;
 };
 
 export const PlaceOrderButtonAndReceipt = ({
@@ -66,7 +64,6 @@ export const PlaceOrderButtonAndReceipt = ({
   currentStep,
   showDeposit,
   confirmButtonConfig,
-  isFullClose,
 }: ElementProps) => {
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
@@ -102,7 +99,9 @@ export const PlaceOrderButtonAndReceipt = ({
   // check if required fields are filled and summary has been calculated
   const areInputsFilled = fee != null || reward != null;
 
-  const hasOpenIsolatedOrders = useAppSelector(getCurrentMarketHasOpenIsolatedOrders);
+  const isIsolatedMarketPostOrderPositionMarginZero = useAppSelector(
+    calculateShouldShowIsolatedMarketPostOrderPositionMarginAsZero
+  );
 
   const renderMarginValue = () => {
     if (marginMode === AbacusMarginMode.cross) {
@@ -131,16 +130,14 @@ export const PlaceOrderButtonAndReceipt = ({
       );
     }
 
-    const isPostOrderPositionMarginZero = isFullClose && !hasOpenIsolatedOrders;
-
     return (
       <DiffOutput
         useGrouping
         type={OutputType.Fiat}
         value={equity?.current}
-        newValue={isPostOrderPositionMarginZero ? null : equity?.postOrder}
+        newValue={isIsolatedMarketPostOrderPositionMarginZero ? null : equity?.postOrder}
         withDiff={
-          isPostOrderPositionMarginZero
+          isIsolatedMarketPostOrderPositionMarginZero
             ? nullIfZero(equity?.current) != null
             : areInputsFilled && getTradeStateWithDoubleValuesHasDiff(equity)
         }
