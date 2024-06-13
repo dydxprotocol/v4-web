@@ -323,12 +323,17 @@ export const getSubaccountConditionalOrders = () =>
  * @param state
  * @returns list of orders that are in the open status
  */
-export const getSubaccountOpenStatusOrders = createAppSelector([getSubaccountOrders], (orders) =>
-  orders?.filter((order) => order.status === AbacusOrderStatus.open)
+export const getSubaccountOpenOrdersForCurrentMarket = createAppSelector(
+  [getSubaccountOrders, getCurrentMarketId],
+  (orders, marketId) =>
+    orders?.filter(
+      (order) =>
+        order.status === AbacusOrderStatus.open && marketId != null && order.marketId === marketId
+    )
 );
 
 export const getSubaccountOrderSizeBySideAndOrderbookLevel = createAppSelector(
-  [getSubaccountOpenStatusOrders, getCurrentMarketOrderbook],
+  [getSubaccountOpenOrdersForCurrentMarket, getCurrentMarketOrderbook],
   (openOrders = [], book = undefined) => {
     const tickSize = book?.grouping?.tickSize;
     const orderSizeBySideAndPrice: Partial<Record<OrderSide, Record<number, number>>> = {};
@@ -336,14 +341,16 @@ export const getSubaccountOrderSizeBySideAndOrderbookLevel = createAppSelector(
       const side = ORDER_SIDES[order.side.name];
       const byPrice = (orderSizeBySideAndPrice[side] ??= {});
 
-      const priceOrderbookLevel = tickSize
-        ? Math.floor(order.price / tickSize) * tickSize
-        : order.price;
-      if (byPrice[priceOrderbookLevel]) {
-        byPrice[priceOrderbookLevel] += order.size;
-      } else {
-        byPrice[priceOrderbookLevel] = order.size;
-      }
+      const priceOrderbookLevel = (() => {
+        if (tickSize == null) {
+          return order.price;
+        }
+        const tickLevelUnrounded = order.price / tickSize;
+        const tickLevel =
+          side === OrderSide.BUY ? Math.floor(tickLevelUnrounded) : Math.ceil(tickLevelUnrounded);
+        return tickLevel * tickSize;
+      })();
+      byPrice[priceOrderbookLevel] = (byPrice[priceOrderbookLevel] ?? 0) + order.size;
     });
     return orderSizeBySideAndPrice;
   }

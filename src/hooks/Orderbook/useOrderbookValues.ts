@@ -5,6 +5,7 @@ import { shallowEqual } from 'react-redux';
 
 import { OrderbookLine, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { DepthChartDatum, DepthChartSeries } from '@/constants/charts';
+import { EMPTY_OBJ } from '@/constants/objects';
 
 import { getSubaccountOrderSizeBySideAndOrderbookLevel } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -17,7 +18,7 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
   const orderbook = useAppSelector(getCurrentMarketOrderbook, shallowEqual);
 
   const subaccountOrderSizeBySideAndPrice =
-    useAppSelector(getSubaccountOrderSizeBySideAndOrderbookLevel, shallowEqual) || {};
+    useAppSelector(getSubaccountOrderSizeBySideAndOrderbookLevel, shallowEqual) || EMPTY_OBJ;
 
   return useMemo(() => {
     const asks: Array<PerpetualMarketOrderbookLevel | undefined> = (
@@ -31,7 +32,6 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
               key: `ask-${idx}`,
               side: 'ask' as const,
               mine: subaccountOrderSizeBySideAndPrice[OrderSide.SELL]?.[row.price],
-              sizeCost: row.size * row.price,
             },
             row
           )
@@ -48,7 +48,6 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
             {
               key: `bid-${idx}`,
               side: 'bid' as const,
-              sizeCost: row.size * row.price,
               mine: subaccountOrderSizeBySideAndPrice[OrderSide.BUY]?.[row.price],
             },
             row
@@ -56,49 +55,7 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
       )
       .slice(0, maxRowsPerSide);
 
-    // Prevent the bid/ask sides from crossing by using the offsets.
-    // While the books are crossing...
-    while (asks[0] && bids[0] && bids[0].price > asks[0].price) {
-      // Drop the order on the side with the lower offset.
-      // The offset of the other side is higher and so supercedes.
-      if (bids[0].offset === asks[0].offset) {
-        // If offsets are the same, give precedence to the larger size. In this case,
-        // one of the sizes *should* be zero, but we simply check for the larger size.
-        if (bids[0].size > asks[0].size) {
-          asks.shift();
-        } else {
-          bids.shift();
-        }
-      } else {
-        // Offsets are not equal. Give precedence to the larger offset.
-        if (bids[0].offset > asks[0].offset) {
-          asks.shift();
-        } else {
-          bids.shift();
-        }
-      }
-    }
-
-    // if bids and asks touch each other, roll up bottom ask to one tick up
-    if (asks[0] && bids[0] && bids[0].price === asks[0].price) {
-      const lowest = asks.shift();
-      if (lowest != null) {
-        const nextHighestPrice = lowest.price + (orderbook?.grouping?.tickSize ?? 1);
-        if (asks[0]?.price === nextHighestPrice) {
-          asks[0] = safeAssign({}, asks[0], {
-            size: asks[0].size + lowest.size,
-            sizeCost: asks[0].sizeCost + lowest.sizeCost,
-            mine: lowest.mine ? (asks[0].mine ?? 0) + lowest.mine : asks[0].mine,
-          });
-        } else {
-          asks.unshift(safeAssign({}, lowest, { price: nextHighestPrice }));
-        }
-      }
-    }
-
-    const spread =
-      asks[0]?.price && bids[0]?.price ? MustBigNumber(asks[0].price).minus(bids[0].price) : null;
-
+    const spread = orderbook?.spread;
     const spreadPercent = orderbook?.spreadPercent;
 
     const histogramRange = Math.max(
@@ -115,7 +72,7 @@ export const useCalculateOrderbookData = ({ maxRowsPerSide }: { maxRowsPerSide: 
       hasOrderbook: !!orderbook,
       currentGrouping: orderbook?.grouping,
     };
-  }, [orderbook, subaccountOrderSizeBySideAndPrice]);
+  }, [maxRowsPerSide, orderbook, subaccountOrderSizeBySideAndPrice]);
 };
 
 export const useOrderbookValuesForDepthChart = () => {

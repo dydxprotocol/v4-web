@@ -361,7 +361,6 @@ export type ConnectNetworkEvent = CustomEvent<Partial<NetworkConfig>>;
 
 export type PerpetualMarketOrderbookLevel = OrderbookLine & {
   side?: 'ask' | 'bid';
-  sizeCost: number;
   mine: number | undefined;
   key: string;
 };

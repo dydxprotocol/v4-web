@@ -239,7 +239,7 @@ export const CanvasOrderbook = forwardRef(
                 {asksOrderbook}
                 <SpreadRow
                   ref={spreadRowRef}
-                  spread={spread?.toNumber()}
+                  spread={spread}
                   spreadPercent={spreadPercent}
                   tickSizeDecimals={tickSizeDecimals}
                 />
