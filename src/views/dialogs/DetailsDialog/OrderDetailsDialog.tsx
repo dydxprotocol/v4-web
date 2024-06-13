@@ -2,9 +2,15 @@ import { OrderFlags, OrderSide } from '@dydxprotocol/v4-client-js';
 import { shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 
-import { AbacusOrderStatus, AbacusOrderTypes, type Nullable } from '@/constants/abacus';
+import {
+  AbacusMarginMode,
+  AbacusOrderStatus,
+  AbacusOrderTypes,
+  type Nullable,
+} from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS, type StringKey } from '@/constants/localization';
+import { isMainnet } from '@/constants/networks';
 import { CancelOrderStatuses } from '@/constants/trade';
 
 import { useParameterizedSelector } from '@/hooks/useParameterizedSelector';
@@ -29,6 +35,7 @@ import { getSelectedLocale } from '@/state/localizationSelectors';
 
 import { MustBigNumber } from '@/lib/numbers';
 import { isMarketOrderType, isOrderStatusClearable, relativeTimeString } from '@/lib/orders';
+import { getMarginModeFromSubaccountNumber } from '@/lib/tradeData';
 
 type ElementProps = {
   orderId: string;
@@ -64,11 +71,19 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     size,
     status,
     stepSizeDecimals,
+    subaccountNumber,
     tickSizeDecimals,
     trailingPercent,
     triggerPrice,
     type,
   } = useParameterizedSelector(getOrderDetails, orderId)! ?? {};
+
+  const marginMode = getMarginModeFromSubaccountNumber(subaccountNumber);
+
+  const marginModeLabel =
+    marginMode === AbacusMarginMode.cross
+      ? stringGetter({ key: STRING_KEYS.CROSS })
+      : stringGetter({ key: STRING_KEYS.ISOLATED });
 
   const renderOrderPrice = ({
     type: innerType,
@@ -94,6 +109,11 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
         key: 'market',
         label: stringGetter({ key: STRING_KEYS.MARKET }),
         value: marketId,
+      },
+      {
+        key: 'margin-mode',
+        label: stringGetter({ key: STRING_KEYS.MARGIN_MODE }),
+        value: marginModeLabel,
       },
       {
         key: 'side',
@@ -175,6 +195,11 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
         key: 'created-at',
         label: stringGetter({ key: STRING_KEYS.CREATED_AT }),
         value: renderOrderTime({ timeInMs: createdAtMilliseconds }),
+      },
+      {
+        key: 'subaccount',
+        label: 'Subaccount # (Debug Only)',
+        value: !isMainnet ? `${subaccountNumber}` : undefined,
       },
     ] satisfies DetailsItem[]
   ).filter((item) => Boolean(item.value));

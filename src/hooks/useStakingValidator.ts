@@ -1,5 +1,3 @@
-import { useCallback } from 'react';
-
 import { useQuery } from '@tanstack/react-query';
 import { groupBy } from 'lodash';
 import { shallowEqual } from 'react-redux';
@@ -30,7 +28,7 @@ export const useStakingValidator = () => {
     }
   );
 
-  const queryFn = useCallback(async () => {
+  const queryFn = async () => {
     const validatorOptions: string[] = [];
     const intersection = validatorWhitelist.filter((delegation) =>
       currentDelegations?.map((d) => d.validator).includes(delegation)
@@ -72,10 +70,10 @@ export const useStakingValidator = () => {
       unbondingValidators: groupBy(unbondingValidators, ({ operatorAddress }) => operatorAddress),
       currentDelegations,
     };
-  }, [validatorWhitelist, getValidators, currentDelegations, unbondingDelegations]);
+  };
 
   const { data } = useQuery({
-    queryKey: ['stakingValidator', selectedNetwork],
+    queryKey: ['stakingValidator', selectedNetwork, currentDelegations, unbondingDelegations],
     queryFn,
     enabled: Boolean(isCompositeClientConnected && validatorWhitelist?.length > 0),
     refetchOnWindowFocus: false,

@@ -6,6 +6,7 @@ import styled, { css, keyframes } from 'styled-components';
 
 import { type OrderbookLine } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { USD_DECIMALS } from '@/constants/numbers';
 import { ORDERBOOK_MAX_ROWS_PER_SIDE } from '@/constants/orderbook';
 
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -303,7 +304,11 @@ export const Orderbook = ({
   const onRowAction = useCallback(
     (key: Key, row: RowData) => {
       if (currentInput === 'trade' && key !== 'spread' && row?.price) {
-        dispatch(setTradeFormInputs({ limitPriceInput: row?.price?.toString() }));
+        dispatch(
+          setTradeFormInputs({
+            limitPriceInput: MustBigNumber(row.price).toFixed(tickSizeDecimals ?? USD_DECIMALS),
+          })
+        );
       }
     },
     [currentInput]

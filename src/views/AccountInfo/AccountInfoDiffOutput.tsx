@@ -10,15 +10,22 @@ import { isNumber } from '@/lib/numbers';
 
 type ElementProps = {
   hasError?: boolean | null;
+  hideDiff?: boolean;
   isPositive: boolean;
   type: OutputType;
   value: Nullable<TradeState<number>>;
 };
 
-export const AccountInfoDiffOutput = ({ hasError, isPositive, type, value }: ElementProps) => {
+export const AccountInfoDiffOutput = ({
+  hasError,
+  hideDiff,
+  isPositive,
+  type,
+  value,
+}: ElementProps) => {
   const currentValue = value?.current;
   const postOrderValue = value?.postOrder;
-  const hasDiffPostOrder = isNumber(postOrderValue) && currentValue !== postOrderValue;
+  const hasDiffPostOrder = isNumber(postOrderValue) && currentValue !== postOrderValue && !hideDiff;
 
   return (
     <$DiffOutput
