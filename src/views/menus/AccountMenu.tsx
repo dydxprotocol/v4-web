@@ -72,8 +72,6 @@ export const AccountMenu = () => {
 
   const { showMfaEnrollmentModal } = useMfaEnrollment();
 
-  // const usdcBalance = freeCollateral?.current ?? 0;
-
   const onRecoverKeys = () => {
     dispatch(openDialog({ type: DialogTypes.Onboarding }));
   };
