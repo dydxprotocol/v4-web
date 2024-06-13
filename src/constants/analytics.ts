@@ -170,7 +170,6 @@ export const AnalyticsEvents = unionize(
   },
   { tag: 'type' as const, value: 'payload' as const }
 );
-// export type AnalyticsEvent = (typeof AnalyticsEvents)['_Union'];
 export type AnalyticsEvent = UnionOf<typeof AnalyticsEvents>;
 export type AnalyticsEventArgTypes = RecordOf<typeof AnalyticsEvents>;
 
