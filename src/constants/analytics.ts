@@ -9,7 +9,7 @@ import { TransferNotificationTypes } from './notifications';
 import type { TradeTypes } from './trade';
 import type { DydxAddress, EvmAddress, WalletConnectionType, WalletType } from './wallets';
 
-type AnalyticsEventDataWithReferrer<T extends AnalyticsEventTypes> = AnalyticsEventArgTypes[T] & {
+type AnalyticsEventDataWithReferrer<T extends AnalyticsEventTypes> = AnalyticsEventPayloads[T] & {
   referrer: string;
 };
 export type AnalyticsEventTrackMeta<T extends AnalyticsEventTypes> = {
@@ -21,7 +21,7 @@ export type AnalyticsEventTrackMeta<T extends AnalyticsEventTypes> = {
 export type AnalyticsEventIdentifyMeta<T extends AnalyticsUserPropertyTypes> = {
   detail: {
     property: T;
-    propertyValue: AnalyticsUserPropertyArgTypes[T];
+    propertyValue: AnalyticsUserPropertyPayloads[T];
   };
 };
 
@@ -68,7 +68,7 @@ export const AnalyticsUserProperties = unionize(
 
 export type AnalyticsUserProperty = UnionOf<typeof AnalyticsUserProperties>;
 export type AnalyticsUserPropertyTypes = TagsOf<typeof AnalyticsUserProperties>;
-export type AnalyticsUserPropertyArgTypes = RecordOf<typeof AnalyticsUserProperties>;
+export type AnalyticsUserPropertyPayloads = RecordOf<typeof AnalyticsUserProperties>;
 
 export const AnalyticsEvents = unionize(
   {
@@ -189,8 +189,8 @@ export const AnalyticsEvents = unionize(
   { tag: 'type' as const, value: 'payload' as const }
 );
 export type AnalyticsEvent = UnionOf<typeof AnalyticsEvents>;
-export type AnalyticsEventArgTypes = RecordOf<typeof AnalyticsEvents>;
 export type AnalyticsEventTypes = TagsOf<typeof AnalyticsEvents>;
+export type AnalyticsEventPayloads = RecordOf<typeof AnalyticsEvents>;
 
 export const DEFAULT_TRANSACTION_MEMO = 'dYdX Frontend (web)';
 export const lastSuccessfulRestRequestByOrigin: Record<URL['origin'], number> = {};
