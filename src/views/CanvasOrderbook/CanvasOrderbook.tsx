@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 
 import { Nullable, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
+import { USD_DECIMALS } from '@/constants/numbers';
 import { ORDERBOOK_MAX_ROWS_PER_SIDE, ORDERBOOK_ROW_HEIGHT } from '@/constants/orderbook';
 
 import { useCenterOrderbook } from '@/hooks/Orderbook/useCenterOrderbook';
@@ -25,6 +26,8 @@ import {
   getCurrentMarketData,
   getCurrentMarketId,
 } from '@/state/perpetualsSelectors';
+
+import { MustBigNumber } from '@/lib/numbers';
 
 import { OrderbookControls } from './OrderbookControls';
 import { OrderbookRow, SpreadRow } from './OrderbookRow';
@@ -59,7 +62,7 @@ export const CanvasOrderbook = forwardRef(
     const currentMarketConfig = useAppSelector(getCurrentMarketConfig, shallowEqual);
     const { assetId: id } = useAppSelector(getCurrentMarketData, shallowEqual) ?? {};
 
-    const { tickSizeDecimals = 2 } = currentMarketConfig ?? {};
+    const { tickSizeDecimals = USD_DECIMALS } = currentMarketConfig ?? {};
 
     /**
      * Slice asks and bids to maxRowsPerSide using empty rows
@@ -115,7 +118,12 @@ export const CanvasOrderbook = forwardRef(
     const onRowAction = useCallback(
       (price: Nullable<number>) => {
         if (currentInput === 'trade' && price) {
-          dispatch(setTradeFormInputs({ limitPriceInput: price?.toString() }));
+          // avoid scientific notation for when converting small number to string
+          dispatch(
+            setTradeFormInputs({
+              limitPriceInput: MustBigNumber(price).toFixed(tickSizeDecimals ?? USD_DECIMALS),
+            })
+          );
         }
       },
       [currentInput]
