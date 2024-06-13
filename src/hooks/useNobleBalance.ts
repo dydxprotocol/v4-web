@@ -1,5 +1,5 @@
 import { StargateClient } from '@cosmjs/stargate';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { formatUnits } from 'viem';
 
 import { MustBigNumber } from '@/lib/numbers';
@@ -15,7 +15,7 @@ export const useNobleBalance = () => {
 
   const { data } = useQuery({
     enabled: nobleAddress !== undefined,
-    queryKey: 'accountBalances_noble_usdc',
+    queryKey: ['accountBalances_noble_usdc'],
     queryFn: async () => {
       const client = await StargateClient.connect(nobleValidator);
       const balance = await client.getBalance(nobleAddress!, usdcGasDenom);
