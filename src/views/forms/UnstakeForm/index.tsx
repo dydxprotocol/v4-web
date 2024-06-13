@@ -24,6 +24,7 @@ import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { OutputType } from '@/components/Output';
+import { ButtonError } from '@/components/StakeRewardButtonAndReceipt';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 import { ValidatorName } from '@/components/ValidatorName';
@@ -46,7 +47,7 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
   const { chainTokenLabel, chainTokenDecimals } = useTokenConfigs();
 
   // Form states
-  const [error, setError] = useState<string>();
+  const [error, setError] = useState<ButtonError>();
   const [fee, setFee] = useState<BigNumberish>();
   const [amounts, setAmounts] = useState<Record<string, number | undefined>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -106,7 +107,7 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
       onDone?.();
     } catch (err) {
       log('UnstakeForm/onUnstake', err);
-      setError(err.message);
+      setError({ key: err.message, type: AlertType.Error, message: err.message });
     } finally {
       setIsLoading(false);
     }
@@ -275,8 +276,9 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
 
       <$Footer>
         <UnstakeButtonAndReceipt
+          error={error}
           fee={fee ?? undefined}
-          isDisabled={!isAmountValid || !fee || isLoading}
+          // isDisabled={!isAmountValid || !fee || isLoading}
           isLoading={isLoading || Boolean(isAmountValid && !fee)}
           amount={totalAmount}
         />

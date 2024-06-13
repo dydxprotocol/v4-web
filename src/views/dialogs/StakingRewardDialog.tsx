@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { SelectedGasDenom } from '@dydxprotocol/v4-client-js/src/clients/constants';
 import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 import { formatUnits } from 'viem';
 
+import { AMOUNT_RESERVED_FOR_GAS_DYDX } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
-import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, SMALL_USD_DECIMALS } from '@/constants/numbers';
 
-import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useSubaccount } from '@/hooks/useSubaccount';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
@@ -20,8 +20,11 @@ import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType, ShowSign } from '@/components/Output';
+import {
+  StakeRewardButtonAndReceipt,
+  type ButtonError,
+} from '@/components/StakeRewardButtonAndReceipt';
 import { Tag } from '@/components/Tag';
-import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
 import { getSubaccountEquity } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
@@ -41,23 +44,42 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
   const { usdcLabel, usdcDecimals } = useTokenConfigs();
 
   const { getWithdrawRewardFee, withdrawReward } = useSubaccount();
-  const { usdcBalance } = useAccountBalance();
 
   const chartDotsBackground = useAppSelector(getChartDotBackground);
   const { current: equity } = useAppSelector(getSubaccountEquity, shallowEqual) ?? {};
 
-  const [error, setError] = useState<string>();
+  const [error, setError] = useState<ButtonError>();
   const [fee, setFee] = useState<BigNumberish>();
   const [isLoading, setIsLoading] = useState(false);
 
-  const showNotEnoughGasWarning = MustBigNumber(usdcBalance).lt(fee ?? 0);
+  const claimRewards = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(undefined);
+      await withdrawReward(validators);
+      setIsOpen(false);
+    } catch (err) {
+      log('StakeRewardDialog/withdrawReward', err);
+      setError({
+        key: err.msg,
+        type: AlertType.Error,
+        message: err.msg,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [validators, withdrawReward, setIsOpen]);
 
   useEffect(() => {
     getWithdrawRewardFee(validators)
       .then((stdFee) => {
         if (stdFee.amount.length > 0) {
           const feeAmount = stdFee.amount[0].amount;
-          setFee(MustBigNumber(formatUnits(BigInt(feeAmount), usdcDecimals)));
+          setFee(
+            MustBigNumber(AMOUNT_RESERVED_FOR_GAS_DYDX).plus(
+              MustBigNumber(formatUnits(BigInt(feeAmount), usdcDecimals))
+            )
+          );
         } else {
           setFee(undefined);
         }
@@ -67,6 +89,36 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
         setFee(undefined);
       });
   }, [getWithdrawRewardFee, usdcDecimals, validators]);
+
+  // useEffect(() => {
+  //   if (MustBigNumber(usdcBalance).lt(fee ?? 0)) {
+  //     addError({
+  //       key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS,
+  //       type: AlertType.Warning,
+  //       message: stringGetter({
+  //         key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS,
+  //         params: { TOKEN: usdcLabel, BALANCE: usdcBalance },
+  //       }),
+  //       slotButton: (
+  //         <$Button action={ButtonAction.Primary} onClick={depositFunds}>
+  //           {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
+  //         </$Button>
+  //       ),
+  //     });
+  //   } else {
+  //     removeError(STRING_KEYS.TRANSFER_INSUFFICIENT_GAS);
+  //   }
+  // }, [stringGetter, addError, removeError, depositFunds, fee, usdcLabel, usdcBalance]);
+
+  useEffect(() => {
+    if (fee && MustBigNumber(fee).gt(MustBigNumber(usdcRewards))) {
+      setError({
+        key: STRING_KEYS.GAS_FEE_GREATER_THAN_REWARD_ERROR,
+        type: AlertType.Error,
+        message: stringGetter({ key: STRING_KEYS.GAS_FEE_GREATER_THAN_REWARD_ERROR }),
+      });
+    }
+  }, [stringGetter, fee, usdcRewards]);
 
   const detailItems = useMemo(() => {
     const newEquity = MustBigNumber(equity).plus(usdcRewards);
@@ -100,19 +152,6 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
     ];
   }, [equity, usdcLabel, usdcRewards, fee, stringGetter]);
 
-  const claimRewards = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      await withdrawReward(validators);
-      setIsOpen(false);
-    } catch (err) {
-      log('StakeRewardDialog/withdrawReward', err);
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [validators, withdrawReward, setIsOpen]);
-
   return (
     <$Dialog isOpen setIsOpen={setIsOpen} hasHeaderBlur={false}>
       <$Container backgroundImagePath={chartDotsBackground}>
@@ -129,36 +168,35 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
           <$AssetIcon symbol="USDC" />
         </$AssetContainer>
         <$Heading>{stringGetter({ key: STRING_KEYS.YOU_EARNED })}</$Heading>
-        {showNotEnoughGasWarning && (
-          <AlertMessage type={AlertType.Warning}>
-            {stringGetter({
-              key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS, // TODO: OTE-399
-              params: { USDC_BALANCE: usdcBalance },
-            })}
-          </AlertMessage>
-        )}
-        {error && <AlertMessage type={AlertType.Error}> {error} </AlertMessage>}
-        <$WithDetailsReceipt detailItems={detailItems}>
-          <Button
-            action={ButtonAction.Primary}
-            onClick={claimRewards}
-            state={{ isLoading, isDisabled: fee === undefined }}
-          >
-            {stringGetter({
-              key: STRING_KEYS.CLAIM_USDC_AMOUNT,
-              params: {
-                USDC_AMOUNT: (
-                  <Output
-                    type={OutputType.Asset}
-                    value={usdcRewards}
-                    showSign={ShowSign.None}
-                    minimumFractionDigits={SMALL_USD_DECIMALS}
-                  />
-                ),
-              },
-            })}
-          </Button>
-        </$WithDetailsReceipt>
+
+        {error && <$AlertMessage type={error.type}> {error.message} </$AlertMessage>}
+
+        <$StakeRewardButtonAndReceipt
+          detailItems={detailItems}
+          error={error}
+          buttonText={
+            <span>
+              {stringGetter({
+                key: STRING_KEYS.CLAIM_USDC_AMOUNT,
+                params: {
+                  USDC_AMOUNT: (
+                    <$AmountOutput
+                      type={OutputType.Asset}
+                      value={usdcRewards}
+                      showSign={ShowSign.None}
+                      minimumFractionDigits={SMALL_USD_DECIMALS}
+                    />
+                  ),
+                },
+              })}
+            </span>
+          }
+          gasFee={fee}
+          gasDenom={SelectedGasDenom.USDC}
+          isLoading={isLoading}
+          isForm={false}
+          onClick={claimRewards}
+        />
       </$Container>
     </$Dialog>
   );
@@ -220,11 +258,20 @@ const $Heading = styled.h3`
   z-index: 1;
 `;
 
-const $WithDetailsReceipt = styled(WithDetailsReceipt)`
-  --withReceipt-backgroundColor: var(--color-layer-2);
-
+const $AlertMessage = styled(AlertMessage)`
   width: 100%;
+`;
+
+const $StakeRewardButtonAndReceipt = styled(StakeRewardButtonAndReceipt)`
   z-index: 1;
+`;
+
+const $Button = styled(Button)`
+  width: 100%;
+`;
+
+const $AmountOutput = styled(Output)`
+  display: inline;
 `;
 
 const $PositiveOutput = styled(Output)`

@@ -51,6 +51,7 @@ export type Hdkey = {
 };
 
 export const AMOUNT_RESERVED_FOR_GAS_USDC = 0.1;
+export const AMOUNT_RESERVED_FOR_GAS_DYDX = 0.1;
 
 /**
  * @description The number of parentSubaccounts: 0 - 127, 128 is the first childSubaccount

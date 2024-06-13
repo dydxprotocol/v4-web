@@ -4,6 +4,7 @@ import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
+import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -63,7 +64,11 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
         .then((stdFee) => {
           if (stdFee.amount.length > 0) {
             const feeAmount = stdFee.amount[0].amount;
-            setFee(MustBigNumber(formatUnits(BigInt(feeAmount), chainTokenDecimals)));
+            setFee(
+              MustBigNumber(AMOUNT_RESERVED_FOR_GAS_USDC).plus(
+                MustBigNumber(formatUnits(BigInt(feeAmount), chainTokenDecimals))
+              )
+            );
           }
         })
         .catch((err) => {
@@ -73,7 +78,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
     } else {
       setFee(undefined);
     }
-  }, [setFee, getDelegateFee, amount, selectedValidator, isAmountValid, chainTokenDecimals]);
+  }, [getDelegateFee, amount, selectedValidator, isAmountValid, chainTokenDecimals]);
 
   const onChangeAmount = (value: number | undefined) => {
     setAmount(value);
@@ -173,7 +178,11 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
       {showNotEnoughGasWarning && (
         <AlertMessage type={AlertType.Warning}>
           {stringGetter({
-            key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS, // TODO: OTE-399 update, this should be DYDX (and support both gas types)
+            key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS,
+            params: {
+              TOKEN: chainTokenLabel,
+              BALANCE: balance,
+            },
           })}
         </AlertMessage>
       )}
@@ -186,6 +195,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
           isDisabled={!isAmountValid || !fee || isLoading}
           isLoading={isLoading || Boolean(isAmountValid && !fee)}
           amount={amount}
+          error={error}
         />
       </$Footer>
     </$Form>

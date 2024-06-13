@@ -429,7 +429,7 @@ export const TransferForm = ({
         <AlertMessage type={AlertType.Warning}>
           {stringGetter({
             key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS,
-            params: { USDC_BALANCE: `(${usdcBalance} USDC)` },
+            params: { TOKEN: usdcLabel, BALANCE: usdcBalance },
           })}
         </AlertMessage>
       )}
