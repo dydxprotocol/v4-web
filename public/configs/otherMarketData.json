@@ -16632,7 +16632,7 @@
             "exchangeConfigJson": [
                 {
                     "exchangeName": "Raydium",
-                    "ticker": "USA-SOL-GpnqjVZtgt6t6yWmm1YaCc5iWhk56HZ7mpeaq5ZpKZop-9-CfhV9UTxrxxMYSomtQvy3PPYQUssWsvhG9gKdAqg9HoV-6-F99Y9rg1o2wVanVcTSAqbfH2RykyU25eFqdVHi1PECzi-HKprCtGbnh1j8xeQggzWhhVd3kwDUdphqPqDP8vMay8b",
+                    "ticker": "USA-SOL-CfhV9UTxrxxMYSomtQvy3PPYQUssWsvhG9gKdAqg9HoV-6-GpnqjVZtgt6t6yWmm1YaCc5iWhk56HZ7mpeaq5ZpKZop-9-F99Y9rg1o2wVanVcTSAqbfH2RykyU25eFqdVHi1PECzi-HKprCtGbnh1j8xeQggzWhhVd3kwDUdphqPqDP8vMay8b",
                     "adjustByMarket": "SOL-USD",
                     "invert": true
                 }
