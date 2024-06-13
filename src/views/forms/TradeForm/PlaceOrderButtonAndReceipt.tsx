@@ -158,6 +158,7 @@ export const PlaceOrderButtonAndReceipt = ({
         <DiffOutput
           useGrouping
           type={OutputType.Fiat}
+          fractionDigits={tickSizeDecimals}
           value={liquidationPrice?.current}
           newValue={liquidationPrice?.postOrder}
           withDiff={areInputsFilled && getTradeStateWithDoubleValuesHasDiff(liquidationPrice)}
