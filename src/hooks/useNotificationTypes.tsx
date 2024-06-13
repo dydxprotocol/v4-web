@@ -285,6 +285,8 @@ export const notificationTypes: NotificationTypeConfig[] = [
       const incentivesExpirationDate = new Date('2024-07-17T23:59:59');
       const conditionalOrdersExpirationDate = new Date('2024-06-01T23:59:59');
       const fokDeprecationExpirationDate = new Date('2024-07-01T23:59:59');
+      const isolatedMarginLiveExpirationDate = new Date('2024-07-12T23:59:59');
+      const { isolatedMarginLearnMore } = useURLConfigs();
 
       const currentDate = new Date();
 
@@ -351,6 +353,31 @@ export const notificationTypes: NotificationTypeConfig[] = [
               }),
               toastSensitivity: 'foreground',
               groupKey: ReleaseUpdateNotificationIds.FOKDeprecation,
+            },
+            []
+          );
+        }
+
+        if (currentDate <= isolatedMarginLiveExpirationDate) {
+          trigger(
+            ReleaseUpdateNotificationIds.IsolatedMarginLive,
+            {
+              icon: <AssetIcon symbol={chainTokenLabel} />,
+              title: stringGetter({
+                key: 'NOTIFICATIONS.ISOLATED_MARGIN_LIVE.TITLE',
+              }),
+              body: stringGetter({
+                key: 'NOTIFICATIONS.ISOLATED_MARGIN_LIVE.BODY',
+                params: {
+                  LEARN_MORE: (
+                    <$Link href={isolatedMarginLearnMore}>
+                      {stringGetter({ key: STRING_KEYS.HERE })}
+                    </$Link>
+                  ),
+                },
+              }),
+              toastSensitivity: 'foreground',
+              groupKey: ReleaseUpdateNotificationIds.IsolatedMarginLive,
             },
             []
           );

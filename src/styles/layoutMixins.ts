@@ -76,7 +76,7 @@ const contentSectionDetached = css`
   ${() => contentSection}
   ${() => stickyLeft}
 
-    max-width: min(var(--content-container-width), var(--content-max-width));
+  max-width: min(var(--content-container-width), var(--content-max-width));
   transition: max-width 0.3s var(--ease-out-expo);
 `;
 

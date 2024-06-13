@@ -50,4 +50,9 @@ export type Hdkey = {
   publicKey: Uint8Array | null;
 };
 
-export const AMOUNT_RESERVED_FOR_GAS_USDC = 0.1;
+export const AMOUNT_RESERVED_FOR_GAS_USDC = 0.5;
+
+/**
+ * @description The number of parentSubaccounts: 0 - 127, 128 is the first childSubaccount
+ */
+export const NUM_PARENT_SUBACCOUNTS = 128;
