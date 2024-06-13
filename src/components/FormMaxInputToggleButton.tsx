@@ -41,7 +41,5 @@ export const FormMaxInputToggleButton = ({
 const $FormMaxInputToggleButton = styled(ToggleButton)`
   ${formMixins.inputInnerToggleButton}
 
-  svg {
-    color: var(--color-text-0);
-  }
+  --button-padding: 0 0.5rem;
 `;
