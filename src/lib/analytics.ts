@@ -15,17 +15,22 @@ export const identify = (property: AnalyticsUserProperty) => {
     console.log(`[Analytics:Identify] ${property.type}`, property.payload);
   }
 
-  const customEvent = customIdentifyEvent(property);
+  const customEvent = customIdentifyEvent({
+    detail: { property: property.type, propertyValue: property.payload },
+  });
 
   globalThis.dispatchEvent(customEvent);
 };
 
 export const track = (event: AnalyticsEvent) => {
+  const eventDataWithReferrer = { ...(event.payload ?? {}), referrer: testFlags.referrer };
   if (DEBUG_ANALYTICS) {
     // eslint-disable-next-line no-console
-    console.log(`[Analytics] ${event.type}`, event.payload, testFlags.referrer);
+    console.log(`[Analytics] ${event.type}`, eventDataWithReferrer);
   }
-  const customEvent = customTrackEvent(event, testFlags.referrer);
+  const customEvent = customTrackEvent({
+    detail: { eventType: event.type, eventData: eventDataWithReferrer },
+  });
 
   globalThis.dispatchEvent(customEvent);
 };

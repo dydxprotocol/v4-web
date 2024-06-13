@@ -1,4 +1,4 @@
-import { RecordOf, UnionOf, ofType, unionize } from 'unionize';
+import { RecordOf, TagsOf, UnionOf, ofType, unionize } from 'unionize';
 
 import type { AbacusApiStatus, HumanReadablePlaceOrderPayload } from './abacus';
 import type { OnboardingState, OnboardingSteps } from './account';
@@ -9,20 +9,36 @@ import { TransferNotificationTypes } from './notifications';
 import type { TradeTypes } from './trade';
 import type { DydxAddress, EvmAddress, WalletConnectionType, WalletType } from './wallets';
 
+type AnalyticsEventDataWithReferrer<T extends AnalyticsEventTypes> = AnalyticsEventArgTypes[T] & {
+  referrer: string;
+};
+export type AnalyticsEventTrackMeta<T extends AnalyticsEventTypes> = {
+  detail: {
+    eventType: T;
+    eventData: AnalyticsEventDataWithReferrer<T>;
+  };
+};
+export type AnalyticsEventIdentifyMeta<T extends AnalyticsUserPropertyTypes> = {
+  detail: {
+    property: T;
+    propertyValue: AnalyticsUserPropertyArgTypes[T];
+  };
+};
+
 // Do not update. this is used specifically to type how we create custom identify events.
 // If you want to update how identify events work, go to src/lib/analytics.ts
-export const customIdentifyEvent = (meta: AnalyticsUserProperty) => {
-  return new CustomEvent('dydx:identify', {
-    detail: { property: meta.type, propertyValue: meta.payload },
-  });
+export const customIdentifyEvent = <T extends AnalyticsUserPropertyTypes>(
+  meta: AnalyticsEventIdentifyMeta<T>
+) => {
+  return new CustomEvent('dydx:identify', meta);
 };
 
 // Do not update. this is used specifically to type how we create custom track events.
 // If you want to update how track events work, go to src/lib/analytics.ts
-export const customTrackEvent = (meta: AnalyticsEvent, referrer: string) => {
-  return new CustomEvent('dydx:track', {
-    detail: { eventType: meta.type, eventData: { ...(meta.payload ?? {}), referrer } },
-  });
+export const customTrackEvent = <T extends AnalyticsEventTypes>(
+  meta: AnalyticsEventTrackMeta<T>
+) => {
+  return new CustomEvent('dydx:track', meta);
 };
 
 // User properties
@@ -51,6 +67,8 @@ export const AnalyticsUserProperties = unionize(
 );
 
 export type AnalyticsUserProperty = UnionOf<typeof AnalyticsUserProperties>;
+export type AnalyticsUserPropertyTypes = TagsOf<typeof AnalyticsUserProperties>;
+export type AnalyticsUserPropertyArgTypes = RecordOf<typeof AnalyticsUserProperties>;
 
 export const AnalyticsEvents = unionize(
   {
@@ -172,6 +190,7 @@ export const AnalyticsEvents = unionize(
 );
 export type AnalyticsEvent = UnionOf<typeof AnalyticsEvents>;
 export type AnalyticsEventArgTypes = RecordOf<typeof AnalyticsEvents>;
+export type AnalyticsEventTypes = TagsOf<typeof AnalyticsEvents>;
 
 export const DEFAULT_TRANSACTION_MEMO = 'dYdX Frontend (web)';
 export const lastSuccessfulRestRequestByOrigin: Record<URL['origin'], number> = {};
