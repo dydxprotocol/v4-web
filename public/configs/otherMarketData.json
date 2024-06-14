@@ -12,7 +12,7 @@
             "exchangeConfigJson": [
                 {
                     "exchangeName": "Raydium",
-                    "ticker": "SOL-$MICHI-5tg9qKYRAXgqxtrvzM77XTKBLQBJppixjqKCXcfhNAE1-6-EzSLA8B6N2oetEnsPcdiYohjqSKP4MUzwwpnzz75DzwH-9-8pkc323WErsJdV9jQTxT8yqPCgcpNKFfkViaGhDYm1eF-GH8Ers4yzKR3UKDvgVu8cqJfGzU4cU62mTeg9bcJ7ug6",
+                    "ticker": "SOL-$MICHI-EzSLA8B6N2oetEnsPcdiYohjqSKP4MUzwwpnzz75DzwH-9-5tg9qKYRAXgqxtrvzM77XTKBLQBJppixjqKCXcfhNAE1-6-8pkc323WErsJdV9jQTxT8yqPCgcpNKFfkViaGhDYm1eF-GH8Ers4yzKR3UKDvgVu8cqJfGzU4cU62mTeg9bcJ7ug6",
                     "adjustByMarket": "SOL-USD",
                     "invert": true
                 }
@@ -2022,7 +2022,7 @@
             "exchangeConfigJson": [
                 {
                     "exchangeName": "Raydium",
-                    "ticker": "SOL-BABY-6ogxazd3uvk3VSF8n9DRcEp2HNqQDxiqRNYXVKNWPNoU-6-7ii3G8iRAVpfFt8NbmisDCVNa8KJxaikL9PQ49r8e6gm-9-7usCDD5FXposJD8xAxQDyQ3ByprweUY9AT8scjKswK1W-2prhzdRwWzas2f4g5AAjyRUBcQcdajxd8NAzKcqhv76P",
+                    "ticker": "SOL-BABY-7ii3G8iRAVpfFt8NbmisDCVNa8KJxaikL9PQ49r8e6gm-9-6ogxazd3uvk3VSF8n9DRcEp2HNqQDxiqRNYXVKNWPNoU-6-7usCDD5FXposJD8xAxQDyQ3ByprweUY9AT8scjKswK1W-2prhzdRwWzas2f4g5AAjyRUBcQcdajxd8NAzKcqhv76P",
                     "adjustByMarket": "SOL-USD",
                     "invert": true
                 }
@@ -6828,9 +6828,9 @@
                 },
                 {
                     "exchangeName": "Raydium",
-                    "ticker": "GME-SOL-2VzMCxFW3nj7pNDbF6WTJgxoJ8ekJS9hfquxPq8edLTY-9-2kdQwdXdwxSJdzFEFtuo9tpmA88FVjMH7F5kgBZNHPR5-9-Gg5UhU7AyhM142a7pdk6WBtdf9rv1VcmJQXgESLjxmsk-9tz6vYKiBDLYx2RnGWC5tESu4pyVE4jD6Tm56352UGte",
+                    "ticker": "GME-SOL-2kdQwdXdwxSJdzFEFtuo9tpmA88FVjMH7F5kgBZNHPR5-9-2VzMCxFW3nj7pNDbF6WTJgxoJ8ekJS9hfquxPq8edLTY-9-Gg5UhU7AyhM142a7pdk6WBtdf9rv1VcmJQXgESLjxmsk-9tz6vYKiBDLYx2RnGWC5tESu4pyVE4jD6Tm56352UGte",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -9882,7 +9882,7 @@
                 },
                 {
                     "exchangeName": "Raydium",
-                    "ticker": "MEW-SOL-BhNdEGJef9jSqT1iCEkFZ2bYZCdpC1vuiWtqDt87vBVp-9-4HqAjFKuQX7tnXEkxsjGQha3G4bcgER8qPXRahn9gj8F-5-CV3Gq5M2R7KRU5ey4LpnZYRR7r7vzKoV9Bt4mZ8P6bSB-879F697iuDJGMevRkRcnW21fcXiAeLJK1ffsw2ATebce",
+                    "ticker": "MEW-SOL-4HqAjFKuQX7tnXEkxsjGQha3G4bcgER8qPXRahn9gj8F-5-BhNdEGJef9jSqT1iCEkFZ2bYZCdpC1vuiWtqDt87vBVp-9-CV3Gq5M2R7KRU5ey4LpnZYRR7r7vzKoV9Bt4mZ8P6bSB-879F697iuDJGMevRkRcnW21fcXiAeLJK1ffsw2ATebce",
                     "adjustByMarket": "SOL-USD",
                     "invert": true
                 }
@@ -10262,7 +10262,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "SOL-MOTHER-8uQwXPi1sWwUTVbDBnjznmf4mV44CETiNAh3UENvHejV-9-8ZcrNqaDbqy1H4R2DtmGnuZnJ6TKGSsaGmyRGQQeELLv-6-1z3rLR6AwR8gjVZ8ArqHp9kdaPrNwPvCdrZ6jGy6wwF-HcPgh6B2yHNvT6JsEmkrHYT8pVHu9Xiaoxm4Mmn2ibWw",
                     "adjustByMarket": "SOL-USD",
-                    "invert": false
+                    "invert": true
                 }
             ],
             "liquidityTier": 2,
@@ -10512,7 +10512,7 @@
                 },
                 {
                     "exchangeName": "Raydium",
-                    "ticker": "USDC-MYRO-BUvMbqP311JDU4ZGnf1rSZJLjutTU9VpNLEos393TYyW-9-AMtPGYQS873njs35mD9MAAMKoospEuzNHPy7LQuuKo4A-6-2w1mZXi8PNqUz4gbezu4xvPzcGogDmVdLXGLhTpPbczd-5WGYajM1xtLy3QrLHGSX4YPwsso3jrjEsbU1VivUErzk",
+                    "ticker": "USDC-MYRO-AMtPGYQS873njs35mD9MAAMKoospEuzNHPy7LQuuKo4A-6-BUvMbqP311JDU4ZGnf1rSZJLjutTU9VpNLEos393TYyW-9-2w1mZXi8PNqUz4gbezu4xvPzcGogDmVdLXGLhTpPbczd-5WGYajM1xtLy3QrLHGSX4YPwsso3jrjEsbU1VivUErzk",
                     "adjustByMarket": "",
                     "invert": true
                 }
@@ -12468,7 +12468,7 @@
                 },
                 {
                     "exchangeName": "Raydium",
-                    "ticker": "PONKE-SOL-8DcvfWidQ53a3SCBrWxBWL2UU5zEBAKEypApiiCCFu2Y-9-D7rw7fyEzo9EQcozjqAHJwbdbywGcSLw1at5MioZtMZ4-9-ECoptgCPMxXXWtxv3Zg2V3E7SpWp6SGqKqj32AcdWRQK-5uTwG3y3F5cx4YkodgTjWEHDrX5HDKZ5bZZ72x8eQ6zE",
+                    "ticker": "PONKE-SOL-D7rw7fyEzo9EQcozjqAHJwbdbywGcSLw1at5MioZtMZ4-9-8DcvfWidQ53a3SCBrWxBWL2UU5zEBAKEypApiiCCFu2Y-9-ECoptgCPMxXXWtxv3Zg2V3E7SpWp6SGqKqj32AcdWRQK-5uTwG3y3F5cx4YkodgTjWEHDrX5HDKZ5bZZ72x8eQ6zE",
                     "adjustByMarket": "SOL-USD",
                     "invert": true
                 }
@@ -12510,7 +12510,7 @@
                 },
                 {
                     "exchangeName": "Raydium",
-                    "ticker": "POPCAT-SOL-n6CwMY77wdEftf2VF6uPvbusYoraYUci3nYBPqH1DJ5-9-4Vc6N76UBu26c3jJDKBAbvSD7zPLuQWStBk7QgVEoeoS-9-4ShRqC2n3PURN7EiqmB8X4WLR81pQPvGLTPjL9X8SNQp-FRhB8L7Y9Qq41qZXYLtC2nw8An1RJfLLxRF2x9RwLLMo",
+                    "ticker": "POPCAT-SOL-4Vc6N76UBu26c3jJDKBAbvSD7zPLuQWStBk7QgVEoeoS-9-n6CwMY77wdEftf2VF6uPvbusYoraYUci3nYBPqH1DJ5-9-4ShRqC2n3PURN7EiqmB8X4WLR81pQPvGLTPjL9X8SNQp-FRhB8L7Y9Qq41qZXYLtC2nw8An1RJfLLxRF2x9RwLLMo",
                     "adjustByMarket": "SOL-USD",
                     "invert": true
                 }
@@ -13134,7 +13134,7 @@
                 },
                 {
                     "exchangeName": "Raydium",
-                    "ticker": "RAY-USDC-Eqrhxd7bDUCH3MepKmdVkgwazXRzY6iHhEoBpY7yAohk-6-FdmKUE4UMiJYFK5ogCngHzShuVKrFXBamPWcewDr31th-6-CSCS9J8eVQ4vnWfWCx59Dz8oLGtcdQ5R53ea4V9o2eUp-6UmmUiYoBjSrhakAobJw8BvkmJtDVxaeBtbt7rxWo1mg",
+                    "ticker": "RAY-USDC-FdmKUE4UMiJYFK5ogCngHzShuVKrFXBamPWcewDr31th-6-Eqrhxd7bDUCH3MepKmdVkgwazXRzY6iHhEoBpY7yAohk-6-CSCS9J8eVQ4vnWfWCx59Dz8oLGtcdQ5R53ea4V9o2eUp-6UmmUiYoBjSrhakAobJw8BvkmJtDVxaeBtbt7rxWo1mg",
                     "adjustByMarket": "",
                     "invert": true
                 }
@@ -14024,7 +14024,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "SOL-SC-DQPzUPZ5GFVVyNSf7tvMLu5NkN2UxUt1VijXGMxJfU8q-9-5ZgybxRW9AMd2U3P3wpzsgCY8UUDCBR488ievHuNiG8B-6-H3Pbn9sMF8wA7hUGgV18YTt6LdR6ALpKaNf4y6j8ep9Q-BSzedbEvWRqVksaF558epPWCM16avEpyhm2HgSq9WZyy",
                     "adjustByMarket": "SOL-USD",
-                    "invert": false
+                    "invert": true
                 }
             ],
             "liquidityTier": 2,
@@ -14358,7 +14358,7 @@
                 },
                 {
                     "exchangeName": "Raydium",
-                    "ticker": "SLERF-SOL-5Zumc1SYPmQ89nqwXqzogeuhdJ85iEMpSk35A4P87pmD-9-9A2ZsPz5Zg6jKN4o4KRMjTVPmkH51wYWFLmt4KBRy1Rq-9-FT5Ptk37g5r6D9BKt3hne8ovHZ1g56oJBvuZRwn3zS3j-AgFnRLUScRD2E4nWQxW73hdbSN7eKEUb2jHX7tx9YTYc",
+                    "ticker": "SLERF-SOL-9A2ZsPz5Zg6jKN4o4KRMjTVPmkH51wYWFLmt4KBRy1Rq-9-5Zumc1SYPmQ89nqwXqzogeuhdJ85iEMpSk35A4P87pmD-9-FT5Ptk37g5r6D9BKt3hne8ovHZ1g56oJBvuZRwn3zS3j-AgFnRLUScRD2E4nWQxW73hdbSN7eKEUb2jHX7tx9YTYc",
                     "adjustByMarket": "SOL-USD",
                     "invert": true
                 }
@@ -16218,7 +16218,7 @@
             "exchangeConfigJson": [
                 {
                     "exchangeName": "Raydium",
-                    "ticker": "TRUMP-SOL-5DNPt6WYgj3x7EmU4Fyqe3jDYPk2HMAB21H5N4Ggbev9-9-GwUn3JYQ5PC6P9cB9HsatJN7y7aw3BXrNqHPpoHtWyKF-8-FAWLdBB8kmWZQ74KpYAYN3YaEW31Si8qrwuQPauFSoma-7Lco4QdQLaW6M4sxVhWe8BHjrykyzjcjGTo4a6qYGABK",
+                    "ticker": "TRUMP-SOL-GwUn3JYQ5PC6P9cB9HsatJN7y7aw3BXrNqHPpoHtWyKF-8-5DNPt6WYgj3x7EmU4Fyqe3jDYPk2HMAB21H5N4Ggbev9-9-FAWLdBB8kmWZQ74KpYAYN3YaEW31Si8qrwuQPauFSoma-7Lco4QdQLaW6M4sxVhWe8BHjrykyzjcjGTo4a6qYGABK",
                     "adjustByMarket": "SOL-USD",
                     "invert": true
                 }
@@ -16634,7 +16634,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "USA-SOL-CfhV9UTxrxxMYSomtQvy3PPYQUssWsvhG9gKdAqg9HoV-6-GpnqjVZtgt6t6yWmm1YaCc5iWhk56HZ7mpeaq5ZpKZop-9-F99Y9rg1o2wVanVcTSAqbfH2RykyU25eFqdVHi1PECzi-HKprCtGbnh1j8xeQggzWhhVd3kwDUdphqPqDP8vMay8b",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
