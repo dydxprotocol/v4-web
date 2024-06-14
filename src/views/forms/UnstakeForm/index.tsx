@@ -126,7 +126,6 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
         key: err.message,
         type: AlertType.Error,
         message: err.message,
-        slotButton: undefined,
       });
     } finally {
       setIsLoading(false);
