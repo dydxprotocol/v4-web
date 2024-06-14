@@ -84,7 +84,8 @@ export const StakeRewardButtonAndReceipt = ({
   );
 
   useEffect(() => {
-    const balance = gasDenom === SelectedGasDenom.NATIVE ? nativeTokenBalance : usdcBalance;
+    const balance =
+      gasDenom === SelectedGasDenom.NATIVE ? nativeTokenBalance.toNumber() : usdcBalance;
     const token = gasDenom === SelectedGasDenom.NATIVE ? chainTokenLabel : usdcLabel;
 
     if (MustBigNumber(balance).lt(gasFee ?? 0)) {
