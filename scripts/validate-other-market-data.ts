@@ -692,7 +692,7 @@ function validateParamsSchema(proposal: Proposal): void {
             exchangeName: { type: 'string' },
             ticker: { type: 'string' },
             adjustByMarket: { type: 'string', nullable: true },
-            Invert: {type: 'boolean', nullable: true },
+            invert: {type: 'boolean', nullable: true },
           },
           required: ['exchangeName', 'ticker'],
           additionalProperties: false,
