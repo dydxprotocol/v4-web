@@ -230,10 +230,6 @@ const $Heading = styled.h3`
   z-index: 1;
 `;
 
-const $AlertMessage = styled(AlertMessage)`
-  width: 100%;
-`;
-
 const $StakeRewardButtonAndReceipt = styled(StakeRewardButtonAndReceipt)`
   z-index: 1;
 `;
