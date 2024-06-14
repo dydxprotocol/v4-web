@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js';
 import { DateTime } from 'luxon';
 import styled, { css } from 'styled-components';
 
+import { SupportedLocales } from '@/constants/localization';
 import {
   LEVERAGE_DECIMALS,
   PERCENT_DECIMALS,
@@ -32,6 +33,194 @@ import { getStringsForDateTimeDiff, getTimestamp } from '@/lib/timeUtils';
 
 import { LoadingOutput } from './Loading/LoadingOutput';
 import { NumberValue } from './NumberValue';
+
+// see useFormattedDateOutput for how to get selectedLocale in app
+function formatDateOutput(
+  value: string | number | null | undefined,
+  type: OutputType.Date | OutputType.DateTime | OutputType.Time,
+  selectedLocale: SupportedLocales,
+  {
+    timeOptions,
+  }: {
+    timeOptions?: {
+      useUTC?: boolean;
+    };
+  }
+) {
+  if (value == null || (typeof value !== 'string' && typeof value !== 'number')) return null;
+  const date = new Date(value);
+  const dateString = {
+    [OutputType.Date]: date.toLocaleString(selectedLocale, {
+      dateStyle: 'medium',
+      timeZone: timeOptions?.useUTC ? 'UTC' : undefined,
+    }),
+    [OutputType.DateTime]: date.toLocaleString(selectedLocale, {
+      dateStyle: 'short',
+      timeStyle: 'short',
+      timeZone: timeOptions?.useUTC ? 'UTC' : undefined,
+    }),
+    [OutputType.Time]: date.toLocaleString(selectedLocale, {
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      timeZone: timeOptions?.useUTC ? 'UTC' : undefined,
+    }),
+  }[type];
+  return dateString;
+}
+
+type RemoveArgsFromTupleForFormatDate<T> = T extends [...infer begin, unknown, infer options]
+  ? [...begin, options]
+  : never;
+
+type FormatDateHookArgs = RemoveArgsFromTupleForFormatDate<Parameters<typeof formatDateOutput>>;
+
+function useFormattedDateOutput(...args: FormatDateHookArgs) {
+  const selectedLocale = useAppSelector(getSelectedLocale);
+  return formatDateOutput(args[0], args[1], selectedLocale, args[2]);
+}
+
+function formatNumberOutput(
+  value: BigNumberish | null | undefined,
+  type:
+    | OutputType.CompactNumber
+    | OutputType.Number
+    | OutputType.Fiat
+    | OutputType.SmallFiat
+    | OutputType.CompactFiat
+    | OutputType.Asset
+    | OutputType.Percent
+    | OutputType.SmallPercent
+    | OutputType.Multiple,
+  decimalSeparator: string | undefined,
+  groupSeparator: string | undefined,
+  {
+    useGrouping = true,
+    roundingMode = BigNumber.ROUND_HALF_UP,
+    fractionDigits,
+    locale = navigator.language || 'en-US',
+    showSign = ShowSign.Negative,
+  }: {
+    fractionDigits?: number | null;
+    roundingMode?: BigNumber.RoundingMode;
+    useGrouping?: boolean;
+    locale?: string;
+    showSign?: ShowSign;
+  }
+) {
+  const valueBN = MustBigNumber(value).abs();
+  const isNegative = MustBigNumber(value).isNegative();
+  const isPositive = MustBigNumber(value).isPositive() && !MustBigNumber(value).isZero();
+
+  const sign: string | undefined = {
+    [ShowSign.Both]: isNegative ? UNICODE.MINUS : isPositive ? UNICODE.PLUS : undefined,
+    [ShowSign.Negative]: isNegative ? UNICODE.MINUS : undefined,
+    [ShowSign.None]: undefined,
+  }[showSign];
+
+  const format = {
+    decimalSeparator,
+    ...(useGrouping
+      ? {
+          groupSeparator,
+          groupSize: 3,
+          secondaryGroupSize: 0,
+          fractionGroupSeparator: ' ',
+          fractionGroupSize: 0,
+        }
+      : {}),
+  };
+
+  const numberRenderers = {
+    [OutputType.CompactNumber]: () => {
+      if (!isNumber(value)) {
+        throw new Error('value must be a number for compact number output');
+      }
+
+      return Intl.NumberFormat(locale, {
+        style: 'decimal',
+        notation: 'compact',
+        maximumSignificantDigits: 3,
+      })
+        .format(Math.abs(value))
+        .toLowerCase();
+    },
+    [OutputType.Number]: () =>
+      valueBN.toFormat(fractionDigits ?? 0, roundingMode, {
+        ...format,
+      }),
+    [OutputType.Fiat]: () =>
+      valueBN.toFormat(fractionDigits ?? USD_DECIMALS, roundingMode, {
+        ...format,
+        prefix: '$',
+      }),
+    [OutputType.SmallFiat]: () =>
+      valueBN.toFormat(fractionDigits ?? SMALL_USD_DECIMALS, roundingMode, {
+        ...format,
+        prefix: '$',
+      }),
+    [OutputType.CompactFiat]: () => {
+      if (!isNumber(value)) {
+        throw new Error('value must be a number for compact fiat output');
+      }
+
+      return Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency: 'USD',
+        notation: 'compact',
+        maximumSignificantDigits: 3,
+      })
+        .format(Math.abs(value))
+        .toLowerCase();
+    },
+    [OutputType.Asset]: () =>
+      valueBN.toFormat(fractionDigits ?? TOKEN_DECIMALS, roundingMode, {
+        ...format,
+      }),
+    [OutputType.Percent]: () =>
+      valueBN.times(100).toFormat(fractionDigits ?? PERCENT_DECIMALS, roundingMode, {
+        ...format,
+        suffix: '%',
+      }),
+    [OutputType.SmallPercent]: () =>
+      valueBN.times(100).toFormat(fractionDigits ?? SMALL_PERCENT_DECIMALS, roundingMode, {
+        ...format,
+        suffix: '%',
+      }),
+    [OutputType.Multiple]: () =>
+      valueBN.toFormat(fractionDigits ?? LEVERAGE_DECIMALS, roundingMode, {
+        ...format,
+        suffix: '×',
+      }),
+  };
+  return `${sign ?? ''}${numberRenderers[type]}`;
+}
+
+type RemoveArgsFromTupleForFormatNumber<T> = T extends [
+  ...infer begin,
+  unknown,
+  unknown,
+  infer options,
+]
+  ? [...begin, options]
+  : never;
+
+type FormatNumberHookArgs = RemoveArgsFromTupleForFormatNumber<
+  Parameters<typeof formatNumberOutput>
+>;
+
+function useFormattedNumberOutput(...args: FormatNumberHookArgs) {
+  const { decimal: LOCALE_DECIMAL_SEPARATOR, group: LOCALE_GROUP_SEPARATOR } =
+    useLocaleSeparators();
+  return formatNumberOutput(
+    args[0],
+    args[1],
+    LOCALE_DECIMAL_SEPARATOR,
+    LOCALE_GROUP_SEPARATOR,
+    args[2]
+  );
+}
 
 export enum OutputType {
   Text = 'Text',
@@ -179,26 +368,8 @@ export const Output = ({
     case OutputType.Date:
     case OutputType.Time:
     case OutputType.DateTime: {
-      if ((typeof value !== 'string' && typeof value !== 'number') || !value) return null;
-      const date = new Date(value);
-      const dateString = {
-        [OutputType.Date]: date.toLocaleString(selectedLocale, {
-          dateStyle: 'medium',
-          timeZone: timeOptions?.useUTC ? 'UTC' : undefined,
-        }),
-        [OutputType.DateTime]: date.toLocaleString(selectedLocale, {
-          dateStyle: 'short',
-          timeStyle: 'short',
-          timeZone: timeOptions?.useUTC ? 'UTC' : undefined,
-        }),
-        [OutputType.Time]: date.toLocaleString(selectedLocale, {
-          hour12: false,
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-          timeZone: timeOptions?.useUTC ? 'UTC' : undefined,
-        }),
-      }[type];
+      if (value == null || (typeof value !== 'string' && typeof value !== 'number')) return null;
+      const dateString = formatDateOutput(value, type, selectedLocale, { timeOptions });
 
       return (
         <$Text key={value} title={`${value ?? ''}${tag ? ` ${tag}` : ''}`} className={className}>
@@ -216,7 +387,6 @@ export const Output = ({
     case OutputType.SmallPercent:
     case OutputType.Multiple: {
       const hasValue = value !== null && value !== undefined;
-      const valueBN = MustBigNumber(value).abs();
       const isNegative = MustBigNumber(value).isNegative();
       const isPositive = MustBigNumber(value).isPositive() && !MustBigNumber(value).isZero();
 
@@ -226,121 +396,18 @@ export const Output = ({
         [ShowSign.None]: undefined,
       }[showSign];
 
-      const format = {
-        decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
-        ...(useGrouping
-          ? {
-              groupSeparator: LOCALE_GROUP_SEPARATOR,
-              groupSize: 3,
-              secondaryGroupSize: 0,
-              fractionGroupSeparator: ' ',
-              fractionGroupSize: 0,
-            }
-          : {}),
-      };
-
-      const numberRenderers = {
-        [OutputType.CompactNumber]: () => {
-          if (!isNumber(value)) {
-            throw new Error('value must be a number for compact number output');
-          }
-
-          return (
-            <NumberValue
-              value={Intl.NumberFormat(locale, {
-                style: 'decimal',
-                notation: 'compact',
-                maximumSignificantDigits: 3,
-              })
-                .format(Math.abs(value))
-                .toLowerCase()}
-              withSubscript={withSubscript}
-            />
-          );
-        },
-        [OutputType.Number]: () => (
-          <NumberValue
-            value={valueBN.toFormat(fractionDigits ?? 0, roundingMode, {
-              ...format,
-            })}
-            withSubscript={withSubscript}
-          />
-        ),
-        [OutputType.Fiat]: () => (
-          <NumberValue
-            value={valueBN.toFormat(fractionDigits ?? USD_DECIMALS, roundingMode, {
-              ...format,
-              prefix: '$',
-            })}
-            withSubscript={withSubscript}
-          />
-        ),
-        [OutputType.SmallFiat]: () => (
-          <NumberValue
-            value={valueBN.toFormat(fractionDigits ?? SMALL_USD_DECIMALS, roundingMode, {
-              ...format,
-              prefix: '$',
-            })}
-            withSubscript={withSubscript}
-          />
-        ),
-        [OutputType.CompactFiat]: () => {
-          if (!isNumber(value)) {
-            throw new Error('value must be a number for compact fiat output');
-          }
-
-          return (
-            <NumberValue
-              value={Intl.NumberFormat(locale, {
-                style: 'currency',
-                currency: 'USD',
-                notation: 'compact',
-                maximumSignificantDigits: 3,
-              })
-                .format(Math.abs(value))
-                .toLowerCase()}
-              withSubscript={withSubscript}
-            />
-          );
-        },
-        [OutputType.Asset]: () => (
-          <NumberValue
-            value={valueBN.toFormat(fractionDigits ?? TOKEN_DECIMALS, roundingMode, {
-              ...format,
-            })}
-            withSubscript={withSubscript}
-          />
-        ),
-        [OutputType.Percent]: () => (
-          <NumberValue
-            value={valueBN.times(100).toFormat(fractionDigits ?? PERCENT_DECIMALS, roundingMode, {
-              ...format,
-              suffix: '%',
-            })}
-            withSubscript={withSubscript}
-          />
-        ),
-        [OutputType.SmallPercent]: () => (
-          <NumberValue
-            value={valueBN
-              .times(100)
-              .toFormat(fractionDigits ?? SMALL_PERCENT_DECIMALS, roundingMode, {
-                ...format,
-                suffix: '%',
-              })}
-            withSubscript={withSubscript}
-          />
-        ),
-        [OutputType.Multiple]: () => (
-          <NumberValue
-            value={valueBN.toFormat(fractionDigits ?? LEVERAGE_DECIMALS, roundingMode, {
-              ...format,
-              suffix: '×',
-            })}
-            withSubscript={withSubscript}
-          />
-        ),
-      };
+      const renderedNumber = (
+        <NumberValue
+          value={formatNumberOutput(value, type, LOCALE_DECIMAL_SEPARATOR, LOCALE_GROUP_SEPARATOR, {
+            useGrouping,
+            fractionDigits,
+            locale,
+            roundingMode,
+            showSign: ShowSign.None,
+          })}
+          withSubscript={withSubscript}
+        />
+      );
       return (
         <$Number
           key={value?.toString()}
@@ -358,7 +425,7 @@ export const Output = ({
         >
           {slotLeft}
           {sign && <$Sign>{sign}</$Sign>}
-          {hasValue && numberRenderers[type]()}
+          {hasValue && renderedNumber}
           {slotRight}
           {tag && <$Tag>{tag}</$Tag>}
         </$Number>
