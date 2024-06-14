@@ -509,7 +509,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
 
   // Wait for prices to update.
   console.log('\nWaiting for 300 seconds for prices to update...');
-  await sleep(300 * 1000);
+  await sleep(400 * 1000);
 
   // Check markets on chain.
   console.log('\nChecking price, clob pair, and perpetual on chain for each market proposed...');
