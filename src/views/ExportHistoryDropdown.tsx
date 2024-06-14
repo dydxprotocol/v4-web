@@ -183,19 +183,19 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
   }, [transfers, stringGetter]);
 
   const exportData = useCallback(() => {
-    if (checkedTrades) {
+    if (checkedTrades && trades.length > 0) {
       exportTrades();
     }
 
-    if (checkedTransfers) {
+    if (checkedTransfers && transfers.length > 0) {
       exportTransfers();
     }
 
     track(AnalyticsEvent.ExportDownloadClick, {
-      trades: checkedTrades,
-      transfers: checkedTransfers,
+      trades: checkedTrades && trades.length > 0,
+      transfers: checkedTransfers && transfers.length > 0,
     });
-  }, [checkedTrades, checkedTransfers, exportTrades, exportTransfers]);
+  }, [checkedTrades, checkedTransfers, trades, transfers, exportTrades, exportTransfers]);
 
   return (
     <DropdownMenu
