@@ -35,8 +35,6 @@ export const Tag = styled.span<StyleProps>`
   letter-spacing: 0.04em;
   line-height: 1.3;
 
-  user-select: none;
-
   ${({ type, size }) =>
     ({
       [TagSize.Small]: css`
