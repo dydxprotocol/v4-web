@@ -116,13 +116,22 @@ export const StakeRewardButtonAndReceipt = ({
     alert,
   ]);
 
+  const shouldDisplayErrorAsWarning = useCallback(
+    () =>
+      errorToDisplay &&
+      (errorToDisplay.type === AlertType.Error || errorToDisplay.type === AlertType.Warning),
+    [errorToDisplay]
+  );
+
   return (
     <>
       {errorToDisplay && (
         <$AlertMessage type={errorToDisplay.type}> {errorToDisplay.message} </$AlertMessage>
       )}
       <$WithDetailsReceipt detailItems={detailItems} isForm={isForm} className={className}>
-        <WithTooltip tooltipString={errorToDisplay ? errorToDisplay.message : undefined}>
+        <WithTooltip
+          tooltipString={shouldDisplayErrorAsWarning() ? errorToDisplay?.message : undefined}
+        >
           {!canAccountTrade ? (
             <$OnboardingTriggerButton />
           ) : (
@@ -132,8 +141,7 @@ export const StakeRewardButtonAndReceipt = ({
                 type={isForm ? ButtonType.Submit : ButtonType.Button}
                 onClick={onClick}
                 slotLeft={
-                  errorToDisplay?.type === AlertType.Error ||
-                  errorToDisplay?.type === AlertType.Warning ? (
+                  shouldDisplayErrorAsWarning() ? (
                     <$WarningIcon iconName={IconName.Warning} />
                   ) : undefined
                 }

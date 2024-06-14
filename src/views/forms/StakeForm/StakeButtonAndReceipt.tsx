@@ -12,7 +12,6 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
-import { Icon, IconName } from '@/components/Icon';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
 import { ValidatorName } from '@/components/ValidatorName';
@@ -29,16 +28,9 @@ type ElementProps = {
   amount?: number;
   isDisabled?: boolean;
   isLoading?: boolean;
-  error?: string;
 };
 
-export const StakeButtonAndReceipt = ({
-  fee,
-  amount,
-  isDisabled,
-  isLoading,
-  error,
-}: ElementProps) => {
+export const StakeButtonAndReceipt = ({ fee, amount, isDisabled, isLoading }: ElementProps) => {
   const stringGetter = useStringGetter();
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
   const { chainTokenLabel } = useTokenConfigs();
@@ -94,7 +86,6 @@ export const StakeButtonAndReceipt = ({
           action={ButtonAction.Primary}
           type={ButtonType.Submit}
           state={{ isLoading, isDisabled }}
-          slotLeft={error ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
         >
           {stringGetter({ key: STRING_KEYS.STAKE })}
         </Button>
@@ -108,8 +99,4 @@ const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   dl {
     padding: var(--form-input-paddingY) var(--form-input-paddingX);
   }
-`;
-
-const $WarningIcon = styled(Icon)`
-  color: var(--color-warning);
 `;

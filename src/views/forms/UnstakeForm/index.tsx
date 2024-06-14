@@ -79,13 +79,20 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
   const isAmountValid = isEachAmountValid && isTotalAmountValid;
 
   useEffect(() => {
-    setError({
-      key: STRING_KEYS.UNSTAKING_PERIOD_DESCRIPTION,
-      type: AlertType.Info,
-      message: stringGetter({ key: STRING_KEYS.UNSTAKING_PERIOD_DESCRIPTION }),
-      slotButton: undefined,
-    });
-  }, [stringGetter]);
+    if (Object.keys(amounts).length > 0 && !isAmountValid) {
+      setError({
+        key: STRING_KEYS.ISOLATED_MARGIN_ADJUSTMENT_INVALID_AMOUNT,
+        type: AlertType.Error,
+        message: stringGetter({ key: STRING_KEYS.ISOLATED_MARGIN_ADJUSTMENT_INVALID_AMOUNT }),
+      });
+    } else {
+      setError({
+        key: STRING_KEYS.UNSTAKING_PERIOD_DESCRIPTION,
+        type: AlertType.Info,
+        message: stringGetter({ key: STRING_KEYS.UNSTAKING_PERIOD_DESCRIPTION }),
+      });
+    }
+  }, [stringGetter, amounts, isAmountValid]);
 
   useEffect(() => {
     if (isAmountValid) {
@@ -279,19 +286,10 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
         </$GridLayout>
       )}
 
-      {/* <AlertMessage type={AlertType.Warning}>
-        {stringGetter({
-          key: STRING_KEYS.UNSTAKING_PERIOD_DESCRIPTION,
-        })}
-      </AlertMessage>
- */}
-      {/* {error && <AlertMessage type={AlertType.Error}>{error}</AlertMessage>} */}
-
       <$Footer>
         <UnstakeButtonAndReceipt
           error={error}
           fee={fee ?? undefined}
-          // isDisabled={!isAmountValid || !fee || isLoading}
           isLoading={isLoading || Boolean(isAmountValid && !fee)}
           amount={totalAmount}
         />

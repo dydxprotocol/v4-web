@@ -190,7 +190,6 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
           isDisabled={!isAmountValid || !fee || isLoading}
           isLoading={isLoading || Boolean(isAmountValid && !fee)}
           amount={amount}
-          error={error}
         />
       </$Footer>
     </$Form>
