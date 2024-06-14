@@ -244,30 +244,30 @@ export type AnalyticsEventData<T extends AnalyticsEvent> =
                                               type: string;
                                               id: string;
                                             }
-                                          : T extends AnalyticsEvent.TransferNotification
+                                          : T extends AnalyticsEvent.ExportDownloadClick
                                             ? {
-                                                type: TransferNotificationTypes | undefined;
-                                                toAmount: number | undefined;
-                                                timeSpent:
-                                                  | Record<string, number>
-                                                  | number
-                                                  | undefined;
-                                                txHash: string;
-                                                status: 'new' | 'success' | 'error';
-                                                triggeredAt: number | undefined;
+                                                trades: boolean;
+                                                transfers: boolean;
                                               }
-                                            : T extends AnalyticsEvent.ExportDownloadClick
+                                            : T extends AnalyticsEvent.ExportTradesCheckboxClick
                                               ? {
-                                                  trades: boolean;
-                                                  transfers: boolean;
+                                                  value: boolean;
                                                 }
-                                              : T extends AnalyticsEvent.ExportTradesCheckboxClick
+                                              : T extends AnalyticsEvent.ExportTransfersCheckboxClick
                                                 ? {
                                                     value: boolean;
                                                   }
-                                                : T extends AnalyticsEvent.ExportTransfersCheckboxClick
+                                                : T extends AnalyticsEvent.TransferNotification
                                                   ? {
-                                                      value: boolean;
+                                                      type: TransferNotificationTypes | undefined;
+                                                      toAmount: number | undefined;
+                                                      timeSpent:
+                                                        | Record<string, number>
+                                                        | number
+                                                        | undefined;
+                                                      txHash: string;
+                                                      status: 'new' | 'success' | 'error';
+                                                      triggeredAt: number | undefined;
                                                     }
                                                   : never;
 
