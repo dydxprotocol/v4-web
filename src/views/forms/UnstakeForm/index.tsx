@@ -18,13 +18,12 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { formMixins } from '@/styles/formMixins';
 import { layoutMixins } from '@/styles/layoutMixins';
 
-import { AlertMessage } from '@/components/AlertMessage';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { Icon, IconName } from '@/components/Icon';
 import { InputType } from '@/components/Input';
 import { OutputType } from '@/components/Output';
-import { ButtonError } from '@/components/StakeRewardButtonAndReceipt';
+import { StakeButtonAlert } from '@/components/StakeRewardButtonAndReceipt';
 import { Tag } from '@/components/Tag';
 import { ToggleButton } from '@/components/ToggleButton';
 import { ValidatorName } from '@/components/ValidatorName';
@@ -47,7 +46,7 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
   const { chainTokenLabel, chainTokenDecimals } = useTokenConfigs();
 
   // Form states
-  const [error, setError] = useState<ButtonError>();
+  const [error, setError] = useState<StakeButtonAlert>();
   const [fee, setFee] = useState<BigNumberish>();
   const [amounts, setAmounts] = useState<Record<string, number | undefined>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -80,6 +79,15 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
   const isAmountValid = isEachAmountValid && isTotalAmountValid;
 
   useEffect(() => {
+    setError({
+      key: STRING_KEYS.UNSTAKING_PERIOD_DESCRIPTION,
+      type: AlertType.Info,
+      message: stringGetter({ key: STRING_KEYS.UNSTAKING_PERIOD_DESCRIPTION }),
+      slotButton: undefined,
+    });
+  }, [stringGetter]);
+
+  useEffect(() => {
     if (isAmountValid) {
       getUndelegateFee(amounts)
         .then((stdFee) => {
@@ -107,7 +115,12 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
       onDone?.();
     } catch (err) {
       log('UnstakeForm/onUnstake', err);
-      setError({ key: err.message, type: AlertType.Error, message: err.message });
+      setError({
+        key: err.message,
+        type: AlertType.Error,
+        message: err.message,
+        slotButton: undefined,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -266,13 +279,13 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
         </$GridLayout>
       )}
 
-      <AlertMessage type={AlertType.Warning}>
+      {/* <AlertMessage type={AlertType.Warning}>
         {stringGetter({
           key: STRING_KEYS.UNSTAKING_PERIOD_DESCRIPTION,
         })}
       </AlertMessage>
-
-      {error && <AlertMessage type={AlertType.Error}>{error}</AlertMessage>}
+ */}
+      {/* {error && <AlertMessage type={AlertType.Error}>{error}</AlertMessage>} */}
 
       <$Footer>
         <UnstakeButtonAndReceipt
@@ -307,6 +320,9 @@ const $GridLayout = styled.div<{ showMigratePanel?: boolean }>`
 const $Footer = styled.footer`
   ${formMixins.footer}
   --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
+
+  display: grid;
+  gap: var(--form-input-gap);
 `;
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);

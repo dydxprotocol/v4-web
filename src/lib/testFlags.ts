@@ -37,8 +37,7 @@ class TestFlags {
   }
 
   get enableStaking() {
-    return true;
-    // return !!this.queryParams.staking;
+    return !!this.queryParams.staking;
   }
 
   get referrer() {

@@ -1,5 +1,4 @@
 import { SelectedGasDenom } from '@dydxprotocol/v4-client-js/src/clients/constants';
-import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
@@ -12,15 +11,14 @@ import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
 import {
   StakeRewardButtonAndReceipt,
-  type ButtonError,
+  type StakeButtonAlert,
 } from '@/components/StakeRewardButtonAndReceipt';
 import { Tag } from '@/components/Tag';
-import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 
 type ElementProps = {
-  error: ButtonError;
+  error?: StakeButtonAlert;
   fee?: BigNumberish;
   amount?: number;
   isLoading: boolean;
@@ -76,7 +74,7 @@ export const UnstakeButtonAndReceipt = ({ error, fee, amount, isLoading }: Eleme
   return (
     <StakeRewardButtonAndReceipt
       detailItems={transferDetailItems}
-      error={error}
+      alert={error}
       buttonText={stringGetter({ key: STRING_KEYS.UNSTAKE })}
       gasFee={fee}
       gasDenom={SelectedGasDenom.NATIVE}
@@ -85,10 +83,3 @@ export const UnstakeButtonAndReceipt = ({ error, fee, amount, isLoading }: Eleme
     />
   );
 };
-const $WithDetailsReceipt = styled(WithDetailsReceipt)`
-  --withReceipt-backgroundColor: var(--color-layer-2);
-
-  dl {
-    padding: var(--form-input-paddingY) var(--form-input-paddingX);
-  }
-`;

@@ -2,13 +2,14 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { SelectedGasDenom } from '@dydxprotocol/v4-client-js';
 import { shallowEqual, useDispatch } from 'react-redux';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { AlertType } from '@/constants/alerts';
 import { ButtonAction, ButtonType } from '@/constants/buttons';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -27,19 +28,27 @@ import { Icon, IconName } from './Icon';
 import { WithDetailsReceipt } from './WithDetailsReceipt';
 import { WithTooltip } from './WithTooltip';
 
-export type ButtonError = {
-  key: string;
-  type: AlertType.Warning | AlertType.Error;
-  message: string;
+type StakeButtonWarning = {
+  type: AlertType.Warning | AlertType.Info;
   slotButton?: React.ReactNode;
 };
+
+type StakeButtonError = {
+  type: AlertType.Error;
+  slotButton?: undefined;
+};
+
+export type StakeButtonAlert = {
+  key: string;
+  message: string;
+} & (StakeButtonWarning | StakeButtonError);
 
 type FormProps = { isForm: true; onClick?: undefined };
 type DialogProps = { isForm: false; onClick: () => void };
 
 type ElementProps = {
   detailItems: DetailsItem[];
-  error?: ButtonError;
+  alert?: StakeButtonAlert;
   buttonText: React.ReactNode;
   gasFee?: BigNumberish;
   gasDenom: SelectedGasDenom;
@@ -52,7 +61,7 @@ type StyleProps = {
 
 export const StakeRewardButtonAndReceipt = ({
   detailItems,
-  error,
+  alert,
   buttonText,
   gasFee,
   gasDenom,
@@ -65,11 +74,9 @@ export const StakeRewardButtonAndReceipt = ({
   const stringGetter = useStringGetter();
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
-  //   const { usdcBalance, nativeTokenBalance } = useAccountBalance();
-  const usdcBalance = 0;
-  const nativeTokenBalance = 0;
+  const { usdcBalance, nativeTokenBalance } = useAccountBalance();
   const { usdcLabel, chainTokenLabel } = useTokenConfigs();
-  const [errorToDisplay, setErrorToDisplay] = useState(error);
+  const [errorToDisplay, setErrorToDisplay] = useState(alert);
 
   const depositFunds = useCallback(
     () => dispatch(forceOpenDialog({ type: DialogTypes.Deposit })),
@@ -94,6 +101,8 @@ export const StakeRewardButtonAndReceipt = ({
           </$Button>
         ),
       });
+    } else {
+      setErrorToDisplay(alert);
     }
   }, [
     stringGetter,
@@ -104,27 +113,33 @@ export const StakeRewardButtonAndReceipt = ({
     nativeTokenBalance,
     usdcLabel,
     usdcBalance,
+    alert,
   ]);
 
   return (
     <>
       {errorToDisplay && (
-        <AlertMessage type={errorToDisplay.type}> {errorToDisplay.message} </AlertMessage>
+        <$AlertMessage type={errorToDisplay.type}> {errorToDisplay.message} </$AlertMessage>
       )}
-      <$WithDetailsReceipt detailItems={detailItems} className={className}>
+      <$WithDetailsReceipt detailItems={detailItems} isForm={isForm} className={className}>
         <WithTooltip tooltipString={errorToDisplay ? errorToDisplay.message : undefined}>
           {!canAccountTrade ? (
-            <OnboardingTriggerButton />
+            <$OnboardingTriggerButton />
           ) : (
             errorToDisplay?.slotButton ?? (
               <$Button
                 action={ButtonAction.Primary}
                 type={isForm ? ButtonType.Submit : ButtonType.Button}
                 onClick={onClick}
-                slotLeft={errorToDisplay ? <$WarningIcon iconName={IconName.Warning} /> : undefined}
+                slotLeft={
+                  errorToDisplay?.type === AlertType.Error ||
+                  errorToDisplay?.type === AlertType.Warning ? (
+                    <$WarningIcon iconName={IconName.Warning} />
+                  ) : undefined
+                }
                 state={{
                   isLoading,
-                  isDisabled: errorToDisplay !== undefined || gasFee === undefined,
+                  isDisabled: errorToDisplay?.type === AlertType.Error || gasFee === undefined,
                 }}
               >
                 {buttonText}
@@ -137,8 +152,24 @@ export const StakeRewardButtonAndReceipt = ({
   );
 };
 
-const $WithDetailsReceipt = styled(WithDetailsReceipt)`
+const $AlertMessage = styled(AlertMessage)`
+  width: 100%;
+`;
+
+const $WithDetailsReceipt = styled(WithDetailsReceipt)<{ isForm: boolean }>`
   --withReceipt-backgroundColor: var(--color-layer-2);
+  width: 100%;
+
+  ${({ isForm }) =>
+    isForm &&
+    css`
+      dl {
+        padding: var(--form-input-paddingY) var(--form-input-paddingX);
+      }
+    `}
+`;
+
+const $OnboardingTriggerButton = styled(OnboardingTriggerButton)`
   width: 100%;
 `;
 

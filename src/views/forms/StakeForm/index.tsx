@@ -4,7 +4,6 @@ import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
-import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
 import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
@@ -64,11 +63,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
         .then((stdFee) => {
           if (stdFee.amount.length > 0) {
             const feeAmount = stdFee.amount[0].amount;
-            setFee(
-              MustBigNumber(AMOUNT_RESERVED_FOR_GAS_USDC).plus(
-                MustBigNumber(formatUnits(BigInt(feeAmount), chainTokenDecimals))
-              )
-            );
+            setFee(MustBigNumber(formatUnits(BigInt(feeAmount), chainTokenDecimals)));
           }
         })
         .catch((err) => {

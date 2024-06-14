@@ -5,7 +5,6 @@ import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 import { formatUnits } from 'viem';
 
-import { AMOUNT_RESERVED_FOR_GAS_DYDX } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign, SMALL_USD_DECIMALS } from '@/constants/numbers';
@@ -16,13 +15,12 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { AlertMessage } from '@/components/AlertMessage';
 import { AssetIcon } from '@/components/AssetIcon';
-import { Button } from '@/components/Button';
 import { Dialog } from '@/components/Dialog';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType, ShowSign } from '@/components/Output';
 import {
   StakeRewardButtonAndReceipt,
-  type ButtonError,
+  type StakeButtonAlert,
 } from '@/components/StakeRewardButtonAndReceipt';
 import { Tag } from '@/components/Tag';
 
@@ -48,38 +46,16 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
   const chartDotsBackground = useAppSelector(getChartDotBackground);
   const { current: equity } = useAppSelector(getSubaccountEquity, shallowEqual) ?? {};
 
-  const [error, setError] = useState<ButtonError>();
+  const [error, setError] = useState<StakeButtonAlert>();
   const [fee, setFee] = useState<BigNumberish>();
   const [isLoading, setIsLoading] = useState(false);
-
-  const claimRewards = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(undefined);
-      await withdrawReward(validators);
-      setIsOpen(false);
-    } catch (err) {
-      log('StakeRewardDialog/withdrawReward', err);
-      setError({
-        key: err.msg,
-        type: AlertType.Error,
-        message: err.msg,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [validators, withdrawReward, setIsOpen]);
 
   useEffect(() => {
     getWithdrawRewardFee(validators)
       .then((stdFee) => {
         if (stdFee.amount.length > 0) {
           const feeAmount = stdFee.amount[0].amount;
-          setFee(
-            MustBigNumber(AMOUNT_RESERVED_FOR_GAS_DYDX).plus(
-              MustBigNumber(formatUnits(BigInt(feeAmount), usdcDecimals))
-            )
-          );
+          setFee(MustBigNumber(formatUnits(BigInt(feeAmount), usdcDecimals)));
         } else {
           setFee(undefined);
         }
@@ -89,26 +65,6 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
         setFee(undefined);
       });
   }, [getWithdrawRewardFee, usdcDecimals, validators]);
-
-  // useEffect(() => {
-  //   if (MustBigNumber(usdcBalance).lt(fee ?? 0)) {
-  //     addError({
-  //       key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS,
-  //       type: AlertType.Warning,
-  //       message: stringGetter({
-  //         key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS,
-  //         params: { TOKEN: usdcLabel, BALANCE: usdcBalance },
-  //       }),
-  //       slotButton: (
-  //         <$Button action={ButtonAction.Primary} onClick={depositFunds}>
-  //           {stringGetter({ key: STRING_KEYS.DEPOSIT_FUNDS })}
-  //         </$Button>
-  //       ),
-  //     });
-  //   } else {
-  //     removeError(STRING_KEYS.TRANSFER_INSUFFICIENT_GAS);
-  //   }
-  // }, [stringGetter, addError, removeError, depositFunds, fee, usdcLabel, usdcBalance]);
 
   useEffect(() => {
     if (fee && MustBigNumber(fee).gt(MustBigNumber(usdcRewards))) {
@@ -152,6 +108,24 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
     ];
   }, [equity, usdcLabel, usdcRewards, fee, stringGetter]);
 
+  const claimRewards = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(undefined);
+      await withdrawReward(validators);
+      setIsOpen(false);
+    } catch (err) {
+      log('StakeRewardDialog/withdrawReward', err);
+      setError({
+        key: err.msg,
+        type: AlertType.Error,
+        message: err.msg,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [validators, withdrawReward, setIsOpen]);
+
   return (
     <$Dialog isOpen setIsOpen={setIsOpen} hasHeaderBlur={false}>
       <$Container backgroundImagePath={chartDotsBackground}>
@@ -169,11 +143,9 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
         </$AssetContainer>
         <$Heading>{stringGetter({ key: STRING_KEYS.YOU_EARNED })}</$Heading>
 
-        {error && <$AlertMessage type={error.type}> {error.message} </$AlertMessage>}
-
         <$StakeRewardButtonAndReceipt
           detailItems={detailItems}
-          error={error}
+          alert={error}
           buttonText={
             <span>
               {stringGetter({
@@ -264,10 +236,6 @@ const $AlertMessage = styled(AlertMessage)`
 
 const $StakeRewardButtonAndReceipt = styled(StakeRewardButtonAndReceipt)`
   z-index: 1;
-`;
-
-const $Button = styled(Button)`
-  width: 100%;
 `;
 
 const $AmountOutput = styled(Output)`
