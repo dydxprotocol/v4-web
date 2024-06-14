@@ -26,6 +26,7 @@ import { track } from '@/lib/analytics';
 import { exportCSV } from '@/lib/csv';
 import { MustBigNumber } from '@/lib/numbers';
 import { useAppSelector } from '@/state/appTypes';
+import { useMutation } from '@tanstack/react-query';
 
 interface ExportHistoryDropdownProps {
   className?: string;
@@ -182,13 +183,23 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
     }
   }, [dydxAddress, subaccountNumber, selectedLocale, stringGetter]);
 
-  const exportData = useCallback(() => {
+  const { mutate: mutateExportTrades, isPending: isPendingExportTrades } = useMutation({
+    mutationFn: exportTrades,
+  })
+
+  const { mutate: mutateExportTransfers, isPending: isPendingExportTransfers } = useMutation({
+    mutationFn: exportTransfers,
+  })
+
+  const exportData = useCallback((e: Event) => {
+    e.preventDefault();
+
     if (checkedTrades) {
-      exportTrades();
+      mutateExportTrades();
     }
 
     if (checkedTransfers) {
-      exportTransfers();
+      mutateExportTransfers();
     }
 
     track(AnalyticsEvent.ExportDownloadClick, {
@@ -241,6 +252,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
               state={{
                 isDisabled:
                   (!checkedTrades && !checkedTransfers),
+                isLoading: isPendingExportTrades || isPendingExportTransfers,
               }}
               action={ButtonAction.Primary}
               size={ButtonSize.XSmall}
