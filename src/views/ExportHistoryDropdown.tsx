@@ -19,6 +19,7 @@ import { OutputType, formatNumber } from '@/components/Output';
 import { getSubaccountFills, getSubaccountTransfers } from '@/state/accountSelectors';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { track } from '@/lib/analytics';
 import { exportCSV } from '@/lib/csv';
 import { MustBigNumber } from '@/lib/numbers';
@@ -34,6 +35,8 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
   const allFills = useSelector(getSubaccountFills, shallowEqual) ?? [];
   const [checkedTrades, setCheckedTrades] = useState(true);
   const [checkedTransfers, setCheckedTransfers] = useState(true);
+  const { decimal: LOCALE_DECIMAL_SEPARATOR, group: LOCALE_GROUP_SEPARATOR } =
+    useLocaleSeparators();
 
   const trades = useMemo(
     () =>
@@ -41,11 +44,15 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
         const { sign: feeSign, formattedString: feeString } = formatNumber({
           type: OutputType.Fiat,
           value: fill.fee,
+          decimal: LOCALE_DECIMAL_SEPARATOR,
+          group: LOCALE_GROUP_SEPARATOR,
         });
 
         const { sign: totalSign, formattedString: totalString } = formatNumber({
           type: OutputType.Fiat,
           value: MustBigNumber(fill.price).times(fill.size),
+          decimal: LOCALE_DECIMAL_SEPARATOR,
+          group: LOCALE_GROUP_SEPARATOR,
         });
 
         const sideKey = {
@@ -82,6 +89,8 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
         const { sign, formattedString } = formatNumber({
           type: OutputType.Fiat,
           value: transfer.amount,
+          decimal: LOCALE_DECIMAL_SEPARATOR,
+          group: LOCALE_GROUP_SEPARATOR,
         });
 
         return {

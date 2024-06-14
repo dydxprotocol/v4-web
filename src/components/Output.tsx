@@ -88,10 +88,27 @@ type FormatTimestampParams = {
 } & FormatParams;
 
 type ElementProps = {
+  type: OutputType;
+  value?: BigNumberish | null;
   isLoading?: boolean;
+  fractionDigits?: number | null;
+  showSign?: ShowSign;
+  slotLeft?: React.ReactNode;
   slotRight?: React.ReactNode;
+  useGrouping?: boolean;
+  roundingMode?: BigNumber.RoundingMode;
+  withSubscript?: boolean;
+  relativeTimeFormatOptions?: {
+    format: 'long' | 'short' | 'narrow' | 'singleCharacter';
+    resolution?: number;
+    stripRelativeWords?: boolean;
+  };
+  timeOptions?: {
+    useUTC?: boolean;
+  };
   tag?: React.ReactNode;
   withParentheses?: boolean;
+  locale?: string;
 };
 
 type StyleProps = {
@@ -178,8 +195,9 @@ export const formatTimestamp = (
     unitStringKey: undefined,
   };
 };
+export type FormatNumberProps = ElementProps & { decimal?: string; group?: string };
 
-export const formatNumber = (params: FormatNumberParams) => {
+export const formatNumber = (params: FormatNumberProps) => {
   const {
     value,
     showSign = ShowSign.Negative,
@@ -188,15 +206,25 @@ export const formatNumber = (params: FormatNumberParams) => {
     locale = navigator.language || 'en-US',
     fractionDigits,
     roundingMode = BigNumber.ROUND_HALF_UP,
-    localeDecimalSeparator,
-    localeGroupSeparator,
+    decimal: LOCALE_DECIMAL_SEPARATOR,
+    group: LOCALE_GROUP_SEPARATOR,
   } = params;
 
+  const valueBN = MustBigNumber(value).abs();
+  const isNegative = MustBigNumber(value).isNegative();
+  const isPositive = MustBigNumber(value).isPositive() && !MustBigNumber(value).isZero();
+
+  const sign: string | undefined = {
+    [ShowSign.Both]: isNegative ? UNICODE.MINUS : isPositive ? UNICODE.PLUS : undefined,
+    [ShowSign.Negative]: isNegative ? UNICODE.MINUS : undefined,
+    [ShowSign.None]: undefined,
+  }[showSign];
+
   const format = {
-    decimalSeparator: localeDecimalSeparator,
+    decimalSeparator: LOCALE_DECIMAL_SEPARATOR,
     ...(useGrouping
       ? {
-          groupSeparator: localeGroupSeparator,
+          groupSeparator: LOCALE_GROUP_SEPARATOR,
           groupSize: 3,
           secondaryGroupSize: 0,
           fractionGroupSeparator: ' ',
@@ -205,16 +233,6 @@ export const formatNumber = (params: FormatNumberParams) => {
       : {}),
   };
 
-  const isNegative = MustBigNumber(value).isNegative();
-  const isPositive = MustBigNumber(value).isPositive() && !MustBigNumber(value).isZero();
-
-  const sign = {
-    [ShowSign.Both]: isNegative ? UNICODE.MINUS : isPositive ? UNICODE.PLUS : undefined,
-    [ShowSign.Negative]: isNegative ? UNICODE.MINUS : undefined,
-    [ShowSign.None]: undefined,
-  }[showSign];
-
-  const valueBN = MustBigNumber(value).abs();
   let formattedString: string | undefined = undefined;
 
   switch (type) {
@@ -410,9 +428,19 @@ export const Output = (props: OutputProps) => {
     case OutputType.Multiple: {
       const hasValue = value !== null && value !== undefined;
       const { sign, formattedString } = formatNumber({
-        ...props,
-        localeDecimalSeparator: LOCALE_DECIMAL_SEPARATOR,
-        localeGroupSeparator: LOCALE_GROUP_SEPARATOR,
+        type,
+        value,
+        isLoading,
+        fractionDigits,
+        showSign,
+        useGrouping,
+        roundingMode,
+        relativeTimeFormatOptions,
+        timeOptions,
+        withParentheses,
+        locale,
+        decimal: LOCALE_DECIMAL_SEPARATOR,
+        group: LOCALE_GROUP_SEPARATOR,
       });
 
       const numberRenderers = {
