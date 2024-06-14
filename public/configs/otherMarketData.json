@@ -12512,7 +12512,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "POPCAT-SOL-4Vc6N76UBu26c3jJDKBAbvSD7zPLuQWStBk7QgVEoeoS-9-n6CwMY77wdEftf2VF6uPvbusYoraYUci3nYBPqH1DJ5-9-4ShRqC2n3PURN7EiqmB8X4WLR81pQPvGLTPjL9X8SNQp-FRhB8L7Y9Qq41qZXYLtC2nw8An1RJfLLxRF2x9RwLLMo",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
@@ -14360,7 +14360,7 @@
                     "exchangeName": "Raydium",
                     "ticker": "SLERF-SOL-9A2ZsPz5Zg6jKN4o4KRMjTVPmkH51wYWFLmt4KBRy1Rq-9-5Zumc1SYPmQ89nqwXqzogeuhdJ85iEMpSk35A4P87pmD-9-FT5Ptk37g5r6D9BKt3hne8ovHZ1g56oJBvuZRwn3zS3j-AgFnRLUScRD2E4nWQxW73hdbSN7eKEUb2jHX7tx9YTYc",
                     "adjustByMarket": "SOL-USD",
-                    "invert": true
+                    "invert": false
                 }
             ],
             "liquidityTier": 2,
