@@ -22,7 +22,7 @@ import type {
   HumanReadableTriggerOrdersPayload,
   ParsingError,
 } from '@/constants/abacus';
-import { AMOUNT_RESERVED_FOR_GAS_USDC } from '@/constants/account';
+import { AMOUNT_RESERVED_FOR_GAS_USDC, AMOUNT_USDC_BEFORE_REBALANCE } from '@/constants/account';
 import { STRING_KEYS } from '@/constants/localization';
 import { QUANTUM_MULTIPLIER } from '@/constants/numbers';
 import { TradeTypes } from '@/constants/trade';
@@ -240,7 +240,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         }
       },
     }),
-    [compositeClient]
+    [compositeClient, usdcDecimals]
   );
 
   const [subaccountNumber] = useState(0);
@@ -259,21 +259,29 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
   useEffect(() => {
     dispatch(setSubaccount(undefined));
     dispatch(setHistoricalPnl([]));
-  }, [dydxAddress]);
+  }, [dispatch, dydxAddress]);
 
   // ------ Deposit/Withdraw Methods ------ //
-  const depositFunds = useCallback(
+  const rebalanceWalletFunds = useCallback(
     async (balance: AccountBalance) => {
-      if (!localDydxWallet) return;
+      if (!subaccountClient) return;
+      const balanceAmount = parseFloat(balance.amount);
+      const shouldDeposit = balanceAmount - AMOUNT_RESERVED_FOR_GAS_USDC > 0;
+      const shouldWithdraw = balanceAmount - AMOUNT_USDC_BEFORE_REBALANCE <= 0;
 
-      const amount = parseFloat(balance.amount) - AMOUNT_RESERVED_FOR_GAS_USDC;
-
-      if (amount > 0) {
-        const newSubaccountClient = new SubaccountClient(localDydxWallet, 0);
-        await depositToSubaccount({ amount, subaccountClient: newSubaccountClient });
+      if (shouldDeposit) {
+        await depositToSubaccount({
+          amount: balanceAmount - AMOUNT_RESERVED_FOR_GAS_USDC,
+          subaccountClient,
+        });
+      } else if (shouldWithdraw) {
+        await withdrawFromSubaccount({
+          amount: AMOUNT_RESERVED_FOR_GAS_USDC - balanceAmount,
+          subaccountClient,
+        });
       }
     },
-    [localDydxWallet, depositToSubaccount]
+    [subaccountClient, depositToSubaccount, withdrawFromSubaccount]
   );
 
   const balances = useAppSelector(getBalances, shallowEqual);
@@ -281,9 +289,9 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
   useEffect(() => {
     if (usdcCoinBalance) {
-      depositFunds(usdcCoinBalance);
+      rebalanceWalletFunds(usdcCoinBalance);
     }
-  }, [usdcCoinBalance]);
+  }, [usdcCoinBalance, rebalanceWalletFunds]);
 
   const deposit = useCallback(
     async (amount: number) => {
@@ -318,7 +326,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         ? transferFromSubaccountToAddress({ subaccountClient, amount, recipient })
         : transferNativeToken({ subaccountClient, amount, recipient, memo }))) as IndexedTx;
     },
-    [subaccountClient, transferFromSubaccountToAddress, transferNativeToken]
+    [subaccountClient, transferFromSubaccountToAddress, transferNativeToken, usdcDenom]
   );
 
   const sendSquidWithdraw = useCallback(
@@ -374,7 +382,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       const subaccountTransferPayload = abacusStateManager.adjustIsolatedMarginOfPosition(callback);
       return subaccountTransferPayload;
     },
-    [subaccountClient]
+    []
   );
 
   // ------ Faucet Methods ------ //
@@ -444,7 +452,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
       return placeOrderParams;
     },
-    [subaccountClient]
+    [dispatch]
   );
 
   const closePosition = useCallback(
@@ -486,7 +494,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
       dispatch(cancelOrderSubmitted(orderId));
       abacusStateManager.cancelOrder(orderId, callback);
     },
-    [subaccountClient]
+    [dispatch]
   );
 
   // ------ Trigger Orders Methods ------ //
@@ -557,7 +565,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
       return triggerOrderParams;
     },
-    [subaccountClient]
+    [dispatch]
   );
 
   const { newMarketProposal } = useGovernanceVariables();
@@ -583,7 +591,7 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
 
       return response;
     },
-    [compositeClient, localDydxWallet]
+    [compositeClient, localDydxWallet, newMarketProposal]
   );
 
   // ------ Staking Methods ------ //
