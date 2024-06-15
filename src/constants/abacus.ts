@@ -274,6 +274,9 @@ export const ORDER_STATUS_STRINGS: Record<KotlinIrEnumValues<typeof AbacusOrderS
   [AbacusOrderStatus.partiallyFilled.name]: STRING_KEYS.PARTIALLY_FILLED,
   [AbacusOrderStatus.partiallyFilled.rawValue]: STRING_KEYS.PARTIALLY_FILLED,
 
+  [AbacusOrderStatus.partiallyCanceled.name]: STRING_KEYS.PARTIALLY_FILLED,
+  [AbacusOrderStatus.partiallyCanceled.rawValue]: STRING_KEYS.PARTIALLY_FILLED,
+
   [AbacusOrderStatus.filled.name]: STRING_KEYS.ORDER_FILLED,
   [AbacusOrderStatus.filled.rawValue]: STRING_KEYS.ORDER_FILLED,
 

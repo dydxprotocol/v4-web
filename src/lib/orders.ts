@@ -45,6 +45,11 @@ export const getOrderStatusInfo = ({ status }: { status: string }) => {
         statusIconColor: `var(--color-error)`,
       };
     }
+    case AbacusOrderStatus.partiallyCanceled.rawValue:
+      return {
+        statusIcon: IconName.OrderCanceled,
+        statusIconColor: `var(--color-error)`,
+      };
     case AbacusOrderStatus.canceling.rawValue: {
       return {
         statusIcon: IconName.OrderPending,
@@ -68,7 +73,7 @@ export const getOrderStatusInfo = ({ status }: { status: string }) => {
 };
 
 export const isOrderStatusClearable = (status: OrderStatus) =>
-  [AbacusOrderStatus.filled, AbacusOrderStatus.cancelled].some(
+  [AbacusOrderStatus.filled, AbacusOrderStatus.cancelled, AbacusOrderStatus.partiallyCanceled].some(
     (orderStatus) => status === orderStatus
   );
 

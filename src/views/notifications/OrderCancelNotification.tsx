@@ -47,10 +47,15 @@ export const OrderCancelNotification = ({
   let customContent = null;
 
   // whichever canceled confirmation happens first (node / indexer)
-  const canceledStatusValue = AbacusOrderStatus.cancelled.rawValue;
-  if (cancelStatus === CancelOrderStatuses.Canceled || indexedOrderStatus === canceledStatusValue) {
-    orderStatusStringKey = STRING_KEYS.CANCELED;
-    orderStatusIcon = <$OrderStatusIcon status={canceledStatusValue} />;
+  const isPartiallyCanceled = indexedOrderStatus === AbacusOrderStatus.partiallyCanceled.rawValue;
+  const isCancelFinalized =
+    indexedOrderStatus === AbacusOrderStatus.cancelled.rawValue || isPartiallyCanceled;
+
+  if (cancelStatus === CancelOrderStatuses.Canceled || isCancelFinalized) {
+    orderStatusStringKey = isPartiallyCanceled
+      ? STRING_KEYS.PARTIALLY_FILLED
+      : STRING_KEYS.CANCELED;
+    orderStatusIcon = <$OrderStatusIcon status={indexedOrderStatus} />;
   }
 
   if (localCancel.errorStringKey) {
