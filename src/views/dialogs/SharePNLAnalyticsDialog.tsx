@@ -7,7 +7,6 @@ import { AbacusPositionSides, Nullable } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { PositionSide } from '@/constants/trade';
-import { TWITTER_BASE_URL } from '@/constants/twitter';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -26,6 +25,7 @@ import { useAppDispatch } from '@/state/appTypes';
 import { closeDialog } from '@/state/dialogs';
 
 import { MustBigNumber } from '@/lib/numbers';
+import { triggerTwitterIntent } from '@/lib/twitter';
 
 type ElementProps = {
   marketId: string;
@@ -75,14 +75,10 @@ export const SharePNLAnalyticsDialog = ({
       const item = new ClipboardItem({ 'image/png': blob });
       await navigator.clipboard.write([item]);
 
-      const twitterIntent = new URL('intent/tweet', TWITTER_BASE_URL);
-      twitterIntent.searchParams.append(
-        'text',
-        `Check out my ${assetId} position on @dYdX\n\n#dYdX #${assetId}\n[paste image and delete this!]`
-      );
-      twitterIntent.searchParams.append('related', 'dYdX');
-
-      window.open(twitterIntent, '_blank');
+      triggerTwitterIntent({
+        text: `Check out my ${assetId} position on @dYdX\n\n#dYdX #${assetId}\n[paste image and delete this!]`,
+        related: 'dYdX',
+      });
 
       dispatch(closeDialog());
     },
