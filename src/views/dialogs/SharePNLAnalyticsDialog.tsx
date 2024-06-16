@@ -52,7 +52,7 @@ export const SharePNLAnalyticsDialog = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
 
-  const [_, convert, ref] = useToPng<HTMLDivElement>({
+  const [{ isLoading: isDownloading }, convert, ref] = useToPng<HTMLDivElement>({
     quality: 1.0,
     onSuccess: (data) => {
       const link = document.createElement('a');
@@ -64,7 +64,7 @@ export const SharePNLAnalyticsDialog = ({
     },
   });
 
-  const [__, convertShare, refShare] = useToBlob<HTMLDivElement>({
+  const [{ isLoading: isSharing }, convertShare, refShare] = useToBlob<HTMLDivElement>({
     quality: 1.0,
     onSuccess: async (blob) => {
       if (!blob) {
@@ -169,6 +169,9 @@ export const SharePNLAnalyticsDialog = ({
           onClick={() => {
             convert();
           }}
+          state={{
+            isLoading: isDownloading,
+          }}
         >
           {stringGetter({ key: STRING_KEYS.DOWNLOAD })}
         </$Action>
@@ -177,6 +180,9 @@ export const SharePNLAnalyticsDialog = ({
           slotLeft={<Icon iconName={IconName.SocialX} />}
           onClick={() => {
             convertShare();
+          }}
+          state={{
+            isLoading: isSharing,
           }}
         >
           {stringGetter({ key: STRING_KEYS.SHARE })}
