@@ -85,6 +85,20 @@ export const PositionsActionsCell = ({
     );
   };
 
+  const openShareDialog = () => {
+    dispatch(
+      openDialog({
+        type: DialogTypes.SharePNLAnalytics,
+        dialogProps: {
+          marketId,
+          assetId,
+          stopLossOrders,
+          takeProfitOrders,
+        },
+      })
+    );
+  };
+
   return (
     <ActionsTableCell>
       {!isDisabled && complianceState === ComplianceStates.FULL_ACCESS && (
@@ -100,6 +114,13 @@ export const PositionsActionsCell = ({
           />
         </WithTooltip>
       )}
+      <$TriggersButton
+        key="share"
+        onClick={openShareDialog}
+        iconName={IconName.Share}
+        shape={ButtonShape.Square}
+        disabled={isDisabled}
+      />
       {showClosePositionAction && (
         <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.CLOSE_POSITION })}>
           <$CloseButtonToggle

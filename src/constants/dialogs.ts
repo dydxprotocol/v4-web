@@ -35,6 +35,7 @@ export enum DialogTypes {
   Unstake = 'Unstake',
   Withdraw = 'Withdraw',
   WithdrawalGated = 'WithdrawalGated',
+  SharePNLAnalytics = 'SharePNLAnalytics',
 }
 
 export enum TradeBoxDialogTypes {
