@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { useToBlob, useToPng } from '@hugocxl/react-to-image';
 import styled from 'styled-components';
 
 import { AbacusPositionSides, Nullable } from '@/constants/abacus';
@@ -51,6 +52,41 @@ export const SharePNLAnalyticsDialog = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
 
+  const [_, convert, ref] = useToPng<HTMLDivElement>({
+    quality: 1.0,
+    onSuccess: (data) => {
+      const link = document.createElement('a');
+      link.download = `${marketId}-share.png`;
+      link.href = data;
+      link.click();
+
+      dispatch(closeDialog());
+    },
+  });
+
+  const [__, convertShare, refShare] = useToBlob<HTMLDivElement>({
+    quality: 1.0,
+    onSuccess: async (blob) => {
+      if (!blob) {
+        return;
+      }
+
+      const item = new ClipboardItem({ 'image/png': blob });
+      await navigator.clipboard.write([item]);
+
+      const twitterIntent = new URL('https://twitter.com/intent/tweet');
+      twitterIntent.searchParams.append(
+        'text',
+        `Check out my ${assetId} position on @dYdX\n\n#dYdX #${assetId}\n[paste image and delete this!]`
+      );
+      twitterIntent.searchParams.append('related', 'dYdX');
+
+      window.open(twitterIntent, '_blank');
+
+      dispatch(closeDialog());
+    },
+  });
+
   const sideSign = useMemo(() => {
     switch (side?.name) {
       case PositionSide.Long:
@@ -66,7 +102,14 @@ export const SharePNLAnalyticsDialog = ({
 
   return (
     <Dialog isOpen setIsOpen={setIsOpen} title={stringGetter({ key: STRING_KEYS.SHARE_ACTIVITY })}>
-      <$SharableCard>
+      <$SharableCard
+        ref={(domNode) => {
+          if (domNode) {
+            ref(domNode);
+            refShare(domNode);
+          }
+        }}
+      >
         <$SharableCardSide>
           <$SharableCardTitle>
             <$AssetIcon symbol={assetId} />
@@ -81,7 +124,13 @@ export const SharePNLAnalyticsDialog = ({
             type={OutputType.Percent}
             value={unrealizedPnlPercent}
             showSign={ShowSign.None}
-            slotLeft={<$ArrowIcon isNegative={unrealizedPnlIsNegative} iconName={IconName.Arrow} />}
+            slotLeft={
+              !unrealizedPnlIsNegative ? (
+                <$ArrowUpIcon iconName={IconName.Arrow} />
+              ) : (
+                <$ArrowDownIcon iconName={IconName.Arrow} />
+              )
+            }
           />
           <LogoShortIcon />
         </$SharableCardSide>
@@ -118,7 +167,7 @@ export const SharePNLAnalyticsDialog = ({
           action={ButtonAction.Secondary}
           slotLeft={<Icon iconName={IconName.Download} />}
           onClick={() => {
-            dispatch(closeDialog());
+            convert();
           }}
         >
           {stringGetter({ key: STRING_KEYS.DOWNLOAD })}
@@ -127,7 +176,7 @@ export const SharePNLAnalyticsDialog = ({
           action={ButtonAction.Primary}
           slotLeft={<Icon iconName={IconName.SocialX} />}
           onClick={() => {
-            dispatch(closeDialog());
+            convertShare();
           }}
         >
           {stringGetter({ key: STRING_KEYS.SHARE })}
@@ -197,6 +246,10 @@ const $HighlightOutput = styled(Output)<{ isNegative?: boolean }>`
       : `var(--color-text-1)`};
 `;
 
-const $ArrowIcon = styled(Icon)<{ isNegative?: boolean }>`
-  transform: ${({ isNegative }) => (isNegative ? 'rotateZ(90deg)' : 'rotateZ(-90deg)')};
+const $ArrowUpIcon = styled(Icon)<{ negative?: boolean }>`
+  transform: rotateZ(-90deg);
+`;
+
+const $ArrowDownIcon = styled(Icon)<{ negative?: boolean }>`
+  transform: rotateZ(90deg);
 `;
