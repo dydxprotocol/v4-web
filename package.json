@@ -51,6 +51,7 @@
     "@dydxprotocol/v4-client-js": "^1.1.15",
     "@dydxprotocol/v4-localization": "^1.1.121",
     "@ethersproject/providers": "^5.7.2",
+    "@hugocxl/react-to-image": "^0.0.9",
     "@js-joda/core": "^5.5.3",
     "@privy-io/react-auth": "^1.66.2",
     "@privy-io/wagmi-connector": "^0.1.12",
