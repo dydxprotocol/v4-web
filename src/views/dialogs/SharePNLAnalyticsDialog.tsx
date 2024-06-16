@@ -157,7 +157,7 @@ export const SharePNLAnalyticsDialog = ({
                 color: 'transparent',
               },
             }}
-            value="https://dydx.trade"
+            value={import.meta.env.VITE_SHARE_PNL_ANALYTICS_URL}
           />
         </$SharableCardStats>
       </$SharableCard>
