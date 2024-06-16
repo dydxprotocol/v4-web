@@ -7,6 +7,7 @@ import { AbacusPositionSides, Nullable } from '@/constants/abacus';
 import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { PositionSide } from '@/constants/trade';
+import { TWITTER_BASE_URL } from '@/constants/twitter';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -74,7 +75,7 @@ export const SharePNLAnalyticsDialog = ({
       const item = new ClipboardItem({ 'image/png': blob });
       await navigator.clipboard.write([item]);
 
-      const twitterIntent = new URL('https://twitter.com/intent/tweet');
+      const twitterIntent = new URL('intent/tweet', TWITTER_BASE_URL);
       twitterIntent.searchParams.append(
         'text',
         `Check out my ${assetId} position on @dYdX\n\n#dYdX #${assetId}\n[paste image and delete this!]`
