@@ -30,14 +30,14 @@ dependencies:
     specifier: ^0.32.1
     version: 0.32.2
   '@dydxprotocol/v4-abacus':
-    specifier: ^1.7.72
-    version: 1.7.72
+    specifier: 1.7.78
+    version: 1.7.78
   '@dydxprotocol/v4-client-js':
     specifier: ^1.1.15
     version: 1.1.15
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.121
-    version: 1.1.121
+    specifier: ^1.1.127
+    version: 1.1.127
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -1387,8 +1387,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@dydxprotocol/v4-abacus@1.7.72:
-    resolution: {integrity: sha512-ie6ynsIwBNuAIKZgrOtMFy74tudEm26ruIW2y1816u/c37VzIG1R7ZsKDXFdZEDGlIjzXK0D16NIVR8jEEleqw==}
+  /@dydxprotocol/v4-abacus@1.7.78:
+    resolution: {integrity: sha512-d1F5QnscAbSi3SqHwxQN7btFP2CMj1EwR8nUejv6mMlLwo/CBAeFFbIjeIEheycXiCsYE4HXkfLVBghmOb0b8w==}
     dependencies:
       '@js-joda/core': 3.2.0
       format-util: 1.0.5
@@ -1423,8 +1423,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.121:
-    resolution: {integrity: sha512-pG3e5+lIuskM0HD45k18q8ZxnFNNkTpv4z/td0AzVIVUq7nzJ4O6ft4vcuNrm4k0Zd9nySEtSjODPC9qicxUKw==}
+  /@dydxprotocol/v4-localization@1.1.127:
+    resolution: {integrity: sha512-6aN+pRLrOqbhZFHGcmfhBxC/S8mui/0zl2jt61Z8lP4BF8P9jLr7W0EF9UTCVydHJVUbjxJui8c1ApWtOBDZtQ==}
     dev: false
 
   /@dydxprotocol/v4-proto@5.0.0-dev.0:
