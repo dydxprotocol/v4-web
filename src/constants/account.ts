@@ -59,36 +59,35 @@ export const AMOUNT_USDC_BEFORE_REBALANCE = 0.05;
 export const NUM_PARENT_SUBACCOUNTS = 128;
 
 export type RawSubaccountFill = {
-  clientMetadata: string
-  createdAt: string
-  createdAtHeight: string
-  fee: string
-  id: string
-  liquidity: string
-  market: string
-  marketType: string
-  orderId: string
-  price: string
-  side: string
-  size: string
-  subaccountNumber: number
-  type: string
-}
+  clientMetadata: string;
+  createdAt: string;
+  createdAtHeight: string;
+  fee: string;
+  id: string;
+  liquidity: string;
+  market: string;
+  marketType: string;
+  orderId: string;
+  price: string;
+  side: string;
+  size: string;
+  subaccountNumber: number;
+  type: string;
+};
 
 export type RawSubaccountTransfer = {
-  id: string
-  sender: RawAccount
-  recipient: RawAccount
-  size: string
-  createdAt: string
-  createdAtHeight: string
-  symbol: string
-  type: string
-  transactionHash: string
-}
+  id: string;
+  sender: RawAccount;
+  recipient: RawAccount;
+  size: string;
+  createdAt: string;
+  createdAtHeight: string;
+  symbol: string;
+  type: string;
+  transactionHash: string;
+};
 
 export type RawAccount = {
-  address: string
-  subaccountNumber: number
-}
-
+  address: string;
+  subaccountNumber: number;
+};

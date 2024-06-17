@@ -16,6 +16,7 @@ import {
 import type { ResolutionString } from 'public/tradingview/charting_library';
 
 import type { ConnectNetworkEvent, NetworkConfig } from '@/constants/abacus';
+import { RawSubaccountFill, RawSubaccountTransfer } from '@/constants/account';
 import { DEFAULT_TRANSACTION_MEMO } from '@/constants/analytics';
 import { RESOLUTION_MAP, type Candle } from '@/constants/candles';
 import { LocalStorageKey } from '@/constants/localStorage';
@@ -26,7 +27,6 @@ import { useAppSelector } from '@/state/appTypes';
 import abacusStateManager from '@/lib/abacus';
 import { log } from '@/lib/telemetry';
 
-import { RawSubaccountFill, RawSubaccountTransfer } from '@/constants/account';
 import { useEndpointsConfig } from './useEndpointsConfig';
 import { useLocalStorage } from './useLocalStorage';
 import { useRestrictions } from './useRestrictions';
@@ -166,9 +166,16 @@ const useDydxClientContext = () => {
     }
   };
 
-  const requestAllAccountFills = async (address: string, subaccountNumber: number): Promise<RawSubaccountFill[]> => {
+  const requestAllAccountFills = async (
+    address: string,
+    subaccountNumber: number
+  ): Promise<RawSubaccountFill[]> => {
     try {
-      const { fills = [], totalResults, pageSize } = await indexerClient.account.getSubaccountFills(
+      const {
+        fills = [],
+        totalResults,
+        pageSize,
+      } = await indexerClient.account.getSubaccountFills(
         address,
         subaccountNumber,
         undefined,
@@ -176,28 +183,33 @@ const useDydxClientContext = () => {
         100,
         undefined,
         undefined,
-        1,
+        1
       );
 
       /**
        * We get all the pages but we should exclude the first one, we already have this data
        */
-      const pages = Array.from({
-        length: Math.ceil(totalResults / pageSize) - 1,
-      }, (_, index) => index + 2);
+      const pages = Array.from(
+        {
+          length: Math.ceil(totalResults / pageSize) - 1,
+        },
+        (_, index) => index + 2
+      );
 
       const results = await Promise.all(
-        pages.map((page) => indexerClient.account.getSubaccountFills(
-          address,
-          subaccountNumber,
-          undefined,
-          undefined,
-          100,
-          undefined,
-          undefined,
-          page,
-        ))
-      )
+        pages.map((page) =>
+          indexerClient.account.getSubaccountFills(
+            address,
+            subaccountNumber,
+            undefined,
+            undefined,
+            100,
+            undefined,
+            undefined,
+            page
+          )
+        )
+      );
 
       const allFills = [...fills, ...results.map((data) => data.fills).flat()];
 
@@ -206,11 +218,18 @@ const useDydxClientContext = () => {
       log('useDydxClient/requestAllAccountFills', error);
       return [];
     }
-  }
+  };
 
-  const requestAllAccountTransfers = async (address: string, subaccountNumber: number): Promise<RawSubaccountTransfer[]> => {
+  const requestAllAccountTransfers = async (
+    address: string,
+    subaccountNumber: number
+  ): Promise<RawSubaccountTransfer[]> => {
     try {
-      const { transfers = [], totalResults, pageSize } = await indexerClient.account.getSubaccountTransfers(
+      const {
+        transfers = [],
+        totalResults,
+        pageSize,
+      } = await indexerClient.account.getSubaccountTransfers(
         address,
         subaccountNumber,
         100,
@@ -222,22 +241,27 @@ const useDydxClientContext = () => {
       /**
        * We get all the pages but we should exclude the first one, we already have this data
        */
-      const pages = Array.from({
-        length: Math.ceil(totalResults / pageSize) - 1,
-      }, (_, index) => index + 2);
+      const pages = Array.from(
+        {
+          length: Math.ceil(totalResults / pageSize) - 1,
+        },
+        (_, index) => index + 2
+      );
 
       const results = await Promise.all(
-        pages.map((page) => indexerClient.account.getSubaccountFills(
-          address,
-          subaccountNumber,
-          undefined,
-          undefined,
-          100,
-          undefined,
-          undefined,
-          page,
-        ))
-      )
+        pages.map((page) =>
+          indexerClient.account.getSubaccountFills(
+            address,
+            subaccountNumber,
+            undefined,
+            undefined,
+            100,
+            undefined,
+            undefined,
+            page
+          )
+        )
+      );
 
       const allTransfers = [...transfers, ...results.map((data) => data.transfers).flat()];
 
@@ -246,7 +270,7 @@ const useDydxClientContext = () => {
       log('useDydxClient/requestAllAccountTransfers', error);
       return [];
     }
-  }
+  };
 
   const getMarketTickSize = async (marketId: string) => {
     try {
