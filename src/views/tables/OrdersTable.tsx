@@ -154,16 +154,12 @@ const getOrdersTableColumnDef = ({
             <Output
               type={OutputType.Asset}
               value={size}
-              fractionDigits={
-                (stepSizeDecimals ?? 0) < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals
-              }
+              fractionDigits={stepSizeDecimals ?? TOKEN_DECIMALS}
             />
             <Output
               type={OutputType.Asset}
               value={totalFilled}
-              fractionDigits={
-                (stepSizeDecimals ?? 0) < TOKEN_DECIMALS ? TOKEN_DECIMALS : stepSizeDecimals
-              }
+              fractionDigits={stepSizeDecimals ?? TOKEN_DECIMALS}
             />
           </TableCell>
         ),
