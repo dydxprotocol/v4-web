@@ -63,7 +63,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
   const isAmountValid = amountBN && amountBN.gt(0) && amountBN.lte(maxAmountBN);
 
   useEffect(() => {
-    if (!isAmountValid) {
+    if (amountBN && !isAmountValid) {
       setError({
         key: STRING_KEYS.ISOLATED_MARGIN_ADJUSTMENT_INVALID_AMOUNT,
         type: AlertType.Error,
@@ -131,7 +131,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
           sign={NumberSign.Negative}
           newValue={newBalanceBN}
           hasInvalidNewValue={newBalanceBN.isNegative()}
-          withDiff={Boolean(amountBN && balance) && !amountBN.isNaN()}
+          withDiff={amountBN && balance && !amountBN.isNaN()}
         />
       ),
     },
