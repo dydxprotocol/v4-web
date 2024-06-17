@@ -306,6 +306,8 @@ export const formatNumber = (params: FormatNumberProps) => {
         suffix: '×',
       });
       break;
+    default:
+      break;
   }
 
   return {
