@@ -501,7 +501,5 @@ const $AddressValidationAlertMessage = styled(AlertMessage)`
 const $FormInputToggleButton = styled(ToggleButton)`
   ${formMixins.inputInnerToggleButton}
 
-  svg {
-    color: var(--color-text-0);
-  }
+  --button-padding: 0 0.5rem;
 `;

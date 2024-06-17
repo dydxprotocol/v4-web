@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
 import { AlertType } from '@/constants/alerts';
-import { ButtonShape, ButtonSize } from '@/constants/buttons';
+import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
@@ -20,13 +20,16 @@ import { formMixins } from '@/styles/formMixins';
 import { AlertMessage } from '@/components/AlertMessage';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
-import { Icon, IconName } from '@/components/Icon';
+import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
 import { InputType } from '@/components/Input';
+import { Link } from '@/components/Link';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
-import { ToggleButton } from '@/components/ToggleButton';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { StakeButtonAndReceipt } from '@/views/forms/StakeForm/StakeButtonAndReceipt';
+
+import { useAppDispatch } from '@/state/appTypes';
+import { forceOpenDialog } from '@/state/dialogs';
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
@@ -37,7 +40,9 @@ type StakeFormProps = {
 };
 
 export const StakeForm = ({ onDone, className }: StakeFormProps) => {
+  const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
+
   const { delegate, getDelegateFee } = useSubaccount();
   const { nativeTokenBalance: balance } = useAccountBalance();
   const { selectedValidator } = useStakingValidator() ?? {};
@@ -46,7 +51,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
   // Form states
   const [error, setError] = useState<string>();
   const [fee, setFee] = useState<BigNumberish>();
-  const [amount, setAmount] = useState<number>();
+  const [amount, setAmount] = useState<number | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
 
   const showNotEnoughGasWarning = balance.lt(fee ?? 0);
@@ -116,27 +121,19 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
     },
   ];
 
-  const renderFormInputButton = ({
-    label,
-    isInputEmpty,
-    onClear,
-    onClick,
-  }: {
-    label: string;
-    isInputEmpty: boolean;
-    onClear: () => void;
-    onClick: () => void;
-  }) => (
-    <$FormInputToggleButton
-      size={ButtonSize.XSmall}
-      isPressed={!isInputEmpty}
-      onPressedChange={(isPressed: boolean) => (isPressed ? onClick : onClear)()}
-      disabled={isLoading}
-      shape={isInputEmpty ? ButtonShape.Rectangle : ButtonShape.Circle}
-    >
-      {isInputEmpty ? label : <Icon iconName={IconName.Close} />}
-    </$FormInputToggleButton>
-  );
+  const openKeplrDialog = () =>
+    dispatch(
+      forceOpenDialog({
+        type: DialogTypes.ExternalNavKeplr,
+      })
+    );
+
+  const openStrideDialog = () =>
+    dispatch(
+      forceOpenDialog({
+        type: DialogTypes.ExternalNavStride,
+      })
+    );
 
   return (
     <$Form
@@ -158,13 +155,13 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
           onChange={({ floatValue }: NumberFormatValues) => onChangeAmount(floatValue)}
           value={amount ?? undefined}
           slotRight={
-            balance.gt(0) &&
-            renderFormInputButton({
-              label: stringGetter({ key: STRING_KEYS.MAX }),
-              isInputEmpty: !amountBN,
-              onClear: () => onChangeAmount(undefined),
-              onClick: () => onChangeAmount(balance.toNumber()),
-            })
+            <FormMaxInputToggleButton
+              isInputEmpty={!amount}
+              isLoading={isLoading}
+              onPressedChange={(isPressed: boolean) =>
+                isPressed ? onChangeAmount(balance.toNumber()) : onChangeAmount(undefined)
+              }
+            />
           }
           disabled={isLoading}
         />
@@ -191,6 +188,23 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
           isLoading={isLoading || Boolean(isAmountValid && !fee)}
           amount={amount}
         />
+        <$LegalDisclaimer>
+          {stringGetter({
+            key: STRING_KEYS.STAKING_LEGAL_DISCLAIMER,
+            params: {
+              KEPLR_DASHBOARD_LINK: (
+                <$Link withIcon onClick={openKeplrDialog}>
+                  {stringGetter({ key: STRING_KEYS.KEPLR_DASHBOARD })}
+                </$Link>
+              ),
+              STRIDE_LINK: (
+                <$Link withIcon onClick={openStrideDialog}>
+                  Stride
+                </$Link>
+              ),
+            },
+          })}
+        </$LegalDisclaimer>
       </$Footer>
     </$Form>
   );
@@ -207,15 +221,22 @@ const $Description = styled.div`
 const $Footer = styled.footer`
   ${formMixins.footer}
   --stickyFooterBackdrop-outsetY: var(--dialog-content-paddingBottom);
+
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 `;
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
 `;
 
-const $FormInputToggleButton = styled(ToggleButton)`
-  ${formMixins.inputInnerToggleButton}
+const $LegalDisclaimer = styled.div`
+  text-align: center;
+  color: var(--color-text-0);
+  font: var(--font-small-book);
+`;
 
-  svg {
-    color: var(--color-text-0);
-  }
+const $Link = styled(Link)`
+  --link-color: var(--color-text-2);
+  display: inline-flex;
 `;

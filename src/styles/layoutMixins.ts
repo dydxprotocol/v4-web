@@ -878,6 +878,14 @@ export const layoutMixins = {
     }
   `,
 
+  textTruncate: css`
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 1px;
+  `,
+
   textOverflow: css`
     display: inline-block;
     overflow-x: auto;
