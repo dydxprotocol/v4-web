@@ -17,7 +17,7 @@ import { testFlags } from '@/lib/testFlags';
 
 export const RewardsHelpPanel = () => {
   const stringGetter = useStringGetter();
-  const { tradingRewardsLearnMore, preconfiguredValidatorSetLearnMore } = useURLConfigs();
+  const { tradingRewardsLearnMore, mintscanValidatorsLearnMore } = useURLConfigs();
 
   const stakingEnabled = testFlags.enableStaking;
 
@@ -86,7 +86,7 @@ export const RewardsHelpPanel = () => {
               key: STRING_KEYS.FAQ_HOW_IS_THE_PRECONFIGURED_SET_OF_VALIDATORS_DETERMINED_ANSWER,
               params: {
                 DOCUMENT_LINK: (
-                  <$Link href={preconfiguredValidatorSetLearnMore}>
+                  <$Link href={mintscanValidatorsLearnMore}>
                     {stringGetter({ key: STRING_KEYS.DOCUMENT })}
                   </$Link>
                 ),
