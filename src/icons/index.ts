@@ -22,6 +22,7 @@ export { default as CurrencySignIcon } from './currency-sign.svg';
 export { default as DepositIcon } from './deposit.svg';
 export { default as DepthChartIcon } from './depth-chart.svg';
 export { default as DiscordIcon } from './discord.svg';
+export { default as DownloadIcon } from './download.svg';
 export { default as ExportKeysIcon } from './export-keys.svg';
 export { default as FeedbackIcon } from './feedback.svg';
 export { default as FileIcon } from './file.svg';
@@ -69,7 +70,6 @@ export { default as TriangleIcon } from './triangle.svg';
 export { default as TryAgainIcon } from './try-again.svg';
 export { default as WarningIcon } from './warning.svg';
 export { default as WithdrawIcon } from './withdraw.svg';
-export { default as DownloadIcon } from './download.svg';
 
 // Wallets
 export { default as AppleIcon } from './wallets/apple.svg';

@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 
 import { OrderSide } from '@dydxprotocol/v4-client-js';
+import { useMutation } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
@@ -8,6 +9,9 @@ import { AnalyticsEvent } from '@/constants/analytics';
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useAccounts } from '@/hooks/useAccounts';
+import { useDydxClient } from '@/hooks/useDydxClient';
+import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { useStringGetter } from '@/hooks/useStringGetter';
 
 import { Button } from '@/components/Button';
@@ -17,16 +21,12 @@ import { Icon, IconName } from '@/components/Icon';
 import { OutputType, formatNumber } from '@/components/Output';
 
 import { getSubaccountId } from '@/state/accountSelectors';
+import { useAppSelector } from '@/state/appTypes';
 import { getSelectedLocale } from '@/state/localizationSelectors';
 
-import { useAccounts } from '@/hooks/useAccounts';
-import { useDydxClient } from '@/hooks/useDydxClient';
-import { useLocaleSeparators } from '@/hooks/useLocaleSeparators';
 import { track } from '@/lib/analytics';
 import { exportCSV } from '@/lib/csv';
 import { MustBigNumber } from '@/lib/numbers';
-import { useAppSelector } from '@/state/appTypes';
-import { useMutation } from '@tanstack/react-query';
 
 interface ExportHistoryDropdownProps {
   className?: string;
@@ -84,7 +84,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
               })
             : '',
         };
-      })
+      });
 
       exportCSV(csvTrades, {
         filename: 'trades',
@@ -185,34 +185,37 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
 
   const { mutate: mutateExportTrades, isPending: isPendingExportTrades } = useMutation({
     mutationFn: exportTrades,
-  })
+  });
 
   const { mutate: mutateExportTransfers, isPending: isPendingExportTransfers } = useMutation({
     mutationFn: exportTransfers,
-  })
+  });
 
-  const exportData = useCallback((e: Event) => {
-    e.preventDefault();
+  const exportData = useCallback(
+    (e: Event) => {
+      e.preventDefault();
 
-    if (checkedTrades) {
-      mutateExportTrades();
-    }
+      if (checkedTrades) {
+        mutateExportTrades();
+      }
 
-    if (checkedTransfers) {
-      mutateExportTransfers();
-    }
+      if (checkedTransfers) {
+        mutateExportTransfers();
+      }
 
-    track(AnalyticsEvent.ExportDownloadClick, {
-      trades: checkedTrades,
-      transfers: checkedTransfers,
-    });
-  }, [checkedTrades, checkedTransfers, exportTrades, exportTransfers]);
+      track(AnalyticsEvent.ExportDownloadClick, {
+        trades: checkedTrades,
+        transfers: checkedTransfers,
+      });
+    },
+    [checkedTrades, checkedTransfers, exportTrades, exportTransfers]
+  );
 
   return (
     <DropdownMenu
       onOpenChange={(open) => {
         if (open) {
-          track(AnalyticsEvent.ExportButtonClick);
+          track(AnalyticsEvent.ExportCsvClick);
         }
       }}
       items={[
@@ -250,8 +253,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
           label: (
             <$Button
               state={{
-                isDisabled:
-                  (!checkedTrades && !checkedTransfers),
+                isDisabled: !checkedTrades && !checkedTransfers,
                 isLoading: isPendingExportTrades || isPendingExportTransfers,
               }}
               action={ButtonAction.Primary}

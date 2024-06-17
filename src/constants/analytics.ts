@@ -118,7 +118,7 @@ export enum AnalyticsEvent {
   TradeCancelOrderConfirmed = 'TradeCancelOrderConfirmed',
 
   // Export CSV
-  ExportButtonClick = 'ExportCSVClick',
+  ExportCsvClick = 'ExportCSVClick',
   ExportTradesCheckboxClick = 'ExportTradesCheckboxClick',
   ExportTransfersCheckboxClick = 'ExportTransfersCheckboxClick',
   ExportDownloadClick = 'ExportDownloadClick',
