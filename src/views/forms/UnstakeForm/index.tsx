@@ -94,16 +94,19 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
 
   useEffect(() => {
     if (isAmountValid) {
+      setIsLoading(true);
       getUndelegateFee(amounts)
         .then((stdFee) => {
           if (stdFee.amount.length > 0) {
             const feeAmount = stdFee.amount[0].amount;
             setFee(MustBigNumber(formatUnits(BigInt(feeAmount), chainTokenDecimals)));
+            setIsLoading(false);
           }
         })
         .catch((err) => {
           log('UnstakeForm/getDelegateFee', err);
           setFee(undefined);
+          setIsLoading(false);
         });
     } else {
       setFee(undefined);

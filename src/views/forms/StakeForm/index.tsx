@@ -76,6 +76,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
 
   useEffect(() => {
     if (isAmountValid && selectedValidator) {
+      setIsLoading(true);
       getDelegateFee(selectedValidator.operatorAddress, amountBN.toNumber())
         .then((stdFee) => {
           if (stdFee.amount.length > 0) {
@@ -85,11 +86,13 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
                 MustBigNumber(AMOUNT_RESERVED_FOR_GAS_DYDX)
               )
             );
+            setIsLoading(false);
           }
         })
         .catch((err) => {
           log('StakeForm/getDelegateFee', err);
           setFee(undefined);
+          setIsLoading(false);
         });
     } else {
       setFee(undefined);
