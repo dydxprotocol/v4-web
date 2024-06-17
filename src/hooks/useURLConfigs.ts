@@ -36,6 +36,7 @@ export interface LinksConfigs {
   complianceSupportEmail?: string;
   fetAgixMarketWindDownProposal?: string;
   contractLossMechanismLearnMore?: string;
+  preconfiguredValidatorSetLearnMore?: string;
 }
 
 export const useURLConfigs = (): LinksConfigs => {
@@ -73,5 +74,7 @@ export const useURLConfigs = (): LinksConfigs => {
     adjustTargetLeverageLearnMore: linksConfigs.adjustTargetLeverageLearnMore ?? FALLBACK_URL,
     fetAgixMarketWindDownProposal: linksConfigs.fetAgixMarketWindDownProposal,
     contractLossMechanismLearnMore: linksConfigs.contractLossMechanismLearnMore,
+    preconfiguredValidatorSetLearnMore:
+      linksConfigs.preconfiguredValidatorSetLearnMore ?? FALLBACK_URL,
   };
 };

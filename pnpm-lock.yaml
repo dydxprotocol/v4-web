@@ -36,8 +36,8 @@ dependencies:
     specifier: ^1.1.15
     version: 1.1.15
   '@dydxprotocol/v4-localization':
-    specifier: ^1.1.121
-    version: 1.1.121
+    specifier: ^1.1.126
+    version: 1.1.126
   '@ethersproject/providers':
     specifier: ^5.7.2
     version: 5.7.2
@@ -1423,8 +1423,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@dydxprotocol/v4-localization@1.1.121:
-    resolution: {integrity: sha512-pG3e5+lIuskM0HD45k18q8ZxnFNNkTpv4z/td0AzVIVUq7nzJ4O6ft4vcuNrm4k0Zd9nySEtSjODPC9qicxUKw==}
+  /@dydxprotocol/v4-localization@1.1.126:
+    resolution: {integrity: sha512-zzLTplwqOsG7Fw/hjUQnpDJrE/KsuC7dsw8rVSFh2kfTIImfrjMmDmlWm0opgmP2Kd+8kwfeWL3oXT09oRU2Bw==}
     dev: false
 
   /@dydxprotocol/v4-proto@5.0.0-dev.0:
@@ -12006,6 +12006,7 @@ packages:
       is-hex-prefixed: 1.0.0
       strip-hex-prefix: 1.0.0
     dev: false
+    bundledDependencies: false
 
   /event-emitter@0.3.5:
     resolution: {integrity: sha512-D9rRn9y7kLPnJ+hMq7S/nhvoKwwvVJahBi2BPmx3bvbsEdK3W9ii8cBSGjP+72/LnM4n6fo3+dkCX5FeTQruXA==}
