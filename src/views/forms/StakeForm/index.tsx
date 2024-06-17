@@ -58,9 +58,9 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
 
   // BN
   const newBalanceBN = balance.minus(amountBN ?? 0);
-  const maxValueBN = MustBigNumber(balance.toNumber() - AMOUNT_RESERVED_FOR_GAS_DYDX);
+  const maxAmountBN = MustBigNumber(balance.toNumber() - AMOUNT_RESERVED_FOR_GAS_DYDX);
 
-  const isAmountValid = amountBN && amountBN.gt(0) && amountBN.lte(maxValueBN);
+  const isAmountValid = amountBN && amountBN.gt(0) && amountBN.lte(maxAmountBN);
 
   useEffect(() => {
     if (!isAmountValid) {
@@ -177,7 +177,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
               isInputEmpty={!amountBN}
               isLoading={isLoading}
               onPressedChange={(isPressed: boolean) =>
-                isPressed ? onChangeAmount(maxValueBN) : onChangeAmount(undefined)
+                isPressed ? onChangeAmount(maxAmountBN) : onChangeAmount(undefined)
               }
             />
           }
