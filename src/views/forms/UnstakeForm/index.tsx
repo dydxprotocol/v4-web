@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
 import { AlertType } from '@/constants/alerts';
-import { ButtonShape, ButtonSize } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
@@ -21,11 +20,10 @@ import { layoutMixins } from '@/styles/layoutMixins';
 import { AlertMessage } from '@/components/AlertMessage';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
-import { Icon, IconName } from '@/components/Icon';
+import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
 import { InputType } from '@/components/Input';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
-import { ToggleButton } from '@/components/ToggleButton';
 import { ValidatorName } from '@/components/ValidatorName';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { UnstakeButtonAndReceipt } from '@/views/forms/UnstakeForm/UnstakeButtonAndReceipt';
@@ -112,28 +110,6 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
     }
   }, [isAmountValid, amounts, undelegate, onDone]);
 
-  const renderFormInputButton = ({
-    label,
-    isInputEmpty,
-    onClear,
-    onClick,
-  }: {
-    label: string;
-    isInputEmpty: boolean;
-    onClear: () => void;
-    onClick: () => void;
-  }) => (
-    <$FormInputToggleButton
-      size={ButtonSize.XSmall}
-      isPressed={!isInputEmpty}
-      onPressedChange={(isPressed: boolean) => (isPressed ? onClick : onClear)()}
-      disabled={isLoading}
-      shape={isInputEmpty ? ButtonShape.Rectangle : ButtonShape.Circle}
-    >
-      {isInputEmpty ? label : <Icon iconName={IconName.Close} />}
-    </$FormInputToggleButton>
-  );
-
   let description = stringGetter({
     key: STRING_KEYS.CURRENTLY_STAKING,
     params: {
@@ -209,16 +185,20 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
               onChangeAmount(currentDelegations[0].validator, floatValue)
             }
             value={amounts[currentDelegations[0].validator] ?? undefined}
-            slotRight={renderFormInputButton({
-              label: stringGetter({ key: STRING_KEYS.MAX }),
-              isInputEmpty: !amounts[currentDelegations[0].validator],
-              onClear: () => onChangeAmount(currentDelegations[0].validator, undefined),
-              onClick: () =>
-                onChangeAmount(
-                  currentDelegations[0].validator,
-                  parseFloat(currentDelegations[0].amount)
-                ),
-            })}
+            slotRight={
+              <FormMaxInputToggleButton
+                isInputEmpty={!amounts[currentDelegations[0].validator]}
+                isLoading={isLoading}
+                onPressedChange={(isPressed: boolean) =>
+                  isPressed
+                    ? onChangeAmount(
+                        currentDelegations[0].validator,
+                        parseFloat(currentDelegations[0].amount)
+                      )
+                    : onChangeAmount(currentDelegations[0].validator, undefined)
+                }
+              />
+            }
             disabled={isLoading}
           />
         </$WithDetailsReceipt>
@@ -251,12 +231,17 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
                     onChangeAmount(delegation.validator, floatValue)
                   }
                   value={amounts[delegation.validator] ?? undefined}
-                  slotRight={renderFormInputButton({
-                    label: stringGetter({ key: STRING_KEYS.MAX }),
-                    isInputEmpty: !amounts[delegation.validator],
-                    onClear: () => onChangeAmount(delegation.validator, undefined),
-                    onClick: () => onChangeAmount(delegation.validator, balance),
-                  })}
+                  slotRight={
+                    <FormMaxInputToggleButton
+                      isInputEmpty={!amounts[delegation.validator]}
+                      isLoading={isLoading}
+                      onPressedChange={(isPressed: boolean) =>
+                        isPressed
+                          ? onChangeAmount(delegation.validator, balance)
+                          : onChangeAmount(delegation.validator, undefined)
+                      }
+                    />
+                  }
                   disabled={isLoading}
                 />
               </React.Fragment>
@@ -308,12 +293,4 @@ const $Footer = styled.footer`
 `;
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
-`;
-
-const $FormInputToggleButton = styled(ToggleButton)`
-  ${formMixins.inputInnerToggleButton}
-
-  svg {
-    color: var(--color-text-0);
-  }
 `;

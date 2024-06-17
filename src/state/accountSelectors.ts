@@ -201,10 +201,10 @@ export const getSubaccountOpenOrders = createAppSelector([getSubaccountOrders], 
   )
 );
 
-export const getPendingIsolatedOrders = createAppSelector(
-  [getSubaccountOrders, getExistingOpenPositions, getPerpetualMarkets],
-  (allOrders, allOpenPositions, allMarkets) => {
-    const allValidOrders = (allOrders ?? [])
+export const getOpenIsolatedOrders = createAppSelector(
+  [getSubaccountOrders, getPerpetualMarkets],
+  (allOrders, allMarkets) =>
+    (allOrders ?? [])
       .filter(
         (o) =>
           (o.status === AbacusOrderStatus.open ||
@@ -214,13 +214,23 @@ export const getPendingIsolatedOrders = createAppSelector(
           o.marginMode === AbacusMarginMode.isolated
       )
       // eslint-disable-next-line prefer-object-spread
-      .map((o) => Object.assign({}, o, { assetId: allMarkets?.[o.marketId]?.assetId }));
+      .map((o) => Object.assign({}, o, { assetId: allMarkets?.[o.marketId]?.assetId }))
+);
+
+export const getPendingIsolatedOrders = createAppSelector(
+  [getOpenIsolatedOrders, getExistingOpenPositions],
+  (isolatedOrders, allOpenPositions) => {
     const allOpenPositionAssetIds = new Set(allOpenPositions?.map((p) => p.assetId) ?? []);
     return groupBy(
-      allValidOrders.filter((o) => !allOpenPositionAssetIds.has(o.assetId ?? '')),
+      isolatedOrders.filter((o) => !allOpenPositionAssetIds.has(o.assetId ?? '')),
       (o) => o.marketId
     );
   }
+);
+
+export const getCurrentMarketHasOpenIsolatedOrders = createAppSelector(
+  [getOpenIsolatedOrders, getCurrentMarketId],
+  (openOrders, marketId) => openOrders.some((o) => o.marketId === marketId)
 );
 
 /**

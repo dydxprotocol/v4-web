@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 
 import { Nullable, type PerpetualMarketOrderbookLevel } from '@/constants/abacus';
 import { STRING_KEYS } from '@/constants/localization';
-import { USD_DECIMALS } from '@/constants/numbers';
+import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { ORDERBOOK_HEIGHT, ORDERBOOK_MAX_ROWS_PER_SIDE } from '@/constants/orderbook';
 
 import { useCenterOrderbook } from '@/hooks/Orderbook/useCenterOrderbook';
@@ -104,12 +104,12 @@ export const CanvasOrderbook = forwardRef(
           // avoid scientific notation for when converting small number to string
           dispatch(
             setTradeFormInputs({
-              limitPriceInput: MustBigNumber(price).toFixed(tickSizeDecimals ?? USD_DECIMALS),
+              limitPriceInput: MustBigNumber(price).toFixed(tickSizeDecimals ?? SMALL_USD_DECIMALS),
             })
           );
         }
       },
-      [currentInput]
+      [currentInput, tickSizeDecimals]
     );
 
     const { canvasRef: asksCanvasRef } = useDrawOrderbook({
