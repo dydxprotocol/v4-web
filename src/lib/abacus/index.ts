@@ -351,7 +351,7 @@ class AbacusStateManager {
       parsingError: Nullable<ParsingError>,
       data: Nullable<HumanReadableCancelOrderPayload>
     ) => void
-  ) => this.stateManager.cancelOrder(orderId, callback, false);
+  ) => this.stateManager.cancelOrder(orderId, callback);
 
   adjustIsolatedMarginOfPosition = (
     callback: (
