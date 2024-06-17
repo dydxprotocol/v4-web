@@ -1,9 +1,11 @@
+import { useEffect } from 'react';
+
 import { shallowEqual } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
-import { AccountBalance } from '@/constants/abacus';
+import { AccountBalance, HistoricalTradingRewardsPeriod } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
@@ -20,9 +22,11 @@ import { BackButton } from '@/components/BackButton';
 import { DetachedSection } from '@/components/ContentSection';
 import { ContentSectionHeader } from '@/components/ContentSectionHeader';
 
+import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getStakingRewards } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
+import abacusStateManager from '@/lib/abacus';
 import { MustBigNumber } from '@/lib/numbers';
 import { testFlags } from '@/lib/testFlags';
 
@@ -46,6 +50,8 @@ const RewardsPage = () => {
 
   const { complianceState } = useComplianceState();
   const { isTablet, isNotTablet } = useBreakpoints();
+  const canViewAccount = useAppSelector(calculateCanViewAccount);
+
   const { usdcDenom } = useTokenConfigs();
   const usdcDecimals = 24; // hardcoded solution; fix in OTE-390
   const stakingEnabled = testFlags.enableStaking;
@@ -74,6 +80,11 @@ const RewardsPage = () => {
       {stringGetter({ key: STRING_KEYS.TRADING_REWARDS_LEGAL_DISCLAIMER })}
     </$LegalDisclaimer>
   );
+
+  useEffect(() => {
+    // Initialize daily data for rewards table + chart
+    abacusStateManager.setHistoricalTradingRewardPeriod(HistoricalTradingRewardsPeriod.DAILY);
+  }, [canViewAccount]);
 
   return isTablet ? (
     <div>
