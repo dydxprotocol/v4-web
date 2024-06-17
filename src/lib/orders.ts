@@ -39,17 +39,13 @@ export const getOrderStatusInfo = ({ status }: { status: string }) => {
         statusIconColor: `var(--color-success)`,
       };
     }
-    case AbacusOrderStatus.cancelled.rawValue: {
+    case AbacusOrderStatus.cancelled.rawValue:
+    case AbacusOrderStatus.partiallyCanceled.rawValue: {
       return {
         statusIcon: IconName.OrderCanceled,
         statusIconColor: `var(--color-error)`,
       };
     }
-    case AbacusOrderStatus.partiallyCanceled.rawValue:
-      return {
-        statusIcon: IconName.OrderCanceled,
-        statusIconColor: `var(--color-error)`,
-      };
     case AbacusOrderStatus.canceling.rawValue: {
       return {
         statusIcon: IconName.OrderPending,
