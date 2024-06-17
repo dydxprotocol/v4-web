@@ -166,10 +166,7 @@ const useDydxClientContext = () => {
     }
   };
 
-  const requestAllAccountFills = async (
-    address: string,
-    subaccountNumber: number
-  ): Promise<RawSubaccountFill[]> => {
+  const requestAllAccountFills = async (address: string, subaccountNumber: number) => {
     try {
       const {
         fills = [],
@@ -211,19 +208,19 @@ const useDydxClientContext = () => {
         )
       );
 
-      const allFills = [...fills, ...results.map((data) => data.fills).flat()];
+      const allFills: RawSubaccountFill[] = [...fills, ...results.map((data) => data.fills).flat()];
 
-      return allFills;
+      // sorts the data in descending order
+      return allFills.sort((fillA, fillB) => {
+        return new Date(fillB.createdAt).getTime() - new Date(fillA.createdAt).getTime();
+      });
     } catch (error) {
       log('useDydxClient/requestAllAccountFills', error);
       return [];
     }
   };
 
-  const requestAllAccountTransfers = async (
-    address: string,
-    subaccountNumber: number
-  ): Promise<RawSubaccountTransfer[]> => {
+  const requestAllAccountTransfers = async (address: string, subaccountNumber: number) => {
     try {
       const {
         transfers = [],
@@ -263,9 +260,15 @@ const useDydxClientContext = () => {
         )
       );
 
-      const allTransfers = [...transfers, ...results.map((data) => data.transfers).flat()];
+      const allTransfers: RawSubaccountTransfer[] = [
+        ...transfers,
+        ...results.map((data) => data.transfers).flat(),
+      ];
 
-      return allTransfers;
+      // sorts the data in descending order
+      return allTransfers.sort((transferA, transferB) => {
+        return new Date(transferB.createdAt).getTime() - new Date(transferA.createdAt).getTime();
+      });
     } catch (error) {
       log('useDydxClient/requestAllAccountTransfers', error);
       return [];
