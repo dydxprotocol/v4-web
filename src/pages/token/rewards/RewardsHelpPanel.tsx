@@ -52,7 +52,7 @@ export const RewardsHelpPanel = () => {
                 ),
               },
             }),
-          }, // xcxc edit
+          },
           {
             header: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_QUESTION }),
             content: stringGetter({ key: STRING_KEYS.FAQ_HOW_DO_I_CLAIM_MY_REWARDS_ANSWER }),

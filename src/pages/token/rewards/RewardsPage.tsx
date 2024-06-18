@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
-import { AccountBalance, HistoricalTradingRewardsPeriod } from '@/constants/abacus';
+import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
 import { AppRoute } from '@/constants/routes';
@@ -56,10 +56,9 @@ const RewardsPage = () => {
   const usdcDecimals = 24; // hardcoded solution; fix in OTE-390
   const stakingEnabled = testFlags.enableStaking;
 
-  const stakingRewards: AccountBalance[] =
-    useAppSelector(getStakingRewards, shallowEqual)?.totalRewards?.toArray() ?? [];
+  const { totalRewards } = useAppSelector(getStakingRewards, shallowEqual) ?? {};
 
-  const totalUsdcRewards = stakingRewards?.reduce((total: number, reward) => {
+  const totalUsdcRewards = (totalRewards?.toArray() ?? [])?.reduce((total: number, reward) => {
     if (reward?.denom === usdcDenom && reward.amount) {
       return total + parseFloat(reward.amount);
     }

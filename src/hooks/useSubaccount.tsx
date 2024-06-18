@@ -715,6 +715,65 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     [localDydxWallet, compositeClient, chainTokenDecimals]
   );
 
+  const withdrawReward = useCallback(
+    async (validators: string[]) => {
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      }
+      if (!localDydxWallet) {
+        throw new Error('wallet not initialized');
+      }
+
+      const msgs = validators
+        .map((validator) => {
+          return compositeClient.validatorClient.post.withdrawDelegatorRewardMsg(
+            localDydxWallet.address ?? '',
+            validator
+          );
+        })
+        .filter(isTruthy);
+
+      const tx = await compositeClient.send(
+        localDydxWallet,
+        () => Promise.resolve(msgs),
+        false,
+        compositeClient.validatorClient.post.defaultGasPrice
+      );
+
+      return tx;
+    },
+    [localDydxWallet, compositeClient]
+  );
+
+  const getWithdrawRewardFee = useCallback(
+    async (validators: string[]) => {
+      if (!compositeClient) {
+        throw new Error('client not initialized');
+      }
+      if (!localDydxWallet) {
+        throw new Error('wallet not initialized');
+      }
+
+      const msgs = validators
+        .map((validator) => {
+          return compositeClient.validatorClient.post.withdrawDelegatorRewardMsg(
+            localDydxWallet.address ?? '',
+            validator
+          );
+        })
+        .filter(isTruthy);
+
+      const tx = await compositeClient.simulate(
+        localDydxWallet,
+        () => Promise.resolve(msgs),
+        compositeClient.validatorClient.post.defaultGasPrice
+      );
+
+      return tx;
+    },
+    [localDydxWallet, compositeClient]
+  );
+
   return {
     // Deposit/Withdraw/Faucet Methods
     deposit,
@@ -735,10 +794,12 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
     // Governance Methods
     submitNewMarketProposal,
 
-    // staking methods
+    // Staking methods
     delegate,
     getDelegateFee,
     undelegate,
     getUndelegateFee,
+    withdrawReward,
+    getWithdrawRewardFee,
   };
 };

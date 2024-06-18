@@ -85,7 +85,6 @@ export const UnbondingPanels = () => {
 const $Container = styled.div`
   ${layoutMixins.flexColumn}
   gap: 1.5rem;
-  flex: 1;
 `;
 
 const $Header = styled.div`

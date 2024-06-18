@@ -1,7 +1,5 @@
-import { shallowEqual } from 'react-redux';
-import styled from 'styled-components';
+import { SelectedGasDenom } from '@dydxprotocol/v4-client-js/src/clients/constants';
 
-import { ButtonAction, ButtonSize, ButtonType } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
@@ -9,28 +7,25 @@ import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
-import { Button } from '@/components/Button';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
-import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
-import { OnboardingTriggerButton } from '@/views/dialogs/OnboardingTriggerButton';
-
-import { calculateCanAccountTrade } from '@/state/accountCalculators';
-import { useAppSelector } from '@/state/appTypes';
+import {
+  StakeRewardButtonAndReceipt,
+  type StakeButtonAlert,
+} from '@/views/StakeRewardButtonAndReceipt';
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 
 type ElementProps = {
+  error?: StakeButtonAlert;
   fee?: BigNumberish;
   amount?: number;
-  isDisabled?: boolean;
-  isLoading?: boolean;
+  isLoading: boolean;
 };
 
-export const UnstakeButtonAndReceipt = ({ fee, amount, isDisabled, isLoading }: ElementProps) => {
+export const UnstakeButtonAndReceipt = ({ error, fee, amount, isLoading }: ElementProps) => {
   const stringGetter = useStringGetter();
-  const canAccountTrade = useAppSelector(calculateCanAccountTrade, shallowEqual);
   const { chainTokenLabel } = useTokenConfigs();
   const { nativeTokenBalance } = useAccountBalance();
 
@@ -77,25 +72,14 @@ export const UnstakeButtonAndReceipt = ({ fee, amount, isDisabled, isLoading }: 
   ];
 
   return (
-    <$WithDetailsReceipt detailItems={transferDetailItems}>
-      {!canAccountTrade ? (
-        <OnboardingTriggerButton size={ButtonSize.Base} />
-      ) : (
-        <Button
-          action={ButtonAction.Primary}
-          type={ButtonType.Submit}
-          state={{ isLoading, isDisabled }}
-        >
-          {stringGetter({ key: STRING_KEYS.UNSTAKE })}
-        </Button>
-      )}
-    </$WithDetailsReceipt>
+    <StakeRewardButtonAndReceipt
+      detailItems={transferDetailItems}
+      alert={error}
+      buttonText={stringGetter({ key: STRING_KEYS.UNSTAKE })}
+      gasFee={fee}
+      gasDenom={SelectedGasDenom.NATIVE}
+      isLoading={isLoading}
+      isForm
+    />
   );
 };
-const $WithDetailsReceipt = styled(WithDetailsReceipt)`
-  --withReceipt-backgroundColor: var(--color-layer-2);
-
-  dl {
-    padding: var(--form-input-paddingY) var(--form-input-paddingX);
-  }
-`;
