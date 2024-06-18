@@ -22,10 +22,10 @@ import { FormInput } from '@/components/FormInput';
 import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
 import { InputType } from '@/components/Input';
 import { OutputType } from '@/components/Output';
-import { StakeButtonAlert } from '@/components/StakeRewardButtonAndReceipt';
 import { Tag } from '@/components/Tag';
 import { ValidatorName } from '@/components/ValidatorName';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
+import { StakeButtonAlert } from '@/views/StakeRewardButtonAndReceipt';
 import { UnstakeButtonAndReceipt } from '@/views/forms/UnstakeForm/UnstakeButtonAndReceipt';
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';

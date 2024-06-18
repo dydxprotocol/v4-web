@@ -21,12 +21,12 @@ import { forceOpenDialog } from '@/state/dialogs';
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 
-import { AlertMessage } from './AlertMessage';
-import { Button } from './Button';
-import { DetailsItem } from './Details';
-import { Icon, IconName } from './Icon';
-import { WithDetailsReceipt } from './WithDetailsReceipt';
-import { WithTooltip } from './WithTooltip';
+import { AlertMessage } from '../components/AlertMessage';
+import { Button } from '../components/Button';
+import { DetailsItem } from '../components/Details';
+import { Icon, IconName } from '../components/Icon';
+import { WithDetailsReceipt } from '../components/WithDetailsReceipt';
+import { WithTooltip } from '../components/WithTooltip';
 
 type StakeButtonWarning = {
   type: AlertType.Warning | AlertType.Info;
