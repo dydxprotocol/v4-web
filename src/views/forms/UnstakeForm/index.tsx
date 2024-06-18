@@ -94,6 +94,7 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
 
   useEffect(() => {
     if (isAmountValid) {
+      setIsLoading(true);
       getUndelegateFee(amounts)
         .then((stdFee) => {
           if (stdFee.amount.length > 0) {
@@ -104,6 +105,9 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
         .catch((err) => {
           log('UnstakeForm/getDelegateFee', err);
           setFee(undefined);
+        })
+        .then(() => {
+          setIsLoading(false);
         });
     } else {
       setFee(undefined);

@@ -50,6 +50,7 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    setIsLoading(true);
     getWithdrawRewardFee(validators)
       .then((stdFee) => {
         if (stdFee.amount.length > 0) {
@@ -62,6 +63,9 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
       .catch((err) => {
         log('StakeRewardDialog/getWithdrawRewardFee', err);
         setFee(undefined);
+      })
+      .then(() => {
+        setIsLoading(false);
       });
   }, [getWithdrawRewardFee, usdcDecimals, validators]);
 
