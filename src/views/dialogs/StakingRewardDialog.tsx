@@ -17,11 +17,11 @@ import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog } from '@/components/Dialog';
 import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType, ShowSign } from '@/components/Output';
+import { Tag } from '@/components/Tag';
 import {
   StakeRewardButtonAndReceipt,
   type StakeButtonAlert,
-} from '@/components/StakeRewardButtonAndReceipt';
-import { Tag } from '@/components/Tag';
+} from '@/views/StakeRewardButtonAndReceipt';
 
 import { getSubaccountEquity } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';

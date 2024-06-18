@@ -9,11 +9,11 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
+import { Tag } from '@/components/Tag';
 import {
   StakeRewardButtonAndReceipt,
   type StakeButtonAlert,
-} from '@/components/StakeRewardButtonAndReceipt';
-import { Tag } from '@/components/Tag';
+} from '@/views/StakeRewardButtonAndReceipt';
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 

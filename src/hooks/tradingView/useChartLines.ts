@@ -191,7 +191,7 @@ export const useChartLines = ({
 
         const shouldShow =
           !cancelReason &&
-          (status === AbacusOrderStatus.open || status === AbacusOrderStatus.untriggered);
+          (status === AbacusOrderStatus.Open || status === AbacusOrderStatus.Untriggered);
 
         const maybeOrderLine = chartLinesRef.current[key]?.line;
         const formattedPrice = MustBigNumber(triggerPrice ?? price).toNumber();
