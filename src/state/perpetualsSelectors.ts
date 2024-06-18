@@ -49,13 +49,16 @@ export const getMarketIds = (state: RootState) =>
  * @returns clobPairIds of all markets, mapped by marketId.
  */
 export const getPerpetualMarketsClobIds = createAppSelector([getPerpetualMarkets], (markets) => {
-  return Object.entries(markets ?? {}).reduce((acc, [marketId, market]) => {
-    const clobPairId: Nullable<string> = market?.configs?.clobPairId;
-    if (clobPairId !== undefined) {
-      acc[marketId] = Number(clobPairId);
-    }
-    return acc;
-  }, {} as Record<string, number>);
+  return Object.entries(markets ?? {}).reduce(
+    (acc, [marketId, market]) => {
+      const clobPairId: Nullable<string> = market?.configs?.clobPairId;
+      if (clobPairId !== undefined) {
+        acc[marketId] = Number(clobPairId);
+      }
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 });
 
 /**
