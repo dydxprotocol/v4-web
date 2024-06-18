@@ -10,7 +10,7 @@ import { PositionSide } from '@/constants/trade';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
-import { LogoShortIcon } from '@/icons';
+import { LogoIcon } from '@/icons/logo';
 import { layoutMixins } from '@/styles/layoutMixins';
 
 import { AssetIcon } from '@/components/AssetIcon';
@@ -94,9 +94,11 @@ export const SharePNLAnalyticsDialog = ({
 
   const unrealizedPnlIsNegative = MustBigNumber(unrealizedPnlPercent).isNegative();
 
+  const [assetLeft, assetRight] = marketId.split('-');
+
   return (
     <Dialog isOpen setIsOpen={setIsOpen} title={stringGetter({ key: STRING_KEYS.SHARE_ACTIVITY })}>
-      <$SharableCard
+      <$ShareableCard
         ref={(domNode) => {
           if (domNode) {
             ref(domNode);
@@ -104,14 +106,16 @@ export const SharePNLAnalyticsDialog = ({
           }
         }}
       >
-        <$SharableCardSide>
-          <$SharableCardTitle>
+        <$ShareableCardSide>
+          <$ShareableCardTitle>
             <$AssetIcon symbol={assetId} />
 
-            {marketId}
+            <span>
+              <$ShareableCardTitleAsset>{assetLeft}</$ShareableCardTitleAsset>/{assetRight}
+            </span>
 
             <Tag sign={sideSign}>{sideLabel}</Tag>
-          </$SharableCardTitle>
+          </$ShareableCardTitle>
 
           <$HighlightOutput
             isNegative={unrealizedPnlIsNegative}
@@ -126,35 +130,48 @@ export const SharePNLAnalyticsDialog = ({
               )
             }
           />
-          <LogoShortIcon />
-        </$SharableCardSide>
 
-        <$SharableCardStats>
-          <$SharableCardStat>
-            {stringGetter({ key: STRING_KEYS.ENTRY })}:{' '}
-            <Output type={OutputType.Fiat} value={entryPrice} withSubscript />
-          </$SharableCardStat>
-          <$SharableCardStat>
-            {stringGetter({ key: STRING_KEYS.INDEX })}:{' '}
-            <Output type={OutputType.Fiat} value={oraclePrice} withSubscript />
-          </$SharableCardStat>
-          <$SharableCardStat>
-            {stringGetter({ key: STRING_KEYS.LEVERAGE })}:{' '}
-            <Output type={OutputType.Multiple} value={leverage} showSign={ShowSign.None} />
-          </$SharableCardStat>
+          <$Logo />
+        </$ShareableCardSide>
+
+        <div>
+          <$ShareableCardStats>
+            <$ShareableCardStatLabel>
+              {stringGetter({ key: STRING_KEYS.ENTRY })}
+            </$ShareableCardStatLabel>
+            <$ShareableCardStatOutput type={OutputType.Fiat} value={entryPrice} withSubscript />
+
+            <$ShareableCardStatLabel>
+              {stringGetter({ key: STRING_KEYS.INDEX })}
+            </$ShareableCardStatLabel>
+            <$ShareableCardStatOutput type={OutputType.Fiat} value={oraclePrice} withSubscript />
+
+            <$ShareableCardStatLabel>
+              {stringGetter({ key: STRING_KEYS.LEVERAGE })}
+            </$ShareableCardStatLabel>
+
+            <$ShareableCardStatOutput
+              type={OutputType.Multiple}
+              value={leverage}
+              showSign={ShowSign.None}
+            />
+          </$ShareableCardStats>
 
           <$QrCode
-            size={128}
+            size={68}
             options={{
               margin: 0,
               backgroundOptions: {
-                color: 'transparent',
+                color: 'var(--color-layer-3)',
+              },
+              imageOptions: {
+                margin: 0,
               },
             }}
             value={import.meta.env.VITE_SHARE_PNL_ANALYTICS_URL}
           />
-        </$SharableCardStats>
-      </$SharableCard>
+        </div>
+      </$ShareableCard>
 
       <$Actions>
         <$Action
@@ -195,35 +212,52 @@ const $Action = styled(Button)`
   flex: 1;
 `;
 
-const $SharableCard = styled.div`
+const $ShareableCard = styled.div`
   ${layoutMixins.row}
   gap: 0.5rem;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
   background-color: var(--color-layer-4);
-  padding: 1.75rem 1.875rem 1.75rem 1.25rem;
+  padding: 1.75rem 1.25rem 1.25rem 1.25rem;
   border-radius: 0.5rem;
 `;
 
-const $SharableCardSide = styled.div`
-  ${layoutMixins.column}
-  gap: 1rem;
+const $ShareableCardSide = styled.div`
+  ${layoutMixins.flexColumn}
+  height: 100%;
 `;
 
-const $SharableCardTitle = styled.div`
+const $ShareableCardTitle = styled.div`
   ${layoutMixins.row};
   gap: 0.5rem;
+  font-weight: var(--fontWeight-medium);
+  margin-bottom: 0.75rem;
 `;
 
-const $SharableCardStats = styled.div`
-  ${layoutMixins.column};
-  gap: 0.5rem;
+const $ShareableCardTitleAsset = styled.span`
+  color: var(--color-white);
 `;
 
-const $SharableCardStat = styled.div`
-  ${layoutMixins.row};
-  gap: 0.5rem;
+const $ShareableCardStats = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.125rem;
+  row-gap: 0.5rem;
+`;
+
+const $ShareableCardStatLabel = styled.div`
+  font: var(--font-base-medium);
+  text-align: right;
+`;
+
+const $ShareableCardStatOutput = styled(Output)`
+  font: var(--font-base-medium);
+  color: var(--color-text-2);
+
+  * {
+    color: var(--color-text-2);
+  }
 `;
 
 const $AssetIcon = styled(AssetIcon)`
@@ -231,7 +265,10 @@ const $AssetIcon = styled(AssetIcon)`
 `;
 
 const $QrCode = styled(QrCode)`
-  margin-top: 2rem;
+  width: 5.25rem;
+  height: 5.25rem;
+  margin-top: 1rem;
+  margin-left: auto;
 
   svg {
     border: none;
@@ -239,6 +276,7 @@ const $QrCode = styled(QrCode)`
 `;
 
 const $HighlightOutput = styled(Output)<{ isNegative?: boolean }>`
+  font-size: 2.25rem;
   color: var(--output-sign-color);
   --secondary-item-color: currentColor;
   --output-sign-color: ${({ isNegative }) =>
@@ -250,9 +288,19 @@ const $HighlightOutput = styled(Output)<{ isNegative?: boolean }>`
 `;
 
 const $ArrowUpIcon = styled(Icon)<{ negative?: boolean }>`
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
   transform: rotateZ(-90deg);
 `;
 
 const $ArrowDownIcon = styled(Icon)<{ negative?: boolean }>`
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
   transform: rotateZ(90deg);
+`;
+
+const $Logo = styled(LogoIcon)`
+  width: 5.125rem;
+  margin-top: auto;
+  height: auto;
 `;
