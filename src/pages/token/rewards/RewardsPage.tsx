@@ -49,7 +49,7 @@ const RewardsPage = () => {
   const usdcDecimals = 24; // hardcoded solution; fix in OTE-390
   const stakingEnabled = testFlags.enableStaking;
 
-  const { totalRewards, validators } = useAppSelector(getStakingRewards, shallowEqual) ?? {};
+  const { totalRewards } = useAppSelector(getStakingRewards, shallowEqual) ?? {};
 
   const totalUsdcRewards = (totalRewards?.toArray() ?? [])?.reduce((total: number, reward) => {
     if (reward?.denom === usdcDenom && reward.amount) {
@@ -64,7 +64,6 @@ const RewardsPage = () => {
 
   const stakingRewardPanel = (
     <StakingRewardPanel
-      validators={validators?.toArray() ?? []}
       usdcRewards={MustBigNumber(formatUnits(BigInt(totalUsdcRewards), usdcDecimals))}
     />
   );

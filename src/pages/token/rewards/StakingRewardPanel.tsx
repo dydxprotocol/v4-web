@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 
+import { shallowEqual } from 'react-redux';
 import styled, { css } from 'styled-components';
 
 import { ButtonAction, ButtonSize } from '@/constants/buttons';
@@ -17,6 +18,7 @@ import { Output, OutputType, ShowSign } from '@/components/Output';
 import { Panel } from '@/components/Panel';
 
 import { calculateCanAccountTrade } from '@/state/accountCalculators';
+import { getStakingRewards } from '@/state/accountSelectors';
 import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getChartDotBackground } from '@/state/configsSelectors';
 import { openDialog } from '@/state/dialogs';
@@ -24,23 +26,23 @@ import { openDialog } from '@/state/dialogs';
 import { BigNumberish } from '@/lib/numbers';
 
 type ElementProps = {
-  validators: string[];
   usdcRewards: BigNumberish;
 };
 
-export const StakingRewardPanel = ({ validators, usdcRewards }: ElementProps) => {
+export const StakingRewardPanel = ({ usdcRewards }: ElementProps) => {
   const dispatch = useAppDispatch();
   const stringGetter = useStringGetter();
 
   const canAccountTrade = useAppSelector(calculateCanAccountTrade);
   const chartDotsBackground = useAppSelector(getChartDotBackground);
+  const { validators } = useAppSelector(getStakingRewards, shallowEqual) ?? {};
 
   const openStakingRewardDialog = useCallback(
     () =>
       dispatch(
         openDialog({
           type: DialogTypes.StakingReward,
-          dialogProps: { validators, usdcRewards },
+          dialogProps: { validators: validators?.toArray() ?? [], usdcRewards },
         })
       ),
     [dispatch, validators, usdcRewards]
