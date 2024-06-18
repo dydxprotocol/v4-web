@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { useToBlob, useToPng } from '@hugocxl/react-to-image';
+import { useToBlob } from '@hugocxl/react-to-image';
 import styled from 'styled-components';
 
 import { AbacusPositionSides, Nullable } from '@/constants/abacus';
@@ -39,6 +39,15 @@ type ElementProps = {
   setIsOpen: (open: boolean) => void;
 };
 
+const copyBlobToClipboard = async (blob: Blob | null) => {
+  if (!blob) {
+    return;
+  }
+
+  const item = new ClipboardItem({ 'image/png': blob });
+  await navigator.clipboard.write([item]);
+};
+
 export const SharePNLAnalyticsDialog = ({
   marketId,
   assetId,
@@ -53,27 +62,15 @@ export const SharePNLAnalyticsDialog = ({
   const stringGetter = useStringGetter();
   const dispatch = useAppDispatch();
 
-  const [{ isLoading: isDownloading }, convert, ref] = useToPng<HTMLDivElement>({
+  const [{ isLoading: isCopying }, convert, ref] = useToBlob<HTMLDivElement>({
     quality: 1.0,
-    onSuccess: (data) => {
-      const link = document.createElement('a');
-      link.download = `${marketId}-share.png`;
-      link.href = data;
-      link.click();
-
-      dispatch(closeDialog());
-    },
+    onSuccess: copyBlobToClipboard,
   });
 
   const [{ isLoading: isSharing }, convertShare, refShare] = useToBlob<HTMLDivElement>({
     quality: 1.0,
     onSuccess: async (blob) => {
-      if (!blob) {
-        return;
-      }
-
-      const item = new ClipboardItem({ 'image/png': blob });
-      await navigator.clipboard.write([item]);
+      await copyBlobToClipboard(blob);
 
       triggerTwitterIntent({
         text: `Check out my ${assetId} position on @dYdX\n\n#dYdX #${assetId}\n[paste image and delete this!]`,
@@ -162,15 +159,15 @@ export const SharePNLAnalyticsDialog = ({
       <$Actions>
         <$Action
           action={ButtonAction.Secondary}
-          slotLeft={<Icon iconName={IconName.Download} />}
+          slotLeft={<Icon iconName={IconName.Copy} />}
           onClick={() => {
             convert();
           }}
           state={{
-            isLoading: isDownloading,
+            isLoading: isCopying,
           }}
         >
-          {stringGetter({ key: STRING_KEYS.DOWNLOAD })}
+          {stringGetter({ key: STRING_KEYS.COPY })}
         </$Action>
         <$Action
           action={ButtonAction.Primary}
@@ -204,6 +201,9 @@ const $SharableCard = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 2rem;
+  background-color: var(--color-layer-4);
+  padding: 1.75rem 1.875rem 1.75rem 1.25rem;
+  border-radius: 0.5rem;
 `;
 
 const $SharableCardSide = styled.div`
@@ -227,7 +227,7 @@ const $SharableCardStat = styled.div`
 `;
 
 const $AssetIcon = styled(AssetIcon)`
-  height: 2rem;
+  height: 1.625rem;
 `;
 
 const $QrCode = styled(QrCode)`
