@@ -1,13 +1,20 @@
 import { useAppThemeAndColorModeContext } from '@/hooks/useAppThemeAndColorMode';
 
-type LogoIconProps = { id?: string };
+type LogoIconProps = { id?: string; className?: string };
 
-export const LogoIcon = ({ id }: LogoIconProps) => {
+export const LogoIcon = ({ id, className }: LogoIconProps) => {
   const theme = useAppThemeAndColorModeContext();
   const fill = theme.logoFill;
 
   return (
-    <svg viewBox="0 0 363 113" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="363"
+      height="113"
+      className={className}
+      viewBox="0 0 363 113"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path d="M336.17 0L258 111.991H282L360.576 0H336.17Z" fill={fill} />
       <path
         d="M284.5 0L307.5 33L295.5 51L260 0H284.5Z"
