@@ -86,12 +86,13 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
                 MustBigNumber(AMOUNT_RESERVED_FOR_GAS_DYDX)
               )
             );
-            setIsLoading(false);
           }
         })
         .catch((err) => {
           log('StakeForm/getDelegateFee', err);
           setFee(undefined);
+        })
+        .then(() => {
           setIsLoading(false);
         });
     } else {

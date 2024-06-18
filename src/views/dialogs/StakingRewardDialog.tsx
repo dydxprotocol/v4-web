@@ -59,11 +59,12 @@ export const StakingRewardDialog = ({ validators, usdcRewards, setIsOpen }: Elem
         } else {
           setFee(undefined);
         }
-        setIsLoading(false);
       })
       .catch((err) => {
         log('StakeRewardDialog/getWithdrawRewardFee', err);
         setFee(undefined);
+      })
+      .then(() => {
         setIsLoading(false);
       });
   }, [getWithdrawRewardFee, usdcDecimals, validators]);

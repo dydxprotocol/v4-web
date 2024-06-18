@@ -100,12 +100,13 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
           if (stdFee.amount.length > 0) {
             const feeAmount = stdFee.amount[0].amount;
             setFee(MustBigNumber(formatUnits(BigInt(feeAmount), chainTokenDecimals)));
-            setIsLoading(false);
           }
         })
         .catch((err) => {
           log('UnstakeForm/getDelegateFee', err);
           setFee(undefined);
+        })
+        .then(() => {
           setIsLoading(false);
         });
     } else {
