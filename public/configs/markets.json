@@ -519,6 +519,14 @@
         "whitepaperLink": "https://makerdao.com/whitepaper",
         "coinMarketCapsLink": "https://coinmarketcap.com/currencies/maker/"
     },
+    "MOTHER-USD": {
+        "name": "Mother Iggy",
+        "tags": [
+            "Meme"
+        ],
+        "websiteLink": "https://x.com/IGGYAZALEA",
+        "coinMarketCapsLink": "https://coinmarketcap.com/currencies/mother-iggy/"
+    },
     "NEAR-USD": {
         "name": "NEAR Protocol",
         "tags": [
