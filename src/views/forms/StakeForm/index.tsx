@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 
+import BigNumber from 'bignumber.js';
 import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
+import { AMOUNT_RESERVED_FOR_GAS_DYDX } from '@/constants/account';
 import { AlertType } from '@/constants/alerts';
 import { DialogTypes } from '@/constants/dialogs';
 import { STRING_KEYS } from '@/constants/localization';
@@ -17,13 +19,13 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { formMixins } from '@/styles/formMixins';
 
-import { AlertMessage } from '@/components/AlertMessage';
 import { DiffOutput } from '@/components/DiffOutput';
 import { FormInput } from '@/components/FormInput';
 import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton';
 import { InputType } from '@/components/Input';
 import { Link } from '@/components/Link';
 import { OutputType } from '@/components/Output';
+import { StakeButtonAlert } from '@/components/StakeRewardButtonAndReceipt';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { StakeButtonAndReceipt } from '@/views/forms/StakeForm/StakeButtonAndReceipt';
@@ -49,39 +51,57 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
   const { chainTokenLabel, chainTokenDecimals } = useTokenConfigs();
 
   // Form states
-  const [error, setError] = useState<string>();
+  const [error, setError] = useState<StakeButtonAlert>();
   const [fee, setFee] = useState<BigNumberish>();
-  const [amount, setAmount] = useState<number | undefined>(undefined);
+  const [amountBN, setAmountBN] = useState<BigNumber | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
 
-  const showNotEnoughGasWarning = balance.lt(fee ?? 0);
-
   // BN
-  const amountBN = MustBigNumber(amount);
   const newBalanceBN = balance.minus(amountBN ?? 0);
+  const maxAmountBN = MustBigNumber(balance.toNumber() - AMOUNT_RESERVED_FOR_GAS_DYDX);
 
-  const isAmountValid = balance && amount && amountBN.gt(0) && newBalanceBN.gte(0);
+  const isAmountValid = amountBN && amountBN.gt(0) && amountBN.lte(maxAmountBN);
+
+  useEffect(() => {
+    if (amountBN && !isAmountValid) {
+      setError({
+        key: STRING_KEYS.ISOLATED_MARGIN_ADJUSTMENT_INVALID_AMOUNT,
+        type: AlertType.Error,
+        message: stringGetter({ key: STRING_KEYS.ISOLATED_MARGIN_ADJUSTMENT_INVALID_AMOUNT }),
+      });
+    } else {
+      setError(undefined);
+    }
+  }, [stringGetter, amountBN, isAmountValid]);
 
   useEffect(() => {
     if (isAmountValid && selectedValidator) {
-      getDelegateFee(selectedValidator.operatorAddress, amount)
+      setIsLoading(true);
+      getDelegateFee(selectedValidator.operatorAddress, amountBN.toNumber())
         .then((stdFee) => {
           if (stdFee.amount.length > 0) {
             const feeAmount = stdFee.amount[0].amount;
-            setFee(MustBigNumber(formatUnits(BigInt(feeAmount), chainTokenDecimals)));
+            setFee(
+              MustBigNumber(formatUnits(BigInt(feeAmount), chainTokenDecimals)).plus(
+                MustBigNumber(AMOUNT_RESERVED_FOR_GAS_DYDX)
+              )
+            );
           }
         })
         .catch((err) => {
           log('StakeForm/getDelegateFee', err);
           setFee(undefined);
+        })
+        .then(() => {
+          setIsLoading(false);
         });
     } else {
       setFee(undefined);
     }
-  }, [setFee, getDelegateFee, amount, selectedValidator, isAmountValid, chainTokenDecimals]);
+  }, [getDelegateFee, amountBN, selectedValidator, isAmountValid, chainTokenDecimals]);
 
-  const onChangeAmount = (value: number | undefined) => {
-    setAmount(value);
+  const onChangeAmount = (value?: BigNumber) => {
+    setAmountBN(value);
   };
 
   const onStake = useCallback(async () => {
@@ -90,15 +110,15 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
     }
     try {
       setIsLoading(true);
-      await delegate(selectedValidator.operatorAddress, amount);
+      await delegate(selectedValidator.operatorAddress, amountBN.toNumber());
       onDone?.();
     } catch (err) {
       log('StakeForm/onStake', err);
-      setError(err.message);
+      setError({ key: err.message, type: AlertType.Error, message: err.message });
     } finally {
       setIsLoading(false);
     }
-  }, [isAmountValid, selectedValidator, amount, delegate, onDone]);
+  }, [isAmountValid, selectedValidator, amountBN, delegate, onDone]);
 
   const amountDetailItems = [
     {
@@ -115,7 +135,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
           sign={NumberSign.Negative}
           newValue={newBalanceBN}
           hasInvalidNewValue={newBalanceBN.isNegative()}
-          withDiff={Boolean(amount && balance) && !amountBN.isNaN()}
+          withDiff={amountBN && balance && !amountBN.isNaN()}
         />
       ),
     },
@@ -152,14 +172,16 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
         <FormInput
           label={stringGetter({ key: STRING_KEYS.AMOUNT_TO_STAKE })}
           type={InputType.Number}
-          onChange={({ floatValue }: NumberFormatValues) => onChangeAmount(floatValue)}
-          value={amount ?? undefined}
+          onChange={({ floatValue }: NumberFormatValues) =>
+            onChangeAmount(floatValue ? MustBigNumber(floatValue) : undefined)
+          }
+          value={amountBN ? amountBN.toNumber() : undefined}
           slotRight={
             <FormMaxInputToggleButton
-              isInputEmpty={!amount}
+              isInputEmpty={!amountBN}
               isLoading={isLoading}
               onPressedChange={(isPressed: boolean) =>
-                isPressed ? onChangeAmount(balance.toNumber()) : onChangeAmount(undefined)
+                isPressed ? onChangeAmount(maxAmountBN) : onChangeAmount(undefined)
               }
             />
           }
@@ -167,22 +189,12 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
         />
       </$WithDetailsReceipt>
 
-      {showNotEnoughGasWarning && (
-        <AlertMessage type={AlertType.Warning}>
-          {stringGetter({
-            key: STRING_KEYS.TRANSFER_INSUFFICIENT_GAS, // TODO: OTE-399 update, this should be DYDX (and support both gas types)
-          })}
-        </AlertMessage>
-      )}
-
-      {error && <AlertMessage type={AlertType.Error}>{error}</AlertMessage>}
-
       <$Footer>
         <StakeButtonAndReceipt
-          fee={fee ?? undefined}
-          isDisabled={!isAmountValid || !fee || isLoading}
-          isLoading={isLoading || Boolean(isAmountValid && !fee)}
-          amount={amount}
+          error={error}
+          fee={fee}
+          isLoading={isLoading}
+          amount={amountBN?.toNumber()}
         />
         <$LegalDisclaimer>
           {stringGetter({
