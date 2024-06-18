@@ -313,7 +313,7 @@ const getOrdersTableColumnDef = ({
           const marginMode = getMarginModeFromSubaccountNumber(row.subaccountNumber);
 
           const marginModeLabel =
-            marginMode === AbacusMarginMode.cross
+            marginMode === AbacusMarginMode.Cross
               ? stringGetter({ key: STRING_KEYS.CROSS })
               : stringGetter({ key: STRING_KEYS.ISOLATED });
           return <Output type={OutputType.Text} value={marginModeLabel} />;
