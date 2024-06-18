@@ -591,8 +591,6 @@ class DydxChainTransactions implements AbacusDYDXChainTransactionsProtocol {
 
       switch (type) {
         case TransactionType.PlaceOrder: {
-          // eslint-disable-next-line no-console
-          console.log('placeOrder', params);
           const result = await this.placeOrderTransaction(params);
           callback(result);
           break;
