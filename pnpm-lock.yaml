@@ -1394,8 +1394,13 @@ packages:
       format-util: 1.0.5
     dev: false
 
+<<<<<<< HEAD
   /@dydxprotocol/v4-client-js@1.1.22:
     resolution: {integrity: sha512-rWySMilUZTKAehLE+XamSEJg8iW0qWfxR/Mp6Ly/pGzWJxMftQAy96If2V42yL7b5v+Eq2uIbCrqkFK4dbZfLQ==}
+=======
+  /@dydxprotocol/v4-client-js@1.1.18:
+    resolution: {integrity: sha512-k3HtKwAJ0bWXkzNKJnhBi5S+UHGmk2e8JZhtNW1+8errXtqgMZTHCJa2ymqLdc1MN140stDt8JWNXO3FWvWu0A==}
+>>>>>>> c17e91e825a24701ae6108862520c4367c830503
     dependencies:
       '@cosmjs/amino': 0.32.2
       '@cosmjs/encoding': 0.32.2

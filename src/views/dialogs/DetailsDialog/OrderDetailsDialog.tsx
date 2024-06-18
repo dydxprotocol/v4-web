@@ -61,6 +61,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     createdAtMilliseconds,
     expiresAtMilliseconds,
     marketId,
+    orderFlags,
     orderSide,
     postOnly,
     price,
@@ -75,7 +76,6 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
     trailingPercent,
     triggerPrice,
     type,
-    orderFlags,
   } = useParameterizedSelector(getOrderDetails, orderId)! ?? {};
 
   const marginMode = getMarginModeFromSubaccountNumber(subaccountNumber);

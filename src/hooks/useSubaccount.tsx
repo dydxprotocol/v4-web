@@ -586,7 +586,10 @@ const useSubaccountContext = ({ localDydxWallet }: { localDydxWallet?: LocalWall
         params,
         utils.getGovAddNewMarketTitle(params.ticker),
         utils.getGovAddNewMarketSummary(params.ticker, newMarketProposal.delayBlocks),
-        BigInt(newMarketProposal.initialDepositAmount).toString()
+        BigInt(newMarketProposal.initialDepositAmount).toString(),
+        undefined,
+        undefined,
+        true
       );
 
       return response;

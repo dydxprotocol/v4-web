@@ -65,6 +65,7 @@ const assetIcons = {
   MEME: '/currencies/meme.png',
   MINA: '/currencies/mina.png',
   MKR: '/currencies/mkr.png',
+  MOTHER: '/currencies/mother.png',
   NEAR: '/currencies/near.png',
   OCEAN: '/currencies/ocean.png',
   ORDI: '/currencies/ordi.png',
@@ -125,4 +126,5 @@ export const AssetIcon = ({
 const $Img = styled.img`
   width: auto;
   height: 1em;
+  border-radius: 50%;
 `;
