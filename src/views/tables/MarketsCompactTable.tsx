@@ -299,17 +299,6 @@ const $RecentlyListed = styled.div`
     text-align: right;
     justify-content: flex-end;
   }
-
-  & > span:first-child {
-    color: var(--color-text-0);
-    font: var(--font-mini-medium);
-  }
-
-  & > span:last-child,
-  & > output:first-child {
-    color: var(--color-text-1);
-    font: var(--font-small-medium);
-  }
 `;
 
 const $InterestOutput = styled(Output)`
