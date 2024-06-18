@@ -57,7 +57,7 @@ export const LimitPriceInputs = ({
   const onToggleLimit = (isLimitChecked: boolean) => {
     if (!isLimitChecked) {
       abacusStateManager.setTriggerOrdersValue({
-        value: AbacusOrderType.takeProfitMarket.rawValue,
+        value: AbacusOrderType.TakeProfitMarket.rawValue,
         field: TriggerOrdersInputField.takeProfitOrderType,
       });
       abacusStateManager.setTriggerOrdersValue({
@@ -65,7 +65,7 @@ export const LimitPriceInputs = ({
         field: TriggerOrdersInputField.takeProfitLimitPrice,
       });
       abacusStateManager.setTriggerOrdersValue({
-        value: AbacusOrderType.stopMarket.rawValue,
+        value: AbacusOrderType.StopMarket.rawValue,
         field: TriggerOrdersInputField.stopLossOrderType,
       });
       abacusStateManager.setTriggerOrdersValue({

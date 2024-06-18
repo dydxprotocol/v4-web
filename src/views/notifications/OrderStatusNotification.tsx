@@ -69,7 +69,7 @@ export const OrderStatusNotification = ({
     case PlaceOrderStatuses.Filled:
       if (indexedOrderStatus) {
         // skip pending / best effort open state -> still show as submitted (loading)
-        if (indexedOrderStatus === AbacusOrderStatus.pending.rawValue) break;
+        if (indexedOrderStatus === AbacusOrderStatus.Pending.rawValue) break;
 
         orderStatusStringKey = ORDER_STATUS_STRINGS[indexedOrderStatus];
         orderStatusIcon = <$OrderStatusIcon status={indexedOrderStatus} />;
