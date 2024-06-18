@@ -25,7 +25,7 @@ import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton'
 import { InputType } from '@/components/Input';
 import { Link } from '@/components/Link';
 import { OutputType } from '@/components/Output';
-import { StakeButtonAlert } from '@/components/StakeRewardButtonAndReceipt';
+import { StakeButtonAlert } from '@/views/StakeRewardButtonAndReceipt';
 import { Tag } from '@/components/Tag';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { StakeButtonAndReceipt } from '@/views/forms/StakeForm/StakeButtonAndReceipt';

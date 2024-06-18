@@ -13,7 +13,7 @@ import { Output, OutputType } from '@/components/Output';
 import {
   StakeButtonAlert,
   StakeRewardButtonAndReceipt,
-} from '@/components/StakeRewardButtonAndReceipt';
+} from '@/views/StakeRewardButtonAndReceipt';
 import { Tag } from '@/components/Tag';
 import { ValidatorName } from '@/components/ValidatorName';
 import { WithTooltip } from '@/components/WithTooltip';
