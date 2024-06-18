@@ -115,6 +115,7 @@ enum ExchangeName {
   Kucoin = 'Kucoin',
   Mexc = 'Mexc',
   Okx = 'Okx',
+  Raydium = 'Raydium',
 }
 
 interface PrometheusTimeSeries {
@@ -270,6 +271,17 @@ const EXCHANGE_INFO: { [key in ExchangeName]: ExchangeInfo } = {
     },
     slinkyProviderName: 'okx_ws',
   },
+  [ExchangeName.Raydium]: {
+    url: '',
+    tickers: null,
+    parseResp: (response: any) => {
+      return Array.from(response.data).reduce((acc: Map<string, any>, item: any) => {
+        acc.set(item.instId, {});
+        return acc;
+      }, new Map<string, any>());
+    },
+    slinkyProviderName: 'Raydium',
+  },
 };
 
 enum ValidationError {
@@ -298,7 +310,9 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
 
     // `adjustByMarket` should be set if ticker doesn't end in usd or USD.
     if (
-      (!/usd$/i.test(exchange.ticker) && exchange.adjustByMarket === undefined) ||
+      (exchange.exchangeName !== ExchangeName.Raydium &&
+        !/usd$|usdc$/i.test(exchange.ticker) &&
+        exchange.adjustByMarket === undefined) ||
       exchange.adjustByMarket === ''
     ) {
       throw new Error(
@@ -309,7 +323,12 @@ async function validateExchangeConfigJson(exchangeConfigJson: Exchange[]): Promi
 
     // TODO: Skip Bybit exchange until we can query from non-US IP.
     if (exchange.exchangeName === ExchangeName.Bybit) {
-      return; // exit the current iteration of the loop.
+      continue; // exit the current iteration of the loop.
+    }
+
+    // TODO: Skip Raydium since ticker is idiosyncratic
+    if (exchange.exchangeName === ExchangeName.Raydium) {
+      continue; // exit the current iteration of the loop.
     }
 
     // Query exchange tickers if not yet.
@@ -402,7 +421,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
     for (let j = 0; j < proposalsToSend.length; j++) {
       // Use wallets[j] to send out proposalsToSend[j]
       const proposal = proposalsToSend[j];
-      const proposalId: number = i + j + 1;
+      const proposalId: number = i + j + 1; 
       const marketId: number = numExistingMarkets + proposalId;
 
       // Send proposal.
@@ -490,7 +509,7 @@ async function validateAgainstLocalnet(proposals: Proposal[]): Promise<void> {
 
   // Wait for prices to update.
   console.log('\nWaiting for 300 seconds for prices to update...');
-  await sleep(300 * 1000);
+  await sleep(400 * 1000);
 
   // Check markets on chain.
   console.log('\nChecking price, clob pair, and perpetual on chain for each market proposed...');
@@ -673,6 +692,7 @@ function validateParamsSchema(proposal: Proposal): void {
             exchangeName: { type: 'string' },
             ticker: { type: 'string' },
             adjustByMarket: { type: 'string', nullable: true },
+            invert: {type: 'boolean', nullable: true },
           },
           required: ['exchangeName', 'ticker'],
           additionalProperties: false,
