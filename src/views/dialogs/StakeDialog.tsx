@@ -42,6 +42,7 @@ export const StakeDialog = ({ setIsOpen }: ElementProps) => {
 };
 const $Dialog = styled(Dialog)`
   --dialog-content-paddingTop: var(--default-border-width);
+  --dialog-width: 30rem;
 `;
 
 const $Title = styled.span`

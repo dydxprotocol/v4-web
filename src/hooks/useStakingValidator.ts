@@ -50,6 +50,8 @@ export const useStakingValidator = () => {
         currentDelegations?.some((d) => d.validator === validator.operatorAddress.toLowerCase())
       ) ?? [];
 
+    console.log('Xcxc staking', stakingValidators);
+
     const unbondingValidators =
       response?.validators.filter((validator) =>
         unbondingDelegations?.some((d) => d.validator === validator.operatorAddress.toLowerCase())
@@ -66,6 +68,7 @@ export const useStakingValidator = () => {
 
     return {
       selectedValidator: validatorWithFewestTokens,
+      availableValidators: filteredValidators,
       stakingValidators: groupBy(stakingValidators, ({ operatorAddress }) => operatorAddress),
       unbondingValidators: groupBy(unbondingValidators, ({ operatorAddress }) => operatorAddress),
       currentDelegations,

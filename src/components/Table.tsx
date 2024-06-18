@@ -565,9 +565,7 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
           <$SortArrow
             aria-hidden="true"
             sortDirection={
-              state.sortDescriptor?.column === column.key
-                ? state.sortDescriptor?.direction
-                : undefined
+              state.sortDescriptor?.column === column.key ? state.sortDescriptor?.direction : 'none'
             }
           >
             <Icon iconName={IconName.Triangle} aria-hidden="true" />
@@ -857,7 +855,7 @@ const $Td = styled.td`
   }
 `;
 
-const $SortArrow = styled.span<{ sortDirection?: 'ascending' | 'descending' }>`
+const $SortArrow = styled.span<{ sortDirection: 'ascending' | 'descending' | 'none' }>`
   float: right;
   margin-left: auto;
 
@@ -868,13 +866,24 @@ const $SortArrow = styled.span<{ sortDirection?: 'ascending' | 'descending' }>`
 
   font-size: 0.375em;
 
-  ${$Th}[aria-sort="none"] & {
-    visibility: hidden;
-  }
+  ${({ sortDirection }) =>
+    ({
+      ascending: css`
+        transform: scaleY(-1);
+      `,
+      descending: css`
+        transform: scaleY(1);
+      `,
+      none: css`
+        visibility: hidden;
+      `,
+    })[sortDirection]}// ${$Th}[aria-sort="none"] & {
+  //   visibility: hidden;
+  // }
 
-  ${$Th}[aria-sort="ascending"] & {
-    transform: scaleY(-1);
-  }
+  // ${$Th}[aria-sort="ascending"] & {
+  //   transform: scaleY(-1);
+  // }
 `;
 
 const $Thead = styled.thead<TableStyleProps>`

@@ -153,8 +153,6 @@ const detailsLayoutVariants = {
 
 const itemLayoutVariants = {
   column: css`
-    isolation: isolate;
-
     ${layoutMixins.scrollArea}
 
     ${layoutMixins.stickyArea0}
@@ -264,7 +262,7 @@ const $Item = styled.div<{
 
   /* > label { */
   /* > dt { */
-  > :first-child {
+  > :first-child {x
     color: var(--color-text-0);
 
     // Tooltip Icon centering when display: inline

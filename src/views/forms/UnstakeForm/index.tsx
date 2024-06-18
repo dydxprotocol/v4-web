@@ -23,7 +23,7 @@ import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton'
 import { InputType } from '@/components/Input';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
-import { ValidatorName } from '@/components/ValidatorName';
+import { ValidatorName } from '@/components/ValidatorDropdown';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { StakeButtonAlert } from '@/views/StakeRewardButtonAndReceipt';
 import { UnstakeButtonAndReceipt } from '@/views/forms/UnstakeForm/UnstakeButtonAndReceipt';
@@ -138,10 +138,10 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
     key: STRING_KEYS.CURRENTLY_STAKING,
     params: {
       AMOUNT: (
-        <>
+        <$StakedAmount>
           {nativeStakingBalance}
           <Tag>{chainTokenLabel}</Tag>
-        </>
+        </$StakedAmount>
       ),
     },
   });
@@ -312,4 +312,9 @@ const $Footer = styled.footer`
 `;
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
+`;
+
+const $StakedAmount = styled.span`
+  ${layoutMixins.inlineRow}
+  color: var(--color-text-1);
 `;
