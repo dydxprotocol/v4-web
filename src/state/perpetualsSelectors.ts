@@ -1,3 +1,4 @@
+import { Nullable } from '@/constants/abacus';
 import { Candle, TradingViewBar } from '@/constants/candles';
 import { EMPTY_ARR, EMPTY_OBJ } from '@/constants/objects';
 
@@ -49,7 +50,10 @@ export const getMarketIds = (state: RootState) =>
  */
 export const getPerpetualMarketsClobIds = createAppSelector([getPerpetualMarkets], (markets) => {
   return Object.entries(markets ?? {}).reduce((acc, [marketId, market]) => {
-    acc[marketId] = Number(market?.configs?.clobPairId ?? 0);
+    const clobPairId: Nullable<string> = market?.configs?.clobPairId;
+    if (clobPairId !== undefined) {
+      acc[marketId] = Number(clobPairId);
+    }
     return acc;
   }, {} as Record<string, number>);
 });

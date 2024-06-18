@@ -94,12 +94,12 @@ export const MarketsCompactTable = ({
           ? {
               columnKey: 'listing',
               allowsSorting: false,
-              renderCell: ({isNew}) => (
+              renderCell: ({ isNew }) => (
                 <$DetailsCell>
                   {isNew && (
-                  <$RecentlyListed>
-                  <$NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</$NewTag>
-                  </$RecentlyListed>
+                    <$RecentlyListed>
+                      <$NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</$NewTag>
+                    </$RecentlyListed>
                   )}
                   <Icon iconName={IconName.ChevronRight} />
                 </$DetailsCell>
@@ -150,8 +150,11 @@ export const MarketsCompactTable = ({
           ? marketB.priceChange24HPercent - marketA.priceChange24HPercent
           : marketA.priceChange24HPercent - marketB.priceChange24HPercent;
       };
+
       return filteredMarkets.sort(sortingFunction);
     }
+
+    return filteredMarkets;
   }, [sorting, filteredMarkets]);
 
   return (
@@ -312,11 +315,6 @@ const $RecentlyListed = styled.div`
 const $InterestOutput = styled(Output)`
   color: var(--color-text-0);
   font: var(--font-mini-medium);
-`;
-
-const $RelativeTimeOutput = styled(Output)`
-  color: var(--color-text-1);
-  font: var(--font-small-medium);
 `;
 
 const $NewTag = styled(Tag)`
