@@ -46,11 +46,17 @@ export const OrderCancelNotification = ({
   let orderStatusIcon = <$LoadingSpinner />;
   let customContent = null;
 
-  // whichever canceled confirmation happens first (node / indexer)
-  const canceledStatusValue = AbacusOrderStatus.cancelled.rawValue;
-  if (cancelStatus === CancelOrderStatuses.Canceled || indexedOrderStatus === canceledStatusValue) {
-    orderStatusStringKey = STRING_KEYS.CANCELED;
-    orderStatusIcon = <$OrderStatusIcon status={canceledStatusValue} />;
+  // show Canceled if either canceled confirmation happens (node / indexer)
+  // note: indexer status is further processed by abacus, but PartiallyCanceled = CANCELED
+  const isPartiallyCanceled = indexedOrderStatus === AbacusOrderStatus.PartiallyCanceled.rawValue;
+  const isCancelFinalized =
+    indexedOrderStatus === AbacusOrderStatus.Canceled.rawValue || isPartiallyCanceled;
+
+  if (cancelStatus === CancelOrderStatuses.Canceled || isCancelFinalized) {
+    orderStatusStringKey = isPartiallyCanceled
+      ? STRING_KEYS.PARTIALLY_FILLED
+      : STRING_KEYS.CANCELED;
+    orderStatusIcon = <$OrderStatusIcon status={indexedOrderStatus} />;
   }
 
   if (localCancel.errorStringKey) {

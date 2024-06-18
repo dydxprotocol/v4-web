@@ -104,7 +104,7 @@ export const PlaceOrderButtonAndReceipt = ({
   );
 
   const renderMarginValue = () => {
-    if (marginMode === AbacusMarginMode.cross) {
+    if (marginMode === AbacusMarginMode.Cross) {
       const currentCrossMargin = nullIfZero(
         calculateCrossPositionMargin({
           notionalTotal: notionalTotal?.current,
