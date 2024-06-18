@@ -22092,10 +22092,6 @@
           "ticker": "EUROC/USDC"
         },
         {
-          "exchangeName": "CoinbasePro",
-          "ticker": "EUROC-USD"
-        },
-        {
           "exchangeName": "Huobi",
           "ticker": "eurocusdt",
           "adjustByMarket": "USDT-USD"
