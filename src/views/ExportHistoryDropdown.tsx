@@ -55,6 +55,13 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
           group: LOCALE_GROUP_SEPARATOR,
         });
 
+        const { formattedString: priceString } = formatNumber({
+          type: OutputType.Fiat,
+          value: fill.price,
+          decimal: LOCALE_DECIMAL_SEPARATOR,
+          group: LOCALE_GROUP_SEPARATOR,
+        });
+
         const { sign: totalSign, formattedString: totalString } = formatNumber({
           type: OutputType.Fiat,
           value: MustBigNumber(fill.price).times(fill.size),
@@ -75,6 +82,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
             timeStyle: 'short',
           }),
           amount: fill.size,
+          price: priceString,
           fee: feeSign ? `${feeSign}${feeString}` : feeString,
           total: totalSign ? `${totalSign}${totalString}` : totalString,
           market: fill.market,
@@ -106,6 +114,10 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
             displayLabel: stringGetter({ key: STRING_KEYS.AMOUNT }),
           },
           {
+            key: 'price',
+            displayLabel: stringGetter({ key: STRING_KEYS.PRICE }),
+          },
+          {
             key: 'total',
             displayLabel: stringGetter({ key: STRING_KEYS.TOTAL }),
           },
@@ -124,7 +136,15 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
         ],
       });
     }
-  }, [dydxAddress, subaccountNumber, selectedLocale, stringGetter]);
+  }, [
+    dydxAddress,
+    subaccountNumber,
+    requestAllAccountFills,
+    stringGetter,
+    LOCALE_DECIMAL_SEPARATOR,
+    LOCALE_GROUP_SEPARATOR,
+    selectedLocale,
+  ]);
 
   const exportTransfers = useCallback(async () => {
     if (dydxAddress && subaccountNumber !== undefined) {
@@ -181,7 +201,15 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
         ],
       });
     }
-  }, [dydxAddress, subaccountNumber, selectedLocale, stringGetter]);
+  }, [
+    dydxAddress,
+    subaccountNumber,
+    requestAllAccountTransfers,
+    stringGetter,
+    LOCALE_DECIMAL_SEPARATOR,
+    LOCALE_GROUP_SEPARATOR,
+    selectedLocale,
+  ]);
 
   const { mutate: mutateExportTrades, isPending: isPendingExportTrades } = useMutation({
     mutationFn: exportTrades,
@@ -208,7 +236,7 @@ export const ExportHistoryDropdown = (props: ExportHistoryDropdownProps) => {
         transfers: checkedTransfers,
       });
     },
-    [checkedTrades, checkedTransfers, exportTrades, exportTransfers]
+    [checkedTrades, checkedTransfers, mutateExportTrades, mutateExportTransfers]
   );
 
   return (
