@@ -1,9 +1,131 @@
 {
+  "MOTHER": {
+    "title": "Add MOTHER-USD perpetual market",
+    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MOTHER-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "params": {
+      "id": 0,
+      "ticker": "MOTHER-USD",
+      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
+      "priceExponent": -10.0,
+      "minPriceChange": 800,
+      "minExchanges": 1,
+      "exchangeConfigJson": [
+        {
+          "exchangeName": "Gate",
+          "ticker": "MOTHER_USDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Huobi",
+          "ticker": "motherusdt",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Raydium",
+          "ticker": "SOL-MOTHER-8uQwXPi1sWwUTVbDBnjznmf4mV44CETiNAh3UENvHejV-9-8ZcrNqaDbqy1H4R2DtmGnuZnJ6TKGSsaGmyRGQQeELLv-6-1z3rLR6AwR8gjVZ8ArqHp9kdaPrNwPvCdrZ6jGy6wwF-HcPgh6B2yHNvT6JsEmkrHYT8pVHu9Xiaoxm4Mmn2ibWw",
+          "adjustByMarket": "SOL-USD",
+          "invert": true
+        }
+      ],
+      "liquidityTier": 2,
+      "atomicResolution": -5.0,
+      "quantumConversionExponent": -9,
+      "defaultFundingPpm": 0,
+      "stepBaseQuantums": 1000000,
+      "subticksPerTick": 1000000,
+      "delayBlocks": 3600
+    },
+    "initialDeposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "meta": {
+      "assetName": "Mother Iggy",
+      "referencePrice": 0.12734174023137868,
+      "cmcId": 31510.0
+    }
+  },
+  "POPCAT": {
+    "title": "Add POPCAT-USD perpetual market",
+    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a POPCAT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "params": {
+      "id": 1,
+      "ticker": "POPCAT-USD",
+      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
+      "priceExponent": -10.0,
+      "minPriceChange": 800,
+      "minExchanges": 1,
+      "exchangeConfigJson": [
+        {
+          "exchangeName": "Gate",
+          "ticker": "POPCAT_USDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
+          "exchangeName": "Raydium",
+          "ticker": "SOL-POPCAT-n6CwMY77wdEftf2VF6uPvbusYoraYUci3nYBPqH1DJ5-9-4Vc6N76UBu26c3jJDKBAbvSD7zPLuQWStBk7QgVEoeoS-9-4ShRqC2n3PURN7EiqmB8X4WLR81pQPvGLTPjL9X8SNQp-FRhB8L7Y9Qq41qZXYLtC2nw8An1RJfLLxRF2x9RwLLMo",
+          "adjustByMarket": "SOL-USD",
+          "invert": true
+        }
+      ],
+      "liquidityTier": 2,
+      "atomicResolution": -5.0,
+      "quantumConversionExponent": -9,
+      "defaultFundingPpm": 0,
+      "stepBaseQuantums": 1000000,
+      "subticksPerTick": 1000000,
+      "delayBlocks": 3600
+    },
+    "initialDeposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "meta": {
+      "assetName": "Popcat (SOL)",
+      "referencePrice": 0.2940114640394957,
+      "cmcId": 28782.0
+    }
+  },
+  "BODEN": {
+    "title": "Add BODEN-USD perpetual market",
+    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BODEN-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "params": {
+      "id": 2,
+      "ticker": "BODEN-USD",
+      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
+      "priceExponent": -10.0,
+      "minPriceChange": 800,
+      "minExchanges": 1,
+      "exchangeConfigJson": [
+        {
+          "exchangeName": "Raydium",
+          "ticker": "BODEN-SOL-54zedUwxuSnmHHYg9oY1AfykeBDaCF6ZFZDW3ym2Nea4-9-DzpiXKsTUCacKyahLBUC5sfjj2fiWbwCpiCPEgyS3zDC-9-9ndGwmmTcFLut1TNjWFA8pDvcrxgmqPEJTZ2Y3jTipva-6UYbX1x8YUcFj8YstPYiZByG7uQzAq2s46ZWphUMkjg5",
+          "adjustByMarket": "SOL-USD"
+        }
+      ],
+      "liquidityTier": 2,
+      "atomicResolution": -5.0,
+      "quantumConversionExponent": -9,
+      "defaultFundingPpm": 0,
+      "stepBaseQuantums": 1000000,
+      "subticksPerTick": 1000000,
+      "delayBlocks": 3600
+    },
+    "initialDeposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "meta": {
+      "assetName": "Jeo Boden",
+      "referencePrice": 0.114779,
+      "cmcId": 29687.0
+    }
+  },
   "DJT": {
     "title": "Add DJT-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a DJT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 0,
+      "id": 3,
       "ticker": "DJT-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
@@ -34,59 +156,25 @@
       "cmcId": -1.0
     }
   },
-  "NOS": {
-    "title": "Add NOS-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a NOS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+  "TREMP": {
+    "title": "Add TREMP-USD perpetual market",
+    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TREMP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 1,
-      "ticker": "NOS-USD",
+      "id": 4,
+      "ticker": "TREMP-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -9.0,
+      "priceExponent": -10.0,
       "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
           "exchangeName": "Raydium",
-          "ticker": "NOS-USDC-9Gs4LvFZw18EBLrSmZbQBw4G2SpTu4bJRCWH1Dz33cUZ-6-FqKU4BxbabPd1tcZAVVv8JkdUWmdz32CocRM856gA3Lw-6-DEM1Zse8UWfKEk9dH1Jkjzepdb9DSaxMZ8uDe34rmbE5-Cj7kD2VmzwSrwKBieuYYbjPEvr8gwhNi76KUESbGDNfF"
-        }
-      ],
-      "liquidityTier": 2,
-      "atomicResolution": -6.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Nosana",
-      "referencePrice": 3.22,
-      "cmcId": -1.0
-    }
-  },
-  "WOLF": {
-    "title": "Add WOLF-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a WOLF-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 2,
-      "ticker": "WOLF-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -12.0,
-      "minPriceChange": 800,
-      "minExchanges": 1,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "Raydium",
-          "ticker": "WOLF-SOL-FoMMZq2mt5KTa2yErsLRHGseFCNpvrzijH7zNSmsJHJs-8-4UynYZ9WhssfHBGTThY9prTVmrDjM8SDHkRsfQCR6wKW-9-CD4CVVusXHxt3faGYcUCBEBxviZGL2dgrCEjvBGkgGnL-EskpS4o6sWFAmf7w8PDwWJQfx8LRU7hHMjPxCcyX4Eq1",
+          "ticker": "TREMP-SOL-G2XNC6Rt2G7JZQWhqpJriYwZyxd2L52KSDbDNBCYCpvx-9-9DfnSR9h3hrmgy5pjqBP3SrVQRWPfjSqZZBrNNYGoyaN-9-kTgLvRcrvhxJy9KZFureP8fU5L11BzFrRvUEUa1joai-5o9kGvozArYNWfbYTZD1WDRkPkkDr6LdpQbUUqM57nFJ",
           "adjustByMarket": "SOL-USD"
         }
       ],
       "liquidityTier": 2,
-      "atomicResolution": -3.0,
+      "atomicResolution": -5.0,
       "quantumConversionExponent": -9,
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
@@ -98,16 +186,16 @@
       "amount": "10000000000000000000000"
     },
     "meta": {
-      "assetName": "LandWolf",
-      "referencePrice": 0.0025301041862092,
-      "cmcId": -1.0
+      "assetName": "Doland Tremp",
+      "referencePrice": 0.585414,
+      "cmcId": 29717.0
     }
   },
   "IO": {
     "title": "Add IO-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a IO-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 3,
+      "id": 5,
       "ticker": "IO-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -9.0,
@@ -158,25 +246,31 @@
       "cmcId": 29835.0
     }
   },
-  "BODEN": {
-    "title": "Add BODEN-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BODEN-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+  "GME": {
+    "title": "Add GME-USD perpetual market",
+    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a GME-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 4,
-      "ticker": "BODEN-USD",
+      "id": 6,
+      "ticker": "GME-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10.0,
+      "priceExponent": -11.0,
       "minPriceChange": 800,
       "minExchanges": 1,
       "exchangeConfigJson": [
         {
+          "exchangeName": "Gate",
+          "ticker": "GME_USDT",
+          "adjustByMarket": "USDT-USD"
+        },
+        {
           "exchangeName": "Raydium",
-          "ticker": "BODEN-SOL-54zedUwxuSnmHHYg9oY1AfykeBDaCF6ZFZDW3ym2Nea4-9-DzpiXKsTUCacKyahLBUC5sfjj2fiWbwCpiCPEgyS3zDC-9-9ndGwmmTcFLut1TNjWFA8pDvcrxgmqPEJTZ2Y3jTipva-6UYbX1x8YUcFj8YstPYiZByG7uQzAq2s46ZWphUMkjg5",
-          "adjustByMarket": "SOL-USD"
+          "ticker": "SOL-GME-2VzMCxFW3nj7pNDbF6WTJgxoJ8ekJS9hfquxPq8edLTY-9-2kdQwdXdwxSJdzFEFtuo9tpmA88FVjMH7F5kgBZNHPR5-9-Gg5UhU7AyhM142a7pdk6WBtdf9rv1VcmJQXgESLjxmsk-9tz6vYKiBDLYx2RnGWC5tESu4pyVE4jD6Tm56352UGte",
+          "adjustByMarket": "SOL-USD",
+          "invert": true
         }
       ],
       "liquidityTier": 2,
-      "atomicResolution": -5.0,
+      "atomicResolution": -4.0,
       "quantumConversionExponent": -9,
       "defaultFundingPpm": 0,
       "stepBaseQuantums": 1000000,
@@ -188,51 +282,16 @@
       "amount": "10000000000000000000000"
     },
     "meta": {
-      "assetName": "Jeo Boden",
-      "referencePrice": 0.114779,
-      "cmcId": 29687.0
-    }
-  },
-  "TREMP": {
-    "title": "Add TREMP-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a TREMP-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 5,
-      "ticker": "TREMP-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10.0,
-      "minPriceChange": 800,
-      "minExchanges": 1,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "Raydium",
-          "ticker": "TREMP-SOL-G2XNC6Rt2G7JZQWhqpJriYwZyxd2L52KSDbDNBCYCpvx-9-9DfnSR9h3hrmgy5pjqBP3SrVQRWPfjSqZZBrNNYGoyaN-9-kTgLvRcrvhxJy9KZFureP8fU5L11BzFrRvUEUa1joai-5o9kGvozArYNWfbYTZD1WDRkPkkDr6LdpQbUUqM57nFJ",
-          "adjustByMarket": "SOL-USD"
-        }
-      ],
-      "liquidityTier": 2,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Doland Tremp",
-      "referencePrice": 0.585414,
-      "cmcId": 29717.0
+      "assetName": "GameStop",
+      "referencePrice": 0.012822953224752753,
+      "cmcId": 29241.0
     }
   },
   "SC": {
     "title": "Add SC-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a SC-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 6,
+      "id": 7,
       "ticker": "SC-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -11.0,
@@ -264,11 +323,80 @@
       "cmcId": 30309.0
     }
   },
+  "NOS": {
+    "title": "Add NOS-USD perpetual market",
+    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a NOS-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "params": {
+      "id": 8,
+      "ticker": "NOS-USD",
+      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
+      "priceExponent": -9.0,
+      "minPriceChange": 800,
+      "minExchanges": 1,
+      "exchangeConfigJson": [
+        {
+          "exchangeName": "Raydium",
+          "ticker": "NOS-USDC-9Gs4LvFZw18EBLrSmZbQBw4G2SpTu4bJRCWH1Dz33cUZ-6-FqKU4BxbabPd1tcZAVVv8JkdUWmdz32CocRM856gA3Lw-6-DEM1Zse8UWfKEk9dH1Jkjzepdb9DSaxMZ8uDe34rmbE5-Cj7kD2VmzwSrwKBieuYYbjPEvr8gwhNi76KUESbGDNfF"
+        }
+      ],
+      "liquidityTier": 2,
+      "atomicResolution": -6.0,
+      "quantumConversionExponent": -9,
+      "defaultFundingPpm": 0,
+      "stepBaseQuantums": 1000000,
+      "subticksPerTick": 1000000,
+      "delayBlocks": 3600
+    },
+    "initialDeposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "meta": {
+      "assetName": "Nosana",
+      "referencePrice": 3.22,
+      "cmcId": -1.0
+    }
+  },
+  "WOLF": {
+    "title": "Add WOLF-USD perpetual market",
+    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a WOLF-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
+    "params": {
+      "id": 9,
+      "ticker": "WOLF-USD",
+      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
+      "priceExponent": -12.0,
+      "minPriceChange": 800,
+      "minExchanges": 1,
+      "exchangeConfigJson": [
+        {
+          "exchangeName": "Raydium",
+          "ticker": "WOLF-SOL-FoMMZq2mt5KTa2yErsLRHGseFCNpvrzijH7zNSmsJHJs-8-4UynYZ9WhssfHBGTThY9prTVmrDjM8SDHkRsfQCR6wKW-9-CD4CVVusXHxt3faGYcUCBEBxviZGL2dgrCEjvBGkgGnL-EskpS4o6sWFAmf7w8PDwWJQfx8LRU7hHMjPxCcyX4Eq1",
+          "adjustByMarket": "SOL-USD"
+        }
+      ],
+      "liquidityTier": 2,
+      "atomicResolution": -3.0,
+      "quantumConversionExponent": -9,
+      "defaultFundingPpm": 0,
+      "stepBaseQuantums": 1000000,
+      "subticksPerTick": 1000000,
+      "delayBlocks": 3600
+    },
+    "initialDeposit": {
+      "denom": "adydx",
+      "amount": "10000000000000000000000"
+    },
+    "meta": {
+      "assetName": "LandWolf",
+      "referencePrice": 0.0025301041862092,
+      "cmcId": -1.0
+    }
+  },
   "BOME": {
     "title": "Add BOME-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a BOME-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 7,
+      "id": 10,
       "ticker": "BOME-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_CROSS",
       "priceExponent": -12.0,
@@ -318,7 +446,7 @@
     "title": "Add USA-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a USA-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 8,
+      "id": 11,
       "ticker": "USA-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -15.0,
@@ -353,7 +481,7 @@
     "title": "Add PONKE-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a PONKE-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 9,
+      "id": 12,
       "ticker": "PONKE-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
@@ -404,7 +532,7 @@
     "title": "Add MEW-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MEW-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 10,
+      "id": 13,
       "ticker": "MEW-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -12.0,
@@ -440,7 +568,7 @@
     "title": "Add MICHI-USD perpetual market",
     "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MICHI-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
     "params": {
-      "id": 11,
+      "id": 14,
       "ticker": "MICHI-USD",
       "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
       "priceExponent": -10.0,
@@ -469,134 +597,6 @@
       "assetName": "michi",
       "referencePrice": 0.174821,
       "cmcId": 30943.0
-    }
-  },
-  "MOTHER": {
-    "title": "Add MOTHER-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a MOTHER-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 12,
-      "ticker": "MOTHER-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10.0,
-      "minPriceChange": 800,
-      "minExchanges": 1,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "Gate",
-          "ticker": "MOTHER_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "Huobi",
-          "ticker": "motherusdt",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "Raydium",
-          "ticker": "SOL-MOTHER-8uQwXPi1sWwUTVbDBnjznmf4mV44CETiNAh3UENvHejV-9-8ZcrNqaDbqy1H4R2DtmGnuZnJ6TKGSsaGmyRGQQeELLv-6-1z3rLR6AwR8gjVZ8ArqHp9kdaPrNwPvCdrZ6jGy6wwF-HcPgh6B2yHNvT6JsEmkrHYT8pVHu9Xiaoxm4Mmn2ibWw",
-          "adjustByMarket": "SOL-USD",
-          "invert": true
-        }
-      ],
-      "liquidityTier": 2,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Mother Iggy",
-      "referencePrice": 0.12734174023137868,
-      "cmcId": 31510.0
-    }
-  },
-  "GME": {
-    "title": "Add GME-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a GME-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 13,
-      "ticker": "GME-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -11.0,
-      "minPriceChange": 800,
-      "minExchanges": 1,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "Gate",
-          "ticker": "GME_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "Raydium",
-          "ticker": "SOL-GME-2VzMCxFW3nj7pNDbF6WTJgxoJ8ekJS9hfquxPq8edLTY-9-2kdQwdXdwxSJdzFEFtuo9tpmA88FVjMH7F5kgBZNHPR5-9-Gg5UhU7AyhM142a7pdk6WBtdf9rv1VcmJQXgESLjxmsk-9tz6vYKiBDLYx2RnGWC5tESu4pyVE4jD6Tm56352UGte",
-          "adjustByMarket": "SOL-USD",
-          "invert": true
-        }
-      ],
-      "liquidityTier": 2,
-      "atomicResolution": -4.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "GameStop",
-      "referencePrice": 0.012822953224752753,
-      "cmcId": 29241.0
-    }
-  },
-  "POPCAT": {
-    "title": "Add POPCAT-USD perpetual market",
-    "summary": "Add the x/prices, x/perpetuals and x/clob parameters needed for a POPCAT-USD perpetual market. Create the market in INITIALIZING status and transition it to ACTIVE status after 3600 blocks. Added via the new market widget.",
-    "params": {
-      "id": 14,
-      "ticker": "POPCAT-USD",
-      "marketType": "PERPETUAL_MARKET_TYPE_ISOLATED",
-      "priceExponent": -10.0,
-      "minPriceChange": 800,
-      "minExchanges": 1,
-      "exchangeConfigJson": [
-        {
-          "exchangeName": "Gate",
-          "ticker": "POPCAT_USDT",
-          "adjustByMarket": "USDT-USD"
-        },
-        {
-          "exchangeName": "Raydium",
-          "ticker": "SOL-POPCAT-n6CwMY77wdEftf2VF6uPvbusYoraYUci3nYBPqH1DJ5-9-4Vc6N76UBu26c3jJDKBAbvSD7zPLuQWStBk7QgVEoeoS-9-4ShRqC2n3PURN7EiqmB8X4WLR81pQPvGLTPjL9X8SNQp-FRhB8L7Y9Qq41qZXYLtC2nw8An1RJfLLxRF2x9RwLLMo",
-          "adjustByMarket": "SOL-USD",
-          "invert": true
-        }
-      ],
-      "liquidityTier": 2,
-      "atomicResolution": -5.0,
-      "quantumConversionExponent": -9,
-      "defaultFundingPpm": 0,
-      "stepBaseQuantums": 1000000,
-      "subticksPerTick": 1000000,
-      "delayBlocks": 3600
-    },
-    "initialDeposit": {
-      "denom": "adydx",
-      "amount": "10000000000000000000000"
-    },
-    "meta": {
-      "assetName": "Popcat (SOL)",
-      "referencePrice": 0.2940114640394957,
-      "cmcId": 28782.0
     }
   },
   "BNB": {
@@ -22290,7 +22290,7 @@
     },
     "meta": {
       "assetName": "EURC",
-      "referencePrice": 1.063592578651627,
+      "referencePrice": 1.0451580640055396,
       "cmcId": 20641.0
     }
   },
