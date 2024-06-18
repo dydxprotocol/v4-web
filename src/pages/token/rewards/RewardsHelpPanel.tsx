@@ -17,7 +17,7 @@ import { testFlags } from '@/lib/testFlags';
 
 export const RewardsHelpPanel = () => {
   const stringGetter = useStringGetter();
-  const { tradingRewardsLearnMore } = useURLConfigs();
+  const { tradingRewardsLearnMore, mintscanValidatorsLearnMore } = useURLConfigs();
 
   const stakingEnabled = testFlags.enableStaking;
 
@@ -77,6 +77,21 @@ export const RewardsHelpPanel = () => {
           stakingEnabled && {
             header: stringGetter({ key: STRING_KEYS.FAQ_WHAT_ARE_THE_RISKS_OF_STAKING_QUESTION }),
             content: stringGetter({ key: STRING_KEYS.FAQ_WHAT_ARE_THE_RISKS_OF_STAKING_ANSWER }),
+          },
+          stakingEnabled && {
+            header: stringGetter({
+              key: STRING_KEYS.FAQ_HOW_IS_THE_PRECONFIGURED_SET_OF_VALIDATORS_DETERMINED_QUESTION,
+            }),
+            content: stringGetter({
+              key: STRING_KEYS.FAQ_HOW_IS_THE_PRECONFIGURED_SET_OF_VALIDATORS_DETERMINED_ANSWER,
+              params: {
+                DOCUMENT_LINK: (
+                  <$Link href={mintscanValidatorsLearnMore}>
+                    {stringGetter({ key: STRING_KEYS.DOCUMENT })}
+                  </$Link>
+                ),
+              },
+            }),
           },
         ].filter(isTruthy)}
       />

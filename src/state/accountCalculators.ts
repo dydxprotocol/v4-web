@@ -140,7 +140,7 @@ export const calculateShouldShowIsolatedMarketPostOrderPositionMarginAsZero = cr
 
     return (
       currentInput === 'closePosition' &&
-      marginMode === AbacusMarginMode.isolated &&
+      marginMode === AbacusMarginMode.Isolated &&
       !hasOpenIsolatedOrders &&
       isFullClose
     );
