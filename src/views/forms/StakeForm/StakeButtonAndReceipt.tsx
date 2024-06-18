@@ -10,13 +10,10 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { DiffOutput } from '@/components/DiffOutput';
 import { Output, OutputType } from '@/components/Output';
-import {
-  StakeButtonAlert,
-  StakeRewardButtonAndReceipt,
-} from '@/views/StakeRewardButtonAndReceipt';
 import { Tag } from '@/components/Tag';
 import { ValidatorName } from '@/components/ValidatorName';
 import { WithTooltip } from '@/components/WithTooltip';
+import { StakeButtonAlert, StakeRewardButtonAndReceipt } from '@/views/StakeRewardButtonAndReceipt';
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 
