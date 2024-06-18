@@ -81,7 +81,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
   const marginMode = getMarginModeFromSubaccountNumber(subaccountNumber);
 
   const marginModeLabel =
-    marginMode === AbacusMarginMode.cross
+    marginMode === AbacusMarginMode.Cross
       ? stringGetter({ key: STRING_KEYS.CROSS })
       : stringGetter({ key: STRING_KEYS.ISOLATED });
 
@@ -214,7 +214,7 @@ export const OrderDetailsDialog = ({ orderId, setIsOpen }: ElementProps) => {
   };
 
   const isShortTermOrder = orderFlags === OrderFlags.SHORT_TERM;
-  const isBestEffortCanceled = status === AbacusOrderStatus.canceling;
+  const isBestEffortCanceled = status === AbacusOrderStatus.Canceling;
   const isCancelDisabled = !!isOrderCanceling || (isShortTermOrder && isBestEffortCanceled);
 
   return (

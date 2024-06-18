@@ -197,30 +197,40 @@ export const getCurrentMarketOrders = createAppSelector(
 export const getSubaccountOpenOrders = createAppSelector([getSubaccountOrders], (orders) =>
   orders?.filter(
     (order) =>
-      order.status !== AbacusOrderStatus.filled && order.status !== AbacusOrderStatus.cancelled
+      order.status !== AbacusOrderStatus.Filled && order.status !== AbacusOrderStatus.Canceled
   )
 );
 
-export const getPendingIsolatedOrders = createAppSelector(
-  [getSubaccountOrders, getExistingOpenPositions, getPerpetualMarkets],
-  (allOrders, allOpenPositions, allMarkets) => {
-    const allValidOrders = (allOrders ?? [])
+export const getOpenIsolatedOrders = createAppSelector(
+  [getSubaccountOrders, getPerpetualMarkets],
+  (allOrders, allMarkets) =>
+    (allOrders ?? [])
       .filter(
         (o) =>
-          (o.status === AbacusOrderStatus.open ||
-            o.status === AbacusOrderStatus.pending ||
-            o.status === AbacusOrderStatus.partiallyFilled ||
-            o.status === AbacusOrderStatus.untriggered) &&
-          o.marginMode === AbacusMarginMode.isolated
+          (o.status === AbacusOrderStatus.Open ||
+            o.status === AbacusOrderStatus.Pending ||
+            o.status === AbacusOrderStatus.PartiallyFilled ||
+            o.status === AbacusOrderStatus.Untriggered) &&
+          o.marginMode === AbacusMarginMode.Isolated
       )
       // eslint-disable-next-line prefer-object-spread
-      .map((o) => Object.assign({}, o, { assetId: allMarkets?.[o.marketId]?.assetId }));
+      .map((o) => Object.assign({}, o, { assetId: allMarkets?.[o.marketId]?.assetId }))
+);
+
+export const getPendingIsolatedOrders = createAppSelector(
+  [getOpenIsolatedOrders, getExistingOpenPositions],
+  (isolatedOrders, allOpenPositions) => {
     const allOpenPositionAssetIds = new Set(allOpenPositions?.map((p) => p.assetId) ?? []);
     return groupBy(
-      allValidOrders.filter((o) => !allOpenPositionAssetIds.has(o.assetId ?? '')),
+      isolatedOrders.filter((o) => !allOpenPositionAssetIds.has(o.assetId ?? '')),
       (o) => o.marketId
     );
   }
+);
+
+export const getCurrentMarketHasOpenIsolatedOrders = createAppSelector(
+  [getOpenIsolatedOrders, getCurrentMarketId],
+  (openOrders, marketId) => openOrders.some((o) => o.marketId === marketId)
 );
 
 /**
@@ -291,8 +301,8 @@ export const getSubaccountConditionalOrders = () =>
       positions?.forEach((position) => {
         const orderSideForConditionalOrder =
           position?.side?.current === AbacusPositionSide.LONG
-            ? AbacusOrderSide.sell
-            : AbacusOrderSide.buy;
+            ? AbacusOrderSide.Sell
+            : AbacusOrderSide.Buy;
 
         const conditionalOrders = openOrdersByMarketId[position.id];
 
@@ -320,7 +330,7 @@ export const getSubaccountConditionalOrders = () =>
  * @returns list of orders that are in the open status
  */
 export const getSubaccountOpenStatusOrders = createAppSelector([getSubaccountOrders], (orders) =>
-  orders?.filter((order) => order.status === AbacusOrderStatus.open)
+  orders?.filter((order) => order.status === AbacusOrderStatus.Open)
 );
 
 export const getSubaccountOrderSizeBySideAndPrice = createAppSelector(
@@ -489,7 +499,7 @@ export const getCurrentMarketFundingPayments = createAppSelector(
  * @returns boolean on whether an order status is considered open
  */
 const isOpenOrderStatus = (status: AbacusOrderStatuses) => {
-  return status !== AbacusOrderStatus.filled && status !== AbacusOrderStatus.cancelled;
+  return status !== AbacusOrderStatus.Filled && status !== AbacusOrderStatus.Canceled;
 };
 
 /**

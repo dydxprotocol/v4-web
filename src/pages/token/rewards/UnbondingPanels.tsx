@@ -42,9 +42,9 @@ export const UnbondingPanels = () => {
 
         return (
           <Panel
-            key={delegation.validator}
-            slotHeaderContent={
-              <>
+            key={`${delegation.validator}-${delegation.completionTime}`}
+            slotHeader={
+              <$Header>
                 <$Title>
                   {stringGetter({
                     key: STRING_KEYS.UNSTAKING_FROM,
@@ -53,11 +53,11 @@ export const UnbondingPanels = () => {
                     },
                   })}
                 </$Title>
-                <$ValidatorFaviconIcon
+                <ValidatorFaviconIcon
                   url={unbondingValidator?.description?.website}
                   fallbackText={unbondingValidator?.description?.moniker}
                 />
-              </>
+              </$Header>
             }
           >
             <$Content>
@@ -88,9 +88,14 @@ const $Container = styled.div`
   flex: 1;
 `;
 
+const $Header = styled.div`
+  ${layoutMixins.spacedRow}
+  padding: var(--panel-paddingY) var(--panel-paddingX) 0;
+`;
+
 const $Title = styled.h3`
   ${layoutMixins.inlineRow}
-  margin-bottom: -1.5rem;
+  ${layoutMixins.textTruncate}
 
   font: var(--font-medium-book);
   color: var(--color-text-1);
@@ -101,13 +106,9 @@ const $Content = styled.div`
   gap: 1rem;
 `;
 
-const $ValidatorFaviconIcon = styled(ValidatorFaviconIcon)`
-  margin-bottom: -1.5rem;
-`;
-
 const $Balance = styled(Output)`
   font: var(--font-large-book);
-  color: var(--color-text-3);
+  color: var(--color-text-2);
 `;
 
 const $AssetIcon = styled(AssetIcon)`

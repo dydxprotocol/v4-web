@@ -76,6 +76,7 @@ type PositionTableRow = {
   fundingRate: Nullable<number>;
   stopLossOrders: SubaccountOrder[];
   takeProfitOrders: SubaccountOrder[];
+  stepSizeDecimals: number;
 } & SubaccountPosition;
 
 const getPositionsTableColumnDef = ({
@@ -192,7 +193,7 @@ const getPositionsTableColumnDef = ({
         getCellValue: (row) => row.notionalTotal?.current,
         label: stringGetter({ key: STRING_KEYS.SIZE }),
         hideOnBreakpoint: MediaQueryKeys.isMobile,
-        renderCell: ({ assetId, size, notionalTotal, tickSizeDecimals }) => (
+        renderCell: ({ assetId, size, notionalTotal, tickSizeDecimals, stepSizeDecimals }) => (
           <TableCell stacked>
             <$OutputSigned
               type={OutputType.Asset}
@@ -200,6 +201,7 @@ const getPositionsTableColumnDef = ({
               tag={assetId}
               showSign={ShowSign.Negative}
               sign={getNumberSign(size?.current)}
+              fractionDigits={stepSizeDecimals}
             />
             <Output
               type={OutputType.Fiat}
@@ -449,6 +451,8 @@ export const PositionsTable = ({
             takeProfitOrders: allTakeProfitOrders.filter(
               (order: SubaccountOrder) => order.marketId === position.id
             ),
+            stepSizeDecimals:
+              perpetualMarkets?.[position.id]?.configs?.stepSizeDecimals ?? TOKEN_DECIMALS,
           },
           position
         );

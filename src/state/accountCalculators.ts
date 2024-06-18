@@ -1,13 +1,23 @@
+import { AbacusMarginMode } from '@/constants/abacus';
 import { OnboardingState, OnboardingSteps } from '@/constants/account';
 
 import {
+  getCurrentMarketHasOpenIsolatedOrders,
+  getCurrentMarketPositionData,
   getOnboardingGuards,
   getOnboardingState,
   getSubaccountId,
   getUncommittedOrderClientIds,
 } from '@/state/accountSelectors';
 
+import { MustBigNumber } from '@/lib/numbers';
+
 import { createAppSelector } from './appTypes';
+import {
+  getCurrentInput,
+  getInputClosePositionData,
+  getInputTradeMarginMode,
+} from './inputsSelectors';
 
 export const calculateOnboardingStep = createAppSelector(
   [getOnboardingState, getOnboardingGuards],
@@ -104,3 +114,35 @@ export const calculateShouldRenderActionsInPositionsTable = () =>
       return !isAccountViewOnly && hasActionsInColumn;
     }
   );
+
+export const calculateShouldShowIsolatedMarketPostOrderPositionMarginAsZero = createAppSelector(
+  [
+    getCurrentInput,
+    getInputTradeMarginMode,
+    getCurrentMarketHasOpenIsolatedOrders,
+    getInputClosePositionData,
+    getCurrentMarketPositionData,
+  ],
+  (
+    currentInput,
+    marginMode,
+    hasOpenIsolatedOrders,
+    closePositionInputData,
+    currentMarketPosition
+  ) => {
+    const { size: sizeInputData } = closePositionInputData ?? {};
+    const { size } = sizeInputData ?? {};
+    const { size: currentPositionSize } = currentMarketPosition ?? {};
+    const { current: currentSize } = currentPositionSize ?? {};
+    const isFullClose = MustBigNumber(currentSize)
+      .abs()
+      .eq(size ?? 0);
+
+    return (
+      currentInput === 'closePosition' &&
+      marginMode === AbacusMarginMode.Isolated &&
+      !hasOpenIsolatedOrders &&
+      isFullClose
+    );
+  }
+);

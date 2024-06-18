@@ -15,6 +15,7 @@ import {
   type StringGetterFunction,
 } from '@/constants/localization';
 import { isDev } from '@/constants/networks';
+import { SMALL_USD_DECIMALS, USD_DECIMALS } from '@/constants/numbers';
 import { DydxChainAsset, WalletType, wallets } from '@/constants/wallets';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
@@ -60,7 +61,7 @@ export const AccountMenu = () => {
   const onboardingState = useAppSelector(getOnboardingState);
   const { freeCollateral } = useAppSelector(getSubaccount, shallowEqual) ?? {};
 
-  const { nativeTokenBalance } = useAccountBalance();
+  const { nativeTokenBalance, usdcBalance } = useAccountBalance();
   const { usdcLabel, chainTokenLabel } = useTokenConfigs();
   const theme = useAppSelector(getAppTheme);
 
@@ -70,8 +71,6 @@ export const AccountMenu = () => {
   const { google, discord, twitter } = privy?.user ?? {};
 
   const { showMfaEnrollmentModal } = useMfaEnrollment();
-
-  const usdcBalance = freeCollateral?.current ?? 0;
 
   const onRecoverKeys = () => {
     dispatch(openDialog({ type: DialogTypes.Onboarding }));
@@ -169,6 +168,24 @@ export const AccountMenu = () => {
                   stringGetter={stringGetter}
                 />
               </div>
+              {isDev && (
+                <div>
+                  <div>
+                    <$label>
+                      {stringGetter({
+                        key: STRING_KEYS.WALLET_BALANCE,
+                        params: { ASSET: usdcLabel },
+                      })}
+                      <AssetIcon symbol="USDC" />
+                    </$label>
+                    <$BalanceOutput
+                      type={OutputType.Asset}
+                      value={usdcBalance}
+                      fractionDigits={SMALL_USD_DECIMALS}
+                    />
+                  </div>
+                </div>
+              )}
               <div>
                 <div>
                   <$label>
@@ -178,7 +195,11 @@ export const AccountMenu = () => {
                     })}
                     <AssetIcon symbol="USDC" />
                   </$label>
-                  <$BalanceOutput type={OutputType.Asset} value={usdcBalance} fractionDigits={2} />
+                  <$BalanceOutput
+                    type={OutputType.Asset}
+                    value={freeCollateral?.current ?? 0}
+                    fractionDigits={USD_DECIMALS}
+                  />
                 </div>
                 <AssetActions
                   asset={DydxChainAsset.USDC}
