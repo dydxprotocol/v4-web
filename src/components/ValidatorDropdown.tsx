@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, memo, useCallback, useMemo, useState } from 'react';
+import { Dispatch, Key, SetStateAction, memo, useCallback, useMemo, useState } from 'react';
 
 import { Validator } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/cosmos/staking/v1beta1/staking';
 import styled from 'styled-components';
@@ -97,8 +97,11 @@ const ValidatorsDropdownContent = ({
   }, []);
 
   const onRowAction = useCallback(
-    (key: string) => {
-      setSelectedValidator(availableValidators.find((v) => v.operatorAddress === key));
+    (key: Key) => {
+      const newValidator = availableValidators.find((v) => v.operatorAddress === key);
+      if (newValidator) {
+        setSelectedValidator(newValidator);
+      }
       setIsPopoverOpen(false);
     },
     [setSelectedValidator, setIsPopoverOpen, availableValidators]
