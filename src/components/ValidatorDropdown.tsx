@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction, memo, useCallback, useMemo, useState } from '
 
 import { Validator } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/cosmos/staking/v1beta1/staking';
 import styled from 'styled-components';
+import { formatUnits } from 'viem';
 
 import { STRING_KEYS } from '@/constants/localization';
 import { ValidatorData } from '@/constants/validators';
@@ -36,6 +37,9 @@ const ValidatorsDropdownContent = ({
 }) => {
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
+
+  const votingPowerDecimals = 36; // hardcoded solution; fix in OTE-390
+  const commissionRateDecimals = 18; // hardcoded solution; fix in OTE-390
 
   const columns = useMemo(
     () =>
@@ -82,8 +86,10 @@ const ValidatorsDropdownContent = ({
       validators.push({
         name: val.description.moniker,
         operatorAddress: val.operatorAddress,
-        votingPower: MustBigNumber(val.delegatorShares).div(10 ** 36),
-        commissionRate: MustBigNumber(val.commission?.commissionRates?.rate).div(10 ** 16),
+        votingPower: MustBigNumber(formatUnits(val.delegatorShares, votingPowerDecimals)),
+        commissionRate: MustBigNumber(
+          formatUnits(val.commission?.commissionRates?.rate, commissionRateDecimals)
+        ),
         website: val.description?.website,
       });
     }
