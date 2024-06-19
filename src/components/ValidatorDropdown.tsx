@@ -13,70 +13,17 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 import { layoutMixins } from '@/styles/layoutMixins';
 import { popoverMixins } from '@/styles/popoverMixins';
 
+import { DropdownIcon } from '@/components/DropdownIcon';
+import { Icon, IconName } from '@/components/Icon';
+import { Link } from '@/components/Link';
+import { Output, OutputType } from '@/components/Output';
+import { Popover, TriggerType } from '@/components/Popover';
 import { ColumnDef, Table } from '@/components/Table';
+import { TableCell } from '@/components/Table/TableCell';
+import { Tag } from '@/components/Tag';
+import { ValidatorFaviconIcon } from '@/components/ValidatorName';
 
 import { MustBigNumber } from '@/lib/numbers';
-
-import { DropdownIcon } from './DropdownIcon';
-import { Icon, IconName } from './Icon';
-import { Link } from './Link';
-import { Output, OutputType } from './Output';
-import { Popover, TriggerType } from './Popover';
-import { TableCell } from './Table/TableCell';
-import { Tag } from './Tag';
-
-export const ValidatorFaviconIcon = ({
-  className,
-  url,
-  fallbackText,
-}: {
-  className?: string;
-  url?: string;
-  fallbackText?: string;
-}) => {
-  const [iconFail, setIconFail] = useState<boolean>(false);
-
-  if (url && !iconFail) {
-    const parsedUrl = new URL(url);
-    const baseUrl = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
-    return (
-      <$Img
-        className={className}
-        src={`${baseUrl}/favicon.ico`}
-        alt="validator favicon"
-        onError={() => setIconFail(true)}
-      />
-    );
-  }
-  if (fallbackText) {
-    return <$IconContainer className={className}>{fallbackText.charAt(0)}</$IconContainer>;
-  }
-
-  return null;
-};
-
-export const ValidatorName = ({ validator }: { validator: Validator }) => {
-  const output = (
-    <$Output
-      type={OutputType.Text}
-      value={validator?.description?.moniker}
-      slotLeft={
-        <ValidatorFaviconIcon
-          url={validator?.description?.website}
-          fallbackText={validator?.description?.moniker}
-        />
-      }
-    />
-  );
-
-  return validator?.description?.website ? (
-    <Link href={validator?.description?.website} withIcon>
-      {output}
-    </Link>
-  ) : (
-    output
-  );
-};
 
 const ValidatorsDropdownContent = ({
   availableValidators,
@@ -208,27 +155,6 @@ export const ValidatorDropdown = memo(() => {
     </$Popover>
   );
 });
-
-const $IconContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.5em;
-  height: 1.5em;
-  background-color: var(--color-layer-6);
-  border-radius: 50%;
-  font-weight: bold;
-  color: var(--color-text-1);
-  margin-right: 0.25em;
-`;
-
-const $Img = styled.img`
-  width: 1.5em;
-  height: 1.5em;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 0.25em;
-`;
 
 const $ScrollArea = styled.div`
   ${layoutMixins.scrollArea}

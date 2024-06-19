@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import { Icon, IconName } from '@/components/Icon';
 
 type ElementProps = {
-  iconName: IconName;
+  iconName?: IconName;
   isOpen?: boolean;
 };
 

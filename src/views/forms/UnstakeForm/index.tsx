@@ -23,7 +23,7 @@ import { FormMaxInputToggleButton } from '@/components/FormMaxInputToggleButton'
 import { InputType } from '@/components/Input';
 import { OutputType } from '@/components/Output';
 import { Tag } from '@/components/Tag';
-import { ValidatorName } from '@/components/ValidatorDropdown';
+import { ValidatorName } from '@/components/ValidatorName';
 import { WithDetailsReceipt } from '@/components/WithDetailsReceipt';
 import { StakeButtonAlert } from '@/views/StakeRewardButtonAndReceipt';
 import { UnstakeButtonAndReceipt } from '@/views/forms/UnstakeForm/UnstakeButtonAndReceipt';
