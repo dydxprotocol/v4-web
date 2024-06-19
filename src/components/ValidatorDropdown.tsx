@@ -32,7 +32,7 @@ const ValidatorsDropdownContent = ({
   setIsPopoverOpen,
 }: {
   availableValidators: Validator[];
-  setSelectedValidator: Dispatch<SetStateAction<Validator>>;
+  setSelectedValidator: Dispatch<SetStateAction<Validator | undefined>>;
   setIsPopoverOpen: (isOpen: boolean) => void;
 }) => {
   const stringGetter = useStringGetter();

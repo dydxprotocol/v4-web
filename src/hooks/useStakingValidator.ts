@@ -50,9 +50,10 @@ export const useStakingValidator = () => {
     const response = await getValidators();
 
     // Filter out jailed and unbonded validators
-    const availableValidators = response?.validators.filter(
-      (validator: Validator) => validator.status === 3 && validator.jailed === false
-    );
+    const availableValidators =
+      response?.validators.filter(
+        (validator: Validator) => validator.status === 3 && validator.jailed === false
+      ) ?? [];
 
     // Sort validators 1/ in ascending commission and 2/ by descending stake weight
     const sortByCommission = (validatorA: Validator, validatorB: Validator): number => {
@@ -127,7 +128,7 @@ export const useStakingValidator = () => {
     setSelectedValidator,
     availableValidators: data?.availableValidators,
     stakingValidators: data?.stakingValidators,
-    unbondingValidator: data?.unbondingValidator,
+    unbondingValidator: data?.unbondingValidators,
     currentDelegations,
   };
 };
