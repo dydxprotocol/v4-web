@@ -518,7 +518,7 @@ const $HistogramOutput = styled(OrderbookTradesOutput)<StyleProps>`
 const orderbookTableType = getSimpleStyledOutputType(OrderbookTradesTable, {} as StyleProps);
 const $OrderbookTable = styled(OrderbookTradesTable)<StyleProps>`
   /* Params */
-  --orderbook-spreadRowHeight: 2rem;
+  --orderbook-middleRowHeight: 2rem;
 
   /* Rules */
 
@@ -550,10 +550,10 @@ const $OrderbookTable = styled(OrderbookTradesTable)<StyleProps>`
           z-index: 2;
 
           &[data-side='bid'] {
-            top: calc(var(--stickyArea-totalInsetTop) + var(--orderbook-spreadRowHeight));
+            top: calc(var(--stickyArea-totalInsetTop) + var(--orderbook-middleRowHeight));
           }
           &[data-side='ask'] {
-            bottom: calc(var(--stickyArea-totalInsetBottom) + var(--orderbook-spreadRowHeight));
+            bottom: calc(var(--stickyArea-totalInsetBottom) + var(--orderbook-middleRowHeight));
           }
         }
       `}
@@ -568,7 +568,7 @@ const $SpreadTableRow = styled(TableRow)`
   ${layoutMixins.sticky}
   position: sticky !important;
 
-  height: var(--orderbook-spreadRowHeight);
+  height: var(--orderbook-middleRowHeight);
 
   // All browsers except Safari (box-shadow doesn't apply to display: table-row 😕)
   @supports not (background: -webkit-named-image(i)) {
