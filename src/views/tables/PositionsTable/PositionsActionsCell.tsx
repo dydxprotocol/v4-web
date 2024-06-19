@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { SubaccountOrder } from '@/constants/abacus';
+import { AbacusPositionSides, Nullable, SubaccountOrder } from '@/constants/abacus';
 import { ButtonShape } from '@/constants/buttons';
 import { ComplianceStates } from '@/constants/compliance';
 import { DialogTypes, TradeBoxDialogTypes } from '@/constants/dialogs';
@@ -26,6 +26,12 @@ import abacusStateManager from '@/lib/abacus';
 type ElementProps = {
   marketId: string;
   assetId: string;
+  leverage: Nullable<number>;
+  oraclePrice: Nullable<number>;
+  entryPrice: Nullable<number>;
+  unrealizedPnlPercent: Nullable<number>;
+  side: Nullable<AbacusPositionSides>;
+  sideLabel: Nullable<string>;
   stopLossOrders: SubaccountOrder[];
   takeProfitOrders: SubaccountOrder[];
   isDisabled?: boolean;
@@ -36,6 +42,12 @@ type ElementProps = {
 export const PositionsActionsCell = ({
   marketId,
   assetId,
+  leverage,
+  oraclePrice,
+  entryPrice,
+  unrealizedPnlPercent,
+  side,
+  sideLabel,
   stopLossOrders,
   takeProfitOrders,
   isDisabled,
@@ -85,6 +97,26 @@ export const PositionsActionsCell = ({
     );
   };
 
+  const openShareDialog = () => {
+    dispatch(
+      openDialog({
+        type: DialogTypes.SharePNLAnalytics,
+        dialogProps: {
+          marketId,
+          assetId,
+          leverage,
+          oraclePrice,
+          entryPrice,
+          unrealizedPnlPercent,
+          side,
+          sideLabel,
+          stopLossOrders,
+          takeProfitOrders,
+        },
+      })
+    );
+  };
+
   return (
     <ActionsTableCell>
       {!isDisabled && complianceState === ComplianceStates.FULL_ACCESS && (
@@ -100,6 +132,13 @@ export const PositionsActionsCell = ({
           />
         </WithTooltip>
       )}
+      <$TriggersButton
+        key="share"
+        onClick={openShareDialog}
+        iconName={IconName.Share}
+        shape={ButtonShape.Square}
+        disabled={isDisabled}
+      />
       {showClosePositionAction && (
         <WithTooltip tooltipString={stringGetter({ key: STRING_KEYS.CLOSE_POSITION })}>
           <$CloseButtonToggle

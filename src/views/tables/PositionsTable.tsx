@@ -357,10 +357,30 @@ const getPositionsTableColumnDef = ({
         isActionable: true,
         allowsSorting: false,
         hideOnBreakpoint: MediaQueryKeys.isTablet,
-        renderCell: ({ id, assetId, stopLossOrders, takeProfitOrders }) => (
+        renderCell: ({
+          id,
+          assetId,
+          stopLossOrders,
+          leverage,
+          side,
+          oraclePrice,
+          entryPrice,
+          takeProfitOrders,
+          unrealizedPnlPercent,
+          resources,
+        }) => (
           <PositionsActionsCell
             marketId={id}
             assetId={assetId}
+            side={side.current}
+            leverage={leverage.current}
+            oraclePrice={oraclePrice}
+            entryPrice={entryPrice.current}
+            unrealizedPnlPercent={unrealizedPnlPercent?.current}
+            sideLabel={
+              resources.sideStringKey?.current &&
+              stringGetter({ key: resources.sideStringKey?.current })
+            }
             isDisabled={isAccountViewOnly}
             showClosePositionAction={showClosePositionAction}
             stopLossOrders={stopLossOrders}
