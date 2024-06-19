@@ -86,9 +86,9 @@ const ValidatorsDropdownContent = ({
       validators.push({
         name: val.description.moniker,
         operatorAddress: val.operatorAddress,
-        votingPower: MustBigNumber(formatUnits(val.delegatorShares, votingPowerDecimals)),
+        votingPower: MustBigNumber(formatUnits(BigInt(val.delegatorShares), votingPowerDecimals)),
         commissionRate: MustBigNumber(
-          formatUnits(val.commission?.commissionRates?.rate, commissionRateDecimals)
+          formatUnits(BigInt(val.commission?.commissionRates?.rate ?? 0), commissionRateDecimals)
         ),
         website: val.description?.website,
       });
