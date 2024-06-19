@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 
-import { Validator } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/cosmos/staking/v1beta1/staking';
 import BigNumber from 'bignumber.js';
 import { type NumberFormatValues } from 'react-number-format';
 import styled from 'styled-components';
@@ -142,6 +141,13 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
     },
   ];
 
+  const openKeplrDialog = () =>
+    dispatch(
+      forceOpenDialog({
+        type: DialogTypes.ExternalNavKeplr,
+      })
+    );
+
   const openStrideDialog = () =>
     dispatch(
       forceOpenDialog({
@@ -192,8 +198,13 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
         />
         <$LegalDisclaimer>
           {stringGetter({
-            key: STRING_KEYS.STAKING_LEGAL_DISCLAIMER_WITH_DEFAULT,
+            key: STRING_KEYS.STAKING_LEGAL_DISCLAIMER,
             params: {
+              KEPLR_DASHBOARD_LINK: (
+                <$Link withIcon onClick={openKeplrDialog}>
+                  {stringGetter({ key: STRING_KEYS.KEPLR_DASHBOARD })}
+                </$Link>
+              ),
               STRIDE_LINK: (
                 <$Link withIcon onClick={openStrideDialog}>
                   Stride
@@ -209,7 +220,6 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
 
 const $Form = styled.form`
   ${formMixins.transfersForm}
-  --color-text-form: var(--color-text-0);
 `;
 
 const $Description = styled.div`
@@ -224,16 +234,14 @@ const $Footer = styled.footer`
   flex-direction: column;
   gap: 1rem;
 `;
-
 const $WithDetailsReceipt = styled(WithDetailsReceipt)`
   --withReceipt-backgroundColor: var(--color-layer-2);
-  color: var(--color-text-form);
 `;
 
 const $LegalDisclaimer = styled.div`
   text-align: center;
   color: var(--color-text-0);
-  font: var(--font-mini-book);
+  font: var(--font-small-book);
 `;
 
 const $Link = styled(Link)`
