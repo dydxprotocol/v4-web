@@ -155,6 +155,7 @@ export enum PlaceOrderStatuses {
   Submitted,
   Placed,
   Filled,
+  Canceled,
 }
 
 export enum CancelOrderStatuses {

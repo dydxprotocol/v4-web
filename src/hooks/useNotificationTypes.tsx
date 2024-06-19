@@ -624,7 +624,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 />
               ),
             },
-            [localPlace.submissionStatus],
+            [localPlace.submissionStatus, localPlace.errorStringKey],
             true
           );
         }
