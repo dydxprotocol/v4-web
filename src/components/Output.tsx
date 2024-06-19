@@ -254,7 +254,7 @@ export const Output = ({
         const numDigits = fractionDigits ?? fallbackDecimals;
         const precisionVal = minimumFractionDigits
           ? MustBigNumber(val.toPrecision(minimumFractionDigits, roundingMode)).abs()
-          : valueBN;
+          : val;
         const dp = minimumFractionDigits ? precisionVal.decimalPlaces() ?? numDigits : numDigits;
         return precisionVal.toFormat(dp, roundingMode, { ...format, ...formattingOptions });
       };
@@ -320,7 +320,7 @@ export const Output = ({
         ),
         [OutputType.Percent]: () => (
           <NumberValue
-            value={getFormattedVal(valueBN, PERCENT_DECIMALS, { suffix: '%' })}
+            value={getFormattedVal(valueBN.times(100), PERCENT_DECIMALS, { suffix: '%' })}
             withSubscript={withSubscript}
           />
         ),
