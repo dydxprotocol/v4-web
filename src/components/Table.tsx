@@ -565,7 +565,9 @@ const TableColumnHeader = <TableRowData extends BaseTableRowData>({
           <$SortArrow
             aria-hidden="true"
             sortDirection={
-              state.sortDescriptor?.column === column.key ? state.sortDescriptor?.direction ?? 'none'
+              state.sortDescriptor?.column === column.key
+                ? state.sortDescriptor?.direction ?? 'none'
+                : 'none'
             }
           >
             <Icon iconName={IconName.Triangle} aria-hidden="true" />
