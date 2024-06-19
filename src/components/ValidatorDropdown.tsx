@@ -93,6 +93,7 @@ const ValidatorsDropdownContent = ({
         label="Validators"
         data={filteredValidators}
         getRowKey={(row: ValidatorData) => row.operatorAddress}
+        // onRowAction // TODO: OTE-449
         columns={columns}
         defaultSortDescriptor={{
           column: 'commission',
@@ -173,7 +174,8 @@ const $Popover = styled(Popover)`
 const $Table = styled(Table)`
   --tableRow-backgroundColor: var(--color-layer-4);
   --tableCell-padding: 0.5rem 1rem;
-`;
+` as typeof Table;
+
 const $Output = styled(Output)`
   color: var(--color-text-1);
 `;
