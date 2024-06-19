@@ -79,7 +79,7 @@ const MarketsDropdownContent = ({ onRowAction }: { onRowAction?: (market: Key) =
                   value={priceChange24HPercent}
                   isNegative={MustBigNumber(priceChange24HPercent).isNegative()}
                 />
-              )} 
+              )}
             </$InlineRow>
           ),
         },

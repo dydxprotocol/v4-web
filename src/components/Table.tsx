@@ -877,13 +877,7 @@ const $SortArrow = styled.span<{ sortDirection: 'ascending' | 'descending' | 'no
       none: css`
         visibility: hidden;
       `,
-    })[sortDirection]}// ${$Th}[aria-sort="none"] & {
-  //   visibility: hidden;
-  // }
-
-  // ${$Th}[aria-sort="ascending"] & {
-  //   transform: scaleY(-1);
-  // }
+    })[sortDirection]}
 `;
 
 const $Thead = styled.thead<TableStyleProps>`

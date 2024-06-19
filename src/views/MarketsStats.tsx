@@ -3,7 +3,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
-import { MarketFilters, MarketSorting } from '@/constants/markets';
+import { MarketSorting } from '@/constants/markets';
 
 import { useStringGetter } from '@/hooks/useStringGetter';
 
@@ -35,7 +35,7 @@ export const MarketsStats = (props: MarketsStatsProps) => {
             <$NewTag>{stringGetter({ key: STRING_KEYS.NEW })}</$NewTag>
           </$RecentlyListed>
         </$SectionHeader>
-        <MarketsCompactTable filters={MarketFilters.NEW} />
+        <MarketsCompactTable sorting={MarketSorting.HIGHEST_CLOB_PAIR_ID} />
       </$Section>
       <$Section>
         <$SectionHeader>

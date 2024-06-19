@@ -9,11 +9,13 @@ export type NumberValueProps = {
 };
 
 export const NumberValue = ({ className, value, withSubscript }: NumberValueProps) => {
-  const { significantDigits, decimalDigits, zeros, punctuationSymbol } = formatZeroNumbers(value);
+  const { currencySign, significantDigits, decimalDigits, zeros, punctuationSymbol } =
+    formatZeroNumbers(value);
 
   if (withSubscript) {
     return (
       <span className={className}>
+        {currencySign}
         {significantDigits}
         {punctuationSymbol}
         {Boolean(zeros) && (

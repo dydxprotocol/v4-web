@@ -262,7 +262,7 @@ const $Item = styled.div<{
 
   /* > label { */
   /* > dt { */
-  > :first-child {x
+  > :first-child {
     color: var(--color-text-0);
 
     // Tooltip Icon centering when display: inline
