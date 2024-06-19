@@ -19,7 +19,6 @@ import { Details } from '@/components/Details';
 import { LoadingSpace } from '@/components/Loading/LoadingSpinner';
 import { Output, OutputType } from '@/components/Output';
 import { ColumnDef, CustomRowConfig, TableRow } from '@/components/Table';
-import { WithTooltip } from '@/components/WithTooltip';
 
 import { calculateCanViewAccount } from '@/state/accountCalculators';
 import { getSubaccountOrderSizeBySideAndPrice } from '@/state/accountSelectors';
@@ -27,7 +26,11 @@ import { useAppDispatch, useAppSelector } from '@/state/appTypes';
 import { getCurrentMarketAssetData } from '@/state/assetsSelectors';
 import { setTradeFormInputs } from '@/state/inputs';
 import { getCurrentInput } from '@/state/inputsSelectors';
-import { getCurrentMarketConfig, getCurrentMarketOrderbook } from '@/state/perpetualsSelectors';
+import {
+  getCurrentMarketConfig,
+  getCurrentMarketMidMarketPriceWithOraclePriceFallback,
+  getCurrentMarketOrderbook,
+} from '@/state/perpetualsSelectors';
 
 import { getSimpleStyledOutputType } from '@/lib/genericFunctionalComponentUtils';
 import { MustBigNumber } from '@/lib/numbers';
@@ -277,25 +280,28 @@ export const Orderbook = ({
     useCalculateOrderbookData({
       maxRowsPerSide,
     });
+  const orderbookMidMarketPrice = useAppSelector(
+    getCurrentMarketMidMarketPriceWithOraclePriceFallback
+  );
 
   const data = useMemo(() => {
     const customRow: CustomRowConfig = {
-      key: 'spread',
+      key: 'middle',
       // TODO - should probably refactor this to not break the lint rule
       // eslint-disable-next-line react/no-unstable-nested-components
       slotCustomRow: (props) => (
-        <$SpreadTableRow key="spread" {...props}>
-          <td>
-            <WithTooltip tooltip="spread">
-              {stringGetter({ key: STRING_KEYS.ORDERBOOK_SPREAD })}
-            </WithTooltip>
-          </td>
+        <$MiddleTableRow key="middle" {...props}>
+          <td>{stringGetter({ key: STRING_KEYS.PRICE })}</td>
           {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
           <td>
-            <Output type={OutputType.Number} value={spread} fractionDigits={tickSizeDecimals} />
+            <Output
+              type={OutputType.Number}
+              value={orderbookMidMarketPrice}
+              fractionDigits={tickSizeDecimals}
+              useGrouping={false}
+            />
           </td>
-          <td>{!isTablet && <Output type={OutputType.Percent} value={spreadPercent} />}</td>
-        </$SpreadTableRow>
+        </$MiddleTableRow>
       ),
     };
     return [...bids.reverse(), customRow, ...asks].reverse();
@@ -303,7 +309,7 @@ export const Orderbook = ({
 
   const onRowAction = useCallback(
     (key: Key, row: RowData) => {
-      if (currentInput === 'trade' && key !== 'spread' && row?.price) {
+      if (currentInput === 'trade' && key !== 'middle' && row?.price) {
         dispatch(
           setTradeFormInputs({
             limitPriceInput: MustBigNumber(row.price).toFixed(
@@ -336,21 +342,18 @@ export const Orderbook = ({
   ) : (
     <$HorizontalLayout className={className}>
       <$Header>
-        <$SpreadDetails
+        <$MiddleDetails
           items={[
             {
-              key: 'spread',
-              label: stringGetter({ key: STRING_KEYS.ORDERBOOK_SPREAD }),
-              tooltip: 'spread',
+              key: 'middle',
+              label: stringGetter({ key: STRING_KEYS.PRICE }),
               value: (
-                <>
-                  <Output
-                    type={OutputType.Number}
-                    value={spread}
-                    fractionDigits={tickSizeDecimals}
-                  />
-                  {!isTablet && <Output type={OutputType.Percent} value={spreadPercent} />}
-                </>
+                <Output
+                  type={OutputType.Number}
+                  value={orderbookMidMarketPrice}
+                  fractionDigits={tickSizeDecimals}
+                  useGrouping={false}
+                />
               ),
             },
           ]}
@@ -392,7 +395,7 @@ export const orderbookMixins = {
           }
         `,
 
-        // Snap orderbook scroll position to Spread row or focused row except while hovered (0.25s debounce)
+        // Snap orderbook scroll position to middle row or focused row except while hovered (0.25s debounce)
         snapToCenterUnlessHovered: () => css`
           scroll-snap-type: none;
 
@@ -564,7 +567,7 @@ const $OrderbookTable = styled(OrderbookTradesTable)<StyleProps>`
   }
 ` as typeof orderbookTableType;
 
-const $SpreadTableRow = styled(TableRow)`
+const $MiddleTableRow = styled(TableRow)`
   ${layoutMixins.sticky}
   position: sticky !important;
 
@@ -601,7 +604,7 @@ const $SpreadTableRow = styled(TableRow)`
   }
 `;
 
-const $SpreadDetails = styled(Details)<{ asTableCells?: boolean }>`
+const $MiddleDetails = styled(Details)<{ asTableCells?: boolean }>`
   /* Overrides */
   --details-item-backgroundColor: var(--color-layer-2);
   --details-value-font: var(--font-mini-book);

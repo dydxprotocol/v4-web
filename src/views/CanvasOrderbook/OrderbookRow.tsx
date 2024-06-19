@@ -50,9 +50,10 @@ export const OrderbookMiddleRow = forwardRef<HTMLDivElement, StyleProps & Elemen
         <span>{stringGetter({ key: STRING_KEYS.PRICE })}</span>
         <$PriceOutputSpan>
           <$Output
-            type={OutputType.Fiat}
+            type={OutputType.Number}
             value={orderbookMidMarketPrice}
             fractionDigits={tickSizeDecimals}
+            useGrouping={false}
           />
         </$PriceOutputSpan>
         <span /> {/* Empty cell */}
@@ -74,7 +75,7 @@ const $OrderbookMiddleRow = styled(OrderbookRow)<{ side?: 'top' | 'bottom' }>`
       bottom: css`
         border-bottom: none;
       `,
-    }[side]}
+    }[side]};
 `;
 
 // matching the output height and styling with price span
