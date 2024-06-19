@@ -36,7 +36,7 @@ export const ValidatorFaviconIcon = ({
   return null;
 };
 
-export const ValidatorName = ({ validator }: { validator: Validator }) => {
+export const ValidatorName = ({ validator }: { validator?: Validator }) => {
   const output = (
     <$Output
       type={OutputType.Text}
