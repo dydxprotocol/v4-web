@@ -50,42 +50,38 @@ export const ExchangeBillboards: React.FC<ExchangeBillboardsProps> = () => {
           labelKey: STRING_KEYS.EARNED_BY_STAKERS,
           tagKey: STRING_KEYS._24H,
           value: feesEarned,
-          type: OutputType.CompactFiat,
+          type: OutputType.Fiat,
           linkLabelKey: STRING_KEYS.LEARN_MORE_ARROW,
           link: `${chainTokenLabel}/${TokenRoute.StakingRewards}`,
-          slotLeft: '~',
         },
-      ].map(
-        ({ key, labelKey, tagKey, value, fractionDigits, type, link, linkLabelKey, slotLeft }) => (
-          <$BillboardContainer key={key}>
-            <$BillboardStat>
-              <$BillboardTitle>
-                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-                <label>{stringGetter({ key: labelKey })}</label>
-                <Tag>{stringGetter({ key: tagKey })}</Tag>
-              </$BillboardTitle>
-              <$Output
-                useGrouping
-                withBaseFont
-                fractionDigits={fractionDigits}
-                type={type}
-                value={value}
-                slotLeft={slotLeft}
-              />
-              {link && linkLabelKey ? (
-                <$BillboardLink
-                  href={link}
-                  size={ButtonSize.Small}
-                  type={ButtonType.Link}
-                  action={ButtonAction.Navigation}
-                >
-                  {stringGetter({ key: linkLabelKey })}
-                </$BillboardLink>
-              ) : null}
-            </$BillboardStat>
-          </$BillboardContainer>
-        )
-      )}
+      ].map(({ key, labelKey, tagKey, value, fractionDigits, type, link, linkLabelKey }) => (
+        <$BillboardContainer key={key}>
+          <$BillboardStat>
+            <$BillboardTitle>
+              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+              <label>{stringGetter({ key: labelKey })}</label>
+              <Tag>{stringGetter({ key: tagKey })}</Tag>
+            </$BillboardTitle>
+            <$Output
+              useGrouping
+              withBaseFont
+              fractionDigits={fractionDigits}
+              type={type}
+              value={value}
+            />
+            {link && linkLabelKey ? (
+              <$BillboardLink
+                href={link}
+                size={ButtonSize.Small}
+                type={ButtonType.Link}
+                action={ButtonAction.Navigation}
+              >
+                {stringGetter({ key: linkLabelKey })}
+              </$BillboardLink>
+            ) : null}
+          </$BillboardStat>
+        </$BillboardContainer>
+      ))}
     </$MarketBillboardsWrapper>
   );
 };
