@@ -128,7 +128,7 @@ export const useStakingValidator = () => {
     setSelectedValidator,
     availableValidators: data?.availableValidators,
     stakingValidators: data?.stakingValidators,
-    unbondingValidator: data?.unbondingValidators,
+    unbondingValidators: data?.unbondingValidators,
     currentDelegations,
   };
 };
