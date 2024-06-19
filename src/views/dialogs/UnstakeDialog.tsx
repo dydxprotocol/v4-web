@@ -1,4 +1,3 @@
-import { UnstakeForm } from '@/forms/UnstakeForm';
 import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
@@ -8,6 +7,7 @@ import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
 import { AssetIcon } from '@/components/AssetIcon';
 import { Dialog } from '@/components/Dialog';
+import { UnstakeForm } from '@/views/forms/UnstakeForm';
 
 type ElementProps = {
   setIsOpen?: (open: boolean) => void;
