@@ -1,4 +1,4 @@
-import { memo, useMemo, useState } from 'react';
+import { Dispatch, SetStateAction, memo, useCallback, useMemo, useState } from 'react';
 
 import { Validator } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/cosmos/staking/v1beta1/staking';
 import styled from 'styled-components';
@@ -27,8 +27,12 @@ import { MustBigNumber } from '@/lib/numbers';
 
 const ValidatorsDropdownContent = ({
   availableValidators,
+  setSelectedValidator,
+  setIsPopoverOpen,
 }: {
   availableValidators: Validator[];
+  setSelectedValidator: Dispatch<SetStateAction<Validator>>;
+  setIsPopoverOpen: (isOpen: boolean) => void;
 }) => {
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
@@ -86,6 +90,14 @@ const ValidatorsDropdownContent = ({
     return validators;
   }, []);
 
+  const onRowAction = useCallback(
+    (key: string) => {
+      setSelectedValidator(availableValidators.find((v) => v.operatorAddress === key));
+      setIsPopoverOpen(false);
+    },
+    [setSelectedValidator, setIsPopoverOpen, availableValidators]
+  );
+
   return (
     <$ScrollArea>
       <$Table
@@ -93,7 +105,7 @@ const ValidatorsDropdownContent = ({
         label="Validators"
         data={filteredValidators}
         getRowKey={(row: ValidatorData) => row.operatorAddress}
-        // onRowAction // TODO: OTE-449
+        onRowAction={onRowAction}
         columns={columns}
         defaultSortDescriptor={{
           column: 'commission',
@@ -116,7 +128,8 @@ const ValidatorsDropdownContent = ({
 };
 
 export const ValidatorDropdown = memo(() => {
-  const { selectedValidator, availableValidators } = useStakingValidator() ?? {};
+  const { availableValidators, selectedValidator, setSelectedValidator } =
+    useStakingValidator() ?? {};
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -130,14 +143,13 @@ export const ValidatorDropdown = memo(() => {
           fallbackText={selectedValidator?.description?.moniker}
         />
       }
-      slotRight={<$DropdownIcon iconName={IconName.Caret} isOpen={isOpen} />}
     />
   );
 
   const slotTrigger = selectedValidator?.description?.website ? (
-    <Link href={selectedValidator?.description?.website} withIcon>
+    <$Link href={selectedValidator?.description?.website} withIcon>
       {output}
-    </Link>
+    </$Link>
   ) : (
     output
   );
@@ -146,13 +158,22 @@ export const ValidatorDropdown = memo(() => {
     <$Popover
       open={isOpen}
       onOpenChange={setIsOpen}
-      slotTrigger={slotTrigger}
+      slotTrigger={
+        <$Trigger>
+          {slotTrigger}
+          <$DropdownIcon iconName={IconName.Caret} isOpen={isOpen} />
+        </$Trigger>
+      }
       triggerType={TriggerType.MarketDropdown}
       align="end"
       sideOffset={8}
       withPortal
     >
-      <ValidatorsDropdownContent availableValidators={availableValidators ?? []} />
+      <ValidatorsDropdownContent
+        availableValidators={availableValidators ?? []}
+        setSelectedValidator={setSelectedValidator}
+        setIsPopoverOpen={setIsOpen}
+      />
     </$Popover>
   );
 });
@@ -176,7 +197,16 @@ const $Table = styled(Table)`
   --tableCell-padding: 0.5rem 1rem;
 ` as typeof Table;
 
+const $Trigger = styled.span`
+  display: flex;
+  align-items: center;
+`;
+
 const $Output = styled(Output)`
+  color: var(--color-text-1);
+`;
+
+const $Link = styled(Link)`
   color: var(--color-text-1);
 `;
 

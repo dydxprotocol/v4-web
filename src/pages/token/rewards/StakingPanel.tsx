@@ -82,7 +82,7 @@ export const StakingPanel = ({ className }: { className?: string }) => {
             </$label>
             <$BalanceOutput type={OutputType.Asset} value={nativeTokenBalance} />
           </div>
-          {canAccountTrade && selectedValidator && (
+          {canAccountTrade && (
             <div>
               <Button
                 action={ButtonAction.Primary}
