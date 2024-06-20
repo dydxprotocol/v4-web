@@ -31,9 +31,11 @@ export const StakeDialog = ({ setIsOpen }: ElementProps) => {
       title={
         <$Title>
           {stringGetter({ key: STRING_KEYS.STAKE })}
-          <Tag sign={TagSign.Positive}>
-            {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: stakingApr } })}
-          </Tag>
+          {stakingApr && (
+            <Tag sign={TagSign.Positive}>
+              {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: stakingApr } })}
+            </Tag>
+          )}
         </$Title>
       }
     >
