@@ -2,6 +2,7 @@ import styled from 'styled-components';
 
 import { STRING_KEYS } from '@/constants/localization';
 
+import { useStakingAPR } from '@/hooks/useStakingAPR';
 import { useStringGetter } from '@/hooks/useStringGetter';
 import { useTokenConfigs } from '@/hooks/useTokenConfigs';
 
@@ -20,7 +21,7 @@ export const StakeDialog = ({ setIsOpen }: ElementProps) => {
   const stringGetter = useStringGetter();
 
   const { chainTokenLabel } = useTokenConfigs();
-  const apr = 16.94; /* OTE-406: Hardcoded for now until I get the APY endpoint working */
+  const stakingApr = useStakingAPR();
 
   return (
     <$Dialog
@@ -31,7 +32,7 @@ export const StakeDialog = ({ setIsOpen }: ElementProps) => {
         <$Title>
           {stringGetter({ key: STRING_KEYS.STAKE })}
           <Tag sign={TagSign.Positive}>
-            {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: apr } })}
+            {stringGetter({ key: STRING_KEYS.EST_APR, params: { PERCENTAGE: stakingApr } })}
           </Tag>
         </$Title>
       }
