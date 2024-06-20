@@ -1,6 +1,9 @@
 import { useState } from 'react';
 
-import { Validator } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/cosmos/staking/v1beta1/staking';
+import {
+  BondStatus,
+  Validator,
+} from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/cosmos/staking/v1beta1/staking';
 import { useQuery } from '@tanstack/react-query';
 import { groupBy } from 'lodash';
 import { shallowEqual } from 'react-redux';
@@ -52,7 +55,8 @@ export const useStakingValidator = () => {
     // Filter out jailed and unbonded validators
     const availableValidators =
       response?.validators.filter(
-        (validator: Validator) => validator.status === 3 && validator.jailed === false
+        (validator: Validator) =>
+          validator.status === BondStatus.BOND_STATUS_BONDED && validator.jailed === false
       ) ?? [];
 
     // Sort validators 1/ in ascending commission and 2/ by descending stake weight
@@ -108,7 +112,6 @@ export const useStakingValidator = () => {
       ) ?? [];
 
     return {
-      validatorWithFewestTokens,
       availableValidators,
       stakingValidators: groupBy(stakingValidators, ({ operatorAddress }) => operatorAddress),
       unbondingValidators: groupBy(unbondingValidators, ({ operatorAddress }) => operatorAddress),
