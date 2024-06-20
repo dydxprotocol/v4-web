@@ -657,7 +657,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 />
               ),
             },
-            [localCancel.submissionStatus],
+            [localCancel.submissionStatus, localCancel.errorStringKey],
             true
           );
         }

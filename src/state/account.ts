@@ -236,6 +236,12 @@ export const accountSlice = createSlice({
         .filter((order) => isOrderStatusCanceled(order.status))
         .map((order) => order.id);
 
+      // ignore locally canceled orders since it's intentional and already handled
+      // by local cancel tracking and notification
+      const isOrderCanceledByBackend = (orderId: string) =>
+        canceledOrderIdsInPayload.includes(orderId) &&
+        !state.localCancelOrders.map((order) => order.orderId).includes(orderId);
+
       return {
         ...state,
         subaccount: action.payload,
@@ -244,7 +250,7 @@ export const accountSlice = createSlice({
           ? state.localPlaceOrders.map((order) =>
               order.submissionStatus !== PlaceOrderStatuses.Canceled &&
               order.orderId &&
-              canceledOrderIdsInPayload.includes(order.orderId)
+              isOrderCanceledByBackend(order.orderId)
                 ? {
                     ...order,
                     submissionStatus: PlaceOrderStatuses.Canceled,
