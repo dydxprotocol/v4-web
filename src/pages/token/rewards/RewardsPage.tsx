@@ -8,7 +8,7 @@ import { formatUnits } from 'viem';
 import { HistoricalTradingRewardsPeriod } from '@/constants/abacus';
 import { ComplianceStates } from '@/constants/compliance';
 import { STRING_KEYS } from '@/constants/localization';
-import { AppRoute } from '@/constants/routes';
+import { AppRoute, BASE_ROUTE } from '@/constants/routes';
 
 import { useAccountBalance } from '@/hooks/useAccountBalance';
 import { useBreakpoints } from '@/hooks/useBreakpoints';
@@ -92,7 +92,11 @@ const RewardsPage = () => {
       {stringGetter({
         key: STRING_KEYS.TRADING_REWARDS_LEGAL_DISCLAIMER,
         params: {
-          TERMS_OF_USE_LINK: <$Link>{stringGetter({ key: STRING_KEYS.TERMS_OF_USE })} </$Link>,
+          TERMS_OF_USE_LINK: (
+            <$Link href={`${BASE_ROUTE}${AppRoute.Terms}`}>
+              {stringGetter({ key: STRING_KEYS.TERMS_OF_USE })}
+            </$Link>
+          ),
         },
       })}
     </$LegalDisclaimer>
