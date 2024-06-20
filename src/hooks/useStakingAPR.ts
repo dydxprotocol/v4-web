@@ -20,14 +20,14 @@ export const useStakingAPR = () => {
   };
 
   const { data } = useQuery({
-    queryKey: ['stakingAPY'],
+    queryKey: ['stakingAPR'],
     queryFn,
     enabled: true,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
 
-  const formatedAPR = data ? (data * 100).toFixed(2) : undefined;
+  const formattedAPR = data ? (data * 100).toFixed(2) : undefined;
 
-  return formatedAPR;
+  return formattedAPR;
 };
