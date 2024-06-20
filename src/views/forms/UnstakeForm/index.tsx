@@ -251,15 +251,15 @@ export const UnstakeForm = ({ onDone, className }: UnstakeFormProps) => {
             {stringGetter({
               key: STRING_KEYS.VALIDATOR,
             })}
-          </div>
+          </div>g
           <$SpacedRow>
             {stringGetter({
               key: STRING_KEYS.AMOUNT_TO_UNSTAKE,
             })}
             {showClearButton ? (
-              <$ClearButton onClick={clearAllUnstakeAmounts} action={ButtonAction.Reset}>
+              <$Button onClick={clearAllUnstakeAmounts} action={ButtonAction.Reset}>
                 {stringGetter({ key: STRING_KEYS.CLEAR })}
-              </$ClearButton>
+              </$Button>
             ) : (
               <$AllButton onClick={setAllUnstakeAmountsToMax}>
                 {stringGetter({ key: STRING_KEYS.ALL })}
@@ -352,8 +352,6 @@ const $Button = styled(Button)`
   --button-height: auto;
   --button-hover-filter: none;
 `;
-
-const $ClearButton = styled($Button)``;
 
 const $AllButton = styled($Button)`
   --button-textColor: var(--color-accent);
