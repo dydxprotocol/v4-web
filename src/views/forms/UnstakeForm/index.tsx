@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { formatUnits } from 'viem';
 
 import { AlertType } from '@/constants/alerts';
+import { ButtonAction } from '@/constants/buttons';
 import { STRING_KEYS } from '@/constants/localization';
 import { NumberSign } from '@/constants/numbers';
 
@@ -31,8 +32,6 @@ import { UnstakeButtonAndReceipt } from '@/views/forms/UnstakeForm/UnstakeButton
 
 import { BigNumberish, MustBigNumber } from '@/lib/numbers';
 import { log } from '@/lib/telemetry';
-
-import { ButtonAction } from '../../../constants/buttons';
 
 type UnstakeFormProps = {
   onDone?: () => void;

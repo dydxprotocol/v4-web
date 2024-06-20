@@ -84,7 +84,7 @@ export const UnstakeButtonAndReceipt = ({
       alert={error}
       buttonText={
         allAmountsEmpty
-          ? stringGetter({ key: STRING_KEYS.ENTER_AMOUNT_TO_STAKE }) // xcxc
+          ? stringGetter({ key: STRING_KEYS.ENTER_AMOUNT_TO_UNSTAKE })
           : stringGetter({ key: STRING_KEYS.UNSTAKE })
       }
       gasFee={fee}
