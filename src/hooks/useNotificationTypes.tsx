@@ -624,7 +624,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 />
               ),
             },
-            [localPlace.submissionStatus],
+            [localPlace.submissionStatus, localPlace.errorStringKey],
             true
           );
         }
@@ -638,6 +638,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
           if (!existingOrder) return;
 
           // share same notification with existing local order if exists
+          // so that canceling a local order will not add an extra notification
           const key = (existingOrder.clientId ?? localCancel.orderId).toString();
 
           trigger(
@@ -656,7 +657,7 @@ export const notificationTypes: NotificationTypeConfig[] = [
                 />
               ),
             },
-            [localCancel.submissionStatus],
+            [localCancel.submissionStatus, localCancel.errorStringKey],
             true
           );
         }

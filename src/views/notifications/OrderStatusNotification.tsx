@@ -67,24 +67,33 @@ export const OrderStatusNotification = ({
   switch (submissionStatus) {
     case PlaceOrderStatuses.Placed:
     case PlaceOrderStatuses.Filled:
+    case PlaceOrderStatuses.Canceled:
       if (indexedOrderStatus) {
         // skip pending / best effort open state -> still show as submitted (loading)
         if (indexedOrderStatus === AbacusOrderStatus.Pending.rawValue) break;
 
         orderStatusStringKey = ORDER_STATUS_STRINGS[indexedOrderStatus];
         orderStatusIcon = <$OrderStatusIcon status={indexedOrderStatus} />;
-      }
-      if (order && fill) {
-        customContent = (
-          <FillDetails
-            orderSide={ORDER_SIDES[order.side.name]}
-            tradeType={getTradeType(order.type.rawValue) ?? undefined}
-            filledAmount={order.totalFilled}
-            assetId={assetId}
-            averagePrice={order.price}
-            tickSizeDecimals={marketData?.configs?.displayTickSizeDecimals ?? USD_DECIMALS}
-          />
-        );
+
+        if (order && fill) {
+          customContent = (
+            <FillDetails
+              orderSide={ORDER_SIDES[order.side.name]}
+              tradeType={getTradeType(order.type.rawValue) ?? undefined}
+              filledAmount={order.totalFilled}
+              assetId={assetId}
+              averagePrice={order.price}
+              tickSizeDecimals={marketData?.configs?.displayTickSizeDecimals ?? USD_DECIMALS}
+            />
+          );
+        } else if (
+          indexedOrderStatus === AbacusOrderStatus.Canceled.rawValue &&
+          order?.cancelReason
+        ) {
+          // when there's no fill and has a cancel reason, i.e. just plain canceled
+          const cancelReason = order.cancelReason as keyof typeof STRING_KEYS;
+          customContent = <span>{stringGetter({ key: STRING_KEYS[cancelReason] })}</span>;
+        }
       }
       break;
     case PlaceOrderStatuses.Submitted:

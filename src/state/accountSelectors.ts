@@ -16,7 +16,12 @@ import {
 import { NUM_PARENT_SUBACCOUNTS, OnboardingState } from '@/constants/account';
 import { LEVERAGE_DECIMALS } from '@/constants/numbers';
 
-import { getHydratedTradingData, isStopLossOrder, isTakeProfitOrder } from '@/lib/orders';
+import {
+  getHydratedTradingData,
+  isOrderStatusClearable,
+  isStopLossOrder,
+  isTakeProfitOrder,
+} from '@/lib/orders';
 import { getHydratedPositionData } from '@/lib/positions';
 
 import { type RootState } from './_store';
@@ -195,10 +200,7 @@ export const getCurrentMarketOrders = createAppSelector(
  * @returns list of orders that have not been filled or cancelled
  */
 export const getSubaccountOpenOrders = createAppSelector([getSubaccountOrders], (orders) =>
-  orders?.filter(
-    (order) =>
-      order.status !== AbacusOrderStatus.Filled && order.status !== AbacusOrderStatus.Canceled
-  )
+  orders?.filter((order) => isOpenOrderStatus(order.status))
 );
 
 export const getOpenIsolatedOrders = createAppSelector(
@@ -498,9 +500,7 @@ export const getCurrentMarketFundingPayments = createAppSelector(
  * @param state
  * @returns boolean on whether an order status is considered open
  */
-const isOpenOrderStatus = (status: AbacusOrderStatuses) => {
-  return status !== AbacusOrderStatus.Filled && status !== AbacusOrderStatus.Canceled;
-};
+const isOpenOrderStatus = (status: AbacusOrderStatuses) => !isOrderStatusClearable(status);
 
 /**
  * @param state
