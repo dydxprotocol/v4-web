@@ -1,18 +1,15 @@
-import { useCallback } from 'react';
-
-import { StargateClient } from '@cosmjs/stargate';
-import { useQuery } from '@tanstack/react-query';
+import { useBalance as useBalanceGraz } from 'graz';
 import { shallowEqual } from 'react-redux';
 import { formatUnits } from 'viem';
-import { useBalance } from 'wagmi';
+import { useBalance as useBalanceWagmi } from 'wagmi';
 
 import { EvmAddress } from '@/constants/wallets';
 
 import { getBalances, getStakingBalances } from '@/state/accountSelectors';
 import { useAppSelector } from '@/state/appTypes';
 
-import { convertBech32Address } from '@/lib/addressUtils';
 import { MustBigNumber } from '@/lib/numbers';
+import { getNobleChainId } from '@/lib/squid';
 
 import { useAccounts } from './useAccounts';
 import { useEnvConfig } from './useEnvConfig';
@@ -21,12 +18,9 @@ import { useTokenConfigs } from './useTokenConfigs';
 type UseAccountBalanceProps = {
   // Token Items
   addressOrDenom?: string;
-  decimals?: number;
 
   // Chain Items
   chainId?: string | number;
-  bech32AddrPrefix?: string;
-  rpc?: string;
 
   isCosmosChain?: boolean;
 };
@@ -39,20 +33,17 @@ export const CHAIN_DEFAULT_TOKEN_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeee
 
 export const useAccountBalance = ({
   addressOrDenom,
-  bech32AddrPrefix,
   chainId,
-  decimals = 0,
-  rpc,
   isCosmosChain,
 }: UseAccountBalanceProps = {}) => {
-  const { evmAddress, dydxAddress } = useAccounts();
+  const { evmAddress, nobleAddress } = useAccounts();
 
   const balances = useAppSelector(getBalances, shallowEqual);
-  const { chainTokenDenom, usdcDenom } = useTokenConfigs();
+  const { chainTokenDenom, usdcDenom, usdcGasDenom, usdcDecimals } = useTokenConfigs();
   const evmChainId = Number(useEnvConfig('ethereumChainId'));
   const stakingBalances = useAppSelector(getStakingBalances, shallowEqual);
 
-  const evmQuery = useBalance({
+  const evmQuery = useBalanceWagmi({
     enabled: Boolean(!isCosmosChain && addressOrDenom?.startsWith('0x')),
     address: evmAddress,
     chainId: typeof chainId === 'number' ? chainId : Number(evmChainId),
@@ -61,39 +52,21 @@ export const useAccountBalance = ({
     watch: true,
   });
 
-  const cosmosQueryFn = useCallback(async () => {
-    if (dydxAddress && bech32AddrPrefix && rpc && addressOrDenom) {
-      const address = convertBech32Address({
-        address: dydxAddress,
-        bech32Prefix: bech32AddrPrefix,
-      });
-
-      const client = await StargateClient.connect(rpc);
-      const balanceAsCoin = await client.getBalance(address, addressOrDenom);
-      await client.disconnect();
-
-      return formatUnits(BigInt(balanceAsCoin.amount), decimals);
-    }
-    return undefined;
-  }, [addressOrDenom, chainId, rpc]);
-
-  const cosmosQuery = useQuery({
-    enabled: Boolean(isCosmosChain && dydxAddress && bech32AddrPrefix && rpc && addressOrDenom),
-    queryKey: ['accountBalances', chainId, addressOrDenom],
-    queryFn: cosmosQueryFn,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    refetchInterval: 10_000,
-    staleTime: 10_000,
+  const cosmosQuery = useBalanceGraz({
+    chainId: getNobleChainId(),
+    bech32Address: nobleAddress,
+    denom: usdcGasDenom,
+    enabled: Boolean(isCosmosChain),
   });
 
   const { formatted: evmBalance } = evmQuery.data ?? {};
-  const balance = isCosmosChain ? cosmosQuery.data : evmBalance;
+  const { amount: cosmosBalance } = cosmosQuery.data ?? {};
+  const balance = isCosmosChain
+    ? formatUnits(BigInt(cosmosBalance ?? 0), usdcDecimals)
+    : evmBalance;
 
   const nativeTokenCoinBalance = balances?.[chainTokenDenom];
   const nativeTokenBalance = MustBigNumber(nativeTokenCoinBalance?.amount);
-
   const usdcCoinBalance = balances?.[usdcDenom];
   const usdcBalance = MustBigNumber(usdcCoinBalance?.amount).toNumber();
 
@@ -106,6 +79,6 @@ export const useAccountBalance = ({
     nativeStakingBalance,
     usdcBalance,
     queryStatus: isCosmosChain ? cosmosQuery.status : evmQuery.status,
-    isQueryFetching: isCosmosChain ? cosmosQuery.isFetching : evmQuery.fetchStatus === 'fetching',
+    isQueryFetching: isCosmosChain ? cosmosQuery.isFetching : evmQuery.isFetching,
   };
 };
