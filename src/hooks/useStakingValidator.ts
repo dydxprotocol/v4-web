@@ -99,8 +99,6 @@ export const useStakingValidator = () => {
       }
     );
 
-    setSelectedValidator(validatorWithFewestTokens);
-
     const stakingValidators =
       response?.validators.filter((validator) =>
         currentDelegations?.some((d) => d.validator === validator.operatorAddress.toLowerCase())
@@ -112,6 +110,7 @@ export const useStakingValidator = () => {
       ) ?? [];
 
     return {
+      validatorWithFewestTokens,
       availableValidators,
       stakingValidators: groupBy(stakingValidators, ({ operatorAddress }) => operatorAddress),
       unbondingValidators: groupBy(unbondingValidators, ({ operatorAddress }) => operatorAddress),
@@ -129,6 +128,7 @@ export const useStakingValidator = () => {
   return {
     selectedValidator,
     setSelectedValidator,
+    defaultValidator: data?.validatorWithFewestTokens,
     availableValidators: data?.availableValidators,
     stakingValidators: data?.stakingValidators,
     unbondingValidators: data?.unbondingValidators,

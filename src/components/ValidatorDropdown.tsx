@@ -136,56 +136,62 @@ const ValidatorsDropdownContent = ({
   );
 };
 
-export const ValidatorDropdown = memo(() => {
-  const { availableValidators, selectedValidator, setSelectedValidator } =
-    useStakingValidator() ?? {};
+type ElementProps = {
+  selectedValidator: Validator | undefined;
+  setSelectedValidator: Dispatch<SetStateAction<Validator | undefined>>;
+};
 
-  const [isOpen, setIsOpen] = useState(false);
+export const ValidatorDropdown = memo(
+  ({ selectedValidator, setSelectedValidator }: ElementProps) => {
+    const { availableValidators } = useStakingValidator() ?? {};
 
-  const output = (
-    <$Output
-      type={OutputType.Text}
-      value={selectedValidator?.description?.moniker}
-      slotLeft={
-        <ValidatorFaviconIcon
-          url={selectedValidator?.description?.website}
-          fallbackText={selectedValidator?.description?.moniker}
-        />
-      }
-    />
-  );
+    const [isOpen, setIsOpen] = useState(false);
 
-  const slotTrigger = selectedValidator?.description?.website ? (
-    <$Link href={selectedValidator?.description?.website} withIcon>
-      {output}
-    </$Link>
-  ) : (
-    output
-  );
-
-  return (
-    <$Popover
-      open={isOpen}
-      onOpenChange={setIsOpen}
-      slotTrigger={
-        <$Trigger>
-          {slotTrigger}
-          <$DropdownIcon iconName={IconName.Caret} isOpen={isOpen} />
-        </$Trigger>
-      }
-      triggerType={TriggerType.MarketDropdown}
-      align="end"
-      sideOffset={8}
-      withPortal
-    >
-      <ValidatorsDropdownContent
-        availableValidators={availableValidators ?? []}
-        setSelectedValidator={setSelectedValidator}
-        setIsPopoverOpen={setIsOpen}
+    const output = (
+      <$Output
+        type={OutputType.Text}
+        value={selectedValidator?.description?.moniker}
+        slotLeft={
+          <ValidatorFaviconIcon
+            url={selectedValidator?.description?.website}
+            fallbackText={selectedValidator?.description?.moniker}
+          />
+        }
       />
-    </$Popover>
-  );
-});
+    );
+
+    const slotTrigger = selectedValidator?.description?.website ? (
+      <$Link href={selectedValidator?.description?.website} withIcon>
+        {output}
+      </$Link>
+    ) : (
+      output
+    );
+
+    return (
+      <$Popover
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        slotTrigger={
+          <$Trigger>
+            {slotTrigger}
+            <$DropdownIcon iconName={IconName.Caret} isOpen={isOpen} />
+          </$Trigger>
+        }
+        triggerType={TriggerType.MarketDropdown}
+        align="end"
+        sideOffset={8}
+        withPortal
+      >
+        <ValidatorsDropdownContent
+          availableValidators={availableValidators ?? []}
+          setSelectedValidator={setSelectedValidator}
+          setIsPopoverOpen={setIsOpen}
+        />
+      </$Popover>
+    );
+  }
+);
 
 const $ScrollArea = styled.div`
   ${layoutMixins.scrollArea}

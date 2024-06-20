@@ -1,3 +1,6 @@
+import { Dispatch, SetStateAction } from 'react';
+
+import { Validator } from '@dydxprotocol/v4-client-js/build/node_modules/@dydxprotocol/v4-proto/src/codegen/cosmos/staking/v1beta1/staking';
 import { SelectedGasDenom } from '@dydxprotocol/v4-client-js/src/clients/constants';
 import styled from 'styled-components';
 
@@ -24,9 +27,18 @@ type ElementProps = {
   fee?: BigNumberish;
   amount?: number;
   isLoading: boolean;
+  selectedValidator: Validator | undefined;
+  setSelectedValidator: Dispatch<SetStateAction<Validator | undefined>>;
 };
 
-export const StakeButtonAndReceipt = ({ error, fee, amount, isLoading }: ElementProps) => {
+export const StakeButtonAndReceipt = ({
+  error,
+  fee,
+  amount,
+  isLoading,
+  selectedValidator,
+  setSelectedValidator,
+}: ElementProps) => {
   const stringGetter = useStringGetter();
   const { chainTokenLabel } = useTokenConfigs();
   const { mintscanValidatorsLearnMore } = useURLConfigs();
@@ -55,7 +67,12 @@ export const StakeButtonAndReceipt = ({ error, fee, amount, isLoading }: Element
           })}
         </WithTooltip>
       ),
-      value: <ValidatorDropdown />,
+      value: (
+        <ValidatorDropdown
+          selectedValidator={selectedValidator}
+          setSelectedValidator={setSelectedValidator}
+        />
+      ),
     },
     {
       key: 'fees',

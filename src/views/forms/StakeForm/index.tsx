@@ -47,7 +47,7 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
 
   const { delegate, getDelegateFee } = useSubaccount();
   const { nativeTokenBalance: balance } = useAccountBalance();
-  const { selectedValidator } = useStakingValidator() ?? {};
+  const { selectedValidator, setSelectedValidator, defaultValidator } = useStakingValidator() ?? {};
   const { chainTokenLabel, chainTokenDecimals } = useTokenConfigs();
 
   // Form states
@@ -61,6 +61,11 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
   const maxAmountBN = MustBigNumber(balance.toNumber() - AMOUNT_RESERVED_FOR_GAS_DYDX);
 
   const isAmountValid = amountBN && amountBN.gt(0) && amountBN.lte(maxAmountBN);
+
+  useEffect(() => {
+    // Initalize to default validator once on mount
+    setSelectedValidator(defaultValidator);
+  }, []);
 
   useEffect(() => {
     if (amountBN && !isAmountValid) {
@@ -188,6 +193,8 @@ export const StakeForm = ({ onDone, className }: StakeFormProps) => {
           fee={fee}
           isLoading={isLoading}
           amount={amountBN?.toNumber()}
+          selectedValidator={selectedValidator}
+          setSelectedValidator={setSelectedValidator}
         />
         <$LegalDisclaimer>
           {stringGetter({
