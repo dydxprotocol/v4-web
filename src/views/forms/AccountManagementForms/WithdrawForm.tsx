@@ -151,7 +151,7 @@ export const WithdrawForm = () => {
   }, [debouncedAmountBN]);
 
   const { screenAddresses } = useDydxClient();
-  const { dydxAddress } = useAccounts();
+  const { dydxAddress, nobleAddress } = useAccounts();
 
   const onSubmit = useCallback(
     async (e: FormEvent) => {
@@ -296,7 +296,20 @@ export const WithdrawForm = () => {
         value: 'coinbase',
       });
     }
-  }, [walletType]);
+    if (walletType === WalletType.Keplr) {
+      if (dydxAddress) {
+        abacusStateManager.setTransfersSourceAddress(dydxAddress);
+      }
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.chain,
+        value: getNobleChainId(),
+      });
+      abacusStateManager.setTransferValue({
+        field: TransferInputField.address,
+        value: nobleAddress,
+      });
+    }
+  }, [walletType, nobleAddress, dydxAddress]);
 
   const onSelectNetwork = useCallback((name: string, type: 'chain' | 'exchange') => {
     if (name) {
